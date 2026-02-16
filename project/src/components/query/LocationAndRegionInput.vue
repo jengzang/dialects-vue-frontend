@@ -5,7 +5,17 @@
 
       <!-- ✅ 地點輸入框 -->
       <div class="location-input">
-        <label for="locations">地點</label>
+        <div class="location-header">
+          <label for="locations">地點</label>
+          <button
+              class="select-location-btn"
+              @click="openPartitionModalWithSelection"
+              type="button"
+              title="從分區選擇地點"
+          >
+            選擇地點
+          </button>
+        </div>
         <div class="textarea-wrapper">
           <textarea
               id="locations"
@@ -215,60 +225,25 @@
     </Teleport>
 
     <!-- 分区详情弹窗 -->
-    <Teleport to="body">
-      <div v-if="showPartitionInfoModal" class="glass-overlay" @mousedown.self="closePartitionInfoModal">
-        <div class="partition-info-modal glass-modal" role="dialog" aria-modal="true">
-          <!-- 头部 -->
-          <div class="modal-header">
-            <div class="modal-title">🗺️ 分區詳情</div>
-            <button class="modal-close" type="button" @click="closePartitionInfoModal">×</button>
-          </div>
-
-          <!-- Tab 切换 -->
-          <div class="partition-tabs">
-            <button
-                v-for="tab in ['map', 'yindian']"
-                :key="tab"
-                class="partition-tab-btn"
-                :class="{ active: partitionTabActive === tab }"
-                @click="partitionTabActive = tab"
-            >
-              {{ tab === 'map' ? '地圖集二分區' : '音典分區' }}
-            </button>
-          </div>
-
-          <!-- 主体：树状图 -->
-          <div class="modal-body">
-            <div v-if="isLoadingPartitions" class="loading-state">
-              <div class="spinner"></div>
-              <span>加載中...</span>
-            </div>
-
-            <div v-else-if="partitionTreeError" class="error-state">
-              <span>❌ {{ partitionTreeError }}</span>
-            </div>
-
-            <div v-else class="partition-tree-container">
-              <PartitionTreeNode
-                  v-for="(value, key) in currentPartitionTree"
-                  :key="key"
-                  :label="key"
-                  :children="value"
-                  :level="0"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <PartitionInfoModal
+        v-model="showPartitionInfoModal"
+        :initial-tab="regionUsing"
+        :partition-data="partitionData"
+        :is-loading="isLoadingPartitions"
+        :error-message="partitionTreeError"
+        :auto-enable-selection="autoEnableSelection"
+        :initial-selected-locations="currentLocations"
+        @locations-selected="handleLocationsSelected"
+    />
   </div>
 </template>
 
 
 <script setup>
-import { ref, nextTick ,onMounted, onActivated, watch, computed,defineProps, defineComponent, h} from 'vue'
+import { ref, nextTick ,onMounted, onActivated, watch, computed,defineProps } from 'vue'
 import { getLocations, getCustomFeature, sqlQuery, batchMatch, getPartitions } from '@/api'
 import RegionSelector from "@/components/query/RegionSelector.vue"
+import PartitionInfoModal from "@/components/query/PartitionInfoModal.vue"
 import { userStore, setLocationDisabled } from '@/utils/store.js'
 import { LOCATION_LIMITS } from '@/config/constants.js'
 import { STATIC_REGION_TREE, top_yindian } from '@/config'
@@ -1014,33 +989,36 @@ function reset() {
 // =====================================
 
 const showPartitionInfoModal = ref(false)
-const partitionTabActive = ref('map')  // 'map' | 'yindian'
+const partitionData = ref([])
 const isLoadingPartitions = ref(false)
 const partitionTreeError = ref('')
-const partitionMapTree = ref({})
-const partitionYindianTree = ref({})
+const autoEnableSelection = ref(false)  // 是否自动启用选择模式
 
-// 当前显示的树（基于 tab）
-const currentPartitionTree = computed(() => {
-  return partitionTabActive.value === 'map'
-    ? partitionMapTree.value
-    : partitionYindianTree.value
+// Parse current input value to location array
+const currentLocations = computed(() => {
+  return inputValue.value.trim().split(/\s+/).filter(Boolean)
 })
 
 // 打开弹窗
-const openPartitionInfoModal = async () => {
-  showPartitionInfoModal.value = true
-  partitionTabActive.value = regionUsing.value  // 默认显示当前选中的 tab
+const openPartitionInfoModal = () => {
+  autoEnableSelection.value = false  // 普通模式
+  showPartitionInfoModal.value = true  // ✅ 立即显示弹窗
 
-  // 如果数据未加载，则加载
-  if (Object.keys(partitionMapTree.value).length === 0) {
-    await fetchPartitionData()
+  // 如果数据未加载，则在后台加载
+  if (partitionData.value.length === 0) {
+    fetchPartitionData()  // ✅ 不 await，让它在后台加载
   }
 }
 
-// 关闭弹窗
-const closePartitionInfoModal = () => {
-  showPartitionInfoModal.value = false
+// 打开弹窗并自动启用选择模式
+const openPartitionModalWithSelection = () => {
+  autoEnableSelection.value = true  // 自动启用选择模式
+  showPartitionInfoModal.value = true  // ✅ 立即显示弹窗
+
+  // 如果数据未加载，则在后台加载
+  if (partitionData.value.length === 0) {
+    fetchPartitionData()  // ✅ 不 await，让它在后台加载
+  }
 }
 
 // 获取分区数据
@@ -1053,7 +1031,7 @@ const fetchPartitionData = async () => {
       db_key: 'query',
       table_name: 'dialects',
       page: 1,
-      page_size: 9999,  // 获取所有数据
+      page_size: 9999,
       sort_by: null,
       sort_desc: false,
       filters: {},
@@ -1061,12 +1039,7 @@ const fetchPartitionData = async () => {
       search_columns: []
     })
 
-    const data = response.data || []
-
-    // 构建两棵树
-    partitionMapTree.value = buildPartitionTree(data, '地圖集二分區')
-    partitionYindianTree.value = buildPartitionTree(data, '音典分區')
-
+    partitionData.value = response.data || []
   } catch (error) {
     console.error('获取分区数据失败:', error)
     partitionTreeError.value = '獲取分區數據失敗，請稍後再試'
@@ -1075,124 +1048,20 @@ const fetchPartitionData = async () => {
   }
 }
 
-// 构建树结构
-const buildPartitionTree = (data, columnName) => {
-  const tree = {}
+// 处理位置选择
+const handleLocationsSelected = (locations) => {
+  // ✅ REPLACE instead of append
+  inputValue.value = locations.join(' ')
 
-  data.forEach(row => {
-    const dialectName = row['簡稱'] || '未知方言點'
-    const partitionStr = row[columnName] || ''
-
-    // 遇到空的就跳过
-    if (!partitionStr.trim()) {
-      return
-    }
-
-    // 分割分区字符串
-    const parts = partitionStr.split('-').map(p => p.trim()).filter(p => p)
-
-    if (parts.length === 0) {
-      return
-    }
-
-    // 构建树路径
-    let current = tree
-    parts.forEach((part, index) => {
-      if (index === parts.length - 1) {
-        // 最后一级，存储方言点数组
-        if (!Array.isArray(current[part])) {
-          current[part] = []
-        }
-        current[part].push(dialectName)
-      } else {
-        // 中间层级，创建子对象
-        if (!current[part] || Array.isArray(current[part])) {
-          current[part] = {}
-        }
-        current = current[part]
-      }
-    })
+  nextTick(() => {
+    fetchLocationsResult()
   })
-
-  return tree
 }
 
-// 递归树节点组件（内联定义，使用渲染函数，模仿 TreeItem.vue）
-const PartitionTreeNode = defineComponent({
-  name: 'PartitionTreeNode',
-  props: {
-    label: { type: String, required: true },
-    children: { type: [Object, Array], required: true },
-    level: { type: Number, default: 0 }
-  },
-  setup(props) {
-    const isExpanded = ref(false)
-    const isLeaf = computed(() => Array.isArray(props.children))
-    const childCount = computed(() => {
-      if (isLeaf.value) {
-        return props.children.length
-      }
-      return Object.keys(props.children).length
-    })
-
-    const toggleExpand = () => {
-      isExpanded.value = !isExpanded.value
-    }
-
-    return { isExpanded, isLeaf, childCount, toggleExpand }
-  },
-  render() {
-    const { label, children, level } = this.$props
-    const { isExpanded, isLeaf, childCount, toggleExpand } = this
-
-    return h('div', { class: 'tree-node' }, [
-      // 节点内容（模仿 TreeItem 的 node-content）
-      h('div', {
-        class: 'node-content',
-        onClick: toggleExpand
-      }, [
-        // 左侧：图标 + 文本 + 数量
-        h('div', { class: 'node-label' }, [
-          // emoji 图标
-          h('span', { class: 'icon' }, isLeaf ? '📂' : '📁'),
-          // 节点文本
-          h('span', { class: 'text' }, label),
-          // 数量（小灰字）
-          h('span', { class: 'count' }, `(${childCount})`)
-        ]),
-
-        // 右侧：展开按钮（模仿 TreeItem 的 expand-btn）
-        h('button', {
-          class: ['expand-btn', { 'is-open': isExpanded }],
-          onClick: (e) => {
-            e.stopPropagation()
-            toggleExpand()
-          }
-        }, [
-          h('span', { class: 'plus-icon' }, '＋')
-        ])
-      ]),
-
-      // 子节点容器（带过渡动画）
-      isExpanded && h('div', { class: 'children-container' }, [
-        isLeaf
-          ? // 叶子节点：方言点列表（Grid 布局）
-            h('div', { class: 'leaf-list' },
-              children.map(item =>
-                h('div', { class: 'leaf-item', key: item }, item)
-              )
-            )
-          : // 递归子树
-            Object.entries(children).map(([key, value]) =>
-              h(PartitionTreeNode, {
-                key,
-                label: key,
-                children: value,
-                level: level + 1
-              })
-            )
-      ])
-    ])
+// 监听弹窗关闭，重置自动选择模式标志
+watch(showPartitionInfoModal, (isVisible) => {
+  if (!isVisible) {
+    autoEnableSelection.value = false
   }
 })
 
@@ -1319,6 +1188,47 @@ defineExpose({
 }
 .region-input{
   flex: 1.2;
+}
+
+/* Location header with label and button */
+.location-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  gap:6px;
+}
+
+.location-header label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* 選擇地點按鈕 */
+.select-location-btn {
+  appearance: none;
+  border: 1px solid var(--color-primary-border2);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.select-location-btn:hover {
+  background: var(--color-primary-light2);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
+}
+
+.select-location-btn:active {
+  transform: translateY(0);
 }
 
 /* Textarea wrapper for checkmark positioning */
@@ -1577,259 +1487,6 @@ defineExpose({
 
 .info-btn .icon {
   display: inline-block;
-}
-
-/* =====================================
-   分区详情弹窗
-   ===================================== */
-
-.partition-info-modal {
-  width: min(920px, 94vw);
-  max-height: 88vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.partition-info-modal .modal-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* 自定义滚动条 */
-.partition-info-modal .modal-body::-webkit-scrollbar {
-  width: 8px;
-}
-
-.partition-info-modal .modal-body::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 10px;
-}
-
-.partition-info-modal .modal-body::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 10px;
-  transition: background 0.2s;
-}
-
-.partition-info-modal .modal-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.partition-tabs {
-  display: flex;
-  gap: 10px;
-  padding: 12px 24px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.4);
-}
-
-.partition-tab-btn {
-  padding: 8px 20px;
-  border-radius: 12px;
-  border: none;
-  background: rgba(142, 142, 147, 0.15);
-  color: #1d1d1f;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.partition-tab-btn:hover {
-  background: rgba(142, 142, 147, 0.25);
-}
-
-.partition-tab-btn.active {
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-  color: white;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-}
-
-/* 加载和错误状态 */
-.loading-state,
-.error-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px;
-  gap: 16px;
-  color: #6e6e73;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid rgba(0, 122, 255, 0.1);
-  border-top-color: #007AFF;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.error-state {
-  color: #d32f2f;
-  font-weight: 500;
-}
-
-/* =====================================
-   树状图样式 - 完全模仿 TreeItem.vue
-   ===================================== */
-
-.partition-tree-container {
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-/* 使用 :deep() 让样式应用到 h() 渲染的元素 */
-.partition-tree-container :deep(.tree-node) {
-  margin-bottom: 8px;
-}
-
-.partition-tree-container :deep(.node-content) {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 10px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.partition-tree-container :deep(.node-content:hover) {
-  background: rgba(255, 255, 255, 0.4);
-}
-
-.partition-tree-container :deep(.node-label) {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #333;
-  flex: 1;
-}
-
-.partition-tree-container :deep(.node-label .icon) {
-  font-size: 16px;
-}
-
-.partition-tree-container :deep(.node-label .text) {
-  flex: 1;
-}
-
-.partition-tree-container :deep(.node-label .count) {
-  font-size: 12px;
-  color: #8e8e93;
-  margin-left: 4px;
-}
-
-.partition-tree-container :deep(.expand-btn) {
-  background: transparent;
-  border: none;
-  color: #007AFF;
-  font-size: 16px;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.partition-tree-container :deep(.expand-btn:hover) {
-  background: rgba(0, 122, 255, 0.1);
-}
-
-.partition-tree-container :deep(.expand-btn.is-open) {
-  transform: rotate(45deg);
-}
-
-.partition-tree-container :deep(.children-container) {
-  padding-left: 20px;
-  border-left: 2px solid rgba(0, 122, 255, 0.1);
-  margin-left: 14px;
-  margin-top: 8px;
-  transition: height 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.partition-tree-container :deep(.leaf-list) {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.partition-tree-container :deep(.leaf-item) {
-  padding: 8px 10px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: background 0.2s;
-  cursor: default;
-}
-
-.partition-tree-container :deep(.leaf-item:hover) {
-  background: rgba(255, 255, 255, 0.7);
-}
-
-/* 响应式 */
-@media (max-width: 768px) {
-  .partition-info-modal {
-    width: 100%;
-    max-width: 100%;
-    max-height: 100dvh;
-    border-radius: 20px;
-  }
-
-  .partition-tabs {
-    padding: 12px;
-  }
-
-  .partition-info-modal .modal-body {
-    padding: 16px;
-  }
-
-  .partition-tree-container :deep(.children-container) {
-    margin-left: 10px;
-    padding-left: 12px;
-  }
-
-  .partition-tree-container :deep(.leaf-list) {
-    gap: 6px;
-  }
-  .partition-tree-container :deep(.leaf-list) {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  }
-  .partition-tree-container :deep(.leaf-item) {
-    font-size: 13px;
-    padding: 6px 8px;
-  }
-}
-
-@media (min-width: 769px) and (max-width: 1200px) {
-  .partition-tree-container :deep(.leaf-list) {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  }
-}
-
-@media (min-width: 1201px) {
-  .partition-tree-container :deep(.leaf-list) {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  }
 }
 
 /* =====================================

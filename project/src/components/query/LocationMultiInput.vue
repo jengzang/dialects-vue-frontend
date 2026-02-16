@@ -2,7 +2,17 @@
   <div class="location-multi-input">
     <div class="input-section">
       <div class="input-header">
-        <label for="location-input">地點</label>
+        <div class="header-left">
+          <label for="location-input">地點</label>
+          <button
+              class="select-location-btn"
+              @click="openPartitionModalWithSelection"
+              type="button"
+              title="從分區選擇地點"
+          >
+            選擇地點
+          </button>
+        </div>
         <div v-if="matchedLocations.length" class="locations-inline">
           <span class="count-inline">{{ matchedLocations.length }}個地點</span>
           <span class="preview-inline">{{ previewText }}</span>
@@ -79,12 +89,25 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- 分区详情弹窗 -->
+    <PartitionInfoModal
+        v-model="showPartitionInfoModal"
+        initial-tab="map"
+        :partition-data="partitionData"
+        :is-loading="isLoadingPartitions"
+        :error-message="partitionTreeError"
+        :auto-enable-selection="autoEnableSelection"
+        :initial-selected-locations="currentLocations"
+        @locations-selected="handleLocationsSelected"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue'
-import { getLocations, batchMatch } from '@/api'
+import { getLocations, batchMatch, sqlQuery } from '@/api'
+import PartitionInfoModal from '@/components/query/PartitionInfoModal.vue'
 
 const props = defineProps({
   modelValue: {
@@ -309,6 +332,78 @@ async function fetchMatchedLocations(queries) {
     emit('update:isMatching', false)
   }
 }
+
+// =====================================
+// 分区详情相关状态和函数
+// =====================================
+
+const showPartitionInfoModal = ref(false)
+const partitionData = ref([])
+const isLoadingPartitions = ref(false)
+const partitionTreeError = ref('')
+const autoEnableSelection = ref(false)
+
+// Parse current input value to location array
+const currentLocations = computed(() => {
+  return inputValue.value.trim().split(/\s+/).filter(Boolean)
+})
+
+// 打开弹窗并自动启用选择模式
+const openPartitionModalWithSelection = () => {
+  autoEnableSelection.value = true
+  showPartitionInfoModal.value = true
+
+  // 如果数据未加载，则在后台加载
+  if (partitionData.value.length === 0) {
+    fetchPartitionData()
+  }
+}
+
+// 获取分区数据
+const fetchPartitionData = async () => {
+  isLoadingPartitions.value = true
+  partitionTreeError.value = ''
+
+  try {
+    const response = await sqlQuery({
+      db_key: 'query',
+      table_name: 'dialects',
+      page: 1,
+      page_size: 9999,
+      sort_by: null,
+      sort_desc: false,
+      filters: {},
+      search_text: '',
+      search_columns: []
+    })
+
+    partitionData.value = response.data || []
+  } catch (error) {
+    console.error('获取分区数据失败:', error)
+    partitionTreeError.value = '獲取分區數據失敗，請稍後再試'
+  } finally {
+    isLoadingPartitions.value = false
+  }
+}
+
+// 处理位置选择
+const handleLocationsSelected = (locations) => {
+  // ✅ REPLACE instead of append
+  inputValue.value = locations.join(' ')
+
+  nextTick(() => {
+    // 触发验证
+    const queries = queryStrings.value
+    fetchMatchedLocations(queries)
+  })
+}
+
+// 监听弹窗关闭，重置自动选择模式标志
+watch(showPartitionInfoModal, (isVisible) => {
+  if (!isVisible) {
+    autoEnableSelection.value = false
+  }
+})
 </script>
 
 <style scoped>
@@ -334,11 +429,43 @@ async function fetchMatchedLocations(queries) {
   flex-wrap: nowrap;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .input-section label {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-dark);
   flex-shrink: 0;
+}
+
+/* 選擇地點按鈕 */
+.select-location-btn {
+  appearance: none;
+  border: 1px solid var(--color-primary-border2);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.select-location-btn:hover {
+  background: var(--color-primary-light2);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
+}
+
+.select-location-btn:active {
+  transform: translateY(0);
 }
 
 .locations-inline {
@@ -612,7 +739,7 @@ async function fetchMatchedLocations(queries) {
 /* 移动端适配 */
 @media (max-aspect-ratio: 1/1) {
   .input-section textarea {
-    font-size: 16px; /* 防止 iOS 自动缩放 */
+    font-size: 14px; /* 防止 iOS 自动缩放 */
   }
 
   .input-header {
@@ -622,6 +749,7 @@ async function fetchMatchedLocations(queries) {
 
   .locations-inline {
     width: 100%;
+    gap: 1px
   }
 
   .preview-inline {
@@ -630,6 +758,7 @@ async function fetchMatchedLocations(queries) {
 
   .count-inline {
     font-size: 11px;
+    padding:2px 2px;
   }
 
   .expand-btn-inline {
