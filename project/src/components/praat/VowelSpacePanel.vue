@@ -20,9 +20,9 @@
           <span class="switch-label-text">分段顯示</span>
           <div class="custom-switch" :class="{ 'open': showSegmented }">
             <span class="custom-slider">
-              <span class="switch-text">
-                {{ showSegmented ? '開啟' : '關閉' }}
-              </span>
+<!--              <span class="switch-text">-->
+<!--                {{ showSegmented ? '開啟' : '關閉' }}-->
+<!--              </span>-->
             </span>
           </div>
         </div>

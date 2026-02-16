@@ -502,7 +502,7 @@ watch(() => route.query.sub, (newSub) => {
 async function loadAllVocabulary() {
   try {
     // 优先读取缓存
-    const cached = sessionStorage.getItem('yubao_vocabulary_all')
+    const cached = localStorage.getItem('yubao_vocabulary_all')
     if (cached) {
       try {
         const response = JSON.parse(cached)
@@ -528,8 +528,8 @@ async function loadAllVocabulary() {
 
     if (response && response.values && Array.isArray(response.values)) {
       allVocabulary.value = response.values.filter(item => item && typeof item === 'string' && item.trim())
-      // 存储到 sessionStorage
-      sessionStorage.setItem('yubao_vocabulary_all', JSON.stringify(response))
+      // 存储到 localStorage
+      localStorage.setItem('yubao_vocabulary_all', JSON.stringify(response))
       console.log(`✅ 从 API 加载 ${allVocabulary.value.length} 条词汇数据`)
     } else {
       console.error('❌ 词汇数据格式错误:', response)
@@ -543,7 +543,7 @@ async function loadAllVocabulary() {
 async function loadAllGrammar() {
   try {
     // 优先读取缓存
-    const cached = sessionStorage.getItem('yubao_grammar_all')
+    const cached = localStorage.getItem('yubao_grammar_all')
     if (cached) {
       try {
         const response = JSON.parse(cached)
@@ -566,8 +566,8 @@ async function loadAllGrammar() {
 
     if (response && response.values && Array.isArray(response.values)) {
       allGrammar.value = response.values.filter(item => item && typeof item === 'string' && item.trim())
-      // 存储到 sessionStorage
-      sessionStorage.setItem('yubao_grammar_all', JSON.stringify(response))
+      // 存储到 localStorage
+      localStorage.setItem('yubao_grammar_all', JSON.stringify(response))
       console.log(`✅ 从 API 加载 ${allGrammar.value.length} 条语法数据`)
     } else {
       console.error('❌ 语法数据格式错误:', response)
@@ -1756,6 +1756,9 @@ watch(viewMode, async (newMode) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 400px;      /* Minimum height for map visibility */
+  max-height: 69dvh;      /* Match content-area max-height */
+  height: 69dvh;          /* Explicit height for percentage-based children */
 }
 
 .map-mode .yubao-map-container {
