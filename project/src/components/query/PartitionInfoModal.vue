@@ -262,6 +262,19 @@ const closeModal = () => {
   selectionMode.value = false
 }
 
+// Helper function to calculate selected count recursively
+const getSelectedCount = (children, selectedLocations) => {
+  if (Array.isArray(children)) {
+    // Leaf node: count how many items are selected
+    return children.filter(item => selectedLocations.has(item)).length
+  } else {
+    // Branch node: sum up selected counts of all children
+    return Object.values(children).reduce((sum, child) => {
+      return sum + getSelectedCount(child, selectedLocations)
+    }, 0)
+  }
+}
+
 // PartitionTreeNode component
 const PartitionTreeNode = defineComponent({
   name: 'PartitionTreeNode',
@@ -299,17 +312,24 @@ const PartitionTreeNode = defineComponent({
     const { label, children, level, selectionMode, selectedLocations } = this.$props
     const { isExpanded, isLeaf, childCount, toggleExpand, handleLocationClick } = this
 
+    // Calculate selected count for this node
+    const selectedCount = selectionMode ? getSelectedCount(children, selectedLocations) : 0
+
     return h('div', { class: 'tree-node' }, [
       // Node content
       h('div', {
         class: 'node-content',
         onClick: toggleExpand
       }, [
-        // Left: icon + text + count
+        // Left: icon + text + count + selected count
         h('div', { class: 'node-label' }, [
           h('span', { class: 'icon' }, isLeaf ? '📂' : '📁'),
           h('span', { class: 'text' }, label),
-          h('span', { class: 'count' }, `(${childCount})`)
+          h('span', { class: 'count' }, `(${childCount})`),
+          // Selected count badge (only show when selection mode is active and count > 0)
+          selectionMode && selectedCount > 0
+            ? h('span', { class: 'selected-count' }, `✓${selectedCount}`)
+            : null
         ]),
 
         // Right: expand button
@@ -645,6 +665,16 @@ const PartitionTreeNode = defineComponent({
   font-size: 12px;
   color: #8e8e93;
   margin-left: 4px;
+}
+
+.partition-tree-container :deep(.node-label .selected-count) {
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(0, 122, 255, 0.15);
+  color: #007aff;
+  border-radius: 10px;
+  font-size: 0.85em;
+  font-weight: 600;
 }
 
 .partition-tree-container :deep(.expand-btn) {
