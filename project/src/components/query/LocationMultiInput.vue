@@ -359,12 +359,21 @@ const openPartitionModalWithSelection = () => {
   }
 }
 
-// 获取分区数据
+// 获取分区数据（使用 sessionStorage 缓存）
 const fetchPartitionData = async () => {
   isLoadingPartitions.value = true
   partitionTreeError.value = ''
 
   try {
+    // 尝试从 sessionStorage 读取缓存
+    const cachedData = sessionStorage.getItem('partition_data_cache')
+    if (cachedData) {
+      partitionData.value = JSON.parse(cachedData)
+      isLoadingPartitions.value = false
+      return
+    }
+
+    // 缓存不存在，从 API 获取
     const response = await sqlQuery({
       db_key: 'query',
       table_name: 'dialects',
@@ -378,6 +387,9 @@ const fetchPartitionData = async () => {
     })
 
     partitionData.value = response.data || []
+
+    // 保存到 sessionStorage
+    sessionStorage.setItem('partition_data_cache', JSON.stringify(partitionData.value))
   } catch (error) {
     console.error('获取分区数据失败:', error)
     partitionTreeError.value = '獲取分區數據失敗，請稍後再試'
