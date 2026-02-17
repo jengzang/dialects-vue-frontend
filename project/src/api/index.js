@@ -2,19 +2,8 @@
 // 这个文件提供了一站式导入，方便组件使用
 
 // ==================== 认证与核心 ====================
-export {
-  getToken,
-  getRefreshToken,
-  saveToken,
-  clearToken,
-  initUserByToken,
-  refreshAccessToken,
-  api,
-  ensureAuthenticated,
-  update_userdatas_bytoken,
-  getUserRole,
-  reportOnlineTime
-} from './auth/auth.js'
+// Export all auth functions from the auth module
+export * from './auth/index.js'
 
 // ==================== Praat 音频分析 ====================
 export {

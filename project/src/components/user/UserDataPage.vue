@@ -320,7 +320,7 @@ import {
   editCustomData,
   batchCreateCustomData,
   batchDeleteCustomData
-} from '@/api/user'
+} from '@/api/user/index.js'
 import { showSuccess, showError, showWarning, showConfirm } from '@/utils/message.js'
 import { userStore } from '@/utils/store.js'
 

@@ -4,7 +4,7 @@ import LikeAuthor from './views/intro/LikeAuthor.vue'
 import Suggestions from './views/intro/Suggestions.vue'
 import Thanks from './views/intro/Thanks.vue'
 import Auth from './views/Auth.vue'
-import UserDataPage from './views/UserDataPage.vue'
+import UserDataPage from './components/user/UserDataPage.vue'
 import MenuEntry from "@/views/MenuEntry.vue";
 import ExploreEntry from "@/views/ExploreEntry.vue";
 import IntroLayout from "@/layouts/IntroLayout.vue";
