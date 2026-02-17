@@ -40,7 +40,6 @@
           <button
               v-if="selectionMode"
               class="confirm-btn"
-              :disabled="selectedLocations.size === 0"
               @click="confirmSelection"
               type="button"
           >
@@ -78,7 +77,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, defineComponent, h } from 'vue'
+import { ref, computed, watch, defineComponent, h, nextTick } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -112,7 +111,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'locations-selected'])
+const emit = defineEmits(['update:modelValue', 'locations-selected', 'locations-changed'])
 
 // State
 const activeTab = ref(props.initialTab)
@@ -132,22 +131,29 @@ watch(() => props.autoEnableSelection, (shouldEnable) => {
   }
 }, { immediate: true })
 
-// Watch for modal visibility and initial selections
+// Watch for modal visibility
 watch(() => props.modelValue, (isVisible) => {
   if (isVisible) {
     // Auto-enable selection mode if requested
     if (props.autoEnableSelection) {
       selectionMode.value = true
     }
-
-    // Pre-select locations from parent (only those that exist in the tree)
-    if (props.initialSelectedLocations.length > 0) {
-      const allLocations = getAllLocations(currentTree.value)
-      const validLocations = props.initialSelectedLocations.filter(loc => allLocations.includes(loc))
-      selectedLocations.value = new Set(validLocations)
-    }
   }
 })
+
+// Watch for partition data changes and apply initial selections when ready
+watch([() => props.partitionData, () => props.modelValue, () => props.initialSelectedLocations],
+  ([data, isVisible, initialLocs]) => {
+    if (isVisible && data.length > 0 && initialLocs.length > 0) {
+      nextTick(() => {
+        const allLocations = getAllLocations(currentTree.value)
+        const validLocations = initialLocs.filter(loc => allLocations.includes(loc))
+        selectedLocations.value = new Set(validLocations)
+      })
+    }
+  },
+  { immediate: true }
+)
 
 // Watch for partition data changes
 watch(() => props.partitionData, (newData) => {
@@ -245,6 +251,9 @@ const toggleLocation = (location) => {
   }
   // Force reactivity update
   selectedLocations.value = new Set(selectedLocations.value)
+
+  // Emit real-time change for preview
+  emit('locations-changed', Array.from(selectedLocations.value))
 }
 
 // Confirm selection
@@ -257,8 +266,7 @@ const confirmSelection = () => {
 // Close modal
 const closeModal = () => {
   emit('update:modelValue', false)
-  // Reset state on close
-  selectedLocations.value.clear()
+  // Don't clear selections - let parent control via initialSelectedLocations
   selectionMode.value = false
 }
 

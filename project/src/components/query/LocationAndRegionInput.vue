@@ -232,7 +232,8 @@
         :is-loading="isLoadingPartitions"
         :error-message="partitionTreeError"
         :auto-enable-selection="autoEnableSelection"
-        :initial-selected-locations="currentLocations"
+        :initial-selected-locations="locationsInTree"
+        @locations-changed="handleLocationsChanged"
         @locations-selected="handleLocationsSelected"
     />
   </div>
@@ -993,10 +994,26 @@ const partitionData = ref([])
 const isLoadingPartitions = ref(false)
 const partitionTreeError = ref('')
 const autoEnableSelection = ref(false)  // 是否自动启用选择模式
+const originalInputValue = ref('')  // Store original value for revert on cancel
+
+// Get all location names from partition data
+const allTreeLocations = computed(() => {
+  if (partitionData.value.length === 0) return []
+  return partitionData.value.map(row => row['簡稱']).filter(Boolean)
+})
 
 // Parse current input value to location array
 const currentLocations = computed(() => {
   return inputValue.value.trim().split(/\s+/).filter(Boolean)
+})
+
+// Separate: locations in tree vs not in tree
+const locationsInTree = computed(() => {
+  return currentLocations.value.filter(loc => allTreeLocations.value.includes(loc))
+})
+
+const locationsNotInTree = computed(() => {
+  return currentLocations.value.filter(loc => !allTreeLocations.value.includes(loc))
 })
 
 // 打开弹窗
@@ -1013,6 +1030,7 @@ const openPartitionInfoModal = () => {
 // 打开弹窗并自动启用选择模式
 const openPartitionModalWithSelection = () => {
   autoEnableSelection.value = true  // 自动启用选择模式
+  originalInputValue.value = inputValue.value  // Store original for revert
   showPartitionInfoModal.value = true  // ✅ 立即显示弹窗
 
   // 如果数据未加载，则在后台加载
@@ -1063,17 +1081,38 @@ const fetchPartitionData = async () => {
 // 处理位置选择
 const handleLocationsSelected = (locations) => {
   // ✅ REPLACE instead of append
-  inputValue.value = locations.join(' ')
+  const mergedLocations = [
+    ...locations,                    // Selected from modal
+    ...locationsNotInTree.value      // Preserve manual input
+  ]
+  inputValue.value = mergedLocations.join(' ')
+  originalInputValue.value = ''  // Clear to prevent revert
 
   nextTick(() => {
     fetchLocationsResult()
   })
 }
 
+// Real-time preview handler (doesn't trigger validation)
+const handleLocationsChanged = (locations) => {
+  const mergedLocations = [
+    ...locations,                    // Selected from modal
+    ...locationsNotInTree.value      // Preserve manual input
+  ]
+  inputValue.value = mergedLocations.join(' ')
+  // Don't trigger validation (too expensive for real-time)
+}
+
 // 监听弹窗关闭，重置自动选择模式标志
 watch(showPartitionInfoModal, (isVisible) => {
   if (!isVisible) {
     autoEnableSelection.value = false
+
+    // Revert to original value if user cancelled (didn't confirm)
+    if (originalInputValue.value !== '') {
+      inputValue.value = originalInputValue.value
+      originalInputValue.value = ''
+    }
   }
 })
 
