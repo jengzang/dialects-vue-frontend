@@ -82,6 +82,8 @@
             v-model:selected="selectedValue"
             :placeholder="regionUsing === 'map' ? '請選擇地圖集分區' : '請選擇音典分區'"
             @selectCustomRegion="handleCustomRegionSelect"
+            @update:customRegions="handleCustomRegionUpdate"
+            @update:customRegionData="handleCustomRegionDataUpdate"
         />
 
       </div>
@@ -243,7 +245,7 @@
 
 <script setup>
 import { ref, nextTick ,onMounted, onActivated, watch, computed,defineProps } from 'vue'
-import { getLocations, getCustomFeature, sqlQuery, batchMatch, getPartitions } from '@/api'
+import { getLocations, getCustomFeature, sqlQuery, batchMatch, getPartitions, getCustomRegions } from '@/api'
 import RegionSelector from "@/components/query/RegionSelector.vue"
 import PartitionInfoModal from "@/components/query/PartitionInfoModal.vue"
 import { userStore, setLocationDisabled } from '@/utils/store.js'
@@ -333,8 +335,10 @@ const emit = defineEmits(['update:runDisabled', 'update:modelValue'])
 // 自定義分區狀態
 const customRegionLocations = ref([])
 const customRegionName = ref('')
+const selectedCustomRegions = ref([])  // Track selected custom region names
+const customRegionsData = ref([])  // Store full custom region data with locations
 
-// 處理自定義分區選擇
+// 處理自定義分區選擇 (old single-select method - keep for backward compatibility)
 function handleCustomRegionSelect({ regionName, locations }) {
   // 不修改 textarea，僅內部處理
   customRegionLocations.value = locations
@@ -346,6 +350,59 @@ function handleCustomRegionSelect({ regionName, locations }) {
   // 自動觸發查詢（使用自定義分區的地點）
   handleCustomRegionQuery(locations)
 }
+
+// New: Handle multi-select custom regions
+function handleCustomRegionUpdate(customRegionNames) {
+  selectedCustomRegions.value = customRegionNames
+
+  // Ensure custom region data is loaded
+  if (customRegionNames.length > 0 && customRegionsData.value.length === 0) {
+    loadCustomRegionsData()
+  }
+}
+
+// New: Handle custom region data update (full region objects with locations)
+function handleCustomRegionDataUpdate(regionObjects) {
+  // Update customRegionsData for immediate use
+  if (regionObjects && regionObjects.length > 0) {
+    customRegionsData.value = regionObjects
+    console.log(`Received ${regionObjects.length} custom region objects with locations`)
+  }
+}
+
+// Load custom regions data when component mounts
+async function loadCustomRegionsData() {
+  if (!userStore.isAuthenticated) return
+
+  try {
+    const data = await getCustomRegions()
+    const regions = data.regions || []
+
+    // Load full data for each region (including locations)
+    const fullRegions = await Promise.all(
+      regions.map(async (region) => {
+        try {
+          const fullData = await getCustomRegions(region.region_name)
+          return fullData.regions[0] || region
+        } catch (error) {
+          console.error(`Failed to load region ${region.region_name}:`, error)
+          return region
+        }
+      })
+    )
+
+    customRegionsData.value = fullRegions
+    console.log(`Loaded ${fullRegions.length} custom regions with full data`)
+  } catch (error) {
+    console.error('Failed to load custom regions:', error)
+  }
+}
+
+// Load custom regions on mount
+onMounted(() => {
+  reset()
+  loadCustomRegionsData()
+})
 
 // 使用自定義分區地點進行查詢
 async function handleCustomRegionQuery(locations) {
@@ -834,6 +891,7 @@ preloadYindianTree()
 
 onMounted(() => {
   reset()
+  loadCustomRegionsData()
 })
 
 // onActivated(() => {
@@ -854,8 +912,11 @@ async function fetchLocationsResult() {
           ? [String(rawRegions).trim()].filter(Boolean)
           : []
 
+  // 🔥 NEW: Get custom region locations from RegionSelector
+  const customRegionLocationsArray = getCustomRegionLocations(selectedCustomRegions.value)
+
   // 3️⃣ 若兩者皆空，直接返回（對齊 isEmptyInput 判斷）
-  if (locations.length === 0 && regions.length === 0) {
+  if (locations.length === 0 && regions.length === 0 && customRegionLocationsArray.length === 0) {
     limitHint.value = '請輸入地點或分區'
     selectedCount.value = null
     locationsResult.value = []
@@ -870,8 +931,11 @@ async function fetchLocationsResult() {
   }
 
   try {
+    // 🔥 Merge manual locations + custom region locations
+    const mergedLocations = [...new Set([...locations, ...customRegionLocationsArray])]
+
     const data = await getLocations({
-      locations,
+      locations: mergedLocations,
       regions,
       region_mode: regionUsing.value
     })
@@ -899,7 +963,7 @@ async function fetchLocationsResult() {
 
     // 🔥 如果是輸入模式，額外調用 get_custom_feature
     if (props.useInputMode) {
-      await fetchCustomFeatureLocations(locations, regions)
+      await fetchCustomFeatureLocations(mergedLocations, regions)
     }
 
     return data
@@ -912,6 +976,25 @@ async function fetchLocationsResult() {
     customFeatureLocations.value = []
     updateDisabledState(true)  // ⭐ 錯誤時禁用按鈕
   }
+}
+
+// Helper to get locations from custom regions
+function getCustomRegionLocations(customRegionNames) {
+  if (!customRegionNames || customRegionNames.length === 0) return []
+
+  const locations = []
+  customRegionNames.forEach(name => {
+    const region = customRegionsData.value.find(r => r.region_name === name)
+    if (region && region.locations) {
+      console.log(`Custom region "${name}" has ${region.locations.length} locations`)
+      locations.push(...region.locations)
+    } else {
+      console.warn(`Custom region "${name}" not found or has no locations`)
+    }
+  })
+
+  console.log(`Total custom region locations: ${locations.length}`)
+  return locations
 }
 
 // 獲取自定義特徵地點列表
@@ -953,11 +1036,43 @@ async function fetchCustomFeatureLocations(locations, regions) {
 }
 let debounceTimer2 = null
 
+// Computed property: merged locations as space-separated string
+// For QueryPage to access via template ref
+const allLocationsString = computed(() => {
+  // Parse textarea locations
+  const textareaLocations = (inputValue.value ?? '').trim().split(/\s+/).filter(Boolean)
+
+  // Get custom region locations
+  const customRegionLocations = getCustomRegionLocations(selectedCustomRegions.value)
+
+  // Merge both sources (deduplicate)
+  const mergedLocations = [...new Set([...textareaLocations, ...customRegionLocations])]
+
+  // Return as space-separated string
+  return mergedLocations.join(' ')
+})
+
+// Computed property: merged locations as array
+// For DivideTab to access via template ref
+const allLocationsArray = computed(() => {
+  // Parse textarea locations
+  const textareaLocations = (inputValue.value ?? '').trim().split(/\s+/).filter(Boolean)
+
+  // Get custom region locations
+  const customRegionLocations = getCustomRegionLocations(selectedCustomRegions.value)
+
+  // Merge both sources (deduplicate)
+  return [...new Set([...textareaLocations, ...customRegionLocations])]
+})
+
 watch(
-    [inputValue, selectedValue, regionUsing, regionInputValue],
-    ([newInput, newSelected, newMode, newRegionInput]) => {
+    [inputValue, selectedValue, regionUsing, regionInputValue, selectedCustomRegions],
+    ([newInput, newSelected, newMode, newRegionInput, newCustomRegions]) => {
       // 1. 立即通知父組件更新數據 (實現雙向綁定)
-      const locationsArr = (newInput ?? '').trim().split(/\s+/).filter(Boolean)
+      // ⚠️ IMPORTANT: Only emit textarea locations (NOT merged with custom regions)
+      // This prevents circular update that would fill the textarea
+      // Parent components should use template ref (allLocationsString) to get merged locations
+      const textareaLocations = (newInput ?? '').trim().split(/\s+/).filter(Boolean)
 
       // 根據模式決定使用哪個數據源
       let regionsArr
@@ -970,8 +1085,9 @@ watch(
       }
 
       // 🔥 發射事件！這行代碼讓父組件知道數據變了
+      // Emit ONLY textarea locations (not merged) to prevent circular update
       emit('update:modelValue', {
-        locations: locationsArr,
+        locations: textareaLocations,
         regions: regionsArr,
         regionUsing: newMode
       })
@@ -1181,6 +1297,8 @@ watch(showPartitionInfoModal, (isVisible) => {
 
 defineExpose({
   inputValue,
+  allLocationsString,
+  allLocationsArray,
   selectedValue,
   regionUsing,
   selectedCount,

@@ -127,46 +127,25 @@ const onClickOutside = (event) => {
 onMounted(() => document.addEventListener('click', onClickOutside))
 onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
 
-// 運行邏輯
-function getLocation() {
-  if (!locationRef.value?.selectedValue ||
-      (Array.isArray(locationRef.value?.selectedValue) && locationRef.value.selectedValue.every(item => item === ''))) {
-    return locationRef.value?.inputValue || '廣州';
-  } else {
-    // 這裡返回 inputValue，確保 LocationInput 組件如果輸入了文字也能拿到
-    return locationRef.value?.inputValue;
-  }
-}
-
 const runAction = async () => {
   setRunning('divide', true);
 
-  // ✨ 4. 優化參數構造邏輯
+  // Use merged locations from template ref (includes custom regions)
+  // This gets textarea locations + custom region locations merged in background
+  const locationList = (locationRef.value?.allLocationsArray && locationRef.value.allLocationsArray.length > 0)
+    ? locationRef.value.allLocationsArray.filter(Boolean)
+    : ['廣州'];  // Default fallback
+
+  const regionList = (locationModel.value.regions && locationModel.value.regions.length > 0)
+    ? locationModel.value.regions.filter(Boolean)
+    : [];
+
   const queryParams = {
-    locations: '',
-    regions: '',
-    region_mode: locationRef.value?.regionUsing || '1',
+    locations: locationList,
+    regions: regionList,
+    region_mode: locationModel.value.regionUsing || 'map',
     iscustom: 'true',
     flag: 'False'
-  }
-
-  // 處理地點
-  const locs = getLocation();
-  if (locs) {
-    const locArray = locs.trim().split(/\s+/);
-    queryParams.locations = locArray;
-  } else {
-    queryParams.locations = '';
-  }
-
-  // 處理分區 (支持數組)
-  const regions = locationRef.value?.selectedValue;
-  if (Array.isArray(regions)) {
-    queryParams.regions = regions;
-  } else if (regions) {
-    queryParams.regions = regions;
-  } else {
-    queryParams.regions = '';
   }
 
   try {

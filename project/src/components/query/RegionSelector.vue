@@ -58,21 +58,61 @@
             </div>
           </div>
 
-          <!-- 第二行：tags -->
+          <!-- 第二行：tags + 自定義分區按鈕 -->
           <div class="topbar-row topbar-row-2">
-            <div class="topbar-tags" v-if="draftSelected.length">
+            <!-- Left: Tags -->
+            <div class="topbar-tags" v-if="draftSelected.length || draftCustomRegions.length">
+              <!-- Partition tags -->
               <span
                   v-for="(s, i) in draftSelected"
-                  :key="'top_' + s + '_' + i"
+                  :key="'partition_' + s + '_' + i"
                   class="topbar-tag"
                   :title="s"
               >
                 {{ s }}
                 <button class="tag-remove" type="button" @click="removeDraft(s)">×</button>
               </span>
+
+              <!-- Custom region tags -->
+              <span
+                  v-for="(s, i) in draftCustomRegions"
+                  :key="'custom_' + s + '_' + i"
+                  class="topbar-tag custom-region-tag"
+                  :title="s"
+              >
+                {{ s }}
+                <button class="tag-remove" type="button" @click="removeCustomRegion(s)">×</button>
+              </span>
             </div>
             <div class="topbar-empty" v-else>
               尚未選擇分區
+            </div>
+
+            <!-- Right: Custom Region Button -->
+            <div class="topbar-right-actions">
+              <button
+                  ref="customRegionButtonRef"
+                  class="custom-region-btn"
+                  :class="`btn-${customRegionButtonState.color}`"
+                  type="button"
+                  @click="handleCustomRegionButtonClick"
+                  :title="customRegionButtonState.text"
+              >
+                <span class="btn-icon">{{ customRegionButtonState.icon }}</span>
+                <span class="btn-text">{{ customRegionButtonState.text }}</span>
+              </button>
+
+              <!-- Multi-Select Dropdown (only for green state) -->
+              <MultiSelectDropdown
+                  v-if="customRegionButtonState.color === 'green' && customRegionDropdownOpen"
+                  v-model="draftCustomRegions"
+                  :options="customRegionOptions"
+                  :triggerEl="customRegionButtonRef"
+                  placeholder="選擇自定義分區"
+                  align="right"
+                  direction="down"
+                  @close="customRegionDropdownOpen = false"
+              />
             </div>
           </div>
         </div>
@@ -240,6 +280,7 @@ import { getPartitions, getCustomRegions } from '@/api'
 import { STATIC_REGION_TREE, top_yindian } from '@/config'
 import { userStore } from '@/utils/store.js'
 import { showError, showSuccess, showConfirm } from '@/utils/message.js'
+import MultiSelectDropdown from '@/components/common/MultiSelectDropdown.vue'
 
 // 全局已有（你原来 Cascader 就这么用的）
 const STATIC_TREE = STATIC_REGION_TREE ?? {}
@@ -251,7 +292,7 @@ const props = defineProps({
   placeholder: { type: String, default: '請選擇分區' }
 })
 
-const emit = defineEmits(['update:selected', 'selectCustomRegion'])
+const emit = defineEmits(['update:selected', 'selectCustomRegion', 'update:customRegions'])
 
 const router = useRouter()
 
@@ -261,6 +302,12 @@ const router = useRouter()
 const showCustomRegionPopup = ref(false)
 const customRegions = ref([])
 const loadingCustomRegions = ref(false)
+
+// New: Custom region selection state
+const selectedCustomRegions = ref([])  // Committed custom regions
+const draftCustomRegions = ref([])     // Draft custom regions (in popup)
+const customRegionDropdownOpen = ref(false)  // Dropdown visibility
+const customRegionButtonRef = ref(null)  // Button element ref for dropdown positioning
 
 /* =========================
    UI state
@@ -315,14 +362,21 @@ function onDocMouseDown(e) {
 
   const t = e.target
 
+  // Check if click is inside custom region dropdown
+  const isInsideCustomDropdown =
+    customRegionButtonRef.value?.contains(t) ||
+    t.closest('.dropdown-panel') ||
+    t.closest('.dropdown-overlay')
+
   const allow =
       topbarEl.value?.contains(t) ||
       lvl1El.value?.contains(t) ||
       lvl2El.value?.contains(t) ||
-      lvl3El.value?.contains(t)
+      lvl3El.value?.contains(t) ||
+      isInsideCustomDropdown
 
   if (!allow) {
-    // 你现在的外部点击是“确认并关闭”，保持一致
+    // 你现在的外部点击是"确认并关闭"，保持一致
     confirmAndClose()
   }
 }
@@ -475,12 +529,81 @@ function closePopup() {
 }
 
 function togglePopup() {
-  popupOpen.value ? closePopup() : openPopup()
+  if (popupOpen.value) {
+    closePopup()
+  } else {
+    popupOpen.value = true
+    draftSelected.value = selectedLeafs.value.slice()
+    syncDraftCustomRegions()  // Sync custom regions
+
+    lvl1.value = getChildren(null)
+    lvl2.value = []
+    lvl3.value = []
+    activeL1.value = ''
+    activeL2.value = ''
+
+    bindEsc()
+    document.addEventListener('mousedown', onDocMouseDown, true)
+
+    // Load custom regions if authenticated
+    if (userStore.isAuthenticated && customRegions.value.length === 0) {
+      loadCustomRegions()
+    }
+  }
 }
 
 /* =========================
    Custom Region Functions
    ========================= */
+
+// Button state based on user status
+const customRegionButtonState = computed(() => {
+  if (!userStore.isAuthenticated) {
+    return {
+      color: 'red',
+      text: '登錄即可創建自定義分區',
+      icon: '🔒'
+    }
+  }
+
+  if (customRegions.value.length === 0) {
+    return {
+      color: 'blue',
+      text: '嘗試創建自定義分區',
+      icon: '➕'
+    }
+  }
+
+  return {
+    color: 'green',
+    text: '使用自定義分區',
+    icon: '🗂️'
+  }
+})
+
+// Custom region options for dropdown
+const customRegionOptions = computed(() => {
+  return customRegions.value.map(region => ({
+    label: region.region_name,
+    value: region.region_name,
+    locations: region.locations  // Store locations for later use
+  }))
+})
+
+async function loadCustomRegions() {
+  if (loadingCustomRegions.value) return
+
+  loadingCustomRegions.value = true
+  try {
+    const data = await getCustomRegions()
+    customRegions.value = data.regions || []
+  } catch (error) {
+    showError('加載自定義分區失敗：' + error.message)
+  } finally {
+    loadingCustomRegions.value = false
+  }
+}
+
 async function openCustomRegionPopup() {
   // 檢查是否登錄
   if (!userStore.isAuthenticated) {
@@ -548,6 +671,43 @@ function goToManagePage() {
   showCustomRegionPopup.value = false
   closePopup()
   router.push('/auth/regions')
+}
+
+// New: Handle custom region button click
+const handleCustomRegionButtonClick = async () => {
+  // Red state: Not logged in → redirect to auth
+  if (!userStore.isAuthenticated) {
+    showError('請先登錄以使用自定義分區功能')
+    router.push('/auth?view=login')
+    return
+  }
+
+  // Blue state: No custom regions → redirect to UserRegionPage
+  if (customRegions.value.length === 0) {
+    router.push(`/auth?view=user-region&username=${userStore.username}`)
+    return
+  }
+
+  // Green state: Has custom regions → toggle dropdown
+  customRegionDropdownOpen.value = !customRegionDropdownOpen.value
+
+  // Load custom regions if not loaded
+  if (customRegions.value.length === 0) {
+    await loadCustomRegions()
+  }
+}
+
+// Remove custom region tag
+const removeCustomRegion = (regionName) => {
+  const index = draftCustomRegions.value.indexOf(regionName)
+  if (index > -1) {
+    draftCustomRegions.value.splice(index, 1)
+  }
+}
+
+// Sync draft custom regions when popup opens
+const syncDraftCustomRegions = () => {
+  draftCustomRegions.value = [...selectedCustomRegions.value]
 }
 
 /* =========================
@@ -649,7 +809,19 @@ function clearDraft() {
 }
 
 function confirmAndClose() {
+  // Commit partition regions
   emit('update:selected', draftSelected.value.slice())
+
+  // Commit custom regions (names only for tags)
+  selectedCustomRegions.value = [...draftCustomRegions.value]
+  emit('update:customRegions', [...draftCustomRegions.value])
+
+  // Also emit full custom region data for location extraction
+  const selectedRegionObjects = draftCustomRegions.value.map(name =>
+    customRegions.value.find(r => r.region_name === name)
+  ).filter(Boolean)
+  emit('update:customRegionData', selectedRegionObjects)
+
   closePopup()
 }
 
@@ -823,9 +995,33 @@ defineExpose({ togglePopup, openPopup, closePopup })
 /* 第二行：tags 自动滚动 */
 .topbar-row-2 {
   display: flex;
-  max-height: 84px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+  width: 100%;
+}
+
+.topbar-tags {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.topbar-empty {
+  flex: 1;
+  font-size: 13px;
+  color: rgba(60, 60, 60, 0.70);
+}
+
+.topbar-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .topbar-title {
@@ -840,17 +1036,66 @@ defineExpose({ togglePopup, openPopup, closePopup })
   margin-left: 6px;
 }
 
-.topbar-tags {
-  margin-top: 8px;
+/* Custom region button states */
+.custom-region-btn {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.topbar-empty {
-  margin-top: 8px;
-  font-size: 13px;
-  color: rgba(60, 60, 60, 0.70);
+.custom-region-btn.btn-red {
+  background: rgba(255, 59, 48, 0.15);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 59, 48, 0.3);
+  color: #ff3b30;
+  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.15);
+}
+
+.custom-region-btn.btn-blue {
+  background: rgba(0, 122, 255, 0.15);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(0, 122, 255, 0.3);
+  color: #007aff;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
+}
+
+.custom-region-btn.btn-green {
+  background: rgba(52, 199, 89, 0.15);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(52, 199, 89, 0.3);
+  color: #34c759;
+  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.15);
+}
+
+.custom-region-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.custom-region-btn .btn-icon {
+  font-size: 14px;
+}
+
+.custom-region-btn .btn-text {
+  font-size: 12px;
+}
+
+/* Custom region tag styling */
+.topbar-tag.custom-region-tag {
+  background: linear-gradient(135deg, #34c759, #28a745);
+  color: white;
+  border: 1px solid rgba(52, 199, 89, 0.3);
 }
 
 .topbar-right {
@@ -980,38 +1225,7 @@ defineExpose({ togglePopup, openPopup, closePopup })
 
 /* Custom Region Trigger */
 .custom-region-trigger {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(0, 122, 255, 0.05));
-  border: 1px solid rgba(0, 122, 255, 0.3);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.custom-region-trigger:hover {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.15), rgba(0, 122, 255, 0.08));
-  transform: translateX(4px);
-}
-
-.custom-region-icon {
-  font-size: 20px;
-}
-
-.custom-region-label {
-  flex: 1;
-  font-size: 14px;
-  font-weight: 500;
-  color: #007aff;
-}
-
-.custom-region-arrow {
-  font-size: 16px;
-  color: #007aff;
-  opacity: 0.7;
+  display: none;  /* Hide old button - moved to topbar-row-2 */
 }
 
 /* Custom Region Popup */

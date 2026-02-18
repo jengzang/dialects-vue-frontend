@@ -790,10 +790,10 @@ const runAction = async () => {
     if (!locationRef.value?.selectedValue ||
         (Array.isArray(locationRef.value?.selectedValue) && locationRef.value.selectedValue.every(item => item === ''))) {
       // 如果沒有選區域，或者區域是空的，回傳輸入框的值 (預設 '廣州')
-      return locationRef.value?.inputValue || '廣州';
+      return locationRef.value?.allLocationsString || '廣州';
     } else {
       // 否則回傳輸入框的值 (這裡邏輯可能視你具體需求微調，目前保持原樣)
-      return locationRef.value?.inputValue;
+      return locationRef.value?.allLocationsString;
     }
   }
 
