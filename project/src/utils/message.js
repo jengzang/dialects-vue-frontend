@@ -82,7 +82,7 @@ export function showInfo(message, duration = 3000) {
 /**
  * 显示确认对话框（苹果液态玻璃风格）
  * @param {string} message - 消息内容
- * @param {Object} options - 配置选项
+ * @param {{cancelText: string, confirmText: string}} options - 配置选项
  * @param {string} options.title - 标题（默认：'確認'）
  * @param {string} options.confirmText - 确认按钮文字（默认：'確定'）
  * @param {string} options.cancelText - 取消按钮文字（默认：'取消'）

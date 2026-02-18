@@ -5,7 +5,7 @@
       <button
         class="benefit-circle-btn"
         @click="$emit('showBenefits')"
-        title="查看會員權益對比"
+        title="查看用戶與遊客權益對比"
       >
         🎁
       </button>

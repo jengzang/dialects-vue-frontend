@@ -608,7 +608,7 @@ async function openCustomRegionPopup() {
   // 檢查是否登錄
   if (!userStore.isAuthenticated) {
     showError('請先登錄以使用自定義分區功能')
-    router.push('/auth?view=login')
+    await router.push('/auth?view=login')
     return
   }
 
@@ -616,22 +616,27 @@ async function openCustomRegionPopup() {
   loadingCustomRegions.value = true
   try {
     const data = await getCustomRegions()
+    // console.log('📦 getCustomRegions 返回數據:', data)
     customRegions.value = data.regions || []
+    // console.log('📊 customRegions.value.length:', customRegions.value.length)
 
     if (customRegions.value.length === 0) {
+      // console.log('⚠️ 沒有自定義分區，準備顯示 confirm')
       // 沒有分區，詢問是否前往創建
       const confirmed = await showConfirm(
         '您還沒有創建自定義分區，是否前往創建？',
         { confirmText: '前往創建', cancelText: '取消' }
       )
+      // console.log('✅ confirm 結果:', confirmed)
       if (confirmed) {
-        router.push('/auth/regions')
+        await router.push('/auth/regions')
       }
       return
     }
 
     showCustomRegionPopup.value = true
   } catch (error) {
+    // console.error('❌ 加載自定義分區失敗:', error)
     showError('加載自定義分區失敗：' + error.message)
   } finally {
     loadingCustomRegions.value = false
@@ -678,13 +683,13 @@ const handleCustomRegionButtonClick = async () => {
   // Red state: Not logged in → redirect to auth
   if (!userStore.isAuthenticated) {
     showError('請先登錄以使用自定義分區功能')
-    router.push('/auth?view=login')
+    await router.push('/auth?view=login')
     return
   }
 
   // Blue state: No custom regions → redirect to UserRegionPage
   if (customRegions.value.length === 0) {
-    router.push(`/auth?view=user-region&username=${userStore.username}`)
+    await router.push(`/auth/regions?username=${userStore.username}`)
     return
   }
 

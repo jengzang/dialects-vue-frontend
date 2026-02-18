@@ -359,17 +359,23 @@ const logout = async () => {
 
   if (!confirmed) return
 
-  console.log('🚪 [登出] 用户登出，先上报在线时长')
+  // console.log('🚪 [登出] 用户登出，先上报在线时长')
   await manualReport()
 
   const refreshToken = getRefreshToken()
   await logoutUser(refreshToken)
 
-  console.log('✅ [登出] 登出完成')
+  // Clear user state
+  userStore.isAuthenticated = false
+  userStore.role = 'anonymous'
+  userStore.id = null
+  userStore.username = null
+  user.value = null
 
-  setTimeout(() => {
-    window.location.reload()
-  }, 500)
+  // console.log('✅ [登出] 登出完成')
+
+  // Redirect to login page instead of reloading
+  setView('login')
 }
 
 const fetchUser = async () => {
