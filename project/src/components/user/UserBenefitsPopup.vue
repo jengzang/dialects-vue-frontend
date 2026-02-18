@@ -61,7 +61,7 @@
           <!-- Call to Action (only for anonymous) -->
           <div v-if="!isAuthenticated" class="benefits-cta">
             <button class="btn-register" @click="goToRegister">
-              🚀 立即註冊，升級用戶權限
+              🚀 立即註冊，解鎖用戶權限
             </button>
             <p class="cta-hint">完全免費，30秒完成註冊</p>
           </div>
@@ -111,6 +111,11 @@ const comparisonData = computed(() => [
     user: '✅️ 不限'
   },
   {
+    feature: '🗂️ 自定義分區',
+    anonymous: '🔒 用戶',
+    user: '✅️ 開放'
+  },
+  {
     feature: '🧩 地位組合',
     unit: '組',
     anonymous: ROLE_LIMITS.anonymous.MAX_COMBINATIONS,
@@ -132,7 +137,7 @@ const comparisonData = computed(() => [
     user: '✅️ 開放'
   },
   {
-    feature: '📁 自定義數據',
+    feature: '💠 自定義數據',
     anonymous: '🔒 用戶',
     user: '✅️ 開放'
   },

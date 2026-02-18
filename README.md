@@ -1,334 +1,263 @@
-# 方音圖鑑 Chinese Dialect Atlas
+# 方音圖鑑 (Chinese Dialect Atlas)
 
-一个专业的中文方言语言学分析和地理可视化平台，支持汉字音韵查询、中古音系统分析、方言地图可视化等功能。
+> 專業的中文方言語言學分析與地理可視化平台
 
-## 项目简介
+[![Vue 3](https://img.shields.io/badge/Vue-3.5.20-4FC08D?logo=vue.js)](https://vuejs.org/)
+[![Vite](https://img.shields.io/badge/Vite-7.1.3-646CFF?logo=vite)](https://vitejs.dev/)
+[![MapLibre GL](https://img.shields.io/badge/MapLibre%20GL-5.16-396CB2)](https://maplibre.org/)
 
-方音圖鑑是一个基于 Vue 3 的现代化方言研究工具，为语言学研究者、方言爱好者提供了强大的数据查询和可视化功能。平台集成了汉语方言数据库，支持多种维度的音韵分析和地理分布展示。
+**線上演示：** [https://dialects.yzup.top](https://dialects.yzup.top)
 
-**核心功能**：
-- 汉字在各方言点的读音、地位及注释查询
-- 中古音系统反推和音位来源分析
-- 调类调值查询和对比
-- 方言数据地理可视化（基于 MapLibre）
-- 用户自定义数据注记
-- 多方言点对比分析
-- 音系统计和音韵矩阵可视化
-- 音节统计和音素分布分析
-- 自定义音素分类表生成
-- 批量数据管理和表格操作
+**文檔語言：** [English](./docs/README.en.md) | 中文
 
-## 功能特点
+---
 
-### 1. 查询系统
-- **查字**：输入汉字查询其在各方言点的读音
-- **查中古**：按中古地位整理读音，理解语音演变规律
-- **查音位**：分析音位的中古来源，探究多音字根源
-- **查调**：查询各方言点的调类、调值信息
+## 📖 項目簡介
 
-### 2. 音系分析工具
-- **音系统计**：生成方言点的音韵矩阵，展示声母、韵母、声调的完整音系
-- **音节统计**：统计各方言点的音素分布，支持声母、韵母、声调的数量统计和地点对比
-- **自定义音素表**：根据中古音分类（清浊、部位、方式等）生成自定义音素分类矩阵
-- **批量数据管理**：管理员可批量添加、编辑、删除方言数据（支持 Excel 导入导出）
+**方音圖鑑**是一個為語言學家、研究人員和語言愛好者設計的綜合性網絡平台，用於探索和分析中文方言音韻學。平台結合了強大的音韻查詢功能、交互式地理可視化和先進的音頻分析工具。
 
-### 3. 地图可视化
-- 基于 MapLibre GL 的高性能地图渲染
-- 支持多种地图样式（街道、卫星、地形）
-- 智能颜色分配算法（最大化视觉区分度）
-- 自定义数据标注和绘图
-- 响应式设计，支持移动端
+**目標用戶：**
+- 🎓 語言學家和音韻學研究人員
+- 👨‍💻 從事語言學應用開發的前端工程師
+- 🔧 部署和維護人員
 
-### 4. 用户体验
-- 现代化毛玻璃（Glassmorphism）UI 设计
-- 流畅的页面切换动画
-- 统一的 Toast 提示和确认对话框
-- 状态保留和浏览器历史支持
-- 响应式布局（桌面/平板/手机）
+**核心能力：**
+- 跨多個中文方言查詢音韻數據
+- 在交互式地圖上可視化方言分佈
+- 使用矩陣工具分析音韻模式
+- 集成 Praat 處理音頻錄音
+- 管理自定義方言數據和區域分區
 
-### 5. 技术特性
-- Vue 3 Composition API + `<script setup>` 语法
-- 响应式状态管理（无需 Vuex/Pinia）
-- Promise 化的 API 请求层
-- Token 自动管理和刷新
-- 多入口 MPA 构建支持
+---
 
-## 技术栈
+## ✨ 功能特性
 
-### 核心框架
-- **Vue 3.5.20** - 渐进式 JavaScript 框架
-- **Vue Router 4** - 单页应用路由管理
-- **Vite 7.1.3** - 现代化前端构建工具
+### 📝 音韻查詢系統
+四種強大的查詢模式探索方言數據：
+- **查字** - 按漢字查詢（你好、世界）
+- **查中古** - 按歷史音韻學搜索（聲母、韻母、調類、韻目）
+- **查音位** - 按 IPA 音位查詢（p、t、k、ŋ）
+- **查調** - 按調值查找方言（55、33、21）
 
-### 地图可视化
-- **MapLibre GL** - 开源地图库
+**[→ 用戶指南](./docs/USER_GUIDE.md)** 查看詳細說明
 
-### 数据处理
-- **opencc-js** - 简繁体中文转换
-- **xlsx** - Excel 文件读写和数据导入导出
+### 🗺️ 地理可視化
+基於 MapLibre GL 的交互式地圖可視化：
+- **三種地圖模式** - 街道、衛星、地形
+- **支持 10,000+ 標記** - GPU 加速的 Symbol Layer 渲染
+- **自動聚類** - 密集區域分組以提高性能
+- **智能顏色分配** - 最大化視覺區分度算法
+- **自定義標註** - 添加您自己的標記和註釋
 
-### 样式和设计
-- **CSS 3** - 毛玻璃效果、渐变、动画
-- **CSS Variables** - 系统化的主题变量
+### 🔬 音系分析工具
+專業的音系研究功能：
+- **音系查詢** - 聲母韻母聲調對照表，完整展示方言音系結構
+- **音素分類** - 根據不同特徵項（清濁、部位、方式等）自定義查詢聲韻調
+- **音節統計** - 統計所查方言點的聲韻調數目，支持多地點對比
+- **中古地位** - 查看漢字的中古音地位信息，追溯歷史音韻演變
 
-### 状态管理
-- **Vue 3 Reactive** - 响应式数据管理
-- **localStorage** - 本地持久化存储
+### 📚 詞彙與語法資料
+豐富的詞彙和語法數據庫：
+- **語保詞彙** - 語保工程 1000 詞表，涵蓋基礎詞彙
+- **語保語法** - 語保工程 50 條句子語法資料
+- **陽春口語詞** - 廣東陽春口語單字詞表
 
-## 项目结构
+### 🏘️ 自然村數據
+詳細的自然村地理信息：
+- **廣東自然村樹狀圖** - 廣東省自然村層級結構可視化
+- **全粵村情表格** - 廣東省自然村完整表格數據
+- **陽春自然村** - 廣東省陽春縣自然村詳細信息（來自縣志）
+
+### 🎙️ Praat 音頻分析
+專業音頻分析集成：
+- **文件上傳和錄音** - 支持 WAV/MP3 格式和直接錄音
+- **共振峰分析** - F1/F2/F3 提取和元音空間可視化
+- **音高追蹤** - 聲調輪廓分析和分類
+- **強度測量** - 聲學能量分析
+- **非阻塞 UI** - 後台處理並顯示進度
+
+### 🛠️ 數據管理工具
+強大的數據操作工具：
+- **字表檢查** - 檢查數據完整性和一致性
+- **表格合併** - 合併多個方言數據集
+- **粵拼轉 IPA** - 將粵語拼音轉換為 IPA
+- **自定義數據管理** - 用戶特定的標註和註釋
+- **自定義分區** - 將地點組織成自定義分組
+- **Excel 導入/導出** - 批量數據操作
+
+---
+
+## 🚀 技術棧
+
+### 前端核心
+- **Vue 3.5.20** - Composition API 與 `<script setup>` 語法
+- **Vue Router 4** - 基於 Hash 的 MPA 架構路由
+- **Vite 7.1.3** - 現代化構建工具，5 個入口點
+
+### 可視化
+- **MapLibre GL 5.16** - 高性能地圖渲染
+- **ECharts 5.6** - 數據可視化和圖表
+- **wavesurfer.js 7.12** - 音頻波形顯示
+
+### 數據處理
+- **opencc-js** - 繁簡體中文轉換
+- **xlsx** - Excel 文件導入/導出
+- **@vueuse/core** - Vue 組合式工具
+
+### 狀態管理
+- **自定義響應式存儲** - 無需 Vuex/Pinia
+- **6 個全局存儲** - globalPayload、userStore、mapStore、queryStore、resultCache、uiStore
+
+### 後端 API
+- **基礎 URL：** `https://dialects.yzup.top/api`
+- **認證：** 基於 JWT 令牌，自動刷新
+- **端點：** 27 個按功能組織的 API 模塊
+
+---
+
+## 🏃 快速開始
+
+### 環境要求
+- **Node.js** >= 18
+- **npm** >= 9
+
+### 安裝
+
+```bash
+# 克隆倉庫
+git clone <repository-url>
+
+# 進入項目目錄
+cd project
+
+# 安裝依賴
+npm install
+```
+
+### 開發
+
+```bash
+# 本地開發（連接到 http://127.0.0.1:5000）
+npm run dev
+
+# 使用生產 API 開發（連接到 https://dialects.yzup.top）
+npm run dev:web
+```
+
+在瀏覽器中訪問 `http://localhost:5173`。
+
+### 構建與部署
+
+```bash
+# 生產構建
+npm run build
+
+# 本地預覽生產構建
+npm run preview
+
+# 部署到服務器（Bash）
+npm run deploy
+
+# 部署到服務器（PowerShell）
+npm run deploy:ps
+```
+
+---
+
+## 📁 項目結構
 
 ```
 project/
 ├── src/
-│   ├── main.js                 # 应用入口
-│   ├── App.vue                 # 根组件
-│   ├── router.js               # 路由配置
-│   ├── style.css               # 全局样式和 CSS 变量
+│   ├── views/                  # 頁面組件
+│   │   ├── menu/               # 主應用頁面（查詢、結果、地圖、設置）
+│   │   ├── explore/            # 分析工具（音韻、統計、Praat）
+│   │   ├── auth/               # 認證頁面
+│   │   └── intro/              # 關於/介紹頁面
 │   │
-│   ├── layouts/                # 布局容器
-│   │   ├── MenuLayout.vue      # 菜单布局
-│   │   └── IntroLayout.vue     # 介绍布局
+│   ├── components/             # 可復用組件
+│   │   ├── query/              # 查詢相關組件
+│   │   ├── map/                # 地圖可視化組件
+│   │   ├── result/             # 結果顯示組件
+│   │   ├── praat/              # Praat 分析組件
+│   │   └── TableAndTree/       # 表格和樹形組件
 │   │
-│   ├── views/                  # 页面组件
-│   │   ├── MenuEntry.vue       # 菜单入口（动态 Tab 加载）
-│   │   ├── ExploreEntry.vue    # 探索工具入口
-│   │   └── menu/               # 各个功能页面
-│   │       ├── QueryPage.vue       # 查询页面
-│   │       ├── ResultPage.vue      # 结果页面
-│   │       ├── MapPage.vue         # 地图页面
-│   │       ├── AboutPage.vue       # 关于页面
-│   │       ├── SourcePage.vue      # 资料来源
-│   │       ├── PrivacyPage.vue     # 隐私政策
-│   │       └── SettingPage.vue     # 设置页面
+│   ├── api/                    # 集中式 API 模塊
+│   │   ├── auth/               # 認證和令牌管理
+│   │   ├── query/              # 音韻查詢
+│   │   ├── praat/              # 音頻分析
+│   │   ├── sql/                # 數據庫操作
+│   │   ├── user/               # 用戶數據管理
+│   │   └── index.js            # 中央導出中心
 │   │
-│   │   └── explore/            # 探索工具页面
-│   │       ├── PhonologyPage.vue      # 音系统计
-│   │       ├── Countphos.vue          # 音节统计
-│   │       ├── PhonologyCustom.vue    # 自定义音素表
-│   │       ├── TableManage.vue        # 表格管理
-│   │       ├── YangChunVillages.vue   # 阳春自然村
-│   │       ├── YangChunSpoken.vue     # 阳春口语词
-│   │       ├── gdVillagesTree.vue     # 广东自然村树状图
-│   │       ├── gdVillagesTable.vue    # 广东自然村表格
-│   │       ├── ZhongGuPage.vue        # 中古汉字地位
-│   │       ├── YuBaoPage.vue          # 语保资料
-│   │       ├── CheckTool.vue          # 字表检查
-│   │       ├── Jyut2IpaTool.vue       # 粤拼转IPA
-│   │       └── MergeTool.vue          # 字表合并
+│   ├── utils/                  # 工具函數
+│   │   ├── store.js            # 響應式狀態管理
+│   │   ├── message.js          # Toast 通知和對話框
+│   │   └── constants.js        # 全局配置
 │   │
-│   ├── components/             # 可复用组件
-│   │   ├── NavBar.vue          # 顶部导航栏
-│   │   ├── GlobalToast.vue     # 全局提示系统
-│   │   ├── GlobalConfirm.vue   # 全局确认对话框
-│   │   ├── UniversalTable.vue  # 通用表格组件
-│   │   ├── LocationMultiInput.vue  # 地点多选输入
-│   │   │
-│   │   ├── TableAndTree/       # 表格和树形组件
-│   │   │   └── PhonologyTable.vue  # 音韵矩阵表格
-│   │   │
-│   │   ├── map/                # 地图相关组件
-│   │   │   ├── MapLibre.vue    # MapLibre 地图主体
-│   │   │   ├── CustomTab.vue   # 自定义 Tab
-│   │   │   └── DivideTab.vue   # 分割 Tab
-│   │   │
-│   │   ├── query/              # 查询选择器组件
-│   │   │   ├── LocationAndRegionInput.vue  # 地点/地区选择
-│   │   │   ├── RegionSelector.vue          # 地区选择器
-│   │   │   ├── ZhongguSelector.vue         # 中古音选择器
-│   │   │   ├── YinweiSelector.vue          # 音位选择器
-│   │   │   └── FloatingDice.vue            # 浮动配置器
-│   │   │
-│   │   └── result/             # 结果显示组件
-│   │       ├── ResultList.vue          # 结果列表
-│   │       ├── CharsAndTones.vue       # 字和调视图
-│   │       ├── DataRow.vue             # 数据行
-│   │       ├── FeaturePopup.vue        # 特征弹窗
-│   │       ├── ValuePopup.vue          # 值弹窗
-│   │       └── PanelManager.vue        # 面板管理器
-│   │
-│   ├── utils/                  # 工具模块
-│   │   ├── store.js            # 状态管理（响应式数据）
-│   │   ├── auth.js             # 认证和 API 请求
-│   │   ├── message.js          # 消息提示系统
-│   │   ├── constants.js        # 全局常量配置
-│   │   ├── MapData.js          # 地图数据处理
-│   │   ├── MapSource.js        # 地图资源和样式
-│   │   └── ResultTable.js      # 结果表格数据处理
-│   │
-│   └── assets/                 # 静态资源
+│   ├── router.js               # Vue Router 配置
+│   └── style.css               # 全局樣式和 CSS 變量
 │
-├── public/                     # 公共资源目录
-├── vite.config.js              # Vite 构建配置
-└── package.json                # 项目依赖和脚本
+├── public/                     # 靜態資源
+├── vite.config.js              # Vite MPA 配置
+└── package.json                # 依賴和腳本
 ```
 
-## 安装和运行
+**[→ 架構文檔](./docs/ARCHITECTURE.md)** 查看詳細系統設計
 
-### 环境要求
-- Node.js >= 16.0
-- npm >= 8.0
+---
 
-### 安装依赖
-```bash
-npm install
-```
+## 🏗️ 架構概覽
 
-### 开发环境
-```bash
-npm run dev
-```
-访问 http://localhost:5173
+### 多頁應用（MPA）
+項目使用 Vite 的 MPA 構建，包含 **5 個獨立入口點**：
 
-### 生产构建
-```bash
-npm run build
-```
-构建产物输出到 `dist/` 目录
+1. **`/` (index.html)** - 根入口，重定向到 `/menu?tab=query`
+2. **`/menu` (menu/index.html)** - 主應用（查詢、結果、地圖、設置）
+3. **`/explore` (explore/index.html)** - 分析工具（音韻、統計、Praat）
+4. **`/auth` (auth/index.html)** - 認證頁面
+5. **`/intro` (intro/index.html)** - 關於/介紹頁面
 
-### 预览生产构建
-```bash
-npm run preview
-```
-
-## 使用说明
-
-### 1. 查询功能
-
-#### 查字
-1. 在顶部导航点击「查询」进入查询页面
-2. 选择「查字」Tab
-3. 输入要查询的汉字（支持多字）
-4. 选择地点或地区
-5. 点击「运行查询」
-6. 在「结果」页面查看详细数据
-
-#### 查中古
-1. 选择「查中古」Tab
-2. 从声母、韵母、调类中选择组合
-3. 选择要查询的特征（声母/韵母/调类等）
-4. 选择地点或地区
-5. 运行查询查看结果
-
-#### 查音位
-1. 选择「查音位」Tab
-2. 选择音位组（如：声母组、韵母组）
-3. 输入具体音节值
-4. 选择地点和特征
-5. 运行查询
-
-#### 查调
-1. 选择「查调」Tab
-2. 选择地点或地区
-3. 运行查询查看调类调值信息
-
-### 2. 地图可视化
-
-1. 运行查询后，点击顶部「地图」Tab
-2. 地图会自动加载查询结果
-3. 可以切换地图样式（街道/卫星/地形）
-4. 点击方言点查看详细信息
-5. 使用「自定义」Tab 添加自己的标注
-
-### 3. 音系分析工具
-
-#### 音系统计
-1. 访问「探索」→「音系统计」
-2. 输入要查询的方言点
-3. 点击「查询」生成音韵矩阵
-4. 查看声母、韵母、声调的完整音系表
-
-#### 音节统计
-1. 访问「探索」→「音节统计」
-2. 输入多个方言点进行对比
-3. 查看汇总统计和各地点详情
-4. 分析音素分布和地点差异
-
-#### 自定义音素表
-1. 访问「探索」→「自定义音素表」
-2. 选择特征类型（声母/韵母/声调）
-3. 配置横向、纵向、单元格分类
-4. 生成自定义音素分类矩阵
-
-### 4. 用户认证
-
-- 匿名用户：有查询次数限制
-- 注册用户：更高的查询权限
-- 管理员：无限制访问
-
-## API 接口
-
-### 后端 API 端点
-
-**Base URL**: `https://dialects.yzup.top/api`
-
-| 端点 | 方法 | 说明 | 参数 |
-|------|------|------|------|
-| `/auth/me` | GET | 获取当前用户信息 | Headers: Authorization |
-| `/phonology` | POST | 查询音韵数据 | Body: Payload 对象 |
-| `/phonology_matrix` | POST | 获取音韵矩阵 | Body: { locations: string[] } |
-| `/phonology_classification_matrix` | POST | 获取自定义音素分类矩阵 | Body: { locations, feature, horizontal_column, vertical_column, cell_row_column } |
-| `/feature_counts` | GET | 获取音节统计数据 | Query: locations[] |
-| `/get_custom` | GET | 获取用户自定义数据 | Query: user_id |
-
-### Payload 结构
+### 狀態管理
+無需 Vuex/Pinia 的自定義響應式存儲系統：
 
 ```javascript
-// 查字
-{
-  chars: "汉字",
-  locations: ["广州", "深圳"],
-  regions: [],
-  region_mode: "full"
-}
-
-// 查中古
-{
-  path_strings: ["帮_东_平"],
-  locations: ["广州"],
-  regions: [],
-  features: ["声母", "韵母"],
-  region_mode: "full"
-}
-
-// 查音位
-{
-  group_inputs: ["声母组"],
-  pho_values: ["p"],
-  locations: ["广州"],
-  regions: [],
-  features: ["声母"],
-  region_mode: "full"
-}
-
-// 查调
-{
-  locations: ["广州"],
-  regions: [],
-  region_mode: "full"
-}
+import {
+  globalPayload,    // 跨頁面查詢數據
+  userStore,        // { role, isAuthenticated, username, id }
+  mapStore,         // { mode, mapData, mergedData, loading }
+  queryStore,       // { locations, regions, regionUsing }
+  resultCache,      // { mode, features, latestResults }
+  uiStore           // 按鈕狀態和標籤追蹤
+} from '@/utils/store.js'
 ```
 
-## 状态管理
-
-项目使用 Vue 3 响应式 API 进行状态管理，主要状态包括：
+### API 架構
+集中式模塊系統 - **始終從 `@/api` 導入**：
 
 ```javascript
-// store.js
-globalPayload     // 跨页面查询数据
-userStore        // 用户认证信息 {role, isAuthenticated, username, id}
-mapStore         // 地图数据状态 {mode, mapData, mergedData, loading}
-queryStore       // 查询配置 {locations, regions, regionUsing}
-resultCache      // 结果缓存 {mode, features, latestResults}
+// ✅ 正確
+import { searchChars, getLocations, sqlQuery } from '@/api'
+
+// ❌ 錯誤
+import { searchChars } from '@/api/query/core.js'
 ```
 
-## 开发指南
+**[→ API 文檔](./docs/API.md)** 查看完整端點參考
 
-### CSS 变量系统
+---
 
-项目使用 CSS Variables 管理主题色彩：
+## 🎨 設計系統
+
+### 視覺風格
+- **玻璃擬態** - 帶背景模糊的液態玻璃效果
+- **流暢過渡** - 所有動畫 300ms 時長
+- **高對比度** - 玻璃背景上的可讀文本
+- **響應式設計** - 支持桌面、平板和移動設備
+
+### CSS 變量
 
 ```css
-/* src/style.css */
 --primary-color: #4a90e2;
 --secondary-color: #50c878;
 --accent-color: #f39c12;
@@ -337,135 +266,483 @@ resultCache      // 结果缓存 {mode, features, latestResults}
 --glass-border: rgba(255, 255, 255, 0.8);
 ```
 
-### 全局提示系统
+**[→ 設計系統指南](./docs/DESIGN_SYSTEM.md)** 查看完整指南
 
-```javascript
-// 导入
-import { showSuccess, showError, showWarning, showInfo, showConfirm } from '@/utils/message.js'
+---
 
-// Toast 提示
-showSuccess('操作成功')
-showError('操作失败')
-showWarning('请注意')
-showInfo('提示信息')
+## 📚 使用指南
 
-// 确认对话框
-const confirmed = await showConfirm('确定删除吗？', {
-  title: '删除确认',
-  confirmText: '删除',
-  cancelText: '取消'
-})
-if (confirmed) {
-  // 用户点击了确定
-}
+### 平台導航
+
+方音圖鑑採用多頁應用架構，主要分為以下幾個部分：
+
+#### 主應用 (/menu)
+- **查詢** - 四種查詢模式（查字、查中古、查音位、查調）
+- **結果** - 查詢結果展示，支持列表和表格視圖
+- **地圖** - 地理可視化，支持查詢模式、自定義模式和分區模式
+- **音系** - 音系分析工具集（音系查詢、音素分類、音節統計、中古地位）
+- **詞句** - 詞彙與語法資料（語保詞彙、語保語法、陽春口語詞）
+- **自然村** - 自然村地理信息（廣東自然村樹狀圖、全粵村情表格、陽春自然村）
+- **工具** - 數據處理工具（字表檢查、粵拼轉IPA、字表合併、聲學分析）
+- **設置** - 用戶設置和帳戶管理
+
+#### 分析工具 (/explore)
+專業的音韻分析和數據處理工具，包括音韻統計、音節統計、自定義音素表、Praat 音頻分析、表格管理等。
+
+### 開始使用
+1. 訪問 [https://dialects.yzup.top](https://dialects.yzup.top)
+2. 導航到 `/menu?tab=query` 進行音韻查詢
+3. 選擇查詢模式（查字、查中古、查音位或查調）
+4. 輸入地點和查詢參數
+5. 在列表、地圖或矩陣格式中查看結果
+
+### 核心功能詳解
+
+#### 1. 音韻查詢系統
+
+**查字模式：**
 ```
+輸入：你好
+地點：廣州、深圳
+→ 返回「你好」在廣州和深圳的讀音
+```
+適用於查詢特定漢字在不同方言點的讀音、聲母、韻母、聲調等信息。
 
-### API 请求
+**查中古模式：**
+```
+選擇：幫母（聲母）+ 東韻（韻母）+ 平聲（調類）
+特徵：聲母、韻母
+→ 返回中古音「幫_東_平」的現代反映
+```
+適用於研究中古音在現代方言中的演變規律，追溯歷史音韻變化。
+
+**查音位模式：**
+```
+組別：聲母組
+值：p
+特徵：聲母
+→ 返回所有帶 [p] 聲母的字
+```
+適用於音位研究，查找具有特定音位特徵的所有字。
+
+**查調模式：**
+```
+地點：廣州
+→ 返回聲調系統（調類和調值）
+```
+適用於聲調系統研究，了解方言點的完整聲調體系。
+
+#### 2. 音系分析工具
+
+**音系查詢：**
+生成完整的聲母韻母聲調對照表，直觀展示方言點的音系結構。支持漸進式渲染，即使面對 6,400+ 單元格的大型矩陣也能流暢顯示。
+
+**音素分類：**
+根據不同的特徵項（如清濁、部位、方式等）自定義查詢聲韻調，支持多維度的音素分類研究。
+
+**音節統計：**
+統計所查方言點的聲母、韻母、聲調數目，支持多地點對比分析，幫助研究者快速了解方言音系的規模和特點。
+
+**中古地位：**
+查看漢字的中古音地位信息，包括聲母、韻母、調類、韻目等，追溯歷史音韻演變。
+
+#### 3. 詞彙與語法資料
+
+**語保詞彙：**
+語保工程 1000 詞表，涵蓋基礎詞彙，支持按方言點查詢每個詞的讀音和用法。
+
+**語保語法：**
+語保工程 50 條句子語法資料，展示不同方言的語法特點和句式結構。
+
+**陽春口語詞：**
+廣東陽春口語單字詞表，收錄當地特色口語詞彙。
+
+#### 4. 自然村數據
+
+**廣東自然村樹狀圖：**
+以樹狀結構展示廣東省自然村的層級關係，從省、市、縣、鎮到村的完整層級。
+
+**全粵村情表格：**
+廣東省自然村的完整表格數據，支持搜索、篩選和導出。
+
+**陽春自然村：**
+廣東省陽春縣自然村的詳細信息，數據來源於縣志，包含村名、位置、人口等信息。
+
+#### 5. 工具箱
+
+**字表檢查：**
+檢查字表的正確性和格式，識別缺失字符、重複條目、無效 IPA 符號等問題。
+
+**粵拼轉 IPA：**
+將粵語拼音（粵拼）轉換為國際音標（IPA），支持批量轉換。
+
+**字表合併：**
+合併多個字表數據，支持不同的合併策略（並集、交集、左連接等）。
+
+**聲學分析（Praat）：**
+基於 Praat 進行專業的聲學分析，包括：
+- 基頻（F0）分析和聲調輪廓提取
+- 共振峰（F1/F2/F3）分析和元音空間可視化
+- 強度分析和音長測量
+- 支持文件上傳和直接錄音
+- 非阻塞 UI，後台處理並實時顯示進度
+
+**[→ 完整用戶指南](./docs/USER_GUIDE.md)** 包含截圖和示例
+
+---
+
+## 👨‍💻 開發指南
+
+### 開發工作流
+1. 從 `master` 創建功能分支
+2. 遵循代碼規範進行更改
+3. 使用 `npm run dev` 本地測試
+4. 使用 `npm run build && npm run preview` 構建和預覽
+5. 使用描述性消息提交
+6. 創建拉取請求
+
+### 代碼規範
+- 使用 Composition API 與 `<script setup>`
+- 所有 API 調用從 `@/api` 導入
+- 使用 `@/utils/store.js` 中的響應式存儲
+- 遵循現有組件模式
+- 為複雜邏輯添加註釋
+
+### 發起 API 請求
 
 ```javascript
-// 导入
-import { request } from '@/utils/auth.js'
+import { searchChars, showError, showSuccess } from '@/api'
 
-// 发送请求
 try {
-  const data = await request('/phonology', {
-    method: 'POST',
-    body: JSON.stringify(payload)
+  const results = await searchChars({
+    chars: '你好',
+    locations: ['廣州', '深圳']
   })
-  console.log(data)
+  showSuccess('查詢成功')
 } catch (error) {
   showError(error.message)
 }
 ```
 
-## 性能优化
+### 使用消息系統
 
-1. **分页加载** - 表格数据分页显示（50条/页）
-2. **防抖搜索** - 查询防抖 1000ms
-3. **KeepAlive 缓存** - 避免重复渲染查询页面
-4. **懒加载路由** - 组件动态导入
-5. **文件哈希** - 长期缓存静态资源
+```javascript
+import { showSuccess, showError, showConfirm } from '@/utils/message.js'
 
-## 浏览器支持
+// Toast 通知
+showSuccess('操作成功')
+showError('操作失敗')
 
+// 確認對話框
+const confirmed = await showConfirm('確定刪除嗎？', {
+  title: '刪除確認',
+  confirmText: '刪除',
+  cancelText: '取消'
+})
+```
+
+**[→ 貢獻指南](./docs/CONTRIBUTING.md)** 查看詳細指南
+
+---
+
+## 🚢 部署
+
+### 構建流程
+
+```bash
+cd project
+npm run build
+```
+
+輸出：`project/dist/` 目錄，包含優化後的資源
+
+### 部署策略
+- **目標服務器：** `root@47.115.57.138:/srv/myapp/statics/`
+- **方法：** 基於白名單的增量同步（rsync）
+- **策略：** 僅完全替換 `assets/` 目錄，其他文件如有更改則覆蓋
+
+### 前置要求
+- 已配置 SSH 密鑰（無密碼提示）
+- 已安裝 rsync
+- 有生產服務器訪問權限
+
+**[→ 部署指南](./project/DEPLOY.md)** 查看詳細說明
+
+---
+
+## ⚡ 性能優化
+
+### 最近優化（2026 年 2 月）
+
+**PhonologyTable 組件：**
+- **漸進式渲染** - 前 15 行即時顯示，然後每次 10 行
+- **記憶化單元格數據** - 使用計算 Map 進行 O(1) 查找
+- **GPU 加速** - `will-change`、`transform: translateZ(0)`
+- **背景濾鏡隔離** - Android 上流暢滾動
+- **結果：** 初始渲染快 50-70%，滾動流暢度提升 80-90%
+
+**YuBaoMap 組件：**
+- **Symbol Layer 遷移** - 零 DOM 元素，GPU 渲染
+- **GeoJSON 格式** - 原生 MapLibre 渲染引擎
+- **自動聚類** - 密集區域分組
+- **結果：** 性能提升 90%+，支持 10,000+ 標記
+
+### 通用優化
+- **表格分頁** - 大數據集每頁 50 行
+- **防抖搜索** - 查詢輸入 1000ms 防抖
+- **KeepAlive 緩存** - 查詢頁面緩存避免重新渲染
+- **懶加載路由** - 路由組件動態導入
+
+---
+
+## 🌐 瀏覽器支持
+
+**支持的瀏覽器：**
 - Chrome >= 90
 - Firefox >= 88
 - Safari >= 14
 - Edge >= 90
 
-## 配置说明
+**注意：** 需要現代瀏覽器功能（ES6+、CSS Grid、backdrop-filter）
 
-### 权限限制配置
+---
 
-```javascript
-// src/utils/constants.js
-export const ROLE_LIMITS = {
-  anonymous: { locations: 2, regions: 1, chars: 5 },
-  user: { locations: 100, regions: 100, chars: 100 },
-  admin: { locations: Infinity, regions: Infinity, chars: Infinity }
-}
-```
+## 🔧 故障排除
 
-### 地图配置
+### 常見問題
 
-```javascript
-// src/utils/constants.js
-export const MAP_CONFIG = {
-  CENTER: [113.2644, 23.1291],  // 广州
-  ZOOM: 9,
-  MAX_ZOOM: 18,
-  MIN_ZOOM: 2
-}
-```
+**構建失敗：**
+- 確保 Node.js >= 18
+- 清除 `node_modules` 並重新安裝：`rm -rf node_modules && npm install`
+- 檢查最近更改中的語法錯誤
 
-## 贡献指南
+**API 連接錯誤：**
+- 檢查網絡連接
+- 驗證環境中的 API 基礎 URL
+- 檢查認證令牌有效性
+- 嘗試 `npm run dev:web` 使用生產 API
 
-欢迎提交 Issue 和 Pull Request！
+**地圖未加載：**
+- 檢查 MapLibre GL 版本兼容性
+- 驗證 GeoJSON 數據格式
+- 檢查瀏覽器控制台錯誤
+- 確保互聯網連接以獲取地圖瓦片
 
-### 开发流程
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
+**性能問題：**
+- 清除瀏覽器緩存
+- 檢查大數據集（使用分頁）
+- 驗證漸進式渲染已啟用
+- 在不同瀏覽器上測試
 
-### 代码规范
-- 使用 Vue 3 Composition API 和 `<script setup>` 语法
-- 遵循 ESLint 配置
-- 组件命名使用 PascalCase
-- 工具函数命名使用 camelCase
-- 添加必要的注释
+---
 
-## 许可证
+## 🤝 貢獻
 
-ISC License
+我們歡迎貢獻！請：
+1. Fork 倉庫
+2. 創建功能分支
+3. 遵循代碼規範
+4. 徹底測試
+5. 提交拉取請求
 
-## 联系方式
+**[→ 貢獻指南](./docs/CONTRIBUTING.md)** 查看詳細流程
 
-- 项目主页: https://dialects.yzup.top
-- GitHub: https://github.com/jengzang/dialects-js-frontend
-- Issues: https://github.com/jengzang/dialects-js-frontend/issues
+---
 
-## 更新日志
+## 📄 許可證與致謝
 
-### 1.1.0 (2026-02-05)
-- 新增音系统计功能，支持音韵矩阵可视化
-- 新增音节统计功能，支持音素分布分析和地点对比
-- 新增自定义音素表功能，支持按中古音分类生成音素矩阵
-- 新增表格管理功能，支持批量数据操作（管理员）
-- 新增 /explore 探索工具路由
-- 集成 opencc-js 支持简繁体转换
-- 集成 xlsx 支持 Excel 数据导入导出
-- 优化项目结构，分离 menu 和 explore 页面
+**許可證：** ISC License
 
-### 1.0.0 (2026-01-20)
-- 完成核心查询功能（查字、查中古、查音位、查调）
-- 集成 MapLibre 地图可视化
-- 实现用户认证系统
-- 添加全局 Toast 和确认对话框
-- 优化 UI 设计（毛玻璃风格）
-- 完善响应式布局
+**項目維護者：** 鄭章
 
-## 致谢
+**相關倉庫：**
+- 前端倉庫：[https://github.com/jengzang/dialects-vue-frontend](https://github.com/jengzang/dialects-vue-frontend)
+- 後端倉庫：[https://github.com/jengzang/dialects-backend](https://github.com/jengzang/dialects-backend)
+- 數據預處理倉庫：[https://github.com/jengzang/dialects-build](https://github.com/jengzang/dialects-build)
 
-感谢所有为中文方言研究做出贡献的学者和开发者。
+**構建工具：**
+- Vue 3、Vite、MapLibre GL、ECharts、wavesurfer.js
+- 來自語言學研究的中文方言數據
+- Praat 音頻分析集成
+
+**致謝：**
+- 中文方言研究社區
+- 開源貢獻者
+- 語言學數據提供者
+
+---
+
+## 📞 聯繫與支持
+
+**線上演示：** [https://dialects.yzup.top](https://dialects.yzup.top)
+
+**GitHub 倉庫：**
+- 前端：[https://github.com/jengzang/dialects-vue-frontend](https://github.com/jengzang/dialects-vue-frontend)
+- 後端：[https://github.com/jengzang/dialects-backend](https://github.com/jengzang/dialects-backend)
+- 數據預處理：[https://github.com/jengzang/dialects-build](https://github.com/jengzang/dialects-build)
+
+**問題反饋：** [GitHub Issues](https://github.com/jengzang/dialects-vue-frontend/issues)
+
+**聯繫方式：**
+- 電子郵件：jengzang@outlook.com
+- 知乎：[https://www.zhihu.com/people/da-shu-18-11](https://www.zhihu.com/people/da-shu-18-11)
+
+---
+
+## 📝 更新日誌
+
+### v1.x 时期（原生 JavaScript，2025-09 ~ 2026-01）
+
+#### v1.0.0 (2025-09-01)
+- 🎉 項目初始化
+- ✨ 基於原生js的基礎查詢功能
+- ✨ 登錄、鳴謝頁面
+
+#### v1.1.0 (2025-09-02 ~ 2025-09-04)
+- ✨ 新查詢界面
+- 🔧 地點分區輸入重構
+
+#### v1.2.0 (2025-12-25 ~ 2026-01-11)
+- ⚡ 輸入地點分區優化
+- ✨ 中古、音位查詢界面
+
+---
+
+### v2.x 时期（Vue 框架重構，2026-01-13 ~ 2026-01-25）
+
+#### v2.0.0 (2026-01-13 ~ 2026-01-16) 🎯 重大更新
+- 🔄 **完全遷移到 Vue 3 框架**
+- ✨ 中古、音位結果顯示界面
+- ✨ 底圖設置
+- ✨ 地圖顯示功能
+- ✨ 陽春自然村顯示
+
+#### v2.1.0 (2026-01-16 ~ 2026-01-22)
+- ✨ 表格組件（UniversalTable）
+- ✨ 表格添加、編輯、刪除功能
+- ✨ 自定義添加右側面板
+
+#### v2.2.0 (2026-01-23)
+- ✨ 批量編輯功能
+- ✨ SimpleLayout 佈局
+- ✨ 工具頁面
+
+---
+
+### v3.x 时期（功能擴展期，2026-01-26 ~ 至今）
+
+#### v3.0.0 (2026-01-26 ~ 2026-01-27) 🎯 重大更新
+- 🔄 **引入工具、詞句、音系等多種功能**
+- ✨ 字表工具：
+  - 字表檢查
+  - 字表合併
+  - 粵拼轉 IPA
+
+#### v3.1.0 (2026-01-30)
+- ✨ 自然村數據展示
+- ✨ 中古漢字樹狀圖
+- ✨ 地圖彈窗功能
+- ✨ 資料來源、隱私界面
+
+#### v3.2.0 (2026-02-01 ~ 2026-02-03)
+- ✨ 語保卡片、表格模式
+- ✨ 當前字表總數顯示
+- ✨ 頁面可見性在線時長記錄
+
+#### v3.3.0 (2026-02-04 ~ 2026-02-05) 🎯 音系功能
+- ✨ **音系查詢功能**
+- ✨ **音節統計功能**
+- ✨ **音素統計功能**
+- ✨ 用戶批量數據管理
+- ✨ 地名彈窗
+
+#### v3.4.0 (2026-02-06) 🎯 語保地圖
+- ✨ **語保地圖**（支持 10,000+ 標記）
+- ⚡ 地圖點聚類優化
+- ✨ 用戶統計增加"查音系"
+
+#### v3.5.0 (2026-02-07 ~ 2026-02-08) 🎯 Praat 音頻分析
+- ✨ **Praat 前端初步**
+- ✨ 語保緩存機制
+- ⚡ 全局狀態管理
+- ⚡ 音系音素界面參數查詢
+
+#### v3.6.0 (2026-02-09) 🎯 Praat 功能完善
+- 🔄 **API 接口統一管理**
+- ✨ Praat 功能擴展：
+  - 元音空間圖
+  - 元音點圖
+  - 手動分段支持
+  - 頻譜圖
+  - 石峰 T 值法
+- ⚡ Check 工具性能優化
+
+#### v3.7.0 (2026-02-10 ~ 2026-02-12) 🎯 用戶系統
+- ✨ 石峰 T 值法導出 Excel
+- ✨ 元音空間提示
+- ✨ **排行榜功能**
+- ✨ HelpIcon 組件
+- ✨ 用戶與遊客對比提示
+
+#### v3.8.0 (2026-02-14) 🎯 組件重構
+- 🔄 組件架構重構（tabsConfig 抽離）
+- ✨ **ExploreBar 功能**
+- ✨ **每行查聲韻調功能**
+
+#### v3.9.0 (2026-02-15 ~ 2026-02-17) 🎯 交互優化
+- ⚡ 音頻預覽交互優化
+- ⚡ 元音空間界面改進（開關和 toggle）
+- ✨ **用戶選擇地點填入功能**
+- ✨ 選擇數量顯示（sessionStorage）
+- ✨ **雙向綁定完善**（彈窗刪除輸入框內容）
+- 🔄 **Auth 組件重構**
+
+#### v3.10.0 (2026-02-18)
+- ✨ **分區管理頁面**
+
+#### v3.11.0 (2026-02-19)
+- 📚 **完整的中英文文檔系統**
+- 📚 詳細的功能介紹和使用指南
+- 📚 架構文檔、API 文檔、設計系統文檔
+
+---
+
+### 版本號說明
+
+- **v1.x**: 原生 JavaScript 實現（2025-09 ~ 2026-01）
+- **v2.x**: Vue 3 框架重構（2026-01-13 ~ 2026-01-25）
+- **v3.x**: 功能擴展期，引入工具、詞句、音系等（2026-01-26 ~ 至今）
+
+### 主要功能里程碑
+
+1. **v2.0.0** - Vue 3 框架重構
+2. **v3.0.0** - 工具系統（字表檢查、合併、粵拼轉IPA）
+3. **v3.3.0** - 音系分析系統（音系查詢、音節統計、音素統計）
+4. **v3.4.0** - 語保地圖（10,000+ 標記支持）
+5. **v3.5.0** - Praat 音頻分析
+6. **v3.6.0** - API 統一管理 + Praat 功能完善
+7. **v3.8.0** - ExploreBar + 每行查聲韻調
+8. **v3.11.0** - 完整文檔系統
+
+---
+
+## 📖 完整文檔
+
+### 中文文檔
+- [架構文檔](./docs/ARCHITECTURE.md)
+- [API 文檔](./docs/API.md)
+- [用戶指南](./docs/USER_GUIDE.md)
+- [設計系統](./docs/DESIGN_SYSTEM.md)
+- [貢獻指南](./docs/CONTRIBUTING.md)
+
+### English Documentation
+- [README (English)](./docs/README.en.md)
+- [Architecture](./docs/ARCHITECTURE.en.md)
+- [API Reference](./docs/API.en.md)
+- [User Guide](./docs/USER_GUIDE.en.md)
+- [Design System](./docs/DESIGN_SYSTEM.en.md)
+- [Contributing](./docs/CONTRIBUTING.en.md)
+
+---
+
+**用心設計，為中文方言研究而生 ❤️**

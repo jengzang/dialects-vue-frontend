@@ -561,7 +561,7 @@ const customRegionButtonState = computed(() => {
   if (!userStore.isAuthenticated) {
     return {
       color: 'red',
-      text: '登錄即可創建自定義分區',
+      text: '登錄即可自定義分區',
       icon: '🔒'
     }
   }
@@ -569,7 +569,7 @@ const customRegionButtonState = computed(() => {
   if (customRegions.value.length === 0) {
     return {
       color: 'blue',
-      text: '嘗試創建自定義分區',
+      text: '創建自定義分區',
       icon: '➕'
     }
   }
