@@ -87,6 +87,9 @@
         <ActionButton variant="info" @click="$emit('goToUserData')">
           📊 個人數據
         </ActionButton>
+        <ActionButton variant="teal" @click="$emit('goToUserRegions')">
+          🗂️ 個人分區
+        </ActionButton>
         <ActionButton variant="blue" @click="$emit('goToModifyProfile')">
           🛠 修改資料
         </ActionButton>
@@ -145,6 +148,7 @@ defineProps({
 
 defineEmits([
   'goToUserData',
+  'goToUserRegions',
   'goToModifyProfile',
   'logout',
   'goToAdminPanel',
@@ -413,14 +417,14 @@ const tabs = [
 }
 
 .action-buttons {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   margin-top: 16px;
   width: 100%;
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
-  flex-wrap: wrap;
 }
 
 .benefit-circle-btn {

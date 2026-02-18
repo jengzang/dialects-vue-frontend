@@ -40,6 +40,7 @@
         :statsExpanded="statsExpanded"
         :currentTab="currentTab"
         @goToUserData="goToUserData"
+        @goToUserRegions="goToUserRegions"
         @goToModifyProfile="setMode('modifyProfile')"
         @logout="logout"
         @goToAdminPanel="goToAdminPanel"
@@ -400,6 +401,13 @@ const goToTableManager = () => {
 const goToUserData = () => {
   router.push({
     path: '/auth/data',
+    query: { username: user.value.username }
+  })
+}
+
+const goToUserRegions = () => {
+  router.push({
+    path: '/auth/regions',
     query: { username: user.value.username }
   })
 }

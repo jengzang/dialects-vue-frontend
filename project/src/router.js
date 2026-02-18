@@ -5,6 +5,7 @@ import Suggestions from './views/intro/Suggestions.vue'
 import Thanks from './views/intro/Thanks.vue'
 import Auth from './views/Auth.vue'
 import UserDataPage from './components/user/UserDataPage.vue'
+import UserRegionPage from './components/user/UserRegionPage.vue'
 import MenuEntry from "@/views/MenuEntry.vue";
 import ExploreEntry from "@/views/ExploreEntry.vue";
 import IntroLayout from "@/layouts/IntroLayout.vue";
@@ -70,6 +71,12 @@ const routes = [
         component: UserDataPage,
         meta: { title: '方音圖鑑 - 個人數據管理' },
 
+    },
+
+    {
+        path: '/auth/regions',
+        component: UserRegionPage,
+        meta: { title: '方音圖鑑 - 個人分區管理' }
     },
 
     // 可選：兜底導回首頁（避免 404）
@@ -139,7 +146,7 @@ router.beforeEach((to, from, next) => {
     }
 
     // 1. 登錄守衛邏輯
-    if (to.path === '/auth/data') {
+    if (to.path === '/auth/data' || to.path === '/auth/regions') {
         // 如果未登錄，直接攔截並跳轉到登錄頁
         if (!userStore.isAuthenticated) {
             showWarningToast('未授權訪問，跳回登錄頁');

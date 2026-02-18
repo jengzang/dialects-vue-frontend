@@ -3,7 +3,7 @@
     <!-- Header with title and stats -->
     <div class="page-header">
       <div class="header-left">
-        <button @click="goBack" class="btn-back">← 返回</button>
+        <button @click="goBack" class="btn-back">返回</button>
         <h2>📊 個人數據管理 <span v-if="username" class="username-badge">{{ username }}</span></h2>
       </div>
       <div class="stats">
@@ -771,6 +771,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
+  justify-self: center;
 }
 
 .username-badge {

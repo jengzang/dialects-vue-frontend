@@ -5,7 +5,7 @@
         <!-- 头部 -->
         <div class="modal-header">
 <!--          <div class="header-left">-->
-            <div class="modal-title">🗺️ 分區詳情</div>
+            <div class="modal-title">🗂️ 分區詳情</div>
             <!-- 选择模式开关 -->
             <div class="selection-mode-toggle">
               <label class="toggle-label">開啟選擇</label>
@@ -144,11 +144,16 @@ watch(() => props.modelValue, (isVisible) => {
 // Watch for partition data changes and apply initial selections when ready
 watch([() => props.partitionData, () => props.modelValue, () => props.initialSelectedLocations],
   ([data, isVisible, initialLocs]) => {
-    if (isVisible && data.length > 0 && initialLocs.length > 0) {
+    if (isVisible && data.length > 0) {
       nextTick(() => {
-        const allLocations = getAllLocations(currentTree.value)
-        const validLocations = initialLocs.filter(loc => allLocations.includes(loc))
-        selectedLocations.value = new Set(validLocations)
+        if (initialLocs.length > 0) {
+          const allLocations = getAllLocations(currentTree.value)
+          const validLocations = initialLocs.filter(loc => allLocations.includes(loc))
+          selectedLocations.value = new Set(validLocations)
+        } else {
+          // 如果 initialLocs 为空，清空选择
+          selectedLocations.value = new Set()
+        }
       })
     }
   },
@@ -413,7 +418,7 @@ const PartitionTreeNode = defineComponent({
   width: min(920px, 94vw);
   max-height: 88vh;
   overflow: hidden;
-  background: var(--glass-lighter2);
+  background: var(--glass-lighter3);
   border: 1px solid var(--border-gray-lighter);
   border-radius: 18px;
   box-shadow: var(--shadow-xl);

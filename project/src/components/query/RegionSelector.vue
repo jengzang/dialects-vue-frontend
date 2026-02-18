@@ -79,6 +79,13 @@
 
         <!-- ✅ Stage：lvl1 仍放在文档流；lvl2/lvl3 以 fixed 浮層跟随 -->
         <div class="partition-stage">
+          <!-- 自定義分區觸發按鈕 -->
+          <div class="custom-region-trigger" @click.stop="openCustomRegionPopup">
+            <div class="custom-region-icon">🗂️</div>
+            <div class="custom-region-label">我的自定義分區</div>
+            <div class="custom-region-arrow">→</div>
+          </div>
+
           <!-- lvl1 -->
           <div ref="lvl1El" class="partition-popup partition-lvl1" @mousedown.stop>
             <div
@@ -174,13 +181,65 @@
 
       </div>
     </Teleport>
+
+    <!-- 自定義分區彈窗 -->
+    <Teleport to="body">
+      <div v-if="showCustomRegionPopup" class="custom-region-overlay" @click.self="showCustomRegionPopup = false">
+        <div class="custom-region-popup" @mousedown.stop>
+          <div class="popup-header">
+            <h3>🗂️ 我的自定義分區</h3>
+            <button class="close-btn" @click="showCustomRegionPopup = false">✕</button>
+          </div>
+
+          <div class="popup-content">
+            <div v-if="loadingCustomRegions" class="loading">
+              <div class="spinner"></div>
+              <p>加載中...</p>
+            </div>
+
+            <div v-else-if="customRegions.length === 0" class="empty-custom-regions">
+              <p>您還沒有創建自定義分區</p>
+              <button class="btn-create" @click="goToManagePage">
+                前往創建
+              </button>
+            </div>
+
+            <div v-else class="region-list">
+              <div
+                v-for="region in customRegions"
+                :key="region.id"
+                class="region-item"
+                @click="selectCustomRegion(region)"
+              >
+                <div class="region-name">{{ region.region_name }}</div>
+                <div class="region-info">
+                  {{ region.location_count || region.locations?.length || 0 }} 個地點
+                  <span v-if="region.description" class="region-desc">
+                    · {{ region.description }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="popup-footer">
+            <button class="btn-manage" @click="goToManagePage">
+              管理我的分區
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { getPartitions } from '@/api'
+import { useRouter } from 'vue-router'
+import { getPartitions, getCustomRegions } from '@/api'
 import { STATIC_REGION_TREE, top_yindian } from '@/config'
+import { userStore } from '@/utils/store.js'
+import { showError, showSuccess, showConfirm } from '@/utils/message.js'
 
 // 全局已有（你原来 Cascader 就这么用的）
 const STATIC_TREE = STATIC_REGION_TREE ?? {}
@@ -192,7 +251,16 @@ const props = defineProps({
   placeholder: { type: String, default: '請選擇分區' }
 })
 
-const emit = defineEmits(['update:selected'])
+const emit = defineEmits(['update:selected', 'selectCustomRegion'])
+
+const router = useRouter()
+
+/* =========================
+   Custom Region State
+   ========================= */
+const showCustomRegionPopup = ref(false)
+const customRegions = ref([])
+const loadingCustomRegions = ref(false)
 
 /* =========================
    UI state
@@ -408,6 +476,78 @@ function closePopup() {
 
 function togglePopup() {
   popupOpen.value ? closePopup() : openPopup()
+}
+
+/* =========================
+   Custom Region Functions
+   ========================= */
+async function openCustomRegionPopup() {
+  // 檢查是否登錄
+  if (!userStore.isAuthenticated) {
+    showError('請先登錄以使用自定義分區功能')
+    router.push('/auth?view=login')
+    return
+  }
+
+  // 加載自定義分區
+  loadingCustomRegions.value = true
+  try {
+    const data = await getCustomRegions()
+    customRegions.value = data.regions || []
+
+    if (customRegions.value.length === 0) {
+      // 沒有分區，詢問是否前往創建
+      const confirmed = await showConfirm(
+        '您還沒有創建自定義分區，是否前往創建？',
+        { confirmText: '前往創建', cancelText: '取消' }
+      )
+      if (confirmed) {
+        router.push('/auth/regions')
+      }
+      return
+    }
+
+    showCustomRegionPopup.value = true
+  } catch (error) {
+    showError('加載自定義分區失敗：' + error.message)
+  } finally {
+    loadingCustomRegions.value = false
+  }
+}
+
+async function selectCustomRegion(region) {
+  try {
+    // 獲取該分區的詳細信息（包含完整地點列表）
+    const data = await getCustomRegions(region.region_name)
+
+    if (!data.success || data.regions.length === 0) {
+      showError('獲取分區詳情失敗')
+      return
+    }
+
+    const selectedRegion = data.regions[0]
+    const locations = selectedRegion.locations // ['廣州', '佛山', '南海']
+
+    // 關閉彈窗
+    showCustomRegionPopup.value = false
+    closePopup()
+
+    // 通知父組件使用這些地點
+    emit('selectCustomRegion', {
+      regionName: selectedRegion.region_name,
+      locations: locations
+    })
+
+    showSuccess(`已選擇自定義分區：${selectedRegion.region_name}`)
+  } catch (error) {
+    showError('選擇分區失敗：' + error.message)
+  }
+}
+
+function goToManagePage() {
+  showCustomRegionPopup.value = false
+  closePopup()
+  router.push('/auth/regions')
 }
 
 /* =========================
@@ -837,4 +977,221 @@ defineExpose({ togglePopup, openPopup, closePopup })
   opacity: 1;
   background: rgba(0, 0, 0, 0.05);
 }
+
+/* Custom Region Trigger */
+.custom-region-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(0, 122, 255, 0.05));
+  border: 1px solid rgba(0, 122, 255, 0.3);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.custom-region-trigger:hover {
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.15), rgba(0, 122, 255, 0.08));
+  transform: translateX(4px);
+}
+
+.custom-region-icon {
+  font-size: 20px;
+}
+
+.custom-region-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #007aff;
+}
+
+.custom-region-arrow {
+  font-size: 16px;
+  color: #007aff;
+  opacity: 0.7;
+}
+
+/* Custom Region Popup */
+.custom-region-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.custom-region-popup {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.popup-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.close-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 18px;
+  color: #666;
+}
+
+.close-btn:hover {
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+}
+
+.popup-content {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 122, 255, 0.2);
+  border-top-color: #007aff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty-custom-regions {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-custom-regions p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.btn-create {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #007aff, #0051d5);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-create:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.region-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.region-item {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.region-item:hover {
+  background: rgba(0, 122, 255, 0.05);
+  border-color: rgba(0, 122, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+}
+
+.region-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 6px;
+}
+
+.region-info {
+  font-size: 13px;
+  color: #666;
+}
+
+.region-desc {
+  color: #999;
+}
+
+.popup-footer {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+}
+
+.btn-manage {
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #007aff;
+  border: 1px solid rgba(0, 122, 255, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-manage:hover {
+  background: rgba(0, 122, 255, 0.1);
+}
+
 </style>

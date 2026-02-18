@@ -35,7 +35,6 @@ defineEmits(['update:modelValue'])
   padding: 4px;
   background-color: #f0f0f5;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
-  margin-bottom: 20px;
 }
 
 .tab-button {
@@ -65,8 +64,10 @@ defineEmits(['update:modelValue'])
 /* Mobile responsive */
 @media (max-aspect-ratio: 1/1) {
   .tab-switcher {
-    flex-direction: column;
     gap: 8px;
+  }
+  .tab-button{
+    padding: 12px 6px;
   }
 }
 </style>

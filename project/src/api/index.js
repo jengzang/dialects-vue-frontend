@@ -110,6 +110,13 @@ export {
   deleteCustomForm
 } from './user/custom.js'
 
+// 自定義分區
+export {
+  getCustomRegions,
+  createOrUpdateCustomRegion,
+  deleteCustomRegion
+} from './user/custom-regions.js'
+
 // ==================== 日志统计 ====================
 export {
   getTodayVisits,

@@ -15,7 +15,7 @@ defineProps({
   variant: {
     type: String,
     default: 'blue',
-    validator: (value) => ['blue', 'green', 'danger', 'info', 'yellow'].includes(value)
+    validator: (value) => ['blue', 'green', 'danger', 'info', 'yellow', 'teal'].includes(value)
   },
   disabled: {
     type: Boolean,
@@ -93,6 +93,16 @@ defineEmits(['click'])
 
 .btn-action.yellow:hover:not(:disabled) {
   background-color: #e67e22;
+}
+
+.btn-action.teal {
+  background: linear-gradient(135deg, #5AC8FA, #4A9FD8);
+  box-shadow: 0 4px 12px rgba(90, 200, 250, 0.3);
+}
+
+.btn-action.teal:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4AB8E8, #3A8FC6);
+  box-shadow: 0 6px 16px rgba(90, 200, 250, 0.4);
 }
 
 .loading-spinner {

@@ -81,6 +81,7 @@
             :mode="regionUsing"
             v-model:selected="selectedValue"
             :placeholder="regionUsing === 'map' ? '請選擇地圖集分區' : '請選擇音典分區'"
+            @selectCustomRegion="handleCustomRegionSelect"
         />
 
       </div>
@@ -328,6 +329,68 @@ const suggestionStyle = ref({
 const selectedCount = ref(null)
 // 定义事件，用于通知父组件禁用/启用按钮
 const emit = defineEmits(['update:runDisabled', 'update:modelValue'])
+
+// 自定義分區狀態
+const customRegionLocations = ref([])
+const customRegionName = ref('')
+
+// 處理自定義分區選擇
+function handleCustomRegionSelect({ regionName, locations }) {
+  // 不修改 textarea，僅內部處理
+  customRegionLocations.value = locations
+  customRegionName.value = regionName
+
+  // 清空系統分區選擇
+  selectedValue.value = []
+
+  // 自動觸發查詢（使用自定義分區的地點）
+  handleCustomRegionQuery(locations)
+}
+
+// 使用自定義分區地點進行查詢
+async function handleCustomRegionQuery(locations) {
+  if (!locations || locations.length === 0) {
+    return
+  }
+
+  try {
+    const data = await getLocations({
+      locations,
+      regions: [],  // 不使用系統分區
+      region_mode: regionUsing.value
+    })
+
+    if (data.success) {
+      selectedCount.value = data.locations_result?.length || 0
+
+      // 更新父組件
+      emit('update:modelValue', {
+        locations: data.locations_result || [],
+        regions: [],
+        regionUsing: regionUsing.value
+      })
+
+      // 檢查限制
+      checkLocationLimit(selectedCount.value)
+    }
+  } catch (error) {
+    console.error('自定義分區查詢失敗', error)
+  }
+}
+
+// 檢查地點數量限制
+function checkLocationLimit(count) {
+  const contextLimits = LOCATION_LIMITS[props.limitContext] || LOCATION_LIMITS.default
+  const limits = contextLimits[userStore.role] || contextLimits.anonymous
+
+  if (count > limits.MAX_LOCATIONS) {
+    limitHint.value = limits.MESSAGE.replace('{limit}', limits.MAX_LOCATIONS)
+    updateDisabledState(true)
+  } else {
+    limitHint.value = ''
+    updateDisabledState(false)
+  }
+}
 
 // 辅助函数：同时更新 emit 和 store（向后兼容）
 function updateDisabledState(isDisabled) {
