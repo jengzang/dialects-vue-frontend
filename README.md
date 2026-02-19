@@ -553,7 +553,7 @@ npm run build
 
 **許可證：** ISC License
 
-**項目維護者：** 鄭章
+**項目維護者：** jengzang
 
 **相關倉庫：**
 - 前端倉庫：[https://github.com/jengzang/dialects-vue-frontend](https://github.com/jengzang/dialects-vue-frontend)
