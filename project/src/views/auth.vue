@@ -1,9 +1,11 @@
 <template>
   <div>
     <!-- Loading State -->
-    <div v-if="isInitLoading" style="padding: 40px; text-align: center;">
-      <div class="login-spinner" style="width: 40px; height: 40px; border-width: 4px; margin: 0 auto 20px;"></div>
-      <p style="color: #666;">正在同步數據...</p>
+    <div v-if="isInitLoading" class="init-loading-overlay">
+      <div class="glass-loading-container">
+        <div class="glass-spinner"></div>
+        <p class="loading-text">正在同步數據...</p>
+      </div>
     </div>
 
     <!-- Main Content -->
@@ -96,7 +98,7 @@ import { userStore } from '@/utils/store.js'
 import { computeQueryStats } from '@/utils/userStats.js'
 import { manualReport } from '@/utils/onlineTimeTracker.js'
 import { WEB_BASE } from '@/env-config.js'
-import { showConfirm } from '@/utils/message.js'
+import { showConfirm, showSuccess } from '@/utils/message.js'
 
 // Component imports
 import LoginForm from '@/components/user/auth/LoginForm.vue'
@@ -175,6 +177,7 @@ const handleLogin = async (credentials) => {
     await fetchUser()
     await getUserRole()
 
+    showSuccess('登录成功')
     success.value = '✅ 登錄成功<br>即將刷新頁面'
     setTimeout(() => {
       window.location.reload()
@@ -230,13 +233,14 @@ const handleRegister = async ({ username, email, password, confirmPassword }) =>
 
   try {
     await registerUser({ username, email, password })
-    success.value = '✅ 註冊成功，請登錄👤<br> ⏳ 兩秒後將自動跳轉到登錄頁面。'
+    showSuccess('注册成功！请登录')
+    success.value = '✅ 註冊成功，請登錄👤<br> ⏳ 一秒後將自動跳轉到登錄頁面。'
 
     setTimeout(() => {
       setMode('login')
       error.value = ''
       success.value = ''
-    }, 2000)
+    }, 1000)
   } catch (e) {
     const msg = e.message || ''
     if (msg.includes('Username already exists')) {
@@ -359,23 +363,32 @@ const logout = async () => {
 
   if (!confirmed) return
 
-  // console.log('🚪 [登出] 用户登出，先上报在线时长')
-  await manualReport()
+  // Show loading state
+  loading.value = true
 
-  const refreshToken = getRefreshToken()
-  await logoutUser(refreshToken)
+  try {
+    // console.log('🚪 [登出] 用户登出，先上报在线时长')
+    await manualReport()
 
-  // Clear user state
-  userStore.isAuthenticated = false
-  userStore.role = 'anonymous'
-  userStore.id = null
-  userStore.username = null
-  user.value = null
+    const refreshToken = getRefreshToken()
+    await logoutUser(refreshToken)
 
-  // console.log('✅ [登出] 登出完成')
+    // Clear user state
+    userStore.isAuthenticated = false
+    userStore.role = 'anonymous'
+    userStore.id = null
+    userStore.username = null
+    user.value = null
 
-  // Redirect to login page instead of reloading
-  setView('login')
+    // console.log('✅ [登出] 登出完成')
+
+    // Redirect to login page instead of reloading
+    setView('login')
+  } catch (error) {
+    console.error('退出登录失败:', error)
+  } finally {
+    loading.value = false
+  }
 }
 
 const fetchUser = async () => {
@@ -448,20 +461,81 @@ watch(mode, () => {
 </script>
 
 <style scoped>
-.login-spinner {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #3498db;
+/* 🍎 Apple 液态玻璃风格加载动画 */
+
+/* 初始加载遮罩 */
+.init-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  z-index: 9999;
+}
+
+/* 玻璃风格加载容器 */
+.glass-loading-container {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.08);
+  padding: 40px 60px;
+  text-align: center;
+  animation: glass-fade-in 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Apple 风格加载动画 */
+.glass-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(0, 122, 255, 0.2);
+  border-top-color: #007aff;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  animation: spin 1s linear infinite;
-  display: inline-block;
-  vertical-align: middle;
+  animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  margin: 0 auto 20px;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.loading-text {
+  color: #1c1c1e;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes glass-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 降级方案（不支持 backdrop-filter 的浏览器） */
+@supports not (backdrop-filter: blur(40px)) {
+  .glass-loading-container {
+    background: rgba(255, 255, 255, 0.98);
+  }
+
+  .init-loading-overlay {
+    background: rgba(255, 255, 255, 0.95);
+  }
 }
 </style>
 
