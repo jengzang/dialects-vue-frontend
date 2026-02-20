@@ -396,7 +396,7 @@ onBeforeUnmount(() => {
   margin: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 12px;
   width: 100%;

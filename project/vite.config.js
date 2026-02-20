@@ -46,7 +46,14 @@ export default defineConfig(({ mode }) => {
           entryFileNames: 'assets/[name].[hash].js',  // 在入口文件名中添加哈希值
           chunkFileNames: 'assets/[name].[hash].js',  // 在chunk文件名中添加哈希值
           assetFileNames: 'assets/[name].[hash].[ext]', // 在资产文件（如 css, images）中添加哈希值
-          manualChunks: undefined,               // 可選：禁用分包
+          // 启用代码分割 - 将大型依赖拆分为独立chunks
+          manualChunks: {
+            'echarts': ['echarts'],
+            'maplibre': ['maplibre-gl'],
+            'xlsx': ['xlsx'],
+            'vue-vendor': ['vue', 'vue-router'],
+            'wavesurfer': ['wavesurfer.js']
+          }
         },
       }
     }

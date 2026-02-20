@@ -1049,3 +1049,76 @@ textarea:focus {
   transform: translateY(-50%) scale(1.01);
   transition: all 0.3s ease;
 }
+
+/* ========================================
+   浏览器兼容性优化 - WeChat/Quark浏览器
+   ======================================== */
+
+/* backdrop-filter fallback - 当浏览器不支持时使用纯色背景 */
+@supports not (backdrop-filter: blur(10px)) {
+  .glass-panel,
+  .glass-card,
+  .glass-modal-overlay,
+  .glass-panel-inner,
+  .glass-button,
+  .nav-bar,
+  .sidebar,
+  .map-control,
+  .tab,
+  .dropdown,
+  .dropdown-panel,
+  .page,
+  [class*="glass"],
+  [class*="panel"] {
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* 深色背景的fallback */
+  .glass-modal-overlay {
+    background: rgba(0, 0, 0, 0.85) !important;
+  }
+
+  .tab.active {
+    background: rgba(0, 122, 255, 0.9) !important;
+  }
+}
+
+/* ========================================
+   Android性能优化 - 减少backdrop-filter重绘
+   ======================================== */
+
+/* 为sticky元素添加GPU加速和布局隔离 */
+.sticky-header,
+.sticky-label,
+[class*="sticky"] {
+  will-change: transform;
+  contain: layout style;
+}
+
+/* 将backdrop-filter移到伪元素，避免滚动时重绘 */
+.sticky-header::before,
+.sticky-label::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: -1;
+}
+
+/* ========================================
+   性能优化 - 避免 transition: all
+   ======================================== */
+
+/* 限制transition属性，避免layout thrashing */
+* {
+  transition-property: background-color, color, border-color, opacity, transform !important;
+}
+
+/* 移除不必要的transition，提升表格性能 */
+.matrix-cell,
+.table-cell,
+[class*="cell"] {
+  transition: background-color 0.15s ease !important;
+}
