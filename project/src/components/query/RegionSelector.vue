@@ -591,6 +591,12 @@ const customRegionOptions = computed(() => {
 })
 
 async function loadCustomRegions() {
+  // Authentication guard - prevent API calls for unauthenticated users
+  if (!userStore.isAuthenticated) {
+    customRegions.value = []
+    return
+  }
+
   if (loadingCustomRegions.value) return
 
   loadingCustomRegions.value = true

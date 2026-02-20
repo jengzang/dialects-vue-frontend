@@ -114,7 +114,8 @@ export {
 export {
   getCustomRegions,
   createOrUpdateCustomRegion,
-  deleteCustomRegion
+  deleteCustomRegion,
+  clearCustomRegionsCache
 } from './user/custom-regions.js'
 
 // ==================== 日志统计 ====================

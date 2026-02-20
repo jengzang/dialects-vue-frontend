@@ -490,7 +490,7 @@ const startAnalysis = async () => {
     jobStage.value = '上傳音頻中...'
     const uploadResponse = await uploadAudio(audioFile.value)
     uploadId.value = uploadResponse.task_id  // ✅ 后端返回的是 task_id
-    isUploading.value = false
+    // isUploading.value = false  // ❌ 延续 loading 状态直到跳转到结果页面
 
     // 管理员不受此限制
     const duration = uploadResponse.normalized_meta?.duration_s || uploadResponse.audio_metadata?.duration_s
@@ -514,6 +514,7 @@ const startAnalysis = async () => {
       jobStage.value = ''
       activeTab.value = 'upload'
       isAnalyzing.value = false  // ✅ 清除分析中标志
+      isUploading.value = false  // ✅ 取消 loading 状态
 
       console.warn(`[Praat] Audio duration ${duration}s exceeds 3s limit for spectrogram analysis - analysis blocked`)
       return
@@ -530,6 +531,7 @@ const startAnalysis = async () => {
     jobId.value = jobResponse.job_id
 
     activeTab.value = 'results'
+    isUploading.value = false  // ✅ 跳转到结果页面时取消 loading 状态
 
     // Start polling
     jobStage.value = '開始分析...'
