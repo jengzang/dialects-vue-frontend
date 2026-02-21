@@ -336,7 +336,7 @@
 import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import * as XLSX from 'xlsx'
-import { uploadReference, uploadFiles, executeMerge, getMergeProgress, downloadMerge } from '@/api/tools'
+import { uploadReference, uploadFiles, executeMerge, getMergeProgress, downloadMerge } from '@/api/tools/index.js'
 import { userStore } from '@/utils/store.js'
 import { showSuccess, showError, showWarning, showConfirm } from '@/utils/message.js'
 

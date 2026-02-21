@@ -9,20 +9,21 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 // 引入 explore 相关的页面组件
-import YangChunVillages from "./explore/YangChunVillages.vue";
-import CheckTool from "./explore/CheckTool.vue";
-import Jyut2IpaTool from "./explore/Jyut2IpaTool.vue";
-import MergeTool from "./explore/MergeTool.vue";
-import gdVillages from "./explore/gdVillagesTree.vue";
-import SimpleLayout from "./explore/TableManage.vue";
-import ZhongGuPage from "./explore/ZhongGuPage.vue";
-import YangChunSpoken from "./explore/YangChunSpoken.vue";
-import YuBaoPage from "./explore/YuBaoPage.vue";
-import gdVillagesTable from "./explore/gdVillagesTable.vue";
-import PhonologyMatrixPage from "./explore/PhonologyPage.vue";
-import Countphos from "./explore/Countphos.vue";
-import PhonologyCustom from "./explore/PhonologyCustom.vue";
-import Praat from "@/views/explore/Praat.vue";
+import YangChunVillages from "./explore/villages/YangChunVillages.vue";
+import CheckTool from "./explore/tools/CheckTool.vue";
+import Jyut2IpaTool from "./explore/tools/Jyut2IpaTool.vue";
+import MergeTool from "./explore/tools/MergeTool.vue";
+import gdVillages from "./explore/villages/gdVillagesTree.vue";
+import SimpleLayout from "./explore/tools/TableManage.vue";
+import ZhongGuPage from "./explore/pho/ZhongGuPage.vue";
+import YangChunSpoken from "./explore/pho/YangChunSpoken.vue";
+import YuBaoPage from "./explore/pho/YuBaoPage.vue";
+import gdVillagesTable from "./explore/villages/gdVillagesTable.vue";
+import PhonologyMatrixPage from "./explore/pho/PhonologyPage.vue";
+import Countphos from "./explore/pho/Countphos.vue";
+import PhonologyCustom from "./explore/pho/PhonologyCustom.vue";
+import Praat from "@/views/explore/tools/Praat.vue";
+import VillagesML from "@/views/explore/villages/VillagesML.vue";
 
 const route = useRoute()
 
@@ -44,7 +45,8 @@ const activeComponent = computed(() => {
     phonologyMatrix: PhonologyMatrixPage,
     Countphos: Countphos,
     phonologyCustom:PhonologyCustom,
-    praat : Praat
+    praat : Praat,
+    VillagesML: VillagesML,
   }
   return pageMap[page] || PhonologyMatrixPage
 })

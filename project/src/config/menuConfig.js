@@ -109,6 +109,11 @@ export const menuConfig = {
         path: '/explore?page=gdVillages'
       },
       {
+        label: '機器學習',
+        icon: '🤖',
+        path: '/explore?page=VillagesML'
+      },
+      {
         label: '全粵村情表格',
         icon: '📈',
         path: '/explore?page=gdVillagesTable'

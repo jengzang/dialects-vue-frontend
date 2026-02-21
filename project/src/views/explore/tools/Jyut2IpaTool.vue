@@ -261,7 +261,7 @@ import {
   processJyut2Ipa,
   getJyut2IpaProgress,
   downloadJyut2IpaResult
-} from '@/api/tools'
+} from '@/api/tools/index.js'
 import { userStore } from '@/utils/store.js'
 import { showSuccess, showError, showWarning, showConfirm } from '@/utils/message.js'
 

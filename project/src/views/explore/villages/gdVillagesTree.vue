@@ -105,7 +105,7 @@
 import { ref, onMounted } from 'vue';
 import VillagesTreeItem from '@/components/TableAndTree/VillagesTreeItem.vue';
 import VillageMapPopup from '@/components/map/VillageMapPopup.vue';
-import { lazyLoadTree, loadFullTree } from '@/api/sql';
+import { lazyLoadTree, loadFullTree } from '@/api/sql/index.js';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { getFeatureCounts } from '@/api/query/core'
+import { getFeatureCounts } from '@/api/query/core.js'
 import LocationMultiInput from '@/components/query/LocationMultiInput.vue'
 
 const loading = ref(false)

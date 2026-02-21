@@ -53,7 +53,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getPhonologyMatrix } from '@/api/query/phonology'
+import { getPhonologyMatrix } from '@/api/query/phonology.js'
 import PhonologyMatrix from '@/components/TableAndTree/PhonologyTable.vue'
 import LocationMultiInput from '@/components/query/LocationMultiInput.vue'
 import { parseLocationsFromUrl, updateUrlWithLocations } from '@/api/urlParams.js'

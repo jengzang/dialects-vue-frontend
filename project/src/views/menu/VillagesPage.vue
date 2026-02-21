@@ -10,12 +10,17 @@
           <div class="village-desc">廣東省自然村樹狀圖</div>
         </button>
 
+        <button class="village-btn" @click="handleVillagesML">
+          <div class="village-icon">🤖</div>
+          <div class="village-name">廣東自然村分析</div>
+          <div class="village-desc">廣東自然村數據機器學習、NLP等</div>
+        </button>
+
         <button class="village-btn" @click="handleGdVillagesTable">
           <div class="village-icon">📈</div>
           <div class="village-name">全粵村情表格</div>
           <div class="village-desc">廣東省自然村表格數據</div>
         </button>
-
 
         <button class="village-btn" @click="handleYcVillages">
           <div class="village-icon">🏠</div>
@@ -41,6 +46,10 @@ const handleGdVillages = () => {
 
 const handleYcVillages = () => {
   router.push('/explore?page=ycVillages')
+};
+
+const handleVillagesML = () => {
+  router.push('/explore?page=VillagesML')
 };
 </script>
 

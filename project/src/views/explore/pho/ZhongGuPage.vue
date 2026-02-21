@@ -93,7 +93,7 @@
 <script setup>
 import {computed, ref} from 'vue';
 import CharTreeItem from '@/components/TableAndTree/CharTreeItem.vue';
-import {loadFullTree} from '@/api/sql';
+import {loadFullTree} from '@/api/sql/index.js';
 
 // Classification Types Configuration
 const CLASSIFICATION_TYPES = {

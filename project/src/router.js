@@ -123,7 +123,8 @@ const ExploreTitleMap = {
     phonologyMatrix: '方音圖鑑 - 音系表',
     phonologyCustom: '方音圖鑑 - 自定義音素表',
     Countphos: '方音圖鑑 - 音節統計',
-    praat: '方音圖鑒 - 實驗語音學'
+    praat: '方音圖鑑 - 實驗語音學',
+    VillagesML: '方音圖鑑 - 自然村機器學習'
 
 };
 

@@ -93,7 +93,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getPhonologyClassificationMatrix } from '@/api/query/phonology'
+import { getPhonologyClassificationMatrix } from '@/api/query/phonology.js'
 import PhonologyMatrix from '@/components/TableAndTree/PhonologyTable.vue'
 import LocationMultiInput from '@/components/query/LocationMultiInput.vue'
 import {
