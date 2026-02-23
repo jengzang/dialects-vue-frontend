@@ -153,7 +153,7 @@ import NetworkGraphPanel from '@/components/villagesML/semantic/NetworkGraphPane
 const modules = [
   {
     id: 'dashboard',
-    label: '儀表板',
+    label: '總覽',
     icon: '📊',
     component: Dashboard,
     requireAuth: false

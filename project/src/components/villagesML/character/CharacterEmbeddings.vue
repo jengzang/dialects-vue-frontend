@@ -41,12 +41,12 @@
           <div class="similarity-items">
             <div
               v-for="(item, index) in similarities"
-              :key="item.char"
+              :key="item.character"
               class="similarity-item"
               :class="{ 'top-3': index < 3 }"
             >
               <div class="rank">{{ index + 1 }}</div>
-              <div class="char">{{ item.char }}</div>
+              <div class="char">{{ item.character }}</div>
               <div class="similarity-bar">
                 <div
                   class="bar-fill"
@@ -60,10 +60,11 @@
 
         <!-- Vector Visualization -->
         <div class="vector-viz glass-panel">
-          <h3>向量可視化</h3>
-          <div class="viz-placeholder">
-            <p>📊 t-SNE / UMAP 可視化</p>
-            <p class="viz-note">顯示 {{ searchChar }} 及其相似字在向量空間中的分佈</p>
+          <h3>相似度網絡圖</h3>
+          <div v-if="similarities.length > 0" ref="vizChartRef" class="viz-chart"></div>
+          <div v-else class="viz-placeholder">
+            <p>📊 相似度可視化</p>
+            <p class="viz-note">搜尋字符後將顯示 {{ searchChar || '該字' }} 及其相似字的關係網絡</p>
           </div>
         </div>
       </div>
@@ -71,7 +72,7 @@
       <!-- Embeddings List -->
       <div class="embeddings-list glass-panel">
         <div class="list-header">
-          <h3>字符嵌入列表</h3>
+          <h3>字符嵌入列表 (共 {{ totalEmbeddings }} 個字符)</h3>
           <div class="pagination-controls">
             <button
               :disabled="currentPage === 1"
@@ -79,9 +80,9 @@
             >
               上一頁
             </button>
-            <span>第 {{ currentPage }} 頁</span>
+            <span>第 {{ currentPage }} / {{ totalPages }} 頁</span>
             <button
-              :disabled="embeddings.length < pageSize"
+              :disabled="currentPage === totalPages"
               @click="changePage(currentPage + 1)"
             >
               下一頁
@@ -97,21 +98,23 @@
         <div v-else class="embeddings-table">
           <div class="table-header">
             <div class="col-char">字符</div>
+            <div class="col-freq">出現頻率</div>
             <div class="col-dim">向量維度</div>
             <div class="col-action">操作</div>
           </div>
           <div class="table-body">
             <div
               v-for="embedding in embeddings"
-              :key="embedding.char"
+              :key="embedding.character"
               class="table-row"
             >
-              <div class="col-char">{{ embedding.char }}</div>
-              <div class="col-dim">{{ embedding.vector_dim }}</div>
+              <div class="col-char">{{ embedding.character }}</div>
+              <div class="col-freq">{{ embedding.frequency || 'N/A' }}</div>
+              <div class="col-dim">{{ embedding.vector_dim || 'N/A' }}</div>
               <div class="col-action">
                 <button
                   class="action-button"
-                  @click="searchChar = embedding.char; searchSimilarities()"
+                  @click="searchChar = embedding.character; searchSimilarities()"
                 >
                   查找相似
                 </button>
@@ -125,8 +128,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
+import * as echarts from 'echarts'
 import {
   getCharEmbeddingsList,
   getCharSimilarities
@@ -143,6 +147,11 @@ const embeddings = ref([])
 const loadingList = ref(false)
 const currentPage = ref(1)
 const pageSize = 100
+const totalEmbeddings = ref(0)
+const totalPages = computed(() => Math.ceil(totalEmbeddings.value / pageSize))
+
+const vizChartRef = ref(null)
+let vizChartInstance = null
 
 // Methods
 const handleCharInput = () => {
@@ -155,29 +164,125 @@ const handleCharInput = () => {
 const searchSimilarities = async () => {
   if (!searchChar.value) return
 
+  console.log('searchSimilarities called with:', searchChar.value, topN.value)
   loading.value = true
   try {
     const result = await getCharSimilarities({
       char: searchChar.value,
-      top_n: topN.value
+      top_k: topN.value
     })
-    similarities.value = result || []
+    console.log('Similarities API result:', result)
+    // 新格式：{ query_character, top_k, similarities: [...] }
+    similarities.value = result.similarities || result || []
+    // 渲染可視化圖表
+    nextTick(() => renderVizChart())
   } catch (error) {
+    console.error('Similarities API error:', error)
     showError('搜尋相似字失敗')
   } finally {
     loading.value = false
   }
 }
 
+const renderVizChart = () => {
+  if (!vizChartRef.value || similarities.value.length === 0) return
+
+  if (vizChartInstance) vizChartInstance.dispose()
+  vizChartInstance = echarts.init(vizChartRef.value)
+
+  // 過濾掉搜索字符本身，並去除重複字符
+  const seenCharacters = new Set([searchChar.value])
+  const filteredSimilarities = similarities.value.filter(item => {
+    if (!item.character || seenCharacters.has(item.character)) {
+      return false
+    }
+    seenCharacters.add(item.character)
+    return true
+  })
+
+  // 如果過濾後沒有數據，不渲染圖表
+  if (filteredSimilarities.length === 0) {
+    console.warn('No valid similarities to display after filtering')
+    return
+  }
+
+  // 構建節點和邊
+  const nodes = [
+    {
+      id: searchChar.value,
+      name: searchChar.value,
+      value: 1,
+      symbolSize: 60,
+      itemStyle: { color: '#4a90e2' },
+      label: { fontSize: 20, fontWeight: 'bold' }
+    },
+    ...filteredSimilarities.map((item, index) => ({
+      id: item.character,
+      name: item.character,
+      value: item.similarity,
+      symbolSize: 30 + item.similarity * 30,
+      itemStyle: {
+        color: `rgba(80, 200, 120, ${0.5 + item.similarity * 0.5})`
+      }
+    }))
+  ]
+
+  const links = filteredSimilarities.map(item => ({
+    source: searchChar.value,
+    target: item.character,
+    value: item.similarity,
+    lineStyle: {
+      width: 1 + item.similarity * 3,
+      opacity: 0.3 + item.similarity * 0.5
+    }
+  }))
+
+  const option = {
+    tooltip: {
+      formatter: (params) => {
+        if (params.dataType === 'edge') {
+          return `${params.data.source} → ${params.data.target}<br/>相似度: ${(params.data.value * 100).toFixed(2)}%`
+        }
+        return `${params.data.name}<br/>相似度: ${(params.data.value * 100).toFixed(2)}%`
+      }
+    },
+    series: [{
+      type: 'graph',
+      layout: 'force',
+      data: nodes,
+      links: links,
+      roam: true,
+      label: { show: true, fontSize: 14 },
+      force: {
+        repulsion: 200,
+        edgeLength: 100
+      },
+      emphasis: {
+        focus: 'adjacency',
+        lineStyle: { width: 5 }
+      }
+    }]
+  }
+
+  vizChartInstance.setOption(option)
+}
+
 const loadEmbeddingsList = async () => {
+  console.log('loadEmbeddingsList called')
   loadingList.value = true
   try {
     const result = await getCharEmbeddingsList({
       limit: pageSize,
       offset: (currentPage.value - 1) * pageSize
     })
+    console.log('Embeddings API result:', result)
+    // 新格式：{ embeddings: [...], total, limit, offset, page, page_size }
     embeddings.value = result.embeddings || []
+    totalEmbeddings.value = result.total || 0
+    console.log('Embeddings value:', embeddings.value)
+    console.log('Total embeddings:', totalEmbeddings.value)
   } catch (error) {
+    console.error('Embeddings API error:', error)
     showError('加載嵌入列表失敗')
   } finally {
     loadingList.value = false
@@ -358,6 +463,11 @@ onMounted(() => {
   text-align: center;
 }
 
+.viz-chart {
+  width: 100%;
+  height: 400px;
+}
+
 .viz-placeholder p {
   font-size: 20px;
   color: var(--text-primary);
@@ -432,14 +542,16 @@ onMounted(() => {
 .embeddings-table {
   border-radius: 12px;
   overflow: hidden;
+  justify-items: center;
 }
 
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 100px 1fr 150px;
+  grid-template-columns: 100px 120px 120px 150px;
   gap: 16px;
   padding: 12px 16px;
+
 }
 
 .table-header {
@@ -464,8 +576,10 @@ onMounted(() => {
   text-align: center;
 }
 
+.col-freq,
 .col-dim {
   color: var(--text-secondary);
+  text-align: center;
 }
 
 .action-button {

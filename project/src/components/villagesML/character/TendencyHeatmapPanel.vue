@@ -37,7 +37,7 @@ const renderChart = () => {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
     xAxis: {
       type: 'category',
-      data: props.data.map(item => item.char),
+      data: props.data.map(item => item.character),
       axisLabel: { fontSize: 14 }
     },
     yAxis: { type: 'value', name: 'Z-Score' },
