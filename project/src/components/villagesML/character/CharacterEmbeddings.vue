@@ -445,7 +445,7 @@ onMounted(() => {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), var(--secondary-color));
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
   transition: width 0.5s ease;
 }
 

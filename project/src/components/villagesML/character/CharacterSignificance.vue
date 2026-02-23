@@ -118,15 +118,17 @@
               :class="{ 'significant': item.p_value < 0.05 }"
             >
               <div class="col">
-                {{ queryMode === 'by-char' ? item.region_name : item.char }}
+                {{ queryMode === 'by-char' ? item.region_name : (item.character || item.char) }}
               </div>
-              <div class="col">{{ item.chi_square.toFixed(4) }}</div>
+              <div class="col">
+                {{ (item.chi_square_statistic !== undefined ? item.chi_square_statistic : item.chi_square).toFixed(2) }}
+              </div>
               <div class="col">
                 <span :class="getPValueClass(item.p_value)">
                   {{ item.p_value.toFixed(6) }}
                 </span>
               </div>
-              <div class="col">{{ item.effect_size.toFixed(4) }}</div>
+              <div class="col">{{ item.effect_size.toFixed(2) }}</div>
               <div class="col">
                 <span class="significance-badge" :class="getSignificanceBadge(item.p_value)">
                   {{ getSignificanceLabel(item.p_value) }}
@@ -185,13 +187,17 @@ const loading = ref(false)
 const queryByChar = async () => {
   if (!queryChar.value) return
 
+  console.log('queryByChar called with:', queryChar.value, regionLevel.value)
   loading.value = true
   try {
-    results.value = await getCharSignificanceByChar({
+    const result = await getCharSignificanceByChar({
       char: queryChar.value,
       region_level: regionLevel.value
     })
+    console.log('Significance by char result:', result)
+    results.value = result || []
   } catch (error) {
+    console.error('Query by char error:', error)
     showError('查詢失敗')
   } finally {
     loading.value = false
@@ -201,19 +207,25 @@ const queryByChar = async () => {
 const queryByRegion = async () => {
   if (!regionName.value) return
 
+  console.log('queryByRegion called with:', regionLevel.value, regionName.value, topN.value)
   loading.value = true
   try {
-    results.value = await getCharSignificanceByRegion({
+    const result = await getCharSignificanceByRegion({
       region_level: regionLevel.value,
       region_name: regionName.value,
-      top_n: topN.value
+      top_k: topN.value
     })
+    console.log('Significance by region result:', result)
+    results.value = result || []
 
     // Load summary
-    summary.value = await getCharSignificanceSummary({
+    const summaryResult = await getCharSignificanceSummary({
       region_level: regionLevel.value
     })
+    console.log('Summary result:', summaryResult)
+    summary.value = summaryResult
   } catch (error) {
+    console.error('Query by region error:', error)
     showError('查詢失敗')
   } finally {
     loading.value = false
