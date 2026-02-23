@@ -150,7 +150,7 @@ onMounted(async () => {
 
 .search-input:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.7);
 }
 
@@ -185,7 +185,7 @@ onMounted(async () => {
 
 .filter-select:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
 }
 
 .clear-filters-button {
@@ -193,7 +193,7 @@ onMounted(async () => {
   border: none;
   border-radius: 10px;
   background: rgba(243, 156, 18, 0.2);
-  color: var(--accent-color);
+  color: var(--color-warning);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.3s ease;

@@ -152,7 +152,7 @@ const changePage = (page) => {
   width: 40px;
   height: 40px;
   border: 3px solid rgba(74, 144, 226, 0.2);
-  border-top-color: var(--primary-color);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -226,7 +226,7 @@ const changePage = (page) => {
 
 .village-name {
   font-weight: 500;
-  color: var(--primary-color);
+  color: var(--color-primary);
 }
 
 .view-button {
@@ -234,7 +234,7 @@ const changePage = (page) => {
   border: none;
   border-radius: 6px;
   background: rgba(74, 144, 226, 0.2);
-  color: var(--primary-color);
+  color: var(--color-primary);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -265,7 +265,7 @@ const changePage = (page) => {
 
 .page-button:hover:not(:disabled) {
   background: rgba(74, 144, 226, 0.2);
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
 }
 
 .page-button:disabled {

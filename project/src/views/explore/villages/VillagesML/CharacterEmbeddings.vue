@@ -1,5 +1,5 @@
 <template>
-  <ExploreLayout>
+<!--  <ExploreLayout>-->
     <div class="character-embeddings-page">
       <h1 class="page-title">🔤 字符嵌入與相似度</h1>
 
@@ -121,7 +121,7 @@
         </div>
       </div>
     </div>
-  </ExploreLayout>
+<!--  </ExploreLayout>-->
 </template>
 
 <script setup>
@@ -247,14 +247,14 @@ onMounted(() => {
 .char-input:focus,
 .number-input:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.8);
 }
 
 .search-button {
   flex: 1;
   padding: 12px 24px;
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 12px;
@@ -340,14 +340,14 @@ onMounted(() => {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(90deg, var(--color-primary), var(--secondary-color));
   transition: width 0.5s ease;
 }
 
 .similarity-value {
   font-size: 14px;
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--color-primary);
   text-align: right;
 }
 
@@ -393,7 +393,7 @@ onMounted(() => {
 
 .pagination-controls button {
   padding: 8px 16px;
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -419,7 +419,7 @@ onMounted(() => {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(74, 144, 226, 0.2);
-  border-top-color: var(--primary-color);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 15px;
@@ -470,7 +470,7 @@ onMounted(() => {
 
 .action-button {
   padding: 6px 16px;
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 6px;

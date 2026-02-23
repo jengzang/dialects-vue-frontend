@@ -24,8 +24,8 @@
           <label>主要區域 Primary Region:</label>
           <select v-model="primaryRegion" @change="handlePrimaryChange" class="glass-select">
             <option value="">-- 請選擇 --</option>
-            <option v-for="region in availableRegions" :key="region" :value="region">
-              {{ region }}
+            <option v-for="region in availableRegions" :key="region.name || region" :value="region.name || region">
+              {{ region.name || region }}
             </option>
           </select>
         </div>
@@ -33,8 +33,8 @@
           <label>比較區域 Compare Region (可選):</label>
           <select v-model="compareRegion" class="glass-select">
             <option value="">-- 無 --</option>
-            <option v-for="region in availableRegions" :key="region" :value="region" :disabled="region === primaryRegion">
-              {{ region }}
+            <option v-for="region in availableRegions" :key="region.name || region" :value="region.name || region" :disabled="(region.name || region) === primaryRegion">
+              {{ region.name || region }}
             </option>
           </select>
         </div>
@@ -400,7 +400,7 @@ onMounted(() => {
 }
 
 .glass-panel {
-  background: var(--glass-bg);
+  background: var(--glass-heavy);
   backdrop-filter: blur(10px);
   border: 1px solid var(--glass-border);
   border-radius: 16px;

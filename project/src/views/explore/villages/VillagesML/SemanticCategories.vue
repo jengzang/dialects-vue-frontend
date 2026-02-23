@@ -1,5 +1,5 @@
 <template>
-  <ExploreLayout>
+<!--  <ExploreLayout>-->
     <div class="semantic-categories-page">
       <h1 class="page-title">🏷️ 語義類別與標籤</h1>
 
@@ -200,7 +200,7 @@
                 class="tendency-fill"
                 :style="{
                   width: `${Math.abs(item.z_score) * 10}%`,
-                  background: item.z_score >= 0 ? 'var(--primary-color)' : '#e74c3c'
+                  background: item.z_score >= 0 ? 'var(--color-primary)' : '#e74c3c'
                 }"
               ></div>
             </div>
@@ -210,7 +210,7 @@
         </div>
       </div>
     </div>
-  </ExploreLayout>
+<!--  </ExploreLayout>-->
 </template>
 
 <script setup>
@@ -402,7 +402,7 @@ onMounted(() => {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(74, 144, 226, 0.2);
-  border-top-color: var(--primary-color);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 15px;
@@ -493,7 +493,7 @@ onMounted(() => {
 
 .query-button {
   padding: 10px 20px;
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -539,7 +539,7 @@ onMounted(() => {
 
 .vtf-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(90deg, var(--color-primary), var(--secondary-color));
   transition: width 0.5s ease;
 }
 
@@ -550,7 +550,7 @@ onMounted(() => {
 .vtf-value {
   font-size: 14px;
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--color-primary);
   text-align: right;
 }
 
@@ -586,9 +586,9 @@ onMounted(() => {
 }
 
 .tab-button.active {
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
 }
 
 .labels-content {
@@ -617,7 +617,7 @@ onMounted(() => {
 .label-tag {
   padding: 6px 14px;
   background: rgba(74, 144, 226, 0.2);
-  color: var(--primary-color);
+  color: var(--color-primary);
   border-radius: 16px;
   font-weight: 500;
   transition: all 0.3s ease;
@@ -702,7 +702,7 @@ onMounted(() => {
 .tendency-value {
   font-size: 14px;
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--color-primary);
 }
 
 .tendency-freq {

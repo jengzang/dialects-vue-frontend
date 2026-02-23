@@ -93,7 +93,7 @@ defineProps({
   width: 40px;
   height: 40px;
   border: 4px solid rgba(74, 144, 226, 0.2);
-  border-top-color: var(--primary-color);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 15px;
@@ -150,7 +150,7 @@ defineProps({
 .item-value {
   font-size: 18px;
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--color-primary);
 }
 
 .map-placeholder {

@@ -1,5 +1,5 @@
 <template>
-  <ExploreLayout>
+<!--  <ExploreLayout>-->
     <div class="spatial-hotspots-page">
       <h1 class="page-title">🗺️ 空間熱點與聚類</h1>
 
@@ -175,7 +175,7 @@
         </div>
       </div>
     </div>
-  </ExploreLayout>
+<!--  </ExploreLayout>-->
 </template>
 
 <script setup>
@@ -286,7 +286,7 @@ const loadClustersSummary = async () => {
 
 .load-button {
   padding: 10px 24px;
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -321,7 +321,7 @@ const loadClustersSummary = async () => {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(74, 144, 226, 0.2);
-  border-top-color: var(--primary-color);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 15px;
@@ -361,7 +361,7 @@ const loadClustersSummary = async () => {
 
 .hotspot-card.selected {
   background: rgba(74, 144, 226, 0.2);
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
 }
 
 .hotspot-header {
@@ -446,7 +446,7 @@ const loadClustersSummary = async () => {
 .stat-value {
   font-size: 24px;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--color-primary);
 }
 
 .map-placeholder {
@@ -576,7 +576,7 @@ const loadClustersSummary = async () => {
 .summary-value {
   font-size: 28px;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--color-primary);
 }
 
 .viz-placeholder {

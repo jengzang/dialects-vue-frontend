@@ -1,5 +1,5 @@
 <template>
-  <ExploreLayout>
+<!--  <ExploreLayout>-->
     <div class="semantic-composition-page">
       <h1 class="page-title">🧩 語義組合模式</h1>
 
@@ -243,7 +243,7 @@
         </div>
       </div>
     </div>
-  </ExploreLayout>
+<!--  </ExploreLayout>-->
 </template>
 
 <script setup>
@@ -401,13 +401,13 @@ const getPMIClass = (pmi) => {
 
 .number-input:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.8);
 }
 
 .query-button {
   padding: 10px 24px;
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -435,7 +435,7 @@ const getPMIClass = (pmi) => {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(74, 144, 226, 0.2);
-  border-top-color: var(--primary-color);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 15px;
@@ -537,7 +537,7 @@ const getPMIClass = (pmi) => {
 .category-badge {
   padding: 3px 10px;
   background: rgba(74, 144, 226, 0.2);
-  color: var(--primary-color);
+  color: var(--color-primary);
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
@@ -592,7 +592,7 @@ const getPMIClass = (pmi) => {
 
 .col-pmi {
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--color-primary);
 }
 
 .col-count {
@@ -608,7 +608,7 @@ const getPMIClass = (pmi) => {
 
 .strength-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(90deg, var(--color-primary), var(--secondary-color));
   transition: width 0.5s ease;
 }
 
@@ -645,7 +645,7 @@ const getPMIClass = (pmi) => {
 .index-value {
   font-size: 32px;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--color-primary);
 }
 
 @media (max-width: 1024px) {

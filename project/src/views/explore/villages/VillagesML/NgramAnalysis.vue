@@ -1,5 +1,5 @@
 <template>
-  <ExploreLayout>
+<!--  <ExploreLayout>-->
     <div class="ngram-analysis-page">
       <h1 class="page-title">📐 N-gram 分析</h1>
 
@@ -228,7 +228,7 @@
                       class="tendency-fill"
                       :style="{
                         width: `${Math.abs(item.z_score) * 10}%`,
-                        background: item.z_score >= 0 ? 'var(--primary-color)' : '#e74c3c'
+                        background: item.z_score >= 0 ? 'var(--color-primary)' : '#e74c3c'
                       }"
                     ></div>
                   </div>
@@ -300,7 +300,7 @@
         </div>
       </div>
     </div>
-  </ExploreLayout>
+<!--  </ExploreLayout>-->
 </template>
 
 <script setup>
@@ -527,7 +527,7 @@ const getSignificanceLabel = (pValue) => {
 
 .query-button {
   padding: 10px 24px;
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -555,7 +555,7 @@ const getSignificanceLabel = (pValue) => {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(74, 144, 226, 0.2);
-  border-top-color: var(--primary-color);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 15px;
@@ -614,7 +614,7 @@ const getSignificanceLabel = (pValue) => {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(90deg, var(--color-primary), var(--secondary-color));
   transition: width 0.5s ease;
 }
 
@@ -662,7 +662,7 @@ const getSignificanceLabel = (pValue) => {
 .example-tag {
   padding: 4px 12px;
   background: rgba(74, 144, 226, 0.2);
-  color: var(--primary-color);
+  color: var(--color-primary);
   border-radius: 12px;
   font-size: 13px;
 }

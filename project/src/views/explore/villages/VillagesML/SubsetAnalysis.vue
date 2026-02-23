@@ -537,7 +537,7 @@ const formatVector = (vec) => {
 }
 
 .glass-panel {
-  background: var(--glass-bg);
+  background: var(--glass-heavy);
   backdrop-filter: blur(10px);
   border: 1px solid var(--glass-border);
   border-radius: 16px;

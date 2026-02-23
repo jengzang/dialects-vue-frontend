@@ -99,7 +99,7 @@ onMounted(() => {
 .metric-value {
   font-size: 24px;
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--color-primary);
 }
 
 .chart-container {

@@ -36,8 +36,8 @@
             <label>區域篩選:</label>
             <select v-model="filterRegion" @change="handleFilterChange" class="glass-select">
               <option value="">全部區域</option>
-              <option v-for="region in availableRegions" :key="region" :value="region">
-                {{ region }}
+              <option v-for="region in availableRegions" :key="region.name || region" :value="region.name || region">
+                {{ region.name || region }}
               </option>
             </select>
           </div>
@@ -550,7 +550,7 @@ onMounted(() => {
 }
 
 .glass-panel {
-  background: var(--glass-bg);
+  background: var(--glass-heavy);
   backdrop-filter: blur(10px);
   border: 1px solid var(--glass-border);
   border-radius: 16px;

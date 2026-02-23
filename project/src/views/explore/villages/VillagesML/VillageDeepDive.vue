@@ -1,5 +1,5 @@
 <template>
-  <ExploreLayout>
+<!--  <ExploreLayout>-->
     <div class="village-deep-dive-page">
       <h1 class="page-title">🏘️ 村名深度分析</h1>
 
@@ -80,7 +80,7 @@
         <p>請搜尋並選擇一個村莊以查看詳細分析</p>
       </div>
     </div>
-  </ExploreLayout>
+<!--  </ExploreLayout>-->
 </template>
 
 <script setup>
@@ -286,7 +286,7 @@ watch(() => route.query.villageId, (newId) => {
 
 .search-input:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.8);
 }
 
@@ -310,7 +310,7 @@ watch(() => route.query.villageId, (newId) => {
 
 .result-item.selected {
   background: rgba(74, 144, 226, 0.2);
-  border: 2px solid var(--primary-color);
+  border: 2px solid var(--color-primary);
 }
 
 .village-name {

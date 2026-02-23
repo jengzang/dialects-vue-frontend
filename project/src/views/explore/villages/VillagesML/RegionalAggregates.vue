@@ -1,5 +1,5 @@
 <template>
-  <ExploreLayout>
+<!--  <ExploreLayout>-->
     <div class="regional-aggregates-page">
       <h1 class="page-title">🌍 區域聚合統計</h1>
 
@@ -264,7 +264,7 @@
         </div>
       </div>
     </div>
-  </ExploreLayout>
+<!--  </ExploreLayout>-->
 </template>
 
 <script setup>
@@ -430,9 +430,9 @@ const formatStatValue = (value) => {
 }
 
 .level-button.active {
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
 }
 
 .filters-section {
@@ -462,13 +462,13 @@ const formatStatValue = (value) => {
 
 .filter-input:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.8);
 }
 
 .query-button {
   padding: 10px 24px;
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -496,7 +496,7 @@ const formatStatValue = (value) => {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(74, 144, 226, 0.2);
-  border-top-color: var(--primary-color);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 15px;
@@ -540,7 +540,7 @@ const formatStatValue = (value) => {
 .stat-value {
   font-size: 28px;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--color-primary);
 }
 
 .aggregates-table {
@@ -592,7 +592,7 @@ const formatStatValue = (value) => {
   align-items: center;
   justify-content: center;
   background: rgba(74, 144, 226, 0.2);
-  color: var(--primary-color);
+  color: var(--color-primary);
   border-radius: 50%;
   font-size: 11px;
   font-weight: 600;
@@ -601,7 +601,7 @@ const formatStatValue = (value) => {
 
 .detail-button {
   padding: 6px 16px;
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 6px;
@@ -624,7 +624,7 @@ const formatStatValue = (value) => {
 
 .pagination button {
   padding: 8px 16px;
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -759,14 +759,14 @@ const formatStatValue = (value) => {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(90deg, var(--color-primary), var(--secondary-color));
   transition: width 0.5s ease;
 }
 
 .bar-value {
   font-size: 14px;
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--color-primary);
   text-align: right;
 }
 
@@ -798,7 +798,7 @@ const formatStatValue = (value) => {
 .stat-item .stat-value {
   font-size: 18px;
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--color-primary);
 }
 
 .spatial-section {

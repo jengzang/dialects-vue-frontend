@@ -207,6 +207,7 @@ const pageToTabMap = {
   'gdVillages': 'villages',
   'gdVillagesTable': 'villages',
   'ycVillages': 'villages',
+  'VillagesML':'villages',
 
   // tools category
   'check': 'tools',

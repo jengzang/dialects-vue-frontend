@@ -77,12 +77,14 @@
           class="feature-card glass-panel"
           @click="navigateTo(feature.route)"
         >
-          <div class="feature-icon">{{ feature.icon }}</div>
-          <h3 class="feature-title">{{ feature.title }}</h3>
-          <p class="feature-description">{{ feature.description }}</p>
-          <div class="feature-badge" :class="feature.badgeClass">
-            {{ feature.badge }}
+          <div class="feature-header">
+            <div class="feature-icon">{{ feature.icon }}</div>
+            <h3 class="feature-title">{{ feature.title }}</h3>
+            <div class="feature-badge" :class="feature.badgeClass">
+              {{ feature.badge }}
+            </div>
           </div>
+          <p class="feature-description">{{ feature.description }}</p>
         </div>
       </div>
     </div>
@@ -111,7 +113,7 @@ const statistics = computed(() => {
     { key: 'counties', icon: '🏛️', label: '區縣數量', value: metadata.value.total_counties || 0 },
     { key: 'townships', icon: '🏘️', label: '鄉鎮數量', value: metadata.value.total_townships || 0 },
     { key: 'characters', icon: '🔤', label: '字符總數', value: metadata.value.unique_characters || 0 },
-    { key: 'ngrams', icon: '📐', label: 'N-gram模式', value: metadata.value.total_ngrams || 0 }
+    // { key: 'ngrams', icon: '📐', label: 'N-gram模式', value: metadata.value.total_ngrams || 0 }
   ]
 })
 
@@ -233,7 +235,7 @@ onMounted(() => {
   font-size: 32px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 30px;
+  margin: 5px;
   text-align: center;
 }
 
@@ -242,6 +244,7 @@ onMounted(() => {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
+  width: 100%;
 }
 
 .stat-card {
@@ -257,7 +260,7 @@ onMounted(() => {
 
 .stat-icon {
   font-size: 48px;
-  margin-right: 20px;
+  margin-right: 10px;
 }
 
 .stat-content {
@@ -267,7 +270,7 @@ onMounted(() => {
 .stat-value {
   font-size: 28px;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--color-primary);
   margin-bottom: 5px;
 }
 
@@ -277,7 +280,7 @@ onMounted(() => {
 }
 
 .quick-search {
-  padding: 30px;
+  padding: 10px 20px;
   margin-bottom: 30px;
 }
 
@@ -304,13 +307,13 @@ onMounted(() => {
 
 .search-input:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.8);
 }
 
 .search-button {
   padding: 12px 30px;
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 12px;
@@ -332,11 +335,13 @@ onMounted(() => {
 }
 
 .feature-card {
-  padding: 30px;
+  padding: 24px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .feature-card:hover {
@@ -344,23 +349,33 @@ onMounted(() => {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
+.feature-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
 .feature-icon {
-  font-size: 48px;
-  margin-bottom: 15px;
+  font-size: 32px;
+  flex-shrink: 0;
 }
 
 .feature-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 10px;
+  margin: 0;
+  line-height: 1.2;
+  flex: 1; /* Take remaining space */
 }
 
 .feature-description {
   font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.6;
-  margin-bottom: 15px;
+  margin-bottom: 0;
+  flex: 1;
 }
 
 .feature-badge {
@@ -369,6 +384,8 @@ onMounted(() => {
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
+  flex-shrink: 0; /* Don't shrink badge */
+  margin-left: auto; /* Push to right */
 }
 
 .badge-public {
@@ -397,7 +414,7 @@ onMounted(() => {
 }
 
 .intro-text strong {
-  color: var(--primary-color);
+  color: var(--color-primary);
   font-weight: 600;
 }
 
@@ -453,32 +470,110 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .dashboard-page {
+    padding: 12px;
+  }
+
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-icon {
+    font-size: 36px;
+  }
+
+  .stat-value {
+    font-size: 22px;
   }
 
   .features-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .feature-card {
+    padding: 20px;
+  }
+
+  .feature-header {
+    gap: 10px;
+  }
+
+  .feature-icon {
+    font-size: 28px;
+  }
+
+  .feature-title {
+    font-size: 16px;
+  }
+
+  .feature-description {
+    font-size: 13px;
+    line-height: 1.5;
   }
 
   .page-title {
     font-size: 24px;
+    margin-bottom: 20px;
   }
 
   .intro-section {
-    padding: 20px;
+    padding: 16px;
+    margin-bottom: 20px;
   }
 
   .intro-text {
     font-size: 14px;
+    line-height: 1.6;
   }
 
   .feature-highlights {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .highlight-item {
+    padding: 10px 14px;
+  }
+
+  .highlight-icon {
+    font-size: 20px;
+  }
+
+  .highlight-text {
+    font-size: 13px;
   }
 
   .section-header h2 {
     font-size: 20px;
+  }
+
+  .section-description {
+    font-size: 13px;
+  }
+
+  .quick-search {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .quick-search h2 {
+    font-size: 18px;
+  }
+
+  .search-input-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-button {
+    width: 100%;
+    padding: 14px;
   }
 }
 </style>

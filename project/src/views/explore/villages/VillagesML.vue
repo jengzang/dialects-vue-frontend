@@ -459,10 +459,11 @@ watch(() => route.query, () => {
 .villages-ml-page {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  height: 92dvh;
+  width:98dvw;
   max-width: 1600px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 10px 20px;
   box-sizing: border-box;
   overflow: hidden; /* Prevent page-level scroll */
 }
@@ -484,6 +485,7 @@ watch(() => route.query, () => {
   flex-shrink: 0; /* Don't shrink tabs */
   overflow-x: auto; /* Enable horizontal scroll when needed */
   scrollbar-width: thin; /* Firefox */
+  justify-content: space-around;
 }
 
 /* Hide scrollbar but keep functionality */
@@ -508,8 +510,8 @@ watch(() => route.query, () => {
 .module-button {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
+  gap: 6px;
+  padding: 12px 6px;
   border: none;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.5);
@@ -639,8 +641,8 @@ watch(() => route.query, () => {
 /* Responsive */
 @media (max-width: 768px) {
   .villages-ml-page {
-    padding: 12px;
-    height: 100dvh; /* Use dvh on mobile too */
+    padding: 8px 12px;
+    height: 91dvh; /* Use dvh on mobile too */
   }
 
   .module-navigation {

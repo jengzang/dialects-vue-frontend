@@ -151,7 +151,7 @@ onMounted(() => {
 .village-title {
   font-size: 20px;
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--color-primary);
   margin: 0;
 }
 
@@ -161,7 +161,7 @@ onMounted(() => {
   border: none;
   border-radius: 50%;
   background: rgba(243, 156, 18, 0.2);
-  color: var(--accent-color);
+  color: var(--color-warning);
   font-size: 18px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -222,7 +222,7 @@ onMounted(() => {
   width: 32px;
   height: 32px;
   border: 3px solid rgba(74, 144, 226, 0.2);
-  border-top-color: var(--primary-color);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

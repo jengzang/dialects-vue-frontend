@@ -1,5 +1,5 @@
 <template>
-  <ExploreLayout>
+<!--  <ExploreLayout>-->
     <div class="character-significance-page">
       <h1 class="page-title">📊 統計顯著性分析</h1>
 
@@ -158,7 +158,7 @@
         </div>
       </div>
     </div>
-  </ExploreLayout>
+<!--  </ExploreLayout>-->
 </template>
 
 <script setup>
@@ -282,9 +282,9 @@ const getSignificanceLabel = (pValue) => {
 }
 
 .mode-button.active {
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
 }
 
 .query-form {
@@ -333,14 +333,14 @@ const getSignificanceLabel = (pValue) => {
 .number-input:focus,
 .select-input:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.8);
 }
 
 .query-button {
   width: 100%;
   padding: 12px 24px;
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 12px;
@@ -380,7 +380,7 @@ const getSignificanceLabel = (pValue) => {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(74, 144, 226, 0.2);
-  border-top-color: var(--primary-color);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 15px;
@@ -506,7 +506,7 @@ const getSignificanceLabel = (pValue) => {
 .summary-value {
   font-size: 28px;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--color-primary);
 }
 
 @media (max-width: 768px) {

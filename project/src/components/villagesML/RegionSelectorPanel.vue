@@ -16,7 +16,7 @@
         <label class="selector-label">區域名稱：</label>
         <select v-model="localName" class="selector-input" @change="handleNameChange" :disabled="regions.length === 0">
           <option value="">請選擇...</option>
-          <option v-for="region in regions" :key="region" :value="region">{{ region }}</option>
+          <option v-for="region in regions" :key="region.name || region" :value="region.name || region">{{ region.name || region }}</option>
         </select>
       </div>
 
@@ -118,7 +118,7 @@ onMounted(() => {
 
 .selector-input:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
 }
 
 .analyze-button {
