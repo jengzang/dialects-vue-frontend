@@ -8,13 +8,13 @@
     </div>
 
     <div v-else-if="data" class="semantic-content">
-      <!-- Categories -->
-      <div v-if="data.semantic_structure?.categories" class="section">
-        <h4>語義類別</h4>
+      <!-- Semantic Sequence -->
+      <div v-if="data.semantic_sequence" class="section">
+        <h4>語義序列</h4>
         <div class="category-tags">
           <span
-            v-for="category in data.semantic_structure.categories"
-            :key="category"
+            v-for="(category, index) in parseSequence(data.semantic_sequence)"
+            :key="index"
             class="category-tag"
           >
             {{ category }}
@@ -22,32 +22,25 @@
         </div>
       </div>
 
-      <!-- Labels -->
-      <div v-if="data.semantic_structure?.labels" class="section">
-        <h4>語義標籤</h4>
-        <div class="label-list">
-          <div
-            v-for="label in data.semantic_structure.labels"
-            :key="label.label"
-            class="label-item"
-          >
-            <span class="label-name">{{ label.label }}</span>
-            <span class="label-category">{{ label.category }}</span>
+      <!-- Structure Info -->
+      <div class="section">
+        <h4>結構信息</h4>
+        <div class="info-grid">
+          <div v-if="data.sequence_length !== undefined" class="info-item">
+            <span class="info-label">序列長度:</span>
+            <span class="info-value">{{ data.sequence_length }}</span>
           </div>
-        </div>
-      </div>
-
-      <!-- Composition -->
-      <div v-if="data.semantic_structure?.composition" class="section">
-        <h4>組合模式</h4>
-        <div class="composition-list">
-          <div
-            v-for="(comp, index) in data.semantic_structure.composition"
-            :key="index"
-            class="composition-item"
-          >
-            <span class="comp-pattern">{{ comp.pattern }}</span>
-            <span class="comp-description">{{ comp.description }}</span>
+          <div v-if="data.has_modifier !== undefined" class="info-item">
+            <span class="info-label">有修飾語:</span>
+            <span class="info-value">{{ data.has_modifier ? '是' : '否' }}</span>
+          </div>
+          <div v-if="data.has_head !== undefined" class="info-item">
+            <span class="info-label">有中心詞:</span>
+            <span class="info-value">{{ data.has_head ? '是' : '否' }}</span>
+          </div>
+          <div v-if="data.has_settlement !== undefined" class="info-item">
+            <span class="info-label">有聚落詞:</span>
+            <span class="info-value">{{ data.has_settlement ? '是' : '否' }}</span>
           </div>
         </div>
       </div>
@@ -74,6 +67,14 @@ defineProps({
     default: false
   }
 })
+
+const parseSequence = (sequence) => {
+  try {
+    return JSON.parse(sequence)
+  } catch {
+    return []
+  }
+}
 </script>
 
 <style scoped>
@@ -116,8 +117,32 @@ defineProps({
   to { opacity: 1; }
 }
 
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+}
+
+.info-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.info-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .section {
-  margin-bottom: 24px;
+  margin-bottom: 6px;
   padding: 16px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
@@ -127,7 +152,7 @@ defineProps({
   font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 12px;
+  margin: 6px;
 }
 
 .category-tags {

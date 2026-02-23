@@ -8,26 +8,17 @@
     </div>
 
     <div v-else-if="data" class="ngram-content">
-      <!-- Unigrams -->
-      <div v-if="data.ngrams?.unigrams" class="ngram-section">
-        <h4>單字 (Unigrams)</h4>
-        <div class="ngram-list">
-          <span
-            v-for="(gram, index) in data.ngrams.unigrams"
-            :key="index"
-            class="ngram-item unigram"
-          >
-            {{ gram }}
-          </span>
-        </div>
+      <!-- N value -->
+      <div v-if="data.n" class="ngram-section">
+        <h4>N-gram 級別: {{ data.n }}</h4>
       </div>
 
       <!-- Bigrams -->
-      <div v-if="data.ngrams?.bigrams" class="ngram-section">
+      <div v-if="data.bigrams" class="ngram-section">
         <h4>二元組 (Bigrams)</h4>
         <div class="ngram-list">
           <span
-            v-for="(gram, index) in data.ngrams.bigrams"
+            v-for="(gram, index) in parseBigrams(data.bigrams)"
             :key="index"
             class="ngram-item bigram"
           >
@@ -37,11 +28,11 @@
       </div>
 
       <!-- Trigrams -->
-      <div v-if="data.ngrams?.trigrams" class="ngram-section">
+      <div v-if="data.trigrams" class="ngram-section">
         <h4>三元組 (Trigrams)</h4>
         <div class="ngram-list">
           <span
-            v-for="(gram, index) in data.ngrams.trigrams"
+            v-for="(gram, index) in parseTrigrams(data.trigrams)"
             :key="index"
             class="ngram-item trigram"
           >
@@ -50,19 +41,26 @@
         </div>
       </div>
 
-      <!-- Statistics -->
-      <div class="ngram-stats">
-        <div class="stat-item">
-          <span class="stat-label">單字數量:</span>
-          <span class="stat-value">{{ data.ngrams?.unigrams?.length || 0 }}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">二元組數量:</span>
-          <span class="stat-value">{{ data.ngrams?.bigrams?.length || 0 }}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">三元組數量:</span>
-          <span class="stat-value">{{ data.ngrams?.trigrams?.length || 0 }}</span>
+      <!-- Prefix/Suffix -->
+      <div class="ngram-section">
+        <h4>前綴/後綴</h4>
+        <div class="info-grid">
+          <div v-if="data.prefix_bigram" class="info-item">
+            <span class="info-label">前綴二元組:</span>
+            <span class="info-value">{{ data.prefix_bigram }}</span>
+          </div>
+          <div v-if="data.suffix_bigram" class="info-item">
+            <span class="info-label">後綴二元組:</span>
+            <span class="info-value">{{ data.suffix_bigram }}</span>
+          </div>
+          <div v-if="data.prefix_trigram" class="info-item">
+            <span class="info-label">前綴三元組:</span>
+            <span class="info-value">{{ data.prefix_trigram }}</span>
+          </div>
+          <div v-if="data.suffix_trigram" class="info-item">
+            <span class="info-label">後綴三元組:</span>
+            <span class="info-value">{{ data.suffix_trigram }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -88,6 +86,23 @@ defineProps({
     default: false
   }
 })
+
+const parseBigrams = (bigrams) => {
+  try {
+    return JSON.parse(bigrams)
+  } catch {
+    return []
+  }
+}
+
+const parseTrigrams = (trigrams) => {
+  if (!trigrams) return []
+  try {
+    return JSON.parse(trigrams)
+  } catch {
+    return []
+  }
+}
 </script>
 
 <style scoped>
@@ -130,8 +145,33 @@ defineProps({
   to { opacity: 1; }
 }
 
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+}
+
+.info-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.info-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .ngram-section {
-  margin-bottom: 24px;
+  margin-bottom: 6px;
   padding: 16px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
@@ -141,7 +181,7 @@ defineProps({
   font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 12px;
+  margin: 6px;
 }
 
 .ngram-list {

@@ -1,0 +1,85 @@
+// utils/villagesMLStore.js
+// VillagesML 狀態管理
+
+import { reactive } from 'vue'
+
+export const villagesMLStore = reactive({
+  // 當前激活的標籤頁
+  activeTab: 'search',
+
+  // 村名搜尋相關
+  searchKeyword: '',
+  searchFilters: {
+    city: '',
+    county: '',
+    township: ''
+  },
+  searchResults: [],
+  searchTotal: 0,
+  searchPage: 1,
+  searchPageSize: 20,
+  selectedVillage: null,
+
+  // 區域分析相關
+  regionLevel: 'city',
+  regionName: '',
+  tendencyData: [],
+  charFrequencyData: [],
+
+  // 聚類分析相關
+  clusteringSettings: {
+    algorithm: 'kmeans',
+    k: 5,
+    eps: 0.5,
+    min_samples: 5,
+    features: {
+      semantic: true,
+      morphology: true,
+      diversity: true
+    },
+    preprocessing: {
+      standardize: true,
+      pca: false,
+      pca_components: 10
+    }
+  },
+  clusteringResults: null,
+  clusteringLoading: false,
+  clusteringProgress: 0,
+
+  // 語義網絡相關
+  semanticSettings: {
+    min_cooccurrence: 5,
+    alpha: 0.05,
+    top_n: 50
+  },
+  semanticNetwork: null,
+  semanticLoading: false,
+
+  // 全局載入狀態
+  loading: false,
+  error: null
+})
+
+// 重置搜尋狀態
+export function resetSearchState() {
+  villagesMLStore.searchKeyword = ''
+  villagesMLStore.searchFilters = { city: '', county: '', township: '' }
+  villagesMLStore.searchResults = []
+  villagesMLStore.searchTotal = 0
+  villagesMLStore.searchPage = 1
+  villagesMLStore.selectedVillage = null
+}
+
+// 重置聚類狀態
+export function resetClusteringState() {
+  villagesMLStore.clusteringResults = null
+  villagesMLStore.clusteringLoading = false
+  villagesMLStore.clusteringProgress = 0
+}
+
+// 重置語義網絡狀態
+export function resetSemanticState() {
+  villagesMLStore.semanticNetwork = null
+  villagesMLStore.semanticLoading = false
+}

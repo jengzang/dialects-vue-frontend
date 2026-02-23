@@ -98,11 +98,11 @@ import {
 import { showError } from '@/utils/message.js'
 
 // Import components
-import VillageInfoPanel from '@/components/villagesML/deepdive/VillageInfoPanel.vue'
-import FeatureVectorPanel from '@/components/villagesML/deepdive/FeatureVectorPanel.vue'
-import SpatialFeaturesPanel from '@/components/villagesML/deepdive/SpatialFeaturesPanel.vue'
-import SemanticStructurePanel from '@/components/villagesML/deepdive/SemanticStructurePanel.vue'
-import NgramPanel from '@/components/villagesML/deepdive/NgramPanel.vue'
+import VillageInfoPanel from './VillageInfoPanel.vue'
+import FeatureVectorPanel from './FeatureVectorPanel.vue'
+import SpatialFeaturesPanel from './SpatialFeaturesPanel.vue'
+import SemanticStructurePanel from './SemanticStructurePanel.vue'
+import NgramPanel from './NgramPanel.vue'
 
 const route = useRoute()
 

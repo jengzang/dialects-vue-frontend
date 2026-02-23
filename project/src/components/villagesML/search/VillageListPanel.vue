@@ -22,27 +22,25 @@
         <table class="villages-table">
           <thead>
             <tr>
-              <th>村名</th>
-              <th>城市</th>
+              <th>自然村</th>
+              <th>市</th>
               <th>區縣</th>
               <th>鄉鎮</th>
-              <th>操作</th>
+              <th>分析</th>
             </tr>
           </thead>
           <tbody>
             <tr
               v-for="village in villages"
               :key="village.id"
-              :class="{ 'selected': selectedVillage?.id === village.id }"
-              @click="selectVillage(village)"
             >
               <td class="village-name">{{ village.name }}</td>
               <td>{{ village.city }}</td>
               <td>{{ village.county }}</td>
               <td>{{ village.township }}</td>
               <td>
-                <button class="view-button" @click.stop="viewDetail(village)">
-                  查看詳情
+                <button class="analyze-button" @click="openDeepAnalysis(village)">
+                  🔍
                 </button>
               </td>
             </tr>
@@ -103,7 +101,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['page-change', 'village-select'])
+const emit = defineEmits(['page-change', 'open-deep-analysis'])
 
 const selectedVillage = computed(() => villagesMLStore.selectedVillage)
 
@@ -118,13 +116,8 @@ const emptyMessage = computed(() => {
   return '請輸入關鍵詞搜尋'
 })
 
-const selectVillage = (village) => {
-  villagesMLStore.selectedVillage = village
-  emit('village-select', village)
-}
-
-const viewDetail = (village) => {
-  selectVillage(village)
+const openDeepAnalysis = (village) => {
+  emit('open-deep-analysis', village)
 }
 
 const changePage = (page) => {
@@ -212,7 +205,6 @@ const changePage = (page) => {
 }
 
 .villages-table tbody tr {
-  cursor: pointer;
   transition: background 0.2s ease;
 }
 
@@ -220,16 +212,12 @@ const changePage = (page) => {
   background: rgba(74, 144, 226, 0.1);
 }
 
-.villages-table tbody tr.selected {
-  background: rgba(74, 144, 226, 0.2);
-}
-
 .village-name {
   font-weight: 500;
   color: var(--color-primary);
 }
 
-.view-button {
+.analyze-button {
   padding: 6px 12px;
   border: none;
   border-radius: 6px;
@@ -238,10 +226,12 @@ const changePage = (page) => {
   font-size: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
-.view-button:hover {
+.analyze-button:hover {
   background: rgba(74, 144, 226, 0.3);
+  transform: translateY(-1px);
 }
 
 .pagination {

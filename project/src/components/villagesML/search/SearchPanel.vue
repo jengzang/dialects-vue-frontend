@@ -18,17 +18,17 @@
     <div class="filters-row">
       <select v-model="localFilters.city" class="filter-select" @change="handleCityChange">
         <option value="">全部城市</option>
-        <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
+        <option v-for="city in cities" :key="city.name || city" :value="city.name || city">{{ city.name || city }}</option>
       </select>
 
       <select v-model="localFilters.county" class="filter-select" @change="handleCountyChange" :disabled="!localFilters.city">
         <option value="">全部區縣</option>
-        <option v-for="county in counties" :key="county" :value="county">{{ county }}</option>
+        <option v-for="county in counties" :key="county.name || county" :value="county.name || county">{{ county.name || county }}</option>
       </select>
 
       <select v-model="localFilters.township" class="filter-select" :disabled="!localFilters.county">
         <option value="">全部鄉鎮</option>
-        <option v-for="township in townships" :key="township" :value="township">{{ township }}</option>
+        <option v-for="township in townships" :key="township.name || township" :value="township.name || township">{{ township.name || township }}</option>
       </select>
 
       <button class="clear-filters-button" @click="clearFilters" v-if="hasFilters">

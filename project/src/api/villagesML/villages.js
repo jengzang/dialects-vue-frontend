@@ -17,12 +17,22 @@ import { api } from '../auth/auth.js'
 export async function searchVillages(params) {
   const queryParams = new URLSearchParams()
 
-  if (params.keyword) queryParams.append('keyword', params.keyword)
+  // query 參數是必需的，如果沒有關鍵詞則使用空格作為通配符
+  const query = params.keyword || ' '
+  queryParams.append('query', query)
+
   if (params.city) queryParams.append('city', params.city)
   if (params.county) queryParams.append('county', params.county)
   if (params.township) queryParams.append('township', params.township)
-  if (params.page) queryParams.append('page', params.page)
-  if (params.page_size) queryParams.append('page_size', params.page_size)
+
+  // 後端使用 limit/offset，需要從 page/page_size 轉換
+  const page = params.page || 1
+  const pageSize = params.page_size || 20
+  const limit = pageSize
+  const offset = (page - 1) * pageSize
+
+  queryParams.append('limit', limit)
+  queryParams.append('offset', offset)
 
   return api(`/api/villages/village/search?${queryParams.toString()}`)
 }

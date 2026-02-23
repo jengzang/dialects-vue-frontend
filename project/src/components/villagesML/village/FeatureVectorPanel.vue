@@ -50,7 +50,7 @@
             :key="index"
             class="vector-bar"
             :style="{ height: `${Math.abs(value) * 100}%`, background: value >= 0 ? 'var(--color-primary)' : '#e74c3c' }"
-            :title="`維度 ${index}: ${value.toFixed(4)}`"
+            :title="`維度 ${index}: ${value.toFixed(2)}`"
           ></div>
         </div>
         <p class="vector-note">顯示前 50 維特徵向量</p>
@@ -81,7 +81,7 @@ defineProps({
 
 const formatValue = (value) => {
   if (typeof value === 'number') {
-    return value.toFixed(4)
+    return value.toFixed(2)
   }
   return value
 }

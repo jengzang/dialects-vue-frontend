@@ -39,23 +39,17 @@
         />
 
         <!-- Legacy Tab: Village Search -->
-        <div v-else-if="activeModule === 'search' && activeSubtab === 'search'" class="legacy-tab">
+        <div v-else-if="activeModule === 'search'" class="legacy-tab">
           <SearchPanel @search="handleSearch" />
-          <div class="two-column-layout">
-            <VillageListPanel
-              :villages="searchResults"
-              :total="searchTotal"
-              :current-page="searchPage"
-              :page-size="searchPageSize"
-              :loading="searchLoading"
-              @page-change="handlePageChange"
-              @village-select="handleVillageSelect"
-            />
-            <VillageDetailPanel
-              :village="selectedVillage"
-              @close="selectedVillage = null"
-            />
-          </div>
+          <VillageListPanel
+            :villages="searchResults"
+            :total="searchTotal"
+            :current-page="searchPage"
+            :page-size="searchPageSize"
+            :loading="searchLoading"
+            @page-change="handlePageChange"
+            @open-deep-analysis="openDeepAnalysisModal"
+          />
         </div>
 
         <!-- Legacy Tab: Regional Analysis -->
@@ -97,6 +91,13 @@
           <p>模塊開發中...</p>
         </div>
       </div>
+
+      <!-- Deep Analysis Modal -->
+      <VillageDeepAnalysisModal
+        :show="showDeepAnalysisModal"
+        :village="selectedVillageForAnalysis"
+        @close="closeDeepAnalysisModal"
+      />
     </div>
 </template>
 
@@ -120,34 +121,33 @@ const route = useRoute()
 // Authentication
 const isAuthenticated = computed(() => userStore.isAuthenticated)
 
-// Lazy load components
-const Dashboard = defineAsyncComponent(() => import('./VillagesML/Dashboard.vue'))
-const VillageDeepDive = defineAsyncComponent(() => import('./VillagesML/VillageDeepDive.vue'))
-const CharacterEmbeddings = defineAsyncComponent(() => import('./VillagesML/CharacterEmbeddings.vue'))
-const CharacterSignificance = defineAsyncComponent(() => import('./VillagesML/CharacterSignificance.vue'))
-const SemanticCategories = defineAsyncComponent(() => import('./VillagesML/SemanticCategories.vue'))
-const SemanticComposition = defineAsyncComponent(() => import('./VillagesML/SemanticComposition.vue'))
-const SpatialHotspots = defineAsyncComponent(() => import('./VillagesML/SpatialHotspots.vue'))
-const SpatialIntegration = defineAsyncComponent(() => import('./VillagesML/SpatialIntegration.vue'))
-const NgramAnalysis = defineAsyncComponent(() => import('./VillagesML/NgramAnalysis.vue'))
-const StructuralPatterns = defineAsyncComponent(() => import('./VillagesML/StructuralPatterns.vue'))
-const RegionalAggregates = defineAsyncComponent(() => import('./VillagesML/RegionalAggregates.vue'))
-const RegionalVectors = defineAsyncComponent(() => import('./VillagesML/RegionalVectors.vue'))
-const FeatureExtraction = defineAsyncComponent(() => import('./VillagesML/FeatureExtraction.vue'))
-const SubsetAnalysis = defineAsyncComponent(() => import('./VillagesML/SubsetAnalysis.vue'))
-const CacheManagement = defineAsyncComponent(() => import('./VillagesML/CacheManagement.vue'))
-const SystemInfo = defineAsyncComponent(() => import('./VillagesML/SystemInfo.vue'))
+// Lazy load page components
+const Dashboard = defineAsyncComponent(() => import('@/components/villagesML/system/Dashboard.vue'))
+const CharacterEmbeddings = defineAsyncComponent(() => import('@/components/villagesML/character/CharacterEmbeddings.vue'))
+const CharacterSignificance = defineAsyncComponent(() => import('@/components/villagesML/character/CharacterSignificance.vue'))
+const SemanticCategories = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticCategories.vue'))
+const SemanticComposition = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticComposition.vue'))
+const SpatialHotspots = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialHotspots.vue'))
+const SpatialIntegration = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialIntegration.vue'))
+const NgramAnalysis = defineAsyncComponent(() => import('@/components/villagesML/pattern/NgramAnalysis.vue'))
+const StructuralPatterns = defineAsyncComponent(() => import('@/components/villagesML/pattern/StructuralPatterns.vue'))
+const RegionalAggregates = defineAsyncComponent(() => import('@/components/villagesML/regional/RegionalAggregates.vue'))
+const RegionalVectors = defineAsyncComponent(() => import('@/components/villagesML/regional/RegionalVectors.vue'))
+const FeatureExtraction = defineAsyncComponent(() => import('@/components/villagesML/ml/FeatureExtraction.vue'))
+const SubsetAnalysis = defineAsyncComponent(() => import('@/components/villagesML/ml/SubsetAnalysis.vue'))
+const CacheManagement = defineAsyncComponent(() => import('@/components/villagesML/system/CacheManagement.vue'))
+const SystemInfo = defineAsyncComponent(() => import('@/components/villagesML/system/SystemInfo.vue'))
 
-// Import existing components for legacy tabs
-import SearchPanel from '@/components/villagesML/SearchPanel.vue'
-import VillageListPanel from '@/components/villagesML/VillageListPanel.vue'
-import VillageDetailPanel from '@/components/villagesML/VillageDetailPanel.vue'
-import RegionSelectorPanel from '@/components/villagesML/RegionSelectorPanel.vue'
-import TendencyHeatmapPanel from '@/components/villagesML/TendencyHeatmapPanel.vue'
-import ClusteringSettingsPanel from '@/components/villagesML/ClusteringSettingsPanel.vue'
-import ClusteringResultsPanel from '@/components/villagesML/ClusteringResultsPanel.vue'
-import SemanticSettingsPanel from '@/components/villagesML/SemanticSettingsPanel.vue'
-import NetworkGraphPanel from '@/components/villagesML/NetworkGraphPanel.vue'
+// Import panel components for legacy tabs
+import SearchPanel from '@/components/villagesML/search/SearchPanel.vue'
+import VillageListPanel from '@/components/villagesML/search/VillageListPanel.vue'
+import VillageDeepAnalysisModal from '@/components/villagesML/search/VillageDeepAnalysisModal.vue'
+import RegionSelectorPanel from '@/components/villagesML/character/RegionSelectorPanel.vue'
+import TendencyHeatmapPanel from '@/components/villagesML/character/TendencyHeatmapPanel.vue'
+import ClusteringSettingsPanel from '@/components/villagesML/ml/ClusteringSettingsPanel.vue'
+import ClusteringResultsPanel from '@/components/villagesML/ml/ClusteringResultsPanel.vue'
+import SemanticSettingsPanel from '@/components/villagesML/semantic/SemanticSettingsPanel.vue'
+import NetworkGraphPanel from '@/components/villagesML/semantic/NetworkGraphPanel.vue'
 
 // Module configuration
 const modules = [
@@ -162,11 +162,7 @@ const modules = [
     id: 'search',
     label: '搜尋探索',
     icon: '🔍',
-    requireAuth: false,
-    subtabs: [
-      { id: 'search', label: '村名搜尋', component: 'SearchTab' },
-      { id: 'deepdive', label: '深度分析', component: VillageDeepDive }
-    ]
+    requireAuth: false
   },
   {
     id: 'character',
@@ -264,7 +260,6 @@ const currentComponent = computed(() => {
     const subtab = module.subtabs.find(s => s.id === activeSubtab.value)
     if (subtab) {
       // Handle legacy tab components
-      if (subtab.component === 'SearchTab') return null // Will render custom layout
       if (subtab.component === 'RegionalTab') return null
       if (subtab.component === 'ClusteringTab') return null
       if (subtab.component === 'SemanticTab') return null
@@ -370,8 +365,20 @@ const handleSearch = async () => {
       page_size: villagesMLStore.searchPageSize
     })
 
-    villagesMLStore.searchResults = result.villages
-    villagesMLStore.searchTotal = result.total
+    // 后端返回格式: { total, page, page_size, data }
+    // 转换字段名: village_id -> id, village_name -> name
+    const villages = (result.data || []).map(v => ({
+      id: v.village_id,
+      name: v.village_name,
+      city: v.city,
+      county: v.county,
+      township: v.township,
+      longitude: v.longitude,
+      latitude: v.latitude
+    }))
+
+    villagesMLStore.searchResults = villages
+    villagesMLStore.searchTotal = result.total || 0
   } catch (error) {
     showError('搜尋失敗')
   } finally {
@@ -444,6 +451,22 @@ const handleRunSemantic = async (settings) => {
   }
 }
 
+// Deep Analysis Modal
+const showDeepAnalysisModal = ref(false)
+const selectedVillageForAnalysis = ref(null)
+
+const openDeepAnalysisModal = (village) => {
+  console.log('openDeepAnalysisModal called with:', village)
+  selectedVillageForAnalysis.value = village
+  showDeepAnalysisModal.value = true
+  console.log('Modal state:', showDeepAnalysisModal.value, selectedVillageForAnalysis.value)
+}
+
+const closeDeepAnalysisModal = () => {
+  showDeepAnalysisModal.value = false
+  selectedVillageForAnalysis.value = null
+}
+
 // Lifecycle
 onMounted(() => {
   syncFromURL()
@@ -478,9 +501,10 @@ watch(() => route.query, () => {
 }
 
 .module-navigation {
+  padding:8px 12px;
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   flex-wrap: wrap; /* Desktop: allow wrapping */
   flex-shrink: 0; /* Don't shrink tabs */
   overflow-x: auto; /* Enable horizontal scroll when needed */

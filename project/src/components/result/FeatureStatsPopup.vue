@@ -158,7 +158,7 @@ const getCharsString = (charIndices) => {
 .modal-body {
   padding: 12px 14px 16px;
   overflow: auto;
-  max-height: calc(min(70vh, 640px) - 100px);
+  //max-height: calc(min(70vh, 640px) - 100px);
 }
 </style>
 

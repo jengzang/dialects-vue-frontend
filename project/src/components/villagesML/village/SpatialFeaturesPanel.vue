@@ -9,43 +9,74 @@
 
     <div v-else-if="data" class="spatial-content">
       <div class="spatial-grid">
-        <div v-if="data.spatial_features?.hotspot_id" class="spatial-item">
-          <div class="item-icon">🔥</div>
-          <div class="item-content">
-            <div class="item-label">熱點ID</div>
-            <div class="item-value">{{ data.spatial_features.hotspot_id }}</div>
-          </div>
-        </div>
-
-        <div v-if="data.spatial_features?.cluster_id" class="spatial-item">
+        <div v-if="data.spatial_cluster_id !== undefined" class="spatial-item">
           <div class="item-icon">🎯</div>
           <div class="item-content">
-            <div class="item-label">聚類ID</div>
-            <div class="item-value">{{ data.spatial_features.cluster_id }}</div>
+            <div class="item-label">空間聚類ID</div>
+            <div class="item-value">{{ data.spatial_cluster_id }}</div>
           </div>
         </div>
 
-        <div v-if="data.spatial_features?.distance_to_center" class="spatial-item">
+        <div v-if="data.cluster_size" class="spatial-item">
+          <div class="item-icon">📦</div>
+          <div class="item-content">
+            <div class="item-label">聚類大小</div>
+            <div class="item-value">{{ data.cluster_size }}</div>
+          </div>
+        </div>
+
+        <div v-if="data.nn_distance_1" class="spatial-item">
           <div class="item-icon">📏</div>
           <div class="item-content">
-            <div class="item-label">距中心距離</div>
-            <div class="item-value">{{ data.spatial_features.distance_to_center.toFixed(2) }} km</div>
+            <div class="item-label">最近鄰距離</div>
+            <div class="item-value">{{ data.nn_distance_1.toFixed(2) }} km</div>
           </div>
         </div>
 
-        <div v-if="data.spatial_features?.density" class="spatial-item">
+        <div v-if="data.local_density_1km !== undefined" class="spatial-item">
           <div class="item-icon">📊</div>
           <div class="item-content">
-            <div class="item-label">密度指數</div>
-            <div class="item-value">{{ data.spatial_features.density.toFixed(4) }}</div>
+            <div class="item-label">1km密度</div>
+            <div class="item-value">{{ data.local_density_1km }}</div>
+          </div>
+        </div>
+
+        <div v-if="data.local_density_5km !== undefined" class="spatial-item">
+          <div class="item-icon">📊</div>
+          <div class="item-content">
+            <div class="item-label">5km密度</div>
+            <div class="item-value">{{ data.local_density_5km }}</div>
+          </div>
+        </div>
+
+        <div v-if="data.local_density_10km !== undefined" class="spatial-item">
+          <div class="item-icon">📊</div>
+          <div class="item-content">
+            <div class="item-label">10km密度</div>
+            <div class="item-value">{{ data.local_density_10km }}</div>
+          </div>
+        </div>
+
+        <div v-if="data.isolation_score !== undefined" class="spatial-item">
+          <div class="item-icon">🏝️</div>
+          <div class="item-content">
+            <div class="item-label">孤立度</div>
+            <div class="item-value">{{ data.isolation_score.toFixed(2) }}</div>
+          </div>
+        </div>
+
+        <div v-if="data.is_isolated !== undefined" class="spatial-item">
+          <div class="item-icon">{{ data.is_isolated ? '⚠️' : '✅' }}</div>
+          <div class="item-content">
+            <div class="item-label">是否孤立</div>
+            <div class="item-value">{{ data.is_isolated ? '是' : '否' }}</div>
           </div>
         </div>
       </div>
 
-      <!-- Map placeholder -->
-      <div class="map-placeholder">
-        <p>🗺️ 地圖可視化</p>
-        <p class="map-note">經度: {{ data.longitude }}, 緯度: {{ data.latitude }}</p>
+      <!-- Coordinates -->
+      <div v-if="data.longitude && data.latitude" class="coordinates-line">
+        🗺️ 地理坐標: {{ data.longitude.toFixed(6) }}, {{ data.latitude.toFixed(6) }}
       </div>
     </div>
 
@@ -151,6 +182,16 @@ defineProps({
   font-size: 18px;
   font-weight: 600;
   color: var(--color-primary);
+}
+
+.coordinates-line {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-primary);
+  text-align: center;
 }
 
 .map-placeholder {
