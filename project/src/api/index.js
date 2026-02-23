@@ -132,3 +132,86 @@ export {
   copyCurrentUrl,
   getUrlSegmentValue
 } from './urlParams.js'
+
+// ==================== VillagesML 自然村分析 ====================
+export {
+  // 村名搜尋
+  searchVillages,
+  getVillageDetail,
+  getRegionList,
+  getVillageComplete,
+  getVillageFeatures,
+  getVillageSpatialFeatures,
+  getVillageSemanticStructure,
+  getVillageNgrams,
+  // 字頻統計
+  getGlobalCharFrequency,
+  getCharTendency,
+  getRegionalCharFrequency,
+  getCharTendencyByChar,
+  getCharEmbeddingsList,
+  getCharEmbeddingVector,
+  getCharSimilarities,
+  getCharSignificanceByChar,
+  getCharSignificanceByRegion,
+  getCharSignificanceSummary,
+  // 聚類分析
+  runClustering,
+  scanClustering,
+  getClusteringStatus,
+  getClusteringCacheStats,
+  clearClusteringCache,
+  // 語義網絡
+  getCooccurrence,
+  getSemanticNetwork,
+  getSemanticNetworkStatus,
+  // 語義類別
+  getSemanticCategoryList,
+  getSemanticCategoryTendency,
+  getSemanticVTFGlobal,
+  getSemanticVTFRegional,
+  // 語義標籤
+  getSemanticLabelCategories,
+  getSemanticLabelsByCategory,
+  getSemanticLabelsByChar,
+  getSemanticCompositionPatterns,
+  getSemanticBigrams,
+  // 語義組合
+  getSemanticTrigrams,
+  getSemanticPMI,
+  getSemanticIndices,
+  // 空間分析
+  getSpatialHotspots,
+  getSpatialHotspotDetail,
+  getSpatialClusters,
+  getSpatialClustersSummary,
+  getSpatialIntegration,
+  getSpatialIntegrationByChar,
+  getSpatialIntegrationByCluster,
+  getSpatialIntegrationSummary,
+  // N-grams
+  getNgramFrequency,
+  getNgramPatterns,
+  getNgramRegional,
+  getNgramTendency,
+  getNgramSignificance,
+  // 結構模式
+  getPatternFrequencyGlobal,
+  getPatternFrequencyRegional,
+  getPatternStructural,
+  getPatternTendency,
+  // 區域聚合
+  getRegionalAggregatesCity,
+  getRegionalAggregatesCounty,
+  getRegionalAggregatesTown,
+  getRegionalSpatialAggregates,
+  getRegionalVectors,
+  // 計算模塊
+  extractFeatures,
+  aggregateFeatures,
+  clusterSubset,
+  compareSubsets,
+  // 元數據
+  getMetadataOverview,
+  getMetadataTables
+} from './villagesML/index.js'
