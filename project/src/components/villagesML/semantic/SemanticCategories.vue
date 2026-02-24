@@ -629,7 +629,6 @@ onMounted(() => {
 }
 
 .char-input {
-  width: 80px;
   padding: 12px;
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 8px;

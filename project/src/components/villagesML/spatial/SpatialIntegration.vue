@@ -56,33 +56,54 @@
           <p>加載中...</p>
         </div>
 
-        <div v-else-if="integrationData" class="integration-results">
-          <!-- Map Visualization -->
-          <div class="map-section glass-panel">
-            <h3>整合地圖</h3>
-            <div class="map-placeholder">
-              <p>🗺️ 空間整合可視化</p>
-              <p class="map-note">
-                顯示村莊分佈、熱點區域、聚類中心和傾向性數據
-              </p>
-            </div>
-          </div>
-
+        <div v-else-if="integrationData && integrationData.length > 0" class="integration-results">
           <!-- Statistics -->
           <div class="stats-section glass-panel">
             <h3>統計信息</h3>
             <div class="stats-grid">
               <div class="stat-card">
-                <div class="stat-label">村莊數量</div>
-                <div class="stat-value">{{ integrationData.villages?.length || 0 }}</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-label">熱點數量</div>
-                <div class="stat-value">{{ integrationData.hotspots?.length || 0 }}</div>
+                <div class="stat-label">字符數量</div>
+                <div class="stat-value">{{ uniqueCharacters.length }}</div>
               </div>
               <div class="stat-card">
                 <div class="stat-label">聚類數量</div>
-                <div class="stat-value">{{ integrationData.clusters?.length || 0 }}</div>
+                <div class="stat-value">{{ uniqueClusters.length }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">總記錄數</div>
+                <div class="stat-value">{{ integrationData.length }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Integration Table -->
+          <div class="table-scroll-wrapper">
+            <div class="integration-table">
+              <div class="table-header">
+                <div>字符</div>
+                <div>聚類ID</div>
+                <div>傾向均值</div>
+                <div>聚類大小</div>
+                <div>村莊數</div>
+                <div>空間一致性</div>
+                <div>主導城市</div>
+                <div>主導區縣</div>
+              </div>
+              <div class="table-body">
+                <div
+                  v-for="item in integrationData"
+                  :key="item.id"
+                  class="table-row"
+                >
+                  <div>{{ item.character }}</div>
+                  <div>{{ item.cluster_id }}</div>
+                  <div>{{ item.cluster_tendency_mean?.toFixed(3) || 'N/A' }}</div>
+                  <div>{{ item.cluster_size?.toLocaleString() || 'N/A' }}</div>
+                  <div>{{ item.n_villages_with_char?.toLocaleString() || 'N/A' }}</div>
+                  <div>{{ item.spatial_coherence?.toFixed(3) || 'N/A' }}</div>
+                  <div>{{ item.dominant_city || 'N/A' }}</div>
+                  <div>{{ item.dominant_county || 'N/A' }}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -265,7 +286,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
 import FilterableSelect from '@/components/common/FilterableSelect.vue'
 import {
@@ -292,6 +313,17 @@ const loadingIntegration = ref(false)
 const loadingByChar = ref(false)
 const loadingByCluster = ref(false)
 const loadingSummary = ref(false)
+
+// Computed properties
+const uniqueCharacters = computed(() => {
+  if (!integrationData.value) return []
+  return [...new Set(integrationData.value.map(item => item.character))]
+})
+
+const uniqueClusters = computed(() => {
+  if (!integrationData.value) return []
+  return [...new Set(integrationData.value.map(item => item.cluster_id))]
+})
 
 // Methods
 const loadIntegration = async () => {
@@ -362,8 +394,13 @@ const formatValue = (value) => {
   margin: 0 auto;
 }
 
+/* Override glass-panel to prevent overflow */
+.glass-panel {
+  min-width: 0;
+}
+
 .page-title {
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 600;
   color: var(--text-primary);
   margin: 0px;
@@ -373,17 +410,17 @@ const formatValue = (value) => {
 .mode-selector {
   display: flex;
   gap: 12px;
-  padding: 16px;
+  padding: 12px;
   margin-bottom: 16px;
 }
 
 .mode-button {
   flex: 1;
-  padding: 12px 24px;
+  padding: 10px 16px;
   background: rgba(255, 255, 255, 0.5);
   border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 12px;
-  font-size: 16px;
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
   cursor: pointer;
@@ -401,25 +438,26 @@ const formatValue = (value) => {
 }
 
 .query-form {
-  padding: 16px;
+  padding: 12px;
   margin-bottom: 16px;
 }
 
 .query-form h3 {
   font-size: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   color: var(--text-primary);
 }
 
 .form-group {
   display: grid;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: 120px 1fr;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .form-group label {
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -428,16 +466,15 @@ const formatValue = (value) => {
 .text-input,
 .number-input,
 .char-input {
-  padding: 10px 16px;
+  padding: 8px 12px;
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 14px;
   background: rgba(255, 255, 255, 0.5);
 }
 
 .char-input {
-  width: 80px;
-  font-size: 24px;
+  font-size: 20px;
   text-align: center;
 }
 
@@ -453,16 +490,16 @@ const formatValue = (value) => {
 .query-button,
 .load-button {
   width: 100%;
-  padding: 12px 24px;
+  padding: 10px 20px;
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 16px;
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .query-button:hover:not(:disabled),
@@ -478,17 +515,17 @@ const formatValue = (value) => {
 
 .loading-state {
   text-align: center;
-  padding: 60px 20px;
+  padding: 40px 20px;
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(74, 144, 226, 0.2);
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(74, 144, 226, 0.2);
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 15px;
+  margin: 0 auto 12px;
 }
 
 @keyframes spin {
@@ -507,7 +544,8 @@ const formatValue = (value) => {
 .tendency-section,
 .characteristics-section,
 .villages-section {
-  padding: 16px;
+  padding: 12px;
+  min-width: 0;
 }
 
 .map-section h3,
@@ -516,49 +554,49 @@ const formatValue = (value) => {
 .characteristics-section h3,
 .villages-section h3 {
   font-size: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   color: var(--text-primary);
 }
 
 .map-placeholder {
-  padding: 80px 20px;
+  padding: 60px 20px;
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  border-radius: 8px;
   text-align: center;
 }
 
 .map-placeholder p {
-  font-size: 24px;
+  font-size: 20px;
   color: var(--text-primary);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .map-note {
-  font-size: 14px !important;
+  font-size: 13px !important;
   color: var(--text-secondary);
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
 }
 
 .stat-card {
   padding: 12px;
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  border-radius: 8px;
   text-align: center;
 }
 
 .stat-label {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-secondary);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .stat-value {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--color-primary);
 }
@@ -566,28 +604,29 @@ const formatValue = (value) => {
 .tendency-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .tendency-item {
   display: grid;
-  grid-template-columns: 150px 1fr 100px;
+  grid-template-columns: 120px 1fr 80px;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: 10px;
+  padding: 10px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 8px;
 }
 
 .tendency-region {
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .tendency-bar {
-  height: 24px;
+  height: 20px;
   background: rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
 }
 
@@ -597,7 +636,7 @@ const formatValue = (value) => {
 }
 
 .tendency-value {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--color-primary);
   text-align: right;
@@ -605,12 +644,12 @@ const formatValue = (value) => {
 
 .characteristics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
 }
 
 .char-item {
-  padding: 12px;
+  padding: 10px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 8px;
   display: flex;
@@ -618,12 +657,12 @@ const formatValue = (value) => {
 }
 
 .char-label {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-secondary);
 }
 
 .char-value {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--color-primary);
 }
@@ -632,96 +671,170 @@ const formatValue = (value) => {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 400px;
+  max-height: 350px;
   overflow-y: auto;
 }
 
 .village-item {
   display: flex;
   justify-content: space-between;
-  padding: 10px 14px;
+  padding: 8px 12px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 8px;
 }
 
 .village-name {
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .village-location {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-secondary);
 }
 
 .more-info {
-  margin-top: 12px;
+  margin-top: 10px;
   text-align: center;
-  padding: 12px;
+  padding: 10px;
   background: rgba(243, 156, 18, 0.1);
   border-radius: 8px;
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .summary-section {
-  padding: 16px;
-  margin-top: 30px;
+  padding: 12px;
+  margin-top: 20px;
 }
 
 .summary-section h2 {
   font-size: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   color: var(--text-primary);
 }
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .summary-card {
-  padding: 16px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  border-radius: 8px;
   text-align: center;
 }
 
 .summary-icon {
-  font-size: 40px;
-  margin-bottom: 12px;
-}
-
-.summary-label {
-  font-size: 14px;
-  color: var(--text-secondary);
+  font-size: 32px;
   margin-bottom: 8px;
 }
 
+.summary-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
 .summary-value {
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--color-primary);
 }
 
+/* 移动端横向滚动容器 */
+.table-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.integration-table {
+  border-radius: 12px;
+  overflow: hidden;
+  display: inline-block;
+  min-width: 100%;
+}
+
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto auto;
+  gap: 16px;
+  padding: 12px 16px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.table-header {
+  background: rgba(74, 144, 226, 0.2);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.table-row {
+  background: rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: background 0.3s ease;
+}
+
+.table-row:hover {
+  background: rgba(74, 144, 226, 0.1);
+}
+
+/* 移动端横向滚动样式 */
+@media (max-aspect-ratio: 1/1) {
+  .table-scroll-wrapper::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .table-scroll-wrapper::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+  }
+
+  .table-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(74, 144, 226, 0.5);
+    border-radius: 4px;
+  }
+
+  .table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(74, 144, 226, 0.7);
+  }
+}
+
+.table-row:hover {
+  background: rgba(74, 144, 226, 0.1);
+}
+
 @media (max-width: 768px) {
   .page-title {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .mode-selector {
     flex-direction: column;
+    gap: 8px;
   }
 
   .form-group {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
 
   .tendency-item {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 6px;
+  }
+
+  .stats-grid,
+  .summary-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>
