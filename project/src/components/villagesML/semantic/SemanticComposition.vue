@@ -324,7 +324,7 @@
             />
             <span class="input-hint">
               限制返回記錄數（10-{{ maxIndicesLimit }}）
-              <span v-if="userStore.role !== 'admin'" class="limit-warning">非管理員最多100條</span>
+<!--              <span v-if="userStore.role !== 'admin'" class="limit-warning">非管理員最多100條</span>-->
             </span>
           </div>
 

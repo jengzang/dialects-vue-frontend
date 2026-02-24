@@ -31,12 +31,14 @@
 
       <!-- Module Content -->
       <div class="module-content">
-        <!-- Dynamic Component Loading (New Pages) -->
-        <component
-          v-if="currentComponent"
-          :is="currentComponent"
-          v-bind="currentComponentProps"
-        />
+        <!-- Dynamic Component Loading (New Pages) with KeepAlive -->
+        <KeepAlive v-if="currentComponent">
+          <component
+            :is="currentComponent"
+            :key="`${activeModule}-${activeSubtab || 'default'}`"
+            v-bind="currentComponentProps"
+          />
+        </KeepAlive>
 
         <!-- Legacy Tab: Village Search -->
         <div v-else-if="activeModule === 'search'" class="legacy-tab">
@@ -127,7 +129,9 @@ const CharacterEmbeddings = defineAsyncComponent(() => import('@/components/vill
 const CharacterSignificance = defineAsyncComponent(() => import('@/components/villagesML/character/CharacterSignificance.vue'))
 const SemanticCategories = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticCategories.vue'))
 const SemanticComposition = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticComposition.vue'))
-const SpatialHotspots = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialHotspots.vue'))
+const SpatialHotspotsTab = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialHotspotsTab.vue'))
+const SpatialClustersTab = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialClustersTab.vue'))
+const SpatialVisualizationTab = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialVisualizationTab.vue'))
 const SpatialIntegration = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialIntegration.vue'))
 const NgramAnalysis = defineAsyncComponent(() => import('@/components/villagesML/pattern/NgramAnalysis.vue'))
 const StructuralPatterns = defineAsyncComponent(() => import('@/components/villagesML/pattern/StructuralPatterns.vue'))
@@ -192,7 +196,9 @@ const modules = [
     icon: '🗺️',
     requireAuth: false,
     subtabs: [
-      { id: 'hotspots', label: '熱點聚類', component: SpatialHotspots },
+      { id: 'hotspots', label: '空間熱點', component: SpatialHotspotsTab },
+      { id: 'clusters', label: '空間聚類', component: SpatialClustersTab },
+      { id: 'visualization', label: '空間可視化', component: SpatialVisualizationTab },
       { id: 'integration', label: '空間整合', component: SpatialIntegration }
     ]
   },

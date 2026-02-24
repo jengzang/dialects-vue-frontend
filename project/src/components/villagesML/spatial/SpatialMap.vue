@@ -1,18 +1,13 @@
 <template>
   <Teleport to="body" :disabled="!isFullScreen">
-    <div class="hotspot-map-container" :class="{ 'is-fullscreen': isFullScreen }">
-      <!-- 地圖容器 -->
+    <div class="spatial-map-container" :class="{ 'is-fullscreen': isFullScreen }">
       <div ref="mapContainer" class="map-container">
         <!-- 地圖控制面板 -->
         <div class="map-controls" v-if="!isFullScreen">
           <div class="control-group">
             <div class="custom-select">
               <select v-model="currentStyleKey" @change="handleStyleChange">
-                <option
-                  v-for="(name, key) in mapStyleConfig"
-                  :key="key"
-                  :value="key"
-                >
+                <option v-for="(name, key) in mapStyleConfig" :key="key" :value="key">
                   {{ name }}
                 </option>
               </select>
@@ -37,36 +32,6 @@
       <button v-if="isFullScreen" class="exit-fullscreen-btn" @click="toggleFullScreen">
         ✕ 退出全屏
       </button>
-
-      <!-- 村莊詳情彈窗 -->
-      <Teleport to="body">
-        <div v-if="showPopup && selectedVillage" class="village-popup-overlay" @click="closePopup">
-          <div class="village-popup-content" @click.stop>
-            <div class="popup-header">
-              <h3>{{ selectedVillage.village_name }}</h3>
-              <button class="close-btn" @click="closePopup">✕</button>
-            </div>
-            <div class="popup-body">
-              <div class="info-row">
-                <span class="label">坐標：</span>
-                <span class="value">{{ selectedVillage.lat?.toFixed(4) }}, {{ selectedVillage.lon?.toFixed(4) }}</span>
-              </div>
-              <div class="info-row" v-if="selectedVillage.city">
-                <span class="label">城市：</span>
-                <span class="value">{{ selectedVillage.city }}</span>
-              </div>
-              <div class="info-row" v-if="selectedVillage.county">
-                <span class="label">區縣：</span>
-                <span class="value">{{ selectedVillage.county }}</span>
-              </div>
-              <div class="info-row" v-if="selectedVillage.township">
-                <span class="label">鄉鎮：</span>
-                <span class="value">{{ selectedVillage.township }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Teleport>
     </div>
   </Teleport>
 </template>
@@ -75,14 +40,28 @@
 import { ref, onMounted, onBeforeUnmount, shallowRef, nextTick, watch } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { mapStyle, mapStyleConfig, calculateDenseMapCenterAndZoom } from '@/utils/MapSource.js'
+import { mapStyle, mapStyleConfig } from '@/utils/MapSource.js'
 
 const props = defineProps({
-  // 熱點數據
+  // 地圖模式: 'hotspot' | 'clusters' | 'points'
+  mode: {
+    type: String,
+    default: 'points'
+  },
+  // 熱點數據 (mode='hotspot')
   hotspot: {
     type: Object,
     default: null
-    // 格式: { hotspot_id, center_lon, center_lat, radius_km, villages: [...] }
+  },
+  // 聚類數據 (mode='clusters')
+  clusters: {
+    type: Array,
+    default: () => []
+  },
+  // 通用點數據 (mode='points')
+  points: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -92,11 +71,6 @@ const currentStyleKey = ref('gaode')
 const loading = ref(false)
 const isFullScreen = ref(false)
 
-// 彈窗狀態
-const showPopup = ref(false)
-const selectedVillage = ref(null)
-
-// 初始化地圖
 onMounted(() => {
   initMap()
 })
@@ -108,10 +82,10 @@ onBeforeUnmount(() => {
   }
 })
 
-// 監聽熱點數據變化
-watch(() => props.hotspot, (newHotspot) => {
-  if (map.value && newHotspot) {
-    renderHotspot()
+// 監聽數據變化
+watch(() => [props.hotspot, props.clusters, props.points], () => {
+  if (map.value) {
+    renderData()
   }
 }, { deep: true })
 
@@ -129,56 +103,52 @@ const initMap = () => {
   map.value.addControl(new maplibregl.NavigationControl(), 'top-left')
 
   map.value.on('load', () => {
-    if (props.hotspot) {
-      renderHotspot()
+    renderData()
+  })
+}
+
+const renderData = () => {
+  if (!map.value) return
+
+  // 清除舊圖層
+  clearLayers()
+
+  if (props.mode === 'hotspot' && props.hotspot) {
+    renderHotspot()
+  } else if (props.mode === 'clusters' && props.clusters.length > 0) {
+    renderClusters()
+  } else if (props.mode === 'points' && props.points.length > 0) {
+    renderPoints()
+  }
+}
+
+const clearLayers = () => {
+  const layersToRemove = ['hotspot-circle', 'villages-layer', 'clusters-layer', 'clusters-labels', 'points-layer']
+  const sourcesToRemove = ['hotspot-source', 'villages-source', 'clusters-source', 'points-source']
+
+  layersToRemove.forEach(layer => {
+    if (map.value.getLayer(layer)) {
+      map.value.removeLayer(layer)
     }
   })
 
-  // 點擊村莊點事件
-  map.value.on('click', 'villages-layer', (e) => {
-    if (e.features && e.features.length > 0) {
-      const feature = e.features[0]
-      selectedVillage.value = feature.properties
-      showPopup.value = true
+  sourcesToRemove.forEach(source => {
+    if (map.value.getSource(source)) {
+      map.value.removeSource(source)
     }
-  })
-
-  // 鼠標懸停效果
-  map.value.on('mouseenter', 'villages-layer', () => {
-    map.value.getCanvas().style.cursor = 'pointer'
-  })
-
-  map.value.on('mouseleave', 'villages-layer', () => {
-    map.value.getCanvas().style.cursor = ''
   })
 }
 
 const renderHotspot = () => {
-  if (!map.value || !props.hotspot) return
-
   const hotspot = props.hotspot
 
-  // 1. 飛到熱點中心
+  // 飛到熱點中心
   map.value.flyTo({
     center: [hotspot.center_lon, hotspot.center_lat],
     zoom: calculateZoomFromRadius(hotspot.radius_km)
   })
 
-  // 2. 移除舊圖層
-  if (map.value.getLayer('hotspot-circle')) {
-    map.value.removeLayer('hotspot-circle')
-  }
-  if (map.value.getLayer('villages-layer')) {
-    map.value.removeLayer('villages-layer')
-  }
-  if (map.value.getSource('hotspot-source')) {
-    map.value.removeSource('hotspot-source')
-  }
-  if (map.value.getSource('villages-source')) {
-    map.value.removeSource('villages-source')
-  }
-
-  // 3. 添加熱點圓圈
+  // 添加熱點圓圈
   map.value.addSource('hotspot-source', {
     type: 'geojson',
     data: {
@@ -186,9 +156,6 @@ const renderHotspot = () => {
       geometry: {
         type: 'Point',
         coordinates: [hotspot.center_lon, hotspot.center_lat]
-      },
-      properties: {
-        radius_km: hotspot.radius_km
       }
     }
   })
@@ -211,7 +178,7 @@ const renderHotspot = () => {
     }
   })
 
-  // 4. 添加村莊點
+  // 添加村莊點
   if (hotspot.villages && hotspot.villages.length > 0) {
     const villagesGeoJSON = {
       type: 'FeatureCollection',
@@ -248,10 +215,167 @@ const renderHotspot = () => {
         'circle-stroke-color': '#ffffff'
       }
     })
+
+    // 點擊村莊點事件
+    map.value.on('click', 'villages-layer', (e) => {
+      if (e.features && e.features.length > 0) {
+        const props = e.features[0].properties
+        new maplibregl.Popup()
+          .setLngLat(e.features[0].geometry.coordinates)
+          .setHTML(`
+            <div style="padding: 8px;">
+              <h4 style="margin: 0 0 8px 0;">${props.village_name}</h4>
+              <p style="margin: 4px 0;"><strong>坐標:</strong> ${props.lat}, ${props.lon}</p>
+              ${props.city ? `<p style="margin: 4px 0;"><strong>城市:</strong> ${props.city}</p>` : ''}
+              ${props.county ? `<p style="margin: 4px 0;"><strong>區縣:</strong> ${props.county}</p>` : ''}
+              ${props.township ? `<p style="margin: 4px 0;"><strong>鄉鎮:</strong> ${props.township}</p>` : ''}
+            </div>
+          `)
+          .addTo(map.value)
+      }
+    })
+
+    map.value.on('mouseenter', 'villages-layer', () => {
+      map.value.getCanvas().style.cursor = 'pointer'
+    })
+
+    map.value.on('mouseleave', 'villages-layer', () => {
+      map.value.getCanvas().style.cursor = ''
+    })
   }
 }
 
-// 根據半徑計算合適的縮放級別
+const renderClusters = () => {
+  const clustersGeoJSON = {
+    type: 'FeatureCollection',
+    features: props.clusters.map(cluster => ({
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [cluster.centroid_lon, cluster.centroid_lat]
+      },
+      properties: {
+        cluster_id: cluster.cluster_id,
+        size: cluster.size,
+        avg_distance_km: cluster.avg_distance_km
+      }
+    }))
+  }
+
+  map.value.addSource('clusters-source', {
+    type: 'geojson',
+    data: clustersGeoJSON
+  })
+
+  map.value.addLayer({
+    id: 'clusters-layer',
+    type: 'circle',
+    source: 'clusters-source',
+    paint: {
+      'circle-radius': [
+        'interpolate',
+        ['linear'],
+        ['get', 'size'],
+        0, 5,
+        100, 10,
+        1000, 15,
+        10000, 20,
+        100000, 30
+      ],
+      'circle-color': '#4a90e2',
+      'circle-opacity': 0.7,
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#ffffff'
+    }
+  })
+
+  map.value.addLayer({
+    id: 'clusters-labels',
+    type: 'symbol',
+    source: 'clusters-source',
+    layout: {
+      'text-field': ['to-string', ['get', 'cluster_id']],
+      'text-size': 12
+    },
+    paint: {
+      'text-color': '#ffffff'
+    }
+  })
+
+  map.value.on('click', 'clusters-layer', (e) => {
+    if (e.features && e.features.length > 0) {
+      const props = e.features[0].properties
+      new maplibregl.Popup()
+        .setLngLat(e.features[0].geometry.coordinates)
+        .setHTML(`
+          <div style="padding: 8px;">
+            <h4 style="margin: 0 0 8px 0;">聚類 #${props.cluster_id}</h4>
+            <p style="margin: 4px 0;"><strong>大小:</strong> ${props.size} 點</p>
+            <p style="margin: 4px 0;"><strong>平均距離:</strong> ${props.avg_distance_km?.toFixed(2)} km</p>
+          </div>
+        `)
+        .addTo(map.value)
+    }
+  })
+
+  map.value.on('mouseenter', 'clusters-layer', () => {
+    map.value.getCanvas().style.cursor = 'pointer'
+  })
+
+  map.value.on('mouseleave', 'clusters-layer', () => {
+    map.value.getCanvas().style.cursor = ''
+  })
+
+  // 調整視圖
+  if (clustersGeoJSON.features.length > 0) {
+    const bounds = new maplibregl.LngLatBounds()
+    clustersGeoJSON.features.forEach(feature => {
+      bounds.extend(feature.geometry.coordinates)
+    })
+    map.value.fitBounds(bounds, { padding: 50 })
+  }
+}
+
+const renderPoints = () => {
+  // 通用點渲染邏輯
+  const pointsGeoJSON = {
+    type: 'FeatureCollection',
+    features: props.points.map(point => ({
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [point.lon || point.longitude, point.lat || point.latitude]
+      },
+      properties: point
+    }))
+  }
+
+  map.value.addSource('points-source', {
+    type: 'geojson',
+    data: pointsGeoJSON
+  })
+
+  map.value.addLayer({
+    id: 'points-layer',
+    type: 'circle',
+    source: 'points-source',
+    paint: {
+      'circle-radius': 6,
+      'circle-color': '#4a90e2',
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#ffffff'
+    }
+  })
+
+  if (pointsGeoJSON.features.length > 0) {
+    const bounds = new maplibregl.LngLatBounds()
+    pointsGeoJSON.features.forEach(feature => {
+      bounds.extend(feature.geometry.coordinates)
+    })
+    map.value.fitBounds(bounds, { padding: 50 })
+  }
+}
+
 const calculateZoomFromRadius = (radiusKm) => {
   if (radiusKm > 50) return 8
   if (radiusKm > 30) return 9
@@ -260,14 +384,8 @@ const calculateZoomFromRadius = (radiusKm) => {
   return 12
 }
 
-// 將米轉換為像素（用於圓圈半徑）
 const metersToPixelsAtMaxZoom = (meters, latitude) => {
   return meters / 0.075 / Math.cos(latitude * Math.PI / 180)
-}
-
-const closePopup = () => {
-  showPopup.value = false
-  selectedVillage.value = null
 }
 
 const toggleFullScreen = async () => {
@@ -281,26 +399,19 @@ const handleStyleChange = () => {
   const newStyle = mapStyle(currentStyleKey.value)
   map.value.setStyle(newStyle)
 
-  // 樣式加載完成後重新渲染
   map.value.once('style.load', () => {
-    if (props.hotspot) {
-      renderHotspot()
-    }
+    renderData()
   })
 }
 
 const resetView = () => {
-  if (!map.value || !props.hotspot) return
-
-  map.value.flyTo({
-    center: [props.hotspot.center_lon, props.hotspot.center_lat],
-    zoom: calculateZoomFromRadius(props.hotspot.radius_km)
-  })
+  if (!map.value) return
+  renderData()
 }
 </script>
 
 <style scoped>
-.hotspot-map-container {
+.spatial-map-container {
   width: 100%;
   height: 500px;
   position: relative;
@@ -310,7 +421,7 @@ const resetView = () => {
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.hotspot-map-container.is-fullscreen {
+.spatial-map-container.is-fullscreen {
   position: fixed;
   top: 0;
   left: 0;
@@ -326,7 +437,6 @@ const resetView = () => {
   height: 100%;
 }
 
-/* 地圖控制面板 */
 .map-controls {
   position: absolute;
   top: 16px;
@@ -413,7 +523,6 @@ const resetView = () => {
   background: #40b368;
 }
 
-/* 全屏退出按鈕 */
 .exit-fullscreen-btn {
   position: absolute;
   top: 24px;
@@ -437,7 +546,6 @@ const resetView = () => {
   transform: scale(1.05);
 }
 
-/* 加載狀態 */
 .loading-overlay {
   position: absolute;
   inset: 0;
@@ -463,87 +571,5 @@ const resetView = () => {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-/* 村莊詳情彈窗 */
-.village-popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-}
-
-.village-popup-content {
-  background: white;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
-
-.popup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #eee;
-}
-
-.popup-header h3 {
-  margin: 0;
-  font-size: 18px;
-  color: #333;
-}
-
-.close-btn {
-  background: #f0f0f0;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: #666;
-  padding: 4px;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.2s;
-}
-
-.close-btn:hover {
-  background: #e0e0e0;
-  color: #333;
-}
-
-.popup-body {
-  padding: 20px;
-}
-
-.info-row {
-  display: flex;
-  padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.info-row:last-child {
-  border-bottom: none;
-}
-
-.info-row .label {
-  font-weight: 600;
-  color: #555;
-  min-width: 80px;
-}
-
-.info-row .value {
-  color: #333;
-  flex: 1;
 }
 </style>
