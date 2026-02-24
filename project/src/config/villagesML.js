@@ -206,6 +206,19 @@ export const VILLAGESML_MODULES = [
         mobileFontSize: 0.9,
         hideOnMobile: false,
         hideLabelOnMobile: true
+      },
+      {
+        id: 'network',
+        label: '字符網絡',
+        icon: '🕸️',
+        path: '/villagesML?module=character&subtab=network',
+        weight: 1,
+        mobileWeight: 1,
+        fontSize: 0.95,
+        mobileFontSize: 0.9,
+        hideOnMobile: false,
+        hideLabelOnMobile: true,
+        requireAuth: true
       }
     ]
   },

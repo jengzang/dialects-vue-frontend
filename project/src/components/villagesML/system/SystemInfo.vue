@@ -64,6 +64,59 @@
       </div>
     </div>
 
+    <!-- N-gram Significance Statistics -->
+    <div class="glass-panel ngram-stats-panel">
+      <div class="panel-header">
+        <h3>N-gram 顯著性統計 Significance Statistics</h3>
+        <button @click="refreshNgramStats" :disabled="loadingNgram" class="solid-button small">
+          <span v-if="!loadingNgram">🔄 刷新</span>
+          <span v-else>刷新中...</span>
+        </button>
+      </div>
+      <div v-if="ngramStats" class="overview-content">
+        <div class="overview-grid">
+          <div class="overview-card">
+            <div class="card-icon">📐</div>
+            <div class="card-info">
+              <div class="card-label">總 N-gram 數</div>
+              <div class="card-value">{{ formatNumber(ngramStats.ngram_significance?.total || 0) }}</div>
+            </div>
+          </div>
+          <div class="overview-card">
+            <div class="card-icon">✅</div>
+            <div class="card-info">
+              <div class="card-label">顯著 N-gram</div>
+              <div class="card-value">{{ formatNumber(ngramStats.ngram_significance?.significant || 0) }}</div>
+            </div>
+          </div>
+          <div class="overview-card">
+            <div class="card-icon">❌</div>
+            <div class="card-info">
+              <div class="card-label">不顯著 N-gram</div>
+              <div class="card-value">{{ formatNumber(ngramStats.ngram_significance?.not_significant || 0) }}</div>
+            </div>
+          </div>
+          <div class="overview-card">
+            <div class="card-icon">📊</div>
+            <div class="card-info">
+              <div class="card-label">整體顯著率</div>
+              <div class="card-value">{{ formatRate(ngramStats.ngram_significance?.significance_rate) }}</div>
+            </div>
+          </div>
+        </div>
+        <div v-if="ngramStats.by_level" class="ngram-level-grid">
+          <div v-for="(data, level) in ngramStats.by_level" :key="level" class="level-card">
+            <div class="level-name">{{ levelLabel(level) }}</div>
+            <div class="level-rate">{{ formatRate(data.rate) }}</div>
+            <div class="level-detail">{{ formatNumber(data.significant) }} / {{ formatNumber(data.total) }}</div>
+          </div>
+        </div>
+      </div>
+      <div v-else-if="loadingNgram" class="loading-state">
+        <div class="spinner"></div>
+      </div>
+    </div>
+
     <!-- Table Statistics -->
     <div class="glass-panel tables-panel">
       <div class="panel-header">
@@ -186,7 +239,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getMetadataOverview, getMetadataTables } from '@/api/index.js'
+import { getMetadataOverview, getMetadataTables, getNgramStatistics } from '@/api/index.js'
 import { showError, showSuccess } from '@/utils/message.js'
 
 // State
@@ -194,6 +247,8 @@ const overview = ref(null)
 const tables = ref([])
 const loading = ref(false)
 const selectedTable = ref(null)
+const ngramStats = ref(null)
+const loadingNgram = ref(false)
 
 // Table filters
 const tableSearch = ref('')
@@ -316,9 +371,25 @@ const formatDate = (dateStr) => {
   return date.toLocaleDateString('zh-TW') + ' ' + date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
 }
 
+const formatRate = (rate) => rate != null ? (rate * 100).toFixed(1) + '%' : '—'
+
+const levelLabel = (level) => ({ city: '城市', county: '區縣', township: '鄉鎮' }[level] || level)
+
+const refreshNgramStats = async () => {
+  loadingNgram.value = true
+  try {
+    ngramStats.value = await getNgramStatistics()
+  } catch (error) {
+    showError('加載 N-gram 統計失敗')
+  } finally {
+    loadingNgram.value = false
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   refreshOverview()
+  refreshNgramStats()
 })
 </script>
 
@@ -373,6 +444,47 @@ onMounted(() => {
 .header-controls {
   display: flex;
   gap: 12px;
+}
+
+.ngram-level-grid {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.level-card {
+  flex: 1;
+  min-width: 120px;
+  padding: 12px 16px;
+  background: rgba(74, 144, 226, 0.06);
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.level-name {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.level-rate {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary-color, #4a90e2);
+}
+
+.level-detail {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
 }
 
 .glass-input,

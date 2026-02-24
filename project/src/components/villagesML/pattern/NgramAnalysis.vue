@@ -7,6 +7,34 @@
       <!-- N-gram Frequency -->
       <div class="frequency-section glass-panel">
         <h2>N-gram 頻率分析</h2>
+
+        <!-- Statistics Banner -->
+        <div v-if="ngramStats" class="stats-banner">
+          <div class="banner-item">
+            <span class="banner-label">總 N-gram</span>
+            <span class="banner-value">{{ formatBannerNum(ngramStats.ngram_significance?.total) }}</span>
+          </div>
+          <div class="banner-divider"></div>
+          <div class="banner-item">
+            <span class="banner-label">顯著 N-gram</span>
+            <span class="banner-value highlight">{{ formatBannerNum(ngramStats.ngram_significance?.significant) }}</span>
+          </div>
+          <div class="banner-divider"></div>
+          <div class="banner-item">
+            <span class="banner-label">顯著率</span>
+            <span class="banner-value">{{ formatRate(ngramStats.ngram_significance?.significance_rate) }}</span>
+          </div>
+          <div class="banner-divider"></div>
+          <div class="banner-item" v-if="ngramStats.by_level">
+            <span class="banner-label">城市 / 區縣 / 鄉鎮</span>
+            <span class="banner-value">
+              {{ formatRate(ngramStats.by_level.city?.rate) }} /
+              {{ formatRate(ngramStats.by_level.county?.rate) }} /
+              {{ formatRate(ngramStats.by_level.township?.rate) }}
+            </span>
+          </div>
+          <div class="banner-tip">只顯示統計顯著的 N-gram (p &lt; 0.05)</div>
+        </div>
         <div class="controls">
           <select v-model.number="nValue" class="select-input">
             <option :value="2">二元組 (Bigrams)</option>
@@ -316,7 +344,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
 import RegionDisplay from '@/components/common/RegionDisplay.vue'
 import {
@@ -324,11 +352,13 @@ import {
   getNgramPatterns,
   getNgramRegional,
   getNgramTendency,
-  getNgramSignificance
+  getNgramSignificance,
+  getNgramStatistics
 } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
 
 // State
+const ngramStats = ref(null)
 const nValue = ref(2)
 const position = ref('all')
 const minFrequency = ref(5)
@@ -494,6 +524,17 @@ const getPatternTypeLabel = (type) => {
   }
   return labels[type] || type
 }
+
+const formatBannerNum = (num) => num ? num.toLocaleString('zh-CN') : '—'
+const formatRate = (rate) => rate != null ? (rate * 100).toFixed(1) + '%' : '—'
+
+onMounted(async () => {
+  try {
+    ngramStats.value = await getNgramStatistics()
+  } catch {
+    // Non-critical
+  }
+})
 </script>
 
 <style scoped>
@@ -518,6 +559,55 @@ const getPatternTypeLabel = (type) => {
 .significance-section {
   padding: 16px;
   margin-bottom: 16px;
+}
+
+.stats-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 0;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  background: rgba(74, 144, 226, 0.08);
+  border: 1px solid rgba(74, 144, 226, 0.25);
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.banner-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 14px;
+}
+
+.banner-label {
+  color: var(--text-secondary);
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.banner-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.banner-value.highlight {
+  color: var(--primary-color, #4a90e2);
+}
+
+.banner-divider {
+  width: 1px;
+  height: 32px;
+  background: rgba(74, 144, 226, 0.2);
+}
+
+.banner-tip {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding-left: 12px;
 }
 
 .frequency-section h2,

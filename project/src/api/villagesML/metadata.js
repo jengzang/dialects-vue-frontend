@@ -32,3 +32,31 @@ export async function getMetadataOverview() {
 export async function getMetadataTables() {
   return api('/api/villages/metadata/stats/tables')
 }
+
+/**
+ * 獲取 N-gram 顯著性統計
+ * @returns {Promise<Object>} {
+ *   ngram_significance: {
+ *     total: number,
+ *     significant: number,
+ *     not_significant: number,
+ *     significance_rate: number
+ *   },
+ *   by_level: {
+ *     city: { total, significant, rate },
+ *     county: { total, significant, rate },
+ *     township: { total, significant, rate }
+ *   }
+ * }
+ */
+export async function getNgramStatistics() {
+  return api('/api/villages/statistics/ngrams')
+}
+
+/**
+ * 獲取數據庫整體統計
+ * @returns {Promise<Object>}
+ */
+export async function getDatabaseStatistics() {
+  return api('/api/villages/statistics/database')
+}

@@ -184,6 +184,7 @@ const isModuleActive = (moduleId) => {
 // Lazy load page components
 const CharacterEmbeddings = defineAsyncComponent(() => import('@/components/villagesML/character/CharacterEmbeddings.vue'))
 const CharacterSignificance = defineAsyncComponent(() => import('@/components/villagesML/character/CharacterSignificance.vue'))
+const CharacterNetwork = defineAsyncComponent(() => import('@/components/villagesML/character/CharacterNetwork.vue'))
 const SemanticCategories = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticCategories.vue'))
 const SemanticComposition = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticComposition.vue'))
 const SemanticNgrams = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticNgrams.vue'))
@@ -245,6 +246,7 @@ const currentComponent = computed(() => {
     const componentMap = {
       'character-embeddings': CharacterEmbeddings,
       'character-significance': CharacterSignificance,
+      'character-network': CharacterNetwork,
       'semantic-categories': SemanticCategories,
       'semantic-composition': SemanticComposition,
       'semantic-ngrams': SemanticNgrams,

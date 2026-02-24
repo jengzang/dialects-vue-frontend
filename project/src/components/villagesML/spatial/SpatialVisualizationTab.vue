@@ -23,6 +23,13 @@
                 <input type="checkbox" v-model="layers.clusters" @change="onLayerChange">
                 <span>🔵 空間聚類</span>
               </label>
+              <div v-if="layers.clusters && availableRuns.length" class="run-selector-inline">
+                <select v-model="selectedRunId" class="filter-select" style="margin-bottom:0">
+                  <option v-for="run in availableRuns" :key="run.run_id" :value="run.run_id">
+                    {{ RUN_LABELS[run.run_id] || run.run_id }}
+                  </option>
+                </select>
+              </div>
               <label class="checkbox-item">
                 <input type="checkbox" v-model="layers.ngrams" @change="onLayerChange">
                 <span>🟢 N-gram 分佈</span>
@@ -32,6 +39,7 @@
                 <span>🟡 字符傾向</span>
               </label>
             </div>
+            <p class="layer-note">💡 提示：如需字符-聚類整合分析，請使用「空間整合」標籤頁</p>
           </div>
 
           <!-- N-gram 過濾器 -->
@@ -151,7 +159,8 @@ import SpatialMap from './SpatialMap.vue'
 import {
   getSpatialHotspots,
   getSpatialClusters,
-  getNgramRegional,
+  getSpatialClustersAvailableRuns,
+  getNgramTendency,
   getCharTendencyByChar
 } from '@/api'
 import { transformRegionalDataToGeoJSON } from '@/utils/geoTransform.js'
@@ -164,6 +173,16 @@ const layers = ref({
   ngrams: false,
   characters: false
 })
+
+// 聚類方案
+const availableRuns = ref([])
+const selectedRunId = ref('')
+const RUN_LABELS = {
+  'spatial_eps_03': '高密度核心聚類',
+  'spatial_eps_05': '中密度擴展聚類',
+  'spatial_eps_10': '全域粗粒度聚類',
+  'optimized_kde_v1': 'KDE 熱點檢測'
+}
 
 // 過濾器
 const filters = ref({
@@ -334,7 +353,7 @@ const loadHotspotsLayer = async () => {
 // 加載聚類圖層
 const loadClustersLayer = async () => {
   try {
-    const clusters = await getSpatialClusters()
+    const clusters = await getSpatialClusters({ run_id: selectedRunId.value || undefined, limit: 0 })
 
     if (!clusters || clusters.length === 0) {
       showWarning('沒有聚類數據')
@@ -351,7 +370,7 @@ const loadClustersLayer = async () => {
       properties: {
         type: 'cluster',
         cluster_id: c.cluster_id,
-        cluster_size: c.cluster_size,
+        cluster_size: c.size,
         avg_distance_km: c.avg_distance_km
       }
     }))
@@ -391,7 +410,7 @@ const loadClustersLayer = async () => {
 // 加載 N-gram 圖層
 const loadNgramsLayer = async () => {
   try {
-    const ngramData = await getNgramRegional({
+    const ngramData = await getNgramTendency({
       ngram: filters.value.ngram.trim(),
       region_level: filters.value.ngramLevel
     })
@@ -491,12 +510,12 @@ const loadCharactersLayer = async () => {
         'circle-color': [
           'interpolate',
           ['linear'],
-          ['get', 'z_score'],
-          -3, '#0000ff',
-          -1, '#6495ed',
-          0, '#ffffff',
-          1, '#ff6b6b',
-          3, '#ff0000'
+          ['get', 'tendency_score'],
+          0, '#0000ff',
+          0.5, '#6495ed',
+          1, '#ffffff',
+          2, '#ff6b6b',
+          4, '#ff0000'
         ],
         'circle-opacity': 0.7,
         'circle-stroke-width': 1,
@@ -519,8 +538,13 @@ const handlePointClick = (properties) => {
 }
 
 // 初始化
-onMounted(() => {
-  // 可以在這裡添加初始化邏輯
+onMounted(async () => {
+  try {
+    const response = await getSpatialClustersAvailableRuns()
+    availableRuns.value = response.available_runs || []
+    const kde = availableRuns.value.find(r => r.run_id === 'optimized_kde_v1')
+    selectedRunId.value = kde?.run_id || response.active_run_id || ''
+  } catch { /* 靜默失敗 */ }
 })
 </script>
 
@@ -651,6 +675,16 @@ h2 {
 .filter-input:focus,
 .filter-select:focus {
   border-color: #4a90e2;
+}
+
+.layer-note {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 12px;
+  padding: 8px;
+  background: rgba(74, 144, 226, 0.05);
+  border-radius: 6px;
+  line-height: 1.4;
 }
 
 /* 應用按鈕 */

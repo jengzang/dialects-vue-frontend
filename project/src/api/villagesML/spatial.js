@@ -22,31 +22,63 @@ export async function getSpatialHotspotDetail(hotspotId) {
 
 /**
  * 獲取空間聚類
- * @returns {Promise<Array>} [{ cluster_id: number, village_count: number, centroid: [lat, lng] }, ...]
+ * @param {Object} [params]
+ * @param {string} [params.run_id] - 分析運行ID，留空使用活躍版本
+ * @param {number} [params.limit] - 返回記錄數（0表示返回所有）
+ * @returns {Promise<Array>} [{ cluster_id: number, size: number, centroid_lon: number, centroid_lat: number, avg_distance_km: number }, ...]
  */
-export async function getSpatialClusters() {
-  return api('/api/villages/spatial/clusters')
+export async function getSpatialClusters(params = {}) {
+  const query = new URLSearchParams()
+  if (params.run_id) query.append('run_id', params.run_id)
+  if (params.limit !== undefined) query.append('limit', params.limit)
+  const qs = query.toString()
+  return api(`/api/villages/spatial/clusters${qs ? '?' + qs : ''}`)
+}
+
+/**
+ * 獲取所有可用的聚類 run_id 及統計信息
+ * @returns {Promise<Object>} { active_run_id: string, available_runs: [{ run_id, total_records, unique_clusters, avg_cluster_size, max_cluster_size, noise_count, is_active }] }
+ */
+export async function getSpatialClustersAvailableRuns() {
+  return api('/api/villages/spatial/clusters/available-runs')
 }
 
 /**
  * 獲取聚類摘要統計
- * @returns {Promise<Object>} { total_clusters: number, avg_size: number, summary: [] }
+ * @param {string} [run_id] - 分析運行ID，留空使用活躍版本
+ * @returns {Promise<Object>} { run_id, total_records, total_clusters, noise_points, total_villages, cluster_size: { avg, min, max }, spatial_extent: { avg_distance_km, lon_range, lat_range } }
  */
-export async function getSpatialClustersSummary() {
-  return api('/api/villages/spatial/clusters/summary')
+export async function getSpatialClustersSummary(run_id) {
+  const qs = run_id ? `?run_id=${run_id}` : ''
+  return api(`/api/villages/spatial/clusters/summary${qs}`)
 }
 
 /**
- * 獲取空間整合數據
+ * 獲取空間整合數據（字符-聚類倾向性整合分析）
  * @param {Object} params
- * @param {string} params.region_level - 區域層級（可選）
- * @param {string} params.region_name - 區域名稱（可選）
- * @returns {Promise<Object>} { villages: [], hotspots: [], clusters: [], tendency: [] }
+ * @param {string} [params.run_id] - 分析運行ID，留空使用活躍版本
+ * @param {string} [params.character] - 過濾特定字符
+ * @param {number} [params.cluster_id] - 過濾特定聚類ID
+ * @param {number} [params.min_cluster_size] - 最小聚類大小（村莊數）
+ * @param {number} [params.min_spatial_coherence] - 最小空間一致性（0-1）
+ * @param {boolean} [params.is_significant] - 僅顯示統計顯著結果
+ * @param {number} [params.limit] - 返回記錄數（默認100，範圍1-1000）
+ * @returns {Promise<Array>} [{
+ *   id, run_id, character, cluster_id,
+ *   cluster_tendency_mean, cluster_tendency_std, cluster_size, n_villages_with_char,
+ *   centroid_lon, centroid_lat, avg_distance_km, spatial_coherence,
+ *   dominant_city, dominant_county, is_significant, avg_p_value
+ * }, ...]
  */
 export async function getSpatialIntegration(params = {}) {
   const queryParams = new URLSearchParams()
-  if (params.region_level) queryParams.append('region_level', params.region_level)
-  if (params.region_name) queryParams.append('region_name', params.region_name)
+  if (params.run_id) queryParams.append('run_id', params.run_id)
+  if (params.character) queryParams.append('character', params.character)
+  if (params.cluster_id !== undefined) queryParams.append('cluster_id', params.cluster_id)
+  if (params.min_cluster_size) queryParams.append('min_cluster_size', params.min_cluster_size)
+  if (params.min_spatial_coherence !== undefined) queryParams.append('min_spatial_coherence', params.min_spatial_coherence)
+  if (params.is_significant !== undefined) queryParams.append('is_significant', params.is_significant)
+  if (params.limit) queryParams.append('limit', params.limit)
 
   return api(`/api/villages/spatial/integration?${queryParams.toString()}`)
 }

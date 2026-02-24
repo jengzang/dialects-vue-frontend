@@ -29,7 +29,14 @@
         </div>
       </div>
 
-      <!-- Section Header: Statistics -->
+      <!-- Maintenance Notice -->
+      <div v-if="showMaintenanceNotice" class="maintenance-notice">
+        <span class="notice-icon">🔧</span>
+        <div class="notice-content">
+          <strong>數據庫優化通知</strong>
+          <span>計劃於 2026-03-02 進行 N-gram 數據優化，將刪除統計不顯著的條目（391萬 → 230萬），查詢性能將大幅提升。</span>
+        </div>
+      </div>
       <div class="section-header">
         <h2>📈 數據概覽</h2>
         <p class="section-description">系統收錄的村名與區域統計</p>
@@ -95,14 +102,18 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
-import { getMetadataOverview } from '@/api/index.js'
+import { getMetadataOverview, getNgramStatistics } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
 import { userStore } from '@/utils/store.js'
 
 const router = useRouter()
 const searchKeyword = ref('')
 const metadata = ref(null)
+const ngramStats = ref(null)
 const loading = ref(false)
+
+// Maintenance notice: show until 2026-03-02
+const showMaintenanceNotice = computed(() => new Date() < new Date('2026-03-02'))
 
 // Statistics
 const statistics = computed(() => {
@@ -113,7 +124,7 @@ const statistics = computed(() => {
     { key: 'counties', icon: '🏛️', label: '區縣數量', value: metadata.value.total_counties || 0 },
     { key: 'townships', icon: '🏘️', label: '鄉鎮數量', value: metadata.value.total_townships || 0 },
     { key: 'characters', icon: '🔤', label: '字符總數', value: metadata.value.unique_characters || 0 },
-    // { key: 'ngrams', icon: '📐', label: 'N-gram模式', value: metadata.value.total_ngrams || 0 }
+    { key: 'ngrams', icon: '📐', label: '顯著 N-gram', value: ngramStats.value?.ngram_significance?.significant || 0 },
   ]
 })
 
@@ -219,8 +230,17 @@ const loadMetadata = async () => {
   }
 }
 
+const loadNgramStats = async () => {
+  try {
+    ngramStats.value = await getNgramStatistics()
+  } catch {
+    // Non-critical, silently ignore
+  }
+}
+
 onMounted(() => {
   loadMetadata()
+  loadNgramStats()
 })
 </script>
 
@@ -244,6 +264,34 @@ onMounted(() => {
   gap: 20px;
   margin-bottom: 30px;
   width: 100%;
+}
+
+.maintenance-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  background: rgba(243, 156, 18, 0.12);
+  border: 1px solid rgba(243, 156, 18, 0.4);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.notice-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.notice-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notice-content strong {
+  color: #d68910;
 }
 
 .stat-card {

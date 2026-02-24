@@ -223,6 +223,27 @@ const showPopup = (feature, lngLat) => {
       <p style="margin: 4px 0;"><strong>大小:</strong> ${props.cluster_size} 點</p>
       <p style="margin: 4px 0;"><strong>平均距離:</strong> ${props.avg_distance_km?.toFixed(2)} km</p>
     `
+  } else if (props.type === 'integration') {
+    html += `
+      <h4 style="margin: 0 0 8px 0;">🟣 空間整合: ${props.character}</h4>
+      <p style="margin: 4px 0;"><strong>聚類 ID:</strong> ${props.cluster_id}</p>
+      <p style="margin: 4px 0;"><strong>聚類大小:</strong> ${props.cluster_size} 村</p>
+      <p style="margin: 4px 0;"><strong>含該字村數:</strong> ${props.n_villages_with_char}</p>
+      <p style="margin: 4px 0;"><strong>傾向性均值:</strong> ${props.cluster_tendency_mean?.toFixed(3)}</p>
+      <p style="margin: 4px 0;"><strong>傾向性標準差:</strong> ${props.cluster_tendency_std?.toFixed(3)}</p>
+      <p style="margin: 4px 0;"><strong>空間一致性:</strong> ${props.spatial_coherence?.toFixed(3)}</p>
+      <p style="margin: 4px 0;"><strong>主要城市:</strong> ${props.dominant_city || 'N/A'}</p>
+      <p style="margin: 4px 0;"><strong>主要區縣:</strong> ${props.dominant_county || 'N/A'}</p>
+      ${props.is_significant ? '<p style="margin: 4px 0; color: #FFD700; font-weight: bold;">✨ 統計顯著</p>' : ''}
+      ${props.avg_p_value ? `<p style="margin: 4px 0;"><strong>P值:</strong> ${props.avg_p_value?.toFixed(4)}</p>` : ''}
+    `
+  } else if (props.type === 'village') {
+    html += `
+      <h4 style="margin: 0 0 8px 0;">🏘️ ${props.village_name}</h4>
+      <p style="margin: 4px 0;"><strong>城市:</strong> ${props.city || 'N/A'}</p>
+      <p style="margin: 4px 0;"><strong>區縣:</strong> ${props.county || 'N/A'}</p>
+      <p style="margin: 4px 0;"><strong>鄉鎮:</strong> ${props.township || 'N/A'}</p>
+    `
   } else if (props.type === 'ngram') {
     html += `
       <h4 style="margin: 0 0 8px 0;">🟢 N-gram: ${props.ngram}</h4>

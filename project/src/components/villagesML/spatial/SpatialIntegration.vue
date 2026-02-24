@@ -139,14 +139,15 @@
         </div>
 
         <div v-else-if="charData" class="char-results">
-          <!-- Spatial Distribution Map -->
-          <div class="map-section glass-panel">
+          <!-- Spatial Distribution Map -->\n          <div class="map-section glass-panel">
             <h3>{{ queryChar }} 的空間分佈</h3>
-            <div class="map-placeholder">
-              <p>🗺️ 字符空間分佈圖</p>
-              <p class="map-note">
-                顯示包含 "{{ queryChar }}" 的村莊分佈和相關熱點
-              </p>
+            <SpatialMap
+              v-if="charMapLayers.length > 0"
+              :layers="charMapLayers"
+              @point-click="handlePointClick"
+            />
+            <div v-else class="map-placeholder">
+              <p>🗺️ 暫無地圖數據</p>
             </div>
           </div>
 
@@ -208,11 +209,13 @@
           <!-- Cluster Map -->
           <div class="map-section glass-panel">
             <h3>聚類 #{{ clusterId }} 空間分佈</h3>
-            <div class="map-placeholder">
-              <p>🗺️ 聚類空間分佈圖</p>
-              <p class="map-note">
-                顯示聚類中的所有村莊和傾向性特徵
-              </p>
+            <SpatialMap
+              v-if="clusterMapLayers.length > 0"
+              :layers="clusterMapLayers"
+              @point-click="handlePointClick"
+            />
+            <div v-else class="map-placeholder">
+              <p>🗺️ 暫無地圖數據</p>
             </div>
           </div>
 
@@ -289,6 +292,7 @@
 import { ref, computed } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
 import FilterableSelect from '@/components/common/FilterableSelect.vue'
+import SpatialMap from './SpatialMap.vue'
 import {
   getSpatialIntegration,
   getSpatialIntegrationByChar,
@@ -323,6 +327,108 @@ const uniqueCharacters = computed(() => {
 const uniqueClusters = computed(() => {
   if (!integrationData.value) return []
   return [...new Set(integrationData.value.map(item => item.cluster_id))]
+})
+
+// 地图图层数据
+const charMapLayers = computed(() => {
+  if (!charData.value || !charData.value.spatial_distribution) return []
+
+  const features = charData.value.spatial_distribution.map(item => ({
+    type: 'Feature',
+    geometry: {
+      type: 'Point',
+      coordinates: [item.centroid_lon || item.lon, item.centroid_lat || item.lat]
+    },
+    properties: {
+      type: 'integration',
+      character: queryChar.value,
+      cluster_id: item.cluster_id,
+      cluster_tendency_mean: item.cluster_tendency_mean || item.tendency_mean,
+      cluster_size: item.cluster_size,
+      n_villages_with_char: item.n_villages_with_char,
+      spatial_coherence: item.spatial_coherence,
+      dominant_city: item.dominant_city,
+      dominant_county: item.dominant_county,
+      is_significant: item.is_significant,
+      avg_p_value: item.avg_p_value
+    }
+  }))
+
+  return [{
+    id: 'char-integration',
+    type: 'circle',
+    data: {
+      type: 'FeatureCollection',
+      features
+    },
+    paint: {
+      'circle-radius': [
+        'interpolate',
+        ['linear'],
+        ['get', 'cluster_size'],
+        0, 8,
+        50, 12,
+        100, 16,
+        500, 20
+      ],
+      'circle-color': [
+        'interpolate',
+        ['linear'],
+        ['get', 'cluster_tendency_mean'],
+        -2, 'rgba(128, 0, 128, 0.3)',
+        0, 'rgba(128, 0, 128, 0.6)',
+        2, 'rgba(128, 0, 128, 0.9)'
+      ],
+      'circle-opacity': 0.7,
+      'circle-stroke-width': [
+        'case',
+        ['==', ['get', 'is_significant'], 1],
+        3,
+        1
+      ],
+      'circle-stroke-color': [
+        'case',
+        ['==', ['get', 'is_significant'], 1],
+        '#FFD700',
+        '#ffffff'
+      ]
+    }
+  }]
+})
+
+const clusterMapLayers = computed(() => {
+  if (!clusterData.value || !clusterData.value.villages) return []
+
+  const features = clusterData.value.villages.map(village => ({
+    type: 'Feature',
+    geometry: {
+      type: 'Point',
+      coordinates: [village.lon || village.longitude, village.lat || village.latitude]
+    },
+    properties: {
+      type: 'village',
+      village_name: village.name || village.village_name,
+      city: village.city,
+      county: village.county,
+      township: village.township
+    }
+  }))
+
+  return [{
+    id: 'cluster-villages',
+    type: 'circle',
+    data: {
+      type: 'FeatureCollection',
+      features
+    },
+    paint: {
+      'circle-radius': 6,
+      'circle-color': '#4a90e2',
+      'circle-opacity': 0.7,
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#ffffff'
+    }
+  }]
 })
 
 // Methods
@@ -384,6 +490,11 @@ const formatValue = (value) => {
     return value.toFixed(2)
   }
   return value
+}
+
+// 处理地图点击事件
+const handlePointClick = (properties) => {
+  console.log('Point clicked:', properties)
 }
 </script>
 

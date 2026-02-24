@@ -184,6 +184,7 @@ export {
   getSpatialHotspots,
   getSpatialHotspotDetail,
   getSpatialClusters,
+  getSpatialClustersAvailableRuns,
   getSpatialClustersSummary,
   getSpatialIntegration,
   getSpatialIntegrationByChar,
@@ -213,5 +214,7 @@ export {
   compareSubsets,
   // 元數據
   getMetadataOverview,
-  getMetadataTables
+  getMetadataTables,
+  getNgramStatistics,
+  getDatabaseStatistics
 } from './villagesML/index.js'

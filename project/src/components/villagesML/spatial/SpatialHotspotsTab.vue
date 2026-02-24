@@ -110,7 +110,9 @@ const loadingHotspotDetail = ref(false)
 const loadHotspots = async () => {
   loadingHotspots.value = true
   try {
-    hotspots.value = await getSpatialHotspots()
+    const data = await getSpatialHotspots()
+    // 按村莊數量從高到低排序
+    hotspots.value = data.sort((a, b) => (b.village_count || 0) - (a.village_count || 0))
   } catch (error) {
     showError('加載熱點數據失敗')
   } finally {

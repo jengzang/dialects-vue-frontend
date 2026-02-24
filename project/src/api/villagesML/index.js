@@ -72,6 +72,7 @@ export {
   getSpatialHotspots,
   getSpatialHotspotDetail,
   getSpatialClusters,
+  getSpatialClustersAvailableRuns,
   getSpatialClustersSummary,
   getSpatialIntegration,
   getSpatialIntegrationByChar,
@@ -116,5 +117,7 @@ export {
 // 元數據
 export {
   getMetadataOverview,
-  getMetadataTables
+  getMetadataTables,
+  getNgramStatistics,
+  getDatabaseStatistics
 } from './metadata.js'
