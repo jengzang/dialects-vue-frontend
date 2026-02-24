@@ -256,7 +256,7 @@ const renderClusters = () => {
       },
       properties: {
         cluster_id: cluster.cluster_id,
-        size: cluster.size,
+        cluster_size: cluster.cluster_size,
         avg_distance_km: cluster.avg_distance_km
       }
     }))
@@ -275,7 +275,7 @@ const renderClusters = () => {
       'circle-radius': [
         'interpolate',
         ['linear'],
-        ['get', 'size'],
+        ['get', 'cluster_size'],
         0, 5,
         100, 10,
         1000, 15,
@@ -310,7 +310,7 @@ const renderClusters = () => {
         .setHTML(`
           <div style="padding: 8px;">
             <h4 style="margin: 0 0 8px 0;">聚類 #${props.cluster_id}</h4>
-            <p style="margin: 4px 0;"><strong>大小:</strong> ${props.size} 點</p>
+            <p style="margin: 4px 0;"><strong>大小:</strong> ${props.cluster_size} 點</p>
             <p style="margin: 4px 0;"><strong>平均距離:</strong> ${props.avg_distance_km?.toFixed(2)} km</p>
           </div>
         `)

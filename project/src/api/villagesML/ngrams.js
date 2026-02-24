@@ -6,16 +6,22 @@ import { api } from '../auth/auth.js'
 /**
  * 獲取N-gram頻率
  * @param {Object} params
- * @param {number} params.n - N值（1, 2, 或 3）
- * @param {number} params.top_k - 返回前K個（默認50）
- * @param {number} params.min_frequency - 最小出現次數（默認5）
- * @returns {Promise<Array>} [{ ngram: string, frequency: number, percentage: number }, ...]
+ * @param {number} params.n - N值（2-4之間：2=bigram, 3=trigram, 4=4-gram）
+ * @param {number} [params.top_k] - 返回前K個（默認100，範圍1-1000）
+ * @param {number} [params.min_frequency] - 最小頻次過濾（可選，≥1）
+ * @param {string} [params.position] - N-gram位置過濾（默認'all'）
+ *   - 'all': 所有位置的統計
+ *   - 'prefix': 前綴位置
+ *   - 'middle': 中間位置
+ *   - 'suffix': 後綴位置
+ * @returns {Promise<Array>} [{ ngram: string, position: string, frequency: number, percentage: number }, ...]
  */
 export async function getNgramFrequency(params) {
   const queryParams = new URLSearchParams()
   queryParams.append('n', params.n)
   if (params.top_k) queryParams.append('top_k', params.top_k)
   if (params.min_frequency) queryParams.append('min_frequency', params.min_frequency)
+  if (params.position) queryParams.append('position', params.position)
 
   return api(`/api/villages/ngrams/frequency?${queryParams.toString()}`)
 }
@@ -24,7 +30,7 @@ export async function getNgramFrequency(params) {
  * 獲取N-gram模式
  * @param {Object} params
  * @param {string} params.pattern - 搜尋模式（支持通配符）
- * @param {number} params.n - N值（1, 2, 或 3）
+ * @param {number} params.n - N值（2-4之間）
  * @returns {Promise<Array>} [{ ngram: string, frequency: number, examples: [] }, ...]
  */
 export async function getNgramPatterns(params) {

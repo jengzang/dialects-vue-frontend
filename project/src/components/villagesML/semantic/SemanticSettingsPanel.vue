@@ -38,7 +38,7 @@
       </div>
 
       <div class="setting-row">
-        <label>中心性指標：</label>
+        <label>中心性指標：<span class="required-hint">（至少選擇一個）</span></label>
         <div class="checkbox-group">
           <label class="checkbox-label">
             <input type="checkbox" value="degree" v-model="selectedMetrics" />
@@ -57,6 +57,7 @@
             特徵向量中心性
           </label>
         </div>
+        <span v-if="selectedMetrics.length === 0" class="error-hint">⚠️ 請至少選擇一個中心性指標</span>
       </div>
 
       <button class="run-button glass-button" @click="runAnalysis" :disabled="loading || !isAuthenticated || !canRun">
@@ -82,9 +83,11 @@ const settings = reactive(villagesMLStore.semanticSettings)
 const selectedMetrics = ref(settings.centrality_metrics || ['degree', 'betweenness'])
 const isAuthenticated = computed(() => userStore.isAuthenticated)
 
-// 是否可以運行（需要選擇區域）
+// 是否可以運行（需要選擇區域和至少一個中心性指標）
 const canRun = computed(() => {
-  return settings.region_name || settings.city || settings.county || settings.township
+  const hasRegion = settings.region_name || settings.city || settings.county || settings.township
+  const hasMetrics = selectedMetrics.value && selectedMetrics.value.length > 0
+  return hasRegion && hasMetrics
 })
 
 // 處理層級更新
@@ -141,6 +144,20 @@ const runAnalysis = () => {
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
+}
+
+.required-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.error-hint {
+  font-size: 12px;
+  color: #e74c3c;
+  font-weight: 500;
+  margin-top: 4px;
+  display: block;
 }
 
 .hint {

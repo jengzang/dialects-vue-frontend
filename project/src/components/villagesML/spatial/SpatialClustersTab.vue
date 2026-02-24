@@ -46,7 +46,7 @@
         >
           <div class="cluster-header">
             <span class="cluster-id">聚類 #{{ cluster.cluster_id }}</span>
-            <span class="cluster-count">{{ cluster.size }} 點</span>
+            <span class="cluster-count">{{ cluster.cluster_size }} 點</span>
           </div>
           <div class="cluster-info">
             <div class="info-row">
@@ -97,7 +97,7 @@
           <div class="summary-icon">📈</div>
           <div class="summary-label">平均規模</div>
           <div class="summary-value">
-            {{ (clustersSummary.clusters.reduce((sum, c) => sum + c.size, 0) / clustersSummary.clusters.length).toFixed(1) }}
+            {{ (clustersSummary.clusters.reduce((sum, c) => sum + c.cluster_size, 0) / clustersSummary.clusters.length).toFixed(1) }}
           </div>
         </div>
       </div>

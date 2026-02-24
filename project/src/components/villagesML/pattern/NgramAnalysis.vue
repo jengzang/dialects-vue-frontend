@@ -8,23 +8,29 @@
         <h2>N-gram 頻率分析</h2>
         <div class="controls">
           <select v-model.number="nValue" class="select-input">
-            <option :value="1">單字 (Unigrams)</option>
             <option :value="2">二元組 (Bigrams)</option>
             <option :value="3">三元組 (Trigrams)</option>
+            <option :value="4">四元組 (4-grams)</option>
+          </select>
+          <select v-model="position" class="select-input">
+            <option value="all">所有位置</option>
+            <option value="prefix">前綴</option>
+            <option value="middle">中間</option>
+            <option value="suffix">後綴</option>
           </select>
           <input
-            v-model.number="minCount"
+            v-model.number="minFrequency"
             type="number"
             min="1"
-            placeholder="最小出現次數"
+            placeholder="最小頻次 (≥1)"
             class="number-input"
           />
           <input
-            v-model.number="topN"
+            v-model.number="topK"
             type="number"
-            min="10"
-            max="100"
-            placeholder="返回數量"
+            min="1"
+            max="1000"
+            placeholder="返回數量 (1-1000)"
             class="number-input"
           />
           <button
@@ -45,6 +51,7 @@
           <div class="results-header">
             <div class="col-rank">排名</div>
             <div class="col-ngram">N-gram</div>
+            <div class="col-position">位置</div>
             <div class="col-frequency">頻率</div>
             <div class="col-percentage">百分比</div>
             <div class="col-bar">分佈</div>
@@ -58,6 +65,11 @@
             >
               <div class="col-rank">{{ index + 1 }}</div>
               <div class="col-ngram">{{ item.ngram }}</div>
+              <div class="col-position">
+                <span class="position-badge" :class="`position-${item.position}`">
+                  {{ getPositionLabel(item.position) }}
+                </span>
+              </div>
               <div class="col-frequency">{{ item.frequency }}</div>
               <div class="col-percentage">{{ (item.percentage * 100).toFixed(2) }}%</div>
               <div class="col-bar">
@@ -85,9 +97,9 @@
             @keyup.enter="searchPatterns"
           />
           <select v-model.number="patternN" class="select-input">
-            <option :value="1">單字</option>
             <option :value="2">二元組</option>
             <option :value="3">三元組</option>
+            <option :value="4">四元組</option>
           </select>
           <button
             class="query-button"
@@ -317,13 +329,14 @@ import {
 import { showError } from '@/utils/message.js'
 
 // State
-const nValue = ref(1)
-const minCount = ref(5)
-const topN = ref(50)
+const nValue = ref(2)
+const position = ref('all')
+const minFrequency = ref(5)
+const topK = ref(100)
 const frequencyData = ref([])
 
 const searchPattern = ref('')
-const patternN = ref(1)
+const patternN = ref(2)
 const patternResults = ref([])
 
 const regionalNgram = ref('')
@@ -353,13 +366,24 @@ const maxRegionalFreq = computed(() => {
 })
 
 // Methods
+const getPositionLabel = (pos) => {
+  const labels = {
+    'all': '全部',
+    'prefix': '前綴',
+    'middle': '中間',
+    'suffix': '後綴'
+  }
+  return labels[pos] || pos
+}
+
 const loadFrequency = async () => {
   loadingFrequency.value = true
   try {
     frequencyData.value = await getNgramFrequency({
       n: nValue.value,
-      top_n: topN.value,
-      min_count: minCount.value
+      top_k: topK.value,
+      min_frequency: minFrequency.value,
+      position: position.value
     })
   } catch (error) {
     showError('加載頻率數據失敗')
@@ -578,7 +602,7 @@ const getSignificanceLabel = (pValue) => {
 .results-header,
 .result-row {
   display: grid;
-  grid-template-columns: 60px 150px 100px 100px 1fr;
+  grid-template-columns: 60px 150px 80px 100px 100px 1fr;
   gap: 12px;
   padding: 12px 16px;
   align-items: center;
@@ -610,6 +634,34 @@ const getSignificanceLabel = (pValue) => {
   font-size: 16px;
 }
 
+.position-badge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.position-all {
+  background: rgba(149, 165, 166, 0.2);
+  color: #7f8c8d;
+}
+
+.position-prefix {
+  background: rgba(52, 152, 219, 0.2);
+  color: #2980b9;
+}
+
+.position-middle {
+  background: rgba(155, 89, 182, 0.2);
+  color: #8e44ad;
+}
+
+.position-suffix {
+  background: rgba(46, 204, 113, 0.2);
+  color: #27ae60;
+}
+
 .bar-container {
   height: 20px;
   background: rgba(255, 255, 255, 0.5);
@@ -619,7 +671,7 @@ const getSignificanceLabel = (pValue) => {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), var(--secondary-color));
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
   transition: width 0.5s ease;
 }
 
