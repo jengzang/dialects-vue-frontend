@@ -75,6 +75,7 @@
             v-model="regionName"
             :level="regionLevel"
             @update:level="(newLevel) => regionLevel = newLevel"
+            @update:hierarchy="(h) => regionHierarchy = h"
             placeholder="請選擇或輸入"
           />
           <input
@@ -285,12 +286,14 @@ const globalMinCount = ref(5)
 
 const regionLevel = ref('city')
 const regionName = ref('')
+const regionHierarchy = ref({ city: null, county: null, township: null })
 const regionalTopN = ref(30)
 
 const patternType = ref('')
 
 const tendencyPattern = ref('')
 const tendencyLevel = ref('city')
+const tendencyHierarchy = ref({ city: null, county: null, township: null })
 
 // Methods
 const loadGlobalPatterns = async () => {
@@ -314,8 +317,8 @@ const loadRegionalPatterns = async () => {
   try {
     regionalPatterns.value = await getPatternFrequencyRegional({
       region_level: regionLevel.value,
-      region_name: regionName.value,
-      top_n: regionalTopN.value
+      ...regionHierarchy.value,
+      top_k: regionalTopN.value
     })
   } catch (error) {
     showError('加載區域模式失敗')
@@ -346,7 +349,8 @@ const loadPatternTendency = async () => {
   try {
     tendencyData.value = await getPatternTendency({
       pattern: tendencyPattern.value,
-      region_level: tendencyLevel.value
+      region_level: tendencyLevel.value,
+      ...tendencyHierarchy.value
     })
   } catch (error) {
     showError('加載傾向性數據失敗')

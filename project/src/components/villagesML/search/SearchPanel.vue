@@ -37,9 +37,9 @@
       <FilterableSelect
         v-model="localFilters.township"
         level="township"
-        :parent="localFilters.county"
+        :parent="townshipParent"
         :show-level-selector="false"
-        :disabled="!localFilters.county"
+        :disabled="!canSelectTownship"
         placeholder="全部鄉鎮"
         @update:modelValue="handleSearch"
       />
@@ -55,18 +55,42 @@
 import { ref, computed } from 'vue'
 import { villagesMLStore } from '@/utils/villagesMLStore.js'
 import FilterableSelect from '@/components/common/FilterableSelect.vue'
+import { cityHasCounties } from '@/utils/regionPreload.js'
 
 const emit = defineEmits(['search'])
 
 // Local state
 const localKeyword = ref(villagesMLStore.searchKeyword)
 const localFilters = ref({ ...villagesMLStore.searchFilters })
+const hasCounties = ref(true)  // 标记当前城市是否有区县
 
 let searchTimeout = null
 
 // Computed
 const hasFilters = computed(() => {
   return localFilters.value.city || localFilters.value.county || localFilters.value.township
+})
+
+// 判断是否可以选择乡镇
+const canSelectTownship = computed(() => {
+  // 如果选择了区县，可以选择乡镇
+  if (localFilters.value.county) return true
+
+  // 如果选择了城市，且该城市没有区县，也可以选择乡镇
+  if (localFilters.value.city && !hasCounties.value) return true
+
+  return false
+})
+
+// 乡镇选择器的 parent
+const townshipParent = computed(() => {
+  // 如果有区县，parent 是区县
+  if (localFilters.value.county) return localFilters.value.county
+
+  // 如果没有区县但有城市，parent 是城市（用于东莞市、中山市等）
+  if (localFilters.value.city && !hasCounties.value) return localFilters.value.city
+
+  return null
 })
 
 // Methods
@@ -83,9 +107,17 @@ const handleSearch = () => {
   emit('search')
 }
 
-const handleCityChange = () => {
+const handleCityChange = async () => {
   localFilters.value.county = ''
   localFilters.value.township = ''
+
+  // 检查该城市是否有区县（从预加载的数据中检查，无 API 请求）
+  if (localFilters.value.city) {
+    hasCounties.value = await cityHasCounties(localFilters.value.city)
+  } else {
+    hasCounties.value = true
+  }
+
   handleSearch()
 }
 

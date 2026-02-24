@@ -37,12 +37,12 @@
                 <div class="info-item">
                   <span class="label">中心:</span>
                   <span class="value">
-                    {{ hotspot.center_lat.toFixed(4) }}, {{ hotspot.center_lng.toFixed(4) }}
+                    {{ hotspot.center_lat?.toFixed(4) || 'N/A' }}, {{ hotspot.center_lon?.toFixed(4) || 'N/A' }}
                   </span>
                 </div>
                 <div class="info-item">
                   <span class="label">半徑:</span>
-                  <span class="value">{{ hotspot.radius.toFixed(2) }} km</span>
+                  <span class="value">{{ hotspot.radius_km?.toFixed(2) || 'N/A' }} km</span>
                 </div>
               </div>
             </div>
@@ -67,21 +67,30 @@
               <div class="detail-stats">
                 <div class="stat-card">
                   <div class="stat-label">村莊數量</div>
-                  <div class="stat-value">{{ hotspotDetail.villages?.length || 0 }}</div>
+                  <div class="stat-value">{{ hotspotDetail.village_count || 0 }}</div>
                 </div>
                 <div class="stat-card">
-                  <div class="stat-label">平均密度</div>
+                  <div class="stat-label">密度分數</div>
                   <div class="stat-value">
-                    {{ hotspotDetail.statistics?.avg_density?.toFixed(2) || 'N/A' }}
+                    {{ hotspotDetail.density_score?.toFixed(4) || 'N/A' }}
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">半徑</div>
+                  <div class="stat-value">
+                    {{ hotspotDetail.radius_km?.toFixed(2) || 'N/A' }} km
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">中心坐標</div>
+                  <div class="stat-value">
+                    {{ hotspotDetail.center_lat?.toFixed(4) || 'N/A' }}, {{ hotspotDetail.center_lon?.toFixed(4) || 'N/A' }}
                   </div>
                 </div>
               </div>
 
-              <!-- Map Placeholder -->
-              <div class="map-placeholder">
-                <p>🗺️ 熱點地圖可視化</p>
-                <p class="map-note">顯示熱點範圍和包含的村莊</p>
-              </div>
+              <!-- 熱點地圖 -->
+              <HotspotMap :hotspot="hotspotDetail" />
             </div>
           </div>
         </div>
@@ -127,7 +136,7 @@
               <div class="cluster-centroid">
                 <span class="label">質心:</span>
                 <span class="value">
-                  {{ cluster.centroid[0].toFixed(4) }}, {{ cluster.centroid[1].toFixed(4) }}
+                  {{ cluster.centroid?.[0]?.toFixed(4) || 'N/A' }}, {{ cluster.centroid?.[1]?.toFixed(4) || 'N/A' }}
                 </span>
               </div>
             </div>
@@ -150,7 +159,7 @@
             <div class="summary-card">
               <div class="summary-icon">📊</div>
               <div class="summary-label">平均規模</div>
-              <div class="summary-value">{{ clustersSummary.avg_size?.toFixed(1) }}</div>
+              <div class="summary-value">{{ clustersSummary.avg_size?.toFixed(1) || 'N/A' }}</div>
             </div>
           </div>
         </div>
@@ -181,6 +190,7 @@
 <script setup>
 import { ref } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
+import HotspotMap from './HotspotMap.vue'
 import {
   getSpatialHotspots,
   getSpatialHotspotDetail,
@@ -356,7 +366,6 @@ const loadClustersSummary = async () => {
 
 .hotspot-card:hover {
   background: rgba(74, 144, 226, 0.1);
-  transform: translateX(5px);
 }
 
 .hotspot-card.selected {
@@ -486,7 +495,6 @@ const loadClustersSummary = async () => {
 }
 
 .cluster-card:hover {
-  transform: translateY(-3px);
   background: rgba(74, 144, 226, 0.1);
 }
 

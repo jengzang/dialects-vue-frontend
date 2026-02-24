@@ -23,18 +23,30 @@ export async function getCooccurrence(params = {}) {
 /**
  * 獲取語義網絡數據
  * @param {Object} params
- * @param {number} params.min_cooccurrence - 最小共現次數
- * @param {number} params.alpha - 顯著性水平
- * @param {number} params.top_k - 返回前K個節點（默認50）
+ * @param {string} params.region_level - 區域層級：'city' | 'county' | 'township'
+ * @param {string} [params.region_name] - 區域名稱（可選）
+ * @param {string} [params.city] - 城市名稱（精確查詢）
+ * @param {string} [params.county] - 區縣名稱（精確查詢）
+ * @param {string} [params.township] - 鄉鎮名稱（精確查詢）
+ * @param {number} [params.min_edge_weight] - 最小邊權重（默認0.5，範圍[0, 10]）
+ * @param {string[]} [params.centrality_metrics] - 中心性指標：['degree', 'betweenness', 'closeness', 'eigenvector']
  * @returns {Promise<Object>} { nodes: [], edges: [], communities: [] }
  */
 export async function getSemanticNetwork(params = {}) {
-  const queryParams = new URLSearchParams()
-  if (params.min_cooccurrence) queryParams.append('min_cooccurrence', params.min_cooccurrence)
-  if (params.alpha) queryParams.append('alpha', params.alpha)
-  if (params.top_k) queryParams.append('top_k', params.top_k)
-
-  return api(`/api/villages/compute/semantic/network?${queryParams.toString()}`, {
+  return api('/api/villages/compute/semantic/network', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      region_level: params.region_level,
+      region_name: params.region_name,
+      city: params.city,
+      county: params.county,
+      township: params.township,
+      min_edge_weight: params.min_edge_weight || 0.5,
+      centrality_metrics: params.centrality_metrics || ['degree', 'betweenness']
+    }),
     timeout: 60000  // 60秒超時
   })
 }

@@ -68,10 +68,26 @@
               }
             ]"
           >
-            <span class="option-name">{{ option.name }}</span>
-            <span v-if="showCounts && option.village_count" class="option-count">
-              {{ option.village_count }}村
-            </span>
+            <div class="option-content">
+              <span class="option-name">
+                <!-- 智能顯示層級路徑 -->
+                <template v-if="option.level === 'county' && option.city">
+                  <!-- 區縣級：顯示 城市 > 區縣 -->
+                  <span class="option-parent">{{ option.city }}</span>
+                  <span class="option-separator"> > </span>
+                </template>
+                <template v-else-if="option.level === 'township'">
+                  <!-- 鄉鎮級：優先顯示區縣，沒有則顯示城市 -->
+                  <span v-if="option.county" class="option-parent">{{ option.county }}</span>
+                  <span v-else-if="option.city" class="option-parent">{{ option.city }}</span>
+                  <span v-if="option.county || option.city" class="option-separator"> > </span>
+                </template>
+                <span class="option-main">{{ option.name }}</span>
+              </span>
+              <span v-if="showCounts && option.village_count" class="option-count">
+                {{ option.village_count }}村
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -81,20 +97,23 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { getRegionList } from '@/api'
 import { showError } from '@/utils/message.js'
+import { getCities, getCounties, getTownships } from '@/utils/regionPreload.js'
 
 const props = defineProps({
   modelValue: { type: String, default: '' },
   level: { type: String, default: 'city' },
   parent: { type: String, default: null },
+  // Hierarchical context for precise queries
+  city: { type: String, default: null },
+  county: { type: String, default: null },
   placeholder: { type: String, default: '請選擇或輸入' },
   showCounts: { type: Boolean, default: true },
   showLevelSelector: { type: Boolean, default: true },
   disabled: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['update:modelValue', 'update:level'])
+const emit = defineEmits(['update:modelValue', 'update:level', 'update:hierarchy'])
 
 // State
 const inputValue = ref(props.modelValue)
@@ -108,11 +127,23 @@ const dropdownRef = ref(null)
 const dropdownStyle = ref({})
 let blurTimeout = null
 
-// Load options from API
+// Load options from preloaded data
 const loadOptions = async () => {
   loading.value = true
   try {
-    const regions = await getRegionList(props.level, props.parent)
+    let regions = []
+
+    // 根据 level 从预加载的数据中获取
+    if (props.level === 'city') {
+      regions = await getCities()
+    } else if (props.level === 'county') {
+      regions = await getCounties(props.parent)
+    } else if (props.level === 'township') {
+      // 如果有 parent，可能是区县或城市
+      // 先尝试作为区县查询，如果没结果再作为城市查询
+      regions = await getTownships(props.parent, props.parent)
+    }
+
     options.value = regions || []
     filterOptions()
   } catch (error) {
@@ -262,6 +293,15 @@ const positionDropdown = async () => {
 const selectOption = (option) => {
   inputValue.value = option.name
   emit('update:modelValue', option.name)
+
+  // Emit full hierarchical path for precise queries
+  const hierarchy = {
+    city: props.level === 'city' ? option.name : props.city,
+    county: props.level === 'county' ? option.name : props.county,
+    township: props.level === 'township' ? option.name : null
+  }
+  emit('update:hierarchy', hierarchy)
+
   closeDropdown()
 }
 
@@ -447,9 +487,35 @@ onUnmounted(() => {
   font-weight: 600;
 }
 
+.option-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
 .option-name {
   flex: 1;
   color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.option-parent {
+  color: var(--text-secondary);
+  font-size: 0.9em;
+}
+
+.option-separator {
+  color: var(--text-tertiary);
+  font-size: 0.85em;
+  opacity: 0.6;
+}
+
+.option-main {
+  font-weight: 500;
 }
 
 .option-count {

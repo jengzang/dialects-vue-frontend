@@ -49,9 +49,13 @@ export const villagesMLStore = reactive({
 
   // 語義網絡相關
   semanticSettings: {
-    min_cooccurrence: 5,
-    alpha: 0.05,
-    top_n: 50
+    region_level: 'county',
+    region_name: '',
+    city: '',
+    county: '',
+    township: '',
+    min_edge_weight: 0.5,
+    centrality_metrics: ['degree', 'betweenness']
   },
   semanticNetwork: null,
   semanticLoading: false,

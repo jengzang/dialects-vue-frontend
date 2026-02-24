@@ -35,13 +35,13 @@ export async function getSemanticLabelsByChar(char) {
  * 獲取語義組合模式
  * @param {Object} params
  * @param {number} params.min_frequency - 最小出現次數（默認5）
- * @param {number} params.top_k - 返回前K個模式（默認50）
- * @returns {Promise<Array>} [{ pattern: string, count: number, example: string }, ...]
+ * @param {number} params.limit - 返回前N個模式（默認100，範圍1-1000）
+ * @returns {Promise<Array>} [{ pattern: string, frequency: number, percentage: number, pattern_type: string, modifier: string, head: string }, ...]
  */
 export async function getSemanticCompositionPatterns(params = {}) {
   const queryParams = new URLSearchParams()
   if (params.min_frequency) queryParams.append('min_frequency', params.min_frequency)
-  if (params.top_k) queryParams.append('top_k', params.top_k)
+  if (params.limit) queryParams.append('limit', params.limit)
 
   return api(`/api/villages/semantic/composition/patterns?${queryParams.toString()}`)
 }
@@ -50,13 +50,13 @@ export async function getSemanticCompositionPatterns(params = {}) {
  * 獲取語義二元組合
  * @param {Object} params
  * @param {number} params.min_frequency - 最小出現次數（默認5）
- * @param {number} params.top_k - 返回前K個（默認50）
+ * @param {number} params.limit - 返回前N個（默認100，範圍1-1000）
  * @returns {Promise<Array>} [{ bigram: string, count: number, categories: [] }, ...]
  */
 export async function getSemanticBigrams(params = {}) {
   const queryParams = new URLSearchParams()
   if (params.min_frequency) queryParams.append('min_frequency', params.min_frequency)
-  if (params.top_k) queryParams.append('top_k', params.top_k)
+  if (params.limit) queryParams.append('limit', params.limit)
 
   return api(`/api/villages/semantic/composition/bigrams?${queryParams.toString()}`)
 }

@@ -161,7 +161,7 @@
               :key="index"
               class="regional-bar"
             >
-              <div class="region-name">{{ item.region_name }}</div>
+              <RegionDisplay :item="item" mode="full" class="region-name" />
               <div class="bar-container">
                 <div
                   class="bar-fill"
@@ -219,7 +219,7 @@
                 class="table-row"
                 :class="getTendencyClass(item.z_score)"
               >
-                <div class="col">{{ item.region_name }}</div>
+                <RegionDisplay :item="item" mode="full" class="col" />
                 <div class="col">{{ item.z_score.toFixed(2) }}</div>
                 <div class="col">{{ item.frequency }}</div>
                 <div class="col">
@@ -306,6 +306,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
+import RegionDisplay from '@/components/common/RegionDisplay.vue'
 import {
   getNgramFrequency,
   getNgramPatterns,
@@ -327,10 +328,12 @@ const patternResults = ref([])
 
 const regionalNgram = ref('')
 const regionalLevel = ref('city')
+const regionalHierarchy = ref({ city: null, county: null, township: null })
 const regionalData = ref([])
 
 const tendencyNgram = ref('')
 const tendencyLevel = ref('city')
+const tendencyHierarchy = ref({ city: null, county: null, township: null })
 const tendencyData = ref([])
 
 const significanceNgram = ref('')
@@ -388,7 +391,8 @@ const loadRegionalDistribution = async () => {
   try {
     regionalData.value = await getNgramRegional({
       ngram: regionalNgram.value,
-      region_level: regionalLevel.value
+      region_level: regionalLevel.value,
+      ...regionalHierarchy.value
     })
   } catch (error) {
     showError('加載區域分佈失敗')
@@ -404,7 +408,8 @@ const loadTendency = async () => {
   try {
     tendencyData.value = await getNgramTendency({
       ngram: tendencyNgram.value,
-      region_level: tendencyLevel.value
+      region_level: tendencyLevel.value,
+      ...tendencyHierarchy.value
     })
   } catch (error) {
     showError('加載傾向性數據失敗')

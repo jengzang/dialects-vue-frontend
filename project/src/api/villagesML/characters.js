@@ -20,14 +20,25 @@ export async function getGlobalCharFrequency(params = {}) {
  * 獲取字的區域傾向性
  * @param {Object} params
  * @param {string} params.region_level - 區域層級：'city' | 'county' | 'township'
- * @param {string} params.region_name - 區域名稱
+ * @param {string} [params.city] - 城市名稱（精確查詢）
+ * @param {string} [params.county] - 區縣名稱（精確查詢）
+ * @param {string} [params.township] - 鄉鎮名稱（精確查詢）
+ * @param {string} [params.region_name] - 區域名稱（模糊查詢，向後兼容）
  * @param {number} params.top_k - 返回前K個字（默認30）
  * @returns {Promise<Array>} [{ char: string, z_score: number, frequency: number }, ...]
  */
 export async function getCharTendency(params) {
   const queryParams = new URLSearchParams()
   queryParams.append('region_level', params.region_level)
-  queryParams.append('region_name', params.region_name)
+
+  // Hierarchical parameters (preferred for precise queries)
+  if (params.city) queryParams.append('city', params.city)
+  if (params.county) queryParams.append('county', params.county)
+  if (params.township) queryParams.append('township', params.township)
+
+  // Legacy parameter (backward compatible)
+  if (params.region_name) queryParams.append('region_name', params.region_name)
+
   if (params.top_k) queryParams.append('top_k', params.top_k)
 
   return api(`/api/villages/character/tendency/by-region?${queryParams.toString()}`)
@@ -37,14 +48,25 @@ export async function getCharTendency(params) {
  * 獲取區域字頻統計
  * @param {Object} params
  * @param {string} params.region_level - 區域層級：'city' | 'county' | 'township'
- * @param {string} params.region_name - 區域名稱
+ * @param {string} [params.city] - 城市名稱（精確查詢）
+ * @param {string} [params.county] - 區縣名稱（精確查詢）
+ * @param {string} [params.township] - 鄉鎮名稱（精確查詢）
+ * @param {string} [params.region_name] - 區域名稱（模糊查詢，向後兼容）
  * @param {number} params.top_k - 返回前K個字（默認50）
  * @returns {Promise<Array>} [{ char: string, frequency: number, percentage: number }, ...]
  */
 export async function getRegionalCharFrequency(params) {
   const queryParams = new URLSearchParams()
   queryParams.append('region_level', params.region_level)
-  queryParams.append('region_name', params.region_name)
+
+  // Hierarchical parameters (preferred for precise queries)
+  if (params.city) queryParams.append('city', params.city)
+  if (params.county) queryParams.append('county', params.county)
+  if (params.township) queryParams.append('township', params.township)
+
+  // Legacy parameter (backward compatible)
+  if (params.region_name) queryParams.append('region_name', params.region_name)
+
   if (params.top_k) queryParams.append('top_k', params.top_k)
 
   return api(`/api/villages/character/frequency/regional?${queryParams.toString()}`)
@@ -55,7 +77,7 @@ export async function getRegionalCharFrequency(params) {
  * @param {Object} params
  * @param {string} params.char - 字符
  * @param {string} params.region_level - 區域層級：'city' | 'county' | 'township'
- * @returns {Promise<Array>} [{ region_name: string, z_score: number, frequency: number }, ...]
+ * @returns {Promise<Array>} [{ region_name: string, city: string, county: string, township: string, z_score: number, frequency: number }, ...]
  */
 export async function getCharTendencyByChar(params) {
   const queryParams = new URLSearchParams()

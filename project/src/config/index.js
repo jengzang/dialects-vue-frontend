@@ -204,3 +204,5 @@ export const S2T_T2S_MAPPING = {
     "摄": "攝", "呼": "呼", "等": "等", "韵": "韻", "入": "入",
     "调": "調", "清浊": "清濁", "系": "系", "组": "組", "母": "母",
 }
+// VillagesML 相關配置
+export * from './villagesML.js'

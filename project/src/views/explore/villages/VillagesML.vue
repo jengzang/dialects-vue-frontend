@@ -395,13 +395,13 @@ const handleVillageSelect = (village) => {
   villagesMLStore.selectedVillage = village
 }
 
-const handleRegionalAnalysis = async ({ level, name }) => {
+const handleRegionalAnalysis = async ({ level, name, hierarchy }) => {
   regionalLoading.value = true
   try {
     const result = await getCharTendency({
       region_level: level,
-      region_name: name,
-      top_n: 30
+      ...hierarchy,
+      top_k: 30
     })
 
     villagesMLStore.tendencyData = result

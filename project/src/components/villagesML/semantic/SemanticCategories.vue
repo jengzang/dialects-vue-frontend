@@ -60,6 +60,7 @@
               v-model="regionName"
               :level="regionLevel"
               @update:level="(newLevel) => regionLevel = newLevel"
+              @update:hierarchy="(h) => regionHierarchy = h"
               placeholder="請選擇或輸入"
             />
             <button
@@ -172,6 +173,7 @@
             v-model="tendencyRegionName"
             :level="tendencyRegionLevel"
             @update:level="(newLevel) => tendencyRegionLevel = newLevel"
+            @update:hierarchy="(h) => tendencyHierarchy = h"
             placeholder="請選擇或輸入"
           />
           <button
@@ -223,6 +225,11 @@ import {
   getSemanticLabelsByChar
 } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
+import {
+  getCategoryIcon,
+  getCategoryName,
+  getCategoryDescription
+} from '@/config/villagesML.js'
 
 // State
 const categories = ref([])
@@ -241,8 +248,10 @@ const loadingLabels = ref(false)
 
 const regionLevel = ref('city')
 const regionName = ref('')
+const regionHierarchy = ref({ city: null, county: null, township: null })
 const tendencyRegionLevel = ref('city')
 const tendencyRegionName = ref('')
+const tendencyHierarchy = ref({ city: null, county: null, township: null })
 
 const labelsMode = ref('by-category')
 const selectedCategoryForLabels = ref('')
@@ -264,51 +273,7 @@ const maxLabelCount = computed(() => {
   return Math.max(...labels.value.map(item => item.count || 1))
 })
 
-// Methods
-const getCategoryIcon = (name) => {
-  const icons = {
-    'agriculture': '🌾',
-    'clan': '👨‍👩‍👧‍👦',
-    'direction': '🧭',
-    'infrastructure': '🏗️',
-    'mountain': '⛰️',
-    'settlement': '🏘️',
-    'symbolic': '🎨',
-    'vegetation': '🌿',
-    'water': '💧'
-  }
-  return icons[name] || '🏷️'
-}
-
-const getCategoryName = (name) => {
-  const names = {
-    'agriculture': '農業',
-    'clan': '宗族',
-    'direction': '方位',
-    'infrastructure': '基建',
-    'mountain': '山地',
-    'settlement': '聚落',
-    'symbolic': '象徵',
-    'vegetation': '植物',
-    'water': '水系'
-  }
-  return names[name] || name
-}
-
-const getCategoryDescription = (name) => {
-  const descriptions = {
-    'agriculture': '農業、耕作、田地相關',
-    'clan': '宗族、姓氏、家族相關',
-    'direction': '東西南北、方向相關',
-    'infrastructure': '道路、橋樑、建築相關',
-    'mountain': '山地、丘陵等地形相關',
-    'settlement': '村落、居住地相關',
-    'symbolic': '吉祥、象徵意義相關',
-    'vegetation': '樹木、花草等植物相關',
-    'water': '河流、湖泊、水系相關'
-  }
-  return descriptions[name] || '語義類別'
-}
+// Methods - removed getCategoryIcon, getCategoryName, getCategoryDescription (now imported from config)
 
 const selectCategory = async (category) => {
   // Toggle: if clicking the same category, deselect it
@@ -354,7 +319,7 @@ const loadVTFRegional = async () => {
   try {
     vtfRegional.value = await getSemanticVTFRegional({
       region_level: regionLevel.value,
-      region_name: regionName.value
+      ...regionHierarchy.value
     })
   } catch (error) {
     showError('加載區域VTF失敗')
@@ -370,7 +335,7 @@ const loadCategoryTendency = async () => {
   try {
     categoryTendency.value = await getSemanticCategoryTendency({
       region_level: tendencyRegionLevel.value,
-      region_name: tendencyRegionName.value
+      ...tendencyHierarchy.value
     })
   } catch (error) {
     showError('加載傾向性失敗')

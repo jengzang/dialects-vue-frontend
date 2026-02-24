@@ -40,12 +40,24 @@ export async function getNgramPatterns(params) {
  * @param {Object} params
  * @param {string} params.ngram - N-gram字符串
  * @param {string} params.region_level - 區域層級：'city' | 'county' | 'township'
- * @returns {Promise<Array>} [{ region_name: string, frequency: number, percentage: number }, ...]
+ * @param {string} [params.city] - 城市名稱（精確查詢）
+ * @param {string} [params.county] - 區縣名稱（精確查詢）
+ * @param {string} [params.township] - 鄉鎮名稱（精確查詢）
+ * @param {string} [params.region_name] - 區域名稱（模糊查詢，向後兼容）
+ * @returns {Promise<Array>} [{ region_name: string, city: string, county: string, township: string, frequency: number, percentage: number }, ...]
  */
 export async function getNgramRegional(params) {
   const queryParams = new URLSearchParams()
   queryParams.append('ngram', params.ngram)
   queryParams.append('region_level', params.region_level)
+
+  // Hierarchical parameters (preferred for precise queries)
+  if (params.city) queryParams.append('city', params.city)
+  if (params.county) queryParams.append('county', params.county)
+  if (params.township) queryParams.append('township', params.township)
+
+  // Legacy parameter (backward compatible)
+  if (params.region_name) queryParams.append('region_name', params.region_name)
 
   return api(`/api/villages/ngrams/regional?${queryParams.toString()}`)
 }
@@ -55,12 +67,24 @@ export async function getNgramRegional(params) {
  * @param {Object} params
  * @param {string} params.ngram - N-gram字符串
  * @param {string} params.region_level - 區域層級
- * @returns {Promise<Array>} [{ region_name: string, z_score: number, frequency: number }, ...]
+ * @param {string} [params.city] - 城市名稱（精確查詢）
+ * @param {string} [params.county] - 區縣名稱（精確查詢）
+ * @param {string} [params.township] - 鄉鎮名稱（精確查詢）
+ * @param {string} [params.region_name] - 區域名稱（模糊查詢，向後兼容）
+ * @returns {Promise<Array>} [{ region_name: string, city: string, county: string, township: string, z_score: number, frequency: number }, ...]
  */
 export async function getNgramTendency(params) {
   const queryParams = new URLSearchParams()
   queryParams.append('ngram', params.ngram)
   queryParams.append('region_level', params.region_level)
+
+  // Hierarchical parameters (preferred for precise queries)
+  if (params.city) queryParams.append('city', params.city)
+  if (params.county) queryParams.append('county', params.county)
+  if (params.township) queryParams.append('township', params.township)
+
+  // Legacy parameter (backward compatible)
+  if (params.region_name) queryParams.append('region_name', params.region_name)
 
   return api(`/api/villages/ngrams/tendency?${queryParams.toString()}`)
 }

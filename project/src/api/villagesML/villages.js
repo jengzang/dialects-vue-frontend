@@ -50,7 +50,8 @@ export async function getVillageDetail(villageId) {
  * 獲取地區列表（用於篩選器）
  * @param {string} level - 層級：'city' | 'county' | 'township'
  * @param {string} parent - 父級名稱（可選）
- * @returns {Promise<string[]>} 地區名稱列表
+ * @returns {Promise<Array>} 地區列表，包含層級信息
+ * 返回格式：[{ name: string, city?: string, county?: string, township?: string, village_count?: number }, ...]
  */
 export async function getRegionList(level, parent = null) {
   const queryParams = new URLSearchParams({ level })

@@ -13,6 +13,7 @@
         :level="localLevel"
         @update:level="handleLevelChange"
         @update:modelValue="handleNameChange"
+        @update:hierarchy="(h) => localHierarchy = h"
         placeholder="請選擇或輸入區域"
       />
 
@@ -29,6 +30,7 @@ const emit = defineEmits(['analyze'])
 
 const localLevel = ref(villagesMLStore.regionLevel)
 const localName = ref(villagesMLStore.regionName)
+const localHierarchy = ref({ city: null, county: null, township: null })
 
 const handleLevelChange = (newLevel) => {
   localLevel.value = newLevel
@@ -42,7 +44,11 @@ const handleNameChange = () => {
 
 const handleAnalyze = () => {
   if (!localName.value) return
-  emit('analyze', { level: localLevel.value, name: localName.value })
+  emit('analyze', {
+    level: localLevel.value,
+    name: localName.value,
+    hierarchy: localHierarchy.value
+  })
 }
 </script>
 

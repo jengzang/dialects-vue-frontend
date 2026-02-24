@@ -9,22 +9,57 @@
     </div>
 
     <div class="settings-group">
+      <!-- 區域選擇 -->
       <div class="setting-row">
-        <label>最小共現次數：</label>
-        <input v-model.number="settings.min_cooccurrence" type="number" min="1" class="setting-input" />
+        <label>行政級別：</label>
+        <select v-model="settings.region_level" class="setting-select">
+          <option value="city">市級</option>
+          <option value="county">區縣級</option>
+          <option value="township">鄉鎮級</option>
+        </select>
       </div>
 
       <div class="setting-row">
-        <label>顯著性水平：</label>
-        <input v-model.number="settings.alpha" type="number" min="0.01" max="0.1" step="0.01" class="setting-input" />
+        <label>區域名稱：</label>
+        <FilterableSelect
+          v-model="settings.region_name"
+          :level="settings.region_level"
+          placeholder="請選擇或輸入區域"
+          :show-level-selector="false"
+          @update:hierarchy="handleHierarchyUpdate"
+        />
+      </div>
+
+      <!-- 網絡參數 -->
+      <div class="setting-row">
+        <label>最小邊權重：</label>
+        <input v-model.number="settings.min_edge_weight" type="number" min="0" max="10" step="0.1" class="setting-input" />
+        <span class="hint">過濾弱連接（0-10）</span>
       </div>
 
       <div class="setting-row">
-        <label>節點數量：</label>
-        <input v-model.number="settings.top_n" type="number" min="10" max="100" class="setting-input" />
+        <label>中心性指標：</label>
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" value="degree" v-model="selectedMetrics" />
+            度中心性
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" value="betweenness" v-model="selectedMetrics" />
+            介數中心性
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" value="closeness" v-model="selectedMetrics" />
+            接近中心性
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" value="eigenvector" v-model="selectedMetrics" />
+            特徵向量中心性
+          </label>
+        </div>
       </div>
 
-      <button class="run-button glass-button" @click="runAnalysis" :disabled="loading || !isAuthenticated">
+      <button class="run-button glass-button" @click="runAnalysis" :disabled="loading || !isAuthenticated || !canRun">
         {{ loading ? '分析中...' : isAuthenticated ? '🔍 生成網絡' : '🔒 需要登錄' }}
       </button>
     </div>
@@ -32,9 +67,10 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue'
+import { reactive, computed, ref, watch } from 'vue'
 import { villagesMLStore } from '@/utils/villagesMLStore.js'
 import { userStore } from '@/utils/store.js'
+import FilterableSelect from '@/components/common/FilterableSelect.vue'
 
 const props = defineProps({
   loading: { type: Boolean, default: false }
@@ -43,9 +79,36 @@ const props = defineProps({
 const emit = defineEmits(['run'])
 
 const settings = reactive(villagesMLStore.semanticSettings)
+const selectedMetrics = ref(settings.centrality_metrics || ['degree', 'betweenness'])
 const isAuthenticated = computed(() => userStore.isAuthenticated)
 
+// 是否可以運行（需要選擇區域）
+const canRun = computed(() => {
+  return settings.region_name || settings.city || settings.county || settings.township
+})
+
+// 處理層級更新
+const handleHierarchyUpdate = (hierarchy) => {
+  settings.city = hierarchy.city || ''
+  settings.county = hierarchy.county || ''
+  settings.township = hierarchy.township || ''
+}
+
+// 監聽指標選擇變化
+watch(selectedMetrics, (newMetrics) => {
+  settings.centrality_metrics = newMetrics
+}, { deep: true })
+
+// 監聽區域級別變化，清空區域名稱
+watch(() => settings.region_level, () => {
+  settings.region_name = ''
+  settings.city = ''
+  settings.county = ''
+  settings.township = ''
+})
+
 const runAnalysis = () => {
+  if (!canRun.value) return
   emit('run', settings)
 }
 </script>
@@ -70,24 +133,59 @@ const runAnalysis = () => {
 
 .setting-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .setting-row label {
-  min-width: 120px;
   font-size: 14px;
   font-weight: 500;
+  color: var(--text-primary);
 }
 
-.setting-input {
-  flex: 1;
+.hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.setting-input,
+.setting-select {
   padding: 10px 14px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(10px);
   font-size: 14px;
+}
+
+.setting-input:focus,
+.setting-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
 }
 
 .run-button {
