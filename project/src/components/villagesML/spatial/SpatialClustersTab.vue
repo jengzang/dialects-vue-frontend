@@ -1,5 +1,6 @@
 <template>
   <div class="spatial-clusters-tab">
+<!--      <h3 class="villagesml-subtab-title">空間分析 - 空間聚類</h3>-->
     <h2>🎯 空間聚類</h2>
     <div class="cluster-controls">
       <button

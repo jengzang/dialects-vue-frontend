@@ -41,6 +41,7 @@
 
       <!-- Legacy Tab: Regional Analysis -->
       <div v-else-if="activeModule === 'character' && activeSubtab === 'frequency'" class="legacy-tab">
+        <h3 class="villagesml-subtab-title">字符分析 - 頻率傾向</h3>
         <RegionSelectorPanel @analyze="handleRegionalAnalysis" />
         <TendencyHeatmapPanel
           :data="tendencyData"
@@ -50,6 +51,7 @@
 
       <!-- Legacy Tab: Clustering Analysis -->
       <div v-else-if="activeModule === 'compute' && activeSubtab === 'clustering'" class="legacy-tab">
+        <h3 class="villagesml-subtab-title">ML計算 - 聚類分析</h3>
         <div class="two-column-layout">
           <ClusteringSettingsPanel
             :loading="clusteringLoading"
@@ -61,6 +63,7 @@
 
       <!-- Legacy Tab: Semantic Network -->
       <div v-else-if="activeModule === 'semantic' && activeSubtab === 'network'" class="legacy-tab">
+        <h3 class="villagesml-subtab-title">語義分析 - 語義網絡</h3>
         <div class="two-column-layout">
           <SemanticSettingsPanel
             :loading="semanticLoading"

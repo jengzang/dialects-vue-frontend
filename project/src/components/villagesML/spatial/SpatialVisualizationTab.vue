@@ -1,5 +1,6 @@
 <template>
   <div class="spatial-visualization-tab">
+<!--      <h3 class="villagesml-subtab-title">空間分析 - 空間可視化</h3>-->
     <h2>🗺️ 空間可視化</h2>
 
     <div class="viz-container">

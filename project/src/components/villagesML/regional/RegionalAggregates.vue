@@ -1,6 +1,7 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="regional-aggregates-page">
+      <h3 class="villagesml-subtab-title">區域分析 - 聚合統計</h3>
       <h1 class="page-title">🌍 區域聚合統計</h1>
 
       <!-- Level Selector -->

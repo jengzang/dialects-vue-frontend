@@ -1,6 +1,7 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="structural-patterns-page">
+      <h3 class="villagesml-subtab-title">模式分析 - 結構模式</h3>
       <h1 class="page-title">🏗️ 結構模式分析</h1>
 
       <!-- Global Pattern Frequency -->

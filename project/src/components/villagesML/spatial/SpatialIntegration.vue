@@ -1,6 +1,7 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="spatial-integration-page">
+<!--      <h3 class="villagesml-subtab-title">空間分析 - 空間整合</h3>-->
       <h1 class="page-title">🌐 空間整合分析</h1>
 
       <!-- Query Mode Selector -->
@@ -365,7 +366,7 @@ const formatValue = (value) => {
   font-size: 32px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 30px;
+  margin: 0px;
   text-align: center;
 }
 

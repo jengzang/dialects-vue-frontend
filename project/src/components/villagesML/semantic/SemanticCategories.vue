@@ -1,7 +1,8 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="semantic-categories-page">
-      <h1 class="page-title">🏷️ 語義類別與標籤</h1>
+      <h3 class="villagesml-subtab-title">語義分析 - 類別標籤</h3>
+<!--      <h1 class="page-title">🏷️ 語義類別與標籤</h1>-->
 
       <!-- Category List -->
       <div class="category-list glass-panel">

@@ -1,5 +1,6 @@
 <template>
   <div class="spatial-hotspots-tab">
+<!--      <h3 class="villagesml-subtab-title">空間分析 - 空間熱點</h3>-->
     <h2>🔥 空間熱點</h2>
     <button
       class="load-button"

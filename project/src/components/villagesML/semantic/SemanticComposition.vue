@@ -1,7 +1,8 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="semantic-composition-page">
-      <h1 class="page-title">🧩 語義組合模式</h1>
+      <h3 class="villagesml-subtab-title">語義分析 - 組合模式</h3>
+<!--      <h1 class="page-title">🧩 語義組合模式</h1>-->
 
       <!-- Composition Patterns -->
       <div class="patterns-section glass-panel">

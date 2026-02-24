@@ -1,6 +1,7 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="ngram-analysis-page">
+      <h3 class="villagesml-subtab-title">模式分析 - N-gram</h3>
       <h1 class="page-title">📐 N-gram 分析</h1>
 
       <!-- N-gram Frequency -->

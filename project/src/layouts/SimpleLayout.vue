@@ -60,9 +60,14 @@ watch(() => route.path, (newPath) => {
   box-sizing: border-box;
 }
 
+@media (max-aspect-ratio: 1/1) {
+  .simple-layout{
+    padding:8px;
+  }
+}
+
 .content-area {
-  width: 95%;
-  height: 88dvh;
+  width: 98%;
   display: flex;
   justify-content: center;
   padding: 10px 6px;

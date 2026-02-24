@@ -934,6 +934,18 @@ textarea:focus {
   background: linear-gradient(135deg, #a0a0a0 0%, #808080 100%);
 }
 
+/* VillagesML Subtab Title - 小标题样式 */
+.villagesml-subtab-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+  padding: 8px 12px;
+  background: rgba(74, 144, 226, 0.08);
+  border-left: 3px solid #4a90e2;
+  border-radius: 4px;
+}
+
 .transition-fast { transition: all 0.15s ease; }
 .transition-slow { transition: all 0.3s ease; }
 

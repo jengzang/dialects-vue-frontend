@@ -1,7 +1,7 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="character-significance-page">
-      <h1 class="page-title">📊 統計顯著性分析</h1>
+      <h3 class="villagesml-subtab-title">字符分析 - 顯著性</h3>
 
       <!-- Query Mode Selector -->
       <div class="mode-selector glass-panel">
@@ -94,37 +94,39 @@
           <p>分析中...</p>
         </div>
 
-        <div v-else class="table-container">
-          <div class="table-header">
-            <div class="col">{{ queryMode === 'by-char' ? '區域' : '字符' }}</div>
-            <div class="col">卡方值</div>
-            <div class="col">P值</div>
-            <div class="col">效應量</div>
-            <div class="col">顯著性</div>
-          </div>
-          <div class="table-body">
-            <div
-              v-for="(item, index) in results"
-              :key="index"
-              class="table-row"
-              :class="{ 'significant': item.p_value < 0.05 }"
-            >
-              <div class="col">
-                {{ queryMode === 'by-char' ? item.region_name : (item.character || item.char) }}
-              </div>
-              <div class="col">
-                {{ (item.chi_square_statistic !== undefined ? item.chi_square_statistic : item.chi_square).toFixed(2) }}
-              </div>
-              <div class="col">
-                <span :class="getPValueClass(item.p_value)">
-                  {{ item.p_value.toFixed(6) }}
-                </span>
-              </div>
-              <div class="col">{{ item.effect_size.toFixed(2) }}</div>
-              <div class="col">
-                <span class="significance-badge" :class="getSignificanceBadge(item.p_value)">
-                  {{ getSignificanceLabel(item.p_value) }}
-                </span>
+        <div v-else class="table-scroll-wrapper">
+          <div class="table-container">
+            <div class="table-header">
+              <div class="col">{{ queryMode === 'by-char' ? '區域' : '字符' }}</div>
+              <div class="col">卡方值</div>
+              <div class="col">P值</div>
+              <div class="col">效應量</div>
+              <div class="col">顯著性</div>
+            </div>
+            <div class="table-body">
+              <div
+                v-for="(item, index) in results"
+                :key="index"
+                class="table-row"
+                :class="{ 'significant': item.p_value < 0.05 }"
+              >
+                <div class="col">
+                  {{ queryMode === 'by-char' ? item.region_name : (item.character || item.char) }}
+                </div>
+                <div class="col">
+                  {{ (item.chi_square_statistic !== undefined ? item.chi_square_statistic : item.chi_square).toFixed(2) }}
+                </div>
+                <div class="col">
+                  <span :class="getPValueClass(item.p_value)">
+                    {{ item.p_value.toFixed(3) }}
+                  </span>
+                </div>
+                <div class="col">{{ item.effect_size.toFixed(2) }}</div>
+                <div class="col">
+                  <span class="significance-badge" :class="getSignificanceBadge(item.p_value)">
+                    {{ getSignificanceLabel(item.p_value) }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -136,17 +138,29 @@
         <h3>統計摘要</h3>
         <div class="summary-grid">
           <div class="summary-item">
-            <div class="summary-label">總測試數</div>
-            <div class="summary-value">{{ summary.total_tests }}</div>
+            <div class="summary-label">總字符數</div>
+            <div class="summary-value">{{ summary.total_characters || summary.total_tests }}</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">總區域數</div>
+            <div class="summary-value">{{ summary.total_regions }}</div>
           </div>
           <div class="summary-item">
             <div class="summary-label">顯著數量</div>
             <div class="summary-value">{{ summary.significant_count }}</div>
           </div>
           <div class="summary-item">
+            <div class="summary-label">平均卡方值</div>
+            <div class="summary-value">{{ summary.avg_abs_chi_square?.toFixed(2) }}</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">最大卡方值</div>
+            <div class="summary-value">{{ summary.max_abs_chi_square?.toFixed(2) }}</div>
+          </div>
+          <div class="summary-item">
             <div class="summary-label">顯著比例</div>
             <div class="summary-value">
-              {{ ((summary.significant_count / summary.total_tests) * 100).toFixed(2) }}%
+              {{ ((summary.significant_count / (summary.total_characters || summary.total_tests)) * 100).toFixed(2) }}%
             </div>
           </div>
         </div>
@@ -249,7 +263,7 @@ const getSignificanceLabel = (pValue) => {
 
 <style scoped>
 .character-significance-page {
-  padding: 20px;
+  padding: 12px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -265,17 +279,17 @@ const getSignificanceLabel = (pValue) => {
 .mode-selector {
   display: flex;
   gap: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
+  padding: 12px;
+  margin-bottom: 16px;
 }
 
 .mode-button {
   flex: 1;
-  padding: 12px 24px;
+  padding: 10px 20px;
   background: rgba(255, 255, 255, 0.5);
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 12px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
   cursor: pointer;
@@ -293,26 +307,27 @@ const getSignificanceLabel = (pValue) => {
 }
 
 .query-form {
-  padding: 24px;
-  margin-bottom: 30px;
+  padding: 16px;
+  margin-bottom: 20px;
 }
 
 .form-content h3 {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
 .form-group {
   display: grid;
-  grid-template-columns: 120px 1fr;
+  grid-template-columns: 100px 1fr;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .form-group label {
   font-weight: 500;
+  font-size: 14px;
   color: var(--text-secondary);
 }
 
@@ -320,16 +335,16 @@ const getSignificanceLabel = (pValue) => {
 .text-input,
 .number-input,
 .select-input {
-  padding: 10px 16px;
+  padding: 8px 12px;
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 14px;
   background: rgba(255, 255, 255, 0.5);
 }
 
 .char-input {
-  width: 60px;
-  font-size: 24px;
+  width: auto;
+  font-size: 20px;
   text-align: center;
 }
 
@@ -344,16 +359,16 @@ const getSignificanceLabel = (pValue) => {
 
 .query-button {
   width: 100%;
-  padding: 12px 24px;
+  padding: 10px 20px;
   background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 12px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .query-button:hover:not(:disabled) {
@@ -366,13 +381,13 @@ const getSignificanceLabel = (pValue) => {
 }
 
 .results-table {
-  padding: 24px;
-  margin-bottom: 30px;
+  padding: 16px;
+  margin-bottom: 20px;
 }
 
 .results-table h3 {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
@@ -398,26 +413,38 @@ const getSignificanceLabel = (pValue) => {
 .table-container {
   border-radius: 12px;
   overflow: hidden;
+  display: inline-block;
+  min-width: 100%;
+}
+
+.table-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
-  gap: 12px;
-  padding: 12px 16px;
+  grid-template-columns: auto auto auto auto auto;
+  gap: 16px;
+  padding: 10px 12px;
+  align-items: center;
 }
 
 .table-header {
   background: rgba(74, 144, 226, 0.2);
   font-weight: 600;
+  font-size: 14px;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .table-row {
   background: rgba(255, 255, 255, 0.3);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: background 0.3s ease;
+  font-size: 14px;
 }
 
 .table-row:hover {
@@ -431,6 +458,7 @@ const getSignificanceLabel = (pValue) => {
 .col {
   display: flex;
   align-items: center;
+  white-space: nowrap;
 }
 
 .p-very-significant {
@@ -480,41 +508,61 @@ const getSignificanceLabel = (pValue) => {
 }
 
 .summary-panel {
-  padding: 24px;
+  padding: 16px;
 }
 
 .summary-panel h3 {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
 }
 
 .summary-item {
-  padding: 20px;
+  padding: 16px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   text-align: center;
 }
 
 .summary-label {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
 .summary-value {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--color-primary);
 }
 
 @media (max-width: 768px) {
+  .character-significance-page {
+    padding: 8px;
+  }
+
+  .mode-selector {
+    padding: 8px;
+  }
+
+  .query-form {
+    padding: 12px;
+  }
+
+  .results-table {
+    padding: 12px;
+  }
+
+  .summary-panel {
+    padding: 12px;
+  }
+
   .page-title {
     font-size: 24px;
   }
@@ -523,20 +571,34 @@ const getSignificanceLabel = (pValue) => {
     grid-template-columns: 1fr;
   }
 
-  .table-header,
-  .table-row {
+  .summary-grid {
     grid-template-columns: 1fr;
-    gap: 8px;
+  }
+}
+
+/* 移动端横向滚动样式 */
+@media (max-aspect-ratio: 1/1) {
+  .table-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .col {
-    justify-content: space-between;
+  .table-scroll-wrapper::-webkit-scrollbar {
+    height: 8px;
   }
 
-  .col::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: var(--text-secondary);
+  .table-scroll-wrapper::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+  }
+
+  .table-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(74, 144, 226, 0.5);
+    border-radius: 4px;
+  }
+
+  .table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(74, 144, 226, 0.7);
   }
 }
 </style>

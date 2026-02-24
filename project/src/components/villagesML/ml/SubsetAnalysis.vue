@@ -1,5 +1,6 @@
 <template>
   <div class="subset-analysis-page">
+      <h3 class="villagesml-subtab-title">ML計算 - 子集分析</h3>
     <!-- Header -->
     <div class="page-header">
       <h2>🔐 子集分析 Subset Analysis</h2>

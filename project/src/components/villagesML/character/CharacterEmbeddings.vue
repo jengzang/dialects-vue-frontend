@@ -1,7 +1,7 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="character-embeddings-page">
-      <h1 class="page-title">🔤 字符嵌入與相似度</h1>
+      <h3 class="villagesml-subtab-title">字符分析 - 嵌入相似</h3>
 
       <!-- Search Section -->
       <div class="search-section glass-panel">
@@ -95,29 +95,31 @@
           <p>加載中...</p>
         </div>
 
-        <div v-else class="embeddings-table">
-          <div class="table-header">
-            <div class="col-char">字符</div>
-            <div class="col-freq">出現頻率</div>
-            <div class="col-dim">向量維度</div>
-            <div class="col-action">操作</div>
-          </div>
-          <div class="table-body">
-            <div
-              v-for="embedding in embeddings"
-              :key="embedding.character"
-              class="table-row"
-            >
-              <div class="col-char">{{ embedding.character }}</div>
-              <div class="col-freq">{{ embedding.frequency || 'N/A' }}</div>
-              <div class="col-dim">{{ embedding.vector_dim || 'N/A' }}</div>
-              <div class="col-action">
-                <button
-                  class="action-button"
-                  @click="searchChar = embedding.character; searchSimilarities()"
-                >
-                  查找相似
-                </button>
+        <div v-else class="table-scroll-wrapper">
+          <div class="embeddings-table">
+            <div class="table-header">
+              <div class="col-char">字符</div>
+              <div class="col-freq">出現頻率</div>
+              <div class="col-dim">向量維度</div>
+              <div class="col-action">操作</div>
+            </div>
+            <div class="table-body">
+              <div
+                v-for="embedding in embeddings"
+                :key="embedding.character"
+                class="table-row"
+              >
+                <div class="col-char">{{ embedding.character }}</div>
+                <div class="col-freq">{{ embedding.frequency || 'N/A' }}</div>
+                <div class="col-dim">{{ embedding.vector_dim || 'N/A' }}</div>
+                <div class="col-action">
+                  <button
+                    class="action-button"
+                    @click="searchChar = embedding.character; searchSimilarities()"
+                  >
+                    查找相似
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -301,7 +303,7 @@ onMounted(() => {
 
 <style scoped>
 .character-embeddings-page {
-  padding: 20px;
+  padding: 12px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -315,13 +317,13 @@ onMounted(() => {
 }
 
 .search-section {
-  padding: 24px;
-  margin-bottom: 30px;
+  padding: 16px;
+  margin-bottom: 20px;
 }
 
 .search-section h2 {
-  font-size: 20px;
-  margin-bottom: 15px;
+  font-size: 16px;
+  margin-bottom: 12px;
   color: var(--text-primary);
 }
 
@@ -331,21 +333,20 @@ onMounted(() => {
 }
 
 .char-input {
-  width: 80px;
-  padding: 12px;
+  padding: 10px;
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 12px;
-  font-size: 24px;
+  font-size: 20px;
   text-align: center;
   background: rgba(255, 255, 255, 0.5);
 }
 
 .number-input {
   width: 120px;
-  padding: 12px;
+  padding: 10px;
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 12px;
-  font-size: 16px;
+  font-size: 14px;
   background: rgba(255, 255, 255, 0.5);
 }
 
@@ -358,12 +359,12 @@ onMounted(() => {
 
 .search-button {
   flex: 1;
-  padding: 12px 24px;
+  padding: 10px 20px;
   background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 12px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -381,21 +382,21 @@ onMounted(() => {
 .results-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .similarity-list,
 .vector-viz {
-  padding: 24px;
+  padding: 16px;
   max-height: 500px;
   overflow-y: auto;
 }
 
 .similarity-list h3,
 .vector-viz h3 {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
@@ -482,18 +483,18 @@ onMounted(() => {
 }
 
 .embeddings-list {
-  padding: 24px;
+  padding: 16px;
 }
 
 .list-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .list-header h3 {
-  font-size: 18px;
+  font-size: 16px;
   color: var(--text-primary);
 }
 
@@ -544,22 +545,31 @@ onMounted(() => {
 .embeddings-table {
   border-radius: 12px;
   overflow: hidden;
-  justify-items: center;
+  display: inline-block; /* 让表格根据内容自适应宽度 */
+  min-width: 100%;
+}
+
+/* 移动端横向滚动容器 */
+.table-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 100px 120px 120px 150px;
-  gap: 16px;
+  grid-template-columns: auto auto auto auto; /* 自适应列宽 */
+  gap: 20px;
   padding: 12px 16px;
-
+  align-items: center;
 }
 
 .table-header {
   background: rgba(74, 144, 226, 0.2);
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap; /* 防止表头换行 */
 }
 
 .table-row {
@@ -576,12 +586,19 @@ onMounted(() => {
   font-size: 20px;
   font-weight: 600;
   text-align: center;
+  min-width: 60px;
 }
 
 .col-freq,
 .col-dim {
   color: var(--text-secondary);
   text-align: center;
+  white-space: nowrap;
+}
+
+.col-action {
+  text-align: center;
+  white-space: nowrap;
 }
 
 .action-button {
@@ -606,17 +623,64 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .character-embeddings-page {
+    padding: 8px;
+  }
+
+  .search-section {
+    padding: 12px;
+  }
+
   .page-title {
     font-size: 24px;
   }
 
   .search-group {
     flex-direction: column;
+    align-items: center;
   }
 
-  .char-input,
+  .char-input {
+    width: 80px;
+  }
+
   .number-input {
-    width: 100%;
+    width: 100px;
+  }
+
+  .embeddings-list {
+    padding: 12px;
+  }
+
+  .similarity-list,
+  .vector-viz {
+    padding: 12px;
+  }
+}
+
+/* 移动端横向滚动样式 */
+@media (max-aspect-ratio: 1/1) {
+  .table-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-scroll-wrapper::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .table-scroll-wrapper::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+  }
+
+  .table-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(74, 144, 226, 0.5);
+    border-radius: 4px;
+  }
+
+  .table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(74, 144, 226, 0.7);
   }
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
   <div class="feature-extraction-page">
+      <h3 class="villagesml-subtab-title">ML計算 - 特徵提取</h3>
     <!-- Header -->
     <div class="page-header">
       <h2>🔐 特徵提取 Feature Extraction</h2>

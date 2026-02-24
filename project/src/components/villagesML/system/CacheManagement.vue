@@ -1,8 +1,9 @@
 <template>
   <div class="cache-management-page">
+    <h3 class="villagesml-subtab-title">ML計算 - 緩存管理</h3>
+
     <!-- Header -->
     <div class="page-header">
-      <h2>🔐 緩存管理 Cache Management</h2>
       <p class="subtitle">查看和管理計算緩存統計</p>
       <div v-if="!isAuthenticated" class="auth-warning">
         <span class="lock-icon">🔒</span>

@@ -1,8 +1,9 @@
 <template>
   <div class="system-info-page">
+    <h3 class="villagesml-subtab-title">系統信息</h3>
+
     <!-- Header -->
     <div class="page-header">
-      <h2>系統信息 System Information</h2>
       <p class="subtitle">數據庫概覽與系統健康指標</p>
     </div>
 
