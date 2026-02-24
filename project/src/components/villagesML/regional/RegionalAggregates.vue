@@ -393,7 +393,7 @@ const formatStatValue = (value) => {
 
 <style scoped>
 .regional-aggregates-page {
-  padding: 20px;
+  padding: 12px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -402,7 +402,7 @@ const formatStatValue = (value) => {
   font-size: 32px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 30px;
+  margin-bottom: 16px;
   text-align: center;
 }
 
@@ -410,7 +410,7 @@ const formatStatValue = (value) => {
   display: flex;
   gap: 12px;
   padding: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .level-button {
@@ -437,12 +437,12 @@ const formatStatValue = (value) => {
 }
 
 .filters-section {
-  padding: 24px;
-  margin-bottom: 20px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .filters-section h3 {
-  font-size: 18px;
+  font-size: 16px;
   margin-bottom: 15px;
   color: var(--text-primary);
 }
@@ -508,13 +508,13 @@ const formatStatValue = (value) => {
 }
 
 .aggregates-section {
-  padding: 24px;
-  margin-bottom: 30px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .aggregates-section h2 {
-  font-size: 20px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
@@ -526,7 +526,7 @@ const formatStatValue = (value) => {
 }
 
 .stat-card {
-  padding: 20px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   text-align: center;
@@ -547,7 +547,7 @@ const formatStatValue = (value) => {
 .aggregates-table {
   border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .table-header,
@@ -653,7 +653,7 @@ const formatStatValue = (value) => {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 20px;
+  padding: 12px;
 }
 
 .modal-content {
@@ -668,12 +668,12 @@ const formatStatValue = (value) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 12px 24px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .modal-header h3 {
-  font-size: 20px;
+  font-size: 16px;
   color: var(--text-primary);
 }
 
@@ -684,7 +684,7 @@ const formatStatValue = (value) => {
   color: #e74c3c;
   border: none;
   border-radius: 50%;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -694,7 +694,7 @@ const formatStatValue = (value) => {
 }
 
 .modal-body {
-  padding: 24px;
+  padding: 16px;
 }
 
 .detail-info {
@@ -797,25 +797,25 @@ const formatStatValue = (value) => {
 }
 
 .stat-item .stat-value {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--color-primary);
 }
 
 .spatial-section {
-  padding: 24px;
+  padding: 16px;
 }
 
 .spatial-section h2 {
-  font-size: 20px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
 .controls {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .select-input {

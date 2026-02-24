@@ -379,7 +379,7 @@ onMounted(() => {
 
 <style scoped>
 .semantic-categories-page {
-  padding: 20px;
+  padding: 12px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -388,18 +388,18 @@ onMounted(() => {
   font-size: 32px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 30px;
+  margin-bottom: 16px;
   text-align: center;
 }
 
 .category-list {
-  padding: 24px;
-  margin-bottom: 30px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .category-list h2 {
-  font-size: 20px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
@@ -429,7 +429,7 @@ onMounted(() => {
 }
 
 .category-card {
-  padding: 20px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   text-align: center;
@@ -458,11 +458,11 @@ onMounted(() => {
 }
 
 .category-icon {
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .category-name {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -483,26 +483,28 @@ onMounted(() => {
 .vtf-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .vtf-global,
 .vtf-regional {
-  padding: 24px;
+  padding: 16px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .vtf-global h3,
 .vtf-regional h3 {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
 .region-selector {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .select-input,
@@ -586,20 +588,20 @@ onMounted(() => {
 }
 
 .labels-section {
-  padding: 24px;
-  margin-bottom: 30px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .labels-section h3 {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
 .labels-tabs {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .tab-button {
@@ -640,7 +642,7 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 20px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
 }
@@ -688,18 +690,18 @@ onMounted(() => {
 }
 
 .tendency-section {
-  padding: 24px;
+  padding: 16px;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .section-header h3 {
-  font-size: 18px;
+  font-size: 16px;
   margin: 0;
   color: var(--text-primary);
 }
@@ -711,7 +713,7 @@ onMounted(() => {
   border-radius: 50%;
   background: rgba(231, 76, 60, 0.2);
   color: #e74c3c;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -725,8 +727,8 @@ onMounted(() => {
 }
 
 .tendency-section h3 {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 

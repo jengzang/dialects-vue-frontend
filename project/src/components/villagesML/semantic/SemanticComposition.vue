@@ -568,7 +568,7 @@ watch(indicesRegionLevel, () => {
 
 <style scoped>
 .semantic-composition-page {
-  padding: 20px;
+  padding: 12px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -577,21 +577,21 @@ watch(indicesRegionLevel, () => {
   font-size: 32px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 30px;
+  margin-bottom: 16px;
   text-align: center;
 }
 
 .patterns-section,
 .pmi-section,
 .indices-section {
-  padding: 24px;
-  margin-bottom: 30px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .patterns-section h2,
 .pmi-section h2,
 .indices-section h2 {
-  font-size: 20px;
+  font-size: 16px;
   margin-bottom: 10px;
   color: var(--text-primary);
 }
@@ -599,7 +599,7 @@ watch(indicesRegionLevel, () => {
 .section-description {
   font-size: 14px;
   color: var(--text-secondary);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   line-height: 1.6;
 }
 
@@ -613,8 +613,8 @@ watch(indicesRegionLevel, () => {
 .controls {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
-  align-items: flex-end;
+  margin-bottom: 16px;
+  align-items: center;
   flex-wrap: wrap;
 }
 
@@ -799,18 +799,18 @@ watch(indicesRegionLevel, () => {
 .ngrams-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .bigrams,
 .trigrams {
-  padding: 24px;
+  padding: 16px;
 }
 
 .bigrams h3,
 .trigrams h3 {
-  font-size: 18px;
+  font-size: 16px;
   margin-bottom: 15px;
   color: var(--text-primary);
 }
@@ -1035,9 +1035,6 @@ watch(indicesRegionLevel, () => {
     flex-direction: column;
   }
 
-  .number-input {
-    width: 100%;
-  }
 
   .table-header,
   .table-row,

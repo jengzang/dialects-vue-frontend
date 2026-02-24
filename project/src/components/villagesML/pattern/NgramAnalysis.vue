@@ -498,7 +498,7 @@ const getPatternTypeLabel = (type) => {
 
 <style scoped>
 .ngram-analysis-page {
-  padding: 20px;
+  padding: 12px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -507,7 +507,7 @@ const getPatternTypeLabel = (type) => {
   font-size: 32px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 30px;
+  margin-bottom: 16px;
   text-align: center;
 }
 
@@ -516,8 +516,8 @@ const getPatternTypeLabel = (type) => {
 .regional-section,
 .tendency-section,
 .significance-section {
-  padding: 24px;
-  margin-bottom: 30px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .frequency-section h2,
@@ -525,8 +525,8 @@ const getPatternTypeLabel = (type) => {
 .regional-section h2,
 .tendency-section h2,
 .significance-section h2 {
-  font-size: 20px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
@@ -534,7 +534,7 @@ const getPatternTypeLabel = (type) => {
 .search-controls {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 .pattern-results{
   display: flex;
@@ -716,7 +716,7 @@ const getPatternTypeLabel = (type) => {
 }
 
 .pattern-ngram {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
 }

@@ -526,7 +526,7 @@ onMounted(() => {
 
 <style scoped>
 .spatial-visualization-tab {
-  padding: 24px;
+  padding: 16px;
   background: var(--glass-medium);
   backdrop-filter: blur(40px) saturate(180%);
   border-radius: var(--radius-xl);
@@ -536,7 +536,7 @@ onMounted(() => {
 
 h2 {
   font-size: 24px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   color: var(--text-primary);
   font-weight: 600;
 }

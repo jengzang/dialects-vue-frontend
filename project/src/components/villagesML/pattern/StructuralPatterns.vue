@@ -369,7 +369,7 @@ const getTendencyClass = (zScore) => {
 
 <style scoped>
 .structural-patterns-page {
-  padding: 20px;
+  padding: 12px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -378,7 +378,7 @@ const getTendencyClass = (zScore) => {
   font-size: 32px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 30px;
+  margin-bottom: 16px;
   text-align: center;
 }
 
@@ -387,8 +387,8 @@ const getTendencyClass = (zScore) => {
 .structural-section,
 .tendency-section,
 .comparison-section {
-  padding: 24px;
-  margin-bottom: 30px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .global-section h2,
@@ -396,15 +396,15 @@ const getTendencyClass = (zScore) => {
 .structural-section h2,
 .tendency-section h2,
 .comparison-section h2 {
-  font-size: 20px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
 .controls {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .select-input,
@@ -476,7 +476,7 @@ const getTendencyClass = (zScore) => {
 }
 
 .pattern-card {
-  padding: 20px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   transition: all 0.3s ease;
@@ -510,7 +510,7 @@ const getTendencyClass = (zScore) => {
 }
 
 .pattern-text {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 12px;
@@ -601,7 +601,7 @@ const getTendencyClass = (zScore) => {
 }
 
 .structural-item {
-  padding: 20px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
 }
@@ -614,7 +614,7 @@ const getTendencyClass = (zScore) => {
 }
 
 .item-pattern {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -725,7 +725,7 @@ const getTendencyClass = (zScore) => {
 }
 
 .comparison-info {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   padding: 12px;
   background: rgba(74, 144, 226, 0.1);
   border-radius: 8px;
@@ -741,11 +741,11 @@ const getTendencyClass = (zScore) => {
 
 .placeholder-icon {
   font-size: 64px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .comparison-placeholder p {
-  font-size: 18px;
+  font-size: 16px;
   color: var(--text-primary);
   margin-bottom: 10px;
 }

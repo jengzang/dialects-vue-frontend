@@ -357,7 +357,7 @@ const formatValue = (value) => {
 
 <style scoped>
 .spatial-integration-page {
-  padding: 20px;
+  padding: 12px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -374,7 +374,7 @@ const formatValue = (value) => {
   display: flex;
   gap: 12px;
   padding: 16px;
-  margin-bottom: 30px;
+  margin-bottom: 16px;
 }
 
 .mode-button {
@@ -401,13 +401,13 @@ const formatValue = (value) => {
 }
 
 .query-form {
-  padding: 24px;
-  margin-bottom: 20px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .query-form h3 {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
@@ -499,7 +499,7 @@ const formatValue = (value) => {
 .char-results,
 .cluster-results {
   display: grid;
-  gap: 20px;
+  gap: 16px;
 }
 
 .map-section,
@@ -507,7 +507,7 @@ const formatValue = (value) => {
 .tendency-section,
 .characteristics-section,
 .villages-section {
-  padding: 24px;
+  padding: 16px;
 }
 
 .map-section h3,
@@ -515,8 +515,8 @@ const formatValue = (value) => {
 .tendency-section h3,
 .characteristics-section h3,
 .villages-section h3 {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
@@ -545,7 +545,7 @@ const formatValue = (value) => {
 }
 
 .stat-card {
-  padding: 20px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   text-align: center;
@@ -665,25 +665,25 @@ const formatValue = (value) => {
 }
 
 .summary-section {
-  padding: 24px;
+  padding: 16px;
   margin-top: 30px;
 }
 
 .summary-section h2 {
-  font-size: 20px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .summary-card {
-  padding: 24px;
+  padding: 16px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   text-align: center;

@@ -173,7 +173,7 @@ const loadClustersSummary = async () => {
 
 <style scoped>
 .spatial-clusters-tab {
-  padding: 24px;
+  padding: 16px;
   background: var(--glass-medium);
   backdrop-filter: blur(40px) saturate(180%);
   border-radius: var(--radius-xl);
@@ -183,13 +183,13 @@ const loadClustersSummary = async () => {
 
 h2, h3 {
   font-size: 24px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   color: var(--text-primary);
   font-weight: 600;
 }
 
 h3 {
-  font-size: 20px;
+  font-size: 16px;
   margin-top: 20px;
 }
 
@@ -203,7 +203,7 @@ h3 {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .load-button:hover:not(:disabled) {
@@ -218,7 +218,7 @@ h3 {
 .cluster-controls {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .loading-state {
@@ -251,7 +251,7 @@ h3 {
   padding: 16px;
   background: rgba(74, 144, 226, 0.1);
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   font-size: 14px;
 }
 
@@ -268,7 +268,7 @@ h3 {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .cluster-card {
@@ -355,14 +355,14 @@ h3 {
 
 .summary-panel {
   margin-top: 30px;
-  padding: 20px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
 }
 
 .summary-panel h3 {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 16px;
   color: var(--text-primary);
 }
 
@@ -373,7 +373,7 @@ h3 {
 }
 
 .summary-card {
-  padding: 20px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 12px;
   text-align: center;

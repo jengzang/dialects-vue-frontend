@@ -139,7 +139,7 @@ const loadHotspotDetail = async () => {
 
 <style scoped>
 .spatial-hotspots-tab {
-  padding: 24px;
+  padding: 16px;
   background: var(--glass-medium);
   backdrop-filter: blur(40px) saturate(180%);
   border-radius: var(--radius-xl);
@@ -149,7 +149,7 @@ const loadHotspotDetail = async () => {
 
 h2 {
   font-size: 24px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   color: var(--text-primary);
   font-weight: 600;
 }
@@ -164,7 +164,7 @@ h2 {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .load-button:hover:not(:disabled) {
@@ -198,7 +198,7 @@ h2 {
 .hotspots-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 16px;
 }
 
 .hotspots-list {
@@ -269,13 +269,13 @@ h2 {
 }
 
 .hotspot-detail {
-  padding: 20px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
 }
 
 .hotspot-detail h3 {
-  font-size: 18px;
+  font-size: 16px;
   margin-bottom: 15px;
   color: var(--text-primary);
 }
@@ -288,7 +288,7 @@ h2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .stat-card {

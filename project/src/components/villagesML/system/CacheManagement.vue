@@ -385,13 +385,13 @@ onMounted(() => {
 
 <style scoped>
 .cache-management-page {
-  padding: 20px;
+  padding: 12px;
   max-width: 1400px;
   margin: 0 auto;
 }
 
 .page-header {
-  margin-bottom: 30px;
+  margin-bottom: 16px;
   text-align: center;
 }
 
@@ -420,7 +420,7 @@ onMounted(() => {
 }
 
 .lock-icon {
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .glass-panel {
@@ -428,7 +428,7 @@ onMounted(() => {
   backdrop-filter: blur(10px);
   border: 1px solid var(--glass-border);
   border-radius: 16px;
-  padding: 24px;
+  padding: 16px;
   margin-bottom: 24px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
@@ -437,13 +437,13 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 2px solid rgba(74, 144, 226, 0.2);
 }
 
 .panel-header h3 {
-  font-size: 20px;
+  font-size: 16px;
   color: var(--text-primary);
   margin: 0;
 }
@@ -486,7 +486,7 @@ onMounted(() => {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  gap: 16px;
   margin-bottom: 32px;
 }
 
@@ -494,7 +494,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 20px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.6);
   border-radius: 12px;
   border: 2px solid rgba(74, 144, 226, 0.2);
@@ -565,7 +565,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 12px;
   border: 2px solid rgba(74, 144, 226, 0.2);
