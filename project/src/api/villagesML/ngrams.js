@@ -29,9 +29,13 @@ export async function getNgramFrequency(params) {
 /**
  * 獲取N-gram模式
  * @param {Object} params
- * @param {string} params.pattern - 搜尋模式（支持通配符）
+ * @param {string} params.pattern - 搜尋模式（支持通配符 *）
  * @param {number} params.n - N值（2-4之間）
- * @returns {Promise<Array>} [{ ngram: string, frequency: number, examples: [] }, ...]
+ * @returns {Promise<Array>} [{ pattern: string, pattern_type: string, frequency: number, example: string }, ...]
+ *   - pattern: 匹配的模式（如 "张X", "X梅"）
+ *   - pattern_type: 模式類型（'prefix' | 'suffix' | 'middle' | 'all'）
+ *   - frequency: 出現頻率
+ *   - example: 示例（單個字符串）
  */
 export async function getNgramPatterns(params) {
   const queryParams = new URLSearchParams()

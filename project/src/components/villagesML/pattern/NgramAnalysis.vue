@@ -122,16 +122,15 @@
               :key="index"
               class="pattern-item"
             >
-              <div class="pattern-ngram">{{ item.ngram }}</div>
+              <div class="pattern-ngram">{{ item.pattern }}</div>
+              <div class="pattern-type">
+                <span class="type-badge" :class="`type-${item.pattern_type}`">
+                  {{ getPatternTypeLabel(item.pattern_type) }}
+                </span>
+              </div>
               <div class="pattern-frequency">{{ item.frequency }} 次</div>
               <div class="pattern-examples">
-                <span
-                  v-for="(example, i) in item.examples?.slice(0, 3)"
-                  :key="i"
-                  class="example-tag"
-                >
-                  {{ example }}
-                </span>
+                <span class="example-tag">{{ item.example }}</span>
               </div>
             </div>
           </div>
@@ -484,6 +483,16 @@ const getSignificanceLabel = (pValue) => {
   if (pValue < 0.05) return '*'
   return 'n.s.'
 }
+
+const getPatternTypeLabel = (type) => {
+  const labels = {
+    'prefix': '前綴',
+    'suffix': '後綴',
+    'middle': '中間',
+    'all': '全部'
+  }
+  return labels[type] || type
+}
 </script>
 
 <style scoped>
@@ -525,6 +534,11 @@ const getSignificanceLabel = (pValue) => {
   display: flex;
   gap: 12px;
   margin-bottom: 20px;
+}
+.pattern-results{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .select-input,
@@ -695,7 +709,7 @@ const getSignificanceLabel = (pValue) => {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   display: grid;
-  grid-template-columns: 150px 100px 1fr;
+  grid-template-columns: 150px 100px 100px 1fr;
   gap: 16px;
   align-items: center;
 }
@@ -722,6 +736,34 @@ const getSignificanceLabel = (pValue) => {
   color: var(--color-primary);
   border-radius: 12px;
   font-size: 13px;
+}
+
+.type-badge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.type-prefix {
+  background: rgba(52, 152, 219, 0.2);
+  color: #2980b9;
+}
+
+.type-suffix {
+  background: rgba(46, 204, 113, 0.2);
+  color: #27ae60;
+}
+
+.type-middle {
+  background: rgba(155, 89, 182, 0.2);
+  color: #8e44ad;
+}
+
+.type-all {
+  background: rgba(149, 165, 166, 0.2);
+  color: #7f8c8d;
 }
 
 .regional-chart {

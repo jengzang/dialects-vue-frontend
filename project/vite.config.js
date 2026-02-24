@@ -40,7 +40,8 @@ export default defineConfig(({ mode }) => {
           auth: path.resolve(__dirname, 'auth/index.html'),  // MPA 頁面
           menu: path.resolve(__dirname, 'menu/index.html'),
           intro: path.resolve(__dirname, 'intro/index.html'),
-          explore:path.resolve(__dirname, 'explore/index.html'),
+          explore: path.resolve(__dirname, 'explore/index.html'),
+          villagesML: path.resolve(__dirname, 'villagesML/index.html'),
         },
         output: {
           entryFileNames: 'assets/[name].[hash].js',  // 在入口文件名中添加哈希值

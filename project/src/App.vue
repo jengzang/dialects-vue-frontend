@@ -53,6 +53,11 @@ export default {
         return IntroLayout
       }
 
+      // /villagesML 路由使用 SimpleLayout
+      if (route.path === '/villagesML') {
+        return SimpleLayout
+      }
+
       // /explore 路由：根据 page 参数选择 Layout
       if (route.path === '/explore') {
         const page = route.query.page

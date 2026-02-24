@@ -242,7 +242,7 @@
 import { ref, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import * as echarts from 'echarts'
-import { clusterSubset, compareSubsets } from '@/api/index.js'
+import { clusterSubset, compareSubsets as compareSubsetsAPI } from '@/api/index.js'
 import { showError, showSuccess } from '@/utils/message.js'
 import { userStore } from '@/utils/store.js'
 
@@ -361,7 +361,7 @@ const compareSubsets = async () => {
   loadingMessage.value = '正在比較子集...'
 
   try {
-    const response = await compareSubsets({
+    const response = await compareSubsetsAPI({
       subset_a: subsetA.value.villages.map(v => v.id),
       subset_b: subsetB.value.villages.map(v => v.id)
     })

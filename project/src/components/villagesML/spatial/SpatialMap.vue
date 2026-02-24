@@ -43,7 +43,12 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle, mapStyleConfig } from '@/utils/MapSource.js'
 
 const props = defineProps({
-  // 地圖模式: 'hotspot' | 'clusters' | 'points'
+  // 多圖層支持（新增）
+  layers: {
+    type: Array,
+    default: () => []
+  },
+  // 地圖模式: 'hotspot' | 'clusters' | 'points' (保留向後兼容)
   mode: {
     type: String,
     default: 'points'
@@ -65,6 +70,8 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['point-click'])
+
 const mapContainer = ref(null)
 const map = shallowRef(null)
 const currentStyleKey = ref('gaode')
@@ -83,7 +90,7 @@ onBeforeUnmount(() => {
 })
 
 // 監聽數據變化
-watch(() => [props.hotspot, props.clusters, props.points], () => {
+watch(() => [props.hotspot, props.clusters, props.points, props.layers], () => {
   if (map.value) {
     renderData()
   }
@@ -113,18 +120,153 @@ const renderData = () => {
   // 清除舊圖層
   clearLayers()
 
-  if (props.mode === 'hotspot' && props.hotspot) {
-    renderHotspot()
-  } else if (props.mode === 'clusters' && props.clusters.length > 0) {
-    renderClusters()
-  } else if (props.mode === 'points' && props.points.length > 0) {
-    renderPoints()
+  // 優先使用新的多圖層模式
+  if (props.layers && props.layers.length > 0) {
+    renderMultipleLayers()
+  } else {
+    // 向後兼容：使用舊的單一模式
+    if (props.mode === 'hotspot' && props.hotspot) {
+      renderHotspot()
+    } else if (props.mode === 'clusters' && props.clusters.length > 0) {
+      renderClusters()
+    } else if (props.mode === 'points' && props.points.length > 0) {
+      renderPoints()
+    }
   }
 }
 
+// 渲染多圖層（新增）
+const renderMultipleLayers = () => {
+  const allFeatures = []
+
+  props.layers.forEach((layer, index) => {
+    const sourceId = `${layer.id}-source`
+    const layerId = `${layer.id}-layer`
+
+    // 添加數據源
+    if (!map.value.getSource(sourceId)) {
+      map.value.addSource(sourceId, {
+        type: 'geojson',
+        data: layer.data
+      })
+    } else {
+      map.value.getSource(sourceId).setData(layer.data)
+    }
+
+    // 添加圖層
+    if (!map.value.getLayer(layerId)) {
+      map.value.addLayer({
+        id: layerId,
+        type: layer.type || 'circle',
+        source: sourceId,
+        paint: layer.paint || {
+          'circle-radius': 6,
+          'circle-color': '#4a90e2',
+          'circle-opacity': 0.7
+        }
+      })
+
+      // 添加點擊事件
+      map.value.on('click', layerId, (e) => {
+        if (e.features && e.features.length > 0) {
+          const props = e.features[0].properties
+          emit('point-click', props)
+
+          // 顯示彈窗
+          showPopup(e.features[0], e.lngLat)
+        }
+      })
+
+      // 添加懸停效果
+      map.value.on('mouseenter', layerId, () => {
+        map.value.getCanvas().style.cursor = 'pointer'
+      })
+
+      map.value.on('mouseleave', layerId, () => {
+        map.value.getCanvas().style.cursor = ''
+      })
+    }
+
+    // 收集所有特徵用於調整視圖
+    if (layer.data && layer.data.features) {
+      allFeatures.push(...layer.data.features)
+    }
+  })
+
+  // 調整視圖以適應所有點
+  if (allFeatures.length > 0) {
+    const bounds = new maplibregl.LngLatBounds()
+    allFeatures.forEach(feature => {
+      if (feature.geometry && feature.geometry.coordinates) {
+        bounds.extend(feature.geometry.coordinates)
+      }
+    })
+    map.value.fitBounds(bounds, { padding: 50, maxZoom: 12 })
+  }
+}
+
+// 顯示彈窗（新增）
+const showPopup = (feature, lngLat) => {
+  const props = feature.properties
+  let html = '<div style="padding: 8px; max-width: 250px;">'
+
+  if (props.type === 'hotspot') {
+    html += `
+      <h4 style="margin: 0 0 8px 0;">🔴 熱點 #${props.hotspot_id}</h4>
+      <p style="margin: 4px 0;"><strong>半徑:</strong> ${props.radius_km?.toFixed(2)} km</p>
+      <p style="margin: 4px 0;"><strong>村莊數:</strong> ${props.village_count}</p>
+      <p style="margin: 4px 0;"><strong>密度:</strong> ${props.density?.toFixed(2)}</p>
+    `
+  } else if (props.type === 'cluster') {
+    html += `
+      <h4 style="margin: 0 0 8px 0;">🔵 聚類 #${props.cluster_id}</h4>
+      <p style="margin: 4px 0;"><strong>大小:</strong> ${props.cluster_size} 點</p>
+      <p style="margin: 4px 0;"><strong>平均距離:</strong> ${props.avg_distance_km?.toFixed(2)} km</p>
+    `
+  } else if (props.type === 'ngram') {
+    html += `
+      <h4 style="margin: 0 0 8px 0;">🟢 N-gram: ${props.ngram}</h4>
+      <p style="margin: 4px 0;"><strong>區域:</strong> ${props.region_name || props.city || props.county || props.township}</p>
+      <p style="margin: 4px 0;"><strong>頻率:</strong> ${props.frequency}</p>
+      <p style="margin: 4px 0;"><strong>百分比:</strong> ${(props.percentage * 100).toFixed(2)}%</p>
+    `
+  } else if (props.type === 'character') {
+    html += `
+      <h4 style="margin: 0 0 8px 0;">🟡 字符: ${props.char}</h4>
+      <p style="margin: 4px 0;"><strong>區域:</strong> ${props.region_name || props.city || props.county || props.township}</p>
+      <p style="margin: 4px 0;"><strong>Z 分數:</strong> ${props.z_score?.toFixed(2)}</p>
+      <p style="margin: 4px 0;"><strong>頻率:</strong> ${props.frequency}</p>
+    `
+  } else {
+    // 通用顯示
+    html += '<h4 style="margin: 0 0 8px 0;">詳細信息</h4>'
+    Object.entries(props).forEach(([key, value]) => {
+      if (key !== 'type' && value !== null && value !== undefined) {
+        html += `<p style="margin: 4px 0;"><strong>${key}:</strong> ${value}</p>`
+      }
+    })
+  }
+
+  html += '</div>'
+
+  new maplibregl.Popup()
+    .setLngLat(lngLat)
+    .setHTML(html)
+    .addTo(map.value)
+}
+
 const clearLayers = () => {
+  // 清除舊的固定圖層
   const layersToRemove = ['hotspot-circle', 'villages-layer', 'clusters-layer', 'clusters-labels', 'points-layer']
   const sourcesToRemove = ['hotspot-source', 'villages-source', 'clusters-source', 'points-source']
+
+  // 清除新的動態圖層
+  if (props.layers && props.layers.length > 0) {
+    props.layers.forEach(layer => {
+      layersToRemove.push(`${layer.id}-layer`)
+      sourcesToRemove.push(`${layer.id}-source`)
+    })
+  }
 
   layersToRemove.forEach(layer => {
     if (map.value.getLayer(layer)) {

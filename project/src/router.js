@@ -8,6 +8,7 @@ import UserDataPage from './components/user/UserDataPage.vue'
 import UserRegionPage from './components/user/UserRegionPage.vue'
 import MenuEntry from "@/views/MenuEntry.vue";
 import ExploreEntry from "@/views/ExploreEntry.vue";
+import VillagesMLEntry from "@/views/VillagesMLEntry.vue";
 import IntroLayout from "@/layouts/IntroLayout.vue";
 import { h, computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -48,6 +49,13 @@ const routes = [
         path: '/explore',
         component: ExploreEntry
     },
+
+    // ✅ /villagesML 村落機器學習（使用 SimpleLayout）
+    {
+        path: '/villagesML',
+        component: VillagesMLEntry
+    },
+
     {
         path: '/intro',
         component: IntroLayout,

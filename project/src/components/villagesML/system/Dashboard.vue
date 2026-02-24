@@ -124,7 +124,7 @@ const features = [
     icon: '🔍',
     title: '村名搜尋',
     description: '按關鍵詞、區域搜尋村名，查看詳細信息與深度分析報告',
-    route: '/explore?page=VillagesML&module=search&subtab=search',
+    route: '/villagesML?module=search',
     badge: '公開',
     badgeClass: 'badge-public'
   },
@@ -133,7 +133,7 @@ const features = [
     icon: '🔤',
     title: '字頻分析',
     description: '分析村名中字符的使用頻率、區域傾向性、語義嵌入向量與統計顯著性',
-    route: '/explore?page=VillagesML&module=character&subtab=frequency',
+    route: '/villagesML?module=character&subtab=frequency',
     badge: '公開',
     badgeClass: 'badge-public'
   },
@@ -142,7 +142,7 @@ const features = [
     icon: '🏷️',
     title: '語義分析',
     description: '探索村名的語義類別、標籤組合模式、語義網絡關係與語義組成結構',
-    route: '/explore?page=VillagesML&module=semantic&subtab=categories',
+    route: '/villagesML?module=semantic&subtab=categories',
     badge: '公開',
     badgeClass: 'badge-public'
   },
@@ -151,7 +151,7 @@ const features = [
     icon: '🗺️',
     title: '空間分析',
     description: '可視化村名的地理分佈、識別空間熱點聚類、分析空間整合模式',
-    route: '/explore?page=VillagesML&module=spatial&subtab=hotspots',
+    route: '/villagesML?module=spatial&subtab=hotspots',
     badge: '公開',
     badgeClass: 'badge-public'
   },
@@ -160,7 +160,7 @@ const features = [
     icon: '📐',
     title: '模式分析',
     description: '提取N-gram模式、分析結構規律、發現村名命名的語言學特徵',
-    route: '/explore?page=VillagesML&module=pattern&subtab=ngram',
+    route: '/villagesML?module=pattern&subtab=ngrams',
     badge: '公開',
     badgeClass: 'badge-public'
   },
@@ -169,7 +169,7 @@ const features = [
     icon: '🌍',
     title: '區域分析',
     description: '計算區域聚合統計、生成區域特徵向量、進行跨區域比較分析',
-    route: '/explore?page=VillagesML&module=regional&subtab=aggregates',
+    route: '/villagesML?module=regional&subtab=aggregates',
     badge: '公開',
     badgeClass: 'badge-public'
   },
@@ -178,7 +178,7 @@ const features = [
     icon: '🤖',
     title: 'ML計算',
     description: '執行機器學習聚類分析、提取高維特徵向量、進行子集深度分析',
-    route: '/explore?page=VillagesML&module=compute&subtab=clustering',
+    route: '/villagesML?module=compute&subtab=clustering',
     badge: '需登錄',
     badgeClass: 'badge-auth'
   },
@@ -187,7 +187,7 @@ const features = [
     icon: 'ℹ️',
     title: '系統信息',
     description: '查看數據庫概覽、表統計信息、系統運行狀態與緩存管理',
-    route: '/explore?page=VillagesML&module=system&subtab=info',
+    route: '/villagesML?module=system',
     badge: '公開',
     badgeClass: 'badge-public'
   }
@@ -201,7 +201,7 @@ const formatNumber = (num) => {
 
 const handleQuickSearch = () => {
   if (!searchKeyword.value.trim()) return
-  router.push(`/explore?page=VillagesML&module=search&subtab=search&keyword=${encodeURIComponent(searchKeyword.value)}`)
+  window.location.href = `/villagesML?module=search&keyword=${encodeURIComponent(searchKeyword.value)}`
 }
 
 const navigateTo = (route) => {
