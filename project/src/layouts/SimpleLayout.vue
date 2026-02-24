@@ -11,7 +11,10 @@
     </div>
 
     <!-- 悬浮按钮组 -->
-    <FloatingButtons @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+    <FloatingButtons
+      :auth-button-position="authButtonPosition"
+      @toggle-sidebar="isSidebarOpen = !isSidebarOpen"
+    />
 
     <!-- 侧边栏 -->
     <SimpleSidebar
@@ -22,11 +25,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import FloatingButtons from '@/components/bar/FloatingButtons.vue';
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue';
 
+const route = useRoute();
 const isSidebarOpen = ref(false);
+const authButtonPosition = ref('top-right');
+
+// 根据路由自动设置 auth-button 位置
+watch(() => route.path, (newPath) => {
+  if (newPath === '/villagesML') {
+    authButtonPosition.value = 'bottom-left';
+  } else {
+    authButtonPosition.value = 'top-right';
+  }
+}, { immediate: true });
 </script>
 
 <style scoped>

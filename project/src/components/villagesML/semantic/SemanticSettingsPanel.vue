@@ -60,7 +60,7 @@
         <span v-if="selectedMetrics.length === 0" class="error-hint">⚠️ 請至少選擇一個中心性指標</span>
       </div>
 
-      <button class="run-button glass-button" @click="runAnalysis" :disabled="loading || !isAuthenticated || !canRun">
+      <button class="run-button solid-button" @click="runAnalysis" :disabled="loading || !isAuthenticated || !canRun">
         {{ loading ? '分析中...' : isAuthenticated ? '🔍 生成網絡' : '🔒 需要登錄' }}
       </button>
     </div>

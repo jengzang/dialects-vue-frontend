@@ -388,6 +388,8 @@ onMounted(() => {
 .similarity-list,
 .vector-viz {
   padding: 24px;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .similarity-list h3,

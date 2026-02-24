@@ -7,7 +7,7 @@
       <div v-if="!isAuthenticated" class="auth-warning">
         <span class="lock-icon">🔒</span>
         <span>此功能需要登入</span>
-        <button @click="goToAuth" class="glass-button small">前往登入</button>
+        <button @click="goToAuth" class="solid-button small">前往登入</button>
       </div>
     </div>
 
@@ -15,7 +15,7 @@
     <div class="glass-panel filter-panel">
       <div class="panel-header">
         <h3>篩選器構建 Filter Builder</h3>
-        <button @click="addFilter" class="glass-button small">+ 添加篩選條件</button>
+        <button @click="addFilter" class="solid-button small">+ 添加篩選條件</button>
       </div>
       <div class="filter-content">
         <div v-for="(filter, idx) in filters" :key="idx" class="filter-row">
@@ -35,13 +35,13 @@
             <option value="lt">小於</option>
           </select>
           <input v-model="filter.value" type="text" placeholder="值" class="glass-input">
-          <button @click="removeFilter(idx)" class="glass-button small secondary">刪除</button>
+          <button @click="removeFilter(idx)" class="solid-button small secondary">刪除</button>
         </div>
         <div class="filter-actions">
-          <button @click="applyFilters" :disabled="filters.length === 0 || loading" class="glass-button primary">
+          <button @click="applyFilters" :disabled="filters.length === 0 || loading" class="solid-button primary">
             應用篩選 Apply Filters
           </button>
-          <button @click="clearFilters" class="glass-button secondary">清空篩選</button>
+          <button @click="clearFilters" class="solid-button secondary">清空篩選</button>
         </div>
         <div v-if="subsetA.villages.length > 0" class="subset-info">
           <span class="info-label">子集 A:</span>
@@ -69,7 +69,7 @@
                 <span class="value">{{ subsetA.avgLength || 'N/A' }}</span>
               </div>
             </div>
-            <button @click="saveAsSubsetA" :disabled="!canSaveSubset" class="glass-button small">
+            <button @click="saveAsSubsetA" :disabled="!canSaveSubset" class="solid-button small">
               保存為子集 A
             </button>
           </div>
@@ -86,7 +86,7 @@
                 <span class="value">{{ subsetB.avgLength || 'N/A' }}</span>
               </div>
             </div>
-            <button @click="saveAsSubsetB" :disabled="!canSaveSubset" class="glass-button small">
+            <button @click="saveAsSubsetB" :disabled="!canSaveSubset" class="solid-button small">
               保存為子集 B
             </button>
           </div>
@@ -95,7 +95,7 @@
           <button
             @click="compareSubsets"
             :disabled="!canCompare || loading"
-            class="glass-button primary large"
+            class="solid-button primary large"
           >
             比較子集 Compare Subsets
           </button>
@@ -195,7 +195,7 @@
           <button
             @click="runSubsetClustering"
             :disabled="!canCluster || loading"
-            class="glass-button primary"
+            class="solid-button primary"
           >
             執行聚類 Run Clustering
           </button>
@@ -589,7 +589,7 @@ const formatVector = (vec) => {
   max-width: 100px;
 }
 
-.glass-button {
+.solid-button {
   padding: 8px 16px;
   background: linear-gradient(135deg, #4a90e2, #50c878);
   color: white;
@@ -601,26 +601,26 @@ const formatVector = (vec) => {
   transition: all 0.3s ease;
 }
 
-.glass-button:hover:not(:disabled) {
+.solid-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
 }
 
-.glass-button:disabled {
+.solid-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.glass-button.secondary {
+.solid-button.secondary {
   background: linear-gradient(135deg, #95a5a6, #7f8c8d);
 }
 
-.glass-button.small {
+.solid-button.small {
   padding: 6px 12px;
   font-size: 13px;
 }
 
-.glass-button.large {
+.solid-button.large {
   padding: 12px 32px;
   font-size: 16px;
 }

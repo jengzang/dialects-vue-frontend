@@ -2,7 +2,7 @@
   <div class="region-selector-panel glass-panel">
     <div class="panel-header">
       <h3 class="panel-title">區域選擇</h3>
-      <button class="analyze-button glass-button" @click="handleAnalyze" :disabled="!localName">
+      <button class="analyze-button solid-button" @click="handleAnalyze" :disabled="!localName">
         🔍 開始分析
       </button>
     </div>

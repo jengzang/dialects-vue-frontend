@@ -7,7 +7,7 @@
       <div v-if="!isAuthenticated" class="auth-warning">
         <span class="lock-icon">🔒</span>
         <span>此功能需要登入</span>
-        <button @click="goToAuth" class="glass-button small">前往登入</button>
+        <button @click="goToAuth" class="solid-button small">前往登入</button>
       </div>
     </div>
 
@@ -15,7 +15,7 @@
     <div class="glass-panel stats-panel">
       <div class="panel-header">
         <h3>緩存統計 Cache Statistics</h3>
-        <button @click="refreshStats" :disabled="loading" class="glass-button small">
+        <button @click="refreshStats" :disabled="loading" class="solid-button small">
           <span v-if="!loading">🔄 刷新</span>
           <span v-else>刷新中...</span>
         </button>
@@ -97,7 +97,7 @@
               <td>{{ cache.misses }}</td>
               <td>{{ formatPercent(cache.hit_rate) }}</td>
               <td>
-                <button @click="clearCacheType(cache.type)" class="glass-button small secondary">
+                <button @click="clearCacheType(cache.type)" class="solid-button small secondary">
                   清除
                 </button>
               </td>
@@ -118,7 +118,7 @@
             <h4>清除所有緩存</h4>
             <p>刪除所有緩存條目，釋放內存空間</p>
           </div>
-          <button @click="clearAllCache" :disabled="loading" class="glass-button danger">
+          <button @click="clearAllCache" :disabled="loading" class="solid-button danger">
             清除所有緩存
           </button>
         </div>
@@ -127,7 +127,7 @@
             <h4>清除過期緩存</h4>
             <p>僅刪除已過期的緩存條目</p>
           </div>
-          <button @click="clearExpiredCache" :disabled="loading" class="glass-button secondary">
+          <button @click="clearExpiredCache" :disabled="loading" class="solid-button secondary">
             清除過期緩存
           </button>
         </div>
@@ -136,7 +136,7 @@
             <h4>優化緩存</h4>
             <p>重新組織緩存結構，提高性能</p>
           </div>
-          <button @click="optimizeCache" :disabled="loading" class="glass-button primary">
+          <button @click="optimizeCache" :disabled="loading" class="solid-button primary">
             優化緩存
           </button>
         </div>
@@ -447,7 +447,7 @@ onMounted(() => {
   margin: 0;
 }
 
-.glass-button {
+.solid-button {
   padding: 8px 16px;
   background: linear-gradient(135deg, #4a90e2, #50c878);
   color: white;
@@ -459,26 +459,26 @@ onMounted(() => {
   transition: all 0.3s ease;
 }
 
-.glass-button:hover:not(:disabled) {
+.solid-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
 }
 
-.glass-button:disabled {
+.solid-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.glass-button.secondary {
+.solid-button.secondary {
   background: linear-gradient(135deg, #95a5a6, #7f8c8d);
 }
 
-.glass-button.small {
+.solid-button.small {
   padding: 6px 12px;
   font-size: 13px;
 }
 
-.glass-button.danger {
+.solid-button.danger {
   background: linear-gradient(135deg, #e74c3c, #c0392b);
 }
 

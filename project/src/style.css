@@ -880,19 +880,17 @@ textarea:focus {
 /* Glass Button - Interactive button with glass effect */
 .glass-button {
   white-space: nowrap;
-  background: var(--color-primary);
-  color: white;
+  background: var(--glass-light);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-primary-hover);
+  border: 1px solid var(--glass-border-weak);
   transition: all 0.3s ease;
   cursor: pointer;
-  font-weight: 500;
 }
 
 .glass-button:hover:not(:disabled) {
-  background: var(--color-primary-hover);
+  /*background: var(--glass-medium);*/
   transform: translateY(-2px);
   box-shadow: var(--shadow-glass-hover);
 }
@@ -904,6 +902,36 @@ textarea:focus {
 .glass-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Solid Button - 实心按钮样式（用于 VillagesML） */
+.solid-button {
+  white-space: nowrap;
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  border-radius: var(--radius-md);
+  border: none;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.solid-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5ba3f5 0%, #4a90e2 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+}
+
+.solid-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(74, 144, 226, 0.3);
+}
+
+.solid-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #a0a0a0 0%, #808080 100%);
 }
 
 .transition-fast { transition: all 0.15s ease; }
@@ -1050,77 +1078,4 @@ textarea:focus {
   opacity: 1;
   transform: translateY(-50%) scale(1.01);
   transition: all 0.3s ease;
-}
-
-/* ========================================
-   浏览器兼容性优化 - WeChat/Quark浏览器
-   ======================================== */
-
-/* backdrop-filter fallback - 当浏览器不支持时使用纯色背景 */
-@supports not (backdrop-filter: blur(10px)) {
-  .glass-panel,
-  .glass-card,
-  .glass-modal-overlay,
-  .glass-panel-inner,
-  .glass-button,
-  .nav-bar,
-  .sidebar,
-  .map-control,
-  .tab,
-  .dropdown,
-  .dropdown-panel,
-  .page,
-  [class*="glass"],
-  [class*="panel"] {
-    background: rgba(255, 255, 255, 0.95) !important;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  /* 深色背景的fallback */
-  .glass-modal-overlay {
-    background: rgba(0, 0, 0, 0.85) !important;
-  }
-
-  .tab.active {
-    background: rgba(0, 122, 255, 0.9) !important;
-  }
-}
-
-/* ========================================
-   Android性能优化 - 减少backdrop-filter重绘
-   ======================================== */
-
-/* 为sticky元素添加GPU加速和布局隔离 */
-.sticky-header,
-.sticky-label,
-[class*="sticky"] {
-  will-change: transform;
-  contain: layout style;
-}
-
-/* 将backdrop-filter移到伪元素，避免滚动时重绘 */
-.sticky-header::before,
-.sticky-label::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  z-index: -1;
-}
-
-/* ========================================
-   性能优化 - 避免 transition: all
-   ======================================== */
-
-/* 限制transition属性，避免layout thrashing */
-* {
-  transition-property: background-color, color, border-color, opacity, transform !important;
-}
-
-/* 移除不必要的transition，提升表格性能 */
-.matrix-cell,
-.table-cell,
-[class*="cell"] {
-  transition: background-color 0.15s ease !important;
 }

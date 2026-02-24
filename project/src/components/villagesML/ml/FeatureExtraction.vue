@@ -7,7 +7,7 @@
       <div v-if="!isAuthenticated" class="auth-warning">
         <span class="lock-icon">🔒</span>
         <span>此功能需要登入</span>
-        <button @click="goToAuth" class="glass-button small">前往登入</button>
+        <button @click="goToAuth" class="solid-button small">前往登入</button>
       </div>
     </div>
 
@@ -27,7 +27,7 @@
             placeholder="搜尋村莊名稱..."
             class="glass-input"
           >
-          <button @click="clearSearch" class="glass-button small secondary">清除</button>
+          <button @click="clearSearch" class="solid-button small secondary">清除</button>
         </div>
 
         <!-- Filter Controls -->
@@ -43,9 +43,9 @@
           </div>
           <div class="filter-item">
             <label>快速選擇:</label>
-            <button @click="selectTop100" class="glass-button small">前 100 個</button>
-            <button @click="selectRandom50" class="glass-button small">隨機 50 個</button>
-            <button @click="clearSelection" class="glass-button small secondary">清空選擇</button>
+            <button @click="selectTop100" class="solid-button small">前 100 個</button>
+            <button @click="selectRandom50" class="solid-button small">隨機 50 個</button>
+            <button @click="clearSelection" class="solid-button small secondary">清空選擇</button>
           </div>
         </div>
 
@@ -65,9 +65,9 @@
 
         <!-- Pagination -->
         <div class="pagination">
-          <button @click="prevPage" :disabled="currentPage === 1" class="glass-button small">上一頁</button>
+          <button @click="prevPage" :disabled="currentPage === 1" class="solid-button small">上一頁</button>
           <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 頁</span>
-          <button @click="nextPage" :disabled="currentPage === totalPages" class="glass-button small">下一頁</button>
+          <button @click="nextPage" :disabled="currentPage === totalPages" class="solid-button small">下一頁</button>
         </div>
       </div>
     </div>
@@ -110,7 +110,7 @@
           <button
             @click="extractFeatures"
             :disabled="!canExtract || loading"
-            class="glass-button primary large"
+            class="solid-button primary large"
           >
             <span v-if="!loading">提取特徵 Extract Features</span>
             <span v-else>提取中...</span>
@@ -118,7 +118,7 @@
           <button
             @click="aggregateFeatures"
             :disabled="!extractionResults || loading"
-            class="glass-button secondary large"
+            class="solid-button secondary large"
           >
             聚合特徵 Aggregate Features
           </button>
@@ -130,7 +130,7 @@
     <div v-if="extractionResults" class="glass-panel results-panel">
       <div class="panel-header">
         <h3>提取結果 Extraction Results</h3>
-        <button @click="exportResults" class="glass-button small">匯出 CSV</button>
+        <button @click="exportResults" class="solid-button small">匯出 CSV</button>
       </div>
       <div class="results-content">
         <!-- Summary Stats -->
@@ -175,9 +175,9 @@
 
         <!-- Results Pagination -->
         <div class="pagination">
-          <button @click="prevResultsPage" :disabled="resultsPage === 1" class="glass-button small">上一頁</button>
+          <button @click="prevResultsPage" :disabled="resultsPage === 1" class="solid-button small">上一頁</button>
           <span class="page-info">第 {{ resultsPage }} / {{ totalResultsPages }} 頁</span>
-          <button @click="nextResultsPage" :disabled="resultsPage === totalResultsPages" class="glass-button small">下一頁</button>
+          <button @click="nextResultsPage" :disabled="resultsPage === totalResultsPages" class="solid-button small">下一頁</button>
         </div>
       </div>
     </div>
@@ -638,7 +638,7 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.8);
 }
 
-.glass-button {
+.solid-button {
   padding: 8px 16px;
   background: linear-gradient(135deg, #4a90e2, #50c878);
   color: white;
@@ -650,26 +650,26 @@ onMounted(() => {
   transition: all 0.3s ease;
 }
 
-.glass-button:hover:not(:disabled) {
+.solid-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
 }
 
-.glass-button:disabled {
+.solid-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.glass-button.secondary {
+.solid-button.secondary {
   background: linear-gradient(135deg, #95a5a6, #7f8c8d);
 }
 
-.glass-button.small {
+.solid-button.small {
   padding: 6px 12px;
   font-size: 13px;
 }
 
-.glass-button.large {
+.solid-button.large {
   padding: 12px 32px;
   font-size: 16px;
 }

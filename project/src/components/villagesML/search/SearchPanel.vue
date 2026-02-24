@@ -9,7 +9,7 @@
         placeholder="搜尋村名..."
         @input="handleSearchInput"
       />
-      <button class="search-button glass-button" @click="handleSearch">
+      <button class="search-button solid-button" @click="handleSearch">
         🔍 搜尋
       </button>
     </div>

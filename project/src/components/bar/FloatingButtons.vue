@@ -1,7 +1,11 @@
 <!-- FloatingButtons.vue - 悬浮按钮组 -->
 <template>
-  <!-- 右上角认证按钮 -->
-  <div class="auth-button" @click="goToAuth">
+  <!-- 认证按钮 -->
+  <div
+    class="auth-button"
+    :class="authButtonPositionClass"
+    @click="goToAuth"
+  >
     <span class="auth-text">
       {{ userStore.username || '登錄' }}
     </span>
@@ -31,12 +35,26 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { userStore } from '@/utils/store.js';
+
+const props = defineProps({
+  // 认证按钮位置: 'top-right' | 'bottom-left'
+  authButtonPosition: {
+    type: String,
+    default: 'top-right',
+    validator: (value) => ['top-right', 'bottom-left'].includes(value)
+  }
+});
 
 const router = useRouter();
 
 defineEmits(['toggle-sidebar']);
+
+const authButtonPositionClass = computed(() => {
+  return props.authButtonPosition === 'bottom-left' ? 'position-bottom-left' : 'position-top-right';
+});
 
 const goToHome = () => {
   router.push({ path: '/menu', query: { tab: 'query' } });
@@ -48,11 +66,9 @@ const goToAuth = () => {
 </script>
 
 <style scoped>
-/* 右上角认证按钮 */
+/* 认证按钮基础样式 */
 .auth-button {
   position: fixed;
-  top: 20px;
-  right: 20px;
   z-index: 998; /* 与 floating-buttons 同级 */
 
   /* 尺寸和形状 */
@@ -81,6 +97,18 @@ const goToAuth = () => {
   cursor: pointer;
   user-select: none;
   transition: all 0.3s ease;
+}
+
+/* 位置变体 - 右上角（默认） */
+.auth-button.position-top-right {
+  top: 20px;
+  right: 20px;
+}
+
+/* 位置变体 - 左下角 */
+.auth-button.position-bottom-left {
+  bottom: 20px;
+  left: 20px;
 }
 
 .auth-button:hover {
@@ -153,16 +181,20 @@ const goToAuth = () => {
 
 /* 移动端适配 */
 @media (max-aspect-ratio: 1/1) {
-  /* 认证按钮移动端 */
+  /* 认证按钮移动端 - 统一到左下角 */
   .auth-button {
-    top: auto;
-    left: 15px;
-    bottom: 15px ;
-    right: auto;
-    min-width:50px;
+    min-width: 50px;
     height: 35px;
     padding: 0 10px;
     border-radius: 22px;
+  }
+
+  .auth-button.position-top-right,
+  .auth-button.position-bottom-left {
+    top: auto;
+    left: 15px;
+    bottom: 15px;
+    right: auto;
   }
 
   .auth-text {

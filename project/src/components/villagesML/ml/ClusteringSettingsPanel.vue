@@ -29,7 +29,7 @@
         <label><input type="checkbox" v-model="settings.features.diversity" /> 多樣性特徵</label>
       </div>
 
-      <button class="run-button glass-button" @click="runClustering" :disabled="loading || !isAuthenticated">
+      <button class="run-button solid-button" @click="runClustering" :disabled="loading || !isAuthenticated">
         {{ loading ? '運行中...' : isAuthenticated ? '🚀 運行聚類' : '🔒 需要登錄' }}
       </button>
     </div>

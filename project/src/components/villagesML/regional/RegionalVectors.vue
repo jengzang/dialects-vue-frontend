@@ -39,11 +39,11 @@
           </select>
         </div>
         <div class="button-group">
-          <button @click="loadVectors" :disabled="!primaryRegion || loading" class="glass-button primary">
+          <button @click="loadVectors" :disabled="!primaryRegion || loading" class="solid-button primary">
             <span v-if="!loading">載入向量 Load Vectors</span>
             <span v-else>載入中...</span>
           </button>
-          <button @click="compareVectors" :disabled="!primaryRegion || !compareRegion || loading" class="glass-button secondary">
+          <button @click="compareVectors" :disabled="!primaryRegion || !compareRegion || loading" class="solid-button secondary">
             比較向量 Compare Vectors
           </button>
         </div>
@@ -112,7 +112,7 @@
     <div class="glass-panel clustering-panel">
       <div class="panel-header">
         <h3>區域聚類 Regional Clustering</h3>
-        <button @click="runClustering" :disabled="loading" class="glass-button small">
+        <button @click="runClustering" :disabled="loading" class="solid-button small">
           執行聚類 Run Clustering
         </button>
       </div>
@@ -480,7 +480,7 @@ onMounted(() => {
   margin-top: 8px;
 }
 
-.glass-button {
+.solid-button {
   padding: 10px 24px;
   background: linear-gradient(135deg, #4a90e2, #50c878);
   color: white;
@@ -492,21 +492,21 @@ onMounted(() => {
   transition: all 0.3s ease;
 }
 
-.glass-button:hover:not(:disabled) {
+.solid-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
 }
 
-.glass-button:disabled {
+.solid-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.glass-button.secondary {
+.solid-button.secondary {
   background: linear-gradient(135deg, #95a5a6, #7f8c8d);
 }
 
-.glass-button.small {
+.solid-button.small {
   padding: 6px 16px;
   font-size: 13px;
 }

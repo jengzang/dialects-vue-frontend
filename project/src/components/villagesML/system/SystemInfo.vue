@@ -10,7 +10,7 @@
     <div class="glass-panel overview-panel">
       <div class="panel-header">
         <h3>數據庫概覽 Database Overview</h3>
-        <button @click="refreshOverview" :disabled="loading" class="glass-button small">
+        <button @click="refreshOverview" :disabled="loading" class="solid-button small">
           <span v-if="!loading">🔄 刷新</span>
           <span v-else>刷新中...</span>
         </button>
@@ -108,7 +108,7 @@
                 <td>{{ table.indexes }}</td>
                 <td>{{ formatDate(table.last_updated) }}</td>
                 <td>
-                  <button @click="viewTableDetails(table)" class="glass-button small">詳情</button>
+                  <button @click="viewTableDetails(table)" class="solid-button small">詳情</button>
                 </td>
               </tr>
             </tbody>
@@ -117,9 +117,9 @@
 
         <!-- Pagination -->
         <div class="pagination">
-          <button @click="prevPage" :disabled="currentPage === 1" class="glass-button small">上一頁</button>
+          <button @click="prevPage" :disabled="currentPage === 1" class="solid-button small">上一頁</button>
           <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 頁</span>
-          <button @click="nextPage" :disabled="currentPage === totalPages" class="glass-button small">下一頁</button>
+          <button @click="nextPage" :disabled="currentPage === totalPages" class="solid-button small">下一頁</button>
         </div>
       </div>
     </div>
@@ -397,7 +397,7 @@ onMounted(() => {
   font-size: 13px;
 }
 
-.glass-button {
+.solid-button {
   padding: 8px 16px;
   background: linear-gradient(135deg, #4a90e2, #50c878);
   color: white;
@@ -409,17 +409,17 @@ onMounted(() => {
   transition: all 0.3s ease;
 }
 
-.glass-button:hover:not(:disabled) {
+.solid-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
 }
 
-.glass-button:disabled {
+.solid-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.glass-button.small {
+.solid-button.small {
   padding: 6px 12px;
   font-size: 13px;
 }
