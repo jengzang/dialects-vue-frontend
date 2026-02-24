@@ -33,21 +33,12 @@
         <div class="query-form glass-panel">
           <h3>空間整合查詢</h3>
           <div class="form-group">
-            <label>區域層級 (可選):</label>
-            <select v-model="regionLevel" class="select-input">
-              <option value="">全部</option>
-              <option value="city">城市</option>
-              <option value="county">區縣</option>
-              <option value="township">鄉鎮</option>
-            </select>
-          </div>
-          <div v-if="regionLevel" class="form-group">
-            <label>區域名稱:</label>
-            <input
+            <label>區域選擇 (可選):</label>
+            <FilterableSelect
               v-model="regionName"
-              type="text"
-              placeholder="輸入區域名稱"
-              class="text-input"
+              :level="regionLevel || 'city'"
+              @update:level="(newLevel) => regionLevel = newLevel"
+              placeholder="全部區域"
             />
           </div>
           <button
@@ -275,6 +266,7 @@
 <script setup>
 import { ref } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
+import FilterableSelect from '@/components/common/FilterableSelect.vue'
 import {
   getSpatialIntegration,
   getSpatialIntegrationByChar,

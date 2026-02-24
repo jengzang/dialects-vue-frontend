@@ -71,16 +71,11 @@
       <div class="regional-section glass-panel">
         <h2>區域模式頻率</h2>
         <div class="controls">
-          <select v-model="regionLevel" class="select-input">
-            <option value="city">城市</option>
-            <option value="county">區縣</option>
-            <option value="township">鄉鎮</option>
-          </select>
-          <input
+          <FilterableSelect
             v-model="regionName"
-            type="text"
-            placeholder="輸入區域名稱"
-            class="text-input"
+            :level="regionLevel"
+            @update:level="(newLevel) => regionLevel = newLevel"
+            placeholder="請選擇或輸入"
           />
           <input
             v-model.number="regionalTopN"
@@ -265,6 +260,7 @@
 <script setup>
 import { ref } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
+import FilterableSelect from '@/components/common/FilterableSelect.vue'
 import {
   getPatternFrequencyGlobal,
   getPatternFrequencyRegional,

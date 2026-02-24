@@ -1,6 +1,25 @@
 <template>
   <div class="tendency-heatmap-panel glass-panel">
-    <h3 class="panel-title">字傾向性熱力圖</h3>
+    <div class="panel-header">
+      <h3 class="panel-title">字傾向性熱力圖</h3>
+
+      <div v-if="data.length > 0" class="metric-selector">
+        <button
+          class="metric-button"
+          :class="{ active: selectedMetric === 'z_score' }"
+          @click="selectedMetric = 'z_score'"
+        >
+          Z-Score
+        </button>
+        <button
+          class="metric-button"
+          :class="{ active: selectedMetric === 'log_odds' }"
+          @click="selectedMetric = 'log_odds'"
+        >
+          Log Odds
+        </button>
+      </div>
+    </div>
 
     <div v-if="loading" class="loading-state">
       <div class="spinner"></div>
@@ -25,7 +44,16 @@ const props = defineProps({
 })
 
 const chartRef = ref(null)
+const selectedMetric = ref('z_score')
 let chartInstance = null
+
+const getMetricLabel = () => {
+  return selectedMetric.value === 'z_score' ? 'Z-Score' : 'Log Odds'
+}
+
+const getMetricValue = (item) => {
+  return selectedMetric.value === 'z_score' ? item.z_score : item.log_odds
+}
 
 const renderChart = () => {
   if (!chartRef.value || props.data.length === 0) return
@@ -34,21 +62,40 @@ const renderChart = () => {
   chartInstance = echarts.init(chartRef.value)
 
   const option = {
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: (params) => {
+        const item = props.data[params[0].dataIndex]
+        return `
+          <strong>${item.character}</strong><br/>
+          Z-Score: ${item.z_score?.toFixed(3) || 'N/A'}<br/>
+          Log Odds: ${item.log_odds?.toFixed(3) || 'N/A'}<br/>
+          Lift: ${item.lift?.toFixed(2) || 'N/A'}
+        `
+      }
+    },
     xAxis: {
       type: 'category',
       data: props.data.map(item => item.character),
       axisLabel: { fontSize: 14 }
     },
-    yAxis: { type: 'value', name: 'Z-Score' },
+    yAxis: {
+      type: 'value',
+      name: getMetricLabel(),
+      nameTextStyle: { fontSize: 14, fontWeight: 600 }
+    },
     series: [{
       type: 'bar',
-      data: props.data.map(item => ({
-        value: item.z_score,
-        itemStyle: {
-          color: item.z_score > 0 ? '#50c878' : '#e74c3c'
+      data: props.data.map(item => {
+        const value = getMetricValue(item)
+        return {
+          value: value,
+          itemStyle: {
+            color: value > 0 ? '#50c878' : '#e74c3c'
+          }
         }
-      }))
+      })
     }]
   }
 
@@ -58,6 +105,10 @@ const renderChart = () => {
 watch(() => props.data, () => {
   nextTick(renderChart)
 }, { deep: true })
+
+watch(() => selectedMetric.value, () => {
+  nextTick(renderChart)
+})
 
 onMounted(() => {
   window.addEventListener('resize', () => chartInstance?.resize())
@@ -70,11 +121,47 @@ onMounted(() => {
   min-height: 400px;
 }
 
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 .panel-title {
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0 0 20px 0;
+  margin: 0;
+}
+
+.metric-selector {
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.metric-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.metric-button:hover {
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.metric-button.active {
+  background: var(--color-primary);
+  color: white;
 }
 
 .chart-container {

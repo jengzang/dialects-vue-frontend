@@ -16,20 +16,33 @@
 
     <!-- Filters -->
     <div class="filters-row">
-      <select v-model="localFilters.city" class="filter-select" @change="handleCityChange">
-        <option value="">全部城市</option>
-        <option v-for="city in cities" :key="city.name || city" :value="city.name || city">{{ city.name || city }}</option>
-      </select>
+      <FilterableSelect
+        v-model="localFilters.city"
+        level="city"
+        :show-level-selector="false"
+        placeholder="全部城市"
+        @update:modelValue="handleCityChange"
+      />
 
-      <select v-model="localFilters.county" class="filter-select" @change="handleCountyChange" :disabled="!localFilters.city">
-        <option value="">全部區縣</option>
-        <option v-for="county in counties" :key="county.name || county" :value="county.name || county">{{ county.name || county }}</option>
-      </select>
+      <FilterableSelect
+        v-model="localFilters.county"
+        level="county"
+        :parent="localFilters.city"
+        :show-level-selector="false"
+        :disabled="!localFilters.city"
+        placeholder="全部區縣"
+        @update:modelValue="handleCountyChange"
+      />
 
-      <select v-model="localFilters.township" class="filter-select" :disabled="!localFilters.county">
-        <option value="">全部鄉鎮</option>
-        <option v-for="township in townships" :key="township.name || township" :value="township.name || township">{{ township.name || township }}</option>
-      </select>
+      <FilterableSelect
+        v-model="localFilters.township"
+        level="township"
+        :parent="localFilters.county"
+        :show-level-selector="false"
+        :disabled="!localFilters.county"
+        placeholder="全部鄉鎮"
+        @update:modelValue="handleSearch"
+      />
 
       <button class="clear-filters-button" @click="clearFilters" v-if="hasFilters">
         ✕ 清除篩選
@@ -39,19 +52,15 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { villagesMLStore } from '@/utils/villagesMLStore.js'
-import { getRegionList } from '@/api'
-import { showError } from '@/utils/message.js'
+import FilterableSelect from '@/components/common/FilterableSelect.vue'
 
 const emit = defineEmits(['search'])
 
 // Local state
 const localKeyword = ref(villagesMLStore.searchKeyword)
 const localFilters = ref({ ...villagesMLStore.searchFilters })
-const cities = ref([])
-const counties = ref([])
-const townships = ref([])
 
 let searchTimeout = null
 
@@ -74,55 +83,21 @@ const handleSearch = () => {
   emit('search')
 }
 
-const handleCityChange = async () => {
+const handleCityChange = () => {
   localFilters.value.county = ''
   localFilters.value.township = ''
-  townships.value = []
-
-  if (localFilters.value.city) {
-    try {
-      counties.value = await getRegionList('county', localFilters.value.city)
-    } catch (error) {
-      showError('載入區縣列表失敗')
-    }
-  } else {
-    counties.value = []
-  }
-
   handleSearch()
 }
 
-const handleCountyChange = async () => {
+const handleCountyChange = () => {
   localFilters.value.township = ''
-
-  if (localFilters.value.county) {
-    try {
-      townships.value = await getRegionList('township', localFilters.value.county)
-    } catch (error) {
-      showError('載入鄉鎮列表失敗')
-    }
-  } else {
-    townships.value = []
-  }
-
   handleSearch()
 }
 
 const clearFilters = () => {
   localFilters.value = { city: '', county: '', township: '' }
-  counties.value = []
-  townships.value = []
   handleSearch()
 }
-
-// Load cities on mount
-onMounted(async () => {
-  try {
-    cities.value = await getRegionList('city')
-  } catch (error) {
-    showError('載入城市列表失敗')
-  }
-})
 </script>
 
 <style scoped>
@@ -160,32 +135,10 @@ onMounted(async () => {
 }
 
 .filters-row {
+  justify-content: center;
   display: flex;
-  gap: 12px;
+  gap: 16px;
   flex-wrap: wrap;
-}
-
-.filter-select {
-  flex: 1;
-  min-width: 150px;
-  padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.filter-select:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: var(--color-primary);
 }
 
 .clear-filters-button {

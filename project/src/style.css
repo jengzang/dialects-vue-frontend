@@ -880,17 +880,19 @@ textarea:focus {
 /* Glass Button - Interactive button with glass effect */
 .glass-button {
   white-space: nowrap;
-  background: var(--glass-light);
+  background: var(--color-primary);
+  color: white;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-md);
-  border: 1px solid var(--glass-border-weak);
+  border: 1px solid var(--color-primary-hover);
   transition: all 0.3s ease;
   cursor: pointer;
+  font-weight: 500;
 }
 
 .glass-button:hover:not(:disabled) {
-  /*background: var(--glass-medium);*/
+  background: var(--color-primary-hover);
   transform: translateY(-2px);
   box-shadow: var(--shadow-glass-hover);
 }

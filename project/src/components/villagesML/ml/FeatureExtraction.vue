@@ -37,7 +37,7 @@
             <select v-model="filterRegion" @change="handleFilterChange" class="glass-select">
               <option value="">全部區域</option>
               <option v-for="region in availableRegions" :key="region.name || region" :value="region.name || region">
-                {{ region.name || region }}
+                {{ region.name || region }}{{ region.village_count ? ` (${region.village_count}村)` : '' }}
               </option>
             </select>
           </div>

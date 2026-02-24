@@ -25,7 +25,7 @@
           <select v-model="primaryRegion" @change="handlePrimaryChange" class="glass-select">
             <option value="">-- 請選擇 --</option>
             <option v-for="region in availableRegions" :key="region.name || region" :value="region.name || region">
-              {{ region.name || region }}
+              {{ region.name || region }}{{ region.village_count ? ` (${region.village_count}村)` : '' }}
             </option>
           </select>
         </div>
@@ -34,7 +34,7 @@
           <select v-model="compareRegion" class="glass-select">
             <option value="">-- 無 --</option>
             <option v-for="region in availableRegions" :key="region.name || region" :value="region.name || region" :disabled="(region.name || region) === primaryRegion">
-              {{ region.name || region }}
+              {{ region.name || region }}{{ region.village_count ? ` (${region.village_count}村)` : '' }}
             </option>
           </select>
         </div>

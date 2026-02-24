@@ -13,13 +13,17 @@
         <div v-else class="category-grid">
           <div
             v-for="category in categories"
-            :key="category.category_id"
+            :key="category.category"
             class="category-card"
-            @click="selectedCategory = category"
+            :class="{ 'selected': selectedCategory?.category === category.category }"
+            @click="selectCategory(category)"
           >
-            <div class="category-icon">{{ getCategoryIcon(category.name) }}</div>
-            <div class="category-name">{{ category.name }}</div>
-            <div class="category-description">{{ category.description }}</div>
+            <div class="category-header">
+              <span class="category-icon">{{ getCategoryIcon(category.category) }}</span>
+              <span class="category-name">{{ getCategoryName(category.category) }}</span>
+            </div>
+            <div class="category-description">{{ getCategoryDescription(category.category) }}</div>
+            <div class="category-count">{{ category.character_count }} 字符</div>
           </div>
         </div>
       </div>
@@ -37,7 +41,7 @@
               :key="item.category"
               class="vtf-bar-container"
             >
-              <div class="vtf-label">{{ item.category }}</div>
+              <div class="vtf-label">{{ getCategoryName(item.category) }}</div>
               <div class="vtf-bar">
                 <div
                   class="vtf-fill"
@@ -52,16 +56,11 @@
         <div class="vtf-regional glass-panel">
           <h3>區域虛擬詞頻</h3>
           <div class="region-selector">
-            <select v-model="regionLevel" class="select-input">
-              <option value="city">城市</option>
-              <option value="county">區縣</option>
-              <option value="township">鄉鎮</option>
-            </select>
-            <input
+            <FilterableSelect
               v-model="regionName"
-              type="text"
-              placeholder="輸入區域名稱"
-              class="text-input"
+              :level="regionLevel"
+              @update:level="(newLevel) => regionLevel = newLevel"
+              placeholder="請選擇或輸入"
             />
             <button
               class="query-button"
@@ -80,7 +79,7 @@
               :key="item.category"
               class="vtf-bar-container"
             >
-              <div class="vtf-label">{{ item.category }}</div>
+              <div class="vtf-label">{{ getCategoryName(item.category) }}</div>
               <div class="vtf-bar">
                 <div
                   class="vtf-fill regional"
@@ -117,8 +116,8 @@
         <div v-if="labelsMode === 'by-category'" class="labels-content">
           <select v-model="selectedCategoryForLabels" class="select-input" @change="loadLabelsByCategory">
             <option value="">選擇類別</option>
-            <option v-for="cat in categories" :key="cat.name" :value="cat.name">
-              {{ cat.name }}
+            <option v-for="cat in categories" :key="cat.category" :value="cat.category">
+              {{ getCategoryName(cat.category) }}
             </option>
           </select>
           <div v-if="loadingLabels" class="loading-state">
@@ -163,19 +162,17 @@
       </div>
 
       <!-- Category Tendency -->
-      <div v-if="selectedCategory" class="tendency-section glass-panel">
-        <h3>{{ selectedCategory.name }} - 區域傾向性</h3>
+      <div v-if="selectedCategory" ref="tendencySection" class="tendency-section glass-panel">
+        <div class="section-header">
+          <h3>{{ getCategoryName(selectedCategory.category) }} - 區域傾向性</h3>
+          <button class="close-button" @click="selectedCategory = null">✕</button>
+        </div>
         <div class="region-selector">
-          <select v-model="tendencyRegionLevel" class="select-input">
-            <option value="city">城市</option>
-            <option value="county">區縣</option>
-            <option value="township">鄉鎮</option>
-          </select>
-          <input
+          <FilterableSelect
             v-model="tendencyRegionName"
-            type="text"
-            placeholder="輸入區域名稱"
-            class="text-input"
+            :level="tendencyRegionLevel"
+            @update:level="(newLevel) => tendencyRegionLevel = newLevel"
+            placeholder="請選擇或輸入"
           />
           <button
             class="query-button"
@@ -214,8 +211,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
+import FilterableSelect from '@/components/common/FilterableSelect.vue'
 import {
   getSemanticCategoryList,
   getSemanticCategoryTendency,
@@ -229,6 +227,7 @@ import { showError } from '@/utils/message.js'
 // State
 const categories = ref([])
 const selectedCategory = ref(null)
+const tendencySection = ref(null)
 const vtfGlobal = ref([])
 const vtfRegional = ref([])
 const categoryTendency = ref([])
@@ -268,17 +267,62 @@ const maxLabelCount = computed(() => {
 // Methods
 const getCategoryIcon = (name) => {
   const icons = {
-    '山': '⛰️',
-    '水': '💧',
-    '聚落': '🏘️',
-    '方位': '🧭',
-    '植物': '🌿',
-    '動物': '🦌',
-    '顏色': '🎨',
-    '數字': '🔢',
-    '其他': '📦'
+    'agriculture': '🌾',
+    'clan': '👨‍👩‍👧‍👦',
+    'direction': '🧭',
+    'infrastructure': '🏗️',
+    'mountain': '⛰️',
+    'settlement': '🏘️',
+    'symbolic': '🎨',
+    'vegetation': '🌿',
+    'water': '💧'
   }
   return icons[name] || '🏷️'
+}
+
+const getCategoryName = (name) => {
+  const names = {
+    'agriculture': '農業',
+    'clan': '宗族',
+    'direction': '方位',
+    'infrastructure': '基建',
+    'mountain': '山地',
+    'settlement': '聚落',
+    'symbolic': '象徵',
+    'vegetation': '植物',
+    'water': '水系'
+  }
+  return names[name] || name
+}
+
+const getCategoryDescription = (name) => {
+  const descriptions = {
+    'agriculture': '農業、耕作、田地相關',
+    'clan': '宗族、姓氏、家族相關',
+    'direction': '東西南北、方向相關',
+    'infrastructure': '道路、橋樑、建築相關',
+    'mountain': '山地、丘陵等地形相關',
+    'settlement': '村落、居住地相關',
+    'symbolic': '吉祥、象徵意義相關',
+    'vegetation': '樹木、花草等植物相關',
+    'water': '河流、湖泊、水系相關'
+  }
+  return descriptions[name] || '語義類別'
+}
+
+const selectCategory = async (category) => {
+  // Toggle: if clicking the same category, deselect it
+  if (selectedCategory.value?.category === category.category) {
+    selectedCategory.value = null
+    return
+  }
+
+  selectedCategory.value = category
+  await nextTick()
+  // Scroll to tendency section
+  if (tendencySection.value) {
+    tendencySection.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 }
 
 const loadCategories = async () => {
@@ -425,6 +469,7 @@ onMounted(() => {
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  border: 2px solid transparent;
 }
 
 .category-card:hover {
@@ -432,21 +477,41 @@ onMounted(() => {
   background: rgba(74, 144, 226, 0.2);
 }
 
+.category-card.selected {
+  background: rgba(74, 144, 226, 0.3);
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .category-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
+  font-size: 20px;
 }
 
 .category-name {
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 8px;
 }
 
 .category-description {
   font-size: 13px;
   color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.category-count {
+  font-size: 12px;
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 .vtf-section {
@@ -539,7 +604,7 @@ onMounted(() => {
 
 .vtf-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), var(--secondary-color));
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
   transition: width 0.5s ease;
 }
 
@@ -658,6 +723,39 @@ onMounted(() => {
 
 .tendency-section {
   padding: 24px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h3 {
+  font-size: 18px;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.close-button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  background: rgba(231, 76, 60, 0.3);
+  transform: scale(1.1);
 }
 
 .tendency-section h3 {
