@@ -81,8 +81,11 @@ export async function getRegionalCharFrequency(params) {
  */
 export async function getCharTendencyByChar(params) {
   const queryParams = new URLSearchParams()
-  queryParams.append('char', params.char)
+  queryParams.append('character', params.character)
   queryParams.append('region_level', params.region_level)
+  if (params.city) queryParams.append('city', params.city)
+  if (params.county) queryParams.append('county', params.county)
+  if (params.township) queryParams.append('township', params.township)
 
   return api(`/api/villages/character/tendency/by-char?${queryParams.toString()}`)
 }

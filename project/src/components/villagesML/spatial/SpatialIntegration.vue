@@ -33,15 +33,7 @@
       <div v-if="queryMode === 'overview'" class="overview-section">
         <div class="query-form glass-panel">
           <h3>空間整合查詢</h3>
-          <div class="form-group">
-            <label>區域選擇 (可選):</label>
-            <FilterableSelect
-              v-model="regionName"
-              :level="regionLevel || 'city'"
-              @update:level="(newLevel) => regionLevel = newLevel"
-              placeholder="全部區域"
-            />
-          </div>
+          <p class="query-note">查詢所有字符-聚類整合數據</p>
           <button
             class="query-button"
             :disabled="loadingIntegration"
@@ -139,7 +131,8 @@
         </div>
 
         <div v-else-if="charData" class="char-results">
-          <!-- Spatial Distribution Map -->\n          <div class="map-section glass-panel">
+          <!-- Spatial Distribution Map -->
+          <div class="map-section glass-panel">
             <h3>{{ queryChar }} 的空間分佈</h3>
             <SpatialMap
               v-if="charMapLayers.length > 0"
@@ -219,38 +212,57 @@
             </div>
           </div>
 
-          <!-- Cluster Characteristics -->
-          <div v-if="clusterData.characteristics" class="characteristics-section glass-panel">
-            <h3>聚類特徵</h3>
+          <!-- Cluster Statistics -->
+          <div v-if="clusterData.characters && clusterData.characters.length > 0" class="characteristics-section glass-panel">
+            <h3>聚類統計</h3>
             <div class="characteristics-grid">
-              <div
-                v-for="(value, key) in clusterData.characteristics"
-                :key="key"
-                class="char-item"
-              >
-                <div class="char-label">{{ key }}</div>
-                <div class="char-value">{{ formatValue(value) }}</div>
+              <div class="char-item">
+                <div class="char-label">聚類大小</div>
+                <div class="char-value">{{ clusterData.characters[0]?.cluster_size || 'N/A' }} 村</div>
+              </div>
+              <div class="char-item">
+                <div class="char-label">平均距離</div>
+                <div class="char-value">{{ clusterData.characters[0]?.avg_distance_km?.toFixed(2) || 'N/A' }} km</div>
+              </div>
+              <div class="char-item">
+                <div class="char-label">空間一致性</div>
+                <div class="char-value">{{ clusterData.characters[0]?.spatial_coherence?.toFixed(3) || 'N/A' }}</div>
+              </div>
+              <div class="char-item">
+                <div class="char-label">主要城市</div>
+                <div class="char-value">{{ clusterData.characters[0]?.dominant_city || 'N/A' }}</div>
+              </div>
+              <div class="char-item">
+                <div class="char-label">主要區縣</div>
+                <div class="char-value">{{ clusterData.characters[0]?.dominant_county || 'N/A' }}</div>
+              </div>
+              <div class="char-item">
+                <div class="char-label">字符數量</div>
+                <div class="char-value">{{ clusterData.total_characters || 0 }}</div>
               </div>
             </div>
           </div>
 
-          <!-- Villages List -->
-          <div v-if="clusterData.villages" class="villages-section glass-panel">
-            <h3>包含村莊 ({{ clusterData.villages.length }})</h3>
-            <div class="villages-list">
+          <!-- Character Tendency List -->
+          <div v-if="clusterData.characters" class="villages-section glass-panel">
+            <h3>字符傾向性 ({{ clusterData.characters.length }})</h3>
+            <div class="characters-list">
               <div
-                v-for="village in clusterData.villages.slice(0, 20)"
-                :key="village.id"
-                class="village-item"
+                v-for="char in clusterData.characters.slice(0, 50)"
+                :key="char.character"
+                class="character-item"
+                :class="{ 'significant': char.is_significant }"
               >
-                <span class="village-name">{{ village.name }}</span>
-                <span class="village-location">
-                  {{ village.city }} / {{ village.county }}
+                <span class="char-name">{{ char.character }}</span>
+                <span class="char-tendency" :style="{ color: getTendencyColor(char.cluster_tendency_mean) }">
+                  {{ char.cluster_tendency_mean?.toFixed(3) || 'N/A' }}
                 </span>
+                <span class="char-villages">{{ char.n_villages_with_char }} 村</span>
+                <span v-if="char.is_significant" class="char-badge">✨ 顯著</span>
               </div>
             </div>
-            <div v-if="clusterData.villages.length > 20" class="more-info">
-              顯示前 20 個村莊，共 {{ clusterData.villages.length }} 個
+            <div v-if="clusterData.characters.length > 50" class="more-info">
+              顯示前 50 個字符，共 {{ clusterData.characters.length }} 個
             </div>
           </div>
         </div>
@@ -291,7 +303,6 @@
 <script setup>
 import { ref, computed } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
-import FilterableSelect from '@/components/common/FilterableSelect.vue'
 import SpatialMap from './SpatialMap.vue'
 import {
   getSpatialIntegration,
@@ -303,8 +314,6 @@ import { showError } from '@/utils/message.js'
 
 // State
 const queryMode = ref('overview')
-const regionLevel = ref('')
-const regionName = ref('')
 const queryChar = ref('')
 const clusterId = ref(null)
 
@@ -331,19 +340,20 @@ const uniqueClusters = computed(() => {
 
 // 地图图层数据
 const charMapLayers = computed(() => {
-  if (!charData.value || !charData.value.spatial_distribution) return []
+  if (!charData.value || !charData.value.clusters) return []
 
-  const features = charData.value.spatial_distribution.map(item => ({
+  const features = charData.value.clusters.map(item => ({
     type: 'Feature',
     geometry: {
       type: 'Point',
-      coordinates: [item.centroid_lon || item.lon, item.centroid_lat || item.lat]
+      coordinates: [item.centroid_lon, item.centroid_lat]
     },
     properties: {
       type: 'integration',
       character: queryChar.value,
       cluster_id: item.cluster_id,
-      cluster_tendency_mean: item.cluster_tendency_mean || item.tendency_mean,
+      cluster_tendency_mean: item.cluster_tendency_mean,
+      cluster_tendency_std: item.tendency_std,  // 後端字段名是 tendency_std
       cluster_size: item.cluster_size,
       n_villages_with_char: item.n_villages_with_char,
       spatial_coherence: item.spatial_coherence,
@@ -397,36 +407,53 @@ const charMapLayers = computed(() => {
 })
 
 const clusterMapLayers = computed(() => {
-  if (!clusterData.value || !clusterData.value.villages) return []
+  if (!clusterData.value || !clusterData.value.characters) return []
 
-  const features = clusterData.value.villages.map(village => ({
+  // 显示聚类中心点（一个大圆圈）
+  // 使用第一个字符的坐标作为聚类中心（所有字符的坐标应该相同）
+  const firstChar = clusterData.value.characters[0]
+  if (!firstChar) return []
+
+  const feature = {
     type: 'Feature',
     geometry: {
       type: 'Point',
-      coordinates: [village.lon || village.longitude, village.lat || village.latitude]
+      coordinates: [firstChar.centroid_lon, firstChar.centroid_lat]
     },
     properties: {
-      type: 'village',
-      village_name: village.name || village.village_name,
-      city: village.city,
-      county: village.county,
-      township: village.township
+      type: 'cluster-center',
+      cluster_id: clusterData.value.cluster_id,
+      cluster_size: firstChar.cluster_size,
+      avg_distance_km: firstChar.avg_distance_km,
+      spatial_coherence: firstChar.spatial_coherence,
+      dominant_city: firstChar.dominant_city,
+      dominant_county: firstChar.dominant_county,
+      total_characters: clusterData.value.total_characters
     }
-  }))
+  }
 
   return [{
-    id: 'cluster-villages',
+    id: 'cluster-center',
     type: 'circle',
     data: {
       type: 'FeatureCollection',
-      features
+      features: [feature]
     },
     paint: {
-      'circle-radius': 6,
-      'circle-color': '#4a90e2',
+      'circle-radius': [
+        'interpolate',
+        ['linear'],
+        ['get', 'cluster_size'],
+        0, 15,
+        50, 20,
+        100, 25,
+        500, 30,
+        1000, 35
+      ],
+      'circle-color': 'rgba(74, 144, 226, 0.6)',
       'circle-opacity': 0.7,
-      'circle-stroke-width': 2,
-      'circle-stroke-color': '#ffffff'
+      'circle-stroke-width': 3,
+      'circle-stroke-color': '#4a90e2'
     }
   }]
 })
@@ -435,12 +462,7 @@ const clusterMapLayers = computed(() => {
 const loadIntegration = async () => {
   loadingIntegration.value = true
   try {
-    const params = {}
-    if (regionLevel.value) {
-      params.region_level = regionLevel.value
-      params.region_name = regionName.value
-    }
-    integrationData.value = await getSpatialIntegration(params)
+    integrationData.value = await getSpatialIntegration({ limit: 100 })
   } catch (error) {
     showError('加載整合數據失敗')
   } finally {
@@ -495,6 +517,17 @@ const formatValue = (value) => {
 // 处理地图点击事件
 const handlePointClick = (properties) => {
   console.log('Point clicked:', properties)
+}
+
+// 根据倾向性值返回颜色
+const getTendencyColor = (tendency) => {
+  if (!tendency) return '#666'
+  if (tendency > 1) return '#228B22'  // 深绿色（高倾向性）
+  if (tendency > 0.5) return '#50c878'  // 绿色
+  if (tendency > 0) return '#90EE90'  // 浅绿色
+  if (tendency > -0.5) return '#ff6b6b'  // 浅红色
+  if (tendency > -1) return '#e74c3c'  // 红色
+  return '#c0392b'  // 深红色（低倾向性）
 }
 </script>
 
@@ -557,6 +590,15 @@ const handlePointClick = (properties) => {
   font-size: 16px;
   margin-bottom: 12px;
   color: var(--text-primary);
+}
+
+.query-note {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  padding: 8px;
+  background: rgba(74, 144, 226, 0.05);
+  border-radius: 6px;
 }
 
 .form-group {
@@ -786,12 +828,58 @@ const handlePointClick = (properties) => {
   overflow-y: auto;
 }
 
-.village-item {
+.village-item,
+.character-item {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 8px 12px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 8px;
+  gap: 12px;
+}
+
+.character-item.significant {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.characters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.char-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 40px;
+}
+
+.char-tendency {
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 60px;
+  text-align: right;
+}
+
+.char-villages {
+  font-size: 13px;
+  color: var(--text-secondary);
+  min-width: 60px;
+  text-align: right;
+}
+
+.char-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  background: rgba(255, 215, 0, 0.2);
+  color: #c87f0a;
+  border-radius: 10px;
+  font-weight: 500;
 }
 
 .village-name {

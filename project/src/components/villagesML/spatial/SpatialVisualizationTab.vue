@@ -45,17 +45,14 @@
           <!-- N-gram 過濾器 -->
           <div v-if="layers.ngrams" class="section">
             <h3>N-gram 設置</h3>
+            <p class="layer-note">⚠️ 僅支持 2-4 字符的 N-gram，區域固定為鄉鎮級</p>
             <input
               v-model="filters.ngram"
               type="text"
-              placeholder="輸入 N-gram（如：村）"
+              placeholder="輸入 2-4 字 N-gram（如：新村）"
               class="filter-input"
+              maxlength="4"
             >
-            <select v-model="filters.ngramLevel" class="filter-select">
-              <option value="city">城市</option>
-              <option value="county">區縣</option>
-              <option value="township">鄉鎮</option>
-            </select>
           </div>
 
           <!-- 字符過濾器 -->
@@ -163,7 +160,6 @@ import {
   getNgramTendency,
   getCharTendencyByChar
 } from '@/api'
-import { transformRegionalDataToGeoJSON } from '@/utils/geoTransform.js'
 import { showError, showWarning } from '@/utils/message.js'
 
 // 圖層狀態
@@ -187,7 +183,6 @@ const RUN_LABELS = {
 // 過濾器
 const filters = ref({
   ngram: '',
-  ngramLevel: 'city',
   character: '',
   charLevel: 'city'
 })
@@ -240,6 +235,10 @@ const loadData = async () => {
   // 驗證過濾器
   if (layers.value.ngrams && !filters.value.ngram.trim()) {
     showWarning('請輸入 N-gram')
+    return
+  }
+  if (layers.value.ngrams && (filters.value.ngram.trim().length < 2 || filters.value.ngram.trim().length > 4)) {
+    showWarning('N-gram 須為 2-4 個字符')
     return
   }
 
@@ -412,7 +411,7 @@ const loadNgramsLayer = async () => {
   try {
     const ngramData = await getNgramTendency({
       ngram: filters.value.ngram.trim(),
-      region_level: filters.value.ngramLevel
+      region_level: 'township'
     })
 
     if (!ngramData || ngramData.length === 0) {
@@ -420,43 +419,37 @@ const loadNgramsLayer = async () => {
       return
     }
 
-    // 轉換為 GeoJSON（需要坐標轉換）
-    const geojson = await transformRegionalDataToGeoJSON(
-      ngramData.slice(0, 100), // 限制前 100 個區域
-      filters.value.ngramLevel
-    )
+    const features = ngramData
+      .filter(item => item.centroid_lon != null && item.centroid_lat != null)
+      .map(item => ({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [item.centroid_lon, item.centroid_lat] },
+        properties: {
+          type: 'ngram',
+          region_name: item.region_name,
+          ngram: item.ngram,
+          tendency_score: item.tendency_score,
+          frequency: item.frequency
+        }
+      }))
 
-    if (geojson.features.length === 0) {
-      showWarning('無法獲取區域坐標')
+    if (features.length === 0) {
+      showWarning('區域數據缺少坐標')
       return
     }
-
-    // 添加類型標記
-    geojson.features.forEach(f => {
-      f.properties.type = 'ngram'
-    })
 
     mapLayers.value.push({
       id: 'ngrams',
       type: 'circle',
-      data: geojson,
+      data: { type: 'FeatureCollection', features },
       paint: {
         'circle-radius': [
-          'interpolate',
-          ['linear'],
-          ['get', 'frequency'],
-          0, 5,
-          50, 10,
-          200, 15,
-          500, 20
+          'interpolate', ['linear'], ['get', 'frequency'],
+          0, 5, 50, 10, 200, 15, 500, 20
         ],
         'circle-color': [
-          'interpolate',
-          ['linear'],
-          ['get', 'percentage'],
-          0, '#90EE90',
-          0.5, '#50c878',
-          1, '#228B22'
+          'interpolate', ['linear'], ['get', 'tendency_score'],
+          0, '#90EE90', 1, '#50c878', 2, '#228B22'
         ],
         'circle-opacity': 0.7,
         'circle-stroke-width': 1,
@@ -464,8 +457,8 @@ const loadNgramsLayer = async () => {
       }
     })
 
-    statistics.value.ngrams = geojson.features.length
-    statistics.value.total += geojson.features.length
+    statistics.value.ngrams = features.length
+    statistics.value.total += features.length
   } catch (error) {
     console.error('Failed to load ngrams:', error)
     throw error
@@ -476,7 +469,7 @@ const loadNgramsLayer = async () => {
 const loadCharactersLayer = async () => {
   try {
     const charData = await getCharTendencyByChar({
-      char: filters.value.character.trim(),
+      character: filters.value.character.trim(),
       region_level: filters.value.charLevel
     })
 
@@ -485,32 +478,32 @@ const loadCharactersLayer = async () => {
       return
     }
 
-    // 轉換為 GeoJSON（需要坐標轉換）
-    const geojson = await transformRegionalDataToGeoJSON(
-      charData.slice(0, 100), // 限制前 100 個區域
-      filters.value.charLevel
-    )
+    const features = charData
+      .filter(item => item.centroid_lon != null && item.centroid_lat != null)
+      .map(item => ({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [item.centroid_lon, item.centroid_lat] },
+        properties: {
+          type: 'character',
+          region_name: item.region_name,
+          lift: item.lift,
+          z_score: item.z_score
+        }
+      }))
 
-    if (geojson.features.length === 0) {
-      showWarning('無法獲取區域坐標')
+    if (features.length === 0) {
+      showWarning('區域數據缺少坐標')
       return
     }
-
-    // 添加類型標記
-    geojson.features.forEach(f => {
-      f.properties.type = 'character'
-    })
 
     mapLayers.value.push({
       id: 'characters',
       type: 'circle',
-      data: geojson,
+      data: { type: 'FeatureCollection', features },
       paint: {
         'circle-radius': 12,
         'circle-color': [
-          'interpolate',
-          ['linear'],
-          ['get', 'tendency_score'],
+          'interpolate', ['linear'], ['get', 'lift'],
           0, '#0000ff',
           0.5, '#6495ed',
           1, '#ffffff',

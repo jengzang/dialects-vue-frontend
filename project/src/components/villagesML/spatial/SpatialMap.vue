@@ -244,6 +244,16 @@ const showPopup = (feature, lngLat) => {
       <p style="margin: 4px 0;"><strong>區縣:</strong> ${props.county || 'N/A'}</p>
       <p style="margin: 4px 0;"><strong>鄉鎮:</strong> ${props.township || 'N/A'}</p>
     `
+  } else if (props.type === 'cluster-center') {
+    html += `
+      <h4 style="margin: 0 0 8px 0;">🎯 聚類中心 #${props.cluster_id}</h4>
+      <p style="margin: 4px 0;"><strong>聚類大小:</strong> ${props.cluster_size} 村</p>
+      <p style="margin: 4px 0;"><strong>平均距離:</strong> ${props.avg_distance_km?.toFixed(2)} km</p>
+      <p style="margin: 4px 0;"><strong>空間一致性:</strong> ${props.spatial_coherence?.toFixed(3)}</p>
+      <p style="margin: 4px 0;"><strong>主要城市:</strong> ${props.dominant_city || 'N/A'}</p>
+      <p style="margin: 4px 0;"><strong>主要區縣:</strong> ${props.dominant_county || 'N/A'}</p>
+      <p style="margin: 4px 0;"><strong>字符數量:</strong> ${props.total_characters || 'N/A'}</p>
+    `
   } else if (props.type === 'ngram') {
     html += `
       <h4 style="margin: 0 0 8px 0;">🟢 N-gram: ${props.ngram}</h4>
