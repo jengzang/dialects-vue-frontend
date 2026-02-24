@@ -186,6 +186,8 @@ const CharacterEmbeddings = defineAsyncComponent(() => import('@/components/vill
 const CharacterSignificance = defineAsyncComponent(() => import('@/components/villagesML/character/CharacterSignificance.vue'))
 const SemanticCategories = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticCategories.vue'))
 const SemanticComposition = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticComposition.vue'))
+const SemanticNgrams = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticNgrams.vue'))
+const SemanticIndices = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticIndices.vue'))
 const SpatialHotspotsTab = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialHotspotsTab.vue'))
 const SpatialClustersTab = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialClustersTab.vue'))
 const SpatialVisualizationTab = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialVisualizationTab.vue'))
@@ -245,6 +247,8 @@ const currentComponent = computed(() => {
       'character-significance': CharacterSignificance,
       'semantic-categories': SemanticCategories,
       'semantic-composition': SemanticComposition,
+      'semantic-ngrams': SemanticNgrams,
+      'semantic-indices': SemanticIndices,
       'spatial-hotspots': SpatialHotspotsTab,
       'spatial-clusters': SpatialClustersTab,
       'spatial-visualization': SpatialVisualizationTab,

@@ -249,6 +249,30 @@ export const VILLAGESML_MODULES = [
         hideLabelOnMobile: true
       },
       {
+        id: 'ngrams',
+        label: 'N-gram分析',
+        icon: '📊',
+        path: '/villagesML?module=semantic&subtab=ngrams',
+        weight: 1,
+        mobileWeight: 1,
+        fontSize: 0.95,
+        mobileFontSize: 0.9,
+        hideOnMobile: false,
+        hideLabelOnMobile: true
+      },
+      {
+        id: 'indices',
+        label: '語義指數',
+        icon: '📈',
+        path: '/villagesML?module=semantic&subtab=indices',
+        weight: 1,
+        mobileWeight: 1,
+        fontSize: 0.95,
+        mobileFontSize: 0.9,
+        hideOnMobile: false,
+        hideLabelOnMobile: true
+      },
+      {
         id: 'network',
         label: '語義網絡',
         icon: '🕸️',

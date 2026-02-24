@@ -906,6 +906,8 @@ textarea:focus {
 
 /* Solid Button - 实心按钮样式（用于 VillagesML） */
 .solid-button {
+  padding: 10px 24px;
+  font-size: 14px;
   white-space: nowrap;
   background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
   border-radius: var(--radius-md);
