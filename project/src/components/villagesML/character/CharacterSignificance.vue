@@ -179,6 +179,7 @@ import {
   getCharSignificanceSummary
 } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
+import { getSignificanceLabel } from '@/config/villagesML.js'
 
 // State
 const queryMode = ref('by-char')
@@ -253,12 +254,8 @@ const getSignificanceBadge = (pValue) => {
   return 'badge-not-significant'
 }
 
-const getSignificanceLabel = (pValue) => {
-  if (pValue < 0.001) return '***'
-  if (pValue < 0.01) return '**'
-  if (pValue < 0.05) return '*'
-  return 'n.s.'
-}
+// getSignificanceLabel is now imported from @/config/villagesML.js
+
 </script>
 
 <style scoped>

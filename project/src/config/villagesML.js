@@ -80,6 +80,76 @@ export const PATTERN_COMPONENT_NAMES = {
 }
 
 // ========================================
+// N-gram 位置和模式類型映射
+// ========================================
+
+/**
+ * N-gram 位置標籤映射
+ * 支持單一位置和組合位置（如 prefix-suffix）
+ * @type {Object<string, string>}
+ */
+export const NGRAM_POSITION_LABELS = {
+  // 單一位置
+  'all': '全部',
+  'prefix': '前綴',
+  'middle': '中間',
+  'suffix': '後綴',
+  // 組合位置
+  'prefix-suffix': '前後綴',
+  'prefix-middle': '前中',
+  'middle-suffix': '中後',
+  'prefix-middle-suffix': '前中後'
+}
+
+/**
+ * N-gram 模式類型標籤映射
+ * @type {Object<string, string>}
+ */
+export const NGRAM_PATTERN_TYPE_LABELS = {
+  'all': '全部',
+  'prefix': '前綴',
+  'suffix': '後綴',
+  'middle': '中間',
+  'prefix-suffix': '前後綴',
+  'infix': '中綴'
+}
+
+// ========================================
+// 統計顯著性標籤映射
+// ========================================
+
+/**
+ * P值顯著性標籤映射
+ * @type {Object<string, {label: string, symbol: string, description: string}>}
+ */
+export const SIGNIFICANCE_LEVELS = {
+  'very_significant': {
+    label: '極顯著',
+    symbol: '***',
+    description: 'p < 0.001',
+    threshold: 0.001
+  },
+  'significant': {
+    label: '顯著',
+    symbol: '**',
+    description: 'p < 0.01',
+    threshold: 0.01
+  },
+  'marginal': {
+    label: '邊緣顯著',
+    symbol: '*',
+    description: 'p < 0.05',
+    threshold: 0.05
+  },
+  'not_significant': {
+    label: '不顯著',
+    symbol: 'n.s.',
+    description: 'p ≥ 0.05',
+    threshold: 1.0
+  }
+}
+
+// ========================================
 // 輔助函數
 // ========================================
 
@@ -128,6 +198,63 @@ export function getPatternTypeName(patternType) {
   )
 
   return translatedParts.join('-')
+}
+
+/**
+ * 獲取 N-gram 位置標籤
+ * 支持單一位置和組合位置（如 prefix-suffix）
+ * @param {string} position - 位置標識（如 'prefix', 'prefix-suffix'）
+ * @returns {string} 中文標籤
+ */
+export function getNgramPositionLabel(position) {
+  if (!position) return ''
+  return NGRAM_POSITION_LABELS[position] || position
+}
+
+/**
+ * 獲取 N-gram 模式類型標籤
+ * @param {string} type - 模式類型（如 'prefix', 'suffix'）
+ * @returns {string} 中文標籤
+ */
+export function getNgramPatternTypeLabel(type) {
+  if (!type) return ''
+  return NGRAM_PATTERN_TYPE_LABELS[type] || type
+}
+
+/**
+ * 獲取顯著性標籤（基於 p 值）
+ * @param {number} pValue - P值
+ * @returns {string} 顯著性符號（***, **, *, n.s.）
+ */
+export function getSignificanceLabel(pValue) {
+  if (pValue < SIGNIFICANCE_LEVELS.very_significant.threshold) {
+    return SIGNIFICANCE_LEVELS.very_significant.symbol
+  }
+  if (pValue < SIGNIFICANCE_LEVELS.significant.threshold) {
+    return SIGNIFICANCE_LEVELS.significant.symbol
+  }
+  if (pValue < SIGNIFICANCE_LEVELS.marginal.threshold) {
+    return SIGNIFICANCE_LEVELS.marginal.symbol
+  }
+  return SIGNIFICANCE_LEVELS.not_significant.symbol
+}
+
+/**
+ * 獲取顯著性等級信息
+ * @param {number} pValue - P值
+ * @returns {Object} 顯著性等級對象 {label, symbol, description}
+ */
+export function getSignificanceLevel(pValue) {
+  if (pValue < SIGNIFICANCE_LEVELS.very_significant.threshold) {
+    return SIGNIFICANCE_LEVELS.very_significant
+  }
+  if (pValue < SIGNIFICANCE_LEVELS.significant.threshold) {
+    return SIGNIFICANCE_LEVELS.significant
+  }
+  if (pValue < SIGNIFICANCE_LEVELS.marginal.threshold) {
+    return SIGNIFICANCE_LEVELS.marginal
+  }
+  return SIGNIFICANCE_LEVELS.not_significant
 }
 
 // ========================================

@@ -22,9 +22,9 @@
       <div class="banner-item" v-if="ngramStats.by_level">
         <span class="banner-label">城市 / 區縣 / 鄉鎮</span>
         <span class="banner-value">
-          {{ formatRate(ngramStats.by_level.city?.rate) }} /
-          {{ formatRate(ngramStats.by_level.county?.rate) }} /
-          {{ formatRate(ngramStats.by_level.township?.rate) }}
+          {{ formatRate(ngramStats.by_level.city?.significant_rate) }} /
+          {{ formatRate(ngramStats.by_level.county?.significant_rate) }} /
+          {{ formatRate(ngramStats.by_level.township?.significant_rate) }}
         </span>
       </div>
       <div class="banner-tip">只顯示統計顯著的 N-gram (p &lt; 0.05)</div>
@@ -101,12 +101,12 @@
               </span>
             </div>
             <div class="col-frequency">{{ item.frequency }}</div>
-            <div class="col-percentage">{{ (item.percentage * 100).toFixed(2) }}%</div>
+            <div class="col-percentage">{{ item.percentage.toFixed(2) }}%</div>
             <div class="col-bar">
               <div class="bar-container">
                 <div
                   class="bar-fill"
-                  :style="{ width: `${item.percentage * 100}%` }"
+                  :style="{ width: `${(item.percentage / maxPercentage) * 100}%` }"
                 ></div>
               </div>
             </div>
@@ -173,7 +173,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   getNgramFrequency,
@@ -181,6 +181,7 @@ import {
   getNgramStatistics
 } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
+import { getNgramPositionLabel, getNgramPatternTypeLabel } from '@/config/villagesML.js'
 
 const router = useRouter()
 
@@ -199,29 +200,18 @@ const patternResults = ref([])
 const loadingFrequency = ref(false)
 const loadingPatterns = ref(false)
 
-// Methods
-const getPositionLabel = (pos) => {
-  const labels = {
-    'all': '全部',
-    'prefix': '前綴',
-    'middle': '中間',
-    'suffix': '後綴'
-  }
-  return labels[pos] || pos
-}
+// Computed
+const maxPercentage = computed(() => {
+  if (frequencyData.value.length === 0) return 1
+  return Math.max(...frequencyData.value.map(item => item.percentage))
+})
 
-const getPatternTypeLabel = (type) => {
-  const labels = {
-    'prefix': '前綴',
-    'suffix': '後綴',
-    'middle': '中間',
-    'all': '全部'
-  }
-  return labels[type] || type
-}
+// Methods
+const getPositionLabel = getNgramPositionLabel
+const getPatternTypeLabel = getNgramPatternTypeLabel
 
 const formatBannerNum = (num) => num ? num.toLocaleString('zh-CN') : '—'
-const formatRate = (rate) => rate != null ? (rate * 100).toFixed(1) + '%' : '—'
+const formatRate = (rate) => rate != null ? rate.toFixed(1) + '%' : '—'
 
 const loadFrequency = async () => {
   loadingFrequency.value = true

@@ -233,6 +233,114 @@
         </div>
       </div>
 
+      <!-- Regional N-gram Rankings -->
+      <div class="ngram-section glass-panel">
+        <h2>區域 N-gram 排行榜</h2>
+        <div class="ngram-controls">
+          <select v-model.number="ngramN" class="select-input">
+            <option :value="2">二元組 (Bigrams)</option>
+            <option :value="3">三元組 (Trigrams)</option>
+            <option :value="4">四元組 (4-grams)</option>
+          </select>
+          <select v-model="ngramLevel" class="select-input">
+            <option value="city">城市</option>
+            <option value="county">區縣</option>
+            <option value="township">鄉鎮</option>
+          </select>
+          <input
+            v-if="ngramLevel === 'city'"
+            v-model="ngramFilters.city"
+            type="text"
+            placeholder="城市名稱（可選）"
+            class="filter-input"
+          />
+          <template v-if="ngramLevel === 'county'">
+            <input
+              v-model="ngramFilters.city"
+              type="text"
+              placeholder="城市名稱（可選）"
+              class="filter-input"
+            />
+            <input
+              v-model="ngramFilters.county"
+              type="text"
+              placeholder="區縣名稱（可選）"
+              class="filter-input"
+            />
+          </template>
+          <template v-if="ngramLevel === 'township'">
+            <input
+              v-model="ngramFilters.city"
+              type="text"
+              placeholder="城市名稱（可選）"
+              class="filter-input"
+            />
+            <input
+              v-model="ngramFilters.county"
+              type="text"
+              placeholder="區縣名稱（可選）"
+              class="filter-input"
+            />
+            <input
+              v-model="ngramFilters.township"
+              type="text"
+              placeholder="鄉鎮名稱（可選）"
+              class="filter-input"
+            />
+          </template>
+          <input
+            v-model.number="ngramTopK"
+            type="number"
+            min="1"
+            max="500"
+            placeholder="返回數量 (1-500)"
+            class="number-input"
+          />
+          <button
+            class="query-button"
+            :disabled="loadingNgram"
+            @click="loadRegionalNgrams"
+          >
+            查詢
+          </button>
+        </div>
+
+        <div v-if="loadingNgram" class="loading-state">
+          <div class="spinner"></div>
+        </div>
+
+        <div v-else-if="ngramData.length > 0" class="ngram-results">
+          <div class="ngram-header">
+            <div class="col-rank">排名</div>
+            <div class="col-ngram">N-gram</div>
+            <div class="col-frequency">頻率</div>
+            <div class="col-percentage">百分比</div>
+            <div class="col-bar">分佈</div>
+          </div>
+          <div class="ngram-body">
+            <div
+              v-for="(item, index) in ngramData"
+              :key="index"
+              class="ngram-row"
+              :class="{ 'top-10': item.rank <= 10 }"
+            >
+              <div class="col-rank">{{ item.rank }}</div>
+              <div class="col-ngram">{{ item.ngram }}</div>
+              <div class="col-frequency">{{ item.frequency }}</div>
+              <div class="col-percentage">{{ item.percentage.toFixed(2) }}%</div>
+              <div class="col-bar">
+                <div class="bar-container">
+                  <div
+                    class="bar-fill"
+                    :style="{ width: `${(item.percentage / maxNgramPercentage) * 100}%` }"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Spatial Aggregates -->
       <div class="spatial-section glass-panel">
         <h2>空間聚合</h2>
@@ -275,7 +383,8 @@ import {
   getRegionalAggregatesCity,
   getRegionalAggregatesCounty,
   getRegionalAggregatesTown,
-  getRegionalSpatialAggregates
+  getRegionalSpatialAggregates,
+  getNgramRegional
 } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
 
@@ -297,6 +406,18 @@ const loadingSpatial = ref(false)
 const currentPage = ref(1)
 const pageSize = 20
 const spatialLevel = ref('city')
+
+// N-gram Rankings State
+const ngramN = ref(2)
+const ngramLevel = ref('city')
+const ngramFilters = ref({
+  city: '',
+  county: '',
+  township: ''
+})
+const ngramTopK = ref(50)
+const ngramData = ref([])
+const loadingNgram = ref(false)
 
 // Computed
 const totalVillages = computed(() => {
@@ -321,6 +442,11 @@ const paginatedAggregates = computed(() => {
 const maxCategoryValue = computed(() => {
   if (!selectedItem.value?.semantic_categories) return 1
   return Math.max(...Object.values(selectedItem.value.semantic_categories))
+})
+
+const maxNgramPercentage = computed(() => {
+  if (ngramData.value.length === 0) return 1
+  return Math.max(...ngramData.value.map(item => item.percentage))
 })
 
 // Methods
@@ -388,6 +514,27 @@ const formatStatValue = (value) => {
     return value.toFixed(2)
   }
   return value
+}
+
+const loadRegionalNgrams = async () => {
+  loadingNgram.value = true
+  try {
+    const params = {
+      n: ngramN.value,
+      region_level: ngramLevel.value,
+      top_k: ngramTopK.value
+    }
+
+    if (ngramFilters.value.city) params.city = ngramFilters.value.city
+    if (ngramFilters.value.county) params.county = ngramFilters.value.county
+    if (ngramFilters.value.township) params.township = ngramFilters.value.township
+
+    ngramData.value = await getNgramRegional(params)
+  } catch (error) {
+    showError('加載 N-gram 排行榜失敗')
+  } finally {
+    loadingNgram.value = false
+  }
 }
 </script>
 
@@ -845,6 +992,84 @@ const formatStatValue = (value) => {
   color: var(--text-secondary);
 }
 
+.map-note {
+  font-size: 14px !important;
+  color: var(--text-secondary);
+}
+
+.ngram-section {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.ngram-section h2 {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.ngram-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.number-input {
+  width: 180px;
+  padding: 10px 16px;
+  border: 2px solid rgba(74, 144, 226, 0.3);
+  border-radius: 8px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.number-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.ngram-results {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.ngram-header,
+.ngram-row {
+  display: grid;
+  grid-template-columns: 60px 150px 100px 100px 1fr;
+  gap: 12px;
+  padding: 12px 16px;
+  align-items: center;
+}
+
+.ngram-header {
+  background: rgba(74, 144, 226, 0.2);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ngram-row {
+  background: rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: background 0.3s ease;
+}
+
+.ngram-row:hover {
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.ngram-row.top-10 {
+  background: rgba(243, 156, 18, 0.1);
+}
+
+.col-ngram {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
 @media (max-width: 768px) {
   .page-title {
     font-size: 24px;
@@ -866,6 +1091,21 @@ const formatStatValue = (value) => {
 
   .modal-content {
     max-height: 95vh;
+  }
+
+  .ngram-controls {
+    flex-direction: column;
+  }
+
+  .number-input,
+  .select-input {
+    width: 100%;
+  }
+
+  .ngram-header,
+  .ngram-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
 }
 </style>

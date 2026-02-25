@@ -54,13 +54,13 @@
                 </div>
                 <div class="stat-item">
                   <span class="stat-label">百分比:</span>
-                  <span class="stat-value">{{ (pattern.percentage * 100).toFixed(2) }}%</span>
+                  <span class="stat-value">{{ pattern.percentage.toFixed(2) }}%</span>
                 </div>
               </div>
               <div class="pattern-bar">
                 <div
                   class="bar-fill"
-                  :style="{ width: `${pattern.percentage * 100}%` }"
+                  :style="{ width: `${(pattern.percentage / maxGlobalPercentage) * 100}%` }"
                 ></div>
               </div>
             </div>
@@ -118,12 +118,12 @@
                 <div class="col-rank">{{ index + 1 }}</div>
                 <div class="col-pattern">{{ pattern.pattern }}</div>
                 <div class="col-frequency">{{ pattern.frequency }}</div>
-                <div class="col-percentage">{{ (pattern.percentage * 100).toFixed(2) }}%</div>
+                <div class="col-percentage">{{ pattern.percentage.toFixed(2) }}%</div>
                 <div class="col-bar">
                   <div class="bar-container">
                     <div
                       class="bar-fill"
-                      :style="{ width: `${pattern.percentage * 100}%` }"
+                      :style="{ width: `${(pattern.percentage / maxRegionalPercentage) * 100}%` }"
                     ></div>
                   </div>
                 </div>
@@ -260,7 +260,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
 import FilterableSelect from '@/components/common/FilterableSelect.vue'
 import {
@@ -295,6 +295,17 @@ const patternType = ref('')
 const tendencyPattern = ref('')
 const tendencyLevel = ref('city')
 const tendencyHierarchy = ref({ city: null, county: null, township: null })
+
+// Computed
+const maxGlobalPercentage = computed(() => {
+  if (globalPatterns.value.length === 0) return 1
+  return Math.max(...globalPatterns.value.map(item => item.percentage))
+})
+
+const maxRegionalPercentage = computed(() => {
+  if (regionalPatterns.value.length === 0) return 1
+  return Math.max(...regionalPatterns.value.map(item => item.percentage))
+})
 
 // Methods
 const loadGlobalPatterns = async () => {
