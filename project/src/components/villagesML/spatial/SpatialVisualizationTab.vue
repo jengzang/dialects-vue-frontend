@@ -152,6 +152,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import SpatialMap from './SpatialMap.vue'
 import {
   getSpatialHotspots,
@@ -160,11 +161,14 @@ import {
   getNgramTendency,
   getCharTendencyByChar
 } from '@/api'
-import { showError, showWarning } from '@/utils/message.js'
+import { showError, showWarning, showConfirm } from '@/utils/message.js'
+import { userStore } from '@/utils/store.js'
 import {
   SPATIAL_CLUSTERING_RUN_LABELS,
   DEFAULT_SPATIAL_CLUSTERING_RUN_ID
 } from '@/config/villagesML.js'
+
+const router = useRouter()
 
 // 圖層狀態
 const layers = ref({
@@ -312,7 +316,7 @@ const loadHotspotsLayer = async () => {
         hotspot_id: h.hotspot_id,
         radius_km: h.radius_km,
         village_count: h.village_count,
-        density: h.density
+        density: h.density_score
       }
     }))
 
@@ -367,7 +371,7 @@ const loadClustersLayer = async () => {
       properties: {
         type: 'cluster',
         cluster_id: c.cluster_id,
-        cluster_size: c.size,
+        cluster_size: c.cluster_size,
         avg_distance_km: c.avg_distance_km
       }
     }))
@@ -406,6 +410,22 @@ const loadClustersLayer = async () => {
 
 // 加載 N-gram 圖層
 const loadNgramsLayer = async () => {
+  // 檢查登錄狀態
+  if (!userStore.isAuthenticated) {
+    const confirmed = await showConfirm(
+      'N-gram 分佈分析需要登錄才能使用，是否前往登錄？',
+      {
+        title: '需要登錄',
+        confirmText: '前往登錄',
+        cancelText: '取消'
+      }
+    )
+    if (confirmed) {
+      router.push('/auth')
+    }
+    return
+  }
+
   try {
     const ngramData = await getNgramTendency({
       ngram: filters.value.ngram.trim(),
@@ -476,6 +496,22 @@ const loadNgramsLayer = async () => {
 
 // 加載字符圖層
 const loadCharactersLayer = async () => {
+  // 檢查登錄狀態
+  if (!userStore.isAuthenticated) {
+    const confirmed = await showConfirm(
+      '字符傾向分析需要登錄才能使用，是否前往登錄？',
+      {
+        title: '需要登錄',
+        confirmText: '前往登錄',
+        cancelText: '取消'
+      }
+    )
+    if (confirmed) {
+      router.push('/auth')
+    }
+    return
+  }
+
   try {
     const charData = await getCharTendencyByChar({
       character: filters.value.character.trim(),

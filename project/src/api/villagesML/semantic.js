@@ -45,7 +45,8 @@ export async function getSemanticNetwork(params = {}) {
       county: params.county,
       township: params.township,
       min_edge_weight: params.min_edge_weight || 0.5,
-      centrality_metrics: params.centrality_metrics || ['degree', 'betweenness']
+      centrality_metrics: params.centrality_metrics || ['degree', 'betweenness'],
+      detail: params.detail || false
     }),
     timeout: 60000  // 60秒超時
   })

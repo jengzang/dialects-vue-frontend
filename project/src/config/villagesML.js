@@ -54,11 +54,120 @@ export const SEMANTIC_CATEGORY_DESCRIPTIONS = {
 }
 
 /**
- * 組合模式組件映射（用於動態組合）
+ * 語義子類別中文名稱映射（v4.0 Hybrid Lexicon）
  * @type {Object<string, string>}
  */
-export const PATTERN_COMPONENT_NAMES = {
-  // 模式結構組件
+export const SEMANTIC_SUBCATEGORY_NAMES = {
+  // 數字類
+  'number_small': '小數字',
+  'number_large': '大數字',
+  'number_ordinal': '序數',
+
+  // 方位類
+  'direction_vertical': '垂直方向',
+  'direction_cardinal': '基本方向',
+  'direction_inside': '內部方向',
+  'direction_outside': '外部方向',
+  'direction_opening': '開口方向',
+  'direction_horizontal': '水平方向',
+  'direction_center': '中心方向',
+  'direction_end': '末端方向',
+
+  // 象徵類
+  'symbolic_virtue': '美德象徵',
+  'symbolic_religion': '宗教象徵',
+  'symbolic_light': '光明象徵',
+  'symbolic_prosperity': '繁榮象徵',
+  'symbolic_animal': '動物象徵',
+  'symbolic_fortune': '吉祥象徵',
+  'symbolic_peace': '和平象徵',
+  'symbolic_treasure': '寶物象徵',
+
+  // 水系類
+  'water_spring': '泉水',
+  'water_stream': '溪流',
+  'water_pond': '池塘',
+  'water_island': '島嶼',
+  'water_shore': '岸邊',
+  'water_river': '河流',
+  'water_beach': '沙灘',
+  'water_lake': '湖泊',
+  'water_port': '港津',
+  'water_bay': '海灣',
+
+  // 基建類
+  'infrastructure_station': '驛站',
+  'infrastructure_port': '港口',
+  'infrastructure_road': '道路',
+  'infrastructure_bridge': '橋樑',
+  'infrastructure_transport': '交通',
+
+  // 時間類
+  'time': '時間',
+
+  // 農業類
+  'agriculture_storage': '農業倉儲',
+  'agriculture_activity': '農業活動',
+  'agriculture_garden': '園圃',
+  'agriculture_field': '田地',
+  'agriculture_irrigation': '灌溉',
+  'agriculture_crop': '農作物',
+
+  // 宗族類
+  'clan_he': '何姓',
+  'clan_other': '其他姓氏',
+  'clan_liu': '劉姓',
+  'clan_wu': '吳姓',
+  'clan_zhang': '張姓',
+  'clan_li': '李姓',
+  'clan_liang': '梁姓',
+  'clan_luo': '羅姓',
+  'clan_chen': '陳姓',
+  'clan_huang': '黃姓',
+
+  // 山地類
+  'mountain_slope': '山坡',
+  'mountain_plateau': '高原平台',
+  'mountain_valley': '山谷',
+  'mountain_rock': '岩石',
+  'mountain_peak': '山峰',
+  'mountain_ridge': '山脊',
+
+  // 聚落類
+  'settlement_district': '區域聚落',
+  'settlement_market': '市集',
+  'settlement_fort': '城堡',
+  'settlement_village': '村莊',
+  'settlement_building': '建築',
+  'settlement_group': '聚落群組',
+
+  // 形狀類
+  'shape': '形狀',
+
+  // 尺寸類
+  'size_large': '大尺寸',
+  'size_small': '小尺寸',
+  'size_short': '短小',
+  'size_long': '長遠',
+
+  // 植物類
+  'vegetation_forest': '森林',
+  'vegetation_pine': '松柏',
+  'vegetation_fruit': '果樹',
+  'vegetation_other': '其他植物',
+  'vegetation_bamboo': '竹類',
+  'vegetation_flower': '花卉',
+  'vegetation_tea': '茶',
+
+  // 顏色類
+  'color': '顏色'
+}
+
+/**
+ * 模式結構組件映射
+ * @type {Object<string, string>}
+ */
+export const PATTERN_STRUCTURE_NAMES = {
   'head': '中心',
   'modifier': '修飾',
   'coordinate': '並列',
@@ -66,17 +175,17 @@ export const PATTERN_COMPONENT_NAMES = {
   'object': '賓',
   'subject': '主',
   'predicate': '謂',
-  'other': '其他',
-  // 語義類別組件
-  'settlement': '聚落',
-  'clan': '宗族',
-  'direction': '方位',
-  'water': '水系',
-  'mountain': '山地',
-  'vegetation': '植物',
-  'agriculture': '農業',
-  'symbolic': '象徵',
-  'infrastructure': '基建'
+  'other': '其他'
+}
+
+/**
+ * 組合模式組件映射（已廢棄，請使用 PATTERN_STRUCTURE_NAMES 和 SEMANTIC_CATEGORY_NAMES）
+ * @deprecated 使用 PATTERN_STRUCTURE_NAMES 和 SEMANTIC_CATEGORY_NAMES 代替
+ * @type {Object<string, string>}
+ */
+export const PATTERN_COMPONENT_NAMES = {
+  ...PATTERN_STRUCTURE_NAMES,
+  ...SEMANTIC_CATEGORY_NAMES
 }
 
 // ========================================
@@ -181,6 +290,43 @@ export function getCategoryDescription(category) {
 }
 
 /**
+ * 獲取語義子類別名稱
+ * @param {string} subcategory - 子類別英文名（如 "number_small", "clan_zhang"）
+ * @returns {string} 中文名稱
+ */
+export function getSubcategoryName(subcategory) {
+  return SEMANTIC_SUBCATEGORY_NAMES[subcategory] || subcategory
+}
+
+/**
+ * 獲取語義類別名稱（智能識別主類別或子類別）
+ * @param {string} category - 類別英文名（可以是主類別如 "clan"，也可以是子類別如 "clan_zhang"）
+ * @param {boolean} isDetailMode - 是否為詳細模式（默認false）
+ * @returns {string} 中文名稱
+ */
+export function getCategoryDisplayName(category, isDetailMode = false) {
+  if (!category) return ''
+
+  // 如果是詳細模式，優先查找子類別映射
+  if (isDetailMode && SEMANTIC_SUBCATEGORY_NAMES[category]) {
+    return SEMANTIC_SUBCATEGORY_NAMES[category]
+  }
+
+  // 否則查找主類別映射
+  if (SEMANTIC_CATEGORY_NAMES[category]) {
+    return SEMANTIC_CATEGORY_NAMES[category]
+  }
+
+  // 如果都找不到，嘗試查找子類別映射（兼容性處理）
+  if (SEMANTIC_SUBCATEGORY_NAMES[category]) {
+    return SEMANTIC_SUBCATEGORY_NAMES[category]
+  }
+
+  // 最後返回原始值
+  return category
+}
+
+/**
  * 獲取組合模式類型名稱
  * @param {string} patternType - 模式類型英文名（如 "head_settlement", "modifier_head"）
  * @returns {string} 中文名稱
@@ -193,9 +339,18 @@ export function getPatternTypeName(patternType) {
   const parts = patternType.split(separator)
 
   // 翻譯每個部分並用連字符連接
-  const translatedParts = parts.map(part =>
-    PATTERN_COMPONENT_NAMES[part] || part
-  )
+  const translatedParts = parts.map(part => {
+    // 先查找模式結構組件
+    if (PATTERN_STRUCTURE_NAMES[part]) {
+      return PATTERN_STRUCTURE_NAMES[part]
+    }
+    // 再查找語義類別
+    if (SEMANTIC_CATEGORY_NAMES[part]) {
+      return SEMANTIC_CATEGORY_NAMES[part]
+    }
+    // 返回原始值
+    return part
+  })
 
   return translatedParts.join('-')
 }
@@ -595,7 +750,7 @@ export const VILLAGESML_MODULES = [
     weightIconOnly: 0.5,
     fontSize: 1.0,
     mobileFontSize: 1.0,
-    requireAuth: true,
+    requireAuth: false,
     hideOnMobile: false,
     hideLabelOnMobile: true,
     showLabelOnlyWhenActive: false,

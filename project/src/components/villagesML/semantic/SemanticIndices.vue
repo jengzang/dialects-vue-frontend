@@ -2,6 +2,15 @@
   <div class="semantic-indices-page">
     <h3 class="villagesml-subtab-title">語義分析 - 語義指數</h3>
 
+    <!-- Detail Mode Toggle -->
+    <div class="detail-toggle glass-panel">
+      <label class="toggle-container">
+        <input type="checkbox" v-model="detailMode" class="toggle-checkbox" />
+        <span class="toggle-label">詳細模式</span>
+      </label>
+      <span class="toggle-hint">（語義分類更細緻）</span>
+    </div>
+
     <div class="indices-section glass-panel">
       <h2>語義指數</h2>
       <p class="section-description">
@@ -144,7 +153,7 @@ import { ref, watch, computed } from 'vue'
 import FilterableSelect from '@/components/common/FilterableSelect.vue'
 import { getSemanticIndices } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
-import { getCategoryName } from '@/config/villagesML.js'
+import { getCategoryDisplayName } from '@/config/villagesML.js'
 import { userStore } from '@/utils/store.js'
 
 // State
@@ -157,6 +166,12 @@ const indicesRegionLevel = ref('')
 const indicesRegionName = ref('')
 const indicesMinVillages = ref(null)
 const indicesLimit = ref(100)
+
+// Detail mode toggle
+const detailMode = ref(false)
+
+// Helper function to get category name based on detail mode
+const getCategoryName = (category) => getCategoryDisplayName(category, detailMode.value)
 
 // Computed properties for role-based limits
 const maxIndicesLimit = computed(() => {
@@ -200,7 +215,10 @@ const loadIndices = async () => {
       params.limit = indicesLimit.value
     }
 
-    indices.value = await getSemanticIndices(params)
+    indices.value = await getSemanticIndices({
+      ...params,
+      ...(detailMode.value && { detail: true })
+    })
   } catch (error) {
     showError('加載語義指數失敗')
   } finally {
@@ -449,5 +467,65 @@ const getRegionLevelName = (level) => {
     grid-template-columns: 1fr;
     gap: 8px;
   }
+}
+
+/* Detail Mode Toggle */
+.detail-toggle {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.toggle-checkbox {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  appearance: none;
+  background: rgba(200, 200, 200, 0.3);
+  border-radius: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.toggle-checkbox:checked {
+  background: var(--color-primary);
+}
+
+.toggle-checkbox::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  background: white;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-checkbox:checked::before {
+  transform: translateX(24px);
+}
+
+.toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.toggle-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 </style>

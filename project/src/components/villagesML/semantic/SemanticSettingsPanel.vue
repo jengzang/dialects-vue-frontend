@@ -60,6 +60,15 @@
         <span v-if="selectedMetrics.length === 0" class="error-hint">⚠️ 請至少選擇一個中心性指標</span>
       </div>
 
+      <!-- Detail Mode Toggle -->
+      <div class="setting-row">
+        <label class="toggle-container">
+          <input type="checkbox" v-model="detailMode" class="toggle-checkbox" />
+          <span class="toggle-label">詳細模式</span>
+        </label>
+        <span class="hint">語義分類更細緻</span>
+      </div>
+
       <button class="run-button solid-button" @click="runAnalysis" :disabled="loading || !isAuthenticated || !canRun">
         {{ loading ? '分析中...' : isAuthenticated ? '🔍 生成網絡' : '🔒 需要登錄' }}
       </button>
@@ -82,6 +91,9 @@ const emit = defineEmits(['run'])
 const settings = reactive(villagesMLStore.semanticSettings)
 const selectedMetrics = ref(settings.centrality_metrics || ['degree', 'betweenness'])
 const isAuthenticated = computed(() => userStore.isAuthenticated)
+
+// Detail mode toggle
+const detailMode = ref(false)
 
 // 是否可以運行（需要選擇區域和至少一個中心性指標）
 const canRun = computed(() => {
@@ -112,7 +124,10 @@ watch(() => settings.region_level, () => {
 
 const runAnalysis = () => {
   if (!canRun.value) return
-  emit('run', settings)
+  emit('run', {
+    ...settings,
+    ...(detailMode.value && { detail: true })
+  })
 }
 </script>
 
@@ -234,5 +249,52 @@ const runAnalysis = () => {
   font-size: 13px;
   color: #856404;
   font-weight: 500;
+}
+
+/* Detail Mode Toggle */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.toggle-checkbox {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  appearance: none;
+  background: rgba(200, 200, 200, 0.3);
+  border-radius: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.toggle-checkbox:checked {
+  background: var(--color-primary);
+}
+
+.toggle-checkbox::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  background: white;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-checkbox:checked::before {
+  transform: translateX(24px);
+}
+
+.toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
 }
 </style>

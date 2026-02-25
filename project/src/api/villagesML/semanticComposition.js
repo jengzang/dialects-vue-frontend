@@ -14,6 +14,7 @@ export async function getSemanticTrigrams(params = {}) {
   const queryParams = new URLSearchParams()
   if (params.min_frequency) queryParams.append('min_frequency', params.min_frequency)
   if (params.limit) queryParams.append('limit', params.limit)
+  if (params.detail) queryParams.append('detail', 'true')
 
   return api(`/api/villages/semantic/composition/trigrams?${queryParams.toString()}`)
 }
@@ -29,6 +30,7 @@ export async function getSemanticPMI(params = {}) {
   const queryParams = new URLSearchParams()
   if (params.min_pmi) queryParams.append('min_pmi', params.min_pmi)
   if (params.limit) queryParams.append('limit', params.limit)
+  if (params.detail) queryParams.append('detail', 'true')
 
   return api(`/api/villages/semantic/composition/pmi?${queryParams.toString()}`)
 }
@@ -58,6 +60,7 @@ export async function getSemanticIndices(params = {}) {
   if (params.region_name) queryParams.append('region_name', params.region_name)
   if (params.min_villages) queryParams.append('min_villages', params.min_villages)
   if (params.limit) queryParams.append('limit', params.limit)
+  if (params.detail) queryParams.append('detail', 'true')
 
   const queryString = queryParams.toString()
   const url = queryString

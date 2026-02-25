@@ -2,6 +2,15 @@
   <div class="semantic-ngrams-page">
     <h3 class="villagesml-subtab-title">語義分析 - N-gram分析</h3>
 
+    <!-- Detail Mode Toggle -->
+    <div class="detail-toggle glass-panel">
+      <label class="toggle-container">
+        <input type="checkbox" v-model="detailMode" class="toggle-checkbox" />
+        <span class="toggle-label">詳細模式</span>
+      </label>
+      <span class="toggle-hint">（語義分類更細緻）</span>
+    </div>
+
     <!-- Bigrams and Trigrams -->
     <div class="ngrams-section">
       <div class="bigrams glass-panel">
@@ -178,7 +187,7 @@ import {
   getSemanticPMI
 } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
-import { getCategoryName } from '@/config/villagesML.js'
+import { getCategoryDisplayName } from '@/config/villagesML.js'
 
 // State
 const bigrams = ref([])
@@ -194,13 +203,20 @@ const trigramMinCount = ref(3)
 const minPMI = ref(0)
 const pmiTopN = ref(50)
 
+// Detail mode toggle
+const detailMode = ref(false)
+
+// Helper function to get category name based on detail mode
+const getCategoryName = (category) => getCategoryDisplayName(category, detailMode.value)
+
 // Methods
 const loadBigrams = async () => {
   loadingBigrams.value = true
   try {
     bigrams.value = await getSemanticBigrams({
       min_frequency: bigramMinCount.value,
-      limit: 50
+      limit: 50,
+      ...(detailMode.value && { detail: true })
     })
   } catch (error) {
     showError('加載二元組合失敗')
@@ -214,7 +230,8 @@ const loadTrigrams = async () => {
   try {
     trigrams.value = await getSemanticTrigrams({
       min_frequency: trigramMinCount.value,
-      limit: 50
+      limit: 50,
+      ...(detailMode.value && { detail: true })
     })
   } catch (error) {
     showError('加載三元組合失敗')
@@ -228,7 +245,8 @@ const loadPMI = async () => {
   try {
     pmiData.value = await getSemanticPMI({
       min_pmi: minPMI.value,
-      limit: pmiTopN.value
+      limit: pmiTopN.value,
+      ...(detailMode.value && { detail: true })
     })
   } catch (error) {
     showError('加載PMI數據失敗')
@@ -494,5 +512,65 @@ const getPMIClass = (pmi_score) => {
     grid-template-columns: 1fr;
     gap: 8px;
   }
+}
+
+/* Detail Mode Toggle */
+.detail-toggle {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.toggle-checkbox {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  appearance: none;
+  background: rgba(200, 200, 200, 0.3);
+  border-radius: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.toggle-checkbox:checked {
+  background: var(--color-primary);
+}
+
+.toggle-checkbox::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  background: white;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-checkbox:checked::before {
+  transform: translateX(24px);
+}
+
+.toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.toggle-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 </style>

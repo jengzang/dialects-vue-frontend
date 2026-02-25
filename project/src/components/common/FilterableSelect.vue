@@ -320,6 +320,14 @@ const handleClickOutside = (event) => {
 
 // Watchers
 watch(() => props.level, () => {
+  // Clear input value when level changes
+  inputValue.value = ''
+  emit('update:modelValue', '')
+  emit('update:hierarchy', {
+    city: null,
+    county: null,
+    township: null
+  })
   loadOptions()
 })
 

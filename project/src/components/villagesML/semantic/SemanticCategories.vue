@@ -94,21 +94,81 @@
         </div>
       </div>
 
+      <!-- Category Tendency -->
+      <div ref="tendencySection" class="tendency-section glass-panel">
+        <div class="section-header">
+          <h3>
+            <span v-if="selectedCategory">{{ getCategoryName(selectedCategory.category) }} - </span>
+            區域傾向性
+          </h3>
+          <button v-if="selectedCategory" class="close-button" @click="selectedCategory = null">✕</button>
+        </div>
+
+        <!-- Prompt when no category selected -->
+        <div v-if="!selectedCategory" class="prompt-message">
+          <span class="prompt-icon">👆</span>
+          <p>請點擊上方的類別卡片以查看該類別的區域傾向性分析</p>
+        </div>
+
+        <!-- Content when category selected -->
+        <template v-else>
+          <div class="region-selector">
+            <FilterableSelect
+              v-model="tendencyRegionName"
+              :level="tendencyRegionLevel"
+              @update:level="(newLevel) => tendencyRegionLevel = newLevel"
+              @update:hierarchy="(h) => tendencyHierarchy = h"
+              placeholder="請選擇或輸入"
+            />
+            <button
+              class="query-button"
+              :disabled="!tendencyRegionName || loadingTendency"
+              @click="loadCategoryTendency"
+            >
+              查詢
+            </button>
+          </div>
+          <div v-if="loadingTendency" class="loading-state">
+            <div class="spinner"></div>
+          </div>
+          <div v-else-if="categoryTendency.length > 0" class="tendency-results">
+            <div
+              v-for="item in categoryTendency"
+              :key="item.category"
+              class="tendency-item"
+            >
+              <div class="tendency-category">{{ getCategoryName(item.category) }}</div>
+              <div class="tendency-bar">
+                <div
+                  class="tendency-fill"
+                  :style="{
+                    width: `${Math.abs(item.z_score) * 10}%`,
+                    background: item.z_score >= 0 ? 'var(--color-primary)' : '#e74c3c'
+                  }"
+                ></div>
+              </div>
+              <div class="tendency-value">Z: {{ item.z_score.toFixed(2) }}</div>
+              <div class="tendency-freq">Lift: {{ item.lift.toFixed(4) }}</div>
+            </div>
+          </div>
+        </template>
+      </div>
+
       <!-- Labels Section -->
       <div class="labels-section glass-panel">
         <h3>語義標籤</h3>
         <div class="labels-tabs">
           <button
-            class="tab-button"
-            :class="{ 'active': labelsMode === 'by-category' }"
-            @click="labelsMode = 'by-category'"
+              class="tab-button"
+              :class="{ 'active': labelsMode === 'by-category' }"
+              @click="labelsMode = 'by-category'"
           >
             按類別
           </button>
           <button
-            class="tab-button"
-            :class="{ 'active': labelsMode === 'by-char' }"
-            @click="labelsMode = 'by-char'"
+              class="tab-button"
+              :class="{ 'active': labelsMode === 'by-char' }"
+              @click="labelsMode = 'by-char'"
           >
             按字符
           </button>
@@ -127,10 +187,10 @@
           </div>
           <div v-else-if="labels.length > 0" class="labels-cloud">
             <span
-              v-for="label in labels"
-              :key="label.label"
-              class="label-tag"
-              :style="{ fontSize: `${12 + (label.count / maxLabelCount) * 12}px` }"
+                v-for="label in labels"
+                :key="label.label"
+                class="label-tag"
+                :style="{ fontSize: `${12 + (label.count / maxLabelCount) * 12}px` }"
             >
               {{ label.label }} ({{ label.count }})
             </span>
@@ -140,21 +200,21 @@
         <!-- By Character -->
         <div v-else class="labels-content">
           <input
-            v-model="charForLabels"
-            type="text"
-            maxlength="1"
-            placeholder="輸入字符"
-            class="char-input"
-            @input="loadLabelsByChar"
+              v-model="charForLabels"
+              type="text"
+              maxlength="1"
+              placeholder="輸入字符"
+              class="char-input"
+              @input="loadLabelsByChar"
           />
           <div v-if="loadingLabels" class="loading-state">
             <div class="spinner"></div>
           </div>
           <div v-else-if="labels.length > 0" class="labels-list">
             <div
-              v-for="label in labels"
-              :key="label.label"
-              class="label-item"
+                v-for="label in labels"
+                :key="label.label"
+                class="label-item"
             >
               <span class="label-name">{{ label.label }}</span>
               <span class="label-category">{{ label.category }}</span>
@@ -163,52 +223,6 @@
         </div>
       </div>
 
-      <!-- Category Tendency -->
-      <div v-if="selectedCategory" ref="tendencySection" class="tendency-section glass-panel">
-        <div class="section-header">
-          <h3>{{ getCategoryName(selectedCategory.category) }} - 區域傾向性</h3>
-          <button class="close-button" @click="selectedCategory = null">✕</button>
-        </div>
-        <div class="region-selector">
-          <FilterableSelect
-            v-model="tendencyRegionName"
-            :level="tendencyRegionLevel"
-            @update:level="(newLevel) => tendencyRegionLevel = newLevel"
-            @update:hierarchy="(h) => tendencyHierarchy = h"
-            placeholder="請選擇或輸入"
-          />
-          <button
-            class="query-button"
-            :disabled="!tendencyRegionName || loadingTendency"
-            @click="loadCategoryTendency"
-          >
-            查詢
-          </button>
-        </div>
-        <div v-if="loadingTendency" class="loading-state">
-          <div class="spinner"></div>
-        </div>
-        <div v-else-if="categoryTendency.length > 0" class="tendency-results">
-          <div
-            v-for="item in categoryTendency"
-            :key="item.category"
-            class="tendency-item"
-          >
-            <div class="tendency-category">{{ item.category }}</div>
-            <div class="tendency-bar">
-              <div
-                class="tendency-fill"
-                :style="{
-                  width: `${Math.abs(item.z_score) * 10}%`,
-                  background: item.z_score >= 0 ? 'var(--color-primary)' : '#e74c3c'
-                }"
-              ></div>
-            </div>
-            <div class="tendency-value">Z: {{ item.z_score.toFixed(2) }}</div>
-            <div class="tendency-freq">頻率: {{ item.frequency }}</div>
-          </div>
-        </div>
-      </div>
     </div>
 <!--  </ExploreLayout>-->
 </template>
@@ -589,7 +603,7 @@ onMounted(() => {
 
 .labels-section {
   padding: 16px;
-  margin-bottom: 16px;
+  margin-top: 16px;
 }
 
 .labels-section h3 {
@@ -731,18 +745,49 @@ onMounted(() => {
   color: var(--text-primary);
 }
 
+.prompt-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.prompt-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.prompt-message p {
+  font-size: 15px;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
 .tendency-results {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
 }
 
 .tendency-item {
   display: grid;
   grid-template-columns: 100px 1fr 100px 120px;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: 6px;
+  padding: 6px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 8px;
 }

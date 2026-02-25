@@ -688,8 +688,8 @@ const getTendencyClass = (zScore) => {
 .tendency-item {
   display: grid;
   grid-template-columns: 150px 1fr 200px;
-  gap: 12px;
-  padding: 12px;
+  gap: 6px;
+  padding: 6px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 8px;
   align-items: center;

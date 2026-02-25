@@ -764,8 +764,8 @@ const getTendencyColor = (tendency) => {
   display: grid;
   grid-template-columns: 120px 1fr 80px;
   align-items: center;
-  gap: 10px;
-  padding: 10px;
+  gap: 6px;
+  padding: 6px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 8px;
 }
