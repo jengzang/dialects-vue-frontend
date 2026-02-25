@@ -92,19 +92,22 @@
               :key="index"
               class="regional-bar"
             >
-              <div class="region-header">
-                <RegionDisplay :item="item" mode="full" :skipCity="false" class="region-name" />
-              </div>
-              <div class="regional-stats">
-                <div class="stat-item">
-                  <span class="stat-label">頻率:</span>
-                  <span class="stat-value">{{ item.frequency }}</span>
+              <div class="region-info-row">
+                <div class="region-header">
+                  <RegionDisplay :item="item" mode="full" :skipCity="false" class="region-name" />
                 </div>
-                <div class="stat-item" v-if="item.position">
-                  <span class="stat-label">位置:</span>
-                  <span class="stat-value">{{ getNgramPositionLabel(item.position) }}</span>
+                <div class="regional-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">頻率:</span>
+                    <span class="stat-value">{{ item.frequency }}</span>
+                  </div>
+                  <div class="stat-item" v-if="item.position">
+                    <span class="stat-label">位置:</span>
+                    <span class="stat-value">{{ getNgramPositionLabel(item.position) }}</span>
+                  </div>
                 </div>
               </div>
+              
               <div class="bar-container">
                 <div
                   class="bar-fill"
@@ -172,34 +175,36 @@
               :key="index"
               class="regional-bar"
             >
-              <div class="region-header">
-                <RegionDisplay :item="item" mode="full" :skipCity="false" class="region-name" />
-              </div>
-              <div class="regional-stats">
-                <div class="stat-item">
-                  <span class="stat-label">Z分數:</span>
-                  <span class="stat-value" :class="getTendencyClassByZScore(item.z_score)">
-                    {{ item.z_score != null ? item.z_score.toFixed(2) : 'N/A' }}
-                  </span>
+              <div class="region-info-row">
+                <div class="region-header">
+                  <RegionDisplay :item="item" mode="full" :skipCity="false" class="region-name" />
                 </div>
-                <div class="stat-item">
-                  <span class="stat-label">對數幾率:</span>
-                  <span class="stat-value">
-                    {{ item.log_odds != null ? item.log_odds.toFixed(2) : 'N/A' }}
-                  </span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">傾向:</span>
-                  <span class="stat-value">
-                    {{ item.tendency_score != null ? item.tendency_score.toFixed(2) : 'N/A' }}x
-                  </span>
+                <div class="regional-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Z分數:</span>
+                    <span class="stat-value" :class="getTendencyClassByZScore(item.z_score)">
+                      {{ item.z_score != null ? item.z_score.toFixed(2) : 'N/A' }}
+                    </span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">對數幾率:</span>
+                    <span class="stat-value">
+                      {{ item.log_odds != null ? item.log_odds.toFixed(2) : 'N/A' }}
+                    </span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">傾向:</span>
+                    <span class="stat-value">
+                      {{ item.tendency_score != null ? item.tendency_score.toFixed(2) : 'N/A' }}x
+                    </span>
                 </div>
                 <div class="stat-item" v-if="item.position">
                   <span class="stat-label">位置:</span>
                   <span class="stat-value">{{ getNgramPositionLabel(item.position) }}</span>
                 </div>
               </div>
-              <div class="bar-container">
+            </div>
+            <div class="bar-container">
                 <div
                   class="bar-fill"
                   :style="{
@@ -244,11 +249,15 @@
       </div>
 
       <div v-else-if="significanceData.length > 0" class="significance-results">
-        <div class="significance-table">
-          <div class="table-header">
-            <div class="col">區域</div>
-            <div class="col">卡方值</div>
-            <div class="col">P值</div>
+        <div class="table-scroll-wrapper">
+          <div class="significance-table">
+            <div class="table-header">
+              <div class="col">區域</div>
+              <div class="col">N-gram</div>
+              <div class="col">位置</div>
+              <div class="col">Z分數</div>
+              <div class="col">P值</div>
+              <div class="col">提升度</div>
             <div class="col">顯著性</div>
           </div>
           <div class="table-body">
@@ -256,15 +265,18 @@
               v-for="(item, index) in significanceData.slice(0, 20)"
               :key="index"
               class="table-row"
-              :class="{ 'significant': item.p_value < 0.05 }"
+              :class="{ 'significant': item.is_significant }"
             >
               <div class="col">{{ item.region_name }}</div>
-              <div class="col">{{ item.chi_square.toFixed(4) }}</div>
+              <div class="col">{{ item.ngram }}</div>
+              <div class="col">{{ getNgramPositionLabel(item.position) }}</div>
+              <div class="col">{{ item.z_score != null ? item.z_score.toFixed(2) : 'N/A' }}</div>
               <div class="col">
                 <span :class="getPValueClass(item.p_value)">
-                  {{ item.p_value.toFixed(6) }}
+                  {{ item.p_value != null ? item.p_value.toExponential(2) : 'N/A' }}
                 </span>
               </div>
+              <div class="col">{{ item.lift != null ? item.lift.toFixed(4) : 'N/A' }}</div>
               <div class="col">
                 <span class="sig-badge" :class="getSignificanceBadge(item.p_value)">
                   {{ getSignificanceLabel(item.p_value) }}
@@ -273,6 +285,7 @@
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   </div>
@@ -762,8 +775,15 @@ watch(
   background: rgba(74, 144, 226, 0.1);
 }
 
+.region-info-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
 .region-header {
-  margin-bottom: 4px;
+  flex-shrink: 0;
 }
 
 .region-name {
@@ -904,34 +924,60 @@ watch(
 }
 
 .tendency-table,
+/* 移动端横向滚动容器 */
+.table-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .significance-table {
   border-radius: 12px;
   overflow: hidden;
+  display: inline-block;
+  min-width: 100%;
 }
 
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 2fr;
+  grid-template-columns: 120px 80px 80px 90px 100px 90px 80px;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 10px 12px;
   align-items: center;
+  font-size: 13px;
 }
 
 .table-header {
   background: rgba(74, 144, 226, 0.2);
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.table-header > div {
+  text-align: center;
 }
 
 .table-row {
   background: rgba(255, 255, 255, 0.3);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: background 0.3s ease;
+  text-align: center;
+}
+
+.table-row > div {
+  text-align: center;
 }
 
 .table-row:hover {
   background: rgba(74, 144, 226, 0.1);
+}
+
+.table-row.significant {
+  background: rgba(255, 215, 0, 0.1);
+  border-left: 3px solid #FFD700;
 }
 
 .table-row.strong-tendency {
