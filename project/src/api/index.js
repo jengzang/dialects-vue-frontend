@@ -190,6 +190,8 @@ export {
   getSpatialIntegrationByChar,
   getSpatialIntegrationByCluster,
   getSpatialIntegrationSummary,
+  getSpatialIntegrationAvailableCharacters,
+  getSpatialIntegrationClusterList,
   // N-grams
   getNgramFrequency,
   getNgramPatterns,

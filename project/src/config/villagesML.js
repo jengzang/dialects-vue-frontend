@@ -34,7 +34,10 @@ export const SEMANTIC_CATEGORY_NAMES = {
   'settlement': '聚落',
   'symbolic': '象徵',
   'vegetation': '植物',
-  'water': '水系'
+  'water': '水系',
+  'terrain': '地形',
+  'modifier':'修飾語',
+  'head':'中心詞'
 }
 
 /**

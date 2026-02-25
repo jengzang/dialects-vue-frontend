@@ -93,6 +93,58 @@ export async function getSpatialIntegrationByChar(char) {
 }
 
 /**
+ * 獲取所有可用字符列表及統計信息
+ * @param {string} [run_id] - 整合分析運行ID，留空使用活躍版本
+ * @returns {Promise<Object>} {
+ *   run_id: string,
+ *   total_characters: number,
+ *   characters: [{
+ *     character: string,
+ *     category: string,
+ *     total_clusters: number,
+ *     total_villages: number,
+ *     avg_tendency: number,
+ *     avg_spatial_coherence: number,
+ *     significant_clusters: number
+ *   }, ...]
+ * }
+ */
+export async function getSpatialIntegrationAvailableCharacters(run_id) {
+  const qs = run_id ? `?run_id=${run_id}` : ''
+  return api(`/api/villages/spatial/integration/available-characters${qs}`)
+}
+
+/**
+ * 獲取聚類列表及其地區信息（整合分析版本）
+ * @param {Object} [params]
+ * @param {string} [params.run_id] - 整合分析運行ID，留空使用活躍版本
+ * @param {number} [params.min_cluster_size] - 最小聚類大小
+ * @returns {Promise<Object>} {
+ *   run_id: string,
+ *   total_clusters: number,
+ *   clusters: [{
+ *     cluster_id: number,
+ *     cluster_size: number,
+ *     dominant_city: string,
+ *     dominant_county: string,
+ *     centroid_lon: number,
+ *     centroid_lat: number,
+ *     total_characters: number,
+ *     avg_tendency: number,
+ *     avg_spatial_coherence: number,
+ *     significant_characters: number
+ *   }, ...]
+ * }
+ */
+export async function getSpatialIntegrationClusterList(params = {}) {
+  const queryParams = new URLSearchParams()
+  if (params.run_id) queryParams.append('run_id', params.run_id)
+  if (params.min_cluster_size) queryParams.append('min_cluster_size', params.min_cluster_size)
+  const qs = queryParams.toString()
+  return api(`/api/villages/spatial/integration/clusterlist${qs ? '?' + qs : ''}`)
+}
+
+/**
  * 獲取聚類的空間整合數據
  * @param {number} clusterId - 聚類ID
  * @returns {Promise<Object>} { cluster_id: number, villages: [], tendency: [], characteristics: {} }

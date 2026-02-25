@@ -32,14 +32,16 @@
       <!-- Overview Mode -->
       <div v-if="queryMode === 'overview'" class="overview-section">
         <div class="query-form glass-panel">
-          <h3>空間整合查詢</h3>
-          <p class="query-note">查詢所有字符-聚類整合數據</p>
+          <div class="query-header">
+            <h3>空間整合查詢</h3>
+            <p class="query-note">查詢統計顯著的字符-聚類整合數據</p>
+          </div>
           <button
             class="query-button"
             :disabled="loadingIntegration"
             @click="loadIntegration"
           >
-            查詢
+            查詢顯著
           </button>
         </div>
 
@@ -62,7 +64,7 @@
                 <div class="stat-value">{{ uniqueClusters.length }}</div>
               </div>
               <div class="stat-card">
-                <div class="stat-label">總記錄數</div>
+                <div class="stat-label">顯著記錄數</div>
                 <div class="stat-value">{{ integrationData.length }}</div>
               </div>
             </div>
@@ -130,16 +132,35 @@
       <div v-if="queryMode === 'by-char'" class="by-char-section">
         <div class="query-form glass-panel">
           <h3>按字符查詢空間分佈</h3>
-          <div class="form-group">
-            <label>字符:</label>
-            <input
+
+          <!-- Load Characters Button -->
+          <button
+            v-if="availableCharacters.length === 0"
+            class="load-clusters-button"
+            :disabled="loadingCharacters"
+            @click="loadCharacters"
+          >
+            {{ loadingCharacters ? '加載中...' : '加載字符列表' }}
+          </button>
+
+          <!-- Character Selector -->
+          <div v-else class="form-group">
+            <label>選擇字符:</label>
+            <select
               v-model="queryChar"
-              type="text"
-              maxlength="1"
-              placeholder="輸入單個字符"
-              class="char-input"
-            />
+              class="select-input"
+            >
+              <option value="">請選擇字符</option>
+              <option
+                v-for="char in availableCharacters"
+                :key="char.character"
+                :value="char.character"
+              >
+                {{ char.character }} - {{ getCategoryName(char.category) }} ({{ char.total_villages }}村, {{ char.total_clusters }}聚類)
+              </option>
+            </select>
           </div>
+
           <button
             class="query-button"
             :disabled="!queryChar || loadingByChar"
@@ -198,16 +219,35 @@
       <div v-if="queryMode === 'by-cluster'" class="by-cluster-section">
         <div class="query-form glass-panel">
           <h3>按聚類查詢</h3>
-          <div class="form-group">
-            <label>聚類ID:</label>
-            <input
-              v-model.number="clusterId"
-              type="number"
-              min="1"
-              placeholder="輸入聚類ID"
-              class="number-input"
-            />
+
+          <!-- Load Clusters Button -->
+          <button
+            v-if="availableClusters.length === 0"
+            class="load-clusters-button"
+            :disabled="loadingClusters"
+            @click="loadClusters"
+          >
+            {{ loadingClusters ? '加載中...' : '加載聚類列表' }}
+          </button>
+
+          <!-- Cluster Selector -->
+          <div v-else class="form-group">
+            <label>選擇聚類:</label>
+            <select
+              v-model="clusterId"
+              class="select-input"
+            >
+              <option :value="null">請選擇聚類</option>
+              <option
+                v-for="cluster in availableClusters"
+                :key="cluster.cluster_id"
+                :value="cluster.cluster_id"
+              >
+                聚類 #{{ cluster.cluster_id }} - {{ cluster.dominant_city }}{{ cluster.dominant_county }} ({{ cluster.cluster_size }}村, {{ cluster.total_characters }}字符)
+              </option>
+            </select>
           </div>
+
           <button
             class="query-button"
             :disabled="!clusterId || loadingByCluster"
@@ -270,19 +310,48 @@
           <!-- Character Tendency List -->
           <div v-if="clusterData.characters" class="villages-section glass-panel">
             <h3>字符傾向性 ({{ clusterData.characters.length }})</h3>
-            <div class="characters-list">
-              <div
-                v-for="char in clusterData.characters.slice(0, 50)"
-                :key="char.character"
-                class="character-item"
-                :class="{ 'significant': char.is_significant }"
-              >
-                <span class="char-name">{{ char.character }}</span>
-                <span class="char-tendency" :style="{ color: getTendencyColor(char.cluster_tendency_mean) }">
-                  {{ char.cluster_tendency_mean?.toFixed(3) || 'N/A' }}
-                </span>
-                <span class="char-villages">{{ char.n_villages_with_char }} 村</span>
-                <span v-if="char.is_significant" class="char-badge">✨ 顯著</span>
+            <div class="characters-table">
+              <div class="char-table-header">
+                <div>字符</div>
+                <div>類別</div>
+                <div>聚類傾向</div>
+                <div>全局傾向</div>
+                <div>傾向偏差</div>
+                <div>村莊數</div>
+                <div>空間一致性</div>
+                <div>空間特異性</div>
+                <div>p值</div>
+                <div>顯著性</div>
+              </div>
+              <div class="char-table-body">
+                <div
+                  v-for="char in clusterData.characters.slice(0, 50)"
+                  :key="char.character"
+                  class="char-table-row"
+                  :class="{ 'significant': char.is_significant }"
+                >
+                  <div class="char-name">{{ char.character }}</div>
+                  <div>
+                    <span class="category-badge-small">{{ getCategoryName(char.character_category) }}</span>
+                  </div>
+                  <div class="char-tendency" :style="{ color: getTendencyColor(char.cluster_tendency_mean) }">
+                    {{ char.cluster_tendency_mean?.toFixed(3) || 'N/A' }}
+                  </div>
+                  <div class="char-tendency">
+                    {{ char.global_tendency_mean?.toFixed(3) || 'N/A' }}
+                  </div>
+                  <div class="char-deviation" :style="{ color: getDeviationColor(char.tendency_deviation) }">
+                    {{ char.tendency_deviation >= 0 ? '+' : '' }}{{ char.tendency_deviation?.toFixed(3) || 'N/A' }}
+                  </div>
+                  <div class="char-villages">{{ char.n_villages_with_char }}</div>
+                  <div>{{ char.spatial_coherence?.toFixed(3) || 'N/A' }}</div>
+                  <div>{{ char.spatial_specificity?.toFixed(2) || 'N/A' }}</div>
+                  <div class="char-pvalue">{{ char.p_value?.toExponential(2) || 'N/A' }}</div>
+                  <div>
+                    <span v-if="char.is_significant" class="char-badge">✨ 顯著</span>
+                    <span v-else class="not-significant">-</span>
+                  </div>
+                </div>
               </div>
             </div>
             <div v-if="clusterData.characters.length > 50" class="more-info">
@@ -332,7 +401,9 @@ import {
   getSpatialIntegration,
   getSpatialIntegrationByChar,
   getSpatialIntegrationByCluster,
-  getSpatialIntegrationSummary
+  getSpatialIntegrationSummary,
+  getSpatialIntegrationAvailableCharacters,
+  getSpatialIntegrationClusterList
 } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
 import { getCategoryName } from '@/config/villagesML.js'
@@ -346,11 +417,15 @@ const integrationData = ref(null)
 const charData = ref(null)
 const clusterData = ref(null)
 const summary = ref(null)
+const availableClusters = ref([])
+const availableCharacters = ref([])
 
 const loadingIntegration = ref(false)
 const loadingByChar = ref(false)
 const loadingByCluster = ref(false)
 const loadingSummary = ref(false)
+const loadingClusters = ref(false)
+const loadingCharacters = ref(false)
 
 // Computed properties
 const uniqueCharacters = computed(() => {
@@ -487,7 +562,10 @@ const clusterMapLayers = computed(() => {
 const loadIntegration = async () => {
   loadingIntegration.value = true
   try {
-    integrationData.value = await getSpatialIntegration({ limit: 1000 })
+    integrationData.value = await getSpatialIntegration({
+      is_significant: true,
+      limit: 1000
+    })
   } catch (error) {
     showError('加載整合數據失敗')
   } finally {
@@ -518,6 +596,33 @@ const loadByCluster = async () => {
     showError('加載聚類數據失敗')
   } finally {
     loadingByCluster.value = false
+  }
+}
+
+const loadClusters = async () => {
+  loadingClusters.value = true
+  try {
+    const response = await getSpatialIntegrationClusterList()
+    availableClusters.value = response.clusters
+    // 已经按聚类大小降序排序，无需再排序
+  } catch (error) {
+    showError('加載聚類列表失敗')
+  } finally {
+    loadingClusters.value = false
+  }
+}
+
+const loadCharacters = async () => {
+  loadingCharacters.value = true
+  try {
+    const response = await getSpatialIntegrationAvailableCharacters()
+    availableCharacters.value = response.characters
+    // 按村庄数量降序排序
+    availableCharacters.value.sort((a, b) => b.total_villages - a.total_villages)
+  } catch (error) {
+    showError('加載字符列表失敗')
+  } finally {
+    loadingCharacters.value = false
   }
 }
 
@@ -553,6 +658,17 @@ const getTendencyColor = (tendency) => {
   if (tendency > -0.5) return '#ff6b6b'  // 浅红色
   if (tendency > -1) return '#e74c3c'  // 红色
   return '#c0392b'  // 深红色（低倾向性）
+}
+
+// 根据偏差值返回颜色
+const getDeviationColor = (deviation) => {
+  if (!deviation) return '#666'
+  if (deviation > 0.5) return '#228B22'  // 深绿色（正偏差）
+  if (deviation > 0.2) return '#50c878'  // 绿色
+  if (deviation > 0) return '#90EE90'  // 浅绿色
+  if (deviation > -0.2) return '#ff6b6b'  // 浅红色
+  if (deviation > -0.5) return '#e74c3c'  // 红色
+  return '#c0392b'  // 深红色（负偏差）
 }
 </script>
 
@@ -611,17 +727,24 @@ const getTendencyColor = (tendency) => {
   margin-bottom: 16px;
 }
 
+.query-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
 .query-form h3 {
   font-size: 16px;
-  margin-bottom: 12px;
+  margin: 0;
   color: var(--text-primary);
 }
 
 .query-note {
   font-size: 13px;
   color: var(--text-secondary);
-  margin-bottom: 12px;
-  padding: 8px;
+  margin: 0;
+  padding: 4px 12px;
   background: rgba(74, 144, 226, 0.05);
   border-radius: 6px;
 }
@@ -651,6 +774,17 @@ const getTendencyColor = (tendency) => {
   background: rgba(255, 255, 255, 0.5);
 }
 
+.select-input {
+  cursor: pointer;
+  width: 100%;
+}
+
+.select-input option {
+  background: white;
+  color: var(--text-primary);
+  padding: 8px;
+}
+
 .char-input {
   font-size: 20px;
   text-align: center;
@@ -666,7 +800,8 @@ const getTendencyColor = (tendency) => {
 }
 
 .query-button,
-.load-button {
+.load-button,
+.load-clusters-button {
   width: 100%;
   padding: 10px 20px;
   background: var(--color-primary);
@@ -680,13 +815,19 @@ const getTendencyColor = (tendency) => {
   margin-top: 8px;
 }
 
+.load-clusters-button {
+  background: rgba(74, 144, 226, 0.8);
+}
+
 .query-button:hover:not(:disabled),
-.load-button:hover:not(:disabled) {
+.load-button:hover:not(:disabled),
+.load-clusters-button:hover:not(:disabled) {
   background: #3a7bc8;
 }
 
 .query-button:disabled,
-.load-button:disabled {
+.load-button:disabled,
+.load-clusters-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -877,25 +1018,98 @@ const getTendencyColor = (tendency) => {
   overflow-y: auto;
 }
 
+.characters-table {
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.char-table-header {
+  display: grid;
+  grid-template-columns: 50px 80px 85px 85px 85px 70px 90px 90px 100px 80px;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(74, 144, 226, 0.2);
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 13px;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: center;
+}
+
+.char-table-header > div {
+  text-align: center;
+}
+
+.char-table-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.char-table-row {
+  display: grid;
+  grid-template-columns: 50px 80px 85px 85px 85px 70px 90px 90px 100px 80px;
+  gap: 12px;
+  padding: 10px 12px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 13px;
+  transition: background 0.3s ease;
+  text-align: center;
+}
+
+.char-table-row > div {
+  text-align: center;
+}
+
+.char-table-row:hover {
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.char-table-row.significant {
+  background: rgba(255, 215, 0, 0.1);
+  border-left: 3px solid #FFD700;
+}
+
 .char-name {
   font-size: 18px;
   font-weight: 700;
   color: var(--text-primary);
-  min-width: 40px;
+}
+
+.category-badge-small {
+  display: inline-block;
+  padding: 3px 8px;
+  background: rgba(74, 144, 226, 0.15);
+  color: var(--color-primary);
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .char-tendency {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  min-width: 60px;
-  text-align: right;
+}
+
+.char-deviation {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.char-pvalue {
+  font-size: 11px;
+  color: var(--text-secondary);
 }
 
 .char-villages {
   font-size: 13px;
   color: var(--text-secondary);
-  min-width: 60px;
-  text-align: right;
 }
 
 .char-badge {
@@ -987,9 +1201,9 @@ const getTendencyColor = (tendency) => {
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: auto auto auto auto auto auto auto auto;
-  gap: 16px;
-  padding: 12px 16px;
+  grid-template-columns: 50px 80px 70px 75px 75px 75px 70px 70px 85px 85px 85px 70px 85px 85px;
+  gap: 12px;
+  padding: 10px 12px;
   align-items: center;
   font-size: 13px;
 }
@@ -999,16 +1213,74 @@ const getTendencyColor = (tendency) => {
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
+  text-align: center;
+}
+
+.table-header > div {
+  text-align: center;
 }
 
 .table-row {
   background: rgba(255, 255, 255, 0.3);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: background 0.3s ease;
+  text-align: center;
+}
+
+.table-row > div {
+  text-align: center;
 }
 
 .table-row:hover {
   background: rgba(74, 144, 226, 0.1);
+}
+
+.table-row:hover {
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.table-row.significant-row {
+  background: rgba(255, 215, 0, 0.1);
+  border-left: 3px solid #FFD700;
+}
+
+.char-cell {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tendency-cell {
+  font-weight: 600;
+}
+
+.deviation-cell {
+  font-weight: 600;
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(74, 144, 226, 0.15);
+  color: var(--color-primary);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.significant-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(255, 215, 0, 0.2);
+  color: #c87f0a;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.not-significant {
+  color: var(--text-secondary);
+  font-size: 12px;
 }
 
 /* 移动端横向滚动样式 */

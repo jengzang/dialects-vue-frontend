@@ -77,7 +77,9 @@ export {
   getSpatialIntegration,
   getSpatialIntegrationByChar,
   getSpatialIntegrationByCluster,
-  getSpatialIntegrationSummary
+  getSpatialIntegrationSummary,
+  getSpatialIntegrationAvailableCharacters,
+  getSpatialIntegrationClusterList
 } from './spatial.js'
 
 // N-grams
