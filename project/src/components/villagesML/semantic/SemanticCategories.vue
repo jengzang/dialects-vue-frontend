@@ -94,61 +94,59 @@
         </div>
       </div>
 
-      <!-- Category Tendency -->
+      <!-- Category Regional Ranking -->
       <div ref="tendencySection" class="tendency-section glass-panel">
-        <div class="section-header">
-          <h3>
-            <span v-if="selectedCategory">{{ getCategoryName(selectedCategory.category) }} - </span>
-            區域傾向性
-          </h3>
-          <button v-if="selectedCategory" class="close-button" @click="selectedCategory = null">✕</button>
+        <div class="section-header-centered" v-if="selectedCategory">
+          <div class="category-title-card">
+            <span class="category-icon-large">{{ getCategoryIcon(selectedCategory.category) }}</span>
+            <h3 class="category-title-large">{{ getCategoryName(selectedCategory.category) }}</h3>
+            <span class="category-separator">-</span>
+            <p class="category-subtitle">區域排行</p>
+          </div>
+          <button class="close-button" @click="selectedCategory = null">✕</button>
         </div>
 
         <!-- Prompt when no category selected -->
         <div v-if="!selectedCategory" class="prompt-message">
           <span class="prompt-icon">👆</span>
-          <p>請點擊上方的類別卡片以查看該類別的區域傾向性分析</p>
+          <p>請點擊上方的類別卡片以查看該類別在不同區域的排行</p>
         </div>
 
         <!-- Content when category selected -->
         <template v-else>
-          <div class="region-selector">
-            <FilterableSelect
-              v-model="tendencyRegionName"
-              :level="tendencyRegionLevel"
-              @update:level="(newLevel) => tendencyRegionLevel = newLevel"
-              @update:hierarchy="(h) => tendencyHierarchy = h"
-              placeholder="請選擇或輸入"
-            />
-            <button
-              class="query-button"
-              :disabled="!tendencyRegionName || loadingTendency"
-              @click="loadCategoryTendency"
-            >
-              查詢
-            </button>
+          <div class="level-selector">
+            <label>行政級別：</label>
+            <select v-model="rankingLevel" class="select-input" @change="loadCategoryRanking">
+              <option value="city">市級</option>
+              <option value="county">區縣級</option>
+              <option value="township">鄉鎮級</option>
+            </select>
           </div>
-          <div v-if="loadingTendency" class="loading-state">
+          <div v-if="loadingRanking" class="loading-state">
             <div class="spinner"></div>
           </div>
-          <div v-else-if="categoryTendency.length > 0" class="tendency-results">
+          <div v-else-if="categoryRanking.length > 0" class="ranking-results">
+            <div class="ranking-header">
+              <div class="col-rank">排名</div>
+              <div class="col-region">區域</div>
+              <div class="col-index">語義指數</div>
+              <div class="col-normalized">標準化指數</div>
+              <div class="col-villages">村莊數</div>
+            </div>
             <div
-              v-for="item in categoryTendency"
-              :key="item.category"
-              class="tendency-item"
+              v-for="(item, index) in categoryRanking"
+              :key="index"
+              class="ranking-item"
             >
-              <div class="tendency-category">{{ getCategoryName(item.category) }}</div>
-              <div class="tendency-bar">
-                <div
-                  class="tendency-fill"
-                  :style="{
-                    width: `${Math.abs(item.z_score) * 10}%`,
-                    background: item.z_score >= 0 ? 'var(--color-primary)' : '#e74c3c'
-                  }"
-                ></div>
+              <div class="col-rank">
+                <span class="rank-badge" :class="getRankClass(index + 1)">
+                  #{{ index + 1 }}
+                </span>
               </div>
-              <div class="tendency-value">Z: {{ item.z_score.toFixed(2) }}</div>
-              <div class="tendency-freq">Lift: {{ item.lift.toFixed(4) }}</div>
+              <div class="col-region">{{ item.region_name }}</div>
+              <div class="col-index">{{ item.semantic_index?.toFixed(2) || 'N/A' }}</div>
+              <div class="col-normalized">{{ item.normalized_index?.toFixed(2) || 'N/A' }}</div>
+              <div class="col-villages">{{ item.village_count || 'N/A' }}</div>
             </div>
           </div>
         </template>
@@ -228,14 +226,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
 import FilterableSelect from '@/components/common/FilterableSelect.vue'
 import {
   getSemanticCategoryList,
-  getSemanticCategoryTendency,
   getSemanticVTFGlobal,
   getSemanticVTFRegional,
+  getSemanticIndices,
   getSemanticLabelsByCategory,
   getSemanticLabelsByChar
 } from '@/api/index.js'
@@ -252,21 +250,19 @@ const selectedCategory = ref(null)
 const tendencySection = ref(null)
 const vtfGlobal = ref([])
 const vtfRegional = ref([])
-const categoryTendency = ref([])
+const categoryRanking = ref([])
 const labels = ref([])
 
 const loadingCategories = ref(false)
 const loadingVTFGlobal = ref(false)
 const loadingVTFRegional = ref(false)
-const loadingTendency = ref(false)
+const loadingRanking = ref(false)
 const loadingLabels = ref(false)
 
 const regionLevel = ref('city')
 const regionName = ref('')
 const regionHierarchy = ref({ city: null, county: null, township: null })
-const tendencyRegionLevel = ref('city')
-const tendencyRegionName = ref('')
-const tendencyHierarchy = ref({ city: null, county: null, township: null })
+const rankingLevel = ref('city')
 
 const labelsMode = ref('by-category')
 const selectedCategoryForLabels = ref('')
@@ -303,6 +299,8 @@ const selectCategory = async (category) => {
   if (tendencySection.value) {
     tendencySection.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
+  // Auto load ranking when category is selected
+  loadCategoryRanking()
 }
 
 const loadCategories = async () => {
@@ -343,20 +341,28 @@ const loadVTFRegional = async () => {
   }
 }
 
-const loadCategoryTendency = async () => {
-  if (!tendencyRegionName.value) return
+const loadCategoryRanking = async () => {
+  if (!selectedCategory.value) return
 
-  loadingTendency.value = true
+  loadingRanking.value = true
   try {
-    categoryTendency.value = await getSemanticCategoryTendency({
-      region_level: tendencyRegionLevel.value,
-      ...tendencyHierarchy.value
+    categoryRanking.value = await getSemanticIndices({
+      category: selectedCategory.value.category,
+      region_level: rankingLevel.value,
+      limit: 50
     })
   } catch (error) {
-    showError('加載傾向性失敗')
+    showError('加載排行失敗')
   } finally {
-    loadingTendency.value = false
+    loadingRanking.value = false
   }
+}
+
+const getRankClass = (rank) => {
+  if (rank === 1) return 'rank-gold'
+  if (rank === 2) return 'rank-silver'
+  if (rank === 3) return 'rank-bronze'
+  return 'rank-normal'
 }
 
 const loadLabelsByCategory = async () => {
@@ -704,6 +710,58 @@ onMounted(() => {
 
 .tendency-section {
   padding: 16px;
+  margin-bottom: 16px;
+}
+
+.section-header-centered {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.category-title-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.15), rgba(80, 200, 120, 0.15));
+  border-radius: 12px;
+  border: 2px solid rgba(74, 144, 226, 0.3);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+}
+
+.category-icon-large {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.category-title-large {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.category-separator {
+  font-size: 18px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.category-subtitle {
+  font-size: 16px;
+  color: var(--text-dark);
+  margin: 0;
+  font-weight: 500;
+}
+
+.section-header-centered .close-button {
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .section-header {
@@ -739,9 +797,16 @@ onMounted(() => {
   transform: scale(1.1);
 }
 
-.tendency-section h3 {
-  font-size: 16px;
+.level-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 16px;
+}
+
+.level-selector label {
+  font-size: 14px;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
@@ -776,47 +841,83 @@ onMounted(() => {
   color: var(--text-secondary);
 }
 
-.tendency-results {
+.ranking-results {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
-.tendency-item {
+.ranking-header,
+.ranking-item {
   display: grid;
-  grid-template-columns: 100px 1fr 100px 120px;
+  grid-template-columns: 80px 2fr 1fr 1.2fr 1fr;
+  gap: 12px;
+  padding: 12px 16px;
   align-items: center;
-  gap: 6px;
-  padding: 6px;
+}
+
+.ranking-header {
+  background: rgba(74, 144, 226, 0.2);
+  font-weight: 600;
+  color: var(--text-primary);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.ranking-item {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 8px;
+  transition: background 0.3s ease;
 }
 
-.tendency-category {
+.ranking-item:hover {
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.col-rank {
+  text-align: center;
+}
+
+.rank-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.rank-gold {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #8b6914;
+}
+
+.rank-silver {
+  background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+  color: #5a5a5a;
+}
+
+.rank-bronze {
+  background: linear-gradient(135deg, #cd7f32, #e8a87c);
+  color: #6b3e1a;
+}
+
+.rank-normal {
+  background: rgba(74, 144, 226, 0.15);
+  color: var(--color-primary);
+}
+
+.col-region {
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.tendency-bar {
-  height: 24px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.tendency-fill {
-  height: 100%;
-  transition: width 0.5s ease;
-}
-
-.tendency-value {
-  font-size: 14px;
+.col-index,
+.col-normalized {
   font-weight: 600;
   color: var(--color-primary);
 }
 
-.tendency-freq {
-  font-size: 13px;
+.col-villages {
   color: var(--text-secondary);
 }
 

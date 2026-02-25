@@ -59,61 +59,61 @@ export const SEMANTIC_CATEGORY_DESCRIPTIONS = {
  */
 export const SEMANTIC_SUBCATEGORY_NAMES = {
   // 數字類
-  'number_small': '小數字',
-  'number_large': '大數字',
-  'number_ordinal': '序數',
+  'number_small': '小數',          // 一二三四五
+  'number_large': '大數',          // 六七八九十
+  'number_ordinal': '序數',        // 初、第、老
 
   // 方位類
-  'direction_vertical': '垂直方向',
-  'direction_cardinal': '基本方向',
-  'direction_inside': '內部方向',
-  'direction_outside': '外部方向',
-  'direction_opening': '開口方向',
-  'direction_horizontal': '水平方向',
-  'direction_center': '中心方向',
-  'direction_end': '末端方向',
+  'direction_vertical': '上下',         // 上、下、低
+  'direction_cardinal': '東南西北',      // 東、北、南、西
+  'direction_inside': '內部',           // 中、內、裡
+  'direction_outside': '外側',          // 側、外、旁、邊
+  'direction_opening': '關口',          // 關、口、門
+  'direction_horizontal': '前後左右',    // 前、右、後、左
+  'direction_center': '中央',           // 央、心
+  'direction_end': '端點',             // 頭、尾、端、角
 
-  // 象徵類
-  'symbolic_virtue': '美德象徵',
-  'symbolic_religion': '宗教象徵',
-  'symbolic_light': '光明象徵',
-  'symbolic_prosperity': '繁榮象徵',
-  'symbolic_animal': '動物象徵',
-  'symbolic_fortune': '吉祥象徵',
-  'symbolic_peace': '和平象徵',
-  'symbolic_treasure': '寶物象徵',
+  // 象徵類（去掉"象徵"後綴）
+  'symbolic_virtue': '美德',           // 義、仁、信、聖、德、文、智、禮、賢
+  'symbolic_religion': '宗教',         // 仙、佛、堂、宮、寺、廟、靈、神、觀
+  'symbolic_light': '光明',            // 光、明、朗、耀、輝
+  'symbolic_prosperity': '繁榮',       // 興、華、富、昌、盛、榮、貴
+  'symbolic_animal': '瑞獸',           // 鳳、虎、鶴、鹿、麟、龍、龜
+  'symbolic_fortune': '吉祥',          // 吉、喜、壽、瑞、祥、祿、福
+  'symbolic_peace': '平安',            // 和、寧、安、康、泰
+  'symbolic_treasure': '珍寶',         // 寶、玉、珍
 
   // 水系類
-  'water_spring': '泉水',
-  'water_stream': '溪流',
-  'water_pond': '池塘',
-  'water_island': '島嶼',
-  'water_shore': '岸邊',
-  'water_river': '河流',
-  'water_beach': '沙灘',
-  'water_lake': '湖泊',
-  'water_port': '港津',
-  'water_bay': '海灣',
+  'water_spring': '泉井',              // 井、泉
+  'water_stream': '溪流',              // 圳、溝、瀝、湧
+  'water_pond': '池塘',                // 塘、池、泊、澱、潭
+  'water_island': '島嶼',              // 嶼、島、洲
+  'water_shore': '岸濱',               // 岸、汀、沿、渚、濱
+  'water_river': '江河',               // 川、江、河、澗、溪
+  'water_beach': '灘塗',               // 灘、沙
+  'water_lake': '湖泊',                // 湖、澤、窪
+  'water_port': '港津',                // 港、津、埠
+  'water_bay': '海灣',                 // 灣、浦、滘、濠
 
   // 基建類
-  'infrastructure_station': '驛站',
-  'infrastructure_port': '港口',
-  'infrastructure_road': '道路',
-  'infrastructure_bridge': '橋樑',
+  'infrastructure_station': '驛站',     // 亭、站、驛
+  'infrastructure_port': '碼頭',        // 埠、渡、碼
+  'infrastructure_road': '道路',        // 巷、街、路、道
+  'infrastructure_bridge': '橋樑',      // 橋
   'infrastructure_transport': '交通',
 
   // 時間類
-  'time': '時間',
+  'time': '時令',                      // 今、冬、古、夏、新、舊、春、晚、朝、秋
 
-  // 農業類
-  'agriculture_storage': '農業倉儲',
-  'agriculture_activity': '農業活動',
-  'agriculture_garden': '園圃',
-  'agriculture_field': '田地',
-  'agriculture_irrigation': '灌溉',
-  'agriculture_crop': '農作物',
+  // 農業類（簡化）
+  'agriculture_storage': '倉廩',        // 倉、廩
+  'agriculture_activity': '農牧',       // 農、牧、畜、耕
+  'agriculture_garden': '園圃',         // 園、圃、場
+  'agriculture_field': '田地',          // 地、田、畔、畬、疇
+  'agriculture_irrigation': '堤壩',     // 壩、堤、渠
+  'agriculture_crop': '作物',           // 稻、禾、麥等
 
-  // 宗族類
+  // 宗族類（保持）
   'clan_he': '何姓',
   'clan_other': '其他姓氏',
   'clan_liu': '劉姓',
@@ -126,41 +126,41 @@ export const SEMANTIC_SUBCATEGORY_NAMES = {
   'clan_huang': '黃姓',
 
   // 山地類
-  'mountain_slope': '山坡',
-  'mountain_plateau': '高原平台',
-  'mountain_valley': '山谷',
-  'mountain_rock': '岩石',
-  'mountain_peak': '山峰',
-  'mountain_ridge': '山脊',
+  'mountain_slope': '坡崗',            // 岡、坎、坡、坳、崗
+  'mountain_plateau': '台坪',          // 台、坪、塱
+  'mountain_valley': '山谷',           // 坑、峒、峽、峪
+  'mountain_rock': '岩石',             // 壁、岩、崖、石
+  'mountain_peak': '山峰',             // 山、嶺、峰、巔、頂
+  'mountain_ridge': '山脊',            // 岐、巒、嶂、脊
 
   // 聚落類
-  'settlement_district': '區域聚落',
-  'settlement_market': '市集',
-  'settlement_fort': '城堡',
-  'settlement_village': '村莊',
-  'settlement_building': '建築',
-  'settlement_group': '聚落群組',
+  'settlement_district': '圍坊',        // 圍、坊
+  'settlement_market': '圩市',          // 圩、墟、市、集
+  'settlement_fort': '城寨',            // 城、堡、寨
+  'settlement_village': '村莊',          // 塆、屯、莊、村
+  'settlement_building': '宅屋',        // 宅、屋、樓、祠
+  'settlement_group': '片區',           // 片、群、帶
 
   // 形狀類
-  'shape': '形狀',
+  'shape': '形狀',                     // 圓、尖、平、扁、方、曲、直
 
-  // 尺寸類
-  'size_large': '大尺寸',
-  'size_small': '小尺寸',
-  'size_short': '短小',
-  'size_long': '長遠',
+  // 尺寸類（簡化）
+  'size_large': '大',                  // 大、寬、巨、廣
+  'size_small': '小',                  // 小、微、細
+  'size_short': '短',                  // 短
+  'size_long': '長',                   // 長
 
   // 植物類
-  'vegetation_forest': '森林',
-  'vegetation_pine': '松柏',
-  'vegetation_fruit': '果樹',
-  'vegetation_other': '其他植物',
-  'vegetation_bamboo': '竹類',
-  'vegetation_flower': '花卉',
-  'vegetation_tea': '茶',
+  'vegetation_forest': '林木',          // 林、森、樹、木
+  'vegetation_pine': '松柏',            // 松、柏
+  'vegetation_fruit': '果樹',           // 果、梅、桃、李等
+  'vegetation_other': '雜木',           // 其他植物
+  'vegetation_bamboo': '竹',            // 竹
+  'vegetation_flower': '花卉',          // 花、菊、蓮等
+  'vegetation_tea': '茶',               // 茶
 
   // 顏色類
-  'color': '顏色'
+  'color': '顏色'                      // 青、赤、黃、白、黑等
 }
 
 /**
@@ -731,6 +731,18 @@ export const VILLAGESML_MODULES = [
         label: '特徵向量',
         icon: '📐',
         path: '/villagesML?module=regional&subtab=vectors',
+        weight: 1,
+        mobileWeight: 1,
+        fontSize: 0.95,
+        mobileFontSize: 0.9,
+        hideOnMobile: false,
+        hideLabelOnMobile: true
+      },
+      {
+        id: 'tendency',
+        label: '類別傾向性',
+        icon: '📊',
+        path: '/villagesML?module=regional&subtab=tendency',
         weight: 1,
         mobileWeight: 1,
         fontSize: 0.95,

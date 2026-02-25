@@ -198,6 +198,7 @@ const NgramStats = defineAsyncComponent(() => import('@/components/villagesML/pa
 const StructuralPatterns = defineAsyncComponent(() => import('@/components/villagesML/pattern/StructuralPatterns.vue'))
 const RegionalAggregates = defineAsyncComponent(() => import('@/components/villagesML/regional/RegionalAggregates.vue'))
 const RegionalVectors = defineAsyncComponent(() => import('@/components/villagesML/regional/RegionalVectors.vue'))
+const CategoryTendency = defineAsyncComponent(() => import('@/components/villagesML/regional/CategoryTendency.vue'))
 const FeatureExtraction = defineAsyncComponent(() => import('@/components/villagesML/ml/FeatureExtraction.vue'))
 const SubsetAnalysis = defineAsyncComponent(() => import('@/components/villagesML/ml/SubsetAnalysis.vue'))
 const CacheManagement = defineAsyncComponent(() => import('@/components/villagesML/system/CacheManagement.vue'))
@@ -261,6 +262,7 @@ const currentComponent = computed(() => {
       'pattern-structural': StructuralPatterns,
       'regional-aggregates': RegionalAggregates,
       'regional-vectors': RegionalVectors,
+      'regional-tendency': CategoryTendency,
       'compute-features': FeatureExtraction,
       'compute-subset': SubsetAnalysis,
       'compute-cache': CacheManagement

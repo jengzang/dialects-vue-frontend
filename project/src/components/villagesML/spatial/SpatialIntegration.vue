@@ -73,11 +73,17 @@
             <div class="integration-table">
               <div class="table-header">
                 <div>字符</div>
+                <div>類別</div>
                 <div>聚類ID</div>
-                <div>傾向均值</div>
+                <div>聚類傾向</div>
+                <div>全局傾向</div>
+                <div>傾向偏差</div>
                 <div>聚類大小</div>
                 <div>村莊數</div>
+                <div>平均距離</div>
                 <div>空間一致性</div>
+                <div>空間特異性</div>
+                <div>顯著性</div>
                 <div>主導城市</div>
                 <div>主導區縣</div>
               </div>
@@ -86,13 +92,31 @@
                   v-for="item in integrationData"
                   :key="item.id"
                   class="table-row"
+                  :class="{ 'significant-row': item.is_significant }"
                 >
-                  <div>{{ item.character }}</div>
+                  <div class="char-cell">{{ item.character }}</div>
+                  <div>
+                    <span class="category-badge">{{ getCategoryName(item.character_category) }}</span>
+                  </div>
                   <div>{{ item.cluster_id }}</div>
-                  <div>{{ item.cluster_tendency_mean?.toFixed(3) || 'N/A' }}</div>
+                  <div class="tendency-cell" :style="{ color: getTendencyColor(item.cluster_tendency_mean) }">
+                    {{ item.cluster_tendency_mean?.toFixed(3) || 'N/A' }}
+                  </div>
+                  <div class="tendency-cell">
+                    {{ item.global_tendency_mean?.toFixed(3) || 'N/A' }}
+                  </div>
+                  <div class="deviation-cell" :style="{ color: getDeviationColor(item.tendency_deviation) }">
+                    {{ item.tendency_deviation >= 0 ? '+' : '' }}{{ item.tendency_deviation?.toFixed(3) || 'N/A' }}
+                  </div>
                   <div>{{ item.cluster_size?.toLocaleString() || 'N/A' }}</div>
                   <div>{{ item.n_villages_with_char?.toLocaleString() || 'N/A' }}</div>
+                  <div>{{ item.avg_distance_km?.toFixed(1) || 'N/A' }} km</div>
                   <div>{{ item.spatial_coherence?.toFixed(3) || 'N/A' }}</div>
+                  <div>{{ item.spatial_specificity?.toFixed(3) || 'N/A' }}</div>
+                  <div>
+                    <span v-if="item.is_significant" class="significant-badge">✨ 顯著</span>
+                    <span v-else class="not-significant">-</span>
+                  </div>
                   <div>{{ item.dominant_city || 'N/A' }}</div>
                   <div>{{ item.dominant_county || 'N/A' }}</div>
                 </div>
@@ -311,6 +335,7 @@ import {
   getSpatialIntegrationSummary
 } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
+import { getCategoryName } from '@/config/villagesML.js'
 
 // State
 const queryMode = ref('overview')
