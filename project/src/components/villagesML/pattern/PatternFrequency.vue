@@ -20,32 +20,39 @@
       <!-- Controls -->
       <div class="controls">
         <!-- Regional Selection (only show when regional mode) -->
-        <FilterableSelect
-          v-if="queryMode === 'regional'"
-          v-model="regionName"
-          :level="regionLevel"
-          @update:level="(newLevel) => regionLevel = newLevel"
-          @update:hierarchy="(h) => regionHierarchy = h"
-          placeholder="請選擇或輸入區域"
-        />
+        <div v-if="queryMode === 'regional'" class="control-group">
+          <FilterableSelect
+            v-model="regionName"
+            :level="regionLevel"
+            @update:level="(newLevel) => regionLevel = newLevel"
+            @update:hierarchy="(h) => regionHierarchy = h"
+            placeholder="請選擇或輸入區域"
+          />
+        </div>
 
-        <input
-          v-model.number="topN"
-          type="number"
-          min="10"
-          :max="queryMode === 'global' ? 100 : 50"
-          placeholder="返回數量"
-          class="number-input"
-        />
+        <div class="control-group">
+          <label class="control-label">返回數量</label>
+          <input
+            v-model.number="topN"
+            type="number"
+            min="10"
+            :max="queryMode === 'global' ? 100 : 50"
+            class="number-input"
+          />
+        </div>
 
-        <input
-          v-if="queryMode === 'global'"
-          v-model.number="minCount"
-          type="number"
-          min="1"
-          placeholder="最小頻次"
-          class="number-input"
-        />
+        <div v-if="queryMode === 'global'" class="control-group">
+          <label class="control-label">最小佔比(%)</label>
+          <input
+            v-model.number="minPercentage"
+            type="number"
+            min="0.01"
+            max="100"
+            step="0.01"
+            placeholder="如: 1"
+            class="number-input"
+          />
+        </div>
 
         <button
           class="query-button"
@@ -74,19 +81,25 @@
             <div class="pattern-rank">{{ index + 1 }}</div>
             <div class="pattern-text">{{ pattern.pattern }}</div>
             <div class="pattern-stats">
-              <div class="stat-item">
-                <span class="stat-label">頻率:</span>
-                <span class="stat-value">{{ pattern.frequency }}</span>
+              <!-- 全局模式：显示村庄数 -->
+              <div v-if="queryMode === 'global'" class="stat-item">
+                <span class="stat-label">村莊數:</span>
+                <span class="stat-value">{{ pattern.village_count || 0 }}</span>
+              </div>
+              <!-- 区域模式：显示区域名称 -->
+              <div v-else class="stat-item">
+                <span class="stat-label">區域:</span>
+                <span class="stat-value region-name">{{ pattern.region_name || '-' }}</span>
               </div>
               <div class="stat-item">
-                <span class="stat-label">百分比:</span>
-                <span class="stat-value">{{ pattern.percentage != null ? pattern.percentage.toFixed(2) : '0.00' }}%</span>
+                <span class="stat-label">佔比:</span>
+                <span class="stat-value">{{ pattern.frequency != null ? (pattern.frequency * 100).toFixed(2) : '0.00' }}%</span>
               </div>
             </div>
             <div class="pattern-bar">
               <div
                 class="bar-fill"
-                :style="{ width: `${pattern.percentage != null ? (pattern.percentage / maxPercentage) * 100 : 0}%` }"
+                :style="{ width: `${pattern.frequency != null ? (pattern.frequency / maxFrequency) * 100 : 0}%` }"
               ></div>
             </div>
             <button class="action-button" @click="goToTendency(pattern.pattern)">
@@ -119,7 +132,7 @@ const loading = ref(false)
 
 // Global mode params
 const topN = ref(50)
-const minCount = ref(5)
+const minPercentage = ref(1.0) // 最小佔比百分比（如1表示1%，转换为0.01传给后端）
 
 // Regional mode params
 const regionLevel = ref('city')
@@ -127,9 +140,9 @@ const regionName = ref('')
 const regionHierarchy = ref({ city: null, county: null, township: null })
 
 // Computed
-const maxPercentage = computed(() => {
+const maxFrequency = computed(() => {
   if (patterns.value.length === 0) return 1
-  return Math.max(...patterns.value.map(item => item.percentage || 0))
+  return Math.max(...patterns.value.map(item => item.frequency || 0))
 })
 
 // Methods
@@ -137,10 +150,14 @@ const loadPatterns = async () => {
   loading.value = true
   try {
     if (queryMode.value === 'global') {
-      patterns.value = await getPatternFrequencyGlobal({
-        top_n: topN.value,
-        min_count: minCount.value
-      })
+      const params = {
+        top_k: topN.value
+      }
+      // 只有当用户输入了最小佔比时才传递该参数
+      if (minPercentage.value > 0) {
+        params.min_frequency = minPercentage.value / 100 // 将百分比转换为小数（如1% → 0.01）
+      }
+      patterns.value = await getPatternFrequencyGlobal(params)
     } else {
       if (!regionName.value) return
       patterns.value = await getPatternFrequencyRegional({
@@ -215,6 +232,20 @@ const goToTendency = (pattern) => {
   gap: 12px;
   margin-bottom: 16px;
   flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.control-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .number-input {
@@ -334,6 +365,12 @@ const goToTendency = (pattern) => {
   font-size: 16px;
   font-weight: 600;
   color: var(--color-primary);
+}
+
+.region-name {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 .pattern-bar {

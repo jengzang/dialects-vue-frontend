@@ -38,28 +38,25 @@
           >
             <div class="item-header">
               <span class="item-pattern">{{ item.pattern }}</span>
-              <span class="item-count">{{ item.count }} 個</span>
+              <div class="header-actions">
+                <span class="item-count">{{ item.frequency }} 次</span>
+                <button class="action-button-small" @click="goToTendency(item.pattern)">
+                  查看傾向性
+                </button>
+              </div>
             </div>
-            <div class="item-structure">
-              <span class="structure-label">結構:</span>
-              <span class="structure-value">{{ item.structure }}</span>
-            </div>
-            <div class="item-examples">
-              <span class="examples-label">示例:</span>
-              <div class="examples-tags">
-                <span
-                  v-for="(example, i) in item.examples?.slice(0, 5)"
-                  :key="i"
-                  class="example-tag"
-                  @click="goToFrequency(example)"
-                >
-                  {{ example }}
+            <div class="item-details">
+              <div class="item-structure">
+                <span class="structure-label">類型:</span>
+                <span class="structure-value">{{ item.pattern_type }}</span>
+              </div>
+              <div class="item-examples">
+                <span class="examples-label">示例:</span>
+                <span class="example-tag" @click="goToTendency(item.pattern)">
+                  {{ item.example }}
                 </span>
               </div>
             </div>
-            <button class="action-button" @click="goToFrequency(item.pattern)">
-              查看頻率分佈
-            </button>
           </div>
         </div>
       </div>
@@ -97,12 +94,14 @@ const loadStructuralAnalysis = async () => {
   }
 }
 
-const goToFrequency = (pattern) => {
+const goToTendency = (pattern) => {
+  // 去掉模式中的 X（通配符）
+  const cleanPattern = pattern.replace(/X/g, '')
   router.push({
     query: {
       ...route.query,
-      subtab: 'frequency',
-      pattern: pattern
+      subtab: 'tendency',
+      pattern: cleanPattern
     }
   })
 }
@@ -186,8 +185,8 @@ const goToFrequency = (pattern) => {
 }
 
 .structural-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 16px;
 }
 
@@ -215,6 +214,12 @@ const goToFrequency = (pattern) => {
   color: var(--text-primary);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .item-count {
   padding: 4px 12px;
   background: rgba(74, 144, 226, 0.2);
@@ -224,14 +229,23 @@ const goToFrequency = (pattern) => {
   font-weight: 500;
 }
 
-.item-structure {
+.item-details {
+  display: flex;
+  gap: 24px;
+  align-items: center;
   margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.item-structure {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 14px;
 }
 
 .structure-label {
   color: var(--text-secondary);
-  margin-right: 8px;
 }
 
 .structure-value {
@@ -241,9 +255,8 @@ const goToFrequency = (pattern) => {
 
 .item-examples {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
 }
 
 .examples-label {
@@ -272,20 +285,20 @@ const goToFrequency = (pattern) => {
   transform: translateY(-2px);
 }
 
-.action-button {
-  width: 100%;
-  padding: 8px 16px;
+.action-button-small {
+  padding: 6px 12px;
   background: rgba(74, 144, 226, 0.1);
   color: var(--color-primary);
   border: 1px solid rgba(74, 144, 226, 0.3);
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
-.action-button:hover {
+.action-button-small:hover {
   background: rgba(74, 144, 226, 0.2);
   border-color: var(--color-primary);
 }

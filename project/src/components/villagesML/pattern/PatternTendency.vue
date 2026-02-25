@@ -54,26 +54,26 @@
         <!-- Tendency Chart -->
         <div class="tendency-chart">
           <div
-            v-for="(item, index) in tendencyData.slice(0, 20)"
+            v-for="(item, index) in tendencyData"
             :key="index"
             class="tendency-item"
-            :class="getTendencyClass(item.z_score)"
+            :class="getTendencyClass(item.tendency_score)"
           >
             <div class="tendency-region">{{ item.region_name }}</div>
             <div class="tendency-bar">
               <div
                 class="tendency-fill"
                 :style="{
-                  width: `${Math.min(Math.abs(item.z_score) * 20, 100)}%`,
-                  background: getBarColor(item.z_score)
+                  width: `${Math.min(Math.abs(item.tendency_score) * 20, 100)}%`,
+                  background: getBarColor(item.tendency_score)
                 }"
               ></div>
             </div>
             <div class="tendency-value">
-              <span class="z-score" :style="{ color: getZScoreColor(item.z_score) }">
-                Z: {{ item.z_score != null ? item.z_score.toFixed(2) : 'N/A' }}
+              <span class="z-score" :style="{ color: getZScoreColor(item.tendency_score) }">
+                Z: {{ item.tendency_score != null ? item.tendency_score.toFixed(2) : 'N/A' }}
               </span>
-              <span class="frequency">({{ item.frequency }}次)</span>
+              <span class="frequency">({{ item.frequency != null ? (item.frequency * 100).toFixed(2) : '0.00' }}%)</span>
             </div>
           </div>
         </div>
@@ -83,7 +83,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { getPatternTendency } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
@@ -134,13 +134,17 @@ const getZScoreColor = (zScore) => {
   return 'var(--color-primary)'
 }
 
-// Initialize from URL query
-onMounted(() => {
-  if (route.query.pattern) {
-    tendencyPattern.value = route.query.pattern
-    loadPatternTendency()
-  }
-})
+// Initialize from URL query and watch for changes
+watch(
+  () => route.query.pattern,
+  (newPattern) => {
+    if (newPattern) {
+      tendencyPattern.value = newPattern
+      loadPatternTendency()
+    }
+  },
+  { immediate: true } // 立即执行一次
+)
 </script>
 
 <style scoped>
