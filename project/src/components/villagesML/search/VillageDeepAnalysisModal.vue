@@ -95,7 +95,8 @@ const props = defineProps({
   },
   village: {
     type: Object,
-    required: true
+    required: false,
+    default: null
   }
 })
 

@@ -462,7 +462,7 @@ const clusterMapLayers = computed(() => {
 const loadIntegration = async () => {
   loadingIntegration.value = true
   try {
-    integrationData.value = await getSpatialIntegration({ limit: 100 })
+    integrationData.value = await getSpatialIntegration({ limit: 1000 })
   } catch (error) {
     showError('加載整合數據失敗')
   } finally {

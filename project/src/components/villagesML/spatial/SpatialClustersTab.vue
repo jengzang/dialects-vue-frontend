@@ -77,6 +77,10 @@ import { ref, onMounted } from 'vue'
 import SpatialMap from './SpatialMap.vue'
 import { getSpatialClusters, getSpatialClustersAvailableRuns, getSpatialClustersSummary } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
+import {
+  SPATIAL_CLUSTERING_RUN_LABELS,
+  DEFAULT_SPATIAL_CLUSTERING_RUN_ID
+} from '@/config/villagesML.js'
 
 // State
 const availableRuns = ref([])
@@ -86,14 +90,8 @@ const clustersMetadata = ref(null)
 const clustersSummary = ref(null)
 const loading = ref(false)
 
-const RUN_LABELS = {
-  'spatial_eps_03': '高密度核心聚類',
-  'spatial_eps_05': '中密度擴展聚類',
-  'spatial_eps_10': '全域粗粒度聚類',
-  'optimized_kde_v1': 'KDE 熱點檢測'
-}
 const runLabel = (run) => {
-  const name = RUN_LABELS[run.run_id] || run.run_id
+  const name = SPATIAL_CLUSTERING_RUN_LABELS[run.run_id] || run.run_id
   return `${name} — ${run.unique_clusters.toLocaleString()} 聚類，均 ${run.avg_cluster_size?.toFixed(2)} 點`
 }
 
@@ -101,9 +99,9 @@ const loadAvailableRuns = async () => {
   try {
     const response = await getSpatialClustersAvailableRuns()
     availableRuns.value = response.available_runs || []
-    // 默認選 KDE 熱點檢測，否則 fallback 到 active
-    const kde = availableRuns.value.find(r => r.run_id === 'optimized_kde_v1')
-    selectedRunId.value = kde?.run_id || response.active_run_id || availableRuns.value[0]?.run_id || ''
+    // 默認選自動多密度聚類，否則 fallback 到 active
+    const hdbscan = availableRuns.value.find(r => r.run_id === DEFAULT_SPATIAL_CLUSTERING_RUN_ID)
+    selectedRunId.value = hdbscan?.run_id || response.active_run_id || availableRuns.value[0]?.run_id || ''
   } catch {
     // 靜默失敗
   }

@@ -368,7 +368,7 @@ export const VILLAGESML_MODULES = [
     id: 'pattern',
     label: '模式分析',
     icon: '📐',
-    path: '/villagesML?module=pattern&subtab=ngrams',
+    path: '/villagesML?module=pattern&subtab=ngram-explore',
     weight: 1.2,
     mobileWeight: 1,
     weightIconOnly: 0.5,
@@ -380,10 +380,22 @@ export const VILLAGESML_MODULES = [
     showLabelOnlyWhenActive: false,
     subtabs: [
       {
-        id: 'ngrams',
-        label: 'N-gram',
-        icon: '🔢',
-        path: '/villagesML?module=pattern&subtab=ngrams',
+        id: 'ngram-explore',
+        label: 'N-gram 探索',
+        icon: '🔍',
+        path: '/villagesML?module=pattern&subtab=ngram-explore',
+        weight: 1,
+        mobileWeight: 1,
+        fontSize: 0.95,
+        mobileFontSize: 0.9,
+        hideOnMobile: false,
+        hideLabelOnMobile: true
+      },
+      {
+        id: 'ngram-stats',
+        label: 'N-gram 統計',
+        icon: '📊',
+        path: '/villagesML?module=pattern&subtab=ngram-stats',
         weight: 1,
         mobileWeight: 1,
         fontSize: 0.95,
@@ -557,4 +569,34 @@ export function getSubtabConfig(moduleId, subtabId) {
  */
 export function getVisibleModules(isAuthenticated) {
   return VILLAGESML_MODULES.filter(m => !m.requireAuth || isAuthenticated)
+}
+
+// ========================================
+// 空間聚類配置
+// ========================================
+
+/**
+ * 空間聚類 Run ID 標籤映射
+ * @type {Object<string, string>}
+ */
+export const SPATIAL_CLUSTERING_RUN_LABELS = {
+  'spatial_eps_05': '超密集核心聚類',
+  'spatial_hdbscan_v1': '自動多密度聚類',
+  'spatial_eps_10': '標準密度聚類',
+  'spatial_eps_20': '全域覆蓋聚類'
+}
+
+/**
+ * 默認的空間聚類 Run ID
+ * @type {string}
+ */
+export const DEFAULT_SPATIAL_CLUSTERING_RUN_ID = 'spatial_hdbscan_v1'
+
+/**
+ * 獲取空間聚類 Run 標籤
+ * @param {string} runId - Run ID
+ * @returns {string} 標籤名稱
+ */
+export function getSpatialClusteringRunLabel(runId) {
+  return SPATIAL_CLUSTERING_RUN_LABELS[runId] || runId
 }

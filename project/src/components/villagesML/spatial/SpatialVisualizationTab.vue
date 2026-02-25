@@ -26,7 +26,7 @@
               <div v-if="layers.clusters && availableRuns.length" class="run-selector-inline">
                 <select v-model="selectedRunId" class="filter-select" style="margin-bottom:0">
                   <option v-for="run in availableRuns" :key="run.run_id" :value="run.run_id">
-                    {{ RUN_LABELS[run.run_id] || run.run_id }}
+                    {{ SPATIAL_CLUSTERING_RUN_LABELS[run.run_id] || run.run_id }}
                   </option>
                 </select>
               </div>
@@ -161,6 +161,10 @@ import {
   getCharTendencyByChar
 } from '@/api'
 import { showError, showWarning } from '@/utils/message.js'
+import {
+  SPATIAL_CLUSTERING_RUN_LABELS,
+  DEFAULT_SPATIAL_CLUSTERING_RUN_ID
+} from '@/config/villagesML.js'
 
 // 圖層狀態
 const layers = ref({
@@ -173,12 +177,6 @@ const layers = ref({
 // 聚類方案
 const availableRuns = ref([])
 const selectedRunId = ref('')
-const RUN_LABELS = {
-  'spatial_eps_03': '高密度核心聚類',
-  'spatial_eps_05': '中密度擴展聚類',
-  'spatial_eps_10': '全域粗粒度聚類',
-  'optimized_kde_v1': 'KDE 熱點檢測'
-}
 
 // 過濾器
 const filters = ref({
@@ -426,10 +424,21 @@ const loadNgramsLayer = async () => {
         geometry: { type: 'Point', coordinates: [item.centroid_lon, item.centroid_lat] },
         properties: {
           type: 'ngram',
-          region_name: item.region_name,
           ngram: item.ngram,
+          region_name: item.region_name,
+          region_level: item.region_level,
+          city: item.city,
+          county: item.county,
+          township: item.township,
+          n: item.n,
+          position: item.position,
           tendency_score: item.tendency_score,
-          frequency: item.frequency
+          log_odds: item.log_odds,
+          z_score: item.z_score,
+          frequency: item.frequency,
+          regional_total: item.regional_total,
+          expected_frequency: item.expected_frequency,
+          global_total: item.global_total
         }
       }))
 
@@ -485,7 +494,12 @@ const loadCharactersLayer = async () => {
         geometry: { type: 'Point', coordinates: [item.centroid_lon, item.centroid_lat] },
         properties: {
           type: 'character',
+          char: filters.value.character.trim(),
           region_name: item.region_name,
+          region_level: item.region_level,
+          city: item.city,
+          county: item.county,
+          township: item.township,
           lift: item.lift,
           z_score: item.z_score
         }
@@ -516,8 +530,8 @@ const loadCharactersLayer = async () => {
       }
     })
 
-    statistics.value.characters = geojson.features.length
-    statistics.value.total += geojson.features.length
+    statistics.value.characters = features.length
+    statistics.value.total += features.length
   } catch (error) {
     console.error('Failed to load characters:', error)
     throw error
@@ -535,8 +549,8 @@ onMounted(async () => {
   try {
     const response = await getSpatialClustersAvailableRuns()
     availableRuns.value = response.available_runs || []
-    const kde = availableRuns.value.find(r => r.run_id === 'optimized_kde_v1')
-    selectedRunId.value = kde?.run_id || response.active_run_id || ''
+    const hdbscan = availableRuns.value.find(r => r.run_id === DEFAULT_SPATIAL_CLUSTERING_RUN_ID)
+    selectedRunId.value = hdbscan?.run_id || response.active_run_id || ''
   } catch { /* 靜默失敗 */ }
 })
 </script>

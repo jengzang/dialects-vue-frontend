@@ -2,7 +2,7 @@
 <!--  <ExploreLayout>-->
     <div class="structural-patterns-page">
       <h3 class="villagesml-subtab-title">模式分析 - 結構模式</h3>
-      <h1 class="page-title">🏗️ 結構模式分析</h1>
+<!--      <h1 class="page-title">🏗️ 結構模式分析</h1>-->
 
       <!-- Global Pattern Frequency -->
       <div class="global-section glass-panel">
@@ -548,7 +548,7 @@ const getTendencyClass = (zScore) => {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), var(--secondary-color));
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
   transition: width 0.5s ease;
 }
 

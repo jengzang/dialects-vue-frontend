@@ -193,7 +193,8 @@ const SpatialHotspotsTab = defineAsyncComponent(() => import('@/components/villa
 const SpatialClustersTab = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialClustersTab.vue'))
 const SpatialVisualizationTab = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialVisualizationTab.vue'))
 const SpatialIntegration = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialIntegration.vue'))
-const NgramAnalysis = defineAsyncComponent(() => import('@/components/villagesML/pattern/NgramAnalysis.vue'))
+const NgramExplore = defineAsyncComponent(() => import('@/components/villagesML/pattern/NgramExplore.vue'))
+const NgramStats = defineAsyncComponent(() => import('@/components/villagesML/pattern/NgramStats.vue'))
 const StructuralPatterns = defineAsyncComponent(() => import('@/components/villagesML/pattern/StructuralPatterns.vue'))
 const RegionalAggregates = defineAsyncComponent(() => import('@/components/villagesML/regional/RegionalAggregates.vue'))
 const RegionalVectors = defineAsyncComponent(() => import('@/components/villagesML/regional/RegionalVectors.vue'))
@@ -255,7 +256,8 @@ const currentComponent = computed(() => {
       'spatial-clusters': SpatialClustersTab,
       'spatial-visualization': SpatialVisualizationTab,
       'spatial-integration': SpatialIntegration,
-      'pattern-ngrams': NgramAnalysis,
+      'pattern-ngram-explore': NgramExplore,
+      'pattern-ngram-stats': NgramStats,
       'pattern-structural': StructuralPatterns,
       'regional-aggregates': RegionalAggregates,
       'regional-vectors': RegionalVectors,

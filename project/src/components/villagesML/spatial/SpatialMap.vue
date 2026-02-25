@@ -257,16 +257,24 @@ const showPopup = (feature, lngLat) => {
   } else if (props.type === 'ngram') {
     html += `
       <h4 style="margin: 0 0 8px 0;">🟢 N-gram: ${props.ngram}</h4>
-      <p style="margin: 4px 0;"><strong>區域:</strong> ${props.region_name || props.city || props.county || props.township}</p>
-      <p style="margin: 4px 0;"><strong>頻率:</strong> ${props.frequency}</p>
-      <p style="margin: 4px 0;"><strong>百分比:</strong> ${(props.percentage * 100).toFixed(2)}%</p>
+      <p style="margin: 4px 0;"><strong>區域:</strong> ${props.region_name}</p>
+      ${props.city ? `<p style="margin: 4px 0;"><strong>城市:</strong> ${props.city}</p>` : ''}
+      ${props.county ? `<p style="margin: 4px 0;"><strong>區縣:</strong> ${props.county}</p>` : ''}
+      ${props.township ? `<p style="margin: 4px 0;"><strong>鄉鎮:</strong> ${props.township}</p>` : ''}
+      <p style="margin: 4px 0;"><strong>位置:</strong> ${props.position === 'prefix' ? '前綴' : props.position === 'suffix' ? '後綴' : props.position === 'middle' ? '中間' : '全部'}</p>
+      <p style="margin: 4px 0;"><strong>頻率:</strong> ${props.frequency} / ${props.regional_total}</p>
+      <p style="margin: 4px 0;"><strong>傾向分數:</strong> ${props.tendency_score?.toFixed(2)}</p>
+      <p style="margin: 4px 0;"><strong>Z 分數:</strong> ${props.z_score?.toFixed(2)}</p>
     `
   } else if (props.type === 'character') {
     html += `
       <h4 style="margin: 0 0 8px 0;">🟡 字符: ${props.char}</h4>
-      <p style="margin: 4px 0;"><strong>區域:</strong> ${props.region_name || props.city || props.county || props.township}</p>
+      <p style="margin: 4px 0;"><strong>區域:</strong> ${props.region_name}</p>
+      ${props.city ? `<p style="margin: 4px 0;"><strong>城市:</strong> ${props.city}</p>` : ''}
+      ${props.county ? `<p style="margin: 4px 0;"><strong>區縣:</strong> ${props.county}</p>` : ''}
+      ${props.township ? `<p style="margin: 4px 0;"><strong>鄉鎮:</strong> ${props.township}</p>` : ''}
+      <p style="margin: 4px 0;"><strong>Lift:</strong> ${props.lift?.toFixed(3)}</p>
       <p style="margin: 4px 0;"><strong>Z 分數:</strong> ${props.z_score?.toFixed(2)}</p>
-      <p style="margin: 4px 0;"><strong>頻率:</strong> ${props.frequency}</p>
     `
   } else {
     // 通用顯示
