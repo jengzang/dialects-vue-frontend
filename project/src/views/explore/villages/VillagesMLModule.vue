@@ -195,7 +195,9 @@ const SpatialVisualizationTab = defineAsyncComponent(() => import('@/components/
 const SpatialIntegration = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialIntegration.vue'))
 const NgramExplore = defineAsyncComponent(() => import('@/components/villagesML/pattern/NgramExplore.vue'))
 const NgramStats = defineAsyncComponent(() => import('@/components/villagesML/pattern/NgramStats.vue'))
-const StructuralPatterns = defineAsyncComponent(() => import('@/components/villagesML/pattern/StructuralPatterns.vue'))
+const PatternFrequency = defineAsyncComponent(() => import('@/components/villagesML/pattern/PatternFrequency.vue'))
+const PatternStructural = defineAsyncComponent(() => import('@/components/villagesML/pattern/PatternStructural.vue'))
+const PatternTendency = defineAsyncComponent(() => import('@/components/villagesML/pattern/PatternTendency.vue'))
 const RegionalAggregates = defineAsyncComponent(() => import('@/components/villagesML/regional/RegionalAggregates.vue'))
 const RegionalVectors = defineAsyncComponent(() => import('@/components/villagesML/regional/RegionalVectors.vue'))
 const CategoryTendency = defineAsyncComponent(() => import('@/components/villagesML/regional/CategoryTendency.vue'))
@@ -257,9 +259,11 @@ const currentComponent = computed(() => {
       'spatial-clusters': SpatialClustersTab,
       'spatial-visualization': SpatialVisualizationTab,
       'spatial-integration': SpatialIntegration,
+      'pattern-frequency': PatternFrequency,
+      'pattern-structural': PatternStructural,
+      'pattern-tendency': PatternTendency,
       'pattern-ngram-explore': NgramExplore,
       'pattern-ngram-stats': NgramStats,
-      'pattern-structural': StructuralPatterns,
       'regional-aggregates': RegionalAggregates,
       'regional-vectors': RegionalVectors,
       'regional-tendency': CategoryTendency,
