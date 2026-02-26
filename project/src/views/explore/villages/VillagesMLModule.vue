@@ -341,7 +341,7 @@ const handleRegionalAnalysis = async ({ level, name, hierarchy }) => {
     const result = await getCharTendency({
       region_level: level,
       ...hierarchy,
-      top_k: 30
+      top_n: 30
     })
 
     villagesMLStore.tendencyData = result

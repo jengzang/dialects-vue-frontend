@@ -24,7 +24,7 @@ export async function getGlobalCharFrequency(params = {}) {
  * @param {string} [params.county] - 區縣名稱（精確查詢）
  * @param {string} [params.township] - 鄉鎮名稱（精確查詢）
  * @param {string} [params.region_name] - 區域名稱（模糊查詢，向後兼容）
- * @param {number} params.top_k - 返回前K個字（默認30）
+ * @param {number} params.top_n - 返回前N個字（默認30）
  * @returns {Promise<Array>} [{ char: string, z_score: number, frequency: number }, ...]
  */
 export async function getCharTendency(params) {
@@ -39,7 +39,7 @@ export async function getCharTendency(params) {
   // Legacy parameter (backward compatible)
   if (params.region_name) queryParams.append('region_name', params.region_name)
 
-  if (params.top_k) queryParams.append('top_k', params.top_k)
+  if (params.top_n) queryParams.append('top_n', params.top_n)
 
   return api(`/api/villages/character/tendency/by-region?${queryParams.toString()}`)
 }

@@ -121,6 +121,17 @@
               <option value="county">區縣級</option>
               <option value="township">鄉鎮級</option>
             </select>
+
+            <label style="margin-left: 20px;">最小村莊數：</label>
+            <input
+              v-model.number="minVillages"
+              type="number"
+              min="1"
+              placeholder="例如：100"
+              class="number-input"
+              @change="loadCategoryRanking"
+            />
+            <span class="input-hint">（過濾小樣本區域）</span>
           </div>
           <div v-if="loadingRanking" class="loading-state">
             <div class="spinner"></div>
@@ -263,6 +274,7 @@ const regionLevel = ref('city')
 const regionName = ref('')
 const regionHierarchy = ref({ city: null, county: null, township: null })
 const rankingLevel = ref('city')
+const minVillages = ref(null)
 
 const labelsMode = ref('by-category')
 const selectedCategoryForLabels = ref('')
@@ -346,11 +358,18 @@ const loadCategoryRanking = async () => {
 
   loadingRanking.value = true
   try {
-    categoryRanking.value = await getSemanticIndices({
+    const params = {
       category: selectedCategory.value.category,
       region_level: rankingLevel.value,
       limit: 50
-    })
+    }
+
+    // 只有当 minVillages 有值且大于 0 时才添加参数
+    if (minVillages.value && minVillages.value > 0) {
+      params.min_villages = minVillages.value
+    }
+
+    categoryRanking.value = await getSemanticIndices(params)
   } catch (error) {
     showError('加載排行失敗')
   } finally {
@@ -943,5 +962,26 @@ onMounted(() => {
   .select-input {
     flex: 1;
   }
+}
+
+/* Number input and hint styles */
+.number-input {
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  font-size: 14px;
+  width: 120px;
+  transition: all 0.3s ease;
+}
+
+.number-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.input-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 </style>

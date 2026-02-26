@@ -4,11 +4,16 @@
 
     <!-- Detail Mode Toggle -->
     <div class="detail-toggle glass-panel">
-      <label class="toggle-container">
-        <input type="checkbox" v-model="detailMode" class="toggle-checkbox" />
-        <span class="toggle-label">詳細模式</span>
-      </label>
-      <span class="toggle-hint">（語義分類更細緻）</span>
+      <div class="toggle-left">
+        <label class="toggle-container">
+          <input type="checkbox" v-model="detailMode" class="toggle-checkbox" />
+          <span class="toggle-label">詳細模式</span>
+        </label>
+        <span class="toggle-hint">（語義分類更細緻）</span>
+      </div>
+      <button class="lexicon-button" @click="showLexiconModal = true">
+        📖 查看詞典
+      </button>
     </div>
 
     <div class="indices-section glass-panel">
@@ -145,6 +150,61 @@
         </div>
       </div>
     </div>
+
+    <!-- Lexicon Modal -->
+    <Teleport to="body">
+      <Transition name="modal-fade">
+        <div v-if="showLexiconModal" class="lexicon-overlay" @click.self="showLexiconModal = false">
+          <div class="lexicon-modal">
+            <div class="lexicon-header">
+              <h3>📖 語義詞典</h3>
+              <button class="close-button" @click="showLexiconModal = false">×</button>
+            </div>
+            <div class="lexicon-body">
+              <!-- 9个主类别 -->
+              <div class="lexicon-section">
+                <h4>主類別 (v1.0.0)</h4>
+                <div class="category-list">
+                  <div
+                    v-for="(chars, category) in SEMANTIC_LEXICON_V1.categories"
+                    :key="category"
+                    class="category-item"
+                  >
+                    <div class="category-header">
+                      <span class="category-name">{{ CATEGORY_NAMES_ZH[category] }}</span>
+                      <span class="category-count">{{ chars.length }} 字</span>
+                    </div>
+                    <div class="char-list">
+                      <span v-for="char in chars" :key="char" class="char-tag">{{ char }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 详细子类别 -->
+              <div class="lexicon-section">
+                <h4>子類別 (v4.0.0-hybrid)</h4>
+                <div class="category-list">
+                  <div
+                    v-for="(chars, subcategory) in SEMANTIC_LEXICON_V4.subcategories"
+                    :key="subcategory"
+                    class="category-item"
+                  >
+                    <div class="category-header">
+                      <span class="category-name">{{ getSubcategoryName(subcategory) }}</span>
+                      <span class="category-count">{{ chars.length }} 字</span>
+                    </div>
+                    <div class="char-list">
+                      <span v-for="char in chars" :key="char" class="char-tag">{{ char }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -153,8 +213,9 @@ import { ref, watch, computed } from 'vue'
 import FilterableSelect from '@/components/common/FilterableSelect.vue'
 import { getSemanticIndices } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
-import { getCategoryDisplayName } from '@/config/villagesML.js'
+import { getCategoryDisplayName, getSubcategoryName } from '@/config/villagesML.js'
 import { userStore } from '@/utils/store.js'
+import { SEMANTIC_LEXICON_V1, SEMANTIC_LEXICON_V4, CATEGORY_NAMES_ZH } from '@/config/semanticLexicon.js'
 
 // State
 const indices = ref(null)
@@ -169,6 +230,9 @@ const indicesLimit = ref(100)
 
 // Detail mode toggle
 const detailMode = ref(false)
+
+// Lexicon modal
+const showLexiconModal = ref(false)
 
 // Helper function to get category name based on detail mode
 const getCategoryName = (category) => getCategoryDisplayName(category, detailMode.value)
@@ -527,5 +591,199 @@ const getRegionLevelName = (level) => {
 .toggle-hint {
   font-size: 12px;
   color: var(--text-secondary);
+}
+
+/* Detail Toggle Layout */
+.detail-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Lexicon Button */
+.lexicon-button {
+  padding: 8px 16px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lexicon-button:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+/* Lexicon Modal Styles */
+.lexicon-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.lexicon-modal {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  max-width: 1200px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lexicon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.lexicon-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.close-button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-secondary);
+}
+
+.close-button:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--text-primary);
+}
+
+.lexicon-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.lexicon-section {
+  margin-bottom: 32px;
+}
+
+.lexicon-section:last-child {
+  margin-bottom: 0;
+}
+
+.lexicon-section h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.category-item {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  border: 1px solid rgba(74, 144, 226, 0.1);
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.category-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.category-count {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 4px 12px;
+  background: rgba(74, 144, 226, 0.1);
+  border-radius: 12px;
+}
+
+.char-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.char-tag {
+  padding: 6px 12px;
+  background: rgba(74, 144, 226, 0.1);
+  color: var(--text-primary);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.char-tag:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Modal Transition */
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
+.modal-fade-enter-active .lexicon-modal,
+.modal-fade-leave-active .lexicon-modal {
+  transition: transform 0.3s ease;
+}
+
+.modal-fade-enter-from .lexicon-modal,
+.modal-fade-leave-to .lexicon-modal {
+  transform: scale(0.9);
 }
 </style>

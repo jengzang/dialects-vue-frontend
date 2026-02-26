@@ -37,7 +37,8 @@ export const SEMANTIC_CATEGORY_NAMES = {
   'water': '水系',
   'terrain': '地形',
   'modifier':'修飾語',
-  'head':'中心詞'
+  'head':'中心詞',
+  'other': '其他',
 }
 
 /**
@@ -61,6 +62,18 @@ export const SEMANTIC_CATEGORY_DESCRIPTIONS = {
  * @type {Object<string, string>}
  */
 export const SEMANTIC_SUBCATEGORY_NAMES = {
+  // ===== 父类别（9个大类 + other）=====
+  'agriculture': '農業',
+  'clan': '宗族',
+  'direction': '方位',
+  'infrastructure': '基建',
+  'mountain': '山地',
+  'settlement': '聚落',
+  'symbolic': '象徵',
+  'vegetation': '植被',
+  'water': '水系',
+  'other': '其他',
+
   // 數字類
   'number_small': '小數',          // 一二三四五
   'number_large': '大數',          // 六七八九十
@@ -823,18 +836,6 @@ export const VILLAGESML_MODULES = [
         label: '子集分析',
         icon: '🧪',
         path: '/villagesML?module=compute&subtab=subset',
-        weight: 1,
-        mobileWeight: 1,
-        fontSize: 0.95,
-        mobileFontSize: 0.9,
-        hideOnMobile: false,
-        hideLabelOnMobile: true
-      },
-      {
-        id: 'cache',
-        label: '緩存管理',
-        icon: '💾',
-        path: '/villagesML?module=compute&subtab=cache',
         weight: 1,
         mobileWeight: 1,
         fontSize: 0.95,

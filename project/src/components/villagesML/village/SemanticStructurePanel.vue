@@ -53,6 +53,9 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import { getSubcategoryName } from '@/config/villagesML.js'
+
 defineProps({
   villageId: {
     type: Number,
@@ -70,7 +73,9 @@ defineProps({
 
 const parseSequence = (sequence) => {
   try {
-    return JSON.parse(sequence)
+    const parsed = JSON.parse(sequence)
+    // 将英文子类别名称映射为中文
+    return parsed.map(category => getSubcategoryName(category))
   } catch {
     return []
   }

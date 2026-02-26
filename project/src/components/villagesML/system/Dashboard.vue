@@ -30,13 +30,14 @@
       </div>
 
       <!-- Maintenance Notice -->
-      <div v-if="showMaintenanceNotice" class="maintenance-notice">
-        <span class="notice-icon">🔧</span>
-        <div class="notice-content">
-          <strong>數據庫優化通知</strong>
-          <span>計劃於 2026-03-02 進行 N-gram 數據優化，將刪除統計不顯著的條目（391萬 → 230萬），查詢性能將大幅提升。</span>
-        </div>
-      </div>
+<!--      <div v-if="showMaintenanceNotice" class="maintenance-notice">-->
+<!--        <span class="notice-icon">🔧</span>-->
+<!--        <div class="notice-content">-->
+<!--          <strong>數據庫優化通知</strong>-->
+<!--          <span>計劃於 2026-03-02 進行 N-gram 數據優化，將刪除統計不顯著的條目（391萬 → 230萬），查詢性能將大幅提升。</span>-->
+<!--        </div>-->
+<!--      </div>-->
+
       <div class="section-header">
         <h2>📈 數據概覽</h2>
         <p class="section-description">系統收錄的村名與區域統計</p>
