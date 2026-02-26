@@ -203,7 +203,6 @@ const RegionalVectors = defineAsyncComponent(() => import('@/components/villages
 const CategoryTendency = defineAsyncComponent(() => import('@/components/villagesML/regional/CategoryTendency.vue'))
 const FeatureExtraction = defineAsyncComponent(() => import('@/components/villagesML/ml/FeatureExtraction.vue'))
 const SubsetAnalysis = defineAsyncComponent(() => import('@/components/villagesML/ml/SubsetAnalysis.vue'))
-const CacheManagement = defineAsyncComponent(() => import('@/components/villagesML/system/CacheManagement.vue'))
 const SystemInfo = defineAsyncComponent(() => import('@/components/villagesML/system/SystemInfo.vue'))
 
 // Import panel components for legacy tabs
@@ -268,8 +267,7 @@ const currentComponent = computed(() => {
       'regional-vectors': RegionalVectors,
       'regional-tendency': CategoryTendency,
       'compute-features': FeatureExtraction,
-      'compute-subset': SubsetAnalysis,
-      'compute-cache': CacheManagement
+      'compute-subset': SubsetAnalysis
     }
 
     const key = `${moduleId}-${subtabId}`

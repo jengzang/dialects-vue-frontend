@@ -30,18 +30,21 @@ export const villagesMLStore = reactive({
   clusteringSettings: {
     algorithm: 'kmeans',
     k: 5,
-    eps: 0.5,
-    min_samples: 5,
+    region_level: 'city',
+    region_filter: null,
     features: {
-      semantic: true,
-      morphology: true,
-      diversity: true
+      use_semantic: true,
+      use_morphology: true,
+      use_diversity: true,
+      top_n_suffix2: 100,
+      top_n_suffix3: 100
     },
     preprocessing: {
-      standardize: true,
-      pca: false,
-      pca_components: 10
-    }
+      use_pca: true,
+      pca_n_components: 50,
+      standardize: true
+    },
+    random_state: 42
   },
   clusteringResults: null,
   clusteringLoading: false,

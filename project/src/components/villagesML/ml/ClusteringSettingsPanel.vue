@@ -10,6 +10,15 @@
 
     <div class="settings-group">
       <div class="setting-row">
+        <label>區域級別：</label>
+        <select v-model="settings.region_level" class="setting-input">
+          <option value="city">市級</option>
+          <option value="county">區縣級</option>
+          <option value="township">鄉鎮級</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
         <label>算法：</label>
         <select v-model="settings.algorithm" class="setting-input">
           <option value="kmeans">K-Means</option>
@@ -20,13 +29,13 @@
 
       <div class="setting-row" v-if="settings.algorithm !== 'dbscan'">
         <label>聚類數 K：</label>
-        <input v-model.number="settings.k" type="number" min="2" max="10" class="setting-input" />
+        <input v-model.number="settings.k" type="number" min="2" max="20" class="setting-input" />
       </div>
 
       <div class="feature-toggles">
-        <label><input type="checkbox" v-model="settings.features.semantic" /> 語義特徵</label>
-        <label><input type="checkbox" v-model="settings.features.morphology" /> 形態特徵</label>
-        <label><input type="checkbox" v-model="settings.features.diversity" /> 多樣性特徵</label>
+        <label><input type="checkbox" v-model="settings.features.use_semantic" /> 語義特徵</label>
+        <label><input type="checkbox" v-model="settings.features.use_morphology" /> 形態特徵</label>
+        <label><input type="checkbox" v-model="settings.features.use_diversity" /> 多樣性特徵</label>
       </div>
 
       <button class="run-button solid-button" @click="runClustering" :disabled="loading || !isAuthenticated">
