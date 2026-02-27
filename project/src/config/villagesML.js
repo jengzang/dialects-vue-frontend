@@ -494,18 +494,6 @@ export const VILLAGESML_MODULES = [
         hideLabelOnMobile: true
       },
       {
-        id: 'significance',
-        label: '顯著性',
-        icon: '⭐',
-        path: '/villagesML?module=character&subtab=significance',
-        weight: 1,
-        mobileWeight: 1,
-        fontSize: 0.95,
-        mobileFontSize: 0.9,
-        hideOnMobile: false,
-        hideLabelOnMobile: true
-      },
-      {
         id: 'network',
         label: '字符網絡',
         icon: '🕸️',
@@ -517,7 +505,19 @@ export const VILLAGESML_MODULES = [
         hideOnMobile: false,
         hideLabelOnMobile: true,
         requireAuth: true
-      }
+      },
+      {
+        id: 'significance',
+        label: '顯著性',
+        icon: '⭐',
+        path: '/villagesML?module=character&subtab=significance',
+        weight: 1,
+        mobileWeight: 1,
+        fontSize: 0.95,
+        mobileFontSize: 0.9,
+        hideOnMobile: false,
+        hideLabelOnMobile: true
+      },
     ]
   },
   {
@@ -778,18 +778,18 @@ export const VILLAGESML_MODULES = [
         hideOnMobile: false,
         hideLabelOnMobile: true
       },
-      {
-        id: 'vectors',
-        label: '特徵向量',
-        icon: '📐',
-        path: '/villagesML?module=regional&subtab=vectors',
-        weight: 1,
-        mobileWeight: 1,
-        fontSize: 0.95,
-        mobileFontSize: 0.9,
-        hideOnMobile: false,
-        hideLabelOnMobile: true
-      },
+      // {
+      //   id: 'vectors',
+      //   label: '特徵向量',
+      //   icon: '📐',
+      //   path: '/villagesML?module=regional&subtab=vectors',
+      //   weight: 1,
+      //   mobileWeight: 1,
+      //   fontSize: 0.95,
+      //   mobileFontSize: 0.9,
+      //   hideOnMobile: false,
+      //   hideLabelOnMobile: true
+      // },
       {
         id: 'tendency',
         label: '類別傾向性',

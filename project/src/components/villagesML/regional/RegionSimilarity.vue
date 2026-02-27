@@ -1,6 +1,7 @@
 <template>
   <div class="region-similarity-page">
-    <h1 class="page-title">🔍 區域相似度分析</h1>
+    <h3 class="villagesml-subtab-title">區域分析 - 相似度分析</h3>
+<!--    <h1 class="page-title">🔍 區域相似度分析</h1>-->
 
     <!-- Mode Selector -->
     <div class="mode-selector glass-panel">

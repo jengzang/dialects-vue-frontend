@@ -229,5 +229,11 @@ export {
   // 區域相似度 (Phase 15)
   getRegionSimilaritySearch,
   getRegionSimilarityPair,
-  getRegionSimilarityMatrix
+  getRegionSimilarityMatrix,
+  //聚类
+  runCharacterTendencyClustering,
+  runSampledVillagesClustering,
+  runSpatialAwareClustering,
+  runHierarchicalClustering,
+  getSpatialRunIds,
 } from './villagesML/index.js'

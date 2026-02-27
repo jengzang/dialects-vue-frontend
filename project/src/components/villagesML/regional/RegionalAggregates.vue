@@ -1,119 +1,48 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="regional-aggregates-page">
-      <h3 class="villagesml-subtab-title">區域分析 - 聚合統計</h3>
-      <h1 class="page-title">🌍 區域聚合統計</h1>
-
-      <!-- Level Selector -->
-      <div class="level-selector glass-panel">
-        <button
-          class="level-button"
-          :class="{ 'active': currentLevel === 'city' }"
-          @click="switchLevel('city')"
-        >
-          城市級
-        </button>
-        <button
-          class="level-button"
-          :class="{ 'active': currentLevel === 'county' }"
-          @click="switchLevel('county')"
-        >
-          區縣級
-        </button>
-        <button
-          class="level-button"
-          :class="{ 'active': currentLevel === 'township' }"
-          @click="switchLevel('township')"
-        >
-          鄉鎮級
-        </button>
-      </div>
-
-      <!-- Filters -->
-      <div class="filters-section glass-panel">
-        <h3>篩選條件</h3>
-        <div class="filter-controls">
-          <input
-            v-if="currentLevel === 'city'"
-            v-model="filters.city"
-            type="text"
-            placeholder="城市名稱（可選）"
-            class="filter-input"
-          />
-          <template v-if="currentLevel === 'county'">
-            <input
-              v-model="filters.city"
-              type="text"
-              placeholder="城市名稱（可選）"
-              class="filter-input"
-            />
-            <input
-              v-model="filters.county"
-              type="text"
-              placeholder="區縣名稱（可選）"
-              class="filter-input"
-            />
-          </template>
-          <template v-if="currentLevel === 'township'">
-            <input
-              v-model="filters.city"
-              type="text"
-              placeholder="城市名稱（可選）"
-              class="filter-input"
-            />
-            <input
-              v-model="filters.county"
-              type="text"
-              placeholder="區縣名稱（可選）"
-              class="filter-input"
-            />
-            <input
-              v-model="filters.township"
-              type="text"
-              placeholder="鄉鎮名稱（可選）"
-              class="filter-input"
-            />
-          </template>
-          <button
-            class="query-button"
-            :disabled="loading"
-            @click="loadAggregates"
-          >
-            查詢
-          </button>
-        </div>
-      </div>
+      <h3 class="villagesml-subtab-title">區域分析 - 🌍聚合統計</h3>
+<!--      <h1 class="page-title">🌍 區域聚合統計</h1>-->
 
       <!-- Aggregates Table -->
-      <div v-if="loading" class="loading-state glass-panel">
-        <div class="spinner"></div>
-        <p>加載中...</p>
-      </div>
-
-      <div v-else-if="aggregates.length > 0" class="aggregates-section glass-panel">
-        <h2>聚合統計結果</h2>
-
-        <!-- Summary Stats -->
-        <div class="summary-stats">
-          <div class="stat-card">
-            <div class="stat-label">總數量</div>
-            <div class="stat-value">{{ aggregates.length }}</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">總村莊數</div>
-            <div class="stat-value">{{ totalVillages }}</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">平均村莊數</div>
-            <div class="stat-value">{{ avgVillages.toFixed(1) }}</div>
-          </div>
+      <div class="aggregates-section glass-panel">
+        <h2>聚合结果表格</h2>
+        <div class="aggregates-header">
+          <select v-model="currentLevel" class="select-input">
+            <option value="city">市級</option>
+            <option value="county">區縣級</option>
+            <option value="township">鄉鎮級</option>
+          </select>
+          <button class="query-button" :disabled="loading" @click="loadAggregates">查詢</button>
         </div>
+
+        <div v-if="loading" class="loading-state">
+          <div class="spinner"></div>
+        </div>
+
+        <template v-else-if="aggregates.length > 0">
+          <!-- Summary Stats -->
+          <div class="summary-stats">
+            <div class="stat-card">
+              <div class="stat-label">總數量</div>
+              <div class="stat-value">{{ aggregates.length }}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">總村莊數</div>
+              <div class="stat-value">{{ totalVillages }}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">平均村莊數</div>
+              <div class="stat-value">{{ avgVillages.toFixed(1) }}</div>
+            </div>
+          </div>
 
         <!-- Aggregates Table -->
         <div class="aggregates-table">
           <div class="table-header">
             <div class="col-region">區域</div>
             <div class="col-villages">村莊數</div>
+            <div class="col-avg">均長</div>
             <div class="col-categories">語義類別</div>
             <div class="col-actions">操作</div>
           </div>
@@ -124,20 +53,19 @@
               class="table-row"
             >
               <div class="col-region">
-                <span v-if="currentLevel === 'city'">{{ item.city }}</span>
-                <span v-else-if="currentLevel === 'county'">{{ item.city }} / {{ item.county }}</span>
-                <span v-else>{{ item.city }} / {{ item.county }} / {{ item.township }}</span>
+                <RegionDisplay :item="item" :skip-city="currentLevel !== 'city'" />
               </div>
-              <div class="col-villages">{{ item.village_count }}</div>
+              <div class="col-villages">{{ item.total_villages }}</div>
+              <div class="col-avg">{{ item.avg_name_length?.toFixed(2) }}</div>
               <div class="col-categories">
                 <div class="categories-mini">
                   <span
-                    v-for="(value, key) in item.semantic_categories"
-                    :key="key"
+                    v-for="cat in getSemCategories(item)"
+                    :key="cat.key"
                     class="category-badge"
-                    :title="`${key}: ${value}`"
+                    :title="`${cat.label}: ${cat.pct.toFixed(1)}%`"
                   >
-                    {{ key.charAt(0) }}
+                  {{ cat.label }}
                   </span>
                 </div>
               </div>
@@ -169,7 +97,8 @@
             下一頁
           </button>
         </div>
-      </div>
+      </template>
+    </div>
 
       <!-- Detail Modal -->
       <div v-if="selectedItem" class="detail-modal" @click.self="selectedItem = null">
@@ -183,14 +112,12 @@
               <div class="info-item">
                 <span class="info-label">區域:</span>
                 <span class="info-value">
-                  <span v-if="currentLevel === 'city'">{{ selectedItem.city }}</span>
-                  <span v-else-if="currentLevel === 'county'">{{ selectedItem.city }} / {{ selectedItem.county }}</span>
-                  <span v-else>{{ selectedItem.city }} / {{ selectedItem.county }} / {{ selectedItem.township }}</span>
+                  <RegionDisplay :item="selectedItem" :skip-city="currentLevel !== 'city'" />
                 </span>
               </div>
               <div class="info-item">
                 <span class="info-label">村莊數量:</span>
-                <span class="info-value">{{ selectedItem.village_count }}</span>
+                <span class="info-value">{{ selectedItem.total_villages }}</span>
               </div>
             </div>
 
@@ -199,141 +126,18 @@
               <h4>語義類別分佈</h4>
               <div class="chart-bars">
                 <div
-                  v-for="(value, key) in selectedItem.semantic_categories"
-                  :key="key"
+                  v-for="cat in getSemCategories(selectedItem)"
+                  :key="cat.key"
                   class="chart-bar"
                 >
-                  <div class="bar-label">{{ key }}</div>
+                  <div class="bar-label">{{ cat.label }}</div>
                   <div class="bar-container">
                     <div
                       class="bar-fill"
-                      :style="{ width: `${(value / maxCategoryValue) * 100}%` }"
+                      :style="{ width: `${(cat.pct / maxCategoryValue) * 100}%` }"
                     ></div>
                   </div>
-                  <div class="bar-value">{{ value }}</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Statistics -->
-            <div v-if="selectedItem.statistics" class="statistics-section">
-              <h4>統計信息</h4>
-              <div class="stats-grid">
-                <div
-                  v-for="(value, key) in selectedItem.statistics"
-                  :key="key"
-                  class="stat-item"
-                >
-                  <div class="stat-label">{{ formatStatKey(key) }}</div>
-                  <div class="stat-value">{{ formatStatValue(value) }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Regional N-gram Rankings -->
-      <div class="ngram-section glass-panel">
-        <h2>區域 N-gram 排行榜</h2>
-        <div class="ngram-controls">
-          <select v-model.number="ngramN" class="select-input">
-            <option :value="2">二元組 (Bigrams)</option>
-            <option :value="3">三元組 (Trigrams)</option>
-            <option :value="4">四元組 (4-grams)</option>
-          </select>
-          <select v-model="ngramLevel" class="select-input">
-            <option value="city">城市</option>
-            <option value="county">區縣</option>
-            <option value="township">鄉鎮</option>
-          </select>
-          <input
-            v-if="ngramLevel === 'city'"
-            v-model="ngramFilters.city"
-            type="text"
-            placeholder="城市名稱（可選）"
-            class="filter-input"
-          />
-          <template v-if="ngramLevel === 'county'">
-            <input
-              v-model="ngramFilters.city"
-              type="text"
-              placeholder="城市名稱（可選）"
-              class="filter-input"
-            />
-            <input
-              v-model="ngramFilters.county"
-              type="text"
-              placeholder="區縣名稱（可選）"
-              class="filter-input"
-            />
-          </template>
-          <template v-if="ngramLevel === 'township'">
-            <input
-              v-model="ngramFilters.city"
-              type="text"
-              placeholder="城市名稱（可選）"
-              class="filter-input"
-            />
-            <input
-              v-model="ngramFilters.county"
-              type="text"
-              placeholder="區縣名稱（可選）"
-              class="filter-input"
-            />
-            <input
-              v-model="ngramFilters.township"
-              type="text"
-              placeholder="鄉鎮名稱（可選）"
-              class="filter-input"
-            />
-          </template>
-          <input
-            v-model.number="ngramTopK"
-            type="number"
-            min="1"
-            max="500"
-            placeholder="返回數量 (1-500)"
-            class="number-input"
-          />
-          <button
-            class="query-button"
-            :disabled="loadingNgram"
-            @click="loadRegionalNgrams"
-          >
-            查詢
-          </button>
-        </div>
-
-        <div v-if="loadingNgram" class="loading-state">
-          <div class="spinner"></div>
-        </div>
-
-        <div v-else-if="ngramData.length > 0" class="ngram-results">
-          <div class="ngram-header">
-            <div class="col-rank">排名</div>
-            <div class="col-ngram">N-gram</div>
-            <div class="col-frequency">頻率</div>
-            <div class="col-percentage">百分比</div>
-            <div class="col-bar">分佈</div>
-          </div>
-          <div class="ngram-body">
-            <div
-              v-for="(item, index) in ngramData"
-              :key="index"
-              class="ngram-row"
-              :class="{ 'top-10': item.rank <= 10 }"
-            >
-              <div class="col-rank">{{ item.rank }}</div>
-              <div class="col-ngram">{{ item.ngram }}</div>
-              <div class="col-frequency">{{ item.frequency }}</div>
-              <div class="col-percentage">{{ item.percentage.toFixed(2) }}%</div>
-              <div class="col-bar">
-                <div class="bar-container">
-                  <div
-                    class="bar-fill"
-                    :style="{ width: `${(item.percentage / maxNgramPercentage) * 100}%` }"
-                  ></div>
+                  <div class="bar-value">{{ cat.pct.toFixed(1) }}%</div>
                 </div>
               </div>
             </div>
@@ -343,85 +147,83 @@
 
       <!-- Spatial Aggregates -->
       <div class="spatial-section glass-panel">
-        <h2>空間聚合</h2>
-        <div class="controls">
-          <select v-model="spatialLevel" class="select-input">
-            <option value="city">城市</option>
-            <option value="county">區縣</option>
-            <option value="township">鄉鎮</option>
-          </select>
-          <button
-            class="query-button"
-            :disabled="loadingSpatial"
-            @click="loadSpatialAggregates"
-          >
-            加載空間數據
-          </button>
+        <div class="spatial-header">
+          <h2>空間聚合</h2>
+          <div class="controls">
+            <select v-model="spatialLevel" class="select-input">
+              <option value="city">城市</option>
+              <option value="county">區縣</option>
+            </select>
+            <button class="query-button" :disabled="loadingSpatial" @click="loadSpatialAggregates">查詢</button>
+          </div>
         </div>
 
         <div v-if="loadingSpatial" class="loading-state">
           <div class="spinner"></div>
         </div>
 
-        <div v-else-if="spatialAggregates.length > 0" class="spatial-results">
-          <div class="map-placeholder">
-            <p>🗺️ 空間聚合地圖</p>
-            <p class="map-note">
-              顯示 {{ spatialAggregates.length }} 個區域的空間分佈和統計數據
-            </p>
-          </div>
-        </div>
+        <template v-else-if="spatialAggregates.length > 0">
+          <p class="spatial-desc">X軸：村莊密度　Y軸：隔離指數　氣泡大小：村莊總數　顏色：空間分散度</p>
+          <div ref="spatialChart" class="spatial-chart"></div>
+        </template>
       </div>
+
     </div>
 <!--  </ExploreLayout>-->
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import ExploreLayout from '@/layouts/ExploreLayout.vue'
+import RegionDisplay from '@/components/common/RegionDisplay.vue'
+import * as echarts from 'echarts'
 import {
   getRegionalAggregatesCity,
   getRegionalAggregatesCounty,
   getRegionalAggregatesTown,
-  getRegionalSpatialAggregates,
-  getNgramRegional
+  getRegionalSpatialAggregates
 } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
 
 // State
 const currentLevel = ref('city')
-const filters = ref({
-  city: '',
-  county: '',
-  township: ''
-})
 
+// 父级选择器的 level：township 查询 → 选县; 其余 → 选市
 const aggregates = ref([])
 const selectedItem = ref(null)
 const spatialAggregates = ref([])
 
 const loading = ref(false)
 const loadingSpatial = ref(false)
+const spatialChart = ref(null)
+let spatialChartInstance = null
 
 const currentPage = ref(1)
-const pageSize = 20
+const pageSize = 30
 const spatialLevel = ref('city')
 
-// N-gram Rankings State
-const ngramN = ref(2)
-const ngramLevel = ref('city')
-const ngramFilters = ref({
-  city: '',
-  county: '',
-  township: ''
-})
-const ngramTopK = ref(50)
-const ngramData = ref([])
-const loadingNgram = ref(false)
+const SEM_LABELS = {
+  mountain: '山地',
+  water: '水系',
+  settlement: '聚落',
+  direction: '方位',
+  clan: '宗族',
+  symbolic: '象徵',
+  agriculture: '農業',
+  vegetation: '植被',
+  infrastructure: '基建'
+}
+
+const getSemCategories = (item) =>
+  Object.entries(SEM_LABELS).map(([key, label]) => ({
+    key, label,
+    pct: item[`sem_${key}_pct`] || 0,
+    count: item[`sem_${key}_count`] || 0
+  }))
 
 // Computed
 const totalVillages = computed(() => {
-  return aggregates.value.reduce((sum, item) => sum + (item.village_count || 0), 0)
+  return aggregates.value.reduce((sum, item) => sum + (item.total_villages || 0), 0)
 })
 
 const avgVillages = computed(() => {
@@ -440,40 +242,24 @@ const paginatedAggregates = computed(() => {
 })
 
 const maxCategoryValue = computed(() => {
-  if (!selectedItem.value?.semantic_categories) return 1
-  return Math.max(...Object.values(selectedItem.value.semantic_categories))
-})
-
-const maxNgramPercentage = computed(() => {
-  if (ngramData.value.length === 0) return 1
-  return Math.max(...ngramData.value.map(item => item.percentage))
+  if (!selectedItem.value) return 1
+  return Math.max(...Object.keys(SEM_LABELS).map(k => selectedItem.value[`sem_${k}_pct`] || 0))
 })
 
 // Methods
-const switchLevel = (level) => {
-  currentLevel.value = level
-  filters.value = { city: '', county: '', township: '' }
-  aggregates.value = []
-  currentPage.value = 1
-}
-
 const loadAggregates = async () => {
   loading.value = true
+  aggregates.value = []
+  currentPage.value = 1
   try {
-    const params = {}
-    if (filters.value.city) params.city = filters.value.city
-    if (filters.value.county) params.county = filters.value.county
-    if (filters.value.township) params.township = filters.value.township
-
     if (currentLevel.value === 'city') {
-      aggregates.value = await getRegionalAggregatesCity(params)
+      aggregates.value = await getRegionalAggregatesCity()
     } else if (currentLevel.value === 'county') {
-      aggregates.value = await getRegionalAggregatesCounty(params)
+      aggregates.value = await getRegionalAggregatesCounty()
     } else {
-      aggregates.value = await getRegionalAggregatesTown(params)
+      const raw = await getRegionalAggregatesTown()
+      aggregates.value = raw.map(item => ({ ...item, township: item.town }))
     }
-
-    currentPage.value = 1
   } catch (error) {
     showError('加載聚合數據失敗')
   } finally {
@@ -487,10 +273,9 @@ const showDetail = (item) => {
 
 const loadSpatialAggregates = async () => {
   loadingSpatial.value = true
+  spatialAggregates.value = []
   try {
-    spatialAggregates.value = await getRegionalSpatialAggregates({
-      region_level: spatialLevel.value
-    })
+    spatialAggregates.value = await getRegionalSpatialAggregates({ region_level: spatialLevel.value })
   } catch (error) {
     showError('加載空間數據失敗')
   } finally {
@@ -498,44 +283,100 @@ const loadSpatialAggregates = async () => {
   }
 }
 
-const formatStatKey = (key) => {
-  const keyMap = {
-    avg_length: '平均長度',
-    max_length: '最大長度',
-    min_length: '最小長度',
-    diversity: '多樣性',
-    entropy: '熵值'
-  }
-  return keyMap[key] || key
+function renderSpatialChart() {
+  if (!spatialChart.value || !spatialAggregates.value.length) return
+  if (spatialChartInstance) spatialChartInstance.dispose()
+  spatialChartInstance = echarts.init(spatialChart.value)
+
+  // Deduplicate by region_name
+  const seen = new Set()
+  const items = spatialAggregates.value.filter(d => {
+    if (seen.has(d.region_name)) return false
+    seen.add(d.region_name)
+    return true
+  })
+
+  const maxCount = Math.max(...items.map(d => d.village_count))
+  const maxDisp = Math.max(...items.map(d => d.spatial_dispersion))
+  const minDisp = Math.min(...items.map(d => d.spatial_dispersion))
+
+  const seriesData = items.map(d => ({
+    name: d.region_name,
+    value: [d.avg_density, d.avg_isolation_score, d.village_count, d.spatial_dispersion, d.avg_nn_distance, d.n_spatial_clusters, d.n_isolated_villages]
+  }))
+
+  spatialChartInstance.setOption({
+    tooltip: {
+      trigger: 'item',
+      formatter: (p) => {
+        const [density, isolation, count, disp, nn, clusters, isolated] = p.data.value
+        return `<b>${p.data.name}</b><br/>
+          村莊數：${count}<br/>
+          密度：${density.toFixed(2)}<br/>
+          隔離指數：${isolation.toFixed(2)}<br/>
+          空間分散度：${disp.toFixed(2)}<br/>
+          最近鄰距離：${nn.toFixed(2)} km<br/>
+          空間聚類數：${clusters}<br/>
+          孤立村莊數：${isolated}`
+      }
+    },
+    dataZoom: [
+      { type: 'inside', xAxisIndex: 0, zoomOnMouseWheel: true },
+      { type: 'inside', yAxisIndex: 0, zoomOnMouseWheel: true },
+      { type: 'slider', xAxisIndex: 0, bottom: 8, height: 20 },
+      { type: 'slider', yAxisIndex: 0, right: 8, width: 20 }
+    ],
+    grid: { left: 70, right: 60, top: 40, bottom: 80 },
+    xAxis: {
+      type: 'value', name: '密度', nameLocation: 'middle', nameGap: 50,
+      min: 'dataMin', max: 'dataMax', scale: true,
+      axisLabel: { formatter: v => v.toFixed(2) }
+    },
+    yAxis: {
+      type: 'value', name: '隔離指數', nameLocation: 'middle', nameGap: 50,
+      min: 'dataMin', max: 'dataMax', scale: true,
+      axisLabel: { formatter: v => v.toFixed(2) }
+    },
+    series: [{
+      type: 'scatter',
+      data: seriesData,
+      symbolSize: d => Math.sqrt(d[2] / maxCount) * 60 + 10,
+      itemStyle: {
+        color: (p) => {
+          const ratio = (p.data.value[3] - minDisp) / (maxDisp - minDisp || 1)
+          const r = Math.round(74 + ratio * (213 - 74))
+          const g = Math.round(144 - ratio * (144 - 76))
+          const b = Math.round(226 - ratio * (226 - 60))
+          return `rgba(${r},${g},${b},0.75)`
+        }
+      },
+      label: {
+        show: true,
+        formatter: p => p.data.name,
+        position: 'top',
+        fontSize: 11,
+        color: '#555'
+      },
+      emphasis: { scale: 1.2 }
+    }]
+  })
 }
 
-const formatStatValue = (value) => {
-  if (typeof value === 'number') {
-    return value.toFixed(2)
+
+watch(currentLevel, loadAggregates)
+
+watch(spatialAggregates, async (val) => {
+  if (!val.length) return
+  await nextTick()
+  renderSpatialChart()
+})
+
+onBeforeUnmount(() => {
+  if (spatialChartInstance) {
+    spatialChartInstance.dispose()
+    spatialChartInstance = null
   }
-  return value
-}
-
-const loadRegionalNgrams = async () => {
-  loadingNgram.value = true
-  try {
-    const params = {
-      n: ngramN.value,
-      region_level: ngramLevel.value,
-      top_k: ngramTopK.value
-    }
-
-    if (ngramFilters.value.city) params.city = ngramFilters.value.city
-    if (ngramFilters.value.county) params.county = ngramFilters.value.county
-    if (ngramFilters.value.township) params.township = ngramFilters.value.township
-
-    ngramData.value = await getNgramRegional(params)
-  } catch (error) {
-    showError('加載 N-gram 排行榜失敗')
-  } finally {
-    loadingNgram.value = false
-  }
-}
+})
 </script>
 
 <style scoped>
@@ -553,34 +394,21 @@ const loadRegionalNgrams = async () => {
   text-align: center;
 }
 
-.level-selector {
-  display: flex;
-  gap: 12px;
+.aggregates-section {
   padding: 16px;
   margin-bottom: 16px;
 }
 
-.level-button {
-  flex: 1;
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.3s ease;
+.aggregates-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
 }
 
-.level-button:hover {
-  background: rgba(74, 144, 226, 0.1);
-}
-
-.level-button.active {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
+.aggregates-header .select-input {
+  width: auto;
 }
 
 .filters-section {
@@ -700,7 +528,7 @@ const loadRegionalNgrams = async () => {
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.5fr 1fr;
+  grid-template-columns: 3fr 1fr 1fr 6fr 1fr;
   gap: 12px;
   padding: 12px 16px;
   align-items: center;
@@ -734,17 +562,17 @@ const loadRegionalNgrams = async () => {
 }
 
 .category-badge {
-  width: 24px;
-  height: 24px;
+  padding: 2px 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(74, 144, 226, 0.2);
   color: var(--color-primary);
-  border-radius: 50%;
+  border-radius: 4px;
   font-size: 11px;
   font-weight: 600;
   cursor: help;
+  white-space: nowrap;
 }
 
 .detail-button {
@@ -907,7 +735,7 @@ const loadRegionalNgrams = async () => {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), var(--secondary-color));
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
   transition: width 0.5s ease;
 }
 
@@ -951,7 +779,33 @@ const loadRegionalNgrams = async () => {
 
 .spatial-section {
   padding: 16px;
+  margin-bottom: 16px;
 }
+
+.spatial-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.spatial-header h2 {
+  font-size: 16px;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.spatial-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0 0 8px 0;
+}
+
+.spatial-chart {
+  width: 100%;
+  height: 500px;
+}
+
 
 .spatial-section h2 {
   font-size: 16px;
@@ -972,102 +826,6 @@ const loadRegionalNgrams = async () => {
   border-radius: 8px;
   font-size: 14px;
   background: rgba(255, 255, 255, 0.5);
-}
-
-.map-placeholder {
-  padding: 80px 20px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  text-align: center;
-}
-
-.map-placeholder p {
-  font-size: 24px;
-  color: var(--text-primary);
-  margin-bottom: 10px;
-}
-
-.map-note {
-  font-size: 14px !important;
-  color: var(--text-secondary);
-}
-
-.map-note {
-  font-size: 14px !important;
-  color: var(--text-secondary);
-}
-
-.ngram-section {
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.ngram-section h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: var(--text-primary);
-}
-
-.ngram-controls {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-
-.number-input {
-  width: 180px;
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.number-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
-}
-
-.ngram-results {
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.ngram-header,
-.ngram-row {
-  display: grid;
-  grid-template-columns: 60px 150px 100px 100px 1fr;
-  gap: 12px;
-  padding: 12px 16px;
-  align-items: center;
-}
-
-.ngram-header {
-  background: rgba(74, 144, 226, 0.2);
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.ngram-row {
-  background: rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  transition: background 0.3s ease;
-}
-
-.ngram-row:hover {
-  background: rgba(74, 144, 226, 0.1);
-}
-
-.ngram-row.top-10 {
-  background: rgba(243, 156, 18, 0.1);
-}
-
-.col-ngram {
-  font-weight: 600;
-  color: var(--text-primary);
-  font-size: 16px;
 }
 
 @media (max-width: 768px) {
@@ -1091,21 +849,6 @@ const loadRegionalNgrams = async () => {
 
   .modal-content {
     max-height: 95vh;
-  }
-
-  .ngram-controls {
-    flex-direction: column;
-  }
-
-  .number-input,
-  .select-input {
-    width: 100%;
-  }
-
-  .ngram-header,
-  .ngram-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
   }
 }
 </style>
