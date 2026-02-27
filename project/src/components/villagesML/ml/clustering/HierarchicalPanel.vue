@@ -1,5 +1,7 @@
 <template>
   <div class="hierarchical-panel">
+    <h3 class="villagesml-subtab-title">ML計算 - 層次聚類</h3>
+    <div class="two-col-layout">
     <div class="settings-section glass-panel">
       <h3 class="panel-title">層次聚類</h3>
       <p class="panel-description">市-縣-鎮三級層次聚類分析</p>
@@ -36,7 +38,7 @@
         <FeatureToggles v-model="settings.features" />
         <PreprocessingSettings v-model="settings.preprocessing" />
 
-        <button @click="runClustering" :disabled="loading" class="run-button">
+        <button @click="runClustering" :disabled="loading" class="run-button solid-button">
           <span v-if="loading" class="loading-spinner">⏳</span>
           <span v-else>🚀</span>
           {{ loading ? '運行中...' : '運行聚類' }}
@@ -46,6 +48,7 @@
 
     <div class="results-section">
       <ClusteringResultsPanel :results="results" :loading="loading" />
+    </div>
     </div>
   </div>
 </template>
@@ -88,7 +91,10 @@ async function runClustering() {
       k_township: settings.value.k_township,
       features: settings.value.features,
       preprocessing: settings.value.preprocessing,
-      dbscan_config: settings.value.dbscan_config,
+      dbscan_config: {
+        eps: settings.value.dbscan_config.eps ?? 0.5,
+        min_samples: settings.value.dbscan_config.min_samples ?? 5
+      },
       random_state: settings.value.random_state
     }
 
@@ -109,136 +115,116 @@ async function runClustering() {
 
 <style scoped>
 .hierarchical-panel {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 1.5rem;
-  height: 100%;
-  padding: 1rem;
+  padding: 12px;
 }
 
-.glass-panel {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+.two-col-layout {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 16px;
+}
+
+.settings-section {
+  padding: 20px;
   overflow-y: auto;
 }
 
 .panel-title {
-  font-size: 1.25rem;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  margin: 0 0 8px 0;
 }
 
 .panel-description {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 1.5rem;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.5;
 }
 
 .auth-notice {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  background: rgba(255, 193, 7, 0.1);
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255, 193, 7, 0.15);
   border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 8px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 13px;
   color: #856404;
-  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .settings-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .hierarchical-k-settings {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.5);
+  padding: 16px;
+  background: rgba(74, 144, 226, 0.08);
+  border: 1px solid rgba(74, 144, 226, 0.2);
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .section-title {
-  font-size: 1rem;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 1rem;
+  margin-bottom: 12px;
 }
 
 .setting-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .setting-label {
   min-width: 80px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .setting-input {
-  padding: 0.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.9);
-  font-size: 0.95rem;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  font-size: 14px;
   width: 100px;
 }
 
+.setting-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.7);
+}
+
 .setting-hint {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 12px;
+  color: var(--text-secondary);
   font-style: italic;
-  margin-top: 0.5rem;
+  margin-top: 4px;
 }
 
 .run-button {
-  margin-top: 1.5rem;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, var(--primary-color), #357abd);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  margin-top: 8px;
+  padding: 12px 24px;
 }
 
-.run-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(74, 144, 226, 0.3);
-}
-
-.run-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.loading-spinner {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.results-section {
+  overflow-y: auto;
 }
 
 @media (max-width: 1024px) {
-  .hierarchical-panel {
+  .two-col-layout {
     grid-template-columns: 1fr;
   }
 }

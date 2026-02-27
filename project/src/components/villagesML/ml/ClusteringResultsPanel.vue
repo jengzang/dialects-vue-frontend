@@ -32,16 +32,16 @@
         </div>
         <div class="metric-card">
           <div class="metric-label">聚類數</div>
-          <div class="metric-value">{{ results.metrics?.n_clusters ?? results.k ?? 'N/A' }}</div>
+          <div class="metric-value">{{ displayNClusters }}</div>
         </div>
-        <div class="metric-card" v-if="results.metrics?.n_noise !== undefined">
+        <div class="metric-card" v-if="displayNNoise !== undefined">
           <div class="metric-label">噪聲點數</div>
-          <div class="metric-value">{{ results.metrics.n_noise }}</div>
+          <div class="metric-value">{{ displayNNoise }}</div>
           <div class="metric-hint">DBSCAN 未分類點</div>
         </div>
-        <div class="metric-card" v-if="results.metrics?.noise_ratio !== undefined">
+        <div class="metric-card" v-if="displayNoiseRatio !== undefined">
           <div class="metric-label">噪聲比例</div>
-          <div class="metric-value">{{ (results.metrics.noise_ratio * 100).toFixed(1) }}%</div>
+          <div class="metric-value">{{ (displayNoiseRatio * 100).toFixed(1) }}%</div>
           <div class="metric-hint">噪聲點佔比</div>
         </div>
         <div class="metric-card">
@@ -67,16 +67,19 @@
       <!-- Cluster Profiles -->
       <div class="cluster-profiles">
         <h4>聚類概況</h4>
+        <div v-if="displayNClusters === 0" class="all-noise-notice">
+          所有區域均為噪聲點，請嘗試調大 eps 或減小 min_samples
+        </div>
         <div class="profiles-grid">
           <div
-            v-for="profile in results.cluster_profiles"
+            v-for="profile in clusterProfiles"
             :key="profile.cluster_id"
             class="profile-card"
             :style="{ borderColor: getClusterColor(profile.cluster_id) }"
           >
             <div class="profile-header">
               <span class="cluster-badge" :style="{ background: getClusterColor(profile.cluster_id) }">
-                聚類 {{ profile.cluster_id }}
+                {{ profile.cluster_id === -1 ? '噪聲' : `聚類 ${profile.cluster_id}` }}
               </span>
               <span class="region-count">{{ profile.region_count }} 個區域</span>
             </div>
@@ -181,27 +184,60 @@ const props = defineProps({
 const emit = defineEmits(['adjust-params'])
 
 // Region display settings
-const maxDisplayRegions = 8 // 默認顯示8個區域
+const maxDisplayRegions = 8
 const showRegionModal = ref(false)
 const selectedProfile = ref(null)
 
 // Cluster color mapping
 const clusterColors = [
-  '#4a90e2', // Blue
-  '#50c878', // Green
-  '#f39c12', // Orange
-  '#e74c3c', // Red
-  '#9b59b6', // Purple
-  '#1abc9c', // Teal
-  '#34495e', // Dark gray
-  '#e67e22', // Dark orange
-  '#3498db', // Light blue
-  '#2ecc71'  // Light green
+  '#4a90e2', '#50c878', '#f39c12', '#e74c3c', '#9b59b6',
+  '#1abc9c', '#34495e', '#e67e22', '#3498db', '#2ecc71'
 ]
 
 const getClusterColor = (clusterId) => {
+  if (clusterId === -1) return '#95a5a6' // gray for noise
   return clusterColors[clusterId % clusterColors.length]
 }
+
+// Derive metrics from assignments when not provided by API
+const derivedNClusters = computed(() => {
+  if (!props.results?.assignments) return null
+  const ids = new Set(props.results.assignments.map(a => a.cluster_id).filter(id => id !== -1))
+  return ids.size
+})
+
+const displayNClusters = computed(() => {
+  return props.results?.metrics?.n_clusters ?? derivedNClusters.value ?? props.results?.k ?? 'N/A'
+})
+
+const displayNNoise = computed(() => {
+  if (props.results?.metrics?.n_noise !== undefined) return props.results.metrics.n_noise
+  if (props.results?.algorithm !== 'dbscan') return undefined
+  if (!props.results?.assignments) return undefined
+  return props.results.assignments.filter(a => a.cluster_id === -1).length
+})
+
+const displayNoiseRatio = computed(() => {
+  if (props.results?.metrics?.noise_ratio !== undefined) return props.results.metrics.noise_ratio
+  if (props.results?.algorithm !== 'dbscan') return undefined
+  if (!props.results?.assignments?.length) return undefined
+  return props.results.assignments.filter(a => a.cluster_id === -1).length / props.results.assignments.length
+})
+
+// Generate cluster profiles from assignments when not provided by API
+const clusterProfiles = computed(() => {
+  if (props.results?.cluster_profiles?.length) return props.results.cluster_profiles
+  if (!props.results?.assignments) return []
+  const clusterMap = {}
+  for (const a of props.results.assignments) {
+    if (!clusterMap[a.cluster_id]) {
+      clusterMap[a.cluster_id] = { cluster_id: a.cluster_id, regions: [], region_count: 0 }
+    }
+    clusterMap[a.cluster_id].regions.push(a.region_name)
+    clusterMap[a.cluster_id].region_count++
+  }
+  return Object.values(clusterMap).sort((a, b) => a.cluster_id - b.cluster_id)
+})
 
 // Get displayed regions (limited)
 const getDisplayedRegions = (regions) => {
@@ -218,11 +254,7 @@ const getAllRegionsForCluster = (clusterId) => {
 
 // Get actual region count for display
 const getActualRegionCount = (profile) => {
-  // If profile.regions is truncated, use region_count
-  // Otherwise use the actual array length
-  if (profile.regions.length < profile.region_count) {
-    return profile.region_count
-  }
+  if (profile.regions.length < profile.region_count) return profile.region_count
   return profile.regions.length
 }
 

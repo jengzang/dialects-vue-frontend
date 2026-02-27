@@ -1,6 +1,8 @@
 <template>
   <div class="char-tendency-panel">
+    <h3 class="villagesml-subtab-title">ML計算 - 字符傾向性聚類</h3>
     <!-- 左側：參數設置 -->
+    <div class="two-col-layout">
     <div class="settings-section glass-panel">
       <h3 class="panel-title">字符傾向性聚類</h3>
       <p class="panel-description">基於字符使用傾向性的區域聚類分析</p>
@@ -37,26 +39,26 @@
           <label class="setting-label">區域級別</label>
           <div class="setting-control">
             <select v-model="settings.region_level" class="setting-select">
-              <option value="city">市</option>
-              <option value="county">縣</option>
-              <option value="township">鎮</option>
+              <option value="city">市級</option>
+              <option value="county">縣級</option>
+              <option value="township">鎮級</option>
             </select>
           </div>
         </div>
 
         <!-- 區域過濾 -->
-        <div class="setting-row">
-          <label class="setting-label">區域過濾</label>
-          <div class="setting-control">
-            <input
-              type="text"
-              v-model="settings.region_filter"
-              placeholder="留空表示全部區域"
-              class="setting-input"
-            />
-            <span class="setting-hint">可選：指定特定區域名稱</span>
-          </div>
-        </div>
+<!--        <div class="setting-row">-->
+<!--          <label class="setting-label">區域過濾</label>-->
+<!--          <div class="setting-control">-->
+<!--            <input-->
+<!--              type="text"-->
+<!--              v-model="settings.region_filter"-->
+<!--              placeholder="留空表示全部區域"-->
+<!--              class="setting-input"-->
+<!--            />-->
+<!--            <span class="setting-hint">可選：指定特定區域名稱</span>-->
+<!--          </div>-->
+<!--        </div>-->
 
         <!-- Top N 字符 -->
         <div class="setting-row">
@@ -79,8 +81,8 @@
           <div class="setting-control">
             <select v-model="settings.tendency_metric" class="setting-select">
               <option value="z_score">Z-Score</option>
-              <option value="tfidf">TF-IDF</option>
-              <option value="pmi">PMI</option>
+              <option value="lift">Lift</option>
+              <option value="log_odds">Log-Odds</option>
             </select>
             <span class="setting-hint">{{ tendencyMetricHint }}</span>
           </div>
@@ -121,7 +123,7 @@
         <button
           @click="runClustering"
           :disabled="loading"
-          class="run-button"
+          class="run-button solid-button"
         >
           <span v-if="loading" class="loading-spinner">⏳</span>
           <span v-else>🚀</span>
@@ -136,6 +138,7 @@
         :results="results"
         :loading="loading"
       />
+    </div>
     </div>
   </div>
 </template>
@@ -159,10 +162,10 @@ const tendencyMetricHint = computed(() => {
   switch (settings.value.tendency_metric) {
     case 'z_score':
       return '標準化偏差，適合比較不同字符'
-    case 'tfidf':
-      return 'TF-IDF 權重，強調區域特異性'
-    case 'pmi':
-      return '點互信息，衡量字符與區域的關聯'
+    case 'lift':
+      return 'Lift 值，衡量字符與區域的提升度'
+    case 'log_odds':
+      return '對數勝率，適合二元傾向性分析'
     default:
       return ''
   }
@@ -180,8 +183,8 @@ async function runClustering() {
     return
   }
 
-  if (settings.value.top_n_chars < 10 || settings.value.top_n_chars > 200) {
-    showError('Top N 字符必須在 10-200 之間')
+  if (settings.value.top_n_chars < 10 || settings.value.top_n_chars > 500) {
+    showError('Top N 字符必須在 10-500 之間')
     return
   }
 
@@ -191,13 +194,16 @@ async function runClustering() {
   try {
     const params = {
       algorithm: settings.value.algorithm,
-      k: settings.value.k,
+      k: settings.value.algorithm === 'dbscan' ? null : settings.value.k,
       region_level: settings.value.region_level,
-      region_filter: settings.value.region_filter || null,
+      region_filter: settings.value.region_filter ? [settings.value.region_filter] : null,
       top_n_chars: settings.value.top_n_chars,
       tendency_metric: settings.value.tendency_metric,
       preprocessing: settings.value.preprocessing,
-      dbscan_config: settings.value.dbscan_config,
+      dbscan_config: {
+        eps: settings.value.dbscan_config.eps ?? 0.5,
+        min_samples: settings.value.dbscan_config.min_samples ?? 5
+      },
       random_state: settings.value.random_state
     }
 
@@ -205,7 +211,7 @@ async function runClustering() {
     results.value = data
     villagesMLStore.clusteringResults = data
 
-    showSuccess(`聚類完成！發現 ${data.n_clusters} 個聚類`)
+    showSuccess(`聚類完成！發現 ${data.metrics?.n_clusters ?? data.k} 個聚類`)
   } catch (error) {
     console.error('字符傾向性聚類失敗:', error)
     showError(error.message || '聚類失敗')
@@ -218,149 +224,116 @@ async function runClustering() {
 
 <style scoped>
 .char-tendency-panel {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 1.5rem;
-  height: 100%;
-  padding: 1rem;
+  padding: 12px;
 }
 
-.glass-panel {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+.two-col-layout {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 16px;
+}
+
+.settings-section {
+  padding: 20px;
   overflow-y: auto;
 }
 
 .panel-title {
-  font-size: 1.25rem;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  margin: 0 0 8px 0;
 }
 
 .panel-description {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 1.5rem;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.5;
 }
 
 .auth-notice {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  background: rgba(255, 193, 7, 0.1);
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255, 193, 7, 0.15);
   border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 8px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 13px;
   color: #856404;
-  font-size: 0.9rem;
-}
-
-.notice-icon {
-  font-size: 1.2rem;
+  font-weight: 500;
 }
 
 .settings-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .setting-row {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 12px;
 }
 
 .setting-label {
   min-width: 100px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
-  padding-top: 0.5rem;
+  padding-top: 10px;
 }
 
 .setting-control {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 6px;
 }
 
 .setting-input,
 .setting-select {
-  padding: 0.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.9);
-  font-size: 0.95rem;
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  font-size: 14px;
 }
 
 .setting-input:focus,
 .setting-select:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .setting-hint {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 12px;
+  color: var(--text-secondary);
   font-style: italic;
 }
 
 .dbscan-params {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.5);
+  padding: 16px;
+  background: rgba(74, 144, 226, 0.08);
+  border: 1px solid rgba(74, 144, 226, 0.2);
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .section-title {
-  font-size: 1rem;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 1rem;
+  margin-bottom: 12px;
 }
 
 .run-button {
-  margin-top: 1.5rem;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, var(--primary-color), #357abd);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.run-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(74, 144, 226, 0.3);
-}
-
-.run-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.loading-spinner {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  margin-top: 8px;
+  padding: 12px 24px;
 }
 
 .results-section {
@@ -368,7 +341,7 @@ async function runClustering() {
 }
 
 @media (max-width: 1024px) {
-  .char-tendency-panel {
+  .two-col-layout {
     grid-template-columns: 1fr;
   }
 }
