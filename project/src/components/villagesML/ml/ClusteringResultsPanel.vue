@@ -45,8 +45,8 @@
           <div class="metric-hint">噪聲點佔比</div>
         </div>
         <div class="metric-card">
-          <div class="metric-label">區域數</div>
-          <div class="metric-value">{{ results.n_regions || 'N/A' }}</div>
+          <div class="metric-label">{{ assignmentLabel }}數</div>
+          <div class="metric-value">{{ displayCount }}</div>
         </div>
         <div class="metric-card">
           <div class="metric-label">執行時間</div>
@@ -111,25 +111,25 @@
 
       <!-- Assignments Table -->
       <div class="assignments-section">
-        <h4>區域分配</h4>
+        <h4>分配詳情</h4>
         <div class="table-container">
           <table class="assignments-table">
             <thead>
               <tr>
-                <th>區域名稱</th>
+                <th>{{ assignmentLabel }}</th>
                 <th>聚類ID</th>
                 <th>距離中心</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="assignment in results.assignments" :key="assignment.region_name">
-                <td class="region-name">{{ assignment.region_name }}</td>
+              <tr v-for="assignment in results.assignments" :key="assignment[assignmentNameKey] + assignment.cluster_id">
+                <td class="region-name">{{ assignment[assignmentNameKey] }}</td>
                 <td>
                   <span
                     class="cluster-badge small"
                     :style="{ background: getClusterColor(assignment.cluster_id) }"
                   >
-                    {{ assignment.cluster_id }}
+                    {{ assignment.cluster_id === -1 ? '噪聲' : assignment.cluster_id }}
                   </span>
                 </td>
                 <td class="distance">{{ assignment.distance?.toFixed(3) }}</td>
@@ -228,15 +228,36 @@ const displayNoiseRatio = computed(() => {
 const clusterProfiles = computed(() => {
   if (props.results?.cluster_profiles?.length) return props.results.cluster_profiles
   if (!props.results?.assignments) return []
+  const key = assignmentNameKey.value
   const clusterMap = {}
   for (const a of props.results.assignments) {
     if (!clusterMap[a.cluster_id]) {
       clusterMap[a.cluster_id] = { cluster_id: a.cluster_id, regions: [], region_count: 0 }
     }
-    clusterMap[a.cluster_id].regions.push(a.region_name)
+    clusterMap[a.cluster_id].regions.push(a[key])
     clusterMap[a.cluster_id].region_count++
   }
   return Object.values(clusterMap).sort((a, b) => a.cluster_id - b.cluster_id)
+})
+
+// Detect assignment name key (region_name vs village_name)
+const assignmentNameKey = computed(() => {
+  const first = props.results?.assignments?.[0]
+  if (!first) return 'region_name'
+  return 'village_name' in first ? 'village_name' : 'region_name'
+})
+
+const assignmentLabel = computed(() => {
+  return assignmentNameKey.value === 'village_name' ? '村莊名稱' : '區域名稱'
+})
+
+// Display count: n_regions for region-level, sampled/spatial counts for others
+const displayCount = computed(() => {
+  return props.results?.n_regions
+    ?? props.results?.n_spatial_clusters
+    ?? props.results?.sampled_village_count
+    ?? props.results?.original_village_count
+    ?? 'N/A'
 })
 
 // Get displayed regions (limited)
@@ -247,9 +268,10 @@ const getDisplayedRegions = (regions) => {
 // Get all regions for a cluster from assignments
 const getAllRegionsForCluster = (clusterId) => {
   if (!props.results?.assignments) return []
+  const key = assignmentNameKey.value
   return props.results.assignments
     .filter(a => a.cluster_id === clusterId)
-    .map(a => a.region_name)
+    .map(a => a[key])
 }
 
 // Get actual region count for display

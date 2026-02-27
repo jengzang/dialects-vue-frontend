@@ -47,7 +47,7 @@
     </div>
 
     <div class="results-section">
-      <ClusteringResultsPanel :results="results" :loading="loading" />
+      <HierarchicalResultsPanel :results="results" :loading="loading" />
     </div>
     </div>
   </div>
@@ -62,7 +62,7 @@ import { showSuccess, showError, showWarning } from '@/utils/message.js'
 import AlgorithmSelector from './shared/AlgorithmSelector.vue'
 import PreprocessingSettings from './shared/PreprocessingSettings.vue'
 import FeatureToggles from './shared/FeatureToggles.vue'
-import ClusteringResultsPanel from '../ClusteringResultsPanel.vue'
+import HierarchicalResultsPanel from '../HierarchicalResultsPanel.vue'
 
 const settings = computed(() => villagesMLStore.hierarchicalSettings)
 const isAuthenticated = computed(() => userStore.isAuthenticated)
@@ -91,10 +91,6 @@ async function runClustering() {
       k_township: settings.value.k_township,
       features: settings.value.features,
       preprocessing: settings.value.preprocessing,
-      dbscan_config: {
-        eps: settings.value.dbscan_config.eps ?? 0.5,
-        min_samples: settings.value.dbscan_config.min_samples ?? 5
-      },
       random_state: settings.value.random_state
     }
 

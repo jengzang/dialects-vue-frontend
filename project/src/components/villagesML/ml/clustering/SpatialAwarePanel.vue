@@ -32,7 +32,7 @@
           </div>
         </div>
 
-        <FeatureToggles v-model="settings.features" />
+        <SpatialFeatureToggles v-model="settings.features" />
         <PreprocessingSettings v-model="settings.preprocessing" />
 
         <button @click="runClustering" :disabled="loading" class="run-button solid-button">
@@ -58,7 +58,7 @@ import { runSpatialAwareClustering } from '@/api'
 import { showSuccess, showError, showWarning } from '@/utils/message.js'
 import AlgorithmSelector from './shared/AlgorithmSelector.vue'
 import PreprocessingSettings from './shared/PreprocessingSettings.vue'
-import FeatureToggles from './shared/FeatureToggles.vue'
+import SpatialFeatureToggles from './shared/SpatialFeatureToggles.vue'
 import ClusteringResultsPanel from '../ClusteringResultsPanel.vue'
 
 const settings = computed(() => villagesMLStore.spatialAwareSettings)
@@ -83,22 +83,29 @@ async function runClustering() {
   try {
     const params = {
       algorithm: settings.value.algorithm,
-      k: settings.value.k,
+      k: settings.value.algorithm === 'dbscan' ? null : settings.value.k,
       spatial_run_id: settings.value.spatial_run_id,
       features: settings.value.features,
       preprocessing: settings.value.preprocessing,
-      dbscan_config: {
-        eps: settings.value.dbscan_config.eps ?? 0.5,
-        min_samples: settings.value.dbscan_config.min_samples ?? 5
-      },
       random_state: settings.value.random_state
     }
 
     const data = await runSpatialAwareClustering(params)
-    results.value = data
-    villagesMLStore.clusteringResults = data
 
-    showSuccess(`聚類完成！發現 ${data.n_clusters} 個聚類`)
+    // Normalize response for ClusteringResultsPanel compatibility
+    const normalized = {
+      ...data,
+      n_regions: data.n_spatial_clusters,
+      assignments: data.assignments?.map(a => ({
+        region_name: `SC-${a.spatial_cluster_id}`,
+        cluster_id: a.meta_cluster_id
+      }))
+    }
+    results.value = normalized
+    villagesMLStore.clusteringResults = normalized
+
+    const nClusters = data.metrics?.n_clusters ?? data.k
+    showSuccess(`聚類完成！發現 ${nClusters} 個元聚類`)
   } catch (error) {
     console.error('空間感知聚類失敗:', error)
     showError(error.message || '聚類失敗')

@@ -109,20 +109,15 @@ export const villagesMLStore = reactive({
     k: 5,
     spatial_run_id: 'spatial_hdbscan_v1',
     features: {
-      use_semantic: true,
-      use_morphology: true,
-      use_diversity: true,
-      top_n_suffix2: 100,
-      top_n_suffix3: 100
+      use_semantic_profile: true,
+      use_naming_patterns: true,
+      use_geographic: true,
+      use_cluster_size: true
     },
     preprocessing: {
       use_pca: true,
       pca_n_components: 50,
       standardize: true
-    },
-    dbscan_config: {
-      eps: null,
-      min_samples: null
     },
     random_state: 42
   },
@@ -144,10 +139,6 @@ export const villagesMLStore = reactive({
       use_pca: true,
       pca_n_components: 50,
       standardize: true
-    },
-    dbscan_config: {
-      eps: null,
-      min_samples: null
     },
     random_state: 42
   },

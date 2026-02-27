@@ -141,7 +141,7 @@ async function runClustering() {
   try {
     const params = {
       algorithm: settings.value.algorithm,
-      k: settings.value.k,
+      k: settings.value.algorithm === 'dbscan' ? null : settings.value.k,
       sampling_strategy: settings.value.sampling_strategy,
       sample_size: settings.value.sample_size,
       filter: settings.value.filter,
