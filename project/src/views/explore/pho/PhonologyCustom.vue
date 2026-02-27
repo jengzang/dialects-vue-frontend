@@ -376,7 +376,7 @@ watch(() => route.query, (newQuery) => {
 
 <style scoped>
 .phonology-matrix-page {
-  min-width: 80dvw;
+  width: 90dvw;
 }
 
 .page-header {

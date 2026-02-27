@@ -706,12 +706,11 @@ const reset = () => {
 
 <style scoped>
 .merge-tool-container {
-  width: 100%;
   height: 80%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 5px;
   padding-top: 60px;
 }
 

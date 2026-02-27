@@ -605,15 +605,15 @@ loadConfig()
 
 <style scoped>
 .jyut2ipa-container {
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 4px;
+  padding-top:25px ;
 }
 
 .glass-container {
-  width: min(95vw, 1000px);
+  width: min(95dvw, 800px);
   background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(25px) saturate(180%);
   -webkit-backdrop-filter: blur(25px) saturate(180%);

@@ -37,6 +37,7 @@ import ExploreBar from '@/components/bar/ExploreBar.vue'
 
 /* 内容区域：与 SimpleLayout 完全一致 */
 .content-area {
+  //overflow: hidden;
   height: 88dvh;
   display: flex;
   justify-content: center;

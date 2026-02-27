@@ -148,7 +148,7 @@ watch(() => route.query.loc, () => {
 
 <style scoped>
 .phonology-matrix-page {
-  min-width: 80dvw;
+  width: 90dvw;
 }
 
 .page-header {

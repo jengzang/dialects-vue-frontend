@@ -149,7 +149,6 @@ const goToGDVillages = () => {
 .glass-container {
   width: 60dvw;
   height: 95%;
-  max-width: 400px;
   margin: 20px auto;
   border-radius: 30px;
   background: rgba(255, 255, 255, 0.65);

@@ -367,7 +367,7 @@ onMounted(() => {
 <style scoped>
 /* Glass Container */
 .glass-container {
-  width: 90%;
+  width: 90dvw;
   max-width: 1400px;
   height: 90dvh;
   margin:10px auto;
@@ -663,7 +663,7 @@ onMounted(() => {
 /* Responsive Design */
 @media (max-aspect-ratio: 1/1) {
   .glass-container {
-    width: 100%;
+    width: 92dvw;
     height: 88dvh;
     border-radius: 20px;
   }

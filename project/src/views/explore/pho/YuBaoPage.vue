@@ -910,7 +910,7 @@ watch(viewMode, async (newMode) => {
 
 <style scoped>
 .yubao-page {
-  width: 100%;
+  width: 90dvw;
   max-width: 1200px;
   margin: 0 auto;
   padding: 12px;

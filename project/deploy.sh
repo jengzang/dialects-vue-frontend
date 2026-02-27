@@ -52,6 +52,7 @@ FILES_TO_UPLOAD=(
     "explore/"
     "intro/"
     "menu/"
+    "villagesML/"
 )
 
 echo -e "${BLUE}步骤 1/2: 清空服务器上的 assets 目录${NC}"
