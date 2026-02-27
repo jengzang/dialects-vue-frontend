@@ -52,12 +52,17 @@
       <!-- Legacy Tab: Clustering Analysis -->
       <div v-else-if="activeModule === 'compute' && activeSubtab === 'clustering'" class="legacy-tab">
         <h3 class="villagesml-subtab-title">ML計算 - 聚類分析</h3>
-        <div class="two-column-layout">
+        <div class="two-column-layout2">
           <ClusteringSettingsPanel
+            ref="clusteringSettingsPanelRef"
             :loading="clusteringLoading"
+            :region-count="estimatedRegionCount"
             @run="handleRunClustering"
           />
-          <ClusteringResultsPanel :results="clusteringResults" />
+          <ClusteringResultsPanel
+            :results="clusteringResults"
+            @adjust-params="handleAdjustParams"
+          />
         </div>
       </div>
 
@@ -189,6 +194,7 @@ const SemanticCategories = defineAsyncComponent(() => import('@/components/villa
 const SemanticComposition = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticComposition.vue'))
 const SemanticNgrams = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticNgrams.vue'))
 const SemanticIndices = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticIndices.vue'))
+const SemanticSubcategories = defineAsyncComponent(() => import('@/components/villagesML/semantic/SemanticSubcategories.vue'))
 const SpatialHotspotsTab = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialHotspotsTab.vue'))
 const SpatialClustersTab = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialClustersTab.vue'))
 const SpatialVisualizationTab = defineAsyncComponent(() => import('@/components/villagesML/spatial/SpatialVisualizationTab.vue'))
@@ -201,6 +207,7 @@ const PatternTendency = defineAsyncComponent(() => import('@/components/villages
 const RegionalAggregates = defineAsyncComponent(() => import('@/components/villagesML/regional/RegionalAggregates.vue'))
 const RegionalVectors = defineAsyncComponent(() => import('@/components/villagesML/regional/RegionalVectors.vue'))
 const CategoryTendency = defineAsyncComponent(() => import('@/components/villagesML/regional/CategoryTendency.vue'))
+const RegionSimilarity = defineAsyncComponent(() => import('@/components/villagesML/regional/RegionSimilarity.vue'))
 const FeatureExtraction = defineAsyncComponent(() => import('@/components/villagesML/ml/FeatureExtraction.vue'))
 const SubsetAnalysis = defineAsyncComponent(() => import('@/components/villagesML/ml/SubsetAnalysis.vue'))
 const SystemInfo = defineAsyncComponent(() => import('@/components/villagesML/system/SystemInfo.vue'))
@@ -254,6 +261,7 @@ const currentComponent = computed(() => {
       'semantic-composition': SemanticComposition,
       'semantic-ngrams': SemanticNgrams,
       'semantic-indices': SemanticIndices,
+      'semantic-subcategories': SemanticSubcategories,
       'spatial-hotspots': SpatialHotspotsTab,
       'spatial-clusters': SpatialClustersTab,
       'spatial-visualization': SpatialVisualizationTab,
@@ -266,6 +274,7 @@ const currentComponent = computed(() => {
       'regional-aggregates': RegionalAggregates,
       'regional-vectors': RegionalVectors,
       'regional-tendency': CategoryTendency,
+      'regional-similarity': RegionSimilarity,
       'compute-features': FeatureExtraction,
       'compute-subset': SubsetAnalysis
     }
@@ -290,6 +299,9 @@ const regionalLoading = ref(false)
 const clusteringLoading = ref(false)
 const semanticLoading = ref(false)
 
+// Refs for component access
+const clusteringSettingsPanelRef = ref(null)
+
 const searchResults = computed(() => villagesMLStore.searchResults)
 const searchTotal = computed(() => villagesMLStore.searchTotal)
 const searchPage = computed(() => villagesMLStore.searchPage)
@@ -298,6 +310,16 @@ const searchPageSize = computed(() => villagesMLStore.searchPageSize)
 const tendencyData = computed(() => villagesMLStore.tendencyData)
 const clusteringResults = computed(() => villagesMLStore.clusteringResults)
 const semanticNetwork = computed(() => villagesMLStore.semanticNetwork)
+
+// 估算區域數量（用於 DBSCAN 參數建議）
+const estimatedRegionCount = computed(() => {
+  const level = villagesMLStore.clusteringSettings.region_level
+  // 基於廣東省的大致數據估算
+  if (level === 'city') return 21      // 21個地級市
+  if (level === 'county') return 120   // 約120個區縣
+  if (level === 'township') return 1600 // 約1600個鄉鎮
+  return 100 // 默認值
+})
 
 const handleSearch = async () => {
   searchLoading.value = true
@@ -360,7 +382,13 @@ const handleRunClustering = async (settings) => {
 
   clusteringLoading.value = true
   try {
-    const result = await runClustering(settings)
+    // 清理参数：DBSCAN 不需要 k 参数
+    const params = { ...settings }
+    if (params.algorithm === 'dbscan' && params.k !== undefined) {
+      delete params.k
+    }
+
+    const result = await runClustering(params)
     villagesMLStore.clusteringResults = result
     showSuccess('聚類完成')
   } catch (error) {
@@ -401,6 +429,13 @@ const openDeepAnalysisModal = (village) => {
 const closeDeepAnalysisModal = () => {
   showDeepAnalysisModal.value = false
   selectedVillageForAnalysis.value = null
+}
+
+// 處理參數快速調整（從 ResultsPanel 觸發）
+const handleAdjustParams = (action) => {
+  if (clusteringSettingsPanelRef.value) {
+    clusteringSettingsPanelRef.value.adjustParams(action)
+  }
 }
 </script>
 
@@ -450,15 +485,17 @@ const closeDeepAnalysisModal = () => {
   animation: fadeIn 0.3s ease;
 }
 
-.two-column-layout {
+.two-column-layout,.two-column-layout2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   margin-top: 20px;
 }
-
+.two-column-layout2{
+  grid-template-columns: 1fr 3fr;
+}
 @media (max-width: 768px) {
-  .two-column-layout {
+  .two-column-layout,.two-column-layout2  {
     grid-template-columns: 1fr;
   }
 }

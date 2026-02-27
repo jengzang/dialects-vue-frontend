@@ -594,6 +594,18 @@ export const VILLAGESML_MODULES = [
         mobileFontSize: 0.9,
         hideOnMobile: false,
         hideLabelOnMobile: true
+      },
+      {
+        id: 'subcategories',
+        label: '子類別分析',
+        icon: '🏷️',
+        path: '/villagesML?module=semantic&subtab=subcategories',
+        weight: 1,
+        mobileWeight: 1,
+        fontSize: 0.95,
+        mobileFontSize: 0.9,
+        hideOnMobile: false,
+        hideLabelOnMobile: true
       }
     ]
   },
@@ -783,6 +795,18 @@ export const VILLAGESML_MODULES = [
         label: '類別傾向性',
         icon: '📊',
         path: '/villagesML?module=regional&subtab=tendency',
+        weight: 1,
+        mobileWeight: 1,
+        fontSize: 0.95,
+        mobileFontSize: 0.9,
+        hideOnMobile: false,
+        hideLabelOnMobile: true
+      },
+      {
+        id: 'similarity',
+        label: '相似度分析',
+        icon: '🔍',
+        path: '/villagesML?module=regional&subtab=similarity',
         weight: 1,
         mobileWeight: 1,
         fontSize: 0.95,

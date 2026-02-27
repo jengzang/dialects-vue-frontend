@@ -170,6 +170,13 @@ export {
   getSemanticCategoryTendency,
   getSemanticVTFGlobal,
   getSemanticVTFRegional,
+  // 語義子類別 (Phase 17)
+  getSemanticSubcategoryList,
+  getSemanticSubcategoryChars,
+  getSemanticSubcategoryVTFGlobal,
+  getSemanticSubcategoryVTFRegional,
+  getSemanticSubcategoryTendencyTop,
+  getSemanticSubcategoryComparison,
   // 語義標籤
   getSemanticLabelCategories,
   getSemanticLabelsByCategory,
@@ -218,5 +225,9 @@ export {
   getMetadataOverview,
   getMetadataTables,
   getNgramStatistics,
-  getDatabaseStatistics
+  getDatabaseStatistics,
+  // 區域相似度 (Phase 15)
+  getRegionSimilaritySearch,
+  getRegionSimilarityPair,
+  getRegionSimilarityMatrix
 } from './villagesML/index.js'

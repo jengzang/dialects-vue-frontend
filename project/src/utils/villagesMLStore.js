@@ -44,6 +44,10 @@ export const villagesMLStore = reactive({
       pca_n_components: 50,
       standardize: true
     },
+    dbscan_config: {
+      eps: null,  // null 表示使用后端自动调整
+      min_samples: null
+    },
     random_state: 42
   },
   clusteringResults: null,

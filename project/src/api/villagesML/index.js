@@ -48,7 +48,14 @@ export {
   getSemanticCategoryList,
   getSemanticCategoryTendency,
   getSemanticVTFGlobal,
-  getSemanticVTFRegional
+  getSemanticVTFRegional,
+  // 子類別 API (Phase 17)
+  getSemanticSubcategoryList,
+  getSemanticSubcategoryChars,
+  getSemanticSubcategoryVTFGlobal,
+  getSemanticSubcategoryVTFRegional,
+  getSemanticSubcategoryTendencyTop,
+  getSemanticSubcategoryComparison
 } from './semanticCategories.js'
 
 // 語義標籤
@@ -123,3 +130,10 @@ export {
   getNgramStatistics,
   getDatabaseStatistics
 } from './metadata.js'
+
+// 區域相似度 (Phase 15)
+export {
+  getRegionSimilaritySearch,
+  getRegionSimilarityPair,
+  getRegionSimilarityMatrix
+} from './regionSimilarity.js'
