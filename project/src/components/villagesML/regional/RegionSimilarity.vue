@@ -34,12 +34,14 @@
 
         <div class="form-group">
           <label>目標區域:</label>
-          <select v-model="targetRegion" class="select-input">
-            <option :value="null">請選擇區域</option>
-            <option v-for="region in regionList" :key="region" :value="region">
-              {{ region }}
-            </option>
-          </select>
+          <FilterableSelect
+            v-model="targetRegion"
+            :level="targetRegionLevel"
+            :allowed-levels="['city', 'county']"
+            @update:level="(newLevel) => targetRegionLevel = newLevel"
+            @update:hierarchy="(h) => targetRegionHierarchy = h"
+            placeholder="請選擇或輸入區域"
+          />
         </div>
 
         <div class="form-row">
@@ -78,9 +80,9 @@
       </div>
 
       <div v-else-if="searchResults && searchResults.length > 0" class="search-results">
-        <div class="results-header glass-panel">
-          <h3>找到 {{ searchResults.length }} 個相似區域</h3>
-        </div>
+<!--        <div class="results-header glass-panel">-->
+<!--          <h3>找到 {{ searchResults.length }} 個相似區域</h3>-->
+<!--        </div>-->
 
         <div class="results-grid">
           <div
@@ -109,8 +111,8 @@
                 <div class="char-list">{{ result.common_chars?.slice(0, 10).join('、') || '無' }}</div>
               </div>
               <div class="char-section">
-                <div class="char-label">特征字符 ({{ result.unique_chars?.length || 0 }}):</div>
-                <div class="char-list">{{ result.unique_chars?.slice(0, 10).join('、') || '無' }}</div>
+                <div class="char-label">特征字符 ({{ result.distinctive_chars?.length || 0 }}):</div>
+                <div class="char-list">{{ result.distinctive_chars?.slice(0, 10).join('、') || '無' }}</div>
               </div>
             </div>
 
@@ -130,22 +132,26 @@
         <div class="form-row">
           <div class="form-group">
             <label>區域 1:</label>
-            <select v-model="region1" class="select-input">
-              <option :value="null">請選擇區域</option>
-              <option v-for="region in regionList" :key="region" :value="region">
-                {{ region }}
-              </option>
-            </select>
+            <FilterableSelect
+              v-model="region1"
+              :level="region1Level"
+              :allowed-levels="['city', 'county']"
+              @update:level="(newLevel) => region1Level = newLevel"
+              @update:hierarchy="(h) => region1Hierarchy = h"
+              placeholder="請選擇或輸入區域"
+            />
           </div>
 
           <div class="form-group">
             <label>區域 2:</label>
-            <select v-model="region2" class="select-input">
-              <option :value="null">請選擇區域</option>
-              <option v-for="region in regionList" :key="region" :value="region">
-                {{ region }}
-              </option>
-            </select>
+            <FilterableSelect
+              v-model="region2"
+              :level="region2Level"
+              :allowed-levels="['city', 'county']"
+              @update:level="(newLevel) => region2Level = newLevel"
+              @update:hierarchy="(h) => region2Hierarchy = h"
+              placeholder="請選擇或輸入區域"
+            />
           </div>
         </div>
 
@@ -176,6 +182,14 @@
               <div class="metric-label">Jaccard 相似度</div>
               <div class="metric-value">{{ (pairData.jaccard_similarity * 100).toFixed(1) }}%</div>
             </div>
+            <div class="metric-card" v-if="pairData.euclidean_distance !== undefined">
+              <div class="metric-label">歐氏距離</div>
+              <div class="metric-value">{{ pairData.euclidean_distance.toFixed(4) }}</div>
+            </div>
+            <div class="metric-card" v-if="pairData.feature_dimension">
+              <div class="metric-label">特徵維度</div>
+              <div class="metric-value">{{ pairData.feature_dimension }}</div>
+            </div>
           </div>
         </div>
 
@@ -192,18 +206,18 @@
             </div>
 
             <div class="comparison-section">
-              <h4>{{ region1 }} 特有 ({{ pairData.unique_to_region1?.length || 0 }})</h4>
+              <h4>{{ region1 }} 特有 ({{ pairData.distinctive_chars_r1?.length || 0 }})</h4>
               <div class="char-cloud">
-                <span v-for="char in pairData.unique_to_region1" :key="char" class="char-tag unique1">
+                <span v-for="char in pairData.distinctive_chars_r1" :key="char" class="char-tag unique1">
                   {{ char }}
                 </span>
               </div>
             </div>
 
             <div class="comparison-section">
-              <h4>{{ region2 }} 特有 ({{ pairData.unique_to_region2?.length || 0 }})</h4>
+              <h4>{{ region2 }} 特有 ({{ pairData.distinctive_chars_r2?.length || 0 }})</h4>
               <div class="char-cloud">
-                <span v-for="char in pairData.unique_to_region2" :key="char" class="char-tag unique2">
+                <span v-for="char in pairData.distinctive_chars_r2" :key="char" class="char-tag unique2">
                   {{ char }}
                 </span>
               </div>
@@ -221,16 +235,14 @@
         <div class="form-group">
           <label>選擇區域 (最多20個):</label>
           <div class="region-selector">
-            <select v-model="selectedRegionToAdd" class="select-input">
-              <option :value="null">選擇區域...</option>
-              <option
-                v-for="region in availableRegionsForMatrix"
-                :key="region"
-                :value="region"
-              >
-                {{ region }}
-              </option>
-            </select>
+            <FilterableSelect
+              v-model="selectedRegionToAdd"
+              :level="matrixRegionLevel"
+              :allowed-levels="['city', 'county']"
+              @update:level="(newLevel) => matrixRegionLevel = newLevel"
+              @update:hierarchy="(h) => selectedRegionHierarchy = h"
+              placeholder="選擇區域..."
+            />
             <button
               class="add-button"
               :disabled="!selectedRegionToAdd || selectedRegions.length >= 20"
@@ -286,24 +298,27 @@
 <script>
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import {
-  getRegionList,
   getRegionSimilaritySearch,
   getRegionSimilarityPair,
   getRegionSimilarityMatrix
 } from '@/api/index.js'
 import { showError, showSuccess } from '@/utils/message.js'
 import * as echarts from 'echarts'
+import FilterableSelect from '@/components/common/FilterableSelect.vue'
 
 export default {
   name: 'RegionSimilarity',
+  components: {
+    FilterableSelect
+  },
   setup() {
     // State
     const queryMode = ref('search')
-    const regionList = ref([])
-    const loadingRegions = ref(false)
 
     // Search mode
-    const targetRegion = ref(null)
+    const targetRegion = ref('')
+    const targetRegionLevel = ref('county')
+    const targetRegionHierarchy = ref(null)
     const metric = ref('cosine')
     const topK = ref(10)
     const minSimilarity = ref(0.0)
@@ -311,47 +326,55 @@ export default {
     const loadingSearch = ref(false)
 
     // Pair mode
-    const region1 = ref(null)
-    const region2 = ref(null)
+    const region1 = ref('')
+    const region1Level = ref('county')
+    const region1Hierarchy = ref(null)
+    const region2 = ref('')
+    const region2Level = ref('county')
+    const region2Hierarchy = ref(null)
     const pairData = ref(null)
     const loadingPair = ref(false)
 
     // Matrix mode
     const selectedRegions = ref([])
-    const selectedRegionToAdd = ref(null)
+    const selectedRegionsHierarchy = ref([])  // 存儲每個區域的層級信息
+    const selectedRegionToAdd = ref('')
+    const selectedRegionHierarchy = ref(null)
+    const matrixRegionLevel = ref('county')
     const matrixMetric = ref('cosine')
     const matrixData = ref(null)
     const loadingMatrix = ref(false)
     const heatmapChart = ref(null)
     let chartInstance = null
 
-    // Computed
-    const availableRegionsForMatrix = computed(() => {
-      return regionList.value.filter(r => !selectedRegions.value.includes(r))
-    })
-
     // Methods
-    async function loadRegionList() {
-      try {
-        loadingRegions.value = true
-        const data = await getRegionList({ region_level: 'county' })
-        regionList.value = data.regions || []
-      } catch (error) {
-        showError('加載區域列表失敗: ' + error.message)
-      } finally {
-        loadingRegions.value = false
-      }
-    }
-
     async function searchSimilarRegions() {
+      if (!targetRegion.value) {
+        showError('請選擇目標區域')
+        return
+      }
       try {
         loadingSearch.value = true
-        const data = await getRegionSimilaritySearch({
-          region: targetRegion.value,
+
+        // 構建參數：優先使用層級信息
+        const params = {
+          region_level: targetRegionLevel.value,
           top_k: topK.value,
           metric: metric.value,
           min_similarity: minSimilarity.value
-        })
+        }
+
+        // 使用層級信息（推薦）
+        if (targetRegionHierarchy.value) {
+          if (targetRegionHierarchy.value.city) params.city = targetRegionHierarchy.value.city
+          if (targetRegionHierarchy.value.county) params.county = targetRegionHierarchy.value.county
+          if (targetRegionHierarchy.value.township) params.township = targetRegionHierarchy.value.township
+        } else {
+          // 向後兼容：使用區域名稱
+          params.region_name = targetRegion.value
+        }
+
+        const data = await getRegionSimilaritySearch(params)
         searchResults.value = data.similar_regions || []
         if (searchResults.value.length === 0) {
           showError('未找到相似區域')
@@ -373,10 +396,31 @@ export default {
     async function loadPairComparison() {
       try {
         loadingPair.value = true
-        const data = await getRegionSimilarityPair({
-          region1: region1.value,
-          region2: region2.value
-        })
+
+        // 構建參數：使用層級信息
+        const params = {
+          region_level: region1Level.value  // 假設兩個區域同級
+        }
+
+        // 區域1層級信息
+        if (region1Hierarchy.value) {
+          if (region1Hierarchy.value.city) params.city1 = region1Hierarchy.value.city
+          if (region1Hierarchy.value.county) params.county1 = region1Hierarchy.value.county
+          if (region1Hierarchy.value.township) params.township1 = region1Hierarchy.value.township
+        } else {
+          params.region1 = region1.value
+        }
+
+        // 區域2層級信息
+        if (region2Hierarchy.value) {
+          if (region2Hierarchy.value.city) params.city2 = region2Hierarchy.value.city
+          if (region2Hierarchy.value.county) params.county2 = region2Hierarchy.value.county
+          if (region2Hierarchy.value.township) params.township2 = region2Hierarchy.value.township
+        } else {
+          params.region2 = region2.value
+        }
+
+        const data = await getRegionSimilarityPair(params)
         pairData.value = data
       } catch (error) {
         showError('對比失敗: ' + error.message)
@@ -388,27 +432,55 @@ export default {
     function addRegion() {
       if (selectedRegionToAdd.value && !selectedRegions.value.includes(selectedRegionToAdd.value)) {
         selectedRegions.value.push(selectedRegionToAdd.value)
+        // 保存層級信息
+        if (selectedRegionHierarchy.value) {
+          selectedRegionsHierarchy.value.push({
+            name: selectedRegionToAdd.value,
+            ...selectedRegionHierarchy.value
+          })
+        }
         selectedRegionToAdd.value = null
+        selectedRegionHierarchy.value = null
       }
     }
 
     function removeRegion(region) {
-      selectedRegions.value = selectedRegions.value.filter(r => r !== region)
+      const index = selectedRegions.value.indexOf(region)
+      if (index > -1) {
+        selectedRegions.value.splice(index, 1)
+        selectedRegionsHierarchy.value.splice(index, 1)
+      }
     }
 
     async function loadMatrix() {
       try {
         loadingMatrix.value = true
-        const data = await getRegionSimilarityMatrix({
-          regions: selectedRegions.value,
+
+        // 構建參數：使用層級信息數組
+        const params = {
+          region_level: matrixRegionLevel.value,
           metric: matrixMetric.value
-        })
+        }
+
+        // 如果有層級信息，使用新格式
+        if (selectedRegionsHierarchy.value.length > 0) {
+          params.regions = selectedRegionsHierarchy.value.map(r => ({
+            city: r.city,
+            county: r.county,
+            township: r.township
+          }))
+        } else {
+          // 向後兼容：使用區域名稱
+          params.region_names = selectedRegions.value
+        }
+
+        const data = await getRegionSimilarityMatrix(params)
         matrixData.value = data
+        loadingMatrix.value = false
         await nextTick()
         renderHeatmap()
       } catch (error) {
         showError('生成矩陣失敗: ' + error.message)
-      } finally {
         loadingMatrix.value = false
       }
     }
@@ -427,11 +499,16 @@ export default {
 
       // Convert matrix to ECharts format
       const data = []
+      let minVal = 1
       for (let i = 0; i < regions.length; i++) {
         for (let j = 0; j < regions.length; j++) {
-          data.push([j, i, matrix[i][j]])
+          const v = matrix[i][j]
+          data.push([j, i, v])
+          if (i !== j && v < minVal) minVal = v
         }
       }
+      // 动态 min：取非对角线最小值，向下取整到0.05
+      const dynamicMin = Math.max(0, Math.floor(minVal * 20) / 20)
 
       const option = {
         tooltip: {
@@ -466,7 +543,7 @@ export default {
           }
         },
         visualMap: {
-          min: 0,
+          min: dynamicMin,
           max: 1,
           calculable: true,
           orient: 'horizontal',
@@ -497,10 +574,6 @@ export default {
     }
 
     // Lifecycle
-    onMounted(() => {
-      loadRegionList()
-    })
-
     watch(queryMode, () => {
       // Reset data when switching modes
       searchResults.value = null
@@ -510,20 +583,22 @@ export default {
 
     return {
       queryMode,
-      regionList,
       targetRegion,
+      targetRegionLevel,
       metric,
       topK,
       minSimilarity,
       searchResults,
       loadingSearch,
       region1,
+      region1Level,
       region2,
+      region2Level,
       pairData,
       loadingPair,
       selectedRegions,
       selectedRegionToAdd,
-      availableRegionsForMatrix,
+      matrixRegionLevel,
       matrixMetric,
       matrixData,
       loadingMatrix,
@@ -587,9 +662,9 @@ export default {
 }
 
 .mode-button.active {
-  background: var(--primary-color, #4a90e2);
+  background: var(--color-primary, #4a90e2);
   color: white;
-  border-color: var(--primary-color, #4a90e2);
+  border-color: var(--color-primary, #4a90e2);
 }
 
 .query-form h3 {
@@ -617,7 +692,6 @@ export default {
 
 .select-input,
 .number-input {
-  width: 100%;
   padding: 10px;
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 8px;
@@ -629,13 +703,13 @@ export default {
 .select-input:focus,
 .number-input:focus {
   outline: none;
-  border-color: var(--primary-color, #4a90e2);
+  border-color: var(--color-primary, #4a90e2);
 }
 
 .query-button {
   width: 100%;
   padding: 12px 24px;
-  background: var(--primary-color, #4a90e2);
+  background: var(--color-primary, #4a90e2);
   color: white;
   border: none;
   border-radius: 8px;
@@ -668,7 +742,7 @@ export default {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(74, 144, 226, 0.2);
-  border-top-color: var(--primary-color, #4a90e2);
+  border-top-color: var(--color-primary, #4a90e2);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -701,7 +775,7 @@ export default {
 }
 
 .rank-badge {
-  background: var(--primary-color, #4a90e2);
+  background: var(--color-primary, #4a90e2);
   color: white;
   padding: 4px 12px;
   border-radius: 12px;
@@ -735,7 +809,7 @@ export default {
 
 .similarity-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-color, #4a90e2), var(--secondary-color, #50c878));
+  background: linear-gradient(90deg, var(--color-primary, #4a90e2), var(--color-success, #50c878));
   transition: width 0.3s ease;
 }
 
@@ -764,7 +838,7 @@ export default {
   width: 100%;
   padding: 8px 16px;
   background: rgba(74, 144, 226, 0.1);
-  color: var(--primary-color, #4a90e2);
+  color: var(--color-primary, #4a90e2);
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 8px;
   font-size: 14px;
@@ -775,7 +849,7 @@ export default {
 
 .detail-button:hover {
   background: rgba(74, 144, 226, 0.2);
-  border-color: var(--primary-color, #4a90e2);
+  border-color: var(--color-primary, #4a90e2);
 }
 
 .similarity-metrics h3,
@@ -807,7 +881,7 @@ export default {
 .metric-value {
   font-size: 32px;
   font-weight: 600;
-  color: var(--primary-color, #4a90e2);
+  color: var(--color-primary, #4a90e2);
 }
 
 .comparison-grid {
@@ -856,7 +930,7 @@ export default {
 
 .add-button {
   padding: 10px 24px;
-  background: var(--secondary-color, #50c878);
+  background: var(--color-success, #50c878);
   color: white;
   border: none;
   border-radius: 8px;

@@ -36,6 +36,15 @@ export {
   clearClusteringCache
 } from './clustering.js'
 
+// 聚類類型（新增）
+export {
+  runCharacterTendencyClustering,
+  runSampledVillagesClustering,
+  runSpatialAwareClustering,
+  runHierarchicalClustering,
+  getSpatialRunIds
+} from './clusteringTypes.js'
+
 // 語義網絡
 export {
   getCooccurrence,

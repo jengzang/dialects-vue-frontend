@@ -212,6 +212,12 @@ const FeatureExtraction = defineAsyncComponent(() => import('@/components/villag
 const SubsetAnalysis = defineAsyncComponent(() => import('@/components/villagesML/ml/SubsetAnalysis.vue'))
 const SystemInfo = defineAsyncComponent(() => import('@/components/villagesML/system/SystemInfo.vue'))
 
+// New clustering type panels
+const CharacterTendencyPanel = defineAsyncComponent(() => import('@/components/villagesML/ml/clustering/CharacterTendencyPanel.vue'))
+const SampledVillagesPanel = defineAsyncComponent(() => import('@/components/villagesML/ml/clustering/SampledVillagesPanel.vue'))
+const SpatialAwarePanel = defineAsyncComponent(() => import('@/components/villagesML/ml/clustering/SpatialAwarePanel.vue'))
+const HierarchicalPanel = defineAsyncComponent(() => import('@/components/villagesML/ml/clustering/HierarchicalPanel.vue'))
+
 // Import panel components for legacy tabs
 import SearchPanel from '@/components/villagesML/search/SearchPanel.vue'
 import VillageListPanel from '@/components/villagesML/search/VillageListPanel.vue'
@@ -276,7 +282,12 @@ const currentComponent = computed(() => {
       'regional-tendency': CategoryTendency,
       'regional-similarity': RegionSimilarity,
       'compute-features': FeatureExtraction,
-      'compute-subset': SubsetAnalysis
+      'compute-subset': SubsetAnalysis,
+      // New clustering types
+      'compute-char-tendency': CharacterTendencyPanel,
+      'compute-sampled-villages': SampledVillagesPanel,
+      'compute-spatial-aware': SpatialAwarePanel,
+      'compute-hierarchical': HierarchicalPanel
     }
 
     const key = `${moduleId}-${subtabId}`
@@ -341,7 +352,23 @@ const handleSearch = async () => {
       latitude: v.latitude
     }))
 
-    villagesMLStore.searchResults = villages
+    // 去重：使用 village_id 作为唯一键
+    const deduplicatedVillages = []
+    const seenIds = new Set()
+
+    for (const village of villages) {
+      if (!seenIds.has(village.id)) {
+        seenIds.add(village.id)
+        deduplicatedVillages.push(village)
+      }
+    }
+
+    // 如果检测到重复数据，输出警告
+    if (villages.length > deduplicatedVillages.length) {
+      console.warn(`Village search deduplication: ${villages.length} → ${deduplicatedVillages.length} (removed ${villages.length - deduplicatedVillages.length} duplicates)`)
+    }
+
+    villagesMLStore.searchResults = deduplicatedVillages
     villagesMLStore.searchTotal = result.total || 0
   } catch (error) {
     showError('搜尋失敗')

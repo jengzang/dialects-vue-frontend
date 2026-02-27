@@ -9,7 +9,7 @@
     >
       <option value="city">城市</option>
       <option value="county">區縣</option>
-      <option value="township">鄉鎮</option>
+      <option v-if="allowedLevels.includes('township')" value="township">鄉鎮</option>
     </select>
 
     <!-- Input + Dropdown Trigger -->
@@ -57,7 +57,7 @@
         <div v-else class="dropdown-options">
           <div
             v-for="(option, index) in filteredOptions"
-            :key="option.name"
+            :key="getUniqueKey(option)"
             @click="selectOption(option)"
             @mouseenter="highlightedIndex = index"
             :class="[
@@ -110,6 +110,7 @@ const props = defineProps({
   placeholder: { type: String, default: '請選擇或輸入' },
   showCounts: { type: Boolean, default: true },
   showLevelSelector: { type: Boolean, default: true },
+  allowedLevels: { type: Array, default: () => ['city', 'county', 'township'] },
   disabled: { type: Boolean, default: false }
 })
 
@@ -153,6 +154,19 @@ const loadOptions = async () => {
   } finally {
     loading.value = false
   }
+}
+
+// Generate unique key for each option
+const getUniqueKey = (option) => {
+  // Use hierarchical path as unique key to avoid duplicates
+  if (props.level === 'city') {
+    return option.name || ''
+  } else if (props.level === 'county') {
+    return `${option.city || ''}|${option.name || ''}`
+  } else if (props.level === 'township') {
+    return `${option.city || ''}|${option.county || ''}|${option.name || ''}`
+  }
+  return option.name || ''
 }
 
 // Filter options based on input

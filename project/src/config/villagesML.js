@@ -831,9 +831,10 @@ export const VILLAGESML_MODULES = [
     hideLabelOnMobile: true,
     showLabelOnlyWhenActive: false,
     subtabs: [
+      // ===== 現有子標籤（修改標籤名稱）=====
       {
         id: 'clustering',
-        label: '聚類分析',
+        label: '基礎聚類',  // 改名：聚類分析 → 基礎聚類
         icon: '🎲',
         path: '/villagesML?module=compute&subtab=clustering',
         weight: 1,
@@ -843,11 +844,37 @@ export const VILLAGESML_MODULES = [
         hideOnMobile: false,
         hideLabelOnMobile: true
       },
+      // {
+      //   id: 'features',
+      //   label: '特徵提取',
+      //   icon: '🔬',
+      //   path: '/villagesML?module=compute&subtab=features',
+      //   weight: 1,
+      //   mobileWeight: 1,
+      //   fontSize: 0.95,
+      //   mobileFontSize: 0.9,
+      //   hideOnMobile: false,
+      //   hideLabelOnMobile: true
+      // },
+      // {
+      //   id: 'subset',
+      //   label: '子集分析',
+      //   icon: '🧪',
+      //   path: '/villagesML?module=compute&subtab=subset',
+      //   weight: 1,
+      //   mobileWeight: 1,
+      //   fontSize: 0.95,
+      //   mobileFontSize: 0.9,
+      //   hideOnMobile: false,
+      //   hideLabelOnMobile: true
+      // },
+
+      // ===== 新增子標籤 =====
       {
-        id: 'features',
-        label: '特徵提取',
-        icon: '🔬',
-        path: '/villagesML?module=compute&subtab=features',
+        id: 'char-tendency',
+        label: '字符傾向',
+        icon: '🔤',
+        path: '/villagesML?module=compute&subtab=char-tendency',
         weight: 1,
         mobileWeight: 1,
         fontSize: 0.95,
@@ -856,10 +883,34 @@ export const VILLAGESML_MODULES = [
         hideLabelOnMobile: true
       },
       {
-        id: 'subset',
-        label: '子集分析',
-        icon: '🧪',
-        path: '/villagesML?module=compute&subtab=subset',
+        id: 'sampled-villages',
+        label: '採樣村莊',
+        icon: '🏘️',
+        path: '/villagesML?module=compute&subtab=sampled-villages',
+        weight: 1,
+        mobileWeight: 1,
+        fontSize: 0.95,
+        mobileFontSize: 0.9,
+        hideOnMobile: false,
+        hideLabelOnMobile: true
+      },
+      {
+        id: 'spatial-aware',
+        label: '空間感知',
+        icon: '🗺️',
+        path: '/villagesML?module=compute&subtab=spatial-aware',
+        weight: 1,
+        mobileWeight: 1,
+        fontSize: 0.95,
+        mobileFontSize: 0.9,
+        hideOnMobile: false,
+        hideLabelOnMobile: true
+      },
+      {
+        id: 'hierarchical',
+        label: '層次聚類',
+        icon: '🌳',
+        path: '/villagesML?module=compute&subtab=hierarchical',
         weight: 1,
         mobileWeight: 1,
         fontSize: 0.95,

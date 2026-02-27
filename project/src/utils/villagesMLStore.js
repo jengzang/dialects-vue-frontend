@@ -54,6 +54,104 @@ export const villagesMLStore = reactive({
   clusteringLoading: false,
   clusteringProgress: 0,
 
+  // 新增：聚類類型選擇
+  clusteringType: 'clustering',  // 默認為基礎聚類
+
+  // 新增：字符傾向性聚類設置
+  characterTendencySettings: {
+    algorithm: 'kmeans',
+    k: 3,
+    region_level: 'city',
+    region_filter: null,
+    top_n_chars: 50,
+    tendency_metric: 'z_score',
+    preprocessing: {
+      use_pca: true,
+      pca_n_components: 20,
+      standardize: true
+    },
+    dbscan_config: {
+      eps: null,
+      min_samples: null
+    },
+    random_state: 42
+  },
+
+  // 新增：採樣村莊聚類設置
+  sampledVillagesSettings: {
+    algorithm: 'kmeans',
+    k: 5,
+    sampling_strategy: 'stratified',
+    sample_size: 5000,
+    filter: {},
+    features: {
+      use_semantic: true,
+      use_morphology: true,
+      use_diversity: true,
+      top_n_suffix2: 100,
+      top_n_suffix3: 100
+    },
+    preprocessing: {
+      use_pca: true,
+      pca_n_components: 50,
+      standardize: true
+    },
+    dbscan_config: {
+      eps: null,
+      min_samples: null
+    },
+    random_state: 42
+  },
+
+  // 新增：空間感知聚類設置
+  spatialAwareSettings: {
+    algorithm: 'kmeans',
+    k: 5,
+    spatial_run_id: 'spatial_hdbscan_v1',
+    features: {
+      use_semantic: true,
+      use_morphology: true,
+      use_diversity: true,
+      top_n_suffix2: 100,
+      top_n_suffix3: 100
+    },
+    preprocessing: {
+      use_pca: true,
+      pca_n_components: 50,
+      standardize: true
+    },
+    dbscan_config: {
+      eps: null,
+      min_samples: null
+    },
+    random_state: 42
+  },
+
+  // 新增：層次聚類設置
+  hierarchicalSettings: {
+    algorithm: 'kmeans',
+    k_city: 3,
+    k_county: 5,
+    k_township: 10,
+    features: {
+      use_semantic: true,
+      use_morphology: true,
+      use_diversity: true,
+      top_n_suffix2: 100,
+      top_n_suffix3: 100
+    },
+    preprocessing: {
+      use_pca: true,
+      pca_n_components: 50,
+      standardize: true
+    },
+    dbscan_config: {
+      eps: null,
+      min_samples: null
+    },
+    random_state: 42
+  },
+
   // 語義網絡相關
   semanticSettings: {
     region_level: 'county',

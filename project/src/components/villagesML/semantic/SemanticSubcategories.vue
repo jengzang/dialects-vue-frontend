@@ -6,13 +6,6 @@
     <div class="mode-selector glass-panel">
       <button
         class="mode-button"
-        :class="{ 'active': viewMode === 'list' }"
-        @click="viewMode = 'list'"
-      >
-        子類別列表
-      </button>
-      <button
-        class="mode-button"
         :class="{ 'active': viewMode === 'regional' }"
         @click="viewMode = 'regional'"
       >
@@ -27,94 +20,19 @@
       </button>
     </div>
 
-    <!-- List Mode -->
-    <div v-if="viewMode === 'list'" class="list-section">
-      <div class="query-form glass-panel">
-        <h3>子類別列表</h3>
-
-        <div class="form-group">
-          <label>父類別:</label>
-          <select v-model="selectedParentCategory" class="select-input" @change="loadSubcategoryList">
-            <option :value="null">全部類別</option>
-            <option v-for="cat in parentCategories" :key="cat.value" :value="cat.value">
-              {{ cat.label }}
-            </option>
-          </select>
-        </div>
-
-        <button
-          class="query-button"
-          :disabled="loadingList"
-          @click="loadSubcategoryList"
-        >
-          {{ loadingList ? '加載中...' : '查詢' }}
-        </button>
-      </div>
-
-      <!-- Subcategory List Results -->
-      <div v-if="loadingList" class="loading-state glass-panel">
-        <div class="spinner"></div>
-        <p>加載中...</p>
-      </div>
-
-      <div v-else-if="subcategoryList && subcategoryList.length > 0" class="subcategory-results">
-        <div class="results-header glass-panel">
-          <h3>找到 {{ subcategoryList.length }} 個子類別</h3>
-        </div>
-
-        <div class="subcategory-grid">
-          <div
-            v-for="subcat in subcategoryList"
-            :key="subcat.subcategory"
-            class="subcat-card glass-panel"
-          >
-            <div class="subcat-header">
-              <h4>{{ subcat.subcategory }}</h4>
-              <span class="parent-badge">{{ subcat.parent_category }}</span>
-            </div>
-
-            <div class="subcat-stats">
-              <div class="stat-item">
-                <span class="stat-label">字符數:</span>
-                <span class="stat-value">{{ subcat.char_count }}</span>
-              </div>
-            </div>
-
-            <div class="char-preview">
-              <div class="char-label">字符:</div>
-              <div class="char-list">{{ subcat.chars?.slice(0, 15).join('、') || '無' }}</div>
-            </div>
-
-            <button class="detail-button" @click="viewSubcategoryDetail(subcat.subcategory)">
-              查看詳情
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Regional Comparison Mode -->
     <div v-if="viewMode === 'regional'" class="regional-section">
       <div class="query-form glass-panel">
         <h3>區域子類別對比</h3>
 
         <div class="form-group">
-          <label>區域名稱:</label>
-          <input
+          <label>區域選擇:</label>
+          <FilterableSelect
             v-model="regionName"
-            type="text"
-            class="text-input"
-            placeholder="例如: 廣州市"
+            :level="regionLevel"
+            @update:level="(newLevel) => regionLevel = newLevel"
+            placeholder="請選擇或輸入區域"
           />
-        </div>
-
-        <div class="form-group">
-          <label>區域層級:</label>
-          <select v-model="regionLevel" class="select-input">
-            <option value="市級">市級</option>
-            <option value="縣級">縣級</option>
-            <option value="鄉鎮級">鄉鎮級</option>
-          </select>
         </div>
 
         <div class="form-group">
@@ -143,7 +61,13 @@
 
       <div v-else-if="regionalData" class="regional-results">
         <div class="regional-header glass-panel">
-          <h3>{{ regionalData.region_name }} - {{ regionalData.parent_category }} 子類別分布</h3>
+          <h3>{{ regionalData.region_name }} - {{ getSubcategoryName(regionalData.parent_category) || regionalData.parent_category }} 子類別分布</h3>
+          <p style="font-size: 14px; color: #666; margin-top: 8px;">
+            包含 {{ regionalData.subcategories?.length || 0 }} 個子類別：
+            <span v-for="(subcat, index) in regionalData.subcategories" :key="subcat.subcategory" style="margin-left: 4px;">
+              {{ getSubcategoryName(subcat.subcategory) || subcat.subcategory }}<span v-if="index < regionalData.subcategories.length - 1">、</span>
+            </span>
+          </p>
         </div>
 
         <!-- Radar Chart -->
@@ -169,16 +93,16 @@
                 <tr
                   v-for="subcat in regionalData.subcategories"
                   :key="subcat.subcategory"
-                  :class="{ 'significant': subcat.tendency_z > 0.2 }"
+                  :class="{ 'significant': subcat.tendency > 0.2 }"
                 >
-                  <td>{{ subcat.subcategory }}</td>
+                  <td>{{ getSubcategoryName(subcat.subcategory) }}</td>
                   <td>{{ subcat.vtf }}</td>
                   <td>
                     <span
                       class="tendency-badge"
-                      :class="{ 'positive': subcat.tendency_z > 0, 'negative': subcat.tendency_z < 0 }"
+                      :class="{ 'positive': subcat.tendency > 0, 'negative': subcat.tendency < 0 }"
                     >
-                      {{ subcat.tendency_z?.toFixed(3) }}
+                      {{ subcat.tendency?.toFixed(3) }}
                     </span>
                   </td>
                   <td>{{ (subcat.percentage * 100).toFixed(2) }}%</td>
@@ -199,9 +123,9 @@
           <div class="form-group">
             <label>區域層級:</label>
             <select v-model="rankingRegionLevel" class="select-input">
-              <option value="市級">市級</option>
-              <option value="縣級">縣級</option>
-              <option value="鄉鎮級">鄉鎮級</option>
+              <option value="city">市級</option>
+              <option value="county">縣級</option>
+              <option value="township">鄉鎮級</option>
             </select>
           </div>
 
@@ -257,9 +181,9 @@
                   <th>排名</th>
                   <th>區域</th>
                   <th>子類別</th>
-                  <th>傾向值 (Z)</th>
-                  <th>VTF</th>
+                  <th>傾向值</th>
                   <th>百分比</th>
+                  <th>村莊數</th>
                 </tr>
               </thead>
               <tbody>
@@ -270,14 +194,14 @@
                     </span>
                   </td>
                   <td>{{ item.region_name }}</td>
-                  <td>{{ item.subcategory }}</td>
+                  <td>{{ getSubcategoryName(item.subcategory) }}</td>
                   <td>
                     <span class="tendency-badge positive">
-                      {{ item.tendency_z?.toFixed(3) }}
+                      {{ item.tendency?.toFixed(3) }}
                     </span>
                   </td>
-                  <td>{{ item.vtf }}</td>
-                  <td>{{ (item.percentage * 100).toFixed(2) }}%</td>
+                  <td>{{ item.percentage?.toFixed(2) }}%</td>
+                  <td>{{ item.village_count }}</td>
                 </tr>
               </tbody>
             </table>
@@ -289,7 +213,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import {
   getSemanticSubcategoryList,
   getSemanticSubcategoryChars,
@@ -300,10 +224,20 @@ import {
 } from '@/api/index.js'
 import { showError, showSuccess } from '@/utils/message.js'
 import * as echarts from 'echarts'
+import FilterableSelect from '@/components/common/FilterableSelect.vue'
+import { SEMANTIC_SUBCATEGORY_NAMES } from '@/config/villagesML.js'
 
 export default {
   name: 'SemanticSubcategories',
+  components: {
+    FilterableSelect
+  },
   setup() {
+    // Helper function to get subcategory Chinese name
+    const getSubcategoryName = (subcategory) => {
+      return SEMANTIC_SUBCATEGORY_NAMES[subcategory] || subcategory
+    }
+
     // Parent categories
     const parentCategories = [
       { value: 'mountain', label: '山地 (mountain)' },
@@ -318,16 +252,16 @@ export default {
     ]
 
     // State
-    const viewMode = ref('list')
+    const viewMode = ref('regional')  // 默认显示区域对比
 
-    // List mode
+    // List mode (移除，不再需要)
     const selectedParentCategory = ref(null)
     const subcategoryList = ref([])
     const loadingList = ref(false)
 
     // Regional mode
     const regionName = ref('')
-    const regionLevel = ref('市級')
+    const regionLevel = ref('city')
     const regionalParentCategory = ref('mountain')
     const regionalData = ref(null)
     const loadingRegional = ref(false)
@@ -335,7 +269,7 @@ export default {
     let radarChartInstance = null
 
     // Ranking mode
-    const rankingRegionLevel = ref('市級')
+    const rankingRegionLevel = ref('city')
     const rankingParentCategory = ref(null)
     const topN = ref(10)
     const rankingData = ref([])
@@ -344,6 +278,15 @@ export default {
     let barChartInstance = null
 
     // Methods
+    const convertRegionLevel = (level) => {
+      const levelMap = {
+        'city': '市级',      // 简体中文
+        'county': '区县级',    // 简体中文
+        'township': '乡镇级'  // 简体中文
+      }
+      return levelMap[level] || level
+    }
+
     async function loadSubcategoryList() {
       try {
         loadingList.value = true
@@ -370,16 +313,24 @@ export default {
     }
 
     async function loadRegionalComparison() {
+      if (!regionName.value) {
+        showError('請選擇區域')
+        return
+      }
       try {
         loadingRegional.value = true
         const data = await getSemanticSubcategoryComparison({
           region_name: regionName.value,
-          region_level: regionLevel.value,
+          region_level: convertRegionLevel(regionLevel.value),
           parent_category: regionalParentCategory.value
         })
         regionalData.value = data
+        console.log('API 返回数据:', data)
         await nextTick()
-        renderRadarChart()
+        // 使用 setTimeout 确保 DOM 完全渲染
+        setTimeout(() => {
+          renderRadarChart()
+        }, 100)
       } catch (error) {
         showError('加載區域對比失敗: ' + error.message)
       } finally {
@@ -388,7 +339,24 @@ export default {
     }
 
     function renderRadarChart() {
-      if (!radarChart.value || !regionalData.value) return
+      if (!radarChart.value || !regionalData.value) {
+        console.log('雷达图渲染条件不满足:', {
+          hasRadarChart: !!radarChart.value,
+          hasRegionalData: !!regionalData.value
+        })
+        return
+      }
+
+      // 检查容器尺寸
+      const containerWidth = radarChart.value.offsetWidth
+      const containerHeight = radarChart.value.offsetHeight
+      console.log('雷达图容器尺寸:', { width: containerWidth, height: containerHeight })
+
+      if (containerWidth === 0 || containerHeight === 0) {
+        console.warn('雷达图容器尺寸为0，延迟渲染')
+        setTimeout(() => renderRadarChart(), 200)
+        return
+      }
 
       if (radarChartInstance) {
         radarChartInstance.dispose()
@@ -397,12 +365,21 @@ export default {
       radarChartInstance = echarts.init(radarChart.value)
 
       const subcategories = regionalData.value.subcategories || []
+      console.log('子类别数据:', subcategories)
+
+      if (subcategories.length === 0) {
+        console.warn('没有子类别数据')
+        return
+      }
+
       const indicator = subcategories.map(s => ({
-        name: s.subcategory,
+        name: getSubcategoryName(s.subcategory),  // 使用中文名称
         max: Math.max(...subcategories.map(x => x.vtf)) * 1.2
       }))
 
       const data = subcategories.map(s => s.vtf)
+
+      console.log('雷达图配置:', { indicator, data })
 
       const option = {
         tooltip: {
@@ -414,7 +391,8 @@ export default {
           splitNumber: 5,
           name: {
             textStyle: {
-              color: '#333'
+              color: '#333',
+              fontSize: 12
             }
           },
           splitLine: {
@@ -455,25 +433,26 @@ export default {
       }
 
       radarChartInstance.setOption(option)
+      console.log('雷达图渲染完成')
     }
 
     async function loadRanking() {
       try {
         loadingRanking.value = true
         const params = {
-          region_level: rankingRegionLevel.value,
+          region_level: convertRegionLevel(rankingRegionLevel.value),
           top_n: topN.value
         }
         if (rankingParentCategory.value) {
           params.parent_category = rankingParentCategory.value
         }
         const data = await getSemanticSubcategoryTendencyTop(params)
-        rankingData.value = data.top_tendencies || []
+        rankingData.value = Array.isArray(data) ? data : (data.top_tendencies || [])
+        loadingRanking.value = false
         await nextTick()
         renderBarChart()
       } catch (error) {
         showError('加載排行榜失敗: ' + error.message)
-      } finally {
         loadingRanking.value = false
       }
     }
@@ -487,8 +466,8 @@ export default {
 
       barChartInstance = echarts.init(barChart.value)
 
-      const labels = rankingData.value.map(item => `${item.region_name}\n${item.subcategory}`)
-      const values = rankingData.value.map(item => item.tendency_z)
+      const labels = rankingData.value.map(item => `${item.region_name}\n${getSubcategoryName(item.subcategory)}`)
+      const values = rankingData.value.map(item => item.tendency)
 
       const option = {
         tooltip: {
@@ -498,7 +477,7 @@ export default {
           },
           formatter: (params) => {
             const item = rankingData.value[params[0].dataIndex]
-            return `${item.region_name}<br/>${item.subcategory}<br/>傾向值: ${item.tendency_z.toFixed(3)}<br/>VTF: ${item.vtf}<br/>百分比: ${(item.percentage * 100).toFixed(2)}%`
+            return `${item.region_name}<br/>${getSubcategoryName(item.subcategory)}<br/>傾向值: ${item.tendency.toFixed(3)}<br/>百分比: ${item.percentage.toFixed(2)}%<br/>村莊數: ${item.village_count}`
           }
         },
         grid: {
@@ -551,14 +530,35 @@ export default {
 
     // Lifecycle
     onMounted(() => {
-      loadSubcategoryList()
+      // 添加窗口 resize 事件监听
+      window.addEventListener('resize', handleResize)
     })
+
+    onUnmounted(() => {
+      // 清理图表实例和事件监听
+      if (radarChartInstance) {
+        radarChartInstance.dispose()
+        radarChartInstance = null
+      }
+      if (barChartInstance) {
+        barChartInstance.dispose()
+        barChartInstance = null
+      }
+      window.removeEventListener('resize', handleResize)
+    })
+
+    function handleResize() {
+      if (radarChartInstance) {
+        radarChartInstance.resize()
+      }
+      if (barChartInstance) {
+        barChartInstance.resize()
+      }
+    }
 
     watch(viewMode, () => {
       // Reset data when switching modes
-      if (viewMode.value === 'list' && subcategoryList.value.length === 0) {
-        loadSubcategoryList()
-      }
+      // 不再需要加载子类别列表
     })
 
     return {
@@ -579,6 +579,7 @@ export default {
       rankingData,
       loadingRanking,
       barChart,
+      getSubcategoryName,
       loadSubcategoryList,
       viewSubcategoryDetail,
       loadRegionalComparison,
@@ -637,9 +638,9 @@ export default {
 }
 
 .mode-button.active {
-  background: var(--primary-color, #4a90e2);
+  background: var(--color-primary, #4a90e2);
   color: white;
-  border-color: var(--primary-color, #4a90e2);
+  border-color: var(--color-primary, #4a90e2);
 }
 
 .query-form h3 {
@@ -681,13 +682,13 @@ export default {
 .text-input:focus,
 .number-input:focus {
   outline: none;
-  border-color: var(--primary-color, #4a90e2);
+  border-color: var(--color-primary, #4a90e2);
 }
 
 .query-button {
   width: 100%;
   padding: 12px 24px;
-  background: var(--primary-color, #4a90e2);
+  background: var(--color-primary, #4a90e2);
   color: white;
   border: none;
   border-radius: 8px;
@@ -720,7 +721,7 @@ export default {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(74, 144, 226, 0.2);
-  border-top-color: var(--primary-color, #4a90e2);
+  border-top-color: var(--color-primary, #4a90e2);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -808,7 +809,7 @@ export default {
   width: 100%;
   padding: 8px 16px;
   background: rgba(74, 144, 226, 0.1);
-  color: var(--primary-color, #4a90e2);
+  color: var(--color-primary, #4a90e2);
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 8px;
   font-size: 14px;
@@ -819,7 +820,7 @@ export default {
 
 .detail-button:hover {
   background: rgba(74, 144, 226, 0.2);
-  border-color: var(--primary-color, #4a90e2);
+  border-color: var(--color-primary, #4a90e2);
 }
 
 .regional-header h3,
@@ -908,7 +909,7 @@ tr.significant {
 }
 
 .rank-badge:not(.gold):not(.silver):not(.bronze) {
-  background: var(--primary-color, #4a90e2);
+  background: var(--color-primary, #4a90e2);
 }
 
 @media (max-width: 768px) {
