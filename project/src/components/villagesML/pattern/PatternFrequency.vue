@@ -233,7 +233,7 @@ const goToTendency = (pattern) => {
   margin-bottom: 16px;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .control-group {

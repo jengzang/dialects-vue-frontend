@@ -310,5 +310,19 @@ const loadCompleteData = async () => {
   flex-direction: column;
   gap: 16px;
 }
+
+@media (max-width: 768px) {
+  .village-modal-body {
+    padding: 12px;
+  }
+
+  .info-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+
+  .village-modal-title {
+    font-size: 15px;
+  }
+}
 </style>
 

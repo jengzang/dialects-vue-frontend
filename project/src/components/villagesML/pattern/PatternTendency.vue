@@ -174,6 +174,8 @@ watch(
   gap: 12px;
   margin-bottom: 16px;
   flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }
 
 .text-input {
@@ -347,10 +349,6 @@ watch(
     flex-direction: column;
   }
 
-  .text-input,
-  .select-input {
-    width: 100%;
-  }
 
   .tendency-item {
     grid-template-columns: 1fr;

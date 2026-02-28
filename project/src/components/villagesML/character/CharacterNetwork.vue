@@ -234,7 +234,7 @@ onBeforeUnmount(() => {
 .control-group label { font-size: 12px; color: var(--text-secondary, #666); }
 
 .char-input {
-  width: 56px; padding: 10px; font-size: 22px; text-align: center;
+  min-width: 56px; width: 56px; padding: 10px; font-size: 22px; text-align: center;
   border: 2px solid rgba(0, 122, 255, 0.3); border-radius: 12px;
   background: rgba(255, 255, 255, 0.5);
 }
@@ -245,7 +245,7 @@ onBeforeUnmount(() => {
   background: rgba(255, 255, 255, 0.5);
   font-size: 14px;
 }
-.glass-input.small { width: 80px; }
+.glass-input.small { min-width: 56px; width: 80px; flex: 1; }
 
 .progress-panel { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .spinner {
@@ -269,7 +269,7 @@ onBeforeUnmount(() => {
 .legend-item { display: flex; align-items: center; gap: 4px; }
 .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
 
-.network-chart { width: 100%; height: 520px; }
+.network-chart { width: 100%; height: clamp(320px, 55vh, 520px); }
 
 .empty-state { text-align: center; color: var(--text-secondary, #888); padding: 40px; }
 </style>

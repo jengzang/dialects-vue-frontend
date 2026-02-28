@@ -1314,7 +1314,6 @@ const getDeviationColor = (deviation) => {
   }
 
   .mode-selector {
-    flex-direction: column;
     gap: 8px;
   }
 

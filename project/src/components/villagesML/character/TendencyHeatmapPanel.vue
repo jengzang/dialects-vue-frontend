@@ -166,7 +166,7 @@ onMounted(() => {
 
 .chart-container {
   width: 100%;
-  height: 400px;
+  height: clamp(280px, 45vh, 400px);
 }
 
 .loading-state,

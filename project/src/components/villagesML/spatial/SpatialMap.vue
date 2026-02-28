@@ -594,7 +594,7 @@ const resetView = () => {
 <style scoped>
 .spatial-map-container {
   width: 100%;
-  height: 500px;
+  height: clamp(300px, 50vh, 500px);
   position: relative;
   border-radius: 12px;
   overflow: hidden;

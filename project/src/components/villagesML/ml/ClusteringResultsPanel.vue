@@ -377,7 +377,7 @@ const handleQuickAdjust = (action) => {
 
 .profiles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -689,5 +689,15 @@ const handleQuickAdjust = (action) => {
 .region-grid .region-tag {
   padding: 6px 12px;
   font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .metric-value {
+    font-size: 18px;
+  }
+
+  .metric-card {
+    padding: 12px;
+  }
 }
 </style>

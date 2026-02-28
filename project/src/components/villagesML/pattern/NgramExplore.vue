@@ -74,7 +74,8 @@
         <p>加載中...</p>
       </div>
 
-      <div v-else-if="frequencyData.length > 0" class="frequency-results">
+      <div v-else-if="frequencyData.length > 0" class="frequency-results-wrapper">
+      <div class="frequency-results">
         <div class="results-header">
           <div class="col-rank">排名</div>
           <div class="col-ngram">N-gram</div>
@@ -112,6 +113,7 @@
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
 
@@ -276,6 +278,9 @@ onMounted(async () => {
 .pattern-section {
   padding: 16px;
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 
 .stats-banner {
@@ -403,15 +408,23 @@ onMounted(async () => {
   to { transform: rotate(360deg); }
 }
 
+.frequency-results-wrapper {
+  overflow-x: auto;
+  width: 100%;
+  border-radius: 12px;
+}
+
 .frequency-results {
   border-radius: 12px;
   overflow: hidden;
+  min-width: 600px;
+  width: 100%;
 }
 
 .results-header,
 .result-row {
   display: grid;
-  grid-template-columns: 60px 150px 80px 100px 100px 1fr;
+  grid-template-columns: 60px 80px 60px 80px 80px 1fr;
   gap: 12px;
   padding: 12px 16px;
   align-items: center;
@@ -611,15 +624,5 @@ onMounted(async () => {
     flex-direction: column;
   }
 
-  .select-input,
-  .number-input {
-    width: 100%;
-  }
-
-  .results-header,
-  .result-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
 }
 </style>

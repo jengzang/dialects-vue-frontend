@@ -148,7 +148,7 @@
       <!-- Spatial Aggregates -->
       <div class="spatial-section glass-panel">
         <div class="spatial-header">
-          <h2>空間聚合</h2>
+          <h2 style="white-space: nowrap">空間聚合</h2>
           <div class="controls">
             <select v-model="spatialLevel" class="select-input">
               <option value="city">城市</option>
@@ -443,6 +443,7 @@ onBeforeUnmount(() => {
 }
 
 .query-button {
+  white-space: nowrap;
   padding: 10px 24px;
   background: var(--color-primary);
   color: white;

@@ -187,4 +187,22 @@ const clearFilters = () => {
 .clear-filters-button:hover {
   background: rgba(243, 156, 18, 0.3);
 }
+
+@media (max-width: 768px) {
+  .search-panel {
+    padding: 14px;
+  }
+
+  .search-input-group {
+    flex-direction: column;
+  }
+
+  .search-button {
+    width: 100%;
+  }
+
+  .filters-row {
+    gap: 10px;
+  }
+}
 </style>

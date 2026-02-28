@@ -267,4 +267,25 @@ const changePage = (page) => {
   font-size: 13px;
   color: var(--text-primary);
 }
+
+@media (max-width: 768px) {
+  .village-list-panel {
+    padding: 12px;
+  }
+
+  .villages-table th,
+  .villages-table td {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+
+  .pagination {
+    gap: 8px;
+  }
+
+  .page-button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
 </style>

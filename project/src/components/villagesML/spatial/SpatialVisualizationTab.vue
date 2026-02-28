@@ -848,12 +848,10 @@ h2 {
   }
 
   .control-panel {
-    width: 100%;
     max-height: 300px;
   }
 
   .control-panel.is-collapsed {
-    width: 100%;
     max-height: 40px;
   }
 
