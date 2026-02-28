@@ -42,14 +42,24 @@ export async function getCustomData(params) {
   try {
     const query = new URLSearchParams()
 
-    query.append('locations', params.locations || '')
-    query.append('regions', params.regions || '')
-
-    // 每个 feature 单独添加
-    if (params.need_features && Array.isArray(params.need_features)) {
-      params.need_features.forEach(feat => {
-        query.append('need_features', feat)
+    // locations 和 regions 是 List[str]，需要多次添加同一个参数
+    if (params.locations && Array.isArray(params.locations)) {
+      params.locations.forEach(loc => {
+        query.append('locations', loc)
       })
+    }
+
+    if (params.regions && Array.isArray(params.regions)) {
+      params.regions.forEach(reg => {
+        query.append('regions', reg)
+      })
+    }
+
+    // need_features 需要用逗号分隔成单个字符串
+    if (params.need_features && Array.isArray(params.need_features)) {
+      query.append('need_features', params.need_features.join(','))
+    } else if (params.need_features) {
+      query.append('need_features', params.need_features)
     }
 
     if (params.region_mode) {
@@ -133,7 +143,7 @@ export async function submitCustomForm(data) {
 export async function deleteCustomForm(data) {
   try {
     return await api('/api/delete_form', {
-      method: 'POST',
+      method: 'DELETE',
       body: data
     })
   } catch (error) {
