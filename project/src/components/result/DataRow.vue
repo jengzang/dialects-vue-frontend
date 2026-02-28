@@ -218,8 +218,8 @@ const queryFeatures = computed(() => {
   // 過濾掉當前查詢的特徵
   const filtered = allFeatures.filter(f => !currentFeatures.includes(f));
 
-  console.log('🔍 當前查詢特徵:', currentFeatures);
-  console.log('🔍 要查詢的特徵:', filtered);
+  // console.log('🔍 當前查詢特徵:', currentFeatures);
+  // console.log('🔍 要查詢的特徵:', filtered);
 
   return filtered;
 });
@@ -382,8 +382,13 @@ const handleFeatureStatsClick = async () => {
   to { opacity: 1; transform: translate(-50%, -100%); }
 }
 
-/* 地名点击交互反馈 */
+/* 地名样式 */
 .locations-vue {
+  font-size: 20px;
+  font-family: "SimHei", "黑体", sans-serif;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 0;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   color: #1d1d1f;

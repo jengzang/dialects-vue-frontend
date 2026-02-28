@@ -873,7 +873,157 @@ const resetView = () => {
 </script>
 
 <style>
-@import '@/components/result/ResultTable.css';
+#toast {
+  visibility: hidden;
+  min-width: 220px;
+  max-width: 80%;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  background-color: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #c28f00;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  border-radius: 12px;
+  padding: 20px 28px;
+  position: fixed;
+  z-index: 99999;
+  left: 50%;
+  top: 70%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  line-height: 1.5;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+#toast.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* MapLibre 地图标记点击弹窗样式 (非 scoped，用于动态创建的弹窗) */
+.popup,
+.popup2 {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(8px) saturate(180%);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  padding: 6px 10px;
+  width: 100px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.3), 0 4px 14px rgba(0, 0, 0, 0.2), 0 0 8px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  z-index: 99999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  text-align: center;
+  color: #222;
+  font-weight: 500;
+}
+
+.popup.active {
+  opacity: 1;
+  z-index: 99999;
+  visibility: visible !important;
+  transform: translateX(-50%) translateY(20px);
+}
+
+.popup-content {
+  font-family: 'Arial', sans-serif;
+  color: #333;
+  text-align: center;
+}
+
+.popup h4 {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0 0 10px;
+}
+
+.popup p, .popup2 p {
+  margin: 2px 0;
+  font-size: 13px;
+  padding: 0;
+  border-radius: 5px;
+  font-weight: bold;
+  display: block;
+}
+
+.popup ul, .popup2 ul {
+  padding: 0;
+  list-style-type: none;
+  margin: 0;
+}
+
+.popup li, .popup2 li {
+  margin: 2px 0;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 1px 6px;
+  background: linear-gradient(135deg, rgba(240, 240, 240, 0.4), rgba(255, 255, 255, 0.2));
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1), inset 0 0 1px rgba(255, 255, 255, 0.5);
+  color: #333;
+}
+
+.popup-close-btn {
+  background-color: #007aff;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.popup-close-btn:hover {
+  background-color: #005bb5;
+}
+
+/* 迷你按钮样式 (用于动态创建的按钮) */
+.mini-button {
+  margin-top: 2px;
+  padding: 1px 2px;
+  font-size: 11px;
+  background-color: #007aff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.mini-button:hover {
+  background-color: #005fcc;
+  transform: scale(1.2);
+}
+
+.mini-button-delete {
+  margin-top: 2px;
+  padding: 1px 2px;
+  font-size: 11px;
+  background-color: #8B0000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.mini-button-delete:hover {
+  background-color: #A52A2A;
+  transform: scale(1.2);
+}
+
+
 </style>
 
 <style scoped>
@@ -1183,16 +1333,137 @@ const resetView = () => {
 }
 /* 整个容器样式 */
 .custom-switch-container1 {
-  /* 關鍵：讓容器佔滿整行寬度，這樣它就獨占一行 */
   width: 100%;
-
-  /* 關鍵：使用 Flex 讓內部的開關按鈕居中 */
   display: flex;
-  justify-content: center; /* 水平居中 */
-  align-items: center;     /* 垂直居中 */
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
 
-  /* 確保它是相對定位，參與正常排版 */
-  position: relative; /* 改回相對定位 */
+.switch-label-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.custom-switch {
+  position: relative;
+  cursor: pointer;
+  width: 50px;
+  height: 30px;
+  background-color: #ccc;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.custom-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-slider:before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 26px;
+  height: 26px;
+  background-color: white;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.custom-switch.open .custom-slider:before {
+  transform: translateX(20px);
+}
+
+.custom-switch:hover {
+  background-color: dimgray;
+  box-shadow: 0 0 10px 4px rgba(0, 123, 255, 0.7);
+  transform: scale(1.1);
+}
+
+.custom-switch:hover .custom-slider:before {
+  background-color: white;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+}
+
+.custom-switch.open {
+  background-color: #007aff;
+  animation: blueGlow 2s infinite ease-in-out;
+}
+
+.custom-switch.open:hover {
+  background: linear-gradient(135deg, #00bfff, #66ccff);
+  transform: scale(1.1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes blueGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(0, 122, 255, 0.4),
+    0 0 10px rgba(0, 122, 255, 0.6),
+    0 0 20px rgba(0, 122, 255, 0.8),
+    0 0 30px rgba(0, 122, 255, 0.9);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(102, 204, 255, 0.6),
+    0 0 20px rgba(102, 204, 255, 0.8),
+    0 0 30px rgba(102, 204, 255, 1),
+    0 0 40px rgba(102, 204, 255, 1);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(0, 122, 255, 0.4),
+    0 0 10px rgba(0, 122, 255, 0.6),
+    0 0 20px rgba(0, 122, 255, 0.8),
+    0 0 30px rgba(0, 122, 255, 0.9);
+  }
+}
+
+.custom-switch.open:hover .custom-slider:before {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.switch-text {
+  color: black;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  position: absolute;
+  z-index: 1;
+  transition: transform 0.3s ease, color 0.3s ease;
+  pointer-events: none;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.custom-switch.open .switch-text {
+  color: black;
+  transform: translateX(-25px) translateY(-50%);
+  top: 50%;
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+  animation: glowing 2s infinite linear;
+  white-space: nowrap;
+}
+
+@keyframes glowing {
+  0%, 100% {
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+  }
 }
 
 /* 地名點擊彈窗樣式 */
@@ -1235,26 +1506,52 @@ const resetView = () => {
 }
 
 .close-btn {
-  background: #f0f0f0;
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.15);
   border: none;
+  border-radius: 50%;
   font-size: 20px;
-  cursor: pointer;
-  color: #666;
-  padding: 4px;
-  width: 28px;
-  height: 28px;
+  color: #444;
+  width: 25px;
+  height: 25px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
-  transition: all 0.2s;
-  flex-shrink: 0;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 999;
 }
 
 .close-btn:hover {
-  background: #e0e0e0;
-  color: #333;
-  transform: scale(1.1);
+  color: #000;
+  transform: scale(1.4) rotate(10deg);
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.4), 0 0 14px rgba(255, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.close-btn:active {
+  transform: scale(0.9);
+  box-shadow: 0 0 18px rgba(255, 0, 0, 0.6);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .location-popup-body {

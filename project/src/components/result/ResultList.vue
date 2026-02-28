@@ -367,7 +367,314 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
- @import "ResultTable.css";
+.Panel {
+  resize: both;
+  overflow: auto;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  z-index: 1;
+  bottom: 1dvh;
+  left: 2dvw;
+  right: 2dvw;
+  height: 78dvh;
+  position: fixed;
+}
+
+@media (orientation: portrait) {
+  .Panel {
+    height: 70dvh;
+    bottom: 2dvh;
+    left: 1dvw;
+    right: 1dvw;
+  }
+}
+
+.panel-content {
+  flex: 1;
+  overflow: visible;
+  padding: 13px;
+  box-sizing: border-box;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+}
+
+.sticky-label2 {
+  position: absolute;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  left: 0;
+  right: 0;
+  backdrop-filter: blur(2px);
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(204, 204, 204, 0.6);
+  z-index: 999;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 10px;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sticky-label2:hover {
+  background: rgba(240, 240, 240, 0.9);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sticky-label2.sticky-scrolled {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.sticky-label2::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  z-index: -1;
+}
+
+.sticky-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  position: relative;
+}
+
+.stickybar-filter-wrapper {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  z-index: 1;
+}
+
+.stickybar-filter-trigger {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 14px;
+  padding: 4px 12px;
+  color: #007aff;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  border: 1px solid rgba(0, 122, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+.stickybar-filter-trigger:hover {
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 8px rgba(0, 122, 255, 0.4);
+}
+
+.stickybar-filter-dropdown {
+  position: absolute;
+  bottom: 110%;
+  left: 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 10px;
+  padding: 8px;
+  display: none;
+  max-height: 200px;
+  overflow-y: auto;
+  min-width: 70px;
+  z-index: 9999;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stickybar-filter-dropdown.open {
+  display: block;
+}
+
+.stickybar-filter-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.stickybar-filter-dropdown::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 122, 255, 0.3);
+  border-radius: 3px;
+}
+
+.stickybar-filter-option {
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.stickybar-filter-option:hover {
+  color: #007aff;
+}
+
+.stickybar-filter-option input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+.custom-switch-container {
+  position: absolute;
+  right: 5%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+}
+
+.custom-switch {
+  position: relative;
+  cursor: pointer;
+  width: 50px;
+  height: 30px;
+  background-color: #ccc;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.custom-slider:before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 26px;
+  height: 26px;
+  background-color: white;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.custom-switch.open .custom-slider:before {
+  transform: translateX(20px);
+}
+
+.custom-switch:hover {
+  background-color: dimgray;
+  box-shadow: 0 0 10px 4px rgba(0, 123, 255, 0.7);
+  transform: scale(1.3);
+}
+
+.custom-switch:hover .custom-slider:before {
+  background-color: white;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+}
+
+.custom-switch.open {
+  background-color: #007aff;
+  animation: blueGlow 2s infinite ease-in-out;
+}
+
+.custom-switch.open:hover {
+  background: linear-gradient(135deg, #00bfff, #66ccff);
+  transform: scale(1.3);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes blueGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(0, 122, 255, 0.4),
+    0 0 10px rgba(0, 122, 255, 0.6),
+    0 0 20px rgba(0, 122, 255, 0.8),
+    0 0 30px rgba(0, 122, 255, 0.9);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(102, 204, 255, 0.6),
+    0 0 20px rgba(102, 204, 255, 0.8),
+    0 0 30px rgba(102, 204, 255, 1),
+    0 0 40px rgba(102, 204, 255, 1);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(0, 122, 255, 0.4),
+    0 0 10px rgba(0, 122, 255, 0.6),
+    0 0 20px rgba(0, 122, 255, 0.8),
+    0 0 30px rgba(0, 122, 255, 0.9);
+  }
+}
+
+.custom-switch.open:hover .custom-slider:before {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.switch-text {
+  color: black;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  position: absolute;
+  z-index: 1;
+  transition: transform 0.3s ease, color 0.3s ease;
+  pointer-events: none;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.custom-switch.open .switch-text {
+  color: black;
+  transform: translateX(-25px) translateY(-50%);
+  top: 50%;
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+  animation: glowing 2s infinite linear;
+  white-space: nowrap;
+}
+
+.location-edit-input {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #007bff;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  min-width: 150px;
+  color: #333;
+}
+
+.location-edit-input:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+#stickyContextText {
+  transition: background 0.2s;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+#stickyContextText:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
 </style>
 <!--<style scoped>-->
 <!--/* ========================================-->

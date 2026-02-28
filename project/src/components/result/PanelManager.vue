@@ -413,5 +413,69 @@ onUnmounted(() => {
 </style>
 
 <style scoped>
-@import 'ResultTable.css';
+/* 各种弹窗的关闭按钮 */
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  color: #444;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 999;
+}
+
+.close-btn:hover {
+  color: #000;
+  transform: scale(1.4) rotate(10deg);
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.4), 0 0 14px rgba(255, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.close-btn:active {
+  transform: scale(0.9);
+  box-shadow: 0 0 18px rgba(255, 0, 0, 0.6);
+}
+
+.query-detail-panel {
+  pointer-events: auto;
+}
+
+.query-detail-panel.border-breath {
+  animation: border-breath 1.5s ease-in-out;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.6);
+  border: 2px solid transparent;
+  border-radius: 12px;
+}
+
+@keyframes border-breath {
+  0% {
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 12px 4px rgba(0, 122, 255, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.6);
+  }
+}
+
+.result-panel-vue {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
 </style>
