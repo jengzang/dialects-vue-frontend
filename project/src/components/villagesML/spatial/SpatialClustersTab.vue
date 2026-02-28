@@ -9,7 +9,6 @@
         <select v-model="selectedRunId" class="run-select">
           <option v-for="run in availableRuns" :key="run.run_id" :value="run.run_id">
             {{ runLabel(run) }}
-            — {{ run.unique_clusters.toLocaleString() }} 聚類，均 {{ run.avg_cluster_size?.toFixed(2) }} 點
           </option>
         </select>
       </div>
@@ -133,6 +132,9 @@ onMounted(loadAvailableRuns)
 
 <style scoped>
 .spatial-clusters-tab {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
   padding: 16px;
   background: var(--glass-medium);
   backdrop-filter: blur(40px) saturate(180%);
@@ -144,7 +146,7 @@ onMounted(loadAvailableRuns)
 h2, h3 { font-size: 24px; margin-bottom: 16px; color: var(--text-primary); font-weight: 600; }
 h3 { font-size: 16px; margin-top: 20px; }
 
-.cluster-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 16px; }
+.cluster-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content:center;margin-bottom: 16px; }
 
 .run-selector { display: flex; flex-direction: column; gap: 4px; }
 .run-selector label { font-size: 12px; color: var(--text-secondary); }

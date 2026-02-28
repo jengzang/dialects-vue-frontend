@@ -141,6 +141,9 @@ const loadHotspotDetail = async () => {
 
 <style scoped>
 .spatial-hotspots-tab {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
   padding: 16px;
   background: var(--glass-medium);
   backdrop-filter: blur(40px) saturate(180%);
@@ -201,11 +204,12 @@ h2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  width: 100%;
 }
 
 .hotspots-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 12px;
 }
 
@@ -247,6 +251,7 @@ h2 {
   border-radius: 12px;
   font-size: 13px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .hotspot-info {

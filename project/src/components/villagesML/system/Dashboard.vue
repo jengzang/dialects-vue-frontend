@@ -38,44 +38,29 @@
 <!--        </div>-->
 <!--      </div>-->
 
-      <div class="section-header">
-        <h2>📈 數據概覽</h2>
-        <p class="section-description">系統收錄的村名與區域統計</p>
-      </div>
-
-      <!-- Statistics Cards -->
-      <div class="stats-grid">
-        <div v-for="stat in statistics" :key="stat.key" class="stat-card glass-panel">
-          <div class="stat-icon">{{ stat.icon }}</div>
-          <div class="stat-content">
-            <div class="stat-value">{{ formatNumber(stat.value) }}</div>
-            <div class="stat-label">{{ stat.label }}</div>
-          </div>
-        </div>
-      </div>
-
       <!-- Section Header: Features -->
       <div class="section-header">
         <h2>🧭 功能模塊</h2>
-        <p class="section-description">選擇下方模塊開始分析</p>
+        <p class="section-description">點擊下方模塊開始分析</p>
       </div>
 
+
       <!-- Quick Search -->
-      <div class="quick-search glass-panel">
-        <h2>🔍 快速搜尋</h2>
-        <div class="search-input-group">
-          <input
-            v-model="searchKeyword"
-            type="text"
-            placeholder="輸入村名關鍵詞..."
-            class="search-input"
-            @keyup.enter="handleQuickSearch"
-          />
-          <button class="search-button" @click="handleQuickSearch">
-            搜尋
-          </button>
-        </div>
-      </div>
+<!--      <div class="quick-search glass-panel">-->
+<!--        <h2>🔍 快速搜尋</h2>-->
+<!--        <div class="search-input-group">-->
+<!--          <input-->
+<!--            v-model="searchKeyword"-->
+<!--            type="text"-->
+<!--            placeholder="輸入村名關鍵詞..."-->
+<!--            class="search-input"-->
+<!--            @keyup.enter="handleQuickSearch"-->
+<!--          />-->
+<!--          <button class="search-button" @click="handleQuickSearch">-->
+<!--            搜尋-->
+<!--          </button>-->
+<!--        </div>-->
+<!--      </div>-->
 
       <!-- Feature Cards -->
       <div class="features-grid">
@@ -95,6 +80,21 @@
           <p class="feature-description">{{ feature.description }}</p>
         </div>
       </div>
+      <div class="section-header">
+        <h2>📈 數據概覽</h2>
+        <p class="section-description">系統收錄的村名與區域統計</p>
+      </div>
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div v-for="stat in statistics" :key="stat.key" class="stat-card glass-panel">
+          <div class="stat-icon">{{ stat.icon }}</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ formatNumber(stat.value) }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+          </div>
+        </div>
+      </div>
+
     </div>
 <!--  </ExploreLayout>-->
 </template>
@@ -523,8 +523,8 @@ onMounted(() => {
   }
 
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    //grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
   .stat-card {

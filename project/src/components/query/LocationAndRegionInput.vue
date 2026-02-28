@@ -398,10 +398,8 @@ async function loadCustomRegionsData() {
   }
 }
 
-// Load custom regions on mount
 onMounted(() => {
   reset()
-  loadCustomRegionsData()
 })
 
 // 使用自定義分區地點進行查詢
