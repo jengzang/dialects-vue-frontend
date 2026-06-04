@@ -202,11 +202,6 @@
         <small class="hint">{{ $t('query.tab4.description') }}</small>
       </div>
     </div>
-    <FloatingDice
-        v-if="selectedCharacterTable === 'characters'"
-        :current-tab="currentTab"
-        @applyConfig="handleApplyConfig"
-    />
   </TabsContainer>
 </template>
 
@@ -218,7 +213,6 @@ import TabsContainer from "@/components/common/TabsContainer.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
 import YinweiSelector from "@/main/components/query/YinweiSelector.vue";
-import FloatingDice from "@/main/components/query/FloatingDice.vue";
 import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
 import ChoiceSelector from "@/components/selector/ChoiceSelector.vue";
@@ -229,7 +223,9 @@ import {
   isQueryButtonDisabled,
   preferredCharacterTable,
   setRunning,
-  setTabContentDisabled
+  setTabContentDisabled,
+  tutorialAssistState,
+  clearTutorialAssistRequest,
 } from '@/main/store/store.js'
 import { useQueryConfig } from '@/composables/domain/useQueryConfig.js'
 import { translateResultTerm } from '@/i18n/utils/resultI18n.js'
@@ -364,6 +360,38 @@ function handleHanziInput(event) {
 watch(currentTab, (newTab) => {
   uiStore.currentSubTab.query = newTab
 }, { immediate: true })
+
+watch(
+  () => tutorialAssistState.requestToken,
+  (token) => {
+    if (!token || !tutorialAssistState.payload) {
+      return
+    }
+
+    if (tutorialAssistState.target === 'query:tab1' && currentTab.value === 'tab1') {
+      const payload = tutorialAssistState.payload
+      hanziInput.value = payload.chars || ''
+      locationModel.value = {
+        locations: payload.loc?.locations || [],
+        regions: payload.loc?.regions || [],
+        regionUsing: payload.loc?.regionUsing || 'yindian'
+      }
+      clearTutorialAssistRequest()
+      return
+    }
+
+    if (tutorialAssistState.target === 'query:tab2' && currentTab.value === 'tab2') {
+      handleApplyConfig(tutorialAssistState.payload)
+      clearTutorialAssistRequest()
+      return
+    }
+
+    if (tutorialAssistState.target === 'query:tab3' && currentTab.value === 'tab3') {
+      handleApplyConfig(tutorialAssistState.payload)
+      clearTutorialAssistRequest()
+    }
+  }
+)
 
 function getNormalizedKeys(keys = []) {
   const allowedKeys = availableKeys.value || []

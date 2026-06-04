@@ -23,5 +23,41 @@
     "praat": "Praat Analysis",
     "exploreResources": "Explore Resources",
     "exploreVillages": "Explore Villages"
+  },
+  "assist": {
+    "badge": "Starter Guide",
+    "experience": {
+      "badge": "Quick Start",
+      "queryChar": {
+        "title": "Try a character query example",
+        "description": "Fill in a common set of characters and locations so you can inspect the result immediately.",
+        "button": "Fill random example"
+      },
+      "queryZhonggu": {
+        "title": "Try a Middle Chinese condition",
+        "description": "Apply a ready-made Middle Chinese condition and location to experience the query flow quickly.",
+        "button": "Generate Middle Chinese example"
+      },
+      "queryYinwei": {
+        "title": "Try a phoneme query input",
+        "description": "Generate a phoneme-analysis example so you can preview the phoneme workflow at once.",
+        "button": "Generate phoneme example"
+      },
+      "compareChar": {
+        "title": "Try a character comparison",
+        "description": "Fill two contrasting characters and a feature so the comparison page is ready to use.",
+        "button": "Generate comparison example"
+      },
+      "compareZhonggu": {
+        "title": "Try a Middle Chinese comparison",
+        "description": "Prepare two groups of Middle Chinese comparison conditions for a quick hands-on trial.",
+        "button": "Generate comparison conditions"
+      },
+      "compareTone": {
+        "title": "Try a tone-class comparison",
+        "description": "Pick two tone classes and a location automatically for a quick comparison preview.",
+        "button": "Generate tone example"
+      }
+    }
   }
 }
