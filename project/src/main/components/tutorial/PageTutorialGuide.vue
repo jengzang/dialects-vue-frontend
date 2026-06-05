@@ -75,7 +75,7 @@
         <div class="tutorial-shell__body">
           <aside
             v-show="!isCompact || isCatalogOpen"
-            class="tutorial-catalog ui-scrollbar"
+            class="tutorial-catalog"
           >
             <section
               v-for="group in groupedEntries"
@@ -113,7 +113,7 @@
             </section>
           </aside>
 
-          <article class="tutorial-article ui-scrollbar">
+          <article class="tutorial-article">
             <div
               ref="articleTopRef"
               class="tutorial-article__anchor"
@@ -451,7 +451,7 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .page-tutorial-guide {
   position: fixed;
   right: var(--tutorial-guide-right);
@@ -464,13 +464,13 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  border-radius: 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(228, 241, 255, 0.92));
   box-shadow:
-    0 14px 32px var(--color-primary-shadow),
+    0 14px 32px rgba(64, 118, 176, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  color: var(--color-blue-dark);
+  color: #19507e;
   cursor: pointer;
   backdrop-filter: blur(14px) saturate(135%);
   -webkit-backdrop-filter: blur(14px) saturate(135%);
@@ -480,7 +480,7 @@ onBeforeUnmount(() => {
 .tutorial-trigger:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 18px 36px var(--color-primary-shadow-light),
+    0 18px 36px rgba(64, 118, 176, 0.26),
     inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
@@ -490,11 +490,11 @@ onBeforeUnmount(() => {
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(180deg, #72b3ff, var(--color-primary));
-  color: var(--text-white);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #72b3ff, #4f92ea);
+  color: #fff;
   font-size: 1.4rem;
-  box-shadow: 0 10px 20px var(--color-primary-shadow);
+  box-shadow: 0 10px 20px rgba(59, 120, 205, 0.24);
 }
 
 .tutorial-trigger__copy {
@@ -506,14 +506,14 @@ onBeforeUnmount(() => {
 
 .tutorial-trigger__eyebrow {
   font-size: 0.72rem;
-  color: var(--text-secondary);
+  color: #6790b6;
   letter-spacing: 0.04em;
 }
 
 .tutorial-trigger__label {
   font-size: 0.96rem;
   font-weight: 700;
-  color: var(--color-blue-dark);
+  color: #19507e;
 }
 
 .tutorial-shell {
@@ -537,19 +537,19 @@ onBeforeUnmount(() => {
 
 .tutorial-shell__current-label {
   font-size: 0.82rem;
-  color: var(--text-secondary);
+  color: #6d8cab;
 }
 
 .tutorial-shell__current-value {
   font-size: 1.1rem;
-  color: var(--color-blue-custom);
+  color: #173f63;
 }
 
 .tutorial-shell__catalog-toggle {
   border: none;
   border-radius: 999px;
-  background: var(--color-primary-light3);
-  color: var(--color-blue-logo);
+  background: rgba(95, 148, 210, 0.12);
+  color: #2a5e90;
   padding: 8px 12px;
   cursor: pointer;
 }
@@ -560,10 +560,10 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   gap: 18px;
   padding: 18px 20px;
-  border-radius: var(--radius-xl);
+  border-radius: 22px;
   background: linear-gradient(135deg, rgba(234, 246, 255, 0.96), rgba(217, 236, 255, 0.9));
-  border: 1px solid var(--color-primary-border2);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(163, 202, 240, 0.86);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
 }
 
 .tutorial-experience__body {
@@ -574,7 +574,7 @@ onBeforeUnmount(() => {
 
 .tutorial-experience__eyebrow {
   margin: 0;
-  color: var(--text-secondary);
+  color: #6b92b6;
   font-size: 0.76rem;
   letter-spacing: 0.05em;
 }
@@ -582,12 +582,12 @@ onBeforeUnmount(() => {
 .tutorial-experience__title {
   margin: 0;
   font-size: 1.06rem;
-  color: var(--color-blue-dark);
+  color: #15466f;
 }
 
 .tutorial-experience__description {
   margin: 0;
-  color: var(--text-medium);
+  color: #466b8c;
   line-height: 1.55;
 }
 
@@ -596,14 +596,14 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 10px;
   border: none;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, var(--color-primary), var(--color-primary-hover));
-  color: var(--text-white);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #4f92ea, #3e7dd0);
+  color: #fff;
   padding: 12px 18px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 0 12px 24px var(--color-primary-shadow);
+  box-shadow: 0 12px 24px rgba(62, 125, 208, 0.24);
 }
 
 .tutorial-experience__button-icon {
@@ -635,22 +635,22 @@ onBeforeUnmount(() => {
 .tutorial-catalog__group-title {
   margin: 0;
   font-size: 0.88rem;
-  color: var(--text-secondary);
+  color: #6e8aa8;
 }
 
 .tutorial-entry {
   width: 100%;
   text-align: left;
-  border: 1px solid var(--color-primary-border);
+  border: 1px solid rgba(185, 210, 234, 0.75);
   background: rgba(249, 252, 255, 0.92);
-  border-radius: var(--radius-lg);
+  border-radius: 16px;
   padding: 12px 14px;
   cursor: pointer;
 }
 
 .tutorial-entry.is-active {
-  border-color: var(--color-primary-medium2);
-  background: var(--color-blue-very-light);
+  border-color: rgba(92, 149, 211, 0.8);
+  background: rgba(228, 242, 255, 0.95);
 }
 
 .tutorial-entry__title-row {
@@ -660,7 +660,7 @@ onBeforeUnmount(() => {
 }
 
 .tutorial-entry__title {
-  color: var(--color-blue-custom);
+  color: #1d4f7a;
   font-weight: 700;
 }
 
@@ -669,15 +669,15 @@ onBeforeUnmount(() => {
   align-items: center;
   padding: 2px 8px;
   border-radius: 999px;
-  background: var(--color-primary-light2);
-  color: var(--color-blue-logo);
+  background: rgba(91, 150, 212, 0.16);
+  color: #2c679b;
   font-size: 0.72rem;
 }
 
 .tutorial-entry__summary {
   display: block;
   margin-top: 6px;
-  color: var(--text-secondary);
+  color: #587998;
   line-height: 1.45;
 }
 
@@ -694,18 +694,18 @@ onBeforeUnmount(() => {
 
 .tutorial-article__group {
   margin: 0 0 8px;
-  color: var(--text-secondary);
+  color: #6b8ba7;
   font-size: 0.84rem;
 }
 
 .tutorial-article__title {
   margin: 0;
-  color: var(--color-blue-dark);
+  color: #173f63;
 }
 
 .tutorial-article__summary {
   margin: 10px 0 18px;
-  color: var(--text-medium);
+  color: #58738f;
   line-height: 1.6;
 }
 
@@ -719,8 +719,8 @@ onBeforeUnmount(() => {
 .tutorial-pagination__button {
   border: none;
   border-radius: 999px;
-  background: var(--color-primary-light3);
-  color: var(--color-blue-logo);
+  background: rgba(89, 144, 207, 0.14);
+  color: #2a5e90;
   padding: 10px 16px;
   cursor: pointer;
 }
@@ -731,7 +731,7 @@ onBeforeUnmount(() => {
 }
 
 .tutorial-pagination__status {
-  color: var(--text-secondary);
+  color: #6584a0;
   font-size: 0.9rem;
 }
 
