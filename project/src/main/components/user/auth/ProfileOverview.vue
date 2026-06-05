@@ -225,7 +225,8 @@ const getDefaultConfig = () => {
   return {
     text: initialText,
     shape: 'circle',
-    bgType: 'glass',
+    bgType: 'solid',
+    glass: true,
     bgColor: '#ffffff',
     gradientFrom: '#007aff',
     gradientTo: '#00c6ff',
@@ -240,7 +241,8 @@ const getLocalStorageKey = () => `avatar_config_${props.user?.id || 'default'}`;
 const avatarConfig = ref({
   text: '',
   shape: 'circle',
-  bgType: 'glass',
+  bgType: 'solid',
+  glass: true,
   bgColor: '#ffffff',
   gradientFrom: '#007aff',
   gradientTo: '#00c6ff',
@@ -255,6 +257,14 @@ const loadAvatarConfig = () => {
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
+      // Migration for old config structures:
+      if (parsed.bgType === 'glass') {
+        parsed.bgType = 'solid';
+        parsed.glass = true;
+      } else if (parsed.bgType === 'liquid_glass') {
+        parsed.bgType = 'gradient';
+        parsed.glass = true;
+      }
       avatarConfig.value = { ...getDefaultConfig(), ...parsed };
       return;
     } catch (e) {
@@ -282,69 +292,78 @@ const avatarStyle = computed(() => {
     fontWeight: '1000',
   };
 
+  const isGlass = avatarConfig.value.glass;
+
   if (avatarConfig.value.bgType === 'solid') {
-    styles.background = avatarConfig.value.bgColor;
-  } else if (avatarConfig.value.bgType === 'gradient') {
-    styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, ${avatarConfig.value.gradientFrom}, ${avatarConfig.value.gradientTo})`;
-  } else if (avatarConfig.value.bgType === 'glass') {
-    const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 255, g: 255, b: 255 };
-    // Frosted glass uses a fixed 145deg opacity-only gradient (same tint color, varying opacity) matching the logo-container
-    styles.background = `linear-gradient(145deg, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2), rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1))`;
-    if (avatarConfig.value.bgColor === '#ffffff') {
-      // Exact style match to top-right logo-container
-      styles.backdropFilter = 'blur(15px) saturate(150%)';
-      styles.webkitBackdropFilter = 'blur(15px) saturate(150%)';
-      styles.border = '3px solid rgba(255, 255, 255, 0.4)';
+    if (isGlass) {
+      const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 255, g: 255, b: 255 };
+      styles.background = `linear-gradient(145deg, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2), rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1))`;
+      if (avatarConfig.value.bgColor === '#ffffff') {
+        styles.backdropFilter = 'blur(15px) saturate(150%)';
+        styles.webkitBackdropFilter = 'blur(15px) saturate(150%)';
+        styles.border = '3px solid rgba(255, 255, 255, 0.4)';
+      } else {
+        styles.backdropFilter = 'blur(16px) saturate(160%)';
+        styles.webkitBackdropFilter = 'blur(16px) saturate(160%)';
+        styles.border = '2.5px solid rgba(255, 255, 255, 0.5)';
+      }
     } else {
-      // Custom colored frosted glass tint
-      styles.backdropFilter = 'blur(16px) saturate(160%)';
-      styles.webkitBackdropFilter = 'blur(16px) saturate(160%)';
-      styles.border = '2.5px solid rgba(255, 255, 255, 0.5)';
+      styles.background = avatarConfig.value.bgColor;
     }
-  } else if (avatarConfig.value.bgType === 'liquid_glass') {
-    const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom) || { r: 0, g: 122, b: 255 };
-    const rgbTo = hexToRgb(avatarConfig.value.gradientTo) || { r: 0, g: 198, b: 255 };
-    styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.55), rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25))`;
-    styles.backdropFilter = 'blur(20px) saturate(190%)';
-    styles.webkitBackdropFilter = 'blur(20px) saturate(190%)';
-    styles.border = '2.5px solid rgba(255, 255, 255, 0.5)';
+  } else if (avatarConfig.value.bgType === 'gradient') {
+    if (isGlass) {
+      const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom) || { r: 0, g: 122, b: 255 };
+      const rgbTo = hexToRgb(avatarConfig.value.gradientTo) || { r: 0, g: 198, b: 255 };
+      styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.55), rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25))`;
+      styles.backdropFilter = 'blur(20px) saturate(190%)';
+      styles.webkitBackdropFilter = 'blur(20px) saturate(190%)';
+      styles.border = '2.5px solid rgba(255, 255, 255, 0.5)';
+    } else {
+      styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, ${avatarConfig.value.gradientFrom}, ${avatarConfig.value.gradientTo})`;
+    }
   }
 
   if (avatarConfig.value.glow) {
     if (avatarConfig.value.bgType === 'solid') {
-      const rgb = hexToRgb(avatarConfig.value.bgColor);
-      if (rgb) {
-        styles.boxShadow = `0 8px 20px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.2)`;
+      if (isGlass) {
+        if (avatarConfig.value.bgColor === '#ffffff') {
+          styles.boxShadow = '0 6px 10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.08)';
+        } else {
+          const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 0, g: 122, b: 255 };
+          styles.boxShadow = `0 8px 24px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2), inset 0 0 12px rgba(255, 255, 255, 0.3)`;
+        }
       } else {
-        styles.boxShadow =
-          '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)';
+        const rgb = hexToRgb(avatarConfig.value.bgColor);
+        if (rgb) {
+          styles.boxShadow = `0 8px 20px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.2)`;
+        } else {
+          styles.boxShadow =
+            '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)';
+        }
       }
     } else if (avatarConfig.value.bgType === 'gradient') {
-      const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom);
-      const rgbTo = hexToRgb(avatarConfig.value.gradientTo);
-      if (rgbFrom && rgbTo) {
-        styles.boxShadow = `0 8px 20px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 4px 12px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 0 8px rgba(255, 255, 255, 0.2)`;
+      if (isGlass) {
+        const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom) || { r: 0, g: 122, b: 255 };
+        const rgbTo = hexToRgb(avatarConfig.value.gradientTo) || { r: 0, g: 198, b: 255 };
+        styles.boxShadow = `0 10px 25px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 5px 15px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)`;
       } else {
-        styles.boxShadow =
-          '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)';
+        const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom);
+        const rgbTo = hexToRgb(avatarConfig.value.gradientTo);
+        if (rgbFrom && rgbTo) {
+          styles.boxShadow = `0 8px 20px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 4px 12px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 0 8px rgba(255, 255, 255, 0.2)`;
+        } else {
+          styles.boxShadow =
+            '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)';
+        }
       }
-    } else if (avatarConfig.value.bgType === 'glass') {
-      if (avatarConfig.value.bgColor === '#ffffff') {
-        styles.boxShadow = '0 6px 10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.08)';
-      } else {
-        const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 0, g: 122, b: 255 };
-        styles.boxShadow = `0 8px 24px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.25), inset 0 0 12px rgba(255, 255, 255, 0.3)`;
-      }
-    } else if (avatarConfig.value.bgType === 'liquid_glass') {
-      const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom) || { r: 0, g: 122, b: 255 };
-      const rgbTo = hexToRgb(avatarConfig.value.gradientTo) || { r: 0, g: 198, b: 255 };
-      styles.boxShadow = `0 10px 25px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 5px 15px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)`;
     }
   } else {
-    if (avatarConfig.value.bgType === 'glass') {
-      styles.boxShadow = avatarConfig.value.bgColor === '#ffffff' ? 'none' : 'inset 0 0 12px rgba(255, 255, 255, 0.3)';
-    } else if (avatarConfig.value.bgType === 'liquid_glass') {
-      styles.boxShadow = 'inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)';
+    if (isGlass) {
+      if (avatarConfig.value.bgType === 'solid') {
+        styles.boxShadow = avatarConfig.value.bgColor === '#ffffff' ? 'none' : 'inset 0 0 12px rgba(255, 255, 255, 0.3)';
+      } else if (avatarConfig.value.bgType === 'gradient') {
+        styles.boxShadow = 'inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)';
+      }
     } else {
       styles.boxShadow = 'none';
     }
