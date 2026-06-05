@@ -2,11 +2,11 @@
   <section class="point-card-list">
     <div class="point-card-toolbar">
       <div class="point-card-heading">
-        <h4 class="point-card-title">補充單點資料</h4>
-        <p class="point-card-description">先選擇一個已有方言點，或新增一個新方言點開始補充資料。</p>
+        <h4 class="point-card-title">{{ t('customEntry.pointList.title') }}</h4>
+        <p class="point-card-description">{{ t('customEntry.pointList.description') }}</p>
       </div>
       <button class="main-glass-button" data-variant="primary" type="button" @click="$emit('create')">
-        + 新增方言點
+        {{ t('customEntry.pointList.create') }}
       </button>
     </div>
 
@@ -19,14 +19,14 @@
     </div>
 
     <div v-else-if="errorMessage" class="point-list-state point-list-state-error">
-      <div class="point-list-state-title">載入方言點失敗</div>
+      <div class="point-list-state-title">{{ t('customEntry.pointList.loadFailed') }}</div>
       <p class="point-list-state-text">{{ errorMessage }}</p>
-      <button class="main-glass-button" type="button" @click="$emit('retry')">重試</button>
+      <button class="main-glass-button" type="button" @click="$emit('retry')">{{ t('customEntry.pointList.retry') }}</button>
     </div>
 
     <div v-else-if="items.length === 0" class="point-list-state">
-      <div class="point-list-state-title">暫無方言點</div>
-      <p class="point-list-state-text">點擊右上角「新增方言點」開始建立你的第一個自定義地點。</p>
+      <div class="point-list-state-title">{{ t('customEntry.pointList.emptyTitle') }}</div>
+      <p class="point-list-state-text">{{ t('customEntry.pointList.emptyText') }}</p>
     </div>
 
     <div v-else class="point-grid">
@@ -37,15 +37,19 @@
         type="button"
         @click="$emit('select', item)"
       >
-        <span class="point-card-name">{{ item['簡稱'] || item.location || '未命名方言點' }}</span>
-        <span class="point-card-region">{{ item['音典分區'] || item.region || '未分區' }}</span>
-        <span class="point-card-badge">已收錄 {{ item.feature_count || 0 }} 條資料</span>
+        <span class="point-card-name">{{ item['簡稱'] || item.location || t('customEntry.pointList.unnamed') }}</span>
+        <span class="point-card-region">{{ item['音典分區'] || item.region || t('customEntry.pointList.unregioned') }}</span>
+        <span class="point-card-badge">{{ t('customEntry.pointList.recordCount', { count: item.feature_count || 0 }) }}</span>
       </button>
     </div>
   </section>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 defineProps({
   items: {
     type: Array,

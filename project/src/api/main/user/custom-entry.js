@@ -37,11 +37,11 @@ export async function getDataByPoint(location, region) {
   }
 }
 
-export async function getDataByFeature(feature, phonology = '') {
+export async function getDataByFeature(feature, phonology) {
   try {
     const query = new URLSearchParams()
     query.append('feature', feature)
-    if (phonology) query.append('phonology', phonology)
+    query.append('phonology', phonology)
     return await api(`/user/custom/data-by-feature?${query.toString()}`)
   } catch (error) {
     showError(error.message || '獲取特徵數據失敗')

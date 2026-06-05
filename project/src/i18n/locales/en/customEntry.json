@@ -1,0 +1,152 @@
+{
+  "modal": {
+    "title": "Custom data entry",
+    "subtitle": "Focused on adding and maintaining user-defined data while preserving legacy personal data management and sidebar single-entry workflows.",
+    "modeGroupLabel": "Entry mode",
+    "close": "Close",
+    "modes": {
+      "point": "Extend one dialect point",
+      "feature": "Build a feature distribution"
+    }
+  },
+  "pointList": {
+    "title": "Extend one dialect point",
+    "description": "Choose an existing dialect point, or create a new one to start adding data.",
+    "create": "+ Add dialect point",
+    "loadFailed": "Failed to load dialect points",
+    "retry": "Retry",
+    "emptyTitle": "No dialect points yet",
+    "emptyText": "Click \"Add dialect point\" to create your first custom location.",
+    "unnamed": "Unnamed dialect point",
+    "unregioned": "Unassigned region",
+    "recordCount": "{count} records added"
+  },
+  "pointDetail": {
+    "back": "← Back",
+    "createTitle": "Add dialect point",
+    "createDescription": "Confirm the location and coordinates first, then add multiple feature records.",
+    "editDescription": "Continuously add or revise multiple records under the same dialect point.",
+    "labels": {
+      "location": "Short name",
+      "region": "Phonological region",
+      "coord": "Coordinates"
+    },
+    "placeholders": {
+      "location": "Enter dialect point short name",
+      "region": "Enter region",
+      "coord": "Filled automatically after clicking the map",
+      "phonology": "e.g. Final",
+      "feature": "e.g. Liu she",
+      "value": "e.g. eu",
+      "note": "Optional note"
+    },
+    "rows": {
+      "title": "Feature records",
+      "description": "Each row represents one custom record ready to submit.",
+      "add": "+ Add another row",
+      "headers": {
+        "phonology": "Phonology",
+        "feature": "Feature",
+        "value": "Value",
+        "note": "Note",
+        "action": "Action"
+      },
+      "remove": "Delete"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "map": {
+      "pickTitle": "Click the map to choose coordinates",
+      "previewTitle": "Current dialect point location",
+      "pickHint": "Click the map to choose coordinates",
+      "previewHint": "Current point preview",
+      "currentPoint": "Current point"
+    },
+    "messages": {
+      "loadFailed": "Failed to load point details",
+      "locationRegionRequired": "Please fill in the dialect point name and region first",
+      "coordRequired": "Please choose coordinates on the map first",
+      "rowRequired": "Please fill in at least one feature and value",
+      "noChanges": "There are no changes to submit",
+      "partialFailed": "{count} items failed to save, please retry",
+      "saveSuccess": "Saved successfully"
+    }
+  },
+  "featureList": {
+    "title": "Build a feature distribution",
+    "description": "Choose a feature first, then gradually add dialect points to form a mappable feature distribution.",
+    "create": "+ Add feature",
+    "loadFailed": "Failed to load feature list",
+    "retry": "Retry",
+    "emptyTitle": "No feature data yet",
+    "emptyText": "Click \"Add feature\" to create your first feature distribution entry.",
+    "unnamed": "Unnamed feature",
+    "uncategorized": "Uncategorized",
+    "pointCount": "{count} dialect points added"
+  },
+  "featureDetail": {
+    "back": "← Back",
+    "description": "Maintain distribution data for multiple dialect points around the same feature.",
+    "createRecord": "+ Add location record",
+    "loading": "Loading feature details…",
+    "retry": "Retry",
+    "empty": "No location records yet. Click the top-right button to add one.",
+    "headers": {
+      "location": "Location",
+      "region": "Region",
+      "coord": "Coordinates",
+      "value": "Value",
+      "note": "Note",
+      "action": "Action"
+    },
+    "emptyNote": "—",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "mapTitle": "Current feature distribution",
+    "mapHint": "Feature distribution preview",
+    "unnamed": "Unnamed feature",
+    "uncategorized": "Uncategorized",
+    "loadFailed": "Failed to load feature details"
+  },
+  "featureRecord": {
+    "createTitle": "Add location record",
+    "editTitle": "Edit location record",
+    "close": "Close",
+    "labels": {
+      "location": "Location",
+      "region": "Region",
+      "coord": "Coordinates",
+      "value": "Value",
+      "note": "Note"
+    },
+    "placeholders": {
+      "location": "Enter location name",
+      "region": "Enter region",
+      "coord": "Filled automatically after clicking the map",
+      "value": "Enter value",
+      "note": "Optional note"
+    },
+    "mapHint": "Click the map to choose coordinates",
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save this row"
+    },
+    "messages": {
+      "locationRegionRequired": "Please fill in the location and region first",
+      "coordRequired": "Please choose coordinates first",
+      "valueRequired": "Please fill in the value first",
+      "featureRequired": "The current feature is empty. Please go back and select it again"
+    }
+  },
+  "miniMap": {
+    "defaultHint": "Click the map to choose coordinates"
+  },
+  "mode": {
+    "pointLoadFailed": "Failed to load dialect point list",
+    "featureLoadFailed": "Failed to load feature list"
+  }
+}

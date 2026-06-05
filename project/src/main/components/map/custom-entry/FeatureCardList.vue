@@ -2,11 +2,11 @@
   <section class="feature-card-list">
     <div class="feature-card-toolbar">
       <div class="feature-card-heading">
-        <h4 class="feature-card-title">製作特徵分布</h4>
-        <p class="feature-card-description">先選擇一個特徵，再逐步把不同方言點補入，形成可上圖的特徵分布資料。</p>
+        <h4 class="feature-card-title">{{ t('customEntry.featureList.title') }}</h4>
+        <p class="feature-card-description">{{ t('customEntry.featureList.description') }}</p>
       </div>
       <button class="main-glass-button" data-variant="primary" type="button" @click="$emit('create')">
-        + 新增特徵
+        {{ t('customEntry.featureList.create') }}
       </button>
     </div>
 
@@ -19,14 +19,14 @@
     </div>
 
     <div v-else-if="errorMessage" class="feature-list-state feature-list-state-error">
-      <div class="feature-list-state-title">載入特徵列表失敗</div>
+      <div class="feature-list-state-title">{{ t('customEntry.featureList.loadFailed') }}</div>
       <p class="feature-list-state-text">{{ errorMessage }}</p>
-      <button class="main-glass-button" type="button" @click="$emit('retry')">重試</button>
+      <button class="main-glass-button" type="button" @click="$emit('retry')">{{ t('customEntry.featureList.retry') }}</button>
     </div>
 
     <div v-else-if="items.length === 0" class="feature-list-state">
-      <div class="feature-list-state-title">暫無特徵資料</div>
-      <p class="feature-list-state-text">點擊右上角「新增特徵」開始建立你的第一個特徵分布條目。</p>
+      <div class="feature-list-state-title">{{ t('customEntry.featureList.emptyTitle') }}</div>
+      <p class="feature-list-state-text">{{ t('customEntry.featureList.emptyText') }}</p>
     </div>
 
     <div v-else class="feature-grid">
@@ -37,15 +37,19 @@
         type="button"
         @click="$emit('select', item)"
       >
-        <span class="feature-card-name">{{ item['特徵'] || item.feature || '未命名特徵' }}</span>
-        <span class="feature-card-tag" :data-tone="resolveToneType(item)">{{ item['聲韻調'] || item.phonology || '未分類' }}</span>
-        <span class="feature-card-badge">已收錄 {{ item.location_count || 0 }} 個方言點</span>
+        <span class="feature-card-name">{{ item['特徵'] || item.feature || t('customEntry.featureList.unnamed') }}</span>
+        <span class="feature-card-tag" :data-tone="resolveToneType(item)">{{ item['聲韻調'] || item.phonology || t('customEntry.featureList.uncategorized') }}</span>
+        <span class="feature-card-badge">{{ t('customEntry.featureList.pointCount', { count: item.location_count || 0 }) }}</span>
       </button>
     </div>
   </section>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 defineProps({
   items: {
     type: Array,

@@ -10,17 +10,17 @@
     <template #header>
       <div class="entry-modal-header">
         <div>
-          <h3 class="entry-modal-title">自定義數據錄入</h3>
-          <div class="entry-modal-subtitle">聚焦用戶自定義資料新增與維護，兼容舊的個人數據管理與右側逐條新增邏輯。</div>
+          <h3 class="entry-modal-title">{{ t('customEntry.modal.title') }}</h3>
+          <div class="entry-modal-subtitle">{{ t('customEntry.modal.subtitle') }}</div>
         </div>
-        <div class="entry-modal-mode-switcher" role="group" aria-label="錄入模式">
+        <div class="entry-modal-mode-switcher" role="group" :aria-label="t('customEntry.modal.modeGroupLabel')">
           <button
             class="entry-mode-button"
             :class="{ active: activeMode === 'point' }"
             type="button"
             @click="activeMode = 'point'"
           >
-            補充單點資料
+            {{ t('customEntry.modal.modes.point') }}
           </button>
           <button
             class="entry-mode-button"
@@ -28,13 +28,13 @@
             type="button"
             @click="activeMode = 'feature'"
           >
-            製作特徵分布
+            {{ t('customEntry.modal.modes.feature') }}
           </button>
         </div>
         <button
           class="close-btn close-btn-lg close-btn-inline"
           type="button"
-          aria-label="關閉"
+          :aria-label="t('customEntry.modal.close')"
           @click="closeModal"
         >
           ×
@@ -51,6 +51,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import PointCentricMode from './PointCentricMode.vue'
 import FeatureCentricMode from './FeatureCentricMode.vue'
@@ -63,6 +64,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+const { t } = useI18n()
 const activeMode = ref('point')
 
 const closeModal = () => {

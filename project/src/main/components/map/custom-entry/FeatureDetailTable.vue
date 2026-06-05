@@ -1,48 +1,48 @@
 <template>
   <section class="feature-detail-table">
     <div class="feature-detail-header">
-      <button class="main-glass-button" type="button" @click="$emit('back')">← 返回</button>
+      <button class="main-glass-button" type="button" @click="$emit('back')">{{ t('customEntry.featureDetail.back') }}</button>
       <div class="feature-detail-heading">
         <h4 class="feature-detail-title">{{ detailTitle }}</h4>
-        <p class="feature-detail-description">以同一特徵為中心，維護多個方言點的分布資料。</p>
+        <p class="feature-detail-description">{{ t('customEntry.featureDetail.description') }}</p>
       </div>
-      <button class="main-glass-button" data-variant="primary" type="button" @click="openCreateModal">+ 新增地點記錄</button>
+      <button class="main-glass-button" data-variant="primary" type="button" @click="openCreateModal">{{ t('customEntry.featureDetail.createRecord') }}</button>
     </div>
 
     <div class="feature-detail-layout">
       <div class="feature-detail-main main-glass-panel-inner">
-        <div v-if="loading" class="feature-detail-state">正在載入特徵詳情…</div>
+        <div v-if="loading" class="feature-detail-state">{{ t('customEntry.featureDetail.loading') }}</div>
         <div v-else-if="errorMessage" class="feature-detail-state feature-detail-state-error">
           <div>{{ errorMessage }}</div>
-          <button class="main-glass-button" type="button" @click="loadRecords">重試</button>
+          <button class="main-glass-button" type="button" @click="loadRecords">{{ t('customEntry.featureDetail.retry') }}</button>
         </div>
-        <div v-else-if="rows.length === 0" class="feature-detail-state">暫無地點記錄，點擊右上角開始新增。</div>
+        <div v-else-if="rows.length === 0" class="feature-detail-state">{{ t('customEntry.featureDetail.empty') }}</div>
         <div v-else class="feature-detail-table-body">
           <div class="feature-detail-table-head">
-            <span>地點</span>
-            <span>分區</span>
-            <span>坐標</span>
-            <span>值</span>
-            <span>說明</span>
-            <span>操作</span>
+            <span>{{ t('customEntry.featureDetail.headers.location') }}</span>
+            <span>{{ t('customEntry.featureDetail.headers.region') }}</span>
+            <span>{{ t('customEntry.featureDetail.headers.coord') }}</span>
+            <span>{{ t('customEntry.featureDetail.headers.value') }}</span>
+            <span>{{ t('customEntry.featureDetail.headers.note') }}</span>
+            <span>{{ t('customEntry.featureDetail.headers.action') }}</span>
           </div>
           <div v-for="row in rows" :key="row.created_at || `${row['簡稱']}-${row['音典分區']}-${row['值']}`" class="feature-detail-row">
             <span>{{ row['簡稱'] }}</span>
             <span>{{ row['音典分區'] }}</span>
             <span>{{ row['經緯度'] }}</span>
             <span>{{ row['值'] }}</span>
-            <span>{{ row['說明'] || '—' }}</span>
+            <span>{{ row['說明'] || t('customEntry.featureDetail.emptyNote') }}</span>
             <div class="feature-detail-actions">
-              <button class="feature-detail-link" type="button" @click="openEditModal(row)">編輯</button>
-              <button class="feature-detail-link danger" type="button" @click="handleDelete(row)">刪除</button>
+              <button class="feature-detail-link" type="button" @click="openEditModal(row)">{{ t('customEntry.featureDetail.actions.edit') }}</button>
+              <button class="feature-detail-link danger" type="button" @click="handleDelete(row)">{{ t('customEntry.featureDetail.actions.delete') }}</button>
             </div>
           </div>
         </div>
       </div>
 
       <div class="feature-detail-side main-glass-panel-inner">
-        <div class="feature-detail-map-title">當前特徵點位分布</div>
-        <MiniMapSelector mode="multi-preview" :readonly="true" :points="mapPoints" hint-text="特徵分布預覽" />
+        <div class="feature-detail-map-title">{{ t('customEntry.featureDetail.mapTitle') }}</div>
+        <MiniMapSelector mode="multi-preview" :readonly="true" :points="mapPoints" :hint-text="t('customEntry.featureDetail.mapHint')" />
       </div>
     </div>
 
@@ -57,6 +57,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { batchDeleteCustomData, getDataByFeature } from '@/api'
 import MiniMapSelector from './MiniMapSelector.vue'
 import FeatureRecordEditorModal from './FeatureRecordEditorModal.vue'
@@ -69,6 +70,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['back', 'saved'])
+const { t } = useI18n()
 
 const loading = ref(false)
 const errorMessage = ref('')
@@ -77,8 +79,8 @@ const isEditorOpen = ref(false)
 const editingRecord = ref(null)
 
 const detailTitle = computed(() => {
-  const featureName = props.feature?.['特徵'] || props.feature?.feature || '未命名特徵'
-  const phonology = props.feature?.['聲韻調'] || props.feature?.phonology || '未分類'
+  const featureName = props.feature?.['特徵'] || props.feature?.feature || t('customEntry.featureDetail.unnamed')
+  const phonology = props.feature?.['聲韻調'] || props.feature?.phonology || t('customEntry.featureDetail.uncategorized')
   return `${featureName}（${phonology}）`
 })
 
@@ -103,10 +105,15 @@ const loadRecords = async () => {
   try {
     const featureName = props.feature?.['特徵'] || props.feature?.feature || ''
     const phonology = props.feature?.['聲韻調'] || props.feature?.phonology || ''
+    if (!featureName || !phonology) {
+      errorMessage.value = t('customEntry.featureDetail.loadFailed')
+      rows.value = []
+      return
+    }
     const response = await getDataByFeature(featureName, phonology)
     rows.value = Array.isArray(response?.data) ? response.data : []
   } catch (error) {
-    errorMessage.value = error.message || '獲取特徵詳情失敗'
+    errorMessage.value = error.message || t('customEntry.featureDetail.loadFailed')
     rows.value = []
   } finally {
     loading.value = false

@@ -20,9 +20,12 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getUserFeatures } from '@/api'
 import FeatureCardList from './FeatureCardList.vue'
 import FeatureDetailTable from './FeatureDetailTable.vue'
+
+const { t } = useI18n()
 
 const loading = ref(false)
 const errorMessage = ref('')
@@ -38,7 +41,7 @@ const loadFeatures = async () => {
     const response = await getUserFeatures()
     featureItems.value = Array.isArray(response?.data) ? response.data : []
   } catch (error) {
-    errorMessage.value = error.message || '獲取特徵列表失敗'
+    errorMessage.value = error.message || t('customEntry.mode.featureLoadFailed')
     featureItems.value = []
   } finally {
     loading.value = false

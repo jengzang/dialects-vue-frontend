@@ -9,37 +9,37 @@
   >
     <template #header>
       <div class="feature-record-header">
-        <h4 class="feature-record-title">{{ isCreateMode ? '新增地點記錄' : '編輯地點記錄' }}</h4>
-        <button class="close-btn close-btn-sm close-btn-inline" type="button" aria-label="關閉" @click="closeModal">×</button>
+        <h4 class="feature-record-title">{{ isCreateMode ? t('customEntry.featureRecord.createTitle') : t('customEntry.featureRecord.editTitle') }}</h4>
+        <button class="close-btn close-btn-sm close-btn-inline" type="button" :aria-label="t('customEntry.featureRecord.close')" @click="closeModal">×</button>
       </div>
     </template>
 
     <div class="feature-record-body">
       <div class="feature-record-grid">
         <label class="feature-record-field">
-          <span>地點</span>
-          <input v-model="location" class="feature-record-input" type="text" placeholder="輸入地點名稱" />
+          <span>{{ t('customEntry.featureRecord.labels.location') }}</span>
+          <input v-model="location" class="feature-record-input" type="text" :placeholder="t('customEntry.featureRecord.placeholders.location')" />
         </label>
         <label class="feature-record-field">
-          <span>分區</span>
-          <input v-model="region" class="feature-record-input" type="text" placeholder="輸入分區" />
+          <span>{{ t('customEntry.featureRecord.labels.region') }}</span>
+          <input v-model="region" class="feature-record-input" type="text" :placeholder="t('customEntry.featureRecord.placeholders.region')" />
         </label>
         <label class="feature-record-field feature-record-field-full">
-          <span>坐標</span>
-          <input :value="coordText" class="feature-record-input" type="text" readonly placeholder="點擊地圖後自動填入" />
+          <span>{{ t('customEntry.featureRecord.labels.coord') }}</span>
+          <input :value="coordText" class="feature-record-input" type="text" readonly :placeholder="t('customEntry.featureRecord.placeholders.coord')" />
         </label>
       </div>
 
-      <MiniMapSelector v-model:coord="coord" mode="picker" :readonly="false" hint-text="點擊地圖選取坐標" />
+      <MiniMapSelector v-model:coord="coord" mode="picker" :readonly="false" :hint-text="t('customEntry.featureRecord.mapHint')" />
 
       <div class="feature-record-grid feature-record-values">
         <label class="feature-record-field">
-          <span>值</span>
-          <input v-model="valueField" class="feature-record-input" type="text" placeholder="輸入值" />
+          <span>{{ t('customEntry.featureRecord.labels.value') }}</span>
+          <input v-model="valueField" class="feature-record-input" type="text" :placeholder="t('customEntry.featureRecord.placeholders.value')" />
         </label>
         <label class="feature-record-field">
-          <span>說明</span>
-          <input v-model="noteField" class="feature-record-input" type="text" placeholder="可選說明" />
+          <span>{{ t('customEntry.featureRecord.labels.note') }}</span>
+          <input v-model="noteField" class="feature-record-input" type="text" :placeholder="t('customEntry.featureRecord.placeholders.note')" />
         </label>
       </div>
 
@@ -47,14 +47,15 @@
     </div>
 
     <template #footer>
-      <button class="main-glass-button" type="button" @click="closeModal">取消</button>
-      <button class="main-glass-button" data-variant="primary" type="button" @click="handleSave">保存此行</button>
+      <button class="main-glass-button" type="button" @click="closeModal">{{ t('customEntry.featureRecord.actions.cancel') }}</button>
+      <button class="main-glass-button" data-variant="primary" type="button" @click="handleSave">{{ t('customEntry.featureRecord.actions.save') }}</button>
     </template>
   </AppModal>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import { batchCreateCustomData, editCustomData } from '@/api'
 import { userStore } from '@/main/store/store.js'
@@ -77,6 +78,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'saved'])
+const { t } = useI18n()
 
 const location = ref('')
 const region = ref('')
@@ -119,17 +121,17 @@ async function handleSave() {
   message.value = ''
 
   if (!location.value.trim() || !region.value.trim()) {
-    message.value = '請先填寫地點與分區'
+    message.value = t('customEntry.featureRecord.messages.locationRegionRequired')
     return
   }
 
   if (!Array.isArray(coord.value)) {
-    message.value = '請先選取坐標'
+    message.value = t('customEntry.featureRecord.messages.coordRequired')
     return
   }
 
   if (!valueField.value.trim()) {
-    message.value = '請先填寫值'
+    message.value = t('customEntry.featureRecord.messages.valueRequired')
     return
   }
 
@@ -145,7 +147,7 @@ async function handleSave() {
   }
 
   if (!payload.特徵) {
-    message.value = '當前特徵為空，請返回上一層重新選擇'
+    message.value = t('customEntry.featureRecord.messages.featureRequired')
     return
   }
 

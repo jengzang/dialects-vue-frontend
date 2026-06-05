@@ -2,13 +2,14 @@
   <div class="mini-map-wrapper" :class="wrapperClass">
     <div ref="mapContainer" class="mini-map-container"></div>
     <div v-if="mode === 'picker' && !readonly" class="mini-map-hint">
-      {{ hintText }}
+      {{ resolvedHintText }}
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle } from '@/utils/map/MapSource.js'
@@ -38,11 +39,12 @@ const props = defineProps({
   },
   hintText: {
     type: String,
-    default: '點擊地圖選取坐標'
+    default: ''
   }
 })
 
 const emit = defineEmits(['update:coord'])
+const { t } = useI18n()
 
 const mapContainer = ref(null)
 const mapInstance = ref(null)
@@ -54,6 +56,8 @@ const wrapperClass = computed(() => ({
   'is-picker': props.mode === 'picker',
   'is-multi': props.mode === 'multi-preview'
 }))
+
+const resolvedHintText = computed(() => props.hintText || t('customEntry.miniMap.defaultHint'))
 
 const normalizedPoints = computed(() => {
   if (props.mode === 'multi-preview') {

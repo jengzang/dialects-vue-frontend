@@ -1,11 +1,11 @@
 <template>
   <section class="point-detail-form">
     <div class="point-detail-header">
-      <button class="main-glass-button" type="button" @click="$emit('back')">← 返回</button>
+      <button class="main-glass-button" type="button" @click="$emit('back')">{{ t('customEntry.pointDetail.back') }}</button>
       <div class="point-detail-heading">
-        <h4 class="point-detail-title">{{ isCreateMode ? '新增方言點' : detailTitle }}</h4>
+        <h4 class="point-detail-title">{{ isCreateMode ? t('customEntry.pointDetail.createTitle') : detailTitle }}</h4>
         <p class="point-detail-description">
-          {{ isCreateMode ? '先确定地點與坐標，再補充多條特徵資料。' : '在同一個方言點下持續補充或修改多條資料。' }}
+          {{ isCreateMode ? t('customEntry.pointDetail.createDescription') : t('customEntry.pointDetail.editDescription') }}
         </p>
       </div>
     </div>
@@ -14,60 +14,60 @@
       <div class="point-detail-main main-glass-panel-inner">
         <div class="point-base-fields">
           <label class="point-field">
-            <span class="point-field-label">簡稱</span>
-            <input v-model="location" class="point-field-input" type="text" placeholder="輸入方言點簡稱" />
+            <span class="point-field-label">{{ t('customEntry.pointDetail.labels.location') }}</span>
+            <input v-model="location" class="point-field-input" type="text" :placeholder="t('customEntry.pointDetail.placeholders.location')" />
           </label>
           <label class="point-field">
-            <span class="point-field-label">音典分區</span>
-            <input v-model="region" class="point-field-input" type="text" placeholder="輸入分區" />
+            <span class="point-field-label">{{ t('customEntry.pointDetail.labels.region') }}</span>
+            <input v-model="region" class="point-field-input" type="text" :placeholder="t('customEntry.pointDetail.placeholders.region')" />
           </label>
           <label class="point-field point-field-full">
-            <span class="point-field-label">經緯度</span>
-            <input :value="coordText" class="point-field-input" type="text" readonly placeholder="點擊地圖後自動填入" />
+            <span class="point-field-label">{{ t('customEntry.pointDetail.labels.coord') }}</span>
+            <input :value="coordText" class="point-field-input" type="text" readonly :placeholder="t('customEntry.pointDetail.placeholders.coord')" />
           </label>
         </div>
 
         <div class="point-rows-header">
           <div>
-            <h5 class="point-rows-title">特徵記錄</h5>
-            <p class="point-rows-description">每一行代表一條可提交的自定義資料。</p>
+            <h5 class="point-rows-title">{{ t('customEntry.pointDetail.rows.title') }}</h5>
+            <p class="point-rows-description">{{ t('customEntry.pointDetail.rows.description') }}</p>
           </div>
-          <button class="main-glass-button" type="button" @click="addRow">+ 再添加一條</button>
+          <button class="main-glass-button" type="button" @click="addRow">{{ t('customEntry.pointDetail.rows.add') }}</button>
         </div>
 
         <div class="point-rows-table">
           <div class="point-rows-table-head">
-            <span>聲韻調</span>
-            <span>特徵</span>
-            <span>值</span>
-            <span>說明</span>
-            <span>操作</span>
+            <span>{{ t('customEntry.pointDetail.rows.headers.phonology') }}</span>
+            <span>{{ t('customEntry.pointDetail.rows.headers.feature') }}</span>
+            <span>{{ t('customEntry.pointDetail.rows.headers.value') }}</span>
+            <span>{{ t('customEntry.pointDetail.rows.headers.note') }}</span>
+            <span>{{ t('customEntry.pointDetail.rows.headers.action') }}</span>
           </div>
           <div v-for="row in rows" :key="row.id" class="point-row">
-            <input v-model="row.聲韻調" class="point-row-input" type="text" placeholder="如：韻母" />
-            <input v-model="row.特徵" class="point-row-input" type="text" placeholder="如：流攝" />
-            <input v-model="row.值" class="point-row-input" type="text" placeholder="如：eu" />
-            <input v-model="row.說明" class="point-row-input" type="text" placeholder="可選補充說明" />
-            <button class="point-row-remove" type="button" @click="removeRow(row.id)">刪除</button>
+            <input v-model="row.聲韻調" class="point-row-input" type="text" :placeholder="t('customEntry.pointDetail.placeholders.phonology')" />
+            <input v-model="row.特徵" class="point-row-input" type="text" :placeholder="t('customEntry.pointDetail.placeholders.feature')" />
+            <input v-model="row.值" class="point-row-input" type="text" :placeholder="t('customEntry.pointDetail.placeholders.value')" />
+            <input v-model="row.說明" class="point-row-input" type="text" :placeholder="t('customEntry.pointDetail.placeholders.note')" />
+            <button class="point-row-remove" type="button" @click="removeRow(row.id)">{{ t('customEntry.pointDetail.rows.remove') }}</button>
           </div>
         </div>
 
         <div v-if="saveMessage" class="point-save-message">{{ saveMessage }}</div>
 
         <div class="point-detail-actions">
-          <button class="main-glass-button" type="button" @click="$emit('back')">取消</button>
-          <button class="main-glass-button" data-variant="primary" type="button" @click="handleSave">保存</button>
+          <button class="main-glass-button" type="button" @click="$emit('back')">{{ t('customEntry.pointDetail.actions.cancel') }}</button>
+          <button class="main-glass-button" data-variant="primary" type="button" @click="handleSave">{{ t('customEntry.pointDetail.actions.save') }}</button>
         </div>
       </div>
 
       <div class="point-detail-side main-glass-panel-inner">
-        <div class="point-map-title">{{ isCreateMode ? '點擊地圖選取坐標' : '當前方言點位置' }}</div>
+        <div class="point-map-title">{{ isCreateMode ? t('customEntry.pointDetail.map.pickTitle') : t('customEntry.pointDetail.map.previewTitle') }}</div>
         <MiniMapSelector
           v-model:coord="coord"
           :readonly="!isCreateMode"
           :mode="isCreateMode ? 'picker' : 'single-preview'"
           :points="mapPreviewPoints"
-          :hint-text="isCreateMode ? '點擊地圖選取坐標' : '當前點位預覽'"
+          :hint-text="isCreateMode ? t('customEntry.pointDetail.map.pickHint') : t('customEntry.pointDetail.map.previewHint')"
         />
       </div>
     </div>
@@ -76,6 +76,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { batchCreateCustomData, batchDeleteCustomData, editCustomData, getDataByPoint } from '@/api'
 import { userStore } from '@/main/store/store.js'
 import { formatCoord } from '@/utils/map/formatCoord.js'
@@ -89,6 +90,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['back', 'saved'])
+const { t } = useI18n()
 
 const location = ref('')
 const region = ref('')
@@ -100,14 +102,14 @@ let rowSeed = 0
 
 const isCreateMode = computed(() => !props.point)
 const detailTitle = computed(() => {
-  if (!props.point) return '新增方言點'
+  if (!props.point) return t('customEntry.pointDetail.createTitle')
   return `${props.point['簡稱'] || props.point.location || ''}（${props.point['音典分區'] || props.point.region || ''}）`
 })
 
 const coordText = computed(() => (Array.isArray(coord.value) ? formatCoord(coord.value[0], coord.value[1]) : ''))
 const mapPreviewPoints = computed(() => {
   if (!Array.isArray(coord.value)) return []
-  return [{ coord: coord.value, label: location.value || '當前點位', active: true }]
+  return [{ coord: coord.value, label: location.value || t('customEntry.pointDetail.map.currentPoint'), active: true }]
 })
 
 function createEmptyRow() {
@@ -193,7 +195,7 @@ async function loadPointDetail(point) {
       rows.value = [createEmptyRow()]
     }
   } catch (error) {
-    saveMessage.value = error.message || '獲取地點詳情失敗'
+    saveMessage.value = error.message || t('customEntry.pointDetail.messages.loadFailed')
     rows.value = [createEmptyRow()]
   }
 }
@@ -202,18 +204,18 @@ async function handleSave() {
   saveMessage.value = ''
 
   if (!location.value.trim() || !region.value.trim()) {
-    saveMessage.value = '請先填寫方言點名稱與分區'
+    saveMessage.value = t('customEntry.pointDetail.messages.locationRegionRequired')
     return
   }
 
   if (!Array.isArray(coord.value)) {
-    saveMessage.value = '請先在地圖上選取坐標'
+    saveMessage.value = t('customEntry.pointDetail.messages.coordRequired')
     return
   }
 
   const validRows = rows.value.filter((row) => row.特徵.trim() && row.值.trim())
   if (validRows.length === 0 && removedIds.value.length === 0) {
-    saveMessage.value = '請至少填寫一條特徵與值'
+    saveMessage.value = t('customEntry.pointDetail.messages.rowRequired')
     return
   }
 
@@ -255,7 +257,7 @@ async function handleSave() {
   toEdit.forEach((record) => tasks.push(editCustomData(record)))
 
   if (tasks.length === 0) {
-    saveMessage.value = '當前沒有需要提交的變更'
+    saveMessage.value = t('customEntry.pointDetail.messages.noChanges')
     return
   }
 
@@ -263,11 +265,11 @@ async function handleSave() {
   const failedCount = results.filter((item) => item.status === 'rejected').length
 
   if (failedCount > 0) {
-    saveMessage.value = `保存時有 ${failedCount} 項失敗，請重試`
+    saveMessage.value = t('customEntry.pointDetail.messages.partialFailed', { count: failedCount })
     return
   }
 
-  saveMessage.value = '保存成功'
+  saveMessage.value = t('customEntry.pointDetail.messages.saveSuccess')
   emit('saved')
 }
 

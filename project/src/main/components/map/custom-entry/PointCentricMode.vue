@@ -20,9 +20,12 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getUserPoints } from '@/api'
 import PointCardList from './PointCardList.vue'
 import PointDetailForm from './PointDetailForm.vue'
+
+const { t } = useI18n()
 
 const loading = ref(false)
 const errorMessage = ref('')
@@ -38,7 +41,7 @@ const loadPoints = async () => {
     const response = await getUserPoints()
     pointItems.value = Array.isArray(response?.data) ? response.data : []
   } catch (error) {
-    errorMessage.value = error.message || '獲取方言點列表失敗'
+    errorMessage.value = error.message || t('customEntry.mode.pointLoadFailed')
     pointItems.value = []
   } finally {
     loading.value = false
