@@ -1,16 +1,9 @@
 <template>
-  <AppModal
-    v-model="isModalOpen"
-    :title="$t('auth.profile.avatar.modalTitle')"
-    size="sm"
-  >
+  <AppModal v-model="isModalOpen" :title="$t('auth.profile.avatar.modalTitle')" size="sm">
     <div class="avatar-config-modal">
       <!-- Preview section -->
       <div class="preview-section">
-        <div
-          class="preview-avatar"
-          :style="avatarStyle"
-        >
+        <div class="preview-avatar" :style="avatarStyle">
           {{ avatarConfig.text }}
         </div>
         <p class="preview-tip">
@@ -29,7 +22,7 @@
             maxlength="3"
             class="config-input"
             :placeholder="$t('auth.profile.avatar.textPlaceholder')"
-          >
+          />
         </div>
 
         <!-- Shape Selector -->
@@ -51,6 +44,14 @@
               @click="avatarConfig.shape = 'squircle'"
             >
               {{ $t('auth.profile.avatar.shapeSquircle') }}
+            </button>
+            <button
+              type="button"
+              class="config-btn"
+              :class="{ active: avatarConfig.shape === 'blob' }"
+              @click="avatarConfig.shape = 'blob'"
+            >
+              {{ $t('auth.profile.avatar.shapeBlob') }}
             </button>
           </div>
         </div>
@@ -78,23 +79,20 @@
               </button>
             </div>
             <label class="glass-toggle-label">
-              <input
-                v-model="avatarConfig.glass"
-                type="checkbox"
-                class="glass-checkbox"
-              >
+              <input v-model="avatarConfig.glass" type="checkbox" class="glass-checkbox" />
               <span>{{ $t('auth.profile.avatar.glassLabel') }}</span>
             </label>
           </div>
         </div>
 
         <!-- Solid / Glass Tint Color Customizer -->
-        <div
-          v-if="avatarConfig.bgType === 'solid'"
-          class="control-group"
-        >
+        <div v-if="avatarConfig.bgType === 'solid'" class="control-group">
           <label class="control-label">
-            {{ avatarConfig.glass ? $t('auth.profile.avatar.glassTintLabel') : $t('auth.profile.avatar.solidPresetLabel') }}
+            {{
+              avatarConfig.glass
+                ? $t('auth.profile.avatar.glassTintLabel')
+                : $t('auth.profile.avatar.solidPresetLabel')
+            }}
           </label>
           <div class="color-preset-grid">
             <button
@@ -109,20 +107,18 @@
           </div>
           <div class="custom-color-picker">
             <span>{{ $t('auth.profile.avatar.customColorLabel') }}</span>
-            <input
-              v-model="avatarConfig.bgColor"
-              type="color"
-            >
+            <input v-model="avatarConfig.bgColor" type="color" />
           </div>
         </div>
 
         <!-- Gradient presets Customizer -->
-        <div
-          v-if="avatarConfig.bgType === 'gradient'"
-          class="control-group"
-        >
+        <div v-if="avatarConfig.bgType === 'gradient'" class="control-group">
           <label class="control-label">
-            {{ avatarConfig.glass ? $t('auth.profile.avatar.liquidGlassPresetLabel') : $t('auth.profile.avatar.gradientPresetLabel') }}
+            {{
+              avatarConfig.glass
+                ? $t('auth.profile.avatar.liquidGlassPresetLabel')
+                : $t('auth.profile.avatar.gradientPresetLabel')
+            }}
           </label>
           <div class="gradient-preset-grid">
             <button
@@ -143,34 +139,22 @@
           <div class="custom-gradient-pickers">
             <div class="picker-item">
               <span>{{ $t('auth.profile.avatar.gradientStartColor') }}</span>
-              <input
-                v-model="avatarConfig.gradientFrom"
-                type="color"
-              >
+              <input v-model="avatarConfig.gradientFrom" type="color" />
             </div>
             <div class="picker-item">
               <span>{{ $t('auth.profile.avatar.gradientEndColor') }}</span>
-              <input
-                v-model="avatarConfig.gradientTo"
-                type="color"
-              >
+              <input v-model="avatarConfig.gradientTo" type="color" />
             </div>
           </div>
         </div>
 
         <!-- Angle Slider (for gradient types) -->
-        <div
-          v-if="avatarConfig.bgType === 'gradient'"
-          class="control-group"
-        >
+        <div v-if="avatarConfig.bgType === 'gradient'" class="control-group">
           <div class="angle-slider">
-            <span>{{ $t('auth.profile.avatar.gradientAngle', { angle: avatarConfig.gradientAngle }) }}</span>
-            <input
-              v-model.number="avatarConfig.gradientAngle"
-              type="range"
-              min="0"
-              max="360"
-            >
+            <span>{{
+              $t('auth.profile.avatar.gradientAngle', { angle: avatarConfig.gradientAngle })
+            }}</span>
+            <input v-model.number="avatarConfig.gradientAngle" type="range" min="0" max="360" />
           </div>
         </div>
 
@@ -196,10 +180,7 @@
             </button>
             <div class="custom-text-color">
               <span>{{ $t('auth.profile.avatar.textColorCustom') }}</span>
-              <input
-                v-model="avatarConfig.textColor"
-                type="color"
-              >
+              <input v-model="avatarConfig.textColor" type="color" />
             </div>
           </div>
         </div>
@@ -207,34 +188,18 @@
         <!-- Glow Effect Toggle -->
         <div class="control-group glow-toggle-group">
           <label class="control-label">{{ $t('auth.profile.avatar.glowLabel') }}</label>
-          <input
-            v-model="avatarConfig.glow"
-            type="checkbox"
-            class="glow-checkbox"
-          >
+          <input v-model="avatarConfig.glow" type="checkbox" class="glow-checkbox" />
         </div>
       </div>
     </div>
     <template #footer>
-      <button
-        type="button"
-        class="modal-footer-btn cancel-btn"
-        @click="isModalOpen = false"
-      >
+      <button type="button" class="modal-footer-btn cancel-btn" @click="isModalOpen = false">
         {{ $t('auth.profile.avatar.btnCancel') }}
       </button>
-      <button
-        type="button"
-        class="modal-footer-btn reset-btn"
-        @click="resetAvatarConfig"
-      >
+      <button type="button" class="modal-footer-btn reset-btn" @click="resetAvatarConfig">
         {{ $t('auth.profile.avatar.btnReset') }}
       </button>
-      <button
-        type="button"
-        class="modal-footer-btn save-btn"
-        @click="saveAvatarConfig"
-      >
+      <button type="button" class="modal-footer-btn save-btn" @click="saveAvatarConfig">
         {{ $t('auth.profile.avatar.btnSave') }}
       </button>
     </template>
@@ -373,7 +338,12 @@ const hexToRgb = (hex) => {
 const avatarStyle = computed(() => {
   const styles = {
     color: avatarConfig.value.textColor,
-    borderRadius: avatarConfig.value.shape === 'circle' ? '50%' : '18px',
+    borderRadius:
+      avatarConfig.value.shape === 'circle'
+        ? '50%'
+        : avatarConfig.value.shape === 'blob'
+          ? '60% 40% 30% 70% / 60% 30% 70% 40%'
+          : '18px',
     fontWeight: '1000',
   };
 
@@ -445,9 +415,13 @@ const avatarStyle = computed(() => {
   } else {
     if (isGlass) {
       if (avatarConfig.value.bgType === 'solid') {
-        styles.boxShadow = avatarConfig.value.bgColor === '#ffffff' ? 'none' : 'inset 0 0 12px rgba(255, 255, 255, 0.3)';
+        styles.boxShadow =
+          avatarConfig.value.bgColor === '#ffffff'
+            ? 'none'
+            : 'inset 0 0 12px rgba(255, 255, 255, 0.3)';
       } else if (avatarConfig.value.bgType === 'gradient') {
-        styles.boxShadow = 'inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)';
+        styles.boxShadow =
+          'inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)';
       }
     } else {
       styles.boxShadow = 'none';

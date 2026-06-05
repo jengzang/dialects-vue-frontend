@@ -40,34 +40,22 @@
             <div class="profile-username">
               {{ user.username }}
             </div>
-            <div
-              v-if="user.email"
-              class="profile-email"
-            >
-              ✉️ {{ user.email }}
-            </div>
-            <div
-              class="user-info-badge"
-              v-html="$t('auth.profile.userNumber', { id: user.id })"
-            />
+            <div v-if="user.email" class="profile-email">✉️ {{ user.email }}</div>
+            <div class="user-info-badge" v-html="$t('auth.profile.userNumber', { id: user.id })" />
           </div>
         </div>
 
         <!-- Info Grid -->
         <div class="info-metrics-grid">
           <div class="metric-item">
-            <div class="metric-icon">
-              🗓️
-            </div>
+            <div class="metric-icon">🗓️</div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.registerLabel') }}</span>
               <span class="metric-value">{{ fmt(user.created_at) }}</span>
             </div>
           </div>
           <div class="metric-item">
-            <div class="metric-icon">
-              ⏱️
-            </div>
+            <div class="metric-icon">⏱️</div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.onlineLabel') }}</span>
               <span class="metric-value">{{ formatOnlineTime(user.total_online_seconds) }}</span>
@@ -77,13 +65,8 @@
 
         <!-- Custom Row (Always side-by-side, clickable) -->
         <div class="info-custom-row">
-          <div
-            class="metric-item highlightable clickable"
-            @click="$emit('goToUserRegions')"
-          >
-            <div class="metric-icon">
-              🗂️
-            </div>
+          <div class="metric-item highlightable clickable" @click="$emit('goToUserRegions')">
+            <div class="metric-icon">🗂️</div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.regionsLabel') }}</span>
               <span class="metric-value count-number">
@@ -91,13 +74,8 @@
               </span>
             </div>
           </div>
-          <div
-            class="metric-item highlightable clickable"
-            @click="$emit('goToUserData')"
-          >
-            <div class="metric-icon">
-              📊
-            </div>
+          <div class="metric-item highlightable clickable" @click="$emit('goToUserData')">
+            <div class="metric-icon">📊</div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.dataLabel') }}</span>
               <span class="metric-value count-number">
@@ -110,28 +88,16 @@
 
       <!-- Action Buttons -->
       <div class="action-buttons">
-        <ActionButton
-          variant="info"
-          @click="$emit('goToUserData')"
-        >
+        <ActionButton variant="info" @click="$emit('goToUserData')">
           📊 {{ $t('auth.profile.buttons.userData') }}
         </ActionButton>
-        <ActionButton
-          variant="teal"
-          @click="$emit('goToUserRegions')"
-        >
+        <ActionButton variant="teal" @click="$emit('goToUserRegions')">
           🗂️ {{ $t('auth.profile.buttons.userRegions') }}
         </ActionButton>
-        <ActionButton
-          variant="blue"
-          @click="$emit('goToModifyProfile')"
-        >
+        <ActionButton variant="blue" @click="$emit('goToModifyProfile')">
           🛠 {{ $t('auth.profile.buttons.modifyProfile') }}
         </ActionButton>
-        <ActionButton
-          variant="danger"
-          @click="$emit('logout')"
-        >
+        <ActionButton variant="danger" @click="$emit('logout')">
           🚪 {{ $t('auth.profile.buttons.logout') }}
         </ActionButton>
         <ActionButton
@@ -157,11 +123,7 @@
     </div>
 
     <!-- Avatar Customization Modal -->
-    <AvatarCustomizerModal
-      v-model="isModalOpen"
-      :user="user"
-      @saved="loadAvatarConfig"
-    />
+    <AvatarCustomizerModal v-model="isModalOpen" :user="user" @saved="loadAvatarConfig" />
   </div>
 </template>
 
@@ -288,7 +250,12 @@ const hexToRgb = (hex) => {
 const avatarStyle = computed(() => {
   const styles = {
     color: avatarConfig.value.textColor,
-    borderRadius: avatarConfig.value.shape === 'circle' ? '50%' : '18px',
+    borderRadius:
+      avatarConfig.value.shape === 'circle'
+        ? '50%'
+        : avatarConfig.value.shape === 'blob'
+          ? '60% 40% 30% 70% / 60% 30% 70% 40%'
+          : '18px',
     fontWeight: '1000',
   };
 
@@ -360,9 +327,13 @@ const avatarStyle = computed(() => {
   } else {
     if (isGlass) {
       if (avatarConfig.value.bgType === 'solid') {
-        styles.boxShadow = avatarConfig.value.bgColor === '#ffffff' ? 'none' : 'inset 0 0 12px rgba(255, 255, 255, 0.3)';
+        styles.boxShadow =
+          avatarConfig.value.bgColor === '#ffffff'
+            ? 'none'
+            : 'inset 0 0 12px rgba(255, 255, 255, 0.3)';
       } else if (avatarConfig.value.bgType === 'gradient') {
-        styles.boxShadow = 'inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)';
+        styles.boxShadow =
+          'inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)';
       }
     } else {
       styles.boxShadow = 'none';
