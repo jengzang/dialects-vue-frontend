@@ -8,20 +8,20 @@
     <button
       type="button"
       class="tutorial-trigger"
-      :title="t('tutorial.ui.openLabel', { title: currentMatchedEntry.title })"
-      :aria-label="t('tutorial.ui.openLabel', { title: currentMatchedEntry.title })"
+      :title="`打開${currentMatchedEntry.title}教程`"
+      :aria-label="`打開${currentMatchedEntry.title}教程`"
       data-tutorial-trigger
       @click="openGuide"
     >
       <span class="tutorial-trigger__icon">❓</span>
-      <span class="tutorial-trigger__label">{{ t('tutorial.ui.triggerLabel') }}</span>
+      <span class="tutorial-trigger__label">教程</span>
     </button>
 
     <AppModal
       :model-value="isOpen"
       size="lg"
-      :title="t('tutorial.ui.modalTitle')"
-      :close-label="t('tutorial.ui.closeLabel')"
+      title="頁面教程"
+      :close-label="'關閉教程'"
       width="min(1080px, 96dvw)"
       max-height="min(82dvh, 780px)"
       @update:model-value="handleModalChange"
@@ -34,7 +34,7 @@
       >
         <div class="tutorial-shell__topbar">
           <div class="tutorial-shell__current">
-            <span class="tutorial-shell__current-label">{{ t('tutorial.ui.currentPage') }}</span>
+            <span class="tutorial-shell__current-label">當前頁</span>
             <strong class="tutorial-shell__current-value">{{ currentMatchedEntry.title }}</strong>
           </div>
 
@@ -44,7 +44,7 @@
             class="tutorial-shell__catalog-toggle"
             @click="isCatalogOpen = !isCatalogOpen"
           >
-            {{ isCatalogOpen ? t('tutorial.ui.collapseCatalog') : t('tutorial.ui.expandCatalog') }}
+            {{ isCatalogOpen ? '收起目錄' : '展開目錄' }}
           </button>
         </div>
 
@@ -55,7 +55,7 @@
           >
             <section
               v-for="group in groupedEntries"
-              :key="group.key"
+              :key="group.label"
               class="tutorial-catalog__group"
             >
               <h3 class="tutorial-catalog__group-title">
@@ -81,7 +81,7 @@
                     v-if="entry.key === currentMatchedEntry.key"
                     class="tutorial-entry__badge"
                   >
-                    {{ t('tutorial.ui.currentBadge') }}
+                    當前
                   </span>
                 </span>
                 <span class="tutorial-entry__summary">{{ entry.summary }}</span>
@@ -95,7 +95,7 @@
               class="tutorial-article__anchor"
             />
             <p class="tutorial-article__group">
-              {{ selectedEntry.groupLabel }}
+              {{ selectedEntry.group }}
             </p>
             <h2
               class="tutorial-article__title"
@@ -107,21 +107,35 @@
               {{ selectedEntry.summary }}
             </p>
 
-            <!-- eslint-disable vue/no-v-html -->
-            <div
-              v-if="selectedDocument?.html"
-              class="tutorial-article__content"
-              data-tutorial-content
-              v-html="selectedDocument.html"
-            />
-            <!-- eslint-enable vue/no-v-html -->
-
-            <p
-              v-else
-              class="tutorial-article__paragraph"
+            <section
+              v-for="section in selectedEntry.sections"
+              :key="`${selectedEntry.key}-${section.heading}`"
+              class="tutorial-article__section"
             >
-              {{ t('tutorial.ui.missing') }}
-            </p>
+              <h3 class="tutorial-article__section-title">
+                {{ section.heading }}
+              </h3>
+              <p
+                v-for="paragraph in section.paragraphs"
+                :key="paragraph"
+                class="tutorial-article__paragraph"
+              >
+                {{ paragraph }}
+              </p>
+
+              <ul
+                v-if="section.bullets && section.bullets.length"
+                class="tutorial-article__list"
+              >
+                <li
+                  v-for="bullet in section.bullets"
+                  :key="bullet"
+                  class="tutorial-article__list-item"
+                >
+                  {{ bullet }}
+                </li>
+              </ul>
+            </section>
           </article>
         </div>
 
@@ -133,7 +147,7 @@
             data-tutorial-prev
             @click="goPrevious"
           >
-            {{ t('tutorial.ui.previous') }}
+            上一篇
           </button>
 
           <span class="tutorial-pagination__status">
@@ -147,7 +161,7 @@
             data-tutorial-next
             @click="goNext"
           >
-            {{ t('tutorial.ui.next') }}
+            下一篇
           </button>
         </div>
       </div>
@@ -158,10 +172,8 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
-import { tutorialManifest } from './tutorialManifest'
-import { resolveTutorialDocument } from './tutorialMarkdown'
+import { tutorialContentEntries } from './pageTutorialContent'
 
 const props = defineProps({
   bottomOffset: {
@@ -183,7 +195,6 @@ const props = defineProps({
 })
 
 const route = useRoute()
-const { locale, t } = useI18n()
 
 const isOpen = ref(false)
 const isCatalogOpen = ref(false)
@@ -199,59 +210,38 @@ const guideStyle = computed(() => ({
   '--tutorial-guide-right': isCompact.value ? props.mobileRightOffset : props.rightOffset,
 }))
 
-const tutorialEntries = computed(() => {
-  return tutorialManifest
-    .map((entry) => {
-      const document = resolveTutorialDocument(entry.docKey, locale.value)
+const tutorialEntries = tutorialContentEntries
 
-      return {
-        ...entry,
-        document,
-        title: document?.title || entry.key,
-        summary: document?.summary || t('tutorial.ui.missing'),
-        groupLabel: t(`tutorial.groups.${entry.groupKey}`),
-      }
-    })
-    .sort((left, right) => left.order - right.order)
-})
-
-const tutorialEntryMap = computed(() => {
-  return new Map(tutorialEntries.value.map((entry) => [entry.key, entry]))
-})
+const tutorialEntryMap = new Map(tutorialEntries.map((entry) => [entry.key, entry]))
 
 const groupedEntries = computed(() => {
   const groups = new Map()
 
-  for (const entry of tutorialEntries.value) {
-    if (!groups.has(entry.groupKey)) {
-      groups.set(entry.groupKey, {
-        key: entry.groupKey,
-        label: entry.groupLabel,
+  for (const entry of tutorialEntries) {
+    if (!groups.has(entry.group)) {
+      groups.set(entry.group, {
+        label: entry.group,
         entries: [],
       })
     }
 
-    groups.get(entry.groupKey).entries.push(entry)
+    groups.get(entry.group).entries.push(entry)
   }
 
   return [...groups.values()]
 })
 
 const currentMatchedEntry = computed(() => {
-  return tutorialEntries.value.find((entry) => entry.match(route)) || null
+  return tutorialEntries.find((entry) => entry.match(route)) || null
 })
 
 const selectedEntry = computed(() => {
-  const selected = tutorialEntryMap.value.get(selectedKey.value)
-  return selected || currentMatchedEntry.value || tutorialEntries.value[0]
-})
-
-const selectedDocument = computed(() => {
-  return selectedEntry.value?.document || null
+  const selected = tutorialEntryMap.get(selectedKey.value)
+  return selected || currentMatchedEntry.value || tutorialEntries[0]
 })
 
 const selectedIndex = computed(() => {
-  return tutorialEntries.value.findIndex((entry) => entry.key === selectedEntry.value.key)
+  return tutorialEntries.findIndex((entry) => entry.key === selectedEntry.value.key)
 })
 
 const previousEntry = computed(() => {
@@ -259,15 +249,15 @@ const previousEntry = computed(() => {
   if (index <= 0) {
     return null
   }
-  return tutorialEntries.value[index - 1]
+  return tutorialEntries[index - 1]
 })
 
 const nextEntry = computed(() => {
   const index = selectedIndex.value
-  if (index < 0 || index >= tutorialEntries.value.length - 1) {
+  if (index < 0 || index >= tutorialEntries.length - 1) {
     return null
   }
-  return tutorialEntries.value[index + 1]
+  return tutorialEntries[index + 1]
 })
 
 function updateViewportWidth() {
@@ -317,7 +307,7 @@ function handleModalChange(value) {
 }
 
 function selectEntry(key) {
-  if (!tutorialEntryMap.value.has(key)) {
+  if (!tutorialEntryMap.has(key)) {
     return
   }
 
@@ -603,70 +593,28 @@ onBeforeUnmount(() => {
   line-height: 1.6;
 }
 
-.tutorial-article__content {
+.tutorial-article__section {
   margin-top: 20px;
-  color: #24445f;
+}
+
+.tutorial-article__section-title {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  color: #163d63;
 }
 
 .tutorial-article__paragraph {
-  margin: 20px 0 0;
+  margin: 0 0 10px;
   line-height: 1.7;
 }
 
-.tutorial-article__content :deep(h2),
-.tutorial-article__content :deep(h3),
-.tutorial-article__content :deep(h4) {
-  margin: 24px 0 10px;
-  color: #163d63;
-  line-height: 1.3;
-}
-
-.tutorial-article__content :deep(h2) {
-  font-size: 1rem;
-}
-
-.tutorial-article__content :deep(h3) {
-  font-size: 0.96rem;
-}
-
-.tutorial-article__content :deep(p) {
-  margin: 0 0 12px;
-  line-height: 1.7;
-}
-
-.tutorial-article__content :deep(ul),
-.tutorial-article__content :deep(ol) {
-  margin: 0 0 14px;
-  padding-left: 20px;
-  line-height: 1.7;
-}
-
-.tutorial-article__content :deep(li + li) {
-  margin-top: 8px;
-}
-
-.tutorial-article__content :deep(a) {
-  color: #0f5da8;
-  font-weight: 700;
-}
-
-.tutorial-article__content :deep(code) {
-  padding: 0.16em 0.4em;
-  border-radius: 0.45rem;
-  background: rgba(15, 93, 168, 0.1);
-  color: #0b4c8b;
-  font-size: 0.92em;
-}
-
-.tutorial-article__content :deep(img) {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  margin: 18px 0;
-  border-radius: 18px;
-  border: 1px solid rgba(154, 185, 215, 0.45);
-  background: #f7fbff;
-  box-shadow: 0 14px 24px rgba(18, 55, 94, 0.08);
+.tutorial-article__list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  line-height: 1.6;
 }
 
 .tutorial-pagination {
