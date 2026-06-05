@@ -1,31 +1,31 @@
 <template>
-  <AppModal v-model="isModalOpen" title="自定义头像" size="sm">
+  <AppModal v-model="isModalOpen" :title="$t('auth.profile.avatar.modalTitle')" size="sm">
     <div class="avatar-config-modal">
       <!-- Preview section -->
       <div class="preview-section">
         <div class="preview-avatar" :style="avatarStyle">
           {{ avatarConfig.text }}
         </div>
-        <p class="preview-tip">实时预览</p>
+        <p class="preview-tip">{{ $t('auth.profile.avatar.previewTip') }}</p>
       </div>
 
       <!-- Controls section -->
       <div class="config-controls">
         <!-- Text Input -->
         <div class="control-group">
-          <label class="control-label">头像文字 (最多 3 个字符)</label>
+          <label class="control-label">{{ $t('auth.profile.avatar.textLabel') }}</label>
           <input
             v-model="avatarConfig.text"
             type="text"
             maxlength="3"
             class="config-input"
-            placeholder="请输入文字"
+            :placeholder="$t('auth.profile.avatar.textPlaceholder')"
           />
         </div>
 
         <!-- Shape Selector -->
         <div class="control-group">
-          <label class="control-label">头像形状</label>
+          <label class="control-label">{{ $t('auth.profile.avatar.shapeLabel') }}</label>
           <div class="btn-group">
             <button
               type="button"
@@ -33,7 +33,7 @@
               :class="{ active: avatarConfig.shape === 'circle' }"
               @click="avatarConfig.shape = 'circle'"
             >
-              🔵 圆形
+              {{ $t('auth.profile.avatar.shapeCircle') }}
             </button>
             <button
               type="button"
@@ -41,14 +41,14 @@
               :class="{ active: avatarConfig.shape === 'squircle' }"
               @click="avatarConfig.shape = 'squircle'"
             >
-              ⬛ 圆角矩形
+              {{ $t('auth.profile.avatar.shapeSquircle') }}
             </button>
           </div>
         </div>
 
         <!-- Background Type -->
         <div class="control-group">
-          <label class="control-label">背景类型</label>
+          <label class="control-label">{{ $t('auth.profile.avatar.bgTypeLabel') }}</label>
           <div class="btn-group">
             <button
               type="button"
@@ -56,7 +56,7 @@
               :class="{ active: avatarConfig.bgType === 'solid' }"
               @click="avatarConfig.bgType = 'solid'"
             >
-              纯色
+              {{ $t('auth.profile.avatar.bgTypeSolid') }}
             </button>
             <button
               type="button"
@@ -64,14 +64,14 @@
               :class="{ active: avatarConfig.bgType === 'gradient' }"
               @click="avatarConfig.bgType = 'gradient'"
             >
-              渐变色
+              {{ $t('auth.profile.avatar.bgTypeGradient') }}
             </button>
           </div>
         </div>
 
         <!-- Color Customizer -->
         <div class="control-group" v-if="avatarConfig.bgType === 'solid'">
-          <label class="control-label">选择纯色</label>
+          <label class="control-label">{{ $t('auth.profile.avatar.solidPresetLabel') }}</label>
           <div class="color-preset-grid">
             <button
               v-for="color in presetSolids"
@@ -84,13 +84,13 @@
             />
           </div>
           <div class="custom-color-picker">
-            <span>自定义颜色:</span>
+            <span>{{ $t('auth.profile.avatar.customColorLabel') }}</span>
             <input type="color" v-model="avatarConfig.bgColor" />
           </div>
         </div>
 
         <div class="control-group" v-else>
-          <label class="control-label">选择渐变预设</label>
+          <label class="control-label">{{ $t('auth.profile.avatar.gradientPresetLabel') }}</label>
           <div class="gradient-preset-grid">
             <button
               v-for="grad in presetGradients"
@@ -104,28 +104,30 @@
               }"
               @click="applyPresetGradient(grad)"
             >
-              {{ grad.name }}
+              {{ $t(grad.name) }}
             </button>
           </div>
           <div class="custom-gradient-pickers">
             <div class="picker-item">
-              <span>起始颜色:</span>
+              <span>{{ $t('auth.profile.avatar.gradientStartColor') }}</span>
               <input type="color" v-model="avatarConfig.gradientFrom" />
             </div>
             <div class="picker-item">
-              <span>结束颜色:</span>
+              <span>{{ $t('auth.profile.avatar.gradientEndColor') }}</span>
               <input type="color" v-model="avatarConfig.gradientTo" />
             </div>
           </div>
           <div class="angle-slider">
-            <span>渐变角度: {{ avatarConfig.gradientAngle }}°</span>
+            <span>{{
+              $t('auth.profile.avatar.gradientAngle', { angle: avatarConfig.gradientAngle })
+            }}</span>
             <input type="range" min="0" max="360" v-model.number="avatarConfig.gradientAngle" />
           </div>
         </div>
 
         <!-- Text Color Picker -->
         <div class="control-group">
-          <label class="control-label">文字颜色</label>
+          <label class="control-label">{{ $t('auth.profile.avatar.textColorLabel') }}</label>
           <div class="text-color-pickers">
             <button
               type="button"
@@ -133,7 +135,7 @@
               :class="{ active: avatarConfig.textColor === '#ffffff' }"
               @click="avatarConfig.textColor = '#ffffff'"
             >
-              白色
+              {{ $t('auth.profile.avatar.textColorWhite') }}
             </button>
             <button
               type="button"
@@ -141,10 +143,10 @@
               :class="{ active: avatarConfig.textColor === '#1d1d1f' }"
               @click="avatarConfig.textColor = '#1d1d1f'"
             >
-              黑色
+              {{ $t('auth.profile.avatar.textColorBlack') }}
             </button>
             <div class="custom-text-color">
-              <span>自定义:</span>
+              <span>{{ $t('auth.profile.avatar.textColorCustom') }}</span>
               <input type="color" v-model="avatarConfig.textColor" />
             </div>
           </div>
@@ -152,20 +154,20 @@
 
         <!-- Glow Effect Toggle -->
         <div class="control-group glow-toggle-group">
-          <label class="control-label">启用发光投影 (Glow)</label>
+          <label class="control-label">{{ $t('auth.profile.avatar.glowLabel') }}</label>
           <input type="checkbox" v-model="avatarConfig.glow" class="glow-checkbox" />
         </div>
       </div>
     </div>
     <template #footer>
       <button type="button" class="modal-footer-btn cancel-btn" @click="isModalOpen = false">
-        取消
+        {{ $t('auth.profile.avatar.btnCancel') }}
       </button>
       <button type="button" class="modal-footer-btn reset-btn" @click="resetAvatarConfig">
-        重置
+        {{ $t('auth.profile.avatar.btnReset') }}
       </button>
       <button type="button" class="modal-footer-btn save-btn" @click="saveAvatarConfig">
-        保存修改
+        {{ $t('auth.profile.avatar.btnSave') }}
       </button>
     </template>
   </AppModal>
@@ -209,12 +211,12 @@ const presetSolids = [
 ];
 
 const presetGradients = [
-  { name: '日落柑橘', from: '#ff5e62', to: '#ff9966' },
-  { name: '海洋之约', from: '#00c6ff', to: '#0072ff' },
-  { name: '霓虹极光', from: '#a18cd1', to: '#fbc2eb' },
-  { name: '春意盎然', from: '#11998e', to: '#38ef7d' },
-  { name: '炫酷暗黑', from: '#1e3c72', to: '#2a5298' },
-  { name: '梦幻紫萝', from: '#7000ff', to: '#f100ff' },
+  { name: 'auth.profile.avatar.presetSunset', from: '#ff5e62', to: '#ff9966' },
+  { name: 'auth.profile.avatar.presetOcean', from: '#00c6ff', to: '#0072ff' },
+  { name: 'auth.profile.avatar.presetAurora', from: '#a18cd1', to: '#fbc2eb' },
+  { name: 'auth.profile.avatar.presetSpring', from: '#11998e', to: '#38ef7d' },
+  { name: 'auth.profile.avatar.presetMidnight', from: '#1e3c72', to: '#2a5298' },
+  { name: 'auth.profile.avatar.presetPurple', from: '#7000ff', to: '#f100ff' },
 ];
 
 const getDefaultConfig = () => {

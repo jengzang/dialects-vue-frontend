@@ -33,7 +33,7 @@
           >
             {{ avatarConfig.text }}
             <div class="avatar-edit-overlay">
-              <span class="edit-overlay-text">修改</span>
+              <span class="edit-overlay-text">{{ $t('auth.profile.avatar.editOverlay') }}</span>
             </div>
           </div>
           <div class="profile-user-meta">
