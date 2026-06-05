@@ -24,18 +24,23 @@
     <div v-if="currentTab === 'overview'">
       <!-- User Info -->
       <div class="profile-user-info">
-        <div class="user-info-badge" v-html="$t('auth.profile.userNumber', { id: user.id })">
-        </div>
-        <p class="user-info-details" style="margin:2px">
+        <div class="user-info-badge" v-html="$t('auth.profile.userNumber', { id: user.id })"></div>
+        <p class="user-info-details" style="margin: 2px">
           {{ $t('auth.profile.registerTime', { time: fmt(user.created_at) }) }}
         </p>
-        <p class="user-info-details" style="margin:2px">
+        <p class="user-info-details" style="margin: 2px">
           {{ $t('auth.profile.onlineTime', { time: formatOnlineTime(user.total_online_seconds) }) }}
+        </p>
+        <p class="user-info-details" style="margin: 2px">
+          {{ $t('auth.profile.customRegions', { count: customRegionCount }) }}
+        </p>
+        <p class="user-info-details" style="margin: 2px">
+          {{ $t('auth.profile.customData', { count: customDataCount }) }}
         </p>
       </div>
 
       <!-- Statistics Card -->
-      <div class="stats-card">
+      <!-- <div class="stats-card">
         <div class="stats-card-header">
           <help-icon
             :content="$t('auth.profile.queryStatsNote')"
@@ -79,7 +84,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Action Buttons -->
       <div class="action-buttons">
@@ -120,34 +125,50 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import ActionButton from './ActionButton.vue'
-import TabSwitcher from './TabSwitcher.vue'
-import LeaderboardPanel from '@/main/components/user/LeaderboardPanel.vue'
-import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { formatOnlineTime, fmt } from '@/main/store/userStats.js'
+import { computed, ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import ActionButton from './ActionButton.vue';
+import TabSwitcher from './TabSwitcher.vue';
+import LeaderboardPanel from '@/main/components/user/LeaderboardPanel.vue';
+import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue';
+import { formatOnlineTime, fmt } from '@/main/store/userStats.js';
+import { getCustomCounts } from '@/api';
 
-const { t } = useI18n()
+const { t } = useI18n();
+
+const customRegionCount = ref(0);
+const customDataCount = ref(0);
+
+onMounted(async () => {
+  try {
+    const res = await getCustomCounts();
+    if (res && res.success) {
+      customRegionCount.value = res.custom_region_total;
+      customDataCount.value = res.custom_data_total;
+    }
+  } catch (err) {
+    console.error('Failed to load custom counts:', err);
+  }
+});
 
 defineProps({
   user: {
     type: Object,
-    required: true
+    required: true,
   },
   queryStats: {
     type: Object,
-    required: true
+    required: true,
   },
   statsExpanded: {
     type: Boolean,
-    default: false
+    default: false,
   },
   currentTab: {
     type: String,
-    default: 'overview'
-  }
-})
+    default: 'overview',
+  },
+});
 
 defineEmits([
   'goToUserData',
@@ -158,13 +179,13 @@ defineEmits([
   'goToTableManager',
   'toggleStats',
   'switchTab',
-  'showBenefits'
-])
+  'showBenefits',
+]);
 
 const tabs = computed(() => [
   { label: '📊 ' + t('auth.profile.tabs.info'), value: 'overview' },
-  { label: '🏆 ' + t('auth.profile.tabs.ranking'), value: 'leaderboard' }
-])
+  { label: '🏆 ' + t('auth.profile.tabs.ranking'), value: 'leaderboard' },
+]);
 </script>
 
 <style scoped>
