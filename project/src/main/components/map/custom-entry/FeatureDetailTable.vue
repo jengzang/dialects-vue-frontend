@@ -160,6 +160,8 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/main/_surfaces.scss';
+
 .feature-detail-table {
   display: flex;
   flex-direction: column;
@@ -202,8 +204,6 @@ onMounted(() => {
 .feature-detail-main,
 .feature-detail-side {
   padding: 18px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.82);
 }
 
 .feature-detail-state {
@@ -243,9 +243,6 @@ onMounted(() => {
 
 .feature-detail-row {
   padding: 12px 14px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
   font-size: 13px;
   color: #0f172a;
 }

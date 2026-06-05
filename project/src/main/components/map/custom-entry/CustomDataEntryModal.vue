@@ -43,14 +43,14 @@
     </template>
 
     <KeepAlive>
-      <PointCentricMode v-if="activeMode === 'point'" key="point" />
-      <FeatureCentricMode v-else key="feature" />
+      <PointCentricMode v-if="activeMode === 'point'" :key="`point-${modalSessionKey}`" />
+      <FeatureCentricMode v-else :key="`feature-${modalSessionKey}`" />
     </KeepAlive>
   </AppModal>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import PointCentricMode from './PointCentricMode.vue'
@@ -66,6 +66,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 const { t } = useI18n()
 const activeMode = ref('point')
+const modalSessionKey = ref(0)
 
 const closeModal = () => {
   emit('update:modelValue', false)
@@ -74,6 +75,13 @@ const closeModal = () => {
 const handleVisibleChange = (value) => {
   emit('update:modelValue', value)
 }
+
+watch(() => props.modelValue, (visible, prev) => {
+  if (prev && !visible) {
+    activeMode.value = 'point'
+    modalSessionKey.value += 1
+  }
+})
 </script>
 
 <style scoped lang="scss">

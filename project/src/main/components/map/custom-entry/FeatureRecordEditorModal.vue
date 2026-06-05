@@ -53,7 +53,7 @@
 
     <template #footer>
       <button class="main-glass-button" type="button" @click="closeModal">{{ t('customEntry.featureRecord.actions.cancel') }}</button>
-      <button class="main-glass-button" data-variant="primary" type="button" @click="handleSave">{{ t('customEntry.featureRecord.actions.save') }}</button>
+      <button class="main-glass-button" data-variant="primary" type="button" :disabled="isSaving" @click="handleSave">{{ isSaving ? t('customEntry.common.saving') : t('customEntry.featureRecord.actions.save') }}</button>
     </template>
   </AppModal>
 </template>
@@ -93,6 +93,7 @@ const coord = ref(null)
 const valueField = ref('')
 const noteField = ref('')
 const message = ref('')
+const isSaving = ref(false)
 const suggestions = ref([])
 const showSuggestions = ref(false)
 let debounceTimer = null
@@ -183,6 +184,7 @@ function handleVisibleChange(value) {
 }
 
 async function handleSave() {
+  if (isSaving.value) return
   message.value = ''
 
   if (!location.value.trim() || !region.value.trim()) {
@@ -223,12 +225,15 @@ async function handleSave() {
     if (confirmed === false) return
   }
 
+  isSaving.value = true
+
   if (props.record?.created_at) {
     await editCustomData({ ...payload, created_at: props.record.created_at })
   } else {
     await batchCreateCustomData([payload])
   }
 
+  isSaving.value = false
   emit('saved')
   emit('update:modelValue', false)
 }
@@ -239,6 +244,8 @@ watch(() => props.modelValue, (visible) => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/main/_surfaces.scss';
+
 .feature-record-header {
   display: flex;
   align-items: center;

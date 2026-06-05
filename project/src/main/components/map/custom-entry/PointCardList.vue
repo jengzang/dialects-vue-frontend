@@ -40,6 +40,7 @@
       >
         <span class="point-card-name">{{ item['簡稱'] || item.location || t('customEntry.pointList.unnamed') }}</span>
         <span class="point-card-region">{{ item['音典分區'] || item.region || t('customEntry.pointList.unregioned') }}</span>
+        <span v-if="item.updated_at" class="point-card-meta">{{ item.updated_at }}</span>
         <span class="point-card-badge">{{ t('customEntry.pointList.recordCount', { count: item.feature_count || 0 }) }}</span>
       </button>
     </div>
@@ -82,6 +83,8 @@ const filteredItems = computed(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/main/_surfaces.scss';
+
 .point-card-list {
   display: flex;
   flex-direction: column;
@@ -128,9 +131,6 @@ const filteredItems = computed(() => {
   gap: 8px;
   padding: 18px;
   border: 1px solid rgba(255, 255, 255, 0.64);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
   text-align: left;
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
@@ -150,6 +150,11 @@ const filteredItems = computed(() => {
 .point-card-region {
   font-size: 13px;
   color: #475569;
+}
+
+.point-card-meta {
+  font-size: 12px;
+  color: #94a3b8;
 }
 
 .point-card-badge {
@@ -188,9 +193,6 @@ const filteredItems = computed(() => {
 
 .point-list-state {
   padding: 28px 20px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.6);
   text-align: center;
 }
 

@@ -61,7 +61,7 @@
 
         <div class="point-detail-actions">
           <button class="main-glass-button" type="button" @click="$emit('back')">{{ t('customEntry.pointDetail.actions.cancel') }}</button>
-          <button class="main-glass-button" data-variant="primary" type="button" @click="handleSave">{{ t('customEntry.pointDetail.actions.save') }}</button>
+          <button class="main-glass-button" data-variant="primary" type="button" :disabled="isSaving" @click="handleSave">{{ isSaving ? t('customEntry.common.saving') : t('customEntry.pointDetail.actions.save') }}</button>
         </div>
       </div>
 
@@ -105,6 +105,7 @@ const coord = ref(null)
 const rows = ref([])
 const removedIds = ref([])
 const saveMessage = ref('')
+const isSaving = ref(false)
 const pointSuggestions = ref([])
 const showPointSuggestions = ref(false)
 let locationDebounceTimer = null
@@ -251,6 +252,7 @@ async function loadPointDetail(point) {
 }
 
 async function handleSave() {
+  if (isSaving.value) return
   saveMessage.value = ''
 
   if (!location.value.trim() || !region.value.trim()) {
@@ -323,15 +325,18 @@ async function handleSave() {
     return
   }
 
+  isSaving.value = true
   const results = await Promise.allSettled(tasks)
   const failedCount = results.filter((item) => item.status === 'rejected').length
 
   if (failedCount > 0) {
     saveMessage.value = t('customEntry.pointDetail.messages.partialFailed', { count: failedCount })
+    isSaving.value = false
     return
   }
 
   saveMessage.value = t('customEntry.pointDetail.messages.saveSuccess')
+  isSaving.value = false
   emit('saved')
 }
 
@@ -341,6 +346,8 @@ watch(() => props.point, (point) => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/main/_surfaces.scss';
+
 .point-detail-form {
   display: flex;
   flex-direction: column;
@@ -381,8 +388,6 @@ watch(() => props.point, (point) => {
 .point-detail-main,
 .point-detail-side {
   padding: 18px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.82);
 }
 
 .point-base-fields {
@@ -415,8 +420,6 @@ watch(() => props.point, (point) => {
   min-height: 42px;
   padding: 10px 12px;
   border: 1px solid rgba(148, 163, 184, 0.28);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.92);
   box-sizing: border-box;
 }
 

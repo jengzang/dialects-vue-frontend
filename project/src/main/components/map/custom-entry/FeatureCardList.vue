@@ -40,6 +40,7 @@
       >
         <span class="feature-card-name">{{ item['特徵'] || item.feature || t('customEntry.featureList.unnamed') }}</span>
         <span class="feature-card-tag" :data-tone="resolveToneType(item)">{{ item['聲韻調'] || item.phonology || t('customEntry.featureList.uncategorized') }}</span>
+        <span v-if="item.updated_at" class="feature-card-meta">{{ item.updated_at }}</span>
         <span class="feature-card-badge">{{ t('customEntry.featureList.pointCount', { count: item.location_count || 0 }) }}</span>
       </button>
     </div>
@@ -91,6 +92,8 @@ function resolveToneType(item) {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/main/_surfaces.scss';
+
 .feature-card-list {
   display: flex;
   flex-direction: column;
@@ -137,9 +140,6 @@ function resolveToneType(item) {
   gap: 10px;
   padding: 18px;
   border: 1px solid rgba(255, 255, 255, 0.64);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
   text-align: left;
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
@@ -197,6 +197,11 @@ function resolveToneType(item) {
   font-weight: 600;
 }
 
+.feature-card-meta {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
 .feature-card-skeleton {
   cursor: default;
 }
@@ -226,9 +231,6 @@ function resolveToneType(item) {
 
 .feature-list-state {
   padding: 28px 20px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.6);
   text-align: center;
 }
 

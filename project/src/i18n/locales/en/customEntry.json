@@ -1,4 +1,7 @@
 {
+  "common": {
+    "saving": "Saving..."
+  },
   "modal": {
     "title": "Custom data entry",
     "subtitle": "Focused on adding and maintaining user-defined data while preserving legacy personal data management and sidebar single-entry workflows.",
