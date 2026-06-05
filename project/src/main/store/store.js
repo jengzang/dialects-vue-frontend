@@ -1,3 +1,4 @@
+// src/utils/store.js
 import { ref, reactive, computed } from 'vue'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import {
@@ -25,38 +26,6 @@ export function setPreferredCharacterTable(tableName) {
     const nextTableName = resolveCharacterTableName(tableName)
     preferredCharacterTable.value = nextTableName
     writePreferredCharacterTableState(nextTableName)
-}
-
-const {
-    state: tutorialEnabledState,
-    write: writeTutorialEnabledState
-} = useStorageState('tutorial-enabled', {
-    defaultValue: true
-})
-
-export const tutorialEnabled = tutorialEnabledState
-
-export function setTutorialEnabled(value) {
-    const nextValue = Boolean(value)
-    tutorialEnabled.value = nextValue
-    writeTutorialEnabledState(nextValue)
-}
-
-export const tutorialAssistState = reactive({
-    requestToken: 0,
-    target: null,
-    payload: null,
-})
-
-export function requestTutorialAssistApply(target, payload) {
-    tutorialAssistState.requestToken += 1
-    tutorialAssistState.target = target
-    tutorialAssistState.payload = payload
-}
-
-export function clearTutorialAssistRequest() {
-    tutorialAssistState.target = null
-    tutorialAssistState.payload = null
 }
 
 // ========================================

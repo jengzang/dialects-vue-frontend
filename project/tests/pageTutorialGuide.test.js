@@ -11,14 +11,6 @@ vi.mock('vue-router', () => ({
 
 const tutorialModule = () => import('../src/main/components/tutorial/PageTutorialGuide.vue')
 
-vi.mock('../src/main/store/store.js', async () => {
-  const actual = await vi.importActual('../src/main/store/store.js')
-  return {
-    ...actual,
-    tutorialEnabled: { value: true },
-  }
-})
-
 const tutorialMessages = {
   'zh-Hant': {
     tutorial: {
@@ -46,17 +38,6 @@ const tutorialMessages = {
         praat: 'Praat 分析',
         exploreResources: 'Explore 資源',
         exploreVillages: 'Explore 村落',
-      },
-      assist: {
-        badge: '新手指引',
-        experience: {
-          badge: '快速體驗',
-          queryZhonggu: {
-            title: '試一組中古條件',
-            description: '自動補上一組中古條件與地點，方便直接體驗主站查詢。',
-            button: '生成中古示例',
-          },
-        },
       },
     },
   },
@@ -87,17 +68,6 @@ const tutorialMessages = {
         exploreResources: 'Explore 资源',
         exploreVillages: 'Explore 村落',
       },
-      assist: {
-        badge: '新手指导',
-        experience: {
-          badge: '快速体验',
-          queryZhonggu: {
-            title: '试一组中古条件',
-            description: '自动补上一组中古条件与地点，方便直接体验主站查询。',
-            button: '生成中古示例',
-          },
-        },
-      },
     },
   },
   en: {
@@ -126,17 +96,6 @@ const tutorialMessages = {
         praat: 'Praat Analysis',
         exploreResources: 'Explore Resources',
         exploreVillages: 'Explore Villages',
-      },
-      assist: {
-        badge: 'Starter Guide',
-        experience: {
-          badge: 'Quick Start',
-          queryZhonggu: {
-            title: 'Try a Middle Chinese condition',
-            description: 'Apply a ready-made Middle Chinese condition and location to experience the query flow quickly.',
-            button: 'Generate Middle Chinese example',
-          },
-        },
       },
     },
   },
@@ -280,14 +239,12 @@ describe('PageTutorialGuide', () => {
 
     const articleImage = document.querySelector('.tutorial-article img')
     const articleLink = document.querySelector('.tutorial-article a[href="https://example.com/tutorial/query/zhonggu"]')
-    const externalLink = articleLink || document.querySelector('.tutorial-article a[target="_blank"]')
-    const codeNodes = [...document.querySelectorAll('.tutorial-article code')]
-    const routeCodeNode = codeNodes.find((node) => node.textContent === '/menu/query/zhonggu')
+    const codeNode = document.querySelector('.tutorial-article code')
 
     expect(articleImage?.getAttribute('src')).toBe('/tutorial/menu-query-zhonggu/overview.svg')
-    expect(externalLink?.getAttribute('target')).toBe('_blank')
-    expect(externalLink?.getAttribute('rel')).toContain('noopener')
-    expect(routeCodeNode?.textContent).toBe('/menu/query/zhonggu')
+    expect(articleLink?.getAttribute('target')).toBe('_blank')
+    expect(articleLink?.getAttribute('rel')).toContain('noopener')
+    expect(codeNode?.textContent).toBe('/menu/query/zhonggu')
 
     wrapper.unmount()
   })

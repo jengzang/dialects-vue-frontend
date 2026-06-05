@@ -239,7 +239,7 @@
                          "donorColumns":  {
                                               "time":  "时间",
                                               "donor":  "捐赠者",
-                                              "amount":  "金额（元）",
+                                              "amount":  "金额(元)",
                                               "method":  "方式"
                                           },
                          "weixinAlt":  "微信收款码",

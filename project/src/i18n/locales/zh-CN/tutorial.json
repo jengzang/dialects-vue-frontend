@@ -23,41 +23,5 @@
     "praat": "Praat 分析",
     "exploreResources": "Explore 资源",
     "exploreVillages": "Explore 村落"
-  },
-  "assist": {
-    "badge": "新手指导",
-    "experience": {
-      "badge": "快速体验",
-      "queryChar": {
-        "title": "试一组查字示例",
-        "description": "自动填入一组常见汉字与地点，方便立刻查看查字结果。",
-        "button": "随机填入示例"
-      },
-      "queryZhonggu": {
-        "title": "试一组中古条件",
-        "description": "自动补上一组中古条件与地点，方便直接体验主站查询。",
-        "button": "生成中古示例"
-      },
-      "queryYinwei": {
-        "title": "试一组音位输入",
-        "description": "自动填入一组音位分析示例，快速查看音位查询流程。",
-        "button": "生成音位示例"
-      },
-      "compareChar": {
-        "title": "试一组比较字例",
-        "description": "自动填入两组对比汉字与特征，方便快速进入比较页。",
-        "button": "生成比较示例"
-      },
-      "compareZhonggu": {
-        "title": "试一组中古比较条件",
-        "description": "自动准备两组中古比较条件，直接体验比较流程。",
-        "button": "生成比较条件"
-      },
-      "compareTone": {
-        "title": "试一组调类比较",
-        "description": "自动选择两个调类与地点，快速查看调类比较结果。",
-        "button": "生成调类示例"
-      }
-    }
   }
 }

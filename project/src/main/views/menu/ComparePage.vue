@@ -273,9 +273,7 @@ import {
   preferredCharacterTable,
   setRunning,
   setTabContentDisabled,
-  userStore,
-  tutorialAssistState,
-  clearTutorialAssistRequest,
+  userStore
 } from '@/main/store/store.js'
 import { compareChars, compareZhongGu, compareTones } from '@/api/index.js'
 import { getCoordinates } from '@/api'
@@ -542,54 +540,6 @@ function getToneCheckboxClass(toneValue) {
 watch(currentTab, (newTab) => {
   uiStore.currentSubTab.compare = newTab
 }, { immediate: true })
-
-watch(
-  () => tutorialAssistState.requestToken,
-  (token) => {
-    if (!token || !tutorialAssistState.payload) {
-      return
-    }
-
-    if (tutorialAssistState.target === 'compare:tab1' && currentTab.value === 'tab1') {
-      const payload = tutorialAssistState.payload
-      tabStates.tab1.group1.chars = normalizeSingleChar(payload.group1Char)
-      tabStates.tab1.group2.chars = normalizeSingleChar(payload.group2Char)
-      tabStates.tab1.features = payload.feature || '聲母'
-      locationModel.value = {
-        locations: payload.loc?.locations || [],
-        regions: payload.loc?.regions || [],
-        regionUsing: payload.loc?.regionUsing || 'yindian'
-      }
-      clearTutorialAssistRequest()
-      return
-    }
-
-    if (tutorialAssistState.target === 'compare:tab2' && currentTab.value === 'tab2') {
-      const payload = tutorialAssistState.payload
-      tabStates.tab2.current = JSON.parse(JSON.stringify(payload.current))
-      tabStates.tab2.group1Items = JSON.parse(JSON.stringify(payload.group1Items || []))
-      tabStates.tab2.group2Items = JSON.parse(JSON.stringify(payload.group2Items || []))
-      locationModel.value = {
-        locations: payload.loc?.locations || [],
-        regions: payload.loc?.regions || [],
-        regionUsing: payload.loc?.regionUsing || 'yindian'
-      }
-      clearTutorialAssistRequest()
-      return
-    }
-
-    if (tutorialAssistState.target === 'compare:tab4' && currentTab.value === 'tab4') {
-      const payload = tutorialAssistState.payload
-      tabStates.tab4.selectedToneClasses = [...(payload.selectedToneClasses || [])]
-      locationModel.value = {
-        locations: payload.loc?.locations || [],
-        regions: payload.loc?.regions || [],
-        regionUsing: payload.loc?.regionUsing || 'yindian'
-      }
-      clearTutorialAssistRequest()
-    }
-  }
-)
 
 function getNormalizedKeys(keys = []) {
   const allowedKeys = availableKeys.value || []
