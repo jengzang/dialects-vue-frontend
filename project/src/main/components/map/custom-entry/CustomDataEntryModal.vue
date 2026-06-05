@@ -44,13 +44,7 @@
 
     <KeepAlive>
       <PointCentricMode v-if="activeMode === 'point'" key="point" />
-      <div v-else class="entry-modal-empty main-glass-panel-inner">
-        <div class="entry-modal-empty-icon">🧪</div>
-        <div class="entry-modal-empty-title">特徵分布模式下一步接入</div>
-        <p class="entry-modal-empty-text">
-          本步先完成模式切換骨架與單點列表，特徵分布模式將在後續步驟接入。
-        </p>
-      </div>
+      <FeatureCentricMode v-else key="feature" />
     </KeepAlive>
   </AppModal>
 </template>
@@ -59,6 +53,7 @@
 import { ref } from 'vue'
 import AppModal from '@/components/common/AppModal.vue'
 import PointCentricMode from './PointCentricMode.vue'
+import FeatureCentricMode from './FeatureCentricMode.vue'
 
 const props = defineProps({
   modelValue: {
