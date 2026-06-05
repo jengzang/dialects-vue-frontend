@@ -220,7 +220,22 @@
         </div>
       </div>
 
+      <!-- Tab5: 比較音値 -->
+      <div v-show="currentTab === 'tab5'" class="page">
+        <div class="page-content-stack">
+          <div class="tone-tip">{{ $t('compare.messages.tab5Hint') }}</div>
+          <div class="compare-group tab5-location-group">
+            <LocationMultiInput
+              v-model="tabStates.tab5.locations"
+              :max-locations="5"
+              @update:matched-locations="tabStates.tab5.locations = $event"
+            />
+          </div>
+        </div>
+      </div>
+
       <LocationAndRegionInput
+          v-show="currentTab !== 'tab5'"
           ref="locationRef"
           @update:runDisabled="uiStore.buttonStates.compare.isLocationDisabled = $event"
           v-model="locationModel"
@@ -251,6 +266,9 @@
       <div v-else-if="currentTab === 'tab4'" class="page-footer" style="margin-top: 20px">
         <small class="hint">{{ $t('compare.messages.tab4Hint') }}</small>
       </div>
+      <div v-else-if="currentTab === 'tab5'" class="page-footer" style="margin-top: 20px">
+        <small class="hint">{{ $t('compare.messages.tab5Hint') }}</small>
+      </div>
     </div>
   </TabsContainer>
 </template>
@@ -261,6 +279,7 @@ import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import TabsContainer from "@/components/common/TabsContainer.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
+import LocationMultiInput from "@/main/components/geo/LocationMultiInput.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
 import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
@@ -291,24 +310,27 @@ const route = useRoute()
 const routeSubToTab = {
   char: 'tab1',
   zhonggu: 'tab2',
-  tone: 'tab4'
+  tone: 'tab4',
+  phonetic: 'tab5'
 }
 const tabToRouteSub = {
   tab1: 'char',
   tab2: 'zhonggu',
-  tab4: 'tone'
+  tab4: 'tone',
+  tab5: 'phonetic'
 }
 const currentTab = computed(() => routeSubToTab[route.params.sub] || 'tab2')
 const tabs = computed(() => [
   { name: 'tab1', label: t('compare.tabs.tab1') },
   { name: 'tab2', label: t('compare.tabs.tab2') },
-  { name: 'tab4', label: t('compare.tabs.tab4') }
+  { name: 'tab4', label: t('compare.tabs.tab4') },
+  { name: 'tab5', label: t('compare.tabs.tab5') }
 ])
 
 // Compute limit context based on current tab
 const locationLimitContext = computed(() => {
   // 映射到 constants.js 中的配置 key
-  return `compare_${currentTab.value}`  // 'compare_tab1', 'compare_tab2', 'compare_tab4'
+  return `compare_${currentTab.value}`  // 'compare_tab1', 'compare_tab2', 'compare_tab4', 'compare_tab5'
 })
 
 // Tab1 state - dual input for character comparison
@@ -371,6 +393,9 @@ const tabStates = reactive({
   },
   tab4: {
     selectedToneClasses: []
+  },
+  tab5: {
+    locations: []  // 地點查詢字符串列表（由 LocationMultiInput emit）
   }
 })
 
@@ -528,6 +553,11 @@ watch(() => tabStates.tab4, (newVal) => {
   setTabContentDisabled('compare', 'tab4', !isValid)
 }, { immediate: true, deep: true })
 
+// 监听 Tab5：有地點輸入即可啟用
+watch(() => tabStates.tab5.locations, (newLocations) => {
+  setTabContentDisabled('compare', 'tab5', !Array.isArray(newLocations) || newLocations.length === 0)
+}, { immediate: true })
+
 // Tab4 调类复选框颜色类
 function getToneCheckboxClass(toneValue) {
   const index = tabStates.tab4.selectedToneClasses.indexOf(toneValue)
@@ -586,7 +616,13 @@ watch(selectedCharacterTable, (newTable, oldTable) => {
 }, { immediate: true })
 
 // 4️⃣ 最终计算属性：控制按钮是否禁用
-const isRunDisabled = isCompareButtonDisabled
+// tab5 使用独立的 LocationMultiInput，不经过 LocationAndRegionInput 的 isLocationDisabled
+const isRunDisabled = computed(() => {
+  if (currentTab.value === 'tab5') {
+    return buttonState.isRunning || uiStore.buttonStates.compare.tabContentDisabled.tab5
+  }
+  return isCompareButtonDisabled.value
+})
 
 // 监听 card（聲韻調）变化，自動清空已選列表
 watch(() => tabStates.tab2.current.card, (newCard, oldCard) => {
@@ -2081,6 +2117,13 @@ export default {
   .tab1-layout{
     gap:1px;
   }
+}
+
+/* Tab5 音值比較 地點輸入容器 */
+.tab5-location-group {
+  width: 100%;
+  max-width: 520px;
+  text-align: left;
 }
 
 </style>

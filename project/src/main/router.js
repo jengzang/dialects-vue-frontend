@@ -239,6 +239,9 @@ const ROUTE_QUERY_ALLOWLIST = {
   '/menu/compare/tone': {
     base: []
   },
+  '/menu/compare/phonetic': {
+    base: []
+  },
   '/menu/map/view': {
     base: ['feature', 'locations', 'regions', 'regionMode', 'openPanel']
   },

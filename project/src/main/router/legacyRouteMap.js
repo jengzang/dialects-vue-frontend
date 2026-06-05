@@ -13,7 +13,8 @@ export const MENU_LEGACY_ROUTES = {
     subMap: {
       tab1: '/menu/compare/char',
       tab2: '/menu/compare/zhonggu',
-      tab4: '/menu/compare/tone'
+      tab4: '/menu/compare/tone',
+      tab5: '/menu/compare/phonetic'
     }
   },
   map: {

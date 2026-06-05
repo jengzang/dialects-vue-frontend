@@ -104,7 +104,8 @@ export const uiStore = reactive({
             tabContentDisabled: {
                 tab1: true,
                 tab2: true,
-                tab4: true
+                tab4: true,
+                tab5: false
             }
         }
     },
@@ -113,7 +114,7 @@ export const uiStore = reactive({
     currentPage: 'query',  // 'query' | 'result' | 'map' | 'about'
     currentSubTab: {
         query: 'tab2',  // 'tab1' | 'tab2' | 'tab3' | 'tab4'
-        compare: 'tab2', // 'tab1' | 'tab2' | 'tab4'
+        compare: 'tab2', // 'tab1' | 'tab2' | 'tab4' | 'tab5'
         map: 'map'      // 'map' | 'divide' | 'custom'
     }
 })
