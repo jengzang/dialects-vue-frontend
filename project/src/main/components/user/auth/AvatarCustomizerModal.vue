@@ -1,12 +1,21 @@
 <template>
-  <AppModal v-model="isModalOpen" :title="$t('auth.profile.avatar.modalTitle')" size="sm">
+  <AppModal
+    v-model="isModalOpen"
+    :title="$t('auth.profile.avatar.modalTitle')"
+    size="sm"
+  >
     <div class="avatar-config-modal">
       <!-- Preview section -->
       <div class="preview-section">
-        <div class="preview-avatar" :style="avatarStyle">
+        <div
+          class="preview-avatar"
+          :style="avatarStyle"
+        >
           {{ avatarConfig.text }}
         </div>
-        <p class="preview-tip">{{ $t('auth.profile.avatar.previewTip') }}</p>
+        <p class="preview-tip">
+          {{ $t('auth.profile.avatar.previewTip') }}
+        </p>
       </div>
 
       <!-- Controls section -->
@@ -20,7 +29,7 @@
             maxlength="3"
             class="config-input"
             :placeholder="$t('auth.profile.avatar.textPlaceholder')"
-          />
+          >
         </div>
 
         <!-- Shape Selector -->
@@ -66,12 +75,33 @@
             >
               {{ $t('auth.profile.avatar.bgTypeGradient') }}
             </button>
+            <button
+              type="button"
+              class="config-btn"
+              :class="{ active: avatarConfig.bgType === 'glass' }"
+              @click="avatarConfig.bgType = 'glass'"
+            >
+              {{ $t('auth.profile.avatar.bgTypeGlass') }}
+            </button>
+            <button
+              type="button"
+              class="config-btn"
+              :class="{ active: avatarConfig.bgType === 'liquid_glass' }"
+              @click="avatarConfig.bgType = 'liquid_glass'"
+            >
+              {{ $t('auth.profile.avatar.bgTypeLiquidGlass') }}
+            </button>
           </div>
         </div>
 
-        <!-- Color Customizer -->
-        <div class="control-group" v-if="avatarConfig.bgType === 'solid'">
-          <label class="control-label">{{ $t('auth.profile.avatar.solidPresetLabel') }}</label>
+        <!-- Solid / Glass Tint Color Customizer -->
+        <div
+          v-if="avatarConfig.bgType === 'solid' || avatarConfig.bgType === 'glass'"
+          class="control-group"
+        >
+          <label class="control-label">
+            {{ avatarConfig.bgType === 'glass' ? $t('auth.profile.avatar.glassTintLabel') : $t('auth.profile.avatar.solidPresetLabel') }}
+          </label>
           <div class="color-preset-grid">
             <button
               v-for="color in presetSolids"
@@ -85,12 +115,21 @@
           </div>
           <div class="custom-color-picker">
             <span>{{ $t('auth.profile.avatar.customColorLabel') }}</span>
-            <input type="color" v-model="avatarConfig.bgColor" />
+            <input
+              v-model="avatarConfig.bgColor"
+              type="color"
+            >
           </div>
         </div>
 
-        <div class="control-group" v-else>
-          <label class="control-label">{{ $t('auth.profile.avatar.gradientPresetLabel') }}</label>
+        <!-- Gradient presets Customizer -->
+        <div
+          v-if="avatarConfig.bgType === 'gradient' || avatarConfig.bgType === 'liquid_glass'"
+          class="control-group"
+        >
+          <label class="control-label">
+            {{ avatarConfig.bgType === 'liquid_glass' ? $t('auth.profile.avatar.liquidGlassPresetLabel') : $t('auth.profile.avatar.gradientPresetLabel') }}
+          </label>
           <div class="gradient-preset-grid">
             <button
               v-for="grad in presetGradients"
@@ -110,18 +149,34 @@
           <div class="custom-gradient-pickers">
             <div class="picker-item">
               <span>{{ $t('auth.profile.avatar.gradientStartColor') }}</span>
-              <input type="color" v-model="avatarConfig.gradientFrom" />
+              <input
+                v-model="avatarConfig.gradientFrom"
+                type="color"
+              >
             </div>
             <div class="picker-item">
               <span>{{ $t('auth.profile.avatar.gradientEndColor') }}</span>
-              <input type="color" v-model="avatarConfig.gradientTo" />
+              <input
+                v-model="avatarConfig.gradientTo"
+                type="color"
+              >
             </div>
           </div>
+        </div>
+
+        <!-- Angle Slider (for gradient, glass & liquid glass types) -->
+        <div
+          v-if="avatarConfig.bgType === 'gradient' || avatarConfig.bgType === 'glass' || avatarConfig.bgType === 'liquid_glass'"
+          class="control-group"
+        >
           <div class="angle-slider">
-            <span>{{
-              $t('auth.profile.avatar.gradientAngle', { angle: avatarConfig.gradientAngle })
-            }}</span>
-            <input type="range" min="0" max="360" v-model.number="avatarConfig.gradientAngle" />
+            <span>{{ $t('auth.profile.avatar.gradientAngle', { angle: avatarConfig.gradientAngle }) }}</span>
+            <input
+              v-model.number="avatarConfig.gradientAngle"
+              type="range"
+              min="0"
+              max="360"
+            >
           </div>
         </div>
 
@@ -147,7 +202,10 @@
             </button>
             <div class="custom-text-color">
               <span>{{ $t('auth.profile.avatar.textColorCustom') }}</span>
-              <input type="color" v-model="avatarConfig.textColor" />
+              <input
+                v-model="avatarConfig.textColor"
+                type="color"
+              >
             </div>
           </div>
         </div>
@@ -155,18 +213,34 @@
         <!-- Glow Effect Toggle -->
         <div class="control-group glow-toggle-group">
           <label class="control-label">{{ $t('auth.profile.avatar.glowLabel') }}</label>
-          <input type="checkbox" v-model="avatarConfig.glow" class="glow-checkbox" />
+          <input
+            v-model="avatarConfig.glow"
+            type="checkbox"
+            class="glow-checkbox"
+          >
         </div>
       </div>
     </div>
     <template #footer>
-      <button type="button" class="modal-footer-btn cancel-btn" @click="isModalOpen = false">
+      <button
+        type="button"
+        class="modal-footer-btn cancel-btn"
+        @click="isModalOpen = false"
+      >
         {{ $t('auth.profile.avatar.btnCancel') }}
       </button>
-      <button type="button" class="modal-footer-btn reset-btn" @click="resetAvatarConfig">
+      <button
+        type="button"
+        class="modal-footer-btn reset-btn"
+        @click="resetAvatarConfig"
+      >
         {{ $t('auth.profile.avatar.btnReset') }}
       </button>
-      <button type="button" class="modal-footer-btn save-btn" @click="saveAvatarConfig">
+      <button
+        type="button"
+        class="modal-footer-btn save-btn"
+        @click="saveAvatarConfig"
+      >
         {{ $t('auth.profile.avatar.btnSave') }}
       </button>
     </template>
@@ -225,12 +299,12 @@ const getDefaultConfig = () => {
   return {
     text: initialText,
     shape: 'circle',
-    bgType: 'gradient',
-    bgColor: '#007aff',
+    bgType: 'glass',
+    bgColor: '#ffffff',
     gradientFrom: '#007aff',
     gradientTo: '#00c6ff',
-    gradientAngle: 135,
-    textColor: '#ffffff',
+    gradientAngle: 145,
+    textColor: '#005fd3',
     glow: true,
   };
 };
@@ -240,12 +314,12 @@ const getLocalStorageKey = () => `avatar_config_${props.user?.id || 'default'}`;
 const avatarConfig = ref({
   text: '',
   shape: 'circle',
-  bgType: 'gradient',
-  bgColor: '#007aff',
+  bgType: 'glass',
+  bgColor: '#ffffff',
   gradientFrom: '#007aff',
   gradientTo: '#00c6ff',
-  gradientAngle: 135,
-  textColor: '#ffffff',
+  gradientAngle: 145,
+  textColor: '#005fd3',
   glow: true,
 });
 
@@ -276,7 +350,9 @@ const resetAvatarConfig = () => {
 };
 
 const applyPresetGradient = (grad) => {
-  avatarConfig.value.bgType = 'gradient';
+  if (avatarConfig.value.bgType !== 'liquid_glass') {
+    avatarConfig.value.bgType = 'gradient';
+  }
   avatarConfig.value.gradientFrom = grad.from;
   avatarConfig.value.gradientTo = grad.to;
 };
@@ -296,12 +372,35 @@ const avatarStyle = computed(() => {
   const styles = {
     color: avatarConfig.value.textColor,
     borderRadius: avatarConfig.value.shape === 'circle' ? '50%' : '18px',
+    fontWeight: '1000',
   };
 
   if (avatarConfig.value.bgType === 'solid') {
     styles.background = avatarConfig.value.bgColor;
-  } else {
+  } else if (avatarConfig.value.bgType === 'gradient') {
     styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, ${avatarConfig.value.gradientFrom}, ${avatarConfig.value.gradientTo})`;
+  } else if (avatarConfig.value.bgType === 'glass') {
+    const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 255, g: 255, b: 255 };
+    if (avatarConfig.value.bgColor === '#ffffff') {
+      // Exact style match to top-right logo-container
+      styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))`;
+      styles.backdropFilter = 'blur(15px) saturate(150%)';
+      styles.webkitBackdropFilter = 'blur(15px) saturate(150%)';
+      styles.border = '3px solid rgba(255, 255, 255, 0.4)';
+    } else {
+      // Custom colored frosted glass tint
+      styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35), rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15))`;
+      styles.backdropFilter = 'blur(16px) saturate(160%)';
+      styles.webkitBackdropFilter = 'blur(16px) saturate(160%)';
+      styles.border = '2.5px solid rgba(255, 255, 255, 0.5)';
+    }
+  } else if (avatarConfig.value.bgType === 'liquid_glass') {
+    const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom) || { r: 0, g: 122, b: 255 };
+    const rgbTo = hexToRgb(avatarConfig.value.gradientTo) || { r: 0, g: 198, b: 255 };
+    styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.55), rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25))`;
+    styles.backdropFilter = 'blur(20px) saturate(190%)';
+    styles.webkitBackdropFilter = 'blur(20px) saturate(190%)';
+    styles.border = '2.5px solid rgba(255, 255, 255, 0.5)';
   }
 
   if (avatarConfig.value.glow) {
@@ -313,7 +412,7 @@ const avatarStyle = computed(() => {
         styles.boxShadow =
           '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)';
       }
-    } else {
+    } else if (avatarConfig.value.bgType === 'gradient') {
       const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom);
       const rgbTo = hexToRgb(avatarConfig.value.gradientTo);
       if (rgbFrom && rgbTo) {
@@ -322,9 +421,26 @@ const avatarStyle = computed(() => {
         styles.boxShadow =
           '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)';
       }
+    } else if (avatarConfig.value.bgType === 'glass') {
+      if (avatarConfig.value.bgColor === '#ffffff') {
+        styles.boxShadow = '0 6px 10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.08)';
+      } else {
+        const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 0, g: 122, b: 255 };
+        styles.boxShadow = `0 8px 24px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.25), inset 0 0 12px rgba(255, 255, 255, 0.3)`;
+      }
+    } else if (avatarConfig.value.bgType === 'liquid_glass') {
+      const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom) || { r: 0, g: 122, b: 255 };
+      const rgbTo = hexToRgb(avatarConfig.value.gradientTo) || { r: 0, g: 198, b: 255 };
+      styles.boxShadow = `0 10px 25px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 5px 15px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)`;
     }
   } else {
-    styles.boxShadow = 'none';
+    if (avatarConfig.value.bgType === 'glass') {
+      styles.boxShadow = avatarConfig.value.bgColor === '#ffffff' ? 'none' : 'inset 0 0 12px rgba(255, 255, 255, 0.3)';
+    } else if (avatarConfig.value.bgType === 'liquid_glass') {
+      styles.boxShadow = 'inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)';
+    } else {
+      styles.boxShadow = 'none';
+    }
   }
 
   return styles;

@@ -7,14 +7,14 @@
     <div class="header-controls">
       <TabSwitcher
         :tabs="tabs"
-        :modelValue="currentTab"
-        @update:modelValue="$emit('switchTab', $event)"
+        :model-value="currentTab"
+        @update:model-value="$emit('switchTab', $event)"
       />
 
       <button
         class="benefit-circle-btn"
-        @click="$emit('showBenefits')"
         :title="$t('auth.profile.viewBenefits')"
+        @click="$emit('showBenefits')"
       >
         🎁
       </button>
@@ -37,26 +37,37 @@
             </div>
           </div>
           <div class="profile-user-meta">
-            <div class="profile-username">{{ user.username }}</div>
-            <div class="profile-email" v-if="user.email">✉️ {{ user.email }}</div>
+            <div class="profile-username">
+              {{ user.username }}
+            </div>
+            <div
+              v-if="user.email"
+              class="profile-email"
+            >
+              ✉️ {{ user.email }}
+            </div>
             <div
               class="user-info-badge"
               v-html="$t('auth.profile.userNumber', { id: user.id })"
-            ></div>
+            />
           </div>
         </div>
 
         <!-- Info Grid -->
         <div class="info-metrics-grid">
           <div class="metric-item">
-            <div class="metric-icon">🗓️</div>
+            <div class="metric-icon">
+              🗓️
+            </div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.registerLabel') }}</span>
               <span class="metric-value">{{ fmt(user.created_at) }}</span>
             </div>
           </div>
           <div class="metric-item">
-            <div class="metric-icon">⏱️</div>
+            <div class="metric-icon">
+              ⏱️
+            </div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.onlineLabel') }}</span>
               <span class="metric-value">{{ formatOnlineTime(user.total_online_seconds) }}</span>
@@ -66,8 +77,13 @@
 
         <!-- Custom Row (Always side-by-side, clickable) -->
         <div class="info-custom-row">
-          <div class="metric-item highlightable clickable" @click="$emit('goToUserRegions')">
-            <div class="metric-icon">🗂️</div>
+          <div
+            class="metric-item highlightable clickable"
+            @click="$emit('goToUserRegions')"
+          >
+            <div class="metric-icon">
+              🗂️
+            </div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.regionsLabel') }}</span>
               <span class="metric-value count-number">
@@ -75,8 +91,13 @@
               </span>
             </div>
           </div>
-          <div class="metric-item highlightable clickable" @click="$emit('goToUserData')">
-            <div class="metric-icon">📊</div>
+          <div
+            class="metric-item highlightable clickable"
+            @click="$emit('goToUserData')"
+          >
+            <div class="metric-icon">
+              📊
+            </div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.dataLabel') }}</span>
               <span class="metric-value count-number">
@@ -89,16 +110,28 @@
 
       <!-- Action Buttons -->
       <div class="action-buttons">
-        <ActionButton variant="info" @click="$emit('goToUserData')">
+        <ActionButton
+          variant="info"
+          @click="$emit('goToUserData')"
+        >
           📊 {{ $t('auth.profile.buttons.userData') }}
         </ActionButton>
-        <ActionButton variant="teal" @click="$emit('goToUserRegions')">
+        <ActionButton
+          variant="teal"
+          @click="$emit('goToUserRegions')"
+        >
           🗂️ {{ $t('auth.profile.buttons.userRegions') }}
         </ActionButton>
-        <ActionButton variant="blue" @click="$emit('goToModifyProfile')">
+        <ActionButton
+          variant="blue"
+          @click="$emit('goToModifyProfile')"
+        >
           🛠 {{ $t('auth.profile.buttons.modifyProfile') }}
         </ActionButton>
-        <ActionButton variant="danger" @click="$emit('logout')">
+        <ActionButton
+          variant="danger"
+          @click="$emit('logout')"
+        >
           🚪 {{ $t('auth.profile.buttons.logout') }}
         </ActionButton>
         <ActionButton
@@ -124,7 +157,11 @@
     </div>
 
     <!-- Avatar Customization Modal -->
-    <AvatarCustomizerModal v-model="isModalOpen" :user="user" @saved="loadAvatarConfig" />
+    <AvatarCustomizerModal
+      v-model="isModalOpen"
+      :user="user"
+      @saved="loadAvatarConfig"
+    />
   </div>
 </template>
 
@@ -188,12 +225,12 @@ const getDefaultConfig = () => {
   return {
     text: initialText,
     shape: 'circle',
-    bgType: 'gradient',
-    bgColor: '#007aff',
+    bgType: 'glass',
+    bgColor: '#ffffff',
     gradientFrom: '#007aff',
     gradientTo: '#00c6ff',
-    gradientAngle: 135,
-    textColor: '#ffffff',
+    gradientAngle: 145,
+    textColor: '#005fd3',
     glow: true,
   };
 };
@@ -203,12 +240,12 @@ const getLocalStorageKey = () => `avatar_config_${props.user?.id || 'default'}`;
 const avatarConfig = ref({
   text: '',
   shape: 'circle',
-  bgType: 'gradient',
-  bgColor: '#007aff',
+  bgType: 'glass',
+  bgColor: '#ffffff',
   gradientFrom: '#007aff',
   gradientTo: '#00c6ff',
-  gradientAngle: 135,
-  textColor: '#ffffff',
+  gradientAngle: 145,
+  textColor: '#005fd3',
   glow: true,
 });
 
@@ -242,12 +279,35 @@ const avatarStyle = computed(() => {
   const styles = {
     color: avatarConfig.value.textColor,
     borderRadius: avatarConfig.value.shape === 'circle' ? '50%' : '18px',
+    fontWeight: '1000',
   };
 
   if (avatarConfig.value.bgType === 'solid') {
     styles.background = avatarConfig.value.bgColor;
-  } else {
+  } else if (avatarConfig.value.bgType === 'gradient') {
     styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, ${avatarConfig.value.gradientFrom}, ${avatarConfig.value.gradientTo})`;
+  } else if (avatarConfig.value.bgType === 'glass') {
+    const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 255, g: 255, b: 255 };
+    if (avatarConfig.value.bgColor === '#ffffff') {
+      // Exact style match to top-right logo-container
+      styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))`;
+      styles.backdropFilter = 'blur(15px) saturate(150%)';
+      styles.webkitBackdropFilter = 'blur(15px) saturate(150%)';
+      styles.border = '3px solid rgba(255, 255, 255, 0.4)';
+    } else {
+      // Custom colored frosted glass tint
+      styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35), rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15))`;
+      styles.backdropFilter = 'blur(16px) saturate(160%)';
+      styles.webkitBackdropFilter = 'blur(16px) saturate(160%)';
+      styles.border = '2.5px solid rgba(255, 255, 255, 0.5)';
+    }
+  } else if (avatarConfig.value.bgType === 'liquid_glass') {
+    const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom) || { r: 0, g: 122, b: 255 };
+    const rgbTo = hexToRgb(avatarConfig.value.gradientTo) || { r: 0, g: 198, b: 255 };
+    styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.55), rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25))`;
+    styles.backdropFilter = 'blur(20px) saturate(190%)';
+    styles.webkitBackdropFilter = 'blur(20px) saturate(190%)';
+    styles.border = '2.5px solid rgba(255, 255, 255, 0.5)';
   }
 
   if (avatarConfig.value.glow) {
@@ -259,7 +319,7 @@ const avatarStyle = computed(() => {
         styles.boxShadow =
           '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)';
       }
-    } else {
+    } else if (avatarConfig.value.bgType === 'gradient') {
       const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom);
       const rgbTo = hexToRgb(avatarConfig.value.gradientTo);
       if (rgbFrom && rgbTo) {
@@ -268,9 +328,26 @@ const avatarStyle = computed(() => {
         styles.boxShadow =
           '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)';
       }
+    } else if (avatarConfig.value.bgType === 'glass') {
+      if (avatarConfig.value.bgColor === '#ffffff') {
+        styles.boxShadow = '0 6px 10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.08)';
+      } else {
+        const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 0, g: 122, b: 255 };
+        styles.boxShadow = `0 8px 24px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.25), inset 0 0 12px rgba(255, 255, 255, 0.3)`;
+      }
+    } else if (avatarConfig.value.bgType === 'liquid_glass') {
+      const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom) || { r: 0, g: 122, b: 255 };
+      const rgbTo = hexToRgb(avatarConfig.value.gradientTo) || { r: 0, g: 198, b: 255 };
+      styles.boxShadow = `0 10px 25px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 5px 15px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)`;
     }
   } else {
-    styles.boxShadow = 'none';
+    if (avatarConfig.value.bgType === 'glass') {
+      styles.boxShadow = avatarConfig.value.bgColor === '#ffffff' ? 'none' : 'inset 0 0 12px rgba(255, 255, 255, 0.3)';
+    } else if (avatarConfig.value.bgType === 'liquid_glass') {
+      styles.boxShadow = 'inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)';
+    } else {
+      styles.boxShadow = 'none';
+    }
   }
 
   return styles;
