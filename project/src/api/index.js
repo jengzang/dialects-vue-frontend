@@ -126,6 +126,13 @@ export {
   deleteCustomForm
 } from './main/user/custom.js'
 
+export {
+  getUserPoints,
+  getUserFeatures,
+  getDataByPoint,
+  getDataByFeature
+} from './main/user/custom-entry.js'
+
 // 自定義分區
 export {
   getCustomRegions,
