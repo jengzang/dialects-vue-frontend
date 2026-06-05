@@ -2,7 +2,7 @@
   <section class="feature-card-list">
     <div class="feature-card-toolbar">
       <div class="feature-card-heading">
-        <input v-model="keyword" class="feature-card-search" type="text" :placeholder="t('customEntry.featureList.searchPlaceholder')" />
+        <input v-model="keyword" class="feature-card-search main-search-field" type="text" :placeholder="t('customEntry.featureList.searchPlaceholder')" />
         <h4 class="feature-card-title">{{ t('customEntry.featureList.title') }}</h4>
         <p class="feature-card-description">{{ t('customEntry.featureList.description') }}</p>
       </div>
@@ -11,36 +11,35 @@
       </button>
     </div>
 
-    <div v-if="loading" class="feature-grid">
-      <div v-for="index in 3" :key="index" class="feature-card feature-card-skeleton" aria-hidden="true">
+    <div v-if="loading" class="feature-grid main-card-grid">
+      <div v-for="index in 3" :key="index" class="feature-card feature-card-skeleton main-data-card main-glass-panel-inner" aria-hidden="true">
         <div class="skeleton-line skeleton-line-lg"></div>
         <div class="skeleton-chip"></div>
         <div class="skeleton-line skeleton-line-sm"></div>
       </div>
     </div>
 
-    <div v-else-if="errorMessage" class="feature-list-state feature-list-state-error">
-      <div class="feature-list-state-title">{{ t('customEntry.featureList.loadFailed') }}</div>
-      <p class="feature-list-state-text">{{ errorMessage }}</p>
+    <div v-else-if="errorMessage" class="feature-list-state main-list-state main-glass-panel-inner" data-state="error">
+      <div class="feature-list-state-title main-list-state-title">{{ t('customEntry.featureList.loadFailed') }}</div>
+      <p class="feature-list-state-text main-list-state-text">{{ errorMessage }}</p>
       <button class="main-glass-button" type="button" @click="$emit('retry')">{{ t('customEntry.featureList.retry') }}</button>
     </div>
 
-    <div v-else-if="filteredItems.length === 0" class="feature-list-state">
-      <div class="feature-list-state-title">{{ t('customEntry.featureList.emptyTitle') }}</div>
-      <p class="feature-list-state-text">{{ t('customEntry.featureList.emptyText') }}</p>
+    <div v-else-if="filteredItems.length === 0" class="feature-list-state main-list-state main-glass-panel-inner">
+      <div class="feature-list-state-title main-list-state-title">{{ t('customEntry.featureList.emptyTitle') }}</div>
+      <p class="feature-list-state-text main-list-state-text">{{ t('customEntry.featureList.emptyText') }}</p>
     </div>
 
-    <div v-else class="feature-grid">
+    <div v-else class="feature-grid main-card-grid">
       <button
         v-for="item in filteredItems"
         :key="item.feature_key || `${item['特徵'] || ''}-${item['聲韻調'] || ''}`"
-        class="feature-card"
+        class="feature-card main-data-card main-glass-panel-inner"
         type="button"
         @click="$emit('select', item)"
       >
         <span class="feature-card-name">{{ item['特徵'] || item.feature || t('customEntry.featureList.unnamed') }}</span>
         <span class="feature-card-tag" :data-tone="resolveToneType(item)">{{ item['聲韻調'] || item.phonology || t('customEntry.featureList.uncategorized') }}</span>
-        <span v-if="item.updated_at" class="feature-card-meta">{{ item.updated_at }}</span>
         <span class="feature-card-badge">{{ t('customEntry.featureList.pointCount', { count: item.location_count || 0 }) }}</span>
       </button>
     </div>
@@ -128,26 +127,11 @@ function resolveToneType(item) {
 }
 
 .feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 14px;
+  --main-card-min-width: 240px;
 }
 
 .feature-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.64);
-  text-align: left;
-  cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.feature-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14);
+  --main-data-card-gap: 10px;
 }
 
 .feature-card-name {
@@ -197,14 +181,7 @@ function resolveToneType(item) {
   font-weight: 600;
 }
 
-.feature-card-meta {
-  font-size: 12px;
-  color: #94a3b8;
-}
 
-.feature-card-skeleton {
-  cursor: default;
-}
 
 .skeleton-line,
 .skeleton-chip {
@@ -229,27 +206,6 @@ function resolveToneType(item) {
   height: 24px;
 }
 
-.feature-list-state {
-  padding: 28px 20px;
-  text-align: center;
-}
-
-.feature-list-state-error {
-  border-color: rgba(220, 38, 38, 0.15);
-}
-
-.feature-list-state-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.feature-list-state-text {
-  margin: 10px 0 0;
-  color: #64748b;
-  font-size: 14px;
-  line-height: 1.7;
-}
 
 @keyframes shimmer {
   from {
