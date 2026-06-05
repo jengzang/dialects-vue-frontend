@@ -56,9 +56,9 @@
         </div>
 
         <!-- Background Type and Glass Toggle -->
-        <div class="control-group bg-type-row">
-          <div class="bg-type-selector-wrapper">
-            <label class="control-label">{{ $t('auth.profile.avatar.bgTypeLabel') }}</label>
+        <div class="control-group">
+          <label class="control-label">{{ $t('auth.profile.avatar.bgTypeLabel') }}</label>
+          <div class="bg-type-controls-inline">
             <div class="btn-group">
               <button
                 type="button"
@@ -77,8 +77,6 @@
                 {{ $t('auth.profile.avatar.bgTypeGradient') }}
               </button>
             </div>
-          </div>
-          <div class="glass-toggle-wrapper">
             <label class="glass-toggle-label">
               <input
                 v-model="avatarConfig.glass"
@@ -530,54 +528,37 @@ watch(
     flex-direction: column;
     gap: 16px;
 
-    .bg-type-row {
+    .bg-type-controls-inline {
+      display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
+      width: 100%;
 
-      @media (max-width: 576px) {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-
-      .bg-type-selector-wrapper {
+      .btn-group {
         display: flex;
-        flex-direction: column;
         gap: 8px;
         flex: 1;
-        width: 100%;
+        max-width: 220px;
       }
 
-      .glass-toggle-wrapper {
+      .glass-toggle-label {
         display: flex;
         align-items: center;
-        padding-top: 24px;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1d1d1f;
+        cursor: pointer;
+        user-select: none;
         flex-shrink: 0;
 
-        @media (max-width: 576px) {
-          padding-top: 0;
-          width: 100%;
-          justify-content: flex-start;
-        }
-
-        .glass-toggle-label {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 13px;
-          font-weight: 600;
-          color: #1d1d1f;
+        .glass-checkbox {
+          width: 18px;
+          height: 18px;
+          accent-color: #007aff;
           cursor: pointer;
-          user-select: none;
-
-          .glass-checkbox {
-            width: 18px;
-            height: 18px;
-            accent-color: #007aff;
-            cursor: pointer;
-          }
         }
       }
     }
