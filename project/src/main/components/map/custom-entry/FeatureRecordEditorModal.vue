@@ -61,7 +61,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { batchMatch, getRegions } from '@/api'
-import { showWarning } from '@/utils/message.js'
+import { showConfirm, showWarning } from '@/utils/message.js'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import { batchCreateCustomData, editCustomData, getDataByFeature } from '@/api'
@@ -221,7 +221,7 @@ async function handleSave() {
   const duplicateExists = await checkDuplicateLocation()
   if (duplicateExists) {
     showWarning(t('customEntry.featureRecord.messages.duplicateLocation'))
-    const confirmed = globalThis?.window?.confirm?.(t('customEntry.featureRecord.messages.duplicateLocation'))
+    const confirmed = await showConfirm(t('customEntry.featureRecord.messages.duplicateLocation'))
     if (confirmed === false) return
   }
 

@@ -82,7 +82,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { batchMatch, getRegions } from '@/api'
-import { showWarning } from '@/utils/message.js'
+import { showConfirm, showWarning } from '@/utils/message.js'
 import { useI18n } from 'vue-i18n'
 import { batchCreateCustomData, batchDeleteCustomData, editCustomData, getDataByPoint } from '@/api'
 import { userStore } from '@/main/store/store.js'
@@ -275,7 +275,7 @@ async function handleSave() {
   })
   if (hasDuplicate) {
     showWarning(t('customEntry.pointDetail.rows.duplicateWarning'))
-    const confirmed = globalThis?.window?.confirm?.(t('customEntry.pointDetail.messages.confirmContinue'))
+    const confirmed = await showConfirm(t('customEntry.pointDetail.messages.confirmContinue'))
     if (confirmed === false) return
   }
   if (validRows.length === 0 && removedIds.value.length === 0) {

@@ -59,6 +59,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { batchDeleteCustomData, getDataByFeature } from '@/api'
+import { showConfirm } from '@/utils/message.js'
 import MiniMapSelector from './MiniMapSelector.vue'
 import FeatureRecordEditorModal from './FeatureRecordEditorModal.vue'
 
@@ -138,7 +139,7 @@ const openEditModal = (row) => {
 
 const handleDelete = async (row) => {
   if (!row?.created_at) return
-  const confirmed = globalThis?.window?.confirm?.(t('customEntry.featureDetail.confirmDelete'))
+  const confirmed = await showConfirm(t('customEntry.featureDetail.confirmDelete'))
   if (confirmed === false) return
   await batchDeleteCustomData([row.created_at])
   rows.value = rows.value.filter((item) => item.created_at !== row.created_at)
