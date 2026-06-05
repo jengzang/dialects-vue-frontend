@@ -667,6 +667,26 @@ const tabs = computed(() => [
 @media (max-width: 576px) {
   .info-metrics-grid {
     grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .metric-item {
+    padding: 8px 12px;
+    gap: 8px;
+    border-radius: 12px;
+  }
+
+  .metric-icon {
+    font-size: 20px;
+  }
+
+  .metric-label {
+    font-size: 10px;
+  }
+
+  .metric-value {
+    font-size: 13px;
+    margin-top: 1px;
   }
 }
 
