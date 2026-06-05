@@ -775,4 +775,66 @@ const tabs = computed(() => [
 .metric-value.count-number {
   color: #007aff;
 }
+
+@media (min-aspect-ratio: 1/1) {
+  .user-profile-card {
+    padding: 24px 30px;
+    margin: 24px auto;
+    max-width: 650px;
+  }
+
+  .profile-avatar-wrapper {
+    margin-bottom: 24px;
+  }
+
+  .profile-avatar {
+    width: 72px;
+    height: 72px;
+    font-size: 24px;
+  }
+
+  .profile-username {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+
+  .profile-email {
+    font-size: 14.5px;
+    margin-bottom: 4px;
+  }
+
+  .profile-user-meta .user-info-badge {
+    font-size: 14px;
+  }
+
+  .profile-user-meta .user-info-badge :deep(.user-number) {
+    font-size: 15.5px;
+  }
+
+  .info-metrics-grid {
+    gap: 16px;
+  }
+
+  .info-custom-row {
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .metric-item {
+    padding: 14px 20px;
+    gap: 14px;
+  }
+
+  .metric-icon {
+    font-size: 24px;
+  }
+
+  .metric-label {
+    font-size: 12px;
+  }
+
+  .metric-value {
+    font-size: 15px;
+  }
+}
 </style>
