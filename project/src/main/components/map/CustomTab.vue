@@ -101,31 +101,20 @@
           </span>
         </div>
 
-        <!-- 添加按钮 -->
         <div class="button-group">
-          <div class="button-with-help">
-            <button class="action-btn add-single-btn" @click="handleAddSingle">
-              {{ t('map.customTab.buttons.addSingle') }}
-            </button>
-            <HelpIcon
-              :content="t('map.customTab.helpIcons.addSingle')"
-              size="md"
-              trigger="both"
-            />
-          </div>
-
-          <div class="button-with-help">
-            <button class="action-btn add-batch-btn" @click="handleAddBatch">
-              {{ t('map.customTab.buttons.addBatch') }}
-            </button>
-            <HelpIcon
-              :content="t('map.customTab.helpIcons.addBatch')"
-              size="md"
-              trigger="both"
-            />
-          </div>
+          <button
+            class="action-btn add-entry-btn"
+            @click="openEntryModal"
+            :disabled="!userStore.isAuthenticated"
+          >
+            添加數據
+          </button>
         </div>
       </div>
+
+    <CustomDataEntryModal
+      v-model="isEntryModalOpen"
+    />
     <!-- 帮助弹窗 -->
     <AppModal
       :model-value="isHelpModalOpen"
@@ -364,6 +353,7 @@ import { useI18n } from 'vue-i18n'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import CustomDataEntryModal from '@/main/components/map/custom-entry/CustomDataEntryModal.vue'
 import { getAllCustomData, getCustomFeature } from '@/api'
 import { userStore, resultCache, mapStore, uiStore, isCustomButtonDisabled, setRunning } from '@/main/store/store.js'
 import { showSuccess, showError, showWarning, showInfo } from '@/utils/message.js'
@@ -499,6 +489,7 @@ watch(
 
 // 帮助弹窗状态
 const isHelpModalOpen = ref(false)
+const isEntryModalOpen = ref(false)
 
 // Dropdown 样式（动态计算位置）
 const dropdownStyle = reactive({
@@ -524,6 +515,15 @@ const closeHelpModal = () => {
 // 登录
 const handleLogin = () => {
   requireAuth()
+}
+
+const openEntryModal = () => {
+  if (!userStore.isAuthenticated) {
+    showWarning(t('map.customTab.validation.loginFirst'))
+    requireAuth()
+    return
+  }
+  isEntryModalOpen.value = true
 }
 
 // 处理输入事件（防抖搜索）
