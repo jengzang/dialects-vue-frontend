@@ -1,7 +1,7 @@
 <template>
   <div class="profile-overview">
     <!-- Welcome Header -->
-    <h3 id="login-title">{{ $t('auth.profile.welcome', { username: user.username }) }}</h3>
+    <!-- <h3 id="login-title">{{ $t('auth.profile.welcome', { username: user.username }) }}</h3> -->
 
     <!-- Tab Switcher + Benefits Button -->
     <div class="header-controls">
@@ -26,8 +26,15 @@
       <div class="user-profile-card">
         <!-- Avatar Header -->
         <div class="profile-avatar-wrapper">
-          <div class="profile-avatar">
-            {{ user.username ? user.username.substring(0, 2).toUpperCase() : '👤' }}
+          <div
+            class="profile-avatar clickable-avatar"
+            :style="avatarStyle"
+            @click="isModalOpen = true"
+          >
+            {{ avatarConfig.text }}
+            <div class="avatar-edit-overlay">
+              <span class="edit-overlay-text">修改</span>
+            </div>
           </div>
           <div class="profile-user-meta">
             <div class="profile-username">{{ user.username }}</div>
@@ -162,16 +169,189 @@
     <div v-if="currentTab === 'leaderboard'">
       <LeaderboardPanel />
     </div>
+
+    <!-- Avatar Customization Modal -->
+    <AppModal v-model="isModalOpen" title="自定义头像" size="sm">
+      <div class="avatar-config-modal">
+        <!-- Preview section -->
+        <div class="preview-section">
+          <div class="profile-avatar preview-avatar" :style="avatarStyle">
+            {{ avatarConfig.text }}
+          </div>
+          <p class="preview-tip">实时预览</p>
+        </div>
+
+        <!-- Controls section -->
+        <div class="config-controls">
+          <!-- Text Input -->
+          <div class="control-group">
+            <label class="control-label">头像文字 (最多 3 个字符)</label>
+            <input
+              v-model="avatarConfig.text"
+              type="text"
+              maxlength="3"
+              class="config-input"
+              placeholder="请输入文字"
+            />
+          </div>
+
+          <!-- Shape Selector -->
+          <div class="control-group">
+            <label class="control-label">头像形状</label>
+            <div class="btn-group">
+              <button
+                type="button"
+                class="config-btn"
+                :class="{ active: avatarConfig.shape === 'circle' }"
+                @click="avatarConfig.shape = 'circle'"
+              >
+                🔵 圆形
+              </button>
+              <button
+                type="button"
+                class="config-btn"
+                :class="{ active: avatarConfig.shape === 'squircle' }"
+                @click="avatarConfig.shape = 'squircle'"
+              >
+                ⬛ 圆角矩形
+              </button>
+            </div>
+          </div>
+
+          <!-- Background Type -->
+          <div class="control-group">
+            <label class="control-label">背景类型</label>
+            <div class="btn-group">
+              <button
+                type="button"
+                class="config-btn"
+                :class="{ active: avatarConfig.bgType === 'solid' }"
+                @click="avatarConfig.bgType = 'solid'"
+              >
+                纯色
+              </button>
+              <button
+                type="button"
+                class="config-btn"
+                :class="{ active: avatarConfig.bgType === 'gradient' }"
+                @click="avatarConfig.bgType = 'gradient'"
+              >
+                渐变色
+              </button>
+            </div>
+          </div>
+
+          <!-- Color Customizer -->
+          <div class="control-group" v-if="avatarConfig.bgType === 'solid'">
+            <label class="control-label">选择纯色</label>
+            <div class="color-preset-grid">
+              <button
+                v-for="color in presetSolids"
+                :key="color"
+                type="button"
+                class="color-dot"
+                :style="{ backgroundColor: color }"
+                :class="{ active: avatarConfig.bgColor === color }"
+                @click="avatarConfig.bgColor = color"
+              />
+            </div>
+            <div class="custom-color-picker">
+              <span>自定义颜色:</span>
+              <input type="color" v-model="avatarConfig.bgColor" />
+            </div>
+          </div>
+
+          <div class="control-group" v-else>
+            <label class="control-label">选择渐变预设</label>
+            <div class="gradient-preset-grid">
+              <button
+                v-for="grad in presetGradients"
+                :key="grad.name"
+                type="button"
+                class="gradient-bar"
+                :style="{ background: `linear-gradient(135deg, ${grad.from}, ${grad.to})` }"
+                :class="{
+                  active:
+                    avatarConfig.gradientFrom === grad.from && avatarConfig.gradientTo === grad.to,
+                }"
+                @click="applyPresetGradient(grad)"
+              >
+                {{ grad.name }}
+              </button>
+            </div>
+            <div class="custom-gradient-pickers">
+              <div class="picker-item">
+                <span>起始颜色:</span>
+                <input type="color" v-model="avatarConfig.gradientFrom" />
+              </div>
+              <div class="picker-item">
+                <span>结束颜色:</span>
+                <input type="color" v-model="avatarConfig.gradientTo" />
+              </div>
+            </div>
+            <div class="angle-slider">
+              <span>渐变角度: {{ avatarConfig.gradientAngle }}°</span>
+              <input type="range" min="0" max="360" v-model.number="avatarConfig.gradientAngle" />
+            </div>
+          </div>
+
+          <!-- Text Color Picker -->
+          <div class="control-group">
+            <label class="control-label">文字颜色</label>
+            <div class="text-color-pickers">
+              <button
+                type="button"
+                class="text-color-btn text-white"
+                :class="{ active: avatarConfig.textColor === '#ffffff' }"
+                @click="avatarConfig.textColor = '#ffffff'"
+              >
+                白色
+              </button>
+              <button
+                type="button"
+                class="text-color-btn text-black"
+                :class="{ active: avatarConfig.textColor === '#1d1d1f' }"
+                @click="avatarConfig.textColor = '#1d1d1f'"
+              >
+                黑色
+              </button>
+              <div class="custom-text-color">
+                <span>自定义:</span>
+                <input type="color" v-model="avatarConfig.textColor" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Glow Effect Toggle -->
+          <div class="control-group glow-toggle-group">
+            <label class="control-label">启用发光投影 (Glow)</label>
+            <input type="checkbox" v-model="avatarConfig.glow" class="glow-checkbox" />
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <button type="button" class="modal-footer-btn cancel-btn" @click="isModalOpen = false">
+          取消
+        </button>
+        <button type="button" class="modal-footer-btn reset-btn" @click="resetAvatarConfig">
+          重置
+        </button>
+        <button type="button" class="modal-footer-btn save-btn" @click="saveAvatarConfig">
+          保存修改
+        </button>
+      </template>
+    </AppModal>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ActionButton from './ActionButton.vue';
 import TabSwitcher from './TabSwitcher.vue';
 import LeaderboardPanel from '@/main/components/user/LeaderboardPanel.vue';
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue';
+import AppModal from '@/components/common/AppModal.vue';
 import { formatOnlineTime, fmt } from '@/main/store/userStats.js';
 import { getCustomCounts } from '@/api';
 
@@ -180,19 +360,7 @@ const { t } = useI18n();
 const customRegionCount = ref(0);
 const customDataCount = ref(0);
 
-onMounted(async () => {
-  try {
-    const res = await getCustomCounts();
-    if (res && res.success) {
-      customRegionCount.value = res.custom_region_total;
-      customDataCount.value = res.custom_data_total;
-    }
-  } catch (err) {
-    console.error('Failed to load custom counts:', err);
-  }
-});
-
-defineProps({
+const props = defineProps({
   user: {
     type: Object,
     required: true,
@@ -227,6 +395,172 @@ const tabs = computed(() => [
   { label: '📊 ' + t('auth.profile.tabs.info'), value: 'overview' },
   { label: '🏆 ' + t('auth.profile.tabs.ranking'), value: 'leaderboard' },
 ]);
+
+// --- Avatar Customization Logic ---
+const isModalOpen = ref(false);
+let backupConfig = null;
+let isSaved = false;
+
+const presetSolids = [
+  '#007aff', // Apple Blue
+  '#34c759', // Apple Green
+  '#ff9500', // Apple Orange
+  '#ff2d55', // Apple Pink/Red
+  '#af52de', // Apple Purple
+  '#5856d6', // Apple Indigo
+  '#ffcc00', // Apple Yellow
+  '#8e8e93', // Apple Gray
+];
+
+const presetGradients = [
+  { name: '日落柑橘', from: '#ff5e62', to: '#ff9966' },
+  { name: '海洋之约', from: '#00c6ff', to: '#0072ff' },
+  { name: '霓虹极光', from: '#a18cd1', to: '#fbc2eb' },
+  { name: '春意盎然', from: '#11998e', to: '#38ef7d' },
+  { name: '炫酷暗黑', from: '#1e3c72', to: '#2a5298' },
+  { name: '梦幻紫萝', from: '#7000ff', to: '#f100ff' },
+];
+
+const getDefaultConfig = () => {
+  const username = props.user?.username || '';
+  const initialText = username ? username.slice(0, 2).toUpperCase() : 'US';
+  return {
+    text: initialText,
+    shape: 'circle',
+    bgType: 'gradient',
+    bgColor: '#007aff',
+    gradientFrom: '#007aff',
+    gradientTo: '#00c6ff',
+    gradientAngle: 135,
+    textColor: '#ffffff',
+    glow: true,
+  };
+};
+
+const getLocalStorageKey = () => `avatar_config_${props.user?.id || 'default'}`;
+
+const avatarConfig = ref({
+  text: '',
+  shape: 'circle',
+  bgType: 'gradient',
+  bgColor: '#007aff',
+  gradientFrom: '#007aff',
+  gradientTo: '#00c6ff',
+  gradientAngle: 135,
+  textColor: '#ffffff',
+  glow: true,
+});
+
+const loadAvatarConfig = () => {
+  const key = getLocalStorageKey();
+  const saved = localStorage.getItem(key);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      avatarConfig.value = { ...getDefaultConfig(), ...parsed };
+      return;
+    } catch (e) {
+      console.error('Failed to parse avatar config:', e);
+    }
+  }
+  avatarConfig.value = getDefaultConfig();
+};
+
+const saveAvatarConfig = () => {
+  isSaved = true;
+  localStorage.setItem(getLocalStorageKey(), JSON.stringify(avatarConfig.value));
+  isModalOpen.value = false;
+};
+
+const resetAvatarConfig = () => {
+  avatarConfig.value = getDefaultConfig();
+};
+
+const applyPresetGradient = (grad) => {
+  avatarConfig.value.bgType = 'gradient';
+  avatarConfig.value.gradientFrom = grad.from;
+  avatarConfig.value.gradientTo = grad.to;
+};
+
+const hexToRgb = (hex) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      }
+    : null;
+};
+
+const avatarStyle = computed(() => {
+  const styles = {
+    color: avatarConfig.value.textColor,
+    borderRadius: avatarConfig.value.shape === 'circle' ? '50%' : '18px',
+  };
+
+  if (avatarConfig.value.bgType === 'solid') {
+    styles.background = avatarConfig.value.bgColor;
+  } else {
+    styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, ${avatarConfig.value.gradientFrom}, ${avatarConfig.value.gradientTo})`;
+  }
+
+  if (avatarConfig.value.glow) {
+    if (avatarConfig.value.bgType === 'solid') {
+      const rgb = hexToRgb(avatarConfig.value.bgColor);
+      if (rgb) {
+        styles.boxShadow = `0 8px 20px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.2)`;
+      } else {
+        styles.boxShadow =
+          '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)';
+      }
+    } else {
+      const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom);
+      const rgbTo = hexToRgb(avatarConfig.value.gradientTo);
+      if (rgbFrom && rgbTo) {
+        styles.boxShadow = `0 8px 20px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 4px 12px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 0 8px rgba(255, 255, 255, 0.2)`;
+      } else {
+        styles.boxShadow =
+          '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)';
+      }
+    }
+  } else {
+    styles.boxShadow = 'none';
+  }
+
+  return styles;
+});
+
+watch(isModalOpen, (newVal) => {
+  if (newVal) {
+    backupConfig = JSON.parse(JSON.stringify(avatarConfig.value));
+    isSaved = false;
+  } else {
+    if (!isSaved && backupConfig) {
+      avatarConfig.value = JSON.parse(JSON.stringify(backupConfig));
+    }
+  }
+});
+
+watch(
+  () => props.user?.id,
+  () => {
+    loadAvatarConfig();
+  }
+);
+
+onMounted(async () => {
+  loadAvatarConfig();
+  try {
+    const res = await getCustomCounts();
+    if (res && res.success) {
+      customRegionCount.value = res.custom_region_total;
+      customDataCount.value = res.custom_data_total;
+    }
+  } catch (err) {
+    console.error('Failed to load custom counts:', err);
+  }
+});
 </script>
 
 <style scoped>
@@ -836,5 +1170,437 @@ const tabs = computed(() => [
   .metric-value {
     font-size: 15px;
   }
+}
+
+/* --- Avatar Customizer Styles --- */
+.clickable-avatar {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.clickable-avatar:hover {
+  transform: scale(1.08) rotate(2deg) !important;
+}
+
+.clickable-avatar:active {
+  transform: scale(0.96) !important;
+}
+
+.avatar-edit-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.clickable-avatar:hover .avatar-edit-overlay {
+  opacity: 1;
+}
+
+.edit-overlay-text {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transform: translateY(4px);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.clickable-avatar:hover .edit-overlay-text {
+  transform: translateY(0);
+}
+
+.avatar-config-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  padding: 4px;
+}
+
+.preview-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 20px;
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 280px;
+  box-sizing: border-box;
+}
+
+.preview-avatar {
+  width: 80px;
+  height: 80px;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  border: 2.5px solid #ffffff;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.preview-tip {
+  font-size: 12px;
+  color: #86868b;
+  margin: 0;
+  font-weight: 550;
+}
+
+.config-controls {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  width: 100%;
+}
+
+.control-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.01em;
+}
+
+.config-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.8);
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.config-input:focus {
+  border-color: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+  background: #ffffff;
+}
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.config-btn {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.6);
+  color: #1d1d1f;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.config-btn:hover {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.config-btn.active {
+  background: #007aff;
+  color: #ffffff;
+  border-color: #007aff;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+}
+
+.color-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.color-dot {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding: 0;
+}
+
+.color-dot:hover {
+  transform: scale(1.15);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+.color-dot.active {
+  transform: scale(1.2);
+  box-shadow:
+    0 0 0 2px #007aff,
+    0 4px 8px rgba(0, 122, 255, 0.3);
+  z-index: 1;
+}
+
+.custom-color-picker,
+.custom-text-color {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 550;
+  color: #86868b;
+}
+
+.custom-color-picker input[type='color'],
+.custom-text-color input[type='color'],
+.picker-item input[type='color'] {
+  -webkit-appearance: none;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.1),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.custom-color-picker input[type='color']::-webkit-color-swatch-wrapper,
+.custom-text-color input[type='color']::-webkit-color-swatch-wrapper,
+.picker-item input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.custom-color-picker input[type='color']::-webkit-color-swatch,
+.custom-text-color input[type='color']::-webkit-color-swatch,
+.picker-item input[type='color']::-webkit-color-swatch {
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+}
+
+.custom-color-picker input[type='color']:hover,
+.custom-text-color input[type='color']:hover,
+.picker-item input[type='color']:hover {
+  transform: scale(1.1);
+}
+
+.gradient-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.gradient-bar {
+  padding: 12px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.gradient-bar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gradient-bar.active {
+  border-color: #007aff;
+  box-shadow:
+    0 0 0 2px #007aff,
+    0 6px 15px rgba(0, 122, 255, 0.35);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.custom-gradient-pickers {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.picker-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 550;
+  color: #86868b;
+}
+
+.angle-slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 550;
+  color: #86868b;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.angle-slider input[type='range'] {
+  flex: 1;
+  -webkit-appearance: none;
+  background: rgba(0, 0, 0, 0.08);
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+}
+
+.angle-slider input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.angle-slider input[type='range']::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+}
+
+.text-color-pickers {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.text-color-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.text-color-btn.text-white {
+  background: #ffffff;
+  color: #1d1d1f;
+}
+
+.text-color-btn.text-black {
+  background: #1d1d1f;
+  color: #ffffff;
+}
+
+.text-color-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.text-color-btn.active {
+  box-shadow:
+    0 0 0 2px #007aff,
+    0 4px 8px rgba(0, 122, 255, 0.25);
+  border-color: #007aff;
+}
+
+.glow-toggle-group {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+.glow-checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: #007aff;
+  cursor: pointer;
+}
+
+.modal-footer-btn {
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: none;
+}
+
+.cancel-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: #48484a;
+}
+
+.cancel-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.reset-btn {
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+  margin-right: auto;
+}
+
+.reset-btn:hover {
+  background: rgba(255, 59, 48, 0.18);
+}
+
+.save-btn {
+  background: #007aff;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+}
+
+.save-btn:hover {
+  background: #0063cc;
+  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.save-btn:active {
+  transform: translateY(0);
 }
 </style>
