@@ -22,21 +22,55 @@
 
     <!-- Overview Tab -->
     <div v-if="currentTab === 'overview'">
-      <!-- User Info -->
-      <div class="profile-user-info">
-        <div class="user-info-badge" v-html="$t('auth.profile.userNumber', { id: user.id })"></div>
-        <p class="user-info-details" style="margin: 2px">
-          {{ $t('auth.profile.registerTime', { time: fmt(user.created_at) }) }}
-        </p>
-        <p class="user-info-details" style="margin: 2px">
-          {{ $t('auth.profile.onlineTime', { time: formatOnlineTime(user.total_online_seconds) }) }}
-        </p>
-        <p class="user-info-details" style="margin: 2px">
-          {{ $t('auth.profile.customRegions', { count: customRegionCount }) }}
-        </p>
-        <p class="user-info-details" style="margin: 2px">
-          {{ $t('auth.profile.customData', { count: customDataCount }) }}
-        </p>
+      <!-- User Info Card -->
+      <div class="user-profile-card">
+        <!-- Avatar Header -->
+        <div class="profile-avatar-wrapper">
+          <div class="profile-avatar">
+            {{ user.username ? user.username.substring(0, 2).toUpperCase() : '👤' }}
+          </div>
+          <div class="profile-username">{{ user.username }}</div>
+          <div
+            class="user-info-badge"
+            v-html="$t('auth.profile.userNumber', { id: user.id })"
+          ></div>
+        </div>
+
+        <!-- Info Grid -->
+        <div class="info-metrics-grid">
+          <div class="metric-item">
+            <div class="metric-icon">🗓️</div>
+            <div class="metric-content">
+              <span class="metric-label">{{ $t('auth.profile.registerLabel') }}</span>
+              <span class="metric-value">{{ fmt(user.created_at) }}</span>
+            </div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-icon">⏱️</div>
+            <div class="metric-content">
+              <span class="metric-label">{{ $t('auth.profile.onlineLabel') }}</span>
+              <span class="metric-value">{{ formatOnlineTime(user.total_online_seconds) }}</span>
+            </div>
+          </div>
+          <div class="metric-item highlightable">
+            <div class="metric-icon">🗂️</div>
+            <div class="metric-content">
+              <span class="metric-label">{{ $t('auth.profile.regionsLabel') }}</span>
+              <span class="metric-value count-number">
+                {{ $t('auth.profile.customRegionsVal', { count: customRegionCount }) }}
+              </span>
+            </div>
+          </div>
+          <div class="metric-item highlightable">
+            <div class="metric-icon">📊</div>
+            <div class="metric-content">
+              <span class="metric-label">{{ $t('auth.profile.dataLabel') }}</span>
+              <span class="metric-value count-number">
+                {{ $t('auth.profile.customDataVal', { count: customDataCount }) }}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Statistics Card -->
@@ -525,5 +559,137 @@ const tabs = computed(() => [
   .action-buttons {
     flex-direction: column;
   }
+}
+
+/* User Profile Card - Premium Glassmorphism */
+.user-profile-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 24px;
+  padding: 30px 24px;
+  margin: 20px auto;
+  max-width: 600px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 12px 40px rgba(0, 0, 0, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.user-profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 20px 48px rgba(0, 122, 255, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 122, 255, 0.15);
+}
+
+.profile-avatar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #007aff, #00c6ff);
+  box-shadow:
+    0 8px 20px rgba(0, 122, 255, 0.25),
+    inset 0 0 12px rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.profile-avatar-wrapper:hover .profile-avatar {
+  transform: scale(1.08) rotate(5deg);
+  box-shadow: 0 12px 24px rgba(0, 122, 255, 0.35);
+}
+
+.profile-username {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+/* Info Metrics Grid */
+.info-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 576px) {
+  .info-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metric-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  border-radius: 18px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.02),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.metric-item:hover {
+  transform: translateY(-2px);
+  background: white;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.05),
+    inset 0 0 0 1.5px rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.3);
+}
+
+.metric-icon {
+  font-size: 26px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+}
+
+.metric-content {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.metric-label {
+  font-size: 11px;
+  color: #86868b;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.metric-value {
+  font-size: 15px;
+  color: #1d1d1f;
+  font-weight: 700;
+  margin-top: 3px;
+  letter-spacing: -0.01em;
+}
+
+.metric-value.count-number {
+  color: #007aff;
 }
 </style>
