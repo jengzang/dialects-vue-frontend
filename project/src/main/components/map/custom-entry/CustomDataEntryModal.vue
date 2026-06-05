@@ -9,8 +9,28 @@
   >
     <template #header>
       <div class="entry-modal-header">
-        <h3 class="entry-modal-title">自定義數據錄入</h3>
-        <div class="entry-modal-subtitle">建設中，下一步接入雙模式錄入流程</div>
+        <div>
+          <h3 class="entry-modal-title">自定義數據錄入</h3>
+          <div class="entry-modal-subtitle">聚焦用戶自定義資料新增與維護，兼容舊的個人數據管理與右側逐條新增邏輯。</div>
+        </div>
+        <div class="entry-modal-mode-switcher" role="group" aria-label="錄入模式">
+          <button
+            class="entry-mode-button"
+            :class="{ active: activeMode === 'point' }"
+            type="button"
+            @click="activeMode = 'point'"
+          >
+            補充單點資料
+          </button>
+          <button
+            class="entry-mode-button"
+            :class="{ active: activeMode === 'feature' }"
+            type="button"
+            @click="activeMode = 'feature'"
+          >
+            製作特徵分布
+          </button>
+        </div>
         <button
           class="close-btn close-btn-lg close-btn-inline"
           type="button"
@@ -22,18 +42,23 @@
       </div>
     </template>
 
-    <div class="entry-modal-empty main-glass-panel-inner">
-      <div class="entry-modal-empty-icon">🧭</div>
-      <div class="entry-modal-empty-title">自定義錄入彈窗骨架已接入</div>
-      <p class="entry-modal-empty-text">
-        本步僅完成入口與彈窗容器接入，後續將逐步補上「補充單點資料 / 製作特徵分布」兩種模式。
-      </p>
-    </div>
+    <KeepAlive>
+      <PointCentricMode v-if="activeMode === 'point'" key="point" />
+      <div v-else class="entry-modal-empty main-glass-panel-inner">
+        <div class="entry-modal-empty-icon">🧪</div>
+        <div class="entry-modal-empty-title">特徵分布模式下一步接入</div>
+        <p class="entry-modal-empty-text">
+          本步先完成模式切換骨架與單點列表，特徵分布模式將在後續步驟接入。
+        </p>
+      </div>
+    </KeepAlive>
   </AppModal>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import AppModal from '@/components/common/AppModal.vue'
+import PointCentricMode from './PointCentricMode.vue'
 
 const props = defineProps({
   modelValue: {
@@ -43,6 +68,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+const activeMode = ref('point')
 
 const closeModal = () => {
   emit('update:modelValue', false)
@@ -56,9 +82,9 @@ const handleVisibleChange = (value) => {
 <style scoped lang="scss">
 .entry-modal-header {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 10px 16px;
+  gap: 12px 16px;
   width: 100%;
 }
 
@@ -73,6 +99,34 @@ const handleVisibleChange = (value) => {
   grid-column: 1 / 2;
   font-size: 13px;
   color: #64748b;
+}
+
+.entry-modal-mode-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(241, 245, 249, 0.96);
+}
+
+.entry-mode-button {
+  min-width: 128px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.entry-mode-button.active {
+  background: #ffffff;
+  color: #007aff;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
 }
 
 .entry-modal-empty {

@@ -107,7 +107,7 @@
             @click="openEntryModal"
             :disabled="!userStore.isAuthenticated"
           >
-            添加數據
+            {{ t('map.customTab.buttons.addData') }}
           </button>
         </div>
       </div>

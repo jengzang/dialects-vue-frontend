@@ -108,6 +108,7 @@
       "running": "查询中...",
       "addSingle": "逐条新增",
       "addBatch": "批量新增",
+      "addData": "添加数据",
       "help": "说明"
     },
     "divider": "新增自定义数据",

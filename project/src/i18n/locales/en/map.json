@@ -108,6 +108,7 @@
       "running": "Running...",
       "addSingle": "Add One",
       "addBatch": "Batch Add",
+      "addData": "Add Data",
       "help": "Help"
     },
     "divider": "Add New Custom Data",
