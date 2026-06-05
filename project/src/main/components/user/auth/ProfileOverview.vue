@@ -29,11 +29,14 @@
           <div class="profile-avatar">
             {{ user.username ? user.username.substring(0, 2).toUpperCase() : '👤' }}
           </div>
-          <div class="profile-username">{{ user.username }}</div>
-          <div
-            class="user-info-badge"
-            v-html="$t('auth.profile.userNumber', { id: user.id })"
-          ></div>
+          <div class="profile-user-meta">
+            <div class="profile-username">{{ user.username }}</div>
+            <div class="profile-email" v-if="user.email">✉️ {{ user.email }}</div>
+            <div
+              class="user-info-badge"
+              v-html="$t('auth.profile.userNumber', { id: user.id })"
+            ></div>
+          </div>
         </div>
 
         <!-- Info Grid -->
@@ -567,8 +570,8 @@ const tabs = computed(() => [
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 24px;
-  padding: 30px 24px;
-  margin: 20px auto;
+  padding: 20px 24px;
+  margin: 16px auto;
   max-width: 600px;
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
@@ -589,48 +592,76 @@ const tabs = computed(() => [
 
 .profile-avatar-wrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  margin-bottom: 24px;
+  gap: 20px;
+  margin-bottom: 20px;
+  justify-content: center;
 }
 
 .profile-avatar {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 700;
   color: white;
-  margin-bottom: 12px;
   background: linear-gradient(135deg, #007aff, #00c6ff);
   box-shadow:
-    0 8px 20px rgba(0, 122, 255, 0.25),
-    inset 0 0 12px rgba(255, 255, 255, 0.2);
-  border: 2px solid white;
+    0 6px 16px rgba(0, 122, 255, 0.2),
+    inset 0 0 8px rgba(255, 255, 255, 0.2);
+  border: 1.5px solid white;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .profile-avatar-wrapper:hover .profile-avatar {
-  transform: scale(1.08) rotate(5deg);
-  box-shadow: 0 12px 24px rgba(0, 122, 255, 0.35);
+  transform: scale(1.06) rotate(3deg);
+  box-shadow: 0 8px 18px rgba(0, 122, 255, 0.3);
+}
+
+.profile-user-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
 }
 
 .profile-username {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: #1d1d1f;
-  margin-bottom: 6px;
+  margin-bottom: 2px;
   letter-spacing: -0.02em;
+}
+
+.profile-email {
+  font-size: 13.5px;
+  color: #707077;
+  font-weight: 500;
+  margin-bottom: 3px;
+  letter-spacing: -0.01em;
+}
+
+.profile-user-meta .user-info-badge {
+  font-size: 13px;
+  font-weight: 600;
+  color: #86868b;
+  margin-bottom: 0px;
+  letter-spacing: -0.01em;
+}
+
+.profile-user-meta .user-info-badge :deep(.user-number) {
+  font-size: 14px;
 }
 
 /* Info Metrics Grid */
 .info-metrics-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 12px;
 }
 
 @media (max-width: 576px) {
@@ -642,8 +673,8 @@ const tabs = computed(() => [
 .metric-item {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px 20px;
+  gap: 12px;
+  padding: 12px 16px;
   background: rgba(255, 255, 255, 0.85);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
   border-radius: 18px;
@@ -663,7 +694,7 @@ const tabs = computed(() => [
 }
 
 .metric-icon {
-  font-size: 26px;
+  font-size: 22px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
 }
 
@@ -682,7 +713,7 @@ const tabs = computed(() => [
 }
 
 .metric-value {
-  font-size: 15px;
+  font-size: 14px;
   color: #1d1d1f;
   font-weight: 700;
   margin-top: 3px;
