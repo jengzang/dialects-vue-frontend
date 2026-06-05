@@ -288,15 +288,15 @@ const avatarStyle = computed(() => {
     styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, ${avatarConfig.value.gradientFrom}, ${avatarConfig.value.gradientTo})`;
   } else if (avatarConfig.value.bgType === 'glass') {
     const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 255, g: 255, b: 255 };
+    // Frosted glass uses a fixed 145deg opacity-only gradient (same tint color, varying opacity) matching the logo-container
+    styles.background = `linear-gradient(145deg, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2), rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1))`;
     if (avatarConfig.value.bgColor === '#ffffff') {
       // Exact style match to top-right logo-container
-      styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))`;
       styles.backdropFilter = 'blur(15px) saturate(150%)';
       styles.webkitBackdropFilter = 'blur(15px) saturate(150%)';
       styles.border = '3px solid rgba(255, 255, 255, 0.4)';
     } else {
       // Custom colored frosted glass tint
-      styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35), rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15))`;
       styles.backdropFilter = 'blur(16px) saturate(160%)';
       styles.webkitBackdropFilter = 'blur(16px) saturate(160%)';
       styles.border = '2.5px solid rgba(255, 255, 255, 0.5)';
