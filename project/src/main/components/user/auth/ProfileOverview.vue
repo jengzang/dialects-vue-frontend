@@ -55,7 +55,11 @@
               <span class="metric-value">{{ formatOnlineTime(user.total_online_seconds) }}</span>
             </div>
           </div>
-          <div class="metric-item highlightable">
+        </div>
+
+        <!-- Custom Row (Always side-by-side, clickable) -->
+        <div class="info-custom-row">
+          <div class="metric-item highlightable clickable" @click="$emit('goToUserRegions')">
             <div class="metric-icon">🗂️</div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.regionsLabel') }}</span>
@@ -64,7 +68,7 @@
               </span>
             </div>
           </div>
-          <div class="metric-item highlightable">
+          <div class="metric-item highlightable clickable" @click="$emit('goToUserData')">
             <div class="metric-icon">📊</div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.dataLabel') }}</span>
@@ -664,10 +668,22 @@ const tabs = computed(() => [
   gap: 12px;
 }
 
+.info-custom-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
 @media (max-width: 576px) {
   .info-metrics-grid {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  .info-custom-row {
+    gap: 8px;
+    margin-top: 8px;
   }
 
   .metric-item {
@@ -711,6 +727,22 @@ const tabs = computed(() => [
     0 8px 24px rgba(0, 0, 0, 0.05),
     inset 0 0 0 1.5px rgba(0, 122, 255, 0.2);
   border-color: rgba(0, 122, 255, 0.3);
+}
+
+.metric-item.clickable {
+  cursor: pointer;
+}
+
+.metric-item.clickable:hover {
+  background: rgba(0, 122, 255, 0.04);
+  border-color: rgba(0, 122, 255, 0.4);
+  box-shadow:
+    0 8px 24px rgba(0, 122, 255, 0.08),
+    inset 0 0 0 1.5px rgba(0, 122, 255, 0.25);
+}
+
+.metric-item.clickable:active {
+  transform: translateY(0) scale(0.97);
 }
 
 .metric-icon {
