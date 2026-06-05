@@ -2,6 +2,7 @@
   <section class="feature-card-list">
     <div class="feature-card-toolbar">
       <div class="feature-card-heading">
+        <input v-model="keyword" class="feature-card-search" type="text" :placeholder="t('customEntry.featureList.searchPlaceholder')" />
         <h4 class="feature-card-title">{{ t('customEntry.featureList.title') }}</h4>
         <p class="feature-card-description">{{ t('customEntry.featureList.description') }}</p>
       </div>
@@ -24,14 +25,14 @@
       <button class="main-glass-button" type="button" @click="$emit('retry')">{{ t('customEntry.featureList.retry') }}</button>
     </div>
 
-    <div v-else-if="items.length === 0" class="feature-list-state">
+    <div v-else-if="filteredItems.length === 0" class="feature-list-state">
       <div class="feature-list-state-title">{{ t('customEntry.featureList.emptyTitle') }}</div>
       <p class="feature-list-state-text">{{ t('customEntry.featureList.emptyText') }}</p>
     </div>
 
     <div v-else class="feature-grid">
       <button
-        v-for="item in items"
+        v-for="item in filteredItems"
         :key="item.feature_key || `${item['特徵'] || ''}-${item['聲韻調'] || ''}`"
         class="feature-card"
         type="button"
@@ -46,11 +47,13 @@
 </template>
 
 <script setup>
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+const keyword = ref('')
 
-defineProps({
+const props = defineProps({
   items: {
     type: Array,
     default: () => []
@@ -66,6 +69,16 @@ defineProps({
 })
 
 defineEmits(['select', 'create', 'retry'])
+
+const filteredItems = computed(() => {
+  const query = keyword.value.trim().toLowerCase()
+  if (!query) return props.items
+  return props.items.filter((item) => {
+    const feature = String(item['特徵'] || item.feature || '').toLowerCase()
+    const phonology = String(item['聲韻調'] || item.phonology || '').toLowerCase()
+    return feature.includes(query) || phonology.includes(query)
+  })
+})
 
 function resolveToneType(item) {
   const value = item?.['聲韻調'] || item?.phonology || ''

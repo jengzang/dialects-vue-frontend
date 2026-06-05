@@ -15,7 +15,12 @@
         <div class="point-base-fields">
           <label class="point-field">
             <span class="point-field-label">{{ t('customEntry.pointDetail.labels.location') }}</span>
-            <input v-model="location" class="point-field-input" type="text" :placeholder="t('customEntry.pointDetail.placeholders.location')" />
+            <input v-model="location" class="point-field-input" type="text" :placeholder="t('customEntry.pointDetail.placeholders.location')" @input="handleLocationInput" @blur="hideSuggestions" />
+            <div v-if="showPointSuggestions && pointSuggestions.length > 0" class="point-suggestions-box">
+              <button v-for="item in pointSuggestions" :key="item" class="point-suggestion-item" type="button" @mousedown.prevent="selectSuggestion(item)">
+                {{ item }}
+              </button>
+            </div>
           </label>
           <label class="point-field">
             <span class="point-field-label">{{ t('customEntry.pointDetail.labels.region') }}</span>
@@ -76,6 +81,8 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { batchMatch, getRegions } from '@/api'
+import { showWarning } from '@/utils/message.js'
 import { useI18n } from 'vue-i18n'
 import { batchCreateCustomData, batchDeleteCustomData, editCustomData, getDataByPoint } from '@/api'
 import { userStore } from '@/main/store/store.js'
@@ -98,6 +105,9 @@ const coord = ref(null)
 const rows = ref([])
 const removedIds = ref([])
 const saveMessage = ref('')
+const pointSuggestions = ref([])
+const showPointSuggestions = ref(false)
+let locationDebounceTimer = null
 let rowSeed = 0
 
 const isCreateMode = computed(() => !props.point)
@@ -132,6 +142,46 @@ function parseCoordText(text) {
   const lat = Number(String(latText).trim())
   if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null
   return [lng, lat]
+}
+
+function handleLocationInput() {
+  if (!isCreateMode.value) return
+  showPointSuggestions.value = false
+  clearTimeout(locationDebounceTimer)
+  locationDebounceTimer = setTimeout(async () => {
+    const query = location.value.trim()
+    if (!query) {
+      pointSuggestions.value = []
+      return
+    }
+    try {
+      const response = await batchMatch(query, false)
+      if (response && response.length > 0) {
+        const items = response[0].items || []
+        pointSuggestions.value = Array.from(new Set(items)).filter((item) => item !== query)
+        showPointSuggestions.value = pointSuggestions.value.length > 0
+      }
+    } catch (error) {
+      pointSuggestions.value = []
+    }
+  }, 250)
+}
+
+async function selectSuggestion(item) {
+  location.value = item
+  showPointSuggestions.value = false
+  try {
+    const response = await getRegions(item)
+    if (response && response['音典分區']) {
+      region.value = response['音典分區']
+    }
+  } catch (error) {}
+}
+
+function hideSuggestions() {
+  setTimeout(() => {
+    showPointSuggestions.value = false
+  }, 150)
 }
 
 function rowChanged(row) {
@@ -214,6 +264,18 @@ async function handleSave() {
   }
 
   const validRows = rows.value.filter((row) => row.特徵.trim() && row.值.trim())
+  const duplicateKeys = new Set()
+  let hasDuplicate = false
+  validRows.forEach((row) => {
+    const key = `${row.聲韻調.trim()}||${row.特徵.trim()}`
+    if (duplicateKeys.has(key)) hasDuplicate = true
+    duplicateKeys.add(key)
+  })
+  if (hasDuplicate) {
+    showWarning(t('customEntry.pointDetail.rows.duplicateWarning'))
+    const confirmed = globalThis?.window?.confirm?.(t('customEntry.pointDetail.messages.confirmContinue'))
+    if (confirmed === false) return
+  }
   if (validRows.length === 0 && removedIds.value.length === 0) {
     saveMessage.value = t('customEntry.pointDetail.messages.rowRequired')
     return

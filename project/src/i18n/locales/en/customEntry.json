@@ -12,6 +12,7 @@
   "pointList": {
     "title": "Extend one dialect point",
     "description": "Choose an existing dialect point, or create a new one to start adding data.",
+    "searchPlaceholder": "Search by short name or region",
     "create": "+ Add dialect point",
     "loadFailed": "Failed to load dialect points",
     "retry": "Retry",
@@ -44,6 +45,7 @@
       "title": "Feature records",
       "description": "Each row represents one custom record ready to submit.",
       "add": "+ Add another row",
+      "duplicateWarning": "A record with the same phonology and feature already exists for this point. Continue saving?",
       "headers": {
         "phonology": "Phonology",
         "feature": "Feature",
@@ -69,6 +71,7 @@
       "locationRegionRequired": "Please fill in the dialect point name and region first",
       "coordRequired": "Please choose coordinates on the map first",
       "rowRequired": "Please fill in at least one feature and value",
+      "confirmContinue": "Continue saving",
       "noChanges": "There are no changes to submit",
       "partialFailed": "{count} items failed to save, please retry",
       "saveSuccess": "Saved successfully"
@@ -77,6 +80,7 @@
   "featureList": {
     "title": "Build a feature distribution",
     "description": "Choose a feature first, then gradually add dialect points to form a mappable feature distribution.",
+    "searchPlaceholder": "Search by feature or phonology",
     "create": "+ Add feature",
     "loadFailed": "Failed to load feature list",
     "retry": "Retry",
@@ -106,6 +110,7 @@
       "edit": "Edit",
       "delete": "Delete"
     },
+    "confirmDelete": "Delete this location record?",
     "mapTitle": "Current feature distribution",
     "mapHint": "Feature distribution preview",
     "unnamed": "Unnamed feature",
@@ -139,7 +144,8 @@
       "locationRegionRequired": "Please fill in the location and region first",
       "coordRequired": "Please choose coordinates first",
       "valueRequired": "Please fill in the value first",
-      "featureRequired": "The current feature is empty. Please go back and select it again"
+      "featureRequired": "The current feature is empty. Please go back and select it again",
+      "duplicateLocation": "A record with the same location and region already exists under this feature. Continue saving?"
     }
   },
   "miniMap": {

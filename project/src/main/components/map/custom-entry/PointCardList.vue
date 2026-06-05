@@ -2,6 +2,7 @@
   <section class="point-card-list">
     <div class="point-card-toolbar">
       <div class="point-card-heading">
+        <input v-model="keyword" class="point-card-search" type="text" :placeholder="t('customEntry.pointList.searchPlaceholder')" />
         <h4 class="point-card-title">{{ t('customEntry.pointList.title') }}</h4>
         <p class="point-card-description">{{ t('customEntry.pointList.description') }}</p>
       </div>
@@ -24,14 +25,14 @@
       <button class="main-glass-button" type="button" @click="$emit('retry')">{{ t('customEntry.pointList.retry') }}</button>
     </div>
 
-    <div v-else-if="items.length === 0" class="point-list-state">
+    <div v-else-if="filteredItems.length === 0" class="point-list-state">
       <div class="point-list-state-title">{{ t('customEntry.pointList.emptyTitle') }}</div>
       <p class="point-list-state-text">{{ t('customEntry.pointList.emptyText') }}</p>
     </div>
 
     <div v-else class="point-grid">
       <button
-        v-for="item in items"
+        v-for="item in filteredItems"
         :key="item.point_key || `${item['簡稱'] || ''}-${item['音典分區'] || ''}`"
         class="point-card"
         type="button"
@@ -46,11 +47,13 @@
 </template>
 
 <script setup>
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+const keyword = ref('')
 
-defineProps({
+const props = defineProps({
   items: {
     type: Array,
     default: () => []
@@ -66,6 +69,16 @@ defineProps({
 })
 
 defineEmits(['select', 'create', 'retry'])
+
+const filteredItems = computed(() => {
+  const query = keyword.value.trim().toLowerCase()
+  if (!query) return props.items
+  return props.items.filter((item) => {
+    const location = String(item['簡稱'] || item.location || '').toLowerCase()
+    const region = String(item['音典分區'] || item.region || '').toLowerCase()
+    return location.includes(query) || region.includes(query)
+  })
+})
 </script>
 
 <style scoped lang="scss">

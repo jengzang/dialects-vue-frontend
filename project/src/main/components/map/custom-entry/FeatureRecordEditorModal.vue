@@ -18,7 +18,12 @@
       <div class="feature-record-grid">
         <label class="feature-record-field">
           <span>{{ t('customEntry.featureRecord.labels.location') }}</span>
-          <input v-model="location" class="feature-record-input" type="text" :placeholder="t('customEntry.featureRecord.placeholders.location')" />
+          <input v-model="location" class="feature-record-input" type="text" :placeholder="t('customEntry.featureRecord.placeholders.location')" @input="handleLocationInput" @blur="hideSuggestions" />
+          <div v-if="showSuggestions && suggestions.length > 0" class="feature-suggestions-box">
+            <button v-for="item in suggestions" :key="item" class="feature-suggestion-item" type="button" @mousedown.prevent="selectSuggestion(item)">
+              {{ item }}
+            </button>
+          </div>
         </label>
         <label class="feature-record-field">
           <span>{{ t('customEntry.featureRecord.labels.region') }}</span>
@@ -55,9 +60,11 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { batchMatch, getRegions } from '@/api'
+import { showWarning } from '@/utils/message.js'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
-import { batchCreateCustomData, editCustomData } from '@/api'
+import { batchCreateCustomData, editCustomData, getDataByFeature } from '@/api'
 import { userStore } from '@/main/store/store.js'
 import { formatCoord } from '@/utils/map/formatCoord.js'
 import MiniMapSelector from './MiniMapSelector.vue'
@@ -86,6 +93,9 @@ const coord = ref(null)
 const valueField = ref('')
 const noteField = ref('')
 const message = ref('')
+const suggestions = ref([])
+const showSuggestions = ref(false)
+let debounceTimer = null
 
 const isCreateMode = computed(() => !props.record?.created_at)
 const coordText = computed(() => (Array.isArray(coord.value) ? formatCoord(coord.value[0], coord.value[1]) : ''))
@@ -99,6 +109,45 @@ function parseCoordText(text) {
   return [lng, lat]
 }
 
+function handleLocationInput() {
+  showSuggestions.value = false
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(async () => {
+    const query = location.value.trim()
+    if (!query) {
+      suggestions.value = []
+      return
+    }
+    try {
+      const response = await batchMatch(query, false)
+      if (response && response.length > 0) {
+        const items = response[0].items || []
+        suggestions.value = Array.from(new Set(items)).filter((item) => item !== query)
+        showSuggestions.value = suggestions.value.length > 0
+      }
+    } catch (error) {
+      suggestions.value = []
+    }
+  }, 250)
+}
+
+async function selectSuggestion(item) {
+  location.value = item
+  showSuggestions.value = false
+  try {
+    const response = await getRegions(item)
+    if (response && response['音典分區']) {
+      region.value = response['音典分區']
+    }
+  } catch (error) {}
+}
+
+function hideSuggestions() {
+  setTimeout(() => {
+    showSuggestions.value = false
+  }, 150)
+}
+
 function syncFromProps() {
   const record = props.record || {}
   location.value = record['簡稱'] || ''
@@ -107,6 +156,22 @@ function syncFromProps() {
   valueField.value = record['值'] || ''
   noteField.value = record['說明'] || ''
   message.value = ''
+}
+
+async function checkDuplicateLocation() {
+  const featureName = props.feature?.['特徵'] || props.feature?.feature || ''
+  const phonology = props.feature?.['聲韻調'] || props.feature?.phonology || ''
+  if (!featureName || !phonology || !location.value.trim() || !region.value.trim()) return false
+  try {
+    const response = await getDataByFeature(featureName, phonology)
+    const records = Array.isArray(response?.data) ? response.data : []
+    return records.some((item) => {
+      if (props.record?.created_at && item.created_at === props.record.created_at) return false
+      return (item['簡稱'] || '') === location.value.trim() && (item['音典分區'] || '') === region.value.trim()
+    })
+  } catch (error) {
+    return false
+  }
 }
 
 function closeModal() {
@@ -149,6 +214,13 @@ async function handleSave() {
   if (!payload.特徵) {
     message.value = t('customEntry.featureRecord.messages.featureRequired')
     return
+  }
+
+  const duplicateExists = await checkDuplicateLocation()
+  if (duplicateExists) {
+    showWarning(t('customEntry.featureRecord.messages.duplicateLocation'))
+    const confirmed = globalThis?.window?.confirm?.(t('customEntry.featureRecord.messages.duplicateLocation'))
+    if (confirmed === false) return
   }
 
   if (props.record?.created_at) {

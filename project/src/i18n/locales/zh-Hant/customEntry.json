@@ -12,6 +12,7 @@
   "pointList": {
     "title": "補充單點資料",
     "description": "先選擇一個已有方言點，或新增一個新方言點開始補充資料。",
+    "searchPlaceholder": "搜尋簡稱或分區",
     "create": "+ 新增方言點",
     "loadFailed": "載入方言點失敗",
     "retry": "重試",
@@ -44,6 +45,7 @@
       "title": "特徵記錄",
       "description": "每一行代表一條可提交的自定義資料。",
       "add": "+ 再添加一條",
+      "duplicateWarning": "同一點下已存在相同的聲韻調與特徵，確認繼續保存嗎？",
       "headers": {
         "phonology": "聲韻調",
         "feature": "特徵",
@@ -69,6 +71,7 @@
       "locationRegionRequired": "請先填寫方言點名稱與分區",
       "coordRequired": "請先在地圖上選取坐標",
       "rowRequired": "請至少填寫一條特徵與值",
+      "confirmContinue": "繼續保存",
       "noChanges": "當前沒有需要提交的變更",
       "partialFailed": "保存時有 {count} 項失敗，請重試",
       "saveSuccess": "保存成功"
@@ -77,6 +80,7 @@
   "featureList": {
     "title": "製作特徵分布",
     "description": "先選擇一個特徵，再逐步把不同方言點補入，形成可上圖的特徵分布資料。",
+    "searchPlaceholder": "搜尋特徵或聲韻調",
     "create": "+ 新增特徵",
     "loadFailed": "載入特徵列表失敗",
     "retry": "重試",
@@ -106,6 +110,7 @@
       "edit": "編輯",
       "delete": "刪除"
     },
+    "confirmDelete": "確認刪除這條地點記錄嗎？",
     "mapTitle": "當前特徵點位分布",
     "mapHint": "特徵分布預覽",
     "unnamed": "未命名特徵",
@@ -139,7 +144,8 @@
       "locationRegionRequired": "請先填寫地點與分區",
       "coordRequired": "請先選取坐標",
       "valueRequired": "請先填寫值",
-      "featureRequired": "當前特徵為空，請返回上一層重新選擇"
+      "featureRequired": "當前特徵為空，請返回上一層重新選擇",
+      "duplicateLocation": "該特徵下已存在相同地點與分區記錄，確認繼續保存嗎？"
     }
   },
   "miniMap": {

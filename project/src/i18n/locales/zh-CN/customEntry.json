@@ -12,6 +12,7 @@
   "pointList": {
     "title": "补充单点资料",
     "description": "先选择一个已有方言点，或新增一个新方言点开始补充资料。",
+    "searchPlaceholder": "搜索简称或分区",
     "create": "+ 新增方言点",
     "loadFailed": "加载方言点失败",
     "retry": "重试",
@@ -44,6 +45,7 @@
       "title": "特征记录",
       "description": "每一行代表一条可提交的自定义资料。",
       "add": "+ 再添加一条",
+      "duplicateWarning": "同一点下已存在相同的声韵调与特征，确认继续保存吗？",
       "headers": {
         "phonology": "声韵调",
         "feature": "特征",
@@ -69,6 +71,7 @@
       "locationRegionRequired": "请先填写方言点名称与分区",
       "coordRequired": "请先在地图上选取坐标",
       "rowRequired": "请至少填写一条特征与值",
+      "confirmContinue": "继续保存",
       "noChanges": "当前没有需要提交的变更",
       "partialFailed": "保存时有 {count} 项失败，请重试",
       "saveSuccess": "保存成功"
@@ -77,6 +80,7 @@
   "featureList": {
     "title": "制作特征分布",
     "description": "先选择一个特征，再逐步把不同方言点补入，形成可上图的特征分布资料。",
+    "searchPlaceholder": "搜索特征或声韵调",
     "create": "+ 新增特征",
     "loadFailed": "加载特征列表失败",
     "retry": "重试",
@@ -106,6 +110,7 @@
       "edit": "编辑",
       "delete": "删除"
     },
+    "confirmDelete": "确认删除这条地点记录吗？",
     "mapTitle": "当前特征点位分布",
     "mapHint": "特征分布预览",
     "unnamed": "未命名特征",
@@ -139,7 +144,8 @@
       "locationRegionRequired": "请先填写地点与分区",
       "coordRequired": "请先选取坐标",
       "valueRequired": "请先填写值",
-      "featureRequired": "当前特征为空，请返回上一层重新选择"
+      "featureRequired": "当前特征为空，请返回上一层重新选择",
+      "duplicateLocation": "该特征下已存在相同地点与分区记录，确认继续保存吗？"
     }
   },
   "miniMap": {

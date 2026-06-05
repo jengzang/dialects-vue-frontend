@@ -138,6 +138,8 @@ const openEditModal = (row) => {
 
 const handleDelete = async (row) => {
   if (!row?.created_at) return
+  const confirmed = globalThis?.window?.confirm?.(t('customEntry.featureDetail.confirmDelete'))
+  if (confirmed === false) return
   await batchDeleteCustomData([row.created_at])
   rows.value = rows.value.filter((item) => item.created_at !== row.created_at)
   emit('saved')
