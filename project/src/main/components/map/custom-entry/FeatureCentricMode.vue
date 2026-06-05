@@ -9,31 +9,26 @@
       @create="handleCreateFeature"
       @retry="loadFeatures"
     />
-    <div v-else class="feature-mode-placeholder main-glass-panel-inner">
-      <button class="main-glass-button" type="button" @click="handleBack">← 返回</button>
-      <div class="feature-mode-placeholder-title">{{ selectedFeatureTitle }}</div>
-      <p class="feature-mode-placeholder-text">本步先完成特徵卡片列表，下一步接入特徵詳情表格與分布點位編輯。</p>
-    </div>
+    <FeatureDetailTable
+      v-else
+      :feature="selectedFeature"
+      @back="handleBack"
+      @saved="handleSaved"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { getUserFeatures } from '@/api'
 import FeatureCardList from './FeatureCardList.vue'
+import FeatureDetailTable from './FeatureDetailTable.vue'
 
 const loading = ref(false)
 const errorMessage = ref('')
 const featureItems = ref([])
 const view = ref('list')
 const selectedFeature = ref(null)
-
-const selectedFeatureTitle = computed(() => {
-  if (!selectedFeature.value) return '特徵詳情'
-  const feature = selectedFeature.value['特徵'] || selectedFeature.value.feature || '未命名特徵'
-  const phonology = selectedFeature.value['聲韻調'] || selectedFeature.value.phonology || '未分類'
-  return `${feature}（${phonology}）`
-})
 
 const loadFeatures = async () => {
   loading.value = true
@@ -68,6 +63,10 @@ const handleBack = () => {
   view.value = 'list'
 }
 
+const handleSaved = async () => {
+  await loadFeatures()
+}
+
 onMounted(() => {
   loadFeatures()
 })
@@ -78,27 +77,5 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.feature-mode-placeholder {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 28px 24px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.82);
-}
-
-.feature-mode-placeholder-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.feature-mode-placeholder-text {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.8;
-  color: #64748b;
 }
 </style>
