@@ -285,9 +285,9 @@
         class="page tab5-page"
       >
         <div class="page-content-stack">
-          <div class="tone-tip">
+          <!-- <div class="tone-tip">
             {{ $t('compare.messages.tab5Hint') }}
-          </div>
+          </div> -->
           <div class="compare-group tab5-location-group">
             <LocationMultiInput
               v-model="tabStates.tab5.locations"

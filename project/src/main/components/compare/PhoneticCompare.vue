@@ -256,54 +256,7 @@ const renderSankey = async (queryLocs) => {
   const option = {
     animation: false,
     tooltip: {
-      trigger: 'item',
-      triggerOn: 'mousemove',
-      confine: true,
-      formatter: (params) => {
-        if (params.dataType === 'edge') {
-          const sourceNode = nodeMap.get(params.data.source)
-          const targetNode = nodeMap.get(params.data.target)
-          const charIndices = params.data.charIndices || []
-          const displayChars = charIndices.slice(0, 15).map(idx => charsMap[idx])
-          const remaining = charIndices.length - displayChars.length
-
-          return `
-            <div style="padding: 6px; font-size: 13px; font-family: sans-serif; line-height: 1.6;">
-              <div style="font-weight: bold; margin-bottom: 4px; color: #007aff;">
-                ${sourceNode.layer} (${sourceNode.rawLabel}) &rarr; ${targetNode.layer} (${targetNode.rawLabel})
-              </div>
-              <div style="border-top: 1px solid #eee; margin: 4px 0; padding-top: 4px;">
-                共 <strong>${charIndices.length}</strong> 字
-              </div>
-              <div style="color: #666; margin-top: 4px; max-width: 250px; white-space: normal;">
-                字：${displayChars.join('、')}${remaining > 0 ? ` ...等（共${charIndices.length}字，点击查看全部）` : ''}
-              </div>
-            </div>
-          `
-        }
-
-        const node = nodeMap.get(params.data.name)
-        const featureData = raw.data[node.layer]?.[activeFeature.value]?.[node.rawLabel] || {}
-        const charIndices = featureData.char_indices || []
-        const displayChars = charIndices.slice(0, 15).map(idx => charsMap[idx])
-        const remaining = charIndices.length - displayChars.length
-
-        return `
-          <div style="padding: 6px; font-size: 13px; font-family: sans-serif; line-height: 1.6;">
-            <div style="font-weight: bold; margin-bottom: 4px; color: #333;">
-              地点：${node.layer} <br/>
-              音值：<strong style="color: #007aff;">${node.rawLabel}</strong>
-            </div>
-            <div style="border-top: 1px solid #eee; margin: 4px 0; padding-top: 4px;">
-              字数：<strong>${featureData.count || charIndices.length}</strong> <br/>
-              占比：<strong>${((featureData.ratio || 0) * 100).toFixed(2)}%</strong>
-            </div>
-            <div style="color: #666; margin-top: 4px; max-width: 250px; white-space: normal;">
-              字：${displayChars.join('、')}${remaining > 0 ? ` ...等（共${charIndices.length}字，点击查看全部）` : ''}
-            </div>
-          </div>
-        `
-      }
+      show: false
     },
     series: [{
       type: 'sankey',
