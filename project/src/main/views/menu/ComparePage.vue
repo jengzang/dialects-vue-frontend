@@ -2193,9 +2193,22 @@ export default {
 .tone-checkbox-blue span {
   color: #1565C0;
 }
+/* Tab5 音值比較 地點輸入容器 */
+.tab5-location-group {
+  width: 100%;
+  max-width: 520px;
+  text-align: left;
+}
+
+.tab5-page {
+  flex-direction: column;
+  max-height: none;
+  align-items: center;
+  width:93dvw;
+}
 
 /* 移動端適配 */
-@media (max-width: 600px) {
+@media (max-aspect-ratio:1/1) {
   .vs-badge {
     padding: 0.5rem 1rem;
     font-size: 1rem;
@@ -2224,20 +2237,9 @@ export default {
   .tab1-layout{
     gap:1px;
   }
-}
-
-
-/* Tab5 音值比較 地點輸入容器 */
-.tab5-location-group {
-  width: 100%;
-  max-width: 520px;
-  text-align: left;
-}
-
-.tab5-page {
-  flex-direction: column;
-  max-height: none;
-  align-items: center;
+  .tab5-page {
+    width: 86dvw!important;;
+  }
 }
 
 </style>

@@ -53,7 +53,10 @@
         <div
           v-if="selectedDetail"
           class="sankey-detail-card"
-          :class="{ 'is-desktop-card': !isMobileLayout }"
+          :class="{
+            'is-desktop-card': !isMobileLayout,
+            'is-hover-preview': !isMobileLayout && !isCardPinned
+          }"
         >
           <div class="detail-card-header">
             <div class="detail-card-meta">
@@ -156,11 +159,13 @@ const clearChart = () => {
   }
 }
 
-// 请求接口数据
+const waitForFrame = () => new Promise(resolve => requestAnimationFrame(resolve))
+
 const handleQuery = async (queryLocs) => {
   isLoading.value = true
   errorMessage.value = ''
   rawData.value = null
+  clearChart()
   closeDetailCard()
   setRunning('compare', true)
 
@@ -176,20 +181,28 @@ const handleQuery = async (queryLocs) => {
       throw new Error('接口返回数据无效')
     }
 
-    // 过滤出真正含有音值数据的有效地点
     const validLocs = queryLocs.filter(loc => response.data[loc])
     if (validLocs.length < 2) {
       throw new Error('所选地点中含有有效音值数据的地点不足 2 个，无法进行比较！')
     }
 
     rawData.value = response
+
+    // 关键：先让 loading 结束，使图表容器进入 DOM
+    isLoading.value = false
+
+    // 等 Vue 更新 DOM
     await nextTick()
+
+    // 再等一帧，确保浏览器完成布局计算，ECharts 能拿到真实宽高
+    await waitForFrame()
+
     await renderSankey(queryLocs)
   } catch (error) {
     console.error('Phonetic comparison query failed:', error)
     errorMessage.value = error.message || '查询失败，请重试！'
-  } finally {
     isLoading.value = false
+  } finally {
     setRunning('compare', false)
   }
 }
@@ -197,7 +210,12 @@ const handleQuery = async (queryLocs) => {
 // 渲染桑基图
 const renderSankey = async (queryLocs) => {
   clearChart()
-  if (!sankeyContainerRef.value || !rawData.value) return
+  await nextTick()
+
+  const el = sankeyContainerRef.value
+
+  if (!el || !rawData.value) return
+  if (el.clientWidth === 0 || el.clientHeight === 0) return
 
   const raw = rawData.value
   const charsMap = raw.chars_map || []
@@ -205,7 +223,7 @@ const renderSankey = async (queryLocs) => {
 
   if (validLocs.length < 2) return
 
-  chartInstance.value = echarts.init(sankeyContainerRef.value)
+  chartInstance.value = echarts.init(el)
 
   const nodeMap = new Map()
   const links = []
@@ -297,6 +315,11 @@ const renderSankey = async (queryLocs) => {
   }
 
   chartInstance.value.setOption(option)
+
+  await nextTick()
+  requestAnimationFrame(() => {
+    chartInstance.value?.resize()
+  })
 
   // 绑定点击详情卡片
   chartInstance.value.on('click', (params) => {
@@ -521,9 +544,9 @@ onUnmounted(() => {
   }
 
   /* 当 Hover 预览未钉住且不是移动端时，允许穿透点击图表 */
-  &.is-desktop-card:not(:has(.detail-card-close:visible)) {
-    pointer-events: none;
-  }
+    &.is-hover-preview {
+      pointer-events: none;
+    }
 }
 
 .detail-card-header {
