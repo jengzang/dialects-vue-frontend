@@ -282,7 +282,7 @@
       <!-- Tab5: 比较音值 -->
       <div
         v-show="currentTab === 'tab5'"
-        class="page"
+        class="page tab5-page"
       >
         <div class="page-content-stack">
           <div class="tone-tip">
@@ -2232,6 +2232,12 @@ export default {
   width: 100%;
   max-width: 520px;
   text-align: left;
+}
+
+.tab5-page {
+  flex-direction: column;
+  max-height: none;
+  align-items: center;
 }
 
 </style>
