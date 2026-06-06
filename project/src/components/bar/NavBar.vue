@@ -39,10 +39,13 @@
           </a>
         </RouterLink>
       </nav>
-      <div class="logo-container" style="color: #005fd3;border-radius: 30px" @click="goToAuthPage">
+      <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
+        <NavAvatar />
+      </div>
+      <div v-else class="logo-container" style="color: #005fd3;border-radius: 30px" @click="goToAuthPage">
         <!-- 显示用户名或"登录" -->
         <span class="login-text">
-          {{ userStore.username || t('navigation.login') }}
+          {{ t('navigation.login') }}
         </span>
       </div>
     </div>
@@ -180,10 +183,13 @@
             <img src="../../assets/picture/title.png" alt="Title" />
           </div>
         </div>
-        <div class="logo-container" style="color: #005fd3; border-radius: 30px;height: 5dvh" @click="goToAuthPage">
+        <div v-if="userStore.username" class="avatar-container" style="width: 5dvh; height: 5dvh; min-width: 5dvh; max-width: 5dvh; flex: 0 0 5dvh;" @click="goToAuthPage">
+          <NavAvatar />
+        </div>
+        <div v-else class="logo-container" style="color: #005fd3; border-radius: 30px;height: 5dvh" @click="goToAuthPage">
           <!-- 显示用户名或"登录" -->
           <span class="login-text">
-            {{ userStore.username || t('navigation.login') }}
+            {{ t('navigation.login') }}
           </span>
         </div>
       </div>
@@ -242,6 +248,7 @@ import {
 } from '@/main/config/index.js'
 import { WEB_BASE } from '@/env-config.js'
 import { userStore, resultCache } from '@/main/store/store.js'
+import NavAvatar from '@/components/bar/NavAvatar.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -1038,6 +1045,30 @@ white-space: nowrap;
   .submenu-panel {
     /* 在移動設備上確保不會超出螢幕 */
     max-width: calc(100vw - 20px);
+  }
+}
+
+.avatar-container {
+  width: 6dvh;
+  min-width: 6dvh;
+  max-width: 6dvh;
+  height: 6dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  flex: 0 0 6dvh;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .avatar-container {
+    width: 5dvh;
+    min-width: 5dvh;
+    max-width: 5dvh;
+    height: 5dvh;
+    flex: 0 0 5dvh;
   }
 }
 </style>

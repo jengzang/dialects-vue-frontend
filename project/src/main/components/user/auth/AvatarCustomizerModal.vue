@@ -310,6 +310,7 @@ const loadAvatarConfig = () => {
 const saveAvatarConfig = () => {
   isSaved = true;
   localStorage.setItem(getLocalStorageKey(), JSON.stringify(avatarConfig.value));
+  window.dispatchEvent(new CustomEvent('avatar-changed', { detail: { userId: props.user?.id } }));
   emit('saved');
   isModalOpen.value = false;
 };
