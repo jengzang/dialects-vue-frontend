@@ -1049,6 +1049,7 @@ white-space: nowrap;
 }
 
 .avatar-container {
+  margin-right: 10px;
   width: calc(6dvh + 16px);
   min-width: calc(6dvh + 16px);
   max-width: calc(6dvh + 16px);

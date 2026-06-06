@@ -242,8 +242,8 @@ const goToAuth = () => {
 .avatar-container {
   position: fixed;
   z-index: 998;
-  width: 6dvh;
-  height: 6dvh;
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -263,8 +263,8 @@ const goToAuth = () => {
 
 @media (max-aspect-ratio: 1/1) {
   .avatar-container {
-    width: 5dvh;
-    height: 5dvh;
+    width: 50px;
+    height: 50px;
   }
 
   .avatar-container.position-top-right,
