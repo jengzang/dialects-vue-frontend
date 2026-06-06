@@ -224,7 +224,10 @@ watch(() => props.coord, (coord) => {
     const nextCoord = normalizeCoord(coord)
     if (nextCoord) {
       placePickedMarker(nextCoord)
-      mapInstance.value.flyTo({ center: nextCoord, zoom: 9.5, duration: 0 })
+      mapInstance.value.easeTo({
+      center: nextCoord,
+      duration: 0
+    })
     }
   } else {
     renderMarkers()
@@ -234,6 +237,9 @@ watch(() => props.coord, (coord) => {
 
 watch(normalizedPoints, () => {
   if (!mapInstance.value) return
+
+  if (props.mode === 'picker') return
+
   renderMarkers()
   fitToMarkers()
 }, { deep: true })
@@ -302,13 +308,15 @@ onBeforeUnmount(() => {
   border-radius: 14px;
 }
 
-.mini-map-pin {
+:deep(.mini-map-pin) {
   width: 16px;
   height: 16px;
   border-radius: 50%;
   background: #007aff;
   border: 3px solid #fff;
-  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.32), 0 8px 16px rgba(0, 122, 255, 0.28);
+  box-shadow:
+    0 0 0 3px rgba(0, 122, 255, 0.25),
+    0 8px 16px rgba(0, 122, 255, 0.28);
 }
 
 .mini-map-point {
