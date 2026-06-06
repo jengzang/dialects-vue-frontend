@@ -244,7 +244,9 @@
 
       <!-- 運行按鈕 -->
       <div class="run-container">
+        <!-- Tab1, Tab2, Tab4 运行按钮 -->
         <button
+            v-if="currentTab !== 'tab5'"
             class="run-btn"
             @click="runAction"
             :disabled="buttonState.isRunning || isRunDisabled"
@@ -252,6 +254,19 @@
         >
           <span v-if="buttonState.isRunning">🔄 {{ $t('compare.button.running') }}</span>
           <span v-else-if="isRunDisabled">🚫 {{ $t('compare.button.invalid') }}</span>
+          <span v-else>🚀 {{ $t('compare.button.startCompare') }}</span>
+        </button>
+
+        <!-- Tab5 独立运行按钮 -->
+        <button
+            v-else
+            class="run-btn"
+            @click="runTab5Action"
+            :disabled="buttonState.isRunning || isTab5RunDisabled"
+            :class="{ disabled: isTab5RunDisabled }"
+        >
+          <span v-if="buttonState.isRunning">🔄 {{ $t('compare.button.running') }}</span>
+          <span v-else-if="isTab5RunDisabled">🚫 {{ $t('compare.button.invalid') }}</span>
           <span v-else>🚀 {{ $t('compare.button.startCompare') }}</span>
         </button>
       </div>
@@ -616,12 +631,12 @@ watch(selectedCharacterTable, (newTable, oldTable) => {
 }, { immediate: true })
 
 // 4️⃣ 最终计算属性：控制按钮是否禁用
-// tab5 使用独立的 LocationMultiInput，不经过 LocationAndRegionInput 的 isLocationDisabled
-const isRunDisabled = computed(() => {
-  if (currentTab.value === 'tab5') {
-    return buttonState.isRunning || uiStore.buttonStates.compare.tabContentDisabled.tab5
-  }
-  return isCompareButtonDisabled.value
+const isRunDisabled = isCompareButtonDisabled
+
+// tab5 独立的按钮禁用逻辑（最多5个地点）
+const isTab5RunDisabled = computed(() => {
+  const locs = tabStates.tab5.locations
+  return !Array.isArray(locs) || locs.length === 0 || locs.length > 5
 })
 
 // 监听 card（聲韻調）变化，自動清空已選列表
@@ -913,6 +928,20 @@ const ZhongguRef = ref(null);
 const ZhongguRef1 = ref(null);  // For tab2 group1
 const ZhongguRef2 = ref(null);  // For tab2 group2
 const ZhongguRefCurrent = ref(null);  // For tab2 current selector
+
+// Tab5 独立的运行逻辑
+const runTab5Action = () => {
+  const locs = tabStates.tab5.locations
+  if (!Array.isArray(locs) || locs.length === 0) {
+    alert('请先输入地点！')
+    return
+  }
+  if (locs.length > 5) {
+    alert('最多只能同时比较 5 个地点！')
+    return
+  }
+  alert(`音值比较功能开发中！已选择的地点：${locs.join(', ')}`)
+}
 
 // 點擊按鈕行為
 const runAction = async () => {
