@@ -1,28 +1,33 @@
 <template>
   <TabsContainer
+    v-slot="{ currentTab }"
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"
     :resolve-route="resolveTabRoute"
-    v-slot="{ currentTab }"
   >
     <div class="tab-content-inner compare-page-root">
       <!-- Tab1: 比較漢字 -->
-      <div v-show="currentTab === 'tab1'" class="page">
+      <div
+        v-show="currentTab === 'tab1'"
+        class="page"
+      >
         <div class="page-content-stack tab1-layout">
           <!-- 組1 輸入 -->
           <div class="compare-group group1-style">
-            <div class="group-label">{{ $t('compare.group.label1') }}</div>
+            <div class="group-label">
+              {{ $t('compare.group.label1') }}
+            </div>
             <div class="query-box">
               <input
-                  class="single-char-input"
-                  type="text"
-                  maxlength="1"
-                  :placeholder="$t('compare.placeholder.enterChar')"
-                  v-model="tabStates.tab1.group1.chars"
-                  @input="handleSingleCharInput('group1')"
-                  autocomplete="off"
-              />
+                v-model="tabStates.tab1.group1.chars"
+                class="single-char-input"
+                type="text"
+                maxlength="1"
+                :placeholder="$t('compare.placeholder.enterChar')"
+                autocomplete="off"
+                @input="handleSingleCharInput('group1')"
+              >
             </div>
           </div>
 
@@ -35,17 +40,19 @@
 
           <!-- 組2 輸入 -->
           <div class="compare-group group2-style">
-            <div class="group-label">{{ $t('compare.group.label2') }}</div>
+            <div class="group-label">
+              {{ $t('compare.group.label2') }}
+            </div>
             <div class="query-box">
               <input
-                  class="single-char-input"
-                  type="text"
-                  maxlength="1"
-                  :placeholder="$t('compare.placeholder.enterChar')"
-                  v-model="tabStates.tab1.group2.chars"
-                  @input="handleSingleCharInput('group2')"
-                  autocomplete="off"
-              />
+                v-model="tabStates.tab1.group2.chars"
+                class="single-char-input"
+                type="text"
+                maxlength="1"
+                :placeholder="$t('compare.placeholder.enterChar')"
+                autocomplete="off"
+                @input="handleSingleCharInput('group2')"
+              >
             </div>
           </div>
 
@@ -54,15 +61,30 @@
             <label class="feature-label">{{ $t('compare.feature.selectLabel') }}</label>
             <div class="feature-checkboxes">
               <label class="checkbox-item">
-                <input type="radio" name="tab1-feature" value="聲母" v-model="tabStates.tab1.features" />
+                <input
+                  v-model="tabStates.tab1.features"
+                  type="radio"
+                  name="tab1-feature"
+                  value="聲母"
+                >
                 <span>{{ $t('compare.feature.initial') }}</span>
               </label>
               <label class="checkbox-item">
-                <input type="radio" name="tab1-feature" value="韻母" v-model="tabStates.tab1.features" />
+                <input
+                  v-model="tabStates.tab1.features"
+                  type="radio"
+                  name="tab1-feature"
+                  value="韻母"
+                >
                 <span>{{ $t('compare.feature.final') }}</span>
               </label>
               <label class="checkbox-item">
-                <input type="radio" name="tab1-feature" value="聲調" v-model="tabStates.tab1.features" />
+                <input
+                  v-model="tabStates.tab1.features"
+                  type="radio"
+                  name="tab1-feature"
+                  value="聲調"
+                >
                 <span>{{ $t('compare.feature.tone') }}</span>
               </label>
             </div>
@@ -71,10 +93,17 @@
       </div>
 
       <!-- Tab2: 比較中古 --  -->
-      <div v-show="currentTab === 'tab2'" class="page" style="max-height: 50dvh;">
+      <div
+        v-show="currentTab === 'tab2'"
+        class="page"
+        style="max-height: 50dvh;"
+      >
         <div class="page-content-stack">
           <!-- 單一中古選擇器 -->
-          <div class="compare-group" style="padding:0;">
+          <div
+            class="compare-group"
+            style="padding:0;"
+          >
             <!-- <div class="group-label">選擇中古音條件</div> -->
             <div class="triple-select-box">
               <!-- 卡片選擇區 -->
@@ -85,11 +114,12 @@
                   :aria-label="$t('compare.group.label1')"
                 />
 
-                <div class="dropdown"
-                     :ref="(el) => excludeFilterTriggerRef.tab2_current = el"
-                     @click="toggleExcludeDropdown('tab2', 'current')"
-                     style="margin: 0;padding: 8px 10px;min-width: 60px;max-height:30px"
-                     :class="{ disabled: buttonState.isRunning }"
+                <div
+                  :ref="(el) => excludeFilterTriggerRef.tab2_current = el"
+                  class="dropdown"
+                  style="margin: 0;padding: 8px 10px;min-width: 60px;max-height:30px"
+                  :class="{ disabled: buttonState.isRunning }"
+                  @click="toggleExcludeDropdown('tab2', 'current')"
                 >
                   {{ getExcludeDisplayText('tab2', 'current') || $t('compare.excludeOptions.noExclude') }}
                   <span class="arrow">▾</span>
@@ -97,16 +127,16 @@
 
                 <Teleport to="body">
                   <div
-                      v-if="excludeDropdownOpen === 'tab2_current'"
-                      class="dropdown-panel choice-dropdown-panel"
-                      :style="excludeDropdownStyle"
+                    v-if="excludeDropdownOpen === 'tab2_current'"
+                    class="dropdown-panel choice-dropdown-panel"
+                    :style="excludeDropdownStyle"
                   >
                     <div
-                        class="dropdown-item choice-dropdown-item"
-                        v-for="option in excludeOptions"
-                        :key="option.value"
-                        :class="{ active: isExcludeSelected(option.value, 'tab2', 'current') }"
-                        @click="toggleExcludeOption(option.value, 'tab2', 'current')"
+                      v-for="option in excludeOptions"
+                      :key="option.value"
+                      class="dropdown-item choice-dropdown-item"
+                      :class="{ active: isExcludeSelected(option.value, 'tab2', 'current') }"
+                      @click="toggleExcludeOption(option.value, 'tab2', 'current')"
                     >
                       <span class="check-icon">{{ isExcludeSelected(option.value, 'tab2', 'current') ? '✓' : '' }}</span>
                       {{ option.label }}
@@ -118,86 +148,115 @@
               <!-- 鍵名 + 鍵值 -->
               <div class="dropdown-row">
                 <KeyButtonGroup
-                  :available-keys="availableKeys"
                   v-model="tabStates.tab2.current.keys"
+                  :available-keys="availableKeys"
                   :exclusive-rules="exclusiveRules"
                   :single-select-keys="singleSelectKeys"
                 />
                 <DropdownValueSelector
-                  :selected-keys="tabStates.tab2.current.keys"
                   v-model="tabStates.tab2.current.valueMap"
+                  :selected-keys="tabStates.tab2.current.keys"
                   :key-value-map="keyValueMap"
                 />
               </div>
 
-          <!-- 已選列表 -->
-          <div class="selected-groups-container">
-            <!-- 組1已選 -->
-            <div class="selected-group group1-style">
-              <div class="selected-group-header">
-<!--                <span>組1已選 ({{ tabStates.tab2.group1Items.length }})</span>-->
-                <span>{{ $t('compare.group.label1') }}</span>
-                <button class="add-btn add-to-group1" @click="addToGroup('group1')" :disabled="!canAddToGroup">
-                  ➕ {{ $t('compare.button.add') }}
-                </button>
-              </div>
-              <div class="selected-items-list">
-                <div
-                    v-for="(item, index) in tabStates.tab2.group1Items"
-                    :key="index"
-                    class="selected-item"
-                >
-                  <span class="item-label">{{ formatSelectedItem(item) }}</span>
-                  <button class="remove-btn" @click="removeFromGroup('group1', index)">✕</button>
+              <!-- 已選列表 -->
+              <div class="selected-groups-container">
+                <!-- 組1已選 -->
+                <div class="selected-group group1-style">
+                  <div class="selected-group-header">
+                    <!--                <span>組1已選 ({{ tabStates.tab2.group1Items.length }})</span>-->
+                    <span>{{ $t('compare.group.label1') }}</span>
+                    <button
+                      class="add-btn add-to-group1"
+                      :disabled="!canAddToGroup"
+                      @click="addToGroup('group1')"
+                    >
+                      ➕ {{ $t('compare.button.add') }}
+                    </button>
+                  </div>
+                  <div class="selected-items-list">
+                    <div
+                      v-for="(item, index) in tabStates.tab2.group1Items"
+                      :key="index"
+                      class="selected-item"
+                    >
+                      <span class="item-label">{{ formatSelectedItem(item) }}</span>
+                      <button
+                        class="remove-btn"
+                        @click="removeFromGroup('group1', index)"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div
+                      v-if="tabStates.tab2.group1Items.length === 0"
+                      class="empty-hint"
+                    >
+                      {{ $t('compare.messages.noConditionsAdded') }}
+                    </div>
+                  </div>
                 </div>
-                <div v-if="tabStates.tab2.group1Items.length === 0" class="empty-hint">
-                  {{ $t('compare.messages.noConditionsAdded') }}
-                </div>
-              </div>
-            </div>
 
-            <!-- 組2已選 -->
-            <div class="selected-group group2-style">
-              <div class="selected-group-header">
-                <span>{{ $t('compare.group.label2') }}</span>
-<!--                <span>組2已選 ({{ tabStates.tab2.group2Items.length }})</span>-->
-                <button class="add-btn add-to-group2" @click="addToGroup('group2')" :disabled="!canAddToGroup">
-                  ➕ {{ $t('compare.button.add') }}
-                </button>
-              </div>
-              <div class="selected-items-list">
-                <div
-                    v-for="(item, index) in tabStates.tab2.group2Items"
-                    :key="index"
-                    class="selected-item"
-                >
-                  <span class="item-label">{{ formatSelectedItem(item) }}</span>
-                  <button class="remove-btn" @click="removeFromGroup('group2', index)">✕</button>
+                <!-- 組2已選 -->
+                <div class="selected-group group2-style">
+                  <div class="selected-group-header">
+                    <span>{{ $t('compare.group.label2') }}</span>
+                    <!--                <span>組2已選 ({{ tabStates.tab2.group2Items.length }})</span>-->
+                    <button
+                      class="add-btn add-to-group2"
+                      :disabled="!canAddToGroup"
+                      @click="addToGroup('group2')"
+                    >
+                      ➕ {{ $t('compare.button.add') }}
+                    </button>
+                  </div>
+                  <div class="selected-items-list">
+                    <div
+                      v-for="(item, index) in tabStates.tab2.group2Items"
+                      :key="index"
+                      class="selected-item"
+                    >
+                      <span class="item-label">{{ formatSelectedItem(item) }}</span>
+                      <button
+                        class="remove-btn"
+                        @click="removeFromGroup('group2', index)"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div
+                      v-if="tabStates.tab2.group2Items.length === 0"
+                      class="empty-hint"
+                    >
+                      {{ $t('compare.messages.noConditionsAdded') }}
+                    </div>
+                  </div>
                 </div>
-                <div v-if="tabStates.tab2.group2Items.length === 0" class="empty-hint">
-                  {{ $t('compare.messages.noConditionsAdded') }}
-                </div>
               </div>
-            </div>
-          </div>
 
-          <ZhongguSelector
-              :active-keys="tabStates.tab2.current.keys"
-              :value-map="tabStates.tab2.current.valueMap"
-              :is-dropdown-open="excludeDropdownOpen === 'tab2_current'"
-              :selected-card="tabStates.tab2.current.card"
-              :exclude-columns="tabStates.tab2.current.excludeColumns"
-              :table-name="selectedCharacterTable"
-              ref="ZhongguRefCurrent"
-          />
+              <ZhongguSelector
+                ref="ZhongguRefCurrent"
+                :active-keys="tabStates.tab2.current.keys"
+                :value-map="tabStates.tab2.current.valueMap"
+                :is-dropdown-open="excludeDropdownOpen === 'tab2_current'"
+                :selected-card="tabStates.tab2.current.card"
+                :exclude-columns="tabStates.tab2.current.excludeColumns"
+                :table-name="selectedCharacterTable"
+              />
             </div>
           </div>
         </div>
       </div>
       <!-- Tab4: 比較調類 -->
-      <div v-show="currentTab === 'tab4'" class="page">
+      <div
+        v-show="currentTab === 'tab4'"
+        class="page"
+      >
         <div class="page-content-stack">
-          <div class="tone-tip">{{ $t('compare.messages.selectTwoToneClasses') }}</div>
+          <div class="tone-tip">
+            {{ $t('compare.messages.selectTwoToneClasses') }}
+          </div>
           <div class="compare-group">
             <!-- <div class="group-label">??????</div> -->
             <div class="tone-selection">
@@ -208,11 +267,11 @@
                 :class="getToneCheckboxClass(i + 1)"
               >
                 <input
+                  v-model="tabStates.tab4.selectedToneClasses"
                   type="checkbox"
                   :value="i + 1"
-                  v-model="tabStates.tab4.selectedToneClasses"
                   :disabled="tabStates.tab4.selectedToneClasses.length >= 2 && !tabStates.tab4.selectedToneClasses.includes(i + 1)"
-                />
+                >
                 <span>{{ toneLabel }}</span>
               </label>
             </div>
@@ -220,45 +279,90 @@
         </div>
       </div>
 
-      <!-- Tab5: 比较音值 (Extracted Component) -->
-      <div v-show="currentTab === 'tab5'" class="page">
-        <PhoneticCompare />
+      <!-- Tab5: 比较音值 -->
+      <div
+        v-show="currentTab === 'tab5'"
+        class="page"
+      >
+        <div class="page-content-stack">
+          <div class="tone-tip">
+            {{ $t('compare.messages.tab5Hint') }}
+          </div>
+          <div class="compare-group tab5-location-group">
+            <LocationMultiInput
+              v-model="tabStates.tab5.locations"
+              :max-locations="5"
+              @update:matched-locations="tabStates.tab5.matchedLocations = $event"
+            />
+          </div>
+        </div>
+        <PhoneticCompare :query-locations="tabStates.tab5.queryLocations" />
       </div>
 
       <LocationAndRegionInput
-          v-show="currentTab !== 'tab5'"
-          ref="locationRef"
-          @update:runDisabled="uiStore.buttonStates.compare.isLocationDisabled = $event"
-          v-model="locationModel"
-          :limitContext="locationLimitContext"
+        v-show="currentTab !== 'tab5'"
+        ref="locationRef"
+        v-model="locationModel"
+        :limit-context="locationLimitContext"
+        @update:run-disabled="uiStore.buttonStates.compare.isLocationDisabled = $event"
       />
 
       <!-- 運行按鈕 -->
-      <div v-if="currentTab !== 'tab5'" class="run-container">
+      <div class="run-container">
         <!-- Tab1, Tab2, Tab4 运行按钮 -->
         <button
-            class="run-btn"
-            @click="runAction"
-            :disabled="buttonState.isRunning || isRunDisabled"
-            :class="{ disabled: isRunDisabled }"
+          v-if="currentTab !== 'tab5'"
+          class="run-btn"
+          :disabled="buttonState.isRunning || isRunDisabled"
+          :class="{ disabled: isRunDisabled }"
+          @click="runAction"
         >
           <span v-if="buttonState.isRunning">🔄 {{ $t('compare.button.running') }}</span>
           <span v-else-if="isRunDisabled">🚫 {{ $t('compare.button.invalid') }}</span>
           <span v-else>🚀 {{ $t('compare.button.startCompare') }}</span>
         </button>
+
+        <!-- Tab5 独立运行按钮 -->
+        <button
+          v-else
+          class="run-btn"
+          :disabled="buttonState.isRunning || isTab5RunDisabled"
+          :class="{ disabled: isTab5RunDisabled }"
+          @click="runTab5Action"
+        >
+          <span v-if="buttonState.isRunning">🔄 {{ $t('compare.button.running') }}</span>
+          <span v-else-if="isTab5RunDisabled">🚫 {{ $t('compare.button.invalid') }}</span>
+          <span v-else>🚀 {{ $t('compare.button.startCompare') }}</span>
+        </button>
       </div>
 
       <!-- 提示區 -->
-      <div v-if="currentTab === 'tab1'" class="page-footer" style="margin-top: 20px">
+      <div
+        v-if="currentTab === 'tab1'"
+        class="page-footer"
+        style="margin-top: 20px"
+      >
         <small class="hint">{{ $t('compare.messages.tab1Hint') }}</small>
       </div>
-      <div v-else-if="currentTab === 'tab2'" class="page-footer" style="margin-top: 20px">
+      <div
+        v-else-if="currentTab === 'tab2'"
+        class="page-footer"
+        style="margin-top: 20px"
+      >
         <small class="hint">{{ $t('compare.messages.tab2Hint') }}</small>
       </div>
-      <div v-else-if="currentTab === 'tab4'" class="page-footer" style="margin-top: 20px">
+      <div
+        v-else-if="currentTab === 'tab4'"
+        class="page-footer"
+        style="margin-top: 20px"
+      >
         <small class="hint">{{ $t('compare.messages.tab4Hint') }}</small>
       </div>
-      <div v-else-if="currentTab === 'tab5'" class="page-footer" style="margin-top: 20px">
+      <div
+        v-else-if="currentTab === 'tab5'"
+        class="page-footer"
+        style="margin-top: 20px"
+      >
         <small class="hint">{{ $t('compare.messages.tab5Hint') }}</small>
       </div>
     </div>
@@ -271,6 +375,7 @@ import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import TabsContainer from "@/components/common/TabsContainer.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
+import LocationMultiInput from "@/main/components/geo/LocationMultiInput.vue";
 import PhoneticCompare from "@/main/components/compare/PhoneticCompare.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
 import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
@@ -385,6 +490,11 @@ const tabStates = reactive({
   },
   tab4: {
     selectedToneClasses: []
+  },
+  tab5: {
+    locations: [],
+    matchedLocations: [],
+    queryLocations: []
   }
 })
 
@@ -541,6 +651,11 @@ watch(() => tabStates.tab4, (newVal) => {
   setTabContentDisabled('compare', 'tab4', !isValid)
 }, { immediate: true, deep: true })
 
+// 监听 Tab5：有地點輸入即可啟用
+watch(() => tabStates.tab5.matchedLocations, (newLocations) => {
+  setTabContentDisabled('compare', 'tab5', !Array.isArray(newLocations) || newLocations.length < 2 || newLocations.length > 5)
+}, { immediate: true })
+
 
 // Tab4 调类复选框颜色类
 function getToneCheckboxClass(toneValue) {
@@ -601,6 +716,12 @@ watch(selectedCharacterTable, (newTable, oldTable) => {
 
 // 4️⃣ 最终计算属性：控制按钮是否禁用
 const isRunDisabled = isCompareButtonDisabled
+
+// tab5 独立的按钮禁用逻辑（2~5个地点）
+const isTab5RunDisabled = computed(() => {
+  const locs = tabStates.tab5.matchedLocations
+  return !Array.isArray(locs) || locs.length < 2 || locs.length > 5
+})
 
 
 // 监听 card（聲韻調）变化，自動清空已選列表
@@ -893,6 +1014,12 @@ const ZhongguRef1 = ref(null);  // For tab2 group1
 const ZhongguRef2 = ref(null);  // For tab2 group2
 const ZhongguRefCurrent = ref(null);  // For tab2 current selector
 
+
+// Tab5 独立的运行逻辑
+const runTab5Action = () => {
+  if (isTab5RunDisabled.value) return
+  tabStates.tab5.queryLocations = [...tabStates.tab5.matchedLocations]
+}
 
 // 點擊按鈕行為
 const runAction = async () => {
@@ -2099,5 +2226,12 @@ export default {
   }
 }
 
+
+/* Tab5 音值比較 地點輸入容器 */
+.tab5-location-group {
+  width: 100%;
+  max-width: 520px;
+  text-align: left;
+}
 
 </style>

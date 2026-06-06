@@ -1,32 +1,5 @@
 <template>
-  <div class="phonetic-compare-container">
-    <div class="page-content-stack">
-      <div class="tone-tip">
-        {{ t('compare.messages.tab5Hint') }}
-      </div>
-      <div class="compare-group tab5-location-group">
-        <LocationMultiInput
-          v-model="locations"
-          :max-locations="5"
-          @update:matched-locations="handleMatchedLocations"
-        />
-      </div>
-    </div>
-
-    <!-- 运行按钮 -->
-    <div class="run-container">
-      <button
-        class="run-btn"
-        :disabled="isLoading || isRunDisabled"
-        :class="{ disabled: isRunDisabled }"
-        @click="handleQuery"
-      >
-        <span v-if="isLoading">🔄 {{ t('compare.button.running') }}</span>
-        <span v-else-if="isRunDisabled">🚫 {{ t('compare.button.invalid') }}</span>
-        <span v-else>🚀 {{ t('compare.button.startCompare') }}</span>
-      </button>
-    </div>
-
+  <div class="phonetic-compare-results-container">
     <!-- 错误信息 -->
     <div
       v-if="errorMessage"
@@ -66,9 +39,9 @@
 
       <!-- 桑基图容器 -->
       <div class="sankey-chart-wrapper">
-        <div 
-          ref="sankeyContainerRef" 
-          class="sankey-chart" 
+        <div
+          ref="sankeyContainerRef"
+          class="sankey-chart"
           :style="{ width: sankeyWidth }"
         />
       </div>
@@ -119,17 +92,23 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
-import LocationMultiInput from '../geo/LocationMultiInput.vue'
 import { getFeatureStats } from '@/api/index.js'
+import { setRunning } from '@/main/store/store.js'
 
 const { t } = useI18n()
 
+// ========== Props ==========
+const props = defineProps({
+  queryLocations: {
+    type: Array,
+    default: () => []
+  }
+})
+
 // ========== 响应式数据 ==========
-const locations = ref([])
-const matchedLocations = ref([])
 const rawData = ref(null)
 const activeFeature = ref('聲母')
 const isLoading = ref(false)
@@ -147,29 +126,21 @@ const isMobileLayout = ref(false)
 const MOBILE_LAYOUT_MEDIA_QUERY = '(max-aspect-ratio: 1/1)'
 
 // ========== 计算属性 ==========
-const isRunDisabled = computed(() => {
-  return matchedLocations.value.length < 2 || matchedLocations.value.length > 5
-})
-
 // 动态宽度计算
 const sankeyWidth = computed(() => {
   if (!rawData.value?.data) return '100%'
-  const validLocs = locations.value.filter(loc => rawData.value.data[loc])
+  const validLocs = props.queryLocations.filter(loc => rawData.value.data[loc])
   if (validLocs.length < 2) return '100%'
   const minWidthPerColumn = isMobileLayout.value ? 160 : 240
   return `${validLocs.length * minWidthPerColumn}px`
 })
 
 // ========== 方法 ==========
-const handleMatchedLocations = (locs) => {
-  matchedLocations.value = locs
-}
-
 const changeFeature = async (feat) => {
   activeFeature.value = feat
   closeDetailCard()
   await nextTick()
-  await renderSankey()
+  await renderSankey(props.queryLocations)
 }
 
 const closeDetailCard = () => {
@@ -186,17 +157,16 @@ const clearChart = () => {
 }
 
 // 请求接口数据
-const handleQuery = async () => {
-  if (isRunDisabled.value) return
-
+const handleQuery = async (queryLocs) => {
   isLoading.value = true
   errorMessage.value = ''
   rawData.value = null
   closeDetailCard()
+  setRunning('compare', true)
 
   try {
     const params = {
-      locations: matchedLocations.value,
+      locations: queryLocs,
       features: ['聲母', '韻母', '聲調']
     }
 
@@ -207,31 +177,31 @@ const handleQuery = async () => {
     }
 
     // 过滤出真正含有音值数据的有效地点
-    const validLocs = matchedLocations.value.filter(loc => response.data[loc])
+    const validLocs = queryLocs.filter(loc => response.data[loc])
     if (validLocs.length < 2) {
       throw new Error('所选地点中含有有效音值数据的地点不足 2 个，无法进行比较！')
     }
 
     rawData.value = response
     await nextTick()
-    await renderSankey()
+    await renderSankey(queryLocs)
   } catch (error) {
     console.error('Phonetic comparison query failed:', error)
     errorMessage.value = error.message || '查询失败，请重试！'
   } finally {
     isLoading.value = false
+    setRunning('compare', false)
   }
 }
 
 // 渲染桑基图
-const renderSankey = async () => {
+const renderSankey = async (queryLocs) => {
   clearChart()
   if (!sankeyContainerRef.value || !rawData.value) return
 
   const raw = rawData.value
   const charsMap = raw.chars_map || []
-  const allLocs = matchedLocations.value
-  const validLocs = allLocs.filter(loc => raw.data[loc])
+  const validLocs = queryLocs.filter(loc => raw.data[loc])
 
   if (validLocs.length < 2) return
 
@@ -476,6 +446,16 @@ const handleResize = () => {
   chartInstance.value?.resize()
 }
 
+// ========== 监听 queryLocations 触发查询 ==========
+watch(() => props.queryLocations, (newVal) => {
+  if (Array.isArray(newVal) && newVal.length >= 2 && newVal.length <= 5) {
+    handleQuery(newVal)
+  } else {
+    rawData.value = null
+    clearChart()
+  }
+}, { deep: true, immediate: true })
+
 onMounted(() => {
   isMobileLayout.value = window.matchMedia(MOBILE_LAYOUT_MEDIA_QUERY).matches
   window.addEventListener('resize', handleResize)
@@ -488,48 +468,11 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-.phonetic-compare-container {
+.phonetic-compare-results-container {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.page-content-stack {
-  width: 100%;
-  max-width: 520px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.tone-tip {
-  font-size: 14px;
-  color: var(--text-secondary, #666);
-  text-align: left;
-}
-
-.tab5-location-group {
-  width: 100%;
-  text-align: left;
-}
-
-/* 运行按钮放置 */
-.run-container {
-  position: fixed;
-  bottom: 25px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-  pointer-events: none;
-
-  .run-btn {
-    pointer-events: auto;
-  }
 }
 
 /* 错误与加载 */
