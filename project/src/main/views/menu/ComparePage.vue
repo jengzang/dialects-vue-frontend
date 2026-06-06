@@ -220,18 +220,9 @@
         </div>
       </div>
 
-      <!-- Tab5: 比較音値 -->
+      <!-- Tab5: 比较音值 (Extracted Component) -->
       <div v-show="currentTab === 'tab5'" class="page">
-        <div class="page-content-stack">
-          <div class="tone-tip">{{ $t('compare.messages.tab5Hint') }}</div>
-          <div class="compare-group tab5-location-group">
-            <LocationMultiInput
-              v-model="tabStates.tab5.locations"
-              :max-locations="5"
-              @update:matched-locations="tabStates.tab5.locations = $event"
-            />
-          </div>
-        </div>
+        <PhoneticCompare />
       </div>
 
       <LocationAndRegionInput
@@ -243,10 +234,9 @@
       />
 
       <!-- 運行按鈕 -->
-      <div class="run-container">
+      <div v-if="currentTab !== 'tab5'" class="run-container">
         <!-- Tab1, Tab2, Tab4 运行按钮 -->
         <button
-            v-if="currentTab !== 'tab5'"
             class="run-btn"
             @click="runAction"
             :disabled="buttonState.isRunning || isRunDisabled"
@@ -254,19 +244,6 @@
         >
           <span v-if="buttonState.isRunning">🔄 {{ $t('compare.button.running') }}</span>
           <span v-else-if="isRunDisabled">🚫 {{ $t('compare.button.invalid') }}</span>
-          <span v-else>🚀 {{ $t('compare.button.startCompare') }}</span>
-        </button>
-
-        <!-- Tab5 独立运行按钮 -->
-        <button
-            v-else
-            class="run-btn"
-            @click="runTab5Action"
-            :disabled="buttonState.isRunning || isTab5RunDisabled"
-            :class="{ disabled: isTab5RunDisabled }"
-        >
-          <span v-if="buttonState.isRunning">🔄 {{ $t('compare.button.running') }}</span>
-          <span v-else-if="isTab5RunDisabled">🚫 {{ $t('compare.button.invalid') }}</span>
           <span v-else>🚀 {{ $t('compare.button.startCompare') }}</span>
         </button>
       </div>
@@ -294,7 +271,7 @@ import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import TabsContainer from "@/components/common/TabsContainer.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
-import LocationMultiInput from "@/main/components/geo/LocationMultiInput.vue";
+import PhoneticCompare from "@/main/components/compare/PhoneticCompare.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
 import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
@@ -408,12 +385,8 @@ const tabStates = reactive({
   },
   tab4: {
     selectedToneClasses: []
-  },
-  tab5: {
-    locations: []  // 地點查詢字符串列表（由 LocationMultiInput emit）
   }
 })
-
 
 // Tab2 相關方法
 // 檢查是否可以添加到組
@@ -568,10 +541,6 @@ watch(() => tabStates.tab4, (newVal) => {
   setTabContentDisabled('compare', 'tab4', !isValid)
 }, { immediate: true, deep: true })
 
-// 监听 Tab5：有地點輸入即可啟用
-watch(() => tabStates.tab5.locations, (newLocations) => {
-  setTabContentDisabled('compare', 'tab5', !Array.isArray(newLocations) || newLocations.length === 0)
-}, { immediate: true })
 
 // Tab4 调类复选框颜色类
 function getToneCheckboxClass(toneValue) {
@@ -633,11 +602,6 @@ watch(selectedCharacterTable, (newTable, oldTable) => {
 // 4️⃣ 最终计算属性：控制按钮是否禁用
 const isRunDisabled = isCompareButtonDisabled
 
-// tab5 独立的按钮禁用逻辑（最多5个地点）
-const isTab5RunDisabled = computed(() => {
-  const locs = tabStates.tab5.locations
-  return !Array.isArray(locs) || locs.length === 0 || locs.length > 5
-})
 
 // 监听 card（聲韻調）变化，自動清空已選列表
 watch(() => tabStates.tab2.current.card, (newCard, oldCard) => {
@@ -929,19 +893,6 @@ const ZhongguRef1 = ref(null);  // For tab2 group1
 const ZhongguRef2 = ref(null);  // For tab2 group2
 const ZhongguRefCurrent = ref(null);  // For tab2 current selector
 
-// Tab5 独立的运行逻辑
-const runTab5Action = () => {
-  const locs = tabStates.tab5.locations
-  if (!Array.isArray(locs) || locs.length === 0) {
-    alert('请先输入地点！')
-    return
-  }
-  if (locs.length > 5) {
-    alert('最多只能同时比较 5 个地点！')
-    return
-  }
-  alert(`音值比较功能开发中！已选择的地点：${locs.join(', ')}`)
-}
 
 // 點擊按鈕行為
 const runAction = async () => {
@@ -2148,11 +2099,5 @@ export default {
   }
 }
 
-/* Tab5 音值比較 地點輸入容器 */
-.tab5-location-group {
-  width: 100%;
-  max-width: 520px;
-  text-align: left;
-}
 
 </style>
