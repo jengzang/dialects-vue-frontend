@@ -2205,6 +2205,7 @@ export default {
   max-height: none;
   align-items: center;
   width:93dvw;
+  max-width: 880px;
 }
 
 /* 移動端適配 */

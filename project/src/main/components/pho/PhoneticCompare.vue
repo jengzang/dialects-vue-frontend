@@ -135,7 +135,7 @@ const sankeyWidth = computed(() => {
   const validLocs = props.queryLocations.filter(loc => rawData.value.data[loc])
   if (validLocs.length < 2) return '100%'
   const minWidthPerColumn = isMobileLayout.value ? 160 : 240
-  return `${validLocs.length * minWidthPerColumn}px`
+  return `max(100%, ${validLocs.length * minWidthPerColumn}px)`
 })
 
 // ========== 方法 ==========
@@ -501,18 +501,18 @@ onUnmounted(() => {
 
 .sankey-chart-wrapper {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
-  display: flex;
-  justify-content: center;
+  overflow-y: hidden;
   padding: 10px 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sankey-chart {
   height: 800px;
   min-height: 400px;
   background: transparent;
-  flex-shrink: 0;
-  transition: width 0.3s ease;
+  margin: 0 auto;
 }
 
 /* 详情卡片样式 */
