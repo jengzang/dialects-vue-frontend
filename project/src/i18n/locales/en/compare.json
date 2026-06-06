@@ -1,9 +1,9 @@
 {
   "tabs": {
-    "tab1": "Compare Characters",
-    "tab2": "Compare Positions",
-    "tab4": "Compare Tone Classes",
-    "tab5": "Compare Phonetic Values"
+    "tab1": "Characters",
+    "tab2": "Middle Chinese",
+    "tab4": "Tone Classes",
+    "tab5": "Phonetic Values"
   },
   "group": {
     "label1": "Group 1",
