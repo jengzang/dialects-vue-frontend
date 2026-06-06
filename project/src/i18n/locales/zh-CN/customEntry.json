@@ -7,6 +7,7 @@
     "subtitle": "聚焦用户自定义资料新增与维护，兼容旧的个人数据管理与右侧逐条新增逻辑。",
     "modeGroupLabel": "录入模式",
     "close": "关闭",
+    "devNotice": "当前功能还在开发测试中",
     "modes": {
       "point": "补充单点资料",
       "feature": "制作特征分布"

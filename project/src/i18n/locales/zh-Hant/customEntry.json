@@ -7,6 +7,7 @@
     "subtitle": "聚焦用戶自定義資料新增與維護，兼容舊的個人數據管理與右側逐條新增邏輯。",
     "modeGroupLabel": "錄入模式",
     "close": "關閉",
+    "devNotice": "當前功能還在開發測試中",
     "modes": {
       "point": "補充單點資料",
       "feature": "製作特徵分布"

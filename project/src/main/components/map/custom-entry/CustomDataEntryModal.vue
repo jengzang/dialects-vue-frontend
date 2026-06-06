@@ -10,10 +10,17 @@
     <template #header>
       <div class="entry-modal-header">
         <div>
-          <h3 class="entry-modal-title">{{ t('customEntry.modal.title') }}</h3>
+          <h3 class="entry-modal-title">
+            {{ t('customEntry.modal.title') }}
+            <span class="entry-modal-dev-badge">{{ t('customEntry.modal.devNotice') }}</span>
+          </h3>
           <div class="entry-modal-subtitle">{{ t('customEntry.modal.subtitle') }}</div>
         </div>
-        <div class="entry-modal-mode-switcher" role="group" :aria-label="t('customEntry.modal.modeGroupLabel')">
+        <div
+          class="entry-modal-mode-switcher"
+          role="group"
+          :aria-label="t('customEntry.modal.modeGroupLabel')"
+        >
           <button
             class="entry-mode-button"
             :class="{ active: activeMode === 'point' }"
@@ -50,38 +57,41 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import AppModal from '@/components/common/AppModal.vue'
-import PointCentricMode from './PointCentricMode.vue'
-import FeatureCentricMode from './FeatureCentricMode.vue'
+import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import AppModal from '@/components/common/AppModal.vue';
+import PointCentricMode from './PointCentricMode.vue';
+import FeatureCentricMode from './FeatureCentricMode.vue';
 
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 
-const emit = defineEmits(['update:modelValue'])
-const { t } = useI18n()
-const activeMode = ref('point')
-const modalSessionKey = ref(0)
+const emit = defineEmits(['update:modelValue']);
+const { t } = useI18n();
+const activeMode = ref('point');
+const modalSessionKey = ref(0);
 
 const closeModal = () => {
-  emit('update:modelValue', false)
-}
+  emit('update:modelValue', false);
+};
 
 const handleVisibleChange = (value) => {
-  emit('update:modelValue', value)
-}
+  emit('update:modelValue', value);
+};
 
-watch(() => props.modelValue, (visible, prev) => {
-  if (prev && !visible) {
-    activeMode.value = 'point'
-    modalSessionKey.value += 1
+watch(
+  () => props.modelValue,
+  (visible, prev) => {
+    if (prev && !visible) {
+      activeMode.value = 'point';
+      modalSessionKey.value += 1;
+    }
   }
-})
+);
 </script>
 
 <style scoped lang="scss">
@@ -98,6 +108,20 @@ watch(() => props.modelValue, (visible, prev) => {
   font-size: 18px;
   font-weight: 700;
   color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.entry-modal-dev-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 149, 0, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(255, 149, 0, 0.24);
+  white-space: nowrap;
 }
 
 .entry-modal-subtitle {
@@ -125,7 +149,10 @@ watch(() => props.modelValue, (visible, prev) => {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .entry-mode-button.active {
