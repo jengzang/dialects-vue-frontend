@@ -485,7 +485,7 @@ onUnmounted(() => {
 }
 
 .sankey-chart {
-  height: 480px;
+  height: 800px;
   min-height: 400px;
   background: transparent;
   flex-shrink: 0;
