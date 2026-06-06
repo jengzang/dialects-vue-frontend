@@ -48,46 +48,47 @@
     </div>
 
     <!-- 详情卡片 (Pin Detail) -->
-    <Transition name="detail-card-fade">
-      <div
-        v-if="selectedDetail"
-        class="sankey-detail-card"
-        :class="{ 'is-desktop-card': !isMobileLayout }"
-        :style="!isMobileLayout ? desktopCardPosition : {}"
-      >
-        <div class="detail-card-header">
-          <div class="detail-card-meta">
-            <div class="detail-card-title-row">
+    <Teleport to="body">
+      <Transition name="detail-card-fade">
+        <div
+          v-if="selectedDetail"
+          class="sankey-detail-card"
+          :class="{ 'is-desktop-card': !isMobileLayout }"
+        >
+          <div class="detail-card-header">
+            <div class="detail-card-meta">
+              <div class="detail-card-title-row">
+                <div
+                  class="detail-card-title"
+                  v-html="selectedDetail.title"
+                />
+              </div>
               <div
-                class="detail-card-title"
-                v-html="selectedDetail.title"
+                class="detail-card-subtitle"
+                v-html="selectedDetail.subtitle"
               />
+              <div class="detail-card-count">
+                共 <strong>{{ selectedDetail.count }}</strong> 字
+              </div>
             </div>
-            <div
-              class="detail-card-subtitle"
-              v-html="selectedDetail.subtitle"
-            />
-            <div class="detail-card-count">
-              共 <strong>{{ selectedDetail.count }}</strong> 字
-            </div>
+            <button
+              v-show="isMobileLayout || isCardPinned"
+              type="button"
+              class="detail-card-close"
+              @click="closeDetailCard"
+            >
+              ×
+            </button>
           </div>
-          <button
-            v-show="isMobileLayout || isCardPinned"
-            type="button"
-            class="detail-card-close"
-            @click="closeDetailCard"
-          >
-            ×
-          </button>
-        </div>
 
-        <div class="detail-card-body ui-scrollbar">
-          <div class="detail-card-chars">
-            {{ selectedDetail.chars.join('、') }}
+          <div class="detail-card-body ui-scrollbar">
+            <div class="detail-card-chars">
+              {{ selectedDetail.chars.join('、') }}
+            </div>
           </div>
         </div>
-      </div>
-    </Transition>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -117,7 +118,6 @@ const errorMessage = ref('')
 // 详情卡片状态
 const selectedDetail = ref(null)
 const isCardPinned = ref(false)
-const desktopCardPosition = ref({ left: '0px', top: '0px' })
 
 // ECharts 相关
 const sankeyContainerRef = ref(null)
@@ -327,22 +327,6 @@ const renderSankey = async (queryLocs) => {
 
     selectedDetail.value = { title, subtitle, count, chars }
     isCardPinned.value = true
-
-    // 桌面端点击时计算卡片浮动位置
-    if (!isMobileLayout.value && params.event?.event) {
-      const e = params.event.event
-      const cardWidth = 340
-      const cardHeight = 300
-
-      let x = e.clientX + 20
-      let y = e.clientY + 20
-
-      if (x + cardWidth > window.innerWidth) x = e.clientX - cardWidth - 20
-      if (y + cardHeight > window.innerHeight) y = window.innerHeight - cardHeight - 20
-      if (y < 10) y = 10
-
-      desktopCardPosition.value = { left: `${x}px`, top: `${y}px` }
-    }
   })
 
   // 桌面端 Hover 时临时显示详情 (未钉住时)
@@ -376,13 +360,6 @@ const renderSankey = async (queryLocs) => {
       }
 
       selectedDetail.value = { title, subtitle, count, chars }
-
-      if (params.event?.event) {
-        const e = params.event.event
-        let x = e.clientX + 20
-        let y = e.clientY + 20
-        desktopCardPosition.value = { left: `${x}px`, top: `${y}px` }
-      }
     })
 
     chartInstance.value.on('mouseout', () => {
@@ -533,7 +510,9 @@ onUnmounted(() => {
 
   &.is-desktop-card {
     position: fixed;
-    right: auto;
+    top: 100px;
+    right: 24px;
+    left: auto;
     bottom: auto;
     width: 320px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
