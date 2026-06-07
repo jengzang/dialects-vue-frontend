@@ -28,6 +28,7 @@
   },
   "pointDetail": {
     "back": "← 返回",
+    "modalTitle": "地點已有特徵：{name}",
     "createTitle": "新增方言點",
     "createDescription": "先確定地點與坐標，再補充多條特徵資料。",
     "editDescription": "在同一個方言點下持續補充或修改多條資料。",
@@ -96,6 +97,7 @@
   },
   "featureDetail": {
     "back": "← 返回",
+    "modalTitle": "特徵分布詳情：{feature}（{phonology}）",
     "description": "以同一特徵為中心，維護多個方言點的分布資料。",
     "createRecord": "+ 新增地點記錄",
     "loading": "正在載入特徵詳情…",

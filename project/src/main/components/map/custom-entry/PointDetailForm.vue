@@ -102,12 +102,23 @@
               />
             </div>
             <div class="point-cell" :data-label="t('customEntry.pointDetail.rows.headers.feature')">
-              <input
-                v-model="row.特徵"
-                class="point-row-input"
-                type="text"
-                :placeholder="t('customEntry.pointDetail.placeholders.feature')"
-              />
+              <div class="feature-input-wrapper">
+                <input
+                  v-model="row.特徵"
+                  class="point-row-input"
+                  type="text"
+                  :placeholder="t('customEntry.pointDetail.placeholders.feature')"
+                />
+                <button
+                  v-if="row.特徵 && row.聲韻調"
+                  class="feature-search-emoji-btn"
+                  type="button"
+                  @click="showFeatureDetail(row.特徵, row.聲韻調)"
+                  title="查看该特征在其他地点的分布"
+                >
+                  🔍
+                </button>
+              </div>
             </div>
             <div class="point-cell" :data-label="t('customEntry.pointDetail.rows.headers.value')">
               <input
@@ -172,6 +183,63 @@
         />
       </div>
     </div>
+
+    <!-- 特征详情联动弹窗 -->
+    <AppModal v-model="isFeatureModalOpen" size="md" width="640px" max-height="80dvh">
+      <template #header>
+        <div class="feature-detail-modal-header">
+          <h4 class="feature-detail-modal-title">
+            {{
+              t('customEntry.featureDetail.modalTitle', {
+                feature: selectedFeatureName,
+                phonology: selectedFeaturePhonology,
+              })
+            }}
+          </h4>
+          <button
+            class="close-btn close-btn-sm close-btn-inline"
+            type="button"
+            @click="isFeatureModalOpen = false"
+          >
+            ×
+          </button>
+        </div>
+      </template>
+
+      <div class="feature-detail-modal-body">
+        <div v-if="featureLoading" class="modal-loading-state">
+          {{ t('customEntry.featureDetail.loading') }}
+        </div>
+        <div v-else-if="featureError" class="modal-error-state">
+          {{ featureError }}
+        </div>
+        <div v-else-if="featureRecords.length === 0" class="modal-empty-state">
+          {{ t('customEntry.featureDetail.empty') }}
+        </div>
+        <div v-else class="modal-table-container">
+          <table class="modal-records-table">
+            <thead>
+              <tr>
+                <th>{{ t('customEntry.featureDetail.headers.location') }}</th>
+                <th>{{ t('customEntry.featureDetail.headers.region') }}</th>
+                <th>{{ t('customEntry.featureDetail.headers.coord') }}</th>
+                <th>{{ t('customEntry.featureDetail.headers.value') }}</th>
+                <th>{{ t('customEntry.featureDetail.headers.note') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="record in featureRecords" :key="record.created_at || record.id">
+                <td>{{ record['簡稱'] }}</td>
+                <td>{{ record['音典分區'] }}</td>
+                <td>{{ record['經緯度'] }}</td>
+                <td>{{ record['值'] }}</td>
+                <td>{{ record['說明'] || '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </AppModal>
   </section>
 </template>
 
@@ -180,11 +248,13 @@ import { computed, ref, watch } from 'vue';
 import { batchMatch, getRegions } from '@/api';
 import { showConfirm, showWarning } from '@/utils/message.js';
 import { useI18n } from 'vue-i18n';
+import AppModal from '@/components/common/AppModal.vue';
 import {
   batchCreateCustomData,
   batchDeleteCustomData,
   editCustomData,
   getDataByPoint,
+  getDataByFeature,
 } from '@/api';
 import { userStore } from '@/main/store/store.js';
 import { formatCoord } from '@/utils/map/formatCoord.js';
@@ -453,6 +523,31 @@ async function handleSave() {
   emit('saved');
 }
 
+const isFeatureModalOpen = ref(false);
+const selectedFeatureName = ref('');
+const selectedFeaturePhonology = ref('');
+const featureLoading = ref(false);
+const featureError = ref('');
+const featureRecords = ref([]);
+
+const showFeatureDetail = async (feature, phonology) => {
+  selectedFeatureName.value = feature;
+  selectedFeaturePhonology.value = phonology;
+  isFeatureModalOpen.value = true;
+  featureLoading.value = true;
+  featureError.value = '';
+  featureRecords.value = [];
+
+  try {
+    const response = await getDataByFeature(feature, phonology);
+    featureRecords.value = Array.isArray(response?.data) ? response.data : [];
+  } catch (error) {
+    featureError.value = error.message || t('customEntry.featureDetail.loadFailed');
+  } finally {
+    featureLoading.value = false;
+  }
+};
+
 watch(
   () => props.point,
   (point) => {
@@ -582,7 +677,7 @@ watch(
 .point-rows-table-head,
 .point-row {
   display: grid;
-  grid-template-columns: 0.85fr 1fr 0.85fr 1fr auto;
+  grid-template-columns: 0.6fr 1fr 0.6fr 1fr auto;
   gap: 10px;
   align-items: center;
 }
@@ -661,6 +756,99 @@ watch(
   .point-row-remove {
     width: 100%;
     margin-top: 4px;
+  }
+}
+
+.feature-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.feature-search-emoji-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+  line-height: 1;
+  transition: transform 0.1s ease;
+  user-select: none;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+}
+
+.feature-input-wrapper .point-row-input {
+  padding-right: 32px;
+}
+
+.feature-detail-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.feature-detail-modal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.feature-detail-modal-body {
+  padding: 16px 20px;
+}
+
+.modal-loading-state,
+.modal-error-state,
+.modal-empty-state {
+  padding: 32px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.modal-error-state {
+  color: #ef4444;
+}
+
+.modal-table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.modal-records-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+
+  th,
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  }
+
+  th {
+    background: rgba(241, 245, 249, 0.7);
+    color: #475569;
+    font-weight: 700;
+  }
+
+  td {
+    color: #334155;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
   }
 }
 </style>

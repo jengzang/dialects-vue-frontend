@@ -28,6 +28,7 @@
   },
   "pointDetail": {
     "back": "← Back",
+    "modalTitle": "Point Features: {name}",
     "createTitle": "Add dialect point",
     "createDescription": "Confirm the location and coordinates first, then add multiple feature records.",
     "editDescription": "Continuously add or revise multiple records under the same dialect point.",
@@ -96,6 +97,7 @@
   },
   "featureDetail": {
     "back": "← Back",
+    "modalTitle": "Feature Distribution: {feature} ({phonology})",
     "description": "Maintain distribution data for multiple dialect points around the same feature.",
     "createRecord": "+ Add location record",
     "loading": "Loading feature details…",

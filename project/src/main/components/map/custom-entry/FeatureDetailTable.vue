@@ -47,13 +47,17 @@
             class="feature-detail-row"
           >
             <span
-              class="cell-location"
+              class="cell-location clickable-location"
               :data-label="t('customEntry.featureDetail.headers.location')"
+              @click="showPointDetail(row['簡稱'], row['音典分區'])"
               >{{ row['簡稱'] }}</span
             >
-            <span class="cell-region" :data-label="t('customEntry.featureDetail.headers.region')">{{
-              row['音典分區']
-            }}</span>
+            <span
+              class="cell-region clickable-location"
+              :data-label="t('customEntry.featureDetail.headers.region')"
+              @click="showPointDetail(row['簡稱'], row['音典分區'])"
+              >{{ row['音典分區'] }}</span
+            >
             <span class="cell-coord" :data-label="t('customEntry.featureDetail.headers.coord')">{{
               row['經緯度']
             }}</span>
@@ -92,13 +96,64 @@
       :record="editingRecord"
       @saved="handleSaved"
     />
+
+    <!-- 地点已录入特征联动弹窗 -->
+    <AppModal v-model="isPointModalOpen" size="md" width="640px" max-height="80dvh">
+      <template #header>
+        <div class="point-detail-modal-header">
+          <h4 class="point-detail-modal-title">
+            {{ t('customEntry.pointDetail.modalTitle', { name: selectedPointName }) }}
+          </h4>
+          <button
+            class="close-btn close-btn-sm close-btn-inline"
+            type="button"
+            @click="isPointModalOpen = false"
+          >
+            ×
+          </button>
+        </div>
+      </template>
+
+      <div class="point-detail-modal-body">
+        <div v-if="pointLoading" class="modal-loading-state">
+          {{ t('customEntry.featureDetail.loading') }}
+        </div>
+        <div v-else-if="pointError" class="modal-error-state">
+          {{ pointError }}
+        </div>
+        <div v-else-if="pointRecords.length === 0" class="modal-empty-state">
+          {{ t('customEntry.featureDetail.empty') }}
+        </div>
+        <div v-else class="modal-table-container">
+          <table class="modal-records-table">
+            <thead>
+              <tr>
+                <th>{{ t('customEntry.pointDetail.rows.headers.phonology') }}</th>
+                <th>{{ t('customEntry.pointDetail.rows.headers.feature') }}</th>
+                <th>{{ t('customEntry.pointDetail.rows.headers.value') }}</th>
+                <th>{{ t('customEntry.pointDetail.rows.headers.note') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="record in pointRecords" :key="record.created_at || record.id">
+                <td>{{ record['聲韻調'] }}</td>
+                <td>{{ record['特徵'] }}</td>
+                <td>{{ record['值'] }}</td>
+                <td>{{ record['說明'] || '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </AppModal>
   </section>
 </template>
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { batchDeleteCustomData, getDataByFeature } from '@/api';
+import AppModal from '@/components/common/AppModal.vue';
+import { batchDeleteCustomData, getDataByFeature, getDataByPoint } from '@/api';
 import { showConfirm } from '@/utils/message.js';
 import MiniMapSelector from './MiniMapSelector.vue';
 import FeatureRecordEditorModal from './FeatureRecordEditorModal.vue';
@@ -152,7 +207,7 @@ const loadRecords = async () => {
   try {
     const featureName = props.feature?.['特徵'] || props.feature?.feature || '';
     const phonology = props.feature?.['聲韻調'] || props.feature?.phonology || '';
-    if (!featureName || !phonology) {
+    if (!featureName) {
       errorMessage.value = t('customEntry.featureDetail.loadFailed');
       rows.value = [];
       return;
@@ -195,6 +250,29 @@ const handleDelete = async (row) => {
 const handleSaved = async () => {
   await loadRecords();
   emit('saved');
+};
+
+const isPointModalOpen = ref(false);
+const selectedPointName = ref('');
+const pointLoading = ref(false);
+const pointError = ref('');
+const pointRecords = ref([]);
+
+const showPointDetail = async (location, region) => {
+  selectedPointName.value = location;
+  isPointModalOpen.value = true;
+  pointLoading.value = true;
+  pointError.value = '';
+  pointRecords.value = [];
+
+  try {
+    const response = await getDataByPoint(location, region);
+    pointRecords.value = Array.isArray(response?.data) ? response.data : [];
+  } catch (error) {
+    pointError.value = error.message || t('customEntry.pointDetail.messages.loadFailed');
+  } finally {
+    pointLoading.value = false;
+  }
 };
 
 watch(
@@ -362,6 +440,84 @@ onMounted(() => {
     margin-top: 4px;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
     padding-top: 8px;
+  }
+}
+
+.clickable-location {
+  color: #007aff;
+  cursor: pointer;
+  transition:
+    text-decoration 0.2s ease,
+    opacity 0.2s ease;
+
+  &:hover {
+    text-decoration: underline;
+    opacity: 0.85;
+  }
+}
+
+.point-detail-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.point-detail-modal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.point-detail-modal-body {
+  padding: 16px 20px;
+}
+
+.modal-loading-state,
+.modal-error-state,
+.modal-empty-state {
+  padding: 32px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.modal-error-state {
+  color: #ef4444;
+}
+
+.modal-table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.modal-records-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+
+  th,
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  }
+
+  th {
+    background: rgba(241, 245, 249, 0.7);
+    color: #475569;
+    font-weight: 700;
+  }
+
+  td {
+    color: #334155;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
   }
 }
 </style>
