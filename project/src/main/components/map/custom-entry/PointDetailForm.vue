@@ -534,10 +534,28 @@ watch(
 .point-field-input,
 .point-row-input {
   width: 100%;
-  min-height: 42px;
-  padding: 10px 12px;
-  border: 1px solid rgba(148, 163, 184, 0.28);
+  padding: 10px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.75);
+  color: #0f172a;
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
   box-sizing: border-box;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+
+  &:focus {
+    border-color: rgba(0, 122, 255, 0.55);
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+  }
 }
 
 .point-rows-header {

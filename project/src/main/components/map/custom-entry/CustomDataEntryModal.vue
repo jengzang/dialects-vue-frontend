@@ -9,12 +9,11 @@
   >
     <template #header>
       <div class="entry-modal-header">
-        <div>
+        <div style="justify-content: space-between; display: flex">
           <h3 class="entry-modal-title">
             {{ t('customEntry.modal.title') }}
-            <span class="entry-modal-dev-badge">{{ t('customEntry.modal.devNotice') }}</span>
           </h3>
-          <div class="entry-modal-subtitle">{{ t('customEntry.modal.subtitle') }}</div>
+          <span class="entry-modal-dev-badge">{{ t('customEntry.modal.devNotice') }}</span>
         </div>
         <div
           class="entry-modal-mode-switcher"

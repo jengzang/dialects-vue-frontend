@@ -827,18 +827,28 @@ const handleAddBatch = () => {
 
 .feature-search-input {
   width: 100%;
-  padding: 10px 40px 10px 12px;
+  padding: 10px 40px 10px 14px;
   font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.75);
+  color: #0f172a;
   outline: none;
-  transition: all 0.3s ease;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
   box-sizing: border-box;
 }
 
+.feature-search-input::placeholder {
+  color: #94a3b8;
+}
+
 .feature-search-input:focus {
-  border-color: #007aff;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  border-color: rgba(0, 122, 255, 0.55);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
 }
 
 /* 加载图标 */
