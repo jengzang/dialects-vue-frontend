@@ -29,6 +29,7 @@
   "pointDetail": {
     "back": "← 返回",
     "modalTitle": "地点已有特征：{name}",
+    "regionModalTitle": "分区已有特征：{name}",
     "createTitle": "新增方言点",
     "createDescription": "先确定地点与坐标，再补充多条特征资料。",
     "editDescription": "在同一个方言点下持续补充或修改多条资料。",

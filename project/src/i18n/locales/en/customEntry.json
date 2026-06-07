@@ -29,6 +29,7 @@
   "pointDetail": {
     "back": "← Back",
     "modalTitle": "Point Features: {name}",
+    "regionModalTitle": "Region Features: {name}",
     "createTitle": "Add dialect point",
     "createDescription": "Confirm the location and coordinates first, then add multiple feature records.",
     "editDescription": "Continuously add or revise multiple records under the same dialect point.",

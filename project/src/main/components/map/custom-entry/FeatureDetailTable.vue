@@ -49,13 +49,13 @@
             <span
               class="cell-location clickable-location"
               :data-label="t('customEntry.featureDetail.headers.location')"
-              @click="showPointDetail(row['簡稱'], row['音典分區'])"
+              @click="showLocationDetail(row['簡稱'])"
               >{{ row['簡稱'] }}</span
             >
             <span
               class="cell-region clickable-location"
               :data-label="t('customEntry.featureDetail.headers.region')"
-              @click="showPointDetail(row['簡稱'], row['音典分區'])"
+              @click="showRegionDetail(row['音典分區'])"
               >{{ row['音典分區'] }}</span
             >
             <span class="cell-coord" :data-label="t('customEntry.featureDetail.headers.coord')">{{
@@ -102,7 +102,11 @@
       <template #header>
         <div class="point-detail-modal-header">
           <h4 class="point-detail-modal-title">
-            {{ t('customEntry.pointDetail.modalTitle', { name: selectedPointName }) }}
+            {{
+              selectedDetailType === 'location'
+                ? t('customEntry.pointDetail.modalTitle', { name: selectedDetailName })
+                : t('customEntry.pointDetail.regionModalTitle', { name: selectedDetailName })
+            }}
           </h4>
           <button
             class="close-btn close-btn-sm close-btn-inline"
@@ -128,6 +132,9 @@
           <table class="modal-records-table">
             <thead>
               <tr>
+                <th v-if="selectedDetailType === 'region'">
+                  {{ t('customEntry.pointDetail.labels.location') }}
+                </th>
                 <th>{{ t('customEntry.pointDetail.rows.headers.phonology') }}</th>
                 <th>{{ t('customEntry.pointDetail.rows.headers.feature') }}</th>
                 <th>{{ t('customEntry.pointDetail.rows.headers.value') }}</th>
@@ -136,6 +143,7 @@
             </thead>
             <tbody>
               <tr v-for="record in pointRecords" :key="record.created_at || record.id">
+                <td v-if="selectedDetailType === 'region'">{{ record['簡稱'] }}</td>
                 <td>{{ record['聲韻調'] }}</td>
                 <td>{{ record['特徵'] }}</td>
                 <td>{{ record['值'] }}</td>
@@ -253,20 +261,40 @@ const handleSaved = async () => {
 };
 
 const isPointModalOpen = ref(false);
-const selectedPointName = ref('');
+const selectedDetailType = ref('location');
+const selectedDetailName = ref('');
 const pointLoading = ref(false);
 const pointError = ref('');
 const pointRecords = ref([]);
 
-const showPointDetail = async (location, region) => {
-  selectedPointName.value = location;
+const showLocationDetail = async (locationName) => {
+  selectedDetailType.value = 'location';
+  selectedDetailName.value = locationName;
   isPointModalOpen.value = true;
   pointLoading.value = true;
   pointError.value = '';
   pointRecords.value = [];
 
   try {
-    const response = await getDataByPoint(location, region);
+    const response = await getDataByPoint(locationName, '');
+    pointRecords.value = Array.isArray(response?.data) ? response.data : [];
+  } catch (error) {
+    pointError.value = error.message || t('customEntry.pointDetail.messages.loadFailed');
+  } finally {
+    pointLoading.value = false;
+  }
+};
+
+const showRegionDetail = async (regionName) => {
+  selectedDetailType.value = 'region';
+  selectedDetailName.value = regionName;
+  isPointModalOpen.value = true;
+  pointLoading.value = true;
+  pointError.value = '';
+  pointRecords.value = [];
+
+  try {
+    const response = await getDataByPoint('', regionName);
     pointRecords.value = Array.isArray(response?.data) ? response.data : [];
   } catch (error) {
     pointError.value = error.message || t('customEntry.pointDetail.messages.loadFailed');
