@@ -186,4 +186,25 @@ watch(
   line-height: 1.7;
   color: #475569;
 }
+
+@media (max-width: 768px) {
+  .entry-modal-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 12px;
+  }
+
+  .entry-modal-mode-switcher {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .entry-mode-button {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+}
 </style>

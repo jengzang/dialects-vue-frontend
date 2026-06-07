@@ -1,22 +1,37 @@
 <template>
   <section class="feature-detail-table">
     <div class="feature-detail-header">
-      <button class="main-glass-button" type="button" @click="$emit('back')">{{ t('customEntry.featureDetail.back') }}</button>
+      <button class="main-glass-button" type="button" @click="$emit('back')">
+        {{ t('customEntry.featureDetail.back') }}
+      </button>
       <div class="feature-detail-heading">
         <h4 class="feature-detail-title">{{ detailTitle }}</h4>
         <p class="feature-detail-description">{{ t('customEntry.featureDetail.description') }}</p>
       </div>
-      <button class="main-glass-button" data-variant="primary" type="button" @click="openCreateModal">{{ t('customEntry.featureDetail.createRecord') }}</button>
+      <button
+        class="main-glass-button"
+        data-variant="primary"
+        type="button"
+        @click="openCreateModal"
+      >
+        {{ t('customEntry.featureDetail.createRecord') }}
+      </button>
     </div>
 
     <div class="feature-detail-layout">
       <div class="feature-detail-main main-glass-panel-inner">
-        <div v-if="loading" class="feature-detail-state">{{ t('customEntry.featureDetail.loading') }}</div>
+        <div v-if="loading" class="feature-detail-state">
+          {{ t('customEntry.featureDetail.loading') }}
+        </div>
         <div v-else-if="errorMessage" class="feature-detail-state feature-detail-state-error">
           <div>{{ errorMessage }}</div>
-          <button class="main-glass-button" type="button" @click="loadRecords">{{ t('customEntry.featureDetail.retry') }}</button>
+          <button class="main-glass-button" type="button" @click="loadRecords">
+            {{ t('customEntry.featureDetail.retry') }}
+          </button>
         </div>
-        <div v-else-if="rows.length === 0" class="feature-detail-state">{{ t('customEntry.featureDetail.empty') }}</div>
+        <div v-else-if="rows.length === 0" class="feature-detail-state">
+          {{ t('customEntry.featureDetail.empty') }}
+        </div>
         <div v-else class="feature-detail-table-body">
           <div class="feature-detail-table-head">
             <span>{{ t('customEntry.featureDetail.headers.location') }}</span>
@@ -26,15 +41,35 @@
             <span>{{ t('customEntry.featureDetail.headers.note') }}</span>
             <span>{{ t('customEntry.featureDetail.headers.action') }}</span>
           </div>
-          <div v-for="row in rows" :key="row.created_at || `${row['簡稱']}-${row['音典分區']}-${row['值']}`" class="feature-detail-row">
-            <span>{{ row['簡稱'] }}</span>
-            <span>{{ row['音典分區'] }}</span>
-            <span>{{ row['經緯度'] }}</span>
-            <span>{{ row['值'] }}</span>
-            <span>{{ row['說明'] || t('customEntry.featureDetail.emptyNote') }}</span>
+          <div
+            v-for="row in rows"
+            :key="row.created_at || `${row['簡稱']}-${row['音典分區']}-${row['值']}`"
+            class="feature-detail-row"
+          >
+            <span
+              class="cell-location"
+              :data-label="t('customEntry.featureDetail.headers.location')"
+              >{{ row['簡稱'] }}</span
+            >
+            <span class="cell-region" :data-label="t('customEntry.featureDetail.headers.region')">{{
+              row['音典分區']
+            }}</span>
+            <span class="cell-coord" :data-label="t('customEntry.featureDetail.headers.coord')">{{
+              row['經緯度']
+            }}</span>
+            <span class="cell-value" :data-label="t('customEntry.featureDetail.headers.value')">{{
+              row['值']
+            }}</span>
+            <span class="cell-note" :data-label="t('customEntry.featureDetail.headers.note')">{{
+              row['說明'] || t('customEntry.featureDetail.emptyNote')
+            }}</span>
             <div class="feature-detail-actions">
-              <button class="feature-detail-link" type="button" @click="openEditModal(row)">{{ t('customEntry.featureDetail.actions.edit') }}</button>
-              <button class="feature-detail-link danger" type="button" @click="handleDelete(row)">{{ t('customEntry.featureDetail.actions.delete') }}</button>
+              <button class="feature-detail-link" type="button" @click="openEditModal(row)">
+                {{ t('customEntry.featureDetail.actions.edit') }}
+              </button>
+              <button class="feature-detail-link danger" type="button" @click="handleDelete(row)">
+                {{ t('customEntry.featureDetail.actions.delete') }}
+              </button>
             </div>
           </div>
         </div>
@@ -42,7 +77,12 @@
 
       <div class="feature-detail-side main-glass-panel-inner">
         <div class="feature-detail-map-title">{{ t('customEntry.featureDetail.mapTitle') }}</div>
-        <MiniMapSelector mode="multi-preview" :readonly="true" :points="mapPoints" :hint-text="t('customEntry.featureDetail.mapHint')" />
+        <MiniMapSelector
+          mode="multi-preview"
+          :readonly="true"
+          :points="mapPoints"
+          :hint-text="t('customEntry.featureDetail.mapHint')"
+        />
       </div>
     </div>
 
@@ -56,108 +96,118 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { batchDeleteCustomData, getDataByFeature } from '@/api'
-import { showConfirm } from '@/utils/message.js'
-import MiniMapSelector from './MiniMapSelector.vue'
-import FeatureRecordEditorModal from './FeatureRecordEditorModal.vue'
+import { computed, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { batchDeleteCustomData, getDataByFeature } from '@/api';
+import { showConfirm } from '@/utils/message.js';
+import MiniMapSelector from './MiniMapSelector.vue';
+import FeatureRecordEditorModal from './FeatureRecordEditorModal.vue';
 
 const props = defineProps({
   feature: {
     type: Object,
-    default: () => ({})
-  }
-})
+    default: () => ({}),
+  },
+});
 
-const emit = defineEmits(['back', 'saved'])
-const { t } = useI18n()
+const emit = defineEmits(['back', 'saved']);
+const { t } = useI18n();
 
-const loading = ref(false)
-const errorMessage = ref('')
-const rows = ref([])
-const isEditorOpen = ref(false)
-const editingRecord = ref(null)
+const loading = ref(false);
+const errorMessage = ref('');
+const rows = ref([]);
+const isEditorOpen = ref(false);
+const editingRecord = ref(null);
 
 const detailTitle = computed(() => {
-  const featureName = props.feature?.['特徵'] || props.feature?.feature || t('customEntry.featureDetail.unnamed')
-  const phonology = props.feature?.['聲韻調'] || props.feature?.phonology || t('customEntry.featureDetail.uncategorized')
-  return `${featureName}（${phonology}）`
-})
+  const featureName =
+    props.feature?.['特徵'] || props.feature?.feature || t('customEntry.featureDetail.unnamed');
+  const phonology =
+    props.feature?.['聲韻調'] ||
+    props.feature?.phonology ||
+    t('customEntry.featureDetail.uncategorized');
+  return `${featureName}（${phonology}）`;
+});
 
-const mapPoints = computed(() => rows.value
-  .map((row) => {
-    const [lngText, latText] = String(row['經緯度'] || '').split(',')
-    const lng = Number(String(lngText).trim())
-    const lat = Number(String(latText).trim())
-    if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null
-    return {
-      coord: [lng, lat],
-      label: row['簡稱'] || '',
-      active: editingRecord.value?.created_at === row.created_at
-    }
-  })
-  .filter(Boolean))
+const mapPoints = computed(() =>
+  rows.value
+    .map((row) => {
+      const [lngText, latText] = String(row['經緯度'] || '').split(',');
+      const lng = Number(String(lngText).trim());
+      const lat = Number(String(latText).trim());
+      if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
+      return {
+        coord: [lng, lat],
+        label: row['簡稱'] || '',
+        active: editingRecord.value?.created_at === row.created_at,
+      };
+    })
+    .filter(Boolean)
+);
 
 const loadRecords = async () => {
-  loading.value = true
-  errorMessage.value = ''
+  loading.value = true;
+  errorMessage.value = '';
 
   try {
-    const featureName = props.feature?.['特徵'] || props.feature?.feature || ''
-    const phonology = props.feature?.['聲韻調'] || props.feature?.phonology || ''
+    const featureName = props.feature?.['特徵'] || props.feature?.feature || '';
+    const phonology = props.feature?.['聲韻調'] || props.feature?.phonology || '';
     if (!featureName || !phonology) {
-      errorMessage.value = t('customEntry.featureDetail.loadFailed')
-      rows.value = []
-      return
+      errorMessage.value = t('customEntry.featureDetail.loadFailed');
+      rows.value = [];
+      return;
     }
-    const response = await getDataByFeature(featureName, phonology)
-    rows.value = Array.isArray(response?.data) ? response.data : []
+    const response = await getDataByFeature(featureName, phonology);
+    rows.value = Array.isArray(response?.data) ? response.data : [];
   } catch (error) {
-    errorMessage.value = error.message || t('customEntry.featureDetail.loadFailed')
-    rows.value = []
+    errorMessage.value = error.message || t('customEntry.featureDetail.loadFailed');
+    rows.value = [];
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const openCreateModal = () => {
   editingRecord.value = {
-    '簡稱': '',
-    '音典分區': '',
-    '經緯度': '',
-    '值': '',
-    '說明': ''
-  }
-  isEditorOpen.value = true
-}
+    簡稱: '',
+    音典分區: '',
+    經緯度: '',
+    值: '',
+    說明: '',
+  };
+  isEditorOpen.value = true;
+};
 
 const openEditModal = (row) => {
-  editingRecord.value = { ...row }
-  isEditorOpen.value = true
-}
+  editingRecord.value = { ...row };
+  isEditorOpen.value = true;
+};
 
 const handleDelete = async (row) => {
-  if (!row?.created_at) return
-  const confirmed = await showConfirm(t('customEntry.featureDetail.confirmDelete'))
-  if (confirmed === false) return
-  await batchDeleteCustomData([row.created_at])
-  rows.value = rows.value.filter((item) => item.created_at !== row.created_at)
-  emit('saved')
-}
+  if (!row?.created_at) return;
+  const confirmed = await showConfirm(t('customEntry.featureDetail.confirmDelete'));
+  if (confirmed === false) return;
+  await batchDeleteCustomData([row.created_at]);
+  rows.value = rows.value.filter((item) => item.created_at !== row.created_at);
+  emit('saved');
+};
 
 const handleSaved = async () => {
-  await loadRecords()
-  emit('saved')
-}
+  await loadRecords();
+  emit('saved');
+};
 
-watch(() => props.feature, () => {
-  loadRecords()
-}, { deep: true })
+watch(
+  () => props.feature,
+  () => {
+    loadRecords();
+  },
+  { deep: true }
+);
 
 onMounted(() => {
-  loadRecords()
-})
+  loadRecords();
+});
 </script>
 
 <style scoped lang="scss">
@@ -278,9 +328,40 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .feature-detail-table-head,
+  .feature-detail-table-head {
+    display: none;
+  }
+
   .feature-detail-row {
     grid-template-columns: 1fr;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.45);
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .feature-detail-row > span {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .feature-detail-row > span::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #64748b;
+    margin-right: 12px;
+  }
+
+  .feature-detail-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    padding-top: 8px;
   }
 }
 </style>
