@@ -110,7 +110,7 @@
                   :placeholder="t('customEntry.pointDetail.placeholders.feature')"
                 />
                 <button
-                  v-if="row.特徵 && row.聲韻調"
+                  v-if="row.特徵"
                   class="feature-search-emoji-btn"
                   type="button"
                   @click="showFeatureDetail(row.特徵, row.聲韻調)"
@@ -448,11 +448,11 @@ async function handleSave() {
     return;
   }
 
-  const validRows = rows.value.filter((row) => row.特徵.trim() && row.值.trim());
+  const validRows = rows.value.filter((row) => (row.特徵 || '').trim() && (row.值 || '').trim());
   const duplicateKeys = new Set();
   let hasDuplicate = false;
   validRows.forEach((row) => {
-    const key = `${row.聲韻調.trim()}||${row.特徵.trim()}`;
+    const key = `${(row.聲韻調 || '').trim()}||${(row.特徵 || '').trim()}`;
     if (duplicateKeys.has(key)) hasDuplicate = true;
     duplicateKeys.add(key);
   });
@@ -479,10 +479,10 @@ async function handleSave() {
   validRows.forEach((row) => {
     const nextRecord = {
       ...baseRecord,
-      聲韻調: row.聲韻調.trim(),
-      特徵: row.特徵.trim(),
-      值: row.值.trim(),
-      說明: row.說明.trim(),
+      聲韻調: (row.聲韻調 || '').trim(),
+      特徵: (row.特徵 || '').trim(),
+      值: (row.值 || '').trim(),
+      說明: (row.說明 || '').trim(),
     };
 
     if (!row.created_at) {

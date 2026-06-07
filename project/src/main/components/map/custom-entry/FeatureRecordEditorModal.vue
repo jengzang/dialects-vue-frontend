@@ -206,7 +206,9 @@ async function selectSuggestion(item) {
     if (response && response['音典分區']) {
       region.value = response['音典分區'];
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error('獲取分區失敗:', error);
+  }
 }
 
 function hideSuggestions() {
@@ -228,7 +230,7 @@ function syncFromProps() {
 async function checkDuplicateLocation() {
   const featureName = props.feature?.['特徵'] || props.feature?.feature || '';
   const phonology = props.feature?.['聲韻調'] || props.feature?.phonology || '';
-  if (!featureName || !phonology || !location.value.trim() || !region.value.trim()) return false;
+  if (!featureName || !location.value.trim() || !region.value.trim()) return false;
   try {
     const response = await getDataByFeature(featureName, phonology);
     const records = Array.isArray(response?.data) ? response.data : [];
