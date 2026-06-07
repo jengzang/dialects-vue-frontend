@@ -28,8 +28,8 @@ export async function getUserFeatures(params = {}) {
 export async function getDataByPoint(location, region) {
   try {
     const query = new URLSearchParams();
-    if (location) query.append('location', location);
-    if (region) query.append('region', region);
+    query.append('location', location || '');
+    query.append('region', region || '');
     return await api(`/user/custom/data-by-point?${query.toString()}`);
   } catch (error) {
     showError(error.message || '獲取地點數據失敗');
