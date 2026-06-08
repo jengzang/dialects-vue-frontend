@@ -152,27 +152,25 @@
             </button>
           </div>
         </div>
-      <div class="point-detail-actions">
-        <button class="main-glass-button add-row-btn" type="button" @click="addRow">
-          {{ t('customEntry.pointDetail.rows.add') }}
-        </button>
-        <div class="action-right-group">
-          <button class="main-glass-button" type="button" @click="$emit('back')">
-            {{ t('customEntry.pointDetail.actions.cancel') }}
-          </button>
-          <button
-            class="main-glass-button"
-            data-variant="primary"
-            type="button"
-            :disabled="isSaving"
-            @click="handleSave"
-          >
-            {{
-              isSaving ? t('customEntry.common.saving') : t('customEntry.pointDetail.actions.save')
-            }}
-          </button>
-        </div>
-      </div>
+          <div class="action-group">
+            <button class="main-glass-button add-row-btn" type="button" @click="addRow">
+              {{ t('customEntry.pointDetail.rows.add') }}
+            </button>
+            <button class="main-glass-button" type="button" @click="$emit('back')">
+              {{ t('customEntry.pointDetail.actions.cancel') }}
+            </button>
+            <button
+              class="main-glass-button"
+              data-variant="primary"
+              type="button"
+              :disabled="isSaving"
+              @click="handleSave"
+            >
+              {{
+                isSaving ? t('customEntry.common.saving') : t('customEntry.pointDetail.actions.save')
+              }}
+            </button>
+          </div>
       </div>
 
       <div class="point-detail-side main-glass-panel-inner">
@@ -885,22 +883,16 @@ watch(
   cursor: pointer;
 }
 
-.point-detail-actions {
+.action-group {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   width: 100%;
   align-items: center;
   gap: 12px;
   margin-top: 18px;
   flex-wrap: wrap;
-}
-
-.action-right-group {
   --main-glass-button-padding: 12px 20px;
   --main-glass-button-white-space: nowrap;
-  display: flex;
-  gap: 12px;
-  align-items: center;
 }
 
 .add-row-btn {
@@ -983,7 +975,7 @@ watch(
     flex-direction: column-reverse;
     align-items: stretch;
   }
-  .action-right-group {
+  .action-group {
     flex-direction: row;
     justify-content: flex-end;
   }
