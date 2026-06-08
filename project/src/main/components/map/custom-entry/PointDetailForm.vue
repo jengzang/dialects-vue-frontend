@@ -696,7 +696,6 @@ watch(
 
 .point-field-label {
   min-width: 56px;
-  text-align: right;
   flex-shrink: 0;
 }
 

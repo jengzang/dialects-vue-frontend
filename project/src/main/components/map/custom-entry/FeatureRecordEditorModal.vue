@@ -87,26 +87,7 @@
           </div>
         </div>
 
-        <label class="feature-record-field feature-record-field-full">
-          <span>{{ t('customEntry.featureRecord.labels.coord') }}</span>
-          <input
-            :value="coordText"
-            class="feature-record-input"
-            type="text"
-            readonly
-            :placeholder="t('customEntry.featureRecord.placeholders.coord')"
-          />
-        </label>
-      </div>
-
-      <MiniMapSelector
-        v-model:coord="coord"
-        :mode="isCoordLocked ? 'single-preview' : 'picker'"
-        :readonly="isCoordLocked"
-        :hint-text="isCoordLocked ? '已锁定已有地点坐标，防止冲突' : t('customEntry.featureRecord.mapHint')"
-      />
-
-      <div class="feature-record-grid feature-record-values">
+        <!-- <div class="feature-record-grid feature-record-values"> -->
         <label class="feature-record-field">
           <span>{{ t('customEntry.featureRecord.labels.value') }}</span>
           <input
@@ -125,7 +106,26 @@
             :placeholder="t('customEntry.featureRecord.placeholders.note')"
           />
         </label>
+        <!-- </div> -->
+
+        <label class="feature-record-field feature-record-field-full">
+          <span>{{ t('customEntry.featureRecord.labels.coord') }}</span>
+          <input
+            :value="coordText"
+            class="feature-record-input"
+            type="text"
+            readonly
+            :placeholder="t('customEntry.featureRecord.placeholders.coord')"
+          />
+        </label>
       </div>
+
+      <MiniMapSelector
+        v-model:coord="coord"
+        :mode="isCoordLocked ? 'single-preview' : 'picker'"
+        :readonly="isCoordLocked"
+        :hint-text="isCoordLocked ? '已锁定已有地点坐标，防止冲突' : t('customEntry.featureRecord.mapHint')"
+      />
 
       <div v-if="message" class="feature-record-message">{{ message }}</div>
     </div>
