@@ -1,18 +1,38 @@
 <template>
   <div>
-    <div class="page" style="max-width: 90%;overflow: hidden">
+    <div
+      class="page"
+      style="max-width: 90%;overflow: hidden"
+    >
       <div class="page-content-stack">
-        <div class="page-footer" style="flex-direction: column">
-          <p style="margin:0">{{ t('map.divideTab.title') }}</p>
-          <small class="hint" v-html="t('map.divideTab.hint')"></small>
+        <div
+          class="page-footer"
+          style="flex-direction: column"
+        >
+          <p style="margin:0">
+            {{ t('map.divideTab.title') }}
+          </p>
+          <small
+            class="hint"
+            v-html="t('map.divideTab.hint')"
+          />
         </div>
 
-        <div class="dropdown-row horizontal-dropdown" style="margin-top: 12px;">
-          <label class="query-label" style="margin:0;font-size: 14px;">
+        <div
+          class="dropdown-row horizontal-dropdown"
+          style="margin-top: 12px;"
+        >
+          <label
+            class="query-label"
+            style="margin:0;font-size: 14px;"
+          >
             {{ t('map.divideTab.labels.regionLevel') }}
           </label>
 
-          <div class="dropdown-wrapper" style="width: 200px">
+          <div
+            class="dropdown-wrapper"
+            style="width: 200px"
+          >
             <SimpleSelectDropdown
               v-model="selectedRegion"
               :options="regionOptions"
@@ -24,19 +44,19 @@
     </div>
 
     <LocationAndRegionInput
-        ref="locationRef"
-        @update:runDisabled="uiStore.buttonStates.divide.isLocationDisabled = $event"
-        v-model="locationModel"
-        limitContext="divide"
+      ref="locationRef"
+      v-model="locationModel"
+      limit-context="divide"
+      @update:run-disabled="uiStore.buttonStates.divide.isLocationDisabled = $event"
     />
 
     <div class="run-container">
       <button
-          id="allmap-first"
-          class="allmap-first"
-          @click="runAction"
-          :disabled="buttonState.isRunning || isDisabled"
-          :class="{ 'disabled-style': isDisabled }"
+        id="allmap-first"
+        class="allmap-first"
+        :disabled="buttonState.isRunning || isDisabled"
+        :class="{ 'disabled-style': isDisabled }"
+        @click="runAction"
       >
         <span v-if="buttonState.isRunning">{{ t('map.divideTab.buttons.running') }}</span>
         <span v-else>{{ t('map.divideTab.buttons.run') }}</span>
@@ -47,7 +67,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
@@ -56,7 +76,6 @@ import { getCoordinates } from '@/api'
 import { showError, showWarning } from '@/utils/message.js';
 
 const router = useRouter()
-const route = useRoute()
 const { t } = useI18n()
 
 const locationRef = ref(null)
@@ -132,15 +151,52 @@ const runAction = async () => {
 }
 </script>
 
-<style scoped>
-/* 可選：給禁用按鈕加一點樣式，讓用戶知道不可點 */
-.allmap-first:disabled {
-  background: #ccc; /* 灰色 */
-  cursor: not-allowed;
-  transform: none !important; /* 禁止按下的動畫 */
-  box-shadow: none;
+<style scoped lang="scss">
+$apple-font:
+  -apple-system,
+  BlinkMacSystemFont,
+  "SF Pro Display",
+  "SF Pro Text",
+  "PingFang SC",
+  "Hiragino Sans GB",
+  "Microsoft YaHei",
+  Arial,
+  sans-serif;
+
+$text-strong: rgba(8, 24, 48, 0.92);
+$text-main: rgba(20, 40, 70, 0.86);
+$text-secondary: rgba(60, 60, 67, 0.72);
+
+/* 页面内字体统一，不改 page 全局布局 */
+.page-content-stack,
+.page-footer,
+.horizontal-dropdown,
+.allmap-first {
+  font-family: $apple-font;
 }
-/* 將相關樣式移入 */
+
+/* 顶部标题与提示 */
+.page-footer {
+  p {
+    font-size: clamp(20px, 2.2vw, 26px);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: $text-strong;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.45);
+  }
+
+  .hint {
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.65;
+    letter-spacing: 0.01em;
+    color: $text-secondary;
+  }
+}
+
+/* 横向下拉区域 */
 .horizontal-dropdown {
   display: flex;
   align-items: center;
@@ -152,39 +208,47 @@ const runAction = async () => {
   margin: auto;
 }
 
-.allmap-first {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(90deg, #007aff, mediumblue);
-  border: none;
-  border-radius: 30px;
-  padding: 14px 28px;
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 1px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
-  pointer-events: auto; /* 恢復點擊事件，覆蓋父容器的 pointer-events: none */
+/* 下拉框左侧文字 */
+.query-label {
+  font-family: $apple-font;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: rgba(20, 40, 70, 0.82);
 }
 
-.allmap-first:hover {
-  background: linear-gradient(145deg, #4e5d5b, #212d2b);
-  transform: translateY(-3px);
-}
-
-/* Dropdown 样式 */
+/* 下拉框外层 */
 .dropdown-wrapper {
   flex: 1;
   position: relative;
   align-items: center;
   display: flex;
   justify-content: center;
+
+  /* 影响 SimpleSelectDropdown 组件内部字体 */
+  :deep(*) {
+    font-family: $apple-font;
+  }
+
+  :deep(.dropdown) {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: $text-main;
+  }
+
+  :deep(.option),
+  :deep(.dropdown-option),
+  :deep(.select-option),
+  :deep(li) {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
 }
 
+/* 如果当前组件内仍有 .dropdown，会保留原有玻璃风格 */
 .dropdown {
   padding: 6px 12px;
   border-radius: var(--radius-md);
@@ -193,6 +257,9 @@ const runAction = async () => {
   -webkit-backdrop-filter: blur(10px);
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: $text-main;
   border: 1px solid rgba(200, 200, 200, 0.5);
   display: flex;
   justify-content: space-between;
@@ -201,10 +268,48 @@ const runAction = async () => {
   margin: auto;
   transition: all 0.2s;
   white-space: nowrap;
+
+  &:hover {
+    background: var(--glass-medium);
+    border-color: var(--color-primary);
+  }
 }
 
-.dropdown:hover {
-  background: var(--glass-medium);
-  border-color: var(--color-primary);
+/* 运行按钮 */
+.allmap-first {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #007aff, mediumblue);
+  border: none;
+  border-radius: 30px;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    0 6px 20px rgba(0, 0, 0, 0.19);
+  pointer-events: auto;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+
+  &:hover {
+    background: linear-gradient(145deg, #4e5d5b, #212d2b);
+    transform: translateY(-3px);
+  }
+
+  &:disabled,
+  &.disabled-style {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none;
+  }
 }
 </style>

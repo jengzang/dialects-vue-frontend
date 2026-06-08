@@ -1,114 +1,200 @@
 <template>
-  <div>
+  <div class="custom-tab-container">
     <div class="page-content-stack">
+      <!-- Header Area -->
       <div class="page-footer">
-        <h3 style="margin: 0">{{ t('map.customTab.title') }}</h3>
-        <button
-          type="button"
-          class="help-icon-head"
-          @click="openHelpModal"
-          :title="t('map.customTab.buttons.help')"
-          :aria-label="t('map.customTab.buttons.help')"
-        >
-          {{ t('map.customTab.buttons.help') }}
-        </button>
-        <div class="button-row" v-if="!userStore.isAuthenticated">
-          <button class="enter-btn" @click="handleLogin">
+        <h3 style="margin: 0">
+          {{ t('map.customTab.title') }}
+        </h3>
+        <div class="header-actions">
+          <button
+            type="button"
+            class="help-icon-head"
+            :title="t('map.customTab.buttons.help')"
+            :aria-label="t('map.customTab.buttons.help')"
+            @click="openHelpModal"
+          >
+            {{ t('map.customTab.buttons.help') }}
+          </button>
+          <button
+            v-if="userStore.isAuthenticated"
+            class="action-btn add-entry-btn-sm"
+            @click="openEntryModal"
+          >
+            {{ t('map.customTab.buttons.addData') }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Login Warning if not authenticated -->
+      <div
+        v-if="!userStore.isAuthenticated"
+        class="auth-warning-container"
+      >
+        <div class="auth-warning-card">
+          <div class="auth-warning-icon">
+            🔒
+          </div>
+          <p class="auth-warning-text">
+            {{ t('map.customTab.validation.loginFirst') || '请先登录以查看 and 管理您的个人语料特征数据' }}
+          </p>
+          <button
+            class="enter-btn"
+            @click="handleLogin"
+          >
             {{ t('map.customTab.labels.login') }}
           </button>
         </div>
       </div>
 
-      <!-- LocationAndRegionInput 组件 -->
-      <LocationAndRegionInput
-        v-model="locationData"
-        :useInputMode="true"
-        style="margin-top: 12px"
-      />
-
-      <!-- 特征搜索输入框 -->
-      <div class="feature-search-container">
-        <div class="label-row">
-          <label for="featureSearch" class="query-label">{{
-            t('map.customTab.labels.featureSearch')
-          }}</label>
-
-          <span v-if="!userStore.isAuthenticated" class="data-count-badge warning">
-            {{ t('map.customTab.badges.loginRequired') }}
-          </span>
-          <span v-else-if="userTotalCount === 0" class="data-count-badge hint">
-            {{ t('map.customTab.badges.noData') }}
-          </span>
-          <span v-else class="data-count-badge success">
-            {{ t('map.customTab.badges.dataCount', { count: userTotalCount }) }}
-          </span>
-        </div>
-        <div class="search-input-wrapper">
-          <input
-            id="featureSearch"
-            v-model="featureSearchInput"
-            type="text"
-            :placeholder="t('map.customTab.placeholders.featureSearch')"
-            @input="handleFeatureInput"
-            @focus="handleInputFocus"
-            class="feature-search-input"
-          />
-          <span v-if="isSearching" class="loading-icon">⏳</span>
-        </div>
-
-        <!-- Dropdown 下拉列表 (使用 Teleport) -->
-        <Teleport to="body">
-          <div
-            v-if="showSuggestions && featureSuggestions.length > 0"
-            class="dropdown-panel"
-            :style="dropdownStyle"
-            ref="featureDropdownEl"
-          >
-            <div
-              class="dropdown-item"
-              v-for="feature in featureSuggestions"
-              :key="feature"
-              @mousedown.prevent="selectFeature(feature)"
+      <!-- Main Tree and Search Interface if authenticated -->
+      <div
+        v-else
+        class="interactive-search-layout"
+      >
+        <!-- Feature Search / Filtering -->
+        <div class="feature-search-section">
+          <div class="label-row">
+            <label
+              for="featureSearch"
+              class="query-label"
             >
-              {{ feature }}
+              {{ t('map.customTab.labels.featureSearch') || '过滤特征' }}
+            </label>
+            <span
+              v-if="userTotalCount === 0"
+              class="data-count-badge hint"
+            >
+              {{ t('map.customTab.badges.noData') }}
+            </span>
+            <span
+              v-else
+              class="data-count-badge success"
+            >
+              {{ t('map.customTab.badges.dataCount', { count: userTotalCount }) }}
+            </span>
+          </div>
+          <div class="search-input-wrapper">
+            <span class="search-emoji-icon">🔍</span>
+            <input
+              id="featureSearch"
+              v-model="searchQuery"
+              type="text"
+              :placeholder="t('map.customTab.placeholders.featureSearch') || '输入特征或分类进行过滤...'"
+              class="feature-search-input"
+            >
+            <button 
+              v-if="searchQuery" 
+              class="clear-search-btn" 
+              type="button" 
+              @click="searchQuery = ''"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
+        <!-- Collapsible Tree Selector -->
+        <div class="tree-selector-container">
+          <div
+            v-if="loadingFeatures"
+            class="tree-loading-state"
+          >
+            <span class="spinner-icon">⏳</span> {{ t('customEntry.featureDetail.loading') || '加载特征列表中...' }}
+          </div>
+          <div
+            v-else-if="userFeatures.length === 0"
+            class="tree-empty-state"
+          >
+            <div class="empty-state-icon">
+              📂
+            </div>
+            <p class="empty-state-title">
+              {{ t('customEntry.featureList.emptyTitle') || '暂无个人特征数据' }}
+            </p>
+            <p class="empty-state-text">
+              {{ t('customEntry.featureList.emptyText') || '点击右上角“录入数据”开始记录吧！' }}
+            </p>
+            <button
+              class="action-btn primary-btn inline-btn"
+              @click="openEntryModal"
+            >
+              {{ t('map.customTab.buttons.addData') }}
+            </button>
+          </div>
+          <div
+            v-else-if="Object.keys(groupedFeatures).length === 0"
+            class="tree-empty-state"
+          >
+            <p class="empty-state-text">
+              {{ t('map.customTab.messages.noMatch') || '没有找到匹配的特征' }}
+            </p>
+          </div>
+          <div
+            v-else
+            class="tree-categories-list"
+          >
+            <div 
+              v-for="(features, category) in groupedFeatures" 
+              :key="category" 
+              class="tree-category-node"
+              :class="{ collapsed: !expandedCategories[category] }"
+            >
+              <!-- Category Header -->
+              <button 
+                class="category-header-btn" 
+                type="button" 
+                @click="toggleCategory(category)"
+              >
+                <span class="arrow-indicator">▶</span>
+                <span class="category-name">{{ category }}</span>
+                <span class="category-count-badge">{{ features.length }}</span>
+              </button>
+
+              <!-- Category Leaf Nodes (Features) -->
+              <div
+                v-show="expandedCategories[category]"
+                class="category-children-container"
+              >
+                <button
+                  v-for="item in features"
+                  :key="item.feature_key || `${item['特徵']}-${item['聲韻調']}`"
+                  class="feature-leaf-node"
+                  type="button"
+                  @click="selectFeatureItem(item)"
+                >
+                  <span class="feature-name">{{ item['特徵'] || item.feature }}</span>
+                  <span class="feature-count-badge">{{ t('customEntry.featureList.pointCount', { count: item.location_count || 0 }) }}</span>
+                </button>
+              </div>
             </div>
           </div>
-        </Teleport>
+        </div>
+
+        <!-- Management Links -->
+        <div class="management-footer">
+          <button
+            class="flat-link-btn"
+            type="button"
+            @click="goToDataManager"
+          >
+            ⚙️ {{ t('map.customTab.helpModal.sections.customCollection.items.manage.label') || '管理我的所有自定义数据' }}
+          </button>
+        </div>
       </div>
 
-      <!-- 已选择的特征显示 -->
-      <div v-if="selectedFeature" class="selected-feature">
-        {{ t('map.customTab.selected', { feature: selectedFeature }) }}
-      </div>
-
-      <!-- 运行查询按钮 -->
-      <div class="button-group">
-        <button class="action-btn primary-btn" @click="handleRunQuery" :disabled="isDisabled">
-          <span v-if="buttonState.isRunning">{{ t('map.customTab.buttons.running') }}</span>
-          <span v-else>{{ t('map.customTab.buttons.run') }}</span>
-        </button>
-      </div>
-
-      <!-- 分隔线 -->
+      <!-- Divider / Usage Info Link -->
       <div class="divider">
         <span>{{ t('map.customTab.divider') }}</span>
       </div>
 
-      <!-- 使用说明链接 -->
       <div class="help-trigger-wrapper">
-        <span class="help-trigger" @click="openHelpModal">
+        <span
+          class="help-trigger"
+          @click="openHelpModal"
+        >
           {{ t('map.customTab.helpTrigger') }}
         </span>
-      </div>
-
-      <div class="button-group">
-        <button
-          class="action-btn add-entry-btn"
-          @click="openEntryModal"
-          :disabled="!userStore.isAuthenticated"
-        >
-          {{ t('map.customTab.buttons.addData') }}
-        </button>
       </div>
     </div>
 
@@ -119,7 +205,7 @@
       size="lg"
       :title="t('map.customTab.helpModal.title')"
       :close-label="t('common.button.close')"
-      @update:modelValue="closeHelpModal"
+      @update:model-value="closeHelpModal"
     >
       <div class="help-content">
         <div class="help-section">
@@ -127,57 +213,94 @@
             🌟 {{ t('map.customTab.helpModal.sections.overview.title') }}
           </h4>
           <ul class="help-list">
-            <li v-for="item in helpOverviewItems" :key="item.key">
-              <strong>{{ item.label }}</strong
-              >{{ item.text }}
+            <li
+              v-for="item in helpOverviewItems"
+              :key="item.key"
+            >
+              <strong>{{ item.label }}</strong>{{ item.text }}
             </li>
           </ul>
         </div>
 
-        <div class="help-section" style="border-left: 4px solid #007aff">
+        <div
+          class="help-section"
+          style="border-left: 4px solid #007aff"
+        >
           <h4 class="section-title">
             🎨 {{ t('map.customTab.helpModal.sections.fieldGuide.title') }}
           </h4>
           <ul class="help-list">
-            <li v-for="item in helpFieldGuideItems" :key="item.key">
-              <strong>{{ item.label }}</strong
-              >{{ item.text }}
+            <li
+              v-for="item in helpFieldGuideItems"
+              :key="item.key"
+            >
+              <strong>{{ item.label }}</strong>{{ item.text }}
             </li>
           </ul>
           <div class="example-hint">
             <ul>
-              <li v-for="example in helpFieldGuideExamples" :key="example">{{ example }}</li>
+              <li
+                v-for="example in helpFieldGuideExamples"
+                :key="example"
+              >
+                {{ example }}
+              </li>
             </ul>
           </div>
           <div class="table-container">
             <table class="example-table">
               <thead>
                 <tr>
-                  <th style="min-width: 60px">簡稱</th>
-                  <th style="min-width: 40px">分區</th>
-                  <th style="min-width: 90px">經緯度</th>
-                  <th style="min-width: 50px">聲韻調</th>
-                  <th style="min-width: 30px">特徵</th>
-                  <th style="min-width: 40px">值</th>
-                  <th style="min-width: 60px">說明</th>
+                  <th style="min-width: 60px">
+                    簡稱
+                  </th>
+                  <th style="min-width: 40px">
+                    分區
+                  </th>
+                  <th style="min-width: 90px">
+                    經緯度
+                  </th>
+                  <th style="min-width: 50px">
+                    聲韻調
+                  </th>
+                  <th style="min-width: 30px">
+                    特徵
+                  </th>
+                  <th style="min-width: 40px">
+                    值
+                  </th>
+                  <th style="min-width: 60px">
+                    說明
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td class="highlight-location">陽春圭崗</td>
-                  <td class="highlight-region">嶺南</td>
-                  <td class="highlight-geo">111.742615,22.35676</td>
+                  <td class="highlight-location">
+                    陽春圭崗
+                  </td>
+                  <td class="highlight-region">
+                    嶺南
+                  </td>
+                  <td class="highlight-geo">
+                    111.742615,22.35676
+                  </td>
                   <td>韻母</td>
                   <td><strong>豪</strong></td>
                   <td><span class="value-tag">ɐu</span></td>
-                  <td class="note-text">個人田調</td>
+                  <td class="note-text">
+                    個人田調
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <div class="help-section" style="border-left: 4px solid #007aff">
+        <div
+          class="help-section"
+          style="border-left: 4px solid #007aff"
+        >
           <h4 class="section-title">
             💫 {{ t('map.customTab.helpModal.sections.customCollection.title') }}
           </h4>
@@ -185,106 +308,174 @@
             {{ t('map.customTab.helpModal.sections.customCollection.intro') }}
           </p>
           <ul class="help-list">
-            <li v-for="item in helpCollectionItems" :key="item.key">
-              <strong>{{ item.label }}</strong
-              >{{ item.text }}
+            <li
+              v-for="item in helpCollectionItems"
+              :key="item.key"
+            >
+              <strong>{{ item.label }}</strong>{{ item.text }}
             </li>
           </ul>
           <div class="example-hint">
             <ul>
-              <li v-for="note in helpCollectionNotes" :key="note">{{ note }}</li>
+              <li
+                v-for="note in helpCollectionNotes"
+                :key="note"
+              >
+                {{ note }}
+              </li>
             </ul>
           </div>
           <div class="table-container">
             <table class="example-table">
               <thead>
                 <tr>
-                  <th style="min-width: 60px">簡稱</th>
-                  <th style="min-width: 30px">分區</th>
-                  <th style="min-width: 70px">經緯度</th>
-                  <th style="min-width: 50px">聲韻調</th>
-                  <th style="min-width: 30px">特徵</th>
-                  <th style="min-width: 40px">值</th>
-                  <th style="min-width: 60px">說明</th>
+                  <th style="min-width: 60px">
+                    簡稱
+                  </th>
+                  <th style="min-width: 30px">
+                    分區
+                  </th>
+                  <th style="min-width: 70px">
+                    經緯度
+                  </th>
+                  <th style="min-width: 50px">
+                    聲韻調
+                  </th>
+                  <th style="min-width: 30px">
+                    特徵
+                  </th>
+                  <th style="min-width: 40px">
+                    值
+                  </th>
+                  <th style="min-width: 60px">
+                    說明
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td rowspan="5" class="highlight-location">陽春雙滘</td>
-                  <td rowspan="10" class="highlight-region">2025田調</td>
-                  <td rowspan="5" class="highlight-geo">111.332451,<br />22.109056</td>
+                  <td
+                    rowspan="5"
+                    class="highlight-location"
+                  >
+                    陽春雙滘
+                  </td>
+                  <td
+                    rowspan="10"
+                    class="highlight-region"
+                  >
+                    2025田調
+                  </td>
+                  <td
+                    rowspan="5"
+                    class="highlight-geo"
+                  >
+                    111.332451,<br>22.109056
+                  </td>
                   <td>韻母</td>
                   <td><strong>止·精組·開</strong></td>
                   <td><span class="value-tag">ei/i</span></td>
-                  <td class="note-text">兩讀</td>
+                  <td class="note-text">
+                    兩讀
+                  </td>
                 </tr>
                 <tr>
                   <td>聲母</td>
                   <td><strong>來</strong></td>
                   <td><span class="value-tag">l</span></td>
-                  <td class="note-text"></td>
+                  <td class="note-text" />
                 </tr>
                 <tr>
                   <td>調值</td>
                   <td><strong>陰去</strong></td>
                   <td><span class="value-tag">53</span></td>
-                  <td class="note-text">可能是受涯話影響</td>
+                  <td class="note-text">
+                    可能是受涯話影響
+                  </td>
                 </tr>
                 <tr>
                   <td>詞彙</td>
                   <td><strong>昨天</strong></td>
                   <td><span class="value-tag">從日</span></td>
-                  <td class="note-text">ʦuŋ21 ȵɐt51</td>
+                  <td class="note-text">
+                    ʦuŋ21 ȵɐt51
+                  </td>
                 </tr>
                 <tr>
                   <td>詞彙</td>
                   <td><strong>玩耍</strong></td>
                   <td><span class="value-tag">嬲</span></td>
-                  <td class="note-text">liɛu53</td>
+                  <td class="note-text">
+                    liɛu53
+                  </td>
                 </tr>
                 <tr>
-                  <td rowspan="5" class="highlight-location">阳春合水</td>
-                  <td rowspan="5" class="highlight-geo">111.856357,<br />22.289037</td>
+                  <td
+                    rowspan="5"
+                    class="highlight-location"
+                  >
+                    阳春合水
+                  </td>
+                  <td
+                    rowspan="5"
+                    class="highlight-geo"
+                  >
+                    111.856357,<br>22.289037
+                  </td>
                   <td>韻母</td>
                   <td><strong>止·精組·開</strong></td>
                   <td><span class="value-tag">ei</span></td>
-                  <td class="note-text">兩陽的特點</td>
+                  <td class="note-text">
+                    兩陽的特點
+                  </td>
                 </tr>
                 <tr>
                   <td>泥來母</td>
                   <td><strong>來母</strong></td>
                   <td><span class="value-tag">l</span></td>
-                  <td class="note-text"></td>
+                  <td class="note-text" />
                 </tr>
                 <tr>
                   <td>調值</td>
                   <td><strong>陰去</strong></td>
                   <td><span class="value-tag">33</span></td>
-                  <td class="note-text"></td>
+                  <td class="note-text" />
                 </tr>
                 <tr>
                   <td>詞彙</td>
                   <td><strong>昨天</strong></td>
                   <td><span class="value-tag">撞日</span></td>
-                  <td class="note-text">tsoŋ53 ŋɐt53</td>
+                  <td class="note-text">
+                    tsoŋ53 ŋɐt53
+                  </td>
                 </tr>
                 <tr>
                   <td>詞彙</td>
                   <td><strong>玩耍</strong></td>
                   <td><span class="value-tag">耍</span></td>
-                  <td class="note-text">ʃa323</td>
+                  <td class="note-text">
+                    ʃa323
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <div class="help-section" style="border-left: 4px solid #007aff">
+        <div
+          class="help-section"
+          style="border-left: 4px solid #007aff"
+        >
           <h4 class="section-title">
             💡 {{ t('map.customTab.helpModal.sections.dailyUsage.title') }}
           </h4>
-          <p class="help-paragraph">{{ t('map.customTab.helpModal.sections.dailyUsage.intro') }}</p>
-          <ul class="help-list" style="margin-top: 8px">
+          <p class="help-paragraph">
+            {{ t('map.customTab.helpModal.sections.dailyUsage.intro') }}
+          </p>
+          <ul
+            class="help-list"
+            style="margin-top: 8px"
+          >
             <li>
               📁 <strong>「分區」即文件夾：</strong>比如填入
               <code>我的探店地圖</code>（「聲韻調」可留空）。
@@ -302,7 +493,9 @@
 
           <div class="usage-diagram">
             <div class="usage-level region-level">
-              <div class="level-icon">📂</div>
+              <div class="level-icon">
+                📂
+              </div>
               <div class="level-content">
                 <div class="field-tag">
                   {{ t('map.customTab.helpModal.sections.dailyUsage.cards.region.label') }}
@@ -321,7 +514,9 @@
             </div>
 
             <div class="usage-level location-level">
-              <div class="level-icon">📍</div>
+              <div class="level-icon">
+                📍
+              </div>
               <div class="level-content">
                 <div class="field-tag">
                   {{ t('map.customTab.helpModal.sections.dailyUsage.cards.location.label') }}
@@ -342,7 +537,9 @@
             <div class="usage-level data-level">
               <div class="level-group">
                 <div class="sub-level feature-box">
-                  <div class="level-icon-sm">🏷️</div>
+                  <div class="level-icon-sm">
+                    🏷️
+                  </div>
                   <div>
                     <div class="field-tag-sm">
                       {{ t('map.customTab.helpModal.sections.dailyUsage.cards.feature.label') }}
@@ -356,10 +553,14 @@
                   </div>
                 </div>
 
-                <div class="arrow-right">👉</div>
+                <div class="arrow-right">
+                  👉
+                </div>
 
                 <div class="sub-level value-box">
-                  <div class="level-icon-sm">💬</div>
+                  <div class="level-icon-sm">
+                    💬
+                  </div>
                   <div>
                     <div class="field-tag-sm">
                       {{ t('map.customTab.helpModal.sections.dailyUsage.cards.value.label') }}
@@ -376,17 +577,27 @@
             </div>
           </div>
 
-          <p class="example-hint" style="margin: 0">
+          <p
+            class="example-hint"
+            style="margin: 0"
+          >
             ✨ {{ t('map.customTab.helpModal.sections.dailyUsage.result') }}
           </p>
         </div>
 
-        <div class="help-section" style="border-left: 4px solid #007aff">
-          <h4 class="section-title">📍 {{ t('map.customTab.helpModal.sections.steps.title') }}</h4>
+        <div
+          class="help-section"
+          style="border-left: 4px solid #007aff"
+        >
+          <h4 class="section-title">
+            📍 {{ t('map.customTab.helpModal.sections.steps.title') }}
+          </h4>
           <ul class="help-list">
-            <li v-for="item in helpStepsItems" :key="item.key">
-              <strong>{{ item.label }}</strong
-              >{{ item.text }}
+            <li
+              v-for="item in helpStepsItems"
+              :key="item.key"
+            >
+              <strong>{{ item.label }}</strong>{{ item.text }}
             </li>
           </ul>
         </div>
@@ -396,29 +607,26 @@
 </template>
 
 <script setup>
-import { computed, ref, reactive, nextTick, onMounted, onBeforeUnmount, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
-import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue';
-import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue';
 import CustomDataEntryModal from '@/main/components/map/custom-entry/CustomDataEntryModal.vue';
-import { getAllCustomData, getCustomFeature } from '@/api';
+import { getAllCustomData, getUserFeatures } from '@/api';
 import {
   userStore,
   resultCache,
   mapStore,
-  uiStore,
-  isCustomButtonDisabled,
-  setRunning,
 } from '@/main/store/store.js';
-import { showSuccess, showError, showWarning, showInfo } from '@/utils/message.js';
+import { showSuccess, showWarning } from '@/utils/message.js';
 import AppModal from '@/components/common/AppModal.vue';
 
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
 const { requireAuth } = useAuthGuard();
+
+// 帮助弹窗相关 computed
 const helpOverviewItems = computed(() => [
   {
     key: 'privateSpace',
@@ -507,342 +715,306 @@ const helpStepsItems = computed(() => [
   },
 ]);
 
-// 地点和分区数据
-const locationData = ref({
-  locations: [],
-  regions: [],
-  regionUsing: 'map',
-});
-
-// 特征搜索相关状态
-const featureSearchInput = ref('');
-const featureSuggestions = ref([]);
-const selectedFeature = ref('');
-const isSearching = ref(false);
-// 使用 uiStore 中的按钮状态（不再定义本地 isRunning）
-const buttonState = uiStore.buttonStates.custom;
-const isDisabled = isCustomButtonDisabled;
-const showSuggestions = ref(false);
-const featureDropdownEl = ref(null);
-// 數據總量
-const userTotalCount = ref(0);
-
-// 同步 selectedFeature 到 store
-watch(
-  selectedFeature,
-  (newVal) => {
-    uiStore.buttonStates.custom.hasSelectedFeature = !!newVal;
-  },
-  { immediate: true }
-);
-
-// Watch for custom tab visibility - only fetch data when tab is active
-watch(
-  () => route.params.sub,
-  (newSub) => {
-    if (newSub === 'custom' && userStore.isAuthenticated) {
-      fetchUserTotalCount();
-    }
-  },
-  { immediate: true } // Run immediately if already on custom tab
-);
-
-// 帮助弹窗状态
+// 状态定义
 const isHelpModalOpen = ref(false);
 const isEntryModalOpen = ref(false);
+const userTotalCount = ref(0);
+const searchQuery = ref('');
+const userFeatures = ref([]);
+const loadingFeatures = ref(false);
+const expandedCategories = ref({});
 
-// Dropdown 样式（动态计算位置）
-const dropdownStyle = reactive({
-  position: 'absolute',
-  top: '0px',
-  left: '0px',
-  minWidth: '200px',
-  zIndex: 99999,
+// 过滤特征
+const filteredFeatures = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) return userFeatures.value;
+  return userFeatures.value.filter((item) => {
+    const fName = String(item['特徵'] || item.feature || '').toLowerCase();
+    const cat = String(item['聲韻調'] || item.phonology || '').toLowerCase();
+    return fName.includes(query) || cat.includes(query);
+  });
 });
 
-// 防抖计时器
-let featureDebounceTimer = null;
-
-// 打开/关闭帮助弹窗
-const openHelpModal = () => {
-  isHelpModalOpen.value = true;
-};
-
-const closeHelpModal = () => {
-  isHelpModalOpen.value = false;
-};
-
-// 登录
-const handleLogin = () => {
-  requireAuth();
-};
-
-const openEntryModal = () => {
-  if (!userStore.isAuthenticated) {
-    showWarning(t('map.customTab.validation.loginFirst'));
-    requireAuth();
-    return;
-  }
-  isEntryModalOpen.value = true;
-};
-
-// 处理输入事件（防抖搜索）
-const handleFeatureInput = () => {
-  clearTimeout(featureDebounceTimer);
-
-  // 允许空搜索，后端会返回所有特征
-  featureDebounceTimer = setTimeout(() => {
-    searchCustomFeatures();
-  }, 300);
-};
-
-// 处理输入框聚焦事件
-const handleInputFocus = () => {
-  if (featureSuggestions.value.length > 0) {
-    showSuggestions.value = true;
-    updateDropdownPosition();
-  }
-};
-
-// 搜索自定义特征
-const searchCustomFeatures = async () => {
-  // ✅ 登录检查（早返回）
-  if (!userStore.isAuthenticated) {
-    featureSuggestions.value = [];
-    showSuggestions.value = false;
-    return; // 静默返回，不显示错误
-  }
-
-  const word = featureSearchInput.value.trim();
-
-  isSearching.value = true;
-
-  try {
-    // 构建查询参数
-    const queryParams = {
-      locations:
-        locationData.value.locations && locationData.value.locations.length > 0
-          ? locationData.value.locations.filter(Boolean)
-          : [''],
-      regions:
-        locationData.value.regions && locationData.value.regions.length > 0
-          ? locationData.value.regions.filter(Boolean)
-          : [''],
-      word: word,
-    };
-
-    // 调用 API
-    const response = await getCustomFeature(queryParams);
-
-    if (Array.isArray(response) && response.length > 0) {
-      // 后端返回的是对象数组: { "簡稱": "test", "聲韻調": "", "特徵": "流" }
-      // 只提取 "特徵" 字段并去重
-      featureSuggestions.value = [...new Set(response.map((item) => item.特徵).filter(Boolean))];
-      showSuggestions.value = true;
-
-      // 更新下拉列表位置
-      nextTick(() => {
-        updateDropdownPosition();
-      });
-    } else {
-      featureSuggestions.value = [];
-      showSuggestions.value = false;
-      showInfo(t('map.customTab.messages.noMatch'));
+// 分组并排序分类
+const groupedFeatures = computed(() => {
+  const groups = {};
+  filteredFeatures.value.forEach((item) => {
+    const category = item['聲韻調'] || item.phonology || '未分类';
+    if (!groups[category]) {
+      groups[category] = [];
     }
-  } catch (error) {
-    console.error('搜索特征失败:', error);
-    showError(t('map.customTab.messages.searchFailed', { error: error.message }));
-    featureSuggestions.value = [];
-    showSuggestions.value = false;
-  } finally {
-    isSearching.value = false;
-  }
-};
+    groups[category].push(item);
+  });
 
-// 更新下拉列表位置
-const updateDropdownPosition = () => {
-  const inputEl = document.getElementById('featureSearch');
-  if (inputEl) {
-    const rect = inputEl.getBoundingClientRect();
-    dropdownStyle.position = 'absolute';
-    dropdownStyle.top = `${rect.bottom + window.scrollY}px`;
-    dropdownStyle.left = `${rect.left + window.scrollX}px`;
-    dropdownStyle.minWidth = `${rect.width}px`;
-    dropdownStyle.zIndex = 99999;
-  }
-};
+  const getSortOrder = (cat) => {
+    const c = cat
+      .replace(/聲/g, '声')
+      .replace(/韻/g, '韵')
+      .replace(/調/g, '调')
+      .replace(/詞/g, '词')
+      .replace(/彙/g, '汇');
+    if (c.includes('声母')) return 1;
+    if (c.includes('韵母')) return 2;
+    if (c.includes('声调')) return 3;
+    if (c.includes('词汇')) return 4;
+    if (c.includes('未分类') || c.includes('uncategorized')) return 99;
+    return 10;
+  };
 
-// 选择特征
-const selectFeature = (feature) => {
-  selectedFeature.value = feature;
-  featureSearchInput.value = feature;
-  showSuggestions.value = false;
-};
-
-// 点击外部关闭下拉列表
-const onClickOutside = (event) => {
-  const inputEl = document.getElementById('featureSearch');
-  const dropdownEl = featureDropdownEl.value;
-
-  const isInsideInput = inputEl?.contains(event.target);
-  const isInsideDropdown = dropdownEl?.contains(event.target);
-
-  if (!isInsideInput && !isInsideDropdown) {
-    showSuggestions.value = false;
-  }
-};
-
-async function fetchUserTotalCount() {
-  if (!userStore.isAuthenticated) return;
-  try {
-    // 不帶任何參數請求，獲取所有個人記錄
-    const response = await getAllCustomData();
-    if (Array.isArray(response.data)) {
-      userTotalCount.value = response.data.length;
-    }
-  } catch (error) {
-    console.error('獲取數據總量失敗:', error);
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', onClickOutside);
-  // fetchUserTotalCount() moved to route watcher below
+  return Object.keys(groups)
+    .sort((a, b) => getSortOrder(a) - getSortOrder(b))
+    .reduce((acc, key) => {
+      acc[key] = groups[key];
+      return acc;
+    }, {});
 });
 
-onBeforeUnmount(() => {
-  document.removeEventListener('click', onClickOutside);
-  clearTimeout(featureDebounceTimer);
-});
-
-// 运行查询
-const handleRunQuery = () => {
-  if (!selectedFeature.value) {
-    showWarning(t('map.customTab.validation.selectFeature'));
-    return;
-  }
-
-  setRunning('custom', true);
-
-  try {
-    // 清空地图数据
-    mapStore.mergedData = [];
-    resultCache.latestResults = [];
-    mapStore.selectedFeature = '';
-    resultCache.features = [];
-    mapStore.mapData = null;
-
-    // 构建查询参数
-    const query = {
-      feature: selectedFeature.value,
-    };
-
-    // 添加地点参数
-    if (locationData.value.locations && locationData.value.locations.length > 0) {
-      query.locations = locationData.value.locations.join(',');
-    }
-
-    // 添加分区参数
-    if (locationData.value.regions && locationData.value.regions.length > 0) {
-      query.regions = locationData.value.regions.join(',');
-    }
-
-    // 添加分区模式
-    query.regionMode = locationData.value.regionUsing || 'map';
-
-    // 跳转到地图页面
-    router.replace({
-      path: '/menu/map/view',
-      query,
-    });
-
-    showSuccess(t('map.customTab.messages.loading'));
-
-    // 清空選中的特徵
-    selectedFeature.value = '';
-    featureSearchInput.value = '';
-
-    // 延迟重置运行状态（跳转后组件不会被销毁，需要手动重置）
-    setTimeout(() => {
-      setRunning('custom', false);
-    }, 1000);
-  } catch (error) {
-    console.error('跳转失败:', error);
-    showError(t('map.customTab.messages.searchFailed', { error: error.message }));
-    setRunning('custom', false);
-  }
+// 展开/收起分类
+const toggleCategory = (category) => {
+  expandedCategories.value[category] = !expandedCategories.value[category];
 };
 
-// 逐条添加：跳转到 map 页面并打开面板
-const handleAddSingle = () => {
-  // 如果当前不是查中古或查音位模式，清空地图数据
-  const currentMode = resultCache.mode || '';
-  if (currentMode !== '查中古' && currentMode !== '查音位') {
-    // 清空地图绘图数据
-    mapStore.mergedData = [];
-    resultCache.latestResults = [];
-    mapStore.selectedFeature = '';
-    resultCache.features = [];
-  }
+// 选择特征跳转
+const selectFeatureItem = (item) => {
+  const featureName = item['特徵'] || item.feature || '';
+  const phonology = item['聲韻調'] || item.phonology || '';
 
-  // 设置查询模式为"查中古"，确保面板能够显示
-  resultCache.mode = '查中古';
+  if (!featureName) return;
+
+  // 清空原有地图数据
+  mapStore.mergedData = [];
+  resultCache.latestResults = [];
+  mapStore.selectedFeature = '';
+  resultCache.features = [];
+  mapStore.mapData = null;
+
   router.replace({
     path: '/menu/map/view',
-    query: { openPanel: 'true' },
+    query: {
+      feature: featureName,
+      phonology: phonology,
+    },
   });
+
+  showSuccess(t('map.customTab.messages.loading'));
 };
 
-// 批量添加：跳转到个人数据管理页面
-const handleAddBatch = () => {
-  // 检查是否已登录
+// 管理数据页面
+const goToDataManager = () => {
   if (!userStore.isAuthenticated) {
     showWarning(t('map.customTab.validation.loginFirst'));
     requireAuth();
     return;
   }
-
-  // 跳转到个人数据管理页面
   router.push({
     path: '/auth/data',
     query: { username: userStore.username },
   });
 };
+
+// 获取特征和数据总量
+const fetchUserFeatures = async () => {
+  if (!userStore.isAuthenticated) {
+    userFeatures.value = [];
+    userTotalCount.value = 0;
+    return;
+  }
+
+  loadingFeatures.value = true;
+  try {
+    const response = await getUserFeatures();
+    userFeatures.value = Array.isArray(response?.data) ? response.data : [];
+
+    const countResponse = await getAllCustomData();
+    if (Array.isArray(countResponse?.data)) {
+      userTotalCount.value = countResponse.data.length;
+    }
+
+    // 默认展开所有分类
+    userFeatures.value.forEach((item) => {
+      const category = item['聲韻調'] || item.phonology || '未分类';
+      if (expandedCategories.value[category] === undefined) {
+        expandedCategories.value[category] = true;
+      }
+    });
+  } catch (error) {
+    console.error('获取特征列表失败:', error);
+  } finally {
+    loadingFeatures.value = false;
+  }
+};
+
+// 监听标签页状态，进入 custom 时重新获取
+watch(
+  () => route.params.sub,
+  (newSub) => {
+    if (newSub === 'custom') {
+      fetchUserFeatures();
+    }
+  },
+  { immediate: true }
+);
+
+// 监听登录状态变化
+watch(
+  () => userStore.isAuthenticated,
+  (isAuth) => {
+    if (isAuth) {
+      fetchUserFeatures();
+    } else {
+      userFeatures.value = [];
+      userTotalCount.value = 0;
+    }
+  }
+);
+
+// 监听数据录入面板关闭
+watch(isEntryModalOpen, (isOpen) => {
+  if (!isOpen) {
+    fetchUserFeatures();
+  }
+});
+
+// 弹窗辅助函数
+const openHelpModal = () => {
+  isHelpModalOpen.value = true;
+};
+const closeHelpModal = () => {
+  isHelpModalOpen.value = false;
+};
+const handleLogin = () => {
+  requireAuth();
+};
+const openEntryModal = () => {
+  isEntryModalOpen.value = true;
+};
 </script>
 
 <style scoped>
-/* 特征搜索容器 */
-.feature-search-container {
-  width: 100%;
-  max-width: 400px;
-  margin: 10px auto 0;
-  position: relative;
+/* Header Actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-/* 搜索输入框包装器 */
+.add-entry-btn-sm {
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.9), rgba(0, 81, 213, 0.9));
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.add-entry-btn-sm:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 14px rgba(0, 122, 255, 0.35);
+  background: linear-gradient(135deg, rgba(0, 122, 255, 1), rgba(0, 81, 213, 1));
+}
+
+.add-entry-btn-sm:active {
+  transform: translateY(0);
+}
+
+/* Auth Warning Container */
+.auth-warning-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.auth-warning-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 30px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  max-width: 360px;
+  width: 100%;
+}
+
+.auth-warning-icon {
+  font-size: 44px;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+  animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.auth-warning-text {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* Interactive Search Layout */
+.interactive-search-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  margin-top: 15px;
+}
+
+/* Feature Search Section */
+.feature-search-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .search-input-wrapper {
   position: relative;
   width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.search-emoji-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 15px;
+  color: #94a3b8;
+  pointer-events: none;
 }
 
 .feature-search-input {
   width: 100%;
-  padding: 10px 40px 10px 14px;
+  padding: 11px 40px 11px 38px;
   font-size: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.32);
+  border: 1px solid rgba(148, 163, 184, 0.3);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.75);
   color: #0f172a;
   outline: none;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
-}
-
-.feature-search-input::placeholder {
-  color: #94a3b8;
 }
 
 .feature-search-input:focus {
@@ -851,99 +1023,256 @@ const handleAddBatch = () => {
   box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
 }
 
-/* 加载图标 */
-.loading-icon {
+.clear-search-btn {
   position: absolute;
   right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 16px;
-}
-
-/* 已选择特征显示 */
-.selected-feature {
-  text-align: center;
-  margin-top: 12px;
-  padding: 8px 12px;
-  background: #e6f7ff;
-  border-radius: 8px;
-  color: #0050b3;
-  font-size: 14px;
-}
-
-.selected-feature strong {
-  color: #003a8c;
-}
-
-/* 按钮组容器 */
-.button-group {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 30px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-
-/* 按鈕與幫助圖標容器 */
-.button-with-help {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-}
-
-/* 頁面頭部幫助圖標 - 蘋果液態玻璃風格 */
-.help-icon-head {
-  width: auto;
-  min-width: 24px;
-  height: 24px;
-  padding: 0 10px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
   line-height: 1;
+  transition: color 0.15s;
+}
+
+.clear-search-btn:hover {
+  color: #475569;
+}
+
+/* Badges */
+.data-count-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2.5px 8px;
+  border-radius: 20px;
+  line-height: 1.2;
+}
+
+.data-count-badge.success {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.data-count-badge.hint {
+  background-color: rgba(148, 163, 184, 0.12);
+  color: #64748b;
+}
+
+/* Tree Selector Container */
+.tree-selector-container {
+  width: 100%;
+  min-height: 220px;
+  max-height: 480px;
+  overflow-y: auto;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* Tree Loading & Empty States */
+.tree-loading-state,
+.tree-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px 10px;
+  color: #64748b;
+  font-size: 14px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.tree-loading-state {
+  gap: 12px;
+}
+
+.spinner-icon {
+  font-size: 24px;
+  animation: spin 1.5s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.empty-state-title {
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 6px 0;
+}
+
+.empty-state-text {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0 0 16px 0;
+  max-width: 260px;
+  line-height: 1.5;
+}
+
+.inline-btn {
+  font-size: 13px !important;
+  padding: 6px 16px !important;
+  border-radius: 16px !important;
+}
+
+/* Tree Categories List */
+.tree-categories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tree-category-node {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tree-category-node:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.category-header-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.arrow-indicator {
+  font-size: 8px;
+  color: #94a3b8;
+  margin-right: 10px;
+  transition: transform 0.2s ease;
+  transform: rotate(90deg);
+}
+
+.tree-category-node.collapsed .arrow-indicator {
+  transform: rotate(0deg);
+}
+
+.category-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #334155;
+  flex: 1;
+}
+
+.category-count-badge {
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(0, 122, 255, 0.08);
+  color: #007aff;
+  padding: 1.5px 6px;
+  border-radius: 10px;
+}
+
+.category-children-container {
+  padding: 4px 10px 10px 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Feature Leaf Node (Buttons) */
+.feature-leaf-node {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 52px;
+  box-sizing: border-box;
+}
+
+.feature-leaf-node:hover {
+  background: #ffffff;
+  border-color: #007aff;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.08);
+  transform: translateY(-1.5px);
+}
+
+.feature-leaf-node:active {
+  transform: translateY(0);
+  background: rgba(240, 247, 255, 0.85);
+}
+
+.feature-leaf-node .feature-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+  word-break: break-all;
+  line-height: 1.35;
+}
+
+.feature-leaf-node .feature-count-badge {
+  font-size: 9.5px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Management Footer */
+.management-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 5px;
+}
+
+.flat-link-btn {
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
   color: #007aff;
   cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-  border: none;
-
-  /* 液態玻璃效果 */
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-
-  /* 邊框和陰影 */
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow:
-    inset 0 0 0.5px rgba(255, 255, 255, 0.3),
-    0 4px 12px rgba(0, 122, 255, 0.15),
-    0 0 0 0.5px rgba(255, 255, 255, 0.1);
-
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-.help-icon-head:hover {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.85));
-  box-shadow:
-    inset 0 0 0.5px rgba(255, 255, 255, 0.5),
-    0 6px 16px rgba(0, 122, 255, 0.25),
-    0 0 0 0.5px rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
+.flat-link-btn:hover {
+  background: rgba(0, 122, 255, 0.06);
+  text-decoration: underline;
 }
 
-.help-icon-head:active {
-  transform: scale(1.05);
-  box-shadow:
-    inset 0 0 0.5px rgba(255, 255, 255, 0.3),
-    0 2px 8px rgba(0, 122, 255, 0.2);
-}
-
-/* 通用按钮样式（非悬浮） */
+/* Action button styles (fallback for common buttons) */
 .action-btn {
   padding: 10px 20px;
   font-size: 15px;
@@ -971,7 +1300,6 @@ const handleAddBatch = () => {
   transform: none;
 }
 
-/* 主要按钮（运行查询） */
 .primary-btn {
   background: linear-gradient(135deg, #007aff, #0051d5);
   color: white;
@@ -981,35 +1309,43 @@ const handleAddBatch = () => {
   background: linear-gradient(135deg, #0051d5, #003db3);
 }
 
-/* 添加数据按钮 */
-.add-entry-btn {
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  color: white;
+.help-icon-head {
+  width: auto;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #007aff;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  border: none;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    inset 0 0 0.5px rgba(255, 255, 255, 0.3),
+    0 4px 12px rgba(0, 122, 255, 0.15),
+    0 0 0 0.5px rgba(255, 255, 255, 0.1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.add-entry-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0051d5, #003db3);
+.help-icon-head:hover {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.85));
+  box-shadow:
+    inset 0 0 0.5px rgba(255, 255, 255, 0.5),
+    0 6px 16px rgba(0, 122, 255, 0.25),
+    0 0 0 0.5px rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
 }
 
-/* 逐条添加按钮 */
-.add-single-btn {
-  background: linear-gradient(135deg, #499f4c, #2c813b);
-  color: white;
-}
-
-.add-single-btn:hover {
-  background: linear-gradient(135deg, #5ede68, #34c759);
-}
-
-/* 批量添加按钮 */
-.add-batch-btn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-}
-
-.add-batch-btn:hover {
-  background: linear-gradient(135deg, #5568d3, #5f3d8a);
-}
 
 /* 使用说明触发器 */
 .divider {

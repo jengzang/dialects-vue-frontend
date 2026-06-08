@@ -1,8 +1,8 @@
 // 整理數據,用於地圖繪製
-import { globalPayload, queryStore, mapStore, resultCache, userStore } from '../../main/store/store.js'
-import { getCustomData } from '@/api'
+import { globalPayload, mapStore, resultCache, userStore } from '../../main/store/store.js'
+import { getCustomData, getDataByFeature } from '@/api'
 
-export async function func_mergeData(resultData = null, mapData = null, customData = null) {
+export async function func_mergeData(resultData = null, mapData = null, customData = null, isCustomFeatureSearch = false) {
     // 1) 数据来源：优先参数，否则 fallback 到 window
     const latestResults = resultData ?? window.latestResults;
     const locations_data = mapData ?? window.locations_data;
@@ -122,7 +122,8 @@ export async function func_mergeData(resultData = null, mapData = null, customDa
     if (Array.isArray(customData) && customData.length > 0) {
         mergeBackendData(customData, mergedData,
             mergedData.length > 0 ? mergedData[0].zoomLevel : 10,
-            mergedData.length > 0 ? mergedData[0].centerCoordinate : [0, 0]
+            mergedData.length > 0 ? mergedData[0].centerCoordinate : [0, 0],
+            isCustomFeatureSearch
         );
     }
 
@@ -132,6 +133,34 @@ export async function func_mergeData(resultData = null, mapData = null, customDa
 }
 
 export async function refreshCurrentCustomLayer() {
+    // 1) 优先处理自定义特征查询
+    if (mapStore.showCustomData && mapStore.selectedFeature) {
+        try {
+            const response = await getDataByFeature(mapStore.selectedFeature, mapStore.selectedFeaturePhonology);
+            const rawData = Array.isArray(response?.data) ? response.data : [];
+            
+            // 整理数据：解析经纬度，并将 "值" 映射到 "maxValue"
+            const cleanedData = rawData.map(row => {
+                let coords = row["經緯度"];
+                if (typeof coords === 'string') {
+                    coords = coords.split(',').map(Number);
+                }
+                return {
+                    ...row,
+                    "經緯度": coords,
+                    "maxValue": row["值"],
+                    "特徵": row["特徵"] || mapStore.selectedFeature,
+                    "聲韻調": row["聲韻調"] || mapStore.selectedFeaturePhonology
+                };
+            });
+            
+            return func_mergeData(resultCache.latestResults, mapStore.mapData, cleanedData, true);
+        } catch (error) {
+            console.error('Failed to refresh custom layer by feature:', error);
+            return func_mergeData(resultCache.latestResults, mapStore.mapData);
+        }
+    }
+
     const currentPayload = globalPayload.value;
     const isZhongGuQuery = currentPayload?._sourceTab === 'tab2';
 

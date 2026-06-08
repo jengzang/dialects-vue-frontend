@@ -1,11 +1,18 @@
 <template>
   <section class="feature-detail-table">
     <div class="feature-detail-header">
-      <button class="main-glass-button" type="button" @click="$emit('back')">
+      <button
+        class="main-glass-button"
+        type="button"
+        @click="$emit('back')"
+      >
         {{ t('customEntry.featureDetail.back') }}
       </button>
       <div class="feature-detail-heading">
-        <div v-if="isNewFeature" class="feature-edit-header-inputs">
+        <div
+          v-if="isNewFeature"
+          class="feature-edit-header-inputs"
+        >
           <label class="header-input-field">
             <span>{{ t('customEntry.pointDetail.rows.headers.feature') }}</span>
             <input
@@ -13,7 +20,7 @@
               type="text"
               class="header-text-input"
               :placeholder="t('customEntry.pointDetail.placeholders.feature')"
-            />
+            >
           </label>
           <label class="header-input-field">
             <span>{{ t('customEntry.pointDetail.rows.headers.phonology') }}</span>
@@ -22,11 +29,18 @@
               type="text"
               class="header-text-input"
               :placeholder="t('customEntry.pointDetail.placeholders.phonology')"
-            />
+            >
           </label>
         </div>
-        <h4 v-else class="feature-detail-title">{{ detailTitle }}</h4>
-        <p class="feature-detail-description">{{ t('customEntry.featureDetail.description') }}</p>
+        <h4
+          v-else
+          class="feature-detail-title"
+        >
+          {{ detailTitle }}
+        </h4>
+        <p class="feature-detail-description">
+          {{ t('customEntry.featureDetail.description') }}
+        </p>
       </div>
       <button
         class="main-glass-button"
@@ -40,19 +54,35 @@
 
     <div class="feature-detail-layout">
       <div class="feature-detail-main main-glass-panel-inner">
-        <div v-if="loading" class="feature-detail-state">
+        <div
+          v-if="loading"
+          class="feature-detail-state"
+        >
           {{ t('customEntry.featureDetail.loading') }}
         </div>
-        <div v-else-if="errorMessage" class="feature-detail-state feature-detail-state-error">
+        <div
+          v-else-if="errorMessage"
+          class="feature-detail-state feature-detail-state-error"
+        >
           <div>{{ errorMessage }}</div>
-          <button class="main-glass-button" type="button" @click="loadRecords">
+          <button
+            class="main-glass-button"
+            type="button"
+            @click="loadRecords"
+          >
             {{ t('customEntry.featureDetail.retry') }}
           </button>
         </div>
-        <div v-else-if="rows.length === 0" class="feature-detail-state">
+        <div
+          v-else-if="rows.length === 0"
+          class="feature-detail-state"
+        >
           {{ t('customEntry.featureDetail.empty') }}
         </div>
-        <div v-else class="feature-detail-table-body">
+        <div
+          v-else
+          class="feature-detail-table-body"
+        >
           <div class="feature-detail-table-head">
             <span>{{ t('customEntry.featureDetail.headers.location') }}</span>
             <span>{{ t('customEntry.featureDetail.headers.region') }}</span>
@@ -70,28 +100,43 @@
               class="cell-location clickable-location"
               :data-label="t('customEntry.featureDetail.headers.location')"
               @click="showLocationDetail(row['簡稱'])"
-              >{{ row['簡稱'] }}</span
-            >
+            >{{ row['簡稱'] }}</span>
             <span
               class="cell-region clickable-location"
               :data-label="t('customEntry.featureDetail.headers.region')"
               @click="showRegionDetail(row['音典分區'])"
-              >{{ row['音典分區'] }}</span
-            >
-            <span class="cell-coord" :data-label="t('customEntry.featureDetail.headers.coord')">{{
+            >{{ row['音典分區'] }}</span>
+            <span
+              class="cell-coord"
+              :data-label="t('customEntry.featureDetail.headers.coord')"
+            >{{
               row['經緯度']
             }}</span>
-            <span class="cell-value" :data-label="t('customEntry.featureDetail.headers.value')">{{
+            <span
+              class="cell-value"
+              :data-label="t('customEntry.featureDetail.headers.value')"
+            >{{
               row['值']
             }}</span>
-            <span class="cell-note" :data-label="t('customEntry.featureDetail.headers.note')">{{
+            <span
+              class="cell-note"
+              :data-label="t('customEntry.featureDetail.headers.note')"
+            >{{
               row['說明'] || t('customEntry.featureDetail.emptyNote')
             }}</span>
             <div class="feature-detail-actions">
-              <button class="feature-detail-link" type="button" @click="openEditModal(row)">
+              <button
+                class="feature-detail-link"
+                type="button"
+                @click="openEditModal(row)"
+              >
                 {{ t('customEntry.featureDetail.actions.edit') }}
               </button>
-              <button class="feature-detail-link danger" type="button" @click="handleDelete(row)">
+              <button
+                class="feature-detail-link danger"
+                type="button"
+                @click="handleDelete(row)"
+              >
                 {{ t('customEntry.featureDetail.actions.delete') }}
               </button>
             </div>
@@ -100,7 +145,9 @@
       </div>
 
       <div class="feature-detail-side main-glass-panel-inner">
-        <div class="feature-detail-map-title">{{ t('customEntry.featureDetail.mapTitle') }}</div>
+        <div class="feature-detail-map-title">
+          {{ t('customEntry.featureDetail.mapTitle') }}
+        </div>
         <MiniMapSelector
           mode="multi-preview"
           :readonly="true"
@@ -118,7 +165,12 @@
     />
 
     <!-- 地点已录入特征联动弹窗 -->
-    <AppModal v-model="isPointModalOpen" size="md" width="640px" max-height="80dvh">
+    <AppModal
+      v-model="isPointModalOpen"
+      size="md"
+      width="640px"
+      max-height="80dvh"
+    >
       <template #header>
         <div class="point-detail-modal-header">
           <h4 class="point-detail-modal-title">
@@ -139,16 +191,28 @@
       </template>
 
       <div class="point-detail-modal-body">
-        <div v-if="pointLoading" class="modal-loading-state">
+        <div
+          v-if="pointLoading"
+          class="modal-loading-state"
+        >
           {{ t('customEntry.featureDetail.loading') }}
         </div>
-        <div v-else-if="pointError" class="modal-error-state">
+        <div
+          v-else-if="pointError"
+          class="modal-error-state"
+        >
           {{ pointError }}
         </div>
-        <div v-else-if="pointRecords.length === 0" class="modal-empty-state">
+        <div
+          v-else-if="pointRecords.length === 0"
+          class="modal-empty-state"
+        >
           {{ t('customEntry.featureDetail.empty') }}
         </div>
-        <div v-else class="modal-table-container">
+        <div
+          v-else
+          class="modal-table-container"
+        >
           <table class="modal-records-table">
             <thead>
               <tr>
@@ -162,8 +226,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="record in pointRecords" :key="record.created_at || record.id">
-                <td v-if="selectedDetailType === 'region'">{{ record['簡稱'] }}</td>
+              <tr
+                v-for="record in pointRecords"
+                :key="record.created_at || record.id"
+              >
+                <td v-if="selectedDetailType === 'region'">
+                  {{ record['簡稱'] }}
+                </td>
                 <td>{{ record['聲韻調'] }}</td>
                 <td>{{ record['特徵'] }}</td>
                 <td>{{ record['值'] }}</td>
@@ -178,7 +247,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import { batchDeleteCustomData, getDataByFeature, getDataByPoint } from '@/api';
@@ -365,8 +434,6 @@ watch(
 }
 
 .feature-detail-header {
-    --main-glass-button-white-space: nowrap;
-  --main-glass-button-padding: 12px 20px;
   display: flex;
   align-items: flex-start;
   gap: 14px;
@@ -427,14 +494,13 @@ watch(
 .feature-detail-table-head,
 .feature-detail-row {
   display: grid;
-  grid-template-columns: 0.9fr 0.85fr 1fr 0.7fr 0.9fr 96px;
+  grid-template-columns: 0.9fr 0.85fr 1fr 0.7fr 0.9fr auto;
   gap: 10px;
   align-items: center;
-  box-sizing: border-box;
 }
 
 .feature-detail-table-head {
-  padding: 0 14px;
+  padding: 0 6px;
   color: #64748b;
   font-size: 12px;
   font-weight: 700;
@@ -449,7 +515,6 @@ watch(
 .feature-detail-actions {
   display: flex;
   gap: 8px;
-  justify-content: flex-start;
 }
 
 .feature-detail-link {
@@ -601,7 +666,6 @@ watch(
 }
 
 .header-input-field {
-  white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 8px;

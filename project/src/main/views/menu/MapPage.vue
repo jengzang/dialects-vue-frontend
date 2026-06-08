@@ -8,63 +8,81 @@
     <!-- Tab 右侧额外内容 -->
     <template #tab-extra>
       <!-- 比较模式：显示比较对象 -->
-      <div v-if="currentTab === 'map' && mapStore.mode === 'compare' && comparePair" class="single-btn-wrapper">
+      <div
+        v-if="currentTab === 'map' && mapStore.mode === 'compare' && comparePair"
+        class="single-btn-wrapper"
+      >
         <button class="feature-btn active">
           {{ comparePair }}
         </button>
       </div>
 
       <!-- Feature 模式：显示特征选择 -->
-      <div v-else-if="currentTab === 'map' && mapStore.mode === 'feature' && availableFeatures.length > 0" class="feature-control-area">
-        <div v-if="availableFeatures.length > 1" class="dropdown-wrapper">
+      <div
+        v-else-if="currentTab === 'map' && mapStore.mode === 'feature' && availableFeatures.length > 0"
+        class="feature-control-area"
+      >
+        <div
+          v-if="availableFeatures.length > 1"
+          class="dropdown-wrapper"
+        >
           <SimpleSelectDropdown
             v-model="selectedFeature"
             :options="featureOptions"
             :placeholder="t('map.placeholder.selectFeature')"
           />
         </div>
-        <div v-else-if="availableFeatures.length === 1" class="single-btn-wrapper">
-          <button class="feature-btn active" @click="selectFeature(availableFeatures[0])">
+        <div
+          v-else-if="availableFeatures.length === 1"
+          class="single-btn-wrapper"
+        >
+          <button
+            class="feature-btn active"
+            @click="selectFeature(availableFeatures[0])"
+          >
             {{ availableFeatures[0] }}
           </button>
         </div>
 
         <!-- 幫助圖標 -->
         <HelpIcon
-            :content="helpText"
-            size="sm"
-            placement="bottom"
-            icon="?"
-            icon-color="#007aff"
-            style="margin-left: 5px;"
+          :content="helpText"
+          size="sm"
+          placement="bottom"
+          icon="?"
+          icon-color="#007aff"
+          style="margin-left: 5px;"
         />
       </div>
     </template>
 
     <!-- Tab 内容 -->
-    <template #default="{ currentTab }">
-      <div class="tab-content" style="justify-items: center; position: relative;">
+    <template #default="{ currentTab: activeTab }">
+      <div
+        class="tab-content"
+        style="justify-items: center; position: relative;"
+      >
         <!-- 使用 v-show 代替 v-if，保持组件状态 -->
         <MapLibre
-            v-show="currentTab === 'map'"
-            :active-feature="selectedFeature"
-            :is-custom="true"
-            :dot-level="selectedLevel"
-            @map-click="handleMapClick"
+          v-show="activeTab === 'map'"
+          :active-feature="selectedFeature"
+          :is-custom="true"
+          :dot-level="selectedLevel"
+          @map-click="handleMapClick"
         />
         <DivideTab
-            v-show="currentTab === 'divide'"
-            @region-selected="(val) => selectedLevel = val"
+          v-show="activeTab === 'divide'"
+          @region-selected="(val) => selectedLevel = val"
         />
         <CustomTab
-            v-show="currentTab === 'custom'"
+          v-show="activeTab === 'custom'"
         />
         <!-- 自定義數據提交面板（只在 map tab 顯示） -->
         <CustomDataPanel
-            v-if="currentTab === 'map'"
-            :map-click-coordinates="mapClickCoordinates"
-            :selected-feature="selectedFeature"
-            @submit-success="handleSubmitSuccess"
+          v-if="activeTab === 'map'"
+          :map-click-coordinates="mapClickCoordinates"
+          :selected-feature="selectedFeature"
+          @submit-success="handleSubmitSuccess"
         />
       </div>
     </template>
@@ -86,7 +104,7 @@ import CustomDataPanel from '@/main/components/map/CustomDataPanel.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
 import { showSuccess, showError } from '@/utils/message.js'
-import { addCustomFeatureData, refreshCurrentCustomLayer } from '@/utils/map/MapData.js'
+import { refreshCurrentCustomLayer } from '@/utils/map/MapData.js'
 
 const { t } = useI18n()
 const selectedLevel = ref(3)
@@ -128,7 +146,7 @@ const handleMapClick = (coordinates) => {
 }
 
 // 處理提交成功事件
-const handleSubmitSuccess = async (response) => {
+const handleSubmitSuccess = async () => {
   showSuccess(t('map.messages.submitSuccess'))
 
   // 自动打开自定义数据开关
@@ -219,22 +237,21 @@ watch(
 
     try {
       // 提取路由参数
-      const locations = route.query.locations?.split(',').filter(Boolean) || []
-      const regions = route.query.regions?.split(',').filter(Boolean) || []
-      const regionMode = route.query.regionMode || 'map'
+      const phonology = route.query.phonology || ''
 
-      // 调用 addCustomFeatureData 加载数据
-      await addCustomFeatureData([newFeature], locations, regions, regionMode)
-
-      // 自动选中该特征
+      // 自动选中该特征并设置其声韵调类型
       selectedFeature.value = newFeature
       mapStore.selectedFeature = newFeature
+      mapStore.selectedFeaturePhonology = phonology
 
       // 自动开启自定义数据显示
       mapStore.showCustomData = true
 
       // 自动切换到 feature 模式（关闭"查看地名"开关）
       mapStore.mode = 'feature'
+
+      // 调用 refreshCurrentCustomLayer 加载数据
+      await refreshCurrentCustomLayer()
 
       showSuccess(t('map.messages.featureLoaded', { feature: newFeature }))
 
@@ -243,6 +260,7 @@ watch(
         query: {
           ...route.query,
           feature: undefined,
+          phonology: undefined,
           locations: undefined,
           regions: undefined,
           regionMode: undefined
