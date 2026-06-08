@@ -21,33 +21,35 @@
     <div class="point-detail-layout">
       <div class="point-detail-main main-glass-panel-inner">
         <div class="point-base-fields">
-          <label class="point-field">
+          <div class="point-field">
             <span class="point-field-label">{{
               t('customEntry.pointDetail.labels.location')
             }}</span>
-            <input
-              v-model="location"
-              class="point-field-input"
-              type="text"
-              :placeholder="t('customEntry.pointDetail.placeholders.location')"
-              @input="handleLocationInput"
-              @blur="hideSuggestions"
-            />
-            <div
-              v-if="showPointSuggestions && pointSuggestions.length > 0"
-              class="point-suggestions-box"
-            >
-              <button
-                v-for="item in pointSuggestions"
-                :key="item"
-                class="point-suggestion-item"
-                type="button"
-                @mousedown.prevent="selectSuggestion(item)"
+            <div class="location-input-wrapper">
+              <input
+                v-model="location"
+                class="point-field-input"
+                type="text"
+                :placeholder="t('customEntry.pointDetail.placeholders.location')"
+                @input="handleLocationInput"
+                @blur="hideSuggestions"
+              />
+              <div
+                v-if="showPointSuggestions && pointSuggestions.length > 0"
+                class="point-suggestions-box"
               >
-                {{ item }}
-              </button>
+                <button
+                  v-for="item in pointSuggestions"
+                  :key="item"
+                  class="point-suggestion-item"
+                  type="button"
+                  @mousedown.prevent="selectSuggestion(item)"
+                >
+                  {{ item }}
+                </button>
+              </div>
             </div>
-          </label>
+          </div>
           <label class="point-field">
             <span class="point-field-label">{{ t('customEntry.pointDetail.labels.region') }}</span>
             <input
@@ -683,12 +685,19 @@ watch(
 
 .point-field {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
 }
 
 .point-field-full {
   grid-column: 1 / -1;
+}
+
+.point-field-label {
+  min-width: 56px;
+  text-align: right;
+  flex-shrink: 0;
 }
 
 .point-field-label,
@@ -697,6 +706,10 @@ watch(
   font-size: 14px;
   font-weight: 700;
   color: #0f172a;
+}
+
+.point-field-input {
+  flex: 1;
 }
 
 .point-field-input,
@@ -922,6 +935,50 @@ watch(
 
   tr:last-child td {
     border-bottom: none;
+  }
+}
+
+.location-input-wrapper {
+  position: relative;
+  flex: 1;
+  width: 100%;
+}
+
+.point-suggestions-box {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  margin-top: 4px;
+}
+
+.point-suggestion-item {
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  display: block;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  transition: background-color 0.18s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: rgba(0, 122, 255, 0.08);
   }
 }
 </style>

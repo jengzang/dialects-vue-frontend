@@ -499,8 +499,9 @@ watch(
 
 .feature-record-field {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
 }
 
 .feature-record-field-full {
@@ -511,9 +512,12 @@ watch(
   font-size: 13px;
   font-weight: 700;
   color: #0f172a;
+  min-width: 45px;
+  flex-shrink: 0;
 }
 
 .feature-record-input {
+  flex: 1;
   width: 100%;
   padding: 10px 14px;
   border: 1px solid rgba(148, 163, 184, 0.32);
@@ -553,6 +557,7 @@ watch(
 .location-input-wrapper {
   position: relative;
   width: 100%;
+  flex: 1;
 }
 
 .feature-suggestions-box {
