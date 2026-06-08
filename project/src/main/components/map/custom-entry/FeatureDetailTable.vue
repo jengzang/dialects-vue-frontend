@@ -365,6 +365,8 @@ watch(
 }
 
 .feature-detail-header {
+    --main-glass-button-white-space: nowrap;
+  --main-glass-button-padding: 12px 20px;
   display: flex;
   align-items: flex-start;
   gap: 14px;
@@ -425,13 +427,14 @@ watch(
 .feature-detail-table-head,
 .feature-detail-row {
   display: grid;
-  grid-template-columns: 0.9fr 0.85fr 1fr 0.7fr 0.9fr auto;
+  grid-template-columns: 0.9fr 0.85fr 1fr 0.7fr 0.9fr 96px;
   gap: 10px;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .feature-detail-table-head {
-  padding: 0 6px;
+  padding: 0 14px;
   color: #64748b;
   font-size: 12px;
   font-weight: 700;
@@ -446,6 +449,7 @@ watch(
 .feature-detail-actions {
   display: flex;
   gap: 8px;
+  justify-content: flex-start;
 }
 
 .feature-detail-link {
@@ -597,6 +601,7 @@ watch(
 }
 
 .header-input-field {
+  white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 8px;

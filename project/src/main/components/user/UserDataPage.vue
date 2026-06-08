@@ -1,10 +1,13 @@
 <template>
-  <div style="width: 100%">
-    <div class="page-header">
+  <div class="user-data-page">
+    <div class="page-header liquid-panel">
       <div class="header-left">
-        <button class="btn-back" @click="goBack">{{ t('common.button.back') }}</button>
+        <button class="liquid-btn btn-back" type="button" @click="goBack">
+          {{ t('common.button.back') }}
+        </button>
         <h2>
-          📊 {{ t('user.dataPage.title') }}
+          <span class="title-icon">📊</span>
+          <span>{{ t('user.dataPage.title') }}</span>
           <span v-if="username" class="username-badge">{{ username }}</span>
         </h2>
       </div>
@@ -14,40 +17,42 @@
       </div>
     </div>
 
-    <div class="toolbar">
+    <div class="toolbar liquid-panel">
       <div class="toolbar-left">
-        <button class="btn-primary" @click="openBatchCreateModal">
+        <button class="liquid-btn btn-primary" type="button" @click="openBatchCreateModal">
           ➕ {{ t('user.dataPage.toolbar.batchAdd') }}
         </button>
         <button
-          class="btn-warning"
+          class="liquid-btn btn-warning"
+          type="button"
           :disabled="selectedRecords.length === 0"
           @click="handleBatchEdit"
         >
           ✏️ {{ t('user.dataPage.toolbar.batchEdit') }}
         </button>
         <button
-          class="btn-danger"
+          class="liquid-btn btn-danger"
+          type="button"
           :disabled="selectedRecords.length === 0"
           @click="handleBatchDelete"
         >
           🗑️ {{ t('user.dataPage.toolbar.batchDelete') }}
         </button>
-        <button class="btn-secondary" @click="fetchData">
+        <button class="liquid-btn btn-secondary" type="button" @click="fetchData">
           🔄 {{ t('user.dataPage.toolbar.refresh') }}
         </button>
       </div>
       <div class="toolbar-right">
         <input
           v-model="searchQuery"
-          class="search-input"
+          class="search-input liquid-input"
           :placeholder="t('user.dataPage.searchPlaceholder')"
           @input="handleSearch"
         />
       </div>
     </div>
 
-    <div class="table-container">
+    <div class="table-container liquid-panel">
       <div v-if="loading" class="loading-overlay">
         <div class="loading-content">
           <div class="ui-loading--page" aria-hidden="true"></div>
@@ -58,7 +63,7 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>
+            <th class="col-check">
               <input
                 type="checkbox"
                 :checked="isAllSelected"
@@ -78,7 +83,7 @@
         </thead>
         <tbody>
           <tr v-if="paginatedData.length === 0">
-            <td colspan="10" style="text-align: center; padding: 40px; color: #999;">
+            <td colspan="10" class="table-empty-cell">
               {{
                 searchQuery
                   ? t('user.dataPage.empty.noMatch')
@@ -87,7 +92,7 @@
             </td>
           </tr>
           <tr v-for="record in paginatedData" :key="record.created_at">
-            <td>
+            <td class="col-check">
               <input
                 v-model="selectedRecords"
                 type="checkbox"
@@ -100,10 +105,10 @@
             <td>{{ record.聲韻調 || '-' }}</td>
             <td>{{ record.特徵 }}</td>
             <td>{{ record.值 }}</td>
-            <td>{{ record.說明 || '-' }}</td>
+            <td class="cell-note">{{ record.說明 || '-' }}</td>
             <td>{{ formatDate(record.created_at) }}</td>
             <td>
-              <button class="btn-edit" @click="openEditModal(record)">
+              <button class="liquid-btn btn-edit" type="button" @click="openEditModal(record)">
                 {{ t('common.button.edit') }}
               </button>
             </td>
@@ -112,7 +117,7 @@
       </table>
     </div>
 
-    <div v-if="filteredData.length > 0" class="pagination">
+    <div v-if="filteredData.length > 0" class="pagination liquid-panel">
       <div class="pagination-info">
         {{
           t('user.dataPage.pagination.showing', {
@@ -123,26 +128,27 @@
         }}
       </div>
       <div class="pagination-controls">
-        <button class="btn-page" :disabled="currentPage === 1" @click="goToPage(1)">
+        <button class="btn-page" type="button" :disabled="currentPage === 1" @click="goToPage(1)">
           {{ t('user.dataPage.pagination.first') }}
         </button>
-        <button class="btn-page" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
+        <button class="btn-page" type="button" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
           {{ t('user.dataPage.pagination.previous') }}
         </button>
         <div class="page-numbers">
           <button
             v-for="page in visiblePages"
             :key="page"
+            type="button"
             :class="['btn-page', { active: page === currentPage }]"
             @click="goToPage(page)"
           >
             {{ page }}
           </button>
         </div>
-        <button class="btn-page" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">
+        <button class="btn-page" type="button" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">
           {{ t('user.dataPage.pagination.next') }}
         </button>
-        <button class="btn-page" :disabled="currentPage === totalPages" @click="goToPage(totalPages)">
+        <button class="btn-page" type="button" :disabled="currentPage === totalPages" @click="goToPage(totalPages)">
           {{ t('user.dataPage.pagination.last') }}
         </button>
       </div>
@@ -164,18 +170,18 @@
       @update:modelValue="closeBatchEditModal"
     >
       <p class="hint">💡 {{ t('user.dataPage.batchEdit.hint') }}</p>
-      <div class="batch-table-wrapper">
+      <div class="batch-table-wrapper" data-variant="edit">
         <table class="batch-table">
           <thead>
             <tr>
-              <th style="width: 50px">#</th>
-              <th style="width: 100px">{{ t('user.dataPage.table.shortNameRequired') }}</th>
-              <th style="width: 120px">{{ t('user.dataPage.table.regionRequired') }}</th>
-              <th style="width: 120px">{{ t('user.dataPage.table.coordinatesRequired') }}</th>
-              <th style="width: 100px">{{ t('user.dataPage.table.phonology') }}</th>
-              <th style="width: 120px">{{ t('user.dataPage.table.featureRequired') }}</th>
-              <th style="width: 100px">{{ t('user.dataPage.table.valueRequired') }}</th>
-              <th style="width: 150px">{{ t('user.dataPage.table.note') }}</th>
+              <th class="col-index">#</th>
+              <th class="col-short-name">{{ t('user.dataPage.table.shortNameRequired') }}</th>
+              <th class="col-region">{{ t('user.dataPage.table.regionRequired') }}</th>
+              <th class="col-coordinates">{{ t('user.dataPage.table.coordinatesRequired') }}</th>
+              <th class="col-phonology">{{ t('user.dataPage.table.phonology') }}</th>
+              <th class="col-feature">{{ t('user.dataPage.table.featureRequired') }}</th>
+              <th class="col-value">{{ t('user.dataPage.table.valueRequired') }}</th>
+              <th class="col-note">{{ t('user.dataPage.table.note') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -193,14 +199,14 @@
         </table>
       </div>
       <template #footer>
-<!--        <div class="user-data-modal-footer">-->
-          <button class="btn-primary" :disabled="validBatchEditRows.length === 0" @click="submitBatchEdit">
+        <div class="user-data-modal-footer">
+          <button class="liquid-btn btn-primary" type="button" :disabled="validBatchEditRows.length === 0" @click="submitBatchEdit">
             {{ t('user.dataPage.batchEdit.save', { count: validBatchEditRows.length }) }}
           </button>
-          <button class="btn-secondary" @click="closeBatchEditModal">
+          <button class="liquid-btn btn-secondary" type="button" @click="closeBatchEditModal">
             {{ t('common.button.cancel') }}
           </button>
-<!--        </div>-->
+        </div>
       </template>
     </AppModal>
 
@@ -213,29 +219,29 @@
     >
       <p class="hint">💡 {{ t('user.dataPage.batchCreate.hint') }}</p>
       <div class="batch-table-controls">
-        <button class="btn-add-row" @click="addBatchRow">
+        <button class="liquid-btn btn-add-row" type="button" @click="addBatchRow">
           ➕ {{ t('user.dataPage.batchCreate.addRow') }}
         </button>
-        <button class="btn-clear" @click="clearBatchRows">
+        <button class="liquid-btn btn-clear" type="button" @click="clearBatchRows">
           🗑️ {{ t('user.dataPage.batchCreate.clear') }}
         </button>
         <span class="row-count">
           {{ t('user.dataPage.batchCreate.currentRows', { count: batchRows.length }) }}
         </span>
       </div>
-      <div class="batch-table-wrapper" @paste="handlePaste">
+      <div class="batch-table-wrapper" data-variant="create" @paste="handlePaste">
         <table class="batch-table">
           <thead>
             <tr>
-              <th style="width: 50px">#</th>
-              <th style="width: 100px">{{ t('user.dataPage.table.shortNameRequired') }}</th>
-              <th style="width: 120px">{{ t('user.dataPage.table.regionRequired') }}</th>
-              <th style="width: 120px">{{ t('user.dataPage.table.coordinatesRequired') }}</th>
-              <th style="width: 100px">{{ t('user.dataPage.table.phonology') }}</th>
-              <th style="width: 120px">{{ t('user.dataPage.table.featureRequired') }}</th>
-              <th style="width: 100px">{{ t('user.dataPage.table.valueRequired') }}</th>
-              <th style="width: 150px">{{ t('user.dataPage.table.note') }}</th>
-              <th style="width: 60px">{{ t('user.dataPage.table.actions') }}</th>
+              <th class="col-index">#</th>
+              <th class="col-short-name">{{ t('user.dataPage.table.shortNameRequired') }}</th>
+              <th class="col-region">{{ t('user.dataPage.table.regionRequired') }}</th>
+              <th class="col-coordinates">{{ t('user.dataPage.table.coordinatesRequired') }}</th>
+              <th class="col-phonology">{{ t('user.dataPage.table.phonology') }}</th>
+              <th class="col-feature">{{ t('user.dataPage.table.featureRequired') }}</th>
+              <th class="col-value">{{ t('user.dataPage.table.valueRequired') }}</th>
+              <th class="col-note">{{ t('user.dataPage.table.note') }}</th>
+              <th class="col-action">{{ t('user.dataPage.table.actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -249,21 +255,21 @@
               <td><input v-model="row.值" :placeholder="t('user.dataPage.form.valuePlaceholder')" /></td>
               <td><input v-model="row.說明" :placeholder="t('user.dataPage.form.notePlaceholder')" /></td>
               <td>
-                <button class="btn-remove" @click="removeBatchRow(index)">×</button>
+                <button class="btn-remove" type="button" @click="removeBatchRow(index)">×</button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
       <template #footer>
-<!--        <div class="user-data-modal-footer">-->
-          <button class="btn-primary" :disabled="validBatchRows.length === 0" @click="submitBatchCreate">
+        <div class="user-data-modal-footer">
+          <button class="liquid-btn btn-primary" type="button" :disabled="validBatchRows.length === 0" @click="submitBatchCreate">
             {{ t('user.dataPage.batchCreate.submit', { count: validBatchRows.length }) }}
           </button>
-          <button class="btn-secondary" @click="closeBatchCreateModal">
+          <button class="liquid-btn btn-secondary" type="button" @click="closeBatchCreateModal">
             {{ t('common.button.cancel') }}
           </button>
-<!--        </div>-->
+        </div>
       </template>
     </AppModal>
 
@@ -303,14 +309,14 @@
         <textarea v-model="editingRecord.說明" rows="3"></textarea>
       </div>
       <template #footer>
-<!--        <div class="user-data-modal-footer">-->
-          <button class="btn-primary" @click="submitEdit">
+        <div class="user-data-modal-footer">
+          <button class="liquid-btn btn-primary" type="button" @click="submitEdit">
             {{ t('common.button.save') }}
           </button>
-          <button class="btn-secondary" @click="closeEditModal">
+          <button class="liquid-btn btn-secondary" type="button" @click="closeEditModal">
             {{ t('common.button.cancel') }}
           </button>
-<!--        </div>-->
+        </div>
       </template>
     </AppModal>
   </div>
@@ -434,23 +440,23 @@ const validBatchEditRows = computed(() => batchEditRows.value.filter((row) => (
 const fetchData = async () => {
   await dataQuery.load(() => getAllCustomData(), {
     onSuccess: (response) => {
-    dataList.value = response.data || []
-    totalCount.value = response.total || 0
+      dataList.value = response.data || []
+      totalCount.value = response.total || 0
 
-    if (dataList.value.length > 0) {
-      showSuccess(t('user.dataPage.messages.fetchSuccess'))
-    } else {
-      showWarning(t('user.dataPage.messages.noDataWarning'))
-    }
+      if (dataList.value.length > 0) {
+        showSuccess(t('user.dataPage.messages.fetchSuccess'))
+      } else {
+        showWarning(t('user.dataPage.messages.noDataWarning'))
+      }
     },
     onError: (error) => {
-    dataList.value = []
-    totalCount.value = 0
-    showError(t('user.dataPage.messages.fetchFailed', { message: error.message }))
+      dataList.value = []
+      totalCount.value = 0
+      showError(t('user.dataPage.messages.fetchFailed', { message: error.message }))
 
-    if (error.message.includes('401') || error.message.includes('登錄') || error.message.includes('登录')) {
-      setTimeout(() => router.replace('/auth'), 1500)
-    }
+      if (error.message.includes('401') || error.message.includes('登錄') || error.message.includes('登录')) {
+        setTimeout(() => router.replace('/auth'), 1500)
+      }
     }
   })
 }
@@ -725,673 +731,879 @@ onMounted(() => {
   }
 
   void parsedBatchData.value
-  fetchData()
+  void fetchData()
 })
 </script>
 
-<style scoped>
-/* Apple liquid glass styling */
+<style scoped lang="scss">
+$user-text: #0f172a;
+$user-muted: #64748b;
+$user-border: rgba(148, 163, 184, 0.24);
+$user-glass-border: rgba(255, 255, 255, 0.58);
+$user-accent: #007aff;
+$user-danger: #ff3b30;
+$user-warning: #ff9500;
+$user-success: #34c759;
 
+@mixin glass-panel($radius: 24px, $padding: 18px) {
+  position: relative;
+  padding: $padding;
+  border: 1px solid $user-glass-border;
+  border-radius: $radius;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.42)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.32));
+  box-shadow:
+    0 24px 70px rgba(15, 23, 42, 0.12),
+    0 8px 22px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.26);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+}
+
+@mixin control-glass {
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.38)),
+    rgba(255, 255, 255, 0.56);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.76),
+    0 8px 22px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+}
+
+@mixin liquid-button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    opacity 0.18s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.985);
+  }
+
+  &:disabled {
+    opacity: 0.48;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgba(0, 122, 255, 0.18),
+      0 10px 26px rgba(15, 23, 42, 0.12);
+  }
+}
+
+.user-data-page {
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100%;
+  padding: clamp(12px, 2vw, 22px);
+  color: $user-text;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(0, 122, 255, 0.16), transparent 30%),
+      radial-gradient(circle at 82% 12%, rgba(88, 86, 214, 0.15), transparent 32%),
+      radial-gradient(circle at 70% 86%, rgba(52, 199, 89, 0.12), transparent 34%),
+      linear-gradient(180deg, #f8fbff 0%, #eef4ff 48%, #f9fbff 100%);
+  }
+
+  &::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.32), transparent 72%);
+  }
+}
+
+.liquid-panel {
+  @include glass-panel;
+}
 
 .page-header {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 18px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
 }
 
 .header-left {
   display: flex;
   align-items: center;
+  min-width: 0;
   gap: 16px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 10px;
+    margin: 0;
+    color: $user-text;
+    font-size: clamp(20px, 2.4vw, 28px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
 }
 
-.btn-back {
-  padding: 8px 16px;
-  background: rgba(142, 142, 147, 0.2);
-  border: none;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-back:hover {
-  background: rgba(142, 142, 147, 0.3);
-  transform: translateX(-2px);
-}
-
-.page-header h2 {
-  margin: 0;
-  font-size: 28px;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  justify-self: center;
+.title-icon {
+  display: inline-flex;
+  filter: drop-shadow(0 8px 18px rgba(0, 122, 255, 0.2));
 }
 
 .username-badge {
-  font-size: 16px;
-  padding: 4px 12px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border-radius: 12px;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  max-width: 220px;
+  padding: 5px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  border-radius: 999px;
+  overflow: hidden;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background:
+    linear-gradient(135deg, rgba(0, 122, 255, 0.9), rgba(88, 86, 214, 0.86)),
+    rgba(0, 122, 255, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 10px 24px rgba(0, 122, 255, 0.24);
 }
 
 .stats {
   display: flex;
-  gap: 20px;
-  font-size: 16px;
-  color: #666;
+  align-items: center;
+  gap: 10px;
+  color: $user-muted;
+  font-size: 14px;
+  font-weight: 700;
+
+  span {
+    @include control-glass;
+
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 7px 12px;
+    border-radius: 999px;
+  }
 }
 
 .toolbar {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 18px;
-  padding: 16px;
-  margin-bottom: 20px;
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
 .toolbar-left {
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 10px;
 }
 
 .toolbar-right {
   flex: 1;
-  max-width: 400px;
-  min-width: 200px;
+  min-width: 220px;
+  max-width: 420px;
 }
 
-.search-input {
-  padding: 10px 16px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.8);
-  transition: all 0.2s ease;
+.liquid-btn {
+  @include liquid-button-base;
 }
 
-.search-input:focus {
-  outline: none;
-  border-color: #007aff;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+.btn-back,
+.btn-secondary,
+.btn-clear {
+  @include control-glass;
+
+  color: $user-text;
+
+  &:hover:not(:disabled) {
+    border-color: rgba(0, 122, 255, 0.28);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.5)),
+      rgba(0, 122, 255, 0.08);
+  }
 }
 
-.toolbar button,
-.user-data-modal-footer button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.toolbar button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.btn-back:hover:not(:disabled) {
+  transform: translateX(-2px);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  color: white;
-}
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
+    $user-accent;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 12px 28px rgba(0, 122, 255, 0.26);
 
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  &:hover:not(:disabled) {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      0 16px 36px rgba(0, 122, 255, 0.34);
+  }
 }
 
 .btn-warning {
-  background: linear-gradient(135deg, #ff9500, #ff6b00);
-  color: white;
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(255, 149, 0, 0.96), rgba(255, 107, 0, 0.9)),
+    $user-warning;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 12px 28px rgba(255, 149, 0, 0.22);
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #ff3b30, #d32f2f);
-  color: white;
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(255, 59, 48, 0.96), rgba(211, 47, 47, 0.92)),
+    $user-danger;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    0 12px 28px rgba(255, 59, 48, 0.22);
 }
 
-.btn-secondary {
-  background: rgba(142, 142, 147, 0.2);
-  color: #333;
+.btn-add-row {
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(52, 199, 89, 0.96), rgba(40, 167, 69, 0.9)),
+    $user-success;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 12px 28px rgba(52, 199, 89, 0.22);
+}
+
+.btn-edit {
+  min-height: 30px;
+  padding: 7px 12px;
+  border-radius: 11px;
+  color: #fff;
+  font-size: 12px;
+  background:
+    linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
+    $user-accent;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 8px 18px rgba(0, 122, 255, 0.24);
+}
+
+.liquid-input,
+.form-group input,
+.form-group textarea,
+.batch-table input {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  color: $user-text;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.48)),
+    rgba(255, 255, 255, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 8px 18px rgba(15, 23, 42, 0.04);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: rgba(0, 122, 255, 0.56);
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow:
+      0 0 0 4px rgba(0, 122, 255, 0.11),
+      inset 0 1px 0 rgba(255, 255, 255, 0.76);
+  }
+}
+
+.search-input {
+  height: 42px;
+  padding: 10px 15px;
+  border-radius: 15px;
+  font-size: 14px;
+}
+
+input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: $user-accent;
+  cursor: pointer;
 }
 
 .table-container {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 18px;
-  padding: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  /* 关键：确保横向滚动 */
-  overflow-x: auto;
-  overflow-y: visible;
-  width: 97%;
-  position: relative; /* 为 loading overlay 提供定位上下文 */
+  width: 100%;
+  max-width: 100%;
+  padding: 10px;
+  overflow: auto;
 }
 
-/* Loading overlay styles */
 .loading-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  inset: 0;
+  z-index: 30;
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 100;
-  border-radius: 18px;
+  justify-content: center;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
 }
 
 .loading-content {
+  @include glass-panel(20px, 18px 22px);
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
-
-
 .loading-text {
-  font-size: 16px;
-  font-weight: 600;
-  color: #007aff;
-  letter-spacing: 0.5px;
+  color: $user-accent;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
 .data-table {
   width: 100%;
-  min-width: 600px; /* 确保表格有最小宽度 */
-  border-collapse: collapse;
+  min-width: 1120px;
+  border-collapse: separate;
+  border-spacing: 0 8px;
   table-layout: auto;
-}
-
-.data-table th,
-.data-table td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  white-space: nowrap; /* 防止内容换行 */
-}
-
-.data-table th {
-  background: rgba(0, 122, 255, 0.1);
-  font-weight: 600;
-  color: #333;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.data-table tr:hover {
-  background: rgba(0, 122, 255, 0.05);
-}
-
-.btn-edit {
-  padding: 6px 12px;
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-/* Modal styles */
-.user-data-modal-footer {
-  padding: 20px;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-}
-
-.batch-textarea {
-  width: 100%;
-  min-height: 300px;
-  padding: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  font-family: monospace;
   font-size: 13px;
-  resize: vertical;
-  background: rgba(255, 255, 255, 0.5);
+
+  th,
+  td {
+    padding: 12px 13px;
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(241, 245, 249, 0.68)),
+      rgba(255, 255, 255, 0.76);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+
+    &:first-child {
+      border-radius: 14px 0 0 14px;
+    }
+
+    &:last-child {
+      border-radius: 0 14px 14px 0;
+    }
+  }
+
+  tbody tr {
+    transition:
+      transform 0.16s ease,
+      filter 0.16s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+
+      td {
+        background: rgba(255, 255, 255, 0.74);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.78),
+          0 10px 24px rgba(15, 23, 42, 0.08);
+      }
+    }
+  }
+
+  tbody td {
+    color: #334155;
+    background: rgba(255, 255, 255, 0.46);
+    border-top: 1px solid rgba(255, 255, 255, 0.52);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    transition:
+      background-color 0.16s ease,
+      box-shadow 0.16s ease;
+
+    &:first-child {
+      border-left: 1px solid rgba(255, 255, 255, 0.52);
+      border-radius: 14px 0 0 14px;
+    }
+
+    &:last-child {
+      border-right: 1px solid rgba(255, 255, 255, 0.52);
+      border-radius: 0 14px 14px 0;
+    }
+  }
 }
 
-.form-group {
-  margin-bottom: 16px;
+.col-check {
+  width: 44px;
+  text-align: center;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #333;
+.cell-note {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-empty-cell {
+  padding: 42px 20px !important;
+  color: #94a3b8 !important;
+  text-align: center !important;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.46) !important;
+  border-radius: 16px !important;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.pagination-info {
+  color: $user-muted;
   font-size: 14px;
+  font-weight: 700;
 }
 
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+.pagination-controls,
+.page-numbers,
+.pagination-size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination-controls {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination-size {
+  color: $user-muted;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+  font-weight: 700;
 }
 
-.form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #007aff;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+.btn-page {
+  @include liquid-button-base;
+  @include control-glass;
+
+  min-width: 38px;
+  min-height: 36px;
+  padding: 8px 12px;
+  color: #334155;
+  font-size: 13px;
+
+  &:hover:not(:disabled) {
+    border-color: rgba(0, 122, 255, 0.38);
+    color: $user-accent;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.52)),
+      rgba(0, 122, 255, 0.08);
+  }
+
+  &.active {
+    color: #fff;
+    border-color: rgba(0, 122, 255, 0.45);
+    background:
+      linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
+      $user-accent;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      0 12px 24px rgba(0, 122, 255, 0.24);
+  }
 }
 
 .hint {
-  color: #666;
-  font-size: 13px;
-  margin-bottom: 12px;
-}
-
-.preview {
-  margin-top: 12px;
-  padding: 12px;
-  background: rgba(0, 122, 255, 0.1);
-  border-radius: 8px;
-  font-size: 14px;
-  color: #007aff;
-}
-
-/* Batch table styles */
-.batch-table-controls {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.btn-add-row,
-.btn-clear {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 122, 255, 0.12);
+  border-radius: 14px;
+  color: #475569;
   font-size: 13px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  background: rgba(0, 122, 255, 0.06);
 }
 
-.btn-add-row {
-  background: linear-gradient(135deg, #34c759, #28a745);
-  color: white;
-}
-
-.btn-add-row:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
-}
-
-.btn-clear {
-  background: rgba(142, 142, 147, 0.2);
-  color: #333;
+.batch-table-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
 }
 
 .row-count {
   margin-left: auto;
+  color: $user-muted;
   font-size: 14px;
-  color: #666;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .batch-table-wrapper {
   max-height: 500px;
   overflow: auto;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  background: white;
+  border: 1px solid rgba(255, 255, 255, 0.54);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.38)),
+    rgba(255, 255, 255, 0.46);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 16px 34px rgba(15, 23, 42, 0.08);
 }
 
 .batch-table {
   width: 100%;
-  border-collapse: collapse;
+  min-width: 860px;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 13px;
-}
 
-.batch-table thead {
-  position: sticky;
-  top: 0;
-  background: rgba(0, 122, 255, 0.1);
-  z-index: 10;
-}
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
 
-.batch-table th {
-  padding: 10px 8px;
-  text-align: left;
-  font-weight: 600;
-  color: #333;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-  white-space: nowrap;
-}
+  th,
+  td {
+    padding: 9px 8px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    text-align: left;
+    white-space: nowrap;
+  }
 
-.batch-table td {
-  padding: 6px 8px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
+  th {
+    color: #475569;
+    font-weight: 800;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(241, 245, 249, 0.76)),
+      rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+  }
 
-.batch-table input {
-  width: 100%;
-  padding: 6px 8px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  font-size: 13px;
-  background: rgba(255, 255, 255, 0.8);
-}
+  td {
+    color: #334155;
+    background: rgba(255, 255, 255, 0.34);
+  }
 
-.batch-table input:focus {
-  outline: none;
-  border-color: #007aff;
-  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
-}
+  tr:hover td {
+    background: rgba(0, 122, 255, 0.045);
+  }
 
-.batch-table tr:hover {
-  background: rgba(0, 122, 255, 0.03);
+  input {
+    min-width: 0;
+    height: 34px;
+    padding: 7px 9px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+
+  .col-index {
+    width: 52px;
+  }
+
+  .col-short-name {
+    width: 110px;
+  }
+
+  .col-region,
+  .col-coordinates,
+  .col-feature {
+    width: 130px;
+  }
+
+  .col-phonology,
+  .col-value {
+    width: 110px;
+  }
+
+  .col-note {
+    width: 160px;
+  }
+
+  .col-action {
+    width: 72px;
+  }
 }
 
 .btn-remove {
-  padding: 4px 8px;
-  background: linear-gradient(135deg, #ff3b30, #d32f2f);
-  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 18px;
   line-height: 1;
-}
-
-.btn-remove:hover {
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
-}
-
-/* Pagination styles */
-.pagination {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 18px;
-  padding: 16px;
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.pagination-info {
-  font-size: 14px;
-  color: #666;
-  font-weight: 600;
-}
-
-.pagination-controls {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.page-numbers {
-  display: flex;
-  gap: 4px;
-}
-
-.btn-page {
-  padding: 8px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.8);
-  color: #333;
-  font-size: 14px;
-  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  background:
+    linear-gradient(135deg, rgba(255, 59, 48, 0.96), rgba(211, 47, 47, 0.92)),
+    $user-danger;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 8px 18px rgba(255, 59, 48, 0.2);
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      0 12px 24px rgba(255, 59, 48, 0.26);
+  }
 }
 
-.btn-page:hover:not(:disabled) {
-  background: rgba(0, 122, 255, 0.1);
-  border-color: #007aff;
-  color: #007aff;
+.form-group {
+  margin-bottom: 15px;
+
+  label {
+    display: block;
+    margin-bottom: 7px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  input,
+  textarea {
+    padding: 10px 12px;
+    border-radius: 13px;
+    font-size: 14px;
+  }
+
+  textarea {
+    min-height: 86px;
+    resize: vertical;
+  }
 }
 
-.btn-page.active {
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  color: white;
-  border-color: #007aff;
-}
-
-.btn-page:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.pagination-size {
+.user-data-modal-footer {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #666;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
 }
 
-.pagination-size select {
-  padding: 8px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.8);
+.preview {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid rgba(0, 122, 255, 0.14);
+  border-radius: 14px;
+  color: $user-accent;
   font-size: 14px;
-  cursor: pointer;
+  font-weight: 700;
+  background: rgba(0, 122, 255, 0.07);
 }
 
-/* Mobile optimization */
 @media (max-width: 768px) {
   .user-data-page {
     padding: 12px;
   }
 
   .page-header {
-    padding: 16px;
-    flex-direction: column;
     align-items: stretch;
-    gap:5px;
+    padding: 16px;
+    gap: 12px;
+    flex-direction: column;
   }
 
   .header-left {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
     width: 100%;
-  }
+    gap: 12px;
+    flex-wrap: wrap;
 
-  .btn-back {
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-
-  .header-left h2 {
-    font-size: 18px;
-    flex: 1;
-    min-width: 200px;
+    h2 {
+      flex: 1;
+      min-width: 200px;
+      font-size: 18px;
+    }
   }
 
   .username-badge {
+    max-width: 160px;
     font-size: 13px;
-    padding: 3px 10px;
   }
 
   .stats {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 12px;
     width: 100%;
-    font-size: 14px;
+    justify-content: space-between;
+    gap: 8px;
+
+    span {
+      flex: 1;
+      justify-content: center;
+      font-size: 13px;
+    }
   }
 
   .toolbar {
-    padding: 12px;
+    align-items: stretch;
+    padding: 14px;
+    flex-direction: column;
   }
 
   .toolbar-left {
-    width: 100%;
     display: grid;
+    width: 100%;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
 
-  .toolbar-left button {
-    padding: 10px 8px;
-    font-size: 13px;
-    white-space: nowrap;
+  .toolbar-right {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
   }
 
-  .toolbar-right {
-    max-width: 100%;
-    width: 100%;
-    margin-top: 8px;
+  .liquid-btn {
+    padding-inline: 10px;
+    font-size: 13px;
   }
 
   .search-input {
+    height: 42px;
     font-size: 16px;
   }
 
-  /* 表格容器 - 关键优化 */
   .table-container {
-    padding: 12px;
-    border-radius: 12px;
-    /* 确保可以横向滚动 */
-    overflow-x: scroll;
-    overflow-y: visible;
+    padding: 8px;
+    border-radius: 18px;
   }
 
   .data-table {
-    min-width: 900px;
-    font-size: 13px;
-  }
-
-  .data-table th,
-  .data-table td {
-    padding: 10px 8px;
-    font-size: 13px;
-  }
-
-  .btn-edit {
-    padding: 6px 10px;
+    min-width: 940px;
     font-size: 12px;
+
+    th,
+    td {
+      padding: 10px 9px;
+      font-size: 12px;
+    }
   }
 
   .pagination {
-    flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-    padding: 12px;
+    flex-direction: column;
+    padding: 14px;
   }
 
-  .pagination-info {
+  .pagination-info,
+  .pagination-size {
+    justify-content: center;
     text-align: center;
     font-size: 13px;
   }
 
   .pagination-controls {
     justify-content: center;
-    flex-wrap: wrap;
   }
 
   .btn-page {
-    padding: 8px 10px;
-    font-size: 13px;
-    min-width: 40px;
-  }
-
-  .page-numbers {
-    gap: 4px;
-  }
-
-  .pagination-size {
-    justify-content: center;
-    font-size: 13px;
-  }
-
-  .pagination-size select {
-    padding: 8px 12px;
-    font-size: 13px;
+    min-width: 36px;
+    padding: 7px 9px;
+    font-size: 12px;
   }
 
   .user-data-modal-footer {
-    padding: 16px;
     flex-direction: column;
+
+    button {
+      width: 100%;
+    }
   }
 
-  .user-data-modal-footer button {
+  .batch-table-controls {
+    gap: 8px;
+  }
+
+  .row-count {
     width: 100%;
+    margin-left: 0;
   }
 
   .batch-table-wrapper {
     max-height: 400px;
-    overflow: auto;
   }
 
   .batch-table {
+    min-width: 780px;
     font-size: 12px;
-    min-width: 600px;
-  }
 
-  .batch-table input {
-    font-size: 12px;
-    padding: 6px 8px;
-  }
-
-  .batch-table-controls {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .btn-add-row,
-  .btn-clear {
-    padding: 8px 12px;
-    font-size: 12px;
+    input {
+      font-size: 12px;
+    }
   }
 }
 
@@ -1400,32 +1612,26 @@ onMounted(() => {
     padding: 8px;
   }
 
-  .page-header {
-    padding: 12px;
-    gap:5px;
+  .page-header,
+  .toolbar,
+  .pagination {
+    border-radius: 16px;
   }
 
   .header-left {
     align-items: flex-start;
-  }
 
-  .header-left h2 {
-    font-size: 16px;
-    width: 100%;
+    h2 {
+      width: 100%;
+      min-width: 0;
+      font-size: 16px;
+    }
   }
 
   .btn-back {
-    padding: 6px 10px;
+    min-height: 34px;
+    padding: 7px 11px;
     font-size: 12px;
-  }
-
-  .stats {
-    font-size: 13px;
-    gap: 6px;
-  }
-
-  .toolbar {
-    padding: 10px;
   }
 
   .toolbar-left {
@@ -1433,38 +1639,33 @@ onMounted(() => {
     gap: 6px;
   }
 
-  .toolbar-left button {
-    padding: 6px 10px;
+  .liquid-btn {
+    min-height: 34px;
+    padding: 7px 8px;
     font-size: 12px;
-  }
-
-  .table-container {
-    padding: 10px;
   }
 
   .data-table {
-    min-width: 800px;
-  }
+    min-width: 860px;
 
-  .data-table th,
-  .data-table td {
-    padding: 8px 6px;
-    font-size: 12px;
-  }
-
-  .btn-page {
-    padding: 6px 8px;
-    font-size: 12px;
-    min-width: 36px;
+    th,
+    td {
+      padding: 8px 7px;
+      font-size: 12px;
+    }
   }
 
   .page-numbers {
-    gap: 2px;
+    gap: 3px;
+  }
+
+  .btn-page {
+    min-width: 34px;
+    padding: 6px 8px;
   }
 
   .batch-table {
-    min-width: 600px;
+    min-width: 720px;
   }
 }
-
 </style>

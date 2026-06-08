@@ -765,6 +765,8 @@ watch(
 }
 
 .point-detail-header {
+  --main-glass-button-white-space: nowrap;
+  --main-glass-button-padding: 12px 20px;
   display: flex;
   align-items: flex-start;
   gap: 14px;
