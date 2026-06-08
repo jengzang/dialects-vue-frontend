@@ -406,17 +406,17 @@ async function handleSave() {
   message.value = '';
 
   if (!location.value.trim() || !region.value.trim()) {
-    message.value = t('customEntry.featureRecord.messages.locationRegionRequired');
+    showWarning(t('customEntry.featureRecord.messages.locationRegionRequired'));
     return;
   }
 
   if (!Array.isArray(coord.value)) {
-    message.value = t('customEntry.featureRecord.messages.coordRequired');
+    showWarning(t('customEntry.featureRecord.messages.coordRequired'));
     return;
   }
 
   if (!valueField.value.trim()) {
-    message.value = t('customEntry.featureRecord.messages.valueRequired');
+    showWarning(t('customEntry.featureRecord.messages.valueRequired'));
     return;
   }
 
@@ -432,7 +432,7 @@ async function handleSave() {
   };
 
   if (!payload.特徵) {
-    message.value = t('customEntry.featureRecord.messages.featureRequired');
+    showWarning(t('customEntry.featureRecord.messages.featureRequired'));
     return;
   }
 

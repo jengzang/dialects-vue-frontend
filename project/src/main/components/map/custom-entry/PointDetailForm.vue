@@ -453,12 +453,12 @@ async function handleSave() {
   saveMessage.value = '';
 
   if (!location.value.trim() || !region.value.trim()) {
-    saveMessage.value = t('customEntry.pointDetail.messages.locationRegionRequired');
+    showWarning(t('customEntry.pointDetail.messages.locationRegionRequired'));
     return;
   }
 
   if (!isCoordValid.value) {
-    saveMessage.value = t('customEntry.pointDetail.messages.coordRequired');
+    showWarning(t('customEntry.pointDetail.messages.coordRequired'));
     return;
   }
 
@@ -476,7 +476,7 @@ async function handleSave() {
     if (confirmed === false) return;
   }
   if (validRows.length === 0 && removedIds.value.length === 0) {
-    saveMessage.value = t('customEntry.pointDetail.messages.rowRequired');
+    showWarning(t('customEntry.pointDetail.messages.rowRequired'));
     return;
   }
 
@@ -518,7 +518,7 @@ async function handleSave() {
   toEdit.forEach((record) => tasks.push(editCustomData(record)));
 
   if (tasks.length === 0) {
-    saveMessage.value = t('customEntry.pointDetail.messages.noChanges');
+    showWarning(t('customEntry.pointDetail.messages.noChanges'));
     return;
   }
 
@@ -527,7 +527,7 @@ async function handleSave() {
   const failedCount = results.filter((item) => item.status === 'rejected').length;
 
   if (failedCount > 0) {
-    saveMessage.value = t('customEntry.pointDetail.messages.partialFailed', { count: failedCount });
+    showWarning(t('customEntry.pointDetail.messages.partialFailed', { count: failedCount }));
     isSaving.value = false;
     return;
   }
