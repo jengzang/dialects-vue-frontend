@@ -52,7 +52,7 @@
     "rows": {
       "title": "Feature records",
       "description": "Each row represents one custom record ready to submit.",
-      "add": "+ Add another row",
+      "add": "+ Add row",
       "duplicateWarning": "A record with the same phonology and feature already exists for this point. Continue saving?",
       "headers": {
         "phonology": "Phonology",

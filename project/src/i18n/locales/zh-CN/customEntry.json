@@ -52,7 +52,7 @@
     "rows": {
       "title": "特征记录",
       "description": "每一行代表一条可提交的自定义资料。",
-      "add": "+ 再添加一条",
+      "add": "+ 添加",
       "duplicateWarning": "同一点下已存在相同的声韵调与特征，确认继续保存吗？",
       "headers": {
         "phonology": "声韵调",

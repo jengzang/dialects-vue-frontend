@@ -83,17 +83,6 @@
               </button>
             </div>
           </div>
-
-          <label class="point-field point-field-full">
-            <span class="point-field-label">{{ t('customEntry.pointDetail.labels.coord') }}</span>
-            <input
-              :value="coordText"
-              class="point-field-input"
-              type="text"
-              readonly
-              :placeholder="t('customEntry.pointDetail.placeholders.coord')"
-            />
-          </label>
         </div>
 
         <div class="point-rows-header">
@@ -164,29 +153,6 @@
           </div>
         </div>
 
-        <div v-if="saveMessage" class="point-save-message">{{ saveMessage }}</div>
-
-        <div class="point-detail-actions">
-          <button class="main-glass-button" type="button" @click="addRow">
-            {{ t('customEntry.pointDetail.rows.add') }}
-          </button>
-          <div class="action-right-group">
-            <button class="main-glass-button" type="button" @click="$emit('back')">
-              {{ t('customEntry.pointDetail.actions.cancel') }}
-            </button>
-            <button
-              class="main-glass-button"
-              data-variant="primary"
-              type="button"
-              :disabled="isSaving"
-              @click="handleSave"
-            >
-              {{
-                isSaving ? t('customEntry.common.saving') : t('customEntry.pointDetail.actions.save')
-              }}
-            </button>
-          </div>
-        </div>
       </div>
 
       <div class="point-detail-side main-glass-panel-inner">
@@ -197,6 +163,16 @@
               : t('customEntry.pointDetail.map.previewTitle')
           }}
         </div>
+        <label class="point-field point-field-full">
+          <span class="point-field-label">{{ t('customEntry.pointDetail.labels.coord') }}</span>
+          <input
+            :value="coordText"
+            class="point-field-input"
+            type="text"
+            readonly
+            :placeholder="t('customEntry.pointDetail.placeholders.coord')"
+          />
+        </label>
         <MiniMapSelector
           v-model:coord="coord"
           :readonly="!isRealCreateMode && isCoordValid"
@@ -208,6 +184,30 @@
               : t('customEntry.pointDetail.map.previewHint')
           "
         />
+      </div>
+    </div>
+
+    <div v-if="saveMessage" class="point-save-message">{{ saveMessage }}</div>
+
+    <div class="point-detail-actions">
+      <button class="main-glass-button add-row-btn" type="button" @click="addRow">
+        {{ t('customEntry.pointDetail.rows.add') }}
+      </button>
+      <div class="action-right-group">
+        <button class="main-glass-button" type="button" @click="$emit('back')">
+          {{ t('customEntry.pointDetail.actions.cancel') }}
+        </button>
+        <button
+          class="main-glass-button"
+          data-variant="primary"
+          type="button"
+          :disabled="isSaving"
+          @click="handleSave"
+        >
+          {{
+            isSaving ? t('customEntry.common.saving') : t('customEntry.pointDetail.actions.save')
+          }}
+        </button>
       </div>
     </div>
 
@@ -890,6 +890,7 @@ watch(
 .point-detail-actions {
   display: flex;
   justify-content: space-between;
+  width: 100%;
   align-items: center;
   gap: 12px;
   margin-top: 18px;
@@ -897,9 +898,24 @@ watch(
 }
 
 .action-right-group {
+  --main-glass-button-padding: 12px 20px;
+  --main-glass-button-white-space: nowrap;
   display: flex;
   gap: 12px;
   align-items: center;
+}
+
+.add-row-btn {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.24);
+  color: #059669;
+}
+
+.add-row-btn:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #047857;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
 }
 
 .point-map-title {

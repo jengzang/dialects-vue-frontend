@@ -52,7 +52,7 @@
     "rows": {
       "title": "特徵記錄",
       "description": "每一行代表一條可提交的自定義資料。",
-      "add": "+ 再添加一條",
+      "add": "+ 添加",
       "duplicateWarning": "同一點下已存在相同的聲韻調與特徵，確認繼續保存嗎？",
       "headers": {
         "phonology": "聲韻調",
