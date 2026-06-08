@@ -72,15 +72,10 @@
         </div>
 
         <div class="point-rows-header">
-          <div>
-            <h5 class="point-rows-title">{{ t('customEntry.pointDetail.rows.title') }}</h5>
-            <p class="point-rows-description">
-              {{ t('customEntry.pointDetail.rows.description') }}
-            </p>
-          </div>
-          <button class="main-glass-button" type="button" @click="addRow">
-            {{ t('customEntry.pointDetail.rows.add') }}
-          </button>
+          <h5 class="point-rows-title">{{ t('customEntry.pointDetail.rows.title') }}</h5>
+          <p class="point-rows-description">
+            {{ t('customEntry.pointDetail.rows.description') }}
+          </p>
         </div>
 
         <div class="point-rows-table">
@@ -147,20 +142,25 @@
         <div v-if="saveMessage" class="point-save-message">{{ saveMessage }}</div>
 
         <div class="point-detail-actions">
-          <button class="main-glass-button" type="button" @click="$emit('back')">
-            {{ t('customEntry.pointDetail.actions.cancel') }}
+          <button class="main-glass-button" type="button" @click="addRow">
+            {{ t('customEntry.pointDetail.rows.add') }}
           </button>
-          <button
-            class="main-glass-button"
-            data-variant="primary"
-            type="button"
-            :disabled="isSaving"
-            @click="handleSave"
-          >
-            {{
-              isSaving ? t('customEntry.common.saving') : t('customEntry.pointDetail.actions.save')
-            }}
-          </button>
+          <div class="action-right-group">
+            <button class="main-glass-button" type="button" @click="$emit('back')">
+              {{ t('customEntry.pointDetail.actions.cancel') }}
+            </button>
+            <button
+              class="main-glass-button"
+              data-variant="primary"
+              type="button"
+              :disabled="isSaving"
+              @click="handleSave"
+            >
+              {{
+                isSaving ? t('customEntry.common.saving') : t('customEntry.pointDetail.actions.save')
+              }}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -740,14 +740,17 @@ watch(
 
 .point-rows-header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  align-items: baseline;
+  gap: 12px;
   margin-top: 18px;
 }
 
+.point-rows-title {
+  margin: 0;
+}
+
 .point-rows-description {
-  margin: 6px 0 0;
+  margin: 0;
   font-size: 13px;
   color: #64748b;
 }
@@ -785,9 +788,17 @@ watch(
 
 .point-detail-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   gap: 12px;
   margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.action-right-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 .point-map-title {
@@ -841,6 +852,25 @@ watch(
   .point-row-remove {
     width: 100%;
     margin-top: 4px;
+  }
+}
+
+@media (max-width: 768px), (orientation: portrait) {
+  .point-rows-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .point-detail-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .action-right-group {
+    flex-direction: row;
+    justify-content: flex-end;
   }
 }
 
