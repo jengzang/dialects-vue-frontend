@@ -236,8 +236,15 @@ const selectSuggestion = async (item) => {
 
   try {
     const response = await getRegions(item)
-    if (response && response['音典分區']) {
-      formData.region = response['音典分區']
+    if (response) {
+      if (response['音典分區']) {
+        formData.region = response['音典分區']
+      } else {
+        formData.region = t('map.customDataPanel.messages.regionNotFound')
+      }
+      if (response['經緯度']) {
+        formData.coordinates = response['經緯度']
+      }
     } else {
       formData.region = t('map.customDataPanel.messages.regionNotFound')
     }

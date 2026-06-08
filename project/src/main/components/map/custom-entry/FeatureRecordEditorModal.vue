@@ -150,7 +150,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, nextTick } from 'vue';
 import { batchMatch, getRegions } from '@/api';
 import { showConfirm, showWarning } from '@/utils/message.js';
 import { useI18n } from 'vue-i18n';
@@ -191,6 +191,7 @@ const userPoints = ref([]);
 let debounceTimer = null;
 
 const isCoordLocked = ref(false);
+const isSelectingSuggestion = ref(false);
 
 async function checkExistingPointCoordinate() {
   const loc = location.value.trim();
@@ -225,6 +226,7 @@ async function checkExistingPointCoordinate() {
 }
 
 watch([location, region], () => {
+  if (isSelectingSuggestion.value) return;
   checkExistingPointCoordinate();
 });
 
@@ -316,46 +318,71 @@ function handleLocationFocus() {
 }
 
 async function selectSuggestion(item) {
-  location.value = item.location;
-  region.value = item.region;
-  showSuggestions.value = false;
+  isSelectingSuggestion.value = true;
+  try {
+    location.value = item.location;
+    region.value = item.region;
+    showSuggestions.value = false;
 
-  if (item.coord) {
-    const parsed = parseCoordText(item.coord);
+    if (item.coord) {
+      const parsed = parseCoordText(item.coord);
+      if (parsed) {
+        coord.value = parsed;
+        isCoordLocked.value = true;
+        message.value = t('customEntry.featureRecord.messages.coordinateSynced') || '已自动同步该地点的已有坐标，防止数据冲突';
+      }
+    } else {
+      isCoordLocked.value = false;
+      if (!region.value) {
+        try {
+          const response = await getRegions(item.location);
+          if (response) {
+            if (response['音典分區']) {
+              region.value = response['音典分區'];
+            }
+            if (response['經緯度']) {
+              const parsed = parseCoordText(response['經緯度']);
+              if (parsed) {
+                coord.value = parsed;
+                isCoordLocked.value = true;
+                message.value = t('customEntry.featureRecord.messages.coordinateSynced') || '已自动同步该地点的已有坐标，防止数据冲突';
+              }
+            }
+          }
+        } catch (error) {
+          console.error('獲取分區/座標失敗:', error);
+        }
+      }
+    }
+  } finally {
+    await nextTick();
+    isSelectingSuggestion.value = false;
+  }
+
+  await checkExistingPointCoordinate();
+}
+
+async function selectQuickPoint(p) {
+  isSelectingSuggestion.value = true;
+  try {
+    location.value = p['簡稱'] || p.location || '';
+    region.value = p['音典分區'] || p.region || '';
+    const parsed = parseCoordText(p['經緯度'] || p.coordinates || '');
     if (parsed) {
       coord.value = parsed;
       isCoordLocked.value = true;
       message.value = t('customEntry.featureRecord.messages.coordinateSynced') || '已自动同步该地点的已有坐标，防止数据冲突';
-      return;
+    } else {
+      coord.value = null;
+      isCoordLocked.value = false;
+      message.value = '';
     }
+  } finally {
+    await nextTick();
+    isSelectingSuggestion.value = false;
   }
 
-  isCoordLocked.value = false;
-  if (!region.value) {
-    try {
-      const response = await getRegions(item.location);
-      if (response && response['音典分區']) {
-        region.value = response['音典分區'];
-      }
-    } catch (error) {
-      console.error('獲取分區失敗:', error);
-    }
-  }
-}
-
-function selectQuickPoint(p) {
-  location.value = p['簡稱'] || p.location || '';
-  region.value = p['音典分區'] || p.region || '';
-  const parsed = parseCoordText(p['經緯度'] || p.coordinates || '');
-  if (parsed) {
-    coord.value = parsed;
-    isCoordLocked.value = true;
-    message.value = t('customEntry.featureRecord.messages.coordinateSynced') || '已自动同步该地点的已有坐标，防止数据冲突';
-  } else {
-    coord.value = null;
-    isCoordLocked.value = false;
-    message.value = '';
-  }
+  await checkExistingPointCoordinate();
 }
 
 function hideSuggestions() {

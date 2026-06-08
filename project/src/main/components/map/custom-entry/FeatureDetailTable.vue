@@ -182,7 +182,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import { batchDeleteCustomData, getDataByFeature, getDataByPoint } from '@/api';
-import { showConfirm } from '@/utils/message.js';
+import { showConfirm, showWarning } from '@/utils/message.js';
 import MiniMapSelector from './MiniMapSelector.vue';
 import FeatureRecordEditorModal from './FeatureRecordEditorModal.vue';
 
@@ -264,7 +264,7 @@ const loadRecords = async () => {
 
 const openCreateModal = () => {
   if (!localFeatureName.value.trim()) {
-    showConfirm(t('customEntry.featureRecord.messages.featureRequired') || '请先填写特征名称');
+    showWarning(t('customEntry.featureRecord.messages.featureRequired') || '请先填写特征名称');
     return;
   }
   editingRecord.value = {

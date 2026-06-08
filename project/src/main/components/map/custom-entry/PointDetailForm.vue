@@ -267,7 +267,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, nextTick } from 'vue';
 import { batchMatch, getRegions, getUserPoints } from '@/api';
 import { showConfirm, showWarning } from '@/utils/message.js';
 import { useI18n } from 'vue-i18n';
@@ -303,6 +303,7 @@ const isSaving = ref(false);
 const pointSuggestions = ref([]);
 const showPointSuggestions = ref(false);
 const userPoints = ref([]);
+const isSelectingSuggestion = ref(false);
 let locationDebounceTimer = null;
 let rowSeed = 0;
 
@@ -431,38 +432,62 @@ function handleLocationFocus() {
 }
 
 async function selectSuggestion(item) {
-  location.value = item.location;
-  region.value = item.region;
-  showPointSuggestions.value = false;
+  isSelectingSuggestion.value = true;
+  try {
+    location.value = item.location;
+    region.value = item.region;
+    showPointSuggestions.value = false;
 
-  if (item.coord) {
-    const parsed = parseCoordText(item.coord);
-    if (parsed) {
-      coord.value = parsed;
-    }
-  }
-
-  if (!region.value) {
-    try {
-      const response = await getRegions(item.location);
-      if (response && response['音典分區']) {
-        region.value = response['音典分區'];
+    if (item.coord) {
+      const parsed = parseCoordText(item.coord);
+      if (parsed) {
+        coord.value = parsed;
       }
-    } catch (error) {
-      // ignore
     }
+
+    if (!region.value) {
+      try {
+        const response = await getRegions(item.location);
+        if (response) {
+          if (response['音典分區']) {
+            region.value = response['音典分區'];
+          }
+          if (response['經緯度']) {
+            const parsed = parseCoordText(response['經緯度']);
+            if (parsed) {
+              coord.value = parsed;
+            }
+          }
+        }
+      } catch (error) {
+        // ignore
+      }
+    }
+  } finally {
+    await nextTick();
+    isSelectingSuggestion.value = false;
   }
+
+  await checkExistingPointOnCreate();
 }
 
-function selectQuickPoint(p) {
-  location.value = p['簡稱'] || p.location || '';
-  region.value = p['音典分區'] || p.region || '';
-  const parsed = parseCoordText(p['經緯度'] || p.coordinates || '');
-  if (parsed) {
-    coord.value = parsed;
-  } else {
-    coord.value = null;
+async function selectQuickPoint(p) {
+  isSelectingSuggestion.value = true;
+  try {
+    location.value = p['簡稱'] || p.location || '';
+    region.value = p['音典分區'] || p.region || '';
+    const parsed = parseCoordText(p['經緯度'] || p.coordinates || '');
+    if (parsed) {
+      coord.value = parsed;
+    } else {
+      coord.value = null;
+    }
+  } finally {
+    await nextTick();
+    isSelectingSuggestion.value = false;
   }
+
+  await checkExistingPointOnCreate();
 }
 
 function hideSuggestions() {
@@ -708,6 +733,7 @@ async function checkExistingPointOnCreate() {
 
 watch([location, region], async () => {
   if (!isCreateMode.value) return;
+  if (isSelectingSuggestion.value) return;
 
   // 如果用户修改了输入，且之前已经自动切换过，我们先重置状态
   if (autoSwitched.value) {
