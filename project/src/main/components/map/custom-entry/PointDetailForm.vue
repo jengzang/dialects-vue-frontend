@@ -32,6 +32,7 @@
                 type="text"
                 :placeholder="t('customEntry.pointDetail.placeholders.location')"
                 @input="handleLocationInput"
+                @focus="handleLocationFocus"
                 @blur="hideSuggestions"
               />
               <div
@@ -40,12 +41,18 @@
               >
                 <button
                   v-for="item in pointSuggestions"
-                  :key="item"
+                  :key="item.key"
                   class="point-suggestion-item"
                   type="button"
                   @mousedown.prevent="selectSuggestion(item)"
                 >
-                  {{ item }}
+                  <div class="suggestion-info">
+                    <span class="suggestion-location">{{ item.location }}</span>
+                    <span v-if="item.region" class="suggestion-region">({{ item.region }})</span>
+                  </div>
+                  <span :class="['suggestion-badge', { archive: !item.isCustom }]">
+                    {{ item.isCustom ? t('customEntry.pointList.userPointBadge') : t('customEntry.pointList.publicPointBadge') }}
+                  </span>
                 </button>
               </div>
             </div>
@@ -59,6 +66,24 @@
               :placeholder="t('customEntry.pointDetail.placeholders.region')"
             />
           </label>
+
+          <!-- Quick Select Pills -->
+          <div v-if="isRealCreateMode && userPoints.length > 0" class="user-points-quick-select point-field-full">
+            <span class="quick-select-label">{{ t('customEntry.featureRecord.labels.quickSelect') }}:</span>
+            <div class="quick-select-list">
+              <button
+                v-for="p in userPoints"
+                :key="p.point_key || p['簡稱']"
+                class="quick-select-pill"
+                type="button"
+                @click="selectQuickPoint(p)"
+              >
+                <span class="pill-location">{{ p['簡稱'] }}</span>
+                <span class="pill-region">（{{ p['音典分區'] || p.region || '未分区' }}）</span>
+              </button>
+            </div>
+          </div>
+
           <label class="point-field point-field-full">
             <span class="point-field-label">{{ t('customEntry.pointDetail.labels.coord') }}</span>
             <input
@@ -247,7 +272,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
-import { batchMatch, getRegions } from '@/api';
+import { batchMatch, getRegions, getUserPoints } from '@/api';
 import { showConfirm, showWarning } from '@/utils/message.js';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
@@ -281,6 +306,7 @@ const saveMessage = ref('');
 const isSaving = ref(false);
 const pointSuggestions = ref([]);
 const showPointSuggestions = ref(false);
+const userPoints = ref([]);
 let locationDebounceTimer = null;
 let rowSeed = 0;
 
@@ -334,39 +360,112 @@ function parseCoordText(text) {
   return [lng, lat];
 }
 
+async function loadUserPoints() {
+  try {
+    const response = await getUserPoints();
+    userPoints.value = Array.isArray(response?.data) ? response.data : [];
+  } catch (error) {
+    console.error('获取用户地点失败:', error);
+  }
+}
+
 function handleLocationInput() {
   if (!isRealCreateMode.value) return;
   showPointSuggestions.value = false;
   clearTimeout(locationDebounceTimer);
+
+  const query = location.value.trim().toLowerCase();
+  if (!query) {
+    pointSuggestions.value = userPoints.value.map(p => ({
+      key: `custom-${p['簡稱'] || p.location}-${p['音典分區'] || p.region}`,
+      location: p['簡稱'] || p.location || '',
+      region: p['音典分區'] || p.region || '',
+      coord: p['經緯度'] || p.coordinates || '',
+      isCustom: true
+    }));
+    showPointSuggestions.value = pointSuggestions.value.length > 0;
+    return;
+  }
+
+  const matchedCustom = userPoints.value
+    .filter(p => {
+      const locName = String(p['簡稱'] || p.location || '').toLowerCase();
+      const regName = String(p['音典分區'] || p.region || '').toLowerCase();
+      return locName.includes(query) || regName.includes(query);
+    })
+    .map(p => ({
+      key: `custom-${p['簡稱'] || p.location}-${p['音典分區'] || p.region}`,
+      location: p['簡稱'] || p.location || '',
+      region: p['音典分區'] || p.region || '',
+      coord: p['經緯度'] || p.coordinates || '',
+      isCustom: true
+    }));
+
   locationDebounceTimer = setTimeout(async () => {
-    const query = location.value.trim();
-    if (!query) {
-      pointSuggestions.value = [];
-      return;
-    }
     try {
-      const response = await batchMatch(query, false);
+      const response = await batchMatch(location.value.trim(), false);
+      let publicItems = [];
       if (response && response.length > 0) {
         const items = response[0].items || [];
-        pointSuggestions.value = Array.from(new Set(items)).filter((item) => item !== query);
-        showPointSuggestions.value = pointSuggestions.value.length > 0;
+        publicItems = Array.from(new Set(items))
+          .filter(item => item !== location.value.trim())
+          .map(item => ({
+            key: `public-${item}`,
+            location: item,
+            region: '',
+            coord: '',
+            isCustom: false
+          }));
       }
+
+      const customLocations = new Set(matchedCustom.map(c => c.location));
+      const filteredPublic = publicItems.filter(p => !customLocations.has(p.location));
+
+      pointSuggestions.value = [...matchedCustom, ...filteredPublic];
+      showPointSuggestions.value = pointSuggestions.value.length > 0;
     } catch (error) {
-      pointSuggestions.value = [];
+      pointSuggestions.value = matchedCustom;
+      showPointSuggestions.value = pointSuggestions.value.length > 0;
     }
   }, 250);
 }
 
+function handleLocationFocus() {
+  handleLocationInput();
+}
+
 async function selectSuggestion(item) {
-  location.value = item;
+  location.value = item.location;
+  region.value = item.region;
   showPointSuggestions.value = false;
-  try {
-    const response = await getRegions(item);
-    if (response && response['音典分區']) {
-      region.value = response['音典分區'];
+
+  if (item.coord) {
+    const parsed = parseCoordText(item.coord);
+    if (parsed) {
+      coord.value = parsed;
     }
-  } catch (error) {
-    // ignore
+  }
+
+  if (!region.value) {
+    try {
+      const response = await getRegions(item.location);
+      if (response && response['音典分區']) {
+        region.value = response['音典分區'];
+      }
+    } catch (error) {
+      // ignore
+    }
+  }
+}
+
+function selectQuickPoint(p) {
+  location.value = p['簡稱'] || p.location || '';
+  region.value = p['音典分區'] || p.region || '';
+  const parsed = parseCoordText(p['經緯度'] || p.coordinates || '');
+  if (parsed) {
+    coord.value = parsed;
+  } else {
+    coord.value = null;
   }
 }
 
@@ -414,6 +513,8 @@ async function loadPointDetail(point) {
   rows.value = [];
   removedIds.value = [];
   saveMessage.value = '';
+
+  loadUserPoints();
 
   if (!point) {
     rows.value = [createEmptyRow()];
@@ -995,7 +1096,9 @@ watch(
   padding: 10px 14px;
   background: transparent;
   border: none;
-  display: block;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   cursor: pointer;
   text-align: left;
   font-size: 13px;
@@ -1009,5 +1112,91 @@ watch(
   &:hover {
     background-color: rgba(0, 122, 255, 0.08);
   }
+}
+
+.suggestion-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.suggestion-location {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.suggestion-region {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.suggestion-badge {
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(0, 122, 255, 0.1);
+  color: #007aff;
+  padding: 2px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+
+  &.archive {
+    background: rgba(142, 142, 147, 0.12);
+    color: #8e8e93;
+  }
+}
+
+.user-points-quick-select {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.quick-select-label {
+  font-size: 11px !important;
+  font-weight: 700;
+  color: #64748b !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.quick-select-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.quick-select-pill {
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  padding: 4px 10px;
+  border-radius: 8px;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+
+  &:hover {
+    background: rgba(0, 122, 255, 0.08);
+    border-color: rgba(0, 122, 255, 0.3);
+    color: #007aff;
+
+    .pill-region {
+      color: rgba(0, 122, 255, 0.6);
+    }
+  }
+}
+
+.pill-region {
+  font-size: 10px;
+  color: #8e8e93;
+  font-weight: 400;
+  transition: color 0.18s ease;
 }
 </style>
