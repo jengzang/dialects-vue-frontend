@@ -89,7 +89,7 @@
     }
   },
   "customTab": {
-    "title": "Search Custom Features",
+    "title": "User Custom Data Editing & Search",
     "labels": {
       "featureSearch": "Feature Search",
       "login": "Login"
@@ -191,6 +191,10 @@
             "value": {
               "label": "Value: ",
               "text": "Use it as the map label, such as \"congri\", \"nau\", or \"ei\"."
+            },
+            "manage": {
+              "label": "Manage all my custom data",
+              "text": "Manage, edit, delete, and search all your submitted personal custom entries."
             }
           },
           "notes": {
