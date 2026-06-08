@@ -152,7 +152,27 @@
             </button>
           </div>
         </div>
-
+      <div class="point-detail-actions">
+          <div class="action-right-group">
+            <button class="main-glass-button add-row-btn" type="button" @click="addRow">
+              {{ t('customEntry.pointDetail.rows.add') }}
+            </button>
+            <button class="main-glass-button" type="button" @click="$emit('back')">
+              {{ t('customEntry.pointDetail.actions.cancel') }}
+            </button>
+            <button
+              class="main-glass-button"
+              data-variant="primary"
+              type="button"
+              :disabled="isSaving"
+              @click="handleSave"
+            >
+              {{
+                isSaving ? t('customEntry.common.saving') : t('customEntry.pointDetail.actions.save')
+              }}
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="point-detail-side main-glass-panel-inner">
@@ -188,28 +208,6 @@
     </div>
 
     <div v-if="saveMessage" class="point-save-message">{{ saveMessage }}</div>
-
-    <div class="point-detail-actions">
-      <button class="main-glass-button add-row-btn" type="button" @click="addRow">
-        {{ t('customEntry.pointDetail.rows.add') }}
-      </button>
-      <div class="action-right-group">
-        <button class="main-glass-button" type="button" @click="$emit('back')">
-          {{ t('customEntry.pointDetail.actions.cancel') }}
-        </button>
-        <button
-          class="main-glass-button"
-          data-variant="primary"
-          type="button"
-          :disabled="isSaving"
-          @click="handleSave"
-        >
-          {{
-            isSaving ? t('customEntry.common.saving') : t('customEntry.pointDetail.actions.save')
-          }}
-        </button>
-      </div>
-    </div>
 
     <!-- 特征详情联动弹窗 -->
     <AppModal v-model="isFeatureModalOpen" size="md" width="640px" max-height="80dvh">
