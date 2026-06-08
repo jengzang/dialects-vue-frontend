@@ -24,10 +24,12 @@
     "emptyText": "Click \"Add dialect point\" to create your first custom location.",
     "unnamed": "Unnamed dialect point",
     "unregioned": "Unassigned region",
-    "recordCount": "{count} records added"
+    "recordCount": "{count} records added",
+    "userPointBadge": "Custom Location",
+    "publicPointBadge": "Archive Location"
   },
   "pointDetail": {
-    "back": "← Back",
+    "back": "Back",
     "modalTitle": "Point Features: {name}",
     "regionModalTitle": "Region Features: {name}",
     "createTitle": "Add dialect point",
@@ -97,7 +99,7 @@
     "pointCount": "{count} dialect points added"
   },
   "featureDetail": {
-    "back": "← Back",
+    "back": "Back",
     "modalTitle": "Feature Distribution: {feature} ({phonology})",
     "description": "Maintain distribution data for multiple dialect points around the same feature.",
     "createRecord": "+ Add location record",
@@ -133,7 +135,8 @@
       "region": "Region",
       "coord": "Coordinates",
       "value": "Value",
-      "note": "Note"
+      "note": "Note",
+      "quickSelect": "Quick Select"
     },
     "placeholders": {
       "location": "Enter location name",
@@ -152,7 +155,8 @@
       "coordRequired": "Please choose coordinates first",
       "valueRequired": "Please fill in the value first",
       "featureRequired": "The current feature is empty. Please go back and select it again",
-      "duplicateLocation": "A record with the same location and region already exists under this feature. Continue saving?"
+      "duplicateLocation": "A record with the same location and region already exists under this feature. Continue saving?",
+      "coordinateSynced": "Automatically synced existing coordinates for this location to prevent conflict"
     }
   },
   "miniMap": {

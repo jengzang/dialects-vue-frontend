@@ -24,10 +24,12 @@
     "emptyText": "點擊右上角「新增方言點」開始建立你的第一個自定義地點。",
     "unnamed": "未命名方言點",
     "unregioned": "未分區",
-    "recordCount": "已收錄 {count} 條資料"
+    "recordCount": "已收錄 {count} 條資料",
+    "userPointBadge": "自定義地點",
+    "publicPointBadge": "檔案地點"
   },
   "pointDetail": {
-    "back": "← 返回",
+    "back": "返回",
     "modalTitle": "地點已有特徵：{name}",
     "regionModalTitle": "分區已有特徵：{name}",
     "createTitle": "新增方言點",
@@ -97,7 +99,7 @@
     "pointCount": "已收錄 {count} 個方言點"
   },
   "featureDetail": {
-    "back": "← 返回",
+    "back": "返回",
     "modalTitle": "特徵分布詳情：{feature}（{phonology}）",
     "description": "以同一特徵為中心，維護多個方言點的分布資料。",
     "createRecord": "+ 新增地點記錄",
@@ -133,7 +135,8 @@
       "region": "分區",
       "coord": "坐標",
       "value": "值",
-      "note": "說明"
+      "note": "說明",
+      "quickSelect": "快捷選擇"
     },
     "placeholders": {
       "location": "輸入地點名稱",
@@ -152,7 +155,8 @@
       "coordRequired": "請先選取坐標",
       "valueRequired": "請先填寫值",
       "featureRequired": "當前特徵為空，請返回上一層重新選擇",
-      "duplicateLocation": "該特徵下已存在相同地點與分區記錄，確認繼續保存嗎？"
+      "duplicateLocation": "該特徵下已存在相同地點與分區記錄，確認繼續保存嗎？",
+      "coordinateSynced": "已自動同步該地點的已有坐標，防止數據衝突"
     }
   },
   "miniMap": {

@@ -66,8 +66,11 @@ const handleBack = () => {
   view.value = 'list'
 }
 
-const handleSaved = async () => {
+const handleSaved = async (newFeature) => {
   await loadFeatures()
+  if (newFeature) {
+    selectedFeature.value = newFeature
+  }
 }
 
 onMounted(() => {

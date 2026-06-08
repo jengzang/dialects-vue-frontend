@@ -5,7 +5,27 @@
         {{ t('customEntry.featureDetail.back') }}
       </button>
       <div class="feature-detail-heading">
-        <h4 class="feature-detail-title">{{ detailTitle }}</h4>
+        <div v-if="isNewFeature" class="feature-edit-header-inputs">
+          <label class="header-input-field">
+            <span>{{ t('customEntry.pointDetail.rows.headers.feature') }}</span>
+            <input
+              v-model="localFeatureName"
+              type="text"
+              class="header-text-input"
+              :placeholder="t('customEntry.pointDetail.placeholders.feature')"
+            />
+          </label>
+          <label class="header-input-field">
+            <span>{{ t('customEntry.pointDetail.rows.headers.phonology') }}</span>
+            <input
+              v-model="localPhonology"
+              type="text"
+              class="header-text-input"
+              :placeholder="t('customEntry.pointDetail.placeholders.phonology')"
+            />
+          </label>
+        </div>
+        <h4 v-else class="feature-detail-title">{{ detailTitle }}</h4>
         <p class="feature-detail-description">{{ t('customEntry.featureDetail.description') }}</p>
       </div>
       <button
@@ -92,7 +112,7 @@
 
     <FeatureRecordEditorModal
       v-model="isEditorOpen"
-      :feature="feature"
+      :feature="modalFeature"
       :record="editingRecord"
       @saved="handleSaved"
     />
@@ -208,18 +228,30 @@ const mapPoints = computed(() =>
     .filter(Boolean)
 );
 
+const localFeatureName = ref('');
+const localPhonology = ref('');
+
+const isNewFeature = computed(() => !props.feature?.['特徵'] && !props.feature?.feature);
+
+const modalFeature = computed(() => ({
+  '特徵': localFeatureName.value,
+  '聲韻調': localPhonology.value
+}));
+
 const loadRecords = async () => {
+  const featureName = localFeatureName.value;
+  const phonology = localPhonology.value;
+
+  if (!featureName) {
+    errorMessage.value = '';
+    rows.value = [];
+    return;
+  }
+
   loading.value = true;
   errorMessage.value = '';
 
   try {
-    const featureName = props.feature?.['特徵'] || props.feature?.feature || '';
-    const phonology = props.feature?.['聲韻調'] || props.feature?.phonology || '';
-    if (!featureName) {
-      errorMessage.value = t('customEntry.featureDetail.loadFailed');
-      rows.value = [];
-      return;
-    }
     const response = await getDataByFeature(featureName, phonology);
     rows.value = Array.isArray(response?.data) ? response.data : [];
   } catch (error) {
@@ -231,6 +263,10 @@ const loadRecords = async () => {
 };
 
 const openCreateModal = () => {
+  if (!localFeatureName.value.trim()) {
+    showConfirm(t('customEntry.featureRecord.messages.featureRequired') || '请先填写特征名称');
+    return;
+  }
   editingRecord.value = {
     簡稱: '',
     音典分區: '',
@@ -255,9 +291,14 @@ const handleDelete = async (row) => {
   emit('saved');
 };
 
-const handleSaved = async () => {
-  await loadRecords();
-  emit('saved');
+const handleSaved = async (newFeature) => {
+  const targetFeature = newFeature || { '特徵': localFeatureName.value, '聲韻調': localPhonology.value };
+  if (isNewFeature.value) {
+    emit('saved', targetFeature);
+  } else {
+    await loadRecords();
+    emit('saved');
+  }
 };
 
 const isPointModalOpen = ref(false);
@@ -305,15 +346,13 @@ const showRegionDetail = async (regionName) => {
 
 watch(
   () => props.feature,
-  () => {
+  (newFeature) => {
+    localFeatureName.value = newFeature?.['特徵'] || newFeature?.feature || '';
+    localPhonology.value = newFeature?.['聲韻調'] || newFeature?.phonology || '';
     loadRecords();
   },
-  { deep: true }
+  { deep: true, immediate: true }
 );
-
-onMounted(() => {
-  loadRecords();
-});
 </script>
 
 <style scoped lang="scss">
@@ -546,6 +585,51 @@ onMounted(() => {
 
   tr:last-child td {
     border-bottom: none;
+  }
+}
+
+.feature-edit-header-inputs {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.header-input-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  span {
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+  }
+}
+
+.header-text-input {
+  padding: 8px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.75);
+  color: #0f172a;
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+  width: 160px;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+
+  &:focus {
+    border-color: rgba(0, 122, 255, 0.55);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
   }
 }
 </style>

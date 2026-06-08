@@ -462,7 +462,11 @@ const handleLocationsSelected = (locations) => {
 const formatDate = (dateString) => {
   if (!dateString) return ''
 
-  const date = new Date(dateString)
+  const formattedStr = (typeof dateString === 'string' && !dateString.endsWith('Z') && !dateString.includes('+') && !/-\d{2}:?\d{2}$/.test(dateString))
+    ? (dateString.includes('T') ? dateString + 'Z' : dateString.replace(' ', 'T') + 'Z')
+    : dateString
+
+  const date = new Date(formattedStr)
   const currentLocale = locale.value === 'en' ? 'en-US' : locale.value
 
   return new Intl.DateTimeFormat(currentLocale, {

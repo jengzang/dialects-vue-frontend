@@ -699,6 +699,10 @@ const handleBatchDelete = async () => {
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'
 
+  const formattedStr = (typeof dateStr === 'string' && !dateStr.endsWith('Z') && !dateStr.includes('+') && !/-\d{2}:?\d{2}$/.test(dateStr))
+    ? (dateStr.includes('T') ? dateStr + 'Z' : dateStr.replace(' ', 'T') + 'Z')
+    : dateStr
+
   const currentLocale = locale.value === 'en' ? 'en-US' : locale.value
   return new Intl.DateTimeFormat(currentLocale, {
     year: 'numeric',
@@ -706,7 +710,7 @@ const formatDate = (dateStr) => {
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit'
-  }).format(new Date(dateStr))
+  }).format(new Date(formattedStr))
 }
 
 const goBack = () => {

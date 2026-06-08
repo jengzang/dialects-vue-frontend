@@ -172,11 +172,11 @@
         </div>
         <MiniMapSelector
           v-model:coord="coord"
-          :readonly="!isCreateMode"
-          :mode="isCreateMode ? 'picker' : 'single-preview'"
+          :readonly="!isRealCreateMode && isCoordValid"
+          :mode="isRealCreateMode || !isCoordValid ? 'picker' : 'single-preview'"
           :points="mapPreviewPoints"
           :hint-text="
-            isCreateMode
+            isRealCreateMode || !isCoordValid
               ? t('customEntry.pointDetail.map.pickHint')
               : t('customEntry.pointDetail.map.previewHint')
           "
@@ -283,13 +283,21 @@ let locationDebounceTimer = null;
 let rowSeed = 0;
 
 const isCreateMode = computed(() => !props.point);
+const autoSwitched = ref(false);
+const isRealCreateMode = computed(() => isCreateMode.value && !autoSwitched.value);
+const isCoordValid = computed(() => {
+  return Array.isArray(coord.value) &&
+    coord.value.length >= 2 &&
+    Number.isFinite(coord.value[0]) &&
+    Number.isFinite(coord.value[1]);
+});
 const detailTitle = computed(() => {
-  if (!props.point) return t('customEntry.pointDetail.createTitle');
-  return `${props.point['簡稱'] || props.point.location || ''}（${props.point['音典分區'] || props.point.region || ''}）`;
+  if (isRealCreateMode.value) return t('customEntry.pointDetail.createTitle');
+  return `${location.value}（${region.value}）`;
 });
 
 const coordText = computed(() =>
-  Array.isArray(coord.value) ? formatCoord(coord.value[0], coord.value[1]) : ''
+  isCoordValid.value ? formatCoord(coord.value[0], coord.value[1]) : ''
 );
 const mapPreviewPoints = computed(() => {
   if (!Array.isArray(coord.value)) return [];
@@ -325,7 +333,7 @@ function parseCoordText(text) {
 }
 
 function handleLocationInput() {
-  if (!isCreateMode.value) return;
+  if (!isRealCreateMode.value) return;
   showPointSuggestions.value = false;
   clearTimeout(locationDebounceTimer);
   locationDebounceTimer = setTimeout(async () => {
@@ -368,7 +376,13 @@ function hideSuggestions() {
 
 function rowChanged(row) {
   if (!row.created_at || !row.original) return true;
+
+  const originalCoord = props.point?.['經緯度'] || props.point?.coordinate || '';
+  const currentCoord = isCoordValid.value ? formatCoord(coord.value[0], coord.value[1]) : '';
+  const isCoordChanged = currentCoord !== originalCoord;
+
   return (
+    isCoordChanged ||
     row.聲韻調 !== (row.original.聲韻調 || '') ||
     row.特徵 !== (row.original.特徵 || '') ||
     row.值 !== (row.original.值 || '') ||
@@ -443,7 +457,7 @@ async function handleSave() {
     return;
   }
 
-  if (!Array.isArray(coord.value)) {
+  if (!isCoordValid.value) {
     saveMessage.value = t('customEntry.pointDetail.messages.coordRequired');
     return;
   }
@@ -547,6 +561,65 @@ const showFeatureDetail = async (feature, phonology) => {
     featureLoading.value = false;
   }
 };
+
+const isCheckingExisting = ref(false);
+
+async function checkExistingPointOnCreate() {
+  if (!isCreateMode.value || autoSwitched.value) return;
+
+  const loc = location.value.trim();
+  const reg = region.value.trim();
+  if (!loc || !reg) return;
+
+  isCheckingExisting.value = true;
+  try {
+    const response = await getDataByPoint(loc, reg);
+    const records = Array.isArray(response?.data) ? response.data : [];
+    if (records.length > 0) {
+      autoSwitched.value = true;
+      saveMessage.value = '检测到该地点已存在，已自动切换为追加/编辑模式并加载历史数据';
+      
+      const firstRecord = records[0];
+      coord.value = parseCoordText(firstRecord['經緯度']);
+      
+      rows.value = records.map((record) => {
+        rowSeed += 1;
+        return {
+          id: `row-${rowSeed}`,
+          created_at: record.created_at || '',
+          聲韻調: record['聲韻調'] || '',
+          特徵: record['特徵'] || '',
+          值: record['值'] || '',
+          說明: record['說明'] || '',
+          original: {
+            聲韻調: record['聲韻調'] || '',
+            特徵: record['特徵'] || '',
+            值: record['值'] || '',
+            說明: record['說明'] || '',
+          },
+        };
+      });
+    }
+  } catch (error) {
+    console.error('Check existing point failed:', error);
+  } finally {
+    isCheckingExisting.value = false;
+  }
+}
+
+watch([location, region], async () => {
+  if (!isCreateMode.value) return;
+
+  // 如果用户修改了输入，且之前已经自动切换过，我们先重置状态
+  if (autoSwitched.value) {
+    autoSwitched.value = false;
+    coord.value = null;
+    rows.value = [createEmptyRow()];
+    saveMessage.value = '';
+  }
+
+  await checkExistingPointOnCreate();
+});
 
 watch(
   () => props.point,

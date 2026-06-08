@@ -46,7 +46,8 @@ const categoryConfigs = computed(() => [
       },
       {
         key: 'endpoint__api_feature_stats',
-        label: t('user.leaderboard.categories.phonology.items.syllable')
+        label: t('user.leaderboard.categories.phonology.items.syllable'),
+        tooltip: t('user.leaderboard.categories.phonology.tooltips.syllable')
       },
       {
         key: 'endpoint__api_compare_ZhongGu',
