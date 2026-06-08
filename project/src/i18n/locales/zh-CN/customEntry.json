@@ -9,12 +9,12 @@
     "close": "关闭",
     "devNotice": "当前功能还在开发测试中",
     "modes": {
-      "point": "补充单点资料",
-      "feature": "制作特征分布"
+      "point": "按调查点",
+      "feature": "按方言特征"
     }
   },
   "pointList": {
-    "title": "补充单点资料",
+    "title": "按调查点",
     "description": "先选择一个已有方言点，或新增一个新方言点开始补充资料。",
     "searchPlaceholder": "搜索简称或分区",
     "create": "+ 新增方言点",
@@ -34,7 +34,7 @@
     "regionModalTitle": "分区已有特征：{name}",
     "createTitle": "新增方言点",
     "createDescription": "先确定地点与坐标，再补充多条特征资料。",
-    "editDescription": "在同一个方言点下持续补充或修改多条资料。",
+    "editDescription": "为当前方言点补充资料。",
     "labels": {
       "location": "简称",
       "region": "音典分区",
@@ -53,11 +53,11 @@
       "title": "特征记录",
       "description": "每一行代表一条可提交的自定义资料。",
       "add": "+ 添加",
-      "duplicateWarning": "同一点下已存在相同的声韵调与特征，确认继续保存吗？",
+      "duplicateWarning": "同一点下已存在相同的分类与对比特征，确认继续保存吗？",
       "headers": {
-        "phonology": "声韵调",
-        "feature": "特征",
-        "value": "值",
+        "phonology": "分类",
+        "feature": "对比特征",
+        "value": "具体表现",
         "note": "说明",
         "action": "操作"
       },
@@ -78,7 +78,7 @@
       "loadFailed": "获取地点详情失败",
       "locationRegionRequired": "请先填写方言点名称与分区",
       "coordRequired": "请先在地图上选取坐标",
-      "rowRequired": "请至少填写一条特征与值",
+      "rowRequired": "请至少填写一条对比特征与具体表现",
       "confirmContinue": "继续保存",
       "noChanges": "当前没有需要提交的变更",
       "partialFailed": "保存时有 {count} 项失败，请重试",
@@ -86,9 +86,9 @@
     }
   },
   "featureList": {
-    "title": "制作特征分布",
-    "description": "先选择一个特征，再逐步把不同方言点补入，形成可上图的特征分布资料。",
-    "searchPlaceholder": "搜索特征或声韵调",
+    "title": "按方言特征",
+    "description": "选择或新建一个方言特征，再逐步补入不同方言点，绘制地理语言学对比图。",
+    "searchPlaceholder": "搜索对比特征或分类",
     "create": "+ 新增特征",
     "loadFailed": "加载特征列表失败",
     "retry": "重试",
@@ -101,7 +101,7 @@
   "featureDetail": {
     "back": "返回",
     "modalTitle": "特征分布详情：{feature}（{phonology}）",
-    "description": "以同一特征为中心，维护多个方言点的分布资料。",
+    "description": "绘制多个方言点的地理语言学特征对比图。",
     "createRecord": "+ 新增地点记录",
     "loading": "正在加载特征详情…",
     "retry": "重试",
@@ -110,7 +110,7 @@
       "location": "地点",
       "region": "分区",
       "coord": "坐标",
-      "value": "值",
+      "value": "具体表现",
       "note": "说明",
       "action": "操作"
     },
@@ -134,7 +134,7 @@
       "location": "地点",
       "region": "分区",
       "coord": "坐标",
-      "value": "值",
+      "value": "具体表现",
       "note": "说明",
       "quickSelect": "快捷选择"
     },
@@ -142,7 +142,7 @@
       "location": "输入地点名称",
       "region": "输入分区",
       "coord": "点击地图后自动填入",
-      "value": "输入值",
+      "value": "输入具体表现",
       "note": "可选说明"
     },
     "mapHint": "点击地图选取坐标",
@@ -153,9 +153,9 @@
     "messages": {
       "locationRegionRequired": "请先填写地点与分区",
       "coordRequired": "请先选取坐标",
-      "valueRequired": "请先填写值",
-      "featureRequired": "当前特征为空，请返回上一层重新选择",
-      "duplicateLocation": "该特征下已存在相同地点与分区记录，确认继续保存吗？",
+      "valueRequired": "请先填写具体表现",
+      "featureRequired": "当前对比特征为空，请返回上一层重新选择",
+      "duplicateLocation": "该对比特征下已存在相同地点与分区记录，确认继续保存吗？",
       "coordinateSynced": "已自动同步该地点的已有坐标，防止数据冲突"
     }
   },
