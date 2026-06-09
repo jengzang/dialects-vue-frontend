@@ -82,5 +82,11 @@
   },
   "results": {
     "noMainReading": "无主要读音"
+  },
+  "sankeyControls": {
+    "title": "桑基图操作",
+    "optimizeLinks": "优化连线",
+    "minLinkCharCount": "连线最少字数",
+    "minNodeCharCount": "节点最少字数"
   }
 }

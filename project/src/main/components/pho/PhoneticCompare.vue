@@ -25,7 +25,7 @@
       v-else-if="rawData && !errorMessage"
       class="results-area"
     >
-      <!-- 声韵调切换 Tab + 桑基图选项 -->
+      <!-- 声韵调切换 Tab -->
       <div class="feature-control-row">
         <div class="feature-tabs">
           <button
@@ -38,18 +38,6 @@
             {{ feat }}
           </button>
         </div>
-
-        <label class="sankey-option-checkbox">
-          <input
-            v-model="enableLinkOptimization"
-            type="checkbox"
-            :disabled="isChartRendering"
-            @change="changeLinkOptimization"
-          >
-          <span>
-            {{ t('phonology.phonology.compare.options.optimizeLinks', '优化连线') }}
-          </span>
-        </label>
       </div>
 
       <!-- 桑基图容器 -->
@@ -139,6 +127,26 @@ const props = defineProps({
   queryLocations: {
     type: Array,
     default: () => []
+  },
+
+  // 父组件传入：是否启用 Sankey 自动布局优化
+  // false 时 layoutIterations = 0，节点顺序更接近输入顺序
+  // true 时 layoutIterations = 200，ECharts 会尝试优化连线交叉
+  enableLinkOptimization: {
+    type: Boolean,
+    default: false
+  },
+
+  // 父组件传入：过滤字数少于该值的连线
+  minLinkCharCount: {
+    type: Number,
+    default: 3
+  },
+
+  // 父组件传入：过滤字数少于该值的节点
+  minNodeCharCount: {
+    type: Number,
+    default: 10
   }
 })
 
@@ -151,15 +159,6 @@ const errorMessage = ref('')
 // 图表局部渲染状态：切换 Tab / 重绘图表时显示
 const isChartRendering = ref(false)
 
-// 是否启用 Sankey 自动布局优化
-// false 时 layoutIterations = 0，节点顺序更接近输入顺序
-// true 时 layoutIterations = 100，ECharts 会尝试优化连线交叉
-const enableLinkOptimization = ref(false)
-
-const sankeyLayoutIterations = computed(() => {
-  return enableLinkOptimization.value ? 200 : 0
-})
-
 // 详情卡片状态
 const selectedDetail = ref(null)
 const isCardPinned = ref(false)
@@ -170,7 +169,30 @@ const chartInstance = ref(null)
 const isMobileLayout = ref(false)
 const MOBILE_LAYOUT_MEDIA_QUERY = '(max-aspect-ratio: 1/1)'
 
+// 父组件控制项在图表渲染期间变化时，记录一次待重绘
+let hasPendingRerender = false
+
 // ========== 计算属性 ==========
+const normalizeMinCount = (value, fallback) => {
+  const num = Number(value)
+
+  if (!Number.isFinite(num) || num < 0) return fallback
+
+  return Math.floor(num)
+}
+
+const normalizedMinLinkCharCount = computed(() => {
+  return normalizeMinCount(props.minLinkCharCount, 3)
+})
+
+const normalizedMinNodeCharCount = computed(() => {
+  return normalizeMinCount(props.minNodeCharCount, 10)
+})
+
+const sankeyLayoutIterations = computed(() => {
+  return props.enableLinkOptimization ? 200 : 0
+})
+
 // 动态宽度计算
 const sankeyWidth = computed(() => {
   if (!rawData.value?.data) return '100%'
@@ -212,24 +234,36 @@ const changeFeature = async (feat) => {
     await waitForPaint()
   } finally {
     isChartRendering.value = false
+
+    if (hasPendingRerender) {
+      await rerenderSankeyOnly()
+    }
   }
 }
 
-const changeLinkOptimization = async () => {
-  if (isChartRendering.value || !rawData.value) return
+const rerenderSankeyOnly = async () => {
+  if (!rawData.value || isLoading.value) return
 
-  closeDetailCard()
-
-  isChartRendering.value = true
-  await nextTick()
-  await waitForPaint()
-
-  try {
-    await renderSankey(props.queryLocations)
-    await waitForPaint()
-  } finally {
-    isChartRendering.value = false
+  if (isChartRendering.value) {
+    hasPendingRerender = true
+    return
   }
+
+  do {
+    hasPendingRerender = false
+    closeDetailCard()
+
+    isChartRendering.value = true
+    await nextTick()
+    await waitForPaint()
+
+    try {
+      await renderSankey(props.queryLocations)
+      await waitForPaint()
+    } finally {
+      isChartRendering.value = false
+    }
+  } while (hasPendingRerender)
 }
 
 const closeDetailCard = () => {
@@ -248,6 +282,7 @@ const clearChart = () => {
 const handleQuery = async (queryLocs) => {
   isLoading.value = true
   isChartRendering.value = false
+  hasPendingRerender = false
   errorMessage.value = ''
   rawData.value = null
   clearChart()
@@ -292,6 +327,10 @@ const handleQuery = async (queryLocs) => {
   } finally {
     isChartRendering.value = false
     setRunning('compare', false)
+
+    if (hasPendingRerender) {
+      await rerenderSankeyOnly()
+    }
   }
 }
 
@@ -315,13 +354,14 @@ const renderSankey = async (queryLocs) => {
   const links = []
   const usedNodeIds = new Set()
 
-  const ensureNode = (id, rawLabel, layer, depth) => {
+  const ensureNode = (id, rawLabel, layer, depth, charCount) => {
     if (!nodeMap.has(id)) {
       nodeMap.set(id, {
         name: id,
         rawLabel,
         layer,
-        depth
+        depth,
+        charCount
       })
     }
   }
@@ -330,9 +370,11 @@ const renderSankey = async (queryLocs) => {
   validLocs.forEach((loc, locIdx) => {
     const featureData = raw.data[loc]?.[activeFeature.value] || {}
 
-    Object.keys(featureData).forEach(val => {
+    Object.entries(featureData).forEach(([val, info]) => {
+      const charIndices = info?.char_indices || []
       const id = `${locIdx}:${loc}:${val}`
-      ensureNode(id, val, loc, locIdx)
+
+      ensureNode(id, val, loc, locIdx, charIndices.length)
     })
   })
 
@@ -382,16 +424,44 @@ const renderSankey = async (queryLocs) => {
     })
   }
 
-  // 3. 只保留真正参与连线的节点，避免孤立节点导致 Sankey 布局迭代失效
-  const nodes = Array.from(nodeMap.values())
-    .filter(node => usedNodeIds.has(node.name))
+  const minLinkCount = normalizedMinLinkCharCount.value
+  const minNodeCount = normalizedMinNodeCharCount.value
 
-  if (!nodes.length || !links.length) {
+  // 3. 先按节点自身字数过滤节点。
+  // 如果节点被过滤掉，则与它相连的所有连线都不展示，不管连线是否满足 minLinkCount。
+  const countPassedNodes = Array.from(nodeMap.values())
+    .filter(node => usedNodeIds.has(node.name))
+    .filter(node => node.charCount >= minNodeCount)
+
+  const countPassedNodeIds = new Set(countPassedNodes.map(node => node.name))
+
+  const linksAfterNodeFilter = links.filter(link => {
+    return countPassedNodeIds.has(link.source) && countPassedNodeIds.has(link.target)
+  })
+
+  // 4. 再按连线字数过滤连线。
+  const linksAfterLinkFilter = linksAfterNodeFilter.filter(link => {
+    return link.charIndices.length >= minLinkCount
+  })
+
+  // 5. 最后清理孤立节点。
+  // 如果一个节点的所有连线都被过滤了，则该节点也不展示，不管是否满足 minNodeCount。
+  const connectedNodeIds = new Set()
+
+  linksAfterLinkFilter.forEach(link => {
+    connectedNodeIds.add(link.source)
+    connectedNodeIds.add(link.target)
+  })
+
+  const nodes = countPassedNodes.filter(node => connectedNodeIds.has(node.name))
+  const linksToRender = linksAfterLinkFilter
+
+  if (!nodes.length || !linksToRender.length) {
     clearChart()
     return
   }
 
-  // 4. 根据每层节点数动态计算高度
+  // 6. 根据每层节点数动态计算高度
   const layerNodeCounts = new Map()
 
   nodes.forEach(node => {
@@ -428,7 +498,7 @@ const renderSankey = async (queryLocs) => {
       top: '6%',
       bottom: '8%',
       data: nodes,
-      links,
+      links: linksToRender,
       nodeAlign: 'justify',
       draggable: false,
       emphasis: {
@@ -460,7 +530,7 @@ const renderSankey = async (queryLocs) => {
       // 这里不要设太大。
       // 100 会明显增加同步布局时间，导致主线程卡住，loading 动画也会停。
       // 如果想更稳定，可改为 0；如果想稍微减少交叉，建议 4、8、16。
-      layoutIterations: sankeyLayoutIterations.value,
+      layoutIterations: sankeyLayoutIterations.value
     }]
   }
 
@@ -570,6 +640,18 @@ const handleResize = () => {
   chartInstance.value?.resize()
 }
 
+// ========== 监听父组件传入的图表控制项：只重绘，不重新请求 API ==========
+watch(
+  () => [
+    props.enableLinkOptimization,
+    normalizedMinLinkCharCount.value,
+    normalizedMinNodeCharCount.value
+  ],
+  () => {
+    rerenderSankeyOnly()
+  }
+)
+
 // ========== 监听 queryLocations 触发查询 ==========
 watch(() => props.queryLocations, (newVal) => {
   if (Array.isArray(newVal) && newVal.length >= 2 && newVal.length <= 5) {
@@ -579,6 +661,7 @@ watch(() => props.queryLocations, (newVal) => {
     errorMessage.value = ''
     isLoading.value = false
     isChartRendering.value = false
+    hasPendingRerender = false
     clearChart()
     closeDetailCard()
   }
@@ -646,7 +729,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 18px;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   flex-wrap: wrap;
 }
 
@@ -679,29 +762,6 @@ onUnmounted(() => {
     color: white;
     border-color: var(--color-primary, #007aff);
     box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2);
-  }
-}
-
-.sankey-option-checkbox {
-  display: inline-flex;
-  align-items: center;
-  gap: 1px;
-  padding: 8px 4px;
-  border-radius: var(--radius-md, 12px);
-  background: var(--glass-light, rgba(255, 255, 255, 0.3));
-  border: 1px solid var(--border-gray-light, rgba(200, 200, 200, 0.5));
-  color: var(--text-secondary, #666);
-  font-size: 11px;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-
-  input {
-    cursor: pointer;
-  }
-
-  input:disabled {
-    cursor: not-allowed;
   }
 }
 

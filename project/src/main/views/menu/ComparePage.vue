@@ -289,14 +289,66 @@
             {{ $t('compare.messages.tab5Hint') }}
           </div> -->
           <div class="compare-group tab5-location-group">
-            <LocationMultiInput
-              v-model="tabStates.tab5.locations"
-              :max-locations="5"
-              @update:matched-locations="tabStates.tab5.matchedLocations = $event"
-            />
+            <div class="tab5-location-control-layout">
+              <div class="tab5-location-input">
+                <LocationMultiInput
+                  v-model="tabStates.tab5.locations"
+                  :max-locations="5"
+                  @update:matched-locations="tabStates.tab5.matchedLocations = $event"
+                />
+              </div>
+
+              <div
+                class="tab5-sankey-controls"
+                :aria-label="t('compare.sankeyControls.title', '桑基图操作')"
+              >
+                <label class="tab5-sankey-checkbox">
+                  <input
+                    v-model="tabStates.tab5.enableLinkOptimization"
+                    type="checkbox"
+                  >
+                  <span>{{ t('compare.sankeyControls.optimizeLinks', '优化连线') }}</span>
+                </label>
+
+                <label class="tab5-sankey-slider">
+                  <span class="tab5-sankey-slider-label">
+                    {{ t('compare.sankeyControls.minLinkCharCount', '连线最少字数') }}
+                    <strong>{{ tabStates.tab5.minLinkCharCountDraft }}</strong>
+                  </span>
+                  <input
+                    v-model.number="tabStates.tab5.minLinkCharCountDraft"
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="1"
+                    @change="scheduleTab5SankeyFilterApply"
+                  >
+                </label>
+
+                <label class="tab5-sankey-slider">
+                  <span class="tab5-sankey-slider-label">
+                    {{ t('compare.sankeyControls.minNodeCharCount', '节点最少字数') }}
+                    <strong>{{ tabStates.tab5.minNodeCharCountDraft }}</strong>
+                  </span>
+                  <input
+                    v-model.number="tabStates.tab5.minNodeCharCountDraft"
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    @change="scheduleTab5SankeyFilterApply"
+                  >
+                </label>
+              </div>
+            </div>
           </div>
         </div>
-        <PhoneticCompare :query-locations="tabStates.tab5.queryLocations" />
+        <PhoneticCompare
+          :query-locations="tabStates.tab5.queryLocations"
+          :enable-link-optimization="tabStates.tab5.enableLinkOptimization"
+          :min-link-char-count="tabStates.tab5.minLinkCharCount"
+          :min-node-char-count="tabStates.tab5.minNodeCharCount"
+        />
       </div>
 
       <LocationAndRegionInput
@@ -494,7 +546,17 @@ const tabStates = reactive({
   tab5: {
     locations: [],
     matchedLocations: [],
-    queryLocations: []
+    queryLocations: [],
+
+    enableLinkOptimization: false,
+
+    // 真正传给 PhoneticCompare 的值
+    minLinkCharCount: 3,
+    minNodeCharCount: 10,
+
+    // 滑块拖动时的临时显示值
+    minLinkCharCountDraft: 3,
+    minNodeCharCountDraft: 10
   }
 })
 
@@ -723,6 +785,19 @@ const isTab5RunDisabled = computed(() => {
   return !Array.isArray(locs) || locs.length < 2 || locs.length > 5
 })
 
+let tab5SankeyFilterTimer = null
+
+function scheduleTab5SankeyFilterApply() {
+  if (tab5SankeyFilterTimer) {
+    clearTimeout(tab5SankeyFilterTimer)
+  }
+
+  tab5SankeyFilterTimer = setTimeout(() => {
+    tabStates.tab5.minLinkCharCount = tabStates.tab5.minLinkCharCountDraft
+    tabStates.tab5.minNodeCharCount = tabStates.tab5.minNodeCharCountDraft
+    tab5SankeyFilterTimer = null
+  }, 200)
+}
 
 // 监听 card（聲韻調）变化，自動清空已選列表
 watch(() => tabStates.tab2.current.card, (newCard, oldCard) => {
@@ -1136,12 +1211,12 @@ const runAction = async () => {
     if (compareResponse && resultsArray) {
       // console.log('📊 Compare API 响应:', compareResponse)
 
-      const locations = resultsArray.map(r => r.location)
+      // const locations = resultsArray.map(r => r.location)
       // console.log('📍 提取的地点列表:', locations)
 
       // 5. 调用 getCoordinates 获取坐标数据
       const MapData = await getCoordinates({
-        locations: locations.join(','),
+        locations: locationList,
         regions: regionList,
         region_mode: locationRef.value?.regionUsing || 'yindian',
         iscustom: userStore.isAuthenticated && userStore.role !== 'anonymous' ? "true" : undefined,
@@ -1484,7 +1559,13 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', onClickOutside)
+
+  if (tab5SankeyFilterTimer) {
+    clearTimeout(tab5SankeyFilterTimer)
+    tab5SankeyFilterTimer = null
+  }
 })
+
 </script>
 
 <script>
@@ -2196,8 +2277,67 @@ export default {
 /* Tab5 音值比較 地點輸入容器 */
 .tab5-location-group {
   width: 100%;
-  max-width: 520px;
+  max-width: 760px;
   text-align: left;
+}
+
+.tab5-location-control-layout {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 14px;
+}
+
+.tab5-location-input {
+  min-width: 0;
+}
+
+.tab5-sankey-controls {
+  flex: 0 0 190px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 1px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(200, 200, 200, 0.35);
+  background: var(--glass-light);
+}
+
+.tab5-sankey-checkbox,
+.tab5-sankey-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  color: var(--text-secondary, #666);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.tab5-sankey-checkbox {
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tab5-sankey-checkbox input {
+  cursor: pointer;
+}
+
+.tab5-sankey-slider-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tab5-sankey-slider-label strong {
+  color: var(--color-primary, #007aff);
+  font-weight: 700;
+}
+
+.tab5-sankey-slider input {
+  width: 100%;
 }
 
 .tab5-page {
@@ -2240,6 +2380,18 @@ export default {
   }
   .tab5-page {
     width: 86dvw!important;;
+  }
+
+  .tab5-location-group {
+    max-width: 520px;
+  }
+
+  .tab5-location-control-layout {
+    flex-direction: column;
+  }
+
+  .tab5-sankey-controls {
+    flex: 0 0 auto;
   }
 }
 

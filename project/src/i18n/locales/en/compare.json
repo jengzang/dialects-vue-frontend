@@ -82,5 +82,11 @@
   },
   "results": {
     "noMainReading": "No main reading"
+  },
+  "sankeyControls": {
+    "title": "Sankey Options",
+    "optimizeLinks": "Optimize links",
+    "minLinkCharCount": "Min. link characters",
+    "minNodeCharCount": "Min. node characters"
   }
 }

@@ -13,12 +13,12 @@ export function getHomeUpdateNotice(t) {
         {
             icon: '🗺️',
             strong: '優化用戶自定義數據頁面',
-            text: '優化「地圖 -> 自定義」數據配置流程（目前功能仍在測試階段）'
+            text: '優化「地圖 -> 自定義」用戶個人數據創建於展示'
         }
     ]
   return {
-    version: 'v4.4.6',
-    lastUpdateDate: '2026-06-07',
+    version: 'v4.4.7',
+    lastUpdateDate: '2026-06-09',
     title: '🎊 ' + t('home.updateNotice.title'),
     items
   }
