@@ -180,6 +180,11 @@
         "loading": "加載中...",
         "empty": "當前特徵沒有數據"
       }
+    },
+    "compare": {
+      "options": {
+        "optimizeLinks": "優化連線"
+      }
     }
   },
   "tabs": {

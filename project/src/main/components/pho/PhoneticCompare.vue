@@ -8,7 +8,7 @@
       {{ errorMessage }}
     </div>
 
-    <!-- 加载中 -->
+    <!-- 加载中：首次请求接口时使用 -->
     <div
       v-if="isLoading"
       class="loading-state"
@@ -25,16 +25,31 @@
       v-else-if="rawData && !errorMessage"
       class="results-area"
     >
-      <!-- 声韵调切换 Tab -->
-      <div class="feature-tabs">
-        <button
-          v-for="feat in ['聲母', '韻母', '聲調']"
-          :key="feat"
-          :class="['feature-tab', { active: activeFeature === feat }]"
-          @click="changeFeature(feat)"
-        >
-          {{ feat }}
-        </button>
+      <!-- 声韵调切换 Tab + 桑基图选项 -->
+      <div class="feature-control-row">
+        <div class="feature-tabs">
+          <button
+            v-for="feat in ['聲母', '韻母', '聲調']"
+            :key="feat"
+            :class="['feature-tab', { active: activeFeature === feat }]"
+            type="button"
+            @click="changeFeature(feat)"
+          >
+            {{ feat }}
+          </button>
+        </div>
+
+        <label class="sankey-option-checkbox">
+          <input
+            v-model="enableLinkOptimization"
+            type="checkbox"
+            :disabled="isChartRendering"
+            @change="changeLinkOptimization"
+          >
+          <span>
+            {{ t('phonology.phonology.compare.options.optimizeLinks', '优化连线') }}
+          </span>
+        </label>
       </div>
 
       <!-- 桑基图容器 -->
@@ -42,6 +57,7 @@
         class="sankey-chart-wrapper"
         :class="{ 'is-rendering': isChartRendering }"
       >
+        <!-- 局部加载：切换 Tab / 重绘桑基图时使用 -->
         <div
           v-if="isChartRendering"
           class="sankey-rendering-mask"
@@ -87,6 +103,7 @@
                 共 <strong>{{ selectedDetail.count }}</strong> 字
               </div>
             </div>
+
             <button
               v-show="isMobileLayout || isCardPinned"
               type="button"
@@ -131,6 +148,18 @@ const activeFeature = ref('聲母')
 const isLoading = ref(false)
 const errorMessage = ref('')
 
+// 图表局部渲染状态：切换 Tab / 重绘图表时显示
+const isChartRendering = ref(false)
+
+// 是否启用 Sankey 自动布局优化
+// false 时 layoutIterations = 0，节点顺序更接近输入顺序
+// true 时 layoutIterations = 100，ECharts 会尝试优化连线交叉
+const enableLinkOptimization = ref(false)
+
+const sankeyLayoutIterations = computed(() => {
+  return enableLinkOptimization.value ? 200 : 0
+})
+
 // 详情卡片状态
 const selectedDetail = ref(null)
 const isCardPinned = ref(false)
@@ -145,15 +174,25 @@ const MOBILE_LAYOUT_MEDIA_QUERY = '(max-aspect-ratio: 1/1)'
 // 动态宽度计算
 const sankeyWidth = computed(() => {
   if (!rawData.value?.data) return '100%'
+
   const validLocs = props.queryLocations.filter(loc => rawData.value.data[loc])
   if (validLocs.length < 2) return '100%'
+
   const minWidthPerColumn = isMobileLayout.value ? 160 : 240
   return `max(100%, ${validLocs.length * minWidthPerColumn}px)`
 })
 
 const sankeyHeight = ref('800px')
 
-const isChartRendering = ref(false)
+// ========== 工具函数 ==========
+// 等待浏览器真正完成一次绘制。
+// 只用一次 requestAnimationFrame 时，回调仍发生在绘制前，loading 可能还没显示就开始同步计算。
+const waitForPaint = () =>
+  new Promise(resolve => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolve)
+    })
+  })
 
 // ========== 方法 ==========
 const changeFeature = async (feat) => {
@@ -162,13 +201,32 @@ const changeFeature = async (feat) => {
   activeFeature.value = feat
   closeDetailCard()
 
+  // 先显示局部 loading
   isChartRendering.value = true
-
   await nextTick()
-  await waitForFrame()
+  await waitForPaint()
 
   try {
     await renderSankey(props.queryLocations)
+    // 给浏览器一帧机会完成图表刷新
+    await waitForPaint()
+  } finally {
+    isChartRendering.value = false
+  }
+}
+
+const changeLinkOptimization = async () => {
+  if (isChartRendering.value || !rawData.value) return
+
+  closeDetailCard()
+
+  isChartRendering.value = true
+  await nextTick()
+  await waitForPaint()
+
+  try {
+    await renderSankey(props.queryLocations)
+    await waitForPaint()
   } finally {
     isChartRendering.value = false
   }
@@ -187,10 +245,9 @@ const clearChart = () => {
   }
 }
 
-const waitForFrame = () => new Promise(resolve => requestAnimationFrame(resolve))
-
 const handleQuery = async (queryLocs) => {
   isLoading.value = true
+  isChartRendering.value = false
   errorMessage.value = ''
   rawData.value = null
   clearChart()
@@ -216,21 +273,24 @@ const handleQuery = async (queryLocs) => {
 
     rawData.value = response
 
-    // 关键：先让 loading 结束，使图表容器进入 DOM
+    // 接口 loading 结束，结果区域进入 DOM
     isLoading.value = false
 
-    // 等 Vue 更新 DOM
-    await nextTick()
+    // 首次图表渲染也显示局部 loading，避免接口 loading 消失后页面空白卡住
+    isChartRendering.value = true
 
-    // 再等一帧，确保浏览器完成布局计算，ECharts 能拿到真实宽高
-    await waitForFrame()
+    await nextTick()
+    await waitForPaint()
 
     await renderSankey(queryLocs)
+
+    await waitForPaint()
   } catch (error) {
     console.error('Phonetic comparison query failed:', error)
     errorMessage.value = error.message || '查询失败，请重试！'
     isLoading.value = false
   } finally {
+    isChartRendering.value = false
     setRunning('compare', false)
   }
 }
@@ -251,20 +311,25 @@ const renderSankey = async (queryLocs) => {
 
   if (validLocs.length < 2) return
 
-  chartInstance.value = echarts.init(el)
-
   const nodeMap = new Map()
   const links = []
+  const usedNodeIds = new Set()
 
   const ensureNode = (id, rawLabel, layer, depth) => {
     if (!nodeMap.has(id)) {
-      nodeMap.set(id, { name: id, rawLabel, layer, depth })
+      nodeMap.set(id, {
+        name: id,
+        rawLabel,
+        layer,
+        depth
+      })
     }
   }
 
-  // 1. 构造节点
+  // 1. 构造所有候选节点
   validLocs.forEach((loc, locIdx) => {
     const featureData = raw.data[loc]?.[activeFeature.value] || {}
+
     Object.keys(featureData).forEach(val => {
       const id = `${locIdx}:${loc}:${val}`
       ensureNode(id, val, loc, locIdx)
@@ -272,47 +337,32 @@ const renderSankey = async (queryLocs) => {
   })
 
   // 2. 构造相邻列连线
+  // 注意：这里不能再重复构造 links，否则边会翻倍，ECharts 布局会明显变慢。
   for (let i = 0; i < validLocs.length - 1; i++) {
     const locCurr = validLocs[i]
     const locNext = validLocs[i + 1]
+
     const dataCurr = raw.data[locCurr]?.[activeFeature.value] || {}
     const dataNext = raw.data[locNext]?.[activeFeature.value] || {}
 
-    Object.entries(dataCurr).forEach(([valCurr, infoCurr]) => {
-      Object.entries(dataNext).forEach(([valNext, infoNext]) => {
-        const indicesCurr = infoCurr.char_indices || []
-        const indicesNext = infoNext.char_indices || []
+    const currEntries = Object.entries(dataCurr)
+    const nextEntries = Object.entries(dataNext).map(([valNext, infoNext]) => {
+      const indicesNext = infoNext.char_indices || []
 
-        // 求交集
-        const intersect = indicesCurr.filter(idx => indicesNext.includes(idx))
-        if (intersect.length > 0) {
-          links.push({
-            source: `${i}:${locCurr}:${valCurr}`,
-            target: `${i + 1}:${locNext}:${valNext}`,
-            value: intersect.length,
-            charIndices: intersect
-          })
-        }
-      })
+      return {
+        valNext,
+        indicesNext,
+        indicesNextSet: new Set(indicesNext)
+      }
     })
-  }
 
-  const usedNodeIds = new Set()
+    currEntries.forEach(([valCurr, infoCurr]) => {
+      const indicesCurr = infoCurr.char_indices || []
 
-  // 2. 构造相邻列连线
-  for (let i = 0; i < validLocs.length - 1; i++) {
-    const locCurr = validLocs[i]
-    const locNext = validLocs[i + 1]
-    const dataCurr = raw.data[locCurr]?.[activeFeature.value] || {}
-    const dataNext = raw.data[locNext]?.[activeFeature.value] || {}
+      if (!indicesCurr.length) return
 
-    Object.entries(dataCurr).forEach(([valCurr, infoCurr]) => {
-      Object.entries(dataNext).forEach(([valNext, infoNext]) => {
-        const indicesCurr = infoCurr.char_indices || []
-        const indicesNext = infoNext.char_indices || []
-
-        const nextSet = new Set(indicesNext)
-        const intersect = indicesCurr.filter(idx => nextSet.has(idx))
+      nextEntries.forEach(({ valNext, indicesNextSet }) => {
+        const intersect = indicesCurr.filter(idx => indicesNextSet.has(idx))
 
         if (intersect.length > 0) {
           const source = `${i}:${locCurr}:${valCurr}`
@@ -332,9 +382,16 @@ const renderSankey = async (queryLocs) => {
     })
   }
 
+  // 3. 只保留真正参与连线的节点，避免孤立节点导致 Sankey 布局迭代失效
   const nodes = Array.from(nodeMap.values())
     .filter(node => usedNodeIds.has(node.name))
 
+  if (!nodes.length || !links.length) {
+    clearChart()
+    return
+  }
+
+  // 4. 根据每层节点数动态计算高度
   const layerNodeCounts = new Map()
 
   nodes.forEach(node => {
@@ -346,7 +403,7 @@ const renderSankey = async (queryLocs) => {
 
   const minHeight = isMobileLayout.value ? 480 : 560
   const maxHeight = isMobileLayout.value ? 1100 : 1400
-  const heightPerNode = isMobileLayout.value ? 36 : 42
+  const heightPerNode = isMobileLayout.value ? 30 : 36
 
   const calculatedHeight = Math.min(
     maxHeight,
@@ -356,6 +413,8 @@ const renderSankey = async (queryLocs) => {
   sankeyHeight.value = `${calculatedHeight}px`
 
   await nextTick()
+
+  chartInstance.value = echarts.init(el)
 
   const option = {
     animation: false,
@@ -369,7 +428,7 @@ const renderSankey = async (queryLocs) => {
       top: '6%',
       bottom: '8%',
       data: nodes,
-      links: links,
+      links,
       nodeAlign: 'justify',
       draggable: false,
       emphasis: {
@@ -397,13 +456,18 @@ const renderSankey = async (queryLocs) => {
         { depth: 3, itemStyle: { color: '#a15cff' } },
         { depth: 4, itemStyle: { color: '#ff5c5c' } }
       ],
-      layoutIterations:100,
+
+      // 这里不要设太大。
+      // 100 会明显增加同步布局时间，导致主线程卡住，loading 动画也会停。
+      // 如果想更稳定，可改为 0；如果想稍微减少交叉，建议 4、8、16。
+      layoutIterations: sankeyLayoutIterations.value,
     }]
   }
 
   chartInstance.value.setOption(option)
 
   await nextTick()
+
   requestAnimationFrame(() => {
     chartInstance.value?.resize()
   })
@@ -420,12 +484,17 @@ const renderSankey = async (queryLocs) => {
       const targetNode = nodeMap.get(params.data.target)
       const charIndices = params.data.charIndices || []
 
+      if (!sourceNode || !targetNode) return
+
       title = `${sourceNode.layer} (${sourceNode.rawLabel}) &rarr; ${targetNode.layer} (${targetNode.rawLabel})`
       subtitle = '两地音值对应汉字'
       count = charIndices.length
       chars = charIndices.map(idx => charsMap[idx])
     } else {
       const node = nodeMap.get(params.data.name)
+
+      if (!node) return
+
       const featureData = raw.data[node.layer]?.[activeFeature.value]?.[node.rawLabel] || {}
       const charIndices = featureData.char_indices || []
 
@@ -435,7 +504,12 @@ const renderSankey = async (queryLocs) => {
       chars = charIndices.map(idx => charsMap[idx])
     }
 
-    selectedDetail.value = { title, subtitle, count, chars }
+    selectedDetail.value = {
+      title,
+      subtitle,
+      count,
+      chars
+    }
     isCardPinned.value = true
   })
 
@@ -454,12 +528,17 @@ const renderSankey = async (queryLocs) => {
         const targetNode = nodeMap.get(params.data.target)
         const charIndices = params.data.charIndices || []
 
+        if (!sourceNode || !targetNode) return
+
         title = `${sourceNode.layer} (${sourceNode.rawLabel}) &rarr; ${targetNode.layer} (${targetNode.rawLabel})`
         subtitle = '两地音值对应汉字'
         count = charIndices.length
         chars = charIndices.map(idx => charsMap[idx])
       } else {
         const node = nodeMap.get(params.data.name)
+
+        if (!node) return
+
         const featureData = raw.data[node.layer]?.[activeFeature.value]?.[node.rawLabel] || {}
         const charIndices = featureData.char_indices || []
 
@@ -469,7 +548,12 @@ const renderSankey = async (queryLocs) => {
         chars = charIndices.map(idx => charsMap[idx])
       }
 
-      selectedDetail.value = { title, subtitle, count, chars }
+      selectedDetail.value = {
+        title,
+        subtitle,
+        count,
+        chars
+      }
     })
 
     chartInstance.value.on('mouseout', () => {
@@ -492,7 +576,11 @@ watch(() => props.queryLocations, (newVal) => {
     handleQuery(newVal)
   } else {
     rawData.value = null
+    errorMessage.value = ''
+    isLoading.value = false
+    isChartRendering.value = false
     clearChart()
+    closeDetailCard()
   }
 }, { deep: true, immediate: true })
 
@@ -553,10 +641,18 @@ onUnmounted(() => {
   align-items: center;
 }
 
+.feature-control-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
 .feature-tabs {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
   justify-content: center;
 }
 
@@ -586,6 +682,29 @@ onUnmounted(() => {
   }
 }
 
+.sankey-option-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  padding: 8px 4px;
+  border-radius: var(--radius-md, 12px);
+  background: var(--glass-light, rgba(255, 255, 255, 0.3));
+  border: 1px solid var(--border-gray-light, rgba(200, 200, 200, 0.5));
+  color: var(--text-secondary, #666);
+  font-size: 11px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  input {
+    cursor: pointer;
+  }
+
+  input:disabled {
+    cursor: not-allowed;
+  }
+}
+
 .sankey-chart-wrapper {
   width: 100%;
   max-width: 100%;
@@ -593,6 +712,25 @@ onUnmounted(() => {
   overflow-y: hidden;
   padding: 10px 0;
   -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+.sankey-chart-wrapper.is-rendering .sankey-chart {
+  opacity: 0.45;
+}
+
+.sankey-rendering-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: auto;
 }
 
 .sankey-chart {
@@ -630,9 +768,9 @@ onUnmounted(() => {
   }
 
   /* 当 Hover 预览未钉住且不是移动端时，允许穿透点击图表 */
-    &.is-hover-preview {
-      pointer-events: none;
-    }
+  &.is-hover-preview {
+    pointer-events: none;
+  }
 }
 
 .detail-card-header {
@@ -729,6 +867,18 @@ onUnmounted(() => {
   transform: translateY(20px) scale(0.95);
 }
 
+/* 适配移动端面板滚动条 */
+.ui-scrollbar {
+  scrollbar-width: thin;
 
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
 
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+  }
+}
 </style>
