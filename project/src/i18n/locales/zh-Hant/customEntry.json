@@ -37,7 +37,7 @@
     "editDescription": "為當前方言點補充資料。",
     "labels": {
       "location": "簡稱",
-      "region": "音典分區",
+      "region": "分區",
       "coord": "經緯度"
     },
     "placeholders": {
@@ -96,7 +96,7 @@
     "emptyText": "點擊右上角「新增特徵」開始建立你的第一個特徵分布條目。",
     "unnamed": "未命名特徵",
     "uncategorized": "未分類",
-    "pointCount": "已收錄 {count} 個方言點"
+    "pointCount": "共 {count} 個方言點"
   },
   "featureDetail": {
     "back": "返回",

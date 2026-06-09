@@ -25,7 +25,7 @@
       "location": "地点简称",
       "region": "分区",
       "coordinates": "坐标",
-      "featureType": "声韵调 / 类别",
+      "featureType": "类别",
       "featureField": "当前查询特征",
       "value": "值",
       "description": "说明"
@@ -92,7 +92,8 @@
     "title": "用户自定义数据编辑与搜索",
     "labels": {
       "featureSearch": "特征搜索",
-      "login": "登录"
+      "login": "登录",
+      "uncategorized": "未分类"
     },
     "placeholders": {
       "featureSearch": "输入特征关键词..."
@@ -100,7 +101,8 @@
     "badges": {
       "loginRequired": "登录后才能管理个人数据",
       "noData": "尚未建立个人数据，请先新增",
-      "dataCount": "你目前有 {count} 条个人数据"
+      "dataCount": "你目前有 {count} 条个人数据",
+      "dataAndFeatureCount": "已有 {dataCount} 条数据，{featureCount} 个比较特征"
     },
     "selected": "已选特征：{feature}",
     "buttons": {

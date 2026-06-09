@@ -37,7 +37,7 @@
     "editDescription": "Add records for the current dialect point.",
     "labels": {
       "location": "Short name",
-      "region": "Phonological region",
+      "region": "region",
       "coord": "Coordinates"
     },
     "placeholders": {

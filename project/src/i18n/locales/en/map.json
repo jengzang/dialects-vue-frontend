@@ -25,7 +25,7 @@
       "location": "Location",
       "region": "Region",
       "coordinates": "Coordinates",
-      "featureType": "Feature Type",
+      "featureType": "Type",
       "featureField": "Current Feature",
       "value": "Value",
       "description": "Description"
@@ -92,7 +92,8 @@
     "title": "User Custom Data Editing & Search",
     "labels": {
       "featureSearch": "Feature Search",
-      "login": "Login"
+      "login": "Login",
+      "uncategorized": "Uncategorized"
     },
     "placeholders": {
       "featureSearch": "Enter feature keywords..."
@@ -100,7 +101,8 @@
     "badges": {
       "loginRequired": "Login required to manage personal data",
       "noData": "No personal data yet. Add some entries first.",
-      "dataCount": "You currently have {count} personal entries"
+      "dataCount": "You currently have {count} personal entries",
+      "dataAndFeatureCount": "{dataCount} records, {featureCount} features"
     },
     "selected": "Selected feature: {feature}",
     "buttons": {
