@@ -38,11 +38,24 @@
       </div>
 
       <!-- 桑基图容器 -->
-      <div class="sankey-chart-wrapper">
+      <div
+        class="sankey-chart-wrapper"
+        :class="{ 'is-rendering': isChartRendering }"
+      >
+        <div
+          v-if="isChartRendering"
+          class="sankey-rendering-mask"
+        >
+          <div
+            class="ui-loading--page"
+            aria-hidden="true"
+          />
+        </div>
+
         <div
           ref="sankeyContainerRef"
           class="sankey-chart"
-          :style="{ width: sankeyWidth }"
+          :style="{ width: sankeyWidth, height: sankeyHeight }"
         />
       </div>
     </div>
@@ -138,12 +151,27 @@ const sankeyWidth = computed(() => {
   return `max(100%, ${validLocs.length * minWidthPerColumn}px)`
 })
 
+const sankeyHeight = ref('800px')
+
+const isChartRendering = ref(false)
+
 // ========== 方法 ==========
 const changeFeature = async (feat) => {
+  if (activeFeature.value === feat || isChartRendering.value) return
+
   activeFeature.value = feat
   closeDetailCard()
+
+  isChartRendering.value = true
+
   await nextTick()
-  await renderSankey(props.queryLocations)
+  await waitForFrame()
+
+  try {
+    await renderSankey(props.queryLocations)
+  } finally {
+    isChartRendering.value = false
+  }
 }
 
 const closeDetailCard = () => {
@@ -269,7 +297,65 @@ const renderSankey = async (queryLocs) => {
     })
   }
 
+  const usedNodeIds = new Set()
+
+  // 2. 构造相邻列连线
+  for (let i = 0; i < validLocs.length - 1; i++) {
+    const locCurr = validLocs[i]
+    const locNext = validLocs[i + 1]
+    const dataCurr = raw.data[locCurr]?.[activeFeature.value] || {}
+    const dataNext = raw.data[locNext]?.[activeFeature.value] || {}
+
+    Object.entries(dataCurr).forEach(([valCurr, infoCurr]) => {
+      Object.entries(dataNext).forEach(([valNext, infoNext]) => {
+        const indicesCurr = infoCurr.char_indices || []
+        const indicesNext = infoNext.char_indices || []
+
+        const nextSet = new Set(indicesNext)
+        const intersect = indicesCurr.filter(idx => nextSet.has(idx))
+
+        if (intersect.length > 0) {
+          const source = `${i}:${locCurr}:${valCurr}`
+          const target = `${i + 1}:${locNext}:${valNext}`
+
+          usedNodeIds.add(source)
+          usedNodeIds.add(target)
+
+          links.push({
+            source,
+            target,
+            value: intersect.length,
+            charIndices: intersect
+          })
+        }
+      })
+    })
+  }
+
   const nodes = Array.from(nodeMap.values())
+    .filter(node => usedNodeIds.has(node.name))
+
+  const layerNodeCounts = new Map()
+
+  nodes.forEach(node => {
+    const depth = node.depth
+    layerNodeCounts.set(depth, (layerNodeCounts.get(depth) || 0) + 1)
+  })
+
+  const maxNodesInLayer = Math.max(...layerNodeCounts.values(), 1)
+
+  const minHeight = isMobileLayout.value ? 480 : 560
+  const maxHeight = isMobileLayout.value ? 1100 : 1400
+  const heightPerNode = isMobileLayout.value ? 36 : 42
+
+  const calculatedHeight = Math.min(
+    maxHeight,
+    Math.max(minHeight, maxNodesInLayer * heightPerNode + 180)
+  )
+
+  sankeyHeight.value = `${calculatedHeight}px`
+
+  await nextTick()
 
   const option = {
     animation: false,
@@ -279,8 +365,8 @@ const renderSankey = async (queryLocs) => {
     series: [{
       type: 'sankey',
       left: '4%',
-      right: '4%',
-      top: '8%',
+      right: '10%',
+      top: '6%',
       bottom: '8%',
       data: nodes,
       links: links,
@@ -310,7 +396,8 @@ const renderSankey = async (queryLocs) => {
         { depth: 2, itemStyle: { color: '#f2994a' } },
         { depth: 3, itemStyle: { color: '#a15cff' } },
         { depth: 4, itemStyle: { color: '#ff5c5c' } }
-      ]
+      ],
+      layoutIterations:100,
     }]
   }
 
@@ -509,7 +596,6 @@ onUnmounted(() => {
 }
 
 .sankey-chart {
-  height: 800px;
   min-height: 400px;
   background: transparent;
   margin: 0 auto;
@@ -643,16 +729,6 @@ onUnmounted(() => {
   transform: translateY(20px) scale(0.95);
 }
 
-/* 适配移动端面板滚动条 */
-.ui-scrollbar {
-  scrollbar-width: thin;
-  &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 3px;
-  }
-}
+
+
 </style>
