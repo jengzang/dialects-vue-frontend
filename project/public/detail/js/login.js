@@ -62,7 +62,7 @@ function showAuthPopup() {
                         form.append('username', username.value)
                     }
                     form.append('password', password.value)
-                    const res = await api('/auth/login', {
+                    const res = await api('/api/auth/login', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: form,
@@ -122,7 +122,7 @@ function showAuthPopup() {
                 loading.value = true
 
                 try {
-                    const res = await api('/auth/register', {
+                    const res = await api('/api/auth/register', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -157,7 +157,7 @@ function showAuthPopup() {
                 const refreshToken = getRefreshToken()
 
                 try {
-                    await api('/auth/logout', {
+                    await api('/api/auth/logout', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ refresh_token: refreshToken })
@@ -176,7 +176,7 @@ function showAuthPopup() {
             const fetchUser = async () => {
                 try {
 
-                    const res = await api('/auth/me')
+                    const res = await api('/api/auth/me')
                     user.value = res
                     const isLoggedIn = res && res.id && res.username;
                     updateLoginUI(isLoggedIn, res?.username);
@@ -202,7 +202,7 @@ function showAuthPopup() {
                     // form.append('password', currentPassword.value);  // 当前密码用于验证
                     form.append('email', user.value.email);
 
-                    const res = await api('/auth/updateProfile', {
+                    const res = await api('/api/auth/updateProfile', {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: form,
@@ -255,7 +255,7 @@ function showAuthPopup() {
                     form.append('new_password', newPassword.value);  // 新密码
                     form.append('email', user.value.email);
 
-                    const res = await api('/auth/updateProfile', {
+                    const res = await api('/api/auth/updateProfile', {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: form,
@@ -784,7 +784,7 @@ async function refreshAccessToken() {
     try {
         const WEB_BASE = window.WEB_BASE || 'http://localhost:5000';
 
-        const res = await fetch(WEB_BASE + '/auth/refresh', {
+        const res = await fetch(WEB_BASE + '/api/auth/refresh', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ refresh_token: refreshToken })
@@ -867,7 +867,7 @@ async function api(path, { method = 'GET', headers = {}, body = null } = {}) {
  */
 async function ensureAuthenticated(e,popup_bool = true) {
     try {
-        const res = await api('/auth/me');
+        const res = await api('/api/auth/me');
         if (res && res.id && res.username) {
             // ✅ 已登入 → 返回用戶信息
             return { id: res.id, username: res.username };
@@ -890,7 +890,7 @@ async function ensureAuthenticated(e,popup_bool = true) {
 
 async function update_userdatas_bytoken(token,console_log = false) {
     try {
-        const userRes = await fetch(`${window.WEB_BASE}/auth/me`, {
+        const userRes = await fetch(`${window.WEB_BASE}/api/auth/me`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

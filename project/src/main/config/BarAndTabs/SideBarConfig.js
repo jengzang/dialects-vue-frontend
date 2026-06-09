@@ -33,7 +33,8 @@ export function useSidebarConfig() {
             children: [
                 { label: t('navigation.submenu.compare.tab1'), icon: '↔️', path: '/menu/compare/char' },
                 { label: t('navigation.submenu.compare.tab2'), icon: '📜', path: '/menu/compare/zhonggu' },
-                { label: t('navigation.submenu.compare.tab4'), icon: '📈', path: '/menu/compare/tone' }
+                { label: t('navigation.submenu.compare.tab4'), icon: '📈', path: '/menu/compare/tone' },
+                { label: t('navigation.submenu.compare.tab5'), icon: '🎵', path: '/menu/compare/phonetic' }
             ]
         },
         pho: {
@@ -143,7 +144,8 @@ export const SideConfig = {
         children: [
             { label: '漢字對比', icon: '🆚', path: '/menu/compare/char' },
             { label: '中古對比', icon: '📜', path: '/menu/compare/zhonggu' },
-            { label: '調類對比', icon: '📊', path: '/menu/compare/tone' }
+            { label: '調類對比', icon: '📊', path: '/menu/compare/tone' },
+            { label: '音值對比', icon: '🎵', path: '/menu/compare/phonetic' }
         ]
     },
     pho: {

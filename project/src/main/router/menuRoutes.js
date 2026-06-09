@@ -33,7 +33,7 @@ export const menuRoutes = [
     redirect: '/menu/compare/zhonggu'
   },
   {
-    path: '/menu/compare/:sub(char|zhonggu|tone)',
+    path: '/menu/compare/:sub(char|zhonggu|tone|phonetic)',
     component: ComparePage
   },
   {

@@ -2,12 +2,21 @@
 <template>
   <!-- 认证按钮 -->
   <div
+    v-if="userStore.username"
+    class="avatar-container"
+    :class="authButtonPositionClass"
+    @click="goToAuth"
+  >
+    <NavAvatar />
+  </div>
+  <div
+    v-else
     class="auth-button"
     :class="authButtonPositionClass"
     @click="goToAuth"
   >
     <span class="auth-text">
-      {{ userStore.username || t('navigation.login') }}
+      {{ t('navigation.login') }}
     </span>
   </div>
 
@@ -40,6 +49,7 @@ import { computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { userStore } from '@/main/store/store.js';
+import NavAvatar from '@/components/bar/NavAvatar.vue';
 
 const props = defineProps({
   // 认证按钮位置: 'top-right' | 'bottom-left'
@@ -226,6 +236,43 @@ const goToAuth = () => {
     width: 50px;
     height: 50px;
     font-size: 22px;
+  }
+}
+
+.avatar-container {
+  position: fixed;
+  z-index: 998;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.avatar-container.position-top-right {
+  top: 20px;
+  right: 20px;
+}
+
+.avatar-container.position-bottom-left {
+  bottom: 20px;
+  left: 20px;
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .avatar-container {
+    width: 50px;
+    height: 50px;
+  }
+
+  .avatar-container.position-top-right,
+  .avatar-container.position-bottom-left {
+    top: auto;
+    left: 15px;
+    bottom: 15px;
+    right: auto;
   }
 }
 </style>

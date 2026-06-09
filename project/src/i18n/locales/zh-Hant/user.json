@@ -259,11 +259,12 @@
           "yinwei": "查音位",
           "diwei": "查地位",
           "combination": "地位組合",
-          "syllable": "查音節",
+          "syllable": "查聲韻調",
           "compareZhonggu": "比較中古"
         },
         "tooltips": {
-          "diwei": "包含彈窗內的細分查詢，以及舊版網站的相關查詢次數。"
+          "diwei": "包含彈窗內的細分查詢，以及舊版網站的相關查詢次數。",
+          "syllable": "包含查中古結果頁面的“統計”查詢以及比較音值的次數"
         }
       },
       "charsTones": {

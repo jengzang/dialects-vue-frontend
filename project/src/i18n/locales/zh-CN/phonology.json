@@ -180,6 +180,11 @@
         "loading": "加载中...",
         "empty": "当前特征没有数据"
       }
+    },
+    "compare": {
+      "options": {
+        "optimizeLinks": "优化连线"
+      }
     }
   },
   "tabs": {

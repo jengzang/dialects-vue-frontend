@@ -1,0 +1,165 @@
+{
+  "page": {
+    "title": "Dialect Clustering Workspace",
+    "description": "Use the staged workflow by default and keep quick run available in the advanced panel."
+  },
+  "steps": {
+    "input": "Input",
+    "preview": "Preview",
+    "prepare": "Prepare",
+    "distance": "Distance",
+    "cluster": "Cluster",
+    "result": "Result"
+  },
+  "actions": {
+    "createPreview": "Create preview",
+    "refreshPreview": "Refresh preview",
+    "continuePrepare": "Continue prepare",
+    "runDistance": "Build distance",
+    "runCluster": "Run cluster",
+    "runQuick": "Run quick job",
+    "reset": "Reset workspace",
+    "addGroup": "Add group",
+    "removeGroup": "Remove group",
+    "reloadResult": "Reload result"
+  },
+  "input": {
+    "title": "Input Setup",
+    "description": "Configure groups, locations, and advanced options before previewing the task.",
+    "groupTitle": "Group {index}",
+    "groupLabel": "Group label",
+    "groupLabelPlaceholder": "For example: Jia rhyme group",
+    "compareDimension": "Compare dimension",
+    "sourceMode": "Character source",
+    "pathStrings": "path_strings",
+    "resolvedChars": "Manual chars",
+    "pathStringsHint": "Reuse the existing Middle Chinese condition builder to generate path_strings.",
+    "resolvedCharsLabel": "Manual character list",
+    "resolvedCharsPlaceholder": "Enter characters separated by spaces, commas, or new lines",
+    "resolvedCharsPreview": "{count} unique characters",
+    "pathStringsPreview": "{count} path_strings generated",
+    "emptyPathStrings": "No valid conditions selected yet",
+    "advanced": "Advanced options",
+    "includeSpecialLocations": "Include special locations",
+    "locationTitle": "Locations and regions",
+    "locationDescription": "Reuses the existing location and partition input component."
+  },
+  "dimensions": {
+    "initial": "Initial",
+    "final": "Final",
+    "tone": "Tone"
+  },
+  "phonemeModes": {
+    "intra_group": "intra_group",
+    "anchored_inventory": "anchored_inventory",
+    "shared_request_identity": "shared_request_identity"
+  },
+  "preview": {
+    "title": "Preview",
+    "description": "Check the task size before moving into prepare.",
+    "hashLabel": "prepare_hash",
+    "continueHint": "After preview is ready, continue into prepare.",
+    "metrics": {
+      "groupCount": "Groups",
+      "uniqueCharCount": "Unique chars",
+      "requestedLocationCount": "Requested locations",
+      "matchedLocationCount": "Matched locations",
+      "pairCount": "Estimated pairs",
+      "matrixMb": "Estimated matrix MB"
+    }
+  },
+  "prepare": {
+    "title": "Prepare",
+    "description": "Prepare turns normalized input into reusable staged resources.",
+    "ready": "Prepare is ready",
+    "waiting": "Prepare has not started yet"
+  },
+  "distance": {
+    "title": "Distance",
+    "description": "Choose a phoneme mode to build or reuse a distance_hash.",
+    "hashLabel": "distance_hash",
+    "ready": "Distance for the selected mode is ready",
+    "waiting": "Finish prepare first"
+  },
+  "clustering": {
+    "title": "Cluster",
+    "description": "Configure the algorithm to produce a result_hash.",
+    "algorithm": "Algorithm",
+    "nClusters": "Cluster count",
+    "linkage": "Linkage",
+    "randomState": "Random state",
+    "eps": "EPS",
+    "minSamples": "Min samples",
+    "resultHash": "result_hash",
+    "waiting": "Finish distance first"
+  },
+  "algorithms": {
+    "agglomerative": "Agglomerative",
+    "dbscan": "DBSCAN",
+    "kmeans": "K-Means",
+    "gmm": "GMM"
+  },
+  "quickRun": {
+    "title": "Quick Run",
+    "description": "Advanced mode: run the one-shot /jobs flow and jump straight to the final result.",
+    "collapsed": "Expand Quick Run"
+  },
+  "task": {
+    "title": "Task status",
+    "source": "Source",
+    "taskId": "task_id",
+    "status": "Status",
+    "progress": "Progress",
+    "message": "Message",
+    "staged": "staged",
+    "jobs": "jobs"
+  },
+  "status": {
+    "idle": "Idle",
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Completed",
+    "failed": "Failed"
+  },
+  "result": {
+    "title": "Cluster result",
+    "description": "Shared result rendering for staged and quick run outputs.",
+    "summary": "Summary",
+    "assignments": "Assignments",
+    "groups": "Groups",
+    "performance": "Performance",
+    "advanced": "Advanced details",
+    "empty": "No cluster result yet. Finish the workflow first.",
+    "columns": {
+      "location": "Location",
+      "clusterId": "Cluster",
+      "province": "Province",
+      "city": "City",
+      "county": "County",
+      "town": "Town",
+      "yindianRegion": "Yindian region",
+      "mapRegion": "Map region"
+    },
+    "summaryCards": {
+      "algorithm": "Algorithm",
+      "phonemeMode": "Phoneme mode",
+      "clusterCount": "Cluster count",
+      "effectiveLocationCount": "Effective locations"
+    },
+    "cacheInfo": "Cache info"
+  },
+  "errors": {
+    "invalidInput": "Please complete a valid group and location setup first.",
+    "groupLabelRequired": "Each group needs a label.",
+    "groupDimensionRequired": "Each group needs a compare dimension.",
+    "groupSourceRequired": "At least one group must contain a valid character source.",
+    "locationRequired": "Select at least one location or region.",
+    "previewExpired": "The preview has expired. Please create a new preview.",
+    "prepareExpired": "The prepare result has expired. Please run prepare again.",
+    "distanceExpired": "The distance result has expired. Please rebuild distance.",
+    "resultExpired": "The cluster result has expired. Please rerun the cluster step.",
+    "taskExpired": "The current task expired. You can rerun the current step.",
+    "taskConflict": "The dependent task is still running. Please wait.",
+    "restart": "The backend failed while processing this task. Please retry or reset the workspace."
+  }
+}

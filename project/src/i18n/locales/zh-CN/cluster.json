@@ -1,0 +1,165 @@
+{
+  "page": {
+    "title": "方言聚类工作台",
+    "description": "使用 staged 流程逐步构建聚类结果，并在高级区保留 quick run。"
+  },
+  "steps": {
+    "input": "输入",
+    "preview": "预览",
+    "prepare": "准备",
+    "distance": "距离",
+    "cluster": "聚类",
+    "result": "结果"
+  },
+  "actions": {
+    "createPreview": "生成预览",
+    "refreshPreview": "重新预览",
+    "continuePrepare": "继续 prepare",
+    "runDistance": "计算距离",
+    "runCluster": "生成聚类",
+    "runQuick": "立即 quick run",
+    "reset": "重置工作台",
+    "addGroup": "新增 group",
+    "removeGroup": "删除 group",
+    "reloadResult": "重新读取结果"
+  },
+  "input": {
+    "title": "输入配置",
+    "description": "先配置 group、地点与高级选项，再进入 preview。",
+    "groupTitle": "Group {index}",
+    "groupLabel": "Group 标签",
+    "groupLabelPlaceholder": "例如：假摄",
+    "compareDimension": "比较维度",
+    "sourceMode": "字集来源",
+    "pathStrings": "path_strings",
+    "resolvedChars": "手动字集",
+    "pathStringsHint": "沿用现有中古条件构造器，生成 path_strings。",
+    "resolvedCharsLabel": "手动字集",
+    "resolvedCharsPlaceholder": "输入汉字，支持空格、逗号、换行分隔",
+    "resolvedCharsPreview": "去重后 {count} 字",
+    "pathStringsPreview": "已生成 {count} 条 path_strings",
+    "emptyPathStrings": "尚未选出有效条件",
+    "advanced": "高级选项",
+    "includeSpecialLocations": "包含特殊地点",
+    "locationTitle": "地点与分区",
+    "locationDescription": "沿用现有地点/分区输入组件。"
+  },
+  "dimensions": {
+    "initial": "声母",
+    "final": "韵母",
+    "tone": "声调"
+  },
+  "phonemeModes": {
+    "intra_group": "intra_group",
+    "anchored_inventory": "anchored_inventory",
+    "shared_request_identity": "shared_request_identity"
+  },
+  "preview": {
+    "title": "Preview",
+    "description": "确认任务规模后再进入 prepare。",
+    "hashLabel": "prepare_hash",
+    "continueHint": "Preview 完成后，点击按钮启动 prepare。",
+    "metrics": {
+      "groupCount": "Group 数",
+      "uniqueCharCount": "唯一字数",
+      "requestedLocationCount": "请求地点",
+      "matchedLocationCount": "匹配地点",
+      "pairCount": "估算配对数",
+      "matrixMb": "估算矩阵 MB"
+    }
+  },
+  "prepare": {
+    "title": "Prepare",
+    "description": "prepare 会把标准化输入转成后续可复用的基础材料。",
+    "ready": "prepare 已就绪",
+    "waiting": "尚未启动 prepare"
+  },
+  "distance": {
+    "title": "Distance",
+    "description": "选择 phoneme_mode 后生成或复用 distance_hash。",
+    "hashLabel": "distance_hash",
+    "ready": "当前 mode 的 distance 已可用",
+    "waiting": "请先完成 prepare"
+  },
+  "clustering": {
+    "title": "Cluster",
+    "description": "设置聚类参数后生成 result_hash。",
+    "algorithm": "算法",
+    "nClusters": "聚类数",
+    "linkage": "Linkage",
+    "randomState": "Random State",
+    "eps": "EPS",
+    "minSamples": "Min Samples",
+    "resultHash": "result_hash",
+    "waiting": "请先完成 distance"
+  },
+  "algorithms": {
+    "agglomerative": "Agglomerative",
+    "dbscan": "DBSCAN",
+    "kmeans": "K-Means",
+    "gmm": "GMM"
+  },
+  "quickRun": {
+    "title": "Quick Run",
+    "description": "高级模式：直接走 /jobs，一步式拿最终结果。",
+    "collapsed": "展开 Quick Run"
+  },
+  "task": {
+    "title": "任务状态",
+    "source": "来源",
+    "taskId": "task_id",
+    "status": "状态",
+    "progress": "进度",
+    "message": "消息",
+    "staged": "staged",
+    "jobs": "jobs"
+  },
+  "status": {
+    "idle": "未开始",
+    "pending": "排队中",
+    "processing": "处理中",
+    "completed": "已完成",
+    "failed": "失败"
+  },
+  "result": {
+    "title": "聚类结果",
+    "description": "staged 与 quick run 共用同一套结果展示。",
+    "summary": "摘要",
+    "assignments": "Assignments",
+    "groups": "Groups",
+    "performance": "Performance",
+    "advanced": "高级信息",
+    "empty": "暂无结果，请先完成聚类流程。",
+    "columns": {
+      "location": "地点",
+      "clusterId": "Cluster",
+      "province": "省",
+      "city": "市",
+      "county": "县",
+      "town": "镇",
+      "yindianRegion": "音典分区",
+      "mapRegion": "地图分区"
+    },
+    "summaryCards": {
+      "algorithm": "算法",
+      "phonemeMode": "Phoneme Mode",
+      "clusterCount": "聚类数",
+      "effectiveLocationCount": "有效地点"
+    },
+    "cacheInfo": "缓存命中信息"
+  },
+  "errors": {
+    "invalidInput": "请先补齐有效的 group 和地点配置。",
+    "groupLabelRequired": "每个 group 都需要标签。",
+    "groupDimensionRequired": "每个 group 都需要 compare_dimension。",
+    "groupSourceRequired": "请至少为一个 group 提供有效字集。",
+    "locationRequired": "请至少选择一个地点或分区。",
+    "previewExpired": "preview 已过期，请重新预览。",
+    "prepareExpired": "prepare 结果已过期，请重新执行 prepare。",
+    "distanceExpired": "distance 结果已过期，请重新计算距离。",
+    "resultExpired": "聚类结果已过期，请重新执行 cluster。",
+    "taskExpired": "当前任务已过期，可从当前步骤重新执行。",
+    "taskConflict": "依赖任务尚未完成，请稍候。",
+    "restart": "后端执行失败，请重试或重置工作台。"
+  }
+}

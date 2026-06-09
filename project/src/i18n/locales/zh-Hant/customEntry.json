@@ -1,0 +1,169 @@
+{
+  "common": {
+    "saving": "保存中..."
+  },
+  "modal": {
+    "title": "自定義數據錄入",
+    "subtitle": "聚焦用戶自定義資料新增與維護，兼容舊的個人數據管理與右側逐條新增邏輯。",
+    "modeGroupLabel": "錄入模式",
+    "close": "關閉",
+    "devNotice": "當前功能還在開發測試中",
+    "modes": {
+      "point": "按調查點",
+      "feature": "按方言特徵"
+    }
+  },
+  "pointList": {
+    "title": "按調查點",
+    "description": "先選擇一個已有方言點，或新增一個新方言點開始補充資料。",
+    "searchPlaceholder": "搜尋簡稱或分區",
+    "create": "+ 新增方言點",
+    "loadFailed": "載入方言點失敗",
+    "retry": "重試",
+    "emptyTitle": "暫無方言點",
+    "emptyText": "點擊右上角「新增方言點」開始建立你的第一個自定義地點。",
+    "unnamed": "未命名方言點",
+    "unregioned": "未分區",
+    "recordCount": "已收錄 {count} 條資料",
+    "userPointBadge": "自定義地點",
+    "publicPointBadge": "檔案地點"
+  },
+  "pointDetail": {
+    "back": "返回",
+    "modalTitle": "地點已有特徵：{name}",
+    "regionModalTitle": "分區已有特徵：{name}",
+    "createTitle": "新增方言點",
+    "createDescription": "先確定地點與坐標，再補充多條特徵資料。",
+    "editDescription": "為當前方言點補充資料。",
+    "labels": {
+      "location": "簡稱",
+      "region": "分區",
+      "coord": "經緯度"
+    },
+    "placeholders": {
+      "location": "輸入方言點簡稱",
+      "region": "輸入分區",
+      "coord": "點擊地圖後自動填入",
+      "phonology": "如：韻母",
+      "feature": "如：流攝",
+      "value": "如：eu",
+      "note": "可選補充說明"
+    },
+    "rows": {
+      "title": "特徵記錄",
+      "description": "每一行代表一條可提交的自定義資料。",
+      "add": "+ 添加",
+      "duplicateWarning": "同一點下已存在相同的分類與對比特徵，確認繼續保存嗎？",
+      "headers": {
+        "phonology": "分類",
+        "feature": "對比特徵",
+        "value": "具體表現",
+        "note": "說明",
+        "action": "操作"
+      },
+      "remove": "刪除"
+    },
+    "actions": {
+      "cancel": "取消",
+      "save": "保存"
+    },
+    "map": {
+      "pickTitle": "點擊地圖選取坐標",
+      "previewTitle": "當前方言點位置",
+      "pickHint": "點擊地圖選取坐標",
+      "previewHint": "當前點位預覽",
+      "currentPoint": "當前點位"
+    },
+    "messages": {
+      "loadFailed": "獲取地點詳情失敗",
+      "locationRegionRequired": "請先填寫方言點名稱與分區",
+      "coordRequired": "請先在地圖上選取坐標",
+      "rowRequired": "請至少填寫一條對比特徵與具體表現",
+      "confirmContinue": "繼續保存",
+      "noChanges": "當前沒有需要提交的變更",
+      "partialFailed": "保存時有 {count} 項失敗，請重試",
+      "saveSuccess": "保存成功"
+    }
+  },
+  "featureList": {
+    "title": "按方言特徵",
+    "description": "選擇或新建一個方言特徵，再逐步補入不同方言點，繪製地理語言學對比圖。",
+    "searchPlaceholder": "搜尋對比特徵或分類",
+    "create": "+ 新增特徵",
+    "loadFailed": "載入特徵列表失敗",
+    "retry": "重試",
+    "emptyTitle": "暫無特徵資料",
+    "emptyText": "點擊右上角「新增特徵」開始建立你的第一個特徵分布條目。",
+    "unnamed": "未命名特徵",
+    "uncategorized": "未分類",
+    "pointCount": "共 {count} 個方言點"
+  },
+  "featureDetail": {
+    "back": "返回",
+    "modalTitle": "特徵分布詳情：{feature}（{phonology}）",
+    "description": "繪製多個方言點的地理語言學特徵對比圖。",
+    "createRecord": "+ 新增地點記錄",
+    "loading": "正在載入特徵詳情…",
+    "retry": "重試",
+    "empty": "暫無地點記錄，點擊右上角開始新增。",
+    "headers": {
+      "location": "地點",
+      "region": "分區",
+      "coord": "坐標",
+      "value": "具體表現",
+      "note": "說明",
+      "action": "操作"
+    },
+    "emptyNote": "—",
+    "actions": {
+      "edit": "編輯",
+      "delete": "刪除"
+    },
+    "confirmDelete": "確認刪除這條地點記錄嗎？",
+    "mapTitle": "當前特徵點位分布",
+    "mapHint": "特徵分布預覽",
+    "unnamed": "未命名特徵",
+    "uncategorized": "未分類",
+    "loadFailed": "獲取特徵詳情失敗"
+  },
+  "featureRecord": {
+    "createTitle": "新增地點記錄",
+    "editTitle": "編輯地點記錄",
+    "close": "關閉",
+    "labels": {
+      "location": "地點",
+      "region": "分區",
+      "coord": "坐標",
+      "value": "具體表現",
+      "note": "說明",
+      "quickSelect": "快捷選擇"
+    },
+    "placeholders": {
+      "location": "輸入地點名稱",
+      "region": "輸入分區",
+      "coord": "點擊地圖後自動填入",
+      "value": "輸入具體表現",
+      "note": "可選說明"
+    },
+    "mapHint": "點擊地圖選取坐標",
+    "actions": {
+      "cancel": "取消",
+      "save": "保存此行"
+    },
+    "messages": {
+      "locationRegionRequired": "請先填寫地點與分區",
+      "coordRequired": "請先選取坐標",
+      "valueRequired": "請先填寫具體表現",
+      "featureRequired": "當前對比特徵為空，請返回上一層重新選擇",
+      "duplicateLocation": "該對比特徵下已存在相同地點與分區記錄，確認繼續保存嗎？",
+      "coordinateSynced": "已自動同步該地點的已有坐標，防止數據衝突"
+    }
+  },
+  "miniMap": {
+    "defaultHint": "點擊地圖選取坐標"
+  },
+  "mode": {
+    "pointLoadFailed": "獲取方言點列表失敗",
+    "featureLoadFailed": "獲取特徵列表失敗"
+  }
+}

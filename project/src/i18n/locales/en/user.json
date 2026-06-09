@@ -259,11 +259,12 @@
           "yinwei": "Phonemes",
           "diwei": "Statuses",
           "combination": "Status combos",
-          "syllable": "Syllables",
+          "syllable": "Pronunciations",
           "compareZhonggu": "Compare Middle Chinese"
         },
         "tooltips": {
-          "diwei": "Includes detailed popup queries and related requests from the legacy site."
+          "diwei": "Includes detailed popup queries and related requests from the legacy site.",
+          "syllable": "Including 'statistical' queries on the Middle Chinese results page and comparing the frequencies of phonetic values."
         }
       },
       "charsTones": {

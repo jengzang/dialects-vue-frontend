@@ -1,26 +1,27 @@
-import { defineConfig, loadEnv } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import path from 'path'
+import { defineConfig, loadEnv } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import path from 'path';
+import http from 'http';
 
-const mpaEntryRoots = ['auth', 'menu', 'intro', 'explore', 'villagesML']
+const mpaEntryRoots = ['auth', 'menu', 'intro', 'explore', 'villagesML'];
 
 function rewriteDevMpaRequest(req) {
   if (!req?.url || !req.headers?.accept?.includes('text/html')) {
-    return
+    return;
   }
 
-  const url = new URL(req.url, 'http://localhost')
-  const pathname = url.pathname.replace(/\/+$/, '') || '/'
-  const matchedRoot = mpaEntryRoots.find((root) => (
-    pathname === `/${root}` || pathname.startsWith(`/${root}/`)
-  ))
+  const url = new URL(req.url, 'http://localhost');
+  const pathname = url.pathname.replace(/\/+$/, '') || '/';
+  const matchedRoot = mpaEntryRoots.find(
+    (root) => pathname === `/${root}` || pathname.startsWith(`/${root}/`)
+  );
 
   if (!matchedRoot || path.extname(pathname)) {
-    return
+    return;
   }
 
-  url.pathname = `/${matchedRoot}/index.html`
-  req.url = `${url.pathname}${url.search}`
+  url.pathname = `/${matchedRoot}/index.html`;
+  req.url = `${url.pathname}${url.search}`;
 }
 
 function devMpaRewritePlugin() {
@@ -28,26 +29,86 @@ function devMpaRewritePlugin() {
     name: 'dev-mpa-rewrite',
     configureServer(server) {
       server.middlewares.use((req, _res, next) => {
-        rewriteDevMpaRequest(req)
-        next()
-      })
+        rewriteDevMpaRequest(req);
+        next();
+      });
     },
+  };
+}
+
+function pingPort(port) {
+  return new Promise((resolve) => {
+    const req = http.get(`http://127.0.0.1:${port}/__ping`, { timeout: 150 }, (res) => {
+      let data = '';
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      res.on('end', () => {
+        const cleaned = data.trim().replace(/^"|"$/g, '');
+        if (cleaned === 'ok!!') {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      });
+    });
+
+    req.on('error', () => {
+      resolve(false);
+    });
+
+    req.on('timeout', () => {
+      req.destroy();
+      resolve(false);
+    });
+  });
+}
+
+async function detectBackendPort() {
+  console.log('[Vite] Detecting backend port (pinging 127.0.0.1:5000-5049 /__ping)...');
+  let attempts = 0;
+  while (true) {
+    const promises = [];
+    for (let port = 5000; port <= 5049; port++) {
+      promises.push(pingPort(port).then((success) => (success ? port : null)));
+    }
+
+    const results = await Promise.all(promises);
+    const foundPort = results.find((port) => port !== null);
+
+    if (foundPort !== undefined) {
+      console.log(`[Vite] Backend detected successfully on port: ${foundPort}`);
+      return foundPort;
+    }
+
+    attempts++;
+    if (attempts === 1 || attempts % 5 === 0) {
+      console.log(
+        '[Vite] Backend not detected on ports 5000-5049. Waiting for backend to start (press Ctrl+C to abort)...'
+      );
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 }
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '')
+export default defineConfig(async ({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
 
-  let webBase
+  let webBase;
   if (mode === 'web') {
-    webBase = ''
+    webBase = '';
   } else if (mode === 'development') {
-    webBase = env.VITE_WEB_BASE || 'http://127.0.0.1:5000'
+    if (env.VITE_WEB_BASE) {
+      webBase = env.VITE_WEB_BASE;
+    } else {
+      const port = await detectBackendPort();
+      webBase = `http://127.0.0.1:${port}`;
+    }
   } else {
-    webBase = env.VITE_WEB_BASE || 'https://dialects.yzup.top'
+    webBase = env.VITE_WEB_BASE || 'https://dialects.yzup.top';
   }
 
-  console.log(`[Vite] Mode: ${mode}, WEB_BASE: ${webBase}`)
+  console.log(`[Vite] Mode: ${mode}, WEB_BASE: ${webBase}`);
 
   return {
     plugins: [vue(), devMpaRewritePlugin()],
@@ -84,28 +145,28 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'assets/[name].[hash].[ext]',
           manualChunks(id) {
             if (id.includes('/api/logs/')) {
-              return 'logs'
+              return 'logs';
             }
             if (id.includes('/src/i18n/')) {
-              return 'i18n'
+              return 'i18n';
             }
             if (id.includes('echarts')) {
-              return 'echarts'
+              return 'echarts';
             }
             if (id.includes('maplibre-gl')) {
-              return 'maplibre'
+              return 'maplibre';
             }
             if (id.includes('xlsx')) {
-              return 'xlsx'
+              return 'xlsx';
             }
             if (id.includes('wavesurfer')) {
-              return 'wavesurfer'
+              return 'wavesurfer';
             }
             if (id.includes('node_modules/vue') || id.includes('node_modules/vue-router')) {
-              return 'vue-vendor'
+              return 'vue-vendor';
             }
             if (id.includes('node_modules')) {
-              return 'vendor'
+              return 'vendor';
             }
           },
         },
@@ -116,5 +177,5 @@ export default defineConfig(({ mode }) => {
         drop: ['console', 'debugger'],
       },
     },
-  }
-})
+  };
+});

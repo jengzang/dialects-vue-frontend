@@ -23,7 +23,8 @@
     "compare": {
       "tab1": "漢字對比",
       "tab2": "中古對比",
-      "tab4": "調類對比"
+      "tab4": "調類對比",
+      "tab5": "音值對比"
     },
     "pho": {
       "phonologyMatrix": "音系查詢",

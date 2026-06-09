@@ -131,6 +131,7 @@ import { batchMatch, getRegions, submitCustomForm } from '@/api'
 import { showSuccess, showError, showWarning, showInfo } from '@/utils/message.js'
 import { userStore, globalPayload, resultCache } from '@/main/store/store.js'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import { formatCoord } from '@/utils/map/formatCoord.js'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -182,9 +183,7 @@ const togglePanel = () => {
 
 watch(() => props.mapClickCoordinates, (newVal) => {
   if (newVal && isPanelOpen.value) {
-    const lng = newVal.lng.toFixed(6)
-    const lat = newVal.lat.toFixed(6)
-    formData.coordinates = `${lng}, ${lat}`
+    formData.coordinates = formatCoord(newVal.lng, newVal.lat)
   }
 })
 
@@ -237,8 +236,15 @@ const selectSuggestion = async (item) => {
 
   try {
     const response = await getRegions(item)
-    if (response && response['音典分區']) {
-      formData.region = response['音典分區']
+    if (response) {
+      if (response['音典分區']) {
+        formData.region = response['音典分區']
+      } else {
+        formData.region = t('map.customDataPanel.messages.regionNotFound')
+      }
+      if (response['經緯度']) {
+        formData.coordinates = response['經緯度']
+      }
     } else {
       formData.region = t('map.customDataPanel.messages.regionNotFound')
     }

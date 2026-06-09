@@ -12,3 +12,10 @@ export {
   submitCustomForm,
   deleteCustomForm
 } from './custom.js'
+
+export {
+  getUserPoints,
+  getUserFeatures,
+  getDataByPoint,
+  getDataByFeature
+} from './custom-entry.js'
