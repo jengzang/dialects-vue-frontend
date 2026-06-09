@@ -106,7 +106,7 @@ const ROUTE_QUERY_ALLOWLIST = {
       query: ['sub'],
       compare: ['sub'],
       result: [],
-      map: ['sub', 'feature', 'locations', 'regions', 'regionMode', 'openPanel'],
+      map: ['sub', 'feature', 'locations', 'regions', 'regionMode', 'openPanel', 'phonology'],
       pho: ['sub', 'loc', 'feature', 'h', 'v', 'c'],
       about: ['sub'],
       source: [],
@@ -243,7 +243,7 @@ const ROUTE_QUERY_ALLOWLIST = {
     base: []
   },
   '/menu/map/view': {
-    base: ['feature', 'locations', 'regions', 'regionMode', 'openPanel']
+    base: ['feature', 'locations', 'regions', 'regionMode', 'openPanel', 'phonology']
   },
   '/menu/map/divide': {
     base: []

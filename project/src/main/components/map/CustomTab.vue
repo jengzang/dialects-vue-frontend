@@ -1,11 +1,15 @@
 <template>
   <div class="custom-tab-container">
-    <div class="page-content-stack">
+    <div 
+      class="page-content-stack"
+      style="width: 98dvw;"
+    >
       <!-- Header Area -->
       <div class="page-footer">
         <h3 style="margin: 0">
           {{ t('map.customTab.title') }}
         </h3>
+
         <div class="header-actions">
           <button
             type="button"
@@ -15,13 +19,6 @@
             @click="openHelpModal"
           >
             {{ t('map.customTab.buttons.help') }}
-          </button>
-          <button
-            v-if="userStore.isAuthenticated"
-            class="action-btn add-entry-btn-sm"
-            @click="openEntryModal"
-          >
-            {{ t('map.customTab.buttons.addData') }}
           </button>
         </div>
       </div>
@@ -35,9 +32,11 @@
           <div class="auth-warning-icon">
             🔒
           </div>
+
           <p class="auth-warning-text">
             {{ t('map.customTab.validation.loginFirst') || '请先登录以查看 and 管理您的个人语料特征数据' }}
           </p>
+
           <button
             class="enter-btn"
             @click="handleLogin"
@@ -52,120 +51,142 @@
         v-else
         class="interactive-search-layout"
       >
-        <!-- Feature Search / Filtering -->
-        <div class="feature-search-section">
-          <div class="label-row">
-            <label
-              for="featureSearch"
-              class="query-label"
-            >
-              {{ t('map.customTab.labels.featureSearch') || '过滤特征' }}
-            </label>
-            <span
-              v-if="userTotalCount === 0"
-              class="data-count-badge hint"
-            >
-              {{ t('map.customTab.badges.noData') }}
-            </span>
-            <span
-              v-else
-              class="data-count-badge success"
-            >
-              {{ t('map.customTab.badges.dataCount', { count: userTotalCount }) }}
-            </span>
-          </div>
-          <div class="search-input-wrapper">
-            <span class="search-emoji-icon">🔍</span>
-            <input
-              id="featureSearch"
-              v-model="searchQuery"
-              type="text"
-              :placeholder="t('map.customTab.placeholders.featureSearch') || '输入特征或分类进行过滤...'"
-              class="feature-search-input"
-            >
-            <button 
-              v-if="searchQuery" 
-              class="clear-search-btn" 
-              type="button" 
-              @click="searchQuery = ''"
-            >
-              ×
-            </button>
-          </div>
+        <!-- Data status + add button -->
+        <div class="custom-toolbar">
+          <span
+            class="data-summary-badge"
+            :class="dataSummaryClass"
+          >
+            {{ dataSummaryText }}
+          </span>
+
+          <button
+            class="action-btn add-entry-btn-sm toolbar-add-entry-btn"
+            @click="openEntryModal"
+          >
+            {{ t('map.customTab.buttons.addData') }}
+          </button>
+        </div>
+        <div
+          class="floating-search"
+          :class="{ active: showFloatingSearchInput }"
+        >
+          <button
+            class="floating-search-toggle"
+            type="button"
+            :aria-label="t('map.customTab.labels.featureSearch') || '过滤特征'"
+            @click="openSearch"
+          >
+            🔍
+          </button>
+
+          <input
+            v-if="showFloatingSearchInput"
+            id="featureSearch"
+            ref="searchInputRef"
+            v-model="searchQuery"
+            type="text"
+            :placeholder="t('map.customTab.placeholders.featureSearch') || '输入特征或分类进行过滤...'"
+            class="floating-search-input"
+            @keydown.esc="closeSearch"
+          >
+
+          <button
+            v-if="showFloatingSearchInput"
+            class="floating-search-clear"
+            type="button"
+            :aria-label="t('common.button.close')"
+            @click="closeSearch"
+          >
+            ×
+          </button>
         </div>
 
-        <!-- Collapsible Tree Selector -->
-        <div class="tree-selector-container">
-          <div
-            v-if="loadingFeatures"
-            class="tree-loading-state"
-          >
-            <span class="spinner-icon">⏳</span> {{ t('customEntry.featureDetail.loading') || '加载特征列表中...' }}
-          </div>
-          <div
-            v-else-if="userFeatures.length === 0"
-            class="tree-empty-state"
-          >
-            <div class="empty-state-icon">
-              📂
-            </div>
-            <p class="empty-state-title">
-              {{ t('customEntry.featureList.emptyTitle') || '暂无个人特征数据' }}
-            </p>
-            <p class="empty-state-text">
-              {{ t('customEntry.featureList.emptyText') || '点击右上角“录入数据”开始记录吧！' }}
-            </p>
-            <button
-              class="action-btn primary-btn inline-btn"
-              @click="openEntryModal"
-            >
-              {{ t('map.customTab.buttons.addData') }}
-            </button>
-          </div>
-          <div
-            v-else-if="groupedFeatures.length === 0"
-            class="tree-empty-state"
-          >
-            <p class="empty-state-text">
-              {{ t('map.customTab.messages.noMatch') || '没有找到匹配的特征' }}
-            </p>
-          </div>
-          <div
-            v-else
-            class="tree-categories-list"
-          >
+        <!-- Tree panel with floating search -->
+        <div
+          class="tree-panel"
+          :class="{ 'search-open': showFloatingSearchInput }"
+        >
+          <!-- Collapsible Tree Selector -->
+          <div class="tree-selector-container">
             <div
-              v-for="group in groupedFeatures"
-              :key="group.category"
-              class="tree-category-node"
-              :class="{ collapsed: !expandedCategories[group.category] }"
+              v-if="loadingFeatures"
+              class="tree-loading-state"
             >
-              <button
-                class="category-header-btn"
-                type="button"
-                @click="toggleCategory(group.category)"
-              >
-                <span class="arrow-indicator">▶</span>
-                <span class="category-name">{{ group.category }}</span>
-                <span class="category-count-badge">{{ group.features.length }}</span>
-              </button>
+              <span class="spinner-icon">⏳</span>
+              {{ t('customEntry.featureDetail.loading') || '加载特征列表中...' }}
+            </div>
 
+            <div
+              v-else-if="userFeatures.length === 0"
+              class="tree-empty-state"
+            >
+              <div class="empty-state-icon">
+                📂
+              </div>
+
+              <p class="empty-state-title">
+                {{ t('customEntry.featureList.emptyTitle') || '暂无个人特征数据' }}
+              </p>
+
+              <p class="empty-state-text">
+                {{ t('customEntry.featureList.emptyText') || '点击右上角“录入数据”开始记录吧！' }}
+              </p>
+
+              <button
+                class="action-btn primary-btn inline-btn"
+                @click="openEntryModal"
+              >
+                {{ t('map.customTab.buttons.addData') }}
+              </button>
+            </div>
+
+            <div
+              v-else-if="groupedFeatures.length === 0"
+              class="tree-empty-state"
+            >
+              <p class="empty-state-text">
+                {{ t('map.customTab.messages.noMatch') || '没有找到匹配的特征' }}
+              </p>
+            </div>
+
+            <div
+              v-else
+              class="tree-categories-list"
+            >
               <div
-                v-show="expandedCategories[group.category]"
-                class="category-children-container"
+                v-for="group in groupedFeatures"
+                :key="group.category"
+                class="tree-category-node"
+                :class="{ collapsed: !expandedCategories[group.category] }"
               >
                 <button
-                  v-for="item in group.features"
-                  :key="item.feature_key || `${item['特徵']}-${item['聲韻調']}`"
-                  class="feature-leaf-node"
+                  class="category-header-btn"
                   type="button"
-                  @click="selectFeatureItem(item)"
+                  @click="toggleCategory(group.category)"
                 >
-                  <span class="feature-name">{{ item['特徵'] || item.feature }}</span>
-                  <span class="feature-count-badge">
-                    {{ t('customEntry.featureList.pointCount', { count: item.location_count || 0 }) }}
-                  </span>
+                  <span class="arrow-indicator">▶</span>
+                  <span class="category-name">{{ group.category }}</span>
+                  <span class="category-count-badge">{{ group.features.length }}</span>
                 </button>
+
+                <div
+                  v-show="expandedCategories[group.category]"
+                  class="category-children-container"
+                >
+                  <button
+                    v-for="item in group.features"
+                    :key="item.feature_key || `${item['特徵']}-${item['聲韻調']}`"
+                    class="feature-leaf-node"
+                    type="button"
+                    @click="selectFeatureItem(item)"
+                  >
+                    <span class="feature-name">{{ item['特徵'] || item.feature }}</span>
+                    <span class="feature-count-badge">
+                      {{ t('customEntry.featureList.pointCount', { count: item.location_count || 0 }) }}
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -182,42 +203,28 @@
           </button>
         </div>
       </div>
-
-      <!-- Divider / Usage Info Link -->
-      <div class="divider">
-        <span>{{ t('map.customTab.divider') }}</span>
-      </div>
-
-      <div class="help-trigger-wrapper">
-        <span
-          class="help-trigger"
-          @click="openHelpModal"
-        >
-          {{ t('map.customTab.helpTrigger') }}
-        </span>
-      </div>
     </div>
 
     <CustomDataEntryModal v-model="isEntryModalOpen" />
-    <!-- 帮助弹窗 -->
+
     <CustomTabHelpModal v-model="isHelpModalOpen" />
   </div>
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import CustomDataEntryModal from '@/main/components/map/custom-entry/CustomDataEntryModal.vue';
 import CustomTabHelpModal from '@/main/components/popup/map/CustomTabHelpModal.vue';
-import { getAllCustomData, getUserFeatures } from '@/api';
+import { getUserFeatures } from '@/api';
 import {
   userStore,
   resultCache,
   mapStore,
 } from '@/main/store/store.js';
-import { showSuccess, showWarning } from '@/utils/message.js';
+import { showSuccess, showWarning, showError } from '@/utils/message.js';
 
 const router = useRouter();
 const route = useRoute();
@@ -226,11 +233,40 @@ const { requireAuth } = useAuthGuard();
 
 const isHelpModalOpen = ref(false);
 const isEntryModalOpen = ref(false);
-const userTotalCount = ref(0);
+const isSearchOpen = ref(false);
+const searchInputRef = ref(null);
+
 const searchQuery = ref('');
 const userFeatures = ref([]);
 const loadingFeatures = ref(false);
 const expandedCategories = ref({});
+
+const uncategorizedLabel = computed(() => t('map.customTab.labels.uncategorized'));
+
+const userFeatureCount = computed(() => userFeatures.value.length);
+
+const userDataCount = computed(() => {
+  return userFeatures.value.reduce((sum, item) => {
+    return sum + Number(item.location_count || 0);
+  }, 0);
+});
+
+const dataSummaryText = computed(() => {
+  return t('map.customTab.badges.dataAndFeatureCount', {
+    dataCount: userDataCount.value,
+    featureCount: userFeatureCount.value,
+  });
+});
+
+const dataSummaryClass = computed(() => {
+  return userDataCount.value === 0 && userFeatureCount.value === 0
+    ? 'hint'
+    : 'success';
+});
+
+const showFloatingSearchInput = computed(() => {
+  return isSearchOpen.value || searchQuery.value.trim().length > 0;
+});
 
 const filteredFeatures = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
@@ -252,7 +288,7 @@ const groupedFeatures = computed(() => {
 
   filteredFeatures.value.forEach((item) => {
     const rawCategory = item['聲韻調'] || item.phonology || '';
-    const category = rawCategory || '未分类';
+    const category = rawCategory || uncategorizedLabel.value;
 
     if (!groupMap.has(category)) {
       groupMap.set(category, {
@@ -317,11 +353,25 @@ const groupedFeatures = computed(() => {
     .sort((a, b) => compareByCustomOrder(a.rawCategory, b.rawCategory));
 });
 
+const openSearch = async () => {
+  isSearchOpen.value = true;
+
+  await nextTick();
+
+  searchInputRef.value?.focus();
+};
+
+const closeSearch = () => {
+  searchQuery.value = '';
+  isSearchOpen.value = false;
+};
+
 const toggleCategory = (category) => {
   expandedCategories.value[category] = !expandedCategories.value[category];
 };
 
-const selectFeatureItem = (item) => {
+const selectFeatureItem = async (item) => {
+  // console.log('Selected feature item:', item);
   const featureName = item['特徵'] || item.feature || '';
   const phonology = item['聲韻調'] || item.phonology || '';
 
@@ -329,21 +379,32 @@ const selectFeatureItem = (item) => {
     return;
   }
 
-  mapStore.mergedData = [];
-  resultCache.latestResults = [];
-  mapStore.selectedFeature = '';
-  resultCache.features = [];
-  mapStore.mapData = null;
+  try {
+    mapStore.mergedData = [];
+    resultCache.latestResults = [];
+    mapStore.selectedFeature = featureName;
+    mapStore.selectedFeaturePhonology = phonology;
+    resultCache.features = [];
+    mapStore.mapData = null;
 
-  router.replace({
-    path: '/menu/map/view',
-    query: {
-      feature: featureName,
-      phonology,
-    },
-  });
+    const query = {
+      feature: featureName
+    };
 
-  showSuccess(t('map.customTab.messages.loading'));
+    if (phonology) {
+      query.phonology = phonology;
+    }
+    // console.log('Navigating with query:', query);
+    await router.replace({
+      path: '/menu/map/view',
+      query
+    });
+
+    showSuccess(t('map.customTab.messages.loading'));
+  } catch (error) {
+    console.error('跳转失败:', error);
+    showError(t('map.customTab.messages.searchFailed', { error: error.message || error }));
+  }
 };
 
 const goToDataManager = () => {
@@ -362,7 +423,6 @@ const goToDataManager = () => {
 const fetchUserFeatures = async () => {
   if (!userStore.isAuthenticated) {
     userFeatures.value = [];
-    userTotalCount.value = 0;
     return;
   }
 
@@ -372,14 +432,8 @@ const fetchUserFeatures = async () => {
     const response = await getUserFeatures();
     userFeatures.value = Array.isArray(response?.data) ? response.data : [];
 
-    const countResponse = await getAllCustomData();
-
-    if (Array.isArray(countResponse?.data)) {
-      userTotalCount.value = countResponse.data.length;
-    }
-
     userFeatures.value.forEach((item) => {
-      const category = item['聲韻調'] || item.phonology || '未分类';
+      const category = item['聲韻調'] || item.phonology || uncategorizedLabel.value;
 
       if (expandedCategories.value[category] === undefined) {
         expandedCategories.value[category] = true;
@@ -409,7 +463,8 @@ watch(
       fetchUserFeatures();
     } else {
       userFeatures.value = [];
-      userTotalCount.value = 0;
+      searchQuery.value = '';
+      isSearchOpen.value = false;
     }
   }
 );
@@ -422,10 +477,6 @@ watch(isEntryModalOpen, (isOpen) => {
 
 const openHelpModal = () => {
   isHelpModalOpen.value = true;
-};
-
-const closeHelpModal = () => {
-  isHelpModalOpen.value = false;
 };
 
 const handleLogin = () => {
@@ -446,6 +497,27 @@ $text-muted: #64748b;
 $text-light: #94a3b8;
 $glass-white: rgba(255, 255, 255, 0.45);
 $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+.custom-tab-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.page-content-stack {
+  width: min(100%, 920px);
+  min-width: 0;
+  align-items: stretch;
+}
+
+.page-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 12px;
+}
 
 .header-actions {
   display: flex;
@@ -490,7 +562,7 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .add-entry-btn-sm {
-  padding: 6px 14px;
+  padding: 10px 20px;
   border: none;
   border-radius: 20px;
   background: linear-gradient(
@@ -499,7 +571,7 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     rgba(0, 81, 213, 0.9)
   );
   color: #fff;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2);
@@ -617,98 +689,36 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 .interactive-search-layout {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  align-self: stretch;
+  gap: 12px;
   width: 100%;
+  min-width: 0;
   margin-top: 15px;
 }
 
-.feature-search-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-
-.label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-  padding: 0 4px;
-}
-
-.query-label {
-  margin-bottom: 0;
-  color: #333;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.search-input-wrapper {
-  position: relative;
+.custom-toolbar {
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 12px;
   width: 100%;
-}
-
-.search-emoji-icon {
-  position: absolute;
-  left: 14px;
-  color: $text-light;
-  font-size: 15px;
-  pointer-events: none;
-}
-
-.feature-search-input {
-  width: 100%;
-  padding: 11px 40px 11px 38px;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.75);
-  color: #0f172a;
-  font-size: 14px;
-  outline: none;
+  min-width: 0;
+  padding: 4px 2px;
   box-sizing: border-box;
-  transition: $motion;
-
-  &:focus {
-    border-color: rgba(0, 122, 255, 0.55);
-    background: #fff;
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
-  }
 }
 
-.clear-search-btn {
-  position: absolute;
-  right: 12px;
-  padding: 4px;
-  border: none;
-  background: none;
-  color: $text-light;
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-  transition: color 0.15s;
-
-  &:hover {
-    color: $text-secondary;
-  }
-}
-
-.data-count-badge {
-  padding: 2.5px 8px;
+.data-summary-badge {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  padding: 5px 12px;
   border: 1px solid transparent;
-  border-radius: 20px;
-  font-size: 11px;
+  border-radius: 999px;
+  font-size: 12px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.35;
+  white-space: nowrap;
   transition: all 0.3s ease;
-
-  &.warning {
-    border-color: rgba(255, 149, 0, 0.2);
-    background: rgba(255, 149, 0, 0.1);
-    color: #ff9500;
-  }
 
   &.hint {
     border-color: rgba(142, 142, 147, 0.2);
@@ -723,10 +733,100 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
+.toolbar-add-entry-btn {
+  flex: 0 0 auto;
+}
+
+.tree-panel {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
+}
+
+.floating-search {
+  position:fixed;
+  top: 12dvh;
+  left: 12px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow:
+    0 8px 22px rgba(0, 122, 255, 0.12),
+    inset 0 0 0.5px rgba(255, 255, 255, 0.55);
+  transition:
+    width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &.active {
+    width: min(320px, calc(100% - 24px));
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow:
+      0 10px 26px rgba(0, 122, 255, 0.16),
+      inset 0 0 0.5px rgba(255, 255, 255, 0.65);
+  }
+}
+
+.floating-search-toggle {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: $primary-blue;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.floating-search-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 8px 0 0;
+  border: none;
+  background: transparent;
+  color: #0f172a;
+  font-size: 13px;
+  outline: none;
+
+  &::placeholder {
+    color: rgba(100, 116, 139, 0.72);
+  }
+}
+
+.floating-search-clear {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: $text-light;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s;
+
+  &:hover {
+    color: $text-secondary;
+  }
+}
+
 .tree-selector-container {
   width: 100%;
+  min-width: 0;
   min-height: 220px;
-  max-height: 480px;
   padding: 12px;
   overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, 0.4);
@@ -744,7 +844,7 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  min-height: 160px;
   padding: 30px 10px;
   color: $text-muted;
   font-size: 14px;
@@ -800,6 +900,9 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tree-category-node {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 12px;
@@ -935,74 +1038,55 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-.divider {
-  position: relative;
-  margin: 40px 0 12px;
-  text-align: center;
-
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 35%;
-    height: 1px;
-    background: linear-gradient(to right, transparent, #7c7575, transparent);
-  }
-
-  &::before {
-    left: 0;
-  }
-
-  &::after {
-    right: 0;
-  }
-
-  span {
-    position: relative;
-    z-index: 1;
-    display: inline-block;
-    padding: 0 12px;
-    color: #353535;
-    font-size: 17px;
-    font-weight: 700;
-  }
-}
-
-.help-trigger-wrapper {
-  margin: 12px 0;
-  text-align: center;
-}
-
-.help-trigger {
-  color: $primary-blue;
-  font-size: 13px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: opacity 0.2s;
-
-  &:hover {
-    opacity: 0.7;
-    text-decoration: underline;
-  }
-}
-
 @media (max-aspect-ratio: 1/1) {
-  .button-group {
+  .page-content-stack {
+    width: 100%;
+  }
+
+  .page-footer {
+    align-items: flex-start;
+  }
+
+  .custom-toolbar {
+    gap: 8px;
+  }
+
+  .data-summary-badge {
+    white-space: normal;
+  }
+
+  .toolbar-add-entry-btn {
+    flex: 0 0 auto;
+    padding-inline: 12px;
+  }
+
+  .tree-panel {
+    display: flex;
     flex-direction: column;
     gap: 10px;
   }
 
+  .floating-search {
+    top: 20dvh;
+    left: auto;
+
+    &.active {
+      width: 80%;
+    }
+  }
+
+  .tree-selector-container {
+    padding: 12px;
+  }
+
+  .category-children-container {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  }
+
   .action-btn {
-    width: 90%;
-  }
-
-  .feature-search-container {
-    max-width: 90%;
-  }
-
-  .label-row {
-    flex-direction: row;
+    max-width: 100%;
   }
 }
+
+
 </style>

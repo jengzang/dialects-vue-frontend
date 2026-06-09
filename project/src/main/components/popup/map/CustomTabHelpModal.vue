@@ -257,8 +257,8 @@
 
         <ul class="help-list help-list--daily">
           <li>
-            📁 <strong>「分區」即文件夾：</strong>比如填入
-            <code>我的探店地圖</code>（「聲韻調」可留空）。
+            📁 <strong>「聲韻調/類別」即文件夾：</strong>比如填入
+            <code>我的探店地圖</code>。
           </li>
           <li>
             🏷️ <strong>「特徵」即分類：</strong>比如填入

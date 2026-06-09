@@ -113,6 +113,9 @@ const route = useRoute()
 const { state: routeFeature } = useRouteQueryState('feature', {
   defaultValue: '',
 })
+const { state: routePhonology } = useRouteQueryState('phonology', {
+  defaultValue: '',
+})
 
 // 地圖點擊坐標
 const mapClickCoordinates = ref(null)
@@ -226,53 +229,54 @@ const selectFeature = (val) => {
 
 // 监听路由参数，自动加载自定义特征
 watch(
-  () => routeFeature.value,
-  async (newFeature, oldFeature) => {
-    // 防止重复触发
-    if (!newFeature || newFeature === oldFeature) return
-    if (!isMapRoute.value) return
+  () => ({
+    feature: route.query.feature || '',
+    phonology: route.query.phonology || ''
+  }),
+  async ({ feature, phonology }, oldVal) => {
+    if (!feature) return;
+    if (!isMapRoute.value) return;
+    if (currentTab.value !== 'map') return;
 
-    // 只在 map tab 中触发
-    if (currentTab.value !== 'map') return
+    // 防止完全相同参数重复触发
+    if (
+      oldVal &&
+      feature === oldVal.feature &&
+      phonology === oldVal.phonology
+    ) {
+      return;
+    }
 
     try {
-      // 提取路由参数
-      const locations = route.query.locations?.split(',').filter(Boolean) || []
-      const regions = route.query.regions?.split(',').filter(Boolean) || []
-      const regionMode = route.query.regionMode || 'map'
+      console.log('test', { feature, phonology });
+      await addCustomFeatureData(feature, phonology);
 
-      // 调用 addCustomFeatureData 加载数据
-      await addCustomFeatureData([newFeature], locations, regions, regionMode)
+      selectedFeature.value = feature;
+      mapStore.selectedFeature = feature;
+      mapStore.selectedFeaturePhonology = phonology;
 
-      // 自动选中该特征
-      selectedFeature.value = newFeature
-      mapStore.selectedFeature = newFeature
+      mapStore.showCustomData = true;
+      mapStore.mode = 'feature';
 
-      // 自动开启自定义数据显示
-      mapStore.showCustomData = true
+      showSuccess(t('map.messages.featureLoaded', { feature }));
 
-      // 自动切换到 feature 模式（关闭"查看地名"开关）
-      mapStore.mode = 'feature'
-
-      showSuccess(t('map.messages.featureLoaded', { feature: newFeature }))
-
-      // 清除路由参数（避免刷新重复加载）
       await router.replace({
         query: {
           ...route.query,
           feature: undefined,
+          phonology: undefined,
           locations: undefined,
           regions: undefined,
           regionMode: undefined
         }
-      })
+      });
     } catch (error) {
-      console.error(t('map.messages.featureLoadFailed'), error)
-      showError(t('map.messages.loadFeatureFailed', { error: error.message || error }))
+      console.error(t('map.messages.featureLoadFailed'), error);
+      showError(t('map.messages.loadFeatureFailed', { error: error.message || error }));
     }
   },
-  { immediate: true } // 立即执行一次，检查初始路由参数
-)
+  { immediate: true }
+);
 
 const resolveTabRoute = (tabName) => {
   const sub = tabToRouteSub[tabName] || 'view'
