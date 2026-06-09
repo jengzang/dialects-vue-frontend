@@ -1,8 +1,9 @@
 {
   "tabs": {
-    "tab1": "Compare Characters",
-    "tab2": "Compare Positions",
-    "tab4": "Compare Tone Classes"
+    "tab1": "Characters",
+    "tab2": "Middle Chinese",
+    "tab4": "Tone Classes",
+    "tab5": "Phonetic Values"
   },
   "group": {
     "label1": "Group 1",
@@ -37,7 +38,8 @@
     "selectTwoToneClasses": "Please select two tone classes",
     "tab1Hint": "Compare how the same character is pronounced across locations.",
     "tab2Hint": "Compare how the same Middle Chinese position develops across locations.",
-    "tab4Hint": "Compare whether two tone classes merge or stay distinct across locations."
+    "tab4Hint": "Compare whether two tone classes merge or stay distinct across locations.",
+    "tab5Hint": "Compare the phonetic value correspondence of the selected locations (2 to 5 locations)."
   },
   "cards": {
     "initial": "Initial",
@@ -80,5 +82,11 @@
   },
   "results": {
     "noMainReading": "No main reading"
+  },
+  "sankeyControls": {
+    "title": "Sankey Options",
+    "optimizeLinks": "Optimize links",
+    "minLinkCharCount": "Min. link characters",
+    "minNodeCharCount": "Min. node characters"
   }
 }

@@ -668,7 +668,7 @@ document.getElementById('dice-button').addEventListener('click', () => {
 // 檢查用戶登錄狀態
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const res = await api('/auth/me');
+        const res = await api('/api/auth/me');
         const isLoggedIn = res && res.id && res.username;
         updateLoginUI(isLoggedIn, res?.username);
     } catch (err) {

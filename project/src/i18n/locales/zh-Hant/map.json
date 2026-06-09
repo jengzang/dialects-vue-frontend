@@ -25,7 +25,7 @@
       "location": "地點簡稱",
       "region": "分區",
       "coordinates": "座標",
-      "featureType": "聲韻調 / 類別",
+      "featureType": "類別",
       "featureField": "當前查詢特徵",
       "value": "值",
       "description": "說明"
@@ -89,10 +89,11 @@
     }
   },
   "customTab": {
-    "title": "搜尋自定義特徵",
+    "title": "用戶自定義資料編輯與搜尋",
     "labels": {
       "featureSearch": "特徵搜尋",
-      "login": "登入"
+      "login": "登入",
+      "uncategorized": "未分類"
     },
     "placeholders": {
       "featureSearch": "輸入特徵關鍵詞..."
@@ -100,7 +101,8 @@
     "badges": {
       "loginRequired": "登入後才能管理個人資料",
       "noData": "尚未建立個人資料，請先新增",
-      "dataCount": "你目前有 {count} 筆個人資料"
+      "dataCount": "你目前有 {count} 筆個人資料",
+      "dataAndFeatureCount": "已有 {dataCount} 條數據，{featureCount} 個比較特徵"
     },
     "selected": "已選特徵：{feature}",
     "buttons": {
@@ -108,6 +110,7 @@
       "running": "查詢中...",
       "addSingle": "逐條新增",
       "addBatch": "批量新增",
+      "addData": "添加數據",
       "help": "說明"
     },
     "divider": "新增自定義資料",
@@ -127,7 +130,7 @@
       "fetchCountFailed": "取得個人資料筆數失敗"
     },
     "helpModal": {
-      "title": "自定義資料使用說明",
+      "title": "自定義資料使用說明（旧版未更新，可能有问题）",
       "sections": {
         "overview": {
           "title": "先理解這個區塊",
@@ -163,7 +166,7 @@
             },
             "region": {
               "label": "分區：",
-              "text": "你的資料集範圍或名稱，例如「粵語-高陽片」或「2025田調」。"
+              "text": "地點所屬的方言分區，可以填你的自定義分區"
             }
           },
           "examples": {
@@ -177,11 +180,11 @@
           "items": {
             "region": {
               "label": "分區：",
-              "text": "把它當成資料夾名稱，例如「2025田調」。"
+              "text": "地點所屬的分區，可以填你自定義的分區"
             },
             "featureType": {
               "label": "聲韻調 / 類別：",
-              "text": "可留空；若想粗略分類，也可填「詞彙」等大類。"
+              "text": "用於分類，可填「詞彙」、「2026田調」等分類。"
             },
             "feature": {
               "label": "特徵：",
@@ -190,6 +193,10 @@
             "value": {
               "label": "值：",
               "text": "把它當成地圖標籤，例如「從日」、「嬲」或「ei」。"
+            },
+            "manage": {
+              "label": "管理我的所有自定義資料",
+              "text": "管理、編輯、刪除和搜尋你已提交的所有個人自定義資料。"
             }
           },
           "notes": {
@@ -207,7 +214,7 @@
           },
           "cards": {
             "region": {
-              "label": "分區 (Region)",
+              "label": "聲韻調/類別",
               "text": "相當於資料夾名稱",
               "example": "例：我的美食地圖"
             },
@@ -227,7 +234,7 @@
               "example": "例：好吃 / 燒烤"
             }
           },
-          "result": "例如把分區填成「我的美食地圖」，再搜尋特徵「評價」，地圖上就會在各店名位置顯示你填入的評語。"
+          "result": "例如把類別填成「我的美食地圖」，再搜尋特徵「評價」，地圖上就會在各店名位置顯示你填入的評語。"
         },
         "steps": {
           "title": "新增資料步驟",

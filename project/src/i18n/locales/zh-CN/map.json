@@ -25,7 +25,7 @@
       "location": "地点简称",
       "region": "分区",
       "coordinates": "坐标",
-      "featureType": "声韵调 / 类别",
+      "featureType": "类别",
       "featureField": "当前查询特征",
       "value": "值",
       "description": "说明"
@@ -89,10 +89,11 @@
     }
   },
   "customTab": {
-    "title": "搜索自定义特征",
+    "title": "用户自定义数据编辑与搜索",
     "labels": {
       "featureSearch": "特征搜索",
-      "login": "登录"
+      "login": "登录",
+      "uncategorized": "未分类"
     },
     "placeholders": {
       "featureSearch": "输入特征关键词..."
@@ -100,7 +101,8 @@
     "badges": {
       "loginRequired": "登录后才能管理个人数据",
       "noData": "尚未建立个人数据，请先新增",
-      "dataCount": "你目前有 {count} 条个人数据"
+      "dataCount": "你目前有 {count} 条个人数据",
+      "dataAndFeatureCount": "已有 {dataCount} 条数据，{featureCount} 个比较特征"
     },
     "selected": "已选特征：{feature}",
     "buttons": {
@@ -108,6 +110,7 @@
       "running": "查询中...",
       "addSingle": "逐条新增",
       "addBatch": "批量新增",
+      "addData": "添加数据",
       "help": "说明"
     },
     "divider": "新增自定义数据",
@@ -127,7 +130,7 @@
       "fetchCountFailed": "获取个人数据条数失败"
     },
     "helpModal": {
-      "title": "自定义数据使用说明",
+      "title": "自定义数据使用说明（旧版未更新，可能有问题）",
       "sections": {
         "overview": {
           "title": "先理解这个区块",
@@ -163,7 +166,7 @@
             },
             "region": {
               "label": "分区：",
-              "text": "你的数据集范围或名称，例如「粤语-高阳片」或「2025田调」。"
+              "text": "地点所属的分区，可以填你的自定义分区"
             }
           },
           "examples": {
@@ -177,11 +180,11 @@
           "items": {
             "region": {
               "label": "分区：",
-              "text": "把它当成文件夹名称，例如「2025田调」。"
+              "text": "地点所属的分区，可以填你自定义的分区"
             },
             "featureType": {
               "label": "声韵调 / 类别：",
-              "text": "可留空；若想粗略分类，也可填「词汇」等大类。"
+              "text": "用于分类，可填「词汇」、「2026田调」等分类。"
             },
             "feature": {
               "label": "特征：",
@@ -190,6 +193,10 @@
             "value": {
               "label": "值：",
               "text": "把它当成地图标签，例如「从日」、「嬲」或「ei」。"
+            },
+            "manage": {
+              "label": "管理我的所有自定义数据",
+              "text": "管理、编辑、删除和搜索你已提交的所有个人自定义数据。"
             }
           },
           "notes": {
@@ -207,7 +214,7 @@
           },
           "cards": {
             "region": {
-              "label": "分区 (Region)",
+              "label": "声韵调/类别",
               "text": "相当于文件夹名称",
               "example": "例：我的美食地图"
             },
@@ -227,7 +234,7 @@
               "example": "例：好吃 / 烧烤"
             }
           },
-          "result": "例如把分区填成「我的美食地图」，再搜索特征「评价」，地图上就会在各店名位置显示你填入的评语。"
+          "result": "例如把类别填成「我的美食地图」，再搜索特征「评价」，地图上就会在各店名位置显示你填入的评语。"
         },
         "steps": {
           "title": "新增数据步骤",

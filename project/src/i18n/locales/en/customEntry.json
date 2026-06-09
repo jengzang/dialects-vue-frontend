@@ -1,0 +1,169 @@
+{
+  "common": {
+    "saving": "Saving..."
+  },
+  "modal": {
+    "title": "Custom data entry",
+    "subtitle": "Focused on adding and maintaining user-defined data while preserving legacy personal data management and sidebar single-entry workflows.",
+    "modeGroupLabel": "Entry mode",
+    "close": "Close",
+    "devNotice": "Under Development & Testing",
+    "modes": {
+      "point": "By Survey Point",
+      "feature": "By Dialect Feature"
+    }
+  },
+  "pointList": {
+    "title": "By Survey Point",
+    "description": "Choose an existing dialect point, or create a new one to start adding data.",
+    "searchPlaceholder": "Search by short name or region",
+    "create": "+ Add dialect point",
+    "loadFailed": "Failed to load dialect points",
+    "retry": "Retry",
+    "emptyTitle": "No dialect points yet",
+    "emptyText": "Click \"Add dialect point\" to create your first custom location.",
+    "unnamed": "Unnamed dialect point",
+    "unregioned": "Unassigned region",
+    "recordCount": "{count} records added",
+    "userPointBadge": "Custom Location",
+    "publicPointBadge": "Archive Location"
+  },
+  "pointDetail": {
+    "back": "Back",
+    "modalTitle": "Point Features: {name}",
+    "regionModalTitle": "Region Features: {name}",
+    "createTitle": "Add dialect point",
+    "createDescription": "Confirm the location and coordinates first, then add multiple feature records.",
+    "editDescription": "Add records for the current dialect point.",
+    "labels": {
+      "location": "Short name",
+      "region": "region",
+      "coord": "Coordinates"
+    },
+    "placeholders": {
+      "location": "Enter dialect point short name",
+      "region": "Enter region",
+      "coord": "Filled automatically after clicking the map",
+      "phonology": "e.g. Final",
+      "feature": "e.g. Liu she",
+      "value": "e.g. eu",
+      "note": "Optional note"
+    },
+    "rows": {
+      "title": "Feature records",
+      "description": "Each row represents one custom record ready to submit.",
+      "add": "+ Add row",
+      "duplicateWarning": "A record with the same category and comparative feature already exists for this point. Continue saving?",
+      "headers": {
+        "phonology": "Category",
+        "feature": "Comparative Feature",
+        "value": "Representation",
+        "note": "Note",
+        "action": "Action"
+      },
+      "remove": "Delete"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "map": {
+      "pickTitle": "Click the map to choose coordinates",
+      "previewTitle": "Current dialect point location",
+      "pickHint": "Click the map to choose coordinates",
+      "previewHint": "Current point preview",
+      "currentPoint": "Current point"
+    },
+    "messages": {
+      "loadFailed": "Failed to load point details",
+      "locationRegionRequired": "Please fill in the dialect point name and region first",
+      "coordRequired": "Please choose coordinates on the map first",
+      "rowRequired": "Please fill in at least one comparative feature and representation",
+      "confirmContinue": "Continue saving",
+      "noChanges": "There are no changes to submit",
+      "partialFailed": "{count} items failed to save, please retry",
+      "saveSuccess": "Saved successfully"
+    }
+  },
+  "featureList": {
+    "title": "By Dialect Feature",
+    "description": "Select or create a dialect feature, then gradually add dialect points to draw a geolinguistic comparison map.",
+    "searchPlaceholder": "Search by comparative feature or category",
+    "create": "+ Add feature",
+    "loadFailed": "Failed to load feature list",
+    "retry": "Retry",
+    "emptyTitle": "No feature data yet",
+    "emptyText": "Click \"Add feature\" to create your first feature distribution entry.",
+    "unnamed": "Unnamed feature",
+    "uncategorized": "Uncategorized",
+    "pointCount": "{count} dialect points added"
+  },
+  "featureDetail": {
+    "back": "Back",
+    "modalTitle": "Feature Distribution: {feature} ({phonology})",
+    "description": "Draw geolinguistic feature comparison maps for multiple dialect points.",
+    "createRecord": "+ Add location record",
+    "loading": "Loading feature details…",
+    "retry": "Retry",
+    "empty": "No location records yet. Click the top-right button to add one.",
+    "headers": {
+      "location": "Location",
+      "region": "Region",
+      "coord": "Coordinates",
+      "value": "Representation",
+      "note": "Note",
+      "action": "Action"
+    },
+    "emptyNote": "—",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "confirmDelete": "Delete this location record?",
+    "mapTitle": "Current feature distribution",
+    "mapHint": "Feature distribution preview",
+    "unnamed": "Unnamed feature",
+    "uncategorized": "Uncategorized",
+    "loadFailed": "Failed to load feature details"
+  },
+  "featureRecord": {
+    "createTitle": "Add location record",
+    "editTitle": "Edit location record",
+    "close": "Close",
+    "labels": {
+      "location": "Location",
+      "region": "Region",
+      "coord": "Coordinates",
+      "value": "Representation",
+      "note": "Note",
+      "quickSelect": "Quick Select"
+    },
+    "placeholders": {
+      "location": "Enter location name",
+      "region": "Enter region",
+      "coord": "Filled automatically after clicking the map",
+      "value": "Enter representation",
+      "note": "Optional note"
+    },
+    "mapHint": "Click the map to choose coordinates",
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save this row"
+    },
+    "messages": {
+      "locationRegionRequired": "Please fill in the location and region first",
+      "coordRequired": "Please choose coordinates first",
+      "valueRequired": "Please fill in the representation first",
+      "featureRequired": "The current comparative feature is empty. Please go back and select it again",
+      "duplicateLocation": "A record with the same location and region already exists under this comparative feature. Continue saving?",
+      "coordinateSynced": "Automatically synced existing coordinates for this location to prevent conflict"
+    }
+  },
+  "miniMap": {
+    "defaultHint": "Click the map to choose coordinates"
+  },
+  "mode": {
+    "pointLoadFailed": "Failed to load dialect point list",
+    "featureLoadFailed": "Failed to load feature list"
+  }
+}

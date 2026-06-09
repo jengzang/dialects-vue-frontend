@@ -8,63 +8,81 @@
     <!-- Tab 右侧额外内容 -->
     <template #tab-extra>
       <!-- 比较模式：显示比较对象 -->
-      <div v-if="currentTab === 'map' && mapStore.mode === 'compare' && comparePair" class="single-btn-wrapper">
+      <div
+        v-if="currentTab === 'map' && mapStore.mode === 'compare' && comparePair"
+        class="single-btn-wrapper"
+      >
         <button class="feature-btn active">
           {{ comparePair }}
         </button>
       </div>
 
       <!-- Feature 模式：显示特征选择 -->
-      <div v-else-if="currentTab === 'map' && mapStore.mode === 'feature' && availableFeatures.length > 0" class="feature-control-area">
-        <div v-if="availableFeatures.length > 1" class="dropdown-wrapper">
+      <div
+        v-else-if="currentTab === 'map' && mapStore.mode === 'feature' && availableFeatures.length > 0"
+        class="feature-control-area"
+      >
+        <div
+          v-if="availableFeatures.length > 1"
+          class="dropdown-wrapper"
+        >
           <SimpleSelectDropdown
             v-model="selectedFeature"
             :options="featureOptions"
             :placeholder="t('map.placeholder.selectFeature')"
           />
         </div>
-        <div v-else-if="availableFeatures.length === 1" class="single-btn-wrapper">
-          <button class="feature-btn active" @click="selectFeature(availableFeatures[0])">
+        <div
+          v-else-if="availableFeatures.length === 1"
+          class="single-btn-wrapper"
+        >
+          <button
+            class="feature-btn active"
+            @click="selectFeature(availableFeatures[0])"
+          >
             {{ availableFeatures[0] }}
           </button>
         </div>
 
         <!-- 幫助圖標 -->
         <HelpIcon
-            :content="helpText"
-            size="sm"
-            placement="bottom"
-            icon="?"
-            icon-color="#007aff"
-            style="margin-left: 5px;"
+          :content="helpText"
+          size="sm"
+          placement="bottom"
+          icon="?"
+          icon-color="#007aff"
+          style="margin-left: 5px;"
         />
       </div>
     </template>
 
     <!-- Tab 内容 -->
-    <template #default="{ currentTab }">
-      <div class="tab-content" style="justify-items: center; position: relative;">
+    <template #default="{ currentTab: activeTab }">
+      <div
+        class="tab-content"
+        style="justify-items: center; position: relative;"
+      >
         <!-- 使用 v-show 代替 v-if，保持组件状态 -->
         <MapLibre
-            v-show="currentTab === 'map'"
-            :active-feature="selectedFeature"
-            :is-custom="true"
-            :dot-level="selectedLevel"
-            @map-click="handleMapClick"
+          v-show="activeTab === 'map'"
+          :active-feature="selectedFeature"
+          :is-custom="true"
+          :dot-level="selectedLevel"
+          @map-click="handleMapClick"
         />
         <DivideTab
-            v-show="currentTab === 'divide'"
-            @region-selected="(val) => selectedLevel = val"
+          v-show="activeTab === 'divide'"
+          @region-selected="(val) => selectedLevel = val"
         />
         <CustomTab
-            v-show="currentTab === 'custom'"
+          v-show="activeTab === 'custom'"
         />
         <!-- 自定義數據提交面板（只在 map tab 顯示） -->
         <CustomDataPanel
-            v-if="currentTab === 'map'"
-            :map-click-coordinates="mapClickCoordinates"
-            :selected-feature="selectedFeature"
-            @submit-success="handleSubmitSuccess"
+          v-if="activeTab === 'map'"
+          :map-click-coordinates="mapClickCoordinates"
+          :selected-feature="selectedFeature"
+          @submit-success="handleSubmitSuccess"
         />
       </div>
     </template>
@@ -93,6 +111,9 @@ const selectedLevel = ref(3)
 const router = useRouter()
 const route = useRoute()
 const { state: routeFeature } = useRouteQueryState('feature', {
+  defaultValue: '',
+})
+const { state: routePhonology } = useRouteQueryState('phonology', {
   defaultValue: '',
 })
 
@@ -208,53 +229,54 @@ const selectFeature = (val) => {
 
 // 监听路由参数，自动加载自定义特征
 watch(
-  () => routeFeature.value,
-  async (newFeature, oldFeature) => {
-    // 防止重复触发
-    if (!newFeature || newFeature === oldFeature) return
-    if (!isMapRoute.value) return
+  () => ({
+    feature: route.query.feature || '',
+    phonology: route.query.phonology || ''
+  }),
+  async ({ feature, phonology }, oldVal) => {
+    if (!feature) return;
+    if (!isMapRoute.value) return;
+    if (currentTab.value !== 'map') return;
 
-    // 只在 map tab 中触发
-    if (currentTab.value !== 'map') return
+    // 防止完全相同参数重复触发
+    if (
+      oldVal &&
+      feature === oldVal.feature &&
+      phonology === oldVal.phonology
+    ) {
+      return;
+    }
 
     try {
-      // 提取路由参数
-      const locations = route.query.locations?.split(',').filter(Boolean) || []
-      const regions = route.query.regions?.split(',').filter(Boolean) || []
-      const regionMode = route.query.regionMode || 'map'
+      console.log('test', { feature, phonology });
+      await addCustomFeatureData(feature, phonology);
 
-      // 调用 addCustomFeatureData 加载数据
-      await addCustomFeatureData([newFeature], locations, regions, regionMode)
+      selectedFeature.value = feature;
+      mapStore.selectedFeature = feature;
+      mapStore.selectedFeaturePhonology = phonology;
 
-      // 自动选中该特征
-      selectedFeature.value = newFeature
-      mapStore.selectedFeature = newFeature
+      mapStore.showCustomData = true;
+      mapStore.mode = 'feature';
 
-      // 自动开启自定义数据显示
-      mapStore.showCustomData = true
+      showSuccess(t('map.messages.featureLoaded', { feature }));
 
-      // 自动切换到 feature 模式（关闭"查看地名"开关）
-      mapStore.mode = 'feature'
-
-      showSuccess(t('map.messages.featureLoaded', { feature: newFeature }))
-
-      // 清除路由参数（避免刷新重复加载）
       await router.replace({
         query: {
           ...route.query,
           feature: undefined,
+          phonology: undefined,
           locations: undefined,
           regions: undefined,
           regionMode: undefined
         }
-      })
+      });
     } catch (error) {
-      console.error(t('map.messages.featureLoadFailed'), error)
-      showError(t('map.messages.loadFeatureFailed', { error: error.message || error }))
+      console.error(t('map.messages.featureLoadFailed'), error);
+      showError(t('map.messages.loadFeatureFailed', { error: error.message || error }));
     }
   },
-  { immediate: true } // 立即执行一次，检查初始路由参数
-)
+  { immediate: true }
+);
 
 const resolveTabRoute = (tabName) => {
   const sub = tabToRouteSub[tabName] || 'view'
@@ -352,3 +374,4 @@ const resolveTabRoute = (tabName) => {
   border-color: var(--color-primary);
 }
 </style>
+

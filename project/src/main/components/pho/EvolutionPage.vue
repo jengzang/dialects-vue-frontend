@@ -79,6 +79,8 @@
           <LocationMultiInput
             v-model="selectedLocations"
             :max-locations="PHONOLOGY_LOCATION_LIMITS.evolution"
+            @update:matched-locations="handleMatchedLocations"
+            @update:is-matching="handleIsMatching"
             class="control-input"
           />
           <div class="input-hint">{{ t('phonology.phonology.evolution.controls.locationHint') }}</div>
@@ -89,7 +91,7 @@
       <div class="control-row control-row--query">
         <button
           @click="handleQuery"
-          :disabled="isLoading || !canQuery"
+          :disabled="isLoading || isMatching || !canQuery"
           class="query-button"
         >
           {{ isLoading ? t('phonology.phonology.evolution.controls.loading') : t('phonology.phonology.evolution.controls.query') }}
@@ -253,10 +255,12 @@ const selectedTable = ref('characters')
 const level1Column = ref('')
 const level2Column = ref('')
 const selectedLocations = ref([])
+const matchedLocations = ref([])
 const showSankey = ref(false)
 
 // 查询状态
 const isLoading = ref(false)
+const isMatching = ref(false)
 const errorMessage = ref('')
 const rawData = ref(null)
 const hasQueriedRealData = ref(false)
@@ -318,7 +322,7 @@ const showMobilePieDetailCard = computed(() => {
 })
 
 const canQuery = computed(() => {
-  return selectedLocations.value.length > 0 &&
+  return matchedLocations.value.length > 0 &&
          level1Column.value &&
          level2Column.value &&
          level1Column.value !== level2Column.value
@@ -362,9 +366,18 @@ const getDemoData = () => (queryMode.value === 'by_value' ? evolutionDemoByValue
 
 const syncControlsFromData = (data) => {
   selectedLocations.value = Array.isArray(data.locations) ? [...data.locations] : []
+  matchedLocations.value = Array.isArray(data.locations) ? [...data.locations] : []
   selectedTable.value = data.table_name || 'characters'
   level1Column.value = data.level1_column || ''
   level2Column.value = data.level2_column || ''
+}
+
+const handleMatchedLocations = (locations) => {
+  matchedLocations.value = locations
+}
+
+const handleIsMatching = (matching) => {
+  isMatching.value = matching
 }
 
 const getInitialFeature = (data) => {
@@ -392,11 +405,11 @@ const handleQuery = async () => {
     return
   }
 
-  if (!selectedLocations.value.length) {
+  if (!matchedLocations.value.length) {
     errorMessage.value = t('phonology.phonology.evolution.errors.minLocation')
     return
   }
-  if (selectedLocations.value.length > 1) {
+  if (matchedLocations.value.length > 1) {
     errorMessage.value = t('phonology.phonology.evolution.errors.maxLocation')
     return
   }
@@ -411,10 +424,11 @@ const handleQuery = async () => {
 
   isLoading.value = true
   errorMessage.value = ''
+  let shouldRefreshVisualization = false
 
   try {
     const params = {
-      locations: selectedLocations.value,
+      locations: matchedLocations.value,
       level1_column: level1Column.value,
       level2_column: level2Column.value,
       table_name: selectedTable.value
@@ -429,15 +443,17 @@ const handleQuery = async () => {
     hasQueriedRealData.value = true
     closeMobilePieDetail()
     currentFeature.value = getInitialFeature(response)
-
-    await nextTick()
-    updateContainerSize()
-    await renderCurrentVisualization()
+    shouldRefreshVisualization = true
   } catch (error) {
     errorMessage.value = error.message || t('phonology.phonology.evolution.errors.queryFailed')
     console.error('Query error:', error)
   } finally {
     isLoading.value = false
+    if (shouldRefreshVisualization) {
+      await nextTick()
+      updateContainerSize()
+      await renderCurrentVisualization()
+    }
   }
 }
 
@@ -668,15 +684,17 @@ const initPieChart = (container, pieData, index) => {
   // 绑定点击：钉住卡片 (注意传 index)
   chart.on('click', (params) => handleInteraction(index, params, true))
 
-  // 绑定悬浮：展示卡片 (注意传 index)
-  chart.on('mouseover', (params) => handleInteraction(index, params, false))
+  if (!isMobileLayout.value) {
+    // 绑定悬浮：展示卡片 (注意传 index)
+    chart.on('mouseover', (params) => handleInteraction(index, params, false))
 
-  // 绑定离开：如果没钉住，就关闭卡片
-  chart.on('mouseout', () => {
-    if (!isMobileLayout.value && !isCardPinned.value) {
-      selectedPieDetail.value = null
-    }
-  })
+    // 绑定离开：如果没钉住，就关闭卡片
+    chart.on('mouseout', () => {
+      if (!isCardPinned.value) {
+        selectedPieDetail.value = null
+      }
+    })
+  }
   return chart
 }
 

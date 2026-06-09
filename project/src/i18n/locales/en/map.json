@@ -25,7 +25,7 @@
       "location": "Location",
       "region": "Region",
       "coordinates": "Coordinates",
-      "featureType": "Feature Type",
+      "featureType": "Type",
       "featureField": "Current Feature",
       "value": "Value",
       "description": "Description"
@@ -89,10 +89,11 @@
     }
   },
   "customTab": {
-    "title": "Search Custom Features",
+    "title": "User Custom Data Editing & Search",
     "labels": {
       "featureSearch": "Feature Search",
-      "login": "Login"
+      "login": "Login",
+      "uncategorized": "Uncategorized"
     },
     "placeholders": {
       "featureSearch": "Enter feature keywords..."
@@ -100,7 +101,8 @@
     "badges": {
       "loginRequired": "Login required to manage personal data",
       "noData": "No personal data yet. Add some entries first.",
-      "dataCount": "You currently have {count} personal entries"
+      "dataCount": "You currently have {count} personal entries",
+      "dataAndFeatureCount": "{dataCount} records, {featureCount} features"
     },
     "selected": "Selected feature: {feature}",
     "buttons": {
@@ -108,6 +110,7 @@
       "running": "Running...",
       "addSingle": "Add One",
       "addBatch": "Batch Add",
+      "addData": "Add Data",
       "help": "Help"
     },
     "divider": "Add New Custom Data",
@@ -190,6 +193,10 @@
             "value": {
               "label": "Value: ",
               "text": "Use it as the map label, such as \"congri\", \"nau\", or \"ei\"."
+            },
+            "manage": {
+              "label": "Manage all my custom data",
+              "text": "Manage, edit, delete, and search all your submitted personal custom entries."
             }
           },
           "notes": {

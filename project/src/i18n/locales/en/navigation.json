@@ -23,7 +23,8 @@
     "compare": {
       "tab1": "Character Comparison",
       "tab2": "Middle Chinese Comparison",
-      "tab4": "Tone Category Comparison"
+      "tab4": "Tone Category Comparison",
+      "tab5": "Phonetic Value Comparison"
     },
     "pho": {
       "phonologyMatrix": "Phonology Query",
