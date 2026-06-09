@@ -104,7 +104,7 @@ import CustomDataPanel from '@/main/components/map/CustomDataPanel.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
 import { showSuccess, showError } from '@/utils/message.js'
-import { refreshCurrentCustomLayer } from '@/utils/map/MapData.js'
+import { addCustomFeatureData, refreshCurrentCustomLayer } from '@/utils/map/MapData.js'
 
 const { t } = useI18n()
 const selectedLevel = ref(3)
@@ -146,7 +146,7 @@ const handleMapClick = (coordinates) => {
 }
 
 // 處理提交成功事件
-const handleSubmitSuccess = async () => {
+const handleSubmitSuccess = async (response) => {
   showSuccess(t('map.messages.submitSuccess'))
 
   // 自动打开自定义数据开关
@@ -237,21 +237,22 @@ watch(
 
     try {
       // 提取路由参数
-      const phonology = route.query.phonology || ''
+      const locations = route.query.locations?.split(',').filter(Boolean) || []
+      const regions = route.query.regions?.split(',').filter(Boolean) || []
+      const regionMode = route.query.regionMode || 'map'
 
-      // 自动选中该特征并设置其声韵调类型
+      // 调用 addCustomFeatureData 加载数据
+      await addCustomFeatureData([newFeature], locations, regions, regionMode)
+
+      // 自动选中该特征
       selectedFeature.value = newFeature
       mapStore.selectedFeature = newFeature
-      mapStore.selectedFeaturePhonology = phonology
 
       // 自动开启自定义数据显示
       mapStore.showCustomData = true
 
       // 自动切换到 feature 模式（关闭"查看地名"开关）
       mapStore.mode = 'feature'
-
-      // 调用 refreshCurrentCustomLayer 加载数据
-      await refreshCurrentCustomLayer()
 
       showSuccess(t('map.messages.featureLoaded', { feature: newFeature }))
 
@@ -260,7 +261,6 @@ watch(
         query: {
           ...route.query,
           feature: undefined,
-          phonology: undefined,
           locations: undefined,
           regions: undefined,
           regionMode: undefined
@@ -370,3 +370,4 @@ const resolveTabRoute = (tabName) => {
   border-color: var(--color-primary);
 }
 </style>
+
