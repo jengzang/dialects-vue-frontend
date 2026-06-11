@@ -13,6 +13,7 @@ import '../utils/message.js'
 // 🌐 导入 i18n 国际化
 import i18n from '../i18n'
 import { initSeo } from '../seo'
+import { initializeInterfaceMode } from '../composables/core/uiPreferences.js'
 import { bootstrapAuthSession } from '../api/auth/auth.js'
 
 // 1. 導入你的組件
@@ -20,8 +21,10 @@ import PanelManager from './components/result/PanelManager.vue'
 
 bootstrapAuthSession()
 
-// 2. 建立 App 實例
+// 2. 創建 Vue 應用實例
 const app = createApp(App)
+
+initializeInterfaceMode()
 
 // 3. 使用插件 (Router, i18n)
 app.use(router)

@@ -7,8 +7,11 @@ import '../../styles/villagesml-entry.scss'
 import '../../utils/message.js'
 import i18n from '../../i18n'
 import { initSeo } from '../../seo'
+import { initializeInterfaceMode } from '../../composables/core/uiPreferences.js'
 
 const app = createApp(App)
+
+initializeInterfaceMode()
 
 app.use(router)
 app.use(i18n)

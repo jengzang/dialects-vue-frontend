@@ -93,6 +93,19 @@
       "title": "語言設置",
       "description": "選擇您偏好的界面語言"
     },
+    "interfaceMode": {
+      "title": "介面模式",
+      "description": "選擇標準或簡潔界面風格；簡潔模式會減少動畫與高成本視覺效果，以提升低性能設備上的流暢度。",
+      "label": "當前模式",
+      "options": {
+        "default": "標準模式",
+        "compact": "簡潔模式"
+      },
+      "help": {
+        "default": "保留當前動畫與視覺效果。",
+        "compact": "減少動畫、模糊與高成本特效，適合低性能設備。"
+      }
+    },
     "characterTable": {
       "title": "字集設置",
       "description": "選擇新查詢默認使用的字集"

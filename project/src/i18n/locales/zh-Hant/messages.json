@@ -5,7 +5,8 @@
     "updated": "更新成功",
     "created": "創建成功",
     "copied": "複製成功",
-    "languageChanged": "語言切換成功"
+    "languageChanged": "語言切換成功",
+    "interfaceModeChanged": "介面模式已更新"
   },
   "error": {
     "saveFailed": "保存失敗",

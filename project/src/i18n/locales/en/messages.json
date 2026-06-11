@@ -5,7 +5,8 @@
     "updated": "Updated successfully",
     "created": "Created successfully",
     "copied": "Copied successfully",
-    "languageChanged": "Language changed successfully"
+    "languageChanged": "Language changed successfully",
+    "interfaceModeChanged": "Interface mode updated"
   },
   "error": {
     "saveFailed": "Save failed",
