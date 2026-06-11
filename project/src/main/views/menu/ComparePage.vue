@@ -450,6 +450,7 @@ import { useQueryConfig } from '@/composables/domain/useQueryConfig.js'
 
 const { t } = useI18n()
 const selectedCharacterTable = preferredCharacterTable
+const PHONETIC_COMPARE_LOGIN_REDIRECT = 'compare-phonetic-login-redirect'
 
 // 使用查询配置 Composable
 const { keyValueMap, availableKeys, exclusiveRules, singleSelectKeys } = useQueryConfig(selectedCharacterTable)
@@ -1093,6 +1094,26 @@ const ZhongguRefCurrent = ref(null);  // For tab2 current selector
 // Tab5 独立的运行逻辑
 const runTab5Action = () => {
   if (isTab5RunDisabled.value) return
+
+  if (!userStore.authReady) {
+    return
+  }
+
+  if (!userStore.isAuthenticated) {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.setItem(PHONETIC_COMPARE_LOGIN_REDIRECT, route.fullPath)
+    }
+    showWarning('音值比较需要登录后使用')
+    router.push({
+      path: '/auth',
+      query: {
+        view: 'login',
+        redirect: route.fullPath
+      }
+    })
+    return
+  }
+
   tabStates.tab5.queryLocations = [...tabStates.tab5.matchedLocations]
 }
 
@@ -1554,6 +1575,9 @@ function handleApplyConfig(data) {
 }
 
 onMounted(() => {
+  if (typeof window !== 'undefined' && userStore.isAuthenticated) {
+    window.sessionStorage.removeItem(PHONETIC_COMPARE_LOGIN_REDIRECT)
+  }
   document.addEventListener('click', onClickOutside)
 })
 
