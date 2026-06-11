@@ -12,6 +12,7 @@ import '../utils/message.js'
 
 // 🌐 导入 i18n 国际化
 import i18n from '../i18n'
+import { initSeo } from '../seo'
 import { bootstrapAuthSession } from '../api/auth/auth.js'
 
 // 1. 導入你的組件
@@ -25,6 +26,7 @@ const app = createApp(App)
 // 3. 使用插件 (Router, i18n)
 app.use(router)
 app.use(i18n)
+initSeo({ router, i18n })
 
 // 4. ★ 註冊全局組件
 // 第一個參數是你在 Template 中使用的標籤名稱 (例如 <PanelManager />)

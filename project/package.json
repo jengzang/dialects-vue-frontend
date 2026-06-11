@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:web": "vite --mode web",
-    "build": "vite build",
+    "build": "npm run seo:sitemap && vite build",
     "preview": "vite preview",
     "lint": "eslint src --ext .js,.vue --max-warnings=0",
     "lint:fix": "npm run lint -- --fix",
@@ -16,7 +16,8 @@
     "test:watch": "vitest",
     "i18n:extract": "vue-i18n-extract report --vueFiles \"./src/**/*.{js,vue}\" --languageFiles \"./src/i18n/locales/**/*.json\"",
     "deploy": "npm run build && bash deploy.sh",
-    "deploy:ps": "npm run build && powershell -ExecutionPolicy Bypass -File deploy.ps1"
+    "deploy:ps": "npm run build && powershell -ExecutionPolicy Bypass -File deploy.ps1",
+    "seo:sitemap": "node ./scripts/generate-sitemap.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
