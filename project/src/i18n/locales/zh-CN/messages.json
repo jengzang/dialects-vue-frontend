@@ -50,5 +50,11 @@
       "second": "秒",
       "now": "现在"
     }
+  },
+  "loginPrompt": {
+    "message": "登录后可保存记录，并使用更多功能。",
+    "login": "立即登录",
+    "dismiss": "关闭",
+    "phoneticRequired": "音值比较需要登录后使用"
   }
 }

@@ -1103,7 +1103,7 @@ const runTab5Action = () => {
     if (typeof window !== 'undefined') {
       window.sessionStorage.setItem(PHONETIC_COMPARE_LOGIN_REDIRECT, route.fullPath)
     }
-    showWarning('音值比较需要登录后使用')
+    showWarning('messages.loginPrompt.phoneticRequired')
     router.push({
       path: '/auth',
       query: {

@@ -50,5 +50,11 @@
       "second": "s",
       "now": "now"
     }
+  },
+  "loginPrompt": {
+    "message": "Log in to save your history and unlock more features.",
+    "login": "Log in",
+    "dismiss": "Dismiss",
+    "phoneticRequired": "Phonetic comparison requires login."
   }
 }

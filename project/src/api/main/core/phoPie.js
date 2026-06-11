@@ -69,7 +69,8 @@ export async function postPhoPieByValue(payload) {
     const body = normalizePhoPiePayload(payload)
     return await api('/api/pho_pie_by_value', {
       method: 'POST',
-      body
+      body,
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Post pho pie by value error:', error)
@@ -83,7 +84,8 @@ export async function postPhoPieByStatus(payload) {
     const body = normalizePhoPiePayload(payload)
     return await api('/api/pho_pie_by_status', {
       method: 'POST',
-      body
+      body,
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Post pho pie by status error:', error)

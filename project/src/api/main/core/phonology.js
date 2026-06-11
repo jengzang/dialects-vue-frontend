@@ -58,7 +58,8 @@ export async function getPhonologyMatrix(params) {
     const path = queryString ? `/api/phonology_matrix?${queryString}` : '/api/phonology_matrix'
 
     return await api(path, {
-      method: 'GET'
+      method: 'GET',
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Get phonology matrix error:', error)
@@ -82,7 +83,8 @@ export async function getPhonologyClassificationMatrix(params) {
   try {
     return await api('/api/phonology_classification_matrix', {
       method: 'POST',
-      body: params
+      body: params,
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Get phonology classification matrix error:', error)
@@ -108,7 +110,8 @@ export async function queryPhonology(params) {
   try {
     return await api('/api/phonology', {
       method: 'POST',
-      body: params
+      body: params,
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Query phonology error:', error)

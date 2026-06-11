@@ -1,5 +1,6 @@
 import { WEB_BASE } from '../../env-config.js';
 import { showRateLimitNotice } from '../../utils/rateLimitNotice.js';
+import { recordLoginPromptApiHit } from '../../utils/loginPromptTracker.js';
 import { userStore } from '../../main/store/store.js';
 
 import { getToken, getTokenExpiresAt } from './tokenStorage.js';
@@ -283,6 +284,7 @@ export async function api(path, options = {}) {
     timeout = 300000,
     showError = true,
     responseType = 'auto',
+    loginPromptEligible = false,
   } = options;
 
   const requestHeaders = { ...headers };
@@ -358,7 +360,13 @@ export async function api(path, options = {}) {
       await handleErrorResponse(path, response);
     }
 
-    return parseSuccessfulResponse(response, responseType);
+    const responseData = await parseSuccessfulResponse(response, responseType);
+
+    if (loginPromptEligible) {
+      recordLoginPromptApiHit(path);
+    }
+
+    return responseData;
   } catch (error) {
     if (
       showError &&
