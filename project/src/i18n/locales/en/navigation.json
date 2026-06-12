@@ -95,7 +95,7 @@
     },
     "interfaceMode": {
       "title": "Interface Mode",
-      "description": "Choose between the standard and compact interface styles. Compact mode reduces animations and expensive visual effects for better performance on low-end devices.",
+      "description": "Choose between the standard and compact interface styles. Compact mode disables animations, shadows, blur, and similar visual effects for better performance on low-end devices.",
       "label": "Current Mode",
       "options": {
         "default": "Standard",
@@ -103,7 +103,7 @@
       },
       "help": {
         "default": "Keeps the current animations and visual effects.",
-        "compact": "Reduces animations, blur, and expensive effects for smoother performance on low-end devices."
+        "compact": "Disables animations, shadows, blur, and similar visual effects for smoother performance on low-end devices."
       }
     },
     "characterTable": {
