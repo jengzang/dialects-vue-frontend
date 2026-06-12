@@ -283,7 +283,8 @@
         "partial": "Partially selected",
         "full": "Fully selected"
       },
-      "singleLocationSuccess": "Only one location matched this feature, so the map was opened directly"
+      "singleLocationSuccess": "Only one location matched this feature, so the map was opened directly",
+      "recognizeHierarchy": "Recognize hierarchy"
     }
   },
   "mapLibre": {

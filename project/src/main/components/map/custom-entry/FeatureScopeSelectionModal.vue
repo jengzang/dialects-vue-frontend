@@ -15,15 +15,15 @@
           </div>
           <div class="summary-item">
             <span class="summary-label">{{ t('map.customTab.scopeModal.summary.records') }}</span>
-            <span class="summary-value">{{ featureMeta?.recordCount || 0 }}</span>
+            <span class="summary-value summary-number">{{ featureMeta?.recordCount || 0 }}</span>
           </div>
           <div class="summary-item">
             <span class="summary-label">{{ t('map.customTab.scopeModal.summary.locations') }}</span>
-            <span class="summary-value">{{ featureMeta?.locationCount || 0 }}</span>
+            <span class="summary-value summary-number">{{ featureMeta?.locationCount || 0 }}</span>
           </div>
           <div class="summary-item">
             <span class="summary-label">{{ t('map.customTab.scopeModal.summary.regions') }}</span>
-            <span class="summary-value">{{ featureMeta?.regionCount || 0 }}</span>
+            <span class="summary-value summary-number">{{ featureMeta?.regionCount || 0 }}</span>
           </div>
         </div>
 
@@ -38,8 +38,14 @@
 
         <template v-else>
           <div class="scope-toolbar main-glass-panel-inner">
-            <div class="scope-toolbar-info">
-              {{ t('map.customTab.scopeModal.selectedCount', { count: selectedLocations.length }) }}
+            <div class="scope-toolbar-main">
+              <div class="scope-toolbar-info">
+                {{ t('map.customTab.scopeModal.selectedCount', { count: selectedLocations.length }) }}
+              </div>
+              <label class="scope-toggle-label">
+                <input v-model="recognizeHierarchy" type="checkbox">
+                <span>{{ t('map.customTab.scopeModal.recognizeHierarchy') }}</span>
+              </label>
             </div>
             <button class="scope-clear-btn" type="button" @click="clearSelection">
               {{ t('map.customTab.scopeModal.clearSelection') }}
@@ -52,20 +58,48 @@
               <div v-if="regions.length === 0" class="feature-scope-state main-list-state">
                 <div class="main-list-state-title">{{ t('map.customTab.scopeModal.emptyRegions') }}</div>
               </div>
-              <button
-                v-for="region in regionOptions"
-                :key="region.name"
-                class="scope-selection-item"
-                :class="[`state-${region.state}`]"
-                type="button"
-                @click="toggleRegion(region)"
-              >
-                <span class="scope-selection-title">{{ region.name || t('map.customTab.scopeModal.summary.empty') }}</span>
-                <span class="scope-selection-meta">
-                  {{ t('map.customTab.scopeModal.regionMeta', { locations: region.locationCount, records: region.recordCount }) }}
-                </span>
-                <span class="scope-selection-status">{{ t(`map.customTab.scopeModal.regionStates.${region.state}`) }}</span>
-              </button>
+
+              <template v-if="recognizeHierarchy">
+                <div class="scope-tree-list">
+                  <template v-for="node in regionTree" :key="node.fullPath">
+                    <div class="scope-tree-node" :style="{ paddingLeft: `${node.depth * 18}px` }">
+                      <button
+                        class="scope-selection-item scope-tree-item"
+                        :class="[`state-${node.state}`]"
+                        type="button"
+                        @click="toggleTreeNode(node)"
+                      >
+                        <div class="scope-tree-main">
+                          <span v-if="node.children.length > 0" class="scope-tree-caret">▾</span>
+                          <span v-else class="scope-tree-caret scope-tree-caret-empty"></span>
+                          <span class="scope-selection-title">{{ node.label || t('map.customTab.scopeModal.summary.empty') }}</span>
+                        </div>
+                        <span class="scope-selection-meta">
+                          {{ t('map.customTab.scopeModal.regionMeta', { locations: node.locationCount, records: node.recordCount }) }}
+                        </span>
+                        <span class="scope-selection-status">{{ t(`map.customTab.scopeModal.regionStates.${node.state}`) }}</span>
+                      </button>
+                    </div>
+                  </template>
+                </div>
+              </template>
+
+              <template v-else>
+                <button
+                  v-for="region in regionOptions"
+                  :key="region.name"
+                  class="scope-selection-item"
+                  :class="[`state-${region.state}`]"
+                  type="button"
+                  @click="toggleRegion(region)"
+                >
+                  <span class="scope-selection-title">{{ region.name || t('map.customTab.scopeModal.summary.empty') }}</span>
+                  <span class="scope-selection-meta">
+                    {{ t('map.customTab.scopeModal.regionMeta', { locations: region.locationCount, records: region.recordCount }) }}
+                  </span>
+                  <span class="scope-selection-status">{{ t(`map.customTab.scopeModal.regionStates.${region.state}`) }}</span>
+                </button>
+              </template>
             </section>
 
             <section class="scope-panel main-glass-panel-inner">
@@ -86,7 +120,7 @@
                 <span class="scope-selection-copy">
                   <span class="scope-selection-title">{{ location.name }}</span>
                   <span class="scope-selection-meta">
-                    {{ t('map.customTab.scopeModal.locationMeta', { records: location.recordCount, regions: location.regionNames.join('、') || t('map.customTab.scopeModal.summary.empty') }) }}
+                    {{ t('map.customTab.scopeModal.locationMeta', { records: location.recordCount, regions: formatRegionNames(location.regionNames) || t('map.customTab.scopeModal.summary.empty') }) }}
                   </span>
                 </span>
               </label>
@@ -102,7 +136,7 @@
           {{ t('common.button.cancel') }}
         </button>
         <button
-          class="main-glass-button"
+          class="main-glass-button scope-confirm-btn"
           data-variant="primary"
           type="button"
           :disabled="confirmDisabled"
@@ -148,9 +182,10 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'confirm'])
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const selectedLocations = ref([])
+const recognizeHierarchy = ref(false)
 const selectedLocationSet = computed(() => new Set(selectedLocations.value))
 
 const modalTitle = computed(() => t('map.customTab.scopeModal.title', {
@@ -175,6 +210,103 @@ const regionOptions = computed(() => {
   })
 })
 
+const regionTree = computed(() => {
+  const roots = []
+  const nodeMap = new Map()
+
+  const ensureNode = (label, fullPath, depth) => {
+    if (!nodeMap.has(fullPath)) {
+      nodeMap.set(fullPath, {
+        label,
+        fullPath,
+        depth,
+        children: [],
+        locationNames: new Set(),
+        recordCount: 0,
+      })
+    }
+    return nodeMap.get(fullPath)
+  }
+
+  regionOptions.value.forEach((region) => {
+    const parts = String(region.name || '')
+      .split('-')
+      .map((item) => item.trim())
+      .filter(Boolean)
+
+    if (parts.length === 0) {
+      return
+    }
+
+    let parent = null
+    const fullParts = []
+
+    parts.forEach((part, index) => {
+      fullParts.push(part)
+      const fullPath = fullParts.join('-')
+      const node = ensureNode(part, fullPath, index)
+
+      if (parent && !parent.children.includes(node)) {
+        parent.children.push(node)
+      } else if (!parent && !roots.includes(node)) {
+        roots.push(node)
+      }
+
+      parent = node
+    })
+
+    const targetNode = parent
+    if (targetNode) {
+      region.locationNames.forEach((name) => targetNode.locationNames.add(name))
+      targetNode.recordCount += region.recordCount
+    }
+  })
+
+  const computeAggregates = (node) => {
+    const aggregatedLocations = new Set(node.locationNames)
+    let aggregatedRecords = node.recordCount
+
+    node.children.forEach((child) => {
+      const childResult = computeAggregates(child)
+      childResult.locationNames.forEach((name) => aggregatedLocations.add(name))
+      aggregatedRecords += childResult.recordCount
+    })
+
+    const matchedCount = Array.from(aggregatedLocations).filter((name) => selectedLocationSet.value.has(name)).length
+    let state = 'none'
+    if (matchedCount > 0 && matchedCount < aggregatedLocations.size) {
+      state = 'partial'
+    } else if (aggregatedLocations.size > 0 && matchedCount === aggregatedLocations.size) {
+      state = 'full'
+    }
+
+    node.aggregatedLocationNames = Array.from(aggregatedLocations)
+    node.locationCount = aggregatedLocations.size
+    node.aggregatedRecordCount = aggregatedRecords
+    node.state = state
+
+    return {
+      locationNames: aggregatedLocations,
+      recordCount: aggregatedRecords
+    }
+  }
+
+  roots.forEach((node) => computeAggregates(node))
+
+  const flattened = []
+  const walk = (node) => {
+    flattened.push({
+      ...node,
+      children: [...node.children],
+      locationNames: [...node.aggregatedLocationNames],
+      recordCount: node.aggregatedRecordCount
+    })
+    node.children.forEach(walk)
+  }
+  roots.forEach(walk)
+  return flattened
+})
+
 const confirmDisabled = computed(() => {
   return props.loading || Boolean(props.errorMessage) || selectedLocations.value.length === 0
 })
@@ -182,6 +314,7 @@ const confirmDisabled = computed(() => {
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen) {
     selectedLocations.value = []
+    recognizeHierarchy.value = false
   }
 })
 
@@ -204,6 +337,10 @@ function toggleRegion(region) {
   selectedLocations.value = Array.from(next)
 }
 
+function toggleTreeNode(node) {
+  toggleRegion(node)
+}
+
 function toggleLocation(locationName) {
   const next = new Set(selectedLocations.value)
   if (next.has(locationName)) {
@@ -223,20 +360,25 @@ function handleConfirm() {
     selectedLocations: [...selectedLocations.value]
   })
 }
+
+function formatRegionNames(regionNames) {
+  const names = Array.isArray(regionNames) ? regionNames.filter(Boolean) : []
+  return names.join(locale.value === 'en' ? ', ' : '、')
+}
 </script>
 
 <style scoped lang="scss">
 .feature-scope-modal {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .feature-scope-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
-  padding: 16px 18px;
+  padding: 18px 20px;
 }
 
 .summary-item {
@@ -256,18 +398,41 @@ function handleConfirm() {
   color: #0f172a;
 }
 
+.summary-number {
+  color: #007aff;
+}
+
 .scope-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
+  gap: 14px;
+  padding: 16px 20px;
+}
+
+.scope-toolbar-main {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
 }
 
 .scope-toolbar-info {
   font-size: 13px;
   color: #475569;
-  font-weight: 600;
+  font-weight: 700;
+}
+
+.scope-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #334155;
+}
+
+.scope-toggle-label input {
+  accent-color: #007aff;
 }
 
 .scope-clear-btn {
@@ -280,24 +445,34 @@ function handleConfirm() {
 
 .scope-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.1fr);
-  gap: 14px;
+  grid-template-columns: minmax(0, 0.98fr) minmax(0, 1.08fr);
+  gap: 16px;
 }
 
 .scope-panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   min-height: 320px;
-  max-height: 420px;
+  max-height: 440px;
   overflow: auto;
-  padding: 16px 18px;
+  padding: 18px 20px;
 }
 
 .scope-panel-title {
   font-size: 14px;
   font-weight: 700;
   color: #0f172a;
+}
+
+.scope-tree-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.scope-tree-node {
+  display: block;
 }
 
 .scope-selection-item,
@@ -308,12 +483,33 @@ function handleConfirm() {
   padding: 16px 18px;
   border-radius: 14px;
   border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.9);
   text-align: left;
 }
 
 .scope-selection-item {
   flex-direction: column;
+  width: 100%;
+}
+
+.scope-tree-item {
+  gap: 8px;
+}
+
+.scope-tree-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scope-tree-caret {
+  width: 12px;
+  color: #64748b;
+  flex: 0 0 auto;
+}
+
+.scope-tree-caret-empty {
+  visibility: hidden;
 }
 
 .scope-selection-item.state-full {
@@ -322,8 +518,13 @@ function handleConfirm() {
 }
 
 .scope-selection-item.state-partial {
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.16);
+  border-color: rgba(0, 122, 255, 0.5);
+  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.12);
+}
+
+.scope-checkbox-item input {
+  accent-color: #007aff;
+  margin-top: 2px;
 }
 
 .scope-selection-copy {
@@ -341,6 +542,15 @@ function handleConfirm() {
 .scope-selection-status {
   font-size: 13px;
   color: #64748b;
+}
+
+.scope-selection-status {
+  color: #007aff;
+  font-weight: 600;
+}
+
+.scope-confirm-btn {
+  color: #fff;
 }
 
 .scope-modal-footer {

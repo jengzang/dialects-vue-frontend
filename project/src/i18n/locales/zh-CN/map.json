@@ -283,7 +283,8 @@
         "partial": "部分选择",
         "full": "已全选"
       },
-      "singleLocationSuccess": "当前特征仅命中一个地点，已直接打开地图"
+      "singleLocationSuccess": "当前特征仅命中一个地点，已直接打开地图",
+      "recognizeHierarchy": "识别层级"
     }
   },
   "mapLibre": {
