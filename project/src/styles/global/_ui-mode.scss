@@ -11,16 +11,18 @@
 :root[data-ui-mode='compact'] *,
 :root[data-ui-mode='compact'] *::before,
 :root[data-ui-mode='compact'] *::after {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.12s !important;
-  transition-delay: 0s !important;
+  animation: none !important;
+  transition: none !important;
   scroll-behavior: auto !important;
 }
 
 :root[data-ui-mode='compact'] * {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
 }
 
 :root[data-ui-mode='compact'] .bg-gradient,
@@ -32,20 +34,6 @@
 :root[data-ui-mode='compact'] .noise-overlay {
   animation: none !important;
   filter: none !important;
-}
-
-:root[data-ui-mode='compact'] .main-glass-button,
-:root[data-ui-mode='compact'] .main-glass-panel,
-:root[data-ui-mode='compact'] .main-glass-panel-inner,
-:root[data-ui-mode='compact'] .glass-panel,
-:root[data-ui-mode='compact'] .glass-container,
-:root[data-ui-mode='compact'] .ui-surface,
-:root[data-ui-mode='compact'] .ui-floating-surface,
-:root[data-ui-mode='compact'] .setting-section,
-:root[data-ui-mode='compact'] .language-card,
-:root[data-ui-mode='compact'] .tab,
-:root[data-ui-mode='compact'] .tab.active {
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08) !important;
 }
 
 :root[data-ui-mode='compact'] .tab-content,
@@ -60,15 +48,5 @@
 :root[data-ui-mode='compact'] .expand-enter-active,
 :root[data-ui-mode='compact'] .expand-leave-active {
   animation: none !important;
-  transition-property: opacity, transform !important;
-}
-
-:root[data-ui-mode='compact'] .tab:hover,
-:root[data-ui-mode='compact'] .language-card:hover,
-:root[data-ui-mode='compact'] .main-glass-button:hover,
-:root[data-ui-mode='compact'] .feature-card:hover,
-:root[data-ui-mode='compact'] .action-btn:hover,
-:root[data-ui-mode='compact'] .btn-primary:hover,
-:root[data-ui-mode='compact'] .btn-secondary:hover {
-  transform: none !important;
+  transition: none !important;
 }
