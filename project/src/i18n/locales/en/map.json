@@ -254,6 +254,32 @@
           }
         }
       }
+    },
+    "scopeModal": {
+      "title": "View “{feature}”",
+      "loading": "Loading feature data...",
+      "loadFailed": "Load failed",
+      "emptyRows": "No map data is available for this feature.",
+      "emptySelection": "There is no data to display for the current selection.",
+      "emptyRegions": "No regions are available for this feature.",
+      "emptyLocations": "No locations are available for this feature.",
+      "confirm": "Open map",
+      "regionMeta": "{locations} locations · {records} records",
+      "locationMeta": "{records} records · {regions}",
+      "summary": {
+        "phonology": "Category",
+        "records": "Records",
+        "locations": "Locations",
+        "regions": "Regions",
+        "empty": "Not set"
+      },
+      "modes": {
+        "all": "All locations",
+        "region": "By region",
+        "location": "By location",
+        "allTitle": "View all locations",
+        "allText": "This will display all {count} matched locations for the feature."
+      }
     }
   },
   "mapLibre": {

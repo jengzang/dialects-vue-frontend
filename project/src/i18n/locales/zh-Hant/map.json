@@ -254,6 +254,33 @@
           }
         }
       }
+    },
+    "scopeModal": {
+      "title": "查看“{feature}”",
+      "loading": "正在加载特征数据...",
+      "loadFailed": "加载失败",
+      "emptyRows": "当前特征暂无可查看的地图数据",
+      "emptySelection": "当前选择下没有可展示的数据",
+      "emptyRegions": "当前特征没有可选分区",
+      "emptyLocations": "当前特征没有可选地点",
+      "confirm": "进入地图",
+      "confirmSuccess": "已按當前選擇打開地圖",
+      "regionMeta": "{locations} 个地点 · {records} 条记录",
+      "locationMeta": "{records} 条记录 · {regions}",
+      "summary": {
+        "phonology": "類別",
+        "records": "記錄數",
+        "locations": "地點數",
+        "regions": "分區數",
+        "empty": "未填寫"
+      },
+      "modes": {
+        "all": "全部地點",
+        "region": "按分區",
+        "location": "按地點",
+        "allTitle": "查看全部地點",
+        "allText": "將展示當前特徵命中的全部 {count} 個地點。"
+      }
     }
   },
   "mapLibre": {

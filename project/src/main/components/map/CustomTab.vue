@@ -207,6 +207,16 @@
 
     <CustomDataEntryModal v-model="isEntryModalOpen" />
 
+    <FeatureScopeSelectionModal
+      v-model="isFeatureScopeModalOpen"
+      :feature-meta="selectedFeatureMeta"
+      :regions="availableRegions"
+      :locations="availableLocations"
+      :loading="loadingFeatureRows"
+      :error-message="featureRowsError"
+      @confirm="confirmFeatureScopeSelection"
+    />
+
     <CustomTabHelpModal v-model="isHelpModalOpen" />
   </div>
 </template>
@@ -218,13 +228,13 @@ import { useI18n } from 'vue-i18n';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import CustomDataEntryModal from '@/main/components/map/custom-entry/CustomDataEntryModal.vue';
 import CustomTabHelpModal from '@/main/components/popup/map/CustomTabHelpModal.vue';
-import { getUserFeatures } from '@/api';
+import { getUserFeatures, getDataByFeature } from '@/api';
 import {
   userStore,
-  resultCache,
-  mapStore,
 } from '@/main/store/store.js';
 import { showSuccess, showWarning, showError } from '@/utils/message.js';
+import FeatureScopeSelectionModal from '@/main/components/map/custom-entry/FeatureScopeSelectionModal.vue';
+import { addCustomFeatureDataWithoutApi } from '@/utils/map/MapData.js';
 
 const router = useRouter();
 const route = useRoute();
@@ -235,6 +245,13 @@ const isHelpModalOpen = ref(false);
 const isEntryModalOpen = ref(false);
 const isSearchOpen = ref(false);
 const searchInputRef = ref(null);
+const isFeatureScopeModalOpen = ref(false);
+const loadingFeatureRows = ref(false);
+const featureRowsError = ref('');
+const currentFeatureRows = ref([]);
+const selectedFeatureMeta = ref(null);
+const availableRegions = ref([]);
+const availableLocations = ref([]);
 
 const searchQuery = ref('');
 const userFeatures = ref([]);
@@ -370,8 +387,64 @@ const toggleCategory = (category) => {
   expandedCategories.value[category] = !expandedCategories.value[category];
 };
 
+const buildFeatureSelectionOptions = (rows) => {
+  const regionMap = new Map();
+  const locationMap = new Map();
+
+  rows.forEach((row) => {
+    const locationName = String(row['簡稱'] || '').trim();
+    const regionName = String(row['音典分區'] || '').trim();
+
+    if (locationName) {
+      if (!locationMap.has(locationName)) {
+        locationMap.set(locationName, {
+          name: locationName,
+          recordCount: 0,
+          regionNames: new Set(),
+        });
+      }
+
+      const locationItem = locationMap.get(locationName);
+      locationItem.recordCount += 1;
+      if (regionName) {
+        locationItem.regionNames.add(regionName);
+      }
+    }
+
+    if (regionName) {
+      if (!regionMap.has(regionName)) {
+        regionMap.set(regionName, {
+          name: regionName,
+          rows: [],
+          locations: new Set(),
+          recordCount: 0,
+        });
+      }
+
+      const regionItem = regionMap.get(regionName);
+      regionItem.rows.push(row);
+      regionItem.recordCount += 1;
+      if (locationName) {
+        regionItem.locations.add(locationName);
+      }
+    }
+  });
+
+  availableRegions.value = Array.from(regionMap.values()).map((item) => ({
+    name: item.name,
+    rows: item.rows,
+    locationCount: item.locations.size,
+    recordCount: item.recordCount,
+  }));
+
+  availableLocations.value = Array.from(locationMap.values()).map((item) => ({
+    name: item.name,
+    recordCount: item.recordCount,
+    regionNames: Array.from(item.regionNames),
+  }));
+};
+
 const selectFeatureItem = async (item) => {
-  // console.log('Selected feature item:', item);
   const featureName = item['特徵'] || item.feature || '';
   const phonology = item['聲韻調'] || item.phonology || '';
 
@@ -379,30 +452,84 @@ const selectFeatureItem = async (item) => {
     return;
   }
 
+  loadingFeatureRows.value = true;
+  featureRowsError.value = '';
+  currentFeatureRows.value = [];
+  availableRegions.value = [];
+  availableLocations.value = [];
+  selectedFeatureMeta.value = {
+    feature: featureName,
+    phonology,
+    recordCount: 0,
+    locationCount: 0,
+    regionCount: 0,
+  };
+  isFeatureScopeModalOpen.value = true;
+
   try {
-    mapStore.mergedData = [];
-    resultCache.latestResults = [];
-    mapStore.selectedFeature = featureName;
-    mapStore.selectedFeaturePhonology = phonology;
-    resultCache.features = [];
-    mapStore.mapData = null;
+    const response = await getDataByFeature(featureName, phonology);
 
-    const query = {
-      feature: featureName
-    };
-
-    if (phonology) {
-      query.phonology = phonology;
+    if (!response || response.success !== true) {
+      throw new Error(response?.message || t('map.customTab.scopeModal.loadFailed'));
     }
-    // console.log('Navigating with query:', query);
-    await router.replace({
-      path: '/menu/map/view',
-      query
-    });
 
-    showSuccess(t('map.customTab.messages.loading'));
+    const rows = Array.isArray(response.data) ? response.data : [];
+
+    if (rows.length === 0) {
+      throw new Error(t('map.customTab.scopeModal.emptyRows'));
+    }
+
+    currentFeatureRows.value = rows;
+    buildFeatureSelectionOptions(rows);
+
+    selectedFeatureMeta.value = {
+      feature: featureName,
+      phonology,
+      recordCount: rows.length,
+      locationCount: availableLocations.value.length,
+      regionCount: availableRegions.value.length,
+    };
   } catch (error) {
-    console.error('跳转失败:', error);
+    featureRowsError.value = error.message || String(error);
+  } finally {
+    loadingFeatureRows.value = false;
+  }
+};
+
+const confirmFeatureScopeSelection = async ({ mode, selectedRegion, selectedLocations }) => {
+  try {
+    const featureMeta = selectedFeatureMeta.value;
+
+    if (!featureMeta?.feature) {
+      return;
+    }
+
+    let filteredRows = currentFeatureRows.value;
+
+    if (mode === 'region') {
+      filteredRows = currentFeatureRows.value.filter((row) => String(row['音典分區'] || '').trim() === selectedRegion);
+    } else if (mode === 'location') {
+      const selectedLocationSet = new Set(selectedLocations);
+      filteredRows = currentFeatureRows.value.filter((row) => selectedLocationSet.has(String(row['簡稱'] || '').trim()));
+    }
+
+    if (!filteredRows.length) {
+      throw new Error(t('map.customTab.scopeModal.emptySelection'));
+    }
+
+    addCustomFeatureDataWithoutApi(filteredRows, featureMeta.feature, featureMeta.phonology || '');
+    currentFeatureRows.value = [];
+    availableRegions.value = [];
+    availableLocations.value = [];
+    selectedFeatureMeta.value = null;
+    featureRowsError.value = '';
+    isFeatureScopeModalOpen.value = false;
+    await router.push({
+      path: '/menu/map/view',
+      query: {}
+    });
+    showSuccess(t('map.customTab.scopeModal.confirmSuccess'));
+  } catch (error) {
     showError(t('map.customTab.messages.searchFailed', { error: error.message || error }));
   }
 };
