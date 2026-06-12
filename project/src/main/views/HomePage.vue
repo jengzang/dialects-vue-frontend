@@ -562,7 +562,7 @@
 import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { getTodayVisits, getTotalVisits } from '@/api/logs/index.js'
+import { useVisitStats } from '@/composables/useVisitStats.js'
 import { queryCount } from '@/api'
 import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
 
@@ -579,13 +579,16 @@ const UpdateNoticeModal = defineAsyncComponent(() =>
 
 const { t } = useI18n()
 const router = useRouter()
+const {
+  todayVisits,
+  totalVisits,
+  ensureVisitStats
+} = useVisitStats()
 const featuresSection = ref(null)
 const expandedCard = ref(null)
 const showSupport = ref(false)
 const showBenefitsPopup = ref(false)
 const showUpdateNotice = ref(false)
-const todayVisits = ref(0)
-const totalVisits = ref(0)
 const sourceLocationCount = ref('...')
 const sourceDataCount = ref('...')
 
@@ -655,12 +658,7 @@ function openZhihu() {
 // Fetch visit statistics
 async function fetchVisitStats() {
   try {
-    const [todayData, totalData] = await Promise.all([
-      getTodayVisits(),
-      getTotalVisits()
-    ])
-    todayVisits.value = todayData?.today_visits || 0
-    totalVisits.value = totalData?.total_visits || 0
+    await ensureVisitStats()
   } catch (error) {
     console.error('獲取訪問統計失敗:', error)
   }
