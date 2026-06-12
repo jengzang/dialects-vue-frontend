@@ -236,6 +236,7 @@ function handleConfirm() {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
+  padding: 16px 18px;
 }
 
 .summary-item {
@@ -260,6 +261,7 @@ function handleConfirm() {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
+  padding: 14px 18px;
 }
 
 .scope-toolbar-info {
@@ -289,6 +291,7 @@ function handleConfirm() {
   min-height: 320px;
   max-height: 420px;
   overflow: auto;
+  padding: 16px 18px;
 }
 
 .scope-panel-title {
@@ -302,7 +305,7 @@ function handleConfirm() {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 12px 14px;
+  padding: 16px 18px;
   border-radius: 14px;
   border: 1px solid rgba(148, 163, 184, 0.24);
   background: rgba(255, 255, 255, 0.88);

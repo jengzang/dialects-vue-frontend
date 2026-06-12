@@ -282,7 +282,8 @@
         "none": "未選",
         "partial": "部分選擇",
         "full": "已全選"
-      }
+      },
+      "singleLocationSuccess": "當前特徵僅命中一個地點，已直接打開地圖"
     }
   },
   "mapLibre": {

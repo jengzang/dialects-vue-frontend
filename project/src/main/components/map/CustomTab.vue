@@ -489,6 +489,22 @@ const selectFeatureItem = async (item) => {
       locationCount: availableLocations.value.length,
       regionCount: availableRegions.value.length,
     };
+
+    if (availableLocations.value.length === 1) {
+      addCustomFeatureDataWithoutApi(rows, featureName, phonology);
+      currentFeatureRows.value = [];
+      availableRegions.value = [];
+      availableLocations.value = [];
+      selectedFeatureMeta.value = null;
+      isFeatureScopeModalOpen.value = false;
+      loadingFeatureRows.value = false;
+      await router.push({
+        path: '/menu/map/view',
+        query: {}
+      });
+      showSuccess(t('map.customTab.scopeModal.singleLocationSuccess'));
+      return;
+    }
   } catch (error) {
     featureRowsError.value = error.message || String(error);
   } finally {
