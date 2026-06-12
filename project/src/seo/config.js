@@ -1,4 +1,5 @@
 const SEO_CONFIG = {
+  siteOrigin: 'https://dialects.yzup.top',
   siteName: '方音圖鑑',
   siteNameLocales: {
     'zh-Hant': '方音圖鑑',
@@ -31,6 +32,42 @@ const SEO_CONFIG = {
         'zh-CN':
           '方音图鉴是一个专注于方言比较与地理语言学的在线平台，提供查字、查中古、查音位、查调、音系分析、方言比较、地图可视化与自然村资料等功能。',
         en: 'Dialects Atlas is an online platform focused on dialect comparison and geolinguistics, offering character lookup, Middle Chinese query, phoneme analysis, tone query, phonology analysis, dialect comparison, map visualization, and village datasets.',
+      },
+    },
+    '/auth': {
+      title: {
+        'zh-Hant': '登入與註冊｜方音圖鑑',
+        'zh-CN': '登录与注册｜方音图鉴',
+        en: 'Login & Sign Up | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '登入方音圖鑑帳號，使用郵箱或用戶名訪問自定義地圖、個人資料與更多進階功能。',
+        'zh-CN': '登录方音图鉴账号，使用邮箱或用户名访问自定义地图、个人资料与更多进阶功能。',
+        en: 'Sign in to Dialects Atlas with your email or username to access custom maps, personal data, and more advanced features.',
+      },
+    },
+    '/auth/data': {
+      title: {
+        'zh-Hant': '個人資料中心｜方音圖鑑',
+        'zh-CN': '个人资料中心｜方音图鉴',
+        en: 'Profile Center | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '查看與管理方音圖鑑帳號的個人資料、頭像與帳號信息。',
+        'zh-CN': '查看与管理方音图鉴账号的个人资料、头像与账号信息。',
+        en: 'View and manage your Dialects Atlas profile, avatar, and account information.',
+      },
+    },
+    '/auth/regions': {
+      title: {
+        'zh-Hant': '我的分區資料｜方音圖鑑',
+        'zh-CN': '我的分区资料｜方音图鉴',
+        en: 'My Region Data | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '管理方音圖鑑帳號下保存的自定義分區資料與相關內容。',
+        'zh-CN': '管理方音图鉴账号下保存的自定义分区资料与相关内容。',
+        en: 'Manage the custom region data and related saved content in your Dialects Atlas account.',
       },
     },
     '/menu/source': {
@@ -378,6 +415,6 @@ export const SITEMAP_PATHS = [
   '/menu/map/view',
 ]
 
-export const NOINDEX_PATHS = new Set(['/intro', '/auth', '/auth/data', '/auth/regions'])
+export const NOINDEX_PATHS = new Set(['/intro'])
 
 export default SEO_CONFIG

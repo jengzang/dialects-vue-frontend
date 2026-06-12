@@ -74,7 +74,7 @@ function getRouteSeo(pathname) {
 }
 
 function getCanonicalUrl(pathname) {
-  const { origin } = window.location
+  const origin = SEO_CONFIG.siteOrigin || window.location.origin
   if (!pathname || pathname === '/') {
     return `${origin}/`
   }
@@ -82,7 +82,8 @@ function getCanonicalUrl(pathname) {
 }
 
 function getOgImageUrl() {
-  return `${window.location.origin}${DEFAULT_OG_IMAGE}`
+  const origin = SEO_CONFIG.siteOrigin || window.location.origin
+  return `${origin}${DEFAULT_OG_IMAGE}`
 }
 
 export function updateSeo({ path, locale }) {
