@@ -496,7 +496,7 @@ const selectFeatureItem = async (item) => {
   }
 };
 
-const confirmFeatureScopeSelection = async ({ mode, selectedRegion, selectedLocations }) => {
+const confirmFeatureScopeSelection = async ({ selectedLocations }) => {
   try {
     const featureMeta = selectedFeatureMeta.value;
 
@@ -504,14 +504,8 @@ const confirmFeatureScopeSelection = async ({ mode, selectedRegion, selectedLoca
       return;
     }
 
-    let filteredRows = currentFeatureRows.value;
-
-    if (mode === 'region') {
-      filteredRows = currentFeatureRows.value.filter((row) => String(row['音典分區'] || '').trim() === selectedRegion);
-    } else if (mode === 'location') {
-      const selectedLocationSet = new Set(selectedLocations);
-      filteredRows = currentFeatureRows.value.filter((row) => selectedLocationSet.has(String(row['簡稱'] || '').trim()));
-    }
+    const selectedLocationSet = new Set(selectedLocations);
+    const filteredRows = currentFeatureRows.value.filter((row) => selectedLocationSet.has(String(row['簡稱'] || '').trim()));
 
     if (!filteredRows.length) {
       throw new Error(t('map.customTab.scopeModal.emptySelection'));

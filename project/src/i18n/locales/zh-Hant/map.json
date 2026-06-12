@@ -263,10 +263,10 @@
       "emptySelection": "当前选择下没有可展示的数据",
       "emptyRegions": "当前特征没有可选分区",
       "emptyLocations": "当前特征没有可选地点",
-      "confirm": "进入地图",
+      "confirm": "進入地圖",
       "confirmSuccess": "已按當前選擇打開地圖",
-      "regionMeta": "{locations} 个地点 · {records} 条记录",
-      "locationMeta": "{records} 条记录 · {regions}",
+      "regionMeta": "{locations} 個地點 · {records} 條記錄",
+      "locationMeta": "{records} 條記錄 · {regions}",
       "summary": {
         "phonology": "類別",
         "records": "記錄數",
@@ -274,12 +274,14 @@
         "regions": "分區數",
         "empty": "未填寫"
       },
-      "modes": {
-        "all": "全部地點",
-        "region": "按分區",
-        "location": "按地點",
-        "allTitle": "查看全部地點",
-        "allText": "將展示當前特徵命中的全部 {count} 個地點。"
+      "clearSelection": "清空選擇",
+      "selectedCount": "已選 {count} 個地點",
+      "regionTitle": "分區",
+      "locationTitle": "地點",
+      "regionStates": {
+        "none": "未選",
+        "partial": "部分選擇",
+        "full": "已全選"
       }
     }
   },

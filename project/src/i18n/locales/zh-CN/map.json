@@ -274,12 +274,14 @@
         "regions": "分区数",
         "empty": "未填写"
       },
-      "modes": {
-        "all": "全部地点",
-        "region": "按分区",
-        "location": "按地点",
-        "allTitle": "查看全部地点",
-        "allText": "将展示当前特征命中的全部 {count} 个地点。"
+      "clearSelection": "清空选择",
+      "selectedCount": "已选 {count} 个地点",
+      "regionTitle": "分区",
+      "locationTitle": "地点",
+      "regionStates": {
+        "none": "未选",
+        "partial": "部分选择",
+        "full": "已全选"
       }
     }
   },

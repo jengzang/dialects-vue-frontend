@@ -273,12 +273,15 @@
         "regions": "Regions",
         "empty": "Not set"
       },
-      "modes": {
-        "all": "All locations",
-        "region": "By region",
-        "location": "By location",
-        "allTitle": "View all locations",
-        "allText": "This will display all {count} matched locations for the feature."
+      "confirmSuccess": "Opened the map with the current selection",
+      "clearSelection": "Clear selection",
+      "selectedCount": "{count} locations selected",
+      "regionTitle": "Regions",
+      "locationTitle": "Locations",
+      "regionStates": {
+        "none": "Not selected",
+        "partial": "Partially selected",
+        "full": "Fully selected"
       }
     }
   },
