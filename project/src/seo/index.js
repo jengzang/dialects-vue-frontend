@@ -70,15 +70,22 @@ function pickLocalizedValue(values, locale) {
 }
 
 function getRouteSeo(pathname) {
-  return SEO_CONFIG.routes[pathname] || null
+  const normalizedPath = normalizePathname(pathname)
+  return SEO_CONFIG.routes[normalizedPath] || null
+}
+
+function normalizePathname(pathname) {
+  if (!pathname || pathname === '/') return '/'
+  return pathname.endsWith('/') ? pathname.slice(0, -1) || '/' : pathname
 }
 
 function getCanonicalUrl(pathname) {
   const origin = SEO_CONFIG.siteOrigin || window.location.origin
-  if (!pathname || pathname === '/') {
+  const normalizedPath = normalizePathname(pathname)
+  if (normalizedPath === '/') {
     return `${origin}/`
   }
-  return `${origin}${pathname}`
+  return `${origin}${normalizedPath}/`
 }
 
 function getOgImageUrl() {
@@ -92,7 +99,8 @@ export function updateSeo({ path, locale }) {
   }
 
   const normalizedLocale = normalizeLocale(locale)
-  const routeSeo = getRouteSeo(path)
+  const normalizedPath = normalizePathname(path)
+  const routeSeo = getRouteSeo(normalizedPath)
 
   const title = routeSeo
     ? pickLocalizedValue(routeSeo.title, normalizedLocale)
@@ -101,10 +109,10 @@ export function updateSeo({ path, locale }) {
     ? pickLocalizedValue(routeSeo.description, normalizedLocale)
     : pickLocalizedValue(SEO_CONFIG.defaultDescription, normalizedLocale)
   const siteName = pickLocalizedValue(SEO_CONFIG.siteNameLocales, normalizedLocale)
-  const canonicalUrl = getCanonicalUrl(path)
-  const shouldNoindex = NOINDEX_PATHS.has(path)
+  const canonicalUrl = getCanonicalUrl(normalizedPath)
+  const shouldNoindex = NOINDEX_PATHS.has(normalizedPath)
   const ogImageUrl = getOgImageUrl()
-  const jsonLdType = getJsonLdType(path)
+  const jsonLdType = getJsonLdType(normalizedPath)
 
   document.title = title
 
