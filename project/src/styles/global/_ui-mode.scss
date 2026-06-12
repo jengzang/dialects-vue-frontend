@@ -66,38 +66,36 @@
   background-image: none !important;
 }
 
-:root[data-ui-mode='compact'] .main-glass-button,
-:root[data-ui-mode='compact'] .main-glass-panel,
-:root[data-ui-mode='compact'] .main-glass-panel-inner,
-:root[data-ui-mode='compact'] .glass-panel,
-:root[data-ui-mode='compact'] .glass-container,
-:root[data-ui-mode='compact'] .ui-surface,
-:root[data-ui-mode='compact'] .ui-floating-surface,
-:root[data-ui-mode='compact'] .setting-section,
-:root[data-ui-mode='compact'] .language-card,
-:root[data-ui-mode='compact'] .tab,
-:root[data-ui-mode='compact'] .tab.active,
-:root[data-ui-mode='compact'] .tab-content,
-:root[data-ui-mode='compact'] .feature-card,
-:root[data-ui-mode='compact'] .project-card,
-:root[data-ui-mode='compact'] .card,
-:root[data-ui-mode='compact'] .panel,
-:root[data-ui-mode='compact'] .sidebar,
-:root[data-ui-mode='compact'] .submenu-panel,
-:root[data-ui-mode='compact'] .app-modal,
-:root[data-ui-mode='compact'] .global-toast,
-:root[data-ui-mode='compact'] .rate-limit-notice {
-  background-color: rgba(255, 255, 255, 0.98) !important;
-}
+// :root[data-ui-mode='compact'] .main-glass-button,
+// :root[data-ui-mode='compact'] .main-glass-panel,
+// :root[data-ui-mode='compact'] .main-glass-panel-inner,
+// :root[data-ui-mode='compact'] .glass-panel,
+// :root[data-ui-mode='compact'] .glass-container,
+// :root[data-ui-mode='compact'] .ui-surface,
+// :root[data-ui-mode='compact'] .ui-floating-surface,
+// :root[data-ui-mode='compact'] .setting-section,
+// :root[data-ui-mode='compact'] .language-card,
+// :root[data-ui-mode='compact'] .tab-content,
+// :root[data-ui-mode='compact'] .feature-card,
+// :root[data-ui-mode='compact'] .project-card,
+// :root[data-ui-mode='compact'] .card,
+// :root[data-ui-mode='compact'] .panel,
+// :root[data-ui-mode='compact'] .sidebar,
+// :root[data-ui-mode='compact'] .submenu-panel,
+// :root[data-ui-mode='compact'] .app-modal,
+// :root[data-ui-mode='compact'] .global-toast,
+// :root[data-ui-mode='compact'] .rate-limit-notice {
+//   background-color: rgba(255, 255, 255, 0.98) !important;
+// }
 
-:root[data-ui-mode='compact'] .notice-button,
-:root[data-ui-mode='compact'] .confirm-btn,
-:root[data-ui-mode='compact'] input,
-:root[data-ui-mode='compact'] textarea,
-:root[data-ui-mode='compact'] select,
-:root[data-ui-mode='compact'] button {
-  background-color: rgba(255, 255, 255, 1) !important;
-}
+// :root[data-ui-mode='compact'] .notice-button,
+// :root[data-ui-mode='compact'] .confirm-btn,
+// :root[data-ui-mode='compact'] input,
+// :root[data-ui-mode='compact'] textarea,
+// :root[data-ui-mode='compact'] select,
+// :root[data-ui-mode='compact'] button {
+//   background-color: rgba(255, 255, 255, 1) !important;
+// }
 
 :root[data-ui-mode='compact'] .tab-content,
 :root[data-ui-mode='compact'] .overlay-enter-active,

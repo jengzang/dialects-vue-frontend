@@ -1565,9 +1565,6 @@ function handleApplyConfig(data) {
 }
 
 onMounted(() => {
-  if (typeof window !== 'undefined' && userStore.isAuthenticated) {
-    window.sessionStorage.removeItem(PHONETIC_COMPARE_LOGIN_REDIRECT)
-  }
   document.addEventListener('click', onClickOutside)
 })
 
