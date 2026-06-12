@@ -450,7 +450,6 @@ import { useQueryConfig } from '@/composables/domain/useQueryConfig.js'
 
 const { t } = useI18n()
 const selectedCharacterTable = preferredCharacterTable
-const PHONETIC_COMPARE_LOGIN_REDIRECT = 'compare-phonetic-login-redirect'
 
 // 使用查询配置 Composable
 const { keyValueMap, availableKeys, exclusiveRules, singleSelectKeys } = useQueryConfig(selectedCharacterTable)
@@ -1100,17 +1099,8 @@ const runTab5Action = () => {
   }
 
   if (!userStore.isAuthenticated) {
-    if (typeof window !== 'undefined') {
-      window.sessionStorage.setItem(PHONETIC_COMPARE_LOGIN_REDIRECT, route.fullPath)
-    }
-    showWarning('messages.loginPrompt.phoneticRequired')
-    router.push({
-      path: '/auth',
-      query: {
-        view: 'login',
-        redirect: route.fullPath
-      }
-    })
+    showWarning(t('user.dataPage.messages.authRequired'))
+    router.push('/auth')
     return
   }
 
@@ -2303,6 +2293,8 @@ export default {
   width: 100%;
   max-width: 760px;
   text-align: left;
+  padding: 0;
+  border:none;
 }
 
 .tab5-location-control-layout {
@@ -2322,7 +2314,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  padding: 1px 10px;
+  padding: 4px 10px;
   border-radius: 12px;
   border: 1px solid rgba(200, 200, 200, 0.35);
   background: var(--glass-light);

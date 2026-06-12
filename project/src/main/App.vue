@@ -107,10 +107,10 @@ export default {
         // console.log('🎯 [App.vue] 检测到用户已登录，启动在线时长统计')
         initOnlineTimeTracker()
       }
-      initLoginPromptTracker()
-      // else {
+      else {
+        initLoginPromptTracker()
       //   console.log('ℹ️ [App.vue] 用户未登录，不启动在线时长统计')
-      // }
+      }
     })
 
     // 组件卸载时停止统计

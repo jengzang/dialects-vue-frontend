@@ -186,6 +186,19 @@ export function hideMessage({ dismissed = false } = {}) {
     }
 }
 
+export function persistMessageUntilDismiss() {
+    const hasManualDismiss = Boolean(messageState.value.dismissText || messageState.value.actionText)
+    if (!messageState.value.show || !hasManualDismiss) {
+        return
+    }
+
+    clearMessageTimer()
+    messageState.value = {
+        ...messageState.value,
+        timerId: null
+    }
+}
+
 export function triggerMessageAction() {
     const onAction = messageState.value.onAction
     hideMessage()

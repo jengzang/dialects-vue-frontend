@@ -4,6 +4,8 @@
       <div
         v-if="messageState.show"
         :class="['global-toast', 'global-toast-shell', messageState.type, { 'has-action': messageState.actionText }]"
+        @mouseenter="persistMessageUntilDismiss"
+        @click="persistMessageUntilDismiss"
       >
         <span class="toast-icon">{{ getIcon(messageState.type) }}</span>
         <span class="toast-message">{{ messageState.message }}</span>
@@ -11,7 +13,7 @@
           v-if="messageState.actionText"
           class="toast-action"
           type="button"
-          @click="triggerMessageAction"
+          @click.stop="triggerMessageAction"
         >
           {{ messageState.actionText }}
         </button>
@@ -20,7 +22,7 @@
           class="toast-dismiss"
           type="button"
           :aria-label="messageState.dismissText || 'Close'"
-          @click="hideMessage({ dismissed: true })"
+          @click.stop="hideMessage({ dismissed: true })"
         >
           ×
         </button>
@@ -30,7 +32,7 @@
 </template>
 
 <script setup>
-import { messageState, triggerMessageAction, hideMessage } from '@/utils/message.js'
+import { messageState, triggerMessageAction, hideMessage, persistMessageUntilDismiss } from '@/utils/message.js'
 
 function getIcon(type) {
   const icons = {
@@ -68,6 +70,7 @@ function getIcon(type) {
 .global-toast.has-action {
   left: auto;
   right: 28px;
+  top:20dvh;
   transform: none;
 }
 
@@ -164,7 +167,7 @@ function getIcon(type) {
 }
 
 .global-toast.has-action.info {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(234, 243, 255, 0.52));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(234, 243, 255, 0.4));
   border-color: rgba(255, 255, 255, 0.48);
   color: rgba(20, 34, 56, 0.88);
 }
@@ -306,6 +309,12 @@ function getIcon(type) {
     width: 22px;
     height: 22px;
     font-size: 13px;
+  }
+  .global-toast.has-action {
+    right: 16px;
+    top: auto;
+    bottom: 20dvh;
+    transform: none;
   }
 }
 </style>

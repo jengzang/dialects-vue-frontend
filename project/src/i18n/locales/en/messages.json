@@ -53,9 +53,8 @@
     }
   },
   "loginPrompt": {
-    "message": "Log in to save your history and unlock more features.",
+    "message": "Log in to use advanced features, get higher query limits, and add personal data.",
     "login": "Log in",
-    "dismiss": "Dismiss",
-    "phoneticRequired": "Phonetic comparison requires login."
+    "dismiss": "Dismiss"
   }
 }

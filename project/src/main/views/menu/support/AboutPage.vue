@@ -741,7 +741,6 @@ p em.emoji {
 }
 
 .setting-section {
-  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 24px;
@@ -751,7 +750,6 @@ p em.emoji {
 
 .mode-group {
   display: flex;
-  flex-direction: column;
   gap: 12px;
 }
 
@@ -823,7 +821,6 @@ p em.emoji {
 
 .language-options {
   display: flex;
-  flex-direction: column;
   gap: 12px;
 }
 
@@ -903,6 +900,12 @@ p em.emoji {
 
   .language-code {
     font-size: 11px;
+  }
+  .language-options {
+    flex-direction: column;
+  }
+  .mode-group {
+    flex-direction: column;
   }
 }
 

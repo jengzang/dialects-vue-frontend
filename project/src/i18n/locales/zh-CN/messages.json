@@ -53,9 +53,8 @@
     }
   },
   "loginPrompt": {
-    "message": "登录后可保存记录，并使用更多功能。",
+    "message": "登录后可使用高级功能，获得更高的查询上限，并可添加个人数据。",
     "login": "立即登录",
-    "dismiss": "关闭",
-    "phoneticRequired": "音值比较需要登录后使用"
+    "dismiss": "关闭"
   }
 }

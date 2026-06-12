@@ -53,9 +53,8 @@
     }
   },
   "loginPrompt": {
-    "message": "登入後可保存記錄，並使用更多功能。",
+    "message": "登入後可使用高級功能，獲得更高的查詢上限，並可添加個人數據。",
     "login": "立即登入",
-    "dismiss": "關閉",
-    "phoneticRequired": "音值比較需要登入後使用"
+    "dismiss": "關閉"
   }
 }

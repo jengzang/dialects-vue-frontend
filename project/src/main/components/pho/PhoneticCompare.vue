@@ -495,15 +495,19 @@ const renderSankey = async (queryLocs) => {
       type: 'sankey',
       left: '4%',
       right: '10%',
-      top: '6%',
-      bottom: '8%',
+      top: '2%',
+      bottom: '4%',
       data: nodes,
       links: linksToRender,
       nodeAlign: 'justify',
       draggable: false,
-      emphasis: {
-        focus: 'adjacency'
-      },
+      emphasis: isMobileLayout.value
+        ? {
+            disabled: true
+          }
+        : {
+            focus: 'adjacency'
+          },
       lineStyle: {
         color: 'gradient',
         curveness: 0.5,
