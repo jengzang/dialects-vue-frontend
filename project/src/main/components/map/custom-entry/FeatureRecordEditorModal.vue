@@ -156,6 +156,7 @@ import { showConfirm, showWarning } from '@/utils/message.js';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import { batchCreateCustomData, editCustomData, getDataByFeature, getDataByPoint, getUserPoints } from '@/api';
+import { ensureCustomDataPresence, invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js';
 import { userStore } from '@/main/store/store.js';
 import { formatCoord } from '@/utils/map/formatCoord.js';
 import MiniMapSelector from './MiniMapSelector.vue';
@@ -405,6 +406,12 @@ async function checkDuplicateLocation() {
   const featureName = props.feature?.['特徵'] || props.feature?.feature || '';
   const phonology = props.feature?.['聲韻調'] || props.feature?.phonology || '';
   if (!featureName || !location.value.trim() || !region.value.trim()) return false;
+
+  const hasCustomData = await ensureCustomDataPresence();
+  if (!hasCustomData) {
+    return false;
+  }
+
   try {
     const response = await getDataByFeature(featureName, phonology);
     const records = Array.isArray(response?.data) ? response.data : [];
@@ -474,8 +481,10 @@ async function handleSave() {
 
   if (props.record?.created_at) {
     await editCustomData({ ...payload, created_at: props.record.created_at });
+    invalidateCustomDataPresence()
   } else {
     await batchCreateCustomData([payload]);
+    markCustomDataExists(true)
   }
 
   isSaving.value = false;

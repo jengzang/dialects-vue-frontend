@@ -279,6 +279,7 @@ import {
   getDataByPoint,
   getDataByFeature,
 } from '@/api';
+import { ensureCustomDataPresence, invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js';
 import { userStore } from '@/main/store/store.js';
 import { formatCoord } from '@/utils/map/formatCoord.js';
 import MiniMapSelector from './MiniMapSelector.vue';
@@ -637,8 +638,11 @@ async function handleSave() {
   });
 
   const tasks = [];
-  if (toCreate.length > 0) tasks.push(batchCreateCustomData(toCreate));
-  if (removedIds.value.length > 0) tasks.push(batchDeleteCustomData(removedIds.value));
+  const hasCreate = toCreate.length > 0;
+  const hasDelete = removedIds.value.length > 0;
+  const hasEdit = toEdit.length > 0;
+  if (hasCreate) tasks.push(batchCreateCustomData(toCreate));
+  if (hasDelete) tasks.push(batchDeleteCustomData(removedIds.value));
   toEdit.forEach((record) => tasks.push(editCustomData(record)));
 
   if (tasks.length === 0) {
@@ -657,6 +661,11 @@ async function handleSave() {
   }
 
   saveMessage.value = t('customEntry.pointDetail.messages.saveSuccess');
+  if (hasDelete || hasEdit) {
+    invalidateCustomDataPresence();
+  } else if (hasCreate) {
+    markCustomDataExists(true);
+  }
   isSaving.value = false;
   emit('saved');
 }
@@ -669,6 +678,13 @@ const featureError = ref('');
 const featureRecords = ref([]);
 
 const showFeatureDetail = async (feature, phonology) => {
+  const hasCustomData = await ensureCustomDataPresence();
+  if (!hasCustomData) {
+    featureError.value = '';
+    featureRecords.value = [];
+    return;
+  }
+
   selectedFeatureName.value = feature;
   selectedFeaturePhonology.value = phonology;
   isFeatureModalOpen.value = true;

@@ -128,6 +128,7 @@ import { ref, reactive, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { batchMatch, getRegions, submitCustomForm } from '@/api'
+import { invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js'
 import { showSuccess, showError, showWarning, showInfo } from '@/utils/message.js'
 import { userStore, globalPayload, resultCache } from '@/main/store/store.js'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
@@ -312,6 +313,7 @@ const handleSubmit = async () => {
     const response = await submitCustomForm(payload)
 
     if (response.success) {
+      markCustomDataExists(true)
       showSuccess(t('map.customDataPanel.messages.submitSuccess'))
       resetForm()
       emit('submit-success', response)

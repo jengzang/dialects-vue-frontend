@@ -229,6 +229,7 @@ import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import CustomDataEntryModal from '@/main/components/map/custom-entry/CustomDataEntryModal.vue';
 import CustomTabHelpModal from '@/main/components/popup/map/CustomTabHelpModal.vue';
 import { getUserFeatures, getDataByFeature } from '@/api';
+import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js';
 import {
   userStore,
 } from '@/main/store/store.js';
@@ -404,10 +405,10 @@ const buildFeatureSelectionOptions = (rows) => {
         });
       }
 
-      const locationItem = locationMap.get(locationName);
-      locationItem.recordCount += 1;
+      const locationEntry = locationMap.get(locationName);
+      locationEntry.recordCount += 1;
       if (regionName) {
-        locationItem.regionNames.add(regionName);
+        locationEntry.regionNames.add(regionName);
       }
     }
 
@@ -421,11 +422,11 @@ const buildFeatureSelectionOptions = (rows) => {
         });
       }
 
-      const regionItem = regionMap.get(regionName);
-      regionItem.rows.push(row);
-      regionItem.recordCount += 1;
+      const regionEntry = regionMap.get(regionName);
+      regionEntry.rows.push(row);
+      regionEntry.recordCount += 1;
       if (locationName) {
-        regionItem.locations.add(locationName);
+        regionEntry.locations.add(locationName);
       }
     }
   });
@@ -444,11 +445,28 @@ const buildFeatureSelectionOptions = (rows) => {
   }));
 };
 
+const resetFeatureScopeState = () => {
+  currentFeatureRows.value = [];
+  availableRegions.value = [];
+  availableLocations.value = [];
+  selectedFeatureMeta.value = null;
+  featureRowsError.value = '';
+  loadingFeatureRows.value = false;
+  isFeatureScopeModalOpen.value = false;
+};
+
 const selectFeatureItem = async (item) => {
   const featureName = item['特徵'] || item.feature || '';
   const phonology = item['聲韻調'] || item.phonology || '';
 
   if (!featureName) {
+    return;
+  }
+
+  const hasCustomData = await ensureCustomDataPresence();
+  if (!hasCustomData) {
+    userFeatures.value = [];
+    resetFeatureScopeState();
     return;
   }
 
@@ -560,6 +578,13 @@ const goToDataManager = () => {
 const fetchUserFeatures = async () => {
   if (!userStore.isAuthenticated) {
     userFeatures.value = [];
+    return;
+  }
+
+  const hasCustomData = await ensureCustomDataPresence();
+  if (!hasCustomData) {
+    userFeatures.value = [];
+    resetFeatureScopeState();
     return;
   }
 
