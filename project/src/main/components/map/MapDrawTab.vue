@@ -29,6 +29,15 @@
           class="main-glass-button"
           data-variant="secondary"
           type="button"
+          :disabled="isVoronoiCalculating"
+          @click="handleBuildVoronoi"
+        >
+          ⬡ {{ isVoronoiCalculating ? t('map.drawTab.buttons.voronoiRunning') : t('map.drawTab.buttons.voronoi') }}
+        </button>
+        <button
+          class="main-glass-button"
+          data-variant="secondary"
+          type="button"
           @click="showExportModal = true"
         >
           📤 {{ t('map.drawTab.buttons.export') }}
@@ -141,10 +150,25 @@
                     {{ t('map.drawTab.buttons.select') }}
                   </button>
                   <button
+                    v-if="!activeLayer || activeLayer.geometryType === 'Point'"
+                    class="main-glass-button draw-tool-mode-button"
+                    :data-variant="currentMode === 'draw_point' ? 'primary' : 'secondary'"
+                    :data-active="currentMode === 'draw_point'"
+                    type="button"
+                    @click="setMode('draw_point')"
+                  >
+                    <span
+                      v-if="currentMode === 'draw_point'"
+                      class="draw-tool-check"
+                      aria-hidden="true"
+                    >✓</span>
+                    {{ t('map.drawTab.buttons.drawPoint') }}
+                  </button>
+                  <button
+                    v-if="!activeLayer || activeLayer.geometryType === 'LineString'"
                     class="main-glass-button draw-tool-mode-button"
                     :data-variant="currentMode === 'draw_line_string' ? 'primary' : 'secondary'"
                     :data-active="currentMode === 'draw_line_string'"
-                    :disabled="activeLayer?.geometryType === 'Polygon'"
                     type="button"
                     @click="setMode('draw_line_string')"
                   >
@@ -156,10 +180,10 @@
                     {{ t('map.drawTab.buttons.drawLine') }}
                   </button>
                   <button
+                    v-if="!activeLayer || activeLayer.geometryType === 'Polygon'"
                     class="main-glass-button draw-tool-mode-button"
                     :data-variant="currentMode === 'draw_polygon' ? 'primary' : 'secondary'"
                     :data-active="currentMode === 'draw_polygon'"
-                    :disabled="activeLayer?.geometryType === 'LineString'"
                     type="button"
                     @click="setMode('draw_polygon')"
                   >
@@ -215,7 +239,10 @@
                     >
                   </label>
 
-                  <label class="draw-field draw-color-field">
+                  <label
+                    v-if="selectedFeatureGeometryType !== 'Point'"
+                    class="draw-field draw-color-field"
+                  >
                     <span class="draw-field-label">{{ t('map.drawTab.labels.strokeColor') }}</span>
                     <input
                       class="draw-color-input"
@@ -226,7 +253,33 @@
                   </label>
 
                   <label
-                    v-if="selectedFeatureGeometryType !== 'Point'"
+                    v-if="selectedFeatureGeometryType === 'Point'"
+                    class="draw-field draw-color-field"
+                  >
+                    <span class="draw-field-label">{{ t('map.drawTab.labels.pointColor') }}</span>
+                    <input
+                      class="draw-color-input"
+                      type="color"
+                      :value="selectedFeatureProperties.pointColor"
+                      @input="updateSelectedFeatureProperty('pointColor', $event.target.value)"
+                    >
+                  </label>
+
+                  <label
+                    v-if="selectedFeatureGeometryType === 'Point'"
+                    class="draw-field draw-color-field"
+                  >
+                    <span class="draw-field-label">{{ t('map.drawTab.labels.pointStrokeColor') }}</span>
+                    <input
+                      class="draw-color-input"
+                      type="color"
+                      :value="selectedFeatureProperties.pointStrokeColor"
+                      @input="updateSelectedFeatureProperty('pointStrokeColor', $event.target.value)"
+                    >
+                  </label>
+
+                  <label
+                    v-if="selectedFeatureGeometryType === 'Polygon'"
                     class="draw-field draw-color-field"
                   >
                     <span class="draw-field-label">{{ t('map.drawTab.labels.fillColor') }}</span>
@@ -238,7 +291,10 @@
                     >
                   </label>
 
-                  <label class="draw-field">
+                  <label
+                    v-if="selectedFeatureGeometryType !== 'Point'"
+                    class="draw-field"
+                  >
                     <span class="draw-field-label">{{ t('map.drawTab.labels.strokeWidth') }}：{{
                       selectedFeatureProperties.strokeWidth
                     }}</span>
@@ -256,7 +312,27 @@
                   </label>
 
                   <label
-                    v-if="selectedFeatureGeometryType !== 'Point'"
+                    v-if="selectedFeatureGeometryType === 'Point'"
+                    class="draw-field"
+                  >
+                    <span class="draw-field-label">{{ t('map.drawTab.labels.pointRadius') }}：{{
+                      selectedFeatureProperties.pointRadius
+                    }}</span>
+                    <input
+                      class="draw-range-input"
+                      type="range"
+                      min="3"
+                      max="24"
+                      step="1"
+                      :value="selectedFeatureProperties.pointRadius"
+                      @input="
+                        updateSelectedFeatureProperty('pointRadius', Number($event.target.value))
+                      "
+                    >
+                  </label>
+
+                  <label
+                    v-if="selectedFeatureGeometryType === 'Polygon'"
                     class="draw-field"
                   >
                     <span class="draw-field-label">{{ t('map.drawTab.labels.fillOpacity') }}：{{
@@ -474,6 +550,22 @@
           <button
             class="draw-modal-card-btn"
             type="button"
+            @click="onCreateLayerClicked('Point')"
+          >
+            <span class="draw-card-icon">📍</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.createPointLayer') }}
+              </div>
+              <div class="draw-card-desc">
+                {{ t('map.drawTab.buttons.createPointLayerDesc') }}
+              </div>
+            </div>
+          </button>
+
+          <button
+            class="draw-modal-card-btn"
+            type="button"
             @click="onCreateLayerClicked('LineString')"
           >
             <span class="draw-card-icon">➖</span>
@@ -659,7 +751,10 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { bbox, featureCollection, point, voronoi } from '@turf/turf';
 
+import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
+import { usePartitionCache } from '@/composables/domain/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import { showConfirm, showError, showSuccess } from '@/utils/message.js';
 import { readGeoJsonFile } from '@/utils/map/draw/export.js';
@@ -670,12 +765,16 @@ import AppModal from '@/components/common/AppModal.vue';
 
 const { t } = useI18n();
 const { requireAuth, isAuthenticated } = useAuthGuard();
+const { getPartitionData } = usePartitionCache();
 
 const defaultLayerStyle = {
   stroke: '#2563eb',
   strokeWidth: 3,
   fill: '#60a5fa',
   fillOpacity: 0.22,
+  pointRadius: 6,
+  pointColor: '#60a5fa',
+  pointStrokeColor: '#2563eb',
   visible: true,
   locked: false,
 };
@@ -694,6 +793,7 @@ const isLayersPanelOpen = ref(false);
 const showAddLayerModal = ref(false);
 const showExportModal = ref(false);
 const showLocalStorageModal = ref(false);
+const isVoronoiCalculating = ref(false);
 const selectedStoredDraftId = ref('');
 const storedDrafts = ref([]);
 const activeFeatureId = computed(() => activeLayerId.value);
@@ -712,10 +812,14 @@ const mapStyleOptions = computed(() => {
 
 const createEmptyLayer = (geometryType) => {
   layerIdSeed += 1;
-  const isLine = geometryType === 'LineString';
+  const geometryLabels = {
+    Point: t('map.drawTab.geometry.point'),
+    LineString: t('map.drawTab.geometry.line'),
+    Polygon: t('map.drawTab.geometry.polygon'),
+  };
   return {
     id: `draw-layer-${layerIdSeed}`,
-    name: `${isLine ? t('map.drawTab.geometry.line') : t('map.drawTab.geometry.polygon')}${t('map.drawTab.labels.layer')} ${layerIdSeed}`,
+    name: `${geometryLabels[geometryType] ?? t('map.drawTab.geometry.line')}${t('map.drawTab.labels.layer')} ${layerIdSeed}`,
     geometryType,
     ...defaultLayerStyle,
     featureCollection: emptyFeatureCollection(),
@@ -771,19 +875,96 @@ const handleStyleChange = () => {
   editableMapRef.value?.handleStyleChange?.();
 };
 
+const getFiniteCoordinatePair = (record) => {
+  const coordinateSource = record?.coordinates ?? record?.coordinate ?? record?.coord ?? record?.location;
+  const pair = Array.isArray(coordinateSource)
+    ? coordinateSource
+    : typeof coordinateSource === 'string'
+      ? coordinateSource.split(/[,，\s]+/)
+      : null;
+  const rawLng = record?.lng ?? record?.lon ?? record?.longitude ?? record?.x ?? pair?.[0];
+  const rawLat = record?.lat ?? record?.latitude ?? record?.y ?? pair?.[1];
+  const lng = Number(rawLng);
+  const lat = Number(rawLat);
+
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
+    return null;
+  }
+  if (Math.abs(lng) > 180 || Math.abs(lat) > 90) {
+    return null;
+  }
+  return [lng, lat];
+};
+
+const getSafeVoronoiBbox = (points) => {
+  const [minLng, minLat, maxLng, maxLat] = bbox(points);
+  const lngPadding = minLng === maxLng ? 0.01 : 0;
+  const latPadding = minLat === maxLat ? 0.01 : 0;
+  return [
+    minLng - lngPadding,
+    minLat - latPadding,
+    maxLng + lngPadding,
+    maxLat + latPadding,
+  ];
+};
+
+const buildPartitionPointCollection = (partitionData) => {
+  const records = Array.isArray(partitionData) ? partitionData : [];
+  return featureCollection(
+    records
+      .map((record) => {
+        const coordinates = getFiniteCoordinatePair(record);
+        if (!coordinates) return null;
+        return point(coordinates, record ?? {});
+      })
+      .filter(Boolean)
+  );
+};
+
+const handleBuildVoronoi = async () => {
+  if (isVoronoiCalculating.value) return;
+  isVoronoiCalculating.value = true;
+
+  try {
+    const partitionData = await getPartitionData(() => getLocationPartitions());
+    const points = buildPartitionPointCollection(partitionData);
+    const voronoiPolygons = points.features.length >= 2
+      ? voronoi(points, { bbox: getSafeVoronoiBbox(points) })
+      : featureCollection([]);
+
+    console.log('[MapDrawTab] partition data:', partitionData);
+    console.log('[MapDrawTab] voronoi points:', points);
+    console.log('[MapDrawTab] voronoi polygons:', voronoiPolygons);
+  } catch (error) {
+    console.error('[MapDrawTab] Voronoi calculation failed:', error);
+    showError(t('map.drawTab.messages.voronoiFailed', { error: error.message || error }));
+  } finally {
+    isVoronoiCalculating.value = false;
+  }
+};
+
 const handleCreateLayer = (geometryType) => {
   const layer = createEmptyLayer(geometryType);
   layers.value.push(layer);
   activeLayerId.value = layer.id;
   selectedFeatureId.value = '';
   isDrawingPanelOpen.value = true;
-  const mode = geometryType === 'Polygon' ? 'draw_polygon' : 'draw_line_string';
+  const mode = geometryType === 'Point'
+    ? 'draw_point'
+    : geometryType === 'Polygon'
+      ? 'draw_polygon'
+      : 'draw_line_string';
   setMode(mode);
 };
 
 const setMode = (mode) => {
   if (!activeLayer.value && mode !== 'simple_select') {
-    handleCreateLayer(mode === 'draw_polygon' ? 'Polygon' : 'LineString');
+    const geometryType = mode === 'draw_point'
+      ? 'Point'
+      : mode === 'draw_polygon'
+        ? 'Polygon'
+        : 'LineString';
+    handleCreateLayer(geometryType);
     return;
   }
   editableMapRef.value?.setDrawMode?.(mode);
@@ -912,9 +1093,11 @@ const triggerImportLayer = () => {
 };
 
 const createImportedLayer = (featureCollection) => {
-  const firstGeometryType =
-    featureCollection?.features?.[0]?.geometry?.type === 'Polygon' ? 'Polygon' : 'LineString';
-  const layer = createEmptyLayer(firstGeometryType);
+  const firstGeometryType = featureCollection?.features?.[0]?.geometry?.type;
+  const geometryType = ['Point', 'LineString', 'Polygon'].includes(firstGeometryType)
+    ? firstGeometryType
+    : 'LineString';
+  const layer = createEmptyLayer(geometryType);
   layer.featureCollection = featureCollection ?? emptyFeatureCollection();
   layers.value.unshift(layer);
   activeLayerId.value = layer.id;
@@ -1190,8 +1373,8 @@ onMounted(() => {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  width: 100%;
-  padding: 1rem 1.2rem;
+  width: 94%;
+  padding: 0.4rem 1.2rem;
 }
 
 .draw-tab-copy {
@@ -1204,6 +1387,10 @@ onMounted(() => {
 
 .draw-tab-hint {
   margin: 0.35rem 0 0;
+}
+
+.main-glass-button{
+  padding:15px 16px;
 }
 
 .draw-toolbar {
@@ -1359,7 +1546,7 @@ onMounted(() => {
 }
 
 .draw-tool-button-grid--three .main-glass-button {
-  padding: 0.55rem 0.45rem;
+  padding: 0.4rem 0.3rem!important;
 }
 
 .draw-tool-mode-button {
@@ -1451,7 +1638,7 @@ onMounted(() => {
 }
 
 .draw-input {
-  min-height: 2.2rem;
+  // min-height: 2.2rem;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.7);
   background: rgba(255, 255, 255, 0.72);
@@ -1569,6 +1756,45 @@ onMounted(() => {
   .draw-tool-section-header {
     display: flex;
     flex-direction: column;
+  }
+
+  .draw-toolbar--header {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.45rem;
+  }
+
+  .draw-toolbar--header .main-glass-button,
+  .draw-toolbar--header .draw-feature-count-badge {
+    min-height: 2.15rem;
+    min-width: auto;
+    padding: 0 0.65rem;
+    font-size: 0.84rem;
+    justify-content: center;
+  }
+
+  .draw-workbench {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    overflow: visible;
+  }
+
+  .draw-tool-panel,
+  .draw-tool-panel.offset-left,
+  .layers-panel {
+    position: static;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: 100%;
+    max-width: 100%;
+    min-height: auto;
+    max-height: none;
+  }
+
+  .draw-tool-panel-body {
+    max-height: none;
   }
 
   .draw-tool-button-grid,

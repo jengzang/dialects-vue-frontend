@@ -62,8 +62,10 @@ const drawStyles = [
     type: 'circle',
     filter: ['all', ['==', '$type', 'Point'], ['!=', 'meta', 'midpoint'], ['!=', 'mode', 'static']],
     paint: {
-      'circle-radius': 5,
-      'circle-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
+      'circle-radius': ['coalesce', ['get', 'pointRadius'], 6],
+      'circle-color': ['coalesce', ['get', 'pointColor'], '#60a5fa'],
+      'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], '#2563eb'],
+      'circle-stroke-width': 2,
       'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
     },
   },
@@ -141,6 +143,9 @@ const buildReadonlyLayerDescriptors = () => {
           strokeWidth: feature.properties?.strokeWidth ?? layer.strokeWidth,
           fill: feature.properties?.fill ?? layer.fill,
           fillOpacity: feature.properties?.fillOpacity ?? layer.fillOpacity,
+          pointRadius: feature.properties?.pointRadius ?? layer.pointRadius,
+          pointColor: feature.properties?.pointColor ?? layer.pointColor,
+          pointStrokeColor: feature.properties?.pointStrokeColor ?? layer.pointStrokeColor,
           visible: feature.properties?.visible ?? layer.visible,
           locked: true,
           layerId: layer.id,
@@ -217,8 +222,10 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
       source: descriptor.sourceId,
       filter: ['==', '$type', 'Point'],
       paint: {
-        'circle-radius': 5,
-        'circle-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
+        'circle-radius': ['coalesce', ['get', 'pointRadius'], 6],
+        'circle-color': ['coalesce', ['get', 'pointColor'], '#60a5fa'],
+        'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], '#2563eb'],
+        'circle-stroke-width': 2,
         'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
         'circle-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
@@ -361,6 +368,7 @@ const initializeDraw = () => {
   draw.value = new MapboxDraw({
     displayControlsDefault: false,
     controls: {
+      point: true,
       line_string: true,
       polygon: true,
       trash: true,

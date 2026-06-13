@@ -4,6 +4,9 @@ const DEFAULT_FEATURE_PROPERTIES = {
   strokeWidth: 3,
   fill: '#60a5fa',
   fillOpacity: 0.22,
+  pointRadius: 6,
+  pointColor: '#60a5fa',
+  pointStrokeColor: '#2563eb',
   visible: true,
   locked: false,
 }
