@@ -430,6 +430,8 @@
       "loginAction": "Login"
     },
     "buttons": {
+      "collapseTools": "Collapse Tools",
+      "expandTools": "Expand Tools",
       "createLineLayer": "New Line Layer",
       "createPolygonLayer": "New Polygon Layer",
       "drawLine": "Draw Line",

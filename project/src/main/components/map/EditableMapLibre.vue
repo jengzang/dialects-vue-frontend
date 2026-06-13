@@ -36,11 +36,11 @@ const drawStyles = [
     layout: {
       'line-cap': 'round',
       'line-join': 'round',
-      'visibility': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 'none', 'visible'],
     },
     paint: {
       'line-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
       'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
+      'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
     },
   },
   {
@@ -50,11 +50,11 @@ const drawStyles = [
     layout: {
       'line-cap': 'round',
       'line-join': 'round',
-      'visibility': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 'none', 'visible'],
     },
     paint: {
       'line-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
       'line-width': ['coalesce', ['get', 'strokeWidth'], 4],
+      'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
     },
   },
   {
@@ -116,17 +116,20 @@ const map = shallowRef(null)
 const draw = shallowRef(null)
 const selectedFeatureId = ref('')
 const currentStyleKey = ref(props.currentStyleKey || 'gaode')
-const readonlyLayerSourceId = 'readonly-draw-layers'
-const readonlyLayerLineId = 'readonly-layer-lines'
-const readonlyLayerFillId = 'readonly-layer-fills'
-const readonlyLayerPointId = 'readonly-layer-points'
+const sanitizeLayerFilename = (layerName) => {
+  return String(layerName || 'map-draw-layer')
+    .trim()
+    .replace(/[\\/:*?"<>|]+/g, '-')
+    .replace(/\s+/g, ' ')
+    || 'map-draw-layer'
+}
 
-const buildReadonlyFeatureCollection = () => {
-  const features = (props.allLayers ?? [])
+const buildReadonlyLayerDescriptors = () => {
+  return (props.allLayers ?? [])
     .filter((layer) => layer && layer.id !== props.activeLayer?.id)
-    .flatMap((layer) => {
+    .map((layer, layerIndex) => {
       const featureCollection = normalizeFeatureCollection(layer.featureCollection)
-      return (featureCollection.features ?? []).map((feature) => ({
+      const features = (featureCollection.features ?? []).map((feature) => ({
         ...feature,
         properties: {
           ...(feature.properties ?? {}),
@@ -137,43 +140,58 @@ const buildReadonlyFeatureCollection = () => {
           visible: feature.properties?.visible ?? layer.visible,
           locked: true,
           layerId: layer.id,
+          layerOrder: layerIndex,
         },
       }))
-    })
 
-  return normalizeFeatureCollection({
-    type: 'FeatureCollection',
-    features,
-  })
+      return {
+        layerId: layer.id,
+        layerOrder: layerIndex,
+        sourceId: `readonly-draw-source-${layer.id}`,
+        fillLayerId: `readonly-draw-fill-${layer.id}`,
+        lineLayerId: `readonly-draw-line-${layer.id}`,
+        pointLayerId: `readonly-draw-point-${layer.id}`,
+        featureCollection: normalizeFeatureCollection({
+          type: 'FeatureCollection',
+          features,
+        }),
+      }
+    })
 }
 
-const ensureReadonlyLayerSource = () => {
-  if (!map.value?.getSource(readonlyLayerSourceId)) {
-    map.value?.addSource(readonlyLayerSourceId, {
+const syncReadonlyLayerDescriptor = (descriptor) => {
+  if (!map.value || !descriptor) return
+
+  if (!map.value.getSource(descriptor.sourceId)) {
+    map.value.addSource(descriptor.sourceId, {
       type: 'geojson',
-      data: buildReadonlyFeatureCollection(),
+      data: descriptor.featureCollection,
     })
   }
 
-  if (!map.value?.getLayer(readonlyLayerFillId)) {
-    map.value?.addLayer({
-      id: readonlyLayerFillId,
+  const source = map.value.getSource(descriptor.sourceId)
+  source?.setData?.(descriptor.featureCollection)
+
+  if (!map.value.getLayer(descriptor.fillLayerId)) {
+    map.value.addLayer({
+      id: descriptor.fillLayerId,
       type: 'fill',
-      source: readonlyLayerSourceId,
+      source: descriptor.sourceId,
       filter: ['==', '$type', 'Polygon'],
       paint: {
         'fill-color': ['coalesce', ['get', 'fill'], '#60a5fa'],
         'fill-outline-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
         'fill-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, ['coalesce', ['get', 'fillOpacity'], 0.22]],
+        'fill-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
     })
   }
 
-  if (!map.value?.getLayer(readonlyLayerLineId)) {
-    map.value?.addLayer({
-      id: readonlyLayerLineId,
+  if (!map.value.getLayer(descriptor.lineLayerId)) {
+    map.value.addLayer({
+      id: descriptor.lineLayerId,
       type: 'line',
-      source: readonlyLayerSourceId,
+      source: descriptor.sourceId,
       filter: ['any', ['==', '$type', 'LineString'], ['==', '$type', 'Polygon']],
       layout: {
         'line-cap': 'round',
@@ -183,28 +201,50 @@ const ensureReadonlyLayerSource = () => {
         'line-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
         'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
         'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+        'line-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
     })
   }
 
-  if (!map.value?.getLayer(readonlyLayerPointId)) {
-    map.value?.addLayer({
-      id: readonlyLayerPointId,
+  if (!map.value.getLayer(descriptor.pointLayerId)) {
+    map.value.addLayer({
+      id: descriptor.pointLayerId,
       type: 'circle',
-      source: readonlyLayerSourceId,
+      source: descriptor.sourceId,
       filter: ['==', '$type', 'Point'],
       paint: {
         'circle-radius': 5,
         'circle-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
         'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+        'circle-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
     })
   }
 }
 
+const cleanupReadonlyLayerDescriptors = (layerDescriptors) => {
+  if (!map.value) return
+  const activeIds = new Set(layerDescriptors.map((descriptor) => descriptor.layerId))
+  ;(props.allLayers ?? []).forEach((layer) => {
+    if (!layer?.id || activeIds.has(layer.id) || layer.id === props.activeLayer?.id) return
+    const sourceId = `readonly-draw-source-${layer.id}`
+    const fillLayerId = `readonly-draw-fill-${layer.id}`
+    const lineLayerId = `readonly-draw-line-${layer.id}`
+    const pointLayerId = `readonly-draw-point-${layer.id}`
+    if (map.value.getLayer(pointLayerId)) map.value.removeLayer(pointLayerId)
+    if (map.value.getLayer(lineLayerId)) map.value.removeLayer(lineLayerId)
+    if (map.value.getLayer(fillLayerId)) map.value.removeLayer(fillLayerId)
+    if (map.value.getSource(sourceId)) map.value.removeSource(sourceId)
+  })
+}
+
 const syncReadonlyLayers = () => {
-  const source = map.value?.getSource(readonlyLayerSourceId)
-  source?.setData?.(buildReadonlyFeatureCollection())
+  if (!map.value) return
+  const layerDescriptors = buildReadonlyLayerDescriptors()
+  layerDescriptors.forEach((descriptor) => {
+    syncReadonlyLayerDescriptor(descriptor)
+  })
+  cleanupReadonlyLayerDescriptors(layerDescriptors)
 }
 
 const syncSelectedFeature = () => {
@@ -323,7 +363,6 @@ const initializeDraw = () => {
   map.value.addControl(draw.value, 'top-left')
   mountHiddenDrawControls()
   bindDrawEvents()
-  ensureReadonlyLayerSource()
   syncReadonlyLayers()
 
   const initialFeatures = normalizeFeatureCollection(props.modelValue)
@@ -362,14 +401,13 @@ const initializeMap = async () => {
   map.value.on('load', initializeDraw)
   map.value.on('styledata', () => {
     if (!draw.value) return
-    ensureReadonlyLayerSource()
     syncReadonlyLayers()
   })
 }
 
 const exportLayer = async (layerName) => {
   const featureCollection = normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue)
-  const safeLayerName = layerName || props.activeLayer?.name || 'map-draw-layer'
+  const safeLayerName = sanitizeLayerFilename(layerName || props.activeLayer?.name || 'map-draw-layer')
   const filename = `${safeLayerName}.geojson`
   const exported = exportFeatureCollectionAsGeoJson(featureCollection, filename)
   emit('export-layer', exported)
@@ -422,7 +460,6 @@ watch(
   () => props.allLayers,
   () => {
     if (!map.value) return
-    ensureReadonlyLayerSource()
     syncReadonlyLayers()
   },
   { deep: true }

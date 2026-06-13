@@ -430,6 +430,8 @@
       "loginAction": "登录"
     },
     "buttons": {
+      "collapseTools": "收起工具",
+      "expandTools": "展开工具",
       "createLineLayer": "新建线图层",
       "createPolygonLayer": "新建面图层",
       "drawLine": "画线",
