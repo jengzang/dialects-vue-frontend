@@ -441,7 +441,7 @@
       "createPointLayerDesc": "Create a new point or marker layer",
       "createLineLayerDesc": "Create a new line or path layer",
       "createPolygonLayerDesc": "Create a new polygon or area layer",
-      "importLayerDesc": "Support importing GeoJSON / JSON geographical data files",
+      "importLayerDesc": "Support importing GeoJSON / JSON / KML / CSV geographical data files",
       "exportCurrentLayerDesc": "Export the currently selected active layer as a GeoJSON file",
       "exportAllLayersDesc": "Merge and export all drawing layers as a single GeoJSON file",
       "exportImageDesc": "Render and export the current map view as a PNG image",
@@ -473,7 +473,7 @@
       "unlockLayer": "Unlock Layer"
     },
     "messages": {
-      "importLayerSuccess": "Layer imported successfully",
+      "importLayerSuccess": "Layer imported successfully, added {count} layer(s)",
       "importLayerFailed": "Failed to import layer: {error}",
       "clearAllConfirm": "Clear all current drawings?",
       "clearAllSuccess": "All drawings cleared",

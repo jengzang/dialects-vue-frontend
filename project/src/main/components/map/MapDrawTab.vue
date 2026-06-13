@@ -535,7 +535,7 @@
       <input
         ref="importInputRef"
         type="file"
-        accept=".json,.geojson,application/geo+json,application/json"
+        accept=".json,.geojson,.kml,.csv,application/geo+json,application/json,application/vnd.google-earth.kml+xml,text/csv"
         class="draw-import-input"
         @change="handleImportAsNewLayer"
       >
@@ -757,7 +757,7 @@ import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
 import { usePartitionCache } from '@/composables/domain/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import { showConfirm, showError, showSuccess } from '@/utils/message.js';
-import { readGeoJsonFile } from '@/utils/map/draw/export.js';
+import { readImportedLayerFile, splitFeatureCollectionByGeometryType } from '@/utils/map/draw/export.js';
 import { mapStyleConfig } from '@/utils/map/MapSource.js';
 import EditableMapLibre from '@/main/components/map/EditableMapLibre.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
@@ -1092,15 +1092,9 @@ const triggerImportLayer = () => {
   importInputRef.value?.click();
 };
 
-const createImportedLayer = (featureCollection) => {
-  const firstGeometryType = featureCollection?.features?.[0]?.geometry?.type;
-  const geometryType = ['Point', 'LineString', 'Polygon'].includes(firstGeometryType)
-    ? firstGeometryType
-    : 'LineString';
+const createImportedLayer = (featureCollection, geometryType) => {
   const layer = createEmptyLayer(geometryType);
   layer.featureCollection = featureCollection ?? emptyFeatureCollection();
-  layers.value.unshift(layer);
-  activeLayerId.value = layer.id;
   return layer;
 };
 
@@ -1109,13 +1103,19 @@ const handleImportAsNewLayer = async (event) => {
   if (!file) return;
 
   try {
-    const importedFeatureCollection = await readGeoJsonFile(file);
-    const layer = createImportedLayer(importedFeatureCollection);
-    activeLayerId.value = layer.id;
+    const importedFeatureCollection = await readImportedLayerFile(file);
+    const importedLayerGroups = splitFeatureCollectionByGeometryType(importedFeatureCollection);
+    const importedLayers = importedLayerGroups.map((group) => createImportedLayer(
+      group.featureCollection,
+      group.geometryType
+    ));
+    layers.value.unshift(...importedLayers);
+    const activeImportedLayer = importedLayers[0];
+    activeLayerId.value = activeImportedLayer.id;
     isDrawingPanelOpen.value = true;
-    editableMapRef.value?.importGeoJson?.(importedFeatureCollection);
+    editableMapRef.value?.importGeoJson?.(activeImportedLayer.featureCollection);
     currentMode.value = 'simple_select';
-    showSuccess(t('map.drawTab.messages.importLayerSuccess'));
+    showSuccess(t('map.drawTab.messages.importLayerSuccess', { count: importedLayers.length }));
   } catch (error) {
     showError(t('map.drawTab.messages.importLayerFailed', { error: error.message || error }));
   } finally {

@@ -441,7 +441,7 @@
       "createPointLayerDesc": "創建新的點位或標註圖層",
       "createLineLayerDesc": "創建新的折線或路徑圖層",
       "createPolygonLayerDesc": "創建新的多邊形或區域圖層",
-      "importLayerDesc": "支援匯入 GeoJSON / JSON 地理數據檔案",
+      "importLayerDesc": "支援匯入 GeoJSON / JSON / KML / CSV 地理數據檔案",
       "exportCurrentLayerDesc": "匯出目前選取的活動圖層為 GeoJSON 檔案",
       "exportAllLayersDesc": "將所有繪製圖層合併匯出為單個 GeoJSON 檔案",
       "exportImageDesc": "將目前地圖視圖區域算圖並匯出為 PNG 圖片",
@@ -473,7 +473,7 @@
       "unlockLayer": "解鎖圖層"
     },
     "messages": {
-      "importLayerSuccess": "圖層匯入成功",
+      "importLayerSuccess": "圖層匯入成功，共新增 {count} 個圖層",
       "importLayerFailed": "圖層匯入失敗：{error}",
       "clearAllConfirm": "確認清空目前所有繪製內容嗎？",
       "clearAllSuccess": "已清空全部繪製內容",

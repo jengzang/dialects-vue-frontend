@@ -1,3 +1,6 @@
+import { kml as kmlToGeoJson } from '@tmcw/togeojson'
+import { DOMParser } from '@xmldom/xmldom'
+
 const DEFAULT_FEATURE_PROPERTIES = {
   name: '',
   stroke: '#2563eb',
@@ -10,6 +13,10 @@ const DEFAULT_FEATURE_PROPERTIES = {
   visible: true,
   locked: false,
 }
+
+const SUPPORTED_DRAW_GEOMETRY_TYPES = ['Point', 'LineString', 'Polygon']
+const CSV_LONGITUDE_KEYS = ['lng', 'lon', 'long', 'longitude', 'x', '经度']
+const CSV_LATITUDE_KEYS = ['lat', 'latitude', 'y', '纬度']
 
 let featureIdSeed = 0
 
@@ -45,6 +52,205 @@ function triggerDownload(blob, filename) {
   URL.revokeObjectURL(objectUrl)
 }
 
+function buildFeatureCollection(features = []) {
+  return {
+    type: 'FeatureCollection',
+    features,
+  }
+}
+
+function normalizeCsvHeader(header = '') {
+  return header.replace(/^\uFEFF/, '').trim().toLowerCase().replace(/[\s_-]+/g, '')
+}
+
+function parseCsvRow(line) {
+  const values = []
+  let current = ''
+  let inQuotes = false
+
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index]
+    const nextChar = line[index + 1]
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        current += '"'
+        index += 1
+      } else {
+        inQuotes = !inQuotes
+      }
+      continue
+    }
+
+    if (char === ',' && !inQuotes) {
+      values.push(current)
+      current = ''
+      continue
+    }
+
+    current += char
+  }
+
+  values.push(current)
+  return values.map((value) => value.trim())
+}
+
+function parseGeoJsonText(text) {
+  const parsed = JSON.parse(text)
+
+  if (parsed?.type === 'FeatureCollection' && Array.isArray(parsed.features)) {
+    return parsed
+  }
+
+  if (parsed?.type === 'Feature') {
+    return buildFeatureCollection([parsed])
+  }
+
+  throw new Error('Invalid GeoJSON FeatureCollection')
+}
+
+function parseKmlText(text) {
+  const xmlDocument = new DOMParser().parseFromString(text, 'text/xml')
+  const featureCollection = kmlToGeoJson(xmlDocument)
+
+  if (!Array.isArray(featureCollection?.features)) {
+    throw new Error('Invalid KML document')
+  }
+
+  return featureCollection
+}
+
+function parseCsvText(text) {
+  const lines = text
+    .replace(/^\uFEFF/, '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+
+  if (lines.length < 2) {
+    throw new Error('CSV file requires a header row and at least one data row')
+  }
+
+  const headers = parseCsvRow(lines[0])
+  const normalizedHeaders = headers.map(normalizeCsvHeader)
+  const lngIndex = normalizedHeaders.findIndex((header) => CSV_LONGITUDE_KEYS.includes(header))
+  const latIndex = normalizedHeaders.findIndex((header) => CSV_LATITUDE_KEYS.includes(header))
+
+  if (lngIndex === -1 || latIndex === -1) {
+    throw new Error('CSV must include longitude/lng and latitude/lat columns')
+  }
+
+  const features = lines
+    .slice(1)
+    .map((line) => parseCsvRow(line))
+    .map((values, rowIndex) => {
+      const lng = Number(values[lngIndex])
+      const lat = Number(values[latIndex])
+
+      if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
+        return null
+      }
+      if (Math.abs(lng) > 180 || Math.abs(lat) > 90) {
+        return null
+      }
+
+      const properties = headers.reduce((result, header, headerIndex) => {
+        if (headerIndex === lngIndex || headerIndex === latIndex) {
+          return result
+        }
+        result[header] = values[headerIndex] ?? ''
+        return result
+      }, {
+        csvRowIndex: rowIndex,
+      })
+
+      return {
+        type: 'Feature',
+        properties,
+        geometry: {
+          type: 'Point',
+          coordinates: [lng, lat],
+        },
+      }
+    })
+    .filter(Boolean)
+
+  if (!features.length) {
+    throw new Error('CSV did not contain any valid coordinates')
+  }
+
+  return buildFeatureCollection(features)
+}
+
+function expandFeatureByGeometry(feature, geometry = feature?.geometry, context = {}) {
+  if (!geometry?.type) {
+    return []
+  }
+
+  const baseProperties = {
+    ...(feature?.properties ?? {}),
+    ...(context.sourceGeometryType ? { sourceGeometryType: context.sourceGeometryType } : {}),
+    ...(Number.isInteger(context.geometryPartIndex)
+      ? { geometryPartIndex: context.geometryPartIndex }
+      : {}),
+  }
+
+  const buildFeature = (nextGeometry, extraProperties = {}) => ({
+    ...feature,
+    properties: {
+      ...baseProperties,
+      ...extraProperties,
+    },
+    geometry: nextGeometry,
+  })
+
+  switch (geometry.type) {
+    case 'Point':
+    case 'LineString':
+    case 'Polygon':
+      return [buildFeature(geometry)]
+    case 'MultiPoint':
+      return (geometry.coordinates ?? []).map((coordinates, index) => buildFeature(
+        { type: 'Point', coordinates },
+        { sourceGeometryType: 'MultiPoint', geometryPartIndex: index }
+      ))
+    case 'MultiLineString':
+      return (geometry.coordinates ?? []).map((coordinates, index) => buildFeature(
+        { type: 'LineString', coordinates },
+        { sourceGeometryType: 'MultiLineString', geometryPartIndex: index }
+      ))
+    case 'MultiPolygon':
+      return (geometry.coordinates ?? []).map((coordinates, index) => buildFeature(
+        { type: 'Polygon', coordinates },
+        { sourceGeometryType: 'MultiPolygon', geometryPartIndex: index }
+      ))
+    case 'GeometryCollection':
+      return (geometry.geometries ?? []).flatMap((nestedGeometry, index) => expandFeatureByGeometry(
+        feature,
+        nestedGeometry,
+        {
+          sourceGeometryType: nestedGeometry?.type ?? geometry.type,
+          geometryPartIndex: index,
+        }
+      ))
+    default:
+      return []
+  }
+}
+
+function inferImportFormat(file) {
+  const fileName = file?.name?.toLowerCase?.() ?? ''
+  const fileType = file?.type?.toLowerCase?.() ?? ''
+
+  if (fileName.endsWith('.kml') || fileType.includes('kml')) {
+    return 'kml'
+  }
+  if (fileName.endsWith('.csv') || fileType.includes('csv')) {
+    return 'csv'
+  }
+  return 'geojson'
+}
+
 export function normalizeFeatureCollection(featureCollection) {
   const normalizedCollection = ensureFeatureCollection(featureCollection)
 
@@ -64,6 +270,54 @@ export function normalizeFeatureCollection(featureCollection) {
       }
     }),
   }
+}
+
+export function splitFeatureCollectionByGeometryType(featureCollection) {
+  const normalizedCollection = ensureFeatureCollection(featureCollection)
+  const groupedFeatures = {
+    Point: [],
+    LineString: [],
+    Polygon: [],
+  }
+
+  normalizedCollection.features.forEach((feature) => {
+    expandFeatureByGeometry(feature).forEach((expandedFeature) => {
+      const geometryType = expandedFeature?.geometry?.type
+      if (SUPPORTED_DRAW_GEOMETRY_TYPES.includes(geometryType)) {
+        groupedFeatures[geometryType].push(expandedFeature)
+      }
+    })
+  })
+
+  const groups = SUPPORTED_DRAW_GEOMETRY_TYPES
+    .filter((geometryType) => groupedFeatures[geometryType].length > 0)
+    .map((geometryType) => ({
+      geometryType,
+      featureCollection: normalizeFeatureCollection(buildFeatureCollection(groupedFeatures[geometryType])),
+    }))
+
+  if (!groups.length) {
+    throw new Error('No supported Point / LineString / Polygon features found')
+  }
+
+  return groups
+}
+
+function readFileAsText(file) {
+  if (typeof file?.text === 'function') {
+    return file.text()
+  }
+
+  if (typeof FileReader !== 'undefined') {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(String(reader.result ?? ''))
+      reader.onerror = () => reject(reader.error ?? new Error('Failed to read file'))
+      reader.readAsText(file)
+    })
+  }
+
+  throw new Error('File text reader is unavailable')
 }
 
 export function exportFeatureCollectionAsGeoJson(featureCollection, filename = 'map-draw-layer.geojson') {
@@ -99,12 +353,21 @@ export function exportCurrentMapAsPng(mapInstance, filename = 'map-draw.png') {
 }
 
 export async function readGeoJsonFile(file) {
-  const text = await file.text()
-  const parsed = JSON.parse(text)
+  const text = await readFileAsText(file)
+  return normalizeFeatureCollection(parseGeoJsonText(text))
+}
 
-  if (parsed.type !== 'FeatureCollection' || !Array.isArray(parsed.features)) {
-    throw new Error('Invalid GeoJSON FeatureCollection')
+export async function readImportedLayerFile(file) {
+  const text = await readFileAsText(file)
+  const importFormat = inferImportFormat(file)
+
+  if (importFormat === 'kml') {
+    return normalizeFeatureCollection(parseKmlText(text))
   }
 
-  return normalizeFeatureCollection(parsed)
+  if (importFormat === 'csv') {
+    return normalizeFeatureCollection(parseCsvText(text))
+  }
+
+  return normalizeFeatureCollection(parseGeoJsonText(text))
 }
