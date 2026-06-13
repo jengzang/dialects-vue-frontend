@@ -116,6 +116,10 @@ const map = shallowRef(null)
 const draw = shallowRef(null)
 const selectedFeatureId = ref('')
 const currentStyleKey = ref(props.currentStyleKey || 'gaode')
+const emptyFeatureCollection = () => ({
+  type: 'FeatureCollection',
+  features: [],
+})
 const sanitizeLayerFilename = (layerName) => {
   return String(layerName || 'map-draw-layer')
     .trim()
@@ -317,6 +321,7 @@ const importGeoJson = (featureCollection, options = {}) => {
 
   const normalized = normalizeFeatureCollection(featureCollection)
   const mergeImportedFeatures = options.merge === true
+  const shouldEmitChanges = options.emitChanges !== false
   const nextFeatureCollection = mergeImportedFeatures
     ? normalizeFeatureCollection({
         type: 'FeatureCollection',
@@ -332,7 +337,11 @@ const importGeoJson = (featureCollection, options = {}) => {
     draw.value.set(nextFeatureCollection)
   }
   selectedFeatureId.value = ''
-  syncFeaturesFromDraw()
+  if (shouldEmitChanges) {
+    syncFeaturesFromDraw()
+  } else {
+    syncSelectedFeature()
+  }
 }
 
 const mountHiddenDrawControls = () => {
@@ -365,7 +374,9 @@ const initializeDraw = () => {
   bindDrawEvents()
   syncReadonlyLayers()
 
-  const initialFeatures = normalizeFeatureCollection(props.modelValue)
+  const initialFeatures = normalizeFeatureCollection(
+    props.activeLayer?.visible === false ? emptyFeatureCollection() : props.modelValue
+  )
   if (initialFeatures.features.length > 0) {
     draw.value.set(initialFeatures)
   }
@@ -443,10 +454,12 @@ const exportImage = async () => {
 }
 
 watch(
-  () => props.modelValue,
-  (nextValue) => {
+  () => [props.modelValue, props.activeLayer?.visible],
+  ([nextValue]) => {
     if (!draw.value || !nextValue) return
-    const normalized = normalizeFeatureCollection(nextValue)
+    const normalized = normalizeFeatureCollection(
+      props.activeLayer?.visible === false ? emptyFeatureCollection() : nextValue
+    )
     draw.value.deleteAll()
     if (normalized.features.length > 0) {
       draw.value.set(normalized)

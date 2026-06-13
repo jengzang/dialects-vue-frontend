@@ -21,45 +21,43 @@
           class="main-glass-button"
           data-variant="secondary"
           type="button"
-          @click="triggerImportLayer"
+          @click="showAddLayerModal = true"
         >
-          {{ t('map.drawTab.buttons.importLayer') }}
+          ➕ {{ t('map.drawTab.buttons.addLayer') }}
         </button>
         <button
           class="main-glass-button"
           data-variant="secondary"
           type="button"
-          @click="handleExportLayer"
+          @click="showExportModal = true"
         >
-          {{ t('map.drawTab.buttons.exportLayer') }}
+          📤 {{ t('map.drawTab.buttons.export') }}
         </button>
         <button
           class="main-glass-button"
           data-variant="secondary"
           type="button"
-          @click="handleExportAllLayers"
+          @click="showLocalStorageModal = true"
         >
-          {{ t('map.drawTab.buttons.exportAllLayers') }}
+          💾 {{ t('map.drawTab.buttons.saveToLocal') }}
         </button>
         <button
           class="main-glass-button"
-          data-variant="primary"
+          :data-variant="isDrawingPanelOpen ? 'primary' : 'secondary'"
+          :data-active="isDrawingPanelOpen"
           type="button"
-          @click="handleExportImage"
+          @click="isDrawingPanelOpen = !isDrawingPanelOpen"
         >
-          {{ t('map.drawTab.buttons.exportImage') }}
+          🛠️ {{ t('map.drawTab.buttons.drawingTools') }}
         </button>
         <button
           class="main-glass-button"
-          :data-variant="isToolPanelCollapsed ? 'primary' : 'secondary'"
+          :data-variant="isLayersPanelOpen ? 'primary' : 'secondary'"
+          :data-active="isLayersPanelOpen"
           type="button"
-          @click="isToolPanelCollapsed = !isToolPanelCollapsed"
+          @click="isLayersPanelOpen = !isLayersPanelOpen"
         >
-          {{
-            isToolPanelCollapsed
-              ? t('map.drawTab.buttons.expandTools')
-              : t('map.drawTab.buttons.collapseTools')
-          }}
+          🗂️ {{ t('map.drawTab.buttons.layers') }}
         </button>
       </div>
     </div>
@@ -86,10 +84,7 @@
     </div>
 
     <template v-else>
-      <div
-        class="draw-workbench"
-        :data-panel-collapsed="isToolPanelCollapsed"
-      >
+      <div class="draw-workbench">
         <div class="draw-map-area">
           <EditableMapLibre
             ref="editableMapRef"
@@ -104,17 +99,22 @@
           />
         </div>
 
+        <!-- Drawing Tools Panel -->
         <Transition name="draw-panel-slide">
           <aside
-            v-if="!isToolPanelCollapsed"
+            v-show="isDrawingPanelOpen"
             class="draw-tool-panel main-glass-panel"
+            :class="{ 'offset-left': isLayersPanelOpen }"
           >
             <div class="draw-tool-panel-header">
               <div>
                 <div class="draw-tool-panel-title">
-                  {{ t('map.drawTab.title') }}
+                  {{ t('map.drawTab.buttons.drawingTools') }}
                 </div>
-                <div class="draw-tool-panel-subtitle">
+                <div
+                  v-if="activeLayer"
+                  class="draw-tool-panel-subtitle"
+                >
                   {{ t('map.drawTab.labels.selectedLayer') }}：{{ selectedLayerLabel }}
                 </div>
               </div>
@@ -123,60 +123,51 @@
             <div class="draw-tool-panel-body">
               <section class="draw-tool-section">
                 <div class="draw-tool-section-title">
-                  新建图层
-                </div>
-                <div class="draw-tool-button-grid">
-                  <button
-                    class="main-glass-button"
-                    data-variant="secondary"
-                    type="button"
-                    @click="handleCreateLayer('LineString')"
-                  >
-                    {{ t('map.drawTab.buttons.createLineLayer') }}
-                  </button>
-                  <button
-                    class="main-glass-button"
-                    data-variant="secondary"
-                    type="button"
-                    @click="handleCreateLayer('Polygon')"
-                  >
-                    {{ t('map.drawTab.buttons.createPolygonLayer') }}
-                  </button>
-                </div>
-              </section>
-
-              <section class="draw-tool-section">
-                <div class="draw-tool-section-title">
                   绘制工具
                 </div>
                 <div class="draw-tool-button-grid draw-tool-button-grid--three">
                   <button
-                    class="main-glass-button"
+                    class="main-glass-button draw-tool-mode-button"
                     :data-variant="currentMode === 'simple_select' ? 'primary' : 'secondary'"
                     :data-active="currentMode === 'simple_select'"
                     type="button"
                     @click="setMode('simple_select')"
                   >
+                    <span
+                      v-if="currentMode === 'simple_select'"
+                      class="draw-tool-check"
+                      aria-hidden="true"
+                    >✓</span>
                     {{ t('map.drawTab.buttons.select') }}
                   </button>
                   <button
-                    class="main-glass-button"
+                    class="main-glass-button draw-tool-mode-button"
                     :data-variant="currentMode === 'draw_line_string' ? 'primary' : 'secondary'"
                     :data-active="currentMode === 'draw_line_string'"
                     :disabled="activeLayer?.geometryType === 'Polygon'"
                     type="button"
                     @click="setMode('draw_line_string')"
                   >
+                    <span
+                      v-if="currentMode === 'draw_line_string'"
+                      class="draw-tool-check"
+                      aria-hidden="true"
+                    >✓</span>
                     {{ t('map.drawTab.buttons.drawLine') }}
                   </button>
                   <button
-                    class="main-glass-button"
+                    class="main-glass-button draw-tool-mode-button"
                     :data-variant="currentMode === 'draw_polygon' ? 'primary' : 'secondary'"
                     :data-active="currentMode === 'draw_polygon'"
                     :disabled="activeLayer?.geometryType === 'LineString'"
                     type="button"
                     @click="setMode('draw_polygon')"
                   >
+                    <span
+                      v-if="currentMode === 'draw_polygon'"
+                      class="draw-tool-check"
+                      aria-hidden="true"
+                    >✓</span>
                     {{ t('map.drawTab.buttons.drawPolygon') }}
                   </button>
                   <button
@@ -207,113 +198,6 @@
               </section>
 
               <section class="draw-tool-section">
-                <div class="draw-tool-section-header">
-                  <div class="draw-tool-section-title">
-                    {{ t('map.drawTab.labels.layerList') }}
-                  </div>
-                  <div class="draw-tool-inline-actions">
-                    <button
-                      class="main-glass-button draw-tool-inline-button"
-                      data-variant="secondary"
-                      type="button"
-                      @click="setAllLayersVisibility(true)"
-                    >
-                      {{ t('map.drawTab.buttons.showAllLayers') }}
-                    </button>
-                    <button
-                      class="main-glass-button draw-tool-inline-button"
-                      data-variant="secondary"
-                      type="button"
-                      @click="setAllLayersVisibility(false)"
-                    >
-                      {{ t('map.drawTab.buttons.hideAllLayers') }}
-                    </button>
-                  </div>
-                </div>
-                <div class="draw-style-hint">
-                  {{ t('map.drawTab.labels.styleHint') }}
-                </div>
-
-                <div
-                  v-if="layers.length"
-                  class="draw-layer-list"
-                >
-                  <div
-                    v-for="layer in layers"
-                    :key="layer.id"
-                    class="draw-layer-row"
-                    :data-active="activeLayerId === layer.id"
-                  >
-                    <button
-                      class="main-glass-button draw-layer-row-button"
-                      :data-variant="activeLayerId === layer.id ? 'primary' : 'secondary'"
-                      :data-active="activeLayerId === layer.id"
-                      type="button"
-                      @click="handleSelectLayer(layer.id)"
-                    >
-                      {{ getLayerLabel(layer) }}
-                    </button>
-                    <div class="draw-layer-row-actions">
-                      <button
-                        class="main-glass-button draw-layer-chip-action"
-                        data-variant="secondary"
-                        type="button"
-                        @click.stop="moveLayer(layer.id, -1)"
-                      >
-                        {{ t('map.drawTab.buttons.moveLayerUp') }}
-                      </button>
-                      <button
-                        class="main-glass-button draw-layer-chip-action"
-                        data-variant="secondary"
-                        type="button"
-                        @click.stop="moveLayer(layer.id, 1)"
-                      >
-                        {{ t('map.drawTab.buttons.moveLayerDown') }}
-                      </button>
-                      <button
-                        class="main-glass-button draw-layer-chip-action"
-                        data-variant="secondary"
-                        type="button"
-                        @click.stop="toggleLayerVisibility(layer.id)"
-                      >
-                        {{
-                          layer.visible
-                            ? t('map.drawTab.buttons.hideLayer')
-                            : t('map.drawTab.buttons.showLayer')
-                        }}
-                      </button>
-                      <button
-                        class="main-glass-button draw-layer-chip-action"
-                        data-variant="secondary"
-                        type="button"
-                        @click.stop="toggleLayerLock(layer.id)"
-                      >
-                        {{
-                          layer.locked
-                            ? t('map.drawTab.buttons.unlockLayer')
-                            : t('map.drawTab.buttons.lockLayer')
-                        }}
-                      </button>
-                      <button
-                        class="main-glass-button draw-layer-chip-action"
-                        data-variant="secondary"
-                        type="button"
-                        @click.stop="handleDeleteLayer(layer.id)"
-                      >
-                        {{ t('map.drawTab.buttons.deleteLayer') }}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  v-else
-                  class="draw-layer-empty"
-                >
-                  {{ t('map.drawTab.labels.emptyState') }}
-                </div>
-              </section>
-
-              <section class="draw-tool-section">
                 <div class="draw-tool-section-title">
                   {{ t('map.drawTab.labels.layerEditor') }}
                 </div>
@@ -331,7 +215,7 @@
                     >
                   </label>
 
-                  <label class="draw-field">
+                  <label class="draw-field draw-color-field">
                     <span class="draw-field-label">{{ t('map.drawTab.labels.strokeColor') }}</span>
                     <input
                       class="draw-color-input"
@@ -343,7 +227,7 @@
 
                   <label
                     v-if="selectedFeatureGeometryType !== 'Point'"
-                    class="draw-field"
+                    class="draw-field draw-color-field"
                   >
                     <span class="draw-field-label">{{ t('map.drawTab.labels.fillColor') }}</span>
                     <input
@@ -416,6 +300,143 @@
                   {{ t('map.drawTab.labels.emptyState') }}
                 </div>
               </section>
+            </div>
+          </aside>
+        </Transition>
+
+        <!-- Layers Panel -->
+        <Transition name="draw-panel-slide">
+          <aside
+            v-show="isLayersPanelOpen"
+            class="draw-tool-panel main-glass-panel layers-panel"
+          >
+            <div class="draw-tool-panel-header">
+              <div>
+                <div class="draw-tool-panel-title">
+                  {{ t('map.drawTab.buttons.layers') }}
+                </div>
+              </div>
+            </div>
+
+            <div class="draw-tool-panel-body">
+              <section class="draw-tool-section">
+                <div class="draw-tool-section-header">
+                  <div class="draw-tool-section-title">
+                    {{ t('map.drawTab.labels.layerList') }}
+                  </div>
+                  <div class="draw-tool-inline-actions">
+                    <button
+                      class="main-glass-button draw-tool-inline-button"
+                      data-variant="secondary"
+                      type="button"
+                      @click="setAllLayersVisibility(true)"
+                    >
+                      {{ t('map.drawTab.buttons.showAllLayers') }}
+                    </button>
+                    <button
+                      class="main-glass-button draw-tool-inline-button"
+                      data-variant="secondary"
+                      type="button"
+                      @click="setAllLayersVisibility(false)"
+                    >
+                      {{ t('map.drawTab.buttons.hideAllLayers') }}
+                    </button>
+                  </div>
+                </div>
+                <div class="draw-style-hint">
+                  {{ t('map.drawTab.labels.styleHint') }}
+                </div>
+
+                <div
+                  v-if="layers.length"
+                  class="draw-layer-list"
+                >
+                  <div
+                    v-for="layer in layers"
+                    :key="layer.id"
+                    class="draw-layer-row"
+                    :data-active="activeLayerId === layer.id"
+                  >
+                    <button
+                      class="main-glass-button draw-layer-row-button"
+                      :data-variant="activeLayerId === layer.id ? 'primary' : 'secondary'"
+                      :data-active="activeLayerId === layer.id"
+                      type="button"
+                      @click="handleSelectLayer(layer.id)"
+                    >
+                      {{ getLayerLabel(layer) }}
+                    </button>
+                    <div class="draw-layer-row-actions">
+                      <button
+                        class="main-glass-button draw-layer-chip-action"
+                        data-variant="secondary"
+                        type="button"
+                        title="置顶"
+                        @click.stop="moveLayerToTop(layer.id)"
+                      >
+                        ⤒
+                      </button>
+                      <button
+                        class="main-glass-button draw-layer-chip-action"
+                        data-variant="secondary"
+                        type="button"
+                        title="上移"
+                        @click.stop="moveLayer(layer.id, -1)"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        class="main-glass-button draw-layer-chip-action"
+                        data-variant="secondary"
+                        type="button"
+                        title="下移"
+                        @click.stop="moveLayer(layer.id, 1)"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        class="main-glass-button draw-layer-chip-action"
+                        data-variant="secondary"
+                        type="button"
+                        title="置底"
+                        @click.stop="moveLayerToBottom(layer.id)"
+                      >
+                        ⤓
+                      </button>
+                      <button
+                        class="main-glass-button draw-layer-chip-action"
+                        data-variant="secondary"
+                        type="button"
+                        @click.stop="toggleLayerVisibility(layer.id)"
+                      >
+                        {{ layer.visible ? '隐藏' : '显示' }}
+                      </button>
+                      <button
+                        class="main-glass-button draw-layer-chip-action"
+                        data-variant="secondary"
+                        type="button"
+                        @click.stop="toggleLayerLock(layer.id)"
+                      >
+                        {{ layer.locked ? '解锁' : '锁定' }}
+                      </button>
+                      <button
+                        class="main-glass-button draw-layer-chip-action"
+                        data-variant="secondary"
+                        type="button"
+                        @click.stop="handleDeleteLayer(layer.id)"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  v-else
+                  class="draw-layer-empty"
+                >
+                  {{ t('map.drawTab.labels.emptyState') }}
+                </div>
+              </section>
 
               <section class="draw-tool-section">
                 <div class="draw-tool-section-title">
@@ -442,12 +463,201 @@
         class="draw-import-input"
         @change="handleImportAsNewLayer"
       >
+
+      <!-- Add Layer Modal -->
+      <AppModal
+        v-model="showAddLayerModal"
+        :title="t('map.drawTab.buttons.addLayerModalTitle')"
+        size="sm"
+      >
+        <div class="draw-modal-choices">
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            @click="onCreateLayerClicked('LineString')"
+          >
+            <span class="draw-card-icon">➖</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.createLineLayer') }}
+              </div>
+              <div class="draw-card-desc">
+                {{ t('map.drawTab.buttons.createLineLayerDesc') }}
+              </div>
+            </div>
+          </button>
+
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            @click="onCreateLayerClicked('Polygon')"
+          >
+            <span class="draw-card-icon">⬡</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.createPolygonLayer') }}
+              </div>
+              <div class="draw-card-desc">
+                {{ t('map.drawTab.buttons.createPolygonLayerDesc') }}
+              </div>
+            </div>
+          </button>
+
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            @click="onImportLayerClicked"
+          >
+            <span class="draw-card-icon">📤</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.importLayer') }}
+              </div>
+              <div class="draw-card-desc">
+                {{ t('map.drawTab.buttons.importLayerDesc') }}
+              </div>
+            </div>
+          </button>
+        </div>
+      </AppModal>
+
+      <!-- Export Modal -->
+      <AppModal
+        v-model="showExportModal"
+        :title="t('map.drawTab.buttons.exportModalTitle')"
+        size="sm"
+      >
+        <div class="draw-modal-choices">
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            :disabled="!activeLayer"
+            @click="onExportCurrentClicked"
+          >
+            <span class="draw-card-icon">📄</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.exportLayer') }}
+              </div>
+              <div class="draw-card-desc">
+                {{ t('map.drawTab.buttons.exportCurrentLayerDesc') }}
+              </div>
+            </div>
+          </button>
+
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            :disabled="!layers.length"
+            @click="onExportAllClicked"
+          >
+            <span class="draw-card-icon">🗂️</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.exportAllLayers') }}
+              </div>
+              <div class="draw-card-desc">
+                {{ t('map.drawTab.buttons.exportAllLayersDesc') }}
+              </div>
+            </div>
+          </button>
+
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            @click="onExportImageClicked"
+          >
+            <span class="draw-card-icon">🖼️</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.exportImage') }}
+              </div>
+              <div class="draw-card-desc">
+                {{ t('map.drawTab.buttons.exportImageDesc') }}
+              </div>
+            </div>
+          </button>
+        </div>
+      </AppModal>
+
+      <AppModal
+        v-model="showLocalStorageModal"
+        :title="t('map.drawTab.buttons.localStorageModalTitle')"
+        size="sm"
+      >
+        <div class="draw-modal-choices draw-local-draft-actions">
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            @click="handleSaveAsNewLocal"
+          >
+            <span class="draw-card-icon">💾</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.saveAsNewLocal') }}
+              </div>
+            </div>
+          </button>
+
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            :disabled="!storedDraftOptions.length"
+            @click="handleUpdateLocal"
+          >
+            <span class="draw-card-icon">♻️</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.updateLocal') }}
+              </div>
+            </div>
+          </button>
+
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            :disabled="!storedDraftOptions.length"
+            @click="handleRestoreLocal"
+          >
+            <span class="draw-card-icon">📂</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.restoreLocal') }}
+              </div>
+            </div>
+          </button>
+
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            :disabled="!storedDraftOptions.length"
+            @click="handleDeleteLocal"
+          >
+            <span class="draw-card-icon">🗑️</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.deleteLocal') }}
+              </div>
+            </div>
+          </button>
+        </div>
+
+        <div class="draw-local-draft-picker">
+          <label class="draw-field">
+            <span class="draw-field-label">{{ t('map.drawTab.labels.localDraftSelection') }}</span>
+            <SimpleSelectDropdown
+              v-model="selectedStoredDraftId"
+              :options="storedDraftOptions"
+            />
+          </label>
+        </div>
+      </AppModal>
     </template>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
@@ -456,6 +666,7 @@ import { readGeoJsonFile } from '@/utils/map/draw/export.js';
 import { mapStyleConfig } from '@/utils/map/MapSource.js';
 import EditableMapLibre from '@/main/components/map/EditableMapLibre.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
+import AppModal from '@/components/common/AppModal.vue';
 
 const { t } = useI18n();
 const { requireAuth, isAuthenticated } = useAuthGuard();
@@ -468,6 +679,7 @@ const defaultLayerStyle = {
   visible: true,
   locked: false,
 };
+const mapDrawStorageKey = 'map-draw-workbench-state';
 let layerIdSeed = 0;
 
 const editableMapRef = ref(null);
@@ -477,7 +689,13 @@ const currentStyleKey = ref('gaode');
 const selectedFeatureId = ref('');
 const layers = ref([]);
 const activeLayerId = ref('');
-const isToolPanelCollapsed = ref(false);
+const isDrawingPanelOpen = ref(true);
+const isLayersPanelOpen = ref(false);
+const showAddLayerModal = ref(false);
+const showExportModal = ref(false);
+const showLocalStorageModal = ref(false);
+const selectedStoredDraftId = ref('');
+const storedDrafts = ref([]);
 const activeFeatureId = computed(() => activeLayerId.value);
 
 const emptyFeatureCollection = () => ({
@@ -558,6 +776,7 @@ const handleCreateLayer = (geometryType) => {
   layers.value.push(layer);
   activeLayerId.value = layer.id;
   selectedFeatureId.value = '';
+  isDrawingPanelOpen.value = true;
   const mode = geometryType === 'Polygon' ? 'draw_polygon' : 'draw_line_string';
   setMode(mode);
 };
@@ -585,6 +804,19 @@ const moveLayer = (layerId, direction) => {
   if (targetIndex < 0 || targetIndex >= layers.value.length) return;
   const [layer] = layers.value.splice(layerIndex, 1);
   layers.value.splice(targetIndex, 0, layer);
+  syncAllLayersAfterMutation();
+};
+
+const syncActiveLayerToMap = () => {
+  if (!activeLayer.value) return;
+  editableMapRef.value?.importGeoJson?.(
+    activeLayer.value.visible === false ? emptyFeatureCollection() : activeLayer.value.featureCollection,
+    { emitChanges: false }
+  );
+};
+
+const syncAllLayersAfterMutation = () => {
+  syncActiveLayerToMap();
 };
 
 const applyLayerPropertyToFeatures = (layer, key, value) => {
@@ -606,9 +838,7 @@ const toggleLayerVisibility = (layerId) => {
   if (!layer) return;
   layer.visible = !layer.visible;
   applyLayerPropertyToFeatures(layer, 'visible', layer.visible);
-  if (activeLayerId.value === layer.id) {
-    editableMapRef.value?.importGeoJson?.(layer.featureCollection);
-  }
+  syncAllLayersAfterMutation();
 };
 
 const setAllLayersVisibility = (visible) => {
@@ -616,9 +846,7 @@ const setAllLayersVisibility = (visible) => {
     layer.visible = visible;
     applyLayerPropertyToFeatures(layer, 'visible', visible);
   });
-  if (activeLayer.value) {
-    editableMapRef.value?.importGeoJson?.(activeLayer.value.featureCollection);
-  }
+  syncAllLayersAfterMutation();
 };
 
 const toggleLayerLock = (layerId) => {
@@ -626,9 +854,7 @@ const toggleLayerLock = (layerId) => {
   if (!layer) return;
   layer.locked = !layer.locked;
   applyLayerPropertyToFeatures(layer, 'locked', layer.locked);
-  if (activeLayerId.value === layer.id) {
-    editableMapRef.value?.importGeoJson?.(layer.featureCollection);
-  }
+  syncAllLayersAfterMutation();
 };
 
 const handleDeleteLayer = (layerId) => {
@@ -643,6 +869,7 @@ const handleDeleteLayer = (layerId) => {
     currentMode.value = 'simple_select';
     editableMapRef.value?.setDrawMode?.('simple_select');
   }
+  syncAllLayersAfterMutation();
 };
 
 const getFeatureId = (feature) => String(feature?.id ?? feature?.properties?.id ?? '');
@@ -665,7 +892,7 @@ const updateSelectedFeatureProperty = (key, value) => {
       },
     })),
   };
-  editableMapRef.value?.importGeoJson?.(activeLayer.value.featureCollection);
+  syncAllLayersAfterMutation();
 };
 
 const handleActiveLayerFeaturesChange = (nextValue) => {
@@ -702,6 +929,7 @@ const handleImportAsNewLayer = async (event) => {
     const importedFeatureCollection = await readGeoJsonFile(file);
     const layer = createImportedLayer(importedFeatureCollection);
     activeLayerId.value = layer.id;
+    isDrawingPanelOpen.value = true;
     editableMapRef.value?.importGeoJson?.(importedFeatureCollection);
     currentMode.value = 'simple_select';
     showSuccess(t('map.drawTab.messages.importLayerSuccess'));
@@ -766,9 +994,172 @@ const handleExportImage = async () => {
 
 const handleImageExported = () => {};
 const handleLayerExported = () => {};
+
+const hasLayersToPersist = computed(() => {
+  return layers.value.some((layer) => (layer?.featureCollection?.features?.length ?? 0) > 0);
+});
+
+const buildPersistedWorkbenchState = () => ({
+  layers: layers.value,
+  activeLayerId: activeLayerId.value,
+  currentStyleKey: currentStyleKey.value,
+  isDrawingPanelOpen: isDrawingPanelOpen.value,
+  isLayersPanelOpen: isLayersPanelOpen.value,
+});
+
+const getStoredDrafts = () => {
+  const raw = localStorage.getItem(mapDrawStorageKey);
+  if (!raw) return [];
+  const parsed = JSON.parse(raw);
+  return Array.isArray(parsed) ? parsed : [];
+};
+
+const writeStoredDrafts = (drafts) => {
+  storedDrafts.value = drafts;
+  localStorage.setItem(mapDrawStorageKey, JSON.stringify(drafts));
+};
+
+const storedDraftOptions = computed(() => {
+  return storedDrafts.value.map((draft) => ({
+    label: draft.name,
+    value: draft.id,
+  }));
+});
+
+const buildDraftRecord = (name) => ({
+  id: `${Date.now()}`,
+  name,
+  savedAt: new Date().toISOString(),
+  state: buildPersistedWorkbenchState(),
+});
+
+const applyDraftState = (state) => {
+  layers.value = Array.isArray(state?.layers) ? state.layers : [];
+  activeLayerId.value = state?.activeLayerId || layers.value[0]?.id || '';
+  currentStyleKey.value = state?.currentStyleKey || 'gaode';
+  isDrawingPanelOpen.value = state?.isDrawingPanelOpen ?? true;
+  isLayersPanelOpen.value = state?.isLayersPanelOpen ?? false;
+  const numericIds = layers.value
+    .map((layer) => Number(String(layer?.id || '').replace('draw-layer-', '')))
+    .filter((value) => Number.isFinite(value));
+  layerIdSeed = numericIds.length ? Math.max(...numericIds) : layerIdSeed;
+  syncAllLayersAfterMutation();
+};
+
+const restoreWorkbenchState = () => {
+  const drafts = getStoredDrafts();
+  storedDrafts.value = drafts;
+  if (!drafts.length) return;
+  const latestDraft = drafts[drafts.length - 1];
+  applyDraftState(latestDraft?.state);
+  selectedStoredDraftId.value = latestDraft?.id || '';
+};
+
+const handleSaveAsNewLocal = () => {
+  if (!hasLayersToPersist.value) {
+    showError(t('map.drawTab.messages.noLayersToSave'));
+    return;
+  }
+  const drafts = getStoredDrafts();
+  const nextDraft = buildDraftRecord(`${t('map.drawTab.title')} ${drafts.length + 1}`);
+  drafts.push(nextDraft);
+  writeStoredDrafts(drafts);
+  selectedStoredDraftId.value = nextDraft.id;
+  showSuccess(t('map.drawTab.messages.saveToLocalSuccess'));
+};
+
+const handleUpdateLocal = () => {
+  if (!hasLayersToPersist.value) {
+    showError(t('map.drawTab.messages.noLayersToSave'));
+    return;
+  }
+  if (!selectedStoredDraftId.value) return;
+  const drafts = getStoredDrafts();
+  const draftIndex = drafts.findIndex((draft) => draft.id === selectedStoredDraftId.value);
+  if (draftIndex === -1) return;
+  drafts[draftIndex] = {
+    ...drafts[draftIndex],
+    savedAt: new Date().toISOString(),
+    state: buildPersistedWorkbenchState(),
+  };
+  writeStoredDrafts(drafts);
+  showSuccess(t('map.drawTab.messages.updateLocalSuccess'));
+};
+
+const handleRestoreLocal = () => {
+  if (!selectedStoredDraftId.value) return;
+  const draft = getStoredDrafts().find((item) => item.id === selectedStoredDraftId.value);
+  if (!draft) return;
+  applyDraftState(draft.state);
+  showSuccess(t('map.drawTab.messages.restoreLocalSuccess'));
+};
+
+const handleDeleteLocal = () => {
+  if (!selectedStoredDraftId.value) return;
+  const drafts = getStoredDrafts().filter((draft) => draft.id !== selectedStoredDraftId.value);
+  writeStoredDrafts(drafts);
+  selectedStoredDraftId.value = drafts[0]?.id || '';
+  showSuccess(t('map.drawTab.messages.deleteLocalSuccess'));
+};
+
+const handleSaveToLocal = () => {
+  if (!hasLayersToPersist.value) return showError(t('map.drawTab.messages.noLayersToSave'));
+  showLocalStorageModal.value = true;
+};
+
+const onCreateLayerClicked = (type) => {
+  handleCreateLayer(type);
+  showAddLayerModal.value = false;
+};
+
+const onImportLayerClicked = () => {
+  triggerImportLayer();
+  showAddLayerModal.value = false;
+};
+
+const onExportCurrentClicked = () => {
+  handleExportLayer();
+  showExportModal.value = false;
+};
+
+const onExportAllClicked = () => {
+  handleExportAllLayers();
+  showExportModal.value = false;
+};
+
+const onExportImageClicked = () => {
+  handleExportImage();
+  showExportModal.value = false;
+};
+
+const moveLayerToTop = (layerId) => {
+  const index = layers.value.findIndex((item) => item.id === layerId);
+  if (index === -1 || index === layers.value.length - 1) return;
+  const [layer] = layers.value.splice(index, 1);
+  layers.value.push(layer);
+  syncAllLayersAfterMutation();
+};
+
+const moveLayerToBottom = (layerId) => {
+  const index = layers.value.findIndex((item) => item.id === layerId);
+  if (index === -1 || index === 0) return;
+  const [layer] = layers.value.splice(index, 1);
+  layers.value.unshift(layer);
+  syncAllLayersAfterMutation();
+};
+
+onMounted(() => {
+  try {
+    restoreWorkbenchState();
+  } catch (error) {
+    console.warn('restore map draw workbench state failed', error);
+  }
+});
 </script>
 
 <style scoped lang="scss">
+@use '../../../styles/global/scrollbars' as scrollbars;
+
 @mixin draw-section-base {
   display: flex;
   flex-direction: column;
@@ -779,8 +1170,8 @@ const handleLayerExported = () => {};
 
 @mixin draw-field-stack {
   display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
+  align-items: center;
+  gap: 0.65rem;
 }
 
 @mixin draw-button-grid($columns) {
@@ -863,6 +1254,14 @@ const handleLayerExported = () => {};
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
+  transition:
+    right 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s ease;
+}
+
+.draw-tool-panel.offset-left {
+  right: 24rem;
 }
 
 .draw-tool-panel-header {
@@ -891,12 +1290,15 @@ const handleLayerExported = () => {};
   flex-direction: column;
   gap: 0.9rem;
   padding-right: 0.15rem;
+  @include scrollbars.visible-scrollbar;
+  @include scrollbars.visible-scrollbar-webkit;
 }
 
 /* Panel slide transition */
 .draw-panel-slide-enter-active,
 .draw-panel-slide-leave-active {
   transition:
+    right 0.35s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.3s ease;
 }
@@ -904,6 +1306,12 @@ const handleLayerExported = () => {};
 .draw-panel-slide-enter-from,
 .draw-panel-slide-leave-to {
   transform: translateX(calc(100% + 1.5rem));
+  opacity: 0;
+}
+
+.draw-tool-panel.offset-left.draw-panel-slide-enter-from,
+.draw-tool-panel.offset-left.draw-panel-slide-leave-to {
+  transform: translateX(calc(100% + 24.5rem));
   opacity: 0;
 }
 
@@ -948,6 +1356,21 @@ const handleLayerExported = () => {};
 
 .draw-tool-button-grid--three {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.draw-tool-button-grid--three .main-glass-button {
+  padding: 0.55rem 0.45rem;
+}
+
+.draw-tool-mode-button {
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.draw-tool-check {
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .draw-basemap-select {
@@ -997,6 +1420,7 @@ const handleLayerExported = () => {};
 
 .draw-layer-chip-action {
   min-width: auto;
+  padding:8px!important;
   padding-inline: 0.8rem;
 }
 
@@ -1008,9 +1432,12 @@ const handleLayerExported = () => {};
 
 .draw-field {
   @include draw-field-stack;
+  justify-content: center;
 }
 
 .draw-field-label {
+  // flex: 0 0 5.2rem;
+  white-space: nowrap;
   font-size: 0.9rem;
   color: #0b2540;
   font-weight: 600;
@@ -1019,16 +1446,41 @@ const handleLayerExported = () => {};
 .draw-input,
 .draw-range-input,
 .draw-color-input {
+  min-width: 0;
   width: 100%;
 }
 
 .draw-input {
-  min-height: 2.6rem;
+  min-height: 2.2rem;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.7);
   background: rgba(255, 255, 255, 0.72);
   color: #0b2540;
-  padding: 0.7rem 0.85rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.draw-range-input {
+  flex: 1;
+}
+
+.draw-field:has(.draw-range-input) .draw-field-label {
+  flex-basis: 8rem;
+}
+
+.draw-color-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.draw-color-field .draw-field-label {
+  flex: 1;
+}
+
+.draw-color-field .draw-color-input {
+  flex: 0 0 5.2rem;
 }
 
 .draw-color-input {
@@ -1054,6 +1506,62 @@ const handleLayerExported = () => {};
 
 .draw-import-input {
   display: none;
+}
+
+/* Modal Choices Styles */
+.draw-modal-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.draw-modal-card-btn {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
+  padding: 1.2rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.draw-modal-card-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: #007aff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.08);
+}
+
+.draw-modal-card-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.draw-card-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.draw-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.draw-card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0b2540;
+}
+
+.draw-card-desc {
+  font-size: 0.85rem;
+  color: rgba(11, 37, 64, 0.65);
 }
 
 @media (max-width: 900px) {
