@@ -71,7 +71,9 @@
     "title": "分區繪圖",
     "hint": "按地圖集或音典分區的層級繪製方言分佈圖。<br>顏色會由系統自動分配。",
     "labels": {
-      "regionLevel": "繪圖分區層級"
+      "regionLevel": "繪圖分區層級",
+      "useAllData": "使用全部資料",
+      "partitionSource": "分區來源"
     },
     "placeholders": {
       "selectLevel": "請選擇層級"
@@ -79,14 +81,24 @@
     "options": {
       "level1": "一級分區",
       "level2": "二級分區",
-      "level3": "三級分區"
+      "level3": "三級分區",
+      "mapPartition": "地圖集分區",
+      "yindianPartition": "音典分區"
     },
     "buttons": {
       "run": "繪製地圖",
       "running": "繪製中..."
     },
+    "hints": {
+      "useAllData": "勾選後會使用系統全部地點資料，並隱藏手動地點輸入。"
+    },
     "messages": {
-      "dataFetchFailed": "取得資料失敗：{error}"
+      "dataFetchFailed": "取得資料失敗：{error}",
+      "allDataLoading": "正在載入全部地點資料...",
+      "allDataLoaded": "已載入 {count} 筆地點資料",
+      "allDataNotLoaded": "尚未載入全部地點資料",
+      "allDataLoadFailed": "載入全部地點資料失敗：{error}",
+      "allDataNoDrawablePoints": "全部資料中沒有可繪製的有效座標"
     }
   },
   "customTab": {

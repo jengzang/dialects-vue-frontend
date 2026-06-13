@@ -71,7 +71,9 @@
     "title": "Regional Mapping",
     "hint": "Draw dialect distribution maps by yindian or map atlas regional levels.<br>Colors are assigned automatically.",
     "labels": {
-      "regionLevel": "Regional Level"
+      "regionLevel": "Regional Level",
+      "useAllData": "Use All Data",
+      "partitionSource": "Partition Source"
     },
     "placeholders": {
       "selectLevel": "Please select a level"
@@ -79,14 +81,24 @@
     "options": {
       "level1": "Level 1 Region",
       "level2": "Level 2 Region",
-      "level3": "Level 3 Region"
+      "level3": "Level 3 Region",
+      "mapPartition": "Atlas Partition",
+      "yindianPartition": "Yindian Partition"
     },
     "buttons": {
       "run": "Draw Map",
       "running": "Drawing..."
     },
+    "hints": {
+      "useAllData": "When enabled, all built-in location data is used and manual location input is hidden."
+    },
     "messages": {
-      "dataFetchFailed": "Failed to fetch data: {error}"
+      "dataFetchFailed": "Failed to fetch data: {error}",
+      "allDataLoading": "Loading all location data...",
+      "allDataLoaded": "Loaded {count} location records",
+      "allDataNotLoaded": "All location data has not been loaded yet",
+      "allDataLoadFailed": "Failed to load all location data: {error}",
+      "allDataNoDrawablePoints": "No drawable coordinates found in all data"
     }
   },
   "customTab": {
