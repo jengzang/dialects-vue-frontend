@@ -1,0 +1,303 @@
+@use '../../../../styles/global/scrollbars' as scrollbars;
+
+@mixin draw-section-base {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.42);
+}
+
+@mixin draw-field-stack {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+@mixin draw-button-grid($columns) {
+  display: grid;
+  grid-template-columns: repeat($columns, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.draw-tool-panel {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  width: 22rem;
+  max-width: calc(100% - 2rem);
+  z-index: 10;
+  padding: 1rem 1.05rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  transition:
+    right 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s ease;
+}
+
+.draw-tool-panel.offset-left {
+  right: 24rem;
+}
+
+.draw-tool-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.draw-tool-panel-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0b2540;
+}
+
+.draw-tool-panel-subtitle {
+  margin-top: 0.3rem;
+  font-size: 0.88rem;
+  color: rgba(11, 37, 64, 0.72);
+}
+
+.draw-tool-panel-body {
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding-right: 0.15rem;
+  @include scrollbars.visible-scrollbar;
+  @include scrollbars.visible-scrollbar-webkit;
+}
+
+.draw-panel-slide-enter-active,
+.draw-panel-slide-leave-active {
+  transition:
+    right 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s ease;
+}
+
+.draw-panel-slide-enter-from,
+.draw-panel-slide-leave-to {
+  transform: translateX(calc(100% + 1.5rem));
+  opacity: 0;
+}
+
+.draw-tool-panel.offset-left.draw-panel-slide-enter-from,
+.draw-tool-panel.offset-left.draw-panel-slide-leave-to {
+  transform: translateX(calc(100% + 24.5rem));
+  opacity: 0;
+}
+
+.draw-tool-section {
+  @include draw-section-base;
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+}
+
+.draw-tool-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.draw-tool-section-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(11, 37, 64, 0.68);
+}
+
+.draw-tool-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+
+.draw-tool-inline-button {
+  min-width: auto;
+  padding-inline: 0.75rem;
+}
+
+.draw-tool-button-grid {
+  @include draw-button-grid(2);
+}
+
+.draw-tool-button-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.draw-tool-button-grid--three .main-glass-button {
+  padding: 0.4rem 0.3rem !important;
+}
+
+.draw-tool-mode-button {
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.draw-tool-check {
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.draw-basemap-select {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.draw-style-hint {
+  font-size: 0.88rem;
+  color: rgba(11, 37, 64, 0.72);
+}
+
+.draw-layer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.draw-layer-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.65rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+.draw-layer-row[data-active='true'] {
+  background: rgba(0, 122, 255, 0.12);
+  border-color: rgba(0, 122, 255, 0.35);
+}
+
+.draw-layer-row-button {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.draw-layer-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.draw-layer-chip-action {
+  min-width: auto;
+  padding: 8px !important;
+  padding-inline: 0.8rem;
+}
+
+.draw-layer-editor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.draw-field {
+  @include draw-field-stack;
+  justify-content: center;
+}
+
+.draw-field-label {
+  white-space: nowrap;
+  font-size: 0.9rem;
+  color: #0b2540;
+  font-weight: 600;
+}
+
+.draw-input,
+.draw-range-input,
+.draw-color-input {
+  min-width: 0;
+  width: 100%;
+}
+
+.draw-input {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.72);
+  color: #0b2540;
+  padding: 0.5rem 0.75rem;
+}
+
+.draw-range-input {
+  flex: 1;
+}
+
+.draw-field:has(.draw-range-input) .draw-field-label {
+  flex-basis: 8rem;
+}
+
+.draw-color-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.draw-color-field .draw-field-label {
+  flex: 1;
+}
+
+.draw-color-field .draw-color-input {
+  flex: 0 0 5.2rem;
+}
+
+.draw-color-input {
+  height: 2.8rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.3rem;
+}
+
+.draw-toggle-field {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #0b2540;
+  font-size: 0.92rem;
+}
+
+.draw-layer-empty {
+  color: rgba(11, 37, 64, 0.65);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 900px) {
+  .draw-tool-section-header {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .draw-tool-panel {
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+  }
+
+  .draw-tool-panel.offset-left {
+    right: auto;
+  }
+
+  .draw-tool-panel-body {
+    max-height: none;
+  }
+}

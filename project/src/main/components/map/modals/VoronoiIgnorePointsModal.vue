@@ -1,0 +1,465 @@
+<template>
+  <AppModal
+    :model-value="modelValue"
+    size="lg"
+    :title="t('map.drawTab.voronoi.ignoreModalTitle')"
+    close-label="关闭"
+    @update:modelValue="handleClose"
+  >
+    <template #default>
+      <div class="voronoi-ignore-modal">
+        <div class="feature-scope-summary main-glass-panel-inner">
+          <div class="summary-item">
+            <span class="summary-label">{{ t('map.drawTab.voronoi.totalPoints') }}</span>
+            <span class="summary-value summary-number">{{ locations.length }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">{{ t('map.drawTab.voronoi.ignoredPoints') }}</span>
+            <span class="summary-value summary-number">{{ selectedLocations.length }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">{{ t('map.drawTab.voronoi.partitionGroups') }}</span>
+            <span class="summary-value summary-number">{{ regions.length }}</span>
+          </div>
+        </div>
+
+        <div class="scope-toolbar main-glass-panel-inner">
+          <div class="scope-toolbar-main">
+            <div class="scope-toolbar-info">
+              {{ t('map.drawTab.voronoi.ignoreSelectedCount', { count: selectedLocations.length }) }}
+            </div>
+          </div>
+          <button class="scope-clear-btn" type="button" @click="clearSelection">
+            {{ t('map.drawTab.voronoi.clearSelection') }}
+          </button>
+        </div>
+
+        <div class="scope-grid">
+          <section class="scope-panel main-glass-panel-inner">
+            <div class="scope-panel-title">{{ t('map.drawTab.voronoi.regionTitle') }}</div>
+            <div v-if="regions.length === 0" class="feature-scope-state main-list-state">
+              <div class="main-list-state-title">{{ t('map.drawTab.voronoi.emptyRegions') }}</div>
+            </div>
+
+            <div v-else class="scope-tree-list">
+              <template v-for="node in regionTree" :key="node.fullPath">
+                <div class="scope-tree-node" :style="{ paddingLeft: `${node.depth * 18}px` }">
+                  <button
+                    class="scope-selection-item scope-tree-item"
+                    :class="[`state-${node.state}`]"
+                    type="button"
+                    @click="toggleRegion(node)"
+                  >
+                    <div class="scope-tree-main">
+                      <span v-if="node.children.length > 0" class="scope-tree-caret">▾</span>
+                      <span v-else class="scope-tree-caret scope-tree-caret-empty"></span>
+                      <span class="scope-selection-title">{{ node.label }}</span>
+                    </div>
+                    <span class="scope-selection-meta">
+                      {{ t('map.drawTab.voronoi.regionMeta', { locations: node.locationCount, records: node.recordCount }) }}
+                    </span>
+                    <span class="scope-selection-status">{{ t(`map.drawTab.voronoi.regionStates.${node.state}`) }}</span>
+                  </button>
+                </div>
+              </template>
+            </div>
+          </section>
+
+          <section class="scope-panel main-glass-panel-inner">
+            <div class="scope-panel-title">{{ t('map.drawTab.voronoi.locationTitle') }}</div>
+            <div v-if="locations.length === 0" class="feature-scope-state main-list-state">
+              <div class="main-list-state-title">{{ t('map.drawTab.voronoi.emptyLocations') }}</div>
+            </div>
+            <label
+              v-for="location in locations"
+              :key="location.name"
+              class="scope-checkbox-item"
+            >
+              <input
+                :checked="selectedLocationSet.has(location.name)"
+                type="checkbox"
+                @change="toggleLocation(location.name)"
+              >
+              <span class="scope-selection-copy">
+                <span class="scope-selection-title">{{ location.name }}</span>
+                <span class="scope-selection-meta">
+                  {{ t('map.drawTab.voronoi.locationMeta', { records: location.recordCount, regions: formatRegionNames(location.regionNames) || t('map.drawTab.voronoi.emptySummary') }) }}
+                </span>
+              </span>
+            </label>
+          </section>
+        </div>
+      </div>
+    </template>
+
+    <template #footer>
+      <div class="scope-modal-footer">
+        <button class="main-glass-button" type="button" @click="handleClose(false)">
+          取消
+        </button>
+        <button
+          class="main-glass-button scope-confirm-btn"
+          data-variant="primary"
+          type="button"
+          @click="handleConfirm"
+        >
+          {{ t('map.drawTab.voronoi.confirmIgnore') }}
+        </button>
+      </div>
+    </template>
+  </AppModal>
+</template>
+
+<script setup>
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import AppModal from '@/components/common/AppModal.vue'
+
+const props = defineProps({
+  modelValue: { type: Boolean, default: false },
+  regions: { type: Array, default: () => [] },
+  locations: { type: Array, default: () => [] },
+  ignoredLocations: { type: Array, default: () => [] },
+})
+
+const emit = defineEmits(['update:modelValue', 'confirm'])
+const { t, locale } = useI18n()
+
+const selectedLocations = ref([])
+const selectedLocationSet = computed(() => new Set(selectedLocations.value))
+
+const regionOptions = computed(() => {
+  return props.regions.map((region) => {
+    const names = new Set(region.rows.map((row) => String(row['簡稱'] || '').trim()).filter(Boolean))
+    const matchedCount = Array.from(names).filter((name) => selectedLocationSet.value.has(name)).length
+    let state = 'none'
+    if (matchedCount > 0 && matchedCount < names.size) {
+      state = 'partial'
+    } else if (names.size > 0 && matchedCount === names.size) {
+      state = 'full'
+    }
+    return {
+      ...region,
+      locationNames: Array.from(names),
+      state,
+    }
+  })
+})
+
+const regionTree = computed(() => {
+  const roots = []
+  const nodeMap = new Map()
+
+  const ensureNode = (label, fullPath, depth) => {
+    if (!nodeMap.has(fullPath)) {
+      nodeMap.set(fullPath, {
+        label,
+        fullPath,
+        depth,
+        children: [],
+        locationNames: new Set(),
+        recordCount: 0,
+      })
+    }
+    return nodeMap.get(fullPath)
+  }
+
+  regionOptions.value.forEach((region) => {
+    const parts = String(region.name || '')
+      .split('-')
+      .map((item) => item.trim())
+      .filter(Boolean)
+
+    if (parts.length === 0) return
+
+    let parent = null
+    const fullParts = []
+
+    parts.forEach((part, index) => {
+      fullParts.push(part)
+      const fullPath = fullParts.join('-')
+      const node = ensureNode(part, fullPath, index)
+
+      if (parent && !parent.children.includes(node)) {
+        parent.children.push(node)
+      } else if (!parent && !roots.includes(node)) {
+        roots.push(node)
+      }
+
+      parent = node
+    })
+
+    if (parent) {
+      region.locationNames.forEach((name) => parent.locationNames.add(name))
+      parent.recordCount += region.recordCount
+    }
+  })
+
+  const computeAggregates = (node) => {
+    const aggregatedLocations = new Set(node.locationNames)
+    let aggregatedRecords = node.recordCount
+
+    node.children.forEach((child) => {
+      const childResult = computeAggregates(child)
+      childResult.locationNames.forEach((name) => aggregatedLocations.add(name))
+      aggregatedRecords += childResult.recordCount
+    })
+
+    const matchedCount = Array.from(aggregatedLocations).filter((name) => selectedLocationSet.value.has(name)).length
+    let state = 'none'
+    if (matchedCount > 0 && matchedCount < aggregatedLocations.size) {
+      state = 'partial'
+    } else if (aggregatedLocations.size > 0 && matchedCount === aggregatedLocations.size) {
+      state = 'full'
+    }
+
+    node.aggregatedLocationNames = Array.from(aggregatedLocations)
+    node.locationCount = aggregatedLocations.size
+    node.aggregatedRecordCount = aggregatedRecords
+    node.state = state
+
+    return {
+      locationNames: aggregatedLocations,
+      recordCount: aggregatedRecords,
+    }
+  }
+
+  roots.forEach((node) => computeAggregates(node))
+
+  const flattened = []
+  const walk = (node) => {
+    flattened.push({
+      ...node,
+      children: [...node.children],
+      locationNames: [...node.aggregatedLocationNames],
+      recordCount: node.aggregatedRecordCount,
+    })
+    node.children.forEach(walk)
+  }
+  roots.forEach(walk)
+  return flattened
+})
+
+watch(() => props.modelValue, (isOpen) => {
+  if (isOpen) {
+    selectedLocations.value = [...props.ignoredLocations]
+  }
+})
+
+function clearSelection() {
+  selectedLocations.value = []
+}
+
+function toggleRegion(region) {
+  const next = new Set(selectedLocations.value)
+  const allSelected = region.state === 'full'
+
+  region.locationNames.forEach((locationName) => {
+    if (allSelected) {
+      next.delete(locationName)
+    } else {
+      next.add(locationName)
+    }
+  })
+
+  selectedLocations.value = Array.from(next)
+}
+
+function toggleLocation(locationName) {
+  const next = new Set(selectedLocations.value)
+  if (next.has(locationName)) {
+    next.delete(locationName)
+  } else {
+    next.add(locationName)
+  }
+  selectedLocations.value = Array.from(next)
+}
+
+function handleClose(value = false) {
+  emit('update:modelValue', value)
+}
+
+function handleConfirm() {
+  emit('confirm', [...selectedLocations.value])
+  handleClose(false)
+}
+
+function formatRegionNames(regionNames) {
+  const names = Array.isArray(regionNames) ? regionNames.filter(Boolean) : []
+  return names.join(locale.value === 'en' ? ', ' : '、')
+}
+</script>
+
+<style scoped lang="scss">
+.voronoi-ignore-modal,
+.feature-scope-summary,
+.scope-toolbar,
+.scope-grid,
+.scope-panel,
+.scope-tree-list {
+  min-width: 0;
+}
+
+.voronoi-ignore-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.feature-scope-summary {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 12px;
+  padding: 18px 20px;
+  overflow-x: auto;
+}
+
+.summary-item {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.summary-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.summary-number {
+  color: #007aff;
+}
+
+.scope-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+}
+
+.scope-toolbar-main {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.scope-toolbar-info {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.scope-clear-btn {
+  border: none;
+  background: transparent;
+  color: #007aff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scope-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.scope-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: min(56vh, 34rem);
+  overflow: auto;
+  padding: 16px;
+}
+
+.scope-panel-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.scope-tree-list,
+.scope-checkbox-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scope-selection-item,
+.scope-checkbox-item {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.62);
+  padding: 12px;
+}
+
+.scope-selection-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.scope-selection-item.state-full {
+  border-color: rgba(0, 122, 255, 0.5);
+  background: rgba(0, 122, 255, 0.12);
+}
+
+.scope-selection-item.state-partial {
+  border-color: rgba(245, 158, 11, 0.5);
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.scope-tree-main,
+.scope-checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.scope-tree-caret,
+.scope-tree-caret-empty {
+  width: 1rem;
+  flex: 0 0 1rem;
+}
+
+.scope-selection-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scope-selection-title {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.scope-selection-meta,
+.scope-selection-status {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.scope-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .scope-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

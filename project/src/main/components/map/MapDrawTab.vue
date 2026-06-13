@@ -27,12 +27,12 @@
         </button>
         <button
           class="main-glass-button"
-          data-variant="secondary"
+          :data-variant="isVoronoiPanelOpen ? 'primary' : 'secondary'"
+          :data-active="isVoronoiPanelOpen"
           type="button"
-          :disabled="isVoronoiCalculating"
-          @click="handleBuildVoronoi"
+          @click="isVoronoiPanelOpen = !isVoronoiPanelOpen"
         >
-          ⬡ {{ isVoronoiCalculating ? t('map.drawTab.buttons.voronoiRunning') : t('map.drawTab.buttons.voronoi') }}
+          ⬡ {{ t('map.drawTab.buttons.voronoi') }}
         </button>
         <button
           class="main-glass-button"
@@ -101,6 +101,7 @@
             v-model:current-style-key="currentStyleKey"
             :active-layer="activeLayer"
             :all-layers="layers"
+            :preview-layers="voronoiPreviewLayers"
             @features-change="handleActiveLayerFeaturesChange"
             @feature-select="handleFeatureSelect"
             @export-image="handleImageExported"
@@ -108,434 +109,63 @@
           />
         </div>
 
-        <!-- Drawing Tools Panel -->
-        <Transition name="draw-panel-slide">
-          <aside
-            v-show="isDrawingPanelOpen"
-            class="draw-tool-panel main-glass-panel"
-            :class="{ 'offset-left': isLayersPanelOpen }"
-          >
-            <div class="draw-tool-panel-header">
-              <div>
-                <div class="draw-tool-panel-title">
-                  {{ t('map.drawTab.buttons.drawingTools') }}
-                </div>
-                <div
-                  v-if="activeLayer"
-                  class="draw-tool-panel-subtitle"
-                >
-                  {{ t('map.drawTab.labels.selectedLayer') }}：{{ selectedLayerLabel }}
-                </div>
-              </div>
-            </div>
+        <MapDrawToolsPanel
+          :is-open="isDrawingPanelOpen"
+          :offset-left="isLayersPanelOpen"
+          :active-layer="activeLayer"
+          :selected-layer-label="selectedLayerLabel"
+          :current-mode="currentMode"
+          :selected-feature-properties="selectedFeatureProperties"
+          :selected-feature-geometry-type="selectedFeatureGeometryType"
+          @set-mode="setMode"
+          @delete-selected="handleDeleteSelected"
+          @clear-all="handleClearAll"
+          @reset-view="handleResetView"
+          @update-feature-property="updateSelectedFeatureProperty"
+        />
 
-            <div class="draw-tool-panel-body">
-              <section class="draw-tool-section">
-                <div class="draw-tool-section-title">
-                  绘制工具
-                </div>
-                <div class="draw-tool-button-grid draw-tool-button-grid--three">
-                  <button
-                    class="main-glass-button draw-tool-mode-button"
-                    :data-variant="currentMode === 'simple_select' ? 'primary' : 'secondary'"
-                    :data-active="currentMode === 'simple_select'"
-                    type="button"
-                    @click="setMode('simple_select')"
-                  >
-                    <span
-                      v-if="currentMode === 'simple_select'"
-                      class="draw-tool-check"
-                      aria-hidden="true"
-                    >✓</span>
-                    {{ t('map.drawTab.buttons.select') }}
-                  </button>
-                  <button
-                    v-if="!activeLayer || activeLayer.geometryType === 'Point'"
-                    class="main-glass-button draw-tool-mode-button"
-                    :data-variant="currentMode === 'draw_point' ? 'primary' : 'secondary'"
-                    :data-active="currentMode === 'draw_point'"
-                    type="button"
-                    @click="setMode('draw_point')"
-                  >
-                    <span
-                      v-if="currentMode === 'draw_point'"
-                      class="draw-tool-check"
-                      aria-hidden="true"
-                    >✓</span>
-                    {{ t('map.drawTab.buttons.drawPoint') }}
-                  </button>
-                  <button
-                    v-if="!activeLayer || activeLayer.geometryType === 'LineString'"
-                    class="main-glass-button draw-tool-mode-button"
-                    :data-variant="currentMode === 'draw_line_string' ? 'primary' : 'secondary'"
-                    :data-active="currentMode === 'draw_line_string'"
-                    type="button"
-                    @click="setMode('draw_line_string')"
-                  >
-                    <span
-                      v-if="currentMode === 'draw_line_string'"
-                      class="draw-tool-check"
-                      aria-hidden="true"
-                    >✓</span>
-                    {{ t('map.drawTab.buttons.drawLine') }}
-                  </button>
-                  <button
-                    v-if="!activeLayer || activeLayer.geometryType === 'Polygon'"
-                    class="main-glass-button draw-tool-mode-button"
-                    :data-variant="currentMode === 'draw_polygon' ? 'primary' : 'secondary'"
-                    :data-active="currentMode === 'draw_polygon'"
-                    type="button"
-                    @click="setMode('draw_polygon')"
-                  >
-                    <span
-                      v-if="currentMode === 'draw_polygon'"
-                      class="draw-tool-check"
-                      aria-hidden="true"
-                    >✓</span>
-                    {{ t('map.drawTab.buttons.drawPolygon') }}
-                  </button>
-                  <button
-                    class="main-glass-button"
-                    data-variant="secondary"
-                    type="button"
-                    @click="handleDeleteSelected"
-                  >
-                    {{ t('map.drawTab.buttons.deleteSelected') }}
-                  </button>
-                  <button
-                    class="main-glass-button"
-                    data-variant="secondary"
-                    type="button"
-                    @click="handleClearAll"
-                  >
-                    {{ t('map.drawTab.buttons.clearAll') }}
-                  </button>
-                  <button
-                    class="main-glass-button"
-                    data-variant="secondary"
-                    type="button"
-                    @click="handleResetView"
-                  >
-                    {{ t('map.mapLibre.buttons.reset') }}
-                  </button>
-                </div>
-              </section>
+        <MapDrawLayersPanel
+          :is-open="isLayersPanelOpen"
+          :layers="layers"
+          :active-layer-id="activeLayerId"
+          :current-style-key="currentStyleKey"
+          :map-style-options="mapStyleOptions"
+          @select-layer="handleSelectLayer"
+          @move-layer="moveLayer"
+          @move-layer-to-top="moveLayerToTop"
+          @move-layer-to-bottom="moveLayerToBottom"
+          @toggle-layer-visibility="toggleLayerVisibility"
+          @toggle-layer-lock="toggleLayerLock"
+          @delete-layer="handleDeleteLayer"
+          @set-all-layers-visibility="setAllLayersVisibility"
+          @update-style-key="handlePanelStyleUpdate"
+        />
 
-              <section class="draw-tool-section">
-                <div class="draw-tool-section-title">
-                  {{ t('map.drawTab.labels.layerEditor') }}
-                </div>
-                <div
-                  v-if="selectedFeatureProperties"
-                  class="draw-layer-editor-form"
-                >
-                  <label class="draw-field">
-                    <span class="draw-field-label">{{ t('map.drawTab.labels.layerName') }}</span>
-                    <input
-                      class="draw-input"
-                      type="text"
-                      :value="selectedFeatureProperties.name"
-                      @input="updateSelectedFeatureProperty('name', $event.target.value)"
-                    >
-                  </label>
-
-                  <label
-                    v-if="selectedFeatureGeometryType !== 'Point'"
-                    class="draw-field draw-color-field"
-                  >
-                    <span class="draw-field-label">{{ t('map.drawTab.labels.strokeColor') }}</span>
-                    <input
-                      class="draw-color-input"
-                      type="color"
-                      :value="selectedFeatureProperties.stroke"
-                      @input="updateSelectedFeatureProperty('stroke', $event.target.value)"
-                    >
-                  </label>
-
-                  <label
-                    v-if="selectedFeatureGeometryType === 'Point'"
-                    class="draw-field draw-color-field"
-                  >
-                    <span class="draw-field-label">{{ t('map.drawTab.labels.pointColor') }}</span>
-                    <input
-                      class="draw-color-input"
-                      type="color"
-                      :value="selectedFeatureProperties.pointColor"
-                      @input="updateSelectedFeatureProperty('pointColor', $event.target.value)"
-                    >
-                  </label>
-
-                  <label
-                    v-if="selectedFeatureGeometryType === 'Point'"
-                    class="draw-field draw-color-field"
-                  >
-                    <span class="draw-field-label">{{ t('map.drawTab.labels.pointStrokeColor') }}</span>
-                    <input
-                      class="draw-color-input"
-                      type="color"
-                      :value="selectedFeatureProperties.pointStrokeColor"
-                      @input="updateSelectedFeatureProperty('pointStrokeColor', $event.target.value)"
-                    >
-                  </label>
-
-                  <label
-                    v-if="selectedFeatureGeometryType === 'Polygon'"
-                    class="draw-field draw-color-field"
-                  >
-                    <span class="draw-field-label">{{ t('map.drawTab.labels.fillColor') }}</span>
-                    <input
-                      class="draw-color-input"
-                      type="color"
-                      :value="selectedFeatureProperties.fill"
-                      @input="updateSelectedFeatureProperty('fill', $event.target.value)"
-                    >
-                  </label>
-
-                  <label
-                    v-if="selectedFeatureGeometryType !== 'Point'"
-                    class="draw-field"
-                  >
-                    <span class="draw-field-label">{{ t('map.drawTab.labels.strokeWidth') }}：{{
-                      selectedFeatureProperties.strokeWidth
-                    }}</span>
-                    <input
-                      class="draw-range-input"
-                      type="range"
-                      min="1"
-                      max="12"
-                      step="1"
-                      :value="selectedFeatureProperties.strokeWidth"
-                      @input="
-                        updateSelectedFeatureProperty('strokeWidth', Number($event.target.value))
-                      "
-                    >
-                  </label>
-
-                  <label
-                    v-if="selectedFeatureGeometryType === 'Point'"
-                    class="draw-field"
-                  >
-                    <span class="draw-field-label">{{ t('map.drawTab.labels.pointRadius') }}：{{
-                      selectedFeatureProperties.pointRadius
-                    }}</span>
-                    <input
-                      class="draw-range-input"
-                      type="range"
-                      min="3"
-                      max="24"
-                      step="1"
-                      :value="selectedFeatureProperties.pointRadius"
-                      @input="
-                        updateSelectedFeatureProperty('pointRadius', Number($event.target.value))
-                      "
-                    >
-                  </label>
-
-                  <label
-                    v-if="selectedFeatureGeometryType === 'Polygon'"
-                    class="draw-field"
-                  >
-                    <span class="draw-field-label">{{ t('map.drawTab.labels.fillOpacity') }}：{{
-                      selectedFeatureProperties.fillOpacity
-                    }}</span>
-                    <input
-                      class="draw-range-input"
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.05"
-                      :value="selectedFeatureProperties.fillOpacity"
-                      @input="
-                        updateSelectedFeatureProperty('fillOpacity', Number($event.target.value))
-                      "
-                    >
-                  </label>
-
-                  <label class="draw-toggle-field">
-                    <input
-                      type="checkbox"
-                      :checked="selectedFeatureProperties.visible"
-                      @change="updateSelectedFeatureProperty('visible', $event.target.checked)"
-                    >
-                    <span>{{ t('map.drawTab.labels.visible') }}</span>
-                  </label>
-
-                  <label class="draw-toggle-field">
-                    <input
-                      type="checkbox"
-                      :checked="selectedFeatureProperties.locked"
-                      @change="updateSelectedFeatureProperty('locked', $event.target.checked)"
-                    >
-                    <span>{{ t('map.drawTab.labels.locked') }}</span>
-                  </label>
-                </div>
-                <div
-                  v-else
-                  class="draw-layer-empty"
-                >
-                  {{ t('map.drawTab.labels.emptyState') }}
-                </div>
-              </section>
-            </div>
-          </aside>
-        </Transition>
-
-        <!-- Layers Panel -->
-        <Transition name="draw-panel-slide">
-          <aside
-            v-show="isLayersPanelOpen"
-            class="draw-tool-panel main-glass-panel layers-panel"
-          >
-            <div class="draw-tool-panel-header">
-              <div>
-                <div class="draw-tool-panel-title">
-                  {{ t('map.drawTab.buttons.layers') }}
-                </div>
-              </div>
-            </div>
-
-            <div class="draw-tool-panel-body">
-              <section class="draw-tool-section">
-                <div class="draw-tool-section-header">
-                  <div class="draw-tool-section-title">
-                    {{ t('map.drawTab.labels.layerList') }}
-                  </div>
-                  <div class="draw-tool-inline-actions">
-                    <button
-                      class="main-glass-button draw-tool-inline-button"
-                      data-variant="secondary"
-                      type="button"
-                      @click="setAllLayersVisibility(true)"
-                    >
-                      {{ t('map.drawTab.buttons.showAllLayers') }}
-                    </button>
-                    <button
-                      class="main-glass-button draw-tool-inline-button"
-                      data-variant="secondary"
-                      type="button"
-                      @click="setAllLayersVisibility(false)"
-                    >
-                      {{ t('map.drawTab.buttons.hideAllLayers') }}
-                    </button>
-                  </div>
-                </div>
-                <div class="draw-style-hint">
-                  {{ t('map.drawTab.labels.styleHint') }}
-                </div>
-
-                <div
-                  v-if="layers.length"
-                  class="draw-layer-list"
-                >
-                  <div
-                    v-for="layer in layers"
-                    :key="layer.id"
-                    class="draw-layer-row"
-                    :data-active="activeLayerId === layer.id"
-                  >
-                    <button
-                      class="main-glass-button draw-layer-row-button"
-                      :data-variant="activeLayerId === layer.id ? 'primary' : 'secondary'"
-                      :data-active="activeLayerId === layer.id"
-                      type="button"
-                      @click="handleSelectLayer(layer.id)"
-                    >
-                      {{ getLayerLabel(layer) }}
-                    </button>
-                    <div class="draw-layer-row-actions">
-                      <button
-                        class="main-glass-button draw-layer-chip-action"
-                        data-variant="secondary"
-                        type="button"
-                        title="置顶"
-                        @click.stop="moveLayerToTop(layer.id)"
-                      >
-                        ⤒
-                      </button>
-                      <button
-                        class="main-glass-button draw-layer-chip-action"
-                        data-variant="secondary"
-                        type="button"
-                        title="上移"
-                        @click.stop="moveLayer(layer.id, -1)"
-                      >
-                        ↑
-                      </button>
-                      <button
-                        class="main-glass-button draw-layer-chip-action"
-                        data-variant="secondary"
-                        type="button"
-                        title="下移"
-                        @click.stop="moveLayer(layer.id, 1)"
-                      >
-                        ↓
-                      </button>
-                      <button
-                        class="main-glass-button draw-layer-chip-action"
-                        data-variant="secondary"
-                        type="button"
-                        title="置底"
-                        @click.stop="moveLayerToBottom(layer.id)"
-                      >
-                        ⤓
-                      </button>
-                      <button
-                        class="main-glass-button draw-layer-chip-action"
-                        data-variant="secondary"
-                        type="button"
-                        @click.stop="toggleLayerVisibility(layer.id)"
-                      >
-                        {{ layer.visible ? '隐藏' : '显示' }}
-                      </button>
-                      <button
-                        class="main-glass-button draw-layer-chip-action"
-                        data-variant="secondary"
-                        type="button"
-                        @click.stop="toggleLayerLock(layer.id)"
-                      >
-                        {{ layer.locked ? '解锁' : '锁定' }}
-                      </button>
-                      <button
-                        class="main-glass-button draw-layer-chip-action"
-                        data-variant="secondary"
-                        type="button"
-                        @click.stop="handleDeleteLayer(layer.id)"
-                      >
-                        删除
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  v-else
-                  class="draw-layer-empty"
-                >
-                  {{ t('map.drawTab.labels.emptyState') }}
-                </div>
-              </section>
-
-              <section class="draw-tool-section">
-                <div class="draw-tool-section-title">
-                  视图设置
-                </div>
-                <div class="draw-basemap-select">
-                  <span class="draw-field-label">{{ t('map.drawTab.labels.basemap') }}</span>
-                  <SimpleSelectDropdown
-                    v-model="currentStyleKey"
-                    :options="mapStyleOptions"
-                    @update:model-value="handleStyleChange"
-                  />
-                </div>
-              </section>
-            </div>
-          </aside>
-        </Transition>
+        <MapDrawVoronoiPanel
+          :is-open="isVoronoiPanelOpen"
+          :total-points="voronoiTotalPointCount"
+          :active-points="voronoiActivePointCount"
+          :ignored-count="ignoredVoronoiLocations.length"
+          :group-count="voronoiGroupCount"
+          :partition-mode="voronoiPartitionMode"
+          :region-level="voronoiRegionLevel"
+          :is-loading-points="isVoronoiLoadingPoints"
+          :is-calculating="isVoronoiCalculating"
+          :status-text="voronoiStatusText"
+          :offset-mode="voronoiPanelOffsetMode"
+          @update:partition-mode="voronoiPartitionMode = $event"
+          @update:region-level="voronoiRegionLevel = $event"
+          @load-points="loadVoronoiPoints"
+          @open-ignore-modal="openVoronoiIgnoreModal"
+          @preview-points="previewVoronoiPoints"
+          @calculate="handleBuildVoronoi"
+        />
       </div>
 
       <input
         ref="importInputRef"
         type="file"
-        accept=".json,.geojson,.kml,.csv,application/geo+json,application/json,application/vnd.google-earth.kml+xml,text/csv"
+        accept=".json,.geojson,.kml,.kmz,.csv,application/geo+json,application/json,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,text/csv"
         class="draw-import-input"
         @change="handleImportAsNewLayer"
       >
@@ -744,22 +374,40 @@
           </label>
         </div>
       </AppModal>
+
+      <VoronoiIgnorePointsModal
+        v-model="showVoronoiIgnoreModal"
+        :regions="voronoiSelectionOptions.regions"
+        :locations="voronoiSelectionOptions.locations"
+        :ignored-locations="ignoredVoronoiLocations"
+        @confirm="handleVoronoiIgnoreConfirm"
+      />
     </template>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { bbox, featureCollection, point, voronoi } from '@turf/turf';
 
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
 import { usePartitionCache } from '@/composables/domain/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import { showConfirm, showError, showSuccess } from '@/utils/message.js';
 import { readImportedLayerFile, splitFeatureCollectionByGeometryType } from '@/utils/map/draw/export.js';
+import {
+  PARTITION_MODE_MAP,
+  buildPartitionPointFeatureCollection,
+  buildPartitionPoints,
+  buildVoronoiSelectionOptions,
+  calculatePartitionVoronoi,
+} from '@/utils/map/partitionVoronoi.js';
 import { mapStyleConfig } from '@/utils/map/MapSource.js';
 import EditableMapLibre from '@/main/components/map/EditableMapLibre.vue';
+import MapDrawLayersPanel from '@/main/components/map/panels/MapDrawLayersPanel.vue';
+import MapDrawToolsPanel from '@/main/components/map/panels/MapDrawToolsPanel.vue';
+import MapDrawVoronoiPanel from '@/main/components/map/panels/MapDrawVoronoiPanel.vue';
+import VoronoiIgnorePointsModal from '@/main/components/map/modals/VoronoiIgnorePointsModal.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
 import AppModal from '@/components/common/AppModal.vue';
 
@@ -793,7 +441,6 @@ const isLayersPanelOpen = ref(false);
 const showAddLayerModal = ref(false);
 const showExportModal = ref(false);
 const showLocalStorageModal = ref(false);
-const isVoronoiCalculating = ref(false);
 const selectedStoredDraftId = ref('');
 const storedDrafts = ref([]);
 const activeFeatureId = computed(() => activeLayerId.value);
@@ -875,50 +522,103 @@ const handleStyleChange = () => {
   editableMapRef.value?.handleStyleChange?.();
 };
 
-const getFiniteCoordinatePair = (record) => {
-  const coordinateSource = record?.coordinates ?? record?.coordinate ?? record?.coord ?? record?.location;
-  const pair = Array.isArray(coordinateSource)
-    ? coordinateSource
-    : typeof coordinateSource === 'string'
-      ? coordinateSource.split(/[,，\s]+/)
-      : null;
-  const rawLng = record?.lng ?? record?.lon ?? record?.longitude ?? record?.x ?? pair?.[0];
-  const rawLat = record?.lat ?? record?.latitude ?? record?.y ?? pair?.[1];
-  const lng = Number(rawLng);
-  const lat = Number(rawLat);
-
-  if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
-    return null;
-  }
-  if (Math.abs(lng) > 180 || Math.abs(lat) > 90) {
-    return null;
-  }
-  return [lng, lat];
+const handlePanelStyleUpdate = (value) => {
+  currentStyleKey.value = value;
+  handleStyleChange();
 };
 
-const getSafeVoronoiBbox = (points) => {
-  const [minLng, minLat, maxLng, maxLat] = bbox(points);
-  const lngPadding = minLng === maxLng ? 0.01 : 0;
-  const latPadding = minLat === maxLat ? 0.01 : 0;
-  return [
-    minLng - lngPadding,
-    minLat - latPadding,
-    maxLng + lngPadding,
-    maxLat + latPadding,
-  ];
+const voronoiRawPartitionData = ref([]);
+const voronoiPartitionPoints = ref([]);
+const ignoredVoronoiLocations = ref([]);
+const voronoiPreviewLayers = ref([]);
+const voronoiPartitionMode = ref(PARTITION_MODE_MAP);
+const voronoiRegionLevel = ref(3);
+const isVoronoiPanelOpen = ref(false);
+const isVoronoiLoadingPoints = ref(false);
+const isVoronoiCalculating = ref(false);
+const showVoronoiIgnoreModal = ref(false);
+const voronoiStatusText = ref('');
+
+const activeVoronoiPoints = computed(() => {
+  const ignored = new Set(ignoredVoronoiLocations.value);
+  return voronoiPartitionPoints.value.filter((item) => !ignored.has(item.name));
+});
+
+const voronoiTotalPointCount = computed(() => voronoiPartitionPoints.value.length);
+const voronoiActivePointCount = computed(() => activeVoronoiPoints.value.length);
+const voronoiGroupCount = computed(() => {
+  const level = Number(voronoiRegionLevel.value) || 3;
+  return new Set(activeVoronoiPoints.value.map((item) => (
+    level === 1 ? item.partitionLevel1 : level === 2 ? item.partitionLevel2 : item.partitionLevel3
+  ))).size;
+});
+
+const voronoiPanelOffsetMode = computed(() => {
+  const openedPanelCount = [isDrawingPanelOpen.value, isLayersPanelOpen.value].filter(Boolean).length;
+  return openedPanelCount >= 2 ? 'double' : openedPanelCount === 1 ? 'single' : 'none';
+});
+
+const voronoiSelectionOptions = computed(() => {
+  return buildVoronoiSelectionOptions(voronoiPartitionPoints.value, Number(voronoiRegionLevel.value) || 3);
+});
+
+const setVoronoiStatus = (key, params = {}) => {
+  voronoiStatusText.value = t(`map.drawTab.voronoi.${key}`, params);
 };
 
-const buildPartitionPointCollection = (partitionData) => {
-  const records = Array.isArray(partitionData) ? partitionData : [];
-  return featureCollection(
-    records
-      .map((record) => {
-        const coordinates = getFiniteCoordinatePair(record);
-        if (!coordinates) return null;
-        return point(coordinates, record ?? {});
-      })
-      .filter(Boolean)
+const normalizeVoronoiPoints = (partitionData = voronoiRawPartitionData.value) => {
+  voronoiPartitionPoints.value = buildPartitionPoints(partitionData, {
+    partitionMode: voronoiPartitionMode.value,
+  });
+};
+
+const loadVoronoiPoints = async () => {
+  if (isVoronoiLoadingPoints.value) return;
+  isVoronoiLoadingPoints.value = true;
+
+  try {
+    const partitionData = await getPartitionData(() => getLocationPartitions());
+    voronoiRawPartitionData.value = Array.isArray(partitionData) ? partitionData : [];
+    normalizeVoronoiPoints(voronoiRawPartitionData.value);
+    setVoronoiStatus('pointsLoaded', { count: voronoiPartitionPoints.value.length });
+    console.log('[MapDrawTab] partition data:', partitionData);
+    console.log('[MapDrawTab] normalized partition points:', voronoiPartitionPoints.value);
+  } catch (error) {
+    console.error('[MapDrawTab] Load Voronoi points failed:', error);
+    showError(t('map.drawTab.messages.voronoiFailed', { error: error.message || error }));
+  } finally {
+    isVoronoiLoadingPoints.value = false;
+  }
+};
+
+const ensureVoronoiPointsLoaded = async () => {
+  if (voronoiPartitionPoints.value.length) return;
+  await loadVoronoiPoints();
+};
+
+const openVoronoiIgnoreModal = async () => {
+  await ensureVoronoiPointsLoaded();
+  showVoronoiIgnoreModal.value = true;
+};
+
+const handleVoronoiIgnoreConfirm = (locations) => {
+  ignoredVoronoiLocations.value = Array.isArray(locations) ? locations : [];
+  setVoronoiStatus('ignoreUpdated', { count: ignoredVoronoiLocations.value.length });
+};
+
+const previewVoronoiPoints = async () => {
+  await ensureVoronoiPointsLoaded();
+  const pointCollection = buildPartitionPointFeatureCollection(
+    activeVoronoiPoints.value,
+    Number(voronoiRegionLevel.value) || 3
   );
+  voronoiPreviewLayers.value = [{
+    id: 'voronoi-preview-points',
+    type: 'points',
+    featureCollection: pointCollection,
+  }];
+  setVoronoiStatus('previewReady', { count: pointCollection.features.length });
+  console.log('[MapDrawTab] voronoi preview points:', pointCollection);
 };
 
 const handleBuildVoronoi = async () => {
@@ -926,15 +626,20 @@ const handleBuildVoronoi = async () => {
   isVoronoiCalculating.value = true;
 
   try {
-    const partitionData = await getPartitionData(() => getLocationPartitions());
-    const points = buildPartitionPointCollection(partitionData);
-    const voronoiPolygons = points.features.length >= 2
-      ? voronoi(points, { bbox: getSafeVoronoiBbox(points) })
-      : featureCollection([]);
+    await ensureVoronoiPointsLoaded();
+    const level = Number(voronoiRegionLevel.value) || 3;
+    const points = activeVoronoiPoints.value;
+    const pointCollection = buildPartitionPointFeatureCollection(points, level);
+    const voronoiResult = calculatePartitionVoronoi(points, level);
 
-    console.log('[MapDrawTab] partition data:', partitionData);
-    console.log('[MapDrawTab] voronoi points:', points);
-    console.log('[MapDrawTab] voronoi polygons:', voronoiPolygons);
+    voronoiPreviewLayers.value = [{
+      id: 'voronoi-preview-polygons',
+      type: 'polygons',
+      featureCollection: voronoiResult.merged,
+    }];
+    setVoronoiStatus('calculated', { count: voronoiResult.merged.features.length });
+    console.log('[MapDrawTab] voronoi points:', pointCollection);
+    console.log('[MapDrawTab] voronoi polygons:', voronoiResult);
   } catch (error) {
     console.error('[MapDrawTab] Voronoi calculation failed:', error);
     showError(t('map.drawTab.messages.voronoiFailed', { error: error.message || error }));
@@ -942,6 +647,16 @@ const handleBuildVoronoi = async () => {
     isVoronoiCalculating.value = false;
   }
 };
+
+watch(voronoiPartitionMode, () => {
+  normalizeVoronoiPoints();
+  ignoredVoronoiLocations.value = [];
+  voronoiPreviewLayers.value = [];
+});
+
+watch(voronoiRegionLevel, () => {
+  voronoiPreviewLayers.value = [];
+});
 
 const handleCreateLayer = (geometryType) => {
   const layer = createEmptyLayer(geometryType);
@@ -1426,273 +1141,6 @@ onMounted(() => {
 
 .draw-map-area {
   width: 100%;
-}
-
-.draw-tool-panel {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  bottom: 1rem;
-  width: 22rem;
-  max-width: calc(100% - 2rem);
-  z-index: 10;
-  padding: 1rem 1.05rem;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  transition:
-    right 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.3s ease;
-}
-
-.draw-tool-panel.offset-left {
-  right: 24rem;
-}
-
-.draw-tool-panel-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.8rem;
-}
-
-.draw-tool-panel-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #0b2540;
-}
-
-.draw-tool-panel-subtitle {
-  margin-top: 0.3rem;
-  font-size: 0.88rem;
-  color: rgba(11, 37, 64, 0.72);
-}
-
-.draw-tool-panel-body {
-  min-height: 0;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  padding-right: 0.15rem;
-  @include scrollbars.visible-scrollbar;
-  @include scrollbars.visible-scrollbar-webkit;
-}
-
-/* Panel slide transition */
-.draw-panel-slide-enter-active,
-.draw-panel-slide-leave-active {
-  transition:
-    right 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.3s ease;
-}
-
-.draw-panel-slide-enter-from,
-.draw-panel-slide-leave-to {
-  transform: translateX(calc(100% + 1.5rem));
-  opacity: 0;
-}
-
-.draw-tool-panel.offset-left.draw-panel-slide-enter-from,
-.draw-tool-panel.offset-left.draw-panel-slide-leave-to {
-  transform: translateX(calc(100% + 24.5rem));
-  opacity: 0;
-}
-
-.draw-tool-section {
-  @include draw-section-base;
-
-  &:last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
-  }
-}
-
-.draw-tool-section-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.draw-tool-section-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: rgba(11, 37, 64, 0.68);
-}
-
-.draw-tool-inline-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  justify-content: flex-end;
-}
-
-.draw-tool-inline-button {
-  min-width: auto;
-  padding-inline: 0.75rem;
-}
-
-.draw-tool-button-grid {
-  @include draw-button-grid(2);
-}
-
-.draw-tool-button-grid--three {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.draw-tool-button-grid--three .main-glass-button {
-  padding: 0.4rem 0.3rem!important;
-}
-
-.draw-tool-mode-button {
-  justify-content: center;
-  gap: 0.35rem;
-}
-
-.draw-tool-check {
-  font-size: 0.88rem;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.draw-basemap-select {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-}
-
-.draw-style-hint {
-  font-size: 0.88rem;
-  color: rgba(11, 37, 64, 0.72);
-}
-
-.draw-layer-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-}
-
-.draw-layer-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.65rem;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.46);
-  border: 1px solid rgba(255, 255, 255, 0.55);
-}
-
-.draw-layer-row[data-active='true'] {
-  background: rgba(0, 122, 255, 0.12);
-  border-color: rgba(0, 122, 255, 0.35);
-}
-
-.draw-layer-row-button {
-  width: 100%;
-  justify-content: flex-start;
-  text-align: left;
-}
-
-.draw-layer-row-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
-
-.draw-layer-chip-action {
-  min-width: auto;
-  padding:8px!important;
-  padding-inline: 0.8rem;
-}
-
-.draw-layer-editor-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-.draw-field {
-  @include draw-field-stack;
-  justify-content: center;
-}
-
-.draw-field-label {
-  // flex: 0 0 5.2rem;
-  white-space: nowrap;
-  font-size: 0.9rem;
-  color: #0b2540;
-  font-weight: 600;
-}
-
-.draw-input,
-.draw-range-input,
-.draw-color-input {
-  min-width: 0;
-  width: 100%;
-}
-
-.draw-input {
-  // min-height: 2.2rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.72);
-  color: #0b2540;
-  padding: 0.5rem 0.75rem;
-}
-
-.draw-range-input {
-  flex: 1;
-}
-
-.draw-field:has(.draw-range-input) .draw-field-label {
-  flex-basis: 8rem;
-}
-
-.draw-color-field {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.draw-color-field .draw-field-label {
-  flex: 1;
-}
-
-.draw-color-field .draw-color-input {
-  flex: 0 0 5.2rem;
-}
-
-.draw-color-input {
-  height: 2.8rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.72);
-  padding: 0.3rem;
-}
-
-.draw-toggle-field {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  color: #0b2540;
-  font-size: 0.92rem;
-}
-
-.draw-layer-empty {
-  color: rgba(11, 37, 64, 0.65);
-  font-size: 0.92rem;
-}
-
-.draw-import-input {
-  display: none;
 }
 
 /* Modal Choices Styles */

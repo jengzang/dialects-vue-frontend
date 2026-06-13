@@ -102,6 +102,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  previewLayers: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const emit = defineEmits([
@@ -118,6 +122,7 @@ const map = shallowRef(null)
 const draw = shallowRef(null)
 const selectedFeatureId = ref('')
 const currentStyleKey = ref(props.currentStyleKey || 'gaode')
+let previousPreviewSourceIds = []
 const emptyFeatureCollection = () => ({
   type: 'FeatureCollection',
   features: [],
@@ -166,6 +171,54 @@ const buildReadonlyLayerDescriptors = () => {
         }),
       }
     })
+}
+
+const buildPreviewLayerDescriptors = () => {
+  return (props.previewLayers ?? []).map((layer, layerIndex) => {
+    const featureCollection = normalizeFeatureCollection(layer?.featureCollection)
+    const style = layer?.type === 'polygons'
+      ? {
+          stroke: '#ef4444',
+          strokeWidth: 2,
+          fill: '#f97316',
+          fillOpacity: 0.18,
+          pointRadius: 6,
+          pointColor: '#ef4444',
+          pointStrokeColor: '#ffffff',
+        }
+      : {
+          stroke: '#ef4444',
+          strokeWidth: 2,
+          fill: '#f97316',
+          fillOpacity: 0.18,
+          pointRadius: 7,
+          pointColor: '#ef4444',
+          pointStrokeColor: '#ffffff',
+        }
+
+    return {
+      layerId: layer?.id ?? `preview-${layerIndex}`,
+      layerOrder: 1000 + layerIndex,
+      sourceId: `preview-draw-source-${layer?.id ?? layerIndex}`,
+      fillLayerId: `preview-draw-fill-${layer?.id ?? layerIndex}`,
+      lineLayerId: `preview-draw-line-${layer?.id ?? layerIndex}`,
+      pointLayerId: `preview-draw-point-${layer?.id ?? layerIndex}`,
+      featureCollection: normalizeFeatureCollection({
+        type: 'FeatureCollection',
+        features: (featureCollection.features ?? []).map((feature) => ({
+          ...feature,
+          properties: {
+            ...(feature.properties ?? {}),
+            ...style,
+            visible: true,
+            locked: true,
+            layerId: layer?.id ?? `preview-${layerIndex}`,
+            layerOrder: 1000 + layerIndex,
+          },
+        })),
+      }),
+    }
+  })
 }
 
 const syncReadonlyLayerDescriptor = (descriptor) => {
@@ -235,23 +288,38 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
 
 const cleanupReadonlyLayerDescriptors = (layerDescriptors) => {
   if (!map.value) return
-  const activeIds = new Set(layerDescriptors.map((descriptor) => descriptor.layerId))
-  ;(props.allLayers ?? []).forEach((layer) => {
-    if (!layer?.id || activeIds.has(layer.id) || layer.id === props.activeLayer?.id) return
-    const sourceId = `readonly-draw-source-${layer.id}`
-    const fillLayerId = `readonly-draw-fill-${layer.id}`
-    const lineLayerId = `readonly-draw-line-${layer.id}`
-    const pointLayerId = `readonly-draw-point-${layer.id}`
+  const activeSourceIds = new Set(layerDescriptors.map((descriptor) => descriptor.sourceId))
+  const currentPreviewSourceIds = (props.previewLayers ?? []).map((layer, index) => `preview-draw-source-${layer?.id ?? index}`)
+  const candidateSourceIds = [
+    ...(props.allLayers ?? [])
+      .filter((layer) => layer?.id && layer.id !== props.activeLayer?.id)
+      .map((layer) => `readonly-draw-source-${layer.id}`),
+    ...currentPreviewSourceIds,
+    ...previousPreviewSourceIds,
+  ]
+
+  candidateSourceIds.forEach((sourceId) => {
+    if (activeSourceIds.has(sourceId)) return
+    const idSuffix = sourceId.replace(/^readonly-draw-source-/, '').replace(/^preview-draw-source-/, '')
+    const prefix = sourceId.startsWith('preview-draw-source-') ? 'preview' : 'readonly'
+    const fillLayerId = `${prefix}-draw-fill-${idSuffix}`
+    const lineLayerId = `${prefix}-draw-line-${idSuffix}`
+    const pointLayerId = `${prefix}-draw-point-${idSuffix}`
     if (map.value.getLayer(pointLayerId)) map.value.removeLayer(pointLayerId)
     if (map.value.getLayer(lineLayerId)) map.value.removeLayer(lineLayerId)
     if (map.value.getLayer(fillLayerId)) map.value.removeLayer(fillLayerId)
     if (map.value.getSource(sourceId)) map.value.removeSource(sourceId)
   })
+
+  previousPreviewSourceIds = currentPreviewSourceIds
 }
 
 const syncReadonlyLayers = () => {
   if (!map.value) return
-  const layerDescriptors = buildReadonlyLayerDescriptors()
+  const layerDescriptors = [
+    ...buildReadonlyLayerDescriptors(),
+    ...buildPreviewLayerDescriptors(),
+  ]
   layerDescriptors.forEach((descriptor) => {
     syncReadonlyLayerDescriptor(descriptor)
   })
@@ -479,6 +547,15 @@ watch(
 
 watch(
   () => props.allLayers,
+  () => {
+    if (!map.value) return
+    syncReadonlyLayers()
+  },
+  { deep: true }
+)
+
+watch(
+  () => props.previewLayers,
   () => {
     if (!map.value) return
     syncReadonlyLayers()

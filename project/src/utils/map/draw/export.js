@@ -1,5 +1,6 @@
 import { kml as kmlToGeoJson } from '@tmcw/togeojson'
 import { DOMParser } from '@xmldom/xmldom'
+import { unzipSync, strFromU8 } from 'fflate'
 
 const DEFAULT_FEATURE_PROPERTIES = {
   name: '',
@@ -118,6 +119,20 @@ function parseKmlText(text) {
   }
 
   return featureCollection
+}
+
+function getKmzKmlText(arrayBuffer) {
+  const zipEntries = unzipSync(new Uint8Array(arrayBuffer))
+  const entryNames = Object.keys(zipEntries)
+
+  const preferredEntryName = entryNames.find((entryName) => entryName.toLowerCase() === 'doc.kml')
+    ?? entryNames.find((entryName) => entryName.toLowerCase().endsWith('.kml'))
+
+  if (!preferredEntryName) {
+    throw new Error('KMZ did not contain a KML document')
+  }
+
+  return strFromU8(zipEntries[preferredEntryName])
 }
 
 function parseCsvText(text) {
@@ -242,6 +257,9 @@ function inferImportFormat(file) {
   const fileName = file?.name?.toLowerCase?.() ?? ''
   const fileType = file?.type?.toLowerCase?.() ?? ''
 
+  if (fileName.endsWith('.kmz') || fileType.includes('kmz')) {
+    return 'kmz'
+  }
   if (fileName.endsWith('.kml') || fileType.includes('kml')) {
     return 'kml'
   }
@@ -320,6 +338,23 @@ function readFileAsText(file) {
   throw new Error('File text reader is unavailable')
 }
 
+async function readFileAsArrayBuffer(file) {
+  if (typeof file?.arrayBuffer === 'function') {
+    return file.arrayBuffer()
+  }
+
+  if (typeof FileReader !== 'undefined') {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = () => reject(reader.error ?? new Error('Failed to read file'))
+      reader.readAsArrayBuffer(file)
+    })
+  }
+
+  throw new Error('File array buffer reader is unavailable')
+}
+
 export function exportFeatureCollectionAsGeoJson(featureCollection, filename = 'map-draw-layer.geojson') {
   const normalized = normalizeFeatureCollection(featureCollection)
   const blob = new Blob([
@@ -358,8 +393,14 @@ export async function readGeoJsonFile(file) {
 }
 
 export async function readImportedLayerFile(file) {
-  const text = await readFileAsText(file)
   const importFormat = inferImportFormat(file)
+
+  if (importFormat === 'kmz') {
+    const arrayBuffer = await readFileAsArrayBuffer(file)
+    return normalizeFeatureCollection(parseKmlText(getKmzKmlText(arrayBuffer)))
+  }
+
+  const text = await readFileAsText(file)
 
   if (importFormat === 'kml') {
     return normalizeFeatureCollection(parseKmlText(text))
