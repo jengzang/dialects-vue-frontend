@@ -285,7 +285,9 @@ export function normalizeFeatureCollection(featureCollection) {
 
   return {
     type: 'FeatureCollection',
-    features: normalizedCollection.features.map((feature) => {
+    features: normalizedCollection.features
+      .filter((feature) => feature && typeof feature === 'object')
+      .map((feature) => {
       const featureId = ensureFeatureId(feature, usedFeatureIds)
       return {
         ...feature,

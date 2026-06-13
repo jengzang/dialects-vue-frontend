@@ -181,7 +181,9 @@ export function calculatePartitionVoronoi(points, level = 3, colorMap = {}) {
       : featureCollection([])
     const style = colorMap[partitionKey] ?? {}
 
-    const features = (polygonCollection?.features ?? []).map((feature) => ({
+    const features = (polygonCollection?.features ?? [])
+      .filter((feature) => feature && typeof feature === 'object')
+      .map((feature) => ({
       ...feature,
       properties: {
         ...(feature.properties ?? {}),

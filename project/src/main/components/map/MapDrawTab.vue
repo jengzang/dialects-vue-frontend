@@ -587,8 +587,8 @@ const loadVoronoiPoints = async () => {
     voronoiRawPartitionData.value = Array.isArray(partitionData) ? partitionData : [];
     normalizeVoronoiPoints(voronoiRawPartitionData.value);
     setVoronoiStatus('pointsLoaded', { count: voronoiPartitionPoints.value.length });
-    console.log('[MapDrawTab] partition data:', partitionData);
-    console.log('[MapDrawTab] normalized partition points:', voronoiPartitionPoints.value);
+    // console.log('[MapDrawTab] partition data:', partitionData);
+    // console.log('[MapDrawTab] normalized partition points:', voronoiPartitionPoints.value);
   } catch (error) {
     console.error('[MapDrawTab] Load Voronoi points failed:', error);
     showError(t('map.drawTab.messages.voronoiFailed', { error: error.message || error }));
@@ -658,8 +658,8 @@ const handleBuildVoronoi = async () => {
       featureCollection: voronoiResult.merged,
     }];
     setVoronoiStatus('calculated', { count: voronoiResult.merged.features.length });
-    console.log('[MapDrawTab] voronoi points:', pointCollection);
-    console.log('[MapDrawTab] voronoi polygons:', voronoiResult);
+    // console.log('[MapDrawTab] voronoi points:', pointCollection);
+    // console.log('[MapDrawTab] voronoi polygons:', voronoiResult);
   } catch (error) {
     console.error('[MapDrawTab] Voronoi calculation failed:', error);
     showError(t('map.drawTab.messages.voronoiFailed', { error: error.message || error }));
