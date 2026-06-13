@@ -2,7 +2,8 @@
   "tabs": {
     "map": "Map",
     "divide": "Regional Map",
-    "custom": "Custom"
+    "custom": "Custom",
+    "draw": "Map Drawing"
   },
   "placeholder": {
     "selectFeature": "Please select a feature first"
@@ -407,6 +408,69 @@
       "chars": "Character Comparison",
       "zhonggu": "Middle Chinese Comparison",
       "tones": "Tone Category Comparison"
+    }
+  },
+  "drawTab": {
+    "title": "Map Drawing",
+    "hint": "Sign in to draw lines and polygons on the map, then export the current layer or an image.",
+    "auth": {
+      "loginRequired": "Please sign in before using map drawing",
+      "loginAction": "Login"
+    },
+    "buttons": {
+      "createLineLayer": "New Line Layer",
+      "createPolygonLayer": "New Polygon Layer",
+      "drawLine": "Draw Line",
+      "drawPolygon": "Draw Polygon",
+      "select": "Select",
+      "deleteSelected": "Delete Selected",
+      "deleteLayer": "Delete Layer",
+      "moveLayerUp": "Move Layer Up",
+      "moveLayerDown": "Move Layer Down",
+      "clearAll": "Clear All",
+      "importLayer": "Import Layer",
+      "exportLayer": "Export Layer",
+      "exportAllLayers": "Export All Layers",
+      "exportImage": "Export Image",
+      "hideLayer": "Hide Layer",
+      "showLayer": "Show Layer",
+      "showAllLayers": "Show All Layers",
+      "hideAllLayers": "Hide All Layers",
+      "lockLayer": "Lock Layer",
+      "unlockLayer": "Unlock Layer"
+    },
+    "messages": {
+      "importLayerSuccess": "Layer imported successfully",
+      "importLayerFailed": "Failed to import layer: {error}",
+      "clearAllConfirm": "Clear all current drawings?",
+      "clearAllSuccess": "All drawings cleared",
+      "exportLayerSuccess": "Layer exported successfully",
+      "exportLayerFailed": "Failed to export layer: {error}",
+      "exportImageSuccess": "Image exported successfully",
+      "exportImageFailed": "Failed to export image: {error}"
+    },
+    "labels": {
+      "featureCount": "{count} shapes currently on the map",
+      "styleHint": "Default line and polygon styles are ready to use and export.",
+      "layerList": "Layers",
+      "selectedLayer": "Selected",
+      "emptyLayer": "No layer selected",
+      "emptyState": "No layers yet. Create a line layer, polygon layer, or import a layer first",
+      "layer": "Layer",
+      "layerEditor": "Layer Properties",
+      "layerName": "Layer Name",
+      "strokeColor": "Stroke Color",
+      "fillColor": "Fill Color",
+      "fillOpacity": "Fill Opacity",
+      "strokeWidth": "Stroke Width",
+      "visible": "Visible",
+      "locked": "Locked",
+      "basemap": "Basemap"
+    },
+    "geometry": {
+      "line": "Line",
+      "polygon": "Polygon",
+      "layer": "Layer"
     }
   }
 }

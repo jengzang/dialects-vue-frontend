@@ -2,7 +2,8 @@
   "tabs": {
     "map": "地图",
     "divide": "分区图",
-    "custom": "自定义"
+    "custom": "自定义",
+    "draw": "地图绘制"
   },
   "placeholder": {
     "selectFeature": "请先选择一个特征"
@@ -407,6 +408,69 @@
       "chars": "字表比较",
       "zhonggu": "中古音比较",
       "tones": "调类比较"
+    }
+  },
+  "drawTab": {
+    "title": "地图绘制",
+    "hint": "登录后可直接在地图上绘制线与面，并导出当前图层或图片。",
+    "auth": {
+      "loginRequired": "请先登录后使用地图绘制",
+      "loginAction": "登录"
+    },
+    "buttons": {
+      "createLineLayer": "新建线图层",
+      "createPolygonLayer": "新建面图层",
+      "drawLine": "画线",
+      "drawPolygon": "画面",
+      "select": "选择",
+      "deleteSelected": "删除选中",
+      "deleteLayer": "删除图层",
+      "moveLayerUp": "图层上移",
+      "moveLayerDown": "图层下移",
+      "clearAll": "清空全部",
+      "importLayer": "导入图层",
+      "exportLayer": "导出图层",
+      "exportAllLayers": "导出全部图层",
+      "exportImage": "导出图片",
+      "hideLayer": "隐藏图层",
+      "showLayer": "显示图层",
+      "showAllLayers": "显示全部图层",
+      "hideAllLayers": "隐藏全部图层",
+      "lockLayer": "锁定图层",
+      "unlockLayer": "解锁图层"
+    },
+    "messages": {
+      "importLayerSuccess": "图层导入成功",
+      "importLayerFailed": "图层导入失败：{error}",
+      "clearAllConfirm": "确认清空当前所有绘制内容吗？",
+      "clearAllSuccess": "已清空全部绘制内容",
+      "exportLayerSuccess": "图层导出成功",
+      "exportLayerFailed": "图层导出失败：{error}",
+      "exportImageSuccess": "图片导出成功",
+      "exportImageFailed": "图片导出失败：{error}"
+    },
+    "labels": {
+      "featureCount": "当前共 {count} 个图形",
+      "styleHint": "线与面的默认样式已预设，可直接绘制后导出。",
+      "layerList": "图层列表",
+      "selectedLayer": "当前选择",
+      "emptyLayer": "未选择图层",
+      "emptyState": "暂无图层，请先新建线图层、面图层或导入图层",
+      "layer": "图层",
+      "layerEditor": "图层属性",
+      "layerName": "图层名称",
+      "strokeColor": "线条颜色",
+      "fillColor": "填充颜色",
+      "fillOpacity": "填充透明度",
+      "strokeWidth": "线条宽度",
+      "visible": "显示图层",
+      "locked": "锁定图层",
+      "basemap": "底图"
+    },
+    "geometry": {
+      "line": "线",
+      "polygon": "面",
+      "layer": "图层"
     }
   }
 }

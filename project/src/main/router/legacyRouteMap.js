@@ -22,7 +22,8 @@ export const MENU_LEGACY_ROUTES = {
     subMap: {
       map: '/menu/map/view',
       divide: '/menu/map/divide',
-      custom: '/menu/map/custom'
+      custom: '/menu/map/custom',
+      draw: '/menu/map/draw'
     }
   },
   pho: {

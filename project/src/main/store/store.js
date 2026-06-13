@@ -116,7 +116,7 @@ export const uiStore = reactive({
     currentSubTab: {
         query: 'tab2',  // 'tab1' | 'tab2' | 'tab3' | 'tab4'
         compare: 'tab2', // 'tab1' | 'tab2' | 'tab4' | 'tab5'
-        map: 'map'      // 'map' | 'divide' | 'custom'
+        map: 'map'      // 'map' | 'divide' | 'custom' | 'draw'
     }
 })
 

@@ -41,7 +41,7 @@ export const menuRoutes = [
     redirect: '/menu/map/view'
   },
   {
-    path: '/menu/map/:sub(view|divide|custom)',
+    path: '/menu/map/:sub(view|divide|custom|draw)',
     component: MapPage
   },
   {

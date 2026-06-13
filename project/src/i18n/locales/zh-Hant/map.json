@@ -2,7 +2,8 @@
   "tabs": {
     "map": "地圖",
     "divide": "分區圖",
-    "custom": "自定義"
+    "custom": "自定義",
+    "draw": "地圖繪製"
   },
   "placeholder": {
     "selectFeature": "請先選擇一個特徵"
@@ -407,6 +408,69 @@
       "chars": "字表比較",
       "zhonggu": "中古音比較",
       "tones": "調類比較"
+    }
+  },
+  "drawTab": {
+    "title": "地圖繪製",
+    "hint": "登入後可直接在地圖上繪製線與面，並匯出目前圖層或圖片。",
+    "auth": {
+      "loginRequired": "請先登入後使用地圖繪製",
+      "loginAction": "登入"
+    },
+    "buttons": {
+      "createLineLayer": "新建線圖層",
+      "createPolygonLayer": "新建面圖層",
+      "drawLine": "畫線",
+      "drawPolygon": "畫面",
+      "select": "選擇",
+      "deleteSelected": "刪除選中",
+      "deleteLayer": "刪除圖層",
+      "moveLayerUp": "圖層上移",
+      "moveLayerDown": "圖層下移",
+      "clearAll": "清空全部",
+      "importLayer": "匯入圖層",
+      "exportLayer": "匯出圖層",
+      "exportAllLayers": "匯出全部圖層",
+      "exportImage": "匯出圖片",
+      "hideLayer": "隱藏圖層",
+      "showLayer": "顯示圖層",
+      "showAllLayers": "顯示全部圖層",
+      "hideAllLayers": "隱藏全部圖層",
+      "lockLayer": "鎖定圖層",
+      "unlockLayer": "解鎖圖層"
+    },
+    "messages": {
+      "importLayerSuccess": "圖層匯入成功",
+      "importLayerFailed": "圖層匯入失敗：{error}",
+      "clearAllConfirm": "確認清空目前所有繪製內容嗎？",
+      "clearAllSuccess": "已清空全部繪製內容",
+      "exportLayerSuccess": "圖層匯出成功",
+      "exportLayerFailed": "圖層匯出失敗：{error}",
+      "exportImageSuccess": "圖片匯出成功",
+      "exportImageFailed": "圖片匯出失敗：{error}"
+    },
+    "labels": {
+      "featureCount": "目前共 {count} 個圖形",
+      "styleHint": "線與面的預設樣式已設定，可直接繪製後匯出。",
+      "layerList": "圖層列表",
+      "selectedLayer": "當前選擇",
+      "emptyLayer": "未選擇圖層",
+      "emptyState": "暫無圖層，請先新建線圖層、面圖層或匯入圖層",
+      "layer": "圖層",
+      "layerEditor": "圖層屬性",
+      "layerName": "圖層名稱",
+      "strokeColor": "線條顏色",
+      "fillColor": "填充顏色",
+      "fillOpacity": "填充透明度",
+      "strokeWidth": "線條寬度",
+      "visible": "顯示圖層",
+      "locked": "鎖定圖層",
+      "basemap": "底圖"
+    },
+    "geometry": {
+      "line": "線",
+      "polygon": "面",
+      "layer": "圖層"
     }
   }
 }
