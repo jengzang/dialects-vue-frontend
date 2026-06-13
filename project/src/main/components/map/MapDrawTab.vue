@@ -397,6 +397,7 @@ import { showConfirm, showError, showSuccess } from '@/utils/message.js';
 import { readImportedLayerFile, splitFeatureCollectionByGeometryType } from '@/utils/map/draw/export.js';
 import {
   PARTITION_MODE_MAP,
+  buildPartitionColorMap,
   buildPartitionPointFeatureCollection,
   buildPartitionPoints,
   buildVoronoiSelectionOptions,
@@ -531,6 +532,7 @@ const voronoiRawPartitionData = ref([]);
 const voronoiPartitionPoints = ref([]);
 const ignoredVoronoiLocations = ref([]);
 const voronoiPreviewLayers = ref([]);
+const voronoiPreviewType = ref('');
 const voronoiPartitionMode = ref(PARTITION_MODE_MAP);
 const voronoiRegionLevel = ref(3);
 const isVoronoiPanelOpen = ref(false);
@@ -560,6 +562,10 @@ const voronoiPanelOffsetMode = computed(() => {
 
 const voronoiSelectionOptions = computed(() => {
   return buildVoronoiSelectionOptions(voronoiPartitionPoints.value, Number(voronoiRegionLevel.value) || 3);
+});
+
+const voronoiColorMap = computed(() => {
+  return buildPartitionColorMap(activeVoronoiPoints.value, Number(voronoiRegionLevel.value) || 3);
 });
 
 const setVoronoiStatus = (key, params = {}) => {
@@ -601,17 +607,30 @@ const openVoronoiIgnoreModal = async () => {
   showVoronoiIgnoreModal.value = true;
 };
 
-const handleVoronoiIgnoreConfirm = (locations) => {
+const refreshVoronoiPreview = async () => {
+  if (voronoiPreviewType.value === 'points') {
+    await previewVoronoiPoints();
+    return;
+  }
+  if (voronoiPreviewType.value === 'polygons') {
+    await handleBuildVoronoi();
+  }
+};
+
+const handleVoronoiIgnoreConfirm = async (locations) => {
   ignoredVoronoiLocations.value = Array.isArray(locations) ? locations : [];
   setVoronoiStatus('ignoreUpdated', { count: ignoredVoronoiLocations.value.length });
+  await refreshVoronoiPreview();
 };
 
 const previewVoronoiPoints = async () => {
   await ensureVoronoiPointsLoaded();
   const pointCollection = buildPartitionPointFeatureCollection(
     activeVoronoiPoints.value,
-    Number(voronoiRegionLevel.value) || 3
+    Number(voronoiRegionLevel.value) || 3,
+    voronoiColorMap.value
   );
+  voronoiPreviewType.value = 'points';
   voronoiPreviewLayers.value = [{
     id: 'voronoi-preview-points',
     type: 'points',
@@ -629,9 +648,10 @@ const handleBuildVoronoi = async () => {
     await ensureVoronoiPointsLoaded();
     const level = Number(voronoiRegionLevel.value) || 3;
     const points = activeVoronoiPoints.value;
-    const pointCollection = buildPartitionPointFeatureCollection(points, level);
-    const voronoiResult = calculatePartitionVoronoi(points, level);
+    const pointCollection = buildPartitionPointFeatureCollection(points, level, voronoiColorMap.value);
+    const voronoiResult = calculatePartitionVoronoi(points, level, voronoiColorMap.value);
 
+    voronoiPreviewType.value = 'polygons';
     voronoiPreviewLayers.value = [{
       id: 'voronoi-preview-polygons',
       type: 'polygons',
@@ -648,14 +668,20 @@ const handleBuildVoronoi = async () => {
   }
 };
 
-watch(voronoiPartitionMode, () => {
+watch(voronoiPartitionMode, async () => {
   normalizeVoronoiPoints();
   ignoredVoronoiLocations.value = [];
-  voronoiPreviewLayers.value = [];
+  await refreshVoronoiPreview();
+  if (!voronoiPreviewType.value) {
+    voronoiPreviewLayers.value = [];
+  }
 });
 
-watch(voronoiRegionLevel, () => {
-  voronoiPreviewLayers.value = [];
+watch(voronoiRegionLevel, async () => {
+  await refreshVoronoiPreview();
+  if (!voronoiPreviewType.value) {
+    voronoiPreviewLayers.value = [];
+  }
 });
 
 const handleCreateLayer = (geometryType) => {

@@ -208,8 +208,8 @@ const buildPreviewLayerDescriptors = () => {
         features: (featureCollection.features ?? []).map((feature) => ({
           ...feature,
           properties: {
-            ...(feature.properties ?? {}),
             ...style,
+            ...(feature.properties ?? {}),
             visible: true,
             locked: true,
             layerId: layer?.id ?? `preview-${layerIndex}`,
@@ -240,11 +240,13 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
       type: 'fill',
       source: descriptor.sourceId,
       filter: ['==', '$type', 'Polygon'],
+      layout: {
+        'fill-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
+      },
       paint: {
         'fill-color': ['coalesce', ['get', 'fill'], '#60a5fa'],
         'fill-outline-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
         'fill-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, ['coalesce', ['get', 'fillOpacity'], 0.22]],
-        'fill-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
     })
   }
@@ -258,12 +260,12 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
       layout: {
         'line-cap': 'round',
         'line-join': 'round',
+        'line-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
       paint: {
         'line-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
         'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
         'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
-        'line-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
     })
   }
@@ -274,13 +276,15 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
       type: 'circle',
       source: descriptor.sourceId,
       filter: ['==', '$type', 'Point'],
+      layout: {
+        'circle-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
+      },
       paint: {
         'circle-radius': ['coalesce', ['get', 'pointRadius'], 6],
         'circle-color': ['coalesce', ['get', 'pointColor'], '#60a5fa'],
         'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], '#2563eb'],
         'circle-stroke-width': 2,
         'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
-        'circle-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
     })
   }
@@ -487,7 +491,6 @@ const initializeMap = async () => {
   map.value.addControl(new maplibregl.NavigationControl(), 'top-left')
   map.value.on('load', initializeDraw)
   map.value.on('styledata', () => {
-    if (!draw.value) return
     syncReadonlyLayers()
   })
 }

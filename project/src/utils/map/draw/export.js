@@ -36,10 +36,20 @@ function ensureFeatureCollection(featureCollection) {
   return featureCollection
 }
 
-function ensureFeatureId(feature) {
+function ensureFeatureId(feature, usedFeatureIds = new Set()) {
   const rawId = feature.id ?? feature.properties?.id ?? `draw-feature-${featureIdSeed}`
   featureIdSeed += 1
-  return String(rawId)
+  const baseId = String(rawId)
+  let featureId = baseId
+  let duplicateIndex = 1
+
+  while (usedFeatureIds.has(featureId)) {
+    featureId = `${baseId}-${duplicateIndex}`
+    duplicateIndex += 1
+  }
+
+  usedFeatureIds.add(featureId)
+  return featureId
 }
 
 function triggerDownload(blob, filename) {
@@ -271,11 +281,12 @@ function inferImportFormat(file) {
 
 export function normalizeFeatureCollection(featureCollection) {
   const normalizedCollection = ensureFeatureCollection(featureCollection)
+  const usedFeatureIds = new Set()
 
   return {
     type: 'FeatureCollection',
     features: normalizedCollection.features.map((feature) => {
-      const featureId = ensureFeatureId(feature)
+      const featureId = ensureFeatureId(feature, usedFeatureIds)
       return {
         ...feature,
         id: featureId,
