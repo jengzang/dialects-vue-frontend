@@ -1135,6 +1135,10 @@ onMounted(() => {
   padding:15px 16px;
 }
 
+.map-draw-tab :deep(button) {
+  white-space: nowrap;
+}
+
 .draw-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -1168,6 +1172,10 @@ onMounted(() => {
 
 .draw-map-area {
   width: 100%;
+}
+
+.draw-import-input {
+  display: none;
 }
 
 /* Modal Choices Styles */

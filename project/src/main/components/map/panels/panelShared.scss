@@ -154,8 +154,13 @@
 .draw-basemap-select {
   min-width: 0;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 0.45rem;
+}
+
+.draw-basemap-select :deep(.simple-select-dropdown) {
+  flex: 1;
+  min-width: 0;
 }
 
 .draw-style-hint {
