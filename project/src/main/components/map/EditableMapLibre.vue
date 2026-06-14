@@ -122,6 +122,7 @@ const map = shallowRef(null)
 const draw = shallowRef(null)
 const selectedFeatureId = ref('')
 const currentStyleKey = ref(props.currentStyleKey || 'gaode')
+const isFullscreen = ref(false)
 let previousPreviewSourceIds = []
 const emptyFeatureCollection = () => ({
   type: 'FeatureCollection',
@@ -489,6 +490,22 @@ const handleStyleChange = () => {
   map.value.setStyle(mapStyle(currentStyleKey.value))
 }
 
+const syncFullscreenState = () => {
+  isFullscreen.value = document.fullscreenElement === mapContainer.value
+}
+
+const toggleFullscreen = async () => {
+  if (!mapContainer.value) return isFullscreen.value
+
+  if (document.fullscreenElement === mapContainer.value) {
+    await document.exitFullscreen?.()
+    return false
+  }
+
+  await mapContainer.value.requestFullscreen?.()
+  return true
+}
+
 const initializeMap = async () => {
   await nextTick()
   if (!mapContainer.value) return
@@ -498,11 +515,14 @@ const initializeMap = async () => {
     style: mapStyle(currentStyleKey.value),
     center: [113.2644, 23.1291],
     zoom: 6,
-    preserveDrawingBuffer: true,
+    canvasContextAttributes: {
+      preserveDrawingBuffer: true,
+    },
     attributionControl: false,
   })
 
   map.value.addControl(new maplibregl.NavigationControl(), 'top-left')
+  map.value.addControl(new maplibregl.FullscreenControl({ container: mapContainer.value }), 'top-left')
   map.value.on('load', initializeDraw)
   map.value.on('styledata', () => {
     syncReadonlyLayers()
@@ -594,10 +614,12 @@ watch(currentStyleKey, (nextValue) => {
 })
 
 onMounted(() => {
+  document.addEventListener('fullscreenchange', syncFullscreenState)
   initializeMap()
 })
 
 onBeforeUnmount(() => {
+  document.removeEventListener('fullscreenchange', syncFullscreenState)
   if (map.value) {
     map.value.remove()
   }
@@ -619,6 +641,8 @@ defineExpose({
   handleStyleChange,
   removeReadonlyLayerById,
   resetView,
+  toggleFullscreen,
+  isFullscreen,
 })
 </script>
 

@@ -108,6 +108,15 @@
             >
               {{ t('map.mapLibre.buttons.reset') }}
             </button>
+            <button
+              class="main-glass-button"
+              :data-variant="isFullscreen ? 'primary' : 'secondary'"
+              :data-active="isFullscreen"
+              type="button"
+              @click="$emit('toggle-fullscreen')"
+            >
+              {{ isFullscreen ? t('map.mapLibre.buttons.exitFullscreen') : t('map.mapLibre.buttons.fullscreen') }}
+            </button>
           </div>
         </section>
 
@@ -264,7 +273,7 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-defineProps({
+const props = defineProps({
   isOpen: { type: Boolean, default: false },
   offsetLeft: { type: Boolean, default: false },
   activeLayer: { type: Object, default: null },
@@ -272,6 +281,7 @@ defineProps({
   currentMode: { type: String, default: 'simple_select' },
   selectedFeatureProperties: { type: Object, default: null },
   selectedFeatureGeometryType: { type: String, default: '' },
+  isFullscreen: { type: Boolean, default: false },
 })
 
 defineEmits([
@@ -279,6 +289,7 @@ defineEmits([
   'delete-selected',
   'clear-all',
   'reset-view',
+  'toggle-fullscreen',
   'update-feature-property',
 ])
 </script>

@@ -117,10 +117,12 @@
           :current-mode="currentMode"
           :selected-feature-properties="selectedFeatureProperties"
           :selected-feature-geometry-type="selectedFeatureGeometryType"
+          :is-fullscreen="isMapFullscreen"
           @set-mode="setMode"
           @delete-selected="handleDeleteSelected"
           @clear-all="handleClearAll"
           @reset-view="handleResetView"
+          @toggle-fullscreen="handleToggleFullscreen"
           @update-feature-property="updateSelectedFeatureProperty"
         />
 
@@ -313,7 +315,7 @@
           <button
             class="draw-modal-card-btn"
             type="button"
-            @click="handleSaveAsNewLocal"
+            @click="openSaveLocalDraftModal"
           >
             <span class="draw-card-icon">💾</span>
             <div class="draw-card-text">
@@ -377,6 +379,48 @@
         </div>
       </AppModal>
 
+      <AppModal
+        v-model="showSaveLocalDraftModal"
+        :title="t('map.drawTab.buttons.saveLocalDraftModalTitle')"
+        size="sm"
+      >
+        <div class="draw-local-draft-picker">
+          <label class="draw-field">
+            <span class="draw-field-label">{{ t('map.drawTab.labels.localDraftName') }}</span>
+            <input
+              v-model="newDraftName"
+              type="text"
+              class="draw-text-input"
+              :placeholder="t('map.drawTab.labels.localDraftNamePlaceholder')"
+            >
+          </label>
+        </div>
+
+        <template #footer>
+          <div class="scope-modal-footer">
+            <button class="main-glass-button" type="button" @click="showSaveLocalDraftModal = false">
+              {{ t('common.button.cancel') }}
+            </button>
+            <button
+              class="main-glass-button scope-confirm-btn"
+              data-variant="primary"
+              type="button"
+              @click="confirmSaveAsNewLocal"
+            >
+              {{ t('map.drawTab.buttons.saveAsNewLocal') }}
+            </button>
+          </div>
+        </template>
+      </AppModal>
+
+      <MapDrawImageExportModal
+        v-model="showImageExportModal"
+        :layers="layers"
+        :active-layer-id="activeLayerId"
+        :selected-feature-id="selectedFeatureId"
+        @confirm="handleConfirmImageExport"
+      />
+
       <VoronoiExportLayersModal
         v-model="showVoronoiExportModal"
         :groups="voronoiExportGroups"
@@ -419,7 +463,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { featureCollection } from '@turf/turf';
 
@@ -429,6 +473,14 @@ import { usePartitionCache } from '@/composables/domain/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import { showConfirm, showError, showSuccess } from '@/utils/message.js';
 import { readImportedLayerFile, readKmzArrayBuffer, splitFeatureCollectionByGeometryType } from '@/utils/map/draw/export.js';
+import {
+  deleteDraftRecord,
+  getDraftRecordById,
+  listDraftRecords,
+  migrateLegacyDraftsFromLocalStorage,
+  saveDraftRecord,
+  updateDraftRecord,
+} from '@/utils/map/draftStorage.js';
 import {
   clipVoronoiFeatureCollectionToNationalBorder,
   prepareNationalBorderForVoronoiClip,
@@ -447,6 +499,7 @@ import EditableMapLibre from '@/main/components/map/EditableMapLibre.vue';
 import MapDrawLayersPanel from '@/main/components/map/panels/MapDrawLayersPanel.vue';
 import MapDrawToolsPanel from '@/main/components/map/panels/MapDrawToolsPanel.vue';
 import MapDrawVoronoiPanel from '@/main/components/map/panels/MapDrawVoronoiPanel.vue';
+import MapDrawImageExportModal from '@/main/components/map/modals/MapDrawImageExportModal.vue';
 import VoronoiExportLayersModal from '@/main/components/map/modals/VoronoiExportLayersModal.vue';
 import VoronoiIgnorePointsModal from '@/main/components/map/modals/VoronoiIgnorePointsModal.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
@@ -487,10 +540,14 @@ const isLayersPanelOpen = ref(false);
 const showAddLayerModal = ref(false);
 const showExportModal = ref(false);
 const showLocalStorageModal = ref(false);
+const showSaveLocalDraftModal = ref(false);
+const showImageExportModal = ref(false);
 const showVoronoiExportModal = ref(false);
 const selectedStoredDraftId = ref('');
 const storedDrafts = ref([]);
+const isMapFullscreen = ref(false);
 const voronoiExportSelections = ref([]);
+
 const clipVoronoiToNationalBorder = ref(false);
 const isVoronoiExporting = ref(false);
 const activeFeatureId = computed(() => activeLayerId.value);
@@ -992,6 +1049,17 @@ watch(voronoiRegionLevel, async () => {
   }
 });
 
+watch(selectedStoredDraftId, async (draftId) => {
+  if (!draftId) {
+    newDraftName.value = '';
+    return;
+  }
+
+  const draft = storedDrafts.value.find((item) => item.id === draftId)
+    ?? await getDraftRecordById(draftId);
+  newDraftName.value = draft?.name || '';
+});
+
 watch(clipVoronoiToNationalBorder, (value) => {
   localStorage.setItem(voronoiExportStorageKey, JSON.stringify({
     clipVoronoiToNationalBorder: Boolean(value),
@@ -1195,6 +1263,19 @@ const handleResetView = () => {
   editableMapRef.value?.resetView?.();
 };
 
+const handleToggleFullscreen = async () => {
+  try {
+    await editableMapRef.value?.toggleFullscreen?.();
+    isMapFullscreen.value = Boolean(editableMapRef.value?.isFullscreen?.value);
+  } catch (error) {
+    showError(error.message || String(error));
+  }
+};
+
+const syncMapFullscreenState = () => {
+  isMapFullscreen.value = Boolean(editableMapRef.value?.isFullscreen?.value);
+};
+
 const handleClearAll = async () => {
   const confirmed = await showConfirm(t('map.drawTab.messages.clearAllConfirm'));
   if (!confirmed) return;
@@ -1239,6 +1320,12 @@ const handleExportImage = async () => {
 const handleImageExported = () => {};
 const handleLayerExported = () => {};
 
+const handleConfirmImageExport = async (settings) => {
+  console.log('[MapDrawImageExportModal] confirm settings', settings);
+  showImageExportModal.value = false;
+  await handleExportImage();
+};
+
 const hasLayersToPersist = computed(() => {
   return layers.value.some((layer) => (layer?.featureCollection?.features?.length ?? 0) > 0);
 });
@@ -1251,18 +1338,6 @@ const buildPersistedWorkbenchState = () => ({
   isLayersPanelOpen: isLayersPanelOpen.value,
 });
 
-const getStoredDrafts = () => {
-  const raw = localStorage.getItem(mapDrawStorageKey);
-  if (!raw) return [];
-  const parsed = JSON.parse(raw);
-  return Array.isArray(parsed) ? parsed : [];
-};
-
-const writeStoredDrafts = (drafts) => {
-  storedDrafts.value = drafts;
-  localStorage.setItem(mapDrawStorageKey, JSON.stringify(drafts));
-};
-
 const storedDraftOptions = computed(() => {
   return storedDrafts.value.map((draft) => ({
     label: draft.name,
@@ -1274,6 +1349,7 @@ const buildDraftRecord = (name) => ({
   id: `${Date.now()}`,
   name,
   savedAt: new Date().toISOString(),
+  version: 1,
   state: buildPersistedWorkbenchState(),
 });
 
@@ -1290,60 +1366,101 @@ const applyDraftState = (state) => {
   syncAllLayersAfterMutation();
 };
 
-const restoreWorkbenchState = () => {
-  const drafts = getStoredDrafts();
-  storedDrafts.value = drafts;
-  if (!drafts.length) return;
-  const latestDraft = drafts[drafts.length - 1];
-  applyDraftState(latestDraft?.state);
-  selectedStoredDraftId.value = latestDraft?.id || '';
+const restoreStoredDrafts = async () => {
+  await migrateLegacyDraftsFromLocalStorage(mapDrawStorageKey);
+  storedDrafts.value = await listDraftRecords();
+  selectedStoredDraftId.value = storedDrafts.value[0]?.id || '';
+  newDraftName.value = '';
 };
 
-const handleSaveAsNewLocal = () => {
+const openSaveLocalDraftModal = () => {
   if (!hasLayersToPersist.value) {
     showError(t('map.drawTab.messages.noLayersToSave'));
     return;
   }
-  const drafts = getStoredDrafts();
-  const nextDraft = buildDraftRecord(`${t('map.drawTab.title')} ${drafts.length + 1}`);
-  drafts.push(nextDraft);
-  writeStoredDrafts(drafts);
-  selectedStoredDraftId.value = nextDraft.id;
-  showSuccess(t('map.drawTab.messages.saveToLocalSuccess'));
+  newDraftName.value = '';
+  showSaveLocalDraftModal.value = true;
 };
 
-const handleUpdateLocal = () => {
+const confirmSaveAsNewLocal = async () => {
+  if (!hasLayersToPersist.value) {
+    showError(t('map.drawTab.messages.noLayersToSave'));
+    return;
+  }
+  if (!newDraftName.value.trim()) {
+    showError(t('map.drawTab.messages.localDraftNameRequired'));
+    return;
+  }
+
+  try {
+    const nextDraft = buildDraftRecord(newDraftName.value.trim());
+    await saveDraftRecord(nextDraft);
+    storedDrafts.value = await listDraftRecords();
+    selectedStoredDraftId.value = nextDraft.id;
+    newDraftName.value = nextDraft.name;
+    showSaveLocalDraftModal.value = false;
+    showSuccess(t('map.drawTab.messages.saveToLocalSuccess'));
+  } catch (error) {
+    showError(t('map.drawTab.messages.saveToLocalFailed', { error: error.message || error }));
+  }
+};
+
+const handleUpdateLocal = async () => {
   if (!hasLayersToPersist.value) {
     showError(t('map.drawTab.messages.noLayersToSave'));
     return;
   }
   if (!selectedStoredDraftId.value) return;
-  const drafts = getStoredDrafts();
-  const draftIndex = drafts.findIndex((draft) => draft.id === selectedStoredDraftId.value);
-  if (draftIndex === -1) return;
-  drafts[draftIndex] = {
-    ...drafts[draftIndex],
-    savedAt: new Date().toISOString(),
-    state: buildPersistedWorkbenchState(),
-  };
-  writeStoredDrafts(drafts);
-  showSuccess(t('map.drawTab.messages.updateLocalSuccess'));
+
+  try {
+    const currentDraft = await getDraftRecordById(selectedStoredDraftId.value);
+    if (!currentDraft) return;
+
+    const draft = await updateDraftRecord(selectedStoredDraftId.value, {
+      name: currentDraft.name,
+      savedAt: new Date().toISOString(),
+      state: buildPersistedWorkbenchState(),
+    });
+    if (!draft) return;
+    storedDrafts.value = await listDraftRecords();
+    selectedStoredDraftId.value = draft.id;
+    newDraftName.value = draft.name;
+    showSuccess(t('map.drawTab.messages.updateLocalSuccess'));
+  } catch (error) {
+    showError(t('map.drawTab.messages.saveToLocalFailed', { error: error.message || error }));
+  }
 };
 
-const handleRestoreLocal = () => {
+const handleRestoreLocal = async () => {
   if (!selectedStoredDraftId.value) return;
-  const draft = getStoredDrafts().find((item) => item.id === selectedStoredDraftId.value);
-  if (!draft) return;
-  applyDraftState(draft.state);
-  showSuccess(t('map.drawTab.messages.restoreLocalSuccess'));
+
+  try {
+    const draft = await getDraftRecordById(selectedStoredDraftId.value);
+    if (!draft) return;
+    applyDraftState(draft.state);
+    newDraftName.value = draft.name || '';
+    showSuccess(t('map.drawTab.messages.restoreLocalSuccess'));
+  } catch (error) {
+    showError(t('map.drawTab.messages.saveToLocalFailed', { error: error.message || error }));
+  }
 };
 
-const handleDeleteLocal = () => {
+const handleDeleteLocal = async () => {
   if (!selectedStoredDraftId.value) return;
-  const drafts = getStoredDrafts().filter((draft) => draft.id !== selectedStoredDraftId.value);
-  writeStoredDrafts(drafts);
-  selectedStoredDraftId.value = drafts[0]?.id || '';
-  showSuccess(t('map.drawTab.messages.deleteLocalSuccess'));
+
+  const confirmed = await showConfirm(t('map.drawTab.messages.deleteLocalConfirm'));
+  if (!confirmed) return;
+
+  try {
+    await deleteDraftRecord(selectedStoredDraftId.value);
+    storedDrafts.value = await listDraftRecords();
+    selectedStoredDraftId.value = storedDrafts.value[0]?.id || '';
+    const nextDraft = storedDrafts.value.find((draft) => draft.id === selectedStoredDraftId.value);
+    newDraftName.value = nextDraft?.name || '';
+    showSuccess(t('map.drawTab.messages.deleteLocalSuccess'));
+  } catch (error) {
+    showError(t('map.drawTab.messages.saveToLocalFailed', { error: error.message || error }));
+  }
 };
 
 const handleSaveToLocal = () => {
@@ -1372,8 +1489,8 @@ const onExportAllClicked = () => {
 };
 
 const onExportImageClicked = () => {
-  handleExportImage();
   showExportModal.value = false;
+  showImageExportModal.value = true;
 };
 
 const moveLayerToTop = (layerId) => {
@@ -1392,12 +1509,19 @@ const moveLayerToBottom = (layerId) => {
   syncAllLayersAfterMutation();
 };
 
-onMounted(() => {
+onMounted(async () => {
   try {
-    restoreWorkbenchState();
+    await restoreStoredDrafts();
   } catch (error) {
     console.warn('restore map draw workbench state failed', error);
   }
+
+  document.addEventListener('fullscreenchange', syncMapFullscreenState);
+  syncMapFullscreenState();
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('fullscreenchange', syncMapFullscreenState);
 });
 </script>
 
@@ -1587,6 +1711,22 @@ onMounted(() => {
 .draw-card-desc {
   font-size: 0.85rem;
   color: rgba(11, 37, 64, 0.65);
+}
+
+.draw-text-input {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: rgba(255, 255, 255, 0.78);
+  color: #0b2540;
+}
+
+.draw-text-input:focus {
+  outline: none;
+  border-color: rgba(0, 122, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
 }
 
 @media (max-width: 900px) {

@@ -478,7 +478,8 @@
       "showAllLayers": "Show All Layers",
       "hideAllLayers": "Hide All Layers",
       "lockLayer": "Lock Layer",
-      "unlockLayer": "Unlock Layer"
+      "unlockLayer": "Unlock Layer",
+      "saveLocalDraftModalTitle": "Save Local Draft"
     },
     "messages": {
       "importLayerSuccess": "Layer imported successfully, added {count} layer(s)",
@@ -495,7 +496,9 @@
       "restoreLocalSuccess": "Local draft restored",
       "deleteLocalSuccess": "Local draft deleted",
       "noLayersToSave": "There are no layers to save",
-      "voronoiFailed": "Voronoi calculation failed: {error}"
+      "voronoiFailed": "Voronoi calculation failed: {error}",
+      "localDraftNameRequired": "Please enter a draft name",
+      "deleteLocalConfirm": "Delete the current local draft?"
     },
     "voronoi": {
       "panelHint": "Calculate Voronoi polygons from location partition data. You can preview them or export them as a polygon layer.",
@@ -567,13 +570,60 @@
       "visible": "Visible",
       "locked": "Locked",
       "basemap": "Basemap",
-      "localDraftSelection": "Select Local Draft"
+      "localDraftSelection": "Select Local Draft",
+      "localDraftName": "Draft Name",
+      "localDraftNamePlaceholder": "Enter draft name"
     },
     "geometry": {
       "point": "Point",
       "line": "Line",
       "polygon": "Polygon",
       "layer": "Layer"
+    },
+    "imageExport": {
+      "modalTitle": "Image Export Settings",
+      "confirmAction": "Preview and Export",
+      "summary": {
+        "layers": "Layers",
+        "features": "Features",
+        "activeLayer": "Active Layer"
+      },
+      "sections": {
+        "range": "Export Range",
+        "size": "Export Size",
+        "zoom": "Export Zoom",
+        "content": "Export Content"
+      },
+      "labels": {
+        "sizePreset": "Size Preset",
+        "width": "Width",
+        "height": "Height",
+        "zoomValue": "Zoom Level"
+      },
+      "range": {
+        "currentView": "Current View",
+        "currentViewDesc": "Export the currently visible map extent",
+        "selectedLayer": "Selected Layer",
+        "selectedFeature": "Selected Feature",
+        "selectedFeatureDesc": "No feature is currently selected. The current view will be used.",
+        "customBbox": "Box Selection",
+        "customBboxDesc": "Map box selection will be wired in next"
+      },
+      "size": {
+        "current": "Current Size",
+        "p1080": "1080p",
+        "p2k": "2K",
+        "custom": "Custom"
+      },
+      "zoom": {
+        "current": "Current Zoom",
+        "custom": "Specify zoom"
+      },
+      "content": {
+        "includeBasemap": "Include basemap",
+        "includeDrawLayers": "Include draw layers",
+        "onlySelectedLayers": "Only selected layers"
+      }
     }
   }
 }

@@ -53,6 +53,11 @@ function ensureFeatureId(feature, usedFeatureIds = new Set()) {
 }
 
 function triggerDownload(blob, filename) {
+  console.log('[exportCurrentMapAsPng] trigger download', {
+    filename,
+    blobSize: blob?.size ?? 0,
+    blobType: blob?.type ?? '',
+  })
   const objectUrl = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = objectUrl
@@ -60,7 +65,8 @@ function triggerDownload(blob, filename) {
   document.body.appendChild(anchor)
   anchor.click()
   document.body.removeChild(anchor)
-  URL.revokeObjectURL(objectUrl)
+  // Delay revocation so browsers can finish consuming the blob URL.
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
 }
 
 function buildFeatureCollection(features = []) {
@@ -387,16 +393,65 @@ export function exportCurrentMapAsPng(mapInstance, filename = 'map-draw.png') {
     throw new Error('Map canvas is unavailable')
   }
 
+  console.log('[exportCurrentMapAsPng] start', {
+    filename,
+    width: canvas.width,
+    height: canvas.height,
+    clientWidth: canvas.clientWidth,
+    clientHeight: canvas.clientHeight,
+    devicePixelRatio: window.devicePixelRatio,
+    hasPreserveDrawingBuffer: true,
+  })
+
   return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        reject(new Error('Failed to export map image'))
+    const exportCanvas = document.createElement('canvas')
+    exportCanvas.width = canvas.width
+    exportCanvas.height = canvas.height
+    const context = exportCanvas.getContext('2d')
+
+    if (!context) {
+      reject(new Error('Failed to create export canvas'))
+      return
+    }
+
+    const capture = () => {
+      try {
+        context.clearRect(0, 0, exportCanvas.width, exportCanvas.height)
+        context.drawImage(canvas, 0, 0)
+        const previewDataUrl = exportCanvas.toDataURL('image/png')
+        console.log('[exportCurrentMapAsPng] copied canvas', {
+          width: exportCanvas.width,
+          height: exportCanvas.height,
+          dataUrlPrefix: previewDataUrl.slice(0, 64),
+          dataUrlLength: previewDataUrl.length,
+        })
+      } catch (error) {
+        console.error('[exportCurrentMapAsPng] drawImage failed', error)
+        reject(error instanceof Error ? error : new Error(String(error)))
         return
       }
 
-      triggerDownload(blob, filename)
-      resolve(blob)
-    }, 'image/png')
+      exportCanvas.toBlob((blob) => {
+        console.log('[exportCurrentMapAsPng] toBlob result', {
+          hasBlob: Boolean(blob),
+          blobSize: blob?.size ?? 0,
+          blobType: blob?.type ?? '',
+        })
+        if (!blob) {
+          reject(new Error('Failed to export map image'))
+          return
+        }
+
+        triggerDownload(blob, filename)
+        resolve(blob)
+      }, 'image/png')
+    }
+
+    // WebGL canvases can be blank when read immediately; repaint first, then capture on the next frame.
+    mapInstance?.triggerRepaint?.()
+    requestAnimationFrame(() => {
+      requestAnimationFrame(capture)
+    })
   })
 }
 

@@ -478,7 +478,8 @@
       "showAllLayers": "显示全部图层",
       "hideAllLayers": "隐藏全部图层",
       "lockLayer": "锁定图层",
-      "unlockLayer": "解锁图层"
+      "unlockLayer": "解锁图层",
+      "saveLocalDraftModalTitle": "保存本地草稿"
     },
     "messages": {
       "importLayerSuccess": "图层导入成功，共新增 {count} 个图层",
@@ -495,7 +496,9 @@
       "restoreLocalSuccess": "已从本地恢复草稿",
       "deleteLocalSuccess": "已删除本地草稿",
       "noLayersToSave": "当前没有图层可以保存",
-      "voronoiFailed": "泰森多边形计算失败：{error}"
+      "voronoiFailed": "泰森多边形计算失败：{error}",
+      "localDraftNameRequired": "请输入草稿名称",
+      "deleteLocalConfirm": "确认删除当前本地草稿吗？"
     },
     "voronoi": {
       "panelHint": "基于地点分区数据计算泰森多边形，可预览或导出为面图层。",
@@ -567,13 +570,60 @@
       "visible": "显示图层",
       "locked": "锁定图层",
       "basemap": "底图",
-      "localDraftSelection": "选择本地草稿"
+      "localDraftSelection": "选择本地草稿",
+      "localDraftName": "草稿名称",
+      "localDraftNamePlaceholder": "请输入草稿名称"
     },
     "geometry": {
       "point": "点",
       "line": "线",
       "polygon": "面",
       "layer": "图层"
+    },
+    "imageExport": {
+      "modalTitle": "导出图片设置",
+      "confirmAction": "预览并导出",
+      "summary": {
+        "layers": "图层数",
+        "features": "图形数",
+        "activeLayer": "当前图层"
+      },
+      "sections": {
+        "range": "导出范围",
+        "size": "导出尺寸",
+        "zoom": "导出级别",
+        "content": "导出内容"
+      },
+      "labels": {
+        "sizePreset": "尺寸预设",
+        "width": "宽度",
+        "height": "高度",
+        "zoomValue": "缩放级别"
+      },
+      "range": {
+        "currentView": "当前视图",
+        "currentViewDesc": "按当前地图可见区域导出",
+        "selectedLayer": "选中图层",
+        "selectedFeature": "选中要素",
+        "selectedFeatureDesc": "当前没有选中的要素，将沿用当前视图",
+        "customBbox": "框选范围",
+        "customBboxDesc": "下一步接入地图框选范围"
+      },
+      "size": {
+        "current": "当前尺寸",
+        "p1080": "1080p",
+        "p2k": "2K",
+        "custom": "自定义"
+      },
+      "zoom": {
+        "current": "当前级别",
+        "custom": "指定 zoom"
+      },
+      "content": {
+        "includeBasemap": "包含底图",
+        "includeDrawLayers": "包含绘制图层",
+        "onlySelectedLayers": "只导出选定图层"
+      }
     }
   }
 }

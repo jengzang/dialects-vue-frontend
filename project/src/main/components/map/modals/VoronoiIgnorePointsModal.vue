@@ -398,7 +398,6 @@ function formatRegionNames(regionNames) {
   display: flex;
   flex: 1;
   min-width: 0;
-  flex-direction: column;
   gap: 12px;
 }
 
@@ -407,6 +406,7 @@ function formatRegionNames(regionNames) {
   font-size: 16px;
   font-weight: 700;
   color: #0f172a;
+  min-width:100px;
 }
 
 .scope-search-field {
@@ -414,7 +414,7 @@ function formatRegionNames(regionNames) {
 }
 
 .scope-search-input {
-  width: 100%;
+  width: 80%;
   height: 38px;
   border: 1px solid rgba(148, 163, 184, 0.28);
   border-radius: 12px;
@@ -443,7 +443,7 @@ function formatRegionNames(regionNames) {
   flex: 1 1 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .summary-label {
@@ -499,7 +499,7 @@ function formatRegionNames(regionNames) {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: min(56vh, 34rem);
+  max-height: min(45dvh, 34rem);
   overflow: hidden;
   padding: 16px;
 }
@@ -604,12 +604,13 @@ function formatRegionNames(regionNames) {
 }
 
 @media (max-width: 760px) {
-  .scope-modal-header {
-    flex-direction: column;
-  }
 
   .scope-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.main-glass-panel-inner{
+  padding:10px 20px;
 }
 </style>
