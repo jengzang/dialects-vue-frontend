@@ -64,7 +64,7 @@
               <div class="main-list-state-title">{{ t('map.drawTab.voronoi.emptyRegions') }}</div>
             </div>
 
-            <div v-else class="scope-tree-list">
+            <div v-else class="scope-tree-list ui-scrollbar">
               <template v-for="node in filteredRegionTree" :key="node.fullPath">
                 <div class="scope-tree-node" :style="{ paddingLeft: `${node.depth * 18}px` }">
                   <button
@@ -510,7 +510,15 @@ function formatRegionNames(regionNames) {
   color: #0f172a;
 }
 
-.scope-tree-list,
+.scope-tree-list {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
 .scope-checkbox-item {
   display: flex;
   flex-direction: column;

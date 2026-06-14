@@ -83,7 +83,7 @@
               </div>
 
               <template v-else-if="recognizeHierarchy">
-                <div class="scope-tree-list">
+                <div class="scope-tree-list ui-scrollbar">
                   <template v-for="node in filteredRegionTree" :key="node.fullPath">
                     <div class="scope-tree-node" :style="{ paddingLeft: `${node.depth * 18}px` }">
                       <button
@@ -108,20 +108,22 @@
               </template>
 
               <template v-else>
-                <button
-                  v-for="region in filteredRegionOptions"
-                  :key="region.name"
-                  class="scope-selection-item"
-                  :class="[`state-${region.state}`]"
-                  type="button"
-                  @click="toggleRegion(region)"
-                >
-                  <span class="scope-selection-title">{{ region.name || t('map.customTab.scopeModal.summary.empty') }}</span>
-                  <span class="scope-selection-meta">
-                    {{ t('map.customTab.scopeModal.regionMeta', { locations: region.locationCount, records: region.recordCount }) }}
-                  </span>
-                  <span class="scope-selection-status">{{ t(`map.customTab.scopeModal.regionStates.${region.state}`) }}</span>
-                </button>
+                <div class="scope-region-list ui-scrollbar">
+                  <button
+                    v-for="region in filteredRegionOptions"
+                    :key="region.name"
+                    class="scope-selection-item"
+                    :class="[`state-${region.state}`]"
+                    type="button"
+                    @click="toggleRegion(region)"
+                  >
+                    <span class="scope-selection-title">{{ region.name || t('map.customTab.scopeModal.summary.empty') }}</span>
+                    <span class="scope-selection-meta">
+                      {{ t('map.customTab.scopeModal.regionMeta', { locations: region.locationCount, records: region.recordCount }) }}
+                    </span>
+                    <span class="scope-selection-status">{{ t(`map.customTab.scopeModal.regionStates.${region.state}`) }}</span>
+                  </button>
+                </div>
               </template>
             </section>
 
@@ -604,10 +606,14 @@ function formatRegionNames(regionNames) {
   color: #0f172a;
 }
 
-.scope-tree-list {
+.scope-tree-list,
+.scope-region-list {
   display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
   flex-direction: column;
   gap: 10px;
+  overflow-y: auto;
 }
 
 .scope-virtual-list {
