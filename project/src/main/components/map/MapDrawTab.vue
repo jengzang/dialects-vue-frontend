@@ -106,6 +106,7 @@
             @feature-select="handleFeatureSelect"
             @export-image="handleImageExported"
             @export-layer="handleLayerExported"
+            @export-selection-bounds-change="boxSelectionBounds = $event"
           />
         </div>
 
@@ -421,6 +422,17 @@
         @confirm="handleConfirmImageExport"
       />
 
+      <MapDrawImagePreviewModal
+        v-model="showImagePreviewModal"
+        :settings="imageExportSettings"
+        :layers="layers"
+        :active-layer-id="activeLayerId"
+        :selected-feature-id="selectedFeatureId"
+        :current-style-key="currentStyleKey"
+        :initial-view-state="imageExportViewState"
+        @exported="handleImagePreviewExported"
+      />
+
       <VoronoiExportLayersModal
         v-model="showVoronoiExportModal"
         :groups="voronoiExportGroups"
@@ -500,6 +512,7 @@ import MapDrawLayersPanel from '@/main/components/map/panels/MapDrawLayersPanel.
 import MapDrawToolsPanel from '@/main/components/map/panels/MapDrawToolsPanel.vue';
 import MapDrawVoronoiPanel from '@/main/components/map/panels/MapDrawVoronoiPanel.vue';
 import MapDrawImageExportModal from '@/main/components/map/modals/MapDrawImageExportModal.vue';
+import MapDrawImagePreviewModal from '@/main/components/map/modals/MapDrawImagePreviewModal.vue';
 import VoronoiExportLayersModal from '@/main/components/map/modals/VoronoiExportLayersModal.vue';
 import VoronoiIgnorePointsModal from '@/main/components/map/modals/VoronoiIgnorePointsModal.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
@@ -542,8 +555,12 @@ const showExportModal = ref(false);
 const showLocalStorageModal = ref(false);
 const showSaveLocalDraftModal = ref(false);
 const showImageExportModal = ref(false);
+const showImagePreviewModal = ref(false);
+const imageExportSettings = ref(null);
+const imageExportViewState = ref(null);
 const showVoronoiExportModal = ref(false);
 const selectedStoredDraftId = ref('');
+const newDraftName = ref('');
 const storedDrafts = ref([]);
 const isMapFullscreen = ref(false);
 const voronoiExportSelections = ref([]);
@@ -1308,9 +1325,12 @@ const handleExportAllLayers = async () => {
   }
 };
 
-const handleExportImage = async () => {
+const handleExportImage = async (settings = {}) => {
   try {
-    await editableMapRef.value?.exportImage?.();
+    await editableMapRef.value?.exportImage?.({
+      ...settings,
+      selectedFeatureId: selectedFeatureId.value,
+    });
     showSuccess(t('map.drawTab.messages.exportImageSuccess'));
   } catch (error) {
     showError(t('map.drawTab.messages.exportImageFailed', { error: error.message || error }));
@@ -1320,10 +1340,24 @@ const handleExportImage = async () => {
 const handleImageExported = () => {};
 const handleLayerExported = () => {};
 
-const handleConfirmImageExport = async (settings) => {
-  console.log('[MapDrawImageExportModal] confirm settings', settings);
+const handleConfirmImageExport = (settings) => {
   showImageExportModal.value = false;
-  await handleExportImage();
+  imageExportSettings.value = {
+    ...settings,
+    selectedFeatureId: selectedFeatureId.value,
+  };
+  imageExportViewState.value = {
+    center: editableMapRef.value?.currentCenter?.value ?? null,
+    zoom: editableMapRef.value?.currentZoom?.value ?? null,
+    bearing: editableMapRef.value?.currentBearing?.value ?? 0,
+    pitch: editableMapRef.value?.currentPitch?.value ?? 0,
+  };
+  showImagePreviewModal.value = true;
+};
+
+const handleImagePreviewExported = async () => {
+  showImagePreviewModal.value = false;
+  showSuccess(t('map.drawTab.messages.exportImageSuccess'));
 };
 
 const hasLayersToPersist = computed(() => {
@@ -1490,6 +1524,9 @@ const onExportAllClicked = () => {
 
 const onExportImageClicked = () => {
   showExportModal.value = false;
+  imageExportSettings.value = null;
+  imageExportViewState.value = null;
+  showImagePreviewModal.value = false;
   showImageExportModal.value = true;
 };
 
@@ -1715,7 +1752,6 @@ onBeforeUnmount(() => {
 
 .draw-text-input {
   width: 100%;
-  min-height: 2.5rem;
   padding: 0.6rem 0.85rem;
   border-radius: 12px;
   border: 1px solid rgba(148, 163, 184, 0.32);
@@ -1727,6 +1763,11 @@ onBeforeUnmount(() => {
   outline: none;
   border-color: rgba(0, 122, 255, 0.5);
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+
+.scope-modal-footer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 @media (max-width: 900px) {

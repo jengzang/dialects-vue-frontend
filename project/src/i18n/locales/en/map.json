@@ -452,7 +452,7 @@
       "importLayerDesc": "Support importing GeoJSON / JSON / KML / KMZ / CSV geographical data files",
       "exportCurrentLayerDesc": "Export the currently selected active layer as a GeoJSON file",
       "exportAllLayersDesc": "Merge and export all drawing layers as a single GeoJSON file",
-      "exportImageDesc": "Render and export the current map view as a PNG image",
+      "exportImageDesc": "Export a PNG map image using the selected range and options",
       "bringToFront": "Bring to Front",
       "sendToBack": "Send to Back",
       "collapseTools": "Collapse Tools",
@@ -582,11 +582,17 @@
     },
     "imageExport": {
       "modalTitle": "Image Export Settings",
-      "confirmAction": "Preview and Export",
+      "previewTitle": "Export Preview",
+      "confirmAction": "Open Preview",
+      "exportAction": "Export Image",
+      "previewGuideTitle": "Preview Guide",
+      "previewHint": "Check the preview map for the final range, size, and basemap visibility before exporting.",
+      "previewCustomBboxHint": "Drag directly on the preview map to box-select the export area. The selection updates immediately.",
       "summary": {
         "layers": "Layers",
         "features": "Features",
-        "activeLayer": "Active Layer"
+        "activeLayer": "Active Layer",
+        "outputSize": "Output Size"
       },
       "sections": {
         "range": "Export Range",
@@ -607,7 +613,7 @@
         "selectedFeature": "Selected Feature",
         "selectedFeatureDesc": "No feature is currently selected. The current view will be used.",
         "customBbox": "Box Selection",
-        "customBboxDesc": "Map box selection will be wired in next"
+        "customBboxDesc": "Drag on the map to box-select the export area"
       },
       "size": {
         "current": "Current Size",

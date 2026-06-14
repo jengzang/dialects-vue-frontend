@@ -452,7 +452,7 @@
       "importLayerDesc": "支持导入 GeoJSON / JSON / KML / KMZ / CSV 地理数据文件",
       "exportCurrentLayerDesc": "导出当前选中的活动图层为 GeoJSON 文件",
       "exportAllLayersDesc": "将所有绘制图层合并导出为单个 GeoJSON 文件",
-      "exportImageDesc": "将当前地图视图区域渲染并导出为 PNG 图片",
+      "exportImageDesc": "按所选范围与参数导出 PNG 地图图片",
       "bringToFront": "置顶",
       "sendToBack": "置底",
       "collapseTools": "收起工具",
@@ -582,11 +582,17 @@
     },
     "imageExport": {
       "modalTitle": "导出图片设置",
-      "confirmAction": "预览并导出",
+      "previewTitle": "导出预览",
+      "confirmAction": "进入预览",
+      "exportAction": "导出图片",
+      "previewGuideTitle": "预览说明",
+      "previewHint": "请确认预览地图中的范围、尺寸与底图显示效果，确认无误后再导出。",
+      "previewCustomBboxHint": "请直接在右侧预览地图中拖拽框选导出范围，框选结果会立即显示。",
       "summary": {
         "layers": "图层数",
         "features": "图形数",
-        "activeLayer": "当前图层"
+        "activeLayer": "当前图层",
+        "outputSize": "输出尺寸"
       },
       "sections": {
         "range": "导出范围",
@@ -607,7 +613,7 @@
         "selectedFeature": "选中要素",
         "selectedFeatureDesc": "当前没有选中的要素，将沿用当前视图",
         "customBbox": "框选范围",
-        "customBboxDesc": "下一步接入地图框选范围"
+        "customBboxDesc": "在地图上拖拽框选要导出的范围"
       },
       "size": {
         "current": "当前尺寸",

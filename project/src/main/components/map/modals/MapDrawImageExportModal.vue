@@ -391,12 +391,12 @@ watch(
 }
 
 @media (max-width: 900px) {
-  .feature-scope-summary {
-    grid-template-columns: 1fr;
-  }
 
   .image-export-custom-size {
     grid-template-columns: 1fr;
+  }
+  .scope-panel {
+    flex-direction: column;
   }
 }
 </style>
