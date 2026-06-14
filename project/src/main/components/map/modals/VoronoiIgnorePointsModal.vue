@@ -404,7 +404,6 @@ function formatRegionNames(regionNames) {
 .scope-selection-item {
   width: 100%;
   display: flex;
-  flex-direction: column;
   align-items: stretch;
   gap: 6px;
   cursor: pointer;
@@ -424,6 +423,7 @@ function formatRegionNames(regionNames) {
 .scope-tree-main,
 .scope-checkbox-item {
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
   gap: 10px;
 }
@@ -436,8 +436,7 @@ function formatRegionNames(regionNames) {
 
 .scope-selection-copy {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
 
 .scope-selection-title {

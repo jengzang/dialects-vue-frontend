@@ -405,12 +405,16 @@ export async function readGeoJsonFile(file) {
   return normalizeFeatureCollection(parseGeoJsonText(text))
 }
 
+export function readKmzArrayBuffer(arrayBuffer) {
+  return normalizeFeatureCollection(parseKmlText(getKmzKmlText(arrayBuffer)))
+}
+
 export async function readImportedLayerFile(file) {
   const importFormat = inferImportFormat(file)
 
   if (importFormat === 'kmz') {
     const arrayBuffer = await readFileAsArrayBuffer(file)
-    return normalizeFeatureCollection(parseKmlText(getKmzKmlText(arrayBuffer)))
+    return readKmzArrayBuffer(arrayBuffer)
   }
 
   const text = await readFileAsText(file)
