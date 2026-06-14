@@ -593,9 +593,11 @@ const voronoiLastResult = ref(null);
 const voronoiExportProgress = ref({ current: 0, total: 0 });
 const showVoronoiExportProgressOverlay = computed(() => isVoronoiExporting.value && voronoiExportProgress.value.total > 0);
 
+const normalizeVoronoiLocationName = (value) => String(value || '').trim();
+
 const activeVoronoiPoints = computed(() => {
-  const ignored = new Set(ignoredVoronoiLocations.value);
-  return voronoiPartitionPoints.value.filter((item) => !ignored.has(item.name));
+  const ignored = new Set(ignoredVoronoiLocations.value.map(normalizeVoronoiLocationName).filter(Boolean));
+  return voronoiPartitionPoints.value.filter((item) => !ignored.has(normalizeVoronoiLocationName(item.name)));
 });
 
 const voronoiTotalPointCount = computed(() => voronoiPartitionPoints.value.length);
@@ -749,20 +751,34 @@ const openVoronoiIgnoreModal = async () => {
   showVoronoiIgnoreModal.value = true;
 };
 
-const refreshVoronoiPreview = async () => {
-  if (voronoiPreviewType.value === 'points') {
+const refreshVoronoiPreview = async (previewType = voronoiPreviewType.value) => {
+  if (previewType === 'points') {
     await previewVoronoiPoints({ force: true });
     return;
   }
-  if (voronoiPreviewType.value === 'polygons') {
+  if (previewType === 'polygons') {
     await handleBuildVoronoi({ force: true });
   }
 };
 
 const handleVoronoiIgnoreConfirm = async (locations) => {
-  ignoredVoronoiLocations.value = Array.isArray(locations) ? locations : [];
+  const previousPreviewType = voronoiPreviewType.value;
+  ignoredVoronoiLocations.value = Array.isArray(locations)
+    ? locations.map(normalizeVoronoiLocationName).filter(Boolean)
+    : [];
+  voronoiLastResult.value = null;
+  voronoiExportSelections.value = [];
+  voronoiPreviewType.value = '';
+  voronoiPreviewLayers.value = [];
+  console.log('[MapDrawTab] ignore confirm', {
+    ignoredCount: ignoredVoronoiLocations.value.length,
+    ignoredLocations: ignoredVoronoiLocations.value.slice(0, 20),
+    totalPoints: voronoiPartitionPoints.value.length,
+    activePoints: activeVoronoiPoints.value.length,
+    activePointSamples: activeVoronoiPoints.value.slice(0, 10).map((item) => item.name),
+  });
   setVoronoiStatus('ignoreUpdated', { count: ignoredVoronoiLocations.value.length });
-  await refreshVoronoiPreview();
+  await refreshVoronoiPreview(previousPreviewType);
 };
 
 const previewVoronoiPoints = async ({ force = false } = {}) => {
@@ -779,6 +795,12 @@ const previewVoronoiPoints = async ({ force = false } = {}) => {
     Number(voronoiRegionLevel.value) || 3,
     voronoiColorMap.value
   );
+  console.log('[MapDrawTab] preview points', {
+    ignoredCount: ignoredVoronoiLocations.value.length,
+    activePoints: activeVoronoiPoints.value.length,
+    previewFeatureCount: pointCollection.features.length,
+    previewPointSamples: pointCollection.features.slice(0, 10).map((feature) => feature.properties?.name),
+  });
   voronoiPreviewType.value = 'points';
   voronoiPreviewLayers.value = [{
     id: 'voronoi-preview-points',
@@ -803,6 +825,11 @@ const handleBuildVoronoi = async ({ force = false } = {}) => {
     await ensureVoronoiPointsLoaded();
     const level = Number(voronoiRegionLevel.value) || 3;
     const points = activeVoronoiPoints.value;
+    console.log('[MapDrawTab] build voronoi input', {
+      ignoredCount: ignoredVoronoiLocations.value.length,
+      inputPointCount: points.length,
+      inputPointSamples: points.slice(0, 10).map((item) => item.name),
+    });
     const voronoiResult = calculatePartitionVoronoi(points, level, voronoiColorMap.value);
     voronoiLastResult.value = voronoiResult;
 
@@ -827,7 +854,7 @@ const exportVoronoiToLayer = async () => {
   await ensureVoronoiPointsLoaded();
   const level = Number(voronoiRegionLevel.value) || 3;
   const points = activeVoronoiPoints.value;
-  const voronoiResult = voronoiLastResult.value ?? calculatePartitionVoronoi(points, level, voronoiColorMap.value);
+  const voronoiResult = calculatePartitionVoronoi(points, level, voronoiColorMap.value);
   voronoiLastResult.value = voronoiResult;
 
   const exportableKeys = voronoiExportGroups.value.map((item) => item.key);
