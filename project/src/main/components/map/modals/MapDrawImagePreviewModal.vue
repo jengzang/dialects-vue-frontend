@@ -781,18 +781,27 @@ async function handleExport() {
 watch(
   () => props.modelValue,
   async (open) => {
-    if (open) {
-      customBounds.value = null
-      isDraggingBox.value = false
-      dragStartLngLat.value = null
-      await nextTick()
-      if (!mapInstance.value) {
-        createPreviewMap()
-      } else {
-        mapInstance.value.resize()
-      }
-      await syncPreviewMap()
+    if (!open) {
+      destroyPreviewMap()
+      return
     }
+
+    customBounds.value = null
+    isDraggingBox.value = false
+    dragStartLngLat.value = null
+    await nextTick()
+
+    if (mapInstance.value?.getContainer?.() !== mapContainer.value) {
+      destroyPreviewMap()
+    }
+
+    if (!mapInstance.value) {
+      createPreviewMap()
+    } else {
+      mapInstance.value.resize()
+    }
+
+    await syncPreviewMap()
   },
   { immediate: true }
 )
