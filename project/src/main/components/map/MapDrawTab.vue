@@ -397,6 +397,7 @@ import { showConfirm, showError, showSuccess } from '@/utils/message.js';
 import { readImportedLayerFile, splitFeatureCollectionByGeometryType } from '@/utils/map/draw/export.js';
 import {
   PARTITION_MODE_MAP,
+  PARTITION_MODE_YINDIAN,
   buildPartitionColorMap,
   buildPartitionPointFeatureCollection,
   buildPartitionPoints,
@@ -533,8 +534,8 @@ const voronoiPartitionPoints = ref([]);
 const ignoredVoronoiLocations = ref([]);
 const voronoiPreviewLayers = ref([]);
 const voronoiPreviewType = ref('');
-const voronoiPartitionMode = ref(PARTITION_MODE_MAP);
-const voronoiRegionLevel = ref(3);
+const voronoiPartitionMode = ref(PARTITION_MODE_YINDIAN);
+const voronoiRegionLevel = ref(1);
 const isVoronoiPanelOpen = ref(false);
 const isVoronoiLoadingPoints = ref(false);
 const isVoronoiCalculating = ref(false);
@@ -637,7 +638,7 @@ const previewVoronoiPoints = async () => {
     featureCollection: pointCollection,
   }];
   setVoronoiStatus('previewReady', { count: pointCollection.features.length });
-  console.log('[MapDrawTab] voronoi preview points:', pointCollection);
+  // console.log('[MapDrawTab] voronoi preview points:', pointCollection);
 };
 
 const handleBuildVoronoi = async () => {
@@ -658,8 +659,8 @@ const handleBuildVoronoi = async () => {
       featureCollection: voronoiResult.merged,
     }];
     setVoronoiStatus('calculated', { count: voronoiResult.merged.features.length });
-    // console.log('[MapDrawTab] voronoi points:', pointCollection);
-    // console.log('[MapDrawTab] voronoi polygons:', voronoiResult);
+    // console.log('[MapDrawTab] voronoi cells:', voronoiResult.cells);
+    // console.log('[MapDrawTab] merged partition polygons:', voronoiResult.merged);
   } catch (error) {
     console.error('[MapDrawTab] Voronoi calculation failed:', error);
     showError(t('map.drawTab.messages.voronoiFailed', { error: error.message || error }));

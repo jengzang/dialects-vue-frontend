@@ -1,4 +1,5 @@
-import { bbox, featureCollection, point, voronoi } from '@turf/turf'
+import { bbox, featureCollection, point, polygon, union } from '@turf/turf'
+import { Delaunay } from 'd3-delaunay'
 
 const FIELD_KEYS = {
   name: ['簡稱', '简称', '地點', '地点', 'name', 'location'],
@@ -169,38 +170,214 @@ function getSafeBbox(featureCollectionValue) {
   ]
 }
 
+function getPointCoordinate(feature) {
+  const coordinate = feature?.geometry?.coordinates
+  if (!Array.isArray(coordinate) || coordinate.length < 2) return null
+  const lng = Number(coordinate[0])
+  const lat = Number(coordinate[1])
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null
+  return [lng, lat]
+}
+
+function getCoordinateKey(coordinate) {
+  return coordinate.map((value) => Number(value).toFixed(8)).join(',')
+}
+
+function logVoronoiDiagnostics(pointCollection, skippedCells = []) {
+  const invalidFeatures = []
+  const coordinateGroups = new Map()
+
+  ;(pointCollection?.features ?? []).forEach((feature, index) => {
+    const coordinate = getPointCoordinate(feature)
+    if (!coordinate) {
+      invalidFeatures.push({ index, properties: feature?.properties ?? null, geometry: feature?.geometry ?? null })
+      return
+    }
+
+    const coordinateKey = getCoordinateKey(coordinate)
+    if (!coordinateGroups.has(coordinateKey)) {
+      coordinateGroups.set(coordinateKey, [])
+    }
+    coordinateGroups.get(coordinateKey).push({
+      index,
+      name: feature.properties?.name,
+      partitionKey: feature.properties?.partitionKey,
+      coordinate,
+    })
+  })
+
+  const duplicateCoordinates = Array.from(coordinateGroups.entries())
+    .filter(([, items]) => items.length > 1)
+    .map(([coordinate, items]) => ({ coordinate, items }))
+
+  if (invalidFeatures.length || duplicateCoordinates.length || skippedCells.length) {
+    console.warn('[partitionVoronoi] diagnostics', {
+      totalFeatures: pointCollection?.features?.length ?? 0,
+      invalidFeatures,
+      duplicateCoordinates,
+      skippedCells,
+    })
+  }
+}
+
+function isValidVoronoiRing(coords) {
+  return Array.isArray(coords)
+    && coords.length >= 3
+    && coords.every((coordinate) => Array.isArray(coordinate)
+      && coordinate.length >= 2
+      && Number.isFinite(Number(coordinate[0]))
+      && Number.isFinite(Number(coordinate[1])))
+}
+
+function buildSafeVoronoiFeatureCollection(pointCollection) {
+  const originalFeatures = pointCollection?.features ?? []
+  const validFeatures = []
+  const filteredFeatures = []
+
+  originalFeatures.forEach((feature, index) => {
+    if (getPointCoordinate(feature)) {
+      validFeatures.push(feature)
+      return
+    }
+    filteredFeatures.push({
+      index,
+      name: feature?.properties?.name,
+      partitionKey: feature?.properties?.partitionKey,
+      geometry: feature?.geometry ?? null,
+    })
+  })
+
+  if (validFeatures.length < 2) {
+    logVoronoiDiagnostics(featureCollection(validFeatures), filteredFeatures.map((item) => ({
+      ...item,
+      reason: 'invalid-point-feature',
+    })))
+    return featureCollection([])
+  }
+
+  const safeBbox = getSafeBbox(featureCollection(validFeatures))
+  const skippedCells = []
+
+  let voronoiDiagram = null
+  try {
+    const delaunay = Delaunay.from(validFeatures, (feature) => getPointCoordinate(feature)[0], (feature) => getPointCoordinate(feature)[1])
+    voronoiDiagram = delaunay.voronoi(safeBbox)
+  } catch (error) {
+    console.error('[partitionVoronoi] d3-delaunay voronoi failed', {
+      error,
+      safeBbox,
+      validFeatureCount: validFeatures.length,
+      invalidFeatureCount: filteredFeatures.length,
+      sampleFeatures: validFeatures.slice(0, 20).map((feature, index) => ({
+        index,
+        name: feature.properties?.name,
+        partitionKey: feature.properties?.partitionKey,
+        coordinate: getPointCoordinate(feature),
+        geometry: feature.geometry,
+      })),
+      filteredFeatures,
+    })
+    throw error
+  }
+
+  const polygonFeatures = []
+  for (let index = 0; index < validFeatures.length; index += 1) {
+    const coords = voronoiDiagram?.cellPolygon(index)
+    const sourceFeature = validFeatures[index]
+    if (!isValidVoronoiRing(coords)) {
+      skippedCells.push({
+        index,
+        reason: coords ? 'invalid-ring' : 'empty-cell',
+        name: sourceFeature?.properties?.name,
+        partitionKey: sourceFeature?.properties?.partitionKey,
+        coordinate: sourceFeature ? getPointCoordinate(sourceFeature) : null,
+      })
+      continue
+    }
+
+    polygonFeatures.push(polygon([[...coords, coords[0]]], sourceFeature?.properties ?? {}))
+  }
+
+  logVoronoiDiagnostics(featureCollection(validFeatures), [
+    ...filteredFeatures.map((item) => ({ ...item, reason: 'invalid-point-feature' })),
+    ...skippedCells,
+  ])
+  return featureCollection(polygonFeatures)
+}
+
+function mergePartitionCellFeatures(cellFeatures, partitionKey, level, groupPoints, style = {}) {
+  const validFeatures = (cellFeatures ?? []).filter((feature) => feature && typeof feature === 'object')
+  if (!validFeatures.length) return null
+
+  const mergedFeature = validFeatures.length === 1
+    ? validFeatures[0]
+    : union(featureCollection(validFeatures))
+
+  if (!mergedFeature) return null
+
+  return {
+    ...mergedFeature,
+    properties: {
+      ...(mergedFeature.properties ?? {}),
+      ...style,
+      name: partitionKey,
+      partitionKey,
+      partitionLevel: level,
+      pointCount: groupPoints.length,
+    },
+  }
+}
+
 export function calculatePartitionVoronoi(points, level = 3, colorMap = {}) {
   const groups = groupPartitionPoints(points, level)
   const groupResults = {}
-  const mergedFeatures = []
+  const cellFeatures = []
+  const partitionFeatures = []
+  const pointCollection = buildPartitionPointFeatureCollection(points, level, colorMap)
+  const polygonCollection = pointCollection.features.length >= 2
+    ? buildSafeVoronoiFeatureCollection(pointCollection)
+    : featureCollection([])
+
+  ;(polygonCollection?.features ?? [])
+    .filter((feature) => feature && typeof feature === 'object')
+    .forEach((feature) => {
+      const partitionKey = feature.properties?.partitionKey
+      if (!partitionKey || !groups.has(partitionKey)) return
+      const groupPoints = groups.get(partitionKey)
+      const style = colorMap[partitionKey] ?? {}
+      const styledFeature = {
+        ...feature,
+        properties: {
+          ...(feature.properties ?? {}),
+          ...style,
+          partitionKey,
+          partitionLevel: level,
+          pointCount: groupPoints.length,
+        },
+      }
+
+      if (!groupResults[partitionKey]) {
+        groupResults[partitionKey] = []
+      }
+      groupResults[partitionKey].push(styledFeature)
+      cellFeatures.push(styledFeature)
+    })
 
   groups.forEach((groupPoints, partitionKey) => {
-    const pointCollection = buildPartitionPointFeatureCollection(groupPoints, level, colorMap)
-    const polygonCollection = pointCollection.features.length >= 2
-      ? voronoi(pointCollection, { bbox: getSafeBbox(pointCollection) })
-      : featureCollection([])
+    const features = groupResults[partitionKey] ?? []
     const style = colorMap[partitionKey] ?? {}
-
-    const features = (polygonCollection?.features ?? [])
-      .filter((feature) => feature && typeof feature === 'object')
-      .map((feature) => ({
-      ...feature,
-      properties: {
-        ...(feature.properties ?? {}),
-        ...style,
-        partitionKey,
-        partitionLevel: level,
-        pointCount: groupPoints.length,
-      },
-    }))
+    const mergedFeature = mergePartitionCellFeatures(features, partitionKey, level, groupPoints, style)
 
     groupResults[partitionKey] = featureCollection(features)
-    mergedFeatures.push(...features)
+    if (mergedFeature) {
+      partitionFeatures.push(mergedFeature)
+    }
   })
 
   return {
     groups: groupResults,
-    merged: featureCollection(mergedFeatures),
+    cells: featureCollection(cellFeatures),
+    merged: featureCollection(partitionFeatures),
   }
 }
 
