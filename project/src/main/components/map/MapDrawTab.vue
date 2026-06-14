@@ -386,7 +386,7 @@
         :is-selection-full="isVoronoiExportSelectionFull"
         :clip-to-national-border="clipVoronoiToNationalBorder"
         :is-exporting="isVoronoiExporting"
-        @update:clip-to-national-border="clipVoronoiToNationalBorder = $event"
+        @update:clip-to-national-border="handleClipVoronoiToggle"
         @toggle-selection="toggleVoronoiExportSelection"
         @clear-selection="voronoiExportSelections = []"
         @confirm="confirmVoronoiExport"
@@ -451,8 +451,10 @@ const defaultLayerStyle = {
 const mapDrawStorageKey = 'map-draw-workbench-state';
 const voronoiExportStorageKey = 'map-draw-voronoi-export-state';
 const nationalBorderCacheKey = 'map-draw-national-border-cache';
+const nationalBorderAssetCacheName = 'map-draw-assets';
 const voronoiExportLimit = 20;
 let layerIdSeed = 0;
+let nationalBorderFeatureCollectionCache = null;
 
 const editableMapRef = ref(null);
 const importInputRef = ref(null);
@@ -655,22 +657,53 @@ const loadVoronoiPoints = async () => {
   }
 };
 
-const readNationalBorderCache = () => {
-  const raw = localStorage.getItem(nationalBorderCacheKey);
-  if (!raw) return null;
-  const parsed = JSON.parse(raw);
-  if (parsed?.type !== 'FeatureCollection' || !Array.isArray(parsed?.features)) {
+const readNationalBorderCache = async () => {
+  if (nationalBorderFeatureCollectionCache) return nationalBorderFeatureCollectionCache;
+
+  const storageRaw = localStorage.getItem(nationalBorderCacheKey);
+  const cacheStorage = typeof window !== 'undefined' && 'caches' in window
+    ? await caches.open(nationalBorderAssetCacheName)
+    : null;
+  const cachedResponse = cacheStorage ? await cacheStorage.match(nationalBorderKmzUrl) : null;
+
+  if (!cachedResponse) {
+    if (storageRaw) {
+      localStorage.removeItem(nationalBorderCacheKey);
+    }
     return null;
   }
-  return parsed;
+
+  const arrayBuffer = await cachedResponse.arrayBuffer();
+  const featureCollectionValue = readKmzArrayBuffer(arrayBuffer);
+  nationalBorderFeatureCollectionCache = featureCollectionValue;
+
+  const nextMeta = JSON.stringify({ version: 2, cachedAt: Date.now() });
+  if (storageRaw !== nextMeta) {
+    localStorage.setItem(nationalBorderCacheKey, nextMeta);
+  }
+
+  return featureCollectionValue;
 };
 
-const writeNationalBorderCache = (featureCollectionValue) => {
-  localStorage.setItem(nationalBorderCacheKey, JSON.stringify(featureCollectionValue));
+const writeNationalBorderCache = async (arrayBuffer) => {
+  const cacheStorage = typeof window !== 'undefined' && 'caches' in window
+    ? await caches.open(nationalBorderAssetCacheName)
+    : null;
+
+  if (cacheStorage) {
+    const response = new Response(arrayBuffer.slice(0), {
+      headers: {
+        'Content-Type': 'application/vnd.google-earth.kmz',
+      },
+    });
+    await cacheStorage.put(nationalBorderKmzUrl, response);
+  }
+
+  localStorage.setItem(nationalBorderCacheKey, JSON.stringify({ version: 2, cachedAt: Date.now() }));
 };
 
 const loadNationalBorderFeatureCollection = async () => {
-  const cached = readNationalBorderCache();
+  const cached = await readNationalBorderCache();
   if (cached) return cached;
 
   const response = await fetch(nationalBorderKmzUrl);
@@ -680,7 +713,8 @@ const loadNationalBorderFeatureCollection = async () => {
 
   const arrayBuffer = await response.arrayBuffer();
   const featureCollectionValue = readKmzArrayBuffer(arrayBuffer);
-  writeNationalBorderCache(featureCollectionValue);
+  nationalBorderFeatureCollectionCache = featureCollectionValue;
+  await writeNationalBorderCache(arrayBuffer);
   return featureCollectionValue;
 };
 
@@ -794,6 +828,18 @@ const toggleVoronoiExportSelection = (partitionKey) => {
   }
   next.add(partitionKey);
   voronoiExportSelections.value = Array.from(next);
+};
+
+const handleClipVoronoiToggle = async (nextValue) => {
+  if (!nextValue) {
+    clipVoronoiToNationalBorder.value = false;
+    return;
+  }
+
+  const confirmed = await showConfirm(t('map.drawTab.voronoi.clipToNationalBorderConfirmMessage'), {
+    title: t('messages.confirm.title'),
+  });
+  clipVoronoiToNationalBorder.value = confirmed;
 };
 
 const clipFeatureCollectionToBorder = (sourceCollection, borderCollection) => {

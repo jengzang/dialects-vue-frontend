@@ -19,6 +19,7 @@
         <div class="summary-actions">
           <button
             class="scope-clear-btn summary-action-button"
+            data-variant="danger"
             type="button"
             @click="emit('clear-selection')"
           >
@@ -209,11 +210,28 @@ function handleClose(value = false) {
 }
 
 .scope-clear-btn {
-  border: none;
-  background: transparent;
-  color: #64748b;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  background: rgba(254, 226, 226, 0.92);
+  color: #b91c1c;
   font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 9px 14px;
+  border-radius: 999px;
+  box-shadow: 0 8px 18px rgba(239, 68, 68, 0.14);
   cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.scope-clear-btn:hover {
+  background: rgba(254, 202, 202, 0.98);
+  border-color: rgba(220, 38, 38, 0.38);
+  box-shadow: 0 10px 22px rgba(239, 68, 68, 0.18);
+  transform: translateY(-1px);
+}
+
+.scope-clear-btn:active {
+  transform: translateY(0);
 }
 
 .voronoi-export-hint {

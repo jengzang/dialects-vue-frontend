@@ -2,10 +2,33 @@
   <AppModal
     :model-value="modelValue"
     size="lg"
-    :title="modalTitle"
     :close-label="t('common.button.close')"
     @update:modelValue="handleClose"
   >
+    <template #header>
+      <div class="scope-modal-header">
+        <div class="scope-modal-header-main">
+          <h3 class="scope-modal-title">{{ modalTitle }}</h3>
+          <div class="scope-search-field">
+            <input
+              v-model="searchText"
+              type="text"
+              class="scope-search-input"
+              :placeholder="t('map.customTab.scopeModal.searchPlaceholder')"
+            >
+          </div>
+        </div>
+        <button
+          type="button"
+          class="close-btn close-btn-lg close-btn-inline"
+          :aria-label="t('common.button.close')"
+          @click="handleClose(false)"
+        >
+          ×
+        </button>
+      </div>
+    </template>
+
     <template #default>
       <div class="feature-scope-modal">
         <div class="feature-scope-summary main-glass-panel-inner">
@@ -55,13 +78,13 @@
           <div class="scope-grid">
             <section class="scope-panel main-glass-panel-inner">
               <div class="scope-panel-title">{{ t('map.customTab.scopeModal.regionTitle') }}</div>
-              <div v-if="regions.length === 0" class="feature-scope-state main-list-state">
+              <div v-if="filteredRegionsEmpty" class="feature-scope-state main-list-state">
                 <div class="main-list-state-title">{{ t('map.customTab.scopeModal.emptyRegions') }}</div>
               </div>
 
-              <template v-if="recognizeHierarchy">
+              <template v-else-if="recognizeHierarchy">
                 <div class="scope-tree-list">
-                  <template v-for="node in regionTree" :key="node.fullPath">
+                  <template v-for="node in filteredRegionTree" :key="node.fullPath">
                     <div class="scope-tree-node" :style="{ paddingLeft: `${node.depth * 18}px` }">
                       <button
                         class="scope-selection-item scope-tree-item"
@@ -86,7 +109,7 @@
 
               <template v-else>
                 <button
-                  v-for="region in regionOptions"
+                  v-for="region in filteredRegionOptions"
                   :key="region.name"
                   class="scope-selection-item"
                   :class="[`state-${region.state}`]"
@@ -104,26 +127,30 @@
 
             <section class="scope-panel main-glass-panel-inner">
               <div class="scope-panel-title">{{ t('map.customTab.scopeModal.locationTitle') }}</div>
-              <div v-if="locations.length === 0" class="feature-scope-state main-list-state">
+              <div v-if="filteredLocations.length === 0" class="feature-scope-state main-list-state">
                 <div class="main-list-state-title">{{ t('map.customTab.scopeModal.emptyLocations') }}</div>
               </div>
-              <label
-                v-for="location in locations"
-                :key="location.name"
-                class="scope-checkbox-item"
-              >
-                <input
-                  :checked="selectedLocationSet.has(location.name)"
-                  type="checkbox"
-                  @change="toggleLocation(location.name)"
-                >
-                <span class="scope-selection-copy">
-                  <span class="scope-selection-title">{{ location.name }}</span>
-                  <span class="scope-selection-meta">
-                    {{ t('map.customTab.scopeModal.locationMeta', { records: location.recordCount, regions: formatRegionNames(location.regionNames) || t('map.customTab.scopeModal.summary.empty') }) }}
-                  </span>
-                </span>
-              </label>
+              <div v-else v-bind="locationContainerProps" class="scope-virtual-list ui-scrollbar">
+                <div v-bind="locationWrapperProps" class="scope-virtual-wrapper">
+                  <label
+                    v-for="item in virtualLocations"
+                    :key="item.data.name"
+                    class="scope-checkbox-item scope-checkbox-item--virtual"
+                  >
+                    <input
+                      :checked="selectedLocationSet.has(item.data.name)"
+                      type="checkbox"
+                      @change="toggleLocation(item.data.name)"
+                    >
+                    <span class="scope-selection-copy">
+                      <span class="scope-selection-title">{{ item.data.name }}</span>
+                      <span class="scope-selection-meta">
+                        {{ t('map.customTab.scopeModal.locationMeta', { records: item.data.recordCount, regions: formatRegionNames(item.data.regionNames) || t('map.customTab.scopeModal.summary.empty') }) }}
+                      </span>
+                    </span>
+                  </label>
+                </div>
+              </div>
             </section>
           </div>
         </template>
@@ -151,6 +178,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useVirtualList } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 
@@ -184,9 +212,21 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'confirm'])
 const { t, locale } = useI18n()
 
+const LOCATION_ITEM_HEIGHT = 76
+
 const selectedLocations = ref([])
+const searchText = ref('')
 const recognizeHierarchy = ref(false)
 const selectedLocationSet = computed(() => new Set(selectedLocations.value))
+const normalizedSearchText = computed(() => searchText.value.trim().toLowerCase())
+
+function matchesSearch(value) {
+  if (!normalizedSearchText.value) {
+    return true
+  }
+
+  return String(value || '').toLowerCase().includes(normalizedSearchText.value)
+}
 
 const modalTitle = computed(() => t('map.customTab.scopeModal.title', {
   feature: props.featureMeta?.feature || ''
@@ -307,6 +347,57 @@ const regionTree = computed(() => {
   return flattened
 })
 
+const filteredRegionTree = computed(() => {
+  if (!normalizedSearchText.value) {
+    return regionTree.value
+  }
+
+  const matchesNode = (node) => {
+    if (matchesSearch(node.label)) {
+      return true
+    }
+
+    return node.locationNames.some((name) => matchesSearch(name))
+  }
+
+  return regionTree.value.filter((node) => {
+    if (matchesNode(node)) {
+      return true
+    }
+
+    const nodePrefix = `${node.fullPath}-`
+    return regionTree.value.some((candidate) => candidate.fullPath.startsWith(nodePrefix) && matchesNode(candidate))
+  })
+})
+
+const filteredRegionOptions = computed(() => {
+  if (!normalizedSearchText.value) {
+    return regionOptions.value
+  }
+
+  return regionOptions.value.filter((region) => matchesSearch(region.name) || region.locationNames.some((name) => matchesSearch(name)))
+})
+
+const filteredRegionsEmpty = computed(() => {
+  return recognizeHierarchy.value ? filteredRegionTree.value.length === 0 : filteredRegionOptions.value.length === 0
+})
+
+const filteredLocations = computed(() => {
+  if (!normalizedSearchText.value) {
+    return props.locations
+  }
+
+  return props.locations.filter((location) => matchesSearch(location.name))
+})
+
+const { list: virtualLocations, containerProps: locationContainerProps, wrapperProps: locationWrapperProps } = useVirtualList(
+  filteredLocations,
+  {
+    itemHeight: LOCATION_ITEM_HEIGHT,
+    overscan: 10,
+  }
+)
+
 const confirmDisabled = computed(() => {
   return props.loading || Boolean(props.errorMessage) || selectedLocations.value.length === 0
 })
@@ -315,6 +406,7 @@ watch(() => props.modelValue, (isOpen) => {
   if (isOpen) {
     selectedLocations.value = []
     recognizeHierarchy.value = false
+    searchText.value = ''
   }
 })
 
@@ -372,6 +464,50 @@ function formatRegionNames(regionNames) {
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+.scope-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.scope-modal-header-main {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.scope-modal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.scope-search-field {
+  width: 100%;
+}
+
+.scope-search-input {
+  width: 100%;
+  height: 38px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 12px;
+  padding: 0 14px;
+  font-size: 13px;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.scope-search-input:focus {
+  outline: none;
+  border-color: rgba(0, 122, 255, 0.48);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
 }
 
 .feature-scope-summary {
@@ -458,7 +594,7 @@ function formatRegionNames(regionNames) {
   gap: 12px;
   min-height: 320px;
   max-height: 440px;
-  overflow: auto;
+  overflow: hidden;
   padding: 18px 20px;
 }
 
@@ -472,6 +608,16 @@ function formatRegionNames(regionNames) {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.scope-virtual-list {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+}
+
+.scope-virtual-wrapper {
+  width: 100%;
 }
 
 .scope-tree-node {
@@ -492,6 +638,11 @@ function formatRegionNames(regionNames) {
 
 .scope-selection-item {
   width: 100%;
+}
+
+.scope-checkbox-item--virtual {
+  min-height: 64px;
+  box-sizing: border-box;
 }
 
 .scope-tree-item {
@@ -563,6 +714,10 @@ function formatRegionNames(regionNames) {
 }
 
 @media (max-width: 900px) {
+  .scope-modal-header {
+    flex-direction: column;
+  }
+
   .scope-grid {
     grid-template-columns: 1fr;
   }

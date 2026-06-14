@@ -297,7 +297,8 @@
         "full": "Fully selected"
       },
       "singleLocationSuccess": "Only one location matched this feature, so the map was opened directly",
-      "recognizeHierarchy": "Recognize hierarchy"
+      "recognizeHierarchy": "Recognize hierarchy",
+      "searchPlaceholder": "search for locations or regions"
     }
   },
   "mapLibre": {
@@ -515,7 +516,7 @@
       "ignoreUpdated": "Set {count} ignored point(s)",
       "previewReady": "Previewing {count} point(s)",
       "calculated": "Calculated {count} Voronoi polygon(s)",
-      "ignoreModalTitle": "Choose Points Excluded from Calculation",
+      "ignoreModalTitle": "Choose Ignored Points",
       "ignoreSelectedCount": "{count} point(s) selected to ignore",
       "clearSelection": "Clear Selection",
       "regionTitle": "Select by Partition",
@@ -526,10 +527,11 @@
       "locationMeta": "{records} record(s); partitions: {regions}",
       "emptySummary": "None",
       "confirmIgnore": "Confirm Ignored Points",
+      "searchPlaceholder": "Search regions or locations",
       "exportModalTitle": "Export Voronoi Layers",
       "exportSelectedCount": "Selected Partitions",
       "clipToNationalBorder": "Clip to National Border",
-      "clipToNationalBorderHint": "The first export loads assets/map/国界面.kmz and caches it locally for future reuse.",
+      "clipToNationalBorderConfirmMessage": "This operation may be very slow. Please be patient.",
       "exportLayerListTitle": "Choose Partition Layers to Export",
       "exportListEmpty": "No partition Voronoi layers are available for export",
       "exportLayerMeta": "{count} point(s)",

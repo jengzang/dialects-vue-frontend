@@ -297,7 +297,8 @@
         "full": "已全選"
       },
       "singleLocationSuccess": "當前特徵僅命中一個地點，已直接打開地圖",
-      "recognizeHierarchy": "識別層級"
+      "recognizeHierarchy": "識別層級",
+      "searchPlaceholder": "搜索地點或分區"
     }
   },
   "mapLibre": {
@@ -515,7 +516,7 @@
       "ignoreUpdated": "已設定 {count} 個忽略點位",
       "previewReady": "已預覽 {count} 個點位",
       "calculated": "已計算 {count} 個泰森多邊形",
-      "ignoreModalTitle": "選擇不參與計算的點位",
+      "ignoreModalTitle": "選擇忽略點",
       "ignoreSelectedCount": "已選擇忽略 {count} 個點位",
       "clearSelection": "清空選擇",
       "regionTitle": "按分區選擇",
@@ -526,10 +527,11 @@
       "locationMeta": "{records} 條記錄；分區:{regions}",
       "emptySummary": "無",
       "confirmIgnore": "確認忽略",
+      "searchPlaceholder": "搜尋分區或地點",
       "exportModalTitle": "匯出泰森多邊形圖層",
       "exportSelectedCount": "已選分區",
-      "clipToNationalBorder": "按國界面裁剪",
-      "clipToNationalBorderHint": "首次會讀取 assets/map/國界面.kmz 並快取到本地，之後優先使用本地快取。",
+      "clipToNationalBorder": "按國界裁剪",
+      "clipToNationalBorderConfirmMessage": "此功能可能會非常卡，請耐心等待。",
       "exportLayerListTitle": "選擇要匯出的分區圖層",
       "exportListEmpty": "目前沒有可匯出的分區泰森圖",
       "exportLayerMeta": "{count} 個點位",
