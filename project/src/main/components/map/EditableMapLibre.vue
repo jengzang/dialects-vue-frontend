@@ -318,6 +318,20 @@ const cleanupReadonlyLayerDescriptors = (layerDescriptors) => {
   previousPreviewSourceIds = currentPreviewSourceIds
 }
 
+const removeReadonlyLayerById = (layerId) => {
+  if (!map.value || !layerId) return
+
+  const sourceId = `readonly-draw-source-${layerId}`
+  const fillLayerId = `readonly-draw-fill-${layerId}`
+  const lineLayerId = `readonly-draw-line-${layerId}`
+  const pointLayerId = `readonly-draw-point-${layerId}`
+
+  if (map.value.getLayer(pointLayerId)) map.value.removeLayer(pointLayerId)
+  if (map.value.getLayer(lineLayerId)) map.value.removeLayer(lineLayerId)
+  if (map.value.getLayer(fillLayerId)) map.value.removeLayer(fillLayerId)
+  if (map.value.getSource(sourceId)) map.value.removeSource(sourceId)
+}
+
 const syncReadonlyLayers = () => {
   if (!map.value) return
   const layerDescriptors = [
@@ -603,6 +617,7 @@ defineExpose({
   importGeoJson,
   currentStyleKey,
   handleStyleChange,
+  removeReadonlyLayerById,
   resetView,
 })
 </script>

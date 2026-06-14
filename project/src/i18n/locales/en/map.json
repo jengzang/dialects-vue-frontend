@@ -539,6 +539,8 @@
       "exportSelectionRequired": "Select at least one partition layer",
       "exportSelectionLimit": "You can export up to {count} partition layers at once",
       "exportEmptyAfterClip": "No layers remained after clipping",
+      "exportLoadingTitle": "Exporting clipped border layers",
+      "exportLoadingProgress": "Completed {current}/{total}",
       "regionStates": {
         "none": "Not selected",
         "partial": "Partially selected",

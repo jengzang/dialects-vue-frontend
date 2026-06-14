@@ -539,6 +539,8 @@
       "exportSelectionRequired": "请至少选择 1 个分区图层",
       "exportSelectionLimit": "一次最多导出 {count} 个分区图层",
       "exportEmptyAfterClip": "裁剪后没有可导出的图层",
+      "exportLoadingTitle": "正在导出国界裁剪图层",
+      "exportLoadingProgress": "已完成 {current}/{total}",
       "regionStates": {
         "none": "未选择",
         "partial": "部分选择",

@@ -392,6 +392,21 @@
         @confirm="confirmVoronoiExport"
       />
 
+      <div v-if="showVoronoiExportProgressOverlay" class="voronoi-export-progress-overlay">
+        <div class="voronoi-export-progress-panel main-glass-panel-inner">
+          <div class="ui-loading--page" aria-hidden="true"></div>
+          <div class="voronoi-export-progress-title">
+            {{ t('map.drawTab.voronoi.exportLoadingTitle') }}
+          </div>
+          <div class="voronoi-export-progress-text">
+            {{ t('map.drawTab.voronoi.exportLoadingProgress', {
+              current: voronoiExportProgress.current,
+              total: voronoiExportProgress.total,
+            }) }}
+          </div>
+        </div>
+      </div>
+
       <VoronoiIgnorePointsModal
         v-model="showVoronoiIgnoreModal"
         :regions="voronoiSelectionOptions.regions"
@@ -406,7 +421,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { booleanIntersects, featureCollection, intersect } from '@turf/turf';
+import { featureCollection } from '@turf/turf';
 
 import nationalBorderKmzUrl from '@/assets/map/国界面.kmz?url';
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
@@ -414,6 +429,10 @@ import { usePartitionCache } from '@/composables/domain/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import { showConfirm, showError, showSuccess } from '@/utils/message.js';
 import { readImportedLayerFile, readKmzArrayBuffer, splitFeatureCollectionByGeometryType } from '@/utils/map/draw/export.js';
+import {
+  clipVoronoiFeatureCollectionToNationalBorder,
+  prepareNationalBorderForVoronoiClip,
+} from '@/utils/map/voronoiClip.js';
 import {
   PARTITION_MODE_MAP,
   PARTITION_MODE_YINDIAN,
@@ -454,7 +473,7 @@ const nationalBorderCacheKey = 'map-draw-national-border-cache';
 const nationalBorderAssetCacheName = 'map-draw-assets';
 const voronoiExportLimit = 20;
 let layerIdSeed = 0;
-let nationalBorderFeatureCollectionCache = null;
+let nationalBorderPreparedCache = null;
 
 const editableMapRef = ref(null);
 const importInputRef = ref(null);
@@ -571,6 +590,8 @@ const isVoronoiCalculating = ref(false);
 const showVoronoiIgnoreModal = ref(false);
 const voronoiStatusText = ref('');
 const voronoiLastResult = ref(null);
+const voronoiExportProgress = ref({ current: 0, total: 0 });
+const showVoronoiExportProgressOverlay = computed(() => isVoronoiExporting.value && voronoiExportProgress.value.total > 0);
 
 const activeVoronoiPoints = computed(() => {
   const ignored = new Set(ignoredVoronoiLocations.value);
@@ -658,7 +679,7 @@ const loadVoronoiPoints = async () => {
 };
 
 const readNationalBorderCache = async () => {
-  if (nationalBorderFeatureCollectionCache) return nationalBorderFeatureCollectionCache;
+  if (nationalBorderPreparedCache) return nationalBorderPreparedCache;
 
   const storageRaw = localStorage.getItem(nationalBorderCacheKey);
   const cacheStorage = typeof window !== 'undefined' && 'caches' in window
@@ -675,14 +696,14 @@ const readNationalBorderCache = async () => {
 
   const arrayBuffer = await cachedResponse.arrayBuffer();
   const featureCollectionValue = readKmzArrayBuffer(arrayBuffer);
-  nationalBorderFeatureCollectionCache = featureCollectionValue;
+  nationalBorderPreparedCache = prepareNationalBorderForVoronoiClip(featureCollectionValue);
 
   const nextMeta = JSON.stringify({ version: 2, cachedAt: Date.now() });
   if (storageRaw !== nextMeta) {
     localStorage.setItem(nationalBorderCacheKey, nextMeta);
   }
 
-  return featureCollectionValue;
+  return nationalBorderPreparedCache;
 };
 
 const writeNationalBorderCache = async (arrayBuffer) => {
@@ -713,9 +734,9 @@ const loadNationalBorderFeatureCollection = async () => {
 
   const arrayBuffer = await response.arrayBuffer();
   const featureCollectionValue = readKmzArrayBuffer(arrayBuffer);
-  nationalBorderFeatureCollectionCache = featureCollectionValue;
+  nationalBorderPreparedCache = prepareNationalBorderForVoronoiClip(featureCollectionValue);
   await writeNationalBorderCache(arrayBuffer);
-  return featureCollectionValue;
+  return nationalBorderPreparedCache;
 };
 
 const ensureVoronoiPointsLoaded = async () => {
@@ -842,34 +863,6 @@ const handleClipVoronoiToggle = async (nextValue) => {
   clipVoronoiToNationalBorder.value = confirmed;
 };
 
-const clipFeatureCollectionToBorder = (sourceCollection, borderCollection) => {
-  const sourceFeatures = sourceCollection?.features ?? [];
-  const borderFeatures = borderCollection?.features ?? [];
-  const clippedFeatures = [];
-
-  sourceFeatures.forEach((feature) => {
-    borderFeatures.forEach((borderFeature) => {
-      if (!feature || !borderFeature) return;
-      if (!booleanIntersects(feature, borderFeature)) return;
-      const clipped = intersect(featureCollection([feature, borderFeature]));
-      if (!clipped?.geometry) return;
-      clippedFeatures.push({
-        ...clipped,
-        id: feature.id,
-        properties: {
-          ...(feature.properties ?? {}),
-          ...(clipped.properties ?? {}),
-        },
-      });
-    });
-  });
-
-  return {
-    ...emptyFeatureCollection(),
-    features: clippedFeatures,
-  };
-};
-
 const confirmVoronoiExport = async () => {
   if (isVoronoiExporting.value) return;
   if (!voronoiExportSelections.value.length) {
@@ -877,26 +870,29 @@ const confirmVoronoiExport = async () => {
     return;
   }
 
+  const selectedGroups = voronoiExportGroups.value.filter((item) => voronoiExportSelections.value.includes(item.key));
+  showVoronoiExportModal.value = false;
   isVoronoiExporting.value = true;
   try {
-    const borderCollection = clipVoronoiToNationalBorder.value
+    const preparedBorderEntries = clipVoronoiToNationalBorder.value
       ? await loadNationalBorderFeatureCollection()
       : null;
 
-    const selectedGroups = voronoiExportGroups.value.filter((item) => voronoiExportSelections.value.includes(item.key));
+    voronoiExportProgress.value = { current: 0, total: selectedGroups.length };
     const exportedLayers = [];
 
-    selectedGroups.forEach((group, index) => {
+    for (const [index, group] of selectedGroups.entries()) {
+      voronoiExportProgress.value.current = index + 1;
       const layer = createEmptyLayer('Polygon');
       const sourceCollection = group.mergedFeature
         ? featureCollection([group.mergedFeature])
         : emptyFeatureCollection();
-      const nextCollection = borderCollection
-        ? clipFeatureCollectionToBorder(sourceCollection, borderCollection)
+      const nextCollection = preparedBorderEntries
+        ? await clipVoronoiFeatureCollectionToNationalBorder(sourceCollection, preparedBorderEntries)
         : sourceCollection;
 
       if (!(nextCollection.features?.length ?? 0)) {
-        return;
+        continue;
       }
 
       const styledFeatureCollection = {
@@ -923,7 +919,7 @@ const confirmVoronoiExport = async () => {
       layer.fillOpacity = styledFeatureCollection.features[0]?.properties?.fillOpacity ?? 0.22;
       layer.featureCollection = styledFeatureCollection;
       exportedLayers.push(layer);
-    });
+    }
 
     if (!exportedLayers.length) {
       showError(t('map.drawTab.voronoi.exportEmptyAfterClip'));
@@ -945,6 +941,7 @@ const confirmVoronoiExport = async () => {
     showError(t('map.drawTab.messages.exportLayerFailed', { error: error.message || error }));
   } finally {
     isVoronoiExporting.value = false;
+    voronoiExportProgress.value = { current: 0, total: 0 };
   }
 };
 
@@ -1078,6 +1075,7 @@ const handleDeleteLayer = (layerId) => {
   const layerIndex = layers.value.findIndex((item) => item.id === layerId);
   if (layerIndex === -1) return;
   layers.value.splice(layerIndex, 1);
+  editableMapRef.value?.removeReadonlyLayerById?.(layerId);
 
   if (activeLayerId.value === layerId) {
     const fallbackLayer = layers.value[layerIndex] ?? layers.value[layerIndex - 1] ?? null;
@@ -1373,16 +1371,6 @@ onMounted(() => {
   } catch (error) {
     console.warn('restore map draw workbench state failed', error);
   }
-
-  try {
-    const rawVoronoiExportState = localStorage.getItem(voronoiExportStorageKey);
-    if (rawVoronoiExportState) {
-      const parsed = JSON.parse(rawVoronoiExportState);
-      clipVoronoiToNationalBorder.value = Boolean(parsed?.clipVoronoiToNationalBorder);
-    }
-  } catch (error) {
-    console.warn('restore voronoi export state failed', error);
-  }
 });
 </script>
 
@@ -1410,6 +1398,7 @@ onMounted(() => {
 }
 
 .map-draw-tab {
+  position: relative;
   width: min(98dvw, 1200px);
   gap: 1rem;
 }
@@ -1451,6 +1440,41 @@ onMounted(() => {
 
 .draw-toolbar--header {
   justify-content: flex-end;
+}
+
+.voronoi-export-progress-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.24);
+  backdrop-filter: blur(10px);
+}
+
+.voronoi-export-progress-panel {
+  min-width: min(92vw, 320px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1.2rem 1.4rem;
+  text-align: center;
+  border-radius: 20px;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.18);
+}
+
+.voronoi-export-progress-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.voronoi-export-progress-text {
+  font-size: 0.92rem;
+  color: #334155;
 }
 
 .draw-feature-count-badge {
