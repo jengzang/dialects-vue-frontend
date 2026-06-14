@@ -496,7 +496,7 @@
       "voronoiFailed": "泰森多边形计算失败：{error}"
     },
     "voronoi": {
-      "panelHint": "基于地点分区数据计算泰森多边形，当前阶段仅预览并输出到控制台。",
+      "panelHint": "基于地点分区数据计算泰森多边形，可预览或导出为面图层。",
       "summaryTitle": "数据概览",
       "settingsTitle": "计算设置",
       "actionsTitle": "操作",
@@ -508,7 +508,8 @@
       "loadingPoints": "加载中...",
       "ignorePointsAction": "选择忽略点",
       "previewPoints": "预览点位",
-      "calculate": "计算泰森多边形",
+      "exportToLayer": "导出至图层",
+      "calculate": "泰森多边形",
       "pointsLoaded": "已加载 {count} 个有效点位",
       "ignoreUpdated": "已设置 {count} 个忽略点位",
       "previewReady": "已预览 {count} 个点位",

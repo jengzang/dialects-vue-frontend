@@ -152,12 +152,14 @@
           :is-loading-points="isVoronoiLoadingPoints"
           :is-calculating="isVoronoiCalculating"
           :status-text="voronoiStatusText"
+          :is-points-preview-active="voronoiPreviewType === 'points'"
+          :is-polygon-preview-active="voronoiPreviewType === 'polygons'"
           :offset-mode="voronoiPanelOffsetMode"
           @update:partition-mode="voronoiPartitionMode = $event"
           @update:region-level="voronoiRegionLevel = $event"
-          @load-points="loadVoronoiPoints"
           @open-ignore-modal="openVoronoiIgnoreModal"
           @preview-points="previewVoronoiPoints"
+          @export-layer="exportVoronoiToLayer"
           @calculate="handleBuildVoronoi"
         />
       </div>
@@ -541,6 +543,7 @@ const isVoronoiLoadingPoints = ref(false);
 const isVoronoiCalculating = ref(false);
 const showVoronoiIgnoreModal = ref(false);
 const voronoiStatusText = ref('');
+const voronoiLastResult = ref(null);
 
 const activeVoronoiPoints = computed(() => {
   const ignored = new Set(ignoredVoronoiLocations.value);
@@ -610,11 +613,11 @@ const openVoronoiIgnoreModal = async () => {
 
 const refreshVoronoiPreview = async () => {
   if (voronoiPreviewType.value === 'points') {
-    await previewVoronoiPoints();
+    await previewVoronoiPoints({ force: true });
     return;
   }
   if (voronoiPreviewType.value === 'polygons') {
-    await handleBuildVoronoi();
+    await handleBuildVoronoi({ force: true });
   }
 };
 
@@ -624,7 +627,14 @@ const handleVoronoiIgnoreConfirm = async (locations) => {
   await refreshVoronoiPreview();
 };
 
-const previewVoronoiPoints = async () => {
+const previewVoronoiPoints = async ({ force = false } = {}) => {
+  if (!force && voronoiPreviewType.value === 'points') {
+    voronoiPreviewType.value = '';
+    voronoiPreviewLayers.value = [];
+    setVoronoiStatus('pointsLoaded', { count: voronoiPartitionPoints.value.length });
+    return;
+  }
+
   await ensureVoronoiPointsLoaded();
   const pointCollection = buildPartitionPointFeatureCollection(
     activeVoronoiPoints.value,
@@ -641,16 +651,22 @@ const previewVoronoiPoints = async () => {
   // console.log('[MapDrawTab] voronoi preview points:', pointCollection);
 };
 
-const handleBuildVoronoi = async () => {
+const handleBuildVoronoi = async ({ force = false } = {}) => {
   if (isVoronoiCalculating.value) return;
+  if (!force && voronoiPreviewType.value === 'polygons') {
+    voronoiPreviewType.value = '';
+    voronoiPreviewLayers.value = [];
+    setVoronoiStatus('pointsLoaded', { count: voronoiPartitionPoints.value.length });
+    return;
+  }
   isVoronoiCalculating.value = true;
 
   try {
     await ensureVoronoiPointsLoaded();
     const level = Number(voronoiRegionLevel.value) || 3;
     const points = activeVoronoiPoints.value;
-    const pointCollection = buildPartitionPointFeatureCollection(points, level, voronoiColorMap.value);
     const voronoiResult = calculatePartitionVoronoi(points, level, voronoiColorMap.value);
+    voronoiLastResult.value = voronoiResult;
 
     voronoiPreviewType.value = 'polygons';
     voronoiPreviewLayers.value = [{
@@ -669,9 +685,52 @@ const handleBuildVoronoi = async () => {
   }
 };
 
+const exportVoronoiToLayer = async () => {
+  await ensureVoronoiPointsLoaded();
+  const level = Number(voronoiRegionLevel.value) || 3;
+  const points = activeVoronoiPoints.value;
+  const voronoiResult = voronoiLastResult.value ?? calculatePartitionVoronoi(points, level, voronoiColorMap.value);
+  voronoiLastResult.value = voronoiResult;
+
+  const layer = createEmptyLayer('Polygon');
+  layer.name = `${t('map.drawTab.buttons.voronoi')} ${t('map.drawTab.labels.layer')}`;
+  layer.stroke = '#2563eb';
+  layer.strokeWidth = 2;
+  layer.fill = '#60a5fa';
+  layer.fillOpacity = 0.22;
+  layer.featureCollection = {
+    ...voronoiResult.merged,
+    features: (voronoiResult.merged?.features ?? []).map((feature, index) => ({
+      ...feature,
+      id: feature.id ?? `voronoi-${index + 1}`,
+      properties: {
+        ...(feature.properties ?? {}),
+        stroke: feature.properties?.stroke ?? layer.stroke,
+        strokeWidth: feature.properties?.strokeWidth ?? layer.strokeWidth,
+        fill: feature.properties?.fill ?? layer.fill,
+        fillOpacity: feature.properties?.fillOpacity ?? layer.fillOpacity,
+        visible: true,
+        locked: false,
+      },
+    })),
+  };
+
+  layers.value.unshift(layer);
+  activeLayerId.value = layer.id;
+  isLayersPanelOpen.value = true;
+  isDrawingPanelOpen.value = true;
+  currentMode.value = 'simple_select';
+  editableMapRef.value?.setDrawMode?.('simple_select');
+  voronoiPreviewType.value = '';
+  voronoiPreviewLayers.value = [];
+  syncAllLayersAfterMutation();
+  showSuccess(t('map.drawTab.messages.importLayerSuccess', { count: 1 }));
+};
+
 watch(voronoiPartitionMode, async () => {
   normalizeVoronoiPoints();
   ignoredVoronoiLocations.value = [];
+  voronoiLastResult.value = null;
   await refreshVoronoiPreview();
   if (!voronoiPreviewType.value) {
     voronoiPreviewLayers.value = [];
@@ -679,10 +738,16 @@ watch(voronoiPartitionMode, async () => {
 });
 
 watch(voronoiRegionLevel, async () => {
+  voronoiLastResult.value = null;
   await refreshVoronoiPreview();
   if (!voronoiPreviewType.value) {
     voronoiPreviewLayers.value = [];
   }
+});
+
+watch(isVoronoiPanelOpen, async (isOpen) => {
+  if (!isOpen) return;
+  await ensureVoronoiPointsLoaded();
 });
 
 const handleCreateLayer = (geometryType) => {

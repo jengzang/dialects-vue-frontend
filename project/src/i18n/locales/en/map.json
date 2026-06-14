@@ -496,7 +496,7 @@
       "voronoiFailed": "Voronoi calculation failed: {error}"
     },
     "voronoi": {
-      "panelHint": "Calculate Voronoi polygons from location partition data. This stage only previews results and logs them to the console.",
+      "panelHint": "Calculate Voronoi polygons from location partition data. You can preview them or export them as a polygon layer.",
       "summaryTitle": "Data Summary",
       "settingsTitle": "Calculation Settings",
       "actionsTitle": "Actions",
@@ -508,7 +508,8 @@
       "loadingPoints": "Loading...",
       "ignorePointsAction": "Choose Ignored Points",
       "previewPoints": "Preview Points",
-      "calculate": "Calculate Voronoi",
+      "exportToLayer": "Export to Layer",
+      "calculate": "Voronoi",
       "pointsLoaded": "Loaded {count} valid point(s)",
       "ignoreUpdated": "Set {count} ignored point(s)",
       "previewReady": "Previewing {count} point(s)",

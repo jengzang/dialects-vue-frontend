@@ -72,35 +72,47 @@
               class="main-glass-button"
               data-variant="secondary"
               type="button"
-              :disabled="isLoadingPoints"
-              @click="$emit('load-points')"
-            >
-              {{ isLoadingPoints ? t('map.drawTab.voronoi.loadingPoints') : t('map.drawTab.voronoi.loadPoints') }}
-            </button>
-            <button
-              class="main-glass-button"
-              data-variant="secondary"
-              type="button"
               @click="$emit('open-ignore-modal')"
             >
               {{ t('map.drawTab.voronoi.ignorePointsAction') }}
+            </button>
+            <button
+              class="main-glass-button draw-tool-mode-button"
+              :data-variant="isPointsPreviewActive ? 'primary' : 'secondary'"
+              :data-active="isPointsPreviewActive"
+              type="button"
+              :disabled="!activePoints"
+              @click="$emit('preview-points')"
+            >
+              <span
+                v-if="isPointsPreviewActive"
+                class="draw-tool-check"
+                aria-hidden="true"
+              >✓</span>
+              {{ t('map.drawTab.voronoi.previewPoints') }}
             </button>
             <button
               class="main-glass-button"
               data-variant="secondary"
               type="button"
               :disabled="!activePoints"
-              @click="$emit('preview-points')"
+              @click="$emit('export-layer')"
             >
-              {{ t('map.drawTab.voronoi.previewPoints') }}
+              {{ t('map.drawTab.voronoi.exportToLayer') }}
             </button>
             <button
-              class="main-glass-button"
-              data-variant="primary"
+              class="main-glass-button draw-tool-mode-button"
+              :data-variant="isPolygonPreviewActive ? 'primary' : 'secondary'"
+              :data-active="isPolygonPreviewActive"
               type="button"
               :disabled="!activePoints || isCalculating"
               @click="$emit('calculate')"
             >
+              <span
+                v-if="isPolygonPreviewActive"
+                class="draw-tool-check"
+                aria-hidden="true"
+              >✓</span>
               {{ isCalculating ? t('map.drawTab.buttons.voronoiRunning') : t('map.drawTab.voronoi.calculate') }}
             </button>
           </div>
@@ -129,15 +141,17 @@ const props = defineProps({
   isLoadingPoints: { type: Boolean, default: false },
   isCalculating: { type: Boolean, default: false },
   statusText: { type: String, default: '' },
+  isPointsPreviewActive: { type: Boolean, default: false },
+  isPolygonPreviewActive: { type: Boolean, default: false },
   offsetMode: { type: String, default: 'none' },
 })
 
 defineEmits([
   'update:partition-mode',
   'update:region-level',
-  'load-points',
   'open-ignore-modal',
   'preview-points',
+  'export-layer',
   'calculate',
 ])
 

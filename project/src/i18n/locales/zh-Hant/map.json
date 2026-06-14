@@ -496,7 +496,7 @@
       "voronoiFailed": "泰森多邊形計算失敗：{error}"
     },
     "voronoi": {
-      "panelHint": "基於地點分區資料計算泰森多邊形，當前階段僅做預覽並輸出到控制台。",
+      "panelHint": "基於地點分區資料計算泰森多邊形，可預覽或匯出為面圖層。",
       "summaryTitle": "資料概覽",
       "settingsTitle": "計算設定",
       "actionsTitle": "操作",
@@ -508,7 +508,8 @@
       "loadingPoints": "載入中...",
       "ignorePointsAction": "選擇忽略點",
       "previewPoints": "預覽點位",
-      "calculate": "計算泰森多邊形",
+      "exportToLayer": "匯出至圖層",
+      "calculate": "泰森多邊形",
       "pointsLoaded": "已載入 {count} 個有效點位",
       "ignoreUpdated": "已設定 {count} 個忽略點位",
       "previewReady": "已預覽 {count} 個點位",
