@@ -126,7 +126,7 @@
     </div>
 
     <!-- 加载状态 -->
-    <div v-if="isLoading" class="loading-state">
+    <div v-if="isLoading && !rawData" class="loading-state">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>{{ t('phonology.phonology.evolution.states.loading') }}</p>
     </div>
@@ -135,8 +135,18 @@
     <div
       v-else-if="rawData && currentPieData.length > 0"
       class="pie-container"
-      :class="{ 'has-mobile-detail-card': showMobilePieDetailCard }"
+      :class="{
+        'has-mobile-detail-card': showMobilePieDetailCard,
+        'is-rendering': isLoading
+      }"
     >
+      <div
+        v-if="isLoading"
+        class="visualization-rendering-mask"
+      >
+        <div class="ui-loading--page" aria-hidden="true"></div>
+      </div>
+
       <div
         v-if="showSankey"
         ref="sankeyContainerRef"
@@ -464,11 +474,10 @@ const handleQuery = async () => {
     errorMessage.value = error.message || t('phonology.phonology.evolution.errors.queryFailed')
     console.error('Query error:', error)
   } finally {
-    isLoading.value = false
     if (shouldRefreshVisualization) {
-      await nextTick()
-      updateContainerSize()
-      await renderCurrentVisualization()
+      await renderCurrentVisualizationWithLoading()
+    } else {
+      isLoading.value = false
     }
   }
 }
@@ -509,6 +518,13 @@ const updateMobileLayout = () => {
 
   isMobileLayout.value = window.matchMedia(MOBILE_LAYOUT_MEDIA_QUERY).matches
 }
+
+const waitForPaint = () =>
+  new Promise(resolve => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolve)
+    })
+  })
 
 // ========== 饼图渲染 ==========
 const generatePieChartOption = (pieData) => {
@@ -950,6 +966,21 @@ const renderCurrentVisualization = async () => {
   await renderAllPies()
 }
 
+const renderCurrentVisualizationWithLoading = async () => {
+  isLoading.value = true
+
+  await nextTick()
+  await waitForPaint()
+
+  try {
+    updateContainerSize()
+    await renderCurrentVisualization()
+    await waitForPaint()
+  } finally {
+    isLoading.value = false
+  }
+}
+
 const handleWindowResize = async () => {
   const previousMobileLayout = isMobileLayout.value
   updateMobileLayout()
@@ -976,7 +1007,7 @@ const handleWindowResize = async () => {
 watch(currentFeature, async () => {
   closeMobilePieDetail()
   if (showSankey.value) {
-    await renderCurrentVisualization()
+    await renderCurrentVisualizationWithLoading()
     return
   }
 
@@ -1014,17 +1045,13 @@ watch(showSankey, async () => {
   if (showSankey.value) {
     closeMobilePieDetail()
   }
-  await nextTick()
-  updateContainerSize()
-  await renderCurrentVisualization()
+  await renderCurrentVisualizationWithLoading()
 })
 
 watch(optimizeSankeyLayout, async () => {
   if (!showSankey.value) return
 
-  await nextTick()
-  updateContainerSize()
-  await renderCurrentVisualization()
+  await renderCurrentVisualizationWithLoading()
 })
 
 watch(queryMode, async () => {
@@ -1334,6 +1361,25 @@ onUnmounted(() => {
 .pie-container {
   position: relative;
   width: 100%;
+}
+
+.visualization-rendering-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+
+.pie-container.is-rendering .pie-grid,
+.pie-container.is-rendering .sankey-chart {
+  opacity: 0.45;
 }
 
 .pie-grid {
