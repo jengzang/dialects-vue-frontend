@@ -802,6 +802,7 @@ onMounted(() => {
 
 .btn-primary:hover {
   transform: translateY(-2px);
+  background: #007aff;
   box-shadow: 0 6px 24px rgba(0, 122, 255, 0.4);
 }
 

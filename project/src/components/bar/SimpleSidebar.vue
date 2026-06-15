@@ -106,7 +106,7 @@
     <Transition name="submenu-fade">
       <div
         v-if="activeSubmenu"
-        class="submenu-panel main-sidebar-submenu-panel"
+        class="submenu-panel main-submenu-panel"
         :style="{
           top: submenuPosition.top + 'px',
           left: submenuPosition.left + 'px'

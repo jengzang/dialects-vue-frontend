@@ -1229,7 +1229,7 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .floating-search {
-    top: 20dvh;
+    top: 36dvh;
     left: auto;
 
     &.active {

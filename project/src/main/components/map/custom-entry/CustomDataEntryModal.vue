@@ -13,7 +13,7 @@
           <h3 class="entry-modal-title">
             {{ t('customEntry.modal.title') }}
           </h3>
-          <span class="entry-modal-dev-badge">{{ t('customEntry.modal.devNotice') }}</span>
+          <!-- <span class="entry-modal-dev-badge">{{ t('customEntry.modal.devNotice') }}</span> -->
         </div>
         <div
           class="entry-modal-mode-switcher"

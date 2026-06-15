@@ -851,7 +851,7 @@ p em.emoji {
 
 .language-flag {
   font-size: 32px;
-  margin-right: 16px;
+  margin-right: 12px;
 }
 
 .language-info {
@@ -891,7 +891,7 @@ p em.emoji {
 
   .language-flag {
     font-size: 28px;
-    margin-right: 12px;
+    margin-right: 8px;
   }
 
   .language-name {
