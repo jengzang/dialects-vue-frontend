@@ -137,12 +137,22 @@ const availableValueStats = ref([]);
 // ... (calculateStats, filteredData, sortedData, displayedData, filterTriggerText 等逻辑完全保留)
 function calculateStats() {
   const totals = new Map();
+
   tableData.value.forEach(item => {
     const groupValues = item.分組值 || {};
-    const val = Object.values(groupValues)[0];
+    const feature = Object.keys(groupValues)[0] || '';
+    const val = groupValues[feature];
     const share = Number(item.佔比) || 0;
-    if (val) totals.set(val, (totals.get(val) || 0) + share);
+
+    if (feature) {
+      totals.set(feature, (totals.get(feature) || 0) + share);
+    }
+
+    if (val) {
+      totals.set(val, (totals.get(val) || 0) + share);
+    }
   });
+
   availableValueStats.value = [...totals.entries()]
       .map(([value, totalShare]) => ({ value, totalShare }))
       .sort((a, b) => b.totalShare - a.totalShare);
@@ -154,7 +164,7 @@ const filteredData = computed(() => {
     const feature = Object.keys(groupValues)[0] || '';
     const value = groupValues[feature];
 
-    if (selected.length > 0 && !selected.includes(value)) return false;
+    if (selected.length > 0 && !selected.includes(feature) && !selected.includes(value)) return false;
     if (!isCondensedMode.value) return true;
 
     const count = item.字數 || 0;
@@ -501,7 +511,7 @@ onUnmounted(() => {
   position: absolute;
   bottom: 110%;
   left: 0;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: 10px;
