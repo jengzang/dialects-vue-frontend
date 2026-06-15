@@ -57,7 +57,7 @@ export const ROLE_LIMITS = {
         MAX_RESULTS: 5              // 最大结果数
     },
     user: {
-        MAX_COMBINATIONS: 120,
+        MAX_COMBINATIONS: 100,
         MAX_RESULTS: 80
     },
     admin: {

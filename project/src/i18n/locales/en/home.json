@@ -25,8 +25,7 @@
         "compareMiddle": "Compare Middle Chinese - Compare locations by phonological categories",
         "compareTone": "Compare Tone Categories - Compare tone systems across locations",
         "comparePhonetic": "Compare Phonetic Values - Visualize phonetic differences across locations with a Sankey diagram"
-      }
-    },
+      },
     "map": {
       "title": "Map Visualization",
       "desc": "Geolinguistic perspective presentation",

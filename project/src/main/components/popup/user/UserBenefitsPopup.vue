@@ -132,12 +132,6 @@ const comparisonData = computed(() => [
     user: LIMIT_TAGS.unlimited
   },
   {
-    key: 'customRegions',
-    feature: t('user.benefitsPopup.items.customRegions'),
-    anonymous: LIMIT_TAGS.userOnly,
-    user: LIMIT_TAGS.open
-  },
-  {
     key: 'locationCombination',
     feature: t('user.benefitsPopup.items.locationCombination'),
     unit: 'group',
@@ -178,6 +172,12 @@ const comparisonData = computed(() => [
     anonymous: LOCATION_LIMITS.divide.anonymous.MAX_LOCATIONS,
     user: LOCATION_LIMITS.divide.user.MAX_LOCATIONS
   },
+    {
+    key: 'drawMap',
+    feature: t('user.benefitsPopup.items.drawMap'),
+    anonymous: LIMIT_TAGS.userOnly,
+    user: LIMIT_TAGS.open
+  },
   {
     key: 'phonologyQuery',
     feature: t('user.benefitsPopup.items.phonologyQuery'),
@@ -205,6 +205,12 @@ const comparisonData = computed(() => [
   {
     key: 'customData',
     feature: t('user.benefitsPopup.items.customData'),
+    anonymous: LIMIT_TAGS.userOnly,
+    user: LIMIT_TAGS.open
+  },
+    {
+    key: 'customRegions',
+    feature: t('user.benefitsPopup.items.customRegions'),
     anonymous: LIMIT_TAGS.userOnly,
     user: LIMIT_TAGS.open
   },
