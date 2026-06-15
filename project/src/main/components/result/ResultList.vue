@@ -178,6 +178,14 @@ const filteredData = computed(() => {
 const sortedData = computed(() => {
   return [...filteredData.value].sort((a, b) => {
     if (a.地點 !== b.地點) return a.地點.localeCompare(b.地點);
+
+    const aGroupValues = a.分組值 || {};
+    const bGroupValues = b.分組值 || {};
+    const aFeature = Object.keys(aGroupValues)[0] || '';
+    const bFeature = Object.keys(bGroupValues)[0] || '';
+
+    if (aFeature !== bFeature) return aFeature.localeCompare(bFeature);
+
     return b.佔比 - a.佔比;
   });
 });
