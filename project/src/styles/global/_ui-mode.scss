@@ -22,7 +22,6 @@
   box-shadow: none !important;
   text-shadow: none !important;
   filter: none !important;
-  transform: none !important;
 }
 
 :root[data-ui-mode='compact'] .bg-gradient,
@@ -36,7 +35,7 @@
   filter: none !important;
 }
 
-:root[data-ui-mode='compact'] .main-glass-button,
+
 :root[data-ui-mode='compact'] .main-glass-panel,
 :root[data-ui-mode='compact'] .main-glass-panel-inner,
 :root[data-ui-mode='compact'] .glass-panel,
@@ -57,8 +56,6 @@
 :root[data-ui-mode='compact'] .app-modal,
 :root[data-ui-mode='compact'] .global-toast,
 :root[data-ui-mode='compact'] .rate-limit-notice,
-:root[data-ui-mode='compact'] .notice-button,
-:root[data-ui-mode='compact'] .confirm-btn,
 :root[data-ui-mode='compact'] input,
 :root[data-ui-mode='compact'] textarea,
 :root[data-ui-mode='compact'] select{

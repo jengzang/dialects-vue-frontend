@@ -111,10 +111,10 @@
           <div class="tree-selector-container">
             <div
               v-if="loadingFeatures"
-              class="tree-loading-state"
+              class="loading-state-base"
             >
-              <span class="spinner-icon">⏳</span>
-              {{ t('customEntry.featureDetail.loading') || '加载特征列表中...' }}
+              <div class="ui-loading--page" aria-hidden="true"></div>
+              <p>{{ t('customEntry.featureDetail.loading') || '加载特征列表中...' }}</p>
             </div>
 
             <div
