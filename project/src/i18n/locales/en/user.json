@@ -32,7 +32,7 @@
       "queryMiddleChinese": "📜 Middle Chinese lookup",
       "queryPhoneme": "🔊 Phoneme lookup",
       "queryTone": "🎵 Tone lookup",
-      "customRegions": "🗺️ Custom regions",
+      "customRegions": "🗂️ Custom regions",
       "locationCombination": "🎯 Phonological status combinations",
       "compareChars": "🔤 Character comparison",
       "compareMiddleChinese": "📜 Middle Chinese comparison",
@@ -49,7 +49,10 @@
       "corpusQuery": "🗂️ Corpus query",
       "guangdongVillages": "🏘️ Guangdong villages",
       "machineLearning": "🤖 Machine learning",
-      "hourlyApiUsage": "⏳ Hourly API calls"
+      "hourlyApiUsage": "⏳ Hourly API calls",
+      "evolution": "🥧 Evolution Analysis",
+      "comparePhonetic": "⚖️ Phonetic Comparison",
+      "drawMap": "✏️ Map Drawing"
     },
     "coreFeatures": {
       "phonologyQuery": "Phonology queries",

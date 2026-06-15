@@ -9,9 +9,9 @@
           class="page-footer"
           style="flex-direction: column"
         >
-          <p style="margin:0">
+          <!-- <p style="margin:0">
             {{ t('map.divideTab.title') }}
-          </p>
+          </p> -->
           <small
             class="hint"
             v-html="t('map.divideTab.hint')"

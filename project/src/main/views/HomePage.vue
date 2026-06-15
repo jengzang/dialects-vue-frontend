@@ -69,7 +69,7 @@
         <!-- 比較功能 -->
         <div class="feature-card" :class="{ expanded: expandedCard === 'compare' }">
           <div class="card-header" @click="toggleCard('compare')">
-            <div class="card-icon">⚖️</div>
+            <div class="card-icon">🔀</div>
             <div class="card-info">
               <h3 class="card-title">{{ $t('home.features.compare.title') }}</h3>
               <p class="card-desc">{{ $t('home.features.compare.desc') }}</p>
@@ -91,6 +91,10 @@
               <a @click.stop="navigateTo('/menu/compare/tone')" class="feature-link">
                 <span class="link-icon">🎹</span>
                 <span class="link-text">{{ $t('home.features.compare.compareTone') }}</span>
+              </a>
+              <a @click.stop="navigateTo('/menu/compare/phonetic')" class="feature-link">
+                <span class="link-icon">⚖️</span>
+                <span class="link-text">{{ $t('home.features.compare.comparePhonetic') }}</span>
               </a>
             </div>
           </transition>
@@ -115,12 +119,16 @@
                 <span class="link-text">{{ $t('home.features.map.dialectMap') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/map/divide')" class="feature-link">
-                <span class="link-icon">🎨</span>
+                <span class="link-icon">🧭</span>
                 <span class="link-text">{{ $t('home.features.map.regionMap') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/map/custom')" class="feature-link">
-                <span class="link-icon">✏️</span>
+                <span class="link-icon">📁</span>
                 <span class="link-text">{{ $t('home.features.map.customMap') }}</span>
+              </a>
+              <a @click.stop="navigateTo('/menu/map/draw')" class="feature-link">
+                <span class="link-icon">✏️</span>
+                <span class="link-text">{{ $t('home.features.map.drawMap') }}</span>
               </a>
             </div>
           </transition>
@@ -361,6 +369,13 @@
       <h2 class="section-title">{{ $t('home.roadmap.sectionTitle') }}</h2>
       <p class="section-subtitle">{{ $t('home.roadmap.sectionSubtitle') }}</p>
       <div class="roadmap-list">
+        <div class="roadmap-item">
+          <div class="roadmap-header">
+            <div class="roadmap-icon">📜</div>
+            <h3 class="roadmap-title">{{ $t('home.roadmap.charsGeneration.title') }}</h3>
+          </div>
+          <p class="roadmap-desc">{{ $t('home.roadmap.charsGeneration.desc') }}</p>
+        </div>
         <div class="roadmap-item">
           <div class="roadmap-header">
             <div class="roadmap-icon">🎙️</div>

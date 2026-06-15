@@ -32,7 +32,7 @@
       "queryMiddleChinese": "📜 查中古",
       "queryPhoneme": "🔊 查音位",
       "queryTone": "🎵 查调",
-      "customRegions": "🗺️ 自定义分区",
+      "customRegions": "🗂️ 自定分区",
       "locationCombination": "🎯 地位组合",
       "compareChars": "🔤 比较汉字",
       "compareMiddleChinese": "📜 比较中古",
@@ -49,7 +49,10 @@
       "corpusQuery": "🗂️ 语保查询",
       "guangdongVillages": "🏘️ 广东村落",
       "machineLearning": "🤖 机器学习",
-      "hourlyApiUsage": "⏳ 每小时 API 调用次数"
+      "hourlyApiUsage": "⏳ 每小时 API 调用次数",
+      "evolution": "🥧 演化分析",
+      "comparePhonetic": "⚖️ 比较音值",
+      "drawMap": "✏️ 地图绘制"
     },
     "coreFeatures": {
       "phonologyQuery": "音韵查询",

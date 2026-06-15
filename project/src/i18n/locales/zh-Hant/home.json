@@ -1,250 +1,256 @@
 {
-    "hero":  {
-                 "title":  "方言比較 · 地理語言學",
-                 "subtitle":  "✨ 探索方言的歷史層次 · 🎵 觸摸漢字的音韻之美",
-                 "startExploring":  "開始探索",
-                 "expandTools":  "拓展工具",
-                 "featuresIntro":  "功能簡介",
-                 "logoAlt":  "方音圖鑑",
-                 "decorationAlt":  "藍色圓環"
-             },
-    "features":  {
-                     "sectionTitle":  "核心功能",
-                     "query":  {
-                                   "title":  "查詢分析",
-                                   "desc":  "多維度查詢方言音韻資料",
-                                   "searchChar":  "查字 - 查詢字音、地位",
-                                   "searchMiddle":  "查中古 - 按中古地位整理讀音",
-                                   "searchPhoneme":  "查音位 - 分析音位的中古來源",
-                                   "searchTone":  "查調 - 查詢調值、調類"
-                               },
-                     "compare":  {
-                                     "title":  "方言比較",
-                                     "desc":  "對比不同方言的音韻特徵",
-                                     "compareChar":  "比較漢字 - 對比字音差異",
-                                     "compareMiddle":  "比較中古 - 對比中古音演變",
-                                     "compareTone":  "比較調類 - 對比聲調系統"
-                                 },
-                     "map":  {
-                                 "title":  "地圖可視化",
-                                 "desc":  "地理語言學視角呈現",
-                                 "dialectMap":  "方言地圖 - 地圖上呈現查詢結果",
-                                 "regionMap":  "分區繪圖 - 按分區繪製方言地圖",
-                                 "customMap":  "自定義繪圖 - 添加個人數據繪圖"
-                             },
-                     "phonology":  {
-                                       "title":  "音系分析",
-                                       "desc":  "方言音系結構研究",
-                                       "phonologyQuery":  "音系查詢 - 查看方言音系表",
-                                       "phonemeClassify":  "音素分類 - 自定義音素分類",
-                                       "syllableCount":  "音節統計 - 統計音節數量",
-                                       "middlePosition":  "中古地位 - 查詢漢字中古地位",
-                                       "evolution":  "演變 - 餅圖桑基圖展示方言演變"
-                                   },
-                     "words":  {
-                                   "title":  "詞句資料",
-                                   "desc":  "方言詞彙與語法資料",
-                                   "yubaoVocab":  "語保詞彙 - 語保工程詞彙資料",
-                                   "yubaoGrammar":  "語保語法 - 語保工程句子資料",
-                                   "ycSpoken":  "陽春口語詞 - 陽春方言口語詞彙"
-                               },
-                     "villages":  {
-                                      "title":  "自然村資料",
-                                      "desc":  "村落地名分析與方言繪圖",
-                                      "gdVillages":  "廣東自然村 - 廣東自然村樹狀圖",
-                                      "villagesML":  "機器學習 - 自然村名機器學習",
-                                      "gdVillagesTable":  "全粵村情表格 - 廣東村落詳細表格",
-                                      "ycVillages":  "陽春自然村 - 陽春自然村資料"
-                                  },
-                     "tools":  {
-                                   "title":  "字表工具",
-                                   "desc":  "字表轉換、合併、檢查等工具",
-                                   "tableProcess":  "字表處理 - 字表檢查與格式轉換",
-                                   "jyut2ipa":  "粵拼轉IPA - 粵拼轉國際音標",
-                                   "tableMerge":  "字表合併 - 合併多個字表"
-                               },
-                     "charClass":  {
-                                       "title":  "漢字地位",
-                                       "desc":  "歷代漢字音韻地位資料",
-                                       "zhonggu":  "中古漢語 - 廣韻等中古音系地位",
-                                       "shanggu":  "上古漢語 - 詩經諧聲等上古地位",
-                                       "jingu":  "近古漢語 - 洪武正韻、中原音韻等近古地位",
-                                       "yueyun":  "粵語韻書 - 分韻撮要等韻書"
-                                   },
-                     "praat":  {
-                                   "title":  "Praat 聲學分析",
-                                   "desc":  "實驗語音學工具與數據分析"
-                               },
-                     "about":  {
-                                   "title":  "關於網站",
-                                   "desc":  "網站介紹與資料來源",
-                                   "intro":  "簡介 - 網站功能介紹",
-                                   "reflection":  "感悟 - 開發感悟與鳴謝",
-                                   "suggestion":  "提出建議 - 反饋與建議",
-                                   "likeAuthor":  "喜歡作者 - 支持與關注",
-                                   "source":  "資料來源 - 查閱字表來源與相關信息",
-                                   "setting":  "設定 - 語言與音韻資料選擇"
-                               },
-                     "dialectClustering":  {
-                                               "title":  "方言聚類",
-                                               "desc":  "方言聚類流程頁面占位"
-                                           }
-                 },
-    "roadmap":  {
-                    "sectionTitle":  "開發中的功能",
-                    "sectionSubtitle":  "即將推出的新特性",
-                    "phoneticsToolbox":  {
-                                             "title":  "韶子的語音學工具箱",
-                                             "desc":  "聲學參數批量估計、多算法基頻檢測、EGG信號分析、聲門參數提取"
-                                         },
-                    "dialectClustering":  {
-                                              "title":  "方言聚類",
-                                              "desc":  "自定義音值音位權重、調整聚類算法參數、基於音位向量的多維度相似度計算"
-                                          },
-                    "evolutionTree":  {
-                                          "title":  "方言演化樹狀圖",
-                                          "desc":  "自定義演化模型參數、調整分支長度算法、交互式系統發生樹構建與可視化"
-                                      },
-                    "ipaTTS":  {
-                                   "title":  "IPA 轉語音合成",
-                                   "desc":  "國際音標到語音的實時轉換、多方言音色支持"
-                               },
-                    "dialectBot":  {
-                                       "title":  "方言對話機器人",
-                                       "desc":  "基於規整字表集的LLM微調、音色克隆、方言語音交互（遠景規劃）"
-                                   }
-                },
-    "login":  {
-                  "title":  "登錄解鎖更多功能",
-                  "desc":  "查看詳細權限對比，了解登錄後的完整權益",
-                  "benefits":  {
-                                   "customMap":  "自定義繪製地圖",
-                                   "customRegion":  "自定義方言分區",
-                                   "moreLocations":  "查詢地點數量提升",
-                                   "praatTools":  "Praat 聲學工具",
-                                   "tableTools":  "字表處理工具",
-                                   "queryHistory":  "查詢記錄與排行榜"
-                               },
-                  "loginNow":  "立即登錄",
-                  "viewDetails":  "查看詳情"
-              },
-    "intro":  {
-                  "thanks":  {
-                                 "aboutTitle":  "ℹ️ 關於網站",
-                                 "aboutDesc":  "「方音圖鑑」是一個專注於中古地位分析、方言比較、地理語言學的線上工具，致力於以清晰、互動的方式呈現各方言點聲韻層次及音位分合。",
-                                 "feature1":  "功能1：\u003cstrong\u003e查中古\u003c/strong\u003e（按中古地位整理讀音）。使用者可輸入各種組合進行分析，目前支持攝、韻、等、呼、調、系、組、母、清濁、發音部位、發聲方式等類別。網站會按輸入的組合分析聲母/韻母/聲調，並把結果呈現在表格和地圖中。",
-                                 "feature2":  "功能2：\u003cstrong\u003e查音位\u003c/strong\u003e（分析音位的中古來源）。使用者可輸入上述類別，網站會分析輸入的音值（音位）對應字的中古來源，並把結果呈現在表格和地圖中。",
-                                 "feature3":  "功能3：\u003cstrong\u003e查調\u003c/strong\u003e（查詢調值、調類）。網站會根據用戶選擇的分區、地點，整理調值、調類，不同的調類標上了不同的顏色。",
-                                 "feature4":  "功能4：\u003cstrong\u003e查字\u003c/strong\u003e（查詢字音、地位）。根據用戶輸入漢字進行查詢，最終呈現各個地點的音值、注釋以及漢字中古地位",
-                                 "feature5":  "功能5：\u003cstrong\u003e分區繪圖\u003c/strong\u003e（按地圖集二分區/音典分區繪製方言地圖）。",
-                                 "feature6":  "功能6：\u003cstrong\u003e自定義繪圖\u003c/strong\u003e（用戶添加個人數據進行繪圖）。用戶可以自己在地圖上選點、標註，網站會根據特徵值自定分配顏色",
-                                 "feature7":  "表格裡的\u003cstrong\u003e藍色字\u003c/strong\u003e（地位、音值等）一般都是可以點擊的，點擊後即在新的彈窗中進行細分查詢，方便與原結果對比分析",
-                                 "feature8":  "地圖上的點也可以點擊，點擊後即可查詢詳細信息。",
-                                 "welcomeText":  "歡迎探索《方音圖鑑》，一起觸摸方言的歷史層次！",
-                                 "devTitle":  "🧑‍💻 開發感悟",
-                                 "devPara1":  "最初，我只想為自己的研究製作稱手的工具，卻在不知不覺間，探索了廣袤的星空。從第一行代碼到第一個功能，從稚嫩的構想到漸豐的體系，昼夜在鍵盤上更迭，我的構想也逐漸從虛無中落地生根。我看著這個網站，就如同看著自家的孩子蹣跚學步，一步步走出自己的輪廓。每一個按鈕、每一次交互，都烙印著一段時光。我曾為如果實現想要的查詢邏輯而精疲力竭，也曾為視覺效果的成功呈現而雀躍不已——這些點滴，匯成了她的血與肉、魂與靈。",
-                                 "devPara2":  "其實，這亦是自我蛻變的歷程。從對前端一無所知，到摸索DOM、嘗試虛擬滾動，進階至運用框架，乃至領略JWT、ORM的精妙。我在建造中學習，在錯誤中成熟。最迷人之處在於，我用以搭建這一切的磚石，正是我渴望學習的知識本身：網站的搭建深化了我對音韻的理解，而鑽研音韻又驅動著代碼的迭代。技術於我，不再是冷冰冰的指令，而是承載文化的舟楫；文化於我，亦不再是遙遠的文獻，逐步化為可交互、可追溯、可觸摸的實體。",
-                                 "devPara3":  "這便是我用代碼與熱愛寫就的答卷，一個普通學生獻給方言領域最誠摯的禮物。感謝每一位與它相遇的你。希望這份仍顯稚拙的創作，能激起你心中一絲好奇的漣漪，或為你節省資料翻檢的片刻光陰，這便是她存在的意義。",
-                                 "devPara4":  "願八方鄉音，生生不息；\u003cbr\u003e願漢字之美，永被珍惜；\u003cbr\u003e願文明薪火，長存於每一次交互與共鳴之中。",
-                                 "thanksTitle":  "特別鳴謝",
-                                 "mcpdict":  "漢字音典",
-                                 "mcpdictDesc":  "本網站大部分資料來自",
-                                 "mcpdictData":  "音典開源數據",
-                                 "jyutjam":  "嶺南粵音",
-                                 "jyutjamDesc":  "提供了交流的平台 及",
-                                 "jyutdict":  "泛粵大典",
-                                 "yubao":  "語保",
-                                 "yubaoDesc":  "篩選了部分資料",
-                                 "xiaoxue":  "小學堂",
-                                 "xiaoxueDesc":  "篩選了部分資料",
-                                 "yueminke":  "粵閩客方言系統",
-                                 "yueminkeDesc":  "篩選了部分資料",
-                                 "testers":  "測試人員",
-                                 "testersDesc":  "正式上線之前測試、提建議的網友！",
-                                 "friends":  "朋友 ❤️",
-                                 "friendsDesc":  "在項目開發過程中，所有支持、鼓勵、幫助過我的朋友！",
-                                 "you":  "你 ❤️",
-                                 "youDesc":  "當然，還有看到這裡的你！"
-                             },
-                  "suggestions":  {
-                                      "title":  "我有建議",
-                                      "desc":  "發現 bug？有建議？\u003cbr /\u003e歡迎通過 GitHub Issue 提出！",
-                                      "subtext":  "點擊下方卡片跳轉對應倉庫",
-                                      "frontendCard":  "🐞 網頁運行有 bug❓\u003cbr /\u003e💡 對交互、UI 有建議❓",
-                                      "frontendLink":  "到前端倉庫提 Issue",
-                                      "buildCard":  "🔤 對字表有疑問❓\u003cbr /\u003e🎯 聲/韻/調 提取出錯❓",
-                                      "buildLink":  "到字表處理倉庫提 Issue"
-                                  },
-                  "likeAuthor":  {
-                                     "title":  "❤️ 喜歡作者",
-                                     "follow":  "關注",
-                                     "starText":  "「如果你覺得項目不錯，可以給個 ⭐️ 嗎！」",
-                                     "frontendRepo":  "前端倉庫 - 使用vue框架和原生js開發",
-                                     "backendRepo":  "後端倉庫 - 基於fastapi",
-                                     "buildRepo":  "字表預處理倉庫 - 提取字表的聲韻調",
-                                     "villagesMLRepo":  "自然村機器學習 - 村落名稱、地理數據分析",
-                                     "supportText":  "「若網站對您有幫助，可以請作者喝杯咖啡☕️，您的支持將是作者持續維護的動力🙏」",
-                                     "supportButton":  "支持一下",
-                                     "supportNote":  "「注：本站由一名本科生開發運營，從字表處理、後端API到前端界面皆一人完成；服務器和域名的開銷，也是從生活費中省出來的💸」",
-                                     "modalTitle":  "☕️ 請作者喝杯咖啡",
-                                     "modalSubtitle":  "感謝您的支持！ 💖",
-                                     "weixinAlt":  "微信收款碼",
-                                     "alipayAlt":  "支付寶收款碼"
-                                 }
-              },
-    "projects":  {
-                     "sectionTitle":  "開源項目",
-                     "sectionSubtitle":  "歡迎 Star、Fork 與貢獻代碼"
-                 },
-    "contact":  {
-                    "title":  "聯繫作者",
-                    "desc":  "關注知乎，了解更多方言研究與GIS知識",
-                    "button":  "前往知乎"
-                },
-    "footer":  {
-                   "links":  {
-                                 "about":  "關於網站",
-                                 "source":  "資料來源",
-                                 "privacy":  "隱私政策",
-                                 "setting":  "設定",
-                                 "oldSite":  "舊版網站",
-                                 "support":  "支持作者"
-                             },
-                   "stats":  "今日訪問 {today} · 總訪問 {total}",
-                   "copyright":  "© 2026 方音圖鑑 · 由不羈(jengzang)開發",
-                   "versionInfo":  "{version} · 最後更新：{date}",
-                   "icp":  "粵ICP備2025466875號"
-               },
-    "updateNotice":  {
-                         "title":  "網站更新通知",
-                         "items":  {
-                                       "homepage":  {
-                                                        "title":  "全新首頁",
-                                                        "description":  "採用液態玻璃風格設計，展示核心功能卡片、開源項目、登入權益等，提供更直觀的導航體驗"
-                                                    },
-                                       "compare":  {
-                                                       "title":  "方言比較功能",
-                                                       "description":  "支持漢字比較、中古音比較、調類比較，地圖用不同顏色的圓點展示兩組數據的差異，並提供圖例說明"
-                                                   },
-                                       "villages":  {
-                                                        "title":  "自然村機器學習分析",
-                                                        "description":  "新增村落方言數據的機器學習分析功能，幫助研究者發現方言分布的潛在規律和模式"
-                                                    }
-                                   }
-                     },
-    "supportModal":  {
-                         "title":  "☕️ 請作者喝杯咖啡",
-                         "subtitle":  "感謝您的支持！ 💖",
-                         "donorThanks":  "感謝你們請作者喝咖啡。每一份支持，都會轉化成繼續維護本站的動力。",
-                         "donorColumns":  {
-                                              "time":  "時間",
-                                              "donor":  "捐贈者",
-                                              "amount":  "金額(元)",
-                                              "method":  "方式"
-                                          },
-                         "weixinAlt":  "微信收款碼",
-                         "weixinLabel":  "微信",
-                         "alipayAlt":  "支付寶收款碼",
-                         "alipayLabel":  "支付寶"
-                     }
+  "hero": {
+    "title": "方言比較 · 地理語言學",
+    "subtitle": "✨ 探索方言的歷史層次 · 🎵 觸摸漢字的音韻之美",
+    "startExploring": "開始探索",
+    "expandTools": "拓展工具",
+    "featuresIntro": "功能簡介",
+    "logoAlt": "方音圖鑑",
+    "decorationAlt": "藍色圓環"
+  },
+  "features": {
+    "sectionTitle": "核心功能",
+    "query": {
+      "title": "查詢分析",
+      "desc": "多維度查詢方言音韻資料",
+      "searchChar": "查字 - 查詢字音、地位",
+      "searchMiddle": "查中古 - 按中古地位整理讀音",
+      "searchPhoneme": "查音位 - 分析音位的中古來源",
+      "searchTone": "查調 - 查詢調值、調類"
+    },
+    "compare": {
+      "title": "方言比較",
+      "desc": "對比不同方言的音韻特徵",
+      "compareChar": "比較漢字 - 比較各點聲韻調的字音差異",
+      "compareMiddle": "比較中古 - 按音韻地位比較各點",
+      "compareTone": "比較調類 - 對比各點聲調系統",
+      "comparePhonetic": "比較音值 - 桑基圖呈現各點音值差異"
+    },
+    "map": {
+      "title": "地圖可視化",
+      "desc": "地理語言學視角呈現",
+      "dialectMap": "地圖顯示 - 地圖上呈現查詢結果",
+      "regionMap": "方言分區圖 - 按地圖集或音典分區繪製",
+      "customMap": "自定義數據 - 添加個人數據繪圖",
+      "drawMap": "繪圖工具 - GIS在線繪圖 泰森多边形"
+    },
+    "phonology": {
+      "title": "音系分析",
+      "desc": "方言語音係統研究",
+      "phonologyQuery": "音系查詢 - 查看方言音系表",
+      "phonemeClassify": "音素分類 - 按自定義類別分析音素",
+      "syllableCount": "音節統計 - 統計音節數量",
+      "middlePosition": "中古地位 - 查詢漢字中古地位",
+      "evolution": "演變 - 餅圖桑基圖展示方言演變"
+    },
+    "words": {
+      "title": "詞句資料",
+      "desc": "方言詞彙與語法資料",
+      "yubaoVocab": "語保詞彙 - 語保工程詞彙資料",
+      "yubaoGrammar": "語保語法 - 語保工程句子資料",
+      "ycSpoken": "陽春口語詞 - 陽春方言口語詞彙"
+    },
+    "villages": {
+      "title": "自然村資料",
+      "desc": "村落地名分析與方言繪圖",
+      "gdVillages": "廣東自然村 - 廣東自然村樹狀圖",
+      "villagesML": "機器學習 - 自然村名機器學習",
+      "gdVillagesTable": "全粵村情表格 - 廣東村落詳細表格",
+      "ycVillages": "陽春自然村 - 陽春自然村資料"
+    },
+    "tools": {
+      "title": "字表工具",
+      "desc": "字表轉換、合併、檢查等工具",
+      "tableProcess": "字表處理 - 字表檢查與格式轉換",
+      "jyut2ipa": "粵拼轉IPA - 粵拼轉國際音標",
+      "tableMerge": "字表合併 - 合併多個字表"
+    },
+    "charClass": {
+      "title": "漢字地位",
+      "desc": "歷代漢字音韻地位資料",
+      "zhonggu": "中古漢語 - 廣韻等中古音系地位",
+      "shanggu": "上古漢語 - 詩經諧聲等上古地位",
+      "jingu": "近古漢語 - 洪武正韻、中原音韻等近古地位",
+      "yueyun": "粵語韻書 - 分韻撮要等韻書"
+    },
+    "praat": {
+      "title": "Praat 聲學分析",
+      "desc": "實驗語音學工具與數據分析"
+    },
+    "about": {
+      "title": "關於網站",
+      "desc": "網站介紹與資料來源",
+      "intro": "簡介 - 網站功能介紹",
+      "reflection": "感悟 - 開發感悟與鳴謝",
+      "suggestion": "提出建議 - 反饋與建議",
+      "likeAuthor": "喜歡作者 - 支持與關注",
+      "source": "資料來源 - 查閱字表來源與相關信息",
+      "setting": "設定 - 語言與音韻資料選擇"
+    },
+    "dialectClustering": {
+      "title": "方言聚類",
+      "desc": "方言聚類流程頁面占位"
+    }
+  },
+  "roadmap": {
+    "sectionTitle": "開發中的功能",
+    "sectionSubtitle": "即將推出的新特性",
+    "charsGeneration": {
+      "title": "字表推導器",
+      "desc": "基於音韻地位的字表推導工具，由少量字生成完整字表，可選多種韻書"
+    },
+    "phoneticsToolbox": {
+      "title": "韶子的語音學工具箱",
+      "desc": "聲學參數批量估計、多算法基頻檢測、EGG信號分析、聲門參數提取"
+    },
+    "dialectClustering": {
+      "title": "方言聚類",
+      "desc": "自定義音值音位權重、調整聚類算法參數、基於音位向量的多維度相似度計算"
+    },
+    "evolutionTree": {
+      "title": "方言演化樹狀圖",
+      "desc": "自定義演化模型參數、調整分支長度算法、交互式系統發生樹構建與可視化"
+    },
+    "ipaTTS": {
+      "title": "IPA 轉語音合成",
+      "desc": "國際音標到語音的實時轉換、多方言音色支持（遠景規劃）"
+    },
+    "dialectBot": {
+      "title": "方言對話機器人",
+      "desc": "基於規整字表集的LLM微調、音色克隆、方言語音交互（遠景規劃）"
+    }
+  },
+  "login": {
+    "title": "登錄解鎖更多功能",
+    "desc": "查看詳細權限對比，了解登錄後的完整權益",
+    "benefits": {
+      "customMap": "自定義繪製地圖",
+      "customRegion": "自定義方言分區",
+      "moreLocations": "查詢地點數量提升",
+      "praatTools": "Praat 聲學工具",
+      "tableTools": "字表處理工具",
+      "queryHistory": "查詢記錄與排行榜"
+    },
+    "loginNow": "立即登錄",
+    "viewDetails": "查看詳情"
+  },
+  "intro": {
+    "thanks": {
+      "aboutTitle": "ℹ️ 關於網站",
+      "aboutDesc": "「方音圖鑑」是一個專注於中古地位分析、方言比較、地理語言學的線上工具，致力於以清晰、互動的方式呈現各方言點聲韻層次及音位分合。",
+      "feature1": "功能1：<strong>查中古</strong>（按中古地位整理讀音）。使用者可輸入各種組合進行分析，目前支持攝、韻、等、呼、調、系、組、母、清濁、發音部位、發聲方式等類別。網站會按輸入的組合分析聲母/韻母/聲調，並把結果呈現在表格和地圖中。",
+      "feature2": "功能2：<strong>查音位</strong>（分析音位的中古來源）。使用者可輸入上述類別，網站會分析輸入的音值（音位）對應字的中古來源，並把結果呈現在表格和地圖中。",
+      "feature3": "功能3：<strong>查調</strong>（查詢調值、調類）。網站會根據用戶選擇的分區、地點，整理調值、調類，不同的調類標上了不同的顏色。",
+      "feature4": "功能4：<strong>查字</strong>（查詢字音、地位）。根據用戶輸入漢字進行查詢，最終呈現各個地點的音值、注釋以及漢字中古地位",
+      "feature5": "功能5：<strong>分區繪圖</strong>（按地圖集二分區/音典分區繪製方言地圖）。",
+      "feature6": "功能6：<strong>自定義繪圖</strong>（用戶添加個人數據進行繪圖）。用戶可以自己在地圖上選點、標註，網站會根據特徵值自定分配顏色",
+      "feature7": "表格裡的<strong>藍色字</strong>（地位、音值等）一般都是可以點擊的，點擊後即在新的彈窗中進行細分查詢，方便與原結果對比分析",
+      "feature8": "地圖上的點也可以點擊，點擊後即可查詢詳細信息。",
+      "welcomeText": "歡迎探索《方音圖鑑》，一起觸摸方言的歷史層次！",
+      "devTitle": "🧑‍💻 開發感悟",
+      "devPara1": "最初，我只想為自己的研究製作稱手的工具，卻在不知不覺間，探索了廣袤的星空。從第一行代碼到第一個功能，從稚嫩的構想到漸豐的體系，昼夜在鍵盤上更迭，我的構想也逐漸從虛無中落地生根。我看著這個網站，就如同看著自家的孩子蹣跚學步，一步步走出自己的輪廓。每一個按鈕、每一次交互，都烙印著一段時光。我曾為如果實現想要的查詢邏輯而精疲力竭，也曾為視覺效果的成功呈現而雀躍不已——這些點滴，匯成了她的血與肉、魂與靈。",
+      "devPara2": "其實，這亦是自我蛻變的歷程。從對前端一無所知，到摸索DOM、嘗試虛擬滾動，進階至運用框架，乃至領略JWT、ORM的精妙。我在建造中學習，在錯誤中成熟。最迷人之處在於，我用以搭建這一切的磚石，正是我渴望學習的知識本身：網站的搭建深化了我對音韻的理解，而鑽研音韻又驅動著代碼的迭代。技術於我，不再是冷冰冰的指令，而是承載文化的舟楫；文化於我，亦不再是遙遠的文獻，逐步化為可交互、可追溯、可觸摸的實體。",
+      "devPara3": "這便是我用代碼與熱愛寫就的答卷，一個普通學生獻給方言領域最誠摯的禮物。感謝每一位與它相遇的你。希望這份仍顯稚拙的創作，能激起你心中一絲好奇的漣漪，或為你節省資料翻檢的片刻光陰，這便是她存在的意義。",
+      "devPara4": "願八方鄉音，生生不息；<br>願漢字之美，永被珍惜；<br>願文明薪火，長存於每一次交互與共鳴之中。",
+      "thanksTitle": "特別鳴謝",
+      "mcpdict": "漢字音典",
+      "mcpdictDesc": "本網站大部分資料來自",
+      "mcpdictData": "音典開源數據",
+      "jyutjam": "嶺南粵音",
+      "jyutjamDesc": "提供了交流的平台 及",
+      "jyutdict": "泛粵大典",
+      "yubao": "語保",
+      "yubaoDesc": "篩選了部分資料",
+      "xiaoxue": "小學堂",
+      "xiaoxueDesc": "篩選了部分資料",
+      "yueminke": "粵閩客方言系統",
+      "yueminkeDesc": "篩選了部分資料",
+      "testers": "測試人員",
+      "testersDesc": "正式上線之前測試、提建議的網友！",
+      "friends": "朋友 ❤️",
+      "friendsDesc": "在項目開發過程中，所有支持、鼓勵、幫助過我的朋友！",
+      "you": "你 ❤️",
+      "youDesc": "當然，還有看到這裡的你！"
+    },
+    "suggestions": {
+      "title": "我有建議",
+      "desc": "發現 bug？有建議？<br />歡迎通過 GitHub Issue 提出！",
+      "subtext": "點擊下方卡片跳轉對應倉庫",
+      "frontendCard": "🐞 網頁運行有 bug❓<br />💡 對交互、UI 有建議❓",
+      "frontendLink": "到前端倉庫提 Issue",
+      "buildCard": "🔤 對字表有疑問❓<br />🎯 聲/韻/調 提取出錯❓",
+      "buildLink": "到字表處理倉庫提 Issue"
+    },
+    "likeAuthor": {
+      "title": "❤️ 喜歡作者",
+      "follow": "關注",
+      "starText": "「如果你覺得項目不錯，可以給個 ⭐️ 嗎！」",
+      "frontendRepo": "前端倉庫 - 使用vue框架和原生js開發",
+      "backendRepo": "後端倉庫 - 基於fastapi",
+      "buildRepo": "字表預處理倉庫 - 提取字表的聲韻調",
+      "villagesMLRepo": "自然村機器學習 - 村落名稱、地理數據分析",
+      "supportText": "「若網站對您有幫助，可以請作者喝杯咖啡☕️，您的支持將是作者持續維護的動力🙏」",
+      "supportButton": "支持一下",
+      "supportNote": "「注：本站由一名本科生開發運營，從字表處理、後端API到前端界面皆一人完成；服務器和域名的開銷，也是從生活費中省出來的💸」",
+      "modalTitle": "☕️ 請作者喝杯咖啡",
+      "modalSubtitle": "感謝您的支持！ 💖",
+      "weixinAlt": "微信收款碼",
+      "alipayAlt": "支付寶收款碼"
+    }
+  },
+  "projects": {
+    "sectionTitle": "開源項目",
+    "sectionSubtitle": "歡迎 Star、Fork 與貢獻代碼"
+  },
+  "contact": {
+    "title": "聯繫作者",
+    "desc": "關注知乎，了解更多方言研究與GIS知識",
+    "button": "前往知乎"
+  },
+  "footer": {
+    "links": {
+      "about": "關於網站",
+      "source": "資料來源",
+      "privacy": "隱私政策",
+      "setting": "設定",
+      "oldSite": "舊版網站",
+      "support": "支持作者"
+    },
+    "stats": "今日訪問 {today} · 總訪問 {total}",
+    "copyright": "© 2026 方音圖鑑 · 由不羈(jengzang)開發",
+    "versionInfo": "{version} · 最後更新：{date}",
+    "icp": "粵ICP備2025466875號"
+  },
+  "updateNotice": {
+    "title": "網站更新通知",
+    "items": {
+      "homepage": {
+        "title": "全新首頁",
+        "description": "採用液態玻璃風格設計，展示核心功能卡片、開源項目、登入權益等，提供更直觀的導航體驗"
+      },
+      "compare": {
+        "title": "方言比較功能",
+        "description": "支持漢字比較、中古音比較、調類比較，地圖用不同顏色的圓點展示兩組數據的差異，並提供圖例說明"
+      },
+      "villages": {
+        "title": "自然村機器學習分析",
+        "description": "新增村落方言數據的機器學習分析功能，幫助研究者發現方言分布的潛在規律和模式"
+      }
+    }
+  },
+  "supportModal": {
+    "title": "☕️ 請作者喝杯咖啡",
+    "subtitle": "感謝您的支持！ 💖",
+    "donorThanks": "感謝你們請作者喝咖啡。每一份支持，都會轉化成繼續維護本站的動力。",
+    "donorColumns": {
+      "time": "時間",
+      "donor": "捐贈者",
+      "amount": "金額(元)",
+      "method": "方式"
+    },
+    "weixinAlt": "微信收款碼",
+    "weixinLabel": "微信",
+    "alipayAlt": "支付寶收款碼",
+    "alipayLabel": "支付寶"
+  }
 }

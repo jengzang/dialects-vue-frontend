@@ -165,6 +165,12 @@ const comparisonData = computed(() => [
     anonymous: LOCATION_LIMITS.compare_tab4.anonymous.MAX_LOCATIONS,
     user: LOCATION_LIMITS.compare_tab4.user.MAX_LOCATIONS
   },
+    {
+    key: 'comparePhonetic',
+    feature: t('user.benefitsPopup.items.comparePhonetic'),
+    anonymous: LIMIT_TAGS.userOnly,
+    user: LIMIT_TAGS.open
+  },
   {
     key: 'regionalMap',
     feature: t('user.benefitsPopup.items.regionalMap'),
@@ -188,6 +194,12 @@ const comparisonData = computed(() => [
     key: 'syllableStats',
     feature: t('user.benefitsPopup.items.syllableStats'),
     anonymous: LIMIT_TAGS.open,
+    user: LIMIT_TAGS.open
+  },
+    {
+    key: 'evolution',
+    feature: t('user.benefitsPopup.items.evolution'),
+    anonymous: LIMIT_TAGS.userOnly,
     user: LIMIT_TAGS.open
   },
   {
