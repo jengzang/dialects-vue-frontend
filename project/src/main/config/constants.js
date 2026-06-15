@@ -7,7 +7,7 @@
 export const TABLE_CONFIG = {
     PAGE_SIZE: 50,                  // 每页显示条数
     MIN_WIDTH: 1000,                // 表格最小宽度(px)
-    SEARCH_DEBOUNCE: 300,           // 搜索防抖延迟(ms)
+    SEARCH_DEBOUNCE: 500,           // 搜索防抖延迟(ms)
     MOBILE_MIN_WIDTH: 800           // 移动端表格最小宽度(px)
 }
 
@@ -73,11 +73,11 @@ export const LOCATION_LIMITS = {
     // tab1: 查字
     tab1: {
         anonymous: {
-            MAX_LOCATIONS: 200,
+            MAX_LOCATIONS: 100,
             MESSAGE: '未登錄用戶單次最多可查詢 {limit} 個地點'
         },
         user: {
-            MAX_LOCATIONS: 800,
+            MAX_LOCATIONS: 600,
             MESSAGE: '用戶單次最多可查詢 {limit} 個地點'
         },
         admin: {
