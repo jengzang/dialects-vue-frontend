@@ -26,7 +26,7 @@
   "resultList": {
     "emptyState": "請先查詢",
     "locationLabel": "地點",
-    "locationPlaceholder": "輸入地點名稱...",
+    "locationPlaceholder": "點擊選擇地點跳轉",
     "filter": {
       "default": "篩選",
       "selected": "已選：{values}",
@@ -129,10 +129,10 @@
       "otherTone": "其他調",
       "neutralTone": "輕聲"
     },
-      "charNav": {
-    "title": "漢字導航",
-    "jumpToChar": "跳轉到「{char}」"
-  }
+    "charNav": {
+      "title": "漢字導航",
+      "jumpToChar": "跳轉到「{char}」"
+    }
   },
   "phonologyTable": {
     "detailButton": "詳情",

@@ -26,7 +26,7 @@
   "resultList": {
     "emptyState": "请先查询",
     "locationLabel": "地点",
-    "locationPlaceholder": "输入地点名称...",
+    "locationPlaceholder": "点击选择地点跳转",
     "filter": {
       "default": "筛选",
       "selected": "已选：{values}",
@@ -129,10 +129,10 @@
       "otherTone": "其他调",
       "neutralTone": "轻声"
     },
-      "charNav": {
-    "title": "汉字导航",
-    "jumpToChar": "跳转到“{char}”"
-  }
+    "charNav": {
+      "title": "汉字导航",
+      "jumpToChar": "跳转到“{char}”"
+    }
   },
   "phonologyTable": {
     "detailButton": "详情",
