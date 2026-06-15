@@ -648,7 +648,6 @@ onBeforeUnmount(() => {
 
 .menu-item:hover {
   background: rgba(0, 122, 255, 0.12);
-  height: 90%;
   color: #007aff;
 }
 
