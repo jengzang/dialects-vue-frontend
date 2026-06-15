@@ -126,7 +126,8 @@
         "location": "Location",
         "locationHint": "Only single-location analysis is supported",
         "query": "Query",
-        "loading": "Querying..."
+        "loading": "Querying...",
+        "optimizeLinks": "Optimize links"
       },
       "sankey": {
         "layer": "Layer",
