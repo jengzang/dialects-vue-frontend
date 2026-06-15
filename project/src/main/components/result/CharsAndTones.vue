@@ -76,10 +76,10 @@
 
     <Teleport to="body">
       <nav
-        v-if="mode === 'tab1' && charNavItems.length > 1"
-        class="char-nav-teleport"
-        :aria-label="t('result.charsAndTones.charNav.title')"
-      >
+          v-if="props.showCharNav && mode === 'tab1' && charNavItems.length > 1"
+          class="char-nav-teleport"
+          :aria-label="t('result.charsAndTones.charNav.title')"
+        >
         <button
           v-for="nav in charNavItems"
           :key="nav.id"
@@ -130,7 +130,11 @@ const props = defineProps({
   selectedToneType: {
     type: String,
     default: '默認'
-  }
+  },
+  showCharNav: {
+  type: Boolean,
+  default: false
+}
 });
 
 const { t } = useI18n();
