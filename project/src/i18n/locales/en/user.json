@@ -93,7 +93,7 @@
       "descriptionLabel": "Description (optional)",
       "descriptionPlaceholder": "Briefly describe what this region is for...",
       "locationsLabel": "Locations *",
-      "selectLocationsButton": "Select locations",
+      "selectLocationsButton": "Select",
       "selectLocationsTitle": "Select locations from the region tree",
       "locationInputPlaceholder": "Enter location names separated by spaces\nExample: Guangzhou Hong Kong Shenzhen Macao\nOr click the button to select from the tree",
       "locationHint": "Separate locations with spaces. The system will deduplicate them automatically. You can also select from the region tree.",

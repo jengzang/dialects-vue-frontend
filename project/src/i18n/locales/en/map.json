@@ -1,7 +1,7 @@
 {
   "tabs": {
     "map": "Map",
-    "divide": "Regional Map",
+    "divide": "Regions",
     "custom": "Custom",
     "draw": "Map Drawing"
   },
@@ -314,9 +314,9 @@
       "disabled": "Off"
     },
     "buttons": {
-      "reset": "Reset View",
+      "reset": "Reset",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit Fullscreen",
+      "exitFullscreen": "Exit",
       "delete": "Delete",
       "detail": "Details"
     },
@@ -383,9 +383,9 @@
       "definition": "Definition"
     },
     "buttons": {
-      "reset": "Reset View",
+      "reset": "Reset",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit Fullscreen"
+      "exitFullscreen": "Exit"
     },
     "popup": {
       "title": "Details",
@@ -410,9 +410,9 @@
       "dialect": "Dialect"
     },
     "buttons": {
-      "reset": "Reset View",
+      "reset": "Reset",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit Fullscreen"
+      "exitFullscreen": "Exit"
     }
   },
   "legend": {
