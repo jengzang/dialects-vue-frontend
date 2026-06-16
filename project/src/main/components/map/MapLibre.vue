@@ -11,7 +11,7 @@
         </div>
 
         <div
-          v-if="isMiddleChineseMode && hasCustomData"
+          v-if="isMiddleChineseMode && hasCustomData && mapStore.mapData"
           id="custom-switch-container"
           class="custom-switch-container1"
           @click="toggleCustomSwitch"

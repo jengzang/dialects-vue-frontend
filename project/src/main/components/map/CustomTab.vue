@@ -513,6 +513,7 @@ const selectFeatureItem = async (item) => {
     if (availableLocations.value.length === 1) {
       mapStore.mapData = null;
       mapStore.mergedData = [];
+      resultCache.mode = '查中古';
       // resultCache.latestResults = [];
       addCustomFeatureDataWithoutApi(rows, featureName, phonology);
       currentFeatureRows.value = [];
@@ -552,6 +553,7 @@ const confirmFeatureScopeSelection = async ({ selectedLocations }) => {
 
     mapStore.mapData = null;
     mapStore.mergedData = [];
+    resultCache.mode = '查中古';
     // resultCache.latestResults = [];
     addCustomFeatureDataWithoutApi(filteredRows, featureMeta.feature, featureMeta.phonology || '');
     currentFeatureRows.value = [];
