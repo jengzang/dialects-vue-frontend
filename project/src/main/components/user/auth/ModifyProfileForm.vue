@@ -290,7 +290,6 @@ h3 {
 
 @media (max-width: 480px) {
   .modify-avatar-card {
-    width: 100%;
     flex-direction: column;
     gap: 12px;
   }
