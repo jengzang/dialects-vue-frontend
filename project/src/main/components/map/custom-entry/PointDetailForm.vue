@@ -48,7 +48,7 @@
                 >
                   <div class="suggestion-info">
                     <span class="suggestion-location">{{ item.location }}</span>
-                    <span v-if="item.region" class="suggestion-region">({{ item.region }})</span>
+                    <!-- <span v-if="item.region" class="suggestion-region">({{ item.region }})</span> -->
                   </div>
                   <span :class="['suggestion-badge', { archive: !item.isCustom }]">
                     {{ item.isCustom ? t('customEntry.pointList.userPointBadge') : t('customEntry.pointList.publicPointBadge') }}
@@ -401,19 +401,33 @@ function handleLocationInput() {
 
   locationDebounceTimer = setTimeout(async () => {
     try {
-      const response = await batchMatch(location.value.trim(), false);
+      const currentQuery = location.value.trim();
+      const response = await batchMatch(currentQuery, false);
+
       let publicItems = [];
+
       if (response && response.length > 0) {
-        const items = response[0].items || [];
-        publicItems = Array.from(new Set(items))
-          .filter(item => item !== location.value.trim())
-          .map(item => ({
-            key: `public-${item}`,
-            location: item,
-            region: '',
-            coord: '',
-            isCustom: false
-          }));
+        const r = response[0];
+        const items = r.items || [];
+
+        let publicValues = Array.from(new Set(items));
+
+        // 匹配成功时，不要过滤掉 currentQuery；
+        // 如果 currentQuery 在后端返回项中，就把它提到最前面
+        if (r.success && currentQuery && publicValues.includes(currentQuery)) {
+          publicValues = [
+            currentQuery,
+            ...publicValues.filter(item => item !== currentQuery)
+          ];
+        }
+
+        publicItems = publicValues.map(item => ({
+          key: `public-${item}`,
+          location: item,
+          region: '',
+          coord: '',
+          isCustom: false
+        }));
       }
 
       const customLocations = new Set(matchedCustom.map(c => c.location));

@@ -195,12 +195,34 @@ const checkWindowMode = () => {
   isMiddleChineseMode.value = (resultCache && resultCache.mode === '查中古');
 };
 // 3. 切換開關邏輯
-const toggleCustomSwitch = () => {
+const toggleCustomSwitch = async () => {
   if (userStore.role === 'anonymous') {
     showWarning(t('map.mapLibre.messages.anonymousNoCustomData'));
     return;
   }
-  mapStore.showCustomData = !mapStore.showCustomData;
+
+  const nextShowCustomData = !mapStore.showCustomData;
+
+  // 关闭时不需要重新请求，直接隐藏即可
+  if (!nextShowCustomData) {
+    mapStore.showCustomData = false;
+    return;
+  }
+
+  try {
+    loading.value = true;
+
+    // 打开个人数据前，重新请求一次 customData 后端
+    await refreshCurrentCustomLayer();
+
+    // 请求完成后再打开显示
+    mapStore.showCustomData = true;
+  } catch (error) {
+    console.error('刷新自定义数据失败:', error);
+    showError(t('map.mapLibre.messages.queryLocationFailed', { error: error.message }));
+  } finally {
+    loading.value = false;
+  }
 };
 const lastNonBaseMode = ref('feature');
 // 只要當前 store 是 base 模式，開關就是開的
