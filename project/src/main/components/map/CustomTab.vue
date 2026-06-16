@@ -552,7 +552,7 @@ const confirmFeatureScopeSelection = async ({ selectedLocations }) => {
 
     mapStore.mapData = null;
     mapStore.mergedData = [];
-    resultCache.latestResults = [];
+    // resultCache.latestResults = [];
     addCustomFeatureDataWithoutApi(filteredRows, featureMeta.feature, featureMeta.phonology || '');
     currentFeatureRows.value = [];
     availableRegions.value = [];

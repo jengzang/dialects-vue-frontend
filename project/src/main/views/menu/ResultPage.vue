@@ -53,7 +53,7 @@ import {globalPayload, mapStore, resultCache, userStore} from '@/main/store/stor
 import ResultList from "@/main/components/result/ResultList.vue";
 import CharsAndTones from "@/main/components/result/CharsAndTones.vue";
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
-import {generateTonesMergedData,generateCharsMergedData,func_mergeData} from "@/utils/map/MapData.js";
+import {generateTonesMergedData,generateCharsMergedData,func_mergeData,requestMapFitView} from "@/utils/map/MapData.js";
 import { DEFAULT_CHARACTER_TABLE } from '@/main/config/index.js'
 
 const { t } = useI18n();
@@ -240,6 +240,7 @@ watch(
 
             mapStore.mapData = MapData;
             mapStore.mergedData = mergedData;
+            requestMapFitView();
           } else {
             console.warn("⚠️ API 返回错误:", response.message);
           }
@@ -270,6 +271,7 @@ watch(
 
             mapStore.mapData = MapData;
             mapStore.mergedData = mergedData;
+            requestMapFitView();
           } else {
             console.warn("⚠️ API returned empty or error:", response.error);
           }

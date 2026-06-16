@@ -402,10 +402,6 @@ watch(
   () => mapStore.fitViewKey,
   async (key) => {
     if (!key) return;
-    if (mapStore.mode !== 'feature') return;
-    if (!mapStore.showCustomData) return;
-    if (!mapStore.mergedData || mapStore.mergedData.length === 0) return;
-
     await nextTick();
     resetView();
   },
