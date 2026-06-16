@@ -351,23 +351,22 @@ const prevMapData = ref(null);
 const prevMergedData = ref(null);
 
 watch(
-    // 監聽源改成 store 裡的數據
+  // 監聽源改成 store 裡的數據
     [() => mapStore.mapData, () => mapStore.mergedData, () => mapStore.mode, () => props.activeFeature],
     ([newMapData, newMergedData, newMode]) => {
       // 判斷是否只是模式切換（數據沒變）
-      const isOnlyModeChange =
-        prevMapData.value === newMapData &&
-        prevMergedData.value === newMergedData;
+      const shouldResetView = prevMapData.value !== newMapData;
 
       // 更新追蹤值
       prevMapData.value = newMapData;
       prevMergedData.value = newMergedData;
 
       // 渲染地圖，傳入是否需要重置視角的標誌
-      renderMapContent(!isOnlyModeChange);
+      renderMapContent(shouldResetView);
     },
     { deep: true }
 );
+
 watch(() => mapStore.showCustomData, () => {
   renderMapContent(false); // 切換自定義數據顯示時不重置視角
 });
@@ -437,12 +436,20 @@ const renderMapContent = async (shouldResetView = true) => {
     let centerCoord = null;
     let zoomLevel = 8;
 
-    // 优先使用 mapStore.mapData（基础地图数据）
-    if (mapStore.mapData && mapStore.mapData.center_coordinate) {
+    // feature 模式优先使用 mergedData 里的中心层级
+    if (mapStore.mode === 'feature' && mapStore.mergedData && mapStore.mergedData.length > 0) {
+      const firstItem = mapStore.mergedData[0];
+
+      if (firstItem.centerCoordinate) {
+        centerCoord = firstItem.centerCoordinate;
+        zoomLevel = firstItem.zoomLevel || 8;
+      }
+    }
+    // 其他模式继续使用 mapData
+    else if (mapStore.mapData && mapStore.mapData.center_coordinate) {
       centerCoord = mapStore.mapData.center_coordinate;
       zoomLevel = mapStore.mapData.zoom_level || 8;
     }
-    // 如果没有 mapData，或者在 feature 模式且有 mergedData，则从 mergedData 中提取
     else if (mapStore.mergedData && mapStore.mergedData.length > 0) {
       const firstItem = mapStore.mergedData[0];
       if (firstItem.centerCoordinate) {
@@ -755,7 +762,7 @@ const handleCustomBtnClick = async (item) => {
 
         try {
           await refreshCurrentCustomLayer()
-          console.log('Custom data refreshed after delete')
+          // console.log('Custom data refreshed after delete')
         } catch (error) {
           console.error('Failed to refresh data after delete:', error)
         }

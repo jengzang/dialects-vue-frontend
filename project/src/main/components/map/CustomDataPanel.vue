@@ -330,8 +330,8 @@ const resetForm = () => {
   formData.location = ''
   formData.region = ''
   formData.coordinates = ''
-  formData.featureType = ''
-  formData.featureField = ''
+  // formData.featureType = ''
+  // formData.featureField = ''
   formData.value = ''
   formData.description = ''
 }
