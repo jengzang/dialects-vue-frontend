@@ -476,6 +476,8 @@ watch(
 
 .feature-detail-main,
 .feature-detail-side {
+  max-height: 60dvh;
+  overflow-y: auto;
   padding: 18px;
 }
 

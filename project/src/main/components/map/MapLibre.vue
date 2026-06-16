@@ -398,12 +398,20 @@ watch(() => resultCache.mode, () => {
   checkWindowMode();
 }, { immediate: true });
 
-// // 監聽 hasCustomData 變化（用於調試）
-// watch(hasCustomData, (newVal) => {
-//   console.log('📊 hasCustomData 變化:', newVal);
-//   console.log('📌 isMiddleChineseMode:', isMiddleChineseMode.value);
-//   console.log('📌 resultCache.mode:', resultCache.mode);
-// });
+watch(
+  () => mapStore.fitViewKey,
+  async (key) => {
+    if (!key) return;
+    if (mapStore.mode !== 'feature') return;
+    if (!mapStore.showCustomData) return;
+    if (!mapStore.mergedData || mapStore.mergedData.length === 0) return;
+
+    await nextTick();
+    resetView();
+  },
+  { flush: 'post' }
+);
+
 
 // 2. 監聽 store 的模式變化，自動記錄歷史
 watch(
@@ -457,20 +465,22 @@ const renderMapContent = async (shouldResetView = true) => {
   if (shouldResetView) {
     let centerCoord = null;
     let zoomLevel = 8;
-
     // feature 模式优先使用 mergedData 里的中心层级
     if (mapStore.mode === 'feature' && mapStore.mergedData && mapStore.mergedData.length > 0) {
       const firstItem = mapStore.mergedData[0];
+      // console.log('Checking mergedData for center and zoom:', firstItem);
 
       if (firstItem.centerCoordinate) {
         centerCoord = firstItem.centerCoordinate;
         zoomLevel = firstItem.zoomLevel || 8;
+        // console.log('Using center and zoom from mergedData:', centerCoord, zoomLevel);
       }
     }
     // 其他模式继续使用 mapData
     else if (mapStore.mapData && mapStore.mapData.center_coordinate) {
       centerCoord = mapStore.mapData.center_coordinate;
       zoomLevel = mapStore.mapData.zoom_level || 8;
+      // console.log('Using center and zoom from mapData:', centerCoord, zoomLevel);
     }
     else if (mapStore.mergedData && mapStore.mergedData.length > 0) {
       const firstItem = mapStore.mergedData[0];

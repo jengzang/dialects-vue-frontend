@@ -232,6 +232,8 @@ import { getUserFeatures, getDataByFeature } from '@/api';
 import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js';
 import {
   userStore,
+  mapStore,
+  resultCache,
 } from '@/main/store/store.js';
 import { showSuccess, showWarning, showError } from '@/utils/message.js';
 import FeatureScopeSelectionModal from '@/main/components/map/custom-entry/FeatureScopeSelectionModal.vue';
@@ -509,6 +511,9 @@ const selectFeatureItem = async (item) => {
     };
 
     if (availableLocations.value.length === 1) {
+      mapStore.mapData = null;
+      mapStore.mergedData = [];
+      // resultCache.latestResults = [];
       addCustomFeatureDataWithoutApi(rows, featureName, phonology);
       currentFeatureRows.value = [];
       availableRegions.value = [];
@@ -545,6 +550,9 @@ const confirmFeatureScopeSelection = async ({ selectedLocations }) => {
       throw new Error(t('map.customTab.scopeModal.emptySelection'));
     }
 
+    mapStore.mapData = null;
+    mapStore.mergedData = [];
+    resultCache.latestResults = [];
     addCustomFeatureDataWithoutApi(filteredRows, featureMeta.feature, featureMeta.phonology || '');
     currentFeatureRows.value = [];
     availableRegions.value = [];

@@ -52,7 +52,8 @@ export const mapStore = reactive({
     selectedFeaturePhonology: '', // 当前选中的特征的声韵调类型
     showCustomData: false,    // 是否显示用户个人数据
     compareType: '',          // 比較類型: 'chars' | 'zhonggu' | 'tones'
-    compareGroups: null       // 比较模式的组信息 { group1: {color, label}, group2: {color, label} }
+    compareGroups: null,       // 比较模式的组信息 { group1: {color, label}, group2: {color, label} }
+    fitViewKey: 0
 })
 
 // =================================

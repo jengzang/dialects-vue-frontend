@@ -402,12 +402,13 @@ export function buildMergedDataFromFeatureRows(rows, feature, phonology = '') {
 
 export function addCustomFeatureDataWithoutApi(rows, feature, phonology = '') {
     const mergedData = buildMergedDataFromFeatureRows(rows, feature, phonology)
-
     mapStore.mergedData = mergedData
     mapStore.selectedFeature = feature?.trim?.() || ''
     mapStore.selectedFeaturePhonology = phonology || ''
     mapStore.showCustomData = true
     mapStore.mode = 'feature'
+    resultCache.features = phonology ? [phonology] : []
+    requestMapFitView()
 
     return mergedData
 }
@@ -663,3 +664,6 @@ export function generateTonesMergedData(resultData, locationsData) {
     return mergedData;
 }
 
+export function requestMapFitView() {
+  mapStore.fitViewKey = Date.now()
+}
