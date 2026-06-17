@@ -26,12 +26,12 @@
     />
 
     <template v-else-if="latestResults.length > 0 && ['tab1', 'tab4'].includes(currentTabRef)">
-
       <CharsAndTones
           :data="latestResults"
           :mode="currentTabRef"
           :tone_for_chars="tone_for_chars"
           :selected-tone-type="selectedTab1Type"
+          :show-char-nav="isResultPageActive && currentTabRef === 'tab1' && !isLoading && latestResults.length > 0"
       />
     </template>
 
@@ -45,20 +45,36 @@
 </template>
 
 <script setup>
-import {computed, onUnmounted, ref, watch, onMounted} from 'vue';
+import {computed, onActivated, onDeactivated, onMounted, onUnmounted, ref, watch} from 'vue';
+import {onBeforeRouteLeave, useRoute, useRouter} from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import {useRoute, useRouter} from 'vue-router';
 import { getCoordinates, searchChars, searchZhongGu, searchYinWei, searchTones } from '@/api'
 import {globalPayload, mapStore, resultCache, userStore} from '@/main/store/store.js';
 import ResultList from "@/main/components/result/ResultList.vue";
 import CharsAndTones from "@/main/components/result/CharsAndTones.vue";
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
-import {generateTonesMergedData,generateCharsMergedData,func_mergeData} from "@/utils/map/MapData.js";
+import {generateTonesMergedData,generateCharsMergedData,func_mergeData,requestMapFitView} from "@/utils/map/MapData.js";
 import { DEFAULT_CHARACTER_TABLE } from '@/main/config/index.js'
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
+
+const isResultPageActive = ref(true);
+
+onActivated(() => {
+  isResultPageActive.value = true;
+});
+
+onDeactivated(() => {
+  isResultPageActive.value = false;
+});
+
+onBeforeRouteLeave((to, from, next) => {
+  isResultPageActive.value = false;
+  next();
+});
+
 const results = ref([]);
 const latestResults = ref([]);
 const tone_for_chars = ref([]);
@@ -224,6 +240,7 @@ watch(
 
             mapStore.mapData = MapData;
             mapStore.mergedData = mergedData;
+            requestMapFitView();
           } else {
             console.warn("⚠️ API 返回错误:", response.message);
           }
@@ -254,6 +271,7 @@ watch(
 
             mapStore.mapData = MapData;
             mapStore.mergedData = mergedData;
+            requestMapFitView();
           } else {
             console.warn("⚠️ API returned empty or error:", response.error);
           }

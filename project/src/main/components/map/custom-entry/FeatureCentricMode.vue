@@ -22,6 +22,8 @@
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getUserFeatures } from '@/api'
+import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js'
+import { userStore } from '@/main/store/store.js'
 import FeatureCardList from './FeatureCardList.vue'
 import FeatureDetailTable from './FeatureDetailTable.vue'
 
@@ -34,6 +36,21 @@ const view = ref('list')
 const selectedFeature = ref(null)
 
 const loadFeatures = async () => {
+  if (!userStore.isAuthenticated) {
+    featureItems.value = []
+    errorMessage.value = ''
+    return
+  }
+
+  const hasCustomData = await ensureCustomDataPresence()
+  if (!hasCustomData) {
+    featureItems.value = []
+    errorMessage.value = ''
+    view.value = 'list'
+    selectedFeature.value = null
+    return
+  }
+
   loading.value = true
   errorMessage.value = ''
 

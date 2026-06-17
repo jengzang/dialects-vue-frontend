@@ -11,7 +11,7 @@
         </div>
 
         <div
-          v-if="isMiddleChineseMode && hasCustomData"
+          v-if="isMiddleChineseMode && hasCustomData && mapStore.mapData"
           id="custom-switch-container"
           class="custom-switch-container1"
           @click="toggleCustomSwitch"
@@ -195,12 +195,34 @@ const checkWindowMode = () => {
   isMiddleChineseMode.value = (resultCache && resultCache.mode === '查中古');
 };
 // 3. 切換開關邏輯
-const toggleCustomSwitch = () => {
+const toggleCustomSwitch = async () => {
   if (userStore.role === 'anonymous') {
     showWarning(t('map.mapLibre.messages.anonymousNoCustomData'));
     return;
   }
-  mapStore.showCustomData = !mapStore.showCustomData;
+
+  const nextShowCustomData = !mapStore.showCustomData;
+
+  // 关闭时不需要重新请求，直接隐藏即可
+  if (!nextShowCustomData) {
+    mapStore.showCustomData = false;
+    return;
+  }
+
+  try {
+    loading.value = true;
+
+    // 打开个人数据前，重新请求一次 customData 后端
+    await refreshCurrentCustomLayer();
+
+    // 请求完成后再打开显示
+    mapStore.showCustomData = true;
+  } catch (error) {
+    console.error('刷新自定义数据失败:', error);
+    showError(t('map.mapLibre.messages.queryLocationFailed', { error: error.message }));
+  } finally {
+    loading.value = false;
+  }
 };
 const lastNonBaseMode = ref('feature');
 // 只要當前 store 是 base 模式，開關就是開的
@@ -351,23 +373,22 @@ const prevMapData = ref(null);
 const prevMergedData = ref(null);
 
 watch(
-    // 監聽源改成 store 裡的數據
+  // 監聽源改成 store 裡的數據
     [() => mapStore.mapData, () => mapStore.mergedData, () => mapStore.mode, () => props.activeFeature],
     ([newMapData, newMergedData, newMode]) => {
       // 判斷是否只是模式切換（數據沒變）
-      const isOnlyModeChange =
-        prevMapData.value === newMapData &&
-        prevMergedData.value === newMergedData;
+      const shouldResetView = prevMapData.value !== newMapData;
 
       // 更新追蹤值
       prevMapData.value = newMapData;
       prevMergedData.value = newMergedData;
 
       // 渲染地圖，傳入是否需要重置視角的標誌
-      renderMapContent(!isOnlyModeChange);
+      renderMapContent(shouldResetView);
     },
     { deep: true }
 );
+
 watch(() => mapStore.showCustomData, () => {
   renderMapContent(false); // 切換自定義數據顯示時不重置視角
 });
@@ -377,12 +398,16 @@ watch(() => resultCache.mode, () => {
   checkWindowMode();
 }, { immediate: true });
 
-// // 監聽 hasCustomData 變化（用於調試）
-// watch(hasCustomData, (newVal) => {
-//   console.log('📊 hasCustomData 變化:', newVal);
-//   console.log('📌 isMiddleChineseMode:', isMiddleChineseMode.value);
-//   console.log('📌 resultCache.mode:', resultCache.mode);
-// });
+watch(
+  () => mapStore.fitViewKey,
+  async (key) => {
+    if (!key) return;
+    await nextTick();
+    resetView();
+  },
+  { flush: 'post' }
+);
+
 
 // 2. 監聽 store 的模式變化，自動記錄歷史
 watch(
@@ -436,13 +461,23 @@ const renderMapContent = async (shouldResetView = true) => {
   if (shouldResetView) {
     let centerCoord = null;
     let zoomLevel = 8;
+    // feature 模式优先使用 mergedData 里的中心层级
+    if (mapStore.mode === 'feature' && mapStore.mergedData && mapStore.mergedData.length > 0) {
+      const firstItem = mapStore.mergedData[0];
+      // console.log('Checking mergedData for center and zoom:', firstItem);
 
-    // 优先使用 mapStore.mapData（基础地图数据）
-    if (mapStore.mapData && mapStore.mapData.center_coordinate) {
+      if (firstItem.centerCoordinate) {
+        centerCoord = firstItem.centerCoordinate;
+        zoomLevel = firstItem.zoomLevel || 8;
+        // console.log('Using center and zoom from mergedData:', centerCoord, zoomLevel);
+      }
+    }
+    // 其他模式继续使用 mapData
+    else if (mapStore.mapData && mapStore.mapData.center_coordinate) {
       centerCoord = mapStore.mapData.center_coordinate;
       zoomLevel = mapStore.mapData.zoom_level || 8;
+      // console.log('Using center and zoom from mapData:', centerCoord, zoomLevel);
     }
-    // 如果没有 mapData，或者在 feature 模式且有 mergedData，则从 mergedData 中提取
     else if (mapStore.mergedData && mapStore.mergedData.length > 0) {
       const firstItem = mapStore.mergedData[0];
       if (firstItem.centerCoordinate) {
@@ -755,7 +790,7 @@ const handleCustomBtnClick = async (item) => {
 
         try {
           await refreshCurrentCustomLayer()
-          console.log('Custom data refreshed after delete')
+          // console.log('Custom data refreshed after delete')
         } catch (error) {
           console.error('Failed to refresh data after delete:', error)
         }

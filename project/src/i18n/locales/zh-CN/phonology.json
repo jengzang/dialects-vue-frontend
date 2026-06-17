@@ -126,7 +126,8 @@
         "location": "地点",
         "locationHint": "仅支持单个地点分析",
         "query": "查询",
-        "loading": "查询中..."
+        "loading": "查询中...",
+        "optimizeLinks": "优化连线"
       },
       "sankey": {
         "layer": "层级",

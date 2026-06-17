@@ -128,6 +128,7 @@ import { ref, reactive, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { batchMatch, getRegions, submitCustomForm } from '@/api'
+import { invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js'
 import { showSuccess, showError, showWarning, showInfo } from '@/utils/message.js'
 import { userStore, globalPayload, resultCache } from '@/main/store/store.js'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
@@ -214,18 +215,38 @@ const handleLocationInput = () => {
     const query = formData.location.trim()
     if (!query) {
       suggestions.value = []
+      showSuggestions.value = false
       return
     }
 
     try {
       const response = await batchMatch(query, false)
+
       if (response && response.length > 0) {
-        const items = response[0].items || []
-        suggestions.value = Array.from(new Set(items)).filter(item => item !== query)
+        const r = response[0]
+        const items = r.items || []
+
+        let values = Array.from(new Set(items))
+
+        // 匹配成功时，不要过滤掉 query 本身；
+        // 如果 query 在候选项中，就把它提到最前面
+        if (r.success && values.includes(query)) {
+          values = [
+            query,
+            ...values.filter(item => item !== query)
+          ]
+        }
+
+        suggestions.value = values
         showSuggestions.value = suggestions.value.length > 0
+      } else {
+        suggestions.value = []
+        showSuggestions.value = false
       }
     } catch (error) {
       console.error('地点匹配失败:', error)
+      suggestions.value = []
+      showSuggestions.value = false
     }
   }, 300)
 }
@@ -312,6 +333,7 @@ const handleSubmit = async () => {
     const response = await submitCustomForm(payload)
 
     if (response.success) {
+      markCustomDataExists(true)
       showSuccess(t('map.customDataPanel.messages.submitSuccess'))
       resetForm()
       emit('submit-success', response)
@@ -328,8 +350,8 @@ const resetForm = () => {
   formData.location = ''
   formData.region = ''
   formData.coordinates = ''
-  formData.featureType = ''
-  formData.featureField = ''
+  // formData.featureType = ''
+  // formData.featureField = ''
   formData.value = ''
   formData.description = ''
 }

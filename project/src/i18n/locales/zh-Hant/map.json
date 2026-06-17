@@ -2,7 +2,8 @@
   "tabs": {
     "map": "地圖",
     "divide": "分區圖",
-    "custom": "自定義"
+    "custom": "自定義",
+    "draw": "地圖繪製"
   },
   "placeholder": {
     "selectFeature": "請先選擇一個特徵"
@@ -70,7 +71,9 @@
     "title": "分區繪圖",
     "hint": "按地圖集或音典分區的層級繪製方言分佈圖。<br>顏色會由系統自動分配。",
     "labels": {
-      "regionLevel": "繪圖分區層級"
+      "regionLevel": "繪圖分區層級",
+      "useAllData": "使用全部資料",
+      "partitionSource": "分區來源"
     },
     "placeholders": {
       "selectLevel": "請選擇層級"
@@ -78,14 +81,24 @@
     "options": {
       "level1": "一級分區",
       "level2": "二級分區",
-      "level3": "三級分區"
+      "level3": "三級分區",
+      "mapPartition": "地圖集分區",
+      "yindianPartition": "音典分區"
     },
     "buttons": {
       "run": "繪製地圖",
       "running": "繪製中..."
     },
+    "hints": {
+      "useAllData": "勾選後會使用系統全部地點資料，並隱藏手動地點輸入。"
+    },
     "messages": {
-      "dataFetchFailed": "取得資料失敗：{error}"
+      "dataFetchFailed": "取得資料失敗：{error}",
+      "allDataLoading": "正在載入全部地點資料...",
+      "allDataLoaded": "已載入 {count} 筆地點資料",
+      "allDataNotLoaded": "尚未載入全部地點資料",
+      "allDataLoadFailed": "載入全部地點資料失敗：{error}",
+      "allDataNoDrawablePoints": "全部資料中沒有可繪製的有效座標"
     }
   },
   "customTab": {
@@ -254,6 +267,38 @@
           }
         }
       }
+    },
+    "scopeModal": {
+      "title": "查看“{feature}”",
+      "loading": "正在加载特征数据...",
+      "loadFailed": "加载失败",
+      "emptyRows": "当前特征暂无可查看的地图数据",
+      "emptySelection": "当前选择下没有可展示的数据",
+      "emptyRegions": "当前特征没有可选分区",
+      "emptyLocations": "当前特征没有可选地点",
+      "confirm": "進入地圖",
+      "confirmSuccess": "已按當前選擇打開地圖",
+      "regionMeta": "{locations} 個地點 · {records} 條記錄",
+      "locationMeta": "{records} 條記錄 · {regions}",
+      "summary": {
+        "phonology": "類別",
+        "records": "記錄數",
+        "locations": "地點數",
+        "regions": "分區數",
+        "empty": "未填寫"
+      },
+      "clearSelection": "清空選擇",
+      "selectedCount": "已選 {count} 個地點",
+      "regionTitle": "分區",
+      "locationTitle": "地點",
+      "regionStates": {
+        "none": "未選",
+        "partial": "部分選擇",
+        "full": "已全選"
+      },
+      "singleLocationSuccess": "當前特徵僅命中一個地點，已直接打開地圖",
+      "recognizeHierarchy": "識別層級",
+      "searchPlaceholder": "搜索地點或分區"
     }
   },
   "mapLibre": {
@@ -376,6 +421,215 @@
       "chars": "字表比較",
       "zhonggu": "中古音比較",
       "tones": "調類比較"
+    }
+  },
+  "drawTab": {
+    "title": "地圖繪製",
+    "hint": "登入後可直接在地圖上繪製線與面，並匯出目前圖層或圖片。",
+    "auth": {
+      "loginRequired": "請先登入後使用地圖繪製",
+      "loginAction": "登入"
+    },
+    "buttons": {
+      "addLayer": "添加圖層",
+      "voronoi": "泰森多邊形",
+      "voronoiRunning": "計算中...",
+      "export": "匯出",
+      "drawingTools": "繪圖工具",
+      "saveToLocal": "本地草稿",
+      "cancel": "取消",
+      "saveAsNewLocal": "保存到本地",
+      "updateLocal": "更新到本地",
+      "restoreLocal": "從本地恢復",
+      "deleteLocal": "刪除本地",
+      "localStorageModalTitle": "本地草稿",
+      "layers": "圖層",
+      "addLayerModalTitle": "新建或匯入圖層",
+      "exportModalTitle": "匯出數據",
+      "createPointLayerDesc": "創建新的點位或標註圖層",
+      "createLineLayerDesc": "創建新的折線或路徑圖層",
+      "createPolygonLayerDesc": "創建新的多邊形或區域圖層",
+      "importLayerDesc": "支援匯入 GeoJSON / JSON / KML / KMZ / CSV 地理數據檔案",
+      "exportCurrentLayerDesc": "匯出目前選取的活動圖層為 GeoJSON 檔案",
+      "exportAllLayersDesc": "將所有繪製圖層合併匯出為單個 GeoJSON 檔案",
+      "exportImageDesc": "按所選範圍與參數匯出 PNG 地圖圖片",
+      "bringToFront": "置頂",
+      "sendToBack": "置底",
+      "collapseTools": "收起工具",
+      "expandTools": "展開工具",
+      "createPointLayer": "新建點圖層",
+      "createLineLayer": "新建線圖層",
+      "createPolygonLayer": "新建面圖層",
+      "drawPoint": "繪製點",
+      "drawLine": "繪製線",
+      "drawPolygon": "繪製面",
+      "select": "選擇",
+      "deleteSelected": "刪除選中",
+      "deleteLayer": "刪除圖層",
+      "moveLayerUp": "圖層上移",
+      "moveLayerDown": "圖層下移",
+      "clearAll": "清空全部",
+      "importLayer": "匯入圖層",
+      "exportLayer": "匯出圖層",
+      "exportAllLayers": "匯出全部圖層",
+      "exportImage": "匯出圖片",
+      "hideLayer": "隱藏圖層",
+      "showLayer": "顯示圖層",
+      "showAllLayers": "顯示全部圖層",
+      "hideAllLayers": "隱藏全部圖層",
+      "lockLayer": "鎖定圖層",
+      "unlockLayer": "解鎖圖層",
+      "saveLocalDraftModalTitle": "保存本地草稿"
+    },
+    "messages": {
+      "importLayerSuccess": "圖層匯入成功，共新增 {count} 個圖層",
+      "importLayerFailed": "圖層匯入失敗：{error}",
+      "clearAllConfirm": "確認清空目前所有繪製內容嗎？",
+      "clearAllSuccess": "已清空全部繪製內容",
+      "exportLayerSuccess": "圖層匯出成功",
+      "exportLayerFailed": "圖層匯出失敗：{error}",
+      "exportImageSuccess": "圖片匯出成功",
+      "exportImageFailed": "圖片匯出失敗：{error}",
+      "saveToLocalSuccess": "已保存到本地",
+      "saveToLocalFailed": "保存到本地失敗：{error}",
+      "updateLocalSuccess": "已更新本地草稿",
+      "restoreLocalSuccess": "已從本地恢復草稿",
+      "deleteLocalSuccess": "已刪除本地草稿",
+      "noLayersToSave": "目前沒有圖層可以保存",
+      "voronoiFailed": "泰森多邊形計算失敗：{error}",
+      "localDraftNameRequired": "請輸入草稿名稱",
+      "deleteLocalConfirm": "確認刪除目前本地草稿嗎？"
+    },
+    "voronoi": {
+      "panelHint": "基於地點分區資料計算泰森多邊形，可預覽或匯出為面圖層。",
+      "summaryTitle": "資料概覽",
+      "settingsTitle": "計算設定",
+      "actionsTitle": "操作",
+      "totalPoints": "全部點位",
+      "activePoints": "參與點位",
+      "ignoredPoints": "忽略點位",
+      "partitionGroups": "分區組數",
+      "loadPoints": "載入點位",
+      "loadingPoints": "載入中...",
+      "ignorePointsAction": "選擇忽略點",
+      "previewPoints": "預覽點位",
+      "exportToLayer": "匯出至圖層",
+      "calculate": "泰森多邊形",
+      "pointsLoaded": "已載入 {count} 個有效點位",
+      "ignoreUpdated": "已設定 {count} 個忽略點位",
+      "previewReady": "已預覽 {count} 個點位",
+      "calculated": "已計算 {count} 個泰森多邊形",
+      "ignoreModalTitle": "選擇忽略點",
+      "ignoreSelectedCount": "已選擇忽略 {count} 個點位",
+      "clearSelection": "清空選擇",
+      "regionTitle": "按分區選擇",
+      "locationTitle": "按地點選擇",
+      "emptyRegions": "暫無可選分區",
+      "emptyLocations": "暫無可選地點",
+      "regionMeta": "{locations} 個地點，{records} 條記錄",
+      "locationMeta": "{records} 條記錄；分區:{regions}",
+      "emptySummary": "無",
+      "confirmIgnore": "確認忽略",
+      "searchPlaceholder": "搜尋分區或地點",
+      "exportModalTitle": "匯出泰森多邊形圖層",
+      "exportSelectedCount": "已選分區",
+      "clipToNationalBorder": "按國界裁剪",
+      "clipToNationalBorderConfirmMessage": "此功能可能會非常卡，請耐心等待。",
+      "exportLayerListTitle": "選擇要匯出的分區圖層",
+      "exportListEmpty": "目前沒有可匯出的分區泰森圖",
+      "exportLayerMeta": "{count} 個點位",
+      "confirmExport": "匯出為多圖層",
+      "exportSelectionRequired": "請至少選擇 1 個分區圖層",
+      "exportSelectionLimit": "一次最多匯出 {count} 個分區圖層",
+      "exportEmptyAfterClip": "裁剪後沒有可匯出的圖層",
+      "exportLoadingTitle": "正在匯出國界裁剪圖層",
+      "exportLoadingProgress": "已完成 {current}/{total}",
+      "regionStates": {
+        "none": "未選擇",
+        "partial": "部分選擇",
+        "full": "已選擇"
+      }
+    },
+    "labels": {
+      "featureCount": "目前共 {count} 個圖形",
+      "styleHint": "點、線與面的預設樣式已設定，可直接繪製後匯出。",
+      "layerList": "圖層列表",
+      "selectedLayer": "當前選擇",
+      "emptyLayer": "未選擇圖層",
+      "emptyState": "暫無圖層，請先新建點圖層、線圖層、面圖層或匯入圖層",
+      "layer": "圖層",
+      "layerEditor": "圖層屬性",
+      "layerName": "圖層名稱",
+      "strokeColor": "線條顏色",
+      "fillColor": "填充顏色",
+      "fillOpacity": "填充透明度",
+      "strokeWidth": "線條寬度",
+      "pointColor": "點填充色",
+      "pointStrokeColor": "點描邊色",
+      "pointRadius": "點半徑",
+      "visible": "顯示圖層",
+      "locked": "鎖定圖層",
+      "basemap": "底圖",
+      "localDraftSelection": "選擇本地草稿",
+      "localDraftName": "草稿名稱",
+      "localDraftNamePlaceholder": "請輸入草稿名稱"
+    },
+    "geometry": {
+      "point": "點",
+      "line": "線",
+      "polygon": "面",
+      "layer": "圖層"
+    },
+    "imageExport": {
+      "modalTitle": "匯出圖片設定",
+      "previewTitle": "匯出預覽",
+      "confirmAction": "進入預覽",
+      "exportAction": "匯出圖片",
+      "previewGuideTitle": "預覽說明",
+      "previewHint": "請先確認預覽地圖中的範圍、尺寸與底圖顯示效果，確認無誤後再匯出。",
+      "previewCustomBboxHint": "請直接在右側預覽地圖中拖曳框選匯出範圍，框選結果會立即顯示。",
+      "summary": {
+        "layers": "圖層數",
+        "features": "圖形數",
+        "activeLayer": "當前圖層",
+        "outputSize": "輸出尺寸"
+      },
+      "sections": {
+        "range": "匯出範圍",
+        "size": "匯出尺寸",
+        "zoom": "匯出級別",
+        "content": "匯出內容"
+      },
+      "labels": {
+        "sizePreset": "尺寸預設",
+        "width": "寬度",
+        "height": "高度",
+        "zoomValue": "縮放級別"
+      },
+      "range": {
+        "currentView": "當前視圖",
+        "currentViewDesc": "按目前地圖可見區域匯出",
+        "selectedLayer": "選取圖層",
+        "selectedFeature": "選取要素",
+        "selectedFeatureDesc": "當前沒有選取要素，將沿用目前視圖",
+        "customBbox": "框選範圍",
+        "customBboxDesc": "在地圖上拖曳框選要匯出的範圍"
+      },
+      "size": {
+        "current": "目前尺寸",
+        "p1080": "1080p",
+        "p2k": "2K",
+        "custom": "自訂"
+      },
+      "zoom": {
+        "current": "目前級別",
+        "custom": "指定 zoom"
+      },
+      "content": {
+        "includeBasemap": "包含底圖",
+        "includeDrawLayers": "包含繪製圖層",
+        "onlySelectedLayers": "只匯出選定圖層"
+      }
     }
   }
 }

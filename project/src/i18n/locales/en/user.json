@@ -32,7 +32,7 @@
       "queryMiddleChinese": "📜 Middle Chinese lookup",
       "queryPhoneme": "🔊 Phoneme lookup",
       "queryTone": "🎵 Tone lookup",
-      "customRegions": "🗺️ Custom regions",
+      "customRegions": "🗂️ Custom regions",
       "locationCombination": "🎯 Phonological status combinations",
       "compareChars": "🔤 Character comparison",
       "compareMiddleChinese": "📜 Middle Chinese comparison",
@@ -49,7 +49,10 @@
       "corpusQuery": "🗂️ Corpus query",
       "guangdongVillages": "🏘️ Guangdong villages",
       "machineLearning": "🤖 Machine learning",
-      "hourlyApiUsage": "⏳ Hourly API calls"
+      "hourlyApiUsage": "⏳ Hourly API calls",
+      "evolution": "🥧 Evolution Analysis",
+      "comparePhonetic": "⚖️ Phonetic Comparison",
+      "drawMap": "✏️ Map Drawing"
     },
     "coreFeatures": {
       "phonologyQuery": "Phonology queries",
@@ -90,7 +93,7 @@
       "descriptionLabel": "Description (optional)",
       "descriptionPlaceholder": "Briefly describe what this region is for...",
       "locationsLabel": "Locations *",
-      "selectLocationsButton": "Select locations",
+      "selectLocationsButton": "Select",
       "selectLocationsTitle": "Select locations from the region tree",
       "locationInputPlaceholder": "Enter location names separated by spaces\nExample: Guangzhou Hong Kong Shenzhen Macao\nOr click the button to select from the tree",
       "locationHint": "Separate locations with spaces. The system will deduplicate them automatically. You can also select from the region tree.",

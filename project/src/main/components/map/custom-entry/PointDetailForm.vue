@@ -48,7 +48,7 @@
                 >
                   <div class="suggestion-info">
                     <span class="suggestion-location">{{ item.location }}</span>
-                    <span v-if="item.region" class="suggestion-region">({{ item.region }})</span>
+                    <!-- <span v-if="item.region" class="suggestion-region">({{ item.region }})</span> -->
                   </div>
                   <span :class="['suggestion-badge', { archive: !item.isCustom }]">
                     {{ item.isCustom ? t('customEntry.pointList.userPointBadge') : t('customEntry.pointList.publicPointBadge') }}
@@ -279,6 +279,7 @@ import {
   getDataByPoint,
   getDataByFeature,
 } from '@/api';
+import { ensureCustomDataPresence, invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js';
 import { userStore } from '@/main/store/store.js';
 import { formatCoord } from '@/utils/map/formatCoord.js';
 import MiniMapSelector from './MiniMapSelector.vue';
@@ -400,19 +401,33 @@ function handleLocationInput() {
 
   locationDebounceTimer = setTimeout(async () => {
     try {
-      const response = await batchMatch(location.value.trim(), false);
+      const currentQuery = location.value.trim();
+      const response = await batchMatch(currentQuery, false);
+
       let publicItems = [];
+
       if (response && response.length > 0) {
-        const items = response[0].items || [];
-        publicItems = Array.from(new Set(items))
-          .filter(item => item !== location.value.trim())
-          .map(item => ({
-            key: `public-${item}`,
-            location: item,
-            region: '',
-            coord: '',
-            isCustom: false
-          }));
+        const r = response[0];
+        const items = r.items || [];
+
+        let publicValues = Array.from(new Set(items));
+
+        // 匹配成功时，不要过滤掉 currentQuery；
+        // 如果 currentQuery 在后端返回项中，就把它提到最前面
+        if (r.success && currentQuery && publicValues.includes(currentQuery)) {
+          publicValues = [
+            currentQuery,
+            ...publicValues.filter(item => item !== currentQuery)
+          ];
+        }
+
+        publicItems = publicValues.map(item => ({
+          key: `public-${item}`,
+          location: item,
+          region: '',
+          coord: '',
+          isCustom: false
+        }));
       }
 
       const customLocations = new Set(matchedCustom.map(c => c.location));
@@ -637,8 +652,11 @@ async function handleSave() {
   });
 
   const tasks = [];
-  if (toCreate.length > 0) tasks.push(batchCreateCustomData(toCreate));
-  if (removedIds.value.length > 0) tasks.push(batchDeleteCustomData(removedIds.value));
+  const hasCreate = toCreate.length > 0;
+  const hasDelete = removedIds.value.length > 0;
+  const hasEdit = toEdit.length > 0;
+  if (hasCreate) tasks.push(batchCreateCustomData(toCreate));
+  if (hasDelete) tasks.push(batchDeleteCustomData(removedIds.value));
   toEdit.forEach((record) => tasks.push(editCustomData(record)));
 
   if (tasks.length === 0) {
@@ -657,6 +675,11 @@ async function handleSave() {
   }
 
   saveMessage.value = t('customEntry.pointDetail.messages.saveSuccess');
+  if (hasDelete || hasEdit) {
+    invalidateCustomDataPresence();
+  } else if (hasCreate) {
+    markCustomDataExists(true);
+  }
   isSaving.value = false;
   emit('saved');
 }
@@ -669,6 +692,13 @@ const featureError = ref('');
 const featureRecords = ref([]);
 
 const showFeatureDetail = async (feature, phonology) => {
+  const hasCustomData = await ensureCustomDataPresence();
+  if (!hasCustomData) {
+    featureError.value = '';
+    featureRecords.value = [];
+    return;
+  }
+
   selectedFeatureName.value = feature;
   selectedFeaturePhonology.value = phonology;
   isFeatureModalOpen.value = true;

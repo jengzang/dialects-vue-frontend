@@ -126,7 +126,8 @@
         "location": "地點",
         "locationHint": "僅支持單個地點分析",
         "query": "查詢",
-        "loading": "查詢中..."
+        "loading": "查詢中...",
+        "optimizeLinks": "優化連線"
       },
       "sankey": {
         "layer": "層級",

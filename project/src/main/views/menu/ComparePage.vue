@@ -1093,6 +1093,17 @@ const ZhongguRefCurrent = ref(null);  // For tab2 current selector
 // Tab5 独立的运行逻辑
 const runTab5Action = () => {
   if (isTab5RunDisabled.value) return
+
+  if (!userStore.authReady) {
+    return
+  }
+
+  if (!userStore.isAuthenticated) {
+    showWarning(t('user.dataPage.messages.authRequired'))
+    router.push('/auth')
+    return
+  }
+
   tabStates.tab5.queryLocations = [...tabStates.tab5.matchedLocations]
 }
 
@@ -2279,6 +2290,8 @@ export default {
   width: 100%;
   max-width: 760px;
   text-align: left;
+  padding: 0;
+  border:none;
 }
 
 .tab5-location-control-layout {
@@ -2298,7 +2311,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  padding: 1px 10px;
+  padding: 4px 10px;
   border-radius: 12px;
   border: 1px solid rgba(200, 200, 200, 0.35);
   background: var(--glass-light);

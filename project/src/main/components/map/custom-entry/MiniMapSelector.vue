@@ -278,7 +278,7 @@ onBeforeUnmount(() => {
 .mini-map-wrapper {
   position: relative;
   width: 100%;
-  height: 300px;
+  height: 400px;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid rgba(15, 23, 42, 0.08);

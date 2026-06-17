@@ -334,30 +334,22 @@ const buttonState = uiStore.buttonStates.query
 
 // 2️⃣ 监听 Tab 1 的输入框内容 (因为它没有子组件 emit 事件，需要手动监听)
 watch(hanziInput, (newVal) => {
-  // 如果为空或只有空白，则禁用
-  setTabContentDisabled('query', 'tab1', !newVal || newVal.trim() === '')
-}, { immediate: true })
+  const limited = limitEffectiveChars(newVal, 5);
+  setTabContentDisabled('query', 'tab1', limited.effectiveCount === 0);
+}, { immediate: true });
 
-function handleHanziInput(event) {
-  const rawValue = event?.target?.value ?? ''
-  const limited = limitEffectiveChars(rawValue, 10)
-
-  if (rawValue !== limited.value) {
-    hanziInput.value = limited.value
-    if (event?.target) {
-      event.target.value = limited.value
-    }
-  }
+function handleHanziInput() {
+  const limited = limitEffectiveChars(hanziInput.value, 5);
 
   if (limited.hasExtraEffectiveChars) {
     if (!hasShownCharLimitWarning.value) {
-      showWarning(t('query.tab1.maxCharsWarning', { max: 10 }))
-      hasShownCharLimitWarning.value = true
+      showWarning(t('query.tab1.maxCharsWarning', { max: 5 }));
+      hasShownCharLimitWarning.value = true;
     }
-    return
+    return;
   }
 
-  hasShownCharLimitWarning.value = false
+  hasShownCharLimitWarning.value = false;
 }
 
 // 3️⃣ 同步当前 Tab 到 store
@@ -579,7 +571,18 @@ const runAction = async () => {
     globalPayload.value = JSON.parse(JSON.stringify(finalPayload))
   }
   else if  (currentTab.value === 'tab1'){
-    const chars = hanziInput.value;
+    const limited = limitEffectiveChars(hanziInput.value, 5);
+    const chars = limited.value;
+
+    if (!chars) {
+      showWarning(t('query.button.invalid'));
+      setRunning('query', false);
+      return;
+    }
+
+    // 可选：点击查询后，把输入框同步成最终查询内容
+    // 这一步不会影响输入法，因为已经是提交时了
+    hanziInput.value = chars;
     payload = {
       chars: chars,
       locations: locationList,

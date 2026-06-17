@@ -35,6 +35,15 @@
             <span class="glass-indicator"></span>
             {{ t('phonology.phonology.evolution.controls.sankey') }}
           </label>
+          <label class="mode-radio-label sankey-toggle">
+            <input
+                v-model="optimizeSankeyLayout"
+                type="checkbox"
+                class="hidden-radio"
+            />
+            <span class="glass-indicator"></span>
+            {{ t('phonology.phonology.evolution.controls.optimizeLinks') }}
+          </label>
         </div>
       </div>
 
@@ -117,7 +126,7 @@
     </div>
 
     <!-- 加载状态 -->
-    <div v-if="isLoading" class="loading-state">
+    <div v-if="isLoading && !rawData" class="loading-state">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>{{ t('phonology.phonology.evolution.states.loading') }}</p>
     </div>
@@ -126,9 +135,24 @@
     <div
       v-else-if="rawData && currentPieData.length > 0"
       class="pie-container"
-      :class="{ 'has-mobile-detail-card': showMobilePieDetailCard }"
+      :class="{
+        'has-mobile-detail-card': showMobilePieDetailCard,
+        'is-rendering': isLoading
+      }"
     >
-      <div v-if="showSankey" ref="sankeyContainerRef" class="sankey-chart"></div>
+      <div
+        v-if="isLoading"
+        class="visualization-rendering-mask"
+      >
+        <div class="ui-loading--page" aria-hidden="true"></div>
+      </div>
+
+      <div
+        v-if="showSankey"
+        ref="sankeyContainerRef"
+        class="sankey-chart"
+        :style="{ height: sankeyHeight }"
+      ></div>
       <div v-else class="pie-grid" :style="gridStyle" ref="pieGridRef">
         <div
           v-for="(pie, index) in currentPieData"
@@ -257,6 +281,7 @@ const level2Column = ref('')
 const selectedLocations = ref([])
 const matchedLocations = ref([])
 const showSankey = ref(false)
+const optimizeSankeyLayout = ref(false)
 
 // 查询状态
 const isLoading = ref(false)
@@ -275,6 +300,7 @@ const sankeyContainerRef = ref(null)
 const chartInstances = ref([])
 const sankeyChartInstance = ref(null)
 const containerWidth = ref(1200)
+const sankeyHeight = ref('680px')
 const isMobileLayout = ref(false)
 const selectedPieDetail = ref(null)
 
@@ -448,11 +474,10 @@ const handleQuery = async () => {
     errorMessage.value = error.message || t('phonology.phonology.evolution.errors.queryFailed')
     console.error('Query error:', error)
   } finally {
-    isLoading.value = false
     if (shouldRefreshVisualization) {
-      await nextTick()
-      updateContainerSize()
-      await renderCurrentVisualization()
+      await renderCurrentVisualizationWithLoading()
+    } else {
+      isLoading.value = false
     }
   }
 }
@@ -493,6 +518,13 @@ const updateMobileLayout = () => {
 
   isMobileLayout.value = window.matchMedia(MOBILE_LAYOUT_MEDIA_QUERY).matches
 }
+
+const waitForPaint = () =>
+  new Promise(resolve => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolve)
+    })
+  })
 
 // ========== 饼图渲染 ==========
 const generatePieChartOption = (pieData) => {
@@ -799,8 +831,36 @@ const buildSankeyData = () => {
   }
 }
 
+const updateSankeyHeight = (nodes) => {
+  if (!Array.isArray(nodes) || nodes.length === 0) {
+    sankeyHeight.value = isMobileLayout.value ? '520px' : '680px'
+    return
+  }
+
+  const layerNodeCounts = new Map()
+
+  nodes.forEach(node => {
+    const layer = node.layer || 'default'
+    layerNodeCounts.set(layer, (layerNodeCounts.get(layer) || 0) + 1)
+  })
+
+  const maxNodesInLayer = Math.max(...layerNodeCounts.values(), 1)
+
+  const minHeight = isMobileLayout.value ? 520 : 680
+  const maxHeight = isMobileLayout.value ? 1100 : 1400
+  const heightPerNode = isMobileLayout.value ? 30 : 36
+
+  const calculatedHeight = Math.min(
+    maxHeight,
+    Math.max(minHeight, maxNodesInLayer * heightPerNode + 180)
+  )
+
+  sankeyHeight.value = `${calculatedHeight}px`
+}
+
 const generateSankeyOption = () => {
   const sankeyData = buildSankeyData()
+  updateSankeyHeight(sankeyData.nodes)
   const title = queryMode.value === 'by_value'
     ? t('phonology.phonology.evolution.sankey.titles.byValue', { feature: currentFeature.value })
     : t('phonology.phonology.evolution.sankey.titles.byStatus', { feature: currentFeature.value })
@@ -837,6 +897,7 @@ const generateSankeyOption = () => {
       right: '12%',  // 距离右侧的边距（覆盖默认的 20%）
       top: '10%',   // 距离顶部的边距（根据你的标题高度微调）
       bottom: '5%', // 距离底部的边距
+      layoutIterations: optimizeSankeyLayout.value ? 200 : 0,
       data: sankeyData.nodes,
       links: sankeyData.links,
       nodeAlign: 'justify',
@@ -876,14 +937,22 @@ const renderSankey = async () => {
     return
   }
 
+  const option = generateSankeyOption()
+
+  await nextTick()
+
   sankeyChartInstance.value = echarts.init(sankeyContainerRef.value, null, {
     renderer: 'canvas',
     useDirtyRect: true
   })
 
-  sankeyChartInstance.value.setOption(generateSankeyOption(), {
+  sankeyChartInstance.value.setOption(option, {
     notMerge: true,
     lazyUpdate: false
+  })
+
+  requestAnimationFrame(() => {
+    sankeyChartInstance.value?.resize()
   })
 }
 
@@ -895,6 +964,21 @@ const renderCurrentVisualization = async () => {
 
   clearSankeyChart()
   await renderAllPies()
+}
+
+const renderCurrentVisualizationWithLoading = async () => {
+  isLoading.value = true
+
+  await nextTick()
+  await waitForPaint()
+
+  try {
+    updateContainerSize()
+    await renderCurrentVisualization()
+    await waitForPaint()
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const handleWindowResize = async () => {
@@ -923,7 +1007,7 @@ const handleWindowResize = async () => {
 watch(currentFeature, async () => {
   closeMobilePieDetail()
   if (showSankey.value) {
-    await renderCurrentVisualization()
+    await renderCurrentVisualizationWithLoading()
     return
   }
 
@@ -961,9 +1045,13 @@ watch(showSankey, async () => {
   if (showSankey.value) {
     closeMobilePieDetail()
   }
-  await nextTick()
-  updateContainerSize()
-  await renderCurrentVisualization()
+  await renderCurrentVisualizationWithLoading()
+})
+
+watch(optimizeSankeyLayout, async () => {
+  if (!showSankey.value) return
+
+  await renderCurrentVisualizationWithLoading()
 })
 
 watch(queryMode, async () => {
@@ -1114,8 +1202,10 @@ onUnmounted(() => {
 
 /* Radio选择器（液态玻璃态） */
 .mode-selector {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
   gap: 20px;
+  align-items: center;
 }
 
 .mode-radio-label {
@@ -1273,6 +1363,25 @@ onUnmounted(() => {
   width: 100%;
 }
 
+.visualization-rendering-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+
+.pie-container.is-rendering .pie-grid,
+.pie-container.is-rendering .sankey-chart {
+  opacity: 0.45;
+}
+
 .pie-grid {
   width: 90dvw;
   position: relative;
@@ -1296,7 +1405,7 @@ onUnmounted(() => {
 
 .sankey-chart {
   width: min(92dvw, 1400px);
-  height: 680px;
+  min-height: 520px;
   margin: 0 auto;
 }
 
@@ -1480,7 +1589,8 @@ onUnmounted(() => {
   }
 
   .mode-selector {
-    gap: 10px;
+    grid-template-columns: repeat(2, max-content);
+    gap: 10px 14px;
   }
 
   .feature-tabs {
@@ -1497,7 +1607,7 @@ onUnmounted(() => {
 
   .sankey-chart {
     width: 100%;
-    height: 520px;
+    min-height: 520px;
   }
 }
 

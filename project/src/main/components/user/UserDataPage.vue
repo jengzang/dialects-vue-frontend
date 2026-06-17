@@ -329,6 +329,7 @@ import { useRoute, useRouter } from 'vue-router'
 import AppModal from '@/components/common/AppModal.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import { batchCreateCustomData, batchDeleteCustomData, editCustomData, getAllCustomData } from '@/api'
+import { invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
 import { userStore } from '@/main/store/store.js'
 import { showConfirm, showError, showSuccess, showWarning } from '@/utils/message.js'
@@ -496,6 +497,7 @@ const closeEditModal = () => {
 const submitEdit = async () => {
   try {
     await editCustomData(editingRecord.value)
+    invalidateCustomDataPresence()
     showSuccess(t('user.dataPage.messages.updateSuccess'))
     closeEditModal()
     await fetchData()
@@ -595,6 +597,7 @@ const submitBatchCreate = async () => {
 
   try {
     const response = await batchCreateCustomData(data)
+    markCustomDataExists(true)
     showSuccess(response.message || t('user.dataPage.messages.batchCreateSuccess', { count: data.length }))
     closeBatchCreateModal()
     await fetchData()
@@ -665,6 +668,7 @@ const submitBatchEdit = async () => {
     }))
 
     await batchCreateCustomData(newData)
+    markCustomDataExists(true)
 
     showSuccess(t('user.dataPage.messages.batchEditSuccess', { count: validRows.length }))
     closeBatchEditModal()
@@ -694,6 +698,7 @@ const handleBatchDelete = async () => {
 
   try {
     const response = await batchDeleteCustomData(selectedRecords.value)
+    invalidateCustomDataPresence()
     showSuccess(response.message || t('user.dataPage.messages.deleteSuccess'))
     selectedRecords.value = []
     await fetchData()

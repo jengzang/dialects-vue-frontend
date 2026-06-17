@@ -101,7 +101,7 @@
       <Transition name="submenu-fade">
         <div
           v-if="activeSubmenu"
-          class="submenu-panel main-sidebar-submenu-panel"
+          class="submenu-panel main-submenu-panel"
           :style="{
             top: submenuPosition.top + 'px',
             left: submenuPosition.left + 'px'
@@ -236,7 +236,7 @@ import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 // import { clearToken, getToken, saveToken } from '../../api/auth/auth.js'
-import { getTodayVisits, getTotalVisits, getVisitHistory } from '@/api/logs/index.js'
+import { useVisitStats, ensureVisitHistory } from '@/composables/useVisitStats.js'
 import { useSidebarConfig } from '@/main/config/index.js'
 import {
   filterVisibleMenuBarTabs,
@@ -255,6 +255,13 @@ const route = useRoute()
 const router = useRouter()
 const isSidebarVisible = ref(false)  // 控制边栏显示
 const menuConfigRef = useSidebarConfig()
+const {
+  todayVisits,
+  totalVisits,
+  visitHistory,
+  loadingVisitHistory: loadingStats,
+  ensureVisitStats
+} = useVisitStats()
 
 // Submenu state management
 const activeSubmenu = ref(null)  // Currently open submenu key
@@ -292,11 +299,7 @@ const filteredMenuConfig = computed(() => {
 const menuConfigData = computed(() => menuConfigRef.value)
 
 // 访问统计相关
-const todayVisits = ref(0)
-const totalVisits = ref(0)
-const isStatsExpanded = ref(false)
-const visitHistory = ref([])
-const loadingStats = ref(false)
+const isStatsExpanded = ref(false);
 
 // 过滤可见的 tabs（label 已在 TabsConfig 中定义）
 const allMenuTabs = useMenuBarConfig()
@@ -364,13 +367,7 @@ const goToAuthPage = () => {
 // 获取访问统计数据
 async function fetchVisitStats() {
   try {
-    const [todayData, totalData] = await Promise.all([
-      getTodayVisits(),
-      getTotalVisits()
-    ])
-
-    todayVisits.value = todayData?.today_visits || 0
-    totalVisits.value = totalData?.total_visits || 0
+    await ensureVisitStats()
   } catch (error) {
     console.error('获取访问统计失败:', error)
   }
@@ -393,37 +390,10 @@ function closeStatsPanel() {
 
 // 获取访问历史
 async function fetchVisitHistory() {
-  loadingStats.value = true
   try {
-    const today = new Date();
-    const startDate = new Date(today);
-    startDate.setDate(today.getDate() - 60); // 30天前
-    const endDate = today;
-
-    const start_date = startDate.toISOString().split('T')[0];  // 格式化为 'YYYY-MM-DD'
-    const end_date = endDate.toISOString().split('T')[0];      // 格式化为 'YYYY-MM-DD'
-
-    const data = await getVisitHistory({ start_date, end_date, limit: 9999 })
-
-
-    // 按日期汇总数据
-    const dateMap = new Map()
-    data?.data?.forEach(item => {
-      const date = item.date
-      if (!dateMap.has(date)) {
-        dateMap.set(date, 0)
-      }
-      dateMap.set(date, dateMap.get(date) + item.count)
-    })
-
-    // 转换为数组并排序
-    visitHistory.value = Array.from(dateMap.entries())
-      .map(([date, count]) => ({ date, count }))
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
+    await ensureVisitHistory()
   } catch (error) {
     console.error('获取访问历史失败:', error)
-  } finally {
-    loadingStats.value = false
   }
 }
 
@@ -678,7 +648,6 @@ onBeforeUnmount(() => {
 
 .menu-item:hover {
   background: rgba(0, 122, 255, 0.12);
-  height: 90%;
   color: #007aff;
 }
 

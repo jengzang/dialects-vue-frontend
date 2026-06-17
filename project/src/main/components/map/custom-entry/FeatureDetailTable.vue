@@ -251,6 +251,7 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import { batchDeleteCustomData, getDataByFeature, getDataByPoint } from '@/api';
+import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js';
 import { showConfirm, showWarning } from '@/utils/message.js';
 import MiniMapSelector from './MiniMapSelector.vue';
 import FeatureRecordEditorModal from './FeatureRecordEditorModal.vue';
@@ -312,6 +313,13 @@ const loadRecords = async () => {
   const phonology = localPhonology.value;
 
   if (!featureName) {
+    errorMessage.value = '';
+    rows.value = [];
+    return;
+  }
+
+  const hasCustomData = await ensureCustomDataPresence();
+  if (!hasCustomData) {
     errorMessage.value = '';
     rows.value = [];
     return;
@@ -468,6 +476,8 @@ watch(
 
 .feature-detail-main,
 .feature-detail-side {
+  max-height: 60dvh;
+  overflow-y: auto;
   padding: 18px;
 }
 

@@ -93,6 +93,19 @@
       "title": "语言设置",
       "description": "选择您偏好的界面语言"
     },
+    "interfaceMode": {
+      "title": "界面模式",
+      "description": "选择标准或简洁界面风格；简洁模式会关闭动画、阴影、模糊等视觉效果，以提升低性能设备上的流畅度。",
+      "label": "当前模式",
+      "options": {
+        "default": "标准模式",
+        "compact": "简洁模式"
+      },
+      "help": {
+        "default": "保留当前动画与视觉效果。",
+        "compact": "关闭动画、阴影、模糊等视觉效果，适合低性能设备。"
+      }
+    },
     "characterTable": {
       "title": "字集设置",
       "description": "选择新查询默认使用的字集"

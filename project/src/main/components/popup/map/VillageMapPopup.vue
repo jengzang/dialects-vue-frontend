@@ -575,6 +575,7 @@ const handleKeydown = (e) => {
 // 弹窗打开时初始化地图
 watch(() => props.visible, (newVal) => {
   if (newVal) {
+    displayMode.value = 'name'
     nextTick(() => initMap())
   } else {
     cleanupMap()

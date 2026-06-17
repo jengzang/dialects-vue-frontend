@@ -51,7 +51,6 @@
               >
                 <div class="suggestion-info">
                   <span class="suggestion-location">{{ item.location }}</span>
-                  <span v-if="item.region" class="suggestion-region">({{ item.region }})</span>
                 </div>
                 <span :class="['suggestion-badge', { archive: !item.isCustom }]">
                   {{ item.isCustom ? t('customEntry.pointList.userPointBadge') : t('customEntry.pointList.publicPointBadge') }}
@@ -156,6 +155,7 @@ import { showConfirm, showWarning } from '@/utils/message.js';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import { batchCreateCustomData, editCustomData, getDataByFeature, getDataByPoint, getUserPoints } from '@/api';
+import { ensureCustomDataPresence, invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js';
 import { userStore } from '@/main/store/store.js';
 import { formatCoord } from '@/utils/map/formatCoord.js';
 import MiniMapSelector from './MiniMapSelector.vue';
@@ -286,19 +286,33 @@ function handleLocationInput() {
 
   debounceTimer = setTimeout(async () => {
     try {
-      const response = await batchMatch(location.value.trim(), false);
+      const currentQuery = location.value.trim();
+      const response = await batchMatch(currentQuery, false);
+
       let publicItems = [];
+
       if (response && response.length > 0) {
-        const items = response[0].items || [];
-        publicItems = Array.from(new Set(items))
-          .filter(item => item !== location.value.trim())
-          .map(item => ({
-            key: `public-${item}`,
-            location: item,
-            region: '',
-            coord: '',
-            isCustom: false
-          }));
+        const r = response[0];
+        const items = r.items || [];
+
+        let publicValues = Array.from(new Set(items));
+
+        // 匹配成功時，如果當前輸入本身在後端返回項中，
+        // 就把它提到最前面，但不要過濾掉它
+        if (r.success && currentQuery && publicValues.includes(currentQuery)) {
+          publicValues = [
+            currentQuery,
+            ...publicValues.filter(item => item !== currentQuery)
+          ];
+        }
+
+        publicItems = publicValues.map(item => ({
+          key: `public-${item}`,
+          location: item,
+          region: '',
+          coord: '',
+          isCustom: false
+        }));
       }
 
       const customLocations = new Set(matchedCustom.map(c => c.location));
@@ -405,6 +419,12 @@ async function checkDuplicateLocation() {
   const featureName = props.feature?.['特徵'] || props.feature?.feature || '';
   const phonology = props.feature?.['聲韻調'] || props.feature?.phonology || '';
   if (!featureName || !location.value.trim() || !region.value.trim()) return false;
+
+  const hasCustomData = await ensureCustomDataPresence();
+  if (!hasCustomData) {
+    return false;
+  }
+
   try {
     const response = await getDataByFeature(featureName, phonology);
     const records = Array.isArray(response?.data) ? response.data : [];
@@ -474,8 +494,10 @@ async function handleSave() {
 
   if (props.record?.created_at) {
     await editCustomData({ ...payload, created_at: props.record.created_at });
+    invalidateCustomDataPresence()
   } else {
     await batchCreateCustomData([payload]);
+    markCustomDataExists(true)
   }
 
   isSaving.value = false;

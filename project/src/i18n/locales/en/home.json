@@ -21,16 +21,18 @@
     "compare": {
       "title": "Dialect Comparison",
       "desc": "Compare phonological features across dialects",
-      "compareChar": "Character Comparison - Compare pronunciation differences",
-      "compareMiddle": "Middle Chinese Comparison - Compare Middle Chinese evolution",
-      "compareTone": "Tone Comparison - Compare tonal systems"
-    },
+      "compareChar": "Compare Characters - Compare differences in initials, finals, and tones across locations",
+        "compareMiddle": "Compare Middle Chinese - Compare locations by phonological categories",
+        "compareTone": "Compare Tone Categories - Compare tone systems across locations",
+        "comparePhonetic": "Compare Phonetic Values - Visualize phonetic differences across locations with a Sankey diagram"
+      },
     "map": {
       "title": "Map Visualization",
       "desc": "Geolinguistic perspective presentation",
       "dialectMap": "Dialect Map - Display query results on map",
-      "regionMap": "Regional Mapping - Draw dialect maps by region",
-      "customMap": "Custom Mapping - Add personal data for mapping"
+      "regionMap": "Dialect Zoning Map - Draw by Atlas or YinDian Division",
+      "customMap": "Custom Data - Add personal data for mapping",
+      "drawMap": "Drawing Tool - GIS Online Mapping & Voronoi Polygons"
     },
     "phonology": {
       "title": "Phonological Analysis",
@@ -93,6 +95,10 @@
   "roadmap": {
     "sectionTitle": "Features in Development",
     "sectionSubtitle": "Upcoming new features",
+    "charsGeneration": {
+      "title": "Character Table Inference Tool",
+      "desc": "A character table inference tool based on phonological categories. Generate a complete character table from a small set of characters, with multiple rhyme books available."
+    },
     "phoneticsToolbox": {
       "title": "Shaozi's Phonetics Toolbox",
       "desc": "Batch acoustic parameter estimation, multi-algorithm pitch detection, EGG signal analysis, glottal parameter extraction"
@@ -107,7 +113,7 @@
     },
     "ipaTTS": {
       "title": "IPA to Speech Synthesis",
-      "desc": "Real-time conversion from International Phonetic Alphabet to speech, multi-dialect voice support"
+      "desc": "Real-time conversion from International Phonetic Alphabet to speech, multi-dialect voice support（long-term plan）"
     },
     "dialectBot": {
       "title": "Dialect Chatbot",

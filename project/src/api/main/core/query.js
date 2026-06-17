@@ -40,7 +40,8 @@ export async function searchZhongGu(params) {
   try {
     return await api('/api/ZhongGu', {
       method: 'POST',
-      body: params
+      body: params,
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Search ZhongGu error:', error)
@@ -64,7 +65,8 @@ export async function searchYinWei(params) {
   try {
     return await api('/api/YinWei', {
       method: 'POST',
-      body: params
+      body: params,
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Search YinWei error:', error)
@@ -153,7 +155,9 @@ export async function searchChars(params) {
       query.append('response_mode', params.response_mode)
     }
 
-    const data = await api(`/api/search_chars/?${query.toString()}`)
+    const data = await api(`/api/search_chars/?${query.toString()}`, {
+      loginPromptEligible: true
+    })
 
     if (params.response_mode === 'compact') {
       return normalizeCompactSearchCharsResponse(data)
@@ -206,7 +210,9 @@ export async function searchTones(params) {
       query.append('region_mode', params.region_mode)
     }
 
-    return await api(`/api/search_tones/?${query.toString()}`)
+    return await api(`/api/search_tones/?${query.toString()}`, {
+      loginPromptEligible: true
+    })
   } catch (error) {
     console.error('Search tones error:', error)
     showError(error.message || '調查詢失敗')
@@ -259,7 +265,9 @@ export async function getFeatureCounts(params) {
       })
     }
 
-    return await api(`/api/feature_counts?${query.toString()}`)
+    return await api(`/api/feature_counts?${query.toString()}`, {
+      loginPromptEligible: true
+    })
   } catch (error) {
     console.error('Get feature counts error:', error)
     showError(error.message || '獲取音位特徵計數失敗')
@@ -287,7 +295,8 @@ export async function getFeatureStats(params) {
   try {
     return await api('/api/feature_stats', {
       method: 'POST',
-      body: params
+      body: params,
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Get feature stats error:', error)

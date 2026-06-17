@@ -113,7 +113,7 @@
       <Transition name="submenu-fade">
         <div
           v-if="activeSubmenu"
-          class="submenu-panel"
+          class="main-submenu-panel"
           :style="{
             top: submenuPosition.top + 'px',
             left: submenuPosition.left + 'px'
@@ -694,7 +694,7 @@ const goToAuthPage = () => {
 }
 
 /* Submenu panel - liquid glass style */
-.submenu-panel {
+.main-submenu-panel {
   position: fixed;
   width: auto;
   max-width: min(300px, calc(100vw - 20px));
@@ -758,7 +758,7 @@ const goToAuthPage = () => {
 
 /* Mobile responsive */
 @media (max-aspect-ratio: 1/1) {
-  .submenu-panel {
+  .main-submenu-panel {
     max-width: calc(100vw - 20px);
   }
 

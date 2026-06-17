@@ -111,10 +111,10 @@
           <div class="tree-selector-container">
             <div
               v-if="loadingFeatures"
-              class="tree-loading-state"
+              class="loading-state-base"
             >
-              <span class="spinner-icon">⏳</span>
-              {{ t('customEntry.featureDetail.loading') || '加载特征列表中...' }}
+              <div class="ui-loading--page" aria-hidden="true"></div>
+              <p>{{ t('customEntry.featureDetail.loading') || '加载特征列表中...' }}</p>
             </div>
 
             <div
@@ -207,6 +207,16 @@
 
     <CustomDataEntryModal v-model="isEntryModalOpen" />
 
+    <FeatureScopeSelectionModal
+      v-model="isFeatureScopeModalOpen"
+      :feature-meta="selectedFeatureMeta"
+      :regions="availableRegions"
+      :locations="availableLocations"
+      :loading="loadingFeatureRows"
+      :error-message="featureRowsError"
+      @confirm="confirmFeatureScopeSelection"
+    />
+
     <CustomTabHelpModal v-model="isHelpModalOpen" />
   </div>
 </template>
@@ -218,13 +228,16 @@ import { useI18n } from 'vue-i18n';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import CustomDataEntryModal from '@/main/components/map/custom-entry/CustomDataEntryModal.vue';
 import CustomTabHelpModal from '@/main/components/popup/map/CustomTabHelpModal.vue';
-import { getUserFeatures } from '@/api';
+import { getUserFeatures, getDataByFeature } from '@/api';
+import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js';
 import {
   userStore,
-  resultCache,
   mapStore,
+  resultCache,
 } from '@/main/store/store.js';
 import { showSuccess, showWarning, showError } from '@/utils/message.js';
+import FeatureScopeSelectionModal from '@/main/components/map/custom-entry/FeatureScopeSelectionModal.vue';
+import { addCustomFeatureDataWithoutApi } from '@/utils/map/MapData.js';
 
 const router = useRouter();
 const route = useRoute();
@@ -235,6 +248,13 @@ const isHelpModalOpen = ref(false);
 const isEntryModalOpen = ref(false);
 const isSearchOpen = ref(false);
 const searchInputRef = ref(null);
+const isFeatureScopeModalOpen = ref(false);
+const loadingFeatureRows = ref(false);
+const featureRowsError = ref('');
+const currentFeatureRows = ref([]);
+const selectedFeatureMeta = ref(null);
+const availableRegions = ref([]);
+const availableLocations = ref([]);
 
 const searchQuery = ref('');
 const userFeatures = ref([]);
@@ -370,8 +390,74 @@ const toggleCategory = (category) => {
   expandedCategories.value[category] = !expandedCategories.value[category];
 };
 
+const buildFeatureSelectionOptions = (rows) => {
+  const regionMap = new Map();
+  const locationMap = new Map();
+
+  rows.forEach((row) => {
+    const locationName = String(row['簡稱'] || '').trim();
+    const regionName = String(row['音典分區'] || '').trim();
+
+    if (locationName) {
+      if (!locationMap.has(locationName)) {
+        locationMap.set(locationName, {
+          name: locationName,
+          recordCount: 0,
+          regionNames: new Set(),
+        });
+      }
+
+      const locationEntry = locationMap.get(locationName);
+      locationEntry.recordCount += 1;
+      if (regionName) {
+        locationEntry.regionNames.add(regionName);
+      }
+    }
+
+    if (regionName) {
+      if (!regionMap.has(regionName)) {
+        regionMap.set(regionName, {
+          name: regionName,
+          rows: [],
+          locations: new Set(),
+          recordCount: 0,
+        });
+      }
+
+      const regionEntry = regionMap.get(regionName);
+      regionEntry.rows.push(row);
+      regionEntry.recordCount += 1;
+      if (locationName) {
+        regionEntry.locations.add(locationName);
+      }
+    }
+  });
+
+  availableRegions.value = Array.from(regionMap.values()).map((item) => ({
+    name: item.name,
+    rows: item.rows,
+    locationCount: item.locations.size,
+    recordCount: item.recordCount,
+  }));
+
+  availableLocations.value = Array.from(locationMap.values()).map((item) => ({
+    name: item.name,
+    recordCount: item.recordCount,
+    regionNames: Array.from(item.regionNames),
+  }));
+};
+
+const resetFeatureScopeState = () => {
+  currentFeatureRows.value = [];
+  availableRegions.value = [];
+  availableLocations.value = [];
+  selectedFeatureMeta.value = null;
+  featureRowsError.value = '';
+  loadingFeatureRows.value = false;
+  isFeatureScopeModalOpen.value = false;
+};
+
 const selectFeatureItem = async (item) => {
-  // console.log('Selected feature item:', item);
   const featureName = item['特徵'] || item.feature || '';
   const phonology = item['聲韻調'] || item.phonology || '';
 
@@ -379,30 +465,109 @@ const selectFeatureItem = async (item) => {
     return;
   }
 
-  try {
-    mapStore.mergedData = [];
-    resultCache.latestResults = [];
-    mapStore.selectedFeature = featureName;
-    mapStore.selectedFeaturePhonology = phonology;
-    resultCache.features = [];
-    mapStore.mapData = null;
+  const hasCustomData = await ensureCustomDataPresence();
+  if (!hasCustomData) {
+    userFeatures.value = [];
+    resetFeatureScopeState();
+    return;
+  }
 
-    const query = {
-      feature: featureName
+  loadingFeatureRows.value = true;
+  featureRowsError.value = '';
+  currentFeatureRows.value = [];
+  availableRegions.value = [];
+  availableLocations.value = [];
+  selectedFeatureMeta.value = {
+    feature: featureName,
+    phonology,
+    recordCount: 0,
+    locationCount: 0,
+    regionCount: 0,
+  };
+  isFeatureScopeModalOpen.value = true;
+
+  try {
+    const response = await getDataByFeature(featureName, phonology);
+
+    if (!response || response.success !== true) {
+      throw new Error(response?.message || t('map.customTab.scopeModal.loadFailed'));
+    }
+
+    const rows = Array.isArray(response.data) ? response.data : [];
+
+    if (rows.length === 0) {
+      throw new Error(t('map.customTab.scopeModal.emptyRows'));
+    }
+
+    currentFeatureRows.value = rows;
+    buildFeatureSelectionOptions(rows);
+
+    selectedFeatureMeta.value = {
+      feature: featureName,
+      phonology,
+      recordCount: rows.length,
+      locationCount: availableLocations.value.length,
+      regionCount: availableRegions.value.length,
     };
 
-    if (phonology) {
-      query.phonology = phonology;
+    if (availableLocations.value.length === 1) {
+      mapStore.mapData = null;
+      mapStore.mergedData = [];
+      resultCache.mode = '查中古';
+      // resultCache.latestResults = [];
+      addCustomFeatureDataWithoutApi(rows, featureName, phonology);
+      currentFeatureRows.value = [];
+      availableRegions.value = [];
+      availableLocations.value = [];
+      selectedFeatureMeta.value = null;
+      isFeatureScopeModalOpen.value = false;
+      loadingFeatureRows.value = false;
+      await router.push({
+        path: '/menu/map/view',
+        query: {}
+      });
+      showSuccess(t('map.customTab.scopeModal.singleLocationSuccess'));
+      return;
     }
-    // console.log('Navigating with query:', query);
-    await router.replace({
-      path: '/menu/map/view',
-      query
-    });
-
-    showSuccess(t('map.customTab.messages.loading'));
   } catch (error) {
-    console.error('跳转失败:', error);
+    featureRowsError.value = error.message || String(error);
+  } finally {
+    loadingFeatureRows.value = false;
+  }
+};
+
+const confirmFeatureScopeSelection = async ({ selectedLocations }) => {
+  try {
+    const featureMeta = selectedFeatureMeta.value;
+
+    if (!featureMeta?.feature) {
+      return;
+    }
+
+    const selectedLocationSet = new Set(selectedLocations);
+    const filteredRows = currentFeatureRows.value.filter((row) => selectedLocationSet.has(String(row['簡稱'] || '').trim()));
+
+    if (!filteredRows.length) {
+      throw new Error(t('map.customTab.scopeModal.emptySelection'));
+    }
+
+    mapStore.mapData = null;
+    mapStore.mergedData = [];
+    resultCache.mode = '查中古';
+    // resultCache.latestResults = [];
+    addCustomFeatureDataWithoutApi(filteredRows, featureMeta.feature, featureMeta.phonology || '');
+    currentFeatureRows.value = [];
+    availableRegions.value = [];
+    availableLocations.value = [];
+    selectedFeatureMeta.value = null;
+    featureRowsError.value = '';
+    isFeatureScopeModalOpen.value = false;
+    await router.push({
+      path: '/menu/map/view',
+      query: {}
+    });
+    showSuccess(t('map.customTab.scopeModal.confirmSuccess'));
+  } catch (error) {
     showError(t('map.customTab.messages.searchFailed', { error: error.message || error }));
   }
 };
@@ -423,6 +588,13 @@ const goToDataManager = () => {
 const fetchUserFeatures = async () => {
   if (!userStore.isAuthenticated) {
     userFeatures.value = [];
+    return;
+  }
+
+  const hasCustomData = await ensureCustomDataPresence();
+  if (!hasCustomData) {
+    userFeatures.value = [];
+    resetFeatureScopeState();
     return;
   }
 
@@ -1067,7 +1239,7 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .floating-search {
-    top: 20dvh;
+    top: 36dvh;
     left: auto;
 
     &.active {

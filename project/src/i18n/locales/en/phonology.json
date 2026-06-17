@@ -1,7 +1,7 @@
 {
   "phonology": {
     "matrix": {
-      "title": "Phonology Query",
+      "title": "Phonology",
       "features": {
         "initial": "Initial",
         "final": "Final",
@@ -40,7 +40,7 @@
       }
     },
     "custom": {
-      "title": "Phoneme Classification",
+      "title": "Phoneme",
       "features": {
         "initial": "Initial",
         "final": "Final",
@@ -126,7 +126,8 @@
         "location": "Location",
         "locationHint": "Only single-location analysis is supported",
         "query": "Query",
-        "loading": "Querying..."
+        "loading": "Querying...",
+        "optimizeLinks": "Optimize links"
       },
       "sankey": {
         "layer": "Layer",
@@ -189,7 +190,7 @@
   },
   "tabs": {
     "matrix": "Phonology",
-    "custom": "Phoneme Classification",
+    "custom": "Phoneme",
     "count": "Syllable Count",
     "evolution": "Evolution"
   }

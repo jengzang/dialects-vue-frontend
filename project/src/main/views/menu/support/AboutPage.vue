@@ -204,6 +204,29 @@
             width="100%"
           />
         </div>
+
+        <div class="setting-section">
+          <h3 class="section-title">{{ $t('navigation.settings.interfaceMode.title') }}</h3>
+          <p class="section-description">{{ $t('navigation.settings.interfaceMode.description') }}</p>
+
+          <div class="mode-group" role="radiogroup" :aria-label="$t('navigation.settings.interfaceMode.label')">
+            <button
+              v-for="option in interfaceModeOptions"
+              :key="option.value"
+              type="button"
+              class="mode-option"
+              :class="{ active: interfaceMode === option.value }"
+              :aria-pressed="interfaceMode === option.value"
+              @click="changeInterfaceMode(option.value)"
+            >
+              <div class="mode-option-header">
+                <span class="mode-option-label">{{ option.label }}</span>
+                <span v-if="interfaceMode === option.value" class="mode-option-check">&check;</span>
+              </div>
+              <div class="mode-option-description">{{ option.description }}</div>
+            </button>
+          </div>
+        </div>
       </div>
     </template>
   </TabsContainer>
@@ -221,6 +244,12 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { setLocale } from '@/i18n/index.js'
 import { SUPPORTED_LOCALES } from '@/i18n/localeDetector.js'
+import {
+  UI_MODE_DEFAULT,
+  UI_MODE_COMPACT,
+  getStoredInterfaceMode,
+  setInterfaceMode,
+} from '@/composables/core/uiPreferences.js'
 import { showSuccess } from '@/utils/message.js'
 import SupportPopup from '@/main/components/popup/SupportPopup.vue'
 import TabsContainer from '@/components/common/TabsContainer.vue'
@@ -294,6 +323,21 @@ const languages = ref([
   SUPPORTED_LOCALES['en']
 ])
 
+const interfaceMode = ref(getStoredInterfaceMode())
+
+const interfaceModeOptions = computed(() => [
+  {
+    value: UI_MODE_DEFAULT,
+    label: t('navigation.settings.interfaceMode.options.default'),
+    description: t('navigation.settings.interfaceMode.help.default')
+  },
+  {
+    value: UI_MODE_COMPACT,
+    label: t('navigation.settings.interfaceMode.options.compact'),
+    description: t('navigation.settings.interfaceMode.help.compact')
+  }
+])
+
 const characterTableOptions = computed(() =>
   Object.entries(TABLE_COLUMN_SCHEMAS).map(([tableName, schema]) => ({
     value: tableName,
@@ -313,6 +357,15 @@ function changeLanguage(newLocale) {
   setLocale(newLocale)
   showSuccess(t('messages.success.languageChanged'))
   setTimeout(() => window.location.reload(), 500)
+}
+
+function changeInterfaceMode(mode) {
+  if (mode === interfaceMode.value) {
+    return
+  }
+
+  interfaceMode.value = setInterfaceMode(mode)
+  showSuccess(t('messages.success.interfaceModeChanged'))
 }
 
 function resolveTabRoute(tabName) {
@@ -688,12 +741,69 @@ p em.emoji {
 }
 
 .setting-section {
-  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mode-group {
+  display: flex;
+  gap: 12px;
+}
+
+.mode-option {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.mode-option:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: #007aff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+}
+
+.mode-option.active {
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(0, 122, 255, 0.05));
+  border-color: #007aff;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.mode-option-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.mode-option-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.mode-option-description {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.mode-option-check {
+  font-size: 24px;
+  color: #007aff;
+  font-weight: bold;
 }
 
 .section-title {
@@ -711,7 +821,6 @@ p em.emoji {
 
 .language-options {
   display: flex;
-  flex-direction: column;
   gap: 12px;
 }
 
@@ -742,7 +851,7 @@ p em.emoji {
 
 .language-flag {
   font-size: 32px;
-  margin-right: 16px;
+  margin-right: 12px;
 }
 
 .language-info {
@@ -782,7 +891,7 @@ p em.emoji {
 
   .language-flag {
     font-size: 28px;
-    margin-right: 12px;
+    margin-right: 8px;
   }
 
   .language-name {
@@ -791,6 +900,12 @@ p em.emoji {
 
   .language-code {
     font-size: 11px;
+  }
+  .language-options {
+    flex-direction: column;
+  }
+  .mode-group {
+    flex-direction: column;
   }
 }
 

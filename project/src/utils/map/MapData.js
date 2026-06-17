@@ -314,13 +314,110 @@ export async function addCustomFeatureDataOld(featuresToAdd, locations = [], reg
  * @param {string} phonology - 声韵调，可为空
  * @returns {Promise<Array>} 合并后的地图数据
  */
+export function buildMergedDataFromFeatureRows(rows, feature, phonology = '') {
+    const targetFeature = feature?.trim?.() || ''
+
+    if (!targetFeature) {
+        throw new Error('请提供要加载的特征')
+    }
+
+    const normalizedRows = Array.isArray(rows) ? rows : []
+    const customItems = []
+
+    normalizedRows.forEach(row => {
+        const coordParts = String(row["經緯度"] || '')
+            .split(',')
+            .map(item => Number(item.trim()))
+
+        const coordinate = (
+            coordParts.length >= 2 &&
+            Number.isFinite(coordParts[0]) &&
+            Number.isFinite(coordParts[1])
+        )
+            ? [coordParts[0], coordParts[1]]
+            : null
+
+        const value = row["值"] == null ? '' : String(row["值"])
+        const rowFeature = row["特徵"] || targetFeature
+
+        if (!row["簡稱"] || !rowFeature || !value || !coordinate) {
+            return
+        }
+
+        customItems.push({
+            location: row["簡稱"],
+            feature: rowFeature,
+            value,
+            coordinate,
+            maxValue: value,
+            notes: row["說明"] || '',
+            iscustoms: 1,
+            detailContent: [],
+            created_at: row["created_at"] || null,
+            phonology: row["聲韻調"] || phonology || '',
+            yindianRegion: row["音典分區"] || ''
+        })
+    })
+
+    if (customItems.length === 0) {
+        throw new Error('后端返回了数据，但没有可绘制的有效坐标或特征值')
+    }
+
+    let defaultZoom = 10
+    let defaultCenter = [113.2644, 23.1291]
+
+    const validCoords = customItems.map(item => item.coordinate)
+    const sumLng = validCoords.reduce((sum, coord) => sum + coord[0], 0)
+    const sumLat = validCoords.reduce((sum, coord) => sum + coord[1], 0)
+
+    defaultCenter = [
+        sumLng / validCoords.length,
+        sumLat / validCoords.length
+    ]
+
+    const lngs = validCoords.map(coord => coord[0])
+    const lats = validCoords.map(coord => coord[1])
+
+    const lngRange = Math.max(...lngs) - Math.min(...lngs)
+    const latRange = Math.max(...lats) - Math.min(...lats)
+    const maxRange = Math.max(lngRange, latRange)
+
+    if (maxRange < 0.1) defaultZoom = 12
+    else if (maxRange < 0.5) defaultZoom = 10
+    else if (maxRange < 1) defaultZoom = 9
+    else if (maxRange < 2) defaultZoom = 8
+    else if (maxRange < 5) defaultZoom = 7
+    else defaultZoom = 6
+
+    const mergedData = customItems.map(item => ({
+        ...item,
+        zoomLevel: defaultZoom,
+        centerCoordinate: defaultCenter
+    }))
+
+    assignColorToMergedData(mergedData)
+
+    return mergedData
+}
+
+export function addCustomFeatureDataWithoutApi(rows, feature, phonology = '') {
+    const mergedData = buildMergedDataFromFeatureRows(rows, feature, phonology)
+    mapStore.mergedData = mergedData
+    mapStore.selectedFeature = feature?.trim?.() || ''
+    mapStore.selectedFeaturePhonology = phonology || ''
+    mapStore.showCustomData = true
+    mapStore.mode = 'feature'
+    resultCache.features = phonology ? [phonology] : []
+    requestMapFitView()
+
+    return mergedData
+}
+
 export async function addCustomFeatureData(feature, phonology = '') {
-    // 1. 验证用户认证
     if (!userStore.isAuthenticated || userStore.role === 'anonymous') {
         throw new Error('需要登录才能加载自定义特征')
     }
 
-    // 2. 验证特征参数
     const targetFeature = feature?.trim?.() || ''
 
     if (!targetFeature) {
@@ -328,7 +425,6 @@ export async function addCustomFeatureData(feature, phonology = '') {
     }
 
     try {
-        // 3. 请求新后端 API
         const response = await getDataByFeature(targetFeature, phonology || '')
 
         if (!response || response.success !== true) {
@@ -341,114 +437,7 @@ export async function addCustomFeatureData(feature, phonology = '') {
             throw new Error('未找到匹配的自定义数据')
         }
 
-        // 4. 复制当前已有地图数据
-        const currentData = JSON.parse(JSON.stringify(mapStore.mergedData || []))
-
-        // 5. 把新后端数据转换成 mergedData item
-        const customItems = []
-
-        rows.forEach(row => {
-            // 后端返回 "113.905829,23.064639"，这里转成 [113.905829, 23.064639]
-            const coordParts = String(row["經緯度"] || '')
-                .split(',')
-                .map(item => Number(item.trim()))
-
-            const coordinate = (
-                coordParts.length >= 2 &&
-                Number.isFinite(coordParts[0]) &&
-                Number.isFinite(coordParts[1])
-            )
-                ? [coordParts[0], coordParts[1]]
-                : null
-
-            const value = row["值"] == null ? '' : String(row["值"])
-
-            if (!row["簡稱"] || !row["特徵"] || !value || !coordinate) {
-                return
-            }
-
-            customItems.push({
-                location: row["簡稱"],
-                feature: row["特徵"],
-                value,
-                coordinate,
-                maxValue: value,
-                notes: row["說明"] || '',
-                iscustoms: 1,
-                detailContent: [],
-                created_at: row["created_at"] || null,
-
-                // 保留后端附加信息，不影响绘图
-                phonology: row["聲韻調"] || '',
-                yindianRegion: row["音典分區"] || ''
-            })
-        })
-
-        if (customItems.length === 0) {
-            throw new Error('后端返回了数据，但没有可绘制的有效坐标或特征值')
-        }
-
-        // 6. 计算默认视角
-        let defaultZoom = 10
-        let defaultCenter = [113.2644, 23.1291]
-
-        if (currentData.length > 0) {
-            defaultZoom = currentData[0].zoomLevel || 10
-            defaultCenter = currentData[0].centerCoordinate || [113.2644, 23.1291]
-        } else {
-            const validCoords = customItems.map(item => item.coordinate)
-
-            const sumLng = validCoords.reduce((sum, coord) => sum + coord[0], 0)
-            const sumLat = validCoords.reduce((sum, coord) => sum + coord[1], 0)
-
-            defaultCenter = [
-                sumLng / validCoords.length,
-                sumLat / validCoords.length
-            ]
-
-            const lngs = validCoords.map(coord => coord[0])
-            const lats = validCoords.map(coord => coord[1])
-
-            const lngRange = Math.max(...lngs) - Math.min(...lngs)
-            const latRange = Math.max(...lats) - Math.min(...lats)
-            const maxRange = Math.max(lngRange, latRange)
-
-            if (maxRange < 0.1) defaultZoom = 12
-            else if (maxRange < 0.5) defaultZoom = 10
-            else if (maxRange < 1) defaultZoom = 9
-            else if (maxRange < 2) defaultZoom = 8
-            else if (maxRange < 5) defaultZoom = 7
-            else defaultZoom = 6
-        }
-
-        // 7. 合并数据，避免重复添加
-        customItems.forEach(newItem => {
-            const itemWithView = {
-                ...newItem,
-                zoomLevel: defaultZoom,
-                centerCoordinate: defaultCenter
-            }
-
-            const exists = currentData.some(oldItem =>
-                oldItem.iscustoms === 1 &&
-                oldItem.feature === itemWithView.feature &&
-                oldItem.value === itemWithView.value &&
-                oldItem.created_at === itemWithView.created_at &&
-                JSON.stringify(oldItem.coordinate) === JSON.stringify(itemWithView.coordinate)
-            )
-
-            if (!exists) {
-                currentData.push(itemWithView)
-            }
-        })
-
-        // 8. 分配颜色
-        assignColorToMergedData(currentData)
-
-        // 9. 更新 store，触发 MapLibre 重绘
-        mapStore.mergedData = currentData
-
-        return currentData
+        return addCustomFeatureDataWithoutApi(rows, targetFeature, phonology)
     } catch (error) {
         console.error('加载自定义特征失败:', error)
         throw new Error('加载特征失败：' + (error.message || error))
@@ -675,3 +664,6 @@ export function generateTonesMergedData(resultData, locationsData) {
     return mergedData;
 }
 
+export function requestMapFitView() {
+  mapStore.fitViewKey = Date.now()
+}

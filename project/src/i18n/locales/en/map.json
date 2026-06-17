@@ -1,8 +1,9 @@
 {
   "tabs": {
     "map": "Map",
-    "divide": "Regional Map",
-    "custom": "Custom"
+    "divide": "Regions",
+    "custom": "Custom",
+    "draw": "Map Drawing"
   },
   "placeholder": {
     "selectFeature": "Please select a feature first"
@@ -70,7 +71,9 @@
     "title": "Regional Mapping",
     "hint": "Draw dialect distribution maps by yindian or map atlas regional levels.<br>Colors are assigned automatically.",
     "labels": {
-      "regionLevel": "Regional Level"
+      "regionLevel": "Regional Level",
+      "useAllData": "Use All Data",
+      "partitionSource": "Partition Source"
     },
     "placeholders": {
       "selectLevel": "Please select a level"
@@ -78,14 +81,24 @@
     "options": {
       "level1": "Level 1 Region",
       "level2": "Level 2 Region",
-      "level3": "Level 3 Region"
+      "level3": "Level 3 Region",
+      "mapPartition": "Atlas Partition",
+      "yindianPartition": "Yindian Partition"
     },
     "buttons": {
       "run": "Draw Map",
       "running": "Drawing..."
     },
+    "hints": {
+      "useAllData": "When enabled, all built-in location data is used and manual location input is hidden."
+    },
     "messages": {
-      "dataFetchFailed": "Failed to fetch data: {error}"
+      "dataFetchFailed": "Failed to fetch data: {error}",
+      "allDataLoading": "Loading all location data...",
+      "allDataLoaded": "Loaded {count} location records",
+      "allDataNotLoaded": "All location data has not been loaded yet",
+      "allDataLoadFailed": "Failed to load all location data: {error}",
+      "allDataNoDrawablePoints": "No drawable coordinates found in all data"
     }
   },
   "customTab": {
@@ -254,6 +267,38 @@
           }
         }
       }
+    },
+    "scopeModal": {
+      "title": "View “{feature}”",
+      "loading": "Loading feature data...",
+      "loadFailed": "Load failed",
+      "emptyRows": "No map data is available for this feature.",
+      "emptySelection": "There is no data to display for the current selection.",
+      "emptyRegions": "No regions are available for this feature.",
+      "emptyLocations": "No locations are available for this feature.",
+      "confirm": "Open map",
+      "regionMeta": "{locations} locations · {records} records",
+      "locationMeta": "{records} records · {regions}",
+      "summary": {
+        "phonology": "Category",
+        "records": "Records",
+        "locations": "Locations",
+        "regions": "Regions",
+        "empty": "Not set"
+      },
+      "confirmSuccess": "Opened the map with the current selection",
+      "clearSelection": "Clear selection",
+      "selectedCount": "{count} locations selected",
+      "regionTitle": "Regions",
+      "locationTitle": "Locations",
+      "regionStates": {
+        "none": "Not selected",
+        "partial": "Partially selected",
+        "full": "Fully selected"
+      },
+      "singleLocationSuccess": "Only one location matched this feature, so the map was opened directly",
+      "recognizeHierarchy": "Recognize hierarchy",
+      "searchPlaceholder": "search for locations or regions"
     }
   },
   "mapLibre": {
@@ -269,9 +314,9 @@
       "disabled": "Off"
     },
     "buttons": {
-      "reset": "Reset View",
+      "reset": "Reset",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit Fullscreen",
+      "exitFullscreen": "Exit",
       "delete": "Delete",
       "detail": "Details"
     },
@@ -338,9 +383,9 @@
       "definition": "Definition"
     },
     "buttons": {
-      "reset": "Reset View",
+      "reset": "Reset",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit Fullscreen"
+      "exitFullscreen": "Exit"
     },
     "popup": {
       "title": "Details",
@@ -365,9 +410,9 @@
       "dialect": "Dialect"
     },
     "buttons": {
-      "reset": "Reset View",
+      "reset": "Reset",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit Fullscreen"
+      "exitFullscreen": "Exit"
     }
   },
   "legend": {
@@ -376,6 +421,215 @@
       "chars": "Character Comparison",
       "zhonggu": "Middle Chinese Comparison",
       "tones": "Tone Category Comparison"
+    }
+  },
+  "drawTab": {
+    "title": "Map Drawing",
+    "hint": "Sign in to draw lines and polygons on the map, then export the current layer or an image.",
+    "auth": {
+      "loginRequired": "Please sign in before using map drawing",
+      "loginAction": "Login"
+    },
+    "buttons": {
+      "addLayer": "Add Layer",
+      "voronoi": "Voronoi",
+      "voronoiRunning": "Calculating...",
+      "export": "Export",
+      "drawingTools": "Drawing Tools",
+      "saveToLocal": "Local Drafts",
+      "cancel": "Cancel",
+      "saveAsNewLocal": "Save Locally",
+      "updateLocal": "Update Local Draft",
+      "restoreLocal": "Restore Local Draft",
+      "deleteLocal": "Delete Local Draft",
+      "localStorageModalTitle": "Local Drafts",
+      "layers": "Layers",
+      "addLayerModalTitle": "Create or Import Layer",
+      "exportModalTitle": "Export Data",
+      "createPointLayerDesc": "Create a new point or marker layer",
+      "createLineLayerDesc": "Create a new line or path layer",
+      "createPolygonLayerDesc": "Create a new polygon or area layer",
+      "importLayerDesc": "Support importing GeoJSON / JSON / KML / KMZ / CSV geographical data files",
+      "exportCurrentLayerDesc": "Export the currently selected active layer as a GeoJSON file",
+      "exportAllLayersDesc": "Merge and export all drawing layers as a single GeoJSON file",
+      "exportImageDesc": "Export a PNG map image using the selected range and options",
+      "bringToFront": "Bring to Front",
+      "sendToBack": "Send to Back",
+      "collapseTools": "Collapse Tools",
+      "expandTools": "Expand Tools",
+      "createPointLayer": "New Point Layer",
+      "createLineLayer": "New Line Layer",
+      "createPolygonLayer": "New Polygon Layer",
+      "drawPoint": "Draw Point",
+      "drawLine": "Draw Line",
+      "drawPolygon": "Draw Polygon",
+      "select": "Select",
+      "deleteSelected": "Delete Selected",
+      "deleteLayer": "Delete Layer",
+      "moveLayerUp": "Move Layer Up",
+      "moveLayerDown": "Move Layer Down",
+      "clearAll": "Clear All",
+      "importLayer": "Import Layer",
+      "exportLayer": "Export Layer",
+      "exportAllLayers": "Export All Layers",
+      "exportImage": "Export Image",
+      "hideLayer": "Hide Layer",
+      "showLayer": "Show Layer",
+      "showAllLayers": "Show All Layers",
+      "hideAllLayers": "Hide All Layers",
+      "lockLayer": "Lock Layer",
+      "unlockLayer": "Unlock Layer",
+      "saveLocalDraftModalTitle": "Save Local Draft"
+    },
+    "messages": {
+      "importLayerSuccess": "Layer imported successfully, added {count} layer(s)",
+      "importLayerFailed": "Failed to import layer: {error}",
+      "clearAllConfirm": "Clear all current drawings?",
+      "clearAllSuccess": "All drawings cleared",
+      "exportLayerSuccess": "Layer exported successfully",
+      "exportLayerFailed": "Failed to export layer: {error}",
+      "exportImageSuccess": "Image exported successfully",
+      "exportImageFailed": "Failed to export image: {error}",
+      "saveToLocalSuccess": "Saved locally",
+      "saveToLocalFailed": "Failed to save locally: {error}",
+      "updateLocalSuccess": "Local draft updated",
+      "restoreLocalSuccess": "Local draft restored",
+      "deleteLocalSuccess": "Local draft deleted",
+      "noLayersToSave": "There are no layers to save",
+      "voronoiFailed": "Voronoi calculation failed: {error}",
+      "localDraftNameRequired": "Please enter a draft name",
+      "deleteLocalConfirm": "Delete the current local draft?"
+    },
+    "voronoi": {
+      "panelHint": "Calculate Voronoi polygons from location partition data. You can preview them or export them as a polygon layer.",
+      "summaryTitle": "Data Summary",
+      "settingsTitle": "Calculation Settings",
+      "actionsTitle": "Actions",
+      "totalPoints": "All Points",
+      "activePoints": "Included Points",
+      "ignoredPoints": "Ignored Points",
+      "partitionGroups": "Partition Groups",
+      "loadPoints": "Load Points",
+      "loadingPoints": "Loading...",
+      "ignorePointsAction": "Choose Ignored Points",
+      "previewPoints": "Preview Points",
+      "exportToLayer": "Export to Layer",
+      "calculate": "Voronoi",
+      "pointsLoaded": "Loaded {count} valid point(s)",
+      "ignoreUpdated": "Set {count} ignored point(s)",
+      "previewReady": "Previewing {count} point(s)",
+      "calculated": "Calculated {count} Voronoi polygon(s)",
+      "ignoreModalTitle": "Choose Ignored Points",
+      "ignoreSelectedCount": "{count} point(s) selected to ignore",
+      "clearSelection": "Clear Selection",
+      "regionTitle": "Select by Partition",
+      "locationTitle": "Select by Location",
+      "emptyRegions": "No partitions available",
+      "emptyLocations": "No locations available",
+      "regionMeta": "{locations} location(s), {records} record(s)",
+      "locationMeta": "{records} record(s); partitions: {regions}",
+      "emptySummary": "None",
+      "confirmIgnore": "Confirm Ignored Points",
+      "searchPlaceholder": "Search regions or locations",
+      "exportModalTitle": "Export Voronoi Layers",
+      "exportSelectedCount": "Selected Partitions",
+      "clipToNationalBorder": "Clip to National Border",
+      "clipToNationalBorderConfirmMessage": "This operation may be very slow. Please be patient.",
+      "exportLayerListTitle": "Choose Partition Layers to Export",
+      "exportListEmpty": "No partition Voronoi layers are available for export",
+      "exportLayerMeta": "{count} point(s)",
+      "confirmExport": "Export as Multiple Layers",
+      "exportSelectionRequired": "Select at least one partition layer",
+      "exportSelectionLimit": "You can export up to {count} partition layers at once",
+      "exportEmptyAfterClip": "No layers remained after clipping",
+      "exportLoadingTitle": "Exporting clipped border layers",
+      "exportLoadingProgress": "Completed {current}/{total}",
+      "regionStates": {
+        "none": "Not selected",
+        "partial": "Partially selected",
+        "full": "Selected"
+      }
+    },
+    "labels": {
+      "featureCount": "{count} shapes currently on the map",
+      "styleHint": "Default point, line, and polygon styles are ready to use and export.",
+      "layerList": "Layers",
+      "selectedLayer": "Selected",
+      "emptyLayer": "No layer selected",
+      "emptyState": "No layers yet. Create a point layer, line layer, polygon layer, or import a layer first",
+      "layer": "Layer",
+      "layerEditor": "Layer Properties",
+      "layerName": "Layer Name",
+      "strokeColor": "Stroke Color",
+      "fillColor": "Fill Color",
+      "fillOpacity": "Fill Opacity",
+      "strokeWidth": "Stroke Width",
+      "pointColor": "Point Fill Color",
+      "pointStrokeColor": "Point Stroke Color",
+      "pointRadius": "Point Radius",
+      "visible": "Visible",
+      "locked": "Locked",
+      "basemap": "Basemap",
+      "localDraftSelection": "Select Local Draft",
+      "localDraftName": "Draft Name",
+      "localDraftNamePlaceholder": "Enter draft name"
+    },
+    "geometry": {
+      "point": "Point",
+      "line": "Line",
+      "polygon": "Polygon",
+      "layer": "Layer"
+    },
+    "imageExport": {
+      "modalTitle": "Image Export Settings",
+      "previewTitle": "Export Preview",
+      "confirmAction": "Open Preview",
+      "exportAction": "Export Image",
+      "previewGuideTitle": "Preview Guide",
+      "previewHint": "Check the preview map for the final range, size, and basemap visibility before exporting.",
+      "previewCustomBboxHint": "Drag directly on the preview map to box-select the export area. The selection updates immediately.",
+      "summary": {
+        "layers": "Layers",
+        "features": "Features",
+        "activeLayer": "Active Layer",
+        "outputSize": "Output Size"
+      },
+      "sections": {
+        "range": "Export Range",
+        "size": "Export Size",
+        "zoom": "Export Zoom",
+        "content": "Export Content"
+      },
+      "labels": {
+        "sizePreset": "Size Preset",
+        "width": "Width",
+        "height": "Height",
+        "zoomValue": "Zoom Level"
+      },
+      "range": {
+        "currentView": "Current View",
+        "currentViewDesc": "Export the currently visible map extent",
+        "selectedLayer": "Selected Layer",
+        "selectedFeature": "Selected Feature",
+        "selectedFeatureDesc": "No feature is currently selected. The current view will be used.",
+        "customBbox": "Box Selection",
+        "customBboxDesc": "Drag on the map to box-select the export area"
+      },
+      "size": {
+        "current": "Current Size",
+        "p1080": "1080p",
+        "p2k": "2K",
+        "custom": "Custom"
+      },
+      "zoom": {
+        "current": "Current Zoom",
+        "custom": "Specify zoom"
+      },
+      "content": {
+        "includeBasemap": "Include basemap",
+        "includeDrawLayers": "Include draw layers",
+        "onlySelectedLayers": "Only selected layers"
+      }
     }
   }
 }

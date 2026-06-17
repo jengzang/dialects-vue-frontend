@@ -27,30 +27,31 @@
 
     <div id="stickyContextBar" class="sticky-label2" style="display: block;" v-if="hasData">
       <div class="sticky-bar-inner">
-        <!-- Display mode -->
-        <span
-          v-if="!isEditingLocation"
-          id="stickyContextText"
-          @click="startEditingLocation"
-          style="cursor: pointer;"
-        >
-          📍 {{ currentStickyLocation }}
-        </span>
+        <div class="stickybar-location-wrapper" ref="locationWrapperRef">
+          <div
+            id="stickyContextText"
+            class="stickybar-location-trigger"
+            @click.stop="toggleLocationDropdown"
+          >
+            📍 {{ currentStickyLocation || t('result.resultList.locationPlaceholder') }}
+          </div>
 
-        <!-- Edit mode -->
-        <input
-          v-else
-          ref="locationInputRef"
-          v-model="editLocationInput"
-          @blur="submitLocationEdit"
-          @keyup.enter="submitLocationEdit"
-          @keyup.esc="cancelLocationEdit"
-          class="location-edit-input"
-          :placeholder="t('result.resultList.locationPlaceholder')"
-        />
+          <div class="stickybar-location-dropdown" :class="{ open: isLocationDropdownOpen }">
+            <button
+              v-for="location in availableLocations"
+              :key="location"
+              type="button"
+              class="stickybar-location-option"
+              :class="{ active: location === currentStickyLocation }"
+              @click.stop="selectLocation(location)"
+            >
+              {{ location }}
+            </button>
+          </div>
+        </div>
 
         <div class="stickybar-filter-wrapper" ref="filterWrapperRef">
-          <div class="stickybar-filter-trigger" @click.stop="isFilterOpen = !isFilterOpen">
+          <div class="stickybar-filter-trigger" @click.stop="toggleFilterDropdown">
             {{ filterTriggerText }}
           </div>
           <div class="stickybar-filter-dropdown" :class="{ open: isFilterOpen }">
@@ -114,11 +115,10 @@ const visibleRows = ref(30);
 const scrollContainerRef = ref(null);
 const isCondensedMode = ref(props.isCondensed);
 const currentStickyLocation = ref('');
-const isEditingLocation = ref(false);
-const editLocationInput = ref('');
-const locationInputRef = ref(null);
 const isFilterOpen = ref(false);
+const isLocationDropdownOpen = ref(false);
 const filterWrapperRef = ref(null);
+const locationWrapperRef = ref(null);
 const selectedValues = ref([]);
 const panelHeight = ref('100%');
 
@@ -137,12 +137,22 @@ const availableValueStats = ref([]);
 // ... (calculateStats, filteredData, sortedData, displayedData, filterTriggerText 等逻辑完全保留)
 function calculateStats() {
   const totals = new Map();
+
   tableData.value.forEach(item => {
     const groupValues = item.分組值 || {};
-    const val = Object.values(groupValues)[0];
+    const feature = Object.keys(groupValues)[0] || '';
+    const val = groupValues[feature];
     const share = Number(item.佔比) || 0;
-    if (val) totals.set(val, (totals.get(val) || 0) + share);
+
+    if (feature) {
+      totals.set(feature, (totals.get(feature) || 0) + share);
+    }
+
+    if (val) {
+      totals.set(val, (totals.get(val) || 0) + share);
+    }
   });
+
   availableValueStats.value = [...totals.entries()]
       .map(([value, totalShare]) => ({ value, totalShare }))
       .sort((a, b) => b.totalShare - a.totalShare);
@@ -154,7 +164,7 @@ const filteredData = computed(() => {
     const feature = Object.keys(groupValues)[0] || '';
     const value = groupValues[feature];
 
-    if (selected.length > 0 && !selected.includes(value)) return false;
+    if (selected.length > 0 && !selected.includes(feature) && !selected.includes(value)) return false;
     if (!isCondensedMode.value) return true;
 
     const count = item.字數 || 0;
@@ -168,10 +178,31 @@ const filteredData = computed(() => {
 const sortedData = computed(() => {
   return [...filteredData.value].sort((a, b) => {
     if (a.地點 !== b.地點) return a.地點.localeCompare(b.地點);
+
+    const aGroupValues = a.分組值 || {};
+    const bGroupValues = b.分組值 || {};
+    const aFeature = Object.keys(aGroupValues)[0] || '';
+    const bFeature = Object.keys(bGroupValues)[0] || '';
+
+    if (aFeature !== bFeature) return aFeature.localeCompare(bFeature);
+
     return b.佔比 - a.佔比;
   });
 });
 const displayedData = computed(() => sortedData.value.slice(0, visibleRows.value));
+const availableLocations = computed(() => {
+  const locations = [];
+  const seen = new Set();
+
+  sortedData.value.forEach(item => {
+    const location = item.地點;
+    if (!location || seen.has(location)) return;
+    seen.add(location);
+    locations.push(location);
+  });
+
+  return locations;
+});
 const filterTriggerText = computed(() => {
   if (selectedValues.value.length === 0) return '🎯 ' + t('result.resultList.filter.default');
   const recent = selectedValues.value.slice(-3);
@@ -288,52 +319,43 @@ const handleFeatureConfirm = ({ location, feature, field }) => {
   }
 };
 
-// Start editing location
-const startEditingLocation = () => {
-  isEditingLocation.value = true;
-  editLocationInput.value = currentStickyLocation.value;
-  nextTick(() => {
-    locationInputRef.value?.focus();
-    locationInputRef.value?.select();
-  });
-};
-
-// Cancel editing
-const cancelLocationEdit = () => {
-  isEditingLocation.value = false;
-  editLocationInput.value = '';
-};
-
-// Submit location edit
-const submitLocationEdit = () => {
-  const targetLocation = editLocationInput.value.trim();
-
-  if (!targetLocation || targetLocation === currentStickyLocation.value) {
-    // No change or empty input - just cancel
-    cancelLocationEdit();
-    return;
+const toggleLocationDropdown = () => {
+  isLocationDropdownOpen.value = !isLocationDropdownOpen.value;
+  if (isLocationDropdownOpen.value) {
+    isFilterOpen.value = false;
   }
+};
 
-  // Find matching location in data
+const toggleFilterDropdown = () => {
+  isFilterOpen.value = !isFilterOpen.value;
+  if (isFilterOpen.value) {
+    isLocationDropdownOpen.value = false;
+  }
+};
+
+const selectLocation = (locationName) => {
   const matchingIndex = sortedData.value.findIndex(
-    item => item.地點 === targetLocation
+    item => item.地點 === locationName
   );
 
   if (matchingIndex === -1) {
-    // No match found - revert to original
-    cancelLocationEdit();
+    isLocationDropdownOpen.value = false;
     return;
   }
 
-  // Match found - scroll to that location
-  scrollToLocation(targetLocation, matchingIndex);
-  cancelLocationEdit();
+  scrollToLocation(locationName, matchingIndex);
+  isLocationDropdownOpen.value = false;
 };
 
 // Scroll to specific location
-const scrollToLocation = (locationName, dataIndex) => {
+const scrollToLocation = async (locationName, dataIndex) => {
   const content = scrollContainerRef.value;
   if (!content) return;
+
+  if (typeof dataIndex === 'number' && dataIndex >= visibleRows.value) {
+    visibleRows.value = Math.min(sortedData.value.length, dataIndex + 20);
+    await nextTick();
+  }
 
   // Find the location element in DOM
   const locationElements = [...content.querySelectorAll('.locations-vue')];
@@ -353,23 +375,31 @@ const scrollToLocation = (locationName, dataIndex) => {
   }
 };
 
-const handleGlobalClickForFilter = (e) => {
+const handleGlobalClickForStickybar = (e) => {
   if (isFilterOpen.value && filterWrapperRef.value && !filterWrapperRef.value.contains(e.target)) {
     isFilterOpen.value = false;
+  }
+
+  if (
+    isLocationDropdownOpen.value &&
+    locationWrapperRef.value &&
+    !locationWrapperRef.value.contains(e.target)
+  ) {
+    isLocationDropdownOpen.value = false;
   }
 };
 
 onMounted(() => {
-  document.addEventListener('click', handleGlobalClickForFilter);
+  document.addEventListener('click', handleGlobalClickForStickybar);
   initScrollObserver();
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleGlobalClickForFilter);
+  document.removeEventListener('click', handleGlobalClickForStickybar);
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .Panel {
   resize: both;
   overflow: auto;
@@ -393,6 +423,12 @@ onUnmounted(() => {
     bottom: 2dvh;
     left: 1dvw;
     right: 1dvw;
+  }
+  .stickybar-filter-wrapper{
+    left:55%!important;
+  }
+  .custom-switch-container{
+    right: 1%!important;
   }
 }
 
@@ -426,27 +462,27 @@ onUnmounted(() => {
   justify-content: space-between;
   border-radius: 10px;
   transition: background 0.3s ease, box-shadow 0.3s ease;
-}
 
-.sticky-label2:hover {
-  background: rgba(240, 240, 240, 0.9);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+  &:hover {
+    background: rgba(240, 240, 240, 0.9);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
 
-.sticky-label2.sticky-scrolled {
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
+  &.sticky-scrolled {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
 
-.sticky-label2::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: inherit;
-  z-index: -1;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    z-index: -1;
+  }
 }
 
 .sticky-bar-inner {
@@ -457,10 +493,79 @@ onUnmounted(() => {
   position: relative;
 }
 
+.stickybar-location-wrapper {
+  position: relative;
+  z-index: 2;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.stickybar-location-trigger {
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  padding: 4px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  color: #333;
+
+  &:hover {
+    color: #007aff;
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 0 8px rgba(0, 122, 255, 0.22);
+  }
+}
+
+.stickybar-location-dropdown {
+  position: absolute;
+  bottom: 110%;
+  left: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 10px;
+  padding: 8px;
+  display: none;
+  max-height: 220px;
+  overflow-y: auto;
+  min-width: 120px;
+  z-index: 9999;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  &.open {
+    display: block;
+  }
+}
+
+.stickybar-location-option {
+  width: 100%;
+  display: block;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #333;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.2s, background 0.2s;
+
+  &:hover {
+    color: #007aff;
+    background: rgba(0, 122, 255, 0.08);
+  }
+
+  &.active {
+    color: #007aff;
+    background: rgba(0, 122, 255, 0.12);
+  }
+}
+
 .stickybar-filter-wrapper {
   position: absolute;
   left: 50%;
-  transform: translateX(-50%);
   top: 50%;
   transform: translate(-50%, -50%);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -484,11 +589,11 @@ onUnmounted(() => {
   justify-content: center;
   font-weight: 500;
   transition: all 0.25s ease;
-}
 
-.stickybar-filter-trigger:hover {
-  background: rgba(255, 255, 255, 0.35);
-  box-shadow: 0 0 8px rgba(0, 122, 255, 0.4);
+  &:hover {
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 0 8px rgba(0, 122, 255, 0.4);
+  }
 }
 
 .stickybar-filter-dropdown {
@@ -507,10 +612,10 @@ onUnmounted(() => {
   z-index: 9999;
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
 
-.stickybar-filter-dropdown.open {
-  display: block;
+  &.open {
+    display: block;
+  }
 }
 
 .stickybar-filter-option {
@@ -521,14 +626,14 @@ onUnmounted(() => {
   color: #333;
   cursor: pointer;
   transition: color 0.2s;
-}
 
-.stickybar-filter-option:hover {
-  color: #007aff;
-}
+  &:hover {
+    color: #007aff;
+  }
 
-.stickybar-filter-option input[type="checkbox"] {
-  margin-right: 6px;
+  input[type="checkbox"] {
+    margin-right: 6px;
+  }
 }
 
 .custom-switch-container {
@@ -544,250 +649,13 @@ onUnmounted(() => {
 
 .result-custom-switch {
   cursor: pointer;
-}
 
-.result-custom-switch:hover {
-  transform: scale(1.3);
-}
+  &:hover {
+    transform: scale(1.3);
+  }
 
-.result-custom-switch.open:hover {
-  transform: scale(1.3);
-}
-
-.location-edit-input {
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px solid #007bff;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 14px;
-  font-weight: 600;
-  outline: none;
-  min-width: 150px;
-  color: #333;
-}
-
-.location-edit-input:focus {
-  border-color: #0056b3;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-}
-
-#stickyContextText {
-  transition: background 0.2s;
-  padding: 4px 8px;
-  border-radius: 4px;
-}
-
-#stickyContextText:hover {
-  background: rgba(255, 255, 255, 0.2);
+  &.open:hover {
+    transform: scale(1.3);
+  }
 }
 </style>
-<!--<style scoped>-->
-<!--/* ========================================-->
-<!--   Panel Container-->
-<!--   ======================================== */-->
-<!--.Panel {-->
-<!--    resize: both;-->
-<!--    overflow: auto;-->
-<!--    border-radius: 12px;-->
-<!--    border: 1px solid #e0e0e0;-->
-<!--    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);-->
-<!--    display: flex;-->
-<!--    flex-direction: column;-->
-<!--    transition: all 0.3s ease;-->
-<!--    z-index: 1;-->
-<!--    bottom: 1dvh;-->
-<!--    left: 2dvw;-->
-<!--    right: 2dvw;-->
-<!--    height: 78dvh;-->
-<!--    position: fixed;-->
-<!--}-->
-
-<!--@media (orientation: portrait) {-->
-<!--    .Panel {-->
-<!--        height: 70dvh;-->
-<!--        bottom: 2dvh;-->
-<!--        left: 1dvw;-->
-<!--        right: 1dvw;-->
-<!--    }-->
-<!--}-->
-
-<!--/* ========================================-->
-<!--   Panel Content-->
-<!--   ======================================== */-->
-<!--.panel-content {-->
-<!--    flex: 1;-->
-<!--    overflow: visible;-->
-<!--    padding: 13px;-->
-<!--    box-sizing: border-box;-->
-<!--    color: #333;-->
-<!--    display: flex;-->
-<!--    flex-direction: column;-->
-<!--    gap: 15px;-->
-<!--    overflow-y: auto;-->
-<!--}-->
-
-<!--#resultPanelContent {-->
-<!--    overflow-y: auto;-->
-<!--    height: 100%;-->
-<!--}-->
-
-<!--/* ========================================-->
-<!--   Sticky Bar-->
-<!--   ======================================== */-->
-<!--.sticky-label2 {-->
-<!--    position: absolute;-->
-<!--    bottom: 0;-->
-<!--    background: rgba(255, 255, 255, 0.3);-->
-<!--    left: 0;-->
-<!--    right: 0;-->
-<!--    backdrop-filter: blur(2px);-->
-<!--    padding: 9px 18px;-->
-<!--    font-size: 14px;-->
-<!--    font-weight: bold;-->
-<!--    border-bottom: 1px solid rgba(204, 204, 204, 0.6);-->
-<!--    z-index: 999;-->
-<!--    color: #333;-->
-<!--    display: flex;-->
-<!--    align-items: center;-->
-<!--    justify-content: space-between;-->
-<!--    border-radius: 10px;-->
-<!--    transition: background 0.3s ease, box-shadow 0.3s ease;-->
-<!--}-->
-
-<!--.sticky-label2:hover {-->
-<!--    background: rgba(240, 240, 240, 0.9);-->
-<!--    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);-->
-<!--}-->
-
-<!--.sticky-label2.sticky-scrolled {-->
-<!--    background: rgba(255, 255, 255, 0.1);-->
-<!--    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);-->
-<!--}-->
-
-<!--.sticky-label2::before {-->
-<!--    content: '';-->
-<!--    position: absolute;-->
-<!--    top: 0;-->
-<!--    left: 0;-->
-<!--    right: 0;-->
-<!--    bottom: 0;-->
-<!--    background: inherit;-->
-<!--    z-index: -1;-->
-<!--}-->
-
-<!--.sticky-bar-inner {-->
-<!--    display: flex;-->
-<!--    align-items: center;-->
-<!--    justify-content: space-between;-->
-<!--    height: 100%;-->
-<!--    position: relative;-->
-<!--}-->
-
-<!--/* ========================================-->
-<!--   Filter Dropdown-->
-<!--   ======================================== */-->
-<!--.stickybar-filter-wrapper {-->
-<!--    position: absolute;-->
-<!--    left: 50%;-->
-<!--    transform: translateX(-50%);-->
-<!--    top: 50%;-->
-<!--    transform: translate(-50%, -50%);-->
-<!--    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;-->
-<!--    font-size: 14px;-->
-<!--    z-index: 1;-->
-<!--}-->
-
-<!--.stickybar-filter-trigger {-->
-<!--    background: rgba(255, 255, 255, 0.2);-->
-<!--    backdrop-filter: blur(10px);-->
-<!--    -webkit-backdrop-filter: blur(10px);-->
-<!--    border-radius: 14px;-->
-<!--    padding: 4px 12px;-->
-<!--    color: #007aff;-->
-<!--    cursor: pointer;-->
-<!--    user-select: none;-->
-<!--    white-space: nowrap;-->
-<!--    border: 1px solid rgba(0, 122, 255, 0.2);-->
-<!--    display: flex;-->
-<!--    align-items: center;-->
-<!--    justify-content: center;-->
-<!--    font-weight: 500;-->
-<!--    transition: all 0.25s ease;-->
-<!--}-->
-
-<!--.stickybar-filter-trigger:hover {-->
-<!--    background: rgba(255, 255, 255, 0.35);-->
-<!--    box-shadow: 0 0 8px rgba(0, 122, 255, 0.4);-->
-<!--}-->
-
-<!--.stickybar-filter-dropdown {-->
-<!--    position: absolute;-->
-<!--    bottom: 110%;-->
-<!--    left: 0;-->
-<!--    background: rgba(255, 255, 255, 0.9);-->
-<!--    backdrop-filter: blur(12px);-->
-<!--    -webkit-backdrop-filter: blur(12px);-->
-<!--    border-radius: 10px;-->
-<!--    padding: 8px;-->
-<!--    display: none;-->
-<!--    max-height: 200px;-->
-<!--    overflow-y: auto;-->
-<!--    min-width: 70px;-->
-<!--    z-index: 9999;-->
-<!--    border: 1px solid rgba(0, 0, 0, 0.1);-->
-<!--    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);-->
-<!--}-->
-
-<!--.stickybar-filter-dropdown.open {-->
-<!--    display: block;-->
-<!--}-->
-
--->
-
--->
-
-<!--.stickybar-filter-option {-->
-<!--    display: flex;-->
-<!--    align-items: center;-->
-<!--    margin: 6px 0;-->
-<!--    font-size: 14px;-->
-<!--    color: #333;-->
-<!--    cursor: pointer;-->
-<!--    transition: color 0.2s;-->
-<!--}-->
-
-<!--.stickybar-filter-option:hover {-->
-<!--    color: #007aff;-->
-<!--}-->
-
-<!--.stickybar-filter-option input[type="checkbox"] {-->
-<!--/* ========================================-->
-<!--   Location Edit Input-->
-<!--   ======================================== */-->
-<!--.location-edit-input {-->
-<!--    background: rgba(255, 255, 255, 0.9);-->
-<!--    border: 2px solid #007bff;-->
-<!--    border-radius: 4px;-->
-<!--    padding: 4px 8px;-->
-<!--    font-size: 14px;-->
-<!--    font-weight: 600;-->
-<!--    outline: none;-->
-<!--    min-width: 150px;-->
-<!--    color: #333;-->
-<!--}-->
-
-<!--.location-edit-input:focus {-->
-<!--    border-color: #0056b3;-->
-<!--    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);-->
-<!--}-->
-
-<!--#stickyContextText {-->
-<!--    transition: background 0.2s;-->
-<!--    padding: 4px 8px;-->
-<!--    border-radius: 4px;-->
-<!--}-->
-
-<!--#stickyContextText:hover {-->
-<!--    background: rgba(255, 255, 255, 0.2);-->
-<!--}-->
-<!--</style>-->

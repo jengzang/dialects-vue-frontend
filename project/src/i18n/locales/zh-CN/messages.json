@@ -5,7 +5,8 @@
     "updated": "更新成功",
     "created": "创建成功",
     "copied": "复制成功",
-    "languageChanged": "语言切换成功"
+    "languageChanged": "语言切换成功",
+    "interfaceModeChanged": "界面模式已更新"
   },
   "error": {
     "saveFailed": "保存失败",
@@ -50,5 +51,10 @@
       "second": "秒",
       "now": "现在"
     }
+  },
+  "loginPrompt": {
+    "message": "登录后可使用高级功能，获得更高的查询上限，并可添加个人数据。",
+    "login": "立即登录",
+    "dismiss": "关闭"
   }
 }
