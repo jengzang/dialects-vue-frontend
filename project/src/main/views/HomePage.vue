@@ -1502,7 +1502,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem 3rem;
+  gap: 1rem 3rem;
   flex-wrap: nowrap;
 }
 

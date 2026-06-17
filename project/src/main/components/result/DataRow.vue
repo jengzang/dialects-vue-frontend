@@ -7,7 +7,7 @@
     <div class="feature-row">
       <!-- 主要信息容器：包裹 p、button、p -->
       <div class="feature-main-items">
-        <p>
+        <p class="feature-inline-row">
           <span
               class="feature-value-clickable"
               style="cursor: pointer; color: #007bff"
@@ -350,6 +350,10 @@ const handleFeatureStatsClick = async () => {
     color: #3c8dbc;
     text-shadow: 0 0 8px rgba(60, 141, 188, 0.6);
   }
+}
+
+.feature-inline-row {
+  white-space: nowrap;
 }
 
 /* 這是傳送到 body 的彈窗樣式，不受小容器限制 */

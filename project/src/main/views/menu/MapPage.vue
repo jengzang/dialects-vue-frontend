@@ -22,6 +22,15 @@
         v-else-if="currentTab === 'map' && mapStore.mode === 'feature' && availableFeatures.length > 0"
         class="feature-control-area"
       >
+        <!-- 幫助圖標 -->
+        <HelpIcon
+          :content="helpText"
+          size="sm"
+          placement="bottom"
+          icon="?"
+          icon-color="#007aff"
+          style="margin-left: 5px;"
+        />
         <div
           v-if="availableFeatures.length > 1"
           class="dropdown-wrapper"
@@ -43,16 +52,6 @@
             {{ availableFeatures[0] }}
           </button>
         </div>
-
-        <!-- 幫助圖標 -->
-        <HelpIcon
-          :content="helpText"
-          size="sm"
-          placement="bottom"
-          icon="?"
-          icon-color="#007aff"
-          style="margin-left: 5px;"
-        />
       </div>
     </template>
 

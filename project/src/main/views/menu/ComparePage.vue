@@ -172,7 +172,7 @@
                       :disabled="!canAddToGroup"
                       @click="addToGroup('group1')"
                     >
-                      ➕ {{ $t('compare.button.add') }}
+                      {{ $t('compare.button.add') }}
                     </button>
                   </div>
                   <div class="selected-items-list">
@@ -208,7 +208,7 @@
                       :disabled="!canAddToGroup"
                       @click="addToGroup('group2')"
                     >
-                      ➕ {{ $t('compare.button.add') }}
+                      {{ $t('compare.button.add') }}
                     </button>
                   </div>
                   <div class="selected-items-list">
