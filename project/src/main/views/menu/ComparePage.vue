@@ -96,7 +96,7 @@
       <div
         v-show="currentTab === 'tab2'"
         class="page"
-        style="max-height: 50dvh;"
+        style="max-height: 50dvh;overflow-x: auto;"
       >
         <div class="page-content-stack">
           <!-- 單一中古選擇器 -->
@@ -1587,9 +1587,6 @@ export default {
 
 <style scoped>
 
-.page{
-  overflow-x: hidden;
-}
 /* 📄 內容區塊動畫 */
 .tab-content-inner {
   width: 100%;
@@ -1912,7 +1909,6 @@ export default {
   border-radius: 12px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(200, 200, 200, 0.3);
 }
 
 .group-label {
@@ -2013,31 +2009,31 @@ export default {
 }
 
 .add-to-group1 {
-  background: linear-gradient(145deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.05));
+  background: linear-gradient(145deg, rgba(76, 175, 80, 0.25), rgba(76, 175, 80, 0.2));
   border-color: #4CAF50;
   color: #2E7D32;
 }
 
 .add-to-group1:hover:not(:disabled) {
-  background: linear-gradient(145deg, rgba(76, 175, 80, 0.25), rgba(76, 175, 80, 0.15));
+  background: linear-gradient(145deg, rgba(76, 175, 80, 0.4), rgba(76, 175, 80, 0.3));
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 .add-to-group2 {
-  background: linear-gradient(145deg, rgba(33, 150, 243, 0.15), rgba(33, 150, 243, 0.05));
+  background: linear-gradient(145deg, rgba(33, 150, 243, 0.25), rgba(33, 150, 243, 0.2));
   border-color: #2196F3;
   color: #1565C0;
 }
 
 .add-to-group2:hover:not(:disabled) {
-  background: linear-gradient(145deg, rgba(33, 150, 243, 0.25), rgba(33, 150, 243, 0.15));
+  background: linear-gradient(145deg, rgba(33, 150, 243, 0.4), rgba(33, 150, 243, 0.3));
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
 }
 
 .add-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
@@ -2071,7 +2067,7 @@ export default {
 }
 
 .selected-group.group1-style {
-  border-color: rgba(76, 175, 80, 0.4);
+  border-color: rgba(76, 175, 80, 0.7);
 }
 
 .selected-group.group1-style .selected-group-header {
@@ -2080,7 +2076,7 @@ export default {
 }
 
 .selected-group.group2-style {
-  border-color: rgba(33, 150, 243, 0.4);
+  border-color: rgba(33, 150, 243, 0.7);
 }
 
 .selected-group.group2-style .selected-group-header {
@@ -2377,12 +2373,21 @@ export default {
     padding: 0.8rem;
   }
 
+  .page {
+    padding: 0.5rem!important;
+  }
+
+  .selected-groups-container {
+    gap: 1rem;
+  }
+
   .feature-checkboxes {
     gap: 1rem;
   }
 
   .tone-selection {
     gap: 0.8rem;
+    padding:0.5rem;
   }
 
   .tone-checkbox {

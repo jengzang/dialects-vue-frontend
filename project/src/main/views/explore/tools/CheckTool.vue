@@ -1983,7 +1983,8 @@ onUnmounted(() => {
 }
 
 .feature-item {
-justify-content: center;
+  white-space: nowrap;
+  justify-content: center;
   display: flex;
   font-size: 15px;
   align-items: center;

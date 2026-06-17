@@ -578,7 +578,7 @@ import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useVisitStats } from '@/composables/useVisitStats.js'
-import { queryCount } from '@/api'
+import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
 
 // ✅ 条件渲染的组件懒加载
@@ -604,8 +604,9 @@ const expandedCard = ref(null)
 const showSupport = ref(false)
 const showBenefitsPopup = ref(false)
 const showUpdateNotice = ref(false)
-const sourceLocationCount = ref('...')
-const sourceDataCount = ref('...')
+const cachedSourceStats = getCachedSourceStats()
+const sourceLocationCount = ref(cachedSourceStats.locationCount)
+const sourceDataCount = ref(cachedSourceStats.dataCount)
 
 // 当前版本号和更新时间
 const homeUpdateNotice = computed(() => getHomeUpdateNotice(t))
@@ -681,12 +682,9 @@ async function fetchVisitStats() {
 
 async function fetchSourceStats() {
   try {
-    const [locationCount, dataCount] = await Promise.all([
-      queryCount({ db_key: 'query', table_name: 'dialects', filter_column: '存儲標記', filter_value: 1 }),
-      queryCount({ db_key: 'dialects', table_name: 'dialects' })
-    ])
-    sourceLocationCount.value = locationCount
-    sourceDataCount.value = dataCount
+    const stats = await getSourceStats()
+    sourceLocationCount.value = stats.locationCount
+    sourceDataCount.value = stats.dataCount
   } catch (error) {
     console.error('獲取字表統計失敗:', error)
   }

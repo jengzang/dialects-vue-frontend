@@ -902,12 +902,11 @@ watch(
     border-radius: 24px;
   }
   .config-panel{
-    max-height: 60dvh;
+    max-height: 55dvh;
   }
 
   .panel-header,
-  .tree-header,
-  .levels-header {
+  .tree-header{
     flex-direction: column;
     align-items: stretch;
   }

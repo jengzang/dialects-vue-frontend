@@ -532,6 +532,7 @@ onMounted(async () => {
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
+  white-space: nowrap;
 
   .user-info-badge {
     font-size: 13px;

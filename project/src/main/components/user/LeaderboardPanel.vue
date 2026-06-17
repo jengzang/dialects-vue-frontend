@@ -946,13 +946,14 @@ const tableData = computed(() => {
     justify-content: center;
     gap: 16px;
     margin-bottom: 24px;
-    overflow-x: visible;
+    overflow-x: auto;
   }
 
   .metric-card {
     min-width: 100px;
     flex-shrink: 0;
     padding: 16px;
+    max-width: 48dvw;
   }
 
   .metric-header {
