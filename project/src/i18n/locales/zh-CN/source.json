@@ -2,6 +2,7 @@
   "title": "资料来源",
   "privacyLink": "想要引用?了解隐私政策?",
   "totalRecords": "共 {locationCount} 份方言字表，合计 {dataCount} 行数据",
+  "databaseVersion": "数据库版本:{version}",
   "columns": {
     "location": "方言点",
     "atlasRegion": "地图集分区",

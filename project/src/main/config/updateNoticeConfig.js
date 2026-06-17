@@ -17,9 +17,9 @@ export function getHomeUpdateNotice(t) {
         }
     ]
   return {
-    version: 'v4.4.8',
+    version: 'v4.5.0',
     dbVersion: '2026-03-19',
-    lastUpdateDate: '2026-06-15',
+    lastUpdateDate: '2026-06-17',
     title: t('home.updateNotice.title'),
     items
   }

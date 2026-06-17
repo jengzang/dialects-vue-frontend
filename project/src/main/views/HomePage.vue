@@ -521,6 +521,7 @@
 
         <div class="footer-stats footer-stats-secondary">
           <span class="stat-text">{{ $t('source.totalRecords', { locationCount: sourceLocationCount, dataCount: sourceDataCount }) }}</span>
+          <span class="stat-text stat-text-muted">{{ $t('source.databaseVersion', { version: sourceDbVersion }) }}</span>
         </div>
 
         <div class="footer-info">
@@ -604,6 +605,7 @@ const expandedCard = ref(null)
 const showSupport = ref(false)
 const showBenefitsPopup = ref(false)
 const showUpdateNotice = ref(false)
+const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
 const cachedSourceStats = getCachedSourceStats()
 const sourceLocationCount = ref(cachedSourceStats.locationCount)
 const sourceDataCount = ref(cachedSourceStats.dataCount)
@@ -1492,16 +1494,27 @@ onMounted(() => {
 .footer-stats {
   margin-bottom: 0.75rem;
   text-align: center;
+  gap: 1rem;
 }
 
 .footer-stats-secondary {
   margin-top: -0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem 3rem;
+  flex-wrap: nowrap;
 }
 
 .stat-text {
   font-size: 0.875rem;
   color: rgba(0, 0, 0, 0.6);
   font-weight: 500;
+}
+
+.stat-text-muted {
+  font-size: 0.8125rem;
+  color: rgba(0, 0, 0, 0.48);
 }
 
 .footer-info {
@@ -1582,6 +1595,10 @@ onMounted(() => {
 /* Responsive */
 @media (orientation: portrait) {
   .hero-section { min-height: 75vh; }
+  .footer-stats-secondary {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
   .hero-logo {
     width: clamp(260px, 50vw, 400px);
   }

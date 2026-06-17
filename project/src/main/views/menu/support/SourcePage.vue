@@ -3,10 +3,12 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import UniversalTable from "@/main/components/TableAndTree/UniversalTable.vue";
+import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceStats.js'
 
 const { t } = useI18n()
 const router = useRouter()
+const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
 
 const cachedStats = getCachedSourceStats()
 const locationCount = ref(cachedStats.locationCount)
@@ -75,6 +77,7 @@ const goToPrivacy = () => {
         :default-filter="defaultFilter"
     />
     <p class="summary">{{ t('source.totalRecords', { locationCount, dataCount }) }}</p>
+    <p class="summary">{{ t('source.databaseVersion', { version: sourceDbVersion }) }}</p>
   </div>
 </template>
 
@@ -104,6 +107,7 @@ const goToPrivacy = () => {
 }
 .summary {
   margin-top: 12px;
+  margin-bottom: 0;
   font-size: 14px;
   color: rgba(0, 0, 0, 0.6);
 }
