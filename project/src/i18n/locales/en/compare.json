@@ -86,6 +86,7 @@
   "sankeyControls": {
     "title": "Sankey Options",
     "optimizeLinks": "Optimize links",
+    "ignorePolyphonicChars": "Ignore polyphonic characters",
     "minLinkCharCount": "Min. link characters",
     "minNodeCharCount": "Min. node characters"
   }

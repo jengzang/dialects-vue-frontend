@@ -496,7 +496,7 @@ watch(showPartitionInfoModal, (isVisible) => {
   justify-content: center;
   align-items: center;
   gap: 8px;
-  max-width: 300px;
+  max-width: 250px;
   min-width: 0;
 }
 

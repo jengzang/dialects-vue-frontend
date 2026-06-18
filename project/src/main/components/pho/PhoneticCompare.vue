@@ -137,6 +137,12 @@ const props = defineProps({
     default: false
   },
 
+  // 父组件传入：过滤相邻两地之间存在多归属的字，避免多音字导致交叉连线
+  ignorePolyphonicChars: {
+    type: Boolean,
+    default: false
+  },
+
   // 父组件传入：过滤字数少于该值的连线
   minLinkCharCount: {
     type: Number,
@@ -191,6 +197,10 @@ const normalizedMinNodeCharCount = computed(() => {
 
 const sankeyLayoutIterations = computed(() => {
   return props.enableLinkOptimization ? 200 : 0
+})
+
+const shouldIgnorePolyphonicChars = computed(() => {
+  return !!props.ignorePolyphonicChars
 })
 
 // 动态宽度计算
@@ -354,6 +364,24 @@ const renderSankey = async (queryLocs) => {
   const links = []
   const usedNodeIds = new Set()
 
+  const buildCharValueMap = (featureData) => {
+    const charValueMap = new Map()
+
+    Object.entries(featureData || {}).forEach(([val, info]) => {
+      const charIndices = info?.char_indices || []
+
+      charIndices.forEach(idx => {
+        if (!charValueMap.has(idx)) {
+          charValueMap.set(idx, new Set())
+        }
+
+        charValueMap.get(idx).add(val)
+      })
+    })
+
+    return charValueMap
+  }
+
   const ensureNode = (id, rawLabel, layer, depth, charCount) => {
     if (!nodeMap.has(id)) {
       nodeMap.set(id, {
@@ -386,6 +414,8 @@ const renderSankey = async (queryLocs) => {
 
     const dataCurr = raw.data[locCurr]?.[activeFeature.value] || {}
     const dataNext = raw.data[locNext]?.[activeFeature.value] || {}
+    const charValueMapCurr = buildCharValueMap(dataCurr)
+    const charValueMapNext = buildCharValueMap(dataNext)
 
     const currEntries = Object.entries(dataCurr)
     const nextEntries = Object.entries(dataNext).map(([valNext, infoNext]) => {
@@ -404,7 +434,12 @@ const renderSankey = async (queryLocs) => {
       if (!indicesCurr.length) return
 
       nextEntries.forEach(({ valNext, indicesNextSet }) => {
-        const intersect = indicesCurr.filter(idx => indicesNextSet.has(idx))
+        const intersect = indicesCurr.filter(idx => {
+          if (!indicesNextSet.has(idx)) return false
+          if (!shouldIgnorePolyphonicChars.value) return true
+
+          return charValueMapCurr.get(idx)?.size === 1 && charValueMapNext.get(idx)?.size === 1
+        })
 
         if (intersect.length > 0) {
           const source = `${i}:${locCurr}:${valCurr}`
@@ -648,6 +683,7 @@ const handleResize = () => {
 watch(
   () => [
     props.enableLinkOptimization,
+    props.ignorePolyphonicChars,
     normalizedMinLinkCharCount.value,
     normalizedMinNodeCharCount.value
   ],

@@ -216,11 +216,11 @@
       "oldSite": "Legacy Site",
       "support": "Support Author"
     },
-    "stats": "Today Visits {today} ? Total Visits {total}",
+    "stats": "Today Visits {today} · Total Visits {total}",
     "dataStats": "📚 {locationCount} dialect points · 🗃️ {dataCount} rows of data",
-    "copyright": "? 2026 Dialects Atlas ? Developed by jengzang",
-    "versionInfo": "{version} ? Last updated: {date}",
-    "icp": "Yue ICP 2025466875"
+    "copyright": "© 2026 方音圖鑑 · Developed by jengzang",
+    "versionInfo": "{version} · Last updated: {date}",
+    "icp": "粤ICP备2025466875号"
   },
   "updateNotice": {
     "title": "Website Update Notice",

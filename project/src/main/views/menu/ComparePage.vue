@@ -302,13 +302,23 @@
                 class="tab5-sankey-controls"
                 :aria-label="t('compare.sankeyControls.title', '桑基图操作')"
               >
-                <label class="tab5-sankey-checkbox">
-                  <input
-                    v-model="tabStates.tab5.enableLinkOptimization"
-                    type="checkbox"
-                  >
-                  <span>{{ t('compare.sankeyControls.optimizeLinks', '优化连线') }}</span>
-                </label>
+                <div class="tab5-sankey-control-row">
+                  <label class="tab5-sankey-checkbox">
+                    <input
+                      v-model="tabStates.tab5.enableLinkOptimization"
+                      type="checkbox"
+                    >
+                    <span>{{ t('compare.sankeyControls.optimizeLinks', '优化连线') }}</span>
+                  </label>
+
+                  <label class="tab5-sankey-checkbox tab5-sankey-checkbox-secondary">
+                    <input
+                      v-model="tabStates.tab5.ignorePolyphonicChars"
+                      type="checkbox"
+                    >
+                    <span>{{ t('compare.sankeyControls.ignorePolyphonicChars', '忽略多音字') }}</span>
+                  </label>
+                </div>
 
                 <label class="tab5-sankey-slider">
                   <span class="tab5-sankey-slider-label">
@@ -346,6 +356,7 @@
         <PhoneticCompare
           :query-locations="tabStates.tab5.queryLocations"
           :enable-link-optimization="tabStates.tab5.enableLinkOptimization"
+          :ignore-polyphonic-chars="tabStates.tab5.ignorePolyphonicChars"
           :min-link-char-count="tabStates.tab5.minLinkCharCount"
           :min-node-char-count="tabStates.tab5.minNodeCharCount"
         />
@@ -549,6 +560,7 @@ const tabStates = reactive({
     queryLocations: [],
 
     enableLinkOptimization: false,
+    ignorePolyphonicChars: false,
 
     // 真正传给 PhoneticCompare 的值
     minLinkCharCount: 3,
@@ -2316,6 +2328,14 @@ export default {
   background: var(--glass-light);
 }
 
+.tab5-sankey-control-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .tab5-sankey-checkbox,
 .tab5-sankey-slider {
   display: flex;
@@ -2331,6 +2351,11 @@ export default {
   align-items: center;
   cursor: pointer;
   user-select: none;
+  white-space: nowrap;
+}
+
+.tab5-sankey-checkbox-secondary {
+  margin-left: 0;
 }
 
 .tab5-sankey-checkbox input {

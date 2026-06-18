@@ -282,7 +282,7 @@ const currentTab = computed(() => {
     return pathSectionToTab[section]
   }
 
-  return 'intro'
+  return 'setting'
 })
 
 const tabs = computed(() => [
