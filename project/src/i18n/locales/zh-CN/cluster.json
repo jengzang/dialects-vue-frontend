@@ -11,6 +11,9 @@
     "cluster": "聚类",
     "result": "结果"
   },
+  "stage": {
+    "currentStep": "当前阶段 {index}"
+  },
   "actions": {
     "createPreview": "生成预览",
     "refreshPreview": "重新预览",

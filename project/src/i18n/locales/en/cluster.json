@@ -11,6 +11,9 @@
     "cluster": "Cluster",
     "result": "Result"
   },
+  "stage": {
+    "currentStep": "Current stage {index}"
+  },
   "actions": {
     "createPreview": "Create preview",
     "refreshPreview": "Refresh preview",

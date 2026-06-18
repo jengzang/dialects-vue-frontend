@@ -209,6 +209,30 @@ export function useClusterWorkspace() {
     return workspaceState.activeResultSource === 'jobs' && Boolean(workspaceState.activeTask.taskId)
   })
 
+
+  const activeStepOption = computed(() => {
+    return stepOptions.value.find((step) => step.value === currentStep.value) || stepOptions.value[0]
+  })
+
+  const stepDescriptionMap = computed(() => ({
+    input: t('cluster.input.description'),
+    preview: t('cluster.preview.description'),
+    prepare: t('cluster.prepare.description'),
+    distance: t('cluster.distance.description'),
+    cluster: t('cluster.clustering.description'),
+    result: t('cluster.result.description')
+  }))
+
+  const activeStepDescription = computed(() => {
+    return stepDescriptionMap.value[currentStep.value] || ''
+  })
+
+  const visibleMainPanels = computed(() => ({
+    input: currentStep.value === 'input',
+    workflow: ['preview', 'prepare', 'distance', 'cluster'].includes(currentStep.value),
+    result: currentStep.value === 'result'
+  }))
+
   recoverWorkspace()
 
   function serializeWorkspaceState() {
@@ -793,6 +817,9 @@ export function useClusterWorkspace() {
     linkageOptions,
     stepOptions,
     currentStep,
+    activeStepOption,
+    activeStepDescription,
+    visibleMainPanels,
     prepareStepStatus,
     currentDistanceHash,
     currentResultHash,
