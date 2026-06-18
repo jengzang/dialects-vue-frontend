@@ -51,8 +51,22 @@
         :key="group.id"
         class="group-panel main-glass-panel-inner"
       >
-        <div class="group-panel__header">
-          <h3>{{ t('cluster.input.groupTitle', { index: index + 1 }) }}</h3>
+        <div class="group-panel__header group-panel__header--compact">
+          <button
+            class="group-summary-toggle"
+            type="button"
+            @click="toggleGroupExpanded(group.id)"
+          >
+            <div>
+              <h3>{{ groupSummaryItems[index]?.title || t('cluster.input.groupTitle', { index: index + 1 }) }}</h3>
+              <p class="group-summary-meta">
+                {{ groupSummaryItems[index]?.compareDimensionLabel }} ·
+                {{ groupSummaryItems[index]?.sourceModeLabel }} ·
+                {{ t('cluster.input.sourceCount', { count: groupSummaryItems[index]?.sourceCount || 0 }) }}
+              </p>
+            </div>
+            <span class="group-summary-arrow">{{ isGroupExpanded(group.id) ? '−' : '+' }}</span>
+          </button>
           <button
             class="global-action-btn global-action-btn-secondary group-remove-btn"
             type="button"
@@ -63,103 +77,105 @@
           </button>
         </div>
 
-        <div class="form-grid">
-          <label class="field">
-            <span>{{ t('cluster.input.groupLabel') }}</span>
-            <input
-              v-model="group.label"
-              type="text"
-              :placeholder="t('cluster.input.groupLabelPlaceholder')"
-            >
-          </label>
-
-          <div class="field">
-            <span>{{ t('cluster.input.compareDimension') }}</span>
-            <ChoiceSelector
-              v-model="group.compare_dimension"
-              :options="compareDimensionOptions"
-              :aria-label="t('cluster.input.compareDimension')"
-            />
-          </div>
-
-          <div class="field">
-            <span>{{ t('cluster.input.sourceMode') }}</span>
-            <ChoiceSelector
-              v-model="group.source_mode"
-              :options="sourceModeOptions"
-              :aria-label="t('cluster.input.sourceMode')"
-            />
-          </div>
-        </div>
-
-        <div
-          v-if="group.source_mode === 'path_strings'"
-          class="source-section source-section--path"
-        >
-          <p class="source-hint">
-            {{ t('cluster.input.pathStringsHint') }}
-          </p>
-          <KeyButtonGroup
-            :available-keys="availableKeys"
-            :exclusive-rules="exclusiveRules"
-            :single-select-keys="singleSelectKeys"
-            :model-value="group.pathKeys"
-            @update:model-value="(value) => updateGroupPathKeys(group, value)"
-          />
-          <DropdownValueSelector
-            :selected-keys="group.pathKeys"
-            :model-value="group.pathValueMap"
-            :key-value-map="keyValueMap"
-            @update:model-value="(value) => updateGroupPathValueMap(group, value)"
-          />
-          <div class="preview-box">
-            <strong>{{ t('cluster.input.pathStringsPreview', { count: getGroupPathStrings(group).length }) }}</strong>
-            <div
-              v-if="getGroupPathStrings(group).length"
-              class="preview-chip-list"
-            >
-              <span
-                v-for="pathString in getGroupPathStrings(group)"
-                :key="pathString"
-                class="preview-chip"
+        <div v-if="isGroupExpanded(group.id)">
+          <div class="form-grid">
+            <label class="field">
+              <span>{{ t('cluster.input.groupLabel') }}</span>
+              <input
+                v-model="group.label"
+                type="text"
+                :placeholder="t('cluster.input.groupLabelPlaceholder')"
               >
-                {{ pathString }}
-              </span>
+            </label>
+
+            <div class="field">
+              <span>{{ t('cluster.input.compareDimension') }}</span>
+              <ChoiceSelector
+                v-model="group.compare_dimension"
+                :options="compareDimensionOptions"
+                :aria-label="t('cluster.input.compareDimension')"
+              />
             </div>
-            <p
-              v-else
-              class="preview-empty"
-            >
-              {{ t('cluster.input.emptyPathStrings') }}
-            </p>
-          </div>
-        </div>
 
-        <div
-          v-else
-          class="source-section source-section--chars"
-        >
-          <label class="field">
-            <span>{{ t('cluster.input.resolvedCharsLabel') }}</span>
-            <textarea
-              v-model="group.resolvedCharsText"
-              rows="4"
-              :placeholder="t('cluster.input.resolvedCharsPlaceholder')"
+            <div class="field">
+              <span>{{ t('cluster.input.sourceMode') }}</span>
+              <ChoiceSelector
+                v-model="group.source_mode"
+                :options="sourceModeOptions"
+                :aria-label="t('cluster.input.sourceMode')"
+              />
+            </div>
+          </div>
+
+          <div
+            v-if="group.source_mode === 'path_strings'"
+            class="source-section source-section--path"
+          >
+            <p class="source-hint">
+              {{ t('cluster.input.pathStringsHint') }}
+            </p>
+            <KeyButtonGroup
+              :available-keys="availableKeys"
+              :exclusive-rules="exclusiveRules"
+              :single-select-keys="singleSelectKeys"
+              :model-value="group.pathKeys"
+              @update:model-value="(value) => updateGroupPathKeys(group, value)"
             />
-          </label>
-          <div class="preview-box">
-            <strong>{{ t('cluster.input.resolvedCharsPreview', { count: getResolvedChars(group).length }) }}</strong>
-            <div
-              v-if="getResolvedChars(group).length"
-              class="preview-chip-list"
-            >
-              <span
-                v-for="char in getResolvedChars(group)"
-                :key="`${group.id}-${char}`"
-                class="preview-chip"
+            <DropdownValueSelector
+              :selected-keys="group.pathKeys"
+              :model-value="group.pathValueMap"
+              :key-value-map="keyValueMap"
+              @update:model-value="(value) => updateGroupPathValueMap(group, value)"
+            />
+            <div class="preview-box">
+              <strong>{{ t('cluster.input.pathStringsPreview', { count: getGroupPathStrings(group).length }) }}</strong>
+              <div
+                v-if="getGroupPathStrings(group).length"
+                class="preview-chip-list"
               >
-                {{ char }}
-              </span>
+                <span
+                  v-for="pathString in getGroupPathStrings(group)"
+                  :key="pathString"
+                  class="preview-chip"
+                >
+                  {{ pathString }}
+                </span>
+              </div>
+              <p
+                v-else
+                class="preview-empty"
+              >
+                {{ t('cluster.input.emptyPathStrings') }}
+              </p>
+            </div>
+          </div>
+
+          <div
+            v-else
+            class="source-section source-section--chars"
+          >
+            <label class="field">
+              <span>{{ t('cluster.input.resolvedCharsLabel') }}</span>
+              <textarea
+                v-model="group.resolvedCharsText"
+                rows="4"
+                :placeholder="t('cluster.input.resolvedCharsPlaceholder')"
+              />
+            </label>
+            <div class="preview-box">
+              <strong>{{ t('cluster.input.resolvedCharsPreview', { count: getResolvedChars(group).length }) }}</strong>
+              <div
+                v-if="getResolvedChars(group).length"
+                class="preview-chip-list"
+              >
+                <span
+                  v-for="char in getResolvedChars(group)"
+                  :key="`${group.id}-${char}`"
+                  class="preview-chip"
+                >
+                  {{ char }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -200,7 +216,10 @@ const {
   exclusiveRules,
   singleSelectKeys,
   keyValueMap,
+  groupSummaryItems,
   addGroup,
+  toggleGroupExpanded,
+  isGroupExpanded,
   removeGroup,
   updateGroupPathKeys,
   updateGroupPathValueMap,

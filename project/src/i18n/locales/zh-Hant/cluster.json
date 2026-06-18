@@ -42,6 +42,7 @@
     "resolvedCharsPreview": "去重後 {count} 字",
     "pathStringsPreview": "已生成 {count} 條 path_strings",
     "emptyPathStrings": "尚未選出有效條件",
+    "sourceCount": "{count} 條來源",
     "advanced": "高級選項",
     "includeSpecialLocations": "包含特殊地點",
     "locationTitle": "地點與分區",

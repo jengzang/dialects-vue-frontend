@@ -42,6 +42,7 @@
     "resolvedCharsPreview": "{count} unique characters",
     "pathStringsPreview": "{count} path_strings generated",
     "emptyPathStrings": "No valid conditions selected yet",
+    "sourceCount": "{count} source entries",
     "advanced": "Advanced options",
     "includeSpecialLocations": "Include special locations",
     "locationTitle": "Locations and regions",

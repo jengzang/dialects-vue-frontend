@@ -195,6 +195,26 @@ export function useClusterWorkspace() {
     return workspaceState.clustering.algorithm !== 'dbscan'
   })
 
+
+  const expandedGroupIds = ref([workspaceState.requestDraft.groups[0]?.id].filter(Boolean))
+
+  const groupSummaryItems = computed(() => {
+    return workspaceState.requestDraft.groups.map((group, index) => {
+      const sourceCount = group.source_mode === 'resolved_chars'
+        ? getResolvedChars(group).length
+        : getGroupPathStrings(group).length
+
+      return {
+        id: group.id,
+        index: index + 1,
+        title: group.label?.trim() || t('cluster.input.groupTitle', { index: index + 1 }),
+        sourceModeLabel: t(`cluster.input.${group.source_mode === 'resolved_chars' ? 'resolvedChars' : 'pathStrings'}`),
+        compareDimensionLabel: t(`cluster.dimensions.${group.compare_dimension || 'final'}`),
+        sourceCount
+      }
+    })
+  })
+
   const isPreviewPending = computed(() => workspaceState.activeTask.stage === 'preview' && isTaskBusy(workspaceState.activeTask.status))
   const isPreparePending = computed(() => workspaceState.activeTask.stage === 'prepare' && isTaskBusy(workspaceState.activeTask.status))
   const isDistancePending = computed(() => workspaceState.activeTask.stage === 'distance' && isTaskBusy(workspaceState.activeTask.status))
@@ -400,7 +420,19 @@ export function useClusterWorkspace() {
   }
 
   function addGroup() {
-    workspaceState.requestDraft.groups.push(createEmptyGroup())
+    const nextGroup = createEmptyGroup()
+    workspaceState.requestDraft.groups.push(nextGroup)
+    expandedGroupIds.value = Array.from(new Set([...expandedGroupIds.value, nextGroup.id]))
+  }
+
+  function toggleGroupExpanded(groupId) {
+    expandedGroupIds.value = expandedGroupIds.value.includes(groupId)
+      ? expandedGroupIds.value.filter((id) => id !== groupId)
+      : [...expandedGroupIds.value, groupId]
+  }
+
+  function isGroupExpanded(groupId) {
+    return expandedGroupIds.value.includes(groupId)
   }
 
   function removeGroup(index) {
@@ -408,7 +440,12 @@ export function useClusterWorkspace() {
       return
     }
 
-    workspaceState.requestDraft.groups.splice(index, 1)
+    const [removedGroup] = workspaceState.requestDraft.groups.splice(index, 1)
+    expandedGroupIds.value = expandedGroupIds.value.filter((id) => id !== removedGroup?.id)
+
+    if (!expandedGroupIds.value.length && workspaceState.requestDraft.groups[0]?.id) {
+      expandedGroupIds.value = [workspaceState.requestDraft.groups[0].id]
+    }
   }
 
   async function handlePreview() {
@@ -903,6 +940,8 @@ export function useClusterWorkspace() {
     resultSummaryCards,
     showNClustersField,
     showRandomStateField,
+    expandedGroupIds,
+    groupSummaryItems,
     isPreviewPending,
     isPreparePending,
     isDistancePending,
@@ -916,6 +955,8 @@ export function useClusterWorkspace() {
     goToStep,
     isStepReachable,
     addGroup,
+    toggleGroupExpanded,
+    isGroupExpanded,
     removeGroup,
     updateGroupPathKeys,
     updateGroupPathValueMap,
