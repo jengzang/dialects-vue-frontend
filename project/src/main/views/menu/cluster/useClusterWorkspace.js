@@ -233,6 +233,77 @@ export function useClusterWorkspace() {
     result: currentStep.value === 'result'
   }))
 
+
+  const stageContextCards = computed(() => ([
+    {
+      key: 'request',
+      label: t('cluster.context.requestScope'),
+      value: t('cluster.context.requestScopeValue', {
+        groups: workspaceState.requestDraft.groups.length,
+        locations: workspaceState.requestDraft.locations.length,
+        regions: workspaceState.requestDraft.regions.length
+      })
+    },
+    {
+      key: 'preview',
+      label: t('cluster.context.prepareHash'),
+      value: workspaceState.prepareHash || '—'
+    },
+    {
+      key: 'distance',
+      label: t('cluster.context.distanceHash'),
+      value: currentDistanceHash.value || '—'
+    },
+    {
+      key: 'result',
+      label: t('cluster.context.resultHash'),
+      value: currentResultHash.value || '—'
+    },
+    {
+      key: 'mode',
+      label: t('cluster.context.phonemeMode'),
+      value: workspaceState.selectedPhonemeMode || '—'
+    },
+    {
+      key: 'source',
+      label: t('cluster.context.resultSource'),
+      value: t(`cluster.task.${workspaceState.activeResultSource || 'staged'}`)
+    }
+  ]))
+
+  const stageProgressItems = computed(() => STEP_ORDER.map((step) => {
+    const status = (() => {
+      if (currentStep.value === step) return 'active'
+      if (step === 'input') return 'completed'
+      if (step === 'preview') return workspaceState.previewData ? 'completed' : 'idle'
+      if (step === 'prepare') {
+        if (workspaceState.prepareCompleted) return 'completed'
+        if (workspaceState.prepareHash) return 'pending'
+        return 'idle'
+      }
+      if (step === 'distance') {
+        if (currentDistanceHash.value) return 'completed'
+        if (workspaceState.prepareCompleted) return 'pending'
+        return 'idle'
+      }
+      if (step === 'cluster') {
+        if (currentResultHash.value || clusterResult.value) return 'completed'
+        if (currentDistanceHash.value) return 'pending'
+        return 'idle'
+      }
+      if (step === 'result') {
+        return clusterResult.value ? 'completed' : 'idle'
+      }
+      return 'idle'
+    })()
+
+    return {
+      key: step,
+      label: t(`cluster.steps.${step}`),
+      status
+    }
+  }))
+
   recoverWorkspace()
 
   function serializeWorkspaceState() {
@@ -820,6 +891,8 @@ export function useClusterWorkspace() {
     activeStepOption,
     activeStepDescription,
     visibleMainPanels,
+    stageContextCards,
+    stageProgressItems,
     prepareStepStatus,
     currentDistanceHash,
     currentResultHash,

@@ -109,6 +109,7 @@
   },
   "task": {
     "title": "任务状态",
+    "description": "右侧持续显示当前任务、阶段产物与流程进度。",
     "source": "来源",
     "taskId": "task_id",
     "status": "状态",
@@ -116,6 +117,23 @@
     "message": "消息",
     "staged": "staged",
     "jobs": "jobs"
+  },
+  "context": {
+    "title": "阶段上下文",
+    "progressTitle": "流程进度",
+    "requestScope": "请求范围",
+    "requestScopeValue": "{groups} 个 group · {locations} 个地点 · {regions} 个分区",
+    "prepareHash": "prepare_hash",
+    "distanceHash": "distance_hash",
+    "resultHash": "result_hash",
+    "phonemeMode": "phoneme_mode",
+    "resultSource": "结果来源",
+    "progress": {
+      "idle": "未就绪",
+      "pending": "待继续",
+      "active": "当前阶段",
+      "completed": "已完成"
+    }
   },
   "status": {
     "idle": "未开始",

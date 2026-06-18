@@ -3,45 +3,80 @@
     <div class="panel-header">
       <div>
         <h2>{{ t('cluster.task.title') }}</h2>
-        <p>{{ t('cluster.task.message') }}</p>
+        <p>{{ t('cluster.task.description') }}</p>
       </div>
     </div>
 
-    <div
-      v-if="workspaceState.activeTask.taskId"
-      class="task-status-card main-glass-panel-inner"
-    >
-      <div class="task-row">
-        <span>{{ t('cluster.task.source') }}</span>
-        <strong>{{ t(`cluster.task.${workspaceState.activeTask.source}`) }}</strong>
-      </div>
-      <div class="task-row">
-        <span>{{ t('cluster.task.taskId') }}</span>
-        <code>{{ workspaceState.activeTask.taskId }}</code>
-      </div>
-      <div class="task-row">
-        <span>{{ t('cluster.task.status') }}</span>
-        <strong>{{ t(`cluster.status.${mapTaskStatus(workspaceState.activeTask.status)}`) }}</strong>
-      </div>
-      <div class="progress-shell">
-        <div class="progress-track">
+    <div class="stage-context-stack">
+      <div class="stage-context-card main-glass-panel-inner">
+        <h3>{{ t('cluster.context.title') }}</h3>
+        <div class="context-list">
           <div
-            class="progress-fill"
-            :style="{ width: `${workspaceState.activeTask.progress || 0}%` }"
-          />
+            v-for="card in stageContextCards"
+            :key="card.key"
+            class="context-row"
+          >
+            <span>{{ card.label }}</span>
+            <strong>{{ card.value }}</strong>
+          </div>
         </div>
-        <span>{{ workspaceState.activeTask.progress || 0 }}%</span>
       </div>
-      <p class="task-message">
-        {{ workspaceState.activeTask.message || '—' }}
+
+      <div class="stage-context-card main-glass-panel-inner">
+        <h3>{{ t('cluster.context.progressTitle') }}</h3>
+        <div class="stage-progress-list">
+          <div
+            v-for="item in stageProgressItems"
+            :key="item.key"
+            class="stage-progress-row"
+          >
+            <span>{{ item.label }}</span>
+            <span
+              class="status-badge"
+              :class="progressStatusClass(item.status)"
+            >
+              {{ t(`cluster.context.progress.${item.status}`) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="workspaceState.activeTask.taskId"
+        class="task-status-card main-glass-panel-inner"
+      >
+        <div class="task-row">
+          <span>{{ t('cluster.task.source') }}</span>
+          <strong>{{ t(`cluster.task.${workspaceState.activeTask.source}`) }}</strong>
+        </div>
+        <div class="task-row">
+          <span>{{ t('cluster.task.taskId') }}</span>
+          <code>{{ workspaceState.activeTask.taskId }}</code>
+        </div>
+        <div class="task-row">
+          <span>{{ t('cluster.task.status') }}</span>
+          <strong>{{ t(`cluster.status.${mapTaskStatus(workspaceState.activeTask.status)}`) }}</strong>
+        </div>
+        <div class="progress-shell">
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              :style="{ width: `${workspaceState.activeTask.progress || 0}%` }"
+            />
+          </div>
+          <span>{{ workspaceState.activeTask.progress || 0 }}%</span>
+        </div>
+        <p class="task-message">
+          {{ workspaceState.activeTask.message || '—' }}
+        </p>
+      </div>
+      <p
+        v-else
+        class="section-note"
+      >
+        {{ t('cluster.status.idle') }}
       </p>
     </div>
-    <p
-      v-else
-      class="section-note"
-    >
-      {{ t('cluster.status.idle') }}
-    </p>
   </section>
 </template>
 
@@ -50,5 +85,18 @@ import { useI18n } from 'vue-i18n'
 import { useClusterWorkspaceContext } from './clusterContext.js'
 
 const { t } = useI18n()
-const { workspaceState, mapTaskStatus } = useClusterWorkspaceContext()
+const {
+  workspaceState,
+  stageContextCards,
+  stageProgressItems,
+  mapTaskStatus
+} = useClusterWorkspaceContext()
+
+function progressStatusClass(status) {
+  return {
+    'is-completed': status === 'completed',
+    'is-pending': status === 'pending' || status === 'active',
+    'is-idle': status === 'idle'
+  }
+}
 </script>
