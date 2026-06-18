@@ -1639,6 +1639,7 @@ export default {
   display: flex;
   gap: 1.5dvw;
   width: 100%;
+  max-width: 90dvw;
   justify-content: space-between;
   flex-direction: column;
 }
@@ -2043,6 +2044,7 @@ export default {
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
   margin-top: 0;
+  max-width:90dvw;
 }
 
 .selected-group {
@@ -2050,6 +2052,7 @@ export default {
   border-radius: 12px;
   padding: 1rem;
   background: rgba(255, 255, 255, 0.5);
+  max-width:38dvw;
 }
 
 .selected-group-header {

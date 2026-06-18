@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="title-row">
-      <h2 style="margin: 0;">{{ t('words.ycSpoken.name') }}</h2>
+      <h2>{{ t('words.ycSpoken.name') }}</h2>
       <button class="village-link-btn" @click="goToYCVillages">
         <span role="img" aria-label="ycVillages">🏠</span> {{ t('villages.ycVillages.name') }}
       </button>
@@ -42,12 +42,20 @@ const goToYCVillages = () => {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .title-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
+  gap: 0px;
   margin: 0;
+  font-size: 1em;
+  flex-wrap: wrap;
+
+  & h2 {
+    margin: 0 20px 0 0;
+    white-space: nowrap;
+  }
 }
 
 .village-link-btn {

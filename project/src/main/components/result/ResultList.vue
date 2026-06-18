@@ -134,6 +134,20 @@ const hasData = computed(() => tableData.value && tableData.value.length > 0);
 
 // === 筛选与排序 (保持不变) ===
 const availableValueStats = ref([]);
+const featureFilterKeys = computed(() => {
+  const features = new Set();
+
+  tableData.value.forEach(item => {
+    const groupValues = item.分組值 || {};
+    Object.keys(groupValues).forEach(key => {
+      if (key) {
+        features.add(key);
+      }
+    });
+  });
+
+  return features;
+});
 // ... (calculateStats, filteredData, sortedData, displayedData, filterTriggerText 等逻辑完全保留)
 function calculateStats() {
   const totals = new Map();
@@ -164,7 +178,16 @@ const filteredData = computed(() => {
     const feature = Object.keys(groupValues)[0] || '';
     const value = groupValues[feature];
 
-    if (selected.length > 0 && !selected.includes(feature) && !selected.includes(value)) return false;
+    if (selected.length > 0) {
+      const selectedFeatures = selected.filter(option => featureFilterKeys.value.has(option));
+      const selectedGroupValues = selected.filter(option => !featureFilterKeys.value.has(option));
+
+      const matchesFeature = selectedFeatures.length === 0 || selectedFeatures.includes(feature);
+      const matchesGroupValue = selectedGroupValues.length === 0 || selectedGroupValues.includes(value);
+
+      if (!matchesFeature || !matchesGroupValue) return false;
+    }
+
     if (!isCondensedMode.value) return true;
 
     const count = item.字數 || 0;

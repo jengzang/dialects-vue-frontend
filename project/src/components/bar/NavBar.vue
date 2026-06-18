@@ -805,6 +805,7 @@ onBeforeUnmount(() => {
   grid-template-columns: 1fr 1fr;
   gap: 15px;
   margin-bottom: 25px;
+  overflow-x:auto;
 }
 
 .stat-card {
