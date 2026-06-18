@@ -286,10 +286,10 @@ const currentTab = computed(() => {
 })
 
 const tabs = computed(() => [
+  { name: 'setting', label: t('about.tabs.setting') },
   { name: 'intro', label: t('about.tabs.intro') },
   { name: 'suggestion', label: t('about.tabs.suggestion') },
   { name: 'like', label: t('about.tabs.like') },
-  { name: 'setting', label: t('about.tabs.setting') },
 ])
 
 const localizedProjects = computed(() => [
@@ -369,7 +369,7 @@ function changeInterfaceMode(mode) {
 }
 
 function resolveTabRoute(tabName) {
-  const section = tabToPathSection[tabName] || 'intro'
+  const section = tabToPathSection[tabName] || 'setting'
   return {
     path: `/menu/about/${section}`,
     query: route.query

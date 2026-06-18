@@ -28,7 +28,7 @@
     },
     "pho": {
       "phonologyMatrix": "Phonology",
-      "phonologyCustom": "Phoneme",
+      "phonologyCustom": "Phoneme Class",
       "Countphos": "Syllable Statistics",
       "evolution": "Evolution"
     },

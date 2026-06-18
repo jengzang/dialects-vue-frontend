@@ -96,8 +96,8 @@
         "locationCount": "{count} locations"
       },
       "tabs": {
-        "map": "Atlas Partition",
-        "yindian": "YinDian Partition"
+        "map": "Atlas Division",
+        "yindian": "Mcpdict Division"
       },
       "myCustomRegions": "My Custom Partitions",
       "customRegionSelectPlaceholder": "Select custom partitions",
@@ -106,7 +106,7 @@
         "loadCustomRegionsFailed": "Failed to load custom partitions: {message}",
         "loginRequired": "Please log in to use custom partitions",
         "noCustomRegionsConfirm": "You have not created any custom partitions yet. Go create one now?",
-        "loadRegionDetailsFailed": "Failed to load partition details",
+        "loadRegionDetailsFailed": "Failed to load details",
         "selectedCustomRegion": "Selected custom partition: {name}",
         "selectRegionFailed": "Failed to select partition: {message}"
       }
@@ -141,7 +141,7 @@
       "tooManyResults": "Too many results ({count}>{limit}), please reduce combinations"
     },
     "partitionModal": {
-      "title": "Partition Details",
+      "title": "Details",
       "selectionToggle": "Enable Selection",
       "enableSelection": "Enable Selection",
       "selectAll": "All",
@@ -149,15 +149,15 @@
       "confirmButton": "Confirm ({count})",
       "confirmSelection": "Confirm Selection ({count})",
       "maxSelectionExceeded": "Selected {count}, limit {max}",
-      "mapPartition": "Atlas Partition",
-      "dictPartition": "Phonetic Dictionary Partition",
+      "mapPartition": "Atlas Division",
+      "dictPartition": "Mcpdict Division",
       "administrativeDivision": "Administrative Division",
       "emptyNode": "(Empty)",
       "unknownDialect": "Unknown Dialect",
       "loading": "Loading...",
       "tabs": {
-        "map": "Atlas Partition",
-        "yindian": "YinDian Partition",
+        "map": "Atlas Division",
+        "yindian": "Mcpdict Division",
         "administrativeDivision": "Administrative Division"
       }
     },
@@ -252,22 +252,22 @@
       "selectLocationTitle": "Select location from partition",
       "locationPlaceholder": "Enter location (auto-match supported)",
       "mapTab": "Atlas",
-      "yindianTab": "Yindian",
-      "viewPartitionDetails": "View partition details",
-      "selectMapPartition": "Please select atlas partition",
-      "selectYindianPartition": "Please select yindian partition",
-      "partitionLabel": "Partition",
-      "partitionPlaceholder": "Enter partition names, space-separated (e.g.: Cantonese)",
+      "yindianTab": "Mcpdict",
+      "viewPartitionDetails": "View details",
+      "selectMapPartition": "Please select atlas division",
+      "selectYindianPartition": "Please select Mcpdict division",
+      "partitionLabel": "Division",
+      "partitionPlaceholder": "Enter division names, space-separated (e.g.: Cantonese)",
       "selectedCount": "You have selected {count} locations",
       "selectedCountPre": "You have selected",
       "selectedCountPost": "locations",
       "mapSource": "Atlas",
-      "yindianSource": "Yindian",
+      "yindianSource": "Mcpdict",
       "expandButton": "Expand",
       "customLocationsLabel": "Custom locations:",
       "selectedLocationsModalTitle": "Selected Locations ({count})",
       "customLocationsModalTitle": "Custom Locations ({count})",
-      "requireInput": "Please enter a location or partition",
+      "requireInput": "Please enter a location or division",
       "tooManyLocations": "Too many explicit locations were provided. Reduce manual locations or custom-region locations and try again."
     }
   },

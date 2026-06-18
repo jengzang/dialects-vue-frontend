@@ -70,8 +70,8 @@
     "loading": "Loading...",
     "noData": "No data",
     "fields": {
-      "mapPartition": "Map partition:",
-      "yindianPartition": "Yindian partition:",
+      "mapPartition": "Map Division:",
+      "yindianPartition": "Mcpdict Division:",
       "source": "Source table:",
       "coordinates": "Coordinates:",
       "region": "Administrative region:"

@@ -40,7 +40,7 @@
       }
     },
     "custom": {
-      "title": "Phoneme",
+      "title": "Phoneme Class",
       "features": {
         "initial": "Initial",
         "final": "Final",
@@ -190,7 +190,7 @@
   },
   "tabs": {
     "matrix": "Phonology",
-    "custom": "Phoneme",
+    "custom": "Phoneme Class",
     "count": "Syllable Count",
     "evolution": "Evolution"
   }

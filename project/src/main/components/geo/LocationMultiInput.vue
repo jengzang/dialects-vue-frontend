@@ -496,7 +496,7 @@ watch(showPartitionInfoModal, (isVisible) => {
   justify-content: center;
   align-items: center;
   gap: 8px;
-
+  max-width: 300px;
   min-width: 0;
 }
 
@@ -669,7 +669,8 @@ watch(showPartitionInfoModal, (isVisible) => {
 
   .locations-inline {
     width: 100%;
-    gap: 1px
+    gap: 1px;
+    max-width: 180px;
   }
 
   .preview-inline {
