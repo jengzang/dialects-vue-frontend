@@ -164,6 +164,20 @@ export function useClusterWorkspace() {
     return Object.entries(clusterResult.value?.metadata || {}).filter(([key]) => key === 'cache_hit' || key === 'cache_source')
   })
 
+  const normalizedAssignments = computed(() => assignments.value.map((assignment, index) => ({
+    ...assignment,
+    _rowKey: `${assignment.location || 'row'}-${assignment.cluster_id ?? 'na'}-${index}`
+  })))
+
+  const resultGroupCards = computed(() => resultGroups.value.map((group, index) => ({
+    key: group.label || group.group_id || `group-${index}`,
+    title: group.label || `Cluster ${group.group_id ?? index + 1}`,
+    clusterId: group.group_id ?? '—',
+    locationCount: Array.isArray(group.locations) ? group.locations.length : (group.location_count ?? '—'),
+    sampleLocations: Array.isArray(group.locations) ? group.locations.slice(0, 8).join('、') : '',
+    raw: group
+  })))
+
   const resultSummaryCards = computed(() => {
     const summary = clusterResult.value?.summary || {}
 
@@ -934,7 +948,9 @@ export function useClusterWorkspace() {
     currentDistanceHash,
     currentResultHash,
     resultGroups,
+    resultGroupCards,
     assignments,
+    normalizedAssignments,
     performanceEntries,
     cacheEntries,
     resultSummaryCards,

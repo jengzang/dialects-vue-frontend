@@ -148,9 +148,12 @@
     "description": "staged 與 quick run 共用同一套結果展示。",
     "summary": "摘要",
     "assignments": "Assignments",
+    "assignmentsDescription": "共 {count} 條地點歸類結果。",
     "groups": "Groups",
+    "groupsDescription": "共 {count} 個聚類組卡片。",
     "performance": "Performance",
     "advanced": "高級信息",
+    "rawGroups": "原始分組資料",
     "empty": "暫無結果，請先完成聚類流程。",
     "columns": {
       "location": "地點",
@@ -167,6 +170,10 @@
       "phonemeMode": "Phoneme Mode",
       "clusterCount": "聚類數",
       "effectiveLocationCount": "有效地點"
+    },
+    "groupCard": {
+      "locationCount": "地點數",
+      "sampleLocations": "樣例地點"
     },
     "cacheInfo": "緩存命中信息"
   },

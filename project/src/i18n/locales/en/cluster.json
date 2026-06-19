@@ -148,9 +148,12 @@
     "description": "Shared result rendering for staged and quick run outputs.",
     "summary": "Summary",
     "assignments": "Assignments",
+    "assignmentsDescription": "{count} location assignments in total.",
     "groups": "Groups",
+    "groupsDescription": "{count} cluster group cards in total.",
     "performance": "Performance",
     "advanced": "Advanced details",
+    "rawGroups": "Raw group payload",
     "empty": "No cluster result yet. Finish the workflow first.",
     "columns": {
       "location": "Location",
@@ -167,6 +170,10 @@
       "phonemeMode": "Phoneme mode",
       "clusterCount": "Cluster count",
       "effectiveLocationCount": "Effective locations"
+    },
+    "groupCard": {
+      "locationCount": "Locations",
+      "sampleLocations": "Sample locations"
     },
     "cacheInfo": "Cache info"
   },

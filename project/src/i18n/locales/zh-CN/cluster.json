@@ -148,9 +148,12 @@
     "description": "staged 与 quick run 共用同一套结果展示。",
     "summary": "摘要",
     "assignments": "Assignments",
+    "assignmentsDescription": "共 {count} 条地点归类结果。",
     "groups": "Groups",
+    "groupsDescription": "共 {count} 个聚类组卡片。",
     "performance": "Performance",
     "advanced": "高级信息",
+    "rawGroups": "原始分组数据",
     "empty": "暂无结果，请先完成聚类流程。",
     "columns": {
       "location": "地点",
@@ -167,6 +170,10 @@
       "phonemeMode": "Phoneme Mode",
       "clusterCount": "聚类数",
       "effectiveLocationCount": "有效地点"
+    },
+    "groupCard": {
+      "locationCount": "地点数",
+      "sampleLocations": "样例地点"
     },
     "cacheInfo": "缓存命中信息"
   },
