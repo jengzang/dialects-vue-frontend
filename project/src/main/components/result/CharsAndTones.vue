@@ -529,40 +529,15 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
 }
 
 .reading-char {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 0.12em;
-  border-radius: 0.35em;
-  border: 1px solid transparent;
-  transition:
-    color 0.18s ease,
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    text-shadow 0.18s ease;
-}
-
-.reading-char--polyphonic {
-  color: darkred;
-  font-weight: 600;
+  color: inherit;
 }
 
 .reading-char--wendu {
   color: #b26a00;
-  background: rgba(255, 204, 0, 0.14);
-  border-color: rgba(255, 204, 0, 0.32);
 }
 
 .reading-char--baidu {
   color: #7e3af2;
-  background: rgba(175, 82, 222, 0.12);
-  border-color: rgba(175, 82, 222, 0.3);
-}
-
-.reading-char--both {
-  color: #5e5ce6;
-  background: rgba(94, 92, 230, 0.12);
-  border-color: rgba(94, 92, 230, 0.3);
 }
 
 .char-nav-teleport {
