@@ -94,6 +94,7 @@
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getCorrespondingCharacters, getReadingClass, getZhongGuCharReadingType } from '@/main/utils/ResultTable.js';
+import { READING_COLORS } from '@/main/constants/readingColors.js';
 import { getFeatureStats, getLocationDetail } from '@/api';
 import { globalPayload } from '@/main/store/store.js';
 import LocationDetailPopup from '../popup/result/LocationDetailPopup.vue';
@@ -338,7 +339,7 @@ const handleFeatureStatsClick = async () => {
 
   &.multi-vue,
   &.char-vue--wendu {
-    color: darkred;
+    color: v-bind('READING_COLORS.zhongguWendu');
     font-weight: bold;
     position: relative;
     cursor: pointer;
@@ -351,15 +352,15 @@ const handleFeatureStatsClick = async () => {
   }
 
   &.char-vue--baidu {
-    color: #003c8f;
+    color: v-bind('READING_COLORS.zhongguBaidu');
   }
 
   &.char-vue--both {
-    color: #5b2ca0;
+    color: v-bind('READING_COLORS.both');
   }
 
   &.char-vue--polyphonic {
-    color: #8b6b00;
+    color: v-bind('READING_COLORS.polyphonic');
   }
 }
 

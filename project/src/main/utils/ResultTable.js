@@ -97,17 +97,37 @@ export function parseFeatureString(featureStr, tableName = DEFAULT_CHARACTER_TAB
 
 /**
  * @typedef {'normal' | 'polyphonic' | 'wendu' | 'baidu' | 'both'} ReadingType
+ * Unified frontend reading-color semantic bucket.
+ *
+ * - `normal`: no special reading color.
+ * - `polyphonic`: ordinary 多音字 bucket.
+ * - `wendu`: 文讀 bucket.
+ * - `baidu`: 白讀 bucket.
+ * - `both`: 文白讀 bucket.
  */
 
 /**
- * Resolve search_chars 音節級文白讀語義。
+ * Resolve search_chars syllable-level reading type.
  *
- * Only `row.type[index]` is authoritative. `notes` is compatibility fallback
- * for older payloads. This helper is for syllable-level display only.
+ * search_chars rows are shaped like:
+ * {
+ *   char: string,
+ *   音节: string[],
+ *   location: string,
+ *   notes: string[],
+ *   type: Array<'文讀' | '白讀' | '_' | string>
+ * }
  *
- * @param {Record<string, any>} row
- * @param {number} index
- * @returns {ReadingType}
+ * `音节[i]`, `notes[i]`, and `type[i]` are index-aligned. For new payloads,
+ * only `type[index]` is authoritative for 文白讀 coloring. `notes[index]` is a
+ * legacy compatibility fallback and should not be used as the primary signal.
+ *
+ * This helper is only for search_chars 音節級顯示 and intentionally does not
+ * infer `polyphonic` or `both` from mixed row-level data.
+ *
+ * @param {Record<string, any>} row search_chars result row.
+ * @param {number} index syllable index aligned with row.音节 / row.notes / row.type.
+ * @returns {'normal' | 'wendu' | 'baidu'}
  */
 export function getSearchCharReadingType(row, index) {
     const raw = row?.type?.[index];
@@ -121,12 +141,20 @@ export function getSearchCharReadingType(row, index) {
 }
 
 /**
- * Resolve ZhongGu char-level 顏色語義 directly from backend-provided `color`.
+ * Resolve ZhongGu char-level reading color directly from backend `row.color`.
  *
- * Buckets come from the API and are treated as authoritative.
+ * Expected bucket shape:
+ * {
+ *   文白讀?: string[],
+ *   文讀?: string[],
+ *   白讀?: string[],
+ *   多音字?: string[]
+ * }
  *
- * @param {Record<string, any>} row
- * @param {string} char
+ * Priority is `文白讀 > 文讀 > 白讀 > 多音字 > normal`.
+ *
+ * @param {Record<string, any>} row ZhongGu result row.
+ * @param {string} char A single displayed character from row.對應字.
  * @returns {ReadingType}
  */
 export function getZhongGuCharReadingType(row, char) {
@@ -142,20 +170,35 @@ export function getZhongGuCharReadingType(row, char) {
 }
 
 /**
- * Convert a normalized reading type to a reusable CSS class string.
+ * Convert a normalized reading type to a reusable BEM-style CSS class string.
+ *
+ * Example: getReadingClass('wendu', 'pronunciation') =>
+ * `reading-char pronunciation pronunciation--wendu`
+ *
+ * The shared `reading-char` root class is always included for cross-component
+ * styling hooks, while the optional `baseClass` keeps component-local styles.
  *
  * @param {ReadingType} type
  * @param {string} [baseClass='reading-char']
  * @returns {string}
  */
 export function getReadingClass(type, baseClass = 'reading-char') {
-    const classes = [baseClass];
+    const classes = ['reading-char'];
+
+    if (baseClass && baseClass !== 'reading-char') {
+        classes.push(baseClass);
+    }
 
     if (!type || type === 'normal') {
         return classes.join(' ');
     }
 
-    classes.push(`${baseClass}--${type}`);
+    classes.push(`reading-char--${type}`);
+
+    if (baseClass) {
+        classes.push(`${baseClass}--${type}`);
+    }
+
     return classes.join(' ');
 }
 
