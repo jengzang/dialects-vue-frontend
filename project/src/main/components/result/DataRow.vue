@@ -336,7 +336,8 @@ const handleFeatureStatsClick = async () => {
   font-size: 15px;
   color: #333;
 
-  &.multi-vue {
+  &.multi-vue,
+  &.char-vue--wendu {
     color: darkred;
     font-weight: bold;
     position: relative;
@@ -349,12 +350,16 @@ const handleFeatureStatsClick = async () => {
     }
   }
 
-  &.char-vue--wendu {
-    color: #b26a00;
+  &.char-vue--baidu {
+    color: #003c8f;
   }
 
-  &.char-vue--baidu {
-    color: #7e3af2;
+  &.char-vue--both {
+    color: #5b2ca0;
+  }
+
+  &.char-vue--polyphonic {
+    color: #8b6b00;
   }
 }
 
@@ -380,7 +385,7 @@ const handleFeatureStatsClick = async () => {
 /* 這是傳送到 body 的彈窗樣式，不受小容器限制 */
 .global-tooltip-popup {
   position: fixed;
-  z-index: 9999;
+  z-index: 10001;
   transform: translate(-50%, -100%);
   background-color: rgba(0, 0, 0, 0.8);
   color: #fff;

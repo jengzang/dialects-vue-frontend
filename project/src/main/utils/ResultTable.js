@@ -100,72 +100,43 @@ export function parseFeatureString(featureStr, tableName = DEFAULT_CHARACTER_TAB
  */
 
 /**
- * Parse a ZhongGu-style detail field like `知:tɕi|ti; 智:tɕi` into a char set.
+ * Resolve search_chars 音節級文白讀語義。
  *
- * @param {string | null | undefined} detail
- * @returns {Set<string>}
- */
-export function parseDetailChars(detail) {
-    const set = new Set();
-    if (!detail) return set;
-
-    detail
-        .split(';')
-        .map(item => item.trim())
-        .filter(Boolean)
-        .forEach(item => {
-            const [char] = item.split(':');
-            if (char) set.add(char.trim());
-        });
-
-    return set;
-}
-
-/**
- * Resolve search_chars 文白讀語義。
- *
- * Formal source is `row.type`; `notes` is only a compatibility fallback for
- * older payloads. When `index` is omitted, the whole row is aggregated.
+ * Only `row.type[index]` is authoritative. `notes` is compatibility fallback
+ * for older payloads. This helper is for syllable-level display only.
  *
  * @param {Record<string, any>} row
- * @param {number} [index]
+ * @param {number} index
  * @returns {ReadingType}
  */
 export function getSearchCharReadingType(row, index) {
-    const raw = index === undefined
-        ? (Array.isArray(row?.type) ? row.type.join(';') : (row?.type || ''))
-        : row?.type?.[index];
-
+    const raw = row?.type?.[index];
     const normalized = normalizeReadingType(raw);
+
     if (normalized !== 'normal') {
         return normalized;
     }
 
-    return fallbackTypeFromNotes(index === undefined ? row?.notes : row?.notes?.[index]);
+    return fallbackTypeFromNotes(row?.notes?.[index]);
 }
 
 /**
- * Resolve ZhongGu char-level 文白讀 / 多音字顯示語義。
+ * Resolve ZhongGu char-level 顏色語義 directly from backend-provided `color`.
  *
- * Priority is `both > wendu > baidu > polyphonic > normal` so 文白讀 colors can
- * override the broader 多音字 bucket.
+ * Buckets come from the API and are treated as authoritative.
  *
  * @param {Record<string, any>} row
  * @param {string} char
  * @returns {ReadingType}
  */
 export function getZhongGuCharReadingType(row, char) {
-    const polyphonicChars = parseDetailChars(row?.多音字詳情);
-    const wenduChars = parseDetailChars(row?.文讀詳情);
-    const baiduChars = parseDetailChars(row?.白讀詳情);
+    const colorMap = row?.color;
+    if (!colorMap || typeof colorMap !== 'object' || !char) return 'normal';
 
-    const hasWendu = wenduChars.has(char);
-    const hasBaidu = baiduChars.has(char);
-
-    if (hasWendu && hasBaidu) return 'both';
-    if (hasWendu) return 'wendu';
-    if (hasBaidu) return 'baidu';
-    if (polyphonicChars.has(char)) return 'polyphonic';
+    if (Array.isArray(colorMap['文白讀']) && colorMap['文白讀'].includes(char)) return 'both';
+    if (Array.isArray(colorMap['文讀']) && colorMap['文讀'].includes(char)) return 'wendu';
+    if (Array.isArray(colorMap['白讀']) && colorMap['白讀'].includes(char)) return 'baidu';
+    if (Array.isArray(colorMap['多音字']) && colorMap['多音字'].includes(char)) return 'polyphonic';
 
     return 'normal';
 }
@@ -190,7 +161,7 @@ export function getReadingClass(type, baseClass = 'reading-char') {
 
 /**
  * @param {string | string[] | null | undefined} raw
- * @returns {ReadingType}
+ * @returns {'normal' | 'wendu' | 'baidu'}
  */
 function normalizeReadingType(raw) {
     const text = Array.isArray(raw) ? raw.join(';') : (raw || '');
@@ -199,7 +170,6 @@ function normalizeReadingType(raw) {
     const hasWendu = text.includes('文讀') || text.includes('文读');
     const hasBaidu = text.includes('白讀') || text.includes('白读');
 
-    if (hasWendu && hasBaidu) return 'both';
     if (hasWendu) return 'wendu';
     if (hasBaidu) return 'baidu';
 
@@ -211,7 +181,7 @@ function normalizeReadingType(raw) {
  * `notes` instead of `type`.
  *
  * @param {string | string[] | null | undefined} notes
- * @returns {ReadingType}
+ * @returns {'normal' | 'wendu' | 'baidu'}
  */
 function fallbackTypeFromNotes(notes) {
     return normalizeReadingType(notes);
@@ -233,10 +203,9 @@ export function getCorrespondingCharacters(item) {
     }
     return item.對應字.map(ch => ({
         type: 'span',
-        props: {
-            class: getReadingClass(getZhongGuCharReadingType(item, ch), 'char-vue'),
-            ...(multiCharDetails[ch] ? { datatitle: multiCharDetails[ch] } : {})
-        },
+        props: multiCharDetails[ch]
+            ? { class: 'char-vue multi-vue', datatitle: multiCharDetails[ch] }
+            : { class: 'char-vue' },
         children: ch
     }));
 }
