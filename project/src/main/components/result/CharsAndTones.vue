@@ -30,8 +30,10 @@
                   class="syllable-unit"
               >
                 <span
-                  class="pronunciation"
-                  :class="{ 'conversion-failed': isConversionFailed(syl, item.location) }"
+                  :class="[
+                    getReadingClass(getSearchCharReadingType(item, sIdx), 'pronunciation'),
+                    { 'conversion-failed': isConversionFailed(syl, item.location) }
+                  ]"
                   :title="isConversionFailed(syl, item.location) ? t('result.charsAndTones.tooltip.conversionFailed') : ''"
                 >
                   {{ getDisplaySyllable(syl, item.location) }}
@@ -111,6 +113,7 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { getReadingClass, getSearchCharReadingType } from '@/main/utils/ResultTable.js';
 
 const props = defineProps({
   data: {
@@ -523,6 +526,43 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   margin-top: 15px;
   margin-bottom: 1px;
   scroll-margin-top: 12px;
+}
+
+.reading-char {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.12em;
+  border-radius: 0.35em;
+  border: 1px solid transparent;
+  transition:
+    color 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    text-shadow 0.18s ease;
+}
+
+.reading-char--polyphonic {
+  color: darkred;
+  font-weight: 600;
+}
+
+.reading-char--wendu {
+  color: #b26a00;
+  background: rgba(255, 204, 0, 0.14);
+  border-color: rgba(255, 204, 0, 0.32);
+}
+
+.reading-char--baidu {
+  color: #7e3af2;
+  background: rgba(175, 82, 222, 0.12);
+  border-color: rgba(175, 82, 222, 0.3);
+}
+
+.reading-char--both {
+  color: #5e5ce6;
+  background: rgba(94, 92, 230, 0.12);
+  border-color: rgba(94, 92, 230, 0.3);
 }
 
 .char-nav-teleport {

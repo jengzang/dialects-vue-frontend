@@ -318,12 +318,21 @@ const handleFeatureStatsClick = async () => {
 
 .char-vue {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 1px 3px;
   margin-right: 2px;
   font-size: 15px;
   color: #333;
+  border: 1px solid transparent;
+  border-radius: 0.35em;
+  transition:
+    color 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
 
-  &.multi-vue {
+  &.char-vue--polyphonic {
     color: darkred;
     font-weight: bold;
     position: relative;
@@ -334,6 +343,24 @@ const handleFeatureStatsClick = async () => {
       border-radius: 4px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+  }
+
+  &.char-vue--wendu {
+    color: #b26a00;
+    background: rgba(255, 204, 0, 0.14);
+    border-color: rgba(255, 204, 0, 0.32);
+  }
+
+  &.char-vue--baidu {
+    color: #7e3af2;
+    background: rgba(175, 82, 222, 0.12);
+    border-color: rgba(175, 82, 222, 0.3);
+  }
+
+  &.char-vue--both {
+    color: #5e5ce6;
+    background: rgba(94, 92, 230, 0.12);
+    border-color: rgba(94, 92, 230, 0.3);
   }
 }
 

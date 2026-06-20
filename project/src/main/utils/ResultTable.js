@@ -95,6 +95,128 @@ export function parseFeatureString(featureStr, tableName = DEFAULT_CHARACTER_TAB
     return { matched_fields, unmatched_fields: allFieldNames.filter(f => !usedFields.has(f)) };
 }
 
+/**
+ * @typedef {'normal' | 'polyphonic' | 'wendu' | 'baidu' | 'both'} ReadingType
+ */
+
+/**
+ * Parse a ZhongGu-style detail field like `知:tɕi|ti; 智:tɕi` into a char set.
+ *
+ * @param {string | null | undefined} detail
+ * @returns {Set<string>}
+ */
+export function parseDetailChars(detail) {
+    const set = new Set();
+    if (!detail) return set;
+
+    detail
+        .split(';')
+        .map(item => item.trim())
+        .filter(Boolean)
+        .forEach(item => {
+            const [char] = item.split(':');
+            if (char) set.add(char.trim());
+        });
+
+    return set;
+}
+
+/**
+ * Resolve search_chars 文白讀語義。
+ *
+ * Formal source is `row.type`; `notes` is only a compatibility fallback for
+ * older payloads. When `index` is omitted, the whole row is aggregated.
+ *
+ * @param {Record<string, any>} row
+ * @param {number} [index]
+ * @returns {ReadingType}
+ */
+export function getSearchCharReadingType(row, index) {
+    const raw = index === undefined
+        ? (Array.isArray(row?.type) ? row.type.join(';') : (row?.type || ''))
+        : row?.type?.[index];
+
+    const normalized = normalizeReadingType(raw);
+    if (normalized !== 'normal') {
+        return normalized;
+    }
+
+    return fallbackTypeFromNotes(index === undefined ? row?.notes : row?.notes?.[index]);
+}
+
+/**
+ * Resolve ZhongGu char-level 文白讀 / 多音字顯示語義。
+ *
+ * Priority is `both > wendu > baidu > polyphonic > normal` so 文白讀 colors can
+ * override the broader 多音字 bucket.
+ *
+ * @param {Record<string, any>} row
+ * @param {string} char
+ * @returns {ReadingType}
+ */
+export function getZhongGuCharReadingType(row, char) {
+    const polyphonicChars = parseDetailChars(row?.多音字詳情);
+    const wenduChars = parseDetailChars(row?.文讀詳情);
+    const baiduChars = parseDetailChars(row?.白讀詳情);
+
+    const hasWendu = wenduChars.has(char);
+    const hasBaidu = baiduChars.has(char);
+
+    if (hasWendu && hasBaidu) return 'both';
+    if (hasWendu) return 'wendu';
+    if (hasBaidu) return 'baidu';
+    if (polyphonicChars.has(char)) return 'polyphonic';
+
+    return 'normal';
+}
+
+/**
+ * Convert a normalized reading type to a reusable CSS class string.
+ *
+ * @param {ReadingType} type
+ * @param {string} [baseClass='reading-char']
+ * @returns {string}
+ */
+export function getReadingClass(type, baseClass = 'reading-char') {
+    const classes = [baseClass];
+
+    if (!type || type === 'normal') {
+        return classes.join(' ');
+    }
+
+    classes.push(`${baseClass}--${type}`);
+    return classes.join(' ');
+}
+
+/**
+ * @param {string | string[] | null | undefined} raw
+ * @returns {ReadingType}
+ */
+function normalizeReadingType(raw) {
+    const text = Array.isArray(raw) ? raw.join(';') : (raw || '');
+    if (!text || text === '_') return 'normal';
+
+    const hasWendu = text.includes('文讀') || text.includes('文读');
+    const hasBaidu = text.includes('白讀') || text.includes('白读');
+
+    if (hasWendu && hasBaidu) return 'both';
+    if (hasWendu) return 'wendu';
+    if (hasBaidu) return 'baidu';
+
+    return 'normal';
+}
+
+/**
+ * Compatibility-only fallback for legacy payloads that still encode 文白讀 in
+ * `notes` instead of `type`.
+ *
+ * @param {string | string[] | null | undefined} notes
+ * @returns {ReadingType}
+ */
+function fallbackTypeFromNotes(notes) {
+    return normalizeReadingType(notes);
+}
+
 export function getCorrespondingCharacters(item) {
     const multiCharDetails = {};
     if (item.多音字詳情) {
@@ -111,9 +233,10 @@ export function getCorrespondingCharacters(item) {
     }
     return item.對應字.map(ch => ({
         type: 'span',
-        props: multiCharDetails[ch]
-            ? { class: 'char-vue multi-vue', datatitle: multiCharDetails[ch] }
-            : { class: 'char-vue' },
+        props: {
+            class: getReadingClass(getZhongGuCharReadingType(item, ch), 'char-vue'),
+            ...(multiCharDetails[ch] ? { datatitle: multiCharDetails[ch] } : {})
+        },
         children: ch
     }));
 }
