@@ -30,13 +30,10 @@
               <span class="item-count">{{ item.count }}</span>
             </div>
             <div class="item-chars">
-              <span
-                v-for="(char, index) in item.chars || []"
-                :key="`${section.tone}-${item.label}-${char}-${index}`"
-                :class="['detail-char', getReadingTypeClass(item.label)]"
-              >
-                {{ char }}
-              </span>
+              <div v-for="(detail, index) in item.details || []" :key="`${section.tone}-${item.label}-${index}`" class="detail-row">
+                <span class="detail-char">{{ detail.char }}</span>
+                <span class="detail-values">{{ detail.values.join(' / ') }}</span>
+              </div>
             </div>
           </div>
         </section>
@@ -90,14 +87,6 @@ function handleVisibilityChange(value) {
   if (!value) {
     emit('close')
   }
-}
-
-function getReadingTypeClass(label) {
-  if (label === '文讀') return 'detail-char--wendu'
-  if (label === '白讀') return 'detail-char--baidu'
-  if (label === '文白讀') return 'detail-char--both'
-  if (label === '多音字') return 'detail-char--polyphonic'
-  return ''
 }
 </script>
 
@@ -172,9 +161,18 @@ function getReadingTypeClass(label) {
   word-break: break-all;
 }
 
+.detail-row {
+  display: flex;
+  gap: 0.5em;
+  align-items: baseline;
+}
+
 .detail-char {
-  display: inline-block;
-  margin-right: 0.35em;
+  font-weight: 600;
+}
+
+.detail-values {
+  color: #4b5563;
 }
 
 .detail-char--wendu {
