@@ -29,7 +29,15 @@
               <span class="item-label">{{ item.label }}</span>
               <span class="item-count">{{ item.count }}</span>
             </div>
-            <div class="item-chars">{{ (item.chars || []).join(' ') }}</div>
+            <div class="item-chars">
+              <span
+                v-for="(char, index) in item.chars || []"
+                :key="`${section.tone}-${item.label}-${char}-${index}`"
+                :class="['detail-char', getReadingTypeClass(item.label)]"
+              >
+                {{ char }}
+              </span>
+            </div>
           </div>
         </section>
       </div>
@@ -41,6 +49,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import { READING_COLORS } from '@/main/constants/readingColors.js'
 
 const { t } = useI18n()
 
@@ -74,13 +83,21 @@ const titleText = computed(() => {
   const initial = props.initial || t('result.phonologyTable.zeroInitial')
   const final = props.final || t('result.phonologyTable.zeroFinal')
 
-  return location ? `${location} - ${initial}/${final}` : `${initial}/${final}`
+  return location ? `${location} - ${initial}·${final}` : `${initial}·${final}`
 })
 
 function handleVisibilityChange(value) {
   if (!value) {
     emit('close')
   }
+}
+
+function getReadingTypeClass(label) {
+  if (label === '文讀') return 'detail-char--wendu'
+  if (label === '白讀') return 'detail-char--baidu'
+  if (label === '文白讀') return 'detail-char--both'
+  if (label === '多音字') return 'detail-char--polyphonic'
+  return ''
 }
 </script>
 
@@ -153,5 +170,26 @@ function handleVisibilityChange(value) {
   line-height: 1.6;
   color: #1f2937;
   word-break: break-all;
+}
+
+.detail-char {
+  display: inline-block;
+  margin-right: 0.35em;
+}
+
+.detail-char--wendu {
+  color: v-bind('READING_COLORS.wendu');
+}
+
+.detail-char--baidu {
+  color: v-bind('READING_COLORS.baidu');
+}
+
+.detail-char--both {
+  color: v-bind('READING_COLORS.both');
+}
+
+.detail-char--polyphonic {
+  color: v-bind('READING_COLORS.polyphonic');
 }
 </style>

@@ -42,6 +42,8 @@
         :finals="matrixData[location].finals"
         :tones="matrixData[location].tones"
         :matrix="matrixData[location].matrix"
+        :cell-detail-enabled="true"
+        :cell-details="matrixData[location].cellDetails"
       />
     </div>
 
@@ -99,6 +101,42 @@ const displayLocations = computed(() => {
   return Object.keys(matrixData.value)
 })
 
+const transformMatrixReadStats = (matrixReadStats = {}) => {
+  const transformedCellDetails = {}
+
+  Object.entries(matrixReadStats || {}).forEach(([initial, finalMap]) => {
+    transformedCellDetails[initial] = {}
+
+    Object.entries(finalMap || {}).forEach(([final, toneMap]) => {
+      transformedCellDetails[initial][final] = {}
+
+      Object.entries(toneMap || {}).forEach(([tone, readStats]) => {
+        const items = [
+          ['polyphonic', '多音字'],
+          ['wendu', '文讀'],
+          ['baidu', '白讀'],
+          ['wenbai', '文白讀']
+        ]
+          .map(([key, label]) => {
+            const bucket = readStats?.[key]
+            return {
+              label,
+              count: Number(bucket?.count || 0),
+              chars: Array.isArray(bucket?.chars) ? bucket.chars : []
+            }
+          })
+          .filter((item) => item.count > 0 || item.chars.length > 0)
+
+        if (items.length > 0) {
+          transformedCellDetails[initial][final][tone] = items
+        }
+      })
+    })
+  })
+
+  return transformedCellDetails
+}
+
 // 处理匹配到的地点列表
 const handleMatchedLocations = (locations) => {
   matchedLocations.value = locations
@@ -124,7 +162,15 @@ const loadData = async () => {
 
     const result = await getPhonologyMatrix(requestBody)
 
-    matrixData.value = result.data
+    matrixData.value = Object.fromEntries(
+      Object.entries(result.data || {}).map(([location, payload]) => [
+        location,
+        {
+          ...payload,
+          cellDetails: transformMatrixReadStats(payload.matrix_read_stats)
+        }
+      ])
+    )
 
     // 首次查询成功后启用 URL 同步
     shouldSyncUrl.value = true
