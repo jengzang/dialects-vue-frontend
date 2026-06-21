@@ -26,11 +26,23 @@ describe('task progress contracts', () => {
     expect(source).not.toContain('setInterval(() => {')
   })
 
-  it('Praat normalizes fraction progress into clamped integer percentages', () => {
+  it('Praat normalizes percent progress into clamped integer percentages', () => {
     const source = readSource(praatViewPath)
 
-    expect(source).toContain('const normalizeFractionProgress = (value) => {')
-    expect(source).toContain('jobProgress.value = normalizeFractionProgress(status.progress)')
+    expect(source).toContain('const normalizePercentProgress = (value) => {')
+    expect(source).toContain('jobProgress.value = normalizePercentProgress(status.progress)')
+    expect(source).not.toContain('Math.round(numeric * 100)')
+  })
+
+  it('Praat avoids immediate progress polling and keeps a loading state while fetching results', () => {
+    const source = readSource(praatViewPath)
+
+    expect(source).toContain('immediate: false')
+    expect(source).toContain("const isFetchingResults = ref(false)")
+    expect(source).toContain('isFetchingResults.value = true')
+    expect(source).toContain("jobStatus.value = 'processing'")
+    expect(source).toContain("jobStage.value = t('praat.main.status.fetchingResults')")
+    expect(source).toContain('isFetchingResults.value = false')
   })
 
   it('Merge and Jyut2Ipa normalize percent progress and stop on failed status', () => {
