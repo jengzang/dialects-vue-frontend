@@ -106,7 +106,7 @@ export function useSidebarConfig() {
         about_ontop: {
             label: t('navigation.menu.about_ontop'),
             icon: '🌐',
-            path: '/menu/about/intro',
+            path: '/menu/about/settings',
             children: [
                 { label: t('navigation.submenu.about.intro'), icon: 'ℹ️', path: '/menu/about/intro' },
                 { label: t('navigation.submenu.about.suggestion'), icon: '💬', path: '/menu/about/suggestion' },
