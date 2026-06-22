@@ -682,8 +682,8 @@ const toneClassLabels = computed(() => [
   t('compare.toneClasses.yangqu'),
   t('compare.toneClasses.yinru'),
   t('compare.toneClasses.yangru'),
+  t('compare.toneClasses.other'),
   t('compare.toneClasses.qingsheng'),
-  t('compare.toneClasses.other')
 ])
 
 // Helper function to get translated card label
