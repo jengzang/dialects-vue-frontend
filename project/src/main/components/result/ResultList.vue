@@ -14,6 +14,17 @@
       </div>
 
       <div v-else class="result-panel-vue" :style="{ height: panelHeight }">
+        <div class="reading-legend" role="note" :aria-label="t('result.resultList.readingLegend.ariaLabel')">
+          <span class="reading-legend-title">{{ t('result.resultList.readingLegend.title') }}</span>
+          <span
+            v-for="item in readingLegendItems"
+            :key="item.key"
+            class="reading-legend-item"
+          >
+            <span class="reading-legend-dot" :style="{ backgroundColor: item.color }"></span>
+            <span class="reading-legend-label">{{ item.label }}</span>
+          </span>
+        </div>
         <DataRow
             v-for="(item, index) in displayedData"
             :key="index"
@@ -99,6 +110,7 @@ import { ref, computed, watch, onMounted, nextTick, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DataRow from './DataRow.vue';
 import { parseFeatureString,get_detail } from '@/main/utils/ResultTable.js';
+import { READING_COLORS } from '@/main/constants/readingColors.js';
 import ValuePopup from "../popup/result/ValuePopup.vue";
 import FeaturePopup from "../popup/result/FeaturePopup.vue";
 import { resultCache } from '@/main/store/store.js';
@@ -110,6 +122,13 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
+
+const readingLegendItems = computed(() => [
+  { key: 'both', label: t('result.resultList.readingLegend.items.both'), color: READING_COLORS.both },
+  { key: 'wendu', label: t('result.resultList.readingLegend.items.wendu'), color: READING_COLORS.wendu },
+  { key: 'baidu', label: t('result.resultList.readingLegend.items.baidu'), color: READING_COLORS.baidu },
+  { key: 'polyphonic', label: t('result.resultList.readingLegend.items.polyphonic'), color: READING_COLORS.polyphonic }
+]);
 
 // === 核心数据 (保持不变) ===
 const tableData = ref([]);
@@ -467,6 +486,44 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 15px;
   overflow-y: auto;
+}
+
+.reading-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #4b5563;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+}
+
+.reading-legend-title {
+  font-weight: 600;
+  color: #374151;
+}
+
+.reading-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.reading-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.reading-legend-label {
+  line-height: 1;
 }
 
 .sticky-label2 {

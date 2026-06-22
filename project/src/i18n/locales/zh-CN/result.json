@@ -24,6 +24,16 @@
     }
   },
   "resultList": {
+    "readingLegend": {
+      "ariaLabel": "字色图例",
+      "title": "字色说明",
+      "items": {
+        "both": "文白读",
+        "wendu": "文读",
+        "baidu": "白读",
+        "polyphonic": "多音/多地位"
+      }
+    },
     "emptyState": "请先查询",
     "locationLabel": "地点",
     "locationPlaceholder": "点击选择地点跳转",

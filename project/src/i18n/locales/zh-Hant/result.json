@@ -24,6 +24,16 @@
     }
   },
   "resultList": {
+    "readingLegend": {
+      "ariaLabel": "字色圖例",
+      "title": "字色說明",
+      "items": {
+        "both": "文白讀",
+        "wendu": "文讀",
+        "baidu": "白讀",
+        "polyphonic": "多音/多地位"
+      }
+    },
     "emptyState": "請先查詢",
     "locationLabel": "地點",
     "locationPlaceholder": "點擊選擇地點跳轉",

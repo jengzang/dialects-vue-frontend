@@ -24,7 +24,17 @@
     }
   },
   "resultList": {
-    "emptyState": "Please run a query first",
+    "readingLegend": {
+      "ariaLabel": "reading color legend",
+      "title": "Color legend",
+      "items": {
+        "both": "Literary + colloquial",
+        "wendu": "Literary",
+        "baidu": "Colloquial",
+        "polyphonic": "Polyphonic / multiple positions"
+      }
+    },
+    "emptyState": "Please search first",
     "locationLabel": "Location",
     "locationPlaceholder": "choose the locations",
     "filter": {
