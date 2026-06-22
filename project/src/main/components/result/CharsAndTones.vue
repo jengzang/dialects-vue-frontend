@@ -295,7 +295,7 @@ const toneMap = computed(() => {
         // Group 1: ID (如 1, 7a)
         // Group 2: 數字 (調值, 如 55, 5)
         // Group 3: 剩餘部分 (調類, 如 陰平, 上陰入)
-        const match = part.match(/^\[([0-9a-zA-Z]+)\](\d+)(.*)$/);
+        const match = part.match(/^\[([0-9a-zA-Z]+)\](`?[\d/-]+)(.*)$/);
 
         if (match) {
           const id = match[1];

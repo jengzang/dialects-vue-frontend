@@ -169,6 +169,74 @@ export function getZhongGuCharReadingType(row, char) {
     return 'normal';
 }
 
+function buildDetailCharSet(detailList) {
+    const chars = new Set();
+
+    if (!Array.isArray(detailList)) {
+        return chars;
+    }
+
+    detailList.forEach((entry) => {
+        if (typeof entry !== 'string') {
+            return;
+        }
+
+        const [char] = entry.split(':').map(str => str.trim());
+        if (char) {
+            chars.add(char);
+        }
+    });
+
+    return chars;
+}
+
+function buildMultiDetailCharSet(detailText) {
+    const chars = new Set();
+
+    if (typeof detailText !== 'string' || !detailText.trim()) {
+        return chars;
+    }
+
+    detailText.split(';').forEach((entry) => {
+        const [char] = entry.split(':').map(str => str.trim());
+        if (char) {
+            chars.add(char);
+        }
+    });
+
+    return chars;
+}
+
+/**
+ * Resolve yinwei char-level reading color from detail fields rather than
+ * ZhongGu-style `row.color` buckets.
+ *
+ * Priority is `文白讀 > 文讀 > 白讀 > 多地位/多音字 > normal`.
+ * Hover content remains driven by `多地位詳情` / `多音字詳情` elsewhere.
+ *
+ * @param {Record<string, any>} row Yinwei result row.
+ * @param {string} char A single displayed character from row.對應字.
+ * @returns {ReadingType}
+ */
+export function getYinWeiCharReadingType(row, char) {
+    if (!row || !char) return 'normal';
+
+    const wenduChars = buildDetailCharSet(row?.文讀詳情);
+    const baiduChars = buildDetailCharSet(row?.白讀詳情);
+
+    if (wenduChars.has(char) && baiduChars.has(char)) return 'both';
+    if (wenduChars.has(char)) return 'wendu';
+    if (baiduChars.has(char)) return 'baidu';
+
+    const multiPositionChars = buildMultiDetailCharSet(row?.多地位詳情);
+    if (multiPositionChars.has(char)) return 'polyphonic';
+
+    const polyphonicChars = buildMultiDetailCharSet(row?.多音字詳情);
+    if (polyphonicChars.has(char)) return 'polyphonic';
+
+    return 'normal';
+}
+
 /**
  * Convert a normalized reading type to a reusable BEM-style CSS class string.
  *

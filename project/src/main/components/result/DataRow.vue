@@ -93,7 +93,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getCorrespondingCharacters, getReadingClass, getZhongGuCharReadingType } from '@/main/utils/ResultTable.js';
+import { getCorrespondingCharacters, getReadingClass, getYinWeiCharReadingType, getZhongGuCharReadingType } from '@/main/utils/ResultTable.js';
 import { READING_COLORS } from '@/main/constants/readingColors.js';
 import { getFeatureStats, getLocationDetail } from '@/api';
 import { globalPayload } from '@/main/store/store.js';
@@ -104,7 +104,8 @@ import { translateResultTerm } from '@/i18n/utils/resultI18n.js';
 const props = defineProps({
   item: { type: Object, required: true },
   isCondensed: { type: Boolean, default: true },
-  showLocation: { type: Boolean, default: false }
+  showLocation: { type: Boolean, default: false },
+  readingSource: { type: String, default: 'zhonggu' }
 });
 
 const emit = defineEmits(['trigger-popup']);
@@ -122,7 +123,12 @@ const parsedChars = computed(() => {
       ...node.props,
       class: [
         node.props?.class,
-        getReadingClass(getZhongGuCharReadingType(props.item, node.children), 'char-vue')
+        getReadingClass(
+          props.readingSource === 'yinwei'
+            ? getYinWeiCharReadingType(props.item, node.children)
+            : getZhongGuCharReadingType(props.item, node.children),
+          'char-vue'
+        )
       ].filter(Boolean).join(' ')
     }
   }));

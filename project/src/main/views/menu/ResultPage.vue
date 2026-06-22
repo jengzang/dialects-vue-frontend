@@ -23,6 +23,7 @@
     <ResultList
         v-else-if="latestResults.length > 0 && ['tab2', 'tab3'].includes(currentTabRef)"
         :data="latestResults"
+        :reading-source="currentTabRef === 'tab3' ? 'yinwei' : 'zhonggu'"
     />
 
     <template v-else-if="latestResults.length > 0 && ['tab1', 'tab4'].includes(currentTabRef)">

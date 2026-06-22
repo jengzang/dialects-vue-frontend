@@ -20,6 +20,7 @@
             :item="item"
             :is-condensed="isCondensedMode"
             :show-location="shouldShowLocation(item, index)"
+            :reading-source="props.readingSource"
             @trigger-popup="onTriggerPopup"
         />
       </div>
@@ -104,7 +105,8 @@ import { resultCache } from '@/main/store/store.js';
 
 const props = defineProps({
   data: { type: Array, default: () => [] },
-  isCondensed: { type: Boolean, default: false }
+  isCondensed: { type: Boolean, default: false },
+  readingSource: { type: String, default: 'zhonggu' }
 });
 
 const { t } = useI18n();
