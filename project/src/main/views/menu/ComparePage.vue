@@ -59,35 +59,11 @@
           <!-- 特徵選擇 -->
           <div class="feature-selection">
             <label class="feature-label">{{ $t('compare.feature.selectLabel') }}</label>
-            <div class="feature-checkboxes">
-              <label class="checkbox-item">
-                <input
-                  v-model="tabStates.tab1.features"
-                  type="radio"
-                  name="tab1-feature"
-                  value="聲母"
-                >
-                <span>{{ $t('compare.feature.initial') }}</span>
-              </label>
-              <label class="checkbox-item">
-                <input
-                  v-model="tabStates.tab1.features"
-                  type="radio"
-                  name="tab1-feature"
-                  value="韻母"
-                >
-                <span>{{ $t('compare.feature.final') }}</span>
-              </label>
-              <label class="checkbox-item">
-                <input
-                  v-model="tabStates.tab1.features"
-                  type="radio"
-                  name="tab1-feature"
-                  value="聲調"
-                >
-                <span>{{ $t('compare.feature.tone') }}</span>
-              </label>
-            </div>
+            <RadioGroup
+              v-model="tabStates.tab1.features"
+              name="tab1-feature"
+              :options="tab1FeatureOptions"
+            />
           </div>
         </div>
       </div>
@@ -442,6 +418,7 @@ import LocationMultiInput from "@/main/components/geo/LocationMultiInput.vue";
 import PhoneticCompare from "@/main/components/pho/PhoneticCompare.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
 import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
+import RadioGroup from '@/components/selector/RadioGroup.vue';
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
 import ChoiceSelector from "@/components/selector/ChoiceSelector.vue";
 import {
@@ -492,6 +469,21 @@ const locationLimitContext = computed(() => {
   // 映射到 constants.js 中的配置 key
   return `compare_${currentTab.value}`  // 'compare_tab1', 'compare_tab2', 'compare_tab4', 'compare_tab5'
 })
+
+const tab1FeatureOptions = computed(() => [
+  {
+    value: '聲母',
+    label: t('compare.feature.initial')
+  },
+  {
+    value: '韻母',
+    label: t('compare.feature.final')
+  },
+  {
+    value: '聲調',
+    label: t('compare.feature.tone')
+  }
+])
 
 // Tab1 state - dual input for character comparison
 const hanziInput = ref({
@@ -1602,7 +1594,6 @@ export default {
 /* 📄 內容區塊動畫 */
 .tab-content-inner {
   width: 100%;
-  max-width: 900px;
   animation: fade 0.6s ease;
 
   /* ✅ 新增這些 */
@@ -1611,6 +1602,10 @@ export default {
   text-align: center;
   justify-content: center; /* 垂直置中 */
   padding: 1rem 0;
+}
+
+.page{
+  max-width: 900px;
 }
 
 
@@ -2169,59 +2164,15 @@ export default {
 /* 特徵選擇樣式 */
 .feature-selection {
   width: 100%;
-  padding: 0.6rem 0.8rem;
+  padding: 0.3rem 0.4rem;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(200, 200, 200, 0.3);
 }
 
 .feature-label {
   display: block;
   font-weight: 600;
   color: #333;
-  margin-bottom: 0.5rem;
   font-size: 0.9rem;
-}
-
-.feature-checkboxes {
-  display: flex;
-  gap: 0.8rem;
-  flex-wrap: nowrap;
-  justify-content: center;
-  overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-}
-
-.checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  cursor: pointer;
-  padding: 0.35rem 0.7rem;
-  border-radius: 6px;
-  transition: all 0.2s;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(0, 122, 255, 0.15);
-}
-
-.checkbox-item:hover {
-  background: rgba(0, 122, 255, 0.1);
-  border-color: rgba(0, 122, 255, 0.3);
-}
-
-.checkbox-item input[type="checkbox"],
-.checkbox-item input[type="radio"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  margin: 0;
-}
-
-.checkbox-item span {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #333;
 }
 
 /* 調類選擇樣式 */
@@ -2382,7 +2333,7 @@ export default {
   max-height: none;
   align-items: center;
   width:93dvw;
-  max-width: 880px;
+  max-width: none;
 }
 
 /* 移動端適配 */
@@ -2406,10 +2357,6 @@ export default {
   }
 
   .selected-groups-container {
-    gap: 1rem;
-  }
-
-  .feature-checkboxes {
     gap: 1rem;
   }
 

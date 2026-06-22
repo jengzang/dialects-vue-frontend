@@ -335,6 +335,7 @@ const resolveTabRoute = (tabName) => {
   font-size: 14px;
   color: #333;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .feature-btn.active {
@@ -378,6 +379,12 @@ const resolveTabRoute = (tabName) => {
 .dropdown:hover {
   background: var(--glass-medium);
   border-color: var(--color-primary);
+}
+
+@media (max-aspect-ratio:1/1){
+  .feature-btn{
+    padding:10px 8px;
+  }
 }
 </style>
 
