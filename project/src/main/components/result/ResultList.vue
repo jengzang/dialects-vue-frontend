@@ -123,12 +123,16 @@ const props = defineProps({
 
 const { t } = useI18n();
 
-const readingLegendItems = computed(() => [
-  { key: 'both', label: t('result.resultList.readingLegend.items.both'), color: READING_COLORS.both },
-  { key: 'wendu', label: t('result.resultList.readingLegend.items.wendu'), color: READING_COLORS.wendu },
-  { key: 'baidu', label: t('result.resultList.readingLegend.items.baidu'), color: READING_COLORS.baidu },
-  { key: 'polyphonic', label: t('result.resultList.readingLegend.items.polyphonic'), color: READING_COLORS.polyphonic }
-]);
+const readingLegendItems = computed(() => {
+  const polyphonicKey = props.readingSource === 'yinwei' ? 'yinweiPolyphonic' : 'zhongguPolyphonic';
+
+  return [
+    { key: 'wendu', label: t('result.resultList.readingLegend.items.wendu'), color: READING_COLORS.wendu },
+    { key: 'baidu', label: t('result.resultList.readingLegend.items.baidu'), color: READING_COLORS.baidu },
+        { key: 'both', label: t('result.resultList.readingLegend.items.both'), color: READING_COLORS.both },
+    { key: polyphonicKey, label: t(`result.resultList.readingLegend.items.${polyphonicKey}`), color: READING_COLORS.polyphonic }
+  ];
+});
 
 // === 核心数据 (保持不变) ===
 const tableData = ref([]);

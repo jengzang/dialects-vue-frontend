@@ -31,7 +31,8 @@
         "both": "Literary + colloquial",
         "wendu": "Literary",
         "baidu": "Colloquial",
-        "polyphonic": "Polyphonic / multiple positions"
+        "yinweiPolyphonic": "Multiple positions",
+        "zhongguPolyphonic": "Polyphonic"
       }
     },
     "emptyState": "Please search first",

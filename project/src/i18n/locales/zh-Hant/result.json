@@ -31,7 +31,8 @@
         "both": "文白讀",
         "wendu": "文讀",
         "baidu": "白讀",
-        "polyphonic": "多音/多地位"
+        "yinweiPolyphonic": "多地位",
+        "zhongguPolyphonic": "多音字"
       }
     },
     "emptyState": "請先查詢",
