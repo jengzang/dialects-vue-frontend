@@ -938,8 +938,14 @@ const resetView = () => {
 
   let points = [];
 
+  // compare 模式优先按当前比较结果坐标复位，避免退回到 mapData 全量范围
+  if (mapStore.mode === 'compare' && mapStore.mergedData && mapStore.mergedData.length > 0) {
+    points = mapStore.mergedData
+      .map(item => item.coordinate)
+      .filter(isValidCoordinatePair);
+  }
   // 1. 优先从 mapStore.mapData 提取坐标（基础地图数据）
-  if (mapStore.mapData && mapStore.mapData.coordinates_locations) {
+  else if (mapStore.mapData && mapStore.mapData.coordinates_locations) {
     points = mapStore.mapData.coordinates_locations
       .map(item => item[1])
       .filter(isValidCoordinatePair);

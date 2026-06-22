@@ -433,6 +433,7 @@ import {
 } from '@/main/store/store.js'
 import { compareChars, compareZhongGu, compareTones } from '@/api/index.js'
 import { getCoordinates } from '@/api'
+import { requestMapFitView } from '@/utils/map/MapData.js'
 import { showWarning } from '@/utils/message.js'
 import { useQueryConfig } from '@/composables/domain/useQueryConfig.js'
 
@@ -1249,6 +1250,7 @@ const runAction = async () => {
       mapStore.mergedData = mergedData
       mapStore.mode = 'compare'
       mapStore.compareType = compareType  // 設置比較類型
+      requestMapFitView()
 
       // 根據比較類型設置不同的圖例
       if (compareType === 'chars') {
