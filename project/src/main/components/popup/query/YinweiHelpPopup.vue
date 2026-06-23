@@ -31,30 +31,30 @@
 
         <Transition name="slide-down">
           <div v-if="apiResults[loc] && apiResults[loc][loc]" class="result-box">
-            <div class="stat-section" v-if="apiResults[loc][loc]['鑱叉瘝']">
+            <div class="stat-section" v-if="apiResults[loc][loc]['聲母']">
               <h4 class="stat-title">{{ t('query.components.yinweiSelector.initial') }}</h4>
               <div class="stat-tags">
-                <span v-for="(count, key) in apiResults[loc][loc]['鑱叉瘝']" :key="key" class="glass-tag">
+                <span v-for="(count, key) in apiResults[loc][loc]['聲母']" :key="key" class="glass-tag">
                   <span class="tag-key">{{ key }}</span>
                   <span class="tag-count">{{ count }}</span>
                 </span>
               </div>
             </div>
 
-            <div class="stat-section" v-if="apiResults[loc][loc]['闊绘瘝']">
+            <div class="stat-section" v-if="apiResults[loc][loc]['韻母']">
               <h4 class="stat-title">{{ t('query.components.yinweiSelector.final') }}</h4>
               <div class="stat-tags">
-                <span v-for="(count, key) in apiResults[loc][loc]['闊绘瘝']" :key="key" class="glass-tag">
+                <span v-for="(count, key) in apiResults[loc][loc]['韻母']" :key="key" class="glass-tag">
                   <span class="tag-key">{{ key }}</span>
                   <span class="tag-count">{{ count }}</span>
                 </span>
               </div>
             </div>
 
-            <div class="stat-section" v-if="apiResults[loc][loc]['鑱茶']">
+            <div class="stat-section" v-if="apiResults[loc][loc]['聲調']">
               <h4 class="stat-title">{{ t('query.components.yinweiSelector.tone') }}</h4>
               <div class="stat-tags">
-                <span v-for="(count, key) in apiResults[loc][loc]['鑱茶']" :key="key" class="glass-tag">
+                <span v-for="(count, key) in apiResults[loc][loc]['聲調']" :key="key" class="glass-tag">
                   <span class="tag-key">{{ key }}</span>
                   <span class="tag-count">{{ count }}</span>
                 </span>
