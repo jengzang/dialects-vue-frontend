@@ -70,6 +70,15 @@ const locationNavItems = computed(() => {
   const orderedLocations = Object.keys(featureData.value)
   const totalItems = []
 
+  if (hasChartData.value) {
+    totalItems.push({
+      id: 'count-charts',
+      fullLabel: '圖表',
+      targetKey: 'charts',
+      kind: 'charts'
+    })
+  }
+
   const totalKeys = Object.keys(aggregatedData.value)
   totalKeys.forEach((featureType) => {
     totalItems.push({
@@ -92,11 +101,24 @@ const locationNavItems = computed(() => {
   return totalItems
 })
 
+const getChartsAnchorId = () => 'count-charts-anchor'
 const getLocationAnchorId = (location) => `count-location-anchor-${location}`
 const getAggregatedAnchorId = (featureType) => `count-total-anchor-${featureType}`
 
 const handleLocationNavJump = async (nav) => {
   await nextTick()
+
+  if (nav.kind === 'charts') {
+    const target = document.getElementById(getChartsAnchorId())
+
+    if (target) {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
+    return
+  }
 
   if (nav.kind === 'total') {
     const target = document.getElementById(getAggregatedAnchorId(nav.targetKey))
@@ -682,7 +704,7 @@ onBeforeUnmount(() => {
         </h3>
 
         <!-- 圖表統計部分 -->
-        <div v-if="hasChartData" class="charts-section">
+        <div v-if="hasChartData" :id="getChartsAnchorId()" class="charts-section">
           <div class="chart-block">
             <h4 class="chart-block-title">{{ $t('phonology.phonology.countphos.charts.pie.title') }}</h4>
             <p class="chart-block-desc">
