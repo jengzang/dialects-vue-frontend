@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 const props = defineProps({
   items: {
@@ -22,7 +22,19 @@ const hoverId = ref('')
 const activeId = ref('')
 const centerIndex = ref(0)
 
-const wheelStep = 1
+// 自然滾動參數
+// 數值越大，滾動越慢；數值越小，滾動越快
+const WHEEL_THRESHOLD = 90
+
+// 兩次換項之間的最小間隔，防止觸控板慣性連續飛過很多項
+const WHEEL_STEP_COOLDOWN_MS = 90
+
+// 停止滾動一小段時間後，清空累積量
+const WHEEL_IDLE_RESET_MS = 180
+
+let wheelDeltaBuffer = 0
+let wheelResetTimer = null
+let lastWheelMoveAt = 0
 
 const orderedItems = computed(() => {
   if (props.itemOrder === 'pinyin') {
@@ -36,11 +48,19 @@ const orderedItems = computed(() => {
 
 const totalItems = computed(() => orderedItems.value.length)
 
-const visibleSlotCount = computed(() => {
-  const count = Math.max(3, Number(props.visibleCount) || 15)
-
-  // 保證有一個明確的正中間
+const toOdd = (value) => {
+  const count = Math.max(1, Number(value) || 1)
   return count % 2 === 0 ? count + 1 : count
+}
+
+const visibleSlotCount = computed(() => {
+  if (totalItems.value <= 0) return 0
+
+  const configuredOdd = toOdd(props.visibleCount)
+  const usefulOdd = toOdd(totalItems.value)
+
+  // 地點少時，不顯示一大堆空占位；地點多時，最多顯示 visibleCount 個窗口位
+  return Math.min(configuredOdd, usefulOdd)
 })
 
 const middleVisibleIndex = computed(() => Math.floor(visibleSlotCount.value / 2))
@@ -81,6 +101,64 @@ const visibleSlots = computed(() => {
   return slots
 })
 
+const resetWheelBuffer = () => {
+  wheelDeltaBuffer = 0
+
+  if (wheelResetTimer) {
+    clearTimeout(wheelResetTimer)
+    wheelResetTimer = null
+  }
+}
+
+const resetWheelBufferLater = () => {
+  if (wheelResetTimer) {
+    clearTimeout(wheelResetTimer)
+  }
+
+  wheelResetTimer = window.setTimeout(() => {
+    wheelDeltaBuffer = 0
+    wheelResetTimer = null
+  }, WHEEL_IDLE_RESET_MS)
+}
+
+const normalizeWheelDelta = (event) => {
+  // deltaMode:
+  // 0 = pixel，多數觸控板 / 現代瀏覽器
+  // 1 = line，部分滑鼠
+  // 2 = page，極少見
+  if (event.deltaMode === 1) {
+    return event.deltaY * 16
+  }
+
+  if (event.deltaMode === 2) {
+    return event.deltaY * window.innerHeight
+  }
+
+  return event.deltaY
+}
+
+const getWheelStep = (event) => {
+  wheelDeltaBuffer += normalizeWheelDelta(event)
+
+  if (Math.abs(wheelDeltaBuffer) < WHEEL_THRESHOLD) {
+    return 0
+  }
+
+  const now = Date.now()
+
+  if (now - lastWheelMoveAt < WHEEL_STEP_COOLDOWN_MS) {
+    return 0
+  }
+
+  const step = wheelDeltaBuffer > 0 ? 1 : -1
+
+  // 只消費一格，不保留過大的慣性殘留
+  wheelDeltaBuffer = 0
+  lastWheelMoveAt = now
+
+  return step
+}
+
 const moveCenter = (delta) => {
   if (!canMove.value) return
 
@@ -118,44 +196,55 @@ const jumpCenter = async () => {
 const handleWheel = (event) => {
   if (!canMove.value) return
 
-  const delta = event.deltaY > 0 ? wheelStep : -wheelStep
-  moveCenter(delta)
+  const step = getWheelStep(event)
+
+  if (step !== 0) {
+    moveCenter(step)
+  }
+
+  resetWheelBufferLater()
   event.preventDefault()
 }
 
 const handleKeydown = async (event) => {
   if (event.key === 'ArrowDown') {
     moveCenter(1)
+    resetWheelBuffer()
     event.preventDefault()
     return
   }
 
   if (event.key === 'ArrowUp') {
     moveCenter(-1)
+    resetWheelBuffer()
     event.preventDefault()
     return
   }
 
   if (event.key === 'PageDown') {
     moveCenter(Math.max(1, middleVisibleIndex.value))
+    resetWheelBuffer()
     event.preventDefault()
     return
   }
 
   if (event.key === 'PageUp') {
     moveCenter(-Math.max(1, middleVisibleIndex.value))
+    resetWheelBuffer()
     event.preventDefault()
     return
   }
 
   if (event.key === 'Home') {
     centerIndex.value = 0
+    resetWheelBuffer()
     event.preventDefault()
     return
   }
 
   if (event.key === 'End') {
     centerIndex.value = clampCenterIndex(totalItems.value - 1)
+    resetWheelBuffer()
     event.preventDefault()
     return
   }
@@ -192,6 +281,7 @@ watch(
     }
 
     centerIndex.value = clampCenterIndex(centerIndex.value)
+    resetWheelBuffer()
   },
   { deep: true }
 )
@@ -200,6 +290,10 @@ watch(activeId, (value) => {
   if (value) {
     moveCenterToItem(value)
   }
+})
+
+onBeforeUnmount(() => {
+  resetWheelBuffer()
 })
 </script>
 
@@ -308,7 +402,7 @@ watch(activeId, (value) => {
   .count-location-jump-nav-control {
     width: 30px;
     height: 30px;
-    margin-right: 7px;
+    margin-right: 5px;
     border: 1px solid rgba(0, 122, 255, 0.14);
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.72);
@@ -367,9 +461,9 @@ watch(activeId, (value) => {
       content: '';
       position: absolute;
       top: 4px;
-      right: 9px;
+      right: 7px;
       bottom: 4px;
-      width: 24px;
+      width: 20px;
       border-radius: 999px;
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.24)),
@@ -699,7 +793,7 @@ watch(activeId, (value) => {
     .count-location-jump-nav-items {
       &::before {
         right: 6px;
-        width: 20px;
+        width: 16px;
       }
     }
 
