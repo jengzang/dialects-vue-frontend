@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getFeatureCounts } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
+import CountLocationJumpNav from '@/main/components/pho/CountLocationJumpNav.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 
@@ -34,6 +35,50 @@ const displayLocations = computed(() => {
   if (!matrixData.value) return []
   return Object.keys(matrixData.value)
 })
+
+const locationNavItems = computed(() => {
+  const orderedLocations = Object.keys(featureData.value)
+  const totalItems = []
+
+  orderedLocations.forEach((location, index) => {
+    totalItems.push({
+      id: `count-location-${index}`,
+      fullLabel: location,
+      targetKey: location,
+      kind: 'location'
+    })
+  })
+
+  const totalKeys = Object.keys(aggregatedData.value)
+  totalKeys.forEach((featureType) => {
+    totalItems.push({
+      id: `count-total-${featureType}`,
+      fullLabel: `总-${featureType}`,
+      targetKey: featureType,
+      kind: 'total'
+    })
+  })
+
+  return totalItems
+})
+
+const getLocationAnchorId = (location) => `count-location-anchor-${location}`
+const getAggregatedAnchorId = (featureType) => `count-total-anchor-${featureType}`
+
+const handleLocationNavJump = async (nav) => {
+  await nextTick()
+  const targetId = nav.kind === 'total'
+    ? getAggregatedAnchorId(nav.targetKey)
+    : getLocationAnchorId(nav.targetKey)
+  const target = document.getElementById(targetId)
+
+  if (!target) return
+
+  target.scrollIntoView({
+    behavior: 'smooth',
+    block: 'center'
+  })
+}
 
 // 处理匹配到的地点列表
 const handleMatchedLocations = (locations) => {
@@ -184,6 +229,7 @@ const closeLocationModal = () => {
         <div
             v-for="(features, featureType) in aggregatedData"
             :key="featureType"
+            :id="getAggregatedAnchorId(featureType)"
             class="feature-category"
         >
           <h4 class="category-title">{{ featureType }}</h4>
@@ -235,6 +281,7 @@ const closeLocationModal = () => {
         <div
             v-for="(locationData, locationName) in featureData"
             :key="locationName"
+            :id="getLocationAnchorId(locationName)"
             class="location-detail"
         >
           <h4 class="location-name">{{ locationName }}</h4>
@@ -263,6 +310,12 @@ const closeLocationModal = () => {
     <div v-else class="empty">
       <p>{{ $t('phonology.phonology.countphos.states.emptyInput') }}</p>
     </div>
+
+    <CountLocationJumpNav
+      v-if="Object.keys(featureData).length > 0 && locationNavItems.length > 0"
+      :items="locationNavItems"
+      @jump="handleLocationNavJump"
+    />
 
     <!-- 地点详情弹窗 -->
     <AppModal
@@ -536,11 +589,12 @@ const closeLocationModal = () => {
 }
 
 .location-detail {
-  background: var(--glass-very-light2);
-  border: 1px solid var(--border-gray-lighter);
-  border-radius: 8px;
-  padding: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(247, 251, 255, 0.66));
+  border: 1px solid rgba(0, 122, 255, 0.12);
+  border-radius: 12px;
+  padding: 18px;
   margin-bottom: 16px;
+  box-shadow: 0 10px 24px rgba(20, 38, 60, 0.06);
 }
 
 .location-detail:last-child {
@@ -549,11 +603,11 @@ const closeLocationModal = () => {
 
 .location-name {
   font-size: 18px;
-  font-weight: 600;
-  color: var(--text-dark);
-  margin-bottom: 10px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid var(--border-gray-lighter);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 122, 255, 0.12);
 }
 
 .feature-group {
@@ -566,45 +620,47 @@ const closeLocationModal = () => {
 
 .feature-type {
   font-size: 15px;
-  font-weight: 600;
-  color: var(--text-dark);
-  margin-bottom: 8px;
+  font-weight: 700;
+  color: #35679b;
+  margin-bottom: 10px;
 }
 
 .feature-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .feature-tag {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid var(--border-gray-lighter);
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 122, 255, 0.12);
+  border-radius: 999px;
   padding: 6px 10px;
-  display: flex;
-  gap: 6px;
+  display: inline-flex;
+  gap: 8px;
   align-items: center;
   transition: all 0.2s ease;
 }
 
 .feature-tag:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.96);
   transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0, 122, 255, 0.08);
 }
 
 .tag-syllable {
   font-size: 14px;
-  font-weight: 600;
-  color: var(--text-dark);
+  font-weight: 700;
+  color: #274b73;
 }
 
 .tag-count {
   font-size: 12px;
-  color: var(--text-dark-light);
-  background: rgba(0, 0, 0, 0.05);
-  padding: 2px 6px;
-  border-radius: 4px;
+  color: var(--color-primary);
+  font-weight: 700;
+  background: rgba(0, 122, 255, 0.12);
+  padding: 2px 8px;
+  border-radius: 999px;
 }
 .empty {
   display: flex;
