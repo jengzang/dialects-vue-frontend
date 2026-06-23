@@ -25,13 +25,9 @@ const aggregatedData = ref({}) // 存儲匯總統計數據
 
 // 圖表配置
 const FEATURE_TYPE_ORDER = ['聲母', '韻母', '聲調']
-const PIE_VISIBLE_LIMIT = 9
-
-const BAR_LIMITS = {
-  聲母: 20,
-  韻母: 30,
-  聲調: 10
-}
+const PIE_MAX_OTHER_SHARE = 0.2
+const BAR_MAX_REMAINDER_SHARE = 0.1
+const MIN_VISIBLE_ITEMS = 1
 
 const chartEls = {
   pie: {},
@@ -216,6 +212,40 @@ const getFeatureStatsList = (featureType) => {
     })
 }
 
+const pickPieVisibleList = (list) => {
+  if (list.length <= 1) return { visible: list, otherCount: 0 }
+
+  const total = list.reduce((sum, item) => sum + item.totalCount, 0)
+  let visibleCount = Math.min(list.length, Math.max(MIN_VISIBLE_ITEMS, 1))
+  let visible = list.slice(0, visibleCount)
+  let otherCount = total - visible.reduce((sum, item) => sum + item.totalCount, 0)
+
+  while (visibleCount < list.length && total > 0 && otherCount / total > PIE_MAX_OTHER_SHARE) {
+    visibleCount += 1
+    visible = list.slice(0, visibleCount)
+    otherCount = total - visible.reduce((sum, item) => sum + item.totalCount, 0)
+  }
+
+  return { visible, otherCount }
+}
+
+const pickBarVisibleList = (list) => {
+  if (list.length <= 1) return { visible: list, hiddenTotalCount: 0 }
+
+  const totalCount = list.reduce((sum, item) => sum + item.totalCount, 0)
+  let visibleCount = Math.min(list.length, Math.max(MIN_VISIBLE_ITEMS, 1))
+  let visible = list.slice(0, visibleCount)
+  let hiddenTotalCount = totalCount - visible.reduce((sum, item) => sum + item.totalCount, 0)
+
+  while (visibleCount < list.length && totalCount > 0 && hiddenTotalCount / totalCount >= BAR_MAX_REMAINDER_SHARE) {
+    visibleCount += 1
+    visible = list.slice(0, visibleCount)
+    hiddenTotalCount = totalCount - visible.reduce((sum, item) => sum + item.totalCount, 0)
+  }
+
+  return { visible, hiddenTotalCount }
+}
+
 const formatLocationsPreview = (locations = [], limit = 8) => {
   if (!locations.length) return '無'
 
@@ -228,20 +258,17 @@ const renderPieChart = (featureType) => {
   if (!chart) return
 
   const list = getFeatureStatsList(featureType)
-  const topItems = list.slice(0, PIE_VISIBLE_LIMIT)
-  const otherValue = list
-    .slice(PIE_VISIBLE_LIMIT)
-    .reduce((sum, item) => sum + item.totalCount, 0)
+  const { visible: topItems, otherCount } = pickPieVisibleList(list)
 
   const pieData = topItems.map((item) => ({
     name: item.syllable,
     value: item.totalCount
   }))
 
-  if (otherValue > 0) {
+  if (otherCount > 0) {
     pieData.push({
-      name: '其他',
-      value: otherValue
+      name: t('phonology.phonology.countphos.charts.common.other'),
+      value: otherCount
     })
   }
 
@@ -251,8 +278,8 @@ const renderPieChart = (featureType) => {
       formatter: (params) => {
         return [
           `${featureType}：${params.name}`,
-          `總數量：${params.value}`,
-          `占比：${params.percent}%`
+          `${t('phonology.phonology.countphos.charts.common.totalCount')}：${params.value}`,
+          `${t('phonology.phonology.countphos.charts.common.share')}：${params.percent}%`
         ].join('<br/>')
       }
     },
@@ -287,7 +314,7 @@ const renderPieChart = (featureType) => {
 
   chart.off('click')
   chart.on('click', (params) => {
-    if (params.name === '其他') return
+    if (params.name === t('phonology.phonology.countphos.charts.common.other')) return
 
     const stats = aggregatedData.value?.[featureType]?.[params.name]
     if (!stats) return
@@ -300,10 +327,8 @@ const renderBarChart = (featureType) => {
   const chart = getChartInstance('bar', featureType)
   if (!chart) return
 
-  const limit = BAR_LIMITS[featureType] || 20
-
   // 先按總數量排行取前 N，再展示這些音節對應的地點數
-  const list = getFeatureStatsList(featureType).slice(0, limit)
+  const { visible: list } = pickBarVisibleList(getFeatureStatsList(featureType))
   const useDataZoom = list.length > 15
 
   chart.setOption({
@@ -319,9 +344,9 @@ const renderBarChart = (featureType) => {
 
         return [
           `${featureType}：${item.syllable}`,
-          `總數量：${item.totalCount}`,
-          `地點數：${item.locationCount}`,
-          `地點：${formatLocationsPreview(item.locations)}`
+          `${t('phonology.phonology.countphos.charts.common.totalCount')}：${item.totalCount}`,
+          `${t('phonology.phonology.countphos.charts.common.locationCount')}：${item.locationCount}`,
+          `${t('phonology.phonology.countphos.charts.common.locations')}：${formatLocationsPreview(item.locations)}`
         ].join('<br/>')
       }
     },
@@ -356,12 +381,12 @@ const renderBarChart = (featureType) => {
     },
     yAxis: {
       type: 'value',
-      name: '地點數',
+      name: t('phonology.phonology.countphos.charts.common.locationCount'),
       minInterval: 1
     },
     series: [
       {
-        name: `${featureType}地點數`,
+        name: `${featureType}${t('phonology.phonology.countphos.charts.common.locationCount')}`,
         type: 'bar',
         data: list.map((item) => item.locationCount),
         barMaxWidth: 32
@@ -420,9 +445,9 @@ const renderScatterChart = () => {
 
         return [
           `${item.featureType}：${item.syllable}`,
-          `總數量：${item.totalCount}`,
-          `地點數：${item.locationCount}`,
-          `地點：${formatLocationsPreview(item.locations)}`
+          `${t('phonology.phonology.countphos.charts.common.totalCount')}：${item.totalCount}`,
+          `${t('phonology.phonology.countphos.charts.common.locationCount')}：${item.locationCount}`,
+          `${t('phonology.phonology.countphos.charts.common.locations')}：${formatLocationsPreview(item.locations)}`
         ].join('<br/>')
       }
     },
@@ -440,7 +465,7 @@ const renderScatterChart = () => {
     },
     xAxis: {
       type: 'value',
-      name: '總數量',
+      name: t('phonology.phonology.countphos.charts.common.totalCount'),
       min: 0,
       splitLine: {
         show: true
@@ -448,7 +473,7 @@ const renderScatterChart = () => {
     },
     yAxis: {
       type: 'value',
-      name: '地點數',
+      name: t('phonology.phonology.countphos.charts.common.locationCount'),
       min: 0,
       minInterval: 1,
       splitLine: {
@@ -659,9 +684,9 @@ onBeforeUnmount(() => {
         <!-- 圖表統計部分 -->
         <div v-if="hasChartData" class="charts-section">
           <div class="chart-block">
-            <h4 class="chart-block-title">音節總量占比</h4>
+            <h4 class="chart-block-title">{{ $t('phonology.phonology.countphos.charts.pie.title') }}</h4>
             <p class="chart-block-desc">
-              每類取總數量前 9 的音節；第 10 名及以後合併為「其他」。點擊具體音節可查看地點。
+              {{ $t('phonology.phonology.countphos.charts.pie.description') }}
             </p>
 
             <div class="pie-chart-row">
@@ -680,9 +705,9 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="chart-block">
-            <h4 class="chart-block-title">高頻音節覆蓋地點數</h4>
+            <h4 class="chart-block-title">{{ $t('phonology.phonology.countphos.charts.bar.title') }}</h4>
             <p class="chart-block-desc">
-              先按音節總數量排序取前 N，再展示這些音節分別出現於多少個地點。
+              {{ $t('phonology.phonology.countphos.charts.bar.description') }}
             </p>
 
             <div class="bar-chart-list">
@@ -693,9 +718,6 @@ onBeforeUnmount(() => {
               >
                 <h5 class="chart-title">
                   {{ featureType }}
-                  <span class="chart-title-note">
-                    Top {{ BAR_LIMITS[featureType] || 20 }}
-                  </span>
                 </h5>
                 <div
                   :ref="(el) => setChartRef('bar', featureType, el)"
@@ -706,9 +728,9 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="chart-block">
-            <h4 class="chart-block-title">音節分布散點圖</h4>
+            <h4 class="chart-block-title">{{ $t('phonology.phonology.countphos.charts.scatter.title') }}</h4>
             <p class="chart-block-desc">
-              橫軸為總數量，縱軸為地點數。越靠右表示總量越高，越靠上表示覆蓋地點越多。
+              {{ $t('phonology.phonology.countphos.charts.scatter.description') }}
             </p>
 
             <div class="chart-card chart-card--wide">

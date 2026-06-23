@@ -97,6 +97,27 @@
         "locations": "Location Details",
         "locationsSubtitle": "Syllable statistics for each location"
       },
+      "charts": {
+        "pie": {
+          "title": "Syllable Share by Total Count",
+          "description": "Automatically keeps enough high-frequency syllables so that the combined share of \"Other\" does not exceed 20%. Click a slice to inspect locations."
+        },
+        "bar": {
+          "title": "Location Coverage of High-Frequency Syllables",
+          "description": "Automatically keeps enough high-frequency syllables so that the total count of omitted syllables stays below 10%."
+        },
+        "scatter": {
+          "title": "Syllable Distribution Scatter Plot",
+          "description": "The x-axis is total count and the y-axis is number of locations. Further right means higher total count; further up means broader location coverage."
+        },
+        "common": {
+          "other": "Other",
+          "totalCount": "Total Count",
+          "locationCount": "Location Count",
+          "locations": "Locations",
+          "share": "Share"
+        }
+      },
       "modal": {
         "title": "{featureType} - {syllable}"
       },
@@ -136,8 +157,8 @@
           "value": "Value"
         },
         "titles": {
-          "byValue": "{feature} ? Value ? Status ? Secondary Dimension",
-          "byStatus": "{feature} ? Status ? Value ? Secondary Dimension"
+          "byValue": "{feature} · Value -> Status -> Secondary Dimension",
+          "byStatus": "{feature} · Status -> Value -> Secondary Dimension"
         }
       },
       "similarity": {

@@ -97,6 +97,27 @@
         "locations": "地點詳情",
         "locationsSubtitle": "每個地點的音節統計"
       },
+      "charts": {
+        "pie": {
+          "title": "音節總量佔比",
+          "description": "自動選取足夠多的高頻音節，直到「其他」佔比不超過 20%。點擊扇區可查看地點。"
+        },
+        "bar": {
+          "title": "高頻音節覆蓋地點數",
+          "description": "自動選取足夠多的高頻音節，直到未繪製音節的總量少於 10%。"
+        },
+        "scatter": {
+          "title": "音節分布散點圖",
+          "description": "橫軸為總數量，縱軸為地點數。越靠右表示總量越高，越靠上表示覆蓋地點越多。"
+        },
+        "common": {
+          "other": "其他",
+          "totalCount": "總數量",
+          "locationCount": "地點數",
+          "locations": "地點",
+          "share": "佔比"
+        }
+      },
       "modal": {
         "title": "{featureType} - {syllable}"
       },
