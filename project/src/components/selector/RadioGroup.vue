@@ -100,7 +100,7 @@ const handleChange = (event, value) => {
   &:checked {
     & ~ .liquid-radio-custom {
       /* 这里的颜色分配参考了你觉得更合理的风格 */
-      background: var(--color-primary);
+      background: var(--bg-white);
       border-color: var(--color-primary);
       box-shadow:
           0 4px 12px var(--color-primary-shadow-light),
@@ -120,8 +120,8 @@ const handleChange = (event, value) => {
 }
 
 .liquid-radio-custom {
-  width: 20px; /* 稍微缩小一点，显得更精致 */
-  height: 20px;
+  width: 18px; /* 稍微缩小一点，显得更精致 */
+  height: 18px;
   border-radius: var(--radius-full);
   position: relative;
   display: flex;
@@ -135,12 +135,16 @@ const handleChange = (event, value) => {
 
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
+  box-shadow:
+      inset 0 1px 3px rgba(255, 255, 255, 0.5), /* 顶部内发光（玻璃质感） */
+      0 2px 4px rgba(0, 0, 0, 0.05); /* 底部微小阴影 */
+
   &::after {
     content: "";
-    width: 8px;
-    height: 8px;
+    width: 12px;
+    height: 12px;
     border-radius: var(--radius-full);
-    background: var(--bg-white);
+    background: var(--color-primary);
     transform: scale(0);
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);

@@ -6,47 +6,34 @@
       <div class="control-row">
         <label class="control-label">{{ t('phonology.phonology.evolution.queryMode.label', '统计模式') }}：</label>
         <div class="mode-selector">
-          <label class="mode-radio-label">
+          <RadioGroup
+            v-model="queryMode"
+            :options="queryModeOptions"
+            name="evolution-query-mode"
+            class="query-mode-radio"
+          />
+
+          <label class="mode-checkbox-label">
             <input
-              type="radio"
-              value="by_value"
-              v-model="queryMode"
-              class="hidden-radio"
+              v-model="showSankey"
+              type="checkbox"
+              class="hidden-checkbox"
             />
-            <span class="glass-indicator"></span>
-            {{ t('phonology.phonology.evolution.queryMode.byValue') }}
-          </label>
-          <label class="mode-radio-label">
-            <input
-              type="radio"
-              value="by_status"
-              v-model="queryMode"
-              class="hidden-radio"
-            />
-            <span class="glass-indicator"></span>
-            {{ t('phonology.phonology.evolution.queryMode.byStatus') }}
-          </label>
-          <label class="mode-radio-label sankey-toggle">
-            <input
-                v-model="showSankey"
-                type="checkbox"
-                class="hidden-radio"
-            />
-            <span class="glass-indicator"></span>
+            <span class="checkbox-indicator"></span>
             {{ t('phonology.phonology.evolution.controls.sankey') }}
           </label>
-          <label class="mode-radio-label sankey-toggle">
+
+          <label class="mode-checkbox-label">
             <input
-                v-model="optimizeSankeyLayout"
-                type="checkbox"
-                class="hidden-radio"
+              v-model="optimizeSankeyLayout"
+              type="checkbox"
+              class="hidden-checkbox"
             />
-            <span class="glass-indicator"></span>
+            <span class="checkbox-indicator"></span>
             {{ t('phonology.phonology.evolution.controls.optimizeLinks') }}
           </label>
         </div>
       </div>
-
 
       <div class="dimension-grid">
         <div class="dimension-field">
@@ -153,6 +140,7 @@
         class="sankey-chart"
         :style="{ height: sankeyHeight }"
       ></div>
+
       <div v-else class="pie-grid" :style="gridStyle" ref="pieGridRef">
         <div
           v-for="(pie, index) in currentPieData"
@@ -172,10 +160,10 @@
 
     <Transition name="mobile-detail-card-fade">
       <div
-          v-if="selectedPieDetail && !showSankey"
-          class="mobile-detail-card"
-          :class="{ 'is-desktop-card': !isMobileLayout }"
-          :style="!isMobileLayout ? desktopCardPosition : {}"
+        v-if="selectedPieDetail && !showSankey"
+        class="mobile-detail-card"
+        :class="{ 'is-desktop-card': !isMobileLayout }"
+        :style="!isMobileLayout ? desktopCardPosition : {}"
       >
         <div class="mobile-detail-card__header">
           <div class="mobile-detail-card__meta">
@@ -188,17 +176,17 @@
             <div class="mobile-detail-card__subtitle">
               {{ selectedPieDetail.pieTitle }} ·
               {{ t('phonology.phonology.evolution.mobileDetail.countAndRatio', {
-              count: selectedPieDetail.count,
-              unit: t('phonology.phonology.evolution.sankey.unit'),
-              percent: selectedPieDetail.percent
-            }) }}
+                count: selectedPieDetail.count,
+                unit: t('phonology.phonology.evolution.sankey.unit'),
+                percent: selectedPieDetail.percent
+              }) }}
             </div>
           </div>
           <button
-              v-show="isMobileLayout || isCardPinned"
-              type="button"
-              class="mobile-detail-card__close"
-              @click="closeMobilePieDetail"
+            v-show="isMobileLayout || isCardPinned"
+            type="button"
+            class="mobile-detail-card__close"
+            @click="closeMobilePieDetail"
           >×</button>
         </div>
 
@@ -258,6 +246,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
 import LocationMultiInput from '../geo/LocationMultiInput.vue'
 import { postPhoPieByValue, postPhoPieByStatus } from '@/api'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
@@ -318,6 +307,17 @@ const tableOptions = [
 ]
 
 // ========== 计算属性 ==========
+const queryModeOptions = computed(() => [
+  {
+    value: 'by_value',
+    label: t('phonology.phonology.evolution.queryMode.byValue')
+  },
+  {
+    value: 'by_status',
+    label: t('phonology.phonology.evolution.queryMode.byStatus')
+  }
+])
+
 const availableColumns = computed(() => {
   const schema = TABLE_COLUMN_SCHEMAS[selectedTable.value]
   const keys = schema?.ui?.available_keys || []
@@ -349,9 +349,9 @@ const showMobilePieDetailCard = computed(() => {
 
 const canQuery = computed(() => {
   return matchedLocations.value.length > 0 &&
-         level1Column.value &&
-         level2Column.value &&
-         level1Column.value !== level2Column.value
+    level1Column.value &&
+    level2Column.value &&
+    level1Column.value !== level2Column.value
 })
 
 const gridLayout = computed(() => {
@@ -727,6 +727,7 @@ const initPieChart = (container, pieData, index) => {
       }
     })
   }
+
   return chart
 }
 
@@ -771,6 +772,7 @@ const renderAllPies = async () => {
           )
         }
       })
+
       // 每批之间让出控制权，避免阻塞UI
       await nextTick()
       // console.log(`[Evolution] Batch ${Math.floor(i / batchSize) + 1} rendered in ${(performance.now() - batchStart).toFixed(2)}ms`)
@@ -861,6 +863,7 @@ const updateSankeyHeight = (nodes) => {
 const generateSankeyOption = () => {
   const sankeyData = buildSankeyData()
   updateSankeyHeight(sankeyData.nodes)
+
   const title = queryMode.value === 'by_value'
     ? t('phonology.phonology.evolution.sankey.titles.byValue', { feature: currentFeature.value })
     : t('phonology.phonology.evolution.sankey.titles.byStatus', { feature: currentFeature.value })
@@ -1006,6 +1009,7 @@ const handleWindowResize = async () => {
 // 当切换feature时，重新渲染饼图
 watch(currentFeature, async () => {
   closeMobilePieDetail()
+
   if (showSankey.value) {
     await renderCurrentVisualizationWithLoading()
     return
@@ -1112,41 +1116,6 @@ onUnmounted(() => {
   }
 }
 
-.control-row--sankey {
-  justify-content: flex-end;
-}
-
-.sankey-toggle {
-  gap: 10px;
-
-  .glass-indicator {
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-  }
-
-  .glass-indicator::after {
-    width: 5px;
-    height: 9px;
-    background: transparent;
-    border-right: 2px solid #fff;
-    border-bottom: 2px solid #fff;
-    border-radius: 0;
-    box-shadow: none;
-    transform: translate(-50%, -58%) rotate(45deg) scale(0);
-    transform-origin: center;
-  }
-
-  .hidden-radio:checked + .glass-indicator {
-    border-color: var(--color-primary, #007aff);
-    background: var(--color-primary, #007aff);
-  }
-
-  .hidden-radio:checked + .glass-indicator::after {
-    transform: translate(-50%, -58%) rotate(45deg) scale(1);
-  }
-}
-
 .dimension-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1200,18 +1169,29 @@ onUnmounted(() => {
   font-style: italic;
 }
 
-/* Radio选择器（液态玻璃态） */
+/* 统计模式：radio 样式交给 RadioGroup；checkbox 保留本组件样式 */
 .mode-selector {
-  display: grid;
-  grid-template-columns: repeat(4, max-content);
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   align-items: center;
 }
 
-.mode-radio-label {
+.query-mode-radio {
+  justify-content: flex-start;
+  gap: 20px;
+}
+
+.query-mode-radio :deep(.liquid-radio-label) {
+  padding: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.mode-checkbox-label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   cursor: pointer;
   font-size: 15px;
   font-weight: 500;
@@ -1224,28 +1204,27 @@ onUnmounted(() => {
   }
 }
 
-.hidden-radio {
+.hidden-checkbox {
   position: absolute;
   opacity: 0;
   width: 0;
   height: 0;
 
-  &:checked + .glass-indicator {
+  &:checked + .checkbox-indicator {
     border-color: var(--color-primary, #007aff);
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--color-primary, #007aff);
 
     &::after {
-      transform: translate(-50%, -50%) scale(1);
+      transform: translate(-50%, -58%) rotate(45deg) scale(1);
     }
   }
 }
 
-/* 液态玻璃圆圈（外圈） */
-.glass-indicator {
+.checkbox-indicator {
   position: relative;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
   border: 1px solid rgba(150, 150, 150, 0.3);
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(8px);
@@ -1260,13 +1239,16 @@ onUnmounted(() => {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--color-primary, #007aff);
-    transform: translate(-50%, -50%) scale(0);
+    width: 5px;
+    height: 9px;
+    background: transparent;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    border-radius: 0;
+    box-shadow: none;
+    transform: translate(-50%, -58%) rotate(45deg) scale(0);
+    transform-origin: center;
     transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -1451,7 +1433,7 @@ onUnmounted(() => {
 
 .mobile-detail-card__meta {
   min-width: 0;
-  flex:1;
+  flex: 1;
 }
 
 .mobile-detail-card__title-row {
@@ -1589,8 +1571,11 @@ onUnmounted(() => {
   }
 
   .mode-selector {
-    grid-template-columns: repeat(2, max-content);
     gap: 10px 14px;
+  }
+
+  .query-mode-radio {
+    gap: 14px;
   }
 
   .feature-tabs {
@@ -1610,5 +1595,4 @@ onUnmounted(() => {
     min-height: 520px;
   }
 }
-
 </style>

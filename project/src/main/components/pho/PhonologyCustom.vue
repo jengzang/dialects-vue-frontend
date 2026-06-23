@@ -3,86 +3,82 @@
     <!-- <div class="page-header">
       <h2 class="page-title">📐 音素分類</h2>
     </div> -->
+
     <!-- 特徵選擇 Tab -->
     <div class="feature-tabs">
-      <label
-          v-for="feature in features"
-          :key="feature"
-          class="feature-radio-label"
-      >
-        <input
-            type="radio"
-            :value="feature"
-            v-model="selectedFeature"
-            class="hidden-radio"
-        />
-        <span class="glass-indicator"></span>
-        {{ feature }}
-      </label>
+      <RadioGroup
+        v-model="selectedFeature"
+        :options="features"
+        name="phonology-custom-feature"
+      />
     </div>
+
     <div v-if="!isTableSupported" class="empty unsupported-state">
       <p>{{ t('phonology.phonology.custom.states.unsupportedTable', { table: currentTableLabel }) }}</p>
     </div>
 
     <template v-else>
-    <!-- 地点输入组件 -->
-    <div class="input-section">
-      <LocationMultiInput
+      <!-- 地点输入组件 -->
+      <div class="input-section">
+        <LocationMultiInput
           v-model="queryStrings"
           :max-locations="PHONOLOGY_LOCATION_LIMITS.custom"
           @update:matchedLocations="handleMatchedLocations"
           @update:isMatching="handleIsMatching"
-      />
-      <!-- 分類欄位選擇 -->
-      <div class="column-selectors">
-        <div class="selector-group">
-          <label>{{ $t('phonology.phonology.custom.columns.horizontal') }}</label>
-          <SimpleSelectDropdown
-            v-model="horizontalColumnChinese"
-            :options="columnOptionsArray"
-          />
+        />
+
+        <!-- 分類欄位選擇 -->
+        <div class="column-selectors">
+          <div class="selector-group">
+            <label>{{ $t('phonology.phonology.custom.columns.horizontal') }}</label>
+            <SimpleSelectDropdown
+              v-model="horizontalColumnChinese"
+              :options="columnOptionsArray"
+            />
+          </div>
+
+          <div class="selector-group">
+            <label>{{ $t('phonology.phonology.custom.columns.vertical') }}</label>
+            <SimpleSelectDropdown
+              v-model="verticalColumnChinese"
+              :options="columnOptionsArray"
+            />
+          </div>
+
+          <div class="selector-group">
+            <label>{{ $t('phonology.phonology.custom.columns.cellRow') }}</label>
+            <SimpleSelectDropdown
+              v-model="cellRowColumnChinese"
+              :options="columnOptionsArray"
+            />
+          </div>
         </div>
 
-        <div class="selector-group">
-          <label>{{ $t('phonology.phonology.custom.columns.vertical') }}</label>
-          <SimpleSelectDropdown
-            v-model="verticalColumnChinese"
-            :options="columnOptionsArray"
-          />
-        </div>
-
-        <div class="selector-group">
-          <label>{{ $t('phonology.phonology.custom.columns.cellRow') }}</label>
-          <SimpleSelectDropdown
-            v-model="cellRowColumnChinese"
-            :options="columnOptionsArray"
-          />
-        </div>
-      </div>
-      <button
+        <button
           class="load-btn"
           @click="loadData"
           :disabled="matchedLocations.length === 0 || loading || isMatching"
-      >
-        <span v-if="isMatching" class="ui-loading--inline" aria-hidden="true">↻</span>
-        <span v-else-if="loading">{{ $t('phonology.phonology.custom.actions.loading') }}</span>
-        <span v-else>{{ $t('phonology.phonology.custom.actions.query') }}</span>
-      </button>
-    </div>
+        >
+          <span v-if="isMatching" class="ui-loading--inline" aria-hidden="true">↻</span>
+          <span v-else-if="loading">{{ $t('phonology.phonology.custom.actions.loading') }}</span>
+          <span v-else>{{ $t('phonology.phonology.custom.actions.query') }}</span>
+        </button>
+      </div>
 
+      <div v-if="loading" class="loading">
+        <div class="ui-loading--page" aria-hidden="true"></div>
+        <p>{{ $t('phonology.phonology.custom.actions.loading') }}</p>
+      </div>
 
-    <div v-if="loading" class="loading">
-      <div class="ui-loading--page" aria-hidden="true"></div>
-      <p>{{ $t('phonology.phonology.custom.actions.loading') }}</p>
-    </div>
+      <div v-else-if="error" class="error">
+        <p>{{ error }}</p>
+        <button @click="loadData" class="retry-btn">
+          {{ $t('phonology.phonology.custom.actions.retry') }}
+        </button>
+      </div>
 
-    <div v-else-if="error" class="error">
-      <p>{{ error }}</p>
-      <button @click="loadData" class="retry-btn">{{ $t('phonology.phonology.custom.actions.retry') }}</button>
-    </div>
-
-    <div v-else-if="matrixData" class="matrix-container">
-      <PhonologyMatrix
+      <div v-else-if="matrixData" class="matrix-container">
+        <PhonologyMatrix
           v-for="location in displayLocations"
           :key="location"
           :location="location"
@@ -92,12 +88,12 @@
           :matrix="matrixData.matrix"
           :cell-detail-enabled="true"
           :cell-details="matrixData.cellDetails"
-      />
-    </div>
+        />
+      </div>
 
-    <div v-else class="empty">
-      <p>{{ $t('phonology.phonology.custom.states.emptyInput') }}</p>
-    </div>
+      <div v-else class="empty">
+        <p>{{ $t('phonology.phonology.custom.states.emptyInput') }}</p>
+      </div>
     </template>
   </div>
 </template>
@@ -112,6 +108,7 @@ import PhonologyMatrix from '@/main/components/TableAndTree/PhonologyTable.vue'
 import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
 import { preferredCharacterTable } from '@/main/store/store.js'
 import {
@@ -233,7 +230,7 @@ const { set: setFeatureQuery } = useRouteQueryState('feature', {
   defaultValue: urlParams.feature || '',
   parse: (value) => decodeURIComponent(value),
   serialize: (value) => encodeURIComponent(value),
-  replace: true,
+  replace: true
 })
 
 // 验证参数
@@ -446,10 +443,10 @@ const loadData = async () => {
   await loadMatrixTask.run(async () => {
     const requestBody = {
       locations: matchedLocations.value,
-      feature: selectedFeatureChinese.value,  // Use Chinese value for API
-      horizontal_column: horizontalColumnChinese.value,  // Use Chinese value for API
-      vertical_column: verticalColumnChinese.value,  // Use Chinese value for API
-      cell_row_column: cellRowColumnChinese.value,  // Use Chinese value for API
+      feature: selectedFeatureChinese.value, // Use Chinese value for API
+      horizontal_column: horizontalColumnChinese.value, // Use Chinese value for API
+      vertical_column: verticalColumnChinese.value, // Use Chinese value for API
+      cell_row_column: cellRowColumnChinese.value, // Use Chinese value for API
       table_name: selectedCharacterTable.value
     }
 
@@ -482,8 +479,8 @@ onMounted(() => {
 
   const hasLocations = urlParams.locations.length > 0
   const hasAllColumns = urlParams.horizontalColumn &&
-                        urlParams.verticalColumn &&
-                        urlParams.cellRowColumn
+    urlParams.verticalColumn &&
+    urlParams.cellRowColumn
 
   if (hasLocations && hasAllColumns && validation.isValid) {
     const unwatch = watch(matchedLocations, (locations) => {
@@ -501,7 +498,7 @@ watch(() => route.query, () => {
 
   // 更新特征
   if (newParams.feature !== selectedFeatureChinese.value &&
-      FEATURE_KEYS.includes(newParams.feature)) {
+    FEATURE_KEYS.includes(newParams.feature)) {
     selectedFeatureChinese.value = newParams.feature
   }
 
@@ -515,17 +512,17 @@ watch(() => route.query, () => {
 
   // 更新分类字段
   if (newParams.horizontalColumn &&
-      activeColumnKeys.value.includes(newParams.horizontalColumn)) {
+    activeColumnKeys.value.includes(newParams.horizontalColumn)) {
     horizontalColumnChinese.value = newParams.horizontalColumn
   }
 
   if (newParams.verticalColumn &&
-      activeColumnKeys.value.includes(newParams.verticalColumn)) {
+    activeColumnKeys.value.includes(newParams.verticalColumn)) {
     verticalColumnChinese.value = newParams.verticalColumn
   }
 
   if (newParams.cellRowColumn &&
-      activeColumnKeys.value.includes(newParams.cellRowColumn)) {
+    activeColumnKeys.value.includes(newParams.cellRowColumn)) {
     cellRowColumnChinese.value = newParams.cellRowColumn
   }
 }, { deep: true })
@@ -535,7 +532,6 @@ watch(() => route.query, () => {
 .phonology-matrix-page {
   width: 90dvw;
 }
-
 
 .input-section {
   max-width: 600px;
@@ -552,83 +548,9 @@ watch(() => route.query, () => {
   margin: 24px auto;
 }
 
-/* 容器：保证在同一行居中 */
+/* 特徵 radio 外層只保留間距；radio 樣式交給 RadioGroup 組件 */
 .feature-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
   margin: 20px auto;
-}
-
-/* 标签容器：让圆圈和文字垂直居中对齐 */
-.feature-radio-label {
-  display: flex;
-  align-items: center;
-  gap: 8px; /* 圆圈和文字的间距 */
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text-dark, #333);
-  user-select: none;
-  transition: opacity 0.2s ease;
-}
-
-.feature-radio-label:hover {
-  opacity: 0.8;
-}
-
-/* 隐藏原生单选框，但不影响功能 */
-.hidden-radio {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* 液态玻璃圆圈（外圈） */
-.glass-indicator {
-  position: relative;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 1px solid rgba(150, 150, 150, 0.3); /* 细微的边框 */
-  background: rgba(255, 255, 255, 0.2); /* 半透明底色 */
-  backdrop-filter: blur(8px); /* 核心：毛玻璃效果 */
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow:
-      inset 0 1px 3px rgba(255, 255, 255, 0.5), /* 顶部内发光（玻璃质感） */
-      0 2px 4px rgba(0, 0, 0, 0.05); /* 底部微小阴影 */
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-/* 选中时的圆圈内部实心点 */
-.glass-indicator::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-primary, #007aff); /* 苹果蓝，或你的主题色 */
-  transform: translate(-50%, -50%) scale(0); /* 默认缩放为0隐藏 */
-  transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); /* 弹性弹出动画 */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-/* 选中状态触发器 */
-.hidden-radio:checked + .glass-indicator {
-  border-color: var(--color-primary, #007aff);
-  background: rgba(255, 255, 255, 0.8); /* 选中时玻璃变亮 */
-}
-
-.hidden-radio:checked + .glass-indicator::after {
-  transform: translate(-50%, -50%) scale(1); /* 弹出中心蓝点 */
-}
-
-/* 选中时的文字颜色变化（可选） */
-.hidden-radio:checked ~ .feature-radio-label {
-  color: var(--color-primary, #007aff);
 }
 
 .column-selectors {
@@ -711,8 +633,6 @@ watch(() => route.query, () => {
   box-shadow: none;
 }
 
-/* 按钮内的小旋转器 */
-
 .loading {
   display: flex;
   flex-direction: column;
@@ -721,8 +641,6 @@ watch(() => route.query, () => {
   min-height: 50vh;
   gap: 15px;
 }
-
-
 
 .loading p {
   color: var(--text-secondary);
@@ -779,7 +697,6 @@ watch(() => route.query, () => {
 
 /* 移动端适配 */
 @media (max-aspect-ratio: 1/1) {
-
   .page-title {
     font-size: 24px;
   }
