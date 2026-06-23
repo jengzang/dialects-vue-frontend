@@ -513,7 +513,6 @@ const runAction = async () => {
   queryStore.regions = regionList;
   // 3. 構建 payload
   let payload = {};
-
   if (currentTab.value === 'tab2') {
 
     // 假設 selectedCard.value 是一個字串，後端 features 需要 List
@@ -547,7 +546,10 @@ const runAction = async () => {
 
   else if (currentTab.value === 'tab3') {
     const featureList = tabStates.tab3.card ? [tabStates.tab3.card] : ['韻母'];
-    const selectedKeys = selectedKeysString.value.replace(/·/g, '');
+    const selectedKeys = selectedKeysString.value
+      .split('·')
+      .map(item => item.trim())
+      .filter(Boolean);
     const phos = YinweiSelectorRef.value.tab3KeyInput;
 
     payload = {
