@@ -160,6 +160,7 @@
               <YinweiSelector
                   ref="YinweiSelectorRef"
                   :locationRef="locationRef"
+                  :selected-card="tabStates.tab3.card"
                   @update:runDisabled="setTabContentDisabled('query', 'tab3', $event)"
               />
             </div>
@@ -550,7 +551,7 @@ const runAction = async () => {
       .split('·')
       .map(item => item.trim())
       .filter(Boolean);
-    const phos = YinweiSelectorRef.value.tab3KeyInput;
+    const phos = YinweiSelectorRef.value?.normalizedPhoInput || '';
 
     payload = {
       group_inputs: selectedKeys,

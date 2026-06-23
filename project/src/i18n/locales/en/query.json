@@ -123,7 +123,8 @@
       "final": "Final",
       "tone": "Tone",
       "errorFetch": "Feature count fetch error",
-      "queryFailed": "Query failed"
+      "queryFailed": "Query failed",
+      "inputLimitHint": "You can enter at most {max} valid syllables. Please stop adding more."
     },
     "zhongguSelector": {
       "possibleCombinations": "May generate {count} combinations",
