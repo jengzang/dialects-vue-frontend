@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import { getFeatureCounts } from '@/api'
@@ -10,6 +11,7 @@ import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 
 const { t } = useI18n()
+const route = useRoute()
 
 const loadCountsTask = useAsyncTask()
 const loading = loadCountsTask.loading
@@ -65,6 +67,7 @@ const chartFeatureTypes = computed(() => {
 })
 
 const hasChartData = computed(() => chartFeatureTypes.value.length > 0)
+const isCurrentCountRoute = computed(() => route.path === '/menu/pho/count')
 
 const locationNavItems = computed(() => {
   const orderedLocations = Object.keys(featureData.value)
@@ -853,7 +856,7 @@ onBeforeUnmount(() => {
     </div>
 
     <CountLocationJumpNav
-      v-if="Object.keys(featureData).length > 0 && locationNavItems.length > 0"
+      v-if="isCurrentCountRoute && Object.keys(featureData).length > 0 && locationNavItems.length > 0"
       :items="locationNavItems"
       @jump="handleLocationNavJump"
     />
