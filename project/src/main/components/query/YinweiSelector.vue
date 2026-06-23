@@ -33,7 +33,11 @@
           class="suggest-line"
           @mousedown.prevent="applySuggestion(item)"
         >
-          {{ item }}
+          <span class="suggest-text">{{ item }}</span>
+          <span class="suggest-counts">
+            <span class="suggest-count suggest-count--locations">{{ getSuggestionStats(item).locationCount }}</span>
+            <span class="suggest-count suggest-count--total">{{ getSuggestionStats(item).totalCount }}</span>
+          </span>
         </div>
       </div>
     </Teleport>
@@ -62,6 +66,7 @@ import YinweiHelpPopup from '@/main/components/popup/query/YinweiHelpPopup.vue'
 import { LOCATION_LIMITS } from '@/main/config/constants.js'
 import { userStore, setTabContentDisabled } from '@/main/store/store.js'
 import {
+  aggregateFeatureCountsByType,
   filterYinweiSuggestions,
   getFeatureSuggestionsByCard,
   normalizeYinweiTokens
@@ -204,10 +209,10 @@ async function ensureFeatureCountsLoaded() {
     }
 
     apiResults.value = data || {}
-    aggregatedFeatureData.value = data || {}
+    aggregatedFeatureData.value = aggregateFeatureCountsByType(data || {})
     const nextAggregated = aggregatedFeatureData.value?.[props.selectedCard]
     aggregatedCardStats.value = nextAggregated && typeof nextAggregated === 'object' ? nextAggregated : {}
-    cardSuggestions.value = getFeatureSuggestionsByCard(aggregatedFeatureData.value, props.selectedCard)
+    cardSuggestions.value = getFeatureSuggestionsByCard(apiResults.value, props.selectedCard)
     hasFetchedFeatureCounts.value = true
 
     const normalized = normalizeYinweiTokens(tab3KeyInput.value, cardSuggestions.value, 3)
@@ -301,6 +306,14 @@ function applySuggestion(item) {
   })
 }
 
+function getSuggestionStats(item) {
+  const stats = aggregatedCardStats.value?.[item]
+  return {
+    locationCount: stats?.locationCount || 0,
+    totalCount: stats?.totalCount || 0
+  }
+}
+
 defineExpose({
   tab3KeyInput,
   legalPhoValues: computed(() => legalState.value.legalTokens),
@@ -376,10 +389,52 @@ defineExpose({
 }
 
 .suggest-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding: 4px 8px;
   cursor: pointer;
   border-radius: 6px;
   transition: background-color 0.2s ease;
+}
+
+.suggest-text {
+  min-width: 0;
+}
+
+.suggest-counts {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-dark-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.suggest-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  line-height: 1.35;
+  box-shadow: var(--shadow-sm2);
+}
+
+.suggest-count--locations {
+  color: #3d7bd9;
+  background: rgba(0, 122, 255, 0.08);
+  border-color: rgba(0, 122, 255, 0.14);
+}
+
+.suggest-count--total {
+  color: #0f5fc4;
+  background: rgba(0, 122, 255, 0.14);
+  border-color: rgba(0, 122, 255, 0.22);
 }
 
 .suggest-line:hover {
