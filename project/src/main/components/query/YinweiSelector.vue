@@ -49,6 +49,7 @@
     :location-list="locationList"
     :loading-states="loadingStates"
     :api-results="apiResults"
+    :opening-animating="isHelpPopupOpening"
     @close="closeHelpModal"
   />
 </template>
@@ -97,12 +98,14 @@ const loadingStates = ref({})
 const apiResults = ref({})
 const inputLimitHint = ref('')
 const isFetchingSuggestions = ref(false)
+const isHelpPopupOpening = ref(false)
 const aggregatedFeatureData = ref({})
 const aggregatedCardStats = ref({})
 const cardSuggestions = ref([])
 const hasFetchedFeatureCounts = ref(false)
 let fetchSuggestionsTimer = null
 let featureRequestToken = 0
+let helpPopupAnimationTimer = null
 
 const locationList = computed(() => {
   const list = props.locationRef?.locationsResult || []
@@ -158,12 +161,23 @@ watch(() => props.selectedCard, () => {
   suggestions.value = []
 })
 
-function openHelpModal() {
+async function openHelpModal() {
+  isHelpPopupOpening.value = true
+  clearTimeout(helpPopupAnimationTimer)
+  helpPopupAnimationTimer = setTimeout(() => {
+    isHelpPopupOpening.value = false
+  }, 900)
   isHelpModalOpen.value = true
+
+  if (!hasFetchedFeatureCounts.value && !isFetchingSuggestions.value) {
+    await ensureFeatureCountsLoaded()
+  }
 }
 
 function closeHelpModal() {
   isHelpModalOpen.value = false
+  isHelpPopupOpening.value = false
+  clearTimeout(helpPopupAnimationTimer)
 }
 
 async function ensureFeatureCountsLoaded() {
@@ -335,6 +349,10 @@ defineExpose({
   box-sizing: border-box;
 }
 
+.query-box :deep(textarea) {
+  margin-bottom: 0;
+}
+
 .inline-suggestion {
   position: absolute !important;
   background: var(--glass-medium2) !important;
@@ -347,8 +365,9 @@ defineExpose({
   white-space: pre-line;
   font-size: 14px;
   color: var(--text-dark);
-  max-width: 100px;
-  width: fit-content;
+  min-width: 140px;
+  max-width: min(240px, 60vw);
+  width: max-content;
   z-index: 99999 !important;
   pointer-events: auto !important;
   max-height: 20dvh;
@@ -368,10 +387,20 @@ defineExpose({
 }
 
 .input-limit-hint {
-  margin-top: 6px;
+  margin: 2px auto 0;
+  max-width: 250px;
+  min-width: 80%;
+  padding: 4px 12px;
   font-size: 13px;
   line-height: 1.4;
   color: var(--color-warning);
   text-align: center;
+  background: var(--glass-lighter2);
+  border: 1px solid var(--border-gray-lighter);
+  border-radius: 12px;
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  box-shadow: var(--shadow-sm2);
+  opacity: 0.95;
 }
 </style>

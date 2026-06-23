@@ -12,6 +12,10 @@
       <p class="empty-text">{{ t('query.components.yinweiSelector.emptyState') }}</p>
     </div>
 
+    <div v-else-if="openingAnimating" class="popup-opening-state" aria-hidden="true">
+      <span class="ui-loading--hourglass popup-opening-loader"></span>
+    </div>
+
     <ul v-else class="glass-list">
       <li v-for="(loc, index) in locationList" :key="index" class="glass-list-item">
         <div class="item-row">
@@ -77,6 +81,10 @@ defineProps({
     type: Object,
     default: () => ({})
   },
+  openingAnimating: {
+    type: Boolean,
+    default: false
+  },
   apiResults: {
     type: Object,
     default: () => ({})
@@ -120,6 +128,17 @@ function handleClose() {
 
 .glass-list-item:last-child {
   border-bottom: none;
+}
+
+.popup-opening-state {
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-opening-loader {
+  transform: scale(1.2);
 }
 
 .item-row {
