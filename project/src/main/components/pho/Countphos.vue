@@ -40,22 +40,22 @@ const locationNavItems = computed(() => {
   const orderedLocations = Object.keys(featureData.value)
   const totalItems = []
 
+  const totalKeys = Object.keys(aggregatedData.value)
+  totalKeys.forEach((featureType) => {
+    totalItems.push({
+      id: `count-total-${featureType}`,
+      fullLabel: `總-${featureType}`,
+      targetKey: featureType,
+      kind: 'total'
+    })
+  })
+
   orderedLocations.forEach((location, index) => {
     totalItems.push({
       id: `count-location-${index}`,
       fullLabel: location,
       targetKey: location,
       kind: 'location'
-    })
-  })
-
-  const totalKeys = Object.keys(aggregatedData.value)
-  totalKeys.forEach((featureType) => {
-    totalItems.push({
-      id: `count-total-${featureType}`,
-      fullLabel: `总-${featureType}`,
-      targetKey: featureType,
-      kind: 'total'
     })
   })
 
@@ -67,10 +67,19 @@ const getAggregatedAnchorId = (featureType) => `count-total-anchor-${featureType
 
 const handleLocationNavJump = async (nav) => {
   await nextTick()
-  const targetId = nav.kind === 'total'
-    ? getAggregatedAnchorId(nav.targetKey)
-    : getLocationAnchorId(nav.targetKey)
-  const target = document.getElementById(targetId)
+
+  if (nav.kind === 'total') {
+    const titleEl = document.querySelector(`#${getAggregatedAnchorId(nav.targetKey)} .category-title`)
+    if (titleEl) {
+      titleEl.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
+    return
+  }
+
+  const target = document.getElementById(getLocationAnchorId(nav.targetKey))
 
   if (!target) return
 

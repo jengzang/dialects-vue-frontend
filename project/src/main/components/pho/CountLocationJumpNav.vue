@@ -369,6 +369,14 @@ const jumpIndicatorTop = computed(() => {
   box-shadow: 0 0 0 5px rgba(0, 122, 255, 0.18);
 }
 
+.count-location-jump-nav-item.is-center .count-location-jump-nav-text {
+  color: var(--color-primary);
+}
+
+.count-location-jump-nav-item.center-label-visible .count-location-jump-nav-text {
+  color: var(--color-primary);
+}
+
 .count-location-jump-nav-items::before,
 .count-location-jump-nav-items::after {
   content: '';
