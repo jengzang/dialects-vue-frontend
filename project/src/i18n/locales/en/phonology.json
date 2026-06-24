@@ -81,6 +81,8 @@
     },
     "countphos": {
       "title": "Syllable Statistics",
+      "titlePrefix": "Syllable statistics for all locations",
+      "locationPill": "{count} locations",
       "subtitle": "Syllable statistics for all locations ({count} locations)",
       "features": {
         "initial": "Initial",

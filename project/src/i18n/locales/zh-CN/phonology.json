@@ -81,6 +81,8 @@
     },
     "countphos": {
       "title": "音节统计",
+      "titlePrefix": "所有地点的音节统计",
+      "locationPill": "{count} 个地点",
       "subtitle": "所有地点的音节统计（共 {count} 个地点）",
       "features": {
         "initial": "声母",

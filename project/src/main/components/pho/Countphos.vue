@@ -997,8 +997,9 @@ onBeforeUnmount(() => {
       <!-- 匯總統計部分 -->
       <section class="aggregated-section">
         <!-- <h3 class="section-title">匯總統計</h3> -->
-        <h3 class="section-title">
-          {{ $t('phonology.phonology.countphos.subtitle', { count: displayLocationCount }) }}
+        <h3 class="section-title section-title--with-pill">
+          <span>{{ $t('phonology.phonology.countphos.titlePrefix') }}</span>
+          <span class="section-title-pill">{{ $t('phonology.phonology.countphos.locationPill', { count: displayLocationCount }) }}</span>
         </h3>
 
         <!-- 圖表統計部分 -->
@@ -1332,10 +1333,31 @@ onBeforeUnmount(() => {
   }
 
   .section-title {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--text-dark);
-    margin-bottom: 8px;
+    margin: 8px 0;
+  }
+
+  .section-title--with-pill {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .section-title-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: rgba(0, 122, 255, 0.12);
+    color: var(--color-primary);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: nowrap;
   }
 
   .section-subtitle {
