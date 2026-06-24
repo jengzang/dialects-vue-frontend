@@ -357,11 +357,19 @@ const gridLayout = computed(() => {
   if (pieCount === 0) return { cols: 0, rows: 0 }
 
   let cols
-  if (pieCount <= 4) cols = 2
-  else if (pieCount <= 9) cols = 3
-  else if (pieCount <= 16) cols = 4
-  else if (pieCount <= 25) cols = 5
-  else cols = 6
+  const containerW = containerWidth.value
+  // 移动端适配：优先根据容器宽度限制列数
+  if (containerW <= 480) {
+    cols = 1
+  } else if (containerW <= 768) {
+    cols = 2
+  } else {
+    if (pieCount <= 4) cols = 2
+    else if (pieCount <= 9) cols = 3
+    else if (pieCount <= 16) cols = 4
+    else if (pieCount <= 25) cols = 5
+    else cols = 6
+  }
 
   const rows = Math.ceil(pieCount / cols)
   return { cols, rows }
@@ -373,7 +381,7 @@ const pieSize = computed(() => {
   const containerW = containerWidth.value
   const gap = 20
   const size = (containerW - (cols + 1) * gap) / cols
-  return Math.max(150, Math.min(250, size))
+  return Math.max(200, Math.min(280, size))
 })
 
 const gridStyle = computed(() => {
@@ -782,7 +790,7 @@ const renderAllPies = async () => {
   if (pieElements) {
     const batchSize = 10 // 每批渲染10个
     for (let i = 0; i < pieElements.length; i += batchSize) {
-      const batchStart = performance.now()
+      // const batchStart = performance.now()
       const batch = Array.from(pieElements).slice(i, i + batchSize)
       batch.forEach((el) => {
         const index = parseInt(el.getAttribute('data-pie-index'))
@@ -801,7 +809,7 @@ const renderAllPies = async () => {
     }
   }
 
-  const endTime = performance.now()
+  // const endTime = performance.now()
   // console.log(`[Evolution] Total rendering took ${(endTime - startTime).toFixed(2)}ms`)
 }
 
@@ -1403,7 +1411,7 @@ onUnmounted(() => {
 
 .pie-chart {
   width: 100%;
-  height: 200px;
+  height: 230px;
   background: transparent;
 }
 
@@ -1605,7 +1613,7 @@ onUnmounted(() => {
   }
 
   .pie-chart {
-    height: 180px;
+    height: 270px;
   }
 
   .pie-container.has-mobile-detail-card {
