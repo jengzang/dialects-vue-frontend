@@ -80,7 +80,6 @@
             class="compare-group"
             style="padding:0;"
           >
-            <!-- <div class="group-label">選擇中古音條件</div> -->
             <div class="triple-select-box">
               <!-- 卡片選擇區 -->
               <div class="card-row">
@@ -224,6 +223,7 @@
           </div>
         </div>
       </div>
+
       <!-- Tab4: 比較調類 -->
       <div
         v-show="currentTab === 'tab4'"
@@ -234,7 +234,6 @@
             {{ $t('compare.messages.selectTwoToneClasses') }}
           </div>
           <div class="compare-group">
-            <!-- <div class="group-label">??????</div> -->
             <div class="tone-selection">
               <label
                 v-for="(toneLabel, i) in toneClassLabels"
@@ -279,21 +278,17 @@
                 :aria-label="t('compare.sankeyControls.title', '桑基图操作')"
               >
                 <div class="tab5-sankey-control-row">
-                  <label class="tab5-sankey-checkbox">
-                    <input
-                      v-model="tabStates.tab5.enableLinkOptimization"
-                      type="checkbox"
-                    >
-                    <span>{{ t('compare.sankeyControls.optimizeLinks', '优化连线') }}</span>
-                  </label>
+                  <Checkbox
+                    v-model="tabStates.tab5.enableLinkOptimization"
+                    :label="t('compare.sankeyControls.optimizeLinks', '优化连线')"
+                    :font-size="12"
+                  />
 
-                  <label class="tab5-sankey-checkbox tab5-sankey-checkbox-secondary">
-                    <input
-                      v-model="tabStates.tab5.ignorePolyphonicChars"
-                      type="checkbox"
-                    >
-                    <span>{{ t('compare.sankeyControls.ignorePolyphonicChars', '忽略多音字') }}</span>
-                  </label>
+                  <Checkbox
+                    v-model="tabStates.tab5.ignorePolyphonicChars"
+                    :label="t('compare.sankeyControls.ignorePolyphonicChars', '忽略多音字')"
+                    :font-size="12"
+                  />
                 </div>
 
                 <label class="tab5-sankey-slider">
@@ -409,8 +404,8 @@
 </template>
 
 <script setup>
-import {computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+import { computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import TabsContainer from "@/components/common/TabsContainer.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
@@ -421,6 +416,7 @@ import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
 import RadioGroup from '@/components/selector/RadioGroup.vue';
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
 import ChoiceSelector from "@/components/selector/ChoiceSelector.vue";
+import Checkbox from "@/components/selector/Checkbox.vue";
 import {
   queryStore,
   uiStore,
@@ -604,7 +600,7 @@ function addToGroup(groupName) {
           current: currentText
         })
       )
-      return  // 不允許添加
+      return
     }
   }
 
@@ -845,7 +841,6 @@ function toggleDropdown(type,key=null) {
     // 🔼 打开逻辑
     dropdownOpen.value = type
 
-    // 🔥🔥🔥 关键点：这里进行了赋值！🔥🔥🔥
     currentActiveKey.value = key
     nextTick(() => {
       let triggerEl = null
@@ -1088,7 +1083,6 @@ function toggleExcludeOption(value, tab, group = 'group1') {
   }
 }
 
-// isRunning 状态已移至 uiStore，不再需要本地定义
 const ZhongguRef = ref(null);
 const ZhongguRef1 = ref(null);  // For tab2 group1
 const ZhongguRef2 = ref(null);  // For tab2 group2
@@ -1300,10 +1294,6 @@ const runAction = async () => {
 
 // 处理比较结果并生成地图数据
 function processCompareResults(results, mapData) {
-  // console.log('🔄 开始处理比较结果...')
-  // console.log('📥 输入 results:', results)
-  // console.log('📥 输入 mapData:', mapData)
-
   const mergedData = []
 
   // 将 coordinates_locations 转换为 Map 以便快速查找
@@ -1316,59 +1306,40 @@ function processCompareResults(results, mapData) {
       coordMap.set(locationName, coordinate)
     })
   }
-  // console.log('🗺️ 坐标映射表:', coordMap)
 
   results.forEach(result => {
     const location = result.location
-    // console.log(`🔍 处理地点: ${location}`)
 
     // 从 coordMap 中查找坐标
     const coordinate = coordMap.get(location)
     if (!coordinate) {
-      // console.warn(`⚠️ 未找到地点 ${location} 的坐标数据`)
       return
     }
-    // console.log(`✅ 找到坐标:`, coordinate)
 
     // 检查是否有 comparisons 或 features（ZhongGu 格式直接在 result 下有 features）
     if (result.comparisons && Array.isArray(result.comparisons)) {
       // chars/tones 格式：有 comparisons 数组
       result.comparisons.forEach(comparison => {
         const pair = comparison.pair
-        // console.log(`  📌 比较对: ${pair ? pair.join(' vs ') : '未知'}`)
 
-        // 判断是 features 格式（chars）还是 comparison 格式（tones）
         if (comparison.features) {
-          // chars API 格式：有多个 features
-          // console.log(`  📋 使用 features 格式`)
-
           if (typeof comparison.features !== 'object') {
-            // console.warn(`  ⚠️ features 不是对象:`, comparison.features)
             return
           }
 
           // 处理每个特征
           Object.entries(comparison.features).forEach(([feature, featureData]) => {
-            const status = featureData.status
-            // console.log(`    🔸 特征: ${feature}, 状态: ${status}`)
-
             const item = createComparisonItem(location, coordinate, feature, featureData.status, featureData, pair)
             if (item) {
-              // console.log(`    ➕ 添加数据项:`, item)
               mergedData.push(item)
             }
           })
         } else if (comparison.comparison) {
-          // tones API 格式：只有一个 comparison
-          // console.log(`  📋 使用 comparison 格式`)
-
           const compData = comparison.comparison
           const status = compData.status
-          // console.log(`    🔸 状态: ${status}`)
 
           const item = createComparisonItem(location, coordinate, t('compare.tabs.tab4'), status, compData, pair)
           if (item) {
-            // console.log(`    ➕ 添加数据项:`, item)
             mergedData.push(item)
           }
         } else {
@@ -1376,27 +1347,17 @@ function processCompareResults(results, mapData) {
         }
       })
     } else if (result.features) {
-      // ZhongGu 格式：直接在 result 下有 features
-      // console.log(`  📋 使用 ZhongGu 格式（features 在 result 下）`)
-
       Object.entries(result.features).forEach(([feature, featureData]) => {
-        // console.log(`    🔸 特征: ${feature}`)
-
-        // ZhongGu 格式：featureData 包含 group1 和 group2
         if (featureData.group1 && featureData.group2) {
           const item = createZhongGuComparisonItem(location, coordinate, feature, featureData)
           if (item) {
-            // console.log(`    ➕ 添加数据项:`, item)
             mergedData.push(item)
           }
         }
       })
-    } else {
-      // console.warn(`⚠️ 地点 ${location} 既没有 comparisons 也没有 features`)
     }
   })
 
-  // console.log(`✅ 处理完成，共生成 ${mergedData.length} 条数据`)
   return mergedData
 }
 
@@ -1582,7 +1543,6 @@ onBeforeUnmount(() => {
     tab5SankeyFilterTimer = null
   }
 })
-
 </script>
 
 <script>
@@ -1598,7 +1558,6 @@ export default {
   width: 100%;
   animation: fade 0.6s ease;
 
-  /* ✅ 新增這些 */
   flex-direction: column;
   align-items: center;
   text-align: center;
@@ -1659,7 +1618,7 @@ export default {
   justify-content: center;
   align-items: center;
   gap: 20px;
-  flex-wrap: wrap; /* ✨ 支持自动换行 */
+  flex-wrap: wrap;
 }
 @media (max-aspect-ratio: 1/1) {
   .card-row{
@@ -1994,8 +1953,6 @@ export default {
   }
 }
 
-/* 特徵選擇樣式 */
-
 /* Tab2 添加按鈕行 */
 .add-buttons-row {
   display: flex;
@@ -2249,6 +2206,7 @@ export default {
 .tone-checkbox-blue span {
   color: #1565C0;
 }
+
 /* Tab5 音值比較 地點輸入容器 */
 .tab5-location-group {
   width: 100%;
@@ -2289,7 +2247,6 @@ export default {
   flex-wrap: wrap;
 }
 
-.tab5-sankey-checkbox,
 .tab5-sankey-slider {
   display: flex;
   flex-direction: column;
@@ -2297,22 +2254,6 @@ export default {
   color: var(--text-secondary, #666);
   font-size: 12px;
   line-height: 1.35;
-}
-
-.tab5-sankey-checkbox {
-  flex-direction: row;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-}
-
-.tab5-sankey-checkbox-secondary {
-  margin-left: 0;
-}
-
-.tab5-sankey-checkbox input {
-  cursor: pointer;
 }
 
 .tab5-sankey-slider-label {

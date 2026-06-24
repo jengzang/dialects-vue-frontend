@@ -7,6 +7,7 @@
         'is-disabled': disabled
       }
     ]"
+    :style="labelStyle"
   >
     <input
       type="checkbox"
@@ -44,6 +45,10 @@ const props = defineProps({
     type: [Number, String],
     default: 18
   },
+  fontSize: {
+    type: [Number, String],
+    default: 15
+  },
   disabled: {
     type: Boolean,
     default: false
@@ -56,9 +61,17 @@ const checkboxSize = computed(() => {
   return typeof props.size === 'number' ? `${props.size}px` : props.size
 })
 
+const checkboxFontSize = computed(() => {
+  return typeof props.fontSize === 'number' ? `${props.fontSize}px` : props.fontSize
+})
+
 const indicatorStyle = computed(() => ({
   width: checkboxSize.value,
   height: checkboxSize.value
+}))
+
+const labelStyle = computed(() => ({
+  fontSize: checkboxFontSize.value
 }))
 
 const handleChange = (event) => {
@@ -72,9 +85,8 @@ const handleChange = (event) => {
 .liquid-checkbox-label {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   cursor: pointer;
-  font-size: 15px;
   font-weight: 500;
   color: var(--text-dark, #333);
   user-select: none;

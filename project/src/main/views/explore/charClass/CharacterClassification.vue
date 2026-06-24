@@ -21,18 +21,12 @@
 
         <div class="control-section preset-section">
           <div class="control-heading">{{ t('charClass.common.recommended') }}</div>
-          <div class="preset-list">
-            <button
-              v-for="preset in currentTableConfig.presets"
-              :key="preset.key"
-              type="button"
-              class="preset-chip"
-              :class="{ active: activePresetKey === preset.key }"
-              @click="applyPreset(preset.key)"
-            >
-              {{ t(preset.labelKey) }}
-            </button>
-          </div>
+          <RadioGroup
+            v-model="activePresetModel"
+            :options="presetOptions"
+            name="char-class-preset"
+            class="preset-list"
+          />
         </div>
 
         <div class="control-section levels-section">
@@ -104,7 +98,6 @@
                   </button>
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -126,14 +119,13 @@
           </div>
 
           <div class="tree-actions">
-            <button
-              class="annotation-toggle"
-              :class="{ active: showAnnotations }"
-              @click="toggleAnnotations"
-            >
-              {{ showAnnotations ? t('charClass.actions.hideAnnotations') : t('charClass.actions.showAnnotations') }}
-            </button>
-            
+            <Checkbox
+              v-model="showAnnotations"
+              class="annotation-checkbox"
+              :label="showAnnotations ? t('charClass.actions.showAnnotations') : t('charClass.actions.hideAnnotations') "
+              :font-size="14"
+            />
+
             <div class="search-wrapper">
               <span class="search-icon">🔍</span>
               <input
@@ -190,6 +182,8 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
+import Checkbox from '@/components/selector/Checkbox.vue'
 import CharTreeItem from '@/main/components/TableAndTree/CharTreeItem.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import { loadFullTree } from '@/api'
@@ -257,6 +251,18 @@ const tableOptions = computed(() =>
     value: tableKey
   }))
 )
+
+const presetOptions = computed(() =>
+  currentTableConfig.value.presets.map(preset => ({
+    label: t(preset.labelKey),
+    value: preset.key
+  }))
+)
+
+const activePresetModel = computed({
+  get: () => activePresetKey.value,
+  set: (presetKey) => applyPreset(presetKey)
+})
 
 const areArraysEqual = (left, right) =>
   left.length === right.length && left.every((item, index) => item === right[index])
@@ -385,10 +391,6 @@ const getLevelOptions = (index) => {
       label: column.label,
       value: column.key
     }))
-}
-
-const toggleAnnotations = () => {
-  showAnnotations.value = !showAnnotations.value
 }
 
 const getFirstPresetLevelKeys = (tableConfig) =>
@@ -528,9 +530,9 @@ watch(
   border-radius: 28px;
   padding: 22px;
   color: var(--text-dark);
-  height: 80dvh!important;
-  overflow-y:auto;
-  overflow-x:hidden;
+  height: 80dvh !important;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .panel-header,
@@ -541,7 +543,7 @@ watch(
   gap: 16px;
 }
 
-  .tree-actions {
+.tree-actions {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -589,28 +591,8 @@ watch(
   opacity: 0.65;
 }
 
-.annotation-toggle {
+.annotation-checkbox {
   white-space: nowrap;
-  border: 1px solid var(--glass-border-weak);
-  background: var(--glass-light);
-  color: #0a84ff;
-  border-radius: 999px;
-  padding: 10px 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-}
-
-.annotation-toggle:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-glass-hover);
-}
-
-.annotation-toggle.active {
-  background: rgba(10, 132, 255, 0.18);
-  border-color: rgba(10, 132, 255, 0.4);
 }
 
 .control-section {
@@ -639,37 +621,19 @@ watch(
 }
 
 .preset-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.preset-section .preset-list {
   flex: 1 1 320px;
   min-width: 0;
+  justify-content: flex-start;
+  gap: 6px 12px;
 }
 
-.preset-chip {
-  border: 1px solid var(--glass-border-weak);
-  background: var(--glass-light);
-  border-radius: 999px;
-  padding: 10px 14px;
-  color: #1d1d1f;
-  cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-  backdrop-filter: blur(14px) saturate(170%);
-  -webkit-backdrop-filter: blur(14px) saturate(170%);
+.preset-list :deep(.liquid-radio-label) {
+  padding: 4px 6px;
 }
 
-.preset-chip:hover {
-  transform: translateY(-1px);
-  border-color: rgba(10, 132, 255, 0.35);
-}
-
-.preset-chip.active {
-  background: rgba(10, 132, 255, 0.16);
-  border-color: rgba(10, 132, 255, 0.45);
-  color: #0057d9;
+.preset-list :deep(.liquid-radio-text) {
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .levels-header {
@@ -682,8 +646,8 @@ watch(
 .add-level-button {
   white-space: nowrap;
   border-color: rgba(10, 132, 255, 0.34);
-  background: linear-gradient(135deg, rgba(10, 132, 255, 0.22), rgba(255, 255, 255, 0.9));
-  color: #0057d9;
+  background:  #007bffea;
+  color: white;
   font-weight: 700;
   box-shadow: 0 12px 28px rgba(10, 132, 255, 0.12);
 }
@@ -888,9 +852,6 @@ watch(
   margin-top: 4px;
 }
 
-
-
-
 @media (orientation: portrait) {
   .page-shell {
     grid-template-columns: 1fr;
@@ -901,14 +862,24 @@ watch(
     padding: 18px;
     border-radius: 24px;
   }
-  .config-panel{
+
+  .config-panel {
     max-height: 55dvh;
   }
 
   .panel-header,
-  .tree-header{
+  .tree-header {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .tree-actions {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .annotation-checkbox {
+    align-self: flex-start;
   }
 
   .level-row-header {
