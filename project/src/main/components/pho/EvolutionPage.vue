@@ -158,85 +158,76 @@
       <p>{{ t('phonology.phonology.evolution.states.empty') }}</p>
     </div>
 
-    <Transition name="mobile-detail-card-fade">
-      <div
-        v-if="selectedPieDetail && !showSankey"
-        class="mobile-detail-card"
-        :class="{ 'is-desktop-card': !isMobileLayout }"
-        :style="!isMobileLayout ? desktopCardPosition : {}"
-      >
-        <div class="mobile-detail-card__header">
-          <div class="mobile-detail-card__meta">
-            <div class="mobile-detail-card__title-row">
-              <div class="mobile-detail-card__title">{{ selectedPieDetail.title }}</div>
-              <div class="mobile-detail-card__section-title">
-                {{ t('phonology.phonology.evolution.mobileDetail.breakdownBy', { dimension: level2Column }) }}
-              </div>
-            </div>
-            <div class="mobile-detail-card__subtitle">
-              {{ selectedPieDetail.pieTitle }} ·
-              {{ t('phonology.phonology.evolution.mobileDetail.countAndRatio', {
-                count: selectedPieDetail.count,
-                unit: t('phonology.phonology.evolution.sankey.unit'),
-                percent: selectedPieDetail.percent
-              }) }}
-            </div>
-          </div>
-          <button
-            v-show="isMobileLayout || isCardPinned"
-            type="button"
-            class="mobile-detail-card__close"
-            @click="closeMobilePieDetail"
-          >×</button>
-        </div>
-
-        <div class="mobile-detail-card__body ui-scrollbar">
-          <div
-            v-if="selectedPieDetail.level2Items.length > 0"
-            class="mobile-detail-card__section"
-          >
-            <div
-              v-for="level2Item in selectedPieDetail.level2Items"
-              :key="`${selectedPieDetail.key}-${level2Item.label}`"
-              class="mobile-detail-card__item"
-            >
-              <div class="mobile-detail-card__item-row">
-                <span class="mobile-detail-card__item-label">{{ level2Item.label }}</span>
-                <span class="mobile-detail-card__item-value">
-                  {{ t('phonology.phonology.evolution.mobileDetail.countAndRatio', {
-                    count: level2Item.count,
-                    unit: t('phonology.phonology.evolution.sankey.unit'),
-                    percent: level2Item.percent
-                  }) }}
-                </span>
-              </div>
-              <div v-if="level2Item.displayChars.length > 0" class="mobile-detail-card__chars">
-                {{ t('phonology.phonology.evolution.mobileDetail.characters') }}：
-                {{ level2Item.displayChars.join('、') }}
-                <template v-if="level2Item.remainingChars > 0">
-                  {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: level2Item.remainingChars }) }}
-                </template>
-              </div>
-            </div>
-          </div>
-
-          <div
-            v-else-if="selectedPieDetail.displayChars.length > 0"
-            class="mobile-detail-card__section"
-          >
+    <HoverDetailCard
+      :visible="Boolean(selectedPieDetail) && !showSankey"
+      :is-mobile-layout="isMobileLayout"
+      :is-pinned="isCardPinned"
+      :desktop-card-position="desktopCardPosition"
+      @close="closeMobilePieDetail"
+    >
+      <template #header>
+        <div class="mobile-detail-card__meta">
+          <div class="mobile-detail-card__title-row">
+            <div class="mobile-detail-card__title">{{ selectedPieDetail?.title }}</div>
             <div class="mobile-detail-card__section-title">
-              {{ t('phonology.phonology.evolution.mobileDetail.characters') }}
+              {{ t('phonology.phonology.evolution.mobileDetail.breakdownBy', { dimension: level2Column }) }}
             </div>
-            <div class="mobile-detail-card__chars mobile-detail-card__chars--standalone">
-              {{ selectedPieDetail.displayChars.join('、') }}
-              <template v-if="selectedPieDetail.remainingChars > 0">
-                {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: selectedPieDetail.remainingChars }) }}
-              </template>
-            </div>
+          </div>
+          <div class="mobile-detail-card__subtitle">
+            {{ selectedPieDetail?.pieTitle }} ·
+            {{ t('phonology.phonology.evolution.mobileDetail.countAndRatio', {
+              count: selectedPieDetail?.count,
+              unit: t('phonology.phonology.evolution.sankey.unit'),
+              percent: selectedPieDetail?.percent
+            }) }}
+          </div>
+        </div>
+      </template>
+
+      <div
+        v-if="selectedPieDetail?.level2Items.length > 0"
+        class="mobile-detail-card__section"
+      >
+        <div
+          v-for="level2Item in selectedPieDetail.level2Items"
+          :key="`${selectedPieDetail.key}-${level2Item.label}`"
+          class="mobile-detail-card__item"
+        >
+          <div class="mobile-detail-card__item-row">
+            <span class="mobile-detail-card__item-label">{{ level2Item.label }}</span>
+            <span class="mobile-detail-card__item-value">
+              {{ t('phonology.phonology.evolution.mobileDetail.countAndRatio', {
+                count: level2Item.count,
+                unit: t('phonology.phonology.evolution.sankey.unit'),
+                percent: level2Item.percent
+              }) }}
+            </span>
+          </div>
+          <div v-if="level2Item.displayChars.length > 0" class="mobile-detail-card__chars">
+            {{ t('phonology.phonology.evolution.mobileDetail.characters') }}：
+            {{ level2Item.displayChars.join('、') }}
+            <template v-if="level2Item.remainingChars > 0">
+              {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: level2Item.remainingChars }) }}
+            </template>
           </div>
         </div>
       </div>
-    </Transition>
+
+      <div
+        v-else-if="selectedPieDetail?.displayChars.length > 0"
+        class="mobile-detail-card__section"
+      >
+        <div class="mobile-detail-card__section-title">
+          {{ t('phonology.phonology.evolution.mobileDetail.characters') }}
+        </div>
+        <div class="mobile-detail-card__chars mobile-detail-card__chars--standalone">
+          {{ selectedPieDetail.displayChars.join('、') }}
+          <template v-if="selectedPieDetail.remainingChars > 0">
+            {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: selectedPieDetail.remainingChars }) }}
+          </template>
+        </div>
+      </div>
+    </HoverDetailCard>
   </div>
 </template>
 
@@ -247,6 +238,8 @@ import { useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
+import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
+import { resolveHoverDetailCardPosition } from '@/components/ToastAndHelp/hoverDetailCardPosition.js'
 import LocationMultiInput from '../geo/LocationMultiInput.vue'
 import { postPhoPieByValue, postPhoPieByStatus } from '@/api'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
@@ -729,17 +722,10 @@ const initPieChart = (container, pieData, index) => {
     // 更新位置 (仅桌面端)
     if (!isMobileLayout.value && params.event?.event) {
       const e = params.event.event
-      const cardWidth = 340
-      const cardHeight = 420
-
-      let x = e.clientX + 20
-      let y = e.clientY + 20
-
-      // 边缘检测防溢出
-      if (x + cardWidth > window.innerWidth) x = e.clientX - cardWidth - 20
-      if (y + cardHeight > window.innerHeight) y = window.innerHeight - cardHeight - 20
-
-      desktopCardPosition.value = { left: `${x}px`, top: `${y}px` }
+      desktopCardPosition.value = resolveHoverDetailCardPosition({
+        clientX: e.clientX,
+        clientY: e.clientY,
+      })
     }
   }
 
@@ -1419,152 +1405,6 @@ onUnmounted(() => {
   width: min(92dvw, 1400px);
   min-height: 520px;
   margin: 0 auto;
-}
-
-.mobile-detail-card {
-  position: fixed;
-  left: 12px;
-  right: 12px;
-  bottom: calc(12px + env(safe-area-inset-bottom));
-  z-index: 1200;
-  border: 1px solid var(--glass-border-weak);
-  border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-}
-
-.mobile-detail-card__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 14px 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-/* 桌面端弹窗样式覆盖 */
-.mobile-detail-card.is-desktop-card {
-  position: fixed;
-  right: auto;
-  bottom: auto;
-  width: 320px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  border: 1px solid var(--border-medium);
-  z-index: 9999;
-  pointer-events: auto;
-}
-
-/* 防止 Hover 状态下卡片遮挡鼠标导致图表触发 mouseout 闪烁 */
-.mobile-detail-card.is-desktop-card:not(:has(.mobile-detail-card__close:visible)) {
-  pointer-events: none;
-}
-
-.mobile-detail-card__meta {
-  min-width: 0;
-  flex: 1;
-}
-
-.mobile-detail-card__title-row {
-  display: flex;
-  justify-content: space-between; /* 核心：把子元素推向两端（一左一右） */
-  align-items: center; /* 让左右的文字在垂直方向上居中对齐 */
-  width: 100%; /* 确保撑满父容器 */
-  gap: 12px; /* 加上一点间距，防止文字太长撞在一起 */
-}
-
-.mobile-detail-card__title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-dark, #333);
-  line-height: 1.3;
-}
-
-.mobile-detail-card__subtitle {
-  margin-top: 4px;
-  font-size: 12px;
-  color: var(--text-secondary, #666);
-  line-height: 1.4;
-}
-
-.mobile-detail-card__close {
-  border: none;
-  background: rgba(255, 255, 255, 0.55);
-  color: var(--text-dark, #333);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.mobile-detail-card__body {
-  max-height: min(38dvh, 300px);
-  overflow-y: auto;
-  padding: 12px 14px 14px;
-}
-
-.mobile-detail-card__section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.mobile-detail-card__section-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dark, #333);
-}
-
-.mobile-detail-card__item {
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.45);
-}
-
-.mobile-detail-card__item-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.mobile-detail-card__item-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-dark, #333);
-}
-
-.mobile-detail-card__item-value {
-  font-size: 12px;
-  color: var(--text-secondary, #666);
-  white-space: nowrap;
-}
-
-.mobile-detail-card__chars {
-  margin-top: 8px;
-  font-size: 12px;
-  color: var(--text-secondary, #666);
-  line-height: 1.6;
-}
-
-.mobile-detail-card__chars--standalone {
-  margin-top: 0;
-}
-
-.mobile-detail-card-fade-enter-active,
-.mobile-detail-card-fade-leave-active {
-  transition: opacity 0.24s ease, transform 0.24s ease;
-}
-
-.mobile-detail-card-fade-enter-from,
-.mobile-detail-card-fade-leave-to {
-  opacity: 0;
-  transform: translateY(12px);
 }
 
 /* 空状态 */
