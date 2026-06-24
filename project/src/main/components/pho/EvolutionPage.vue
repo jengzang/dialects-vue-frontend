@@ -13,25 +13,15 @@
             class="query-mode-radio"
           />
 
-          <label class="mode-checkbox-label">
-            <input
-              v-model="showSankey"
-              type="checkbox"
-              class="hidden-checkbox"
-            />
-            <span class="checkbox-indicator"></span>
-            {{ t('phonology.phonology.evolution.controls.sankey') }}
-          </label>
+          <Checkbox
+            v-model="showSankey"
+            :label="t('phonology.phonology.evolution.controls.sankey')"
+          />
 
-          <label class="mode-checkbox-label">
-            <input
-              v-model="optimizeSankeyLayout"
-              type="checkbox"
-              class="hidden-checkbox"
-            />
-            <span class="checkbox-indicator"></span>
-            {{ t('phonology.phonology.evolution.controls.optimizeLinks') }}
-          </label>
+          <Checkbox
+            v-model="optimizeSankeyLayout"
+            :label="t('phonology.phonology.evolution.controls.optimizeLinks')"
+          />
         </div>
       </div>
 
@@ -265,6 +255,7 @@ import { useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
+import Checkbox from '@/components/selector/CheckBox.vue'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
 import { resolveHoverDetailCardPosition } from '@/components/ToastAndHelp/hoverDetailCardPosition.js'
 import LocationMultiInput from '../geo/LocationMultiInput.vue'
@@ -340,7 +331,6 @@ const queryModeOptions = computed(() => [
 const availableColumns = computed(() => {
   const schema = TABLE_COLUMN_SCHEMAS[selectedTable.value]
   const keys = schema?.ui?.available_keys || []
-  // 转换为 SimpleSelectDropdown 需要的格式
   return keys.map(key => ({ label: key, value: key }))
 })
 
@@ -379,7 +369,7 @@ const gridLayout = computed(() => {
 
   let cols
   const containerW = containerWidth.value
-  // 移动端适配：优先根据容器宽度限制列数
+
   if (containerW <= 480) {
     cols = 1
   } else if (containerW <= 768) {
@@ -588,7 +578,7 @@ const generatePieChartOption = (pieData) => {
   if (!items) return null
 
   return {
-    animation: false, // 完全禁用动画
+    animation: false,
     title: {
       text: title,
       subtext: `${total}条`,
@@ -658,9 +648,7 @@ const generatePieChartOption = (pieData) => {
     // },
     series: [{
       type: 'pie',
-      // 1. 缩小外半径，给周围的文字留出充足空间（原来是 ['40%', '70%']）
       radius: ['30%', '55%'],
-      // 确保饼图在正中间
       center: ['50%', '50%'],
       avoidLabelOverlap: true,
       itemStyle: {
@@ -758,7 +746,6 @@ const initPieChart = (container, pieData, index) => {
     }
   }
 
-  // 绑定点击：钉住卡片 (注意传 index)
   chart.on('click', (params) => handleInteraction(index, params, true))
 
   if (!isMobileLayout.value) {
@@ -791,8 +778,6 @@ const initPieChart = (container, pieData, index) => {
 // }
 
 const renderAllPies = async () => {
-  const startTime = performance.now()
-  // console.log(`[Evolution] Starting to render ${currentPieData.value.length} pies...`)
 
   await nextTick()
   clearPieCharts()
@@ -805,7 +790,6 @@ const renderAllPies = async () => {
   if (pieElements) {
     const batchSize = 10 // 每批渲染10个
     for (let i = 0; i < pieElements.length; i += batchSize) {
-      // const batchStart = performance.now()
       const batch = Array.from(pieElements).slice(i, i + batchSize)
       batch.forEach((el) => {
         const index = parseInt(el.getAttribute('data-pie-index'))
@@ -820,12 +804,8 @@ const renderAllPies = async () => {
 
       // 每批之间让出控制权，避免阻塞UI
       await nextTick()
-      // console.log(`[Evolution] Batch ${Math.floor(i / batchSize) + 1} rendered in ${(performance.now() - batchStart).toFixed(2)}ms`)
     }
   }
-
-  // const endTime = performance.now()
-  // console.log(`[Evolution] Total rendering took ${(endTime - startTime).toFixed(2)}ms`)
 }
 
 const buildSankeyData = () => {
@@ -1053,7 +1033,7 @@ const generateSankeyOption = () => {
       }
     },
     tooltip: {
-      show:false,
+      show: false,
     },
     // tooltip: {
     //   trigger: 'item',
@@ -1071,10 +1051,10 @@ const generateSankeyOption = () => {
     // },
     series: [{
       type: 'sankey',
-      left: '5%',   // 距离左侧的边距
-      right: '12%',  // 距离右侧的边距（覆盖默认的 20%）
-      top: '10%',   // 距离顶部的边距（根据你的标题高度微调）
-      bottom: '5%', // 距离底部的边距
+      left: '5%',
+      right: '12%',
+      top: '10%',
+      bottom: '5%',
       layoutIterations: optimizeSankeyLayout.value ? 300 : 0,
       data: sankeyData.nodes,
       links: sankeyData.links,
@@ -1412,7 +1392,7 @@ onUnmounted(() => {
   font-style: italic;
 }
 
-/* 统计模式：radio 样式交给 RadioGroup；checkbox 保留本组件样式 */
+/* 统计模式：radio 样式交给 RadioGroup；checkbox 样式交给 Checkbox */
 .mode-selector {
   display: flex;
   flex-wrap: wrap;
@@ -1429,70 +1409,6 @@ onUnmounted(() => {
   padding: 0;
   font-size: 15px;
   font-weight: 500;
-}
-
-.mode-checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text-dark, #333);
-  user-select: none;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 0.8;
-  }
-}
-
-.hidden-checkbox {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-
-  &:checked + .checkbox-indicator {
-    border-color: var(--color-primary, #007aff);
-    background: var(--color-primary, #007aff);
-
-    &::after {
-      transform: translate(-50%, -58%) rotate(45deg) scale(1);
-    }
-  }
-}
-
-.checkbox-indicator {
-  position: relative;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  border: 1px solid rgba(150, 150, 150, 0.3);
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow:
-    inset 0 1px 3px rgba(255, 255, 255, 0.5),
-    0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 9px;
-    background: transparent;
-    border-right: 2px solid #fff;
-    border-bottom: 2px solid #fff;
-    border-radius: 0;
-    box-shadow: none;
-    transform: translate(-50%, -58%) rotate(45deg) scale(0);
-    transform-origin: center;
-    transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-  }
 }
 
 /* 查询按钮 */
