@@ -353,7 +353,7 @@ import { showError, showSuccess } from '@/utils/message.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
-import defaultReferenceWorkbookUrl from '@/assets/data/参考表.xlsx?url'
+import defaultReferenceWorkbookUrl from '/data/参考表.xlsx?url'
 
 const { t } = useI18n()
 const { requireAuth } = useAuthGuard({

@@ -479,7 +479,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { featureCollection } from '@turf/turf';
 
-import nationalBorderKmzUrl from '@/assets/map/国界面.kmz?url';
+import nationalBorderKmzUrl from '/data/国界面.kmz?url';
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
 import { usePartitionCache } from '@/composables/domain/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';

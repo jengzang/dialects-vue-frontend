@@ -253,8 +253,6 @@ import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { TABLE_COLUMN_SCHEMAS } from '../../config/chars_positions/characters.js'
 import { userStore } from '@/main/store/store.js'
 import { showWarning } from '@/utils/message.js'
-import evolutionDemoByStatus from '@/assets/data/evolution_demo_status.json'
-import evolutionDemoByValue from '@/assets/data/evolution_demo_value.json'
 import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from './evolutionDetail.js'
 
 const { t } = useI18n()
@@ -388,7 +386,31 @@ const gridStyle = computed(() => {
   }
 })
 
-const getDemoData = () => (queryMode.value === 'by_value' ? evolutionDemoByValue : evolutionDemoByStatus)
+const demoDataCache = {
+  byStatus: null,
+  byValue: null,
+}
+
+const loadDemoData = async (mode) => {
+  const cacheKey = mode === 'by_value' ? 'byValue' : 'byStatus'
+  if (demoDataCache[cacheKey]) {
+    return demoDataCache[cacheKey]
+  }
+
+  const fileName = mode === 'by_value'
+    ? 'evolution_demo_value.json'
+    : 'evolution_demo_status.json'
+  const response = await fetch(`/data/${fileName}`)
+  if (!response.ok) {
+    throw new Error(`Failed to load demo data: ${response.status}`)
+  }
+
+  const data = await response.json()
+  demoDataCache[cacheKey] = data
+  return data
+}
+
+const getDemoData = async () => loadDemoData(queryMode.value)
 
 const syncControlsFromData = (data) => {
   selectedLocations.value = Array.isArray(data.locations) ? [...data.locations] : []
@@ -412,7 +434,7 @@ const getInitialFeature = (data) => {
 }
 
 const applyDemoData = async () => {
-  const demoData = getDemoData()
+  const demoData = await getDemoData()
   closeMobilePieDetail()
   syncControlsFromData(demoData)
   currentFeature.value = getInitialFeature(demoData)
