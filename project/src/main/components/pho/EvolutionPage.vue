@@ -833,24 +833,29 @@ const buildSankeyData = () => {
   const nodeMap = new Map()
   const linkMap = new Map()
 
+  const mergeChars = (...charLists) => {
+    return [
+      ...new Set(
+        charLists
+          .flat()
+          .filter(Boolean)
+      )
+    ]
+  }
+
   const ensureNode = (id, rawLabel, layer, chars = []) => {
     if (!nodeMap.has(id)) {
       nodeMap.set(id, {
         name: id,
         rawLabel,
         layer,
-        chars: [...new Set(chars)]
+        chars: mergeChars(chars)
       })
       return
     }
 
     const existingNode = nodeMap.get(id)
-    existingNode.chars = [
-      ...new Set([
-        ...(existingNode.chars || []),
-        ...chars
-      ])
-    ]
+    existingNode.chars = mergeChars(existingNode.chars || [], chars)
   }
 
   const addLink = (source, target, value, chars = []) => {
@@ -869,46 +874,133 @@ const buildSankeyData = () => {
 
     const link = linkMap.get(key)
     link.value += value
-    link.chars = [
-      ...new Set([
-        ...(link.chars || []),
-        ...chars
-      ])
-    ]
+    link.chars = mergeChars(link.chars || [], chars)
   }
 
   currentPieData.value.forEach((pie) => {
-    const rootLabel = isByValue ? pie.value : pie.level1_value
-    const rootLayer = isByValue ? t('phonology.phonology.evolution.sankey.layers.value') : level1Column.value
-    const rootId = `${isByValue ? 'value' : 'level1'}:${rootLabel}`
     const items = isByValue ? pie.level1 : pie.phonetic_values
 
-    const rootChars = [
-      ...new Set(
+    if (isByValue) {
+      const rootLabel = pie.value
+      const rootLayer = t('phonology.phonology.evolution.sankey.layers.value')
+      const rootId = `value:${rootLabel}`
+
+      const rootChars = mergeChars(
         (items || []).flatMap(item => item.chars || [])
       )
-    ]
+
+      ensureNode(rootId, rootLabel, rootLayer, rootChars)
+
+      items?.forEach((item) => {
+        const level1Label = item.label
+        const level2Items = item.level2 || []
+
+        // 正常情况：一级维度 × 二级维度组合
+        if (level2Items.length > 0) {
+          level2Items.forEach((level2Item) => {
+            const level2Label = level2Item.label
+            const comboLabel = `${level1Label}｜${level2Label}`
+            const comboLayer = `${level1Column.value} × ${level2Column.value}`
+            const comboId = `combo:${level1Label}__${level2Label}`
+            const chars = level2Item.chars || []
+
+            ensureNode(comboId, comboLabel, comboLayer, chars)
+            addLink(rootId, comboId, level2Item.count, chars)
+          })
+
+          return
+        }
+
+        // 兜底：如果某个一级维度下面没有 level2，也不要完全丢掉
+        const comboLabel = `${level1Label}｜未分类`
+        const comboLayer = `${level1Column.value} × ${level2Column.value}`
+        const comboId = `combo:${level1Label}__未分类`
+        const chars = item.chars || []
+
+        ensureNode(comboId, comboLabel, comboLayer, chars)
+        addLink(rootId, comboId, item.count, chars)
+      })
+
+      return
+    }
+
+    // by_status 原逻辑保持不变：一级维度 → 音值 → 二级维度
+    const rootLabel = pie.level1_value
+    const rootLayer = level1Column.value
+    const rootId = `level1:${rootLabel}`
+
+    const rootChars = mergeChars(
+      (items || []).flatMap(item => item.chars || [])
+    )
 
     ensureNode(rootId, rootLabel, rootLayer, rootChars)
 
     items?.forEach((item) => {
-      const middleLabel = isByValue ? item.label : item.value
-      const middleLayer = isByValue ? level1Column.value : t('phonology.phonology.evolution.sankey.layers.value')
-      const middleId = `${isByValue ? 'level1' : 'value'}:${middleLabel}`
+      const middleLabel = item.value
+      const middleLayer = t('phonology.phonology.evolution.sankey.layers.value')
+      const middleId = `value:${middleLabel}`
 
       ensureNode(middleId, middleLabel, middleLayer, item.chars || [])
       addLink(rootId, middleId, item.count, item.chars || [])
 
       item.level2?.forEach((level2Item) => {
         const level2Id = `level2:${level2Item.label}`
+
         ensureNode(level2Id, level2Item.label, level2Column.value, level2Item.chars || [])
         addLink(middleId, level2Id, level2Item.count, level2Item.chars || [])
       })
     })
   })
 
+  const level1Order = []
+  const level2Order = []
+
+  currentPieData.value.forEach((pie) => {
+    ;(pie.level1 || []).forEach((item) => {
+      if (item.label && !level1Order.includes(item.label)) {
+        level1Order.push(item.label)
+      }
+
+      ;(item.level2 || []).forEach((level2Item) => {
+        if (level2Item.label && !level2Order.includes(level2Item.label)) {
+          level2Order.push(level2Item.label)
+        }
+      })
+    })
+  })
+
+  const nodes = Array.from(nodeMap.values()).sort((a, b) => {
+    const aIsCombo = a.name.startsWith('combo:')
+    const bIsCombo = b.name.startsWith('combo:')
+
+    // 左侧音值节点保持在组合节点前面
+    if (aIsCombo !== bIsCombo) {
+      return aIsCombo ? 1 : -1
+    }
+
+    // 非 combo 节点之间保持原顺序
+    if (!aIsCombo && !bIsCombo) {
+      return 0
+    }
+
+    const [aLevel1 = '', aLevel2 = ''] = a.name.replace('combo:', '').split('__')
+    const [bLevel1 = '', bLevel2 = ''] = b.name.replace('combo:', '').split('__')
+
+    const aLevel1Index = level1Order.indexOf(aLevel1)
+    const bLevel1Index = level1Order.indexOf(bLevel1)
+
+    if (aLevel1Index !== bLevel1Index) {
+      return aLevel1Index - bLevel1Index
+    }
+
+    const aLevel2Index = level2Order.indexOf(aLevel2)
+    const bLevel2Index = level2Order.indexOf(bLevel2)
+
+    return aLevel2Index - bLevel2Index
+  })
+
   return {
-    nodes: Array.from(nodeMap.values()),
+    nodes,
     links: Array.from(linkMap.values())
   }
 }
@@ -983,7 +1075,7 @@ const generateSankeyOption = () => {
       right: '12%',  // 距离右侧的边距（覆盖默认的 20%）
       top: '10%',   // 距离顶部的边距（根据你的标题高度微调）
       bottom: '5%', // 距离底部的边距
-      layoutIterations: optimizeSankeyLayout.value ? 200 : 0,
+      layoutIterations: optimizeSankeyLayout.value ? 300 : 0,
       data: sankeyData.nodes,
       links: sankeyData.links,
       nodeAlign: 'justify',
