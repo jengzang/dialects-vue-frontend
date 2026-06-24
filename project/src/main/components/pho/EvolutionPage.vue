@@ -159,74 +159,101 @@
     </div>
 
     <HoverDetailCard
-      :visible="Boolean(selectedPieDetail) && !showSankey"
+      :visible="(showSankey ? Boolean(selectedSankeyDetail) : Boolean(selectedPieDetail))"
       :is-mobile-layout="isMobileLayout"
       :is-pinned="isCardPinned"
       :desktop-card-position="desktopCardPosition"
       @close="closeMobilePieDetail"
     >
       <template #header>
-        <div class="mobile-detail-card__meta">
-          <div class="mobile-detail-card__title-row">
-            <div class="mobile-detail-card__title">{{ selectedPieDetail?.title }}</div>
-            <div class="mobile-detail-card__section-title">
-              {{ t('phonology.phonology.evolution.mobileDetail.breakdownBy', { dimension: level2Column }) }}
+        <template v-if="showSankey && selectedSankeyDetail">
+          <div class="mobile-detail-card__meta">
+            <div class="mobile-detail-card__title-row">
+              <div class="mobile-detail-card__title">{{ selectedSankeyDetail.title }}</div>
+              <div class="mobile-detail-card__section-title">
+                {{ selectedSankeyDetail.layerLabel }}
+              </div>
+            </div>
+            <div class="mobile-detail-card__subtitle">
+              {{ selectedSankeyDetail.subtitle }}
             </div>
           </div>
-          <div class="mobile-detail-card__subtitle">
-            {{ selectedPieDetail?.pieTitle }} ·
-            {{ t('phonology.phonology.evolution.mobileDetail.countAndRatio', {
-              count: selectedPieDetail?.count,
-              unit: t('phonology.phonology.evolution.sankey.unit'),
-              percent: selectedPieDetail?.percent
-            }) }}
+        </template>
+        <template v-else>
+          <div class="mobile-detail-card__meta">
+            <div class="mobile-detail-card__title-row">
+              <div class="mobile-detail-card__title">{{ selectedPieDetail?.title }}</div>
+              <div class="mobile-detail-card__section-title">
+                {{ t('phonology.phonology.evolution.mobileDetail.breakdownBy', { dimension: level2Column }) }}
+              </div>
+            </div>
+            <div class="mobile-detail-card__subtitle">
+              {{ selectedPieDetail?.pieTitle }} ·
+              {{ t('phonology.phonology.evolution.mobileDetail.countAndRatio', {
+                count: selectedPieDetail?.count,
+                unit: t('phonology.phonology.evolution.sankey.unit'),
+                percent: selectedPieDetail?.percent
+              }) }}
+            </div>
           </div>
-        </div>
+        </template>
       </template>
 
-      <div
-        v-if="selectedPieDetail?.level2Items.length > 0"
-        class="mobile-detail-card__section"
-      >
-        <div
-          v-for="level2Item in selectedPieDetail.level2Items"
-          :key="`${selectedPieDetail.key}-${level2Item.label}`"
-          class="mobile-detail-card__item"
-        >
-          <div class="mobile-detail-card__item-row">
-            <span class="mobile-detail-card__item-label">{{ level2Item.label }}</span>
-            <span class="mobile-detail-card__item-value">
-              {{ t('phonology.phonology.evolution.mobileDetail.countAndRatio', {
-                count: level2Item.count,
-                unit: t('phonology.phonology.evolution.sankey.unit'),
-                percent: level2Item.percent
-              }) }}
-            </span>
-          </div>
-          <div v-if="level2Item.displayChars.length > 0" class="mobile-detail-card__chars">
-            {{ t('phonology.phonology.evolution.mobileDetail.characters') }}：
-            {{ level2Item.displayChars.join('、') }}
-            <template v-if="level2Item.remainingChars > 0">
-              {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: level2Item.remainingChars }) }}
+      <template v-if="showSankey && selectedSankeyDetail">
+        <div class="mobile-detail-card__section">
+          <div class="mobile-detail-card__chars mobile-detail-card__chars--standalone">
+            {{ selectedSankeyDetail.displayChars.join('、') }}
+            <template v-if="selectedSankeyDetail.remainingChars > 0">
+              {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: selectedSankeyDetail.remainingChars }) }}
             </template>
           </div>
         </div>
-      </div>
+      </template>
+      <template v-else>
+        <div
+          v-if="selectedPieDetail?.level2Items.length > 0"
+          class="mobile-detail-card__section"
+        >
+          <div
+            v-for="level2Item in selectedPieDetail.level2Items"
+            :key="`${selectedPieDetail.key}-${level2Item.label}`"
+            class="mobile-detail-card__item"
+          >
+            <div class="mobile-detail-card__item-row">
+              <span class="mobile-detail-card__item-label">{{ level2Item.label }}</span>
+              <span class="mobile-detail-card__item-value">
+                {{ t('phonology.phonology.evolution.mobileDetail.countAndRatio', {
+                  count: level2Item.count,
+                  unit: t('phonology.phonology.evolution.sankey.unit'),
+                  percent: level2Item.percent
+                }) }}
+              </span>
+            </div>
+            <div v-if="level2Item.displayChars.length > 0" class="mobile-detail-card__chars">
+              {{ t('phonology.phonology.evolution.mobileDetail.characters') }}：
+              {{ level2Item.displayChars.join('、') }}
+              <template v-if="level2Item.remainingChars > 0">
+                {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: level2Item.remainingChars }) }}
+              </template>
+            </div>
+          </div>
+        </div>
 
-      <div
-        v-else-if="selectedPieDetail?.displayChars.length > 0"
-        class="mobile-detail-card__section"
-      >
-        <div class="mobile-detail-card__section-title">
-          {{ t('phonology.phonology.evolution.mobileDetail.characters') }}
+        <div
+          v-else-if="selectedPieDetail?.displayChars.length > 0"
+          class="mobile-detail-card__section"
+        >
+          <div class="mobile-detail-card__section-title">
+            {{ t('phonology.phonology.evolution.mobileDetail.characters') }}
+          </div>
+          <div class="mobile-detail-card__chars mobile-detail-card__chars--standalone">
+            {{ selectedPieDetail.displayChars.join('、') }}
+            <template v-if="selectedPieDetail.remainingChars > 0">
+              {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: selectedPieDetail.remainingChars }) }}
+            </template>
+          </div>
         </div>
-        <div class="mobile-detail-card__chars mobile-detail-card__chars--standalone">
-          {{ selectedPieDetail.displayChars.join('、') }}
-          <template v-if="selectedPieDetail.remainingChars > 0">
-            {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: selectedPieDetail.remainingChars }) }}
-          </template>
-        </div>
-      </div>
+      </template>
     </HoverDetailCard>
   </div>
 </template>
@@ -283,9 +310,10 @@ const containerWidth = ref(1200)
 const sankeyHeight = ref('680px')
 const isMobileLayout = ref(false)
 const selectedPieDetail = ref(null)
+const selectedSankeyDetail = ref(null)
 
 const desktopCardPosition = ref({ left: '0px', top: '0px' })
-const isCardPinned = ref(false) // 记录卡片是否被点击固定
+const isCardPinned = ref(false)
 
 // ========== 配置数据 ==========
 const tableOptions = [
@@ -531,7 +559,8 @@ const clearSankeyChart = () => {
 
 const closeMobilePieDetail = () => {
   selectedPieDetail.value = null
-  isCardPinned.value = false // 重置固定状态
+  selectedSankeyDetail.value = null
+  isCardPinned.value = false
 }
 
 const updateMobileLayout = () => {
@@ -804,16 +833,48 @@ const buildSankeyData = () => {
   const nodeMap = new Map()
   const linkMap = new Map()
 
-  const ensureNode = (id, rawLabel, layer) => {
+  const ensureNode = (id, rawLabel, layer, chars = []) => {
     if (!nodeMap.has(id)) {
-      nodeMap.set(id, { name: id, rawLabel, layer })
+      nodeMap.set(id, {
+        name: id,
+        rawLabel,
+        layer,
+        chars: [...new Set(chars)]
+      })
+      return
     }
+
+    const existingNode = nodeMap.get(id)
+    existingNode.chars = [
+      ...new Set([
+        ...(existingNode.chars || []),
+        ...chars
+      ])
+    ]
   }
 
-  const addLink = (source, target, value) => {
+  const addLink = (source, target, value, chars = []) => {
     if (!value) return
+
     const key = `${source}__${target}`
-    linkMap.set(key, (linkMap.get(key) || 0) + value)
+
+    if (!linkMap.has(key)) {
+      linkMap.set(key, {
+        source,
+        target,
+        value: 0,
+        chars: []
+      })
+    }
+
+    const link = linkMap.get(key)
+    link.value += value
+    link.chars = [
+      ...new Set([
+        ...(link.chars || []),
+        ...chars
+      ])
+    ]
   }
 
   currentPieData.value.forEach((pie) => {
@@ -822,30 +883,33 @@ const buildSankeyData = () => {
     const rootId = `${isByValue ? 'value' : 'level1'}:${rootLabel}`
     const items = isByValue ? pie.level1 : pie.phonetic_values
 
-    ensureNode(rootId, rootLabel, rootLayer)
+    const rootChars = [
+      ...new Set(
+        (items || []).flatMap(item => item.chars || [])
+      )
+    ]
+
+    ensureNode(rootId, rootLabel, rootLayer, rootChars)
 
     items?.forEach((item) => {
       const middleLabel = isByValue ? item.label : item.value
       const middleLayer = isByValue ? level1Column.value : t('phonology.phonology.evolution.sankey.layers.value')
       const middleId = `${isByValue ? 'level1' : 'value'}:${middleLabel}`
 
-      ensureNode(middleId, middleLabel, middleLayer)
-      addLink(rootId, middleId, item.count)
+      ensureNode(middleId, middleLabel, middleLayer, item.chars || [])
+      addLink(rootId, middleId, item.count, item.chars || [])
 
       item.level2?.forEach((level2Item) => {
         const level2Id = `level2:${level2Item.label}`
-        ensureNode(level2Id, level2Item.label, level2Column.value)
-        addLink(middleId, level2Id, level2Item.count)
+        ensureNode(level2Id, level2Item.label, level2Column.value, level2Item.chars || [])
+        addLink(middleId, level2Id, level2Item.count, level2Item.chars || [])
       })
     })
   })
 
   return {
     nodes: Array.from(nodeMap.values()),
-    links: Array.from(linkMap.entries()).map(([key, value]) => {
-      const [source, target] = key.split('__')
-      return { source, target, value }
-    })
+    links: Array.from(linkMap.values())
   }
 }
 
@@ -897,19 +961,22 @@ const generateSankeyOption = () => {
       }
     },
     tooltip: {
-      trigger: 'item',
-      triggerOn: 'mousemove',
-      confine: true,
-      formatter: (params) => {
-        if (params.dataType === 'edge') {
-          const sourceNode = sankeyData.nodes.find(node => node.name === params.data.source)
-          const targetNode = sankeyData.nodes.find(node => node.name === params.data.target)
-          return `${sourceNode?.rawLabel || params.data.source} -> ${targetNode?.rawLabel || params.data.target}<br/>${params.data.value} ${t('phonology.phonology.evolution.sankey.unit')}`
-        }
-
-        return `${params.data.rawLabel}<br/>${t('phonology.phonology.evolution.sankey.layer')}: ${params.data.layer}`
-      }
+      show:false,
     },
+    // tooltip: {
+    //   trigger: 'item',
+    //   triggerOn: 'mousemove',
+    //   confine: true,
+    //   formatter: (params) => {
+    //     if (params.dataType === 'edge') {
+    //       const sourceNode = sankeyData.nodes.find(node => node.name === params.data.source)
+    //       const targetNode = sankeyData.nodes.find(node => node.name === params.data.target)
+    //       return `${sourceNode?.rawLabel || params.data.source} -> ${targetNode?.rawLabel || params.data.target}<br/>${params.data.value} ${t('phonology.phonology.evolution.sankey.unit')}`
+    //     }
+
+    //     return `${params.data.rawLabel}<br/>${t('phonology.phonology.evolution.sankey.layer')}: ${params.data.layer}`
+    //   }
+    // },
     series: [{
       type: 'sankey',
       left: '5%',   // 距离左侧的边距
@@ -957,6 +1024,7 @@ const renderSankey = async () => {
   }
 
   const option = generateSankeyOption()
+  const sankeyData = buildSankeyData()
 
   await nextTick()
 
@@ -969,6 +1037,73 @@ const renderSankey = async () => {
     notMerge: true,
     lazyUpdate: false
   })
+
+  const buildSankeyDetail = (params) => {
+    if (params?.dataType === 'edge') {
+      const sourceNode = sankeyData.nodes.find(node => node.name === params.data.source)
+      const targetNode = sankeyData.nodes.find(node => node.name === params.data.target)
+      const chars = Array.isArray(params.data.chars) ? params.data.chars : []
+
+      if (!sourceNode || !targetNode) return null
+
+      return {
+        title: `${sourceNode.rawLabel} → ${targetNode.rawLabel}`,
+        subtitle: `${sourceNode.layer} → ${targetNode.layer} · ${params.data.value} ${t('phonology.phonology.evolution.sankey.unit')}`,
+        layerLabel: t('phonology.phonology.evolution.sankey.layer'),
+        displayChars: chars,
+        remainingChars: 0
+      }
+    }
+
+    const node = sankeyData.nodes.find(item => item.name === params?.data?.name)
+    if (!node) return null
+
+    const chars = Array.isArray(node.chars) ? node.chars : []
+    return {
+      title: node.rawLabel,
+      subtitle: `${t('phonology.phonology.evolution.sankey.layer')}: ${node.layer} · ${chars.length} ${t('phonology.phonology.evolution.sankey.unit')}`,
+      layerLabel: node.layer,
+      displayChars: chars,
+      remainingChars: 0
+    }
+  }
+
+  const updateSankeyDetailPosition = (params) => {
+    if (isMobileLayout.value || !params?.event?.event) return
+
+    const e = params.event.event
+    desktopCardPosition.value = resolveHoverDetailCardPosition({
+      clientX: e.clientX,
+      clientY: e.clientY,
+    })
+  }
+
+  const handleSankeyInteraction = (params, isClick) => {
+    if (!params) return
+    if (!isClick && isCardPinned.value) return
+
+    const detail = buildSankeyDetail(params)
+    if (!detail) return
+
+    selectedSankeyDetail.value = detail
+    selectedPieDetail.value = null
+    updateSankeyDetailPosition(params)
+
+    if (isClick) {
+      isCardPinned.value = true
+    }
+  }
+
+  sankeyChartInstance.value.on('click', (params) => handleSankeyInteraction(params, true))
+
+  if (!isMobileLayout.value) {
+    sankeyChartInstance.value.on('mouseover', (params) => handleSankeyInteraction(params, false))
+    sankeyChartInstance.value.on('mouseout', () => {
+      if (!isCardPinned.value) {
+        selectedSankeyDetail.value = null
+      }
+    })
+  }
 
   requestAnimationFrame(() => {
     sankeyChartInstance.value?.resize()
