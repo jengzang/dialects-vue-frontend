@@ -13,7 +13,7 @@
         <button
           v-show="isMobileLayout || isPinned"
           type="button"
-          class="hover-detail-card__close"
+          class="close-btn close-btn-sm close-btn-inline"
           @click="$emit('close')"
         >×</button>
       </div>
