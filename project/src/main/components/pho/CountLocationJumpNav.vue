@@ -13,6 +13,10 @@ const props = defineProps({
   itemOrder: {
     type: String,
     default: 'source'
+  },
+  followId: {
+    type: String,
+    default: ''
   }
 })
 
@@ -291,6 +295,15 @@ watch(activeId, (value) => {
     moveCenterToItem(value)
   }
 })
+
+watch(
+  () => props.followId,
+  (value) => {
+    if (value) {
+      moveCenterToItem(value)
+    }
+  }
+)
 
 onBeforeUnmount(() => {
   resetWheelBuffer()

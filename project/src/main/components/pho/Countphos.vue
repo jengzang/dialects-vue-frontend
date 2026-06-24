@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
@@ -22,6 +22,7 @@ const queryStrings = ref([])
 const matchedLocations = ref([])
 const isMatching = ref(false) // 添加匹配状态
 const rendering = ref(false)
+const currentVisibleNavId = ref('')
 
 // 音節統計數據
 const featureData = ref({}) // 存儲每個地點的原始數據
@@ -129,6 +130,81 @@ const locationNavItems = computed(() => {
 const getChartsAnchorId = () => 'count-charts-anchor'
 const getLocationAnchorId = (location) => `count-location-anchor-${location}`
 const getAggregatedAnchorId = (featureType) => `count-total-anchor-${featureType}`
+
+const SCROLL_SYNC_DEBOUNCE_MS = 180
+let scrollSyncTimer = null
+
+const getNavAnchorElement = (nav) => {
+  if (!nav) return null
+
+  if (nav.kind === 'charts') {
+    return document.getElementById(getChartsAnchorId())
+  }
+
+  if (nav.kind === 'total') {
+    const section = document.getElementById(getAggregatedAnchorId(nav.targetKey))
+    return section?.querySelector('.category-title') || section
+  }
+
+  if (nav.kind === 'location') {
+    return document.getElementById(getLocationAnchorId(nav.targetKey))
+  }
+
+  return null
+}
+
+const updateCurrentVisibleNav = () => {
+  if (!isCurrentCountRoute.value || !locationNavItems.value.length) return
+
+  const anchorTop = window.innerHeight * 0.35
+  let bestNav = locationNavItems.value[0]
+  let bestDistance = Number.POSITIVE_INFINITY
+
+  locationNavItems.value.forEach((nav) => {
+    const target = getNavAnchorElement(nav)
+    if (!target) return
+
+    const rect = target.getBoundingClientRect()
+    const distance = Math.abs(rect.top - anchorTop)
+
+    if (distance < bestDistance) {
+      bestDistance = distance
+      bestNav = nav
+    }
+  })
+
+  currentVisibleNavId.value = bestNav?.id || ''
+}
+
+const scheduleScrollSync = () => {
+  if (scrollSyncTimer) {
+    clearTimeout(scrollSyncTimer)
+  }
+
+  scrollSyncTimer = window.setTimeout(() => {
+    scrollSyncTimer = null
+    updateCurrentVisibleNav()
+  }, SCROLL_SYNC_DEBOUNCE_MS)
+}
+
+const clearScrollSyncTimer = () => {
+  if (scrollSyncTimer) {
+    clearTimeout(scrollSyncTimer)
+    scrollSyncTimer = null
+  }
+}
+
+const handleWindowScroll = () => {
+  scheduleScrollSync()
+}
+
+watch(
+  () => locationNavItems.value.map((item) => item.id).join('|'),
+  async () => {
+    await nextTick()
+    updateCurrentVisibleNav()
+  }
+)
 
 const handleLocationNavJump = async (nav) => {
   await nextTick()
@@ -862,11 +938,16 @@ const closeLocationModal = () => {
 
 onMounted(async () => {
   window.addEventListener('resize', resizeCharts)
+  window.addEventListener('scroll', handleWindowScroll, { passive: true })
   await loadDefaultCountsData()
+  await nextTick()
+  updateCurrentVisibleNav()
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', resizeCharts)
+  window.removeEventListener('scroll', handleWindowScroll)
+  clearScrollSyncTimer()
   disposeAllCharts()
 })
 </script>
@@ -1076,6 +1157,7 @@ onBeforeUnmount(() => {
     <CountLocationJumpNav
       v-if="isCurrentCountRoute && hasResultData && locationNavItems.length > 0"
       :items="locationNavItems"
+      :follow-id="currentVisibleNavId"
       @jump="handleLocationNavJump"
     />
 
