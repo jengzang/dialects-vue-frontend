@@ -3,7 +3,10 @@
     <div
       v-if="visible"
       class="hover-detail-card"
-      :class="{ 'is-desktop-card': !isMobileLayout, 'is-pinned': isPinned }"
+      :class="[
+        rootClass,
+        { 'is-desktop-card': !isMobileLayout, 'is-pinned': isPinned }
+      ]"
       :style="!isMobileLayout ? desktopCardPosition : {}"
       @wheel.stop
       @touchmove.stop
@@ -12,12 +15,14 @@
         <div class="hover-detail-card__header-content">
           <slot name="header" />
         </div>
-        <button
-          v-show="isMobileLayout || isPinned"
-          type="button"
-          class="close-btn close-btn-sm close-btn-inline"
-          @click="$emit('close')"
-        >×</button>
+        <slot name="header-actions">
+          <button
+            v-show="isMobileLayout || isPinned"
+            type="button"
+            class="close-btn close-btn-sm close-btn-inline"
+            @click="$emit('close')"
+          >×</button>
+        </slot>
       </div>
 
       <div class="hover-detail-card__body ui-scrollbar">
@@ -48,6 +53,10 @@ defineProps({
   desktopCardPosition: {
     type: Object,
     default: () => ({}),
+  },
+  rootClass: {
+    type: [String, Array, Object],
+    default: '',
   },
 })
 
