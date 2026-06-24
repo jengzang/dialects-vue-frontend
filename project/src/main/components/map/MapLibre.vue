@@ -939,7 +939,7 @@ const resetView = () => {
   let points = [];
 
   // compare 模式优先按当前比较结果坐标复位，避免退回到 mapData 全量范围
-  if (mapStore.mode === 'compare' && mapStore.mergedData && mapStore.mergedData.length > 0) {
+  if ((mapStore.mode === 'compare' || mapStore.mode === 'feature') && mapStore.mergedData && mapStore.mergedData.length > 0) {
     points = mapStore.mergedData
       .map(item => item.coordinate)
       .filter(isValidCoordinatePair);

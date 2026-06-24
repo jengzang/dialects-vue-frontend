@@ -94,7 +94,7 @@
       "description": "選擇您偏好的界面語言"
     },
     "interfaceMode": {
-      "title": "介面模式",
+      "title": "頁面風格",
       "description": "選擇標準或簡潔界面風格；簡潔模式會關閉動畫、陰影、模糊等視覺效果，以提升低性能設備上的流暢度。",
       "label": "當前模式",
       "options": {

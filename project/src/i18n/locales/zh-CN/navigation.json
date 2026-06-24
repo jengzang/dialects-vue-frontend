@@ -94,7 +94,7 @@
       "description": "选择您偏好的界面语言"
     },
     "interfaceMode": {
-      "title": "界面模式",
+      "title": "页面风格",
       "description": "选择标准或简洁界面风格；简洁模式会关闭动画、阴影、模糊等视觉效果，以提升低性能设备上的流畅度。",
       "label": "当前模式",
       "options": {

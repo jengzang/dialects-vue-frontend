@@ -14,7 +14,7 @@
             <label class="query-label" for="hanzi-input">{{ $t('query.tab1.label') }}</label>
             <textarea
                 id="hanzi-input"
-                style="height: 5dvh"
+                style="height: 5dvh;white-space:nowrap;"
                 :placeholder="$t('query.tab1.placeholder')"
                 v-model="hanziInput"
                 @input="handleHanziInput"
@@ -152,10 +152,6 @@
                 :single-select-keys="singleSelectKeys"
               />
 
-              <div class="info-text" style="margin: 15px 0">
-                <span class="info-icon">ℹ️</span>
-                <span v-html="$t('query.tab3.analysisText', { card: tabStates.tab3.card, keys: selectedKeysString })"></span>
-              </div>
               <!-- 🔄 輸入框 -->
               <YinweiSelector
                   ref="YinweiSelectorRef"
@@ -163,6 +159,11 @@
                   :selected-card="tabStates.tab3.card"
                   @update:runDisabled="setTabContentDisabled('query', 'tab3', $event)"
               />
+
+              <div class="info-text" style="margin: 10px 0 15px">
+                <span class="info-icon">ℹ️</span>
+                <span v-html="$t('query.tab3.analysisText', { card: tabStates.tab3.card, keys: selectedKeysString })"></span>
+              </div>
             </div>
           </div>
         </div>
