@@ -21,6 +21,7 @@ const matrixData = ref(null)
 const queryStrings = ref([])
 const matchedLocations = ref([])
 const isMatching = ref(false) // 添加匹配状态
+const rendering = ref(false)
 
 // 音節統計數據
 const featureData = ref({}) // 存儲每個地點的原始數據
@@ -87,6 +88,7 @@ const chartFeatureTypes = computed(() => {
 })
 
 const hasChartData = computed(() => chartFeatureTypes.value.length > 0)
+const isResultsBusy = computed(() => loading.value || rendering.value)
 const isCurrentCountRoute = computed(() => route.path === '/menu/pho/count')
 
 const locationNavItems = computed(() => {
@@ -677,17 +679,24 @@ const resizeCharts = () => {
 }
 
 const renderAllCharts = async () => {
-  await nextTick()
+  rendering.value = true
 
-  if (!hasChartData.value) return
+  try {
+    await nextTick()
 
-  chartFeatureTypes.value.forEach((featureType) => {
-    renderPieChart(featureType)
-    renderBarChart(featureType)
-  })
+    if (!hasChartData.value) return
 
-  renderScatterChart()
-  resizeCharts()
+    chartFeatureTypes.value.forEach((featureType) => {
+      renderPieChart(featureType)
+      renderBarChart(featureType)
+    })
+
+    renderScatterChart()
+    resizeCharts()
+    await nextTick()
+  } finally {
+    rendering.value = false
+  }
 }
 
 const getDefaultCountsData = async () => {
@@ -899,7 +908,11 @@ onBeforeUnmount(() => {
       </button>
     </div>
 
-    <div v-else-if="hasResultData" class="results-container">
+    <div v-else-if="hasResultData" class="results-container" :class="{ 'results-container--busy': isResultsBusy }">
+      <div v-if="isResultsBusy" class="results-loading-overlay" aria-live="polite">
+        <div class="ui-loading--page" aria-hidden="true"></div>
+        <p>{{ $t('phonology.phonology.countphos.actions.loading') }}</p>
+      </div>
       <!-- 匯總統計部分 -->
       <section class="aggregated-section">
         <!-- <h3 class="section-title">匯總統計</h3> -->
@@ -1205,10 +1218,35 @@ onBeforeUnmount(() => {
   }
 
   .results-container {
+    position: relative;
     margin-top: 24px;
     display: flex;
     flex-direction: column;
     gap: 32px;
+  }
+
+  .results-container--busy {
+    pointer-events: none;
+  }
+
+  .results-loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.58);
+    backdrop-filter: blur(10px);
+
+    p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
   }
 
   .section-title {
