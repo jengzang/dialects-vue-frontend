@@ -43,6 +43,11 @@ const FEATURE_TYPE_ORDER = ['聲母', '韻母', '聲調']
 const PIE_MAX_OTHER_SHARE = 0.2
 const BAR_MAX_REMAINDER_SHARE = 0.1
 const MIN_VISIBLE_ITEMS = 1
+const DEFAULT_JSON_MIN_TOTAL_COUNT = {
+  聲母: 5,
+  韻母: 20,
+  聲調: 2
+}
 
 const chartEls = {
   pie: {},
@@ -56,6 +61,8 @@ const chartInstances = {
 
 const scatterChartEl = ref(null)
 let scatterChartInstance = null
+let defaultCountsCache = null
+let defaultCountsPromise = null
 
 // 弹窗状态
 const showLocationModal = ref(false)
@@ -248,6 +255,59 @@ const getFeatureStatsList = (featureType) => {
       if (b.locationCount !== a.locationCount) return b.locationCount - a.locationCount
       return a.syllable.localeCompare(b.syllable, 'zh-Hant')
     })
+}
+
+const sortFeatureEntries = (features = {}) => {
+  return Object.fromEntries(
+    Object.entries(features)
+      .map(([syllable, stats]) => {
+        const normalizedStats = {
+          totalCount: Number(stats?.totalCount || 0),
+          locationCount: Number(stats?.locationCount || stats?.locations?.length || 0),
+          locations: Array.isArray(stats?.locations) ? stats.locations : []
+        }
+
+        return [syllable, normalizedStats]
+      })
+      .sort(([syllableA, a], [syllableB, b]) => {
+        if (b.totalCount !== a.totalCount) return b.totalCount - a.totalCount
+        if (b.locationCount !== a.locationCount) return b.locationCount - a.locationCount
+        return String(syllableA).localeCompare(String(syllableB), 'zh-Hant')
+      })
+  )
+}
+
+const normalizeAndFilterAggregatedData = (data = {}, { applyDefaultThreshold = false } = {}) => {
+  const normalized = {}
+
+  Object.entries(data || {}).forEach(([featureType, features]) => {
+    const minTotalCount = applyDefaultThreshold ? Number(DEFAULT_JSON_MIN_TOTAL_COUNT[featureType] || 0) : 0
+
+    const filteredEntries = Object.entries(features || {}).filter(([, stats]) => {
+      const totalCount = Number(stats?.totalCount || 0)
+      return totalCount >= minTotalCount
+    })
+
+    if (!filteredEntries.length) return
+
+    normalized[featureType] = sortFeatureEntries(Object.fromEntries(filteredEntries))
+  })
+
+  const ordered = {}
+
+  FEATURE_TYPE_ORDER.forEach((type) => {
+    if (normalized[type]) {
+      ordered[type] = normalized[type]
+    }
+  })
+
+  Object.keys(normalized).forEach((type) => {
+    if (!Object.prototype.hasOwnProperty.call(ordered, type)) {
+      ordered[type] = normalized[type]
+    }
+  })
+
+  return ordered
 }
 
 const pickPieVisibleList = (list) => {
@@ -630,20 +690,46 @@ const renderAllCharts = async () => {
   resizeCharts()
 }
 
+const getDefaultCountsData = async () => {
+  if (defaultCountsCache) {
+    return defaultCountsCache
+  }
+
+  if (!defaultCountsPromise) {
+    defaultCountsPromise = fetch(all_feature_counts)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to load default feature counts: ${res.status}`)
+        }
+        return res.json()
+      })
+      .then((result) => {
+        const aggregated = normalizeAndFilterAggregatedData(result?.aggregated || result || {}, {
+          applyDefaultThreshold: true
+        })
+
+        defaultCountsCache = {
+          aggregated,
+          locationCount: Number(result?.locationCount || 0) || inferAggregatedLocationCount(aggregated)
+        }
+
+        return defaultCountsCache
+      })
+      .finally(() => {
+        defaultCountsPromise = null
+      })
+  }
+
+  return defaultCountsPromise
+}
+
 const loadDefaultCountsData = async () => {
   try {
-    const res = await fetch(all_feature_counts)
-
-    if (!res.ok) {
-      throw new Error(`Failed to load default feature counts: ${res.status}`)
-    }
-
-    const result = await res.json()
-    const aggregated = orderAggregatedData(result?.aggregated || result || {})
+    const cachedData = await getDefaultCountsData()
 
     featureData.value = {}
-    aggregatedData.value = aggregated
-    displayLocationCount.value = Number(result?.locationCount || 0) || inferAggregatedLocationCount(aggregated)
+    aggregatedData.value = cachedData.aggregated
+    displayLocationCount.value = cachedData.locationCount
     isUsingDefaultCounts.value = true
 
     if (Object.keys(aggregatedData.value).length > 0) {
@@ -726,39 +812,11 @@ const calculateAggregatedData = (data) => {
     })
   })
 
-  const orderedAggregated = {}
-
-  FEATURE_TYPE_ORDER.forEach((type) => {
-    if (aggregated[type]) {
-      orderedAggregated[type] = aggregated[type]
-    }
-  })
-
-  Object.keys(aggregated).forEach((type) => {
-    if (!Object.prototype.hasOwnProperty.call(orderedAggregated, type)) {
-      orderedAggregated[type] = aggregated[type]
-    }
-  })
-
-  return orderedAggregated
+  return normalizeAndFilterAggregatedData(aggregated)
 }
 
 const orderAggregatedData = (data = {}) => {
-  const ordered = {}
-
-  FEATURE_TYPE_ORDER.forEach((type) => {
-    if (data[type]) {
-      ordered[type] = data[type]
-    }
-  })
-
-  Object.keys(data || {}).forEach((type) => {
-    if (!Object.prototype.hasOwnProperty.call(ordered, type)) {
-      ordered[type] = data[type]
-    }
-  })
-
-  return ordered
+  return normalizeAndFilterAggregatedData(data)
 }
 
 const inferAggregatedLocationCount = (aggregated = {}) => {
