@@ -5,6 +5,8 @@
       class="hover-detail-card"
       :class="{ 'is-desktop-card': !isMobileLayout, 'is-pinned': isPinned }"
       :style="!isMobileLayout ? desktopCardPosition : {}"
+      @wheel.stop
+      @touchmove.stop
     >
       <div class="hover-detail-card__header">
         <div class="hover-detail-card__header-content">
@@ -65,6 +67,7 @@ defineEmits(['close'])
   box-shadow: 0 16px 44px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(18px) saturate(160%);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
+  overscroll-behavior: contain;
 }
 
 .hover-detail-card__header {
@@ -96,23 +99,12 @@ defineEmits(['close'])
   flex: 1;
 }
 
-.hover-detail-card__close {
-  border: none;
-  background: rgba(255, 255, 255, 0.55);
-  color: var(--text-dark, #333);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
 .hover-detail-card__body {
   max-height: min(38dvh, 300px);
   overflow-y: auto;
   padding: 12px 14px 14px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .hover-detail-card-fade-enter-active,

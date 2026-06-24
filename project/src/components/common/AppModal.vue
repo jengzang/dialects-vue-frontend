@@ -8,6 +8,8 @@
         :data-size="resolvedSize"
         :style="rootStyle"
         @mousedown.self="handleBackdropClose"
+        @wheel.self.prevent
+        @touchmove.self.prevent
       >
         <div
           class="panel"
@@ -15,6 +17,8 @@
           :role="dialogRole"
           :aria-modal="dialogRole === 'dialog' ? 'true' : undefined"
           @click.stop
+          @wheel.stop
+          @touchmove.stop
         >
           <div v-if="hasHeader" class="header">
             <slot name="header">
@@ -51,7 +55,7 @@
 </template>
 
 <script setup>
-import { computed, useSlots } from 'vue'
+import { computed, useSlots, watch, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -170,6 +174,30 @@ function handleBackdropClose() {
 
   close()
 }
+
+let previousBodyOverflow = ''
+
+watch(
+  () => props.modelValue,
+  (visible) => {
+    if (typeof document === 'undefined') return
+
+    if (visible) {
+      previousBodyOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = previousBodyOverflow
+    }
+  },
+  { immediate: true }
+)
+
+onBeforeUnmount(() => {
+  if (typeof document !== 'undefined') {
+    document.body.style.overflow = previousBodyOverflow
+  }
+})
+
 </script>
 
 <style scoped lang="scss">
@@ -348,5 +376,18 @@ function handleBackdropClose() {
 .fade-modal-leave-to .panel {
   opacity: 0;
   transform: translateY(12px) scale(0.98);
+}
+
+.app-modal {
+  overscroll-behavior: contain;
+}
+
+.panel {
+  overscroll-behavior: contain;
+}
+
+.content {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 </style>
