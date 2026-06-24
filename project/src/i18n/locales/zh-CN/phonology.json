@@ -129,7 +129,8 @@
       "states": {
         "emptyInput": "请输入地点并点击查询",
         "minLocationError": "请至少输入一个地点",
-        "loadError": "加载数据时发生错误"
+        "loadError": "加载数据时发生错误",
+        "hint": "可同时输入 1～100 个地点，用于分析一类方言的音节统计特征。"
       }
     },
     "evolution": {

@@ -129,7 +129,8 @@
       "states": {
         "emptyInput": "Please enter location and click query",
         "minLocationError": "Please enter at least one location",
-        "loadError": "Error loading data"
+        "loadError": "Error loading data",
+        "hint": "Supports simultaneous input of 1–100 locations and can be used to analyze the syllable distribution features of a group of dialects."
       }
     },
     "evolution": {

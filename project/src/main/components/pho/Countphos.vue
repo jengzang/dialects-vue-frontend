@@ -853,6 +853,7 @@ onBeforeUnmount(() => {
 
     <div v-else class="empty">
       <p>{{ $t('phonology.phonology.countphos.states.emptyInput') }}</p>
+      <p>{{ $t('phonology.phonology.countphos.states.hint') }}</p>
     </div>
 
     <CountLocationJumpNav
@@ -882,12 +883,8 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="modal-locations-list">
-        <span
-          v-for="(loc, index) in modalData.locations"
-          :key="index"
-          class="modal-location-chip"
-        >
-          {{ loc }}
+        <span class="modal-location-text">
+          {{ modalData.locations.join('、') }}
         </span>
       </div>
     </AppModal>
@@ -1284,11 +1281,19 @@ onBeforeUnmount(() => {
 
   .empty {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 50vh;
+
     color: var(--text-secondary);
     font-size: 16px;
+    text-align: center;
+    gap: 8px;
+
+    p {
+      margin: 0;
+      line-height: 1.6;
+    }
   }
 
   .expand-btn {
@@ -1316,59 +1321,6 @@ onBeforeUnmount(() => {
     }
   }
 
-  .modal-stats {
-    display: flex;
-    gap: 24px;
-    margin-bottom: 20px;
-    padding: 16px;
-    background: rgba(0, 122, 255, 0.08);
-    border-radius: 12px;
-  }
-
-  .modal-stat-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .modal-stat-label {
-    font-size: 14px;
-    color: #666;
-    font-weight: 500;
-  }
-
-  .modal-stat-value {
-    font-size: 18px;
-    font-weight: 700;
-    color: #007aff;
-  }
-
-  .modal-locations-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-
-  .modal-location-chip {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 14px;
-    color: #333;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: white;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transform: translateY(-1px);
-    }
-  }
-
   @media (max-width: 768px) {
     min-width: 0;
 
@@ -1391,11 +1343,76 @@ onBeforeUnmount(() => {
     .scatter-chart {
       height: 360px;
     }
-
-    .modal-stats {
-      flex-direction: column;
-      gap: 10px;
-    }
   }
 }
+
+.modal-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.72),
+      rgba(245, 250, 255, 0.46)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow:
+      0 12px 30px rgba(31, 78, 121, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(18px) saturate(1.35);
+  }
+
+  .modal-stat-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.48);
+    border: 1px solid rgba(255, 255, 255, 0.56);
+  }
+
+  .modal-stat-label {
+    font-size: 13px;
+    color: rgba(37, 54, 74, 0.68);
+    font-weight: 600;
+  }
+
+  .modal-stat-value {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--color-primary);
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 8px rgba(0, 122, 255, 0.16);
+  }
+
+  .modal-locations-list {
+    margin-bottom: 20px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.68),
+      rgba(248, 251, 255, 0.42)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.62);
+    box-shadow:
+      0 14px 34px rgba(20, 38, 60, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(18px) saturate(1.3);
+  }
+
+  .modal-location-text {
+    display: block;
+    font-size: 14px;
+    line-height: 1.9;
+    color: rgba(28, 43, 61, 0.86);
+    font-weight: 500;
+    letter-spacing: 0.015em;
+    word-break: break-word;
+    text-wrap: pretty;
+  }
+
 </style>
