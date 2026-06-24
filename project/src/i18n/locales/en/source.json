@@ -2,6 +2,7 @@
   "title": "Data Sources",
   "privacyLink": "Want to cite? Learn about privacy policy?",
   "totalRecords": "{locationCount} dialect character tables, {dataCount} rows of data in total",
+  "databaseVersion": "Database version: {version}",
   "columns": {
     "location": "Dialect Point",
     "atlasRegion": "Atlas Region",

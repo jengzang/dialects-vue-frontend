@@ -56,7 +56,7 @@
     "yinru": "陰入",
     "yangru": "陽入",
     "qingsheng": "輕聲",
-    "other": "其他調"
+    "other": "變調"
   },
   "excludeOptions": {
     "noExclude": "不排除",
@@ -86,6 +86,7 @@
   "sankeyControls": {
     "title": "桑基圖操作",
     "optimizeLinks": "優化連線",
+    "ignorePolyphonicChars": "忽略多音字",
     "minLinkCharCount": "連線最少字數",
     "minNodeCharCount": "節點最少字數"
   }

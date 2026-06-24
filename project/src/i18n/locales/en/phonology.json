@@ -40,7 +40,7 @@
       }
     },
     "custom": {
-      "title": "Phoneme",
+      "title": "Phoneme Class",
       "features": {
         "initial": "Initial",
         "final": "Final",
@@ -81,6 +81,8 @@
     },
     "countphos": {
       "title": "Syllable Statistics",
+      "titlePrefix": "Syllable statistics for all locations",
+      "locationPill": "{count} locations",
       "subtitle": "Syllable statistics for all locations ({count} locations)",
       "features": {
         "initial": "Initial",
@@ -97,6 +99,27 @@
         "locations": "Location Details",
         "locationsSubtitle": "Syllable statistics for each location"
       },
+      "charts": {
+        "pie": {
+          "title": "Syllable Share by Total Count",
+          "description": "Automatically keeps enough high-frequency syllables so that the combined share of \"Other\" does not exceed 20%. Click a slice to inspect locations."
+        },
+        "bar": {
+          "title": "Location Coverage of High-Frequency Syllables",
+          "description": "Automatically keeps enough high-frequency syllables so that the total count of omitted syllables stays below 10%."
+        },
+        "scatter": {
+          "title": "Syllable Distribution Scatter Plot",
+          "description": "The x-axis is total count and the y-axis is number of locations. Further right means higher total count; further up means broader location coverage."
+        },
+        "common": {
+          "other": "Other",
+          "totalCount": "Total Count",
+          "locationCount": "Location Count",
+          "locations": "Locations",
+          "share": "Share"
+        }
+      },
       "modal": {
         "title": "{featureType} - {syllable}"
       },
@@ -108,7 +131,8 @@
       "states": {
         "emptyInput": "Please enter location and click query",
         "minLocationError": "Please enter at least one location",
-        "loadError": "Error loading data"
+        "loadError": "Error loading data",
+        "hint": "Supports simultaneous input of 1–100 locations and can be used to analyze the syllable distribution features of a group of dialects."
       }
     },
     "evolution": {
@@ -136,8 +160,8 @@
           "value": "Value"
         },
         "titles": {
-          "byValue": "{feature} ? Value ? Status ? Secondary Dimension",
-          "byStatus": "{feature} ? Status ? Value ? Secondary Dimension"
+          "byValue": "{feature} · Value -> Status -> Secondary Dimension",
+          "byStatus": "{feature} · Status -> Value -> Secondary Dimension"
         }
       },
       "similarity": {
@@ -190,7 +214,7 @@
   },
   "tabs": {
     "matrix": "Phonology",
-    "custom": "Phoneme",
+    "custom": "Phoneme Class",
     "count": "Syllable Count",
     "evolution": "Evolution"
   }

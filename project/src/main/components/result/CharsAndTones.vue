@@ -30,9 +30,12 @@
                   class="syllable-unit"
               >
                 <span
-                  class="pronunciation"
-                  :class="{ 'conversion-failed': isConversionFailed(syl, item.location) }"
-                  :title="isConversionFailed(syl, item.location) ? t('result.charsAndTones.tooltip.conversionFailed') : ''"
+                  :class="[
+                    getReadingClass(getSearchCharReadingType(item, sIdx), 'pronunciation'),
+                    { 'conversion-failed': isConversionFailed(syl, item.location) }
+                  ]"
+                  @mouseenter="handleSyllableMouseEnter($event, item, sIdx, syl)"
+                  @mouseleave="handleSyllableMouseLeave"
                 >
                   {{ getDisplaySyllable(syl, item.location) }}
                 </span>
@@ -98,6 +101,16 @@
 
     <Teleport to="body">
       <div
+        v-if="readingTooltip.visible"
+        class="global-tooltip-popup"
+        :style="{ top: readingTooltip.top + 'px', left: readingTooltip.left + 'px' }"
+      >
+        {{ readingTooltip.content }}
+      </div>
+    </Teleport>
+
+    <Teleport to="body">
+      <div
           v-if="popup.visible"
           class="popup-tones"
           :style="{ top: popup.top + 'px', left: popup.left + 'px' }"
@@ -111,6 +124,8 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { getReadingClass, getSearchCharReadingType } from '@/main/utils/ResultTable.js';
+import { READING_COLORS } from '@/main/constants/readingColors.js';
 
 const props = defineProps({
   data: {
@@ -280,7 +295,7 @@ const toneMap = computed(() => {
         // Group 1: ID (如 1, 7a)
         // Group 2: 數字 (調值, 如 55, 5)
         // Group 3: 剩餘部分 (調類, 如 陰平, 上陰入)
-        const match = part.match(/^\[([0-9a-zA-Z]+)\](\d+)(.*)$/);
+        const match = part.match(/^\[([0-9a-zA-Z]+)\](`?[\d/-]+)(.*)$/);
 
         if (match) {
           const id = match[1];
@@ -352,6 +367,51 @@ const isConversionFailed = (syllable, location) => {
   if (!cityTones || !cityTones[suffix]) return true; // 有後綴但沒數據 -> 視為失敗
 
   return false; // 成功
+};
+
+const getReadingTypeLabel = (type) => {
+  if (type === 'wendu') return '文讀';
+  if (type === 'baidu') return '白讀';
+  return '';
+};
+
+const getSyllableHoverTitle = (item, index, syllable) => {
+  const messages = [];
+  const readingLabel = getReadingTypeLabel(getSearchCharReadingType(item, index));
+
+  if (readingLabel) {
+    messages.push(readingLabel);
+  }
+
+  if (isConversionFailed(syllable, item?.location)) {
+    messages.push(t('result.charsAndTones.tooltip.conversionFailed'));
+  }
+
+  return messages.join(' | ');
+};
+
+const readingTooltip = ref({
+  visible: false,
+  content: '',
+  top: 0,
+  left: 0
+});
+
+const handleSyllableMouseEnter = (event, item, index, syllable) => {
+  const content = getSyllableHoverTitle(item, index, syllable);
+  if (!content) return;
+
+  const rect = event.target.getBoundingClientRect();
+  readingTooltip.value = {
+    visible: true,
+    content,
+    top: rect.top - 10,
+    left: rect.left + (rect.width / 2)
+  };
+};
+
+const handleSyllableMouseLeave = () => {
+  readingTooltip.value.visible = false;
 };
 // 舊的 getNotesTitle 和 hasNotes 函數已刪除，因為不再需要 tooltip
 
@@ -525,6 +585,45 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   scroll-margin-top: 12px;
 }
 
+.reading-char {
+  color: inherit;
+}
+
+.reading-char--wendu {
+  color: v-bind('READING_COLORS.wendu');
+}
+
+.reading-char--baidu {
+  color: v-bind('READING_COLORS.baidu');
+}
+
+.global-tooltip-popup {
+  position: fixed;
+  z-index: 10001;
+  transform: translate(-50%, -100%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  max-width: 200px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -90%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%);
+  }
+}
+
 .char-nav-teleport {
   position: fixed;
   right: 18px;
@@ -613,6 +712,16 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   color: #000;
   font-weight: normal;
   font-size: 1.1em;
+}
+
+.reading-char--wendu,
+.pronunciation--wendu {
+  color: v-bind('READING_COLORS.wendu');
+}
+
+.reading-char--baidu,
+.pronunciation--baidu {
+  color: v-bind('READING_COLORS.baidu');
 }
 
 .conversion-failed {

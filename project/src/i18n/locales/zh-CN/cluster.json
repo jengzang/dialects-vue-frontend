@@ -11,6 +11,9 @@
     "cluster": "聚类",
     "result": "结果"
   },
+  "stage": {
+    "currentStep": "当前阶段 {index}"
+  },
   "actions": {
     "createPreview": "生成预览",
     "refreshPreview": "重新预览",
@@ -39,6 +42,7 @@
     "resolvedCharsPreview": "去重后 {count} 字",
     "pathStringsPreview": "已生成 {count} 条 path_strings",
     "emptyPathStrings": "尚未选出有效条件",
+    "sourceCount": "{count} 条来源",
     "advanced": "高级选项",
     "includeSpecialLocations": "包含特殊地点",
     "locationTitle": "地点与分区",
@@ -106,6 +110,7 @@
   },
   "task": {
     "title": "任务状态",
+    "description": "右侧持续显示当前任务、阶段产物与流程进度。",
     "source": "来源",
     "taskId": "task_id",
     "status": "状态",
@@ -113,6 +118,23 @@
     "message": "消息",
     "staged": "staged",
     "jobs": "jobs"
+  },
+  "context": {
+    "title": "阶段上下文",
+    "progressTitle": "流程进度",
+    "requestScope": "请求范围",
+    "requestScopeValue": "{groups} 个 group · {locations} 个地点 · {regions} 个分区",
+    "prepareHash": "prepare_hash",
+    "distanceHash": "distance_hash",
+    "resultHash": "result_hash",
+    "phonemeMode": "phoneme_mode",
+    "resultSource": "结果来源",
+    "progress": {
+      "idle": "未就绪",
+      "pending": "待继续",
+      "active": "当前阶段",
+      "completed": "已完成"
+    }
   },
   "status": {
     "idle": "未开始",
@@ -126,9 +148,12 @@
     "description": "staged 与 quick run 共用同一套结果展示。",
     "summary": "摘要",
     "assignments": "Assignments",
+    "assignmentsDescription": "共 {count} 条地点归类结果。",
     "groups": "Groups",
+    "groupsDescription": "共 {count} 个聚类组卡片。",
     "performance": "Performance",
     "advanced": "高级信息",
+    "rawGroups": "原始分组数据",
     "empty": "暂无结果，请先完成聚类流程。",
     "columns": {
       "location": "地点",
@@ -145,6 +170,10 @@
       "phonemeMode": "Phoneme Mode",
       "clusterCount": "聚类数",
       "effectiveLocationCount": "有效地点"
+    },
+    "groupCard": {
+      "locationCount": "地点数",
+      "sampleLocations": "样例地点"
     },
     "cacheInfo": "缓存命中信息"
   },

@@ -7,7 +7,7 @@
     <div class="feature-row">
       <!-- 主要信息容器：包裹 p、button、p -->
       <div class="feature-main-items">
-        <p>
+        <p class="feature-inline-row">
           <span
               class="feature-value-clickable"
               style="cursor: pointer; color: #007bff"
@@ -93,7 +93,8 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getCorrespondingCharacters } from '@/main/utils/ResultTable.js';
+import { getCorrespondingCharacters, getReadingClass, getYinWeiCharReadingType, getZhongGuCharReadingType } from '@/main/utils/ResultTable.js';
+import { READING_COLORS } from '@/main/constants/readingColors.js';
 import { getFeatureStats, getLocationDetail } from '@/api';
 import { globalPayload } from '@/main/store/store.js';
 import LocationDetailPopup from '../popup/result/LocationDetailPopup.vue';
@@ -103,7 +104,8 @@ import { translateResultTerm } from '@/i18n/utils/resultI18n.js';
 const props = defineProps({
   item: { type: Object, required: true },
   isCondensed: { type: Boolean, default: true },
-  showLocation: { type: Boolean, default: false }
+  showLocation: { type: Boolean, default: false },
+  readingSource: { type: String, default: 'zhonggu' }
 });
 
 const emit = defineEmits(['trigger-popup']);
@@ -112,7 +114,25 @@ const { t } = useI18n();
 const featureKey = computed(() => Object.keys(props.item.分組值 || {})[0]);
 const featureVal = computed(() => (props.item.分組值 || {})[featureKey.value]);
 
-const parsedChars = computed(() => getCorrespondingCharacters(props.item));
+const parsedChars = computed(() => {
+  const nodes = getCorrespondingCharacters(props.item);
+
+  return nodes.map(node => ({
+    ...node,
+    props: {
+      ...node.props,
+      class: [
+        node.props?.class,
+        getReadingClass(
+          props.readingSource === 'yinwei'
+            ? getYinWeiCharReadingType(props.item, node.children)
+            : getZhongGuCharReadingType(props.item, node.children),
+          'char-vue'
+        )
+      ].filter(Boolean).join(' ')
+    }
+  }));
+});
 
 // --- 新增：Tooltip 相關邏輯 ---
 const tooltip = ref({
@@ -323,8 +343,9 @@ const handleFeatureStatsClick = async () => {
   font-size: 15px;
   color: #333;
 
-  &.multi-vue {
-    color: darkred;
+  &.multi-vue,
+  &.char-vue--wendu {
+    color: v-bind('READING_COLORS.zhongguWendu');
     font-weight: bold;
     position: relative;
     cursor: pointer;
@@ -334,6 +355,18 @@ const handleFeatureStatsClick = async () => {
       border-radius: 4px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+  }
+
+  &.char-vue--baidu {
+    color: v-bind('READING_COLORS.zhongguBaidu');
+  }
+
+  &.char-vue--both {
+    color: v-bind('READING_COLORS.both');
+  }
+
+  &.char-vue--polyphonic {
+    color: v-bind('READING_COLORS.polyphonic');
   }
 }
 
@@ -352,10 +385,14 @@ const handleFeatureStatsClick = async () => {
   }
 }
 
+.feature-inline-row {
+  white-space: nowrap;
+}
+
 /* 這是傳送到 body 的彈窗樣式，不受小容器限制 */
 .global-tooltip-popup {
   position: fixed;
-  z-index: 9999;
+  z-index: 10001;
   transform: translate(-50%, -100%);
   background-color: rgba(0, 0, 0, 0.8);
   color: #fff;

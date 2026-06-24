@@ -33,52 +33,79 @@
         </div>
       </div>
 
-      <div class="result-section main-glass-panel-inner">
-        <h3>{{ t('cluster.result.assignments') }}</h3>
-        <div class="table-scroll ui-scrollbar">
-          <table class="result-table">
-            <thead>
-              <tr>
-                <th>{{ t('cluster.result.columns.location') }}</th>
-                <th>{{ t('cluster.result.columns.clusterId') }}</th>
-                <th>{{ t('cluster.result.columns.province') }}</th>
-                <th>{{ t('cluster.result.columns.city') }}</th>
-                <th>{{ t('cluster.result.columns.county') }}</th>
-                <th>{{ t('cluster.result.columns.town') }}</th>
-                <th>{{ t('cluster.result.columns.yindianRegion') }}</th>
-                <th>{{ t('cluster.result.columns.mapRegion') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="assignment in assignments"
-                :key="assignment.location + '-' + assignment.cluster_id"
-              >
-                <td>{{ assignment.location || '—' }}</td>
-                <td>{{ assignment.cluster_id ?? '—' }}</td>
-                <td>{{ assignment.province || '—' }}</td>
-                <td>{{ assignment.city || '—' }}</td>
-                <td>{{ assignment.county || '—' }}</td>
-                <td>{{ assignment.town || '—' }}</td>
-                <td>{{ assignment.yindian_region || '—' }}</td>
-                <td>{{ assignment.map_region || '—' }}</td>
-              </tr>
-            </tbody>
-          </table>
+      <div class="result-reading-grid">
+        <div class="result-section main-glass-panel-inner">
+          <div class="section-heading section-heading--dense">
+            <div>
+              <h3>{{ t('cluster.result.assignments') }}</h3>
+              <p>{{ t('cluster.result.assignmentsDescription', { count: normalizedAssignments.length }) }}</p>
+            </div>
+          </div>
+          <div class="table-scroll ui-scrollbar">
+            <table class="result-table">
+              <thead>
+                <tr>
+                  <th>{{ t('cluster.result.columns.location') }}</th>
+                  <th>{{ t('cluster.result.columns.clusterId') }}</th>
+                  <th>{{ t('cluster.result.columns.province') }}</th>
+                  <th>{{ t('cluster.result.columns.city') }}</th>
+                  <th>{{ t('cluster.result.columns.county') }}</th>
+                  <th>{{ t('cluster.result.columns.town') }}</th>
+                  <th>{{ t('cluster.result.columns.yindianRegion') }}</th>
+                  <th>{{ t('cluster.result.columns.mapRegion') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="assignment in normalizedAssignments"
+                  :key="assignment._rowKey"
+                >
+                  <td>{{ assignment.location || '—' }}</td>
+                  <td>{{ assignment.cluster_id ?? '—' }}</td>
+                  <td>{{ assignment.province || '—' }}</td>
+                  <td>{{ assignment.city || '—' }}</td>
+                  <td>{{ assignment.county || '—' }}</td>
+                  <td>{{ assignment.town || '—' }}</td>
+                  <td>{{ assignment.yindian_region || '—' }}</td>
+                  <td>{{ assignment.map_region || '—' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
-      <div class="result-section main-glass-panel-inner">
-        <h3>{{ t('cluster.result.groups') }}</h3>
-        <div class="diagnostic-list">
-          <article
-            v-for="group in resultGroups"
-            :key="group.label || group.group_id || JSON.stringify(group)"
-            class="diagnostic-card"
-          >
-            <h4>{{ group.label || 'Group' }}</h4>
-            <pre>{{ formatStructuredValue(group) }}</pre>
-          </article>
+        <div class="result-section main-glass-panel-inner">
+          <div class="section-heading section-heading--dense">
+            <div>
+              <h3>{{ t('cluster.result.groups') }}</h3>
+              <p>{{ t('cluster.result.groupsDescription', { count: resultGroupCards.length }) }}</p>
+            </div>
+          </div>
+          <div class="diagnostic-list diagnostic-list--reading">
+            <article
+              v-for="group in resultGroupCards"
+              :key="group.key"
+              class="diagnostic-card"
+            >
+              <div class="diagnostic-card__header">
+                <h4>{{ group.title }}</h4>
+                <span class="status-badge is-idle">#{{ group.clusterId }}</span>
+              </div>
+              <div class="diagnostic-meta-list">
+                <div class="diagnostic-meta-row">
+                  <span>{{ t('cluster.result.groupCard.locationCount') }}</span>
+                  <strong>{{ group.locationCount }}</strong>
+                </div>
+                <div
+                  v-if="group.sampleLocations"
+                  class="diagnostic-meta-row diagnostic-meta-row--stacked"
+                >
+                  <span>{{ t('cluster.result.groupCard.sampleLocations') }}</span>
+                  <p>{{ group.sampleLocations }}</p>
+                </div>
+              </div>
+            </article>
+          </div>
         </div>
       </div>
 
@@ -111,6 +138,18 @@
               </div>
             </div>
           </div>
+          <div v-if="resultGroups.length > 0">
+            <h3>{{ t('cluster.result.rawGroups') }}</h3>
+            <div class="diagnostic-list">
+              <article
+                v-for="group in resultGroups"
+                :key="group.label || group.group_id || JSON.stringify(group)"
+                class="diagnostic-card"
+              >
+                <pre>{{ formatStructuredValue(group) }}</pre>
+              </article>
+            </div>
+          </div>
         </div>
       </details>
     </div>
@@ -133,8 +172,9 @@ const {
   clusterResult,
   canReloadResult,
   resultSummaryCards,
-  assignments,
+  normalizedAssignments,
   resultGroups,
+  resultGroupCards,
   performanceEntries,
   cacheEntries,
   reloadCurrentResult,

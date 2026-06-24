@@ -11,6 +11,9 @@
     "cluster": "Cluster",
     "result": "Result"
   },
+  "stage": {
+    "currentStep": "Current stage {index}"
+  },
   "actions": {
     "createPreview": "Create preview",
     "refreshPreview": "Refresh preview",
@@ -39,6 +42,7 @@
     "resolvedCharsPreview": "{count} unique characters",
     "pathStringsPreview": "{count} path_strings generated",
     "emptyPathStrings": "No valid conditions selected yet",
+    "sourceCount": "{count} source entries",
     "advanced": "Advanced options",
     "includeSpecialLocations": "Include special locations",
     "locationTitle": "Locations and regions",
@@ -106,6 +110,7 @@
   },
   "task": {
     "title": "Task status",
+    "description": "Keep the current task, staged artifacts, and workflow progress visible on the right.",
     "source": "Source",
     "taskId": "task_id",
     "status": "Status",
@@ -113,6 +118,23 @@
     "message": "Message",
     "staged": "staged",
     "jobs": "jobs"
+  },
+  "context": {
+    "title": "Stage context",
+    "progressTitle": "Workflow progress",
+    "requestScope": "Request scope",
+    "requestScopeValue": "{groups} groups · {locations} locations · {regions} regions",
+    "prepareHash": "prepare_hash",
+    "distanceHash": "distance_hash",
+    "resultHash": "result_hash",
+    "phonemeMode": "phoneme_mode",
+    "resultSource": "Result source",
+    "progress": {
+      "idle": "Not ready",
+      "pending": "Ready to continue",
+      "active": "Current step",
+      "completed": "Completed"
+    }
   },
   "status": {
     "idle": "Idle",
@@ -126,9 +148,12 @@
     "description": "Shared result rendering for staged and quick run outputs.",
     "summary": "Summary",
     "assignments": "Assignments",
+    "assignmentsDescription": "{count} location assignments in total.",
     "groups": "Groups",
+    "groupsDescription": "{count} cluster group cards in total.",
     "performance": "Performance",
     "advanced": "Advanced details",
+    "rawGroups": "Raw group payload",
     "empty": "No cluster result yet. Finish the workflow first.",
     "columns": {
       "location": "Location",
@@ -137,7 +162,7 @@
       "city": "City",
       "county": "County",
       "town": "Town",
-      "yindianRegion": "Yindian region",
+      "yindianRegion": "Mcpdict region",
       "mapRegion": "Map region"
     },
     "summaryCards": {
@@ -145,6 +170,10 @@
       "phonemeMode": "Phoneme mode",
       "clusterCount": "Cluster count",
       "effectiveLocationCount": "Effective locations"
+    },
+    "groupCard": {
+      "locationCount": "Locations",
+      "sampleLocations": "Sample locations"
     },
     "cacheInfo": "Cache info"
   },

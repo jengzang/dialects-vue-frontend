@@ -24,9 +24,20 @@
     }
   },
   "resultList": {
-    "emptyState": "Please run a query first",
+    "readingLegend": {
+      "ariaLabel": "reading color legend",
+      "title": "Color legend",
+      "items": {
+        "both": "Literary + colloquial",
+        "wendu": "Literary",
+        "baidu": "Colloquial",
+        "yinweiPolyphonic": "Multiple positions",
+        "zhongguPolyphonic": "Polyphonic"
+      }
+    },
+    "emptyState": "Please search first",
     "locationLabel": "Location",
-    "locationPlaceholder": "click and choose the locations",
+    "locationPlaceholder": "choose the locations",
     "filter": {
       "default": "Filter",
       "selected": "Selected: {values}",
@@ -70,8 +81,8 @@
     "loading": "Loading...",
     "noData": "No data",
     "fields": {
-      "mapPartition": "Map partition:",
-      "yindianPartition": "Yindian partition:",
+      "mapPartition": "Map Division:",
+      "yindianPartition": "Mcpdict Division:",
       "source": "Source table:",
       "coordinates": "Coordinates:",
       "region": "Administrative region:"

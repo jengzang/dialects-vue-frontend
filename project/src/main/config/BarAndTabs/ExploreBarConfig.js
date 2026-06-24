@@ -299,7 +299,7 @@ export function useExploreBarConfig() {
                 }
             },
             navigation: {
-                defaultTo: { path: '/menu/about/intro' }
+                defaultTo: { path: '/menu/about/settings' }
             }
         })
     }))

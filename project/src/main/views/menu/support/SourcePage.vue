@@ -3,21 +3,25 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import UniversalTable from "@/main/components/TableAndTree/UniversalTable.vue";
-import { queryCount } from '@/api/index.js'
+import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
+import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceStats.js'
 
 const { t } = useI18n()
 const router = useRouter()
+const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
 
-const locationCount = ref('…')
-const dataCount = ref('…')
+const cachedStats = getCachedSourceStats()
+const locationCount = ref(cachedStats.locationCount)
+const dataCount = ref(cachedStats.dataCount)
 
 onMounted(async () => {
-  const [loc, data] = await Promise.all([
-    queryCount({ db_key: 'query', table_name: 'dialects', filter_column: '存儲標記', filter_value: 1 }),
-    queryCount({ db_key: 'dialects', table_name: 'dialects' })
-  ])
-  locationCount.value = loc
-  dataCount.value = data
+  try {
+    const stats = await getSourceStats()
+    locationCount.value = stats.locationCount
+    dataCount.value = stats.dataCount
+  } catch (error) {
+    console.error('獲取字表統計失敗:', error)
+  }
 })
 
 const dataColumns = [
@@ -54,7 +58,7 @@ const goToPrivacy = () => {
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="header-row">
 
-      <h2 class="tabs-title">📚 {{ t('source.title') }}</h2>
+      <h2 class="tabs-title" style="font-size: 1.5rem;">📚 {{ t('source.title') }}</h2>
       <a class="privacy-link" @click="goToPrivacy">
         {{ t('source.privacyLink') }}
       </a>
@@ -72,7 +76,8 @@ const goToPrivacy = () => {
         :columns="dataColumns"
         :default-filter="defaultFilter"
     />
-    <p>{{ t('source.totalRecords', { locationCount, dataCount }) }}</p>
+    <p class="summary">{{ t('source.totalRecords', { locationCount, dataCount }) }}</p>
+    <p class="summary">{{ t('source.databaseVersion', { version: sourceDbVersion }) }}</p>
   </div>
 </template>
 
@@ -100,7 +105,12 @@ const goToPrivacy = () => {
   gap: 15px;           /* 標題和下拉框之間的間距 */
   justify-content: center;
 }
-
+.summary {
+  margin-top: 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
 /* 响应式：移动端换行 */
 @media (max-width: 768px) {
   .header-row {

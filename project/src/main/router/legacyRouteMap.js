@@ -37,7 +37,7 @@ export const MENU_LEGACY_ROUTES = {
     }
   },
   about: {
-    defaultPath: '/menu/about/intro',
+    defaultPath: '/menu/about/settings',
     subMap: {
       intro: '/menu/about/intro',
       suggestion: '/menu/about/suggestion',

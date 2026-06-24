@@ -123,7 +123,8 @@
       "final": "韻母",
       "tone": "聲調",
       "errorFetch": "Feature count fetch error",
-      "queryFailed": "查詢失敗"
+      "queryFailed": "查詢失敗",
+      "inputLimitHint": "最多只能輸入 {max} 個合法音節，請勿繼續輸入。"
     },
     "zhongguSelector": {
       "possibleCombinations": "可能產生{count}種組合",

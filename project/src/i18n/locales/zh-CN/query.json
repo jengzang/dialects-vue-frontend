@@ -123,7 +123,8 @@
       "final": "韵母",
       "tone": "声调",
       "errorFetch": "Feature count fetch error",
-      "queryFailed": "查询失败"
+      "queryFailed": "查询失败",
+      "inputLimitHint": "最多只能输入 {max} 个合法音节，请勿继续输入。"
     },
     "zhongguSelector": {
       "possibleCombinations": "可能产生{count}种组合",

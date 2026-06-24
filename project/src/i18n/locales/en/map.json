@@ -82,8 +82,8 @@
       "level1": "Level 1 Region",
       "level2": "Level 2 Region",
       "level3": "Level 3 Region",
-      "mapPartition": "Atlas Partition",
-      "yindianPartition": "Yindian Partition"
+      "mapPartition": "Atlas Division",
+      "yindianPartition": "Mcpdict Division"
     },
     "buttons": {
       "run": "Draw Map",

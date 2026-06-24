@@ -59,35 +59,11 @@
           <!-- 特徵選擇 -->
           <div class="feature-selection">
             <label class="feature-label">{{ $t('compare.feature.selectLabel') }}</label>
-            <div class="feature-checkboxes">
-              <label class="checkbox-item">
-                <input
-                  v-model="tabStates.tab1.features"
-                  type="radio"
-                  name="tab1-feature"
-                  value="聲母"
-                >
-                <span>{{ $t('compare.feature.initial') }}</span>
-              </label>
-              <label class="checkbox-item">
-                <input
-                  v-model="tabStates.tab1.features"
-                  type="radio"
-                  name="tab1-feature"
-                  value="韻母"
-                >
-                <span>{{ $t('compare.feature.final') }}</span>
-              </label>
-              <label class="checkbox-item">
-                <input
-                  v-model="tabStates.tab1.features"
-                  type="radio"
-                  name="tab1-feature"
-                  value="聲調"
-                >
-                <span>{{ $t('compare.feature.tone') }}</span>
-              </label>
-            </div>
+            <RadioGroup
+              v-model="tabStates.tab1.features"
+              name="tab1-feature"
+              :options="tab1FeatureOptions"
+            />
           </div>
         </div>
       </div>
@@ -96,7 +72,7 @@
       <div
         v-show="currentTab === 'tab2'"
         class="page"
-        style="max-height: 50dvh;"
+        style="max-height: 50dvh;overflow-x: auto;"
       >
         <div class="page-content-stack">
           <!-- 單一中古選擇器 -->
@@ -172,7 +148,7 @@
                       :disabled="!canAddToGroup"
                       @click="addToGroup('group1')"
                     >
-                      ➕ {{ $t('compare.button.add') }}
+                      {{ $t('compare.button.add') }}
                     </button>
                   </div>
                   <div class="selected-items-list">
@@ -208,7 +184,7 @@
                       :disabled="!canAddToGroup"
                       @click="addToGroup('group2')"
                     >
-                      ➕ {{ $t('compare.button.add') }}
+                      {{ $t('compare.button.add') }}
                     </button>
                   </div>
                   <div class="selected-items-list">
@@ -302,13 +278,23 @@
                 class="tab5-sankey-controls"
                 :aria-label="t('compare.sankeyControls.title', '桑基图操作')"
               >
-                <label class="tab5-sankey-checkbox">
-                  <input
-                    v-model="tabStates.tab5.enableLinkOptimization"
-                    type="checkbox"
-                  >
-                  <span>{{ t('compare.sankeyControls.optimizeLinks', '优化连线') }}</span>
-                </label>
+                <div class="tab5-sankey-control-row">
+                  <label class="tab5-sankey-checkbox">
+                    <input
+                      v-model="tabStates.tab5.enableLinkOptimization"
+                      type="checkbox"
+                    >
+                    <span>{{ t('compare.sankeyControls.optimizeLinks', '优化连线') }}</span>
+                  </label>
+
+                  <label class="tab5-sankey-checkbox tab5-sankey-checkbox-secondary">
+                    <input
+                      v-model="tabStates.tab5.ignorePolyphonicChars"
+                      type="checkbox"
+                    >
+                    <span>{{ t('compare.sankeyControls.ignorePolyphonicChars', '忽略多音字') }}</span>
+                  </label>
+                </div>
 
                 <label class="tab5-sankey-slider">
                   <span class="tab5-sankey-slider-label">
@@ -346,6 +332,7 @@
         <PhoneticCompare
           :query-locations="tabStates.tab5.queryLocations"
           :enable-link-optimization="tabStates.tab5.enableLinkOptimization"
+          :ignore-polyphonic-chars="tabStates.tab5.ignorePolyphonicChars"
           :min-link-char-count="tabStates.tab5.minLinkCharCount"
           :min-node-char-count="tabStates.tab5.minNodeCharCount"
         />
@@ -431,6 +418,7 @@ import LocationMultiInput from "@/main/components/geo/LocationMultiInput.vue";
 import PhoneticCompare from "@/main/components/pho/PhoneticCompare.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
 import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
+import RadioGroup from '@/components/selector/RadioGroup.vue';
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
 import ChoiceSelector from "@/components/selector/ChoiceSelector.vue";
 import {
@@ -445,6 +433,7 @@ import {
 } from '@/main/store/store.js'
 import { compareChars, compareZhongGu, compareTones } from '@/api/index.js'
 import { getCoordinates } from '@/api'
+import { requestMapFitView } from '@/utils/map/MapData.js'
 import { showWarning } from '@/utils/message.js'
 import { useQueryConfig } from '@/composables/domain/useQueryConfig.js'
 
@@ -481,6 +470,21 @@ const locationLimitContext = computed(() => {
   // 映射到 constants.js 中的配置 key
   return `compare_${currentTab.value}`  // 'compare_tab1', 'compare_tab2', 'compare_tab4', 'compare_tab5'
 })
+
+const tab1FeatureOptions = computed(() => [
+  {
+    value: '聲母',
+    label: t('compare.feature.initial')
+  },
+  {
+    value: '韻母',
+    label: t('compare.feature.final')
+  },
+  {
+    value: '聲調',
+    label: t('compare.feature.tone')
+  }
+])
 
 // Tab1 state - dual input for character comparison
 const hanziInput = ref({
@@ -549,6 +553,7 @@ const tabStates = reactive({
     queryLocations: [],
 
     enableLinkOptimization: false,
+    ignorePolyphonicChars: false,
 
     // 真正传给 PhoneticCompare 的值
     minLinkCharCount: 3,
@@ -670,8 +675,8 @@ const toneClassLabels = computed(() => [
   t('compare.toneClasses.yangqu'),
   t('compare.toneClasses.yinru'),
   t('compare.toneClasses.yangru'),
+  t('compare.toneClasses.other'),
   t('compare.toneClasses.qingsheng'),
-  t('compare.toneClasses.other')
 ])
 
 // Helper function to get translated card label
@@ -1245,6 +1250,7 @@ const runAction = async () => {
       mapStore.mergedData = mergedData
       mapStore.mode = 'compare'
       mapStore.compareType = compareType  // 設置比較類型
+      requestMapFitView()
 
       // 根據比較類型設置不同的圖例
       if (compareType === 'chars') {
@@ -1587,13 +1593,9 @@ export default {
 
 <style scoped>
 
-.page{
-  overflow-x: hidden;
-}
 /* 📄 內容區塊動畫 */
 .tab-content-inner {
   width: 100%;
-  max-width: 900px;
   animation: fade 0.6s ease;
 
   /* ✅ 新增這些 */
@@ -1602,6 +1604,10 @@ export default {
   text-align: center;
   justify-content: center; /* 垂直置中 */
   padding: 1rem 0;
+}
+
+.page{
+  max-width: 900px;
 }
 
 
@@ -1642,6 +1648,7 @@ export default {
   display: flex;
   gap: 1.5dvw;
   width: 100%;
+  max-width: 90dvw;
   justify-content: space-between;
   flex-direction: column;
 }
@@ -1912,7 +1919,6 @@ export default {
   border-radius: 12px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(200, 200, 200, 0.3);
 }
 
 .group-label {
@@ -2013,31 +2019,31 @@ export default {
 }
 
 .add-to-group1 {
-  background: linear-gradient(145deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.05));
+  background: linear-gradient(145deg, rgba(76, 175, 80, 0.25), rgba(76, 175, 80, 0.2));
   border-color: #4CAF50;
   color: #2E7D32;
 }
 
 .add-to-group1:hover:not(:disabled) {
-  background: linear-gradient(145deg, rgba(76, 175, 80, 0.25), rgba(76, 175, 80, 0.15));
+  background: linear-gradient(145deg, rgba(76, 175, 80, 0.4), rgba(76, 175, 80, 0.3));
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 .add-to-group2 {
-  background: linear-gradient(145deg, rgba(33, 150, 243, 0.15), rgba(33, 150, 243, 0.05));
+  background: linear-gradient(145deg, rgba(33, 150, 243, 0.25), rgba(33, 150, 243, 0.2));
   border-color: #2196F3;
   color: #1565C0;
 }
 
 .add-to-group2:hover:not(:disabled) {
-  background: linear-gradient(145deg, rgba(33, 150, 243, 0.25), rgba(33, 150, 243, 0.15));
+  background: linear-gradient(145deg, rgba(33, 150, 243, 0.4), rgba(33, 150, 243, 0.3));
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
 }
 
 .add-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
@@ -2047,6 +2053,7 @@ export default {
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
   margin-top: 0;
+  max-width:90dvw;
 }
 
 .selected-group {
@@ -2054,6 +2061,7 @@ export default {
   border-radius: 12px;
   padding: 1rem;
   background: rgba(255, 255, 255, 0.5);
+  max-width:38dvw;
 }
 
 .selected-group-header {
@@ -2071,7 +2079,7 @@ export default {
 }
 
 .selected-group.group1-style {
-  border-color: rgba(76, 175, 80, 0.4);
+  border-color: rgba(76, 175, 80, 0.7);
 }
 
 .selected-group.group1-style .selected-group-header {
@@ -2080,7 +2088,7 @@ export default {
 }
 
 .selected-group.group2-style {
-  border-color: rgba(33, 150, 243, 0.4);
+  border-color: rgba(33, 150, 243, 0.7);
 }
 
 .selected-group.group2-style .selected-group-header {
@@ -2158,59 +2166,15 @@ export default {
 /* 特徵選擇樣式 */
 .feature-selection {
   width: 100%;
-  padding: 0.6rem 0.8rem;
+  padding: 0.3rem 0.4rem;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(200, 200, 200, 0.3);
 }
 
 .feature-label {
   display: block;
   font-weight: 600;
   color: #333;
-  margin-bottom: 0.5rem;
   font-size: 0.9rem;
-}
-
-.feature-checkboxes {
-  display: flex;
-  gap: 0.8rem;
-  flex-wrap: nowrap;
-  justify-content: center;
-  overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-}
-
-.checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  cursor: pointer;
-  padding: 0.35rem 0.7rem;
-  border-radius: 6px;
-  transition: all 0.2s;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(0, 122, 255, 0.15);
-}
-
-.checkbox-item:hover {
-  background: rgba(0, 122, 255, 0.1);
-  border-color: rgba(0, 122, 255, 0.3);
-}
-
-.checkbox-item input[type="checkbox"],
-.checkbox-item input[type="radio"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  margin: 0;
-}
-
-.checkbox-item span {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #333;
 }
 
 /* 調類選擇樣式 */
@@ -2317,6 +2281,14 @@ export default {
   background: var(--glass-light);
 }
 
+.tab5-sankey-control-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .tab5-sankey-checkbox,
 .tab5-sankey-slider {
   display: flex;
@@ -2332,6 +2304,11 @@ export default {
   align-items: center;
   cursor: pointer;
   user-select: none;
+  white-space: nowrap;
+}
+
+.tab5-sankey-checkbox-secondary {
+  margin-left: 0;
 }
 
 .tab5-sankey-checkbox input {
@@ -2358,7 +2335,7 @@ export default {
   max-height: none;
   align-items: center;
   width:93dvw;
-  max-width: 880px;
+  max-width: none;
 }
 
 /* 移動端適配 */
@@ -2377,12 +2354,17 @@ export default {
     padding: 0.8rem;
   }
 
-  .feature-checkboxes {
+  .page {
+    padding: 0.5rem!important;
+  }
+
+  .selected-groups-container {
     gap: 1rem;
   }
 
   .tone-selection {
     gap: 0.8rem;
+    padding:0.5rem;
   }
 
   .tone-checkbox {

@@ -12,49 +12,42 @@
       <p class="empty-text">{{ t('query.components.yinweiSelector.emptyState') }}</p>
     </div>
 
+    <div v-else-if="openingAnimating" class="popup-opening-state" aria-hidden="true">
+      <span class="ui-loading--hourglass popup-opening-loader"></span>
+    </div>
+
     <ul v-else class="glass-list">
       <li v-for="(loc, index) in locationList" :key="index" class="glass-list-item">
         <div class="item-row">
           <span class="loc-name">{{ loc }}</span>
-          <button
-            class="query-btn"
-            @click="emit('query-location', loc)"
-            :disabled="loadingStates[loc]"
-          >
-            {{
-              loadingStates[loc]
-                ? t('query.components.yinweiSelector.queryingButton')
-                : t('query.components.yinweiSelector.queryButton')
-            }}
-          </button>
         </div>
 
         <Transition name="slide-down">
-          <div v-if="apiResults[loc] && apiResults[loc][loc]" class="result-box">
-            <div class="stat-section" v-if="apiResults[loc][loc]['鑱叉瘝']">
+          <div v-if="apiResults[loc]" class="result-box">
+            <div class="stat-section" v-if="apiResults[loc]['聲母']">
               <h4 class="stat-title">{{ t('query.components.yinweiSelector.initial') }}</h4>
               <div class="stat-tags">
-                <span v-for="(count, key) in apiResults[loc][loc]['鑱叉瘝']" :key="key" class="glass-tag">
+                <span v-for="(count, key) in apiResults[loc]['聲母']" :key="key" class="glass-tag">
                   <span class="tag-key">{{ key }}</span>
                   <span class="tag-count">{{ count }}</span>
                 </span>
               </div>
             </div>
 
-            <div class="stat-section" v-if="apiResults[loc][loc]['闊绘瘝']">
+            <div class="stat-section" v-if="apiResults[loc]['韻母']">
               <h4 class="stat-title">{{ t('query.components.yinweiSelector.final') }}</h4>
               <div class="stat-tags">
-                <span v-for="(count, key) in apiResults[loc][loc]['闊绘瘝']" :key="key" class="glass-tag">
+                <span v-for="(count, key) in apiResults[loc]['韻母']" :key="key" class="glass-tag">
                   <span class="tag-key">{{ key }}</span>
                   <span class="tag-count">{{ count }}</span>
                 </span>
               </div>
             </div>
 
-            <div class="stat-section" v-if="apiResults[loc][loc]['鑱茶']">
+            <div class="stat-section" v-if="apiResults[loc]['聲調']">
               <h4 class="stat-title">{{ t('query.components.yinweiSelector.tone') }}</h4>
               <div class="stat-tags">
-                <span v-for="(count, key) in apiResults[loc][loc]['鑱茶']" :key="key" class="glass-tag">
+                <span v-for="(count, key) in apiResults[loc]['聲調']" :key="key" class="glass-tag">
                   <span class="tag-key">{{ key }}</span>
                   <span class="tag-count">{{ count }}</span>
                 </span>
@@ -88,13 +81,17 @@ defineProps({
     type: Object,
     default: () => ({})
   },
+  openingAnimating: {
+    type: Boolean,
+    default: false
+  },
   apiResults: {
     type: Object,
     default: () => ({})
   }
 })
 
-const emit = defineEmits(['close', 'query-location'])
+const emit = defineEmits(['close'])
 const { t } = useI18n()
 
 function handleClose() {
@@ -133,6 +130,17 @@ function handleClose() {
   border-bottom: none;
 }
 
+.popup-opening-state {
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-opening-loader {
+  transform: scale(1.2);
+}
+
 .item-row {
   display: flex;
   justify-content: space-between;
@@ -143,31 +151,6 @@ function handleClose() {
 .loc-name {
   font-weight: 500;
   font-size: 16px;
-}
-
-.query-btn {
-  background: #007aff;
-  color: white;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 14px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 6px rgba(0, 122, 255, 0.25);
-}
-
-.query-btn:hover {
-  background: #006ce6;
-  transform: scale(1.02);
-}
-
-.query-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
 }
 
 .slide-down-enter-active,

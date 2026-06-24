@@ -2,24 +2,26 @@ export function getHomeUpdateNotice(t) {
     const items = [
         {
             icon: '📊',
+            strong: '更新數據並增加文白讀展示',
+            text: '文讀、白讀、多音字分別用不同的顏色展示，點擊也可以查看詳情'
+        },
+        {
+            icon: '🔢',
+            strong: '優化“查音位”、“音值統計”頁面',
+            text: '“查音位”支持匹配音節；“音值統計”頁面增加餅圖、柱狀圖、散點圖等'
+        },
+        {
+            icon: '🆚',
             strong: '增加音值比較功能',
             text: '新增桑基圖可視化，支持多方言間的音值對比呈現'
         },
-        {
-            icon: '🗺️',
-            strong: '新增地圖繪製功能',
-            text: '支持手動繪製點、線、面等圖層，也可根據泰森多邊形自動計算方言分布圖，並支持導出圖層、圖片等功能（功能測試中）'
-        },
-        {
-            icon: '👤',
-            strong: '優化用戶自定義數據頁面',
-            text: '優化「地圖 -> 自定義」用戶個人數據創建於展示'
-        }
+
     ]
   return {
-    version: 'v4.4.8',
-    lastUpdateDate: '2026-06-15',
-    title: '🎊 ' + t('home.updateNotice.title'),
+    version: 'v4.5.2',
+    dbVersion: '2026-06-22',
+    lastUpdateDate: '2026-06-24',
+    title: t('home.updateNotice.title'),
     items
   }
 }

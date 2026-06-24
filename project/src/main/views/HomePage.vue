@@ -521,6 +521,7 @@
 
         <div class="footer-stats footer-stats-secondary">
           <span class="stat-text">{{ $t('source.totalRecords', { locationCount: sourceLocationCount, dataCount: sourceDataCount }) }}</span>
+          <span class="stat-text stat-text-muted">{{ $t('source.databaseVersion', { version: sourceDbVersion }) }}</span>
         </div>
 
         <div class="footer-info">
@@ -578,7 +579,7 @@ import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useVisitStats } from '@/composables/useVisitStats.js'
-import { queryCount } from '@/api'
+import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
 
 // ✅ 条件渲染的组件懒加载
@@ -604,8 +605,10 @@ const expandedCard = ref(null)
 const showSupport = ref(false)
 const showBenefitsPopup = ref(false)
 const showUpdateNotice = ref(false)
-const sourceLocationCount = ref('...')
-const sourceDataCount = ref('...')
+const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
+const cachedSourceStats = getCachedSourceStats()
+const sourceLocationCount = ref(cachedSourceStats.locationCount)
+const sourceDataCount = ref(cachedSourceStats.dataCount)
 
 // 当前版本号和更新时间
 const homeUpdateNotice = computed(() => getHomeUpdateNotice(t))
@@ -681,12 +684,9 @@ async function fetchVisitStats() {
 
 async function fetchSourceStats() {
   try {
-    const [locationCount, dataCount] = await Promise.all([
-      queryCount({ db_key: 'query', table_name: 'dialects', filter_column: '存儲標記', filter_value: 1 }),
-      queryCount({ db_key: 'dialects', table_name: 'dialects' })
-    ])
-    sourceLocationCount.value = locationCount
-    sourceDataCount.value = dataCount
+    const stats = await getSourceStats()
+    sourceLocationCount.value = stats.locationCount
+    sourceDataCount.value = stats.dataCount
   } catch (error) {
     console.error('獲取字表統計失敗:', error)
   }
@@ -817,7 +817,6 @@ onMounted(() => {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  background: #007aff;
   box-shadow: 0 6px 24px rgba(0, 122, 255, 0.4);
 }
 
@@ -1494,16 +1493,27 @@ onMounted(() => {
 .footer-stats {
   margin-bottom: 0.75rem;
   text-align: center;
+  gap: 1rem;
 }
 
 .footer-stats-secondary {
   margin-top: -0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem 3rem;
+  flex-wrap: nowrap;
 }
 
 .stat-text {
   font-size: 0.875rem;
   color: rgba(0, 0, 0, 0.6);
   font-weight: 500;
+}
+
+.stat-text-muted {
+  font-size: 0.8125rem;
+  color: rgba(0, 0, 0, 0.48);
 }
 
 .footer-info {
@@ -1584,6 +1594,10 @@ onMounted(() => {
 /* Responsive */
 @media (orientation: portrait) {
   .hero-section { min-height: 75vh; }
+  .footer-stats-secondary {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
   .hero-logo {
     width: clamp(260px, 50vw, 400px);
   }

@@ -53,12 +53,12 @@ export const PRAAT_AUDIO_LIMITS = {
 // ========================================
 export const ROLE_LIMITS = {
     anonymous: {
-        MAX_COMBINATIONS: 5,        // 最大组合数
-        MAX_RESULTS: 5              // 最大结果数
+        MAX_COMBINATIONS: 20,        // 最大组合数
+        MAX_RESULTS: 3              // 最大结果数
     },
     user: {
-        MAX_COMBINATIONS: 100,
-        MAX_RESULTS: 80
+        MAX_COMBINATIONS: 200,
+        MAX_RESULTS: 20
     },
     admin: {
         MAX_COMBINATIONS: Infinity,

@@ -81,6 +81,8 @@
     },
     "countphos": {
       "title": "音节统计",
+      "titlePrefix": "所有地点的音节统计",
+      "locationPill": "{count} 个地点",
       "subtitle": "所有地点的音节统计（共 {count} 个地点）",
       "features": {
         "initial": "声母",
@@ -97,6 +99,27 @@
         "locations": "地点详情",
         "locationsSubtitle": "每个地点的音节统计"
       },
+      "charts": {
+        "pie": {
+          "title": "音节总量占比",
+          "description": "自动选取足够多的高频音节，直到“其他”占比不超过 20%。点击扇区可查看地点。"
+        },
+        "bar": {
+          "title": "高频音节覆盖地点数",
+          "description": "自动选取足够多的高频音节，直到未绘制音节的总量少于 10%。"
+        },
+        "scatter": {
+          "title": "音节分布散点图",
+          "description": "横轴为总数量，纵轴为地点数。越靠右表示总量越高，越靠上表示覆盖地点越多。"
+        },
+        "common": {
+          "other": "其他",
+          "totalCount": "总数量",
+          "locationCount": "地点数",
+          "locations": "地点",
+          "share": "占比"
+        }
+      },
       "modal": {
         "title": "{featureType} - {syllable}"
       },
@@ -108,7 +131,8 @@
       "states": {
         "emptyInput": "请输入地点并点击查询",
         "minLocationError": "请至少输入一个地点",
-        "loadError": "加载数据时发生错误"
+        "loadError": "加载数据时发生错误",
+        "hint": "可同时输入 1～100 个地点，用于分析一类方言的音节统计特征。"
       }
     },
     "evolution": {

@@ -206,7 +206,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: '/menu/about/intro' }
+        defaultTo: { path: '/menu/about/settings' }
       }
     })
   ])

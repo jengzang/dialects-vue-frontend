@@ -108,7 +108,7 @@
     },
     "characterTable": {
       "title": "字集設置",
-      "description": "選擇新查詢默認使用的字集"
+      "description": "選擇新查詢默認使用的韻書"
     }
   },
   "stats": {
