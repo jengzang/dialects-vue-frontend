@@ -9,6 +9,7 @@ import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
 import CountLocationJumpNav from '@/main/components/pho/CountLocationJumpNav.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
+import all_feature_counts from '/data/feature_counts_20260624.json?url'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -24,6 +25,18 @@ const isMatching = ref(false) // 添加匹配状态
 // 音節統計數據
 const featureData = ref({}) // 存儲每個地點的原始數據
 const aggregatedData = ref({}) // 存儲匯總統計數據
+
+//默认加载
+const isUsingDefaultCounts = ref(false)
+const displayLocationCount = ref(0)
+
+const hasResultData = computed(() => {
+  return Object.keys(featureData.value).length > 0 || Object.keys(aggregatedData.value).length > 0
+})
+
+const hasLocationDetailData = computed(() => {
+  return Object.keys(featureData.value).length > 0
+})
 
 // 圖表配置
 const FEATURE_TYPE_ORDER = ['聲母', '韻母', '聲調']
@@ -271,11 +284,54 @@ const pickBarVisibleList = (list) => {
   return { visible, hiddenTotalCount }
 }
 
-const formatLocationsPreview = (locations = [], limit = 8) => {
+const formatLocationsPreview = (locations = [], limit = 2) => {
   if (!locations.length) return '無'
 
   const preview = locations.slice(0, limit).join('、')
   return locations.length > limit ? `${preview}…` : preview
+}
+
+const isMobileChart = () => {
+  return window.innerWidth <= 768
+}
+
+const getTotalLocationCountForCharts = () => {
+  // 如果你前面已经加了 displayLocationCount，就优先用它
+  if (typeof displayLocationCount.value !== 'undefined' && Number(displayLocationCount.value) > 0) {
+    return Number(displayLocationCount.value)
+  }
+
+  // 用户真实查询后，有 featureData
+  const featureLocationCount = Object.keys(featureData.value || {}).length
+  if (featureLocationCount > 0) {
+    return featureLocationCount
+  }
+
+  // 默认 aggregated-only 数据下，从 locations 反推总地点数
+  const locationSet = new Set()
+
+  Object.values(aggregatedData.value || {}).forEach((features) => {
+    Object.values(features || {}).forEach((stats) => {
+      if (Array.isArray(stats?.locations)) {
+        stats.locations.forEach((location) => {
+          if (location) locationSet.add(location)
+        })
+      }
+    })
+  })
+
+  return locationSet.size || 1
+}
+
+const getScatterSymbolSize = (locationCount) => {
+  const totalLocationCount = getTotalLocationCountForCharts()
+  const ratio = totalLocationCount > 0 ? locationCount / totalLocationCount : 0
+
+  const minSize = isMobileChart() ? 5 : 6
+  const maxSize = isMobileChart() ? 18 : 28
+
+  // 用 sqrt 保留差异，但避免小比例全部挤在一起
+  return minSize + Math.sqrt(Math.max(0, ratio)) * (maxSize - minSize)
 }
 
 const renderPieChart = (featureType) => {
@@ -354,11 +410,14 @@ const renderBarChart = (featureType) => {
 
   // 先按總數量排行取前 N，再展示這些音節對應的地點數
   const { visible: list } = pickBarVisibleList(getFeatureStatsList(featureType))
-  const useDataZoom = list.length > 15
+
+  const mobile = isMobileChart()
+  const useDataZoom = list.length > 50 && (!mobile)
 
   chart.setOption({
     tooltip: {
       trigger: 'axis',
+      confine: true,
       axisPointer: {
         type: 'shadow'
       },
@@ -376,10 +435,10 @@ const renderBarChart = (featureType) => {
       }
     },
     grid: {
-      left: 48,
-      right: 20,
-      top: 36,
-      bottom: useDataZoom ? 88 : 64,
+      left: mobile ? 6 : 12,
+      right: mobile ? 15 : 30,
+      top: mobile ? 30 : 36,
+      bottom: mobile ? 76 : 64,
       containLabel: true
     },
     dataZoom: useDataZoom
@@ -401,20 +460,26 @@ const renderBarChart = (featureType) => {
       data: list.map((item) => item.syllable),
       axisLabel: {
         interval: 0,
-        rotate: 45
+        rotate: mobile ? 60 : 45,
+        fontSize: mobile ? 10 : 12,
+        hideOverlap: true
       }
     },
     yAxis: {
       type: 'value',
-      name: t('phonology.phonology.countphos.charts.common.locationCount'),
-      minInterval: 1
+      position: 'right',
+      name: mobile ? '' : t('phonology.phonology.countphos.charts.common.locationCount'),
+      minInterval: 1,
+      axisLabel: {
+        fontSize: mobile ? 10 : 12
+      }
     },
     series: [
       {
         name: `${featureType}${t('phonology.phonology.countphos.charts.common.locationCount')}`,
         type: 'bar',
         data: list.map((item) => item.locationCount),
-        barMaxWidth: 32
+        barMaxWidth: mobile ? 22 : 32
       }
     ]
   }, true)
@@ -440,7 +505,7 @@ const renderScatterChart = () => {
     type: 'scatter',
     symbolSize: (value) => {
       const locationCount = Number(value?.[1] || 0)
-      return Math.max(8, Math.min(28, 6 + Math.sqrt(locationCount) * 3))
+      return getScatterSymbolSize(locationCount)
     },
     emphasis: {
       focus: 'series',
@@ -461,9 +526,12 @@ const renderScatterChart = () => {
     }))
   }))
 
+  const mobile = isMobileChart()
+
   chart.setOption({
     tooltip: {
       trigger: 'item',
+      confine: true,
       formatter: (params) => {
         const item = params.data
         if (!item) return ''
@@ -479,28 +547,40 @@ const renderScatterChart = () => {
     legend: {
       type: 'scroll',
       top: 0,
-      left: 'center'
+      left: 'center',
+      itemWidth: mobile ? 10 : 14,
+      itemHeight: mobile ? 8 : 10,
+      textStyle: {
+        fontSize: mobile ? 11 : 12
+      }
     },
     grid: {
-      left: 64,
-      right: 28,
-      top: 52,
-      bottom: 52,
+      left: mobile ? 6 : 12,
+      right: mobile ? 15 : 30,
+      top: mobile ? 48 : 52,
+      bottom: mobile ? 42 : 52,
       containLabel: true
     },
     xAxis: {
       type: 'value',
-      name: t('phonology.phonology.countphos.charts.common.totalCount'),
+      name: mobile ? '' : t('phonology.phonology.countphos.charts.common.totalCount'),
       min: 0,
+      axisLabel: {
+        fontSize: mobile ? 10 : 12
+      },
       splitLine: {
         show: true
       }
     },
     yAxis: {
       type: 'value',
-      name: t('phonology.phonology.countphos.charts.common.locationCount'),
+      position: 'right',
+      name: mobile ? '' : t('phonology.phonology.countphos.charts.common.locationCount'),
       min: 0,
       minInterval: 1,
+      axisLabel: {
+        fontSize: mobile ? 10 : 12
+      },
       splitLine: {
         show: true
       }
@@ -550,6 +630,30 @@ const renderAllCharts = async () => {
   resizeCharts()
 }
 
+const loadDefaultCountsData = async () => {
+  try {
+    const res = await fetch(all_feature_counts)
+
+    if (!res.ok) {
+      throw new Error(`Failed to load default feature counts: ${res.status}`)
+    }
+
+    const result = await res.json()
+    const aggregated = orderAggregatedData(result?.aggregated || result || {})
+
+    featureData.value = {}
+    aggregatedData.value = aggregated
+    displayLocationCount.value = Number(result?.locationCount || 0) || inferAggregatedLocationCount(aggregated)
+    isUsingDefaultCounts.value = true
+
+    if (Object.keys(aggregatedData.value).length > 0) {
+      await renderAllCharts()
+    }
+  } catch (err) {
+    console.error('默认音节统计数据加载失败:', err)
+  }
+}
+
 const loadData = async () => {
   if (matchedLocations.value.length === 0) {
     error.value = t('phonology.phonology.countphos.states.minLocationError')
@@ -560,6 +664,8 @@ const loadData = async () => {
   disposeAllCharts()
   featureData.value = {}
   aggregatedData.value = {}
+  isUsingDefaultCounts.value = false
+  displayLocationCount.value = matchedLocations.value.length
 
   await loadCountsTask.run(async () => {
     // 調用 API
@@ -570,6 +676,8 @@ const loadData = async () => {
 
     // 計算匯總數據
     aggregatedData.value = calculateAggregatedData(result || {})
+
+    displayLocationCount.value = Object.keys(featureData.value).length || matchedLocations.value.length
   }, {
     onError: (err) => {
       console.error('加載失敗:', err)
@@ -635,6 +743,40 @@ const calculateAggregatedData = (data) => {
   return orderedAggregated
 }
 
+const orderAggregatedData = (data = {}) => {
+  const ordered = {}
+
+  FEATURE_TYPE_ORDER.forEach((type) => {
+    if (data[type]) {
+      ordered[type] = data[type]
+    }
+  })
+
+  Object.keys(data || {}).forEach((type) => {
+    if (!Object.prototype.hasOwnProperty.call(ordered, type)) {
+      ordered[type] = data[type]
+    }
+  })
+
+  return ordered
+}
+
+const inferAggregatedLocationCount = (aggregated = {}) => {
+  const locationSet = new Set()
+
+  Object.values(aggregated || {}).forEach((features) => {
+    Object.values(features || {}).forEach((stats) => {
+      if (Array.isArray(stats?.locations)) {
+        stats.locations.forEach((location) => {
+          if (location) locationSet.add(location)
+        })
+      }
+    })
+  })
+
+  return locationSet.size
+}
+
 // 打开地点详情弹窗
 const openLocationModal = (syllable, featureType, stats) => {
   modalData.value = {
@@ -651,8 +793,9 @@ const closeLocationModal = () => {
   showLocationModal.value = false
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('resize', resizeCharts)
+  await loadDefaultCountsData()
 })
 
 onBeforeUnmount(() => {
@@ -698,12 +841,12 @@ onBeforeUnmount(() => {
       </button>
     </div>
 
-    <div v-else-if="Object.keys(featureData).length > 0" class="results-container">
+    <div v-else-if="hasResultData" class="results-container">
       <!-- 匯總統計部分 -->
       <section class="aggregated-section">
         <!-- <h3 class="section-title">匯總統計</h3> -->
         <h3 class="section-title">
-          {{ $t('phonology.phonology.countphos.subtitle', { count: matchedLocations.length }) }}
+          {{ $t('phonology.phonology.countphos.subtitle', { count: displayLocationCount }) }}
         </h3>
 
         <!-- 圖表統計部分 -->
@@ -781,8 +924,9 @@ onBeforeUnmount(() => {
               :key="syllable"
               class="syllable-card"
             >
-              <div class="syllable-name">{{ syllable }}</div>
-              <div class="syllable-stats">
+              <div class="syllable-top">
+                <div class="syllable-name">{{ syllable }}</div>
+                <div class="syllable-stats">
                 <span class="stat-item">
                   <span class="stat-label">{{ $t('phonology.phonology.countphos.stats.total') }}:</span>
                   <span class="stat-value">{{ stats.totalCount }}</span>
@@ -791,6 +935,8 @@ onBeforeUnmount(() => {
                   <span class="stat-label">{{ $t('phonology.phonology.countphos.stats.locationCount') }}:</span>
                   <span class="stat-value">{{ stats.locationCount }}</span>
                 </span>
+              
+              </div>
               </div>
               <div class="location-tags">
                 <!-- 显示前10个地点 -->
@@ -816,7 +962,7 @@ onBeforeUnmount(() => {
       </section>
 
       <!-- 地點詳情部分 -->
-      <section class="locations-section">
+      <section v-if="hasLocationDetailData" class="locations-section">
         <h3 class="section-title">{{ $t('phonology.phonology.countphos.sections.locations') }}</h3>
         <p class="section-subtitle">
           {{ $t('phonology.phonology.countphos.sections.locationsSubtitle') }}
@@ -857,7 +1003,7 @@ onBeforeUnmount(() => {
     </div>
 
     <CountLocationJumpNav
-      v-if="isCurrentCountRoute && Object.keys(featureData).length > 0 && locationNavItems.length > 0"
+      v-if="isCurrentCountRoute && hasResultData && locationNavItems.length > 0"
       :items="locationNavItems"
       @jump="handleLocationNavJump"
     />
@@ -962,7 +1108,7 @@ onBeforeUnmount(() => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 50vh;
+    min-height: 50dvh;
     gap: 15px;
   }
 
@@ -1008,7 +1154,7 @@ onBeforeUnmount(() => {
   }
 
   .section-title {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     color: var(--text-dark);
     margin-bottom: 8px;
@@ -1086,7 +1232,7 @@ onBeforeUnmount(() => {
   }
 
   .chart-title {
-    margin: 0 0 8px;
+    margin: 0;
     font-size: 15px;
     font-weight: 700;
     color: #274b73;
@@ -1113,7 +1259,7 @@ onBeforeUnmount(() => {
   }
 
   .bar-chart {
-    height: 360px;
+    height: 300px;
   }
 
   .scatter-chart {
@@ -1139,7 +1285,7 @@ onBeforeUnmount(() => {
 
   .syllable-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
   }
 
@@ -1324,6 +1470,20 @@ onBeforeUnmount(() => {
   @media (max-width: 768px) {
     min-width: 0;
 
+    .syllable-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .syllable-top{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .location-tag{
+      padding: 2px 4px;
+    }
+
     .pie-chart-row {
       grid-template-columns: 1fr;
     }
@@ -1337,7 +1497,7 @@ onBeforeUnmount(() => {
     }
 
     .bar-chart {
-      height: 330px;
+      height: 180px;
     }
 
     .scatter-chart {
