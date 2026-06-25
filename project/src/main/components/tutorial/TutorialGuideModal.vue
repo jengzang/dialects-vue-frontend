@@ -219,7 +219,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 
@@ -278,7 +278,7 @@ const props = defineProps({
   },
 })
 
-defineEmits([
+const emit = defineEmits([
   'update:modelValue',
   'update:isCatalogOpen',
   'selectEntry',
@@ -336,6 +336,17 @@ function scrollSelectionIntoView() {
     activeEntryElement?.scrollIntoView?.({ block: 'nearest' })
   })
 }
+
+// 只处理竖屏：弹窗打开时，目录默认强制收起。
+// 不影响横屏 / 桌面，因为横屏和桌面由 shouldShowCatalog 默认展示左侧目录。
+watch(
+  () => [props.modelValue, props.isCompact, props.isMobileLandscape],
+  ([visible, compact, landscape]) => {
+    if (visible && compact && !landscape) {
+      emit('update:isCatalogOpen', false)
+    }
+  }
+)
 
 defineExpose({
   scrollSelectionIntoView,
@@ -767,8 +778,6 @@ defineExpose({
   }
 
   .tutorial-experience {
-    // flex-direction: column;
-    // align-items: stretch;
     gap: 9px;
     padding: 10px;
   }
@@ -831,6 +840,11 @@ defineExpose({
     gap: 12px;
   }
 
+  .tutorial-catalog,
+  .tutorial-article {
+    max-height: var(--tutorial-content-max-height);
+  }
+
   .tutorial-catalog {
     padding: 10px;
   }
@@ -865,17 +879,18 @@ defineExpose({
   }
 }
 
-/* 移动端竖屏 / 接近竖屏：目录改成浮动按钮 + 浮动面板 */
+/* 只改竖屏：目录默认收起；目录按钮 fixed；展开后目录 fixed，70dvw × 40dvh */
 @media (max-aspect-ratio: 1/1) {
   .tutorial-shell__body {
-    position: relative;
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .tutorial-catalog-float-button {
     position: fixed;
-    top: 120px;
-    left: 10px;
-    z-index: 12;
+    top: max(112px, calc(env(safe-area-inset-top, 0px) + 17dvh));
+    left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
+    z-index: 20030;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -902,14 +917,17 @@ defineExpose({
   }
 
   .tutorial-catalog {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 13;
-    width: min(320px, calc(100% - 20px));
-    max-height: min(62dvh, 520px) !important;
+    position: fixed;
+    top: max(112px, calc(env(safe-area-inset-top, 0px) + 17dvh));
+    left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
+    z-index: 20031;
+    width: 70dvw;
+    max-width: 320px;
+    height: 40dvh;
+    max-height: 40dvh !important;
     padding: 10px;
     border-radius: var(--radius-xl);
+    overflow: auto;
     box-shadow:
       0 18px 42px rgba(38, 105, 176, 0.2),
       0 8px 20px rgba(45, 103, 160, 0.12),
