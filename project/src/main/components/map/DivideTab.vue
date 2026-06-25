@@ -19,13 +19,13 @@
         </div>
 
         <div class="all-data-toggle-row">
-          <label class="all-data-toggle">
-            <input
-              v-model="useAllData"
-              type="checkbox"
-            >
-            <span>{{ t('map.divideTab.labels.useAllData') }}</span>
-          </label>
+          <Checkbox
+            v-model="useAllData"
+            class="all-data-toggle"
+            :label="t('map.divideTab.labels.useAllData')"
+            :font-size="14"
+            :size="16"
+          />
           <small class="all-data-hint">
             {{ t('map.divideTab.hints.useAllData') }}
           </small>
@@ -103,6 +103,7 @@ import { useI18n } from 'vue-i18n'
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
 import RadioGroup from '@/components/selector/RadioGroup.vue'
+import Checkbox from '@/components/selector/Checkbox.vue'
 import { mapStore, uiStore, userStore, isDivideButtonDisabled, setRunning } from "@/main/store/store.js";
 import { getCoordinates, getLocationPartitions } from '@/api'
 import { showError, showWarning } from '@/utils/message.js';
