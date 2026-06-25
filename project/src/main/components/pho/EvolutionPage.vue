@@ -269,83 +269,15 @@ import { TABLE_COLUMN_SCHEMAS } from '../../config/chars_positions/characters.js
 import { userStore } from '@/main/store/store.js'
 import { showWarning } from '@/utils/message.js'
 import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from './evolutionDetail.js'
+import {
+  parseLocationsFromUrl,
+  updateUrlWithLocations
+} from '@/utils/urlParams.js'
 
 const { t } = useI18n()
-const router = useRouter()
 const route = useRoute()
+const router = useRouter()
 const MOBILE_LAYOUT_MEDIA_QUERY = '(max-aspect-ratio: 1/1)'
-
-const encodeLocationForQuery = (location) => {
-  const bytes = new TextEncoder().encode(String(location || ''))
-  let binary = ''
-
-  bytes.forEach((byte) => {
-    binary += String.fromCharCode(byte)
-  })
-
-  return btoa(binary)
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/g, '')
-}
-
-const decodeLocationFromQuery = (value) => {
-  const raw = String(value || '')
-  if (!raw) return ''
-
-  // 新格式：base64url，避免 URL 出现中文，也避免 % 被二次编码成 %25
-  try {
-    const base64 = raw
-      .replace(/-/g, '+')
-      .replace(/_/g, '/')
-      .padEnd(Math.ceil(raw.length / 4) * 4, '=')
-
-    const binary = atob(base64)
-    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))
-    const decoded = new TextDecoder().decode(bytes)
-
-    if (decoded) return decoded
-  } catch {
-    // ignore
-  }
-
-  // 兼容旧 URL：?loc=%E6%9D%B1... 或 ?loc=東莞
-  try {
-    return decodeURIComponent(raw)
-  } catch {
-    return raw
-  }
-}
-
-const parseLocationQuery = (value = route.query.loc) => {
-  const locations = Array.isArray(value) ? value : value ? [value] : []
-
-  return locations
-    .map((location) => decodeLocationFromQuery(location))
-    .filter(Boolean)
-}
-
-const getFirstUrlLocation = (value = route.query.loc) => {
-  return parseLocationQuery(value).slice(0, 1)
-}
-
-const isSameLocationList = (a = [], b = []) => {
-  return JSON.stringify(a) === JSON.stringify(b)
-}
-
-const updateLocationQuery = () => {
-  const query = { ...route.query }
-
-  if (matchedLocations.value.length > 0) {
-    query.loc = matchedLocations.value
-      .slice(0, 1)
-      .map((location) => encodeLocationForQuery(location))
-  } else {
-    delete query.loc
-  }
-
-  router.replace({ query })
-}
 
 // ========== 响应式数据 ==========
 // 查询参数
@@ -353,7 +285,7 @@ const queryMode = ref('by_value')
 const selectedTable = ref('characters')
 const level1Column = ref('')
 const level2Column = ref('')
-const selectedLocations = ref(getFirstUrlLocation())
+const selectedLocations = ref(parseLocationsFromUrl(route, { limit: 1 }))
 const matchedLocations = ref([])
 const showSankey = ref(false)
 const optimizeSankeyLayout = ref(false)
@@ -364,6 +296,7 @@ const isMatching = ref(false)
 const errorMessage = ref('')
 const rawData = ref(null)
 const hasQueriedRealData = ref(false)
+const pendingUrlAutoQuery = ref(false)
 
 // 当前展示
 const features = ['聲母', '韻母', '聲調']
@@ -515,8 +448,9 @@ const getDemoData = async () => loadDemoData(queryMode.value)
 
 const syncControlsFromData = (data, { syncLocations = true } = {}) => {
   if (syncLocations) {
-    selectedLocations.value = Array.isArray(data.locations) ? [...data.locations] : []
-    matchedLocations.value = Array.isArray(data.locations) ? [...data.locations] : []
+    const locations = Array.isArray(data.locations) ? data.locations.slice(0, 1) : []
+    selectedLocations.value = [...locations]
+    matchedLocations.value = [...locations]
   }
 
   selectedTable.value = data.table_name || 'characters'
@@ -537,12 +471,10 @@ const getInitialFeature = (data) => {
   return features.find(feature => featureKeys.includes(feature) && (data.data[feature]?.length || 0) > 0) || features[0]
 }
 
-const applyDemoData = async () => {
+const applyDemoData = async ({ syncLocations = parseLocationsFromUrl(route, { limit: 1 }).length === 0 } = {}) => {
   const demoData = await getDemoData()
   closeMobilePieDetail()
-  syncControlsFromData(demoData, {
-    syncLocations: parseLocationQuery().length === 0
-  })
+  syncControlsFromData(demoData, { syncLocations })
   currentFeature.value = getInitialFeature(demoData)
   rawData.value = demoData
   errorMessage.value = ''
@@ -582,7 +514,7 @@ const handleQuery = async () => {
 
   try {
     const params = {
-      locations: matchedLocations.value,
+      locations: matchedLocations.value.slice(0, 1),
       level1_column: level1Column.value,
       level2_column: level2Column.value,
       table_name: selectedTable.value
@@ -593,11 +525,19 @@ const handleQuery = async () => {
       : postPhoPieByStatus
 
     const response = await apiCall(params)
-    rawData.value = response
+    const responseData = response || {}
+
+    rawData.value = {
+      ...responseData,
+      locations: Array.isArray(responseData.locations) && responseData.locations.length > 0
+        ? responseData.locations.slice(0, 1)
+        : params.locations.slice(0, 1)
+    }
+
     hasQueriedRealData.value = true
     closeMobilePieDetail()
-    currentFeature.value = getInitialFeature(response)
-    updateLocationQuery()
+    currentFeature.value = getInitialFeature(rawData.value)
+    updateUrlWithLocations(router, matchedLocations.value, {}, { limit: 1 })
     shouldRefreshVisualization = true
   } catch (error) {
     errorMessage.value = error.message || t('phonology.phonology.evolution.errors.queryFailed')
@@ -866,7 +806,6 @@ const initPieChart = (container, pieData, index) => {
 // }
 
 const renderAllPies = async () => {
-
   await nextTick()
   clearPieCharts()
 
@@ -1317,6 +1256,18 @@ const handleWindowResize = async () => {
   chartInstances.value.forEach(chart => chart?.resize())
 }
 
+const tryRunUrlAutoQuery = async () => {
+  if (!pendingUrlAutoQuery.value) return
+  if (isLoading.value) return
+  if (isMatching.value) return
+  if (!matchedLocations.value.length) return
+
+  pendingUrlAutoQuery.value = false
+  matchedLocations.value = matchedLocations.value.slice(0, 1)
+
+  await handleQuery()
+}
+
 // 当切换feature时，重新渲染饼图
 watch(currentFeature, async () => {
   closeMobilePieDetail()
@@ -1377,34 +1328,57 @@ watch(queryMode, async () => {
   await applyDemoData()
 })
 
+watch(matchedLocations, async () => {
+  await tryRunUrlAutoQuery()
+})
+
+watch(isMatching, async () => {
+  await tryRunUrlAutoQuery()
+})
+
 watch(
   () => route.query.loc,
-  async (value) => {
-    const urlLocations = parseLocationQuery(value)
+  async () => {
+    const urlLocations = parseLocationsFromUrl(route, { limit: 1 })
 
-    if (isSameLocationList(urlLocations, selectedLocations.value)) {
+    if (isSameEvolutionMobileDetail(urlLocations, selectedLocations.value)) {
       return
     }
 
     selectedLocations.value = [...urlLocations]
+    matchedLocations.value = []
     errorMessage.value = ''
     closeMobilePieDetail()
 
     if (urlLocations.length === 0) {
-      matchedLocations.value = []
+      pendingUrlAutoQuery.value = false
+      hasQueriedRealData.value = false
+      await applyDemoData()
+      return
     }
 
-    if (hasQueriedRealData.value) {
-      hasQueriedRealData.value = false
-      rawData.value = null
-      await applyDemoData()
-    }
+    await applyDemoData({ syncLocations: false })
+    pendingUrlAutoQuery.value = true
+    await nextTick()
+    await tryRunUrlAutoQuery()
   }
 )
 
 onMounted(async () => {
   updateMobileLayout()
-  await applyDemoData()
+
+  const urlLocations = parseLocationsFromUrl(route, { limit: 1 })
+
+  if (urlLocations.length > 0) {
+    selectedLocations.value = [...urlLocations]
+    await applyDemoData({ syncLocations: false })
+    pendingUrlAutoQuery.value = true
+    await nextTick()
+    await tryRunUrlAutoQuery()
+  } else {
+    await applyDemoData()
+  }
+
   window.addEventListener('resize', handleWindowResize)
 })
 
@@ -1566,6 +1540,8 @@ onUnmounted(() => {
   gap: 12px;
   margin-bottom: 20px;
   justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .feature-tab {
@@ -1594,6 +1570,19 @@ onUnmounted(() => {
     border-color: var(--color-primary);
     box-shadow: 0 4px 12px var(--color-primary-shadow);
   }
+}
+
+.feature-tabs-location {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(0, 122, 255, 0.1);
+  border: 1px solid rgba(0, 122, 255, 0.18);
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 /* 加载状态 */
@@ -1782,6 +1771,12 @@ onUnmounted(() => {
 
   .feature-tabs {
     flex-wrap: wrap;
+  }
+  .feature-tab {
+    padding:10px 8px;
+  }
+  .feature-tabs-location{
+    padding:10px 6px;
   }
 
   .pie-chart {
