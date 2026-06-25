@@ -28,15 +28,6 @@
 
           <div class="tutorial-shell__actions">
             <button
-              v-if="isCompact && !isMobileLandscape"
-              type="button"
-              class="tutorial-shell__catalog-toggle"
-              @click="$emit('update:isCatalogOpen', !isCatalogOpen)"
-            >
-              {{ isCatalogOpen ? t('tutorial.ui.collapseCatalog') : t('tutorial.ui.expandCatalog') }}
-            </button>
-
-            <button
               type="button"
               class="close-btn close-btn-sm close-btn-inline"
               :aria-label="t('tutorial.ui.closeLabel')"
@@ -86,10 +77,34 @@
       data-tutorial-modal
     >
       <div class="tutorial-shell__body">
+        <button
+          v-if="isCompact && !isMobileLandscape && !isCatalogOpen"
+          type="button"
+          class="tutorial-catalog-float-button"
+          @click="$emit('update:isCatalogOpen', true)"
+        >
+          目录
+        </button>
+
         <aside
           v-show="shouldShowCatalog"
           class="tutorial-catalog ui-scrollbar"
         >
+          <div
+            v-if="isCompact && !isMobileLandscape"
+            class="tutorial-catalog__float-header"
+          >
+            <span>目录</span>
+            <button
+              type="button"
+              class="close-btn close-btn-sm close-btn-inline"
+              :aria-label="t('tutorial.ui.collapseCatalog')"
+              @click="$emit('update:isCatalogOpen', false)"
+            >
+              ×
+            </button>
+          </div>
+
           <section
             v-for="group in groupedEntries"
             :key="group.key"
@@ -382,48 +397,6 @@ defineExpose({
   gap: 8px;
 }
 
-.tutorial-shell__catalog-toggle{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.68);
-  border-radius: 999px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(220, 238, 255, 0.62));
-  color: var(--color-blue-logo);
-  cursor: pointer;
-  box-shadow:
-    0 8px 18px rgba(56, 123, 196, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    opacity 0.18s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow:
-      0 10px 22px rgba(56, 123, 196, 0.18),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-
-  &:focus-visible {
-    outline: 3px solid rgba(79, 154, 255, 0.28);
-    outline-offset: 2px;
-  }
-}
-
-.tutorial-shell__catalog-toggle {
-  min-height: 32px;
-  padding: 6px 11px;
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
 .tutorial-experience {
   display: flex;
   align-items: center;
@@ -519,6 +492,7 @@ defineExpose({
 }
 
 .tutorial-shell__body {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(230px, 290px) minmax(0, 1fr);
   gap: 16px;
@@ -546,6 +520,11 @@ defineExpose({
   padding: 12px 10px;
   border-radius: var(--radius-xl);
   overflow: auto;
+}
+
+.tutorial-catalog-float-button,
+.tutorial-catalog__float-header {
+  display: none;
 }
 
 .tutorial-catalog__group {
@@ -789,7 +768,7 @@ defineExpose({
 
   .tutorial-experience {
     // flex-direction: column;
-    align-items: stretch;
+    // align-items: stretch;
     gap: 9px;
     padding: 10px;
   }
@@ -886,22 +865,80 @@ defineExpose({
   }
 }
 
-@media (max-width: 520px) and (orientation: portrait) {
-  .tutorial-shell__topbar {
+/* 移动端竖屏 / 接近竖屏：目录改成浮动按钮 + 浮动面板 */
+@media (max-aspect-ratio: 1/1) {
+  .tutorial-shell__body {
+    position: relative;
+  }
+
+  .tutorial-catalog-float-button {
+    position: fixed;
+    top: 120px;
+    left: 10px;
+    z-index: 12;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 46px;
+    min-height: 30px;
+    padding: 6px 11px;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 999px;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(220, 238, 255, 0.62));
+    color: var(--color-blue-logo);
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow:
+      0 10px 22px rgba(56, 123, 196, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.84);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  .tutorial-catalog {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 13;
+    width: min(320px, calc(100% - 20px));
+    max-height: min(62dvh, 520px) !important;
+    padding: 10px;
+    border-radius: var(--radius-xl);
+    box-shadow:
+      0 18px 42px rgba(38, 105, 176, 0.2),
+      0 8px 20px rgba(45, 103, 160, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.84);
+  }
+
+  .tutorial-catalog__float-header {
+    position: sticky;
+    top: -10px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 10px;
+    margin: -10px -10px 10px;
+    padding: 9px 10px;
+    border-bottom: 1px solid rgba(110, 160, 214, 0.16);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(226, 241, 255, 0.72));
+    color: var(--color-blue-dark);
+    font-size: 0.86rem;
+    font-weight: 850;
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
   }
 
-  .tutorial-shell__actions {
-    gap: 6px;
-  }
-
-  .tutorial-shell__catalog-toggle {
-    padding-inline: 9px;
-  }
-
-  .tutorial-pagination__button {
-    min-width: 64px;
-    padding-inline: 9px;
+  .tutorial-article {
+    padding-top: 52px;
   }
 }
 </style>
