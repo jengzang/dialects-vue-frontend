@@ -12,7 +12,7 @@
     "title": "Middle Chinese",
     "placeholder": "Please enter Middle Chinese pronunciation",
     "button": "Query",
-    "description": "Middle Chinese➡️Pronunciation • Organize by Middle Chinese position",
+    "description": "Middle Chinese → Pronunciation • Organize by Middle Chinese position",
     "noExclude": "No Exclusion",
     "selectAll": "Select All",
     "cards": {
@@ -31,7 +31,7 @@
     "title": "Phonemes",
     "placeholder": "Please enter phoneme",
     "button": "Query",
-    "description": "Pronunciation➡️Middle Chinese • Analyze phoneme origins",
+    "description": "Pronunciation → Middle Chinese • Analyze phoneme origins",
     "noExclude": "No Exclusion",
     "selectAll": "Select All",
     "analysisText": "Analyze the Middle Chinese origins of <strong>{card}</strong> syllables, i.e., which Middle Chinese [<strong>{keys}</strong>] the current <strong>{card}</strong> characters come from",

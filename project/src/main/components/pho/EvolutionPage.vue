@@ -1387,7 +1387,7 @@ watch(locationQuery, async (urlLocations) => {
   }
 
   selectedLocations.value = [...limitedUrlLocations]
-  matchedLocations.value = []
+  matchedLocations.value = [...limitedUrlLocations]
   errorMessage.value = ''
   closeMobilePieDetail()
 
