@@ -241,6 +241,7 @@ watch(
 
             mapStore.mapData = MapData;
             mapStore.mergedData = mergedData;
+            mapStore.mode = 'feature';
             requestMapFitView();
           } else {
             console.warn("⚠️ API 返回错误:", response.message);

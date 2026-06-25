@@ -99,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getPhonologyClassificationMatrix } from '@/api'
@@ -112,7 +112,9 @@ import RadioGroup from '@/components/selector/RadioGroup.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
 import { preferredCharacterTable } from '@/main/store/store.js'
 import {
-  parsePhonologyCustomParams,
+  decodeQueryValueBase64Url,
+  encodeQueryValueBase64Url,
+  parseLocationsFromUrl,
   validatePhonologyParams
 } from '@/utils/urlParams.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
@@ -128,6 +130,9 @@ const matrixData = ref(null)
 const isMatching = ref(false)
 const shouldSyncUrl = ref(false)
 const selectedCharacterTable = preferredCharacterTable
+const CUSTOM_LOCATION_LIMIT = PHONOLOGY_LOCATION_LIMITS.custom
+const isApplyingRouteQuery = ref(false)
+const isApplyingFeatureDefaults = ref(false)
 
 // 特徵選擇（聲母/韻母/聲調） - Keep original values for API
 const FEATURE_KEYS = ['聲母', '韻母', '聲調']
@@ -224,18 +229,79 @@ const columnOptionsArray = computed(() => activeColumnKeys.value.map(columnKey =
   value: columnKey
 })))
 
-// 解析 URL 参数
-const urlParams = parsePhonologyCustomParams(route)
-const { set: setFeatureQuery } = useRouteQueryState('feature', {
-  defaultValue: urlParams.feature || '',
-  parse: (value) => decodeURIComponent(value),
-  serialize: (value) => encodeURIComponent(value),
-  replace: true
+const parseCustomLocationQuery = (value) => {
+  return parseLocationsFromUrl(
+    {
+      query: {
+        loc: value
+      }
+    },
+    {
+      limit: CUSTOM_LOCATION_LIMIT
+    }
+  )
+}
+
+const serializeCustomLocationQuery = (locations) => {
+  if (!Array.isArray(locations)) return []
+
+  return locations
+    .filter(Boolean)
+    .slice(0, CUSTOM_LOCATION_LIMIT)
+    .map((location) => encodeQueryValueBase64Url(location))
+}
+
+const locationQueryState = useRouteQueryState('loc', {
+  defaultValue: [],
+  parse: parseCustomLocationQuery,
+  serialize: serializeCustomLocationQuery,
+  replace: true,
+  removeIf: (locations) => !Array.isArray(locations) || locations.length === 0,
 })
+
+const featureQueryState = useRouteQueryState('feature', {
+  defaultValue: '',
+  parse: decodeQueryValueBase64Url,
+  serialize: encodeQueryValueBase64Url,
+  replace: true,
+})
+
+const horizontalQueryState = useRouteQueryState('h', {
+  defaultValue: '',
+  parse: decodeQueryValueBase64Url,
+  serialize: encodeQueryValueBase64Url,
+  replace: true,
+})
+
+const verticalQueryState = useRouteQueryState('v', {
+  defaultValue: '',
+  parse: decodeQueryValueBase64Url,
+  serialize: encodeQueryValueBase64Url,
+  replace: true,
+})
+
+const cellRowQueryState = useRouteQueryState('c', {
+  defaultValue: '',
+  parse: decodeQueryValueBase64Url,
+  serialize: encodeQueryValueBase64Url,
+  replace: true,
+})
+
+const { state: locationQuery } = locationQueryState
+const { state: featureQuery } = featureQueryState
+const { state: horizontalQuery } = horizontalQueryState
+const { state: verticalQuery } = verticalQueryState
+const { state: cellRowQuery } = cellRowQueryState
 
 // 验证参数
 const validation = validatePhonologyParams(
-  urlParams,
+  {
+    locations: locationQuery.value,
+    feature: featureQuery.value,
+    horizontalColumn: horizontalQuery.value,
+    verticalColumn: verticalQuery.value,
+    cellRowColumn: cellRowQuery.value
+  },
   FEATURE_KEYS,
   activeColumnKeys.value
 )
@@ -245,7 +311,7 @@ if (!validation.isValid) {
 }
 
 // 初始化地点
-const queryStrings = ref(urlParams.locations)
+const queryStrings = ref([...locationQuery.value])
 const matchedLocations = ref([])
 
 // 辅助函数：获取初始分类字段值
@@ -253,7 +319,10 @@ const getInitialColumn = (urlValue, defaultValue, allowedColumns = activeColumnK
   return urlValue && allowedColumns.includes(urlValue) ? urlValue : defaultValue
 }
 
-const initialSelectedFeature = FEATURE_KEYS.includes(urlParams.feature) ? urlParams.feature : FEATURE_KEYS[0]
+const initialSelectedFeature = FEATURE_KEYS.includes(featureQuery.value)
+  ? featureQuery.value
+  : FEATURE_KEYS[0]
+
 const initialFeatureDefaults = currentFeatureDefaults.value[initialSelectedFeature] || currentFeatureDefaults.value[FEATURE_KEYS[0]]
 
 // 初始化特征 - Use Chinese value internally
@@ -271,21 +340,21 @@ const selectedFeature = computed({
 // 初始化分类字段 - Use Chinese values internally
 const horizontalColumnChinese = ref(
   getInitialColumn(
-    urlParams.horizontalColumn,
+    horizontalQuery.value,
     initialFeatureDefaults.horizontal
   )
 )
 
 const verticalColumnChinese = ref(
   getInitialColumn(
-    urlParams.verticalColumn,
+    verticalQuery.value,
     initialFeatureDefaults.vertical
   )
 )
 
 const cellRowColumnChinese = ref(
   getInitialColumn(
-    urlParams.cellRowColumn,
+    cellRowQuery.value,
     initialFeatureDefaults.cellRow
   )
 )
@@ -297,7 +366,9 @@ const displayLocations = computed(() => {
 
 // 处理匹配到的地点列表
 const handleMatchedLocations = (locations) => {
-  matchedLocations.value = locations
+  matchedLocations.value = Array.isArray(locations)
+    ? locations.slice(0, CUSTOM_LOCATION_LIMIT)
+    : []
 }
 
 // 处理匹配状态
@@ -305,28 +376,45 @@ const handleIsMatching = (matching) => {
   isMatching.value = matching
 }
 
-// 更新 URL 参数
-function updatePhonologyCustomUrl() {
-  const query = {
-    ...route.query,
-    feature: encodeURIComponent(selectedFeatureChinese.value),
-    h: encodeURIComponent(horizontalColumnChinese.value),
-    v: encodeURIComponent(verticalColumnChinese.value),
-    c: encodeURIComponent(cellRowColumnChinese.value)
-  }
+// 更新 URL 参数：全部 query state 走 applyToQuery，最后只 replace 一次
+async function updatePhonologyCustomUrl() {
+  const nextQuery = { ...route.query }
 
-  if (matchedLocations.value.length > 0) {
-    query.loc = matchedLocations.value.map(loc => encodeURIComponent(loc))
-  } else {
-    delete query.loc
-  }
+  locationQueryState.applyToQuery(
+    nextQuery,
+    matchedLocations.value.slice(0, CUSTOM_LOCATION_LIMIT)
+  )
 
-  router.replace({ query })
+  featureQueryState.applyToQuery(
+    nextQuery,
+    selectedFeatureChinese.value
+  )
+
+  horizontalQueryState.applyToQuery(
+    nextQuery,
+    horizontalColumnChinese.value
+  )
+
+  verticalQueryState.applyToQuery(
+    nextQuery,
+    verticalColumnChinese.value
+  )
+
+  cellRowQueryState.applyToQuery(
+    nextQuery,
+    cellRowColumnChinese.value
+  )
+
+  await router.replace({
+    query: nextQuery
+  })
 }
 
 // 監聽特徵選擇變化
 watch(selectedFeatureChinese, async (newFeature) => {
-  await setFeatureQuery(newFeature)
+  if (isApplyingRouteQuery.value) {
+    return
+  }
 
   // 清空表格和錯誤信息
   matrixData.value = null
@@ -337,20 +425,32 @@ watch(selectedFeatureChinese, async (newFeature) => {
     return
   }
 
-  const defaults = currentFeatureDefaults.value[newFeature]
+  const defaults = currentFeatureDefaults.value[newFeature] || currentFeatureDefaults.value[FEATURE_KEYS[0]]
+
+  isApplyingFeatureDefaults.value = true
   horizontalColumnChinese.value = defaults.horizontal
   verticalColumnChinese.value = defaults.vertical
   cellRowColumnChinese.value = defaults.cellRow
-})
+  await nextTick()
+  isApplyingFeatureDefaults.value = false
 
-// 監聽分類字段變化
-watch([horizontalColumnChinese, verticalColumnChinese, cellRowColumnChinese], () => {
   if (shouldSyncUrl.value) {
-    updatePhonologyCustomUrl()
+    await updatePhonologyCustomUrl()
   }
 })
 
-watch(selectedCharacterTable, () => {
+// 監聽分類字段變化
+watch([horizontalColumnChinese, verticalColumnChinese, cellRowColumnChinese], async () => {
+  if (isApplyingRouteQuery.value || isApplyingFeatureDefaults.value) {
+    return
+  }
+
+  if (shouldSyncUrl.value) {
+    await updatePhonologyCustomUrl()
+  }
+})
+
+watch(selectedCharacterTable, async () => {
   matrixData.value = null
   error.value = null
 
@@ -358,13 +458,17 @@ watch(selectedCharacterTable, () => {
     return
   }
 
-  const defaults = currentFeatureDefaults.value[selectedFeatureChinese.value]
+  const defaults = currentFeatureDefaults.value[selectedFeatureChinese.value] || currentFeatureDefaults.value[FEATURE_KEYS[0]]
+
+  isApplyingFeatureDefaults.value = true
   horizontalColumnChinese.value = defaults.horizontal
   verticalColumnChinese.value = defaults.vertical
   cellRowColumnChinese.value = defaults.cellRow
+  await nextTick()
+  isApplyingFeatureDefaults.value = false
 
   if (shouldSyncUrl.value) {
-    updatePhonologyCustomUrl()
+    await updatePhonologyCustomUrl()
   }
 })
 
@@ -411,14 +515,21 @@ const transformMatrixData = (apiData) => {
         transformedCellDetails[h][v][c] = sortedEntries.map(({ key, chars }) => ({
           label: key,
           count: chars.length,
-          chars
+          details: [
+            {
+              char: chars.join(' '),
+              values: []
+            }
+          ]
         }))
       }
     }
   }
 
   return {
-    locations: apiData.locations,
+    locations: Array.isArray(apiData.locations)
+      ? apiData.locations.slice(0, CUSTOM_LOCATION_LIMIT)
+      : [],
     initials: apiData.horizontal_values,
     finals: apiData.vertical_values,
     tones: apiData.cell_row_values,
@@ -442,7 +553,7 @@ const loadData = async () => {
 
   await loadMatrixTask.run(async () => {
     const requestBody = {
-      locations: matchedLocations.value,
+      locations: matchedLocations.value.slice(0, CUSTOM_LOCATION_LIMIT),
       feature: selectedFeatureChinese.value, // Use Chinese value for API
       horizontal_column: horizontalColumnChinese.value, // Use Chinese value for API
       vertical_column: verticalColumnChinese.value, // Use Chinese value for API
@@ -462,7 +573,7 @@ const loadData = async () => {
     shouldSyncUrl.value = true
 
     // 更新 URL
-    updatePhonologyCustomUrl()
+    await updatePhonologyCustomUrl()
   }, {
     onError: (err) => {
       console.error('加載音韻矩陣失敗:', err)
@@ -477,10 +588,10 @@ onMounted(() => {
     return
   }
 
-  const hasLocations = urlParams.locations.length > 0
-  const hasAllColumns = urlParams.horizontalColumn &&
-    urlParams.verticalColumn &&
-    urlParams.cellRowColumn
+  const hasLocations = locationQuery.value.length > 0
+  const hasAllColumns = horizontalQuery.value &&
+    verticalQuery.value &&
+    cellRowQuery.value
 
   if (hasLocations && hasAllColumns && validation.isValid) {
     const unwatch = watch(matchedLocations, (locations) => {
@@ -493,221 +604,237 @@ onMounted(() => {
 })
 
 // 处理浏览器前进/后退
-watch(() => route.query, () => {
-  const newParams = parsePhonologyCustomParams(route)
+watch(
+  [locationQuery, featureQuery, horizontalQuery, verticalQuery, cellRowQuery],
+  async () => {
+    const nextFeature = featureQuery.value
+    const nextHorizontalColumn = horizontalQuery.value
+    const nextVerticalColumn = verticalQuery.value
+    const nextCellRowColumn = cellRowQuery.value
+    const nextLocations = Array.isArray(locationQuery.value)
+      ? locationQuery.value.slice(0, CUSTOM_LOCATION_LIMIT)
+      : []
 
-  // 更新特征
-  if (newParams.feature !== selectedFeatureChinese.value &&
-    FEATURE_KEYS.includes(newParams.feature)) {
-    selectedFeatureChinese.value = newParams.feature
-  }
+    isApplyingRouteQuery.value = true
 
-  // 更新地点 - 只有当 URL 的地点和当前匹配的地点不同时，才清空数据
-  const newLocations = newParams.locations
-  if (JSON.stringify(newLocations) !== JSON.stringify(matchedLocations.value)) {
-    queryStrings.value = newLocations
-    matrixData.value = null
-    error.value = null
-  }
+    // 更新特征
+    if (nextFeature !== selectedFeatureChinese.value &&
+      FEATURE_KEYS.includes(nextFeature)) {
+      selectedFeatureChinese.value = nextFeature
+    }
 
-  // 更新分类字段
-  if (newParams.horizontalColumn &&
-    activeColumnKeys.value.includes(newParams.horizontalColumn)) {
-    horizontalColumnChinese.value = newParams.horizontalColumn
-  }
+    const activeFeature = FEATURE_KEYS.includes(nextFeature)
+      ? nextFeature
+      : selectedFeatureChinese.value
 
-  if (newParams.verticalColumn &&
-    activeColumnKeys.value.includes(newParams.verticalColumn)) {
-    verticalColumnChinese.value = newParams.verticalColumn
-  }
+    const defaults = currentFeatureDefaults.value[activeFeature] || currentFeatureDefaults.value[FEATURE_KEYS[0]]
 
-  if (newParams.cellRowColumn &&
-    activeColumnKeys.value.includes(newParams.cellRowColumn)) {
-    cellRowColumnChinese.value = newParams.cellRowColumn
+    // 更新分类字段；URL 中没有合法值时，使用当前特征默认值兜底
+    horizontalColumnChinese.value = nextHorizontalColumn &&
+      activeColumnKeys.value.includes(nextHorizontalColumn)
+      ? nextHorizontalColumn
+      : defaults.horizontal
+
+    verticalColumnChinese.value = nextVerticalColumn &&
+      activeColumnKeys.value.includes(nextVerticalColumn)
+      ? nextVerticalColumn
+      : defaults.vertical
+
+    cellRowColumnChinese.value = nextCellRowColumn &&
+      activeColumnKeys.value.includes(nextCellRowColumn)
+      ? nextCellRowColumn
+      : defaults.cellRow
+
+    // 更新地点 - 只有当 URL 的地点和当前匹配的地点不同时，才清空数据
+    if (JSON.stringify(nextLocations) !== JSON.stringify(matchedLocations.value)) {
+      queryStrings.value = [...nextLocations]
+      matchedLocations.value = []
+      matrixData.value = null
+      error.value = null
+    }
+
+    await nextTick()
+    isApplyingRouteQuery.value = false
   }
-}, { deep: true })
+)
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .phonology-matrix-page {
   width: 90dvw;
-}
-
-.input-section {
-  max-width: 600px;
-  margin: 0 auto 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  justify-content: center;
-  align-items: center;
-}
-
-.unsupported-state {
-  max-width: 640px;
-  margin: 24px auto;
-}
-
-/* 特徵 radio 外層只保留間距；radio 樣式交給 RadioGroup 組件 */
-.feature-tabs {
-  margin: 20px auto;
-}
-
-.column-selectors {
-  display: flex;
-  gap: 16px;
-  margin: 10px auto 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-  max-width: 600px;
-}
-
-.selector-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 150px;
-}
-
-.selector-group label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dark);
-  text-align: center;
-}
-
-.selector-group select {
-  padding: 10px 12px;
-  border: 1px solid var(--border-gray-light);
-  border-radius: var(--radius-md);
-  background: var(--glass-light2);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.selector-group select:hover {
-  border-color: var(--color-primary);
-  background: var(--glass-medium2);
-}
-
-.selector-group select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-}
-
-.load-btn {
-  padding: 12px 24px;
-  max-width: 100px;
-  white-space: nowrap;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
-  color: var(--text-white);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px var(--color-primary-shadow), 0 2px 4px rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.load-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--color-primary-hover) 0%, #004ba0 100%);
-  box-shadow: 0 6px 16px var(--color-primary-shadow-light), 0 3px 6px rgba(0, 0, 0, 0.12);
-  transform: translateY(-1px);
-}
-
-.load-btn:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.load-btn:disabled {
-  background: var(--bg-hover-medium);
-  color: var(--text-secondary);
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  gap: 15px;
-}
-
-.loading p {
-  color: var(--text-secondary);
-  font-size: 15px;
-}
-
-.error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  gap: 15px;
-}
-
-.error p {
-  color: var(--color-error);
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.retry-btn {
-  padding: 10px 20px;
-  background: var(--color-primary);
-  color: var(--text-white);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-md);
-}
-
-.retry-btn:hover {
-  background: var(--color-primary-hover);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-1px);
-}
-
-.matrix-container {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-.empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  font-size: 16px;
-}
-
-/* 移动端适配 */
-@media (max-aspect-ratio: 1/1) {
-  .page-title {
-    font-size: 24px;
-  }
 
   .input-section {
-    max-width: 100%;
+    max-width: 600px;
+    margin: 0 auto 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .unsupported-state {
+    max-width: 640px;
+    margin: 24px auto;
+  }
+
+  /* 特徵 radio 外層只保留間距；radio 樣式交給 RadioGroup 組件 */
+  .feature-tabs {
+    margin: 20px auto;
+  }
+
+  .column-selectors {
+    display: flex;
+    gap: 16px;
+    margin: 10px auto 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 600px;
+  }
+
+  .selector-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 150px;
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dark);
+      text-align: center;
+    }
+
+    select {
+      padding: 10px 12px;
+      border: 1px solid var(--border-gray-light);
+      border-radius: var(--radius-md);
+      background: var(--glass-light2);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: var(--color-primary);
+        background: var(--glass-medium2);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+      }
+    }
   }
 
   .load-btn {
-    font-size: 14px;
+    padding: 12px 24px;
+    max-width: 100px;
+    white-space: nowrap;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+    color: var(--text-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px var(--color-primary-shadow), 0 2px 4px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--color-primary-hover) 0%, #004ba0 100%);
+      box-shadow: 0 6px 16px var(--color-primary-shadow-light), 0 3px 6px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      background: var(--bg-hover-medium);
+      color: var(--text-secondary);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  }
+
+  .loading,
+  .error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    gap: 15px;
+  }
+
+  .loading {
+    p {
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+  }
+
+  .error {
+    p {
+      color: var(--color-error);
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+
+  .retry-btn {
     padding: 10px 20px;
+    background: var(--color-primary);
+    color: var(--text-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+
+    &:hover {
+      background: var(--color-primary-hover);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-1px);
+    }
+  }
+
+  .matrix-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 16px;
+  }
+
+  /* 移动端适配 */
+  @media (max-aspect-ratio: 1/1) {
+    .page-title {
+      font-size: 24px;
+    }
+
+    .input-section {
+      max-width: 100%;
+    }
+
+    .load-btn {
+      font-size: 14px;
+      padding: 10px 20px;
+    }
   }
 }
 </style>

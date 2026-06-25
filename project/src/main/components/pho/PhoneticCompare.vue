@@ -66,49 +66,47 @@
 
     <!-- 详情卡片 (Pin Detail) -->
     <Teleport to="body">
-      <Transition name="detail-card-fade">
-        <div
-          v-if="selectedDetail"
-          class="sankey-detail-card"
-          :class="{
-            'is-desktop-card': !isMobileLayout,
-            'is-hover-preview': !isMobileLayout && !isCardPinned
-          }"
-        >
-          <div class="detail-card-header">
-            <div class="detail-card-meta">
-              <div class="detail-card-title-row">
-                <div
-                  class="detail-card-title"
-                  v-html="selectedDetail.title"
-                />
-              </div>
+      <HoverDetailCard
+        :visible="Boolean(selectedDetail)"
+        :is-mobile-layout="isMobileLayout"
+        :is-pinned="isCardPinned"
+        :desktop-card-position="desktopCardPosition"
+        root-class="sankey-detail-card"
+        @close="closeDetailCard"
+      >
+        <template #header>
+          <div class="detail-card-meta">
+            <div class="detail-card-title-row">
               <div
-                class="detail-card-subtitle"
-                v-html="selectedDetail.subtitle"
+                class="detail-card-title"
+                v-html="selectedDetail?.title"
               />
-              <div class="detail-card-count">
-                共 <strong>{{ selectedDetail.count }}</strong> 字
-              </div>
             </div>
-
-            <button
-              v-show="isMobileLayout || isCardPinned"
-              type="button"
-              class="detail-card-close"
-              @click="closeDetailCard"
-            >
-              ×
-            </button>
-          </div>
-
-          <div class="detail-card-body ui-scrollbar">
-            <div class="detail-card-chars">
-              {{ selectedDetail.chars.join('、') }}
+            <div
+              class="detail-card-subtitle"
+              v-html="selectedDetail?.subtitle"
+            />
+            <div class="detail-card-count">
+              共 <strong>{{ selectedDetail?.count }}</strong> 字
             </div>
           </div>
+        </template>
+
+        <template #header-actions>
+          <button
+            v-show="isMobileLayout || isCardPinned"
+            type="button"
+            class="close-btn close-btn-sm close-btn-inline"
+            @click="closeDetailCard"
+          >
+            ×
+          </button>
+        </template>
+
+        <div class="detail-card-chars">
+          {{ selectedDetail?.chars.join('、') }}
         </div>
-      </Transition>
+      </HoverDetailCard>
     </Teleport>
   </div>
 </template>
@@ -117,6 +115,8 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
+import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
+import { resolveHoverDetailCardPosition } from '@/components/ToastAndHelp/hoverDetailCardPosition.js'
 import { getFeatureStats } from '@/api/index.js'
 import { setRunning } from '@/main/store/store.js'
 
@@ -168,6 +168,7 @@ const isChartRendering = ref(false)
 // 详情卡片状态
 const selectedDetail = ref(null)
 const isCardPinned = ref(false)
+const desktopCardPosition = ref({ left: '0px', top: '0px' })
 
 // ECharts 相关
 const sankeyContainerRef = ref(null)
@@ -581,6 +582,16 @@ const renderSankey = async (queryLocs) => {
     chartInstance.value?.resize()
   })
 
+  const updateDetailCardPosition = (params) => {
+    if (isMobileLayout.value || !params?.event?.event) return
+
+    const e = params.event.event
+    desktopCardPosition.value = resolveHoverDetailCardPosition({
+      clientX: e.clientX,
+      clientY: e.clientY,
+    })
+  }
+
   // 绑定点击详情卡片
   chartInstance.value.on('click', (params) => {
     let title = ''
@@ -619,6 +630,7 @@ const renderSankey = async (queryLocs) => {
       count,
       chars
     }
+    updateDetailCardPosition(params)
     isCardPinned.value = true
   })
 
@@ -663,6 +675,7 @@ const renderSankey = async (queryLocs) => {
         count,
         chars
       }
+      updateDetailCardPosition(params)
     })
 
     chartInstance.value.on('mouseout', () => {
@@ -840,12 +853,7 @@ onUnmounted(() => {
 }
 
 /* 详情卡片样式 */
-.sankey-detail-card {
-  position: fixed;
-  left: 12px;
-  right: 12px;
-  bottom: calc(12px + env(safe-area-inset-bottom));
-  z-index: 1200;
+:deep(.sankey-detail-card) {
   border: 1px solid var(--border-gray-light, rgba(200, 200, 200, 0.5));
   border-radius: var(--radius-lg, 16px);
   background: rgba(255, 255, 255, 0.95);
@@ -854,32 +862,34 @@ onUnmounted(() => {
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   display: flex;
   flex-direction: column;
-
-  &.is-desktop-card {
-    position: fixed;
-    top: 100px;
-    right: 24px;
-    left: auto;
-    bottom: auto;
-    width: 320px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    z-index: 9999;
-    pointer-events: auto;
-  }
-
-  /* 当 Hover 预览未钉住且不是移动端时，允许穿透点击图表 */
-  &.is-hover-preview {
-    pointer-events: none;
-  }
 }
 
-.detail-card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+:deep(.sankey-detail-card.is-desktop-card) {
+  width: 320px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+:deep(.sankey-detail-card.hover-detail-card-fade-enter-active),
+:deep(.sankey-detail-card.hover-detail-card-fade-leave-active) {
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+:deep(.sankey-detail-card.hover-detail-card-fade-enter-from),
+:deep(.sankey-detail-card.hover-detail-card-fade-leave-to) {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+
+:deep(.sankey-detail-card .hover-detail-card__header) {
   padding: 14px 16px 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:deep(.sankey-detail-card .hover-detail-card__body) {
+  max-height: min(35dvh, 260px);
+  overflow-y: auto;
+  padding: 12px 16px 16px;
+  text-align: left;
 }
 
 .detail-card-meta {
@@ -918,33 +928,6 @@ onUnmounted(() => {
   font-weight: 600;
 }
 
-.detail-card-close {
-  border: none;
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--text-dark, #333);
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.1);
-  }
-}
-
-.detail-card-body {
-  max-height: min(35dvh, 260px);
-  overflow-y: auto;
-  padding: 12px 16px 16px;
-  text-align: left;
-}
 
 .detail-card-chars {
   font-size: 14px;
@@ -953,18 +936,6 @@ onUnmounted(() => {
   word-break: break-all;
   white-space: pre-wrap;
   letter-spacing: 1px;
-}
-
-/* Detail Card Fade Animation */
-.detail-card-fade-enter-active,
-.detail-card-fade-leave-active {
-  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.detail-card-fade-enter-from,
-.detail-card-fade-leave-to {
-  opacity: 0;
-  transform: translateY(20px) scale(0.95);
 }
 
 /* 适配移动端面板滚动条 */

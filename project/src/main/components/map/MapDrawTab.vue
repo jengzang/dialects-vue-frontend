@@ -1770,6 +1770,56 @@ onBeforeUnmount(() => {
   justify-content: flex-end;
 }
 
+.auth-warning-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.auth-warning-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.auth-warning-icon {
+  margin-bottom: 16px;
+  font-size: 44px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  animation: floatIcon 3s ease-in-out infinite;
+}
+
+.auth-warning-text {
+  margin-bottom: 20px;
+  color: grey;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@keyframes floatIcon {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
 @media (max-width: 900px) {
   .draw-tab-header,
   .draw-tool-section-header {

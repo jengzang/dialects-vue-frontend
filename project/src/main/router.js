@@ -174,16 +174,16 @@ const ROUTE_QUERY_ALLOWLIST = {
     base: []
   },
   '/menu/pho/matrix': {
-    base: ['loc', 'feature', 'h', 'v', 'c']
+    base: ['loc']
   },
   '/menu/pho/custom': {
     base: ['loc', 'feature', 'h', 'v', 'c']
   },
   '/menu/pho/count': {
-    base: ['loc', 'feature', 'h', 'v', 'c']
+    base: []
   },
   '/menu/pho/evolution': {
-    base: ['loc', 'feature', 'h', 'v', 'c']
+    base: ['loc']
   },
   '/menu/about/intro': {
     base: []

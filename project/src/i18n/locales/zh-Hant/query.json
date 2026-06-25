@@ -12,7 +12,7 @@
     "title": "查中古",
     "placeholder": "請輸入中古音",
     "button": "查詢",
-    "description": "中古➡️讀音•按中古地位整理讀音",
+    "description": "中古 → 讀音 • 按中古地位整理讀音",
     "noExclude": "不排除",
     "selectAll": "全選",
     "cards": {
@@ -31,7 +31,7 @@
     "title": "查音位",
     "placeholder": "請輸入音位",
     "button": "查詢",
-    "description": "讀音➡️中古•分析音位的中古來源",
+    "description": "讀音 → 中古 • 分析音位的中古來源",
     "noExclude": "不排除",
     "selectAll": "全選",
     "analysisText": "分析<strong>{card}</strong>音節的中古來源，即當今的同<strong>{card}</strong>字分別來自哪些中古[<strong>{keys}</strong>]",

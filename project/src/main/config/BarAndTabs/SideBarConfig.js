@@ -81,17 +81,6 @@ export function useSidebarConfig() {
                 { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: '/explore/villages/yc' }
             ]
         },
-        tools: {
-            label: t('navigation.menu.tools'),
-            icon: '🧰',
-            path: '/menu/tools',
-            children: [
-                { label: t('navigation.submenu.tools.check'), icon: '📝', path: '/explore/tools/check' },
-                { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: '/explore/tools/jyut2ipa' },
-                { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: '/explore/tools/merge' },
-                { label: t('navigation.submenu.tools.praat'), icon: '👂️', path: '/explore/tools/praat' }
-            ]
-        },
         source: {
             label: t('navigation.menu.source'),
             icon: '📚',
@@ -102,6 +91,24 @@ export function useSidebarConfig() {
                 { label: t('navigation.submenu.source.suggestion'), icon: '💬', path: '/menu/about/suggestion' },
                 { label: t('navigation.submenu.source.like'), icon: '❤️', path: '/menu/about/like' }
             ]
+        },
+        tools: {
+            label: t('navigation.menu.tools'),
+            icon: '🧰',
+            path: '/menu/tools',
+            children: [
+                { label: t('navigation.submenu.tools.check'), icon: '📝', path: '/explore/tools/check' },
+                { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: '/explore/tools/jyut2ipa' },
+                { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: '/explore/tools/merge' },
+                // { label: t('navigation.submenu.tools.praat'), icon: '👂️', path: '/explore/tools/praat' }
+            ]
+        },
+        praat: {
+            label: t('navigation.submenu.tools.praatname'), 
+            icon: '🎙️', 
+            path: '/explore/tools/praat',
+            external: true,
+            children: null
         },
         about_ontop: {
             label: t('navigation.menu.about_ontop'),

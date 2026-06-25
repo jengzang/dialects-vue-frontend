@@ -207,7 +207,7 @@ export function useExploreBarConfig() {
                     { label: t('navigation.submenu.tools.check'), icon: '📝', path: '/explore/tools/check' },
                     { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: '/explore/tools/jyut2ipa' },
                     { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: '/explore/tools/merge' },
-                    { label: t('navigation.submenu.tools.praat'), icon: '👂️', path: '/explore/tools/praat' }
+                    // { label: t('navigation.submenu.tools.praat'), icon: '👂️', path: '/explore/tools/praat' }
                 ]
             }
         }),

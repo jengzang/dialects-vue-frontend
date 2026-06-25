@@ -14,32 +14,25 @@
           v-if="isMiddleChineseMode && hasCustomData && mapStore.mapData"
           id="custom-switch-container"
           class="custom-switch-container1"
-          @click="toggleCustomSwitch"
         >
-          <span class="switch-label-text">{{ t('map.mapLibre.controls.personalData') }}</span>
-          <div class="map-custom-switch custom-switch-base main-glow-switch" :class="{ open: mapStore.showCustomData }" id="custom-toggle">
-            <span class="map-custom-slider custom-switch-slider-base">
-              <span id="switch-text" class="map-switch-text main-glow-switch-text">
-                {{ mapStore.showCustomData ? t('map.mapLibre.controls.show') : t('map.mapLibre.controls.hide') }}
-              </span>
-            </span>
-          </div>
+          <Checkbox
+            :model-value="mapStore.showCustomData"
+            :label="t('map.mapLibre.controls.personalData')"
+            :font-size="14"
+            @change="toggleCustomSwitch"
+          />
         </div>
 
         <div
           id="base-switch-container"
           class="custom-switch-container1"
-          @click="toggleBaseMode"
         >
-          <span class="switch-label-text">{{ t('map.mapLibre.controls.viewPlaceNames') }}</span>
-
-          <div class="map-custom-switch custom-switch-base main-glow-switch" :class="{ open: isBaseModeActive }" id="base-toggle">
-            <span class="map-custom-slider custom-switch-slider-base">
-              <span class="map-switch-text main-glow-switch-text">
-                {{ isBaseModeActive ? t('map.mapLibre.controls.enabled') : t('map.mapLibre.controls.disabled') }}
-              </span>
-            </span>
-          </div>
+          <Checkbox
+            :model-value="isBaseModeActive"
+            :label="t('map.mapLibre.controls.viewPlaceNames')"
+            :font-size="14"
+            @change="() => toggleBaseMode()"
+          />
         </div>
         <div class="button-row">
           <button class="action-btn" @click="resetView">🎯 {{ t('map.mapLibre.buttons.reset') }}</button>
@@ -140,6 +133,7 @@ import { getLocationDetail } from '@/api'
 import { deleteCustomForm } from '@/api'
 import { refreshCurrentCustomLayer } from '@/utils/map/MapData.js';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import Checkbox from '@/components/selector/Checkbox.vue'
 import MapLegend from './MapLegend.vue'
 import CompareMapPopup from '../popup/map/CompareMapPopup.vue'
 import FeatureMapPopup from '../popup/map/FeatureMapPopup.vue'
@@ -939,7 +933,7 @@ const resetView = () => {
   let points = [];
 
   // compare 模式优先按当前比较结果坐标复位，避免退回到 mapData 全量范围
-  if (mapStore.mode === 'compare' && mapStore.mergedData && mapStore.mergedData.length > 0) {
+  if ((mapStore.mode === 'compare' || mapStore.mode === 'feature') && mapStore.mergedData && mapStore.mergedData.length > 0) {
     points = mapStore.mergedData
       .map(item => item.coordinate)
       .filter(isValidCoordinatePair);
@@ -1180,39 +1174,6 @@ const resetView = () => {
   display: block;
 }
 
-/* 自定義 Select */
-.custom-select {
-  position: relative;
-  width: 100%;
-}
-
-.custom-select select {
-  width: 100%;
-  appearance: none;
-  background: white;
-  border: 1px solid #ddd;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  outline: none;
-  transition: border 0.3s;
-}
-
-.custom-select select:focus {
-  border-color: #007aff;
-}
-
-.custom-select .arrow {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  font-size: 12px;
-  color: #888;
-}
-
 /* ✨ 新增：按鈕並排容器 */
 .button-row {
   display: flex;
@@ -1272,24 +1233,6 @@ const resetView = () => {
   align-items: center;
   gap: 12px;
   position: relative;
-}
-
-.switch-label-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-}
-
-.map-custom-switch {
-  cursor: pointer;
-}
-
-.map-custom-switch:hover {
-  transform: scale(1.1);
-}
-
-.map-custom-switch.open:hover {
-  transform: scale(1.1);
 }
 
 /* 地名點擊彈窗樣式 */

@@ -24,6 +24,14 @@ const isMatching = ref(false) // 添加匹配状态
 const rendering = ref(false)
 const currentVisibleNavId = ref('')
 
+const waitForPaint = () => {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolve)
+    })
+  })
+}
+
 // 音節統計數據
 const featureData = ref({}) // 存儲每個地點的原始數據
 const aggregatedData = ref({}) // 存儲匯總統計數據
@@ -68,6 +76,10 @@ let defaultCountsPromise = null
 
 // 弹窗状态
 const showLocationModal = ref(false)
+const modalLoading = ref(false)
+const modalLocationText = ref('')
+let modalOpenToken = 0
+
 const modalData = ref({
   syllable: '',
   featureType: '',
@@ -762,6 +774,8 @@ const renderAllCharts = async () => {
 
     if (!hasChartData.value) return
 
+    await waitForPaint()
+
     chartFeatureTypes.value.forEach((featureType) => {
       renderPieChart(featureType)
       renderBarChart(featureType)
@@ -809,19 +823,23 @@ const getDefaultCountsData = async () => {
 }
 
 const loadDefaultCountsData = async () => {
-  try {
+  error.value = null
+
+  await loadCountsTask.run(async () => {
     const cachedData = await getDefaultCountsData()
 
     featureData.value = {}
     aggregatedData.value = cachedData.aggregated
     displayLocationCount.value = cachedData.locationCount
     isUsingDefaultCounts.value = true
-
-    if (Object.keys(aggregatedData.value).length > 0) {
-      await renderAllCharts()
+  }, {
+    onError: (err) => {
+      console.error('默认音节统计数据加载失败:', err)
     }
-  } catch (err) {
-    console.error('默认音节统计数据加载失败:', err)
+  })
+
+  if (!error.value && Object.keys(aggregatedData.value).length > 0) {
+    await renderAllCharts()
   }
 }
 
@@ -921,19 +939,50 @@ const inferAggregatedLocationCount = (aggregated = {}) => {
 }
 
 // 打开地点详情弹窗
-const openLocationModal = (syllable, featureType, stats) => {
+const openLocationModal = async (syllable, featureType, stats) => {
+  const currentToken = ++modalOpenToken
+  const locations = Array.isArray(stats?.locations) ? stats.locations : []
+  const totalCount = Number(stats?.totalCount || 0)
+
+  modalLoading.value = true
+  modalLocationText.value = ''
+
   modalData.value = {
     syllable,
     featureType,
-    locations: Array.isArray(stats.locations) ? stats.locations : [],
-    totalCount: Number(stats.totalCount || 0)
+    locations: [],
+    totalCount
   }
+
   showLocationModal.value = true
+
+  await nextTick()
+  await waitForPaint()
+
+  if (currentToken !== modalOpenToken || !showLocationModal.value) return
+
+  modalData.value = {
+    syllable,
+    featureType,
+    locations,
+    totalCount
+  }
+
+  modalLocationText.value = locations.join('、')
+
+  await nextTick()
+
+  if (currentToken !== modalOpenToken || !showLocationModal.value) return
+
+  modalLoading.value = false
 }
 
 // 关闭弹窗
 const closeLocationModal = () => {
+  modalOpenToken += 1
   showLocationModal.value = false
+  modalLoading.value = false
+  modalLocationText.value = ''
 }
 
 onMounted(async () => {
@@ -1080,16 +1129,15 @@ onBeforeUnmount(() => {
               <div class="syllable-top">
                 <div class="syllable-name">{{ syllable }}</div>
                 <div class="syllable-stats">
-                <span class="stat-item">
-                  <span class="stat-label">{{ $t('phonology.phonology.countphos.stats.total') }}:</span>
-                  <span class="stat-value">{{ stats.totalCount }}</span>
-                </span>
-                <span class="stat-item">
-                  <span class="stat-label">{{ $t('phonology.phonology.countphos.stats.locationCount') }}:</span>
-                  <span class="stat-value">{{ stats.locationCount }}</span>
-                </span>
-              
-              </div>
+                  <span class="stat-item">
+                    <span class="stat-label">{{ $t('phonology.phonology.countphos.stats.total') }}:</span>
+                    <span class="stat-value">{{ stats.totalCount }}</span>
+                  </span>
+                  <span class="stat-item">
+                    <span class="stat-label">{{ $t('phonology.phonology.countphos.stats.locationCount') }}:</span>
+                    <span class="stat-value">{{ stats.locationCount }}</span>
+                  </span>
+                </div>
               </div>
               <div class="location-tags">
                 <!-- 显示前10个地点 -->
@@ -1171,21 +1219,30 @@ onBeforeUnmount(() => {
       :z-index="20000"
       @update:modelValue="closeLocationModal"
     >
-      <div class="modal-stats">
-        <span class="modal-stat-item">
-          <span class="modal-stat-label">{{ $t('phonology.phonology.countphos.stats.total') }}:</span>
-          <span class="modal-stat-value">{{ modalData.totalCount }}</span>
-        </span>
-        <span class="modal-stat-item">
-          <span class="modal-stat-label">{{ $t('phonology.phonology.countphos.stats.locationCount') }}:</span>
-          <span class="modal-stat-value">{{ modalData.locations.length }}</span>
-        </span>
-      </div>
+      <div class="modal-content-shell">
+        <div v-if="modalLoading" class="modal-loading-block" aria-live="polite">
+          <div class="ui-loading--page" aria-hidden="true"></div>
+          <p>{{ $t('phonology.phonology.countphos.actions.loading') }}</p>
+        </div>
 
-      <div class="modal-locations-list">
-        <span class="modal-location-text">
-          {{ modalData.locations.join('、') }}
-        </span>
+        <template v-else>
+          <div class="modal-stats">
+            <span class="modal-stat-item">
+              <span class="modal-stat-label">{{ $t('phonology.phonology.countphos.stats.total') }}:</span>
+              <span class="modal-stat-value">{{ modalData.totalCount }}</span>
+            </span>
+            <span class="modal-stat-item">
+              <span class="modal-stat-label">{{ $t('phonology.phonology.countphos.stats.locationCount') }}:</span>
+              <span class="modal-stat-value">{{ modalData.locations.length }}</span>
+            </span>
+          </div>
+
+          <div class="modal-locations-list">
+            <span class="modal-location-text">
+              {{ modalLocationText }}
+            </span>
+          </div>
+        </template>
       </div>
     </AppModal>
   </div>
@@ -1674,13 +1731,14 @@ onBeforeUnmount(() => {
       grid-template-columns: 1fr;
       gap: 10px;
     }
-    .syllable-top{
+
+    .syllable-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .location-tag{
+    .location-tag {
       padding: 2px 4px;
     }
 
@@ -1706,73 +1764,92 @@ onBeforeUnmount(() => {
   }
 }
 
-.modal-stats {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 18px;
-    padding: 14px 16px;
-    border-radius: 18px;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.72),
-      rgba(245, 250, 255, 0.46)
-    );
-    border: 1px solid rgba(255, 255, 255, 0.65);
-    box-shadow:
-      0 12px 30px rgba(31, 78, 121, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(18px) saturate(1.35);
-  }
+.modal-content-shell {
+  min-height: 160px;
+}
 
-  .modal-stat-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0px 12px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.48);
-    border: 1px solid rgba(255, 255, 255, 0.56);
-  }
+.modal-loading-block {
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 
-  .modal-stat-label {
-    font-size: 13px;
-    color: rgba(37, 54, 74, 0.68);
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 14px;
     font-weight: 600;
   }
+}
 
-  .modal-stat-value {
-    font-size: 17px;
-    font-weight: 800;
-    color: var(--color-primary);
-    letter-spacing: 0.02em;
-    text-shadow: 0 1px 8px rgba(0, 122, 255, 0.16);
-  }
+.modal-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.72),
+    rgba(245, 250, 255, 0.46)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 12px 30px rgba(31, 78, 121, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(18px) saturate(1.35);
+}
 
-  .modal-locations-list {
-    margin-bottom: 20px;
-    padding: 16px 18px;
-    border-radius: 18px;
-    background: linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.68),
-      rgba(248, 251, 255, 0.42)
-    );
-    border: 1px solid rgba(255, 255, 255, 0.62);
-    box-shadow:
-      0 14px 34px rgba(20, 38, 60, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(18px) saturate(1.3);
-  }
+.modal-stat-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+}
 
-  .modal-location-text {
-    display: block;
-    font-size: 14px;
-    line-height: 1.9;
-    color: rgba(28, 43, 61, 0.86);
-    font-weight: 500;
-    letter-spacing: 0.015em;
-    word-break: break-word;
-    text-wrap: pretty;
-  }
+.modal-stat-label {
+  font-size: 13px;
+  color: rgba(37, 54, 74, 0.68);
+  font-weight: 600;
+}
 
+.modal-stat-value {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--color-primary);
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 8px rgba(0, 122, 255, 0.16);
+}
+
+.modal-locations-list {
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.68),
+    rgba(248, 251, 255, 0.42)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  box-shadow:
+    0 14px 34px rgba(20, 38, 60, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(18px) saturate(1.3);
+}
+
+.modal-location-text {
+  display: block;
+  font-size: 14px;
+  line-height: 1.9;
+  color: rgba(28, 43, 61, 0.86);
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  word-break: break-word;
+  text-wrap: pretty;
+}
 </style>

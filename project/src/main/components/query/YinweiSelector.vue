@@ -353,7 +353,7 @@ defineExpose({
 
 .query-box {
   width: 100%;
-  max-width: 250px;
+  margin: 10px auto 0px;
 }
 
 .query-box textarea {
