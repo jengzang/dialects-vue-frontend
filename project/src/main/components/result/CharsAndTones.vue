@@ -125,7 +125,7 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getReadingClass, getSearchCharReadingType } from '@/main/utils/ResultTable.js';
-import { READING_COLORS } from '@/main/constants/readingColors.js';
+import { READING_COLORS } from '@/main/config/readingColors.js';
 
 const props = defineProps({
   data: {

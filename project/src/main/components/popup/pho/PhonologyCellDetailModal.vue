@@ -46,7 +46,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
-import { READING_COLORS } from '@/main/constants/readingColors.js'
+import { READING_COLORS } from '@/main/config/readingColors.js'
 
 const { t } = useI18n()
 
