@@ -53,7 +53,8 @@
       "check": "Character Table Tool",
       "jyut2ipa": "Jyutping to IPA",
       "merge": "Character Table Merge",
-      "praat": "Acoustic Analysis"
+      "praat": "Acoustic Analysis",
+      "praatname": "Praat"
     },
     "source": {
       "source": "Data Sources",
