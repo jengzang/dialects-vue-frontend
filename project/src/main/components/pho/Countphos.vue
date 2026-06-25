@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
@@ -9,6 +9,7 @@ import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
 import CountLocationJumpNav from '@/main/components/pho/CountLocationJumpNav.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
+import { useNavAnchorJump } from '@/composables/useNavAnchorJump.js'
 import all_feature_counts from '/data/feature_counts_20260624.json?url'
 
 const { t } = useI18n()
@@ -22,7 +23,6 @@ const queryStrings = ref([])
 const matchedLocations = ref([])
 const isMatching = ref(false) // 添加匹配状态
 const rendering = ref(false)
-const currentVisibleNavId = ref('')
 
 const waitForPaint = () => {
   return new Promise((resolve) => {
@@ -104,157 +104,20 @@ const hasChartData = computed(() => chartFeatureTypes.value.length > 0)
 const isResultsBusy = computed(() => loading.value || rendering.value)
 const isCurrentCountRoute = computed(() => route.path === '/menu/pho/count')
 
-const locationNavItems = computed(() => {
-  const orderedLocations = Object.keys(featureData.value)
-  const totalItems = []
-
-  if (hasChartData.value) {
-    totalItems.push({
-      id: 'count-charts',
-      fullLabel: '圖表',
-      targetKey: 'charts',
-      kind: 'charts'
-    })
-  }
-
-  const totalKeys = Object.keys(aggregatedData.value)
-  totalKeys.forEach((featureType) => {
-    totalItems.push({
-      id: `count-total-${featureType}`,
-      fullLabel: `總-${featureType}`,
-      targetKey: featureType,
-      kind: 'total'
-    })
-  })
-
-  orderedLocations.forEach((location, index) => {
-    totalItems.push({
-      id: `count-location-${index}`,
-      fullLabel: location,
-      targetKey: location,
-      kind: 'location'
-    })
-  })
-
-  return totalItems
+const {
+  locationNavItems,
+  currentVisibleNavId,
+  getChartsAnchorId,
+  getAggregatedAnchorId,
+  getLocationAnchorId,
+  handleLocationNavJump
+} = useNavAnchorJump({
+  featureData,
+  aggregatedData,
+  hasChartData,
+  hasResultData,
+  isEnabled: isCurrentCountRoute
 })
-
-const getChartsAnchorId = () => 'count-charts-anchor'
-const getLocationAnchorId = (location) => `count-location-anchor-${location}`
-const getAggregatedAnchorId = (featureType) => `count-total-anchor-${featureType}`
-
-const SCROLL_SYNC_DEBOUNCE_MS = 180
-let scrollSyncTimer = null
-
-const getNavAnchorElement = (nav) => {
-  if (!nav) return null
-
-  if (nav.kind === 'charts') {
-    return document.getElementById(getChartsAnchorId())
-  }
-
-  if (nav.kind === 'total') {
-    const section = document.getElementById(getAggregatedAnchorId(nav.targetKey))
-    return section?.querySelector('.category-title') || section
-  }
-
-  if (nav.kind === 'location') {
-    return document.getElementById(getLocationAnchorId(nav.targetKey))
-  }
-
-  return null
-}
-
-const updateCurrentVisibleNav = () => {
-  if (!isCurrentCountRoute.value || !locationNavItems.value.length) return
-
-  const anchorTop = window.innerHeight * 0.35
-  let bestNav = locationNavItems.value[0]
-  let bestDistance = Number.POSITIVE_INFINITY
-
-  locationNavItems.value.forEach((nav) => {
-    const target = getNavAnchorElement(nav)
-    if (!target) return
-
-    const rect = target.getBoundingClientRect()
-    const distance = Math.abs(rect.top - anchorTop)
-
-    if (distance < bestDistance) {
-      bestDistance = distance
-      bestNav = nav
-    }
-  })
-
-  currentVisibleNavId.value = bestNav?.id || ''
-}
-
-const scheduleScrollSync = () => {
-  if (scrollSyncTimer) {
-    clearTimeout(scrollSyncTimer)
-  }
-
-  scrollSyncTimer = window.setTimeout(() => {
-    scrollSyncTimer = null
-    updateCurrentVisibleNav()
-  }, SCROLL_SYNC_DEBOUNCE_MS)
-}
-
-const clearScrollSyncTimer = () => {
-  if (scrollSyncTimer) {
-    clearTimeout(scrollSyncTimer)
-    scrollSyncTimer = null
-  }
-}
-
-const handleWindowScroll = () => {
-  scheduleScrollSync()
-}
-
-watch(
-  () => locationNavItems.value.map((item) => item.id).join('|'),
-  async () => {
-    await nextTick()
-    updateCurrentVisibleNav()
-  }
-)
-
-const handleLocationNavJump = async (nav) => {
-  await nextTick()
-
-  if (nav.kind === 'charts') {
-    const target = document.getElementById(getChartsAnchorId())
-
-    if (target) {
-      target.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      })
-    }
-    return
-  }
-
-  if (nav.kind === 'total') {
-    const target = document.getElementById(getAggregatedAnchorId(nav.targetKey))
-    const titleEl = target?.querySelector('.category-title')
-
-    if (titleEl) {
-      titleEl.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      })
-    }
-    return
-  }
-
-  const target = document.getElementById(getLocationAnchorId(nav.targetKey))
-
-  if (!target) return
-
-  target.scrollIntoView({
-    behavior: 'smooth',
-    block: 'center'
-  })
-}
 
 // 处理匹配到的地点列表
 const handleMatchedLocations = (locations) => {
@@ -987,16 +850,11 @@ const closeLocationModal = () => {
 
 onMounted(async () => {
   window.addEventListener('resize', resizeCharts)
-  window.addEventListener('scroll', handleWindowScroll, { passive: true })
   await loadDefaultCountsData()
-  await nextTick()
-  updateCurrentVisibleNav()
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', resizeCharts)
-  window.removeEventListener('scroll', handleWindowScroll)
-  clearScrollSyncTimer()
   disposeAllCharts()
 })
 </script>
