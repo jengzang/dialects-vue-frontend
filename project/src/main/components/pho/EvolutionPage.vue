@@ -269,9 +269,10 @@ import { TABLE_COLUMN_SCHEMAS } from '../../config/chars_positions/characters.js
 import { userStore } from '@/main/store/store.js'
 import { showWarning } from '@/utils/message.js'
 import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from './evolutionDetail.js'
+import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import {
-  parseLocationsFromUrl,
-  updateUrlWithLocations
+  encodeQueryValueBase64Url,
+  parseLocationsFromUrl
 } from '@/utils/urlParams.js'
 
 const { t } = useI18n()
@@ -279,13 +280,45 @@ const route = useRoute()
 const router = useRouter()
 const MOBILE_LAYOUT_MEDIA_QUERY = '(max-aspect-ratio: 1/1)'
 
+const EVOLUTION_LOCATION_LIMIT = PHONOLOGY_LOCATION_LIMITS.evolution
+
+const parseEvolutionLocationQuery = (value) => {
+  return parseLocationsFromUrl(
+    {
+      query: {
+        loc: value
+      }
+    },
+    {
+      limit: EVOLUTION_LOCATION_LIMIT
+    }
+  )
+}
+
+const serializeEvolutionLocationQuery = (locations) => {
+  if (!Array.isArray(locations)) return []
+
+  return locations
+    .filter(Boolean)
+    .slice(0, EVOLUTION_LOCATION_LIMIT)
+    .map((location) => encodeQueryValueBase64Url(location))
+}
+
+const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('loc', {
+  defaultValue: [],
+  parse: parseEvolutionLocationQuery,
+  serialize: serializeEvolutionLocationQuery,
+  replace: true,
+  removeIf: (locations) => !Array.isArray(locations) || locations.length === 0,
+})
+
 // ========== 响应式数据 ==========
 // 查询参数
 const queryMode = ref('by_value')
 const selectedTable = ref('characters')
 const level1Column = ref('')
 const level2Column = ref('')
-const selectedLocations = ref(parseLocationsFromUrl(route, { limit: 1 }))
+const selectedLocations = ref([...locationQuery.value])
 const matchedLocations = ref([])
 const showSankey = ref(false)
 const optimizeSankeyLayout = ref(false)
@@ -363,7 +396,10 @@ const pieCountByFeature = computed(() => {
 })
 
 const currentDataLocationName = computed(() => {
-  const locations = Array.isArray(rawData.value?.locations) ? rawData.value.locations : []
+  const locations = Array.isArray(rawData.value?.locations)
+    ? rawData.value.locations.slice(0, EVOLUTION_LOCATION_LIMIT)
+    : []
+
   return locations[0] || ''
 })
 
@@ -448,7 +484,10 @@ const getDemoData = async () => loadDemoData(queryMode.value)
 
 const syncControlsFromData = (data, { syncLocations = true } = {}) => {
   if (syncLocations) {
-    const locations = Array.isArray(data.locations) ? data.locations.slice(0, 1) : []
+    const locations = Array.isArray(data.locations)
+      ? data.locations.slice(0, EVOLUTION_LOCATION_LIMIT)
+      : []
+
     selectedLocations.value = [...locations]
     matchedLocations.value = [...locations]
   }
@@ -459,7 +498,9 @@ const syncControlsFromData = (data, { syncLocations = true } = {}) => {
 }
 
 const handleMatchedLocations = (locations) => {
-  matchedLocations.value = Array.isArray(locations) ? locations.slice(0, 1) : []
+  matchedLocations.value = Array.isArray(locations)
+    ? locations.slice(0, EVOLUTION_LOCATION_LIMIT)
+    : []
 }
 
 const handleIsMatching = (matching) => {
@@ -471,7 +512,7 @@ const getInitialFeature = (data) => {
   return features.find(feature => featureKeys.includes(feature) && (data.data[feature]?.length || 0) > 0) || features[0]
 }
 
-const applyDemoData = async ({ syncLocations = parseLocationsFromUrl(route, { limit: 1 }).length === 0 } = {}) => {
+const applyDemoData = async ({ syncLocations = locationQuery.value.length === 0 } = {}) => {
   const demoData = await getDemoData()
   closeMobilePieDetail()
   syncControlsFromData(demoData, { syncLocations })
@@ -514,7 +555,7 @@ const handleQuery = async () => {
 
   try {
     const params = {
-      locations: matchedLocations.value.slice(0, 1),
+      locations: matchedLocations.value.slice(0, EVOLUTION_LOCATION_LIMIT),
       level1_column: level1Column.value,
       level2_column: level2Column.value,
       table_name: selectedTable.value
@@ -530,14 +571,14 @@ const handleQuery = async () => {
     rawData.value = {
       ...responseData,
       locations: Array.isArray(responseData.locations) && responseData.locations.length > 0
-        ? responseData.locations.slice(0, 1)
-        : params.locations.slice(0, 1)
+        ? responseData.locations.slice(0, EVOLUTION_LOCATION_LIMIT)
+        : params.locations.slice(0, EVOLUTION_LOCATION_LIMIT)
     }
 
     hasQueriedRealData.value = true
     closeMobilePieDetail()
     currentFeature.value = getInitialFeature(rawData.value)
-    updateUrlWithLocations(router, matchedLocations.value, {}, { limit: 1 })
+    await setLocationQuery(matchedLocations.value.slice(0, EVOLUTION_LOCATION_LIMIT))
     shouldRefreshVisualization = true
   } catch (error) {
     errorMessage.value = error.message || t('phonology.phonology.evolution.errors.queryFailed')
@@ -1263,7 +1304,7 @@ const tryRunUrlAutoQuery = async () => {
   if (!matchedLocations.value.length) return
 
   pendingUrlAutoQuery.value = false
-  matchedLocations.value = matchedLocations.value.slice(0, 1)
+  matchedLocations.value = matchedLocations.value.slice(0, EVOLUTION_LOCATION_LIMIT)
 
   await handleQuery()
 }
@@ -1336,38 +1377,37 @@ watch(isMatching, async () => {
   await tryRunUrlAutoQuery()
 })
 
-watch(
-  () => route.query.loc,
-  async () => {
-    const urlLocations = parseLocationsFromUrl(route, { limit: 1 })
+watch(locationQuery, async (urlLocations) => {
+  const limitedUrlLocations = Array.isArray(urlLocations)
+    ? urlLocations.slice(0, EVOLUTION_LOCATION_LIMIT)
+    : []
 
-    if (isSameEvolutionMobileDetail(urlLocations, selectedLocations.value)) {
-      return
-    }
-
-    selectedLocations.value = [...urlLocations]
-    matchedLocations.value = []
-    errorMessage.value = ''
-    closeMobilePieDetail()
-
-    if (urlLocations.length === 0) {
-      pendingUrlAutoQuery.value = false
-      hasQueriedRealData.value = false
-      await applyDemoData()
-      return
-    }
-
-    await applyDemoData({ syncLocations: false })
-    pendingUrlAutoQuery.value = true
-    await nextTick()
-    await tryRunUrlAutoQuery()
+  if (JSON.stringify(limitedUrlLocations) === JSON.stringify(selectedLocations.value)) {
+    return
   }
-)
+
+  selectedLocations.value = [...limitedUrlLocations]
+  matchedLocations.value = []
+  errorMessage.value = ''
+  closeMobilePieDetail()
+
+  if (limitedUrlLocations.length === 0) {
+    pendingUrlAutoQuery.value = false
+    hasQueriedRealData.value = false
+    await applyDemoData()
+    return
+  }
+
+  await applyDemoData({ syncLocations: false })
+  pendingUrlAutoQuery.value = true
+  await nextTick()
+  await tryRunUrlAutoQuery()
+})
 
 onMounted(async () => {
   updateMobileLayout()
 
-  const urlLocations = parseLocationsFromUrl(route, { limit: 1 })
+  const urlLocations = locationQuery.value.slice(0, EVOLUTION_LOCATION_LIMIT)
 
   if (urlLocations.length > 0) {
     selectedLocations.value = [...urlLocations]

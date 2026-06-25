@@ -62,6 +62,10 @@ import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import {
+  encodeQueryValueBase64Url,
+  parseLocationsFromUrl
+} from '@/utils/urlParams.js'
 
 const { t } = useI18n()
 
@@ -71,21 +75,32 @@ const error = ref(null)
 const matrixData = ref(null)
 
 // 从 URL 初始化地点
-function parseLocationQuery(value) {
-  const locations = Array.isArray(value) ? value : [value]
-  return locations.filter(Boolean).map((location) => {
-    try {
-      return decodeURIComponent(location)
-    } catch {
-      return location
+const parseMatrixLocationQuery = (value) => {
+  return parseLocationsFromUrl(
+    {
+      query: {
+        loc: value
+      }
+    },
+    {
+      limit: PHONOLOGY_LOCATION_LIMITS.matrix
     }
-  })
+  )
+}
+
+const serializeMatrixLocationQuery = (locations) => {
+  if (!Array.isArray(locations)) return []
+
+  return locations
+    .filter(Boolean)
+    .slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
+    .map((location) => encodeQueryValueBase64Url(location))
 }
 
 const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('loc', {
   defaultValue: [],
-  parse: parseLocationQuery,
-  serialize: (locations) => locations.map((location) => encodeURIComponent(location)),
+  parse: parseMatrixLocationQuery,
+  serialize: serializeMatrixLocationQuery,
   replace: true,
   removeIf: (locations) => !Array.isArray(locations) || locations.length === 0,
 })
@@ -153,7 +168,9 @@ const transformMatrixReadStats = (matrixReadStats = {}) => {
 
 // 处理匹配到的地点列表
 const handleMatchedLocations = (locations) => {
-  matchedLocations.value = locations
+  matchedLocations.value = Array.isArray(locations)
+    ? locations.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
+    : []
 }
 
 // 处理匹配状态
@@ -171,7 +188,7 @@ const loadData = async () => {
 
   await loadMatrixTask.run(async () => {
     const requestBody = {
-      locations: matchedLocations.value
+      locations: matchedLocations.value.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
     }
 
     const result = await getPhonologyMatrix(requestBody)
@@ -187,7 +204,7 @@ const loadData = async () => {
     )
 
     // 更新 URL
-    await setLocationQuery(matchedLocations.value)
+    await setLocationQuery(matchedLocations.value.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix))
   }, {
     onError: (err) => {
       console.error('加載音韻矩陣失敗:', err)
@@ -211,11 +228,14 @@ onMounted(() => {
 
 // 处理浏览器前进/后退
 watch(locationQuery, (urlLocations) => {
+  const limitedUrlLocations = Array.isArray(urlLocations)
+    ? urlLocations.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
+    : []
 
   // 只有当 URL 的地点和当前匹配的地点不同时，才需要清空数据
   // 这样可以避免在查询成功更新 URL 后误清空数据
-  if (JSON.stringify(urlLocations) !== JSON.stringify(matchedLocations.value)) {
-    queryStrings.value = [...urlLocations]
+  if (JSON.stringify(limitedUrlLocations) !== JSON.stringify(matchedLocations.value)) {
+    queryStrings.value = [...limitedUrlLocations]
     matrixData.value = null
     error.value = null
   }

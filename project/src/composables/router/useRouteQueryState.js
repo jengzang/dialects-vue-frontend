@@ -37,22 +37,28 @@ export function useRouteQueryState(key, options = {}) {
     }
   })
 
-  async function set(value) {
-    const nextQuery = { ...route.query }
+  function applyToQuery(nextQuery, value) {
     const serialized = serialize(value)
 
-    // 允许调用方把“空值该不该删 query”这个策略外置，兼容数组/对象等场景。
     if (removeIf(serialized)) {
       delete nextQuery[key]
     } else {
       nextQuery[key] = serialized
     }
 
+    state.value = value
+    return nextQuery
+  }
+
+  async function set(value) {
+    const nextQuery = { ...route.query }
+
+    applyToQuery(nextQuery, value)
+
     const navigation = {
       query: nextQuery,
     }
 
-    state.value = value
     if (replace) {
       // replace 常用于 tab/filter 同步，避免把每次内部切换都塞进浏览器历史。
       await router.replace(navigation)
@@ -65,5 +71,6 @@ export function useRouteQueryState(key, options = {}) {
   return {
     state,
     set,
+    applyToQuery,
   }
 }
