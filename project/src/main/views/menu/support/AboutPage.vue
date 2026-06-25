@@ -758,7 +758,7 @@ p em.emoji {
 }
 
 .settings-radio-group {
-  justify-content: flex-start;
+  justify-content: center;
   gap: 18px 24px;
 }
 
@@ -794,6 +794,7 @@ p em.emoji {
 .language-options {
   display: flex;
   gap: 12px;
+  justify-content: center;
 }
 
 .language-card {

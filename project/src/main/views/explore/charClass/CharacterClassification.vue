@@ -873,15 +873,6 @@ watch(
     align-items: stretch;
   }
 
-  .tree-actions {
-    align-items: stretch;
-    flex-wrap: wrap;
-  }
-
-  .annotation-checkbox {
-    align-self: flex-start;
-  }
-
   .level-row-header {
     justify-content: flex-start;
   }
