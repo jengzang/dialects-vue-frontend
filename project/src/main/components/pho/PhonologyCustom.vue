@@ -411,7 +411,13 @@ const transformMatrixData = (apiData) => {
         transformedCellDetails[h][v][c] = sortedEntries.map(({ key, chars }) => ({
           label: key,
           count: chars.length,
-          chars
+          details: [
+          {
+            char: chars.join(' '),
+            values: []
+          }
+        ]
+          // chars
         }))
       }
     }
@@ -528,186 +534,182 @@ watch(() => route.query, () => {
 }, { deep: true })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .phonology-matrix-page {
   width: 90dvw;
-}
-
-.input-section {
-  max-width: 600px;
-  margin: 0 auto 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  justify-content: center;
-  align-items: center;
-}
-
-.unsupported-state {
-  max-width: 640px;
-  margin: 24px auto;
-}
-
-/* 特徵 radio 外層只保留間距；radio 樣式交給 RadioGroup 組件 */
-.feature-tabs {
-  margin: 20px auto;
-}
-
-.column-selectors {
-  display: flex;
-  gap: 16px;
-  margin: 10px auto 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-  max-width: 600px;
-}
-
-.selector-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 150px;
-}
-
-.selector-group label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dark);
-  text-align: center;
-}
-
-.selector-group select {
-  padding: 10px 12px;
-  border: 1px solid var(--border-gray-light);
-  border-radius: var(--radius-md);
-  background: var(--glass-light2);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.selector-group select:hover {
-  border-color: var(--color-primary);
-  background: var(--glass-medium2);
-}
-
-.selector-group select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-}
-
-.load-btn {
-  padding: 12px 24px;
-  max-width: 100px;
-  white-space: nowrap;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
-  color: var(--text-white);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px var(--color-primary-shadow), 0 2px 4px rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.load-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--color-primary-hover) 0%, #004ba0 100%);
-  box-shadow: 0 6px 16px var(--color-primary-shadow-light), 0 3px 6px rgba(0, 0, 0, 0.12);
-  transform: translateY(-1px);
-}
-
-.load-btn:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.load-btn:disabled {
-  background: var(--bg-hover-medium);
-  color: var(--text-secondary);
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  gap: 15px;
-}
-
-.loading p {
-  color: var(--text-secondary);
-  font-size: 15px;
-}
-
-.error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  gap: 15px;
-}
-
-.error p {
-  color: var(--color-error);
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.retry-btn {
-  padding: 10px 20px;
-  background: var(--color-primary);
-  color: var(--text-white);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-md);
-}
-
-.retry-btn:hover {
-  background: var(--color-primary-hover);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-1px);
-}
-
-.matrix-container {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-.empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  font-size: 16px;
-}
-
-/* 移动端适配 */
-@media (max-aspect-ratio: 1/1) {
-  .page-title {
-    font-size: 24px;
-  }
 
   .input-section {
-    max-width: 100%;
+    max-width: 600px;
+    margin: 0 auto 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .unsupported-state {
+    max-width: 640px;
+    margin: 24px auto;
+  }
+
+  /* 特徵 radio 外層只保留間距；radio 樣式交給 RadioGroup 組件 */
+  .feature-tabs {
+    margin: 20px auto;
+  }
+
+  .column-selectors {
+    display: flex;
+    gap: 16px;
+    margin: 10px auto 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 600px;
+  }
+
+  .selector-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 150px;
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dark);
+      text-align: center;
+    }
+
+    select {
+      padding: 10px 12px;
+      border: 1px solid var(--border-gray-light);
+      border-radius: var(--radius-md);
+      background: var(--glass-light2);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: var(--color-primary);
+        background: var(--glass-medium2);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+      }
+    }
   }
 
   .load-btn {
-    font-size: 14px;
+    padding: 12px 24px;
+    max-width: 100px;
+    white-space: nowrap;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+    color: var(--text-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px var(--color-primary-shadow), 0 2px 4px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--color-primary-hover) 0%, #004ba0 100%);
+      box-shadow: 0 6px 16px var(--color-primary-shadow-light), 0 3px 6px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      background: var(--bg-hover-medium);
+      color: var(--text-secondary);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  }
+
+  .loading,
+  .error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    gap: 15px;
+  }
+
+  .loading {
+    p {
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+  }
+
+  .error {
+    p {
+      color: var(--color-error);
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+
+  .retry-btn {
     padding: 10px 20px;
+    background: var(--color-primary);
+    color: var(--text-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+
+    &:hover {
+      background: var(--color-primary-hover);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-1px);
+    }
+  }
+
+  .matrix-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 16px;
+  }
+
+  /* 移动端适配 */
+  @media (max-aspect-ratio: 1/1) {
+    .page-title {
+      font-size: 24px;
+    }
+
+    .input-section {
+      max-width: 100%;
+    }
+
+    .load-btn {
+      font-size: 14px;
+      padding: 10px 20px;
+    }
   }
 }
 </style>
