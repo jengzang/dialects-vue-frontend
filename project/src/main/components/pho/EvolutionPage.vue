@@ -100,6 +100,10 @@
       >
         {{ feature }} ({{ pieCountByFeature[feature] || 0 }})
       </button>
+
+      <div v-if="currentDataLocationName" class="feature-tabs-location">
+        📍 {{ currentDataLocationName }}
+      </div>
     </div>
 
     <!-- 加载状态 -->
@@ -251,7 +255,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
@@ -268,7 +272,80 @@ import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from './evolu
 
 const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const MOBILE_LAYOUT_MEDIA_QUERY = '(max-aspect-ratio: 1/1)'
+
+const encodeLocationForQuery = (location) => {
+  const bytes = new TextEncoder().encode(String(location || ''))
+  let binary = ''
+
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte)
+  })
+
+  return btoa(binary)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/g, '')
+}
+
+const decodeLocationFromQuery = (value) => {
+  const raw = String(value || '')
+  if (!raw) return ''
+
+  // 新格式：base64url，避免 URL 出现中文，也避免 % 被二次编码成 %25
+  try {
+    const base64 = raw
+      .replace(/-/g, '+')
+      .replace(/_/g, '/')
+      .padEnd(Math.ceil(raw.length / 4) * 4, '=')
+
+    const binary = atob(base64)
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))
+    const decoded = new TextDecoder().decode(bytes)
+
+    if (decoded) return decoded
+  } catch {
+    // ignore
+  }
+
+  // 兼容旧 URL：?loc=%E6%9D%B1... 或 ?loc=東莞
+  try {
+    return decodeURIComponent(raw)
+  } catch {
+    return raw
+  }
+}
+
+const parseLocationQuery = (value = route.query.loc) => {
+  const locations = Array.isArray(value) ? value : value ? [value] : []
+
+  return locations
+    .map((location) => decodeLocationFromQuery(location))
+    .filter(Boolean)
+}
+
+const getFirstUrlLocation = (value = route.query.loc) => {
+  return parseLocationQuery(value).slice(0, 1)
+}
+
+const isSameLocationList = (a = [], b = []) => {
+  return JSON.stringify(a) === JSON.stringify(b)
+}
+
+const updateLocationQuery = () => {
+  const query = { ...route.query }
+
+  if (matchedLocations.value.length > 0) {
+    query.loc = matchedLocations.value
+      .slice(0, 1)
+      .map((location) => encodeLocationForQuery(location))
+  } else {
+    delete query.loc
+  }
+
+  router.replace({ query })
+}
 
 // ========== 响应式数据 ==========
 // 查询参数
@@ -276,7 +353,7 @@ const queryMode = ref('by_value')
 const selectedTable = ref('characters')
 const level1Column = ref('')
 const level2Column = ref('')
-const selectedLocations = ref([])
+const selectedLocations = ref(getFirstUrlLocation())
 const matchedLocations = ref([])
 const showSankey = ref(false)
 const optimizeSankeyLayout = ref(false)
@@ -350,6 +427,11 @@ const pieCountByFeature = computed(() => {
     韻母: rawData.value.data.韻母?.length || 0,
     聲調: rawData.value.data.聲調?.length || 0
   }
+})
+
+const currentDataLocationName = computed(() => {
+  const locations = Array.isArray(rawData.value?.locations) ? rawData.value.locations : []
+  return locations[0] || ''
 })
 
 const showMobilePieDetailCard = computed(() => {
@@ -431,16 +513,19 @@ const loadDemoData = async (mode) => {
 
 const getDemoData = async () => loadDemoData(queryMode.value)
 
-const syncControlsFromData = (data) => {
-  selectedLocations.value = Array.isArray(data.locations) ? [...data.locations] : []
-  matchedLocations.value = Array.isArray(data.locations) ? [...data.locations] : []
+const syncControlsFromData = (data, { syncLocations = true } = {}) => {
+  if (syncLocations) {
+    selectedLocations.value = Array.isArray(data.locations) ? [...data.locations] : []
+    matchedLocations.value = Array.isArray(data.locations) ? [...data.locations] : []
+  }
+
   selectedTable.value = data.table_name || 'characters'
   level1Column.value = data.level1_column || ''
   level2Column.value = data.level2_column || ''
 }
 
 const handleMatchedLocations = (locations) => {
-  matchedLocations.value = locations
+  matchedLocations.value = Array.isArray(locations) ? locations.slice(0, 1) : []
 }
 
 const handleIsMatching = (matching) => {
@@ -455,7 +540,9 @@ const getInitialFeature = (data) => {
 const applyDemoData = async () => {
   const demoData = await getDemoData()
   closeMobilePieDetail()
-  syncControlsFromData(demoData)
+  syncControlsFromData(demoData, {
+    syncLocations: parseLocationQuery().length === 0
+  })
   currentFeature.value = getInitialFeature(demoData)
   rawData.value = demoData
   errorMessage.value = ''
@@ -510,6 +597,7 @@ const handleQuery = async () => {
     hasQueriedRealData.value = true
     closeMobilePieDetail()
     currentFeature.value = getInitialFeature(response)
+    updateLocationQuery()
     shouldRefreshVisualization = true
   } catch (error) {
     errorMessage.value = error.message || t('phonology.phonology.evolution.errors.queryFailed')
@@ -1288,6 +1376,31 @@ watch(queryMode, async () => {
 
   await applyDemoData()
 })
+
+watch(
+  () => route.query.loc,
+  async (value) => {
+    const urlLocations = parseLocationQuery(value)
+
+    if (isSameLocationList(urlLocations, selectedLocations.value)) {
+      return
+    }
+
+    selectedLocations.value = [...urlLocations]
+    errorMessage.value = ''
+    closeMobilePieDetail()
+
+    if (urlLocations.length === 0) {
+      matchedLocations.value = []
+    }
+
+    if (hasQueriedRealData.value) {
+      hasQueriedRealData.value = false
+      rawData.value = null
+      await applyDemoData()
+    }
+  }
+)
 
 onMounted(async () => {
   updateMobileLayout()
