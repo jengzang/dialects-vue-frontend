@@ -59,9 +59,9 @@
             <h3 class="tutorial-experience__title">
               {{ t(currentDiceEntry.titleKey) }}
             </h3>
-            <p class="tutorial-experience__description">
+            <!-- <p class="tutorial-experience__description">
               {{ t(currentDiceEntry.descriptionKey) }}
-            </p>
+            </p> -->
           </div>
 
           <button
@@ -788,7 +788,7 @@ defineExpose({
   }
 
   .tutorial-experience {
-    flex-direction: column;
+    // flex-direction: column;
     align-items: stretch;
     gap: 9px;
     padding: 10px;
@@ -805,10 +805,6 @@ defineExpose({
     overflow: hidden;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-  }
-
-  .tutorial-experience__button {
-    width: 100%;
   }
 }
 

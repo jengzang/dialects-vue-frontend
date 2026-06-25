@@ -7,7 +7,9 @@
   >
     <TutorialDiceTrigger
       :entry="currentMatchedEntry"
+      :has-dice-config="Boolean(currentDiceEntry)"
       @open="openGuide"
+      @apply-dice="applyDiceConfig"
     />
 
     <TutorialGuideModal
@@ -260,6 +262,10 @@ function applyDiceConfig() {
     currentDiceEntry.value.target,
     currentDiceEntry.value.createPayload({ route })
   )
+
+  // 从弹窗内点击 tutorial-experience__button 后，自动关闭弹窗；
+  // 从外部骰子点击时，isOpen 本来就是 false，不会有副作用。
+  isOpen.value = false
 }
 
 watch(currentMatchedEntry, (entry) => {

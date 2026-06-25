@@ -1,36 +1,65 @@
 <template>
-  <button
-    type="button"
+  <div
     class="tutorial-trigger"
-    :title="t('tutorial.ui.openLabel', { title: entry.title })"
-    :aria-label="t('tutorial.ui.openLabel', { title: entry.title })"
+    :class="{
+      'has-dice': hasDiceConfig,
+      'is-text-only': !hasDiceConfig
+    }"
     data-tutorial-trigger
-    @click="$emit('open')"
   >
-    <span class="tutorial-trigger__orb" aria-hidden="true">
-      <span class="tutorial-trigger__dice">🎲</span>
-    </span>
+    <button
+      v-if="hasDiceConfig"
+      type="button"
+      class="tutorial-trigger__orb"
+      :title="diceTitle"
+      :aria-label="diceTitle"
+      @click="$emit('applyDice')"
+    >
+      <span
+        class="tutorial-trigger__dice"
+        aria-hidden="true"
+      >
+        🎲
+      </span>
+    </button>
 
-    <span class="tutorial-trigger__copy">
-      <span class="tutorial-trigger__eyebrow">{{ t('tutorial.assist.badge') }}</span>
-      <span class="tutorial-trigger__label">{{ t('tutorial.ui.triggerLabel') }}</span>
-    </span>
-  </button>
+    <button
+      type="button"
+      class="tutorial-trigger__main"
+      :title="t('tutorial.ui.openLabel', { title: entry.title })"
+      :aria-label="t('tutorial.ui.openLabel', { title: entry.title })"
+      @click="$emit('open')"
+    >
+      <span class="tutorial-trigger__copy">
+        <span class="tutorial-trigger__eyebrow">{{ t('tutorial.assist.badge') }}</span>
+        <span class="tutorial-trigger__label">{{ t('tutorial.ui.triggerLabel') }}</span>
+      </span>
+    </button>
+  </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-defineProps({
+const props = defineProps({
   entry: {
     type: Object,
     required: true,
   },
+  hasDiceConfig: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-defineEmits(['open'])
+defineEmits(['open', 'applyDice'])
 
 const { t } = useI18n()
+
+const diceTitle = computed(() => {
+  return t('tutorial.assist.badge')
+})
 </script>
 
 <style lang="scss" scoped>
@@ -38,24 +67,24 @@ const { t } = useI18n()
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  min-height: 58px;
-  padding: 10px 16px 10px 10px;
+  gap: 8px;
+  max-width: calc(100dvw - 32px);
+  min-height: 46px;
+  padding: 6px 12px 6px 9px;
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 999px;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(226, 241, 255, 0.54)),
-    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.96), transparent 42%);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(226, 241, 255, 0.46)),
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.92), transparent 40%);
   box-shadow:
-    0 18px 44px rgba(34, 109, 192, 0.24),
-    0 4px 14px rgba(64, 125, 190, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 12px 30px rgba(34, 109, 192, 0.2),
+    0 3px 10px rgba(64, 125, 190, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
     inset 0 -1px 0 rgba(91, 139, 186, 0.08);
   color: var(--color-blue-dark);
-  cursor: pointer;
   overflow: hidden;
-  backdrop-filter: blur(22px) saturate(170%);
-  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  backdrop-filter: blur(20px) saturate(165%);
+  -webkit-backdrop-filter: blur(20px) saturate(165%);
   transition:
     transform 0.22s ease,
     box-shadow 0.22s ease,
@@ -67,107 +96,157 @@ const { t } = useI18n()
     inset: 1px;
     border-radius: inherit;
     pointer-events: none;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.58), transparent 44%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.52), transparent 44%);
   }
 
   &:hover {
-    transform: translateY(-2px) scale(1.01);
-    border-color: rgba(255, 255, 255, 0.92);
+    transform: translateY(-1px) scale(1.01);
+    border-color: rgba(255, 255, 255, 0.9);
     box-shadow:
-      0 22px 52px rgba(34, 109, 192, 0.3),
-      0 8px 20px rgba(64, 125, 190, 0.18),
-      inset 0 1px 0 rgba(255, 255, 255, 0.94);
+      0 16px 36px rgba(34, 109, 192, 0.25),
+      0 6px 16px rgba(64, 125, 190, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.92);
   }
+}
 
-  &:active {
-    transform: translateY(0) scale(0.98);
-  }
-
-  &:focus-visible {
-    outline: 3px solid rgba(79, 154, 255, 0.34);
-    outline-offset: 3px;
-  }
+.tutorial-trigger__orb,
+.tutorial-trigger__main {
+  position: relative;
+  z-index: 1;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
 }
 
 .tutorial-trigger__orb {
-  position: relative;
-  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.2) 30%, transparent 34%),
-    linear-gradient(145deg, rgba(112, 181, 255, 0.98), rgba(45, 128, 224, 0.98));
-  box-shadow:
-    0 12px 26px rgba(55, 132, 221, 0.38),
-    inset 0 1px 0 rgba(255, 255, 255, 0.76),
-    inset 0 -8px 18px rgba(0, 65, 140, 0.18);
+  box-shadow: none;
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease;
+
+  &:hover {
+    transform: rotate(-10deg) scale(1.12);
+    filter: drop-shadow(0 5px 10px rgba(42, 120, 216, 0.22));
+  }
+
+  &:active {
+    transform: scale(0.94);
+  }
 }
 
 .tutorial-trigger__dice {
-  font-size: 1.38rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 56, 120, 0.22));
+  font-size: 1.82rem;
+  line-height: 1;
+  filter:
+    drop-shadow(0 2px 3px rgba(0, 56, 120, 0.18))
+    drop-shadow(0 8px 12px rgba(42, 120, 216, 0.16));
+}
+
+.tutorial-trigger__main {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  text-align: left;
 }
 
 .tutorial-trigger__copy {
-  position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: 1px;
   min-width: 0;
 }
 
 .tutorial-trigger__eyebrow {
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   color: var(--text-secondary);
   letter-spacing: 0.06em;
 }
 
 .tutorial-trigger__label {
-  font-size: 0.96rem;
+  max-width: 7em;
+  font-size: 0.86rem;
   font-weight: 800;
   color: var(--color-blue-dark);
   letter-spacing: 0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-@media (max-width: 560px) {
+.tutorial-trigger__orb:focus-visible,
+.tutorial-trigger__main:focus-visible {
+  outline: 3px solid rgba(79, 154, 255, 0.34);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+/* 竖屏 / 接近竖屏：宽高比 <= 1，统一隐藏骰子，只保留打开教程入口 */
+@media (max-aspect-ratio: 1/1) {
   .tutorial-trigger {
-    min-height: 54px;
-    padding: 8px;
+    gap: 0;
+    min-height: 42px;
+    padding: 7px 12px;
   }
 
-  .tutorial-trigger__copy {
+  .tutorial-trigger__orb {
     display: none;
   }
 
-  .tutorial-trigger__orb {
-    width: 44px;
-    height: 44px;
-  }
-}
-
-@media (max-width: 900px) and (orientation: landscape) {
-  .tutorial-trigger {
-    min-height: 48px;
-    padding: 6px 12px 6px 6px;
+  .tutorial-trigger__main {
+    display: inline-flex;
+    min-width: 0;
   }
 
-  .tutorial-trigger__orb {
-    width: 38px;
-    height: 38px;
-  }
-
-  .tutorial-trigger__dice {
-    font-size: 1.12rem;
+  .tutorial-trigger__eyebrow {
+    display: none;
   }
 
   .tutorial-trigger__label {
-    font-size: 0.88rem;
+    max-width: 7em;
+    font-size: 0.8rem;
+    line-height: 1.1;
+  }
+}
+
+/* 横屏低高度：宽高比 >= 1，且高度较矮 */
+@media (min-aspect-ratio: 1/1) and (max-height: 560px) {
+  .tutorial-trigger {
+    gap: 6px;
+    min-height: 38px;
+    padding: 4px 10px 4px 7px;
+  }
+
+  .tutorial-trigger.is-text-only {
+    padding: 6px 12px;
+  }
+
+  .tutorial-trigger__orb {
+    width: 30px;
+    height: 30px;
+  }
+
+  .tutorial-trigger__dice {
+    font-size: 1.54rem;
+  }
+
+  .tutorial-trigger__eyebrow {
+    display: none;
+  }
+
+  .tutorial-trigger__label {
+    max-width: 6em;
+    font-size: 0.78rem;
+    line-height: 1.1;
   }
 }
 </style>

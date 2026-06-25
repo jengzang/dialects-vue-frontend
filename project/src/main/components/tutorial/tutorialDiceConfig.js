@@ -13,7 +13,7 @@ function createQueryTab2Payload() {
     card: '韻母',
     keys: ['攝'],
     valuesMap: {
-      攝: ['通攝'],
+      攝: ['通'],
     },
     loc: createLocation(['廣州'], ['廣府片'], 'yindian'),
   }
