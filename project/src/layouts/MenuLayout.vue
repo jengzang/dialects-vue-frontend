@@ -2,30 +2,34 @@
 <template>
   <div class="menu-bg">
     <NavBar />
-<!--    <FloatingHeader v-if="shouldShowHeader" />-->
-      <!-- 內容區：注意底部留白避免被 tab 擋住 -->
-      <div class="glass-content">
-        <router-view v-slot="{ Component }">
-          <transition name="fade" mode="out-in">
-            <KeepAlive :include="keepAliveViewNames">
-              <component :is="Component" />
-            </KeepAlive>
-          </transition>
-        </router-view>
-      </div>
-<!--    <MenuTabs />-->
-<!--    <TabControls />-->
+    <!--    <FloatingHeader v-if="shouldShowHeader" />-->
+    <!-- 內容區：注意底部留白避免被 tab 擋住 -->
+    <div class="glass-content">
+      <router-view v-slot="{ Component }">
+        <transition
+          name="fade"
+          mode="out-in"
+        >
+          <KeepAlive :include="keepAliveViewNames">
+            <component :is="Component" />
+          </KeepAlive>
+        </transition>
+      </router-view>
+    </div>
+    <PageTutorialGuide />
+    <!--    <MenuTabs />-->
+    <!--    <TabControls />-->
   </div>
 </template>
 
 <script setup>
-import { KeepAlive } from 'vue'
 // import MenuTabs from '@/components/MenuTabs.vue'
 // import TabControls from "@/components/TabControls.vue";
 // import FloatingHeader from '@/components/FloatingHeader.vue'
 // import { useRoute } from 'vue-router'
 // import { computed } from 'vue'
 import NavBar from "@/components/bar/NavBar.vue";
+import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 
 const keepAliveViewNames = [
   'AboutPage',

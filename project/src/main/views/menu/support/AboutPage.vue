@@ -204,6 +204,22 @@
             width="100%"
           />
         </div>
+
+        <div class="setting-section tutorial-toggle-section">
+          <div class="tutorial-toggle-copy">
+            <h3 class="section-title">新手指导</h3>
+            <p class="section-description">控制教程入口与随机示例按钮是否显示，默认开启。</p>
+          </div>
+          <button
+            type="button"
+            class="tutorial-toggle-button"
+            :class="{ active: tutorialGuideEnabled }"
+            @click="tutorialGuideEnabled = !tutorialGuideEnabled"
+          >
+            <span class="tutorial-toggle-button__thumb"></span>
+            <span class="tutorial-toggle-button__label">{{ tutorialGuideEnabled ? '已开启' : '已关闭' }}</span>
+          </button>
+        </div>
       </div>
     </template>
   </TabsContainer>
@@ -226,7 +242,12 @@ import SupportPopup from '@/main/components/popup/SupportPopup.vue'
 import TabsContainer from '@/components/common/TabsContainer.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
-import { preferredCharacterTable, setPreferredCharacterTable } from '@/main/store/store.js'
+import {
+  preferredCharacterTable,
+  setPreferredCharacterTable,
+  tutorialEnabled,
+  setTutorialEnabled,
+} from '@/main/store/store.js'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -306,6 +327,11 @@ const currentCharacterTable = computed({
   set: (tableName) => setPreferredCharacterTable(tableName)
 })
 
+const tutorialGuideEnabled = computed({
+  get: () => tutorialEnabled.value,
+  set: (value) => setTutorialEnabled(value)
+})
+
 function changeLanguage(newLocale) {
   if (newLocale === currentLocale.value) {
     return
@@ -331,6 +357,69 @@ function resolveTabRoute(tabName) {
 }
 
 /* === 內容區塊 === */
+.tutorial-toggle-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.tutorial-toggle-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tutorial-toggle-button {
+  position: relative;
+  min-width: 126px;
+  height: 50px;
+  border: none;
+  border-radius: 999px;
+  padding: 0 18px 0 56px;
+  background: rgba(151, 174, 198, 0.3);
+  color: #476784;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.22s ease, color 0.22s ease;
+}
+
+.tutorial-toggle-button.active {
+  background: linear-gradient(180deg, #68aaf6, #4f92ea);
+  color: #fff;
+}
+
+.tutorial-toggle-button__thumb {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 6px 14px rgba(38, 88, 137, 0.18);
+  transition: transform 0.22s ease;
+}
+
+.tutorial-toggle-button.active .tutorial-toggle-button__thumb {
+  transform: translateX(70px);
+}
+
+.tutorial-toggle-button__label {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .tutorial-toggle-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tutorial-toggle-button {
+    width: 100%;
+  }
+}
+
 .page2 {
   padding: 1dvw 8dvw;
   font-size: 18px;

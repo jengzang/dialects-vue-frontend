@@ -6,19 +6,23 @@
     <!-- 内容区域 (与 SimpleLayout 保持一致) -->
     <div class="content-area">
       <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
+        <transition
+          name="fade"
+          mode="out-in"
+        >
           <KeepAlive :include="keepAliveViewNames">
             <component :is="Component" />
           </KeepAlive>
         </transition>
       </router-view>
     </div>
+    <PageTutorialGuide />
   </div>
 </template>
 
 <script setup>
-import { KeepAlive } from 'vue'
 import ExploreBar from '@/components/bar/ExploreBar.vue'
+import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 
 const keepAliveViewNames = [
   'CharacterClassification',

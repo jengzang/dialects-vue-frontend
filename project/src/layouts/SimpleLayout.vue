@@ -4,7 +4,10 @@
     <!-- 内容区域 -->
     <div class="content-area">
       <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
+        <transition
+          name="fade"
+          mode="out-in"
+        >
           <component :is="Component" />
         </transition>
       </router-view>
@@ -21,18 +24,26 @@
       :is-open="isSidebarOpen"
       @close="isSidebarOpen = false"
     />
+
+    <PageTutorialGuide
+      v-if="showTutorialGuide"
+      bottom-offset="112px"
+      mobile-bottom-offset="82px"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import FloatingButtons from '@/components/bar/FloatingButtons.vue';
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue';
+import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 
 const route = useRoute();
 const isSidebarOpen = ref(false);
 const authButtonPosition = ref('top-right');
+const showTutorialGuide = computed(() => route.path === '/explore/tools/praat')
 
 // 根据路由自动设置 auth-button 位置
 watch(() => route.path, (newPath) => {
