@@ -11,35 +11,28 @@
         </div>
 
         <div
-          v-if="isMiddleChineseMode && hasCustomData"
+          v-if="isMiddleChineseMode && hasCustomData && mapStore.mapData"
           id="custom-switch-container"
           class="custom-switch-container1"
-          @click="toggleCustomSwitch"
         >
-          <span class="switch-label-text">{{ t('map.mapLibre.controls.personalData') }}</span>
-          <div class="map-custom-switch custom-switch-base main-glow-switch" :class="{ open: mapStore.showCustomData }" id="custom-toggle">
-            <span class="map-custom-slider custom-switch-slider-base">
-              <span id="switch-text" class="map-switch-text main-glow-switch-text">
-                {{ mapStore.showCustomData ? t('map.mapLibre.controls.show') : t('map.mapLibre.controls.hide') }}
-              </span>
-            </span>
-          </div>
+          <Checkbox
+            :model-value="mapStore.showCustomData"
+            :label="t('map.mapLibre.controls.personalData')"
+            :font-size="14"
+            @change="toggleCustomSwitch"
+          />
         </div>
 
         <div
           id="base-switch-container"
           class="custom-switch-container1"
-          @click="toggleBaseMode"
         >
-          <span class="switch-label-text">{{ t('map.mapLibre.controls.viewPlaceNames') }}</span>
-
-          <div class="map-custom-switch custom-switch-base main-glow-switch" :class="{ open: isBaseModeActive }" id="base-toggle">
-            <span class="map-custom-slider custom-switch-slider-base">
-              <span class="map-switch-text main-glow-switch-text">
-                {{ isBaseModeActive ? t('map.mapLibre.controls.enabled') : t('map.mapLibre.controls.disabled') }}
-              </span>
-            </span>
-          </div>
+          <Checkbox
+            :model-value="isBaseModeActive"
+            :label="t('map.mapLibre.controls.viewPlaceNames')"
+            :font-size="14"
+            @change="() => toggleBaseMode()"
+          />
         </div>
         <div class="button-row">
           <button class="action-btn" @click="resetView">🎯 {{ t('map.mapLibre.buttons.reset') }}</button>
@@ -140,6 +133,7 @@ import { getLocationDetail } from '@/api'
 import { deleteCustomForm } from '@/api'
 import { refreshCurrentCustomLayer } from '@/utils/map/MapData.js';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import Checkbox from '@/components/selector/Checkbox.vue'
 import MapLegend from './MapLegend.vue'
 import CompareMapPopup from '../popup/map/CompareMapPopup.vue'
 import FeatureMapPopup from '../popup/map/FeatureMapPopup.vue'
@@ -195,12 +189,34 @@ const checkWindowMode = () => {
   isMiddleChineseMode.value = (resultCache && resultCache.mode === '查中古');
 };
 // 3. 切換開關邏輯
-const toggleCustomSwitch = () => {
+const toggleCustomSwitch = async () => {
   if (userStore.role === 'anonymous') {
     showWarning(t('map.mapLibre.messages.anonymousNoCustomData'));
     return;
   }
-  mapStore.showCustomData = !mapStore.showCustomData;
+
+  const nextShowCustomData = !mapStore.showCustomData;
+
+  // 关闭时不需要重新请求，直接隐藏即可
+  if (!nextShowCustomData) {
+    mapStore.showCustomData = false;
+    return;
+  }
+
+  try {
+    loading.value = true;
+
+    // 打开个人数据前，重新请求一次 customData 后端
+    await refreshCurrentCustomLayer();
+
+    // 请求完成后再打开显示
+    mapStore.showCustomData = true;
+  } catch (error) {
+    console.error('刷新自定义数据失败:', error);
+    showError(t('map.mapLibre.messages.queryLocationFailed', { error: error.message }));
+  } finally {
+    loading.value = false;
+  }
 };
 const lastNonBaseMode = ref('feature');
 // 只要當前 store 是 base 模式，開關就是開的
@@ -351,23 +367,22 @@ const prevMapData = ref(null);
 const prevMergedData = ref(null);
 
 watch(
-    // 監聽源改成 store 裡的數據
+  // 監聽源改成 store 裡的數據
     [() => mapStore.mapData, () => mapStore.mergedData, () => mapStore.mode, () => props.activeFeature],
     ([newMapData, newMergedData, newMode]) => {
       // 判斷是否只是模式切換（數據沒變）
-      const isOnlyModeChange =
-        prevMapData.value === newMapData &&
-        prevMergedData.value === newMergedData;
+      const shouldResetView = prevMapData.value !== newMapData;
 
       // 更新追蹤值
       prevMapData.value = newMapData;
       prevMergedData.value = newMergedData;
 
       // 渲染地圖，傳入是否需要重置視角的標誌
-      renderMapContent(!isOnlyModeChange);
+      renderMapContent(shouldResetView);
     },
     { deep: true }
 );
+
 watch(() => mapStore.showCustomData, () => {
   renderMapContent(false); // 切換自定義數據顯示時不重置視角
 });
@@ -377,12 +392,16 @@ watch(() => resultCache.mode, () => {
   checkWindowMode();
 }, { immediate: true });
 
-// // 監聽 hasCustomData 變化（用於調試）
-// watch(hasCustomData, (newVal) => {
-//   console.log('📊 hasCustomData 變化:', newVal);
-//   console.log('📌 isMiddleChineseMode:', isMiddleChineseMode.value);
-//   console.log('📌 resultCache.mode:', resultCache.mode);
-// });
+watch(
+  () => mapStore.fitViewKey,
+  async (key) => {
+    if (!key) return;
+    await nextTick();
+    resetView();
+  },
+  { flush: 'post' }
+);
+
 
 // 2. 監聽 store 的模式變化，自動記錄歷史
 watch(
@@ -436,13 +455,23 @@ const renderMapContent = async (shouldResetView = true) => {
   if (shouldResetView) {
     let centerCoord = null;
     let zoomLevel = 8;
+    // feature 模式优先使用 mergedData 里的中心层级
+    if (mapStore.mode === 'feature' && mapStore.mergedData && mapStore.mergedData.length > 0) {
+      const firstItem = mapStore.mergedData[0];
+      // console.log('Checking mergedData for center and zoom:', firstItem);
 
-    // 优先使用 mapStore.mapData（基础地图数据）
-    if (mapStore.mapData && mapStore.mapData.center_coordinate) {
+      if (firstItem.centerCoordinate) {
+        centerCoord = firstItem.centerCoordinate;
+        zoomLevel = firstItem.zoomLevel || 8;
+        // console.log('Using center and zoom from mergedData:', centerCoord, zoomLevel);
+      }
+    }
+    // 其他模式继续使用 mapData
+    else if (mapStore.mapData && mapStore.mapData.center_coordinate) {
       centerCoord = mapStore.mapData.center_coordinate;
       zoomLevel = mapStore.mapData.zoom_level || 8;
+      // console.log('Using center and zoom from mapData:', centerCoord, zoomLevel);
     }
-    // 如果没有 mapData，或者在 feature 模式且有 mergedData，则从 mergedData 中提取
     else if (mapStore.mergedData && mapStore.mergedData.length > 0) {
       const firstItem = mapStore.mergedData[0];
       if (firstItem.centerCoordinate) {
@@ -755,7 +784,7 @@ const handleCustomBtnClick = async (item) => {
 
         try {
           await refreshCurrentCustomLayer()
-          console.log('Custom data refreshed after delete')
+          // console.log('Custom data refreshed after delete')
         } catch (error) {
           console.error('Failed to refresh data after delete:', error)
         }
@@ -903,8 +932,14 @@ const resetView = () => {
 
   let points = [];
 
+  // compare 模式优先按当前比较结果坐标复位，避免退回到 mapData 全量范围
+  if ((mapStore.mode === 'compare' || mapStore.mode === 'feature') && mapStore.mergedData && mapStore.mergedData.length > 0) {
+    points = mapStore.mergedData
+      .map(item => item.coordinate)
+      .filter(isValidCoordinatePair);
+  }
   // 1. 优先从 mapStore.mapData 提取坐标（基础地图数据）
-  if (mapStore.mapData && mapStore.mapData.coordinates_locations) {
+  else if (mapStore.mapData && mapStore.mapData.coordinates_locations) {
     points = mapStore.mapData.coordinates_locations
       .map(item => item[1])
       .filter(isValidCoordinatePair);
@@ -1139,39 +1174,6 @@ const resetView = () => {
   display: block;
 }
 
-/* 自定義 Select */
-.custom-select {
-  position: relative;
-  width: 100%;
-}
-
-.custom-select select {
-  width: 100%;
-  appearance: none;
-  background: white;
-  border: 1px solid #ddd;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  outline: none;
-  transition: border 0.3s;
-}
-
-.custom-select select:focus {
-  border-color: #007aff;
-}
-
-.custom-select .arrow {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  font-size: 12px;
-  color: #888;
-}
-
 /* ✨ 新增：按鈕並排容器 */
 .button-row {
   display: flex;
@@ -1231,24 +1233,6 @@ const resetView = () => {
   align-items: center;
   gap: 12px;
   position: relative;
-}
-
-.switch-label-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-}
-
-.map-custom-switch {
-  cursor: pointer;
-}
-
-.map-custom-switch:hover {
-  transform: scale(1.1);
-}
-
-.map-custom-switch.open:hover {
-  transform: scale(1.1);
 }
 
 /* 地名點擊彈窗樣式 */

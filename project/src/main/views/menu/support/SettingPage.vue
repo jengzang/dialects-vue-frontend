@@ -1,29 +1,51 @@
 <template>
   <div class="page-root">
-    <!-- <h2 class="tabs-title">⚙️ {{ $t('navigation.tabs.settings') }}</h2> -->
-
     <div class="settings-container">
-      <!-- 语言设置区域 -->
-      <div class="setting-section">
-        <h3 class="section-title">🌐 {{ $t('navigation.settings.language.title') }}</h3>
-        <p class="section-description">{{ $t('navigation.settings.language.description') }}</p>
+      <div class="setting-grid">
+        <div class="setting-section">
+          <h3 class="section-title">🌐 {{ $t('navigation.settings.language.title') }}</h3>
+          <p class="section-description">{{ $t('navigation.settings.language.description') }}</p>
 
-        <div class="language-options">
-          <div
-            v-for="lang in languages"
-            :key="lang.code"
-            class="language-card"
-            :class="{ active: currentLocale === lang.code }"
-            @click="changeLanguage(lang.code)"
-          >
-            <div class="language-flag">{{ lang.flag }}</div>
-            <div class="language-info">
-              <div class="language-name">{{ lang.name }}</div>
-              <div class="language-code">{{ lang.code }}</div>
+          <div class="language-options">
+            <div
+              v-for="lang in languages"
+              :key="lang.code"
+              class="language-card"
+              :class="{ active: currentLocale === lang.code }"
+              @click="changeLanguage(lang.code)"
+            >
+              <div class="language-flag">{{ lang.flag }}</div>
+              <div class="language-info">
+                <div class="language-name">{{ lang.name }}</div>
+                <div class="language-code">{{ lang.code }}</div>
+              </div>
+              <div v-if="currentLocale === lang.code" class="language-check">
+                ✓
+              </div>
             </div>
-            <div class="language-check" v-if="currentLocale === lang.code">
-              ✓
-            </div>
+          </div>
+        </div>
+
+        <div class="setting-section">
+          <h3 class="section-title">⚡ {{ $t('navigation.settings.interfaceMode.title') }}</h3>
+          <p class="section-description">{{ $t('navigation.settings.interfaceMode.description') }}</p>
+
+          <div class="mode-group" role="radiogroup" :aria-label="$t('navigation.settings.interfaceMode.label')">
+            <button
+              v-for="option in interfaceModeOptions"
+              :key="option.value"
+              type="button"
+              class="mode-option"
+              :class="{ active: interfaceMode === option.value }"
+              :aria-pressed="interfaceMode === option.value"
+              @click="changeInterfaceMode(option.value)"
+            >
+              <div class="mode-option-header">
+                <span class="mode-option-label">{{ option.label }}</span>
+                <span v-if="interfaceMode === option.value" class="mode-option-check">✓</span>
+              </div>
+              <div class="mode-option-description">{{ option.description }}</div>
+            </button>
           </div>
         </div>
       </div>
@@ -36,23 +58,39 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { setLocale } from '@/i18n/index.js'
 import { SUPPORTED_LOCALES } from '@/i18n/localeDetector.js'
+import {
+  UI_MODE_DEFAULT,
+  UI_MODE_COMPACT,
+  getStoredInterfaceMode,
+  setInterfaceMode,
+} from '@/composables/core/uiPreferences.js'
 import { showSuccess } from '@/utils/message.js'
 
 const { locale, t } = useI18n()
 
-// 当前语言
 const currentLocale = computed(() => locale.value)
 
-// 语言列表
 const languages = ref([
   SUPPORTED_LOCALES['zh-Hant'],
   SUPPORTED_LOCALES['zh-CN'],
-  SUPPORTED_LOCALES['en']
+  SUPPORTED_LOCALES['en'],
 ])
 
-/**
- * 切换语言
- */
+const interfaceMode = ref(getStoredInterfaceMode())
+
+const interfaceModeOptions = computed(() => [
+  {
+    value: UI_MODE_DEFAULT,
+    label: t('navigation.settings.interfaceMode.options.default'),
+    description: t('navigation.settings.interfaceMode.help.default'),
+  },
+  {
+    value: UI_MODE_COMPACT,
+    label: t('navigation.settings.interfaceMode.options.compact'),
+    description: t('navigation.settings.interfaceMode.help.compact'),
+  },
+])
+
 function changeLanguage(newLocale) {
   if (newLocale === currentLocale.value) {
     return
@@ -62,13 +100,29 @@ function changeLanguage(newLocale) {
   showSuccess(t('messages.success.languageChanged'))
   setTimeout(() => window.location.reload(), 500)
 }
+
+function changeInterfaceMode(mode) {
+  if (mode === interfaceMode.value) {
+    return
+  }
+
+  interfaceMode.value = setInterfaceMode(mode)
+  showSuccess(t('messages.success.interfaceModeChanged'))
+}
 </script>
 
 <style scoped>
 .settings-container {
   padding: 20px;
-  max-width: 800px;
+  max-width: 880px;
   margin: 0 auto;
+}
+
+.setting-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: start;
 }
 
 .setting-section {
@@ -76,7 +130,6 @@ function changeLanguage(newLocale) {
   backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 24px;
-  margin-bottom: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -93,31 +146,42 @@ function changeLanguage(newLocale) {
   margin: 0 0 20px 0;
 }
 
-.language-options {
+.language-options,
+.mode-group {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.language-card {
+.language-card,
+.mode-option {
   display: flex;
   align-items: center;
+  width: 100%;
   padding: 16px;
   background: rgba(255, 255, 255, 0.8);
   border: 2px solid #e0e0e0;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-align: left;
 }
 
-.language-card:hover {
+.mode-option {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.language-card:hover,
+.mode-option:hover {
   background: rgba(255, 255, 255, 1);
   border-color: #007aff;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
 }
 
-.language-card.active {
+.language-card.active,
+.mode-option.active {
   background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(0, 122, 255, 0.05));
   border-color: #007aff;
   box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
@@ -132,25 +196,44 @@ function changeLanguage(newLocale) {
   flex: 1;
 }
 
-.language-name {
+.language-name,
+.mode-option-label {
   font-size: 16px;
   font-weight: 600;
   color: #333;
+}
+
+.language-name {
   margin-bottom: 4px;
 }
 
-.language-code {
+.language-code,
+.mode-option-description {
   font-size: 12px;
   color: #999;
 }
 
-.language-check {
+.language-check,
+.mode-option-check {
   font-size: 24px;
   color: #007aff;
   font-weight: bold;
 }
 
-/* 响应式设计 */
+.mode-option-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.mode-option-description {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
 @media (max-width: 480px) {
   .settings-container {
     padding: 12px;
@@ -165,11 +248,13 @@ function changeLanguage(newLocale) {
     margin-right: 12px;
   }
 
-  .language-name {
+  .language-name,
+  .mode-option-label {
     font-size: 14px;
   }
 
-  .language-code {
+  .language-code,
+  .mode-option-description {
     font-size: 11px;
   }
 }

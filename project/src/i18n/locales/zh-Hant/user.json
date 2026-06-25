@@ -32,7 +32,7 @@
       "queryMiddleChinese": "📜 查中古",
       "queryPhoneme": "🔊 查音位",
       "queryTone": "🎵 查調",
-      "customRegions": "🗺️ 自定分區",
+      "customRegions": "🗂️ 自定分區",
       "locationCombination": "🎯 地位組合",
       "compareChars": "🔤 比較漢字",
       "compareMiddleChinese": "📜 比較中古",
@@ -49,7 +49,10 @@
       "corpusQuery": "🗂️ 語保查詢",
       "guangdongVillages": "🏘️ 廣東村落",
       "machineLearning": "🤖 機器學習",
-      "hourlyApiUsage": "⏳ 每小時 API 調用次數"
+      "hourlyApiUsage": "⏳ 每小時 API 調用次數",
+      "evolution": "🥧 演變分析",
+      "comparePhonetic": "⚖️ 比較音值",
+      "drawMap": "✏️ 地圖繪製"
     },
     "coreFeatures": {
       "phonologyQuery": "音韻查詢",
@@ -259,11 +262,12 @@
           "yinwei": "查音位",
           "diwei": "查地位",
           "combination": "地位組合",
-          "syllable": "查音節",
+          "syllable": "查聲韻調",
           "compareZhonggu": "比較中古"
         },
         "tooltips": {
-          "diwei": "包含彈窗內的細分查詢，以及舊版網站的相關查詢次數。"
+          "diwei": "包含彈窗內的細分查詢，以及舊版網站的相關查詢次數。",
+          "syllable": "包含查中古結果頁面的“統計”查詢以及比較音值的次數"
         }
       },
       "charsTones": {

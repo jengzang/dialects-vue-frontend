@@ -13,7 +13,8 @@ export const MENU_LEGACY_ROUTES = {
     subMap: {
       tab1: '/menu/compare/char',
       tab2: '/menu/compare/zhonggu',
-      tab4: '/menu/compare/tone'
+      tab4: '/menu/compare/tone',
+      tab5: '/menu/compare/phonetic'
     }
   },
   map: {
@@ -21,7 +22,8 @@ export const MENU_LEGACY_ROUTES = {
     subMap: {
       map: '/menu/map/view',
       divide: '/menu/map/divide',
-      custom: '/menu/map/custom'
+      custom: '/menu/map/custom',
+      draw: '/menu/map/draw'
     }
   },
   pho: {
@@ -35,7 +37,7 @@ export const MENU_LEGACY_ROUTES = {
     }
   },
   about: {
-    defaultPath: '/menu/about/intro',
+    defaultPath: '/menu/about/settings',
     subMap: {
       intro: '/menu/about/intro',
       suggestion: '/menu/about/suggestion',

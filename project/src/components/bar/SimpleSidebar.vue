@@ -106,7 +106,7 @@
     <Transition name="submenu-fade">
       <div
         v-if="activeSubmenu"
-        class="submenu-panel main-sidebar-submenu-panel"
+        class="submenu-panel main-submenu-panel"
         :style="{
           top: submenuPosition.top + 'px',
           left: submenuPosition.left + 'px'
@@ -135,13 +135,20 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue'
 import { clearToken, getToken } from '@/api/auth/auth.js'
-import { getTodayVisits, getTotalVisits, getVisitHistory } from '@/api/logs/index.js'
+import { useVisitStats, ensureVisitHistory } from '@/composables/useVisitStats.js'
 import {userStore} from "@/main/store/store.js";
 import { useSidebarConfig } from '@/main/config/index.js';
 import { WEB_BASE } from '@/env-config.js';
 
 const { t } = useI18n();
 const router = useRouter();
+const {
+  todayVisits,
+  totalVisits,
+  visitHistory,
+  loadingVisitHistory: loadingStats,
+  ensureVisitStats
+} = useVisitStats();
 const props = defineProps({
   isOpen: Boolean,
   showTitle: {
@@ -180,11 +187,7 @@ const filteredMenuConfig = computed(() => {
 })
 
 // 访问统计相关
-const todayVisits = ref(0);
-const totalVisits = ref(0);
 const isStatsExpanded = ref(false);
-const visitHistory = ref([]);
-const loadingStats = ref(false);
 
 // 导航方法
 const closeSidebar = () => {
@@ -296,13 +299,7 @@ const closeSubmenu = () => {
 // 获取访问统计数据
 async function fetchVisitStats() {
   try {
-    const [todayData, totalData] = await Promise.all([
-      getTodayVisits(),
-      getTotalVisits()
-    ]);
-
-    todayVisits.value = todayData?.today_visits || 0;
-    totalVisits.value = totalData?.total_visits || 0;
+    await ensureVisitStats();
   } catch (error) {
     console.error('获取访问统计失败:', error);
   }
@@ -324,34 +321,10 @@ function closeStatsPanel() {
 
 // 获取访问历史
 async function fetchVisitHistory() {
-  loadingStats.value = true;
   try {
-    const today = new Date();
-    const startDate = new Date(today);
-    startDate.setDate(today.getDate() - 60);
-    const endDate = today;
-
-    const start_date = startDate.toISOString().split('T')[0];
-    const end_date = endDate.toISOString().split('T')[0];
-
-    const data = await getVisitHistory({ start_date, end_date, limit: 9999 })
-
-    const dateMap = new Map();
-    data?.data?.forEach(item => {
-      const date = item.date;
-      if (!dateMap.has(date)) {
-        dateMap.set(date, 0);
-      }
-      dateMap.set(date, dateMap.get(date) + item.count);
-    });
-
-    visitHistory.value = Array.from(dateMap.entries())
-      .map(([date, count]) => ({ date, count }))
-      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    await ensureVisitHistory();
   } catch (error) {
     console.error('获取访问历史失败:', error);
-  } finally {
-    loadingStats.value = false;
   }
 }
 
@@ -590,6 +563,7 @@ onBeforeUnmount(() => {
   grid-template-columns: 1fr 1fr;
   gap: 15px;
   margin-bottom: 25px;
+  overflow-x:auto;
 }
 
 .stat-card {

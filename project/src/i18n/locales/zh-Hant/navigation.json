@@ -23,7 +23,8 @@
     "compare": {
       "tab1": "漢字對比",
       "tab2": "中古對比",
-      "tab4": "調類對比"
+      "tab4": "調類對比",
+      "tab5": "音值對比"
     },
     "pho": {
       "phonologyMatrix": "音系查詢",
@@ -52,7 +53,8 @@
       "check": "字表工具",
       "jyut2ipa": "粵拼轉IPA",
       "merge": "字表合併",
-      "praat": "聲學分析"
+      "praat": "聲學分析",
+      "praatname": "Praat"
     },
     "source": {
       "source": "字表來源",
@@ -92,9 +94,22 @@
       "title": "語言設置",
       "description": "選擇您偏好的界面語言"
     },
+    "interfaceMode": {
+      "title": "頁面風格",
+      "description": "選擇標準或簡潔界面風格；簡潔模式會關閉動畫、陰影、模糊等視覺效果，以提升低性能設備上的流暢度。",
+      "label": "當前模式",
+      "options": {
+        "default": "標準模式",
+        "compact": "簡潔模式"
+      },
+      "help": {
+        "default": "保留當前動畫與視覺效果。",
+        "compact": "關閉動畫、陰影、模糊等視覺效果，適合低性能設備。"
+      }
+    },
     "characterTable": {
       "title": "字集設置",
-      "description": "選擇新查詢默認使用的字集"
+      "description": "選擇新查詢默認使用的韻書"
     }
   },
   "stats": {

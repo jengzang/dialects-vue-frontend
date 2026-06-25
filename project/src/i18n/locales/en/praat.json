@@ -31,6 +31,7 @@
       "uploading": "Uploading audio...",
       "creatingJob": "Creating analysis job...",
       "startingAnalysis": "Starting analysis...",
+      "fetchingResults": "Fetching analysis results...",
       "reusingUpload": "Reusing existing upload...",
       "retryingUpload": "Cached upload expired, uploading again...",
       "pollingFailed": "Failed to poll job status",

@@ -164,6 +164,20 @@ export function useClusterWorkspace() {
     return Object.entries(clusterResult.value?.metadata || {}).filter(([key]) => key === 'cache_hit' || key === 'cache_source')
   })
 
+  const normalizedAssignments = computed(() => assignments.value.map((assignment, index) => ({
+    ...assignment,
+    _rowKey: `${assignment.location || 'row'}-${assignment.cluster_id ?? 'na'}-${index}`
+  })))
+
+  const resultGroupCards = computed(() => resultGroups.value.map((group, index) => ({
+    key: group.label || group.group_id || `group-${index}`,
+    title: group.label || `Cluster ${group.group_id ?? index + 1}`,
+    clusterId: group.group_id ?? '—',
+    locationCount: Array.isArray(group.locations) ? group.locations.length : (group.location_count ?? '—'),
+    sampleLocations: Array.isArray(group.locations) ? group.locations.slice(0, 8).join('、') : '',
+    raw: group
+  })))
+
   const resultSummaryCards = computed(() => {
     const summary = clusterResult.value?.summary || {}
 
@@ -195,6 +209,26 @@ export function useClusterWorkspace() {
     return workspaceState.clustering.algorithm !== 'dbscan'
   })
 
+
+  const expandedGroupIds = ref([workspaceState.requestDraft.groups[0]?.id].filter(Boolean))
+
+  const groupSummaryItems = computed(() => {
+    return workspaceState.requestDraft.groups.map((group, index) => {
+      const sourceCount = group.source_mode === 'resolved_chars'
+        ? getResolvedChars(group).length
+        : getGroupPathStrings(group).length
+
+      return {
+        id: group.id,
+        index: index + 1,
+        title: group.label?.trim() || t('cluster.input.groupTitle', { index: index + 1 }),
+        sourceModeLabel: t(`cluster.input.${group.source_mode === 'resolved_chars' ? 'resolvedChars' : 'pathStrings'}`),
+        compareDimensionLabel: t(`cluster.dimensions.${group.compare_dimension || 'final'}`),
+        sourceCount
+      }
+    })
+  })
+
   const isPreviewPending = computed(() => workspaceState.activeTask.stage === 'preview' && isTaskBusy(workspaceState.activeTask.status))
   const isPreparePending = computed(() => workspaceState.activeTask.stage === 'prepare' && isTaskBusy(workspaceState.activeTask.status))
   const isDistancePending = computed(() => workspaceState.activeTask.stage === 'distance' && isTaskBusy(workspaceState.activeTask.status))
@@ -208,6 +242,101 @@ export function useClusterWorkspace() {
 
     return workspaceState.activeResultSource === 'jobs' && Boolean(workspaceState.activeTask.taskId)
   })
+
+
+  const activeStepOption = computed(() => {
+    return stepOptions.value.find((step) => step.value === currentStep.value) || stepOptions.value[0]
+  })
+
+  const stepDescriptionMap = computed(() => ({
+    input: t('cluster.input.description'),
+    preview: t('cluster.preview.description'),
+    prepare: t('cluster.prepare.description'),
+    distance: t('cluster.distance.description'),
+    cluster: t('cluster.clustering.description'),
+    result: t('cluster.result.description')
+  }))
+
+  const activeStepDescription = computed(() => {
+    return stepDescriptionMap.value[currentStep.value] || ''
+  })
+
+  const visibleMainPanels = computed(() => ({
+    input: currentStep.value === 'input',
+    workflow: ['preview', 'prepare', 'distance', 'cluster'].includes(currentStep.value),
+    result: currentStep.value === 'result'
+  }))
+
+
+  const stageContextCards = computed(() => ([
+    {
+      key: 'request',
+      label: t('cluster.context.requestScope'),
+      value: t('cluster.context.requestScopeValue', {
+        groups: workspaceState.requestDraft.groups.length,
+        locations: workspaceState.requestDraft.locations.length,
+        regions: workspaceState.requestDraft.regions.length
+      })
+    },
+    {
+      key: 'preview',
+      label: t('cluster.context.prepareHash'),
+      value: workspaceState.prepareHash || '—'
+    },
+    {
+      key: 'distance',
+      label: t('cluster.context.distanceHash'),
+      value: currentDistanceHash.value || '—'
+    },
+    {
+      key: 'result',
+      label: t('cluster.context.resultHash'),
+      value: currentResultHash.value || '—'
+    },
+    {
+      key: 'mode',
+      label: t('cluster.context.phonemeMode'),
+      value: workspaceState.selectedPhonemeMode || '—'
+    },
+    {
+      key: 'source',
+      label: t('cluster.context.resultSource'),
+      value: t(`cluster.task.${workspaceState.activeResultSource || 'staged'}`)
+    }
+  ]))
+
+  const stageProgressItems = computed(() => STEP_ORDER.map((step) => {
+    const status = (() => {
+      if (currentStep.value === step) return 'active'
+      if (step === 'input') return 'completed'
+      if (step === 'preview') return workspaceState.previewData ? 'completed' : 'idle'
+      if (step === 'prepare') {
+        if (workspaceState.prepareCompleted) return 'completed'
+        if (workspaceState.prepareHash) return 'pending'
+        return 'idle'
+      }
+      if (step === 'distance') {
+        if (currentDistanceHash.value) return 'completed'
+        if (workspaceState.prepareCompleted) return 'pending'
+        return 'idle'
+      }
+      if (step === 'cluster') {
+        if (currentResultHash.value || clusterResult.value) return 'completed'
+        if (currentDistanceHash.value) return 'pending'
+        return 'idle'
+      }
+      if (step === 'result') {
+        return clusterResult.value ? 'completed' : 'idle'
+      }
+      return 'idle'
+    })()
+
+    return {
+      key: step,
+      label: t(`cluster.steps.${step}`),
+      status
+    }
+  }))
 
   recoverWorkspace()
 
@@ -305,7 +434,19 @@ export function useClusterWorkspace() {
   }
 
   function addGroup() {
-    workspaceState.requestDraft.groups.push(createEmptyGroup())
+    const nextGroup = createEmptyGroup()
+    workspaceState.requestDraft.groups.push(nextGroup)
+    expandedGroupIds.value = Array.from(new Set([...expandedGroupIds.value, nextGroup.id]))
+  }
+
+  function toggleGroupExpanded(groupId) {
+    expandedGroupIds.value = expandedGroupIds.value.includes(groupId)
+      ? expandedGroupIds.value.filter((id) => id !== groupId)
+      : [...expandedGroupIds.value, groupId]
+  }
+
+  function isGroupExpanded(groupId) {
+    return expandedGroupIds.value.includes(groupId)
   }
 
   function removeGroup(index) {
@@ -313,7 +454,12 @@ export function useClusterWorkspace() {
       return
     }
 
-    workspaceState.requestDraft.groups.splice(index, 1)
+    const [removedGroup] = workspaceState.requestDraft.groups.splice(index, 1)
+    expandedGroupIds.value = expandedGroupIds.value.filter((id) => id !== removedGroup?.id)
+
+    if (!expandedGroupIds.value.length && workspaceState.requestDraft.groups[0]?.id) {
+      expandedGroupIds.value = [workspaceState.requestDraft.groups[0].id]
+    }
   }
 
   async function handlePreview() {
@@ -793,16 +939,25 @@ export function useClusterWorkspace() {
     linkageOptions,
     stepOptions,
     currentStep,
+    activeStepOption,
+    activeStepDescription,
+    visibleMainPanels,
+    stageContextCards,
+    stageProgressItems,
     prepareStepStatus,
     currentDistanceHash,
     currentResultHash,
     resultGroups,
+    resultGroupCards,
     assignments,
+    normalizedAssignments,
     performanceEntries,
     cacheEntries,
     resultSummaryCards,
     showNClustersField,
     showRandomStateField,
+    expandedGroupIds,
+    groupSummaryItems,
     isPreviewPending,
     isPreparePending,
     isDistancePending,
@@ -816,6 +971,8 @@ export function useClusterWorkspace() {
     goToStep,
     isStepReachable,
     addGroup,
+    toggleGroupExpanded,
+    isGroupExpanded,
     removeGroup,
     updateGroupPathKeys,
     updateGroupPathValueMap,

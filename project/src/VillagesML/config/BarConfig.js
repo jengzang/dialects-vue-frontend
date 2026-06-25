@@ -61,7 +61,6 @@ export const VILLAGESML_MODULES = [
                 label: '字符網絡',
                 icon: '🕸️',
                 path: '/villagesML?module=character&subtab=network',
-                requireAuth: true
             },
             {
                 id: 'significance',

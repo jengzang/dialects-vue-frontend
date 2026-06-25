@@ -29,7 +29,12 @@
               <span class="item-label">{{ item.label }}</span>
               <span class="item-count">{{ item.count }}</span>
             </div>
-            <div class="item-chars">{{ (item.chars || []).join(' ') }}</div>
+            <div class="item-chars">
+              <div v-for="(detail, index) in item.details || []" :key="`${section.tone}-${item.label}-${index}`" class="detail-row">
+                <span class="detail-char">{{ detail.char }}</span>
+                <span class="detail-values">{{ detail.values.join(' / ') }}</span>
+              </div>
+            </div>
           </div>
         </section>
       </div>
@@ -41,6 +46,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import { READING_COLORS } from '@/main/constants/readingColors.js'
 
 const { t } = useI18n()
 
@@ -74,7 +80,7 @@ const titleText = computed(() => {
   const initial = props.initial || t('result.phonologyTable.zeroInitial')
   const final = props.final || t('result.phonologyTable.zeroFinal')
 
-  return location ? `${location} - ${initial}/${final}` : `${initial}/${final}`
+  return location ? `${location} - ${initial}·${final}` : `${initial}·${final}`
 })
 
 function handleVisibilityChange(value) {
@@ -153,5 +159,35 @@ function handleVisibilityChange(value) {
   line-height: 1.6;
   color: #1f2937;
   word-break: break-all;
+}
+
+.detail-row {
+  display: flex;
+  gap: 0.5em;
+  align-items: baseline;
+}
+
+.detail-char {
+  font-weight: 600;
+}
+
+.detail-values {
+  color: #4b5563;
+}
+
+.detail-char--wendu {
+  color: v-bind('READING_COLORS.wendu');
+}
+
+.detail-char--baidu {
+  color: v-bind('READING_COLORS.baidu');
+}
+
+.detail-char--both {
+  color: v-bind('READING_COLORS.both');
+}
+
+.detail-char--polyphonic {
+  color: v-bind('READING_COLORS.polyphonic');
 }
 </style>

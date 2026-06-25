@@ -6,38 +6,24 @@
       <div class="control-row">
         <label class="control-label">{{ t('phonology.phonology.evolution.queryMode.label', '统计模式') }}：</label>
         <div class="mode-selector">
-          <label class="mode-radio-label">
-            <input
-              type="radio"
-              value="by_value"
-              v-model="queryMode"
-              class="hidden-radio"
-            />
-            <span class="glass-indicator"></span>
-            {{ t('phonology.phonology.evolution.queryMode.byValue') }}
-          </label>
-          <label class="mode-radio-label">
-            <input
-              type="radio"
-              value="by_status"
-              v-model="queryMode"
-              class="hidden-radio"
-            />
-            <span class="glass-indicator"></span>
-            {{ t('phonology.phonology.evolution.queryMode.byStatus') }}
-          </label>
-          <label class="mode-radio-label sankey-toggle">
-            <input
-                v-model="showSankey"
-                type="checkbox"
-                class="hidden-radio"
-            />
-            <span class="glass-indicator"></span>
-            {{ t('phonology.phonology.evolution.controls.sankey') }}
-          </label>
+          <RadioGroup
+            v-model="queryMode"
+            :options="queryModeOptions"
+            name="evolution-query-mode"
+            class="query-mode-radio"
+          />
+
+          <Checkbox
+            v-model="showSankey"
+            :label="t('phonology.phonology.evolution.controls.sankey')"
+          />
+
+          <Checkbox
+            v-model="optimizeSankeyLayout"
+            :label="t('phonology.phonology.evolution.controls.optimizeLinks')"
+          />
         </div>
       </div>
-
 
       <div class="dimension-grid">
         <div class="dimension-field">
@@ -114,10 +100,14 @@
       >
         {{ feature }} ({{ pieCountByFeature[feature] || 0 }})
       </button>
+
+      <div v-if="currentDataLocationName" class="feature-tabs-location">
+        📍 {{ currentDataLocationName }}
+      </div>
     </div>
 
     <!-- 加载状态 -->
-    <div v-if="isLoading" class="loading-state">
+    <div v-if="isLoading && !rawData" class="loading-state">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>{{ t('phonology.phonology.evolution.states.loading') }}</p>
     </div>
@@ -126,9 +116,25 @@
     <div
       v-else-if="rawData && currentPieData.length > 0"
       class="pie-container"
-      :class="{ 'has-mobile-detail-card': showMobilePieDetailCard }"
+      :class="{
+        'has-mobile-detail-card': showMobilePieDetailCard,
+        'is-rendering': isLoading
+      }"
     >
-      <div v-if="showSankey" ref="sankeyContainerRef" class="sankey-chart"></div>
+      <div
+        v-if="isLoading"
+        class="visualization-rendering-mask"
+      >
+        <div class="ui-loading--page" aria-hidden="true"></div>
+      </div>
+
+      <div
+        v-if="showSankey"
+        ref="sankeyContainerRef"
+        class="sankey-chart"
+        :style="{ height: sankeyHeight }"
+      ></div>
+
       <div v-else class="pie-grid" :style="gridStyle" ref="pieGridRef">
         <div
           v-for="(pie, index) in currentPieData"
@@ -146,107 +152,165 @@
       <p>{{ t('phonology.phonology.evolution.states.empty') }}</p>
     </div>
 
-    <Transition name="mobile-detail-card-fade">
-      <div
-          v-if="selectedPieDetail && !showSankey"
-          class="mobile-detail-card"
-          :class="{ 'is-desktop-card': !isMobileLayout }"
-          :style="!isMobileLayout ? desktopCardPosition : {}"
-      >
-        <div class="mobile-detail-card__header">
+    <HoverDetailCard
+      :visible="(showSankey ? Boolean(selectedSankeyDetail) : Boolean(selectedPieDetail))"
+      :is-mobile-layout="isMobileLayout"
+      :is-pinned="isCardPinned"
+      :desktop-card-position="desktopCardPosition"
+      @close="closeMobilePieDetail"
+    >
+      <template #header>
+        <template v-if="showSankey && selectedSankeyDetail">
           <div class="mobile-detail-card__meta">
             <div class="mobile-detail-card__title-row">
-              <div class="mobile-detail-card__title">{{ selectedPieDetail.title }}</div>
+              <div class="mobile-detail-card__title">{{ selectedSankeyDetail.title }}</div>
+              <div class="mobile-detail-card__section-title">
+                {{ selectedSankeyDetail.layerLabel }}
+              </div>
+            </div>
+            <div class="mobile-detail-card__subtitle">
+              {{ selectedSankeyDetail.subtitle }}
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <div class="mobile-detail-card__meta">
+            <div class="mobile-detail-card__title-row">
+              <div class="mobile-detail-card__title">{{ selectedPieDetail?.title }}</div>
               <div class="mobile-detail-card__section-title">
                 {{ t('phonology.phonology.evolution.mobileDetail.breakdownBy', { dimension: level2Column }) }}
               </div>
             </div>
             <div class="mobile-detail-card__subtitle">
-              {{ selectedPieDetail.pieTitle }} ·
+              {{ selectedPieDetail?.pieTitle }} ·
               {{ t('phonology.phonology.evolution.mobileDetail.countAndRatio', {
-              count: selectedPieDetail.count,
-              unit: t('phonology.phonology.evolution.sankey.unit'),
-              percent: selectedPieDetail.percent
-            }) }}
+                count: selectedPieDetail?.count,
+                unit: t('phonology.phonology.evolution.sankey.unit'),
+                percent: selectedPieDetail?.percent
+              }) }}
             </div>
           </div>
-          <button
-              v-show="isMobileLayout || isCardPinned"
-              type="button"
-              class="mobile-detail-card__close"
-              @click="closeMobilePieDetail"
-          >×</button>
+        </template>
+      </template>
+
+      <template v-if="showSankey && selectedSankeyDetail">
+        <div class="mobile-detail-card__section">
+          <div class="mobile-detail-card__chars mobile-detail-card__chars--standalone">
+            {{ selectedSankeyDetail.displayChars.join('、') }}
+            <template v-if="selectedSankeyDetail.remainingChars > 0">
+              {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: selectedSankeyDetail.remainingChars }) }}
+            </template>
+          </div>
         </div>
-
-        <div class="mobile-detail-card__body ui-scrollbar">
+      </template>
+      <template v-else>
+        <div
+          v-if="selectedPieDetail?.level2Items.length > 0"
+          class="mobile-detail-card__section"
+        >
           <div
-            v-if="selectedPieDetail.level2Items.length > 0"
-            class="mobile-detail-card__section"
+            v-for="level2Item in selectedPieDetail.level2Items"
+            :key="`${selectedPieDetail.key}-${level2Item.label}`"
+            class="mobile-detail-card__item"
           >
-            <div
-              v-for="level2Item in selectedPieDetail.level2Items"
-              :key="`${selectedPieDetail.key}-${level2Item.label}`"
-              class="mobile-detail-card__item"
-            >
-              <div class="mobile-detail-card__item-row">
-                <span class="mobile-detail-card__item-label">{{ level2Item.label }}</span>
-                <span class="mobile-detail-card__item-value">
-                  {{ t('phonology.phonology.evolution.mobileDetail.countAndRatio', {
-                    count: level2Item.count,
-                    unit: t('phonology.phonology.evolution.sankey.unit'),
-                    percent: level2Item.percent
-                  }) }}
-                </span>
-              </div>
-              <div v-if="level2Item.displayChars.length > 0" class="mobile-detail-card__chars">
-                {{ t('phonology.phonology.evolution.mobileDetail.characters') }}：
-                {{ level2Item.displayChars.join('、') }}
-                <template v-if="level2Item.remainingChars > 0">
-                  {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: level2Item.remainingChars }) }}
-                </template>
-              </div>
+            <div class="mobile-detail-card__item-row">
+              <span class="mobile-detail-card__item-label">{{ level2Item.label }}</span>
+              <span class="mobile-detail-card__item-value">
+                {{ t('phonology.phonology.evolution.mobileDetail.countAndRatio', {
+                  count: level2Item.count,
+                  unit: t('phonology.phonology.evolution.sankey.unit'),
+                  percent: level2Item.percent
+                }) }}
+              </span>
             </div>
-          </div>
-
-          <div
-            v-else-if="selectedPieDetail.displayChars.length > 0"
-            class="mobile-detail-card__section"
-          >
-            <div class="mobile-detail-card__section-title">
-              {{ t('phonology.phonology.evolution.mobileDetail.characters') }}
-            </div>
-            <div class="mobile-detail-card__chars mobile-detail-card__chars--standalone">
-              {{ selectedPieDetail.displayChars.join('、') }}
-              <template v-if="selectedPieDetail.remainingChars > 0">
-                {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: selectedPieDetail.remainingChars }) }}
+            <div v-if="level2Item.displayChars.length > 0" class="mobile-detail-card__chars">
+              {{ t('phonology.phonology.evolution.mobileDetail.characters') }}：
+              {{ level2Item.displayChars.join('、') }}
+              <template v-if="level2Item.remainingChars > 0">
+                {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: level2Item.remainingChars }) }}
               </template>
             </div>
           </div>
         </div>
-      </div>
-    </Transition>
+
+        <div
+          v-else-if="selectedPieDetail?.displayChars.length > 0"
+          class="mobile-detail-card__section"
+        >
+          <div class="mobile-detail-card__section-title">
+            {{ t('phonology.phonology.evolution.mobileDetail.characters') }}
+          </div>
+          <div class="mobile-detail-card__chars mobile-detail-card__chars--standalone">
+            {{ selectedPieDetail.displayChars.join('、') }}
+            <template v-if="selectedPieDetail.remainingChars > 0">
+              {{ t('phonology.phonology.evolution.mobileDetail.moreChars', { count: selectedPieDetail.remainingChars }) }}
+            </template>
+          </div>
+        </div>
+      </template>
+    </HoverDetailCard>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
+import Checkbox from '@/components/selector/Checkbox.vue'
+import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
+import { resolveHoverDetailCardPosition } from '@/components/ToastAndHelp/hoverDetailCardPosition.js'
 import LocationMultiInput from '../geo/LocationMultiInput.vue'
 import { postPhoPieByValue, postPhoPieByStatus } from '@/api'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { TABLE_COLUMN_SCHEMAS } from '../../config/chars_positions/characters.js'
 import { userStore } from '@/main/store/store.js'
 import { showWarning } from '@/utils/message.js'
-import evolutionDemoByStatus from '@/assets/data/evolution_demo_status.json'
-import evolutionDemoByValue from '@/assets/data/evolution_demo_value.json'
 import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from './evolutionDetail.js'
+import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import {
+  encodeQueryValueBase64Url,
+  parseLocationsFromUrl
+} from '@/utils/urlParams.js'
 
 const { t } = useI18n()
+const route = useRoute()
 const router = useRouter()
 const MOBILE_LAYOUT_MEDIA_QUERY = '(max-aspect-ratio: 1/1)'
+
+const EVOLUTION_LOCATION_LIMIT = PHONOLOGY_LOCATION_LIMITS.evolution
+
+const parseEvolutionLocationQuery = (value) => {
+  return parseLocationsFromUrl(
+    {
+      query: {
+        loc: value
+      }
+    },
+    {
+      limit: EVOLUTION_LOCATION_LIMIT
+    }
+  )
+}
+
+const serializeEvolutionLocationQuery = (locations) => {
+  if (!Array.isArray(locations)) return []
+
+  return locations
+    .filter(Boolean)
+    .slice(0, EVOLUTION_LOCATION_LIMIT)
+    .map((location) => encodeQueryValueBase64Url(location))
+}
+
+const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('loc', {
+  defaultValue: [],
+  parse: parseEvolutionLocationQuery,
+  serialize: serializeEvolutionLocationQuery,
+  replace: true,
+  removeIf: (locations) => !Array.isArray(locations) || locations.length === 0,
+})
 
 // ========== 响应式数据 ==========
 // 查询参数
@@ -254,9 +318,10 @@ const queryMode = ref('by_value')
 const selectedTable = ref('characters')
 const level1Column = ref('')
 const level2Column = ref('')
-const selectedLocations = ref([])
+const selectedLocations = ref([...locationQuery.value])
 const matchedLocations = ref([])
 const showSankey = ref(false)
+const optimizeSankeyLayout = ref(false)
 
 // 查询状态
 const isLoading = ref(false)
@@ -264,6 +329,7 @@ const isMatching = ref(false)
 const errorMessage = ref('')
 const rawData = ref(null)
 const hasQueriedRealData = ref(false)
+const pendingUrlAutoQuery = ref(false)
 
 // 当前展示
 const features = ['聲母', '韻母', '聲調']
@@ -275,11 +341,13 @@ const sankeyContainerRef = ref(null)
 const chartInstances = ref([])
 const sankeyChartInstance = ref(null)
 const containerWidth = ref(1200)
+const sankeyHeight = ref('680px')
 const isMobileLayout = ref(false)
 const selectedPieDetail = ref(null)
+const selectedSankeyDetail = ref(null)
 
 const desktopCardPosition = ref({ left: '0px', top: '0px' })
-const isCardPinned = ref(false) // 记录卡片是否被点击固定
+const isCardPinned = ref(false)
 
 // ========== 配置数据 ==========
 const tableOptions = [
@@ -292,10 +360,20 @@ const tableOptions = [
 ]
 
 // ========== 计算属性 ==========
+const queryModeOptions = computed(() => [
+  {
+    value: 'by_value',
+    label: t('phonology.phonology.evolution.queryMode.byValue')
+  },
+  {
+    value: 'by_status',
+    label: t('phonology.phonology.evolution.queryMode.byStatus')
+  }
+])
+
 const availableColumns = computed(() => {
   const schema = TABLE_COLUMN_SCHEMAS[selectedTable.value]
   const keys = schema?.ui?.available_keys || []
-  // 转换为 SimpleSelectDropdown 需要的格式
   return keys.map(key => ({ label: key, value: key }))
 })
 
@@ -317,15 +395,23 @@ const pieCountByFeature = computed(() => {
   }
 })
 
+const currentDataLocationName = computed(() => {
+  const locations = Array.isArray(rawData.value?.locations)
+    ? rawData.value.locations.slice(0, EVOLUTION_LOCATION_LIMIT)
+    : []
+
+  return locations[0] || ''
+})
+
 const showMobilePieDetailCard = computed(() => {
   return isMobileLayout.value && !showSankey.value && Boolean(selectedPieDetail.value)
 })
 
 const canQuery = computed(() => {
   return matchedLocations.value.length > 0 &&
-         level1Column.value &&
-         level2Column.value &&
-         level1Column.value !== level2Column.value
+    level1Column.value &&
+    level2Column.value &&
+    level1Column.value !== level2Column.value
 })
 
 const gridLayout = computed(() => {
@@ -333,11 +419,19 @@ const gridLayout = computed(() => {
   if (pieCount === 0) return { cols: 0, rows: 0 }
 
   let cols
-  if (pieCount <= 4) cols = 2
-  else if (pieCount <= 9) cols = 3
-  else if (pieCount <= 16) cols = 4
-  else if (pieCount <= 25) cols = 5
-  else cols = 6
+  const containerW = containerWidth.value
+
+  if (containerW <= 480) {
+    cols = 1
+  } else if (containerW <= 768) {
+    cols = 2
+  } else {
+    if (pieCount <= 4) cols = 2
+    else if (pieCount <= 9) cols = 3
+    else if (pieCount <= 16) cols = 4
+    else if (pieCount <= 25) cols = 5
+    else cols = 6
+  }
 
   const rows = Math.ceil(pieCount / cols)
   return { cols, rows }
@@ -349,7 +443,7 @@ const pieSize = computed(() => {
   const containerW = containerWidth.value
   const gap = 20
   const size = (containerW - (cols + 1) * gap) / cols
-  return Math.max(150, Math.min(250, size))
+  return Math.max(200, Math.min(280, size))
 })
 
 const gridStyle = computed(() => {
@@ -362,18 +456,51 @@ const gridStyle = computed(() => {
   }
 })
 
-const getDemoData = () => (queryMode.value === 'by_value' ? evolutionDemoByValue : evolutionDemoByStatus)
+const demoDataCache = {
+  byStatus: null,
+  byValue: null,
+}
 
-const syncControlsFromData = (data) => {
-  selectedLocations.value = Array.isArray(data.locations) ? [...data.locations] : []
-  matchedLocations.value = Array.isArray(data.locations) ? [...data.locations] : []
+const loadDemoData = async (mode) => {
+  const cacheKey = mode === 'by_value' ? 'byValue' : 'byStatus'
+  if (demoDataCache[cacheKey]) {
+    return demoDataCache[cacheKey]
+  }
+
+  const fileName = mode === 'by_value'
+    ? 'evolution_demo_value.json'
+    : 'evolution_demo_status.json'
+  const response = await fetch(`/data/${fileName}`)
+  if (!response.ok) {
+    throw new Error(`Failed to load demo data: ${response.status}`)
+  }
+
+  const data = await response.json()
+  demoDataCache[cacheKey] = data
+  return data
+}
+
+const getDemoData = async () => loadDemoData(queryMode.value)
+
+const syncControlsFromData = (data, { syncLocations = true } = {}) => {
+  if (syncLocations) {
+    const locations = Array.isArray(data.locations)
+      ? data.locations.slice(0, EVOLUTION_LOCATION_LIMIT)
+      : []
+
+    selectedLocations.value = [...locations]
+    matchedLocations.value = [...locations]
+  }
+
   selectedTable.value = data.table_name || 'characters'
   level1Column.value = data.level1_column || ''
   level2Column.value = data.level2_column || ''
 }
 
 const handleMatchedLocations = (locations) => {
-  matchedLocations.value = locations
+  matchedLocations.value = Array.isArray(locations)
+    ? locations.slice(0, EVOLUTION_LOCATION_LIMIT)
+    : []
 }
 
 const handleIsMatching = (matching) => {
@@ -385,10 +512,10 @@ const getInitialFeature = (data) => {
   return features.find(feature => featureKeys.includes(feature) && (data.data[feature]?.length || 0) > 0) || features[0]
 }
 
-const applyDemoData = async () => {
-  const demoData = getDemoData()
+const applyDemoData = async ({ syncLocations = locationQuery.value.length === 0 } = {}) => {
+  const demoData = await getDemoData()
   closeMobilePieDetail()
-  syncControlsFromData(demoData)
+  syncControlsFromData(demoData, { syncLocations })
   currentFeature.value = getInitialFeature(demoData)
   rawData.value = demoData
   errorMessage.value = ''
@@ -428,7 +555,7 @@ const handleQuery = async () => {
 
   try {
     const params = {
-      locations: matchedLocations.value,
+      locations: matchedLocations.value.slice(0, EVOLUTION_LOCATION_LIMIT),
       level1_column: level1Column.value,
       level2_column: level2Column.value,
       table_name: selectedTable.value
@@ -439,20 +566,28 @@ const handleQuery = async () => {
       : postPhoPieByStatus
 
     const response = await apiCall(params)
-    rawData.value = response
+    const responseData = response || {}
+
+    rawData.value = {
+      ...responseData,
+      locations: Array.isArray(responseData.locations) && responseData.locations.length > 0
+        ? responseData.locations.slice(0, EVOLUTION_LOCATION_LIMIT)
+        : params.locations.slice(0, EVOLUTION_LOCATION_LIMIT)
+    }
+
     hasQueriedRealData.value = true
     closeMobilePieDetail()
-    currentFeature.value = getInitialFeature(response)
+    currentFeature.value = getInitialFeature(rawData.value)
+    await setLocationQuery(matchedLocations.value.slice(0, EVOLUTION_LOCATION_LIMIT))
     shouldRefreshVisualization = true
   } catch (error) {
     errorMessage.value = error.message || t('phonology.phonology.evolution.errors.queryFailed')
     console.error('Query error:', error)
   } finally {
-    isLoading.value = false
     if (shouldRefreshVisualization) {
-      await nextTick()
-      updateContainerSize()
-      await renderCurrentVisualization()
+      await renderCurrentVisualizationWithLoading()
+    } else {
+      isLoading.value = false
     }
   }
 }
@@ -483,7 +618,8 @@ const clearSankeyChart = () => {
 
 const closeMobilePieDetail = () => {
   selectedPieDetail.value = null
-  isCardPinned.value = false // 重置固定状态
+  selectedSankeyDetail.value = null
+  isCardPinned.value = false
 }
 
 const updateMobileLayout = () => {
@@ -493,6 +629,13 @@ const updateMobileLayout = () => {
 
   isMobileLayout.value = window.matchMedia(MOBILE_LAYOUT_MEDIA_QUERY).matches
 }
+
+const waitForPaint = () =>
+  new Promise(resolve => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolve)
+    })
+  })
 
 // ========== 饼图渲染 ==========
 const generatePieChartOption = (pieData) => {
@@ -504,7 +647,7 @@ const generatePieChartOption = (pieData) => {
   if (!items) return null
 
   return {
-    animation: false, // 完全禁用动画
+    animation: false,
     title: {
       text: title,
       subtext: `${total}条`,
@@ -574,9 +717,7 @@ const generatePieChartOption = (pieData) => {
     // },
     series: [{
       type: 'pie',
-      // 1. 缩小外半径，给周围的文字留出充足空间（原来是 ['40%', '70%']）
       radius: ['30%', '55%'],
-      // 确保饼图在正中间
       center: ['50%', '50%'],
       avoidLabelOverlap: true,
       itemStyle: {
@@ -667,21 +808,13 @@ const initPieChart = (container, pieData, index) => {
     // 更新位置 (仅桌面端)
     if (!isMobileLayout.value && params.event?.event) {
       const e = params.event.event
-      const cardWidth = 340
-      const cardHeight = 420
-
-      let x = e.clientX + 20
-      let y = e.clientY + 20
-
-      // 边缘检测防溢出
-      if (x + cardWidth > window.innerWidth) x = e.clientX - cardWidth - 20
-      if (y + cardHeight > window.innerHeight) y = window.innerHeight - cardHeight - 20
-
-      desktopCardPosition.value = { left: `${x}px`, top: `${y}px` }
+      desktopCardPosition.value = resolveHoverDetailCardPosition({
+        clientX: e.clientX,
+        clientY: e.clientY,
+      })
     }
   }
 
-  // 绑定点击：钉住卡片 (注意传 index)
   chart.on('click', (params) => handleInteraction(index, params, true))
 
   if (!isMobileLayout.value) {
@@ -695,6 +828,7 @@ const initPieChart = (container, pieData, index) => {
       }
     })
   }
+
   return chart
 }
 
@@ -713,9 +847,6 @@ const initPieChart = (container, pieData, index) => {
 // }
 
 const renderAllPies = async () => {
-  const startTime = performance.now()
-  // console.log(`[Evolution] Starting to render ${currentPieData.value.length} pies...`)
-
   await nextTick()
   clearPieCharts()
 
@@ -727,7 +858,6 @@ const renderAllPies = async () => {
   if (pieElements) {
     const batchSize = 10 // 每批渲染10个
     for (let i = 0; i < pieElements.length; i += batchSize) {
-      const batchStart = performance.now()
       const batch = Array.from(pieElements).slice(i, i + batchSize)
       batch.forEach((el) => {
         const index = parseInt(el.getAttribute('data-pie-index'))
@@ -739,14 +869,11 @@ const renderAllPies = async () => {
           )
         }
       })
+
       // 每批之间让出控制权，避免阻塞UI
       await nextTick()
-      // console.log(`[Evolution] Batch ${Math.floor(i / batchSize) + 1} rendered in ${(performance.now() - batchStart).toFixed(2)}ms`)
     }
   }
-
-  const endTime = performance.now()
-  // console.log(`[Evolution] Total rendering took ${(endTime - startTime).toFixed(2)}ms`)
 }
 
 const buildSankeyData = () => {
@@ -754,53 +881,209 @@ const buildSankeyData = () => {
   const nodeMap = new Map()
   const linkMap = new Map()
 
-  const ensureNode = (id, rawLabel, layer) => {
-    if (!nodeMap.has(id)) {
-      nodeMap.set(id, { name: id, rawLabel, layer })
-    }
+  const mergeChars = (...charLists) => {
+    return [
+      ...new Set(
+        charLists
+          .flat()
+          .filter(Boolean)
+      )
+    ]
   }
 
-  const addLink = (source, target, value) => {
+  const ensureNode = (id, rawLabel, layer, chars = []) => {
+    if (!nodeMap.has(id)) {
+      nodeMap.set(id, {
+        name: id,
+        rawLabel,
+        layer,
+        chars: mergeChars(chars)
+      })
+      return
+    }
+
+    const existingNode = nodeMap.get(id)
+    existingNode.chars = mergeChars(existingNode.chars || [], chars)
+  }
+
+  const addLink = (source, target, value, chars = []) => {
     if (!value) return
+
     const key = `${source}__${target}`
-    linkMap.set(key, (linkMap.get(key) || 0) + value)
+
+    if (!linkMap.has(key)) {
+      linkMap.set(key, {
+        source,
+        target,
+        value: 0,
+        chars: []
+      })
+    }
+
+    const link = linkMap.get(key)
+    link.value += value
+    link.chars = mergeChars(link.chars || [], chars)
   }
 
   currentPieData.value.forEach((pie) => {
-    const rootLabel = isByValue ? pie.value : pie.level1_value
-    const rootLayer = isByValue ? t('phonology.phonology.evolution.sankey.layers.value') : level1Column.value
-    const rootId = `${isByValue ? 'value' : 'level1'}:${rootLabel}`
     const items = isByValue ? pie.level1 : pie.phonetic_values
 
-    ensureNode(rootId, rootLabel, rootLayer)
+    if (isByValue) {
+      const rootLabel = pie.value
+      const rootLayer = t('phonology.phonology.evolution.sankey.layers.value')
+      const rootId = `value:${rootLabel}`
+
+      const rootChars = mergeChars(
+        (items || []).flatMap(item => item.chars || [])
+      )
+
+      ensureNode(rootId, rootLabel, rootLayer, rootChars)
+
+      items?.forEach((item) => {
+        const level1Label = item.label
+        const level2Items = item.level2 || []
+
+        // 正常情况：一级维度 × 二级维度组合
+        if (level2Items.length > 0) {
+          level2Items.forEach((level2Item) => {
+            const level2Label = level2Item.label
+            const comboLabel = `${level1Label}｜${level2Label}`
+            const comboLayer = `${level1Column.value} × ${level2Column.value}`
+            const comboId = `combo:${level1Label}__${level2Label}`
+            const chars = level2Item.chars || []
+
+            ensureNode(comboId, comboLabel, comboLayer, chars)
+            addLink(rootId, comboId, level2Item.count, chars)
+          })
+
+          return
+        }
+
+        // 兜底：如果某个一级维度下面没有 level2，也不要完全丢掉
+        const comboLabel = `${level1Label}｜未分类`
+        const comboLayer = `${level1Column.value} × ${level2Column.value}`
+        const comboId = `combo:${level1Label}__未分类`
+        const chars = item.chars || []
+
+        ensureNode(comboId, comboLabel, comboLayer, chars)
+        addLink(rootId, comboId, item.count, chars)
+      })
+
+      return
+    }
+
+    // by_status 原逻辑保持不变：一级维度 → 音值 → 二级维度
+    const rootLabel = pie.level1_value
+    const rootLayer = level1Column.value
+    const rootId = `level1:${rootLabel}`
+
+    const rootChars = mergeChars(
+      (items || []).flatMap(item => item.chars || [])
+    )
+
+    ensureNode(rootId, rootLabel, rootLayer, rootChars)
 
     items?.forEach((item) => {
-      const middleLabel = isByValue ? item.label : item.value
-      const middleLayer = isByValue ? level1Column.value : t('phonology.phonology.evolution.sankey.layers.value')
-      const middleId = `${isByValue ? 'level1' : 'value'}:${middleLabel}`
+      const middleLabel = item.value
+      const middleLayer = t('phonology.phonology.evolution.sankey.layers.value')
+      const middleId = `value:${middleLabel}`
 
-      ensureNode(middleId, middleLabel, middleLayer)
-      addLink(rootId, middleId, item.count)
+      ensureNode(middleId, middleLabel, middleLayer, item.chars || [])
+      addLink(rootId, middleId, item.count, item.chars || [])
 
       item.level2?.forEach((level2Item) => {
         const level2Id = `level2:${level2Item.label}`
-        ensureNode(level2Id, level2Item.label, level2Column.value)
-        addLink(middleId, level2Id, level2Item.count)
+
+        ensureNode(level2Id, level2Item.label, level2Column.value, level2Item.chars || [])
+        addLink(middleId, level2Id, level2Item.count, level2Item.chars || [])
       })
     })
   })
 
-  return {
-    nodes: Array.from(nodeMap.values()),
-    links: Array.from(linkMap.entries()).map(([key, value]) => {
-      const [source, target] = key.split('__')
-      return { source, target, value }
+  const level1Order = []
+  const level2Order = []
+
+  currentPieData.value.forEach((pie) => {
+    ;(pie.level1 || []).forEach((item) => {
+      if (item.label && !level1Order.includes(item.label)) {
+        level1Order.push(item.label)
+      }
+
+      ;(item.level2 || []).forEach((level2Item) => {
+        if (level2Item.label && !level2Order.includes(level2Item.label)) {
+          level2Order.push(level2Item.label)
+        }
+      })
     })
+  })
+
+  const nodes = Array.from(nodeMap.values()).sort((a, b) => {
+    const aIsCombo = a.name.startsWith('combo:')
+    const bIsCombo = b.name.startsWith('combo:')
+
+    // 左侧音值节点保持在组合节点前面
+    if (aIsCombo !== bIsCombo) {
+      return aIsCombo ? 1 : -1
+    }
+
+    // 非 combo 节点之间保持原顺序
+    if (!aIsCombo && !bIsCombo) {
+      return 0
+    }
+
+    const [aLevel1 = '', aLevel2 = ''] = a.name.replace('combo:', '').split('__')
+    const [bLevel1 = '', bLevel2 = ''] = b.name.replace('combo:', '').split('__')
+
+    const aLevel1Index = level1Order.indexOf(aLevel1)
+    const bLevel1Index = level1Order.indexOf(bLevel1)
+
+    if (aLevel1Index !== bLevel1Index) {
+      return aLevel1Index - bLevel1Index
+    }
+
+    const aLevel2Index = level2Order.indexOf(aLevel2)
+    const bLevel2Index = level2Order.indexOf(bLevel2)
+
+    return aLevel2Index - bLevel2Index
+  })
+
+  return {
+    nodes,
+    links: Array.from(linkMap.values())
   }
+}
+
+const updateSankeyHeight = (nodes) => {
+  if (!Array.isArray(nodes) || nodes.length === 0) {
+    sankeyHeight.value = isMobileLayout.value ? '520px' : '680px'
+    return
+  }
+
+  const layerNodeCounts = new Map()
+
+  nodes.forEach(node => {
+    const layer = node.layer || 'default'
+    layerNodeCounts.set(layer, (layerNodeCounts.get(layer) || 0) + 1)
+  })
+
+  const maxNodesInLayer = Math.max(...layerNodeCounts.values(), 1)
+
+  const minHeight = isMobileLayout.value ? 520 : 680
+  const maxHeight = isMobileLayout.value ? 1100 : 1400
+  const heightPerNode = isMobileLayout.value ? 30 : 36
+
+  const calculatedHeight = Math.min(
+    maxHeight,
+    Math.max(minHeight, maxNodesInLayer * heightPerNode + 180)
+  )
+
+  sankeyHeight.value = `${calculatedHeight}px`
 }
 
 const generateSankeyOption = () => {
   const sankeyData = buildSankeyData()
+  updateSankeyHeight(sankeyData.nodes)
+
   const title = queryMode.value === 'by_value'
     ? t('phonology.phonology.evolution.sankey.titles.byValue', { feature: currentFeature.value })
     : t('phonology.phonology.evolution.sankey.titles.byStatus', { feature: currentFeature.value })
@@ -818,25 +1101,29 @@ const generateSankeyOption = () => {
       }
     },
     tooltip: {
-      trigger: 'item',
-      triggerOn: 'mousemove',
-      confine: true,
-      formatter: (params) => {
-        if (params.dataType === 'edge') {
-          const sourceNode = sankeyData.nodes.find(node => node.name === params.data.source)
-          const targetNode = sankeyData.nodes.find(node => node.name === params.data.target)
-          return `${sourceNode?.rawLabel || params.data.source} -> ${targetNode?.rawLabel || params.data.target}<br/>${params.data.value} ${t('phonology.phonology.evolution.sankey.unit')}`
-        }
-
-        return `${params.data.rawLabel}<br/>${t('phonology.phonology.evolution.sankey.layer')}: ${params.data.layer}`
-      }
+      show: false,
     },
+    // tooltip: {
+    //   trigger: 'item',
+    //   triggerOn: 'mousemove',
+    //   confine: true,
+    //   formatter: (params) => {
+    //     if (params.dataType === 'edge') {
+    //       const sourceNode = sankeyData.nodes.find(node => node.name === params.data.source)
+    //       const targetNode = sankeyData.nodes.find(node => node.name === params.data.target)
+    //       return `${sourceNode?.rawLabel || params.data.source} -> ${targetNode?.rawLabel || params.data.target}<br/>${params.data.value} ${t('phonology.phonology.evolution.sankey.unit')}`
+    //     }
+
+    //     return `${params.data.rawLabel}<br/>${t('phonology.phonology.evolution.sankey.layer')}: ${params.data.layer}`
+    //   }
+    // },
     series: [{
       type: 'sankey',
-      left: '5%',   // 距离左侧的边距
-      right: '12%',  // 距离右侧的边距（覆盖默认的 20%）
-      top: '10%',   // 距离顶部的边距（根据你的标题高度微调）
-      bottom: '5%', // 距离底部的边距
+      left: '5%',
+      right: '12%',
+      top: '10%',
+      bottom: '5%',
+      layoutIterations: optimizeSankeyLayout.value ? 300 : 0,
       data: sankeyData.nodes,
       links: sankeyData.links,
       nodeAlign: 'justify',
@@ -876,14 +1163,90 @@ const renderSankey = async () => {
     return
   }
 
+  const option = generateSankeyOption()
+  const sankeyData = buildSankeyData()
+
+  await nextTick()
+
   sankeyChartInstance.value = echarts.init(sankeyContainerRef.value, null, {
     renderer: 'canvas',
     useDirtyRect: true
   })
 
-  sankeyChartInstance.value.setOption(generateSankeyOption(), {
+  sankeyChartInstance.value.setOption(option, {
     notMerge: true,
     lazyUpdate: false
+  })
+
+  const buildSankeyDetail = (params) => {
+    if (params?.dataType === 'edge') {
+      const sourceNode = sankeyData.nodes.find(node => node.name === params.data.source)
+      const targetNode = sankeyData.nodes.find(node => node.name === params.data.target)
+      const chars = Array.isArray(params.data.chars) ? params.data.chars : []
+
+      if (!sourceNode || !targetNode) return null
+
+      return {
+        title: `${sourceNode.rawLabel} → ${targetNode.rawLabel}`,
+        subtitle: `${sourceNode.layer} → ${targetNode.layer} · ${params.data.value} ${t('phonology.phonology.evolution.sankey.unit')}`,
+        layerLabel: t('phonology.phonology.evolution.sankey.layer'),
+        displayChars: chars,
+        remainingChars: 0
+      }
+    }
+
+    const node = sankeyData.nodes.find(item => item.name === params?.data?.name)
+    if (!node) return null
+
+    const chars = Array.isArray(node.chars) ? node.chars : []
+    return {
+      title: node.rawLabel,
+      subtitle: `${t('phonology.phonology.evolution.sankey.layer')}: ${node.layer} · ${chars.length} ${t('phonology.phonology.evolution.sankey.unit')}`,
+      layerLabel: node.layer,
+      displayChars: chars,
+      remainingChars: 0
+    }
+  }
+
+  const updateSankeyDetailPosition = (params) => {
+    if (isMobileLayout.value || !params?.event?.event) return
+
+    const e = params.event.event
+    desktopCardPosition.value = resolveHoverDetailCardPosition({
+      clientX: e.clientX,
+      clientY: e.clientY,
+    })
+  }
+
+  const handleSankeyInteraction = (params, isClick) => {
+    if (!params) return
+    if (!isClick && isCardPinned.value) return
+
+    const detail = buildSankeyDetail(params)
+    if (!detail) return
+
+    selectedSankeyDetail.value = detail
+    selectedPieDetail.value = null
+    updateSankeyDetailPosition(params)
+
+    if (isClick) {
+      isCardPinned.value = true
+    }
+  }
+
+  sankeyChartInstance.value.on('click', (params) => handleSankeyInteraction(params, true))
+
+  if (!isMobileLayout.value) {
+    sankeyChartInstance.value.on('mouseover', (params) => handleSankeyInteraction(params, false))
+    sankeyChartInstance.value.on('mouseout', () => {
+      if (!isCardPinned.value) {
+        selectedSankeyDetail.value = null
+      }
+    })
+  }
+
+  requestAnimationFrame(() => {
+    sankeyChartInstance.value?.resize()
   })
 }
 
@@ -895,6 +1258,21 @@ const renderCurrentVisualization = async () => {
 
   clearSankeyChart()
   await renderAllPies()
+}
+
+const renderCurrentVisualizationWithLoading = async () => {
+  isLoading.value = true
+
+  await nextTick()
+  await waitForPaint()
+
+  try {
+    updateContainerSize()
+    await renderCurrentVisualization()
+    await waitForPaint()
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const handleWindowResize = async () => {
@@ -919,11 +1297,24 @@ const handleWindowResize = async () => {
   chartInstances.value.forEach(chart => chart?.resize())
 }
 
+const tryRunUrlAutoQuery = async () => {
+  if (!pendingUrlAutoQuery.value) return
+  if (isLoading.value) return
+  if (isMatching.value) return
+  if (!matchedLocations.value.length) return
+
+  pendingUrlAutoQuery.value = false
+  matchedLocations.value = matchedLocations.value.slice(0, EVOLUTION_LOCATION_LIMIT)
+
+  await handleQuery()
+}
+
 // 当切换feature时，重新渲染饼图
 watch(currentFeature, async () => {
   closeMobilePieDetail()
+
   if (showSankey.value) {
-    await renderCurrentVisualization()
+    await renderCurrentVisualizationWithLoading()
     return
   }
 
@@ -961,9 +1352,13 @@ watch(showSankey, async () => {
   if (showSankey.value) {
     closeMobilePieDetail()
   }
-  await nextTick()
-  updateContainerSize()
-  await renderCurrentVisualization()
+  await renderCurrentVisualizationWithLoading()
+})
+
+watch(optimizeSankeyLayout, async () => {
+  if (!showSankey.value) return
+
+  await renderCurrentVisualizationWithLoading()
 })
 
 watch(queryMode, async () => {
@@ -974,9 +1369,56 @@ watch(queryMode, async () => {
   await applyDemoData()
 })
 
+watch(matchedLocations, async () => {
+  await tryRunUrlAutoQuery()
+})
+
+watch(isMatching, async () => {
+  await tryRunUrlAutoQuery()
+})
+
+watch(locationQuery, async (urlLocations) => {
+  const limitedUrlLocations = Array.isArray(urlLocations)
+    ? urlLocations.slice(0, EVOLUTION_LOCATION_LIMIT)
+    : []
+
+  if (JSON.stringify(limitedUrlLocations) === JSON.stringify(selectedLocations.value)) {
+    return
+  }
+
+  selectedLocations.value = [...limitedUrlLocations]
+  matchedLocations.value = [...limitedUrlLocations]
+  errorMessage.value = ''
+  closeMobilePieDetail()
+
+  if (limitedUrlLocations.length === 0) {
+    pendingUrlAutoQuery.value = false
+    hasQueriedRealData.value = false
+    await applyDemoData()
+    return
+  }
+
+  await applyDemoData({ syncLocations: false })
+  pendingUrlAutoQuery.value = true
+  await nextTick()
+  await tryRunUrlAutoQuery()
+})
+
 onMounted(async () => {
   updateMobileLayout()
-  await applyDemoData()
+
+  const urlLocations = locationQuery.value.slice(0, EVOLUTION_LOCATION_LIMIT)
+
+  if (urlLocations.length > 0) {
+    selectedLocations.value = [...urlLocations]
+    await applyDemoData({ syncLocations: false })
+    pendingUrlAutoQuery.value = true
+    await nextTick()
+    await tryRunUrlAutoQuery()
+  } else {
+    await applyDemoData()
+  }
+
   window.addEventListener('resize', handleWindowResize)
 })
 
@@ -1021,41 +1463,6 @@ onUnmounted(() => {
 
   &--query {
     justify-content: center;
-  }
-}
-
-.control-row--sankey {
-  justify-content: flex-end;
-}
-
-.sankey-toggle {
-  gap: 10px;
-
-  .glass-indicator {
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-  }
-
-  .glass-indicator::after {
-    width: 5px;
-    height: 9px;
-    background: transparent;
-    border-right: 2px solid #fff;
-    border-bottom: 2px solid #fff;
-    border-radius: 0;
-    box-shadow: none;
-    transform: translate(-50%, -58%) rotate(45deg) scale(0);
-    transform-origin: center;
-  }
-
-  .hidden-radio:checked + .glass-indicator {
-    border-color: var(--color-primary, #007aff);
-    background: var(--color-primary, #007aff);
-  }
-
-  .hidden-radio:checked + .glass-indicator::after {
-    transform: translate(-50%, -58%) rotate(45deg) scale(1);
   }
 }
 
@@ -1112,72 +1519,23 @@ onUnmounted(() => {
   font-style: italic;
 }
 
-/* Radio选择器（液态玻璃态） */
+/* 统计模式：radio 样式交给 RadioGroup；checkbox 样式交给 Checkbox */
 .mode-selector {
   display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+}
+
+.query-mode-radio {
+  justify-content: flex-start;
   gap: 20px;
 }
 
-.mode-radio-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
+.query-mode-radio :deep(.liquid-radio-label) {
+  padding: 0;
   font-size: 15px;
   font-weight: 500;
-  color: var(--text-dark, #333);
-  user-select: none;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 0.8;
-  }
-}
-
-.hidden-radio {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-
-  &:checked + .glass-indicator {
-    border-color: var(--color-primary, #007aff);
-    background: rgba(255, 255, 255, 0.8);
-
-    &::after {
-      transform: translate(-50%, -50%) scale(1);
-    }
-  }
-}
-
-/* 液态玻璃圆圈（外圈） */
-.glass-indicator {
-  position: relative;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 1px solid rgba(150, 150, 150, 0.3);
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow:
-    inset 0 1px 3px rgba(255, 255, 255, 0.5),
-    0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--color-primary, #007aff);
-    transform: translate(-50%, -50%) scale(0);
-    transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  }
 }
 
 /* 查询按钮 */
@@ -1222,6 +1580,8 @@ onUnmounted(() => {
   gap: 12px;
   margin-bottom: 20px;
   justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .feature-tab {
@@ -1252,6 +1612,19 @@ onUnmounted(() => {
   }
 }
 
+.feature-tabs-location {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(0, 122, 255, 0.1);
+  border: 1px solid rgba(0, 122, 255, 0.18);
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 /* 加载状态 */
 .loading-state {
   display: flex;
@@ -1273,6 +1646,25 @@ onUnmounted(() => {
   width: 100%;
 }
 
+.visualization-rendering-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+
+.pie-container.is-rendering .pie-grid,
+.pie-container.is-rendering .sankey-chart {
+  opacity: 0.45;
+}
+
 .pie-grid {
   width: 90dvw;
   position: relative;
@@ -1290,67 +1682,27 @@ onUnmounted(() => {
 
 .pie-chart {
   width: 100%;
-  height: 200px;
+  height: 230px;
   background: transparent;
 }
 
 .sankey-chart {
   width: min(92dvw, 1400px);
-  height: 680px;
+  min-height: 520px;
   margin: 0 auto;
-}
-
-.mobile-detail-card {
-  position: fixed;
-  left: 12px;
-  right: 12px;
-  bottom: calc(12px + env(safe-area-inset-bottom));
-  z-index: 1200;
-  border: 1px solid var(--glass-border-weak);
-  border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-}
-
-.mobile-detail-card__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 14px 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-/* 桌面端弹窗样式覆盖 */
-.mobile-detail-card.is-desktop-card {
-  position: fixed;
-  right: auto;
-  bottom: auto;
-  width: 320px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  border: 1px solid var(--border-medium);
-  z-index: 9999;
-  pointer-events: auto;
-}
-
-/* 防止 Hover 状态下卡片遮挡鼠标导致图表触发 mouseout 闪烁 */
-.mobile-detail-card.is-desktop-card:not(:has(.mobile-detail-card__close:visible)) {
-  pointer-events: none;
 }
 
 .mobile-detail-card__meta {
   min-width: 0;
-  flex:1;
+  flex: 1;
 }
 
 .mobile-detail-card__title-row {
   display: flex;
-  justify-content: space-between; /* 核心：把子元素推向两端（一左一右） */
-  align-items: center; /* 让左右的文字在垂直方向上居中对齐 */
-  width: 100%; /* 确保撑满父容器 */
-  gap: 12px; /* 加上一点间距，防止文字太长撞在一起 */
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
 }
 
 .mobile-detail-card__title {
@@ -1365,25 +1717,6 @@ onUnmounted(() => {
   font-size: 12px;
   color: var(--text-secondary, #666);
   line-height: 1.4;
-}
-
-.mobile-detail-card__close {
-  border: none;
-  background: rgba(255, 255, 255, 0.55);
-  color: var(--text-dark, #333);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.mobile-detail-card__body {
-  max-height: min(38dvh, 300px);
-  overflow-y: auto;
-  padding: 12px 14px 14px;
 }
 
 .mobile-detail-card__section {
@@ -1435,17 +1768,6 @@ onUnmounted(() => {
   margin-top: 0;
 }
 
-.mobile-detail-card-fade-enter-active,
-.mobile-detail-card-fade-leave-active {
-  transition: opacity 0.24s ease, transform 0.24s ease;
-}
-
-.mobile-detail-card-fade-enter-from,
-.mobile-detail-card-fade-leave-to {
-  opacity: 0;
-  transform: translateY(12px);
-}
-
 /* 空状态 */
 .empty-state {
   display: flex;
@@ -1480,15 +1802,25 @@ onUnmounted(() => {
   }
 
   .mode-selector {
-    gap: 10px;
+    gap: 10px 14px;
+  }
+
+  .query-mode-radio {
+    gap: 14px;
   }
 
   .feature-tabs {
     flex-wrap: wrap;
   }
+  .feature-tab {
+    padding:10px 8px;
+  }
+  .feature-tabs-location{
+    padding:10px 6px;
+  }
 
   .pie-chart {
-    height: 180px;
+    height: 270px;
   }
 
   .pie-container.has-mobile-detail-card {
@@ -1497,8 +1829,7 @@ onUnmounted(() => {
 
   .sankey-chart {
     width: 100%;
-    height: 520px;
+    min-height: 520px;
   }
 }
-
 </style>

@@ -21,13 +21,14 @@
       "tab4": "Tones"
     },
     "compare": {
-      "tab1": "Character Comparison",
-      "tab2": "Middle Chinese Comparison",
-      "tab4": "Tone Category Comparison"
+      "tab1": "Character",
+      "tab2": "Middle Chinese",
+      "tab4": "Tone Category",
+      "tab5": "Pronunciation"
     },
     "pho": {
-      "phonologyMatrix": "Phonology Query",
-      "phonologyCustom": "Phoneme Classification",
+      "phonologyMatrix": "Phonology",
+      "phonologyCustom": "Phoneme Class",
       "Countphos": "Syllable Statistics",
       "evolution": "Evolution"
     },
@@ -38,8 +39,8 @@
       "yueyun": "Cantonese Rhyme Books"
     },
     "words": {
-      "vocabulary": "Language Preservation Vocabulary",
-      "grammar": "Language Preservation Grammar",
+      "vocabulary": "YuBao Vocabulary",
+      "grammar": "YuBao Grammar",
       "ycSpoken": "Yangchun Colloquial Words"
     },
     "villages": {
@@ -49,10 +50,11 @@
       "ycVillages": "Yangchun Villages"
     },
     "tools": {
-      "check": "Character List Tool",
+      "check": "Character Table Tool",
       "jyut2ipa": "Jyutping to IPA",
-      "merge": "Character List Merge",
-      "praat": "Acoustic Analysis"
+      "merge": "Character Table Merge",
+      "praat": "Acoustic Analysis",
+      "praatname": "Praat"
     },
     "source": {
       "source": "Data Sources",
@@ -91,6 +93,19 @@
     "language": {
       "title": "Language Settings",
       "description": "Choose your preferred interface language"
+    },
+    "interfaceMode": {
+      "title": "Interface Mode",
+      "description": "Choose between the standard and compact interface styles. Compact mode disables animations, shadows, blur, and similar visual effects for better performance on low-end devices.",
+      "label": "Current Mode",
+      "options": {
+        "default": "Standard",
+        "compact": "Compact"
+      },
+      "help": {
+        "default": "Keeps the current animations and visual effects.",
+        "compact": "Disables animations, shadows, blur, and similar visual effects for smoother performance on low-end devices."
+      }
     },
     "characterTable": {
       "title": "Character Table",

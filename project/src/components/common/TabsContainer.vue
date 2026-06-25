@@ -1,6 +1,8 @@
 <template>
   <div class="tabs-wrapper">
     <div class="tabs ui-scrollbar--hidden">
+      <!-- 额外的 tab 左侧内容插槽 -->
+      <slot name="tab-extra"></slot>
       <div
         v-for="tab in tabs"
         :key="tab.name"
@@ -9,9 +11,6 @@
       >
         {{ tab.label }}
       </div>
-
-      <!-- 额外的 tab 右侧内容插槽 -->
-      <slot name="tab-extra"></slot>
     </div>
 
     <div class="tab-content">

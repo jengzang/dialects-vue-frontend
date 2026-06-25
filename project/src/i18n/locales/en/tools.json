@@ -398,7 +398,7 @@
       "missingTone": "Missing tone"
     },
     "export": {
-      "filePrefix": "phonicon_"
+      "filePrefix": "方音圖鑑_"
     }
   },
   "tableManage": {

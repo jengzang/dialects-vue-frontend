@@ -85,7 +85,8 @@ export async function compareChars(params) {
     }
 
     return await api(`/api/compare/chars?${queryParams.toString()}`, {
-      method: 'GET'
+      method: 'GET',
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Compare chars error:', error)
@@ -118,7 +119,8 @@ export async function compareZhongGu(params) {
   try {
     return await api('/api/compare/ZhongGu', {
       method: 'POST',
-      body: params
+      body: params,
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Compare ZhongGu error:', error)
@@ -168,7 +170,8 @@ export async function compareTones(params) {
     }
 
     return await api(`/api/compare/tones?${queryParams.toString()}`, {
-      method: 'GET'
+      method: 'GET',
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Compare tones error:', error)

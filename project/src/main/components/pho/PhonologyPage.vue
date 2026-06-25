@@ -42,6 +42,8 @@
         :finals="matrixData[location].finals"
         :tones="matrixData[location].tones"
         :matrix="matrixData[location].matrix"
+        :cell-detail-enabled="true"
+        :cell-details="matrixData[location].cellDetails"
       />
     </div>
 
@@ -60,6 +62,10 @@ import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import {
+  encodeQueryValueBase64Url,
+  parseLocationsFromUrl
+} from '@/utils/urlParams.js'
 
 const { t } = useI18n()
 
@@ -69,21 +75,32 @@ const error = ref(null)
 const matrixData = ref(null)
 
 // 从 URL 初始化地点
-function parseLocationQuery(value) {
-  const locations = Array.isArray(value) ? value : [value]
-  return locations.filter(Boolean).map((location) => {
-    try {
-      return decodeURIComponent(location)
-    } catch {
-      return location
+const parseMatrixLocationQuery = (value) => {
+  return parseLocationsFromUrl(
+    {
+      query: {
+        loc: value
+      }
+    },
+    {
+      limit: PHONOLOGY_LOCATION_LIMITS.matrix
     }
-  })
+  )
+}
+
+const serializeMatrixLocationQuery = (locations) => {
+  if (!Array.isArray(locations)) return []
+
+  return locations
+    .filter(Boolean)
+    .slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
+    .map((location) => encodeQueryValueBase64Url(location))
 }
 
 const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('loc', {
   defaultValue: [],
-  parse: parseLocationQuery,
-  serialize: (locations) => locations.map((location) => encodeURIComponent(location)),
+  parse: parseMatrixLocationQuery,
+  serialize: serializeMatrixLocationQuery,
   replace: true,
   removeIf: (locations) => !Array.isArray(locations) || locations.length === 0,
 })
@@ -92,16 +109,68 @@ const queryStrings = ref([...locationQuery.value])
 
 const matchedLocations = ref([])
 const isMatching = ref(false) // 添加匹配状态
-const shouldSyncUrl = ref(false) // 控制是否同步 URL
 
 const displayLocations = computed(() => {
   if (!matrixData.value) return []
   return Object.keys(matrixData.value)
 })
 
+const transformMatrixReadStats = (matrixReadStats = {}) => {
+  const transformedCellDetails = {}
+
+  Object.entries(matrixReadStats || {}).forEach(([initial, finalMap]) => {
+    transformedCellDetails[initial] = {}
+
+    Object.entries(finalMap || {}).forEach(([final, toneMap]) => {
+      transformedCellDetails[initial][final] = {}
+
+      Object.entries(toneMap || {}).forEach(([tone, readStats]) => {
+        const polyphonicDetails = readStats?.polyphonic?.details || {}
+
+        const items = [
+          ['polyphonic', '多音字'],
+          ['wendu', '文讀'],
+          ['baidu', '白讀'],
+          ['wenbai', '文白讀']
+        ]
+          .map(([key, label]) => {
+            const bucket = readStats?.[key]
+            const item = {
+              label,
+              count: Number(bucket?.count || 0),
+              chars: Array.isArray(bucket?.chars) ? bucket.chars : []
+            }
+
+            if (key === 'polyphonic') {
+              const detailEntries = Object.entries(polyphonicDetails).map(([char, values]) => ({
+                char,
+                values: Array.isArray(values) ? values : []
+              }))
+
+              if (detailEntries.length > 0) {
+                item.details = detailEntries
+              }
+            }
+
+            return item
+          })
+          .filter((item) => item.count > 0 || item.chars.length > 0 || item.details?.length > 0)
+
+        if (items.length > 0) {
+          transformedCellDetails[initial][final][tone] = items
+        }
+      })
+    })
+  })
+
+  return transformedCellDetails
+}
+
 // 处理匹配到的地点列表
 const handleMatchedLocations = (locations) => {
-  matchedLocations.value = locations
+  matchedLocations.value = Array.isArray(locations)
+    ? locations.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
+    : []
 }
 
 // 处理匹配状态
@@ -119,18 +188,23 @@ const loadData = async () => {
 
   await loadMatrixTask.run(async () => {
     const requestBody = {
-      locations: matchedLocations.value
+      locations: matchedLocations.value.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
     }
 
     const result = await getPhonologyMatrix(requestBody)
 
-    matrixData.value = result.data
-
-    // 首次查询成功后启用 URL 同步
-    shouldSyncUrl.value = true
+    matrixData.value = Object.fromEntries(
+      Object.entries(result.data || {}).map(([location, payload]) => [
+        location,
+        {
+          ...payload,
+          cellDetails: transformMatrixReadStats(payload.matrix_read_stats)
+        }
+      ])
+    )
 
     // 更新 URL
-    await setLocationQuery(matchedLocations.value)
+    await setLocationQuery(matchedLocations.value.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix))
   }, {
     onError: (err) => {
       console.error('加載音韻矩陣失敗:', err)
@@ -154,164 +228,160 @@ onMounted(() => {
 
 // 处理浏览器前进/后退
 watch(locationQuery, (urlLocations) => {
+  const limitedUrlLocations = Array.isArray(urlLocations)
+    ? urlLocations.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
+    : []
 
   // 只有当 URL 的地点和当前匹配的地点不同时，才需要清空数据
   // 这样可以避免在查询成功更新 URL 后误清空数据
-  if (JSON.stringify(urlLocations) !== JSON.stringify(matchedLocations.value)) {
-    queryStrings.value = [...urlLocations]
+  if (JSON.stringify(limitedUrlLocations) !== JSON.stringify(matchedLocations.value)) {
+    queryStrings.value = [...limitedUrlLocations]
     matrixData.value = null
     error.value = null
   }
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .phonology-matrix-page {
   margin-top: 20px;
   width: 90dvw;
-}
 
-.page-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px 0;
-}
-
-.page-title {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text-dark-light);
-}
-
-.input-section {
-  max-width: 600px;
-  margin: 0 auto 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  justify-content: center;
-  align-items: center;
-}
-
-.load-btn {
-  padding: 12px 24px;
-  max-width: 100px;
-  white-space: nowrap;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
-  color: var(--text-white);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px var(--color-primary-shadow), 0 2px 4px rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.load-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--color-primary-hover) 0%, #004ba0 100%);
-  box-shadow: 0 6px 16px var(--color-primary-shadow-light), 0 3px 6px rgba(0, 0, 0, 0.12);
-  transform: translateY(-1px);
-}
-
-.load-btn:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.load-btn:disabled {
-  background: var(--bg-hover-medium);
-  color: var(--text-secondary);
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* 按钮内的小旋转器 */
-
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  gap: 15px;
-}
-
-
-
-.loading p {
-  color: var(--text-secondary);
-  font-size: 15px;
-}
-
-.error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  gap: 15px;
-}
-
-.error p {
-  color: var(--color-error);
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.retry-btn {
-  padding: 10px 20px;
-  background: var(--color-primary);
-  color: var(--text-white);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-md);
-}
-
-.retry-btn:hover {
-  background: var(--color-primary-hover);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-1px);
-}
-
-.matrix-container {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-.empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 30dvh;
-  color: var(--text-secondary);
-  font-size: 16px;
-}
-
-/* 移动端适配 */
-@media (max-aspect-ratio: 1/1) {
+  .page-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+  }
 
   .page-title {
-    font-size: 24px;
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-dark-light);
   }
 
   .input-section {
-    max-width: 100%;
+    max-width: 600px;
+    margin: 0 auto 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
   }
 
   .load-btn {
-    font-size: 14px;
+    padding: 12px 24px;
+    max-width: 100px;
+    white-space: nowrap;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+    color: var(--text-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px var(--color-primary-shadow), 0 2px 4px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--color-primary-hover) 0%, #004ba0 100%);
+      box-shadow: 0 6px 16px var(--color-primary-shadow-light), 0 3px 6px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      background: var(--bg-hover-medium);
+      color: var(--text-secondary);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  }
+
+  /* 按钮内的小旋转器 */
+
+  .loading,
+  .error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    gap: 15px;
+  }
+
+  .loading {
+    p {
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+  }
+
+  .error {
+    p {
+      color: var(--color-error);
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+
+  .retry-btn {
     padding: 10px 20px;
+    background: var(--color-primary);
+    color: var(--text-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+
+    &:hover {
+      background: var(--color-primary-hover);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-1px);
+    }
+  }
+
+  .matrix-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30dvh;
+    color: var(--text-secondary);
+    font-size: 16px;
+  }
+
+  /* 移动端适配 */
+  @media (max-aspect-ratio: 1/1) {
+    .page-title {
+      font-size: 24px;
+    }
+
+    .input-section {
+      max-width: 100%;
+    }
+
+    .load-btn {
+      font-size: 14px;
+      padding: 10px 20px;
+    }
   }
 }
 </style>

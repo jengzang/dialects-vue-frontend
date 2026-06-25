@@ -21,16 +21,18 @@
     "compare": {
       "title": "Dialect Comparison",
       "desc": "Compare phonological features across dialects",
-      "compareChar": "Character Comparison - Compare pronunciation differences",
-      "compareMiddle": "Middle Chinese Comparison - Compare Middle Chinese evolution",
-      "compareTone": "Tone Comparison - Compare tonal systems"
-    },
+      "compareChar": "Compare Characters - Compare differences in initials, finals, and tones across locations",
+        "compareMiddle": "Compare Middle Chinese - Compare locations by phonological categories",
+        "compareTone": "Compare Tone Categories - Compare tone systems across locations",
+        "comparePhonetic": "Compare Phonetic Values - Visualize phonetic differences across locations with a Sankey diagram"
+      },
     "map": {
       "title": "Map Visualization",
       "desc": "Geolinguistic perspective presentation",
       "dialectMap": "Dialect Map - Display query results on map",
-      "regionMap": "Regional Mapping - Draw dialect maps by region",
-      "customMap": "Custom Mapping - Add personal data for mapping"
+      "regionMap": "Dialect Zoning Map - Draw by Atlas or Mcpdict Division",
+      "customMap": "Custom Data - Add personal data for mapping",
+      "drawMap": "Drawing Tool - GIS Online Mapping & Voronoi Polygons"
     },
     "phonology": {
       "title": "Phonological Analysis",
@@ -93,6 +95,10 @@
   "roadmap": {
     "sectionTitle": "Features in Development",
     "sectionSubtitle": "Upcoming new features",
+    "charsGeneration": {
+      "title": "Character Table Inference Tool",
+      "desc": "A character table inference tool based on phonological categories. Generate a complete character table from a small set of characters, with multiple rhyme books available."
+    },
     "phoneticsToolbox": {
       "title": "Shaozi's Phonetics Toolbox",
       "desc": "Batch acoustic parameter estimation, multi-algorithm pitch detection, EGG signal analysis, glottal parameter extraction"
@@ -107,7 +113,7 @@
     },
     "ipaTTS": {
       "title": "IPA to Speech Synthesis",
-      "desc": "Real-time conversion from International Phonetic Alphabet to speech, multi-dialect voice support"
+      "desc": "Real-time conversion from International Phonetic Alphabet to speech, multi-dialect voice support（long-term plan）"
     },
     "dialectBot": {
       "title": "Dialect Chatbot",
@@ -136,7 +142,7 @@
       "feature2": "Feature 2: <strong>Phoneme Search</strong> (analyze Middle Chinese origins of phonemes). Users can input the above categories, and the website will analyze the Middle Chinese origins of the input phonetic values (phonemes) and present the results in tables and maps.",
       "feature3": "Feature 3: <strong>Tone Search</strong> (query tone values and categories). The website will organize tone values and categories based on the user's selected region and location, with different tone categories marked in different colors.",
       "feature4": "Feature 4: <strong>Character Search</strong> (query character pronunciation and position). Query based on user-input Chinese characters, ultimately presenting the phonetic values, annotations, and Middle Chinese positions of characters at various locations.",
-      "feature5": "Feature 5: <strong>Regional Mapping</strong> (draw dialect maps by atlas regions/phonetic dictionary regions).",
+      "feature5": "Feature 5: <strong>Regional Mapping</strong> (draw dialect maps by atlas regions/mcpdict regions).",
       "feature6": "Feature 6: <strong>Custom Mapping</strong> (users add personal data for mapping). Users can select points and annotate on the map themselves, and the website will automatically assign colors based on feature values.",
       "feature7": "<strong>Blue text</strong> in tables (positions, phonetic values, etc.) are generally clickable. After clicking, a detailed query will be performed in a new popup, making it easy to compare and analyze with the original results.",
       "feature8": "Points on the map can also be clicked to query detailed information.",
@@ -210,11 +216,11 @@
       "oldSite": "Legacy Site",
       "support": "Support Author"
     },
-    "stats": "Today Visits {today} ? Total Visits {total}",
+    "stats": "Today Visits {today} · Total Visits {total}",
     "dataStats": "📚 {locationCount} dialect points · 🗃️ {dataCount} rows of data",
-    "copyright": "? 2026 Dialects Atlas ? Developed by jengzang",
-    "versionInfo": "{version} ? Last updated: {date}",
-    "icp": "Yue ICP 2025466875"
+    "copyright": "© 2026 方音圖鑑 · Developed by jengzang",
+    "versionInfo": "{version} · Last updated: {date}",
+    "icp": "粤ICP备2025466875号"
   },
   "updateNotice": {
     "title": "Website Update Notice",

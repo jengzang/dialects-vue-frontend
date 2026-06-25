@@ -3,12 +3,14 @@
     <div class="toolbar">
       <div class="search-wrapper">
         <span class="search-icon">🔍</span>
-        <input
-            v-model="searchText"
-            @input="handleSearch"
-            :placeholder="t('tableTree.universalTable.toolbar.searchPlaceholder')"
-            class="search-input"
-        />
+          <input
+              v-model="searchText"
+              @compositionstart="handleSearchCompositionStart"
+              @compositionend="handleSearchCompositionEnd"
+              @input="handleSearch"
+              :placeholder="t('tableTree.universalTable.toolbar.searchPlaceholder')"
+              class="search-input"
+          />
       </div>
       <div v-if="userStore.role === 'admin'" class="action-buttons">
         <button v-if="!isEditMode" class="main-glass-button" data-size="compact" @click="exportToExcel">
@@ -887,8 +889,31 @@ const closeFilter = () => {
 
 // 搜索
 let timeout = null;
-const handleSearch = () => {
-  // 这样才能访问到“上一次”的定时器 ID
+const isSearchComposing = ref(false);
+
+const handleSearchCompositionStart = () => {
+  isSearchComposing.value = true;
+
+  // 输入法组合期间，取消已有的搜索定时器
+  if (timeout) {
+    clearTimeout(timeout);
+    timeout = null;
+  }
+};
+
+const handleSearchCompositionEnd = () => {
+  isSearchComposing.value = false;
+
+  // 选字完成后，再执行一次搜索
+  handleSearch();
+};
+
+const handleSearch = (event) => {
+  // 输入法组合期间不搜索
+  if (isSearchComposing.value || event?.isComposing) {
+    return;
+  }
+
   if (timeout) clearTimeout(timeout);
 
   timeout = setTimeout(() => {

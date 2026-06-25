@@ -1,250 +1,256 @@
 {
-    "hero":  {
-                 "title":  "方言比较 · 地理语言学",
-                 "subtitle":  "✨ 探索方言的历史层次 · 🎵 触摸汉字的音韵之美",
-                 "startExploring":  "开始探索",
-                 "expandTools":  "拓展工具",
-                 "featuresIntro":  "功能简介",
-                 "logoAlt":  "方音图鉴",
-                 "decorationAlt":  "蓝色圆环"
-             },
-    "features":  {
-                     "sectionTitle":  "核心功能",
-                     "query":  {
-                                   "title":  "查询分析",
-                                   "desc":  "多维度查询方言音韵资料",
-                                   "searchChar":  "查字 - 查询字音、地位",
-                                   "searchMiddle":  "查中古 - 按中古地位整理读音",
-                                   "searchPhoneme":  "查音位 - 分析音位的中古来源",
-                                   "searchTone":  "查调 - 查询调值、调类"
-                               },
-                     "compare":  {
-                                     "title":  "方言比较",
-                                     "desc":  "对比不同方言的音韵特征",
-                                     "compareChar":  "比较汉字 - 对比字音差异",
-                                     "compareMiddle":  "比较中古 - 对比中古音演变",
-                                     "compareTone":  "比较调类 - 对比声调系统"
-                                 },
-                     "map":  {
-                                 "title":  "地图可视化",
-                                 "desc":  "地理语言学视角呈现",
-                                 "dialectMap":  "方言地图 - 地图上呈现查询结果",
-                                 "regionMap":  "分区绘图 - 按分区绘制方言地图",
-                                 "customMap":  "自定义绘图 - 添加个人数据绘图"
-                             },
-                     "phonology":  {
-                                       "title":  "音系分析",
-                                       "desc":  "方言音系结构研究",
-                                       "phonologyQuery":  "音系查询 - 查看方言音系表",
-                                       "phonemeClassify":  "音素分类 - 自定义音素分类",
-                                       "syllableCount":  "音节统计 - 统计音节数量",
-                                       "middlePosition":  "中古地位 - 查询汉字中古地位",
-                                       "evolution":  "演变 - 饼图桑基图展示方言演变"
-                                   },
-                     "words":  {
-                                   "title":  "词句资料",
-                                   "desc":  "方言词汇与语法资料",
-                                   "yubaoVocab":  "语保词汇 - 语保工程词汇资料",
-                                   "yubaoGrammar":  "语保语法 - 语保工程句子资料",
-                                   "ycSpoken":  "阳春口语词 - 阳春方言口语词汇"
-                               },
-                     "villages":  {
-                                      "title":  "自然村资料",
-                                      "desc":  "村落地名分析与方言绘图",
-                                      "gdVillages":  "广东自然村 - 广东自然村树状图",
-                                      "villagesML":  "机器学习 - 自然村名机器学习",
-                                      "gdVillagesTable":  "全粤村情表格 - 广东村落详细表格",
-                                      "ycVillages":  "阳春自然村 - 阳春自然村资料"
-                                  },
-                     "tools":  {
-                                   "title":  "字表工具",
-                                   "desc":  "字表转换、合并、检查等工具",
-                                   "tableProcess":  "字表处理 - 字表检查与格式转换",
-                                   "jyut2ipa":  "粤拼转IPA - 粤拼转国际音标",
-                                   "tableMerge":  "字表合并 - 合并多个字表"
-                               },
-                     "charClass":  {
-                                       "title":  "汉字地位",
-                                       "desc":  "历代汉字音韵地位资料",
-                                       "zhonggu":  "中古汉语 - 广韵等中古音系地位",
-                                       "shanggu":  "上古汉语 - 诗经谐声等上古地位",
-                                       "jingu":  "近古汉语 - 洪武正韵、中原音韵等近古地位",
-                                       "yueyun":  "粤语韵书 - 分韵撮要等韵书"
-                                   },
-                     "praat":  {
-                                   "title":  "Praat 声学分析",
-                                   "desc":  "实验语音学工具与数据分析"
-                               },
-                     "about":  {
-                                   "title":  "关于网站",
-                                   "desc":  "网站介绍与资料来源",
-                                   "intro":  "简介 - 网站功能介绍",
-                                   "reflection":  "感悟 - 开发感悟与鸣谢",
-                                   "suggestion":  "提出建议 - 反馈与建议",
-                                   "likeAuthor":  "喜欢作者 - 支持与关注",
-                                   "source":  "资料来源 - 查阅字表来源与相关信息",
-                                   "setting":  "设置 - 语言与音韵资料选择"
-                               },
-                     "dialectClustering":  {
-                                               "title":  "方言聚类",
-                                               "desc":  "方言聚类流程页面占位"
-                                           }
-                 },
-    "roadmap":  {
-                    "sectionTitle":  "开发中的功能",
-                    "sectionSubtitle":  "即将推出的新特性",
-                    "phoneticsToolbox":  {
-                                             "title":  "韶子的语音学工具箱",
-                                             "desc":  "声学参数批量估计、多算法基频检测、EGG信号分析、声门参数提取"
-                                         },
-                    "dialectClustering":  {
-                                              "title":  "方言聚类",
-                                              "desc":  "自定义音值音位权重、调整聚类算法参数、基于音位向量的多维度相似度计算"
-                                          },
-                    "evolutionTree":  {
-                                          "title":  "方言演化树状图",
-                                          "desc":  "自定义演化模型参数、调整分支长度算法、交互式系统发生树构建与可视化"
-                                      },
-                    "ipaTTS":  {
-                                   "title":  "IPA 转语音合成",
-                                   "desc":  "国际音标到语音的实时转换、多方言音色支持"
-                               },
-                    "dialectBot":  {
-                                       "title":  "方言对话机器人",
-                                       "desc":  "基于规整字表集的LLM微调、音色克隆、方言语音交互（远景规划）"
-                                   }
-                },
-    "login":  {
-                  "title":  "登录解锁更多功能",
-                  "desc":  "查看详细权限对比，了解登录后的完整权益",
-                  "benefits":  {
-                                   "customMap":  "自定义绘制地图",
-                                   "customRegion":  "自定义方言分区",
-                                   "moreLocations":  "查询地点数量提升",
-                                   "praatTools":  "Praat 声学工具",
-                                   "tableTools":  "字表处理工具",
-                                   "queryHistory":  "查询记录与排行榜"
-                               },
-                  "loginNow":  "立即登录",
-                  "viewDetails":  "查看详情"
-              },
-    "intro":  {
-                  "thanks":  {
-                                 "aboutTitle":  "ℹ️ 关于网站",
-                                 "aboutDesc":  "「方音图鉴」是一个专注于中古地位分析、方言比较、地理语言学的在线工具，致力于以清晰、互动的方式呈现各方言点声韵层次及音位分合。",
-                                 "feature1":  "功能1：\u003cstrong\u003e查中古\u003c/strong\u003e（按中古地位整理读音）。使用者可输入各种组合进行分析，目前支持摄、韵、等、呼、调、系、组、母、清浊、发音部位、发声方式等类别。网站会按输入的组合分析声母/韵母/声调，并把结果呈现在表格和地图中。",
-                                 "feature2":  "功能2：\u003cstrong\u003e查音位\u003c/strong\u003e（分析音位的中古来源）。使用者可输入上述类别，网站会分析输入的音值（音位）对应字的中古来源，并把结果呈现在表格和地图中。",
-                                 "feature3":  "功能3：\u003cstrong\u003e查调\u003c/strong\u003e（查询调值、调类）。网站会根据用户选择的分区、地点，整理调值、调类，不同的调类标上了不同的颜色。",
-                                 "feature4":  "功能4：\u003cstrong\u003e查字\u003c/strong\u003e（查询字音、地位）。根据用户输入汉字进行查询，最终呈现各个地点的音值、注释以及汉字中古地位",
-                                 "feature5":  "功能5：\u003cstrong\u003e分区绘图\u003c/strong\u003e（按地图集二分区/音典分区绘制方言地图）。",
-                                 "feature6":  "功能6：\u003cstrong\u003e自定义绘图\u003c/strong\u003e（用户添加个人数据进行绘图）。用户可以自己在地图上选点、标注，网站会根据特征值自定分配颜色",
-                                 "feature7":  "表格里的\u003cstrong\u003e蓝色字\u003c/strong\u003e（地位、音值等）一般都是可以点击的，点击后即在新的弹窗中进行细分查询，方便与原结果对比分析",
-                                 "feature8":  "地图上的点也可以点击，点击后即可查询详细信息。",
-                                 "welcomeText":  "欢迎探索《方音图鉴》，一起触摸方言的历史层次！",
-                                 "devTitle":  "🧑‍💻 开发感悟",
-                                 "devPara1":  "最初，我只想为自己的研究制作称手的工具，却在不知不觉间，探索了广袤的星空。从第一行代码到第一个功能，从稚嫩的构想到渐丰的体系，昼夜在键盘上更迭，我的构想也逐渐从虚无中落地生根。我看着这个网站，就如同看着自家的孩子蹒跚学步，一步步走出自己的轮廓。每一个按钮、每一次交互，都烙印着一段时光。我曾为如果实现想要的查询逻辑而精疲力竭，也曾为视觉效果的成功呈现而雀跃不已——这些点滴，汇成了她的血与肉、魂与灵。",
-                                 "devPara2":  "其实，这亦是自我蜕变的历程。从对前端一无所知，到摸索DOM、尝试虚拟滚动，进阶至运用框架，乃至领略JWT、ORM的精妙。我在建造中学习，在错误中成熟。最迷人之处在于，我用以搭建这一切的砖石，正是我渴望学习的知识本身：网站的搭建深化了我对音韵的理解，而钻研音韵又驱动着代码的迭代。技术于我，不再是冷冰冰的指令，而是承载文化的舟楫；文化于我，亦不再是遥远的文献，逐步化为可交互、可追溯、可触摸的实体。",
-                                 "devPara3":  "这便是我用代码与热爱写就的答卷，一个普通学生献给方言领域最诚挚的礼物。感谢每一位与它相遇的你。希望这份仍显稚拙的创作，能激起你心中一丝好奇的涟漪，或为你节省资料翻检的片刻光阴，这便是她存在的意义。",
-                                 "devPara4":  "愿八方乡音，生生不息；\u003cbr\u003e愿汉字之美，永被珍惜；\u003cbr\u003e愿文明薪火，长存于每一次交互与共鸣之中。",
-                                 "thanksTitle":  "特别鸣谢",
-                                 "mcpdict":  "汉字音典",
-                                 "mcpdictDesc":  "本网站大部分资料来自",
-                                 "mcpdictData":  "音典开源数据",
-                                 "jyutjam":  "岭南粤音",
-                                 "jyutjamDesc":  "提供了交流的平台 及",
-                                 "jyutdict":  "泛粤大典",
-                                 "yubao":  "语保",
-                                 "yubaoDesc":  "筛选了部分资料",
-                                 "xiaoxue":  "小学堂",
-                                 "xiaoxueDesc":  "筛选了部分资料",
-                                 "yueminke":  "粤闽客方言系统",
-                                 "yueminkeDesc":  "筛选了部分资料",
-                                 "testers":  "测试人员",
-                                 "testersDesc":  "正式上线之前测试、提建议的网友！",
-                                 "friends":  "朋友 ❤️",
-                                 "friendsDesc":  "在项目开发过程中，所有支持、鼓励、帮助过我的朋友！",
-                                 "you":  "你 ❤️",
-                                 "youDesc":  "当然，还有看到这里的你！"
-                             },
-                  "suggestions":  {
-                                      "title":  "我有建议",
-                                      "desc":  "发现 bug？有建议？\u003cbr /\u003e欢迎通过 GitHub Issue 提出！",
-                                      "subtext":  "点击下方卡片跳转对应仓库",
-                                      "frontendCard":  "🐞 网页运行有 bug❓\u003cbr /\u003e💡 对交互、UI 有建议❓",
-                                      "frontendLink":  "到前端仓库提 Issue",
-                                      "buildCard":  "🔤 对字表有疑问❓\u003cbr /\u003e🎯 声/韵/调 提取出错❓",
-                                      "buildLink":  "到字表处理仓库提 Issue"
-                                  },
-                  "likeAuthor":  {
-                                     "title":  "❤️ 喜欢作者",
-                                     "follow":  "关注",
-                                     "starText":  "「如果你觉得项目不错，可以给个 ⭐️ 吗！」",
-                                     "frontendRepo":  "前端仓库 - 使用vue框架和原生js开发",
-                                     "backendRepo":  "后端仓库 - 基于fastapi",
-                                     "buildRepo":  "字表预处理仓库 - 提取字表的声韵调",
-                                     "villagesMLRepo":  "自然村机器学习 - 村落名称、地理数据分析",
-                                     "supportText":  "「若网站对您有帮助，可以请作者喝杯咖啡☕️，您的支持将是作者持续维护的动力🙏」",
-                                     "supportButton":  "支持一下",
-                                     "supportNote":  "「注：本站由一名本科生开发运营，从字表处理、后端API到前端界面皆一人完成；服务器和域名的开销，也是从生活费中省出来的💸」",
-                                     "modalTitle":  "☕️ 请作者喝杯咖啡",
-                                     "modalSubtitle":  "感谢您的支持！ 💖",
-                                     "weixinAlt":  "微信收款码",
-                                     "alipayAlt":  "支付宝收款码"
-                                 }
-              },
-    "projects":  {
-                     "sectionTitle":  "开源项目",
-                     "sectionSubtitle":  "欢迎 Star、Fork 与贡献代码"
-                 },
-    "contact":  {
-                    "title":  "联系作者",
-                    "desc":  "关注知乎，了解更多方言研究与GIS知识",
-                    "button":  "前往知乎"
-                },
-    "footer":  {
-                   "links":  {
-                                 "about":  "关于网站",
-                                 "source":  "资料来源",
-                                 "privacy":  "隐私政策",
-                                 "setting":  "设置",
-                                 "oldSite":  "旧版网站",
-                                 "support":  "支持作者"
-                             },
-                   "stats":  "今日访问 {today} · 总访问 {total}",
-                   "copyright":  "© 2026 方音图鉴 · 由不羁(jengzang)开发",
-                   "versionInfo":  "{version} · 最后更新：{date}",
-                   "icp":  "粤ICP备2025466875号"
-               },
-    "updateNotice":  {
-                         "title":  "网站更新通知",
-                         "items":  {
-                                       "homepage":  {
-                                                        "title":  "全新首页",
-                                                        "description":  "采用液态玻璃风格设计，展示核心功能卡片、开源项目、登录权益等，提供更直观的导航体验"
-                                                    },
-                                       "compare":  {
-                                                       "title":  "方言比较功能",
-                                                       "description":  "支持汉字比较、中古音比较、调类比较，地图用不同颜色的圆点展示两组数据的差异，并提供图例说明"
-                                                   },
-                                       "villages":  {
-                                                        "title":  "自然村机器学习分析",
-                                                        "description":  "新增村落方言数据的机器学习分析功能，帮助研究者发现方言分布的潜在规律和模式"
-                                                    }
-                                   }
-                     },
-    "supportModal":  {
-                         "title":  "☕️ 请作者喝杯咖啡",
-                         "subtitle":  "感谢您的支持！ 💖",
-                         "donorThanks":  "感谢你们请作者喝咖啡。每一份支持，都会转化成继续维护本站的动力。",
-                         "donorColumns":  {
-                                              "time":  "时间",
-                                              "donor":  "捐赠者",
-                                              "amount":  "金额（元）",
-                                              "method":  "方式"
-                                          },
-                         "weixinAlt":  "微信收款码",
-                         "weixinLabel":  "微信",
-                         "alipayAlt":  "支付宝收款码",
-                         "alipayLabel":  "支付宝"
-                     }
+  "hero": {
+    "title": "方言比较 · 地理语言学",
+    "subtitle": "✨ 探索方言的历史层次 · 🎵 触摸汉字的音韵之美",
+    "startExploring": "开始探索",
+    "expandTools": "拓展工具",
+    "featuresIntro": "功能简介",
+    "logoAlt": "方音图鉴",
+    "decorationAlt": "蓝色圆环"
+  },
+  "features": {
+    "sectionTitle": "核心功能",
+    "query": {
+      "title": "查询分析",
+      "desc": "多维度查询方言音韵资料",
+      "searchChar": "查字 - 查询字音、地位",
+      "searchMiddle": "查中古 - 按中古地位整理读音",
+      "searchPhoneme": "查音位 - 分析音位的中古来源",
+      "searchTone": "查调 - 查询调值、调类"
+    },
+    "compare": {
+      "title": "方言比较",
+      "desc": "对比不同方言的音韵特征",
+      "compareChar": "比较汉字 - 比较各点声韵调的字音差异",
+      "compareMiddle": "比较中古 - 按音韵地位比较各点",
+      "compareTone": "比较调类 - 对比各点声调系统",
+      "comparePhonetic": "比较音值 - 桑基图呈现各点音值差异"
+    },
+    "map": {
+      "title": "地图可视化",
+      "desc": "地理语言学视角呈现",
+      "dialectMap": "地图显示 - 地图上呈现查询结果",
+      "regionMap": "方言分区图 - 按地图集或音典分区绘制",
+      "customMap": "自定义数据 - 添加个人数据绘图",
+      "drawMap": "绘图工具 - GIS在线绘图 泰森多边形"
+    },
+    "phonology": {
+      "title": "音系分析",
+      "desc": "方言语音系统研究",
+      "phonologyQuery": "音系查询 - 查看方言音系表",
+      "phonemeClassify": "音素分类 - 按自定义类别分析音素",
+      "syllableCount": "音节统计 - 统计音节数量",
+      "middlePosition": "中古地位 - 查询汉字中古地位",
+      "evolution": "演变 - 饼图桑基图展示方言演变"
+    },
+    "words": {
+      "title": "词句资料",
+      "desc": "方言词汇与语法资料",
+      "yubaoVocab": "语保词汇 - 语保工程词汇资料",
+      "yubaoGrammar": "语保语法 - 语保工程句子资料",
+      "ycSpoken": "阳春口语词 - 阳春方言口语词汇"
+    },
+    "villages": {
+      "title": "自然村资料",
+      "desc": "村落地名分析与方言绘图",
+      "gdVillages": "广东自然村 - 广东自然村树状图",
+      "villagesML": "机器学习 - 自然村名机器学习",
+      "gdVillagesTable": "全粤村情表格 - 广东村落详细表格",
+      "ycVillages": "阳春自然村 - 阳春自然村资料"
+    },
+    "tools": {
+      "title": "字表工具",
+      "desc": "字表转换、合并、检查等工具",
+      "tableProcess": "字表处理 - 字表检查与格式转换",
+      "jyut2ipa": "粤拼转IPA - 粤拼转国际音标",
+      "tableMerge": "字表合并 - 合并多个字表"
+    },
+    "charClass": {
+      "title": "汉字地位",
+      "desc": "历代汉字音韵地位资料",
+      "zhonggu": "中古汉语 - 广韵等中古音系地位",
+      "shanggu": "上古汉语 - 诗经谐声等上古地位",
+      "jingu": "近古汉语 - 洪武正韵、中原音韵等近古地位",
+      "yueyun": "粤语韵书 - 分韵撮要等韵书"
+    },
+    "praat": {
+      "title": "Praat 声学分析",
+      "desc": "实验语音学工具与数据分析"
+    },
+    "about": {
+      "title": "关于网站",
+      "desc": "网站介绍与资料来源",
+      "intro": "简介 - 网站功能介绍",
+      "reflection": "感悟 - 开发感悟与鸣谢",
+      "suggestion": "提出建议 - 反馈与建议",
+      "likeAuthor": "喜欢作者 - 支持与关注",
+      "source": "资料来源 - 查阅字表来源与相关信息",
+      "setting": "设置 - 语言与音韵资料选择"
+    },
+    "dialectClustering": {
+      "title": "方言聚类",
+      "desc": "方言聚类流程页面占位"
+    }
+  },
+  "roadmap": {
+    "sectionTitle": "开发中的功能",
+    "sectionSubtitle": "即将推出的新特性",
+    "phoneticsToolbox": {
+      "title": "韶子的语音学工具箱",
+      "desc": "声学参数批量估计、多算法基频检测、EGG信号分析、声门参数提取"
+    },
+    "charsGeneration": {
+      "title": "字表推导器",
+      "desc": "基于音韵地位的字表推导工具，由少量字生成完整字表，可选多种韵书"
+    },
+    "dialectClustering": {
+      "title": "方言聚类",
+      "desc": "自定义音值音位权重、调整聚类算法参数、基于音位向量的多维度相似度计算"
+    },
+    "evolutionTree": {
+      "title": "方言演化树状图",
+      "desc": "自定义演化模型参数、调整分支长度算法、交互式系统发生树构建与可视化"
+    },
+    "ipaTTS": {
+      "title": "IPA 转语音合成",
+      "desc": "国际音标到语音的实时转换、多方言音色支持（远景规划）"
+    },
+    "dialectBot": {
+      "title": "方言对话机器人",
+      "desc": "基于规整字表集的LLM微调、音色克隆、方言语音交互（远景规划）"
+    }
+  },
+  "login": {
+    "title": "登录解锁更多功能",
+    "desc": "查看详细权限对比，了解登录后的完整权益",
+    "benefits": {
+      "customMap": "自定义绘制地图",
+      "customRegion": "自定义方言分区",
+      "moreLocations": "查询地点数量提升",
+      "praatTools": "Praat 声学工具",
+      "tableTools": "字表处理工具",
+      "queryHistory": "查询记录与排行榜"
+    },
+    "loginNow": "立即登录",
+    "viewDetails": "查看详情"
+  },
+  "intro": {
+    "thanks": {
+      "aboutTitle": "ℹ️ 关于网站",
+      "aboutDesc": "「方音图鉴」是一个专注于中古地位分析、方言比较、地理语言学的在线工具，致力于以清晰、互动的方式呈现各方言点声韵层次及音位分合。",
+      "feature1": "功能1：<strong>查中古</strong>（按中古地位整理读音）。使用者可输入各种组合进行分析，目前支持摄、韵、等、呼、调、系、组、母、清浊、发音部位、发声方式等类别。网站会按输入的组合分析声母/韵母/声调，并把结果呈现在表格和地图中。",
+      "feature2": "功能2：<strong>查音位</strong>（分析音位的中古来源）。使用者可输入上述类别，网站会分析输入的音值（音位）对应字的中古来源，并把结果呈现在表格和地图中。",
+      "feature3": "功能3：<strong>查调</strong>（查询调值、调类）。网站会根据用户选择的分区、地点，整理调值、调类，不同的调类标上了不同的颜色。",
+      "feature4": "功能4：<strong>查字</strong>（查询字音、地位）。根据用户输入汉字进行查询，最终呈现各个地点的音值、注释以及汉字中古地位",
+      "feature5": "功能5：<strong>分区绘图</strong>（按地图集二分区/音典分区绘制方言地图）。",
+      "feature6": "功能6：<strong>自定义绘图</strong>（用户添加个人数据进行绘图）。用户可以自己在地图上选点、标注，网站会根据特征值自定分配颜色",
+      "feature7": "表格里的<strong>蓝色字</strong>（地位、音值等）一般都是可以点击的，点击后即在新的弹窗中进行细分查询，方便与原结果对比分析",
+      "feature8": "地图上的点也可以点击，点击后即可查询详细信息。",
+      "welcomeText": "欢迎探索《方音图鉴》，一起触摸方言的历史层次！",
+      "devTitle": "🧑‍💻 开发感悟",
+      "devPara1": "最初，我只想为自己的研究制作称手的工具，却在不知不觉间，探索了广袤的星空。从第一行代码到第一个功能，从稚嫩的构想到渐丰的体系，昼夜在键盘上更迭，我的构想也逐渐从虚无中落地生根。我看着这个网站，就如同看着自家的孩子蹒跚学步，一步步走出自己的轮廓。每一个按钮、每一次交互，都烙印着一段时光。我曾为如果实现想要的查询逻辑而精疲力竭，也曾为视觉效果的成功呈现而雀跃不已——这些点滴，汇成了她的血与肉、魂与灵。",
+      "devPara2": "其实，这亦是自我蜕变的历程。从对前端一无所知，到摸索DOM、尝试虚拟滚动，进阶至运用框架，乃至领略JWT、ORM的精妙。我在建造中学习，在错误中成熟。最迷人之处在于，我用以搭建这一切的砖石，正是我渴望学习的知识本身：网站的搭建深化了我对音韵的理解，而钻研音韵又驱动着代码的迭代。技术于我，不再是冷冰冰的指令，而是承载文化的舟楫；文化于我，亦不再是遥远的文献，逐步化为可交互、可追溯、可触摸的实体。",
+      "devPara3": "这便是我用代码与热爱写就的答卷，一个普通学生献给方言领域最诚挚的礼物。感谢每一位与它相遇的你。希望这份仍显稚拙的创作，能激起你心中一丝好奇的涟漪，或为你节省资料翻检的片刻光阴，这便是她存在的意义。",
+      "devPara4": "愿八方乡音，生生不息；<br>愿汉字之美，永被珍惜；<br>愿文明薪火，长存于每一次交互与共鸣之中。",
+      "thanksTitle": "特别鸣谢",
+      "mcpdict": "汉字音典",
+      "mcpdictDesc": "本网站大部分资料来自",
+      "mcpdictData": "音典开源数据",
+      "jyutjam": "岭南粤音",
+      "jyutjamDesc": "提供了交流的平台 及",
+      "jyutdict": "泛粤大典",
+      "yubao": "语保",
+      "yubaoDesc": "筛选了部分资料",
+      "xiaoxue": "小学堂",
+      "xiaoxueDesc": "筛选了部分资料",
+      "yueminke": "粤闽客方言系统",
+      "yueminkeDesc": "筛选了部分资料",
+      "testers": "测试人员",
+      "testersDesc": "正式上线之前测试、提建议的网友！",
+      "friends": "朋友 ❤️",
+      "friendsDesc": "在项目开发过程中，所有支持、鼓励、帮助过我的朋友！",
+      "you": "你 ❤️",
+      "youDesc": "当然，还有看到这里的你！"
+    },
+    "suggestions": {
+      "title": "我有建议",
+      "desc": "发现 bug？有建议？<br />欢迎通过 GitHub Issue 提出！",
+      "subtext": "点击下方卡片跳转对应仓库",
+      "frontendCard": "🐞 网页运行有 bug❓<br />💡 对交互、UI 有建议❓",
+      "frontendLink": "到前端仓库提 Issue",
+      "buildCard": "🔤 对字表有疑问❓<br />🎯 声/韵/调 提取出错❓",
+      "buildLink": "到字表处理仓库提 Issue"
+    },
+    "likeAuthor": {
+      "title": "❤️ 喜欢作者",
+      "follow": "关注",
+      "starText": "「如果你觉得项目不错，可以给个 ⭐️ 吗！」",
+      "frontendRepo": "前端仓库 - 使用vue框架和原生js开发",
+      "backendRepo": "后端仓库 - 基于fastapi",
+      "buildRepo": "字表预处理仓库 - 提取字表的声韵调",
+      "villagesMLRepo": "自然村机器学习 - 村落名称、地理数据分析",
+      "supportText": "「若网站对您有帮助，可以请作者喝杯咖啡☕️，您的支持将是作者持续维护的动力🙏」",
+      "supportButton": "支持一下",
+      "supportNote": "「注：本站由一名本科生开发运营，从字表处理、后端API到前端界面皆一人完成；服务器和域名的开销，也是从生活费中省出来的💸」",
+      "modalTitle": "☕️ 请作者喝杯咖啡",
+      "modalSubtitle": "感谢您的支持！ 💖",
+      "weixinAlt": "微信收款码",
+      "alipayAlt": "支付宝收款码"
+    }
+  },
+  "projects": {
+    "sectionTitle": "开源项目",
+    "sectionSubtitle": "欢迎 Star、Fork 与贡献代码"
+  },
+  "contact": {
+    "title": "联系作者",
+    "desc": "关注知乎，了解更多方言研究与GIS知识",
+    "button": "前往知乎"
+  },
+  "footer": {
+    "links": {
+      "about": "关于网站",
+      "source": "资料来源",
+      "privacy": "隐私政策",
+      "setting": "设置",
+      "oldSite": "旧版网站",
+      "support": "支持作者"
+    },
+    "stats": "今日访问 {today} · 总访问 {total}",
+    "copyright": "© 2026 方音图鉴 · 由不羁(jengzang)开发",
+    "versionInfo": "{version} · 最后更新：{date}",
+    "icp": "粤ICP备2025466875号"
+  },
+  "updateNotice": {
+    "title": "网站更新通知",
+    "items": {
+      "homepage": {
+        "title": "全新首页",
+        "description": "采用液态玻璃风格设计，展示核心功能卡片、开源项目、登录权益等，提供更直观的导航体验"
+      },
+      "compare": {
+        "title": "方言比较功能",
+        "description": "支持汉字比较、中古音比较、调类比较，地图用不同颜色的圆点展示两组数据的差异，并提供图例说明"
+      },
+      "villages": {
+        "title": "自然村机器学习分析",
+        "description": "新增村落方言数据的机器学习分析功能，帮助研究者发现方言分布的潜在规律和模式"
+      }
+    }
+  },
+  "supportModal": {
+    "title": "☕️ 请作者喝杯咖啡",
+    "subtitle": "感谢您的支持！ 💖",
+    "donorThanks": "感谢你们请作者喝咖啡。每一份支持，都会转化成继续维护本站的动力。",
+    "donorColumns": {
+      "time": "时间",
+      "donor": "捐赠者",
+      "amount": "金额(元)",
+      "method": "方式"
+    },
+    "weixinAlt": "微信收款码",
+    "weixinLabel": "微信",
+    "alipayAlt": "支付宝收款码",
+    "alipayLabel": "支付宝"
+  }
 }

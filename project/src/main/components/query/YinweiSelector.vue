@@ -7,13 +7,44 @@
       </span>
     </div>
 
-    <textarea
+    <div class="textarea-wrapper">
+      <textarea
         id="tab3-key-input"
+        ref="inputEl"
         v-model="tab3KeyInput"
         :placeholder="$t('query.components.yinweiSelector.placeholder')"
         style="max-height: 5dvh"
         autocomplete="off"
-    ></textarea>
+        @keyup="onKeyup"
+        @blur="onBlur"
+      ></textarea>
+      <span v-if="showSuccessCheckmark" class="success-checkmark">✓</span>
+    </div>
+
+    <Teleport to="body">
+      <div
+        v-if="suggestions.length"
+        class="inline-suggestion"
+        :style="suggestionStyle"
+      >
+        <div
+          v-for="item in suggestions"
+          :key="item"
+          class="suggest-line"
+          @mousedown.prevent="applySuggestion(item)"
+        >
+          <span class="suggest-text">{{ item }}</span>
+          <span class="suggest-counts">
+            <span class="suggest-count suggest-count--locations">{{ getSuggestionStats(item).locationCount }}</span>
+            <span class="suggest-count suggest-count--total">{{ getSuggestionStats(item).totalCount }}</span>
+          </span>
+        </div>
+      </div>
+    </Teleport>
+
+    <div v-if="inputLimitHint" class="input-limit-hint">
+      {{ inputLimitHint }}
+    </div>
   </div>
 
   <YinweiHelpPopup
@@ -22,179 +53,278 @@
     :location-list="locationList"
     :loading-states="loadingStates"
     :api-results="apiResults"
+    :opening-animating="isHelpPopupOpening"
     @close="closeHelpModal"
-    @query-location="fetchFeatureCount"
   />
-  <!--
-    <div class="yinwei-help-shell">
-          <button
-            class="close-btn close-btn-lg close-btn-corner"
-            @click="closeHelpModal"
-            :title="$t('common.button.close')"
-            :aria-label="$t('common.button.close')"
-          >
-            &times;
-          </button>
-          <h3 class="yinwei-help-title">{{ $t('query.components.yinweiSelector.modalTitle') }}</h3>
-            <div v-if="!hasLocations" class="empty-state">
-              <div class="icon-warn">⚠️</div>
-              <p style="white-space: pre-line">{{ $t('query.components.yinweiSelector.emptyState') }}</p>
-            </div>
-            <div v-else class="location-list-container">
-              <ul class="glass-list">
-                <li v-for="(loc, index) in locationList" :key="index" class="glass-list-item">
-                  <div class="item-row">
-                    <span class="loc-name">{{ loc }}</span>
-                    <button
-                        class="query-btn"
-                        @click="fetchFeatureCount(loc)"
-                        :disabled="loadingStates[loc]"
-                    >
-                      {{ loadingStates[loc] ? $t('query.components.yinweiSelector.queryingButton') : $t('query.components.yinweiSelector.queryButton') }}
-                    </button>
-                  </div>
-
-                  <Transition name="slide-down">
-                    <div v-if="apiResults[loc] && apiResults[loc][loc]" class="result-box">
-
-                      <div class="stat-section" v-if="apiResults[loc][loc]['聲母']">
-                        <h4 class="stat-title">{{ $t('query.components.yinweiSelector.initial') }}</h4>
-                        <div class="stat-tags">
-                            <span v-for="(count, key) in apiResults[loc][loc]['聲母']" :key="key" class="glass-tag">
-                              <span class="tag-key">{{ key }}</span>
-                              <span class="tag-count">{{ count }}</span>
-                            </span>
-                        </div>
-                      </div>
-
-                      <div class="stat-section" v-if="apiResults[loc][loc]['韻母']">
-                        <h4 class="stat-title">{{ $t('query.components.yinweiSelector.final') }}</h4>
-                        <div class="stat-tags">
-                          <span v-for="(count, key) in apiResults[loc][loc]['韻母']" :key="key" class="glass-tag">
-                            <span class="tag-key">{{ key }}</span>
-                            <span class="tag-count">{{ count }}</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div class="stat-section" v-if="apiResults[loc][loc]['聲調']">
-                        <h4 class="stat-title">{{ $t('query.components.yinweiSelector.tone') }}</h4>
-                        <div class="stat-tags">
-                          <span v-for="(count, key) in apiResults[loc][loc]['聲調']" :key="key" class="glass-tag">
-                            <span class="tag-key">{{ key }}</span>
-                            <span class="tag-count">{{ count }}</span>
-                          </span>
-                        </div>
-                      </div>
-
-                    </div>
-                  </Transition>
-                </li>
-              </ul>
-            </div>
-    </div>
-  -->
 </template>
 
 <script setup>
-import { ref, computed ,watch} from 'vue';
+import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getFeatureCounts } from '@/api'
 import YinweiHelpPopup from '@/main/components/popup/query/YinweiHelpPopup.vue'
+import { LOCATION_LIMITS } from '@/main/config/constants.js'
 import { userStore, setTabContentDisabled } from '@/main/store/store.js'
+import {
+  aggregateFeatureCountsByType,
+  filterYinweiSuggestions,
+  getFeatureSuggestionsByCard,
+  normalizeYinweiTokens
+} from '@/main/utils/yinweiInput.js'
 
 const { t } = useI18n()
 
-// 1. 接收父組件傳入的 locationRef
 const props = defineProps({
   locationRef: {
     type: Object,
     default: null
   },
+  selectedCard: {
+    type: String,
+    default: '韻母'
+  }
+})
 
-});
+const emit = defineEmits(['update:runDisabled'])
 
-const tab3KeyInput = ref('');
-const isHelpModalOpen = ref(false);
+const inputEl = ref(null)
+const tab3KeyInput = ref('')
+const isHelpModalOpen = ref(false)
+const showSuccessCheckmark = ref(false)
+const suggestions = ref([])
+const suggestionStyle = ref({
+  left: '0px',
+  top: '0px',
+  position: 'absolute',
+  zIndex: 99999
+})
 
-const emit = defineEmits(['update:runDisabled']);
+const loadingStates = ref({})
+const apiResults = ref({})
+const inputLimitHint = ref('')
+const isFetchingSuggestions = ref(false)
+const isHelpPopupOpening = ref(false)
+const aggregatedFeatureData = ref({})
+const aggregatedCardStats = ref({})
+const cardSuggestions = ref([])
+const hasFetchedFeatureCounts = ref(false)
+let fetchSuggestionsTimer = null
+let featureRequestToken = 0
+let helpPopupAnimationTimer = null
 
-// 辅助函数：同时更新 emit 和 store（向后兼容）
+const locationList = computed(() => {
+  const list = props.locationRef?.locationsResult || []
+  return Array.isArray(list) ? list : []
+})
+
+const hasLocations = computed(() => locationList.value.length > 0)
+
+const currentLocationLimit = computed(() => {
+  const contextLimits = LOCATION_LIMITS.tab3 || LOCATION_LIMITS.default
+  const roleLimits = contextLimits[userStore.role] || contextLimits.anonymous
+  return roleLimits.MAX_LOCATIONS
+})
+
+const legalState = computed(() => normalizeYinweiTokens(tab3KeyInput.value, cardSuggestions.value, 3))
+
 function updateDisabledState(isDisabled) {
-  // 1. Emit to parent (backward compatible)
   emit('update:runDisabled', isDisabled)
-
-  // 2. Update store for tab3 (音位查询)
   setTabContentDisabled('query', 'tab3', isDisabled)
 }
 
-// ✅ 3. 修改後的監聽邏輯：
-// 僅當輸入框為空，或"只包含"空格和特定分隔符時，禁用按鈕
-watch(tab3KeyInput, (newVal) => {
-  const isInvalid = !newVal || /^[\s,;，；、]*$/.test(newVal);
-  if (userStore.role !== 'admin'){
-    updateDisabledState(isInvalid);}
-  else {updateDisabledState(false);}
-}, { immediate: true });
+watch(legalState, (state) => {
+  const isInvalid = state.legalTokens.length === 0
+  if (userStore.role !== 'admin') {
+    updateDisabledState(isInvalid)
+  } else {
+    updateDisabledState(false)
+  }
 
-// 狀態管理
-const loadingStates = ref({});
-const apiResults = ref({});
+  inputLimitHint.value = state.exceededLimit
+    ? t('query.components.yinweiSelector.inputLimitHint', { max: 3 })
+    : ''
+  showSuccessCheckmark.value = state.legalTokens.length > 0
+}, { immediate: true })
 
-// 2. 修改：從 props 中獲取地點列表
-const locationList = computed(() => {
-  // 安全訪問：先判斷 props.locationRef 是否存在
-  // 注意：取決於兄弟組件的 expose 方式，通常是 props.locationRef.locationsResult
-  // 如果 locationsResult 是 ref，Vue 會自動解包，或需要 .value (視具體實現而定，通常組件實例屬性不需要 .value)
-  const list = props.locationRef?.locationsResult || [];
-  return Array.isArray(list) ? list : [];
-});
+watch(locationList, () => {
+  aggregatedFeatureData.value = {}
+  aggregatedCardStats.value = {}
+  cardSuggestions.value = []
+  hasFetchedFeatureCounts.value = false
+  suggestions.value = []
+  apiResults.value = {}
+}, { deep: true })
 
-const hasLocations = computed(() => locationList.value.length > 0);
+watch(() => props.selectedCard, () => {
+  const nextAggregated = aggregatedFeatureData.value?.[props.selectedCard]
+  aggregatedCardStats.value = nextAggregated && typeof nextAggregated === 'object' ? nextAggregated : {}
+  cardSuggestions.value = getFeatureSuggestionsByCard(apiResults.value, props.selectedCard)
+  const normalized = normalizeYinweiTokens(tab3KeyInput.value, cardSuggestions.value, 3)
+  if (normalized.normalizedInput !== tab3KeyInput.value.trim()) {
+    tab3KeyInput.value = normalized.normalizedInput
+  }
+  suggestions.value = []
+})
 
-// 打開/關閉彈窗
-const openHelpModal = () => {
-  isHelpModalOpen.value = true;
-};
+async function openHelpModal() {
+  isHelpPopupOpening.value = true
+  clearTimeout(helpPopupAnimationTimer)
+  helpPopupAnimationTimer = setTimeout(() => {
+    isHelpPopupOpening.value = false
+  }, 900)
+  isHelpModalOpen.value = true
 
-const closeHelpModal = () => {
-  isHelpModalOpen.value = false;
-};
+  if (!hasFetchedFeatureCounts.value && !isFetchingSuggestions.value) {
+    await ensureFeatureCountsLoaded()
+  }
+}
 
-// 調用 API
-const fetchFeatureCount = async (locationName) => {
-  loadingStates.value[locationName] = true;
-  apiResults.value[locationName] = null;
+function closeHelpModal() {
+  isHelpModalOpen.value = false
+  isHelpPopupOpening.value = false
+  clearTimeout(helpPopupAnimationTimer)
+}
+
+async function ensureFeatureCountsLoaded() {
+  if (hasFetchedFeatureCounts.value || isFetchingSuggestions.value) {
+    return
+  }
+
+  if (!hasLocations.value) {
+    return
+  }
+
+  if (locationList.value.length > currentLocationLimit.value) {
+    return
+  }
+
+  const requestToken = ++featureRequestToken
+  isFetchingSuggestions.value = true
 
   try {
-    // ✅ 重點修改：顯式定義為列表，然後遍歷 append
-    // 即使只有一個元素，這樣寫也完全符合 List[str] 的邏輯
-    const locationsPayload = [locationName];
+    const data = await getFeatureCounts({ locations: locationList.value })
 
-    const data = await getFeatureCounts({ locations: locationsPayload })
+    if (requestToken !== featureRequestToken) {
+      return
+    }
 
-    // 這裡假設後端返回的數據結構，如果需要格式化請在此處理
-    // 例如：const formatted = `共有 ${data.count} 個特徵`;
-    apiResults.value[locationName] = data;
+    apiResults.value = data || {}
+    aggregatedFeatureData.value = aggregateFeatureCountsByType(data || {})
+    const nextAggregated = aggregatedFeatureData.value?.[props.selectedCard]
+    aggregatedCardStats.value = nextAggregated && typeof nextAggregated === 'object' ? nextAggregated : {}
+    cardSuggestions.value = getFeatureSuggestionsByCard(apiResults.value, props.selectedCard)
+    hasFetchedFeatureCounts.value = true
 
+    const normalized = normalizeYinweiTokens(tab3KeyInput.value, cardSuggestions.value, 3)
+    if (normalized.normalizedInput !== tab3KeyInput.value.trim()) {
+      tab3KeyInput.value = normalized.normalizedInput
+    }
   } catch (error) {
-    console.error(t('query.components.yinweiSelector.errorFetch'), error);
-    apiResults.value[locationName] = t('query.components.yinweiSelector.queryFailed');
+    console.error(t('query.components.yinweiSelector.errorFetch'), error)
   } finally {
-    loadingStates.value[locationName] = false;
+    if (requestToken === featureRequestToken) {
+      isFetchingSuggestions.value = false
+    }
   }
-};
+}
+
+async function fetchSuggestion() {
+  await ensureFeatureCountsLoaded()
+
+  if (!cardSuggestions.value.length) {
+    suggestions.value = []
+    showSuccessCheckmark.value = false
+    return
+  }
+
+  const { legalTokens } = legalState.value
+  const rawValue = String(tab3KeyInput.value)
+  const tokens = rawValue
+    .split(/[\s,;，；、\n\t]+/)
+    .filter(Boolean)
+  const endsWithSeparator = /[\s,;，；、\n\t]$/.test(rawValue)
+  const currentQuery = endsWithSeparator ? '' : (tokens.at(-1) || '')
+
+  if (legalTokens.length >= 3 && !legalTokens.includes(currentQuery) && currentQuery) {
+    suggestions.value = []
+    return
+  }
+
+  suggestions.value = filterYinweiSuggestions(currentQuery, cardSuggestions.value, legalTokens, aggregatedCardStats.value).slice(0, 20)
+
+  nextTick(() => {
+    const el = inputEl.value
+    if (!el) return
+
+    const rect = el.getBoundingClientRect()
+    suggestionStyle.value = {
+      position: 'absolute',
+      left: `${rect.left + window.scrollX}px`,
+      top: `${rect.top + rect.height + 6 + window.scrollY}px`,
+      zIndex: 99999,
+      minWidth: `${el.offsetWidth}px`
+    }
+  })
+}
+
+function onKeyup() {
+  showSuccessCheckmark.value = legalState.value.legalTokens.length > 0
+  clearTimeout(fetchSuggestionsTimer)
+  fetchSuggestionsTimer = setTimeout(() => {
+    fetchSuggestion()
+  }, 200)
+}
+
+function onBlur() {
+  setTimeout(() => {
+    suggestions.value = []
+    const normalized = normalizeYinweiTokens(tab3KeyInput.value, cardSuggestions.value, 3)
+    if (normalized.normalizedInput !== tab3KeyInput.value.trim()) {
+      tab3KeyInput.value = normalized.normalizedInput
+    }
+  }, 200)
+}
+
+function applySuggestion(item) {
+  const parts = String(tab3KeyInput.value)
+    .split(/[\s,;，；、\n\t]+/)
+    .map(part => part.trim())
+    .filter(Boolean)
+
+  const normalizedExisting = normalizeYinweiTokens(parts.slice(0, -1).join(' '), cardSuggestions.value, 3).legalTokens
+  const nextRaw = [...normalizedExisting, item].join(' ')
+  const normalized = normalizeYinweiTokens(nextRaw, cardSuggestions.value, 3)
+
+  tab3KeyInput.value = normalized.normalizedInput
+  suggestions.value = []
+
+  nextTick(() => {
+    const el = inputEl.value
+    if (!el) return
+    const pos = tab3KeyInput.value.length
+    el.setSelectionRange(pos, pos)
+  })
+}
+
+function getSuggestionStats(item) {
+  const stats = aggregatedCardStats.value?.[item]
+  return {
+    locationCount: stats?.locationCount || 0,
+    totalCount: stats?.totalCount || 0
+  }
+}
+
 defineExpose({
-  tab3KeyInput
-});
+  tab3KeyInput,
+  legalPhoValues: computed(() => legalState.value.legalTokens),
+  normalizedPhoInput: computed(() => legalState.value.normalizedInput)
+})
 </script>
 
-<style scoped>
-
-/* 触发按钮样式 */
+<style scoped lang="scss">
 .help-trigger {
   font-size: 13px;
-  color: #007aff; /* Apple Blue */
+  color: #007aff;
   cursor: pointer;
   transition: opacity 0.2s;
   text-decoration: none;
@@ -205,212 +335,127 @@ defineExpose({
   text-decoration: underline;
 }
 
-.yinwei-help-shell {
+.textarea-wrapper {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
+  width: 100%;
 }
 
-
-
-/* ----------- 🍎 苹果液态玻璃弹窗样式 ----------- */
-
-/* 玻璃卡片主体 */
-.yinwei-help-title {
-  margin: 0 0 20px 0;
+.success-checkmark {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 20px;
-  font-weight: 700;
-  text-align: center;
-  color: #1d1d1f;
+  font-weight: bold;
+  color: #52c41a;
+  pointer-events: none;
 }
 
-/* 空状态 */
-.empty-state {
-  text-align: center;
-  padding: 30px 0;
-  color: #666;
-}
-.icon-warn {
-  font-size: 40px;
-  margin-bottom: 10px;
+.query-box {
+  width: 100%;
+  margin: 10px auto 0px;
 }
 
-/* 列表容器 */
-.location-list-container {
-  flex: 1;
-  min-height: 0;
-  margin-top: 10px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: none;
+.query-box textarea {
+  width: 100%;
+  padding-right: 40px;
+  box-sizing: border-box;
 }
 
-.glass-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.glass-list-item {
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-.glass-list-item:last-child {
-  border-bottom: none;
-}
-
-/* 列表行布局 */
-.item-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.loc-name {
-  font-weight: 500;
-  font-size: 16px;
-}
-
-/* 苹果风格按钮 */
-.query-btn {
-  background: #007aff;
-  color: white;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 14px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 6px rgba(0, 122, 255, 0.25);
-}
-
-.query-btn:hover {
-  background: #006ce6;
-  transform: scale(1.02);
-}
-
-.query-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
-/* 结果框 */
-.result-box {
-  margin-top: 10px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 13px;
-  color: #333;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-}
-
-.result-content {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.result-label {
-  font-weight: 600;
-  color: #007aff;
-  font-size: 12px;
-}
-
-.result-data {
-  font-family: monospace;
-  word-break: break-all;
-}
-
-/* 动画效果 */
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition: all 0.3s ease;
-  max-height: 200px;
-  opacity: 1;
-}
-.slide-down-enter-from,
-.slide-down-leave-to {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-}
-
-/* 结果容器 */
-.result-box {
-  margin-top: 10px;
-  background: rgba(255, 255, 255, 0.4); /* 更通透的背景 */
-  border-radius: 12px;
-  padding: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-/* 分区标题 */
-.stat-section {
-  margin-bottom: 12px;
-}
-.stat-section:last-child {
+.query-box :deep(textarea) {
   margin-bottom: 0;
 }
 
-.stat-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: #8e8e93; /* iOS Label Gray */
-  margin: 0 0 6px 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.inline-suggestion {
+  position: absolute !important;
+  background: var(--glass-medium2) !important;
+  border: 1px solid var(--border-gray-light) !important;
+  box-shadow: var(--shadow-lg2);
+  padding: 8px 12px;
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  white-space: pre-line;
+  font-size: 14px;
+  color: var(--text-dark);
+  min-width: 140px;
+  max-width: min(240px, 60vw);
+  width: max-content;
+  z-index: 99999 !important;
+  pointer-events: auto !important;
+  max-height: 20dvh;
+  overflow-y: auto;
+  transition: background-color 0.2s ease;
 }
 
-/* 标签容器 */
-.stat-tags {
+.suggest-line {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
 }
 
-/* 🍎 玻璃胶囊标签 */
-.glass-tag {
+.suggest-text {
+  min-width: 0;
+}
+
+.suggest-counts {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  border-radius: 20px; /* 胶囊圆角 */
+  gap: 8px;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-dark-medium);
+  font-variant-numeric: tabular-nums;
+}
 
-  /* 微型玻璃效果 */
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+.suggest-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  line-height: 1.35;
+  box-shadow: var(--shadow-sm2);
+}
 
+.suggest-count--locations {
+  color: #3d7bd9;
+  background: rgba(0, 122, 255, 0.08);
+  border-color: rgba(0, 122, 255, 0.14);
+}
+
+.suggest-count--total {
+  color: #0f5fc4;
+  background: rgba(0, 122, 255, 0.14);
+  border-color: rgba(0, 122, 255, 0.22);
+}
+
+.suggest-line:hover {
+  background-color: var(--bg-blue-hover);
+}
+
+.input-limit-hint {
+  margin: 2px auto 0;
+  max-width: 250px;
+  min-width: 80%;
+  padding: 4px 12px;
   font-size: 13px;
-  color: #333;
-  transition: transform 0.2s;
-}
-
-.glass-tag:hover {
-  transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.8);
-}
-
-/* 标签内的文字样式 */
-.tag-key {
-  font-family: "Menlo", "Consolas", monospace; /* 等宽字体显示音标更专业 */
-  font-weight: 600;
-  margin-right: 6px;
-}
-
-.tag-count {
-  background: rgba(0, 122, 255, 0.1); /* 浅蓝色背景强调数字 */
-  color: #007aff;
-  font-weight: 700;
-  font-size: 11px;
-  padding: 1px 5px;
-  border-radius: 8px;
-  min-width: 14px;
+  line-height: 1.4;
+  color: var(--color-warning);
   text-align: center;
+  background: var(--glass-lighter2);
+  border: 1px solid var(--border-gray-lighter);
+  border-radius: 12px;
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  box-shadow: var(--shadow-sm2);
+  opacity: 0.95;
 }
 </style>

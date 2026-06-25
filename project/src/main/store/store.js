@@ -80,9 +80,11 @@ export const mapStore = reactive({
     mergedData: [],           // 存放特征数据 (results)
     loading: false,           // 共享加载状态
     selectedFeature: '',      // 当前选中的特征
+    selectedFeaturePhonology: '', // 当前选中的特征的声韵调类型
     showCustomData: false,    // 是否显示用户个人数据
     compareType: '',          // 比較類型: 'chars' | 'zhonggu' | 'tones'
-    compareGroups: null       // 比较模式的组信息 { group1: {color, label}, group2: {color, label} }
+    compareGroups: null,       // 比较模式的组信息 { group1: {color, label}, group2: {color, label} }
+    fitViewKey: 0
 })
 
 // =================================
@@ -135,7 +137,8 @@ export const uiStore = reactive({
             tabContentDisabled: {
                 tab1: true,
                 tab2: true,
-                tab4: true
+                tab4: true,
+                tab5: false
             }
         }
     },
@@ -144,8 +147,8 @@ export const uiStore = reactive({
     currentPage: 'query',  // 'query' | 'result' | 'map' | 'about'
     currentSubTab: {
         query: 'tab2',  // 'tab1' | 'tab2' | 'tab3' | 'tab4'
-        compare: 'tab2', // 'tab1' | 'tab2' | 'tab4'
-        map: 'map'      // 'map' | 'divide' | 'custom'
+        compare: 'tab2', // 'tab1' | 'tab2' | 'tab4' | 'tab5'
+        map: 'map'      // 'map' | 'divide' | 'custom' | 'draw'
     }
 })
 

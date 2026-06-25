@@ -69,7 +69,7 @@
         <!-- 比較功能 -->
         <div class="feature-card" :class="{ expanded: expandedCard === 'compare' }">
           <div class="card-header" @click="toggleCard('compare')">
-            <div class="card-icon">⚖️</div>
+            <div class="card-icon">🔀</div>
             <div class="card-info">
               <h3 class="card-title">{{ $t('home.features.compare.title') }}</h3>
               <p class="card-desc">{{ $t('home.features.compare.desc') }}</p>
@@ -91,6 +91,10 @@
               <a @click.stop="navigateTo('/menu/compare/tone')" class="feature-link">
                 <span class="link-icon">🎹</span>
                 <span class="link-text">{{ $t('home.features.compare.compareTone') }}</span>
+              </a>
+              <a @click.stop="navigateTo('/menu/compare/phonetic')" class="feature-link">
+                <span class="link-icon">⚖️</span>
+                <span class="link-text">{{ $t('home.features.compare.comparePhonetic') }}</span>
               </a>
             </div>
           </transition>
@@ -115,12 +119,16 @@
                 <span class="link-text">{{ $t('home.features.map.dialectMap') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/map/divide')" class="feature-link">
-                <span class="link-icon">🎨</span>
+                <span class="link-icon">🧭</span>
                 <span class="link-text">{{ $t('home.features.map.regionMap') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/map/custom')" class="feature-link">
-                <span class="link-icon">✏️</span>
+                <span class="link-icon">📁</span>
                 <span class="link-text">{{ $t('home.features.map.customMap') }}</span>
+              </a>
+              <a @click.stop="navigateTo('/menu/map/draw')" class="feature-link">
+                <span class="link-icon">✏️</span>
+                <span class="link-text">{{ $t('home.features.map.drawMap') }}</span>
               </a>
             </div>
           </transition>
@@ -363,6 +371,13 @@
       <div class="roadmap-list">
         <div class="roadmap-item">
           <div class="roadmap-header">
+            <div class="roadmap-icon">📜</div>
+            <h3 class="roadmap-title">{{ $t('home.roadmap.charsGeneration.title') }}</h3>
+          </div>
+          <p class="roadmap-desc">{{ $t('home.roadmap.charsGeneration.desc') }}</p>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-header">
             <div class="roadmap-icon">🎙️</div>
             <h3 class="roadmap-title">{{ $t('home.roadmap.phoneticsToolbox.title') }}</h3>
           </div>
@@ -506,6 +521,7 @@
 
         <div class="footer-stats footer-stats-secondary">
           <span class="stat-text">{{ $t('source.totalRecords', { locationCount: sourceLocationCount, dataCount: sourceDataCount }) }}</span>
+          <span class="stat-text stat-text-muted">{{ $t('source.databaseVersion', { version: sourceDbVersion }) }}</span>
         </div>
 
         <div class="footer-info">
@@ -562,8 +578,8 @@
 import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { getTodayVisits, getTotalVisits } from '@/api/logs/index.js'
-import { queryCount } from '@/api'
+import { useVisitStats } from '@/composables/useVisitStats.js'
+import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
 
 // ✅ 条件渲染的组件懒加载
@@ -579,15 +595,20 @@ const UpdateNoticeModal = defineAsyncComponent(() =>
 
 const { t } = useI18n()
 const router = useRouter()
+const {
+  todayVisits,
+  totalVisits,
+  ensureVisitStats
+} = useVisitStats()
 const featuresSection = ref(null)
 const expandedCard = ref(null)
 const showSupport = ref(false)
 const showBenefitsPopup = ref(false)
 const showUpdateNotice = ref(false)
-const todayVisits = ref(0)
-const totalVisits = ref(0)
-const sourceLocationCount = ref('...')
-const sourceDataCount = ref('...')
+const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
+const cachedSourceStats = getCachedSourceStats()
+const sourceLocationCount = ref(cachedSourceStats.locationCount)
+const sourceDataCount = ref(cachedSourceStats.dataCount)
 
 // 当前版本号和更新时间
 const homeUpdateNotice = computed(() => getHomeUpdateNotice(t))
@@ -655,12 +676,7 @@ function openZhihu() {
 // Fetch visit statistics
 async function fetchVisitStats() {
   try {
-    const [todayData, totalData] = await Promise.all([
-      getTodayVisits(),
-      getTotalVisits()
-    ])
-    todayVisits.value = todayData?.today_visits || 0
-    totalVisits.value = totalData?.total_visits || 0
+    await ensureVisitStats()
   } catch (error) {
     console.error('獲取訪問統計失敗:', error)
   }
@@ -668,12 +684,9 @@ async function fetchVisitStats() {
 
 async function fetchSourceStats() {
   try {
-    const [locationCount, dataCount] = await Promise.all([
-      queryCount({ db_key: 'query', table_name: 'dialects', filter_column: '存儲標記', filter_value: 1 }),
-      queryCount({ db_key: 'dialects', table_name: 'dialects' })
-    ])
-    sourceLocationCount.value = locationCount
-    sourceDataCount.value = dataCount
+    const stats = await getSourceStats()
+    sourceLocationCount.value = stats.locationCount
+    sourceDataCount.value = stats.dataCount
   } catch (error) {
     console.error('獲取字表統計失敗:', error)
   }
@@ -1480,16 +1493,27 @@ onMounted(() => {
 .footer-stats {
   margin-bottom: 0.75rem;
   text-align: center;
+  gap: 1rem;
 }
 
 .footer-stats-secondary {
   margin-top: -0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem 3rem;
+  flex-wrap: nowrap;
 }
 
 .stat-text {
   font-size: 0.875rem;
   color: rgba(0, 0, 0, 0.6);
   font-weight: 500;
+}
+
+.stat-text-muted {
+  font-size: 0.8125rem;
+  color: rgba(0, 0, 0, 0.48);
 }
 
 .footer-info {
@@ -1570,6 +1594,10 @@ onMounted(() => {
 /* Responsive */
 @media (orientation: portrait) {
   .hero-section { min-height: 75vh; }
+  .footer-stats-secondary {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
   .hero-logo {
     width: clamp(260px, 50vw, 400px);
   }

@@ -1,5 +1,9 @@
 <template>
-  <div class="liquid-radio-group" v-if="options && options.length">
+  <div
+    class="liquid-radio-group"
+    v-if="options && options.length"
+    :style="radioSizeStyle"
+  >
     <label
         v-for="(option, index) in options"
         :key="getOptionValue(option)"
@@ -23,7 +27,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import { computed, defineProps, defineEmits } from 'vue';
 
 // 定义接收的属性
 const props = defineProps({
@@ -40,6 +44,11 @@ const props = defineProps({
   modelValue: {
     type: [String, Number, Boolean],
     default: ''
+  },
+  // 控制文字大小，并同步控制圆圈大小；不传时默认保持原样
+  size: {
+    type: [Number, String],
+    default: 14
   }
 });
 
@@ -58,6 +67,27 @@ const getOptionLabel = (option) => {
       ? option.label
       : option;
 };
+
+const normalizeSize = (value) => {
+  if (typeof value === 'number') {
+    return value;
+  }
+
+  const parsed = parseFloat(value);
+  return Number.isNaN(parsed) ? 14 : parsed;
+};
+
+const radioSizeStyle = computed(() => {
+  const fontSize = normalizeSize(props.size);
+  const radioSize = fontSize + 4;
+  const dotSize = Math.round(radioSize * 0.67);
+
+  return {
+    '--radio-font-size': `${fontSize}px`,
+    '--radio-size': `${radioSize}px`,
+    '--radio-dot-size': `${dotSize}px`
+  };
+});
 
 // 处理切换事件
 const handleChange = (event, value) => {
@@ -82,7 +112,7 @@ const handleChange = (event, value) => {
   cursor: pointer;
   position: relative;
   user-select: none;
-  gap: 10px;
+  gap: 8px;
   padding: 4px 8px; /* 增加点击区域 */
 
   &:hover .liquid-radio-custom {
@@ -100,7 +130,7 @@ const handleChange = (event, value) => {
   &:checked {
     & ~ .liquid-radio-custom {
       /* 这里的颜色分配参考了你觉得更合理的风格 */
-      background: var(--color-primary);
+      background: var(--bg-white);
       border-color: var(--color-primary);
       box-shadow:
           0 4px 12px var(--color-primary-shadow-light),
@@ -120,13 +150,14 @@ const handleChange = (event, value) => {
 }
 
 .liquid-radio-custom {
-  width: 20px; /* 稍微缩小一点，显得更精致 */
-  height: 20px;
+  width: var(--radio-size, 18px); /* 稍微缩小一点，显得更精致 */
+  height: var(--radio-size, 18px);
   border-radius: var(--radius-full);
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-shrink: 0;
 
   background: var(--glass-lighter); /* 使用更透明的白色背景 */
   border: 2px solid var(--border-gray); /* 默认使用较明显的灰色边框 */
@@ -135,12 +166,16 @@ const handleChange = (event, value) => {
 
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
+  box-shadow:
+      inset 0 1px 3px rgba(255, 255, 255, 0.5), /* 顶部内发光（玻璃质感） */
+      0 2px 4px rgba(0, 0, 0, 0.05); /* 底部微小阴影 */
+
   &::after {
     content: "";
-    width: 8px;
-    height: 8px;
+    width: var(--radio-dot-size, 12px);
+    height: var(--radio-dot-size, 12px);
     border-radius: var(--radius-full);
-    background: var(--bg-white);
+    background: var(--color-primary);
     transform: scale(0);
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -148,7 +183,7 @@ const handleChange = (event, value) => {
 }
 
 .liquid-radio-text {
-  font-size: 14px; /* 减小到 14px，更符合管理后台风格 */
+  font-size: var(--radio-font-size, 14px); /* 减小到 14px，更符合管理后台风格 */
   color: var(--text-primary);
   transition: all 0.3s ease;
 }

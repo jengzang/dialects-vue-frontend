@@ -118,7 +118,7 @@ const dropdownStyle = ref({
   position: 'absolute',
   top: '0px',
   left: '0px',
-  zIndex: 10000
+  zIndex: 30000
 })
 
 // Filtered options based on search
@@ -247,7 +247,7 @@ const updatePosition = () => {
       position: 'fixed',
       top: `${top}px`,
       left: `${left}px`,
-      zIndex: 10000,
+      zIndex: 30000,
       maxHeight: props.maxHeight,
       ...(props.matchTriggerWidth ? {
         width: `${triggerRect.width}px`,
@@ -299,7 +299,7 @@ watch(searchQuery, () => {
 .dropdown-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 30000;
   background: transparent;
 }
 

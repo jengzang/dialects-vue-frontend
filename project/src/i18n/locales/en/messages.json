@@ -5,7 +5,8 @@
     "updated": "Updated successfully",
     "created": "Created successfully",
     "copied": "Copied successfully",
-    "languageChanged": "Language changed successfully"
+    "languageChanged": "Language changed successfully",
+    "interfaceModeChanged": "Interface mode updated"
   },
   "error": {
     "saveFailed": "Save failed",
@@ -50,5 +51,10 @@
       "second": "s",
       "now": "now"
     }
+  },
+  "loginPrompt": {
+    "message": "Log in to use advanced features, get higher query limits, and add personal data.",
+    "login": "Log in",
+    "dismiss": "Dismiss"
   }
 }

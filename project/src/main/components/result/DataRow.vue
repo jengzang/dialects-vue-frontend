@@ -7,7 +7,7 @@
     <div class="feature-row">
       <!-- 主要信息容器：包裹 p、button、p -->
       <div class="feature-main-items">
-        <p>
+        <p class="feature-inline-row">
           <span
               class="feature-value-clickable"
               style="cursor: pointer; color: #007bff"
@@ -93,7 +93,8 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getCorrespondingCharacters } from '@/main/utils/ResultTable.js';
+import { getCorrespondingCharacters, getReadingClass, getYinWeiCharReadingType, getZhongGuCharReadingType } from '@/main/utils/ResultTable.js';
+import { READING_COLORS } from '@/main/constants/readingColors.js';
 import { getFeatureStats, getLocationDetail } from '@/api';
 import { globalPayload } from '@/main/store/store.js';
 import LocationDetailPopup from '../popup/result/LocationDetailPopup.vue';
@@ -103,7 +104,8 @@ import { translateResultTerm } from '@/i18n/utils/resultI18n.js';
 const props = defineProps({
   item: { type: Object, required: true },
   isCondensed: { type: Boolean, default: true },
-  showLocation: { type: Boolean, default: false }
+  showLocation: { type: Boolean, default: false },
+  readingSource: { type: String, default: 'zhonggu' }
 });
 
 const emit = defineEmits(['trigger-popup']);
@@ -112,7 +114,25 @@ const { t } = useI18n();
 const featureKey = computed(() => Object.keys(props.item.分組值 || {})[0]);
 const featureVal = computed(() => (props.item.分組值 || {})[featureKey.value]);
 
-const parsedChars = computed(() => getCorrespondingCharacters(props.item));
+const parsedChars = computed(() => {
+  const nodes = getCorrespondingCharacters(props.item);
+
+  return nodes.map(node => ({
+    ...node,
+    props: {
+      ...node.props,
+      class: [
+        node.props?.class,
+        getReadingClass(
+          props.readingSource === 'yinwei'
+            ? getYinWeiCharReadingType(props.item, node.children)
+            : getZhongGuCharReadingType(props.item, node.children),
+          'char-vue'
+        )
+      ].filter(Boolean).join(' ')
+    }
+  }));
+});
 
 // --- 新增：Tooltip 相關邏輯 ---
 const tooltip = ref({
@@ -290,7 +310,7 @@ const handleFeatureStatsClick = async () => {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* 從 ResultTable.css 遷移的樣式 */
 .data-row-vue {
   margin-bottom: 15px;
@@ -322,19 +342,32 @@ const handleFeatureStatsClick = async () => {
   margin-right: 2px;
   font-size: 15px;
   color: #333;
-}
 
-.char-vue.multi-vue {
-  color: darkred;
-  font-weight: bold;
-  position: relative;
-  cursor: pointer;
-}
+  &.multi-vue,
+  &.char-vue--wendu {
+    color: v-bind('READING_COLORS.zhongguWendu');
+    font-weight: bold;
+    position: relative;
+    cursor: pointer;
 
-.char-vue.multi-vue:hover {
-  background-color: #f9f9f9;
-  border-radius: 4px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    &:hover {
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &.char-vue--baidu {
+    color: v-bind('READING_COLORS.zhongguBaidu');
+  }
+
+  &.char-vue--both {
+    color: v-bind('READING_COLORS.both');
+  }
+
+  &.char-vue--polyphonic {
+    color: v-bind('READING_COLORS.polyphonic');
+  }
 }
 
 .feature-value-clickable {
@@ -343,38 +376,45 @@ const handleFeatureStatsClick = async () => {
   color: #007bff;
   display: inline-block;
   transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.3s ease;
+
+  &:hover {
+    transform: scale(1.3);
+    text-decoration: underline;
+    color: #3c8dbc;
+    text-shadow: 0 0 8px rgba(60, 141, 188, 0.6);
+  }
 }
 
-.feature-value-clickable:hover {
-  transform: scale(1.3);
-  text-decoration: underline;
-  color: #3c8dbc;
-  text-shadow: 0 0 8px rgba(60, 141, 188, 0.6);
+.feature-inline-row {
+  white-space: nowrap;
 }
 
 /* 這是傳送到 body 的彈窗樣式，不受小容器限制 */
 .global-tooltip-popup {
-  position: fixed; /* 關鍵：使用 fixed 定位 */
-  z-index: 9999;   /* 確保在最上層 */
-  transform: translate(-50%, -100%); /* 讓定位點在彈窗底部中央，實現向上彈出 */
-
-  /* 以下複製你原本 CSS ::after 的樣式 */
+  position: fixed;
+  z-index: 10001;
+  transform: translate(-50%, -100%);
   background-color: rgba(0, 0, 0, 0.8);
   color: #fff;
   padding: 5px 10px;
   border-radius: 4px;
   font-size: 12px;
-  pointer-events: none; /* 讓滑鼠穿透，避免閃爍 */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   max-width: 200px;
-  /* 添加一個小動畫讓它更順滑 (可選) */
   animation: fadeIn 0.2s ease-out;
-
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translate(-50%, -90%); }
-  to { opacity: 1; transform: translate(-50%, -100%); }
+  from {
+    opacity: 0;
+    transform: translate(-50%, -90%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%);
+  }
 }
 
 /* 地名样式 */
@@ -387,71 +427,58 @@ const handleFeatureStatsClick = async () => {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   color: #1d1d1f;
-}
 
-.locations-vue:hover {
-  color: #007aff;
-  transform: translateX(2px);
-}
+  &:hover {
+    color: #007aff;
+    transform: translateX(2px);
+  }
 
-.locations-vue:active {
-  transform: scale(0.98);
+  &:active {
+    transform: scale(0.98);
+  }
 }
 
 /* 特徵統計按鈕 */
 .feature-stats-btn {
-  /* 基础布局 */
   appearance: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
   white-space: nowrap;
-
-  /* 尺寸与字体 */
   padding: 6px 12px;
-  border-radius: 999px; /* 或者保持 8px，999px 更像胶囊风格 */
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 500; /* 600有点太重，500更精致 */
-
-  /* 核心：液态玻璃风格 */
-  background-color: rgba(0, 122, 255, 0.08); /* 极淡的蓝色背景 */
-  border: 1px solid rgba(0, 122, 255, 0.2); /* 半透明的蓝色细边框 */
-  color: #007AFF; /* 苹果蓝文字 */
-
-  /* 磨砂效果（这是玻璃感的灵魂） */
+  font-weight: 500;
+  background-color: rgba(0, 122, 255, 0.08);
+  border: 1px solid rgba(0, 122, 255, 0.2);
+  color: #007aff;
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px); /* 兼容 Safari */
-
-  /* 交互 */
+  -webkit-backdrop-filter: blur(8px);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1); /* iOS 物理缓动 */
-  box-shadow: none; /* 去掉之前的深色阴影 */
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  box-shadow: none;
+  order: 3;
+  margin-left: 12px;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(0, 122, 255, 0.15);
+    border-color: rgba(0, 122, 255, 0.4);
+    transform: translateY(-0.5px);
+  }
+
+  &:active {
+    background-color: rgba(0, 122, 255, 0.2);
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    filter: grayscale(1);
+    cursor: not-allowed;
+  }
 }
 
-/* 悬停状态：稍微加深一点点背景，增强边框 */
-.feature-stats-btn:hover:not(:disabled) {
-  background-color: rgba(0, 122, 255, 0.15);
-  border-color: rgba(0, 122, 255, 0.4);
-  transform: translateY(-0.5px); /* 极其微小的位移 */
-}
-
-/* 点击状态：微缩 */
-.feature-stats-btn:active {
-  background-color: rgba(0, 122, 255, 0.2);
-  transform: scale(0.98);
-}
-
-/* 禁用状态 */
-.feature-stats-btn:disabled {
-  opacity: 0.5;
-  filter: grayscale(1); /* 自动置灰 */
-  cursor: not-allowed;
-}
-
-
-
-/* ?????? */
 /* 簡要統計顯示 */
 .brief-stats {
   font-size: 13px;
@@ -466,6 +493,8 @@ const handleFeatureStatsClick = async () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  order: 2;
+  margin-left: 12px;
 }
 
 /* feature-row 佈局：寬屏左右對齊 */
@@ -473,47 +502,32 @@ const handleFeatureStatsClick = async () => {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  /* 移除 gap，改用個別元素的 margin 控制間距 */
 }
 
 /* feature-main-items 使用 contents 讓子元素成為 feature-row 的直接 flex 項目 */
 .feature-main-items {
   display: contents;
-}
 
-/* 特徵 p 標籤：左對齊，使用 margin-right: auto 推開右側元素 */
-.feature-main-items > p:first-child {
-  font-size: 18px;
-  text-align: left;
-  font-weight: bold;
-  color: #007bff;
-  margin: 1px;
-  margin-right: auto; /* 關鍵：推開右側所有元素到最右邊 */
-  order: 1;
-}
+  > p:first-child {
+    font-size: 18px;
+    text-align: left;
+    font-weight: bold;
+    color: #007bff;
+    margin: 1px;
+    margin-right: auto;
+    order: 1;
+  }
 
-/* brief-stats 排在特徵 p 之後，與右側元素有間距 */
-.brief-stats {
-  order: 2;
-  margin-left: 12px; /* 與 button 之間的間距 */
-}
-
-/* 按鈕排在 brief-stats 之後 */
-.feature-stats-btn {
-  order: 3;
-  margin-left: 12px; /* 與字數佔比之間的間距 */
-}
-
-/* 字數佔比 p 標籤：最右側 */
-.feature-main-items > p:last-child {
-  font-size: 13px;
-  font-style: italic;
-  text-align: right;
-  color: #6c757d;
-  margin: 1px;
-  margin-left: 12px; /* 與 button 之間的間距 */
-  white-space: nowrap;
-  order: 4;
+  > p:last-child {
+    font-size: 13px;
+    font-style: italic;
+    text-align: right;
+    color: #6c757d;
+    margin: 1px;
+    margin-left: 12px;
+    white-space: nowrap;
+    order: 4;
+  }
 }
 
 /* 響應式：小螢幕下垂直堆疊 */
@@ -531,23 +545,23 @@ const handleFeatureStatsClick = async () => {
     align-items: center;
     width: 100%;
     gap: 8px;
-  }
 
-  .feature-main-items > p:first-child {
-    font-size: 16px;
-    flex: 1;
-    margin-right: 0;
-    order: 0;
+    > p:first-child {
+      font-size: 16px;
+      flex: 1;
+      margin-right: 0;
+      order: 0;
+    }
+
+    > p:last-child {
+      font-size: 12px;
+      order: 0;
+    }
   }
 
   .feature-stats-btn {
     padding: 4px 10px;
     font-size: 11px;
-    order: 0;
-  }
-
-  .feature-main-items > p:last-child {
-    font-size: 12px;
     order: 0;
   }
 
@@ -558,7 +572,7 @@ const handleFeatureStatsClick = async () => {
   }
 }
 
-/* Container Query：當面板容器寬度小於 600px 時也應用相同樣式 */
+/* Container Query：當面板容器寬度小於 500px 時也應用相同樣式 */
 @container query-panel (max-width: 500px) {
   .feature-row {
     flex-direction: column;
@@ -573,23 +587,23 @@ const handleFeatureStatsClick = async () => {
     align-items: center;
     width: 100%;
     gap: 8px;
-  }
 
-  .feature-main-items > p:first-child {
-    font-size: 16px;
-    flex: 1;
-    margin-right: 0;
-    order: 0;
+    > p:first-child {
+      font-size: 16px;
+      flex: 1;
+      margin-right: 0;
+      order: 0;
+    }
+
+    > p:last-child {
+      font-size: 12px;
+      order: 0;
+    }
   }
 
   .feature-stats-btn {
     padding: 4px 10px;
     font-size: 11px;
-    order: 0;
-  }
-
-  .feature-main-items > p:last-child {
-    font-size: 12px;
     order: 0;
   }
 

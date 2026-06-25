@@ -1,44 +1,45 @@
 .main-glass-button {
   padding: var(--main-glass-button-padding, 12px 32px);
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.54);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: var(--main-glass-button-border-radius, 16px);
   color: #0b2540;
   font-size: var(--main-glass-button-font-size, 15px);
   font-weight: var(--main-glass-button-font-weight, 500);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
   display: flex;
   align-items: center;
   gap: 8px;
   white-space: var(--main-glass-button-white-space, normal);
+  text-align: center;
 }
 
 .main-glass-button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.68);
   transform: translateY(-1px);
 }
 
 .main-glass-button[data-variant='primary'] {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.8), rgba(0, 122, 255, 0.6));
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.78), rgba(0, 122, 255, 0.6));
   color: white;
-  border-color: rgba(0, 122, 255, 0.6);
+  border-color: rgba(0, 122, 255, 0.52);
 }
 
 .main-glass-button[data-variant='primary']:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.9), rgba(0, 122, 255, 0.7));
-  box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.86), rgba(0, 122, 255, 0.68));
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+  transform: translateY(-1px);
 }
 
 .main-glass-button[data-variant='secondary'] {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.58);
 }
 
 .main-glass-button[data-variant='secondary']:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .main-glass-button:disabled {
@@ -57,6 +58,6 @@
 }
 
 .main-glass-button[data-active='true'] {
-  background: rgba(0, 122, 255, 0.2);
+  background: rgba(0, 123, 255, 0.5);
   border-color: rgba(0, 122, 255, 0.5);
 }

@@ -6,174 +6,176 @@
       :route-value="currentTab"
       :resolve-route="resolveTabRoute"
     >
-    <template #default="{ currentTab }">
-      <!-- 新的"簡介"页面 -->
-      <div v-if="currentTab === 'intro'" class="thanks-container">
-        <h2 class="tabs-title">{{ $t('about.intro.title') }}</h2>
-        <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
-        <ul class="customlist">
-          <li>
-            <span v-html="$t('about.intro.features.feature1.title')"></span>
-            {{ $t('about.intro.features.feature1.description') }}
-          </li>
-          <li>
-            <span v-html="$t('about.intro.features.feature2.title')"></span>
-            {{ $t('about.intro.features.feature2.description') }}
-          </li>
-          <li>
-            <span v-html="$t('about.intro.features.feature3.title')"></span>
-            {{ $t('about.intro.features.feature3.description') }}
-          </li>
-          <li>
-            <span v-html="$t('about.intro.features.feature4.title')"></span>
-            {{ $t('about.intro.features.feature4.description') }}
-          </li>
-          <li v-html="$t('about.intro.features.feature5.title')"></li>
-          <li>
-            <span v-html="$t('about.intro.features.feature6.title')"></span>
-            {{ $t('about.intro.features.feature6.description') }}
-          </li>
-          <li v-html="$t('about.intro.features.blueText')"></li>
-          <li>{{ $t('about.intro.features.mapClick') }}</li>
-        </ul>
-        <ul v-if="false" class="customlist">
-          <li>功能1：<strong>查中古</strong>（按中古地位整理讀音）。
-            使用者可輸入各種組合進行分析，目前支持攝、韻、等、呼、調、系、組、母、清濁、發音部位、發聲方式等類別。
-            網站會按輸入的組合分析聲母/韻母/聲調，並把結果呈現在表格和地圖中。</li>
-          <li>功能2：<strong>查音位</strong>（分析音位的中古來源）。
-            使用者可輸入上述類別，網站會分析輸入的音值（音位）對應字的中古來源，並把結果呈現在表格和地圖中。</li>
-          <li>功能3：<strong>查調</strong>（查詢調值、調類）。
-            網站會根據用戶選擇的分區、地點，整理調值、調類，不同的調類標上了不同的顏色。</li>
-          <li>功能4：<strong>查字</strong>（查詢字音、地位）。
-            根據用戶輸入漢字進行查詢，最終呈現各個地點的音值、注釋以及漢字中古地位</li>
-          <li v-html="$t('about.intro.features.feature5.title')"></li>
-          <li>功能6：<strong>自定義繪圖</strong>（用戶添加個人數據進行繪圖）。
-            用戶可以自己在地圖上選點、標註，網站會根據特徵值自定分配顏色</li>
-          <li v-html="$t('about.intro.features.blueText')"></li>
-          <li>{{ $t('about.intro.features.mapClick') }}</li>
-        </ul>
-        <p style=" text-align: left;font-weight: bold;text-decoration: underline">{{ $t('about.intro.footer') }}</p>
-      
+      <template #default="{ currentTab }">
+        <!-- 新的"簡介"页面 -->
+        <div v-if="currentTab === 'intro'" class="thanks-container">
+          <h2 class="tabs-title">{{ $t('about.intro.title') }}</h2>
+          <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
+          <ul class="customlist">
+            <li>
+              <span v-html="$t('about.intro.features.feature1.title')"></span>
+              {{ $t('about.intro.features.feature1.description') }}
+            </li>
+            <li>
+              <span v-html="$t('about.intro.features.feature2.title')"></span>
+              {{ $t('about.intro.features.feature2.description') }}
+            </li>
+            <li>
+              <span v-html="$t('about.intro.features.feature3.title')"></span>
+              {{ $t('about.intro.features.feature3.description') }}
+            </li>
+            <li>
+              <span v-html="$t('about.intro.features.feature4.title')"></span>
+              {{ $t('about.intro.features.feature4.description') }}
+            </li>
+            <li v-html="$t('about.intro.features.feature5.title')"></li>
+            <li>
+              <span v-html="$t('about.intro.features.feature6.title')"></span>
+              {{ $t('about.intro.features.feature6.description') }}
+            </li>
+            <li v-html="$t('about.intro.features.blueText')"></li>
+            <li>{{ $t('about.intro.features.mapClick') }}</li>
+          </ul>
 
-        <!-- 感悟部分 -->
-        <h2 class="tabs-title" style="margin-top: 20px">{{ $t('about.reflection.title') }}</h2>
-        <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
-        <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
-        <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
-        <p class="thoughts"><em v-html="$t('about.reflection.poem')"></em></p>
+          <ul v-if="false" class="customlist">
+            <li>功能1：<strong>查中古</strong>（按中古地位整理讀音）。
+              使用者可輸入各種組合進行分析，目前支持攝、韻、等、呼、調、系、組、母、清濁、發音部位、發聲方式等類別。
+              網站會按輸入的組合分析聲母/韻母/聲調，並把結果呈現在表格和地圖中。</li>
+            <li>功能2：<strong>查音位</strong>（分析音位的中古來源）。
+              使用者可輸入上述類別，網站會分析輸入的音值（音位）對應字的中古來源，並把結果呈現在表格和地圖中。</li>
+            <li>功能3：<strong>查調</strong>（查詢調值、調類）。
+              網站會根據用戶選擇的分區、地點，整理調值、調類，不同的調類標上了不同的顏色。</li>
+            <li>功能4：<strong>查字</strong>（查詢字音、地位）。
+              根據用戶輸入漢字進行查詢，最終呈現各個地點的音值、注釋以及漢字中古地位</li>
+            <li v-html="$t('about.intro.features.feature5.title')"></li>
+            <li>功能6：<strong>自定義繪圖</strong>（用戶添加個人數據進行繪圖）。
+              用戶可以自己在地圖上選點、標註，網站會根據特徵值自定分配顏色</li>
+            <li v-html="$t('about.intro.features.blueText')"></li>
+            <li>{{ $t('about.intro.features.mapClick') }}</li>
+          </ul>
 
-        <h2 class="tabs-title" style="margin-top: 20px">🙏 {{ $t('about.thanks.title') }}</h2>
-        <ul class="thanks-list">
-          <li>
-            ✔ <a href="https://mcpdict.vear.vip/" target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.mcpdict') }}</a>
-            - {{ $t('about.thanks.mcpdictDesc') }}<a href="https://github.com/osfans/MCPDict/tree/master/tools/tables/output"
-                                     target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.mcpdictData') }}</a>
-          </li>
-          <li>
-            ✔ <a href="https://jyutjam.org/" target="_blank" rel="noopener noreferrer"
-                 class="thanks-link">{{ $t('about.thanks.jyutjam') }}</a> - {{ $t('about.thanks.jyutjamDesc') }}<a href="https://jyutdict.org/"
-                                                                          target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.jyutdict') }}</a>
-          </li>
-          <li>
-            ✔ <a href="https://zhongguoyuyan.cn/" target="_blank" rel="noopener noreferrer"
-                 class="thanks-link">{{ $t('about.thanks.yuyan') }}</a> - {{ $t('about.thanks.yuyanDesc') }}
-          </li>
-          <li>
-            ✔ <a href="https://xiaoxue.iis.sinica.edu.tw/ccrdata/" target="_blank" rel="noopener noreferrer"
-                 class="thanks-link">{{ $t('about.thanks.xiaoxue') }}</a> - {{ $t('about.thanks.xiaoxueDesc') }}
-          </li>
-          <li>
-            ✔ <a href="http://1.14.238.88:8099/dialect/main/about.html" target="_blank" rel="noopener noreferrer"
-                 class="thanks-link">{{ $t('about.thanks.yuemin') }}</a> - {{ $t('about.thanks.yueminDesc') }}
-          </li>
-          <li>
-            ✔ <a href="#" class="thanks-link">{{ $t('about.thanks.testers') }}</a> - {{ $t('about.thanks.testersDesc') }}
-          </li>
-          <li style="margin-bottom: 0">
-            ✔ <a href="#" class="thanks-link">{{ $t('about.thanks.friends') }}</a> - {{ $t('about.thanks.friendsDesc') }}
-          </li>
-          <li>
-            ✔ <a href="#" class="thanks-link">{{ $t('about.thanks.you') }}</a> - {{ $t('about.thanks.youDesc') }}
-          </li>
-        </ul>
-        <p style="font-size:2rem;margin-top:0.5rem;margin-bottom: 3rem">💖🌟🥳</p>
-      </div>
+          <p style=" text-align: left;font-weight: bold;text-decoration: underline">{{ $t('about.intro.footer') }}</p>
 
-      <!-- 新的"建議"页面 -->
-      <div v-if="currentTab === 'suggestion'" class="page2">
-        <div class="suggestion-box">
-          <h2 class="tabs-title">💬 {{ $t('about.suggestion.title') }}</h2>
-          <p v-html="$t('about.suggestion.description')"></p>
-          <p class="subtext">👇 {{ $t('about.suggestion.subtext') }}</p>
-          <div class="card-links">
-            <a
+          <!-- 感悟部分 -->
+          <h2 class="tabs-title" style="margin-top: 20px">{{ $t('about.reflection.title') }}</h2>
+          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
+          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
+          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
+          <p class="thoughts"><em v-html="$t('about.reflection.poem')"></em></p>
+
+          <h2 class="tabs-title" style="margin-top: 20px">🙏 {{ $t('about.thanks.title') }}</h2>
+          <ul class="thanks-list">
+            <li>
+              ✔ <a href="https://mcpdict.vear.vip/" target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.mcpdict') }}</a>
+              - {{ $t('about.thanks.mcpdictDesc') }}<a href="https://github.com/osfans/MCPDict/tree/master/tools/tables/output"
+                                                       target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.mcpdictData') }}</a>
+            </li>
+            <li>
+              ✔ <a href="https://jyutjam.org/" target="_blank" rel="noopener noreferrer"
+                   class="thanks-link">{{ $t('about.thanks.jyutjam') }}</a> - {{ $t('about.thanks.jyutjamDesc') }}<a href="https://jyutdict.org/"
+                                                                                                                    target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.jyutdict') }}</a>
+            </li>
+            <li>
+              ✔ <a href="https://zhongguoyuyan.cn/" target="_blank" rel="noopener noreferrer"
+                   class="thanks-link">{{ $t('about.thanks.yuyan') }}</a> - {{ $t('about.thanks.yuyanDesc') }}
+            </li>
+            <li>
+              ✔ <a href="https://xiaoxue.iis.sinica.edu.tw/ccrdata/" target="_blank" rel="noopener noreferrer"
+                   class="thanks-link">{{ $t('about.thanks.xiaoxue') }}</a> - {{ $t('about.thanks.xiaoxueDesc') }}
+            </li>
+            <li>
+              ✔ <a href="http://1.14.238.88:8099/dialect/main/about.html" target="_blank" rel="noopener noreferrer"
+                   class="thanks-link">{{ $t('about.thanks.yuemin') }}</a> - {{ $t('about.thanks.yueminDesc') }}
+            </li>
+            <li>
+              ✔ <a href="#" class="thanks-link">{{ $t('about.thanks.testers') }}</a> - {{ $t('about.thanks.testersDesc') }}
+            </li>
+            <li style="margin-bottom: 0">
+              ✔ <a href="#" class="thanks-link">{{ $t('about.thanks.friends') }}</a> - {{ $t('about.thanks.friendsDesc') }}
+            </li>
+            <li>
+              ✔ <a href="#" class="thanks-link">{{ $t('about.thanks.you') }}</a> - {{ $t('about.thanks.youDesc') }}
+            </li>
+          </ul>
+          <p style="font-size:2rem;margin-top:0.5rem;margin-bottom: 3rem">💖🌟🥳</p>
+        </div>
+
+        <!-- 新的"建議"页面 -->
+        <div v-if="currentTab === 'suggestion'" class="page2">
+          <div class="suggestion-box">
+            <h2 class="tabs-title">💬 {{ $t('about.suggestion.title') }}</h2>
+            <p v-html="$t('about.suggestion.description')"></p>
+            <p class="subtext">👇 {{ $t('about.suggestion.subtext') }}</p>
+            <div class="card-links">
+              <a
                 href="https://github.com/jengzang/dialects-js-frontend/issues"
                 target="_blank"
                 rel="noopener"
                 class="card"
-            >
-              <span v-html="$t('about.suggestion.frontend.title')"></span>
-              <span class="thanks-link">👉 {{ $t('about.suggestion.frontend.link') }}</span>
-            </a>
-            <a
+              >
+                <span v-html="$t('about.suggestion.frontend.title')"></span>
+                <span class="thanks-link">👉 {{ $t('about.suggestion.frontend.link') }}</span>
+              </a>
+              <a
                 href="https://github.com/jengzang/dialects-build/issues"
                 target="_blank"
                 rel="noopener"
                 class="card"
-            >
-              <span v-html="$t('about.suggestion.backend.title')"></span>
-              <span class="thanks-link">👉 {{ $t('about.suggestion.backend.link') }}</span>
-            </a>
+              >
+                <span v-html="$t('about.suggestion.backend.title')"></span>
+                <span class="thanks-link">👉 {{ $t('about.suggestion.backend.link') }}</span>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 新的"喜歡"页面 -->
-      <div v-if="currentTab === 'like'" class="cards-container">
-        <h2 class="tabs-title like-author-title">
-          {{ $t('about.like.title') }}
-          <button class="follow-button" @click="followClicked">
-            {{ $t('about.like.followButton') }}
-          </button>
-        </h2>
-        <p style="display: block; width: 100%; clear: both; margin: 0;">
-          {{ $t('about.like.starMessage') }}
-        </p>
+        <!-- 新的"喜歡"页面 -->
+        <div v-if="currentTab === 'like'" class="cards-container">
+          <h2 class="tabs-title like-author-title">
+            {{ $t('about.like.title') }}
+            <button class="follow-button" @click="followClicked">
+              {{ $t('about.like.followButton') }}
+            </button>
+          </h2>
+          <p style="display: block; width: 100%; clear: both; margin: 0;">
+            {{ $t('about.like.starMessage') }}
+          </p>
 
-        <a
+          <a
             class="project-card"
             v-for="project in localizedProjects"
             :key="project.name"
             :href="project.url"
             target="_blank"
             rel="noopener noreferrer"
-        >
-          <div class="card-header">
-            <img class="github-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
-            <span class="thanks-link" style="font-weight: bold">{{ project.name }}</span>
-          </div>
-          <p>{{ project.description }}</p>
-          <div class="glow-border"></div>
-        </a>
-        <p style="margin-top: 2rem">
-          {{ $t('about.like.supportMessage') }}
-          <br />
-          <button class="support-button" @click="showQRCodes = true">
-            🙌 {{ $t('about.like.supportButton') }}
-          </button>
-          <br />
-          <span class="support-note">{{ $t('about.like.supportNote') }}</span>
-        </p>
-        <p></p>
-        <p></p>
-      </div>
+          >
+            <div class="card-header">
+              <img class="github-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
+              <span class="thanks-link" style="font-weight: bold">{{ project.name }}</span>
+            </div>
+            <p>{{ project.description }}</p>
+            <div class="glow-border"></div>
+          </a>
 
-      <!-- 设置页面 -->
-      <div v-if="currentTab === 'setting'" class="settings-container">
+          <p style="margin-top: 2rem">
+            {{ $t('about.like.supportMessage') }}
+            <br />
+            <button class="support-button" @click="showQRCodes = true">
+              🙌 {{ $t('about.like.supportButton') }}
+            </button>
+            <br />
+            <span class="support-note">{{ $t('about.like.supportNote') }}</span>
+          </p>
+          <p></p>
+          <p></p>
+        </div>
+
+        <!-- 设置页面 -->
+        <div v-if="currentTab === 'setting'" class="settings-container">
         <!-- <h2 class="tabs-title">{{ $t('navigation.tabs.settings') }}</h2> -->
 
-        <div class="setting-section">
-          <h3 class="section-title">{{ $t('navigation.settings.language.title') }}</h3>
+          <div class="setting-section">
+            <h3 class="section-title">{{ $t('navigation.settings.language.title') }}</h3>
 <!--          <p class="section-description">{{ $t('navigation.settings.language.description') }}</p>-->
 
           <div class="language-options">
@@ -192,55 +194,75 @@
               <div v-if="currentLocale === lang.code" class="language-check">&check;</div>
             </div>
           </div>
-        </div>
-
-        <div class="setting-section">
-          <h3 class="section-title">{{ $t('navigation.settings.characterTable.title') }}</h3>
-          <p class="section-description">{{ $t('navigation.settings.characterTable.description') }}</p>
-
-          <SimpleSelectDropdown
-            v-model="currentCharacterTable"
-            :options="characterTableOptions"
-            width="100%"
-          />
-        </div>
-
-        <div class="setting-section tutorial-toggle-section">
-          <div class="tutorial-toggle-copy">
-            <h3 class="section-title">新手指导</h3>
-            <p class="section-description">控制教程入口与随机示例按钮是否显示，默认开启。</p>
           </div>
-          <button
-            type="button"
-            class="tutorial-toggle-button"
-            :class="{ active: tutorialGuideEnabled }"
-            @click="tutorialGuideEnabled = !tutorialGuideEnabled"
-          >
-            <span class="tutorial-toggle-button__thumb"></span>
-            <span class="tutorial-toggle-button__label">{{ tutorialGuideEnabled ? '已开启' : '已关闭' }}</span>
-          </button>
-        </div>
-      </div>
-    </template>
-  </TabsContainer>
 
-  <SupportPopup
-    :visible="showQRCodes"
-    @close="showQRCodes = false"
-  />
+          <div class="setting-section">
+            <h3 class="section-title">{{ $t('navigation.settings.characterTable.title') }}</h3>
+            <p class="section-description">{{ $t('navigation.settings.characterTable.description') }}</p>
+
+            <SimpleSelectDropdown
+              v-model="currentCharacterTable"
+              :options="characterTableOptions"
+              width="100%"
+            />
+          </div>
+
+          <div class="setting-section">
+            <h3 class="section-title">{{ $t('navigation.settings.interfaceMode.title') }}</h3>
+            <p class="section-description">{{ $t('navigation.settings.interfaceMode.description') }}</p>
+
+            <RadioGroup
+              v-model="interfaceModeModel"
+              :options="interfaceModeRadioOptions"
+              name="about-interface-mode"
+              class="settings-radio-group interface-mode-radio-group"
+            />
+          </div>
+
+          <div class="setting-section tutorial-toggle-section">
+            <div class="tutorial-toggle-copy">
+              <h3 class="section-title">新手指导</h3>
+              <p class="section-description">控制教程入口与随机示例按钮是否显示，默认开启。</p>
+            </div>
+            <button
+              type="button"
+              class="tutorial-toggle-button"
+              :class="{ active: tutorialGuideEnabled }"
+              @click="tutorialGuideEnabled = !tutorialGuideEnabled"
+            >
+              <span class="tutorial-toggle-button__thumb"></span>
+              <span class="tutorial-toggle-button__label">{{ tutorialGuideEnabled ? '已开启' : '已关闭' }}</span>
+            </button>
+          </div>
+
+        </div>
+      </template>
+    </TabsContainer>
+
+    <SupportPopup
+      :visible="showQRCodes"
+      @close="showQRCodes = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { setLocale } from '@/i18n/index.js'
 import { SUPPORTED_LOCALES } from '@/i18n/localeDetector.js'
+import {
+  UI_MODE_DEFAULT,
+  UI_MODE_COMPACT,
+  getStoredInterfaceMode,
+  setInterfaceMode,
+} from '@/composables/core/uiPreferences.js'
 import { showSuccess } from '@/utils/message.js'
 import SupportPopup from '@/main/components/popup/SupportPopup.vue'
 import TabsContainer from '@/components/common/TabsContainer.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
 import {
   preferredCharacterTable,
@@ -251,7 +273,6 @@ import {
 
 const { t, locale } = useI18n()
 const route = useRoute()
-const router = useRouter()
 const showQRCodes = ref(false)
 
 const pathSectionToTab = {
@@ -274,14 +295,14 @@ const currentTab = computed(() => {
     return pathSectionToTab[section]
   }
 
-  return 'intro'
+  return 'setting'
 })
 
 const tabs = computed(() => [
+  { name: 'setting', label: t('about.tabs.setting') },
   { name: 'intro', label: t('about.tabs.intro') },
   { name: 'suggestion', label: t('about.tabs.suggestion') },
   { name: 'like', label: t('about.tabs.like') },
-  { name: 'setting', label: t('about.tabs.setting') },
 ])
 
 const localizedProjects = computed(() => [
@@ -303,7 +324,7 @@ const localizedProjects = computed(() => [
 ])
 
 function followClicked() {
-  window.open('https://www.zhihu.com/people/da-shu-18-11', '_blank');
+  window.open('https://www.zhihu.com/people/da-shu-18-11', '_blank')
 }
 
 // 语言设置相关
@@ -314,6 +335,33 @@ const languages = ref([
   SUPPORTED_LOCALES['zh-CN'],
   SUPPORTED_LOCALES['en']
 ])
+
+const interfaceMode = ref(getStoredInterfaceMode())
+
+const interfaceModeOptions = computed(() => [
+  {
+    value: UI_MODE_DEFAULT,
+    label: t('navigation.settings.interfaceMode.options.default'),
+    description: t('navigation.settings.interfaceMode.help.default')
+  },
+  {
+    value: UI_MODE_COMPACT,
+    label: t('navigation.settings.interfaceMode.options.compact'),
+    description: t('navigation.settings.interfaceMode.help.compact')
+  }
+])
+
+const interfaceModeRadioOptions = computed(() =>
+  interfaceModeOptions.value.map(option => ({
+    value: option.value,
+    label: `${option.label}`
+  }))
+)
+
+const interfaceModeModel = computed({
+  get: () => interfaceMode.value,
+  set: (mode) => changeInterfaceMode(mode)
+})
 
 const characterTableOptions = computed(() =>
   Object.entries(TABLE_COLUMN_SCHEMAS).map(([tableName, schema]) => ({
@@ -336,13 +384,23 @@ function changeLanguage(newLocale) {
   if (newLocale === currentLocale.value) {
     return
   }
+
   setLocale(newLocale)
   showSuccess(t('messages.success.languageChanged'))
   setTimeout(() => window.location.reload(), 500)
 }
 
+function changeInterfaceMode(mode) {
+  if (mode === interfaceMode.value) {
+    return
+  }
+
+  interfaceMode.value = setInterfaceMode(mode)
+  showSuccess(t('messages.success.interfaceModeChanged'))
+}
+
 function resolveTabRoute(tabName) {
-  const section = tabToPathSection[tabName] || 'intro'
+  const section = tabToPathSection[tabName] || 'setting'
   return {
     path: `/menu/about/${section}`,
     query: route.query
@@ -433,19 +491,23 @@ function resolveTabRoute(tabName) {
   display: flex;
   margin: 0 auto;
 }
+
 @keyframes fade {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 .thanks-list li {
   margin-bottom: 0.5rem;
 }
+
 p {
   font-family: 'Arial', sans-serif;
   line-height: 1.6;
@@ -528,7 +590,7 @@ p em.emoji {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  text-align:left;
+  text-align: left;
 }
 
 .thoughts em {
@@ -591,6 +653,7 @@ p em.emoji {
   0%, 100% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
@@ -777,12 +840,32 @@ p em.emoji {
 }
 
 .setting-section {
-  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.settings-radio-group {
+  justify-content: center;
+  gap: 18px 24px;
+}
+
+.settings-radio-group :deep(.liquid-radio-label) {
+  padding: 6px 8px;
+}
+
+.settings-radio-group :deep(.liquid-radio-text) {
+  line-height: 1.5;
+}
+
+.language-radio-group :deep(.liquid-radio-text) {
+  font-size: 15px;
+}
+
+.interface-mode-radio-group :deep(.liquid-radio-text) {
+  font-size: 14px;
 }
 
 .section-title {
@@ -800,8 +883,8 @@ p em.emoji {
 
 .language-options {
   display: flex;
-  flex-direction: column;
   gap: 12px;
+  justify-content: center;
 }
 
 .language-card {
@@ -831,7 +914,7 @@ p em.emoji {
 
 .language-flag {
   font-size: 32px;
-  margin-right: 16px;
+  margin-right: 12px;
 }
 
 .language-info {
@@ -871,7 +954,7 @@ p em.emoji {
 
   .language-flag {
     font-size: 28px;
-    margin-right: 12px;
+    margin-right: 8px;
   }
 
   .language-name {
@@ -881,6 +964,8 @@ p em.emoji {
   .language-code {
     font-size: 11px;
   }
+  .language-options {
+    flex-direction: column;
+  }
 }
-
 </style>

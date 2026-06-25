@@ -26,6 +26,7 @@ import GlobalConfirm from '../components/ToastAndHelp/GlobalConfirm.vue'
 import RateLimitNotice from '../components/ToastAndHelp/RateLimitNotice.vue'
 import PanelManager from './components/result/PanelManager.vue'
 import { initOnlineTimeTracker, stopOnlineTimeTracker } from '../utils/onlineTimeTracker.js'
+import { initLoginPromptTracker, stopLoginPromptTracker } from '../utils/loginPromptTracker.js'
 import { getToken } from '../api/auth/auth.js'
 
 // // 🌉 建立 bridge 用於跨組件共享 iframe 狀態
@@ -106,14 +107,16 @@ export default {
         // console.log('🎯 [App.vue] 检测到用户已登录，启动在线时长统计')
         initOnlineTimeTracker()
       }
-      // else {
+      else {
+        initLoginPromptTracker()
       //   console.log('ℹ️ [App.vue] 用户未登录，不启动在线时长统计')
-      // }
+      }
     })
 
     // 组件卸载时停止统计
     onBeforeUnmount(() => {
       stopOnlineTimeTracker()
+      stopLoginPromptTracker()
     })
 
     // // 🔁 輪詢 iframe 是否掛上 window.receiveFromVue()

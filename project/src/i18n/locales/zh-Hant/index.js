@@ -22,6 +22,7 @@ import result from './result.json'
 import tableTree from './tableTree.json'
 import user from './user.json'
 import cluster from './cluster.json'
+import customEntry from './customEntry.json'
 import tutorial from './tutorial.json'
 
 export default {
@@ -46,5 +47,6 @@ export default {
   tableTree,
   user,
   cluster,
+  customEntry,
   tutorial
 }

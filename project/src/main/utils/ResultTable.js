@@ -95,6 +95,209 @@ export function parseFeatureString(featureStr, tableName = DEFAULT_CHARACTER_TAB
     return { matched_fields, unmatched_fields: allFieldNames.filter(f => !usedFields.has(f)) };
 }
 
+/**
+ * @typedef {'normal' | 'polyphonic' | 'wendu' | 'baidu' | 'both'} ReadingType
+ * Unified frontend reading-color semantic bucket.
+ *
+ * - `normal`: no special reading color.
+ * - `polyphonic`: ordinary 多音字 bucket.
+ * - `wendu`: 文讀 bucket.
+ * - `baidu`: 白讀 bucket.
+ * - `both`: 文白讀 bucket.
+ */
+
+/**
+ * Resolve search_chars syllable-level reading type.
+ *
+ * search_chars rows are shaped like:
+ * {
+ *   char: string,
+ *   音节: string[],
+ *   location: string,
+ *   notes: string[],
+ *   type: Array<'文讀' | '白讀' | '_' | string>
+ * }
+ *
+ * `音节[i]`, `notes[i]`, and `type[i]` are index-aligned. For new payloads,
+ * only `type[index]` is authoritative for 文白讀 coloring. `notes[index]` is a
+ * legacy compatibility fallback and should not be used as the primary signal.
+ *
+ * This helper is only for search_chars 音節級顯示 and intentionally does not
+ * infer `polyphonic` or `both` from mixed row-level data.
+ *
+ * @param {Record<string, any>} row search_chars result row.
+ * @param {number} index syllable index aligned with row.音节 / row.notes / row.type.
+ * @returns {'normal' | 'wendu' | 'baidu'}
+ */
+export function getSearchCharReadingType(row, index) {
+    const raw = row?.type?.[index];
+    const normalized = normalizeReadingType(raw);
+
+    if (normalized !== 'normal') {
+        return normalized;
+    }
+
+    return fallbackTypeFromNotes(row?.notes?.[index]);
+}
+
+/**
+ * Resolve ZhongGu char-level reading color directly from backend `row.color`.
+ *
+ * Expected bucket shape:
+ * {
+ *   文白讀?: string[],
+ *   文讀?: string[],
+ *   白讀?: string[],
+ *   多音字?: string[]
+ * }
+ *
+ * Priority is `文白讀 > 文讀 > 白讀 > 多音字 > normal`.
+ *
+ * @param {Record<string, any>} row ZhongGu result row.
+ * @param {string} char A single displayed character from row.對應字.
+ * @returns {ReadingType}
+ */
+export function getZhongGuCharReadingType(row, char) {
+    const colorMap = row?.color;
+    if (!colorMap || typeof colorMap !== 'object' || !char) return 'normal';
+
+    if (Array.isArray(colorMap['文白讀']) && colorMap['文白讀'].includes(char)) return 'both';
+    if (Array.isArray(colorMap['文讀']) && colorMap['文讀'].includes(char)) return 'wendu';
+    if (Array.isArray(colorMap['白讀']) && colorMap['白讀'].includes(char)) return 'baidu';
+    if (Array.isArray(colorMap['多音字']) && colorMap['多音字'].includes(char)) return 'polyphonic';
+
+    return 'normal';
+}
+
+function buildDetailCharSet(detailList) {
+    const chars = new Set();
+
+    if (!Array.isArray(detailList)) {
+        return chars;
+    }
+
+    detailList.forEach((entry) => {
+        if (typeof entry !== 'string') {
+            return;
+        }
+
+        const [char] = entry.split(':').map(str => str.trim());
+        if (char) {
+            chars.add(char);
+        }
+    });
+
+    return chars;
+}
+
+function buildMultiDetailCharSet(detailText) {
+    const chars = new Set();
+
+    if (typeof detailText !== 'string' || !detailText.trim()) {
+        return chars;
+    }
+
+    detailText.split(';').forEach((entry) => {
+        const [char] = entry.split(':').map(str => str.trim());
+        if (char) {
+            chars.add(char);
+        }
+    });
+
+    return chars;
+}
+
+/**
+ * Resolve yinwei char-level reading color from detail fields rather than
+ * ZhongGu-style `row.color` buckets.
+ *
+ * Priority is `文白讀 > 文讀 > 白讀 > 多地位/多音字 > normal`.
+ * Hover content remains driven by `多地位詳情` / `多音字詳情` elsewhere.
+ *
+ * @param {Record<string, any>} row Yinwei result row.
+ * @param {string} char A single displayed character from row.對應字.
+ * @returns {ReadingType}
+ */
+export function getYinWeiCharReadingType(row, char) {
+    if (!row || !char) return 'normal';
+
+    const wenduChars = buildDetailCharSet(row?.文讀詳情);
+    const baiduChars = buildDetailCharSet(row?.白讀詳情);
+
+    if (wenduChars.has(char) && baiduChars.has(char)) return 'both';
+    if (wenduChars.has(char)) return 'wendu';
+    if (baiduChars.has(char)) return 'baidu';
+
+    const multiPositionChars = buildMultiDetailCharSet(row?.多地位詳情);
+    if (multiPositionChars.has(char)) return 'polyphonic';
+
+    const polyphonicChars = buildMultiDetailCharSet(row?.多音字詳情);
+    if (polyphonicChars.has(char)) return 'polyphonic';
+
+    return 'normal';
+}
+
+/**
+ * Convert a normalized reading type to a reusable BEM-style CSS class string.
+ *
+ * Example: getReadingClass('wendu', 'pronunciation') =>
+ * `reading-char pronunciation pronunciation--wendu`
+ *
+ * The shared `reading-char` root class is always included for cross-component
+ * styling hooks, while the optional `baseClass` keeps component-local styles.
+ *
+ * @param {ReadingType} type
+ * @param {string} [baseClass='reading-char']
+ * @returns {string}
+ */
+export function getReadingClass(type, baseClass = 'reading-char') {
+    const classes = ['reading-char'];
+
+    if (baseClass && baseClass !== 'reading-char') {
+        classes.push(baseClass);
+    }
+
+    if (!type || type === 'normal') {
+        return classes.join(' ');
+    }
+
+    classes.push(`reading-char--${type}`);
+
+    if (baseClass) {
+        classes.push(`${baseClass}--${type}`);
+    }
+
+    return classes.join(' ');
+}
+
+/**
+ * @param {string | string[] | null | undefined} raw
+ * @returns {'normal' | 'wendu' | 'baidu'}
+ */
+function normalizeReadingType(raw) {
+    const text = Array.isArray(raw) ? raw.join(';') : (raw || '');
+    if (!text || text === '_') return 'normal';
+
+    const hasWendu = text.includes('文讀') || text.includes('文读');
+    const hasBaidu = text.includes('白讀') || text.includes('白读');
+
+    if (hasWendu) return 'wendu';
+    if (hasBaidu) return 'baidu';
+
+    return 'normal';
+}
+
+/**
+ * Compatibility-only fallback for legacy payloads that still encode 文白讀 in
+ * `notes` instead of `type`.
+ *
+ * @param {string | string[] | null | undefined} notes
+ * @returns {'normal' | 'wendu' | 'baidu'}
+ */
+function fallbackTypeFromNotes(notes) {
+    return normalizeReadingType(notes);
+}
+
 export function getCorrespondingCharacters(item) {
     const multiCharDetails = {};
     if (item.多音字詳情) {

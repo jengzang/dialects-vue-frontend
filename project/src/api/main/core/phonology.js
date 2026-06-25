@@ -26,7 +26,10 @@ import { showError } from '@/utils/message.js'
 /**
  * 获取音系矩阵
  * @param {PhonologyMatrixParams} params - 查询参数
- * @returns {Promise<Object>} 音系矩阵数据
+ * @returns {Promise<Object>} 音系矩阵数据。单个地点结果除 `initials` / `finals` /
+ * `tones` / `matrix` 外，还可能包含 `matrix_read_stats`，其结构与 `matrix`
+ * 平行：`matrix_read_stats[initial][final][tone] = { polyphonic, wendu, baidu, wenbai }`，
+ * 每个 bucket 形如 `{ count: number, chars: string[] }`。
  * @throws {Error} 查询失败
  * @example
  * const matrix = await getPhonologyMatrix({
@@ -58,7 +61,8 @@ export async function getPhonologyMatrix(params) {
     const path = queryString ? `/api/phonology_matrix?${queryString}` : '/api/phonology_matrix'
 
     return await api(path, {
-      method: 'GET'
+      method: 'GET',
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Get phonology matrix error:', error)
@@ -82,7 +86,8 @@ export async function getPhonologyClassificationMatrix(params) {
   try {
     return await api('/api/phonology_classification_matrix', {
       method: 'POST',
-      body: params
+      body: params,
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Get phonology classification matrix error:', error)
@@ -108,7 +113,8 @@ export async function queryPhonology(params) {
   try {
     return await api('/api/phonology', {
       method: 'POST',
-      body: params
+      body: params,
+      loginPromptEligible: true
     })
   } catch (error) {
     console.error('Query phonology error:', error)

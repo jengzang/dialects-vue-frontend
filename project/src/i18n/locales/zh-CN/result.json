@@ -24,9 +24,20 @@
     }
   },
   "resultList": {
+    "readingLegend": {
+      "ariaLabel": "字色图例",
+      "title": "字色说明",
+      "items": {
+        "both": "文白读",
+        "wendu": "文读",
+        "baidu": "白读",
+        "yinweiPolyphonic": "多地位",
+        "zhongguPolyphonic": "多音字"
+      }
+    },
     "emptyState": "请先查询",
     "locationLabel": "地点",
-    "locationPlaceholder": "输入地点名称...",
+    "locationPlaceholder": "点击选择地点跳转",
     "filter": {
       "default": "筛选",
       "selected": "已选：{values}",
@@ -128,6 +139,10 @@
       "yangRu": "阳入",
       "otherTone": "其他调",
       "neutralTone": "轻声"
+    },
+    "charNav": {
+      "title": "汉字导航",
+      "jumpToChar": "跳转到“{char}”"
     }
   },
   "phonologyTable": {

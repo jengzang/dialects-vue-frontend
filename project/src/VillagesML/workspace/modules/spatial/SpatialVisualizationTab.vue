@@ -30,7 +30,6 @@
                 <SimpleSelectDropdown :match-trigger-width="true"
                   v-model="selectedRunId"
                   :options="runOptions"
-                  class="filter-select"
                   style="margin-bottom:0"
                 />
               </div>
@@ -784,8 +783,7 @@ h2 {
   margin-bottom: 0;
 }
 
-.filter-input,
-.filter-select {
+.filter-input{
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -795,8 +793,7 @@ h2 {
   margin-bottom: 8px;
 }
 
-.filter-input:focus,
-.filter-select:focus {
+.filter-input:focus{
   border-color: #4a90e2;
 }
 

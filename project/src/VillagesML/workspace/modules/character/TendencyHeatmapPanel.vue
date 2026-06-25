@@ -127,13 +127,28 @@ const renderChart = () => {
   chartInstance.setOption(option)
 }
 
-watch(() => props.data, () => {
-  nextTick(renderChart)
-}, { deep: true })
+const scheduleRenderChart = async () => {
+  await nextTick()
 
-watch(() => selectedMetric.value, () => {
-  nextTick(renderChart)
-})
+  requestAnimationFrame(() => {
+    if (!props.loading && props.data.length > 0 && chartRef.value) {
+      renderChart()
+      chartInstance?.resize()
+    }
+  })
+}
+
+watch(
+  [() => props.data, () => props.loading, () => selectedMetric.value],
+  () => {
+    scheduleRenderChart()
+  },
+  {
+    deep: true,
+    immediate: true,
+    flush: 'post'
+  }
+)
 
 onMounted(() => {
   window.addEventListener('resize', handleResize)

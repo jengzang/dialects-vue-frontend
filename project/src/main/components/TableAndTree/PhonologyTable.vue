@@ -63,8 +63,10 @@
                     {{ tone }}:
                   </span>
                 <span class="characters">
-                    {{ getCellData(initial, final)[tone]?.join(' ') || '' }}
-                  </span>
+                  <template v-for="charItem in getToneCharacters(initial, final, tone)" :key="`${initial}-${final}-${tone}-${charItem.key}`">
+                    <span :class="['matrix-char', charItem.className]">{{ charItem.char }}</span>
+                  </template>
+                </span>
               </div>
             </div>
           </td>
@@ -81,6 +83,7 @@ import { useI18n } from 'vue-i18n';
 import LocationDetailPopup from '@/main/components/popup/result/LocationDetailPopup.vue';
 import PhonologyCellDetailModal from '@/main/components/popup/pho/PhonologyCellDetailModal.vue';
 import { getLocationDetail } from '@/api';
+import { READING_COLORS } from '@/main/constants/readingColors.js';
 
 const { t } = useI18n();
 
@@ -159,6 +162,55 @@ const cellDetailMap = computed(() => {
 
 const getCellDetails = (initial, final) => {
   return cellDetailMap.value.get(`${initial}-${final}`) || null;
+};
+
+const readingPriorityLabels = ['文白讀', '文讀', '白讀', '多音字'];
+
+const getReadingTypeClass = (label) => {
+  if (label === '文讀') return 'matrix-char--wendu';
+  if (label === '白讀') return 'matrix-char--baidu';
+  if (label === '文白讀') return 'matrix-char--both';
+  if (label === '多音字') return 'matrix-char--polyphonic';
+  return '';
+};
+
+const getToneCharacters = (initial, final, tone) => {
+  const chars = getCellData(initial, final)?.[tone] || [];
+  const detailItems = getCellDetails(initial, final)?.[tone] || [];
+
+  if (!Array.isArray(chars) || chars.length === 0) {
+    return [];
+  }
+
+  if (!Array.isArray(detailItems) || detailItems.length === 0) {
+    return chars.map((char, index) => ({
+      key: `${char}-${index}`,
+      char,
+      className: ''
+    }));
+  }
+
+  const detailMap = new Map();
+  detailItems.forEach((item) => {
+    const label = item?.label;
+    if (!label || !Array.isArray(item?.chars)) return;
+
+    item.chars.forEach((char) => {
+      const currentLabel = detailMap.get(char);
+      const currentPriority = currentLabel ? readingPriorityLabels.indexOf(currentLabel) : Infinity;
+      const nextPriority = readingPriorityLabels.indexOf(label);
+
+      if (nextPriority !== -1 && nextPriority < currentPriority) {
+        detailMap.set(char, label);
+      }
+    });
+  });
+
+  return chars.map((char, index) => ({
+    key: `${char}-${index}`,
+    char,
+    className: getReadingTypeClass(detailMap.get(char))
+  }));
 };
 
 const canOpenCellDetail = (initial, final) => {
@@ -518,10 +570,26 @@ const getToneData = (data) => {
   font-weight: 600;
   min-width: 35px;
 }
-
 .characters {
-  color: var(--text-dark);
-  word-break: break-all;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 4px;
+}
+
+.matrix-char--wendu {
+  color: v-bind('READING_COLORS.wendu');
+}
+
+.matrix-char--baidu {
+  color: v-bind('READING_COLORS.baidu');
+}
+
+.matrix-char--both {
+  color: v-bind('READING_COLORS.both');
+}
+
+.matrix-char--polyphonic {
+  color: v-bind('READING_COLORS.polyphonic');
 }
 
 /* 移动端适配 */

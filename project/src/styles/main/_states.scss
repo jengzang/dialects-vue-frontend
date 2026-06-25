@@ -12,3 +12,25 @@
   justify-content: center;
   text-align: center;
 }
+
+.main-list-state {
+  padding: 28px 20px;
+  text-align: center;
+}
+
+.main-list-state[data-state='error'] {
+  border-color: rgba(220, 38, 38, 0.15);
+}
+
+.main-list-state-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.main-list-state-text {
+  margin: 10px 0 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.7;
+}

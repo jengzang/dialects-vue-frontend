@@ -38,8 +38,11 @@
         </RouterLink>
       </nav>
 
-      <div class="login-container" @click="goToAuthPage">
-        <span class="login-text">{{ userStore.username || t('navigation.login') }}</span>
+      <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
+        <NavAvatar />
+      </div>
+      <div v-else class="login-container" @click="goToAuthPage">
+        <span class="login-text">{{ t('navigation.login') }}</span>
       </div>
     </div>
 
@@ -76,8 +79,11 @@
         </RouterLink>
       </nav>
 
-      <div class="login-container" @click="goToAuthPage">
-        <span class="login-text">{{ userStore.username || t('navigation.login') }}</span>
+      <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
+        <NavAvatar />
+      </div>
+      <div v-else class="login-container" @click="goToAuthPage">
+        <span class="login-text">{{ t('navigation.login') }}</span>
       </div>
     </div>
 
@@ -91,7 +97,7 @@
       <Transition name="submenu-fade">
         <div
           v-if="activeSubmenu"
-          class="submenu-panel"
+          class="main-submenu-panel"
           :style="{
             top: submenuPosition.top + 'px',
             left: submenuPosition.left + 'px'
@@ -120,6 +126,7 @@ import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { userStore } from '@/main/store/store.js'
+import NavAvatar from '@/components/bar/NavAvatar.vue'
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
 import {
   useExploreBarConfig,
@@ -590,7 +597,7 @@ const goToAuthPage = () => {
   }
 }
 
-.submenu-panel {
+.main-submenu-panel {
   position: fixed;
   width: auto;
   max-width: min(300px, calc(100vw - 20px));
@@ -652,7 +659,7 @@ const goToAuthPage = () => {
 }
 
 @media (max-aspect-ratio: 1/1) {
-  .submenu-panel {
+  .main-submenu-panel {
     max-width: calc(100vw - 20px);
   }
 
@@ -660,5 +667,19 @@ const goToAuthPage = () => {
     padding: 10px 14px;
     font-size: 14px;
   }
+}
+
+.avatar-container {
+  width: 6dvh;
+  min-width: 6dvh;
+  max-width: 6dvh;
+  height: 6dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 </style>

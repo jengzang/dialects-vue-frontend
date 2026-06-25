@@ -46,13 +46,17 @@ FILES_TO_UPLOAD=(
     "index.html"
     "config.js"
     "vite.svg"
-    "参考表.xlsx"
+    "robots.txt"
+    "sitemap.xml"
+    "og-cover.png"  
     "auth/"
     "detail/"
     "explore/"
     "intro/"
     "menu/"
     "villagesML/"
+    "tutorial/"
+    "data/"
 )
 
 echo -e "${BLUE}步骤 1/2: 清空服务器上的 assets 目录${NC}"

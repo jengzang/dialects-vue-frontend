@@ -42,8 +42,13 @@
         </RouterLink>
       </nav>
 
-      <div v-if="showLoginButton" class="login-container" @click="goToAuthPage">
-        <span class="login-text">{{ userStore.username || t('navigation.login') }}</span>
+      <div v-if="showLoginButton">
+        <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
+          <NavAvatar />
+        </div>
+        <div v-else class="login-container" @click="goToAuthPage">
+          <span class="login-text">{{ t('navigation.login') }}</span>
+        </div>
       </div>
     </div>
 
@@ -84,8 +89,13 @@
         </RouterLink>
       </nav>
 
-      <div v-if="showLoginButton" class="login-container" @click="goToAuthPage">
-        <span class="login-text">{{ userStore.username || t('navigation.login') }}</span>
+      <div v-if="showLoginButton">
+        <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
+          <NavAvatar />
+        </div>
+        <div v-else class="login-container" @click="goToAuthPage">
+          <span class="login-text">{{ t('navigation.login') }}</span>
+        </div>
       </div>
     </div>
 
@@ -103,7 +113,7 @@
       <Transition name="submenu-fade">
         <div
           v-if="activeSubmenu"
-          class="submenu-panel"
+          class="main-submenu-panel"
           :style="{
             top: submenuPosition.top + 'px',
             left: submenuPosition.left + 'px'
@@ -132,6 +142,7 @@ import { ref, computed, onMounted, onBeforeUnmount, useAttrs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { userStore } from '@/main/store/store.js'
+import NavAvatar from '@/components/bar/NavAvatar.vue'
 import {
   filterVisibleCommonBarTabs,
   getCommonBarActiveTab,
@@ -683,7 +694,7 @@ const goToAuthPage = () => {
 }
 
 /* Submenu panel - liquid glass style */
-.submenu-panel {
+.main-submenu-panel {
   position: fixed;
   width: auto;
   max-width: min(300px, calc(100vw - 20px));
@@ -747,7 +758,7 @@ const goToAuthPage = () => {
 
 /* Mobile responsive */
 @media (max-aspect-ratio: 1/1) {
-  .submenu-panel {
+  .main-submenu-panel {
     max-width: calc(100vw - 20px);
   }
 
@@ -755,5 +766,19 @@ const goToAuthPage = () => {
     padding: 10px 14px;
     font-size: 14px;
   }
+}
+
+.avatar-container {
+  width: 6dvh;
+  min-width: 6dvh;
+  max-width: 6dvh;
+  height: 6dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 </style>

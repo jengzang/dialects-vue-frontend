@@ -1,181 +1,221 @@
 {
-    "phonology":  {
-                      "matrix":  {
-                                     "title":  "Phonology Query",
-                                     "features":  {
-                                                      "initial":  "Initial",
-                                                      "final":  "Final",
-                                                      "tone":  "Tone"
-                                                  },
-                                     "columns":  {
-                                                     "horizontal":  "Horizontal Classification",
-                                                     "vertical":  "Vertical Classification",
-                                                     "cellRow":  "Cell Row"
-                                                 },
-                                     "columnOptions":  {
-                                                           "rhyme":  "Rhyme Group",
-                                                           "rhymeDetail":  "Rhyme",
-                                                           "grade":  "Grade",
-                                                           "openness":  "Openness",
-                                                           "entering":  "Entering",
-                                                           "voicing":  "Voicing",
-                                                           "series":  "Series",
-                                                           "group":  "Group",
-                                                           "initial":  "Initial",
-                                                           "tone":  "Tone",
-                                                           "place":  "Place",
-                                                           "manner":  "Manner"
-                                                       },
-                                     "actions":  {
-                                                     "query":  "Query",
-                                                     "loading":  "Loading...",
-                                                     "retry":  "Retry"
-                                                 },
-                                     "states":  {
-                                                    "emptyInput":  "Please enter location and click query",
-                                                    "minLocationError":  "Please enter at least one location",
-                                                    "loadError":  "Error loading data",
-                                                    "apiError":  "API returned empty data",
-                                                    "missingMatrix":  "API data missing matrix property"
-                                                }
-                                 },
-                      "custom":  {
-                                     "title":  "Phoneme Classification",
-                                     "features":  {
-                                                      "initial":  "Initial",
-                                                      "final":  "Final",
-                                                      "tone":  "Tone"
-                                                  },
-                                     "columns":  {
-                                                     "horizontal":  "Horizontal Classification",
-                                                     "vertical":  "Vertical Classification",
-                                                     "cellRow":  "Cell Row"
-                                                 },
-                                     "columnOptions":  {
-                                                           "rhyme":  "Rhyme Group",
-                                                           "rhymeDetail":  "Rhyme",
-                                                           "grade":  "Grade",
-                                                           "openness":  "Openness",
-                                                           "entering":  "Entering",
-                                                           "voicing":  "Voicing",
-                                                           "series":  "Series",
-                                                           "group":  "Group",
-                                                           "initial":  "Initial",
-                                                           "tone":  "Tone",
-                                                           "place":  "Place",
-                                                           "manner":  "Manner"
-                                                       },
-                                     "actions":  {
-                                                     "query":  "Query",
-                                                     "loading":  "Loading...",
-                                                     "retry":  "Retry"
-                                                 },
-                                     "states":  {
-                                                    "emptyInput":  "Please enter location and click query",
-                                                    "minLocationError":  "Please enter at least one location",
-                                                    "loadError":  "Error loading data",
-                                                    "apiError":  "API returned empty data",
-                                                    "missingMatrix":  "API data missing matrix property",
-                                                    "unsupportedTable":  "The current table \"{table}\" is not supported on this page yet"
-                                                }
-                                 },
-                      "countphos":  {
-                                        "title":  "Syllable Statistics",
-                                        "subtitle":  "Syllable statistics for all locations ({count} locations)",
-                                        "features":  {
-                                                         "initial":  "Initial",
-                                                         "final":  "Final",
-                                                         "tone":  "Tone"
-                                                     },
-                                        "stats":  {
-                                                      "total":  "Total",
-                                                      "locationCount":  "Locations",
-                                                      "more":  "+{count} more"
-                                                  },
-                                        "sections":  {
-                                                         "aggregated":  "Aggregated Statistics",
-                                                         "locations":  "Location Details",
-                                                         "locationsSubtitle":  "Syllable statistics for each location"
-                                                     },
-                                        "modal":  {
-                                                      "title":  "{featureType} - {syllable}"
-                                                  },
-                                        "actions":  {
-                                                        "query":  "Query",
-                                                        "loading":  "Loading...",
-                                                        "retry":  "Retry"
-                                                    },
-                                        "states":  {
-                                                       "emptyInput":  "Please enter location and click query",
-                                                       "minLocationError":  "Please enter at least one location",
-                                                       "loadError":  "Error loading data"
-                                                   }
-                                    },
-                      "evolution":  {
-                                         "title":  "Evolution",
-                                         "queryMode":  {
-                                                           "label":  "Statistics Mode",
-                                                           "byValue":  "By Value",
-                                                           "byStatus":  "By Status"
-                                                       },
-                                         "controls":  {
-                                                          "table":  "Character Table",
-                                                          "level1":  "First Dimension",
-                                                          "level2":  "Second Dimension",
-                                           "sankey": "Sankey",
-                                                          "location":  "Location",
-                                                          "locationHint":  "Only single-location analysis is supported",
-                                                          "query":  "Query",
-                                                          "loading":  "Querying..."
-                                                      },
-                                         "sankey": {                                            "layer": "Layer",                                            "unit": "items",                                            "layers": {                                              "value": "Value"                                            },                                            "titles": {                                              "byValue": "{feature} ? Value ? Status ? Secondary Dimension",                                              "byStatus": "{feature} ? Status ? Value ? Secondary Dimension"                                            }                                          },
-                                         "similarity":  {
-                                                            "algorithm":  "Similarity Algorithm",
-                                                            "threshold":  "Display Threshold",
-                                                            "showConnections":  "Show Connections",
-                                                            "showCategoryLinks":  "Show Category Links",
-                                                            "algorithms":  {
-                                                                               "cosine":  "Cosine Similarity",
-                                                                               "overlap":  "Weighted Overlap",
-                                                                               "topK":  "Top-3 Match",
-                                                                               "kl":  "KL Divergence",
-                                                                               "jaccard":  "Jaccard Similarity",
-                                                                               "charWeighted":  "Char-Weighted Similarity",
-                                                                               "structural":  "Structural Similarity",
-                                                                               "cooccurrence":  "Co-occurrence",
-                                                                               "entropy":  "Entropy Similarity",
-                                                                               "hierarchical":  "Hierarchical Similarity"
-                                                                           }
-                                                        },
-                                         "features":  {
-                                                          "initial":  "Initial",
-                                                          "final":  "Final",
-                                                          "tone":  "Tone"
-                                                      },
-                                         "errors":  {
-                                                        "minLocation":  "Please select at least one location",
-                                                        "maxLocation":  "Evolution analysis only supports a single location. Please remove extra locations.",
-                                                        "autoLimitLocation":  "Evolution analysis only supports a single location. The first location has been kept automatically.",
-                                                        "selectDimensions":  "Please select two dimensions",
-                                                        "sameDimensions":  "Two dimensions cannot be the same",
-                                                        "queryFailed":  "Query failed"
-                                                    },
-                                         "mobileDetail":  {
-                                                              "countAndRatio":  "{count} {unit} ({percent}%)",
-                                                              "breakdownBy":  "Break down by {dimension}",
-                                                              "characters":  "Characters",
-                                                              "moreChars":  "+{count} more"
-                                                          },
-                                         "states":  {
-                                                       "loading":  "Loading...",
-                                                       "empty":  "No data for the current feature"
-                                                   }
-                                     }
-                  },
-    "tabs":  {
-                 "matrix":  "Phonology",
-                 "custom":  "Phoneme Classification",
-                 "count":  "Syllable Count",
-                 "evolution":  "Evolution"
-             }
+  "phonology": {
+    "matrix": {
+      "title": "Phonology",
+      "features": {
+        "initial": "Initial",
+        "final": "Final",
+        "tone": "Tone"
+      },
+      "columns": {
+        "horizontal": "Horizontal Classification",
+        "vertical": "Vertical Classification",
+        "cellRow": "Cell Row"
+      },
+      "columnOptions": {
+        "rhyme": "Rhyme Group",
+        "rhymeDetail": "Rhyme",
+        "grade": "Grade",
+        "openness": "Openness",
+        "entering": "Entering",
+        "voicing": "Voicing",
+        "series": "Series",
+        "group": "Group",
+        "initial": "Initial",
+        "tone": "Tone",
+        "place": "Place",
+        "manner": "Manner"
+      },
+      "actions": {
+        "query": "Query",
+        "loading": "Loading...",
+        "retry": "Retry"
+      },
+      "states": {
+        "emptyInput": "Please enter location and click query",
+        "minLocationError": "Please enter at least one location",
+        "loadError": "Error loading data",
+        "apiError": "API returned empty data",
+        "missingMatrix": "API data missing matrix property"
+      }
+    },
+    "custom": {
+      "title": "Phoneme Class",
+      "features": {
+        "initial": "Initial",
+        "final": "Final",
+        "tone": "Tone"
+      },
+      "columns": {
+        "horizontal": "Horizontal Classification",
+        "vertical": "Vertical Classification",
+        "cellRow": "Cell Row"
+      },
+      "columnOptions": {
+        "rhyme": "Rhyme Group",
+        "rhymeDetail": "Rhyme",
+        "grade": "Grade",
+        "openness": "Openness",
+        "entering": "Entering",
+        "voicing": "Voicing",
+        "series": "Series",
+        "group": "Group",
+        "initial": "Initial",
+        "tone": "Tone",
+        "place": "Place",
+        "manner": "Manner"
+      },
+      "actions": {
+        "query": "Query",
+        "loading": "Loading...",
+        "retry": "Retry"
+      },
+      "states": {
+        "emptyInput": "Please enter location and click query",
+        "minLocationError": "Please enter at least one location",
+        "loadError": "Error loading data",
+        "apiError": "API returned empty data",
+        "missingMatrix": "API data missing matrix property",
+        "unsupportedTable": "The current table \"{table}\" is not supported on this page yet"
+      }
+    },
+    "countphos": {
+      "title": "Syllable Statistics",
+      "titlePrefix": "Syllable statistics for all locations",
+      "locationPill": "{count} locations",
+      "subtitle": "Syllable statistics for all locations ({count} locations)",
+      "features": {
+        "initial": "Initial",
+        "final": "Final",
+        "tone": "Tone"
+      },
+      "stats": {
+        "total": "Total",
+        "locationCount": "Locations",
+        "more": "+{count} more"
+      },
+      "sections": {
+        "aggregated": "Aggregated Statistics",
+        "locations": "Location Details",
+        "locationsSubtitle": "Syllable statistics for each location"
+      },
+      "charts": {
+        "pie": {
+          "title": "Syllable Share by Total Count",
+          "description": "Automatically keeps enough high-frequency syllables so that the combined share of \"Other\" does not exceed 20%. Click a slice to inspect locations."
+        },
+        "bar": {
+          "title": "Location Coverage of High-Frequency Syllables",
+          "description": "Automatically keeps enough high-frequency syllables so that the total count of omitted syllables stays below 10%."
+        },
+        "scatter": {
+          "title": "Syllable Distribution Scatter Plot",
+          "description": "The x-axis is total count and the y-axis is number of locations. Further right means higher total count; further up means broader location coverage."
+        },
+        "common": {
+          "other": "Other",
+          "totalCount": "Total Count",
+          "locationCount": "Location Count",
+          "locations": "Locations",
+          "share": "Share"
+        }
+      },
+      "modal": {
+        "title": "{featureType} - {syllable}"
+      },
+      "actions": {
+        "query": "Query",
+        "loading": "Loading...",
+        "retry": "Retry"
+      },
+      "states": {
+        "emptyInput": "Please enter location and click query",
+        "minLocationError": "Please enter at least one location",
+        "loadError": "Error loading data",
+        "hint": "Supports simultaneous input of 1–100 locations and can be used to analyze the syllable distribution features of a group of dialects."
+      }
+    },
+    "evolution": {
+      "title": "Evolution",
+      "queryMode": {
+        "label": "Statistics Mode",
+        "byValue": "By Value",
+        "byStatus": "By Status"
+      },
+      "controls": {
+        "table": "Character Table",
+        "level1": "First Dimension",
+        "level2": "Second Dimension",
+        "sankey": "Sankey",
+        "location": "Location",
+        "locationHint": "Only single-location analysis is supported",
+        "query": "Query",
+        "loading": "Querying...",
+        "optimizeLinks": "Optimize links"
+      },
+      "sankey": {
+        "layer": "Layer",
+        "unit": "items",
+        "layers": {
+          "value": "Value"
+        },
+        "titles": {
+          "byValue": "{feature} · Value -> Status -> Secondary Dimension",
+          "byStatus": "{feature} · Status -> Value -> Secondary Dimension"
+        }
+      },
+      "similarity": {
+        "algorithm": "Similarity Algorithm",
+        "threshold": "Display Threshold",
+        "showConnections": "Show Connections",
+        "showCategoryLinks": "Show Category Links",
+        "algorithms": {
+          "cosine": "Cosine Similarity",
+          "overlap": "Weighted Overlap",
+          "topK": "Top-3 Match",
+          "kl": "KL Divergence",
+          "jaccard": "Jaccard Similarity",
+          "charWeighted": "Char-Weighted Similarity",
+          "structural": "Structural Similarity",
+          "cooccurrence": "Co-occurrence",
+          "entropy": "Entropy Similarity",
+          "hierarchical": "Hierarchical Similarity"
+        }
+      },
+      "features": {
+        "initial": "Initial",
+        "final": "Final",
+        "tone": "Tone"
+      },
+      "errors": {
+        "minLocation": "Please select at least one location",
+        "maxLocation": "Evolution analysis only supports a single location. Please remove extra locations.",
+        "autoLimitLocation": "Evolution analysis only supports a single location. The first location has been kept automatically.",
+        "selectDimensions": "Please select two dimensions",
+        "sameDimensions": "Two dimensions cannot be the same",
+        "queryFailed": "Query failed"
+      },
+      "mobileDetail": {
+        "countAndRatio": "{count} {unit} ({percent}%)",
+        "breakdownBy": "Break down by {dimension}",
+        "characters": "Characters",
+        "moreChars": "+{count} more"
+      },
+      "states": {
+        "loading": "Loading...",
+        "empty": "No data for the current feature"
+      }
+    },
+    "compare": {
+      "options": {
+        "optimizeLinks": "Optimize links"
+      }
+    }
+  },
+  "tabs": {
+    "matrix": "Phonology",
+    "custom": "Phoneme Class",
+    "count": "Syllable Count",
+    "evolution": "Evolution"
+  }
 }

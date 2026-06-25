@@ -4,6 +4,7 @@ const REFRESH_TOKEN_KEY = 'refresh_token';
 const TOKEN_EXPIRES_AT_KEY = 'token_expires_at';
 const LEGACY_ACCESS_TOKEN_KEY = 'ACCESS_TOKEN';
 const LEGACY_TOKEN_EXP_KEY = 'TOKEN_EXP';
+const CUSTOM_DATA_EXISTS_KEY = 'custom-data-exists';
 
 export function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -101,6 +102,7 @@ export function getUserCache() {
 
 export function clearUserCache() {
   localStorage.removeItem(USER_CACHE_KEY);
+  localStorage.removeItem(CUSTOM_DATA_EXISTS_KEY);
 }
 
 export function clearStoredTokens() {

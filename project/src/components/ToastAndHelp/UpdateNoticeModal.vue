@@ -11,7 +11,7 @@
   >
     <template #header>
       <div class="update-notice-header">
-        <div class="update-icon">🎀</div>
+        <div class="update-icon">🎊</div>
         <div class="update-notice-header-main">
           <h2 class="update-notice-title">{{ title || $t('common.updateNotice.title') }}</h2>
           <p class="update-version">{{ versionLine }}</p>
@@ -180,7 +180,8 @@ onMounted(() => {
   font-size: 1.75rem;
   font-weight: 700;
   color: #007aff;
-  margin: 0 0 0.5rem 0;
+  white-space: nowrap;
+  margin: 0;
 }
 
 .update-version {
@@ -188,6 +189,7 @@ onMounted(() => {
   color: rgba(0, 0, 0, 0.6);
   font-weight: 500;
   margin: 0;
+  white-space: nowrap;
 }
 
 .update-notice-content {
@@ -245,7 +247,6 @@ onMounted(() => {
 .no-show-checkbox {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
   cursor: pointer;
   font-size: 0.9375rem;
   color: rgba(0, 0, 0, 0.7);
@@ -267,7 +268,7 @@ onMounted(() => {
 }
 
 .confirm-btn {
-  padding: 0.75rem 2rem;
+  padding: 0.75rem 1rem;
   background: linear-gradient(135deg, #007aff 0%, #005ecb 100%);
   color: white;
   border: none;
@@ -277,6 +278,7 @@ onMounted(() => {
   cursor: pointer;
   transition: all 0.25s ease;
   box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+  white-space: nowrap;
 }
 
 .confirm-btn:hover {

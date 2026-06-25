@@ -25,11 +25,11 @@
 .main-glass-modal {
   --main-glass-modal-width: min(720px, 94vw);
   --main-glass-modal-max-height: min(70vh, 640px);
-  --main-glass-modal-background: rgba(255, 255, 255, 0.85);
-  --main-glass-modal-border: 1px solid rgba(255, 255, 255, 0.5);
+  --main-glass-modal-background: rgba(255, 255, 255, 0.92);
+  --main-glass-modal-border: 1px solid rgba(255, 255, 255, 0.42);
   --main-glass-modal-radius: 18px;
-  --main-glass-modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  --main-glass-modal-backdrop-filter: blur(18px) saturate(160%);
+  --main-glass-modal-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+  --main-glass-modal-backdrop-filter: blur(10px) saturate(145%);
   width: var(--main-glass-modal-width);
   max-height: var(--main-glass-modal-max-height);
   overflow: hidden;
@@ -66,8 +66,8 @@
   --main-query-modal-body-offset: 100px;
   --main-query-modal-header-padding: 12px 14px;
   --main-query-modal-body-padding: 12px 14px 16px;
-  --main-query-modal-background: var(--glass-lighter2);
-  --main-query-modal-border-color: var(--border-gray-lighter);
+  --main-query-modal-background: rgba(255, 255, 255, 0.72);
+  --main-query-modal-border-color: rgba(200, 200, 200, 0.34);
   --main-query-modal-radius: 18px;
   width: var(--main-query-modal-width);
   max-height: var(--main-query-modal-max-height);
@@ -77,9 +77,9 @@
   background: var(--main-query-modal-background);
   border: 1px solid var(--main-query-modal-border-color);
   border-radius: var(--main-query-modal-radius);
-  box-shadow: var(--shadow-xl);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+  backdrop-filter: blur(10px) saturate(145%);
+  -webkit-backdrop-filter: blur(10px) saturate(145%);
 }
 
 .main-query-modal > .modal-header {
@@ -124,11 +124,11 @@
 .main-crud-modal {
   --main-crud-modal-width: min(800px, 100%);
   --main-crud-modal-max-height: 90vh;
-  --main-crud-modal-background: rgba(255, 255, 255, 0.95);
-  --main-crud-modal-border: 1px solid rgba(255, 255, 255, 0.3);
+  --main-crud-modal-background: rgba(255, 255, 255, 0.96);
+  --main-crud-modal-border: 1px solid rgba(255, 255, 255, 0.24);
   --main-crud-modal-radius: 18px;
-  --main-crud-modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  --main-crud-modal-backdrop-filter: blur(40px) saturate(180%);
+  --main-crud-modal-shadow: 0 18px 42px rgba(0, 0, 0, 0.2);
+  --main-crud-modal-backdrop-filter: blur(12px) saturate(145%);
   width: 100%;
   max-width: var(--main-crud-modal-width);
   max-height: var(--main-crud-modal-max-height);
@@ -177,13 +177,13 @@
   --main-tool-modal-width: min(90vw, 700px);
   --main-tool-modal-max-height: 85vh;
   --main-tool-modal-header-padding: 20px 24px;
-  --main-tool-modal-header-border-color: rgba(255, 255, 255, 0.5);
+  --main-tool-modal-header-border-color: rgba(255, 255, 255, 0.44);
   --main-tool-modal-body-padding: 20px 24px;
   --main-tool-modal-body-overflow-y: auto;
-  --main-tool-modal-background: rgba(255, 255, 255, 0.95);
-  --main-tool-modal-border-color: rgba(255, 255, 255, 0.6);
+  --main-tool-modal-background: rgba(255, 255, 255, 0.96);
+  --main-tool-modal-border-color: rgba(255, 255, 255, 0.5);
   --main-tool-modal-radius: 24px;
-  --main-tool-modal-shadow: 0 16px 64px rgba(0, 0, 0, 0.2);
+  --main-tool-modal-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
   width: var(--main-tool-modal-width);
   max-height: var(--main-tool-modal-max-height);
   display: flex;
@@ -193,8 +193,8 @@
   border: 1px solid var(--main-tool-modal-border-color);
   border-radius: var(--main-tool-modal-radius);
   box-shadow: var(--main-tool-modal-shadow);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .main-tool-modal > .modal-header {
@@ -221,12 +221,12 @@
 }
 
 .tool-modal-shell {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 24px;
-  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
   display: flex;
   flex-direction: column;
   overflow: hidden;

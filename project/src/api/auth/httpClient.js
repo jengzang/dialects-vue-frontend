@@ -1,5 +1,6 @@
 import { WEB_BASE } from '../../env-config.js';
 import { showRateLimitNotice } from '../../utils/rateLimitNotice.js';
+import { recordLoginPromptApiHit } from '../../utils/loginPromptTracker.js';
 import { userStore } from '../../main/store/store.js';
 
 import { getToken, getTokenExpiresAt } from './tokenStorage.js';
@@ -7,16 +8,19 @@ import { clearSession, refreshAccessToken } from './session.js';
 
 const PROACTIVE_REFRESH_WINDOW_MS = 10 * 60 * 1000;
 
-function createApiError(message, {
-  kind = 'http',
-  status = 0,
-  data = null,
-  detail = null,
-  headers = {},
-  rawText = '',
-  response = null,
-  cause = null,
-} = {}) {
+function createApiError(
+  message,
+  {
+    kind = 'http',
+    status = 0,
+    data = null,
+    detail = null,
+    headers = {},
+    rawText = '',
+    response = null,
+    cause = null,
+  } = {}
+) {
   const error = new Error(message);
   error.kind = kind;
   error.status = status;
@@ -81,7 +85,12 @@ function getErrorMessage(detail, rawText, status) {
     return detail.trim();
   }
 
-  if (detail && typeof detail === 'object' && typeof detail.message === 'string' && detail.message.trim()) {
+  if (
+    detail &&
+    typeof detail === 'object' &&
+    typeof detail.message === 'string' &&
+    detail.message.trim()
+  ) {
     return detail.message.trim();
   }
 
@@ -117,9 +126,11 @@ function buildRateLimitNoticePayload(path, response) {
   const noticeMessage =
     typeof detail === 'string' && detail.trim()
       ? detail.trim()
-      : (detailObject?.message && typeof detailObject.message === 'string' && detailObject.message.trim())
+      : detailObject?.message &&
+          typeof detailObject.message === 'string' &&
+          detailObject.message.trim()
         ? detailObject.message.trim()
-        : (typeof response.rawText === 'string' && response.rawText.trim())
+        : typeof response.rawText === 'string' && response.rawText.trim()
           ? response.rawText.trim()
           : '';
 
@@ -142,7 +153,7 @@ function needsProactiveRefresh(expiresAt) {
   }
 
   const now = Date.now();
-  return expiresAt <= now || (expiresAt - now < PROACTIVE_REFRESH_WINDOW_MS);
+  return expiresAt <= now || expiresAt - now < PROACTIVE_REFRESH_WINDOW_MS;
 }
 
 function shouldTreatAsTransientAuth(refreshResult) {
@@ -218,7 +229,10 @@ async function parseSuccessfulResponse(response, responseType) {
     return response.json();
   }
 
-  if (contentType.includes('application/octet-stream') || contentType.includes('application/vnd.openxmlformats')) {
+  if (
+    contentType.includes('application/octet-stream') ||
+    contentType.includes('application/vnd.openxmlformats')
+  ) {
     return response.blob();
   }
 
@@ -231,7 +245,7 @@ async function handleErrorResponse(path, response) {
   const message = getErrorMessage(
     normalizedResponse.detail,
     normalizedResponse.rawText,
-    normalizedResponse.status,
+    normalizedResponse.status
   );
 
   if (response.status === 429) {
@@ -270,6 +284,7 @@ export async function api(path, options = {}) {
     timeout = 300000,
     showError = true,
     responseType = 'auto',
+    loginPromptEligible = false,
   } = options;
 
   const requestHeaders = { ...headers };
@@ -309,6 +324,10 @@ export async function api(path, options = {}) {
     });
 
     if (response.status === 401) {
+      if (path.endsWith('/login')) {
+        await handleErrorResponse(path, response);
+      }
+
       const refreshResult = await refreshAccessToken();
 
       if (refreshResult.ok) {
@@ -341,9 +360,20 @@ export async function api(path, options = {}) {
       await handleErrorResponse(path, response);
     }
 
-    return parseSuccessfulResponse(response, responseType);
+    const responseData = await parseSuccessfulResponse(response, responseType);
+
+    if (loginPromptEligible) {
+      recordLoginPromptApiHit(path);
+    }
+
+    return responseData;
   } catch (error) {
-    if (showError && error.kind !== 'network' && error.status !== 429 && typeof window.showErrorToast === 'function') {
+    if (
+      showError &&
+      error.kind !== 'network' &&
+      error.status !== 429 &&
+      typeof window.showErrorToast === 'function'
+    ) {
       window.showErrorToast(error.message);
     }
     throw error;

@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+Disallow: /auth
+Disallow: /auth/
+Disallow: /api/
+Disallow: /logs/
+Disallow: /sql/
+Disallow: /upload/
+Disallow: /download/
+Disallow: /files/
+Disallow: /*?*
+
+Sitemap: https://dialects.yzup.top/sitemap.xml

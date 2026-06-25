@@ -1,8 +1,19 @@
 <template>
   <div class="chartonepage" >
-    <div v-if="mode === 'tab1'" class="content-search">
+    <div
+      v-if="mode === 'tab1'"
+      ref="contentSearchRef"
+      class="content-search"
+      @scroll="updateActiveCharNav"
+    >
       <template v-for="(item, index) in processedData" :key="index">
-        <div v-if="shouldShowChar(index)" class="char">{{ item.char }}</div>
+        <div
+          v-if="shouldShowChar(index)"
+          class="char"
+          :data-char-nav-id="getCharNavId(index)"
+        >
+          {{ item.char }}
+        </div>
 
         <div v-if="shouldShowPositions(index)" class="positions">
           <p v-for="(pos, pIdx) in item.positions" :key="pIdx">{{ pos }}</p>
@@ -19,9 +30,12 @@
                   class="syllable-unit"
               >
                 <span
-                  class="pronunciation"
-                  :class="{ 'conversion-failed': isConversionFailed(syl, item.location) }"
-                  :title="isConversionFailed(syl, item.location) ? t('result.charsAndTones.tooltip.conversionFailed') : ''"
+                  :class="[
+                    getReadingClass(getSearchCharReadingType(item, sIdx), 'pronunciation'),
+                    { 'conversion-failed': isConversionFailed(syl, item.location) }
+                  ]"
+                  @mouseenter="handleSyllableMouseEnter($event, item, sIdx, syl)"
+                  @mouseleave="handleSyllableMouseLeave"
                 >
                   {{ getDisplaySyllable(syl, item.location) }}
                 </span>
@@ -64,6 +78,38 @@
     </table>
 
     <Teleport to="body">
+      <nav
+          v-if="props.showCharNav && mode === 'tab1' && charNavItems.length > 1"
+          class="char-nav-teleport"
+          :aria-label="t('result.charsAndTones.charNav.title')"
+        >
+        <button
+          v-for="nav in charNavItems"
+          :key="nav.id"
+          type="button"
+          class="char-nav-node"
+          :class="{ active: activeCharNavId === nav.id }"
+          :title="t('result.charsAndTones.charNav.jumpToChar', { char: nav.char })"
+          :aria-label="t('result.charsAndTones.charNav.jumpToChar', { char: nav.char })"
+          :aria-current="activeCharNavId === nav.id ? 'true' : undefined"
+          @click="jumpToChar(nav.id)"
+        >
+          <span class="char-nav-char">{{ nav.char }}</span>
+        </button>
+      </nav>
+    </Teleport>
+
+    <Teleport to="body">
+      <div
+        v-if="readingTooltip.visible"
+        class="global-tooltip-popup"
+        :style="{ top: readingTooltip.top + 'px', left: readingTooltip.left + 'px' }"
+      >
+        {{ readingTooltip.content }}
+      </div>
+    </Teleport>
+
+    <Teleport to="body">
       <div
           v-if="popup.visible"
           class="popup-tones"
@@ -76,8 +122,10 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { getReadingClass, getSearchCharReadingType } from '@/main/utils/ResultTable.js';
+import { READING_COLORS } from '@/main/constants/readingColors.js';
 
 const props = defineProps({
   data: {
@@ -97,7 +145,11 @@ const props = defineProps({
   selectedToneType: {
     type: String,
     default: '默認'
-  }
+  },
+  showCharNav: {
+  type: Boolean,
+  default: false
+}
 });
 
 const { t } = useI18n();
@@ -106,6 +158,81 @@ const { t } = useI18n();
 const processedData = computed(() => {
   return props.data || [];
 });
+
+// ================= TAB 1 漢字導航 =================
+const contentSearchRef = ref(null);
+const activeCharNavId = ref('');
+
+const getCharNavId = (index) => `char-nav-${index}`;
+
+const charNavItems = computed(() => {
+  const result = [];
+  const seen = new Set();
+
+  processedData.value.forEach((item, index) => {
+    if (!item?.char || seen.has(item.char)) return;
+
+    seen.add(item.char);
+    result.push({
+      id: getCharNavId(index),
+      char: item.char,
+      index
+    });
+  });
+
+  return result;
+});
+
+const updateActiveCharNav = () => {
+  const container = contentSearchRef.value;
+
+  if (!container || charNavItems.value.length === 0) {
+    activeCharNavId.value = '';
+    return;
+  }
+
+  const containerTop = container.getBoundingClientRect().top;
+  let currentId = charNavItems.value[0].id;
+
+  charNavItems.value.forEach((nav) => {
+    const target = container.querySelector(`[data-char-nav-id="${nav.id}"]`);
+    if (!target) return;
+
+    const offsetTop = target.getBoundingClientRect().top - containerTop;
+
+    if (offsetTop <= 36) {
+      currentId = nav.id;
+    }
+  });
+
+  activeCharNavId.value = currentId;
+};
+
+const jumpToChar = async (id) => {
+  await nextTick();
+
+  const container = contentSearchRef.value;
+  const target = container?.querySelector(`[data-char-nav-id="${id}"]`);
+
+  if (!container || !target) return;
+
+  const containerRect = container.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+
+  container.scrollTo({
+    top: container.scrollTop + targetRect.top - containerRect.top - 12,
+    behavior: 'smooth'
+  });
+
+  activeCharNavId.value = id;
+};
+
+watch(
+  () => [props.mode, charNavItems.value.length],
+  () => {
+    nextTick(() => updateActiveCharNav());
+  }
+);
 
 // ================= TAB 1 邏輯 =================
 const shouldShowChar = (index) => {
@@ -168,7 +295,7 @@ const toneMap = computed(() => {
         // Group 1: ID (如 1, 7a)
         // Group 2: 數字 (調值, 如 55, 5)
         // Group 3: 剩餘部分 (調類, 如 陰平, 上陰入)
-        const match = part.match(/^\[([0-9a-zA-Z]+)\](\d+)(.*)$/);
+        const match = part.match(/^\[([0-9a-zA-Z]+)\](`?[\d/-]+)(.*)$/);
 
         if (match) {
           const id = match[1];
@@ -240,6 +367,51 @@ const isConversionFailed = (syllable, location) => {
   if (!cityTones || !cityTones[suffix]) return true; // 有後綴但沒數據 -> 視為失敗
 
   return false; // 成功
+};
+
+const getReadingTypeLabel = (type) => {
+  if (type === 'wendu') return '文讀';
+  if (type === 'baidu') return '白讀';
+  return '';
+};
+
+const getSyllableHoverTitle = (item, index, syllable) => {
+  const messages = [];
+  const readingLabel = getReadingTypeLabel(getSearchCharReadingType(item, index));
+
+  if (readingLabel) {
+    messages.push(readingLabel);
+  }
+
+  if (isConversionFailed(syllable, item?.location)) {
+    messages.push(t('result.charsAndTones.tooltip.conversionFailed'));
+  }
+
+  return messages.join(' | ');
+};
+
+const readingTooltip = ref({
+  visible: false,
+  content: '',
+  top: 0,
+  left: 0
+});
+
+const handleSyllableMouseEnter = (event, item, index, syllable) => {
+  const content = getSyllableHoverTitle(item, index, syllable);
+  if (!content) return;
+
+  const rect = event.target.getBoundingClientRect();
+  readingTooltip.value = {
+    visible: true,
+    content,
+    top: rect.top - 10,
+    left: rect.left + (rect.width / 2)
+  };
+};
+
+const handleSyllableMouseLeave = () => {
+  readingTooltip.value.visible = false;
 };
 // 舊的 getNotesTitle 和 hasNotes 函數已刪除，因為不再需要 tooltip
 
@@ -358,13 +530,17 @@ const handleGlobalClick = (e) => {
   }
 };
 
-onMounted(() => window.addEventListener('click', handleGlobalClick));
+onMounted(() => {
+  window.addEventListener('click', handleGlobalClick);
+  nextTick(() => updateActiveCharNav());
+});
+
 onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
 
 </script>
 
-<style>
-.chartonepage{
+<style lang="scss">
+.chartonepage {
   max-width: 85dvw;
   min-width: 60dvw;
   height: 66dvh;
@@ -380,23 +556,24 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
 
   display: flex;
   margin: 0 auto;
-
 }
+
 @media (max-aspect-ratio: 1/1) {
-  .chartonepage{
+  .chartonepage {
     height: 60dvh;
   }
 }
-
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 .content-search {
   padding: 20px;
   overflow-y: auto;
   flex-grow: 1;
   max-height: calc(100% - 70px);
   border-radius: 12px;
+  position: relative;
+  scroll-behavior: smooth;
 }
 
 .char {
@@ -405,6 +582,107 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   text-align: center;
   margin-top: 15px;
   margin-bottom: 1px;
+  scroll-margin-top: 12px;
+}
+
+.reading-char {
+  color: inherit;
+}
+
+.reading-char--wendu {
+  color: v-bind('READING_COLORS.wendu');
+}
+
+.reading-char--baidu {
+  color: v-bind('READING_COLORS.baidu');
+}
+
+.global-tooltip-popup {
+  position: fixed;
+  z-index: 10001;
+  transform: translate(-50%, -100%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  max-width: 200px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -90%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%);
+  }
+}
+
+.char-nav-teleport {
+  position: fixed;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  box-shadow:
+    inset 0 0 1px rgba(255, 255, 255, 0.45),
+    0 8px 24px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.char-nav-node {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #4f5663;
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+
+  &:hover {
+    color: #0038a1;
+    background: rgba(255, 255, 255, 0.86);
+    transform: translateX(-2px) scale(1.06);
+    box-shadow: 0 4px 12px rgba(0, 56, 161, 0.12);
+  }
+
+  &.active {
+    color: #0038a1;
+    background: rgba(0, 56, 161, 0.12);
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 56, 161, 0.24),
+      0 4px 14px rgba(0, 56, 161, 0.16);
+  }
+}
+
+.char-nav-char {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .info-container {
@@ -436,6 +714,16 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   font-size: 1.1em;
 }
 
+.reading-char--wendu,
+.pronunciation--wendu {
+  color: v-bind('READING_COLORS.wendu');
+}
+
+.reading-char--baidu,
+.pronunciation--baidu {
+  color: v-bind('READING_COLORS.baidu');
+}
+
 .conversion-failed {
   color: #666;
   text-decoration: underline dashed;
@@ -460,10 +748,10 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   color: gray;
   text-align: center;
   margin-bottom: 15px;
-}
 
-.positions p {
-  margin: 2px 0;
+  p {
+    margin: 2px 0;
+  }
 }
 
 .location {
@@ -487,43 +775,45 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   font-weight: 600;
 }
 
-.syllables span {
-  margin-right: 3px;
+.syllables {
+  span {
+    margin-right: 3px;
+  }
 }
 
 .table-tones {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-}
 
-.table-tones th,
-.table-tones td {
-  border: 1px solid #ddd;
-  padding: 3px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 1em;
-}
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 3px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1em;
+  }
 
-.table-tones th:first-child,
-.table-tones td:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 10;
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-  border-right: 1px solid rgba(0,0,0,0.1);
-  background-clip: padding-box;
-}
+  th:first-child,
+  td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    border-right: 1px solid rgba(0,0,0,0.1);
+    background-clip: padding-box;
+  }
 
-.table-tones th:first-child {
-  z-index: 20;
-  background: rgba(255, 255, 255, 0.9);
+  th:first-child {
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.9);
+  }
 }
 
 .location-tones {
@@ -533,13 +823,13 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   white-space: nowrap;
   font-size: 12px;
   transition: transform 0.2s ease, background-color 0.2s ease;
-}
 
-.location-tones:hover {
-  background-color: #f4f4f4;
-  transform: scale(1.15);
-  cursor: pointer;
-  color: #0038a1;
+  &:hover {
+    background-color: #f4f4f4;
+    transform: scale(1.15);
+    cursor: pointer;
+    color: #0038a1;
+  }
 }
 
 .tones-cell-tones {
@@ -563,11 +853,11 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   align-items: center;
   z-index: 9999;
   transition: opacity 0.3s ease;
-}
 
-#loading-overlay.loading-hidden {
-  opacity: 0;
-  pointer-events: none;
+  &.loading-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 .bouncing-wrapper {
@@ -581,24 +871,24 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   justify-content: center;
   align-items: center;
   margin-bottom: 16px;
-}
 
-.bouncing-loader > div {
-  width: 14px;
-  height: 14px;
-  margin: 4px;
-  background: #9aa0a6;
-  border-radius: 50%;
-  animation: bouncing 0.6s infinite ease-in-out;
-  box-shadow: 0 0 8px rgba(0,0,0,0.05);
-}
+  > div {
+    width: 14px;
+    height: 14px;
+    margin: 4px;
+    background: #9aa0a6;
+    border-radius: 50%;
+    animation: bouncing 0.6s infinite ease-in-out;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
 
-.bouncing-loader > div:nth-child(2) {
-  animation-delay: 0.2s;
-}
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+    }
 
-.bouncing-loader > div:nth-child(3) {
-  animation-delay: 0.4s;
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
 }
 
 @keyframes bouncing {
@@ -606,6 +896,7 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
     transform: scale(0.7);
     opacity: 0.5;
   }
+
   40% {
     transform: scale(1);
     opacity: 1;
@@ -627,35 +918,35 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   padding: 2px 2px;
   cursor: pointer;
   font-size: 16px;
-}
 
-.multi:hover {
-  color: #d33;
-}
+  &:hover {
+    color: #d33;
+  }
 
-.multi::after {
-  content: attr(data-title);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #333;
-  color: #fff;
-  padding: 5px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  z-index: 9999;
-  pointer-events: none;
-  font-style: normal;
-}
+  &::after {
+    content: attr(data-title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 9999;
+    pointer-events: none;
+    font-style: normal;
+  }
 
-.multi:hover::after {
-  opacity: 1;
-  visibility: visible;
+  &:hover::after {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 .popup-tones {
@@ -680,11 +971,28 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   z-index: 10000;
   white-space: pre-wrap;
   transition: opacity 0.3s ease, transform 0.3s ease;
+
+  h3 {
+    margin-top: 0;
+    font-size: 16px;
+    color: #333;
+  }
 }
 
-.popup-tones h3 {
-  margin-top: 0;
-  font-size: 16px;
-  color: #333;
+@media (max-aspect-ratio: 1/1) {
+  .char-nav-teleport {
+    right: 10px;
+    gap: 6px;
+    padding: 8px 6px;
+  }
+
+  .char-nav-node {
+    width: 29px;
+    height: 29px;
+  }
+
+  .char-nav-char {
+    font-size: 16px;
+  }
 }
 </style>

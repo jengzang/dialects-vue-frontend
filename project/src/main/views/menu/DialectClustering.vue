@@ -32,16 +32,28 @@
       </button>
     </nav>
 
-    <section class="workflow-grid">
-      <div class="workflow-main">
-        <ClusterInputPanel />
-        <ClusterWorkflowPanel />
-        <ClusterResultPanel />
+    <section class="workspace-stage-shell main-glass-panel">
+      <div class="workspace-stage-head">
+        <div>
+          <p class="stage-kicker">
+            {{ t('cluster.stage.currentStep', { index: activeStepOption?.index || 1 }) }}
+          </p>
+          <h2>{{ activeStepOption?.label }}</h2>
+          <p>{{ activeStepDescription }}</p>
+        </div>
       </div>
 
-      <aside class="workflow-side">
-        <ClusterTaskSidebar />
-      </aside>
+      <section class="workflow-grid workflow-grid--focused">
+        <div class="workflow-main">
+          <ClusterInputPanel v-if="visibleMainPanels.input" />
+          <ClusterWorkflowPanel v-if="visibleMainPanels.workflow" />
+          <ClusterResultPanel v-if="visibleMainPanels.result" />
+        </div>
+
+        <aside class="workflow-side">
+          <ClusterTaskSidebar />
+        </aside>
+      </section>
     </section>
 
     <AppModal
@@ -89,6 +101,9 @@ provideClusterWorkspace(workspace)
 const {
   currentStep,
   stepOptions,
+  activeStepOption,
+  activeStepDescription,
+  visibleMainPanels,
   showResetModal,
   goToStep,
   isStepReachable,
@@ -105,7 +120,8 @@ const {
   min-height: 100%;
 
   .page-header,
-  .panel {
+  .panel,
+  .workspace-stage-shell {
     padding: 20px;
   }
 
@@ -118,7 +134,8 @@ const {
 
   .page-header h1,
   .panel-header h2,
-  .section-heading h3 {
+  .section-heading h3,
+  .workspace-stage-head h2 {
     margin: 0;
     color: #1d1d1f;
   }
@@ -128,10 +145,34 @@ const {
   .section-heading p,
   .section-note,
   .preview-hint,
-  .task-message {
+  .task-message,
+  .workspace-stage-head p {
     margin: 6px 0 0;
     color: #51606f;
     line-height: 1.55;
+  }
+
+  .stage-kicker {
+    margin: 0;
+    color: #0b57d0;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .workspace-stage-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .workspace-stage-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    padding-bottom: 4px;
   }
 
   .reset-btn,
@@ -188,6 +229,10 @@ const {
     gap: 20px;
   }
 
+  .workflow-grid--focused {
+    align-items: start;
+  }
+
   .workflow-main,
   .workflow-side,
   .groups-stack,
@@ -226,7 +271,8 @@ const {
   .result-section,
   .task-status-card,
   .cluster-form,
-  .mode-panel {
+  .mode-panel,
+  .stage-context-card {
     padding: 16px;
   }
 
@@ -503,7 +549,8 @@ const {
     .panel-header,
     .group-panel__header,
     .section-heading,
-    .quick-run-summary {
+    .quick-run-summary,
+    .workspace-stage-head {
       flex-direction: column;
     }
 

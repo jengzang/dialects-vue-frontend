@@ -23,7 +23,8 @@ function isI18nKey(message) {
     message.startsWith('common.') ||
     message.startsWith('navigation.') ||
     message.startsWith('auth.') ||
-    message.startsWith('query.')
+    message.startsWith('query.') ||
+    message.startsWith('compare.')
   )
 }
 
@@ -56,7 +57,12 @@ export const messageState = ref({
     show: false,
     type: 'info',        // 'success' | 'error' | 'warning' | 'info'
     message: '',
-    duration: 3000
+    duration: 3000,
+    actionText: '',
+    dismissText: '',
+    onAction: null,
+    onDismiss: null,
+    timerId: null
 })
 
 // ========================================
@@ -94,8 +100,8 @@ export function resolveConfirm(result) {
  * @param {string} message - 消息内容
  * @param {number} duration - 显示时长（ms）
  */
-export function showSuccess(message, duration = 3000) {
-    showMessage(message, 'success', duration)
+export function showSuccess(message, duration = 3000, options = {}) {
+    showMessage(message, 'success', duration, options)
 }
 
 /**
@@ -103,8 +109,8 @@ export function showSuccess(message, duration = 3000) {
  * @param {string} message - 消息内容
  * @param {number} duration - 显示时长（ms）
  */
-export function showError(message, duration = 5000) {
-    showMessage(message, 'error', duration)
+export function showError(message, duration = 5000, options = {}) {
+    showMessage(message, 'error', duration, options)
 }
 
 /**
@@ -112,8 +118,8 @@ export function showError(message, duration = 5000) {
  * @param {string} message - 消息内容
  * @param {{duration: number}} duration - 显示时长（ms）
  */
-export function showWarning(message, duration = 4000) {
-    showMessage(message, 'warning', duration)
+export function showWarning(message, duration = 4000, options = {}) {
+    showMessage(message, 'warning', duration, options)
 }
 
 /**
@@ -121,8 +127,8 @@ export function showWarning(message, duration = 4000) {
  * @param {string} message - 消息内容
  * @param {number} duration - 显示时长（ms）
  */
-export function showInfo(message, duration = 3000) {
-    showMessage(message, 'info', duration)
+export function showInfo(message, duration = 3000, options = {}) {
+    showMessage(message, 'info', duration, options)
 }
 
 /**
@@ -161,28 +167,75 @@ export function showConfirm(message, options = {}) {
     })
 }
 
+function clearMessageTimer() {
+    if (messageState.value.timerId) {
+        clearTimeout(messageState.value.timerId)
+    }
+}
+
+export function hideMessage({ dismissed = false } = {}) {
+    clearMessageTimer()
+    const onDismiss = messageState.value.onDismiss
+    messageState.value = {
+        ...messageState.value,
+        show: false,
+        timerId: null
+    }
+    if (dismissed && typeof onDismiss === 'function') {
+        onDismiss()
+    }
+}
+
+export function persistMessageUntilDismiss() {
+    const hasManualDismiss = Boolean(messageState.value.dismissText || messageState.value.actionText)
+    if (!messageState.value.show || !hasManualDismiss) {
+        return
+    }
+
+    clearMessageTimer()
+    messageState.value = {
+        ...messageState.value,
+        timerId: null
+    }
+}
+
+export function triggerMessageAction() {
+    const onAction = messageState.value.onAction
+    hideMessage()
+    if (typeof onAction === 'function') {
+        onAction()
+    }
+}
+
 /**
  * 内部方法：显示 Toast 消息
  */
-function showMessage(message, type, duration) {
+function showMessage(message, type, duration, options = {}) {
     // 自动翻译 i18n key
     const translatedMessage = translateMessage(message)
+    const translatedActionText = options.actionText ? translateMessage(options.actionText) : ''
+    const translatedDismissText = options.dismissText ? translateMessage(options.dismissText) : ''
 
     if (shouldSuppressRateLimitToast(type, translatedMessage)) {
         return
     }
 
+    clearMessageTimer()
+    const timerId = setTimeout(() => {
+        hideMessage()
+    }, duration)
+
     messageState.value = {
         show: true,
         type,
         message: translatedMessage,
-        duration
+        duration,
+        actionText: translatedActionText,
+        dismissText: translatedDismissText,
+        onAction: typeof options.onAction === 'function' ? options.onAction : null,
+        onDismiss: typeof options.onDismiss === 'function' ? options.onDismiss : null,
+        timerId
     }
-
-    // 自动隐藏
-    setTimeout(() => {
-        messageState.value.show = false
-    }, duration)
 }
 
 // ========================================

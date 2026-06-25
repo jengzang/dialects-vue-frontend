@@ -31,6 +31,7 @@
       "uploading": "上傳音訊中...",
       "creatingJob": "建立分析任務...",
       "startingAnalysis": "開始分析...",
+      "fetchingResults": "正在取得分析結果...",
       "reusingUpload": "復用既有上傳中...",
       "retryingUpload": "快取上傳已失效，重新上傳中...",
       "pollingFailed": "輪詢任務狀態失敗",

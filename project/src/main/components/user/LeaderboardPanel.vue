@@ -46,7 +46,8 @@ const categoryConfigs = computed(() => [
       },
       {
         key: 'endpoint__api_feature_stats',
-        label: t('user.leaderboard.categories.phonology.items.syllable')
+        label: t('user.leaderboard.categories.phonology.items.syllable'),
+        tooltip: t('user.leaderboard.categories.phonology.tooltips.syllable')
       },
       {
         key: 'endpoint__api_compare_ZhongGu',
@@ -945,13 +946,14 @@ const tableData = computed(() => {
     justify-content: center;
     gap: 16px;
     margin-bottom: 24px;
-    overflow-x: visible;
+    overflow-x: auto;
   }
 
   .metric-card {
     min-width: 100px;
     flex-shrink: 0;
     padding: 16px;
+    max-width: 48dvw;
   }
 
   .metric-header {

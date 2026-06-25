@@ -12,7 +12,7 @@
     "title": "Middle Chinese",
     "placeholder": "Please enter Middle Chinese pronunciation",
     "button": "Query",
-    "description": "Middle Chinese➡️Pronunciation • Organize by Middle Chinese position",
+    "description": "Middle Chinese → Pronunciation • Organize by Middle Chinese position",
     "noExclude": "No Exclusion",
     "selectAll": "Select All",
     "cards": {
@@ -31,7 +31,7 @@
     "title": "Phonemes",
     "placeholder": "Please enter phoneme",
     "button": "Query",
-    "description": "Pronunciation➡️Middle Chinese • Analyze phoneme origins",
+    "description": "Pronunciation → Middle Chinese • Analyze phoneme origins",
     "noExclude": "No Exclusion",
     "selectAll": "Select All",
     "analysisText": "Analyze the Middle Chinese origins of <strong>{card}</strong> syllables, i.e., which Middle Chinese [<strong>{keys}</strong>] the current <strong>{card}</strong> characters come from",
@@ -57,13 +57,13 @@
   "components": {
     "locationInput": {
       "label": "Location",
-      "selectButton": "Select Location",
+      "selectButton": "Select",
       "selectButtonTitle": "Select location from partition",
       "placeholder": "Enter location (matchable)"
     },
     "locationMultiInput": {
       "label": "Location",
-      "selectButton": "Select Location",
+      "selectButton": "Select",
       "selectButtonTitle": "Select location from partition",
       "locationCount": "{count} locations",
       "expandButton": "Expand",
@@ -96,8 +96,8 @@
         "locationCount": "{count} locations"
       },
       "tabs": {
-        "map": "Atlas Partition 2",
-        "yindian": "Phonetic Dictionary Partition"
+        "map": "Atlas Division",
+        "yindian": "Mcpdict Division"
       },
       "myCustomRegions": "My Custom Partitions",
       "customRegionSelectPlaceholder": "Select custom partitions",
@@ -106,7 +106,7 @@
         "loadCustomRegionsFailed": "Failed to load custom partitions: {message}",
         "loginRequired": "Please log in to use custom partitions",
         "noCustomRegionsConfirm": "You have not created any custom partitions yet. Go create one now?",
-        "loadRegionDetailsFailed": "Failed to load partition details",
+        "loadRegionDetailsFailed": "Failed to load details",
         "selectedCustomRegion": "Selected custom partition: {name}",
         "selectRegionFailed": "Failed to select partition: {message}"
       }
@@ -123,7 +123,8 @@
       "final": "Final",
       "tone": "Tone",
       "errorFetch": "Feature count fetch error",
-      "queryFailed": "Query failed"
+      "queryFailed": "Query failed",
+      "inputLimitHint": "You can enter at most {max} valid syllables. Please stop adding more."
     },
     "zhongguSelector": {
       "possibleCombinations": "May generate {count} combinations",
@@ -141,23 +142,23 @@
       "tooManyResults": "Too many results ({count}>{limit}), please reduce combinations"
     },
     "partitionModal": {
-      "title": "Partition Details",
+      "title": "Details",
       "selectionToggle": "Enable Selection",
       "enableSelection": "Enable Selection",
-      "selectAll": "Select All",
+      "selectAll": "All",
       "clearSelection": "Clear Selection",
-      "confirmButton": "Confirm Selection ({count})",
+      "confirmButton": "Confirm ({count})",
       "confirmSelection": "Confirm Selection ({count})",
       "maxSelectionExceeded": "Selected {count}, limit {max}",
-      "mapPartition": "Atlas Partition 2",
-      "dictPartition": "Phonetic Dictionary Partition",
+      "mapPartition": "Atlas Division",
+      "dictPartition": "Mcpdict Division",
       "administrativeDivision": "Administrative Division",
       "emptyNode": "(Empty)",
       "unknownDialect": "Unknown Dialect",
       "loading": "Loading...",
       "tabs": {
-        "map": "Atlas Partition 2",
-        "yindian": "Phonetic Dictionary Partition",
+        "map": "Atlas Division",
+        "yindian": "Mcpdict Division",
         "administrativeDivision": "Administrative Division"
       }
     },
@@ -248,26 +249,26 @@
     },
     "locationAndRegionInput": {
       "locationLabel": "Location",
-      "selectLocationButton": "Select Location",
+      "selectLocationButton": "Select",
       "selectLocationTitle": "Select location from partition",
       "locationPlaceholder": "Enter location (auto-match supported)",
       "mapTab": "Atlas",
-      "yindianTab": "Yindian",
-      "viewPartitionDetails": "View partition details",
-      "selectMapPartition": "Please select atlas partition",
-      "selectYindianPartition": "Please select yindian partition",
-      "partitionLabel": "Partition",
-      "partitionPlaceholder": "Enter partition names, space-separated (e.g.: Cantonese)",
+      "yindianTab": "Mcpdict",
+      "viewPartitionDetails": "View details",
+      "selectMapPartition": "Please select atlas division",
+      "selectYindianPartition": "Please select Mcpdict division",
+      "partitionLabel": "Division",
+      "partitionPlaceholder": "Enter division names, space-separated (e.g.: Cantonese)",
       "selectedCount": "You have selected {count} locations",
       "selectedCountPre": "You have selected",
       "selectedCountPost": "locations",
       "mapSource": "Atlas",
-      "yindianSource": "Yindian",
+      "yindianSource": "Mcpdict",
       "expandButton": "Expand",
       "customLocationsLabel": "Custom locations:",
       "selectedLocationsModalTitle": "Selected Locations ({count})",
       "customLocationsModalTitle": "Custom Locations ({count})",
-      "requireInput": "Please enter a location or partition",
+      "requireInput": "Please enter a location or division",
       "tooManyLocations": "Too many explicit locations were provided. Reduce manual locations or custom-region locations and try again."
     }
   },

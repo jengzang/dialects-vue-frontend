@@ -1,8 +1,9 @@
 {
   "tabs": {
-    "tab1": "比較漢字",
-    "tab2": "比較地位",
-    "tab4": "比較調類"
+    "tab1": "漢字",
+    "tab2": "中古",
+    "tab4": "調類",
+    "tab5": "音值"
   },
   "group": {
     "label1": "組1",
@@ -37,7 +38,8 @@
     "selectTwoToneClasses": "請選擇兩個調類",
     "tab1Hint": "比較同一漢字在不同地點的讀音差異。",
     "tab2Hint": "比較同一中古地位在不同地點的演變情況。",
-    "tab4Hint": "比較兩個調類在不同地點是合流還是分立。"
+    "tab4Hint": "比較兩個調類在不同地點是合流還是分立。",
+    "tab5Hint": "比較所選各點的音值對應關係（请輸入2~5個地點）。"
   },
   "cards": {
     "initial": "聲母",
@@ -54,7 +56,7 @@
     "yinru": "陰入",
     "yangru": "陽入",
     "qingsheng": "輕聲",
-    "other": "其他調"
+    "other": "變調"
   },
   "excludeOptions": {
     "noExclude": "不排除",
@@ -80,5 +82,12 @@
   },
   "results": {
     "noMainReading": "無主要讀音"
+  },
+  "sankeyControls": {
+    "title": "桑基圖操作",
+    "optimizeLinks": "優化連線",
+    "ignorePolyphonicChars": "忽略多音字",
+    "minLinkCharCount": "連線最少字數",
+    "minNodeCharCount": "節點最少字數"
   }
 }

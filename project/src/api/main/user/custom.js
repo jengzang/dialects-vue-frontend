@@ -1,6 +1,6 @@
 // api/user/custom.js - 自定义特征查询 API
-import { api } from '../../auth/httpClient.js'
-import { showError } from '@/utils/message.js'
+import { api } from '../../auth/httpClient.js';
+import { showError } from '@/utils/message.js';
 
 /**
  * @typedef {Object} CustomDataParams
@@ -40,43 +40,43 @@ import { showError } from '@/utils/message.js'
  */
 export async function getCustomData(params) {
   try {
-    const query = new URLSearchParams()
+    const query = new URLSearchParams();
 
     // locations 和 regions 是 List[str]，需要多次添加同一个参数
     if (params.locations && Array.isArray(params.locations)) {
-      params.locations.forEach(loc => {
-        query.append('locations', loc)
-      })
+      params.locations.forEach((loc) => {
+        query.append('locations', loc);
+      });
     }
 
     if (params.regions && Array.isArray(params.regions)) {
-      params.regions.forEach(reg => {
-        query.append('regions', reg)
-      })
+      params.regions.forEach((reg) => {
+        query.append('regions', reg);
+      });
     }
 
     // need_features 需要用逗号分隔成单个字符串
     if (params.need_features && Array.isArray(params.need_features)) {
-      query.append('need_features', params.need_features.join(','))
+      query.append('need_features', params.need_features.join(','));
     } else if (params.need_features) {
-      query.append('need_features', params.need_features)
+      query.append('need_features', params.need_features);
     }
 
     if (params.phonology && Array.isArray(params.phonology)) {
-      query.append('phonology', params.phonology.join(','))
+      query.append('phonology', params.phonology.join(','));
     } else if (params.phonology) {
-      query.append('phonology', params.phonology)
+      query.append('phonology', params.phonology);
     }
 
     if (params.region_mode) {
-      query.append('region_mode', params.region_mode)
+      query.append('region_mode', params.region_mode);
     }
 
-    return await api(`/api/get_custom?${query.toString()}`)
+    return await api(`/api/get_custom?${query.toString()}`);
   } catch (error) {
-    console.error('Get custom data error:', error)
-    showError(error.message || '獲取自定義數據失敗')
-    throw new Error(error.message || '獲取自定義數據失敗')
+    console.error('Get custom data error:', error);
+    showError(error.message || '獲取自定義數據失敗');
+    throw new Error(error.message || '獲取自定義數據失敗');
   }
 }
 
@@ -94,20 +94,20 @@ export async function getCustomData(params) {
  */
 export async function getCustomFeature(params) {
   try {
-    const query = new URLSearchParams()
+    const query = new URLSearchParams();
 
-    query.append('locations', params.locations || '')
-    query.append('regions', params.regions || '')
+    query.append('locations', params.locations || '');
+    query.append('regions', params.regions || '');
 
     if (params.word !== undefined) {
-      query.append('word', params.word)
+      query.append('word', params.word);
     }
 
-    return await api(`/api/get_custom_feature?${query.toString()}`)
+    return await api(`/api/get_custom_feature?${query.toString()}`);
   } catch (error) {
-    console.error('Get custom feature error:', error)
-    showError(error.message || '獲取自定義特徵失敗')
-    throw new Error(error.message || '獲取自定義特徵失敗')
+    console.error('Get custom feature error:', error);
+    showError(error.message || '獲取自定義特徵失敗');
+    throw new Error(error.message || '獲取自定義特徵失敗');
   }
 }
 
@@ -128,12 +128,12 @@ export async function submitCustomForm(data) {
   try {
     return await api('/api/submit_form', {
       method: 'POST',
-      body: data
-    })
+      body: data,
+    });
   } catch (error) {
-    console.error('Submit custom form error:', error)
-    showError(error.message || '提交自定義表單失敗')
-    throw new Error(error.message || '提交自定義表單失敗')
+    console.error('Submit custom form error:', error);
+    showError(error.message || '提交自定義表單失敗');
+    throw new Error(error.message || '提交自定義表單失敗');
   }
 }
 
@@ -150,11 +150,25 @@ export async function deleteCustomForm(data) {
   try {
     return await api('/api/delete_form', {
       method: 'DELETE',
-      body: data
-    })
+      body: data,
+    });
   } catch (error) {
-    console.error('Delete custom form error:', error)
-    showError(error.message || '刪除自定義表單失敗')
-    throw new Error(error.message || '刪除自定義表單失敗')
+    console.error('Delete custom form error:', error);
+    showError(error.message || '刪除自定義表單失敗');
+    throw new Error(error.message || '刪除自定義表單失敗');
+  }
+}
+
+/**
+ * 获取用户自定义数据和自定义分区的数量
+ * @returns {Promise<{success: boolean, custom_region_total: number, custom_data_total: number}>} 自定义数据和分区计数
+ * @throws {Error} 获取失败
+ */
+export async function getCustomCounts() {
+  try {
+    return await api('/user/custom/counts');
+  } catch (error) {
+    console.error('Get custom counts error:', error);
+    throw new Error(error.message || '獲取自定義計數失敗');
   }
 }

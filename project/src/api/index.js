@@ -3,14 +3,10 @@
 
 // ==================== 认证与核心 ====================
 // Export all auth functions from the auth module
-export * from './auth/index.js'
+export * from './auth/index.js';
 
 // ==================== Praat 音频分析 ====================
-export {
-  useClusterApi,
-  praat,
-  usePraatApi
-} from './main/tools/index.js'
+export { useClusterApi, praat, usePraatApi } from './main/tools/index.js';
 
 // ==================== 工具模块 ====================
 // 字表合并工具
@@ -19,8 +15,8 @@ export {
   uploadFiles,
   executeMerge,
   getMergeProgress,
-  downloadMerge
-} from './main/tools/merge.js'
+  downloadMerge,
+} from './main/tools/merge.js';
 
 // 字表检查工具
 export {
@@ -31,39 +27,31 @@ export {
   updateRow,
   batchDelete,
   executeBatchOperation,
-  downloadCheckResult
-} from './main/tools/check.js'
+  downloadCheckResult,
+} from './main/tools/check.js';
 
 // 粤拼转IPA工具
 export {
   uploadJyutFile,
   processJyut2Ipa,
   getJyut2IpaProgress,
-  downloadJyut2IpaResult
-} from './main/tools/jyut2ipa.js'
+  downloadJyut2IpaResult,
+} from './main/tools/jyut2ipa.js';
 
 // ==================== SQL 操作 ====================
 // SQL查询
-export {
-  sqlQuery,
-  distinctQuery,
-  getTableColumns,
-  queryCount
-} from './main/sql/query.js'
+export { sqlQuery, distinctQuery, getTableColumns, queryCount } from './main/sql/query.js';
 
 // SQL修改
 export {
   mutateSingleRow,
   batchMutate,
   batchReplacePreview,
-  batchReplaceExecute
-} from './main/sql/mutate.js'
+  batchReplaceExecute,
+} from './main/sql/mutate.js';
 
 // 树形数据
-export {
-  lazyLoadTree,
-  loadFullTree
-} from './main/sql/tree.js'
+export { lazyLoadTree, loadFullTree } from './main/sql/tree.js';
 
 // ==================== 查询模块 ====================
 // 核心查询
@@ -74,8 +62,8 @@ export {
   searchTones,
   getCharList,
   getFeatureCounts,
-  getFeatureStats
-} from './main/core/query.js'
+  getFeatureStats,
+} from './main/core/query.js';
 
 // 地点查询
 export {
@@ -84,69 +72,64 @@ export {
   getLocationPartitions,
   batchMatch,
   getPartitions,
-  getRegions
-} from './main/geo/LocationAndRegion.js'
+  getRegions,
+} from './main/geo/LocationAndRegion.js';
 
 // 地理数据查询
-export {
-  getCoordinates
-} from './main/geo/geo.js'
+export { getCoordinates } from './main/geo/geo.js';
 
 // 音系查询
 export {
   getPhonologyMatrix,
   getPhonologyClassificationMatrix,
-  queryPhonology
-} from './main/core/phonology.js'
+  queryPhonology,
+} from './main/core/phonology.js';
 
-export {
-  postPhoPieByValue,
-  postPhoPieByStatus
-} from './main/core/phoPie.js'
+export { postPhoPieByValue, postPhoPieByStatus } from './main/core/phoPie.js';
 
 // ==================== 比较模块 ====================
-export {
-  compareChars,
-  compareZhongGu,
-  compareTones
-} from './main/core/compare.js'
+export { compareChars, compareZhongGu, compareTones } from './main/core/compare.js';
 
 // ==================== 用户数据 ====================
 export {
   getAllCustomData,
   editCustomData,
   batchCreateCustomData,
-  batchDeleteCustomData
-} from './main/user/custom-data.js'
+  batchDeleteCustomData,
+} from './main/user/custom-data.js';
 
 export {
   getCustomData,
   getCustomFeature,
   submitCustomForm,
-  deleteCustomForm
-} from './main/user/custom.js'
+  deleteCustomForm,
+  getCustomCounts,
+} from './main/user/custom.js';
+
+export {
+  getUserPoints,
+  getUserFeatures,
+  getDataByPoint,
+  getDataByFeature,
+} from './main/user/custom-entry.js';
 
 // 自定義分區
 export {
   getCustomRegions,
   createOrUpdateCustomRegion,
-  deleteCustomRegion
-} from './main/user/custom-regions.js'
+  deleteCustomRegion,
+} from './main/user/custom-regions.js';
 
 // ==================== 日志统计 ====================
-export {
-  getTodayVisits,
-  getTotalVisits,
-  getVisitHistory
-} from './logs/visits.js'
+export { getTodayVisits, getTotalVisits, getVisitHistory } from './logs/visits.js';
 
 // ==================== URL 参数工具 ====================
 export {
   decodeParams,
   buildQueryUrl,
   copyCurrentUrl,
-  getUrlSegmentValue
-} from '../utils/urlParams.js'
+  getUrlSegmentValue,
+} from '../utils/urlParams.js';
 
 // ==================== VillagesML 自然村分析 ====================
 export {
@@ -254,4 +237,4 @@ export {
   runSpatialAwareClustering,
   runHierarchicalClustering,
   getSpatialRunIds,
-} from './villagesML/index.js'
+} from './villagesML/index.js';

@@ -5,7 +5,8 @@
     "updated": "更新成功",
     "created": "創建成功",
     "copied": "複製成功",
-    "languageChanged": "語言切換成功"
+    "languageChanged": "語言切換成功",
+    "interfaceModeChanged": "介面模式已更新"
   },
   "error": {
     "saveFailed": "保存失敗",
@@ -50,5 +51,10 @@
       "second": "秒",
       "now": "現在"
     }
+  },
+  "loginPrompt": {
+    "message": "登入後可使用高級功能，獲得更高的查詢上限，並可添加個人數據。",
+    "login": "立即登入",
+    "dismiss": "關閉"
   }
 }

@@ -33,7 +33,7 @@ export const menuRoutes = [
     redirect: '/menu/compare/zhonggu'
   },
   {
-    path: '/menu/compare/:sub(char|zhonggu|tone)',
+    path: '/menu/compare/:sub(char|zhonggu|tone|phonetic)',
     component: ComparePage
   },
   {
@@ -41,7 +41,7 @@ export const menuRoutes = [
     redirect: '/menu/map/view'
   },
   {
-    path: '/menu/map/:sub(view|divide|custom)',
+    path: '/menu/map/:sub(view|divide|custom|draw)',
     component: MapPage
   },
   {

@@ -1,17 +1,23 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
     <!--    <meta http-equiv="X-UA-Compatible" content="IE=edge">-->
-<!--    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">-->
+    <!--    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">-->
     <title>方音圖鑑 - 方言比較 地理語言學</title>
-    <meta name="description" content="方音圖鑑深入分析中古地位、方言比較、地理語言學，呈現各方言點的聲韻層次及音位分合。
-    支持：按中古地位整理讀音、分析音位的中古來源、查詢調值調類、查詢漢字讀音、用戶自定義繪圖等。">
+    <meta
+      name="description"
+      content="方音圖鑑深入分析中古地位、方言比較、地理語言學，呈現各方言點的聲韻層次及音位分合。
+    支持：按中古地位整理讀音、分析音位的中古來源、查詢調值調類、查詢漢字讀音、用戶自定義繪圖等。"
+    />
     <script>
-        if (!/\/$/.test(location.pathname)) {
-            location.replace(location.pathname + '/' + location.search + location.hash)
-        }
+      if (!/\/$/.test(location.pathname)) {
+        location.replace(location.pathname + '/' + location.search + location.hash);
+      }
     </script>
     <script src="../config.js"></script>
     <!-- CSS 引入 -->
@@ -20,518 +26,670 @@
     <link rel="stylesheet" href="css/resultpanel.css" />
     <link rel="stylesheet" href="css/mappanel.css" />
     <link rel="stylesheet" href="css/Extrapanel.css" />
-    <link rel="stylesheet" href="css/vue.css">
-    <link rel="stylesheet" href="css/button_switchs.css">
-    <link rel="stylesheet" href="css/input_style.css">
-    <link rel="stylesheet" href="css/popups.css">
+    <link rel="stylesheet" href="css/vue.css" />
+    <link rel="stylesheet" href="css/button_switchs.css" />
+    <link rel="stylesheet" href="css/input_style.css" />
+    <link rel="stylesheet" href="css/popups.css" />
 
     <!-- 加載 Vue 3 的 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.js"></script>
     <script src="js/login.js"></script>
-<!--    高德地图-->
+    <!--    高德地图-->
     <script src="https://webapi.amap.com/loader.js"></script>
+  </head>
 
-</head>
-
-<body>
-
-<div id="welcomeOverlay" class="welcome-overlay hidden">
-    <div id="welcomeModal" class="welcome-modal">
+  <body>
+    <div id="welcomeOverlay" class="welcome-overlay hidden">
+      <div id="welcomeModal" class="welcome-modal">
         <div class="modal-content">
-            <h1>👏 方音圖鑑</h1>
-            <h3>🗣️ 方言比較 - 地理語言學🌏</h3>
-            <div class="author-row">
-                <p>開發者：不羈</p>
-                <button id="contactBtn" style="padding: 4px 6px;background-color: #1c8dba">聯繫作者</button>
-            </div>
-            <div class="button-group">
-                <button id="likeAuthorBtn" style="background-color: darkred">👍喜歡作者</button>
-                <button id="suggestionBtn">💡我有建議</button>
-            </div>
+          <h1>👏 方音圖鑑</h1>
+          <h3>🗣️ 方言比較 - 地理語言學🌏</h3>
+          <div class="author-row">
+            <p>開發者：不羈</p>
+            <button id="contactBtn" style="padding: 4px 6px; background-color: #1c8dba">
+              聯繫作者
+            </button>
+          </div>
+          <div class="button-group">
+            <button id="likeAuthorBtn" style="background-color: darkred">👍喜歡作者</button>
+            <button id="suggestionBtn">💡我有建議</button>
+          </div>
 
-            <span id="currentDateTime"></span>
-            <span class="close-hint">點擊空白處關閉</span>
+          <span id="currentDateTime"></span>
+          <span class="close-hint">點擊空白處關閉</span>
         </div>
+      </div>
     </div>
-</div>
 
-<div id="authBox"></div>
-<div id="toast"></div>
-<!-- 全局彈出層 用於分區的彈出 -->
-<div id="popupLayer"></div>
-<!-- 地點匹配建議提示框 -->
-<div id="inlineSuggestion" class="inline-suggestion"></div>
+    <div id="authBox"></div>
+    <div id="toast"></div>
+    <!-- 全局彈出層 用於分區的彈出 -->
+    <div id="popupLayer"></div>
+    <!-- 地點匹配建議提示框 -->
+    <div id="inlineSuggestion" class="inline-suggestion"></div>
 
-<!--小窗查詢、浮窗顯示-->
-<div id="query-detail-panel" class="query-detail-panel">
-    <button id="close-panel" class="close-btn">×</button>
-    <div id='display-detail' class="panel-content">
+    <!--小窗查詢、浮窗顯示-->
+    <div id="query-detail-panel" class="query-detail-panel">
+      <button id="close-panel" class="close-btn">×</button>
+      <div id="display-detail" class="panel-content"></div>
     </div>
-</div>
-<div id="query-detail-panel2" class="query-detail-panel2">
-    <button id="close-panel2" class="close-btn">×</button>
-    <div id='display-detail2' class="panel-content">
+    <div id="query-detail-panel2" class="query-detail-panel2">
+      <button id="close-panel2" class="close-btn">×</button>
+      <div id="display-detail2" class="panel-content"></div>
     </div>
-</div>
-<div id="query-detail-panel3" class="query-detail-panel" style="left: 20%">
-    <button id="close-panel3" class="close-btn">×</button>
-    <div id='display-detail3' class="panel-content">
-        <p style="margin: 0">說明<br><span class="example-input"><strong>-</strong></span> 代表 <span class="example-desc">全匹配</span> 分析，意為提取“-”後對應的所有中古類別。</p>
-        <p style="margin: 0"><span class="example-input"><strong>空格</strong></span> 代表 <span class="example-desc">合併</span> 分析，即一起分析多個特徵的所轄字。</p>
-        <p style="margin-top: 0"><span class="example-input"><strong>回車</strong></span> 代表 <span class="example-desc">獨立</span> 分析，即把輸入特徵按回車拆分再各自分析轄字。</p>
-        <p style="margin: 0">一些示例<br><span class="example-input"><strong>「泥」</strong></span> 使用 <span class="example-desc">泥母</span> 進行分析。</p>
-        <p style="margin: 0"><span class="example-input"><strong>「豪」</strong></span> 使用 <span class="example-desc">豪韻</span> 進行分析。</p>
-        <p style="margin: 0"><span class="example-input"><strong>「蟹-等」</strong></span> 使用 <span class="example-desc">蟹攝一、二、三、四等</span> 進行分析("-"代表全匹配,“-”後需輸入中古類別)</p>
-        <p style="margin: 0"><span class="example-input"><strong>「次浊-調」</strong></span> 使用 <span class="example-desc">次濁聲母+平上去入</span> 進行分析。</p>
-        <p style="margin: 0"><span class="example-input"><strong>「宕 江」</strong></span> 使用合併後的 <span class="example-desc">宕、江攝</span> 轄字進行分析(中間空格代表一起分析，回車則是按照不同特徵處理)</p>
-        <p style="margin: 0"><span class="example-input"><strong>「庄組」</strong></span> 使用 <span class="example-desc">庄組</span> 進行分析（如果只輸入「庄」，會使用 <span class="example-desc">庄母</span> 分析）。</p>
-        <p style="margin: 0"><span class="example-input"><strong>「流開一」</strong></span> 使用 <span class="example-desc">流攝開口一等字</span> 進行分析。</p>
-        <p style="margin: 0"><span class="example-input"><strong>「假知組 假章組」</strong></span> 使用 <span class="example-desc">假攝的知、章組</span> 轄字進行分析。</p>
-        <p style="margin: 0"><span class="example-input"><strong>「塞擦」</strong></span> 提取 <span class="example-desc">塞擦音</span> 進行分析。</p>
-        <p style="margin: 0"><span class="example-input"><strong>「-部位」</strong></span> 分析 <span class="example-desc">所有發聲部位</span> ，包括“唇齒、喉、捲舌、腭、軟腭、雙唇、齒”。</p>
-        <p style="margin-bottom:0;font-size: 17px ">支持的輸入見下表（簡體也可以）</p>
+    <div id="query-detail-panel3" class="query-detail-panel" style="left: 20%">
+      <button id="close-panel3" class="close-btn">×</button>
+      <div id="display-detail3" class="panel-content">
+        <p style="margin: 0">
+          說明<br /><span class="example-input"><strong>-</strong></span> 代表
+          <span class="example-desc">全匹配</span> 分析，意為提取“-”後對應的所有中古類別。
+        </p>
+        <p style="margin: 0">
+          <span class="example-input"><strong>空格</strong></span> 代表
+          <span class="example-desc">合併</span> 分析，即一起分析多個特徵的所轄字。
+        </p>
+        <p style="margin-top: 0">
+          <span class="example-input"><strong>回車</strong></span> 代表
+          <span class="example-desc">獨立</span> 分析，即把輸入特徵按回車拆分再各自分析轄字。
+        </p>
+        <p style="margin: 0">
+          一些示例<br /><span class="example-input"><strong>「泥」</strong></span> 使用
+          <span class="example-desc">泥母</span> 進行分析。
+        </p>
+        <p style="margin: 0">
+          <span class="example-input"><strong>「豪」</strong></span> 使用
+          <span class="example-desc">豪韻</span> 進行分析。
+        </p>
+        <p style="margin: 0">
+          <span class="example-input"><strong>「蟹-等」</strong></span> 使用
+          <span class="example-desc">蟹攝一、二、三、四等</span>
+          進行分析("-"代表全匹配,“-”後需輸入中古類別)
+        </p>
+        <p style="margin: 0">
+          <span class="example-input"><strong>「次浊-調」</strong></span> 使用
+          <span class="example-desc">次濁聲母+平上去入</span> 進行分析。
+        </p>
+        <p style="margin: 0">
+          <span class="example-input"><strong>「宕 江」</strong></span> 使用合併後的
+          <span class="example-desc">宕、江攝</span>
+          轄字進行分析(中間空格代表一起分析，回車則是按照不同特徵處理)
+        </p>
+        <p style="margin: 0">
+          <span class="example-input"><strong>「庄組」</strong></span> 使用
+          <span class="example-desc">庄組</span> 進行分析（如果只輸入「庄」，會使用
+          <span class="example-desc">庄母</span> 分析）。
+        </p>
+        <p style="margin: 0">
+          <span class="example-input"><strong>「流開一」</strong></span> 使用
+          <span class="example-desc">流攝開口一等字</span> 進行分析。
+        </p>
+        <p style="margin: 0">
+          <span class="example-input"><strong>「假知組 假章組」</strong></span> 使用
+          <span class="example-desc">假攝的知、章組</span> 轄字進行分析。
+        </p>
+        <p style="margin: 0">
+          <span class="example-input"><strong>「塞擦」</strong></span> 提取
+          <span class="example-desc">塞擦音</span> 進行分析。
+        </p>
+        <p style="margin: 0">
+          <span class="example-input"><strong>「-部位」</strong></span> 分析
+          <span class="example-desc">所有發聲部位</span>
+          ，包括“唇齒、喉、捲舌、腭、軟腭、雙唇、齒”。
+        </p>
+        <p style="margin-bottom: 0; font-size: 17px">支持的輸入見下表（簡體也可以）</p>
         <table class="feature-table">
-            <thead>
+          <thead>
             <tr>
-                <th>類別</th>
-                <th>對應值</th>
+              <th>類別</th>
+              <th>對應值</th>
             </tr>
-            </thead>
-            <tbody>
-            <tr><td>攝</td><td>通、宕、江、止、遇、蟹、流、山、效、咸、深、臻、曾、梗、果、假</td></tr>
-            <tr><td>韻</td><td>之、仙、佳、侯、侵、元、先、冬、凡、刪、咍、咸、唐、嚴、夬、宵、寒、尤、山、幽、庚、廢、微、支、文、東、模、欣、
-                歌、江、泰、添、灰、痕、登、皆、真、祭、耕、肴、脂、臻、蒸、蕭、虞、覃、談、豪、銜、鍾、陽、青、魂、魚、鹽、麻、齊、#清(清有歧義，需用#指定清韻)</td></tr>
-            <tr><td>呼</td><td>合、開</td></tr>
-            <tr><td>等</td><td>一、二、三、三A、三B、三C、三銳、四(輸入“三”會輸出所有的三等字，如果考慮重紐，請指明“ABC銳”，例如“三A”)</td></tr>
-            <tr><td>入</td><td>舒、入</td></tr>
-            <tr><td>調</td><td>平、上、去、入</td></tr>
-            <tr><td>部位</td><td>雙唇、齒、唇齒、喉、捲舌、腭、軟腭</td></tr>
-            <tr><td>方式</td><td>塞、塞擦、擦、近、鼻</td></tr>
-            <tr><td>清濁</td><td>全清、全濁、次清、次濁</td></tr>
-            <tr><td>系</td><td>幫、知、端、見</td></tr>
-            <tr><td>組</td><td>幫、非、端、泥、精、莊、知、章、見、曉、影、日</td></tr>
-            <tr><td>母</td><td>幫、滂、並、明、非、敷、奉、微、端、透、定、泥、知、徹、澄、娘、精、從、心、邪、莊、初、崇、俟、生、章、昌、常、書、日、船、見、溪、群、疑、影、曉、匣、云、以、來、@清(清有歧義，需用@指定清母)</td></tr>
-            </tbody>
+          </thead>
+          <tbody>
+            <tr>
+              <td>攝</td>
+              <td>通、宕、江、止、遇、蟹、流、山、效、咸、深、臻、曾、梗、果、假</td>
+            </tr>
+            <tr>
+              <td>韻</td>
+              <td>
+                之、仙、佳、侯、侵、元、先、冬、凡、刪、咍、咸、唐、嚴、夬、宵、寒、尤、山、幽、庚、廢、微、支、文、東、模、欣、
+                歌、江、泰、添、灰、痕、登、皆、真、祭、耕、肴、脂、臻、蒸、蕭、虞、覃、談、豪、銜、鍾、陽、青、魂、魚、鹽、麻、齊、#清(清有歧義，需用#指定清韻)
+              </td>
+            </tr>
+            <tr>
+              <td>呼</td>
+              <td>合、開</td>
+            </tr>
+            <tr>
+              <td>等</td>
+              <td>
+                一、二、三、三A、三B、三C、三銳、四(輸入“三”會輸出所有的三等字，如果考慮重紐，請指明“ABC銳”，例如“三A”)
+              </td>
+            </tr>
+            <tr>
+              <td>入</td>
+              <td>舒、入</td>
+            </tr>
+            <tr>
+              <td>調</td>
+              <td>平、上、去、入</td>
+            </tr>
+            <tr>
+              <td>部位</td>
+              <td>雙唇、齒、唇齒、喉、捲舌、腭、軟腭</td>
+            </tr>
+            <tr>
+              <td>方式</td>
+              <td>塞、塞擦、擦、近、鼻</td>
+            </tr>
+            <tr>
+              <td>清濁</td>
+              <td>全清、全濁、次清、次濁</td>
+            </tr>
+            <tr>
+              <td>系</td>
+              <td>幫、知、端、見</td>
+            </tr>
+            <tr>
+              <td>組</td>
+              <td>幫、非、端、泥、精、莊、知、章、見、曉、影、日</td>
+            </tr>
+            <tr>
+              <td>母</td>
+              <td>
+                幫、滂、並、明、非、敷、奉、微、端、透、定、泥、知、徹、澄、娘、精、從、心、邪、莊、初、崇、俟、生、章、昌、常、書、日、船、見、溪、群、疑、影、曉、匣、云、以、來、@清(清有歧義，需用@指定清母)
+              </td>
+            </tr>
+          </tbody>
         </table>
         <p><span class="example-desc">點擊按鈕即可查詢！</span></p>
-        <p>在分析結果界面，像這樣的 <span class="example-input"><strong>藍色字</strong></span> 都是
-            <span class="example-desc">可點擊</span>的。<br>單擊後可在浮窗中選擇特徵，即可再次生成新窗口，進行<span class="example-desc">細分查詢</span>
-            。<br>這樣的窗口可以<span class="example-desc">無限生成</span>(瀏覽器帶得動的話)，可以同時對比多個地點/特徵。</p>
+        <p>
+          在分析結果界面，像這樣的 <span class="example-input"><strong>藍色字</strong></span> 都是
+          <span class="example-desc">可點擊</span
+          >的。<br />單擊後可在浮窗中選擇特徵，即可再次生成新窗口，進行<span class="example-desc"
+            >細分查詢</span
+          >
+          。<br />這樣的窗口可以<span class="example-desc">無限生成</span
+          >(瀏覽器帶得動的話)，可以同時對比多個地點/特徵。
+        </p>
         <p>✔ 注1：<span class="example-desc">移動端</span>界面可能顯示不全，請多滑動/拖動。</p>
-        <p>✔ 注2：點擊 <span class="example-input">分區 ▼</span> 按鈕，會出分區彈窗，用戶可<span class="example-desc">單擊</span>選擇所需分區。如要顯示下一級分區:<br>
-            ※ <span class="example-desc">電腦端</span>只需將<span class="example-desc">光標</span>移到對應分區上即可；<br>
-            ※ <span class="example-desc">移動端</span>則需要<span class="example-desc">點擊箭頭⌵</span>或<span class="example-desc">長按</span>對應分區</p>
-        <p>更詳細的使用說明，可點擊屏幕上方 <span class="example-input"> ❓使用說明 </span> 按鈕，點擊後會跳轉至詳細教程文章</p>
+        <p>
+          ✔ 注2：點擊 <span class="example-input">分區 ▼</span> 按鈕，會出分區彈窗，用戶可<span
+            class="example-desc"
+            >單擊</span
+          >選擇所需分區。如要顯示下一級分區:<br />
+          ※ <span class="example-desc">電腦端</span>只需將<span class="example-desc">光標</span
+          >移到對應分區上即可；<br />
+          ※ <span class="example-desc">移動端</span>則需要<span class="example-desc">點擊箭頭⌵</span
+          >或<span class="example-desc">長按</span>對應分區
+        </p>
+        <p>
+          更詳細的使用說明，可點擊屏幕上方
+          <span class="example-input"> ❓使用說明 </span> 按鈕，點擊後會跳轉至詳細教程文章
+        </p>
         <p>點擊🎲 可隨機生成分析示例</p>
+      </div>
     </div>
-</div>
-<div id="popup3" class="popup">
-    <div class="popup-content">
+    <div id="popup3" class="popup">
+      <div class="popup-content">
         <p id="location-name3"></p>
         <p id="feature3"></p>
         <button id="mini-btn2" class="mini-button">🔍詳情</button>
+      </div>
     </div>
-</div>
 
-<button id="floating-button">↺</button>
-<!-- 輸入面板 -->
-<div id="inputpanel" class="panel panel-medium" style="overflow-x: hidden; box-sizing: border-box;">
-    <div class="panel-header" id="dragHandle">
+    <button id="floating-button">↺</button>
+    <!-- 輸入面板 -->
+    <div
+      id="inputpanel"
+      class="panel panel-medium"
+      style="overflow-x: hidden; box-sizing: border-box"
+    >
+      <div class="panel-header" id="dragHandle">
         <span class="panel-title">🔍 設置參數</span>
-        <button id="openUsageModalBtn" title="點擊後鏈接跳轉">
-            ❓使用說明
-        </button>
+        <button id="openUsageModalBtn" title="點擊後鏈接跳轉">❓使用說明</button>
         <button id="minimizeBtn" class="mode-btn">_</button>
         <button id="maximizeBtn" class="mode-btn">⛶</button>
-    </div>
+      </div>
 
-    <div id="panelContent" class="panel-content">
+      <div id="panelContent" class="panel-content">
         <h4 id="mode-subtitle" class="panel-subtitle">選擇分析模式</h4>
         <div class="mode-feature-row">
-            <div class="mode-box">
-                <label class="mode-label">
-                    <input type="radio" name="mode" value="s2p" style="pointer-events: none;" checked />
-                    <div class="mode-text">
-                        <div class="mode-title">中古➡️讀音</div>
-                        <div class="mode-desc">按中古地位整理讀音</div>
-                    </div>
-                </label>
-                <label class="mode-label">
-                    <input type="radio" name="mode" value="p2s" style="pointer-events: none;" />
-                    <div class="mode-text">
-                        <div class="mode-title">讀音➡️中古</div>
-                        <div class="mode-desc">分析音位的中古來源</div>
-                    </div>
-                </label>
-            </div>
+          <div class="mode-box">
+            <label class="mode-label">
+              <input type="radio" name="mode" value="s2p" style="pointer-events: none" checked />
+              <div class="mode-text">
+                <div class="mode-title">中古➡️讀音</div>
+                <div class="mode-desc">按中古地位整理讀音</div>
+              </div>
+            </label>
+            <label class="mode-label">
+              <input type="radio" name="mode" value="p2s" style="pointer-events: none" />
+              <div class="mode-text">
+                <div class="mode-title">讀音➡️中古</div>
+                <div class="mode-desc">分析音位的中古來源</div>
+              </div>
+            </label>
+          </div>
 
-            <div class="feature-box">
-                <div class="checkbox-group" id="features-group">
-                    <label><input type="checkbox" value="聲母" /> 聲母</label>
-                    <label><input type="checkbox" value="韻母" checked /> 韻母</label>
-                    <label><input type="checkbox" value="聲調" /> 聲調</label>
-                </div>
+          <div class="feature-box">
+            <div class="checkbox-group" id="features-group">
+              <label><input type="checkbox" value="聲母" /> 聲母</label>
+              <label><input type="checkbox" value="韻母" checked /> 韻母</label>
+              <label><input type="checkbox" value="聲調" /> 聲調</label>
             </div>
+          </div>
         </div>
 
         <!-- 地點與分區 -->
         <div class="input-section">
-            <div class="group-row2">
-                <!-- 地點 -->
-                <div class="location-input">
-                    <label for="locations" style="margin-bottom: 10px;">地點</label>
-                    <textarea id="locations" placeholder="請輸入地點(可匹配)"></textarea>
-                </div>
-                <!-- 分區 -->
-                <div class="region-input">
-                    <div class="region-header" style="display: flex; align-items: center; margin-bottom: 0; white-space: nowrap;">
-                        <div class="login-tabs" id="regionTabs" style="margin:0 0 0 -10px;">
-                            <button class="tab-btn active" data-tab="map" style="padding: 3px 3px;">地圖集</button>
-                            <button class="tab-btn" data-tab="yindian" style="padding: 3px 3px;">音典</button>
-                        </div>
-                        <button id="partitionBtn" class="text-btn" style="white-space: nowrap; margin-left: 0;">分區 ▼</button>
-                    </div>
-                    <textarea id="regions" placeholder="請輸入或選擇分區"></textarea>
-                </div>
+          <div class="group-row2">
+            <!-- 地點 -->
+            <div class="location-input">
+              <label for="locations" style="margin-bottom: 10px">地點</label>
+              <textarea id="locations" placeholder="請輸入地點(可匹配)"></textarea>
             </div>
+            <!-- 分區 -->
+            <div class="region-input">
+              <div
+                class="region-header"
+                style="display: flex; align-items: center; margin-bottom: 0; white-space: nowrap"
+              >
+                <div class="login-tabs" id="regionTabs" style="margin: 0 0 0 -10px">
+                  <button class="tab-btn active" data-tab="map" style="padding: 3px 3px">
+                    地圖集
+                  </button>
+                  <button class="tab-btn" data-tab="yindian" style="padding: 3px 3px">音典</button>
+                </div>
+                <button
+                  id="partitionBtn"
+                  class="text-btn"
+                  style="white-space: nowrap; margin-left: 0"
+                >
+                  分區 ▼
+                </button>
+              </div>
+              <textarea id="regions" placeholder="請輸入或選擇分區"></textarea>
+            </div>
+          </div>
         </div>
-
 
         <!-- 中古音輸入 -->
         <div class="input-section">
-            <div  id="status_input_button" class="group-row2">
-                <div id="status_inputs_group">
-                    <h4 class="panel-subtitle" >中古音地位</h4>
-                    <textarea id="status_inputs" placeholder="請輸入待查中古音地位 支持-全匹配"></textarea>
-                </div>
-                <!-- 添加“輸入示例”按钮，垂直排列 -->
-                <div class="input-example-container">
-                    <button id="input-example-button" class="input-example-btn">❔示例</button>
-                    <button class="emoji-button" id="dice-button">🎲</button>
-                </div>
+          <div id="status_input_button" class="group-row2">
+            <div id="status_inputs_group">
+              <h4 class="panel-subtitle">中古音地位</h4>
+              <textarea
+                id="status_inputs"
+                placeholder="請輸入待查中古音地位 支持-全匹配"
+              ></textarea>
             </div>
+            <!-- 添加“輸入示例”按钮，垂直排列 -->
+            <div class="input-example-container">
+              <button id="input-example-button" class="input-example-btn">❔示例</button>
+              <button class="emoji-button" id="dice-button">🎲</button>
+            </div>
+          </div>
         </div>
 
         <div class="input-section">
-            <div id="group_inputs_group" style="display: none;">
-<!--                <h4 class="panel-subtitle">分類與待查音節</h4>-->
-                <div class="group-row">
-                    <div style="max-width: 250px;">
-                        <label for="group_inputs">按中古音分類</label>
-                        <textarea id="group_inputs" placeholder="輸入分類所用中古類別「清濁/系/組/母/攝/韻/入/調」"></textarea>
-                    </div>
-                    <div style="max-width: 250px;">
-                        <label for="pho_values">待查音節</label>
-                        <textarea id="pho_values" placeholder="輸入待查的音節(留空則查全部）"></textarea>
-                    </div>
-                </div>
+          <div id="group_inputs_group" style="display: none">
+            <!--                <h4 class="panel-subtitle">分類與待查音節</h4>-->
+            <div class="group-row">
+              <div style="max-width: 250px">
+                <label for="group_inputs">按中古音分類</label>
+                <textarea
+                  id="group_inputs"
+                  placeholder="輸入分類所用中古類別「清濁/系/組/母/攝/韻/入/調」"
+                ></textarea>
+              </div>
+              <div style="max-width: 250px">
+                <label for="pho_values">待查音節</label>
+                <textarea id="pho_values" placeholder="輸入待查的音節(留空則查全部）"></textarea>
+              </div>
             </div>
+          </div>
         </div>
 
         <!-- 操作運行 -->
         <div class="input-section">
-            <div class="center-btn">
-                <button id="runBtn" class="fancy-run-btn">🚀 單擊運行</button>
-                <!-- 圓形切換開關 -->
-                <div class="switch-container-masschange">
-                    <span id="button-text-masschange" class="button-text-masschange">海量數據</span>
-                    <button id="button-masschange" class="button-masschange">
-                        <span class="button-icon-masschange">↻</span>
-                    </button>
-                </div>
+          <div class="center-btn">
+            <button id="runBtn" class="fancy-run-btn">🚀 單擊運行</button>
+            <!-- 圓形切換開關 -->
+            <div class="switch-container-masschange">
+              <span id="button-text-masschange" class="button-text-masschange">海量數據</span>
+              <button id="button-masschange" class="button-masschange">
+                <span class="button-icon-masschange">↻</span>
+              </button>
             </div>
+          </div>
 
-<!--            <div class="debug-row">-->
-<!--                <button id="testBackendBtn" class="vertical-btn">測試後端連線</button>-->
-<!--                <pre id="debug-log"></pre>-->
-<!--            </div>-->
+          <!--            <div class="debug-row">-->
+          <!--                <button id="testBackendBtn" class="vertical-btn">測試後端連線</button>-->
+          <!--                <pre id="debug-log"></pre>-->
+          <!--            </div>-->
         </div>
         <div class="button-container-map">
-            <div class="button-description-map">
-                方言分區點圖
+          <div class="button-description-map">方言分區點圖</div>
+          <button id="allmap-first" class="allmap-first">🌍繪圖</button>
+          <!-- 下拉選框 -->
+          <div>
+            <div class="button-description-map">分區級數</div>
+            <div class="dropdown-container-map">
+              <select id="max-level" class="dropdown-map">
+                <option value="" selected disabled>請選擇</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
             </div>
-            <button id="allmap-first" class="allmap-first">
-                🌍繪圖
-            </button>
-            <!-- 下拉選框 -->
-            <div>
-                <div class="button-description-map">
-                    分區級數
-                </div>
-                <div class="dropdown-container-map">
-                    <select id="max-level" class="dropdown-map">
-                        <option value="" selected disabled>請選擇</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                    </select>
-                </div>
-             </div>
+          </div>
         </div>
         <!-- 父容器 -->
         <div class="bug-button-container">
-            <span class="bug-text">發現了bug⁉️</span> <!-- 纯文字部分 -->
-            <!-- 强制刷新按钮 -->
-            <button class="btn-refresh" id="refreshBtn" style="background-color: #28a745">刷新</button>
-            <!-- 反馈BUG按钮 -->
-            <button class="btn-feedback" id="feedbackBtn">反饋</button>
+          <span class="bug-text">發現了bug⁉️</span>
+          <!-- 纯文字部分 -->
+          <!-- 强制刷新按钮 -->
+          <button class="btn-refresh" id="refreshBtn" style="background-color: #28a745">
+            刷新
+          </button>
+          <!-- 反馈BUG按钮 -->
+          <button class="btn-feedback" id="feedbackBtn">反饋</button>
         </div>
-
+      </div>
     </div>
-</div>
 
-
-<!-- 結果面板 -->
-<div id="resultPanel" class="panel panel-medium">
-    <div class="panel-header" id="resultDragHandle">
+    <!-- 結果面板 -->
+    <div id="resultPanel" class="panel panel-medium">
+      <div class="panel-header" id="resultDragHandle">
         <span class="panel-title">📊 分析結果</span>
         <button id="resultMinimizeBtn" class="mode-btn">🗕</button>
         <button id="resultMaximizeBtn" class="mode-btn">⛶</button>
-    </div>
-    <!-- 將浮動欄移出內容區，放在這裡 -->
-    <div id="stickyContextBar" class="sticky-label" style="display: none;">
+      </div>
+      <!-- 將浮動欄移出內容區，放在這裡 -->
+      <div id="stickyContextBar" class="sticky-label" style="display: none">
         <span id="stickyContextText"></span>
         <button id="toggleColumnsBtn">切換隱藏</button>
-    </div>
-    <div id="resultPanelContent" class="panel-content">
-    </div>
-    <div id="stickyContextBar2" class="sticky-label2" style="display: none;">
+      </div>
+      <div id="resultPanelContent" class="panel-content"></div>
+      <div id="stickyContextBar2" class="sticky-label2" style="display: none">
         <div class="sticky-bar-inner">
-            <span id="stickyContextText2"></span>
-            <div id="toggleColumnsBtn2" class="custom-switch-container" style="left: 90%">
-                <div class="custom-switch">
-                <span class="custom-slider">
-                    <span id="switch-text2" class="switch-text">主體</span>
-                </span>
-                </div>
+          <span id="stickyContextText2"></span>
+          <div id="toggleColumnsBtn2" class="custom-switch-container" style="left: 90%">
+            <div class="custom-switch">
+              <span class="custom-slider">
+                <span id="switch-text2" class="switch-text">主體</span>
+              </span>
             </div>
+          </div>
         </div>
+      </div>
     </div>
 
-</div>
-
-
-<!-- 地图面板 -->
-<div id="mapPanel" class="panel panel-medium">
-    <div class="panel-header" id="mapDragHandle">
+    <!-- 地图面板 -->
+    <div id="mapPanel" class="panel panel-medium">
+      <div class="panel-header" id="mapDragHandle">
         <span class="panel-title">🗺️ 地图</span>
         <button id="mapMinimizeBtn" class="mode-btn">🗕</button>
         <button id="mapMaximizeBtn" class="mode-btn">⛶</button>
 
         <!-- 新增的特徵值下拉框或按钮，默认不显示 -->
         <div id="featureContainer" class="feature-container">
-            <!-- 默认是空的，下拉框或按钮将在点击后填充 -->
+          <!-- 默认是空的，下拉框或按钮将在点击后填充 -->
         </div>
         <div id="custom-switch-container" class="custom-switch-container">
-            <div class="custom-switch" id="custom-toggle">
-                <span class="custom-slider">
-                    <span id="switch-text" class="switch-text">隱藏</span> <!-- 默认文本为 "自定义信息 (隐藏)" -->
-                </span>
-            </div>
+          <div class="custom-switch" id="custom-toggle">
+            <span class="custom-slider">
+              <span id="switch-text" class="switch-text">隱藏</span>
+              <!-- 默认文本为 "自定义信息 (隐藏)" -->
+            </span>
+          </div>
         </div>
-    </div>
-    <div id="mapPanelContent" class="panel-content">
-                <!-- 地图区域 -->
+      </div>
+      <div id="mapPanelContent" class="panel-content">
+        <!-- 地图区域 -->
         <div id="mapContainer">
-            <!-- 地图将加载在这里 -->
+          <!-- 地图将加载在这里 -->
         </div>
         <div id="popup" class="popup">
-            <div class="popup-content">
-                <!--                    <h4>详细信息</h4>-->
-                <p id="location-name"></p>
-                <p id="feature"></p>
-                <p id="phonology"></p>
-                <p id="detail-content"></p>
-                <p id="notes1"></p>
-                <button id="mini-btn" class="mini-button">🔍詳情</button>
-                <button id="mini-btn0" class="mini-button" style="background-color: brown">🗑️刪除</button>
-            </div>
+          <div class="popup-content">
+            <!--                    <h4>详细信息</h4>-->
+            <p id="location-name"></p>
+            <p id="feature"></p>
+            <p id="phonology"></p>
+            <p id="detail-content"></p>
+            <p id="notes1"></p>
+            <button id="mini-btn" class="mini-button">🔍詳情</button>
+            <button id="mini-btn0" class="mini-button" style="background-color: brown">
+              🗑️刪除
+            </button>
+          </div>
         </div>
         <div id="popup2" class="popup">
-            <div class="popup-content">
-                <p id="location-name2"></p>
-                <p id="feature2"></p>
-            </div>
+          <div class="popup-content">
+            <p id="location-name2"></p>
+            <p id="feature2"></p>
+          </div>
         </div>
 
-
-           <!-- 控件控制面板（最小化和最大化是通过鼠标操作和点击控制）-->
+        <!-- 控件控制面板（最小化和最大化是通过鼠标操作和点击控制）-->
         <div class="input-card" id="inputCard">
-            <div class="input-item">
-                <label class="switch">
-                    <input type="checkbox" id="togglesearch" name="toggleControls" />
-                    <span class="slider"></span>
-                </label>
-                <label  class="custom-label">搜索地點</label>
-            </div>
-            <div class="input-item">
-                <!-- 苹果风格的开关按钮 -->
-                <label class="switch">
-                    <input type="checkbox" id="toggleControlsRadio" name="toggleControls" checked/>
-                    <span class="slider"></span>
-                </label>
-                <label  class="custom-label">顯示/隱藏 控件</label>
-            </div>
-            <div class="input-item">
-                <label class="switch">
-                    <input type="checkbox" id="toggleBg" name="mapStyle" value="bg" checked />
-                    <span class="slider"></span>
-                </label>
-                <label  class="custom1-label">區域面 </label>
-            </div>
+          <div class="input-item">
+            <label class="switch">
+              <input type="checkbox" id="togglesearch" name="toggleControls" />
+              <span class="slider"></span>
+            </label>
+            <label class="custom-label">搜索地點</label>
+          </div>
+          <div class="input-item">
+            <!-- 苹果风格的开关按钮 -->
+            <label class="switch">
+              <input type="checkbox" id="toggleControlsRadio" name="toggleControls" checked />
+              <span class="slider"></span>
+            </label>
+            <label class="custom-label">顯示/隱藏 控件</label>
+          </div>
+          <div class="input-item">
+            <label class="switch">
+              <input type="checkbox" id="toggleBg" name="mapStyle" value="bg" checked />
+              <span class="slider"></span>
+            </label>
+            <label class="custom1-label">區域面 </label>
+          </div>
 
-            <div class="input-item">
-                <label class="switch">
-                    <input type="checkbox" id="toggleRoad" name="mapStyle" value="road" />
-                    <span class="slider"></span>
-                </label>
-                <label  class="custom1-label">道路</label>
-            </div>
+          <div class="input-item">
+            <label class="switch">
+              <input type="checkbox" id="toggleRoad" name="mapStyle" value="road" />
+              <span class="slider"></span>
+            </label>
+            <label class="custom1-label">道路</label>
+          </div>
 
-            <div class="input-item">
-                <label class="switch">
-                    <input type="checkbox" id="toggleBuilding" name="mapStyle" value="building" checked />
-                    <span class="slider"></span>
-                </label>
-                <label  class="custom1-label">建築物 </label>
-            </div>
+          <div class="input-item">
+            <label class="switch">
+              <input type="checkbox" id="toggleBuilding" name="mapStyle" value="building" checked />
+              <span class="slider"></span>
+            </label>
+            <label class="custom1-label">建築物 </label>
+          </div>
 
-            <div class="input-item">
-                <label class="switch">
-                    <input type="checkbox" id="togglePoint" name="mapStyle" value="point" checked />
-                    <span class="slider"></span>
-                </label>
-                <label  class="custom1-label">標註</label>
-            </div>
+          <div class="input-item">
+            <label class="switch">
+              <input type="checkbox" id="togglePoint" name="mapStyle" value="point" checked />
+              <span class="slider"></span>
+            </label>
+            <label class="custom1-label">標註</label>
+          </div>
         </div>
         <div id="myPageTop">
-            <table>
-                <tr>
-                    <td>
-                        <label>地點搜索：</label>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input id="tipinput" placeholder="請輸入關鍵字" autocomplete="off"/>
-                    </td>
-                </tr>
-            </table>
+          <table>
+            <tr>
+              <td>
+                <label>地點搜索：</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input id="tipinput" placeholder="請輸入關鍵字" autocomplete="off" />
+              </td>
+            </tr>
+          </table>
         </div>
-    </div>
+      </div>
 
-    <!-- 右侧面板容器 -->
-    <div id="rightPanel" class="right-panel">
+      <!-- 右侧面板容器 -->
+      <div id="rightPanel" class="right-panel">
         <div class="panel-content1">
-            <h3>手動添加數據</h3>
-            <div class="login-line">
-                <button id="login" onclick="showAuthPopup()">登录</button>
-                <p id="login-tip">此功能需登錄使用</p>
+          <h3>手動添加數據</h3>
+          <div class="login-line">
+            <button id="login" onclick="showAuthPopup()">登录</button>
+            <p id="login-tip">此功能需登錄使用</p>
+          </div>
+          <form id="infoForm">
+            <div class="form-row">
+              <label for="location-input" class="location-input-label">地點(簡稱):</label>
+              <input
+                type="text"
+                id="location-input"
+                name="location"
+                placeholder="請輸入地點，支持模糊匹配"
+                autocomplete="off"
+              />
             </div>
-            <form id="infoForm">
-                <div class="form-row">
-                    <label for="location-input" class="location-input-label">地點(簡稱):</label>
-                    <input type="text" id="location-input" name="location" placeholder="請輸入地點，支持模糊匹配" autocomplete="off">
-                </div>
-                <div class="form-row">
-                    <label for="region-input">音典分區:</label>
-                    <input type="text" id="region-input" name="region" placeholder="單擊地點選框 自動填入分區" autocomplete="off">
-                </div>
-                <div class="form-row">
-                    <label for="coordinates-input">經緯度:</label>
-                    <input type="text" id="coordinates-input" name="coordinates" placeholder="點擊地圖自動填入經緯度" autocomplete="off">
-                </div>
-                <div class="form-row">
-                    <label for="phonology-input">聲韻調:</label>
-                    <input type="text" id="phonology-input" name="phonology" placeholder="請輸入聲韻調" autocomplete="off">
-                </div>
-                <div class="form-row">
-                    <label for="feature-input">特徵:</label>
-                    <input type="text" id="feature-input" name="feature" placeholder="請輸入特徵" autocomplete="off">
-                </div>
-                <div class="form-row">
-                    <label for="value-input">值:</label>
-                    <input type="text" id="value-input" name="value" placeholder="請輸入用於繪圖的值" autocomplete="off">
-                </div>
-                <div class="form-row">
-                    <label for="description-input">說明:</label>
-                    <textarea id="description-input" name="description" placeholder="請輸入說明" autocomplete="off"></textarea>
-                </div>
-                <button type="submit">提交</button>
-            </form>
+            <div class="form-row">
+              <label for="region-input">音典分區:</label>
+              <input
+                type="text"
+                id="region-input"
+                name="region"
+                placeholder="單擊地點選框 自動填入分區"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-row">
+              <label for="coordinates-input">經緯度:</label>
+              <input
+                type="text"
+                id="coordinates-input"
+                name="coordinates"
+                placeholder="點擊地圖自動填入經緯度"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-row">
+              <label for="phonology-input">聲韻調:</label>
+              <input
+                type="text"
+                id="phonology-input"
+                name="phonology"
+                placeholder="請輸入聲韻調"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-row">
+              <label for="feature-input">特徵:</label>
+              <input
+                type="text"
+                id="feature-input"
+                name="feature"
+                placeholder="請輸入特徵"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-row">
+              <label for="value-input">值:</label>
+              <input
+                type="text"
+                id="value-input"
+                name="value"
+                placeholder="請輸入用於繪圖的值"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-row">
+              <label for="description-input">說明:</label>
+              <textarea
+                id="description-input"
+                name="description"
+                placeholder="請輸入說明"
+                autocomplete="off"
+              ></textarea>
+            </div>
+            <button type="submit">提交</button>
+          </form>
         </div>
+      </div>
+      <!-- 加号按钮 -->
+      <div id="expandButton" class="expand-button">+</div>
     </div>
-    <!-- 加号按钮 -->
-    <div id="expandButton" class="expand-button">
-        +
-    </div>
-</div>
 
-<!-- 三個主面板的復原按鈕 -->
-<button id="panelRestoreBtn" class="toggle-btn">⇄</button>
-<button id="resultRestoreBtn" class="toggle-btn">⇄</button>
-<button id="mapPanelRestoreBtn" class="toggle-btn">⇄</button>
+    <!-- 三個主面板的復原按鈕 -->
+    <button id="panelRestoreBtn" class="toggle-btn">⇄</button>
+    <button id="resultRestoreBtn" class="toggle-btn">⇄</button>
+    <button id="mapPanelRestoreBtn" class="toggle-btn">⇄</button>
 
-
-<!--查音、查調小窗口-->
-<div class="container-search">
-    <!-- 可拖动的展开部分 -->
-    <div class="expansion-panel-search">
+    <!--查音、查調小窗口-->
+    <div class="container-search">
+      <!-- 可拖动的展开部分 -->
+      <div class="expansion-panel-search">
         <div class="content-search">
-            <div class="syllables" style="font-size: 14px">
-                點擊右上角 × 清空該頁面 →<br>該頁面不會自動清空，方便多次查詢、比對<br>
-            </div>
-            <div class="syllables">
-                <br>****************************
-                <!-- <br>更詳細的查字功能，可移步<br>
+          <div class="syllables" style="font-size: 14px">
+            點擊右上角 × 清空該頁面 →<br />該頁面不會自動清空，方便多次查詢、比對<br />
+          </div>
+          <div class="syllables">
+            <br />****************************
+            <!-- <br>更詳細的查字功能，可移步<br>
                 <a href="https://mcpdict.vear.vip/" target="_blank" rel="noopener noreferrer">
                     漢字音典（唯二網頁版）
                 </a>
                 <br><a href="https://jyutdict.org/" target="_blank" rel="noopener noreferrer">
                     泛粵典(官網)
                 </a> -->
+          </div>
+          <div id="loading-overlay" class="loading-hidden">
+            <div class="bouncing-wrapper">
+              <div class="bouncing-loader">
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+              <p class="loading-text">正在檢索中……</p>
             </div>
-            <div id="loading-overlay" class="loading-hidden">
-                <div class="bouncing-wrapper">
-                    <div class="bouncing-loader">
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                    </div>
-                    <p class="loading-text">正在檢索中……</p>
-                </div>
-            </div>
+          </div>
 
-            <!-- 这里是可填充的内容 -->
-            <button class="clear-btn" id="clear-btn">×</button> <!-- 清空按钮 -->
+          <!-- 这里是可填充的内容 -->
+          <button class="clear-btn" id="clear-btn">×</button>
+          <!-- 清空按钮 -->
         </div>
 
         <!-- 底部按钮部分 -->
         <div class="footer-search">
-            <!-- 输入框占据30%宽度 -->
-            <input type="text" class="input-search" placeholder="🔎︎請輸入待查漢字" autocomplete="off">
-            <!-- 查字按钮 -->
-            <button class="btn-search" id="characters-btn">查字</button>
-            <!-- 查音按钮 -->
-            <button class="btn-search" id="tones-btn">查調</button>
-            <!-- 圆形展开按钮 -->
-            <button class="btn-search-circle" id="expand-btn">&#9776</button>
+          <!-- 输入框占据30%宽度 -->
+          <input
+            type="text"
+            class="input-search"
+            placeholder="🔎︎請輸入待查漢字"
+            autocomplete="off"
+          />
+          <!-- 查字按钮 -->
+          <button class="btn-search" id="characters-btn">查字</button>
+          <!-- 查音按钮 -->
+          <button class="btn-search" id="tones-btn">查調</button>
+          <!-- 圆形展开按钮 -->
+          <button class="btn-search-circle" id="expand-btn">&#9776;</button>
         </div>
-
+      </div>
     </div>
-</div>
 
-
-<!-- JS 檔案引入 -->
-<script src="js/main.js"></script>
-<script src="js/inputpanel.js"></script>
-<script src="js/html_table.js"></script>
-<script src="js/mappanel.js"></script>
-<script src="js/Extrapanel.js"></script>
-<script src="js/vue_table.js"></script>
-<script src="js/process_data.js"></script>
-<script src="js/popup.js"></script>
-<script src="js/get_vue.js">
-</script>
-</body>
+    <!-- JS 檔案引入 -->
+    <script src="js/main.js"></script>
+    <script src="js/inputpanel.js"></script>
+    <script src="js/html_table.js"></script>
+    <script src="js/mappanel.js"></script>
+    <script src="js/Extrapanel.js"></script>
+    <script src="js/vue_table.js"></script>
+    <script src="js/process_data.js"></script>
+    <script src="js/popup.js"></script>
+    <script src="js/get_vue.js"></script>
+  </body>
 </html>

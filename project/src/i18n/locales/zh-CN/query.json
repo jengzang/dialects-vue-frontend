@@ -12,7 +12,7 @@
     "title": "查中古",
     "placeholder": "请输入中古音",
     "button": "查询",
-    "description": "中古➡️读音•按中古地位整理读音",
+    "description": "中古 → 读音 • 按中古地位整理读音",
     "noExclude": "不排除",
     "selectAll": "全选",
     "cards": {
@@ -31,7 +31,7 @@
     "title": "查音位",
     "placeholder": "请输入音位",
     "button": "查询",
-    "description": "读音➡️中古•分析音位的中古来源",
+    "description": "读音 → 中古 • 分析音位的中古来源",
     "noExclude": "不排除",
     "selectAll": "全选",
     "analysisText": "分析<strong>{card}</strong>音节的中古来源，即当今的同<strong>{card}</strong>字分别来自哪些中古[<strong>{keys}</strong>]",
@@ -123,7 +123,8 @@
       "final": "韵母",
       "tone": "声调",
       "errorFetch": "Feature count fetch error",
-      "queryFailed": "查询失败"
+      "queryFailed": "查询失败",
+      "inputLimitHint": "最多只能输入 {max} 个合法音节，请勿继续输入。"
     },
     "zhongguSelector": {
       "possibleCombinations": "可能产生{count}种组合",

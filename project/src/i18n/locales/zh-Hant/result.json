@@ -24,9 +24,20 @@
     }
   },
   "resultList": {
+    "readingLegend": {
+      "ariaLabel": "字色圖例",
+      "title": "字色說明",
+      "items": {
+        "both": "文白讀",
+        "wendu": "文讀",
+        "baidu": "白讀",
+        "yinweiPolyphonic": "多地位",
+        "zhongguPolyphonic": "多音字"
+      }
+    },
     "emptyState": "請先查詢",
     "locationLabel": "地點",
-    "locationPlaceholder": "輸入地點名稱...",
+    "locationPlaceholder": "點擊選擇地點跳轉",
     "filter": {
       "default": "篩選",
       "selected": "已選：{values}",
@@ -128,6 +139,10 @@
       "yangRu": "陽入",
       "otherTone": "其他調",
       "neutralTone": "輕聲"
+    },
+    "charNav": {
+      "title": "漢字導航",
+      "jumpToChar": "跳轉到「{char}」"
     }
   },
   "phonologyTable": {
