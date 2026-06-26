@@ -303,12 +303,14 @@
           "coordinates": "Coordinate lookup",
           "table": "Table lookup",
           "tree": "Tree lookup",
-          "villages": "Villages Machine Learning"
+          "villages": "Villages Machine Learning",
+          "locations": "Location Information"
         },
         "tooltips": {
           "coordinates": "Used to fetch map coordinates for Middle Chinese, phoneme, character, tone, partition-map, and custom-map queries.",
           "table": "Includes table-based queries such as language-preservation vocabulary and grammar, sources, Guangdong village tables, and Yangchun spoken-word lists.",
-          "tree": "Includes tree-based queries such as Guangdong natural-village trees and Middle Chinese status trees."
+          "tree": "Includes tree-based queries such as Guangdong natural-village trees and Middle Chinese status trees.",
+          "locations": "Includes retrieving individual location details and obtaining complete zone information."
         }
       }
     }
