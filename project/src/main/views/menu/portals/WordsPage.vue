@@ -26,20 +26,22 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter()
+const route = useRoute()
 
 const handleYcSpoken = () => {
-  router.push('/explore/yc-spoken')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/yc-spoken'))
 };
 
 const handleYuBaoVocabulary = () => {
-  router.push('/explore/yubao?tab=vocabulary')
+  router.push({ path: buildLocalePath(resolveRouteLocale(route), '/explore/yubao'), query: { tab: 'vocabulary' } })
 };
 
 const handleYuBaoGrammar = () => {
-  router.push('/explore/yubao?tab=grammar')
+  router.push({ path: buildLocalePath(resolveRouteLocale(route), '/explore/yubao'), query: { tab: 'grammar' } })
 };
 </script>
 

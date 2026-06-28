@@ -56,8 +56,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { setLocale } from '@/i18n/index.js'
+import { useRoute, useRouter } from 'vue-router'
 import { SUPPORTED_LOCALES } from '@/i18n/localeDetector.js'
+import { buildLocalePath } from '@/i18n/localeRouting.js'
 import {
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
@@ -67,6 +68,8 @@ import {
 import { showSuccess } from '@/utils/message.js'
 
 const { locale, t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 
 const currentLocale = computed(() => locale.value)
 
@@ -96,9 +99,12 @@ function changeLanguage(newLocale) {
     return
   }
 
-  setLocale(newLocale)
+  router.push({
+    path: buildLocalePath(newLocale, route.path),
+    query: route.query,
+    hash: route.hash,
+  })
   showSuccess(t('messages.success.languageChanged'))
-  setTimeout(() => window.location.reload(), 500)
 }
 
 function changeInterfaceMode(mode) {

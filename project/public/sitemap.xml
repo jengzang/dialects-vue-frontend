@@ -1,84 +1,246 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://dialects.yzup.top/</loc>
+    <loc>https://dialects.yzup.top/zh-CN/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/source</loc>
+    <loc>https://dialects.yzup.top/zh-Hant/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/privacy</loc>
+    <loc>https://dialects.yzup.top/en/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/query/char</loc>
+    <loc>https://dialects.yzup.top/zh-CN/menu/source/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/query/zhonggu</loc>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/source/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/query/yinwei</loc>
+    <loc>https://dialects.yzup.top/en/menu/source/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/query/tone</loc>
+    <loc>https://dialects.yzup.top/zh-CN/menu/privacy/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/compare/char</loc>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/privacy/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/compare/zhonggu</loc>
+    <loc>https://dialects.yzup.top/en/menu/privacy/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/compare/tone</loc>
+    <loc>https://dialects.yzup.top/zh-CN/menu/query/char/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/compare/phonetic</loc>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/query/char/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/pho/matrix</loc>
+    <loc>https://dialects.yzup.top/en/menu/query/char/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/pho/custom</loc>
+    <loc>https://dialects.yzup.top/zh-CN/menu/query/zhonggu/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/pho/count</loc>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/query/zhonggu/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/pho/evolution</loc>
+    <loc>https://dialects.yzup.top/en/menu/query/zhonggu/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/explore/yubao</loc>
+    <loc>https://dialects.yzup.top/zh-CN/menu/query/yinwei/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/explore/char-class</loc>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/query/yinwei/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/explore/yc-spoken</loc>
+    <loc>https://dialects.yzup.top/en/menu/query/yinwei/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/explore/villages/gd</loc>
+    <loc>https://dialects.yzup.top/zh-CN/menu/query/tone/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/explore/villages/table</loc>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/query/tone/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/explore/villages/yc</loc>
+    <loc>https://dialects.yzup.top/en/menu/query/tone/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/explore/villages/ml</loc>
+    <loc>https://dialects.yzup.top/zh-CN/menu/compare/char/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/tools</loc>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/compare/char/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/words</loc>
+    <loc>https://dialects.yzup.top/en/menu/compare/char/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/villages</loc>
+    <loc>https://dialects.yzup.top/zh-CN/menu/compare/zhonggu/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/cluster</loc>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/compare/zhonggu/</loc>
   </url>
   <url>
-    <loc>https://dialects.yzup.top/menu/map/view</loc>
+    <loc>https://dialects.yzup.top/en/menu/compare/zhonggu/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/menu/compare/tone/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/compare/tone/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/menu/compare/tone/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/menu/compare/phonetic/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/compare/phonetic/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/menu/compare/phonetic/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/menu/pho/matrix/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/pho/matrix/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/menu/pho/matrix/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/menu/pho/custom/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/pho/custom/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/menu/pho/custom/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/menu/pho/count/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/pho/count/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/menu/pho/count/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/menu/pho/evolution/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/pho/evolution/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/menu/pho/evolution/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/explore/yubao/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/explore/yubao/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/explore/yubao/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/explore/char-class/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/explore/char-class/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/explore/char-class/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/explore/yc-spoken/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/explore/yc-spoken/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/explore/yc-spoken/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/explore/villages/gd/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/explore/villages/gd/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/explore/villages/gd/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/explore/villages/table/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/explore/villages/table/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/explore/villages/table/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/explore/villages/yc/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/explore/villages/yc/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/explore/villages/yc/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/explore/villages/ml/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/explore/villages/ml/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/explore/villages/ml/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/menu/tools/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/tools/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/menu/tools/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/menu/words/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/words/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/menu/words/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/menu/villages/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/villages/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/menu/villages/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/menu/cluster/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/cluster/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/menu/cluster/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-CN/menu/map/view/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/zh-Hant/menu/map/view/</loc>
+  </url>
+  <url>
+    <loc>https://dialects.yzup.top/en/menu/map/view/</loc>
   </url>
 </urlset>

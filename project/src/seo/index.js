@@ -1,4 +1,11 @@
 import SEO_CONFIG, { NOINDEX_PATHS } from './config.js'
+import {
+  SUPPORTED_LOCALES,
+  buildLocalePath,
+  extractLocaleFromPath,
+  normalizeLocale as normalizeRouteLocale,
+  stripLocaleFromPath,
+} from '@/i18n/localeRouting.js'
 
 const DEFAULT_OG_IMAGE = '/og-cover.png'
 const DEFAULT_JSON_LD = {
@@ -10,13 +17,14 @@ const DEFAULT_JSON_LD = {
 }
 
 function getJsonLdType(path) {
-  if (path === '/') return 'WebSite'
-  if (path === '/menu/source') return 'CollectionPage'
-  if (path === '/menu/privacy') return 'WebPage'
-  if (path.startsWith('/menu/query/') || path.startsWith('/menu/compare/') || path.startsWith('/menu/pho/')) {
+  const normalizedPath = stripLocaleFromPath(path)
+  if (normalizedPath === '/') return 'WebSite'
+  if (normalizedPath === '/menu/source') return 'CollectionPage'
+  if (normalizedPath === '/menu/privacy') return 'WebPage'
+  if (normalizedPath.startsWith('/menu/query/') || normalizedPath.startsWith('/menu/compare/') || normalizedPath.startsWith('/menu/pho/')) {
     return 'SoftwareApplication'
   }
-  if (path.startsWith('/explore/villages/')) return 'Dataset'
+  if (normalizedPath.startsWith('/explore/villages/')) return 'Dataset'
   return 'WebPage'
 }
 
@@ -53,6 +61,29 @@ function ensureCanonical() {
   return canonical
 }
 
+
+function ensureAlternateLink(hreflang) {
+  let link = document.head.querySelector(`link[rel="alternate"][hreflang="${hreflang}"]`)
+  if (!link) {
+    link = document.createElement('link')
+    link.setAttribute('rel', 'alternate')
+    link.setAttribute('hreflang', hreflang)
+    document.head.appendChild(link)
+  }
+  return link
+}
+
+function updateHreflangLinks(pathname) {
+  const origin = SEO_CONFIG.siteOrigin || window.location.origin
+  const normalizedPath = normalizePathname(pathname)
+
+  for (const locale of SUPPORTED_LOCALES) {
+    const href = `${origin}${buildLocalePath(locale, normalizedPath)}/`
+    ensureAlternateLink(locale).setAttribute('href', href)
+  }
+
+  ensureAlternateLink('x-default').setAttribute('href', `${origin}${normalizedPath === '/' ? '/' : normalizedPath}`)
+}
 function ensureJsonLd() {
   let script = document.head.querySelector('script[data-hermes-seo="jsonld"]')
   if (!script) {
@@ -76,16 +107,18 @@ function getRouteSeo(pathname) {
 
 function normalizePathname(pathname) {
   if (!pathname || pathname === '/') return '/'
-  return pathname.endsWith('/') ? pathname.slice(0, -1) || '/' : pathname
+  const localeStripped = stripLocaleFromPath(pathname)
+  return localeStripped.endsWith('/') ? localeStripped.slice(0, -1) || '/' : localeStripped
 }
 
-function getCanonicalUrl(pathname) {
+function getCanonicalUrl(pathname, locale) {
   const origin = SEO_CONFIG.siteOrigin || window.location.origin
   const normalizedPath = normalizePathname(pathname)
-  if (normalizedPath === '/') {
-    return `${origin}/`
+  const localizedPath = buildLocalePath(locale, normalizedPath)
+  if (localizedPath === `/${locale}`) {
+    return `${origin}${localizedPath}/`
   }
-  return `${origin}${normalizedPath}/`
+  return `${origin}${localizedPath}/`
 }
 
 function getOgImageUrl() {
@@ -98,7 +131,7 @@ export function updateSeo({ path, locale }) {
     return
   }
 
-  const normalizedLocale = normalizeLocale(locale)
+  const normalizedLocale = normalizeRouteLocale(locale)
   const normalizedPath = normalizePathname(path)
   const routeSeo = getRouteSeo(normalizedPath)
 
@@ -109,7 +142,7 @@ export function updateSeo({ path, locale }) {
     ? pickLocalizedValue(routeSeo.description, normalizedLocale)
     : pickLocalizedValue(SEO_CONFIG.defaultDescription, normalizedLocale)
   const siteName = pickLocalizedValue(SEO_CONFIG.siteNameLocales, normalizedLocale)
-  const canonicalUrl = getCanonicalUrl(normalizedPath)
+  const canonicalUrl = getCanonicalUrl(normalizedPath, normalizedLocale)
   const shouldNoindex = NOINDEX_PATHS.has(normalizedPath)
   const ogImageUrl = getOgImageUrl()
   const jsonLdType = getJsonLdType(normalizedPath)
@@ -153,6 +186,7 @@ export function updateSeo({ path, locale }) {
   twitterImage.setAttribute('content', ogImageUrl)
 
   ensureCanonical().setAttribute('href', canonicalUrl)
+  updateHreflangLinks(normalizedPath)
 
   const jsonLdScript = ensureJsonLd()
   jsonLdScript.textContent = JSON.stringify({

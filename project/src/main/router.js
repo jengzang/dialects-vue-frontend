@@ -7,8 +7,21 @@ import { userStore } from '@/main/store/store.js'
 import { showWarning } from '@/utils/message.js'
 import { menuRoutes } from '@/main/router/menuRoutes.js'
 import { exploreRoutes } from '@/main/router/exploreRoutes.js'
+import {
+  FALLBACK_LOCALE,
+  buildLocalePath,
+  buildLocaleRedirectTarget,
+  detectBrowserLocale,
+  extractLocaleFromPath,
+  isSupportedLocale,
+  normalizeLocale,
+  resolveRouteLocale,
+  shouldRedirectMainEntry,
+  stripLocaleFromPath,
+} from '@/i18n/localeRouting.js'
 
 const HomePage = () => import('@/main/views/HomePage.vue')
+// 旧 intro 入口已停用，仅为兼容历史代码保留导入与兜底 layout 分支。
 const LikeAuthor = () => import('./views/intro/LikeAuthor.vue')
 const Suggestions = () => import('./views/intro/Suggestions.vue')
 const Thanks = () => import('./views/intro/Thanks.vue')
@@ -22,6 +35,19 @@ const IntroLayout = () => import('@/layouts/IntroLayout.vue')
 
 const DEFAULT_TITLE = '\u65B9\u97F3\u5716\u9451'
 
+function withLocalePath(path, routeLike) {
+  return buildLocalePath(resolveRouteLocale(routeLike), path)
+}
+
+function createLocaleRedirect(path) {
+  return (to) => ({
+    path: buildLocalePath(to.params.locale, path),
+    query: to.query,
+    hash: to.hash,
+  })
+}
+
+// 旧 intro 入口已停用：此兼容组件目前不会被主路由树使用，暂保留避免扩大本次改动面。
 const IntroEntry = {
   setup() {
     const route = useRoute()
@@ -41,21 +67,86 @@ const IntroEntry = {
 const routes = [
   {
     path: '/',
-    component: HomePage
+    beforeEnter: () => {
+      if (typeof window === 'undefined') {
+        return { path: buildLocalePath(FALLBACK_LOCALE, '/') }
+      }
+
+      return {
+        path: buildLocaleRedirectTarget({
+          pathname: '/',
+          locale: detectBrowserLocale(),
+        })
+      }
+    }
   },
   {
     path: '/menu',
-    component: MenuEntry
+    beforeEnter: (to) => ({
+      path: buildLocaleRedirectTarget({
+        pathname: '/menu',
+        search: typeof window !== 'undefined' ? window.location.search : '',
+        hash: to.hash,
+        locale: detectBrowserLocale(),
+      })
+    })
   },
-  ...menuRoutes,
   {
     path: '/explore',
-    component: ExploreEntry
+    beforeEnter: (to) => ({
+      path: buildLocaleRedirectTarget({
+        pathname: '/explore',
+        search: typeof window !== 'undefined' ? window.location.search : '',
+        hash: to.hash,
+        locale: detectBrowserLocale(),
+      })
+    })
   },
-  ...exploreRoutes,
   {
-    path: '/praat',
-    redirect: '/explore/tools/praat'
+    path: '/auth',
+    beforeEnter: (to) => ({
+      path: buildLocaleRedirectTarget({
+        pathname: '/auth',
+        search: typeof window !== 'undefined' ? window.location.search : '',
+        hash: to.hash,
+        locale: detectBrowserLocale(),
+      })
+    })
+  },
+  {
+    path: '/:locale(zh-CN|zh-Hant|en)',
+    children: [
+      {
+        path: '',
+        component: HomePage
+      },
+      {
+        path: 'menu',
+        component: MenuEntry
+      },
+      ...menuRoutes,
+      {
+        path: 'explore',
+        component: ExploreEntry
+      },
+      ...exploreRoutes,
+      {
+        path: 'praat',
+        redirect: createLocaleRedirect('/explore/tools/praat')
+      },
+      {
+        path: 'auth',
+        component: Auth
+      },
+      {
+        path: 'auth/data',
+        component: UserDataPage
+      },
+      {
+        path: 'auth/regions',
+        component: UserRegionPage
+      },
+    ]
   },
   {
     path: '/villagesML/:pathMatch(.*)*',
@@ -63,29 +154,38 @@ const routes = [
   },
   {
     path: '/intro',
-    component: IntroLayout,
-    children: [
-      {
-        path: '',
-        component: IntroEntry
-      }
-    ]
-  },
-  {
-    path: '/auth',
-    component: Auth
-  },
-  {
-    path: '/auth/data',
-    component: UserDataPage
-  },
-  {
-    path: '/auth/regions',
-    component: UserRegionPage
+    redirect: () => ({
+      path: buildLocalePath(detectBrowserLocale(), '/'),
+    })
   },
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/'
+    beforeEnter: (to) => {
+      const locale = extractLocaleFromPath(to.path)
+      if (locale) {
+        return {
+          path: buildLocalePath(locale, '/'),
+          replace: true,
+        }
+      }
+
+      if (shouldRedirectMainEntry(to.path)) {
+        return {
+          path: buildLocaleRedirectTarget({
+            pathname: stripLocaleFromPath(to.path),
+            search: typeof window !== 'undefined' ? window.location.search : '',
+            hash: to.hash,
+            locale: detectBrowserLocale(),
+          }),
+          replace: true,
+        }
+      }
+
+      return {
+        path: buildLocalePath(detectBrowserLocale(), '/'),
+        replace: true,
+      }
+    }
   }
 ]
 
@@ -255,7 +355,8 @@ const ROUTE_QUERY_ALLOWLIST = {
 }
 
 function sanitizeQueryByRoute(to) {
-  const config = ROUTE_QUERY_ALLOWLIST[to.path]
+  const normalizedPath = stripLocaleFromPath(to.path)
+  const config = ROUTE_QUERY_ALLOWLIST[normalizedPath]
   if (!config) {
     return to.query
   }
@@ -303,6 +404,24 @@ function isSameQuery(left, right) {
 }
 
 router.beforeEach(async (to, from, next) => {
+  const routeLocale = to.params.locale
+
+  if (routeLocale && !isSupportedLocale(routeLocale)) {
+    return next({
+      path: buildLocalePath(normalizeLocale(routeLocale), stripLocaleFromPath(to.path)),
+      query: to.query,
+      hash: to.hash,
+      replace: true,
+    })
+  }
+
+  if (to.path === '/intro') {
+    return next({
+      path: buildLocalePath(detectBrowserLocale(), '/'),
+      replace: true,
+    })
+  }
+
   const sanitizedQuery = sanitizeQueryByRoute(to)
 
   if (!isSameQuery(sanitizedQuery, to.query)) {
@@ -314,14 +433,14 @@ router.beforeEach(async (to, from, next) => {
     })
   }
 
-  if (to.path === '/auth/data' || to.path === '/auth/regions') {
+  if (to.path.endsWith('/auth/data') || to.path.endsWith('/auth/regions')) {
     if (!userStore.authReady) {
       await waitForAuthReady()
     }
 
     if (!userStore.isAuthenticated) {
       showWarning(i18n.global.t('user.dataPage.messages.authRequired'))
-      return next({ path: '/auth', replace: true })
+      return next({ path: withLocalePath('/auth', to), replace: true })
     }
   }
 

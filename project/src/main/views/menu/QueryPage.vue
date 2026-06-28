@@ -218,6 +218,7 @@ import YinweiSelector from "@/main/components/query/YinweiSelector.vue";
 import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
 import ChoiceSelector from "@/components/selector/ChoiceSelector.vue";
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import {
   globalPayload,
   queryStore,
@@ -703,7 +704,7 @@ function handleApplyConfig(data) {
 function resolveTabRoute(tabName) {
   const sub = tabToRouteSub[tabName] || 'zhonggu'
   return {
-    path: `/menu/query/${sub}`
+    path: buildLocalePath(resolveRouteLocale(route), `/menu/query/${sub}`)
   }
 }
 

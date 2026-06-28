@@ -38,29 +38,31 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter()
+const route = useRoute()
 
 // 跳转到对应的工具页面
 const handleDataCheck = () => {
-  router.push('/explore/tools/check')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/tools/check'))
 };
 
 const handleJyutpingToIpa = () => {
-  router.push('/explore/tools/jyut2ipa')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/tools/jyut2ipa'))
 };
 
 const handleMergeTables = () => {
-  router.push('/explore/tools/merge')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/tools/merge'))
 };
 
 const handleDeriveTables = () => {
-  router.push('/explore/tools/derive')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/tools/derive'))
 };
 
 const handlePraatTables = () => {
-  router.push('/explore/tools/praat')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/tools/praat'))
 };
 </script>
 

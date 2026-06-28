@@ -28,6 +28,7 @@ import PanelManager from './components/result/PanelManager.vue'
 import { initOnlineTimeTracker, stopOnlineTimeTracker } from '../utils/onlineTimeTracker.js'
 import { initLoginPromptTracker, stopLoginPromptTracker } from '../utils/loginPromptTracker.js'
 import { getToken } from '../api/auth/auth.js'
+import { stripLocaleFromPath } from '../i18n/localeRouting.js'
 
 // // 🌉 建立 bridge 用於跨組件共享 iframe 狀態
 // const nativeFrame = ref(null)
@@ -52,39 +53,41 @@ export default {
     const route = useRoute()
 
     const layoutComponent = computed(() => {
+      const normalizedPath = stripLocaleFromPath(route.path)
+
       // 首页使用 SimpleLayout（无 navbar）
-      if (route.path === '/') {
+      if (normalizedPath === '/') {
         return SimpleLayout
       }
 
-      // intro 开头的路由使用 IntroLayout
-      if (route.path.startsWith('/intro')) {
+      // intro 已不再作为现用页面入口，保留分支仅作兼容兜底
+      if (normalizedPath.startsWith('/intro')) {
         return IntroLayout
       }
 
       // /villagesML 路由使用 SimpleLayout
-      if (route.path === '/villagesML' || route.path.startsWith('/villagesML/')) {
+      if (normalizedPath === '/villagesML' || normalizedPath.startsWith('/villagesML/')) {
         return SimpleLayout
       }
 
       // New canonical explore routes
-      if (route.path === '/explore/tools/praat') {
+      if (normalizedPath === '/explore/tools/praat') {
         return SimpleLayout
       }
 
       if (
-        route.path.startsWith('/explore/tools/') ||
-        route.path === '/explore/manage' ||
-        route.path === '/explore/yubao' ||
-        route.path === '/explore/char-class' ||
-        route.path === '/explore/yc-spoken' ||
-        route.path.startsWith('/explore/villages/')
+        normalizedPath.startsWith('/explore/tools/') ||
+        normalizedPath === '/explore/manage' ||
+        normalizedPath === '/explore/yubao' ||
+        normalizedPath === '/explore/char-class' ||
+        normalizedPath === '/explore/yc-spoken' ||
+        normalizedPath.startsWith('/explore/villages/')
       ) {
         return ExploreLayout
       }
 
       // Legacy /explore entry: choose layout by query.page
-      if (route.path === '/explore') {
+      if (normalizedPath === '/explore') {
         const page = route.query.page
 
         // Praat 页面使用 SimpleLayout（无 navbar）

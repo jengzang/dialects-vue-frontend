@@ -13,63 +13,75 @@ const DialectClusteringPage = () => import('@/main/views/menu/DialectClustering.
 
 export const menuRoutes = [
   {
-    path: '/menu/pho/:section(matrix|custom|count|evolution)',
+    path: 'menu/pho/:section(matrix|custom|count|evolution)',
     component: PhoPage
   },
   {
-    path: '/menu/about/:section(intro|suggestion|like|settings)',
+    path: 'menu/about/:section(intro|suggestion|like|settings)',
     component: AboutPage
   },
   {
-    path: '/menu/query',
-    redirect: '/menu/query/zhonggu'
+    path: 'menu/query',
+    redirect: to => ({
+      path: `/${to.params.locale}/menu/query/zhonggu`,
+      query: to.query,
+      hash: to.hash,
+    })
   },
   {
-    path: '/menu/query/:sub(char|zhonggu|yinwei|tone)',
+    path: 'menu/query/:sub(char|zhonggu|yinwei|tone)',
     component: QueryPage
   },
   {
-    path: '/menu/compare',
-    redirect: '/menu/compare/zhonggu'
+    path: 'menu/compare',
+    redirect: to => ({
+      path: `/${to.params.locale}/menu/compare/zhonggu`,
+      query: to.query,
+      hash: to.hash,
+    })
   },
   {
-    path: '/menu/compare/:sub(char|zhonggu|tone|phonetic)',
+    path: 'menu/compare/:sub(char|zhonggu|tone|phonetic)',
     component: ComparePage
   },
   {
-    path: '/menu/map',
-    redirect: '/menu/map/view'
+    path: 'menu/map',
+    redirect: to => ({
+      path: `/${to.params.locale}/menu/map/view`,
+      query: to.query,
+      hash: to.hash,
+    })
   },
   {
-    path: '/menu/map/:sub(view|divide|custom|draw)',
+    path: 'menu/map/:sub(view|divide|custom|draw)',
     component: MapPage
   },
   {
-    path: '/menu/result',
+    path: 'menu/result',
     component: ResultPage
   },
   {
-    path: '/menu/source',
+    path: 'menu/source',
     component: SourcePage
   },
   {
-    path: '/menu/privacy',
+    path: 'menu/privacy',
     component: PrivacyPage
   },
   {
-    path: '/menu/tools',
+    path: 'menu/tools',
     component: ToolsPage
   },
   {
-    path: '/menu/words',
+    path: 'menu/words',
     component: WordsPage
   },
   {
-    path: '/menu/villages',
+    path: 'menu/villages',
     component: VillagesPage
   },
   {
-    path: '/menu/cluster',
+    path: 'menu/cluster',
     component: DialectClusteringPage
   }
 ]

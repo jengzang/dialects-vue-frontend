@@ -96,6 +96,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { mapStore } from '@/main/store/store.js'
 
 import TabsContainer from '@/components/common/TabsContainer.vue'
@@ -287,7 +288,7 @@ watch(
 const resolveTabRoute = (tabName) => {
   const sub = tabToRouteSub[tabName] || 'view'
   return {
-    path: `/menu/map/${sub}`,
+    path: buildLocalePath(resolveRouteLocale(route), `/menu/map/${sub}`),
     query: route.query
   }
 }

@@ -662,7 +662,11 @@ const localizedProjects = computed(() => [
 ])
 
 function navigateTo(path) {
-  router.push(path)
+  const [pathname, queryString = ''] = path.split('?')
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), pathname),
+    query: queryString ? Object.fromEntries(new URLSearchParams(queryString).entries()) : undefined
+  })
 }
 
 function scrollToFeatures() {

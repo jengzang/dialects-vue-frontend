@@ -249,21 +249,21 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
-import { setLocale } from '@/i18n/index.js'
-import { SUPPORTED_LOCALES } from '@/i18n/localeDetector.js'
-import {
-  UI_MODE_DEFAULT,
-  UI_MODE_COMPACT,
-  getStoredInterfaceMode,
-  setInterfaceMode,
-} from '@/composables/core/uiPreferences.js'
+import { useRoute, useRouter } from 'vue-router'
 import { showSuccess } from '@/utils/message.js'
 import SupportPopup from '@/main/components/popup/SupportPopup.vue'
 import TabsContainer from '@/components/common/TabsContainer.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
+import {
+  UI_MODE_DEFAULT,
+  UI_MODE_COMPACT,
+  getStoredInterfaceMode,
+  setInterfaceMode,
+} from '@/composables/core/uiPreferences.js'
+import { SUPPORTED_LOCALES } from '@/i18n/localeDetector.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import {
   preferredCharacterTable,
   setPreferredCharacterTable,
@@ -273,6 +273,7 @@ import {
 
 const { t, locale } = useI18n()
 const route = useRoute()
+const router = useRouter()
 const showQRCodes = ref(false)
 
 const pathSectionToTab = {
@@ -385,9 +386,13 @@ function changeLanguage(newLocale) {
     return
   }
 
-  setLocale(newLocale)
+  const targetPath = buildLocalePath(newLocale, route.path)
+  router.push({
+    path: targetPath,
+    query: route.query,
+    hash: route.hash,
+  })
   showSuccess(t('messages.success.languageChanged'))
-  setTimeout(() => window.location.reload(), 500)
 }
 
 function changeInterfaceMode(mode) {
@@ -402,7 +407,7 @@ function changeInterfaceMode(mode) {
 function resolveTabRoute(tabName) {
   const section = tabToPathSection[tabName] || 'setting'
   return {
-    path: `/menu/about/${section}`,
+    path: buildLocalePath(resolveRouteLocale(route), `/menu/about/${section}`),
     query: route.query
   }
 }

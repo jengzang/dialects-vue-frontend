@@ -21,6 +21,7 @@
 import { KeepAlive, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import TabsContainer from '@/components/common/TabsContainer.vue'
 import PhonologyMatrixPage from '@/main/components/pho/PhonologyPage.vue'
 import PhonologyCustomPage from '@/main/components/pho/PhonologyCustom.vue'
@@ -73,7 +74,7 @@ const getTabComponent = (tabName) => tabComponentMap[tabName] || PhonologyMatrix
 const resolveTabRoute = (tabName) => {
   const section = tabToPathSection[tabName] || 'matrix'
   return {
-    path: `/menu/pho/${section}`,
+    path: buildLocalePath(resolveRouteLocale(route), `/menu/pho/${section}`),
     query: route.query
   }
 }

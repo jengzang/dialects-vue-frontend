@@ -407,6 +407,7 @@
 import { computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import TabsContainer from "@/components/common/TabsContainer.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
 import LocationMultiInput from "@/main/components/geo/LocationMultiInput.vue";
@@ -1480,7 +1481,7 @@ function createComparisonItem(location, coordinate, feature, status, data, pair)
 function resolveTabRoute(tabName) {
   const sub = tabToRouteSub[tabName] || 'zhonggu'
   return {
-    path: `/menu/compare/${sub}`
+    path: buildLocalePath(resolveRouteLocale(route), `/menu/compare/${sub}`)
   }
 }
 

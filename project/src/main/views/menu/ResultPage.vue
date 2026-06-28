@@ -48,7 +48,8 @@
 <script setup>
 import {computed, onActivated, onDeactivated, onMounted, onUnmounted, ref, watch} from 'vue';
 import {onBeforeRouteLeave, useRoute, useRouter} from 'vue-router';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js';
 import { getCoordinates, searchChars, searchZhongGu, searchYinWei, searchTones } from '@/api'
 import {globalPayload, mapStore, resultCache, userStore} from '@/main/store/store.js';
 import ResultList from "@/main/components/result/ResultList.vue";
@@ -323,7 +324,7 @@ watch(
 );
 
 const goToQuery = () => {
-  router.push('/menu/query/zhonggu');
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/query/zhonggu'));
 };
 
 // ================= ✨ Tab1 Dropdown 邏輯 (使用 SimpleSelectDropdown) =================
