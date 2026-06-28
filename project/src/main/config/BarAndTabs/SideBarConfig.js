@@ -100,6 +100,7 @@ export function useSidebarConfig() {
                 { label: t('navigation.submenu.tools.check'), icon: '📝', path: '/explore/tools/check' },
                 { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: '/explore/tools/jyut2ipa' },
                 { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: '/explore/tools/merge' },
+                { label: t('navigation.submenu.tools.derive'), icon: '🧪', path: '/explore/tools/derive' },
                 // { label: t('navigation.submenu.tools.praat'), icon: '👂️', path: '/explore/tools/praat' }
             ]
         },
@@ -212,6 +213,7 @@ export const SideConfig = {
             { label: '字表工具', icon: '📋', path: '/explore/tools/check' },
             { label: '粵拼轉IPA', icon: '🔄', path: '/explore/tools/jyut2ipa' },
             { label: '字表合併', icon: '🔗', path: '/explore/tools/merge' },
+            { label: '字表推導', icon: '🧪', path: '/explore/tools/derive' },
             { label: '聲學分析', icon: '🌊', path: '/explore/tools/praat' }
         ]
     },

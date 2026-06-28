@@ -199,7 +199,7 @@ export function useExploreBarConfig() {
             },
             navigation: {
                 defaultTo: { path: '/menu/tools' },
-                matchPages: ['check', 'jyut2ipa', 'merge', 'praat'],
+                matchPages: ['check', 'jyut2ipa', 'merge', 'derive', 'praat'],
                 activeMatchPaths: ['/explore/manage'],
                 rememberChild: true,
                 defaultChild: '/explore/tools/check',
@@ -207,6 +207,7 @@ export function useExploreBarConfig() {
                     { label: t('navigation.submenu.tools.check'), icon: '📝', path: '/explore/tools/check' },
                     { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: '/explore/tools/jyut2ipa' },
                     { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: '/explore/tools/merge' },
+                    { label: t('navigation.submenu.tools.derive'), icon: '🧪', path: '/explore/tools/derive' },
                     // { label: t('navigation.submenu.tools.praat'), icon: '👂️', path: '/explore/tools/praat' }
                 ]
             }

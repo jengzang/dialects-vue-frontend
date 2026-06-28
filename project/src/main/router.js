@@ -131,7 +131,8 @@ const ROUTE_QUERY_ALLOWLIST = {
       gdVillagesTable: [],
       check: [],
       jyut2ipa: [],
-      merge: []
+      merge: [],
+      derive: []
     }
   },
   '/villagesML': {

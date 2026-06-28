@@ -292,6 +292,10 @@
                 <span class="link-icon">🔗</span>
                 <span class="link-text">{{ $t('home.features.tools.tableMerge') }}</span>
               </a>
+              <a @click.stop="navigateTo('/explore/tools/derive')" class="feature-link">
+                <span class="link-icon">🧪</span>
+                <span class="link-text">{{ $t('home.features.tools.tableDerive') }}</span>
+              </a>
               <!-- <a @click.stop="navigateTo('/explore?page=praat')" class="feature-link">
                 <span class="link-icon">🎙️</span>
                 <span class="link-text">聲學分析 - 實驗語音學工具</span>

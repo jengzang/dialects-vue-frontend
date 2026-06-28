@@ -418,7 +418,7 @@
   "legend": {
     "title": "图例",
     "compareTypes": {
-      "chars": "字表比较",
+      "chars": "汉字比较",
       "zhonggu": "中古音比较",
       "tones": "调类比较"
     }

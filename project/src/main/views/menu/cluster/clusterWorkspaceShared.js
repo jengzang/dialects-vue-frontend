@@ -170,10 +170,13 @@ export function isTaskBusy(status) {
 }
 
 export function getGroupPathStrings(group) {
-  const validEntries = group.pathKeys
+  const pathKeys = Array.isArray(group?.pathKeys) ? group.pathKeys : [...DEFAULT_GROUP_KEYS]
+  const pathValueMap = group?.pathValueMap || {}
+
+  const validEntries = pathKeys
     .map((key) => ({
       key,
-      values: Array.isArray(group.pathValueMap[key]) ? group.pathValueMap[key].filter(Boolean) : []
+      values: Array.isArray(pathValueMap[key]) ? pathValueMap[key].filter(Boolean) : []
     }))
     .filter((entry) => entry.values.length > 0)
 
@@ -223,7 +226,7 @@ export function buildPreviewRequestDraft(requestDraft) {
       if (group.source_mode === 'resolved_chars') {
         return {
           label: group.label,
-          source_mode: 'resolved_chars',
+          source_mode: 'preset',
           resolved_chars: group.resolvedChars,
           compare_dimension: group.compare_dimension
         }
@@ -231,7 +234,7 @@ export function buildPreviewRequestDraft(requestDraft) {
 
       return {
         label: group.label,
-        source_mode: 'path_strings',
+        source_mode: 'preset',
         table_name: 'characters',
         path_strings: group.pathStrings,
         compare_dimension: group.compare_dimension

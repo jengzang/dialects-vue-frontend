@@ -21,6 +21,12 @@
           <div class="tool-desc">{{ $t('tools.mergeTables.desc') }}</div>
         </button>
 
+        <button class="tool-btn" @click="handleDeriveTables">
+          <div class="tool-icon">🧪</div>
+          <div class="tool-name">{{ $t('tools.deriveTables.name') }}</div>
+          <div class="tool-desc">{{ $t('tools.deriveTables.desc') }}</div>
+        </button>
+
         <button class="tool-btn" @click="handlePraatTables">
           <div class="tool-icon">👂️</div>
           <div class="tool-name">{{ $t('tools.praatAnalysis.name') }}</div>
@@ -47,6 +53,10 @@ const handleJyutpingToIpa = () => {
 
 const handleMergeTables = () => {
   router.push('/explore/tools/merge')
+};
+
+const handleDeriveTables = () => {
+  router.push('/explore/tools/derive')
 };
 
 const handlePraatTables = () => {

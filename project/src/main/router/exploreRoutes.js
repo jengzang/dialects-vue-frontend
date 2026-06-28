@@ -1,6 +1,7 @@
 const CheckTool = () => import('@/main/views/explore/tools/CheckTool.vue')
 const Jyut2IpaTool = () => import('@/main/views/explore/tools/Jyut2IpaTool.vue')
 const MergeTool = () => import('@/main/views/explore/tools/MergeTool.vue')
+const DeriveTool = () => import('@/main/views/explore/tools/DeriveTool.vue')
 const PraatPage = () => import('@/main/views/Praat.vue')
 const TableManagePage = () => import('@/main/views/explore/tools/TableManage.vue')
 const YuBaoPage = () => import('@/main/views/explore/word/YuBaoPage.vue')
@@ -23,6 +24,10 @@ export const exploreRoutes = [
   {
     path: '/explore/tools/merge',
     component: MergeTool
+  },
+  {
+    path: '/explore/tools/derive',
+    component: DeriveTool
   },
   {
     path: '/explore/tools/praat',
