@@ -580,8 +580,9 @@
 
 <script setup>
 import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useVisitStats } from '@/composables/useVisitStats.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
@@ -599,6 +600,7 @@ const UpdateNoticeModal = defineAsyncComponent(() =>
 
 const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const {
   todayVisits,
   totalVisits,

@@ -108,6 +108,7 @@ import { mapStore, uiStore, userStore, isDivideButtonDisabled, setRunning } from
 import { getCoordinates, getLocationPartitions } from '@/api'
 import { showError, showWarning } from '@/utils/message.js';
 import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -288,7 +289,7 @@ const runAllDataAction = async () => {
   mapStore.mode = 'dot'
 
   await router.replace({
-    path: '/menu/map/view'
+    path: buildLocalePath(resolveRouteLocale(route), '/menu/map/view')
   })
 }
 
@@ -332,7 +333,7 @@ const runAction = async () => {
 
     // 切換回地圖 Tab
     await router.replace({
-      path: '/menu/map/view'
+      path: buildLocalePath(resolveRouteLocale(route), '/menu/map/view')
     });
 
   } catch (error) {

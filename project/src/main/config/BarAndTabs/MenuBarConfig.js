@@ -1,3 +1,4 @@
+import { buildLocalePath } from '@/i18n/localeRouting.js'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { resultCache } from '@/main/store/store.js'
@@ -144,7 +145,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: '/menu/pho/matrix' }
+        defaultTo: { path: buildLocalePath('zh-Hant', '/menu/pho/matrix') }
       }
     }),
     createMenuTab({
@@ -156,7 +157,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: '/menu/query/zhonggu' }
+        defaultTo: { path: buildLocalePath('zh-Hant', '/menu/query/zhonggu') }
       }
     }),
     createMenuTab({
@@ -170,7 +171,7 @@ export function useMenuTabsConfig() {
         }
       },
       navigation: {
-        defaultTo: { path: '/menu/result' }
+        defaultTo: { path: buildLocalePath('zh-Hant', '/menu/result') }
       }
     }),
     createMenuTab({
@@ -182,7 +183,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: '/menu/map/view' }
+        defaultTo: { path: buildLocalePath('zh-Hant', '/menu/map/view') }
       }
     }),
     createMenuTab({
@@ -194,7 +195,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: '/menu/compare/zhonggu' }
+        defaultTo: { path: buildLocalePath('zh-Hant', '/menu/compare/zhonggu') }
       }
     }),
     createMenuTab({
@@ -206,7 +207,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: '/menu/about/settings' }
+        defaultTo: { path: buildLocalePath('zh-Hant', '/menu/about/settings') }
       }
     })
   ])

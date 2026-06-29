@@ -650,7 +650,7 @@ const runAction = async () => {
   }
   // 3. 纯净跳转
   await router.replace({
-    path: '/menu/result'
+    path: buildLocalePath(resolveRouteLocale(route), '/menu/result')
   });
   setRunning('query', false); // 請求結束，關閉 loading 狀態
 }

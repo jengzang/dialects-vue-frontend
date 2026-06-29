@@ -107,6 +107,7 @@ import RegisterForm from '@/main/components/user/auth/RegisterForm.vue'
 import ProfileOverview from '@/main/components/user/auth/ProfileOverview.vue'
 import ModifyProfileForm from '@/main/components/user/auth/ModifyProfileForm.vue'
 import UserBenefitsPopup from '@/main/components/popup/user/UserBenefitsPopup.vue'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -432,19 +433,19 @@ const goToAdminPanel = () => {
 }
 
 const goToTableManager = () => {
-  router.push('/explore/manage')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/manage'))
 }
 
 const goToUserData = () => {
   router.push({
-    path: '/auth/data',
+    path: buildLocalePath(resolveRouteLocale(route), '/auth/data'),
     query: { username: user.value.username }
   })
 }
 
 const goToUserRegions = () => {
   router.push({
-    path: '/auth/regions',
+    path: buildLocalePath(resolveRouteLocale(route), '/auth/regions'),
     query: { username: user.value.username }
   })
 }

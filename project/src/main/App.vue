@@ -1,7 +1,9 @@
 <!-- ✅ App.vue -->
 <template>
   <!-- 🧱 動態載入 layout -->
-  <component :is="layoutComponent" />
+  <component :is="layoutComponent">
+    <router-view />
+  </component>
 
   <PanelManager />
 

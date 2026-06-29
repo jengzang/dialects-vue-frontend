@@ -1,3 +1,4 @@
+import { buildLocalePath } from '@/i18n/localeRouting.js'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -198,16 +199,16 @@ export function useExploreBarConfig() {
                 overrides: {}
             },
             navigation: {
-                defaultTo: { path: '/menu/tools' },
+                defaultTo: { path: buildLocalePath('zh-Hant', '/menu/tools') },
                 matchPages: ['check', 'jyut2ipa', 'merge', 'derive', 'praat'],
-                activeMatchPaths: ['/explore/manage'],
+                activeMatchPaths: [buildLocalePath('zh-Hant', '/explore/manage')],
                 rememberChild: true,
-                defaultChild: '/explore/tools/check',
+                defaultChild: buildLocalePath('zh-Hant', '/explore/tools/check'),
                 children: [
-                    { label: t('navigation.submenu.tools.check'), icon: '📝', path: '/explore/tools/check' },
-                    { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: '/explore/tools/jyut2ipa' },
-                    { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: '/explore/tools/merge' },
-                    { label: t('navigation.submenu.tools.derive'), icon: '🧪', path: '/explore/tools/derive' },
+                    { label: t('navigation.submenu.tools.check'), icon: '📝', path: buildLocalePath('zh-Hant', '/explore/tools/check') },
+                    { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: buildLocalePath('zh-Hant', '/explore/tools/jyut2ipa') },
+                    { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: buildLocalePath('zh-Hant', '/explore/tools/merge') },
+                    { label: t('navigation.submenu.tools.derive'), icon: '🧪', path: buildLocalePath('zh-Hant', '/explore/tools/derive') },
                     // { label: t('navigation.submenu.tools.praat'), icon: '👂️', path: '/explore/tools/praat' }
                 ]
             }
@@ -236,15 +237,15 @@ export function useExploreBarConfig() {
                 overrides: {}
             },
             navigation: {
-                defaultTo: { path: '/explore/char-class', query: { tab: 'zhonggu' } },
+                defaultTo: { path: buildLocalePath('zh-Hant', '/explore/char-class'), query: { tab: 'zhonggu' } },
                 matchPages: ['CharacterClassification'],
                 rememberChild: true,
                 defaultChild: '/explore/char-class?tab=zhonggu',
                 children: [
-                    { label: t('navigation.submenu.charClass.zhonggu'), icon: '📜', path: '/explore/char-class?tab=zhonggu' },
-                    { label: t('navigation.submenu.charClass.shanggu'), icon: '🏛️', path: '/explore/char-class?tab=shanggu' },
-                    { label: t('navigation.submenu.charClass.jingu'), icon: '📖', path: '/explore/char-class?tab=jingu' },
-                    { label: t('navigation.submenu.charClass.yueyun'), icon: '🎵', path: '/explore/char-class?tab=yueyun' }
+                    { label: t('navigation.submenu.charClass.zhonggu'), icon: '📜', path: buildLocalePath('zh-Hant', '/explore/char-class?tab=zhonggu') },
+                    { label: t('navigation.submenu.charClass.shanggu'), icon: '🏛️', path: buildLocalePath('zh-Hant', '/explore/char-class?tab=shanggu') },
+                    { label: t('navigation.submenu.charClass.jingu'), icon: '📖', path: buildLocalePath('zh-Hant', '/explore/char-class?tab=jingu') },
+                    { label: t('navigation.submenu.charClass.yueyun'), icon: '🎵', path: buildLocalePath('zh-Hant', '/explore/char-class?tab=yueyun') }
                 ]
             }
         }),
@@ -257,14 +258,14 @@ export function useExploreBarConfig() {
                 overrides: {}
             },
             navigation: {
-                defaultTo: { path: '/menu/words' },
+                defaultTo: { path: buildLocalePath('zh-Hant', '/menu/words') },
                 matchPages: ['YuBao', 'ycSpoken'],
                 rememberChild: true,
                 defaultChild: '/explore/yubao?tab=vocabulary',
                 children: [
-                    { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: '/explore/yubao?tab=vocabulary' },
-                    { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: '/explore/yubao?tab=grammar' },
-                    { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: '/explore/yc-spoken' }
+                    { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: buildLocalePath('zh-Hant', '/explore/yubao?tab=vocabulary') },
+                    { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: buildLocalePath('zh-Hant', '/explore/yubao?tab=grammar') },
+                    { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: buildLocalePath('zh-Hant', '/explore/yc-spoken') }
                 ]
             }
         }),
@@ -277,15 +278,15 @@ export function useExploreBarConfig() {
                 overrides: {}
             },
             navigation: {
-                defaultTo: { path: '/menu/villages' },
+                defaultTo: { path: buildLocalePath('zh-Hant', '/menu/villages') },
                 matchPages: ['gdVillages', 'gdVillagesTable', 'ycVillages', 'VillagesML'],
                 rememberChild: true,
                 defaultChild: '/explore/villages/gd',
                 children: [
-                    { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: '/explore/villages/gd' },
-                    { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: '/explore/villages/ml' },
-                    { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: '/explore/villages/table' },
-                    { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: '/explore/villages/yc' }
+                    { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: buildLocalePath('zh-Hant', '/explore/villages/gd') },
+                    { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: buildLocalePath('zh-Hant', '/explore/villages/ml') },
+                    { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: buildLocalePath('zh-Hant', '/explore/villages/table') },
+                    { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: buildLocalePath('zh-Hant', '/explore/villages/yc') }
                 ]
             }
         }),
@@ -300,7 +301,7 @@ export function useExploreBarConfig() {
                 }
             },
             navigation: {
-                defaultTo: { path: '/menu/about/settings' }
+                defaultTo: { path: buildLocalePath('zh-Hant', '/menu/about/settings') }
             }
         })
     }))

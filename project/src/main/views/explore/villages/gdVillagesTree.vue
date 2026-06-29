@@ -108,6 +108,7 @@ import { useI18n } from 'vue-i18n';
 import VillagesTreeItem from '@/main/components/TableAndTree/VillagesTreeItem.vue';
 import VillageMapPopup from '@/main/components/popup/map/VillageMapPopup.vue';
 import { lazyLoadTree, loadFullTree } from '@/api';
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 const { t } = useI18n();
 const router = useRouter();
 
@@ -341,7 +342,7 @@ const getFilteredCityData = (cityName) => {
   return filterTree(cityData, query);
 };
 const goToYCVillages = () => {
-  router.push('/explore/villages/yc');
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/yc'));
 };
 
 /**

@@ -333,6 +333,7 @@ import { invalidateCustomDataPresence, markCustomDataExists } from '@/composable
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
 import { userStore } from '@/main/store/store.js'
 import { showConfirm, showError, showSuccess, showWarning } from '@/utils/message.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -456,7 +457,7 @@ const fetchData = async () => {
       showError(t('user.dataPage.messages.fetchFailed', { message: error.message }))
 
       if (error.message.includes('401') || error.message.includes('登錄') || error.message.includes('登录')) {
-        setTimeout(() => router.replace('/auth'), 1500)
+        setTimeout(() => router.replace(buildLocalePath(resolveRouteLocale(route), '/auth')), 1500)
       }
     }
   })
@@ -725,13 +726,13 @@ const formatDate = (dateStr) => {
 }
 
 const goBack = () => {
-  router.push('/auth')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
 }
 
 onMounted(() => {
   if (!userStore.isAuthenticated) {
     showWarning(t('user.dataPage.messages.authRequired'))
-    router.push('/auth')
+    router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
     return
   }
 

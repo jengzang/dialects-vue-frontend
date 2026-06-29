@@ -57,7 +57,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { SUPPORTED_LOCALES } from '@/i18n/localeDetector.js'
+import { SUPPORTED_LOCALES } from '@/i18n/localeRouting.js'
 import { buildLocalePath } from '@/i18n/localeRouting.js'
 import {
   UI_MODE_DEFAULT,

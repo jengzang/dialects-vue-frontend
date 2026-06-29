@@ -4,6 +4,7 @@ import path from 'path';
 import http from 'http';
 
 const mpaEntryRoots = ['auth', 'menu', 'intro', 'explore', 'villagesML'];
+const localePrefixPattern = /^\/(zh-CN|zh-Hant|en)(?=\/|$)/;
 
 function rewriteDevMpaRequest(req) {
   if (!req?.url || !req.headers?.accept?.includes('text/html')) {
@@ -11,16 +12,26 @@ function rewriteDevMpaRequest(req) {
   }
 
   const url = new URL(req.url, 'http://localhost');
-  const pathname = url.pathname.replace(/\/+$/, '') || '/';
+  const localeMatch = localePrefixPattern.exec(url.pathname);
+  const pathnameWithoutLocale = localeMatch
+    ? url.pathname.slice(localeMatch[0].length) || '/'
+    : url.pathname;
+  const pathname = pathnameWithoutLocale.replace(/\/+$/, '') || '/';
   const matchedRoot = mpaEntryRoots.find(
     (root) => pathname === `/${root}` || pathname.startsWith(`/${root}/`)
   );
 
-  if (!matchedRoot || path.extname(pathname)) {
+  if (matchedRoot && !path.extname(pathname)) {
+    url.pathname = `${localeMatch ? localeMatch[0] : ''}/${matchedRoot}/index.html`.replace(/\/+/g, '/');
+    req.url = `${url.pathname}${url.search}`;
     return;
   }
 
-  url.pathname = `/${matchedRoot}/index.html`;
+  if (!localeMatch || path.extname(pathname)) {
+    return;
+  }
+
+  url.pathname = '/index.html';
   req.url = `${url.pathname}${url.search}`;
 }
 

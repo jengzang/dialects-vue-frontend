@@ -238,6 +238,7 @@ import {
 import { showSuccess, showWarning, showError } from '@/utils/message.js';
 import FeatureScopeSelectionModal from '@/main/components/map/custom-entry/FeatureScopeSelectionModal.vue';
 import { addCustomFeatureDataWithoutApi } from '@/utils/map/MapData.js';
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter();
 const route = useRoute();
@@ -523,7 +524,7 @@ const selectFeatureItem = async (item) => {
       isFeatureScopeModalOpen.value = false;
       loadingFeatureRows.value = false;
       await router.push({
-        path: '/menu/map/view',
+        path: buildLocalePath(resolveRouteLocale(route), '/menu/map/view'),
         query: {}
       });
       showSuccess(t('map.customTab.scopeModal.singleLocationSuccess'));
@@ -563,7 +564,7 @@ const confirmFeatureScopeSelection = async ({ selectedLocations }) => {
     featureRowsError.value = '';
     isFeatureScopeModalOpen.value = false;
     await router.push({
-      path: '/menu/map/view',
+      path: buildLocalePath(resolveRouteLocale(route), '/menu/map/view'),
       query: {}
     });
     showSuccess(t('map.customTab.scopeModal.confirmSuccess'));
@@ -580,7 +581,7 @@ const goToDataManager = () => {
   }
 
   router.push({
-    path: '/auth/data',
+    path: buildLocalePath(resolveRouteLocale(route), '/auth/data'),
     query: { username: userStore.username },
   });
 };

@@ -262,7 +262,7 @@ import {
   getStoredInterfaceMode,
   setInterfaceMode,
 } from '@/composables/core/uiPreferences.js'
-import { SUPPORTED_LOCALES } from '@/i18n/localeDetector.js'
+import { SUPPORTED_LOCALES } from '@/i18n/localeRouting.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import {
   preferredCharacterTable,

@@ -141,6 +141,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, useAttrs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js'
 import NavAvatar from '@/components/bar/NavAvatar.vue'
 import {
@@ -466,7 +467,7 @@ const toggleSidebar = () => {
 }
 
 const goToAuthPage = () => {
-  router.push('/auth')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
 }
 </script>
 

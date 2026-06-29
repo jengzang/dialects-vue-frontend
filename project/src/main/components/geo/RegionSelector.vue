@@ -283,6 +283,7 @@ import AppModal from '@/components/common/AppModal.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import {STATIC_REGION_TREE, top_yindian} from "@/main/config/RegionTree.js";
 import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
 
@@ -633,7 +634,7 @@ async function openCustomRegionPopup() {
         { confirmText: 'query.components.regionSelector.customRegionModal.createButton', cancelText: 'common.button.cancel' }
       )
       if (confirmed) {
-        await router.push('/auth/regions')
+        await router.push(buildLocalePath(resolveRouteLocale(route), '/auth/regions'))
       }
       return
     }
@@ -677,7 +678,7 @@ async function selectCustomRegion(region) {
 function goToManagePage() {
   showCustomRegionPopup.value = false
   closePopup()
-  router.push('/auth/regions')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/auth/regions'))
 }
 
 // New: Handle custom region button click

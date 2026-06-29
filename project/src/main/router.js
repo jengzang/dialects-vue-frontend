@@ -66,54 +66,6 @@ const IntroEntry = {
 
 const routes = [
   {
-    path: '/',
-    beforeEnter: () => {
-      if (typeof window === 'undefined') {
-        return { path: buildLocalePath(FALLBACK_LOCALE, '/') }
-      }
-
-      return {
-        path: buildLocaleRedirectTarget({
-          pathname: '/',
-          locale: detectBrowserLocale(),
-        })
-      }
-    }
-  },
-  {
-    path: '/menu',
-    beforeEnter: (to) => ({
-      path: buildLocaleRedirectTarget({
-        pathname: '/menu',
-        search: typeof window !== 'undefined' ? window.location.search : '',
-        hash: to.hash,
-        locale: detectBrowserLocale(),
-      })
-    })
-  },
-  {
-    path: '/explore',
-    beforeEnter: (to) => ({
-      path: buildLocaleRedirectTarget({
-        pathname: '/explore',
-        search: typeof window !== 'undefined' ? window.location.search : '',
-        hash: to.hash,
-        locale: detectBrowserLocale(),
-      })
-    })
-  },
-  {
-    path: '/auth',
-    beforeEnter: (to) => ({
-      path: buildLocaleRedirectTarget({
-        pathname: '/auth',
-        search: typeof window !== 'undefined' ? window.location.search : '',
-        hash: to.hash,
-        locale: detectBrowserLocale(),
-      })
-    })
-  },
-  {
     path: '/:locale(zh-CN|zh-Hant|en)',
     children: [
       {
@@ -147,6 +99,43 @@ const routes = [
         component: UserRegionPage
       },
     ]
+  },
+  {
+    path: '/',
+    redirect: () => buildLocalePath(detectBrowserLocale(), '/')
+  },
+  {
+    path: '/menu',
+    beforeEnter: (to) => ({
+      path: buildLocaleRedirectTarget({
+        pathname: '/menu',
+        search: typeof window !== 'undefined' ? window.location.search : '',
+        hash: to.hash,
+        locale: detectBrowserLocale(),
+      })
+    })
+  },
+  {
+    path: '/explore',
+    beforeEnter: (to) => ({
+      path: buildLocaleRedirectTarget({
+        pathname: '/explore',
+        search: typeof window !== 'undefined' ? window.location.search : '',
+        hash: to.hash,
+        locale: detectBrowserLocale(),
+      })
+    })
+  },
+  {
+    path: '/auth',
+    beforeEnter: (to) => ({
+      path: buildLocaleRedirectTarget({
+        pathname: '/auth',
+        search: typeof window !== 'undefined' ? window.location.search : '',
+        hash: to.hash,
+        locale: detectBrowserLocale(),
+      })
+    })
   },
   {
     path: '/villagesML/:pathMatch(.*)*',

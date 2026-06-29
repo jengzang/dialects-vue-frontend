@@ -1150,7 +1150,7 @@ const runTab5Action = () => {
 
   if (!userStore.isAuthenticated) {
     showWarning(t('user.dataPage.messages.authRequired'))
-    router.push('/auth')
+    router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
     return
   }
 
@@ -1330,7 +1330,7 @@ const runAction = async () => {
 
       // 8. 跳转到地图页面
       await router.replace({
-        path: '/menu/map/view'
+        path: buildLocalePath(resolveRouteLocale(route), '/menu/map/view')
       });
     } else {
       // console.error('❌ Compare API 响应无效:', compareResponse)
