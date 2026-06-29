@@ -190,7 +190,6 @@ const routes = [
 ]
 
 const router = createRouter({
-  base: '/',
   history: createWebHistory(),
   routes,
   scrollBehavior() {
@@ -420,6 +419,14 @@ router.beforeEach(async (to, from, next) => {
       path: buildLocalePath(detectBrowserLocale(), '/'),
       replace: true,
     })
+  }
+
+  const activeLocale = routeLocale ? normalizeLocale(routeLocale) : detectBrowserLocale()
+  if (i18n.global.locale?.value !== activeLocale) {
+    i18n.global.locale.value = activeLocale
+  }
+  if (typeof document !== 'undefined') {
+    document.documentElement.setAttribute('lang', activeLocale)
   }
 
   const sanitizedQuery = sanitizeQueryByRoute(to)
