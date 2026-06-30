@@ -392,6 +392,7 @@ function changeLanguage(newLocale) {
     hash: route.hash,
   })
   showSuccess(t('messages.success.languageChanged'))
+  setTimeout(() => window.location.reload(), 500)
 }
 
 function changeInterfaceMode(mode) {

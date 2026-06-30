@@ -7,6 +7,7 @@ import { userStore } from '@/main/store/store.js'
 import { showWarning } from '@/utils/message.js'
 import { menuRoutes } from '@/main/router/menuRoutes.js'
 import { exploreRoutes } from '@/main/router/exploreRoutes.js'
+import { resolvePreferredLocale } from '@/i18n/localeDetector.js'
 import {
   FALLBACK_LOCALE,
   buildLocalePath,
@@ -102,7 +103,7 @@ const routes = [
   },
   {
     path: '/',
-    redirect: () => buildLocalePath(detectBrowserLocale(), '/')
+    redirect: () => buildLocalePath(resolvePreferredLocale('/'), '/')
   },
   {
     path: '/menu',
@@ -111,7 +112,7 @@ const routes = [
         pathname: '/menu',
         search: typeof window !== 'undefined' ? window.location.search : '',
         hash: to.hash,
-        locale: detectBrowserLocale(),
+        locale: resolvePreferredLocale('/menu'),
       })
     })
   },
@@ -122,7 +123,7 @@ const routes = [
         pathname: '/explore',
         search: typeof window !== 'undefined' ? window.location.search : '',
         hash: to.hash,
-        locale: detectBrowserLocale(),
+        locale: resolvePreferredLocale('/explore'),
       })
     })
   },
@@ -133,7 +134,7 @@ const routes = [
         pathname: '/auth',
         search: typeof window !== 'undefined' ? window.location.search : '',
         hash: to.hash,
-        locale: detectBrowserLocale(),
+        locale: resolvePreferredLocale('/auth'),
       })
     })
   },
@@ -164,14 +165,14 @@ const routes = [
             pathname: stripLocaleFromPath(to.path),
             search: typeof window !== 'undefined' ? window.location.search : '',
             hash: to.hash,
-            locale: detectBrowserLocale(),
+            locale: resolvePreferredLocale(to.path),
           }),
           replace: true,
         }
       }
 
       return {
-        path: buildLocalePath(detectBrowserLocale(), '/'),
+        path: buildLocalePath(resolvePreferredLocale(to.path), '/'),
         replace: true,
       }
     }
@@ -401,7 +402,7 @@ router.beforeEach(async (to, from, next) => {
         pathname: to.path,
         search: typeof window !== 'undefined' ? window.location.search : '',
         hash: to.hash,
-        locale: detectBrowserLocale(),
+        locale: resolvePreferredLocale(to.path),
       }),
       replace: true,
     })
@@ -418,7 +419,7 @@ router.beforeEach(async (to, from, next) => {
 
   if (to.path === '/intro') {
     return next({
-      path: buildLocalePath(detectBrowserLocale(), '/'),
+      path: buildLocalePath(resolvePreferredLocale('/intro'), '/'),
       replace: true,
     })
   }
