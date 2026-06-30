@@ -598,7 +598,7 @@ const UpdateNoticeModal = defineAsyncComponent(() =>
   import('@/components/ToastAndHelp/UpdateNoticeModal.vue')
 )
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
 const route = useRoute()
 const {
@@ -617,7 +617,7 @@ const sourceLocationCount = ref(cachedSourceStats.locationCount)
 const sourceDataCount = ref(cachedSourceStats.dataCount)
 
 // 当前版本号和更新时间
-const homeUpdateNotice = computed(() => getHomeUpdateNotice(t))
+const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
 const CURRENT_VERSION = computed(() => homeUpdateNotice.value.version)
 const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
 
@@ -625,41 +625,41 @@ const projects = [
   {
     name: 'dialects-vue-frontend',
     url: 'https://github.com/jengzang/dialects-vue-frontend',
-    description: t('home.intro.likeAuthor.frontendRepo')
+    description: t('home.intro.likeAuthor.frontendRepo', undefined, { locale: locale.value })
   },
   {
     name: 'dialects-backend',
     url: 'https://github.com/jengzang/dialects-backend',
-    description: t('home.intro.likeAuthor.backendRepo')
+    description: t('home.intro.likeAuthor.backendRepo', undefined, { locale: locale.value })
   },
   {
     name: 'dialects-build',
     url: 'https://github.com/jengzang/dialects-build',
-    description: t('home.intro.likeAuthor.buildRepo')
+    description: t('home.intro.likeAuthor.buildRepo', undefined, { locale: locale.value })
   },
   {
     name: 'villages-ML',
     url: 'https://github.com/jengzang/villages-ML',
-    description: t('home.intro.likeAuthor.villagesMLRepo')
+    description: t('home.intro.likeAuthor.villagesMLRepo', undefined, { locale: locale.value })
   }
 ]
 
 const localizedProjects = computed(() => [
   {
     ...projects[0],
-    description: t('home.intro.likeAuthor.frontendRepo')
+    description: t('home.intro.likeAuthor.frontendRepo', undefined, { locale: locale.value })
   },
   {
     ...projects[1],
-    description: t('home.intro.likeAuthor.backendRepo')
+    description: t('home.intro.likeAuthor.backendRepo', undefined, { locale: locale.value })
   },
   {
     ...projects[2],
-    description: t('home.intro.likeAuthor.buildRepo')
+    description: t('home.intro.likeAuthor.buildRepo', undefined, { locale: locale.value })
   },
   {
     ...projects[3],
-    description: t('home.intro.likeAuthor.villagesMLRepo')
+    description: t('home.intro.likeAuthor.villagesMLRepo', undefined, { locale: locale.value })
   }
 ])
 

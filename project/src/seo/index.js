@@ -82,7 +82,7 @@ function updateHreflangLinks(pathname) {
     ensureAlternateLink(locale).setAttribute('href', href)
   }
 
-  ensureAlternateLink('x-default').setAttribute('href', `${origin}${normalizedPath === '/' ? '/' : normalizedPath}`)
+  ensureAlternateLink('x-default').setAttribute('href', `${origin}${buildLocalePath(SEO_CONFIG.defaultLocale, normalizedPath)}/`)
 }
 function ensureJsonLd() {
   let script = document.head.querySelector('script[data-hermes-seo="jsonld"]')

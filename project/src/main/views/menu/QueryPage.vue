@@ -235,7 +235,7 @@ import { translateResultTerm } from '@/i18n/utils/resultI18n.js'
 import { showWarning } from '@/utils/message.js'
 import { limitEffectiveChars } from '@/main/utils/queryLimits.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const selectedCharacterTable = preferredCharacterTable
 
 // 使用查询配置 Composable
@@ -257,12 +257,12 @@ const tabToRouteSub = {
   tab4: 'tone'
 }
 const currentTab = computed(() => routeSubToTab[route.params.sub] || 'tab2')
-const tabs = [
-  { name: 'tab1', label: t('query.tab1.title') },
-  { name: 'tab2', label: t('query.tab2.title') },
-  { name: 'tab3', label: t('query.tab3.title') },
-  { name: 'tab4', label: t('query.tab4.title') }
-]
+const tabs = computed(() => [
+  { name: 'tab1', label: t('query.tab1.title', undefined, { locale: locale.value }) },
+  { name: 'tab2', label: t('query.tab2.title', undefined, { locale: locale.value }) },
+  { name: 'tab3', label: t('query.tab3.title', undefined, { locale: locale.value }) },
+  { name: 'tab4', label: t('query.tab4.title', undefined, { locale: locale.value }) }
+])
 
 // Compute limit context based on current tab
 const locationLimitContext = computed(() => {
@@ -275,15 +275,15 @@ const hasShownCharLimitWarning = ref(false)
 // ✨ 過濾器相關狀態
 const excludeOptions = computed(() => {
   const options = [
-    { value: '多地位標記', label: t('query.tab2.excludeOptions.allMulti') }
+    { value: '多地位標記', label: t('query.tab2.excludeOptions.allMulti', undefined, { locale: locale.value }) }
   ]
 
   if (selectedCharacterTable.value === 'characters') {
     options.push(
-      { value: '多等', label: t('query.tab2.excludeOptions.excludeMultiGrade') },
-      { value: '多韻', label: t('query.tab2.excludeOptions.excludeMultiRime') },
-      { value: '多聲母', label: t('query.tab2.excludeOptions.excludeMultiInitial') },
-      { value: '多調', label: t('query.tab2.excludeOptions.excludeMultiTone') }
+      { value: '多等', label: t('query.tab2.excludeOptions.excludeMultiGrade', undefined, { locale: locale.value }) },
+      { value: '多韻', label: t('query.tab2.excludeOptions.excludeMultiRime', undefined, { locale: locale.value }) },
+      { value: '多聲母', label: t('query.tab2.excludeOptions.excludeMultiInitial', undefined, { locale: locale.value }) },
+      { value: '多調', label: t('query.tab2.excludeOptions.excludeMultiTone', undefined, { locale: locale.value }) }
     )
   }
 

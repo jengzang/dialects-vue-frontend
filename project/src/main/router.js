@@ -151,7 +151,7 @@ const routes = [
   },
   {
     path: '/:pathMatch(.*)*',
-    beforeEnter: (to) => {
+    redirect: (to) => {
       const locale = extractLocaleFromPath(to.path)
       if (locale) {
         return {
@@ -173,7 +173,7 @@ const routes = [
       }
 
       return {
-        path: buildLocalePath(resolvePreferredLocale(to.path), '/'),
+        path: buildLocalePath(resolvePreferredLocale('/'), '/'),
         replace: true,
       }
     }
