@@ -262,8 +262,7 @@ import {
   getStoredInterfaceMode,
   setInterfaceMode,
 } from '@/composables/core/uiPreferences.js'
-import { SUPPORTED_LOCALES } from '@/i18n/localeRouting.js'
-import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import {
   preferredCharacterTable,
   setPreferredCharacterTable,
@@ -332,9 +331,9 @@ function followClicked() {
 const currentLocale = computed(() => locale.value)
 
 const languages = ref([
-  SUPPORTED_LOCALES['zh-Hant'],
-  SUPPORTED_LOCALES['zh-CN'],
-  SUPPORTED_LOCALES['en']
+  { code: 'zh-Hant', name: '繁體中文', flag: '🇭🇰' },
+  { code: 'zh-CN', name: '简体中文', flag: '🇨🇳' },
+  { code: 'en', name: 'English', flag: '🇺🇸' }
 ])
 
 const interfaceMode = ref(getStoredInterfaceMode())
@@ -386,7 +385,7 @@ function changeLanguage(newLocale) {
     return
   }
 
-  const targetPath = buildLocalePath(newLocale, route.path)
+  const targetPath = buildLocalePath(newLocale, stripLocaleFromPath(route.path))
   router.push({
     path: targetPath,
     query: route.query,

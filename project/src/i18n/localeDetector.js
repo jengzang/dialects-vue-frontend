@@ -2,7 +2,7 @@
 // 兼容层：保留已有导出，权威 locale 现由 URL 路由决定
 
 import {
-  FALLBACK_LOCALE as DEFAULT_LOCALE,
+  DEFAULT_LOCALE,
   SUPPORTED_LOCALES,
   detectBrowserLocale,
 } from './localeRouting'
@@ -31,5 +31,17 @@ export function saveLocale(locale) {
 }
 
 export function getCurrentLocale() {
+  const savedLocale = getSavedLocale()
+  if (savedLocale && typeof SUPPORTED_LOCALES === 'object') {
+    if (Array.isArray(SUPPORTED_LOCALES)) {
+      if (SUPPORTED_LOCALES.includes(savedLocale)) {
+        return savedLocale
+      }
+    }
+    else if (SUPPORTED_LOCALES[savedLocale]) {
+      return savedLocale
+    }
+  }
+
   return detectBrowserLocale()
 }

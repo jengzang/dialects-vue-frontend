@@ -1,5 +1,6 @@
-import { buildLocalePath } from '@/i18n/localeRouting.js'
+import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { resultCache } from '@/main/store/store.js'
 
@@ -113,6 +114,10 @@ const createMenuTab = ({
   meta
 })
 
+function withRouteLocale(route, path) {
+  return buildLocalePath(resolveRouteLocale(route), stripLocaleFromPath(path))
+}
+
 function getMenuTabKeyFromRoute(route) {
   if (typeof route?.path !== 'string') return null
 
@@ -134,6 +139,7 @@ function getMenuTabKeyFromRoute(route) {
 
 export function useMenuTabsConfig() {
   const { t } = useI18n()
+  const route = useRoute()
 
   return computed(() => [
     createMenuTab({
@@ -145,7 +151,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: buildLocalePath('zh-Hant', '/menu/pho/matrix') }
+        defaultTo: { path: withRouteLocale(route, '/menu/pho/matrix') }
       }
     }),
     createMenuTab({
@@ -157,7 +163,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: buildLocalePath('zh-Hant', '/menu/query/zhonggu') }
+        defaultTo: { path: withRouteLocale(route, '/menu/query/zhonggu') }
       }
     }),
     createMenuTab({
@@ -171,7 +177,7 @@ export function useMenuTabsConfig() {
         }
       },
       navigation: {
-        defaultTo: { path: buildLocalePath('zh-Hant', '/menu/result') }
+        defaultTo: { path: withRouteLocale(route, '/menu/result') }
       }
     }),
     createMenuTab({
@@ -183,7 +189,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: buildLocalePath('zh-Hant', '/menu/map/view') }
+        defaultTo: { path: withRouteLocale(route, '/menu/map/view') }
       }
     }),
     createMenuTab({
@@ -195,7 +201,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: buildLocalePath('zh-Hant', '/menu/compare/zhonggu') }
+        defaultTo: { path: withRouteLocale(route, '/menu/compare/zhonggu') }
       }
     }),
     createMenuTab({
@@ -207,7 +213,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: buildLocalePath('zh-Hant', '/menu/about/settings') }
+        defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
       }
     })
   ])
@@ -308,7 +314,7 @@ export function getMenuBarActiveTab(tabs, route) {
 export function resolveMenuBarTarget(tabConfig) {
   if (!tabConfig?.to) {
     const tabKey = tabConfig?.navigation?.tabKey || tabConfig?.tab
-    return MENU_CHILD_PATHS[tabKey]?.[0] || '/menu/query/zhonggu'
+    return MENU_CHILD_PATHS[tabKey]?.[0] || withRouteLocale(route, '/menu/query/zhonggu')
   }
 
   if (!tabConfig.navigation?.rememberChild) {
@@ -320,5 +326,6 @@ export function resolveMenuBarTarget(tabConfig) {
     return tabConfig.to
   }
 
-  return rememberedPath
+  return withRouteLocale(null, rememberedPath)
 }
+

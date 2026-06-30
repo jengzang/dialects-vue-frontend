@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { computed, h } from 'vue'
+import { computed, h, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import i18n from '@/i18n/index.js'
 import { waitForAuthReady } from '@/api/auth/auth.js'
@@ -393,6 +393,19 @@ function isSameQuery(left, right) {
 
 router.beforeEach(async (to, from, next) => {
   const routeLocale = to.params.locale
+  const currentRouteLocale = routeLocale || extractLocaleFromPath(to.path)
+
+  if (!currentRouteLocale && shouldRedirectMainEntry(to.path)) {
+    return next({
+      path: buildLocaleRedirectTarget({
+        pathname: to.path,
+        search: typeof window !== 'undefined' ? window.location.search : '',
+        hash: to.hash,
+        locale: detectBrowserLocale(),
+      }),
+      replace: true,
+    })
+  }
 
   if (routeLocale && !isSupportedLocale(routeLocale)) {
     return next({
@@ -410,14 +423,16 @@ router.beforeEach(async (to, from, next) => {
     })
   }
 
-  const activeLocale = routeLocale ? normalizeLocale(routeLocale) : detectBrowserLocale()
+  const activeLocale = currentRouteLocale ? normalizeLocale(currentRouteLocale) : detectBrowserLocale()
   if (i18n.global.locale?.value !== activeLocale) {
     i18n.global.locale.value = activeLocale
   }
   if (typeof document !== 'undefined') {
     document.documentElement.setAttribute('lang', activeLocale)
   }
+  await nextTick()
 
+  const localizedAuthPath = withLocalePath('/auth', to)
   const sanitizedQuery = sanitizeQueryByRoute(to)
 
   if (!isSameQuery(sanitizedQuery, to.query)) {

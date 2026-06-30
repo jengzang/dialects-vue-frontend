@@ -5,6 +5,7 @@ import http from 'http';
 
 const mpaEntryRoots = ['auth', 'menu', 'intro', 'explore', 'villagesML'];
 const localePrefixPattern = /^\/(zh-CN|zh-Hant|en)(?=\/|$)/;
+const localeAwareEntryRoots = new Set(['auth', 'menu', 'explore']);
 
 function rewriteDevMpaRequest(req) {
   if (!req?.url || !req.headers?.accept?.includes('text/html')) {
@@ -22,6 +23,12 @@ function rewriteDevMpaRequest(req) {
   );
 
   if (matchedRoot && !path.extname(pathname)) {
+    if (!localeMatch && localeAwareEntryRoots.has(matchedRoot)) {
+      url.pathname = '/index.html';
+      req.url = `${url.pathname}${url.search}`;
+      return;
+    }
+
     url.pathname = `${localeMatch ? localeMatch[0] : ''}/${matchedRoot}/index.html`.replace(/\/+/g, '/');
     req.url = `${url.pathname}${url.search}`;
     return;

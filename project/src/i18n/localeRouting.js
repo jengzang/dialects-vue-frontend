@@ -1,10 +1,11 @@
 const SUPPORTED_LOCALES = ['zh-CN', 'zh-Hant', 'en']
 const SUPPORTED_LOCALE_SET = new Set(SUPPORTED_LOCALES)
 const FALLBACK_LOCALE = 'zh-Hant'
+const DEFAULT_LOCALE = FALLBACK_LOCALE
 const LOCALE_ROUTE_PATTERN = /^\/(zh-CN|zh-Hant|en)(?=\/|$)/
 const MAIN_ENTRY_PREFIXES = ['/', '/menu', '/explore', '/auth']
 
-export { SUPPORTED_LOCALES, SUPPORTED_LOCALE_SET, FALLBACK_LOCALE }
+export { SUPPORTED_LOCALES, SUPPORTED_LOCALE_SET, FALLBACK_LOCALE, DEFAULT_LOCALE }
 
 export function isSupportedLocale(locale) {
   return typeof locale === 'string' && SUPPORTED_LOCALE_SET.has(locale)

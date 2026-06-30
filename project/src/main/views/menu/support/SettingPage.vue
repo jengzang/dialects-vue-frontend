@@ -57,8 +57,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { SUPPORTED_LOCALES } from '@/i18n/localeRouting.js'
-import { buildLocalePath } from '@/i18n/localeRouting.js'
+import { SUPPORTED_LOCALES, buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import {
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
@@ -74,9 +73,9 @@ const router = useRouter()
 const currentLocale = computed(() => locale.value)
 
 const languages = ref([
-  SUPPORTED_LOCALES['zh-Hant'],
-  SUPPORTED_LOCALES['zh-CN'],
-  SUPPORTED_LOCALES['en'],
+  { code: 'zh-Hant', name: '繁體中文', flag: '🇭🇰' },
+  { code: 'zh-CN', name: '简体中文', flag: '🇨🇳' },
+  { code: 'en', name: 'English', flag: '🇺🇸' },
 ])
 
 const interfaceMode = ref(getStoredInterfaceMode())
@@ -100,7 +99,7 @@ function changeLanguage(newLocale) {
   }
 
   router.push({
-    path: buildLocalePath(newLocale, route.path),
+    path: buildLocalePath(newLocale, stripLocaleFromPath(route.path)),
     query: route.query,
     hash: route.hash,
   })
