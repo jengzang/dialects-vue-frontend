@@ -232,11 +232,10 @@ import {
 } from '@/main/store/store.js'
 import { useQueryConfig } from '@/composables/domain/useQueryConfig.js'
 import { translateResultTerm } from '@/i18n/utils/resultI18n.js'
-import { readMenuBarMemory, writeMenuBarMemory } from '@/main/config/BarAndTabs/MenuBarConfig.js'
 import { showWarning } from '@/utils/message.js'
 import { limitEffectiveChars } from '@/main/utils/queryLimits.js'
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const selectedCharacterTable = preferredCharacterTable
 
 // 使用查询配置 Composable
@@ -258,12 +257,12 @@ const tabToRouteSub = {
   tab4: 'tone'
 }
 const currentTab = computed(() => routeSubToTab[route.params.sub] || 'tab2')
-const tabs = computed(() => [
-  { name: 'tab1', label: t('query.tab1.title', undefined, { locale: locale.value }) },
-  { name: 'tab2', label: t('query.tab2.title', undefined, { locale: locale.value }) },
-  { name: 'tab3', label: t('query.tab3.title', undefined, { locale: locale.value }) },
-  { name: 'tab4', label: t('query.tab4.title', undefined, { locale: locale.value }) }
-])
+const tabs = [
+  { name: 'tab1', label: t('query.tab1.title') },
+  { name: 'tab2', label: t('query.tab2.title') },
+  { name: 'tab3', label: t('query.tab3.title') },
+  { name: 'tab4', label: t('query.tab4.title') }
+]
 
 // Compute limit context based on current tab
 const locationLimitContext = computed(() => {
@@ -276,15 +275,15 @@ const hasShownCharLimitWarning = ref(false)
 // ✨ 過濾器相關狀態
 const excludeOptions = computed(() => {
   const options = [
-    { value: '多地位標記', label: t('query.tab2.excludeOptions.allMulti', undefined, { locale: locale.value }) }
+    { value: '多地位標記', label: t('query.tab2.excludeOptions.allMulti') }
   ]
 
   if (selectedCharacterTable.value === 'characters') {
     options.push(
-      { value: '多等', label: t('query.tab2.excludeOptions.excludeMultiGrade', undefined, { locale: locale.value }) },
-      { value: '多韻', label: t('query.tab2.excludeOptions.excludeMultiRime', undefined, { locale: locale.value }) },
-      { value: '多聲母', label: t('query.tab2.excludeOptions.excludeMultiInitial', undefined, { locale: locale.value }) },
-      { value: '多調', label: t('query.tab2.excludeOptions.excludeMultiTone', undefined, { locale: locale.value }) }
+      { value: '多等', label: t('query.tab2.excludeOptions.excludeMultiGrade') },
+      { value: '多韻', label: t('query.tab2.excludeOptions.excludeMultiRime') },
+      { value: '多聲母', label: t('query.tab2.excludeOptions.excludeMultiInitial') },
+      { value: '多調', label: t('query.tab2.excludeOptions.excludeMultiTone') }
     )
   }
 
@@ -517,14 +516,6 @@ function toggleExcludeOption(value, tab) {
 
 // isRunning 状态已移至 uiStore，不再需要本地定义
 const ZhongguRef = ref(null);
-
-function resetRememberedMapSubToView() {
-  const rememberedMapPath = readMenuBarMemory('map')
-  if (rememberedMapPath && rememberedMapPath !== '/menu/map/view') {
-    writeMenuBarMemory('map', '/menu/map/view')
-  }
-}
-
 // 點擊按鈕行為
 const runAction = async () => {
   setRunning('query', true);
@@ -657,7 +648,6 @@ const runAction = async () => {
     // 2. 存入全局仓库
     globalPayload.value = JSON.parse(JSON.stringify(finalPayload))
   }
-  resetRememberedMapSubToView()
   // 3. 纯净跳转
   await router.replace({
     path: buildLocalePath(resolveRouteLocale(route), '/menu/result')

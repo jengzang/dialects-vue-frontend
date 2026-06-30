@@ -1,4 +1,4 @@
-import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
+import { buildLocalePath, extractLocaleFromPath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -114,9 +114,7 @@ const createMenuTab = ({
   meta
 })
 
-function withRouteLocale(route, path) {
-  return buildLocalePath(resolveRouteLocale(route), stripLocaleFromPath(path))
-}
+const withRouteLocale = (route, path) => buildLocalePath(resolveRouteLocale(route), stripLocaleFromPath(path))
 
 function getMenuTabKeyFromRoute(route) {
   const normalizedPath = stripLocaleFromPath(route?.path || '')
@@ -328,6 +326,7 @@ export function resolveMenuBarTarget(tabConfig) {
     return tabConfig.to
   }
 
-  return withRouteLocale(null, rememberedPath)
+  const locale = extractLocaleFromPath(tabConfig.to?.path || '/')
+  return buildLocalePath(locale, rememberedPath)
 }
 

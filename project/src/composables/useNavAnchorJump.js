@@ -23,6 +23,7 @@ export function useNavAnchorJump(options = {}) {
 
     chartsLabel = '圖表',
     totalLabelPrefix = '總',
+    formatTotalLabel = null,
 
     chartsNavId = 'count-charts',
     chartsAnchorId = 'count-charts-anchor',
@@ -93,7 +94,9 @@ export function useNavAnchorJump(options = {}) {
     Object.keys(dataByFeatureType).forEach((featureType) => {
       totalItems.push({
         id: `${totalNavPrefix}-${featureType}`,
-        fullLabel: `${totalLabelPrefix}-${featureType}`,
+        fullLabel: formatTotalLabel
+          ? formatTotalLabel(featureType)
+          : `${totalLabelPrefix}-${featureType}`,
         targetKey: featureType,
         kind: 'total'
       })

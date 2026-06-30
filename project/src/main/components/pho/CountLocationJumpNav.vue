@@ -1,5 +1,8 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   items: {
@@ -316,7 +319,7 @@ onBeforeUnmount(() => {
       v-if="items.length > 0"
       class="count-location-jump-nav"
       tabindex="0"
-      aria-label="count location quick jump"
+      :aria-label="t('phonology.phonology.countphos.nav.navLabel')"
       @wheel="handleWheel"
       @keydown="handleKeydown"
     >
@@ -326,7 +329,7 @@ onBeforeUnmount(() => {
         class="count-location-jump-nav-control count-location-jump-nav-control--up"
         :class="{ disabled: !canMovePrev }"
         :disabled="!canMovePrev"
-        aria-label="向上滑動"
+        :aria-label="t('phonology.phonology.countphos.nav.scrollUp')"
         @click="moveCenter(-1)"
       >
         <span aria-hidden="true">⌃</span>
@@ -382,7 +385,7 @@ onBeforeUnmount(() => {
         class="count-location-jump-nav-control count-location-jump-nav-control--down"
         :class="{ disabled: !canMoveNext }"
         :disabled="!canMoveNext"
-        aria-label="向下滑動"
+        :aria-label="t('phonology.phonology.countphos.nav.scrollDown')"
         @click="moveCenter(1)"
       >
         <span aria-hidden="true">⌄</span>

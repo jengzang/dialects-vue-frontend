@@ -50,6 +50,7 @@ const hasLocationDetailData = computed(() => {
 
 // 圖表配置
 const FEATURE_TYPE_ORDER = ['聲母', '韻母', '聲調']
+
 const PIE_MAX_OTHER_SHARE = 0.2
 const BAR_MAX_REMAINDER_SHARE = 0.1
 const MIN_VISIBLE_ITEMS = 1
@@ -116,7 +117,16 @@ const {
   aggregatedData,
   hasChartData,
   hasResultData,
-  isEnabled: isCurrentCountRoute
+  isEnabled: isCurrentCountRoute,
+  chartsLabel: t('phonology.phonology.countphos.nav.chartsLabel'),
+  formatTotalLabel: (featureType) => {
+    const map = {
+      '聲母': t('phonology.phonology.countphos.nav.totalInitial'),
+      '韻母': t('phonology.phonology.countphos.nav.totalFinal'),
+      '聲調': t('phonology.phonology.countphos.nav.totalTone'),
+    }
+    return map[featureType] || featureType
+  }
 })
 
 // 处理匹配到的地点列表
@@ -298,7 +308,7 @@ const pickBarVisibleList = (list) => {
 }
 
 const formatLocationsPreview = (locations = [], limit = 2) => {
-  if (!locations.length) return '無'
+  if (!locations.length) return t('phonology.phonology.countphos.states.none')
 
   const preview = locations.slice(0, limit).join('、')
   return locations.length > limit ? `${preview}…` : preview
@@ -962,7 +972,7 @@ onBeforeUnmount(() => {
             </p>
 
             <div class="chart-card chart-card--wide">
-              <h5 class="chart-title">總數量 × 地點覆蓋</h5>
+              <h5 class="chart-title">{{ $t('phonology.phonology.countphos.charts.scatter.subtitle') }}</h5>
               <div
                 :ref="(el) => setScatterChartRef(el)"
                 class="echart-container scatter-chart"
