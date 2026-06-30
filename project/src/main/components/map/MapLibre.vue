@@ -362,23 +362,13 @@ onBeforeUnmount(() => {
 });
 
 // --- 監聽數據變化，自動重繪 ---
-// 追蹤上一次的數據，用於判斷是否需要重置視角
-const prevMapData = ref(null);
-const prevMergedData = ref(null);
-
 watch(
   // 監聽源改成 store 裡的數據
     [() => mapStore.mapData, () => mapStore.mergedData, () => mapStore.mode, () => props.activeFeature],
-    ([newMapData, newMergedData, newMode]) => {
-      // 判斷是否只是模式切換（數據沒變）
-      const shouldResetView = prevMapData.value !== newMapData;
-
-      // 更新追蹤值
-      prevMapData.value = newMapData;
-      prevMergedData.value = newMergedData;
-
-      // 渲染地圖，傳入是否需要重置視角的標誌
-      renderMapContent(shouldResetView);
+    () => {
+      // 視圖內容變更時只重繪，不在這裡自行判斷是否 reset；
+      // reset 邊界統一由 requestMapFitView -> fitViewKey watcher 控制。
+      renderMapContent(false);
     },
     { deep: true }
 );
