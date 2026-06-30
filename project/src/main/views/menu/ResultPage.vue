@@ -300,6 +300,7 @@ watch(
 
             mapStore.mapData = MapData;
             mapStore.mergedData = mergedData;
+            requestMapFitView();
           } else {
             console.warn("Tab4 Error:", response);
           }

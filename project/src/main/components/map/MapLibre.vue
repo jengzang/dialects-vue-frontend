@@ -141,7 +141,7 @@ import FeatureMapPopup from '../popup/map/FeatureMapPopup.vue'
 // --- Props: 只接收數據，不負責請求 ---
 const props = defineProps({
   // 1. 基礎數據 (對應 locations_data)
-  // 格式: { coordinates_locations: [['廣州', [113, 23]], ...], center_coordinate: [], zoom_level: 8, region_mappings: {...} }
+  // 格式: { coordinates_locations: [['廣州', [113, 23]], ...], region_mappings: {...} }
   // mapData: { type: Object, default: null },
   // 2. 特徵詳細數據 (對應 mergedData)
   // 格式: [{ feature: '流攝', value: 'eu', coordinate: [...], color: '#f00', detailContent: [...], iscustoms: 0, notes: '' }, ...]
@@ -451,43 +451,8 @@ const renderMapContent = async (shouldResetView = true) => {
   // 清除舊標記
   clearMarkers();
 
-  // 根據數據調整視角（僅在需要時）
-  if (shouldResetView) {
-    let centerCoord = null;
-    let zoomLevel = 8;
-    // feature 模式优先使用 mergedData 里的中心层级
-    if (mapStore.mode === 'feature' && mapStore.mergedData && mapStore.mergedData.length > 0) {
-      const firstItem = mapStore.mergedData[0];
-      // console.log('Checking mergedData for center and zoom:', firstItem);
-
-      if (firstItem.centerCoordinate) {
-        centerCoord = firstItem.centerCoordinate;
-        zoomLevel = firstItem.zoomLevel || 8;
-        // console.log('Using center and zoom from mergedData:', centerCoord, zoomLevel);
-      }
-    }
-    // 其他模式继续使用 mapData
-    else if (mapStore.mapData && mapStore.mapData.center_coordinate) {
-      centerCoord = mapStore.mapData.center_coordinate;
-      zoomLevel = mapStore.mapData.zoom_level || 8;
-      // console.log('Using center and zoom from mapData:', centerCoord, zoomLevel);
-    }
-    else if (mapStore.mergedData && mapStore.mergedData.length > 0) {
-      const firstItem = mapStore.mergedData[0];
-      if (firstItem.centerCoordinate) {
-        centerCoord = firstItem.centerCoordinate;
-        zoomLevel = firstItem.zoomLevel || 8;
-      }
-    }
-
-    // 应用视角调整
-    if (centerCoord && Array.isArray(centerCoord) && centerCoord.length >= 2) {
-      map.value.flyTo({
-        center: centerCoord,
-        zoom: zoomLevel
-      });
-    }
-  }
+  // 視角統一由 requestMapFitView -> resetView 控制，這裡不再消費入口側預計算的 center/zoom。
+  void shouldResetView;
 
   // 根據模式分發邏輯
   if (mapStore.mode === 'base') {

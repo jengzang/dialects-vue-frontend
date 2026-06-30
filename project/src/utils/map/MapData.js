@@ -14,8 +14,6 @@ export async function func_mergeData(resultData = null, mapData = null, customDa
     }
 
     // 3) 读取地图基础信息
-    const zoomLevel = locations_data.zoom_level;
-    const centerCoordinate = locations_data.center_coordinate;
     const coordinates_raw = locations_data.coordinates_locations || [];
 
     // 最小化改动 - 创建地点到坐标的映射
@@ -110,9 +108,7 @@ export async function func_mergeData(resultData = null, mapData = null, customDa
                 location,
                 feature,
                 value: finalValue,
-                zoomLevel,
                 coordinate,
-                centerCoordinate,
                 maxValue: maxPercentageValue,
                 detailContent: dc // 详细记录
             });
@@ -120,10 +116,7 @@ export async function func_mergeData(resultData = null, mapData = null, customDa
     }
 
     if (Array.isArray(customData) && customData.length > 0) {
-        mergeBackendData(customData, mergedData,
-            mergedData.length > 0 ? mergedData[0].zoomLevel : 10,
-            mergedData.length > 0 ? mergedData[0].centerCoordinate : [0, 0]
-        );
+        mergeBackendData(customData, mergedData);
     }
 
     assignColorToMergedData(mergedData);
@@ -229,48 +222,8 @@ export async function addCustomFeatureDataOld(featuresToAdd, locations = [], reg
         // 7. 复用现有函数合并数据
         const currentData = JSON.parse(JSON.stringify(mapStore.mergedData))
 
-        // 获取默认的 zoom 和 center
-        let defaultZoom = 10
-        let defaultCenter = [113.2644, 23.1291] // 默认广州
-
-        // 优先从现有数据获取
-        if (currentData.length > 0) {
-            defaultZoom = currentData[0].zoomLevel || 10
-            defaultCenter = currentData[0].centerCoordinate || [113.2644, 23.1291]
-        }
-        // 如果没有现有数据，从新数据中计算中心点
-        else if (customData.length > 0) {
-            // 提取所有有效坐标
-            const validCoords = customData
-                .map(item => item["經緯度"])
-                .filter(coord => Array.isArray(coord) && coord.length >= 2 &&
-                               Number.isFinite(coord[0]) && Number.isFinite(coord[1]))
-
-            if (validCoords.length > 0) {
-                // 计算中心点（平均值）
-                const sumLng = validCoords.reduce((sum, coord) => sum + coord[0], 0)
-                const sumLat = validCoords.reduce((sum, coord) => sum + coord[1], 0)
-                defaultCenter = [sumLng / validCoords.length, sumLat / validCoords.length]
-
-                // 计算合适的缩放级别（根据坐标范围）
-                const lngs = validCoords.map(c => c[0])
-                const lats = validCoords.map(c => c[1])
-                const lngRange = Math.max(...lngs) - Math.min(...lngs)
-                const latRange = Math.max(...lats) - Math.min(...lats)
-                const maxRange = Math.max(lngRange, latRange)
-
-                // 根据范围设置缩放级别
-                if (maxRange < 0.1) defaultZoom = 12
-                else if (maxRange < 0.5) defaultZoom = 10
-                else if (maxRange < 1) defaultZoom = 9
-                else if (maxRange < 2) defaultZoom = 8
-                else if (maxRange < 5) defaultZoom = 7
-                else defaultZoom = 6
-            }
-        }
-
         // 合并数据（复用现有函数，传递 isCustomFeatureSearch = true 跳过聲韻調过滤）
-        mergeBackendData(customData, currentData, defaultZoom, defaultCenter, true)
+        mergeBackendData(customData, currentData, true)
 
         // 8. 分配颜色（复用现有函数）
         assignColorToMergedData(currentData)
@@ -363,36 +316,8 @@ export function buildMergedDataFromFeatureRows(rows, feature, phonology = '') {
         throw new Error('后端返回了数据，但没有可绘制的有效坐标或特征值')
     }
 
-    let defaultZoom = 10
-    let defaultCenter = [113.2644, 23.1291]
-
-    const validCoords = customItems.map(item => item.coordinate)
-    const sumLng = validCoords.reduce((sum, coord) => sum + coord[0], 0)
-    const sumLat = validCoords.reduce((sum, coord) => sum + coord[1], 0)
-
-    defaultCenter = [
-        sumLng / validCoords.length,
-        sumLat / validCoords.length
-    ]
-
-    const lngs = validCoords.map(coord => coord[0])
-    const lats = validCoords.map(coord => coord[1])
-
-    const lngRange = Math.max(...lngs) - Math.min(...lngs)
-    const latRange = Math.max(...lats) - Math.min(...lats)
-    const maxRange = Math.max(lngRange, latRange)
-
-    if (maxRange < 0.1) defaultZoom = 12
-    else if (maxRange < 0.5) defaultZoom = 10
-    else if (maxRange < 1) defaultZoom = 9
-    else if (maxRange < 2) defaultZoom = 8
-    else if (maxRange < 5) defaultZoom = 7
-    else defaultZoom = 6
-
     const mergedData = customItems.map(item => ({
-        ...item,
-        zoomLevel: defaultZoom,
-        centerCoordinate: defaultCenter
+        ...item
     }))
 
     assignColorToMergedData(mergedData)
@@ -445,7 +370,7 @@ export async function addCustomFeatureData(feature, phonology = '') {
 }
 
 // 對用戶自定義數據進行處理
-function mergeBackendData(result, mergedData, defaultZoom, defaultCenter, isCustomFeatureSearch = false) {
+function mergeBackendData(result, mergedData, isCustomFeatureSearch = false) {
     result.forEach(row => {
         const featureType = row["聲韻調"];  // "声母"/"韵母"/"声调" 或空字符串（自定义特征）
 
@@ -474,8 +399,6 @@ function mergeBackendData(result, mergedData, defaultZoom, defaultCenter, isCust
                 maxValue: row["maxValue"],
                 notes: row["說明"],
                 iscustoms: 1,
-                zoomLevel: defaultZoom,
-                centerCoordinate: defaultCenter,
                 detailContent: [],
                 created_at:created_at,
             });
@@ -495,8 +418,6 @@ function mergeBackendData(result, mergedData, defaultZoom, defaultCenter, isCust
                     maxValue: row["maxValue"],
                     notes: row["說明"],
                     iscustoms: 1,
-                    zoomLevel: defaultZoom,
-                    centerCoordinate: defaultCenter,
                     detailContent: [],
                     created_at:created_at,
                 });
@@ -561,9 +482,7 @@ export function generateCharsMergedData(resultData, locationsData) {
             location: item.location,
             feature: item.char,
             value: syllablesString,
-            zoomLevel: locationsData.zoom_level,
             coordinate: locationToCoordinates[item.location] || [0, 0],
-            centerCoordinate: locationsData.center_coordinate,
             maxValue: syllablesString,
             detailContent: pairedArray
         };
@@ -647,9 +566,7 @@ export function generateTonesMergedData(resultData, locationsData) {
                 location: locationName,
                 feature: chineseToneName,                 // 中文调名作为 feature
                 value: toneValue,
-                zoomLevel: locationsData?.zoom_level,
                 coordinate,
-                centerCoordinate: locationsData?.center_coordinate,
                 maxValue: toneValue,
                 detailContent: notes                      // 合并说明
             });
