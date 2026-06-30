@@ -158,7 +158,7 @@
 
     <!-- 表格模式 - 输入无效时的提示 -->
     <div v-else-if="viewMode === 'table'" class="content-area">
-      <div class="empty-state">
+      <div class="empty-state empty-state-base">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <circle cx="12" cy="12" r="10"/>
           <line x1="12" y1="8" x2="12" y2="12"/>
@@ -268,6 +268,10 @@
           <p v-if="!currentInputValue">{{ t('words.yuBaoPage.states.enterSearch') }}</p>
           <p v-else-if="!isValidInput">{{ t('words.yuBaoPage.states.chooseSuggestion') }}</p>
           <p v-else>{{ t('words.yuBaoPage.states.noData') }}</p>
+          <small v-if="!currentInputValue">
+            {{ t('words.yuBaoPage.states.queryHint', { type: currentSearchTypeLabel }) }}
+          </small>
+          <small v-else>{{ t('words.yuBaoPage.states.clickSuggestion') }}</small>
         </div>
       </div>
 
@@ -292,6 +296,7 @@
           <small v-if="!currentInputValue">
             {{ t('words.yuBaoPage.states.queryHint', { type: currentSearchTypeLabel }) }}
           </small>
+          <small v-else>{{ t('words.yuBaoPage.states.clickSuggestion') }}</small>
         </div>
         <YuBaoMap
             v-else
