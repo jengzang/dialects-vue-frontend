@@ -32,7 +32,6 @@ const UserRegionPage = () => import('./components/user/UserRegionPage.vue')
 const MenuEntry = () => import('@/main/views/entry/MenuEntry.vue')
 const ExploreEntry = () => import('@/main/views/entry/ExploreEntry.vue')
 const VillagesMLBridge = () => import('@/main/views/entry/ExternalRouteBridge.vue')
-const IntroLayout = () => import('@/layouts/IntroLayout.vue')
 
 const DEFAULT_TITLE = '\u65B9\u97F3\u5716\u9451'
 
