@@ -102,7 +102,7 @@ const chartFeatureTypes = computed(() => {
 
 const hasChartData = computed(() => chartFeatureTypes.value.length > 0)
 const isResultsBusy = computed(() => loading.value || rendering.value)
-const isCurrentCountRoute = computed(() => route.path === '/menu/pho/count')
+const isCurrentCountRoute = computed(() => route.path === '/menu/pho/count' || route.path.endsWith('/menu/pho/count'))
 
 const {
   locationNavItems,
