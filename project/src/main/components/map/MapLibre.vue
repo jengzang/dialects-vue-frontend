@@ -125,7 +125,7 @@ import { ref, onMounted, onBeforeUnmount, shallowRef, nextTick, watch, computed,
 import { useI18n } from 'vue-i18n';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { mapStyle, mapStyleConfig, calculateDenseMapCenterAndZoom } from '@/utils/map/MapSource.js';
+import { mapStyle, mapStyleConfig, calculateMapCenterAndZoom } from '@/utils/map/MapSource.js';
 import {get_detail} from "@/main/utils/ResultTable.js";
 import {mapStore, userStore, resultCache} from "@/main/store/store.js";
 import { showSuccess, showError, showWarning, showConfirm } from '@/utils/message.js';
@@ -387,7 +387,7 @@ watch(
   async (key) => {
     if (!key) return;
     await nextTick();
-    resetView();
+    applyResetView(AUTO_RESET_DENSITY_PERCENTILE);
   },
   { flush: 'post' }
 );
@@ -882,12 +882,13 @@ const handleStyleChange = () => {
   map.value.setStyle(newStyle);
 };
 
-const resetView = () => {
-  if (!map.value) return;
+const AUTO_RESET_DENSITY_PERCENTILE = 0.98;
+const MANUAL_RESET_DENSITY_PERCENTILE = 0.85;
 
+const collectResetViewPoints = () => {
   let points = [];
 
-  // compare 模式优先按当前比较结果坐标复位，避免退回到 mapData 全量范围
+  // compare / feature 模式优先按当前结果坐标复位，避免退回到 mapData 全量范围
   if ((mapStore.mode === 'compare' || mapStore.mode === 'feature') && mapStore.mergedData && mapStore.mergedData.length > 0) {
     points = mapStore.mergedData
       .map(item => item.coordinate)
@@ -906,22 +907,32 @@ const resetView = () => {
       .filter(isValidCoordinatePair);
   }
 
-  // 3. 如果有坐标数据，重新计算最佳视角
+  return points;
+};
+
+const applyResetView = (densityPercentile = MANUAL_RESET_DENSITY_PERCENTILE) => {
+  if (!map.value) return;
+
+  const points = collectResetViewPoints();
+
   if (points.length > 0) {
-    const { center, zoom } = calculateDenseMapCenterAndZoom(points);
+    const { center, zoom } = calculateMapCenterAndZoom(points, { densityPercentile });
     map.value.flyTo({
       center,
       zoom,
       essential: true
     });
   } else {
-    // 没有数据时，返回默认视角（广州）
     map.value.flyTo({
       center: [113.2644, 23.1291],
       zoom: 8,
       essential: true
     });
   }
+};
+
+const resetView = () => {
+  applyResetView(MANUAL_RESET_DENSITY_PERCENTILE);
 };
 </script>
 
