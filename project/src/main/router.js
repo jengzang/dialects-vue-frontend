@@ -22,7 +22,7 @@ import {
 } from '@/i18n/localeRouting.js'
 
 const HomePage = () => import('@/main/views/HomePage.vue')
-// 旧 intro 入口已停用，仅为兼容历史代码保留导入与兜底 layout 分支。
+// 旧 intro 入口已废弃，不再保留单独入口，避免继续暴露历史页面标识。
 const LikeAuthor = () => import('./views/intro/LikeAuthor.vue')
 const Suggestions = () => import('./views/intro/Suggestions.vue')
 const Thanks = () => import('./views/intro/Thanks.vue')
@@ -48,7 +48,7 @@ function createLocaleRedirect(path) {
   })
 }
 
-// 旧 intro 入口已停用：此兼容组件目前不会被主路由树使用，暂保留避免扩大本次改动面。
+// 旧 intro 入口已废弃：此兼容组件仅保留给内部兜底，不再作为对外页面入口。
 const IntroEntry = {
   setup() {
     const route = useRoute()
@@ -145,7 +145,8 @@ const routes = [
   {
     path: '/intro',
     redirect: () => ({
-      path: buildLocalePath(detectBrowserLocale(), '/'),
+      path: buildLocalePath(resolvePreferredLocale('/intro'), '/'),
+      replace: true,
     })
   },
   {
