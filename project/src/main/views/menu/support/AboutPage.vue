@@ -221,8 +221,8 @@
 
           <div class="setting-section tutorial-toggle-section">
             <div class="tutorial-toggle-copy">
-              <h3 class="section-title">新手指导</h3>
-              <p class="section-description">控制教程入口与随机示例按钮是否显示，默认开启。</p>
+              <h3 class="section-title">{{ $t('about.settings.tutorialToggle.title') }}</h3>
+              <p class="section-description">{{ $t('about.settings.tutorialToggle.description') }}</p>
             </div>
             <button
               type="button"
@@ -231,7 +231,7 @@
               @click="tutorialGuideEnabled = !tutorialGuideEnabled"
             >
               <span class="tutorial-toggle-button__thumb"></span>
-              <span class="tutorial-toggle-button__label">{{ tutorialGuideEnabled ? '已开启' : '已关闭' }}</span>
+              <span class="tutorial-toggle-button__label">{{ tutorialGuideEnabled ? $t('about.settings.tutorialToggle.enabled') : $t('about.settings.tutorialToggle.disabled') }}</span>
             </button>
           </div>
 

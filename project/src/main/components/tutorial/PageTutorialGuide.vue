@@ -51,15 +51,15 @@ import TutorialGuideModal from './TutorialGuideModal.vue'
 const props = defineProps({
   bottomOffset: {
     type: String,
-    default: '30px',
+    default: '80dvh',
   },
   mobileBottomOffset: {
     type: String,
-    default: '18px',
+    default: '63dvh',
   },
   rightOffset: {
     type: String,
-    default: '30px',
+    default: '16px',
   },
   mobileRightOffset: {
     type: String,
@@ -329,9 +329,7 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 .page-tutorial-guide {
-  position: fixed;
-  right: calc(var(--tutorial-guide-right) + env(safe-area-inset-right, 0px));
-  bottom: calc(var(--tutorial-guide-bottom) + env(safe-area-inset-bottom, 0px));
-  z-index: 60;
+  --tutorial-guide-bottom: 30px;
+  --tutorial-guide-right: 30px;
 }
 </style>

@@ -105,5 +105,13 @@
     },
     "weixinAlt": "WeChat payment QR code",
     "alipayAlt": "Alipay payment QR code"
+  },
+  "settings": {
+    "tutorialToggle": {
+      "title": "Tutorial Guide",
+      "description": "Control whether the tutorial entry and random example buttons are displayed. Enabled by default.",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    }
   }
 }

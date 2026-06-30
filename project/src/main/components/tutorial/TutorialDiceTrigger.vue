@@ -64,7 +64,10 @@ const diceTitle = computed(() => {
 
 <style lang="scss" scoped>
 .tutorial-trigger {
-  position: relative;
+  position: fixed;
+  right: calc(var(--tutorial-guide-right) + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--tutorial-guide-bottom) + env(safe-area-inset-bottom, 0px));
+  z-index: 1200;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -194,7 +197,7 @@ const diceTitle = computed(() => {
 @media (max-aspect-ratio: 1/1) {
   .tutorial-trigger {
     gap: 0;
-    min-height: 42px;
+    min-height: 24px;
     padding: 7px 12px;
   }
 

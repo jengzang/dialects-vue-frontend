@@ -105,5 +105,13 @@
     },
     "weixinAlt": "微信收款二維碼",
     "alipayAlt": "支付寶收款二維碼"
+  },
+  "settings": {
+    "tutorialToggle": {
+      "title": "新手指導",
+      "description": "控制教程入口與隨機示例按鈕是否顯示，預設開啟。",
+      "enabled": "已開啟",
+      "disabled": "已關閉"
+    }
   }
 }

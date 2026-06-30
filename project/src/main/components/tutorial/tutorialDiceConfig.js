@@ -8,24 +8,100 @@ function createLocation(locations = ['廣州'], regions = [], regionUsing = 'yin
   }
 }
 
-function createQueryTab2Payload() {
-  return {
+const presets_tab2 = [
+  {
     card: '韻母',
     keys: ['攝'],
-    valuesMap: {
-      攝: ['通'],
-    },
-    loc: createLocation(['廣州'], ['廣府片'], 'yindian'),
+    values: { '攝': ['流', '深'] },
+    loc: { locations: ['广州 梅縣 汕头'], regions: ['瓊崖'], regionUsing: 'yindian' }
+  },
+  {
+    card: '聲母',
+    keys: ['母'],
+    values: { '母': ['精'] },
+    loc: { locations: ['鬱林 北流'], regions: ['吳化','銅容'], regionUsing: 'yindian' }
+  },
+  {
+    card: '聲調',
+    keys: ['清濁','調'],
+    values: { '清濁': ['次濁'] ,'調': ['上'] },
+    loc: { locations: ['台山台城 新會會城 東莞橋頭'], regions: ['東江'], regionUsing: 'yindian' }
+  },
+  {
+    card: '韻母',
+    keys: ['攝', '等'],
+    values: { '攝': ['蟹'], '等': ['一', '二', '三', '四'] },
+    loc: { locations: ['南雄'], regions: ['韶州'], regionUsing: 'yindian' }
+  },
+  {
+    card: '韻母',
+    keys: ['攝'],
+    values: { '攝': ['山'] },
+    loc: { locations: ['博羅'], regions: ['四邑片'], regionUsing: 'map' }
+  },
+  {
+    card: '聲母',
+    keys: ['組', '等'],
+    values: { '組': ['見'], '等': [ '二'] },
+    loc: { locations: ['南京 鹽城 淮安 廬江'], regions: ['海泗'], regionUsing: 'yindian' }
+  },
+  {
+    card: '韻母',
+    keys: ['韻'],
+    values: { '韻': ['豪'] },
+    loc: { locations: ['銀川 天津 邢臺'], regions: ['魯中'], regionUsing: 'yindian' }
+  },
+  {
+    card: '聲母',
+    keys: ['組', '等'],
+    values: { '組': ['知'], '等': [ '三'] },
+    loc: { locations: ['髙安 修水'], regions: ['撫州'], regionUsing: 'yindian' }
+  },
+]
+
+const presets_tab3 = [
+  {
+    card: '韻母',
+    keys: ['攝'],
+    tab3KeyInput: ['a'],
+    loc: { locations: ['揭陽 饒平 永安 福州'], regions: ['莆仙'], regionUsing: 'yindian' }
+  },
+  {
+    card: '聲母',
+    keys: ['組'],
+    tab3KeyInput: ['h'],
+    loc: { locations: ['台山斗山墟 恩平 鶴山雅瑤 從化獅象'], regions: ['南海'], regionUsing: 'yindian' }
+  },
+]
+
+let diceIndex = 0
+
+function createQueryTab2Payload() {
+  const config = presets_tab2[diceIndex % presets_tab2.length]
+  const valuesMap = {}
+  if (config.values) {
+    for (const k in config.values) {
+      valuesMap[k] = [...config.values[k]]
+    }
+  }
+  diceIndex++
+  return {
+    card: config.card,
+    keys: [...config.keys],
+    valuesMap,
+    loc: createLocation(config.loc.locations, config.loc.regions, config.loc.regionUsing),
   }
 }
 
 function createQueryTab3Payload() {
+  const config = presets_tab3[diceIndex % presets_tab3.length]
+  diceIndex++
   return {
-    card: '聲母',
-    keys: ['清濁'],
-    tab3InputValue: 'p',
+    card: config.card,
+    keys: [...config.keys],
     isTab3: true,
-    loc: createLocation(['廣州'], ['廣府片'], 'yindian'),
+    tab3InputValue: config.tab3KeyInput ? config.tab3KeyInput[0] : '',
+    loc: createLocation(config.loc.locations, config.loc.regions, config.loc.regionUsing),
   }
 }
 

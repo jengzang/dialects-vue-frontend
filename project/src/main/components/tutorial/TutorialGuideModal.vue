@@ -61,7 +61,7 @@
             @click="$emit('applyDice')"
           >
             <span class="tutorial-experience__button-icon">🎲</span>
-            <span>{{ t(currentDiceEntry.buttonKey) }}</span>
+            <span class="tutorial-experience__button-text">{{ t(currentDiceEntry.buttonKey) }}</span>
           </button>
         </section>
       </div>
@@ -469,6 +469,7 @@ defineExpose({
   justify-content: center;
   gap: 7px;
   min-height: 34px;
+  max-width: 180px;
   padding: 7px 12px;
   border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 999px;
@@ -496,10 +497,13 @@ defineExpose({
   &:active {
     transform: scale(0.98);
   }
-}
-
-.tutorial-experience__button-icon {
+  &-icon {
   font-size: 1rem;
+  }
+  &-text{
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .tutorial-shell__body {

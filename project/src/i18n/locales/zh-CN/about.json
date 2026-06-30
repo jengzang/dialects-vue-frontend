@@ -105,5 +105,13 @@
     },
     "weixinAlt": "微信收款二维码",
     "alipayAlt": "支付宝收款二维码"
+  },
+  "settings": {
+    "tutorialToggle": {
+      "title": "新手指导",
+      "description": "控制教程入口与随机示例按钮是否显示，默认开启。",
+      "enabled": "已开启",
+      "disabled": "已关闭"
+    }
   }
 }
