@@ -389,6 +389,10 @@ export const SITEMAP_PATHS = [
   '/',
   '/menu/source',
   '/menu/privacy',
+  '/menu/about/settings',
+  '/menu/about/intro',
+  '/menu/about/suggestion',
+  '/menu/about/like',
   '/menu/query/char',
   '/menu/query/zhonggu',
   '/menu/query/yinwei',
@@ -401,6 +405,22 @@ export const SITEMAP_PATHS = [
   '/menu/pho/custom',
   '/menu/pho/count',
   '/menu/pho/evolution',
+  '/menu/map/view',
+  '/menu/map/divide',
+  '/menu/map/custom',
+  '/menu/map/draw',
+  '/menu/result',
+  '/menu/tools',
+  '/menu/words',
+  '/menu/villages',
+  '/menu/cluster',
+  '/explore',
+  '/explore/tools/check',
+  '/explore/tools/jyut2ipa',
+  '/explore/tools/merge',
+  '/explore/tools/derive',
+  '/explore/tools/praat',
+  '/explore/manage',
   '/explore/yubao',
   '/explore/char-class',
   '/explore/yc-spoken',
@@ -408,13 +428,13 @@ export const SITEMAP_PATHS = [
   '/explore/villages/table',
   '/explore/villages/yc',
   '/explore/villages/ml',
-  '/menu/tools',
-  '/menu/words',
-  '/menu/villages',
-  '/menu/cluster',
-  '/menu/map/view',
 ]
 
-export const NOINDEX_PATHS = new Set(['/intro'])
+export const NOINDEX_PATHS = new Set([
+  '/intro',
+  '/auth',
+  '/auth/data',
+  '/auth/regions',
+])
 
 export default SEO_CONFIG
