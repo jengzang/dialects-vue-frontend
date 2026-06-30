@@ -137,11 +137,7 @@ const tabToRouteSub = {
   custom: 'custom',
   draw: 'draw'
 }
-const isMapRoute = computed(() => route.path.startsWith('/menu/map/'))
-const currentTab = computed(() => {
-  if (!isMapRoute.value) return null
-  return routeSubToTab[route.params.sub] || 'map'
-})
+const currentTab = computed(() => routeSubToTab[route.params.sub] || 'map')
 
 const tabs = computed(() => [
   { name: 'map', label: t('map.tabs.map') },

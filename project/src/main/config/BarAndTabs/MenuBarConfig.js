@@ -119,20 +119,21 @@ function withRouteLocale(route, path) {
 }
 
 function getMenuTabKeyFromRoute(route) {
-  if (typeof route?.path !== 'string') return null
+  const normalizedPath = stripLocaleFromPath(route?.path || '')
+  if (!normalizedPath) return null
 
-  if (route.path.startsWith('/menu/query/')) return 'query'
-  if (route.path.startsWith('/menu/compare/')) return 'compare'
-  if (route.path.startsWith('/menu/map/')) return 'map'
-  if (route.path === '/menu/result') return 'result'
-  if (route.path === '/menu/source') return 'source'
-  if (route.path === '/menu/privacy') return 'privacy'
-  if (route.path === '/menu/tools') return 'tools'
-  if (route.path === '/menu/words') return 'words'
-  if (route.path === '/menu/villages') return 'villages'
-  if (route.path === '/menu/cluster') return 'cluster'
-  if (route.path.startsWith('/menu/pho/')) return 'pho'
-  if (route.path.startsWith('/menu/about/')) return 'about'
+  if (normalizedPath.startsWith('/menu/query/')) return 'query'
+  if (normalizedPath.startsWith('/menu/compare/')) return 'compare'
+  if (normalizedPath.startsWith('/menu/map/')) return 'map'
+  if (normalizedPath === '/menu/result') return 'result'
+  if (normalizedPath === '/menu/source') return 'source'
+  if (normalizedPath === '/menu/privacy') return 'privacy'
+  if (normalizedPath === '/menu/tools') return 'tools'
+  if (normalizedPath === '/menu/words') return 'words'
+  if (normalizedPath === '/menu/villages') return 'villages'
+  if (normalizedPath === '/menu/cluster') return 'cluster'
+  if (normalizedPath.startsWith('/menu/pho/')) return 'pho'
+  if (normalizedPath.startsWith('/menu/about/')) return 'about'
 
   return route?.query?.tab || null
 }
@@ -275,8 +276,9 @@ export function syncMenuBarMemoryFromRoute(route) {
   const tabKey = getMenuTabKeyFromRoute(route)
   if (!tabKey) return
 
-  if (MENU_CHILD_PATHS[tabKey]?.includes(route.path)) {
-    writeMenuBarMemory(tabKey, route.path)
+  const normalizedPath = stripLocaleFromPath(route?.path || '')
+  if (MENU_CHILD_PATHS[tabKey]?.includes(normalizedPath)) {
+    writeMenuBarMemory(tabKey, normalizedPath)
   }
 }
 
