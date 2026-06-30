@@ -250,6 +250,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+import { setLocale } from '@/i18n/index.js'
 import { showSuccess } from '@/utils/message.js'
 import SupportPopup from '@/main/components/popup/SupportPopup.vue'
 import TabsContainer from '@/components/common/TabsContainer.vue'
@@ -384,6 +385,8 @@ function changeLanguage(newLocale) {
   if (newLocale === currentLocale.value) {
     return
   }
+
+  setLocale(newLocale)
 
   const targetPath = buildLocalePath(newLocale, stripLocaleFromPath(route.path))
   router.push({
