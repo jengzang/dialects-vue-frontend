@@ -41,7 +41,7 @@ const tutorialMessages = {
         menuCompare: '主站比較',
         menuMap: '主站地圖',
         menuPhonology: '主站音系',
-        menuResources: '支援與資源',
+        menuResources: '支持與資源',
         exploreTools: 'Explore 工具',
         praat: 'Praat 分析',
         exploreResources: 'Explore 資源',

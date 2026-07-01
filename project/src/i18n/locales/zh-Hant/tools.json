@@ -70,7 +70,7 @@
       "enabledRules": "已啟用",
       "disabledRules": "已停用",
       "exportTitle": "匯出規則配置",
-      "importTitle": "匯入規則配置",
+      "importTitle": "導入規則配置",
       "headers": {
         "index": "序號",
         "source": "待替換內容",
@@ -105,9 +105,9 @@
       "resetSuccess": "已重置為默認配置",
       "saveSuccess": "配置已保存",
       "saveFailed": "保存失敗：{message}",
-      "importSuccess": "匯入成功",
+      "importSuccess": "導入成功",
       "importInvalid": "檔案格式錯誤：必須是數組格式",
-      "importFailed": "匯入失敗：{message}",
+      "importFailed": "導入失敗：{message}",
       "progressFailed": "獲取進度失敗：{message}",
       "processFailed": "處理失敗：{message}",
       "taskMissing": "未找到任務 ID",
@@ -132,7 +132,7 @@
       "title": "上傳參考表",
       "desc": "參考表用於確定欄位與字符範圍，可上傳自備檔案或直接使用默認參考表。",
       "uploadText": "點擊或拖拽上傳參考表 Excel 檔案",
-      "uploadHint": "支援 .xlsx 與 .xls 格式",
+      "uploadHint": "支持 .xlsx 與 .xls 格式",
       "charCount": "字數",
       "columnCount": "列數",
       "viewDefault": "查看默認參考表",
@@ -179,7 +179,7 @@
     "validation": {
       "loginRequired": "請先登錄",
       "invalidFileType": "請上傳 Excel 檔案（.xlsx 或 .xls 格式）",
-      "partialInvalid": "部分檔案格式不正確，僅支援 .xlsx 與 .xls 格式",
+      "partialInvalid": "部分檔案格式不正確，僅支持 .xlsx 與 .xls 格式",
       "fileTooLarge": "以下檔案超過 3MB 限制：{files}",
       "referenceFileTooLarge": "檔案大小不得超過 3MB",
       "maxFiles": "最多只能上傳 20 個檔案，當前已存在 {count} 個檔案"

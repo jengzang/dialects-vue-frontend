@@ -130,7 +130,7 @@
     "helpTrigger": "不知道怎樣新增資料？點這裡查看說明",
     "helpIcons": {
       "addSingle": "跳轉到地圖頁後，直接點擊地圖即可自動填入座標。",
-      "addBatch": "一次新增多筆資料，支援從 Excel 直接貼上。"
+      "addBatch": "一次新增多筆資料，支持從 Excel 直接貼上。"
     },
     "validation": {
       "selectFeature": "請先選擇一個特徵",
@@ -444,12 +444,12 @@
       "deleteLocal": "刪除本地",
       "localStorageModalTitle": "本地草稿",
       "layers": "圖層",
-      "addLayerModalTitle": "新建或匯入圖層",
+      "addLayerModalTitle": "新建或導入圖層",
       "exportModalTitle": "匯出數據",
       "createPointLayerDesc": "創建新的點位或標註圖層",
       "createLineLayerDesc": "創建新的折線或路徑圖層",
       "createPolygonLayerDesc": "創建新的多邊形或區域圖層",
-      "importLayerDesc": "支援匯入 GeoJSON / JSON / KML / KMZ / CSV 地理數據檔案",
+      "importLayerDesc": "支持導入 GeoJSON / JSON / KML / KMZ / CSV 地理數據檔案",
       "exportCurrentLayerDesc": "匯出目前選取的活動圖層為 GeoJSON 檔案",
       "exportAllLayersDesc": "將所有繪製圖層合併匯出為單個 GeoJSON 檔案",
       "exportImageDesc": "按所選範圍與參數匯出 PNG 地圖圖片",
@@ -469,7 +469,7 @@
       "moveLayerUp": "圖層上移",
       "moveLayerDown": "圖層下移",
       "clearAll": "清空全部",
-      "importLayer": "匯入圖層",
+      "importLayer": "導入圖層",
       "exportLayer": "匯出圖層",
       "exportAllLayers": "匯出全部圖層",
       "exportImage": "匯出圖片",
@@ -482,8 +482,8 @@
       "saveLocalDraftModalTitle": "保存本地草稿"
     },
     "messages": {
-      "importLayerSuccess": "圖層匯入成功，共新增 {count} 個圖層",
-      "importLayerFailed": "圖層匯入失敗：{error}",
+      "importLayerSuccess": "圖層導入成功，共新增 {count} 個圖層",
+      "importLayerFailed": "圖層導入失敗：{error}",
       "clearAllConfirm": "確認清空目前所有繪製內容嗎？",
       "clearAllSuccess": "已清空全部繪製內容",
       "exportLayerSuccess": "圖層匯出成功",
@@ -556,7 +556,7 @@
       "layerList": "圖層列表",
       "selectedLayer": "當前選擇",
       "emptyLayer": "未選擇圖層",
-      "emptyState": "暫無圖層，請先新建點圖層、線圖層、面圖層或匯入圖層",
+      "emptyState": "暫無圖層，請先新建點圖層、線圖層、面圖層或導入圖層",
       "layer": "圖層",
       "layerEditor": "圖層屬性",
       "layerName": "圖層名稱",

@@ -477,13 +477,13 @@ const performTValueAnalysis = () => {
   const lgMax = Math.log10(ceiling)
   const denominator = lgMax - lgMin
 
-  // ✅ 修复：调值范围改为 1~5（传统五度值）
+  // ✅ 修复：调值范围改为 0~5（传统五度值）
   // Helper: Convert Hz array to T-value array
   const hzToTValues = (hzArray) => {
     return hzArray.map(hz => {
       const lgX = Math.log10(hz)
-      let T = ((lgX - lgMin) / denominator) * 4 + 1  // 映射到 [1, 5]
-      return Math.max(1, Math.min(5, T))  // Clamp to [1, 5]
+      let T = ((lgX - lgMin) / denominator) * 5  // 映射到 [0, 5]
+      return Math.max(0, Math.min(5, T))  // Clamp to [0, 5]
     })
   }
 
@@ -657,9 +657,10 @@ const initTValueChart = () => {
     yAxis: {
       type: 'value',
       name: t('praat.pitchTone.step3.chart.yAxis'),
-      min: 1,
+      min: 0,
       max: 5,
       interval: 1,
+      splitNumber: 5,
       splitLine: { show: true }
     },
     series: series

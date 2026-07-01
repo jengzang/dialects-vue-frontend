@@ -224,15 +224,22 @@
               <h3 class="section-title">{{ $t('about.settings.tutorialToggle.title') }}</h3>
               <p class="section-description">{{ $t('about.settings.tutorialToggle.description') }}</p>
             </div>
-            <button
-              type="button"
-              class="tutorial-toggle-button"
-              :class="{ active: tutorialGuideEnabled }"
-              @click="tutorialGuideEnabled = !tutorialGuideEnabled"
-            >
-              <span class="tutorial-toggle-button__thumb"></span>
-              <span class="tutorial-toggle-button__label">{{ tutorialGuideEnabled ? $t('about.settings.tutorialToggle.enabled') : $t('about.settings.tutorialToggle.disabled') }}</span>
-            </button>
+            <SwitchToggle
+              :model-value="tutorialGuideEnabled"
+              :width="100"
+              :height="40"
+              :thumb-size="32"
+              color="#007aff"
+              variant="solid"
+              show-label
+              :active-text="$t('about.settings.tutorialToggle.enabled')"
+              :inactive-text="$t('about.settings.tutorialToggle.disabled')"
+              label-position="inside"
+              :gap="20"
+              :aria-label="$t('about.settings.tutorialToggle.title')"
+              class="tutorial-switch-toggle"
+              @update:modelValue="tutorialGuideEnabled = $event"
+            />
           </div>
 
         </div>
@@ -256,6 +263,7 @@ import SupportPopup from '@/main/components/popup/SupportPopup.vue'
 import TabsContainer from '@/components/common/TabsContainer.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
 import {
   UI_MODE_DEFAULT,
@@ -436,52 +444,34 @@ function resolveTabRoute(tabName) {
   gap: 6px;
 }
 
-.tutorial-toggle-button {
-  position: relative;
-  min-width: 126px;
-  height: 50px;
-  border: none;
-  border-radius: 999px;
-  padding: 0 18px 0 56px;
-  background: rgba(151, 174, 198, 0.3);
-  color: #476784;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.22s ease, color 0.22s ease;
+.tutorial-switch-toggle {
+  width: 100%;
+  justify-content: flex-end;
 }
 
-.tutorial-toggle-button.active {
-  background: linear-gradient(180deg, #68aaf6, #4f92ea);
+.tutorial-switch-toggle :deep(.switch-toggle__button) {
+  /* background: rgba(151, 174, 198, 0.3); */
+  /* color: #476784; */
+  font-weight: 700;
+}
+
+.tutorial-switch-toggle :deep(.switch-toggle__button.is-on) {
+  background: (#007aff);
   color: #fff;
 }
 
-.tutorial-toggle-button__thumb {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 6px 14px rgba(38, 88, 137, 0.18);
-  transition: transform 0.22s ease;
-}
-
-.tutorial-toggle-button.active .tutorial-toggle-button__thumb {
-  transform: translateX(70px);
-}
-
-.tutorial-toggle-button__label {
+.tutorial-switch-toggle :deep(.switch-toggle__label--inside) {
+  color: inherit;
+  font-weight: 700;
   white-space: nowrap;
 }
 
-@media (max-width: 768px) {
-  .tutorial-toggle-section {
-    flex-direction: column;
-    align-items: stretch;
-  }
+.tutorial-switch-toggle :deep(.switch-toggle__thumb) {
+  box-shadow: 0 6px 14px rgba(38, 88, 137, 0.18);
+}
 
-  .tutorial-toggle-button {
+@media (max-width: 768px) {
+  .tutorial-switch-toggle {
     width: 100%;
   }
 }

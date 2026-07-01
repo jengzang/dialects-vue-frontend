@@ -579,7 +579,7 @@ label:hover {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     padding: 8px 12px;
     border-radius: 6px;
-    white-space: pre-line;  /* 支援多行 */
+    white-space: pre-line;  /* 支持多行 */
     font-size: 14px;
     color: #333;
     max-width: 320px;
