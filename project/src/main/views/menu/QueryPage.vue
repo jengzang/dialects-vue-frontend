@@ -232,6 +232,7 @@ import {
 } from '@/main/store/store.js'
 import { useQueryConfig } from '@/composables/domain/useQueryConfig.js'
 import { translateResultTerm } from '@/i18n/utils/resultI18n.js'
+import { readMenuBarMemory, writeMenuBarMemory } from '@/main/config/BarAndTabs/MenuBarConfig.js'
 import { showWarning } from '@/utils/message.js'
 import { limitEffectiveChars } from '@/main/utils/queryLimits.js'
 
@@ -516,6 +517,14 @@ function toggleExcludeOption(value, tab) {
 
 // isRunning 状态已移至 uiStore，不再需要本地定义
 const ZhongguRef = ref(null);
+
+function resetRememberedMapSubToView() {
+  const rememberedMapPath = readMenuBarMemory('map')
+  if (rememberedMapPath && rememberedMapPath !== '/menu/map/view') {
+    writeMenuBarMemory('map', '/menu/map/view')
+  }
+}
+
 // 點擊按鈕行為
 const runAction = async () => {
   setRunning('query', true);
@@ -648,6 +657,7 @@ const runAction = async () => {
     // 2. 存入全局仓库
     globalPayload.value = JSON.parse(JSON.stringify(finalPayload))
   }
+  resetRememberedMapSubToView()
   // 3. 纯净跳转
   await router.replace({
     path: buildLocalePath(resolveRouteLocale(route), '/menu/result')
