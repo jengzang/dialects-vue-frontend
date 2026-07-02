@@ -273,7 +273,7 @@
     },
     "zhongguDirectInput": {
       "positionLabel": "中古地位输入",
-      "positionPlaceholder": "输入中古地位，空格分隔。例：泥母 庄组 蟹-等",
+      "positionPlaceholder": "空格分隔独立地位，连写代表组合查询，横杠代表全匹配。例：泥母 流开一 蟹-等",
       "charLabel": "汉字直接输入",
       "charPlaceholder": "输入汉字，例：你好",
       "helpButton": "?",
@@ -291,6 +291,7 @@
       "duplicateValueError": "「{value}」存在于多个类别（{categories}），请加上类别后缀",
       "unknownValueError": "「{value}」不是有效的中古地位值",
       "unknownCategoryError": "「{category}」不是有效的类别名称",
+      "tooManyTokens": "输入地位项数量({count})超过限制({limit})，请减少输入",
       "help": {
         "title": "直接输入说明",
         "rules": {
@@ -301,6 +302,7 @@
           "rule5": "可以自由组合多个查询项（如「蟹-等 知组」查询蟹摄的所有等+知组）。",
           "rule6": "像「流开一」这样的复合词，会逐字解析每个部分。"
         },
+        "examplesNote": "以下示例基于中古音（广韵）字表",
         "examples": {
           "title": "输入示例",
           "example1": "「泥」 → 使用 泥母 进行分析",

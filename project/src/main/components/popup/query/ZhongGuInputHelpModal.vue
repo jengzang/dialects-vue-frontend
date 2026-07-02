@@ -19,6 +19,7 @@
 
       <section class="help-section">
         <h4 class="help-subtitle">{{ $t('query.components.zhongguDirectInput.help.examples.title') }}</h4>
+        <p class="help-examples-note">{{ $t('query.components.zhongguDirectInput.help.examplesNote') }}</p>
         <ul class="help-examples">
           <li v-html="$t('query.components.zhongguDirectInput.help.examples.example1')"></li>
           <li v-html="$t('query.components.zhongguDirectInput.help.examples.example2')"></li>
@@ -32,7 +33,7 @@
       </section>
 
       <section class="help-section">
-        <h4 class="help-subtitle">{{ $t('query.components.zhongguDirectInput.help.table.title') }}</h4>
+        <h4 class="help-subtitle">{{ tableLabel }}</h4>
         <div class="help-table-wrapper">
           <table class="help-table">
             <thead>
@@ -42,53 +43,9 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>{{ $t('query.components.floatingDice.inputRows.she.category') }}</td>
-                <td>{{ $t('query.components.floatingDice.inputRows.she.values') }}</td>
-              </tr>
-              <tr>
-                <td>{{ $t('query.components.floatingDice.inputRows.yun.category') }}</td>
-                <td>{{ $t('query.components.floatingDice.inputRows.yun.values') }}</td>
-              </tr>
-              <tr>
-                <td>{{ $t('query.components.floatingDice.inputRows.hu.category') }}</td>
-                <td>{{ $t('query.components.floatingDice.inputRows.hu.values') }}</td>
-              </tr>
-              <tr>
-                <td>{{ $t('query.components.floatingDice.inputRows.deng.category') }}</td>
-                <td>{{ $t('query.components.floatingDice.inputRows.deng.values') }}</td>
-              </tr>
-              <tr>
-                <td>{{ $t('query.components.floatingDice.inputRows.ru.category') }}</td>
-                <td>{{ $t('query.components.floatingDice.inputRows.ru.values') }}</td>
-              </tr>
-              <tr>
-                <td>{{ $t('query.components.floatingDice.inputRows.diao.category') }}</td>
-                <td>{{ $t('query.components.floatingDice.inputRows.diao.values') }}</td>
-              </tr>
-              <tr>
-                <td>{{ $t('query.components.floatingDice.inputRows.buwei.category') }}</td>
-                <td>{{ $t('query.components.floatingDice.inputRows.buwei.values') }}</td>
-              </tr>
-              <tr>
-                <td>{{ $t('query.components.floatingDice.inputRows.fangshi.category') }}</td>
-                <td>{{ $t('query.components.floatingDice.inputRows.fangshi.values') }}</td>
-              </tr>
-              <tr>
-                <td>{{ $t('query.components.floatingDice.inputRows.qingzhuo.category') }}</td>
-                <td>{{ $t('query.components.floatingDice.inputRows.qingzhuo.values') }}</td>
-              </tr>
-              <tr>
-                <td>{{ $t('query.components.floatingDice.inputRows.xi.category') }}</td>
-                <td>{{ $t('query.components.floatingDice.inputRows.xi.values') }}</td>
-              </tr>
-              <tr>
-                <td>{{ $t('query.components.floatingDice.inputRows.zu.category') }}</td>
-                <td>{{ $t('query.components.floatingDice.inputRows.zu.values') }}</td>
-              </tr>
-              <tr>
-                <td>{{ $t('query.components.floatingDice.inputRows.mu.category') }}</td>
-                <td>{{ $t('query.components.floatingDice.inputRows.mu.values') }}</td>
+              <tr v-for="(values, category) in tableColumnValues" :key="category">
+                <td>{{ category }}</td>
+                <td>{{ Array.isArray(values) ? values.join('、') : values }}</td>
               </tr>
             </tbody>
           </table>
@@ -99,13 +56,30 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import { TABLE_COLUMN_SCHEMAS } from '@/main/config/chars_positions/characters.js'
 
-defineProps({
-  visible: { type: Boolean, default: false }
+const { t } = useI18n()
+
+const props = defineProps({
+  visible: { type: Boolean, default: false },
+  tableName: { type: String, default: 'characters' }
 })
 
 defineEmits(['close'])
+
+const tableColumnValues = computed(() => {
+  const schema = TABLE_COLUMN_SCHEMAS[props.tableName]
+  return schema?.columns?.column_values || {}
+})
+
+const tableLabel = computed(() => {
+  const schema = TABLE_COLUMN_SCHEMAS[props.tableName]
+  const label = schema?.meta?.label || props.tableName
+  return `${label} — ${t('query.components.zhongguDirectInput.help.table.title')}`
+})
 </script>
 
 <style scoped>
@@ -124,6 +98,13 @@ defineEmits(['close'])
   color: #333;
   font-size: 16px;
   font-weight: 600;
+}
+
+.help-examples-note {
+  margin: 0 0 8px;
+  color: #888;
+  font-size: 12px;
+  font-style: italic;
 }
 
 .help-rules {

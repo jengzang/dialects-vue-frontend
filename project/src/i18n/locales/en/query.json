@@ -273,7 +273,7 @@
     },
     "zhongguDirectInput": {
       "positionLabel": "Middle Chinese Position Input",
-      "positionPlaceholder": "Enter Middle Chinese positions, separated by spaces. E.g.: 泥母 莊組 蟹-等",
+      "positionPlaceholder": "Spaces = independent, joined = combined, dash = match all. E.g.: 泥母 流開一 蟹-等",
       "charLabel": "Direct Character Input",
       "charPlaceholder": "Enter Chinese characters, e.g.: 你好",
       "helpButton": "?",
@@ -291,6 +291,7 @@
       "duplicateValueError": "\"{value}\" exists in multiple categories ({categories}), please add a category suffix",
       "unknownValueError": "\"{value}\" is not a valid Middle Chinese position value",
       "unknownCategoryError": "\"{category}\" is not a valid category name",
+      "tooManyTokens": "Too many position tokens ({count} > {limit}), please reduce input",
       "help": {
         "title": "Direct Input Guide",
         "rules": {
@@ -301,6 +302,7 @@
           "rule5": "Freely combine multiple query tokens (e.g., \"蟹-等 知組\" queries 蟹攝 with all grades AND 知組).",
           "rule6": "Compounds like \"流開一\" are parsed character by character."
         },
+        "examplesNote": "The following examples are based on the Middle Chinese (Guangyun) character table",
         "examples": {
           "title": "Examples",
           "example1": "\"泥\" → Analyze with 泥母",

@@ -14,6 +14,7 @@
         :class="{ 'input-error': hasPositionError, 'input-warning': !hasPositionError && hasPositionWarning }"
         :placeholder="$t('query.components.zhongguDirectInput.positionPlaceholder')"
         rows="2"
+        :disabled="isLoading"
         @input="onPositionInput"
       />
       <div v-if="hasPositionError" class="error-message">
@@ -23,6 +24,9 @@
           </template>
           <template v-else-if="err.message === 'unknownCategory'">
             {{ $t('query.components.zhongguDirectInput.unknownCategoryError', { category: err.payload.category }) }}
+          </template>
+          <template v-else-if="err.message === 'tooManyTokens'">
+            {{ $t('query.components.zhongguDirectInput.tooManyTokens', { count: err.payload.count, limit: err.payload.limit }) }}
           </template>
         </span>
       </div>
@@ -35,7 +39,18 @@
       </div>
     </div>
 
-    <div class="input-section">
+    <ZhongGuSelector
+      ref="innerSelectorRef"
+      :path-strings="_pathStrings"
+      :is-dropdown-open="false"
+      selected-card="結果"
+      :exclude-columns="excludeColumns"
+      :table-name="tableName"
+      :hide-info-header="true"
+      @update:runDisabled="emit('update:runDisabled', $event)"
+    />
+
+     <div class="input-section" style="margin-top: 12px;">
       <label class="input-label">{{ $t('query.components.zhongguDirectInput.charLabel') }}</label>
       <input
         v-model="charInput"
@@ -45,18 +60,9 @@
       />
     </div>
 
-    <ZhongGuSelector
-      ref="innerSelectorRef"
-      :path-strings="_pathStrings"
-      :is-dropdown-open="false"
-      selected-card="結果"
-      :exclude-columns="excludeColumns"
-      :table-name="tableName"
-      @update:runDisabled="emit('update:runDisabled', $event)"
-    />
-
     <ZhongGuInputHelpModal
       :visible="isHelpModalOpen"
+      :table-name="tableName"
       @close="isHelpModalOpen = false"
     />
   </div>
@@ -66,7 +72,9 @@
 import { ref, computed, watch } from 'vue'
 import ZhongGuSelector from '@/main/components/query/ZhongGuSelector.vue'
 import ZhongGuInputHelpModal from '@/main/components/popup/query/ZhongGuInputHelpModal.vue'
-import { validateAll, tokensToPathStrings } from '@/main/utils/zhongguDirectInputValidator.js'
+import { validateAll, parseTokens, tokensToPathStrings } from '@/main/utils/zhongguDirectInputValidator.js'
+import { ROLE_LIMITS } from '@/main/config/constants.js'
+import { userStore } from '@/main/store/store.js'
 
 const emit = defineEmits(['update:runDisabled'])
 
@@ -84,12 +92,13 @@ const innerSelectorRef = ref(null)
 const parsedResults = ref([])
 let debounceTimer = null
 
+const isLoading = computed(() => innerSelectorRef.value?.loading || false)
 const hasPositionError = computed(() => positionErrors.value.length > 0)
 const hasPositionWarning = computed(() => positionWarnings.value.length > 0)
 
 const _pathStrings = computed(() => {
   if (parsedResults.value.length === 0) return null
-  return tokensToPathStrings(parsedResults.value)
+  return tokensToPathStrings(parsedResults.value, props.tableName)
 })
 
 const pathStrings = computed(() => {
@@ -105,13 +114,27 @@ function onPositionInput() {
   if (debounceTimer) clearTimeout(debounceTimer)
 
   debounceTimer = setTimeout(() => {
-    const validation = validateAll(positionInput.value)
+    const tokens = parseTokens(positionInput.value)
+    const limits = ROLE_LIMITS[userStore.role] || ROLE_LIMITS.anonymous
+
+    if (tokens.length > limits.MAX_RESULTS) {
+      positionErrors.value = [{
+        token: '',
+        message: 'tooManyTokens',
+        payload: { count: tokens.length, limit: limits.MAX_RESULTS }
+      }]
+      positionWarnings.value = []
+      parsedResults.value = []
+      return
+    }
+
+    const validation = validateAll(positionInput.value, props.tableName)
 
     positionErrors.value = validation.errors
     positionWarnings.value = validation.warnings
 
     parsedResults.value = validation.errors.length === 0 ? validation.results : []
-  }, 300)
+  }, 600)
 }
 
 watch(chars, (newVal) => {
@@ -124,7 +147,7 @@ watch(chars, (newVal) => {
 defineExpose({ pathStrings, chars })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .zhonggu-direct-input {
   background: none;
   width: 80dvw;
@@ -133,7 +156,7 @@ defineExpose({ pathStrings, chars })
   padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
   position: relative;
   left: 50%;
   transform: translateX(-50%);
@@ -149,7 +172,7 @@ defineExpose({ pathStrings, chars })
   display: flex;
   align-items: center;
   justify-content: center;
-  gap:16px;
+  gap: 16px;
 }
 
 .input-label {
@@ -172,11 +195,11 @@ defineExpose({ pathStrings, chars })
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-}
 
-.help-btn:hover {
-  background: var(--color-blue-custom, #007aff);
-  color: #fff;
+  &:hover {
+    background: var(--color-blue-custom, #007aff);
+    color: #fff;
+  }
 }
 
 .position-textarea {
@@ -195,21 +218,21 @@ defineExpose({ pathStrings, chars })
   outline: none;
   transition: border-color 0.25s, box-shadow 0.25s;
   box-sizing: border-box;
-}
 
-.position-textarea:focus {
-  border-color: var(--color-blue-custom, #007aff);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
-}
+  &:focus {
+    border-color: var(--color-blue-custom, #007aff);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+  }
 
-.position-textarea.input-error {
-  border-color: #ff3b30;
-  box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.12);
-}
+  &.input-error {
+    border-color: #ff3b30;
+    box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.12);
+  }
 
-.position-textarea.input-warning {
-  border-color: #ff9500;
-  box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.12);
+  &.input-warning {
+    border-color: #ff9500;
+    box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.12);
+  }
 }
 
 .char-input {
@@ -225,11 +248,11 @@ defineExpose({ pathStrings, chars })
   outline: none;
   transition: border-color 0.25s, box-shadow 0.25s;
   box-sizing: border-box;
-}
 
-.char-input:focus {
-  border-color: var(--color-blue-custom, #007aff);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+  &:focus {
+    border-color: var(--color-blue-custom, #007aff);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+  }
 }
 
 .error-message {
@@ -254,5 +277,12 @@ defineExpose({ pathStrings, chars })
   color: #ff9500;
   font-size: 12px;
   line-height: 1.4;
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .zhonggu-direct-input {
+    gap:0px;
+    padding: 8px;
+  }
 }
 </style>

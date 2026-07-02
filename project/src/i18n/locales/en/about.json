@@ -115,7 +115,7 @@
     },
     "zhongguInputMode": {
       "title": "Middle Chinese Input Mode",
-      "description": "Choose between dropdown selector mode or direct input mode for Middle Chinese queries. Direct input mode supports typing position tokens (e.g., \"泥母 莊組 蟹-等\") and direct character input.",
+      "description": "Choose between dropdown selector mode or direct input mode for Middle Chinese queries. Direct input mode supports typing position tokens (e.g., \"通开一 莊組 蟹-等\") and direct character input.",
       "options": {
         "selector": "Selector",
         "direct": "Direct Input"
