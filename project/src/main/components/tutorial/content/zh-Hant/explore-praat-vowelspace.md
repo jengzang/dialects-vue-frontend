@@ -10,7 +10,7 @@
 
 ## 顯示模式
 
-- **分段顯示**（默認）：按 rime_core、syllable_like、voiced 三類片段分別著色
+- **分段顯示**（預設）：按 rime_core、syllable_like、voiced 三類片段分別著色
 - **全部散點**：所有有效 F1/F2 數據點畫到圖上，不按片段分色
 
 ## 交互
