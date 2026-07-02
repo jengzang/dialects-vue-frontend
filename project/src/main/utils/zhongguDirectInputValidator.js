@@ -25,7 +25,7 @@ const S2T = {
   '刘': '劉', '龙': '龍', '马': '馬', '么': '麼', '万': '萬',
   '农': '農', '气': '氣', '圣': '聖', '胜': '勝', '实': '實',
   '肃': '肅', '岁': '歲',
-  '调': '調', '韵': '韻', '组': '組',
+  '摄': '攝', '调': '調', '韵': '韻', '组': '組',
 }
 
 const T2S = {}
@@ -182,20 +182,24 @@ function tryMatchCategorySuffix(token) {
 
   for (const cat of CATEGORY_NAMES_SORTED) {
     const catSimp = toSimplified(cat)
-    let value = null
+    const vals = CATEGORY_VALUES[cat]
+    if (!vals) continue
 
     if (tradToken.endsWith(cat) && tradToken.length > cat.length) {
-      value = tradToken.slice(0, -cat.length)
-    } else if (catSimp !== cat && tradToken.endsWith(catSimp) && tradToken.length > catSimp.length) {
-      value = tradToken.slice(0, -catSimp.length)
-    } else if (simpToken.endsWith(cat) && simpToken.length > cat.length) {
-      value = simpToken.slice(0, -cat.length)
-    } else if (catSimp !== cat && simpToken.endsWith(catSimp) && simpToken.length > catSimp.length) {
-      value = simpToken.slice(0, -catSimp.length)
+      const v = tradToken.slice(0, -cat.length)
+      if (vals.includes(v)) return { value: v, category: cat }
     }
-
-    if (value !== null && CATEGORY_VALUES[cat] && CATEGORY_VALUES[cat].includes(value)) {
-      return { value, category: cat }
+    if (catSimp !== cat && tradToken.endsWith(catSimp) && tradToken.length > catSimp.length) {
+      const v = tradToken.slice(0, -catSimp.length)
+      if (vals.includes(v)) return { value: v, category: cat }
+    }
+    if (simpToken.endsWith(cat) && simpToken.length > cat.length) {
+      const v = simpToken.slice(0, -cat.length)
+      if (vals.includes(v)) return { value: v, category: cat }
+    }
+    if (catSimp !== cat && simpToken.endsWith(catSimp) && simpToken.length > catSimp.length) {
+      const v = simpToken.slice(0, -catSimp.length)
+      if (vals.includes(v)) return { value: v, category: cat }
     }
   }
   return null
@@ -269,7 +273,7 @@ export function validateToken(token) {
         allKnown = false
         break
       }
-      charResults.push({ value: ch, category: getDefaultCategory(chCats) })
+      charResults.push({ value: resolveCanonicalValue(ch), category: getDefaultCategory(chCats) })
     }
 
     if (allKnown && charResults.length > 0) {
@@ -370,4 +374,4 @@ function getCategoryForValue(value) {
   return getDefaultCategory(cats)
 }
 
-export { CATEGORY_VALUES, valueToCategories, duplicateValues, CATEGORY_NAMES }
+export { CATEGORY_VALUES, valueToCategories, duplicateValues, CATEGORY_NAMES, getDefaultCategory }

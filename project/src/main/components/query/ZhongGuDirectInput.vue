@@ -45,53 +45,14 @@
       />
     </div>
 
-    <div v-if="hasPositions" class="info-header">
-      <div class="info-text">
-        <span class="info-icon">ℹ️</span>
-        <span>
-          {{ $t('query.components.zhongguDirectInput.possibleCombinations', { count: pathStrings.length }) }}
-          <span v-if="!loading && results.length >= 0" class="fade-in">
-          {{ $t('query.components.zhongguDirectInput.actualMatches', { count: results.length }) }}
-          </span>
-        </span>
-      </div>
-
-      <button
-        v-if="!loading && results.length > 0"
-        class="global-expand-btn"
-        @click="isModalOpen = true"
-      >
-        {{ $t('query.components.zhongguDirectInput.detailsButton') }}
-      </button>
-    </div>
-
-    <div v-if="limitHint" class="limit-warning">
-      ⚠️ {{ limitHint }}
-    </div>
-
-    <div v-if="hasPositions && loading" class="status-msg loading">
-      <span class="ui-loading--inline" aria-hidden="true">↻</span> {{ $t('query.components.zhongguDirectInput.querying') }}
-    </div>
-
-    <div v-else-if="hasPositions && (!results || results.length === 0)" class="status-msg empty">
-      {{ $t('query.components.zhongguDirectInput.noMatches') }}
-    </div>
-
-    <div v-else-if="hasPositions" class="compact-grid">
-      <div v-for="item in results" :key="item.query" class="compact-item">
-        <span class="compact-title">{{ formatTitle(item.query) }}</span>
-        <span class="compact-count">({{ item['char_count'] }})</span>
-        <span class="compact-preview">
-          {{ (item['chars'] || []).slice(0, 8).join('') }}{{ (item['chars'] || []).length > 8 ? '...' : '' }}
-        </span>
-      </div>
-    </div>
-
-    <ZhongguDetailsPopup
-      :visible="isModalOpen"
-      :results="results"
-      :format-title="formatTitle"
-      @close="isModalOpen = false"
+    <ZhongGuSelector
+      ref="innerSelectorRef"
+      :path-strings="_pathStrings"
+      :is-dropdown-open="false"
+      selected-card="結果"
+      :exclude-columns="excludeColumns"
+      :table-name="tableName"
+      @update:runDisabled="emit('update:runDisabled', $event)"
     />
 
     <ZhongGuInputHelpModal
@@ -103,18 +64,11 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { getCharList } from '@/api'
-import ZhongguDetailsPopup from '@/main/components/popup/query/ZhongguDetailsPopup.vue'
+import ZhongGuSelector from '@/main/components/query/ZhongGuSelector.vue'
 import ZhongGuInputHelpModal from '@/main/components/popup/query/ZhongGuInputHelpModal.vue'
-import { userStore } from '@/main/store/store.js'
-import { ROLE_LIMITS, QUERY_CONFIG } from '@/main/config/constants.js'
-import { parseTokens, validateToken, validateAll, tokensToPathStrings } from '@/main/utils/zhongguDirectInputValidator.js'
+import { validateAll, tokensToPathStrings } from '@/main/utils/zhongguDirectInputValidator.js'
 
 const emit = defineEmits(['update:runDisabled'])
-
-function updateDisabledState(isDisabled) {
-  emit('update:runDisabled', isDisabled)
-}
 
 const props = defineProps({
   excludeColumns: { type: Array, default: () => [] },
@@ -125,41 +79,27 @@ const positionInput = ref('')
 const charInput = ref('')
 const positionErrors = ref([])
 const positionWarnings = ref([])
-const loading = ref(false)
-const results = ref([])
-const limitHint = ref('')
-const isModalOpen = ref(false)
 const isHelpModalOpen = ref(false)
+const innerSelectorRef = ref(null)
+const parsedResults = ref([])
 let debounceTimer = null
 
 const hasPositionError = computed(() => positionErrors.value.length > 0)
 const hasPositionWarning = computed(() => positionWarnings.value.length > 0)
 
+const _pathStrings = computed(() => {
+  if (parsedResults.value.length === 0) return null
+  return tokensToPathStrings(parsedResults.value)
+})
+
 const pathStrings = computed(() => {
-  if (!positionInput.value.trim()) return []
-
-  const tokens = parseTokens(positionInput.value)
-  const parsedResults = []
-
-  for (const token of tokens) {
-    const result = validateToken(token)
-    if (result.valid && result.parsed) {
-      parsedResults.push(result.parsed)
-    }
-  }
-
-  return tokensToPathStrings(parsedResults)
+  return innerSelectorRef.value?.combinations || []
 })
 
 const chars = computed(() => {
   if (!charInput.value.trim()) return ''
   return [...charInput.value.trim()].filter(ch => /\p{Script=Han}/u.test(ch))
 })
-
-const hasPositions = computed(() => pathStrings.value.length > 0)
-const hasSelection = computed(() => hasPositions.value || (chars.value && chars.value.length > 0))
-
-const positionInputRef = ref(null)
 
 function onPositionInput() {
   if (debounceTimer) clearTimeout(debounceTimer)
@@ -170,93 +110,16 @@ function onPositionInput() {
     positionErrors.value = validation.errors
     positionWarnings.value = validation.warnings
 
-    if (validation.errors.length === 0 && hasSelection.value) {
-      fetchData(pathStrings.value)
-    } else if (validation.errors.length > 0) {
-      results.value = []
-    }
-  }, QUERY_CONFIG.DEBOUNCE_DELAY)
+    parsedResults.value = validation.errors.length === 0 ? validation.results : []
+  }, 300)
 }
-
-watch(() => props.excludeColumns, () => {
-  if (hasSelection.value && positionErrors.value.length === 0) {
-    if (debounceTimer) clearTimeout(debounceTimer)
-    debounceTimer = setTimeout(() => {
-      fetchData(pathStrings.value)
-    }, QUERY_CONFIG.DEBOUNCE_DELAY)
-  }
-}, { deep: true })
-
-watch(pathStrings, (newVal, oldVal) => {
-  if (JSON.stringify(newVal) === JSON.stringify(oldVal)) return
-
-  if (newVal.length === 0) {
-    results.value = []
-    return
-  }
-})
 
 watch(chars, (newVal) => {
   if (positionErrors.value.length > 0) return
-  if (!pathStrings.value.length) {
-    updateDisabledState(!(newVal && newVal.length > 0))
+  if (parsedResults.value.length === 0) {
+    emit('update:runDisabled', !(newVal && newVal.length > 0))
   }
 })
-
-async function fetchData(pathStringsData) {
-  loading.value = true
-  limitHint.value = ''
-  results.value = []
-
-  updateDisabledState(true)
-
-  try {
-    const data = await getCharList({
-      path_strings: pathStringsData,
-      combine_query: false,
-      exclude_columns: props.excludeColumns,
-      table_name: props.tableName
-    })
-    results.value = Array.isArray(data) ? data : []
-
-    validateResultLimit(results.value.length)
-  } catch (e) {
-    console.error('Direct input fetch error:', e)
-    limitHint.value = 'queryFailed'
-    results.value = []
-    updateDisabledState(true)
-  } finally {
-    loading.value = false
-  }
-}
-
-function validateResultLimit(count) {
-  const limits = ROLE_LIMITS[userStore.role] || ROLE_LIMITS.anonymous
-
-  if (count > limits.MAX_RESULTS) {
-    limitHint.value = userStore.role === 'anonymous'
-      ? `查詢結果過多(${count}>${limits.MAX_RESULTS})，登錄可查詢更多組合`
-      : `查詢結果過多(${count}>${limits.MAX_RESULTS})，請減少組合`
-    updateDisabledState(true)
-  } else {
-    limitHint.value = ''
-    updateDisabledState(false)
-  }
-}
-
-function formatTitle(queryStr) {
-  if (!queryStr) return ''
-  const matches = [...queryStr.matchAll(/\[(.*?)]\{(.*?)\}/g)]
-  if (matches.length > 0) {
-    const removeKeys = ['清濁', '入', '部位', '方式', '調']
-    return matches.map(m => {
-      let key = m[2]
-      if (removeKeys.includes(key)) key = ''
-      return `${m[1]}${key}`
-    }).join('·')
-  }
-  return queryStr
-}
 
 defineExpose({ pathStrings, chars })
 </script>
@@ -265,7 +128,7 @@ defineExpose({ pathStrings, chars })
 .zhonggu-direct-input {
   background: none;
   width: 80dvw;
-  max-width:600px;
+  max-width: 600px;
   margin: 10px 0;
   padding: 12px;
   display: flex;
@@ -285,7 +148,8 @@ defineExpose({ pathStrings, chars })
 .input-label-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap:16px;
 }
 
 .input-label {
@@ -390,103 +254,5 @@ defineExpose({ pathStrings, chars })
   color: #ff9500;
   font-size: 12px;
   line-height: 1.4;
-}
-
-.info-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-light, #eee);
-  color: var(--text-medium, #555);
-  font-size: 13px;
-}
-
-.global-expand-btn {
-  background: var(--color-blue-custom-light, rgba(0,122,255,0.1));
-  color: var(--color-blue-custom, #007aff);
-  border: none;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.global-expand-btn:hover {
-  background: var(--color-blue-custom, #007aff);
-  color: #fff;
-}
-
-.status-msg {
-  text-align: center;
-  color: var(--text-muted, #999);
-  font-size: 14px;
-  width: 100%;
-}
-
-.compact-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 6px;
-  width: 100%;
-}
-
-.compact-item {
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-  overflow: hidden;
-  font-size: 14px;
-  padding: 8px;
-  border-radius: 8px;
-  background: var(--glass-lighter);
-  transition: background 0.2s;
-}
-
-.compact-item:hover {
-  background: var(--glass-medium-strong);
-}
-
-.compact-title {
-  font-weight: bold;
-  color: var(--text-dark);
-  margin-right: 4px;
-}
-
-.compact-count {
-  color: var(--color-blue-custom, #007aff);
-  font-size: 0.9em;
-  margin-right: 8px;
-  font-weight: 600;
-}
-
-.compact-preview {
-  color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-}
-
-.limit-warning {
-  padding: 12px;
-  background: var(--color-error-bg);
-  border: 1px solid var(--color-error-border);
-  color: var(--color-error);
-  border-radius: 12px;
-  font-size: 14px;
-  text-align: center;
-  font-weight: 600;
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 </style>
