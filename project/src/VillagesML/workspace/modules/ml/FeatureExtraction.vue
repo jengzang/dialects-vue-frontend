@@ -103,7 +103,7 @@
             @click="toggleVillage(village)"
             :class="['village-item', { selected: isSelected(village.id) }]"
           >
-            <input type="checkbox" :checked="isSelected(village.id)" @click.stop="toggleVillage(village)">
+            <CheckBox :model-value="isSelected(village.id)" @update:modelValue="toggleVillage(village)" />
             <div class="village-info">
               <div class="village-main">
                 <span class="village-name">{{ village.name }}</span>
@@ -133,11 +133,16 @@
         <h3>特徵類型</h3>
       </div>
       <div class="feature-types">
-        <label v-for="type in featureTypes" :key="type.value" class="feature-type-item">
-          <input type="checkbox" v-model="selectedFeatureTypes" :value="type.value">
+        <CheckBox
+          v-for="type in featureTypes"
+          :key="type.value"
+          :model-value="selectedFeatureTypes.includes(type.value)"
+          class="feature-type-item"
+          @update:modelValue="toggleFeatureType(type.value, $event)"
+        >
           <span class="type-label">{{ type.label }}</span>
           <span class="type-desc">{{ type.description }}</span>
-        </label>
+        </CheckBox>
       </div>
     </div>
 
@@ -157,7 +162,7 @@
           </div>
           <div class="control-item">
             <label>標準化:</label>
-            <input type="checkbox" v-model="normalize">
+            <CheckBox :model-value="normalize" @update:modelValue="normalize = $event" />
             <span>對特徵向量進行標準化</span>
           </div>
         </div>
@@ -377,6 +382,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
@@ -435,6 +441,16 @@ const featureTypes = [
   { value: 'spatial', label: '空間特徵', description: '經緯度坐標' },
   { value: 'character', label: '字符特徵', description: 'Top-20 高頻字符' }
 ]
+
+const toggleFeatureType = (value, checked) => {
+  if (checked) {
+    if (!selectedFeatureTypes.value.includes(value)) {
+      selectedFeatureTypes.value.push(value)
+    }
+    return
+  }
+  selectedFeatureTypes.value = selectedFeatureTypes.value.filter(item => item !== value)
+}
 
 const aggregationMethodOptions = [
   { label: '平均值 (Mean)', value: 'mean' },
@@ -1263,10 +1279,6 @@ onBeforeUnmount(() => {
   background: rgba(74, 144, 226, 0.1);
 }
 
-.village-item input[type="checkbox"] {
-  flex-shrink: 0;
-}
-
 .village-info {
   flex: 1;
   display: flex;
@@ -1346,12 +1358,6 @@ onBeforeUnmount(() => {
   border-color: rgba(74, 144, 226, 0.4);
 }
 
-.feature-type-item input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
 .type-label {
   font-weight: 600;
   color: var(--text-primary);
@@ -1389,12 +1395,6 @@ onBeforeUnmount(() => {
   font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
-}
-
-.control-item input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
 }
 
 .control-item span {

@@ -47,19 +47,19 @@
         <label>中心性指標：<span class="required-hint">（至少選擇一個）</span></label>
         <div class="checkbox-group">
           <label class="checkbox-label">
-            <input type="checkbox" value="degree" v-model="selectedMetrics" />
+            <CheckBox :model-value="selectedMetrics.includes('degree')" @update:modelValue="toggleMetric('degree', $event)" />
             度中心性
           </label>
           <label class="checkbox-label">
-            <input type="checkbox" value="betweenness" v-model="selectedMetrics" />
+            <CheckBox :model-value="selectedMetrics.includes('betweenness')" @update:modelValue="toggleMetric('betweenness', $event)" />
             介數中心性
           </label>
           <label class="checkbox-label">
-            <input type="checkbox" value="closeness" v-model="selectedMetrics" />
+            <CheckBox :model-value="selectedMetrics.includes('closeness')" @update:modelValue="toggleMetric('closeness', $event)" />
             接近中心性
           </label>
           <label class="checkbox-label">
-            <input type="checkbox" value="eigenvector" v-model="selectedMetrics" />
+            <CheckBox :model-value="selectedMetrics.includes('eigenvector')" @update:modelValue="toggleMetric('eigenvector', $event)" />
             特徵向量中心性
           </label>
         </div>
@@ -101,6 +101,7 @@ import { userStore } from '@/main/store/store.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const props = defineProps({
   loading: { type: Boolean, default: false },
@@ -112,6 +113,16 @@ const emit = defineEmits(['run'])
 const settings = reactive(villagesMLStore.semanticSettings)
 const selectedMetrics = ref(settings.centrality_metrics || ['degree', 'betweenness'])
 const isAuthenticated = computed(() => userStore.isAuthenticated)
+
+const toggleMetric = (metric, checked) => {
+  if (checked) {
+    if (!selectedMetrics.value.includes(metric)) {
+      selectedMetrics.value.push(metric)
+    }
+    return
+  }
+  selectedMetrics.value = selectedMetrics.value.filter(item => item !== metric)
+}
 
 // Region level options
 const regionLevelOptions = [
@@ -246,12 +257,6 @@ const runAnalysis = () => {
   gap: 8px;
   font-size: 14px;
   color: var(--text-primary);
-  cursor: pointer;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
   cursor: pointer;
 }
 

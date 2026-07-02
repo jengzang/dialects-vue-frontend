@@ -394,7 +394,7 @@
         "success": "Excel file exported",
         "noData": "No analysis results available for export",
         "fileName": "方音圖鑑_T值法定調_{timestamp}.xlsx",
-        "sheetName": "石峰T值分析",
+        "sheetName": "石鋒T值分析",
         "columns": {
           "time": "時間 (ms)"
         }

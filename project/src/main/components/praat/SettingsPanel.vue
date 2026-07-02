@@ -4,12 +4,14 @@
     <div class="setting-group">
       <label class="setting-label">{{ t('praat.settings.modules.label') }}</label>
       <div class="module-checkboxes">
-        <label class="checkbox-option" v-for="module in availableModules"
-               :key="module.value">
-          <input type="checkbox" :value="module.value"
-                 v-model="localSettings.modules" />
-          <span>{{ module.label }}</span>
-        </label>
+        <CheckBox
+          v-for="module in availableModules"
+          :key="module.value"
+          :model-value="localSettings.modules.includes(module.value)"
+          :label="module.label"
+          class="checkbox-option"
+          @update:modelValue="toggleModule(module.value, $event)"
+        />
       </div>
     </div>
 
@@ -166,16 +168,18 @@
         </div>
       </div>
       <div class="checkbox-options">
-        <label class="checkbox-option">
-          <input type="checkbox"
-                 v-model="localSettings.output_options.include_timeseries" />
-          <span>{{ t('praat.settings.output.includeTimeseries') }}</span>
-        </label>
-        <label class="checkbox-option">
-          <input type="checkbox"
-                 v-model="localSettings.output_options.include_summary" />
-          <span>{{ t('praat.settings.output.includeSummary') }}</span>
-        </label>
+        <CheckBox
+          :model-value="localSettings.output_options.include_timeseries"
+          :label="t('praat.settings.output.includeTimeseries')"
+          class="checkbox-option"
+          @update:modelValue="localSettings.output_options.include_timeseries = $event"
+        />
+        <CheckBox
+          :model-value="localSettings.output_options.include_summary"
+          :label="t('praat.settings.output.includeSummary')"
+          class="checkbox-option"
+          @update:modelValue="localSettings.output_options.include_summary = $event"
+        />
       </div>
     </div>
   </div>
@@ -183,6 +187,7 @@
 
 <script setup>
 import { computed, reactive, watch, ref, onMounted } from 'vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
@@ -233,6 +238,16 @@ const localSettings = reactive(JSON.parse(JSON.stringify(props.settings)))
 
 // 当前选中的模式
 const currentResolutionMode = ref('standard')
+
+const toggleModule = (moduleValue, checked) => {
+  if (checked) {
+    if (!localSettings.modules.includes(moduleValue)) {
+      localSettings.modules.push(moduleValue)
+    }
+    return
+  }
+  localSettings.modules = localSettings.modules.filter(value => value !== moduleValue)
+}
 
 // 根据当前设置推断初始模式
 const detectCurrentMode = () => {
@@ -368,10 +383,6 @@ watch(localSettings, (newSettings) => {
 
 .checkbox-option:hover {
   background: var(--glass-medium);
-}
-
-.checkbox-option input[type="checkbox"] {
-  cursor: pointer;
 }
 
 .param-grid {

@@ -234,14 +234,17 @@
                   </span>
                 </td>
                 <td>
-                  <label class="toggle-switch input-switch-base">
-                    <input
-                      type="checkbox"
-                      v-model="rule.enabled"
-                      @change="updateStats"
-                    />
-                    <span class="toggle-slider input-switch-slider-base"></span>
-                  </label>
+                  <SwitchToggle
+                    :model-value="rule.enabled"
+                    :width="44"
+                    :height="22"
+                    :thumb-size="16"
+                    color="blue"
+                    variant="solid"
+                    :aria-label="t('tools.jyut2ipa.modal.headers.enabled')"
+                    @update:modelValue="rule.enabled = $event"
+                    @change="updateStats"
+                  />
                 </td>
                 <td>
                   <button
@@ -286,6 +289,7 @@
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
@@ -1197,52 +1201,6 @@ loadConfig()
   color: #065f46;
 }
 
-/* Toggle开关 */
-.jyut2ipa-toggle-switch-unused {
-  position: relative;
-  width: 44px;
-  height: 22px;
-  display: inline-block;
-}
-
-.jyut2ipa-toggle-switch-unused input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.jyut2ipa-toggle-slider-unused {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: 0.3s;
-  border-radius: 22px;
-}
-
-.jyut2ipa-toggle-slider-unused:before {
-  position: absolute;
-  content: '';
-  height: 16px;
-  width: 16px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.3s;
-  border-radius: 50%;
-}
-
-.jyut2ipa-toggle-switch-unused input:checked + .jyut2ipa-toggle-slider-unused {
-  background-color: #007aff;
-}
-
-.jyut2ipa-toggle-switch-unused input:checked + .jyut2ipa-toggle-slider-unused:before {
-  transform: translateX(22px);
-}
-
 /* 删除按钮 */
 .btn-delete {
   padding: 5px 10px;
@@ -1538,16 +1496,6 @@ loadConfig()
   .rules-table th,
   .rules-table td {
     padding: 8px 6px;
-  }
-
-  .toggle-switch {
-    width: 42px;
-    height: 22px;
-  }
-
-  .toggle-slider:before {
-    width: 18px;
-    height: 18px;
   }
 
   .jyut2ipa-config-footer {

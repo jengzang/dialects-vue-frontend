@@ -35,13 +35,12 @@
         </div>
 
         <!-- Reference Vowels Checkbox -->
-        <label class="reference-vowels-checkbox">
-          <input
-            type="checkbox"
-            v-model="showReferenceVowels"
-          />
-          <span class="segment-label">{{ t('praat.vowelSpace.controls.showReferenceVowels') }}</span>
-        </label>
+        <CheckBox
+          :model-value="showReferenceVowels"
+          :label="t('praat.vowelSpace.controls.showReferenceVowels')"
+          class="reference-vowels-checkbox"
+          @update:modelValue="showReferenceVowels = $event"
+        />
       </div>
     </div>
 
@@ -55,34 +54,32 @@
 
       <div v-else class="segment-list">
         <!-- Select All Checkbox -->
-        <label class="segment-checkbox main-glass-panel-inner">
-          <input
-            type="checkbox"
-            :checked="showAll"
-            @change="toggleAll"
-          />
-          <span class="segment-label">{{ t('praat.vowelSpace.segments.selectAll') }}</span>
-        </label>
+        <CheckBox
+          :model-value="showAll"
+          :label="t('praat.vowelSpace.segments.selectAll')"
+          class="segment-checkbox main-glass-panel-inner"
+          @update:modelValue="toggleAll"
+        />
 
         <!-- Individual Segment Checkboxes -->
-        <label
+        <div
           v-for="seg in vowelSegments"
           :key="seg.id"
           class="segment-checkbox main-glass-panel-inner"
         >
-          <input
-            type="checkbox"
-            :checked="selectedSegments.has(seg.id)"
-            @change="toggleSegment(seg.id)"
-          />
-          <span class="segment-color-indicator" :style="{ backgroundColor: getSegmentColor(seg.id) }"></span>
-          <span class="segment-label">
-            {{ seg.label }} ({{ seg.timeRange }})
-          </span>
-          <span class="segment-type-badge" :class="`type-${seg.type}`">
-            {{ getSegmentTypeLabel(seg.type) }}
-          </span>
-        </label>
+          <CheckBox
+            :model-value="selectedSegments.has(seg.id)"
+            @update:modelValue="toggleSegment(seg.id)"
+          >
+            <span class="segment-color-indicator" :style="{ backgroundColor: getSegmentColor(seg.id) }"></span>
+            <span class="segment-label">
+              {{ seg.label }} ({{ seg.timeRange }})
+            </span>
+            <span class="segment-type-badge" :class="`type-${seg.type}`">
+              {{ getSegmentTypeLabel(seg.type) }}
+            </span>
+          </CheckBox>
+        </div>
       </div>
     </div>
 
@@ -144,6 +141,7 @@ import * as echarts from 'echarts'
 import { useI18n } from 'vue-i18n'
 import referenceVowelsData from '@/assets/data/vowels.json'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const props = defineProps({
   results: {

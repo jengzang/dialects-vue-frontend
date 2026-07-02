@@ -43,7 +43,7 @@ import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 const route = useRoute();
 const isSidebarOpen = ref(false);
 const authButtonPosition = ref('top-right');
-const showTutorialGuide = computed(() => route.path === '/explore/tools/praat')
+const showTutorialGuide = computed(() => route.path.endsWith('/explore/tools/praat'))
 
 // 根据路由自动设置 auth-button 位置
 watch(() => route.path, (newPath) => {

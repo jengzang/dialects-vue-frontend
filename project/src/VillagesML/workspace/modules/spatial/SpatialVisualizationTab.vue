@@ -18,32 +18,20 @@
           <div class="section">
             <h3>圖層選擇</h3>
             <div class="layer-checkboxes">
-              <label class="checkbox-item">
-                <input type="checkbox" v-model="layers.hotspots" @change="onLayerChange">
-                <span>🔴 空間熱點</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" v-model="layers.clusters" @change="onLayerChange">
-                <span>🔵 空間聚類</span>
-              </label>
+              <CheckBox :model-value="layers.hotspots" label="🔴 空間熱點" class="checkbox-item" @update:modelValue="updateLayer('hotspots', $event)" />
+              <CheckBox :model-value="layers.clusters" label="🔵 空間聚類" class="checkbox-item" @update:modelValue="updateLayer('clusters', $event)" />
               <div v-if="layers.clusters && availableRuns.length" class="run-selector-inline">
                 <SimpleSelectDropdown :match-trigger-width="true"
                   v-model="selectedRunId"
                   :options="runOptions"
+                  width="220px"
+                  @update:modelValue="loadData"
                   style="margin-bottom:0"
                 />
               </div>
-              <label class="checkbox-item">
-                <input type="checkbox" v-model="layers.characters" @change="onLayerChange">
-                <span>🟡 字符傾向</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" v-model="layers.ngrams" @change="onLayerChange">
-                <span>🟢 N-gram 分佈</span>
-              </label>
+              <CheckBox :model-value="layers.characters" label="🟡 字符傾向" class="checkbox-item" @update:modelValue="updateLayer('characters', $event)" />
+              <CheckBox :model-value="layers.ngrams" label="🟢 N-gram 分佈" class="checkbox-item" @update:modelValue="updateLayer('ngrams', $event)" />
             </div>
-<!--            <p class="layer-note">💡 提示：如需字符-聚類整合分析，請使用「空間整合」標籤頁</p>-->
-          </div>
 
           <!-- N-gram 過濾器 -->
           <div v-if="layers.ngrams" class="section">
@@ -156,6 +144,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'
 import SpatialMap from './SpatialMap.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
@@ -241,6 +230,11 @@ const hasActiveLayers = computed(() => {
 })
 
 // 圖層變化處理
+const updateLayer = (key, checked) => {
+  layers.value[key] = checked
+  onLayerChange()
+}
+
 const onLayerChange = () => {
   // 如果取消所有圖層，重置地圖
   if (!hasActiveLayers.value) {
@@ -760,10 +754,6 @@ h2 {
 
 .checkbox-item:hover {
   background: rgba(74, 144, 226, 0.05);
-}
-
-.checkbox-item input[type="checkbox"] {
-  cursor: pointer;
 }
 
 .checkbox-item span {

@@ -447,16 +447,16 @@
           <div class="control-row feature-selector">
             <label>聚類特徵:</label>
             <div class="feature-checkboxes">
-              <label v-for="option in clusterFeatureOptions" :key="option.value" class="feature-checkbox">
-                <input
-                  type="checkbox"
-                  :value="option.value"
-                  v-model="clusterFeatures"
-                  class="checkbox-input"
-                >
+              <CheckBox
+                v-for="option in clusterFeatureOptions"
+                :key="option.value"
+                :model-value="clusterFeatures.includes(option.value)"
+                class="feature-checkbox"
+                @update:modelValue="toggleClusterFeature(option.value, $event)"
+              >
                 <span class="checkbox-label">{{ option.label }}</span>
                 <span class="checkbox-desc">{{ option.description }}</span>
-              </label>
+              </CheckBox>
             </div>
           </div>
           <button
@@ -523,6 +523,7 @@
 
 <script setup>
 import { ref, computed, nextTick, onBeforeUnmount } from 'vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import { clusterSubset, compareSubsets as compareSubsetsAPI, searchVillages } from '@/api/index.js'
@@ -631,6 +632,16 @@ const clusterFeatureOptions = [
   { label: '語義特徵', value: 'semantic', description: '九大語義類別（水系、山地、方位等）' },
   { label: '形態學特徵', value: 'morphology', description: '名稱長度' }
 ]
+
+const toggleClusterFeature = (value, checked) => {
+  if (checked) {
+    if (!clusterFeatures.value.includes(value)) {
+      clusterFeatures.value.push(value)
+    }
+    return
+  }
+  clusterFeatures.value = clusterFeatures.value.filter(item => item !== value)
+}
 
 // Chart refs
 const comparisonChart = ref(null)
@@ -1611,13 +1622,6 @@ const handleApiError = (error) => {
 
 .feature-checkbox:hover {
   background: rgba(74, 144, 226, 0.1);
-}
-
-.checkbox-input {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: #4a90e2;
 }
 
 .checkbox-label {

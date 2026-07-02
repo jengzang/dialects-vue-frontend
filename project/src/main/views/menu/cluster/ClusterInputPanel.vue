@@ -35,13 +35,12 @@
         @update:run-disabled="locationInputDisabled = $event"
       />
       <div class="inline-toggle-row">
-        <label class="inline-toggle">
-          <input
-            v-model="workspaceState.requestDraft.include_special_locations"
-            type="checkbox"
-          >
-          <span>{{ t('cluster.input.includeSpecialLocations') }}</span>
-        </label>
+        <CheckBox
+          :model-value="workspaceState.requestDraft.include_special_locations"
+          :label="t('cluster.input.includeSpecialLocations')"
+          class="inline-toggle"
+          @update:modelValue="workspaceState.requestDraft.include_special_locations = $event"
+        />
       </div>
     </div>
 
@@ -196,6 +195,7 @@
 </template>
 
 <script setup>
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { useI18n } from 'vue-i18n'
 import ChoiceSelector from '@/components/selector/ChoiceSelector.vue'
 import DropdownValueSelector from '@/main/components/query/DropdownValueSelector.vue'

@@ -118,7 +118,7 @@ const props = defineProps({
 })
 const { t } = useI18n()
 const PITCH_TONE_EXPORT_FILE_PREFIX = '方音圖鑑_T值法定調_'
-const PITCH_TONE_EXPORT_SHEET_NAME = '石峰T值分析'
+const PITCH_TONE_EXPORT_SHEET_NAME = '石鋒T值分析'
 const PITCH_TONE_EXPORT_TIME_COLUMN = '時間 (ms)'
 
 // === 狀態變量 ===
@@ -447,7 +447,7 @@ const clearAll = () => {
   }
 }
 
-// === 3. 石峰 T 值分析算法 ===
+// === 3. 石鋒 T 值分析算法 ===
 const performTValueAnalysis = () => {
   if (savedTones.value.length === 0) return
 

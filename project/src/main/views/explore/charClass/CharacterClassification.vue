@@ -280,7 +280,7 @@ const normalizeState = (tableKey, levelKeys) => {
 }
 
 const syncUrlToState = (state) => {
-  if (route.path !== '/explore/char-class') {
+  if (!route.path.endsWith('/explore/char-class')) {
     return
   }
 
@@ -480,7 +480,7 @@ const resetPageState = () => {
 }
 
 const applyRouteState = () => {
-  if (route.path !== '/explore/char-class') {
+  if (!route.path.endsWith('/explore/char-class')) {
     return
   }
 

@@ -60,7 +60,7 @@ function normalizeCharacterTableTab(currentRoute) {
 
 export const tutorialManifest = [
   createQueryEntry({
-    key: 'auth-login',
+    key: 'auth-operation',
     groupKey: 'account',
     order: 0,
     path: '/auth',
@@ -68,47 +68,23 @@ export const tutorialManifest = [
     expectedValue: 'login',
   }),
   createQueryEntry({
-    key: 'auth-register',
+    key: 'auth-info',
     groupKey: 'account',
     order: 1,
     path: '/auth',
     queryResolver: normalizeAuthView,
-    expectedValue: 'register',
-  }),
-  createQueryEntry({
-    key: 'auth-overview',
-    groupKey: 'account',
-    order: 2,
-    path: '/auth',
-    queryResolver: normalizeAuthView,
     expectedValue: 'overview',
-  }),
-  createQueryEntry({
-    key: 'auth-leaderboard',
-    groupKey: 'account',
-    order: 3,
-    path: '/auth',
-    queryResolver: normalizeAuthView,
-    expectedValue: 'leaderboard',
-  }),
-  createQueryEntry({
-    key: 'auth-modify',
-    groupKey: 'account',
-    order: 4,
-    path: '/auth',
-    queryResolver: normalizeAuthView,
-    expectedValue: 'modify',
   }),
   createPathEntry({
     key: 'auth-data',
     groupKey: 'account',
-    order: 5,
+    order: 2,
     path: '/auth/data',
   }),
   createPathEntry({
     key: 'auth-regions',
     groupKey: 'account',
-    order: 6,
+    order: 3,
     path: '/auth/regions',
   }),
   createPathEntry({
@@ -225,42 +201,30 @@ export const tutorialManifest = [
     order: 25,
     path: '/menu/about/settings',
   }),
-  createPathEntry({
-    key: 'menu-source',
-    groupKey: 'menuResources',
-    order: 26,
-    path: '/menu/source',
-  }),
-  createPathEntry({
-    key: 'menu-privacy',
-    groupKey: 'menuResources',
-    order: 27,
-    path: '/menu/privacy',
-  }),
-  createPathEntry({
-    key: 'menu-tools',
-    groupKey: 'menuResources',
-    order: 28,
-    path: '/menu/tools',
-  }),
-  createPathEntry({
-    key: 'menu-words',
-    groupKey: 'menuResources',
-    order: 29,
-    path: '/menu/words',
-  }),
+  // createPathEntry({
+  //   key: 'menu-source',
+  //   groupKey: 'menuResources',
+  //   order: 26,
+  //   path: '/menu/source',
+  // }),
+  // createPathEntry({
+  //   key: 'menu-privacy',
+  //   groupKey: 'menuResources',
+  //   order: 27,
+  //   path: '/menu/privacy',
+  // }),
   createPathEntry({
     key: 'menu-villages',
     groupKey: 'menuResources',
     order: 30,
     path: '/menu/villages',
   }),
-  createPathEntry({
-    key: 'menu-cluster',
-    groupKey: 'menuResources',
-    order: 31,
-    path: '/menu/cluster',
-  }),
+  // createPathEntry({
+  //   key: 'menu-cluster',
+  //   groupKey: 'menuResources',
+  //   order: 31,
+  //   path: '/menu/cluster',
+  // }),
   createPathEntry({
     key: 'explore-check',
     groupKey: 'exploreTools',
@@ -278,12 +242,6 @@ export const tutorialManifest = [
     groupKey: 'exploreTools',
     order: 34,
     path: '/explore/tools/merge',
-  }),
-  createPathEntry({
-    key: 'explore-manage',
-    groupKey: 'exploreTools',
-    order: 35,
-    path: '/explore/manage',
   }),
   createQueryEntry({
     key: 'explore-praat-upload',
@@ -383,10 +341,10 @@ export const tutorialManifest = [
     order: 48,
     path: '/explore/villages/table',
   }),
-  createPathEntry({
-    key: 'explore-villages-yc',
-    groupKey: 'exploreVillages',
-    order: 49,
-    path: '/explore/villages/yc',
-  }),
+  // createPathEntry({
+  //   key: 'explore-villages-yc',
+  //   groupKey: 'exploreVillages',
+  //   order: 49,
+  //   path: '/explore/villages/yc',
+  // }),
 ]

@@ -330,7 +330,7 @@
     }
   },
   "pitchTone": {
-    "title": "石峰 T 值分析器",
+    "title": "石鋒 T 值分析器",
     "noData": {
       "text": "請先上傳音訊並完成 Praat 分析"
     },
@@ -378,7 +378,7 @@
       },
       "exportButton": "匯出 Excel",
       "chart": {
-        "title": "石峰 T 值曲線",
+        "title": "石鋒 T 值曲線",
         "tooltipTime": "時間: {time} ms",
         "xAxis": "時間 (ms)",
         "yAxis": "五度值 (T)",
@@ -388,13 +388,13 @@
           "restore": "重置",
           "saveAsImage": "另存為圖片"
         },
-        "imageName": "石峰T值分析"
+        "imageName": "石鋒T值分析"
       },
       "export": {
         "success": "已匯出 Excel 檔案",
         "noData": "沒有可匯出的分析結果",
         "fileName": "方音圖鑑_T值法定調_{timestamp}.xlsx",
-        "sheetName": "石峰T值分析",
+        "sheetName": "石鋒T值分析",
         "columns": {
           "time": "時間 (ms)"
         }
