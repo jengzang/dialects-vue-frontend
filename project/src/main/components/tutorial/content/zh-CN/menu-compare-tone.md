@@ -4,11 +4,6 @@
 
 ## 基本操作
 
-![比較調類——珠三角陽上、陰去合併](/tutorial/menu-compare-tone/01-overview.jpg)
-
-![南方方言陰入、陽入合併情況](/tutorial/menu-compare-tone/02-overall.jpg)
-
-
 1. 在调类勾选区勾选第一个调类（如阴上）
 2. 再勾选第二个调类（如阳上）
 3. 输入地点或分区
@@ -40,3 +35,7 @@
 - 有些方言点资料中没有注明某些调类（如阳上），会显示无数据
 - 如需查看完整调类系统，先用「查调」
 - 可一次性分析多个地点，观察区域性的调类归并趋势
+
+![比較調類——珠三角陽上、陰去合併](/tutorial/menu-compare-tone/01-overview.jpg)
+
+![南方方言陰入、陽入合併情況](/tutorial/menu-compare-tone/02-overall.jpg)

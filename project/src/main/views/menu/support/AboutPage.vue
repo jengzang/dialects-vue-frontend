@@ -478,6 +478,7 @@ function resolveTabRoute(tabName) {
   font-size: 1.8rem;
   font-weight: bold;
   margin-top: 3rem!important;
+  margin-bottom: 0.5rem!important;
   // color: #007aff;
 }
 .about-page-wrapper {
@@ -692,7 +693,7 @@ em {
 .thoughts {
   p {
     max-width: 800px;
-    margin: 40px auto;
+    margin: 20px auto;
     padding: 20px;
     border-radius: 8px;
     color: #333;

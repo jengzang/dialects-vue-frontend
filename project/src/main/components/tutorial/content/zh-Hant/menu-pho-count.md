@@ -9,13 +9,6 @@
 
 ## 結果展示
 
-![餅圖——各音節佔比](/tutorial/menu-pho-count/01-pie.jpg)
-
-![散點圖——音節數量與地點數關係](/tutorial/menu-pho-count/02-scatter.jpg)
-
-![逐地點明細——聲韻調數目](/tutorial/menu-pho-count/03-detail.jpg)
-
-
 ### 全量數據（預設）
 
 - **餅圖**：查看各音節佔比，點擊可彈窗查看具體音節來源
@@ -39,3 +32,9 @@
 
 - 上方匯總是跨地點加總，下方明細是單地點數據
 - 不輸入地點時預設展示全量所有地點的統計
+
+![餅圖——各音節佔比](/tutorial/menu-pho-count/01-pie.jpg)
+
+![散點圖——音節數量與地點數關係](/tutorial/menu-pho-count/02-scatter.jpg)
+
+![逐地點明細——聲韻調數目](/tutorial/menu-pho-count/03-detail.jpg)

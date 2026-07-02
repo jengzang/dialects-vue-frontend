@@ -4,17 +4,6 @@
 
 ## 基本操作
 
-![查中古輸入頁面](/tutorial/menu-query-zhonggu/01-input.jpg)
-
-![查中古結果頁面——按中古地位分組展示](/tutorial/menu-query-zhonggu/02-result.jpg)
-
-![地圖頁面——方言數據空間分布](/tutorial/menu-query-zhonggu/03-map.jpg)
-
-![文白讀顏色標注：紅文讀、藍白讀](/tutorial/menu-query-zhonggu/04-wenbai.jpg)
-
-![右下角切換顯示模式：全顯 vs 主體](/tutorial/menu-query-zhonggu/05-display-mode.jpg)
-
-
 1. 选择分析维度：声母、韵母或声调
 2. 选择中古地位条件，可从摄、韵、等、呼、清浊、系、组、母、舒入、调、部位、方式共 12 种类型中选择
 3. 选择多种条件时，系统自动计算笛卡尔积（所有选项相互组合）
@@ -58,3 +47,13 @@
 - 结果太多时先加分區缩小范围；结果太少时减少条件数量
 - 按鈕灰色時通常表示中古条件尚未形成有效查询
 - 想从字形出发查读音用「查字」；想从音值倒推中古来源用「查音位」
+
+![查中古輸入頁面](/tutorial/menu-query-zhonggu/01-input.jpg)
+
+![查中古結果頁面——按中古地位分組展示](/tutorial/menu-query-zhonggu/02-result.jpg)
+
+![地圖頁面——方言數據空間分布](/tutorial/menu-query-zhonggu/03-map.jpg)
+
+![文白讀顏色標注：紅文讀、藍白讀](/tutorial/menu-query-zhonggu/04-wenbai.jpg)
+
+![右下角切換顯示模式：全顯 vs 主體](/tutorial/menu-query-zhonggu/05-display-mode.jpg)

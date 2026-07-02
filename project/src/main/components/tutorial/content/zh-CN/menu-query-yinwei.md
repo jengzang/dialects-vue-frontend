@@ -4,13 +4,6 @@
 
 ## 基本操作
 
-![查音位輸入頁面](/tutorial/menu-query-yinwei/01-input.jpg)
-
-![查音位結果——中古來源分布](/tutorial/menu-query-yinwei/02-result.jpg)
-
-![地圖模式——音位地理分布](/tutorial/menu-query-yinwei/03-map.jpg)
-
-
 1. 点击卡片选择要整理的维度（声母/韵母/声调等分类方式）
 2. 输入待查的音节（如 `a`、`h`、`ɐu`）
 3. 输入地点或分区
@@ -40,3 +33,9 @@
 - 此功能计算复杂度较高，地点太多时容易超时，建议先减少地点多试几次
 - 与查中古的区别：查音位是从实际读音出发，适合做音类分合的探索性分析
 - 如果只是想查看某个字的读音，用「查字」更直接
+
+![查音位輸入頁面](/tutorial/menu-query-yinwei/01-input.jpg)
+
+![查音位結果——中古來源分布](/tutorial/menu-query-yinwei/02-result.jpg)
+
+![地圖模式——音位地理分布](/tutorial/menu-query-yinwei/03-map.jpg)

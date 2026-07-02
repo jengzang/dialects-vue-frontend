@@ -10,11 +10,6 @@ Praat 声学分析的入口。上传语音文件或直接录音，截取分段�
 
 ## 上传语音
 
-![上傳語音檔案或直接錄音](/tutorial/explore-praat-upload/01-upload.jpg)
-
-![在波形上拖動截取分段](/tutorial/explore-praat-upload/02-segment.jpg)
-
-
 - 拖动文件或点击「选择文件」上传
 - 支持 WAV、MP3、M4A、WebM、OGG、FLAC、AAC 等多种格式
 - 也可以直接在网站上录音，无需预先准备文件
@@ -42,3 +37,7 @@ Praat 声学分析的入口。上传语音文件或直接录音，截取分段�
 - 只有当前选中的片段会进入分析，不会自动分析所有片段
 - 手机录音音质通常好于电脑自带麦克风
 - 上传较慢，请耐心等待
+
+![上傳語音檔案或直接錄音](/tutorial/explore-praat-upload/01-upload.jpg)
+
+![在波形上拖動截取分段](/tutorial/explore-praat-upload/02-segment.jpg)

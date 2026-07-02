@@ -4,11 +4,6 @@
 
 ## 基本操作
 
-![字表檢查——自動分析錯誤統計](/tutorial/explore-check/01-overview.jpg)
-
-![編輯模式——在線修改與批量替換](/tutorial/explore-check/02-edit.jpg)
-
-
 1. 登入帳號
 2. 選擇數據格式（音典、跳跳老鼠、縣誌）
 3. 上傳檔案（支持 .xlsx、.xls、.doc、.docx、.tsv，單檔案上限 3 MB）
@@ -42,3 +37,7 @@
 - 格式選錯會整份資料錯誤拆欄，上傳前務必確認
 - 退出編輯模式時未儲存的修改會被清空
 - 伺服器做了限流，上傳載入較慢請耐心等待
+
+![字表檢查——自動分析錯誤統計](/tutorial/explore-check/01-overview.jpg)
+
+![編輯模式——在線修改與批量替換](/tutorial/explore-check/02-edit.jpg)

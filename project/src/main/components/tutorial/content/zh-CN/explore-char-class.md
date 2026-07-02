@@ -13,13 +13,6 @@
 
 ## 基本操作
 
-![漢字字集——中古廣韻樹狀結構](/tutorial/explore-char-class/01-overview.jpg)
-
-![按中古地位逐級展開](/tutorial/explore-char-class/02-tree.jpg)
-
-![顯示廣韻注釋](/tutorial/explore-char-class/03-zhushi.jpg)
-
-
 1. 系统默认停留在中古字表
 2. 在左侧选择预设分组（如韵系、声母、清浊等导向）
 3. 根据需要增减层级或调整层级顺序
@@ -46,3 +39,9 @@
 - 切换字集后重新加载对应数据
 - 广韵注释可以帮助理解各字的中古音韵地位
 - 此页面与「查中古」互补：这里是浏览字表，查中古是按条件搜读音
+
+![漢字字集——中古廣韻樹狀結構](/tutorial/explore-char-class/01-overview.jpg)
+
+![按中古地位逐級展開](/tutorial/explore-char-class/02-tree.jpg)
+
+![顯示廣韻注釋](/tutorial/explore-char-class/03-zhushi.jpg)

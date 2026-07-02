@@ -4,13 +4,6 @@
 
 ## 基本操作
 
-![音素查詢——自選三維分類維度](/tutorial/menu-pho-custom/01-input.jpg)
-
-![按清濁×發聲部位×聲母分類結果](/tutorial/menu-pho-custom/02-result.jpg)
-
-![按開合口×韻攝×等分類結果](/tutorial/menu-pho-custom/03-result2.jpg)
-
-
 1. 选择分析类别：声母、韵母或声调
 2. 输入地点（最多 10 个）
 3. 选择三个分类维度：
@@ -35,3 +28,9 @@
 
 - 切换字表后可选分类栏位会跟着变化
 - 此功能适合做探索性分析，从不同角度观察音系结构
+
+![音素查詢——自選三維分類維度](/tutorial/menu-pho-custom/01-input.jpg)
+
+![按清濁×發聲部位×聲母分類結果](/tutorial/menu-pho-custom/02-result.jpg)
+
+![按開合口×韻攝×等分類結果](/tutorial/menu-pho-custom/03-result2.jpg)

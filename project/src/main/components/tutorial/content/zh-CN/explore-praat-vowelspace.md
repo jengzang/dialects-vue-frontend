@@ -10,9 +10,6 @@
 
 ## 显示模式
 
-![元音空間圖——F1/F2 共振峰繪製](/tutorial/explore-praat-vowelspace/01-overview.jpg)
-
-
 - **分段显示**（默认）：按 rime_core、syllable_like、voiced 三类片段分别着色
 - **全部散点**：所有有效 F1/F2 数据点画到图上，不按片段分色
 
@@ -32,3 +29,5 @@
 - 连续语流模式的元音点非常散，误差较大
 - 如需精确分析，推荐单音节 + 仔细截取
 - 没有 formant 数据时，此页面无法使用
+
+![元音空間圖——F1/F2 共振峰繪製](/tutorial/explore-praat-vowelspace/01-overview.jpg)

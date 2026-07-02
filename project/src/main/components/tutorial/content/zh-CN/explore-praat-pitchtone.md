@@ -4,9 +4,6 @@
 
 ## 基本流程
 
-![T 值五度圖——石鋒法標調結果](/tutorial/explore-praat-pitchtone/01-overview.jpg)
-
-
 1. 确保分析结果中包含基频（pitch）数据
 2. 在音高曲线上框选一段样本（推荐单音节的黄色 rime_core 部分，或连续语流的深蓝色 voiced 段）
 3. 输入调类名称后「加入列表」
@@ -39,3 +36,5 @@
 - 如果没有 pitch 数据，此页面无法使用
 - 一条录音可截取多个调类
 - 推荐使用单音节模式截取韵核部分进行精确分析
+
+![T 值五度圖——石鋒法標調結果](/tutorial/explore-praat-pitchtone/01-overview.jpg)

@@ -4,15 +4,6 @@
 
 ## 基本操作
 
-![音系矩陣輸入頁面](/tutorial/menu-pho-matrix/01-input.jpg)
-
-![完整音系表——聲韻調拼合矩陣](/tutorial/menu-pho-matrix/02-matrix.jpg)
-
-![文白讀顏色標注](/tutorial/menu-pho-matrix/03-wenbai.jpg)
-
-![點擊詳情查看方言點資訊](/tutorial/menu-pho-matrix/04-popup.jpg)
-
-
 1. 输入地点名称（可同时输入多个，最多 10 个）
 2. 等待地点匹配完成
 3. 点击「查询」
@@ -36,3 +27,11 @@
 - 支持全屏查看，尤其适用于移动端小屏幕
 - 网地址同步匹配成功的地点名单，可直接分享链接
 - 如需更灵活的分类方式（自选横纵轴和格内项目），使用「音素查询」
+
+![音系矩陣輸入頁面](/tutorial/menu-pho-matrix/01-input.jpg)
+
+![完整音系表——聲韻調拼合矩陣](/tutorial/menu-pho-matrix/02-matrix.jpg)
+
+![文白讀顏色標注](/tutorial/menu-pho-matrix/03-wenbai.jpg)
+
+![點擊詳情查看方言點資訊](/tutorial/menu-pho-matrix/04-popup.jpg)

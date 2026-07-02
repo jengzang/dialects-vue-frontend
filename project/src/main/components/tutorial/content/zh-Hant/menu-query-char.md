@@ -4,15 +4,6 @@
 
 ## 基本操作
 
-![查字輸入頁面](/tutorial/menu-query-char/01-input.jpg)
-
-![查字結果頁面——各地方言讀音](/tutorial/menu-query-char/02-result.jpg)
-
-![地圖模式——讀音地理分布](/tutorial/menu-query-char/03-map.jpg)
-
-![文白讀顏色標注：藍白讀、紅文讀](/tutorial/menu-query-char/04-wenbai.jpg)
-
-
 1. 在輸入框中鍵入要查詢的漢字（支持繁簡）
 2. 在下方地點/分區區域選擇方言點或分區
 3. 點擊「運行」按鈕，自動跳轉到結果頁面
@@ -48,3 +39,11 @@
 - 地點支持模糊匹配，輸入簡繁均可
 - 輸入行政區劃名稱可匹配該區域所有方言點
 - 與查中古不同：查字以漢字為出發點，直接看讀音
+
+![查字輸入頁面](/tutorial/menu-query-char/01-input.jpg)
+
+![查字結果頁面——各地方言讀音](/tutorial/menu-query-char/02-result.jpg)
+
+![地圖模式——讀音地理分布](/tutorial/menu-query-char/03-map.jpg)
+
+![文白讀顏色標注：藍白讀、紅文讀](/tutorial/menu-query-char/04-wenbai.jpg)

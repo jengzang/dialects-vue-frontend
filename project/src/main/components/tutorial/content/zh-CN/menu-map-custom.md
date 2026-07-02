@@ -4,11 +4,6 @@
 
 ## 补充自定义数据
 
-![添加自定義數據——填入地點與特徵](/tutorial/menu-map-custom/01-add.jpg)
-
-![補充數據前後對比——以東莞流攝為例](/tutorial/menu-map-custom/02-compare.jpg)
-
-
 适用于补充档案中缺少的方言点或特征数据。例如档案里的东莞方言点数据有限，可自己补充。
 
 ### 添加流程
@@ -41,3 +36,7 @@
 - 需登录才能使用
 - 按查询后会自动跳转到地图页显示
 - 帮助按钮内有欄位说明和格式示例
+
+![添加自定義數據——填入地點與特徵](/tutorial/menu-map-custom/01-add.jpg)
+
+![補充數據前後對比——以東莞流攝為例](/tutorial/menu-map-custom/02-compare.jpg)

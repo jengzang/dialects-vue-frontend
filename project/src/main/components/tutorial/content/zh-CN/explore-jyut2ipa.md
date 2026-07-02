@@ -4,11 +4,6 @@
 
 ## 基本操作
 
-![粵拼轉 IPA——自定義轉換規則](/tutorial/explore-jyut2ipa/01-overview.jpg)
-
-![轉換結果預覽](/tutorial/explore-jyut2ipa/02-result.jpg)
-
-
 1. 登录账号
 2. 在设置面板中调整转换规则（可选，默认规则已涵盖常见转换）
 3. 上传 Excel 文件（.xlsx、.xls，单文件上限 3 MB）
@@ -35,3 +30,7 @@
 - 表中必须有「粤拼」列
 - 导入规则后需手动点击储存才能持久化
 - 文件格式不正确或过大时会直接报错
+
+![粵拼轉 IPA——自定義轉換規則](/tutorial/explore-jyut2ipa/01-overview.jpg)
+
+![轉換結果預覽](/tutorial/explore-jyut2ipa/02-result.jpg)

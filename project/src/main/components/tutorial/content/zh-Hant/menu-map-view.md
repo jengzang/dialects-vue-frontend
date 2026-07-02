@@ -11,11 +11,6 @@
 
 ## 功能
 
-![方言地圖——數據空間分布](/tutorial/menu-map-view/01-overview.jpg)
-
-![點擊地圖查看詳情](/tutorial/menu-map-view/02-detail.jpg)
-
-
 - 在地圖上顯示方言點的讀音或特徵數據
 - 支持點聚合顯示，放大後顯示詳細內容
 - 右上角開關切換顯示地名標籤
@@ -37,3 +32,7 @@
 
 - 點擊地圖會把經緯度傳給自定義數據面板，方便添加新數據
 - 未登入時不能開啓「自定義數據」開關
+
+![方言地圖——數據空間分布](/tutorial/menu-map-view/01-overview.jpg)
+
+![點擊地圖查看詳情](/tutorial/menu-map-view/02-detail.jpg)

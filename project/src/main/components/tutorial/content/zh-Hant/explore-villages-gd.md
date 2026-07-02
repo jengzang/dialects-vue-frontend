@@ -6,11 +6,6 @@
 
 ## 基本操作
 
-![廣東自然村樹狀圖——按行政層級展開](/tutorial/explore-villages-gd/01-tree.jpg)
-
-![地圖彈窗——點擊 🌍 查看](/tutorial/explore-villages-gd/02-map.jpg)
-
-
 1. 頁面載入市級清單
 2. 點擊目標市卡片上的「載入」
 3. 逐級展開樹狀結構：市 → 區縣 → 鄉鎮 → 行政村 → 自然村
@@ -43,3 +38,7 @@
 - 地圖上點數少於樹節點數是因為部分村落沒有經緯度
 - 目前只有廣東省數據
 - 瓦片地圖源在國外，可能需要科學上網
+
+![廣東自然村樹狀圖——按行政層級展開](/tutorial/explore-villages-gd/01-tree.jpg)
+
+![地圖彈窗——點擊 🌍 查看](/tutorial/explore-villages-gd/02-map.jpg)

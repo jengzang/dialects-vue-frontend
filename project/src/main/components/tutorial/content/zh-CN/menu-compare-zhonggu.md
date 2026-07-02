@@ -4,13 +4,6 @@
 
 ## 基本操作
 
-![比較中古——加入條件到組1/組2](/tutorial/menu-compare-zhonggu/01-setup.jpg)
-
-![比較中古地圖結果](/tutorial/menu-compare-zhonggu/02-result.jpg)
-
-![點擊彈窗查看具體資訊](/tutorial/menu-compare-zhonggu/03-popup.jpg)
-
-
 1. 选择比较维度：声母、韵母或声调
 2. 在中央条件编辑区组出第一组中古条件
 3. 点击「加入组 1」
@@ -48,3 +41,9 @@
 - 同一组内所有条件的「排除」设置必须一致
 - 第一次使用建议每组只放一条条件，确认流程后再增加
 - 想先单独查看某组条件的结果，先用「查中古」各自查一遍
+
+![比較中古——加入條件到組1/組2](/tutorial/menu-compare-zhonggu/01-setup.jpg)
+
+![比較中古地圖結果](/tutorial/menu-compare-zhonggu/02-result.jpg)
+
+![點擊彈窗查看具體資訊](/tutorial/menu-compare-zhonggu/03-popup.jpg)

@@ -4,11 +4,6 @@
 
 ## 三步流程
 
-![字表合併——上傳參考表與待合併檔案](/tutorial/explore-merge/01-overview.jpg)
-
-![合併結果——按參考表順序排列](/tutorial/explore-merge/02-result.jpg)
-
-
 ### 步驟 1：準備參考表
 
 - 上傳或使用預設參考表
@@ -38,3 +33,7 @@
 - 需登入才能使用
 - 原始數據質量不佳時建議先去「字表檢查」整理
 - 可點擊「重設」清除所有步驟重新開始
+
+![字表合併——上傳參考表與待合併檔案](/tutorial/explore-merge/01-overview.jpg)
+
+![合併結果——按參考表順序排列](/tutorial/explore-merge/02-result.jpg)

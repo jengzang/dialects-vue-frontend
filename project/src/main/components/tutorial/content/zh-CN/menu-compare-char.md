@@ -4,13 +4,6 @@
 
 ## 基本操作
 
-![比較漢字輸入界面](/tutorial/menu-compare-char/01-overview.jpg)
-
-![地圖結果——顏色區分相同/部分相同/不同](/tutorial/menu-compare-char/02-map.jpg)
-
-![點擊地圖查看具體讀音細節](/tutorial/menu-compare-char/03-popup.jpg)
-
-
 1. 分别在组 1 和组 2 的输入框中各输入一个汉字
 2. 选择比较角度：声母、韵母或声调
 3. 输入地点或分区
@@ -42,3 +35,9 @@
 - 两个输入框各只保留 1 个有效字
 - 必须先选择比较角度（声母/韵母/声调）才能运行
 - 如果只想知道某个字本身怎么读，先用「查字」
+
+![比較漢字輸入界面](/tutorial/menu-compare-char/01-overview.jpg)
+
+![地圖結果——顏色區分相同/部分相同/不同](/tutorial/menu-compare-char/02-map.jpg)
+
+![點擊地圖查看具體讀音細節](/tutorial/menu-compare-char/03-popup.jpg)

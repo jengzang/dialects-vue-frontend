@@ -4,9 +4,6 @@
 
 ## 欄位
 
-![廣東自然村表格——排序、篩選、分頁](/tutorial/explore-villages-table/01-overview.jpg)
-
-
 共 8 欄：市級、區縣級、鄉鎮級、行政村、自然村、方言分布、longitude、latitude。
 
 其中可打開篩選器的欄位：市級、區縣級、鄉鎮級、行政村、方言分布。
@@ -44,3 +41,5 @@
 
 - 搜索為後端查詢，結果不立即變化是因為防抖延遲
 - 篩選器選項受當前搜索條件影響，不一定是全表完整值
+
+![廣東自然村表格——排序、篩選、分頁](/tutorial/explore-villages-table/01-overview.jpg)

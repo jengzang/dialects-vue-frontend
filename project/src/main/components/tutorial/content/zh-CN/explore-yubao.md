@@ -6,13 +6,6 @@
 
 ## 词汇查询
 
-![語保詞彙——地圖模式展示](/tutorial/explore-yubao/01-overview.jpg)
-
-![比例尺較小時自動聚合顯示](/tutorial/explore-yubao/02-map-aggregate.jpg)
-
-![卡片模式——釋義文字展示](/tutorial/explore-yubao/03-card-mode.jpg)
-
-
 ### 基本操作
 
 1. 在输入框搜索条目（支持繁简匹配），从下拉建议中点选
@@ -53,3 +46,9 @@
 - 只输入半个词或自由输入未在清單中的内容时表格不会出现
 - 词彙与语法各有自己的输入框，切换标签页后需重新输入
 - 移动端做了专门适配，手机可正常使用
+
+![語保詞彙——地圖模式展示](/tutorial/explore-yubao/01-overview.jpg)
+
+![比例尺較小時自動聚合顯示](/tutorial/explore-yubao/02-map-aggregate.jpg)
+
+![卡片模式——釋義文字展示](/tutorial/explore-yubao/03-card-mode.jpg)
