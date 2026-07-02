@@ -69,7 +69,7 @@
       "totalRules": "總規則",
       "enabledRules": "已啟用",
       "disabledRules": "已停用",
-      "exportTitle": "匯出規則配置",
+      "exportTitle": "導出規則配置",
       "importTitle": "導入規則配置",
       "headers": {
         "index": "序號",

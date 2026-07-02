@@ -485,6 +485,11 @@ const applyRouteState = () => {
   }
 
   const parsedParams = parseCharClassParams(route)
+
+  if (!parsedParams.table && !parsedParams.levels?.length) {
+    return
+  }
+
   const normalizedState = normalizeState(parsedParams.table, parsedParams.levels)
   commitState(normalizedState.tableKey, normalizedState.levels, {
     syncUrl: true,

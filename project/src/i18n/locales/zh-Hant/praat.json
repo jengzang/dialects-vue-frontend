@@ -376,7 +376,7 @@
         "ceiling": "參考系上限：{max} Hz",
         "floor": "參考系下限：{min} Hz"
       },
-      "exportButton": "匯出 Excel",
+      "exportButton": "導出 Excel",
       "chart": {
         "title": "石鋒 T 值曲線",
         "tooltipTime": "時間: {time} ms",
@@ -391,8 +391,8 @@
         "imageName": "石鋒T值分析"
       },
       "export": {
-        "success": "已匯出 Excel 檔案",
-        "noData": "沒有可匯出的分析結果",
+        "success": "已導出 Excel 檔案",
+        "noData": "沒有可導出的分析結果",
         "fileName": "方音圖鑑_T值法定調_{timestamp}.xlsx",
         "sheetName": "石鋒T值分析",
         "columns": {
