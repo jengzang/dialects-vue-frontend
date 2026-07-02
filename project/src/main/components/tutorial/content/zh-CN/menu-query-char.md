@@ -4,9 +4,14 @@
 
 ## 基本操作
 
-![查字输入页面](/tutorial/menu-query-char/input.jpg)
+![查字輸入頁面](/tutorial/menu-query-char/01-input.jpg)
 
-*查字输入页面*
+![查字結果頁面——各地方言讀音](/tutorial/menu-query-char/02-result.jpg)
+
+![地圖模式——讀音地理分布](/tutorial/menu-query-char/03-map.jpg)
+
+![文白讀顏色標注：藍白讀、紅文讀](/tutorial/menu-query-char/04-wenbai.jpg)
+
 
 1. 在输入框中键入要查询的汉字（支持繁简）
 2. 在下方地点/分区区域选择方言点或分区

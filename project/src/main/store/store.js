@@ -31,7 +31,7 @@ const {
     state: tutorialEnabledState,
     write: writeTutorialEnabledState
 } = useStorageState('tutorial-enabled', {
-    defaultValue: false
+    defaultValue: true
 })
 
 export const tutorialEnabled = tutorialEnabledState

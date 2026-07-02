@@ -4,9 +4,10 @@
 
 ## 補充自定義數據
 
-![自定地圖面板](/tutorial/menu-map-custom/overview.jpg)
+![添加自定義數據——填入地點與特徵](/tutorial/menu-map-custom/01-add.jpg)
 
-*添加自定義數據面板*
+![補充數據前後對比——以東莞流攝為例](/tutorial/menu-map-custom/02-compare.jpg)
+
 
 適用於補充檔案中缺少的方言點或特徵數據。例如檔案里的東莞方言點數據有限，可自己補充。
 

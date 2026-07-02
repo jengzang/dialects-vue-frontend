@@ -4,9 +4,10 @@
 
 ## 三步流程
 
-![字表合并界面](/tutorial/explore-merge/overview.jpg)
+![字表合併——上傳參考表與待合併檔案](/tutorial/explore-merge/01-overview.jpg)
 
-*字表合并——三步骤流程*
+![合併結果——按參考表順序排列](/tutorial/explore-merge/02-result.jpg)
+
 
 ### 步骤 1：准备参考表
 

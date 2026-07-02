@@ -50,13 +50,6 @@
 
           <p style=" text-align: left;font-weight: bold;text-decoration: underline">{{ $t('about.intro.footer') }}</p>
 
-          <!-- 感悟部分 -->
-          <h2 class="tabs-title" style="margin-top: 20px">{{ $t('about.reflection.title') }}</h2>
-          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
-          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
-          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
-          <p class="thoughts"><em v-html="$t('about.reflection.poem')"></em></p>
-
           <h2 class="tabs-title" style="margin-top: 20px">🙏 {{ $t('about.thanks.title') }}</h2>
           <ul class="thanks-list">
             <li>
@@ -162,6 +155,13 @@
           </p>
           <p></p>
           <p></p>
+
+          <!-- 感悟部分 -->
+          <h2 class="tabs-title" style="margin-top: 20px">{{ $t('about.reflection.title') }}</h2>
+          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
+          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
+          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
+          <p class="thoughts"><em v-html="$t('about.reflection.poem')"></em></p>
         </div>
 
         <!-- 设置页面 -->
@@ -474,6 +474,12 @@ function resolveTabRoute(tabName) {
 </script>
 
 <style lang="scss" scoped>
+.tabs-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-top: 3rem!important;
+  // color: #007aff;
+}
 .about-page-wrapper {
   width: 100%;
   height: 100%;

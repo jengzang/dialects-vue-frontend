@@ -4,9 +4,12 @@
 
 ## 基本操作
 
-![比較中古設置界面](/tutorial/menu-compare-zhonggu/setup.jpg)
+![比較中古——加入條件到組1/組2](/tutorial/menu-compare-zhonggu/01-setup.jpg)
 
-*比較中古——加入條件到組1/組2*
+![比較中古地圖結果](/tutorial/menu-compare-zhonggu/02-result.jpg)
+
+![點擊彈窗查看具體資訊](/tutorial/menu-compare-zhonggu/03-popup.jpg)
+
 
 1. 選擇比較維度：聲母、韻母或聲調
 2. 在中央條件編輯區組出第一組中古條件
@@ -30,10 +33,6 @@
 - 可同時加入多組條件進行綜合比較
 
 ## 相似度算法
-
-![比較中古結果](/tutorial/menu-compare-zhonggu/result.jpg)
-
-*比較中古地圖結果*
 
 對於某個中古特徵，系統計算兩組在各地的讀音分布重疊度：
 

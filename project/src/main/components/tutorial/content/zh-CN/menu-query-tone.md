@@ -9,9 +9,10 @@
 
 ## 结果页面
 
-![查调结果表格](/tutorial/menu-query-tone/result.jpg)
+![查調結果——調值表格](/tutorial/menu-query-tone/02-result.jpg)
 
-*查调结果——调值表格*
+![地圖模式——調值區域分布](/tutorial/menu-query-tone/03-map.jpg)
+
 
 - 以表格形式展示各方言点的调值
 - 每行对应一个调类（阴平、阳平、阴上、阳上、阴去、阳去、阴入、阳入等）

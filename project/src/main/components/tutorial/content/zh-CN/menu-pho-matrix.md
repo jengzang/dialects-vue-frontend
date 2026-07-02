@@ -4,19 +4,20 @@
 
 ## 基本操作
 
-![音系矩阵输入页面](/tutorial/menu-pho-matrix/input.jpg)
+![音系矩陣輸入頁面](/tutorial/menu-pho-matrix/01-input.jpg)
 
-*音系矩阵输入页面*
+![完整音系表——聲韻調拼合矩陣](/tutorial/menu-pho-matrix/02-matrix.jpg)
+
+![文白讀顏色標注](/tutorial/menu-pho-matrix/03-wenbai.jpg)
+
+![點擊詳情查看方言點資訊](/tutorial/menu-pho-matrix/04-popup.jpg)
+
 
 1. 输入地点名称（可同时输入多个，最多 10 个）
 2. 等待地点匹配完成
 3. 点击「查询」
 
 ## 结果展示
-
-![完整音系表](/tutorial/menu-pho-matrix/matrix.jpg)
-
-*完整音系表——声韵调拼合矩阵*
 
 - 以完整音系表形式展示，横行为声母、竖列为韵母，交叉格为音节
 - 点击详情按钮可弹窗查看该方言点的详细信息

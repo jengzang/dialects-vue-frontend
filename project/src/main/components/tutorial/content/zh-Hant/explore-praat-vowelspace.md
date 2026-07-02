@@ -10,6 +10,9 @@
 
 ## 顯示模式
 
+![元音空間圖——F1/F2 共振峰繪製](/tutorial/explore-praat-vowelspace/01-overview.jpg)
+
+
 - **分段顯示**（預設）：按 rime_core、syllable_like、voiced 三類片段分別著色
 - **全部散點**：所有有效 F1/F2 數據點畫到圖上，不按片段分色
 

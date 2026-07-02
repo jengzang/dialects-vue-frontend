@@ -10,9 +10,10 @@
 
 ## 分區著色
 
-![分區繪圖結果](/tutorial/menu-map-divide/overview.jpg)
+![分區繪圖——不同分區以不同顏色標示](/tutorial/menu-map-divide/01-overview.jpg)
 
-*分區繪圖——不同分區以不同顏色標示*
+![全國分區圖——音典一級分區](/tutorial/menu-map-divide/02-national.jpg)
+
 
 - 不同分區以不同顏色標示，直觀展示地理分布
 - 滑鼠懸浮或單擊可查詢具體地點名和分區資訊

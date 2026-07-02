@@ -4,9 +4,10 @@
 
 ## 基本操作
 
-![字表检查界面](/tutorial/explore-check/overview.jpg)
+![字表檢查——自動分析錯誤統計](/tutorial/explore-check/01-overview.jpg)
 
-*字表检查——自动分析错误统计*
+![編輯模式——在線修改與批量替換](/tutorial/explore-check/02-edit.jpg)
+
 
 1. 登录账号
 2. 选择数据格式（音典、跳跳老鼠、县志）

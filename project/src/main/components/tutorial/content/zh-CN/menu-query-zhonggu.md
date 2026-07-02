@@ -4,9 +4,16 @@
 
 ## 基本操作
 
-![查中古输入页面](/tutorial/menu-query-zhonggu/input.jpg)
+![查中古輸入頁面](/tutorial/menu-query-zhonggu/01-input.jpg)
 
-*查中古输入页面*
+![查中古結果頁面——按中古地位分組展示](/tutorial/menu-query-zhonggu/02-result.jpg)
+
+![地圖頁面——方言數據空間分布](/tutorial/menu-query-zhonggu/03-map.jpg)
+
+![文白讀顏色標注：紅文讀、藍白讀](/tutorial/menu-query-zhonggu/04-wenbai.jpg)
+
+![右下角切換顯示模式：全顯 vs 主體](/tutorial/menu-query-zhonggu/05-display-mode.jpg)
+
 
 1. 选择分析维度：声母、韵母或声调
 2. 选择中古地位条件，可从摄、韵、等、呼、清浊、系、组、母、舒入、调、部位、方式共 12 种类型中选择
@@ -15,10 +22,6 @@
 5. 输入地点或分区，点击「运行」
 
 ## 结果页面
-
-![查中古结果页面](/tutorial/menu-query-zhonggu/result.jpg)
-
-*查中古结果页面*
 
 - 按中古地位分组展示各地方言读音
 - 多音字展示多个读音

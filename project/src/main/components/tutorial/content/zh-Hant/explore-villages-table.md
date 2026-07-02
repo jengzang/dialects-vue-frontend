@@ -4,6 +4,9 @@
 
 ## 欄位
 
+![廣東自然村表格——排序、篩選、分頁](/tutorial/explore-villages-table/01-overview.jpg)
+
+
 共 8 欄：市級、區縣級、鄉鎮級、行政村、自然村、方言分布、longitude、latitude。
 
 其中可打開篩選器的欄位：市級、區縣級、鄉鎮級、行政村、方言分布。

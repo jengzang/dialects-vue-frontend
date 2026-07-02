@@ -4,9 +4,12 @@
 
 ## 基本操作
 
-![比较汉字界面](/tutorial/menu-compare-char/overview.jpg)
+![比較漢字輸入界面](/tutorial/menu-compare-char/01-overview.jpg)
 
-*比较汉字输入界面*
+![地圖結果——顏色區分相同/部分相同/不同](/tutorial/menu-compare-char/02-map.jpg)
+
+![點擊地圖查看具體讀音細節](/tutorial/menu-compare-char/03-popup.jpg)
+
 
 1. 分别在组 1 和组 2 的输入框中各输入一个汉字
 2. 选择比较角度：声母、韵母或声调
@@ -14,10 +17,6 @@
 4. 点击「比较」，直接跳转到地图页面
 
 ## 结果解读
-
-![比较汉字地图结果](/tutorial/menu-compare-char/map.jpg)
-
-*地图上以颜色区分比较结果*
 
 地图上以颜色区分比较结果：
 

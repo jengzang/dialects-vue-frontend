@@ -9,9 +9,12 @@
 
 ## 結果展示
 
-![音節統計圖表](/tutorial/menu-pho-count/overview.jpg)
+![餅圖——各音節佔比](/tutorial/menu-pho-count/01-pie.jpg)
 
-*音節統計——餅圖查看各音節佔比*
+![散點圖——音節數量與地點數關係](/tutorial/menu-pho-count/02-scatter.jpg)
+
+![逐地點明細——聲韻調數目](/tutorial/menu-pho-count/03-detail.jpg)
+
 
 ### 全量數據（預設）
 

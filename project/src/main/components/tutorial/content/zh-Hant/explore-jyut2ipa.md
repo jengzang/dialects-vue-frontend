@@ -4,9 +4,10 @@
 
 ## 基本操作
 
-![粵拼轉IPA界面](/tutorial/explore-jyut2ipa/overview.jpg)
+![粵拼轉 IPA——自定義轉換規則](/tutorial/explore-jyut2ipa/01-overview.jpg)
 
-*粵拼轉IPA——自定義轉換規則*
+![轉換結果預覽](/tutorial/explore-jyut2ipa/02-result.jpg)
+
 
 1. 登入帳號
 2. 在設置面板中調整轉換規則（可選，預設規則已涵蓋常見轉換）

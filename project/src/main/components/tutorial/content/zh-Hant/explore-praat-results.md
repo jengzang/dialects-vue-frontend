@@ -4,9 +4,8 @@
 
 ## 結果內容
 
-![Praat 分析結果](/tutorial/explore-praat-results/results.jpg)
+![聲學分析結果——基頻、共振峰等](/tutorial/explore-praat-results/01-results.jpg)
 
-*聲學分析結果——基頻、強度、共振峰*
 
 根據勾選的分析模塊，結果頁面會展示：
 

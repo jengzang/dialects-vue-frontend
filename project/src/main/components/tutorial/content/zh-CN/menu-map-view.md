@@ -11,9 +11,10 @@
 
 ## 功能
 
-![方言地图展示](/tutorial/menu-map-view/overview.jpg)
+![方言地圖——數據空間分布](/tutorial/menu-map-view/01-overview.jpg)
 
-*地图页面——方言数据空间分布*
+![點擊地圖查看詳情](/tutorial/menu-map-view/02-detail.jpg)
+
 
 - 在地图上显示方言点的读音或特征数据
 - 支持点聚合显示，放大后显示详细内容

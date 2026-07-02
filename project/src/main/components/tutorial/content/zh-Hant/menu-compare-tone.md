@@ -4,9 +4,10 @@
 
 ## 基本操作
 
-![比較調類界面](/tutorial/menu-compare-tone/overview.jpg)
+![比較調類——珠三角陽上、陰去合併](/tutorial/menu-compare-tone/01-overview.jpg)
 
-*比較調類——地圖顏色標注合流情況*
+![南方方言陰入、陽入合併情況](/tutorial/menu-compare-tone/02-overall.jpg)
+
 
 1. 在調類勾選區勾選第一個調類（如陰上）
 2. 再勾選第二個調類（如陽上）

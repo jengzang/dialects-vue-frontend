@@ -13,9 +13,12 @@
 
 ## 基本操作
 
-![漢字字集樹狀結構](/tutorial/explore-char-class/overview.jpg)
+![漢字字集——中古廣韻樹狀結構](/tutorial/explore-char-class/01-overview.jpg)
 
-*按中古音韻地位逐級展開漢字*
+![按中古地位逐級展開](/tutorial/explore-char-class/02-tree.jpg)
+
+![顯示廣韻注釋](/tutorial/explore-char-class/03-zhushi.jpg)
+
 
 1. 系統預設停留在中古字表
 2. 在左側選擇預設分組（如韻系、聲母、清濁等導向）

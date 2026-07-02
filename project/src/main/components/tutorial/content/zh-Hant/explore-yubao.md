@@ -6,9 +6,12 @@
 
 ## 詞彙查詢
 
-![語保詞彙展示](/tutorial/explore-yubao/overview.jpg)
+![語保詞彙——地圖模式展示](/tutorial/explore-yubao/01-overview.jpg)
 
-*語保詞彙——地圖模式展示*
+![比例尺較小時自動聚合顯示](/tutorial/explore-yubao/02-map-aggregate.jpg)
+
+![卡片模式——釋義文字展示](/tutorial/explore-yubao/03-card-mode.jpg)
+
 
 ### 基本操作
 

@@ -4,9 +4,12 @@
 
 ## 基本操作
 
-![查音位輸入頁面](/tutorial/menu-query-yinwei/input.jpg)
+![查音位輸入頁面](/tutorial/menu-query-yinwei/01-input.jpg)
 
-*查音位輸入頁面*
+![查音位結果——中古來源分布](/tutorial/menu-query-yinwei/02-result.jpg)
+
+![地圖模式——音位地理分布](/tutorial/menu-query-yinwei/03-map.jpg)
+
 
 1. 點擊卡片選擇要整理的維度（聲母/韻母/聲調等分類方式）
 2. 輸入待查的音節（如 `a`、`h`、`ɐu`）

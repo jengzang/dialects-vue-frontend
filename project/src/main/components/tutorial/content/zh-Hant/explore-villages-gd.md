@@ -6,9 +6,10 @@
 
 ## 基本操作
 
-![廣東自然村樹狀圖](/tutorial/explore-villages-gd/overview.jpg)
+![廣東自然村樹狀圖——按行政層級展開](/tutorial/explore-villages-gd/01-tree.jpg)
 
-*廣東自然村——按行政層級展開*
+![地圖彈窗——點擊 🌍 查看](/tutorial/explore-villages-gd/02-map.jpg)
+
 
 1. 頁面載入市級清單
 2. 點擊目標市卡片上的「載入」
