@@ -143,7 +143,7 @@ watch(chars, (newVal) => {
   }
 })
 
-defineExpose({ pathStrings, chars })
+defineExpose({ pathStrings, chars, positionInput, charInput })
 </script>
 
 <style lang="scss" scoped>

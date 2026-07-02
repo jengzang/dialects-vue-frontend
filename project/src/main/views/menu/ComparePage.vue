@@ -891,6 +891,18 @@ function getToneCheckboxClass(toneValue) {
   return ''
 }
 
+// 切換輸入模式時清空 tab2 已選內容
+watch(zhongguInputMode, () => {
+  tabStates.tab2.current = {
+    card: '韻母',
+    keys: ['攝'],
+    valueMap: {},
+    excludeColumns: []
+  }
+  tabStates.tab2.group1Items = []
+  tabStates.tab2.group2Items = []
+})
+
 // 3️⃣ 同步当前 Tab 到 store
 watch(currentTab, (newTab) => {
   uiStore.currentSubTab.compare = newTab

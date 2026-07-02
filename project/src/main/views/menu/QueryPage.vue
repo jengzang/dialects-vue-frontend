@@ -757,7 +757,17 @@ function handleApplyConfig(data) {
     regions: data.loc.regions,
     regionUsing: data.loc.regionUsing
   }
-  // 3. 更新鍵名 (Keys)
+
+  // 3. 直接輸入模式
+  if (data.mode === 'direct') {
+    if (tab === 'tab2' && ZhongguDirectInputRef.value) {
+      ZhongguDirectInputRef.value.positionInput = data.positionInput || ''
+      ZhongguDirectInputRef.value.charInput = data.charInput || ''
+    }
+    return
+  }
+
+  // 4. 下拉選擇器模式：更新鍵名 (Keys)
   if (tab === 'tab2') {
     tabStates.tab2.keys = data.keys
   }
@@ -765,7 +775,7 @@ function handleApplyConfig(data) {
     tabStates.tab3.keys = data.keys
   }
 
-  // 4. 根據 Tab 更新具體的值
+  // 5. 根據 Tab 更新具體的值
   if (data.isTab3) {
     // Tab3: 更新 YinweiSelector 組件的輸入框
     if (YinweiSelectorRef.value) {

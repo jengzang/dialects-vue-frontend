@@ -1,4 +1,4 @@
-import { uiStore } from '@/main/store/store.js'
+import { uiStore, zhongguInputMode } from '@/main/store/store.js'
 
 function createLocation(locations = ['廣州'], regions = [], regionUsing = 'yindian') {
   return {
@@ -6,6 +6,37 @@ function createLocation(locations = ['廣州'], regions = [], regionUsing = 'yin
     regions,
     regionUsing,
   }
+}
+
+// 從 keys + valueMap 計算 combinations（與 ZhongGuSelector 的 cross-product 邏輯一致）
+function computeCombinations(keys, valueMap) {
+  const validEntries = keys
+    .map(key => ({ key, values: valueMap[key] }))
+    .filter(e => e.values && e.values.length > 0)
+
+  if (validEntries.length === 0) return []
+
+  return validEntries.reduce((acc, entry) => {
+    const next = []
+    acc.forEach(path => {
+      entry.values.forEach(val => {
+        next.push(path + `[${val}]{${entry.key}}`)
+      })
+    })
+    return next
+  }, [''])
+}
+
+// 從 keys + valueMap 生成直接輸入文本（值鍵拼接，空格分隔）
+function toDirectInputText(keys, valueMap) {
+  const tokens = []
+  for (const key of keys) {
+    const values = valueMap[key] || []
+    for (const val of values) {
+      tokens.push(`${val}${key}`)
+    }
+  }
+  return tokens.join(' ')
 }
 
 const presets_tab2 = [
@@ -89,6 +120,25 @@ function createQueryTab2Payload() {
     card: config.card,
     keys: [...config.keys],
     valuesMap,
+    combinations: computeCombinations(config.keys, valuesMap),
+    loc: createLocation(config.loc.locations, config.loc.regions, config.loc.regionUsing),
+  }
+}
+
+function createQueryTab2DirectPayload() {
+  const config = presets_tab2[diceIndex % presets_tab2.length]
+  const valuesMap = {}
+  if (config.values) {
+    for (const k in config.values) {
+      valuesMap[k] = [...config.values[k]]
+    }
+  }
+  diceIndex++
+  return {
+    mode: 'direct',
+    card: config.card,
+    positionInput: toDirectInputText(config.keys, valuesMap),
+    charInput: '',
     loc: createLocation(config.loc.locations, config.loc.regions, config.loc.regionUsing),
   }
 }
@@ -115,43 +165,95 @@ function createCompareTab1Payload() {
 }
 
 function createCompareTab2Payload() {
+  const current = {
+    card: '韻母',
+    keys: ['攝'],
+    valueMap: { 攝: ['止'] },
+    excludeColumns: [],
+  }
+  const group1Item = {
+    card: '韻母',
+    keys: ['攝'],
+    valueMap: { 攝: ['宕'] },
+    excludeColumns: [],
+  }
+  const group2Item = {
+    card: '韻母',
+    keys: ['攝'],
+    valueMap: { 攝: ['江'] },
+    excludeColumns: [],
+  }
   return {
     current: {
-      card: '韻母',
-      keys: ['攝'],
-      valueMap: {
-        攝: ['止'],
-      },
-      excludeColumns: [],
+      ...current,
+      combinations: computeCombinations(current.keys, current.valueMap),
     },
     group1Items: [
       {
-        card: '韻母',
-        keys: ['攝'],
-        valueMap: {
-          攝: ['宕'],
-        },
-        excludeColumns: [],
+        ...group1Item,
+        combinations: computeCombinations(group1Item.keys, group1Item.valueMap),
       },
     ],
     group2Items: [
       {
-        card: '韻母',
-        keys: ['攝'],
-        valueMap: {
-          攝: ['江'],
-        },
-        excludeColumns: [],
+        ...group2Item,
+        combinations: computeCombinations(group2Item.keys, group2Item.valueMap),
       },
     ],
     loc: createLocation(['南寧'], ['鬱潯'], 'yindian'),
   }
 }
 
+function createCompareTab2DirectPayload() {
+  const current = {
+    card: '韻母',
+    keys: ['攝'],
+    valueMap: { 攝: ['止'] },
+    excludeColumns: [],
+  }
+  const group1Item = {
+    card: '韻母',
+    keys: ['攝'],
+    valueMap: { 攝: ['宕'] },
+    excludeColumns: [],
+  }
+  const group2Item = {
+    card: '韻母',
+    keys: ['攝'],
+    valueMap: { 攝: ['江'] },
+    excludeColumns: [],
+  }
+  return {
+    mode: 'direct',
+    current: {
+      type: 'direct',
+      card: current.card,
+      pathStrings: computeCombinations(current.keys, current.valueMap),
+      chars: '',
+      excludeColumns: current.excludeColumns,
+    },
+    group1Items: [{
+      type: 'direct',
+      card: group1Item.card,
+      pathStrings: computeCombinations(group1Item.keys, group1Item.valueMap),
+      chars: '',
+      excludeColumns: group1Item.excludeColumns,
+    }],
+    group2Items: [{
+      type: 'direct',
+      card: group2Item.card,
+      pathStrings: computeCombinations(group2Item.keys, group2Item.valueMap),
+      chars: '',
+      excludeColumns: group2Item.excludeColumns,
+    }],
+    loc: createLocation(['南寧'], ['鬱潯'], 'yindian'),
+  }
+}
+
 function createCompareTab4Payload() {
   return {
-    selectedToneClasses: [1, 3],
-    loc: createLocation(['廣州'], ['廣府片'], 'yindian'),
+    selectedToneClasses: [1, 5],
+    loc: createLocation(['廣州 東莞'], ['廣中'], 'yindian'),
   }
 }
 
@@ -178,7 +280,12 @@ export const tutorialDiceConfig = {
     buttonKey: 'tutorial.assist.experience.queryZhonggu.button',
     target: 'query:tab2',
     when: shouldEnableCharacterDice,
-    createPayload: createQueryTab2Payload,
+    createPayload: () => {
+      if (zhongguInputMode.value === 'direct') {
+        return createQueryTab2DirectPayload()
+      }
+      return createQueryTab2Payload()
+    },
   },
   'menu-query-yinwei': {
     enabled: true,
@@ -213,7 +320,12 @@ export const tutorialDiceConfig = {
     descriptionKey: 'tutorial.assist.experience.compareZhonggu.description',
     buttonKey: 'tutorial.assist.experience.compareZhonggu.button',
     target: 'compare:tab2',
-    createPayload: createCompareTab2Payload,
+    createPayload: () => {
+      if (zhongguInputMode.value === 'direct') {
+        return createCompareTab2DirectPayload()
+      }
+      return createCompareTab2Payload()
+    },
   },
   'menu-compare-tone': {
     enabled: true,
