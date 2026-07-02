@@ -45,7 +45,6 @@
       selected-card="結果"
       :exclude-columns="excludeColumns"
       :table-name="tableName"
-      :hide-info-header="true"
       @update:runDisabled="emit('update:runDisabled', $event)"
     />
 
@@ -55,6 +54,7 @@
         v-model="charInput"
         class="main-input-field"
         type="text"
+        maxlength="500"
         :placeholder="$t('query.components.zhongguDirectInput.charPlaceholder')"
       />
     </div>

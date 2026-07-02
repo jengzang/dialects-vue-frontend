@@ -1,7 +1,7 @@
 <template>
   <div class="map-popup active">
     <p>{{ item.location }}</p>
-    <p>{{ item.feature }}</p>
+    <p>{{ item.featureLabel || item.feature }}</p>
 
     <p v-if="showCustomNote" style="margin-top: 5px;">{{ noteText }}</p>
 

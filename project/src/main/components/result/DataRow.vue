@@ -13,7 +13,7 @@
               style="cursor: pointer; color: #007bff"
               @click.stop="(e) => $emit('trigger-popup', 'feature', item, featureKey, featureVal, e)"
           >
-            {{ featureKey }}
+            {{ featureKeyDisplay }}
           </span>
           <span> ☞ </span>
           <span
@@ -96,7 +96,7 @@ import { useI18n } from 'vue-i18n';
 import { getCorrespondingCharacters, getReadingClass, getYinWeiCharReadingType, getZhongGuCharReadingType } from '@/main/utils/ResultTable.js';
 import { READING_COLORS } from '@/main/config/readingColors.js';
 import { getFeatureStats, getLocationDetail } from '@/api';
-import { globalPayload } from '@/main/store/store.js';
+import { globalPayload, mapStore } from '@/main/store/store.js';
 import LocationDetailPopup from '../popup/result/LocationDetailPopup.vue';
 import FeatureStatsPopup from '../popup/result/FeatureStatsPopup.vue';
 import { translateResultTerm } from '@/i18n/utils/resultI18n.js';
@@ -112,6 +112,7 @@ const emit = defineEmits(['trigger-popup']);
 const { t } = useI18n();
 
 const featureKey = computed(() => Object.keys(props.item.分組值 || {})[0]);
+const featureKeyDisplay = computed(() => mapStore.featureLabels[featureKey.value] || featureKey.value);
 const featureVal = computed(() => (props.item.分組值 || {})[featureKey.value]);
 
 const parsedChars = computed(() => {

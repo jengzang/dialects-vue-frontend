@@ -28,19 +28,28 @@ export async function func_mergeData(resultData = null, mapData = null, customDa
     const groupedData = {};
 
     // 构建 featureLabels: hash → 可读标签（取對應字前2字）
-    const featureLabels = {}
+    // 仅当 key 是哈希（≥6位字母数字混合）时才构建，避免影响普通可读特征
+    const isFeatureHash = (key) => /^[a-zA-Z0-9+/=]{6,}$/.test(key) && /[0-9]/.test(key)
+    const hashChars = {}
     latestResults.forEach(item => {
-      const chars = item['對應字']
-      if (chars && Array.isArray(chars) && chars.length > 0) {
-        const label = chars.slice(0, 2).join('') + (chars.length > 2 ? '...' : '')
-        const keys = Object.keys(item['分組值'] || {})
-        if (keys.length > 0 && !featureLabels[keys[0]]) {
-          featureLabels[keys[0]] = label
+      const keys = Object.keys(item['分組值'] || {})
+      if (keys.length > 0 && isFeatureHash(keys[0])) {
+        const hash = keys[0]
+        const chars = item['對應字']
+        if (chars && Array.isArray(chars) && chars.length > 0) {
+          if (!hashChars[hash]) hashChars[hash] = new Set()
+          chars.forEach(ch => hashChars[hash].add(ch))
         }
       }
     })
-    mapStore.featureLabels = featureLabels
-    console.log('featureLabels built:', Object.keys(featureLabels).length, 'entries', featureLabels)
+    const featureLabels = {}
+    for (const [hash, charSet] of Object.entries(hashChars)) {
+      const chars = [...charSet]
+      featureLabels[hash] = chars.slice(0, 2).join('') + (chars.length > 2 ? '...' : '')
+    }
+    if (Object.keys(featureLabels).length > 0) {
+      mapStore.featureLabels = { ...mapStore.featureLabels, ...featureLabels }
+    }
 
     // 遍历 latestResults 中的数据，获取相关列数据
     latestResults.forEach(item => {
@@ -122,6 +131,7 @@ export async function func_mergeData(resultData = null, mapData = null, customDa
             mergedData.push({
                 location,
                 feature,
+                featureLabel: featureLabels[feature] || null,
                 value: finalValue,
                 coordinate,
                 maxValue: maxPercentageValue,

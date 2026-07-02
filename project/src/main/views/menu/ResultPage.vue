@@ -234,6 +234,7 @@ watch(
           if (response.success || response.status === 'success') {
             results.value = response.results || response.data;
             latestResults.value = Array.isArray(results.value) ? results.value.flat() : [];
+            resultCache.latestResults = latestResults.value
 
             // ✅ 修复：func_mergeData 是 async，必须 await
             mergedData = await func_mergeData(latestResults.value, MapData, response.custom_data || []);
@@ -267,6 +268,7 @@ watch(
           if (response.success) {
             results.value = response.results || response.data;
             latestResults.value = Array.isArray(results.value) ? results.value.flat() : [];
+            resultCache.latestResults = latestResults.value
 
             // ✅ 修复：func_mergeData 是 async，必须 await
             mergedData = await func_mergeData(latestResults.value, MapData);
