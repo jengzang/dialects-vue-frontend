@@ -170,6 +170,10 @@ export async function searchChars(params) {
       query.append('response_mode', params.response_mode)
     }
 
+    if (params.include_custom) {
+      query.append('include_custom', 'true')
+    }
+
     const data = await api(`/api/search_chars/?${query.toString()}`, {
       loginPromptEligible: true
     })
@@ -223,6 +227,10 @@ export async function searchTones(params) {
     // 处理 region_mode 参数
     if (params.region_mode) {
       query.append('region_mode', params.region_mode)
+    }
+
+    if (params.include_custom) {
+      query.append('include_custom', 'true')
     }
 
     return await api(`/api/search_tones/?${query.toString()}`, {

@@ -151,10 +151,10 @@ export async function func_mergeData(resultData = null, mapData = null, customDa
 
 export async function refreshCurrentCustomLayer() {
     const currentPayload = globalPayload.value;
-    const isZhongGuQuery = currentPayload?._sourceTab === 'tab2';
+    const sourceTab = currentPayload?._sourceTab || '';
 
-    if (!isZhongGuQuery || !mapStore.mapData) {
-        return func_mergeData(resultCache.latestResults, mapStore.mapData);
+    if (!mapStore.mapData) {
+        return [];
     }
 
     const normalizedLocations = Array.isArray(currentPayload.locations) && currentPayload.locations.length > 0
@@ -191,6 +191,14 @@ export async function refreshCurrentCustomLayer() {
     const normalizedCustomData = Array.isArray(customData)
         ? customData
         : (Array.isArray(customData?.data) ? customData.data : []);
+
+    if (sourceTab === 'tab1') {
+        return generateCharsMergedData(resultCache.latestResults, mapStore.mapData, normalizedCustomData);
+    }
+
+    if (sourceTab === 'tab4') {
+        return generateTonesMergedData(resultCache.latestResults, mapStore.mapData, normalizedCustomData);
+    }
 
     return func_mergeData(resultCache.latestResults, mapStore.mapData, normalizedCustomData);
 }
@@ -483,7 +491,7 @@ function assignColorToMergedData(mergedData) {
     });
 }
 
-export function generateCharsMergedData(resultData, locationsData) {
+export function generateCharsMergedData(resultData, locationsData, customData = []) {
     const locationToCoordinates = {};
     locationsData.coordinates_locations.forEach(([loc, coord]) => {
         locationToCoordinates[loc] = coord;
@@ -513,6 +521,10 @@ export function generateCharsMergedData(resultData, locationsData) {
         };
     });
 
+    if (Array.isArray(customData) && customData.length > 0) {
+        mergeBackendData(customData, mergedData);
+    }
+
     assignColorToMergedData(mergedData);
     mapStore.mergedData = mergedData;
     return mergedData;
@@ -520,7 +532,7 @@ export function generateCharsMergedData(resultData, locationsData) {
 
 
 // 新的函数：处理音调并分配颜色
-export function generateTonesMergedData(resultData, locationsData) {
+export function generateTonesMergedData(resultData, locationsData, customData = []) {
     // 1) tone 映射
     const toneMapping = {
         T1: "陰平",
@@ -598,10 +610,15 @@ export function generateTonesMergedData(resultData, locationsData) {
         });
     });
 
-    // 4) 一次性分配颜色
+    // 4) 合并自定义数据
+    if (Array.isArray(customData) && customData.length > 0) {
+        mergeBackendData(customData, mergedData);
+    }
+
+    // 5) 一次性分配颜色
     assignColorToMergedData(mergedData);
 
-    // 5) 写入 mapStore 并返回
+    // 6) 写入 mapStore 并返回
     mapStore.mergedData = mergedData;
     return mergedData;
 }

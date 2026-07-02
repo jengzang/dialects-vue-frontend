@@ -47,6 +47,7 @@ import { resolveTutorialDocument } from './tutorialMarkdown'
 import { tutorialDiceConfig } from './tutorialDiceConfig'
 import TutorialDiceTrigger from './TutorialDiceTrigger.vue'
 import TutorialGuideModal from './TutorialGuideModal.vue'
+import { showConfirm } from '@/utils/message.js'
 
 const props = defineProps({
   bottomOffset: {
@@ -69,6 +70,8 @@ const props = defineProps({
 
 const route = useRoute()
 const { locale, t } = useI18n()
+
+let disclaimerShown = false
 
 const isOpen = ref(false)
 const isCatalogOpen = ref(false)
@@ -201,6 +204,14 @@ function scrollSelectionIntoView() {
 function openGuide() {
   if (!currentMatchedEntry.value) {
     return
+  }
+
+  if (!disclaimerShown) {
+    disclaimerShown = true
+    showConfirm(t('tutorial.disclaimer.message'), {
+      title: t('tutorial.disclaimer.title'),
+      confirmText: t('tutorial.disclaimer.confirm'),
+    })
   }
 
   selectedKey.value = currentMatchedEntry.value.key

@@ -179,14 +179,15 @@ watch(
         // ================= TAB 1: 查字 =================
         if (sourceTab === 'tab1') {
           resultCache.mode = '';
-          resultCache.features = [];
+          resultCache.features = ['漢字'];
 
           const queryParams = {
             chars: [],
             locations: newPayload.locations || "",
             regions: Array.isArray(newPayload.regions) ? newPayload.regions : (newPayload.regions || ""),
             region_mode: newPayload.region_mode || 'yindian',
-            response_mode: 'compact'
+            response_mode: 'compact',
+            include_custom: userStore.isAuthenticated && userStore.role !== 'anonymous'
           }
 
           let rawChars = newPayload.chars;
@@ -202,7 +203,7 @@ watch(
           if (response && response.result) {
             latestResults.value = response.result;
 
-            mergedData = generateCharsMergedData(latestResults.value, MapData);
+            mergedData = generateCharsMergedData(latestResults.value, MapData, response.custom_data || []);
             if (seq !== requestSeq) return;
 
             mapStore.mapData = MapData;
@@ -260,7 +261,8 @@ watch(
           const response = await searchYinWei({
             ...payload.value,
             exclude_columns: payload.value.exclude_columns || [],
-            table_name: tableName
+            table_name: tableName,
+            include_custom: userStore.isAuthenticated && userStore.role !== 'anonymous'
           })
 
           if (seq !== requestSeq) return;
@@ -271,7 +273,7 @@ watch(
             resultCache.latestResults = latestResults.value
 
             // ✅ 修复：func_mergeData 是 async，必须 await
-            mergedData = await func_mergeData(latestResults.value, MapData);
+            mergedData = await func_mergeData(latestResults.value, MapData, response.custom_data || []);
             if (seq !== requestSeq) return;
 
             mapStore.mapData = MapData;
@@ -285,11 +287,12 @@ watch(
         // ================= TAB 4: 查調 =================
         else if (sourceTab === 'tab4') {
           resultCache.mode = '';
-          resultCache.features = [];
+          resultCache.features = ['調值'];
           const response = await searchTones({
             locations: newPayload.locations || "",
             regions: Array.isArray(newPayload.regions) ? newPayload.regions : (newPayload.regions || ""),
-            region_mode: newPayload.region_mode || 'yindian'
+            region_mode: newPayload.region_mode || 'yindian',
+            include_custom: userStore.isAuthenticated && userStore.role !== 'anonymous'
           })
 
           if (seq !== requestSeq) return;
@@ -297,7 +300,7 @@ watch(
           if (response && response.tones_result) {
             latestResults.value = response.tones_result;
 
-            mergedData = generateTonesMergedData(response.tones_result, MapData);
+            mergedData = generateTonesMergedData(response.tones_result, MapData, response.custom_data || []);
             if (seq !== requestSeq) return;
 
             mapStore.mapData = MapData;

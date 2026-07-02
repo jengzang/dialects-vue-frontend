@@ -656,6 +656,10 @@ const runAction = async () => {
       .split('·')
       .map(item => item.trim())
       .filter(Boolean);
+
+    if (YinweiSelectorRef.value?.ensureReady) {
+      await YinweiSelectorRef.value.ensureReady()
+    }
     const phos = YinweiSelectorRef.value?.normalizedPhoInput || '';
 
     payload = {

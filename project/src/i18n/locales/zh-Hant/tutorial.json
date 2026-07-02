@@ -26,6 +26,11 @@
     "exploreResources": "Explore 資源",
     "exploreVillages": "Explore 村落"
   },
+  "disclaimer": {
+    "title": "溫馨提示",
+    "message": "目前的教學內容由 AI 生成，其實没啥參考價值。站长暫時還沒有時間編寫正式的教學文件，如果你有興趣協助完善教學內容，我將非常歡迎！",
+    "confirm": "知道了"
+  },
   "assist": {
     "badge": "新手指引",
     "experience": {
