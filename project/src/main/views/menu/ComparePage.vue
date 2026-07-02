@@ -80,7 +80,70 @@
             class="compare-group"
             style="padding:0;"
           >
-            <div class="triple-select-box">
+            <!-- 直接輸入模式 -->
+            <div v-if="zhongguInputMode === 'direct'" class="direct-compare-box">
+              <div class="card-row">
+                <ChoiceSelector
+                  v-model="tabStates.tab2.current.card"
+                  :options="cardOptions"
+                  :aria-label="$t('compare.group.label1')"
+                />
+                <div
+                  :ref="(el) => excludeFilterTriggerRef.tab2_current = el"
+                  class="dropdown"
+                  style="margin: 0;padding: 8px 10px;min-width: 60px;max-height:30px"
+                  :class="{ disabled: buttonState.isRunning }"
+                  @click="toggleExcludeDropdown('tab2', 'current')"
+                >
+                  {{ getExcludeDisplayText('tab2', 'current') || $t('compare.excludeOptions.noExclude') }}
+                  <span class="arrow">▾</span>
+                </div>
+                <Teleport to="body">
+                  <div
+                    v-if="excludeDropdownOpen === 'tab2_current'"
+                    class="dropdown-panel choice-dropdown-panel"
+                    :style="excludeDropdownStyle"
+                  >
+                    <div
+                      v-for="option in excludeOptions"
+                      :key="option.value"
+                      class="dropdown-item choice-dropdown-item"
+                      :class="{ active: isExcludeSelected(option.value, 'tab2', 'current') }"
+                      @click="toggleExcludeOption(option.value, 'tab2', 'current')"
+                    >
+                      <span class="check-icon">{{ isExcludeSelected(option.value, 'tab2', 'current') ? '✓' : '' }}</span>
+                      {{ option.label }}
+                    </div>
+                  </div>
+                </Teleport>
+              </div>
+
+              <div class="selected-groups-container">
+                <div class="selected-group group1-style">
+                  <div class="selected-group-header">
+                    <span>{{ $t('compare.group.label1') }}</span>
+                  </div>
+                  <ZhongGuDirectInput
+                    ref="CompareDirectInputRef1"
+                    :exclude-columns="tabStates.tab2.current.excludeColumns"
+                    :table-name="selectedCharacterTable"
+                  />
+                </div>
+                <div class="selected-group group2-style">
+                  <div class="selected-group-header">
+                    <span>{{ $t('compare.group.label2') }}</span>
+                  </div>
+                  <ZhongGuDirectInput
+                    ref="CompareDirectInputRef2"
+                    :exclude-columns="tabStates.tab2.current.excludeColumns"
+                    :table-name="selectedCharacterTable"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- 選擇器模式 -->
+            <div v-else class="triple-select-box">
               <!-- 卡片選擇區 -->
               <div class="card-row">
                 <ChoiceSelector
@@ -413,6 +476,7 @@ import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput
 import LocationMultiInput from "@/main/components/geo/LocationMultiInput.vue";
 import PhoneticCompare from "@/main/components/pho/PhoneticCompare.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
+import ZhongGuDirectInput from "@/main/components/query/ZhongGuDirectInput.vue";
 import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
 import RadioGroup from '@/components/selector/RadioGroup.vue';
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
@@ -429,6 +493,7 @@ import {
   userStore,
   tutorialAssistState,
   clearTutorialAssistRequest,
+  zhongguInputMode,
 } from '@/main/store/store.js'
 import { compareChars, compareZhongGu, compareTones } from '@/api/index.js'
 import { getCoordinates } from '@/api'
@@ -707,9 +772,24 @@ watch(() => tabStates.tab1, (newVal) => {
 }, { immediate: true, deep: true })
 
 // 监听 Tab2：两个组都有至少一个条件才启用
-watch(() => [tabStates.tab2.group1Items.length, tabStates.tab2.group2Items.length], ([g1, g2]) => {
-  setTabContentDisabled('compare', 'tab2', g1 === 0 || g2 === 0)
-}, { immediate: true })
+watch(() => {
+  if (zhongguInputMode.value === 'direct') {
+    const p1 = CompareDirectInputRef1.value?.pathStrings || []
+    const c1 = CompareDirectInputRef1.value?.chars || ''
+    const p2 = CompareDirectInputRef2.value?.pathStrings || []
+    const c2 = CompareDirectInputRef2.value?.chars || ''
+    const g1Valid = (p1.length > 0) || (c1 && c1.length > 0)
+    const g2Valid = (p2.length > 0) || (c2 && c2.length > 0)
+    return [g1Valid, g2Valid]
+  }
+  return [tabStates.tab2.group1Items.length, tabStates.tab2.group2Items.length]
+}, ([g1, g2]) => {
+  if (zhongguInputMode.value === 'direct') {
+    setTabContentDisabled('compare', 'tab2', !g1 || !g2)
+  } else {
+    setTabContentDisabled('compare', 'tab2', g1 === 0 || g2 === 0)
+  }
+}, { immediate: true, deep: true })
 
 // 监听 Tab 4 的调类选择
 watch(() => tabStates.tab4, (newVal) => {
@@ -1138,6 +1218,8 @@ const ZhongguRef = ref(null);
 const ZhongguRef1 = ref(null);  // For tab2 group1
 const ZhongguRef2 = ref(null);  // For tab2 group2
 const ZhongguRefCurrent = ref(null);  // For tab2 current selector
+const CompareDirectInputRef1 = ref(null)
+const CompareDirectInputRef2 = ref(null)
 
 
 // Tab5 独立的运行逻辑
@@ -1203,53 +1285,73 @@ const runAction = async () => {
     }
     else if (currentTab.value === 'tab2') {
       compareType = 'zhonggu';
-      // 比较中古 - 使用已選列表中的數據
 
-      // 檢查是否有選擇項目
-      if (tabStates.tab2.group1Items.length === 0 || tabStates.tab2.group2Items.length === 0) {
-        // console.error('❌ 組1或組2沒有選擇任何條件')
-        return
+      let params
+
+      if (zhongguInputMode.value === 'direct') {
+        const group1PathStrings = CompareDirectInputRef1.value?.pathStrings || []
+        const group1Chars = CompareDirectInputRef1.value?.chars || ''
+        const group2PathStrings = CompareDirectInputRef2.value?.pathStrings || []
+        const group2Chars = CompareDirectInputRef2.value?.chars || ''
+
+        if (group1PathStrings.length === 0 && (!group1Chars || group1Chars.length === 0)) return
+        if (group2PathStrings.length === 0 && (!group2Chars || group2Chars.length === 0)) return
+
+        const card = tabStates.tab2.current.card || '韻母'
+        const excludeCols = tabStates.tab2.current.excludeColumns
+
+        params = {
+          path_strings1: group1PathStrings,
+          chars1: group1Chars ? [...group1Chars] : [],
+          column1: null,
+          combine_query1: false,
+          exclude_columns1: excludeCols,
+
+          path_strings2: group2PathStrings,
+          chars2: group2Chars ? [...group2Chars] : [],
+          column2: null,
+          combine_query2: false,
+          exclude_columns2: excludeCols,
+
+          locations: locationList,
+          regions: regionList,
+          features: [card, card],
+          region_mode: locationRef.value?.regionUsing || 'yindian',
+          table_name: selectedCharacterTable.value
+        }
+      } else {
+        if (tabStates.tab2.group1Items.length === 0 || tabStates.tab2.group2Items.length === 0) {
+          return
+        }
+
+        const group1Combinations = tabStates.tab2.group1Items.flatMap(item => item.combinations || [])
+        const group2Combinations = tabStates.tab2.group2Items.flatMap(item => item.combinations || [])
+
+        const group1Exclude = tabStates.tab2.group1Items[0].excludeColumns
+        const group2Exclude = tabStates.tab2.group2Items[0].excludeColumns
+
+        const group1Card = tabStates.tab2.group1Items[0].card
+        const group2Card = tabStates.tab2.group2Items[0].card
+
+        params = {
+          path_strings1: group1Combinations,
+          column1: null,
+          combine_query1: false,
+          exclude_columns1: group1Exclude,
+
+          path_strings2: group2Combinations,
+          column2: null,
+          combine_query2: false,
+          exclude_columns2: group2Exclude,
+
+          locations: locationList,
+          regions: regionList,
+          features: [group1Card, group2Card],
+          region_mode: locationRef.value?.regionUsing || 'yindian',
+          table_name: selectedCharacterTable.value
+        }
       }
 
-      // ✅ 合併所有條件的 combinations（方案A：OR邏輯）
-      const group1Combinations = tabStates.tab2.group1Items.flatMap(item => item.combinations || [])
-      const group2Combinations = tabStates.tab2.group2Items.flatMap(item => item.combinations || [])
-
-      // ✅ 排除設置：因為已經強制統一，直接取第一個即可
-      const group1Exclude = tabStates.tab2.group1Items[0].excludeColumns
-      const group2Exclude = tabStates.tab2.group2Items[0].excludeColumns
-
-      // ✅ 卡片（聲韻調）：因為已經強制統一，直接取第一個即可
-      const group1Card = tabStates.tab2.group1Items[0].card
-      const group2Card = tabStates.tab2.group2Items[0].card
-
-      const params = {
-        path_strings1: group1Combinations,
-        column1: null,
-        combine_query1: false,
-        exclude_columns1: group1Exclude,
-
-        path_strings2: group2Combinations,
-        column2: null,
-        combine_query2: false,
-        exclude_columns2: group2Exclude,
-
-        locations: locationList,
-        regions: regionList,
-        features: [group1Card, group2Card],
-        region_mode: locationRef.value?.regionUsing || 'yindian',
-        table_name: selectedCharacterTable.value
-      }
-
-      // console.log('🔍 比較中古參數:', {
-      //   組1條件數: tabStates.tab2.group1Items.length,
-      //   組1組合數: group1Combinations.length,
-      //   組2條件數: tabStates.tab2.group2Items.length,
-      //   組2組合數: group2Combinations.length,
-      //   params
-      // })
-
-      // console.log('📤 Tab2 API 參數:', params)
       compareResponse = await compareZhongGu(params)
     }
     else if (currentTab.value === 'tab4') {

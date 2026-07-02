@@ -42,6 +42,21 @@ export function setTutorialEnabled(value) {
     writeTutorialEnabledState(nextValue)
 }
 
+const {
+    state: zhongguInputModeState,
+    write: writeZhongguInputModeState
+} = useStorageState('zhonggu-input-mode', {
+    defaultValue: 'selector'
+})
+
+export const zhongguInputMode = zhongguInputModeState
+
+export function setZhongguInputMode(value) {
+    const nextValue = (value === 'direct') ? 'direct' : 'selector'
+    zhongguInputMode.value = nextValue
+    writeZhongguInputModeState(nextValue)
+}
+
 export const tutorialAssistState = reactive({
     requestToken: 0,
     target: null,

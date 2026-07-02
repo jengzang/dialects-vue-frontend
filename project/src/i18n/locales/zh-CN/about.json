@@ -112,6 +112,14 @@
       "description": "是否显示教程入口与随机骰子",
       "enabled": "已开启",
       "disabled": "已关闭"
+    },
+    "zhongguInputMode": {
+      "title": "中古查询模式",
+      "description": "选择使用下拉选择器模式或直接输入模式进行中古查询。直接输入模式支持输入地位文字（如「泥母 庄组 蟹-等」）和汉字直接查询。",
+      "options": {
+        "selector": "选择器模式",
+        "direct": "直接输入模式"
+      }
     }
   }
 }

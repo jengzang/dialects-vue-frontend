@@ -270,6 +270,56 @@
       "customLocationsModalTitle": "自定义地点（{count}）",
       "requireInput": "请输入地点或分区",
       "tooManyLocations": "显式地点过多，请减少手动输入或自定义分区中的地点数量"
+    },
+    "zhongguDirectInput": {
+      "positionLabel": "中古地位输入",
+      "positionPlaceholder": "输入中古地位，空格分隔。例：泥母 庄组 蟹-等",
+      "charLabel": "汉字直接输入",
+      "charPlaceholder": "输入汉字，例：笨蛋",
+      "helpButton": "?",
+      "possibleCombinations": "可能产生{count}种组合",
+      "actualMatches": ",实际匹配{count}组",
+      "outputFormat": ",将按所选组合整理输出{format}",
+      "detailsButton": "⤢ 详情",
+      "querying": "正在查询数据...",
+      "noMatches": "暂无匹配汉字",
+      "pleaseSelect": "请输入中古地位以检索",
+      "detailsTitle": "检索详情",
+      "charCount": "{count} 字",
+      "tooManyCombinations": "检索组合过多({count}>{limit})，请缩小检索范围",
+      "queryFailed": "数据查询失败，请稍后重试",
+      "duplicateValueError": "「{value}」存在于多个类别（{categories}），请加上类别后缀",
+      "unknownValueError": "「{value}」不是有效的中古地位值",
+      "unknownCategoryError": "「{category}」不是有效的类别名称",
+      "help": {
+        "title": "直接输入说明",
+        "rules": {
+          "rule1": "以空格分隔多个地位项，每项代表一种查询组合。",
+          "rule2": "只在一个类别出现的值（如「泥」只在「母」中出现），不需要后缀。",
+          "rule3": "出现在多个类别的值（如「山」同时在「摄」和「韵」中出现），必须加上类别后缀（如「山摄」或「山韵」）。",
+          "rule4": "「-」前缀表示全匹配该类别所有值（如「-等」匹配所有等值；「蟹-等」匹配蟹摄的所有等值）。",
+          "rule5": "可以自由组合多个查询项（如「蟹-等 知组」查询蟹摄的所有等+知组）。",
+          "rule6": "像「流开一」这样的复合词，会逐字解析每个部分。"
+        },
+        "examples": {
+          "title": "输入示例",
+          "example1": "「泥」 → 使用 泥母 进行分析",
+          "example2": "「蟹-等」 → 使用 蟹摄一、二、三、四等 进行分析",
+          "example3": "「次浊-调」 → 使用 次浊声母+平上去入 进行分析",
+          "example4": "「庄组」 → 使用 庄组 进行分析（如果只输入「庄」，会使用 庄母 分析）",
+          "example5": "「流开一」 → 使用 流摄开口一等字 进行分析",
+          "example6": "「塞擦」 → 提取 塞擦音 进行分析",
+          "example7": "「-部位」 → 分析 所有发声部位",
+          "example8": "「山摄 知组」 → 使用 山摄+知组 进行分析"
+        },
+        "table": {
+          "title": "支持的类别及对应值（简体也可以）",
+          "tableHeaders": {
+            "category": "类别",
+            "values": "对应值"
+          }
+        }
+      }
     }
   },
   "result": {

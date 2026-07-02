@@ -219,6 +219,18 @@
             />
           </div>
 
+          <div class="setting-section">
+            <h3 class="section-title">{{ $t('about.settings.zhongguInputMode.title') }}</h3>
+            <p class="section-description">{{ $t('about.settings.zhongguInputMode.description') }}</p>
+
+            <RadioGroup
+              v-model="zhongguInputModeModel"
+              :options="zhongguInputModeOptions"
+              name="about-zhonggu-input-mode"
+              class="settings-radio-group"
+            />
+          </div>
+
           <div class="setting-section tutorial-toggle-section">
             <div class="tutorial-toggle-copy">
               <h3 class="section-title">{{ $t('about.settings.tutorialToggle.title') }}</h3>
@@ -277,6 +289,8 @@ import {
   setPreferredCharacterTable,
   tutorialEnabled,
   setTutorialEnabled,
+  zhongguInputMode,
+  setZhongguInputMode,
 } from '@/main/store/store.js'
 
 const { t, locale } = useI18n()
@@ -388,6 +402,22 @@ const tutorialGuideEnabled = computed({
   get: () => tutorialEnabled.value,
   set: (value) => setTutorialEnabled(value)
 })
+
+const zhongguInputModeModel = computed({
+  get: () => zhongguInputMode.value,
+  set: (mode) => setZhongguInputMode(mode)
+})
+
+const zhongguInputModeOptions = computed(() => [
+  {
+    value: 'selector',
+    label: t('about.settings.zhongguInputMode.options.selector')
+  },
+  {
+    value: 'direct',
+    label: t('about.settings.zhongguInputMode.options.direct')
+  }
+])
 
 function changeLanguage(newLocale) {
   if (newLocale === currentLocale.value) {
