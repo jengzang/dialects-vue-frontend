@@ -11,7 +11,8 @@
     "previous": "Previous",
     "next": "Next",
     "missing": "Tutorial is not available yet",
-    "hideTutorial": "Don't show tutorials"
+    "hideTutorial": "Don't show tutorials",
+    "hideTutorialTip": "You can re-enable tutorials in About - Settings."
   },
   "groups": {
     "account": "Account and Customization",

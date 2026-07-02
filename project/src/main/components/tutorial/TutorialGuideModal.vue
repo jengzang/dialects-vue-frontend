@@ -232,6 +232,7 @@ import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import { tutorialEnabled, setTutorialEnabled } from '@/main/store/store.js'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import { showInfo } from '@/utils/message.js'
 
 const props = defineProps({
   modelValue: {
@@ -314,6 +315,12 @@ watch(() => props.modelValue, (visible) => {
   }
   if (visible) {
     hideTutorialLocal.value = !tutorialEnabled.value
+  }
+})
+
+watch(hideTutorialLocal, (val) => {
+  if (val) {
+    showInfo(t('tutorial.ui.hideTutorialTip'), 4000)
   }
 })
 

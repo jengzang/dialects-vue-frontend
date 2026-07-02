@@ -11,7 +11,8 @@
     "previous": "上一篇",
     "next": "下一篇",
     "missing": "教程暫未提供",
-    "hideTutorial": "不再顯示教學"
+    "hideTutorial": "不再顯示教學",
+    "hideTutorialTip": "你可以在「關於 - 設定」頁面重新開啟教學。"
   },
   "groups": {
     "account": "賬戶與自定義",

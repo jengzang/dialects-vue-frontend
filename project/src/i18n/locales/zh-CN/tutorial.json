@@ -11,7 +11,8 @@
     "previous": "上一篇",
     "next": "下一篇",
     "missing": "教程暂未提供",
-    "hideTutorial": "不再显示教程"
+    "hideTutorial": "不再显示教程",
+    "hideTutorialTip": "你可以在「关于 - 设置」页面重新开启教程。"
   },
   "groups": {
     "account": "账户与自定义",
