@@ -27,8 +27,8 @@
                 </li>
               </ul>
             </li>
-            <li v-html="$t('about.intro.features.blueText')"></li>
-            <li v-html="$t('about.intro.features.mapClick')"></li>
+            <!-- <li v-html="$t('about.intro.features.blueText')"></li>
+            <li v-html="$t('about.intro.features.mapClick')"></li> -->
           </ul>
 
           <ul v-if="false" class="customlist">
@@ -305,7 +305,7 @@ const showQRCodes = ref(false)
 
 const featureList = computed(() => {
   const messages = i18n.global.messages.value[locale.value]
-  return Array.from({ length: 10 }, (_, i) => {
+  return Array.from({ length: 9 }, (_, i) => {
     const n = i + 1
     const f = messages.about.intro.features[`feature${n}`]
     return {

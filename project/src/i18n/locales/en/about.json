@@ -16,7 +16,7 @@
         "items": [
           {
             "title": "Middle Chinese Query",
-            "body": "Organize pronunciations by Middle Chinese position. Supports free combination of twelve categories: She, Yun, Deng, Hu, Diao, Xi, Zu, Mu, voicing, place of articulation, and manner of articulation. The website automatically computes the Cartesian product and filters invalid combinations. Location input supports fuzzy matching (simplified/traditional) and batch selection by region (Atlas Region / Dictionary Region). Results are presented in tables, with multiple readings shown for polyphonic characters — click statistics buttons for drill-down queries, click phonetic values to reverse-lookup syllable origins, click place names for detailed dialect point info. Supports multi-window parallel comparison, phonetic value filtering, and full/primary display modes. The map view displays values by proportion (>50% no parentheses, 35–50% with parentheses, 20–35% with asterisk, <20% hidden); points on the map can be clicked for drill-down queries. Updated July 2026 with literary/colloquial coloring (red = literary, blue = colloquial, purple = both, green = regular polyphony). Switchable rime books currently supporting Guangyun, Fangyan Diaocha Zibiao, Jiyun, Hongwu Zhengyun, and Old Chinese."
+            "body": "Organize pronunciations by Middle Chinese position. Supports free combination of twelve categories: She, Yun, Deng, Hu, Diao, Xi, Zu, Mu, voicing, place of articulation, and manner of articulation. The website automatically computes the Cartesian product and filters invalid combinations. Location input supports fuzzy matching (simplified/traditional) and batch selection by region (Atlas Region / Dictionary Region). Results are presented in tables, with multiple readings shown for polyphonic characters — click statistics buttons for drill-down queries, click phonetic values to reverse-lookup syllable origins, click place names for detailed dialect point info. Supports multi-window parallel comparison, phonetic value filtering, and full/primary display modes. The map view displays values by proportion; points on the map can be clicked for drill-down queries. Updated July 2026 with literary/colloquial coloring (red = literary, blue = colloquial, purple = both, green = regular polyphony). Switchable rime books currently supporting Guangyun, Fangyan Diaocha Zibiao, Jiyun, Hongwu Zhengyun, and Old Chinese."
           },
           {
             "title": "Phoneme Query",
@@ -108,7 +108,7 @@
         "items": [
           {
             "title": "Dialect Maps",
-            "body": "One-click switch from query results to map view, displaying phonetic values by proportion (>50% no parentheses, 35–50% with parentheses, 20–35% with asterisk). Click points on the map for drill-down queries. Supports place name labels, fullscreen, and base map switching."
+            "body": "One-click switch from query results to map view, displaying phonetic values by proportion. Click points on the map for drill-down queries. Supports place name labels, fullscreen, and base map switching."
           },
           {
             "title": "Regional Mapping",
@@ -135,7 +135,7 @@
           },
           {
             "title": "Jyutping to IPA",
-            "body": "Upload tables with a 'Jyutping' column and convert to IPA by rule. Supports custom conversion rules; personal configuration stored in localStorage."
+            "body": "Upload tables with a 'Jyutping' column and convert to IPA by rule. Supports custom conversion rules; can store personal configuration locally."
           },
           {
             "title": "Table Merge",
