@@ -10,6 +10,10 @@ Praat 声学分析的入口。上传语音文件或直接录音，截取分段�
 
 ## 上传语音
 
+![Praat 上传/录音界面](/tutorial/explore-praat-upload/upload.jpg)
+
+*上传语音文件或直接录音*
+
 - 拖动文件或点击「选择文件」上传
 - 支持 WAV、MP3、M4A、WebM、OGG、FLAC、AAC 等多种格式
 - 也可以直接在网站上录音，无需预先准备文件

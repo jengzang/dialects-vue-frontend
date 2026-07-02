@@ -4,6 +4,10 @@
 
 ## 基本操作
 
+![粵拼轉IPA界面](/tutorial/explore-jyut2ipa/overview.jpg)
+
+*粵拼轉IPA——自定義轉換規則*
+
 1. 登入帳號
 2. 在設置面板中調整轉換規則（可選，預設規則已涵蓋常見轉換）
 3. 上傳 Excel 檔案（.xlsx、.xls，單檔案上限 3 MB）

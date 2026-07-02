@@ -4,6 +4,10 @@
 
 ## 结果内容
 
+![Praat 分析结果](/tutorial/explore-praat-results/results.jpg)
+
+*声学分析结果——基频、强度、共振峰*
+
 根据勾选的分析模块，结果页面会展示：
 
 - **基本信息**：时长、采样率

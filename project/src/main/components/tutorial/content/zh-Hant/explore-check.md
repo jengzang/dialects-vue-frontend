@@ -4,6 +4,10 @@
 
 ## 基本操作
 
+![字表檢查界面](/tutorial/explore-check/overview.jpg)
+
+*字表檢查——自動分析錯誤統計*
+
 1. 登入帳號
 2. 選擇數據格式（音典、跳跳老鼠、縣誌）
 3. 上傳檔案（支持 .xlsx、.xls、.doc、.docx、.tsv，單檔案上限 3 MB）
