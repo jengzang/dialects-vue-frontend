@@ -121,7 +121,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render } from 'vue';
+import { ref, onMounted, onActivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render } from 'vue';
 import { useI18n } from 'vue-i18n';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -353,6 +353,12 @@ onMounted(() => {
   initMap();
 });
 
+onActivated(() => {
+  if (map.value && mapStore.mergedData?.length > 0) {
+    applyResetView(AUTO_RESET_DENSITY_PERCENTILE);
+  }
+});
+
 onBeforeUnmount(() => {
   clearMarkers();
   if (map.value) {
@@ -387,6 +393,7 @@ watch(
   async (key) => {
     if (!key) return;
     await nextTick();
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     applyResetView(AUTO_RESET_DENSITY_PERCENTILE);
   },
   { flush: 'post' }

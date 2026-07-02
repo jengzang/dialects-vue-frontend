@@ -27,6 +27,21 @@ export async function func_mergeData(resultData = null, mapData = null, customDa
     // 用一个对象根据 location 和 feature 分组数据
     const groupedData = {};
 
+    // 构建 featureLabels: hash → 可读标签（取對應字前2字）
+    const featureLabels = {}
+    latestResults.forEach(item => {
+      const chars = item['對應字']
+      if (chars && Array.isArray(chars) && chars.length > 0) {
+        const label = chars.slice(0, 2).join('') + (chars.length > 2 ? '...' : '')
+        const keys = Object.keys(item['分組值'] || {})
+        if (keys.length > 0 && !featureLabels[keys[0]]) {
+          featureLabels[keys[0]] = label
+        }
+      }
+    })
+    mapStore.featureLabels = featureLabels
+    console.log('featureLabels built:', Object.keys(featureLabels).length, 'entries', featureLabels)
+
     // 遍历 latestResults 中的数据，获取相关列数据
     latestResults.forEach(item => {
         // 确保 "分組值" 是一个对象，并从中正确获取 feature 和 value
@@ -581,6 +596,8 @@ export function generateTonesMergedData(resultData, locationsData) {
     return mergedData;
 }
 
+let fitViewSeq = 0
+
 export function requestMapFitView() {
-  mapStore.fitViewKey = Date.now()
+  mapStore.fitViewKey = ++fitViewSeq
 }

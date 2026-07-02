@@ -49,7 +49,7 @@
             class="feature-btn active"
             @click="selectFeature(availableFeatures[0])"
           >
-            {{ availableFeatures[0] }}
+            {{ mapStore.featureLabels[availableFeatures[0]] || availableFeatures[0] }}
           </button>
         </div>
       </div>
@@ -170,10 +170,10 @@ const handleSubmitSuccess = async (response) => {
 // Feature dropdown
 const selectedFeature = ref('')
 
-// Computed feature options for dropdown
+// Computed feature options for dropdown (labels from featureLabels, values stay as hashes)
 const featureOptions = computed(() => {
   return availableFeatures.value.map(feat => ({
-    label: feat,
+    label: mapStore.featureLabels[feat] || feat,
     value: feat
   }))
 })
@@ -198,7 +198,7 @@ const comparePair = computed(() => {
 // 計算幫助文本
 const helpText = computed(() => {
   if (!selectedFeature.value) return t('map.help.noFeature')
-  return t('map.help.withFeature', { feature: selectedFeature.value })
+  return t('map.help.withFeature', { feature: mapStore.featureLabels[selectedFeature.value] || selectedFeature.value })
 })
 
 // Watch for feature list changes
