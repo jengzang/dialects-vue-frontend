@@ -205,6 +205,25 @@
               :options="characterTableOptions"
               width="100%"
             />
+            <hr style="border: none; height: 1px; background: rgba(0, 0, 0, 0.12); margin: 16px 0;">
+
+            <h3 class="section-title">{{ $t('about.settings.zhongguInputMode.title') }}
+              <HelpIcon
+                  :content="$t('about.settings.zhongguInputMode.description')"
+                  size="sm"
+                  placement="right"
+                  icon="?"
+                  icon-color="#007aff"
+                  style="margin-right: 2px; vertical-align: bottom;"
+              />
+            </h3>
+            <!-- <p class="section-description">{{ $t('about.settings.zhongguInputMode.description') }}</p> -->
+            <RadioGroup
+              v-model="zhongguInputModeModel"
+              :options="zhongguInputModeOptions"
+              name="about-zhonggu-input-mode"
+              class="settings-radio-group"
+            />
           </div>
 
           <div class="setting-section">
@@ -216,18 +235,6 @@
               :options="interfaceModeRadioOptions"
               name="about-interface-mode"
               class="settings-radio-group interface-mode-radio-group"
-            />
-          </div>
-
-          <div class="setting-section">
-            <h3 class="section-title">{{ $t('about.settings.zhongguInputMode.title') }}</h3>
-            <p class="section-description">{{ $t('about.settings.zhongguInputMode.description') }}</p>
-
-            <RadioGroup
-              v-model="zhongguInputModeModel"
-              :options="zhongguInputModeOptions"
-              name="about-zhonggu-input-mode"
-              class="settings-radio-group"
             />
           </div>
 
@@ -276,6 +283,7 @@ import TabsContainer from '@/components/common/TabsContainer.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
+import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
 import {
   UI_MODE_DEFAULT,

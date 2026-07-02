@@ -45,7 +45,7 @@
       />
     </div>
 
-    <div v-if="hasSelection" class="info-header">
+    <div v-if="hasPositions" class="info-header">
       <div class="info-text">
         <span class="info-icon">ℹ️</span>
         <span>
@@ -69,15 +69,15 @@
       ⚠️ {{ limitHint }}
     </div>
 
-    <div v-if="loading" class="status-msg loading">
+    <div v-if="hasPositions && loading" class="status-msg loading">
       <span class="ui-loading--inline" aria-hidden="true">↻</span> {{ $t('query.components.zhongguDirectInput.querying') }}
     </div>
 
-    <div v-else-if="!results || results.length === 0" class="status-msg empty">
-      {{ hasSelection ? $t('query.components.zhongguDirectInput.noMatches') : $t('query.components.zhongguDirectInput.pleaseSelect') }}
+    <div v-else-if="hasPositions && (!results || results.length === 0)" class="status-msg empty">
+      {{ $t('query.components.zhongguDirectInput.noMatches') }}
     </div>
 
-    <div v-else class="compact-grid">
+    <div v-else-if="hasPositions" class="compact-grid">
       <div v-for="item in results" :key="item.query" class="compact-item">
         <span class="compact-title">{{ formatTitle(item.query) }}</span>
         <span class="compact-count">({{ item['char_count'] }})</span>
@@ -156,7 +156,8 @@ const chars = computed(() => {
   return [...charInput.value.trim()].filter(ch => /\p{Script=Han}/u.test(ch))
 })
 
-const hasSelection = computed(() => pathStrings.value.length > 0)
+const hasPositions = computed(() => pathStrings.value.length > 0)
+const hasSelection = computed(() => hasPositions.value || (chars.value && chars.value.length > 0))
 
 const positionInputRef = ref(null)
 
@@ -192,6 +193,13 @@ watch(pathStrings, (newVal, oldVal) => {
   if (newVal.length === 0) {
     results.value = []
     return
+  }
+})
+
+watch(chars, (newVal) => {
+  if (positionErrors.value.length > 0) return
+  if (!pathStrings.value.length) {
+    updateDisabledState(!(newVal && newVal.length > 0))
   }
 })
 
@@ -255,11 +263,17 @@ defineExpose({ pathStrings, chars })
 
 <style scoped>
 .zhonggu-direct-input {
+  background: none;
+  width: 80dvw;
+  max-width:600px;
   margin: 10px 0;
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .input-section {
@@ -303,6 +317,7 @@ defineExpose({ pathStrings, chars })
 
 .position-textarea {
   width: 100%;
+  max-width: 600px;
   min-height: 56px;
   padding: 10px 12px;
   border: 1.5px solid var(--border-medium, #ddd);
@@ -335,6 +350,7 @@ defineExpose({ pathStrings, chars })
 
 .char-input {
   width: 100%;
+  max-width: 600px;
   padding: 10px 12px;
   border: 1.5px solid var(--border-medium, #ddd);
   border-radius: 10px;

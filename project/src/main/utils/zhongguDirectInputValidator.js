@@ -17,20 +17,84 @@ const S2T = {
   '庄': '莊', '浊': '濁', '软': '軟', '卷': '捲', '齿': '齒',
   '双': '雙', '见': '見', '帮': '幫', '并': '並', '来': '來',
   '从': '從', '开': '開', '无': '無', '为': '為', '门': '門',
-  '云': '云', '关': '關', '书': '書', '东': '東', '经': '經',
+  '关': '關', '书': '書', '东': '東', '经': '經',
   '层': '層', '严': '嚴', '刍': '芻', '发': '發', '齐': '齊',
   '废': '廢', '号': '號', '国': '國', '会': '會', '机': '機',
   '极': '極', '节': '節', '尽': '盡', '据': '據', '宽': '寬',
   '乐': '樂', '离': '離', '里': '裡', '历': '歷', '联': '聯',
   '刘': '劉', '龙': '龍', '马': '馬', '么': '麼', '万': '萬',
   '农': '農', '气': '氣', '圣': '聖', '胜': '勝', '实': '實',
-  '肃': '肅', '岁': '歲'
+  '肃': '肅', '岁': '歲',
+  '调': '調', '韵': '韻', '组': '組',
 }
+
+const T2S = {}
+Object.entries(S2T).forEach(([s, t]) => {
+  T2S[t] = s
+})
+// Additional traditional→simplified mappings for characters whose
+// traditional variant differs from the canonical category value
+Object.assign(T2S, {
+  '雲': '云',
+  '衛': '卫',
+  '錄': '录',
+  '復': '复',
+  '術': '术',
+  '選': '选',
+  '尋': '寻',
+  '對': '对',
+  '導': '导',
+  '義': '义',
+  '處': '处',
+  '傳': '传',
+  '區': '区',
+  '號': '号',
+  '機': '机',
+  '極': '极',
+  '節': '节',
+  '盡': '尽',
+  '據': '据',
+  '寬': '宽',
+  '樂': '乐',
+  '離': '离',
+  '聯': '联',
+  '劉': '刘',
+  '龍': '龙',
+  '馬': '马',
+  '農': '农',
+  '氣': '气',
+  '聖': '圣',
+  '勝': '胜',
+  '實': '实',
+  '肅': '肃',
+  '歲': '岁',
+  '萬': '万',
+  '經': '经',
+  '層': '层',
+  '嚴': '严',
+  '廢': '废',
+  '齊': '齐',
+  '國': '国',
+  '會': '会',
+  '關': '关',
+  '東': '东',
+  '麼': '么',
+  '裏': '里',
+  '歷': '历'
+})
 
 function toTraditional(str) {
   let result = ''
   for (const ch of str) {
     result += S2T[ch] || ch
+  }
+  return result
+}
+
+function toSimplified(str) {
+  let result = ''
+  for (const ch of str) {
+    result += T2S[ch] || ch
   }
   return result
 }
@@ -73,6 +137,26 @@ function lookupValue(value) {
   if (valueToCategories[value]) return valueToCategories[value]
   const trad = toTraditional(value)
   if (trad !== value && valueToCategories[trad]) return valueToCategories[trad]
+  const simp = toSimplified(value)
+  if (simp !== value && valueToCategories[simp]) return valueToCategories[simp]
+  return null
+}
+
+function resolveCanonicalValue(value) {
+  if (valueToCategories[value]) return value
+  const trad = toTraditional(value)
+  if (trad !== value && valueToCategories[trad]) return trad
+  const simp = toSimplified(value)
+  if (simp !== value && valueToCategories[simp]) return simp
+  return toTraditional(value)
+}
+
+function lookupCategory(cat) {
+  if (CATEGORY_VALUES[cat]) return cat
+  const trad = toTraditional(cat)
+  if (trad !== cat && CATEGORY_VALUES[trad]) return trad
+  const simp = toSimplified(cat)
+  if (simp !== cat && CATEGORY_VALUES[simp]) return simp
   return null
 }
 
@@ -83,25 +167,35 @@ function tryMatchFullMatchPattern(token) {
   const prefixValueRaw = token.slice(0, dashIdx)
   const categoryRaw = token.slice(dashIdx + 1)
 
-  const prefixValue = toTraditional(prefixValueRaw)
-  const category = toTraditional(categoryRaw)
+  const category = lookupCategory(categoryRaw)
+  if (!category) return null
 
-  if (!CATEGORY_VALUES[category]) return null
-
-  const prefixCats = lookupValue(prefixValue)
+  const prefixCats = lookupValue(prefixValueRaw)
   if (!prefixCats || prefixCats.length === 0) return null
 
-  return { value: prefixValue, category, isFullMatch: true }
+  return { value: resolveCanonicalValue(prefixValueRaw), category, isFullMatch: true }
 }
 
 function tryMatchCategorySuffix(token) {
   const tradToken = toTraditional(token)
+  const simpToken = toSimplified(token)
+
   for (const cat of CATEGORY_NAMES_SORTED) {
+    const catSimp = toSimplified(cat)
+    let value = null
+
     if (tradToken.endsWith(cat) && tradToken.length > cat.length) {
-      const value = tradToken.slice(0, -cat.length)
-      if (CATEGORY_VALUES[cat] && CATEGORY_VALUES[cat].includes(value)) {
-        return { value, category: cat }
-      }
+      value = tradToken.slice(0, -cat.length)
+    } else if (catSimp !== cat && tradToken.endsWith(catSimp) && tradToken.length > catSimp.length) {
+      value = tradToken.slice(0, -catSimp.length)
+    } else if (simpToken.endsWith(cat) && simpToken.length > cat.length) {
+      value = simpToken.slice(0, -cat.length)
+    } else if (catSimp !== cat && simpToken.endsWith(catSimp) && simpToken.length > catSimp.length) {
+      value = simpToken.slice(0, -catSimp.length)
+    }
+
+    if (value !== null && CATEGORY_VALUES[cat] && CATEGORY_VALUES[cat].includes(value)) {
+      return { value, category: cat }
     }
   }
   return null
@@ -116,8 +210,8 @@ export function validateToken(token) {
 
   if (trimmed.startsWith('-')) {
     const categoryRaw = trimmed.slice(1)
-    const category = toTraditional(categoryRaw)
-    if (!CATEGORY_VALUES[category]) {
+    const category = lookupCategory(categoryRaw)
+    if (!category) {
       return {
         valid: false,
         error: 'unknownCategory',
@@ -143,12 +237,12 @@ export function validateToken(token) {
     }
   }
 
-  const tradToken = toTraditional(trimmed)
-  const categories = valueToCategories[tradToken]
+  const categories = lookupValue(trimmed)
+  const resolvedValue = resolveCanonicalValue(trimmed)
   if (categories && categories.length === 1) {
     return {
       valid: true,
-      parsed: { value: tradToken, category: categories[0], isFullMatch: false }
+      parsed: { value: resolvedValue, category: categories[0], isFullMatch: false }
     }
   }
 
@@ -158,14 +252,14 @@ export function validateToken(token) {
       warning: 'duplicateValue',
       warningPayload: {
         value: trimmed,
-        categories: categories.map(c => `${tradToken}${getCategoryLabel(c)}`)
+        categories: categories.map(c => `${resolvedValue}${getCategoryLabel(c)}`)
       },
-      parsed: { value: tradToken, category: getDefaultCategory(categories), isFullMatch: false }
+      parsed: { value: resolvedValue, category: getDefaultCategory(categories), isFullMatch: false }
     }
   }
 
-  if (tradToken.length > 1) {
-    const chars = [...tradToken]
+  if (resolvedValue.length > 1) {
+    const chars = [...resolvedValue]
     const charResults = []
     let allKnown = true
 

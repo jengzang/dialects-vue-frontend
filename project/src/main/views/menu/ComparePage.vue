@@ -118,26 +118,79 @@
                 </Teleport>
               </div>
 
+              <ZhongGuDirectInput
+                ref="CompareDirectInputRef"
+                :exclude-columns="tabStates.tab2.current.excludeColumns"
+                :table-name="selectedCharacterTable"
+              />
+
               <div class="selected-groups-container">
                 <div class="selected-group group1-style">
                   <div class="selected-group-header">
                     <span>{{ $t('compare.group.label1') }}</span>
+                    <button
+                      class="add-btn add-to-group1"
+                      :disabled="!canAddToGroup"
+                      @click="addToGroup('group1')"
+                    >
+                      {{ $t('compare.button.add') }}
+                    </button>
                   </div>
-                  <ZhongGuDirectInput
-                    ref="CompareDirectInputRef1"
-                    :exclude-columns="tabStates.tab2.current.excludeColumns"
-                    :table-name="selectedCharacterTable"
-                  />
+                  <div class="selected-items-list">
+                    <div
+                      v-for="(item, index) in tabStates.tab2.group1Items"
+                      :key="index"
+                      class="selected-item"
+                    >
+                      <span class="item-label">{{ formatSelectedItem(item) }}</span>
+                      <button
+                        class="remove-btn"
+                        @click="removeFromGroup('group1', index)"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div
+                      v-if="tabStates.tab2.group1Items.length === 0"
+                      class="empty-hint"
+                    >
+                      {{ $t('compare.messages.noConditionsAdded') }}
+                    </div>
+                  </div>
                 </div>
+
                 <div class="selected-group group2-style">
                   <div class="selected-group-header">
                     <span>{{ $t('compare.group.label2') }}</span>
+                    <button
+                      class="add-btn add-to-group2"
+                      :disabled="!canAddToGroup"
+                      @click="addToGroup('group2')"
+                    >
+                      {{ $t('compare.button.add') }}
+                    </button>
                   </div>
-                  <ZhongGuDirectInput
-                    ref="CompareDirectInputRef2"
-                    :exclude-columns="tabStates.tab2.current.excludeColumns"
-                    :table-name="selectedCharacterTable"
-                  />
+                  <div class="selected-items-list">
+                    <div
+                      v-for="(item, index) in tabStates.tab2.group2Items"
+                      :key="index"
+                      class="selected-item"
+                    >
+                      <span class="item-label">{{ formatSelectedItem(item) }}</span>
+                      <button
+                        class="remove-btn"
+                        @click="removeFromGroup('group2', index)"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div
+                      v-if="tabStates.tab2.group2Items.length === 0"
+                      class="empty-hint"
+                    >
+                      {{ $t('compare.messages.noConditionsAdded') }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -341,13 +394,13 @@
                 :aria-label="t('compare.sankeyControls.title', '桑基图操作')"
               >
                 <div class="tab5-sankey-control-row">
-                  <Checkbox
+                  <CheckBox
                     v-model="tabStates.tab5.enableLinkOptimization"
                     :label="t('compare.sankeyControls.optimizeLinks', '优化连线')"
                     :font-size="12"
                   />
 
-                  <Checkbox
+                  <CheckBox
                     v-model="tabStates.tab5.ignorePolyphonicChars"
                     :label="t('compare.sankeyControls.ignorePolyphonicChars', '忽略多音字')"
                     :font-size="12"
@@ -481,7 +534,7 @@ import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
 import RadioGroup from '@/components/selector/RadioGroup.vue';
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
 import ChoiceSelector from "@/components/selector/ChoiceSelector.vue";
-import Checkbox from "@/components/selector/Checkbox.vue";
+import CheckBox from "@/components/selector/CheckBox.vue";
 import {
   queryStore,
   uiStore,
@@ -632,8 +685,14 @@ const tabStates = reactive({
 // Tab2 相關方法
 // 檢查是否可以添加到組
 const canAddToGroup = computed(() => {
+  if (zhongguInputMode.value === 'direct') {
+    const ref = CompareDirectInputRef.value
+    if (!ref) return false
+    const ps = ref.pathStrings || []
+    const cs = ref.chars || ''
+    return ps.length > 0 || (cs && cs.length > 0)
+  }
   const current = tabStates.tab2.current
-  // 至少要有一個 key 被選中，且該 key 有值
   return current.keys.length > 0 && current.keys.some(key => {
     const values = current.valueMap[key]
     return values && values.length > 0
@@ -643,12 +702,27 @@ const canAddToGroup = computed(() => {
 // 添加到指定組
 function addToGroup(groupName) {
   const current = tabStates.tab2.current
+  const targetGroup = groupName === 'group1' ? tabStates.tab2.group1Items : tabStates.tab2.group2Items
+
+  if (zhongguInputMode.value === 'direct') {
+    const ref = CompareDirectInputRef.value
+    if (!ref) return
+    const pathStrings = ref.pathStrings || []
+    const chars = ref.chars || ''
+
+    const snapshot = {
+      type: 'direct',
+      card: current.card,
+      pathStrings: [...pathStrings],
+      chars,
+      excludeColumns: [...current.excludeColumns]
+    }
+    targetGroup.push(snapshot)
+    return
+  }
 
   // 從 ZhongguRefCurrent 獲取當前的 combinations
   const combinations = ZhongguRefCurrent.value?.combinations || []
-
-  // 獲取目標組的已有條件
-  const targetGroup = groupName === 'group1' ? tabStates.tab2.group1Items : tabStates.tab2.group2Items
 
   // ✅ 檢查排除設置是否一致（方案C：強制統一）
   if (targetGroup.length > 0) {
@@ -698,6 +772,23 @@ function removeFromGroup(groupName, index) {
 
 // 格式化已選項目顯示
 function formatSelectedItem(item) {
+  if (item.type === 'direct') {
+    const parts = []
+    if (item.pathStrings && item.pathStrings.length > 0) {
+      parts.push(item.pathStrings.map(s => {
+        const matches = [...s.matchAll(/\[(.*?)]\{(.*?)\}/g)]
+        return matches.map(m => `${m[1]}${m[2]}`).join('·')
+      }).join(', '))
+    }
+    if (item.chars && item.chars.length > 0) {
+      parts.push(item.chars)
+    }
+    if (item.excludeColumns && item.excludeColumns.length > 0) {
+      parts.push(`排除:${item.excludeColumns.join(',')}`)
+    }
+    return parts.join(' | ') || '(空)'
+  }
+
   const parts = []
   // ❌ 不再顯示 card（聲韻調），因為必須相同才能比較
   // parts.push(item.card)
@@ -771,24 +862,13 @@ watch(() => tabStates.tab1, (newVal) => {
   setTabContentDisabled('compare', 'tab1', !(group1Valid && group2Valid && featuresValid))
 }, { immediate: true, deep: true })
 
+const CompareDirectInputRef = ref(null)
+
 // 监听 Tab2：两个组都有至少一个条件才启用
 watch(() => {
-  if (zhongguInputMode.value === 'direct') {
-    const p1 = CompareDirectInputRef1.value?.pathStrings || []
-    const c1 = CompareDirectInputRef1.value?.chars || ''
-    const p2 = CompareDirectInputRef2.value?.pathStrings || []
-    const c2 = CompareDirectInputRef2.value?.chars || ''
-    const g1Valid = (p1.length > 0) || (c1 && c1.length > 0)
-    const g2Valid = (p2.length > 0) || (c2 && c2.length > 0)
-    return [g1Valid, g2Valid]
-  }
   return [tabStates.tab2.group1Items.length, tabStates.tab2.group2Items.length]
 }, ([g1, g2]) => {
-  if (zhongguInputMode.value === 'direct') {
-    setTabContentDisabled('compare', 'tab2', !g1 || !g2)
-  } else {
-    setTabContentDisabled('compare', 'tab2', g1 === 0 || g2 === 0)
-  }
+  setTabContentDisabled('compare', 'tab2', g1 === 0 || g2 === 0)
 }, { immediate: true, deep: true })
 
 // 监听 Tab 4 的调类选择
@@ -1218,10 +1298,6 @@ const ZhongguRef = ref(null);
 const ZhongguRef1 = ref(null);  // For tab2 group1
 const ZhongguRef2 = ref(null);  // For tab2 group2
 const ZhongguRefCurrent = ref(null);  // For tab2 current selector
-const CompareDirectInputRef1 = ref(null)
-const CompareDirectInputRef2 = ref(null)
-
-
 // Tab5 独立的运行逻辑
 const runTab5Action = () => {
   if (isTab5RunDisabled.value) return
@@ -1289,33 +1365,36 @@ const runAction = async () => {
       let params
 
       if (zhongguInputMode.value === 'direct') {
-        const group1PathStrings = CompareDirectInputRef1.value?.pathStrings || []
-        const group1Chars = CompareDirectInputRef1.value?.chars || ''
-        const group2PathStrings = CompareDirectInputRef2.value?.pathStrings || []
-        const group2Chars = CompareDirectInputRef2.value?.chars || ''
+        if (tabStates.tab2.group1Items.length === 0 || tabStates.tab2.group2Items.length === 0) {
+          return
+        }
 
-        if (group1PathStrings.length === 0 && (!group1Chars || group1Chars.length === 0)) return
-        if (group2PathStrings.length === 0 && (!group2Chars || group2Chars.length === 0)) return
+        const group1PathStrings = tabStates.tab2.group1Items.flatMap(item => item.pathStrings || [])
+        const group1Chars = tabStates.tab2.group1Items.map(item => item.chars || '').filter(Boolean).join('')
+        const group2PathStrings = tabStates.tab2.group2Items.flatMap(item => item.pathStrings || [])
+        const group2Chars = tabStates.tab2.group2Items.map(item => item.chars || '').filter(Boolean).join('')
 
-        const card = tabStates.tab2.current.card || '韻母'
-        const excludeCols = tabStates.tab2.current.excludeColumns
+        const group1Exclude = tabStates.tab2.group1Items[0].excludeColumns
+        const group2Exclude = tabStates.tab2.group2Items[0].excludeColumns
+        const group1Card = tabStates.tab2.group1Items[0].card
+        const group2Card = tabStates.tab2.group2Items[0].card
 
         params = {
           path_strings1: group1PathStrings,
           chars1: group1Chars ? [...group1Chars] : [],
           column1: null,
           combine_query1: false,
-          exclude_columns1: excludeCols,
+          exclude_columns1: group1Exclude,
 
           path_strings2: group2PathStrings,
           chars2: group2Chars ? [...group2Chars] : [],
           column2: null,
           combine_query2: false,
-          exclude_columns2: excludeCols,
+          exclude_columns2: group2Exclude,
 
           locations: locationList,
           regions: regionList,
-          features: [card, card],
+          features: [group1Card, group2Card],
           region_mode: locationRef.value?.regionUsing || 'yindian',
           table_name: selectedCharacterTable.value
         }
