@@ -12,46 +12,21 @@
           <h2 class="tabs-title">{{ $t('about.intro.title') }}</h2>
           <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
           <ul class="customlist">
-            <li>
-              <span v-html="$t('about.intro.features.feature1.title')"></span>
-              <span v-html="$t('about.intro.features.feature1.description')"></span>
+            <li v-for="(feature, idx) in featureList" :key="idx" class="feature-item">
+              <h3 class="feature-heading">{{ feature.heading }}</h3>
+              <p class="feature-subtitle">{{ feature.subtitle }}</p>
+              <p class="feature-intro">{{ feature.intro }}</p>
+              <ul v-if="feature.items.length" class="subfeature-list">
+                <li
+                  v-for="(item, i) in feature.items"
+                  :key="i"
+                  class="subfeature-item"
+                >
+                  <h4 class="subfeature-title">{{ item.title }}</h4>
+                  <p class="subfeature-body">{{ item.body }}</p>
+                </li>
+              </ul>
             </li>
-            <li>
-              <span v-html="$t('about.intro.features.feature2.title')"></span>
-              <span v-html="$t('about.intro.features.feature2.description')"></span>
-            </li>
-            <li>
-              <span v-html="$t('about.intro.features.feature3.title')"></span>
-              <span v-html="$t('about.intro.features.feature3.description')"></span>
-            </li>
-            <li>
-              <span v-html="$t('about.intro.features.feature4.title')"></span>
-              <span v-html="$t('about.intro.features.feature4.description')"></span>
-            </li>
-            <li>
-              <span v-html="$t('about.intro.features.feature5.title')"></span>
-              <span v-html="$t('about.intro.features.feature5.description')"></span>
-            </li>
-            <li>
-              <span v-html="$t('about.intro.features.feature6.title')"></span>
-              <span v-html="$t('about.intro.features.feature6.description')"></span>
-            </li>
-            <li>
-              <span v-html="$t('about.intro.features.feature7.title')"></span>
-              <span v-html="$t('about.intro.features.feature7.description')"></span>
-            </li>
-            <li>
-              <span v-html="$t('about.intro.features.feature8.title')"></span>
-              <span v-html="$t('about.intro.features.feature8.description')"></span>
-            </li>
-            <li>
-              <span v-html="$t('about.intro.features.feature9.title')"></span>
-              <span v-html="$t('about.intro.features.feature9.description')"></span>
-            </li>
-            <!-- <li>
-              <span v-html="$t('about.intro.features.feature10.title')"></span>
-              <span v-html="$t('about.intro.features.feature10.description')"></span>
-            </li> -->
             <li v-html="$t('about.intro.features.blueText')"></li>
             <li v-html="$t('about.intro.features.mapClick')"></li>
           </ul>
@@ -298,7 +273,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { setLocale } from '@/i18n/index.js'
+import i18n, { setLocale } from '@/i18n/index.js'
 import { showSuccess } from '@/utils/message.js'
 import SupportPopup from '@/main/components/popup/SupportPopup.vue'
 import TabsContainer from '@/components/common/TabsContainer.vue'
@@ -327,6 +302,20 @@ const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const showQRCodes = ref(false)
+
+const featureList = computed(() => {
+  const messages = i18n.global.messages.value[locale.value]
+  return Array.from({ length: 10 }, (_, i) => {
+    const n = i + 1
+    const f = messages.about.intro.features[`feature${n}`]
+    return {
+      heading: f.heading,
+      subtitle: f.subtitle,
+      intro: f.intro,
+      items: f.items || [],
+    }
+  })
+})
 
 const pathSectionToTab = {
   intro: 'intro',
@@ -618,14 +607,14 @@ em {
   padding-left: 20px;
   color: #333;
   font-size: 16px;
-  list-style-type: disc;
+  list-style-type: none;
 
   ol {
     list-style-type: decimal;
   }
 
   ul {
-    list-style-type: square;
+    list-style-type: none;
   }
 
   li {
@@ -642,6 +631,56 @@ em {
       }
     }
   }
+}
+
+.feature-item {
+  margin-bottom: 24px !important;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.feature-heading {
+  margin: 0 0 4px;
+  color: #1a1a1a;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.feature-subtitle {
+  margin: 0 0 6px;
+  color: #007aff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.feature-intro {
+  margin: 0 0 12px;
+  color: #555;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.subfeature-list {
+  margin: 8px 0 0 16px;
+  padding: 0;
+}
+
+.subfeature-item {
+  margin-bottom: 10px !important;
+}
+
+.subfeature-title {
+  margin: 0 0 2px;
+  color: #2c3e50;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.subfeature-body {
+  margin: 0;
+  color: #555;
+  font-size: 14px;
+  line-height: 1.65;
 }
 
 .thoughts {
@@ -1028,6 +1067,31 @@ em {
       margin-bottom: 4px;
       line-height: 1.45;
     }
+  }
+
+  .feature-heading {
+    font-size: 17px;
+  }
+
+  .feature-subtitle {
+    font-size: 13px;
+  }
+
+  .feature-intro {
+    font-size: 14px;
+  }
+
+  .subfeature-list {
+    margin-left: 12px;
+  }
+
+  .subfeature-title {
+    font-size: 14px;
+  }
+
+  .subfeature-body {
+    font-size: 13px;
+    line-height: 1.55;
   }
 
   .thoughts {
