@@ -14,27 +14,46 @@
           <ul class="customlist">
             <li>
               <span v-html="$t('about.intro.features.feature1.title')"></span>
-              {{ $t('about.intro.features.feature1.description') }}
+              <span v-html="$t('about.intro.features.feature1.description')"></span>
             </li>
             <li>
               <span v-html="$t('about.intro.features.feature2.title')"></span>
-              {{ $t('about.intro.features.feature2.description') }}
+              <span v-html="$t('about.intro.features.feature2.description')"></span>
             </li>
             <li>
               <span v-html="$t('about.intro.features.feature3.title')"></span>
-              {{ $t('about.intro.features.feature3.description') }}
+              <span v-html="$t('about.intro.features.feature3.description')"></span>
             </li>
             <li>
               <span v-html="$t('about.intro.features.feature4.title')"></span>
-              {{ $t('about.intro.features.feature4.description') }}
+              <span v-html="$t('about.intro.features.feature4.description')"></span>
             </li>
-            <li v-html="$t('about.intro.features.feature5.title')"></li>
+            <li>
+              <span v-html="$t('about.intro.features.feature5.title')"></span>
+              <span v-html="$t('about.intro.features.feature5.description')"></span>
+            </li>
             <li>
               <span v-html="$t('about.intro.features.feature6.title')"></span>
-              {{ $t('about.intro.features.feature6.description') }}
+              <span v-html="$t('about.intro.features.feature6.description')"></span>
             </li>
+            <li>
+              <span v-html="$t('about.intro.features.feature7.title')"></span>
+              <span v-html="$t('about.intro.features.feature7.description')"></span>
+            </li>
+            <li>
+              <span v-html="$t('about.intro.features.feature8.title')"></span>
+              <span v-html="$t('about.intro.features.feature8.description')"></span>
+            </li>
+            <li>
+              <span v-html="$t('about.intro.features.feature9.title')"></span>
+              <span v-html="$t('about.intro.features.feature9.description')"></span>
+            </li>
+            <!-- <li>
+              <span v-html="$t('about.intro.features.feature10.title')"></span>
+              <span v-html="$t('about.intro.features.feature10.description')"></span>
+            </li> -->
             <li v-html="$t('about.intro.features.blueText')"></li>
-            <li>{{ $t('about.intro.features.mapClick') }}</li>
+            <li v-html="$t('about.intro.features.mapClick')"></li>
           </ul>
 
           <ul v-if="false" class="customlist">
