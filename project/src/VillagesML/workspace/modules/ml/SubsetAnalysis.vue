@@ -10,8 +10,8 @@
 <!--      <p class="subtitle">對自訂村莊子集進行聚類與比較分析</p>-->
       <div v-if="!isAuthenticated" class="auth-warning">
         <span class="lock-icon">🔒</span>
-        <span>此功能需要登入</span>
-        <button @click="goToAuth" class="solid-button small">前往登入</button>
+        <span>此功能需要登錄</span>
+        <button @click="goToAuth" class="solid-button small">前往登錄</button>
       </div>
     </div>
 

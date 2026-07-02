@@ -36,12 +36,12 @@ const SEO_CONFIG = {
     },
     '/auth': {
       title: {
-        'zh-Hant': '登入與註冊｜方音圖鑑',
+        'zh-Hant': '登錄與註冊｜方音圖鑑',
         'zh-CN': '登录与注册｜方音图鉴',
         en: 'Login & Sign Up | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '登入方音圖鑑帳號，使用郵箱或用戶名訪問自定義地圖、個人資料與更多進階功能。',
+        'zh-Hant': '登錄方音圖鑑帳號，使用郵箱或用戶名訪問自定義地圖、個人資料與更多進階功能。',
         'zh-CN': '登录方音图鉴账号，使用邮箱或用户名访问自定义地图、个人资料与更多进阶功能。',
         en: 'Sign in to Dialects Atlas with your email or username to access custom maps, personal data, and more advanced features.',
       },

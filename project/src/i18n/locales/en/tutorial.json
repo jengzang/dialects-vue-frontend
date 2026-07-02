@@ -10,7 +10,8 @@
     "currentBadge": "Current",
     "previous": "Previous",
     "next": "Next",
-    "missing": "Tutorial is not available yet"
+    "missing": "Tutorial is not available yet",
+    "hideTutorial": "Don't show tutorials"
   },
   "groups": {
     "account": "Account and Customization",

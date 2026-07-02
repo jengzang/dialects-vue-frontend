@@ -27,6 +27,14 @@
           </div>
 
           <div class="tutorial-shell__actions">
+            <CheckBox
+              class="tutorial-hide-checkbox"
+              v-model="hideTutorialLocal"
+              :label="t('tutorial.ui.hideTutorial')"
+              :size="16"
+              :font-size="12"
+            />
+
             <button
               type="button"
               class="close-btn close-btn-sm close-btn-inline"
@@ -222,6 +230,8 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import { tutorialEnabled, setTutorialEnabled } from '@/main/store/store.js'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const props = defineProps({
   modelValue: {
@@ -294,6 +304,17 @@ const articleTopRef = ref(null)
 
 const shouldShowCatalog = computed(() => {
   return !props.isCompact || props.isMobileLandscape || props.isCatalogOpen
+})
+
+const hideTutorialLocal = ref(!tutorialEnabled.value)
+
+watch(() => props.modelValue, (visible) => {
+  if (!visible && hideTutorialLocal.value !== !tutorialEnabled.value) {
+    setTutorialEnabled(!hideTutorialLocal.value)
+  }
+  if (visible) {
+    hideTutorialLocal.value = !tutorialEnabled.value
+  }
 })
 
 const modalWidth = computed(() => {
@@ -495,7 +516,11 @@ $float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
     flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+  }
+
+  .tutorial-hide-checkbox {
+    white-space: nowrap;
   }
 
   &__body {

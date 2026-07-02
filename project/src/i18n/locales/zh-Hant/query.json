@@ -104,7 +104,7 @@
       "expandChildren": "展開",
       "messages": {
         "loadCustomRegionsFailed": "加載自定義分區失敗：{message}",
-        "loginRequired": "請先登入以使用自定義分區功能",
+        "loginRequired": "請先登錄以使用自定義分區功能",
         "noCustomRegionsConfirm": "您還沒有建立自定義分區，是否前往建立？",
         "loadRegionDetailsFailed": "獲取分區詳情失敗",
         "selectedCustomRegion": "已選擇自定義分區：{name}",

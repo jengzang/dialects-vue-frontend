@@ -27,8 +27,6 @@
 
     <PageTutorialGuide
       v-if="showTutorialGuide"
-      bottom-offset="112px"
-      mobile-bottom-offset="82px"
     />
   </div>
 </template>

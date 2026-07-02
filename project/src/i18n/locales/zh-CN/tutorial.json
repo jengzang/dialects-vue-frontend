@@ -10,7 +10,8 @@
     "currentBadge": "当前",
     "previous": "上一篇",
     "next": "下一篇",
-    "missing": "教程暂未提供"
+    "missing": "教程暂未提供",
+    "hideTutorial": "不再显示教程"
   },
   "groups": {
     "account": "账户与自定义",

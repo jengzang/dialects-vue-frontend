@@ -455,7 +455,7 @@ watch(localSettings, (newSettings) => {
 /* 选中状态 */
 .radio-option.active {
   border-color: #007aff; /* 激活色 */
-  background-color: rgba(0, 122, 255, 0.05);
+  background-color: rgba(0, 123, 255, 0.206);
 }
 
 .radio-label {

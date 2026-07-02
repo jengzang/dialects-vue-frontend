@@ -10,8 +10,8 @@
 <!--      <p class="subtitle">為自訂村莊集合提取特徵向量</p>-->
       <div v-if="!isAuthenticated" class="auth-warning">
         <span class="lock-icon">🔒</span>
-        <span>此功能需要登入</span>
-        <button @click="goToAuth" class="solid-button small">前往登入</button>
+        <span>此功能需要登錄</span>
+        <button @click="goToAuth" class="solid-button small">前往登錄</button>
       </div>
     </div>
 

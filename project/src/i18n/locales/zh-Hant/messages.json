@@ -36,13 +36,13 @@
   "rateLimit": {
     "defaultMessage": "請求過於頻繁，請稍後再試。",
     "retryIn": "恢復倒數",
-    "guestHint": "登入帳號後可繼續查詢，不必一直等到遊客額度恢復。",
+    "guestHint": "登錄帳號後可繼續查詢，不必一直等到遊客額度恢復。",
     "userHint": "請等待倒數結束後再試，無需重複提交。",
     "limitTypes": {
       "guest_ip_limit": "遊客額度已滿",
       "authenticated_ip_limit": "目前 IP 額度已滿",
       "authenticated_user_limit": "目前帳號額度已滿",
-      "login_ip_limit": "登入請求過於頻繁",
+      "login_ip_limit": "登錄請求過於頻繁",
       "default": "目前請求已被限流"
     },
     "duration": {
@@ -53,8 +53,8 @@
     }
   },
   "loginPrompt": {
-    "message": "登入後可使用高級功能，獲得更高的查詢上限，並可添加個人數據。",
-    "login": "立即登入",
+    "message": "登錄後可使用高級功能，獲得更高的查詢上限，並可添加個人數據。",
+    "login": "立即登錄",
     "dismiss": "關閉"
   }
 }

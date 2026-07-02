@@ -56,7 +56,7 @@
       "featureTypeRequired": "請填寫聲韻調或類別",
       "featureFieldRequired": "請填寫特徵",
       "valueRequired": "請填寫值",
-      "loginRequired": "登入後才能提交個人資料"
+      "loginRequired": "登錄後才能提交個人資料"
     },
     "messages": {
       "submitSuccess": "提交成功！",
@@ -105,14 +105,14 @@
     "title": "用戶自定義資料編輯與搜尋",
     "labels": {
       "featureSearch": "特徵搜尋",
-      "login": "登入",
+      "login": "登錄",
       "uncategorized": "未分類"
     },
     "placeholders": {
       "featureSearch": "輸入特徵關鍵詞..."
     },
     "badges": {
-      "loginRequired": "登入後才能管理個人資料",
+      "loginRequired": "登錄後才能管理個人資料",
       "noData": "尚未建立個人資料，請先新增",
       "dataCount": "你目前有 {count} 筆個人資料",
       "dataAndFeatureCount": "已有 {dataCount} 條數據，{featureCount} 個比較特徵"
@@ -134,7 +134,7 @@
     },
     "validation": {
       "selectFeature": "請先選擇一個特徵",
-      "loginFirst": "請先登入"
+      "loginFirst": "請先登錄"
     },
     "messages": {
       "noMatch": "找不到匹配的特徵",
@@ -150,7 +150,7 @@
           "items": {
             "privateSpace": {
               "label": "私人資料庫：",
-              "text": "這裡的資料只屬於你的帳號，登入後才能查看與編輯。"
+              "text": "這裡的資料只屬於你的帳號，登錄後才能查看與編輯。"
             },
             "mapRendering": {
               "label": "地圖呈現：",
@@ -347,7 +347,7 @@
       "cancelText": "取消"
     },
     "messages": {
-      "anonymousNoCustomData": "未登入用戶無法查看用戶個人資料！",
+      "anonymousNoCustomData": "未登錄用戶無法查看用戶個人資料！",
       "queryLocationFailed": "查詢失敗：{error}",
       "deleteInvalid": "刪除失敗，地點/特徵/值存在空值",
       "deleteSuccess": "刪除成功！\n{message}",
@@ -425,10 +425,10 @@
   },
   "drawTab": {
     "title": "地圖繪製",
-    "hint": "登入後可直接在地圖上繪製線與面，並導出目前圖層或圖片。",
+    "hint": "登錄後可直接在地圖上繪製線與面，並導出目前圖層或圖片。",
     "auth": {
-      "loginRequired": "請先登入後使用地圖繪製",
-      "loginAction": "登入"
+      "loginRequired": "請先登錄後使用地圖繪製",
+      "loginAction": "登錄"
     },
     "buttons": {
       "addLayer": "添加圖層",

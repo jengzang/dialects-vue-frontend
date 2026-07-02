@@ -281,7 +281,7 @@ docs(contributing): document standalone module boundaries
 - 可以有自己的 `App.vue`、`main.js`、`router.js`。
 - 可能需要獨立的 HTML 入口。
 - 可能同時需要在主站 Explore 裡暴露一個入口頁。
-- 可能需要登入後才能使用。
+- 可能需要登錄後才能使用。
 
 這種模組不是單純在現有主站下新增一個普通頁面，而是「獨立入口 + 主站接入」的混合模式。
 
@@ -402,9 +402,9 @@ project/
 - 主站 bridge 只作為兼容方案或 owner 指定方案，不作為新模組默認模板。
 - 只有當主站確實保留橋接或 legacy 入口時，才需要同步檢查 `project/src/main/router.js` 裡與外部橋接、query 白名單相關的邏輯。
 
-### 6.6 登入與權限規則
+### 6.6 登錄與權限規則
 
-若新模組需要登入後才能使用，必須複用現有登入與權限邏輯，不要自己複製一套：
+若新模組需要登錄後才能使用，必須複用現有登錄與權限邏輯，不要自己複製一套：
 
 - API 層：`project/src/api/auth/**`
 - 導出入口：`project/src/api/auth/index.js`
@@ -414,7 +414,7 @@ project/
 
 - 不要自行重寫 token 管理。
 - 不要自行重寫 session 驗證。
-- 不要另做一套與主站不一致的登入跳轉體驗。
+- 不要另做一套與主站不一致的登錄跳轉體驗。
 - 需要回跳時，沿用現有 redirect 約定。
 
 ### 6.7 國際化規則
@@ -458,7 +458,7 @@ project/
 | 模態框 | `project/src/components/common/AppModal.vue` | 新彈窗優先複用，不要每個模組各自寫一套 modal shell。 |
 | 消息提示 / 確認框 | `project/src/utils/message.js` | 請優先使用 `showSuccess`、`showError`、`showWarning`、`showInfo`、`showConfirm`，不要直接使用 `alert` / `confirm`。 |
 | 下拉選擇 | `project/src/components/selector/**` | 優先複用現有單選、多選、簡化選擇器。 |
-| 登入校驗 | `project/src/api/auth/**` + `project/src/composables/router/useAuthGuard.js` | 權限與登入跳轉務必複用。 |
+| 登錄校驗 | `project/src/api/auth/**` + `project/src/composables/router/useAuthGuard.js` | 權限與登錄跳轉務必複用。 |
 
 ### 7.2 可以參考，但不要默認當成穩定公共基礎設施
 
@@ -585,7 +585,7 @@ import CommonBar from '@/components/bar/CommonBar.vue'
 新增模組時請保持 API 層邊界清晰：
 
 - 與模組直接相關的 API 請放入 `project/src/api/<ModuleName>/`。
-- 權限與登入相關邏輯請複用 `project/src/api/auth/`。
+- 權限與登錄相關邏輯請複用 `project/src/api/auth/`。
 - 若要做 API 聚合導出，請在模組自己的 API 入口文件中完成，不要把模組私有 API 混進無關聚合文件。
 
 ---
@@ -672,7 +672,7 @@ import CommonBar from '@/components/bar/CommonBar.vue'
 - 模組主目錄在哪裡。
 - API 目錄在哪裡。
 - 是否已完成 Explore 接入。
-- 是否需要登入。
+- 是否需要登錄。
 - 是否已完成 i18n 接入。
 - 是否需要維護者補首頁入口或其他 owner-managed 接線。
 

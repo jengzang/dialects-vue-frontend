@@ -4,7 +4,7 @@
   },
   "main": {
     "title": "Praat 聲學分析",
-    "description": "上傳音訊或錄音，進行聲學特徵分析",
+    "description": "上傳音頻或錄音，進行聲學特徵分析",
     "tabs": {
       "upload": "上傳錄音",
       "results": "分析結果",
@@ -21,14 +21,14 @@
     },
     "actions": {
       "startAnalysis": "開始分析",
-      "pleaseSelectAudio": "請先選擇音訊",
+      "pleaseSelectAudio": "請先選擇音頻",
       "uploading": "上傳中...",
       "analysisInProgress": "分析進行中..."
     },
     "closePreview": "關閉預覽",
     "status": {
-      "preparingUpload": "準備上傳音訊...",
-      "uploading": "上傳音訊中...",
+      "preparingUpload": "準備上傳音頻...",
+      "uploading": "上傳音頻中...",
       "creatingJob": "建立分析任務...",
       "startingAnalysis": "開始分析...",
       "fetchingResults": "正在取得分析結果...",
@@ -38,23 +38,23 @@
       "pollingFailedCount": "輪詢任務狀態連續失敗 {count} 次"
     },
     "errors": {
-      "loginRequired": "請先登入",
+      "loginRequired": "請先登錄",
       "analysisStartFailed": "啟動分析失敗",
       "analysisFailed": "分析任務失敗",
       "resultsFetchFailed": "取得分析結果失敗",
       "cancelFailed": "取消任務失敗",
-      "durationExceeded": "音訊時長為 {duration} 秒，超過 3 秒限制。頻譜圖分析不支持超過 3 秒的音訊。請在設定中關閉頻譜圖模組後重試。",
+      "durationExceeded": "音頻時長為 {duration} 秒，超過 3 秒限制。頻譜圖分析不支持超過 3 秒的音頻。請在設定中關閉頻譜圖模組後重試。",
       "analysisInProgress": "已有分析任務正在進行中，請等待完成或先取消。",
       "uploadBusy": "目前上傳仍在忙碌中，請等待現有分析結束後再試。"
     },
     "noResults": {
       "title": "尚無分析結果",
-      "text": "請先上傳音訊並開始分析"
+      "text": "請先上傳音頻並開始分析"
     }
   },
   "audioInput": {
     "upload": {
-      "text": "拖曳音訊檔到此處，或點擊選擇",
+      "text": "拖曳音頻檔到此處，或點擊選擇",
       "hint": "支持 WAV、MP3、M4A、WebM、OGG、FLAC、AAC 格式"
     },
     "recording": {
@@ -65,14 +65,14 @@
     },
     "errors": {
       "fileSizeExceeded": "檔案大小超過 5MB 限制",
-      "unsupportedFormat": "不支持的音訊格式，請上傳 WAV、MP3、M4A、WebM、OGG、FLAC 或 AAC 檔案",
-      "processingFailed": "處理音訊檔失敗：{error}",
-      "readFailed": "無法讀取音訊檔",
+      "unsupportedFormat": "不支持的音頻格式，請上傳 WAV、MP3、M4A、WebM、OGG、FLAC 或 AAC 檔案",
+      "processingFailed": "處理音頻檔失敗：{error}",
+      "readFailed": "無法讀取音頻檔",
       "microphoneAccessDenied": "無法存取麥克風，請檢查權限設定"
     }
   },
   "audioPreview": {
-    "title": "音訊預覽",
+    "title": "音頻預覽",
     "segmentCount": "（{count} 個片段）",
     "modes": {
       "auto": "分段結果",
@@ -107,7 +107,7 @@
       "segment": "片段 {index}",
       "selected": "已選擇",
       "badges": {
-        "original": "原始音訊",
+        "original": "原始音頻",
         "autoSplit": "自動分段",
         "manual": "手動分段",
         "unknown": "未知"
@@ -176,7 +176,7 @@
     "cancel": "取消分析",
     "loading": {
       "title": "分析進行中...",
-      "defaultText": "正在處理音訊資料"
+      "defaultText": "正在處理音頻資料"
     },
     "error": {
       "title": "分析失敗",
@@ -199,7 +199,7 @@
     },
     "basicInfo": {
       "title": "基本資訊",
-      "duration": "音訊時長",
+      "duration": "音頻時長",
       "durationValue": "{duration} 秒",
       "sampleRate": "採樣率",
       "sampleRateValue": "{rate} Hz",
@@ -332,7 +332,7 @@
   "pitchTone": {
     "title": "石鋒 T 值分析器",
     "noData": {
-      "text": "請先上傳音訊並完成 Praat 分析"
+      "text": "請先上傳音頻並完成 Praat 分析"
     },
     "step1": {
       "title": "框選基頻並標註",

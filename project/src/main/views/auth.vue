@@ -380,7 +380,7 @@ const logout = async () => {
   if (!confirmed) return
 
   await authTask.run(async () => {
-    // console.log('🚪 [登出] 用户登出，先上报在线时长')
+    // console.log('🚪 [退出] 用户退出，先上报在线时长')
     await manualReport()
     stopOnlineTimeTracker({ clearPending: true })
 
@@ -389,7 +389,7 @@ const logout = async () => {
 
     user.value = null
 
-    // console.log('✅ [登出] 登出完成')
+    // console.log('✅ [退出] 退出完成')
 
     // Redirect to login page instead of reloading
     setView('login')

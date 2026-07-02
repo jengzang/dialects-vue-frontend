@@ -152,7 +152,7 @@ document.getElementById("infoForm").addEventListener("submit", async function (e
     if (!auth){
         // console.log("攔截")
         showToast("💡 提交個人數據需登錄！")
-    }  // 🚫 未登入 → 已經 preventDefault 並提示，直接退出
+    }  // 🚫 未登錄 → 已經 preventDefault 並提示，直接退出
     else
     {
         // 獲取表單元素
@@ -267,16 +267,16 @@ const customLabel  = document.getElementById('switch-text');
 // 全局旗標
 window.isCustomOn = window.isCustomOn || false;
 
-// ✅ 只保留一個 click 監聽，最前面做登入攔截
+// ✅ 只保留一個 click 監聽，最前面做登錄攔截
 customToggle.addEventListener('click', async function (e) {
 
     const auth = await ensureAuthenticated(e);
     if (!auth) {
         showToast("💡 自定義數據庫需要登錄")
         return;
-    } // 🚫 未登入直接退出
+    } // 🚫 未登錄直接退出
 
-    // ✅ 已登入 → 正常執行原本邏輯
+    // ✅ 已登錄 → 正常執行原本邏輯
     window.isCustomOn = !window.isCustomOn;
 
     // 切换 open 类

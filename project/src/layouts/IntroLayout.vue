@@ -9,7 +9,7 @@
       </transition>
     </router-view>
 
-    <!-- 🔐 登入按鈕 -->
+    <!-- 🔐 登錄按鈕 -->
     <button
       class="floating-login-button"
       @click="goToAuthPage"
