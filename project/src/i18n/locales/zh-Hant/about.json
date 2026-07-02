@@ -109,7 +109,7 @@
   "settings": {
     "tutorialToggle": {
       "title": "新手指導",
-      "description": "控制教程入口與隨機示例按鈕是否顯示，預設開啟。",
+      "description": "是否顯示教程入口與隨機骰子",
       "enabled": "已開啟",
       "disabled": "已關閉"
     }

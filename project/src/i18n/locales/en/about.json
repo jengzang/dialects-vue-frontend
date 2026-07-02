@@ -109,7 +109,7 @@
   "settings": {
     "tutorialToggle": {
       "title": "Tutorial Guide",
-      "description": "Control whether the tutorial entry and random example buttons are displayed. Enabled by default.",
+      "description": "Control whether the tutorial entry and random example buttons are displayed. ",
       "enabled": "Enabled",
       "disabled": "Disabled"
     }

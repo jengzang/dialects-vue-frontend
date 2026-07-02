@@ -439,13 +439,14 @@ function resolveTabRoute(tabName) {
 }
 
 .tutorial-toggle-copy {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
 .tutorial-switch-toggle {
-  width: 100%;
+  flex-shrink: 0;
   justify-content: flex-end;
 
   :deep(.switch-toggle__button) {
@@ -923,7 +924,7 @@ em {
   }
 
   .tutorial-switch-toggle {
-    width: 100%;
+    flex-shrink: 0;
     justify-content: flex-end;
   }
 
@@ -1096,7 +1097,7 @@ em {
   }
 
   .language-info {
-    gap: 2px;
+    gap: 0px;
     align-items: center;
     flex-direction: column;
   }
