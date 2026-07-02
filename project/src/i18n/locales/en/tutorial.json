@@ -14,17 +14,30 @@
     "hideTutorial": "Don't show tutorials",
     "hideTutorialTip": "You can re-enable tutorials in About - Settings."
   },
+  "categories": {
+    "account": "Account & Personal Data",
+    "multiCompare": "Multi-Variety Comparison",
+    "singleAnalysis": "Single-Variety Analysis",
+    "corpusAndCharClass": "Corpus & Character Sets",
+    "practicalTools": "Practical Tools",
+    "villages": "Village Analysis"
+  },
   "groups": {
-    "account": "Account and Customization",
-    "menuQuery": "Main Query",
-    "menuCompare": "Main Compare",
-    "menuMap": "Main Map",
-    "menuPhonology": "Main Phonology",
-    "menuResources": "Support and Resources",
-    "exploreTools": "Explore Tools",
-    "praat": "Praat Analysis",
-    "exploreResources": "Explore Resources",
-    "exploreVillages": "Explore Villages"
+    "authAccount": "Account Management",
+    "authData": "Personal Data",
+    "menuMapCustom": "Custom Map",
+    "menuQuery": "Query",
+    "menuCompare": "Compare",
+    "menuMapOverview": "Map & Results",
+    "menuPhonology": "Phonology Analysis",
+    "exploreYubao": "YuBao Corpus",
+    "exploreCharClass": "Character Sets",
+    "exploreYcSpoken": "Yangchun Spoken",
+    "praat": "Praat Acoustic Analysis",
+    "exploreTools": "Character Table Tools",
+    "menuMapDraw": "Map Drawing",
+    "exploreVillages": "Guangdong Villages",
+    "villagesML": "Village Name ML"
   },
   "disclaimer": {
     "title": "Please Note",

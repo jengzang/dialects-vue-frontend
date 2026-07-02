@@ -8,23 +8,36 @@ function readQueryValue(query, key) {
   return rawValue || ''
 }
 
-function createPathEntry({ key, groupKey, order, path }) {
+function createPathEntry({ key, categoryKey, groupKey, order, path, docKey }) {
   return {
     key,
-    docKey: key,
+    docKey: docKey || key,
+    categoryKey,
     groupKey,
     order,
     match: (currentRoute) => stripLocaleFromPath(currentRoute.path) === stripLocaleFromPath(path),
   }
 }
 
-function createQueryEntry({ key, groupKey, order, path, queryResolver, expectedValue }) {
+function createQueryEntry({ key, categoryKey, groupKey, order, path, queryResolver, expectedValue, docKey }) {
   return {
     key,
-    docKey: key,
+    docKey: docKey || key,
+    categoryKey,
     groupKey,
     order,
     match: (currentRoute) => stripLocaleFromPath(currentRoute.path) === stripLocaleFromPath(path) && queryResolver(currentRoute) === expectedValue,
+  }
+}
+
+function createPathPrefixEntry({ key, categoryKey, groupKey, order, pathPrefix, docKey }) {
+  return {
+    key,
+    docKey: docKey || key,
+    categoryKey,
+    groupKey,
+    order,
+    match: (currentRoute) => stripLocaleFromPath(currentRoute.path).startsWith(stripLocaleFromPath(pathPrefix)),
   }
 }
 
@@ -48,28 +61,21 @@ function normalizePraatTab(currentRoute) {
   return validTabs.includes(tab) ? tab : 'upload'
 }
 
-function normalizeYuBaoTab(currentRoute) {
-  return readQueryValue(currentRoute.query, 'tab') === 'grammar' ? 'grammar' : 'vocabulary'
-}
-
-function normalizeCharacterTableTab(currentRoute) {
-  const tab = readQueryValue(currentRoute.query, 'tab')
-  const validTabs = ['zhonggu', 'shanggu', 'jingu', 'yueyun']
-  return validTabs.includes(tab) ? tab : 'zhonggu'
-}
-
 export const tutorialManifest = [
+  // ==================== 账户与个人数据 ====================
   createQueryEntry({
-    key: 'auth-operation',
-    groupKey: 'account',
+    key: 'auth-login',
+    categoryKey: 'account',
+    groupKey: 'authAccount',
     order: 0,
     path: '/auth',
     queryResolver: normalizeAuthView,
     expectedValue: 'login',
   }),
   createQueryEntry({
-    key: 'auth-info',
-    groupKey: 'account',
+    key: 'auth-overview',
+    categoryKey: 'account',
+    groupKey: 'authAccount',
     order: 1,
     path: '/auth',
     queryResolver: normalizeAuthView,
@@ -77,274 +83,237 @@ export const tutorialManifest = [
   }),
   createPathEntry({
     key: 'auth-data',
-    groupKey: 'account',
+    categoryKey: 'account',
+    groupKey: 'authData',
     order: 2,
     path: '/auth/data',
   }),
   createPathEntry({
     key: 'auth-regions',
-    groupKey: 'account',
+    categoryKey: 'account',
+    groupKey: 'authData',
     order: 3,
     path: '/auth/regions',
   }),
   createPathEntry({
+    key: 'menu-map-custom',
+    categoryKey: 'account',
+    groupKey: 'menuMapCustom',
+    order: 4,
+    path: '/menu/map/custom',
+  }),
+
+  // ==================== 多方言点对比分析 ====================
+  createPathEntry({
     key: 'menu-query-char',
+    categoryKey: 'multiCompare',
     groupKey: 'menuQuery',
-    order: 7,
+    order: 10,
     path: '/menu/query/char',
   }),
   createPathEntry({
     key: 'menu-query-zhonggu',
+    categoryKey: 'multiCompare',
     groupKey: 'menuQuery',
-    order: 8,
+    order: 11,
     path: '/menu/query/zhonggu',
   }),
   createPathEntry({
     key: 'menu-query-yinwei',
+    categoryKey: 'multiCompare',
     groupKey: 'menuQuery',
-    order: 9,
+    order: 12,
     path: '/menu/query/yinwei',
   }),
   createPathEntry({
     key: 'menu-query-tone',
+    categoryKey: 'multiCompare',
     groupKey: 'menuQuery',
-    order: 10,
+    order: 13,
     path: '/menu/query/tone',
   }),
   createPathEntry({
     key: 'menu-compare-char',
+    categoryKey: 'multiCompare',
     groupKey: 'menuCompare',
-    order: 11,
+    order: 14,
     path: '/menu/compare/char',
   }),
   createPathEntry({
     key: 'menu-compare-zhonggu',
+    categoryKey: 'multiCompare',
     groupKey: 'menuCompare',
-    order: 12,
+    order: 15,
     path: '/menu/compare/zhonggu',
   }),
   createPathEntry({
     key: 'menu-compare-tone',
+    categoryKey: 'multiCompare',
     groupKey: 'menuCompare',
-    order: 13,
+    order: 16,
     path: '/menu/compare/tone',
   }),
   createPathEntry({
     key: 'menu-map-view',
-    groupKey: 'menuMap',
-    order: 14,
+    categoryKey: 'multiCompare',
+    groupKey: 'menuMapOverview',
+    order: 17,
     path: '/menu/map/view',
   }),
   createPathEntry({
     key: 'menu-map-divide',
-    groupKey: 'menuMap',
-    order: 15,
+    categoryKey: 'multiCompare',
+    groupKey: 'menuMapOverview',
+    order: 18,
     path: '/menu/map/divide',
   }),
   createPathEntry({
-    key: 'menu-map-custom',
-    groupKey: 'menuMap',
-    order: 16,
-    path: '/menu/map/custom',
+    key: 'menu-result',
+    categoryKey: 'multiCompare',
+    groupKey: 'menuMapOverview',
+    order: 19,
+    path: '/menu/result',
   }),
+
+  // ==================== 单方言点深入探索 ====================
   createPathEntry({
     key: 'menu-pho-matrix',
+    categoryKey: 'singleAnalysis',
     groupKey: 'menuPhonology',
-    order: 17,
+    order: 20,
     path: '/menu/pho/matrix',
   }),
   createPathEntry({
     key: 'menu-pho-custom',
+    categoryKey: 'singleAnalysis',
     groupKey: 'menuPhonology',
-    order: 18,
+    order: 21,
     path: '/menu/pho/custom',
   }),
   createPathEntry({
     key: 'menu-pho-count',
+    categoryKey: 'singleAnalysis',
     groupKey: 'menuPhonology',
-    order: 19,
+    order: 22,
     path: '/menu/pho/count',
   }),
   createPathEntry({
     key: 'menu-pho-evolution',
+    categoryKey: 'singleAnalysis',
     groupKey: 'menuPhonology',
-    order: 20,
+    order: 23,
     path: '/menu/pho/evolution',
   }),
-  createPathEntry({
-    key: 'menu-result',
-    groupKey: 'menuResources',
-    order: 21,
-    path: '/menu/result',
-  }),
-  createPathEntry({
-    key: 'menu-about-intro',
-    groupKey: 'menuResources',
-    order: 22,
-    path: '/menu/about/intro',
-  }),
-  createPathEntry({
-    key: 'menu-about-suggestion',
-    groupKey: 'menuResources',
-    order: 23,
-    path: '/menu/about/suggestion',
-  }),
-  createPathEntry({
-    key: 'menu-about-like',
-    groupKey: 'menuResources',
-    order: 24,
-    path: '/menu/about/like',
-  }),
-  createPathEntry({
-    key: 'menu-about-settings',
-    groupKey: 'menuResources',
-    order: 25,
-    path: '/menu/about/settings',
-  }),
-  // createPathEntry({
-  //   key: 'menu-source',
-  //   groupKey: 'menuResources',
-  //   order: 26,
-  //   path: '/menu/source',
-  // }),
-  // createPathEntry({
-  //   key: 'menu-privacy',
-  //   groupKey: 'menuResources',
-  //   order: 27,
-  //   path: '/menu/privacy',
-  // }),
-  createPathEntry({
-    key: 'menu-villages',
-    groupKey: 'menuResources',
+
+  // ==================== 词句与字集 ====================
+  createPathPrefixEntry({
+    key: 'explore-yubao',
+    categoryKey: 'corpusAndCharClass',
+    groupKey: 'exploreYubao',
     order: 30,
-    path: '/menu/villages',
+    pathPrefix: '/explore/yubao',
   }),
-  // createPathEntry({
-  //   key: 'menu-cluster',
-  //   groupKey: 'menuResources',
-  //   order: 31,
-  //   path: '/menu/cluster',
-  // }),
+  createPathPrefixEntry({
+    key: 'explore-char-class',
+    categoryKey: 'corpusAndCharClass',
+    groupKey: 'exploreCharClass',
+    order: 31,
+    pathPrefix: '/explore/char-class',
+  }),
   createPathEntry({
-    key: 'explore-check',
-    groupKey: 'exploreTools',
+    key: 'explore-yc-spoken',
+    categoryKey: 'corpusAndCharClass',
+    groupKey: 'exploreYcSpoken',
     order: 32,
-    path: '/explore/tools/check',
+    path: '/explore/yc-spoken',
   }),
-  createPathEntry({
-    key: 'explore-jyut2ipa',
-    groupKey: 'exploreTools',
-    order: 33,
-    path: '/explore/tools/jyut2ipa',
-  }),
-  createPathEntry({
-    key: 'explore-merge',
-    groupKey: 'exploreTools',
-    order: 34,
-    path: '/explore/tools/merge',
-  }),
+
+  // ==================== 实用工具 ====================
   createQueryEntry({
     key: 'explore-praat-upload',
+    categoryKey: 'practicalTools',
     groupKey: 'praat',
-    order: 36,
+    order: 40,
     path: '/explore/tools/praat',
     queryResolver: normalizePraatTab,
     expectedValue: 'upload',
   }),
   createQueryEntry({
     key: 'explore-praat-results',
+    categoryKey: 'practicalTools',
     groupKey: 'praat',
-    order: 37,
+    order: 41,
     path: '/explore/tools/praat',
     queryResolver: normalizePraatTab,
     expectedValue: 'results',
   }),
   createQueryEntry({
     key: 'explore-praat-vowelspace',
+    categoryKey: 'practicalTools',
     groupKey: 'praat',
-    order: 38,
+    order: 42,
     path: '/explore/tools/praat',
     queryResolver: normalizePraatTab,
     expectedValue: 'vowelspace',
   }),
   createQueryEntry({
     key: 'explore-praat-pitchtone',
+    categoryKey: 'practicalTools',
     groupKey: 'praat',
-    order: 39,
+    order: 43,
     path: '/explore/tools/praat',
     queryResolver: normalizePraatTab,
     expectedValue: 'pitchtone',
   }),
-  createQueryEntry({
-    key: 'explore-yubao-vocabulary',
-    groupKey: 'exploreResources',
-    order: 40,
-    path: '/explore/yubao',
-    queryResolver: normalizeYuBaoTab,
-    expectedValue: 'vocabulary',
-  }),
-  createQueryEntry({
-    key: 'explore-yubao-grammar',
-    groupKey: 'exploreResources',
-    order: 41,
-    path: '/explore/yubao',
-    queryResolver: normalizeYuBaoTab,
-    expectedValue: 'grammar',
-  }),
-  createQueryEntry({
-    key: 'explore-char-class-zhonggu',
-    groupKey: 'exploreResources',
-    order: 42,
-    path: '/explore/char-class',
-    queryResolver: normalizeCharacterTableTab,
-    expectedValue: 'zhonggu',
-  }),
-  createQueryEntry({
-    key: 'explore-char-class-shanggu',
-    groupKey: 'exploreResources',
-    order: 43,
-    path: '/explore/char-class',
-    queryResolver: normalizeCharacterTableTab,
-    expectedValue: 'shanggu',
-  }),
-  createQueryEntry({
-    key: 'explore-char-class-jingu',
-    groupKey: 'exploreResources',
+  createPathEntry({
+    key: 'explore-check',
+    categoryKey: 'practicalTools',
+    groupKey: 'exploreTools',
     order: 44,
-    path: '/explore/char-class',
-    queryResolver: normalizeCharacterTableTab,
-    expectedValue: 'jingu',
-  }),
-  createQueryEntry({
-    key: 'explore-char-class-yueyun',
-    groupKey: 'exploreResources',
-    order: 45,
-    path: '/explore/char-class',
-    queryResolver: normalizeCharacterTableTab,
-    expectedValue: 'yueyun',
+    path: '/explore/tools/check',
   }),
   createPathEntry({
-    key: 'explore-yc-spoken',
-    groupKey: 'exploreResources',
-    order: 46,
-    path: '/explore/yc-spoken',
+    key: 'explore-jyut2ipa',
+    categoryKey: 'practicalTools',
+    groupKey: 'exploreTools',
+    order: 45,
+    path: '/explore/tools/jyut2ipa',
   }),
+  createPathEntry({
+    key: 'explore-merge',
+    categoryKey: 'practicalTools',
+    groupKey: 'exploreTools',
+    order: 46,
+    path: '/explore/tools/merge',
+  }),
+  createPathEntry({
+    key: 'menu-map-draw',
+    categoryKey: 'practicalTools',
+    groupKey: 'menuMapDraw',
+    order: 47,
+    path: '/menu/map/draw',
+  }),
+
+  // ==================== 自然村 ====================
   createPathEntry({
     key: 'explore-villages-gd',
+    categoryKey: 'villages',
     groupKey: 'exploreVillages',
-    order: 47,
+    order: 50,
     path: '/explore/villages/gd',
   }),
   createPathEntry({
     key: 'explore-villages-table',
+    categoryKey: 'villages',
     groupKey: 'exploreVillages',
-    order: 48,
+    order: 51,
     path: '/explore/villages/table',
   }),
-  // createPathEntry({
-  //   key: 'explore-villages-yc',
-  //   groupKey: 'exploreVillages',
-  //   order: 49,
-  //   path: '/explore/villages/yc',
-  // }),
+  createPathPrefixEntry({
+    key: 'villagesML',
+    categoryKey: 'villages',
+    groupKey: 'villagesML',
+    order: 52,
+    pathPrefix: '/villagesML',
+  }),
 ]

@@ -114,39 +114,49 @@
           </div>
 
           <section
-            v-for="group in groupedEntries"
-            :key="group.key"
-            class="tutorial-catalog__group"
+            v-for="category in groupedEntries"
+            :key="category.key"
+            class="tutorial-catalog__category"
           >
-            <h3 class="tutorial-catalog__group-title">
-              {{ group.label }}
-            </h3>
+            <h2 class="tutorial-catalog__category-title">
+              {{ category.label }}
+            </h2>
 
-            <button
-              v-for="entry in group.entries"
-              :key="entry.key"
-              type="button"
-              class="tutorial-entry"
-              :class="{
-                'is-active': entry.key === selectedEntry.key,
-                'is-current-route': entry.key === currentEntry.key
-              }"
-              :data-tutorial-key="entry.key"
-              data-tutorial-entry
-              @click="$emit('selectEntry', entry.key)"
+            <section
+              v-for="group in category.groups"
+              :key="group.key"
+              class="tutorial-catalog__group"
             >
-              <span class="tutorial-entry__title-row">
-                <span class="tutorial-entry__title">{{ entry.title }}</span>
-                <span
-                  v-if="entry.key === currentEntry.key"
-                  class="tutorial-entry__badge"
-                >
-                  {{ t('tutorial.ui.currentBadge') }}
-                </span>
-              </span>
+              <h3 class="tutorial-catalog__group-title">
+                {{ group.label }}
+              </h3>
 
-              <span class="tutorial-entry__summary">{{ entry.summary }}</span>
-            </button>
+              <button
+                v-for="entry in group.entries"
+                :key="entry.key"
+                type="button"
+                class="tutorial-entry"
+                :class="{
+                  'is-active': entry.key === selectedEntry.key,
+                  'is-current-route': entry.key === currentEntry.key
+                }"
+                :data-tutorial-key="entry.key"
+                data-tutorial-entry
+                @click="$emit('selectEntry', entry.key)"
+              >
+                <span class="tutorial-entry__title-row">
+                  <span class="tutorial-entry__title">{{ entry.title }}</span>
+                  <span
+                    v-if="entry.key === currentEntry.key"
+                    class="tutorial-entry__badge"
+                  >
+                    {{ t('tutorial.ui.currentBadge') }}
+                  </span>
+                </span>
+
+                <span class="tutorial-entry__summary">{{ entry.summary }}</span>
+              </button>
+            </section>
           </section>
         </aside>
 
@@ -157,7 +167,7 @@
           />
 
           <p class="tutorial-article__group">
-            {{ selectedEntry.groupLabel }}
+            {{ selectedEntry.categoryLabel }} · {{ selectedEntry.groupLabel }}
           </p>
 
           <h2
@@ -694,7 +704,7 @@ $float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
 .tutorial-catalog {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   max-height: var(--tutorial-content-max-height);
   padding: 12px 10px;
   border-radius: var(--radius-xl);
@@ -703,6 +713,23 @@ $float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
   &-float-button,
   &__float-header {
     display: none;
+  }
+
+  &__category {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    &-title {
+      margin: 0;
+      padding: 4px 6px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--color-blue-logo);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(110, 160, 214, 0.16);
+    }
   }
 
   &__group {

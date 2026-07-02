@@ -103,6 +103,7 @@ const tutorialEntries = computed(() => {
         document,
         title: document?.title || entry.key,
         summary: document?.summary || t('tutorial.ui.missing'),
+        categoryLabel: t(`tutorial.categories.${entry.categoryKey}`),
         groupLabel: t(`tutorial.groups.${entry.groupKey}`),
       }
     })
@@ -114,21 +115,33 @@ const tutorialEntryMap = computed(() => {
 })
 
 const groupedEntries = computed(() => {
-  const groups = new Map()
+  const categories = new Map()
 
   for (const entry of tutorialEntries.value) {
-    if (!groups.has(entry.groupKey)) {
-      groups.set(entry.groupKey, {
+    if (!categories.has(entry.categoryKey)) {
+      categories.set(entry.categoryKey, {
+        key: entry.categoryKey,
+        label: entry.categoryLabel,
+        groups: new Map(),
+      })
+    }
+
+    const category = categories.get(entry.categoryKey)
+    if (!category.groups.has(entry.groupKey)) {
+      category.groups.set(entry.groupKey, {
         key: entry.groupKey,
         label: entry.groupLabel,
         entries: [],
       })
     }
 
-    groups.get(entry.groupKey).entries.push(entry)
+    category.groups.get(entry.groupKey).entries.push(entry)
   }
 
-  return [...groups.values()]
+  return [...categories.values()].map(cat => ({
+    ...cat,
+    groups: [...cat.groups.values()],
+  }))
 })
 
 const currentMatchedEntry = computed(() => {
@@ -207,7 +220,7 @@ function openGuide() {
   }
 
   if (!disclaimerShown) {
-    disclaimerShown = true
+    // disclaimerShown = true
     showConfirm(t('tutorial.disclaimer.message'), {
       title: t('tutorial.disclaimer.title'),
       confirmText: t('tutorial.disclaimer.confirm'),

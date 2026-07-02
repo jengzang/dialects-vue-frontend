@@ -14,21 +14,34 @@
     "hideTutorial": "不再顯示教學",
     "hideTutorialTip": "你可以在「關於 - 設定」頁面重新開啟教學。"
   },
+  "categories": {
+    "account": "賬戶與個人數據",
+    "multiCompare": "多方言點對比分析",
+    "singleAnalysis": "單方言點深入探索",
+    "corpusAndCharClass": "詞句與字集",
+    "practicalTools": "實用工具",
+    "villages": "自然村"
+  },
   "groups": {
-    "account": "賬戶與自定義",
-    "menuQuery": "主站查詢",
-    "menuCompare": "主站比較",
-    "menuMap": "主站地圖",
-    "menuPhonology": "主站音系",
-    "menuResources": "支持與資源",
-    "exploreTools": "Explore 工具",
-    "praat": "Praat 分析",
-    "exploreResources": "Explore 資源",
-    "exploreVillages": "Explore 村落"
+    "authAccount": "賬戶管理",
+    "authData": "個人數據",
+    "menuMapCustom": "自定地圖",
+    "menuQuery": "查詢",
+    "menuCompare": "比較",
+    "menuMapOverview": "地圖與結果",
+    "menuPhonology": "音系分析",
+    "exploreYubao": "語保詞句",
+    "exploreCharClass": "字集",
+    "exploreYcSpoken": "陽春口語",
+    "praat": "Praat 聲學分析",
+    "exploreTools": "字表工具",
+    "menuMapDraw": "地圖繪製",
+    "exploreVillages": "廣東自然村",
+    "villagesML": "村名機器學習"
   },
   "disclaimer": {
     "title": "溫馨提示",
-    "message": "目前的教學內容由 AI 生成，其實没啥參考價值。站长暫時還沒有時間編寫正式的教學文件，如果你有興趣協助完善教學內容，我將非常歡迎！",
+    "message": "目前的教學內容由 AI 生成，其實没啥參考價值。站長暫時還沒有時間編寫正式的教學文件，如果你有興趣協助完善教學內容，我將非常歡迎！",
     "confirm": "知道了"
   },
   "assist": {
