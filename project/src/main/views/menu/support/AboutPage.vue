@@ -196,34 +196,37 @@
           </div>
           </div>
 
-          <div class="setting-section">
-            <h3 class="section-title">{{ $t('navigation.settings.characterTable.title') }}</h3>
-            <p class="section-description">{{ $t('navigation.settings.characterTable.description') }}</p>
+          <div class="setting-section setting-split">
+            <div class="setting-split-item">
+              <h3 class="section-title">{{ $t('navigation.settings.characterTable.title') }}</h3>
+              <p class="section-description">{{ $t('navigation.settings.characterTable.description') }}</p>
 
-            <SimpleSelectDropdown
-              v-model="currentCharacterTable"
-              :options="characterTableOptions"
-              width="100%"
-            />
-            <hr style="border: none; height: 1px; background: rgba(0, 0, 0, 0.12); margin: 16px 0;">
-
-            <h3 class="section-title">{{ $t('about.settings.zhongguInputMode.title') }}
-              <HelpIcon
-                  :content="$t('about.settings.zhongguInputMode.description')"
-                  size="sm"
-                  placement="right"
-                  icon="?"
-                  icon-color="#007aff"
-                  style="margin-right: 2px; vertical-align: bottom;"
+              <SimpleSelectDropdown
+                v-model="currentCharacterTable"
+                :options="characterTableOptions"
+                width="100%"
               />
-            </h3>
-            <!-- <p class="section-description">{{ $t('about.settings.zhongguInputMode.description') }}</p> -->
-            <RadioGroup
-              v-model="zhongguInputModeModel"
-              :options="zhongguInputModeOptions"
-              name="about-zhonggu-input-mode"
-              class="settings-radio-group"
-            />
+            </div>
+            <hr class="setting-split-divider">
+            <div class="setting-split-item">
+              <h3 class="section-title">{{ $t('about.settings.zhongguInputMode.title') }}
+                <HelpIcon
+                    :content="$t('about.settings.zhongguInputMode.description')"
+                    size="sm"
+                    placement="right"
+                    icon="?"
+                    icon-color="#007aff"
+                    style="margin-right: 2px; vertical-align: bottom;"
+                />
+              </h3>
+              <!-- <p class="section-description">{{ $t('about.settings.zhongguInputMode.description') }}</p> -->
+              <RadioGroup
+                v-model="zhongguInputModeModel"
+                :options="zhongguInputModeOptions"
+                name="about-zhonggu-input-mode"
+                class="settings-radio-group"
+              />
+            </div>
           </div>
 
           <div class="setting-section">
@@ -848,6 +851,25 @@ em {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+.setting-split {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.setting-split-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.setting-split-divider {
+  border: none;
+  width: 1px;
+  background: rgba(0, 0, 0, 0.12);
+  align-self: stretch;
+  margin: 0;
+}
+
 .section-title {
   margin: 0 0 8px;
   color: #333;
@@ -1082,6 +1104,18 @@ em {
     margin-bottom: 14px;
     padding: 16px;
     border-radius: 14px;
+  }
+
+  .setting-split {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .setting-split-divider {
+    width: 100%;
+    height: 1px;
+    margin: 16px 0;
   }
 
   .section-title {
