@@ -32,6 +32,7 @@
               <CheckBox :model-value="layers.characters" label="🟡 字符傾向" class="checkbox-item" @update:modelValue="updateLayer('characters', $event)" />
               <CheckBox :model-value="layers.ngrams" label="🟢 N-gram 分佈" class="checkbox-item" @update:modelValue="updateLayer('ngrams', $event)" />
             </div>
+          </div>
 
           <!-- N-gram 過濾器 -->
           <div v-if="layers.ngrams" class="section">
