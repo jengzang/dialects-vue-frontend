@@ -1783,5 +1783,11 @@ defineExpose({
   font-weight: 600;
 }
 
+@media (max-aspect-ratio: 1/1) {
+  .region-tabs button{
+    padding: 4px 2px;
+    min-width: 50px;
+  }
+}
 
 </style>

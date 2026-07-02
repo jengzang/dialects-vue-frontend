@@ -10,7 +10,6 @@
       <textarea
         ref="positionInputRef"
         v-model="positionInput"
-        class="position-textarea"
         :class="{ 'input-error': hasPositionError, 'input-warning': !hasPositionError && hasPositionWarning }"
         :placeholder="$t('query.components.zhongguDirectInput.positionPlaceholder')"
         rows="2"
@@ -54,7 +53,7 @@
       <label class="input-label">{{ $t('query.components.zhongguDirectInput.charLabel') }}</label>
       <input
         v-model="charInput"
-        class="char-input"
+        class="main-input-field"
         type="text"
         :placeholder="$t('query.components.zhongguDirectInput.charPlaceholder')"
       />
@@ -202,22 +201,12 @@ defineExpose({ pathStrings, chars })
   }
 }
 
-.position-textarea {
-  width: 100%;
-  max-width: 600px;
+textarea {
+  height: auto;
   min-height: 56px;
-  padding: 10px 12px;
-  border: 1.5px solid var(--border-medium, #ddd);
-  border-radius: 10px;
-  background: var(--glass-lighter, rgba(255,255,255,0.6));
-  color: var(--text-dark, #333);
-  font-size: 14px;
   font-family: inherit;
-  line-height: 1.5;
+  font-size: 14px;
   resize: vertical;
-  outline: none;
-  transition: border-color 0.25s, box-shadow 0.25s;
-  box-sizing: border-box;
 
   &:focus {
     border-color: var(--color-blue-custom, #007aff);
@@ -232,26 +221,6 @@ defineExpose({ pathStrings, chars })
   &.input-warning {
     border-color: #ff9500;
     box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.12);
-  }
-}
-
-.char-input {
-  width: 100%;
-  max-width: 600px;
-  padding: 10px 12px;
-  border: 1.5px solid var(--border-medium, #ddd);
-  border-radius: 10px;
-  background: var(--glass-lighter, rgba(255,255,255,0.6));
-  color: var(--text-dark, #333);
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.25s, box-shadow 0.25s;
-  box-sizing: border-box;
-
-  &:focus {
-    border-color: var(--color-blue-custom, #007aff);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
   }
 }
 
