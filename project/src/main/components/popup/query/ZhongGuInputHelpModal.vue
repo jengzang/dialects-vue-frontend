@@ -28,7 +28,7 @@
           <li v-html="$t('query.components.zhongguDirectInput.help.examples.example5')"></li>
           <li v-html="$t('query.components.zhongguDirectInput.help.examples.example6')"></li>
           <li v-html="$t('query.components.zhongguDirectInput.help.examples.example7')"></li>
-          <li v-html="$t('query.components.zhongguDirectInput.help.examples.example8')"></li>
+          <!-- <li v-html="$t('query.components.zhongguDirectInput.help.examples.example8')"></li> -->
         </ul>
       </section>
 

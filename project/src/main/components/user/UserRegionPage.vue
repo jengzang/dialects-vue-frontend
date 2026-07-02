@@ -5,23 +5,25 @@
         {{ t('common.button.back') }}
       </button>
 
-      <h1 class="page-title">
-        <span class="title-icon">🗂️</span>
-        <span>{{ t('user.regionPage.title') }}</span>
-      </h1>
+      <div class="page-title-group">
+        <h1 class="page-title">
+          <span class="title-icon">🗂️</span>
+          <span>{{ t('user.regionPage.title') }}</span>
+        </h1>
+
+        <div class="header-stats">
+          <span class="header-stat">
+            <span class="header-stat-label">{{ t('user.regionPage.stats.regionCount') }}</span>
+            <span class="header-stat-value">{{ regions.length }}</span>
+          </span>
+          <span class="header-stat">
+            <span class="header-stat-label">{{ t('user.regionPage.stats.locationCount') }}</span>
+            <span class="header-stat-value">{{ totalLocations }}</span>
+          </span>
+        </div>
+      </div>
 
       <div class="user-badge">{{ username }}</div>
-    </div>
-
-    <div class="stats-bar">
-      <div class="stat-item liquid-panel">
-        <span class="stat-label">{{ t('user.regionPage.stats.regionCount') }}</span>
-        <span class="stat-value">{{ regions.length }}</span>
-      </div>
-      <div class="stat-item liquid-panel">
-        <span class="stat-label">{{ t('user.regionPage.stats.locationCount') }}</span>
-        <span class="stat-value">{{ totalLocations }}</span>
-      </div>
     </div>
 
     <div class="toolbar liquid-panel">
@@ -507,7 +509,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 $region-text: #0f172a;
 $region-muted: #64748b;
 $region-soft: #94a3b8;
@@ -643,48 +645,97 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
   align-items: center;
   gap: 16px;
   margin-bottom: 18px;
-}
 
-.page-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  gap: 10px;
-  margin: 0;
-  color: $region-text;
-  font-size: clamp(20px, 2.3vw, 28px);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  white-space: nowrap;
-}
+  .page-title-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    gap: 8px;
+  }
 
-.title-icon {
-  display: inline-flex;
-  filter: drop-shadow(0 8px 18px rgba(0, 122, 255, 0.2));
-}
+  .page-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    gap: 10px;
+    margin: 0;
+    color: $region-text;
+    font-size: clamp(20px, 2.3vw, 28px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+  }
 
-.user-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 220px;
-  min-height: 34px;
-  padding: 6px 13px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 999px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 800;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  background:
-    linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(88, 86, 214, 0.88)),
-    $region-accent;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 10px 24px rgba(0, 122, 255, 0.24);
+  .title-icon {
+    display: inline-flex;
+    filter: drop-shadow(0 8px 18px rgba(0, 122, 255, 0.2));
+  }
+
+  .header-stats {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .header-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    padding: 4px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.52);
+    border-radius: 999px;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.36)),
+      rgba(0, 122, 255, 0.06);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.66),
+      0 8px 18px rgba(0, 122, 255, 0.06);
+  }
+
+  .header-stat-label {
+    color: $region-muted;
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .header-stat-value {
+    color: $region-accent;
+    font-size: 16px;
+    font-weight: 850;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .user-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 220px;
+    min-height: 34px;
+    padding: 6px 13px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 999px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background:
+      linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(88, 86, 214, 0.88)),
+      $region-accent;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      0 10px 24px rgba(0, 122, 255, 0.24);
+  }
 }
 
 .liquid-btn {
@@ -731,46 +782,6 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
   line-height: 1;
 }
 
-.stats-bar {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  min-height: 82px;
-}
-
-.stat-label {
-  color: $region-muted;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.stat-value {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 68px;
-  min-height: 48px;
-  padding: 6px 14px;
-  border-radius: 18px;
-  color: $region-accent;
-  font-size: 30px;
-  font-weight: 850;
-  letter-spacing: -0.05em;
-  background:
-    linear-gradient(135deg, rgba(0, 122, 255, 0.12), rgba(88, 86, 214, 0.08)),
-    rgba(255, 255, 255, 0.52);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.66),
-    0 10px 24px rgba(0, 122, 255, 0.08);
-}
 
 .toolbar {
   display: flex;
@@ -1059,18 +1070,6 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
   border: 1px solid rgba(0, 122, 255, 0.12);
 }
 
-@media (orientation: portrait) {
-  .stat-item {
-    min-height: 66px;
-    padding-block: 12px;
-  }
-
-  .stat-value {
-    min-height: 42px;
-    font-size: 26px;
-  }
-}
-
 @media (max-width: 768px) {
   .user-region-page {
     width: min(100%, calc(100dvw - 20px));
@@ -1078,49 +1077,47 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
   }
 
   .page-header {
+    grid-template-columns: auto minmax(0, 1fr);
     gap: 12px;
     padding: 16px;
     text-align: center;
+
+    .page-title-group {
+      order: -1;
+      grid-column: 1 / -1;
+      gap: 7px;
+    }
+
+    .page-title {
+      font-size: 20px;
+      white-space: normal;
+    }
+
+    .header-stats {
+      gap: 6px;
+    }
+
+    .header-stat {
+      min-height: 26px;
+      padding: 4px 9px;
+    }
+
+    .header-stat-label {
+      font-size: 11px;
+    }
+
+    .header-stat-value {
+      font-size: 15px;
+    }
+
+    .user-badge {
+      justify-self: stretch;
+      max-width: none;
+    }
   }
 
   .back-btn {
     justify-self: start;
-  }
-
-  .page-title {
-    order: -1;
-    font-size: 20px;
-    white-space: normal;
-  }
-
-  .user-badge {
-    justify-self: stretch;
-    max-width: none;
-  }
-
-  .stats-bar {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .stat-item {
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 8px;
-    min-height: 94px;
-    padding: 14px 10px;
-  }
-
-  .stat-label {
-    font-size: 13px;
-    text-align: center;
-  }
-
-  .stat-value {
-    min-width: 58px;
-    min-height: 40px;
-    font-size: 24px;
   }
 
   .toolbar {
@@ -1172,7 +1169,7 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
 
 @media (max-width: 480px) {
   .user-region-page {
-    width: min(100%, calc(100dvw - 12px));
+    width: min(96dvw, calc(100dvw - 12px));
     padding: 8px;
   }
 
@@ -1200,6 +1197,24 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
 
   .page-title {
     font-size: 18px;
+  }
+
+  .page-header {
+    .header-stats {
+      width: 100%;
+    }
+
+    .header-stat {
+      flex: 1 1 0;
+      justify-content: center;
+      min-width: 0;
+      padding-inline: 8px;
+    }
+
+    .header-stat-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   .region-name {

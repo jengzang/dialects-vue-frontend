@@ -12,7 +12,7 @@
         @keydown.space.prevent="togglePopup"
     >
       <!-- ✅ 已選葉子列表（選框內可刪除） -->
-      <div v-if="selectedLeafs.length" class="region-tags">
+      <div v-if="selectedLeafs.length || externalCustomRegions.length" class="region-tags">
         <span
             v-for="(s, i) in selectedLeafs"
             :key="s + '_' + i"
@@ -21,6 +21,15 @@
         >
           {{ s }}
           <button class="tag-remove" type="button" @click.stop="removeCommitted(s)">×</button>
+        </span>
+        <span
+            v-for="(s, i) in externalCustomRegions"
+            :key="'custom_' + s + '_' + i"
+            class="region-tag custom-region-tag"
+            :title="s"
+        >
+          {{ s }}
+          <button class="tag-remove" type="button" @click.stop="removeCustomRegionCommitted(s)">×</button>
         </span>
       </div>
 
@@ -842,6 +851,14 @@ function removeCommitted(label) {
   }
 }
 
+function removeCustomRegionCommitted(regionName) {
+  const next = externalCustomRegions.value.filter(x => x !== regionName)
+  emit('update:customRegions', next)
+  if (popupOpen.value) {
+    draftCustomRegions.value = draftCustomRegions.value.filter(x => x !== regionName)
+  }
+}
+
 /* =========================
    ESC
    ========================= */
@@ -1087,8 +1104,9 @@ defineExpose({ togglePopup, openPopup, closePopup })
 }
 
 /* Custom region tag styling */
-.topbar-tag.custom-region-tag {
-  background: linear-gradient(135deg, #34c759, #28a745);
+.topbar-tag.custom-region-tag,
+.region-tag.custom-region-tag {
+  background: rgba(0, 123, 255, 0.5);
   color: white;
   border: 1px solid rgba(52, 199, 89, 0.3);
 }
