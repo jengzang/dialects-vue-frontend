@@ -70,7 +70,7 @@ const presets_tab3 = [
     card: '聲母',
     keys: ['組'],
     tab3KeyInput: ['h'],
-    loc: { locations: ['台山斗山墟 恩平 鶴山雅瑤 從化獅象'], regions: ['南海'], regionUsing: 'yindian' }
+    loc: { locations: ['台山斗山墟 恩平 鶴山雅瑤 從化獅象'], regions: [''], regionUsing: 'yindian' }
   },
 ]
 
@@ -110,7 +110,7 @@ function createCompareTab1Payload() {
     group1Char: '天',
     group2Char: '地',
     feature: '聲母',
-    loc: createLocation(['廣州'], ['廣府片'], 'yindian'),
+    loc: createLocation(['南京'], ['太湖片'], 'map'),
   }
 }
 
@@ -167,8 +167,8 @@ export const tutorialDiceConfig = {
     buttonKey: 'tutorial.assist.experience.queryChar.button',
     target: 'query:tab1',
     createPayload: () => ({
-      chars: '天地方言',
-      loc: createLocation(['廣州'], ['廣府片'], 'yindian'),
+      chars: '发财',
+      loc: createLocation(['南京'], ['杭州小片', '上海小片', '蘇嘉湖小片'], 'map'),
     }),
   },
   'menu-query-zhonggu': {
@@ -188,6 +188,16 @@ export const tutorialDiceConfig = {
     target: 'query:tab3',
     when: shouldEnableCharacterDice,
     createPayload: createQueryTab3Payload,
+  },
+  'menu-query-tone': {
+    enabled: true,
+    titleKey: 'tutorial.assist.experience.queryTone.title',
+    descriptionKey: 'tutorial.assist.experience.queryTone.description',
+    buttonKey: 'tutorial.assist.experience.queryTone.button',
+    target: 'query:tab4',
+    createPayload: () => ({
+      loc: createLocation(['南京'], ['吳語'], 'map'),
+    }),
   },
   'menu-compare-char': {
     enabled: true,

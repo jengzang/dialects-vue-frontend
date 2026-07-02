@@ -386,6 +386,16 @@ watch(
       handleApplyConfig(tutorialAssistState.payload)
       clearTutorialAssistRequest()
     }
+
+    if (tutorialAssistState.target === 'query:tab4' && currentTab.value === 'tab4') {
+      const payload = tutorialAssistState.payload
+      locationModel.value = {
+        locations: payload.loc?.locations || [],
+        regions: payload.loc?.regions || [],
+        regionUsing: payload.loc?.regionUsing || 'yindian'
+      }
+      clearTutorialAssistRequest()
+    }
   }
 )
 

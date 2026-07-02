@@ -43,6 +43,11 @@
         "description": "自動填入一組音位分析示例，快速查看音位查詢流程。",
         "button": "生成音位示例"
       },
+      "queryTone": {
+        "title": "試一組查調示例",
+        "description": "自動填入一組常見地點，方便立刻查看查調結果。",
+        "button": "填入查調示例"
+      },
       "compareChar": {
         "title": "試一組比較字例",
         "description": "自動填入兩組對比漢字與特徵，方便快速進入比較頁。",

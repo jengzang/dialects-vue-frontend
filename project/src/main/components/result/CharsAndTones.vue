@@ -539,7 +539,7 @@ onMounted(() => {
   height: 66dvh;
   overflow-y: auto;
   overflow-x: auto;
-  padding: 20px;
+  padding: 8px;
   font-size: 18px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
@@ -726,7 +726,9 @@ onMounted(() => {
 .annotation {
   color: #888;
   font-size: 0.85em;
-  max-width: 200px;
+  max-width: 400px;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .separator {
@@ -970,6 +972,9 @@ onMounted(() => {
 
   .char-nav-char {
     font-size: 16px;
+  }
+  .annotation{
+    max-width: 200px;
   }
 }
 </style>

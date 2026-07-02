@@ -55,7 +55,7 @@ const props = defineProps({
   },
   mobileBottomOffset: {
     type: String,
-    default: '63dvh',
+    default: '65dvh',
   },
   rightOffset: {
     type: String,

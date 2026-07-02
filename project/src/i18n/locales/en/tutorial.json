@@ -43,6 +43,11 @@
         "description": "Generate a phoneme-analysis example so you can preview the phoneme workflow at once.",
         "button": "Generate phoneme example"
       },
+      "queryTone": {
+        "title": "Try a tone query example",
+        "description": "Fill in a common set of locations so you can inspect the tone query result immediately.",
+        "button": "Fill tone example"
+      },
       "compareChar": {
         "title": "Try a character comparison",
         "description": "Fill two contrasting characters and a feature so the comparison page is ready to use.",
