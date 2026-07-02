@@ -17,6 +17,29 @@
       </div>
 
       <div class="draw-tool-panel-body">
+
+        <section class="draw-tool-section">
+          <div class="draw-tool-section-title">
+            {{ t('map.drawTab.voronoi.settingsTitle') }}
+          </div>
+          <div class="draw-basemap-select">
+            <span class="draw-field-label">{{ t('map.divideTab.labels.partitionSource') }}</span>
+            <SimpleSelectDropdown
+              :model-value="partitionMode"
+              :options="partitionModeOptions"
+              @update:model-value="$emit('update:partition-mode', $event)"
+            />
+          </div>
+          <div class="draw-basemap-select">
+            <span class="draw-field-label">{{ t('map.divideTab.labels.regionLevel') }}</span>
+            <SimpleSelectDropdown
+              :model-value="regionLevel"
+              :options="regionLevelOptions"
+              @update:model-value="$emit('update:region-level', $event)"
+            />
+          </div>
+        </section>
+
         <section class="draw-tool-section">
           <div class="draw-tool-section-title">
             {{ t('map.drawTab.voronoi.summaryTitle') }}
@@ -38,28 +61,6 @@
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.partitionGroups') }}</span>
               <strong class="voronoi-summary-value">{{ groupCount }}</strong>
             </div>
-          </div>
-        </section>
-
-        <section class="draw-tool-section">
-          <div class="draw-tool-section-title">
-            {{ t('map.drawTab.voronoi.settingsTitle') }}
-          </div>
-          <div class="draw-basemap-select">
-            <span class="draw-field-label">{{ t('map.divideTab.labels.partitionSource') }}</span>
-            <SimpleSelectDropdown
-              :model-value="partitionMode"
-              :options="partitionModeOptions"
-              @update:model-value="$emit('update:partition-mode', $event)"
-            />
-          </div>
-          <div class="draw-basemap-select">
-            <span class="draw-field-label">{{ t('map.divideTab.labels.regionLevel') }}</span>
-            <SimpleSelectDropdown
-              :model-value="regionLevel"
-              :options="regionLevelOptions"
-              @update:model-value="$emit('update:region-level', $event)"
-            />
           </div>
         </section>
 

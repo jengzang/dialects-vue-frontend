@@ -2380,6 +2380,9 @@ export default {
   .tab5-sankey-controls {
     flex: 0 0 auto;
   }
+  :deep(.liquid-radio-group) {
+    gap: 12px;
+  }
 }
 
 </style>
