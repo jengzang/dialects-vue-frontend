@@ -632,12 +632,6 @@ onBeforeUnmount(() => {
   transform: translateY(-2px);
 }
 
-.reference-vowels-checkbox input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
 /* Segment Selector Section */
 .segment-selector-section {
   margin-bottom: 2rem;
@@ -669,12 +663,6 @@ onBeforeUnmount(() => {
 .segment-checkbox:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: translateX(4px);
-}
-
-.segment-checkbox input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
 }
 
 .segment-color-indicator {

@@ -64,10 +64,9 @@
         <thead>
           <tr>
             <th class="col-check">
-              <input
-                type="checkbox"
-                :checked="isAllSelected"
-                @change="toggleSelectAll"
+              <CheckBox
+                :model-value="isAllSelected"
+                @update:modelValue="toggleSelectAll"
               />
             </th>
             <th>{{ t('user.dataPage.table.shortName') }}</th>
@@ -93,10 +92,9 @@
           </tr>
           <tr v-for="record in paginatedData" :key="record.created_at">
             <td class="col-check">
-              <input
-                v-model="selectedRecords"
-                type="checkbox"
-                :value="record.created_at"
+              <CheckBox
+                :model-value="selectedRecords.includes(record.created_at)"
+                @update:modelValue="toggleRecordSelection(record.created_at, $event)"
               />
             </td>
             <td>{{ record.簡稱 }}</td>
@@ -327,6 +325,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import AppModal from '@/components/common/AppModal.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import { batchCreateCustomData, batchDeleteCustomData, editCustomData, getAllCustomData } from '@/api'
 import { invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js'
@@ -463,12 +462,23 @@ const fetchData = async () => {
   })
 }
 
-const toggleSelectAll = (event) => {
-  if (event.target.checked) {
+const toggleSelectAll = (checked) => {
+  if (checked) {
     selectedRecords.value = paginatedData.value.map((record) => record.created_at)
   } else {
     selectedRecords.value = []
   }
+}
+
+const toggleRecordSelection = (recordId, checked) => {
+  if (checked) {
+    if (!selectedRecords.value.includes(recordId)) {
+      selectedRecords.value = [...selectedRecords.value, recordId]
+    }
+    return
+  }
+
+  selectedRecords.value = selectedRecords.value.filter((id) => id !== recordId)
 }
 
 const handleSearch = () => {
@@ -1081,13 +1091,6 @@ $user-success: #34c759;
   padding: 10px 15px;
   border-radius: 15px;
   font-size: 14px;
-}
-
-input[type='checkbox'] {
-  width: 16px;
-  height: 16px;
-  accent-color: $user-accent;
-  cursor: pointer;
 }
 
 .table-container {

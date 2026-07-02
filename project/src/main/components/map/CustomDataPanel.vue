@@ -156,8 +156,8 @@ const shouldShowPanel = computed(() => {
   const isMapTab = route.params.sub === 'view'
   if (!isMapTab) return false
 
-  const queryMode = resultCache.mode || ''
-  const hasQueryContext = queryMode === '查中古' || queryMode === '查音位'
+  const sourceTab = globalPayload.value?._sourceTab || ''
+  const hasQueryContext = sourceTab === 'tab1' || sourceTab === 'tab2' || sourceTab === 'tab4' || sourceTab === 'tab3'
 
   return hasQueryContext
 })

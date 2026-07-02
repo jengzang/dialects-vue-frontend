@@ -50,10 +50,13 @@
 
     <template #footer>
 <!--      <div class="update-notice-footer">-->
-        <label class="no-show-checkbox">
-          <input v-model="dontShowAgain" type="checkbox" />
-          <span>{{ $t('common.updateNotice.dontShowAgain') }}</span>
-        </label>
+        <CheckBox
+          class="no-show-checkbox"
+          :model-value="dontShowAgain"
+          @update:modelValue="dontShowAgain = $event"
+        >
+          {{ $t('common.updateNotice.dontShowAgain') }}
+        </CheckBox>
         <button class="confirm-btn" @click="handleConfirm">
           {{ $t('common.updateNotice.confirm') }}
         </button>
@@ -65,6 +68,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import AppModal from '@/components/common/AppModal.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const UPDATE_NOTICE_DISMISS_STORAGE_KEY = 'update-notice-dismissed'
 const UPDATE_NOTICE_LAST_SHOWN_PREFIX = 'update-notice-last-shown'
@@ -258,13 +262,6 @@ onMounted(() => {
 
 .no-show-checkbox:hover {
   background: rgba(0, 122, 255, 0.05);
-}
-
-.no-show-checkbox input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  accent-color: #007aff;
 }
 
 .confirm-btn {

@@ -107,10 +107,10 @@ function createQueryTab3Payload() {
 
 function createCompareTab1Payload() {
   return {
-    group1Char: '天',
-    group2Char: '地',
-    feature: '聲母',
-    loc: createLocation(['南京'], ['太湖片'], 'map'),
+    group1Char: '包',
+    group2Char: '好',
+    feature: '韻母',
+    loc: createLocation(['台山'], ['珠江'], 'yindian'),
   }
 }
 
@@ -120,7 +120,7 @@ function createCompareTab2Payload() {
       card: '韻母',
       keys: ['攝'],
       valueMap: {
-        攝: ['止攝'],
+        攝: ['止'],
       },
       excludeColumns: [],
     },
@@ -129,7 +129,7 @@ function createCompareTab2Payload() {
         card: '韻母',
         keys: ['攝'],
         valueMap: {
-          攝: ['止攝'],
+          攝: ['宕'],
         },
         excludeColumns: [],
       },
@@ -139,12 +139,12 @@ function createCompareTab2Payload() {
         card: '韻母',
         keys: ['攝'],
         valueMap: {
-          攝: ['遇攝'],
+          攝: ['江'],
         },
         excludeColumns: [],
       },
     ],
-    loc: createLocation(['廣州'], ['廣府片'], 'yindian'),
+    loc: createLocation(['南寧'], ['鬱潯'], 'yindian'),
   }
 }
 
