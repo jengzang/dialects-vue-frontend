@@ -119,7 +119,7 @@
           </div>
 
           <div class="tree-actions">
-            <Checkbox
+            <CheckBox
               v-model="showAnnotations"
               class="annotation-checkbox"
               :label="showAnnotations ? t('charClass.actions.showAnnotations') : t('charClass.actions.hideAnnotations') "
@@ -183,7 +183,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
-import Checkbox from '@/components/selector/Checkbox.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import CharTreeItem from '@/main/components/TableAndTree/CharTreeItem.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import { loadFullTree } from '@/api'

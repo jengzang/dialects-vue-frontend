@@ -275,7 +275,7 @@
       "positionLabel": "Middle Chinese Position Input",
       "positionPlaceholder": "Enter Middle Chinese positions, separated by spaces. E.g.: 泥母 莊組 蟹-等",
       "charLabel": "Direct Character Input",
-      "charPlaceholder": "Enter Chinese characters, e.g.: 笨蛋",
+      "charPlaceholder": "Enter Chinese characters, e.g.: 你好",
       "helpButton": "?",
       "possibleCombinations": "{count} possible combinations",
       "actualMatches": ", {count} actual matches",

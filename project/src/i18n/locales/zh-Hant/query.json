@@ -275,7 +275,7 @@
       "positionLabel": "中古地位輸入",
       "positionPlaceholder": "輸入中古地位，空格分隔。例：泥母 莊組 蟹-等",
       "charLabel": "漢字直接輸入",
-      "charPlaceholder": "輸入漢字，例：笨蛋",
+      "charPlaceholder": "輸入漢字，例：你好",
       "helpButton": "?",
       "possibleCombinations": "可能產生{count}種組合",
       "actualMatches": ",實際匹配{count}組",

@@ -15,7 +15,7 @@
           id="custom-switch-container"
           class="custom-switch-container1"
         >
-          <Checkbox
+          <CheckBox
             :model-value="mapStore.showCustomData"
             :label="t('map.mapLibre.controls.personalData')"
             :font-size="14"
@@ -27,7 +27,7 @@
           id="base-switch-container"
           class="custom-switch-container1"
         >
-          <Checkbox
+          <CheckBox
             :model-value="isBaseModeActive"
             :label="t('map.mapLibre.controls.viewPlaceNames')"
             :font-size="14"
@@ -133,7 +133,7 @@ import { getLocationDetail } from '@/api'
 import { deleteCustomForm } from '@/api'
 import { refreshCurrentCustomLayer } from '@/utils/map/MapData.js';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
-import Checkbox from '@/components/selector/Checkbox.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import MapLegend from './MapLegend.vue'
 import CompareMapPopup from '../popup/map/CompareMapPopup.vue'
 import FeatureMapPopup from '../popup/map/FeatureMapPopup.vue'

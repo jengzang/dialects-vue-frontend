@@ -3,26 +3,22 @@
     <h4 class="section-title">特徵選擇</h4>
 
     <div class="setting-row">
-      <label class="setting-label">
-        <input
-          type="checkbox"
-          :checked="modelValue.use_semantic"
-          @change="updateFeature('use_semantic', $event.target.checked)"
-        />
+      <CheckBox
+        :model-value="modelValue.use_semantic"
+        @update:modelValue="updateFeature('use_semantic', $event)"
+      >
         語義特徵
-      </label>
+      </CheckBox>
       <span class="setting-hint">語義類別分佈</span>
     </div>
 
     <div class="setting-row">
-      <label class="setting-label">
-        <input
-          type="checkbox"
-          :checked="modelValue.use_morphology"
-          @change="updateFeature('use_morphology', $event.target.checked)"
-        />
+      <CheckBox
+        :model-value="modelValue.use_morphology"
+        @update:modelValue="updateFeature('use_morphology', $event)"
+      >
         形態特徵
-      </label>
+      </CheckBox>
       <span class="setting-hint">後綴 N-gram 特徵</span>
     </div>
 
@@ -53,20 +49,19 @@
     </div>
 
     <div class="setting-row">
-      <label class="setting-label">
-        <input
-          type="checkbox"
-          :checked="modelValue.use_diversity"
-          @change="updateFeature('use_diversity', $event.target.checked)"
-        />
+      <CheckBox
+        :model-value="modelValue.use_diversity"
+        @update:modelValue="updateFeature('use_diversity', $event)"
+      >
         多樣性特徵
-      </label>
+      </CheckBox>
       <span class="setting-hint">字符多樣性指標</span>
     </div>
   </div>
 </template>
 
 <script setup>
+import CheckBox from '@/components/selector/CheckBox.vue'
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -107,10 +102,6 @@ function updateFeature(key, value) {
   color: var(--text-primary);
   cursor: pointer;
   min-width: 120px;
-}
-
-.setting-label input[type="checkbox"] {
-  cursor: pointer;
 }
 
 .setting-hint {
