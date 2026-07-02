@@ -364,6 +364,15 @@ export default {
   /* 如果希望是全屏遮罩，可以改為 fixed 並設置 z-index */
 }
 
+.header-row{
+  display:flex;
+  flex-direction: row;
+  flex-wrap:wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
 .glass-card {
   width: 280px;
   padding: 30px;
