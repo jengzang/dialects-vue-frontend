@@ -53,6 +53,14 @@ export {
 // 树形数据
 export { lazyLoadTree, loadFullTree } from './main/sql/tree.js';
 
+// ==================== Yubao 语保业务接口 ====================
+export {
+  getYubaoVocabularyWords,
+  getYubaoGrammarSentences,
+  getYubaoVocabularyItems,
+  getYubaoGrammarItems,
+} from './main/yubao.js';
+
 // ==================== 查询模块 ====================
 // 核心查询
 export {
