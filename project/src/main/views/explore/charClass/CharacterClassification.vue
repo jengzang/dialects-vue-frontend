@@ -187,7 +187,7 @@ import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import CharTreeItem from '@/main/components/TableAndTree/CharTreeItem.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
-import { loadFullTree } from '@/api'
+import { lazyLoadTree, loadFullTree } from '@/api'
 import {
   parseCharClassParams,
   updateUrlWithCharClassConfig
@@ -327,61 +327,43 @@ const loadTreeForState = async (state) => {
 
   try {
     const payload = buildCharClassTreePayload(activeTab.value, state.tableKey, state.levels)
-    const result = await loadFullTree(payload)
+    // Load only the first level lazily (same pattern as gdVillages)
+    const result = await lazyLoadTree({
+      db_key: payload.db_key,
+      table_name: payload.table_name,
+      level_columns: payload.level_columns,
+      parent_path: []
+    })
 
     if (requestId !== loadRequestId) {
       return
     }
 
-    if (result.mode === 'lazy_fallback') {
-      // lazy_bootstrap is a two-level map: { "分类1": ["子1", "子2"], ... }
-      const bootstrap = result.lazy_bootstrap
-      if (bootstrap && typeof bootstrap === 'object') {
-        // First level consumed, shift for sub-nodes
-        const shifted = payload.level_columns.slice(1)
-        const filterCol = shifted[0]
-        const nodes = Object.entries(bootstrap).map(([catName, subNames]) => ({
-          id: catName,
-          name: catName,
-          _normalizedName: catName.toLowerCase(),
+    if (result && result.children && Array.isArray(result.children)) {
+      const filterCol = payload.level_columns[0]
+      const nodes = result.children.map(child => {
+        const name = typeof child === 'string' ? child : (child.name || '')
+        return {
+          id: name,
+          name,
+          _normalizedName: name.toLowerCase(),
           chars: [],
           annotations: [],
-          children: (subNames || []).map(subName => ({
-            id: subName,
-            name: subName,
-            _normalizedName: subName.toLowerCase(),
-            chars: [],
-            annotations: [],
-            children: [],
-            isLeaf: false,
-            _lazy: true,
-            _lazyFilterCol: filterCol,
-            _lazyLevelColumns: shifted
-          })),
+          children: [],
           isLeaf: false,
-          _autoExpand: true
-        }))
-        treeCache.value = {
-          ...treeCache.value,
-          [cacheKey]: nodes
+          _lazy: true,
+          _lazyFilterCol: filterCol,
+          _lazyLevelColumns: payload.level_columns
         }
-      } else {
-        treeCache.value = {
-          ...treeCache.value,
-          [cacheKey]: []
-        }
-      }
-    } else {
-      if (!result?.tree) {
-        throw new Error(t('charClass.states.dataFormatError'))
-      }
-
+      })
       treeCache.value = {
         ...treeCache.value,
-        [cacheKey]: normalizeCharClassTree(result.tree, {
-          leafLevelColumnName: tableConfig?.leafLevelColumnName,
-          leafData: tableConfig?.leafData,
-        })
+        [cacheKey]: nodes
+      }
+    } else {
+      treeCache.value = {
+        ...treeCache.value,
+        [cacheKey]: []
       }
     }
   } catch (error) {
