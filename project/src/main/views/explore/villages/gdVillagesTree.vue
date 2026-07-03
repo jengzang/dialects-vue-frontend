@@ -204,19 +204,18 @@ const loadCityData = async (cityName) => {
     const result = await loadFullTree(payload)
 
     if (result.mode === 'lazy_fallback') {
-      // Lazy fallback: create lazy nodes from flat bootstrap children
+      // lazy_bootstrap is a two-level map: { "广州市": ["从化区", "南沙区", ...] }
       const bootstrap = result.lazy_bootstrap
-      const shifted = result.shifted_level_columns || []
-      if (bootstrap && bootstrap.children && bootstrap.children.length > 0) {
-        const filterCol = shifted[0]
-        const nodes = bootstrap.children.map(childName => ({
+      if (bootstrap && typeof bootstrap === 'object') {
+        // Extract districts for this city (keyed by cityName from the filter)
+        const districts = bootstrap[cityName] || Object.values(bootstrap)[0] || []
+        const nodes = districts.map(districtName => ({
           id: generateId(),
-          name: childName,
-          rawName: childName,
+          name: districtName,
+          rawName: districtName,
           children: [],
           _lazy: true,
-          _lazyFilterCol: filterCol,
-          _lazyLevelColumns: shifted
+          _lazyParentPath: districtName === '(空)' ? [cityName, '(空)'] : [cityName, districtName]
         }))
         loadedCitiesData.value[cityName] = nodes
       } else {
@@ -373,42 +372,60 @@ const getFilteredCityData = (cityName) => {
 };
 
 /**
- * Lazy load children for a tree node (via loadFullTree with shifted filter)
+ * Normalize lazyLoadTree children into VillagesTreeItem-compatible nodes
+ */
+const normalizeLazyNodeChildren = (children, parentPath = []) => {
+  return children.map(child => {
+    const childName = typeof child === 'string' ? child : (child.name || child.label || '')
+
+    // Leaf node with raw data (longitude/latitude from API)
+    if (child && typeof child === 'object') {
+      const hasRawData = child['longitude'] !== undefined
+        || child['latitude'] !== undefined
+        || child['方言分布'] !== undefined
+      if (hasRawData) {
+        return {
+          id: generateId(),
+          name: formatLeafNode(childName, child),
+          rawName: childName,
+          rawData: child,
+          children: []
+        }
+      }
+    }
+
+    // Branch node — mark as lazy for further expansion
+    return {
+      id: generateId(),
+      name: childName,
+      rawName: childName,
+      children: [],
+      _lazy: true,
+      _lazyParentPath: [...parentPath, childName]
+    }
+  })
+}
+
+/**
+ * Lazy load children for a tree node via /sql/tree/lazy with parent_path
  */
 const lazyLoadChildren = async (node) => {
   if (!node._lazy || node._childrenLoaded || node._loadingChildren) return
 
   node._loadingChildren = true
   try {
-    const result = await loadFullTree({
+    const result = await lazyLoadTree({
       db_key: API_CONFIG.db_key,
       table_name: API_CONFIG.table_name,
-      level_columns: node._lazyLevelColumns,
+      level_columns: API_CONFIG.level_columns,
       data_columns: API_CONFIG.data_columns,
-      filters: { [String(node._lazyFilterCol)]: [node.rawName || node.name] }
+      parent_path: node._lazyParentPath
     })
 
-    if (result.mode === 'lazy_fallback') {
-      // Still too many rows — create another layer of lazy nodes
-      const bootstrap = result.lazy_bootstrap
-      const shifted = result.shifted_level_columns || []
-      const filterCol = shifted[0]
-      if (bootstrap && bootstrap.children && bootstrap.children.length > 0) {
-        node.children = bootstrap.children.map(childName => ({
-          id: generateId(),
-          name: childName,
-          rawName: childName,
-          children: [],
-          _lazy: true,
-          _lazyFilterCol: filterCol,
-          _lazyLevelColumns: shifted
-        }))
-      }
+    if (result && result.children && Array.isArray(result.children)) {
+      node.children = normalizeLazyNodeChildren(result.children, node._lazyParentPath || [])
     } else {
-      // mode === 'full' — the tree's top-level key is the node being expanded,
-      // extract its children to avoid duplicating the node itself.
-      const nodeKey = node.rawName || node.name
-      node.children = normalizeTreeData(result.tree?.[nodeKey] || {})
+      node.children = []
     }
     node._childrenLoaded = true
   } catch (error) {

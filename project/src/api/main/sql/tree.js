@@ -73,10 +73,11 @@ export async function loadFullTree(params) {
     })
 
     // Pass through full response — callers inspect result.mode to handle lazy_fallback
+    // lazy_bootstrap is a two-level map: { "key": ["child1", "child2", ...], ... }
     return {
       mode: result.mode || 'full',
       ...(result.mode === 'lazy_fallback'
-        ? { lazy_bootstrap: result.lazy_bootstrap, shifted_level_columns: result.shifted_level_columns }
+        ? { lazy_bootstrap: result.lazy_bootstrap }
         : { tree: result.tree || {} }),
     }
   } catch (error) {
