@@ -169,6 +169,7 @@
               :node="item"
               :search-query="searchQuery"
               :show-annotations="showAnnotations"
+              :lazy-load-fn="lazyLoadCharClassChildren"
             />
           </div>
         </div>
@@ -333,16 +334,45 @@ const loadTreeForState = async (state) => {
       return
     }
 
-    if (!result?.tree) {
-      throw new Error(t('charClass.states.dataFormatError'))
-    }
+    if (result.mode === 'lazy_fallback') {
+      const bootstrap = result.lazy_bootstrap
+      const shifted = result.shifted_level_columns || []
+      if (bootstrap && bootstrap.children && bootstrap.children.length > 0) {
+        const filterCol = shifted[0]
+        const nodes = bootstrap.children.map(name => ({
+          id: name,
+          name,
+          _normalizedName: name.toLowerCase(),
+          chars: [],
+          annotations: [],
+          children: [],
+          isLeaf: false,
+          _lazy: true,
+          _lazyFilterCol: filterCol,
+          _lazyLevelColumns: shifted
+        }))
+        treeCache.value = {
+          ...treeCache.value,
+          [cacheKey]: nodes
+        }
+      } else {
+        treeCache.value = {
+          ...treeCache.value,
+          [cacheKey]: []
+        }
+      }
+    } else {
+      if (!result?.tree) {
+        throw new Error(t('charClass.states.dataFormatError'))
+      }
 
-    treeCache.value = {
-      ...treeCache.value,
-      [cacheKey]: normalizeCharClassTree(result.tree, {
-        leafLevelColumnName: tableConfig?.leafLevelColumnName,
-        leafData: tableConfig?.leafData,
-      })
+      treeCache.value = {
+        ...treeCache.value,
+        [cacheKey]: normalizeCharClassTree(result.tree, {
+          leafLevelColumnName: tableConfig?.leafLevelColumnName,
+          leafData: tableConfig?.leafData,
+        })
+      }
     }
   } catch (error) {
     if (requestId !== loadRequestId) {
@@ -463,6 +493,55 @@ const retryCurrentState = () => {
     tableKey: selectedTableKey.value,
     levels: [...levels.value]
   })
+}
+
+const lazyLoadCharClassChildren = async (node) => {
+  if (!node._lazy || node._childrenLoaded || node._loadingChildren) return
+
+  node._loadingChildren = true
+  try {
+    const payload = buildCharClassTreePayload(activeTab.value, selectedTableKey.value, levels.value)
+    const result = await loadFullTree({
+      ...payload,
+      level_columns: node._lazyLevelColumns,
+      filters: { [String(node._lazyFilterCol)]: [node.name] }
+    })
+
+    if (result.mode === 'lazy_fallback') {
+      const bootstrap = result.lazy_bootstrap
+      const shifted = result.shifted_level_columns || []
+      const filterCol = shifted[0]
+      if (bootstrap && bootstrap.children && bootstrap.children.length > 0) {
+        node.children = bootstrap.children.map(childName => ({
+          id: childName,
+          name: childName,
+          _normalizedName: childName.toLowerCase(),
+          chars: [],
+          annotations: [],
+          children: [],
+          isLeaf: false,
+          _lazy: true,
+          _lazyFilterCol: filterCol,
+          _lazyLevelColumns: shifted
+        }))
+      }
+    } else {
+      // mode === 'full' — the tree's top-level key is the node being expanded,
+      // extract its children to avoid duplicating the node itself.
+      const tableConfig = currentTableConfig.value
+      const normalized = normalizeCharClassTree(result.tree || {}, {
+        leafLevelColumnName: tableConfig?.leafLevelColumnName,
+        leafData: tableConfig?.leafData,
+      })
+      node.children = normalized[0]?.children || []
+    }
+    node._childrenLoaded = true
+  } catch (error) {
+    console.error('Lazy load char class children error:', error)
+    node._loadError = error.message || '加載子節點失敗'
+  } finally {
+    node._loadingChildren = false
+  }
 }
 
 const resetPageState = () => {

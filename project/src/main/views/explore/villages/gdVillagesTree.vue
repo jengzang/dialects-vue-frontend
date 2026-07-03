@@ -48,16 +48,27 @@
           <!-- City Header -->
           <div class="city-header">
             <h3 class="city-name">{{ city }}</h3>
-            <button
-                v-if="!loadedCitiesData[city]"
-                @click="loadCityData(city)"
-                :disabled="loadingStates[city]"
-                class="load-btn"
-            >
-              {{ loadingStates[city] ? t('villages.pages.gdTree.loading') : t('villages.pages.gdTree.load') }}
-            </button>
-            <div v-else class="loaded-badge">
-              ✓ {{ t('villages.pages.gdTree.loaded') }}
+            <div class="city-header-actions">
+              <button
+                  v-if="!loadedCitiesData[city]"
+                  @click="loadCityData(city)"
+                  :disabled="loadingStates[city]"
+                  class="load-btn"
+              >
+                {{ loadingStates[city] ? t('villages.pages.gdTree.loading') : t('villages.pages.gdTree.load') }}
+              </button>
+              <template v-else>
+                <button
+                    class="city-map-btn"
+                    :class="{ 'is-disabled': !getCityLeafCount(city) }"
+                    :disabled="!getCityLeafCount(city)"
+                    @click.stop="handleCityMapClick(city)"
+                    title="顯示全市村落地圖"
+                >🌍</button>
+                <div class="loaded-badge">
+                  ✓ {{ t('villages.pages.gdTree.loaded') }}
+                </div>
+              </template>
             </div>
           </div>
 
@@ -85,6 +96,7 @@
                 :key="item.id"
                 :node="item"
                 :search-query="searchQuery"
+                :lazy-load-fn="lazyLoadChildren"
                 @open-map="openMapPopup"
             />
           </div>
@@ -191,9 +203,28 @@ const loadCityData = async (cityName) => {
   try {
     const result = await loadFullTree(payload)
 
-    // Extract city data from result.tree
-    if (result && result.tree && result.tree[cityName]) {
-      const normalizedData = normalizeTreeData(result.tree[cityName], cityName);
+    if (result.mode === 'lazy_fallback') {
+      // Lazy fallback: create lazy nodes from flat bootstrap children
+      const bootstrap = result.lazy_bootstrap
+      const shifted = result.shifted_level_columns || []
+      if (bootstrap && bootstrap.children && bootstrap.children.length > 0) {
+        const filterCol = shifted[0]
+        const nodes = bootstrap.children.map(childName => ({
+          id: generateId(),
+          name: childName,
+          rawName: childName,
+          children: [],
+          _lazy: true,
+          _lazyFilterCol: filterCol,
+          _lazyLevelColumns: shifted
+        }))
+        loadedCitiesData.value[cityName] = nodes
+      } else {
+        loadedCitiesData.value[cityName] = []
+      }
+    } else if (result.tree && result.tree[cityName]) {
+      // Normal full tree
+      const normalizedData = normalizeTreeData(result.tree[cityName]);
       loadedCitiesData.value[cityName] = normalizedData;
     } else {
       throw new Error(t('villages.pages.gdTree.errors.invalidCityData'));
@@ -207,9 +238,9 @@ const loadCityData = async (cityName) => {
 };
 
 /**
- * Normalize tree data from API response
+ * Normalize tree data from API response (full tree mode)
  */
-const normalizeTreeData = (rawData, cityName) => {
+const normalizeTreeData = (rawData) => {
   if (!rawData || typeof rawData !== 'object') {
     return [];
   }
@@ -221,7 +252,6 @@ const normalizeTreeData = (rawData, cityName) => {
                    data['latitude'] !== undefined;
 
     if (isLeaf) {
-      // Format leaf node with data
       const formattedName = formatLeafNode(name, data);
       return {
         id: generateId(),
@@ -341,6 +371,53 @@ const getFilteredCityData = (cityName) => {
 
   return filterTree(cityData, query);
 };
+
+/**
+ * Lazy load children for a tree node (via loadFullTree with shifted filter)
+ */
+const lazyLoadChildren = async (node) => {
+  if (!node._lazy || node._childrenLoaded || node._loadingChildren) return
+
+  node._loadingChildren = true
+  try {
+    const result = await loadFullTree({
+      db_key: API_CONFIG.db_key,
+      table_name: API_CONFIG.table_name,
+      level_columns: node._lazyLevelColumns,
+      data_columns: API_CONFIG.data_columns,
+      filters: { [String(node._lazyFilterCol)]: [node.rawName || node.name] }
+    })
+
+    if (result.mode === 'lazy_fallback') {
+      // Still too many rows — create another layer of lazy nodes
+      const bootstrap = result.lazy_bootstrap
+      const shifted = result.shifted_level_columns || []
+      const filterCol = shifted[0]
+      if (bootstrap && bootstrap.children && bootstrap.children.length > 0) {
+        node.children = bootstrap.children.map(childName => ({
+          id: generateId(),
+          name: childName,
+          rawName: childName,
+          children: [],
+          _lazy: true,
+          _lazyFilterCol: filterCol,
+          _lazyLevelColumns: shifted
+        }))
+      }
+    } else {
+      // mode === 'full' — the tree's top-level key is the node being expanded,
+      // extract its children to avoid duplicating the node itself.
+      const nodeKey = node.rawName || node.name
+      node.children = normalizeTreeData(result.tree?.[nodeKey] || {})
+    }
+    node._childrenLoaded = true
+  } catch (error) {
+    console.error('Lazy load children error:', error)
+    node._loadError = error.message || '加載子節點失敗'
+  } finally {
+    node._loadingChildren = false
+  }
+};
 const goToYCVillages = () => {
   router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/yc'));
 };
@@ -359,6 +436,47 @@ const openMapPopup = (villages) => {
 const closeMapPopup = () => {
   mapPopupVisible.value = false;
   mapPopupVillages.value = [];
+};
+
+/**
+ * Recursively collect all leaf nodes (with rawData) from an array of tree nodes.
+ * Skips unloaded lazy nodes — they have no leaf data yet.
+ */
+const collectAllLeafNodes = (nodes) => {
+  const leaves = [];
+  const traverse = (n) => {
+    if (n.rawData) {
+      const dialect = n.rawData['方言分布']?.[0] || '';
+      leaves.push({
+        name: n.rawName || n.name,
+        dialect,
+        longitude: parseFloat(n.rawData['longitude']?.[0]) || 0,
+        latitude: parseFloat(n.rawData['latitude']?.[0]) || 0,
+      });
+    }
+    if (n.children && n.children.length > 0) {
+      n.children.forEach(traverse);
+    }
+  };
+  nodes.forEach(traverse);
+  return leaves;
+};
+
+const getCityLeafCount = (city) => {
+  const cityData = loadedCitiesData.value[city];
+  return cityData ? collectAllLeafNodes(cityData).length : 0;
+};
+
+/**
+ * Show all villages in a city on the map
+ */
+const handleCityMapClick = (city) => {
+  const cityData = loadedCitiesData.value[city];
+  if (!cityData) return;
+  const leafNodes = collectAllLeafNodes(cityData);
+  if (leafNodes.length > 0) {
+    openMapPopup(leafNodes);
+  }
 };
 
 // Initialize on mount
@@ -546,6 +664,37 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.city-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.city-map-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.city-map-btn:hover:not(:disabled) {
+  background: rgba(52, 199, 89, 0.15);
+  transform: scale(1.15);
+}
+
+.city-map-btn.is-disabled,
+.city-map-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 /* City Loading State */

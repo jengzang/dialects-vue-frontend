@@ -67,10 +67,18 @@ export async function lazyLoadTree(params) {
  */
 export async function loadFullTree(params) {
   try {
-    return await api('/sql/tree/full', {
+    const result = await api('/sql/tree/full', {
       method: 'POST',
       body: params
     })
+
+    // Pass through full response — callers inspect result.mode to handle lazy_fallback
+    return {
+      mode: result.mode || 'full',
+      ...(result.mode === 'lazy_fallback'
+        ? { lazy_bootstrap: result.lazy_bootstrap, shifted_level_columns: result.shifted_level_columns }
+        : { tree: result.tree || {} }),
+    }
   } catch (error) {
     console.error('Load full tree error:', error)
     showError(error.message || '加載完整樹形數據失敗')

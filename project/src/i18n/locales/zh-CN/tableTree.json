@@ -96,6 +96,7 @@
   "villagesTreeItem": {
     "drawAllChildrenMap": "绘制所有下级自然村点图",
     "drawCurrentVillageMap": "绘制当前自然村点图",
-    "expandPrompt": "请展开"
+    "expandPrompt": "请展开",
+    "expandFirstForMap": "请先展开节点加载村落数据"
   }
 }

@@ -96,6 +96,7 @@
   "villagesTreeItem": {
     "drawAllChildrenMap": "Draw map for all descendant villages",
     "drawCurrentVillageMap": "Draw map for the current village",
-    "expandPrompt": "Please expand"
+    "expandPrompt": "Please expand",
+    "expandFirstForMap": "Expand the node first to load village data"
   }
 }
