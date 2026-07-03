@@ -526,14 +526,12 @@ const lazyLoadCharClassChildren = async (node) => {
         }))
       }
     } else {
-      // mode === 'full' — the tree's top-level key is the node being expanded,
-      // extract its children to avoid duplicating the node itself.
+      // mode === 'full' — charClass tree top-level entries are the direct children
       const tableConfig = currentTableConfig.value
-      const normalized = normalizeCharClassTree(result.tree || {}, {
+      node.children = normalizeCharClassTree(result.tree || {}, {
         leafLevelColumnName: tableConfig?.leafLevelColumnName,
         leafData: tableConfig?.leafData,
       })
-      node.children = normalized[0]?.children || []
     }
     node._childrenLoaded = true
   } catch (error) {
