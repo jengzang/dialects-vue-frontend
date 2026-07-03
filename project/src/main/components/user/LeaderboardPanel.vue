@@ -149,7 +149,7 @@ const categoryConfigs = computed(() => [
         tooltip: t('user.leaderboard.categories.other.tooltips.table')
       },
       {
-        key: 'endpoint__sql_tree_full',
+        key: 'endpoint_group_sql_tree',
         label: t('user.leaderboard.categories.other.items.tree'),
         tooltip: t('user.leaderboard.categories.other.tooltips.tree')
       },

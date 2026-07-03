@@ -249,7 +249,22 @@ async function handleErrorResponse(path, response) {
   );
 
   if (response.status === 429) {
-    showRateLimitNotice(buildRateLimitNoticePayload(path, normalizedResponse));
+    const detail = normalizedResponse.data?.detail;
+    const detailObj = detail && typeof detail === 'object' ? detail : null;
+
+    if (detailObj?.code === 'online_time_rate_limited') {
+      return 'suppress';
+    }
+
+    if (detailObj) {
+      showRateLimitNotice(buildRateLimitNoticePayload(path, normalizedResponse));
+    } else {
+      const rawStr = typeof detail === 'string' ? detail.trim() : '';
+      const isHtmlLike = /^\s*</.test(rawStr) || rawStr.length > 500;
+      showRateLimitNotice({
+        message: rawStr && !isHtmlLike ? rawStr : '请求过于频繁，请稍后再试',
+      });
+    }
   }
 
   if (response.status === 401) {
@@ -357,7 +372,10 @@ export async function api(path, options = {}) {
     }
 
     if (!response.ok) {
-      await handleErrorResponse(path, response);
+      const handled = await handleErrorResponse(path, response);
+      if (handled === 'suppress') {
+        return null;
+      }
     }
 
     const responseData = await parseSuccessfulResponse(response, responseType);
