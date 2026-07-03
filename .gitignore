@@ -54,6 +54,9 @@ coverage/
 # Claude Code
 .claude/
 
+# Zhihu tutorial images (local only, not for repo)
+docs/zhihu/img/
+
 # Misc
 nul
 *.bak
