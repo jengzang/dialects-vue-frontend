@@ -207,15 +207,18 @@ const loadCityData = async (cityName) => {
       // lazy_bootstrap is a two-level map: { "广州市": ["从化区", "南沙区", ...] }
       const bootstrap = result.lazy_bootstrap
       if (bootstrap && typeof bootstrap === 'object') {
-        // Extract districts for this city (keyed by cityName from the filter)
         const districts = bootstrap[cityName] || Object.values(bootstrap)[0] || []
+        // city consumed level_columns[0], shift for the next level
+        const shifted = API_CONFIG.level_columns.slice(1)
+        const filterCol = shifted[0]
         const nodes = districts.map(districtName => ({
           id: generateId(),
           name: districtName,
           rawName: districtName,
           children: [],
           _lazy: true,
-          _lazyParentPath: districtName === '(空)' ? [cityName, '(空)'] : [cityName, districtName]
+          _lazyFilterCol: filterCol,
+          _lazyLevelColumns: shifted
         }))
         loadedCitiesData.value[cityName] = nodes
       } else {
@@ -372,60 +375,41 @@ const getFilteredCityData = (cityName) => {
 };
 
 /**
- * Normalize lazyLoadTree children into VillagesTreeItem-compatible nodes
- */
-const normalizeLazyNodeChildren = (children, parentPath = []) => {
-  return children.map(child => {
-    const childName = typeof child === 'string' ? child : (child.name || child.label || '')
-
-    // Leaf node with raw data (longitude/latitude from API)
-    if (child && typeof child === 'object') {
-      const hasRawData = child['longitude'] !== undefined
-        || child['latitude'] !== undefined
-        || child['方言分布'] !== undefined
-      if (hasRawData) {
-        return {
-          id: generateId(),
-          name: formatLeafNode(childName, child),
-          rawName: childName,
-          rawData: child,
-          children: []
-        }
-      }
-    }
-
-    // Branch node — mark as lazy for further expansion
-    return {
-      id: generateId(),
-      name: childName,
-      rawName: childName,
-      children: [],
-      _lazy: true,
-      _lazyParentPath: [...parentPath, childName]
-    }
-  })
-}
-
-/**
- * Lazy load children for a tree node via /sql/tree/lazy with parent_path
+ * Lazy load children for a tree node via loadFullTree with shifted filter
  */
 const lazyLoadChildren = async (node) => {
   if (!node._lazy || node._childrenLoaded || node._loadingChildren) return
 
   node._loadingChildren = true
   try {
-    const result = await lazyLoadTree({
+    const result = await loadFullTree({
       db_key: API_CONFIG.db_key,
       table_name: API_CONFIG.table_name,
-      level_columns: API_CONFIG.level_columns,
+      level_columns: node._lazyLevelColumns,
       data_columns: API_CONFIG.data_columns,
-      parent_path: node._lazyParentPath
+      filters: { [String(node._lazyFilterCol)]: [node.rawName || node.name] }
     })
 
-    if (result && result.children && Array.isArray(result.children)) {
-      node.children = normalizeLazyNodeChildren(result.children, node._lazyParentPath || [])
+    if (result.mode === 'lazy_fallback') {
+      // Still too many rows — another two-level map at this depth
+      const bootstrap = result.lazy_bootstrap
+      const nodeKey = node.rawName || node.name
+      const children = bootstrap?.[nodeKey] || Object.values(bootstrap || {})[0] || []
+      const shifted = node._lazyLevelColumns.slice(1)
+      const filterCol = shifted[0]
+      node.children = children.map(childName => ({
+        id: generateId(),
+        name: childName,
+        rawName: childName,
+        children: [],
+        _lazy: true,
+        _lazyFilterCol: filterCol,
+        _lazyLevelColumns: shifted
+      }))
     } else {
-      node.children = []
+      // mode === 'full' — extract subtree for the filter node
+      const nodeKey = node.rawName || node.name
+      node.children = normalizeTreeData(result.tree?.[nodeKey] || {})
     }
     node._childrenLoaded = true
   } catch (error) {

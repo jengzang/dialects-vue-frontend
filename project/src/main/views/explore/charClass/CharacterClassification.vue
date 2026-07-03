@@ -187,7 +187,7 @@ import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import CharTreeItem from '@/main/components/TableAndTree/CharTreeItem.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
-import { lazyLoadTree, loadFullTree } from '@/api'
+import { loadFullTree } from '@/api'
 import {
   parseCharClassParams,
   updateUrlWithCharClassConfig
@@ -326,9 +326,8 @@ const loadTreeForState = async (state) => {
   loadingCacheKey.value = cacheKey
 
   try {
-    const result = await loadFullTree(
-      buildCharClassTreePayload(activeTab.value, state.tableKey, state.levels)
-    )
+    const payload = buildCharClassTreePayload(activeTab.value, state.tableKey, state.levels)
+    const result = await loadFullTree(payload)
 
     if (requestId !== loadRequestId) {
       return
@@ -338,6 +337,9 @@ const loadTreeForState = async (state) => {
       // lazy_bootstrap is a two-level map: { "分类1": ["子1", "子2"], ... }
       const bootstrap = result.lazy_bootstrap
       if (bootstrap && typeof bootstrap === 'object') {
+        // First level consumed, shift for sub-nodes
+        const shifted = payload.level_columns.slice(1)
+        const filterCol = shifted[0]
         const nodes = Object.entries(bootstrap).map(([catName, subNames]) => ({
           id: catName,
           name: catName,
@@ -353,7 +355,8 @@ const loadTreeForState = async (state) => {
             children: [],
             isLeaf: false,
             _lazy: true,
-            _lazyParentPath: [catName, subName]
+            _lazyFilterCol: filterCol,
+            _lazyLevelColumns: shifted
           })),
           isLeaf: false,
           _autoExpand: true
@@ -507,47 +510,38 @@ const lazyLoadCharClassChildren = async (node) => {
 
   node._loadingChildren = true
   try {
-    const tableConfig = currentTableConfig.value
-    const payload = buildCharClassTreePayload(activeTab.value, selectedTableKey.value, levels.value)
-    const result = await lazyLoadTree({
-      db_key: payload.db_key,
-      table_name: payload.table_name,
-      level_columns: payload.level_columns,
-      data_columns: payload.data_columns,
-      parent_path: node._lazyParentPath
+    const result = await loadFullTree({
+      ...buildCharClassTreePayload(activeTab.value, selectedTableKey.value, levels.value),
+      level_columns: node._lazyLevelColumns,
+      filters: { [String(node._lazyFilterCol)]: [node.name] }
     })
 
-    if (result && result.children && Array.isArray(result.children)) {
-      node.children = result.children.map(child => {
-        const childName = typeof child === 'string' ? child : (child.name || '')
-
-        if (child && typeof child === 'object') {
-          // Check if the child has leaf data (chars/annotations) or children
-          const hasChars = Array.isArray(child.chars) || Array.isArray(child['漢字']) || Array.isArray(child['汉字'])
-          if (hasChars || child.isLeaf) {
-            const normalized = normalizeCharClassTree({ [childName]: child }, {
-              leafLevelColumnName: tableConfig?.leafLevelColumnName,
-              leafData: tableConfig?.leafData,
-            })
-            if (normalized.length > 0) return normalized[0]
-          }
-        }
-
-        // Intermediate node — mark as lazy for further expansion
-        return {
-          id: childName,
-          name: childName,
-          _normalizedName: childName.toLowerCase(),
-          chars: [],
-          annotations: [],
-          children: [],
-          isLeaf: false,
-          _lazy: true,
-          _lazyParentPath: [...(node._lazyParentPath || []), childName]
-        }
-      })
+    if (result.mode === 'lazy_fallback') {
+      // Still too many rows — another two-level map at this depth
+      const bootstrap = result.lazy_bootstrap
+      const children = bootstrap?.[node.name] || Object.values(bootstrap || {})[0] || []
+      const shifted = node._lazyLevelColumns.slice(1)
+      const filterCol = shifted[0]
+      node.children = children.map(childName => ({
+        id: childName,
+        name: childName,
+        _normalizedName: childName.toLowerCase(),
+        chars: [],
+        annotations: [],
+        children: [],
+        isLeaf: false,
+        _lazy: true,
+        _lazyFilterCol: filterCol,
+        _lazyLevelColumns: shifted
+      }))
     } else {
-      node.children = []
+      // mode === 'full' — extract subtree for the filter node
+      const tableConfig = currentTableConfig.value
+      const subtree = result.tree?.[node.name]
+      node.children = normalizeCharClassTree(subtree || {}, {
+        leafLevelColumnName: tableConfig?.leafLevelColumnName,
+        leafData: tableConfig?.leafData,
+      })
     }
     node._childrenLoaded = true
   } catch (error) {
