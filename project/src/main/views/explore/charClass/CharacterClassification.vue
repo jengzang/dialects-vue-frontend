@@ -351,7 +351,8 @@ const loadTreeForState = async (state) => {
           children: [],
           isLeaf: false,
           _lazy: true,
-          _lazyFilters: { [String(payload.level_columns[0])]: [name] }
+          _lazyFilters: { [String(payload.level_columns[0])]: [name] },
+          _lazyLevelColumns: payload.level_columns
         }
       })
       treeCache.value = {
@@ -494,16 +495,17 @@ const lazyLoadCharClassChildren = async (node) => {
     const result = await loadFullTree({
       db_key: payload.db_key,
       table_name: payload.table_name,
-      level_columns: payload.level_columns,
+      level_columns: node._lazyLevelColumns,
       data_columns: payload.data_columns,
       filters: node._lazyFilters
     })
 
     if (result.mode === 'lazy_fallback') {
-      // Still too many rows — accumulate filters for the next depth
+      // Still too many rows — accumulate filters + shift level_columns further
       const bootstrap = result.lazy_bootstrap
       const children = bootstrap?.[node.name] || Object.values(bootstrap || {})[0] || []
-      const nextCol = payload.level_columns[Object.keys(node._lazyFilters).length]
+      const nextCol = node._lazyLevelColumns[0]
+      const nextShifted = node._lazyLevelColumns.slice(1)
       node.children = children.map(childName => ({
         id: childName,
         name: childName,
@@ -513,10 +515,11 @@ const lazyLoadCharClassChildren = async (node) => {
         children: [],
         isLeaf: false,
         _lazy: true,
-        _lazyFilters: { ...node._lazyFilters, [String(nextCol)]: [childName] }
+        _lazyFilters: { ...node._lazyFilters, [String(nextCol)]: [childName] },
+        _lazyLevelColumns: nextShifted
       }))
     } else {
-      // mode === 'full' — extract subtree for the filter node
+      // mode === 'full' — tree rooted at filter level, extract by node key
       const tableConfig = currentTableConfig.value
       const subtree = result.tree?.[node.name]
       node.children = normalizeCharClassTree(subtree || {}, {
