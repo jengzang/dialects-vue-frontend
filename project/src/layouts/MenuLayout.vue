@@ -31,7 +31,6 @@ import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import PanelManager from '@/main/components/result/PanelManager.vue'
 
 const keepAliveViewNames = [
-  'AboutPage',
   'ComparePage',
   'DialectClustering',
   'MapPage',
