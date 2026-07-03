@@ -63,7 +63,8 @@
       "desc": "Character table conversion, merging, checking tools",
       "tableProcess": "Table Processing - Table checking and format conversion",
       "jyut2ipa": "Jyutping to IPA - Convert Jyutping to International Phonetic Alphabet",
-      "tableMerge": "Table Merging - Merge multiple character tables"
+      "tableMerge": "Table Merging - Merge multiple character tables",
+      "tableDerive": "Character Table Inference - Generate a full character table from rule presets"
     },
     "charClass": {
       "title": "Character Positions",

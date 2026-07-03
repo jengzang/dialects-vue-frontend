@@ -1,4 +1,6 @@
+import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 // ========================================
@@ -49,6 +51,8 @@ import { useI18n } from 'vue-i18n'
 // - compactDesktop: 针对桌面端进行压缩。字体和宽度较小，适用于非核心功能标签。
 // - balancedMobile: 保持桌面端默认表现，但适度增加移动端的图标权重和字号，提升可读性和点击范围。
 //
+const withRouteLocale = (route, path) => buildLocalePath(resolveRouteLocale(route), stripLocaleFromPath(path))
+
 const DISPLAY_DEFAULTS = {
     // Flex 尺寸布局
     weight: 1,
@@ -187,6 +191,7 @@ export function matchExploreBarChildRoute(childPath, route, router) {
 
 export function useExploreBarConfig() {
     const { t } = useI18n()
+    const route = useRoute()
 
     return computed(() => ({
         tools: createExploreTab({
@@ -198,15 +203,16 @@ export function useExploreBarConfig() {
                 overrides: {}
             },
             navigation: {
-                defaultTo: { path: '/menu/tools' },
-                matchPages: ['check', 'jyut2ipa', 'merge', 'praat'],
-                activeMatchPaths: ['/explore/manage'],
+                defaultTo: { path: withRouteLocale(route, '/menu/tools') },
+                matchPages: ['check', 'jyut2ipa', 'merge', 'derive', 'praat'],
+                activeMatchPaths: [withRouteLocale(route, '/explore/manage')],
                 rememberChild: true,
-                defaultChild: '/explore/tools/check',
+                defaultChild: withRouteLocale(route, '/explore/tools/check'),
                 children: [
-                    { label: t('navigation.submenu.tools.check'), icon: '📝', path: '/explore/tools/check' },
-                    { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: '/explore/tools/jyut2ipa' },
-                    { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: '/explore/tools/merge' },
+                    { label: t('navigation.submenu.tools.check'), icon: '📝', path: withRouteLocale(route, '/explore/tools/check') },
+                    { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: withRouteLocale(route, '/explore/tools/jyut2ipa') },
+                    { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: withRouteLocale(route, '/explore/tools/merge') },
+                    { label: t('navigation.submenu.tools.derive'), icon: '🧪', path: withRouteLocale(route, '/explore/tools/derive') },
                     // { label: t('navigation.submenu.tools.praat'), icon: '👂️', path: '/explore/tools/praat' }
                 ]
             }
@@ -235,15 +241,15 @@ export function useExploreBarConfig() {
                 overrides: {}
             },
             navigation: {
-                defaultTo: { path: '/explore/char-class', query: { tab: 'zhonggu' } },
+                defaultTo: { path: withRouteLocale(route, '/explore/char-class'), query: { tab: 'zhonggu' } },
                 matchPages: ['CharacterClassification'],
                 rememberChild: true,
                 defaultChild: '/explore/char-class?tab=zhonggu',
                 children: [
-                    { label: t('navigation.submenu.charClass.zhonggu'), icon: '📜', path: '/explore/char-class?tab=zhonggu' },
-                    { label: t('navigation.submenu.charClass.shanggu'), icon: '🏛️', path: '/explore/char-class?tab=shanggu' },
-                    { label: t('navigation.submenu.charClass.jingu'), icon: '📖', path: '/explore/char-class?tab=jingu' },
-                    { label: t('navigation.submenu.charClass.yueyun'), icon: '🎵', path: '/explore/char-class?tab=yueyun' }
+                    { label: t('navigation.submenu.charClass.zhonggu'), icon: '📜', path: withRouteLocale(route, '/explore/char-class?tab=zhonggu') },
+                    { label: t('navigation.submenu.charClass.shanggu'), icon: '🏛️', path: withRouteLocale(route, '/explore/char-class?tab=shanggu') },
+                    { label: t('navigation.submenu.charClass.jingu'), icon: '📖', path: withRouteLocale(route, '/explore/char-class?tab=jingu') },
+                    { label: t('navigation.submenu.charClass.yueyun'), icon: '🎵', path: withRouteLocale(route, '/explore/char-class?tab=yueyun') }
                 ]
             }
         }),
@@ -256,14 +262,14 @@ export function useExploreBarConfig() {
                 overrides: {}
             },
             navigation: {
-                defaultTo: { path: '/menu/words' },
+                defaultTo: { path: withRouteLocale(route, '/menu/words') },
                 matchPages: ['YuBao', 'ycSpoken'],
                 rememberChild: true,
                 defaultChild: '/explore/yubao?tab=vocabulary',
                 children: [
-                    { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: '/explore/yubao?tab=vocabulary' },
-                    { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: '/explore/yubao?tab=grammar' },
-                    { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: '/explore/yc-spoken' }
+                    { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: withRouteLocale(route, '/explore/yubao?tab=vocabulary') },
+                    { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: withRouteLocale(route, '/explore/yubao?tab=grammar') },
+                    { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc-spoken') }
                 ]
             }
         }),
@@ -276,15 +282,15 @@ export function useExploreBarConfig() {
                 overrides: {}
             },
             navigation: {
-                defaultTo: { path: '/menu/villages' },
+                defaultTo: { path: withRouteLocale(route, '/menu/villages') },
                 matchPages: ['gdVillages', 'gdVillagesTable', 'ycVillages', 'VillagesML'],
                 rememberChild: true,
                 defaultChild: '/explore/villages/gd',
                 children: [
-                    { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: '/explore/villages/gd' },
-                    { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: '/explore/villages/ml' },
-                    { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: '/explore/villages/table' },
-                    { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: '/explore/villages/yc' }
+                    { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
+                    { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: withRouteLocale(route, '/explore/villages/ml') },
+                    { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
+                    { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/villages/yc') }
                 ]
             }
         }),
@@ -299,7 +305,7 @@ export function useExploreBarConfig() {
                 }
             },
             navigation: {
-                defaultTo: { path: '/menu/about/settings' }
+                defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
             }
         })
     }))

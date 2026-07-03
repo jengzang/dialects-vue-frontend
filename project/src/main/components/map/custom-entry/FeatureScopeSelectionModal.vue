@@ -65,10 +65,12 @@
               <div class="scope-toolbar-info">
                 {{ t('map.customTab.scopeModal.selectedCount', { count: selectedLocations.length }) }}
               </div>
-              <label class="scope-toggle-label">
-                <input v-model="recognizeHierarchy" type="checkbox">
-                <span>{{ t('map.customTab.scopeModal.recognizeHierarchy') }}</span>
-              </label>
+              <CheckBox
+                :model-value="recognizeHierarchy"
+                :label="t('map.customTab.scopeModal.recognizeHierarchy')"
+                class="scope-toggle-label"
+                @update:modelValue="recognizeHierarchy = $event"
+              />
             </div>
             <button class="scope-clear-btn" type="button" @click="clearSelection">
               {{ t('map.customTab.scopeModal.clearSelection') }}
@@ -134,23 +136,20 @@
               </div>
               <div v-else v-bind="locationContainerProps" class="scope-virtual-list ui-scrollbar">
                 <div v-bind="locationWrapperProps" class="scope-virtual-wrapper">
-                  <label
+                  <CheckBox
                     v-for="item in virtualLocations"
                     :key="item.data.name"
+                    :model-value="selectedLocationSet.has(item.data.name)"
                     class="scope-checkbox-item scope-checkbox-item--virtual"
+                    @update:modelValue="toggleLocation(item.data.name)"
                   >
-                    <input
-                      :checked="selectedLocationSet.has(item.data.name)"
-                      type="checkbox"
-                      @change="toggleLocation(item.data.name)"
-                    >
                     <span class="scope-selection-copy">
                       <span class="scope-selection-title">{{ item.data.name }}</span>
                       <span class="scope-selection-meta">
                         {{ t('map.customTab.scopeModal.locationMeta', { records: item.data.recordCount, regions: formatRegionNames(item.data.regionNames) || t('map.customTab.scopeModal.summary.empty') }) }}
                       </span>
                     </span>
-                  </label>
+                  </CheckBox>
                 </div>
               </div>
             </section>
@@ -183,6 +182,7 @@ import { computed, ref, watch } from 'vue'
 import { useVirtualList } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const props = defineProps({
   modelValue: {

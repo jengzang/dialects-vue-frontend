@@ -260,8 +260,8 @@ const comparisonData = computed(() => [
     key: 'hourlyApiUsage',
     feature: t('user.benefitsPopup.items.hourlyApiUsage'),
     unit: 'callRate',
-    anonymous: 100,
-    user: 1000
+    anonymous: 50,
+    user: 500
   }
 ])
 

@@ -6,19 +6,23 @@
     <!-- 内容区域 (与 SimpleLayout 保持一致) -->
     <div class="content-area">
       <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
+        <transition
+          name="fade"
+          mode="out-in"
+        >
           <KeepAlive :include="keepAliveViewNames">
             <component :is="Component" />
           </KeepAlive>
         </transition>
       </router-view>
     </div>
+    <PageTutorialGuide />
   </div>
 </template>
 
 <script setup>
-import { KeepAlive } from 'vue'
 import ExploreBar from '@/components/bar/ExploreBar.vue'
+import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 
 const keepAliveViewNames = [
   'CharacterClassification',
@@ -33,6 +37,7 @@ const keepAliveViewNames = [
   'YangChunVillages',
   'YuBaoPage'
 ]
+
 </script>
 
 <style scoped>
@@ -54,6 +59,7 @@ const keepAliveViewNames = [
 
 /* 内容区域：与 SimpleLayout 完全一致 */
 .content-area {
+  position: relative;
   height: 88dvh;
   display: flex;
   justify-content: center;
@@ -75,12 +81,11 @@ const keepAliveViewNames = [
 /* 动画 */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.14s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-  transform: translateY(6px);
 }
 </style>

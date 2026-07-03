@@ -1,4 +1,3 @@
-// src/utils/store.js
 import { ref, reactive, computed } from 'vue'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import {
@@ -28,6 +27,53 @@ export function setPreferredCharacterTable(tableName) {
     writePreferredCharacterTableState(nextTableName)
 }
 
+const {
+    state: tutorialEnabledState,
+    write: writeTutorialEnabledState
+} = useStorageState('tutorial-enabled', {
+    defaultValue: true
+})
+
+export const tutorialEnabled = tutorialEnabledState
+
+export function setTutorialEnabled(value) {
+    const nextValue = Boolean(value)
+    tutorialEnabled.value = nextValue
+    writeTutorialEnabledState(nextValue)
+}
+
+const {
+    state: zhongguInputModeState,
+    write: writeZhongguInputModeState
+} = useStorageState('zhonggu-input-mode', {
+    defaultValue: 'selector'
+})
+
+export const zhongguInputMode = zhongguInputModeState
+
+export function setZhongguInputMode(value) {
+    const nextValue = (value === 'direct') ? 'direct' : 'selector'
+    zhongguInputMode.value = nextValue
+    writeZhongguInputModeState(nextValue)
+}
+
+export const tutorialAssistState = reactive({
+    requestToken: 0,
+    target: null,
+    payload: null,
+})
+
+export function requestTutorialAssistApply(target, payload) {
+    tutorialAssistState.requestToken += 1
+    tutorialAssistState.target = target
+    tutorialAssistState.payload = payload
+}
+
+export function clearTutorialAssistRequest() {
+    tutorialAssistState.target = null
+    tutorialAssistState.payload = null
+}
+
 // ========================================
 // 用户状态管理（替代 window.userRole 和 window.currentUser）
 // ========================================
@@ -53,7 +99,8 @@ export const mapStore = reactive({
     showCustomData: false,    // 是否显示用户个人数据
     compareType: '',          // 比較類型: 'chars' | 'zhonggu' | 'tones'
     compareGroups: null,       // 比较模式的组信息 { group1: {color, label}, group2: {color, label} }
-    fitViewKey: 0
+    fitViewKey: 0,
+    featureLabels: {}         // hash → readable label (built from 對應字)
 })
 
 // =================================

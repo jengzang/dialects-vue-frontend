@@ -78,6 +78,9 @@ export const EXPLORE_LEGACY_ROUTES = {
   merge: {
     path: '/explore/tools/merge'
   },
+  derive: {
+    path: '/explore/tools/derive'
+  },
   praat: {
     path: '/explore/tools/praat'
   },

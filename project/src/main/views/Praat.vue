@@ -146,7 +146,7 @@
       <div v-if="showSettings" class="settings-sidebar">
         <div class="sidebar-header">
           <h2 class="sidebar-title">{{ t('praat.main.settings.title') }}</h2>
-          <button class="close-button" @click="showSettings = false">✕</button>
+          <button class="close-btn close-btn-lg" @click="showSettings = false">✕</button>
         </div>
         <div class="sidebar-content">
           <SettingsPanel
@@ -160,7 +160,7 @@
     <!-- Audio Preview Floating Window (Only on Tab 1) -->
     <Transition name="preview-fade">
       <div v-if="showAudioPreview" class="audio-preview-float">
-        <button class="preview-close-button" @click="showPreview = false" :title="t('praat.main.closePreview')">
+        <button class="close-btn close-btn-sm close-btn-corner" @click="showPreview = false" :title="t('praat.main.closePreview')">
           ✕
         </button>
         <AudioPreviewPanel
@@ -827,7 +827,6 @@ const stopPolling = () => {
 
 const fetchResults = async (currentJobId) => {
   isFetchingResults.value = true
-  jobStatus.value = 'processing'
   jobStage.value = t('praat.main.status.fetchingResults')
 
   try {
@@ -1140,7 +1139,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1rem;
   border: none;
   cursor: pointer;
   font-size: 1rem;
@@ -1174,7 +1173,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.6rem;
   border: none;
   cursor: pointer;
   font-size: 0.9rem;
@@ -1271,27 +1270,6 @@ onBeforeUnmount(() => {
   margin: 0;
 }
 
-.close-button {
-  width: 2.5rem;
-  height: 2.5rem;
-  border: none;
-  border-radius: 50%;
-  background: var(--glass-light);
-  color: var(--color-text-primary);
-  font-size: 1.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.close-button:hover {
-  background: var(--color-error);
-  color: white;
-  transform: rotate(90deg);
-}
-
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
@@ -1340,33 +1318,6 @@ onBeforeUnmount(() => {
   z-index: 100;
   overflow: hidden;
   max-height: 95dvh;
-}
-
-.preview-close-button {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 1.75rem;
-  height: 1.75rem;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
-  color: var(--color-text-primary);
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  z-index: 10;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.preview-close-button:hover {
-  background: var(--color-error);
-  color: white;
-  transform: rotate(90deg) scale(1.1);
 }
 
 /* Preview Fade Transition */

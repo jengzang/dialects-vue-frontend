@@ -54,10 +54,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 import { setLocale } from '@/i18n/index.js'
-import { SUPPORTED_LOCALES } from '@/i18n/localeDetector.js'
+import { buildLocalePath, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import {
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
@@ -67,13 +68,25 @@ import {
 import { showSuccess } from '@/utils/message.js'
 
 const { locale, t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 
-const currentLocale = computed(() => locale.value)
+const currentLocale = computed(() => route.params.locale || locale.value)
+
+watch(
+  () => route.params.locale,
+  (routeLocale) => {
+    if (routeLocale && locale.value !== routeLocale) {
+      locale.value = routeLocale
+    }
+  },
+  { immediate: true }
+)
 
 const languages = ref([
-  SUPPORTED_LOCALES['zh-Hant'],
-  SUPPORTED_LOCALES['zh-CN'],
-  SUPPORTED_LOCALES['en'],
+  { code: 'zh-Hant', name: '繁體中文', flag: '🇭🇰' },
+  { code: 'zh-CN', name: '简体中文', flag: '🇨🇳' },
+  { code: 'en', name: 'English', flag: '🇺🇸' },
 ])
 
 const interfaceMode = ref(getStoredInterfaceMode())
@@ -97,6 +110,11 @@ function changeLanguage(newLocale) {
   }
 
   setLocale(newLocale)
+  router.push({
+    path: buildLocalePath(newLocale, stripLocaleFromPath(route.path)),
+    query: route.query,
+    hash: route.hash,
+  })
   showSuccess(t('messages.success.languageChanged'))
   setTimeout(() => window.location.reload(), 500)
 }

@@ -25,6 +25,21 @@ import { showError } from '@/utils/message.js'
  */
 
 /**
+ * @typedef {Object} ZhongGuAnalysisParams
+ * @property {string[]} path_strings - 語音條件列表，例如 ['[知]{組}', '[蟹]{攝}']
+ * @property {string[]} [chars] - 可直接輸入的漢字集合，例如 ['笨', '蛋']
+ * @property {string[]} [column] - 需要進行排列組合的額外欄位，例如 ['等']
+ * @property {boolean} [combine_query=false] - 是否開啟 path_strings 與 column 的交叉組合查詢
+ * @property {string[]} [exclude_columns] - 要排除的列名列表，如 ['多地位標記', '多等']
+ * @property {string[]} [locations] - 目標地點列表，例如 ['北京', '廣州']
+ * @property {string[]} [regions] - 目標區域列表
+ * @property {string[]} [features] - 需要分析的語音特徵，例如 ['聲母', '韻母']
+ * @property {string} [region_mode='yindian'] - 地區匹配模式
+ * @property {boolean} [include_custom=false] - 是否附帶查詢當前用戶的自定義數據
+ * @property {string} [table_name='characters'] - 字符數據庫表名
+ */
+
+/**
  * 中古音查询
  * @param {ZhongGuQueryParams} params - 查询参数
  * @returns {Promise<Array<Object>>} 查询结果
@@ -155,6 +170,10 @@ export async function searchChars(params) {
       query.append('response_mode', params.response_mode)
     }
 
+    if (params.include_custom) {
+      query.append('include_custom', 'true')
+    }
+
     const data = await api(`/api/search_chars/?${query.toString()}`, {
       loginPromptEligible: true
     })
@@ -210,6 +229,10 @@ export async function searchTones(params) {
       query.append('region_mode', params.region_mode)
     }
 
+    if (params.include_custom) {
+      query.append('include_custom', 'true')
+    }
+
     return await api(`/api/search_tones/?${query.toString()}`, {
       loginPromptEligible: true
     })
@@ -223,10 +246,18 @@ export async function searchTones(params) {
 /**
  * 获取字符列表
  * @param {Object} params - 查询参数
- * @returns {Promise<Array<string>>} 字符列表
+ * @param {string[]} params.path_strings - 語音條件列表
+ * @param {string[]} [params.chars] - 可直接輸入的漢字集合
+ * @param {boolean} [params.combine_query=false] - 是否交叉組合查詢
+ * @param {string[]} [params.exclude_columns] - 排除的列名
+ * @param {string} [params.table_name='characters'] - 字符數據庫表名
+ * @returns {Promise<Array<Object>>} 字符列表及統計
  * @throws {Error} 查询失败
  * @example
- * const charList = await getCharList({ category: 'common' })
+ * const charList = await getCharList({
+ *   path_strings: ['[知]{組}', '[蟹]{攝}'],
+ *   table_name: 'characters'
+ * })
  */
 export async function getCharList(params) {
   try {

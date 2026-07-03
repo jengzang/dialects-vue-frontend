@@ -53,6 +53,7 @@
       "check": "字表工具",
       "jyut2ipa": "粤拼转IPA",
       "merge": "字表合并",
+      "derive": "字表推导",
       "praat": "声学分析",
       "praatname": "Praat"
     },

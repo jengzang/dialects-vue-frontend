@@ -17,7 +17,14 @@
     "i18n:extract": "vue-i18n-extract report --vueFiles \"./src/**/*.{js,vue}\" --languageFiles \"./src/i18n/locales/**/*.json\"",
     "deploy": "npm run build && bash deploy.sh",
     "deploy:ps": "npm run build && powershell -ExecutionPolicy Bypass -File deploy.ps1",
-    "seo:sitemap": "node ./scripts/generate-sitemap.mjs"
+    "seo:sitemap": "node ./scripts/generate-sitemap.mjs",
+    "num": "node ./scripts/analyze-vue-loc.mjs --root src",
+    "num:out": "node ./scripts/analyze-vue-loc.mjs --root src --out frontend-loc-report.md",
+    "num:vue": "node ./scripts/analyze-vue-loc.mjs --root src --ext vue",
+    "num:script": "node ./scripts/analyze-vue-loc.mjs --root src --kind script --sort script --order desc",
+    "num:style": "node ./scripts/analyze-vue-loc.mjs --root src --kind style --sort style --order desc",
+    "num:css": "node ./scripts/analyze-vue-loc.mjs --root src --style css --sort css --order desc",
+    "num:scss": "node ./scripts/analyze-vue-loc.mjs --root src --style scss --sort scss --order desc"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
@@ -44,6 +51,7 @@
     "echarts": "^5.6.0",
     "fflate": "^0.8.3",
     "maplibre-gl": "^5.16.0",
+    "marked": "^18.0.0",
     "opencc-js": "^1.0.5",
     "vue-i18n": "^11.3.0",
     "vue-router": "^4.5.1",

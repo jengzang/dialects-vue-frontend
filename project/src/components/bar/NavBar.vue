@@ -249,6 +249,7 @@ import {
 import { WEB_BASE } from '@/env-config.js'
 import { userStore, resultCache } from '@/main/store/store.js'
 import NavAvatar from '@/components/bar/NavAvatar.vue'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -358,9 +359,9 @@ const onMenuBarClick = async (tabConfig, navigate) => {
 const goToAuthPage = () => {
   // 如果用户已登录，跳转到个人资料页面；否则跳转到登录页面
   if (userStore.isAuthenticated) {
-    router.push({ path: '/auth', query: { view: 'profile' } })
+    router.push({ path: buildLocalePath(resolveRouteLocale(route), '/auth'), query: { view: 'profile' } })
   } else {
-    router.push('/auth')
+    router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
   }
 }
 

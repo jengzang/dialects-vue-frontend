@@ -157,9 +157,21 @@ export const mapStyle = (name) => {
 }
 
 export function calculateDenseMapCenterAndZoom(coords, densityPercentile = 0.85) {
+    return calculateMapCenterAndZoom(coords, { densityPercentile });
+}
+
+export function calculateMapCenterAndZoom(coords, options = {}) {
+    const {
+        densityPercentile = 0.85
+    } = options;
+
     // 输入验证
     if (!Array.isArray(coords) || coords.length === 0) {
         throw new Error('坐标数组不能为空');
+    }
+
+    if (typeof densityPercentile !== 'number' || Number.isNaN(densityPercentile) || densityPercentile <= 0 || densityPercentile > 1) {
+        throw new Error('densityPercentile 必须是 (0, 1] 范围内的数字');
     }
 
     // 验证坐标格式和有效性
@@ -178,25 +190,25 @@ export function calculateDenseMapCenterAndZoom(coords, densityPercentile = 0.85)
 
     // 处理单点情况
     if (validCoords.length === 1) {
-        const [lat, lng] = validCoords[0];
+        const [lng, lat] = validCoords[0];
         return {
-            center: [lat, lng],
+            center: [lng, lat],
             zoom: 15
         };
     }
 
-    // 分离纬度和经度（注意：这里假设输入格式为 [lat, lng]）
-    const lats = validCoords.map(coord => coord[0]);
-    const lngs = validCoords.map(coord => coord[1]);
+    // 分离经度和纬度（输入格式统一按 [lng, lat] 处理）
+    const lngs = validCoords.map(coord => coord[0]);
+    const lats = validCoords.map(coord => coord[1]);
 
     // 计算核心区域边界（使用百分位数排除离群点）
-    const latRange = getPercentileRange(lats, densityPercentile);
     const lngRange = getPercentileRange(lngs, densityPercentile);
+    const latRange = getPercentileRange(lats, densityPercentile);
 
     // 计算核心区域中心点
     const center = [
-        (latRange.min + latRange.max) / 2,
-        (lngRange.min + lngRange.max) / 2
+        (lngRange.min + lngRange.max) / 2,
+        (latRange.min + latRange.max) / 2
     ];
 
     // 计算核心区域的大小（度数）
@@ -204,7 +216,7 @@ export function calculateDenseMapCenterAndZoom(coords, densityPercentile = 0.85)
     const lngSpan = lngRange.max - lngRange.min;
 
     // 计算缩放级别 - 基于核心区域大小
-    const zoom = calculateZoomFromSpan(latSpan, lngSpan, center[0]);
+    const zoom = calculateZoomFromSpan(latSpan, lngSpan, center[1]);
 
     return {
         center,

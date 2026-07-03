@@ -19,6 +19,7 @@ import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n();
 const router = useRouter();
@@ -38,7 +39,7 @@ const spokenColumns = computed(() => [
 ]);
 
 const goToYCVillages = () => {
-  router.push('/explore/villages/yc');
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/yc'));
 };
 </script>
 

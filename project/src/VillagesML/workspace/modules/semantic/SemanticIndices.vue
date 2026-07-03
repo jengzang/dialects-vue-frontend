@@ -9,8 +9,20 @@
     <div class="detail-toggle glass-panel">
       <div class="toggle-left">
         <label class="toggle-container">
-          <input type="checkbox" v-model="detailMode" class="toggle-checkbox" />
-          <span class="toggle-label">詳細模式</span>
+          <SwitchToggle
+            :model-value="detailMode"
+            :width="48"
+            :height="24"
+            :thumb-size="20"
+            color="blue"
+            variant="solid"
+            show-label
+            active-text="詳細模式"
+            inactive-text="詳細模式"
+            label-position="right"
+            :aria-label="'詳細模式'"
+            @update:modelValue="detailMode = $event"
+          />
         </label>
         <span class="toggle-hint">（語義分類更細緻）</span>
       </div>
@@ -202,6 +214,7 @@ import AppModal from '@/components/common/AppModal.vue'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { getSemanticIndices } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
 import { getCategoryDisplayName, getSubcategoryName } from '@/VillagesML/config/villagesML.js'
@@ -554,39 +567,6 @@ const getRegionLevelName = (level) => {
   align-items: center;
   gap: 10px;
   cursor: pointer;
-}
-
-.toggle-checkbox {
-  position: relative;
-  width: 48px;
-  height: 24px;
-  appearance: none;
-  background: rgba(200, 200, 200, 0.3);
-  border-radius: 12px;
-  outline: none;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.toggle-checkbox:checked {
-  background: var(--color-primary);
-}
-
-.toggle-checkbox::before {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  top: 2px;
-  left: 2px;
-  background: white;
-  transition: transform 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.toggle-checkbox:checked::before {
-  transform: translateX(24px);
 }
 
 .toggle-label {

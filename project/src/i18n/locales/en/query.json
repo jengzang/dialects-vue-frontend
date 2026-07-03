@@ -270,6 +270,58 @@
       "customLocationsModalTitle": "Custom Locations ({count})",
       "requireInput": "Please enter a location or division",
       "tooManyLocations": "Too many explicit locations were provided. Reduce manual locations or custom-region locations and try again."
+    },
+    "zhongguDirectInput": {
+      "positionLabel": "Middle Chinese Position Input",
+      "positionPlaceholder": "Spaces = independent, joined = combined, dash = match all. E.g.: 泥母 流開一 蟹-等",
+      "charLabel": "Direct Character Input",
+      "charPlaceholder": "Enter Chinese characters, e.g.: 你好",
+      "helpButton": "?",
+      "possibleCombinations": "{count} possible combinations",
+      "actualMatches": ", {count} actual matches",
+      "outputFormat": ", output format: {format}",
+      "detailsButton": "⤢ Details",
+      "querying": "Querying data...",
+      "noMatches": "No matching characters",
+      "pleaseSelect": "Enter Middle Chinese positions to search",
+      "detailsTitle": "Search Details",
+      "charCount": "{count} chars",
+      "tooManyCombinations": "Too many combinations ({count} > {limit}), please narrow the search",
+      "queryFailed": "Data query failed, please try again later",
+      "duplicateValueError": "\"{value}\" exists in multiple categories ({categories}), please add a category suffix",
+      "unknownValueError": "\"{value}\" is not a valid Middle Chinese position value",
+      "unknownCategoryError": "\"{category}\" is not a valid category name",
+      "tooManyTokens": "Too many position tokens ({count} > {limit}), please reduce input",
+      "help": {
+        "title": "Direct Input Guide",
+        "rules": {
+          "rule1": "Separate position tokens with spaces. Each token represents one query combination.",
+          "rule2": "Values that appear in only one category (e.g., \"泥\" only in \"母\") do not need a suffix.",
+          "rule3": "Values appearing in multiple categories (e.g., \"山\" in both \"攝\" and \"韻\") MUST have a category suffix (e.g., \"山攝\" or \"山韻\").",
+          "rule4": "The \"-\" prefix means \"all values from this category\" (e.g., \"-等\" matches all grade values; \"蟹-等\" matches 蟹攝 with all grades).",
+          "rule5": "Freely combine multiple query tokens (e.g., \"蟹-等 知組\" queries 蟹攝 with all grades AND 知組).",
+          "rule6": "Compounds like \"流開一\" are parsed character by character."
+        },
+        "examplesNote": "The following examples are based on the Middle Chinese (Guangyun) character table",
+        "examples": {
+          "title": "Examples",
+          "example1": "\"泥\" → Analyze with 泥母",
+          "example2": "\"蟹-等\" → Analyze with 蟹攝 divisions I, II, III, IV",
+          "example3": "\"次濁-調\" → Analyze with 次濁 initial + all tones",
+          "example4": "\"庄組\" → Analyze with 庄組 (entering just \"庄\" defaults to 庄母)",
+          "example5": "\"流開一\" → Analyze with 流攝開口一等",
+          "example6": "\"塞擦\" → Extract 塞擦音 for analysis",
+          "example7": "\"-部位\" → Analyze all places of articulation",
+          "example8": "\"山攝 知組\" → Analyze with 山攝 + 知組"
+        },
+        "table": {
+          "title": "Supported Categories & Values (simplified Chinese also accepted)",
+          "tableHeaders": {
+            "category": "Category",
+            "values": "Values"
+          }
+        }
+      }
     }
   },
   "result": {

@@ -12,6 +12,10 @@
     "name": "字表合并",
     "desc": "合并多个字表数据"
   },
+  "deriveTables": {
+    "name": "字表推导",
+    "desc": "基于少量样本与规则生成完整字表"
+  },
   "praatAnalysis": {
     "name": "声学分析",
     "desc": "基于 Praat 进行基频、共振峰等分析"
@@ -197,6 +201,56 @@
       "defaultReferenceFileName": "参考表.xlsx",
       "mainSheetName": "主表",
       "supplementSheetName": "補充表"
+    }
+  },
+  "derive": {
+    "page": {
+      "badge": "ALPHA",
+      "title": "字表推导工具",
+      "subtitle": "先提供页面壳子，用于后续承接样本上传、规则选择与推导结果预览。"
+    },
+    "sections": {
+      "workflow": {
+        "title": "推导流程",
+        "desc": "围绕“少量已知字音 → 规则映射 → 完整字表”组织后续能力。",
+        "steps": {
+          "source": {
+            "title": "输入种子字表",
+            "desc": "上传少量已整理样本，作为推导起点。"
+          },
+          "rules": {
+            "title": "选择推导规则",
+            "desc": "后续将在这里接入韵书、音类与映射方案。"
+          },
+          "result": {
+            "title": "生成推导结果",
+            "desc": "输出完整字表、规则轨迹与人工复核清单。"
+          }
+        }
+      },
+      "inputs": {
+        "title": "预留输入区",
+        "desc": "后续页面会在这里放置上传、参数选择与校验配置。",
+        "items": {
+          "seedTable": "种子字表 / 参考样本",
+          "phonologyPreset": "音韵规则与韵书预设",
+          "validationConfig": "推导范围与结果校验参数"
+        }
+      },
+      "outputs": {
+        "title": "预期输出",
+        "desc": "此处先展示后续结果模块的结构占位。",
+        "tags": {
+          "derivedTable": "推导字表",
+          "ruleTrace": "规则轨迹",
+          "reviewChecklist": "人工复核清单"
+        }
+      },
+      "status": {
+        "title": "当前状态",
+        "desc": "本阶段仅完成导航、页面接入与样式框架，业务逻辑后续补充。",
+        "placeholder": "字表推导功能壳子已接入，可在此基础上继续扩展表单、任务流与结果区。"
+      }
     }
   },
   "checkTool": {

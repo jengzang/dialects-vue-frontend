@@ -63,7 +63,8 @@
       "desc": "字表转换、合并、检查等工具",
       "tableProcess": "字表处理 - 字表检查与格式转换",
       "jyut2ipa": "粤拼转IPA - 粤拼转国际音标",
-      "tableMerge": "字表合并 - 合并多个字表"
+      "tableMerge": "字表合并 - 合并多个字表",
+      "tableDerive": "字表推导 - 基于规则生成完整字表"
     },
     "charClass": {
       "title": "汉字地位",
@@ -100,7 +101,7 @@
       "desc": "声学参数批量估计、多算法基频检测、EGG信号分析、声门参数提取"
     },
     "charsGeneration": {
-      "title": "字表推导器",
+      "title": "字表推导工具",
       "desc": "基于音韵地位的字表推导工具，由少量字生成完整字表，可选多种韵书"
     },
     "dialectClustering": {

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useI18n } from 'vue-i18n'
 import UniversalTable from "@/main/components/TableAndTree/UniversalTable.vue";
 import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
@@ -8,6 +9,7 @@ import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceSta
 
 const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
 
 const cachedStats = getCachedSourceStats()
@@ -50,7 +52,7 @@ const defaultFilter = { '存儲標記': 1 }
 // const defaultFilter = { '省': ['廣東', '廣西'] }
 
 const goToPrivacy = () => {
-  router.push('/menu/privacy')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/privacy'))
 }
 </script>
 

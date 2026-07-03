@@ -110,7 +110,8 @@
         },
         "scatter": {
           "title": "音節分布散點圖",
-          "description": "橫軸為總數量，縱軸為地點數。越靠右表示總量越高，越靠上表示覆蓋地點越多。"
+          "description": "橫軸為總數量，縱軸為地點數。越靠右表示總量越高，越靠上表示覆蓋地點越多。",
+          "subtitle": "總數量 × 地點覆蓋"
         },
         "common": {
           "other": "其他",
@@ -123,6 +124,15 @@
       "modal": {
         "title": "{featureType} - {syllable}"
       },
+      "nav": {
+        "navLabel": "音節統計頁面導航",
+        "chartsLabel": "圖表",
+        "totalInitial": "總聲母",
+        "totalFinal": "總韻母",
+        "totalTone": "總聲調",
+        "scrollUp": "向上滑動",
+        "scrollDown": "向下滑動"
+      },
       "actions": {
         "query": "查詢",
         "loading": "加載中...",
@@ -132,7 +142,8 @@
         "emptyInput": "請輸入地點並點擊查詢",
         "minLocationError": "請至少輸入一個地點",
         "loadError": "加載數據時發生錯誤",
-        "hint": "可同時輸入1~100個地點，用於分析一類方言的音節統計特征"
+        "hint": "可同時輸入1~100個地點，用於分析一類方言的音節統計特征",
+        "none": "無"
       }
     },
     "evolution": {

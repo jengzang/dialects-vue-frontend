@@ -6,7 +6,7 @@
     <ul>
       <li>
         <span class="map-popup__label">{{ labels.feature }}</span>
-        <span class="val">{{ item.feature }}</span>
+        <span class="val">{{ item.featureLabel || item.feature }}</span>
       </li>
       <li>
         <span class="map-popup__label">{{ labels.result }}</span>

@@ -379,7 +379,7 @@ export async function get_detail(location, feature_value, bool=false, vue=false,
         }
     } else {
         if (mode === 's2p') {
-            // 已加入 \u00b7 以支援中間點「·」
+            // 已加入 \u00b7 以支持中間點「·」
             if (!/^[\u4e00-\u9fa5\-\s\u00b7]+$/.test(feature_value)) {
                 status_inputs = [];
             } else {

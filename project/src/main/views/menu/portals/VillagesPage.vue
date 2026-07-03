@@ -32,24 +32,26 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter()
+const route = useRoute()
 
 const handleGdVillagesTable = () => {
-  router.push('/explore/villages/table')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/table'))
 };
 
 const handleGdVillages = () => {
-  router.push('/explore/villages/gd')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/gd'))
 };
 
 const handleYcVillages = () => {
-  router.push('/explore/villages/yc')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/yc'))
 };
 
 const handleVillagesML = () => {
-  router.push('/explore/villages/ml')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/ml'))
 };
 </script>
 

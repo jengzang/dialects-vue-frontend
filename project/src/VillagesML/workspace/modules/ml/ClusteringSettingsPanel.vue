@@ -67,9 +67,9 @@
       </div>
 
       <div class="feature-toggles">
-        <label><input type="checkbox" v-model="settings.features.use_semantic" /> 語義特徵</label>
-        <label><input type="checkbox" v-model="settings.features.use_morphology" /> 形態特徵</label>
-        <label><input type="checkbox" v-model="settings.features.use_diversity" /> 多樣性特徵</label>
+        <CheckBox :model-value="settings.features.use_semantic" label="語義特徵" @update:modelValue="settings.features.use_semantic = $event" />
+        <CheckBox :model-value="settings.features.use_morphology" label="形態特徵" @update:modelValue="settings.features.use_morphology = $event" />
+        <CheckBox :model-value="settings.features.use_diversity" label="多樣性特徵" @update:modelValue="settings.features.use_diversity = $event" />
       </div>
 
       <button class="run-button solid-button" @click="runClustering" :disabled="loading || !isAuthenticated">
@@ -84,6 +84,7 @@ import { reactive, computed, watch, onMounted, ref } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import { userStore } from '@/main/store/store.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const props = defineProps({
   loading: { type: Boolean, default: false },

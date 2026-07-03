@@ -1,14 +1,29 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { computed, h } from 'vue'
+import { computed, h, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import i18n from '@/i18n/index.js'
 import { waitForAuthReady } from '@/api/auth/auth.js'
 import { userStore } from '@/main/store/store.js'
 import { showWarning } from '@/utils/message.js'
+import { showRouteLoading, hideRouteLoading } from '@/stores/routeLoading.js'
 import { menuRoutes } from '@/main/router/menuRoutes.js'
 import { exploreRoutes } from '@/main/router/exploreRoutes.js'
+import { resolvePreferredLocale } from '@/i18n/localeDetector.js'
+import {
+  FALLBACK_LOCALE,
+  buildLocalePath,
+  buildLocaleRedirectTarget,
+  detectBrowserLocale,
+  extractLocaleFromPath,
+  isSupportedLocale,
+  normalizeLocale,
+  resolveRouteLocale,
+  shouldRedirectMainEntry,
+  stripLocaleFromPath,
+} from '@/i18n/localeRouting.js'
 
 const HomePage = () => import('@/main/views/HomePage.vue')
+// 旧 intro 入口已废弃，不再保留单独入口，避免继续暴露历史页面标识。
 const LikeAuthor = () => import('./views/intro/LikeAuthor.vue')
 const Suggestions = () => import('./views/intro/Suggestions.vue')
 const Thanks = () => import('./views/intro/Thanks.vue')
@@ -18,10 +33,22 @@ const UserRegionPage = () => import('./components/user/UserRegionPage.vue')
 const MenuEntry = () => import('@/main/views/entry/MenuEntry.vue')
 const ExploreEntry = () => import('@/main/views/entry/ExploreEntry.vue')
 const VillagesMLBridge = () => import('@/main/views/entry/ExternalRouteBridge.vue')
-const IntroLayout = () => import('@/layouts/IntroLayout.vue')
 
 const DEFAULT_TITLE = '\u65B9\u97F3\u5716\u9451'
 
+function withLocalePath(path, routeLike) {
+  return buildLocalePath(resolveRouteLocale(routeLike), path)
+}
+
+function createLocaleRedirect(path) {
+  return (to) => ({
+    path: buildLocalePath(to.params.locale, path),
+    query: to.query,
+    hash: to.hash,
+  })
+}
+
+// 旧 intro 入口已废弃：此兼容组件仅保留给内部兜底，不再作为对外页面入口。
 const IntroEntry = {
   setup() {
     const route = useRoute()
@@ -40,22 +67,76 @@ const IntroEntry = {
 
 const routes = [
   {
+    path: '/:locale(zh-CN|zh-Hant|en)',
+    children: [
+      {
+        path: '',
+        component: HomePage
+      },
+      {
+        path: 'menu',
+        component: MenuEntry
+      },
+      ...menuRoutes,
+      {
+        path: 'explore',
+        component: ExploreEntry
+      },
+      ...exploreRoutes,
+      {
+        path: 'praat',
+        redirect: createLocaleRedirect('/explore/tools/praat')
+      },
+      {
+        path: 'auth',
+        component: Auth
+      },
+      {
+        path: 'auth/data',
+        component: UserDataPage
+      },
+      {
+        path: 'auth/regions',
+        component: UserRegionPage
+      },
+    ]
+  },
+  {
     path: '/',
-    component: HomePage
+    redirect: () => buildLocalePath(resolvePreferredLocale('/'), '/')
   },
   {
     path: '/menu',
-    component: MenuEntry
+    beforeEnter: (to) => ({
+      path: buildLocaleRedirectTarget({
+        pathname: '/menu',
+        search: typeof window !== 'undefined' ? window.location.search : '',
+        hash: to.hash,
+        locale: resolvePreferredLocale('/menu'),
+      })
+    })
   },
-  ...menuRoutes,
   {
     path: '/explore',
-    component: ExploreEntry
+    beforeEnter: (to) => ({
+      path: buildLocaleRedirectTarget({
+        pathname: '/explore',
+        search: typeof window !== 'undefined' ? window.location.search : '',
+        hash: to.hash,
+        locale: resolvePreferredLocale('/explore'),
+      })
+    })
   },
-  ...exploreRoutes,
   {
-    path: '/praat',
-    redirect: '/explore/tools/praat'
+    path: '/auth',
+    beforeEnter: (to) => ({
+      path: buildLocaleRedirectTarget({
+        pathname: '/auth',
+        search: typeof window !== 'undefined' ? window.location.search : '',
+        hash: to.hash,
+        locale: resolvePreferredLocale('/auth'),
+      })
+    })
   },
   {
     path: '/villagesML/:pathMatch(.*)*',
@@ -63,34 +144,43 @@ const routes = [
   },
   {
     path: '/intro',
-    component: IntroLayout,
-    children: [
-      {
-        path: '',
-        component: IntroEntry
-      }
-    ]
-  },
-  {
-    path: '/auth',
-    component: Auth
-  },
-  {
-    path: '/auth/data',
-    component: UserDataPage
-  },
-  {
-    path: '/auth/regions',
-    component: UserRegionPage
+    redirect: () => ({
+      path: buildLocalePath(resolvePreferredLocale('/intro'), '/'),
+      replace: true,
+    })
   },
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/'
+    redirect: (to) => {
+      const locale = extractLocaleFromPath(to.path)
+      if (locale) {
+        return {
+          path: buildLocalePath(locale, '/'),
+          replace: true,
+        }
+      }
+
+      if (shouldRedirectMainEntry(to.path)) {
+        return {
+          path: buildLocaleRedirectTarget({
+            pathname: stripLocaleFromPath(to.path),
+            search: typeof window !== 'undefined' ? window.location.search : '',
+            hash: to.hash,
+            locale: resolvePreferredLocale(to.path),
+          }),
+          replace: true,
+        }
+      }
+
+      return {
+        path: buildLocalePath(resolvePreferredLocale('/'), '/'),
+        replace: true,
+      }
+    }
   }
 ]
 
 const router = createRouter({
-  base: '/',
   history: createWebHistory(),
   routes,
   scrollBehavior() {
@@ -131,7 +221,8 @@ const ROUTE_QUERY_ALLOWLIST = {
       gdVillagesTable: [],
       check: [],
       jyut2ipa: [],
-      merge: []
+      merge: [],
+      derive: []
     }
   },
   '/villagesML': {
@@ -254,7 +345,8 @@ const ROUTE_QUERY_ALLOWLIST = {
 }
 
 function sanitizeQueryByRoute(to) {
-  const config = ROUTE_QUERY_ALLOWLIST[to.path]
+  const normalizedPath = stripLocaleFromPath(to.path)
+  const config = ROUTE_QUERY_ALLOWLIST[normalizedPath]
   if (!config) {
     return to.query
   }
@@ -302,6 +394,51 @@ function isSameQuery(left, right) {
 }
 
 router.beforeEach(async (to, from, next) => {
+  if (to.fullPath !== from.fullPath) {
+    showRouteLoading()
+  }
+
+  const routeLocale = to.params.locale
+  const currentRouteLocale = routeLocale || extractLocaleFromPath(to.path)
+
+  if (!currentRouteLocale && shouldRedirectMainEntry(to.path)) {
+    return next({
+      path: buildLocaleRedirectTarget({
+        pathname: to.path,
+        search: typeof window !== 'undefined' ? window.location.search : '',
+        hash: to.hash,
+        locale: resolvePreferredLocale(to.path),
+      }),
+      replace: true,
+    })
+  }
+
+  if (routeLocale && !isSupportedLocale(routeLocale)) {
+    return next({
+      path: buildLocalePath(normalizeLocale(routeLocale), stripLocaleFromPath(to.path)),
+      query: to.query,
+      hash: to.hash,
+      replace: true,
+    })
+  }
+
+  if (to.path === '/intro') {
+    return next({
+      path: buildLocalePath(resolvePreferredLocale('/intro'), '/'),
+      replace: true,
+    })
+  }
+
+  const activeLocale = currentRouteLocale ? normalizeLocale(currentRouteLocale) : detectBrowserLocale()
+  if (i18n.global.locale?.value !== activeLocale) {
+    i18n.global.locale.value = activeLocale
+  }
+  if (typeof document !== 'undefined') {
+    document.documentElement.setAttribute('lang', activeLocale)
+  }
+  await nextTick()
+
+  const localizedAuthPath = withLocalePath('/auth', to)
   const sanitizedQuery = sanitizeQueryByRoute(to)
 
   if (!isSameQuery(sanitizedQuery, to.query)) {
@@ -313,19 +450,31 @@ router.beforeEach(async (to, from, next) => {
     })
   }
 
-  if (to.path === '/auth/data' || to.path === '/auth/regions') {
+  if (to.path.endsWith('/auth/data') || to.path.endsWith('/auth/regions')) {
     if (!userStore.authReady) {
       await waitForAuthReady()
     }
 
     if (!userStore.isAuthenticated) {
       showWarning(i18n.global.t('user.dataPage.messages.authRequired'))
-      return next({ path: '/auth', replace: true })
+      return next({ path: withLocalePath('/auth', to), replace: true })
     }
   }
 
   document.title = to.meta?.title || DEFAULT_TITLE
   next()
+})
+
+router.afterEach(() => {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      hideRouteLoading()
+    })
+  })
+})
+
+router.onError(() => {
+  hideRouteLoading()
 })
 
 export default router

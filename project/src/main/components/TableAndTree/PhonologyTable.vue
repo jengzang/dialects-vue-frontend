@@ -83,7 +83,7 @@ import { useI18n } from 'vue-i18n';
 import LocationDetailPopup from '@/main/components/popup/result/LocationDetailPopup.vue';
 import PhonologyCellDetailModal from '@/main/components/popup/pho/PhonologyCellDetailModal.vue';
 import { getLocationDetail } from '@/api';
-import { READING_COLORS } from '@/main/constants/readingColors.js';
+import { READING_COLORS } from '@/main/config/readingColors.js';
 
 const { t } = useI18n();
 

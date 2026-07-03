@@ -3,26 +3,22 @@
     <h4 class="section-title">預處理參數</h4>
 
     <div class="setting-row">
-      <label class="setting-label">
-        <input
-          type="checkbox"
-          :checked="modelValue.standardize"
-          @change="updateSetting('standardize', $event.target.checked)"
-        />
-        標準化
-      </label>
+      <CheckBox
+        :model-value="modelValue.standardize"
+        label="標準化"
+        class="setting-label"
+        @update:modelValue="updateSetting('standardize', $event)"
+      />
       <span class="setting-hint">將特徵縮放到均值0、方差1</span>
     </div>
 
     <div class="setting-row">
-      <label class="setting-label">
-        <input
-          type="checkbox"
-          :checked="modelValue.use_pca"
-          @change="updateSetting('use_pca', $event.target.checked)"
-        />
-        使用 PCA 降維
-      </label>
+      <CheckBox
+        :model-value="modelValue.use_pca"
+        label="使用 PCA 降維"
+        class="setting-label"
+        @update:modelValue="updateSetting('use_pca', $event)"
+      />
       <span class="setting-hint">減少特徵維度，提高計算效率</span>
     </div>
 
@@ -44,6 +40,7 @@
 </template>
 
 <script setup>
+import CheckBox from '@/components/selector/CheckBox.vue'
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -85,9 +82,6 @@ function updateSetting(key, value) {
   cursor: pointer;
 }
 
-.setting-label input[type="checkbox"] {
-  cursor: pointer;
-}
 
 .setting-control {
   flex: 1;

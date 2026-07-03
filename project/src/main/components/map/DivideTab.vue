@@ -19,7 +19,7 @@
         </div>
 
         <div class="all-data-toggle-row">
-          <Checkbox
+          <CheckBox
             v-model="useAllData"
             class="all-data-toggle"
             :label="t('map.divideTab.labels.useAllData')"
@@ -103,11 +103,13 @@ import { useI18n } from 'vue-i18n'
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
 import RadioGroup from '@/components/selector/RadioGroup.vue'
-import Checkbox from '@/components/selector/Checkbox.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { mapStore, uiStore, userStore, isDivideButtonDisabled, setRunning } from "@/main/store/store.js";
 import { getCoordinates, getLocationPartitions } from '@/api'
 import { showError, showWarning } from '@/utils/message.js';
 import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { requestMapFitView } from '@/utils/map/MapData.js'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -231,28 +233,8 @@ const buildAllDataMapData = () => {
     throw new Error(t('map.divideTab.messages.allDataNoDrawablePoints'))
   }
 
-  const coordinates = coordinatesLocations.map(([, coordinate]) => coordinate)
-  const lngs = coordinates.map(coordinate => coordinate[0])
-  const lats = coordinates.map(coordinate => coordinate[1])
-  const centerCoordinate = [
-    lngs.reduce((sum, lng) => sum + lng, 0) / lngs.length,
-    lats.reduce((sum, lat) => sum + lat, 0) / lats.length
-  ]
-  const maxRange = Math.max(
-    Math.max(...lngs) - Math.min(...lngs),
-    Math.max(...lats) - Math.min(...lats)
-  )
-  let zoomLevel = 6
-  if (maxRange < 0.1) zoomLevel = 12
-  else if (maxRange < 0.5) zoomLevel = 10
-  else if (maxRange < 1) zoomLevel = 9
-  else if (maxRange < 2) zoomLevel = 8
-  else if (maxRange < 5) zoomLevel = 7
-
   return {
     coordinates_locations: coordinatesLocations,
-    center_coordinate: centerCoordinate,
-    zoom_level: zoomLevel,
     region_mappings: regionMappings
   }
 }
@@ -286,9 +268,10 @@ const runAllDataAction = async () => {
   mapStore.mapData = buildAllDataMapData()
   mapStore.mergedData = []
   mapStore.mode = 'dot'
+  requestMapFitView()
 
   await router.replace({
-    path: '/menu/map/view'
+    path: buildLocalePath(resolveRouteLocale(route), '/menu/map/view')
   })
 }
 
@@ -329,10 +312,11 @@ const runAction = async () => {
     mapStore.mapData = data;
     mapStore.mergedData = [];
     mapStore.mode = 'dot';
+    requestMapFitView()
 
     // 切換回地圖 Tab
     await router.replace({
-      path: '/menu/map/view'
+      path: buildLocalePath(resolveRouteLocale(route), '/menu/map/view')
     });
 
   } catch (error) {

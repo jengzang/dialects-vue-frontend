@@ -47,19 +47,19 @@
         <label>中心性指標：<span class="required-hint">（至少選擇一個）</span></label>
         <div class="checkbox-group">
           <label class="checkbox-label">
-            <input type="checkbox" value="degree" v-model="selectedMetrics" />
+            <CheckBox :model-value="selectedMetrics.includes('degree')" @update:modelValue="toggleMetric('degree', $event)" />
             度中心性
           </label>
           <label class="checkbox-label">
-            <input type="checkbox" value="betweenness" v-model="selectedMetrics" />
+            <CheckBox :model-value="selectedMetrics.includes('betweenness')" @update:modelValue="toggleMetric('betweenness', $event)" />
             介數中心性
           </label>
           <label class="checkbox-label">
-            <input type="checkbox" value="closeness" v-model="selectedMetrics" />
+            <CheckBox :model-value="selectedMetrics.includes('closeness')" @update:modelValue="toggleMetric('closeness', $event)" />
             接近中心性
           </label>
           <label class="checkbox-label">
-            <input type="checkbox" value="eigenvector" v-model="selectedMetrics" />
+            <CheckBox :model-value="selectedMetrics.includes('eigenvector')" @update:modelValue="toggleMetric('eigenvector', $event)" />
             特徵向量中心性
           </label>
         </div>
@@ -69,8 +69,20 @@
       <!-- Detail Mode Toggle -->
       <div class="setting-row">
         <label class="toggle-container">
-          <input type="checkbox" v-model="detailMode" class="toggle-checkbox" />
-          <span class="toggle-label">詳細模式</span>
+          <SwitchToggle
+            :model-value="detailMode"
+            :width="48"
+            :height="24"
+            :thumb-size="20"
+            color="blue"
+            variant="solid"
+            show-label
+            active-text="詳細模式"
+            inactive-text="詳細模式"
+            label-position="right"
+            :aria-label="'詳細模式'"
+            @update:modelValue="detailMode = $event"
+          />
         </label>
         <span class="hint">語義分類更細緻</span>
       </div>
@@ -88,6 +100,8 @@ import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import { userStore } from '@/main/store/store.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const props = defineProps({
   loading: { type: Boolean, default: false },
@@ -99,6 +113,16 @@ const emit = defineEmits(['run'])
 const settings = reactive(villagesMLStore.semanticSettings)
 const selectedMetrics = ref(settings.centrality_metrics || ['degree', 'betweenness'])
 const isAuthenticated = computed(() => userStore.isAuthenticated)
+
+const toggleMetric = (metric, checked) => {
+  if (checked) {
+    if (!selectedMetrics.value.includes(metric)) {
+      selectedMetrics.value.push(metric)
+    }
+    return
+  }
+  selectedMetrics.value = selectedMetrics.value.filter(item => item !== metric)
+}
 
 // Region level options
 const regionLevelOptions = [
@@ -236,12 +260,6 @@ const runAnalysis = () => {
   cursor: pointer;
 }
 
-.checkbox-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
 
 .auth-notice {
   display: flex;
@@ -270,39 +288,6 @@ const runAnalysis = () => {
   align-items: center;
   gap: 10px;
   cursor: pointer;
-}
-
-.toggle-checkbox {
-  position: relative;
-  width: 48px;
-  height: 24px;
-  appearance: none;
-  background: rgba(200, 200, 200, 0.3);
-  border-radius: 12px;
-  outline: none;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.toggle-checkbox:checked {
-  background: var(--color-primary);
-}
-
-.toggle-checkbox::before {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  top: 2px;
-  left: 2px;
-  background: white;
-  transition: transform 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.toggle-checkbox:checked::before {
-  transform: translateX(24px);
 }
 
 .toggle-label {

@@ -12,29 +12,23 @@
           <h2 class="tabs-title">{{ $t('about.intro.title') }}</h2>
           <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
           <ul class="customlist">
-            <li>
-              <span v-html="$t('about.intro.features.feature1.title')"></span>
-              {{ $t('about.intro.features.feature1.description') }}
+            <li v-for="(feature, idx) in featureList" :key="idx" class="feature-item">
+              <h3 class="feature-heading">{{ feature.heading }}</h3>
+              <p class="feature-subtitle">{{ feature.subtitle }}</p>
+              <p class="feature-intro">{{ feature.intro }}</p>
+              <ul v-if="feature.items.length" class="subfeature-list">
+                <li
+                  v-for="(item, i) in feature.items"
+                  :key="i"
+                  class="subfeature-item"
+                >
+                  <h4 class="subfeature-title">{{ item.title }}</h4>
+                  <p class="subfeature-body">{{ item.body }}</p>
+                </li>
+              </ul>
             </li>
-            <li>
-              <span v-html="$t('about.intro.features.feature2.title')"></span>
-              {{ $t('about.intro.features.feature2.description') }}
-            </li>
-            <li>
-              <span v-html="$t('about.intro.features.feature3.title')"></span>
-              {{ $t('about.intro.features.feature3.description') }}
-            </li>
-            <li>
-              <span v-html="$t('about.intro.features.feature4.title')"></span>
-              {{ $t('about.intro.features.feature4.description') }}
-            </li>
-            <li v-html="$t('about.intro.features.feature5.title')"></li>
-            <li>
-              <span v-html="$t('about.intro.features.feature6.title')"></span>
-              {{ $t('about.intro.features.feature6.description') }}
-            </li>
-            <li v-html="$t('about.intro.features.blueText')"></li>
-            <li>{{ $t('about.intro.features.mapClick') }}</li>
+            <!-- <li v-html="$t('about.intro.features.blueText')"></li>
+            <li v-html="$t('about.intro.features.mapClick')"></li> -->
           </ul>
 
           <ul v-if="false" class="customlist">
@@ -55,13 +49,6 @@
           </ul>
 
           <p style=" text-align: left;font-weight: bold;text-decoration: underline">{{ $t('about.intro.footer') }}</p>
-
-          <!-- 感悟部分 -->
-          <h2 class="tabs-title" style="margin-top: 20px">{{ $t('about.reflection.title') }}</h2>
-          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
-          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
-          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
-          <p class="thoughts"><em v-html="$t('about.reflection.poem')"></em></p>
 
           <h2 class="tabs-title" style="margin-top: 20px">🙏 {{ $t('about.thanks.title') }}</h2>
           <ul class="thanks-list">
@@ -168,6 +155,13 @@
           </p>
           <p></p>
           <p></p>
+
+          <!-- 感悟部分 -->
+          <h2 class="tabs-title" style="margin-top: 20px">{{ $t('about.reflection.title') }}</h2>
+          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
+          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
+          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
+          <p class="thoughts"><em v-html="$t('about.reflection.poem')"></em></p>
         </div>
 
         <!-- 设置页面 -->
@@ -186,7 +180,7 @@
               :class="{ active: currentLocale === lang.code }"
               @click="changeLanguage(lang.code)"
             >
-              <div class="language-flag">{{ lang.flag }}</div>
+              <!-- <div class="language-flag">{{ lang.flag }}</div> -->
               <div class="language-info">
                 <div class="language-name">{{ lang.name }}</div>
                 <div class="language-code">{{ lang.code }}</div>
@@ -196,15 +190,37 @@
           </div>
           </div>
 
-          <div class="setting-section">
-            <h3 class="section-title">{{ $t('navigation.settings.characterTable.title') }}</h3>
-            <p class="section-description">{{ $t('navigation.settings.characterTable.description') }}</p>
+          <div class="setting-section setting-split">
+            <div class="setting-split-item">
+              <h3 class="section-title">{{ $t('navigation.settings.characterTable.title') }}</h3>
+              <p class="section-description">{{ $t('navigation.settings.characterTable.description') }}</p>
 
-            <SimpleSelectDropdown
-              v-model="currentCharacterTable"
-              :options="characterTableOptions"
-              width="100%"
-            />
+              <SimpleSelectDropdown
+                v-model="currentCharacterTable"
+                :options="characterTableOptions"
+                width="100%"
+              />
+            </div>
+            <hr class="setting-split-divider">
+            <div class="setting-split-item">
+              <h3 class="section-title">{{ $t('about.settings.zhongguInputMode.title') }}
+                <HelpIcon
+                    :content="$t('about.settings.zhongguInputMode.description')"
+                    size="sm"
+                    placement="right"
+                    icon="?"
+                    icon-color="#007aff"
+                    style="margin-right: 2px; vertical-align: bottom;"
+                />
+              </h3>
+              <!-- <p class="section-description">{{ $t('about.settings.zhongguInputMode.description') }}</p> -->
+              <RadioGroup
+                v-model="zhongguInputModeModel"
+                :options="zhongguInputModeOptions"
+                name="about-zhonggu-input-mode"
+                class="settings-radio-group"
+              />
+            </div>
           </div>
 
           <div class="setting-section">
@@ -218,6 +234,30 @@
               class="settings-radio-group interface-mode-radio-group"
             />
           </div>
+
+          <div class="setting-section tutorial-toggle-section">
+            <div class="tutorial-toggle-copy">
+              <h3 class="section-title">{{ $t('about.settings.tutorialToggle.title') }}</h3>
+              <p class="section-description">{{ $t('about.settings.tutorialToggle.description') }}</p>
+            </div>
+            <SwitchToggle
+              :model-value="tutorialGuideEnabled"
+              :width="100"
+              :height="40"
+              :thumb-size="32"
+              color="#007aff"
+              variant="solid"
+              show-label
+              :active-text="$t('about.settings.tutorialToggle.enabled')"
+              :inactive-text="$t('about.settings.tutorialToggle.disabled')"
+              label-position="inside"
+              :gap="20"
+              :aria-label="$t('about.settings.tutorialToggle.title')"
+              class="tutorial-switch-toggle"
+              @update:modelValue="tutorialGuideEnabled = $event"
+            />
+          </div>
+
         </div>
       </template>
     </TabsContainer>
@@ -232,26 +272,50 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
-import { setLocale } from '@/i18n/index.js'
-import { SUPPORTED_LOCALES } from '@/i18n/localeDetector.js'
+import { useRoute, useRouter } from 'vue-router'
+import i18n, { setLocale } from '@/i18n/index.js'
+import { showSuccess } from '@/utils/message.js'
+import SupportPopup from '@/main/components/popup/SupportPopup.vue'
+import TabsContainer from '@/components/common/TabsContainer.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
+import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
 import {
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
   getStoredInterfaceMode,
   setInterfaceMode,
 } from '@/composables/core/uiPreferences.js'
-import { showSuccess } from '@/utils/message.js'
-import SupportPopup from '@/main/components/popup/SupportPopup.vue'
-import TabsContainer from '@/components/common/TabsContainer.vue'
-import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
-import RadioGroup from '@/components/selector/RadioGroup.vue'
-import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
-import { preferredCharacterTable, setPreferredCharacterTable } from '@/main/store/store.js'
+import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
+import {
+  preferredCharacterTable,
+  setPreferredCharacterTable,
+  tutorialEnabled,
+  setTutorialEnabled,
+  zhongguInputMode,
+  setZhongguInputMode,
+} from '@/main/store/store.js'
 
 const { t, locale } = useI18n()
 const route = useRoute()
+const router = useRouter()
 const showQRCodes = ref(false)
+
+const featureList = computed(() => {
+  const messages = i18n.global.messages.value[locale.value]
+  return Array.from({ length: 9 }, (_, i) => {
+    const n = i + 1
+    const f = messages.about.intro.features[`feature${n}`]
+    return {
+      heading: f.heading,
+      subtitle: f.subtitle,
+      intro: f.intro,
+      items: f.items || [],
+    }
+  })
+})
 
 const pathSectionToTab = {
   intro: 'intro',
@@ -309,9 +373,9 @@ function followClicked() {
 const currentLocale = computed(() => locale.value)
 
 const languages = ref([
-  SUPPORTED_LOCALES['zh-Hant'],
-  SUPPORTED_LOCALES['zh-CN'],
-  SUPPORTED_LOCALES['en']
+  { code: 'zh-Hant', name: '繁體中文', flag: '🇭🇰' },
+  { code: 'zh-CN', name: '简体中文', flag: '🇨🇳' },
+  { code: 'en', name: 'English', flag: '🇺🇸' }
 ])
 
 const interfaceMode = ref(getStoredInterfaceMode())
@@ -353,12 +417,40 @@ const currentCharacterTable = computed({
   set: (tableName) => setPreferredCharacterTable(tableName)
 })
 
+const tutorialGuideEnabled = computed({
+  get: () => tutorialEnabled.value,
+  set: (value) => setTutorialEnabled(value)
+})
+
+const zhongguInputModeModel = computed({
+  get: () => zhongguInputMode.value,
+  set: (mode) => setZhongguInputMode(mode)
+})
+
+const zhongguInputModeOptions = computed(() => [
+  {
+    value: 'selector',
+    label: t('about.settings.zhongguInputMode.options.selector')
+  },
+  {
+    value: 'direct',
+    label: t('about.settings.zhongguInputMode.options.direct')
+  }
+])
+
 function changeLanguage(newLocale) {
   if (newLocale === currentLocale.value) {
     return
   }
 
   setLocale(newLocale)
+
+  const targetPath = buildLocalePath(newLocale, stripLocaleFromPath(route.path))
+  router.push({
+    path: targetPath,
+    query: route.query,
+    hash: route.hash,
+  })
   showSuccess(t('messages.success.languageChanged'))
   setTimeout(() => window.location.reload(), 500)
 }
@@ -375,31 +467,76 @@ function changeInterfaceMode(mode) {
 function resolveTabRoute(tabName) {
   const section = tabToPathSection[tabName] || 'setting'
   return {
-    path: `/menu/about/${section}`,
+    path: buildLocalePath(resolveRouteLocale(route), `/menu/about/${section}`),
     query: route.query
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.tabs-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-top: 3rem!important;
+  margin-bottom: 0.5rem!important;
+  // color: #007aff;
+}
 .about-page-wrapper {
   width: 100%;
   height: 100%;
 }
 
 /* === 內容區塊 === */
-.page2 {
-  padding: 1dvw 8dvw;
-  font-size: 18px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-  max-width: 500px;
-  justify-content: center;
+.tutorial-toggle-section {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.tutorial-toggle-copy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tutorial-switch-toggle {
+  flex-shrink: 0;
+  justify-content: flex-end;
+
+  :deep(.switch-toggle__button) {
+    font-weight: 700;
+
+    &.is-on {
+      background: #007aff;
+      color: #fff;
+    }
+  }
+
+  :deep(.switch-toggle__label--inside) {
+    color: inherit;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  :deep(.switch-toggle__thumb) {
+    box-shadow: 0 6px 14px rgba(38, 88, 137, 0.18);
+  }
+}
+
+.page2 {
+  display: flex;
+  justify-content: center;
+  max-width: 500px;
   margin: 0 auto;
+  padding: 1dvw 8dvw;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  font-size: 18px;
 }
 
 @keyframes fade {
@@ -414,153 +551,9 @@ function resolveTabRoute(tabName) {
   }
 }
 
-.thanks-list li {
-  margin-bottom: 0.5rem;
-}
-
-p {
-  font-family: 'Arial', sans-serif;
-  line-height: 1.6;
-  font-size: 16px;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-strong {
-  font-weight: bold;
-  color: #007aff;
-}
-
-em {
-  font-style: italic;
-}
-
-p a {
-  color: #007aff;
-  text-decoration: none;
-}
-
-p a:hover {
-  text-decoration: underline;
-}
-
-p + p {
-  margin-top: 8px;
-}
-
-p strong {
-  background-color: rgba(0, 122, 255, 0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-p em.emoji {
-  font-size: 1.2em;
-  margin-left: 5px;
-}
-
-.customlist {
-  list-style-type: disc;
-  margin-left: 20px;
-  padding-left: 20px;
-  font-size: 16px;
-  color: #333;
-}
-
-.customlist ol {
-  list-style-type: decimal;
-}
-
-.customlist ul {
-  list-style-type: square;
-}
-
-.customlist li {
-  margin-bottom: 6px;
-  line-height: 1.5;
-  text-align: left;
-}
-
-.customlist li a {
-  color: #007aff;
-  text-decoration: none;
-}
-
-.customlist li a:hover {
-  text-decoration: underline;
-}
-
-.thoughts p {
-  font-family: 'Georgia', serif;
-  line-height: 1.8;
-  font-size: 18px;
-  color: #333;
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  text-align: left;
-}
-
-.thoughts em {
-  font-weight: bold;
-  text-decoration: underline;
-  color: #000000;
-}
-
-.cards-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-  text-align: center;
-  max-width: 800px;
-}
-
-.project-card {
-  position: relative;
-  display: block;
-  flex: 1 1 280px;
-  max-width: 320px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 1.1rem;
-  box-shadow: 0 2px 10px rgba(0, 122, 255, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-  z-index: 0;
-  border: 2px solid transparent;
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0 auto;
-}
-
-.project-card:hover {
-  transform: translateY(-6px) scale(1.01);
-  box-shadow: 0 0 12px rgba(63, 142, 255, 0.2);
-}
-
-.project-card::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border-radius: 14px;
-  background: linear-gradient(45deg, #7ec8ff, #d0eaff, #7ec8ff);
-  background-size: 400% 400%;
-  animation: breathing 6s ease infinite;
-  z-index: -1;
-  filter: blur(4px);
-  opacity: 0.5;
-}
-
 @keyframes breathing {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
 
@@ -569,14 +562,220 @@ p em.emoji {
   }
 }
 
+p {
+  margin-bottom: 20px;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+
+  a {
+    color: #007aff;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  strong {
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: rgba(0, 122, 255, 0.1);
+  }
+
+  em.emoji {
+    margin-left: 5px;
+    font-size: 1.2em;
+  }
+
+  + p {
+    margin-top: 8px;
+  }
+}
+
+strong {
+  color: #007aff;
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+}
+
+.thanks-list {
+  li {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.customlist {
+  margin-left: 20px;
+  padding-left: 20px;
+  color: #333;
+  font-size: 16px;
+  list-style-type: none;
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul {
+    list-style-type: none;
+  }
+
+  li {
+    margin-bottom: 6px;
+    line-height: 1.5;
+    text-align: left;
+
+    a {
+      color: #007aff;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.feature-item {
+  margin-bottom: 24px !important;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.feature-heading {
+  margin: 0 0 4px;
+  color: #1a1a1a;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.feature-subtitle {
+  margin: 0 0 6px;
+  color: #007aff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.feature-intro {
+  margin: 0 0 12px;
+  color: #555;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.subfeature-list {
+  margin: 8px 0 0 16px;
+  padding: 0;
+}
+
+.subfeature-item {
+  margin-bottom: 10px !important;
+}
+
+.subfeature-title {
+  margin: 0 0 2px;
+  color: #2c3e50;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.subfeature-body {
+  margin: 0;
+  color: #555;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.thoughts {
+  p {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 8px;
+    color: #333;
+    font-family: 'Georgia', serif;
+    font-size: 18px;
+    line-height: 1.8;
+    text-align: left;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  em {
+    color: #000;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+}
+
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 800px;
+  gap: 1rem;
+  text-align: center;
+}
+
+.project-card {
+  position: relative;
+  z-index: 0;
+  display: block;
+  flex: 1 1 280px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 1.1rem;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background-color: #fff;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 2px 10px rgba(0, 122, 255, 0.08);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 0 12px rgba(63, 142, 255, 0.2);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: 14px;
+    background: linear-gradient(45deg, #7ec8ff, #d0eaff, #7ec8ff);
+    background-size: 400% 400%;
+    filter: blur(4px);
+    opacity: 0.5;
+    animation: breathing 6s ease infinite;
+  }
+
+  p {
+    margin: 0.5rem 0.5rem 0.2rem;
+    color: #444;
+    font-size: 1rem;
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+}
+
 .card-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  font-size: 1.2rem;
   margin-bottom: 0.5rem;
   color: #3f8eff;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 .github-icon {
@@ -585,103 +784,78 @@ p em.emoji {
   margin-right: 0.5rem;
 }
 
-.project-card p {
-  color: #444;
-  line-height: 1.6;
-  margin: 0.5rem 0.5rem 0.2rem;
-  font-size: 1rem;
-  white-space: nowrap;
-}
-
 .like-author-title {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  flex-wrap: wrap;
+}
+
+.follow-button,
+.support-button {
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .follow-button {
-  background-color: #3f8eff;
-  color: white;
-  border: none;
-  border-radius: 8px;
   padding: 0.4rem 0.9rem;
+  background-color: #3f8eff;
   font-size: 1.2rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 2px 5px rgba(63, 142, 255, 0.3);
-}
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
 
-.follow-button:hover {
-  background-color: #5fa4ff;
-  transform: scale(1.05);
+  &:hover {
+    background-color: #5fa4ff;
+    transform: scale(1.05);
+  }
 }
 
 .support-button {
   margin-top: 1rem;
-  background-color: #c52f27;
-  color: white;
-  border: none;
-  border-radius: 8px;
   padding: 0.5rem 1.1rem;
+  background-color: #c52f27;
   font-size: 1rem;
-  cursor: pointer;
   box-shadow: 0 2px 6px rgba(255, 59, 48, 0.35);
   transition: all 0.2s ease;
-}
 
-.support-button:hover {
-  background-color: #ff615c;
-  transform: scale(1.05);
+  &:hover {
+    background-color: #ff615c;
+    transform: scale(1.05);
+  }
 }
 
 .support-note {
   display: inline-block;
-  margin-top: 0.5rem;
-  font-size: 0.88rem;
-  color: #555;
-  line-height: 1.5;
   max-width: 500px;
-}
-
-@media (max-width: 600px) {
-  .project-card {
-    padding: 1.2rem;
-  }
-
-  .card-header {
-    font-size: 1.4rem;
-  }
-
-  .project-card p {
-    font-size: 1.1rem;
-  }
-
-  .github-icon {
-    width: 24px;
-    height: 24px;
-  }
+  margin-top: 0.5rem;
+  color: #555;
+  font-size: 0.88rem;
+  line-height: 1.5;
 }
 
 .suggestion-box {
   max-width: 700px;
   margin: 0 auto;
-  text-align: center;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   color: #1f2937;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  text-align: center;
   justify-content: center;
-}
 
-.suggestion-box p {
-  font-size: 18px;
-  color: #6b7280;
-  margin: 8px 0;
+  p {
+    margin: 8px 0;
+    color: #6b7280;
+    font-size: 18px;
+  }
 }
 
 .subtext {
-  font-size: 15px;
   color: #9ca3af;
+  font-size: 15px;
 }
 
 .card-links {
@@ -692,190 +866,416 @@ p em.emoji {
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(to bottom right, #b7cffa, #ffffff);
   padding: 20px;
-  border-radius: 16px;
-  text-decoration: none;
-  color: black;
-  font-weight: 600;
-  font-size: 18px;
-  box-shadow: 0 6px 12px rgba(0, 122, 255, 0.1);
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-  backdrop-filter: blur(4px);
-  cursor: pointer;
-  transform: scale(1);
-  position: relative;
   overflow: hidden;
-}
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: linear-gradient(to bottom right, #b7cffa, #fff);
+  backdrop-filter: blur(4px);
+  color: #000;
+  font-size: 18px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 6px 12px rgba(0, 122, 255, 0.1);
+  transform: scale(1);
+  transition: all 0.3s ease;
 
-.card:hover {
-  transform: scale(1.02) translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 122, 255, 0.2);
-  border-color: #007aff;
-  background: linear-gradient(to bottom right, #a5c1f6, #ffffff);
-}
-
-.card span {
-  font-size: 15px;
-  color: #003cff;
-  margin-top: 10px;
-  text-decoration: underline;
-  transition: color 0.3s ease;
-}
-
-@media (max-width: 600px) {
-  .card-links {
-    gap: 16px;
+  &:hover {
+    border-color: #007aff;
+    background: linear-gradient(to bottom right, #a5c1f6, #fff);
+    box-shadow: 0 10px 20px rgba(0, 122, 255, 0.2);
+    transform: scale(1.02) translateY(-2px);
   }
 
-  .card {
-    font-size: 18px;
-    padding: 20px;
-  }
-
-  .suggestion-box p {
-    font-size: 18px;
+  span {
+    margin-top: 10px;
+    color: #003cff;
+    font-size: 15px;
+    text-decoration: underline;
+    transition: color 0.3s ease;
   }
 }
 
-/* 设置页面样式 */
+/* === 设置页面样式 === */
 .settings-container {
-  padding: 20px;
   max-width: 800px;
   margin: 0 auto;
+  padding: 20px;
 }
 
 .setting-section {
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 24px;
   margin-bottom: 24px;
+  padding: 24px;
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.setting-split {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.setting-split-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.setting-split-divider {
+  border: none;
+  width: 1px;
+  background: rgba(0, 0, 0, 0.12);
+  align-self: stretch;
+  margin: 0;
+}
+
+.section-title {
+  margin: 0 0 8px;
+  color: #333;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.section-description {
+  margin: 0 0 20px;
+  color: #666;
+  font-size: 14px;
 }
 
 .settings-radio-group {
   justify-content: center;
   gap: 18px 24px;
+
+  :deep(.liquid-radio-label) {
+    padding: 6px 8px;
+  }
+
+  :deep(.liquid-radio-text) {
+    line-height: 1.5;
+  }
 }
 
-.settings-radio-group :deep(.liquid-radio-label) {
-  padding: 6px 8px;
+.language-radio-group {
+  :deep(.liquid-radio-text) {
+    font-size: 15px;
+  }
 }
 
-.settings-radio-group :deep(.liquid-radio-text) {
-  line-height: 1.5;
-}
-
-.language-radio-group :deep(.liquid-radio-text) {
-  font-size: 15px;
-}
-
-.interface-mode-radio-group :deep(.liquid-radio-text) {
-  font-size: 14px;
-}
-
-.section-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 8px 0;
-}
-
-.section-description {
-  font-size: 14px;
-  color: #666;
-  margin: 0 0 20px 0;
+.interface-mode-radio-group {
+  :deep(.liquid-radio-text) {
+    font-size: 14px;
+  }
 }
 
 .language-options {
   display: flex;
-  gap: 12px;
   justify-content: center;
+  gap: 12px;
 }
 
 .language-card {
-  justify-content: center;
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.8);
   border: 2px solid #e0e0e0;
   border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.3s ease;
-}
 
-.language-card:hover {
-  background: rgba(255, 255, 255, 1);
-  border-color: #007aff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
-}
+  &:hover {
+    border-color: #007aff;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+    transform: translateY(-2px);
+  }
 
-.language-card.active {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(0, 122, 255, 0.05));
-  border-color: #007aff;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  &.active {
+    border-color: #007aff;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 122, 255, 0.1),
+      rgba(0, 122, 255, 0.05)
+    );
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  }
 }
 
 .language-flag {
-  font-size: 32px;
   margin-right: 12px;
+  font-size: 32px;
 }
 
 .language-info {
   display: flex;
-  gap:12px;
-  flex-direction: row;
+  gap: 12px;
 }
 
 .language-name {
+  margin-bottom: 4px;
+  color: #333;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 4px;
 }
 
 .language-code {
-  font-size: 12px;
   color: #999;
+  font-size: 12px;
 }
 
 .language-check {
-  font-size: 24px;
-  color: #007aff;
-  font-weight: bold;
   margin-left: 20px;
+  color: #007aff;
+  font-size: 24px;
+  font-weight: bold;
 }
 
-/* 响应式设计 */
-@media (max-width: 480px) {
+/* === 竖屏 / 移动端：按宽高比判断 === */
+@media (max-aspect-ratio: 1/1) {
+  .tutorial-toggle-section {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .tutorial-toggle-copy {
+    gap: 4px;
+  }
+
+  .tutorial-switch-toggle {
+    flex-shrink: 0;
+    justify-content: flex-end;
+  }
+
+  .page2 {
+    max-width: none;
+    padding: 10px 14px;
+    font-size: 16px;
+  }
+
+  p {
+    margin-bottom: 14px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .customlist {
+    margin-left: 14px;
+    padding-left: 16px;
+    font-size: 15px;
+
+    li {
+      margin-bottom: 4px;
+      line-height: 1.45;
+    }
+  }
+
+  .feature-heading {
+    font-size: 17px;
+  }
+
+  .feature-subtitle {
+    font-size: 13px;
+  }
+
+  .feature-intro {
+    font-size: 14px;
+  }
+
+  .subfeature-list {
+    margin-left: 12px;
+  }
+
+  .subfeature-title {
+    font-size: 14px;
+  }
+
+  .subfeature-body {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .thoughts {
+    p {
+      margin: 24px auto;
+      padding: 14px;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+  }
+
+  .cards-container {
+    gap: 12px;
+  }
+
+  .project-card {
+    flex-basis: 100%;
+    max-width: 100%;
+    padding: 14px;
+
+    p {
+      margin: 6px 4px 2px;
+      font-size: 15px;
+      line-height: 1.45;
+      white-space: normal;
+    }
+  }
+
+  .card-header {
+    margin-bottom: 6px;
+    font-size: 18px;
+  }
+
+  .github-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 6px;
+  }
+
+  .like-author-title {
+    gap: 8px;
+  }
+
+  .follow-button {
+    padding: 6px 12px;
+    font-size: 16px;
+  }
+
+  .support-button {
+    margin-top: 12px;
+    padding: 7px 14px;
+    font-size: 15px;
+  }
+
+  .support-note {
+    font-size: 13px;
+  }
+
+  .suggestion-box {
+    max-width: 100%;
+
+    p {
+      margin: 6px 0;
+      font-size: 16px;
+    }
+  }
+
+  .subtext {
+    font-size: 13px;
+  }
+
+  .card-links {
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .card {
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-size: 16px;
+
+    span {
+      margin-top: 6px;
+      font-size: 13px;
+    }
+  }
+
   .settings-container {
     padding: 12px;
   }
 
   .setting-section {
+    margin-bottom: 14px;
     padding: 16px;
+    border-radius: 14px;
+  }
+
+  .setting-split {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .setting-split-divider {
+    width: 100%;
+    height: 1px;
+    margin: 16px 0;
+  }
+
+  .section-title {
+    margin-bottom: 6px;
+    font-size: 18px;
+  }
+
+  .section-description {
+    margin-bottom: 14px;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .settings-radio-group {
+    gap: 10px 12px;
+
+    :deep(.liquid-radio-label) {
+      padding: 4px 6px;
+    }
+
+    :deep(.liquid-radio-text) {
+      line-height: 1.4;
+    }
+  }
+
+  .language-radio-group {
+    :deep(.liquid-radio-text) {
+      font-size: 14px;
+    }
+  }
+
+  .interface-mode-radio-group {
+    :deep(.liquid-radio-text) {
+      font-size: 13px;
+    }
+  }
+
+  .language-options {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .language-card {
+    padding: 10px 12px;
+    border-width: 1.5px;
   }
 
   .language-flag {
-    font-size: 28px;
     margin-right: 8px;
+    font-size: 26px;
+  }
+
+  .language-info {
+    gap: 0px;
+    align-items: center;
+    flex-direction: column;
   }
 
   .language-name {
+    margin-bottom: 0;
     font-size: 14px;
   }
 
   .language-code {
     font-size: 11px;
   }
-  .language-options {
-    flex-direction: column;
+
+  .language-check {
+    margin-left: 8px;
+    font-size: 18px;
   }
 }
 </style>

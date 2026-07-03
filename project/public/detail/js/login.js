@@ -378,7 +378,7 @@ function showAuthPopup() {
                 </button>
               </div>
               
-              <!-- 郵箱登入 -->
+              <!-- 郵箱登錄 -->
               <div v-if="loginMode === 'email'">
                 <div class="form-row" style="display: flex; justify-content: center;">
                   <input
@@ -421,7 +421,7 @@ function showAuthPopup() {
                 </div>
               </div>
 
-              <!-- 用戶名登入 -->
+              <!-- 用戶名登錄 -->
               <div v-else>
                 <div class="form-row" style="display: flex; justify-content: center;">
                   <input
@@ -465,7 +465,7 @@ function showAuthPopup() {
               </div>
 
               <div class="form-row" style="display: flex; justify-content: center;">
-                <button class="btn-search" @click="login" :disabled="loading">登入</button>
+                <button class="btn-search" @click="login" :disabled="loading">登錄</button>
               </div>
               <p v-if="error" class="err" v-html="error"></p>
               <p><a href="#" @click.prevent="mode='register'">沒有帳號？註冊一個</a></p>
@@ -858,18 +858,18 @@ async function api(path, { method = 'GET', headers = {}, body = null } = {}) {
 
 
 /**
- * 驗證當前用戶是否已登入
+ * 驗證當前用戶是否已登錄
  * @param {Event} [e] - 點擊事件，可選。如果傳入會自動 preventDefault/stopPropagation
  * @param popup_bool - 是否顯示彈窗
  * @returns {Promise<false | { id: string|number, username: string }>}
- *          - false = 未登入（事件已攔截，並彈出提示）
- *          - {id, username} = 已登入，用戶資訊
+ *          - false = 未登錄（事件已攔截，並彈出提示）
+ *          - {id, username} = 已登錄，用戶資訊
  */
 async function ensureAuthenticated(e,popup_bool = true) {
     try {
         const res = await api('/api/auth/me');
         if (res && res.id && res.username) {
-            // ✅ 已登入 → 返回用戶信息
+            // ✅ 已登錄 → 返回用戶信息
             return { id: res.id, username: res.username };
         }
     } catch (err) {
@@ -877,12 +877,12 @@ async function ensureAuthenticated(e,popup_bool = true) {
             clearToken();  // 明確知道是 token 無效才清掉
         }
     }
-    // ❌ 未登入 → 攔截事件
+    // ❌ 未登錄 → 攔截事件
     if (e) {
         e.preventDefault();
         e.stopPropagation();
     }
-    if (popup_bool) {// 提示登入
+    if (popup_bool) {// 提示登錄
         showAuthPopup();
     }
     return false;

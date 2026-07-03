@@ -12,8 +12,8 @@
 
     <!-- Auth warning -->
     <div v-if="!isAuthenticated" class="auth-warning">
-      <span>此功能需要登入才能使用</span>
-      <button @click="goToAuth" class="solid-button small">前往登入</button>
+      <span>此功能需要登錄才能使用</span>
+      <button @click="goToAuth" class="solid-button small">前往登錄</button>
     </div>
 
     <!-- Controls -->

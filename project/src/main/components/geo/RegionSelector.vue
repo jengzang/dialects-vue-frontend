@@ -12,7 +12,7 @@
         @keydown.space.prevent="togglePopup"
     >
       <!-- ✅ 已選葉子列表（選框內可刪除） -->
-      <div v-if="selectedLeafs.length" class="region-tags">
+      <div v-if="selectedLeafs.length || externalCustomRegions.length" class="region-tags">
         <span
             v-for="(s, i) in selectedLeafs"
             :key="s + '_' + i"
@@ -21,6 +21,15 @@
         >
           {{ s }}
           <button class="tag-remove" type="button" @click.stop="removeCommitted(s)">×</button>
+        </span>
+        <span
+            v-for="(s, i) in externalCustomRegions"
+            :key="'custom_' + s + '_' + i"
+            class="region-tag custom-region-tag"
+            :title="s"
+        >
+          {{ s }}
+          <button class="tag-remove" type="button" @click.stop="removeCustomRegionCommitted(s)">×</button>
         </span>
       </div>
 
@@ -283,6 +292,7 @@ import AppModal from '@/components/common/AppModal.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import {STATIC_REGION_TREE, top_yindian} from "@/main/config/RegionTree.js";
 import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
 
@@ -633,7 +643,7 @@ async function openCustomRegionPopup() {
         { confirmText: 'query.components.regionSelector.customRegionModal.createButton', cancelText: 'common.button.cancel' }
       )
       if (confirmed) {
-        await router.push('/auth/regions')
+        await router.push(buildLocalePath(resolveRouteLocale(route), '/auth/regions'))
       }
       return
     }
@@ -677,7 +687,7 @@ async function selectCustomRegion(region) {
 function goToManagePage() {
   showCustomRegionPopup.value = false
   closePopup()
-  router.push('/auth/regions')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/auth/regions'))
 }
 
 // New: Handle custom region button click
@@ -838,6 +848,14 @@ function removeCommitted(label) {
   emit('update:selected', next)
   if (popupOpen.value) {
     draftSelected.value = draftSelected.value.filter(x => x !== label)
+  }
+}
+
+function removeCustomRegionCommitted(regionName) {
+  const next = externalCustomRegions.value.filter(x => x !== regionName)
+  emit('update:customRegions', next)
+  if (popupOpen.value) {
+    draftCustomRegions.value = draftCustomRegions.value.filter(x => x !== regionName)
   }
 }
 
@@ -1086,8 +1104,9 @@ defineExpose({ togglePopup, openPopup, closePopup })
 }
 
 /* Custom region tag styling */
-.topbar-tag.custom-region-tag {
-  background: linear-gradient(135deg, #34c759, #28a745);
+.topbar-tag.custom-region-tag,
+.region-tag.custom-region-tag {
+  background: rgba(0, 123, 255, 0.5);
   color: white;
   border: 1px solid rgba(52, 199, 89, 0.3);
 }

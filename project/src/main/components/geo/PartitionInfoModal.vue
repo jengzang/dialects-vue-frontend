@@ -13,14 +13,17 @@
         <!-- 选择模式开关 -->
         <div class="selection-mode-toggle">
           <label class="toggle-label">{{ $t('query.components.partitionModal.enableSelection') }}</label>
-          <button
-            class="toggle-switch toggle-switch-base"
-            :class="{ active: selectionMode }"
-            @click="toggleSelectionMode"
-            type="button"
-          >
-            <span class="toggle-slider toggle-switch-slider-base"></span>
-          </button>
+          <SwitchToggle
+            :model-value="selectionMode"
+            :width="50"
+            :height="30"
+            :thumb-size="24"
+            color="blue"
+            variant="solid"
+            :aria-label="$t('query.components.partitionModal.enableSelection')"
+            @update:modelValue="selectionMode = $event"
+            @change="toggleSelectionMode"
+          />
         </div>
         <button class="close-btn close-btn-sm close-btn-inline" type="button" @click="closeModal">×</button>
 <!--      </div>-->
@@ -86,6 +89,7 @@
 import { ref, computed, watch, defineComponent, h, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 
 const { t } = useI18n()
 

@@ -17,7 +17,7 @@
             style="font-size: 16px; margin: 0 2px;"
             @click="handleFieldClick(field)"
           >
-            {{ translateResultTerm(t, field) }}
+            {{ field }}
           </button>
         </template>
       </div>
@@ -30,7 +30,8 @@ import { computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { parseFeatureString } from '@/main/utils/ResultTable.js';
 import { resultCache } from '@/main/store/store.js';
-import { translateResultTerm, translateResultTerms } from '@/i18n/utils/resultI18n.js';
+
+
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -41,7 +42,10 @@ const props = defineProps({
 const emit = defineEmits(['close', 'confirm']);
 const { t } = useI18n();
 
-const checkedFeatures = computed(() => translateResultTerms(t, resultCache.features));
+const checkedFeatures = computed(() => {
+  const terms = (resultCache.features || []).filter(Boolean);
+  return terms.length > 0 ? terms.join(' · ') : t('result.terms.none');
+});
 
 const unmatchedFields = computed(() => {
   return parseFeatureString(props.data?.feature || '', resultCache.tableName).unmatched_fields || [];

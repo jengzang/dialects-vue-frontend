@@ -314,9 +314,6 @@ async function func_mergeData() {
     }
     let locations_data = window.locations_data;
     let latestResults = window.latestResults;
-    // 获取 zoom_level 和 center_coordinate
-    let zoomLevel = locations_data.zoom_level;
-    let centerCoordinate = locations_data.center_coordinate;
     let coordinates_raw = locations_data.coordinates_locations;
 
     // 最小化改动 - 创建地点到坐标的映射
@@ -441,9 +438,7 @@ async function func_mergeData() {
                 location: location,
                 feature: feature,
                 value: finalValue,
-                zoomLevel: zoomLevel,
                 coordinate: coordinate,
-                centerCoordinate: centerCoordinate,
                 maxValue: maxPercentageValue,  // 添加最大占比对应的 value
                 detailContent: groupedData[location][feature].detailContent // 详细记录
             });
@@ -496,10 +491,7 @@ async function func_mergeData() {
         shouldContinue = false;
     }
     if (shouldContinue && Array.isArray(result)) {
-        mergeBackendData(result, mergedData,
-            mergedData.length > 0 ? mergedData[0].zoomLevel : 10,
-            mergedData.length > 0 ? mergedData[0].centerCoordinate : [0, 0]
-        );
+        mergeBackendData(result, mergedData);
     } else {
         console.log("當前地點/分區選擇不包含自定義數據", result);
     }
@@ -644,54 +636,15 @@ async function process_custom() {
         return;
     }
 
-    // 設置地圖中心及顯示層級
-    function getCenterAndZoom(coordinates) {
-        const valid = coordinates.filter(c => Array.isArray(c) && c.length === 2);
-        if (!valid.length) return { centerCoordinate: [0, 0], zoomLevel: 10 };
-
-        const lats = valid.map(c => c[1]);
-        const lons = valid.map(c => c[0]);
-
-        const minLat = Math.min(...lats);
-        const maxLat = Math.max(...lats);
-        const minLon = Math.min(...lons);
-        const maxLon = Math.max(...lons);
-
-        const centerLat = Number(((maxLat + minLat) / 2).toFixed(6));
-        const centerLon = Number(((maxLon + minLon) / 2).toFixed(6));
-
-        const latSpan = maxLat - minLat;
-        const lonSpan = maxLon - minLon;
-        const maxSpan = Math.max(latSpan, lonSpan);
-
-        // 简化版 zoom 估算（你可以自己调这个阈值）
-        let zoomLevel = 10;
-        if (maxSpan > 1) zoomLevel = 7;
-        else if (maxSpan > 0.5) zoomLevel = 9;
-        else if (maxSpan > 0.2) zoomLevel = 11;
-        else if (maxSpan > 0.1) zoomLevel = 13;
-        else if (maxSpan > 0.05) zoomLevel = 15;
-        else zoomLevel = 17;
-
-        return {
-            centerCoordinate: [centerLon , centerLat],
-            zoomLevel
-        };
-    }
-    const coordinateList = result
-        .map(row => row["經緯度"])
-        .filter(coord => Array.isArray(coord) && coord.length === 2);
-    const { centerCoordinate, zoomLevel } = getCenterAndZoom(coordinateList);
-
     let mergedData = [];
-    mergeBackendData(result, mergedData, zoomLevel, centerCoordinate);
+    mergeBackendData(result, mergedData);
     assignColorToMergedData(mergedData);
     window.mergedData = mergedData;
 
 }
 
 // 對用戶自定義數據進行處理
-function mergeBackendData(result, mergedData, defaultZoom, defaultCenter) {
+function mergeBackendData(result, mergedData) {
     result.forEach(row => {
         const newCoordinate = row["經緯度"];
         const newLocation = row["簡稱"];
@@ -714,8 +667,6 @@ function mergeBackendData(result, mergedData, defaultZoom, defaultCenter) {
                 maxValue: row["maxValue"],
                 notes: row["說明"],
                 iscustoms: 1,
-                zoomLevel: defaultZoom,
-                centerCoordinate: defaultCenter,
                 detailContent: [],
                 created_at:created_at,
             });
@@ -737,8 +688,6 @@ function mergeBackendData(result, mergedData, defaultZoom, defaultCenter) {
                     maxValue: row["maxValue"],
                     notes: row["說明"],
                     iscustoms: 1,
-                    zoomLevel: defaultZoom,
-                    centerCoordinate: defaultCenter,
                     detailContent: [],
                     created_at:created_at,
                 });
@@ -804,9 +753,7 @@ function generateCharsMergedData(resultData, locationsData) {
             location: item.location,  // 使用 location 字段
             feature: item.char,  // 使用 char 字段作为 feature
             value: syllablesString,  // 拼接后的音节字符串
-            zoomLevel: locationsData.zoom_level,  // 从 locationsData 获取 zoom_level
             coordinate: coordinate,  // 使用映射的坐标
-            centerCoordinate: locationsData.center_coordinate,  // 从 locationsData 获取 center_coordinate
             maxValue: syllablesString,  // 与 value 相同
             detailContent: notesString  // 使用处理后的 notes 字符串
         });
@@ -835,9 +782,7 @@ function generateTonesMergedData(resultData, locationsData) {
             location: item.location,  // 使用 location 字段
             feature: item.tone,  // 使用 char 字段作为 feature
             value: item.value,  // 拼接后的音节字符串
-            zoomLevel: locationsData.zoom_level,  // 从 locationsData 获取 zoom_level
             coordinate: coordinate,  // 使用映射的坐标
-            centerCoordinate: locationsData.center_coordinate,  // 从 locationsData 获取 center_coordinate
             maxValue: item.value,  // 与 value 相同
             detailContent: item.notes  // 使用处理后的 notes 字符串
         });

@@ -317,7 +317,8 @@ function getSuggestionStats(item) {
 defineExpose({
   tab3KeyInput,
   legalPhoValues: computed(() => legalState.value.legalTokens),
-  normalizedPhoInput: computed(() => legalState.value.normalizedInput)
+  normalizedPhoInput: computed(() => legalState.value.normalizedInput),
+  ensureReady: ensureFeatureCountsLoaded
 })
 </script>
 

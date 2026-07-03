@@ -292,6 +292,10 @@
                 <span class="link-icon">🔗</span>
                 <span class="link-text">{{ $t('home.features.tools.tableMerge') }}</span>
               </a>
+              <a @click.stop="navigateTo('/explore/tools/derive')" class="feature-link">
+                <span class="link-icon">🧪</span>
+                <span class="link-text">{{ $t('home.features.tools.tableDerive') }}</span>
+              </a>
               <!-- <a @click.stop="navigateTo('/explore?page=praat')" class="feature-link">
                 <span class="link-icon">🎙️</span>
                 <span class="link-text">聲學分析 - 實驗語音學工具</span>
@@ -576,8 +580,9 @@
 
 <script setup>
 import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useVisitStats } from '@/composables/useVisitStats.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
@@ -593,8 +598,9 @@ const UpdateNoticeModal = defineAsyncComponent(() =>
   import('@/components/ToastAndHelp/UpdateNoticeModal.vue')
 )
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const {
   todayVisits,
   totalVisits,
@@ -611,7 +617,7 @@ const sourceLocationCount = ref(cachedSourceStats.locationCount)
 const sourceDataCount = ref(cachedSourceStats.dataCount)
 
 // 当前版本号和更新时间
-const homeUpdateNotice = computed(() => getHomeUpdateNotice(t))
+const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
 const CURRENT_VERSION = computed(() => homeUpdateNotice.value.version)
 const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
 
@@ -619,46 +625,50 @@ const projects = [
   {
     name: 'dialects-vue-frontend',
     url: 'https://github.com/jengzang/dialects-vue-frontend',
-    description: t('home.intro.likeAuthor.frontendRepo')
+    description: t('home.intro.likeAuthor.frontendRepo', undefined, { locale: locale.value })
   },
   {
     name: 'dialects-backend',
     url: 'https://github.com/jengzang/dialects-backend',
-    description: t('home.intro.likeAuthor.backendRepo')
+    description: t('home.intro.likeAuthor.backendRepo', undefined, { locale: locale.value })
   },
   {
     name: 'dialects-build',
     url: 'https://github.com/jengzang/dialects-build',
-    description: t('home.intro.likeAuthor.buildRepo')
+    description: t('home.intro.likeAuthor.buildRepo', undefined, { locale: locale.value })
   },
   {
     name: 'villages-ML',
     url: 'https://github.com/jengzang/villages-ML',
-    description: t('home.intro.likeAuthor.villagesMLRepo')
+    description: t('home.intro.likeAuthor.villagesMLRepo', undefined, { locale: locale.value })
   }
 ]
 
 const localizedProjects = computed(() => [
   {
     ...projects[0],
-    description: t('home.intro.likeAuthor.frontendRepo')
+    description: t('home.intro.likeAuthor.frontendRepo', undefined, { locale: locale.value })
   },
   {
     ...projects[1],
-    description: t('home.intro.likeAuthor.backendRepo')
+    description: t('home.intro.likeAuthor.backendRepo', undefined, { locale: locale.value })
   },
   {
     ...projects[2],
-    description: t('home.intro.likeAuthor.buildRepo')
+    description: t('home.intro.likeAuthor.buildRepo', undefined, { locale: locale.value })
   },
   {
     ...projects[3],
-    description: t('home.intro.likeAuthor.villagesMLRepo')
+    description: t('home.intro.likeAuthor.villagesMLRepo', undefined, { locale: locale.value })
   }
 ])
 
 function navigateTo(path) {
-  router.push(path)
+  const [pathname, queryString = ''] = path.split('?')
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), pathname),
+    query: queryString ? Object.fromEntries(new URLSearchParams(queryString).entries()) : undefined
+  })
 }
 
 function scrollToFeatures() {

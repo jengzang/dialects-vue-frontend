@@ -78,11 +78,22 @@
           </div>
         </div>
 
-        <div id="toggleColumnsBtn" @click="isCondensedMode = !isCondensedMode" class="custom-switch-container">
-          <div class="result-custom-switch custom-switch-base main-glow-switch" :class="{ open: !isCondensedMode }">
-            <div class="result-custom-slider custom-switch-slider-base"></div>
-          </div>
-          <span class="result-switch-text main-glow-switch-text">{{ !isCondensedMode ? t('result.resultList.displayMode.full') : t('result.resultList.displayMode.main') }}</span>
+        <div id="toggleColumnsBtn" class="custom-switch-container">
+          <SwitchToggle
+            :model-value="!isCondensedMode"
+            :width="50"
+            :height="30"
+            :thumb-size="26"
+            color="blue"
+            variant="glow"
+            show-label
+            :active-text="t('result.resultList.displayMode.full')"
+            :inactive-text="t('result.resultList.displayMode.main')"
+            label-position="inside"
+            :aria-label="t('result.resultList.displayMode.full')"
+            class="result-display-switch"
+            @update:modelValue="isCondensedMode = !$event"
+          />
         </div>
       </div>
     </div>
@@ -110,9 +121,10 @@ import { ref, computed, watch, onMounted, nextTick, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DataRow from './DataRow.vue';
 import { parseFeatureString,get_detail } from '@/main/utils/ResultTable.js';
-import { READING_COLORS } from '@/main/constants/readingColors.js';
+import { READING_COLORS } from '@/main/config/readingColors.js';
 import ValuePopup from "../popup/result/ValuePopup.vue";
 import FeaturePopup from "../popup/result/FeaturePopup.vue";
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { resultCache } from '@/main/store/store.js';
 
 const props = defineProps({
@@ -733,15 +745,11 @@ onUnmounted(() => {
   font-size: 16px;
 }
 
-.result-custom-switch {
+.result-display-switch :deep(.switch-toggle__button) {
   cursor: pointer;
+}
 
-  &:hover {
-    transform: scale(1.3);
-  }
-
-  &.open:hover {
-    transform: scale(1.3);
-  }
+.result-display-switch :deep(.switch-toggle__button:hover:not(.is-disabled)) {
+  transform: scale(1.3);
 }
 </style>

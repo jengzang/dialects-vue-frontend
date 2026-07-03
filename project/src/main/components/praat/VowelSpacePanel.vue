@@ -14,27 +14,33 @@
         <div
           class="vowel-switch-container"
           :class="{ disabled: vowelSegments.length === 0 }"
-          @click="vowelSegments.length > 0 && (showSegmented = !showSegmented)"
           :title="vowelSegments.length === 0 ? t('praat.vowelSpace.controls.segmentedDisabled') : ''"
         >
-          <span class="switch-label-text">{{ t('praat.vowelSpace.controls.segmentedDisplay') }}</span>
-          <div class="vowel-custom-switch custom-switch-base" :class="{ 'open': showSegmented }">
-            <span class="vowel-custom-slider custom-switch-slider-base">
-<!--              <span class="switch-text">-->
-<!--                {{ showSegmented ? '開啟' : '關閉' }}-->
-<!--              </span>-->
-            </span>
-          </div>
+          <SwitchToggle
+            :model-value="showSegmented"
+            :disabled="vowelSegments.length === 0"
+            :width="50"
+            :height="30"
+            :thumb-size="26"
+            color="blue"
+            variant="solid"
+            show-label
+            :active-text="t('praat.vowelSpace.controls.segmentedDisplay')"
+            :inactive-text="t('praat.vowelSpace.controls.segmentedDisplay')"
+            label-position="left"
+            :gap="1.6"
+            :aria-label="t('praat.vowelSpace.controls.segmentedDisplay')"
+            @update:modelValue="showSegmented = $event"
+          />
         </div>
 
         <!-- Reference Vowels Checkbox -->
-        <label class="reference-vowels-checkbox">
-          <input
-            type="checkbox"
-            v-model="showReferenceVowels"
-          />
-          <span class="segment-label">{{ t('praat.vowelSpace.controls.showReferenceVowels') }}</span>
-        </label>
+        <CheckBox
+          :model-value="showReferenceVowels"
+          :label="t('praat.vowelSpace.controls.showReferenceVowels')"
+          class="reference-vowels-checkbox"
+          @update:modelValue="showReferenceVowels = $event"
+        />
       </div>
     </div>
 
@@ -48,34 +54,32 @@
 
       <div v-else class="segment-list">
         <!-- Select All Checkbox -->
-        <label class="segment-checkbox main-glass-panel-inner">
-          <input
-            type="checkbox"
-            :checked="showAll"
-            @change="toggleAll"
-          />
-          <span class="segment-label">{{ t('praat.vowelSpace.segments.selectAll') }}</span>
-        </label>
+        <CheckBox
+          :model-value="showAll"
+          :label="t('praat.vowelSpace.segments.selectAll')"
+          class="segment-checkbox main-glass-panel-inner"
+          @update:modelValue="toggleAll"
+        />
 
         <!-- Individual Segment Checkboxes -->
-        <label
+        <div
           v-for="seg in vowelSegments"
           :key="seg.id"
           class="segment-checkbox main-glass-panel-inner"
         >
-          <input
-            type="checkbox"
-            :checked="selectedSegments.has(seg.id)"
-            @change="toggleSegment(seg.id)"
-          />
-          <span class="segment-color-indicator" :style="{ backgroundColor: getSegmentColor(seg.id) }"></span>
-          <span class="segment-label">
-            {{ seg.label }} ({{ seg.timeRange }})
-          </span>
-          <span class="segment-type-badge" :class="`type-${seg.type}`">
-            {{ getSegmentTypeLabel(seg.type) }}
-          </span>
-        </label>
+          <CheckBox
+            :model-value="selectedSegments.has(seg.id)"
+            @update:modelValue="toggleSegment(seg.id)"
+          >
+            <span class="segment-color-indicator" :style="{ backgroundColor: getSegmentColor(seg.id) }"></span>
+            <span class="segment-label">
+              {{ seg.label }} ({{ seg.timeRange }})
+            </span>
+            <span class="segment-type-badge" :class="`type-${seg.type}`">
+              {{ getSegmentTypeLabel(seg.type) }}
+            </span>
+          </CheckBox>
+        </div>
       </div>
     </div>
 
@@ -136,6 +140,8 @@ import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import * as echarts from 'echarts'
 import { useI18n } from 'vue-i18n'
 import referenceVowelsData from '@/assets/data/vowels.json'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const props = defineProps({
   results: {
@@ -602,7 +608,6 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.1rem;
   padding: 0.75rem 1.5rem;
-  cursor: pointer;
   transition: all 0.3s ease;
 }
 
@@ -611,20 +616,6 @@ onBeforeUnmount(() => {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
-}
-
-.switch-label-text {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--color-text-primary);
-}
-
-.vowel-custom-switch.open {
-  background-color: #007aff;
-}
-
-.vowel-custom-switch:hover {
-  box-shadow: 0 0 10px 4px rgba(0, 122, 255, 0.3);
 }
 
 /* Reference Vowels Checkbox */
@@ -639,12 +630,6 @@ onBeforeUnmount(() => {
 
 .reference-vowels-checkbox:hover {
   transform: translateY(-2px);
-}
-
-.reference-vowels-checkbox input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
 }
 
 /* Segment Selector Section */
@@ -678,12 +663,6 @@ onBeforeUnmount(() => {
 .segment-checkbox:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: translateX(4px);
-}
-
-.segment-checkbox input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
 }
 
 .segment-color-indicator {
@@ -854,7 +833,6 @@ onBeforeUnmount(() => {
     padding: 0.5rem 1rem;
   }
 
-  .switch-label-text,
   .segment-label {
     font-size: 0.8rem;
   }

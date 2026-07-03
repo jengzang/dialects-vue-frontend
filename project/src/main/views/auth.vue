@@ -107,6 +107,7 @@ import RegisterForm from '@/main/components/user/auth/RegisterForm.vue'
 import ProfileOverview from '@/main/components/user/auth/ProfileOverview.vue'
 import ModifyProfileForm from '@/main/components/user/auth/ModifyProfileForm.vue'
 import UserBenefitsPopup from '@/main/components/popup/user/UserBenefitsPopup.vue'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -379,7 +380,7 @@ const logout = async () => {
   if (!confirmed) return
 
   await authTask.run(async () => {
-    // console.log('🚪 [登出] 用户登出，先上报在线时长')
+    // console.log('🚪 [退出] 用户退出，先上报在线时长')
     await manualReport()
     stopOnlineTimeTracker({ clearPending: true })
 
@@ -388,7 +389,7 @@ const logout = async () => {
 
     user.value = null
 
-    // console.log('✅ [登出] 登出完成')
+    // console.log('✅ [退出] 退出完成')
 
     // Redirect to login page instead of reloading
     setView('login')
@@ -432,19 +433,19 @@ const goToAdminPanel = () => {
 }
 
 const goToTableManager = () => {
-  router.push('/explore/manage')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/manage'))
 }
 
 const goToUserData = () => {
   router.push({
-    path: '/auth/data',
+    path: buildLocalePath(resolveRouteLocale(route), '/auth/data'),
     query: { username: user.value.username }
   })
 }
 
 const goToUserRegions = () => {
   router.push({
-    path: '/auth/regions',
+    path: buildLocalePath(resolveRouteLocale(route), '/auth/regions'),
     query: { username: user.value.username }
   })
 }

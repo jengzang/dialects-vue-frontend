@@ -1,16 +1,24 @@
 <!-- ✅ App.vue -->
 <template>
   <!-- 🧱 動態載入 layout -->
-  <component :is="layoutComponent" />
+  <component :is="layoutComponent">
+    <router-view />
+  </component>
 
-  <PanelManager />
-
-  <!-- 🍎 全局 Toast 提示 -->
   <RateLimitNotice />
   <GlobalToast />
 
   <!-- 🍎 全局确认对话框 -->
   <GlobalConfirm />
+
+  <transition name="layout-loading-fade">
+    <div v-if="isRouteLoading" class="global-route-loading" aria-live="polite">
+      <div class="global-route-loading-shell">
+        <div class="ui-loading--page" aria-hidden="true"></div>
+        <p class="global-route-loading-text">{{ $t('common.label.loading') }}</p>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -24,10 +32,11 @@ import ExploreLayout from '../layouts/ExploreLayout.vue'
 import GlobalToast from '../components/ToastAndHelp/GlobalToast.vue'
 import GlobalConfirm from '../components/ToastAndHelp/GlobalConfirm.vue'
 import RateLimitNotice from '../components/ToastAndHelp/RateLimitNotice.vue'
-import PanelManager from './components/result/PanelManager.vue'
 import { initOnlineTimeTracker, stopOnlineTimeTracker } from '../utils/onlineTimeTracker.js'
 import { initLoginPromptTracker, stopLoginPromptTracker } from '../utils/loginPromptTracker.js'
 import { getToken } from '../api/auth/auth.js'
+import { stripLocaleFromPath } from '../i18n/localeRouting.js'
+import { isRouteLoading } from '../stores/routeLoading.js'
 
 // // 🌉 建立 bridge 用於跨組件共享 iframe 狀態
 // const nativeFrame = ref(null)
@@ -45,46 +54,47 @@ export default {
   components: {
     GlobalToast,
     GlobalConfirm,
-    RateLimitNotice,
-    PanelManager
+    RateLimitNotice
   },
   setup() {
     const route = useRoute()
 
     const layoutComponent = computed(() => {
+      const normalizedPath = stripLocaleFromPath(route.path)
+
       // 首页使用 SimpleLayout（无 navbar）
-      if (route.path === '/') {
+      if (normalizedPath === '/') {
         return SimpleLayout
       }
 
-      // intro 开头的路由使用 IntroLayout
-      if (route.path.startsWith('/intro')) {
+      // intro 已不再作为现用页面入口，保留分支仅作兼容兜底
+      if (normalizedPath.startsWith('/intro')) {
         return IntroLayout
       }
 
       // /villagesML 路由使用 SimpleLayout
-      if (route.path === '/villagesML' || route.path.startsWith('/villagesML/')) {
+      if (normalizedPath === '/villagesML' || normalizedPath.startsWith('/villagesML/')) {
         return SimpleLayout
       }
 
       // New canonical explore routes
-      if (route.path === '/explore/tools/praat') {
+      if (normalizedPath === '/explore/tools/praat') {
         return SimpleLayout
       }
 
       if (
-        route.path.startsWith('/explore/tools/') ||
-        route.path === '/explore/manage' ||
-        route.path === '/explore/yubao' ||
-        route.path === '/explore/char-class' ||
-        route.path === '/explore/yc-spoken' ||
-        route.path.startsWith('/explore/villages/')
+        normalizedPath.startsWith('/explore/tools/') ||
+        normalizedPath === '/explore/manage' ||
+        normalizedPath === '/explore/yubao' ||
+        normalizedPath === '/explore/char-class' ||
+        normalizedPath === '/explore/yc-spoken' ||
+        normalizedPath.startsWith('/explore/villages/')
       ) {
         return ExploreLayout
       }
 
       // Legacy /explore entry: choose layout by query.page
-      if (route.path === '/explore') {
+      if (normalizedPath === '/explore') {
         const page = route.query.page
 
         // Praat 页面使用 SimpleLayout（无 navbar）
@@ -138,8 +148,46 @@ export default {
     // }
 
     return {
-      layoutComponent
+      layoutComponent,
+      isRouteLoading
     }
   }
 }
 </script>
+
+<style>
+.global-route-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(234, 245, 255, 0.55);
+  pointer-events: none;
+}
+
+.global-route-loading-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.global-route-loading-text {
+  margin: 0;
+  color: #4a5568;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.layout-loading-fade-enter-active,
+.layout-loading-fade-leave-active {
+  transition: opacity 0.12s ease;
+}
+
+.layout-loading-fade-enter-from,
+.layout-loading-fade-leave-to {
+  opacity: 0;
+}
+</style>

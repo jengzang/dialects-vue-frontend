@@ -238,23 +238,21 @@
               >
             </label>
 
-            <label class="draw-toggle-field">
-              <input
-                type="checkbox"
-                :checked="selectedFeatureProperties.visible"
-                @change="$emit('update-feature-property', 'visible', $event.target.checked)"
-              >
-              <span>{{ t('map.drawTab.labels.visible') }}</span>
-            </label>
+            <CheckBox
+              class="draw-toggle-field"
+              :model-value="selectedFeatureProperties.visible"
+              @update:modelValue="$emit('update-feature-property', 'visible', $event)"
+            >
+              {{ t('map.drawTab.labels.visible') }}
+            </CheckBox>
 
-            <label class="draw-toggle-field">
-              <input
-                type="checkbox"
-                :checked="selectedFeatureProperties.locked"
-                @change="$emit('update-feature-property', 'locked', $event.target.checked)"
-              >
-              <span>{{ t('map.drawTab.labels.locked') }}</span>
-            </label>
+            <CheckBox
+              class="draw-toggle-field"
+              :model-value="selectedFeatureProperties.locked"
+              @update:modelValue="$emit('update-feature-property', 'locked', $event)"
+            >
+              {{ t('map.drawTab.labels.locked') }}
+            </CheckBox>
           </div>
           <div
             v-else
@@ -270,6 +268,7 @@
 
 <script setup>
 import { useI18n } from 'vue-i18n'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const { t } = useI18n()
 

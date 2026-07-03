@@ -49,7 +49,7 @@
             class="feature-btn active"
             @click="selectFeature(availableFeatures[0])"
           >
-            {{ availableFeatures[0] }}
+            {{ mapStore.featureLabels[availableFeatures[0]] || availableFeatures[0] }}
           </button>
         </div>
       </div>
@@ -96,6 +96,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { mapStore } from '@/main/store/store.js'
 
 import TabsContainer from '@/components/common/TabsContainer.vue'
@@ -136,11 +137,7 @@ const tabToRouteSub = {
   custom: 'custom',
   draw: 'draw'
 }
-const isMapRoute = computed(() => route.path.startsWith('/menu/map/'))
-const currentTab = computed(() => {
-  if (!isMapRoute.value) return null
-  return routeSubToTab[route.params.sub] || 'map'
-})
+const currentTab = computed(() => routeSubToTab[route.params.sub] || 'map')
 
 const tabs = computed(() => [
   { name: 'map', label: t('map.tabs.map') },
@@ -173,10 +170,10 @@ const handleSubmitSuccess = async (response) => {
 // Feature dropdown
 const selectedFeature = ref('')
 
-// Computed feature options for dropdown
+// Computed feature options for dropdown (labels from featureLabels, values stay as hashes)
 const featureOptions = computed(() => {
   return availableFeatures.value.map(feat => ({
-    label: feat,
+    label: mapStore.featureLabels[feat] || feat,
     value: feat
   }))
 })
@@ -201,7 +198,7 @@ const comparePair = computed(() => {
 // 計算幫助文本
 const helpText = computed(() => {
   if (!selectedFeature.value) return t('map.help.noFeature')
-  return t('map.help.withFeature', { feature: selectedFeature.value })
+  return t('map.help.withFeature', { feature: mapStore.featureLabels[selectedFeature.value] || selectedFeature.value })
 })
 
 // Watch for feature list changes
@@ -287,7 +284,7 @@ watch(
 const resolveTabRoute = (tabName) => {
   const sub = tabToRouteSub[tabName] || 'view'
   return {
-    path: `/menu/map/${sub}`,
+    path: buildLocalePath(resolveRouteLocale(route), `/menu/map/${sub}`),
     query: route.query
   }
 }

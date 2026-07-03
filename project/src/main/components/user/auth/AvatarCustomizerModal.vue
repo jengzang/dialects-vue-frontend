@@ -78,10 +78,13 @@
                 {{ $t('auth.profile.avatar.bgTypeGradient') }}
               </button>
             </div>
-            <label class="glass-toggle-label">
-              <input v-model="avatarConfig.glass" type="checkbox" class="glass-checkbox" />
-              <span>{{ $t('auth.profile.avatar.glassLabel') }}</span>
-            </label>
+            <CheckBox
+              class="glass-toggle-label"
+              :model-value="avatarConfig.glass"
+              @update:modelValue="avatarConfig.glass = $event"
+            >
+              {{ $t('auth.profile.avatar.glassLabel') }}
+            </CheckBox>
           </div>
         </div>
 
@@ -188,7 +191,11 @@
         <!-- Glow Effect Toggle -->
         <div class="control-group glow-toggle-group">
           <label class="control-label">{{ $t('auth.profile.avatar.glowLabel') }}</label>
-          <input v-model="avatarConfig.glow" type="checkbox" class="glow-checkbox" />
+          <CheckBox
+            class="glow-checkbox"
+            :model-value="avatarConfig.glow"
+            @update:modelValue="avatarConfig.glow = $event"
+          />
         </div>
       </div>
     </div>
@@ -209,6 +216,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import AppModal from '@/components/common/AppModal.vue';
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const props = defineProps({
   modelValue: {
@@ -529,12 +537,6 @@ watch(
         user-select: none;
         flex-shrink: 0;
 
-        .glass-checkbox {
-          width: 18px;
-          height: 18px;
-          accent-color: #007aff;
-          cursor: pointer;
-        }
       }
     }
 
@@ -841,12 +843,6 @@ watch(
         border: 1px solid rgba(0, 0, 0, 0.05);
         box-sizing: border-box;
 
-        .glow-checkbox {
-          width: 20px;
-          height: 20px;
-          accent-color: #007aff;
-          cursor: pointer;
-        }
       }
     }
   }

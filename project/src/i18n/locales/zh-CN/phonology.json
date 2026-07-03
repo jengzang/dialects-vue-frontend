@@ -110,7 +110,8 @@
         },
         "scatter": {
           "title": "音节分布散点图",
-          "description": "横轴为总数量，纵轴为地点数。越靠右表示总量越高，越靠上表示覆盖地点越多。"
+          "description": "横轴为总数量，纵轴为地点数。越靠右表示总量越高，越靠上表示覆盖地点越多。",
+          "subtitle": "总数量 × 地点覆盖"
         },
         "common": {
           "other": "其他",
@@ -123,6 +124,15 @@
       "modal": {
         "title": "{featureType} - {syllable}"
       },
+      "nav": {
+        "navLabel": "音节统计页面导航",
+        "chartsLabel": "图表",
+        "totalInitial": "总声母",
+        "totalFinal": "总韵母",
+        "totalTone": "总声调",
+        "scrollUp": "向上滑动",
+        "scrollDown": "向下滑动"
+      },
       "actions": {
         "query": "查询",
         "loading": "加载中...",
@@ -132,7 +142,8 @@
         "emptyInput": "请输入地点并点击查询",
         "minLocationError": "请至少输入一个地点",
         "loadError": "加载数据时发生错误",
-        "hint": "可同时输入 1～100 个地点，用于分析一类方言的音节统计特征。"
+        "hint": "可同时输入 1～100 个地点，用于分析一类方言的音节统计特征。",
+        "none": "无"
       }
     },
     "evolution": {

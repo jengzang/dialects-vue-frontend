@@ -119,7 +119,7 @@
           </div>
 
           <div class="tree-actions">
-            <Checkbox
+            <CheckBox
               v-model="showAnnotations"
               class="annotation-checkbox"
               :label="showAnnotations ? t('charClass.actions.showAnnotations') : t('charClass.actions.hideAnnotations') "
@@ -169,6 +169,7 @@
               :node="item"
               :search-query="searchQuery"
               :show-annotations="showAnnotations"
+              :lazy-load-fn="lazyLoadCharClassChildren"
             />
           </div>
         </div>
@@ -183,10 +184,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
-import Checkbox from '@/components/selector/Checkbox.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import CharTreeItem from '@/main/components/TableAndTree/CharTreeItem.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
-import { loadFullTree } from '@/api'
+import { lazyLoadTree, loadFullTree } from '@/api'
 import {
   parseCharClassParams,
   updateUrlWithCharClassConfig
@@ -280,7 +281,7 @@ const normalizeState = (tableKey, levelKeys) => {
 }
 
 const syncUrlToState = (state) => {
-  if (route.path !== '/explore/char-class') {
+  if (!route.path.endsWith('/explore/char-class')) {
     return
   }
 
@@ -325,24 +326,44 @@ const loadTreeForState = async (state) => {
   loadingCacheKey.value = cacheKey
 
   try {
-    const result = await loadFullTree(
-      buildCharClassTreePayload(activeTab.value, state.tableKey, state.levels)
-    )
+    const payload = buildCharClassTreePayload(activeTab.value, state.tableKey, state.levels)
+    // Load only the first level lazily (same pattern as gdVillages)
+    const result = await lazyLoadTree({
+      db_key: payload.db_key,
+      table_name: payload.table_name,
+      level_columns: payload.level_columns,
+      parent_path: []
+    })
 
     if (requestId !== loadRequestId) {
       return
     }
 
-    if (!result?.tree) {
-      throw new Error(t('charClass.states.dataFormatError'))
-    }
-
-    treeCache.value = {
-      ...treeCache.value,
-      [cacheKey]: normalizeCharClassTree(result.tree, {
-        leafLevelColumnName: tableConfig?.leafLevelColumnName,
-        leafData: tableConfig?.leafData,
+    if (result && result.children && Array.isArray(result.children)) {
+      const nodes = result.children.map(child => {
+        const name = typeof child === 'string' ? child : (child.name || '')
+        return {
+          id: name,
+          name,
+          _normalizedName: name.toLowerCase(),
+          chars: [],
+          annotations: [],
+          children: [],
+          isLeaf: false,
+          _lazy: true,
+          _lazyFilters: { [String(payload.level_columns[0])]: [name] },
+          _lazyLevelColumns: payload.level_columns
+        }
       })
+      treeCache.value = {
+        ...treeCache.value,
+        [cacheKey]: nodes
+      }
+    } else {
+      treeCache.value = {
+        ...treeCache.value,
+        [cacheKey]: []
+      }
     }
   } catch (error) {
     if (requestId !== loadRequestId) {
@@ -465,6 +486,56 @@ const retryCurrentState = () => {
   })
 }
 
+const lazyLoadCharClassChildren = async (node) => {
+  if (!node._lazy || node._childrenLoaded || node._loadingChildren) return
+
+  node._loadingChildren = true
+  try {
+    const payload = buildCharClassTreePayload(activeTab.value, selectedTableKey.value, levels.value)
+    const result = await loadFullTree({
+      db_key: payload.db_key,
+      table_name: payload.table_name,
+      level_columns: node._lazyLevelColumns,
+      data_columns: payload.data_columns,
+      filters: node._lazyFilters
+    })
+
+    if (result.mode === 'lazy_fallback') {
+      // Still too many rows — accumulate filters + shift level_columns further
+      const bootstrap = result.lazy_bootstrap
+      const children = bootstrap?.[node.name] || Object.values(bootstrap || {})[0] || []
+      const nextCol = node._lazyLevelColumns[0]
+      const nextShifted = node._lazyLevelColumns.slice(1)
+      node.children = children.map(childName => ({
+        id: childName,
+        name: childName,
+        _normalizedName: childName.toLowerCase(),
+        chars: [],
+        annotations: [],
+        children: [],
+        isLeaf: false,
+        _lazy: true,
+        _lazyFilters: { ...node._lazyFilters, [String(nextCol)]: [childName] },
+        _lazyLevelColumns: nextShifted
+      }))
+    } else {
+      // mode === 'full' — tree rooted at filter level, extract by node key
+      const tableConfig = currentTableConfig.value
+      const subtree = result.tree?.[node.name]
+      node.children = normalizeCharClassTree(subtree || {}, {
+        leafLevelColumnName: tableConfig?.leafLevelColumnName,
+        leafData: tableConfig?.leafData,
+      })
+    }
+    node._childrenLoaded = true
+  } catch (error) {
+    console.error('Lazy load char class children error:', error)
+    node._loadError = error.message || '加載子節點失敗'
+  } finally {
+    node._loadingChildren = false
+  }
+}
+
 const resetPageState = () => {
   selectedTableKey.value = ''
   levels.value = []
@@ -480,11 +551,16 @@ const resetPageState = () => {
 }
 
 const applyRouteState = () => {
-  if (route.path !== '/explore/char-class') {
+  if (!route.path.endsWith('/explore/char-class')) {
     return
   }
 
   const parsedParams = parseCharClassParams(route)
+
+  if (!parsedParams.table && !parsedParams.levels?.length) {
+    return
+  }
+
   const normalizedState = normalizeState(parsedParams.table, parsedParams.levels)
   commitState(normalizedState.tableKey, normalizedState.levels, {
     syncUrl: true,

@@ -21,7 +21,7 @@
 
 
           <div class="info-container" v-if="item.音节 && item.音节.length > 0">
-            <div class="location">{{ item.location }}</div>
+            <div class="location" @click.stop="handleLocationClick(item.location)">{{ item.location }}</div>
 
             <div class="syllables-grid">
               <div
@@ -65,7 +65,7 @@
         </thead>
         <tbody>
         <tr v-for="(row, rIdx) in processedData" :key="rIdx">
-          <td class="location-tones" @click.stop="showPopup($event, row['總數據'])">
+          <td class="location-tones" @click.stop="handleLocationClick(row['簡稱'])">
             {{ row['簡稱'] }}
           </td>
           <td v-for="(toneVal, tIdx) in getToneValues(row.tones)" :key="tIdx"
@@ -109,23 +109,24 @@
       </div>
     </Teleport>
 
-    <Teleport to="body">
-      <div
-          v-if="popup.visible"
-          class="popup-tones"
-          :style="{ top: popup.top + 'px', left: popup.left + 'px' }"
-          v-html="popup.content"
-      ></div>
-    </Teleport>
+    <LocationDetailPopup
+      :visible="locationPopup.visible"
+      :location-name="locationPopup.locationName"
+      :data="locationPopup.data"
+      :loading="locationPopup.loading"
+      @close="locationPopup.visible = false"
+    />
 
   </div>
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getReadingClass, getSearchCharReadingType } from '@/main/utils/ResultTable.js';
-import { READING_COLORS } from '@/main/constants/readingColors.js';
+import { READING_COLORS } from '@/main/config/readingColors.js';
+import { getLocationDetail } from '@/api';
+import LocationDetailPopup from '../popup/result/LocationDetailPopup.vue';
 
 const props = defineProps({
   data: {
@@ -499,43 +500,35 @@ const formatToneText = (val) => {
   return val;
 };
 
-// ================= 彈窗邏輯 =================
-const popup = ref({ visible: false, top: 0, left: 0, content: '' });
+// ================= 地名詳情彈窗邏輯 =================
+const locationPopup = ref({
+  visible: false,
+  locationName: '',
+  data: null,
+  loading: false
+});
 
-const showPopup = (event, contentArray) => {
+const handleLocationClick = async (locationName) => {
+  if (!locationName) return;
 
-  // 數據保護：如果沒有詳情數據，不彈窗
-  if (!contentArray || !Array.isArray(contentArray) || contentArray.length === 0) {
-    // console.log('沒數據')
-    return;
-  }
-  // console.log('有數據')
-  popup.value = {
-    visible: true,
-    // 使用 pageX/Y 確保是相對於整個文檔的坐標 (因為 Teleport 到了 body)
-    // +15 是為了讓彈窗稍微偏離鼠標一點，避免遮擋視線或誤觸
-    top: event.pageY + 10,
-    left: event.pageX + 10,
-    content: contentArray.join('<br>') // 將數組換行顯示
-  };
-};
+  locationPopup.value.visible = true;
+  locationPopup.value.locationName = locationName;
+  locationPopup.value.loading = true;
+  locationPopup.value.data = null;
 
-// 點擊頁面其他地方關閉彈窗
-const handleGlobalClick = (e) => {
-  if (popup.value.visible) {
-    // 如果點擊的不是觸發按鈕 (.location-tones)，則關閉
-    if (!e.target.closest('.location-tones')) {
-      popup.value.visible = false;
-    }
+  try {
+    const response = await getLocationDetail(locationName);
+    locationPopup.value.data = response;
+  } catch (error) {
+    console.error('查詢地名數據失敗:', error);
+  } finally {
+    locationPopup.value.loading = false;
   }
 };
 
 onMounted(() => {
-  window.addEventListener('click', handleGlobalClick);
   nextTick(() => updateActiveCharNav());
 });
-
-onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
 
 </script>
 
@@ -546,7 +539,7 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   height: 66dvh;
   overflow-y: auto;
   overflow-x: auto;
-  padding: 20px;
+  padding: 8px;
   font-size: 18px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
@@ -690,7 +683,6 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   justify-content: center;
   align-items: center;
   padding: 8px 5px;
-  border-bottom: 1px solid #eee;
 }
 
 .syllables-grid {
@@ -734,7 +726,9 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
 .annotation {
   color: #888;
   font-size: 0.85em;
-  max-width: 200px;
+  max-width: 400px;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .separator {
@@ -755,12 +749,27 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
 }
 
 .location {
-  font-size: 16px;
-  color: darkblue;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0d5bae;
   margin-bottom: 5px;
   display: inline-block;
   margin-right: 15px;
   white-space: nowrap;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(0, 122, 255, 0.04);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #007aff;
+    background: rgba(0, 122, 255, 0.1);
+    border-color: rgba(0, 122, 255, 0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.12);
+  }
 }
 
 .no-data-warning {
@@ -949,36 +958,6 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
   }
 }
 
-.popup-tones {
-  position: absolute;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.18),
-    rgba(255, 255, 255, 0.05)
-  );
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  padding: 15px;
-  border-radius: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  box-shadow:
-    inset 0 0 1px rgba(255,255,255,0.2),
-    0 4px 12px rgba(0, 0, 0, 0.15);
-  max-width: 300px;
-  min-width: 150px;
-  font-size: 14px;
-  color: #000000;
-  z-index: 10000;
-  white-space: pre-wrap;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-
-  h3 {
-    margin-top: 0;
-    font-size: 16px;
-    color: #333;
-  }
-}
-
 @media (max-aspect-ratio: 1/1) {
   .char-nav-teleport {
     right: 10px;
@@ -993,6 +972,9 @@ onUnmounted(() => window.removeEventListener('click', handleGlobalClick));
 
   .char-nav-char {
     font-size: 16px;
+  }
+  .annotation{
+    max-width: 200px;
   }
 }
 </style>

@@ -48,6 +48,7 @@
 import { computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js';
 import NavAvatar from '@/components/bar/NavAvatar.vue';
 
@@ -60,7 +61,7 @@ const props = defineProps({
   }
 });
 
-const router = useRouter();
+const router = useRouter()
 const route = useRoute();
 const { t } = useI18n();
 
@@ -72,15 +73,15 @@ const authButtonPositionClass = computed(() => {
 
 // 判断是否在首页
 const isHomePage = computed(() => {
-  return route.path === '/';
+  return route.path === `/${resolveRouteLocale(route)}`;
 });
 
 const goToHome = () => {
-  router.push('/');
+  router.push(buildLocalePath(resolveRouteLocale(route), '/'));
 };
 
 const goToAuth = () => {
-  router.push('/auth');
+  router.push(buildLocalePath(resolveRouteLocale(route), '/auth'));
 };
 </script>
 

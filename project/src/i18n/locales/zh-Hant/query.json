@@ -104,7 +104,7 @@
       "expandChildren": "展開",
       "messages": {
         "loadCustomRegionsFailed": "加載自定義分區失敗：{message}",
-        "loginRequired": "請先登入以使用自定義分區功能",
+        "loginRequired": "請先登錄以使用自定義分區功能",
         "noCustomRegionsConfirm": "您還沒有建立自定義分區，是否前往建立？",
         "loadRegionDetailsFailed": "獲取分區詳情失敗",
         "selectedCustomRegion": "已選擇自定義分區：{name}",
@@ -270,6 +270,58 @@
       "customLocationsModalTitle": "自定義地點（{count}）",
       "requireInput": "請輸入地點或分區",
       "tooManyLocations": "顯式地點過多，請減少手動輸入或自定義分區中的地點數量"
+    },
+    "zhongguDirectInput": {
+      "positionLabel": "中古地位輸入",
+      "positionPlaceholder": "空格分隔獨立地位，連寫代表組合查詢，橫槓代表全匹配。例：泥母 流開一 蟹-等",
+      "charLabel": "漢字直接輸入",
+      "charPlaceholder": "輸入漢字，例：你好",
+      "helpButton": "?",
+      "possibleCombinations": "可能產生{count}種組合",
+      "actualMatches": ",實際匹配{count}組",
+      "outputFormat": ",將按所選組合整理輸出{format}",
+      "detailsButton": "⤢ 詳情",
+      "querying": "正在查詢數據...",
+      "noMatches": "暫無匹配漢字",
+      "pleaseSelect": "請輸入中古地位以檢索",
+      "detailsTitle": "檢索詳情",
+      "charCount": "{count} 字",
+      "tooManyCombinations": "檢索組合過多({count}>{limit})，請縮小檢索範圍",
+      "queryFailed": "數據查詢失敗，請稍後重試",
+      "duplicateValueError": "「{value}」存在於多個類別（{categories}），請加上類別後綴",
+      "unknownValueError": "「{value}」不是有效的中古地位值",
+      "unknownCategoryError": "「{category}」不是有效的類別名稱",
+      "tooManyTokens": "輸入地位項數量({count})超過限制({limit})，請減少輸入",
+      "help": {
+        "title": "直接輸入說明",
+        "rules": {
+          "rule1": "以空格分隔多個地位項，每項代表一種查詢組合。",
+          "rule2": "只在一個類別出現的值（如「泥」只在「母」中出現），不需要後綴。",
+          "rule3": "出現在多個類別的值（如「山」同時在「攝」和「韻」中出現），必須加上類別後綴（如「山攝」或「山韻」）。",
+          "rule4": "「-」前綴表示全匹配該類別所有值（如「-等」匹配所有等值；「蟹-等」匹配蟹攝的所有等值）。",
+          "rule5": "可以自由組合多個查詢項（如「蟹-等 知組」查詢蟹攝的所有等+知組）。",
+          "rule6": "像「流開一」這樣的復合詞，會逐字解析每個部分。"
+        },
+        "examplesNote": "以下示例基於中古音（廣韻）字表",
+        "examples": {
+          "title": "輸入示例",
+          "example1": "「泥」 → 使用 泥母 進行分析",
+          "example2": "「蟹-等」 → 使用 蟹攝一、二、三、四等 進行分析",
+          "example3": "「次濁-調」 → 使用 次濁聲母+平上去入 進行分析",
+          "example4": "「庄組」 → 使用 庄組 進行分析（如果只輸入「庄」，會使用 庄母 分析）",
+          "example5": "「流開一」 → 使用 流攝開口一等字 進行分析",
+          "example6": "「塞擦」 → 提取 塞擦音 進行分析",
+          "example7": "「-部位」 → 分析 所有發聲部位",
+          "example8": "「山攝 知組」 → 使用 山攝+知組 進行分析"
+        },
+        "table": {
+          "title": "支持的類別及對應值（簡體也可以）",
+          "tableHeaders": {
+            "category": "類別",
+            "values": "對應值"
+          }
+        }
+      }
     }
   },
   "result": {

@@ -3,44 +3,49 @@
     <h4 class="section-title">特徵選擇</h4>
 
     <div class="setting-row">
-      <label class="setting-label">
-        <input type="checkbox" :checked="modelValue.use_semantic_profile"
-          @change="update('use_semantic_profile', $event.target.checked)" />
+      <CheckBox
+        :model-value="modelValue.use_semantic_profile"
+        @update:modelValue="update('use_semantic_profile', $event)"
+      >
         語義特徵
-      </label>
+      </CheckBox>
       <span class="setting-hint">9個語義類別占比</span>
     </div>
 
     <div class="setting-row">
-      <label class="setting-label">
-        <input type="checkbox" :checked="modelValue.use_naming_patterns"
-          @change="update('use_naming_patterns', $event.target.checked)" />
+      <CheckBox
+        :model-value="modelValue.use_naming_patterns"
+        @update:modelValue="update('use_naming_patterns', $event)"
+      >
         命名模式
-      </label>
+      </CheckBox>
       <span class="setting-hint">高頻後綴出現頻率</span>
     </div>
 
     <div class="setting-row">
-      <label class="setting-label">
-        <input type="checkbox" :checked="modelValue.use_geographic"
-          @change="update('use_geographic', $event.target.checked)" />
+      <CheckBox
+        :model-value="modelValue.use_geographic"
+        @update:modelValue="update('use_geographic', $event)"
+      >
         地理特徵
-      </label>
+      </CheckBox>
       <span class="setting-hint">聚類質心經緯度</span>
     </div>
 
     <div class="setting-row">
-      <label class="setting-label">
-        <input type="checkbox" :checked="modelValue.use_cluster_size"
-          @change="update('use_cluster_size', $event.target.checked)" />
+      <CheckBox
+        :model-value="modelValue.use_cluster_size"
+        @update:modelValue="update('use_cluster_size', $event)"
+      >
         聚類規模
-      </label>
+      </CheckBox>
       <span class="setting-hint">聚類包含的村莊數</span>
     </div>
   </div>
 </template>
 
 <script setup>
+import CheckBox from '@/components/selector/CheckBox.vue'
 const props = defineProps({
   modelValue: { type: Object, required: true }
 })
@@ -76,10 +81,6 @@ function update(key, value) {
   color: var(--text-primary);
   cursor: pointer;
   min-width: 100px;
-}
-
-.setting-label input[type="checkbox"] {
-  cursor: pointer;
 }
 
 .setting-hint {

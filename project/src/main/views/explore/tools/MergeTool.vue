@@ -111,7 +111,7 @@
                 class="main-glass-button"
                 data-size="small"
                 style="display: inline-block; padding: 2px 8px; margin: 0 2px; vertical-align: middle;background: #007aff;color:white"
-                @click="$router.push('/explore/tools/check')"
+                @click="$router.push(buildLocalePath(resolveRouteLocale(route), '/explore/tools/check'))"
             >
               {{ t('tools.merge.files.checkTool') }}
             </button>
@@ -354,6 +354,7 @@ import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import defaultReferenceWorkbookUrl from '/data/参考表.xlsx?url'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
 const { requireAuth } = useAuthGuard({

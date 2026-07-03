@@ -13,12 +13,12 @@
             class="query-mode-radio"
           />
 
-          <Checkbox
+          <CheckBox
             v-model="showSankey"
             :label="t('phonology.phonology.evolution.controls.sankey')"
           />
 
-          <Checkbox
+          <CheckBox
             v-model="optimizeSankeyLayout"
             :label="t('phonology.phonology.evolution.controls.optimizeLinks')"
           />
@@ -256,10 +256,11 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
-import Checkbox from '@/components/selector/Checkbox.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
 import { resolveHoverDetailCardPosition } from '@/components/ToastAndHelp/hoverDetailCardPosition.js'
 import LocationMultiInput from '../geo/LocationMultiInput.vue'
@@ -528,7 +529,7 @@ const applyDemoData = async ({ syncLocations = locationQuery.value.length === 0 
 const handleQuery = async () => {
   if (!userStore.isAuthenticated) {
     showWarning(t('user.dataPage.messages.authRequired'))
-    router.push('/auth')
+    router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
     return
   }
 

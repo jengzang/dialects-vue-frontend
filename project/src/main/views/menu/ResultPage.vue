@@ -48,7 +48,8 @@
 <script setup>
 import {computed, onActivated, onDeactivated, onMounted, onUnmounted, ref, watch} from 'vue';
 import {onBeforeRouteLeave, useRoute, useRouter} from 'vue-router';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js';
 import { getCoordinates, searchChars, searchZhongGu, searchYinWei, searchTones } from '@/api'
 import {globalPayload, mapStore, resultCache, userStore} from '@/main/store/store.js';
 import ResultList from "@/main/components/result/ResultList.vue";
@@ -178,14 +179,15 @@ watch(
         // ================= TAB 1: 查字 =================
         if (sourceTab === 'tab1') {
           resultCache.mode = '';
-          resultCache.features = [];
+          resultCache.features = ['漢字'];
 
           const queryParams = {
             chars: [],
             locations: newPayload.locations || "",
             regions: Array.isArray(newPayload.regions) ? newPayload.regions : (newPayload.regions || ""),
             region_mode: newPayload.region_mode || 'yindian',
-            response_mode: 'compact'
+            response_mode: 'compact',
+            include_custom: userStore.isAuthenticated && userStore.role !== 'anonymous'
           }
 
           let rawChars = newPayload.chars;
@@ -201,7 +203,7 @@ watch(
           if (response && response.result) {
             latestResults.value = response.result;
 
-            mergedData = generateCharsMergedData(latestResults.value, MapData);
+            mergedData = generateCharsMergedData(latestResults.value, MapData, response.custom_data || []);
             if (seq !== requestSeq) return;
 
             mapStore.mapData = MapData;
@@ -216,9 +218,8 @@ watch(
 
         // ================= TAB 2: 查中古 =================
         else if (sourceTab === 'tab2') {
-          const modeCN = tabMap.value[sourceTab] || sourceTab;
           const featuresList = Array.isArray(newPayload.features) ? newPayload.features : [];
-          resultCache.mode = modeCN;
+          resultCache.mode = '查中古';
           resultCache.features = featuresList;
 
           const response = await searchZhongGu({
@@ -233,6 +234,7 @@ watch(
           if (response.success || response.status === 'success') {
             results.value = response.results || response.data;
             latestResults.value = Array.isArray(results.value) ? results.value.flat() : [];
+            resultCache.latestResults = latestResults.value
 
             // ✅ 修复：func_mergeData 是 async，必须 await
             mergedData = await func_mergeData(latestResults.value, MapData, response.custom_data || []);
@@ -250,15 +252,15 @@ watch(
 
         // ================= TAB 3: 查音位 =================
         else if (sourceTab === 'tab3') {
-          const modeCN = tabMap.value[sourceTab] || sourceTab;
           const featuresList = Array.isArray(newPayload.features) ? newPayload.features : [];
-          resultCache.mode = modeCN;
+          resultCache.mode = '查音位';
           resultCache.features = featuresList;
 
           const response = await searchYinWei({
             ...payload.value,
             exclude_columns: payload.value.exclude_columns || [],
-            table_name: tableName
+            table_name: tableName,
+            include_custom: userStore.isAuthenticated && userStore.role !== 'anonymous'
           })
 
           if (seq !== requestSeq) return;
@@ -266,9 +268,10 @@ watch(
           if (response.success) {
             results.value = response.results || response.data;
             latestResults.value = Array.isArray(results.value) ? results.value.flat() : [];
+            resultCache.latestResults = latestResults.value
 
             // ✅ 修复：func_mergeData 是 async，必须 await
-            mergedData = await func_mergeData(latestResults.value, MapData);
+            mergedData = await func_mergeData(latestResults.value, MapData, response.custom_data || []);
             if (seq !== requestSeq) return;
 
             mapStore.mapData = MapData;
@@ -282,11 +285,12 @@ watch(
         // ================= TAB 4: 查調 =================
         else if (sourceTab === 'tab4') {
           resultCache.mode = '';
-          resultCache.features = [];
+          resultCache.features = ['調值'];
           const response = await searchTones({
             locations: newPayload.locations || "",
             regions: Array.isArray(newPayload.regions) ? newPayload.regions : (newPayload.regions || ""),
-            region_mode: newPayload.region_mode || 'yindian'
+            region_mode: newPayload.region_mode || 'yindian',
+            include_custom: userStore.isAuthenticated && userStore.role !== 'anonymous'
           })
 
           if (seq !== requestSeq) return;
@@ -294,11 +298,12 @@ watch(
           if (response && response.tones_result) {
             latestResults.value = response.tones_result;
 
-            mergedData = generateTonesMergedData(response.tones_result, MapData);
+            mergedData = generateTonesMergedData(response.tones_result, MapData, response.custom_data || []);
             if (seq !== requestSeq) return;
 
             mapStore.mapData = MapData;
             mapStore.mergedData = mergedData;
+            requestMapFitView();
           } else {
             console.warn("Tab4 Error:", response);
           }
@@ -323,7 +328,7 @@ watch(
 );
 
 const goToQuery = () => {
-  router.push('/menu/query/zhonggu');
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/query/zhonggu'));
 };
 
 // ================= ✨ Tab1 Dropdown 邏輯 (使用 SimpleSelectDropdown) =================
@@ -360,6 +365,15 @@ export default {
   align-items: center;
   padding: 40px 0;
   /* 如果希望是全屏遮罩，可以改為 fixed 並設置 z-index */
+}
+
+.header-row{
+  display:flex;
+  flex-direction: row;
+  flex-wrap:wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
 .glass-card {

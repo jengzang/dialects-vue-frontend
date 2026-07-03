@@ -80,7 +80,8 @@ const props = defineProps({
   isDropdownOpen: { type: Boolean, default: false },
   selectedCard: { type: String, default: '結果' },
   excludeColumns: { type: Array, default: () => [] },  // ✨ 新增
-  tableName: { type: String, default: 'characters' }
+  tableName: { type: String, default: 'characters' },
+  pathStrings: { type: Array, default: null }
 })
 
 const loading = ref(false)
@@ -97,6 +98,8 @@ const isModalOpen = ref(false)
 
 // 1. 计算逻辑 (保持不变)
 const combinations = computed(() => {
+  if (props.pathStrings !== null) return props.pathStrings
+
   const validEntries = props.activeKeys
       .map(key => ({ key, values: props.valueMap[key] }))
       .filter(e => e.values && e.values.length > 0)
@@ -114,7 +117,10 @@ const combinations = computed(() => {
   }, [''])
 })
 
-const hasSelection = computed(() => combinations.value.length > 0 && combinations.value[0] !== '')
+const hasSelection = computed(() => {
+  if (props.pathStrings !== null) return props.pathStrings.length > 0
+  return combinations.value.length > 0 && combinations.value[0] !== ''
+})
 
 // 2. Watch 逻辑 (🔴 修改：加入前置拦截)
 watch(combinations, (newVal, oldVal) => {

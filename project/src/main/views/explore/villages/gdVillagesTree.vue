@@ -48,16 +48,27 @@
           <!-- City Header -->
           <div class="city-header">
             <h3 class="city-name">{{ city }}</h3>
-            <button
-                v-if="!loadedCitiesData[city]"
-                @click="loadCityData(city)"
-                :disabled="loadingStates[city]"
-                class="load-btn"
-            >
-              {{ loadingStates[city] ? t('villages.pages.gdTree.loading') : t('villages.pages.gdTree.load') }}
-            </button>
-            <div v-else class="loaded-badge">
-              ✓ {{ t('villages.pages.gdTree.loaded') }}
+            <div class="city-header-actions">
+              <button
+                  v-if="!loadedCitiesData[city]"
+                  @click="loadCityData(city)"
+                  :disabled="loadingStates[city]"
+                  class="load-btn"
+              >
+                {{ loadingStates[city] ? t('villages.pages.gdTree.loading') : t('villages.pages.gdTree.load') }}
+              </button>
+              <template v-else>
+                <button
+                    class="city-map-btn"
+                    :class="{ 'is-disabled': !getCityLeafCount(city) }"
+                    :disabled="!getCityLeafCount(city)"
+                    @click.stop="handleCityMapClick(city)"
+                    title="顯示全市村落地圖"
+                >🌍</button>
+                <div class="loaded-badge">
+                  ✓ {{ t('villages.pages.gdTree.loaded') }}
+                </div>
+              </template>
             </div>
           </div>
 
@@ -85,6 +96,7 @@
                 :key="item.id"
                 :node="item"
                 :search-query="searchQuery"
+                :lazy-load-fn="lazyLoadChildren"
                 @open-map="openMapPopup"
             />
           </div>
@@ -108,6 +120,7 @@ import { useI18n } from 'vue-i18n';
 import VillagesTreeItem from '@/main/components/TableAndTree/VillagesTreeItem.vue';
 import VillageMapPopup from '@/main/components/popup/map/VillageMapPopup.vue';
 import { lazyLoadTree, loadFullTree } from '@/api';
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 const { t } = useI18n();
 const router = useRouter();
 
@@ -190,9 +203,29 @@ const loadCityData = async (cityName) => {
   try {
     const result = await loadFullTree(payload)
 
-    // Extract city data from result.tree
-    if (result && result.tree && result.tree[cityName]) {
-      const normalizedData = normalizeTreeData(result.tree[cityName], cityName);
+    if (result.mode === 'lazy_fallback') {
+      // lazy_bootstrap is a two-level map: { "广州市": ["从化区", "南沙区", ...] }
+      const bootstrap = result.lazy_bootstrap
+      if (bootstrap && typeof bootstrap === 'object') {
+        const districts = bootstrap[cityName] || Object.values(bootstrap)[0] || []
+        // filters accumulate (AND), level_columns shift past consumed levels
+        const shifted = API_CONFIG.level_columns.slice(1)
+        const nodes = districts.map(districtName => ({
+          id: generateId(),
+          name: districtName,
+          rawName: districtName,
+          children: [],
+          _lazy: true,
+          _lazyFilters: { "0": [cityName], "1": [districtName] },
+          _lazyLevelColumns: shifted
+        }))
+        loadedCitiesData.value[cityName] = nodes
+      } else {
+        loadedCitiesData.value[cityName] = []
+      }
+    } else if (result.tree && result.tree[cityName]) {
+      // Normal full tree
+      const normalizedData = normalizeTreeData(result.tree[cityName]);
       loadedCitiesData.value[cityName] = normalizedData;
     } else {
       throw new Error(t('villages.pages.gdTree.errors.invalidCityData'));
@@ -206,11 +239,20 @@ const loadCityData = async (cityName) => {
 };
 
 /**
- * Normalize tree data from API response
+ * Normalize tree data from API response (full tree mode)
  */
-const normalizeTreeData = (rawData, cityName) => {
+const normalizeTreeData = (rawData) => {
   if (!rawData || typeof rawData !== 'object') {
     return [];
+  }
+
+  const pushChild = (children, result) => {
+    if (!result) return
+    if (Array.isArray(result)) {
+      children.push(...result)
+    } else {
+      children.push(result)
+    }
   }
 
   const processNode = (data, name, level = 1) => {
@@ -220,25 +262,42 @@ const normalizeTreeData = (rawData, cityName) => {
                    data['latitude'] !== undefined;
 
     if (isLeaf) {
-      // Format leaf node with data
-      const formattedName = formatLeafNode(name, data);
-      return {
-        id: generateId(),
-        name: formattedName,
-        rawName: name,
-        rawData: data,
-        children: []
-      };
+      const lngs = Array.isArray(data['longitude']) ? data['longitude'] : []
+      const lats = Array.isArray(data['latitude']) ? data['latitude'] : []
+      const dialects = Array.isArray(data['方言分布']) ? data['方言分布'] : []
+      const count = Math.max(lngs.length, lats.length, 1)
+
+      if (count <= 1) {
+        return {
+          id: generateId(),
+          name: formatLeafNode(name, data),
+          rawName: name,
+          rawData: data,
+          children: []
+        }
+      }
+
+      // Duplicate leaf names with multiple records — split into individual nodes
+      return Array.from({ length: count }, (_, i) => {
+        const single = {}
+        if (dialects[i] !== undefined) single['方言分布'] = [dialects[i]]
+        if (lngs[i] !== undefined) single['longitude'] = [lngs[i]]
+        if (lats[i] !== undefined) single['latitude'] = [lats[i]]
+        return {
+          id: generateId(),
+          name: formatLeafNode(name, single),
+          rawName: name,
+          rawData: single,
+          children: []
+        }
+      })
     }
 
     // Process branch node
     const children = [];
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        const childNode = processNode(data[key], key, level + 1);
-        if (childNode) {
-          children.push(childNode);
-        }
+        pushChild(children, processNode(data[key], key, level + 1))
       }
     }
 
@@ -259,10 +318,7 @@ const normalizeTreeData = (rawData, cityName) => {
   const cityChildren = [];
   for (const districtName in rawData) {
     if (Object.prototype.hasOwnProperty.call(rawData, districtName)) {
-      const districtNode = processNode(rawData[districtName], districtName, 1);
-      if (districtNode) {
-        cityChildren.push(districtNode);
-      }
+      pushChild(cityChildren, processNode(rawData[districtName], districtName, 1))
     }
   }
 
@@ -340,8 +396,54 @@ const getFilteredCityData = (cityName) => {
 
   return filterTree(cityData, query);
 };
+
+/**
+ * Lazy load children via loadFullTree with accumulated AND filters + shifted level_columns
+ */
+const lazyLoadChildren = async (node) => {
+  if (!node._lazy || node._childrenLoaded || node._loadingChildren) return
+
+  node._loadingChildren = true
+  try {
+    const result = await loadFullTree({
+      db_key: API_CONFIG.db_key,
+      table_name: API_CONFIG.table_name,
+      level_columns: node._lazyLevelColumns,
+      data_columns: API_CONFIG.data_columns,
+      filters: node._lazyFilters
+    })
+
+    if (result.mode === 'lazy_fallback') {
+      // Still too many rows — accumulate filters + shift level_columns further
+      const bootstrap = result.lazy_bootstrap
+      const nodeKey = node.rawName || node.name
+      const children = bootstrap?.[nodeKey] || Object.values(bootstrap || {})[0] || []
+      const nextCol = node._lazyLevelColumns[0]
+      const nextShifted = node._lazyLevelColumns.slice(1)
+      node.children = children.map(childName => ({
+        id: generateId(),
+        name: childName,
+        rawName: childName,
+        children: [],
+        _lazy: true,
+        _lazyFilters: { ...node._lazyFilters, [String(nextCol)]: [childName] },
+        _lazyLevelColumns: nextShifted
+      }))
+    } else {
+      // mode === 'full' — tree rooted at filter level, extract by node key
+      const nodeKey = node.rawName || node.name
+      node.children = normalizeTreeData(result.tree?.[nodeKey] || {})
+    }
+    node._childrenLoaded = true
+  } catch (error) {
+    console.error('Lazy load children error:', error)
+    node._loadError = error.message || '加載子節點失敗'
+  } finally {
+    node._loadingChildren = false
+  }
+};
 const goToYCVillages = () => {
-  router.push('/explore/villages/yc');
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/yc'));
 };
 
 /**
@@ -358,6 +460,52 @@ const openMapPopup = (villages) => {
 const closeMapPopup = () => {
   mapPopupVisible.value = false;
   mapPopupVillages.value = [];
+};
+
+/**
+ * Recursively collect all leaf nodes (with rawData) from an array of tree nodes.
+ * Skips unloaded lazy nodes — they have no leaf data yet.
+ */
+const collectAllLeafNodes = (nodes) => {
+  const leaves = [];
+  const traverse = (n) => {
+    if (n.rawData) {
+      const dialects = n.rawData['方言分布'] || [];
+      const lngs = n.rawData['longitude'] || [];
+      const lats = n.rawData['latitude'] || [];
+      const count = Math.max(dialects.length, lngs.length, lats.length, 1);
+      for (let i = 0; i < count; i++) {
+        leaves.push({
+          name: n.rawName || n.name,
+          dialect: dialects[i] || '',
+          longitude: parseFloat(lngs[i]) || 0,
+          latitude: parseFloat(lats[i]) || 0,
+        });
+      }
+    }
+    if (n.children && n.children.length > 0) {
+      n.children.forEach(traverse);
+    }
+  };
+  nodes.forEach(traverse);
+  return leaves;
+};
+
+const getCityLeafCount = (city) => {
+  const cityData = loadedCitiesData.value[city];
+  return cityData ? collectAllLeafNodes(cityData).length : 0;
+};
+
+/**
+ * Show all villages in a city on the map
+ */
+const handleCityMapClick = (city) => {
+  const cityData = loadedCitiesData.value[city];
+  if (!cityData) return;
+  const leafNodes = collectAllLeafNodes(cityData);
+  if (leafNodes.length > 0) {
+    openMapPopup(leafNodes);
+  }
 };
 
 // Initialize on mount
@@ -545,6 +693,37 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.city-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.city-map-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.city-map-btn:hover:not(:disabled) {
+  background: rgba(52, 199, 89, 0.15);
+  transform: scale(1.15);
+}
+
+.city-map-btn.is-disabled,
+.city-map-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 /* City Loading State */

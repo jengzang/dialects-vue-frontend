@@ -84,8 +84,10 @@ function resolveToneType(item) {
   const value = item?.['聲韻調'] || item?.phonology || ''
   if (value.includes('聲母')) return 'initial'
   if (value.includes('韻母')) return 'final'
-  if (value.includes('調')) return 'tone'
-  if (value.includes('詞')) return 'lexicon'
+  if (value.includes('調值')) return 'tone-value'
+  if (value.includes('聲調')) return 'tone'
+  if (value.includes('漢字')) return 'hanzi'
+  if (value.includes('詞') || value.includes('词')) return 'lexicon'
   return 'other'
 }
 </script>
@@ -163,6 +165,16 @@ function resolveToneType(item) {
 .feature-card-tag[data-tone='tone'] {
   background: #fff3e0;
   color: #ff9500;
+}
+
+.feature-card-tag[data-tone='hanzi'] {
+  background: #e0f2f1;
+  color: #00887a;
+}
+
+.feature-card-tag[data-tone='tone-value'] {
+  background: #fde4ec;
+  color: #f43e5c;
 }
 
 .feature-card-tag[data-tone='lexicon'] {

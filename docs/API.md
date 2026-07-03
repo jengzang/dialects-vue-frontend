@@ -94,7 +94,7 @@ import {
 ### 主要文件
 
 - `auth.js`：會話初始化與 session helper 聚合
-- `actions.js`：登錄、註冊、修改資料、登出等業務操作
+- `actions.js`：登錄、註冊、修改資料、退出等業務操作
 - `httpClient.js`：統一請求客戶端與錯誤標準化
 - `session.js`：token 刷新、用戶初始化、在線時長上報
 - `tokenStorage.js`：token / user cache 存取

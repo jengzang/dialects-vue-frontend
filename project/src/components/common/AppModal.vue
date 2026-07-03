@@ -54,6 +54,12 @@
   </Teleport>
 </template>
 
+<script>
+// module-level state shared across all AppModal instances
+let modalCount = 0
+let savedBodyOverflow = ''
+</script>
+
 <script setup>
 import { computed, useSlots, watch, onBeforeUnmount } from 'vue'
 
@@ -175,26 +181,38 @@ function handleBackdropClose() {
   close()
 }
 
-let previousBodyOverflow = ''
+let isOpen = false
 
 watch(
   () => props.modelValue,
   (visible) => {
     if (typeof document === 'undefined') return
 
-    if (visible) {
-      previousBodyOverflow = document.body.style.overflow
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = previousBodyOverflow
+    if (visible && !isOpen) {
+      isOpen = true
+      if (modalCount === 0) {
+        savedBodyOverflow = document.body.style.overflow
+        document.body.style.overflow = 'hidden'
+      }
+      modalCount++
+    } else if (!visible && isOpen) {
+      isOpen = false
+      modalCount = Math.max(0, modalCount - 1)
+      if (modalCount === 0) {
+        document.body.style.overflow = savedBodyOverflow
+      }
     }
   },
   { immediate: true }
 )
 
 onBeforeUnmount(() => {
-  if (typeof document !== 'undefined') {
-    document.body.style.overflow = previousBodyOverflow
+  if (isOpen) {
+    modalCount = Math.max(0, modalCount - 1)
+    isOpen = false
+    if (modalCount === 0 && typeof document !== 'undefined') {
+      document.body.style.overflow = savedBodyOverflow
+    }
   }
 })
 

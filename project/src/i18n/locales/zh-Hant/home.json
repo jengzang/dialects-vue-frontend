@@ -63,7 +63,8 @@
       "desc": "字表轉換、合併、檢查等工具",
       "tableProcess": "字表處理 - 字表檢查與格式轉換",
       "jyut2ipa": "粵拼轉IPA - 粵拼轉國際音標",
-      "tableMerge": "字表合併 - 合併多個字表"
+      "tableMerge": "字表合併 - 合併多個字表",
+      "tableDerive": "字表推導 - 基於規則生成完整字表"
     },
     "charClass": {
       "title": "漢字地位",
@@ -96,7 +97,7 @@
     "sectionTitle": "開發中的功能",
     "sectionSubtitle": "即將推出的新特性",
     "charsGeneration": {
-      "title": "字表推導器",
+      "title": "字表推導工具",
       "desc": "基於音韻地位的字表推導工具，由少量字生成完整字表，可選多種韻書"
     },
     "phoneticsToolbox": {
@@ -226,7 +227,7 @@
     "items": {
       "homepage": {
         "title": "全新首頁",
-        "description": "採用液態玻璃風格設計，展示核心功能卡片、開源項目、登入權益等，提供更直觀的導航體驗"
+        "description": "採用液態玻璃風格設計，展示核心功能卡片、開源項目、登錄權益等，提供更直觀的導航體驗"
       },
       "compare": {
         "title": "方言比較功能",

@@ -95,23 +95,20 @@
             </div>
             <div v-else v-bind="locationContainerProps" class="scope-virtual-list ui-scrollbar">
               <div v-bind="locationWrapperProps" class="scope-virtual-wrapper">
-                <label
+                <CheckBox
                   v-for="item in virtualLocations"
                   :key="item.data.name"
+                  :model-value="selectedLocationSet.has(item.data.name)"
                   class="scope-checkbox-item scope-checkbox-item--virtual"
+                  @update:modelValue="toggleLocation(item.data.name)"
                 >
-                  <input
-                    :checked="selectedLocationSet.has(item.data.name)"
-                    type="checkbox"
-                    @change="toggleLocation(item.data.name)"
-                  >
                   <span class="scope-selection-copy">
                     <span class="scope-selection-title">{{ item.data.name }}</span>
                     <span class="scope-selection-meta">
                       {{ t('map.drawTab.voronoi.locationMeta', { records: item.data.recordCount, regions: formatRegionNames(item.data.regionNames) || t('map.drawTab.voronoi.emptySummary') }) }}
                     </span>
                   </span>
-                </label>
+                </CheckBox>
               </div>
             </div>
           </section>
@@ -142,6 +139,7 @@ import { computed, ref, watch } from 'vue'
 import { useVirtualList } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },

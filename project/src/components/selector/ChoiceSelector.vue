@@ -82,7 +82,7 @@ function handleSelect(value) {
   border-left-color: var(--border-gray-medium);
   transition: background 0.2s ease;
   white-space: nowrap;
-  overflow: hidden;
+  /* overflow: hidden; */
   text-overflow: ellipsis;
 }
 

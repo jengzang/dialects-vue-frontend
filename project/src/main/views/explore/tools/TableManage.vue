@@ -101,9 +101,9 @@
               <tbody>
                 <tr v-for="col in allColumns" :key="col.name">
                   <td>
-                    <input
-                      type="checkbox"
-                      v-model="selectedColumns[col.name]"
+                    <CheckBox
+                      :model-value="selectedColumns[col.name]"
+                      @update:modelValue="selectedColumns[col.name] = $event"
                     />
                   </td>
                   <td>{{ col.name }}</td>
@@ -119,9 +119,9 @@
                     />
                   </td>
                   <td>
-                    <input
-                      type="checkbox"
-                      v-model="filterableColumns[col.name]"
+                    <CheckBox
+                      :model-value="filterableColumns[col.name]"
+                      @update:modelValue="filterableColumns[col.name] = $event"
                     />
                   </td>
                 </tr>
@@ -173,6 +173,7 @@
 
 <script setup>
 import { computed, nextTick, onMounted, ref } from 'vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { userStore } from '@/main/store/store.js'
@@ -181,6 +182,7 @@ import { getTableColumns } from '@/api'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import { showError, showSuccess, showWarning } from '@/utils/message.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -611,7 +613,7 @@ onMounted(async () => {
     setTimeout(() => {
       if (!isAdmin.value) {
         console.log('[TableManage] 延迟检查后仍无权限，跳转到登录页')
-        router.push('/auth')
+        router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
       }
     }, 3000)
   }
@@ -1006,13 +1008,6 @@ onMounted(async () => {
 
 .column-config-table tbody tr:hover {
   background: rgba(0, 122, 255, 0.08);
-}
-
-.column-config-table input[type="checkbox"] {
-  cursor: pointer;
-  width: 18px;
-  height: 18px;
-  accent-color: #007aff;
 }
 
 .width-input {

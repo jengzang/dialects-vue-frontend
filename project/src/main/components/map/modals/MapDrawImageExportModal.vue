@@ -74,33 +74,47 @@
 
         <section class="scope-panel main-glass-panel-inner">
           <div class="scope-panel-title">{{ t('map.drawTab.imageExport.sections.content') }}</div>
-          <label class="scope-checkbox-item">
-            <input v-model="form.includeBasemap" type="checkbox">
+          <CheckBox
+            :model-value="form.includeBasemap"
+            class="scope-checkbox-item"
+            @update:modelValue="form.includeBasemap = $event"
+          >
             <span class="scope-selection-copy">
               <span class="scope-selection-title">{{ t('map.drawTab.imageExport.content.includeBasemap') }}</span>
             </span>
-          </label>
-          <label class="scope-checkbox-item">
-            <input v-model="form.includeDrawLayers" type="checkbox">
+          </CheckBox>
+          <CheckBox
+            :model-value="form.includeDrawLayers"
+            class="scope-checkbox-item"
+            @update:modelValue="form.includeDrawLayers = $event"
+          >
             <span class="scope-selection-copy">
               <span class="scope-selection-title">{{ t('map.drawTab.imageExport.content.includeDrawLayers') }}</span>
             </span>
-          </label>
-          <label class="scope-checkbox-item">
-            <input v-model="form.onlySelectedLayers" type="checkbox">
+          </CheckBox>
+          <CheckBox
+            :model-value="form.onlySelectedLayers"
+            class="scope-checkbox-item"
+            @update:modelValue="form.onlySelectedLayers = $event"
+          >
             <span class="scope-selection-copy">
               <span class="scope-selection-title">{{ t('map.drawTab.imageExport.content.onlySelectedLayers') }}</span>
             </span>
-          </label>
+          </CheckBox>
 
           <div v-if="form.onlySelectedLayers" class="image-export-layer-list ui-scrollbar">
-            <label v-for="layer in layers" :key="layer.id" class="scope-checkbox-item scope-checkbox-item--dense">
-              <input :checked="selectedLayerSet.has(layer.id)" type="checkbox" @change="toggleLayerSelection(layer.id)">
+            <CheckBox
+              v-for="layer in layers"
+              :key="layer.id"
+              :model-value="selectedLayerSet.has(layer.id)"
+              class="scope-checkbox-item scope-checkbox-item--dense"
+              @update:modelValue="toggleLayerSelection(layer.id)"
+            >
               <span class="scope-selection-copy">
                 <span class="scope-selection-title">{{ layer.name }}</span>
                 <span class="scope-selection-meta">{{ t('map.drawTab.labels.featureCount', { count: layer.featureCollection?.features?.length ?? 0 }) }}</span>
               </span>
-            </label>
+            </CheckBox>
           </div>
         </section>
       </div>
@@ -128,6 +142,7 @@
 import { computed, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -320,8 +335,7 @@ watch(
   border: 1px solid rgba(148, 163, 184, 0.22);
 }
 
-.scope-radio-item input,
-.scope-checkbox-item input {
+.scope-radio-item input {
   margin-top: 2px;
   accent-color: #007aff;
 }

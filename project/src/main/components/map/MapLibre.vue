@@ -11,11 +11,11 @@
         </div>
 
         <div
-          v-if="isMiddleChineseMode && hasCustomData && mapStore.mapData"
+          v-if="hasCustomData && mapStore.mapData"
           id="custom-switch-container"
           class="custom-switch-container1"
         >
-          <Checkbox
+          <CheckBox
             :model-value="mapStore.showCustomData"
             :label="t('map.mapLibre.controls.personalData')"
             :font-size="14"
@@ -27,7 +27,7 @@
           id="base-switch-container"
           class="custom-switch-container1"
         >
-          <Checkbox
+          <CheckBox
             :model-value="isBaseModeActive"
             :label="t('map.mapLibre.controls.viewPlaceNames')"
             :font-size="14"
@@ -121,11 +121,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render } from 'vue';
+import { ref, onMounted, onActivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render } from 'vue';
 import { useI18n } from 'vue-i18n';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { mapStyle, mapStyleConfig, calculateDenseMapCenterAndZoom } from '@/utils/map/MapSource.js';
+import { mapStyle, mapStyleConfig, calculateMapCenterAndZoom } from '@/utils/map/MapSource.js';
 import {get_detail} from "@/main/utils/ResultTable.js";
 import {mapStore, userStore, resultCache} from "@/main/store/store.js";
 import { showSuccess, showError, showWarning, showConfirm } from '@/utils/message.js';
@@ -133,7 +133,7 @@ import { getLocationDetail } from '@/api'
 import { deleteCustomForm } from '@/api'
 import { refreshCurrentCustomLayer } from '@/utils/map/MapData.js';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
-import Checkbox from '@/components/selector/Checkbox.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import MapLegend from './MapLegend.vue'
 import CompareMapPopup from '../popup/map/CompareMapPopup.vue'
 import FeatureMapPopup from '../popup/map/FeatureMapPopup.vue'
@@ -141,7 +141,7 @@ import FeatureMapPopup from '../popup/map/FeatureMapPopup.vue'
 // --- Props: 只接收數據，不負責請求 ---
 const props = defineProps({
   // 1. 基礎數據 (對應 locations_data)
-  // 格式: { coordinates_locations: [['廣州', [113, 23]], ...], center_coordinate: [], zoom_level: 8, region_mappings: {...} }
+  // 格式: { coordinates_locations: [['廣州', [113, 23]], ...], region_mappings: {...} }
   // mapData: { type: Object, default: null },
   // 2. 特徵詳細數據 (對應 mergedData)
   // 格式: [{ feature: '流攝', value: 'eu', coordinate: [...], color: '#f00', detailContent: [...], iscustoms: 0, notes: '' }, ...]
@@ -353,6 +353,12 @@ onMounted(() => {
   initMap();
 });
 
+onActivated(() => {
+  if (map.value && mapStore.mergedData?.length > 0) {
+    applyResetView(AUTO_RESET_DENSITY_PERCENTILE);
+  }
+});
+
 onBeforeUnmount(() => {
   clearMarkers();
   if (map.value) {
@@ -362,23 +368,13 @@ onBeforeUnmount(() => {
 });
 
 // --- 監聽數據變化，自動重繪 ---
-// 追蹤上一次的數據，用於判斷是否需要重置視角
-const prevMapData = ref(null);
-const prevMergedData = ref(null);
-
 watch(
   // 監聽源改成 store 裡的數據
     [() => mapStore.mapData, () => mapStore.mergedData, () => mapStore.mode, () => props.activeFeature],
-    ([newMapData, newMergedData, newMode]) => {
-      // 判斷是否只是模式切換（數據沒變）
-      const shouldResetView = prevMapData.value !== newMapData;
-
-      // 更新追蹤值
-      prevMapData.value = newMapData;
-      prevMergedData.value = newMergedData;
-
-      // 渲染地圖，傳入是否需要重置視角的標誌
-      renderMapContent(shouldResetView);
+    () => {
+      // 視圖內容變更時只重繪，不在這裡自行判斷是否 reset；
+      // reset 邊界統一由 requestMapFitView -> fitViewKey watcher 控制。
+      renderMapContent(false);
     },
     { deep: true }
 );
@@ -397,7 +393,8 @@ watch(
   async (key) => {
     if (!key) return;
     await nextTick();
-    resetView();
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    applyResetView(AUTO_RESET_DENSITY_PERCENTILE);
   },
   { flush: 'post' }
 );
@@ -451,43 +448,8 @@ const renderMapContent = async (shouldResetView = true) => {
   // 清除舊標記
   clearMarkers();
 
-  // 根據數據調整視角（僅在需要時）
-  if (shouldResetView) {
-    let centerCoord = null;
-    let zoomLevel = 8;
-    // feature 模式优先使用 mergedData 里的中心层级
-    if (mapStore.mode === 'feature' && mapStore.mergedData && mapStore.mergedData.length > 0) {
-      const firstItem = mapStore.mergedData[0];
-      // console.log('Checking mergedData for center and zoom:', firstItem);
-
-      if (firstItem.centerCoordinate) {
-        centerCoord = firstItem.centerCoordinate;
-        zoomLevel = firstItem.zoomLevel || 8;
-        // console.log('Using center and zoom from mergedData:', centerCoord, zoomLevel);
-      }
-    }
-    // 其他模式继续使用 mapData
-    else if (mapStore.mapData && mapStore.mapData.center_coordinate) {
-      centerCoord = mapStore.mapData.center_coordinate;
-      zoomLevel = mapStore.mapData.zoom_level || 8;
-      // console.log('Using center and zoom from mapData:', centerCoord, zoomLevel);
-    }
-    else if (mapStore.mergedData && mapStore.mergedData.length > 0) {
-      const firstItem = mapStore.mergedData[0];
-      if (firstItem.centerCoordinate) {
-        centerCoord = firstItem.centerCoordinate;
-        zoomLevel = firstItem.zoomLevel || 8;
-      }
-    }
-
-    // 应用视角调整
-    if (centerCoord && Array.isArray(centerCoord) && centerCoord.length >= 2) {
-      map.value.flyTo({
-        center: centerCoord,
-        zoom: zoomLevel
-      });
-    }
-  }
+  // 視角統一由 requestMapFitView -> resetView 控制，這裡不再消費入口側預計算的 center/zoom。
+  void shouldResetView;
 
   // 根據模式分發邏輯
   if (mapStore.mode === 'base') {
@@ -927,12 +889,13 @@ const handleStyleChange = () => {
   map.value.setStyle(newStyle);
 };
 
-const resetView = () => {
-  if (!map.value) return;
+const AUTO_RESET_DENSITY_PERCENTILE = 0.98;
+const MANUAL_RESET_DENSITY_PERCENTILE = 0.85;
 
+const collectResetViewPoints = () => {
   let points = [];
 
-  // compare 模式优先按当前比较结果坐标复位，避免退回到 mapData 全量范围
+  // compare / feature 模式优先按当前结果坐标复位，避免退回到 mapData 全量范围
   if ((mapStore.mode === 'compare' || mapStore.mode === 'feature') && mapStore.mergedData && mapStore.mergedData.length > 0) {
     points = mapStore.mergedData
       .map(item => item.coordinate)
@@ -951,22 +914,32 @@ const resetView = () => {
       .filter(isValidCoordinatePair);
   }
 
-  // 3. 如果有坐标数据，重新计算最佳视角
+  return points;
+};
+
+const applyResetView = (densityPercentile = MANUAL_RESET_DENSITY_PERCENTILE) => {
+  if (!map.value) return;
+
+  const points = collectResetViewPoints();
+
   if (points.length > 0) {
-    const { center, zoom } = calculateDenseMapCenterAndZoom(points);
+    const { center, zoom } = calculateMapCenterAndZoom(points, { densityPercentile });
     map.value.flyTo({
       center,
       zoom,
       essential: true
     });
   } else {
-    // 没有数据时，返回默认视角（广州）
     map.value.flyTo({
       center: [113.2644, 23.1291],
       zoom: 8,
       essential: true
     });
   }
+};
+
+const resetView = () => {
+  applyResetView(MANUAL_RESET_DENSITY_PERCENTILE);
 };
 </script>
 

@@ -27,8 +27,52 @@
 
       <div v-show="currentTab === 'tab2'" class="page">
         <div class="page-content-stack">
-         <!-- 三欄選擇 -->
-          <div class="triple-select-box">
+          <!-- 直接輸入模式 -->
+          <div v-if="zhongguInputMode === 'direct'" class="direct-input-box">
+            <div class="card-row">
+              <ChoiceSelector
+                v-model="tabStates.tab2.card"
+                :options="cardOptions"
+                :aria-label="$t('query.tab2.title')"
+              />
+              <div class="dropdown"
+                   :ref="(el) => excludeFilterTriggerRef.tab2 = el"
+                   @click="toggleExcludeDropdown('tab2')"
+                   style="margin: 0;padding: 8px 10px;min-width: 60px;max-height:30px"
+                   :class="{ disabled: buttonState.isRunning }"
+              >
+                {{ getExcludeDisplayText('tab2') || $t('query.tab2.noExclude') }}
+                <span class="arrow">▾</span>
+              </div>
+              <Teleport to="body">
+                <div
+                    v-if="excludeDropdownOpen === 'tab2'"
+                    class="dropdown-panel choice-dropdown-panel"
+                    :style="excludeDropdownStyle"
+                >
+                  <div
+                      class="dropdown-item choice-dropdown-item"
+                      v-for="option in excludeOptions"
+                      :key="option.value"
+                      :class="{ active: isExcludeSelected(option.value, 'tab2') }"
+                      @click="toggleExcludeOption(option.value, 'tab2')"
+                  >
+                    <span class="check-icon">{{ isExcludeSelected(option.value, 'tab2') ? '✓' : '' }}</span>
+                    {{ option.label }}
+                  </div>
+                </div>
+              </Teleport>
+            </div>
+            <ZhongGuDirectInput
+              :exclude-columns="tabStates.tab2.excludeColumns"
+              :table-name="selectedCharacterTable"
+              @update:runDisabled="setTabContentDisabled('query', 'tab2', $event)"
+              ref="ZhongguDirectInputRef"
+            />
+          </div>
+
+          <!-- 選擇器模式 -->
+          <div v-else class="triple-select-box">
             <!-- ✅ 卡片選擇區：獨立一行 -->
             <div class="card-row">
               <ChoiceSelector
@@ -204,11 +248,6 @@
         <small class="hint">{{ $t('query.tab4.description') }}</small>
       </div>
     </div>
-    <FloatingDice
-        v-if="selectedCharacterTable === 'characters'"
-        :current-tab="currentTab"
-        @applyConfig="handleApplyConfig"
-    />
   </TabsContainer>
 </template>
 
@@ -219,11 +258,12 @@ import { useI18n } from 'vue-i18n'
 import TabsContainer from "@/components/common/TabsContainer.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
+import ZhongGuDirectInput from "@/main/components/query/ZhongGuDirectInput.vue";
 import YinweiSelector from "@/main/components/query/YinweiSelector.vue";
-import FloatingDice from "@/main/components/query/FloatingDice.vue";
 import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
 import ChoiceSelector from "@/components/selector/ChoiceSelector.vue";
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import {
   globalPayload,
   queryStore,
@@ -231,10 +271,15 @@ import {
   isQueryButtonDisabled,
   preferredCharacterTable,
   setRunning,
-  setTabContentDisabled
+  setTabContentDisabled,
+  tutorialAssistState,
+  clearTutorialAssistRequest,
+  zhongguInputMode,
 } from '@/main/store/store.js'
 import { useQueryConfig } from '@/composables/domain/useQueryConfig.js'
+
 import { translateResultTerm } from '@/i18n/utils/resultI18n.js'
+import { readMenuBarMemory, writeMenuBarMemory } from '@/main/config/BarAndTabs/MenuBarConfig.js'
 import { showWarning } from '@/utils/message.js'
 import { limitEffectiveChars } from '@/main/utils/queryLimits.js'
 
@@ -358,6 +403,48 @@ function handleHanziInput() {
 watch(currentTab, (newTab) => {
   uiStore.currentSubTab.query = newTab
 }, { immediate: true })
+
+watch(
+  () => tutorialAssistState.requestToken,
+  (token) => {
+    if (!token || !tutorialAssistState.payload) {
+      return
+    }
+
+    if (tutorialAssistState.target === 'query:tab1' && currentTab.value === 'tab1') {
+      const payload = tutorialAssistState.payload
+      hanziInput.value = payload.chars || ''
+      locationModel.value = {
+        locations: payload.loc?.locations || [],
+        regions: payload.loc?.regions || [],
+        regionUsing: payload.loc?.regionUsing || 'yindian'
+      }
+      clearTutorialAssistRequest()
+      return
+    }
+
+    if (tutorialAssistState.target === 'query:tab2' && currentTab.value === 'tab2') {
+      handleApplyConfig(tutorialAssistState.payload)
+      clearTutorialAssistRequest()
+      return
+    }
+
+    if (tutorialAssistState.target === 'query:tab3' && currentTab.value === 'tab3') {
+      handleApplyConfig(tutorialAssistState.payload)
+      clearTutorialAssistRequest()
+    }
+
+    if (tutorialAssistState.target === 'query:tab4' && currentTab.value === 'tab4') {
+      const payload = tutorialAssistState.payload
+      locationModel.value = {
+        locations: payload.loc?.locations || [],
+        regions: payload.loc?.regions || [],
+        regionUsing: payload.loc?.regionUsing || 'yindian'
+      }
+      clearTutorialAssistRequest()
+    }
+  }
+)
 
 function getNormalizedKeys(keys = []) {
   const allowedKeys = availableKeys.value || []
@@ -487,6 +574,15 @@ function toggleExcludeOption(value, tab) {
 
 // isRunning 状态已移至 uiStore，不再需要本地定义
 const ZhongguRef = ref(null);
+const ZhongguDirectInputRef = ref(null);
+
+function resetRememberedMapSubToView() {
+  const rememberedMapPath = readMenuBarMemory('map')
+  if (rememberedMapPath && rememberedMapPath !== '/menu/map/view') {
+    writeMenuBarMemory('map', '/menu/map/view')
+  }
+}
+
 // 點擊按鈕行為
 const runAction = async () => {
   setRunning('query', true);
@@ -520,11 +616,20 @@ const runAction = async () => {
     // 假設 selectedCard.value 是一個字串，後端 features 需要 List
     const featureList = tabStates.tab2.card ? [tabStates.tab2.card] : ['韻母'];
 
-    // 這裡對應後端的 path_strings
-    const pathStrings = ZhongguRef.value?.combinations || [];
+    let pathStrings = []
+    let charsForPayload = ''
+
+    if (zhongguInputMode.value === 'direct') {
+      pathStrings = ZhongguDirectInputRef.value?.pathStrings || []
+      charsForPayload = ZhongguDirectInputRef.value?.chars || ''
+    } else {
+      pathStrings = ZhongguRef.value?.combinations || []
+    }
+
     payload = {
       // 第一部分：查字參數
       path_strings: pathStrings,
+      chars: charsForPayload ? [...charsForPayload] : [],
       column: [],            // 目前前端沒提供，預設空
       combine_query: false,  // 目前前端沒提供，預設 false
 
@@ -552,6 +657,10 @@ const runAction = async () => {
       .split('·')
       .map(item => item.trim())
       .filter(Boolean);
+
+    if (YinweiSelectorRef.value?.ensureReady) {
+      await YinweiSelectorRef.value.ensureReady()
+    }
     const phos = YinweiSelectorRef.value?.normalizedPhoInput || '';
 
     payload = {
@@ -619,9 +728,10 @@ const runAction = async () => {
     // 2. 存入全局仓库
     globalPayload.value = JSON.parse(JSON.stringify(finalPayload))
   }
+  resetRememberedMapSubToView()
   // 3. 纯净跳转
   await router.replace({
-    path: '/menu/result'
+    path: buildLocalePath(resolveRouteLocale(route), '/menu/result')
   });
   setRunning('query', false); // 請求結束，關閉 loading 狀態
 }
@@ -652,7 +762,17 @@ function handleApplyConfig(data) {
     regions: data.loc.regions,
     regionUsing: data.loc.regionUsing
   }
-  // 3. 更新鍵名 (Keys)
+
+  // 3. 直接輸入模式
+  if (data.mode === 'direct') {
+    if (tab === 'tab2' && ZhongguDirectInputRef.value) {
+      ZhongguDirectInputRef.value.positionInput = data.positionInput || ''
+      ZhongguDirectInputRef.value.charInput = data.charInput || ''
+    }
+    return
+  }
+
+  // 4. 下拉選擇器模式：更新鍵名 (Keys)
   if (tab === 'tab2') {
     tabStates.tab2.keys = data.keys
   }
@@ -660,7 +780,7 @@ function handleApplyConfig(data) {
     tabStates.tab3.keys = data.keys
   }
 
-  // 4. 根據 Tab 更新具體的值
+  // 5. 根據 Tab 更新具體的值
   if (data.isTab3) {
     // Tab3: 更新 YinweiSelector 組件的輸入框
     if (YinweiSelectorRef.value) {
@@ -675,7 +795,7 @@ function handleApplyConfig(data) {
 function resolveTabRoute(tabName) {
   const sub = tabToRouteSub[tabName] || 'zhonggu'
   return {
-    path: `/menu/query/${sub}`
+    path: buildLocalePath(resolveRouteLocale(route), `/menu/query/${sub}`)
   }
 }
 

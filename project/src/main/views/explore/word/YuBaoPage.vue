@@ -158,7 +158,7 @@
 
     <!-- 表格模式 - 输入无效时的提示 -->
     <div v-else-if="viewMode === 'table'" class="content-area">
-      <div class="empty-state">
+      <div class="empty-state empty-state-base">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <circle cx="12" cy="12" r="10"/>
           <line x1="12" y1="8" x2="12" y2="12"/>
@@ -268,6 +268,10 @@
           <p v-if="!currentInputValue">{{ t('words.yuBaoPage.states.enterSearch') }}</p>
           <p v-else-if="!isValidInput">{{ t('words.yuBaoPage.states.chooseSuggestion') }}</p>
           <p v-else>{{ t('words.yuBaoPage.states.noData') }}</p>
+          <small v-if="!currentInputValue">
+            {{ t('words.yuBaoPage.states.queryHint', { type: currentSearchTypeLabel }) }}
+          </small>
+          <small v-else>{{ t('words.yuBaoPage.states.clickSuggestion') }}</small>
         </div>
       </div>
 
@@ -292,6 +296,7 @@
           <small v-if="!currentInputValue">
             {{ t('words.yuBaoPage.states.queryHint', { type: currentSearchTypeLabel }) }}
           </small>
+          <small v-else>{{ t('words.yuBaoPage.states.clickSuggestion') }}</small>
         </div>
         <YuBaoMap
             v-else
@@ -339,7 +344,7 @@
 import { ref, nextTick, onMounted, watch, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { distinctQuery, sqlQuery } from '@/api'
+import { getYubaoVocabularyWords, getYubaoGrammarSentences, getYubaoVocabularyItems, getYubaoGrammarItems } from '@/api'
 import * as OpenCC from 'opencc-js'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import { watchDebounced } from '@vueuse/core'
@@ -517,23 +522,16 @@ async function loadAllVocabulary() {
   try {
     // 先走本地缓存，弹窗联想只需要全集数据，不必每次打开都重新打接口。
     const cached = vocabularyCache.read()
-    if (cached && cached.values && Array.isArray(cached.values)) {
-      allVocabulary.value = cached.values.filter(item => item && typeof item === 'string' && item.trim())
+    if (cached && cached.items && Array.isArray(cached.items)) {
+      allVocabulary.value = cached.items.filter(item => item && typeof item === 'string' && item.trim())
       console.log('Loaded vocabulary cache:', allVocabulary.value.length)
       return
     }
 
-    const response = await distinctQuery({
-      db_key: 'yubao',
-      table_name: 'vocabulary',
-      target_column: 'word',
-      search_text: '',
-      search_columns: [],
-      current_filters: {}
-    })
+    const response = await getYubaoVocabularyWords({ all: true })
 
-    if (response && response.values && Array.isArray(response.values)) {
-      allVocabulary.value = response.values.filter(item => item && typeof item === 'string' && item.trim())
+    if (response && response.items && Array.isArray(response.items)) {
+      allVocabulary.value = response.items.filter(item => item && typeof item === 'string' && item.trim())
       // 只缓存后端原始返回，后面仍然沿用现有过滤逻辑生成可用列表。
       vocabularyCache.write(response)
       console.log('Loaded vocabulary API data:', allVocabulary.value.length)
@@ -549,20 +547,16 @@ async function loadAllGrammar() {
   try {
     // 语法数据和词汇数据保持同一套缓存策略，避免两个 tab 行为不一致。
     const cached = grammarCache.read()
-    if (cached && cached.values && Array.isArray(cached.values)) {
-      allGrammar.value = cached.values.filter(item => item && typeof item === 'string' && item.trim())
+    if (cached && cached.items && Array.isArray(cached.items)) {
+      allGrammar.value = cached.items.filter(item => item && typeof item === 'string' && item.trim())
       console.log('Loaded grammar cache:', allGrammar.value.length)
       return
     }
 
-    const response = await distinctQuery({
-      db_key: 'yubao',
-      table_name: 'grammar',
-      target_column: 'sentence'
-    })
+    const response = await getYubaoGrammarSentences({ all: true })
 
-    if (response && response.values && Array.isArray(response.values)) {
-      allGrammar.value = response.values.filter(item => item && typeof item === 'string' && item.trim())
+    if (response && response.items && Array.isArray(response.items)) {
+      allGrammar.value = response.items.filter(item => item && typeof item === 'string' && item.trim())
       grammarCache.write(response)
       console.log('Loaded grammar API data:', allGrammar.value.length)
     } else {
@@ -736,37 +730,34 @@ async function loadCardsPage() {
   isLoadingCards.value = true
 
   try {
-    const tableName = activeTab.value === 'vocabulary' ? 'vocabulary' : 'grammar'
     const searchValue = activeTab.value === 'vocabulary'
       ? vocabularyInput.value.trim()
       : grammarInput.value.trim()
-    const searchColumn = activeTab.value === 'vocabulary' ? 'word' : 'sentence'
 
-    // 构建筛选条件 - filters中的值必须是列表格式
-    const filters = { [searchColumn]: [searchValue] }
-
-    const response = await sqlQuery({
-      db_key: 'yubao',
-      table_name: tableName,
-      page_size: 2000,
-      page: 1,
-      filters: filters,
-      search_text: '',
-      search_columns: []
-    })
+    const response = activeTab.value === 'vocabulary'
+      ? await getYubaoVocabularyItems({
+        word: searchValue,
+        page: 1,
+        page_size: 2000
+      })
+      : await getYubaoGrammarItems({
+        sentence: searchValue,
+        page: 1,
+        page_size: 2000
+      })
 
     // console.log('📦 卡片数据响应:', response)
 
-    if (response && response.data) {
-      // console.log(response.data)
+    if (response && response.items) {
+      // console.log(response.items)
       // 更新对应 tab 的数据
       if (activeTab.value === 'vocabulary') {
-        vocabularyCardData.value = response.data
+        vocabularyCardData.value = response.items
 
       } else {
-        grammarCardData.value = response.data
+        grammarCardData.value = response.items
       }
-      console.log('✅ 加载了', response.data.length, '条卡片数据')
+      console.log('✅ 加载了', response.items.length, '条卡片数据')
     } else {
       if (activeTab.value === 'vocabulary') {
         vocabularyCardData.value = []

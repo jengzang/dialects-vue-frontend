@@ -1,4 +1,6 @@
+import { buildLocalePath, extractLocaleFromPath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { resultCache } from '@/main/store/store.js'
 
@@ -112,27 +114,31 @@ const createMenuTab = ({
   meta
 })
 
-function getMenuTabKeyFromRoute(route) {
-  if (typeof route?.path !== 'string') return null
+const withRouteLocale = (route, path) => buildLocalePath(resolveRouteLocale(route), stripLocaleFromPath(path))
 
-  if (route.path.startsWith('/menu/query/')) return 'query'
-  if (route.path.startsWith('/menu/compare/')) return 'compare'
-  if (route.path.startsWith('/menu/map/')) return 'map'
-  if (route.path === '/menu/result') return 'result'
-  if (route.path === '/menu/source') return 'source'
-  if (route.path === '/menu/privacy') return 'privacy'
-  if (route.path === '/menu/tools') return 'tools'
-  if (route.path === '/menu/words') return 'words'
-  if (route.path === '/menu/villages') return 'villages'
-  if (route.path === '/menu/cluster') return 'cluster'
-  if (route.path.startsWith('/menu/pho/')) return 'pho'
-  if (route.path.startsWith('/menu/about/')) return 'about'
+function getMenuTabKeyFromRoute(route) {
+  const normalizedPath = stripLocaleFromPath(route?.path || '')
+  if (!normalizedPath) return null
+
+  if (normalizedPath.startsWith('/menu/query/')) return 'query'
+  if (normalizedPath.startsWith('/menu/compare/')) return 'compare'
+  if (normalizedPath.startsWith('/menu/map/')) return 'map'
+  if (normalizedPath === '/menu/result') return 'result'
+  if (normalizedPath === '/menu/source') return 'source'
+  if (normalizedPath === '/menu/privacy') return 'privacy'
+  if (normalizedPath === '/menu/tools') return 'tools'
+  if (normalizedPath === '/menu/words') return 'words'
+  if (normalizedPath === '/menu/villages') return 'villages'
+  if (normalizedPath === '/menu/cluster') return 'cluster'
+  if (normalizedPath.startsWith('/menu/pho/')) return 'pho'
+  if (normalizedPath.startsWith('/menu/about/')) return 'about'
 
   return route?.query?.tab || null
 }
 
 export function useMenuTabsConfig() {
   const { t } = useI18n()
+  const route = useRoute()
 
   return computed(() => [
     createMenuTab({
@@ -144,7 +150,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: '/menu/pho/matrix' }
+        defaultTo: { path: withRouteLocale(route, '/menu/pho/matrix') }
       }
     }),
     createMenuTab({
@@ -156,7 +162,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: '/menu/query/zhonggu' }
+        defaultTo: { path: withRouteLocale(route, '/menu/query/zhonggu') }
       }
     }),
     createMenuTab({
@@ -170,7 +176,7 @@ export function useMenuTabsConfig() {
         }
       },
       navigation: {
-        defaultTo: { path: '/menu/result' }
+        defaultTo: { path: withRouteLocale(route, '/menu/result') }
       }
     }),
     createMenuTab({
@@ -182,7 +188,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: '/menu/map/view' }
+        defaultTo: { path: withRouteLocale(route, '/menu/map/view') }
       }
     }),
     createMenuTab({
@@ -194,7 +200,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: '/menu/compare/zhonggu' }
+        defaultTo: { path: withRouteLocale(route, '/menu/compare/zhonggu') }
       }
     }),
     createMenuTab({
@@ -206,7 +212,7 @@ export function useMenuTabsConfig() {
         overrides: {}
       },
       navigation: {
-        defaultTo: { path: '/menu/about/settings' }
+        defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
       }
     })
   ])
@@ -268,8 +274,9 @@ export function syncMenuBarMemoryFromRoute(route) {
   const tabKey = getMenuTabKeyFromRoute(route)
   if (!tabKey) return
 
-  if (MENU_CHILD_PATHS[tabKey]?.includes(route.path)) {
-    writeMenuBarMemory(tabKey, route.path)
+  const normalizedPath = stripLocaleFromPath(route?.path || '')
+  if (MENU_CHILD_PATHS[tabKey]?.includes(normalizedPath)) {
+    writeMenuBarMemory(tabKey, normalizedPath)
   }
 }
 
@@ -307,7 +314,7 @@ export function getMenuBarActiveTab(tabs, route) {
 export function resolveMenuBarTarget(tabConfig) {
   if (!tabConfig?.to) {
     const tabKey = tabConfig?.navigation?.tabKey || tabConfig?.tab
-    return MENU_CHILD_PATHS[tabKey]?.[0] || '/menu/query/zhonggu'
+    return MENU_CHILD_PATHS[tabKey]?.[0] || withRouteLocale(route, '/menu/query/zhonggu')
   }
 
   if (!tabConfig.navigation?.rememberChild) {
@@ -319,5 +326,7 @@ export function resolveMenuBarTarget(tabConfig) {
     return tabConfig.to
   }
 
-  return rememberedPath
+  const locale = extractLocaleFromPath(tabConfig.to?.path || '/')
+  return buildLocalePath(locale, rememberedPath)
 }
+

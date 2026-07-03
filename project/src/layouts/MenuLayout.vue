@@ -2,47 +2,43 @@
 <template>
   <div class="menu-bg">
     <NavBar />
-<!--    <FloatingHeader v-if="shouldShowHeader" />-->
-      <!-- 內容區：注意底部留白避免被 tab 擋住 -->
-      <div class="glass-content">
-        <router-view v-slot="{ Component }">
-          <transition name="fade" mode="out-in">
-            <KeepAlive :include="keepAliveViewNames">
-              <component :is="Component" />
-            </KeepAlive>
-          </transition>
-        </router-view>
-      </div>
-<!--    <MenuTabs />-->
-<!--    <TabControls />-->
+    <!--    <FloatingHeader v-if="shouldShowHeader" />-->
+    <!-- 內容區：注意底部留白避免被 tab 擋住 -->
+    <div class="glass-content">
+      <router-view v-slot="{ Component }">
+        <transition
+          name="fade"
+          mode="out-in"
+        >
+          <KeepAlive :include="keepAliveViewNames">
+            <component :is="Component" />
+          </KeepAlive>
+        </transition>
+      </router-view>
+    </div>
+    <PageTutorialGuide />
+    <PanelManager />
   </div>
 </template>
 
 <script setup>
-import { KeepAlive } from 'vue'
 // import MenuTabs from '@/components/MenuTabs.vue'
 // import TabControls from "@/components/TabControls.vue";
 // import FloatingHeader from '@/components/FloatingHeader.vue'
-// import { useRoute } from 'vue-router'
 // import { computed } from 'vue'
 import NavBar from "@/components/bar/NavBar.vue";
+import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
+import PanelManager from '@/main/components/result/PanelManager.vue'
 
 const keepAliveViewNames = [
-  'AboutPage',
   'ComparePage',
   'DialectClustering',
   'MapPage',
   'PhoPage',
-  'PrivacyPage',
   'QueryPage',
   'ResultPage',
-  'SourcePage',
-  'ToolsPage',
-  'VillagesPage',
-  'WordsPage'
 ]
 
-// const route = useRoute()
 // const shouldShowHeader = computed(() => {
 //   // console.log(route)
 //   return route.query.tab !== 'about' && !route.path.includes('auth')
@@ -99,6 +95,7 @@ nav {
 
 /* 內容區：底部預留給 tabs 的高度 */
 .glass-content {
+  position: relative;
   /* tab 高度 + 間距 */
   padding: 10dvh 12px 12px;
   color: #0b2540;
@@ -112,8 +109,8 @@ nav {
 }
 
 /* 動畫 */
-.fade-enter-active, .fade-leave-active { transition: opacity .25s ease, transform .25s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(6px); }
+.fade-enter-active, .fade-leave-active { transition: opacity .14s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 
 /* 📱 手機：只調整文字與按鈕 */
 @media (max-aspect-ratio: 1/1)  {

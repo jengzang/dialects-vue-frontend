@@ -25,14 +25,13 @@
           >
             {{ t('map.drawTab.voronoi.clearSelection') }}
           </button>
-          <label class="scope-toggle-label summary-toggle-label">
-            <input
-              :checked="clipToNationalBorder"
-              type="checkbox"
-              @change="emit('update:clip-to-national-border', $event.target.checked)"
-            >
-            <span>{{ t('map.drawTab.voronoi.clipToNationalBorder') }}</span>
-          </label>
+          <CheckBox
+            class="scope-toggle-label summary-toggle-label"
+            :model-value="clipToNationalBorder"
+            @update:modelValue="emit('update:clip-to-national-border', $event)"
+          >
+            {{ t('map.drawTab.voronoi.clipToNationalBorder') }}
+          </CheckBox>
         </div>
       </div>
 
@@ -41,23 +40,20 @@
           <div class="main-list-state-title">{{ t('map.drawTab.voronoi.exportListEmpty') }}</div>
         </div>
         <div v-else class="voronoi-export-list">
-          <label
+          <CheckBox
             v-for="group in groups"
             :key="group.key"
             class="scope-checkbox-item voronoi-export-item"
             :class="{ 'is-disabled': !selectedKeys.includes(group.key) && isSelectionFull }"
+            :model-value="selectedKeys.includes(group.key)"
+            :disabled="!selectedKeys.includes(group.key) && isSelectionFull"
+            @update:modelValue="emit('toggle-selection', group.key)"
           >
-            <input
-              :checked="selectedKeys.includes(group.key)"
-              :disabled="!selectedKeys.includes(group.key) && isSelectionFull"
-              type="checkbox"
-              @change="emit('toggle-selection', group.key)"
-            >
             <span class="scope-selection-copy voronoi-export-item-copy">
               <span class="scope-selection-title">{{ group.name }}</span>
               <span class="scope-selection-meta">{{ t('map.drawTab.voronoi.exportLayerMeta', { count: group.pointCount }) }}</span>
             </span>
-          </label>
+          </CheckBox>
         </div>
       </section>
     </div>
@@ -84,6 +80,7 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 defineProps({
   modelValue: { type: Boolean, default: false },

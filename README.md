@@ -20,7 +20,7 @@
 - `project/src/VillagesML`：VillagesML 子應用，承載自然村資料分析與機器學習工作台。
 - `project/src/api`、`project/src/components`、`project/src/composables`、`project/src/i18n`、`project/src/layouts`、`project/src/seo`、`project/src/styles`、`project/src/utils`：兩個入口共用的基礎設施層。
 
-這份根 README 是倉庫入口文檔，重點說明當前真實結構、啟動方式、路由語義與文檔入口。更細的架構、API、設計與協作規範分別維護在 `docs/` 中。
+這份根 README 是倉庫入口文檔，重點說明當前真實結構、啟動方式、路由語義、版本節點與文檔入口。更細的架構、API、設計與協作規範分別維護在 `docs/` 中。
 
 ---
 
@@ -34,13 +34,13 @@
 - **結果展示**：列表、表格與查詢結果整合視圖。
 - **地圖可視化**：方言點地理分布、分區查看、自定義數據與地圖繪製。`/menu/map/view` 承載常規方言地圖，`/menu/map/divide` 承載分區查看，`/menu/map/custom` 承載用戶自定義資料錄入，`/menu/map/draw` 承載圖層式地圖繪製、泰森多邊形、底圖切換、圖層導入 / 導出與圖片導出。
 - **用戶自定義數據**：支持「補充單點資料」與「製作特徵分布」雙模式，整合小地圖選點定位、地名模糊補全、特徵範圍選擇、明細表格、個人數據頁同步展示與登錄態保護。
-- **音系分析**：音系矩陣、自定義音素表、音節統計、音變 / 演化相關頁面。
+- **音系分析**：音系矩陣、自定義音素表、查音位、音節統計、音變 / 演化相關頁面。演化頁已支持 URL 狀態同步、桑基圖（Sankey）切換、優化鏈路布局與懸浮詳情卡；音節統計頁已擴展圖表區、跳轉導航與默認 JSON 聚合數據展示。
 - **音值比較**：在比較頁提供獨立音值比較結果組件，支持多地點音值對照與桑基圖（Sankey）可視化。
 - **詞彙與語法資料**：語保詞彙、語保語法、陽春口語資料入口。
 - **自然村資料入口**：主站中的自然村資料總入口與導航。
-- **方言聚類**：面向方言點的聚類分析頁面（包含聚類參數輸入、分析工作流面板與 ECharts 樹狀圖聚類結果展示）。
+- **方言聚類**：面向方言點的聚類分析頁面。當前已演進為分步式 workspace，包含步驟導航、聚類參數輸入、任務側欄、工作流面板、結果面板與重置流程。
 - **個人中心與頭像自定義**：全新個人中心，支持設置磨砂玻璃、液態玻璃等多種特效與圓形、圓角矩形、水滴形等形狀的自定義頭像，並在全站導航欄自動同步展示。
-- **說明、支持與站點信息**：資料來源、隱私、建議、鳴謝、設置等頁面。首頁展示版本信息與資料庫版本，支持更新公告彈窗、訪問統計、SEO metadata、robots.txt 與 sitemap。
+- **說明、支持與站點信息**：資料來源、隱私、建議、鳴謝、設置等頁面。首頁展示版本信息與資料庫版本，支持更新公告彈窗、訪問統計、SEO metadata、robots.txt 與 sitemap；字表總數 / 地點總數會基於 `dbVersion` 做本地緩存與失效控制。
 
 ### Explore 工具區
 
@@ -51,6 +51,7 @@
 - `merge`：字表合併工具。
 - `praat`：Praat 音頻處理與聲學分析頁面。
 - `manage`：表格 / 數據管理頁面。
+- `derive`：字表推導工具。
 - `yubao`：語保相關資料頁。
 - `char-class`：字符分類與統計分析頁。
 - `yc-spoken`：陽春口語資料頁。
@@ -69,7 +70,7 @@
 - 區域分析
 - ML 計算與聚類工作流
 
-VillagesML 的詳細功能說明請直接閱讀 [VillagesML 功能總覽](./docs/VillagesML/FEATURE_OVERVIEW.md) 與 [VillagesML 使用指南](./docs/VillagesML/USER_GUIDE.md)。
+VillagesML 的詳細功能說明請直接閱讀 [VillagesML 功能總覽](./docs/VillagesML/FEATURE_OVERVIEW.md) 與 [VillagesML 使用指南](./docs/VillagesML/USER_GUIDE.md)。需要注意的是，當前版本仍保持 `villagesML/` 獨立入口與獨立 workspace 邏輯，與主站間通過共享 API、i18n、樣式與部分通用組件協作。
 
 ---
 
@@ -421,15 +422,17 @@ npm run deploy:ps
 - `project/src/utils/map/`
 - `project/tests/mapDraw*.test.js`
 
-### 6. 更新公告版本與 README 更新日誌要分開核對
+### 6. 首頁更新公告版本與 README 更新日誌要分開核對
 
 首頁更新公告來自 `project/src/main/config/updateNoticeConfig.js`，當前字段包括：
 
-- `version: 'v4.5.0'`
-- `dbVersion: '2026-06-20'`
-- `lastUpdateDate: '2026-06-17'`
+- `version: 'v4.6.0'`
+- `dbVersion: '2026-06-22'`
+- `lastUpdateDate: '2026-07-02'`
 
-README 的更新日誌則按倉庫提交歷史記錄版本演進。當前代碼歷史已經包含 `v4.6.5`，如果後續修改公告彈窗版本號，需要同步核對 README、首頁 footer 與更新公告的展示語義。
+README 的更新日誌則按倉庫提交歷史記錄版本演進。也就是說：首頁公告版本、README 版本小節、git 合併節點不一定一一等號，整理版本說明時應按各自語義分開核對，不要把首頁彈窗版本號直接當成唯一的 git 版本基點。
+
+另外，當前 `main` 分支的最新版本節點已經到 `v4.6.8`；下方版本小節已補齊 `v4.6.7` / `v4.6.8`，用於對齊實際版本歷史口徑。
 
 ### 7. 文檔維護以中文版本為主
 
@@ -526,11 +529,11 @@ README 的更新日誌則按倉庫提交歷史記錄版本演進。當前代碼�
   - 元音點圖
   - 手動分段支持
   - 頻譜圖
-  - 石峰 T 值法
+  - 石鋒 T 值法
 - Check 工具性能優化
 
 #### v3.7.0 (2026-02-10 ~ 2026-02-12)
-- 石峰 T 值法導出 Excel
+- 石鋒 T 值法導出 Excel
 - 元音空間提示
 - 排行榜功能
 - HelpIcon 組件
@@ -660,6 +663,26 @@ README 的更新日誌則按倉庫提交歷史記錄版本演進。當前代碼�
 - 補充 `uiPreferences`、`useCustomDataPresence`、`useVisitStats`、`loginPromptTracker` 等共享狀態與用戶體驗工具
 - 持續補全 MapDraw 相關測試，覆蓋底圖、圖層導入格式、圖層管理、圖層順序、屬性編輯、導出同步、持久化、只讀隔離、渲染順序與右側工具面板布局
 
+#### v4.6.7 (2026-06-24)
+- 進一步優化「查音位」與「音節統計」頁面：
+  - 擴展 `Countphos.vue` 的圖表聚合、錨點跳轉與地點導航能力
+  - 補充 `yinweiInput.js`、`ResultTable.js` 等結果整形與輸入處理工具
+  - 增強 `YinweiSelector.vue`、`ResultList.vue`、`DataRow.vue` 等結果鏈路組件
+- 更新 `feature_counts_20260624.json` 等音系統計數據資源
+- 調整多語文案、導航配置與結果展示細節，提升查音位 / 音節統計頁面的整體可讀性
+
+#### v4.6.8 (2026-06-25)
+- `main` 分支版本推進到 `v4.6.8`，主題為「組件拆分與復用；音系音素演化頁面的 URL 完善」
+- 音系 / 音素 / 演化頁面持續拆分共用交互組件並提升復用度，新增或強化：
+  - `project/src/components/selector/CheckBox.vue`
+  - `project/src/components/ToastAndHelp/HoverDetailCard.vue`
+  - `project/src/components/ToastAndHelp/hoverDetailCardPosition.js`
+- `EvolutionPage.vue` 完善 URL 狀態、懸浮詳情卡、桑基圖與移動端詳情呈現
+- `CheckTool.vue` 完成一輪工作區與側欄交互重整
+- `DialectClustering.vue` / `useClusterWorkspace.js` 等聚類頁面組件繼續向可分步工作流與共享面板結構收斂
+- `useSourceStats.js` 新增字表 / 地點統計本地緩存邏輯，用於減少首頁統計的重複請求
+- 同步整理多語文案、導航配置、樣式玻璃層與公共表單控件，讓主站多個功能面共享更一致的交互基礎
+
 ### 版本階段概覽
 
 - **v1.x**：原生 JavaScript 實現（2025-09 ~ 2026-01）
@@ -683,6 +706,8 @@ README 的更新日誌則按倉庫提交歷史記錄版本演進。當前代碼�
 12. **v4.5.0**：多字集切換與當前一輪穩定性修復
 13. **v4.4.7 / v4.6.0**：方言聚類工作流、用戶自定義數據錄入、頭像自定義與音值比較重構
 14. **v4.6.5**：初版地圖繪製、泰森多邊形、圖層導入 / 導出與 SEO 初步
+15. **v4.6.7**：查音位與音節統計頁面優化
+16. **v4.6.8**：組件拆分與復用、音系音素演化頁面的 URL 與交互完善
 
 ---
 

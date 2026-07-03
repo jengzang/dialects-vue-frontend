@@ -5,13 +5,16 @@
         <span class="icon">{{ hasChildren ? '📁' : '📍' }}</span>
         <span class="text" v-if="isMatch" v-html="highlightName"></span>
         <span class="text" v-else>{{ displayName }}</span>
+        <span v-if="node._loadingChildren" class="lazy-indicator">↻</span>
       </div>
 
       <div class="buttons-group">
         <button
             class="map-btn"
+            :class="{ 'is-disabled': node._lazy && !node._childrenLoaded }"
             @click.stop="handleMapClick"
-            :title="hasChildren ? t('tableTree.villagesTreeItem.drawAllChildrenMap') : t('tableTree.villagesTreeItem.drawCurrentVillageMap')"
+            :title="mapButtonTitle"
+            :disabled="node._lazy && !node._childrenLoaded"
         >
           🌍
         </button>
@@ -26,6 +29,12 @@
       </div>
     </div>
 
+    <!-- Lazy load error state -->
+    <div v-if="node._loadError" class="lazy-error">
+      <span class="error-text">{{ node._loadError }}</span>
+      <button class="retry-btn-small" @click.stop="toggle">重試</button>
+    </div>
+
     <transition
         name="expand"
         @enter="enter"
@@ -38,6 +47,7 @@
             :key="child.id"
             :node="child"
             :search-query="searchQuery"
+            :lazy-load-fn="lazyLoadFn"
             @open-map="emit('open-map', $event)"
         />
       </div>
@@ -56,6 +66,7 @@ defineOptions({
 const props = defineProps({
   node: Object,
   searchQuery: String,
+  lazyLoadFn: Function,
 });
 
 const emit = defineEmits(['open-map']);
@@ -64,6 +75,9 @@ const { t } = useI18n();
 const isOpen = ref(false);
 
 const hasChildren = computed(() => {
+  if (props.node._lazy && !props.node._childrenLoaded && !props.node._loadError) {
+    return true
+  }
   return props.node.children && props.node.children.length > 0;
 });
 
@@ -71,6 +85,15 @@ const hasChildren = computed(() => {
 const displayName = computed(() => {
   return props.node.name === '(空)' ? t('tableTree.villagesTreeItem.expandPrompt') : props.node.name;
 });
+
+const mapButtonTitle = computed(() => {
+  if (props.node._lazy && !props.node._childrenLoaded) {
+    return t('tableTree.villagesTreeItem.expandFirstForMap')
+  }
+  return hasChildren.value
+    ? t('tableTree.villagesTreeItem.drawAllChildrenMap')
+    : t('tableTree.villagesTreeItem.drawCurrentVillageMap')
+})
 
 // Auto-expand based on _autoExpand flag
 watch(() => props.node, (newNode) => {
@@ -81,7 +104,13 @@ watch(() => props.node, (newNode) => {
   }
 }, { immediate: true, deep: true });
 
-const toggle = () => {
+const toggle = async () => {
+  if (!isOpen.value && props.node._lazy && !props.node._childrenLoaded) {
+    if (props.lazyLoadFn) {
+      await props.lazyLoadFn(props.node)
+      if (props.node._loadError) return
+    }
+  }
   isOpen.value = !isOpen.value;
 };
 
@@ -242,6 +271,55 @@ const leave = (el) => {
 .map-btn:hover {
   background: rgba(52, 199, 89, 0.15);
   transform: scale(1.1);
+}
+
+.map-btn.is-disabled,
+.map-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.map-btn.is-disabled:hover,
+.map-btn:disabled:hover {
+  background: transparent;
+  transform: none;
+}
+
+.lazy-indicator {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 14px;
+  color: #007AFF;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.lazy-error {
+  padding: 8px 12px;
+  margin: 4px 0 4px 20px;
+  background: rgba(211, 47, 47, 0.06);
+  border: 1px solid rgba(211, 47, 47, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #d32f2f;
+}
+
+.lazy-error .retry-btn-small {
+  padding: 3px 10px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(211, 47, 47, 0.12);
+  color: #d32f2f;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .children-container {

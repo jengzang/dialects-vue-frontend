@@ -303,9 +303,6 @@ async function create_map1(create_mep = false){
 
         // 如果数据存在，动态更新地图
         if (locations_data && create_mep) {
-            // 更新地图中心点和缩放级别
-            map.setCenter(locations_data.center_coordinate);
-            map.setZoom(locations_data.zoom_level);
 
             // 清除旧的标记
             map.clearMap();
@@ -545,9 +542,6 @@ async function triggerDrawingFunction() {
 
     if (window.mergedData) {
         // console.log("绘图正常运行")
-        // 更新地图中心点和缩放级别
-        map.setCenter(window.mergedData[0].centerCoordinate);
-        map.setZoom(window.mergedData[0].zoomLevel);
 
         // 清除旧的标记
         map.clearMap();
@@ -841,8 +835,6 @@ async function create_dot_all() {
             return;
         }
         const mapParams = {
-            center_coordinate: all_locations_dot.center_coordinate,
-            zoom_level: all_locations_dot.zoom_level,
             max_level: maxLevel
         };
         let result = [];
@@ -905,10 +897,6 @@ async function create_dot_all() {
                 v_togglePanel(resultpanel, 15, 5, 2);
                 v_togglePanel(mappanel, 90, 10, 3);
             }
-            // 更新地图中心点和缩放级别
-            map.setCenter(mapParams.center_coordinate);
-            map.setZoom(mapParams.zoom_level);
-
             // 清除旧的标记
             map.clearMap();
 

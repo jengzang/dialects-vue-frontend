@@ -139,12 +139,17 @@ const categoryConfigs = computed(() => [
         tooltip: t('user.leaderboard.categories.other.tooltips.coordinates')
       },
       {
+        key: 'endpoint_group_locations',
+        label: t('user.leaderboard.categories.other.items.locations'),
+        tooltip: t('user.leaderboard.categories.other.tooltips.locations')
+      },
+      {
         key: 'endpoint__sql_query',
         label: t('user.leaderboard.categories.other.items.table'),
         tooltip: t('user.leaderboard.categories.other.tooltips.table')
       },
       {
-        key: 'endpoint__sql_tree_full',
+        key: 'endpoint_group_sql_tree',
         label: t('user.leaderboard.categories.other.items.tree'),
         tooltip: t('user.leaderboard.categories.other.tooltips.tree')
       },
@@ -981,7 +986,7 @@ const tableData = computed(() => {
   }
 
   .table-wrapper {
-    width: 100%;
+    width: 98dvw;
     align-self: stretch;
     min-width: 0;
     padding: 12px 0;

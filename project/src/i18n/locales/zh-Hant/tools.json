@@ -12,6 +12,10 @@
     "name": "字表合併",
     "desc": "合併多個字表數據"
   },
+  "deriveTables": {
+    "name": "字表推導",
+    "desc": "基於少量樣本與規則生成完整字表"
+  },
   "praatAnalysis": {
     "name": "聲學分析",
     "desc": "基於 Praat 進行基頻、共振峰等分析"
@@ -65,8 +69,8 @@
       "totalRules": "總規則",
       "enabledRules": "已啟用",
       "disabledRules": "已停用",
-      "exportTitle": "匯出規則配置",
-      "importTitle": "匯入規則配置",
+      "exportTitle": "導出規則配置",
+      "importTitle": "導入規則配置",
       "headers": {
         "index": "序號",
         "source": "待替換內容",
@@ -101,9 +105,9 @@
       "resetSuccess": "已重置為默認配置",
       "saveSuccess": "配置已保存",
       "saveFailed": "保存失敗：{message}",
-      "importSuccess": "匯入成功",
+      "importSuccess": "導入成功",
       "importInvalid": "檔案格式錯誤：必須是數組格式",
-      "importFailed": "匯入失敗：{message}",
+      "importFailed": "導入失敗：{message}",
       "progressFailed": "獲取進度失敗：{message}",
       "processFailed": "處理失敗：{message}",
       "taskMissing": "未找到任務 ID",
@@ -128,7 +132,7 @@
       "title": "上傳參考表",
       "desc": "參考表用於確定欄位與字符範圍，可上傳自備檔案或直接使用默認參考表。",
       "uploadText": "點擊或拖拽上傳參考表 Excel 檔案",
-      "uploadHint": "支援 .xlsx 與 .xls 格式",
+      "uploadHint": "支持 .xlsx 與 .xls 格式",
       "charCount": "字數",
       "columnCount": "列數",
       "viewDefault": "查看默認參考表",
@@ -175,7 +179,7 @@
     "validation": {
       "loginRequired": "請先登錄",
       "invalidFileType": "請上傳 Excel 檔案（.xlsx 或 .xls 格式）",
-      "partialInvalid": "部分檔案格式不正確，僅支援 .xlsx 與 .xls 格式",
+      "partialInvalid": "部分檔案格式不正確，僅支持 .xlsx 與 .xls 格式",
       "fileTooLarge": "以下檔案超過 3MB 限制：{files}",
       "referenceFileTooLarge": "檔案大小不得超過 3MB",
       "maxFiles": "最多只能上傳 20 個檔案，當前已存在 {count} 個檔案"
@@ -197,6 +201,56 @@
       "defaultReferenceFileName": "参考表.xlsx",
       "mainSheetName": "主表",
       "supplementSheetName": "補充表"
+    }
+  },
+  "derive": {
+    "page": {
+      "badge": "ALPHA",
+      "title": "字表推導工具",
+      "subtitle": "先提供頁面殼子，用於後續承接樣本上傳、規則選擇與推導結果預覽。"
+    },
+    "sections": {
+      "workflow": {
+        "title": "推導流程",
+        "desc": "圍繞「少量已知字音 → 規則映射 → 完整字表」組織後續能力。",
+        "steps": {
+          "source": {
+            "title": "輸入種子字表",
+            "desc": "上傳少量已整理樣本，作為推導起點。"
+          },
+          "rules": {
+            "title": "選擇推導規則",
+            "desc": "後續將在這裡接入韻書、音類與映射方案。"
+          },
+          "result": {
+            "title": "生成推導結果",
+            "desc": "輸出完整字表、規則軌跡與人工覆核清單。"
+          }
+        }
+      },
+      "inputs": {
+        "title": "預留輸入區",
+        "desc": "後續頁面會在這裡放置上傳、參數選擇與校驗配置。",
+        "items": {
+          "seedTable": "種子字表 / 參考樣本",
+          "phonologyPreset": "音韻規則與韻書預設",
+          "validationConfig": "推導範圍與結果校驗參數"
+        }
+      },
+      "outputs": {
+        "title": "預期輸出",
+        "desc": "此處先展示後續結果模組的結構占位。",
+        "tags": {
+          "derivedTable": "推導字表",
+          "ruleTrace": "規則軌跡",
+          "reviewChecklist": "人工覆核清單"
+        }
+      },
+      "status": {
+        "title": "目前狀態",
+        "desc": "本階段僅完成導航、頁面接入與樣式框架，業務邏輯後續補充。",
+        "placeholder": "字表推導功能殼子已接入，可在此基礎上繼續擴展表單、任務流與結果區。"
+      }
     }
   },
   "checkTool": {

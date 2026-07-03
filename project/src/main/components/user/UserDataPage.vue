@@ -64,10 +64,9 @@
         <thead>
           <tr>
             <th class="col-check">
-              <input
-                type="checkbox"
-                :checked="isAllSelected"
-                @change="toggleSelectAll"
+              <CheckBox
+                :model-value="isAllSelected"
+                @update:modelValue="toggleSelectAll"
               />
             </th>
             <th>{{ t('user.dataPage.table.shortName') }}</th>
@@ -93,10 +92,9 @@
           </tr>
           <tr v-for="record in paginatedData" :key="record.created_at">
             <td class="col-check">
-              <input
-                v-model="selectedRecords"
-                type="checkbox"
-                :value="record.created_at"
+              <CheckBox
+                :model-value="selectedRecords.includes(record.created_at)"
+                @update:modelValue="toggleRecordSelection(record.created_at, $event)"
               />
             </td>
             <td>{{ record.簡稱 }}</td>
@@ -327,12 +325,14 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import AppModal from '@/components/common/AppModal.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import { batchCreateCustomData, batchDeleteCustomData, editCustomData, getAllCustomData } from '@/api'
 import { invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
 import { userStore } from '@/main/store/store.js'
 import { showConfirm, showError, showSuccess, showWarning } from '@/utils/message.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -456,18 +456,29 @@ const fetchData = async () => {
       showError(t('user.dataPage.messages.fetchFailed', { message: error.message }))
 
       if (error.message.includes('401') || error.message.includes('登錄') || error.message.includes('登录')) {
-        setTimeout(() => router.replace('/auth'), 1500)
+        setTimeout(() => router.replace(buildLocalePath(resolveRouteLocale(route), '/auth')), 1500)
       }
     }
   })
 }
 
-const toggleSelectAll = (event) => {
-  if (event.target.checked) {
+const toggleSelectAll = (checked) => {
+  if (checked) {
     selectedRecords.value = paginatedData.value.map((record) => record.created_at)
   } else {
     selectedRecords.value = []
   }
+}
+
+const toggleRecordSelection = (recordId, checked) => {
+  if (checked) {
+    if (!selectedRecords.value.includes(recordId)) {
+      selectedRecords.value = [...selectedRecords.value, recordId]
+    }
+    return
+  }
+
+  selectedRecords.value = selectedRecords.value.filter((id) => id !== recordId)
 }
 
 const handleSearch = () => {
@@ -725,13 +736,13 @@ const formatDate = (dateStr) => {
 }
 
 const goBack = () => {
-  router.push('/auth')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
 }
 
 onMounted(() => {
   if (!userStore.isAuthenticated) {
     showWarning(t('user.dataPage.messages.authRequired'))
-    router.push('/auth')
+    router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
     return
   }
 
@@ -1080,13 +1091,6 @@ $user-success: #34c759;
   padding: 10px 15px;
   border-radius: 15px;
   font-size: 14px;
-}
-
-input[type='checkbox'] {
-  width: 16px;
-  height: 16px;
-  accent-color: $user-accent;
-  cursor: pointer;
 }
 
 .table-container {

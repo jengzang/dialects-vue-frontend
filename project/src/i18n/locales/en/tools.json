@@ -12,6 +12,10 @@
     "name": "Merge Tables",
     "desc": "Merge multiple data tables"
   },
+  "deriveTables": {
+    "name": "Character Table Inference",
+    "desc": "Generate a complete character table from a small sample and rule presets"
+  },
   "praatAnalysis": {
     "name": "Acoustic Analysis",
     "desc": "Analyze pitch, formants, and related data with Praat"
@@ -197,6 +201,56 @@
       "defaultReferenceFileName": "参考表.xlsx",
       "mainSheetName": "主表",
       "supplementSheetName": "補充表"
+    }
+  },
+  "derive": {
+    "page": {
+      "badge": "ALPHA",
+      "title": "Character Table Inference Tool",
+      "subtitle": "This first pass provides the page shell for future sample upload, rule selection, and inferred result preview flows."
+    },
+    "sections": {
+      "workflow": {
+        "title": "Inference Workflow",
+        "desc": "Future capabilities will be organized around “seed readings → rule mapping → full table output”.",
+        "steps": {
+          "source": {
+            "title": "Input Seed Table",
+            "desc": "Upload a small curated sample as the starting point for inference."
+          },
+          "rules": {
+            "title": "Select Rule Presets",
+            "desc": "Rhyme books, phonological classes, and mapping presets will be connected here later."
+          },
+          "result": {
+            "title": "Generate Results",
+            "desc": "Output the inferred table, rule trace, and a manual review checklist."
+          }
+        }
+      },
+      "inputs": {
+        "title": "Reserved Inputs",
+        "desc": "This area is reserved for upload controls, parameter selection, and validation options. ",
+        "items": {
+          "seedTable": "Seed table / reference sample",
+          "phonologyPreset": "Phonology rules and rhyme-book presets",
+          "validationConfig": "Inference scope and validation settings"
+        }
+      },
+      "outputs": {
+        "title": "Planned Outputs",
+        "desc": "This section currently acts as a placeholder for the future result modules.",
+        "tags": {
+          "derivedTable": "Inferred table",
+          "ruleTrace": "Rule trace",
+          "reviewChecklist": "Manual review checklist"
+        }
+      },
+      "status": {
+        "title": "Current Status",
+        "desc": "This step only lands navigation, page wiring, and the visual scaffold. Business logic will be added later.",
+        "placeholder": "The character table inference shell is now wired in and ready for future forms, task flow, and result panels."
+      }
     }
   },
   "checkTool": {
