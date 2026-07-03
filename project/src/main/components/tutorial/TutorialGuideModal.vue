@@ -91,6 +91,7 @@
           class="tutorial-catalog-float-button"
           @click="$emit('update:isCatalogOpen', true)"
         >
+          <span class="tutorial-catalog-float-button__icon">☰</span>
           目录
         </button>
 
@@ -402,19 +403,17 @@ $glass-border-strong: rgba(255, 255, 255, 0.72);
 $blue-border-soft: rgba(122, 176, 230, 0.18);
 $blue-border-panel: rgba(110, 160, 214, 0.18);
 
-$float-catalog-top: max(112px, calc(env(safe-area-inset-top, 0px) + 17dvh));
-$float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
+$float-catalog-top: max(50px, calc(env(safe-area-inset-top, 0px) + 15dvh));
+$float-catalog-left: max(10px, calc(env(safe-area-inset-left, 0px) + 10px));
 
 @mixin glass-panel {
-  border: 1px solid $glass-border;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(230, 242, 255, 0.42)),
-    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.9), transparent 38%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.48);
   box-shadow:
-    0 14px 34px rgba(38, 105, 176, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
+    0 14px 34px rgba(38, 105, 176, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
 }
 
 @mixin single-line {
@@ -457,7 +456,7 @@ $float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
 
     .tutorial-experience {
       gap: 9px;
-      padding: 10px;
+      padding: 4px 10px;
 
       &__body {
         grid-template-columns: 1fr;
@@ -604,13 +603,14 @@ $float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
   gap: 12px;
   min-width: 0;
   padding: 10px 12px;
-  border: 1px solid $blue-border-soft;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 16px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.62), rgba(226, 241, 255, 0.42));
+  background: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.74),
-    0 8px 20px rgba(45, 103, 160, 0.06);
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    0 8px 20px rgba(45, 103, 160, 0.08);
 
   &__body {
     display: grid;
@@ -750,14 +750,16 @@ $float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
 .tutorial-entry {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid rgba(116, 168, 220, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.46);
+  background: rgba(255, 255, 255, 0.38);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
   text-align: left;
   cursor: pointer;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.68),
-    0 6px 14px rgba(45, 103, 160, 0.05);
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 6px 14px rgba(45, 103, 160, 0.06);
   transition:
     transform 0.18s ease,
     border-color 0.18s ease,
@@ -766,21 +768,25 @@ $float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
 
   &:hover {
     transform: translateY(-1px);
-    border-color: rgba(76, 146, 222, 0.34);
-    background: rgba(255, 255, 255, 0.68);
+    border-color: rgba(255, 255, 255, 0.62);
+    background: rgba(255, 255, 255, 0.52);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.82),
+      0 8px 18px rgba(45, 103, 160, 0.1);
   }
 
   &.is-active {
-    border-color: rgba(58, 138, 231, 0.56);
-    background:
-      linear-gradient(135deg, rgba(234, 246, 255, 0.92), rgba(210, 231, 255, 0.68));
+    border-color: rgba(100, 170, 240, 0.55);
+    background: rgba(220, 238, 255, 0.52);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
     box-shadow:
-      0 10px 22px rgba(62, 132, 211, 0.13),
-      inset 0 1px 0 rgba(255, 255, 255, 0.82);
+      0 10px 22px rgba(62, 132, 211, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.86);
   }
 
   &.is-current-route:not(.is-active) {
-    border-color: rgba(75, 148, 224, 0.26);
+    border-color: rgba(255, 255, 255, 0.55);
   }
 
   &__title-row {
@@ -890,6 +896,15 @@ $float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
       background: rgba(247, 251, 255, 0.72);
       overflow: auto;
     }
+
+    :deep(img) {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 12px 0;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(110, 160, 214, 0.12);
+    }
   }
 }
 
@@ -907,17 +922,18 @@ $float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
     min-width: 82px;
     min-height: 34px;
     padding: 7px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.68);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: $radius-pill;
-    background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.84), rgba(218, 236, 255, 0.58));
+    background: rgba(255, 255, 255, 0.44);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
     color: var(--color-blue-logo);
     font-size: 0.86rem;
     font-weight: 800;
     cursor: pointer;
     box-shadow:
-      0 8px 18px rgba(56, 123, 196, 0.11),
-      inset 0 1px 0 rgba(255, 255, 255, 0.78);
+      0 8px 18px rgba(56, 123, 196, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
     transition:
       transform 0.18s ease,
       box-shadow 0.18s ease,
@@ -989,8 +1005,8 @@ $float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
     top: $float-catalog-top;
     left: $float-catalog-left;
     z-index: $z-catalog-panel;
-    width: 70dvw;
-    max-width: 320px;
+    width: 75dvw;
+    max-width: 360px;
     height: 40dvh;
     max-height: 40dvh !important;
     padding: 10px;
@@ -1009,25 +1025,28 @@ $float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
       min-width: 46px;
       min-height: 30px;
-      padding: 6px 11px;
-      border: 1px solid $glass-border-strong;
+      padding: 8px 14px;
+      border: none;
       border-radius: $radius-pill;
-      background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(220, 238, 255, 0.62));
-      color: var(--color-blue-logo);
-      font-size: 0.82rem;
-      font-weight: 800;
+      background: #007aff;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
       cursor: pointer;
       box-shadow:
-        0 10px 22px rgba(56, 123, 196, 0.16),
-        inset 0 1px 0 rgba(255, 255, 255, 0.84);
-      backdrop-filter: blur(16px) saturate(160%);
-      -webkit-backdrop-filter: blur(16px) saturate(160%);
+        0 10px 24px rgba(0, 122, 255, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+
+      &__icon {
+        font-size: 0.85rem;
+        line-height: 1;
+      }
 
       &:active {
-        transform: scale(0.98);
+        transform: scale(0.97);
       }
     }
 
@@ -1041,15 +1060,14 @@ $float-catalog-left: max(14px, calc(env(safe-area-inset-left, 0px) + 14px));
       gap: 10px;
       margin: -10px -10px 10px;
       padding: 9px 10px;
-      border-bottom: 1px solid rgba(110, 160, 214, 0.16);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.42);
       border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-      background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(226, 241, 255, 0.72));
+      background: rgba(255, 255, 255, 0.5);
       color: var(--color-blue-dark);
       font-size: 0.86rem;
       font-weight: 850;
-      backdrop-filter: blur(16px) saturate(160%);
-      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      backdrop-filter: blur(28px) saturate(160%);
+      -webkit-backdrop-filter: blur(28px) saturate(160%);
     }
   }
 

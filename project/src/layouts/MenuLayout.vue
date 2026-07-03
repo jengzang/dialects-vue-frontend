@@ -37,13 +37,8 @@ const keepAliveViewNames = [
   'DialectClustering',
   'MapPage',
   'PhoPage',
-  'PrivacyPage',
   'QueryPage',
   'ResultPage',
-  'SourcePage',
-  'ToolsPage',
-  'VillagesPage',
-  'WordsPage'
 ]
 
 // const route = useRoute()
