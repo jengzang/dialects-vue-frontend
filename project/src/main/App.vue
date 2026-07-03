@@ -13,6 +13,15 @@
 
   <!-- 🍎 全局确认对话框 -->
   <GlobalConfirm />
+
+  <transition name="layout-loading-fade">
+    <div v-if="isRouteLoading" class="global-route-loading" aria-live="polite">
+      <div class="global-route-loading-shell">
+        <div class="ui-loading--page" aria-hidden="true"></div>
+        <p class="global-route-loading-text">頁面切換中...</p>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -31,6 +40,7 @@ import { initOnlineTimeTracker, stopOnlineTimeTracker } from '../utils/onlineTim
 import { initLoginPromptTracker, stopLoginPromptTracker } from '../utils/loginPromptTracker.js'
 import { getToken } from '../api/auth/auth.js'
 import { stripLocaleFromPath } from '../i18n/localeRouting.js'
+import { isRouteLoading } from '../stores/routeLoading.js'
 
 // // 🌉 建立 bridge 用於跨組件共享 iframe 狀態
 // const nativeFrame = ref(null)
@@ -143,8 +153,46 @@ export default {
     // }
 
     return {
-      layoutComponent
+      layoutComponent,
+      isRouteLoading
     }
   }
 }
 </script>
+
+<style>
+.global-route-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(234, 245, 255, 0.55);
+  pointer-events: none;
+}
+
+.global-route-loading-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.global-route-loading-text {
+  margin: 0;
+  color: #4a5568;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.layout-loading-fade-enter-active,
+.layout-loading-fade-leave-active {
+  transition: opacity 0.12s ease;
+}
+
+.layout-loading-fade-enter-from,
+.layout-loading-fade-leave-to {
+  opacity: 0;
+}
+</style>

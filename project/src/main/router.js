@@ -5,6 +5,7 @@ import i18n from '@/i18n/index.js'
 import { waitForAuthReady } from '@/api/auth/auth.js'
 import { userStore } from '@/main/store/store.js'
 import { showWarning } from '@/utils/message.js'
+import { showRouteLoading, hideRouteLoading } from '@/stores/routeLoading.js'
 import { menuRoutes } from '@/main/router/menuRoutes.js'
 import { exploreRoutes } from '@/main/router/exploreRoutes.js'
 import { resolvePreferredLocale } from '@/i18n/localeDetector.js'
@@ -393,6 +394,10 @@ function isSameQuery(left, right) {
 }
 
 router.beforeEach(async (to, from, next) => {
+  if (to.fullPath !== from.fullPath) {
+    showRouteLoading()
+  }
+
   const routeLocale = to.params.locale
   const currentRouteLocale = routeLocale || extractLocaleFromPath(to.path)
 
@@ -458,6 +463,18 @@ router.beforeEach(async (to, from, next) => {
 
   document.title = to.meta?.title || DEFAULT_TITLE
   next()
+})
+
+router.afterEach(() => {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      hideRouteLoading()
+    })
+  })
+})
+
+router.onError(() => {
+  hideRouteLoading()
 })
 
 export default router

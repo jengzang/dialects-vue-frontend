@@ -15,23 +15,12 @@
           </KeepAlive>
         </transition>
       </router-view>
-
-      <transition name="layout-loading-fade">
-        <div v-if="isRouteTransitionLoading" class="layout-loading-overlay" aria-live="polite">
-          <div class="layout-loading-shell">
-            <div class="ui-loading--page" aria-hidden="true"></div>
-            <p class="layout-loading-text">頁面切換中...</p>
-          </div>
-        </div>
-      </transition>
     </div>
     <PageTutorialGuide />
   </div>
 </template>
 
 <script setup>
-import { nextTick, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import ExploreBar from '@/components/bar/ExploreBar.vue'
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 
@@ -49,33 +38,6 @@ const keepAliveViewNames = [
   'YuBaoPage'
 ]
 
-const route = useRoute()
-const isRouteTransitionLoading = ref(false)
-let pendingHideToken = 0
-
-const finishRouteTransition = async () => {
-  const token = ++pendingHideToken
-  await nextTick()
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      if (token === pendingHideToken) {
-        isRouteTransitionLoading.value = false
-      }
-    })
-  })
-}
-
-watch(
-  () => route.fullPath,
-  async (nextPath, previousPath) => {
-    if (!previousPath || nextPath === previousPath) {
-      return
-    }
-
-    isRouteTransitionLoading.value = true
-    await finishRouteTransition()
-  }
-)
 </script>
 
 <style scoped>
@@ -108,32 +70,6 @@ watch(
   padding-top: calc(7.5dvh - 15px);
 }
 
-.layout-loading-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(234, 245, 255, 0.42);
-  border-radius: 28px;
-  z-index: 20;
-  pointer-events: none;
-}
-
-.layout-loading-shell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.layout-loading-text {
-  margin: 0;
-  color: #4a5568;
-  font-size: 14px;
-  font-weight: 500;
-}
-
 /* 移动端：调整 padding-top */
 @media (max-aspect-ratio: 1/1) {
   .content-area {
@@ -150,16 +86,6 @@ watch(
 
 .fade-enter-from,
 .fade-leave-to {
-  opacity: 0;
-}
-
-.layout-loading-fade-enter-active,
-.layout-loading-fade-leave-active {
-  transition: opacity 0.12s ease;
-}
-
-.layout-loading-fade-enter-from,
-.layout-loading-fade-leave-to {
   opacity: 0;
 }
 </style>
