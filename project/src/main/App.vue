@@ -5,9 +5,6 @@
     <router-view />
   </component>
 
-  <PanelManager />
-
-  <!-- 🍎 全局 Toast 提示 -->
   <RateLimitNotice />
   <GlobalToast />
 
@@ -18,7 +15,7 @@
     <div v-if="isRouteLoading" class="global-route-loading" aria-live="polite">
       <div class="global-route-loading-shell">
         <div class="ui-loading--page" aria-hidden="true"></div>
-        <p class="global-route-loading-text">頁面切換中...</p>
+        <p class="global-route-loading-text">{{ $t('common.label.loading') }}</p>
       </div>
     </div>
   </transition>
@@ -35,7 +32,6 @@ import ExploreLayout from '../layouts/ExploreLayout.vue'
 import GlobalToast from '../components/ToastAndHelp/GlobalToast.vue'
 import GlobalConfirm from '../components/ToastAndHelp/GlobalConfirm.vue'
 import RateLimitNotice from '../components/ToastAndHelp/RateLimitNotice.vue'
-import PanelManager from './components/result/PanelManager.vue'
 import { initOnlineTimeTracker, stopOnlineTimeTracker } from '../utils/onlineTimeTracker.js'
 import { initLoginPromptTracker, stopLoginPromptTracker } from '../utils/loginPromptTracker.js'
 import { getToken } from '../api/auth/auth.js'
@@ -58,8 +54,7 @@ export default {
   components: {
     GlobalToast,
     GlobalConfirm,
-    RateLimitNotice,
-    PanelManager
+    RateLimitNotice
   },
   setup() {
     const route = useRoute()

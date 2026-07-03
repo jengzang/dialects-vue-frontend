@@ -1,4 +1,15 @@
 <template>
+  <Teleport to="body" v-if="modelValue && isCompact && !isMobileLandscape && !isCatalogOpen">
+    <button
+      type="button"
+      class="tutorial-catalog-float-button"
+      @click="$emit('update:isCatalogOpen', true)"
+    >
+      <span class="tutorial-catalog-float-button__icon">☰</span>
+      {{ t('tutorial.ui.catalogLabel') }}
+    </button>
+  </Teleport>
+
   <AppModal
     :model-value="modelValue"
     size="sm"
@@ -85,16 +96,6 @@
       data-tutorial-modal
     >
       <div class="tutorial-shell__body">
-        <button
-          v-if="isCompact && !isMobileLandscape && !isCatalogOpen"
-          type="button"
-          class="tutorial-catalog-float-button"
-          @click="$emit('update:isCatalogOpen', true)"
-        >
-          <span class="tutorial-catalog-float-button__icon">☰</span>
-          目录
-        </button>
-
         <aside
           v-show="shouldShowCatalog"
           class="tutorial-catalog ui-scrollbar"
@@ -103,7 +104,7 @@
             v-if="isCompact && !isMobileLandscape"
             class="tutorial-catalog__float-header"
           >
-            <span>目录</span>
+            <span>{{ t('tutorial.ui.catalogLabel') }}</span>
             <button
               type="button"
               class="close-btn close-btn-sm close-btn-inline"
@@ -403,8 +404,9 @@ $glass-border-strong: rgba(255, 255, 255, 0.72);
 $blue-border-soft: rgba(122, 176, 230, 0.18);
 $blue-border-panel: rgba(110, 160, 214, 0.18);
 
-$float-catalog-top: max(50px, calc(env(safe-area-inset-top, 0px) + 15dvh));
+$float-catalog-top: max(50px, calc(env(safe-area-inset-top, 0px) + 20dvh));
 $float-catalog-left: max(10px, calc(env(safe-area-inset-left, 0px) + 10px));
+$float-catalog-button-left:0;
 
 @mixin glass-panel {
   border: 1px solid rgba(255, 255, 255, 0.55);
@@ -1011,6 +1013,11 @@ $float-catalog-left: max(10px, calc(env(safe-area-inset-left, 0px) + 10px));
     max-height: 40dvh !important;
     padding: 10px;
     border-radius: var(--radius-xl);
+    background: var(--glass-medium);
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    border: 2px solid var(--glass-border);
+    // box-shadow: var(--shadow-glass);
     overflow: auto;
     box-shadow:
       0 18px 42px rgba(38, 105, 176, 0.2),
@@ -1020,7 +1027,7 @@ $float-catalog-left: max(10px, calc(env(safe-area-inset-left, 0px) + 10px));
     &-float-button {
       position: fixed;
       top: $float-catalog-top;
-      left: $float-catalog-left;
+      left: $float-catalog-button-left;
       z-index: $z-catalog-button;
       display: inline-flex;
       align-items: center;
@@ -1028,9 +1035,9 @@ $float-catalog-left: max(10px, calc(env(safe-area-inset-left, 0px) + 10px));
       gap: 6px;
       min-width: 46px;
       min-height: 30px;
-      padding: 8px 14px;
+      padding: 10px 6px 10px 0px;
       border: none;
-      border-radius: $radius-pill;
+      border-radius: 0 100px 100px 0;
       background: #007aff;
       color: #fff;
       font-size: 0.8rem;
@@ -1060,7 +1067,7 @@ $float-catalog-left: max(10px, calc(env(safe-area-inset-left, 0px) + 10px));
       gap: 10px;
       margin: -10px -10px 10px;
       padding: 9px 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.42);
+      border-bottom: 1px solid rgba(223, 220, 220, 0.42);
       border-radius: var(--radius-xl) var(--radius-xl) 0 0;
       background: rgba(255, 255, 255, 0.5);
       color: var(--color-blue-dark);

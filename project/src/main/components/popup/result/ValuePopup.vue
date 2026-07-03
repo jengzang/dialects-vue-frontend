@@ -33,7 +33,7 @@ import { computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { parseFeatureString } from '@/main/utils/ResultTable.js';
 import { resultCache } from '@/main/store/store.js';
-import { getResultModeId, translateResultTerms } from '@/i18n/utils/resultI18n.js';
+import { getResultModeId } from '@/i18n/utils/resultI18n.js';
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -44,7 +44,10 @@ const props = defineProps({
 const emit = defineEmits(['close', 'confirm']);
 const { t } = useI18n();
 
-const checkedFeatures = computed(() => translateResultTerms(t, resultCache.features));
+const checkedFeatures = computed(() => {
+  const terms = (resultCache.features || []).filter(Boolean);
+  return terms.length > 0 ? terms.join(' · ') : t('result.terms.none');
+});
 
 const modeOptions = computed(() => {
   const modeId = getResultModeId(resultCache.mode || '');

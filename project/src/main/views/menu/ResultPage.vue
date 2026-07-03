@@ -218,9 +218,8 @@ watch(
 
         // ================= TAB 2: 查中古 =================
         else if (sourceTab === 'tab2') {
-          const modeCN = tabMap.value[sourceTab] || sourceTab;
           const featuresList = Array.isArray(newPayload.features) ? newPayload.features : [];
-          resultCache.mode = modeCN;
+          resultCache.mode = '查中古';
           resultCache.features = featuresList;
 
           const response = await searchZhongGu({
@@ -253,9 +252,8 @@ watch(
 
         // ================= TAB 3: 查音位 =================
         else if (sourceTab === 'tab3') {
-          const modeCN = tabMap.value[sourceTab] || sourceTab;
           const featuresList = Array.isArray(newPayload.features) ? newPayload.features : [];
-          resultCache.mode = modeCN;
+          resultCache.mode = '查音位';
           resultCache.features = featuresList;
 
           const response = await searchYinWei({

@@ -220,7 +220,7 @@ function openGuide() {
   }
 
   if (!disclaimerShown) {
-    // disclaimerShown = true
+    disclaimerShown = true
     showConfirm(t('tutorial.disclaimer.message'), {
       title: t('tutorial.disclaimer.title'),
       confirmText: t('tutorial.disclaimer.confirm'),

@@ -17,8 +17,7 @@
       </router-view>
     </div>
     <PageTutorialGuide />
-    <!--    <MenuTabs />-->
-    <!--    <TabControls />-->
+    <PanelManager />
   </div>
 </template>
 
@@ -29,6 +28,7 @@
 // import { computed } from 'vue'
 import NavBar from "@/components/bar/NavBar.vue";
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
+import PanelManager from '@/main/components/result/PanelManager.vue'
 
 const keepAliveViewNames = [
   'AboutPage',

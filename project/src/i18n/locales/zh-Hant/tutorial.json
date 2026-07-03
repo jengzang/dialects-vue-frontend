@@ -7,12 +7,13 @@
     "currentPage": "當前頁",
     "expandCatalog": "展開目錄",
     "collapseCatalog": "收起目錄",
+    "catalogLabel": "目錄",
     "currentBadge": "當前",
     "previous": "上一篇",
     "next": "下一篇",
     "missing": "教程暫未提供",
-    "hideTutorial": "不再顯示教學",
-    "hideTutorialTip": "你可以在「關於 - 設定」頁面重新開啟教學。"
+    "hideTutorial": "不再顯示教程",
+    "hideTutorialTip": "你可以在「關於 - 設定」頁面重新開啟教程。"
   },
   "categories": {
     "account": "賬戶與個人數據",
@@ -41,7 +42,7 @@
   },
   "disclaimer": {
     "title": "溫馨提示",
-    "message": "目前的教學內容由 AI 生成，其實没啥參考價值。站長暫時還沒有時間編寫正式的教學文件，如果你有興趣協助完善教學內容，我將非常歡迎！",
+    "message": "目前的教程內容由 AI 生成，參考價值有限。站長暫時還沒有時間編寫正式的教程文件，如果你有興趣協助完善教程內容，我將非常歡迎！",
     "confirm": "知道了"
   },
   "assist": {
@@ -69,8 +70,8 @@
         "button": "填入查調示例"
       },
       "compareChar": {
-        "title": "試一組比較字例",
-        "description": "自動填入兩組對比漢字與特徵，方便快速進入比較頁。",
+        "title": "試一組比較漢字",
+        "description": "自動填入兩組對比漢字與特徵，方便快速查看效果。",
         "button": "生成比較示例"
       },
       "compareZhonggu": {

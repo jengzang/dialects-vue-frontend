@@ -7,6 +7,7 @@
     "currentPage": "当前页",
     "expandCatalog": "展开目录",
     "collapseCatalog": "收起目录",
+    "catalogLabel": "目录",
     "currentBadge": "当前",
     "previous": "上一篇",
     "next": "下一篇",
@@ -41,7 +42,7 @@
   },
   "disclaimer": {
     "title": "温馨提示",
-    "message": "目前的教学内容由 AI 生成，其实没啥参考价值。站长暂时还没有时间编写正式的教学文件，如果你有兴趣协助完善教学内容，我将非常欢迎！",
+    "message": "目前的教程内容由 AI 生成，参考价值有限。站长暂时还没有时间编写正式的教程文件，如果你有兴趣协助完善教程内容，我将非常欢迎！",
     "confirm": "知道了"
   },
   "assist": {
@@ -69,8 +70,8 @@
         "button": "填入查调示例"
       },
       "compareChar": {
-        "title": "试一组比较字例",
-        "description": "自动填入两组对比汉字与特征，方便快速进入比较页。",
+        "title": "试一组比较汉字",
+        "description": "自动填入两组对比汉字与特征，方便快速查看效果。",
         "button": "生成比较示例"
       },
       "compareZhonggu": {

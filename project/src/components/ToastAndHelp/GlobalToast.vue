@@ -19,7 +19,7 @@
         </button>
         <button
           v-if="messageState.dismissText || messageState.actionText"
-          class="toast-dismiss"
+          class="close-btn"
           type="button"
           :aria-label="messageState.dismissText || 'Close'"
           @click.stop="hideMessage({ dismissed: true })"
@@ -183,8 +183,7 @@ function getIcon(type) {
   line-height: 1.4;
 }
 
-.toast-action,
-.toast-dismiss {
+.toast-action{
   border: 0;
   font: inherit;
   cursor: pointer;
@@ -214,22 +213,6 @@ function getIcon(type) {
 
 .global-toast.has-action.info .toast-action:hover {
   background: rgba(0, 122, 255, 0.18);
-}
-
-.toast-dismiss {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.28);
-  color: inherit;
-  font-size: 18px;
-  line-height: 1;
-  opacity: 0.72;
-}
-
-.toast-dismiss:hover {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.44);
 }
 
 /* 🎬 苹果风格动画 - 轻量上浮 */

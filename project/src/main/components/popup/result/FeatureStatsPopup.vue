@@ -46,6 +46,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { translateResultTerm } from '@/i18n/utils/resultI18n.js';
+
 import AppModal from '@/components/common/AppModal.vue'
 
 const props = defineProps({
