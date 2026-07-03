@@ -246,6 +246,15 @@ const normalizeTreeData = (rawData) => {
     return [];
   }
 
+  const pushChild = (children, result) => {
+    if (!result) return
+    if (Array.isArray(result)) {
+      children.push(...result)
+    } else {
+      children.push(result)
+    }
+  }
+
   const processNode = (data, name, level = 1) => {
     // Check if this is a leaf node (contains data fields)
     const isLeaf = data['方言分布'] !== undefined ||
@@ -253,24 +262,42 @@ const normalizeTreeData = (rawData) => {
                    data['latitude'] !== undefined;
 
     if (isLeaf) {
-      const formattedName = formatLeafNode(name, data);
-      return {
-        id: generateId(),
-        name: formattedName,
-        rawName: name,
-        rawData: data,
-        children: []
-      };
+      const lngs = Array.isArray(data['longitude']) ? data['longitude'] : []
+      const lats = Array.isArray(data['latitude']) ? data['latitude'] : []
+      const dialects = Array.isArray(data['方言分布']) ? data['方言分布'] : []
+      const count = Math.max(lngs.length, lats.length, 1)
+
+      if (count <= 1) {
+        return {
+          id: generateId(),
+          name: formatLeafNode(name, data),
+          rawName: name,
+          rawData: data,
+          children: []
+        }
+      }
+
+      // Duplicate leaf names with multiple records — split into individual nodes
+      return Array.from({ length: count }, (_, i) => {
+        const single = {}
+        if (dialects[i] !== undefined) single['方言分布'] = [dialects[i]]
+        if (lngs[i] !== undefined) single['longitude'] = [lngs[i]]
+        if (lats[i] !== undefined) single['latitude'] = [lats[i]]
+        return {
+          id: generateId(),
+          name: formatLeafNode(name, single),
+          rawName: name,
+          rawData: single,
+          children: []
+        }
+      })
     }
 
     // Process branch node
     const children = [];
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        const childNode = processNode(data[key], key, level + 1);
-        if (childNode) {
-          children.push(childNode);
-        }
+        pushChild(children, processNode(data[key], key, level + 1))
       }
     }
 
@@ -291,10 +318,7 @@ const normalizeTreeData = (rawData) => {
   const cityChildren = [];
   for (const districtName in rawData) {
     if (Object.prototype.hasOwnProperty.call(rawData, districtName)) {
-      const districtNode = processNode(rawData[districtName], districtName, 1);
-      if (districtNode) {
-        cityChildren.push(districtNode);
-      }
+      pushChild(cityChildren, processNode(rawData[districtName], districtName, 1))
     }
   }
 
@@ -446,13 +470,18 @@ const collectAllLeafNodes = (nodes) => {
   const leaves = [];
   const traverse = (n) => {
     if (n.rawData) {
-      const dialect = n.rawData['方言分布']?.[0] || '';
-      leaves.push({
-        name: n.rawName || n.name,
-        dialect,
-        longitude: parseFloat(n.rawData['longitude']?.[0]) || 0,
-        latitude: parseFloat(n.rawData['latitude']?.[0]) || 0,
-      });
+      const dialects = n.rawData['方言分布'] || [];
+      const lngs = n.rawData['longitude'] || [];
+      const lats = n.rawData['latitude'] || [];
+      const count = Math.max(dialects.length, lngs.length, lats.length, 1);
+      for (let i = 0; i < count; i++) {
+        leaves.push({
+          name: n.rawName || n.name,
+          dialect: dialects[i] || '',
+          longitude: parseFloat(lngs[i]) || 0,
+          latitude: parseFloat(lats[i]) || 0,
+        });
+      }
     }
     if (n.children && n.children.length > 0) {
       n.children.forEach(traverse);
