@@ -208,17 +208,14 @@ const loadCityData = async (cityName) => {
       const bootstrap = result.lazy_bootstrap
       if (bootstrap && typeof bootstrap === 'object') {
         const districts = bootstrap[cityName] || Object.values(bootstrap)[0] || []
-        // city consumed level_columns[0], shift for the next level
-        const shifted = API_CONFIG.level_columns.slice(1)
-        const filterCol = shifted[0]
+        // filters are AND: accumulate {"0": [city], "1": [district]} for unique path
         const nodes = districts.map(districtName => ({
           id: generateId(),
           name: districtName,
           rawName: districtName,
           children: [],
           _lazy: true,
-          _lazyFilterCol: filterCol,
-          _lazyLevelColumns: shifted
+          _lazyFilters: { "0": [cityName], "1": [districtName] }
         }))
         loadedCitiesData.value[cityName] = nodes
       } else {
@@ -375,7 +372,7 @@ const getFilteredCityData = (cityName) => {
 };
 
 /**
- * Lazy load children for a tree node via loadFullTree with shifted filter
+ * Lazy load children for a tree node via loadFullTree with accumulated filters
  */
 const lazyLoadChildren = async (node) => {
   if (!node._lazy || node._childrenLoaded || node._loadingChildren) return
@@ -385,26 +382,24 @@ const lazyLoadChildren = async (node) => {
     const result = await loadFullTree({
       db_key: API_CONFIG.db_key,
       table_name: API_CONFIG.table_name,
-      level_columns: node._lazyLevelColumns,
+      level_columns: API_CONFIG.level_columns,
       data_columns: API_CONFIG.data_columns,
-      filters: { [String(node._lazyFilterCol)]: [node.rawName || node.name] }
+      filters: node._lazyFilters
     })
 
     if (result.mode === 'lazy_fallback') {
-      // Still too many rows — another two-level map at this depth
+      // Still too many rows — accumulate filters for the next depth
       const bootstrap = result.lazy_bootstrap
       const nodeKey = node.rawName || node.name
       const children = bootstrap?.[nodeKey] || Object.values(bootstrap || {})[0] || []
-      const shifted = node._lazyLevelColumns.slice(1)
-      const filterCol = shifted[0]
+      const nextCol = Object.keys(node._lazyFilters).length
       node.children = children.map(childName => ({
         id: generateId(),
         name: childName,
         rawName: childName,
         children: [],
         _lazy: true,
-        _lazyFilterCol: filterCol,
-        _lazyLevelColumns: shifted
+        _lazyFilters: { ...node._lazyFilters, [String(nextCol)]: [childName] }
       }))
     } else {
       // mode === 'full' — extract subtree for the filter node

@@ -340,7 +340,6 @@ const loadTreeForState = async (state) => {
     }
 
     if (result && result.children && Array.isArray(result.children)) {
-      const filterCol = payload.level_columns[0]
       const nodes = result.children.map(child => {
         const name = typeof child === 'string' ? child : (child.name || '')
         return {
@@ -352,8 +351,7 @@ const loadTreeForState = async (state) => {
           children: [],
           isLeaf: false,
           _lazy: true,
-          _lazyFilterCol: filterCol,
-          _lazyLevelColumns: payload.level_columns
+          _lazyFilters: { [String(payload.level_columns[0])]: [name] }
         }
       })
       treeCache.value = {
@@ -492,18 +490,20 @@ const lazyLoadCharClassChildren = async (node) => {
 
   node._loadingChildren = true
   try {
+    const payload = buildCharClassTreePayload(activeTab.value, selectedTableKey.value, levels.value)
     const result = await loadFullTree({
-      ...buildCharClassTreePayload(activeTab.value, selectedTableKey.value, levels.value),
-      level_columns: node._lazyLevelColumns,
-      filters: { [String(node._lazyFilterCol)]: [node.name] }
+      db_key: payload.db_key,
+      table_name: payload.table_name,
+      level_columns: payload.level_columns,
+      data_columns: payload.data_columns,
+      filters: node._lazyFilters
     })
 
     if (result.mode === 'lazy_fallback') {
-      // Still too many rows — another two-level map at this depth
+      // Still too many rows — accumulate filters for the next depth
       const bootstrap = result.lazy_bootstrap
       const children = bootstrap?.[node.name] || Object.values(bootstrap || {})[0] || []
-      const shifted = node._lazyLevelColumns.slice(1)
-      const filterCol = shifted[0]
+      const nextCol = payload.level_columns[Object.keys(node._lazyFilters).length]
       node.children = children.map(childName => ({
         id: childName,
         name: childName,
@@ -513,8 +513,7 @@ const lazyLoadCharClassChildren = async (node) => {
         children: [],
         isLeaf: false,
         _lazy: true,
-        _lazyFilterCol: filterCol,
-        _lazyLevelColumns: shifted
+        _lazyFilters: { ...node._lazyFilters, [String(nextCol)]: [childName] }
       }))
     } else {
       // mode === 'full' — extract subtree for the filter node
