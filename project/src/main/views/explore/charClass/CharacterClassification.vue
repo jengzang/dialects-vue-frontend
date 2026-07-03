@@ -526,9 +526,10 @@ const lazyLoadCharClassChildren = async (node) => {
         }))
       }
     } else {
-      // mode === 'full' — charClass tree top-level entries are the direct children
+      // mode === 'full' — extract subtree for the filter node (same pattern as gdVillages)
       const tableConfig = currentTableConfig.value
-      node.children = normalizeCharClassTree(result.tree || {}, {
+      const subtree = result.tree?.[node.name]
+      node.children = normalizeCharClassTree(subtree || {}, {
         leafLevelColumnName: tableConfig?.leafLevelColumnName,
         leafData: tableConfig?.leafData,
       })
