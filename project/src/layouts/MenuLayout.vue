@@ -15,6 +15,15 @@
           </KeepAlive>
         </transition>
       </router-view>
+
+      <transition name="layout-loading-fade">
+        <div v-if="isRouteTransitionLoading" class="layout-loading-overlay" aria-live="polite">
+          <div class="layout-loading-shell">
+            <div class="ui-loading--page" aria-hidden="true"></div>
+            <p class="layout-loading-text">頁面切換中...</p>
+          </div>
+        </div>
+      </transition>
     </div>
     <PageTutorialGuide />
     <!--    <MenuTabs />-->
@@ -26,8 +35,9 @@
 // import MenuTabs from '@/components/MenuTabs.vue'
 // import TabControls from "@/components/TabControls.vue";
 // import FloatingHeader from '@/components/FloatingHeader.vue'
-// import { useRoute } from 'vue-router'
 // import { computed } from 'vue'
+import { nextTick, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import NavBar from "@/components/bar/NavBar.vue";
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 
@@ -41,7 +51,34 @@ const keepAliveViewNames = [
   'ResultPage',
 ]
 
-// const route = useRoute()
+const route = useRoute()
+const isRouteTransitionLoading = ref(false)
+let pendingHideToken = 0
+
+const finishRouteTransition = async () => {
+  const token = ++pendingHideToken
+  await nextTick()
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (token === pendingHideToken) {
+        isRouteTransitionLoading.value = false
+      }
+    })
+  })
+}
+
+watch(
+  () => route.fullPath,
+  async (nextPath, previousPath) => {
+    if (!previousPath || nextPath === previousPath) {
+      return
+    }
+
+    isRouteTransitionLoading.value = true
+    await finishRouteTransition()
+  }
+)
+
 // const shouldShowHeader = computed(() => {
 //   // console.log(route)
 //   return route.query.tab !== 'about' && !route.path.includes('auth')
@@ -98,6 +135,7 @@ nav {
 
 /* 內容區：底部預留給 tabs 的高度 */
 .glass-content {
+  position: relative;
   /* tab 高度 + 間距 */
   padding: 10dvh 12px 12px;
   color: #0b2540;
@@ -110,9 +148,45 @@ nav {
   overflow-x: hidden;
 }
 
+.layout-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(234, 245, 255, 0.42);
+  border-radius: 28px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.layout-loading-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.layout-loading-text {
+  margin: 0;
+  color: #4a5568;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 /* 動畫 */
-.fade-enter-active, .fade-leave-active { transition: opacity .25s ease, transform .25s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(6px); }
+.fade-enter-active, .fade-leave-active { transition: opacity .14s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+.layout-loading-fade-enter-active,
+.layout-loading-fade-leave-active {
+  transition: opacity 0.12s ease;
+}
+
+.layout-loading-fade-enter-from,
+.layout-loading-fade-leave-to {
+  opacity: 0;
+}
 
 /* 📱 手機：只調整文字與按鈕 */
 @media (max-aspect-ratio: 1/1)  {
