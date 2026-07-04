@@ -35,6 +35,10 @@
               :disabled="currentSelection.length === 0 || !toneNameInput"
               @click="saveTone"
             >➕ {{ t('praat.pitchTone.step1.controls.addButton') }}</button>
+
+          <div class="persistence-hint">
+            💡 {{ t('praat.pitchTone.step1.controls.persistenceHint') }}
+          </div>
         </div>
 
         <div class="saved-list-container">
@@ -71,6 +75,14 @@
       </div>
 
       <div class="analyze-action">
+        <div class="log-scale-selector">
+          <span class="log-scale-label">{{ t('praat.pitchTone.step2.logScaleLabel') }}</span>
+          <RadioGroup
+            v-model="logScaleMode"
+            :options="logScaleOptions"
+            name="logScaleMode"
+          />
+        </div>
         <button
             class="analyze-btn"
             @click="performTValueAnalysis"
@@ -89,8 +101,14 @@
       </div>
 
       <div class="stats-info">
-        <span>{{ t('praat.pitchTone.step3.stats.ceiling', { max: globalStats.max.toFixed(1) }) }}</span>
-        <span>{{ t('praat.pitchTone.step3.stats.floor', { min: globalStats.min.toFixed(1) }) }}</span>
+        <template v-if="globalStats.mode === 'logZScore'">
+          <span>{{ t('praat.pitchTone.step3.stats.logMean', { mean: globalStats.logMean.toFixed(3) }) }}</span>
+          <span>{{ t('praat.pitchTone.step3.stats.logSd', { sd: globalStats.logSd.toFixed(3) }) }}</span>
+        </template>
+        <template v-else>
+          <span>{{ t('praat.pitchTone.step3.stats.ceiling', { max: globalStats.max.toFixed(1) }) }}</span>
+          <span>{{ t('praat.pitchTone.step3.stats.floor', { min: globalStats.min.toFixed(1) }) }}</span>
+        </template>
       </div>
 
       <div class="export-actions">
@@ -112,6 +130,7 @@ import * as XLSX from 'xlsx'
 import { useI18n } from 'vue-i18n'
 import { showSuccess, showWarning } from '@/utils/message.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
 
 const props = defineProps({
   results: { type: Object, default: null }
@@ -132,7 +151,14 @@ const toneNameInput = ref('')
 const currentSelection = ref([]) // 當前框選的Hz數組
 const savedTones = ref([])       // 已保存的調類列表 [{name, segments:[[]]}]
 const tValueResults = ref([])    // 計算後的T值結果
-const globalStats = ref({ max: 0, min: 0 })
+const globalStats = ref({ max: 0, min: 0, mode: 'log', logMean: 0, logSd: 0 })
+
+// 对数变换方式：'log' | 'logZScore'
+const logScaleMode = ref('log')
+const logScaleOptions = computed(() => [
+  { value: 'log', label: t('praat.pitchTone.step2.logScaleOptions.log') },
+  { value: 'logZScore', label: t('praat.pitchTone.step2.logScaleOptions.logZScore') }
+])
 
 // 本地存儲 Key
 const STORAGE_KEY = 'shifeng_analysis_data'
@@ -470,20 +496,31 @@ const performTValueAnalysis = () => {
 
   console.log('Statistics:', { mean, sd, ceiling, floor, realMax: ceiling, realMin: floor })
 
-  globalStats.value = { max: ceiling, min: floor }
-
   // B. Calculate T-values for each tone class
-  const lgMin = Math.log10(floor)
-  const lgMax = Math.log10(ceiling)
-  const denominator = lgMax - lgMin
+  const lgValues = allValues.map(v => Math.log10(v))
+  const lgMin = Math.min(...lgValues)
+  const lgMax = Math.max(...lgValues)
 
-  // ✅ 修复：调值范围改为 0~5（传统五度值）
-  // Helper: Convert Hz array to T-value array
+  const useZScore = logScaleMode.value === 'logZScore'
+
+  // Helper: Convert Hz array to T-value array based on selected log scale mode
+  let zMean, zSd
+  if (useZScore) {
+    zMean = lgValues.reduce((sum, v) => sum + v, 0) / lgValues.length
+    const varianceLog = lgValues.reduce((sum, v) => sum + Math.pow(v - zMean, 2), 0) / lgValues.length
+    zSd = Math.sqrt(varianceLog)
+    globalStats.value = { max: ceiling, min: floor, mode: 'logZScore', logMean: zMean, logSd: zSd }
+  } else {
+    globalStats.value = { max: ceiling, min: floor, mode: 'log' }
+  }
+
   const hzToTValues = (hzArray) => {
     return hzArray.map(hz => {
       const lgX = Math.log10(hz)
-      let T = ((lgX - lgMin) / denominator) * 5  // 映射到 [0, 5]
-      return Math.max(0, Math.min(5, T))  // Clamp to [0, 5]
+      if (useZScore) {
+        return (lgX - zMean) / zSd
+      }
+      return Math.max(0, Math.min(5, ((lgX - lgMin) / (lgMax - lgMin)) * 5))
     })
   }
 
@@ -596,6 +633,8 @@ const initTValueChart = () => {
 
   tValueChart = echarts.init(tValueChartContainer.value)
 
+  const isZScore = globalStats.value.mode === 'logZScore'
+
   const series = tValueResults.value.map(res => ({
     name: res.name,
     type: 'line',
@@ -656,11 +695,13 @@ const initTValueChart = () => {
     },
     yAxis: {
       type: 'value',
-      name: t('praat.pitchTone.step3.chart.yAxis'),
-      min: 0,
-      max: 5,
-      interval: 1,
-      splitNumber: 5,
+      name: isZScore
+        ? t('praat.pitchTone.step3.chart.yAxisZScore')
+        : t('praat.pitchTone.step3.chart.yAxis'),
+      ...(isZScore
+        ? { scale: true }
+        : { min: 0, max: 5, interval: 1, splitNumber: 5 }
+      ),
       splitLine: { show: true }
     },
     series: series
@@ -697,7 +738,6 @@ const initTValueChart = () => {
     flex-direction: column;
     gap: 1rem;
   }
-
   /* 图表容器高度调整 */
   .chart-container {
     height: 280px;
@@ -720,6 +760,10 @@ const initTValueChart = () => {
     width: 100%;
   }
 
+  .log-scale-selector {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
 
 /* 额外的小屏幕适配 */
@@ -839,7 +883,7 @@ const initTValueChart = () => {
 /* 控制面板樣式 */
 .controls-section {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 1.5rem;
   padding: 1.5rem;
   background: rgba(255, 255, 255, 0.5);
@@ -1020,8 +1064,33 @@ const initTValueChart = () => {
 
 .analyze-action {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
   padding: 1rem 0;
+}
+
+.persistence-hint {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary, #888);
+  font-style: italic;
+  padding: 0.25rem 0;
+  line-height: 1.4;
+}
+
+.log-scale-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.log-scale-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #2c3e50);
+  white-space: nowrap;
 }
 
 .analyze-btn {

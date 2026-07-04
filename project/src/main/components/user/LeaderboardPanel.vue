@@ -310,8 +310,8 @@ const tableData = computed(() => {
 <template>
   <div class="leaderboard-container">
     <div v-if="loading" class="loading-container">
-      <div class="ui-loading--page" aria-hidden="true"></div>
-      <p>{{ t('user.leaderboard.loading') }}</p>
+      <!-- <div class="ui-loading--page" aria-hidden="true"></div>
+      <p>{{ t('user.leaderboard.loading') }}</p> -->
     </div>
 
     <div v-else-if="error" class="error-container">

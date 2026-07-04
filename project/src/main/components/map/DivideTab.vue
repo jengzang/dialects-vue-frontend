@@ -112,6 +112,7 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { requestMapFitView } from '@/utils/map/MapData.js'
 
 const router = useRouter()
+const route = useRouter()
 const { t } = useI18n()
 const { getPartitionData } = usePartitionCache()
 

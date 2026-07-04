@@ -140,7 +140,7 @@ export default defineConfig(async ({ mode }) => {
     },
     server: {
       proxy: {
-        '^/(api|logs|sql|upload|download|static|files)(?:/|$)': {
+        '^/(api|user|logs|sql|upload|download|static|files)(?:/|$)': {
           target: 'https://dialects.yzup.top',
           changeOrigin: true,
           secure: false,

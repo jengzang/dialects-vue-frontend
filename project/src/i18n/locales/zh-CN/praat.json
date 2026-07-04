@@ -354,7 +354,8 @@
           "idle": "等待框选..."
         },
         "toneNameInput": "输入调类名称（例如：阴平）",
-        "addButton": "加入列表"
+        "addButton": "加入列表",
+        "persistenceHint": "已添加的调值信息会自动保存，刷新或退出页面后数据仍然保留。"
       },
       "savedList": {
         "title": "已采集调类（{count}）",
@@ -367,14 +368,21 @@
     "step2": {
       "title": "开始 T 值分析",
       "hint": "计算并生成各调类的五度值曲线",
-      "analyzeButton": "开始分析（{count} 个调类）"
+      "analyzeButton": "开始分析（{count} 个调类）",
+      "logScaleLabel": "对数变换方式",
+      "logScaleOptions": {
+        "log": "普通 Log",
+        "logZScore": "Log z-score"
+      }
     },
     "step3": {
       "title": "分析结果",
       "hint": "五度值曲线（保留原始时长，对齐起点）",
       "stats": {
         "ceiling": "参考系上限：{max} Hz",
-        "floor": "参考系下限：{min} Hz"
+        "floor": "参考系下限：{min} Hz",
+        "logMean": "Log 均值：{mean}",
+        "logSd": "Log 标准差：{sd}"
       },
       "exportButton": "导出 Excel",
       "chart": {
@@ -382,6 +390,7 @@
         "tooltipTime": "时间: {time} ms",
         "xAxis": "时间 (ms)",
         "yAxis": "五度值 (T)",
+        "yAxisZScore": "Log z-score",
         "toolbox": {
           "zoom": "缩放",
           "back": "还原",
