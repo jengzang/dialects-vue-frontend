@@ -145,6 +145,7 @@ const { t } = useI18n()
 const PITCH_TONE_EXPORT_FILE_PREFIX = '方音圖鑑_T值法定調_'
 const PITCH_TONE_EXPORT_SHEET_NAME = '石鋒T值分析'
 const PITCH_TONE_EXPORT_TIME_COLUMN = '時間 (ms)'
+const PITCH_TONE_EXPORT_TIME_COLUMN_ELEVEN_POINT = '归一化时长 (%)'
 
 // === 狀態變量 ===
 const pitchChartContainer = ref(null)
@@ -589,42 +590,58 @@ const performTValueAnalysis = () => {
   // C. Process each tone class
   const isElevenPoint = analysisMode.value
 
-  // For 11-point mode, always use standard log formula (0-5 T-values)
-  const hzToTValues11Point = (hzArray) => {
-    return hzArray
-      .filter(v => v !== null && v !== undefined && v > 0)
-      .map(hz => {
-        const lgX = Math.log10(hz)
-        return Math.max(0, Math.min(5, ((lgX - lgMin) / (lgMax - lgMin)) * 5))
-      })
-  }
-
   if (isElevenPoint) {
-    // 11-point mode always uses standard log formula
-    globalStats.value = { max: ceiling, min: floor, mode: 'log' }
+    // Find max segment duration (ms) across ALL tone classes — this defines 100%
+    let maxDurationMs = 0
+    savedTones.value.forEach(tone => {
+      tone.segments.forEach(seg => {
+        const clean = seg.filter(v => v !== null && v !== undefined && v > 0)
+        const dur = clean.length * samplingIntervalMs
+        if (dur > maxDurationMs) maxDurationMs = dur
+      })
+    })
 
     tValueResults.value = savedTones.value.map(tone => {
-      const tValueSegments = tone.segments
-        .map(hzSegment => hzToTValues11Point(hzSegment))
-        .filter(segment => segment.length > 0)
+      // Each token: { percents: [11], values: [11] }
+      const tokenData = []
 
-      const normalizedSegments = tValueSegments.map(segment =>
-        resampleToNPoints(segment, STANDARD_POINT_COUNT)
-      )
+      tone.segments.forEach(hzSegment => {
+        const cleanHz = hzSegment.filter(v => v !== null && v !== undefined && v > 0)
+        if (cleanHz.length === 0) return
 
-      const avgTValues = averagePointwise(normalizedSegments)
+        const tValues = hzToTValues(cleanHz)
+        const resampled11 = resampleToNPoints(tValues, STANDARD_POINT_COUNT)
 
-      const chartData = avgTValues
-        .map((val, idx) => {
-          const percent = (idx / (STANDARD_POINT_COUNT - 1)) * 100
-          return [percent, val]
-        })
-        .filter(([, val]) => val !== null)
+        const tokenDuration = cleanHz.length * samplingIntervalMs
+        const percents = []
+        for (let i = 0; i < STANDARD_POINT_COUNT; i++) {
+          percents.push((i / (STANDARD_POINT_COUNT - 1)) * (tokenDuration / maxDurationMs) * 100)
+        }
 
-      return {
-        name: tone.name,
-        data: chartData
+        tokenData.push({ percents, values: resampled11 })
+      })
+
+      if (tokenData.length === 0) return { name: tone.name, data: [] }
+
+      // Average by index: point 0 with point 0, etc.
+      // x = avg of each token's percent at that index, y = avg of T-values
+      const chartData = []
+      for (let i = 0; i < STANDARD_POINT_COUNT; i++) {
+        let sumT = 0, sumPct = 0, count = 0
+        for (const td of tokenData) {
+          const v = td.values[i]
+          if (Number.isFinite(v)) {
+            sumT += v
+            sumPct += td.percents[i]
+            count++
+          }
+        }
+        if (count > 0) {
+          chartData.push([sumPct / count, sumT / count])
+        }
       }
+
+      return { name: tone.name, data: chartData }
     })
   } else {
     tValueResults.value = savedTones.value.map(tone => {
@@ -669,7 +686,6 @@ const performTValueAnalysis = () => {
 }
 
 // === 4. Excel 导出功能 ===
-const PITCH_TONE_EXPORT_TIME_COLUMN_ELEVEN_POINT = '归一化时长 (%)'
 const exportToExcel = () => {
   if (tValueResults.value.length === 0) {
     showWarning(t('praat.pitchTone.step3.export.noData'))
@@ -677,7 +693,6 @@ const exportToExcel = () => {
   }
 
   const isElevenPoint = analysisMode.value
-
   const timeColumnName = isElevenPoint
     ? PITCH_TONE_EXPORT_TIME_COLUMN_ELEVEN_POINT
     : PITCH_TONE_EXPORT_TIME_COLUMN
@@ -742,10 +757,14 @@ const ACADEMIC_SYMBOLS = [
   'rect',
   'triangle',
   'diamond',
-  'path://M-6,0L6,0M0,-6L0,6',
-  'path://M0,-7L1.5,-2.5L6,-2.5L2.5,0.5L4,5.5L0,3L-4,5.5L-2.5,0.5L-6,-2.5L-1.5,-2.5Z',
-  'arrow',
   'roundRect',
+  'pin',
+  'arrow',
+  'path://M-6,0L6,0M0,-6L0,6',
+  'path://M-5,-5L5,5M-5,5L5,-5',
+  'path://M0,-7L1.5,-2.5L6,-2.5L2.5,0.5L4,5.5L0,3L-4,5.5L-2.5,0.5L-6,-2.5L-1.5,-2.5Z',
+  'path://M0,6L5,-4L-5,-4Z',
+  'path://M0,-6L3.5,-3.5L6,0L3.5,3.5L0,6L-3.5,3.5L-6,0L-3.5,-3.5Z',
 ]
 
 const ACADEMIC_COLORS = [
@@ -760,6 +779,8 @@ const ACADEMIC_COLORS = [
 ]
 
 const initElevenPointChart = () => {
+  const isZScore = globalStats.value.mode === 'logZScore'
+
   const series = tValueResults.value.map((res, idx) => ({
     name: res.name,
     type: 'line',
@@ -839,33 +860,27 @@ const initElevenPointChart = () => {
       nameTextStyle: { fontSize: 12, color: '#000' },
       min: 0,
       max: 100,
-      interval: 10,
-      axisLabel: {
-        formatter: '{value}%',
-        color: '#000',
-        fontSize: 11,
-      },
+      axisLabel: { formatter: '{value}%', color: '#000', fontSize: 11 },
       axisLine: { lineStyle: { color: '#000', width: 1 } },
       axisTick: { lineStyle: { color: '#000' } },
       splitLine: { show: false },
     },
     yAxis: {
       type: 'value',
-      name: t('praat.pitchTone.step3.chart.yAxis'),
+      name: isZScore
+        ? t('praat.pitchTone.step3.chart.yAxisZScore')
+        : t('praat.pitchTone.step3.chart.yAxis'),
       nameTextStyle: { fontSize: 12, color: '#000' },
-      min: 0,
-      max: 5,
-      interval: 1,
+      ...(isZScore
+        ? { scale: true }
+        : { min: 0, max: 5, interval: 1 }
+      ),
       axisLabel: { color: '#000', fontSize: 11 },
       axisLine: { lineStyle: { color: '#000', width: 1 } },
       axisTick: { lineStyle: { color: '#000' } },
       splitLine: {
         show: true,
         lineStyle: { color: '#555555', width: 0.8, type: 'solid' },
-      },
-      splitArea: {
-        show: true,
-        areaStyle: { color: ['#c0c0c0', '#c0c0c0'] },
       },
     },
     series: series,
