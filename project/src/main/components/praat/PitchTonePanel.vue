@@ -145,7 +145,6 @@ const { t } = useI18n()
 const PITCH_TONE_EXPORT_FILE_PREFIX = '方音圖鑑_T值法定調_'
 const PITCH_TONE_EXPORT_SHEET_NAME = '石鋒T值分析'
 const PITCH_TONE_EXPORT_TIME_COLUMN = '時間 (ms)'
-const PITCH_TONE_EXPORT_TIME_COLUMN_ELEVEN_POINT = '归一化时长 (%)'
 
 // === 狀態變量 ===
 const pitchChartContainer = ref(null)
@@ -591,18 +590,17 @@ const performTValueAnalysis = () => {
   const isElevenPoint = analysisMode.value
 
   if (isElevenPoint) {
-    // Find max segment duration (ms) across ALL tone classes — this defines 100%
-    let maxDurationMs = 0
-    savedTones.value.forEach(tone => {
+    tValueResults.value = savedTones.value.map(tone => {
+      // Find this tone class's own longest token duration (ms) → determines x-axis extent
+      let classMaxMs = 0
       tone.segments.forEach(seg => {
         const clean = seg.filter(v => v !== null && v !== undefined && v > 0)
         const dur = clean.length * samplingIntervalMs
-        if (dur > maxDurationMs) maxDurationMs = dur
+        if (dur > classMaxMs) classMaxMs = dur
       })
-    })
 
-    tValueResults.value = savedTones.value.map(tone => {
-      // Each token: { percents: [11], values: [11] }
+      if (classMaxMs === 0) return { name: tone.name, data: [] }
+
       const tokenData = []
 
       tone.segments.forEach(hzSegment => {
@@ -613,31 +611,29 @@ const performTValueAnalysis = () => {
         const resampled11 = resampleToNPoints(tValues, STANDARD_POINT_COUNT)
 
         const tokenDuration = cleanHz.length * samplingIntervalMs
-        const percents = []
+        const times = []
         for (let i = 0; i < STANDARD_POINT_COUNT; i++) {
-          percents.push((i / (STANDARD_POINT_COUNT - 1)) * (tokenDuration / maxDurationMs) * 100)
+          times.push((i / (STANDARD_POINT_COUNT - 1)) * tokenDuration)
         }
 
-        tokenData.push({ percents, values: resampled11 })
+        tokenData.push({ times, values: resampled11 })
       })
 
       if (tokenData.length === 0) return { name: tone.name, data: [] }
 
-      // Average by index: point 0 with point 0, etc.
-      // x = avg of each token's percent at that index, y = avg of T-values
       const chartData = []
       for (let i = 0; i < STANDARD_POINT_COUNT; i++) {
-        let sumT = 0, sumPct = 0, count = 0
+        let sumT = 0, sumTime = 0, count = 0
         for (const td of tokenData) {
           const v = td.values[i]
           if (Number.isFinite(v)) {
             sumT += v
-            sumPct += td.percents[i]
+            sumTime += td.times[i]
             count++
           }
         }
         if (count > 0) {
-          chartData.push([sumPct / count, sumT / count])
+          chartData.push([sumTime / count, sumT / count])
         }
       }
 
@@ -692,11 +688,6 @@ const exportToExcel = () => {
     return
   }
 
-  const isElevenPoint = analysisMode.value
-  const timeColumnName = isElevenPoint
-    ? PITCH_TONE_EXPORT_TIME_COLUMN_ELEVEN_POINT
-    : PITCH_TONE_EXPORT_TIME_COLUMN
-
   const maxLength = Math.max(...tValueResults.value.map(r => r.data.length))
 
   const excelData = []
@@ -704,9 +695,7 @@ const exportToExcel = () => {
     const row = {}
 
     const firstTime = tValueResults.value[0].data[i]?.[0]
-    row[timeColumnName] = isElevenPoint
-      ? firstTime?.toFixed(0) || ''
-      : firstTime?.toFixed(1) || ''
+    row[PITCH_TONE_EXPORT_TIME_COLUMN] = firstTime?.toFixed(1) || ''
 
     tValueResults.value.forEach(result => {
       const point = result.data[i]
@@ -813,8 +802,8 @@ const initElevenPointChart = () => {
       borderWidth: 1,
       textStyle: { color: '#000', fontSize: 12 },
       formatter: (params) => {
-        let result = t('praat.pitchTone.step3.chart.tooltipTimeElevenPoint', {
-          percent: params[0].value[0]
+        let result = t('praat.pitchTone.step3.chart.tooltipTime', {
+          time: params[0].value[0].toFixed(1)
         }) + '<br/>'
         params.forEach(param => {
           result += `${param.seriesName}: ${param.value[1].toFixed(2)}<br/>`
@@ -854,13 +843,12 @@ const initElevenPointChart = () => {
     },
     xAxis: {
       type: 'value',
-      name: t('praat.pitchTone.step3.chart.xAxisElevenPoint'),
+      name: t('praat.pitchTone.step3.chart.xAxis'),
       nameLocation: 'center',
       nameGap: 28,
       nameTextStyle: { fontSize: 12, color: '#000' },
       min: 0,
-      max: 100,
-      axisLabel: { formatter: '{value}%', color: '#000', fontSize: 11 },
+      axisLabel: { color: '#000', fontSize: 11 },
       axisLine: { lineStyle: { color: '#000', width: 1 } },
       axisTick: { lineStyle: { color: '#000' } },
       splitLine: { show: false },
