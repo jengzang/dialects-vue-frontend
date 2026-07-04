@@ -83,6 +83,9 @@
             name="logScaleMode"
           />
         </div>
+        <div class="analysis-mode-toggle">
+          <CheckBox v-model="analysisMode" :label="t('praat.pitchTone.step2.analysisModeCheckbox')" />
+        </div>
         <button
             class="analyze-btn"
             @click="performTValueAnalysis"
@@ -131,6 +134,9 @@ import { useI18n } from 'vue-i18n'
 import { showSuccess, showWarning } from '@/utils/message.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
+
+const STANDARD_POINT_COUNT = 11
 
 const props = defineProps({
   results: { type: Object, default: null }
@@ -159,6 +165,9 @@ const logScaleOptions = computed(() => [
   { value: 'log', label: t('praat.pitchTone.step2.logScaleOptions.log') },
   { value: 'logZScore', label: t('praat.pitchTone.step2.logScaleOptions.logZScore') }
 ])
+
+// 分析模式：false = 完整曲线，true = 11 点标准化
+const analysisMode = ref(false)
 
 // 本地存儲 Key
 const STORAGE_KEY = 'shifeng_analysis_data'
@@ -474,6 +483,48 @@ const clearAll = () => {
 }
 
 // === 3. 石鋒 T 值分析算法 ===
+
+const resampleToNPoints = (values, pointCount = STANDARD_POINT_COUNT) => {
+  const cleanValues = values.filter(v => Number.isFinite(v))
+  if (cleanValues.length === 0) return []
+  if (cleanValues.length === 1) return Array(pointCount).fill(cleanValues[0])
+
+  const result = []
+  const lastIndex = cleanValues.length - 1
+  for (let i = 0; i < pointCount; i++) {
+    const position = (i / (pointCount - 1)) * lastIndex
+    const leftIndex = Math.floor(position)
+    const rightIndex = Math.ceil(position)
+    const ratio = position - leftIndex
+    if (leftIndex === rightIndex) {
+      result.push(cleanValues[leftIndex])
+    } else {
+      result.push(cleanValues[leftIndex] * (1 - ratio) + cleanValues[rightIndex] * ratio)
+    }
+  }
+  return result
+}
+
+const averagePointwise = (segments) => {
+  if (!segments.length) return []
+  const pointCount = segments[0].length
+  const averaged = []
+  for (let i = 0; i < pointCount; i++) {
+    let sum = 0
+    let count = 0
+    for (const segment of segments) {
+      const value = segment[i]
+      if (Number.isFinite(value)) {
+        sum += value
+        count++
+      }
+    }
+    averaged.push(count > 0 ? sum / count : null)
+  }
+  return averaged
+}
+
+// === 4. 石鋒 T 值分析算法 ===
 const performTValueAnalysis = () => {
   if (savedTones.value.length === 0) return
 
@@ -536,42 +587,77 @@ const performTValueAnalysis = () => {
   console.log('Sampling interval:', samplingIntervalMs, 'ms')
 
   // C. Process each tone class
-  tValueResults.value = savedTones.value.map(tone => {
-    // ✅ 修复：不再归一化时长，保留原始点数
-    // Convert each segment to T-values (keep original length)
-    const tValueSegments = tone.segments.map(hzSegment => {
-      return hzToTValues(hzSegment)  // 不再调用 normalizeLength
-    })
+  const isElevenPoint = analysisMode.value
 
-    // 找出最长的音段，用于对齐
-    const maxLength = Math.max(...tValueSegments.map(seg => seg.length))
+  // For 11-point mode, always use standard log formula (0-5 T-values)
+  const hzToTValues11Point = (hzArray) => {
+    return hzArray
+      .filter(v => v !== null && v !== undefined && v > 0)
+      .map(hz => {
+        const lgX = Math.log10(hz)
+        return Math.max(0, Math.min(5, ((lgX - lgMin) / (lgMax - lgMin)) * 5))
+      })
+  }
 
-    // Average across all segments at each position (对齐到最长音段)
-    const avgTValues = []
-    for (let i = 0; i < maxLength; i++) {
-      let sum = 0
-      let count = 0
-      for (const seg of tValueSegments) {
-        if (i < seg.length) {
-          sum += seg[i]
-          count++
-        }
+  if (isElevenPoint) {
+    // 11-point mode always uses standard log formula
+    globalStats.value = { max: ceiling, min: floor, mode: 'log' }
+
+    tValueResults.value = savedTones.value.map(tone => {
+      const tValueSegments = tone.segments
+        .map(hzSegment => hzToTValues11Point(hzSegment))
+        .filter(segment => segment.length > 0)
+
+      const normalizedSegments = tValueSegments.map(segment =>
+        resampleToNPoints(segment, STANDARD_POINT_COUNT)
+      )
+
+      const avgTValues = averagePointwise(normalizedSegments)
+
+      const chartData = avgTValues
+        .map((val, idx) => {
+          const percent = (idx / (STANDARD_POINT_COUNT - 1)) * 100
+          return [percent, val]
+        })
+        .filter(([, val]) => val !== null)
+
+      return {
+        name: tone.name,
+        data: chartData
       }
-      avgTValues.push(count > 0 ? sum / count : null)
-    }
+    })
+  } else {
+    tValueResults.value = savedTones.value.map(tone => {
+      const tValueSegments = tone.segments.map(hzSegment => {
+        return hzToTValues(hzSegment)
+      })
 
-    // ✅ 修复：使用真实时间（毫秒）而不是百分比
-    // Convert to chart data format [time_ms, T-value]
-    const chartData = avgTValues.map((val, idx) => {
-      const timeMs = idx * samplingIntervalMs  // 真实时间（毫秒）
-      return [timeMs, val]
-    }).filter(([time, val]) => val !== null)  // 过滤掉无效点
+      const maxLength = Math.max(...tValueSegments.map(seg => seg.length))
 
-    return {
-      name: tone.name,
-      data: chartData
-    }
-  })
+      const avgTValues = []
+      for (let i = 0; i < maxLength; i++) {
+        let sum = 0
+        let count = 0
+        for (const seg of tValueSegments) {
+          if (i < seg.length) {
+            sum += seg[i]
+            count++
+          }
+        }
+        avgTValues.push(count > 0 ? sum / count : null)
+      }
+
+      const chartData = avgTValues.map((val, idx) => {
+        const timeMs = idx * samplingIntervalMs
+        return [timeMs, val]
+      }).filter(([, val]) => val !== null)
+
+      return {
+        name: tone.name,
+        data: chartData
+      }
+    })
+  }
 
   // D. Do NOT clear localStorage automatically
   // User will manually clear using the "清空" button
@@ -583,25 +669,30 @@ const performTValueAnalysis = () => {
 }
 
 // === 4. Excel 导出功能 ===
+const PITCH_TONE_EXPORT_TIME_COLUMN_ELEVEN_POINT = '归一化时长 (%)'
 const exportToExcel = () => {
   if (tValueResults.value.length === 0) {
     showWarning(t('praat.pitchTone.step3.export.noData'))
     return
   }
 
-  // 1. 找出最大时间点数（对齐到最长曲线）
+  const isElevenPoint = analysisMode.value
+
+  const timeColumnName = isElevenPoint
+    ? PITCH_TONE_EXPORT_TIME_COLUMN_ELEVEN_POINT
+    : PITCH_TONE_EXPORT_TIME_COLUMN
+
   const maxLength = Math.max(...tValueResults.value.map(r => r.data.length))
 
-  // 2. 构建表格数据
   const excelData = []
   for (let i = 0; i < maxLength; i++) {
     const row = {}
 
-    // 时间列
     const firstTime = tValueResults.value[0].data[i]?.[0]
-    row[PITCH_TONE_EXPORT_TIME_COLUMN] = firstTime?.toFixed(1) || ''
+    row[timeColumnName] = isElevenPoint
+      ? firstTime?.toFixed(0) || ''
+      : firstTime?.toFixed(1) || ''
 
-    // 每个调类的 T 值列
     tValueResults.value.forEach(result => {
       const point = result.data[i]
       row[result.name] = point ? point[1].toFixed(2) : ''
@@ -626,7 +717,6 @@ const initTValueChart = () => {
   if (!tValueChartContainer.value) return
   if (tValueChart) tValueChart.dispose()
 
-  // === 重新绑定 ResizeObserver ===
   if (resizeObserver && tValueChartContainer.value) {
     resizeObserver.observe(tValueChartContainer.value)
   }
@@ -634,7 +724,157 @@ const initTValueChart = () => {
   tValueChart = echarts.init(tValueChartContainer.value)
 
   const isZScore = globalStats.value.mode === 'logZScore'
+  const isElevenPoint = analysisMode.value
 
+  if (isElevenPoint) {
+    initElevenPointChart()
+  } else {
+    initContinuousChart(isZScore)
+  }
+
+  setTimeout(() => {
+    tValueChart?.resize({ width: 'auto', height: 'auto' })
+  }, 100)
+}
+
+const ACADEMIC_SYMBOLS = [
+  'circle',
+  'rect',
+  'triangle',
+  'diamond',
+  'path://M-6,0L6,0M0,-6L0,6',
+  'path://M0,-7L1.5,-2.5L6,-2.5L2.5,0.5L4,5.5L0,3L-4,5.5L-2.5,0.5L-6,-2.5L-1.5,-2.5Z',
+  'arrow',
+  'roundRect',
+]
+
+const ACADEMIC_COLORS = [
+  '#000000',
+  '#e41a1c',
+  '#377eb8',
+  '#4daf4a',
+  '#984ea3',
+  '#ff7f00',
+  '#a65628',
+  '#f781bf',
+]
+
+const initElevenPointChart = () => {
+  const series = tValueResults.value.map((res, idx) => ({
+    name: res.name,
+    type: 'line',
+    data: res.data,
+    smooth: false,
+    showSymbol: true,
+    symbol: ACADEMIC_SYMBOLS[idx % ACADEMIC_SYMBOLS.length],
+    symbolSize: 7,
+    lineStyle: {
+      width: 1.8,
+      color: ACADEMIC_COLORS[idx % ACADEMIC_COLORS.length],
+    },
+    itemStyle: {
+      color: ACADEMIC_COLORS[idx % ACADEMIC_COLORS.length],
+    },
+  }))
+
+  const option = {
+    backgroundColor: '#ffffff',
+    title: {
+      text: t('praat.pitchTone.step3.chart.title'),
+      left: 'center',
+      top: 8,
+      textStyle: { fontSize: 14, fontWeight: 'bold', color: '#000' },
+    },
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: '#fff',
+      borderColor: '#000',
+      borderWidth: 1,
+      textStyle: { color: '#000', fontSize: 12 },
+      formatter: (params) => {
+        let result = t('praat.pitchTone.step3.chart.tooltipTimeElevenPoint', {
+          percent: params[0].value[0]
+        }) + '<br/>'
+        params.forEach(param => {
+          result += `${param.seriesName}: ${param.value[1].toFixed(2)}<br/>`
+        })
+        return result
+      },
+    },
+    legend: {
+      orient: 'vertical',
+      right: 8,
+      top: 50,
+      backgroundColor: '#ffffff',
+      borderColor: '#000000',
+      borderWidth: 1,
+      padding: [8, 12],
+      itemGap: 10,
+      itemWidth: 24,
+      textStyle: { fontSize: 12, color: '#000' },
+    },
+    toolbox: {
+      right: 10,
+      top: 8,
+      feature: {
+        saveAsImage: {
+          title: t('praat.pitchTone.step3.chart.toolbox.saveAsImage'),
+          name: t('praat.pitchTone.step3.chart.imageName'),
+          pixelRatio: 2,
+          backgroundColor: '#fff',
+        },
+      },
+    },
+    grid: {
+      top: 50,
+      bottom: 50,
+      left: 60,
+      right: 120,
+    },
+    xAxis: {
+      type: 'value',
+      name: t('praat.pitchTone.step3.chart.xAxisElevenPoint'),
+      nameLocation: 'center',
+      nameGap: 28,
+      nameTextStyle: { fontSize: 12, color: '#000' },
+      min: 0,
+      max: 100,
+      interval: 10,
+      axisLabel: {
+        formatter: '{value}%',
+        color: '#000',
+        fontSize: 11,
+      },
+      axisLine: { lineStyle: { color: '#000', width: 1 } },
+      axisTick: { lineStyle: { color: '#000' } },
+      splitLine: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      name: t('praat.pitchTone.step3.chart.yAxis'),
+      nameTextStyle: { fontSize: 12, color: '#000' },
+      min: 0,
+      max: 5,
+      interval: 1,
+      axisLabel: { color: '#000', fontSize: 11 },
+      axisLine: { lineStyle: { color: '#000', width: 1 } },
+      axisTick: { lineStyle: { color: '#000' } },
+      splitLine: {
+        show: true,
+        lineStyle: { color: '#555555', width: 0.8, type: 'solid' },
+      },
+      splitArea: {
+        show: true,
+        areaStyle: { color: ['#c0c0c0', '#c0c0c0'] },
+      },
+    },
+    series: series,
+  }
+
+  tValueChart.setOption(option)
+}
+
+const initContinuousChart = (isZScore) => {
   const series = tValueResults.value.map(res => ({
     name: res.name,
     type: 'line',
@@ -660,9 +900,9 @@ const initTValueChart = () => {
     },
     legend: {
       bottom: 0,
-      type: 'scroll',        // 添加滚动条（调类多时有用）
-      orient: 'horizontal',  // 水平排列
-      itemGap: 20,           // 增加间距
+      type: 'scroll',
+      orient: 'horizontal',
+      itemGap: 20,
       textStyle: {
         fontSize: 14,
         color: '#2c3e50'
@@ -678,10 +918,10 @@ const initTValueChart = () => {
           }
         },
         restore: { title: t('praat.pitchTone.step3.chart.toolbox.restore') },
-        saveAsImage: {           // 新增 PNG 导出
+        saveAsImage: {
           title: t('praat.pitchTone.step3.chart.toolbox.saveAsImage'),
           name: t('praat.pitchTone.step3.chart.imageName'),
-          pixelRatio: 2,         // 高清图（2倍分辨率）
+          pixelRatio: 2,
           backgroundColor: '#fff'
         }
       }
@@ -708,11 +948,6 @@ const initTValueChart = () => {
   }
 
   tValueChart.setOption(option)
-
-  // 强制 resize 确保 T 值图表尺寸正确
-  setTimeout(() => {
-    tValueChart?.resize({ width: 'auto', height: 'auto' })
-  }, 100)
 }
 </script>
 
@@ -1091,6 +1326,11 @@ const initTValueChart = () => {
   font-weight: 600;
   color: var(--color-text-primary, #2c3e50);
   white-space: nowrap;
+}
+
+.analysis-mode-toggle {
+  display: flex;
+  justify-content: center;
 }
 
 .analyze-btn {

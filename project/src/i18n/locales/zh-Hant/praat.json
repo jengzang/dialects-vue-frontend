@@ -373,7 +373,8 @@
       "logScaleOptions": {
         "log": "普通 Log",
         "logZScore": "Log z-score"
-      }
+      },
+      "analysisModeCheckbox": "取 11 點標準化"
     },
     "step3": {
       "title": "分析結果",
@@ -388,7 +389,9 @@
       "chart": {
         "title": "石鋒 T 值曲線",
         "tooltipTime": "時間: {time} ms",
+        "tooltipTimeElevenPoint": "時長位置：{percent}%",
         "xAxis": "時間 (ms)",
+        "xAxisElevenPoint": "歸一化時長 (%)",
         "yAxis": "五度值 (T)",
         "yAxisZScore": "Log z-score",
         "toolbox": {
@@ -405,7 +408,8 @@
         "fileName": "方音圖鑑_T值法定調_{timestamp}.xlsx",
         "sheetName": "石鋒T值分析",
         "columns": {
-          "time": "時間 (ms)"
+          "time": "時間 (ms)",
+          "timeElevenPoint": "歸一化時長 (%)"
         }
       }
     },

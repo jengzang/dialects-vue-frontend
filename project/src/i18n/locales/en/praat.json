@@ -373,7 +373,8 @@
       "logScaleOptions": {
         "log": "Plain Log",
         "logZScore": "Log z-score"
-      }
+      },
+      "analysisModeCheckbox": "11-Point Standardized"
     },
     "step3": {
       "title": "Analysis Results",
@@ -388,7 +389,9 @@
       "chart": {
         "title": "Shi Feng T-Value Curves",
         "tooltipTime": "Time: {time} ms",
+        "tooltipTimeElevenPoint": "Position: {percent}%",
         "xAxis": "Time (ms)",
+        "xAxisElevenPoint": "Normalized Duration (%)",
         "yAxis": "T Value",
         "yAxisZScore": "Log z-score",
         "toolbox": {
@@ -405,7 +408,8 @@
         "fileName": "方音圖鑑_T值法定調_{timestamp}.xlsx",
         "sheetName": "石鋒T值分析",
         "columns": {
-          "time": "時間 (ms)"
+          "time": "時間 (ms)",
+          "timeElevenPoint": "Normalized Duration (%)"
         }
       }
     },
