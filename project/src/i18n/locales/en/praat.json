@@ -362,7 +362,12 @@
         "clearAll": "Clear All",
         "empty": "No data yet. Select a region in the chart above and add it first",
         "tagCount": "{count} segments",
-        "confirmClear": "Clear all saved tone classes?"
+        "confirmClear": "Clear all saved tone classes?",
+        "previewTitle": "Preview - {name}",
+        "segmentIndex": "Segment {index}",
+        "segmentPoints": "{count} points",
+        "deleteSegment": "Delete this segment",
+        "closePreview": "Close"
       }
     },
     "step2": {

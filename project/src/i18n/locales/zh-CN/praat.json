@@ -362,7 +362,12 @@
         "clearAll": "清空全部",
         "empty": "暂无数据，请在上方图表框选并加入",
         "tagCount": "{count} 段",
-        "confirmClear": "确定要清空所有已保存的调类吗？"
+        "confirmClear": "确定要清空所有已保存的调类吗？",
+        "previewTitle": "预览调类 - {name}",
+        "segmentIndex": "段 {index}",
+        "segmentPoints": "{count} 个采样点",
+        "deleteSegment": "删除此段",
+        "closePreview": "关闭预览"
       }
     },
     "step2": {

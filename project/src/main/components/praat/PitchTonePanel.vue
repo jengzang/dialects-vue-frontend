@@ -48,10 +48,10 @@
           </div>
 
           <div class="tags-wrapper">
-            <div v-for="(tone, index) in savedTones" :key="index" class="tone-tag">
+            <div v-for="(tone, index) in savedTones" :key="index" class="tone-tag" @click="openPreview(index)">
               <span class="tag-name">{{ tone.name }}</span>
               <span class="tag-count">{{ t('praat.pitchTone.step1.savedList.tagCount', { count: getToneSegmentCount(tone) }) }}</span>
-              <button @click="removeTone(index)" class="close-tag">×</button>
+              <button @click.stop="removeTone(index)" class="close-tag">×</button>
             </div>
             <div v-if="savedTones.length === 0" class="empty-hint">{{ t('praat.pitchTone.step1.savedList.empty') }}</div>
           </div>
@@ -125,6 +125,43 @@
       <div ref="tValueChartContainer" class="chart-container result-chart"></div>
     </div>
 
+    <AppModal
+      v-model="showPreviewModal"
+      size="sm"
+      :title="previewTitle"
+      :close-label="t('praat.pitchTone.step1.savedList.closePreview')"
+    >
+      <div v-if="previewTone" class="preview-segments">
+        <div
+          v-for="(seg, si) in previewTone.segments"
+          :key="si"
+          class="preview-segment-row"
+        >
+          <div class="preview-segment-info">
+            <span class="preview-segment-label">
+              {{ t('praat.pitchTone.step1.savedList.segmentIndex', { index: si + 1 }) }}
+            </span>
+            <span class="preview-segment-meta">
+              {{ t('praat.pitchTone.step1.savedList.segmentPoints', { count: getSegmentValues(seg).length }) }}
+              <template v-if="getSegmentValues(seg).length > 0">
+                · {{ getSegmentHZRange(seg).min.toFixed(1) }} – {{ getSegmentHZRange(seg).max.toFixed(1) }} Hz
+              </template>
+            </span>
+            <span v-if="seg.savedAt" class="preview-segment-time">
+              {{ formatTime(seg.savedAt) }}
+            </span>
+          </div>
+          <button
+            class="text-btn danger"
+            @click="deleteSegment(si)"
+          >{{ t('praat.pitchTone.step1.savedList.deleteSegment') }}</button>
+        </div>
+      </div>
+      <div v-else class="preview-empty">
+        {{ t('praat.pitchTone.step1.savedList.empty') }}
+      </div>
+    </AppModal>
+
   </div>
 </template>
 
@@ -137,6 +174,7 @@ import { showSuccess, showWarning } from '@/utils/message.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import AppModal from '@/components/common/AppModal.vue'
 
 const STANDARD_POINT_COUNT = 11
 
@@ -161,6 +199,15 @@ const currentSelection = ref([]) // 當前框選的Hz數組
 const savedTones = ref([])       // 已保存的調類列表 [{name, segments:[[]]}]
 const tValueResults = ref([])    // 計算後的T值結果
 const globalStats = ref({ max: 0, min: 0, mode: 'log', logMean: 0, logSd: 0 })
+
+// 预览弹窗
+const showPreviewModal = ref(false)
+const previewToneIndex = ref(-1)
+const previewTone = computed(() => savedTones.value[previewToneIndex.value] ?? null)
+const previewTitle = computed(() => {
+  if (!previewTone.value) return ''
+  return t('praat.pitchTone.step1.savedList.previewTitle', { name: previewTone.value.name })
+})
 
 // 对数变换方式：'log' | 'logZScore'
 const logScaleMode = ref('log')
@@ -193,6 +240,29 @@ const getToneSegmentCount = (tone) => {
     return 1
   }
   return 0
+}
+
+// Helper: extract Hz array from a segment regardless of old/new format
+const getSegmentValues = (seg) => {
+  if (Array.isArray(seg)) return seg
+  return seg?.values ?? []
+}
+
+const formatTime = (ts) => {
+  const d = new Date(ts)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+}
+
+const getSegmentHZRange = (seg) => {
+  const values = getSegmentValues(seg)
+  if (values.length === 0) return { min: 0, max: 0 }
+  let min = Infinity, max = -Infinity
+  for (const v of values) {
+    if (v < min) min = v
+    if (v > max) max = v
+  }
+  return { min, max }
 }
 
 // === 初始化與生命週期 ===
@@ -452,12 +522,12 @@ const saveTone = () => {
 
   if (existingTone) {
     // Add to existing tone class
-    existingTone.segments.push([...currentSelection.value])
+    existingTone.segments.push({ values: [...currentSelection.value], savedAt: Date.now() })
   } else {
     // Create new tone class
     savedTones.value.push({
       name: toneNameInput.value,
-      segments: [[...currentSelection.value]]
+      segments: [{ values: [...currentSelection.value], savedAt: Date.now() }]
     })
   }
 
@@ -482,6 +552,20 @@ const clearAll = () => {
     savedTones.value = []
     pitchToneStorage.remove()
     // Do NOT clear tValueResults - keep analysis results visible
+  }
+}
+
+const openPreview = (index) => {
+  previewToneIndex.value = index
+  showPreviewModal.value = true
+}
+
+const deleteSegment = (segIndex) => {
+  if (!previewTone.value) return
+  previewTone.value.segments.splice(segIndex, 1)
+  if (previewTone.value.segments.length === 0) {
+    savedTones.value.splice(previewToneIndex.value, 1)
+    showPreviewModal.value = false
   }
 }
 
@@ -535,11 +619,11 @@ const performTValueAnalysis = () => {
   const allValues = analysisMode.value
     ? savedTones.value.flatMap(t =>
         t.segments.flatMap(seg => {
-          const clean = seg.filter(v => v !== null && v !== undefined && v > 0)
+          const clean = getSegmentValues(seg).filter(v => v !== null && v !== undefined && v > 0)
           return resampleToNPoints(clean, STANDARD_POINT_COUNT)
         })
       )
-    : savedTones.value.flatMap(t => t.segments.flat())
+    : savedTones.value.flatMap(t => t.segments.flatMap(seg => getSegmentValues(seg)))
 
   if (allValues.length === 0) {
     showWarning(t('praat.pitchTone.alerts.noValidData'))
@@ -604,7 +688,7 @@ const performTValueAnalysis = () => {
       // Find this tone class's own longest token duration (ms) → determines x-axis extent
       let classMaxMs = 0
       tone.segments.forEach(seg => {
-        const clean = seg.filter(v => v !== null && v !== undefined && v > 0)
+        const clean = getSegmentValues(seg).filter(v => v !== null && v !== undefined && v > 0)
         const dur = clean.length * samplingIntervalMs
         if (dur > classMaxMs) classMaxMs = dur
       })
@@ -613,8 +697,8 @@ const performTValueAnalysis = () => {
 
       const tokenData = []
 
-      tone.segments.forEach(hzSegment => {
-        const cleanHz = hzSegment.filter(v => v !== null && v !== undefined && v > 0)
+      tone.segments.forEach(seg => {
+        const cleanHz = getSegmentValues(seg).filter(v => v !== null && v !== undefined && v > 0)
         if (cleanHz.length === 0) return
 
         const tValues = hzToTValues(cleanHz)
@@ -664,8 +748,8 @@ const performTValueAnalysis = () => {
     }
   } else {
     tValueResults.value = savedTones.value.map(tone => {
-      const tValueSegments = tone.segments.map(hzSegment => {
-        return hzToTValues(hzSegment)
+      const tValueSegments = tone.segments.map(seg => {
+        return hzToTValues(getSegmentValues(seg))
       }).filter(seg => seg.length > 0)
 
       if (tValueSegments.length === 0) return { name: tone.name, data: [] }
@@ -1178,23 +1262,6 @@ const initContinuousChart = (isZScore) => {
         color: var(--color-text-primary, #2c3e50);
       }
 
-      .text-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 0.85rem;
-        text-decoration: underline;
-        transition: opacity 0.2s;
-
-        &:hover {
-          opacity: 0.7;
-        }
-
-        &.danger {
-          color: var(--color-error, #e74c3c);
-          font-weight: 600;
-        }
-      }
 
       .tags-wrapper {
         display: flex;
@@ -1218,6 +1285,7 @@ const initContinuousChart = (isZScore) => {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         font-size: 0.95rem;
         transition: all 0.2s;
+        cursor: pointer;
 
         &:hover {
           transform: translateY(-2px);
@@ -1383,6 +1451,24 @@ const initContinuousChart = (isZScore) => {
   }
 }
 
+.text-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &.danger {
+    color: var(--color-error, #e74c3c);
+    font-weight: 600;
+  }
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
@@ -1443,5 +1529,56 @@ const initContinuousChart = (isZScore) => {
       font-size: 1.4rem;
     }
   }
+}
+
+.preview-segments {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 80px;
+}
+
+.preview-segment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.6rem 0.75rem;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: var(--radius-md, 8px);
+  gap: 1rem;
+
+  .preview-segment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+
+    .preview-segment-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-primary, #2c3e50);
+    }
+
+    .preview-segment-meta {
+      font-size: 0.8rem;
+      color: var(--color-text-secondary, #666);
+    }
+
+    .preview-segment-time {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary, #999);
+    }
+  }
+
+  .text-btn.danger {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+}
+
+.preview-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-secondary, #999);
+  font-style: italic;
 }
 </style>
