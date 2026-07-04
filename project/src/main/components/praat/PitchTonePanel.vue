@@ -75,16 +75,18 @@
       </div>
 
       <div class="analyze-action">
-        <div class="log-scale-selector">
-          <span class="log-scale-label">{{ t('praat.pitchTone.step2.logScaleLabel') }}</span>
-          <RadioGroup
-            v-model="logScaleMode"
-            :options="logScaleOptions"
-            name="logScaleMode"
-          />
-        </div>
-        <div class="analysis-mode-toggle">
-          <CheckBox v-model="analysisMode" :label="t('praat.pitchTone.step2.analysisModeCheckbox')" />
+        <div class="analyze-options-row">
+          <div class="log-scale-selector">
+            <span class="log-scale-label">{{ t('praat.pitchTone.step2.logScaleLabel') }}</span>
+            <RadioGroup
+              v-model="logScaleMode"
+              :options="logScaleOptions"
+              name="logScaleMode"
+            />
+          </div>
+          <div class="analysis-mode-toggle">
+            <CheckBox v-model="analysisMode" :label="t('praat.pitchTone.step2.analysisModeCheckbox')" />
+          </div>
         </div>
         <button
             class="analyze-btn"
@@ -530,7 +532,14 @@ const performTValueAnalysis = () => {
   if (savedTones.value.length === 0) return
 
   // A. Calculate global statistics from ALL collected segments
-  const allValues = savedTones.value.flatMap(t => t.segments.flat())
+  const allValues = analysisMode.value
+    ? savedTones.value.flatMap(t =>
+        t.segments.flatMap(seg => {
+          const clean = seg.filter(v => v !== null && v !== undefined && v > 0)
+          return resampleToNPoints(clean, STANDARD_POINT_COUNT)
+        })
+      )
+    : savedTones.value.flatMap(t => t.segments.flat())
 
   if (allValues.length === 0) {
     showWarning(t('praat.pitchTone.alerts.noValidData'))
@@ -657,22 +666,18 @@ const performTValueAnalysis = () => {
     tValueResults.value = savedTones.value.map(tone => {
       const tValueSegments = tone.segments.map(hzSegment => {
         return hzToTValues(hzSegment)
-      })
+      }).filter(seg => seg.length > 0)
 
-      const maxLength = Math.max(...tValueSegments.map(seg => seg.length))
+      if (tValueSegments.length === 0) return { name: tone.name, data: [] }
 
-      const avgTValues = []
-      for (let i = 0; i < maxLength; i++) {
-        let sum = 0
-        let count = 0
-        for (const seg of tValueSegments) {
-          if (i < seg.length) {
-            sum += seg[i]
-            count++
-          }
-        }
-        avgTValues.push(count > 0 ? sum / count : null)
-      }
+      // Target length = average of all token lengths within this tone class
+      const totalLen = tValueSegments.reduce((s, seg) => s + seg.length, 0)
+      const avgLength = Math.round(totalLen / tValueSegments.length)
+
+      // Resample each token to the average length
+      const normalizedSegments = tValueSegments.map(seg => resampleToNPoints(seg, avgLength))
+
+      const avgTValues = averagePointwise(normalizedSegments)
 
       const chartData = avgTValues.map((val, idx) => {
         const timeMs = idx * samplingIntervalMs
@@ -987,66 +992,6 @@ const initContinuousChart = (isZScore) => {
   gap: 1rem;
 }
 
-@media (max-aspect-ratio: 1/1) {
-  .pitch-tone-panel{
-    padding:0.5rem;
-  }
-
-  /* 控制面板改为单列布局 */
-  .controls-section{
-    display: flex!important;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  /* 图表容器高度调整 */
-  .chart-container {
-    height: 280px;
-  }
-
-  .result-chart {
-    height: 320px;
-  }
-
-  /* 统计信息纵向排列 */
-  .stats-info {
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: flex-start;
-  }
-
-  /* 导出按钮自适应 */
-  .export-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .log-scale-selector {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-}
-
-/* 额外的小屏幕适配 */
-@media (max-width: 600px) {
-  .step-number {
-    width: 2rem;
-    height: 2rem;
-    font-size: 1rem;
-  }
-
-  .step-title {
-    font-size: 1.1rem;
-  }
-
-  .step-hint {
-    font-size: 0.85rem;
-  }
-
-  .panel-title {
-    font-size: 1.4rem;
-  }
-}
-
 .panel-title {
   font-size: 1.8rem;
   font-weight: 700;
@@ -1330,6 +1275,14 @@ const initContinuousChart = (isZScore) => {
   padding: 1rem 0;
 }
 
+.analyze-options-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
 .persistence-hint {
   font-size: 0.8rem;
   color: var(--color-text-secondary, #888);
@@ -1351,11 +1304,6 @@ const initContinuousChart = (isZScore) => {
   font-weight: 600;
   color: var(--color-text-primary, #2c3e50);
   white-space: nowrap;
-}
-
-.analysis-mode-toggle {
-  display: flex;
-  justify-content: center;
 }
 
 .analyze-btn {
@@ -1440,6 +1388,65 @@ const initContinuousChart = (isZScore) => {
 
 .export-btn:active {
   transform: translateY(0);
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .pitch-tone-panel{
+    padding:0.5rem;
+  }
+
+  /* 控制面板改为单列布局 */
+  .controls-section{
+    display: flex!important;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  /* 图表容器高度调整 */
+  .chart-container {
+    height: 280px;
+  }
+
+  .result-chart {
+    height: 320px;
+  }
+
+  /* 统计信息纵向排列 */
+  .stats-info {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  /* 导出按钮自适应 */
+  .export-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .analyze-options-row {
+    gap: 1rem;
+  }
+}
+
+/* 额外的小屏幕适配 */
+@media (max-width: 600px) {
+  .step-number {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1rem;
+  }
+
+  .step-title {
+    font-size: 1.1rem;
+  }
+
+  .step-hint {
+    font-size: 0.85rem;
+  }
+
+  .panel-title {
+    font-size: 1.4rem;
+  }
 }
 
 </style>
