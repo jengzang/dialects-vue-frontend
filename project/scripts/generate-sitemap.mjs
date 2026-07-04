@@ -20,7 +20,7 @@ function getMeta(pathname) {
   if (pathname.startsWith('/menu/map/')) {
     return { priority: '0.7', changefreq: 'weekly' }
   }
-  if (pathname.startsWith('/menu/compare/') || pathname.startsWith('/menu/pho/') || pathname === '/menu/result' || pathname === '/menu/cluster') {
+  if (pathname.startsWith('/menu/compare/') || pathname.startsWith('/menu/pho/')  || pathname === '/menu/cluster') {
     return { priority: '0.8', changefreq: 'weekly' }
   }
   if (pathname === '/explore/tools/praat') {

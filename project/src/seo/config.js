@@ -432,7 +432,6 @@ export const SITEMAP_PATHS = [
 
 export const NOINDEX_PATHS = new Set([
   '/intro',
-  '/auth',
   '/auth/data',
   '/auth/regions',
 ])
