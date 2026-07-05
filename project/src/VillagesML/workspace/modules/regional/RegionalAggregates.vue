@@ -175,10 +175,10 @@
           <div class="ui-loading--page" aria-hidden="true"></div>
         </div>
 
-        <template v-else-if="spatialAggregates.length > 0">
+        <div v-show="!loadingSpatial && spatialAggregates.length > 0" style="width: 100%">
           <p class="spatial-desc">X軸：村莊密度 Y軸：隔離指數 氣泡大小：村莊總數 顏色：空間分散度</p>
           <div ref="spatialChart" class="spatial-chart"></div>
-        </template>
+        </div>
       </div>
 
     </div>
@@ -330,7 +330,6 @@ function renderSpatialChart() {
   if (spatialChartInstance) spatialChartInstance.dispose()
   spatialChartInstance = echarts.init(spatialChart.value)
 
-  // Deduplicate by region_name
   const seen = new Set()
   const items = spatialAggregates.value.filter(d => {
     if (seen.has(d.region_name)) return false
@@ -410,7 +409,9 @@ watch(currentLevel, loadAggregates)
 watch(spatialAggregates, async (val) => {
   if (!val.length) return
   await nextTick()
-  renderSpatialChart()
+  requestAnimationFrame(() => {
+    renderSpatialChart()
+  })
 })
 
 onBeforeUnmount(() => {
