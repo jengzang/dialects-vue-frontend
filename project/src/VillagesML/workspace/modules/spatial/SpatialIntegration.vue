@@ -1046,9 +1046,7 @@ onMounted(() => {
 }
 
 .summary-section h2 {
-  font-size: 16px;
   margin-bottom: 12px;
-  color: var(--text-primary);
 }
 
 .summary-grid {

@@ -353,9 +353,6 @@ onBeforeUnmount(() => {
 }
 
 .search-section h2 {
-  font-size: 16px;
-  margin: 0;
-  color: var(--text-primary);
   white-space: nowrap;
   flex-shrink: 0;
 }

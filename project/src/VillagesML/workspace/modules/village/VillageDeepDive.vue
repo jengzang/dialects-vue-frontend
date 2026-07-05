@@ -251,7 +251,6 @@ watch(() => route.query.villageId, (newId) => {
 
 .selector-header h2 {
   font-size: 18px;
-  color: var(--text-primary);
 }
 
 .clear-button {

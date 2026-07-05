@@ -354,9 +354,7 @@ const getRegionLevelName = (level) => {
 }
 
 .indices-section h2 {
-  font-size: 16px;
   margin-bottom: 10px;
-  color: var(--text-primary);
   white-space: nowrap;
   flex-shrink: 0;
 }

@@ -640,12 +640,6 @@ watch(
   margin-bottom: 16px;
 }
 
-.section-header h2 {
-  font-size: 16px;
-  margin: 0;
-  color: var(--text-primary);
-}
-
 .toggle-section-btn {
   padding: 6px 16px;
   background: rgba(74, 144, 226, 0.2);
@@ -665,9 +659,7 @@ watch(
 .regional-section h2,
 .tendency-section h2,
 .significance-section h2 {
-  font-size: 16px;
   margin-bottom: 16px;
-  color: var(--text-primary);
 }
 
 .controls {

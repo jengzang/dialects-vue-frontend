@@ -136,9 +136,7 @@ const translatePattern = (patternStr) => {
 }
 
 .patterns-section h2 {
-  font-size: 16px;
   margin-bottom: 10px;
-  color: var(--text-primary);
 }
 
 .section-description {
