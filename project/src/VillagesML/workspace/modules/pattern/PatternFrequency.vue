@@ -362,13 +362,13 @@ const goToTendency = (pattern) => {
 
 @media (min-aspect-ratio: 1/1) {
   .vml-glass-panel {
-    flex-flow: row wrap;
+    flex-direction: row;
     align-items: center;
-    gap: 8px 16px;
   }
 
   .controls {
     flex: 1;
+    justify-content: flex-end;
   }
 }
 

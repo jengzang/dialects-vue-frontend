@@ -475,9 +475,14 @@ const loadRegionalNgrams = async () => {
 
 @media (min-aspect-ratio: 1/1) {
   .tendency-section {
-    flex-flow: row wrap;
+    flex-direction: row;
     align-items: center;
     gap: 8px 16px;
+  }
+
+  .tendency-section .region-selector {
+    flex: 1;
+    justify-content: flex-end;
   }
 
   .ngram-section {
