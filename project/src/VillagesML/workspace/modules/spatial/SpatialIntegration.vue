@@ -19,7 +19,7 @@
       <!-- Overview Mode -->
       <div v-if="queryMode === 'overview'" class="overview-section">
 
-        <div v-if="loadingIntegration" class="loading-state vml-glass-panel">
+        <div v-if="loadingIntegration" class="vml-loading vml-glass-panel">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>加載中...</p>
         </div>
@@ -128,7 +128,7 @@
           </div>
         </div>
 
-        <div v-if="loadingByChar" class="loading-state vml-glass-panel">
+        <div v-if="loadingByChar" class="vml-loading vml-glass-panel">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>加載中...</p>
         </div>
@@ -198,7 +198,7 @@
           </div>
         </div>
 
-        <div v-if="loadingByCluster" class="loading-state vml-glass-panel">
+        <div v-if="loadingByCluster" class="vml-loading vml-glass-panel">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>加載中...</p>
         </div>

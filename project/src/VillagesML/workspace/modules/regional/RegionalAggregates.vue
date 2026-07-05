@@ -18,7 +18,7 @@
           <button class="query-button" :disabled="loading" @click="loadAggregates">查詢</button>
         </div>
 
-        <div v-if="loading" class="loading-state">
+        <div v-if="loading" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
         </div>
 
@@ -171,7 +171,7 @@
           </div>
         </div>
 
-        <div v-if="loadingSpatial" class="loading-state">
+        <div v-if="loadingSpatial" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
         </div>
 
@@ -482,11 +482,6 @@ onBeforeUnmount(() => {
   outline: none;
   border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.8);
-}
-
-.loading-state {
-  text-align: center;
-  padding: 60px 20px;
 }
 
 

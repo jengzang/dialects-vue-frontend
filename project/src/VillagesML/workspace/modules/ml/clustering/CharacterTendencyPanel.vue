@@ -5,42 +5,42 @@
       <HelpIcon content="基於字符使用傾向性的區域聚類。特徵為每個區域的字符Z分數向量（標準化偏差），衡量該區域對特定字符的偏好程度。算法：K-Means（質心聚類）、DBSCAN（密度聚類）、GMM（高斯混合模型）" />
     </h3>
     <!-- 左側：參數設置 -->
-    <div class="two-col-layout">
+    <div class="vml-two-col">
     <div class="vml-glass-panel">
       <h3 class="panel-title">字符傾向性聚類</h3>
       <p class="panel-description">基於字符使用傾向性的區域聚類分析</p>
 
       <!-- 認證提示 -->
-      <div v-if="!isAuthenticated" class="auth-notice">
+      <div v-if="!isAuthenticated" class="vml-auth-notice">
         <span class="notice-icon">🔒</span>
         <span>此功能需要登錄後使用</span>
       </div>
 
-      <div v-else class="settings-form">
+      <div v-else class="vml-settings-form">
         <!-- 算法選擇 -->
         <AlgorithmSelector
           v-model="settings.algorithm"
         />
 
         <!-- K值設置（僅 kmeans/gmm） -->
-        <div v-if="settings.algorithm !== 'dbscan'" class="setting-row">
-          <label class="setting-label">聚類數量 (k)</label>
-          <div class="setting-control">
+        <div v-if="settings.algorithm !== 'dbscan'" class="vml-setting-row">
+          <label class="vml-setting-label">聚類數量 (k)</label>
+          <div class="vml-setting-control">
             <input
               type="number"
               v-model.number="settings.k"
               min="2"
               max="20"
-              class="setting-input"
+              class="vml-input"
             />
-            <span class="setting-hint">建議 2-10 個聚類</span>
+            <span class="vml-setting-hint">建議 2-10 個聚類</span>
           </div>
         </div>
 
         <!-- 區域級別 -->
-        <div class="setting-row">
-          <label class="setting-label">區域級別</label>
-          <div class="setting-control">
+        <div class="vml-setting-row">
+          <label class="vml-setting-label">區域級別</label>
+          <div class="vml-setting-control">
             <SimpleSelectDropdown
               v-model="settings.region_level"
               :options="regionLevelOptions"
@@ -49,43 +49,43 @@
         </div>
 
         <!-- 區域過濾 -->
-<!--        <div class="setting-row">-->
-<!--          <label class="setting-label">區域過濾</label>-->
-<!--          <div class="setting-control">-->
+<!--        <div class="vml-setting-row">-->
+<!--          <label class="vml-setting-label">區域過濾</label>-->
+<!--          <div class="vml-setting-control">-->
 <!--            <input-->
 <!--              type="text"-->
 <!--              v-model="settings.region_filter"-->
 <!--              placeholder="留空表示全部區域"-->
-<!--              class="setting-input"-->
+<!--              class="vml-input"-->
 <!--            />-->
-<!--            <span class="setting-hint">可選：指定特定區域名稱</span>-->
+<!--            <span class="vml-setting-hint">可選：指定特定區域名稱</span>-->
 <!--          </div>-->
 <!--        </div>-->
 
         <!-- Top N 字符 -->
-        <div class="setting-row">
-          <label class="setting-label">Top N 字符</label>
-          <div class="setting-control">
+        <div class="vml-setting-row">
+          <label class="vml-setting-label">Top N 字符</label>
+          <div class="vml-setting-control">
             <input
               type="number"
               v-model.number="settings.top_n_chars"
               min="10"
               max="200"
-              class="setting-input"
+              class="vml-input"
             />
-            <span class="setting-hint">使用前 N 個高頻字符（10-200）</span>
+            <span class="vml-setting-hint">使用前 N 個高頻字符（10-200）</span>
           </div>
         </div>
 
         <!-- 傾向性指標 -->
-        <div class="setting-row">
-          <label class="setting-label">傾向性指標</label>
-          <div class="setting-control">
+        <div class="vml-setting-row">
+          <label class="vml-setting-label">傾向性指標</label>
+          <div class="vml-setting-control">
             <SimpleSelectDropdown
               v-model="settings.tendency_metric"
               :options="tendencyMetricOptions"
             />
-            <span class="setting-hint">{{ tendencyMetricHint }}</span>
+            <span class="vml-setting-hint">{{ tendencyMetricHint }}</span>
           </div>
         </div>
 
@@ -97,25 +97,25 @@
         <!-- DBSCAN 參數 -->
         <div v-if="settings.algorithm === 'dbscan'" class="dbscan-params">
           <h4 class="section-title">DBSCAN 參數</h4>
-          <div class="setting-row">
-            <label class="setting-label">Epsilon (eps)</label>
+          <div class="vml-setting-row">
+            <label class="vml-setting-label">Epsilon (eps)</label>
             <input
               type="number"
               v-model.number="settings.dbscan_config.eps"
               step="0.1"
               min="0.1"
               placeholder="自動調整"
-              class="setting-input"
+              class="vml-input"
             />
           </div>
-          <div class="setting-row">
-            <label class="setting-label">Min Samples</label>
+          <div class="vml-setting-row">
+            <label class="vml-setting-label">Min Samples</label>
             <input
               type="number"
               v-model.number="settings.dbscan_config.min_samples"
               min="2"
               placeholder="自動調整"
-              class="setting-input"
+              class="vml-input"
             />
           </div>
         </div>
@@ -243,13 +243,7 @@ async function runClustering() {
   padding: 12px;
 }
 
-.two-col-layout {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 16px;
-}
-
-.two-col-layout > .vml-glass-panel {
+.vml-two-col > .vml-glass-panel {
   padding: 20px;
   overflow-y: auto;
 }
@@ -268,71 +262,6 @@ async function runClustering() {
   line-height: 1.5;
 }
 
-.auth-notice {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: rgba(255, 193, 7, 0.15);
-  border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 10px;
-  margin-bottom: 16px;
-  font-size: 13px;
-  color: #856404;
-  font-weight: 500;
-}
-
-.settings-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.setting-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.setting-label {
-  min-width: 100px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
-  padding-top: 10px;
-}
-
-.setting-control {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.setting-input,
-.setting-select {
-  flex: 1;
-  padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  font-size: 14px;
-}
-
-.setting-input:focus,
-.setting-select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.setting-hint {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
 .dbscan-params {
   padding: 16px;
   background: rgba(74, 144, 226, 0.08);
@@ -347,14 +276,7 @@ async function runClustering() {
   margin-bottom: 12px;
 }
 
-
 .results-section {
   overflow-y: auto;
-}
-
-@media (max-width: 600px) {
-  .two-col-layout {
-    grid-template-columns: 1fr;
-  }
 }
 </style>

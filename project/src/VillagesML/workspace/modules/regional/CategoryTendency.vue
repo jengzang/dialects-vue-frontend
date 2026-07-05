@@ -29,7 +29,7 @@
         </button>
       </div>
 
-      <div v-if="loadingTendency" class="loading-state">
+      <div v-if="loadingTendency" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
 
@@ -97,7 +97,7 @@
       </button>
     </div>
 
-    <div v-if="loadingNgram" class="loading-state">
+    <div v-if="loadingNgram" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
     </div>
 

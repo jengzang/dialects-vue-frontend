@@ -56,7 +56,7 @@
       </div>
     </div>
 
-    <div v-if="loading" class="loading-state glass-panel">
+    <div v-if="loading" class="vml-loading glass-panel">
       <div class="ui-loading--page" aria-hidden="true"></div>
     </div>
 
@@ -289,7 +289,7 @@
         </button>
       </div>
 
-      <div v-if="loadingSignificance" class="loading-state">
+      <div v-if="loadingSignificance" class="vml-loading"">
         <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
 
@@ -605,11 +605,6 @@ watch(
   margin-bottom: 16px;
 }
 
-.loading-state {
-  padding: 40px;
-  text-align: center;
-}
-
 .info-banner strong {
   color: var(--color-primary);
   margin: 0 6px;
@@ -726,11 +721,6 @@ watch(
 
 .text-input {
   flex: 1;
-}
-
-.loading-state {
-  text-align: center;
-  padding: 40px 20px;
 }
 
 

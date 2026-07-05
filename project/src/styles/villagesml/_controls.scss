@@ -1,15 +1,15 @@
-@mixin vm-query-button-styles($padding: 10px 20px, $radius: 8px, $font-size: 14px) {
-  display: block;
-  width: fit-content; /* 确保按钮包裹文字，而不是撑满整行 */
-  //margin: 0 auto 0; /* 核心：左右 margin 为 auto 实现绝对居中，上边距给 20px 留白 */
+// VillagesML 控件样式（按钮、输入框、设置行）
 
+.vml-query-btn {
+  display: block;
+  width: fit-content;
   white-space: nowrap;
-  padding: $padding;
+  padding: 10px 20px;
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: $radius;
-  font-size: $font-size;
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -26,29 +26,40 @@
   }
 }
 
-@mixin vm-query-button-disabled-styles {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-@mixin vm-mode-button-styles($padding: 8px 16px, $radius: 8px, $font-size: 14px) {
+.vml-mode-btn {
   flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: $padding;
+  padding: 8px 16px;
   border: 2px solid rgba(74, 144, 226, 0.3);
   background: rgba(255, 255, 255, 0.5);
-  border-radius: $radius;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: $font-size;
+  font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(74, 144, 226, 0.1);
+    border-color: rgba(74, 144, 226, 0.5);
+  }
+
+  &.active {
+    background: var(--color-primary, #4a90e2);
+    color: white;
+    border-color: var(--color-primary, #4a90e2);
+  }
 }
 
-@mixin vm-run-button-styles {
+.vml-run-btn {
   margin-top: 8px;
   padding: 12px 24px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .vm-setting-input {
@@ -67,12 +78,12 @@
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.9);
   font-size: 0.95rem;
-}
 
-.vm-setting-input-compact:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  }
 }
 
 .vm-setting-hint-muted {
@@ -83,39 +94,4 @@
 
 .vm-setting-indent {
   margin-left: 1.5rem;
-}
-
-.villagesml-module .query-button {
-  @include vm-query-button-styles;
-}
-
-.villagesml-module .query-button:hover:not(:disabled) {
-  background: #3a7bc8;
-}
-
-.villagesml-module .query-button:disabled {
-  @include vm-query-button-disabled-styles;
-}
-
-.villagesml-module .mode-button {
-  @include vm-mode-button-styles;
-}
-
-.villagesml-module .mode-button:hover {
-  background: rgba(74, 144, 226, 0.1);
-  border-color: rgba(74, 144, 226, 0.5);
-}
-
-.villagesml-module .mode-button.active {
-  background: var(--color-primary, #4a90e2);
-  color: white;
-  border-color: var(--color-primary, #4a90e2);
-}
-
-.villagesml-module .run-button {
-  @include vm-run-button-styles;
-}
-
-.villagesml-module .run-button:disabled {
-  @include vm-query-button-disabled-styles;
 }

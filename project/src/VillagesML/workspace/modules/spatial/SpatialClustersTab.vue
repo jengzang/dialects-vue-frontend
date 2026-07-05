@@ -17,7 +17,7 @@
     </div>
 
     <!-- Clusters 地圖 -->
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="vml-loading"">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>加載中...</p>
     </div>
@@ -186,8 +186,6 @@ h3 { font-size: 16px; margin-top: 20px; }
 .load-button.secondary { background: rgba(74,144,226,0.2); color: var(--color-primary); }
 .load-button:hover:not(:disabled) { opacity: 0.85; }
 .load-button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.loading-state { text-align: center; padding: 40px 20px; }
 
 .clusters-content { margin-top: 20px; width: 100%;  display: flex; flex-direction: column; }
 .clusters-metadata {

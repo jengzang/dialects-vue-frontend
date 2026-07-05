@@ -63,7 +63,7 @@
           </button>
         </div>
 
-        <div v-if="loadingBigrams" class="loading-state">
+        <div v-if="loadingBigrams" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
         </div>
 
@@ -108,7 +108,7 @@
           </button>
         </div>
 
-        <div v-if="loadingTrigrams" class="loading-state">
+        <div v-if="loadingTrigrams" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
         </div>
 
@@ -168,7 +168,7 @@
         </button>
       </div>
 
-      <div v-if="loadingPMI" class="loading-state">
+      <div v-if="loadingPMI" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
 

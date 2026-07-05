@@ -50,7 +50,7 @@
       </div>
 
       <!-- Results Section -->
-      <div v-if="similarities.length > 0" class="results-section">
+      <div v-if="similarities.length > 0" ref="resultsSectionRef" class="results-section">
         <!-- Similarity List -->
         <div class="similarity-list glass-panel">
           <h3>相似字列表</h3>
@@ -106,7 +106,7 @@
           </div>
         </div>
 
-        <div v-if="loadingList" class="loading-state">
+        <div v-if="loadingList" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>加載中...</p>
         </div>
@@ -169,6 +169,7 @@ const totalEmbeddings = ref(0)
 const totalPages = computed(() => Math.ceil(totalEmbeddings.value / pageSize))
 
 const vizChartRef = ref(null)
+const resultsSectionRef = ref(null)
 let vizChartInstance = null
 
 // Methods
@@ -193,7 +194,10 @@ const searchSimilarities = async () => {
     // 新格式：{ query_character, top_k, similarities: [...] }
     similarities.value = result.similarities || result || []
     // 渲染可視化圖表
-    nextTick(() => renderVizChart())
+    nextTick(() => {
+      renderVizChart()
+      resultsSectionRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
   } catch (error) {
     console.error('Similarities API error:', error)
     showError('搜尋相似字失敗')
@@ -544,11 +548,6 @@ onBeforeUnmount(() => {
 .pagination-controls button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.loading-state {
-  text-align: center;
-  padding: 40px 20px;
 }
 
 

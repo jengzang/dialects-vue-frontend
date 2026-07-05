@@ -21,7 +21,7 @@
       </span>
     </div>
 
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>生成網絡中...</p>
     </div>
@@ -308,7 +308,6 @@ onBeforeUnmount(() => {
   margin-bottom: 16px;
 }
 
-.loading-state,
 .empty-state {
   display: flex;
   flex-direction: column;

@@ -1,3 +1,5 @@
+// VillagesML 子面板和卡片
+
 .vm-subpanel-shell {
   padding: 1rem;
   background: rgba(255, 255, 255, 0.5);
@@ -7,4 +9,30 @@
 
 .vm-subpanel-shell-spaced {
   margin-top: 1.5rem;
+}
+
+.vml-card {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.vml-stat-card {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  text-align: center;
+
+  .vml-stat-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .vml-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
 }

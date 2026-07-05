@@ -84,7 +84,7 @@
       <div v-if="results.length > 0" class="results-table vml-glass-panel">
         <h3>顯著性分析結果</h3>
 
-        <div v-if="loading" class="loading-state">
+        <div v-if="loading" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>分析中...</p>
         </div>

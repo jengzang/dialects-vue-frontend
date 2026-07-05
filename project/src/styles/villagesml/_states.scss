@@ -1,0 +1,63 @@
+// VillagesML 状态占位（替代原 _workspace.scss）
+// loading spinner 统一使用 global/_loading.scss 的 .ui-loading--page
+
+.vml-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.vml-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+.vml-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  color: #e74c3c;
+}
+
+.vml-auth-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background: rgba(255, 193, 7, 0.15);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 10px;
+  font-size: 13px;
+  color: #856404;
+  font-weight: 500;
+}
+
+.vml-auth-notice--error {
+  background: rgba(231, 76, 60, 0.1);
+  border-color: rgba(231, 76, 60, 0.25);
+  color: #c0392b;
+}
+
+// 全局 empty-state（通过 .villagesml-module 祖先选择器覆盖所有 scoped 组件）
+// 原在 _workspace.scss，删除该文件时遗漏，此处补回
+.villagesml-module .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}

@@ -132,7 +132,7 @@
           </div>
         </div>
       </div>
-      <div v-else-if="loadingNgram" class="loading-state">
+      <div v-else-if="loadingNgram" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
     </div>
@@ -573,11 +573,8 @@ onMounted(() => {
   color: var(--text-primary);
 }
 
-.loading-state {
-  display: flex;
-  justify-content: center;
-  padding: 20px;
-}
+
+
 
 .glass-input,
 .glass-select {

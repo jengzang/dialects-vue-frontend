@@ -116,7 +116,7 @@
         </button>
       </div>
 
-      <div v-if="loadingIndices" class="loading-state">
+      <div v-if="loadingIndices" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
 

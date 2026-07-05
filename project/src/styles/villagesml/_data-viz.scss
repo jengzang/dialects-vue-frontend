@@ -1,0 +1,57 @@
+// VillagesML 数据可视化（进度条、徽章）
+
+.vml-bar {
+  height: 24px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.vml-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+  transition: width 0.5s ease;
+}
+
+.vml-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.vml-badge-significant {
+  background: rgba(46, 204, 113, 0.15);
+  color: #27ae60;
+}
+
+.vml-badge-very-significant {
+  background: rgba(39, 174, 96, 0.2);
+  color: #1e8449;
+}
+
+.vml-badge-marginal {
+  background: rgba(243, 156, 18, 0.15);
+  color: #e67e22;
+}
+
+.vml-badge-not-significant {
+  background: rgba(149, 165, 166, 0.15);
+  color: var(--text-secondary);
+}
+
+.vml-rank-gold {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #8b6914;
+}
+
+.vml-rank-silver {
+  background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+  color: #5a5a5a;
+}
+
+.vml-rank-bronze {
+  background: linear-gradient(135deg, #cd7f32, #e8a87c);
+  color: #6b3e1a;
+}

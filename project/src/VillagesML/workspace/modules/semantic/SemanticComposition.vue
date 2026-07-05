@@ -49,7 +49,7 @@
         </button>
       </div>
 
-      <div v-if="loadingPatterns" class="loading-state">
+      <div v-if="loadingPatterns" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>

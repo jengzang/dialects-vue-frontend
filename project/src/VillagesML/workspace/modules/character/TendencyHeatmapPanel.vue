@@ -41,7 +41,7 @@
       </div>
     </div>
 
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>載入中...</p>
     </div>
@@ -170,7 +170,6 @@ onBeforeUnmount(() => {
   min-height: 400px;
 }
 
-.loading-state,
 .empty-state {
   min-height: 300px;
   color: var(--text-primary);

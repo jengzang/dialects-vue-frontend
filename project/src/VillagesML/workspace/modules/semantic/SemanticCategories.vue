@@ -15,7 +15,7 @@
       <!-- Category List -->
       <div class="category-list glass-panel">
         <h2>語義類別</h2>
-        <div v-if="loadingCategories" class="loading-state">
+        <div v-if="loadingCategories" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>加載中...</p>
         </div>
@@ -49,7 +49,7 @@
               trigger="both"
             />
           </h3>
-          <div v-if="loadingVTFGlobal" class="loading-state">
+          <div v-if="loadingVTFGlobal" class="vml-loading">
             <div class="ui-loading--page" aria-hidden="true"></div>
           </div>
           <div v-else class="vtf-chart">
@@ -96,7 +96,7 @@
               查詢
             </button>
           </div>
-          <div v-if="loadingVTFRegional" class="loading-state">
+          <div v-if="loadingVTFRegional" class="vml-loading">
             <div class="ui-loading--page" aria-hidden="true"></div>
           </div>
           <div v-else-if="vtfRegional.length > 0" class="vtf-chart">
@@ -157,7 +157,7 @@
             />
             <span class="input-hint">（過濾小樣本區域）</span>
           </div>
-          <div v-if="loadingRanking" class="loading-state">
+          <div v-if="loadingRanking" class="vml-loading">
             <div class="ui-loading--page" aria-hidden="true"></div>
           </div>
           <div v-else-if="categoryRanking.length > 0" class="ranking-results">
@@ -214,7 +214,7 @@
 <!--            :options="categoryOptionsForLabels"-->
 <!--            @update:modelValue="loadLabelsByCategory"-->
 <!--          />-->
-<!--          <div v-if="loadingLabels" class="loading-state">-->
+<!--          <div v-if="loadingLabels" class="vml-loading">-->
 <!--            <div class="ui-loading--page" aria-hidden="true"></div>-->
 <!--          </div>-->
 <!--          <div v-else-if="labels.length > 0" class="labels-cloud">-->
@@ -239,7 +239,7 @@
 <!--              class="char-input"-->
 <!--              @input="loadLabelsByChar"-->
 <!--          />-->
-<!--          <div v-if="loadingLabels" class="loading-state">-->
+<!--          <div v-if="loadingLabels" class="vml-loading">-->
 <!--            <div class="ui-loading--page" aria-hidden="true"></div>-->
 <!--          </div>-->
 <!--          <div v-else-if="labels.length > 0" class="labels-list">-->

@@ -75,7 +75,7 @@
         </button>
       </div>
 
-      <div v-if="loadingFrequency" class="loading-state">
+      <div v-if="loadingFrequency" class="vml-loading"">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -150,7 +150,7 @@
         </button>
       </div>
 
-      <div v-if="loadingPatterns" class="loading-state">
+      <div v-if="loadingPatterns" class="vml-loading"">
         <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
 
@@ -392,11 +392,6 @@ onMounted(async () => {
 
 .pattern-input {
   flex: 1;
-}
-
-.loading-state {
-  text-align: center;
-  padding: 40px 20px;
 }
 
 
