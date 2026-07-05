@@ -554,11 +554,6 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.vtf-regional {
-  display: flex;
-  flex-direction: column;
-}
-
 .vtf-global h3,
 .vtf-regional h3 {
   font-size: 16px;
@@ -566,16 +561,10 @@ onMounted(() => {
   color: var(--text-primary);
 }
 
-.vtf-regional h3 {
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
 .region-selector {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
-  flex: 1;
 }
 
 .vtf-chart {
@@ -925,23 +914,6 @@ onMounted(() => {
 
 .col-villages {
   color: var(--text-secondary);
-}
-
-@media (min-aspect-ratio: 1/1) {
-  .vtf-regional {
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .vtf-regional h3 {
-    margin: 0;
-  }
-
-  .region-selector {
-    margin-bottom: 0;
-    justify-content: flex-end;
-  }
 }
 
 @media (max-width: 600px) {

@@ -145,8 +145,6 @@ const clearFilters = () => {
 
 <style scoped>
 .vml-glass-panel {
-  display: flex;
-  flex-direction: column;
   padding: 20px;
   margin-bottom: 20px;
 }
@@ -199,23 +197,6 @@ const clearFilters = () => {
 
 .clear-filters-button:hover {
   background: rgba(243, 156, 18, 0.3);
-}
-
-@media (min-aspect-ratio: 1/1) {
-  .vml-glass-panel {
-    flex-flow: row wrap;
-    align-items: center;
-    gap: 8px 16px;
-  }
-
-  .search-input-group {
-    flex: 1;
-    margin-bottom: 0;
-  }
-
-  .filters-row {
-    width: 100%;
-  }
 }
 
 @media (max-width: 768px) {

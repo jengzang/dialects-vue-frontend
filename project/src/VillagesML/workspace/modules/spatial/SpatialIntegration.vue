@@ -703,8 +703,6 @@ onMounted(() => {
 }
 
 .query-form {
-  display: flex;
-  flex-direction: column;
   padding: 12px;
   margin-bottom: 16px;
 }
@@ -1179,14 +1177,6 @@ onMounted(() => {
 }
 
 /* 移动端横向滚动样式 */
-@media (min-aspect-ratio: 1/1) {
-  .query-form {
-    flex-flow: row wrap;
-    align-items: center;
-    gap: 12px;
-  }
-}
-
 @media (max-aspect-ratio: 1/1) {
 }
 

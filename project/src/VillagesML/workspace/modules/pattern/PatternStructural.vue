@@ -125,38 +125,14 @@ const goToTendency = (pattern) => {
   margin: 0 auto;
 }
 
-.vml-glass-panel {
-  display: flex;
-  flex-direction: column;
-}
-
 .vml-glass-panel h2 {
   margin-bottom: 16px;
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 
 .controls {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
-}
-
-@media (min-aspect-ratio: 1/1) {
-  .vml-glass-panel {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .vml-glass-panel h2 {
-    margin: 0;
-  }
-
-  .controls {
-    flex: 1;
-    justify-content: flex-end;
-    margin-bottom: 0;
-  }
 }
 
 .structural-list {
