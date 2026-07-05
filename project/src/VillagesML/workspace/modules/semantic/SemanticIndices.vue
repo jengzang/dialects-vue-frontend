@@ -347,6 +347,8 @@ const getRegionLevelName = (level) => {
 }
 
 .indices-section {
+  display: flex;
+  flex-direction: column;
   padding: 16px;
   margin-bottom: 16px;
 }
@@ -355,6 +357,8 @@ const getRegionLevelName = (level) => {
   font-size: 16px;
   margin-bottom: 10px;
   color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .section-description {
@@ -371,6 +375,29 @@ const getRegionLevelName = (level) => {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .indices-section {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 8px 16px;
+  }
+
+  .indices-section h2 {
+    margin: 0;
+  }
+
+  .section-description {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .controls {
+    flex: 1;
+    justify-content: flex-end;
+    margin-bottom: 0;
+  }
 }
 
 .input-group {

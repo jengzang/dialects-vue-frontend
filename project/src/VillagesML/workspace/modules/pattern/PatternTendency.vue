@@ -165,8 +165,15 @@ watch(
   margin: 0 auto;
 }
 
+.vml-glass-panel {
+  display: flex;
+  flex-direction: column;
+}
+
 .vml-glass-panel h2 {
   margin-bottom: 16px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .controls {
@@ -176,6 +183,23 @@ watch(
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .vml-glass-panel {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .vml-glass-panel h2 {
+    margin: 0;
+  }
+
+  .controls {
+    flex: 1;
+    justify-content: flex-end;
+    margin-bottom: 0;
+  }
 }
 
 .text-input {

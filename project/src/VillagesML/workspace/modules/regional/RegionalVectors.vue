@@ -716,10 +716,16 @@ onUnmounted(() => {
   font-weight: 500;
 }
 
+.selector-panel {
+  display: flex;
+  flex-direction: column;
+}
+
 .selector-content {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  flex: 1;
 }
 
 /* 區域選擇器並排 */
@@ -1009,6 +1015,31 @@ onUnmounted(() => {
   color: white;
   margin-top: 16px;
   font-size: 16px;
+}
+
+/* Responsive - Landscape orientation */
+@media (min-aspect-ratio: 1/1) {
+  .selector-panel {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .selector-panel .panel-header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .selector-content {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .action-button {
+    width: auto;
+    flex-shrink: 0;
+  }
 }
 
 /* Responsive - Portrait orientation */
