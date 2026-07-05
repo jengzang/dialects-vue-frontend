@@ -6,7 +6,7 @@
     </h3>
 
     <!-- Region Selector -->
-    <div class="glass-panel selector-panel">
+    <div class="vml-glass-panel selector-panel">
       <div class="panel-header">
         <h3>選擇兩個區域進行比較</h3>
       </div>
@@ -54,7 +54,7 @@
     <!-- Comparison Results -->
     <div v-if="comparisonData" class="results-section">
       <!-- Similarity Metrics -->
-      <div class="glass-panel similarity-panel">
+      <div class="vml-glass-panel similarity-panel">
         <div class="panel-header">
           <h3>相似度分析</h3>
         </div>
@@ -87,7 +87,7 @@
       <!-- Side-by-side Vector Charts -->
 <!--      <div class="vectors-row">-->
         <!-- Region 1 Vector -->
-<!--        <div class="glass-panel vector-panel">-->
+<!--        <div class="vml-glass-panel vector-panel">-->
 <!--          <div class="panel-header">-->
 <!--            <h3>{{ region1 }}</h3>-->
 <!--            <span class="region-label">{{ getLevelLabel(level1) }}</span>-->
@@ -106,7 +106,7 @@
 <!--        </div>-->
 
         <!-- Region 2 Vector -->
-<!--        <div class="glass-panel vector-panel">-->
+<!--        <div class="vml-glass-panel vector-panel">-->
 <!--          <div class="panel-header">-->
 <!--            <h3>{{ region2 }}</h3>-->
 <!--            <span class="region-label">{{ getLevelLabel(level2) }}</span>-->
@@ -128,7 +128,7 @@
     </div>
 
     <!-- Multi-Region Selector for Batch Analysis -->
-    <div class="glass-panel multi-region-panel">
+    <div class="vml-glass-panel multi-region-panel">
       <div class="panel-header">
         <h3>批量分析（熱力圖 & 散點圖）</h3>
       </div>
@@ -188,7 +188,7 @@
     <!-- Batch Analysis Results -->
     <div v-if="batchComparisonData || reductionData" class="batch-results-section">
       <!-- Heatmap -->
-      <div v-if="batchComparisonData" class="glass-panel heatmap-panel">
+      <div v-if="batchComparisonData" class="vml-glass-panel heatmap-panel">
         <div class="panel-header">
           <h3>相似度熱力圖</h3>
         </div>
@@ -198,7 +198,7 @@
       </div>
 
       <!-- Scatter Plot -->
-      <div v-if="reductionData" class="glass-panel scatter-panel">
+      <div v-if="reductionData" class="vml-glass-panel scatter-panel">
         <div class="panel-header">
           <h3>向量降維散點圖 (PCA)</h3>
           <span class="info-label">解釋方差: {{ formatVariance(reductionData.explained_variance) }}</span>

@@ -329,11 +329,12 @@ const getSignificanceBadge = (pValue) => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: 16px;
 }
 
 .form-content h3 {
   font-size: 16px;
-  margin: 0;
+  margin: 0 16px 0 0;
   color: var(--text-primary);
   white-space: nowrap;
   flex-shrink: 0;
@@ -341,9 +342,8 @@ const getSignificanceBadge = (pValue) => {
 
 .form-group {
   display: grid;
-  grid-template-columns: 100px 1fr;
-  align-items: center;
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 4px 12px;
   margin-bottom: 12px;
 }
 
@@ -502,6 +502,11 @@ const getSignificanceBadge = (pValue) => {
 @media (min-aspect-ratio: 1/1) {
   .form-content {
     flex-flow: row wrap;
+    align-items: center;
+  }
+
+  .form-group {
+    grid-template-columns: auto 1fr;
     align-items: center;
   }
 }

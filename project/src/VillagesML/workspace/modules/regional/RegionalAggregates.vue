@@ -8,7 +8,7 @@
 <!--      <h1 class="page-title">🌍 區域聚合統計</h1>-->
 
       <!-- Aggregates Table -->
-      <div class="aggregates-section glass-panel">
+      <div class="aggregates-section vml-glass-panel">
         <h2>聚合结果表格</h2>
         <div class="aggregates-header">
           <SimpleSelectDropdown
@@ -159,7 +159,7 @@
       </AppModal>
 
       <!-- Spatial Aggregates -->
-      <div class="spatial-section glass-panel">
+      <div class="spatial-section vml-glass-panel">
         <div class="spatial-header">
           <h2 style="white-space: nowrap">空間聚合</h2>
           <div class="controls">
@@ -444,9 +444,7 @@ onBeforeUnmount(() => {
 }
 
 .aggregates-section h2 {
-  font-size: 16px;
   margin-bottom: 16px;
-  color: var(--text-primary);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -768,12 +766,6 @@ onBeforeUnmount(() => {
   height: 500px;
 }
 
-
-.spatial-section h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: var(--text-primary);
-}
 
 .controls {
   display: flex;

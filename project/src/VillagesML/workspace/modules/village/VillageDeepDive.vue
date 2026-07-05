@@ -4,7 +4,7 @@
       <h1 class="page-title">🏘️ 村名深度分析</h1>
 
       <!-- Village Selector -->
-      <div class="village-selector glass-panel">
+      <div class="village-selector vml-glass-panel">
         <div class="selector-header">
           <h2>選擇村莊</h2>
           <button v-if="selectedVillageId" class="clear-button" @click="clearSelection">
@@ -75,7 +75,7 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else class="empty-state glass-panel">
+      <div v-else class="empty-state vml-glass-panel">
         <div class="empty-icon">🔍</div>
         <p>請搜尋並選擇一個村莊以查看詳細分析</p>
       </div>

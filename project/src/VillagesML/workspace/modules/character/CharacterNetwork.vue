@@ -17,7 +17,7 @@
     </div>
 
     <!-- Controls -->
-    <div class="controls-panel glass-panel">
+    <div class="controls-panel vml-glass-panel">
       <div class="controls-row">
         <div class="control-group">
           <label>字符</label>
@@ -53,7 +53,7 @@
     </div>
 
     <!-- Progress -->
-    <div v-if="loading" class="progress-panel glass-panel">
+    <div v-if="loading" class="progress-panel vml-glass-panel">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p class="progress-text">{{ progressText }}</p>
       <div class="progress-bar-track">
@@ -62,7 +62,7 @@
     </div>
 
     <!-- Graph -->
-    <div v-if="graphReady" class="graph-panel glass-panel">
+    <div v-if="graphReady" class="graph-panel vml-glass-panel">
       <div class="graph-stats">
         <span class="stat-item">節點 <strong>{{ graphNodes.length }}</strong></span>
         <span class="stat-item">邊 <strong>{{ graphLinks.length }}</strong></span>
@@ -78,7 +78,7 @@
     </div>
 
     <!-- Empty state -->
-    <div v-else-if="!loading" class="empty-state glass-panel">
+    <div v-else-if="!loading" class="empty-state vml-glass-panel">
       <p>輸入字符並點擊「生成網絡」開始分析</p>
     </div>
   </div>

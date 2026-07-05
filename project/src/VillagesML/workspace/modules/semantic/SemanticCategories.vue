@@ -13,7 +13,7 @@
 <!--      <h1 class="page-title">🏷️ 語義類別與標籤</h1>-->
 
       <!-- Category List -->
-      <div class="category-list glass-panel">
+      <div class="category-list vml-glass-panel">
         <h2>語義類別</h2>
         <div v-if="loadingCategories" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
@@ -39,7 +39,7 @@
 
       <!-- VTF Analysis -->
       <div class="vtf-section">
-        <div class="vtf-global glass-panel">
+        <div class="vtf-global vml-glass-panel">
           <h3>
             全局虛擬詞頻 (VTF)
             <HelpIcon
@@ -70,7 +70,7 @@
           </div>
         </div>
 
-        <div class="vtf-regional glass-panel">
+        <div class="vtf-regional vml-glass-panel">
           <h3>
             區域虛擬詞頻
             <HelpIcon
@@ -119,7 +119,7 @@
       </div>
 
       <!-- Category Regional Ranking -->
-      <div ref="tendencySection" class="tendency-section glass-panel">
+      <div ref="tendencySection" class="tendency-section vml-glass-panel">
         <div class="section-header-centered" v-if="selectedCategory">
           <div class="category-title-card">
             <span class="category-icon-large">{{ getCategoryIcon(selectedCategory.category) }}</span>
@@ -188,7 +188,7 @@
       </div>
 
 <!--      &lt;!&ndash; Labels Section &ndash;&gt;-->
-<!--      <div class="labels-section glass-panel">-->
+<!--      <div class="labels-section vml-glass-panel">-->
 <!--        <h3>語義標籤</h3>-->
 <!--        <div class="labels-tabs">-->
 <!--          <button-->

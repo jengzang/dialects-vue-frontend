@@ -8,7 +8,7 @@
 <!--    </div>-->
 
     <!-- Database Overview -->
-    <div class="glass-panel overview-panel">
+    <div class="vml-glass-panel overview-panel">
       <div class="panel-header">
         <h3>數據庫概覽 Database Overview</h3>
         <button @click="refreshOverview" :disabled="loading" class="solid-button small">
@@ -65,7 +65,7 @@
     </div>
 
     <!-- N-gram Significance Statistics -->
-    <div class="glass-panel ngram-stats-panel">
+    <div class="vml-glass-panel ngram-stats-panel">
       <div class="panel-header">
         <h3>N-gram 顯著性統計 Significance Statistics</h3>
         <button @click="refreshNgramStats" :disabled="loadingNgram" class="solid-button small">
@@ -138,7 +138,7 @@
     </div>
 
     <!-- Table Statistics -->
-    <div class="glass-panel tables-panel">
+    <div class="vml-glass-panel tables-panel">
       <div class="panel-header">
         <h3>表統計信息 Table Statistics</h3>
         <div class="header-controls">

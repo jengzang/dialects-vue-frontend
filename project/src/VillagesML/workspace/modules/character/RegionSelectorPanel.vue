@@ -10,18 +10,20 @@
       />
     </h3>
 
-    <FilterableSelect
-      v-model="localName"
-      :level="localLevel"
-      @update:level="handleLevelChange"
-      @update:modelValue="handleNameChange"
-      @update:hierarchy="(h) => localHierarchy = h"
-      placeholder="請選擇或輸入區域"
-    />
-
     <button class="analyze-button solid-button" @click="handleAnalyze" :disabled="!localName">
       🔍 開始分析
     </button>
+
+    <div class="selector-wrapper">
+      <FilterableSelect
+        v-model="localName"
+        :level="localLevel"
+        @update:level="handleLevelChange"
+        @update:modelValue="handleNameChange"
+        @update:hierarchy="(h) => localHierarchy = h"
+        placeholder="請選擇或輸入區域"
+      />
+    </div>
   </div>
 </template>
 
@@ -60,7 +62,8 @@ const handleAnalyze = () => {
 <style scoped>
 .region-selector-panel {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 16px;
   padding: 20px;
   margin-bottom: 20px;
@@ -72,7 +75,7 @@ const handleAnalyze = () => {
   color: var(--text-primary);
   margin: 0;
   white-space: nowrap;
-  flex-shrink: 0;
+  flex: 1;
 }
 
 .analyze-button {
@@ -86,16 +89,24 @@ const handleAnalyze = () => {
   cursor: not-allowed;
 }
 
-@media (min-aspect-ratio: 1/1) {
-  .region-selector-panel {
-    flex-direction: row;
-    align-items: center;
-  }
+.selector-wrapper {
+  width: 100%;
 }
 
-@media (max-aspect-ratio: 1/1) {
+@media (min-aspect-ratio: 1/1) {
   .region-selector-panel {
-    gap: 16px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+
+  .panel-title {
+    flex: 0 0 auto;
+  }
+
+  .selector-wrapper {
+    width: auto;
+    flex: 1;
+    max-width: 360px;
   }
 }
 </style>

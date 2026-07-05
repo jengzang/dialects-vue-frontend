@@ -16,7 +16,7 @@
     </div>
 
     <!-- Filter Builder -->
-    <div class="glass-panel filter-panel">
+    <div class="vml-glass-panel filter-panel">
       <div class="panel-header">
         <h3>📋 步驟 1：篩選器構建</h3>
         <button @click="addFilter" class="solid-button small">+ 添加篩選條件</button>
@@ -83,7 +83,7 @@
     </div>
 
     <!-- Filtered Villages List -->
-    <div v-if="currentFilteredVillages.length > 0" class="glass-panel villages-list-panel">
+    <div v-if="currentFilteredVillages.length > 0" class="vml-glass-panel villages-list-panel">
       <div class="panel-header">
         <h3>📊 步驟 2：查看篩選結果</h3>
         <div class="header-info">
@@ -134,7 +134,7 @@
     </div>
 
     <!-- Subset Comparison -->
-    <div class="glass-panel comparison-panel">
+    <div class="vml-glass-panel comparison-panel">
       <div class="panel-header">
         <h3>⚖️ 步驟 3：子集比較</h3>
       </div>
@@ -191,7 +191,7 @@
     </div>
 
     <!-- Comparison Results -->
-    <div v-if="comparisonResults" class="glass-panel results-panel">
+    <div v-if="comparisonResults" class="vml-glass-panel results-panel">
       <div class="panel-header">
         <h3>比較結果</h3>
       </div>
@@ -420,7 +420,7 @@
     </div>
 
     <!-- Subset Clustering -->
-    <div class="glass-panel clustering-panel">
+    <div class="vml-glass-panel clustering-panel">
       <div class="panel-header">
         <h3>子集聚類</h3>
       </div>

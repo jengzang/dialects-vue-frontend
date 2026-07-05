@@ -6,7 +6,7 @@
     </h3>
 
     <!-- Detail Mode Toggle -->
-    <div class="detail-toggle glass-panel">
+    <div class="detail-toggle vml-glass-panel">
       <div class="toggle-left">
         <label class="toggle-container">
           <SwitchToggle
@@ -31,7 +31,7 @@
       </button>
     </div>
 
-    <div class="indices-section glass-panel">
+    <div class="indices-section vml-glass-panel">
       <h2>語義指數</h2>
       <p class="section-description">
         獲取區域的語義強度指數，分析不同地區村莊命名的語義特徵偏好。語義強度 = 該區域村莊名稱中，平均每個村莊包含該語義類別字符的次數。

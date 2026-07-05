@@ -16,7 +16,7 @@
     </div>
 
     <!-- Village Selector -->
-    <div class="glass-panel selector-panel">
+    <div class="vml-glass-panel selector-panel">
       <div class="panel-header">
         <h3>選擇村莊</h3>
         <span class="count-badge">已選擇: {{ selectedVillages.length }}</span>
@@ -128,7 +128,7 @@
     </div>
 
     <!-- Feature Type Selector -->
-    <div class="glass-panel feature-type-panel">
+    <div class="vml-glass-panel feature-type-panel">
       <div class="panel-header">
         <h3>特徵類型</h3>
       </div>
@@ -147,7 +147,7 @@
     </div>
 
     <!-- Extraction Controls -->
-    <div class="glass-panel controls-panel">
+    <div class="vml-glass-panel controls-panel">
       <div class="panel-header">
         <h3>提取控制</h3>
       </div>
@@ -187,7 +187,7 @@
     </div>
 
     <!-- Extraction Results -->
-    <div v-if="extractionResults" class="glass-panel results-panel">
+    <div v-if="extractionResults" class="vml-glass-panel results-panel">
       <div class="panel-header">
         <h3>提取結果</h3>
         <button @click="exportResults" class="solid-button small">導出CSV</button>
@@ -248,7 +248,7 @@
     </div>
 
     <!-- Aggregation Results -->
-    <div v-if="aggregationResults" class="glass-panel aggregation-panel">
+    <div v-if="aggregationResults" class="vml-glass-panel aggregation-panel">
       <div class="panel-header">
         <h3>聚合結果 - 特徵分布分析</h3>
         <span class="stat-badge">共 {{ aggregationResults.village_count }} 個村莊</span>

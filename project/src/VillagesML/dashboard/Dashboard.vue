@@ -4,7 +4,7 @@
       <h1 class="page-title">📊 自然村分析系統</h1>
 
       <!-- Introduction Section -->
-      <div class="intro-section glass-panel">
+      <div class="intro-section vml-glass-panel">
         <p class="intro-text">
           <strong>自然村機器學習分析系統</strong>是一個基於廣東省285,860個自然村名稱的語言學分析平台。
           系統運用機器學習和自然語言處理技術，從多個維度分析村名的語義、結構、空間分佈等特徵，為地名學研究、文化地理學、語言學等領域提供數據支持。
@@ -42,7 +42,7 @@
 
 
       <!-- Quick Search -->
-<!--      <div class="quick-search glass-panel">-->
+<!--      <div class="quick-search vml-glass-panel">-->
 <!--        <h2>🔍 快速搜尋</h2>-->
 <!--        <div class="search-input-group">-->
 <!--          <input-->
@@ -63,7 +63,7 @@
         <div
           v-for="feature in features"
           :key="feature.id"
-          class="feature-card glass-panel"
+          class="feature-card vml-glass-panel"
           @click="navigateTo(feature.route)"
         >
           <div class="feature-header">
@@ -91,7 +91,7 @@
       </div>
       <!-- Statistics Cards -->
       <div class="stats-grid">
-        <div v-for="stat in statistics" :key="stat.key" class="stat-card glass-panel">
+        <div v-for="stat in statistics" :key="stat.key" class="stat-card vml-glass-panel">
           <div class="stat-icon">{{ stat.icon }}</div>
           <div class="stat-content">
             <template v-if="stat.loadable && !ngramStats">

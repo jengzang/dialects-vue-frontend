@@ -11,7 +11,7 @@
     </h3>
 
     <!-- Composition Patterns -->
-    <div class="patterns-section glass-panel">
+    <div class="patterns-section vml-glass-panel">
 <!--      <h2>組合模式</h2>-->
       <p class="section-description">
         分析村名中語義類別的組合模式，例如「方位+聚落」、「水系+聚落」等。

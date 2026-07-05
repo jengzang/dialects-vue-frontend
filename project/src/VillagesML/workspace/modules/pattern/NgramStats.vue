@@ -6,13 +6,13 @@
     </h3>
 
     <!-- Info Banner (if coming from explore page) -->
-    <div v-if="route.query.ngram" class="info-banner glass-panel">
+    <div v-if="route.query.ngram" class="info-banner vml-glass-panel">
       <span>正在分析 N-gram：<strong>{{ route.query.ngram }}</strong></span>
       <button @click="clearNgram" class="text-button">清除</button>
     </div>
 
     <!-- Shared Controls -->
-    <div class="shared-controls glass-panel">
+    <div class="shared-controls vml-glass-panel">
       <div class="controls">
         <!-- N-gram 选择器 -->
         <div class="ngram-selector">
@@ -56,13 +56,13 @@
       </div>
     </div>
 
-    <div v-if="loading" class="vml-loading glass-panel">
+    <div v-if="loading" class="vml-loading vml-glass-panel">
       <div class="ui-loading--page" aria-hidden="true"></div>
     </div>
 
     <template v-else-if="ngramData.length > 0">
       <!-- Regional Distribution -->
-      <div class="regional-section glass-panel">
+      <div class="regional-section vml-glass-panel">
         <div class="section-header">
           <h2>區域分佈</h2>
           <button class="toggle-section-btn" @click="toggleRegionalSection">
@@ -145,7 +145,7 @@
     </div>
 
     <!-- Tendency Analysis -->
-    <div class="tendency-section glass-panel">
+    <div class="tendency-section vml-glass-panel">
       <div class="section-header">
         <h2>傾向性分析</h2>
         <button class="toggle-section-btn" @click="toggleTendencySection">
@@ -245,7 +245,7 @@
     </template>
 
     <!-- Significance Analysis -->
-    <div class="significance-section glass-panel">
+    <div class="significance-section vml-glass-panel">
       <h2>顯著性分析</h2>
       <div class="controls">
         <!-- N-gram 选择器 -->

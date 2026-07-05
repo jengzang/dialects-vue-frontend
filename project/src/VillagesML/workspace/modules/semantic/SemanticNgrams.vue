@@ -11,7 +11,7 @@
     </h3>
 
     <!-- Detail Mode Toggle -->
-    <div class="detail-toggle glass-panel">
+    <div class="detail-toggle vml-glass-panel">
       <div class="toggle-left">
         <label class="toggle-container">
           <SwitchToggle
@@ -38,7 +38,7 @@
 
     <!-- Bigrams and Trigrams -->
     <div class="ngrams-section">
-      <div class="bigrams glass-panel">
+      <div class="bigrams vml-glass-panel">
         <h3>二元組合 (Bigrams)</h3>
         <p class="subsection-description">
           分析相鄰兩個語義類別的組合，顯示頻率、佔比和PMI關聯強度。
@@ -83,7 +83,7 @@
         </div>
       </div>
 
-      <div class="trigrams glass-panel">
+      <div class="trigrams vml-glass-panel">
         <h3>三元組合 (Trigrams)</h3>
         <p class="subsection-description">
           分析連續三個語義類別的組合模式，顯示頻率和佔比。
@@ -130,7 +130,7 @@
     </div>
 
     <!-- PMI Analysis -->
-    <div class="pmi-section glass-panel">
+    <div class="pmi-section vml-glass-panel">
       <h2>點互信息 (PMI) 分析</h2>
       <p class="section-description">
         PMI 衡量兩個類別共現的關聯強度。PMI > 0 表示正相關（傾向共現），PMI &lt; 0 表示負相關（傾向不共現）。

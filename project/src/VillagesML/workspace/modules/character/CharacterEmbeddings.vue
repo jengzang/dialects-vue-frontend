@@ -12,7 +12,7 @@
       </h3>
 
       <!-- Search Section -->
-      <div class="search-section glass-panel">
+      <div class="search-section vml-glass-panel">
         <h2>
           🔍 相似字搜尋
           <HelpIcon
@@ -52,7 +52,7 @@
       <!-- Results Section -->
       <div v-if="similarities.length > 0" ref="resultsSectionRef" class="results-section">
         <!-- Similarity List -->
-        <div class="similarity-list glass-panel">
+        <div class="similarity-list vml-glass-panel">
           <h3>相似字列表</h3>
           <div class="similarity-items">
             <div
@@ -75,7 +75,7 @@
         </div>
 
         <!-- Vector Visualization -->
-        <div class="vector-viz glass-panel">
+        <div class="vector-viz vml-glass-panel">
           <h3>相似度網絡圖</h3>
           <div v-if="similarities.length > 0" ref="vizChartRef" class="viz-chart"></div>
           <div v-else class="viz-placeholder">
@@ -86,7 +86,7 @@
       </div>
 
       <!-- Embeddings List -->
-      <div class="embeddings-list glass-panel">
+      <div class="embeddings-list vml-glass-panel">
         <div class="list-header">
           <h3>字符嵌入列表 (共 {{ totalEmbeddings }} 個字符)</h3>
         </div>
