@@ -437,15 +437,11 @@ onBeforeUnmount(() => {
 }
 
 .aggregates-section {
-  display: flex;
-  flex-direction: column;
   margin-bottom: 16px;
 }
 
 .aggregates-section h2 {
   margin-bottom: 16px;
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 
 .aggregates-header {
@@ -474,23 +470,6 @@ onBeforeUnmount(() => {
   outline: none;
   border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.8);
-}
-
-@media (min-aspect-ratio: 1/1) {
-  .aggregates-section {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .aggregates-section h2 {
-    margin: 0;
-  }
-
-  .aggregates-header {
-    flex: 1;
-    justify-content: flex-end;
-    margin-bottom: 0;
-  }
 }
 
 .summary-stats {
