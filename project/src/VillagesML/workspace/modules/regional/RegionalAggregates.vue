@@ -439,7 +439,6 @@ onBeforeUnmount(() => {
 .aggregates-section {
   display: flex;
   flex-direction: column;
-  padding: 16px;
   margin-bottom: 16px;
 }
 
@@ -738,7 +737,6 @@ onBeforeUnmount(() => {
 }
 
 .spatial-section {
-  padding: 16px;
   margin-bottom: 16px;
 }
 
@@ -750,9 +748,7 @@ onBeforeUnmount(() => {
 }
 
 .spatial-header h2 {
-  font-size: 16px;
   margin: 0;
-  color: var(--text-primary);
 }
 
 .spatial-desc {
