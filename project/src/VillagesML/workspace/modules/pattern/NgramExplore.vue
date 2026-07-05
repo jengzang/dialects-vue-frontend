@@ -308,6 +308,21 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   flex-direction: column;
+  gap: 12px;
+}
+
+.frequency-section h2,
+.pattern-section h2 {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.controls,
+.search-controls {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  width: 100%;
 }
 
 .stats-banner {
@@ -356,20 +371,6 @@ onMounted(async () => {
   color: var(--text-secondary);
   font-style: italic;
   padding-left: 12px;
-}
-
-.frequency-section h2,
-.pattern-section h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: var(--text-primary);
-}
-
-.controls,
-.search-controls {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
 }
 
 .select-input,
@@ -604,6 +605,19 @@ onMounted(async () => {
 .type-all {
   background: rgba(149, 165, 166, 0.2);
   color: #7f8c8d;
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .frequency-section,
+  .pattern-section {
+    flex-direction: row;
+  }
+
+  .controls,
+  .search-controls {
+    width: auto;
+    flex: 1;
+  }
 }
 
 @media (max-width: 768px) {

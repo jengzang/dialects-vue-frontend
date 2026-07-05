@@ -28,7 +28,7 @@
               type="text"
               maxlength="1"
               placeholder="輸入單個字符"
-              class="char-input"
+              class="vml-char-input"
             />
           </div>
           <div class="form-group">
@@ -325,10 +325,18 @@ const getSignificanceBadge = (pValue) => {
   margin-bottom: 20px;
 }
 
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .form-content h3 {
   font-size: 16px;
-  margin-bottom: 16px;
+  margin: 0;
   color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .form-group {
@@ -345,7 +353,6 @@ const getSignificanceBadge = (pValue) => {
   color: var(--text-secondary);
 }
 
-.char-input,
 .text-input,
 .number-input,
 .select-input {
@@ -356,13 +363,6 @@ const getSignificanceBadge = (pValue) => {
   background: rgba(255, 255, 255, 0.5);
 }
 
-.char-input {
-  width: auto;
-  font-size: 16px;
-  text-align: center;
-}
-
-.char-input:focus,
 .text-input:focus,
 .number-input:focus,
 .select-input:focus {
@@ -511,6 +511,13 @@ const getSignificanceBadge = (pValue) => {
   font-size: 24px;
   font-weight: 700;
   color: var(--color-primary);
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .form-content {
+    flex-flow: row wrap;
+    align-items: center;
+  }
 }
 
 @media (max-width: 768px) {

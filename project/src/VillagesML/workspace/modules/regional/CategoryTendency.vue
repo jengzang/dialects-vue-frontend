@@ -264,23 +264,29 @@ const loadRegionalNgrams = async () => {
   margin-top: 16px;
 }
 
+.tendency-section {
+  display: flex;
+  flex-direction: column;
+}
+
 .tendency-section h3 {
   font-size: 16px;
-  margin-bottom: 10px;
+  margin: 0;
   color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .section-description {
   font-size: 14px;
   color: var(--text-secondary);
-  margin-bottom: 16px;
   line-height: 1.6;
+  width: 100%;
 }
 
 .region-selector {
   display: flex;
   gap: 12px;
-  margin-bottom: 16px;
   align-items: center;
 }
 
@@ -345,16 +351,20 @@ const loadRegionalNgrams = async () => {
   background: rgba(255, 255, 255, 0.5);
 }
 
+.ngram-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .ngram-section h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .ngram-controls {
   display: flex;
   gap: 12px;
-  margin-bottom: 16px;
   flex-wrap: wrap;
 }
 
@@ -481,6 +491,23 @@ const loadRegionalNgrams = async () => {
   .simple-select-dropdown,
   .filterable-select {
     width: 100% !important;
+  }
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .tendency-section {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 8px 16px;
+  }
+
+  .ngram-section {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .ngram-controls {
+    flex: 1;
   }
 }
 

@@ -632,10 +632,17 @@ export default {
 }
 
 
+.query-form {
+  display: flex;
+  flex-direction: column;
+}
+
 .query-form h3 {
-  margin-bottom: 16px;
-  font-size: 20px;
+  margin: 0;
+  font-size: 16px;
   color: var(--text-primary, #2c3e50);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .form-group {
@@ -854,6 +861,14 @@ tr.significant {
 
 .rank-badge:not(.gold):not(.silver):not(.bronze) {
   background: var(--color-primary, #4a90e2);
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .query-form {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 12px;
+  }
 }
 
 @media (max-width: 768px) {

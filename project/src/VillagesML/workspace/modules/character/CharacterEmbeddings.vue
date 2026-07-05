@@ -28,7 +28,7 @@
             type="text"
             placeholder="輸入單個字符..."
             maxlength="1"
-            class="char-input"
+            class="vml-char-input"
             @input="handleCharInput"
           />
           <input
@@ -89,21 +89,6 @@
       <div class="embeddings-list glass-panel">
         <div class="list-header">
           <h3>字符嵌入列表 (共 {{ totalEmbeddings }} 個字符)</h3>
-          <div class="pagination-controls">
-            <button
-              :disabled="currentPage === 1"
-              @click="changePage(currentPage - 1)"
-            >
-              上一頁
-            </button>
-            <span>第 {{ currentPage }} / {{ totalPages }} 頁</span>
-            <button
-              :disabled="currentPage === totalPages"
-              @click="changePage(currentPage + 1)"
-            >
-              下一頁
-            </button>
-          </div>
         </div>
 
         <div v-if="loadingList" class="vml-loading">
@@ -139,6 +124,22 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="pagination-controls">
+          <button
+            :disabled="currentPage === 1"
+            @click="changePage(currentPage - 1)"
+          >
+            上一頁
+          </button>
+          <span>第 {{ currentPage }} / {{ totalPages }} 頁</span>
+          <button
+            :disabled="currentPage === totalPages"
+            @click="changePage(currentPage + 1)"
+          >
+            下一頁
+          </button>
         </div>
       </div>
     </div>
@@ -344,28 +345,25 @@ onBeforeUnmount(() => {
 }
 
 .search-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   padding: 16px;
   margin-bottom: 20px;
 }
 
 .search-section h2 {
   font-size: 16px;
-  margin-bottom: 12px;
+  margin: 0;
   color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .search-group {
   display: flex;
   gap: 12px;
-}
-
-.char-input {
-  padding: 10px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 12px;
-  font-size: 16px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.5);
+  flex: 1;
 }
 
 .number-input {
@@ -377,7 +375,6 @@ onBeforeUnmount(() => {
   background: rgba(255, 255, 255, 0.5);
 }
 
-.char-input:focus,
 .number-input:focus {
   outline: none;
   border-color: var(--color-primary);
@@ -514,21 +511,21 @@ onBeforeUnmount(() => {
 }
 
 .list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 16px;
 }
 
 .list-header h3 {
   font-size: 16px;
   color: var(--text-primary);
+  margin: 0;
 }
 
 .pagination-controls {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 12px;
+  padding-top: 16px;
 }
 
 .pagination-controls button {
@@ -562,7 +559,8 @@ onBeforeUnmount(() => {
 /* 移动端横向滚动容器 */
 .table-scroll-wrapper {
   width: 100%;
-  overflow-x: auto;
+  max-height: 500px;
+  overflow: auto;
 }
 
 .table-header,
@@ -645,7 +643,7 @@ onBeforeUnmount(() => {
   }
 
 
-  .char-input {
+  .vml-char-input {
     width: 80px;
   }
 
@@ -664,9 +662,17 @@ onBeforeUnmount(() => {
 }
 
 /* 移动端横向滚动样式 */
+@media (min-aspect-ratio: 1/1) {
+  .search-section {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
 @media (max-aspect-ratio: 1/1) {
   .table-scroll-wrapper {
-    overflow-x: auto;
+    max-height: 400px;
+    overflow: auto;
   }
 
 }

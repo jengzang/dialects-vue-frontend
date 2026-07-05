@@ -166,9 +166,7 @@ watch(
 }
 
 .vml-glass-panel h2 {
-  font-size: 16px;
   margin-bottom: 16px;
-  color: var(--text-primary);
 }
 
 .controls {

@@ -1371,10 +1371,21 @@ onBeforeUnmount(() => {
   flex: 1;
 }
 
+.controls-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.controls-panel .panel-header h3 {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .controls-content {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex: 1;
 }
 
 .controls-row {
@@ -1732,8 +1743,22 @@ onBeforeUnmount(() => {
   color: var(--text-secondary);
 }
 
+/* Responsive - Landscape orientation */
+@media (min-aspect-ratio: 1/1) {
+  .controls-panel {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .controls-panel .panel-header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
 /* Responsive - Portrait orientation */
-@media (orientation: portrait) {
+@media (max-aspect-ratio: 1/1) {
   .feature-extraction-page {
     padding: 8px;
   }

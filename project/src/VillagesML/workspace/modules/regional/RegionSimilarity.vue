@@ -655,10 +655,17 @@ export default {
   padding: 12px;
 }
 
+.query-form {
+  display: flex;
+  flex-direction: column;
+}
+
 .query-form h3 {
-  margin-bottom: 16px;
-  font-size: 20px;
+  margin: 0;
+  font-size: 16px;
   color: var(--text-primary, #2c3e50);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .form-group {
@@ -942,6 +949,14 @@ export default {
   width: 100%;
   height: 600px;
   min-height: 400px;
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .query-form {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 12px;
+  }
 }
 
 @media (max-width: 768px) {

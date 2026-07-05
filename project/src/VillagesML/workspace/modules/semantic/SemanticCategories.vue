@@ -670,15 +670,6 @@ onMounted(() => {
   margin-top: 20px;
 }
 
-.char-input {
-  padding: 12px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 16px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.5);
-}
-
 .labels-cloud {
   display: flex;
   flex-wrap: wrap;

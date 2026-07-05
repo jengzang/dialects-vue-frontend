@@ -745,8 +745,7 @@ onMounted(() => {
 
 .select-input,
 .text-input,
-.number-input,
-.char-input {
+.number-input {
   padding: 8px 12px;
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 8px;
@@ -765,15 +764,9 @@ onMounted(() => {
   padding: 8px;
 }
 
-.char-input {
-  font-size: 20px;
-  text-align: center;
-}
-
 .select-input:focus,
 .text-input:focus,
-.number-input:focus,
-.char-input:focus {
+.number-input:focus {
   outline: none;
   border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.8);

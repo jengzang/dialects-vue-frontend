@@ -21,7 +21,7 @@
       <div class="controls-row">
         <div class="control-group">
           <label>字符</label>
-          <input v-model="rootChar" maxlength="1" class="char-input" placeholder="請輸入單個漢字" />
+          <input v-model="rootChar" maxlength="1" class="vml-char-input" placeholder="請輸入單個漢字" />
         </div>
         <div class="control-group">
           <label>擴展深度</label>
@@ -255,10 +255,11 @@ onBeforeUnmount(() => {
 .control-group { display: flex; flex-direction: column; gap: 4px; }
 .control-group label { font-size: 12px; color: var(--text-secondary, #666); }
 
-.char-input {
-  min-width: 56px; width: 100px; padding: 10px; font-size: 14px; text-align: center;
-  border: 2px solid rgba(0, 122, 255, 0.3); border-radius: 12px;
-  background: rgba(255, 255, 255, 0.5);
+.vml-char-input {
+  min-width: 56px;
+  width: 100px;
+  font-size: 14px;
+  border-color: rgba(0, 122, 255, 0.3);
 }
 
 .glass-select, .glass-input {

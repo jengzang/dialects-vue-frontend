@@ -198,16 +198,19 @@ const goToTendency = (pattern) => {
   margin: 0 auto;
 }
 
+.vml-glass-panel {
+  display: flex;
+  flex-direction: column;
+}
+
 .vml-glass-panel h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .mode-selector {
   display: flex;
   gap: 24px;
-  margin-bottom: 16px;
 }
 
 .radio-label {
@@ -228,7 +231,6 @@ const goToTendency = (pattern) => {
 .controls {
   display: flex;
   gap: 12px;
-  margin-bottom: 16px;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
@@ -361,6 +363,18 @@ const goToTendency = (pattern) => {
 .action-button:hover {
   background: rgba(74, 144, 226, 0.2);
   border-color: var(--color-primary);
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .vml-glass-panel {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 8px 16px;
+  }
+
+  .controls {
+    flex: 1;
+  }
 }
 
 @media (max-width: 768px) {
