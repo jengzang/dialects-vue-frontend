@@ -43,12 +43,12 @@
 
           <div class="form-group">
             <label>返回數量:</label>
-            <input v-model.number="topK" type="number" min="1" max="50" class="number-input" />
+            <input v-model.number="topK" type="number" min="1" max="50" class="vml-number-input" />
           </div>
 
           <div class="form-group">
             <label>最小相似度:</label>
-            <input v-model.number="minSimilarity" type="number" min="0" max="1" step="0.1" class="number-input" />
+            <input v-model.number="minSimilarity" type="number" min="0" max="1" step="0.1" class="vml-number-input" />
           </div>
           <button
             class="query-button"
@@ -690,8 +690,7 @@ export default {
   min-width: 200px;
 }
 
-.select-input,
-.number-input {
+.vml-number-input {
   padding: 10px;
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 8px;
@@ -700,8 +699,7 @@ export default {
   transition: border-color 0.3s ease;
 }
 
-.select-input:focus,
-.number-input:focus {
+.vml-number-input:focus {
   outline: none;
   border-color: var(--color-primary, #4a90e2);
 }
@@ -976,7 +974,7 @@ export default {
   .mode-button{
     padding: 6px;
   }
-  .number-input{
+  .vml-number-input{
     width: 100%;
   }
 }

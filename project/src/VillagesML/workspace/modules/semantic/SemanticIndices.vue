@@ -84,7 +84,7 @@
             type="number"
             min="1"
             placeholder="例如：50"
-            class="number-input"
+            class="vml-number-input"
             :disabled="!canUseMinVillages"
           />
           <span class="input-hint">
@@ -100,7 +100,7 @@
             min="10"
             :max="maxIndicesLimit"
             placeholder="例如：100"
-            class="number-input"
+            class="vml-number-input"
           />
           <span class="input-hint">
             限制返回記錄數（10-{{ maxIndicesLimit }}）
@@ -442,40 +442,14 @@ const getRegionLevelName = (level) => {
   margin-top: 2px;
 }
 
-.number-input {
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+.vml-number-input {
   width: 150px;
 }
 
-.number-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
-}
-
-.number-input:disabled {
+.vml-number-input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   background: rgba(200, 200, 200, 0.3);
-}
-
-.select-input {
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-  width: 150px;
-}
-
-.select-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
 }
 
 .indices-table {
@@ -575,7 +549,7 @@ const getRegionLevelName = (level) => {
   }
 
 
-  .number-input {
+  .vml-number-input {
     width: 100%;
   }
 }

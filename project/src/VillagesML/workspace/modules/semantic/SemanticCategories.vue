@@ -152,7 +152,7 @@
               type="number"
               min="1"
               placeholder="例如：100"
-              class="number-input"
+              class="vml-number-input"
               @change="loadCategoryRanking"
             />
             <span class="input-hint">（過濾小樣本區域）</span>
@@ -580,23 +580,6 @@ onMounted(() => {
   flex: 1;
 }
 
-.select-input,
-.text-input {
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.select-input {
-  flex: 0 0 120px;
-}
-
-.text-input {
-  flex: 1;
-}
-
 .vtf-chart {
   display: flex;
   flex-direction: column;
@@ -982,10 +965,6 @@ onMounted(() => {
     flex-direction: column;
   }
 
-  .select-input {
-    flex: 1;
-  }
-
   /* Level selector responsive layout */
   .level-selector {
     flex-wrap: wrap;
@@ -1002,7 +981,7 @@ onMounted(() => {
     min-width: 150px;
   }
 
-  .level-selector .number-input {
+  .level-selector .vml-number-input {
     flex: 1;
     min-width: 120px;
   }
@@ -1014,7 +993,7 @@ onMounted(() => {
 }
 
 /* Number input and hint styles */
-.number-input {
+.vml-number-input {
   padding: 8px 12px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 6px;
@@ -1023,7 +1002,7 @@ onMounted(() => {
   transition: all 0.3s ease;
 }
 
-.number-input:focus {
+.vml-number-input:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);

@@ -459,10 +459,6 @@ onBeforeUnmount(() => {
   margin-bottom: 16px;
 }
 
-.aggregates-header .select-input {
-  width: auto;
-}
-
 .filter-controls {
   display: flex;
   gap: 12px;
@@ -783,15 +779,6 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
-}
-
-.select-input {
-  width: 150px;
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
 }
 
 @media (max-width: 768px) {

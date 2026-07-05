@@ -745,35 +745,6 @@ onMounted(() => {
   color: var(--text-secondary);
 }
 
-.select-input,
-.text-input,
-.number-input {
-  padding: 8px 12px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.select-input {
-  cursor: pointer;
-  width: 100%;
-}
-
-.select-input option {
-  background: white;
-  color: var(--text-primary);
-  padding: 8px;
-}
-
-.select-input:focus,
-.text-input:focus,
-.number-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
-}
-
 .load-clusters-button {
   background: rgba(74, 144, 226, 0.8);
 }

@@ -159,15 +159,6 @@ const goToTendency = (pattern) => {
   }
 }
 
-.select-input {
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-  width: 200px;
-}
-
 .structural-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));

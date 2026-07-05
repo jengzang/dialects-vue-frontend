@@ -29,7 +29,7 @@
             v-model="ngram"
             type="text"
             placeholder="輸入 N-gram"
-            class="text-input"
+            class="vml-input"
           />
           <button
             v-if="availableNgrams.length === 0"
@@ -263,7 +263,7 @@
             v-model="significanceNgram"
             type="text"
             placeholder="輸入 N-gram"
-            class="text-input"
+            class="vml-input"
           />
           <button
             v-if="availableNgrams.length === 0"
@@ -706,21 +706,13 @@ watch(
   cursor: not-allowed;
 }
 
-.select-input,
-.text-input {
+.vml-input {
+  flex: 1;
   padding: 10px 16px;
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 8px;
   font-size: 14px;
   background: rgba(255, 255, 255, 0.5);
-}
-
-.select-input {
-  width: 150px;
-}
-
-.text-input {
-  flex: 1;
 }
 
 
@@ -1075,7 +1067,7 @@ watch(
   .regional-chart{
     gap:4px;
   }
-  .select-input {
+  .vml-input {
     width: 100%;
   }
 

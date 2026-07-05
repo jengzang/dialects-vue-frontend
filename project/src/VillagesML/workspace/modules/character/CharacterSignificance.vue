@@ -67,7 +67,7 @@
               type="number"
               min="10"
               max="100"
-              class="number-input"
+              class="vml-number-input"
             />
           </div>
           <button
@@ -353,22 +353,8 @@ const getSignificanceBadge = (pValue) => {
   color: var(--text-secondary);
 }
 
-.text-input,
-.number-input,
-.select-input {
+.vml-number-input {
   padding: 8px 12px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.text-input:focus,
-.number-input:focus,
-.select-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
 }
 
 .results-table {

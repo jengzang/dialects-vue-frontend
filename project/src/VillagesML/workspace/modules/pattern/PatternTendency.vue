@@ -14,7 +14,7 @@
           v-model="tendencyPattern"
           type="text"
           placeholder="輸入模式（如：新村）"
-          class="text-input"
+          class="vml-input"
         />
         <SimpleSelectDropdown :match-trigger-width="true"
           v-model="tendencyLevel"
@@ -202,7 +202,7 @@ watch(
   }
 }
 
-.text-input {
+.vml-input {
   flex: 1;
   min-width: 200px;
   padding: 10px 16px;
@@ -210,15 +210,6 @@ watch(
   border-radius: 8px;
   font-size: 14px;
   background: rgba(255, 255, 255, 0.5);
-}
-
-.select-input {
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-  width: 150px;
 }
 
 .significance-legend {

@@ -37,7 +37,7 @@
             min="5"
             max="50"
             placeholder="返回數量"
-            class="number-input"
+            class="vml-number-input"
           />
           <button
             class="search-button"
@@ -366,19 +366,10 @@ onBeforeUnmount(() => {
   flex: 1;
 }
 
-.number-input {
+.vml-number-input {
   width: 120px;
   padding: 10px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 12px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.number-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
 }
 
 .search-button {
@@ -647,7 +638,7 @@ onBeforeUnmount(() => {
     width: 80px;
   }
 
-  .number-input {
+  .vml-number-input {
     width: 60px;
   }
 

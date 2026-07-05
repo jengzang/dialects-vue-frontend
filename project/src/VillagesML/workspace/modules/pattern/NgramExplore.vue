@@ -56,7 +56,7 @@
           type="number"
           min="1"
           placeholder="最小頻次 (≥1)"
-          class="number-input"
+          class="vml-number-input"
         />
         <input
           v-model.number="topK"
@@ -64,7 +64,7 @@
           min="1"
           max="1000"
           placeholder="返回數量 (1-1000)"
-          class="number-input"
+          class="vml-number-input"
         />
         <button
           class="query-button"
@@ -373,8 +373,7 @@ onMounted(async () => {
   padding-left: 12px;
 }
 
-.select-input,
-.number-input,
+.vml-number-input,
 .pattern-input {
   padding: 10px 16px;
   border: 2px solid rgba(74, 144, 226, 0.3);
@@ -383,11 +382,7 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.5);
 }
 
-.select-input {
-  width: 150px;
-}
-
-.number-input {
+.vml-number-input {
   width: 150px;
 }
 

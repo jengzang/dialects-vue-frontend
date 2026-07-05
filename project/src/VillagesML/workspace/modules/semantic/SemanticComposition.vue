@@ -24,7 +24,7 @@
             type="number"
             min="1"
             placeholder="例如：5"
-            class="number-input"
+            class="vml-number-input"
           />
           <span class="input-hint">過濾掉出現次數少於此值的模式</span>
         </div>
@@ -36,7 +36,7 @@
             min="10"
             max="1000"
             placeholder="例如：50"
-            class="number-input"
+            class="vml-number-input"
           />
           <span class="input-hint">返回前N個最常見的模式（最多1000）</span>
         </div>
@@ -174,19 +174,8 @@ const translatePattern = (patternStr) => {
   margin-top: 2px;
 }
 
-.number-input {
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+.vml-number-input {
   width: 150px;
-}
-
-.number-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
 }
 
 .patterns-table {
@@ -266,7 +255,7 @@ const translatePattern = (patternStr) => {
     align-items: stretch;
   }
 
-  .number-input {
+  .vml-number-input {
     width: 100%;
   }
 }

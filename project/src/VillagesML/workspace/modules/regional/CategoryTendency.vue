@@ -86,7 +86,7 @@
         min="1"
         max="500"
         placeholder="返回數量 (1-500)"
-        class="number-input"
+        class="vml-number-input"
       />
       <button
         class="query-button solid-button"
@@ -342,15 +342,6 @@ const loadRegionalNgrams = async () => {
   text-align: right;
 }
 
-.select-input {
-  width: 150px;
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
 .ngram-section {
   display: flex;
   flex-direction: column;
@@ -368,19 +359,8 @@ const loadRegionalNgrams = async () => {
   flex-wrap: wrap;
 }
 
-.number-input {
+.vml-number-input {
   width: 180px;
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.number-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
 }
 
 .ngram-results {
@@ -483,11 +463,10 @@ const loadRegionalNgrams = async () => {
     max-width: 100% !important;
   }
 
-  .number-input {
+  .vml-number-input {
     width: 100% !important;
   }
 
-  .select-input,
   .simple-select-dropdown,
   .filterable-select {
     width: 100% !important;

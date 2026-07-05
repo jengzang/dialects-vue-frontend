@@ -37,7 +37,7 @@
             type="number"
             min="10"
             :max="queryMode === 'global' ? 100 : 50"
-            class="number-input"
+            class="vml-number-input"
           />
         </div>
 
@@ -50,7 +50,7 @@
             max="100"
             step="0.01"
             placeholder="如: 1"
-            class="number-input"
+            class="vml-number-input"
           />
         </div>
 
@@ -248,12 +248,7 @@ const goToTendency = (pattern) => {
   font-weight: 500;
 }
 
-.number-input {
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+.vml-number-input {
   width: 150px;
 }
 
@@ -382,7 +377,7 @@ const goToTendency = (pattern) => {
     flex-direction: column;
   }
 
-  .number-input {
+  .vml-number-input {
     width: 100%;
   }
 

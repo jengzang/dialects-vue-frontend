@@ -131,7 +131,7 @@
 
           <div class="form-group">
             <label>返回數量:</label>
-            <input v-model.number="topN" type="number" min="5" max="50" class="number-input" />
+            <input v-model.number="topN" type="number" min="5" max="50" class="vml-number-input" />
           </div>
         </div>
 
@@ -662,21 +662,15 @@ export default {
   gap: 16px;
 }
 
-.select-input,
-.text-input,
-.number-input {
+.vml-number-input {
   width: 100%;
   padding: 10px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
   transition: border-color 0.3s ease;
 }
 
-.select-input:focus,
-.text-input:focus,
-.number-input:focus {
+.vml-number-input:focus {
   outline: none;
   border-color: var(--color-primary, #4a90e2);
 }

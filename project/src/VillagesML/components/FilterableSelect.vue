@@ -30,7 +30,7 @@
         @keydown="handleKeydown"
         :placeholder="placeholder || $t('common.components.filterableSelect.placeholder')"
         :disabled="disabled"
-        class="select-input"
+        class="vml-select"
       />
       <button
         @click.stop="toggleDropdown"
@@ -535,7 +535,7 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 0.7);
 }
 
-.select-input {
+.vml-select {
   flex: 1;
   width: 100%;
   padding: 10px 12px;
