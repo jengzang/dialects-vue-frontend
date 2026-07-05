@@ -1,31 +1,27 @@
 <template>
-  <div class="vml-glass-panel">
-    <div class="panel-header">
-      <h3 class="panel-title">
-        區域選擇
-        <HelpIcon
-          content="選擇分析區域（市/縣/鎮），系統將計算該字符在各區域的TF-IDF傾向性得分。支持三級行政區切換"
-          size="md"
-          fontSize="16px"
-          trigger="both"
-        />
-      </h3>
-      <button class="analyze-button solid-button" @click="handleAnalyze" :disabled="!localName">
-        🔍 開始分析
-      </button>
-    </div>
-
-    <div class="selector-group">
-      <FilterableSelect
-        v-model="localName"
-        :level="localLevel"
-        @update:level="handleLevelChange"
-        @update:modelValue="handleNameChange"
-        @update:hierarchy="(h) => localHierarchy = h"
-        placeholder="請選擇或輸入區域"
+  <div class="vml-glass-panel region-selector-panel">
+    <h3 class="panel-title">
+      區域選擇
+      <HelpIcon
+        content="選擇分析區域（市/縣/鎮），系統將計算該字符在各區域的TF-IDF傾向性得分。支持三級行政區切換"
+        size="md"
+        fontSize="16px"
+        trigger="both"
       />
+    </h3>
 
-    </div>
+    <FilterableSelect
+      v-model="localName"
+      :level="localLevel"
+      @update:level="handleLevelChange"
+      @update:modelValue="handleNameChange"
+      @update:hierarchy="(h) => localHierarchy = h"
+      placeholder="請選擇或輸入區域"
+    />
+
+    <button class="analyze-button solid-button" @click="handleAnalyze" :disabled="!localName">
+      🔍 開始分析
+    </button>
   </div>
 </template>
 
@@ -62,15 +58,11 @@ const handleAnalyze = () => {
 </script>
 
 <style scoped>
-.vml-glass-panel {
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.panel-header {
+.region-selector-panel {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
   margin-bottom: 20px;
 }
 
@@ -79,20 +71,31 @@ const handleAnalyze = () => {
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
-}
-
-.selector-group {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .analyze-button {
   padding: 12px 24px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .analyze-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .region-selector-panel {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .region-selector-panel {
+    gap: 16px;
+  }
 }
 </style>
