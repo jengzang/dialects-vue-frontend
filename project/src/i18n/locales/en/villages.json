@@ -79,7 +79,8 @@
         "clear": "Clear",
         "placeholder": "Select...",
         "modeNone": "No Filter"
-      }
+      },
+      "reload": "Reload"
     },
     "yangChun": {
       "title": "Yangchun Administrative Divisions",

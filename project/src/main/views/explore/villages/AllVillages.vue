@@ -75,9 +75,11 @@
                     @click.stop="handleCityMapClick(city)"
                     title="顯示全市地圖"
                 >🌍</button>
-                <div class="loaded-badge">
-                  ✓ {{ t('villages.pages.allVillages.loaded') }}
-                </div>
+                <button
+                    class="reload-btn"
+                    :disabled="loadingStates[city]"
+                    @click="reloadCityData(city)"
+                >{{ loadingStates[city] ? t('villages.pages.allVillages.loading') : t('villages.pages.allVillages.reload') }}</button>
               </template>
             </div>
           </div>
@@ -372,6 +374,11 @@ const loadCityData = async (cityName) => {
     loadingStates.value[cityName] = false;
   }
 };
+
+const reloadCityData = (cityName) => {
+  loadedCitiesData.value[cityName] = null
+  loadCityData(cityName)
+}
 
 /**
  * Normalize tree data from API response (full tree mode)
@@ -816,16 +823,25 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
-.loaded-badge {
+.reload-btn {
   padding: 6px 12px;
+  border: none;
   border-radius: 10px;
-  background: rgba(52, 199, 89, 0.15);
-  color: #34c759;
+  background: rgba(142, 142, 147, 0.2);
+  color: #1d1d1f;
   font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reload-btn:hover:not(:disabled) {
+  background: rgba(142, 142, 147, 0.35);
+}
+
+.reload-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .city-header-actions {
