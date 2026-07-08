@@ -5,6 +5,7 @@
         <span class="icon">{{ leafIcon }}</span>
         <span class="text" v-if="isMatch" v-html="highlightName"></span>
         <span class="text" v-else>{{ displayName }}</span>
+        <span v-if="node._tag" class="node-tag" :style="{ backgroundColor: node._tag.color }">{{ node._tag.text }}</span>
         <span v-if="node._loadingChildren" class="lazy-indicator">↻</span>
       </div>
 
@@ -296,6 +297,18 @@ const leave = (el) => {
 .map-btn:disabled:hover {
   background: transparent;
   transform: none;
+}
+
+.node-tag {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 6px;
+  color: #555;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .lazy-indicator {

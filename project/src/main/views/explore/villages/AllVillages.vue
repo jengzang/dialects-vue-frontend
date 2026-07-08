@@ -113,7 +113,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { unzipSync, strFromU8 } from 'fflate'
+import { decompressSync, strFromU8 } from 'fflate'
 import VillagesTreeItem from '@/main/components/TableAndTree/VillagesTreeItem.vue';
 import AllVillagesMapPopup from '@/main/components/popup/map/AllVillagesMapPopup.vue';
 import { lazyLoadTree, loadFullTree } from '@/api';
@@ -154,7 +154,7 @@ const decompressCoors = (compressed) => {
   try {
     const bytes = compressed.match(/.{1,2}/g).map(b => parseInt(b, 16))
     const binary = new Uint8Array(bytes)
-    const decompressed = unzipSync(binary)
+    const decompressed = decompressSync(binary)
     const jsonStr = strFromU8(decompressed)
     return JSON.parse(jsonStr)
   } catch (e) {
@@ -173,14 +173,34 @@ const getPlaceTypeDisplay = (data) => {
   return info?.place_type_name || `[${code}]`
 }
 
+const tagColorPalette = [
+  '#e3f2fd', '#fce4ec', '#e8f5e9', '#fff3e0', '#f3e5f5',
+  '#e0f7fa', '#fbe9e7', '#e8eaf6', '#f1f8e9', '#fff8e1',
+  '#ede7f6', '#e1f5fe', '#f9fbe7', '#efebe9', '#e0f2f1'
+]
+
+const tagColorMap = {}
+const getTagColor = (text) => {
+  if (tagColorMap[text]) return tagColorMap[text]
+  let hash = 0
+  for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0
+  tagColorMap[text] = tagColorPalette[Math.abs(hash) % tagColorPalette.length]
+  return tagColorMap[text]
+}
+
 /**
- * Format leaf node display name: name (level3_name)
+ * Build tag info for a leaf node: { text, color }
+ */
+const getTagInfo = (data) => {
+  const text = getPlaceTypeDisplay(data)
+  if (!text) return null
+  return { text, color: getTagColor(text) }
+}
+
+/**
+ * Format leaf node display name (plain, tag is rendered separately)
  */
 const formatLeafNode = (name, data) => {
-  const level3 = getPlaceTypeDisplay(data)
-  if (level3) {
-    return `${name} (${level3})`
-  }
   return name
 }
 
@@ -280,22 +300,24 @@ const normalizeTreeData = (rawData) => {
   const processNode = (data, name, level = 1) => {
     // Leaf detection: check for place_type_code or coors fields
     const isLeaf = data['place_type_code'] !== undefined ||
-                   data['coors'] !== undefined;
+                   data['coords'] !== undefined;
 
     if (isLeaf) {
       const codes = Array.isArray(data['place_type_code']) ? data['place_type_code'] : []
-      const coorsArr = Array.isArray(data['coors']) ? data['coors'] : []
+      const coorsArr = Array.isArray(data['coords']) ? data['coords'] : []
       const count = Math.max(codes.length, coorsArr.length, 1)
 
       const makeLeafNode = (singleData) => {
-        const compressed = Array.isArray(singleData['coors']) ? singleData['coors'][0] : singleData['coors']
+        const compressed = Array.isArray(singleData['coords']) ? singleData['coords'][0] : singleData['coords']
         const coors = decompressCoors(compressed)
+        const tag = getTagInfo(singleData)
         return {
           id: generateId(),
           name: formatLeafNode(name, singleData),
           rawName: name,
           rawData: singleData,
           _coordCount: Array.isArray(coors) ? coors.length : 0,
+          _tag: tag,
           children: []
         }
       }
@@ -308,7 +330,7 @@ const normalizeTreeData = (rawData) => {
       return Array.from({ length: count }, (_, i) => {
         const single = {}
         if (codes[i] !== undefined) single['place_type_code'] = [codes[i]]
-        if (coorsArr[i] !== undefined) single['coors'] = [coorsArr[i]]
+        if (coorsArr[i] !== undefined) single['coords'] = [coorsArr[i]]
         return makeLeafNode(single)
       })
     }
@@ -346,7 +368,7 @@ const normalizeTreeData = (rawData) => {
  */
 const allVillagesLeafExtractor = (rawData, rawName) => {
   const codes = Array.isArray(rawData['place_type_code']) ? rawData['place_type_code'] : [rawData['place_type_code']].filter(Boolean)
-  const coorsArr = Array.isArray(rawData['coors']) ? rawData['coors'] : [rawData['coors']].filter(Boolean)
+  const coorsArr = Array.isArray(rawData['coords']) ? rawData['coords'] : [rawData['coords']].filter(Boolean)
   const count = Math.max(codes.length, coorsArr.length, 1)
 
   const results = []
