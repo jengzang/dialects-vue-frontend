@@ -9,15 +9,15 @@
           v-model="filterMode"
           :options="filterModeOptions"
           :placeholder="t('villages.pages.allVillages.filter.placeholder')"
-          :match-trigger-width="true"
+          width="120px"
         />
         <SimpleSelectDropdown
           v-if="filterMode && filterMode !== FILTER_MODE_NONE"
           v-model="filterValue"
           :options="filterValueOptions"
           :placeholder="t('villages.pages.allVillages.filter.placeholder')"
-          :match-trigger-width="true"
-          :searchable="filterMode === 'raw'"
+          width="180px"
+          searchable
         />
       </div>
       <div class="search-wrapper">
