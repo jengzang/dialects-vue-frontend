@@ -146,13 +146,14 @@ let idCounter = 0;
 const generateId = () => `node-${Date.now()}-${idCounter++}`;
 
 /**
- * Decompress zlib-compressed coors data.
- * Expects base64-encoded zlib → Uint8Array → unzip → JSON string → parsed array.
+ * Decompress hex-encoded zlib-compressed coors data.
+ * Hex string → Uint8Array → unzip → JSON string → parsed array.
  */
 const decompressCoors = (compressed) => {
   if (!compressed) return []
   try {
-    const binary = Uint8Array.from(atob(compressed), c => c.charCodeAt(0))
+    const bytes = compressed.match(/.{1,2}/g).map(b => parseInt(b, 16))
+    const binary = new Uint8Array(bytes)
     const decompressed = unzipSync(binary)
     const jsonStr = strFromU8(decompressed)
     return JSON.parse(jsonStr)
@@ -169,7 +170,7 @@ const getPlaceTypeDisplay = (data) => {
   const code = Array.isArray(data['place_type_code']) ? data['place_type_code'][0] : data['place_type_code']
   if (!code) return ''
   const info = getPlaceTypeInfo(String(code))
-  return info?.place_type_name || ''
+  return info?.place_type_name || `[${code}]`
 }
 
 /**
