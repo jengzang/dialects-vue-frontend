@@ -422,7 +422,7 @@
       "name": "Name",
       "level2": "Level 2",
       "level3": "Level 3",
-      "code": "Code"
+      "code": "Raw"
     },
     "buttons": {
       "reset": "Reset",

@@ -272,14 +272,15 @@ const loadCityData = async (cityName) => {
           children: [],
           _lazy: true,
           _lazyFilters: { "3": [cityName], "4": [districtName] },
-          _lazyLevelColumns: shifted
+          _lazyLevelColumns: shifted,
+          _path: [cityName, districtName]
         }))
         loadedCitiesData.value[cityName] = nodes
       } else {
         loadedCitiesData.value[cityName] = []
       }
     } else if (result.tree && result.tree[cityName]) {
-      const normalizedData = normalizeTreeData(result.tree[cityName]);
+      const normalizedData = normalizeTreeData(result.tree[cityName], [cityName]);
       loadedCitiesData.value[cityName] = normalizedData;
     } else {
       throw new Error(t('villages.pages.allVillages.errors.invalidCityData'));
@@ -295,7 +296,7 @@ const loadCityData = async (cityName) => {
 /**
  * Normalize tree data from API response (full tree mode)
  */
-const normalizeTreeData = (rawData) => {
+const normalizeTreeData = (rawData, pathPrefix = []) => {
   if (!rawData || typeof rawData !== 'object') return [];
 
   const pushChild = (children, result) => {
@@ -307,7 +308,7 @@ const normalizeTreeData = (rawData) => {
     }
   }
 
-  const processNode = (data, name, level = 1) => {
+  const processNode = (data, name, level = 1, path = []) => {
     // Leaf detection: check for place_type_code or coors fields
     const isLeaf = data['place_type_code'] !== undefined ||
                    data['coords'] !== undefined;
@@ -328,6 +329,7 @@ const normalizeTreeData = (rawData) => {
           rawData: singleData,
           _coordCount: Array.isArray(coors) ? coors.length : 0,
           _tag: tag,
+          _path: [...path, name],
           children: []
         }
       }
@@ -349,7 +351,7 @@ const normalizeTreeData = (rawData) => {
     const children = [];
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        pushChild(children, processNode(data[key], key, level + 1))
+        pushChild(children, processNode(data[key], key, level + 1, [...path, name]))
       }
     }
 
@@ -359,6 +361,7 @@ const normalizeTreeData = (rawData) => {
       id: generateId(),
       name: name,
       rawName: name,
+      _path: [...path, name],
       children: children
     };
   };
@@ -366,7 +369,7 @@ const normalizeTreeData = (rawData) => {
   const cityChildren = [];
   for (const districtName in rawData) {
     if (Object.prototype.hasOwnProperty.call(rawData, districtName)) {
-      pushChild(cityChildren, processNode(rawData[districtName], districtName, 1))
+      pushChild(cityChildren, processNode(rawData[districtName], districtName, 1, pathPrefix))
     }
   }
 
@@ -483,11 +486,12 @@ const lazyLoadChildren = async (node) => {
         children: [],
         _lazy: true,
         _lazyFilters: { ...node._lazyFilters, [String(nextCol)]: [childName] },
-        _lazyLevelColumns: nextShifted
+        _lazyLevelColumns: nextShifted,
+        _path: [...(node._path || []), childName]
       }))
     } else {
       const nodeKey = node.rawName || node.name
-      node.children = normalizeTreeData(result.tree?.[nodeKey] || {})
+      node.children = normalizeTreeData(result.tree?.[nodeKey] || {}, node._path || [])
     }
     node._childrenLoaded = true
   } catch (error) {
@@ -519,6 +523,7 @@ const collectAllLeafNodes = (nodes) => {
   const traverse = (n) => {
     if (n.rawData) {
       const extracted = allVillagesLeafExtractor(n.rawData, n.rawName || n.name)
+      if (n._path) extracted.forEach(e => e._path = n._path)
       leaves.push(...extracted)
     }
     if (n.children && n.children.length > 0) {

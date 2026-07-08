@@ -110,6 +110,28 @@ const colorPalette = [
   "#aaffc3", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
 ]
 
+const tagPastelPalette = [
+  '#e3f2fd', '#fce4ec', '#e8f5e9', '#fff3e0', '#f3e5f5',
+  '#e0f7fa', '#fbe9e7', '#e8eaf6', '#f1f8e9', '#fff8e1',
+  '#ede7f6', '#e1f5fe', '#f9fbe7', '#efebe9', '#e0f2f1'
+]
+const getTagColor = (text) => {
+  if (!text) return '#f5f5f5'
+  let hash = 0
+  for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0
+  return tagPastelPalette[Math.abs(hash) % tagPastelPalette.length]
+}
+
+const buildTag = (text, bgColor) =>
+  `<span style="display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:500;color:#555;background:${bgColor};margin-top:2px">${text}</span>`
+
+const buildHoverHtml = (name, pathStr, tagText, tagColor) => {
+  let html = `<div style="text-align:center"><strong>${name}</strong></div>`
+  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:#999;margin-top:2px">${pathStr}</div>`
+  if (tagText) html += `<div style="text-align:center">${buildTag(tagText, tagColor)}</div>`
+  return html
+}
+
 // 数据验证
 const validVillages = computed(() => {
   return props.villages.filter(v => {
@@ -203,10 +225,10 @@ const bindClusteredInteractions = () => {
       map.value.getCanvas().style.cursor = 'pointer'
 
       if (e.features.length > 0) {
-        const feature = e.features[0]
-        const { name, dialect } = feature.properties
+        const props = e.features[0].properties
+        const html = buildHoverHtml(props.name, props._pathStr, props.dialect, getTagColor(props.dialect))
         clusteredPopup.setLngLat(e.lngLat)
-          .setHTML(`<strong>${name}</strong><br>${dialect || ''}`)
+          .setHTML(html)
           .addTo(map.value)
       }
     },
@@ -303,7 +325,8 @@ const renderMarkers = () => {
           dialect: village.dialect || '',
           label: label,
           bgColor: bgColor,
-          textColor: textColor
+          textColor: textColor,
+          _pathStr: (village._path && village._path.length) ? village._path.join(' > ') : ''
         }
       }
     })
@@ -431,7 +454,7 @@ const renderWithoutClustering = (geojsonData) => {
 
     for (let i = currentIndex; i < endIndex; i++) {
       const feature = features[i]
-      const { name, dialect } = feature.properties
+      const { name, dialect, _pathStr } = feature.properties
       const [lng, lat] = feature.geometry.coordinates
 
       // 创建文字标记元素（类似 MapLibre.vue 的 marker-text-feature）
@@ -458,7 +481,7 @@ const renderWithoutClustering = (geojsonData) => {
       el.addEventListener('mouseenter', () => {
         window._villagePopup
           .setLngLat([lng, lat])
-          .setHTML(`<strong>${name}</strong>`)
+          .setHTML(buildHoverHtml(name, _pathStr, dialect, getTagColor(dialect)))
           .addTo(map.value)
       })
 

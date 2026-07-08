@@ -105,11 +105,32 @@ const mapStyleOptions = computed(() => {
 })
 
 const colorPalette = [
-  "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
-  "#911eb4", "#42d4f4", "#f032e6", "#bfe745", "#fabed4",
-  "#469990", "#dcbaff", "#9a6324", "#fffac8", "#800000",
-  "#aaffc3", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
+  "#b31919", "#b34719", "#b37519", "#b3a319", "#94b319",
+  "#66b319", "#38b319", "#19b329", "#19b357", "#19b385",
+  "#19b3b3", "#1985b3", "#1957b3", "#1929b3", "#3819b3",
+  "#6619b3", "#9419b3", "#b319a3", "#b31975", "#b31947"
 ]
+
+const getCategoryColor = (text) => {
+  if (!text) return colorPalette[0]
+  let hash = 0
+  for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0
+  return colorPalette[Math.abs(hash) % colorPalette.length]
+}
+
+const buildTag = (text, bgColor) => {
+  const r = parseInt(bgColor.slice(1, 3), 16)
+  const g = parseInt(bgColor.slice(3, 5), 16)
+  const b = parseInt(bgColor.slice(5, 7), 16)
+  return `<span style="display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:500;color:#333;background:rgba(${r},${g},${b},0.2);margin-top:2px">${text}</span>`
+}
+
+const buildHoverHtml = (name, pathStr, tagText, tagColor) => {
+  let html = `<div style="text-align:center"><strong>${name}</strong></div>`
+  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:#999;margin-top:2px">${pathStr}</div>`
+  if (tagText && tagColor) html += `<div style="text-align:center">${buildTag(tagText, tagColor)}</div>`
+  return html
+}
 
 const getDisplayValue = (village) => {
   if (displayMode.value === 'level2') return village.level2_name || ''
@@ -212,9 +233,9 @@ const bindClusteredInteractions = () => {
     mouseEnterPoint: (e) => {
       map.value.getCanvas().style.cursor = 'pointer'
       if (e.features.length > 0) {
-        const { name, displayValue } = e.features[0].properties
+        const props = e.features[0].properties
         clusteredPopup.setLngLat(e.lngLat)
-          .setHTML(`<strong>${name}</strong><br>${displayValue || ''}`)
+          .setHTML(buildHoverHtml(props.name, props._pathStr, props.tagText, props.tagColor))
           .addTo(map.value)
       }
     },
@@ -334,9 +355,9 @@ const renderCircles = (pointFeatures) => {
   const pointPopup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 })
   map.value.on('mouseenter', 'allvillages-points-layer', (e) => {
     map.value.getCanvas().style.cursor = 'pointer'
-    const { name, displayValue } = e.features[0].properties
+    const props = e.features[0].properties
     pointPopup.setLngLat(e.lngLat)
-      .setHTML(`<strong>${name}</strong><br>${displayValue || ''}`)
+      .setHTML(buildHoverHtml(props.name, props._pathStr, props.tagText, props.tagColor))
       .addTo(map.value)
   })
   map.value.on('mouseleave', 'allvillages-points-layer', () => {
@@ -359,16 +380,25 @@ const renderMarkers = () => {
   }
 
   // Render lines (always non-clustered GeoJSON layer)
+  const isNameMode = displayMode.value === 'name'
   if (lineVillages.value.length > 0) {
-    const lineFeatures = lineVillages.value.map(v => ({
-      type: 'Feature',
-      geometry: { type: 'LineString', coordinates: v.coors },
-      properties: {
-        name: v.name,
-        displayValue: getDisplayValue(v),
-        color: categoryColorMap.value[getDisplayValue(v)] || '#1b2e2b'
+    const lineFeatures = lineVillages.value.map(v => {
+      const displayValue = getDisplayValue(v)
+      const tagText = isNameMode ? (v.place_type_name || '') : displayValue
+      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || '#1b2e2b')
+      return {
+        type: 'Feature',
+        geometry: { type: 'LineString', coordinates: v.coors },
+        properties: {
+          name: v.name,
+          displayValue: displayValue,
+          color: categoryColorMap.value[displayValue] || '#1b2e2b',
+          _pathStr: (v._path && v._path.length) ? v._path.join(' > ') : '',
+          tagText: tagText,
+          tagColor: tagColor
+        }
       }
-    }))
+    })
 
     map.value.addSource('allvillages-lines', {
       type: 'geojson',
@@ -392,7 +422,7 @@ const renderMarkers = () => {
       map.value.getCanvas().style.cursor = 'pointer'
       const props = e.features[0].properties
       linePopup.setLngLat(e.lngLat)
-        .setHTML(`<strong>${props.name}</strong><br>${props.displayValue || ''}`)
+        .setHTML(buildHoverHtml(props.name, props._pathStr, props.tagText, props.tagColor))
         .addTo(map.value)
     })
     map.value.on('mouseleave', 'allvillages-lines', () => {
@@ -403,9 +433,10 @@ const renderMarkers = () => {
 
   // Render points
   if (pointVillages.value.length > 0) {
-    const isNameMode = displayMode.value === 'name'
     const pointFeatures = pointVillages.value.map(v => {
       const displayValue = getDisplayValue(v)
+      const tagText = isNameMode ? (v.place_type_name || '') : displayValue
+      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || '#1b2e2b')
       return {
         type: 'Feature',
         geometry: { type: 'Point', coordinates: v.coors[0] },
@@ -415,7 +446,10 @@ const renderMarkers = () => {
           label: isNameMode ? v.name : displayValue,
           bgColor: '#1b2e2b',
           textColor: '#a6ffdc',
-          color: categoryColorMap.value[displayValue] || '#1b2e2b'
+          color: categoryColorMap.value[displayValue] || '#1b2e2b',
+          _pathStr: (v._path && v._path.length) ? v._path.join(' > ') : '',
+          tagText: tagText,
+          tagColor: tagColor
         }
       }
     })

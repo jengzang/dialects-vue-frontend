@@ -228,7 +228,8 @@ const loadCityData = async (cityName) => {
           children: [],
           _lazy: true,
           _lazyFilters: { "0": [cityName], "1": [districtName] },
-          _lazyLevelColumns: shifted
+          _lazyLevelColumns: shifted,
+          _path: [cityName, districtName]
         }))
         loadedCitiesData.value[cityName] = nodes
       } else {
@@ -236,7 +237,7 @@ const loadCityData = async (cityName) => {
       }
     } else if (result.tree && result.tree[cityName]) {
       // Normal full tree
-      const normalizedData = normalizeTreeData(result.tree[cityName]);
+      const normalizedData = normalizeTreeData(result.tree[cityName], [cityName]);
       loadedCitiesData.value[cityName] = normalizedData;
     } else {
       throw new Error(t('villages.pages.gdTree.errors.invalidCityData'));
@@ -252,7 +253,7 @@ const loadCityData = async (cityName) => {
 /**
  * Normalize tree data from API response (full tree mode)
  */
-const normalizeTreeData = (rawData) => {
+const normalizeTreeData = (rawData, pathPrefix = []) => {
   if (!rawData || typeof rawData !== 'object') {
     return [];
   }
@@ -266,7 +267,7 @@ const normalizeTreeData = (rawData) => {
     }
   }
 
-  const processNode = (data, name, level = 1) => {
+  const processNode = (data, name, level = 1, path = []) => {
     // Check if this is a leaf node (contains data fields)
     const isLeaf = data['dialect'] !== undefined ||
                    data['方言分布'] !== undefined ||
@@ -285,6 +286,7 @@ const normalizeTreeData = (rawData) => {
         rawName: name,
         rawData: singleData,
         _tag: getGdTagInfo(singleData),
+        _path: [...path, name],
         children: []
       })
 
@@ -306,7 +308,7 @@ const normalizeTreeData = (rawData) => {
     const children = [];
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        pushChild(children, processNode(data[key], key, level + 1))
+        pushChild(children, processNode(data[key], key, level + 1, [...path, name]))
       }
     }
 
@@ -319,6 +321,7 @@ const normalizeTreeData = (rawData) => {
       id: generateId(),
       name: name,
       rawName: name,
+      _path: [...path, name],
       children: children
     };
   };
@@ -327,7 +330,7 @@ const normalizeTreeData = (rawData) => {
   const cityChildren = [];
   for (const districtName in rawData) {
     if (Object.prototype.hasOwnProperty.call(rawData, districtName)) {
-      pushChild(cityChildren, processNode(rawData[districtName], districtName, 1))
+      pushChild(cityChildren, processNode(rawData[districtName], districtName, 1, pathPrefix))
     }
   }
 
@@ -470,12 +473,13 @@ const lazyLoadChildren = async (node) => {
         children: [],
         _lazy: true,
         _lazyFilters: { ...node._lazyFilters, [String(nextCol)]: [childName] },
-        _lazyLevelColumns: nextShifted
+        _lazyLevelColumns: nextShifted,
+        _path: [...(node._path || []), childName]
       }))
     } else {
       // mode === 'full' — tree rooted at filter level, extract by node key
       const nodeKey = node.rawName || node.name
-      node.children = normalizeTreeData(result.tree?.[nodeKey] || {})
+      node.children = normalizeTreeData(result.tree?.[nodeKey] || {}, node._path || [])
     }
     node._childrenLoaded = true
   } catch (error) {
@@ -523,6 +527,7 @@ const collectAllLeafNodes = (nodes) => {
           dialect: dialects[i] || '',
           longitude: parseFloat(lngs[i]) || 0,
           latitude: parseFloat(lats[i]) || 0,
+          _path: n._path || []
         });
       }
     }

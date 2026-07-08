@@ -149,8 +149,10 @@ const collectLeafNodes = (node) => {
       if (props.leafDataExtractor) {
         const extracted = props.leafDataExtractor(n.rawData, n.rawName || n.name)
         if (Array.isArray(extracted)) {
+          if (n._path) extracted.forEach(e => e._path = n._path)
           leaves.push(...extracted)
         } else if (extracted) {
+          if (n._path) extracted._path = n._path
           leaves.push(extracted)
         }
       } else {
@@ -162,7 +164,8 @@ const collectLeafNodes = (node) => {
           name: n.rawName || n.name,
           dialect: dialect,
           longitude: parseFloat(lng) || 0,
-          latitude: parseFloat(lat) || 0
+          latitude: parseFloat(lat) || 0,
+          _path: n._path || []
         });
       }
     }
@@ -194,7 +197,9 @@ const handleMapClick = () => {
     // Leaf node: show single node data
     if (props.leafDataExtractor) {
       const extracted = props.leafDataExtractor(props.node.rawData, props.node.rawName || props.node.name)
-      emit('open-map', Array.isArray(extracted) ? extracted : [extracted])
+      const result = Array.isArray(extracted) ? extracted : [extracted]
+      if (props.node._path) result.forEach(e => e._path = props.node._path)
+      emit('open-map', result)
     } else {
       const dialect = (props.node.rawData?.['dialect'] || props.node.rawData?.['方言分布'])?.[0] || '';
       const lng = props.node.rawData?.['longitude']?.[0] || '';
@@ -204,7 +209,8 @@ const handleMapClick = () => {
         name: props.node.rawName || props.node.name,
         dialect: dialect,
         longitude: parseFloat(lng) || 0,
-        latitude: parseFloat(lat) || 0
+        latitude: parseFloat(lat) || 0,
+        _path: props.node._path || []
       }]);
     }
   }
