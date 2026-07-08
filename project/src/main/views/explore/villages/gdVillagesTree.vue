@@ -355,16 +355,17 @@ const getGdTagColor = (dialect) => {
 
 const getGdTagInfo = (data) => {
   const dialect = getDialect(data)
-  const lng = data['longitude']?.[0] || ''
-  const lat = data['latitude']?.[0] || ''
-  if (lng && lat) {
-    return { text: `${dialect} (${lng},${lat})`, color: getGdTagColor(dialect) }
+  const lng = data['longitude']?.[0]
+  const lat = data['latitude']?.[0]
+  const coordStr = (lng && lat) ? `(${Number(lng).toFixed(3)}, ${Number(lat).toFixed(3)})` : ''
+  if (lng && lat && dialect) {
+    return { text: `${dialect} ${coordStr}`, color: getGdTagColor(dialect) }
   }
   if (dialect) {
     return { text: dialect, color: getGdTagColor(dialect) }
   }
-  if (lng && lat) {
-    return { text: `(${lng},${lat})`, color: '#f5f5f5' }
+  if (coordStr) {
+    return { text: coordStr, color: '#f5f5f5' }
   }
   return null
 }

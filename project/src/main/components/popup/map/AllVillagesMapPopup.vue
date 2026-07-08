@@ -689,7 +689,7 @@ onBeforeUnmount(() => {
 
   .map-popup-title {
     font-size: 18px;
-    width: 100%;
+    /* width: 100%; */
   }
 
   .map-controls {
