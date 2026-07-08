@@ -151,14 +151,24 @@ const generateId = () => `node-${Date.now()}-${idCounter++}`;
  */
 const decompressCoors = (compressed) => {
   if (!compressed) return []
+  const hex = String(compressed).trim()
+  if (hex.length % 2 !== 0) {
+    console.warn('coors hex has odd length, padding:', hex.length, hex.slice(0, 20))
+    return []
+  }
   try {
-    const bytes = compressed.match(/.{1,2}/g).map(b => parseInt(b, 16))
+    const bytes = hex.match(/.{1,2}/g).map(b => parseInt(b, 16))
     const binary = new Uint8Array(bytes)
     const decompressed = decompressSync(binary)
     const jsonStr = strFromU8(decompressed)
-    return JSON.parse(jsonStr)
+    const parsed = JSON.parse(jsonStr)
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      console.warn('coors decompressed to non-array or empty:', jsonStr.slice(0, 80))
+      return []
+    }
+    return parsed
   } catch (e) {
-    console.error('coors decompression failed:', e)
+    console.error('coors decompression failed:', e.message, 'hex preview:', hex.slice(0, 40))
     return []
   }
 }
