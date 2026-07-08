@@ -169,7 +169,7 @@ const getPlaceTypeDisplay = (data) => {
   const code = Array.isArray(data['place_type_code']) ? data['place_type_code'][0] : data['place_type_code']
   if (!code) return ''
   const info = getPlaceTypeInfo(String(code))
-  return info?.level3?.name || ''
+  return info?.place_type_name || ''
 }
 
 /**
@@ -286,14 +286,21 @@ const normalizeTreeData = (rawData) => {
       const coorsArr = Array.isArray(data['coors']) ? data['coors'] : []
       const count = Math.max(codes.length, coorsArr.length, 1)
 
-      if (count <= 1) {
+      const makeLeafNode = (singleData) => {
+        const compressed = Array.isArray(singleData['coors']) ? singleData['coors'][0] : singleData['coors']
+        const coors = decompressCoors(compressed)
         return {
           id: generateId(),
-          name: formatLeafNode(name, data),
+          name: formatLeafNode(name, singleData),
           rawName: name,
-          rawData: data,
+          rawData: singleData,
+          _coordCount: Array.isArray(coors) ? coors.length : 0,
           children: []
         }
+      }
+
+      if (count <= 1) {
+        return makeLeafNode(data)
       }
 
       // Multi-record leaf — split into individual nodes
@@ -301,13 +308,7 @@ const normalizeTreeData = (rawData) => {
         const single = {}
         if (codes[i] !== undefined) single['place_type_code'] = [codes[i]]
         if (coorsArr[i] !== undefined) single['coors'] = [coorsArr[i]]
-        return {
-          id: generateId(),
-          name: formatLeafNode(name, single),
-          rawName: name,
-          rawData: single,
-          children: []
-        }
+        return makeLeafNode(single)
       })
     }
 

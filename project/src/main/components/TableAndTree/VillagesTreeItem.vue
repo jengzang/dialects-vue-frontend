@@ -2,7 +2,7 @@
   <div class="tree-node">
     <div class="node-content" :class="{ 'is-match': isMatch }" @click="toggle">
       <div class="node-label">
-        <span class="icon">{{ hasChildren ? '📁' : '📍' }}</span>
+        <span class="icon">{{ leafIcon }}</span>
         <span class="text" v-if="isMatch" v-html="highlightName"></span>
         <span class="text" v-else>{{ displayName }}</span>
         <span v-if="node._loadingChildren" class="lazy-indicator">↻</span>
@@ -84,6 +84,12 @@ const hasChildren = computed(() => {
   }
   return props.node.children && props.node.children.length > 0;
 });
+
+const leafIcon = computed(() => {
+  if (hasChildren.value) return '📁'
+  if (props.node._coordCount > 1) return '📐'
+  return '📍'
+})
 
 // Replace "(空)" with "請展開"
 const displayName = computed(() => {
