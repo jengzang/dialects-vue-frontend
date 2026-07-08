@@ -415,6 +415,21 @@
       "exitFullscreen": "退出全屏"
     }
   },
+  "allVillagesMapPopup": {
+    "title": "全部自然村分佈地圖",
+    "count": "{count} 個要素",
+    "toggle": {
+      "name": "地名",
+      "level2": "級別2",
+      "level3": "級別3",
+      "code": "代碼"
+    },
+    "buttons": {
+      "reset": "復位",
+      "fullscreen": "全屏",
+      "exitFullscreen": "退出全屏"
+    }
+  },
   "legend": {
     "title": "圖例",
     "compareTypes": {

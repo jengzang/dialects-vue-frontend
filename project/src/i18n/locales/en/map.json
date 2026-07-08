@@ -415,6 +415,21 @@
       "exitFullscreen": "Exit"
     }
   },
+  "allVillagesMapPopup": {
+    "title": "All Villages Distribution Map",
+    "count": "{count} features",
+    "toggle": {
+      "name": "Name",
+      "level2": "Level 2",
+      "level3": "Level 3",
+      "code": "Code"
+    },
+    "buttons": {
+      "reset": "Reset",
+      "fullscreen": "Fullscreen",
+      "exitFullscreen": "Exit"
+    }
+  },
   "legend": {
     "title": "Legend",
     "compareTypes": {

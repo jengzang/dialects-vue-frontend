@@ -55,7 +55,21 @@
     },
     "allVillages": {
       "title": "All Villages",
-      "placeholder": "All villages data content coming soon..."
+      "searchPlaceholder": "Search loaded villages...",
+      "loadingCities": "Loading list...",
+      "retry": "Retry",
+      "load": "Load",
+      "loading": "Loading...",
+      "loaded": "Loaded",
+      "fetching": "Fetching data...",
+      "noResults": "No matching results found",
+      "noData": "No data available",
+      "errors": {
+        "invalidCityList": "Unexpected list format returned",
+        "loadCities": "Failed to load the list. Please retry.",
+        "invalidCityData": "Unexpected data format returned, or no data",
+        "loadCity": "Load failed. Please retry."
+      }
     },
     "yangChun": {
       "title": "Yangchun Administrative Divisions",

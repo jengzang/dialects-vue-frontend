@@ -55,7 +55,21 @@
     },
     "allVillages": {
       "title": "全部自然村",
-      "placeholder": "全部自然村數據內容待添加..."
+      "searchPlaceholder": "搜索已加載的村落...",
+      "loadingCities": "正在加載列表...",
+      "retry": "重試",
+      "load": "加載",
+      "loading": "加載中...",
+      "loaded": "已加載",
+      "fetching": "正在獲取數據...",
+      "noResults": "沒有找到匹配的結果",
+      "noData": "暫無數據",
+      "errors": {
+        "invalidCityList": "返回的列表格式錯誤",
+        "loadCities": "無法加載列表，請重試",
+        "invalidCityData": "返回的數據格式錯誤或無數據",
+        "loadCity": "加載失敗，請重試"
+      }
     },
     "yangChun": {
       "title": "陽春行政規劃",

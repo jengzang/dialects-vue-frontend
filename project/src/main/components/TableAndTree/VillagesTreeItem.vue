@@ -67,6 +67,10 @@ const props = defineProps({
   node: Object,
   searchQuery: String,
   lazyLoadFn: Function,
+  leafDataExtractor: {
+    type: Function,
+    default: null
+  }
 });
 
 const emit = defineEmits(['open-map']);
@@ -134,16 +138,25 @@ const collectLeafNodes = (node) => {
   const traverse = (n) => {
     // If it's a leaf node (has rawData)
     if (n.rawData) {
-      const dialect = (n.rawData['dialect'] || n.rawData['方言分布'])?.[0] || '';
-      const lng = n.rawData['longitude']?.[0] || '';
-      const lat = n.rawData['latitude']?.[0] || '';
+      if (props.leafDataExtractor) {
+        const extracted = props.leafDataExtractor(n.rawData, n.rawName || n.name)
+        if (Array.isArray(extracted)) {
+          leaves.push(...extracted)
+        } else if (extracted) {
+          leaves.push(extracted)
+        }
+      } else {
+        const dialect = (n.rawData['dialect'] || n.rawData['方言分布'])?.[0] || '';
+        const lng = n.rawData['longitude']?.[0] || '';
+        const lat = n.rawData['latitude']?.[0] || '';
 
-      leaves.push({
-        name: n.rawName || n.name,
-        dialect: dialect,
-        longitude: parseFloat(lng) || 0,
-        latitude: parseFloat(lat) || 0
-      });
+        leaves.push({
+          name: n.rawName || n.name,
+          dialect: dialect,
+          longitude: parseFloat(lng) || 0,
+          latitude: parseFloat(lat) || 0
+        });
+      }
     }
 
     // Recursively process children
@@ -171,25 +184,21 @@ const handleMapClick = () => {
     emit('open-map', leafNodes);
   } else {
     // Leaf node: show single node data
-    const dialect = (props.node.rawData?.['dialect'] || props.node.rawData?.['方言分布'])?.[0] || '';
-    const lng = props.node.rawData?.['longitude']?.[0] || '';
-    const lat = props.node.rawData?.['latitude']?.[0] || '';
+    if (props.leafDataExtractor) {
+      const extracted = props.leafDataExtractor(props.node.rawData, props.node.rawName || props.node.name)
+      emit('open-map', Array.isArray(extracted) ? extracted : [extracted])
+    } else {
+      const dialect = (props.node.rawData?.['dialect'] || props.node.rawData?.['方言分布'])?.[0] || '';
+      const lng = props.node.rawData?.['longitude']?.[0] || '';
+      const lat = props.node.rawData?.['latitude']?.[0] || '';
 
-    // console.log(`=== ${props.node.rawName || props.node.name} ===`);
-    // console.log({
-    //   name: props.node.rawName || props.node.name,
-    //   dialect: dialect,
-    //   longitude: lng,
-    //   latitude: lat
-    // });
-
-    // Emit to parent component
-    emit('open-map', [{
-      name: props.node.rawName || props.node.name,
-      dialect: dialect,
-      longitude: parseFloat(lng) || 0,
-      latitude: parseFloat(lat) || 0
-    }]);
+      emit('open-map', [{
+        name: props.node.rawName || props.node.name,
+        dialect: dialect,
+        longitude: parseFloat(lng) || 0,
+        latitude: parseFloat(lat) || 0
+      }]);
+    }
   }
 };
 

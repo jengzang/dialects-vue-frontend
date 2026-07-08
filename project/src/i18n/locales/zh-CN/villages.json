@@ -55,7 +55,21 @@
     },
     "allVillages": {
       "title": "全部自然村",
-      "placeholder": "全部自然村数据内容待添加..."
+      "searchPlaceholder": "搜索已加载的村落...",
+      "loadingCities": "正在加载列表...",
+      "retry": "重试",
+      "load": "加载",
+      "loading": "加载中...",
+      "loaded": "已加载",
+      "fetching": "正在获取数据...",
+      "noResults": "没有找到匹配的结果",
+      "noData": "暂无数据",
+      "errors": {
+        "invalidCityList": "返回的列表格式错误",
+        "loadCities": "无法加载列表，请重试",
+        "invalidCityData": "返回的数据格式错误或无数据",
+        "loadCity": "加载失败，请重试"
+      }
     },
     "yangChun": {
       "title": "阳春行政规划",
