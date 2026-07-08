@@ -186,7 +186,9 @@ const filterValueOptions = computed(() => {
     }
     if (!seen.has(value)) seen.set(value, { label, value })
   }
-  return Array.from(seen.values())
+  const list = Array.from(seen.values())
+  list.sort((a, b) => (a.value < b.value ? -1 : 1))
+  return list
 })
 
 const matchedCodes = computed(() => {
