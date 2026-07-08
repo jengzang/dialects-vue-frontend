@@ -6,7 +6,7 @@
     </h3>
 
     <div class="vml-glass-panel">
-      <div class="tendency-section">
+      <div class="tendency-section" style="flex-direction: column; gap: 12px;">
       <h3>區域語義類別傾向性</h3>
       <p class="section-description">
         分析特定區域中各語義類別的傾向性，使用Z分數和Lift值衡量該區域對不同語義類別的偏好程度。

@@ -263,7 +263,7 @@
       size="lg"
       :title="t('tools.merge.modal.title')"
       :close-label="t('tools.common.close')"
-      :z-index="1000"
+      :z-index="1500"
       @update:modelValue="showDefaultRefModal = false"
     >
       <div class="merge-default-ref-tabs">

@@ -593,7 +593,7 @@
       size="sm"
       :title="t('tools.checkTool.batchReplace.title')"
       :close-label="t('tools.common.close')"
-      :z-index="1000"
+      :z-index="1500"
       @update:modelValue="showBatchReplaceModal = false"
     >
       <div class="check-tool-batch-replace-content">
@@ -658,7 +658,7 @@
       size="lg"
       :title="t('tools.checkTool.help.title')"
       :close-label="t('tools.common.close')"
-      :z-index="1000"
+      :z-index="1500"
       @update:modelValue="showHelpModal = false"
     >
       <div class="help-content ui-scrollbar">
@@ -750,7 +750,7 @@
       size="lg"
       :title="t('tools.checkTool.formatHelp.title')"
       :close-label="t('tools.common.close')"
-      :z-index="1000"
+      :z-index="1500"
       @update:modelValue="showFormatHelpModal = false"
     >
       <div class="help-content ui-scrollbar">
@@ -829,7 +829,7 @@
       size="sm"
       :title="toneCharsModalTitle"
       :close-label="t('tools.common.close')"
-      :z-index="1000"
+      :z-index="1500"
       @update:modelValue="showToneCharsModal = false"
     >
       <div class="tone-chars-display">
@@ -849,7 +849,7 @@
       size="sm"
       :title="t('tools.checkTool.filter.title', { column: getFilterColumnLabel(filterColumnType) })"
       :close-label="t('tools.common.close')"
-      :z-index="1000"
+      :z-index="1500"
       @update:modelValue="showFilterModal = false"
     >
       <div class="filter-modal-body">

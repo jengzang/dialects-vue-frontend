@@ -337,14 +337,14 @@ const tableData = computed(() => {
             <span class="metric-icon">{{ metric.icon }}</span>
             <span class="metric-label">
               {{ metric.label }}
-              <HelpIcon
+              <!-- <HelpIcon
                 v-if="metric.tooltip"
                 :content="metric.tooltip"
                 size="md"
                 fontSize="16px"
                 iconColor="#c7254e"
                 trigger="both"
-              />
+              /> -->
             </span>
           </div>
 
@@ -396,17 +396,28 @@ const tableData = computed(() => {
                 <tr
                   v-if="!row.isCategorySummary"
                   class="data-row"
-                  :class="{
-                    'first-place': row.isFirstPlace,
-                    'second-place': row.isSecondPlace,
-                    'third-place': row.isThirdPlace
-                  }"
                 >
                   <template v-if="row.isFirstEndpointInCategory">
-                    <td :rowspan="row.categoryEndpointCount" class="category-cell">
+                    <td
+                      :rowspan="row.categoryEndpointCount"
+                      class="category-cell"
+                      :class="{
+                        gold: row.categorySummary.isFirstPlace,
+                        silver: row.categorySummary.isSecondPlace,
+                        bronze: row.categorySummary.isThirdPlace
+                      }"
+                    >
                       {{ row.categoryIcon }} {{ row.categoryName }}
                     </td>
-                    <td :rowspan="row.categoryEndpointCount" class="rank category-data">
+                    <td
+                      :rowspan="row.categoryEndpointCount"
+                      class="rank category-data"
+                      :class="{
+                        'category-gold': row.categorySummary.isFirstPlace,
+                        'category-silver': row.categorySummary.isSecondPlace,
+                        'category-bronze': row.categorySummary.isThirdPlace
+                      }"
+                    >
                       <span
                         class="rank-badge"
                         :class="{
@@ -418,18 +429,49 @@ const tableData = computed(() => {
                         {{ getRankLabel(row.categorySummary.rank) }}
                       </span>
                     </td>
-                    <td :rowspan="row.categoryEndpointCount" class="value category-data">
+                    <td
+                      :rowspan="row.categoryEndpointCount"
+                      class="value category-data"
+                      :class="{
+                        'category-gold': row.categorySummary.isFirstPlace,
+                        'category-silver': row.categorySummary.isSecondPlace,
+                        'category-bronze': row.categorySummary.isThirdPlace
+                      }"
+                    >
                       {{ row.categorySummary.value }}
                     </td>
-                    <td :rowspan="row.categoryEndpointCount" class="gap category-data">
+                    <td
+                      :rowspan="row.categoryEndpointCount"
+                      class="gap category-data"
+                      :class="{
+                        'category-gold': row.categorySummary.isFirstPlace,
+                        'category-silver': row.categorySummary.isSecondPlace,
+                        'category-bronze': row.categorySummary.isThirdPlace
+                      }"
+                    >
                       {{ row.categorySummary.gap }}
                     </td>
-                    <td :rowspan="row.categoryEndpointCount" class="first-place-value category-data">
+                    <td
+                      :rowspan="row.categoryEndpointCount"
+                      class="first-place-value category-data"
+                      :class="{
+                        'category-gold': row.categorySummary.isFirstPlace,
+                        'category-silver': row.categorySummary.isSecondPlace,
+                        'category-bronze': row.categorySummary.isThirdPlace
+                      }"
+                    >
                       {{ row.categorySummary.firstPlace }}
                     </td>
                   </template>
 
-                  <td class="metric-name">
+                  <td
+                    class="metric-name"
+                    :class="{
+                      'first-place': row.isFirstPlace,
+                      'second-place': row.isSecondPlace,
+                      'third-place': row.isThirdPlace
+                    }"
+                  >
                     {{ row.label }}
                     <HelpIcon
                       v-if="row.tooltip"
@@ -439,7 +481,14 @@ const tableData = computed(() => {
                       trigger="both"
                     />
                   </td>
-                  <td class="rank">
+                  <td
+                    class="rank"
+                    :class="{
+                      'first-place': row.isFirstPlace,
+                      'second-place': row.isSecondPlace,
+                      'third-place': row.isThirdPlace
+                    }"
+                  >
                     <span
                       class="rank-badge"
                       :class="{
@@ -451,9 +500,30 @@ const tableData = computed(() => {
                       {{ getRankLabel(row.rank) }}
                     </span>
                   </td>
-                  <td class="value">{{ row.value }}</td>
-                  <td class="gap">{{ row.gap }}</td>
-                  <td class="first-place-value">{{ row.firstPlace }}</td>
+                  <td
+                    class="value"
+                    :class="{
+                      'first-place': row.isFirstPlace,
+                      'second-place': row.isSecondPlace,
+                      'third-place': row.isThirdPlace
+                    }"
+                  >{{ row.value }}</td>
+                  <td
+                    class="gap"
+                    :class="{
+                      'first-place': row.isFirstPlace,
+                      'second-place': row.isSecondPlace,
+                      'third-place': row.isThirdPlace
+                    }"
+                  >{{ row.gap }}</td>
+                  <td
+                    class="first-place-value"
+                    :class="{
+                      'first-place': row.isFirstPlace,
+                      'second-place': row.isSecondPlace,
+                      'third-place': row.isThirdPlace
+                    }"
+                  >{{ row.firstPlace }}</td>
                 </tr>
               </template>
             </tbody>
@@ -785,10 +855,43 @@ const tableData = computed(() => {
   padding: 12px 8px;
 }
 
+.category-cell.gold {
+  color: #b8860b;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.18), rgba(255, 215, 0, 0.08));
+  border-right: 2px solid rgba(255, 215, 0, 0.4);
+}
+
+.category-cell.silver {
+  color: #5a6c6e;
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.18), rgba(192, 192, 192, 0.08));
+  border-right: 2px solid rgba(192, 192, 192, 0.4);
+}
+
+.category-cell.bronze {
+  color: #8b5a2b;
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.18), rgba(205, 127, 50, 0.08));
+  border-right: 2px solid rgba(205, 127, 50, 0.4);
+}
+
 .category-data {
   background: linear-gradient(90deg, rgba(0, 122, 255, 0.06), rgba(0, 122, 255, 0.03));
   font-weight: 600;
   border-right: 1px solid rgba(0, 122, 255, 0.15);
+}
+
+.category-data.category-gold {
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.12), rgba(255, 215, 0, 0.05));
+  border-right: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.category-data.category-silver {
+  background: linear-gradient(90deg, rgba(192, 192, 192, 0.12), rgba(192, 192, 192, 0.05));
+  border-right: 1px solid rgba(192, 192, 192, 0.3);
+}
+
+.category-data.category-bronze {
+  background: linear-gradient(90deg, rgba(205, 127, 50, 0.12), rgba(205, 127, 50, 0.05));
+  border-right: 1px solid rgba(205, 127, 50, 0.3);
 }
 
 .desktop-table {
@@ -815,39 +918,36 @@ const tableData = computed(() => {
 }
 
 .data-row:hover {
-  background: linear-gradient(90deg, rgba(0, 122, 255, 0.08), rgba(0, 122, 255, 0.04));
-  transform: translateX(2px);
+  background: transparent;
 }
 
 .data-row.category-summary:hover {
   background: linear-gradient(90deg, rgba(0, 122, 255, 0.12), rgba(0, 122, 255, 0.06));
 }
 
-.data-row.first-place {
+/* Rank-specific cell backgrounds — applied to right-side cells only, not merged cells */
+.data-row td.first-place {
   background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.08));
+}
+
+.data-row td.second-place {
+  background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), rgba(224, 224, 224, 0.08));
+}
+
+.data-row td.third-place {
+  background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), rgba(255, 160, 122, 0.08));
+}
+
+.data-row td.metric-name.first-place {
   border-left: 3px solid #ffd700;
 }
 
-.data-row.first-place:hover {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.12));
-}
-
-.data-row.second-place {
-  background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), rgba(224, 224, 224, 0.08));
+.data-row td.metric-name.second-place {
   border-left: 3px solid #c0c0c0;
 }
 
-.data-row.second-place:hover {
-  background: linear-gradient(90deg, rgba(192, 192, 192, 0.2), rgba(192, 192, 192, 0.12));
-}
-
-.data-row.third-place {
-  background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), rgba(255, 160, 122, 0.08));
+.data-row td.metric-name.third-place {
   border-left: 3px solid #cd7f32;
-}
-
-.data-row.third-place:hover {
-  background: linear-gradient(90deg, rgba(205, 127, 50, 0.2), rgba(205, 127, 50, 0.12));
 }
 
 .data-row td {

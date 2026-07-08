@@ -2,7 +2,7 @@
   <AppModal
     :model-value="visible"
     size="lg"
-    :z-index="1000"
+    :z-index="10000"
     transition-name="modal-fade"
     :close-label="t('common.button.close')"
     :show-close="false"

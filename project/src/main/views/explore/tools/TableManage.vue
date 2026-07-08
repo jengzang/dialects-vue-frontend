@@ -101,9 +101,9 @@
               <tbody>
                 <tr v-for="col in allColumns" :key="col.name">
                   <td>
-                    <CheckBox
-                      :model-value="selectedColumns[col.name]"
-                      @update:modelValue="selectedColumns[col.name] = $event"
+                    <input
+                      type="checkbox"
+                      v-model="selectedColumns[col.name]"
                     />
                   </td>
                   <td>{{ col.name }}</td>
@@ -119,9 +119,9 @@
                     />
                   </td>
                   <td>
-                    <CheckBox
-                      :model-value="filterableColumns[col.name]"
-                      @update:modelValue="filterableColumns[col.name] = $event"
+                    <input
+                      type="checkbox"
+                      v-model="filterableColumns[col.name]"
                     />
                   </td>
                 </tr>
@@ -173,7 +173,6 @@
 
 <script setup>
 import { computed, nextTick, onMounted, ref } from 'vue'
-import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { userStore } from '@/main/store/store.js'
@@ -1008,6 +1007,13 @@ onMounted(async () => {
 
 .column-config-table tbody tr:hover {
   background: rgba(0, 122, 255, 0.08);
+}
+
+.column-config-table input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: #007aff;
 }
 
 .width-input {

@@ -137,7 +137,7 @@
       size="lg"
       :close-label="t('tools.common.close')"
       transition-name="modal-fade"
-      :z-index="1000"
+      :z-index="1500"
       :show-close="false"
       @update:modelValue="showConfigModal = false"
     >
