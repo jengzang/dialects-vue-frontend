@@ -69,6 +69,15 @@
         "loadCities": "無法加載列表，請重試",
         "invalidCityData": "返回的數據格式錯誤或無數據",
         "loadCity": "加載失敗，請重試"
+      },
+      "filter": {
+        "modeLabel": "篩選：",
+        "modeLevel1": "級別1",
+        "modeLevel2": "級別2",
+        "modeLevel3": "級別3",
+        "modeRaw": "原始代碼",
+        "clear": "清除",
+        "placeholder": "選擇..."
       }
     },
     "yangChun": {

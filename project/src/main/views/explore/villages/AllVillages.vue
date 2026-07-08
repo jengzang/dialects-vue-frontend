@@ -14,6 +14,26 @@
             class="glass-input"
         />
       </div>
+      <div class="filter-row">
+        <span class="filter-label">{{ t('villages.pages.allVillages.filter.modeLabel') }}</span>
+        <SimpleSelectDropdown
+          v-model="filterMode"
+          :options="filterModeOptions"
+          :placeholder="t('villages.pages.allVillages.filter.placeholder')"
+          :match-trigger-width="true"
+        />
+        <SimpleSelectDropdown
+          v-if="filterMode"
+          v-model="filterValue"
+          :options="filterValueOptions"
+          :placeholder="t('villages.pages.allVillages.filter.placeholder')"
+          :match-trigger-width="true"
+          :searchable="filterMode === 'raw'"
+        />
+        <button v-if="filterValue" class="filter-clear-btn" @click="clearFilter">
+          ✕ {{ t('villages.pages.allVillages.filter.clear') }}
+        </button>
+      </div>
     </div>
 
     <!-- Content Area -->
@@ -111,13 +131,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { decompressSync, strFromU8 } from 'fflate'
 import VillagesTreeItem from '@/main/components/TableAndTree/VillagesTreeItem.vue';
 import AllVillagesMapPopup from '@/main/components/popup/map/AllVillagesMapPopup.vue';
 import { lazyLoadTree, loadFullTree } from '@/api';
-import { getPlaceTypeInfo } from '@/main/config/placeTypeMapping.js'
+import { getPlaceTypeInfo, default as PLACE_TYPE_MAPPING } from '@/main/config/placeTypeMapping.js'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 
 const { t } = useI18n();
 
@@ -140,6 +161,62 @@ const cityLoadErrors = ref({});
 // Map popup state
 const mapPopupVisible = ref(false);
 const mapPopupVillages = ref([]);
+
+// Filter state
+const filterMode = ref('');
+const filterValue = ref('');
+
+const filterModeOptions = computed(() => [
+  { label: t('villages.pages.allVillages.filter.modeLevel1'), value: 'level1' },
+  { label: t('villages.pages.allVillages.filter.modeLevel2'), value: 'level2' },
+  { label: t('villages.pages.allVillages.filter.modeLevel3'), value: 'level3' },
+  { label: t('villages.pages.allVillages.filter.modeRaw'), value: 'raw' }
+])
+
+const filterValueOptions = computed(() => {
+  if (!filterMode.value) return []
+  const seen = new Map()
+  for (const [code, info] of Object.entries(PLACE_TYPE_MAPPING)) {
+    let label, value
+    if (filterMode.value === 'raw') {
+      label = info.place_type_name
+      value = info.place_type_name
+    } else {
+      const level = info[filterMode.value]
+      if (!level) continue
+      label = `${level.code} - ${level.name}`
+      value = level.code
+    }
+    if (!seen.has(value)) seen.set(value, { label, value })
+  }
+  return Array.from(seen.values())
+})
+
+const matchedCodes = computed(() => {
+  if (!filterMode.value || !filterValue.value) return []
+  if (filterMode.value === 'raw') {
+    const codes = []
+    for (const [code, info] of Object.entries(PLACE_TYPE_MAPPING)) {
+      if (info.place_type_name === filterValue.value) codes.push(code)
+    }
+    return codes
+  }
+  const levelKey = filterMode.value
+  const codes = []
+  for (const [code, info] of Object.entries(PLACE_TYPE_MAPPING)) {
+    if (info[levelKey] && info[levelKey].code === filterValue.value) codes.push(code)
+  }
+  return codes
+})
+
+const clearFilter = () => {
+  filterMode.value = ''
+  filterValue.value = ''
+}
+
+watch(filterMode, () => {
+  filterValue.value = ''
+})
 
 // ID Generator
 let idCounter = 0;
@@ -252,12 +329,14 @@ const loadCityData = async (cityName) => {
   cityLoadErrors.value[cityName] = null;
 
   try {
+    const filters = { "3": [cityName] }
+    if (filterValue.value && matchedCodes.value.length > 0) filters["2"] = matchedCodes.value
     const result = await loadFullTree({
       db_key: API_CONFIG.db_key,
       table_name: API_CONFIG.table_name,
       level_columns: API_CONFIG.level_columns,
       data_columns: API_CONFIG.data_columns,
-      filters: { "3": [cityName] }
+      filters
     })
 
     if (result.mode === 'lazy_fallback') {
@@ -265,13 +344,15 @@ const loadCityData = async (cityName) => {
       if (bootstrap && typeof bootstrap === 'object') {
         const districts = bootstrap[cityName] || Object.values(bootstrap)[0] || []
         const shifted = API_CONFIG.level_columns.slice(1)
+        const baseFilters = { "3": [cityName] }
+        if (filters["2"]) baseFilters["2"] = filters["2"]
         const nodes = districts.map(districtName => ({
           id: generateId(),
           name: districtName,
           rawName: districtName,
           children: [],
           _lazy: true,
-          _lazyFilters: { "3": [cityName], "4": [districtName] },
+          _lazyFilters: { ...baseFilters, "4": [districtName] },
           _lazyLevelColumns: shifted,
           _path: [cityName, districtName]
         }))
@@ -441,9 +522,32 @@ const filterTree = (nodes, query) => {
   }, []);
 };
 
+/**
+ * Client-side filter: prune tree to only show nodes matching place_type_codes
+ */
+const filterByPlaceTypeCode = (nodes, codes) => {
+  if (!nodes || nodes.length === 0) return []
+  return nodes.reduce((acc, node) => {
+    if (node.rawData) {
+      const nodeCodes = Array.isArray(node.rawData['place_type_code'])
+        ? node.rawData['place_type_code']
+        : [node.rawData['place_type_code']]
+      if (nodeCodes.some(c => codes.includes(String(c)))) acc.push(node)
+    } else if (node.children && node.children.length > 0) {
+      const filtered = filterByPlaceTypeCode(node.children, codes)
+      if (filtered.length > 0) acc.push({ ...node, children: filtered })
+    }
+    return acc
+  }, [])
+}
+
 const getFilteredCityData = (cityName) => {
-  const cityData = loadedCitiesData.value[cityName];
+  let cityData = loadedCitiesData.value[cityName];
   if (!cityData) return [];
+
+  if (filterValue.value && matchedCodes.value.length > 0) {
+    cityData = filterByPlaceTypeCode(cityData, matchedCodes.value)
+  }
 
   const query = searchQuery.value.trim();
   if (!query) return cityData;
@@ -569,6 +673,38 @@ onMounted(() => {
   padding: 24px 28px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   background: rgba(255, 255, 255, 0.3);
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 14px;
+  color: #6e6e73;
+  white-space: nowrap;
+}
+
+.filter-clear-btn {
+  padding: 4px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #999;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.filter-clear-btn:hover {
+  background: #f5f5f7;
+  border-color: #d32f2f;
+  color: #d32f2f;
 }
 
 .search-wrapper {

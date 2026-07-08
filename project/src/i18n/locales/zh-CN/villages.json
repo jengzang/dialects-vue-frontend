@@ -69,6 +69,15 @@
         "loadCities": "无法加载列表，请重试",
         "invalidCityData": "返回的数据格式错误或无数据",
         "loadCity": "加载失败，请重试"
+      },
+      "filter": {
+        "modeLabel": "筛选：",
+        "modeLevel1": "级别1",
+        "modeLevel2": "级别2",
+        "modeLevel3": "级别3",
+        "modeRaw": "原始代码",
+        "clear": "清除",
+        "placeholder": "选择..."
       }
     },
     "yangChun": {

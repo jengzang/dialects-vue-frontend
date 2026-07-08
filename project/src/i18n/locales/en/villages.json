@@ -69,6 +69,15 @@
         "loadCities": "Failed to load the list. Please retry.",
         "invalidCityData": "Unexpected data format returned, or no data",
         "loadCity": "Load failed. Please retry."
+      },
+      "filter": {
+        "modeLabel": "Filter:",
+        "modeLevel1": "Level 1",
+        "modeLevel2": "Level 2",
+        "modeLevel3": "Level 3",
+        "modeRaw": "Raw Code",
+        "clear": "Clear",
+        "placeholder": "Select..."
       }
     },
     "yangChun": {
