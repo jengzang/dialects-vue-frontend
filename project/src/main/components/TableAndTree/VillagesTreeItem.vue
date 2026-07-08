@@ -134,7 +134,7 @@ const collectLeafNodes = (node) => {
   const traverse = (n) => {
     // If it's a leaf node (has rawData)
     if (n.rawData) {
-      const dialect = n.rawData['方言分布']?.[0] || '';
+      const dialect = (n.rawData['dialect'] || n.rawData['方言分布'])?.[0] || '';
       const lng = n.rawData['longitude']?.[0] || '';
       const lat = n.rawData['latitude']?.[0] || '';
 
@@ -171,7 +171,7 @@ const handleMapClick = () => {
     emit('open-map', leafNodes);
   } else {
     // Leaf node: show single node data
-    const dialect = props.node.rawData?.['方言分布']?.[0] || '';
+    const dialect = (props.node.rawData?.['dialect'] || props.node.rawData?.['方言分布'])?.[0] || '';
     const lng = props.node.rawData?.['longitude']?.[0] || '';
     const lat = props.node.rawData?.['latitude']?.[0] || '';
 

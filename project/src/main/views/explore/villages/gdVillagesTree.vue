@@ -114,23 +114,34 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import VillagesTreeItem from '@/main/components/TableAndTree/VillagesTreeItem.vue';
 import VillageMapPopup from '@/main/components/popup/map/VillageMapPopup.vue';
 import { lazyLoadTree, loadFullTree } from '@/api';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { userStore } from '@/main/store/store.js'
 const { t } = useI18n();
 const router = useRouter();
 
-// API Configuration
-const API_CONFIG = {
-  db_key: "village",
-  table_name: "广东省自然村",
-  level_columns: [0, 1, 2, 3, 4],
-  data_columns: [6, 7, 8]
-};
+// API Configuration — admin reads from village_admin/gd, regular users from village/广东省自然村
+const API_CONFIG = computed(() => {
+  if (userStore.role === 'admin') {
+    return {
+      db_key: 'village_admin',
+      table_name: 'gd',
+      level_columns: [0, 1, 2, 3, 4],
+      data_columns: [5, 6, 7]
+    };
+  }
+  return {
+    db_key: 'village',
+    table_name: '广东省自然村',
+    level_columns: [0, 1, 2, 3, 4],
+    data_columns: [6, 7, 8]
+  };
+});
 
 // State Management
 const topLevelCities = ref([]);
@@ -157,9 +168,9 @@ const loadInitialCities = async () => {
   initialLoadError.value = null;
 
   const payload = {
-    db_key: API_CONFIG.db_key,
-    table_name: API_CONFIG.table_name,
-    level_columns: API_CONFIG.level_columns,
+    db_key: API_CONFIG.value.db_key,
+    table_name: API_CONFIG.value.table_name,
+    level_columns: API_CONFIG.value.level_columns,
     parent_path: []
   };
 
@@ -193,10 +204,10 @@ const loadCityData = async (cityName) => {
   cityLoadErrors.value[cityName] = null;
 
   const payload = {
-    db_key: API_CONFIG.db_key,
-    table_name: API_CONFIG.table_name,
-    level_columns: API_CONFIG.level_columns,
-    data_columns: API_CONFIG.data_columns,
+    db_key: API_CONFIG.value.db_key,
+    table_name: API_CONFIG.value.table_name,
+    level_columns: API_CONFIG.value.level_columns,
+    data_columns: API_CONFIG.value.data_columns,
     filters: { "0": [cityName] }
   };
 
@@ -209,7 +220,7 @@ const loadCityData = async (cityName) => {
       if (bootstrap && typeof bootstrap === 'object') {
         const districts = bootstrap[cityName] || Object.values(bootstrap)[0] || []
         // filters accumulate (AND), level_columns shift past consumed levels
-        const shifted = API_CONFIG.level_columns.slice(1)
+        const shifted = API_CONFIG.value.level_columns.slice(1)
         const nodes = districts.map(districtName => ({
           id: generateId(),
           name: districtName,
@@ -257,14 +268,15 @@ const normalizeTreeData = (rawData) => {
 
   const processNode = (data, name, level = 1) => {
     // Check if this is a leaf node (contains data fields)
-    const isLeaf = data['方言分布'] !== undefined ||
+    const isLeaf = data['dialect'] !== undefined ||
+                   data['方言分布'] !== undefined ||
                    data['longitude'] !== undefined ||
                    data['latitude'] !== undefined;
 
     if (isLeaf) {
       const lngs = Array.isArray(data['longitude']) ? data['longitude'] : []
       const lats = Array.isArray(data['latitude']) ? data['latitude'] : []
-      const dialects = Array.isArray(data['方言分布']) ? data['方言分布'] : []
+      const dialectKey = data['dialect'] !== undefined ? 'dialect' : '方言分布'; const dialects = Array.isArray(data[dialectKey]) ? data[dialectKey] : []
       const count = Math.max(lngs.length, lats.length, 1)
 
       if (count <= 1) {
@@ -280,7 +292,7 @@ const normalizeTreeData = (rawData) => {
       // Duplicate leaf names with multiple records — split into individual nodes
       return Array.from({ length: count }, (_, i) => {
         const single = {}
-        if (dialects[i] !== undefined) single['方言分布'] = [dialects[i]]
+        if (dialects[i] !== undefined) single[dialectKey] = [dialects[i]]
         if (lngs[i] !== undefined) single['longitude'] = [lngs[i]]
         if (lats[i] !== undefined) single['latitude'] = [lats[i]]
         return {
@@ -328,8 +340,10 @@ const normalizeTreeData = (rawData) => {
 /**
  * Format leaf node with data fields
  */
+const getDialect = (d) => d?.dialect?.[0] || d?.['方言分布']?.[0] || ''
+
 const formatLeafNode = (name, data) => {
-  const dialect = data['方言分布']?.[0] || '';
+  const dialect = getDialect(data);
   const lng = data['longitude']?.[0] || '';
   const lat = data['latitude']?.[0] || '';
 
@@ -406,10 +420,10 @@ const lazyLoadChildren = async (node) => {
   node._loadingChildren = true
   try {
     const result = await loadFullTree({
-      db_key: API_CONFIG.db_key,
-      table_name: API_CONFIG.table_name,
+      db_key: API_CONFIG.value.db_key,
+      table_name: API_CONFIG.value.table_name,
       level_columns: node._lazyLevelColumns,
-      data_columns: API_CONFIG.data_columns,
+      data_columns: API_CONFIG.value.data_columns,
       filters: node._lazyFilters
     })
 
@@ -478,7 +492,7 @@ const collectAllLeafNodes = (nodes) => {
   const leaves = [];
   const traverse = (n) => {
     if (n.rawData) {
-      const dialects = n.rawData['方言分布'] || [];
+      const dialects = n.rawData['dialect'] || n.rawData['方言分布'] || [];
       const lngs = n.rawData['longitude'] || [];
       const lats = n.rawData['latitude'] || [];
       const count = Math.max(dialects.length, lngs.length, lats.length, 1);
