@@ -95,14 +95,12 @@ const mapButtonTitle = computed(() => {
     : t('tableTree.villagesTreeItem.drawCurrentVillageMap')
 })
 
-// Auto-expand based on _autoExpand flag
-watch(() => props.node, (newNode) => {
-  if (newNode && newNode._autoExpand) {
+// Auto-expand only when _autoExpand flag is explicitly set (e.g. search results)
+watch(() => props.node._autoExpand, (autoExpand) => {
+  if (autoExpand) {
     isOpen.value = true;
-  } else {
-    isOpen.value = false;
   }
-}, { immediate: true, deep: true });
+});
 
 const toggle = async () => {
   if (!isOpen.value && props.node._lazy && !props.node._childrenLoaded) {

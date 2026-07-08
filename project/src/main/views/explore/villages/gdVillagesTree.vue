@@ -8,7 +8,7 @@
 <!--          <span role="img" aria-label="ycVillages">🏠</span> 陽春自然村-->
 <!--        </button>-->
       </div>
-      <p class="subtitle">{{ t('villages.pages.gdTree.subtitle') }}</p>
+      <!-- <p class="subtitle">{{ t('villages.pages.gdTree.subtitle') }}</p> -->
       <div class="search-wrapper">
         <span class="search-icon">🔍</span>
         <input
@@ -418,7 +418,15 @@ const lazyLoadChildren = async (node) => {
       const bootstrap = result.lazy_bootstrap
       const nodeKey = node.rawName || node.name
       const children = bootstrap?.[nodeKey] || Object.values(bootstrap || {})[0] || []
-      const nextCol = node._lazyLevelColumns[0]
+      // level_columns[1] is the column consumed by this lazy_fallback response;
+      // level_columns.slice(1) is the shifted list for the next call (matches API doc pattern)
+      const nextCol = node._lazyLevelColumns[1]
+      if (nextCol == null) {
+        node.children = []
+        node._childrenLoaded = true
+        node._loadingChildren = false
+        return
+      }
       const nextShifted = node._lazyLevelColumns.slice(1)
       node.children = children.map(childName => ({
         id: generateId(),
