@@ -170,7 +170,6 @@
                   大小 <span v-if="tableSortBy === 'size'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
                 </th>
                 <th>索引數</th>
-                <th>最後更新</th>
                 <th>操作</th>
               </tr>
             </thead>
@@ -180,7 +179,6 @@
                 <td>{{ formatNumber(table.records) }}</td>
                 <td>{{ formatSize(table.size) }}</td>
                 <td>{{ table.indexes }}</td>
-                <td>{{ formatDate(table.last_updated) }}</td>
                 <td>
                   <button @click="viewTableDetails(table)" class="solid-button small">詳情</button>
                 </td>
@@ -249,8 +247,8 @@
       </div>
     </AppModal>
 
-    <!-- Loading Overlay -->
-    <div v-if="loading" class="loading-overlay">
+    <!-- Loading -->
+    <div v-if="loading" class="initial-state">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>載入中...</p>
     </div>
@@ -335,7 +333,7 @@ const refreshOverview = async () => {
       onSuccess: ([overviewRes, tablesRes]) => {
         // Map API response to component data structure
         overview.value = {
-          database_size: (overviewRes.database_size_mb || 0) * 1024 * 1024, // Convert MB to bytes
+          database_size: (overviewRes.database_size_mb || 0) * 1024,
           total_tables: tablesRes?.length || 0,
           total_records: overviewRes.total_villages || 0, // Use villages as main record count
           village_count: overviewRes.total_villages || 0,
@@ -347,7 +345,7 @@ const refreshOverview = async () => {
         tables.value = (tablesRes || []).map(table => ({
           name: table.table_name || 'unknown',
           records: table.row_count || 0,
-          size: (table.size_mb || 0) * 1024 * 1024, // Convert MB to bytes for display
+          size: (table.size_mb || 0) * 1024,
           indexes: table.index_count || 0,
           last_updated: table.last_modified || new Date().toISOString(),
           columns: table.columns || []
@@ -467,7 +465,7 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 2px solid rgba(0, 122, 255, 0.2);
 }
 
 .panel-header h3 {
@@ -498,13 +496,13 @@ onMounted(() => {
   color: var(--text-primary);
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 2px solid rgba(0, 122, 255, 0.2);
 }
 
 .level-card {
   padding: 16px;
-  background: rgba(74, 144, 226, 0.06);
-  border: 1px solid rgba(74, 144, 226, 0.2);
+  background: rgba(0, 122, 255, 0.06);
+  border: 1px solid rgba(0, 122, 255, 0.2);
   border-radius: 12px;
   text-align: center;
 }
@@ -519,7 +517,7 @@ onMounted(() => {
 .level-rate {
   font-size: 28px;
   font-weight: 700;
-  color: var(--color-primary, #4a90e2);
+  color: var(--color-primary, #007AFF);
   margin-bottom: 12px;
 }
 
@@ -533,7 +531,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 4px 0;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+  border-bottom: 1px solid rgba(0, 122, 255, 0.1);
 }
 
 .level-detail-row:last-child {
@@ -580,7 +578,7 @@ onMounted(() => {
 .glass-select {
   padding: 8px 16px;
   background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  border: 1px solid rgba(0, 122, 255, 0.3);
   border-radius: 8px;
   font-size: 14px;
   transition: all 0.3s ease;
@@ -589,7 +587,7 @@ onMounted(() => {
 .glass-input:focus,
 .glass-select:focus {
   outline: none;
-  border-color: #4a90e2;
+  border-color: #007AFF;
   background: rgba(255, 255, 255, 0.8);
 }
 
@@ -601,10 +599,10 @@ onMounted(() => {
 
 .solid-button {
   padding: 8px 16px;
-  background: linear-gradient(135deg, #4a90e2, #50c878);
+  background: linear-gradient(135deg, #007AFF, #0051D5);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -613,7 +611,7 @@ onMounted(() => {
 
 .solid-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
 }
 
 .solid-button:disabled {
@@ -639,7 +637,7 @@ onMounted(() => {
   padding: 12px;
   background: rgba(255, 255, 255, 0.6);
   border-radius: 12px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(0, 122, 255, 0.2);
 }
 
 .overview-card.large-card {
@@ -662,7 +660,7 @@ onMounted(() => {
   color: var(--text-secondary);
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid rgba(74, 144, 226, 0.15);
+  border-top: 1px solid rgba(0, 122, 255, 0.15);
 }
 
 .meta-row {
@@ -682,7 +680,7 @@ onMounted(() => {
 }
 
 .meta-row .highlight {
-  color: #4a90e2;
+  color: #007AFF;
   font-weight: 700;
   font-size: 16px;
 }
@@ -704,7 +702,7 @@ onMounted(() => {
 .card-value {
   font-size: 24px;
   font-weight: 700;
-  color: #4a90e2;
+  color: #007AFF;
 }
 
 .card-value-dual {
@@ -719,7 +717,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   padding: 12px;
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(0, 122, 255, 0.05);
   border-radius: 8px;
 }
 
@@ -732,11 +730,11 @@ onMounted(() => {
 .dual-number {
   font-size: 28px;
   font-weight: 700;
-  color: #4a90e2;
+  color: #007AFF;
 }
 
 .dual-number.highlight {
-  color: #50c878;
+  color: #007AFF;
 }
 
 .table-wrapper {
@@ -750,14 +748,14 @@ onMounted(() => {
 }
 
 .glass-table thead {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(0, 122, 255, 0.1);
 }
 
 .glass-table th,
 .glass-table td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+  border-bottom: 1px solid rgba(0, 122, 255, 0.1);
 }
 
 .glass-table th {
@@ -771,12 +769,12 @@ onMounted(() => {
 }
 
 .glass-table th.sortable:hover {
-  background: rgba(74, 144, 226, 0.15);
+  background: rgba(0, 122, 255, 0.15);
 }
 
 .table-name {
   font-weight: 500;
-  color: #4a90e2;
+  color: #007AFF;
 }
 
 .pagination {
@@ -802,7 +800,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 12px;
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(0, 122, 255, 0.05);
   border-radius: 8px;
 }
 
@@ -825,26 +823,18 @@ onMounted(() => {
   color: var(--text-primary);
 }
 
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
+.initial-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  height: 60dvh;
+  gap: 16px;
 }
 
-
-
-.loading-overlay p {
-  color: white;
-  margin-top: 16px;
+.initial-state p {
   font-size: 16px;
+  color: #6e6e73;
 }
 
 /* Responsive */

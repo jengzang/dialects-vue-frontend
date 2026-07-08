@@ -752,7 +752,7 @@ const reset = () => {
 }
 
 .glass-container {
-  width: min(95vw, 900px);
+  width: min(95dvw, 800px);
   padding: 30px 40px;
   display: flex;
   flex-direction: column;

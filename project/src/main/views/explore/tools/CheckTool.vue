@@ -25,7 +25,7 @@
         <div class="format-selector">
           <div class="format-label-row">
             <label class="format-label">{{ t('tools.checkTool.welcome.formatLabel') }}</label>
-            <button class="main-glass-button" data-size="small" @click="showFormatHelpModal = true">
+            <button class="main-glass-button info-help-btn" data-size="small" @click="showFormatHelpModal = true">
               📋 {{ t('tools.checkTool.welcome.formatHelp') }}
             </button>
           </div>
@@ -263,7 +263,7 @@
             <span class="file-rows">{{ t('tools.checkTool.fileBar.rows', { count: totalRows }) }}</span>
           </div>
           <button v-if="!isPortrait" class="main-glass-button" data-variant="secondary" data-size="small" @click="resetUpload">{{ t('tools.checkTool.fileBar.changeFile') }}</button>
-          <button v-if="!isPortrait" class="main-glass-button" data-size="small" @click="showHelpModal = true">
+          <button v-if="!isPortrait" class="main-glass-button info-help-btn" data-size="small" @click="showHelpModal = true">
             ❓ {{ t('tools.checkTool.fileBar.help') }}
           </button>
           <!-- 模式切换 -->
@@ -549,7 +549,7 @@
           <div class="command-panel glass-panel">
             <div class="command-header">
               <h3>💻 {{ t('tools.checkTool.command.title') }}</h3>
-              <button v-if="!isPortrait" class="main-glass-button" data-size="small" @click="showHelpModal = true">
+              <button v-if="!isPortrait" class="main-glass-button info-help-btn" data-size="small" @click="showHelpModal = true">
                 ❓ {{ t('tools.checkTool.command.help') }}
               </button>
             </div>
@@ -3887,6 +3887,22 @@ $success-soft: rgba(52, 199, 89, 0.1);
       background: white;
       box-shadow: inset 0 0 0 2px #4a90e2;
     }
+  }
+}
+
+// "说明" help buttons — stand out from the glass background with a visible border and hover glow
+.info-help-btn {
+  border: 1px dashed rgba(0, 122, 255, 0.45) !important;
+  background: rgba(0, 122, 255, 0.07) !important;
+  color: #0059c8 !important;
+  font-weight: 600 !important;
+  transition: all 0.22s ease !important;
+
+  &:hover:not(:disabled) {
+    background: rgba(0, 122, 255, 0.14) !important;
+    border-color: rgba(0, 122, 255, 0.65) !important;
+    box-shadow: 0 2px 12px rgba(0, 122, 255, 0.18) !important;
+    transform: translateY(-2px) !important;
   }
 }
 </style>

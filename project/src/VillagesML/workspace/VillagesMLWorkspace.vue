@@ -253,13 +253,13 @@ const modules = VILLAGESML_MODULES.map(m => ({
 
 // Computed
 const currentComponent = computed(() => {
-  const module = currentModule.value
-  if (!module) return null
-
-  // System module (no subtabs)
-  if (module.id === 'system') {
+  // System module — handled independently of module config (not yet in sidebar)
+  if (activeModule.value === 'system') {
     return SystemInfo
   }
+
+  const module = currentModule.value
+  if (!module) return null
 
   // Module with subtabs
   if (module.subtabs && activeSubtab.value) {
