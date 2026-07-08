@@ -4,21 +4,20 @@
     <div class="header-section">
       <div class="title-row">
         <h2 style="margin: 0;">{{ t('villages.pages.allVillages.title') }}</h2>
-        <span class="filter-label">{{ t('villages.pages.allVillages.filter.modeLabel') }}</span>
-        <SimpleSelectDropdown
-          v-model="filterMode"
-          :options="filterModeOptions"
-          :placeholder="t('villages.pages.allVillages.filter.placeholder')"
-          width="120px"
-        />
-        <SimpleSelectDropdown
-          v-if="filterMode && filterMode !== FILTER_MODE_NONE"
-          v-model="filterValue"
-          :options="filterValueOptions"
-          :placeholder="t('villages.pages.allVillages.filter.placeholder')"
-          width="180px"
-          searchable
-        />
+        <div class="filter-controls">
+          <SimpleSelectDropdown
+            v-model="filterMode"
+            :options="filterModeOptions"
+            :placeholder="t('villages.pages.allVillages.filter.placeholder')"
+          />
+          <SimpleSelectDropdown
+            v-if="filterMode && filterMode !== FILTER_MODE_NONE"
+            v-model="filterValue"
+            :options="filterValueOptions"
+            :placeholder="t('villages.pages.allVillages.filter.placeholder')"
+            searchable
+          />
+        </div>
       </div>
       <div class="search-wrapper">
         <span class="search-icon">🔍</span>
@@ -673,10 +672,11 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.3);
 }
 
-.filter-label {
-  font-size: 13px;
-  color: #8e8e93;
-  white-space: nowrap;
+.filter-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
 }
 
