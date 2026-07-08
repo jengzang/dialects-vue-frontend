@@ -77,7 +77,8 @@
         "modeLevel3": "級別3",
         "modeRaw": "原始代碼",
         "clear": "清除",
-        "placeholder": "選擇..."
+        "placeholder": "選擇...",
+        "modeNone": "不篩選"
       }
     },
     "yangChun": {

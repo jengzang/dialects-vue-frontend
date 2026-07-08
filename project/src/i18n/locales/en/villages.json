@@ -77,7 +77,8 @@
         "modeLevel3": "Level 3",
         "modeRaw": "Raw Code",
         "clear": "Clear",
-        "placeholder": "Select..."
+        "placeholder": "Select...",
+        "modeNone": "No Filter"
       }
     },
     "yangChun": {

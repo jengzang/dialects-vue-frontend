@@ -77,7 +77,8 @@
         "modeLevel3": "级别3",
         "modeRaw": "原始代码",
         "clear": "清除",
-        "placeholder": "选择..."
+        "placeholder": "选择...",
+        "modeNone": "不筛选"
       }
     },
     "yangChun": {

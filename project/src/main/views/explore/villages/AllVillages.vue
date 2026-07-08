@@ -4,6 +4,21 @@
     <div class="header-section">
       <div class="title-row">
         <h2 style="margin: 0;">{{ t('villages.pages.allVillages.title') }}</h2>
+        <span class="filter-label">{{ t('villages.pages.allVillages.filter.modeLabel') }}</span>
+        <SimpleSelectDropdown
+          v-model="filterMode"
+          :options="filterModeOptions"
+          :placeholder="t('villages.pages.allVillages.filter.placeholder')"
+          :match-trigger-width="true"
+        />
+        <SimpleSelectDropdown
+          v-if="filterMode && filterMode !== FILTER_MODE_NONE"
+          v-model="filterValue"
+          :options="filterValueOptions"
+          :placeholder="t('villages.pages.allVillages.filter.placeholder')"
+          :match-trigger-width="true"
+          :searchable="filterMode === 'raw'"
+        />
       </div>
       <div class="search-wrapper">
         <span class="search-icon">🔍</span>
@@ -13,26 +28,6 @@
             :placeholder="t('villages.pages.allVillages.searchPlaceholder')"
             class="glass-input"
         />
-      </div>
-      <div class="filter-row">
-        <span class="filter-label">{{ t('villages.pages.allVillages.filter.modeLabel') }}</span>
-        <SimpleSelectDropdown
-          v-model="filterMode"
-          :options="filterModeOptions"
-          :placeholder="t('villages.pages.allVillages.filter.placeholder')"
-          :match-trigger-width="true"
-        />
-        <SimpleSelectDropdown
-          v-if="filterMode"
-          v-model="filterValue"
-          :options="filterValueOptions"
-          :placeholder="t('villages.pages.allVillages.filter.placeholder')"
-          :match-trigger-width="true"
-          :searchable="filterMode === 'raw'"
-        />
-        <button v-if="filterValue" class="filter-clear-btn" @click="clearFilter">
-          ✕ {{ t('villages.pages.allVillages.filter.clear') }}
-        </button>
       </div>
     </div>
 
@@ -166,7 +161,10 @@ const mapPopupVillages = ref([]);
 const filterMode = ref('');
 const filterValue = ref('');
 
+const FILTER_MODE_NONE = '__none__'
+
 const filterModeOptions = computed(() => [
+  { label: t('villages.pages.allVillages.filter.modeNone'), value: FILTER_MODE_NONE },
   { label: t('villages.pages.allVillages.filter.modeLevel1'), value: 'level1' },
   { label: t('villages.pages.allVillages.filter.modeLevel2'), value: 'level2' },
   { label: t('villages.pages.allVillages.filter.modeLevel3'), value: 'level3' },
@@ -174,7 +172,7 @@ const filterModeOptions = computed(() => [
 ])
 
 const filterValueOptions = computed(() => {
-  if (!filterMode.value) return []
+  if (!filterMode.value || filterMode.value === FILTER_MODE_NONE) return []
   const seen = new Map()
   for (const [code, info] of Object.entries(PLACE_TYPE_MAPPING)) {
     let label, value
@@ -210,7 +208,7 @@ const matchedCodes = computed(() => {
 })
 
 const clearFilter = () => {
-  filterMode.value = ''
+  filterMode.value = FILTER_MODE_NONE
   filterValue.value = ''
 }
 
@@ -675,36 +673,11 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.3);
 }
 
-.filter-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-
 .filter-label {
-  font-size: 14px;
-  color: #6e6e73;
+  font-size: 13px;
+  color: #8e8e93;
   white-space: nowrap;
-}
-
-.filter-clear-btn {
-  padding: 4px 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fff;
-  color: #999;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.filter-clear-btn:hover {
-  background: #f5f5f7;
-  border-color: #d32f2f;
-  color: #d32f2f;
+  flex-shrink: 0;
 }
 
 .search-wrapper {
@@ -947,8 +920,9 @@ onMounted(() => {
 .title-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
   margin: 0;
+  flex-wrap: wrap;
 }
 
 @media (max-aspect-ratio: 1/1) {
