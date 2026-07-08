@@ -680,6 +680,15 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
+.filter-controls :deep(.select-trigger) {
+  background: rgba(0, 122, 255, 0.1);
+  border: 1px solid rgba(0, 122, 255, 0.3);
+  &:hover {
+    background: rgba(0, 122, 255, 0.2);
+    border-color: #007AFF;
+  }
+}
+
 .search-wrapper {
   position: relative;
   display: flex;
