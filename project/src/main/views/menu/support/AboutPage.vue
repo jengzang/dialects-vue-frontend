@@ -157,11 +157,13 @@
           <p></p>
 
           <!-- 感悟部分 -->
-          <h2 class="tabs-title" style="margin-top: 20px">{{ $t('about.reflection.title') }}</h2>
-          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
-          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
-          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
-          <p class="thoughts"><em v-html="$t('about.reflection.poem')"></em></p>
+          <div class="thoughts-container">
+            <h2 class="tabs-title" style="margin-top: 20px">{{ $t('about.reflection.title') }}</h2>
+            <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
+            <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
+            <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
+            <p class="thoughts"><em v-html="$t('about.reflection.poem')"></em></p>
+          </div>
         </div>
 
         <!-- 设置页面 -->
@@ -479,6 +481,7 @@ function resolveTabRoute(tabName) {
   font-weight: bold;
   margin-top: 3rem!important;
   margin-bottom: 0.5rem!important;
+  width: 100%;
   // color: #007aff;
 }
 .about-page-wrapper {
@@ -711,11 +714,16 @@ em {
   }
 }
 
+.thoughts-container {
+  width: 100%;
+  max-width: 800px;
+}
+
 .cards-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  max-width: 800px;
+  max-width: 900px;
   gap: 1rem;
   text-align: center;
 }
@@ -790,6 +798,7 @@ em {
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  width: 100%;
 }
 
 .follow-button,

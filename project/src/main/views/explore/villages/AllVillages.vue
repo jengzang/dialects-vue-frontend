@@ -824,11 +824,11 @@ onMounted(() => {
 }
 
 .reload-btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 10px;
-  background: rgba(142, 142, 147, 0.2);
-  color: #1d1d1f;
+  padding: 8px 16px;
+  border: 1px solid rgba(0, 122, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(0, 122, 255, 0.05);
+  color: #007AFF;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -836,11 +836,12 @@ onMounted(() => {
 }
 
 .reload-btn:hover:not(:disabled) {
-  background: rgba(142, 142, 147, 0.35);
+  background: rgba(0, 122, 255, 0.12);
+  border-color: #007AFF;
 }
 
 .reload-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -865,7 +866,7 @@ onMounted(() => {
 }
 
 .city-map-btn:hover:not(:disabled) {
-  background: rgba(52, 199, 89, 0.15);
+  background: rgba(52, 118, 199, 0.2);
   transform: scale(1.15);
 }
 
