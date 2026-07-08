@@ -49,6 +49,7 @@
             :node="child"
             :search-query="searchQuery"
             :lazy-load-fn="lazyLoadFn"
+            :leaf-data-extractor="leafDataExtractor"
             @open-map="emit('open-map', $event)"
         />
       </div>

@@ -502,8 +502,6 @@ const lazyLoadChildren = async (node) => {
  * Open map popup with villages data
  */
 const openMapPopup = (villages) => {
-  console.log('openMapPopup received:', villages?.length, 'items',
-    villages?.slice(0, 2).map(v => ({ name: v.name, coorsLen: v.coors?.length, coors: v.coors?.slice(0, 1) })))
   mapPopupVillages.value = villages;
   mapPopupVisible.value = true;
 };

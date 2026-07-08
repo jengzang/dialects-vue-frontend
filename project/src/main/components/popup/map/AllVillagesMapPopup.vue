@@ -12,7 +12,7 @@
     <div class="map-modal-container" :class="{ fullscreen: isFullscreen }">
       <div v-if="!isFullscreen" class="map-popup-header">
         <h3 class="map-popup-title">{{ t('map.allVillagesMapPopup.title') }}</h3>
-        <span class="village-count">{{ t('map.allVillagesMapPopup.count', { count: allFeatures.length }) }}</span>
+        <span class="village-count">{{ t('map.allVillagesMapPopup.count', { count: validVillages.length }) }}</span>
         <button
           class="close-btn close-btn-lg close-btn-inline"
           @click="handleClose"
@@ -72,7 +72,6 @@ const props = defineProps({
   villages: {
     type: Array,
     default: () => []
-    // [{ name, place_type_code, level2_name, level3_name, place_type_name, coors: [[lng,lat],...] }]
   }
 })
 
@@ -92,7 +91,8 @@ const map = shallowRef(null)
 const currentStyle = ref('gaode')
 const displayModeIndex = ref(0)
 const isFullscreen = ref(false)
-let popup = null
+let clusteredPopup = null
+let clusteredInteractionHandlers = null
 
 const displayMode = computed(() => DISPLAY_MODES[displayModeIndex.value])
 const displayModeLabel = computed(() => DISPLAY_MODE_LABELS[displayMode.value])
@@ -114,51 +114,27 @@ const colorPalette = [
 const getDisplayValue = (village) => {
   if (displayMode.value === 'level2') return village.level2_name || ''
   if (displayMode.value === 'level3') return village.level3_name || ''
-  if (displayMode.value === 'code') return village.place_type_code || ''
+  if (displayMode.value === 'code') return village.place_type_name || village.place_type_code || ''
   return village.name || ''
 }
 
-const allFeatures = computed(() => {
-  const features = []
-  props.villages.forEach(village => {
-    const coors = village.coors
-    if (!coors || !Array.isArray(coors) || coors.length === 0) return
-
-    if (coors.length === 1) {
-      features.push({
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: coors[0] },
-        properties: {
-          name: village.name,
-          place_type_code: village.place_type_code || '',
-          level2_name: village.level2_name || '',
-          level3_name: village.level3_name || '',
-          place_type_name: village.place_type_name || '',
-          displayValue: getDisplayValue(village),
-          featureType: 'point'
-        }
-      })
-    } else {
-      features.push({
-        type: 'Feature',
-        geometry: { type: 'LineString', coordinates: coors },
-        properties: {
-          name: village.name,
-          place_type_code: village.place_type_code || '',
-          level2_name: village.level2_name || '',
-          level3_name: village.level3_name || '',
-          place_type_name: village.place_type_name || '',
-          displayValue: getDisplayValue(village),
-          featureType: 'line'
-        }
-      })
-    }
+// Filter valid villages (with valid coords)
+const validVillages = computed(() => {
+  return props.villages.filter(v => {
+    const coors = v.coors
+    return coors && Array.isArray(coors) && coors.length > 0 &&
+      coors.every(c => Array.isArray(c) && c.length >= 2 &&
+        typeof c[0] === 'number' && typeof c[1] === 'number')
   })
-  return features
 })
 
+// Split into point villages and line villages
+const pointVillages = computed(() => validVillages.value.filter(v => v.coors.length === 1))
+const lineVillages = computed(() => validVillages.value.filter(v => v.coors.length > 1))
+
+// Category color map for current display mode
 const categoryColorMap = computed(() => {
-  const categories = [...new Set(allFeatures.value.map(f => f.properties.displayValue).filter(Boolean))]
+  const categories = [...new Set(validVillages.value.map(v => getDisplayValue(v)).filter(Boolean))]
   const map = {}
   categories.forEach((cat, idx) => {
     map[cat] = colorPalette[idx % colorPalette.length]
@@ -180,61 +156,172 @@ const initMap = () => {
   map.value.addControl(new maplibregl.NavigationControl(), 'top-left')
 
   map.value.on('load', () => {
-    renderLayers()
+    renderMarkers()
   })
 }
 
-const cleanupLayers = () => {
+const cleanupAllSources = () => {
   if (!map.value) return
-  const layers = ['allvillages-lines', 'allvillages-points', 'allvillages-labels']
-  layers.forEach(id => {
+  const layerIds = ['clusters', 'cluster-count', 'unclustered-point-bg', 'unclustered-point-text',
+    'allvillages-lines', 'allvillages-points-layer']
+  layerIds.forEach(id => {
     if (map.value.getLayer(id)) map.value.removeLayer(id)
+  });
+  ['allvillages-cluster', 'allvillages-lines', 'allvillages-points'].forEach(id => {
+    if (map.value.getSource(id)) map.value.removeSource(id)
   })
-  if (map.value.getSource('allvillages')) {
-    map.value.removeSource('allvillages')
-  }
 }
 
-const renderLayers = () => {
-  cleanupLayers()
-
-  if (!map.value || !allFeatures.value.length) return
-
-  const geojson = {
-    type: 'FeatureCollection',
-    features: allFeatures.value.map(f => ({
-      ...f,
-      properties: {
-        ...f.properties,
-        color: categoryColorMap.value[f.properties.displayValue] || '#1b2e2b'
-      }
-    }))
+const unbindClusteredInteractions = () => {
+  if (clusteredPopup) {
+    clusteredPopup.remove()
+    clusteredPopup = null
   }
+  if (!map.value || !clusteredInteractionHandlers) {
+    clusteredInteractionHandlers = null
+    return
+  }
+  map.value.off('click', 'clusters', clusteredInteractionHandlers.clickClusters)
+  map.value.off('mouseenter', 'unclustered-point-bg', clusteredInteractionHandlers.mouseEnterPoint)
+  map.value.off('mouseleave', 'unclustered-point-bg', clusteredInteractionHandlers.mouseLeavePoint)
+  map.value.off('mouseenter', 'clusters', clusteredInteractionHandlers.mouseEnterClusters)
+  map.value.off('mouseleave', 'clusters', clusteredInteractionHandlers.mouseLeaveClusters)
+  clusteredInteractionHandlers = null
+}
 
-  map.value.addSource('allvillages', {
-    type: 'geojson',
-    data: geojson
+const bindClusteredInteractions = () => {
+  if (!map.value) return
+  unbindClusteredInteractions()
+
+  clusteredPopup = new maplibregl.Popup({
+    closeButton: false,
+    closeOnClick: false,
+    offset: 10
   })
 
-  // LineStrings
+  clusteredInteractionHandlers = {
+    clickClusters: (e) => {
+      const features = map.value.queryRenderedFeatures(e.point, { layers: ['clusters'] })
+      if (!features.length) return
+      const clusterId = features[0].properties.cluster_id
+      map.value.getSource('allvillages-cluster').getClusterExpansionZoom(clusterId, (err, zoom) => {
+        if (err) return
+        map.value.easeTo({ center: features[0].geometry.coordinates, zoom: zoom + 0.5 })
+      })
+    },
+    mouseEnterPoint: (e) => {
+      map.value.getCanvas().style.cursor = 'pointer'
+      if (e.features.length > 0) {
+        const { name, displayValue } = e.features[0].properties
+        clusteredPopup.setLngLat(e.lngLat)
+          .setHTML(`<strong>${name}</strong><br>${displayValue || ''}`)
+          .addTo(map.value)
+      }
+    },
+    mouseLeavePoint: () => {
+      map.value.getCanvas().style.cursor = ''
+      clusteredPopup.remove()
+    },
+    mouseEnterClusters: () => {
+      map.value.getCanvas().style.cursor = 'pointer'
+    },
+    mouseLeaveClusters: () => {
+      map.value.getCanvas().style.cursor = ''
+    }
+  }
+
+  map.value.on('click', 'clusters', clusteredInteractionHandlers.clickClusters)
+  map.value.on('mouseenter', 'unclustered-point-bg', clusteredInteractionHandlers.mouseEnterPoint)
+  map.value.on('mouseleave', 'unclustered-point-bg', clusteredInteractionHandlers.mouseLeavePoint)
+  map.value.on('mouseenter', 'clusters', clusteredInteractionHandlers.mouseEnterClusters)
+  map.value.on('mouseleave', 'clusters', clusteredInteractionHandlers.mouseLeaveClusters)
+}
+
+// Render clustered points with text labels (name mode — like gdVillages)
+const renderWithClustering = (pointFeatures) => {
+  map.value.addSource('allvillages-cluster', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: pointFeatures },
+    cluster: true,
+    clusterMaxZoom: 20,
+    clusterRadius: 30
+  })
+
+  // Cluster circles
   map.value.addLayer({
-    id: 'allvillages-lines',
-    type: 'line',
-    source: 'allvillages',
-    filter: ['==', ['get', 'featureType'], 'line'],
+    id: 'clusters',
+    type: 'circle',
+    source: 'allvillages-cluster',
+    filter: ['has', 'point_count'],
     paint: {
-      'line-color': ['get', 'color'],
-      'line-width': 2.5,
-      'line-opacity': 0.8
+      'circle-color': ['step', ['get', 'point_count'], '#51bbd6', 50, '#f1f075', 100, '#f28cb1'],
+      'circle-radius': ['step', ['get', 'point_count'], 20, 50, 30, 100, 40],
+      'circle-opacity': 0.85,
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#fff'
     }
   })
 
-  // Points (circles)
+  // Cluster count
   map.value.addLayer({
-    id: 'allvillages-points',
+    id: 'cluster-count',
+    type: 'symbol',
+    source: 'allvillages-cluster',
+    filter: ['has', 'point_count'],
+    layout: {
+      'text-field': '{point_count_abbreviated}',
+      'text-font': ['Open Sans Bold'],
+      'text-size': 14
+    },
+    paint: { 'text-color': '#ffffff' }
+  })
+
+  // Unclustered point background circle
+  map.value.addLayer({
+    id: 'unclustered-point-bg',
     type: 'circle',
-    source: 'allvillages',
-    filter: ['==', ['get', 'featureType'], 'point'],
+    source: 'allvillages-cluster',
+    filter: ['!', ['has', 'point_count']],
+    paint: {
+      'circle-radius': 17,
+      'circle-color': ['get', 'bgColor'],
+      'circle-opacity': 0.9,
+      'circle-stroke-width': 1.5,
+      'circle-stroke-color': 'rgba(255, 255, 255, 0.8)'
+    }
+  })
+
+  // Unclustered point text label
+  map.value.addLayer({
+    id: 'unclustered-point-text',
+    type: 'symbol',
+    source: 'allvillages-cluster',
+    filter: ['!', ['has', 'point_count']],
+    layout: {
+      'text-field': ['get', 'label'],
+      'text-size': 11,
+      'text-font': ['Open Sans Regular'],
+      'text-anchor': 'center'
+    },
+    paint: {
+      'text-color': ['get', 'textColor']
+    }
+  })
+
+  bindClusteredInteractions()
+}
+
+// Render simple circles with hover popup (non-name modes)
+const renderCircles = (pointFeatures) => {
+  map.value.addSource('allvillages-points', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: pointFeatures }
+  })
+
+  map.value.addLayer({
+    id: 'allvillages-points-layer',
+    type: 'circle',
+    source: 'allvillages-points',
     paint: {
       'circle-radius': 6,
       'circle-color': ['get', 'color'],
@@ -244,60 +331,100 @@ const renderLayers = () => {
     }
   })
 
-  // Labels for points
-  map.value.addLayer({
-    id: 'allvillages-labels',
-    type: 'symbol',
-    source: 'allvillages',
-    filter: ['==', ['get', 'featureType'], 'point'],
-    layout: {
-      'text-field': ['get', 'displayValue'],
-      'text-size': 11,
-      'text-font': ['Open Sans Regular'],
-      'text-anchor': 'top',
-      'text-offset': [0, 1.2]
-    },
-    paint: {
-      'text-color': '#1d1d1f',
-      'text-halo-color': '#fff',
-      'text-halo-width': 1.5
-    }
-  })
-
-  // Popup interactions
-  popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 })
-
-  map.value.on('mouseenter', 'allvillages-points', (e) => {
+  const pointPopup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 })
+  map.value.on('mouseenter', 'allvillages-points-layer', (e) => {
     map.value.getCanvas().style.cursor = 'pointer'
-    const props = e.features[0].properties
-    popup.setLngLat(e.lngLat)
-      .setHTML(`<strong>${props.name}</strong><br>${props.displayValue}`)
+    const { name, displayValue } = e.features[0].properties
+    pointPopup.setLngLat(e.lngLat)
+      .setHTML(`<strong>${name}</strong><br>${displayValue || ''}`)
       .addTo(map.value)
   })
-
-  map.value.on('mouseleave', 'allvillages-points', () => {
+  map.value.on('mouseleave', 'allvillages-points-layer', () => {
     map.value.getCanvas().style.cursor = ''
-    popup.remove()
+    pointPopup.remove()
   })
+}
 
-  map.value.on('mouseenter', 'allvillages-lines', (e) => {
-    map.value.getCanvas().style.cursor = 'pointer'
-    const props = e.features[0].properties
-    popup.setLngLat(e.lngLat)
-      .setHTML(`<strong>${props.name}</strong><br>${props.displayValue}`)
-      .addTo(map.value)
-  })
+const renderMarkers = () => {
+  cleanupAllSources()
+  unbindClusteredInteractions()
 
-  map.value.on('mouseleave', 'allvillages-lines', () => {
-    map.value.getCanvas().style.cursor = ''
-    popup.remove()
-  })
+  if (!map.value || !validVillages.value.length) return
 
   // Auto-fit
-  const allCoords = props.villages.flatMap(v => v.coors || [])
+  const allCoords = validVillages.value.flatMap(v => v.coors)
   if (allCoords.length) {
     const { center, zoom } = calculateDenseMapCenterAndZoom(allCoords)
     map.value.flyTo({ center, zoom })
+  }
+
+  // Render lines (always non-clustered GeoJSON layer)
+  if (lineVillages.value.length > 0) {
+    const lineFeatures = lineVillages.value.map(v => ({
+      type: 'Feature',
+      geometry: { type: 'LineString', coordinates: v.coors },
+      properties: {
+        name: v.name,
+        displayValue: getDisplayValue(v),
+        color: categoryColorMap.value[getDisplayValue(v)] || '#1b2e2b'
+      }
+    }))
+
+    map.value.addSource('allvillages-lines', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: lineFeatures }
+    })
+
+    map.value.addLayer({
+      id: 'allvillages-lines',
+      type: 'line',
+      source: 'allvillages-lines',
+      paint: {
+        'line-color': ['get', 'color'],
+        'line-width': 2.5,
+        'line-opacity': 0.8
+      }
+    })
+
+    // Line hover popup
+    const linePopup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 })
+    map.value.on('mouseenter', 'allvillages-lines', (e) => {
+      map.value.getCanvas().style.cursor = 'pointer'
+      const props = e.features[0].properties
+      linePopup.setLngLat(e.lngLat)
+        .setHTML(`<strong>${props.name}</strong><br>${props.displayValue || ''}`)
+        .addTo(map.value)
+    })
+    map.value.on('mouseleave', 'allvillages-lines', () => {
+      map.value.getCanvas().style.cursor = ''
+      linePopup.remove()
+    })
+  }
+
+  // Render points
+  if (pointVillages.value.length > 0) {
+    const isNameMode = displayMode.value === 'name'
+    const pointFeatures = pointVillages.value.map(v => {
+      const displayValue = getDisplayValue(v)
+      return {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: v.coors[0] },
+        properties: {
+          name: v.name,
+          displayValue: displayValue,
+          label: isNameMode ? v.name : displayValue,
+          bgColor: '#1b2e2b',
+          textColor: '#a6ffdc',
+          color: categoryColorMap.value[displayValue] || '#1b2e2b'
+        }
+      }
+    })
+
+    if (isNameMode) {
+      renderWithClustering(pointFeatures)
+    } else {
+      renderCircles(pointFeatures)
+    }
   }
 }
 
@@ -313,7 +440,7 @@ const toggleFullscreen = () => {
 }
 
 const resetView = () => {
-  const allCoords = props.villages.flatMap(v => v.coors || [])
+  const allCoords = validVillages.value.flatMap(v => v.coors)
   if (map.value && allCoords.length) {
     const { center, zoom } = calculateDenseMapCenterAndZoom(allCoords)
     map.value.flyTo({ center, zoom })
@@ -324,13 +451,13 @@ const changeMapStyle = () => {
   if (!map.value) return
   map.value.setStyle(mapStyle(currentStyle.value))
   map.value.once('style.load', () => {
-    renderLayers()
+    renderMarkers()
   })
 }
 
 const cleanupMap = () => {
-  if (popup) { popup.remove(); popup = null }
-  cleanupLayers()
+  cleanupAllSources()
+  unbindClusteredInteractions()
   if (map.value) { map.value.remove(); map.value = null }
 }
 
@@ -358,11 +485,11 @@ watch(() => props.visible, (newVal) => {
 })
 
 watch(() => props.villages, () => {
-  if (map.value && props.visible) renderLayers()
+  if (map.value && props.visible) renderMarkers()
 }, { deep: true })
 
 watch(displayMode, () => {
-  if (map.value && props.visible) renderLayers()
+  if (map.value && props.visible) renderMarkers()
 })
 
 onMounted(() => {
@@ -517,6 +644,18 @@ onBeforeUnmount(() => {
 .exit-fullscreen-btn:hover {
   background: rgba(255, 255, 255, 1);
   transform: scale(1.05);
+}
+
+:deep(.marker-text-feature) {
+  padding: 2px 4px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
+  font-size: 15px;
+  color: black;
+  white-space: nowrap;
+  font-family: "Times New Roman", serif;
+  border: 0.7px solid black;
+  cursor: pointer;
 }
 
 :deep(.maplibregl-popup-content) {
