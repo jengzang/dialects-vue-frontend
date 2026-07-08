@@ -381,6 +381,10 @@ const allVillagesLeafExtractor = (rawData, rawName) => {
   const coorsArr = Array.isArray(rawData['coords']) ? rawData['coords'] : [rawData['coords']].filter(Boolean)
   const count = Math.max(codes.length, coorsArr.length, 1)
 
+  if (coorsArr.length === 0) {
+    console.warn('allVillagesLeafExtractor: no coords in rawData for', rawName, 'rawData keys:', Object.keys(rawData))
+  }
+
   const results = []
   for (let i = 0; i < count; i++) {
     const code = String(codes[i] || codes[0] || '')
@@ -498,6 +502,8 @@ const lazyLoadChildren = async (node) => {
  * Open map popup with villages data
  */
 const openMapPopup = (villages) => {
+  console.log('openMapPopup received:', villages?.length, 'items',
+    villages?.slice(0, 2).map(v => ({ name: v.name, coorsLen: v.coors?.length, coors: v.coors?.slice(0, 1) })))
   mapPopupVillages.value = villages;
   mapPopupVisible.value = true;
 };
