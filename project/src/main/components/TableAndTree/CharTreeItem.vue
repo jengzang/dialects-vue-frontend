@@ -136,21 +136,18 @@ const hasChildren = computed(() => {
   return hasLeafContent.value || hasChildNodes.value
 })
 
+// Auto-expand when _autoExpand is set (e.g. search results) or for promoted leaf content
 watch(
-  () => props.node,
-  (newNode) => {
+  () => props.node._autoExpand,
+  (autoExpand) => {
     if (!hasDisplayName.value) {
       isOpen.value = true
       return
     }
-
-    if (newNode && newNode._autoExpand) {
+    if (autoExpand) {
       isOpen.value = true
-    } else {
-      isOpen.value = false
     }
-  },
-  { immediate: true, deep: true }
+  }
 )
 
 const toggle = async () => {

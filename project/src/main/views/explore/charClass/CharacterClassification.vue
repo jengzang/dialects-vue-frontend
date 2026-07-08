@@ -504,7 +504,15 @@ const lazyLoadCharClassChildren = async (node) => {
       // Still too many rows — accumulate filters + shift level_columns further
       const bootstrap = result.lazy_bootstrap
       const children = bootstrap?.[node.name] || Object.values(bootstrap || {})[0] || []
-      const nextCol = node._lazyLevelColumns[0]
+      // level_columns[1] is the column consumed by this lazy_fallback response;
+      // level_columns.slice(1) is the shifted list for the next call (matches API doc pattern)
+      const nextCol = node._lazyLevelColumns[1]
+      if (nextCol == null) {
+        node.children = []
+        node._childrenLoaded = true
+        node._loadingChildren = false
+        return
+      }
       const nextShifted = node._lazyLevelColumns.slice(1)
       node.children = children.map(childName => ({
         id: childName,
