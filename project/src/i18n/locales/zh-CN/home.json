@@ -56,7 +56,8 @@
       "gdVillages": "广东自然村 - 广东自然村树状图",
       "villagesML": "机器学习 - 自然村名机器学习",
       "gdVillagesTable": "全粤村情表格 - 广东村落详细表格",
-      "ycVillages": "阳春自然村 - 阳春自然村资料"
+      "ycVillages": "阳春自然村 - 阳春自然村资料",
+      "allVillages": "全部自然村 - 全部自然村数据（仅管理员）"
     },
     "tools": {
       "title": "字表工具",

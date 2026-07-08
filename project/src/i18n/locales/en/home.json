@@ -56,7 +56,8 @@
       "gdVillages": "Guangdong Villages - Guangdong village tree diagram",
       "villagesML": "Machine Learning - Village name machine learning",
       "gdVillagesTable": "Guangdong Village Table - Detailed Guangdong village table",
-      "ycVillages": "Yangchun Villages - Yangchun village data"
+      "ycVillages": "Yangchun Villages - Yangchun village data",
+      "allVillages": "All Villages - All villages data (admin only)"
     },
     "tools": {
       "title": "Character Table Tools",

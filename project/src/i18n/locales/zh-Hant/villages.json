@@ -16,6 +16,10 @@
     "name": "陽春自然村",
     "desc": "廣東省陽春縣自然村(來自縣志)"
   },
+  "allVillages": {
+    "name": "全部自然村",
+    "desc": "全部自然村數據（僅管理員）"
+  },
   "pages": {
     "gdTree": {
       "title": "廣東自然村樹狀圖",
@@ -48,6 +52,10 @@
         "longitude": "經度",
         "latitude": "緯度"
       }
+    },
+    "allVillages": {
+      "title": "全部自然村",
+      "placeholder": "全部自然村數據內容待添加..."
     },
     "yangChun": {
       "title": "陽春行政規劃",

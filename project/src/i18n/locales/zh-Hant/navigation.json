@@ -47,7 +47,8 @@
       "gdVillages": "廣東自然村",
       "VillagesML": "機器學習",
       "gdVillagesTable": "全粵村情表格",
-      "ycVillages": "陽春自然村"
+      "ycVillages": "陽春自然村",
+      "allVillages": "全部自然村"
     },
     "tools": {
       "check": "字表工具",

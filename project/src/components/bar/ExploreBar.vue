@@ -159,7 +159,13 @@ const checkMobile = () => {
 }
 
 const getTabChildren = (tabKey) => {
-  return getExploreBarChildren(exploreBarConfig.value, tabKey)
+  const children = getExploreBarChildren(exploreBarConfig.value, tabKey)
+  return children.filter((child) => {
+    if (typeof child.visibleWhen === 'function') {
+      return child.visibleWhen()
+    }
+    return true
+  })
 }
 
 const getLastChildPath = (tabKey) => {

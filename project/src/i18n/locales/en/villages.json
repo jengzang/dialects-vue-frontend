@@ -16,6 +16,10 @@
     "name": "Yangchun Villages",
     "desc": "Yangchun County natural villages (from county records)"
   },
+  "allVillages": {
+    "name": "All Villages",
+    "desc": "All villages data (admin only)"
+  },
   "pages": {
     "gdTree": {
       "title": "Guangdong Village Tree",
@@ -48,6 +52,10 @@
         "longitude": "Longitude",
         "latitude": "Latitude"
       }
+    },
+    "allVillages": {
+      "title": "All Villages",
+      "placeholder": "All villages data content coming soon..."
     },
     "yangChun": {
       "title": "Yangchun Administrative Divisions",

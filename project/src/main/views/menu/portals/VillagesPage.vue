@@ -27,6 +27,12 @@
           <div class="village-name">{{ $t('villages.ycVillages.name') }}</div>
           <div class="village-desc">{{ $t('villages.ycVillages.desc') }}</div>
         </button>
+
+        <button v-if="userStore.role === 'admin'" class="village-btn" @click="handleAllVillages">
+          <div class="village-icon">📋</div>
+          <div class="village-name">{{ $t('villages.allVillages.name') }}</div>
+          <div class="village-desc">{{ $t('villages.allVillages.desc') }}</div>
+        </button>
       </div>
   </div>
 </template>
@@ -34,6 +40,7 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { userStore } from '@/main/store/store.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -52,6 +59,10 @@ const handleYcVillages = () => {
 
 const handleVillagesML = () => {
   router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/ml'))
+};
+
+const handleAllVillages = () => {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/all'))
 };
 </script>
 

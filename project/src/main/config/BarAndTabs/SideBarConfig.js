@@ -5,6 +5,7 @@ import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { userStore } from '@/main/store/store.js'
 
 const withRouteLocale = (route, path) => buildLocalePath(resolveRouteLocale(route), stripLocaleFromPath(path))
 
@@ -83,7 +84,8 @@ export function useSidebarConfig() {
                 { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
                 { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: withRouteLocale(route, '/explore/villages/ml') },
                 { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
-                { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/villages/yc') }
+                { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/villages/yc') },
+                { label: t('navigation.submenu.villages.allVillages'), icon: '📋', path: withRouteLocale(route, '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }
             ]
         },
         source: {
@@ -207,7 +209,8 @@ export const SideConfig = {
             { label: '廣東自然村', icon: '🏕️', path: buildLocalePath('zh-Hant', '/explore/villages/gd') },
             { label: '機器學習', icon: '🤖', path: buildLocalePath('zh-Hant', '/explore/villages/ml') },
             { label: '全粵村情表格', icon: '📊', path: buildLocalePath('zh-Hant', '/explore/villages/table') },
-            { label: '陽春自然村', icon: '🏠', path: buildLocalePath('zh-Hant', '/explore/villages/yc') }
+            { label: '陽春自然村', icon: '🏠', path: buildLocalePath('zh-Hant', '/explore/villages/yc') },
+            { label: '全部自然村', icon: '📋', path: buildLocalePath('zh-Hant', '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }
         ]
     },
     tools: {

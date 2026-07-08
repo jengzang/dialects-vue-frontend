@@ -219,6 +219,7 @@ const ROUTE_QUERY_ALLOWLIST = {
       manage: [],
       gdVillages: [],
       gdVillagesTable: [],
+      allVillages: [],
       check: [],
       jyut2ipa: [],
       merge: [],
@@ -262,6 +263,9 @@ const ROUTE_QUERY_ALLOWLIST = {
     base: []
   },
   '/explore/villages/ml': {
+    base: []
+  },
+  '/explore/villages/all': {
     base: []
   },
   '/menu/pho/matrix': {

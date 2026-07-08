@@ -16,6 +16,10 @@
     "name": "阳春自然村",
     "desc": "广东省阳春县自然村(来自县志)"
   },
+  "allVillages": {
+    "name": "全部自然村",
+    "desc": "全部自然村数据（仅管理员）"
+  },
   "pages": {
     "gdTree": {
       "title": "广东自然村树状图",
@@ -48,6 +52,10 @@
         "longitude": "经度",
         "latitude": "纬度"
       }
+    },
+    "allVillages": {
+      "title": "全部自然村",
+      "placeholder": "全部自然村数据内容待添加..."
     },
     "yangChun": {
       "title": "阳春行政规划",

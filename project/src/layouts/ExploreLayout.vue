@@ -25,6 +25,7 @@ import ExploreBar from '@/components/bar/ExploreBar.vue'
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 
 const keepAliveViewNames = [
+  'AllVillages',
   'CharacterClassification',
   'CheckTool',
   'gdVillagesTable',

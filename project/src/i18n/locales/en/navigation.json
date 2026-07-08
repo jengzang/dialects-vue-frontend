@@ -47,7 +47,8 @@
       "gdVillages": "Guangdong Villages",
       "VillagesML": "Machine Learning",
       "gdVillagesTable": "Guangdong Villages Table",
-      "ycVillages": "Yangchun Villages"
+      "ycVillages": "Yangchun Villages",
+      "allVillages": "All Villages"
     },
     "tools": {
       "check": "Character Table Tool",
