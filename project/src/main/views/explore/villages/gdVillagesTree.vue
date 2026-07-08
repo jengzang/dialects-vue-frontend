@@ -279,14 +279,17 @@ const normalizeTreeData = (rawData) => {
       const dialectKey = data['dialect'] !== undefined ? 'dialect' : '方言分布'; const dialects = Array.isArray(data[dialectKey]) ? data[dialectKey] : []
       const count = Math.max(lngs.length, lats.length, 1)
 
+      const makeLeafNode = (singleData) => ({
+        id: generateId(),
+        name: formatLeafNode(name, singleData),
+        rawName: name,
+        rawData: singleData,
+        _tag: getGdTagInfo(singleData),
+        children: []
+      })
+
       if (count <= 1) {
-        return {
-          id: generateId(),
-          name: formatLeafNode(name, data),
-          rawName: name,
-          rawData: data,
-          children: []
-        }
+        return makeLeafNode(data)
       }
 
       // Duplicate leaf names with multiple records — split into individual nodes
@@ -295,13 +298,7 @@ const normalizeTreeData = (rawData) => {
         if (dialects[i] !== undefined) single[dialectKey] = [dialects[i]]
         if (lngs[i] !== undefined) single['longitude'] = [lngs[i]]
         if (lats[i] !== undefined) single['latitude'] = [lats[i]]
-        return {
-          id: generateId(),
-          name: formatLeafNode(name, single),
-          rawName: name,
-          rawData: single,
-          children: []
-        }
+        return makeLeafNode(single)
       })
     }
 
@@ -342,15 +339,38 @@ const normalizeTreeData = (rawData) => {
  */
 const getDialect = (d) => d?.dialect?.[0] || d?.['方言分布']?.[0] || ''
 
-const formatLeafNode = (name, data) => {
-  const dialect = getDialect(data);
-  const lng = data['longitude']?.[0] || '';
-  const lat = data['latitude']?.[0] || '';
+const gdTagPalette = [
+  '#e3f2fd', '#fce4ec', '#e8f5e9', '#fff3e0', '#f3e5f5',
+  '#e0f7fa', '#fbe9e7', '#e8eaf6', '#f1f8e9', '#fff8e1',
+  '#ede7f6', '#e1f5fe', '#f9fbe7', '#efebe9', '#e0f2f1'
+]
+const gdTagColorMap = {}
+const getGdTagColor = (dialect) => {
+  if (gdTagColorMap[dialect]) return gdTagColorMap[dialect]
+  let hash = 0
+  for (let i = 0; i < dialect.length; i++) hash = ((hash << 5) - hash + dialect.charCodeAt(i)) | 0
+  gdTagColorMap[dialect] = gdTagPalette[Math.abs(hash) % gdTagPalette.length]
+  return gdTagColorMap[dialect]
+}
 
+const getGdTagInfo = (data) => {
+  const dialect = getDialect(data)
+  const lng = data['longitude']?.[0] || ''
+  const lat = data['latitude']?.[0] || ''
   if (lng && lat) {
-    return `${name}  ${dialect} (${lng},${lat})`;
+    return { text: `${dialect} (${lng},${lat})`, color: getGdTagColor(dialect) }
   }
-  return `${name}  ${dialect}`;
+  if (dialect) {
+    return { text: dialect, color: getGdTagColor(dialect) }
+  }
+  if (lng && lat) {
+    return { text: `(${lng},${lat})`, color: '#f5f5f5' }
+  }
+  return null
+}
+
+const formatLeafNode = (name, data) => {
+  return name
 };
 
 /**
