@@ -83,100 +83,166 @@ const goToPrivacy = () => {
   </div>
 </template>
 
-<style scoped>
+```vue
+<style scoped lang="scss">
+$primary-blue: #007aff;
+$text-primary: #333;
+$text-secondary: #666;
+$text-muted: #999;
+$border-color: #e0e0e0;
+$white: #fff;
 
-.privacy-link {
-  font-size: 14px;
-  color: #007aff;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s;
-  white-space: nowrap;
-  padding: 4px 8px;
-  border-radius: 4px;
-}
+$transition-duration: 0.3s;
 
-.privacy-link:hover {
-  color: #0051d5;
-  background: rgba(0, 122, 255, 0.1);
-  text-decoration: underline;
-}
-.header-row {
-  display: flex;
-  align-items: center; /* 垂直居中對齊 */
-  gap: 15px;           /* 標題和下拉框之間的間距 */
-  justify-content: center;
-}
-.summary {
-  margin-top: 12px;
-  margin-bottom: 0;
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
-}
-/* 响应式：移动端换行 */
-@media (max-width: 768px) {
-  .header-row {
-    gap: 8px;
-  }
+.settings-container {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 20px;
 
-  .privacy-link {
-    font-size: 13px;
+  @media (max-width: 480px) {
+    padding: 12px;
   }
 }
 
-/* 背景设置 */
-.coming-soon-container {
-  position: absolute;
-  top: 26dvh;
-  left: 0;
-  width: 100%;
-  height: 74dvh;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 122, 255, 0.15));
+.setting-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.setting-section {
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  @media (max-width: 480px) {
+    padding: 16px;
+  }
+}
+
+.section-title {
+  margin: 0 0 8px;
+  color: $text-primary;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.section-description {
+  margin: 0 0 20px;
+  color: $text-secondary;
+  font-size: 14px;
+}
+
+.language-options,
+.mode-group {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.language-card,
+.mode-option {
+  display: flex;
   align-items: center;
-  z-index: 99;
-}
-
-/* 提示框样式 */
-.coming-soon-message {
-  font-size: 28px;
-  font-weight: bold;
-  color: #ffffff;
-  text-align: center;
-  padding: 30px 50px;
+  width: 100%;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid $border-color;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.6);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  transform: scale(0);
-  animation: scaleIn 1s ease-out forwards, glowAnimation 1.5s infinite alternate;
-}
+  transition: all $transition-duration ease;
 
-/* 提示文本的动画效果 */
-@keyframes scaleIn {
-  0% {
-    transform: scale(0);
+  &:hover {
+    background: $white;
+    border-color: $primary-blue;
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+    transform: translateY(-2px);
   }
-  100% {
-    transform: scale(1);
-  }
-}
 
-@keyframes glowAnimation {
-  0% {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(0, 122, 255, 0.9);
-  }
-  100% {
-    text-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 40px rgba(255, 255, 255, 0.7), 0 0 60px rgba(0, 122, 255, 1);
+  &.active {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 122, 255, 0.1),
+      rgba(0, 122, 255, 0.05)
+    );
+    border-color: $primary-blue;
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
   }
 }
 
-/* 自适应样式，保证在小屏设备上也能很好展示 */
-@media (max-width: 480px) {
-  .coming-soon-message {
-    font-size: 22px;
-    padding: 20px 30px;
+.mode-option {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.language-flag {
+  margin-right: 16px;
+  font-size: 32px;
+
+  @media (max-width: 480px) {
+    margin-right: 12px;
+    font-size: 28px;
+  }
+}
+
+.language-info {
+  flex: 1;
+}
+
+.language-name,
+.mode-option-label {
+  color: $text-primary;
+  font-size: 16px;
+  font-weight: 600;
+
+  @media (max-width: 480px) {
+    font-size: 14px;
+  }
+}
+
+.language-name {
+  margin-bottom: 4px;
+}
+
+.language-code,
+.mode-option-description {
+  color: $text-muted;
+  font-size: 12px;
+
+  @media (max-width: 480px) {
+    font-size: 11px;
+  }
+}
+
+.language-check,
+.mode-option-check {
+  color: $primary-blue;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.mode-option-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.mode-option-description {
+  color: $text-secondary;
+  font-size: 13px;
+  line-height: 1.5;
+
+  @media (max-width: 480px) {
+    font-size: 11px;
   }
 }
 </style>
+```
+

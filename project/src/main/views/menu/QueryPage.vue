@@ -814,55 +814,53 @@ export default {
 }
 </script>
 
-<style scoped>
+```vue
+<style scoped lang="scss">
+$text-color: #333;
+$placeholder-color: #6a6a6a;
+$white: #fff;
+$dark-blue: darkblue;
 
-/* 📄 內容區塊動畫 */
+$transition-fast: 0.2s;
+$transition-base: 0.3s;
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 内容区块动画 */
 .tab-content-inner {
   width: 100%;
   max-width: 900px;
+  padding: 1rem 0;
+  text-align: center;
   animation: fade 0.6s ease;
 
-  /* ✅ 新增這些 */
+  display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  justify-content: center; /* 垂直置中 */
-  padding: 1rem 0;
-}
-
-
-@keyframes fade {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  justify-content: center;
 }
 
 .run-label {
+  color: $dark-blue;
   font-size: 18px;
   font-weight: bold;
-  color: darkblue;
   white-space: nowrap;
-}
-
-
-/* 📱 響應式：小螢幕按鈕變小 */
-@media(max-width: 600px) {
-  .triple-select-box{
-    flex-wrap: wrap;
-  }
 }
 
 .triple-select-box {
   display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   gap: 1.5dvw;
   width: 100%;
-  justify-content: space-between;
-  flex-direction: column;
+
+  @media (max-width: 600px) {
+    flex-wrap: wrap;
+  }
 }
 
 .page-content-stack {
@@ -873,168 +871,161 @@ export default {
 }
 
 .card-row {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include flex-center;
+
+  flex-wrap: wrap;
   gap: 20px;
-  flex-wrap: wrap; /* ✨ 支持自动换行 */
-}
-@media (max-aspect-ratio: 1/1) {
-  .card-row{
-    gap:0;
+  width: 100%;
+
+  @media (max-aspect-ratio: 1/1) {
+    gap: 0;
   }
 }
 
 .dropdown-row {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  white-space: nowrap;
+  @include flex-center;
+
   flex-direction: column;
-  align-items: center;
+  width: 100%;
+  white-space: nowrap;
 }
 
-.button-group{
-  flex-wrap: wrap; /* 按钮换行 */
+.button-group {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  border-bottom: 1px solid var(--color-blue-dark);  /* 添加苹果蓝色调的下划线 */
+  border-bottom: 1px solid var(--color-blue-dark);
 }
+
 .key-item {
-  flex: 0 1 auto; /* 保证它们的大小适应内容 */
+  flex: 0 1 auto;
 }
-/* 键名按钮样式 */
+
+/* 键名按钮 */
 .key-button {
   padding: 8px 16px;
+  margin: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  background: var(--glass-light);
   border: 1px solid var(--color-primary-medium);
   border-radius: 12px;
-  background: var(--glass-light);
-  cursor: pointer;
-  transition: background 0.3s ease;
-  font-size: 14px;
-  margin: 5px;
-}
+  transition: background $transition-base ease;
 
-@media(max-width: 600px) {
-  .key-button{
+  &.active {
+    color: $white;
+    font-weight: 600;
+    background: var(--color-primary-medium2);
+  }
+
+  @media (max-width: 600px) {
     padding: 8px 10px;
     margin: 3px;
   }
 }
 
-.key-button.active {
-  background: var(--color-primary-medium2);
-  color: white;
-  font-weight: 600;
-}
-.key-dropdown-group{
+.key-dropdown-group {
   display: flex;
   flex-wrap: wrap;
-  column-gap:30px;
+  column-gap: 30px;
 }
-/* 键值展示样式 */
+
+/* 键值展示 */
 .key-value-dropdown {
-  margin-top: 10px;
   display: flex;
   flex-direction: row;
   width: 135px;
+  margin-top: 10px;
+
+  .dropdown-item {
+    padding: 8px 16px;
+    overflow: hidden;
+    font-size: 14px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color $transition-fast;
+
+    &:hover {
+      background-color: var(--color-blue-very-light);
+    }
+
+    &.active {
+      color: var(--color-primary);
+      background-color: var(--color-primary-medium);
+    }
+  }
 }
-.key-name{
+
+.key-name {
   align-self: center;
 }
 
-.key-value-dropdown .dropdown-item {
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
-  border-radius: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.key-value-dropdown .dropdown-item:hover {
-  background-color: var(--color-blue-very-light);
-}
-
-/* 选中的键名显示的效果 */
-.key-value-dropdown .dropdown-item.active {
-  background-color: var(--color-primary-medium);
-  color: var(--color-primary);
-}
-
-/* 下拉菜单分割线 */
 .dropdown-divider {
   height: 1px;
-  background: var(--border-divider);
   margin: 2px 0;
+  background: var(--border-divider);
 }
 
-/* 键名文字颜色 */
 .key-name-text {
   color: var(--color-blue-custom);
 }
 
-/* 下拉框包装器 */
+/* 下拉输入框包装器 */
 .dropdown-wrapper {
   display: flex;
   align-items: stretch;
-  border: 1px solid var(--color-primary-medium);
-  border-radius: 8px;
   overflow: hidden;
   background: var(--glass-light);
+  border: 1px solid var(--color-primary-medium);
+  border-radius: 8px;
 }
 
-/* 输入框样式 */
 .dropdown-input {
   flex: 1;
+  width: 80px;
+  padding: 8px 0;
+  color: $text-color;
+  font-size: 14px;
+  text-align: center;
+  background: transparent;
   border: none;
   outline: none;
-  padding: 8px 0px;
-  font-size: 14px;
-  background: transparent;
-  width: 80px;
-  color: #333;
-  text-align: center;
+
+  &::placeholder {
+    color: $placeholder-color;
+    font-size: 12px;
+    text-align: center;
+  }
 }
 
-.dropdown-input::placeholder {
-  color: #6a6a6a;
-  font-size: 12px;
-  text-align: center;
-}
-
-/* 箭头触发区域 */
 .arrow-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: var(--color-primary-medium);
-  border-left: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.2s ease;
-  user-select: none;
+  @include flex-center;
+
   min-width: 36px;
   max-width: 36px;
-}
+  cursor: pointer;
+  user-select: none;
+  background: var(--color-primary-medium);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all $transition-fast ease;
 
-.arrow-trigger:hover {
-  background: var(--color-primary-medium2);
-}
+  &:hover {
+    background: var(--color-primary-medium2);
+  }
 
-.arrow-trigger:active {
-  transform: scale(0.95);
+  &:active {
+    transform: scale(0.95);
+  }
 }
 
 .arrow-icon {
+  color: $white;
   font-size: 14px;
-  color: white;
   font-weight: bold;
 }
 
-/* 全选按钮特殊样式 */
 .select-all-item {
   color: var(--text-tertiary);
   font-size: 0.9em;
@@ -1042,35 +1033,50 @@ export default {
 }
 
 .check-icon {
-  width: 16px;
   display: inline-block;
+  width: 16px;
 }
 
-/* Dropdown 样式 */
-
-/* Dropdown 触发器样式（用于 tab2/tab3 的"不排除"下拉框） */
+/* Tab2 / Tab3 的“不排除”触发器 */
 .dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 80px;
   padding: 6px 12px;
-  border-radius: var(--radius-md);
+  margin: auto;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
   background: var(--glass-light);
+  border: 1px solid rgba(200, 200, 200, 0.5);
+  border-radius: var(--radius-md);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  cursor: pointer;
-  font-size: 14px;
-  border: 1px solid rgba(200, 200, 200, 0.5);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-width: 80px;
-  margin: auto;
-  transition: all 0.2s;
-  white-space: nowrap;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--glass-medium);
+    border-color: var(--color-primary);
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 }
 
-.dropdown:hover {
-  background: var(--glass-medium);
-  border-color: var(--color-primary);
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
-
 </style>
+```
+

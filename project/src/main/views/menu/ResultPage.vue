@@ -349,95 +349,170 @@ export default {
 </script>
 
 
-<style scoped>
+<style scoped lang="scss">
+$primary-blue: #007aff;
+$primary-blue-hover: #0062cc;
+$apple-red: #ff3b30;
+
+$text-primary: #333;
+$text-secondary: #666;
+$text-muted: #999;
+$white: #fff;
+
+$transition-fast: 0.2s;
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .result-page-container {
   position: relative;
-  min-height: 200px;
-  width: 100%;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  min-height: 200px;
 }
 
-/* 🌟 液態玻璃加載器樣式 */
-.glass-loader-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 0;
-  /* 如果希望是全屏遮罩，可以改為 fixed 並設置 z-index */
-}
+.header-row {
+  @include flex-center;
 
-.header-row{
-  display:flex;
-  flex-direction: row;
-  flex-wrap:wrap;
-  justify-content: center;
-  align-items: center;
+  flex-flow: row wrap;
   gap: 10px;
 }
 
+/* 液态玻璃加载器 */
+.glass-loader-container {
+  @include flex-center;
+
+  padding: 40px 0;
+}
+
 .glass-card {
-  width: 280px;
-  padding: 30px;
-  background: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 280px;
+  padding: 30px;
   text-align: center;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   animation: float 3s ease-in-out infinite;
 }
 
-/* 蘋果風格 Spinner */
-
 .timer-text {
-  font-size: 2em;
-  font-weight: 200; /* Apple style thin font */
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: #333;
   margin-bottom: 5px;
-  font-variant-numeric: tabular-nums; /* 防止數字跳動 */
+  color: $text-primary;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  font-size: 2em;
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
 }
 
 .loading-text {
+  color: $text-secondary;
   font-size: 0.9em;
-  color: #666;
   font-weight: 500;
 }
 
 .warning-msg {
-  margin-top: 15px;
-  font-size: 0.85em;
-  color: #ff3b30; /* Apple Red */
-  background: rgba(255, 59, 48, 0.1);
   padding: 10px;
-  border-radius: 12px;
+  margin-top: 15px;
+  color: $apple-red;
+  font-size: 0.85em;
   line-height: 1.4;
+  background: rgba(255, 59, 48, 0.1);
+  border-radius: 12px;
   animation: fadeIn 0.5s ease-out;
 }
 
 .empty-state {
-  text-align: center;
-  color: #999;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
   padding: 40px;
+  color: $text-muted;
   font-size: 16px;
+  text-align: center;
 }
 
-/* 動畫定義 */
+.go-query-btn {
+  padding: 10px 24px;
+  color: $white;
+  font-size: 15px;
+  cursor: pointer;
+  background-color: $primary-blue;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 122, 255, 0.2);
+  transition: all $transition-fast ease;
+
+  &:hover {
+    background-color: $primary-blue-hover;
+    box-shadow: 0 6px 8px rgba(0, 122, 255, 0.3);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+/* SimpleSelectDropdown 外层 */
+.dropdown-wrapper {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+/*
+ * 当前模板中未直接使用。
+ * 保留原有通用下拉触发器样式。
+ */
+.dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 80px;
+  padding: 6px 12px;
+  margin: auto;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--glass-light);
+  border: 1px solid rgba(200, 200, 200, 0.5);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--glass-medium);
+    border-color: var(--color-primary);
+  }
+}
 
 @keyframes float {
-  0% {
-    transform: translateY(0px);
+  0%,
+  100% {
+    transform: translateY(0);
   }
+
   50% {
     transform: translateY(-6px);
-  }
-  100% {
-    transform: translateY(0px);
   }
 }
 
@@ -446,76 +521,10 @@ export default {
     opacity: 0;
     transform: translateY(5px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-.empty-state {
-  text-align: center;
-  color: #999;
-  padding: 40px;
-  /* 增加 Flex 佈局讓內容垂直居中 */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px; /* 文字和按鈕的間距 */
-}
-
-/* 🌟 新增：按鈕樣式 */
-.go-query-btn {
-  padding: 10px 24px;
-  background-color: #007aff; /* Apple Blue */
-  color: white;
-  border: none;
-  border-radius: 20px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 6px rgba(0, 122, 255, 0.2);
-}
-
-.go-query-btn:hover {
-  background-color: #0062cc;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 8px rgba(0, 122, 255, 0.3);
-}
-
-.go-query-btn:active {
-  transform: translateY(1px);
-}
-
-/* Dropdown 样式 */
-.dropdown-wrapper {
-  flex: 1;
-  position: relative;
-  align-items: center;
-  display: flex;
-  justify-content: center;
-}
-
-.dropdown {
-  padding: 6px 12px;
-  border-radius: var(--radius-md);
-  background: var(--glass-light);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  cursor: pointer;
-  font-size: 14px;
-  border: 1px solid rgba(200, 200, 200, 0.5);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-width: 80px;
-  margin: auto;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.dropdown:hover {
-  background: var(--glass-medium);
-  border-color: var(--color-primary);
-}
-
-
 </style>

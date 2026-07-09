@@ -108,205 +108,231 @@ const copyCitation = () => {
   </div>
 </template>
 
-<style scoped>
+```vue
+<style scoped lang="scss">
+$primary-blue: #007aff;
+$primary-blue-dark: #0051d5;
+$purple: #5856d6;
+$warning-yellow: #ffcc00;
+
+$text-primary: #1d1d1f;
+$text-secondary: #333;
+$text-muted: #666;
+$white: #fff;
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 20px;
+
+$transition-base: 0.3s;
+
 .privacy-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   width: 100%;
   min-height: 100vh;
   padding: 40px 20px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  background: linear-gradient(135deg, rgba(240, 248, 255, 0.8), rgba(230, 240, 255, 0.6));
+  background: linear-gradient(
+    135deg,
+    rgba(240, 248, 255, 0.8),
+    rgba(230, 240, 255, 0.6)
+  );
+
+  @media (max-width: 768px) {
+    padding: 20px 10px;
+  }
 }
 
 .privacy-content {
-  max-width: 900px;
   width: 100%;
+  max-width: 900px;
   padding: 40px;
-  border-radius: 20px;
+  border-radius: $radius-lg;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-}
 
-.glass-container {
+  @media (max-width: 768px) {
+    padding: 24px;
+  }
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  justify-content: space-between;
   padding-bottom: 20px;
+  margin-bottom: 30px;
   border-bottom: 2px solid rgba(0, 122, 255, 0.2);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
 }
 
 .title {
   margin: 0;
+  color: $text-primary;
   font-size: 32px;
   font-weight: 700;
-  color: #1d1d1f;
-  background: linear-gradient(135deg, #007aff, #5856d6);
+  background: linear-gradient(135deg, $primary-blue, $purple);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
+
+  @media (max-width: 768px) {
+    font-size: 24px;
+  }
 }
 
 .content-section {
-  animation: fadeIn 0.5s ease-in;
+  animation: fade-in 0.5s ease-in;
 }
 
-@keyframes fadeIn {
+.section {
+  margin-bottom: 40px;
+
+  h2 {
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    color: $text-primary;
+    font-size: 24px;
+    font-weight: 700;
+    border-bottom: 2px solid rgba(0, 122, 255, 0.15);
+
+    @media (max-width: 768px) {
+      font-size: 20px;
+    }
+  }
+
+  h3 {
+    margin-top: 24px;
+    margin-bottom: 12px;
+    color: $text-secondary;
+    font-size: 18px;
+    font-weight: 600;
+
+    @media (max-width: 768px) {
+      font-size: 16px;
+    }
+  }
+
+  p {
+    color: $text-secondary;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  ul {
+    padding-left: 24px;
+    margin: 16px 0;
+  }
+
+  li {
+    margin-bottom: 8px;
+    color: $text-secondary;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+}
+
+.citation-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  margin: 20px 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 122, 255, 0.05),
+    rgba(88, 86, 214, 0.05)
+  );
+  border-left: 4px solid $primary-blue;
+  border-radius: $radius-md;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.citation-text {
+  flex: 1;
+  margin: 0;
+  color: $text-primary;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 500;
+
+  a {
+    color: $primary-blue;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.copy-btn {
+  padding: 10px 20px;
+  color: $white;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  background: linear-gradient(
+    135deg,
+    $primary-blue,
+    $primary-blue-dark
+  );
+  border: none;
+  border-radius: $radius-sm;
+  transition: all $transition-base;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.note {
+  padding: 12px;
+  margin-top: 12px;
+  color: $text-muted;
+  font-size: 14px;
+  font-style: italic;
+  background: rgba(0, 122, 255, 0.03);
+  border-radius: $radius-sm;
+}
+
+.update-note {
+  padding: 16px;
+  margin-top: 24px;
+  font-size: 14px;
+  background: rgba(255, 204, 0, 0.1);
+  border-left: 4px solid $warning-yellow;
+  border-radius: $radius-sm;
+}
+
+@keyframes fade-in {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
-.section {
-  margin-bottom: 40px;
-}
-
-.section h2 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1d1d1f;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid rgba(0, 122, 255, 0.15);
-}
-
-.section h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin-top: 24px;
-  margin-bottom: 12px;
-}
-
-.section p {
-  font-size: 15px;
-  line-height: 1.8;
-  color: #333;
-}
-
-.section ul {
-  margin: 16px 0;
-  padding-left: 24px;
-}
-
-.section li {
-  font-size: 15px;
-  line-height: 1.8;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.citation-box {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.05), rgba(88, 86, 214, 0.05));
-  border-left: 4px solid #007aff;
-  padding: 20px;
-  border-radius: 12px;
-  margin: 20px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.citation-text {
-  font-size: 16px;
-  font-weight: 500;
-  color: #1d1d1f;
-  margin: 0;
-  flex: 1;
-  font-style: italic;
-}
-
-.citation-text a {
-  color: #007aff;
-  text-decoration: none;
-}
-
-.citation-text a:hover {
-  text-decoration: underline;
-}
-
-.copy-btn {
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  white-space: nowrap;
-}
-
-.copy-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
-}
-
-.note {
-  font-size: 14px;
-  color: #666;
-  font-style: italic;
-  padding: 12px;
-  background: rgba(0, 122, 255, 0.03);
-  border-radius: 8px;
-  margin-top: 12px;
-}
-
-.update-note {
-  margin-top: 24px;
-  padding: 16px;
-  background: rgba(255, 204, 0, 0.1);
-  border-left: 4px solid #ffcc00;
-  border-radius: 8px;
-  font-size: 14px;
-}
-
-/* 响应式 */
-@media (max-width: 768px) {
-  .privacy-container {
-    padding: 20px 10px;
-  }
-
-  .privacy-content {
-    padding: 24px;
-  }
-
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .title {
-    font-size: 24px;
-  }
-
-  .citation-box {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .copy-btn {
-    width: 100%;
-  }
-
-  .section h2 {
-    font-size: 20px;
-  }
-
-  .section h3 {
-    font-size: 16px;
-  }
-}
 </style>
+```
+

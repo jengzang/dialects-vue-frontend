@@ -898,12 +898,21 @@ watch(viewMode, async (newMode) => {
 
 </script>
 
+```vue
 <style scoped lang="scss">
 $primary: #0071e3;
+$white: #fff;
+$purple: #af52de;
+
 $text-primary: #1d1d1f;
 $text-secondary: #6e6e73;
 $text-tertiary: #999;
-$purple: #af52de;
+
+$font-monospace: "Courier New", monospace;
+
+$transition-fast: 0.2s;
+$transition-control: 0.25s;
+$transition-base: 0.3s;
 
 $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -937,11 +946,17 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @mixin control-active {
-  background: #fff;
   color: $primary;
+  background: $white;
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.08),
     0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+@mixin field-focus {
+  background: $white;
+  border-color: $primary;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
 }
 
 /* 页面主体 */
@@ -950,29 +965,51 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   max-width: 1200px;
   margin: 0 auto;
   padding: 12px;
+
+  @media (max-width: 768px) {
+    padding: 4px;
+  }
 }
 
 /* 顶部控制栏 */
 .top-controls {
   display: flex;
-  align-items: stretch;
   gap: 16px;
+  align-items: stretch;
   margin-bottom: 24px;
+
+  @media (max-width: 650px) {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  @media (max-width: 640px) {
+    margin-bottom: 8px;
+  }
 }
 
 .header-container {
   display: flex;
-  align-items: center;
   flex-shrink: 0;
   gap: 12px;
+  align-items: center;
+
+  @media (max-width: 640px) {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .search-container {
-  flex: 1;
-  min-width: 0;
   display: flex;
-  align-items: center;
+  flex: 1;
   gap: 12px;
+  align-items: center;
+  min-width: 0;
+
+  @media (max-width: 650px) {
+    width: 100%;
+  }
 }
 
 /* Tab 切换 */
@@ -981,30 +1018,39 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   gap: 4px;
 
   @include segmented-shell;
+
+  @media (max-width: 640px) {
+    justify-content: center;
+  }
 }
 
 .tab-btn {
   padding: 8px 16px;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  white-space: nowrap;
   color: $text-secondary;
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.01em;
+  white-space: nowrap;
   cursor: pointer;
-  transition: all 0.25s $ease-standard;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  transition: all $transition-control $ease-standard;
 
   &:hover:not(.active) {
-    background: rgba(0, 0, 0, 0.04);
     color: $text-primary;
+    background: rgba(0, 0, 0, 0.04);
   }
 
   &.active {
     font-weight: 600;
 
     @include control-active;
+  }
+
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+    font-size: 14px;
   }
 }
 
@@ -1014,15 +1060,15 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   width: 40px;
   height: 40px;
   padding: 0;
+  color: $primary;
+  cursor: pointer;
   background: rgba(255, 255, 255, 0.6);
   border: 0.5px solid rgba(255, 255, 255, 0.8);
   border-radius: 12px;
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.06),
     0 2px 6px rgba(0, 0, 0, 0.04);
-  color: $primary;
-  cursor: pointer;
-  transition: all 0.25s $ease-standard;
+  transition: all $transition-control $ease-standard;
 
   @include flex-center;
   @include saturated-glass;
@@ -1060,26 +1106,26 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   max-height: 200px;
   padding: 12px 16px;
   overflow: hidden;
+  color: var(--text-dark);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "PingFang SC",
+    "Hiragino Sans GB",
+    "Microsoft YaHei",
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
   resize: vertical;
   background: var(--bg-white);
   border: 1.5px solid var(--border-gray);
   border-radius: 12px;
   outline: none;
-  color: var(--text-dark);
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    'PingFang SC',
-    'Hiragino Sans GB',
-    'Microsoft YaHei',
-    sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
-  transition: all 0.3s $ease-standard;
+  transition: all $transition-base $ease-standard;
 
   &:focus {
-    background: #fff;
+    background: $white;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
   }
@@ -1091,8 +1137,8 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
 /* 视图模式选择器 */
 .view-mode-selector {
-  flex-shrink: 0;
   display: flex;
+  flex-shrink: 0;
   gap: 4px;
 
   @include segmented-shell;
@@ -1102,18 +1148,18 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   width: 32px;
   height: 32px;
   padding: 0;
+  color: $text-secondary;
+  cursor: pointer;
   background: transparent;
   border: none;
   border-radius: 8px;
-  color: $text-secondary;
-  cursor: pointer;
-  transition: all 0.25s $ease-standard;
+  transition: all $transition-control $ease-standard;
 
   @include flex-center;
 
   &:hover:not(.active) {
-    background: rgba(0, 0, 0, 0.04);
     color: $text-primary;
+    background: rgba(0, 0, 0, 0.04);
   }
 
   &.active {
@@ -1133,6 +1179,10 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-md);
 
   @include glass-blur;
+
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
 }
 
 /* 加载状态 */
@@ -1141,7 +1191,10 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   padding: 60px 20px;
 }
 
-/* 输入建议 */
+/*
+ * 搜索建议通过 Teleport 挂载到 body，
+ * 不能嵌套到 .yubao-page 或 .input-wrapper 下。
+ */
 .inline-suggestion {
   position: absolute !important;
   z-index: 99999 !important;
@@ -1150,25 +1203,29 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   max-height: 40vh;
   padding: 8px 12px;
   overflow-y: auto;
+  color: var(--text-dark);
+  font-size: 14px;
+  white-space: pre-line;
+  pointer-events: auto !important;
   background: var(--glass-medium2) !important;
   border: 1px solid var(--border-gray-light) !important;
   border-radius: 12px;
   box-shadow: var(--shadow-lg2);
-  white-space: pre-line;
-  color: var(--text-dark);
-  font-size: 14px;
-  pointer-events: auto !important;
-  transition: background-color 0.2s ease;
+  transition: background-color $transition-fast ease;
 
   @include glass-blur(12px);
+
+  @media (max-width: 768px) {
+    max-width: 90vw;
+  }
 }
 
 .suggest-line {
-  margin: 2px 0;
   padding: 8px 12px;
-  border-radius: 6px;
+  margin: 2px 0;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  border-radius: 6px;
+  transition: background-color $transition-fast ease;
 
   &:hover {
     background-color: var(--bg-blue-hover);
@@ -1183,17 +1240,15 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 .modal-search-input {
   width: 100%;
   padding: 10px 16px;
+  font-size: 14px;
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   outline: none;
-  font-size: 14px;
-  transition: all 0.2s;
+  transition: all $transition-fast;
 
   &:focus {
-    background: #fff;
-    border-color: $primary;
-    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+    @include field-focus;
   }
 }
 
@@ -1206,27 +1261,27 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .item-line {
-  margin-bottom: 4px;
   padding: 10px 12px;
-  border-radius: 8px;
+  margin-bottom: 4px;
   color: $text-primary;
   font-size: 14px;
   cursor: pointer;
+  border-radius: 8px;
   transition: all 0.15s;
 
   &:hover {
-    background: rgba(0, 113, 227, 0.08);
     color: $primary;
+    background: rgba(0, 113, 227, 0.08);
   }
 }
 
 .all-items-modal-footer {
-  margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  text-align: center;
+  margin-top: 12px;
   color: $text-secondary;
   font-size: 13px;
+  text-align: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 /* 卡片模式 */
@@ -1237,9 +1292,9 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 .cards-loading {
   display: flex;
   flex-direction: column;
+  gap: 16px;
   align-items: center;
   justify-content: center;
-  gap: 16px;
   padding: 80px 20px;
   color: $text-secondary;
 }
@@ -1250,6 +1305,15 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   gap: 16px;
   min-height: 100px;
   padding: 4px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 }
 
 .card {
@@ -1265,7 +1329,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
     0 8px 32px rgba(0, 0, 0, 0.06),
     0 2px 8px rgba(0, 0, 0, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 1);
-  transition: all 0.3s $ease-standard;
+  transition: all $transition-base $ease-standard;
 
   @include saturated-glass;
 
@@ -1277,12 +1341,21 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
       inset 0 1px 0 rgba(255, 255, 255, 1);
     transform: translateY(-2px);
   }
+
+  @media (max-width: 768px) {
+    padding: 16px 18px;
+  }
+
+  @media (max-width: 480px) {
+    gap: 12px;
+    padding: 14px 16px;
+  }
 }
 
 .card-row {
   display: flex;
-  align-items: center;
   gap: 12px;
+  align-items: center;
   line-height: 1.5;
 }
 
@@ -1290,6 +1363,10 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   flex-wrap: wrap;
   color: $text-secondary;
   font-size: 12px;
+
+  @media (max-width: 480px) {
+    font-size: 11px;
+  }
 }
 
 .location-chain,
@@ -1301,10 +1378,10 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .category-chain {
-  white-space: nowrap;
   color: $purple;
   font-size: 11px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .vocabulary-card {
@@ -1319,20 +1396,32 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   color: $text-primary;
   font-size: 20px;
   letter-spacing: -0.01em;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 16px;
+  }
 }
 
 .pronunciation-text {
   color: $primary;
-  font-family: 'Courier New', monospace;
+  font-family: $font-monospace;
   font-size: 14px;
   font-weight: 500;
+
+  @media (max-width: 480px) {
+    font-size: 13px;
+  }
 }
 
 .grammar-card {
   .row-2,
   .row-3 {
-    margin: 0 -4px;
     padding: 10px 12px;
+    margin: 0 -4px;
     border-radius: 10px;
   }
 
@@ -1347,11 +1436,15 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
 .phonetic-text {
   color: $primary;
-  font-family: 'Courier New', monospace;
+  font-family: $font-monospace;
   font-size: 14px;
   font-weight: 500;
   line-height: 1.6;
   word-break: break-all;
+
+  @media (max-width: 480px) {
+    font-size: 13px;
+  }
 }
 
 .memo-text {
@@ -1386,17 +1479,21 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 /* 本地筛选 */
 .local-filter-bar {
   display: flex;
+  gap: 12px;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 20px;
   padding: 0 4px;
+  margin-bottom: 20px;
 }
 
 .filter-input-wrapper {
   position: relative;
   flex: 1;
   max-width: 300px;
+
+  @media (max-width: 480px) {
+    max-width: 100%;
+  }
 }
 
 .filter-icon {
@@ -1410,17 +1507,15 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
 .local-filter-input {
   padding: 8px 32px;
+  font-size: 14px;
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   outline: none;
-  font-size: 14px;
-  transition: all 0.2s;
+  transition: all $transition-fast;
 
   &:focus {
-    background: #fff;
-    border-color: $primary;
-    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+    @include field-focus;
   }
 }
 
@@ -1431,13 +1526,13 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   width: 18px;
   height: 18px;
   padding: 0;
-  background: rgba(0, 0, 0, 0.1);
-  border: none;
-  border-radius: 50%;
-  color: #fff;
+  color: $white;
   font-size: 14px;
   line-height: 1;
   cursor: pointer;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 50%;
   transform: translateY(-50%);
 
   @include flex-center;
@@ -1464,8 +1559,8 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
 .loading-status {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   color: $text-secondary;
   font-size: 14px;
 }
@@ -1478,9 +1573,10 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
 /* 地图模式 */
 .map-mode {
+  width: 100%;
+  height: 69dvh;
   min-height: 400px;
   max-height: 69dvh;
-  height: 69dvh;
 
   @include flex-center;
 
@@ -1489,91 +1585,6 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
   }
 }
-
-/* 响应式 */
-@media (max-width: 768px) {
-  .yubao-page {
-    padding: 4px;
-  }
-
-  .content-area {
-    padding: 20px;
-  }
-
-  .tab-btn {
-    padding: 8px 12px;
-    font-size: 14px;
-  }
-
-  .inline-suggestion {
-    max-width: 90vw;
-  }
-
-  .cards-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .card {
-    padding: 16px 18px;
-  }
-
-  .word-text {
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 650px) {
-  .top-controls {
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .search-container {
-    width: 100%;
-  }
-}
-
-@media (max-width: 640px) {
-  .top-controls {
-    margin-bottom: 8px;
-  }
-
-  .header-container {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .tab-container {
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .cards-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .card {
-    gap: 12px;
-    padding: 14px 16px;
-  }
-
-  .word-text {
-    font-size: 16px;
-  }
-
-  .pronunciation-text,
-  .phonetic-text {
-    font-size: 13px;
-  }
-
-  .row-1 {
-    font-size: 11px;
-  }
-
-  .filter-input-wrapper {
-    max-width: 100%;
-  }
-}
 </style>
+```
+
