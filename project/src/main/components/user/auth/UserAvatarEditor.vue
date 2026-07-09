@@ -236,43 +236,58 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.user-avatar-editor {
-  display: inline-flex;
+$primary-blue: #007aff;
+$secondary-blue: #00c6ff;
+$white: #fff;
+
+$avatar-size: 64px;
+$avatar-size-landscape: 72px;
+
+$avatar-transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+$overlay-transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+@mixin flex-center {
+  display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.user-avatar-editor {
+  @include flex-center;
+
+  display: inline-flex;
   flex-shrink: 0;
 }
 
 .profile-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
+
+  width: $avatar-size;
+  height: $avatar-size;
+  color: $white;
   font-size: 22px;
   font-weight: 700;
-  color: white;
-  background: linear-gradient(135deg, #007aff, #00c6ff);
+  background: linear-gradient(135deg, $primary-blue, $secondary-blue);
+  border: 1.5px solid $white;
+  border-radius: 50%;
   box-shadow:
     0 6px 16px rgba(0, 122, 255, 0.2),
     inset 0 0 8px rgba(255, 255, 255, 0.2);
-  border: 1.5px solid white;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all $avatar-transition;
 
   @media (min-aspect-ratio: 1/1) {
-    width: 72px;
-    height: 72px;
+    width: $avatar-size-landscape;
+    height: $avatar-size-landscape;
     font-size: 24px;
   }
 }
 
 .clickable-avatar {
-  cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
   user-select: none;
+  transition: all $avatar-transition;
 
   &:hover {
     transform: scale(1.08) rotate(2deg) !important;
@@ -291,24 +306,23 @@ onMounted(() => {
   }
 
   .avatar-edit-overlay {
+    @include flex-center;
+
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: opacity $overlay-transition;
 
     .edit-overlay-text {
-      color: #ffffff;
+      color: $white;
       font-size: 13px;
       font-weight: 600;
       letter-spacing: 0.05em;
       transform: translateY(4px);
-      transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      transition: transform $overlay-transition;
     }
   }
 }

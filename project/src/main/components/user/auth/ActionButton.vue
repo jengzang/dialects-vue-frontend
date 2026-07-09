@@ -30,88 +30,99 @@ defineProps({
 defineEmits(['click'])
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$transition-duration: 0.3s;
+$mobile-aspect-ratio: 1 / 1;
+
+$solid-variants: (
+  blue: (
+    background: #007aff,
+    hover: #005fcc
+  ),
+  green: (
+    background: #28a745,
+    hover: #1f8a36
+  ),
+  danger: (
+    background: darkred,
+    hover: #a91f1f
+  ),
+  yellow: (
+    background: #f39c12,
+    hover: #e67e22
+  )
+);
+
+$gradient-variants: (
+  info: (
+    background: linear-gradient(135deg, #667eea, #764ba2),
+    hover: linear-gradient(135deg, #5568d3, #5f3d8a)
+  ),
+  teal: (
+    background: linear-gradient(135deg, #5ac8fa, #4a9fd8),
+    hover: linear-gradient(135deg, #4ab8e8, #3a8fc6)
+  )
+);
+
 .action-button {
-  padding: 14px 18px;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  color: white;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  max-width: 180px;
-  justify-content: center;
-  margin: 0 auto;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-}
+  max-width: 180px;
+  margin: 0 auto;
+  padding: 14px 18px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all $transition-duration ease;
 
-.action-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
 
-.btn-action.blue {
-  background-color: #007aff;
-}
-
-.btn-action.blue:hover:not(:disabled) {
-  background-color: #005fcc;
-}
-
-.btn-action.green {
-  background-color: #28a745;
-}
-
-.btn-action.green:hover:not(:disabled) {
-  background-color: #1f8a36;
-}
-
-.btn-action.danger {
-  background-color: darkred;
-}
-
-.btn-action.danger:hover:not(:disabled) {
-  background-color: #a91f1f;
-}
-
-.btn-action.info {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-}
-
-.btn-action.info:hover:not(:disabled) {
-  background: linear-gradient(135deg, #5568d3, #5f3d8a);
-}
-
-.btn-action.yellow {
-  background-color: #f39c12;
-  color: #ffffff;
-}
-
-.btn-action.yellow:hover:not(:disabled) {
-  background-color: #e67e22;
-}
-
-.btn-action.teal {
-  background: linear-gradient(135deg, #5AC8FA, #4A9FD8);
-  box-shadow: 0 4px 12px rgba(90, 200, 250, 0.3);
-}
-
-.btn-action.teal:hover:not(:disabled) {
-  background: linear-gradient(135deg, #4AB8E8, #3A8FC6);
-  box-shadow: 0 6px 16px rgba(90, 200, 250, 0.4);
-}
-
-
-
-/* Mobile responsive */
-@media (max-aspect-ratio: 1/1) {
-  .action-button {
-    font-size: 18px;
+  @media (max-aspect-ratio: $mobile-aspect-ratio) {
     padding: 12px 20px;
+    font-size: 18px;
+  }
+}
+
+.btn-action {
+  @each $name, $colors in $solid-variants {
+    &.#{$name} {
+      background-color: map-get($colors, background);
+
+      &:hover:not(:disabled) {
+        background-color: map-get($colors, hover);
+      }
+    }
+  }
+
+  @each $name, $colors in $gradient-variants {
+    &.#{$name} {
+      background: map-get($colors, background);
+
+      &:hover:not(:disabled) {
+        background: map-get($colors, hover);
+      }
+    }
+  }
+
+  &.yellow {
+    color: #fff;
+  }
+
+  &.teal {
+    box-shadow: 0 4px 12px rgba(90, 200, 250, 0.3);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 6px 16px rgba(90, 200, 250, 0.4);
+    }
   }
 }
 </style>

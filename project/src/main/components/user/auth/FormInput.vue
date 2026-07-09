@@ -69,77 +69,86 @@ const togglePasswordVisibility = () => {
 }
 </script>
 
-<style scoped>
+```vue
+<style scoped lang="scss">
+$primary-color: #007aff;
+$error-color: #ff3b30;
+$text-color: #333;
+$placeholder-color: #999;
+$control-right: 15px;
+$transition-duration: 0.3s;
+$glass-blur: 12px;
+
 .form-row {
-  width: 100%;
-  margin: 12px 0;
+  position: relative;
   display: flex;
   justify-content: center;
-  position: relative;
+  width: 100%;
+  margin: 12px 0;
 }
 
 .form-input {
   width: 100%;
   max-width: 320px;
-  padding: 14px 16px;
-  padding-right: 2em;
+  padding: 14px 2em 14px 16px;
+  color: $text-color;
   font-size: 16px;
+  background: rgba(255, 255, 255, 0.3);
   border: none;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.4),
-    0 4px 12px rgba(0, 0, 0, 0.08);
-  color: #333;
   outline: none;
-  transition: all 0.3s ease;
+  box-shadow:
+    inset 0 0 1px rgba(255, 255, 255, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur($glass-blur) saturate(180%);
+  -webkit-backdrop-filter: blur($glass-blur) saturate(180%);
+  transition: all $transition-duration ease;
+
+  &::placeholder {
+    color: $placeholder-color;
+  }
+
+  &:focus {
+    box-shadow:
+      0 0 0 2px $primary-color,
+      0 0 12px rgba(0, 122, 255, 0.2);
+  }
+
+  &.has-error {
+    box-shadow:
+      0 0 0 2px $error-color,
+      0 0 12px rgba(255, 59, 48, 0.2);
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    padding: 16px 2.5em 16px 16px;
+    font-size: 18px;
+  }
 }
 
-.form-input::placeholder {
-  color: #999;
-}
-
-.form-input:focus {
-  box-shadow: 0 0 0 2px #007aff, 0 0 12px rgba(0, 122, 255, 0.2);
-}
-
-.form-input.has-error {
-  box-shadow: 0 0 0 2px #ff3b30, 0 0 12px rgba(255, 59, 48, 0.2);
+.input-icon,
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: $control-right;
+  font-size: 16px;
+  user-select: none;
+  transform: translateY(-50%);
 }
 
 .input-icon {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
   color: transparent;
-  font-size: 16px;
   pointer-events: none;
-  user-select: none;
 }
 
 .password-toggle {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
   cursor: pointer;
-  user-select: none;
-  font-size: 16px;
   transition: transform 0.2s ease;
-}
 
-.password-toggle:hover {
-  transform: translateY(-50%) scale(1.1);
-}
-
-/* Mobile responsive */
-@media (max-aspect-ratio: 1/1) {
-  .form-input {
-    font-size: 18px;
-    padding: 16px;
-    padding-right: 2.5em;
+  &:hover {
+    transform: translateY(-50%) scale(1.1);
   }
 }
 </style>
+```
+

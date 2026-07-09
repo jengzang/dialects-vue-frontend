@@ -27,46 +27,52 @@ defineProps({
 defineEmits(['update:modelValue'])
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$primary-blue: #007aff;
+$text-color: #333;
+$border-color: #d0d0d0;
+$switcher-background: #f0f0f5;
+$white: #fff;
+$transition-duration: 0.25s;
+$mobile-aspect-ratio: 1 / 1;
+
 .tab-switcher {
   display: inline-flex;
-  border: 1px solid #d0d0d0;
-  border-radius: 12px;
   padding: 4px;
-  background-color: #f0f0f5;
+  background-color: $switcher-background;
+  border: 1px solid $border-color;
+  border-radius: 12px;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  @media (max-aspect-ratio: $mobile-aspect-ratio) {
+    gap: 8px;
+  }
 }
 
 .tab-button {
+  padding: 10px 16px;
+  color: $text-color;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
   appearance: none;
   background: none;
   border: none;
-  padding: 10px 16px;
   border-radius: 10px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: all 0.25s ease;
-  color: #333;
-  font-weight: 500;
-}
+  transition: all $transition-duration ease;
 
-.tab-button:hover {
-  background-color: rgba(0, 122, 255, 0.1);
-}
-
-.tab-button.active {
-  background-color: white;
-  color: #007aff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  font-weight: 600;
-}
-
-/* Mobile responsive */
-@media (max-aspect-ratio: 1/1) {
-  .tab-switcher {
-    gap: 8px;
+  &:hover {
+    background-color: rgba(0, 122, 255, 0.1);
   }
-  .tab-button{
+
+  &.active {
+    color: $primary-blue;
+    font-weight: 600;
+    background-color: $white;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-aspect-ratio: $mobile-aspect-ratio) {
     padding: 12px 6px;
   }
 }

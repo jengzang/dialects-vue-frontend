@@ -184,104 +184,157 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
+$primary-blue: #007aff;
+$primary-blue-dark: #0051d5;
+$text-primary: #1d1d1f;
+$text-secondary: #707077;
+$text-muted: #86868b;
+$white: #fff;
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+
+$transition-fast: 0.2s;
+$transition-base: 0.3s;
+$transition-slow: 0.4s;
+$standard-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
+$smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
+$card-easing: cubic-bezier(0.16, 1, 0.3, 1);
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin glass-blur($blur: 20px, $saturation: null) {
+  @if $saturation {
+    backdrop-filter: blur($blur) saturate($saturation);
+    -webkit-backdrop-filter: blur($blur) saturate($saturation);
+  } @else {
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+  }
+}
+
 .profile-overview {
   text-align: center;
 }
 
+/*
+ * 当前模板中的标题已注释。
+ * 保留选择器，避免删除未来可能恢复使用的样式。
+ */
 #login-title {
+  margin: 12px;
   font-size: 30px;
   font-weight: 600;
-  margin: 12px;
-  transition: all 0.3s ease;
   white-space: nowrap;
+  transition: all $transition-base ease;
 
   &:hover {
-    color: #007aff;
+    color: $primary-blue;
     text-shadow: 0 0 8px rgba(0, 122, 255, 0.6);
     transform: scale(1.05);
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    font-size: 28px !important;
   }
 }
 
 .header-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  justify-content: center;
+  @include flex-center;
+
   flex-wrap: wrap;
+  gap: 12px;
 }
 
 .profile-user-info {
-  margin: 10px auto;
   max-width: 600px;
+  margin: 10px auto;
   text-align: center;
 }
 
 .user-info-badge {
+  margin-bottom: 8px;
+  color: $text-primary;
   font-size: 18px;
   font-weight: 600;
-  color: #1d1d1f;
-  margin-bottom: 8px;
   letter-spacing: -0.01em;
+
+  @media (max-aspect-ratio: 1/1) {
+    font-size: 16px;
+  }
 }
 
 .user-number {
-  color: #007aff;
-  font-weight: 700;
-  font-size: 20px;
   padding: 0 4px;
+  color: $primary-blue;
+  font-size: 20px;
+  font-weight: 700;
+
+  @media (max-aspect-ratio: 1/1) {
+    font-size: 18px;
+  }
 }
 
 .user-info-details {
+  color: $text-secondary;
   font-size: 15px;
-  color: #707077;
   font-weight: 500;
-  letter-spacing: -0.01em;
   line-height: 1.4;
+  letter-spacing: -0.01em;
+
+  @media (max-aspect-ratio: 1/1) {
+    font-size: 14px;
+  }
 }
 
 /* Statistics Card - Apple Liquid Glass Style */
 .stats-card {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-radius: 24px;
-  padding: 16px 28px;
-  margin: 20px auto;
   max-width: 1000px;
+  margin: 20px auto;
+  padding: 16px 28px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 0.5px solid rgba(255, 255, 255, 0.8);
+  border-radius: $radius-xl;
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 8px 32px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px rgba(255, 255, 255, 0.9);
-  border: 0.5px solid rgba(255, 255, 255, 0.8);
+
+  @include glass-blur(40px, 180%);
 
   .stats-card-header {
+    @include flex-center;
+
+    gap: 12px;
+    margin-bottom: 20px;
+    color: $text-primary;
     font-size: 22px;
     font-weight: 700;
-    color: #1d1d1f;
-    margin-bottom: 20px;
     text-align: center;
     letter-spacing: -0.02em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
   }
 
   .stats-toggle-btn {
-    background: rgba(0, 122, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 0.5px solid rgba(0, 122, 255, 0.3);
-    border-radius: 8px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
     padding: 6px 12px;
+    color: $primary-blue;
     font-size: 14px;
     font-weight: 600;
-    color: #007aff;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    background: rgba(0, 122, 255, 0.1);
+    border: 0.5px solid rgba(0, 122, 255, 0.3);
+    border-radius: $radius-sm;
+    transition: all $transition-base $smooth-easing;
+
+    @include glass-blur(10px);
 
     &:hover {
       background: rgba(0, 122, 255, 0.15);
@@ -291,36 +344,41 @@ onMounted(async () => {
 
     .stats-toggle-icon {
       font-size: 10px;
-      transition: transform 0.3s ease;
+      transition: transform $transition-base ease;
     }
   }
 
   .stats-total {
-    background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(0, 122, 255, 0.05));
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    color: #007aff;
-    padding: 15px;
     margin-bottom: 8px;
-    border-radius: 16px;
-    text-align: center;
+    padding: 15px;
+    color: $primary-blue;
     font-size: 15px;
     font-weight: 600;
+    text-align: center;
     letter-spacing: -0.01em;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 122, 255, 0.1),
+      rgba(0, 122, 255, 0.05)
+    );
+    border: 0.5px solid rgba(0, 122, 255, 0.3);
+    border-radius: $radius-lg;
     box-shadow:
       0 2px 8px rgba(0, 122, 255, 0.12),
       inset 0 0 0 1px rgba(0, 122, 255, 0.2);
-    border: 0.5px solid rgba(0, 122, 255, 0.3);
+
+    @include glass-blur(20px);
 
     .stats-total-number {
+      display: block;
+      color: transparent;
       font-size: 42px;
       font-weight: 700;
-      display: block;
       letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #007aff, #0051d5);
+      background: linear-gradient(135deg, $primary-blue, $primary-blue-dark);
+      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
   }
 
@@ -336,20 +394,20 @@ onMounted(async () => {
   }
 
   .stat-category {
-    background: rgba(247, 247, 247, 0.5);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 16px;
     padding: 12px;
+    background: rgba(247, 247, 247, 0.5);
+    border: 0.5px solid rgba(255, 255, 255, 0.5);
+    border-radius: $radius-lg;
     box-shadow:
       0 1px 2px rgba(0, 0, 0, 0.04),
       inset 0 0 0 1px rgba(255, 255, 255, 0.6);
-    border: 0.5px solid rgba(255, 255, 255, 0.5);
+
+    @include glass-blur(20px);
 
     .stat-category-header {
       display: flex;
-      align-items: center;
       gap: 10px;
+      align-items: center;
       margin-bottom: 14px;
       padding-bottom: 12px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.06);
@@ -360,74 +418,95 @@ onMounted(async () => {
       }
 
       .stat-category-name {
+        flex: 1;
+        color: $text-primary;
         font-size: 16px;
         font-weight: 600;
-        color: #1d1d1f;
         letter-spacing: -0.01em;
-        flex: 1;
       }
 
       .stat-category-total {
+        padding: 4px 12px;
+        color: $primary-blue;
         font-size: 18px;
         font-weight: 700;
-        color: #007aff;
         letter-spacing: -0.02em;
         background: rgba(0, 122, 255, 0.08);
-        padding: 4px 12px;
-        border-radius: 8px;
+        border-radius: $radius-sm;
+      }
+
+      @media (max-aspect-ratio: 1/1) {
+        font-size: 14px;
+
+        .stat-category-name {
+          font-size: 14px;
+        }
+
+        .stat-category-total {
+          font-size: 16px;
+        }
       }
     }
 
     .stat-category-items {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
       gap: 8px;
+      justify-content: center;
+
+      @media (max-aspect-ratio: 1/1) {
+        grid-template-columns: 1fr;
+      }
     }
 
     .stat-item {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border-radius: 12px;
+      flex: 0 0 80px;
       padding: 8px 12px;
       text-align: center;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: default;
+      background: rgba(255, 255, 255, 0.7);
+      border: 0.5px solid rgba(255, 255, 255, 0.6);
+      border-radius: $radius-md;
       box-shadow:
         0 1px 2px rgba(0, 0, 0, 0.04),
         inset 0 0 0 1px rgba(255, 255, 255, 0.8);
-      border: 0.5px solid rgba(255, 255, 255, 0.6);
-      flex: 0 0 80px;
+      transition: all $transition-base $smooth-easing;
 
-      @media (max-aspect-ratio: 1/1) {
-        flex: 0 0 90px;
-      }
+      @include glass-blur(20px, 180%);
 
       &:hover {
-        transform: translateY(-2px) scale(1.03);
         background: rgba(255, 255, 255, 0.9);
+        border-color: rgba(0, 122, 255, 0.5);
         box-shadow:
           0 4px 12px rgba(0, 122, 255, 0.15),
           inset 0 0 0 1.5px rgba(0, 122, 255, 0.4);
-        border-color: rgba(0, 122, 255, 0.5);
+        transform: translateY(-2px) scale(1.03);
       }
 
       .stat-item-label {
-        font-size: 12px;
-        color: #86868b;
         margin-bottom: 8px;
+        color: $text-muted;
+        font-size: 12px;
         font-weight: 500;
         letter-spacing: -0.01em;
       }
 
       .stat-item-count {
+        color: $primary-blue;
         font-size: 22px;
         font-weight: 700;
-        color: #007aff;
         letter-spacing: -0.02em;
       }
+
+      @media (max-aspect-ratio: 1/1) {
+        flex: 0 0 90px;
+        padding: 12px;
+      }
     }
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    padding: 12px 20px !important;
   }
 }
 
@@ -435,86 +514,90 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  margin-top: 16px;
   width: 100%;
   max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 16px auto 0;
+
+  /*
+   * 原样式在移动端设置 flex-direction，
+   * 但该容器仍为 grid。保留该声明以维持现有行为。
+   */
+  @media (max-aspect-ratio: 1/1) {
+    flex-direction: column;
+  }
 }
 
 .benefit-circle-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
+
   width: 35px;
   height: 35px;
   padding: 0;
-  border-radius: 50%;
-  background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   user-select: none;
+  background-color: $white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all $transition-fast $standard-easing;
 
   &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.15);
     border-color: rgba(255, 149, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.15);
+    transform: translateY(-1px);
   }
 
   &:active {
-    transform: translateY(0) scale(0.96);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    transform: translateY(0) scale(0.96);
   }
 }
 
 /* User Profile Card - Premium Glassmorphism */
 .user-profile-card {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 24px;
-  padding: 20px 24px;
-  margin: 16px auto;
   max-width: 600px;
+  margin: 16px auto;
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+  border-radius: $radius-xl;
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 12px 40px rgba(0, 0, 0, 0.06),
     inset 0 0 0 1px rgba(255, 255, 255, 0.7);
-  border: 0.5px solid rgba(255, 255, 255, 0.5);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all $transition-slow $card-easing;
+
+  @include glass-blur(20px, 180%);
 
   &:hover {
-    transform: translateY(-2px);
+    border-color: rgba(0, 122, 255, 0.15);
     box-shadow:
       0 1px 2px rgba(0, 0, 0, 0.04),
       0 20px 48px rgba(0, 122, 255, 0.08),
       inset 0 0 0 1px rgba(255, 255, 255, 0.9);
-    border-color: rgba(0, 122, 255, 0.15);
+    transform: translateY(-2px);
   }
 
   @media (min-aspect-ratio: 1/1) {
-    padding: 24px 30px;
-    margin: 24px auto;
     max-width: 650px;
+    margin: 24px auto;
+    padding: 24px 30px;
   }
 }
 
 .profile-avatar-wrapper {
-  display: flex;
+  @include flex-center;
+
   flex-direction: row;
-  align-items: center;
   gap: 20px;
   margin-bottom: 20px;
-  justify-content: center;
 
   &:hover {
     :deep(.profile-avatar) {
-      transform: scale(1.06) rotate(3deg);
       box-shadow: 0 8px 18px rgba(0, 122, 255, 0.3);
+      transform: scale(1.06) rotate(3deg);
     }
   }
 
@@ -535,10 +618,10 @@ onMounted(async () => {
   white-space: nowrap;
 
   .user-info-badge {
+    margin-bottom: 0;
+    color: $text-muted;
     font-size: 13px;
     font-weight: 600;
-    color: #86868b;
-    margin-bottom: 0px;
     letter-spacing: -0.01em;
 
     :deep(.user-number) {
@@ -556,28 +639,28 @@ onMounted(async () => {
 }
 
 .profile-username {
+  margin-bottom: 2px;
+  color: $text-primary;
   font-size: 20px;
   font-weight: 700;
-  color: #1d1d1f;
-  margin-bottom: 2px;
   letter-spacing: -0.02em;
 
   @media (min-aspect-ratio: 1/1) {
-    font-size: 22px;
     margin-bottom: 4px;
+    font-size: 22px;
   }
 }
 
 .profile-email {
-  font-size: 13.5px;
-  color: #707077;
-  font-weight: 500;
   margin-bottom: 3px;
+  color: $text-secondary;
+  font-size: 13.5px;
+  font-weight: 500;
   letter-spacing: -0.01em;
 
   @media (min-aspect-ratio: 1/1) {
-    font-size: 14.5px;
     margin-bottom: 4px;
+    font-size: 14.5px;
   }
 }
 
@@ -616,24 +699,24 @@ onMounted(async () => {
 
 .metric-item {
   display: flex;
-  align-items: center;
   gap: 12px;
+  align-items: center;
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.85);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
   border-radius: 18px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.02),
     inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+  transition: all $transition-base $standard-easing;
 
   &:hover {
-    transform: translateY(-2px);
-    background: white;
+    background: $white;
+    border-color: rgba(0, 122, 255, 0.3);
     box-shadow:
       0 8px 24px rgba(0, 0, 0, 0.05),
       inset 0 0 0 1.5px rgba(0, 122, 255, 0.2);
-    border-color: rgba(0, 122, 255, 0.3);
+    transform: translateY(-2px);
   }
 
   &.clickable {
@@ -653,14 +736,14 @@ onMounted(async () => {
   }
 
   @media (max-width: 576px) {
-    padding: 8px 12px;
     gap: 8px;
-    border-radius: 12px;
+    padding: 8px 12px;
+    border-radius: $radius-md;
   }
 
   @media (min-aspect-ratio: 1/1) {
-    padding: 14px 20px;
     gap: 14px;
+    padding: 14px 20px;
   }
 }
 
@@ -684,11 +767,11 @@ onMounted(async () => {
 }
 
 .metric-label {
+  color: $text-muted;
   font-size: 11px;
-  color: #86868b;
   font-weight: 600;
-  letter-spacing: -0.01em;
   text-transform: uppercase;
+  letter-spacing: -0.01em;
 
   @media (max-width: 576px) {
     font-size: 10px;
@@ -700,70 +783,23 @@ onMounted(async () => {
 }
 
 .metric-value {
-  font-size: 14px;
-  color: #1d1d1f;
-  font-weight: 700;
   margin-top: 3px;
+  color: $text-primary;
+  font-size: 14px;
+  font-weight: 700;
   letter-spacing: -0.01em;
 
   &.count-number {
-    color: #007aff;
+    color: $primary-blue;
   }
 
   @media (max-width: 576px) {
-    font-size: 13px;
     margin-top: 1px;
+    font-size: 13px;
   }
 
   @media (min-aspect-ratio: 1/1) {
     font-size: 15px;
-  }
-}
-
-/* Mobile responsive */
-@media (max-aspect-ratio: 1/1) {
-  #login-title {
-    font-size: 28px !important;
-  }
-
-  .user-info-badge {
-    font-size: 16px;
-  }
-
-  .user-number {
-    font-size: 18px;
-  }
-
-  .user-info-details {
-    font-size: 14px;
-  }
-
-  .stats-card {
-    padding: 12px 20px !important;
-  }
-
-  .stat-category-items {
-    grid-template-columns: 1fr;
-  }
-
-  .stat-item {
-    padding: 12px;
-  }
-
-  .stat-category-header {
-    font-size: 14px;
-
-    .stat-category-name {
-      font-size: 14px;
-    }
-
-    .stat-category-total {
-      font-size: 16px;
-    }
-  }
-
-  .action-buttons {
-    flex-direction: column;
   }
 }
 </style>
