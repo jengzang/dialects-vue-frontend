@@ -330,12 +330,13 @@ import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
+import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import {
   downloadJyut2IpaResult,
-  processJyut2Ipa,
   getJyut2IpaProgress,
-  uploadJyutFile
+  processJyut2Ipa,
+  uploadJyutFile,
 } from '@/api'
 import { showConfirm, showError, showSuccess } from '@/utils/message.js'
 
@@ -351,7 +352,7 @@ const pendingPreviewFile = ref(null)
 const previewConfirmKey = ref(0)
 const fileImportPayload = ref(null)
 const importInput = ref(null)
-const shouldAlwaysConfirmImport = ref(false)
+const requireExplicitConfirmation = ref(false)
 const isDragOver = ref(false)
 const processing = ref(false)
 const completed = ref(false)
@@ -400,9 +401,46 @@ const jyutImportSchema = computed(() => ([
 const jyutPreviewState = useTabularImportPreview({
   schema: jyutImportSchema,
   previewRowCount: 8,
-  requireExplicitConfirmation: () => shouldAlwaysConfirmImport.value
+  requireExplicitConfirmation: () => requireExplicitConfirmation.value
 })
-const isJyutImportReady = computed(() => !!fileImportPayload.value?.isComplete)
+const fileImportFlow = useTabularImportFlow({
+  previewState: jyutPreviewState,
+  pendingFileRef: pendingPreviewFile,
+  payloadRef: fileImportPayload,
+  confirmKeyRef: previewConfirmKey,
+  beforePreview: async (file) => {
+    const isAllowed = await requireAuth({
+      message: t('tools.jyut2ipa.validation.loginRequired'),
+    })
+    if (!isAllowed) {
+      return false
+    }
+
+    if (!file.name.match(/\.(xlsx|xls)$/i)) {
+      showError(t('tools.jyut2ipa.validation.invalidFileType'))
+      return false
+    }
+
+    if (file.size > 3 * 1024 * 1024) {
+      showError(t('tools.jyut2ipa.validation.fileTooLarge'))
+      return false
+    }
+
+    return true
+  },
+  onAutoApply: async () => {
+    await confirmPreviewAndProcess()
+  },
+  onPreviewError: (error) => {
+    showError(t('tools.jyut2ipa.messages.previewFailed', { message: error.message }))
+  },
+  resetInput: () => {
+    if (fileInput.value) {
+      fileInput.value.value = ''
+    }
+  }
+})
+const isJyutImportReady = computed(() => fileImportFlow.isReady.value)
 const jyutImportSummary = computed(() => {
   if (!fileImportPayload.value) {
     return ''
@@ -591,7 +629,7 @@ const handleImportFile = async (event) => {
 const handleFileSelect = (event) => {
   const file = event.target.files[0]
   if (file) {
-    previewFile(file)
+    fileImportFlow.loadPreview(file)
   }
 }
 
@@ -599,7 +637,7 @@ const handleDrop = (event) => {
   isDragOver.value = false
   const file = event.dataTransfer.files[0]
   if (file) {
-    previewFile(file)
+    fileImportFlow.loadPreview(file)
   }
 }
 
@@ -645,7 +683,7 @@ const applyProgressData = (progressData) => {
   completed.value = true
 }
 
-const processFile = async (file) => {
+const processFile = async (file, options = {}) => {
   const isAllowed = await requireAuth({
     message: t('tools.jyut2ipa.validation.loginRequired'),
   })
@@ -672,7 +710,7 @@ const processFile = async (file) => {
   taskId.value = null
   try {
     processingText.value = t('tools.jyut2ipa.processing.uploading')
-    const uploadData = await uploadJyutFile(file)
+    const uploadData = await uploadJyutFile(file, options)
 
     taskId.value = uploadData.task_id
 
@@ -704,53 +742,15 @@ const processFile = async (file) => {
 }
 
 const previewFile = async (file) => {
-  const isAllowed = await requireAuth({
-    message: t('tools.jyut2ipa.validation.loginRequired'),
-  })
-  if (!isAllowed) {
-    return
-  }
-
-  if (!file.name.match(/\.(xlsx|xls)$/i)) {
-    showError(t('tools.jyut2ipa.validation.invalidFileType'))
-    return
-  }
-
-  if (file.size > 3 * 1024 * 1024) {
-    showError(t('tools.jyut2ipa.validation.fileTooLarge'))
-    return
-  }
-
-  pendingPreviewFile.value = file
-  previewConfirmKey.value += 1
-
-  try {
-    await jyutPreviewState.loadFile(file)
-    fileImportPayload.value = jyutPreviewState.summary.value
-
-    if (jyutPreviewState.canAutoApply.value) {
-      await confirmPreviewAndProcess()
-    }
-  } catch (error) {
-    pendingPreviewFile.value = null
-    fileImportPayload.value = null
-    jyutPreviewState.resetState()
-    showError(t('tools.jyut2ipa.messages.previewFailed', { message: error.message }))
-  }
+  await fileImportFlow.loadPreview(file)
 }
 
 const handleJyutMappingUpdate = ({ fieldKey, sourceKey }) => {
-  jyutPreviewState.updateMapping(fieldKey, sourceKey)
-  fileImportPayload.value = jyutPreviewState.summary.value
+  fileImportFlow.updateManualMapping({ fieldKey, sourceKey })
 }
 
 const clearPendingPreview = () => {
-  pendingPreviewFile.value = null
-  fileImportPayload.value = null
-  jyutPreviewState.resetState()
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
+  fileImportFlow.clearPreview()
 }
 
 const confirmPreviewAndProcess = async () => {
@@ -759,9 +759,19 @@ const confirmPreviewAndProcess = async () => {
     return
   }
 
+  const activeSheet = jyutPreviewState.previewTable.value?.activeSheet
+  const columnMapping = {
+    headerJyutping: jyutPreviewState.mapping.value.jyutping || null,
+    headerChar: jyutPreviewState.mapping.value.char || null
+  }
+
   const selectedFile = pendingPreviewFile.value
-  clearPendingPreview()
-  await processFile(selectedFile)
+  fileImportFlow.clearPreview()
+  await processFile(selectedFile, {
+    columnMapping,
+    headerRowIndex: jyutPreviewState.headerRowIndex.value,
+    sheetName: activeSheet?.name || null
+  })
 }
 
 const downloadResult = async () => {

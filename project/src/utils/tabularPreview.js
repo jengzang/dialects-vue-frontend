@@ -4,6 +4,8 @@ const EXCEL_FILE_PATTERN = /\.(xlsx|xls)$/i
 const CSV_FILE_PATTERN = /\.csv$/i
 const TABULAR_FILE_PATTERN = /\.(xlsx|xls|csv)$/i
 
+export const DEFAULT_PREVIEW_ROW_COUNT = 8
+
 function normalizeCellValue(value) {
   if (value === null || value === undefined) {
     return ''

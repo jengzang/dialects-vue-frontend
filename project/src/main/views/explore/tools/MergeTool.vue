@@ -114,13 +114,22 @@
             <button
               class="main-glass-button"
               data-variant="secondary"
-              @click="showDefaultReference"
+              @click="previewDefaultReference"
               :disabled="isLoadingRef"
             >
               <span class="icon">{{ isLoadingRef ? '⏳' : '👁️' }}</span>
               <span>
                 {{ isLoadingRef ? t('tools.merge.reference.loadingDefault') : t('tools.merge.reference.viewDefault') }}
               </span>
+            </button>
+            <button
+              v-if="!pendingReferenceFile"
+              class="main-glass-button"
+              data-variant="secondary"
+              @click="downloadDefaultReference"
+            >
+              <span class="icon">⬇️</span>
+              <span>{{ t('tools.merge.reference.downloadDefault') }}</span>
             </button>
             <button
               class="main-glass-button"
@@ -288,103 +297,18 @@
         </div>
       </div>
     </div>
-
-    <AppModal
-      :model-value="showDefaultRefModal"
-      size="lg"
-      :title="t('tools.merge.modal.title')"
-      :close-label="t('tools.common.close')"
-      :z-index="1500"
-      @update:modelValue="showDefaultRefModal = false"
-    >
-      <div class="merge-default-ref-tabs">
-          <button
-            class="tab-btn"
-            :class="{ active: currentTab === 'main' }"
-            @click="currentTab = 'main'"
-          >
-            {{ t('tools.merge.modal.mainTable') }} ({{ mainTableData.length }})
-          </button>
-          <button
-            class="tab-btn"
-            :class="{ active: currentTab === 'supplement' }"
-            @click="currentTab = 'supplement'"
-          >
-            {{ t('tools.merge.modal.supplementTable') }} ({{ supplementTableData.length }})
-          </button>
-        </div>
-
-      <div class="merge-default-ref-content">
-        <div class="table-container ui-scrollbar">
-            <table v-if="currentTab === 'main'" class="data-table">
-              <thead>
-                <tr>
-                  <th v-for="(col, index) in mainTableHeaders" :key="index">{{ col }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(row, index) in displayedMainData" :key="index">
-                  <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell || '' }}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <table v-if="currentTab === 'supplement'" class="data-table">
-              <thead>
-                <tr>
-                  <th v-for="(col, index) in supplementTableHeaders" :key="index">{{ col }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(row, index) in displayedSupplementData" :key="index">
-                  <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell || '' }}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div v-if="hasMoreData" class="load-more-hint">
-              {{
-                t('tools.merge.modal.showingRows', {
-                  displayed: maxDisplayRows,
-                  total: currentTab === 'main' ? mainTableData.length : supplementTableData.length
-                })
-              }}
-            </div>
-        </div>
-      </div>
-
-      <template #footer>
-<!--        <div class="merge-default-ref-footer">-->
-        <button class="main-glass-button" data-variant="primary" @click="downloadDefaultReference">
-            <span class="icon">⬇️</span>
-            <span>{{ t('tools.merge.modal.downloadDefault') }}</span>
-          </button>
-          <button
-              class="main-glass-button"
-              data-variant="secondary"
-              @click="useDefaultReference"
-              style="background: rgba(31,138,54,0.43)"
-          >
-            <span class="icon">✅</span>
-            <span>{{ t('tools.merge.modal.useDefault') }}</span>
-        </button>
-<!--        </div>-->
-      </template>
-    </AppModal>
   </div>
 </template>
 
 <script setup>
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import * as XLSX from 'xlsx'
-import AppModal from '@/components/common/AppModal.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { downloadMerge, executeMerge, getMergeProgress, uploadFiles, uploadReference } from '@/api'
 import { showError, showSuccess } from '@/utils/message.js'
-import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
+import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import defaultReferenceWorkbookUrl from '/data/参考表.xlsx?url'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -395,9 +319,8 @@ const { requireAuth } = useAuthGuard({
 })
 
 const DEFAULT_REFERENCE_PATH = defaultReferenceWorkbookUrl
+const DEFAULT_REFERENCE_SENTINEL = '__default_reference__'
 const DEFAULT_REFERENCE_FILE_NAME = '参考表.xlsx'
-const MAIN_SHEET_NAME = '主表'
-const SUPPLEMENT_SHEET_NAME = '補充表'
 const MERGE_RESULT_FILE_NAME = '方音圖鑑_合併字表.xlsx'
 
 const currentStep = ref(1)
@@ -415,7 +338,7 @@ const taskId = ref(null)
 
 const refInput = ref(null)
 const filesInput = ref(null)
-const shouldAlwaysConfirmReferenceImport = ref(false)
+const requireExplicitConfirmation = ref(false)
 
 const referenceStats = reactive({
   charCount: 0,
@@ -432,26 +355,12 @@ const mergeStats = reactive({
 })
 
 const mergedFilesList = ref([])
-const loadDefaultReferenceTask = useAsyncTask()
 const mergePollingTask = usePollingTask({
   intervalMs: 1000,
   maxFailures: 3,
 })
 
-// 默认参考表相关
-const showDefaultRefModal = ref(false)
-const currentTab = ref('main')
-const mainTableHeaders = ref([])
-const mainTableData = ref([])
-const supplementTableHeaders = ref([])
-const supplementTableData = ref([])
-const defaultRefWorkbook = ref(null)
-const maxDisplayRows = 500 // 限制显示行数，提升性能
-const isLoadingRef = loadDefaultReferenceTask.loading
-
-// 计算属性：限制显示的数据量
-const displayedMainData = computed(() => mainTableData.value.slice(0, maxDisplayRows))
-const displayedSupplementData = computed(() => supplementTableData.value.slice(0, maxDisplayRows))
+const isLoadingRef = computed(() => referencePreviewState.loading.value)
 const referenceImportSchema = computed(() => ([
   {
     key: 'char',
@@ -492,9 +401,60 @@ const referenceImportSchema = computed(() => ([
 const referencePreviewState = useTabularImportPreview({
   schema: referenceImportSchema,
   previewRowCount: 8,
-  requireExplicitConfirmation: () => shouldAlwaysConfirmReferenceImport.value
+  requireExplicitConfirmation: () => requireExplicitConfirmation.value
 })
-const isReferenceImportReady = computed(() => !!referenceImportPayload.value?.isComplete)
+const referenceImportFlow = useTabularImportFlow({
+  previewState: referencePreviewState,
+  pendingFileRef: pendingReferenceFile,
+  payloadRef: referenceImportPayload,
+  confirmKeyRef: referenceImportConfirmKey,
+  beforePreview: async (file) => {
+    const authed = await requireAuth({
+      message: t('tools.merge.validation.loginRequired'),
+      redirect: '/explore/tools/merge',
+    })
+    if (!authed) {
+      return false
+    }
+
+    if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
+      showError(t('tools.merge.validation.invalidFileType'))
+      return false
+    }
+
+    if (file.size > 3 * 1024 * 1024) {
+      showError(t('tools.merge.validation.referenceFileTooLarge'))
+      return false
+    }
+
+    return true
+  },
+  createPreviewFile: async (file) => {
+    if (file === DEFAULT_REFERENCE_SENTINEL) {
+      const response = await fetch(DEFAULT_REFERENCE_PATH)
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+      const blob = await response.blob()
+      return new File([blob], DEFAULT_REFERENCE_FILE_NAME, {
+        type: blob.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      })
+    }
+    return file
+  },
+  onAutoApply: async () => {
+    await handleReferenceConfirm()
+  },
+  onPreviewError: (error) => {
+    showError(t('tools.merge.messages.previewFailed', { message: error.message }))
+  },
+  resetInput: () => {
+    if (refInput.value) {
+      refInput.value.value = ''
+    }
+  }
+})
+const isReferenceImportReady = computed(() => referenceImportFlow.isReady.value)
 const referenceImportSummary = computed(() => {
   if (!referenceImportPayload.value) {
     return ''
@@ -507,18 +467,11 @@ const referenceImportSummary = computed(() => {
     columnCount
   })
 })
-const hasMoreData = computed(() => {
-  if (currentTab.value === 'main') {
-    return mainTableData.value.length > maxDisplayRows
-  } else {
-    return supplementTableData.value.length > maxDisplayRows
-  }
-})
 
 const handleRefSelect = (event) => {
   const file = event.target.files[0]
   if (file) {
-    previewReferenceFile(file)
+    referenceImportFlow.loadPreview(file)
   }
 }
 
@@ -526,7 +479,7 @@ const handleRefDrop = (event) => {
   dragOver1.value = false
   const file = event.dataTransfer.files[0]
   if (file) {
-    previewReferenceFile(file)
+    referenceImportFlow.loadPreview(file)
   }
 }
 
@@ -586,40 +539,7 @@ const setReferenceFile = async (file, options = {}) => {
 }
 
 const previewReferenceFile = async (file) => {
-  const authed = await requireAuth({
-    message: t('tools.merge.validation.loginRequired'),
-    redirect: '/explore/tools/merge',
-  })
-  if (!authed) {
-    return
-  }
-
-  if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
-    showError(t('tools.merge.validation.invalidFileType'))
-    return
-  }
-
-  if (file.size > 3 * 1024 * 1024) {
-    showError(t('tools.merge.validation.referenceFileTooLarge'))
-    return
-  }
-
-  pendingReferenceFile.value = file
-  referenceImportConfirmKey.value += 1
-
-  try {
-    await referencePreviewState.loadFile(file)
-    referenceImportPayload.value = referencePreviewState.summary.value
-
-    if (referencePreviewState.canAutoApply.value) {
-      await handleReferenceConfirm()
-    }
-  } catch (error) {
-    pendingReferenceFile.value = null
-    referenceImportPayload.value = null
-    referencePreviewState.resetState()
-    showError(t('tools.merge.messages.previewFailed', { message: error.message }))
-  }
+  await referenceImportFlow.loadPreview(file)
 }
 
 const handleReferenceMappingUpdate = ({ fieldKey, sourceKey }) => {
@@ -628,24 +548,14 @@ const handleReferenceMappingUpdate = ({ fieldKey, sourceKey }) => {
 }
 
 const clearPendingReference = () => {
-  pendingReferenceFile.value = null
-  referenceImportPayload.value = null
-  referencePreviewState.resetState()
-  if (refInput.value) {
-    refInput.value.value = ''
-  }
+  referenceImportFlow.clearPreview()
 }
 
 const removeReference = () => {
   referenceFile.value = null
-  pendingReferenceFile.value = null
-  referenceImportPayload.value = null
+  referenceImportFlow.clearPreview()
   referenceStats.charCount = 0
   referenceStats.columnCount = 0
-  referencePreviewState.resetState()
-  if (refInput.value) {
-    refInput.value.value = ''
-  }
 }
 
 const handleFilesSelect = (event) => {
@@ -824,46 +734,18 @@ const downloadMerged = async () => {
   }
 }
 
-const showDefaultReference = async () => {
+const previewDefaultReference = async () => {
   if (isLoadingRef.value) return
 
-  await loadDefaultReferenceTask.run(async () => {
-    const response = await fetch(DEFAULT_REFERENCE_PATH)
-    const arrayBuffer = await response.arrayBuffer()
-    const workbook = XLSX.read(arrayBuffer, { type: 'array' })
-
-    defaultRefWorkbook.value = workbook
-
-    if (workbook.SheetNames.includes(MAIN_SHEET_NAME)) {
-      const mainSheet = workbook.Sheets[MAIN_SHEET_NAME]
-      const mainData = XLSX.utils.sheet_to_json(mainSheet, { header: 1 })
-      if (mainData.length > 0) {
-        mainTableHeaders.value = mainData[0]
-        mainTableData.value = mainData.slice(1)
-      }
-    }
-
-    if (workbook.SheetNames.includes(SUPPLEMENT_SHEET_NAME)) {
-      const supplementSheet = workbook.Sheets[SUPPLEMENT_SHEET_NAME]
-      const supplementData = XLSX.utils.sheet_to_json(supplementSheet, { header: 1 })
-      if (supplementData.length > 0) {
-        supplementTableHeaders.value = supplementData[0]
-        supplementTableData.value = supplementData.slice(1)
-      }
-    }
-
-    showDefaultRefModal.value = true
-    currentTab.value = 'main'
-  }, {
-    onError: (error) => {
-      showError(t('tools.merge.messages.readDefaultFailed', { message: error.message }))
-    }
-  })
+  await referenceImportFlow.loadPreview(DEFAULT_REFERENCE_SENTINEL)
 }
 
 const downloadDefaultReference = async () => {
   try {
     const response = await fetch(DEFAULT_REFERENCE_PATH)
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
     const blob = await response.blob()
 
     const url = window.URL.createObjectURL(blob)
@@ -903,6 +785,7 @@ const reset = () => {
   mergePollingTask.stop()
   currentStep.value = 1
   referenceFile.value = null
+  referenceImportFlow.clearPreview()
   mergeFiles.value = []
   processing.value = false
   progress.value = 0

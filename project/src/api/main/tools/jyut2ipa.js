@@ -10,26 +10,37 @@ import { showError } from '@/utils/message.js'
  */
 
 /**
- * @typedef {Object} Jyut2IpaProgress
- * @property {string} task_id - 任务ID
- * @property {'pending'|'processing'|'completed'|'error'} status - 任务状态
- * @property {number} progress - 进度（0-100）
- * @property {string} [message] - 状态消息
- * @property {string} [error] - 错误信息（可选）
- */
-
-/**
  * 上传粤拼文件
  * @param {File} file - 粤拼文件（.xlsx 或 .xls）
+ * @param {Object} [options] - 附加选项
+ * @param {Object|null} [options.columnMapping] - 列匹配结果
+ * @param {number|null} [options.headerRowIndex] - 表头所在行（从 0 开始）
+ * @param {string|null} [options.sheetName] - 选中的工作表名称
  * @returns {Promise<Jyut2IpaUploadResponse>} 上传结果
  * @throws {Error} 上传失败
  * @example
- * const result = await uploadJyutFile(file)
+ * const result = await uploadJyutFile(file, {
+ *   columnMapping: { jyutping: 'column_1', char: 'column_2' }
+ * })
  * console.log(result.task_id)
  */
-export async function uploadJyutFile(file) {
+export async function uploadJyutFile(file, options = {}) {
   const formData = new FormData()
   formData.append('file', file)
+
+  const { columnMapping = null, headerRowIndex = null, sheetName = null } = options
+
+  if (columnMapping) {
+    formData.append('column_mapping', JSON.stringify(columnMapping))
+  }
+
+  if (headerRowIndex !== null && headerRowIndex !== undefined) {
+    formData.append('header_row_index', String(headerRowIndex))
+  }
+
+  if (sheetName) {
+    formData.append('sheet_name', sheetName)
+  }
 
   try {
     return await api('/api/tools/jyut2ipa/upload', {

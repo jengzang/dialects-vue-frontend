@@ -1,12 +1,12 @@
 import { computed, ref, watch } from 'vue'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { autoMatchColumns, buildMappingDiagnostics } from '@/utils/columnMapping.js'
-import { derivePreviewTable, parseTabularFile } from '@/utils/tabularPreview.js'
+import { DEFAULT_PREVIEW_ROW_COUNT, derivePreviewTable, parseTabularFile } from '@/utils/tabularPreview.js'
 
 export function useTabularImportPreview(options = {}) {
   const {
     schema = ref([]),
-    previewRowCount = 8,
+    previewRowCount = DEFAULT_PREVIEW_ROW_COUNT,
     requireExplicitConfirmation = false
   } = options
 

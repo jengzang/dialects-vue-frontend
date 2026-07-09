@@ -938,6 +938,7 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
+import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import {
   uploadCheckFile,
@@ -968,7 +969,7 @@ const isUploading = ref(false) // 上传加载状态
 const pendingPreviewFile = ref(null)
 const previewConfirmKey = ref(0)
 const checkImportPayload = ref(null)
-const shouldAlwaysConfirmImport = ref(false)
+const requireExplicitConfirmation = ref(false)
 
 // 数据
 const allData = ref([])
@@ -1097,9 +1098,49 @@ const checkImportSchema = computed(() => ([
 const checkPreviewState = useTabularImportPreview({
   schema: checkImportSchema,
   previewRowCount: 8,
-  requireExplicitConfirmation: () => shouldAlwaysConfirmImport.value
+  requireExplicitConfirmation: () => requireExplicitConfirmation.value
 })
-const isCheckImportReady = computed(() => !!checkImportPayload.value?.isComplete)
+const checkImportFlow = useTabularImportFlow({
+  previewState: checkPreviewState,
+  pendingFileRef: pendingPreviewFile,
+  payloadRef: checkImportPayload,
+  confirmKeyRef: previewConfirmKey,
+  beforePreview: async (file) => {
+    const isAllowed = await requireAuth({
+      message: t('tools.checkTool.messages.loginRequired'),
+    })
+    if (!isAllowed) {
+      return false
+    }
+
+    const allowedExts = ['.xlsx', '.xls']
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
+
+    if (!allowedExts.includes(ext)) {
+      showError(t('tools.checkTool.messages.previewInvalidFileType'))
+      return false
+    }
+
+    if (file.size > 3 * 1024 * 1024) {
+      showError(t('tools.checkTool.messages.fileTooLarge'))
+      return false
+    }
+
+    return true
+  },
+  onAutoApply: async () => {
+    await confirmPreviewAndUpload()
+  },
+  onPreviewError: (error) => {
+    showError(t('tools.checkTool.messages.previewFailed', { message: error.message }))
+  },
+  resetInput: () => {
+    if (fileInput.value) {
+      fileInput.value.value = ''
+    }
+  }
+})
+const isCheckImportReady = computed(() => checkImportFlow.isReady.value)
 const checkImportSummary = computed(() => {
   if (!checkImportPayload.value) {
     return ''
@@ -1280,18 +1321,18 @@ const handleDrop = (event) => {
   isDragOver.value = false
   const file = event.dataTransfer.files[0]
   if (file) {
-    previewFile(file)
+    checkImportFlow.loadPreview(file)
   }
 }
 
 const handleFileUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
-    previewFile(file)
+    checkImportFlow.loadPreview(file)
   }
 }
 
-const uploadFile = async (file) => {
+const uploadFile = async (file, options = {}) => {
   const isAllowed = await requireAuth({
     message: t('tools.checkTool.messages.loginRequired'),
   })
@@ -1317,7 +1358,7 @@ const uploadFile = async (file) => {
   await uploadTask.run(
     async () => {
       isUploading.value = true
-      const data = await uploadCheckFile(file, selectedFormat.value || 'excel', isSimplified.value)
+      const data = await uploadCheckFile(file, selectedFormat.value || 'excel', isSimplified.value, options)
 
       taskId.value = data.task_id
       totalRows.value = data.total_rows || 0
@@ -1337,56 +1378,15 @@ const uploadFile = async (file) => {
 }
 
 const previewFile = async (file) => {
-  const isAllowed = await requireAuth({
-    message: t('tools.checkTool.messages.loginRequired'),
-  })
-  if (!isAllowed) {
-    return
-  }
-
-  const allowedExts = ['.xlsx', '.xls']
-  const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
-
-  if (!allowedExts.includes(ext)) {
-    showError(t('tools.checkTool.messages.previewInvalidFileType'))
-    return
-  }
-
-  if (file.size > 3 * 1024 * 1024) {
-    showError(t('tools.checkTool.messages.fileTooLarge'))
-    return
-  }
-
-  pendingPreviewFile.value = file
-  previewConfirmKey.value += 1
-
-  try {
-    await checkPreviewState.loadFile(file)
-    checkImportPayload.value = checkPreviewState.summary.value
-
-    if (checkPreviewState.canAutoApply.value) {
-      await confirmPreviewAndUpload()
-    }
-  } catch (error) {
-    pendingPreviewFile.value = null
-    checkImportPayload.value = null
-    checkPreviewState.resetState()
-    showError(t('tools.checkTool.messages.previewFailed', { message: error.message }))
-  }
+  await checkImportFlow.loadPreview(file)
 }
 
 const handleCheckMappingUpdate = ({ fieldKey, sourceKey }) => {
-  checkPreviewState.updateMapping(fieldKey, sourceKey)
-  checkImportPayload.value = checkPreviewState.summary.value
+  checkImportFlow.updateManualMapping({ fieldKey, sourceKey })
 }
 
 const clearPendingPreview = () => {
-  pendingPreviewFile.value = null
-  checkImportPayload.value = null
-  checkPreviewState.resetState()
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
+  checkImportFlow.clearPreview()
 }
 
 const confirmPreviewAndUpload = async () => {
@@ -1395,9 +1395,20 @@ const confirmPreviewAndUpload = async () => {
     return
   }
 
+  const activeSheet = checkPreviewState.previewTable.value?.activeSheet
+  const columnMapping = {
+    headerChar: checkPreviewState.mapping.value.char || null,
+    headerIpa: checkPreviewState.mapping.value.ipa || null,
+    headerNotes: checkPreviewState.mapping.value.note || null
+  }
+
   const selectedFile = pendingPreviewFile.value
-  clearPendingPreview()
-  await uploadFile(selectedFile)
+  checkImportFlow.clearPreview()
+  await uploadFile(selectedFile, {
+    columnMapping,
+    headerRowIndex: checkPreviewState.headerRowIndex.value,
+    sheetName: activeSheet?.name || null
+  })
 }
 
 const analyzeFile = async () => {
