@@ -132,7 +132,7 @@ import { invalidateCustomDataPresence, markCustomDataExists } from '@/composable
 import { showSuccess, showError, showWarning, showInfo } from '@/utils/message.js'
 import { userStore, globalPayload, resultCache } from '@/main/store/store.js'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { formatCoord } from '@/utils/map/formatCoord.js'
+import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 
 const route = useRoute()
 const { t } = useI18n()

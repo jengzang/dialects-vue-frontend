@@ -95,7 +95,7 @@ import {
 } from '@/api'
 import { userStore } from '@/main/store/store.js'
 import { computeQueryStats } from '@/main/store/userStats.js'
-import { initOnlineTimeTracker, manualReport, stopOnlineTimeTracker } from '@/utils/onlineTimeTracker.js'
+import { initOnlineTimeTracker, manualReport, stopOnlineTimeTracker } from '@/utils/user/onlineTimeTracker.js'
 import { WEB_BASE } from '@/env-config.js'
 import { showConfirm, showSuccess } from '@/utils/message.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'

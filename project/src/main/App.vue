@@ -32,11 +32,11 @@ import ExploreLayout from '../layouts/ExploreLayout.vue'
 import GlobalToast from '../components/ToastAndHelp/GlobalToast.vue'
 import GlobalConfirm from '../components/ToastAndHelp/GlobalConfirm.vue'
 import RateLimitNotice from '../components/ToastAndHelp/RateLimitNotice.vue'
-import { initOnlineTimeTracker, stopOnlineTimeTracker } from '../utils/onlineTimeTracker.js'
-import { initLoginPromptTracker, stopLoginPromptTracker } from '../utils/loginPromptTracker.js'
+import { initOnlineTimeTracker, stopOnlineTimeTracker } from '../utils/user/onlineTimeTracker.js'
+import { initLoginPromptTracker, stopLoginPromptTracker } from '../utils/user/loginPromptTracker.js'
 import { getToken } from '../api/auth/auth.js'
 import { stripLocaleFromPath } from '../i18n/localeRouting.js'
-import { isRouteLoading } from '../stores/routeLoading.js'
+import { isRouteLoading } from '../utils/routeLoading.js'
 
 // // 🌉 建立 bridge 用於跨組件共享 iframe 狀態
 // const nativeFrame = ref(null)

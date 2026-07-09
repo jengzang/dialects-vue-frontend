@@ -391,7 +391,7 @@ import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { extractFeatures as apiExtractFeatures, aggregateFeatures as apiAggregateFeatures, searchVillages } from '@/api/index.js'
 import { showError, showSuccess, showWarning } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
-import { cityHasCounties } from '@/utils/region/regionPreload.js'
+import { cityHasCounties } from '@/VillagesML/utils/regionPreload.js'
 import { SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 
 // Router

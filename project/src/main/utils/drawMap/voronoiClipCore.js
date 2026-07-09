@@ -1,6 +1,6 @@
 import { bbox, booleanIntersects, featureCollection, intersect } from '@turf/turf'
 
-import { splitFeatureCollectionByGeometryType } from '@/utils/map/draw/export.js'
+import { splitFeatureCollectionByGeometryType } from '@/main/utils/drawMap/export.js'
 
 export const BORDER_GRID_STEP = 4
 export const CLIP_DIAGNOSTICS_NAMESPACE = '[voronoiClip]'

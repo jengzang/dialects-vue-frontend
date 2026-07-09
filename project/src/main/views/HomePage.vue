@@ -595,7 +595,7 @@ const SupportPopup = defineAsyncComponent(() =>
   import('@/main/components/popup/SupportPopup.vue')
 )
 const UpdateNoticeModal = defineAsyncComponent(() =>
-  import('@/components/ToastAndHelp/UpdateNoticeModal.vue')
+  import('@/main/components/popup/UpdateNoticeModal.vue')
 )
 
 const { t, locale } = useI18n()

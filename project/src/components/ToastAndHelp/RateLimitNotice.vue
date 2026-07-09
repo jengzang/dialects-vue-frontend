@@ -47,7 +47,7 @@
 import { computed, onBeforeUnmount, watch, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { rateLimitNoticeState, clearRateLimitNotice } from '@/utils/rateLimitNotice.js'
+import { rateLimitNoticeState, clearRateLimitNotice } from '@/utils/user/rateLimitNotice.js'
 
 const router = useRouter()
 const route = useRoute()

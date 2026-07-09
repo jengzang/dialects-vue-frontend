@@ -3,7 +3,7 @@ import {
   clipVoronoiFeatureCollectionToNationalBorderSync,
   logClipDiagnostics,
   prepareNationalBorderForVoronoiClip,
-} from '@/utils/map/voronoiClipCore.js'
+} from '@/main/utils/drawMap/voronoiClipCore.js'
 
 const VoronoiClipWorker = typeof Worker !== 'undefined'
   ? new Worker(new URL('./voronoiClip.worker.js', import.meta.url), { type: 'module' })

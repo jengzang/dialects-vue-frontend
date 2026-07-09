@@ -1,4 +1,4 @@
-import { clipVoronoiFeatureCollectionToNationalBorderSync } from '@/utils/map/voronoiClipCore.js'
+import { clipVoronoiFeatureCollectionToNationalBorderSync } from '@/main/utils/drawMap/voronoiClipCore.js'
 
 self.onmessage = (event) => {
   const { requestId, sourceCollection, preparedBorderData } = event.data ?? {}

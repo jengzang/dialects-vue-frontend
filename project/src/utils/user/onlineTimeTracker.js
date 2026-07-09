@@ -1,4 +1,4 @@
-import { reportOnlineTime, getToken } from '../api/auth/auth.js'
+import { reportOnlineTime, getToken } from '../../api/auth/auth.js'
 import { userStore } from '@/main/store/store.js'
 import { WEB_BASE } from '@/env-config.js'
 

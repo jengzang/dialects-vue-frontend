@@ -65,7 +65,7 @@ import { ref, computed } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { cityHasCounties } from '@/utils/region/regionPreload.js'
+import { cityHasCounties } from '@/VillagesML/utils/regionPreload.js'
 
 const emit = defineEmits(['search'])
 

@@ -67,7 +67,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import AppModal from '@/components/common/AppModal.vue'
 import { useI18n } from 'vue-i18n'
 import { mapStyle } from '@/utils/map/MapSource.js'
-import { exportCurrentMapAsPng, normalizeFeatureCollection } from '@/utils/map/draw/export.js'
+import { exportCurrentMapAsPng, normalizeFeatureCollection } from '@/main/utils/drawMap/export.js'
 
 const PREVIEW_SOURCE_ID = 'image-export-preview-source'
 const PREVIEW_FILL_LAYER_ID = 'image-export-preview-fill'

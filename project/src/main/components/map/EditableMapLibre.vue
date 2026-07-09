@@ -15,7 +15,7 @@ import {
   exportCurrentMapAsPng,
   exportFeatureCollectionAsGeoJson,
   normalizeFeatureCollection,
-} from '@/utils/map/draw/export.js'
+} from '@/main/utils/drawMap/export.js'
 
 const drawControlContainerClass = 'draw-control-container'
 const drawStyles = [

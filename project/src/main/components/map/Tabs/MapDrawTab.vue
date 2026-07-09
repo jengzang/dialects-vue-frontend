@@ -484,7 +484,7 @@ import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
 import { usePartitionCache } from '@/composables/domain/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import { showConfirm, showError, showSuccess } from '@/utils/message.js';
-import { readImportedLayerFile, readKmzArrayBuffer, splitFeatureCollectionByGeometryType } from '@/utils/map/draw/export.js';
+import { readImportedLayerFile, readKmzArrayBuffer, splitFeatureCollectionByGeometryType } from '@/main/utils/drawMap/export.js';
 import {
   deleteDraftRecord,
   getDraftRecordById,
@@ -492,11 +492,11 @@ import {
   migrateLegacyDraftsFromLocalStorage,
   saveDraftRecord,
   updateDraftRecord,
-} from '@/utils/map/draftStorage.js';
+} from '@/main/utils/drawMap/draftStorage.js';
 import {
   clipVoronoiFeatureCollectionToNationalBorder,
   prepareNationalBorderForVoronoiClip,
-} from '@/utils/map/voronoiClip.js';
+} from '@/main/utils/drawMap/voronoiClip.js';
 import {
   PARTITION_MODE_MAP,
   PARTITION_MODE_YINDIAN,
@@ -505,7 +505,7 @@ import {
   buildPartitionPoints,
   buildVoronoiSelectionOptions,
   calculatePartitionVoronoi,
-} from '@/utils/map/partitionVoronoi.js';
+} from '@/main/utils/drawMap/partitionVoronoi.js';
 import { mapStyleConfig } from '@/utils/map/MapSource.js';
 import EditableMapLibre from '@/main/components/map/EditableMapLibre.vue';
 import MapDrawLayersPanel from '@/main/components/map/Draw/panels/MapDrawLayersPanel.vue';
