@@ -83,6 +83,7 @@ import { useI18n } from 'vue-i18n';
 import LocationDetailPopup from '@/main/components/popup/result/LocationDetailPopup.vue';
 import PhonologyCellDetailModal from '@/main/components/popup/pho/PhonologyCellDetailModal.vue';
 import { getLocationDetail } from '@/api';
+import { showError } from '@/utils/message.js';
 import { READING_COLORS } from '@/main/config/readingColors.js';
 
 const { t } = useI18n();
@@ -320,7 +321,7 @@ const handleShowDetails = async () => {
     locationData.value = response;
   } catch (error) {
     console.error('查詢地名數據失敗:', error);
-    alert('查詢失敗，請稍後重試');
+    showError('查詢失敗，請稍後重試');
   } finally {
     isLoading.value = false;
   }

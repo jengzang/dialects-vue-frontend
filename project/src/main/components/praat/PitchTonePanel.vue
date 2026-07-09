@@ -170,7 +170,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts'
 import * as XLSX from 'xlsx'
 import { useI18n } from 'vue-i18n'
-import { showSuccess, showWarning } from '@/utils/message.js'
+import { showSuccess, showWarning, showConfirm } from '@/utils/message.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
@@ -547,8 +547,8 @@ const removeTone = (index) => {
   savedTones.value.splice(index, 1)
 }
 
-const clearAll = () => {
-  if (confirm(t('praat.pitchTone.step1.savedList.confirmClear'))) {
+const clearAll = async () => {
+  if (await showConfirm(t('praat.pitchTone.step1.savedList.confirmClear'))) {
     savedTones.value = []
     pitchToneStorage.remove()
     // Do NOT clear tValueResults - keep analysis results visible

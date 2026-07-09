@@ -1,11 +1,12 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
+import { showSuccess } from '@/utils/message.js'
 
 const { t } = useI18n()
 
 const copyCitation = () => {
   navigator.clipboard.writeText(t('privacy.citation.text'))
-  alert(t('privacy.citation.copySuccess'))
+  showSuccess(t('privacy.citation.copySuccess'))
 }
 </script>
 
