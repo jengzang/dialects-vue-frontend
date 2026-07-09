@@ -427,59 +427,56 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$text-primary: var(--color-text-primary);
+$text-secondary: var(--color-text-secondary);
+$error-color: var(--color-error);
+$white: #fff;
+
+$transition-duration: 0.3s;
+
 .audio-input-panel {
   max-width: 800px;
+  margin-bottom: 1.5rem;
   padding: 1rem 5rem;
-  margin-bottom: 1.5rem;
-}
-
-@media (max-aspect-ratio: 1/1) {
-  .audio-input-panel {
-    padding: 1rem 1rem;
-  }
-}
-
-.panel-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-  color: var(--color-text-primary);
 }
 
 .upload-area {
+  padding: 1rem 2rem;
+  background: var(--glass-light);
   border: 2px dashed var(--glass-border);
   border-radius: var(--radius-xl);
-  padding: 1rem 2rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background: var(--glass-light);
-}
+  transition:
+    background $transition-duration ease,
+    border-color $transition-duration ease,
+    transform $transition-duration ease;
 
-.upload-area:hover,
-.upload-area.drag-over {
-  border-color: var(--color-primary);
-  background: var(--glass-medium);
-  transform: translateY(-2px);
-}
+  &:hover,
+  &.drag-over {
+    background: var(--glass-medium);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+  }
 
-.upload-icon {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
-}
+  .upload-icon {
+    margin-bottom: 0.5rem;
+    font-size: 3rem;
+  }
 
-.upload-text {
-  font-size: 1.1rem;
-  color: var(--color-text-primary);
-  margin-bottom: 0.5rem;
-  margin-top:0.5rem;
-}
+  .upload-text {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: $text-primary;
+    font-size: 1.1rem;
+  }
 
-.upload-hint {
-  font-size: 0.9rem;
-  margin:0;
-  color: var(--color-text-secondary);
+  .upload-hint {
+    margin: 0;
+    color: $text-secondary;
+    font-size: 0.9rem;
+  }
 }
 
 .recording-section {
@@ -490,91 +487,101 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 1rem;
-}
 
-.divider-inline {
-  flex-shrink: 0;
-  padding: 0.5rem 1rem;
-  background: var(--glass-light);
-  border-radius: var(--radius-md);
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
-}
+  .divider-inline {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+    background: var(--glass-light);
+    border-radius: var(--radius-md);
+    color: $text-secondary;
+    font-size: 0.9rem;
+  }
 
-.record-button {
-  flex: 1;
-  padding: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-size: 1rem;
-  border: none;
-  cursor: pointer;
-}
+  .record-button {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
 
-.record-button.recording {
-  background: var(--color-error);
-  color: white;
-}
-.record-button.recording:hover{
-  background: var(--color-error);
-}
+    &.recording {
+      background: $error-color;
+      color: $white;
 
-.record-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+      &:hover {
+        background: $error-color;
+      }
+    }
 
-.record-icon {
-  font-size: 1.5rem;
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .record-icon {
+      font-size: 1.5rem;
+    }
+  }
 }
 
 .recording-timer {
-  text-align: center;
   margin-top: 1rem;
+  color: $error-color;
+  text-align: center;
   font-size: 1.1rem;
-  color: var(--color-error);
   font-weight: 600;
 }
 
 .file-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-top: 1rem;
   padding: 0.8rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+
+  .file-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .file-name {
+    color: $text-primary;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .file-size {
+    color: $text-secondary;
+    font-size: 0.9rem;
+  }
+
+  .clear-button {
+    padding: 0.5rem 0.75rem;
+    background: var(--glass-light);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition:
+      background $transition-duration ease,
+      color $transition-duration ease,
+      transform $transition-duration ease;
+
+    &:hover {
+      background: $error-color;
+      color: $white;
+      transform: scale(1.1);
+    }
+  }
 }
 
-.file-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.file-name {
-  font-weight: 500;
-  font-size: 15px;
-  color: var(--color-text-primary);
-}
-
-.file-size {
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
-}
-
-.clear-button {
-  background: var(--glass-light);
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.5rem 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.clear-button:hover {
-  background: var(--color-error);
-  color: white;
-  transform: scale(1.1);
+@media (max-aspect-ratio: 1/1) {
+  .audio-input-panel {
+    padding: 1rem;
+  }
 }
 </style>

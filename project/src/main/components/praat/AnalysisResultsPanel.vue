@@ -723,29 +723,48 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$primary-blue: #007aff;
+$quality-good: #34c759;
+$quality-fair: #ff9500;
+$quality-poor: #ff3b30;
+
+$text-primary: var(--color-text-primary);
+$text-secondary: var(--color-text-secondary);
+
+$chart-width: 80%;
+$chart-height: 400px;
+$card-padding: 1.5rem;
+$section-spacing: 2rem;
+
+$border-light: rgba(0, 0, 0, 0.1);
+$blue-shadow: rgba(0, 122, 255, 0.2);
+$blue-shadow-hover: rgba(0, 122, 255, 0.3);
+
+$transition-normal: 0.3s;
+
 .analysis-results-panel {
-  padding: 1rem;
+  width: 95%;
   margin-bottom: 1.5rem;
-  width:95%;
+  padding: 1rem;
 }
 
 .panel-title {
+  margin-bottom: 1.5rem;
+  color: $text-primary;
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 1.5rem;
-  color: var(--color-text-primary);
 }
 
 .summary-section {
-  margin-bottom: 2rem;
+  margin-bottom: $section-spacing;
 }
 
 .section-title {
+  margin-bottom: 1rem;
+  color: $text-primary;
   font-size: 1.2rem;
   font-weight: 600;
-  margin-bottom: 1rem;
-  color: var(--color-text-primary);
 }
 
 .stats-grid {
@@ -755,72 +774,78 @@ onBeforeUnmount(() => {
 }
 
 .stat-card {
-  padding: 1.5rem;
+  padding: $card-padding;
   text-align: center;
 }
+
+/*
+ * 保留在基础图表规则之前。
+ * 原样式中 spectrogram-chart 的 400px 会被后面的 500px 覆盖，
+ * 当前整理不擅自改变这个实际效果。
+ */
 @media (max-aspect-ratio: 1/1) {
-  .stat-card{
-    padding:0.8rem;
-  }
-  .chart-container{
-    width: 96%!important;
-    padding:0.5rem!important;
-  }
-  .spectrogram-chart {
-    min-height: 400px;
-    height: 400px;
+  .stat-card {
+    padding: 0.8rem;
   }
 
+  .chart-container {
+    width: 96% !important;
+    padding: 0.5rem !important;
+  }
+
+  .spectrogram-chart {
+    height: 400px;
+    min-height: 400px;
+  }
 }
 
 .stat-label {
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
   margin-bottom: 0.5rem;
+  color: $text-secondary;
+  font-size: 0.9rem;
 }
 
 .stat-value {
+  color: $text-primary;
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--color-text-primary);
-}
 
-.stat-value.contour-display {
-  font-size: 1.1rem;
-  font-family: 'Courier New', monospace;
-  letter-spacing: 0.05em;
-  color: #007aff;
-}
-
-.chart-section {
-  margin-top: 2rem;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-}
-
-.chart-container {
-  width: 80%;
-  height: 400px;
-  background: var(--glass-light);
-  border-radius: var(--radius-lg);
-  padding: 1rem;
-}
-
-/* Spectrogram specific styling */
-.spectrogram-chart {
-  min-height: 500px;
-  height: 500px;
+  &.contour-display {
+    color: $primary-blue;
+    font-family: "Courier New", monospace;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+  }
 }
 
 .charts-section {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: $section-spacing;
+}
+
+.chart-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: $section-spacing;
+}
+
+.chart-container {
+  width: $chart-width;
+  height: $chart-height;
+  padding: 1rem;
+  background: var(--glass-light);
+  border-radius: var(--radius-lg);
+}
+
+.spectrogram-chart {
+  height: 500px;
+  min-height: 500px;
 }
 
 .voice-quality-section {
-  margin-top: 2rem;
+  margin-top: $section-spacing;
 }
 
 .quality-grid {
@@ -830,98 +855,103 @@ onBeforeUnmount(() => {
 }
 
 .quality-card {
-  padding: 1.5rem;
-  text-align: center;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  padding: $card-padding;
+  text-align: center;
 }
 
 .quality-label {
+  color: $text-secondary;
   font-size: 0.95rem;
-  color: var(--color-text-secondary);
   font-weight: 500;
 }
 
 .quality-value {
   font-size: 1.8rem;
   font-weight: 700;
-  transition: color 0.3s ease;
-}
+  transition: color $transition-normal ease;
 
-.quality-value.quality-good {
-  color: #34c759;
-}
+  &.quality-good {
+    color: $quality-good;
+  }
 
-.quality-value.quality-fair {
-  color: #ff9500;
-}
+  &.quality-fair {
+    color: $quality-fair;
+  }
 
-.quality-value.quality-poor {
-  color: #ff3b30;
+  &.quality-poor {
+    color: $quality-poor;
+  }
 }
 
 .quality-bar {
   width: 100%;
   height: 8px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
   overflow: hidden;
-}
-
-.quality-fill {
-  height: 100%;
-  transition: width 0.5s ease, background-color 0.3s ease;
+  background: $border-light;
   border-radius: 4px;
+
+  .quality-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition:
+      width 0.5s ease,
+      background-color $transition-normal ease;
+  }
 }
 
 .quality-status {
+  color: $text-secondary;
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--color-text-secondary);
 }
 
-/* 【新增】頻譜圖佔位區與按鈕樣式 */
+/* 频谱图占位区域 */
 .spectrogram-placeholder {
-  width: 80%;
-  height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.3); /* 半透明背景 */
+  width: $chart-width;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px dashed $border-light;
   border-radius: var(--radius-lg);
-  border: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .placeholder-content {
-  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-}
+  text-align: center;
 
-.placeholder-icon {
-  font-size: 3rem;
-  opacity: 0.7;
+  .placeholder-icon {
+    opacity: 0.7;
+    font-size: 3rem;
+  }
 }
 
 .load-spectrogram-btn {
   padding: 0.8rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
   background: var(--color-primary);
-  color: white;
   border: none;
   border-radius: var(--radius-2xl);
+  box-shadow: 0 4px 12px $blue-shadow;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
-}
+  transition:
+    opacity $transition-normal ease,
+    box-shadow $transition-normal ease,
+    transform $transition-normal ease;
 
-.load-spectrogram-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
-  opacity: 0.9;
+  &:hover {
+    opacity: 0.9;
+    box-shadow: 0 6px 16px $blue-shadow-hover;
+    transform: translateY(-2px);
+  }
 }
 </style>

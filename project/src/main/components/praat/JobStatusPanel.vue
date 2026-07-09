@@ -78,7 +78,46 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$primary: #007aff;
+$primary-light: #5ac8fa;
+
+$error: #ff3b30;
+$success: #34c759;
+$warning: #ff9500;
+
+$text-primary: var(--color-text-primary);
+$text-secondary: var(--color-text-secondary);
+
+$error-background: rgba(255, 59, 48, 0.15);
+$error-background-hover: rgba(255, 59, 48, 0.25);
+$error-border: rgba(255, 59, 48, 0.3);
+$error-border-hover: rgba(255, 59, 48, 0.5);
+
+$panel-divider: rgba(255, 255, 255, 0.2);
+$progress-background: rgba(0, 0, 0, 0.1);
+
+$transition-duration: 0.3s;
+
+@mixin status-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+@mixin status-icon {
+  margin-bottom: 1rem;
+  font-size: 3rem;
+}
+
+@mixin status-title($color) {
+  color: $color;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
 .job-status-panel {
   width: 95%;
   max-width: 800px;
@@ -88,164 +127,141 @@ onUnmounted(() => {
 
 .panel-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid $panel-divider;
+
+  .job-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .job-label {
+    color: $text-secondary;
+    font-size: 0.9rem;
+  }
+
+  .job-id {
+    color: $text-primary;
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .cancel-button {
+    padding: 0.5rem 1rem;
+    background: $error-background;
+    border: 1px solid $error-border;
+    border-radius: var(--radius-md);
+    color: $error;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background $transition-duration ease,
+      border-color $transition-duration ease;
+
+    &:hover {
+      background: $error-background-hover;
+      border-color: $error-border-hover;
+    }
+  }
 }
 
-.job-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.job-label {
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
-}
-
-.job-id {
-  font-size: 0.9rem;
-  font-family: 'Courier New', monospace;
-  color: var(--color-text-primary);
-  font-weight: 600;
-}
-
-.cancel-button {
-  padding: 0.5rem 1rem;
-  background: rgba(255, 59, 48, 0.15);
-  color: #ff3b30;
-  border: 1px solid rgba(255, 59, 48, 0.3);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.cancel-button:hover {
-  background: rgba(255, 59, 48, 0.25);
-  border-color: rgba(255, 59, 48, 0.5);
-}
-
-/* Loading State */
+/* 加载状态 */
 .loading-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 2rem 0;
+  @include status-content;
 }
-
-
 
 .loading-title {
+  margin-bottom: 0.5rem;
+  color: $text-primary;
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--color-text-primary);
-  margin-bottom: 0.5rem;
 }
 
 .loading-text {
-  font-size: 1rem;
-  color: var(--color-text-secondary);
   margin-bottom: 2rem;
+  color: $text-secondary;
+  font-size: 1rem;
 }
 
 .loading-progress {
-  width: 100%;
-  max-width: 400px;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+  max-width: 400px;
 }
 
 .progress-bar {
   width: 100%;
   height: 8px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
   overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #007aff, #5ac8fa);
+  background: $progress-background;
   border-radius: 4px;
-  transition: width 0.3s ease;
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, $primary, $primary-light);
+    border-radius: 4px;
+    transition: width $transition-duration ease;
+  }
 }
 
 .progress-text {
+  color: $primary;
+  text-align: center;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #007aff;
-  text-align: center;
 }
 
-/* Error State */
+/* 错误状态 */
 .error-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 2rem 0;
+  @include status-content;
 }
 
 .error-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  @include status-icon;
 }
 
 .error-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #ff3b30;
   margin-bottom: 0.5rem;
+
+  @include status-title($error);
 }
 
 .error-text {
+  color: $text-secondary;
   font-size: 1rem;
-  color: var(--color-text-secondary);
 }
 
-/* Completed State */
+/* 完成状态 */
 .completed-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 2rem 0;
+  @include status-content;
 }
 
 .completed-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  @include status-icon;
 }
 
 .completed-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #34c759;
+  @include status-title($success);
 }
 
+/* 已取消状态 */
 .canceled-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 2rem 0;
+  @include status-content;
 }
 
 .canceled-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  @include status-icon;
 }
 
 .canceled-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #ff9500;
+  @include status-title($warning);
 }
 </style>
