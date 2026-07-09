@@ -26,7 +26,11 @@
                   <p class="subfeature-body">{{ item.body }}</p>
                 </li>
               </ul>
+              <a v-if="feature.zhihuLink" :href="feature.zhihuLink" target="_blank" rel="noopener" class="zhihu-article-link">{{ $t('about.intro.readZhihuArticle') }}</a>
             </li>
+            <p style="text-align: left;">
+              <a href="https://zhuanlan.zhihu.com/p/1934345780199682731" target="_blank" rel="noopener" class="zhihu-article-link">{{ $t('about.intro.oldSiteZhihuArticle') }}</a>
+            </p>
             <!-- <li v-html="$t('about.intro.features.blueText')"></li>
             <li v-html="$t('about.intro.features.mapClick')"></li> -->
           </ul>
@@ -100,6 +104,7 @@
                 rel="noopener"
                 class="card"
               >
+                <img class="card-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
                 <span v-html="$t('about.suggestion.frontend.title')"></span>
                 <span class="thanks-link">👉 {{ $t('about.suggestion.frontend.link') }}</span>
               </a>
@@ -109,8 +114,19 @@
                 rel="noopener"
                 class="card"
               >
+                <img class="card-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
                 <span v-html="$t('about.suggestion.backend.title')"></span>
                 <span class="thanks-link">👉 {{ $t('about.suggestion.backend.link') }}</span>
+              </a>
+              <a
+                href="https://www.zhihu.com/project/detail/60225"
+                target="_blank"
+                rel="noopener"
+                class="card"
+              >
+                <img class="card-icon" src="https://static.zhihu.com/heifetz/favicon.ico" alt="Zhihu" />
+                <span v-html="$t('about.suggestion.zhihu.title')"></span>
+                <span class="thanks-link">👉 {{ $t('about.suggestion.zhihu.link') }}</span>
               </a>
             </div>
           </div>
@@ -141,13 +157,12 @@
               </a>
             </span>
           </h2>
-          <p style="display: block; width: 100%; clear: both; margin: 0;">
+          <p style="display: block; width: 100%; clear: both; margin: 0 0 0.8rem;">
             {{ $t('about.like.starMessage') }}
           </p>
-
           <a
             class="project-card"
-            v-for="project in localizedProjects"
+            v-for="project in githubProjects"
             :key="project.name"
             :href="project.url"
             target="_blank"
@@ -155,6 +170,25 @@
           >
             <div class="card-header">
               <img class="github-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
+              <span class="thanks-link" style="font-weight: bold">{{ project.name }}</span>
+            </div>
+            <p :title="project.description">{{ splitDesc(project.description)[0] }}<span class="desc-sub">{{ splitDesc(project.description)[1] }}</span></p>
+            <div class="glow-border"></div>
+          </a>
+
+          <p style="display: block; width: 100%; clear: both; margin: 1.2rem 0 0.8rem;">
+            {{ $t('about.like.zhihuLike') }}
+          </p>
+          <a
+            class="project-card"
+            v-for="project in zhihuProjects"
+            :key="project.name"
+            :href="project.url"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div class="card-header">
+              <img class="github-icon" src="https://static.zhihu.com/heifetz/favicon.ico" alt="Zhihu" />
               <span class="thanks-link" style="font-weight: bold">{{ project.name }}</span>
             </div>
             <p :title="project.description">{{ splitDesc(project.description)[0] }}<span class="desc-sub">{{ splitDesc(project.description)[1] }}</span></p>
@@ -335,6 +369,7 @@ const featureList = computed(() => {
       subtitle: f.subtitle,
       intro: f.intro,
       items: f.items || [],
+      zhihuLink: f.zhihuLink || '',
     }
   })
 })
@@ -373,19 +408,37 @@ const localizedProjects = computed(() => [
   {
     name: 'dialects-vue-frontend',
     url: 'https://github.com/jengzang/dialects-vue-frontend',
-    description: t('about.like.projects.frontend.description')
+    description: t('about.like.projects.frontend.description'),
+    icon: 'github'
   },
   {
     name: 'dialects-backend',
     url: 'https://github.com/jengzang/dialects-backend',
-    description: t('about.like.projects.backend.description')
+    description: t('about.like.projects.backend.description'),
+    icon: 'github'
   },
   {
     name: 'dialects-build',
     url: 'https://github.com/jengzang/dialects-build',
-    description: t('about.like.projects.build.description')
+    description: t('about.like.projects.build.description'),
+    icon: 'github'
+  },
+  {
+    name: t('about.like.projects.zhihuProject.name'),
+    url: 'https://www.zhihu.com/project/detail/60225',
+    description: t('about.like.projects.zhihuProject.description'),
+    icon: 'zhihu'
+  },
+  {
+    name: t('about.like.projects.zhihuColumn.name'),
+    url: 'https://www.zhihu.com/column/c_1899090664681080236',
+    description: t('about.like.projects.zhihuColumn.description'),
+    icon: 'zhihu'
   },
 ])
+
+const githubProjects = computed(() => localizedProjects.value.filter(p => p.icon !== 'zhihu'))
+const zhihuProjects = computed(() => localizedProjects.value.filter(p => p.icon === 'zhihu'))
 
 function followClicked() {
   window.open('https://www.zhihu.com/people/da-shu-18-11', '_blank')
@@ -684,6 +737,18 @@ em {
   line-height: 1.6;
 }
 
+.zhihu-article-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: #0066FF;
+  font-size: 14px;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .subfeature-list {
   margin: 8px 0 0 16px;
   padding: 0;
@@ -903,20 +968,20 @@ em {
   justify-content: center;
 
   p {
-    margin: 8px 0;
-    color: #6b7280;
+    margin: 10px 0;
+    color: #4b5563;
     font-size: 18px;
   }
 }
 
 .subtext {
-  color: #9ca3af;
-  font-size: 15px;
+  color: #6b7280;
+  font-size: 16px;
 }
 
 .card-links {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 16px;
   margin-top: 24px;
 }
@@ -926,6 +991,8 @@ em {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 1 1 200px;
+  min-width: 180px;
   padding: 20px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.42);
@@ -954,6 +1021,13 @@ em {
     font-size: 15px;
     transition: color 0.3s ease;
   }
+}
+
+.card-icon {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 4px;
+  flex-shrink: 0;
 }
 
 /* === 设置页面样式 === */
@@ -1143,6 +1217,10 @@ em {
     font-size: 14px;
   }
 
+  .zhihu-article-link {
+    font-size: 13px;
+  }
+
   .subfeature-list {
     margin-left: 12px;
   }
@@ -1225,13 +1303,13 @@ em {
     max-width: 100%;
 
     p {
-      margin: 6px 0;
+      margin: 8px 0;
       font-size: 16px;
     }
   }
 
   .subtext {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .card-links {
@@ -1240,6 +1318,8 @@ em {
   }
 
   .card {
+    flex: 1 1 100%;
+    min-width: 0;
     padding: 14px 16px;
     border-radius: 14px;
     font-size: 16px;
@@ -1248,6 +1328,12 @@ em {
       margin-top: 6px;
       font-size: 13px;
     }
+  }
+
+  .card-icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 2px;
   }
 
   .settings-container {

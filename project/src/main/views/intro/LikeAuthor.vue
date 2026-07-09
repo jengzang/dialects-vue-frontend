@@ -24,13 +24,12 @@
           </a>
         </span>
       </h2>
-      <p style="display: block; width: 100%; clear: both; margin: 0;">
+      <p style="display: block; width: 100%; clear: both; margin: 0 0 0.8rem;">
         {{ $t('home.intro.likeAuthor.starText') }}
       </p>
-
       <a
           class="project-card"
-          v-for="project in projects"
+          v-for="project in githubProjects"
           :key="project.name"
           :href="project.url"
           target="_blank"
@@ -38,6 +37,25 @@
       >
         <div class="card-header">
           <img class="github-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
+          <span class="thanks-link" style="font-weight: bold">{{ project.name }}</span>
+        </div>
+        <p :title="project.description">{{ splitDesc(project.description)[0] }}<span class="desc-sub">{{ splitDesc(project.description)[1] }}</span></p>
+        <div class="glow-border"></div>
+      </a>
+
+      <p style="display: block; width: 100%; clear: both; margin: 1.2rem 0 0.8rem;">
+        {{ $t('home.intro.likeAuthor.zhihuLike') }}
+      </p>
+      <a
+          class="project-card"
+          v-for="project in zhihuProjects"
+          :key="project.name"
+          :href="project.url"
+          target="_blank"
+          rel="noopener noreferrer"
+      >
+        <div class="card-header">
+          <img class="github-icon" src="https://static.zhihu.com/heifetz/favicon.ico" alt="Zhihu" />
           <span class="thanks-link" style="font-weight: bold">{{ project.name }}</span>
         </div>
         <p :title="project.description">{{ splitDesc(project.description)[0] }}<span class="desc-sub">{{ splitDesc(project.description)[1] }}</span></p>
@@ -80,19 +98,37 @@ const projects = computed(() => [
   {
     name: 'dialects-vue-frontend',
     url: 'https://github.com/jengzang/dialects-vue-frontend',
-    description: t('home.intro.likeAuthor.frontendRepo')
+    description: t('home.intro.likeAuthor.frontendRepo'),
+    icon: 'github'
   },
   {
     name: 'dialects-backend',
     url: 'https://github.com/jengzang/dialects-backend',
-    description: t('home.intro.likeAuthor.backendRepo')
+    description: t('home.intro.likeAuthor.backendRepo'),
+    icon: 'github'
   },
   {
     name: 'dialects-build',
     url: 'https://github.com/jengzang/dialects-build',
-    description: t('home.intro.likeAuthor.buildRepo')
+    description: t('home.intro.likeAuthor.buildRepo'),
+    icon: 'github'
+  },
+  {
+    name: t('home.intro.likeAuthor.zhihuProjectName'),
+    url: 'https://www.zhihu.com/project/detail/60225',
+    description: t('home.intro.likeAuthor.zhihuProjectRepo'),
+    icon: 'zhihu'
+  },
+  {
+    name: t('home.intro.likeAuthor.zhihuColumnName'),
+    url: 'https://www.zhihu.com/column/c_1899090664681080236',
+    description: t('home.intro.likeAuthor.zhihuColumnRepo'),
+    icon: 'zhihu'
   },
 ])
+
+const githubProjects = computed(() => projects.value.filter(p => p.icon !== 'zhihu'))
+const zhihuProjects = computed(() => projects.value.filter(p => p.icon === 'zhihu'))
 
 function followClicked() {
   window.open('https://www.zhihu.com/people/da-shu-18-11', '_blank');

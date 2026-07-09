@@ -30,7 +30,8 @@
             "title": "Tone Query",
             "body": "Query tone values and tone categories. Lightweight API — logged-in users can query many locations simultaneously without restriction. Results presented in tables (different tone categories in different colors); maps can switch between tone categories; click to view tone merger details."
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2047826401479364959"
       },
       "feature2": {
         "heading": "Interactive Maps & Custom Data",
@@ -53,7 +54,8 @@
             "title": "Map Drawing",
             "body": "Provides drawing tools supporting Voronoi diagram generation and layer export."
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2047826401479364959"
       },
       "feature3": {
         "heading": "Dialect Comparison",
@@ -76,7 +78,8 @@
             "title": "Compare Phonetic Values",
             "body": "Display actual readings from each dialect point side by side for point-by-point comparison."
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2023530288848930082"
       },
       "feature4": {
         "heading": "In-Depth Single Dialect Analysis",
@@ -99,7 +102,8 @@
             "title": "Evolution Charts",
             "body": "Display the evolution trajectory of a single dialect point's initials/finals/tones from Middle Chinese to modern forms using Sankey diagrams, pie charts, and other visualizations, intuitively showing merger and split paths."
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2002848348378521848"
       },
       "feature5": {
         "heading": "Chinese Character Set Query",
@@ -145,7 +149,8 @@
             "title": "Table Derivation",
             "body": "Automatically derive and generate missing readings based on phonological rules."
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2001363637311381604"
       },
       "feature7": {
         "heading": "Lexicon & Sentence Data",
@@ -164,16 +169,17 @@
             "title": "Yangchun Colloquial Words",
             "body": "A collection of common colloquial vocabulary from the Yangchun area."
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2003637219919946701"
       },
       "feature8": {
-        "heading": "Guangdong Village Dialect Data",
-        "subtitle": "Tree Diagram, Interactive Map, Raw Table, Yangchun Natural Villages, Machine Learning",
-        "intro": "Guangdong natural village dialect data manually entered village by village from the Quan Yue Cun Qing series (data concentrated in western Guangdong: Yangjiang, Maoming, Yunfu, etc.).",
+        "heading": "Natural Village Data",
+        "subtitle": "Guangdong Province Tree Diagram, Interactive Map, Raw Table, Yangchun Natural Villages, Machine Learning",
+        "intro": "Provides information on the geographical location, administrative divisions, and dialect data of natural villages. The site offers a tree diagram, interactive map, raw table, Yangchun natural village data, and machine learning analysis for Guangdong Province.",
         "items": [
           {
-            "title": "Tree Diagram",
-            "body": "Drill down level by level: City → County → Town → Administrative Village → Natural Village, clearly showing hierarchical structure. All loaded data is searchable. Currently only Guangdong province data is available."
+            "title": "Guangdong Natural Village Tree Diagram",
+            "body": "Based on the dialect data of Guangdong natural villages recorded in the \"Quan Yue Cun Qing\" series (manually entered by the author village by village, with data concentrated in western Guangdong: Yangjiang, Maoming, Yunfu, etc.), supports hierarchical expansion from city → county → town → administrative village → natural village, clearly displaying the hierarchical structure and supporting search."
           },
           {
             "title": "Interactive Map",
@@ -191,7 +197,8 @@
             "title": "Machine Learning Analysis (VillagesML)",
             "body": "A fully independent sub-application with 7 modules and 28 analysis tabs: Character Analysis (frequency tendencies, embedding similarity, character networks, significance); Semantic Analysis (category labels, combination patterns, N-gram analysis, semantic indices, semantic networks, subcategory analysis); Spatial Analysis (spatial hotspots, spatial clustering, spatial visualization, spatial integration); Pattern Analysis (frequency analysis, structural analysis, tendency analysis, N-gram exploration, N-gram statistics); Regional Analysis (aggregate statistics, eigenvectors, category tendencies, similarity analysis); ML Computation (basic clustering, character tendencies, sampled villages, spatially-aware clustering, hierarchical clustering, feature extraction, subset analysis); Search."
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2005418333642707057"
       },
       "feature9": {
         "heading": "Acoustic Analysis Tools (Praat Web Edition)",
@@ -222,7 +229,8 @@
             "title": "Fundamental Frequency Tuning",
             "body": "Extract voiced / rime_core portions of each tone category → add to list → generate a five-degree chart using the Shi Feng T-value method. Export to Excel supported. Multiple tone categories can be extracted from a single recording; mobile-friendly."
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2007951324780713596"
       },
       "feature10": {
         "heading": "Dialect Clustering Analysis",
@@ -231,7 +239,9 @@
         "items": []
       }
     },
-    "footer": "Welcome to explore \"Dialects Atlas\" and touch the historical layers of dialects together!"
+    "footer": "Welcome to explore \"Dialects Atlas\" and touch the historical layers of dialects together!",
+    "readZhihuArticle": "📖 知乎文章：了解详情 →",
+    "oldSiteZhihuArticle": "📖 Legacy Website Introduction → Zhihu Article"
   },
   "reflection": {
     "title": "🧑‍💻 Development Reflection",
@@ -263,8 +273,8 @@
   },
   "suggestion": {
     "title": "Feedback",
-    "description": "Found a bug? Have suggestions?<br />Welcome to submit via GitHub Issue!",
-    "subtext": "Click the cards below to jump to the corresponding repository",
+    "description": "Found a bug? Have suggestions? Got ideas?<br />Welcome to submit via GitHub Issue or leave a comment on Zhihu!",
+    "subtext": "👇 Click the cards below to jump to the corresponding platform",
     "frontend": {
       "title": "🐞 Website has bugs❓<br />💡 Have suggestions for UI/UX❓",
       "link": "Submit Issue to Frontend Repo"
@@ -272,12 +282,17 @@
     "backend": {
       "title": "🔤 Questions about character tables❓<br />🎯 Errors in initial/final/tone extraction❓",
       "link": "Submit Issue to Character Processing Repo"
+    },
+    "zhihu": {
+      "title": "💬 Want to discuss❓<br />📝 Have thoughts on the site❓",
+      "link": "Leave a comment on Zhihu"
     }
   },
   "like": {
     "title": "❤️ Support Author",
     "followButton": "Follow",
     "starMessage": "\"If you like this project, could you give it a ⭐️!\"",
+    "zhihuLike": "\"If you like it, feel free to give it a like on Zhihu too 👍\"",
     "projects": {
       "frontend": {
         "name": "dialects-vue-frontend",
@@ -290,6 +305,14 @@
       "build": {
         "name": "dialects-build",
         "description": "Data pipeline - Character table preprocessing"
+      },
+      "zhihuProject": {
+        "name": "Dialects Atlas",
+        "description": "Project - Zhihu Humanities Season"
+      },
+      "zhihuColumn": {
+        "name": "Zhihu Column",
+        "description": "Column - Dialect-related"
       }
     },
     "supportMessage": "\"If this website has helped you, you can buy the author a coffee☕️. Your support will be the motivation for the author to continue maintaining it🙏\"",
