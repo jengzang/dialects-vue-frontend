@@ -282,7 +282,7 @@ import {
 import { ensureCustomDataPresence, invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js';
 import { userStore } from '@/main/store/store.js';
 import { formatCoord } from '@/utils/map/formatCoord.js';
-import MiniMapSelector from './MiniMapSelector.vue';
+import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue';
 
 const props = defineProps({
   point: {
@@ -786,6 +786,8 @@ watch(
 </script>
 
 <style scoped lang="scss">
+@use '../../_map-variables' as *;
+
 @use '@/styles/main/_surfaces.scss';
 
 .point-detail-form {
@@ -812,13 +814,13 @@ watch(
   margin: 0;
   font-size: 20px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .point-detail-description {
   margin: 0;
   font-size: 14px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .point-detail-layout {
@@ -859,7 +861,7 @@ watch(
 .point-rows-title {
   font-size: 14px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .point-field-input {
@@ -870,10 +872,10 @@ watch(
 .point-row-input {
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid rgba(148, 163, 184, 0.32);
+  border: 1px solid $muted-ring;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.75);
-  color: #0f172a;
+  background: $glass-medium;
+  color: $text-strong;
   font-size: 14px;
   outline: none;
   transition:
@@ -883,13 +885,13 @@ watch(
   box-sizing: border-box;
 
   &::placeholder {
-    color: #94a3b8;
+    color: $text-light;
   }
 
   &:focus {
-    border-color: rgba(0, 122, 255, 0.55);
-    background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+    border-color: $primary-focus;
+    background: #fff;
+    box-shadow: 0 0 0 4px $primary-glass;
   }
 }
 
@@ -907,7 +909,7 @@ watch(
 .point-rows-description {
   margin: 0;
   font-size: 13px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .point-rows-table {
@@ -927,7 +929,7 @@ watch(
 
 .point-rows-table-head {
   padding: 0 6px;
-  color: #64748b;
+  color: $text-muted;
   font-size: 12px;
   font-weight: 700;
 }
@@ -936,8 +938,8 @@ watch(
   padding: 10px 12px;
   border: none;
   border-radius: 12px;
-  background: rgba(239, 68, 68, 0.12);
-  color: #dc2626;
+  background: rgba($danger-light, 0.12);
+  color: $danger;
   cursor: pointer;
 }
 
@@ -954,16 +956,16 @@ watch(
 }
 
 .add-row-btn {
-  background: rgba(16, 185, 129, 0.08);
-  border-color: rgba(16, 185, 129, 0.24);
+  background: rgba(#10b981, 0.08);
+  border-color: rgba(#10b981, 0.24);
   color: #059669;
 }
 
 .add-row-btn:hover:not(:disabled) {
-  background: rgba(16, 185, 129, 0.15);
-  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(#10b981, 0.15);
+  border-color: rgba(#10b981, 0.4);
   color: #047857;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+  box-shadow: 0 4px 12px rgba(#10b981, 0.08);
 }
 
 .point-map-title {
@@ -973,7 +975,7 @@ watch(
 .point-save-message {
   margin-top: 12px;
   font-size: 13px;
-  color: #475569;
+  color: $text-secondary;
 }
 
 @media (max-width: 1100px) {
@@ -997,7 +999,7 @@ watch(
     padding: 16px;
     border-radius: 12px;
     border: 1px solid rgba(0, 0, 0, 0.08);
-    background: rgba(255, 255, 255, 0.45);
+    background: $glass-white;
     margin-bottom: 8px;
   }
 
@@ -1011,7 +1013,7 @@ watch(
     content: attr(data-label);
     font-size: 12px;
     font-weight: 700;
-    color: #475569;
+    color: $text-secondary;
   }
 
   .point-row-remove {
@@ -1078,7 +1080,7 @@ watch(
   margin: 0;
   font-size: 16px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .feature-detail-modal-body {
@@ -1090,18 +1092,18 @@ watch(
 .modal-empty-state {
   padding: 32px;
   text-align: center;
-  color: #64748b;
+  color: $text-muted;
   font-size: 14px;
 }
 
 .modal-error-state {
-  color: #ef4444;
+  color: $danger-light;
 }
 
 .modal-table-container {
   overflow-x: auto;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  border: 1px solid rgba($text-light, 0.16);
   background: rgba(255, 255, 255, 0.5);
 }
 
@@ -1114,17 +1116,17 @@ watch(
   th,
   td {
     padding: 10px 12px;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    border-bottom: 1px solid $muted-subtle;
   }
 
   th {
     background: rgba(241, 245, 249, 0.7);
-    color: #475569;
+    color: $text-secondary;
     font-weight: 700;
   }
 
   td {
-    color: #334155;
+    color: $text-dark;
   }
 
   tr:last-child td {
@@ -1145,10 +1147,10 @@ watch(
   right: 0;
   max-height: 200px;
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.95);
+  background: $glass-solid;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  border: 1px solid $muted-hover;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   z-index: 1000;
@@ -1166,7 +1168,7 @@ watch(
   cursor: pointer;
   text-align: left;
   font-size: 13px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  border-bottom: 1px solid $muted-border;
   transition: background-color 0.18s ease;
 
   &:last-child {
@@ -1174,7 +1176,7 @@ watch(
   }
 
   &:hover {
-    background-color: rgba(0, 122, 255, 0.08);
+    background-color: $primary-subtle;
   }
 }
 
@@ -1186,26 +1188,26 @@ watch(
 
 .suggestion-location {
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .suggestion-region {
-  color: #64748b;
+  color: $text-muted;
   font-size: 12px;
 }
 
 .suggestion-badge {
   font-size: 10px;
   font-weight: 700;
-  background: rgba(0, 122, 255, 0.1);
-  color: #007aff;
+  background: $primary-glass;
+  color: $primary;
   padding: 2px 6px;
   border-radius: 999px;
   white-space: nowrap;
 
   &.archive {
-    background: rgba(142, 142, 147, 0.12);
-    color: #8e8e93;
+    background: rgba($text-subtle, 0.12);
+    color: $text-subtle;
   }
 }
 
@@ -1219,7 +1221,7 @@ watch(
 .quick-select-label {
   font-size: 11px !important;
   font-weight: 700;
-  color: #64748b !important;
+  color: $text-muted !important;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -1235,11 +1237,11 @@ watch(
 .quick-select-pill {
   font-size: 12px;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: $glass-light;
+  border: 1px solid $muted-hover;
   padding: 4px 10px;
   border-radius: 8px;
-  color: #334155;
+  color: $text-dark;
   cursor: pointer;
   transition: all 0.18s ease;
   display: inline-flex;
@@ -1247,19 +1249,19 @@ watch(
   gap: 2px;
 
   &:hover {
-    background: rgba(0, 122, 255, 0.08);
-    border-color: rgba(0, 122, 255, 0.3);
-    color: #007aff;
+    background: $primary-subtle;
+    border-color: $primary-active;
+    color: $primary;
 
     .pill-region {
-      color: rgba(0, 122, 255, 0.6);
+      color: rgba($primary, 0.6);
     }
   }
 }
 
 .pill-region {
   font-size: 10px;
-  color: #8e8e93;
+  color: $text-subtle;
   font-weight: 400;
   transition: color 0.18s ease;
 }

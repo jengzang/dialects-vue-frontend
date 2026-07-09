@@ -1,4 +1,4 @@
-@use '../../../../styles/global/scrollbars' as scrollbars;
+@use '../../../../../styles/global/scrollbars' as scrollbars;
 
 @mixin draw-section-base {
   display: flex;

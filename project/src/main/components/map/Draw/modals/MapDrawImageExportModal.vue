@@ -272,6 +272,8 @@ watch(
 </script>
 
 <style scoped lang="scss">
+@use '../../_map-variables' as *;
+
 .image-export-modal {
   display: flex;
   flex-direction: column;
@@ -294,18 +296,18 @@ watch(
 
 .summary-label {
   font-size: 11px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .summary-value {
   font-size: 14px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
   word-break: break-word;
 }
 
 .summary-number {
-  color: #007aff;
+  color: $primary;
 }
 
 .image-export-grid {
@@ -321,7 +323,7 @@ watch(
 .scope-panel-title {
   font-size: 13px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .scope-radio-item,
@@ -332,12 +334,12 @@ watch(
   padding: 10px 12px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  border: 1px solid rgba($text-light, 0.22);
 }
 
 .scope-radio-item input {
   margin-top: 2px;
-  accent-color: #007aff;
+  accent-color: $primary;
 }
 
 .scope-selection-copy {
@@ -350,12 +352,12 @@ watch(
 .scope-selection-title {
   font-size: 13px;
   font-weight: 600;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .scope-selection-meta {
   font-size: 11px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .draw-field {
@@ -367,7 +369,7 @@ watch(
 .draw-field-label {
   font-size: 12px;
   font-weight: 600;
-  color: #334155;
+  color: $text-dark;
 }
 
 .draw-select-input,
@@ -375,9 +377,9 @@ watch(
   width: 80%;
   padding: 0.6rem 0.85rem;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.32);
-  background: rgba(255, 255, 255, 0.82);
-  color: #0b2540;
+  border: 1px solid $muted-ring;
+  background: $glass-strong;
+  color: $deep-blue;
 }
 
 .image-export-custom-size {

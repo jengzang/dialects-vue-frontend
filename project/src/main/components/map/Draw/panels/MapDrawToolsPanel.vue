@@ -294,5 +294,7 @@ defineEmits([
 </script>
 
 <style scoped lang="scss">
+@use '../../_map-variables' as *;
+
 @use './panelShared';
 </style>

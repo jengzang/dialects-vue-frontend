@@ -1,0 +1,81 @@
+// Shared SCSS variables for map components
+
+// == Colors ==
+
+// Primary
+$primary: #007aff;
+$primary-dark: #0051d5;
+
+// Text
+$text-strong: #0f172a;
+$text-main: #1e293b;
+$text-dark: #334155;
+$text-secondary: #475569;
+$text-muted: #64748b;
+$text-light: #94a3b8;
+$text-subtle: #8e8e93;
+
+// Glass / Surfaces
+$glass-white: rgba(255, 255, 255, 0.45);
+$glass-light: rgba(255, 255, 255, 0.6);
+$glass-medium: rgba(255, 255, 255, 0.75);
+$glass-strong: rgba(255, 255, 255, 0.82);
+$glass-heavy: rgba(255, 255, 255, 0.9);
+$glass-solid: rgba(255, 255, 255, 0.95);
+$bg-light: rgba(241, 245, 249, 0.9);
+$bg-subtle: rgba(15, 23, 42, 0.08);
+
+// Semantic
+$success: #34c759;
+$success-bg: #e8f8ef;
+$danger: #dc2626;
+$danger-light: #ef4444;
+$danger-bg: #fde4ec;
+$warning: #ff9500;
+$warning-dark: #d97706;
+$purple: #af52de;
+$teal: #00887a;
+$deep-blue: #0b2540;
+
+// Primary opacity variants
+$primary-subtle: rgba(0, 122, 255, 0.08);
+$primary-glass: rgba(0, 122, 255, 0.1);
+$primary-border: rgba(0, 122, 255, 0.12);
+$primary-hover: rgba(0, 122, 255, 0.25);
+$primary-active: rgba(0, 122, 255, 0.3);
+$primary-ring: rgba(0, 122, 255, 0.5);
+$primary-focus: rgba(0, 122, 255, 0.55);
+
+// Muted opacity variants
+$muted-border: rgba(148, 163, 184, 0.08);
+$muted-subtle: rgba(148, 163, 184, 0.12);
+$muted-hover: rgba(148, 163, 184, 0.24);
+$muted-active: rgba(148, 163, 184, 0.28);
+$muted-ring: rgba(148, 163, 184, 0.32);
+
+// == Typography ==
+$font-system:
+  -apple-system,
+  BlinkMacSystemFont,
+  'SF Pro Display',
+  'SF Pro Text',
+  'PingFang SC',
+  'Hiragino Sans GB',
+  'Microsoft YaHei',
+  Arial,
+  sans-serif;
+
+// == Motion ==
+$motion-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+$motion-smooth: all 0.25s ease;
+
+// == Spacing ==
+$spacing-xs: 6px;
+$spacing-sm: 10px;
+$spacing-md: 16px;
+$spacing-lg: 18px;
+
+// == Radius ==
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 14px;

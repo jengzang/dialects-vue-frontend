@@ -59,8 +59,8 @@
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
-import PointCentricMode from './PointCentricMode.vue';
-import FeatureCentricMode from './FeatureCentricMode.vue';
+import PointCentricMode from './point/PointCentricMode.vue';
+import FeatureCentricMode from './feature/FeatureCentricMode.vue';
 
 const props = defineProps({
   modelValue: {
@@ -94,6 +94,8 @@ watch(
 </script>
 
 <style scoped lang="scss">
+@use '../_map-variables' as *;
+
 .entry-modal-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
@@ -106,7 +108,7 @@ watch(
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -117,16 +119,16 @@ watch(
   font-weight: 500;
   padding: 2px 8px;
   border-radius: 6px;
-  background: rgba(255, 149, 0, 0.12);
-  color: #d97706;
-  border: 1px solid rgba(255, 149, 0, 0.24);
+  background: rgba($warning, 0.12);
+  color: $warning-dark;
+  border: 1px solid rgba($warning, 0.24);
   white-space: nowrap;
 }
 
 .entry-modal-subtitle {
   grid-column: 1 / 2;
   font-size: 13px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .entry-modal-mode-switcher {
@@ -144,7 +146,7 @@ watch(
   border: none;
   border-radius: 999px;
   background: transparent;
-  color: #475569;
+  color: $text-secondary;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -155,16 +157,16 @@ watch(
 }
 
 .entry-mode-button.active {
-  background: #ffffff;
-  color: #007aff;
-  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+  background: #fff;
+  color: $primary;
+  box-shadow: 0 8px 16px $bg-subtle;
 }
 
 .entry-modal-empty {
   padding: 36px 24px;
   border-radius: 18px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.82);
+  background: $glass-strong;
 }
 
 .entry-modal-empty-icon {
@@ -175,7 +177,7 @@ watch(
 .entry-modal-empty-title {
   font-size: 18px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .entry-modal-empty-text {
@@ -183,7 +185,7 @@ watch(
   margin: 12px auto 0;
   font-size: 14px;
   line-height: 1.7;
-  color: #475569;
+  color: $text-secondary;
 }
 
 @media (max-width: 768px) {

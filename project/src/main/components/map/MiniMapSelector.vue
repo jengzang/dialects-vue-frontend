@@ -273,6 +273,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@use './_map-variables' as *;
+
 @use '@/styles/main/_surfaces.scss';
 
 .mini-map-wrapper {
@@ -281,9 +283,9 @@ onBeforeUnmount(() => {
   height: 400px;
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+  border: 1px solid $bg-subtle;
+  background: $glass-strong;
+  box-shadow: 0 10px 28px $bg-subtle;
   flex-shrink: 0;
 }
 
@@ -299,7 +301,7 @@ onBeforeUnmount(() => {
   padding: 6px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.92);
-  color: #475569;
+  color: $text-secondary;
   font-size: 12px;
   line-height: 1;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
@@ -324,11 +326,11 @@ onBeforeUnmount(() => {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #007aff;
+  background: $primary;
   border: 3px solid #fff;
   box-shadow:
-    0 0 0 3px rgba(0, 122, 255, 0.25),
-    0 8px 16px rgba(0, 122, 255, 0.28);
+    0 0 0 3px $primary-hover,
+    0 8px 16px rgba($primary, 0.28);
 }
 
 :deep(.mini-map-point) {
@@ -336,13 +338,13 @@ onBeforeUnmount(() => {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #34c759;
+  background: $success;
   border: 2px solid #fff;
-  box-shadow: 0 6px 14px rgba(52, 199, 89, 0.28);
+  box-shadow: 0 6px 14px rgba($success, 0.28);
 
   &.is-active {
-    background: #007aff;
-    box-shadow: 0 8px 18px rgba(0, 122, 255, 0.34);
+    background: $primary;
+    box-shadow: 0 8px 18px rgba($primary, 0.34);
   }
 }
 
@@ -360,9 +362,9 @@ onBeforeUnmount(() => {
   text-align: center;
 
   &.is-active {
-    background-color: #007aff;
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.5);
+    background-color: $primary;
+    color: #fff;
+    box-shadow: 0 2px 8px $primary-ring;
   }
 }
 

@@ -253,7 +253,7 @@ import AppModal from '@/components/common/AppModal.vue';
 import { batchDeleteCustomData, getDataByFeature, getDataByPoint } from '@/api';
 import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js';
 import { showConfirm, showWarning } from '@/utils/message.js';
-import MiniMapSelector from './MiniMapSelector.vue';
+import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue';
 import FeatureRecordEditorModal from './FeatureRecordEditorModal.vue';
 
 const props = defineProps({
@@ -433,6 +433,8 @@ watch(
 </script>
 
 <style scoped lang="scss">
+@use '../../_map-variables' as *;
+
 @use '@/styles/main/_surfaces.scss';
 
 .feature-detail-table {
@@ -459,13 +461,13 @@ watch(
   margin: 0;
   font-size: 20px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .feature-detail-description {
   margin: 0;
   font-size: 14px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .feature-detail-layout {
@@ -488,11 +490,11 @@ watch(
   align-items: center;
   justify-content: center;
   min-height: 220px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .feature-detail-state-error {
-  color: #dc2626;
+  color: $danger;
 }
 
 .feature-detail-table-body {
@@ -511,7 +513,7 @@ watch(
 
 .feature-detail-table-head {
   padding: 0 6px;
-  color: #64748b;
+  color: $text-muted;
   font-size: 12px;
   font-weight: 700;
 }
@@ -519,7 +521,7 @@ watch(
 .feature-detail-row {
   padding: 12px 14px;
   font-size: 13px;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .feature-detail-actions {
@@ -530,19 +532,19 @@ watch(
 .feature-detail-link {
   border: none;
   background: transparent;
-  color: #007aff;
+  color: $primary;
   cursor: pointer;
 }
 
 .feature-detail-link.danger {
-  color: #dc2626;
+  color: $danger;
 }
 
 .feature-detail-map-title {
   margin-bottom: 12px;
   font-size: 14px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 @media (max-width: 1100px) {
@@ -561,7 +563,7 @@ watch(
     border: 1px solid rgba(0, 0, 0, 0.08);
     padding: 12px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.45);
+    background: $glass-white;
     gap: 8px;
     margin-bottom: 8px;
   }
@@ -576,7 +578,7 @@ watch(
   .feature-detail-row > span::before {
     content: attr(data-label);
     font-weight: 600;
-    color: #64748b;
+    color: $text-muted;
     margin-right: 12px;
   }
 
@@ -590,7 +592,7 @@ watch(
 }
 
 .clickable-location {
-  color: #007aff;
+  color: $primary;
   cursor: pointer;
   transition:
     text-decoration 0.2s ease,
@@ -613,7 +615,7 @@ watch(
   margin: 0;
   font-size: 16px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .point-detail-modal-body {
@@ -625,18 +627,18 @@ watch(
 .modal-empty-state {
   padding: 32px;
   text-align: center;
-  color: #64748b;
+  color: $text-muted;
   font-size: 14px;
 }
 
 .modal-error-state {
-  color: #ef4444;
+  color: $danger-light;
 }
 
 .modal-table-container {
   overflow-x: auto;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  border: 1px solid rgba($text-light, 0.16);
   background: rgba(255, 255, 255, 0.5);
 }
 
@@ -649,17 +651,17 @@ watch(
   th,
   td {
     padding: 10px 12px;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    border-bottom: 1px solid $muted-subtle;
   }
 
   th {
     background: rgba(241, 245, 249, 0.7);
-    color: #475569;
+    color: $text-secondary;
     font-weight: 700;
   }
 
   td {
-    color: #334155;
+    color: $text-dark;
   }
 
   tr:last-child td {
@@ -683,16 +685,16 @@ watch(
   span {
     font-size: 13px;
     font-weight: 700;
-    color: #475569;
+    color: $text-secondary;
   }
 }
 
 .header-text-input {
   padding: 8px 12px;
-  border: 1px solid rgba(148, 163, 184, 0.32);
+  border: 1px solid $muted-ring;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.75);
-  color: #0f172a;
+  background: $glass-medium;
+  color: $text-strong;
   font-size: 14px;
   outline: none;
   transition:
@@ -702,13 +704,13 @@ watch(
   width: 160px;
 
   &::placeholder {
-    color: #94a3b8;
+    color: $text-light;
   }
 
   &:focus {
-    border-color: rgba(0, 122, 255, 0.55);
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    border-color: $primary-focus;
+    background: #fff;
+    box-shadow: 0 0 0 3px $primary-glass;
   }
 }
 </style>

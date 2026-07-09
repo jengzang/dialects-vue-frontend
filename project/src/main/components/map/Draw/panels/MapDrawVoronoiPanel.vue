@@ -181,6 +181,8 @@ const offsetClass = computed(() => {
 </script>
 
 <style scoped lang="scss">
+@use '../../_map-variables' as *;
+
 @use './panelShared';
 
 .voronoi-panel.offset-double {
@@ -205,12 +207,12 @@ const offsetClass = computed(() => {
 
 .voronoi-summary-label {
   font-size: 0.78rem;
-  color: rgba(11, 37, 64, 0.68);
+  color: rgba($deep-blue, 0.68);
 }
 
 .voronoi-summary-value {
   font-size: 1.08rem;
-  color: #0b2540;
+  color: $deep-blue;
 }
 
 @media (max-width: 900px) {

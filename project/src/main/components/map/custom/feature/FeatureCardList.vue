@@ -93,6 +93,8 @@ function resolveToneType(item) {
 </script>
 
 <style scoped lang="scss">
+@use '../../_map-variables' as *;
+
 @use '@/styles/main/_surfaces.scss';
 
 .feature-card-list {
@@ -119,13 +121,13 @@ function resolveToneType(item) {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .feature-card-description {
   margin: 0;
   font-size: 14px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .feature-grid {
@@ -139,7 +141,7 @@ function resolveToneType(item) {
 .feature-card-name {
   font-size: 16px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .feature-card-tag {
@@ -153,43 +155,43 @@ function resolveToneType(item) {
 }
 
 .feature-card-tag[data-tone='initial'] {
-  background: #e3f0ff;
-  color: #007aff;
+  background: rgba($primary, 0.06);
+  color: $primary;
 }
 
 .feature-card-tag[data-tone='final'] {
-  background: #e8f8ef;
-  color: #34c759;
+  background: $success-bg;
+  color: $success;
 }
 
 .feature-card-tag[data-tone='tone'] {
-  background: #fff3e0;
-  color: #ff9500;
+  background: rgba($warning, 0.12);
+  color: $warning;
 }
 
 .feature-card-tag[data-tone='hanzi'] {
-  background: #e0f2f1;
-  color: #00887a;
+  background: rgba($teal, 0.07);
+  color: $teal;
 }
 
 .feature-card-tag[data-tone='tone-value'] {
-  background: #fde4ec;
+  background: $danger-bg;
   color: #f43e5c;
 }
 
 .feature-card-tag[data-tone='lexicon'] {
-  background: #f3e8ff;
-  color: #af52de;
+  background: rgba($purple, 0.09);
+  color: $purple;
 }
 
 .feature-card-tag[data-tone='other'] {
-  background: #f2f2f7;
-  color: #8e8e93;
+  background: rgba($text-subtle, 0.09);
+  color: $text-subtle;
 }
 
 .feature-card-badge {
   font-size: 12px;
-  color: #475569;
+  color: $text-secondary;
   font-weight: 600;
 }
 
@@ -198,7 +200,7 @@ function resolveToneType(item) {
 .skeleton-line,
 .skeleton-chip {
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(226, 232, 240, 0.9), rgba(241, 245, 249, 0.9), rgba(226, 232, 240, 0.9));
+  background: linear-gradient(90deg, rgba(226, 232, 240, 0.9), $bg-light, rgba(226, 232, 240, 0.9));
   background-size: 200% 100%;
   animation: shimmer 1.2s linear infinite;
 }

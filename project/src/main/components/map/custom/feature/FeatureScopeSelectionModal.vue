@@ -462,6 +462,8 @@ function formatRegionNames(regionNames) {
 </script>
 
 <style scoped lang="scss">
+@use '../../_map-variables' as *;
+
 .feature-scope-modal {
   display: flex;
   flex-direction: column;
@@ -487,7 +489,7 @@ function formatRegionNames(regionNames) {
   margin: 0;
   font-size: 16px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
   min-width:100px;
 }
 
@@ -498,18 +500,18 @@ function formatRegionNames(regionNames) {
 .scope-search-input {
   width: 80%;
   height: 38px;
-  border: 1px solid rgba(148, 163, 184, 0.28);
+  border: 1px solid $muted-active;
   border-radius: 12px;
   padding: 0 14px;
   font-size: 13px;
-  color: #0f172a;
-  background: rgba(255, 255, 255, 0.82);
+  color: $text-strong;
+  background: $glass-strong;
 }
 
 .scope-search-input:focus {
   outline: none;
-  border-color: rgba(0, 122, 255, 0.48);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+  border-color: rgba($primary, 0.48);
+  box-shadow: 0 0 0 3px $primary-border;
 }
 
 .feature-scope-summary {
@@ -530,17 +532,17 @@ function formatRegionNames(regionNames) {
 
 .summary-label {
   font-size: 12px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .summary-value {
   font-size: 15px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .summary-number {
-  color: #007aff;
+  color: $primary;
 }
 
 .scope-toolbar {
@@ -560,7 +562,7 @@ function formatRegionNames(regionNames) {
 
 .scope-toolbar-info {
   font-size: 13px;
-  color: #475569;
+  color: $text-secondary;
   font-weight: 700;
 }
 
@@ -569,17 +571,17 @@ function formatRegionNames(regionNames) {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #334155;
+  color: $text-dark;
 }
 
 .scope-toggle-label input {
-  accent-color: #007aff;
+  accent-color: $primary;
 }
 
 .scope-clear-btn {
   border: none;
   background: transparent;
-  color: #64748b;
+  color: $text-muted;
   font-size: 13px;
   cursor: pointer;
 }
@@ -603,7 +605,7 @@ function formatRegionNames(regionNames) {
 .scope-panel-title {
   font-size: 14px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .scope-tree-list,
@@ -637,8 +639,8 @@ function formatRegionNames(regionNames) {
   gap: 10px;
   padding: 16px 18px;
   border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid $muted-hover;
+  background: $glass-heavy;
   text-align: left;
 }
 
@@ -665,7 +667,7 @@ function formatRegionNames(regionNames) {
 
 .scope-tree-caret {
   width: 12px;
-  color: #64748b;
+  color: $text-muted;
   flex: 0 0 auto;
 }
 
@@ -674,17 +676,17 @@ function formatRegionNames(regionNames) {
 }
 
 .scope-selection-item.state-full {
-  border-color: #007aff;
-  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.18);
+  border-color: $primary;
+  box-shadow: 0 0 0 1px rgba($primary, 0.18);
 }
 
 .scope-selection-item.state-partial {
-  border-color: rgba(0, 122, 255, 0.5);
-  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.12);
+  border-color: $primary-ring;
+  box-shadow: 0 0 0 1px $primary-border;
 }
 
 .scope-checkbox-item input {
-  accent-color: #007aff;
+  accent-color: $primary;
   margin-top: 2px;
 }
 
@@ -695,17 +697,17 @@ function formatRegionNames(regionNames) {
 
 .scope-selection-title {
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .scope-selection-meta,
 .scope-selection-status {
   font-size: 13px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .scope-selection-status {
-  color: #007aff;
+  color: $primary;
   font-weight: 600;
 }
 

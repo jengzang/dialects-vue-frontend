@@ -226,7 +226,7 @@ import { computed, nextTick, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
-import CustomDataEntryModal from '@/main/components/map/custom-entry/CustomDataEntryModal.vue';
+import CustomDataEntryModal from '@/main/components/map/custom/CustomDataEntryModal.vue';
 import CustomTabHelpModal from '@/main/components/popup/map/CustomTabHelpModal.vue';
 import { getUserFeatures, getDataByFeature } from '@/api';
 import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js';
@@ -236,7 +236,7 @@ import {
   resultCache,
 } from '@/main/store/store.js';
 import { showSuccess, showWarning, showError } from '@/utils/message.js';
-import FeatureScopeSelectionModal from '@/main/components/map/custom-entry/FeatureScopeSelectionModal.vue';
+import FeatureScopeSelectionModal from '@/main/components/map/custom/feature/FeatureScopeSelectionModal.vue';
 import { addCustomFeatureDataWithoutApi } from '@/utils/map/MapData.js';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 

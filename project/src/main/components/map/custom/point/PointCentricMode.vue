@@ -75,9 +75,11 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+@use '../../_map-variables' as *;
+
 .point-mode-shell {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: $spacing-md;
 }
 </style>

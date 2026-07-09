@@ -82,6 +82,8 @@ const filteredItems = computed(() => {
 </script>
 
 <style scoped lang="scss">
+@use '../../_map-variables' as *;
+
 @use '@/styles/main/_surfaces.scss';
 
 .point-card-list {
@@ -108,13 +110,13 @@ const filteredItems = computed(() => {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .point-card-description {
   margin: 0;
   font-size: 14px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .point-grid {
@@ -124,26 +126,26 @@ const filteredItems = computed(() => {
 .point-card-name {
   font-size: 16px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .point-card-region {
   font-size: 13px;
-  color: #475569;
+  color: $text-secondary;
 }
 
 
 .point-card-badge {
   margin-top: 4px;
   font-size: 12px;
-  color: #007aff;
+  color: $primary;
   font-weight: 600;
 }
 
 
 .skeleton-line {
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(226, 232, 240, 0.9), rgba(241, 245, 249, 0.9), rgba(226, 232, 240, 0.9));
+  background: linear-gradient(90deg, rgba(226, 232, 240, 0.9), $bg-light, rgba(226, 232, 240, 0.9));
   background-size: 200% 100%;
   animation: shimmer 1.2s linear infinite;
 }

@@ -508,13 +508,13 @@ import {
 } from '@/utils/map/partitionVoronoi.js';
 import { mapStyleConfig } from '@/utils/map/MapSource.js';
 import EditableMapLibre from '@/main/components/map/EditableMapLibre.vue';
-import MapDrawLayersPanel from '@/main/components/map/panels/MapDrawLayersPanel.vue';
-import MapDrawToolsPanel from '@/main/components/map/panels/MapDrawToolsPanel.vue';
-import MapDrawVoronoiPanel from '@/main/components/map/panels/MapDrawVoronoiPanel.vue';
-import MapDrawImageExportModal from '@/main/components/map/modals/MapDrawImageExportModal.vue';
-import MapDrawImagePreviewModal from '@/main/components/map/modals/MapDrawImagePreviewModal.vue';
-import VoronoiExportLayersModal from '@/main/components/map/modals/VoronoiExportLayersModal.vue';
-import VoronoiIgnorePointsModal from '@/main/components/map/modals/VoronoiIgnorePointsModal.vue';
+import MapDrawLayersPanel from '@/main/components/map/Draw/panels/MapDrawLayersPanel.vue';
+import MapDrawToolsPanel from '@/main/components/map/Draw/panels/MapDrawToolsPanel.vue';
+import MapDrawVoronoiPanel from '@/main/components/map/Draw/panels/MapDrawVoronoiPanel.vue';
+import MapDrawImageExportModal from '@/main/components/map/Draw/modals/MapDrawImageExportModal.vue';
+import MapDrawImagePreviewModal from '@/main/components/map/Draw/modals/MapDrawImagePreviewModal.vue';
+import VoronoiExportLayersModal from '@/main/components/map/Draw/modals/VoronoiExportLayersModal.vue';
+import VoronoiIgnorePointsModal from '@/main/components/map/Draw/modals/VoronoiIgnorePointsModal.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
 import AppModal from '@/components/common/AppModal.vue';
 
@@ -1563,7 +1563,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
-@use '../../../styles/global/scrollbars' as scrollbars;
+@use '../../../../styles/global/scrollbars' as scrollbars;
 
 @mixin draw-section-base {
   display: flex;

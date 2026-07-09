@@ -100,11 +100,11 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { mapStore } from '@/main/store/store.js'
 
 import TabsContainer from '@/components/common/TabsContainer.vue'
-import DivideTab from "@/main/components/map/DivideTab.vue";
-import CustomTab from '@/main/components/map/CustomTab.vue'
-import MapDrawTab from '@/main/components/map/MapDrawTab.vue'
+import DivideTab from "@/main/components/map/Tabs/DivideTab.vue";
+import CustomTab from '@/main/components/map/Tabs/CustomTab.vue'
+import MapDrawTab from '@/main/components/map/Tabs/MapDrawTab.vue'
 import MapLibre from "@/main/components/map/MapLibre.vue";
-import CustomDataPanel from '@/main/components/map/CustomDataPanel.vue'
+import CustomDataPanel from '@/main/components/map/custom/CustomDataPanel.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
 import { showSuccess, showError } from '@/utils/message.js'

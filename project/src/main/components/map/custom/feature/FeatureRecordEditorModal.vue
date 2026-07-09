@@ -158,7 +158,7 @@ import { batchCreateCustomData, editCustomData, getDataByFeature, getDataByPoint
 import { ensureCustomDataPresence, invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js';
 import { userStore } from '@/main/store/store.js';
 import { formatCoord } from '@/utils/map/formatCoord.js';
-import MiniMapSelector from './MiniMapSelector.vue';
+import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue';
 
 const props = defineProps({
   modelValue: {
@@ -518,6 +518,8 @@ watch(
 </script>
 
 <style scoped lang="scss">
+@use '../../_map-variables' as *;
+
 @use '@/styles/main/_surfaces.scss';
 
 .feature-record-header {
@@ -531,7 +533,7 @@ watch(
   margin: 0;
   font-size: 16px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .feature-record-body {
@@ -560,7 +562,7 @@ watch(
 .feature-record-field span {
   font-size: 13px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
   min-width: 45px;
   flex-shrink: 0;
 }
@@ -569,10 +571,10 @@ watch(
   flex: 1;
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid rgba(148, 163, 184, 0.32);
+  border: 1px solid $muted-ring;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.75);
-  color: #0f172a;
+  background: $glass-medium;
+  color: $text-strong;
   font-size: 14px;
   outline: none;
   transition:
@@ -582,19 +584,19 @@ watch(
   box-sizing: border-box;
 
   &::placeholder {
-    color: #94a3b8;
+    color: $text-light;
   }
 
   &:focus {
-    border-color: rgba(0, 122, 255, 0.55);
-    background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+    border-color: $primary-focus;
+    background: #fff;
+    box-shadow: 0 0 0 4px $primary-glass;
   }
 }
 
 .feature-record-message {
   font-size: 13px;
-  color: #475569;
+  color: $text-secondary;
 }
 
 @media (max-width: 768px) {
@@ -616,10 +618,10 @@ watch(
   right: 0;
   max-height: 200px;
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.95);
+  background: $glass-solid;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  border: 1px solid $muted-hover;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   z-index: 1000;
@@ -637,7 +639,7 @@ watch(
   cursor: pointer;
   text-align: left;
   font-size: 13px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  border-bottom: 1px solid $muted-border;
   transition: background-color 0.18s ease;
 
   &:last-child {
@@ -645,7 +647,7 @@ watch(
   }
 
   &:hover {
-    background-color: rgba(0, 122, 255, 0.08);
+    background-color: $primary-subtle;
   }
 }
 
@@ -657,26 +659,26 @@ watch(
 
 .suggestion-location {
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .suggestion-region {
-  color: #64748b;
+  color: $text-muted;
   font-size: 12px;
 }
 
 .suggestion-badge {
   font-size: 10px;
   font-weight: 700;
-  background: rgba(0, 122, 255, 0.1);
-  color: #007aff;
+  background: $primary-glass;
+  color: $primary;
   padding: 2px 6px;
   border-radius: 999px;
   white-space: nowrap;
 
   &.archive {
-    background: rgba(142, 142, 147, 0.12);
-    color: #8e8e93;
+    background: rgba($text-subtle, 0.12);
+    color: $text-subtle;
   }
 }
 
@@ -690,7 +692,7 @@ watch(
 .quick-select-label {
   font-size: 11px !important;
   font-weight: 700;
-  color: #64748b !important;
+  color: $text-muted !important;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -706,11 +708,11 @@ watch(
 .quick-select-pill {
   font-size: 12px;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: $glass-light;
+  border: 1px solid $muted-hover;
   padding: 4px 10px;
   border-radius: 8px;
-  color: #334155;
+  color: $text-dark;
   cursor: pointer;
   transition: all 0.18s ease;
   display: inline-flex;
@@ -718,19 +720,19 @@ watch(
   gap: 2px;
 
   &:hover {
-    background: rgba(0, 122, 255, 0.08);
-    border-color: rgba(0, 122, 255, 0.3);
-    color: #007aff;
+    background: $primary-subtle;
+    border-color: $primary-active;
+    color: $primary;
 
     .pill-region {
-      color: rgba(0, 122, 255, 0.6);
+      color: rgba($primary, 0.6);
     }
   }
 }
 
 .pill-region {
   font-size: 10px;
-  color: #8e8e93;
+  color: $text-subtle;
   font-weight: 400;
   transition: color 0.18s ease;
 }

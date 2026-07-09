@@ -109,6 +109,8 @@ function handleClose(value = false) {
 </script>
 
 <style scoped lang="scss">
+@use '../../_map-variables' as *;
+
 .voronoi-export-modal {
   display: flex;
   flex-direction: column;
@@ -159,17 +161,17 @@ function handleClose(value = false) {
 
 .summary-label {
   font-size: 11px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .summary-value {
   font-size: 14px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .summary-number {
-  color: #007aff;
+  color: $primary;
 }
 
 .scope-toolbar {
@@ -189,7 +191,7 @@ function handleClose(value = false) {
 
 .scope-toolbar-info {
   font-size: 12px;
-  color: #475569;
+  color: $text-secondary;
   font-weight: 700;
 }
 
@@ -198,32 +200,32 @@ function handleClose(value = false) {
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #334155;
+  color: $text-dark;
 }
 
 .scope-toggle-label input {
   margin: 0;
-  accent-color: #007aff;
+  accent-color: $primary;
 }
 
 .scope-clear-btn {
-  border: 1px solid rgba(239, 68, 68, 0.28);
+  border: 1px solid rgba($danger-light, 0.28);
   background: rgba(254, 226, 226, 0.92);
-  color: #b91c1c;
+  color: darken($danger, 15%);
   font-size: 12px;
   font-weight: 700;
   line-height: 1;
   padding: 9px 14px;
   border-radius: 999px;
-  box-shadow: 0 8px 18px rgba(239, 68, 68, 0.14);
+  box-shadow: 0 8px 18px rgba($danger-light, 0.14);
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .scope-clear-btn:hover {
   background: rgba(254, 202, 202, 0.98);
-  border-color: rgba(220, 38, 38, 0.38);
-  box-shadow: 0 10px 22px rgba(239, 68, 68, 0.18);
+  border-color: rgba($danger, 0.38);
+  box-shadow: 0 10px 22px rgba($danger-light, 0.18);
   transform: translateY(-1px);
 }
 
@@ -235,7 +237,7 @@ function handleClose(value = false) {
   padding: 10px 14px;
   font-size: 11px;
   line-height: 1.55;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .scope-panel {
@@ -260,13 +262,13 @@ function handleClose(value = false) {
   gap: 10px;
   padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid $muted-hover;
+  background: $glass-heavy;
 }
 
 .scope-checkbox-item input {
   margin-top: 2px;
-  accent-color: #007aff;
+  accent-color: $primary;
 }
 
 .voronoi-export-item.is-disabled {
@@ -287,13 +289,13 @@ function handleClose(value = false) {
 .scope-selection-title {
   font-size: 13px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
   white-space: nowrap;
 }
 
 .scope-selection-meta {
   font-size: 11px;
-  color: #64748b;
+  color: $text-muted;
   white-space: nowrap;
 }
 

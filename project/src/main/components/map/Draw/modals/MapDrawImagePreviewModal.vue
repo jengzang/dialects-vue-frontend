@@ -830,6 +830,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@use '../../_map-variables' as *;
+
 .image-export-preview-modal {
   display: flex;
   flex-direction: column;
@@ -852,18 +854,18 @@ onBeforeUnmount(() => {
 
 .summary-label {
   font-size: 11px;
-  color: #64748b;
+  color: $text-muted;
 }
 
 .summary-value {
   font-size: 14px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
   word-break: break-word;
 }
 
 .summary-number {
-  color: #007aff;
+  color: $primary;
 }
 
 .image-export-preview-main {
@@ -887,20 +889,20 @@ onBeforeUnmount(() => {
 .sidebar-title {
   font-size: 13px;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-strong;
 }
 
 .sidebar-text {
   margin: 0;
   font-size: 12px;
   line-height: 1.6;
-  color: #475569;
+  color: $text-secondary;
 }
 
 .image-export-preview-validation {
   margin: 0;
   font-size: 12px;
-  color: #dc2626;
+  color: $danger;
 }
 
 .image-export-preview-stage {
