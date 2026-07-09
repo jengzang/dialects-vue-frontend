@@ -142,6 +142,11 @@
       <div class="panel-header">
         <h3>表統計信息 Table Statistics</h3>
         <div class="header-controls">
+          <button @click="refreshTables" :disabled="loadingTables" class="solid-button small">
+            <span v-if="loadingTables">加載中...</span>
+            <span v-else-if="tables === null">加載</span>
+            <span v-else>🔄 刷新</span>
+          </button>
           <input
             v-model="tableSearch"
             type="text"
@@ -151,11 +156,10 @@
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model="tableSortBy"
             :options="sortOptions"
-            class="glass-select small"
           />
         </div>
       </div>
-      <div v-if="tables" class="tables-content">
+      <div v-if="tables !== null" class="tables-content">
         <div class="table-wrapper">
           <table class="glass-table">
             <thead>
@@ -193,6 +197,9 @@
           <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 頁</span>
           <button @click="nextPage" :disabled="currentPage === totalPages" class="solid-button small">下一頁</button>
         </div>
+      </div>
+      <div v-else-if="loadingTables" class="vml-loading">
+        <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
     </div>
 
@@ -265,10 +272,12 @@ import { useAsyncData } from '@/composables/core/useAsyncData.js'
 
 // State
 const overview = ref(null)
-const tables = ref([])
+const tables = ref(null)
 const overviewQuery = useAsyncData()
+const tablesQuery = useAsyncData()
 const ngramStatsQuery = useAsyncData()
 const loading = overviewQuery.loading
+const loadingTables = tablesQuery.loading
 const selectedTable = ref(null)
 const ngramStats = ref(null)
 const loadingNgram = ngramStatsQuery.loading
@@ -289,6 +298,7 @@ const sortOptions = [
 
 // Computed
 const filteredTables = computed(() => {
+  if (!tables.value) return []
   let filtered = tables.value
 
   if (tableSearch.value) {
@@ -313,6 +323,7 @@ const filteredTables = computed(() => {
 })
 
 const totalPages = computed(() => {
+  if (!tables.value) return 0
   let count = tables.value.length
   if (tableSearch.value) {
     count = tables.value.filter(t => t.name.toLowerCase().includes(tableSearch.value.toLowerCase())).length
@@ -325,36 +336,43 @@ const selectedTableTitle = computed(() => selectedTable.value ? `表詳情: ${se
 // Methods
 const refreshOverview = async () => {
   await overviewQuery.load(
-    () => Promise.all([
-      getMetadataOverview(),
-      getMetadataTables()
-    ]),
+    () => getMetadataOverview(),
     {
-      onSuccess: ([overviewRes, tablesRes]) => {
-        // Map API response to component data structure
+      onSuccess: (overviewRes) => {
         overview.value = {
-          database_size: (overviewRes.database_size_mb || 0) * 1024,
-          total_tables: tablesRes?.length || 0,
-          total_records: overviewRes.total_villages || 0, // Use villages as main record count
+          database_size: (overviewRes.database_size_mb || 0) * 1024 * 1024,
+          total_tables: overviewRes.total_tables || 0,
+          total_records: overviewRes.total_villages || 0,
           village_count: overviewRes.total_villages || 0,
           character_count: overviewRes.unique_characters || overviewRes.total_characters || 0,
           region_count: (overviewRes.total_cities || 0) + (overviewRes.total_counties || 0) + (overviewRes.total_townships || 0)
         }
 
-        // Map table data from API response (use real field names)
-        tables.value = (tablesRes || []).map(table => ({
-          name: table.table_name || 'unknown',
-          records: table.row_count || 0,
-          size: (table.size_mb || 0) * 1024,
-          indexes: table.index_count || 0,
-          last_updated: table.last_modified || new Date().toISOString(),
-          columns: table.columns || []
-        }))
-
         showSuccess('系統信息刷新成功')
       },
       onError: (error) => {
         showError(error.message || '刷新系統信息失敗')
+      }
+    }
+  )
+}
+
+const refreshTables = async () => {
+  await tablesQuery.load(
+    () => getMetadataTables(),
+    {
+      onSuccess: (tablesRes) => {
+        tables.value = (tablesRes || []).map(table => ({
+          name: table.table_name || 'unknown',
+          records: table.row_count || 0,
+          size: (table.size_mb || 0) * 1024 * 1024,
+          indexes: table.index_count || 0,
+          last_updated: table.last_modified || new Date().toISOString(),
+          columns: table.columns || []
+        }))
+      },
+      onError: (error) => {
+        showError(error.message || '加載表信息失敗')
       }
     }
   )
@@ -388,7 +406,7 @@ const closeModal = () => {
 
 const formatSize = (bytes) => {
   if (bytes === 0) return '0 B'
-  const k = 1024
+  const k = 1024 
   const sizes = ['B', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i]
