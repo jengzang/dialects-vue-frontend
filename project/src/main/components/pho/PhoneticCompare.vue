@@ -732,6 +732,26 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
+$primary: #007aff;
+$error: #d32f2f;
+$ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin glass-blur($blur, $saturation: null) {
+  @if $saturation {
+    backdrop-filter: blur($blur) saturate($saturation);
+    -webkit-backdrop-filter: blur($blur) saturate($saturation);
+  } @else {
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+  }
+}
+
 .phonetic-compare-results-container {
   width: 100%;
   display: flex;
@@ -739,71 +759,71 @@ onUnmounted(() => {
   align-items: center;
 }
 
-/* 错误与加载 */
+/* 错误与加载状态 */
 .error-message {
-  color: var(--color-error, #d32f2f);
-  background: rgba(255, 59, 48, 0.08);
-  border-left: 3px solid var(--color-error, #d32f2f);
-  padding: 10px 14px;
-  border-radius: var(--radius-sm, 6px);
-  margin-top: 15px;
-  font-size: 14px;
   width: 100%;
   max-width: 520px;
+  margin-top: 15px;
+  padding: 10px 14px;
+  background: rgba(255, 59, 48, 0.08);
+  border-left: 3px solid var(--color-error, #{$error});
+  border-radius: var(--radius-sm, 6px);
+  color: var(--color-error, #{$error});
   text-align: left;
+  font-size: 14px;
 }
 
 .loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   min-height: 250px;
+  flex-direction: column;
   gap: 15px;
   margin-top: 20px;
 
+  @include flex-center;
+
   p {
-    font-size: 14px;
     color: var(--text-secondary, #666);
+    font-size: 14px;
   }
 }
 
 /* 结果区域 */
 .results-area {
   width: 100%;
-  margin-top: 25px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 25px;
 }
 
+/* 声韵调切换 */
 .feature-control-row {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 18px;
   margin-bottom: 5px;
-  flex-wrap: wrap;
 }
 
 .feature-tabs {
   display: flex;
-  gap: 12px;
   justify-content: center;
+  gap: 12px;
 }
 
 .feature-tab {
   padding: 8px 18px;
   background: var(--glass-light, rgba(255, 255, 255, 0.3));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-gray-light, rgba(200, 200, 200, 0.5));
   border-radius: var(--radius-md, 12px);
+  color: var(--text-dark, #333);
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-dark, #333);
   cursor: pointer;
   transition: all 0.25s ease;
+
+  @include glass-blur(10px);
 
   &:hover {
     background: var(--glass-medium, rgba(255, 255, 255, 0.5));
@@ -811,57 +831,58 @@ onUnmounted(() => {
   }
 
   &.active {
-    background: var(--color-primary, #007aff);
-    color: white;
-    border-color: var(--color-primary, #007aff);
+    background: var(--color-primary, #{$primary});
+    border-color: var(--color-primary, #{$primary});
     box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2);
+    color: #fff;
   }
 }
 
+/* 桑基图 */
 .sankey-chart-wrapper {
+  position: relative;
   width: 100%;
   max-width: 100%;
+  padding: 10px 0;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 10px 0;
   -webkit-overflow-scrolling: touch;
-  position: relative;
-}
 
-.sankey-chart-wrapper.is-rendering .sankey-chart {
-  opacity: 0.45;
+  &.is-rendering {
+    .sankey-chart {
+      opacity: 0.45;
+    }
+  }
 }
 
 .sankey-rendering-mask {
   position: absolute;
   inset: 0;
   z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   min-height: 400px;
   background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
   pointer-events: auto;
+
+  @include flex-center;
+  @include glass-blur(2px);
 }
 
 .sankey-chart {
   min-height: 400px;
-  background: transparent;
   margin: 0 auto;
+  background: transparent;
 }
 
-/* 详情卡片样式 */
+/* 详情卡片根容器 */
 :deep(.sankey-detail-card) {
-  border: 1px solid var(--border-gray-light, rgba(200, 200, 200, 0.5));
-  border-radius: var(--radius-lg, 16px);
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
   display: flex;
   flex-direction: column;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--border-gray-light, rgba(200, 200, 200, 0.5));
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+
+  @include glass-blur(20px, 180%);
 }
 
 :deep(.sankey-detail-card.is-desktop-card) {
@@ -869,9 +890,10 @@ onUnmounted(() => {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
+/* 详情卡片过渡 */
 :deep(.sankey-detail-card.hover-detail-card-fade-enter-active),
 :deep(.sankey-detail-card.hover-detail-card-fade-leave-active) {
-  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.25s $ease-fluid;
 }
 
 :deep(.sankey-detail-card.hover-detail-card-fade-enter-from),
@@ -880,6 +902,7 @@ onUnmounted(() => {
   transform: translateY(20px) scale(0.95);
 }
 
+/* 详情卡片内部结构 */
 :deep(.sankey-detail-card .hover-detail-card__header) {
   padding: 14px 16px 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
@@ -887,69 +910,53 @@ onUnmounted(() => {
 
 :deep(.sankey-detail-card .hover-detail-card__body) {
   max-height: min(35dvh, 260px);
-  overflow-y: auto;
   padding: 12px 16px 16px;
+  overflow-y: auto;
   text-align: left;
 }
 
 .detail-card-meta {
-  min-width: 0;
   flex: 1;
+  min-width: 0;
   text-align: left;
 }
 
 .detail-card-title-row {
+  width: 100%;
   display: flex;
   align-items: center;
-  width: 100%;
 }
 
 .detail-card-title {
+  overflow: hidden;
+  color: var(--text-dark, #333);
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: 15px;
   font-weight: 700;
-  color: var(--text-dark, #333);
   line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .detail-card-subtitle {
   margin-top: 4px;
-  font-size: 12px;
   color: var(--text-secondary, #666);
+  font-size: 12px;
   line-height: 1.4;
 }
 
 .detail-card-count {
   margin-top: 4px;
+  color: var(--color-primary, #{$primary});
   font-size: 11px;
-  color: var(--color-primary, #007aff);
   font-weight: 600;
 }
 
-
 .detail-card-chars {
-  font-size: 14px;
   color: var(--text-dark, #333);
-  line-height: 1.8;
   word-break: break-all;
   white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.8;
   letter-spacing: 1px;
-}
-
-/* 适配移动端面板滚动条 */
-.ui-scrollbar {
-  scrollbar-width: thin;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 3px;
-  }
 }
 </style>

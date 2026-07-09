@@ -663,91 +663,86 @@ watch(
 .phonology-matrix-page {
   width: 90dvw;
 
-  .input-section {
-    max-width: 600px;
-    margin: 0 auto 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    justify-content: center;
-    align-items: center;
+  /* 特征选择 */
+  .feature-tabs {
+    margin: 20px auto;
   }
 
+  /* 输入区域 */
+  .input-section {
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin: 0 auto 30px;
+  }
+
+  /* 不支持当前字表 */
   .unsupported-state {
     max-width: 640px;
     margin: 24px auto;
   }
 
-  /* 特徵 radio 外層只保留間距；radio 樣式交給 RadioGroup 組件 */
-  .feature-tabs {
-    margin: 20px auto;
-  }
-
+  /* 分类字段选择 */
   .column-selectors {
+    max-width: 600px;
     display: flex;
-    gap: 16px;
-    margin: 10px auto 10px;
     justify-content: center;
     flex-wrap: wrap;
-    max-width: 600px;
+    gap: 16px;
+    margin: 10px auto;
   }
 
   .selector-group {
+    min-width: 150px;
     display: flex;
     flex-direction: column;
     gap: 6px;
-    min-width: 150px;
 
     label {
-      font-size: 13px;
-      font-weight: 600;
       color: var(--text-dark);
       text-align: center;
-    }
-
-    select {
-      padding: 10px 12px;
-      border: 1px solid var(--border-gray-light);
-      border-radius: var(--radius-md);
-      background: var(--glass-light2);
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-
-      &:hover {
-        border-color: var(--color-primary);
-        background: var(--glass-medium2);
-      }
-
-      &:focus {
-        outline: none;
-        border-color: var(--color-primary);
-        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-      }
+      font-size: 13px;
+      font-weight: 600;
     }
   }
 
+  /* 查询按钮 */
   .load-btn {
-    padding: 12px 24px;
     max-width: 100px;
-    white-space: nowrap;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
-    color: var(--text-white);
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px var(--color-primary-shadow), 0 2px 4px rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-primary-hover) 100%
+    );
+    border: none;
+    border-radius: var(--radius-md);
+    box-shadow:
+      0 4px 12px var(--color-primary-shadow),
+      0 2px 4px rgba(0, 0, 0, 0.08);
+    color: var(--text-white);
+    white-space: nowrap;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
 
     &:hover:not(:disabled) {
-      background: linear-gradient(135deg, var(--color-primary-hover) 0%, #004ba0 100%);
-      box-shadow: 0 6px 16px var(--color-primary-shadow-light), 0 3px 6px rgba(0, 0, 0, 0.12);
+      background: linear-gradient(
+        135deg,
+        var(--color-primary-hover) 0%,
+        #004ba0 100%
+      );
+      box-shadow:
+        0 6px 16px var(--color-primary-shadow-light),
+        0 3px 6px rgba(0, 0, 0, 0.12);
       transform: translateY(-1px);
     }
 
@@ -757,19 +752,20 @@ watch(
 
     &:disabled {
       background: var(--bg-hover-medium);
+      box-shadow: none;
       color: var(--text-secondary);
       cursor: not-allowed;
-      box-shadow: none;
     }
   }
 
+  /* 加载和错误状态 */
   .loading,
   .error {
+    min-height: 50vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 50vh;
     gap: 15px;
   }
 
@@ -791,14 +787,14 @@ watch(
   .retry-btn {
     padding: 10px 20px;
     background: var(--color-primary);
-    color: var(--text-white);
     border: none;
     border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    color: var(--text-white);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-md);
 
     &:hover {
       background: var(--color-primary-hover);
@@ -807,12 +803,14 @@ watch(
     }
   }
 
+  /* 矩阵结果 */
   .matrix-container {
     display: flex;
     flex-direction: column;
     gap: 30px;
   }
 
+  /* 空状态 */
   .empty {
     display: flex;
     align-items: center;
@@ -821,19 +819,15 @@ watch(
     font-size: 16px;
   }
 
-  /* 移动端适配 */
+  /* 竖屏 */
   @media (max-aspect-ratio: 1/1) {
-    .page-title {
-      font-size: 24px;
-    }
-
     .input-section {
       max-width: 100%;
     }
 
     .load-btn {
-      font-size: 14px;
       padding: 10px 20px;
+      font-size: 14px;
     }
   }
 }

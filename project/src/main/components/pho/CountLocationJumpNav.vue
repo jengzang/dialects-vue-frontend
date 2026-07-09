@@ -395,43 +395,58 @@ onBeforeUnmount(() => {
 </template>
 
 <style lang="scss" scoped>
+$primary: #007aff;
+$primary-dark: #0051d5;
+$primary-deep: #004fc4;
+
+$desktop-width: 214px;
+$tablet-width: 176px;
+$mobile-width: 150px;
+
+@mixin glass-blur($blur, $saturation) {
+  backdrop-filter: blur($blur) saturate($saturation);
+  -webkit-backdrop-filter: blur($blur) saturate($saturation);
+}
+
 .count-location-jump-nav {
   position: fixed;
   top: 50%;
   right: 10px;
   z-index: 1600;
-  width: 214px;
+  width: $desktop-width;
   max-height: min(82vh, 620px);
-  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
   outline: none;
   pointer-events: none;
+  transform: translateY(-50%);
 
   .count-location-jump-nav-control,
   .count-location-jump-nav-item {
     pointer-events: auto;
   }
 
+  /* 上下控制按钮 */
   .count-location-jump-nav-control {
     width: 30px;
     height: 30px;
     margin-right: 5px;
+    background: rgba(255, 255, 255, 0.72);
     border: 1px solid rgba(0, 122, 255, 0.14);
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.72);
+    box-shadow:
+      0 8px 18px rgba(24, 38, 64, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.78);
     color: var(--color-primary);
     font-size: 18px;
     font-weight: 800;
     line-height: 1;
     cursor: pointer;
-    box-shadow:
-      0 8px 18px rgba(24, 38, 64, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.78);
-    backdrop-filter: blur(14px) saturate(150%);
-    -webkit-backdrop-filter: blur(14px) saturate(150%);
+
+    @include glass-blur(14px, 150%);
+
     transition:
       transform 0.18s ease,
       opacity 0.18s ease,
@@ -439,11 +454,11 @@ onBeforeUnmount(() => {
       box-shadow 0.18s ease;
 
     &:hover:not(:disabled) {
-      transform: translateY(-1px);
       background: rgba(255, 255, 255, 0.92);
       box-shadow:
         0 10px 22px rgba(24, 38, 64, 0.14),
         0 4px 10px rgba(0, 122, 255, 0.1);
+      transform: translateY(-1px);
     }
 
     &:active:not(:disabled) {
@@ -453,8 +468,8 @@ onBeforeUnmount(() => {
     &.disabled,
     &:disabled {
       opacity: 0.28;
-      cursor: not-allowed;
       box-shadow: none;
+      cursor: not-allowed;
     }
   }
 
@@ -464,6 +479,7 @@ onBeforeUnmount(() => {
     }
   }
 
+  /* 导航项目容器 */
   .count-location-jump-nav-items {
     position: relative;
     width: 100%;
@@ -480,31 +496,36 @@ onBeforeUnmount(() => {
       right: 7px;
       bottom: 4px;
       width: 20px;
-      border-radius: 999px;
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.24)),
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.52),
+          rgba(255, 255, 255, 0.24)
+        ),
         rgba(240, 246, 255, 0.24);
       border: 1px solid rgba(255, 255, 255, 0.44);
+      border-radius: 999px;
       box-shadow:
         0 12px 30px rgba(24, 38, 64, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.72);
-      backdrop-filter: blur(16px) saturate(160%);
-      -webkit-backdrop-filter: blur(16px) saturate(160%);
       pointer-events: none;
+
+      @include glass-blur(16px, 160%);
     }
   }
 
   .count-location-jump-nav-placeholder,
   .count-location-jump-nav-item {
     position: relative;
+    flex: 0 0 auto;
     width: 42px;
     height: 26px;
-    flex: 0 0 auto;
   }
 
+  /* 边界占位项 */
   .count-location-jump-nav-placeholder {
-    pointer-events: none;
     visibility: hidden;
+    pointer-events: none;
 
     &.depth-0 {
       height: 36px;
@@ -524,14 +545,16 @@ onBeforeUnmount(() => {
     }
   }
 
+  /* 可交互地点项 */
   .count-location-jump-nav-item {
     padding: 0;
+    overflow: visible;
+    background: transparent;
     border: none;
     border-radius: 999px;
-    background: transparent;
-    cursor: pointer;
     text-align: right;
-    overflow: visible;
+    cursor: pointer;
+
     transition:
       width 0.2s ease,
       height 0.2s ease,
@@ -543,6 +566,11 @@ onBeforeUnmount(() => {
     &.is-hovered,
     &.is-center {
       width: 198px;
+
+      .count-location-jump-nav-label {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+      }
     }
 
     &:focus-visible {
@@ -555,20 +583,10 @@ onBeforeUnmount(() => {
       }
     }
 
-    &:hover,
-    &:focus-visible,
-    &.is-hovered,
     &.is-center {
-      .count-location-jump-nav-label {
-        opacity: 1;
-        transform: translateY(-50%) translateX(0);
-      }
-    }
-
-    &.is-center {
+      z-index: 3;
       height: 36px;
       opacity: 1;
-      z-index: 3;
 
       .count-location-jump-nav-label {
         max-width: 158px;
@@ -589,11 +607,11 @@ onBeforeUnmount(() => {
       }
 
       .count-location-jump-nav-dot {
+        right: 8px;
         width: 14px;
         height: 14px;
-        right: 8px;
         margin-top: -7px;
-        background: linear-gradient(135deg, #007aff, #004fc4);
+        background: linear-gradient(135deg, $primary, $primary-deep);
         box-shadow:
           0 0 0 6px rgba(0, 122, 255, 0.16),
           0 6px 16px rgba(0, 122, 255, 0.24);
@@ -602,7 +620,7 @@ onBeforeUnmount(() => {
 
     &.is-active:not(.is-center) {
       .count-location-jump-nav-dot {
-        background: linear-gradient(135deg, #0051d5, #003d9e);
+        background: linear-gradient(135deg, $primary-dark, #003d9e);
         box-shadow:
           0 0 0 4px rgba(0, 122, 255, 0.16),
           0 4px 12px rgba(0, 122, 255, 0.18);
@@ -618,9 +636,9 @@ onBeforeUnmount(() => {
       opacity: 0.84;
 
       .count-location-jump-nav-dot {
+        right: 10px;
         width: 10px;
         height: 10px;
-        right: 10px;
         margin-top: -5px;
       }
     }
@@ -630,9 +648,9 @@ onBeforeUnmount(() => {
       opacity: 0.62;
 
       .count-location-jump-nav-dot {
+        right: 11px;
         width: 8px;
         height: 8px;
-        right: 11px;
         margin-top: -4px;
       }
     }
@@ -642,9 +660,9 @@ onBeforeUnmount(() => {
       opacity: 0.42;
 
       .count-location-jump-nav-dot {
+        right: 12px;
         width: 6px;
         height: 6px;
-        right: 12px;
         margin-top: -3px;
       }
     }
@@ -654,43 +672,45 @@ onBeforeUnmount(() => {
       opacity: 0.24;
 
       .count-location-jump-nav-dot {
+        right: 12.5px;
         width: 5px;
         height: 5px;
-        right: 12.5px;
         margin-top: -2.5px;
       }
     }
 
     &:hover {
-      opacity: 1;
       z-index: 4;
+      opacity: 1;
 
       .count-location-jump-nav-dot {
-        transform: scale(1.16);
         box-shadow:
           0 0 0 4px rgba(0, 122, 255, 0.16),
           0 4px 12px rgba(0, 122, 255, 0.2);
+        transform: scale(1.16);
       }
     }
   }
 
+  /* 展开的地点名称 */
   .count-location-jump-nav-label {
     position: absolute;
     top: 50%;
     right: 30px;
     max-width: 150px;
     padding: 5px 10px;
-    border-radius: 999px;
     opacity: 0;
-    pointer-events: none;
-    transform: translateY(-50%) translateX(8px);
     background: rgba(255, 255, 255, 0.78);
     border: 1px solid rgba(0, 122, 255, 0.12);
+    border-radius: 999px;
     box-shadow:
       0 8px 20px rgba(24, 38, 64, 0.1),
       inset 0 1px 0 rgba(255, 255, 255, 0.78);
-    backdrop-filter: blur(14px) saturate(150%);
-    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    pointer-events: none;
+    transform: translateY(-50%) translateX(8px);
+
+    @include glass-blur(14px, 150%);
+
     transition:
       opacity 0.16s ease,
       transform 0.2s ease,
@@ -704,17 +724,19 @@ onBeforeUnmount(() => {
     max-width: 128px;
     overflow: hidden;
     color: var(--text-dark);
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-size: 12px;
     font-weight: 650;
     line-height: 1.25;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+
     transition:
       color 0.18s ease,
       font-size 0.18s ease,
       font-weight 0.18s ease;
   }
 
+  /* 右侧圆点 */
   .count-location-jump-nav-dot {
     position: absolute;
     top: 50%;
@@ -722,11 +744,16 @@ onBeforeUnmount(() => {
     width: 9px;
     height: 9px;
     margin-top: -4.5px;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 122, 255, 0.88),
+      rgba(0, 81, 213, 0.88)
+    );
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(0, 122, 255, 0.88), rgba(0, 81, 213, 0.88));
     box-shadow:
       0 0 0 3px rgba(0, 122, 255, 0.1),
       0 3px 8px rgba(0, 122, 255, 0.14);
+
     transition:
       width 0.18s ease,
       height 0.18s ease,
@@ -738,10 +765,11 @@ onBeforeUnmount(() => {
   }
 }
 
+/* 平板与较窄桌面 */
 @media (max-width: 960px) {
   .count-location-jump-nav {
     right: 6px;
-    width: 176px;
+    width: $tablet-width;
     max-height: min(78vh, 560px);
 
     .count-location-jump-nav-control {
@@ -793,10 +821,11 @@ onBeforeUnmount(() => {
   }
 }
 
+/* 手机 */
 @media (max-width: 640px) {
   .count-location-jump-nav {
     right: 4px;
-    width: 150px;
+    width: $mobile-width;
     max-height: min(70dvh, 520px);
 
     .count-location-jump-nav-control {
@@ -838,9 +867,9 @@ onBeforeUnmount(() => {
         }
 
         .count-location-jump-nav-dot {
+          right: 6px;
           width: 13px;
           height: 13px;
-          right: 6px;
           margin-top: -6.5px;
         }
       }
