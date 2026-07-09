@@ -102,6 +102,25 @@ watch(
   align-items: center;
   gap: 12px 16px;
   width: 100%;
+
+  @media (max-width: 768px) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 12px;
+
+    .entry-modal-mode-switcher {
+      grid-row: 2;
+      grid-column: 1 / -1;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .entry-mode-button {
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+    }
+  }
 }
 
 .entry-modal-title {
@@ -138,28 +157,28 @@ watch(
   padding: 4px;
   border-radius: 999px;
   background: rgba(241, 245, 249, 0.96);
-}
 
-.entry-mode-button {
-  min-width: 128px;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 999px;
-  background: transparent;
-  color: $text-secondary;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 0.18s ease,
-    color 0.18s ease,
-    box-shadow 0.18s ease;
-}
+  .entry-mode-button {
+    min-width: 128px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: $text-secondary;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease,
+      box-shadow 0.18s ease;
 
-.entry-mode-button.active {
-  background: #fff;
-  color: $primary;
-  box-shadow: 0 8px 16px $bg-subtle;
+    &.active {
+      background: #fff;
+      color: $primary;
+      box-shadow: 0 8px 16px $bg-subtle;
+    }
+  }
 }
 
 .entry-modal-empty {
@@ -167,45 +186,24 @@ watch(
   border-radius: 18px;
   text-align: center;
   background: $glass-strong;
-}
 
-.entry-modal-empty-icon {
-  font-size: 32px;
-  margin-bottom: 12px;
-}
-
-.entry-modal-empty-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: $text-strong;
-}
-
-.entry-modal-empty-text {
-  max-width: 520px;
-  margin: 12px auto 0;
-  font-size: 14px;
-  line-height: 1.7;
-  color: $text-secondary;
-}
-
-@media (max-width: 768px) {
-  .entry-modal-header {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto auto;
-    gap: 12px;
+  &-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
   }
 
-  .entry-modal-mode-switcher {
-    grid-row: 2;
-    grid-column: 1 / -1;
-    justify-content: center;
-    width: 100%;
+  &-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: $text-strong;
   }
 
-  .entry-mode-button {
-    flex: 1;
-    min-width: 0;
-    text-align: center;
+  &-text {
+    max-width: 520px;
+    margin: 12px auto 0;
+    font-size: 14px;
+    line-height: 1.7;
+    color: $text-secondary;
   }
 }
 </style>

@@ -440,7 +440,7 @@ watch(
 .feature-detail-table {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: $spacing-lg;
 }
 
 .feature-detail-header {
@@ -453,7 +453,7 @@ watch(
 .feature-detail-heading {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: $spacing-xs;
   flex: 1;
 }
 
@@ -473,41 +473,47 @@ watch(
 .feature-detail-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.85fr);
-  gap: 18px;
+  gap: $spacing-lg;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .feature-detail-main,
 .feature-detail-side {
   max-height: 60dvh;
   overflow-y: auto;
-  padding: 18px;
+  padding: $spacing-lg;
 }
 
+// -- States --
 .feature-detail-state {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: $radius-md;
   align-items: center;
   justify-content: center;
   min-height: 220px;
   color: $text-muted;
+
+  &-error {
+    color: $danger;
+  }
 }
 
-.feature-detail-state-error {
-  color: $danger;
-}
-
+// -- Table body --
 .feature-detail-table-body {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: $spacing-sm;
 }
 
 .feature-detail-table-head,
 .feature-detail-row {
   display: grid;
   grid-template-columns: 0.9fr 0.85fr 1fr 0.7fr 0.9fr auto;
-  gap: 10px;
+  gap: $spacing-sm;
   align-items: center;
 }
 
@@ -516,17 +522,52 @@ watch(
   color: $text-muted;
   font-size: 12px;
   font-weight: 700;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 .feature-detail-row {
-  padding: 12px 14px;
+  padding: $radius-md 14px;
   font-size: 13px;
   color: $text-strong;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: $radius-md;
+    border-radius: $radius-md;
+    background: $glass-white;
+    gap: $radius-sm;
+    margin-bottom: $radius-sm;
+
+    > span {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+
+      &::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: $text-muted;
+        margin-right: $radius-md;
+      }
+    }
+  }
 }
 
 .feature-detail-actions {
   display: flex;
-  gap: 8px;
+  gap: $radius-sm;
+
+  @media (max-width: 768px) {
+    justify-content: flex-end;
+    margin-top: 4px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    padding-top: $radius-sm;
+  }
 }
 
 .feature-detail-link {
@@ -534,60 +575,9 @@ watch(
   background: transparent;
   color: $primary;
   cursor: pointer;
-}
 
-.feature-detail-link.danger {
-  color: $danger;
-}
-
-.feature-detail-map-title {
-  margin-bottom: 12px;
-  font-size: 14px;
-  font-weight: 700;
-  color: $text-strong;
-}
-
-@media (max-width: 1100px) {
-  .feature-detail-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .feature-detail-table-head {
-    display: none;
-  }
-
-  .feature-detail-row {
-    grid-template-columns: 1fr;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    padding: 12px;
-    border-radius: 12px;
-    background: $glass-white;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-
-  .feature-detail-row > span {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-  }
-
-  .feature-detail-row > span::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: $text-muted;
-    margin-right: 12px;
-  }
-
-  .feature-detail-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 4px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    padding-top: 8px;
+  &.danger {
+    color: $danger;
   }
 }
 
@@ -604,6 +594,61 @@ watch(
   }
 }
 
+// -- Side --
+.feature-detail-map-title {
+  margin-bottom: $radius-md;
+  font-size: 14px;
+  font-weight: 700;
+  color: $text-strong;
+}
+
+// -- Edit header --
+.feature-edit-header-inputs {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.header-input-field {
+  display: flex;
+  align-items: center;
+  gap: $radius-sm;
+
+  span {
+    font-size: 13px;
+    font-weight: 700;
+    color: $text-secondary;
+  }
+}
+
+.header-text-input {
+  padding: $radius-sm $radius-md;
+  border: 1px solid $muted-ring;
+  border-radius: $spacing-sm;
+  background: $glass-medium;
+  color: $text-strong;
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+  width: 160px;
+
+  &::placeholder {
+    color: $text-light;
+  }
+
+  &:focus {
+    border-color: $primary-focus;
+    background: #fff;
+    box-shadow: 0 0 0 3px $primary-glass;
+  }
+}
+
+// -- Point detail modal --
 .point-detail-modal-header {
   display: flex;
   align-items: center;
@@ -613,13 +658,13 @@ watch(
 
 .point-detail-modal-title {
   margin: 0;
-  font-size: 16px;
+  font-size: $spacing-md;
   font-weight: 700;
   color: $text-strong;
 }
 
 .point-detail-modal-body {
-  padding: 16px 20px;
+  padding: $spacing-md 20px;
 }
 
 .modal-loading-state,
@@ -637,7 +682,7 @@ watch(
 
 .modal-table-container {
   overflow-x: auto;
-  border-radius: 12px;
+  border-radius: $radius-md;
   border: 1px solid rgba($text-light, 0.16);
   background: rgba(255, 255, 255, 0.5);
 }
@@ -666,51 +711,6 @@ watch(
 
   tr:last-child td {
     border-bottom: none;
-  }
-}
-
-.feature-edit-header-inputs {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 4px;
-}
-
-.header-input-field {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  
-  span {
-    font-size: 13px;
-    font-weight: 700;
-    color: $text-secondary;
-  }
-}
-
-.header-text-input {
-  padding: 8px 12px;
-  border: 1px solid $muted-ring;
-  border-radius: 10px;
-  background: $glass-medium;
-  color: $text-strong;
-  font-size: 14px;
-  outline: none;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease;
-  width: 160px;
-
-  &::placeholder {
-    color: $text-light;
-  }
-
-  &:focus {
-    border-color: $primary-focus;
-    background: #fff;
-    box-shadow: 0 0 0 3px $primary-glass;
   }
 }
 </style>

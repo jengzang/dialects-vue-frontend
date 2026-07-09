@@ -104,23 +104,27 @@ const filteredItems = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 6px;
-}
 
-.point-card-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: $text-strong;
-}
+  .point-card-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: $text-strong;
+  }
 
-.point-card-description {
-  margin: 0;
-  font-size: 14px;
-  color: $text-muted;
+  .point-card-description {
+    margin: 0;
+    font-size: 14px;
+    color: $text-muted;
+  }
 }
 
 .point-grid {
   --main-card-min-width: 220px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .point-card-name {
@@ -134,7 +138,6 @@ const filteredItems = computed(() => {
   color: $text-secondary;
 }
 
-
 .point-card-badge {
   margin-top: 4px;
   font-size: 12px;
@@ -142,30 +145,28 @@ const filteredItems = computed(() => {
   font-weight: 600;
 }
 
-
 .skeleton-line {
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(226, 232, 240, 0.9), $bg-light, rgba(226, 232, 240, 0.9));
   background-size: 200% 100%;
   animation: shimmer 1.2s linear infinite;
-}
 
-.skeleton-line-lg {
-  width: 58%;
-  height: 18px;
-}
+  &-lg {
+    width: 58%;
+    height: 18px;
+  }
 
-.skeleton-line-sm {
-  width: 36%;
-  height: 14px;
-}
+  &-sm {
+    width: 36%;
+    height: 14px;
+  }
 
-.skeleton-line-xs {
-  width: 46%;
-  height: 12px;
-  margin-top: 12px;
+  &-xs {
+    width: 46%;
+    height: 12px;
+    margin-top: 12px;
+  }
 }
-
 
 @keyframes shimmer {
   from {
@@ -173,12 +174,6 @@ const filteredItems = computed(() => {
   }
   to {
     background-position: -200% 0;
-  }
-}
-
-@media (max-width: 768px) {
-  .point-grid {
-    grid-template-columns: 1fr;
   }
 }
 </style>

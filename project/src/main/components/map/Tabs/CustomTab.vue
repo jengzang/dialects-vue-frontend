@@ -662,14 +662,7 @@ const openEntryModal = () => {
 </script>
 
 <style scoped lang="scss">
-$primary-blue: #007aff;
-$primary-blue-dark: #0051d5;
-$text-main: #1e293b;
-$text-secondary: #475569;
-$text-muted: #64748b;
-$text-light: #94a3b8;
-$glass-white: rgba(255, 255, 255, 0.45);
-$motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+@use '../_map-variables' as *;
 
 .custom-tab-container {
   display: flex;
@@ -726,11 +719,11 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .primary-btn {
-  background: linear-gradient(135deg, $primary-blue, $primary-blue-dark);
+  background: linear-gradient(135deg, $primary, $primary-dark);
   color: #fff;
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, $primary-blue-dark, #003db3);
+    background: linear-gradient(135deg, $primary-dark, #003db3);
   }
 }
 
@@ -748,7 +741,7 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2);
-  transition: $motion;
+  transition: $motion-fast;
 
   &:hover {
     transform: translateY(-1.5px);
@@ -782,7 +775,7 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   );
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  color: $primary-blue;
+  color: $primary;
   font-size: 12px;
   font-weight: 700;
   line-height: 1;
@@ -902,7 +895,7 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   &.success {
     border-color: rgba(0, 122, 255, 0.2);
     background: rgba(0, 122, 255, 0.1);
-    color: $primary-blue;
+    color: $primary;
   }
 }
 
@@ -956,7 +949,7 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
   border: none;
   background: transparent;
-  color: $primary-blue;
+  color: $primary;
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
@@ -1080,7 +1073,7 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.35);
-  transition: $motion;
+  transition: $motion-fast;
 
   &:hover {
     background: rgba(255, 255, 255, 0.55);
@@ -1126,7 +1119,7 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 1.5px 6px;
   border-radius: 10px;
   background: rgba(0, 122, 255, 0.08);
-  color: $primary-blue;
+  color: $primary;
   font-size: 10px;
   font-weight: 700;
 }
@@ -1155,11 +1148,11 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   box-sizing: border-box;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-  transition: $motion;
+  transition: $motion-fast;
 
   &:hover {
     transform: translateY(-1.5px);
-    border-color: $primary-blue;
+    border-color: $primary;
     background: #fff;
     box-shadow: 0 4px 12px rgba(0, 122, 255, 0.08);
   }
@@ -1199,7 +1192,7 @@ $motion: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
   border-radius: 8px;
   background: none;
-  color: $primary-blue;
+  color: $primary;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;

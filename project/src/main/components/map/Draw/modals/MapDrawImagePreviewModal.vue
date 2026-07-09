@@ -843,29 +843,33 @@ onBeforeUnmount(() => {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   padding: 14px 16px;
-}
 
-.summary-item {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 
-.summary-label {
-  font-size: 11px;
-  color: $text-muted;
-}
+  .summary-item {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
 
-.summary-value {
-  font-size: 14px;
-  font-weight: 700;
-  color: $text-strong;
-  word-break: break-word;
-}
+  .summary-label {
+    font-size: 11px;
+    color: $text-muted;
+  }
 
-.summary-number {
-  color: $primary;
+  .summary-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: $text-strong;
+    word-break: break-word;
+  }
+
+  .summary-number {
+    color: $primary;
+  }
 }
 
 .image-export-preview-main {
@@ -873,6 +877,10 @@ onBeforeUnmount(() => {
   grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
   gap: 14px;
   align-items: stretch;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .image-export-preview-sidebar,
@@ -884,53 +892,49 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
 
-.sidebar-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: $text-strong;
-}
+  .sidebar-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: $text-strong;
+  }
 
-.sidebar-text {
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.6;
-  color: $text-secondary;
-}
+  .sidebar-text {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: $text-secondary;
+  }
 
-.image-export-preview-validation {
-  margin: 0;
-  font-size: 12px;
-  color: $danger;
+  .image-export-preview-validation {
+    margin: 0;
+    font-size: 12px;
+    color: $danger;
+  }
 }
 
 .image-export-preview-stage {
   min-height: 420px;
-}
 
-.image-export-preview-map {
-  width: 100%;
-  min-height: 420px;
-  border-radius: 16px;
-  overflow: hidden;
+  @media (max-width: 900px) {
+    min-height: 320px;
+  }
+
+  .image-export-preview-map {
+    width: 100%;
+    min-height: 420px;
+    border-radius: 16px;
+    overflow: hidden;
+
+    @media (max-width: 900px) {
+      min-height: 320px;
+    }
+  }
 }
 
 .scope-modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-}
-
-@media (max-width: 900px) {
-  .image-export-preview-summary,
-  .image-export-preview-main {
-    grid-template-columns: 1fr;
-  }
-
-  .image-export-preview-stage,
-  .image-export-preview-map {
-    min-height: 320px;
-  }
 }
 </style>

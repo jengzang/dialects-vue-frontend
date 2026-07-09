@@ -527,13 +527,13 @@ watch(
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-}
 
-.feature-record-title {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: $text-strong;
+  .feature-record-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: $text-strong;
+  }
 }
 
 .feature-record-body {
@@ -546,6 +546,10 @@ watch(
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .feature-record-field {
@@ -553,55 +557,17 @@ watch(
   flex-direction: row;
   align-items: center;
   gap: 10px;
-}
 
-.feature-record-field-full {
-  grid-column: 1 / -1;
-}
-
-.feature-record-field span {
-  font-size: 13px;
-  font-weight: 700;
-  color: $text-strong;
-  min-width: 45px;
-  flex-shrink: 0;
-}
-
-.feature-record-input {
-  flex: 1;
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid $muted-ring;
-  border-radius: 12px;
-  background: $glass-medium;
-  color: $text-strong;
-  font-size: 14px;
-  outline: none;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease;
-  box-sizing: border-box;
-
-  &::placeholder {
-    color: $text-light;
+  span {
+    font-size: 13px;
+    font-weight: 700;
+    color: $text-strong;
+    min-width: 45px;
+    flex-shrink: 0;
   }
 
-  &:focus {
-    border-color: $primary-focus;
-    background: #fff;
-    box-shadow: 0 0 0 4px $primary-glass;
-  }
-}
-
-.feature-record-message {
-  font-size: 13px;
-  color: $text-secondary;
-}
-
-@media (max-width: 768px) {
-  .feature-record-grid {
-    grid-template-columns: 1fr;
+  &-full {
+    grid-column: 1 / -1;
   }
 }
 

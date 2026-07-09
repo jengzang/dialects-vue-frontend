@@ -115,23 +115,27 @@ function resolveToneType(item) {
   display: flex;
   flex-direction: column;
   gap: 6px;
-}
 
-.feature-card-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: $text-strong;
-}
+  .feature-card-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: $text-strong;
+  }
 
-.feature-card-description {
-  margin: 0;
-  font-size: 14px;
-  color: $text-muted;
+  .feature-card-description {
+    margin: 0;
+    font-size: 14px;
+    color: $text-muted;
+  }
 }
 
 .feature-grid {
   --main-card-min-width: 240px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .feature-card {
@@ -152,41 +156,41 @@ function resolveToneType(item) {
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
-}
 
-.feature-card-tag[data-tone='initial'] {
-  background: rgba($primary, 0.06);
-  color: $primary;
-}
+  &[data-tone='initial'] {
+    background: rgba($primary, 0.06);
+    color: $primary;
+  }
 
-.feature-card-tag[data-tone='final'] {
-  background: $success-bg;
-  color: $success;
-}
+  &[data-tone='final'] {
+    background: $success-bg;
+    color: $success;
+  }
 
-.feature-card-tag[data-tone='tone'] {
-  background: rgba($warning, 0.12);
-  color: $warning;
-}
+  &[data-tone='tone'] {
+    background: rgba($warning, 0.12);
+    color: $warning;
+  }
 
-.feature-card-tag[data-tone='hanzi'] {
-  background: rgba($teal, 0.07);
-  color: $teal;
-}
+  &[data-tone='hanzi'] {
+    background: rgba($teal, 0.07);
+    color: $teal;
+  }
 
-.feature-card-tag[data-tone='tone-value'] {
-  background: $danger-bg;
-  color: #f43e5c;
-}
+  &[data-tone='tone-value'] {
+    background: $danger-bg;
+    color: #f43e5c;
+  }
 
-.feature-card-tag[data-tone='lexicon'] {
-  background: rgba($purple, 0.09);
-  color: $purple;
-}
+  &[data-tone='lexicon'] {
+    background: rgba($purple, 0.09);
+    color: $purple;
+  }
 
-.feature-card-tag[data-tone='other'] {
-  background: rgba($text-subtle, 0.09);
-  color: $text-subtle;
+  &[data-tone='other'] {
+    background: rgba($text-subtle, 0.09);
+    color: $text-subtle;
+  }
 }
 
 .feature-card-badge {
@@ -194,8 +198,6 @@ function resolveToneType(item) {
   color: $text-secondary;
   font-weight: 600;
 }
-
-
 
 .skeleton-line,
 .skeleton-chip {
@@ -205,14 +207,16 @@ function resolveToneType(item) {
   animation: shimmer 1.2s linear infinite;
 }
 
-.skeleton-line-lg {
-  width: 56%;
-  height: 18px;
-}
+.skeleton-line {
+  &-lg {
+    width: 56%;
+    height: 18px;
+  }
 
-.skeleton-line-sm {
-  width: 42%;
-  height: 14px;
+  &-sm {
+    width: 42%;
+    height: 14px;
+  }
 }
 
 .skeleton-chip {
@@ -220,19 +224,12 @@ function resolveToneType(item) {
   height: 24px;
 }
 
-
 @keyframes shimmer {
   from {
     background-position: 200% 0;
   }
   to {
     background-position: -200% 0;
-  }
-}
-
-@media (max-width: 768px) {
-  .feature-grid {
-    grid-template-columns: 1fr;
   }
 }
 </style>

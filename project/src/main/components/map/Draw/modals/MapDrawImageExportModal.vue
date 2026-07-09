@@ -285,29 +285,29 @@ watch(
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   padding: 14px 16px;
-}
 
-.summary-item {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+  .summary-item {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
 
-.summary-label {
-  font-size: 11px;
-  color: $text-muted;
-}
+  .summary-label {
+    font-size: 11px;
+    color: $text-muted;
+  }
 
-.summary-value {
-  font-size: 14px;
-  font-weight: 700;
-  color: $text-strong;
-  word-break: break-word;
-}
+  .summary-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: $text-strong;
+    word-break: break-word;
+  }
 
-.summary-number {
-  color: $primary;
+  .summary-number {
+    color: $primary;
+  }
 }
 
 .image-export-grid {
@@ -318,12 +318,16 @@ watch(
   display: flex;
   gap: 10px;
   padding: 14px 16px;
-}
 
-.scope-panel-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: $text-strong;
+  .scope-panel-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: $text-strong;
+  }
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+  }
 }
 
 .scope-radio-item,
@@ -337,9 +341,17 @@ watch(
   border: 1px solid rgba($text-light, 0.22);
 }
 
-.scope-radio-item input {
-  margin-top: 2px;
-  accent-color: $primary;
+.scope-radio-item {
+  input {
+    margin-top: 2px;
+    accent-color: $primary;
+  }
+}
+
+.scope-checkbox-item {
+  &--dense {
+    padding: 8px 10px;
+  }
 }
 
 .scope-selection-copy {
@@ -347,29 +359,29 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 2px;
-}
 
-.scope-selection-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: $text-strong;
-}
+  .scope-selection-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: $text-strong;
+  }
 
-.scope-selection-meta {
-  font-size: 11px;
-  color: $text-muted;
+  .scope-selection-meta {
+    font-size: 11px;
+    color: $text-muted;
+  }
 }
 
 .draw-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
-}
 
-.draw-field-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: $text-dark;
+  .draw-field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: $text-dark;
+  }
 }
 
 .draw-select-input,
@@ -386,6 +398,10 @@ watch(
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .image-export-layer-list {
@@ -396,23 +412,9 @@ watch(
   overflow-y: auto;
 }
 
-.scope-checkbox-item--dense {
-  padding: 8px 10px;
-}
-
 .scope-modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-}
-
-@media (max-width: 900px) {
-
-  .image-export-custom-size {
-    grid-template-columns: 1fr;
-  }
-  .scope-panel {
-    flex-direction: column;
-  }
 }
 </style>

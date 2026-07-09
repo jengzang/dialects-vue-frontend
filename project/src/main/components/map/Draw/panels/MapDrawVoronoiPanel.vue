@@ -185,14 +185,20 @@ const offsetClass = computed(() => {
 
 @use './panelShared';
 
-.voronoi-panel.offset-double {
-  right: 47rem;
+.voronoi-panel {
+  &.offset-double {
+    right: 47rem;
+  }
 }
 
 .voronoi-summary-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.6rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .voronoi-summary-card {
@@ -203,26 +209,24 @@ const offsetClass = computed(() => {
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.46);
   border: 1px solid rgba(255, 255, 255, 0.55);
-}
 
-.voronoi-summary-label {
-  font-size: 0.78rem;
-  color: rgba($deep-blue, 0.68);
-}
+  .voronoi-summary-label {
+    font-size: 0.78rem;
+    color: rgba($deep-blue, 0.68);
+  }
 
-.voronoi-summary-value {
-  font-size: 1.08rem;
-  color: $deep-blue;
+  .voronoi-summary-value {
+    font-size: 1.08rem;
+    color: $deep-blue;
+  }
 }
 
 @media (max-width: 900px) {
-  .voronoi-panel.offset-double,
-  .voronoi-panel.offset-left {
-    right: auto;
-  }
-
-  .voronoi-summary-grid {
-    grid-template-columns: 1fr;
+  .voronoi-panel {
+    &.offset-double,
+    &.offset-left {
+      right: auto;
+    }
   }
 }
 </style>

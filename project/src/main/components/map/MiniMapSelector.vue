@@ -131,7 +131,6 @@ function createPointElement(point) {
   if (point.label) {
     const element = document.createElement('div');
     element.className = `mini-map-point-label${point.active ? ' is-active' : ''}`;
-    element.textContent = point.label;
     return element;
   }
 
@@ -274,7 +273,6 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 @use './_map-variables' as *;
-
 @use '@/styles/main/_surfaces.scss';
 
 .mini-map-wrapper {
@@ -287,6 +285,10 @@ onBeforeUnmount(() => {
   background: $glass-strong;
   box-shadow: 0 10px 28px $bg-subtle;
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    height: 220px;
+  }
 }
 
 .mini-map-container {
@@ -305,6 +307,12 @@ onBeforeUnmount(() => {
   font-size: 12px;
   line-height: 1;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+
+  @media (max-width: 768px) {
+    right: 8px;
+    bottom: 8px;
+    font-size: 11px;
+  }
 }
 
 :deep(.maplibregl-ctrl-top-left) {
@@ -365,18 +373,6 @@ onBeforeUnmount(() => {
     background-color: $primary;
     color: #fff;
     box-shadow: 0 2px 8px $primary-ring;
-  }
-}
-
-@media (max-width: 768px) {
-  .mini-map-wrapper {
-    height: 220px;
-  }
-
-  .mini-map-hint {
-    right: 8px;
-    bottom: 8px;
-    font-size: 11px;
   }
 }
 </style>

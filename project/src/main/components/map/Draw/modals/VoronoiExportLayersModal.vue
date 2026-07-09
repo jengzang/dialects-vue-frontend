@@ -132,46 +132,58 @@ function handleClose(value = false) {
   gap: 10px;
   padding: 14px 16px;
   overflow-x: auto;
-}
 
-.summary-item {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+  @media (max-width: 760px) {
+    flex-wrap: wrap;
+  }
 
-.summary-actions {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  flex: 0 0 auto;
-}
+  .summary-item {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
 
-.summary-action-button {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
+  .summary-actions {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    flex: 0 0 auto;
 
-.summary-toggle-label {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
+    @media (max-width: 760px) {
+      width: 100%;
+      margin-left: 0;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  }
 
-.summary-label {
-  font-size: 11px;
-  color: $text-muted;
-}
+  .summary-action-button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
 
-.summary-value {
-  font-size: 14px;
-  font-weight: 700;
-  color: $text-strong;
-}
+  .summary-toggle-label {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
 
-.summary-number {
-  color: $primary;
+  .summary-label {
+    font-size: 11px;
+    color: $text-muted;
+  }
+
+  .summary-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: $text-strong;
+  }
+
+  .summary-number {
+    color: $primary;
+  }
 }
 
 .scope-toolbar {
@@ -180,19 +192,19 @@ function handleClose(value = false) {
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-}
 
-.scope-toolbar-main {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
+  &-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
 
-.scope-toolbar-info {
-  font-size: 12px;
-  color: $text-secondary;
-  font-weight: 700;
+  &-info {
+    font-size: 12px;
+    color: $text-secondary;
+    font-weight: 700;
+  }
 }
 
 .scope-toggle-label {
@@ -201,11 +213,11 @@ function handleClose(value = false) {
   gap: 6px;
   font-size: 12px;
   color: $text-dark;
-}
 
-.scope-toggle-label input {
-  margin: 0;
-  accent-color: $primary;
+  input {
+    margin: 0;
+    accent-color: $primary;
+  }
 }
 
 .scope-clear-btn {
@@ -220,17 +232,17 @@ function handleClose(value = false) {
   box-shadow: 0 8px 18px rgba($danger-light, 0.14);
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-}
 
-.scope-clear-btn:hover {
-  background: rgba(254, 202, 202, 0.98);
-  border-color: rgba($danger, 0.38);
-  box-shadow: 0 10px 22px rgba($danger-light, 0.18);
-  transform: translateY(-1px);
-}
+  &:hover {
+    background: rgba(254, 202, 202, 0.98);
+    border-color: rgba($danger, 0.38);
+    box-shadow: 0 10px 22px rgba($danger-light, 0.18);
+    transform: translateY(-1px);
+  }
 
-.scope-clear-btn:active {
-  transform: translateY(0);
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 .voronoi-export-hint {
@@ -248,6 +260,11 @@ function handleClose(value = false) {
   max-height: 360px;
   overflow: auto;
   padding: 14px 16px;
+
+  @media (max-width: 760px) {
+    min-height: 220px;
+    max-height: 320px;
+  }
 }
 
 .voronoi-export-list {
@@ -264,63 +281,46 @@ function handleClose(value = false) {
   border-radius: 12px;
   border: 1px solid $muted-hover;
   background: $glass-heavy;
+
+  input {
+    margin-top: 2px;
+    accent-color: $primary;
+  }
 }
 
-.scope-checkbox-item input {
-  margin-top: 2px;
-  accent-color: $primary;
-}
+.voronoi-export-item {
+  &.is-disabled {
+    opacity: 0.55;
+  }
 
-.voronoi-export-item.is-disabled {
-  opacity: 0.55;
-}
-
-.voronoi-export-item-copy {
-  min-width: 0;
-  flex: 1;
-  display: flex;
-  gap: 10px;
+  &-copy {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    gap: 10px;
+  }
 }
 
 .scope-selection-copy {
   min-width: 0;
-}
 
-.scope-selection-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: $text-strong;
-  white-space: nowrap;
-}
+  .scope-selection-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: $text-strong;
+    white-space: nowrap;
+  }
 
-.scope-selection-meta {
-  font-size: 11px;
-  color: $text-muted;
-  white-space: nowrap;
+  .scope-selection-meta {
+    font-size: 11px;
+    color: $text-muted;
+    white-space: nowrap;
+  }
 }
 
 .scope-modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-}
-
-@media (max-width: 760px) {
-  .feature-scope-summary {
-    flex-wrap: wrap;
-  }
-
-  .summary-actions {
-    width: 100%;
-    margin-left: 0;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .scope-panel {
-    min-height: 220px;
-    max-height: 320px;
-  }
 }
 </style>
