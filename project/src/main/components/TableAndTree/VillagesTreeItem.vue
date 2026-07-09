@@ -235,185 +235,195 @@ const leave = (el) => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$primary-blue: #007aff;
+$success-green: #34c759;
+$text-dark: #333;
+$text-muted: #555;
+$error-color: #d32f2f;
+$transition-fast: 0.2s;
+$transition-expand: 0.3s;
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .tree-node {
   margin-bottom: 8px;
 }
 
 .node-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 8px 10px;
-  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.2s;
-}
+  border-radius: 12px;
+  transition: background $transition-fast;
 
-.node-content:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
+  &:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
 
-.node-content.is-match {
-  background: rgba(255, 215, 0, 0.15);
-  border: 1px solid rgba(255, 215, 0, 0.3);
+  &.is-match {
+    background: rgba(255, 215, 0, 0.15);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+  }
 }
 
 .node-label {
   display: flex;
-  align-items: center;
+  flex: 1;
   gap: 8px;
+  align-items: center;
+  color: $text-dark;
   font-size: 15px;
   font-weight: 500;
-  color: #333;
-  flex: 1;
 }
 
 .buttons-group {
   display: flex;
-  align-items: center;
   gap: 6px;
+  align-items: center;
 }
 
 .map-btn {
-  background: transparent;
-  border: none;
-  font-size: 18px;
+  @include flex-center;
+
   width: 28px;
   height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  font-size: 18px;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.map-btn:hover {
-  background: rgba(52, 199, 89, 0.15);
-  transform: scale(1.1);
-}
-
-.map-btn.is-disabled,
-.map-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.map-btn.is-disabled:hover,
-.map-btn:disabled:hover {
   background: transparent;
-  transform: none;
+  border: none;
+  border-radius: 50%;
+  transition: all $transition-fast ease;
+
+  &:hover {
+    background: rgba($success-green, 0.15);
+    transform: scale(1.1);
+  }
+
+  &.is-disabled,
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+
+    &:hover {
+      background: transparent;
+      transform: none;
+    }
+  }
 }
 
 .node-tag {
   display: inline-block;
-  font-size: 10px;
-  padding: 1px 6px;
-  border-radius: 8px;
+  flex-shrink: 0;
   margin-left: 6px;
-  color: #555;
+  padding: 1px 6px;
+  color: $text-muted;
+  font-size: 10px;
   font-weight: 500;
   white-space: nowrap;
-  flex-shrink: 0;
+  border-radius: 8px;
 }
 
 .lazy-indicator {
   display: inline-block;
   margin-left: 6px;
+  color: $primary-blue;
   font-size: 14px;
-  color: #007AFF;
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 .lazy-error {
-  padding: 8px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
   margin: 4px 0 4px 20px;
+  padding: 8px 12px;
+  color: $error-color;
+  font-size: 13px;
   background: rgba(211, 47, 47, 0.06);
   border: 1px solid rgba(211, 47, 47, 0.2);
   border-radius: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  color: #d32f2f;
-}
 
-.lazy-error .retry-btn-small {
-  padding: 3px 10px;
-  border: none;
-  border-radius: 6px;
-  background: rgba(211, 47, 47, 0.12);
-  color: #d32f2f;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
+  .retry-btn-small {
+    padding: 3px 10px;
+    color: $error-color;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(211, 47, 47, 0.12);
+    border: none;
+    border-radius: 6px;
+  }
 }
 
 .children-container {
-  padding-left: 20px;
-  border-left: 2px solid rgba(0, 122, 255, 0.1);
-  margin-left: 14px;
-  transition: height 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-  /* Grid layout for children */
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 8px;
+  margin-left: 14px;
+  padding-left: 20px;
+  border-left: 2px solid rgba(0, 122, 255, 0.1);
+  transition: height $transition-expand cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 769px) and (max-width: 1200px) {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  @media (min-width: 1201px) {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
 }
 
 .expand-btn {
-  background: transparent;
-  border: none;
-  color: #007AFF;
-  font-size: 16px;
+  @include flex-center;
+
   width: 24px;
   height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  color: $primary-blue;
+  font-size: 16px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  transition: all $transition-expand ease;
+
+  &:hover {
+    background: rgba(0, 122, 255, 0.1);
+  }
+
+  &.is-open {
+    transform: rotate(45deg);
+  }
 }
 
-.expand-btn:hover {
-  background: rgba(0, 122, 255, 0.1);
-}
-
-.expand-btn.is-open {
-  transform: rotate(45deg);
-}
-
-/* Highlight style for search */
+/*
+ * highlight 元素由 v-html 动态插入，
+ * scoped 样式必须使用 :deep() 才能生效。
+ */
 :deep(.highlight) {
-  background: rgba(255, 255, 0, 0.4);
-  border-radius: 4px;
   padding: 0 2px;
   color: #000;
+  background: rgba(255, 255, 0, 0.4);
+  border-radius: 4px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .children-container {
-    grid-template-columns: 1fr;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
   }
-}
 
-@media (min-width: 769px) and (max-width: 1200px) {
-  .children-container {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  }
-}
-
-@media (min-width: 1201px) {
-  .children-container {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

@@ -257,144 +257,124 @@ defineExpose({ combinations })
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$font-size-base: 14px;
+$transition-duration: 0.2s;
+$card-radius: 8px;
+
 /* 最外层容器：统一的大玻璃卡片 */
 .query-result-box {
-  margin: 10px 0;
-  padding: 8px; /* 统一内边距 */
   display: flex;
   flex-direction: column;
+  margin: 10px 0;
+  padding: 8px;
 }
-
-
 
 /* 头部样式调整 */
 .info-header {
-  margin-bottom: 10px;
-  color: var(--text-medium);
-  font-size: 14px;
   display: flex;
-  justify-content: space-between; /* 两端对齐 */
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-light); /* 分割线 */
+  color: var(--text-medium);
+  font-size: $font-size-base;
+  border-bottom: 1px solid var(--border-light);
 }
 
 /* 全局展开按钮 */
 .global-expand-btn {
-  background: var(--color-blue-custom-light);
-  color: var(--color-blue-custom);
-  border: none;
   padding: 4px 12px;
-  border-radius: 12px;
+  color: var(--color-blue-custom);
   font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
   font-weight: 600;
-  white-space:nowrap;
-}
-.global-expand-btn:hover {
-  background: var(--color-blue-custom);
-  color: white;
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--color-blue-custom-light);
+  border: none;
+  border-radius: 12px;
+  transition: all $transition-duration;
+
+  &:hover {
+    color: white;
+    background: var(--color-blue-custom);
+  }
 }
 
 /* Loading 和 Empty 状态 */
 .status-msg {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 14px;
   width: 100%;
+  color: var(--text-muted);
+  font-size: $font-size-base;
+  text-align: center;
 }
 
-
-/* ✅ Grid 布局 (预览列表) */
+/* Grid 布局（预览列表） */
 .compact-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* 响应式 Grid */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 6px;
   width: 100%;
 }
 
-/* 单个紧凑项 (一行显示) */
+/* 单个紧凑项（一行显示） */
 .compact-item {
   display: flex;
   align-items: center;
-  white-space: nowrap;
-  overflow: hidden;
-  font-size: 14px;
   padding: 8px;
-  border-radius: 8px;
+  overflow: hidden;
+  font-size: $font-size-base;
+  white-space: nowrap;
   background: var(--glass-lighter);
-  transition: background 0.2s;
-}
-.compact-item:hover {
-  background: var(--glass-medium-strong);
+  border-radius: $card-radius;
+  transition: background $transition-duration;
+
+  &:hover {
+    background: var(--glass-medium-strong);
+  }
 }
 
 .compact-title {
-  font-weight: bold;
-  color: var(--text-dark);
   margin-right: 4px;
+  color: var(--text-dark);
+  font-weight: bold;
 }
+
 .compact-count {
+  margin-right: 8px;
   color: var(--color-blue-custom);
   font-size: 0.9em;
-  margin-right: 8px;
   font-weight: 600;
 }
+
 .compact-preview {
-  color: var(--text-muted);
+  flex: 1;
   overflow: hidden;
+  color: var(--text-muted);
   text-overflow: ellipsis;
-  flex: 1; /* 占据剩余空间 */
 }
 
-.full-item {
-  border-bottom: 1px dashed var(--border-medium);
-  padding-bottom: 16px;
-}
-.full-item:last-child { border-bottom: none; }
-
-.full-item-header {
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.full-item-header .combo-name { font-size: 16px; font-weight: bold; color: var(--color-blue-custom); }
-.full-item-header .count-badge {
-  background: var(--color-blue-custom-bg); color: var(--color-blue-custom); padding: 2px 8px; border-radius: 10px; font-size: 12px;
-}
-
-.full-chars {
-  font-size: 18px;
-  line-height: 1.6;
-  color: var(--text-dark);
-  /* 每个字之间增加 1em 的间距，相当于一个空格的宽度 */
-  letter-spacing: 0.5em;
-  /* 可选：防止连体字或特殊渲染问题 */
-  font-variant-ligatures: none;
-}
-.full-chars .char-tag {
-  display: inline-block;
-  margin-right: 6px;
-}
-
-/* 弹窗动画 */
 .limit-warning {
   padding: 12px;
-  background: var(--color-error-bg); /* 浅红色背景 */
-  border: 1px solid var(--color-error-border);
   color: var(--color-error);
-  border-radius: 12px;
-  font-size: 14px;
-  text-align: center;
+  font-size: $font-size-base;
   font-weight: 600;
-  animation: fadeIn 0.3s ease;
+  text-align: center;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  border-radius: 12px;
+  animation: fade-in 0.3s ease;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

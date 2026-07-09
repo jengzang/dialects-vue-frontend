@@ -147,18 +147,41 @@ defineExpose({ pathStrings, chars, positionInput, charInput })
 </script>
 
 <style lang="scss" scoped>
+$primary-color: var(--color-blue-custom, #007aff);
+$text-medium-color: var(--text-medium, #555);
+$error-color: #ff3b30;
+$warning-color: #ff9500;
+$transition-duration: 0.2s;
+
+@mixin status-message {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+@mixin status-item($color) {
+  color: $color;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .zhonggu-direct-input {
-  background: none;
+  position: relative;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   width: 80dvw;
   max-width: 600px;
   margin: 10px 0;
   padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  position: relative;
-  left: 50%;
+  background: none;
   transform: translateX(-50%);
+
+  @media (max-aspect-ratio: 1/1) {
+    gap: 0;
+    padding: 8px;
+  }
 }
 
 .input-section {
@@ -169,35 +192,35 @@ defineExpose({ pathStrings, chars, positionInput, charInput })
 
 .input-label-row {
   display: flex;
+  gap: 16px;
   align-items: center;
   justify-content: center;
-  gap: 16px;
 }
 
 .input-label {
+  color: $text-medium-color;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-medium, #555);
 }
 
 .help-btn {
-  width: 24px;
-  height: 24px;
-  border: 1.5px solid var(--color-blue-custom, #007aff);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--color-blue-custom, #007aff);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  width: 24px;
+  height: 24px;
+  color: $primary-color;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  border: 1.5px solid $primary-color;
+  border-radius: 50%;
+  transition: all $transition-duration;
 
   &:hover {
-    background: var(--color-blue-custom, #007aff);
     color: #fff;
+    background: $primary-color;
   }
 }
 
@@ -209,49 +232,34 @@ textarea {
   resize: vertical;
 
   &:focus {
-    border-color: var(--color-blue-custom, #007aff);
+    border-color: $primary-color;
     box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
   }
 
   &.input-error {
-    border-color: #ff3b30;
+    border-color: $error-color;
     box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.12);
   }
 
   &.input-warning {
-    border-color: #ff9500;
+    border-color: $warning-color;
     box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.12);
   }
 }
 
 .error-message {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  @include status-message;
 }
 
 .error-item {
-  color: #ff3b30;
-  font-size: 12px;
-  line-height: 1.4;
+  @include status-item($error-color);
 }
 
 .warning-message {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  @include status-message;
 }
 
 .warning-item {
-  color: #ff9500;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-@media (max-aspect-ratio: 1/1) {
-  .zhonggu-direct-input {
-    gap:0px;
-    padding: 8px;
-  }
+  @include status-item($warning-color);
 }
 </style>

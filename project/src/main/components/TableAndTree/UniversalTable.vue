@@ -1526,7 +1526,26 @@ onUnmounted(() => {
 
 
 
-<style scoped>
+<style scoped lang="scss">
+$primary-blue: #007aff;
+$success-green: #34c759;
+$warning-orange: #ff9800;
+$warning-dark: #ff6f00;
+$danger-red: #ff3b30;
+$text-dark: #333;
+$text-muted: #666;
+$transition-fast: 0.2s;
+$mobile-breakpoint: 768px;
+$system-font:
+  -apple-system,
+  BlinkMacSystemFont,
+  "SF Pro Text",
+  "Segoe UI",
+  Roboto,
+  Helvetica,
+  Arial,
+  sans-serif;
+
 /* ========================================
    UniversalTable 组件样式
    使用全局 CSS 变量和工具类
@@ -1541,7 +1560,7 @@ onUnmounted(() => {
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-md);
   padding: 12px 4px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: $system-font;
   color: var(--text-primary);
   display: flex;
   flex-direction: column;
@@ -1576,12 +1595,12 @@ onUnmounted(() => {
   font-size: 14px;
   outline: none;
   transition: all 0.3s;
-}
 
-.search-input:focus {
-  background: var(--bg-white);
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+  &:focus {
+    background: var(--bg-white);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
 }
 
 .search-icon {
@@ -1602,41 +1621,41 @@ onUnmounted(() => {
   --main-glass-button-padding: 8px 16px;
   --main-glass-button-border-radius: var(--radius-md);
   --main-glass-button-font-size: 13px;
-  padding: 8px 16px;
-  border: 1px solid var(--border-light);
-  background: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
+
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s;
   max-width: 100px;
+  padding: 8px 16px;
   white-space: nowrap;
-}
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border-light);
+  transition: all $transition-fast;
 
-.main-glass-button:hover:not(:disabled) {
-  background: var(--bg-white);
-  transform: translateY(-1px);
-}
+  &:hover:not(:disabled) {
+    background: var(--bg-white);
+    transform: translateY(-1px);
+  }
 
-.main-glass-button[data-size='compact'] {
-  --main-glass-button-padding: 8px 6px;
-}
+  &[data-size='compact'] {
+    --main-glass-button-padding: 8px 6px;
+  }
 
-.main-glass-button[data-variant='primary'] {
-  background: var(--color-primary);
-  color: white;
-}
+  &[data-variant='primary'] {
+    color: white;
+    background: var(--color-primary);
+  }
 
-.main-glass-button[data-role='edit-toggle'] {
-  background: darkgoldenrod;
-}
+  &[data-role='edit-toggle'] {
+    background: darkgoldenrod;
 
-/* 編輯模式按鈕樣式 */
-.main-glass-button[data-role='edit-toggle'][data-state='edit-mode'] {
-  background: #ff9500;
-  color: white;
-  animation: pulse 2s ease-in-out infinite;
+    &[data-state='edit-mode'] {
+      color: white;
+      background: #ff9500;
+      animation: pulse 2s ease-in-out infinite;
+    }
+  }
 }
 
 @keyframes pulse {
@@ -1650,15 +1669,15 @@ onUnmounted(() => {
 
 /* 提交按鈕樣式 */
 .main-glass-button[data-role='submit'] {
-  background: linear-gradient(135deg, #34c759, #28a745);
   color: white;
   font-weight: 600;
-}
+  background: linear-gradient(135deg, $success-green, #28a745);
 
-.main-glass-button[data-role='submit']:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: #ccc;
+  &:disabled {
+    cursor: not-allowed;
+    background: #ccc;
+    opacity: 0.5;
+  }
 }
 
 /* Table Area */
@@ -1715,40 +1734,41 @@ td {
 }
 
 /* 可編輯單元格樣式 */
-td.editable-cell {
-  cursor: text;
-  background: #fffbf0;
-  border: 1px solid #ffd700;
-  transition: all 0.2s;
-}
+td {
+  &.editable-cell {
+    cursor: text;
+    background: #fffbf0;
+    border: 1px solid #ffd700;
+    transition: all $transition-fast;
 
-td.editable-cell:hover {
-  background: #fff9e6;
-  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
-}
+    &:hover {
+      background: #fff9e6;
+      box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+    }
 
-td.editable-cell:focus {
-  outline: none;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
-  border-color: var(--color-primary);
-}
+    &:focus {
+      background: white;
+      border-color: var(--color-primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+    }
+  }
 
-/* 已改變的單元格樣式 */
-td.cell-changed {
-  background: #e6f7ff;
-  border-color: var(--color-primary);
-  font-weight: 600;
-  position: relative;
-}
+  &.cell-changed {
+    position: relative;
+    font-weight: 600;
+    background: #e6f7ff;
+    border-color: var(--color-primary);
 
-td.cell-changed::after {
-  content: '✎';
-  position: absolute;
-  top: 2px;
-  right: 4px;
-  font-size: 10px;
-  color: var(--color-primary);
+    &::after {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      color: var(--color-primary);
+      font-size: 10px;
+      content: '✎';
+    }
+  }
 }
 
 /* Header & Filter */
@@ -1763,31 +1783,33 @@ td.cell-changed::after {
 
 .header-text-wrapper {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px;
-  border-radius: var(--radius-sm);
-  transition: background 0.2s;
   flex: 1;
+  gap: 4px;
+  align-items: center;
   min-width: 0;
+  padding: 4px;
   overflow: hidden;
+  border-radius: var(--radius-sm);
+  transition: background $transition-fast;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--bg-hover);
+    }
+  }
+
+  &.filtering {
+    .header-text {
+      color: var(--color-primary);
+      font-weight: bold;
+    }
+  }
 }
 
 .header-text {
   white-space: nowrap;
-}
-
-.header-text-wrapper.clickable {
-  cursor: pointer;
-}
-
-.header-text-wrapper.clickable:hover {
-  background: var(--bg-hover);
-}
-
-.header-text-wrapper.filtering .header-text {
-  color: var(--color-primary);
-  font-weight: bold;
 }
 
 .filter-hint-icon {
@@ -1823,26 +1845,23 @@ td.cell-changed::after {
   --main-glass-panel-shadow: var(--shadow-lg);
   --main-glass-panel-hover-shadow: var(--shadow-lg);
   --main-glass-panel-border-radius: var(--radius-lg);
+
   position: absolute;
   top: 100%;
   left: 0;
-  margin-top: 8px;
   z-index: 10000;
-  min-width: 240px;
-  max-width: 300px;
-  padding: 10px;
   display: flex;
   flex-direction: column;
-  max-height: 400px;
-}
-
-.main-glass-panel[data-surface='filter-popup'].align-right {
-  left: auto;
-  right: 0;
-}
-
-.main-glass-panel[data-surface='filter-popup'] {
+  min-width: 240px;
+  max-width: 300px;
   max-height: 50dvh;
+  padding: 10px;
+  margin-top: 8px;
+
+  &.align-right {
+    right: 0;
+    left: auto;
+  }
 }
 
 .filter-header {
@@ -1878,79 +1897,81 @@ td.cell-changed::after {
 /* Checkbox Styling */
 .checkbox-item {
   display: flex;
-  align-items: center;
   gap: 10px;
-  cursor: pointer;
+  align-items: center;
   padding: 3px;
+  cursor: pointer;
   border-radius: var(--radius-md);
-  transition: background 0.2s;
-}
+  transition: background $transition-fast;
 
-.checkbox-item:hover {
-  background: var(--bg-hover-light);
-}
+  &:hover {
+    background: var(--bg-hover-light);
+  }
 
-.checkbox-item input {
-  display: none;
+  input {
+    display: none;
+
+    &:checked {
+      + .custom-checkbox {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+
+        &::after {
+          display: block;
+          color: darkgreen;
+          font-size: 14px;
+          font-weight: bold;
+          line-height: 1;
+          content: '✓';
+        }
+      }
+    }
+  }
 }
 
 .custom-checkbox {
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
-  border: 2px solid var(--border-gray);
+  position: relative;
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  width: 20px;
+  height: 20px;
   background: white;
-  flex-shrink: 0;
-  position: relative;
-}
-
-.checkbox-item input:checked + .custom-checkbox {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-.checkbox-item input:checked + .custom-checkbox::after {
-  content: '✓';
-  color: darkgreen;
-  font-size: 14px;
-  font-weight: bold;
-  line-height: 1;
-  display: block;
+  border: 2px solid var(--border-gray);
+  border-radius: 5px;
+  transition: all $transition-fast;
 }
 
 .text-btn {
-  background: none;
-  border: none;
+  padding: 6px 12px;
   font-size: 13px;
   cursor: pointer;
-  padding: 6px 12px;
+  background: none;
+  border: none;
   border-radius: var(--radius-sm);
+
+  &.confirm {
+    color: white;
+    background: var(--color-gradient);
+  }
+
+  &.cancel {
+    color: var(--text-tertiary);
+
+    &:hover {
+      background: var(--bg-hover);
+    }
+  }
 }
 
 .toggle-select {
   color: var(--color-accent-purple);
   font-weight: bold;
-}
 
-.toggle-select:hover {
-  background: var(--color-accent-purple-light);
-}
-
-.text-btn.confirm {
-  background: var(--color-gradient);
-  color: white;
-}
-
-.text-btn.cancel {
-  color: var(--text-tertiary);
-}
-
-.text-btn.cancel:hover {
-  background: var(--bg-hover);
+  &:hover {
+    background: var(--color-accent-purple-light);
+  }
 }
 
 /* Mobile Responsiveness */
@@ -2019,33 +2040,33 @@ td.cell-changed::after {
 }
 
 .icon-action-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-full);
-  border: none;
-  background: var(--bg-hover-light);
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: 0.2s;
-}
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  background: var(--bg-hover-light);
+  border: none;
+  border-radius: var(--radius-full);
+  transition: $transition-fast;
 
-.icon-action-btn:hover {
-  background: var(--color-primary);
-  color: white;
-}
+  &:hover {
+    color: white;
+    background: var(--color-primary);
+  }
 
-/* 删除按钮专用样式（暗红色） */
-.icon-action-btn.delete {
-  background: #8B0000; /* 暗红色 */
-  color: white;
-}
+  /* 删除按钮专用样式（暗红色） */
+  &.delete {
+    color: white;
+    background: #8b0000;
 
-.icon-action-btn.delete:hover {
-  background: #A52A2A; /* 悬停时更浅的红色 */
-  color: white;
-  transform: scale(1.1);
+    &:hover {
+      color: white;
+      background: #a52a2a;
+      transform: scale(1.1);
+    }
+  }
 }
 
 /* Pagination */
@@ -2064,24 +2085,24 @@ td.cell-changed::after {
 }
 
 .page-info {
+  padding: 8px 12px;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-primary);
-  padding: 8px 12px;
   border-radius: var(--radius-md);
-  transition: all 0.2s;
-}
+  transition: all $transition-fast;
 
-.page-info.clickable {
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid var(--border-light);
-}
+  &.clickable {
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--border-light);
 
-.page-info.clickable:hover {
-  background: var(--color-primary-light);
-  border-color: var(--color-primary);
-  transform: translateY(-1px);
+    &:hover {
+      background: var(--color-primary-light);
+      border-color: var(--color-primary);
+      transform: translateY(-1px);
+    }
+  }
 }
 
 .page-input-wrapper {
@@ -2093,25 +2114,26 @@ td.cell-changed::after {
 .page-input {
   width: 50px;
   padding: 6px 8px;
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius-md);
-  background: white;
   font-size: 14px;
   font-weight: 600;
   text-align: center;
+  appearance: textfield;
+  background: white;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-md);
   outline: none;
-  transition: all 0.2s;
+  transition: all $transition-fast;
   -moz-appearance: textfield;
-}
 
-.page-input::-webkit-outer-spin-button,
-.page-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+  }
 
-.page-input:focus {
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+  &:focus {
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
 }
 
 .page-total {
@@ -2123,21 +2145,21 @@ td.cell-changed::after {
 .page-btn {
   width: 36px;
   height: 36px;
-  border-radius: var(--radius-full);
+  cursor: pointer;
   background: white;
   border: 1px solid var(--border-medium);
-  cursor: pointer;
-  transition: all 0.2s;
-}
+  border-radius: var(--radius-full);
+  transition: all $transition-fast;
 
-.page-btn:hover:not(:disabled) {
-  background: var(--color-primary-light);
-  border-color: var(--color-primary);
-}
+  &:hover:not(:disabled) {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+  }
 
-.page-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
 }
 
 .label-text {
@@ -2236,7 +2258,7 @@ td.cell-changed::after {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all $transition-fast;
 }
 
 .cancel-btn {
@@ -2287,7 +2309,7 @@ td.cell-changed::after {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all $transition-fast;
   white-space: nowrap;
 }
 
@@ -2298,7 +2320,7 @@ td.cell-changed::after {
 }
 
 .fullscreen-toggle-btn.exit-btn {
-  background: #ff3b30;
+  background: $danger-red;
   margin-left: auto;
 }
 
@@ -2355,6 +2377,9 @@ td.cell-changed::after {
 /* ==========================================
    批量替换对话框样式
 
+   原文件此处的标题注释没有闭合，因此以下规则当前不会生效。
+   为保持原有样式行为，继续将其保留在注释中。
+
 .modal-fade-enter-active,
 .modal-fade-leave-active {
   transition: opacity 0.3s ease;
@@ -2378,7 +2403,7 @@ td.cell-changed::after {
   margin-bottom: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: $text-dark;
 }
 
 .batch-replace-modal-body .glass-input {
@@ -2389,14 +2414,16 @@ td.cell-changed::after {
   background: rgba(255, 255, 255, 0.6);
   font-size: 14px;
   outline: none;
-  transition: all 0.2s;
+  transition: all $transition-fast;
 }
 
 .batch-replace-modal-body .glass-input:focus {
-  border-color: #007aff;
+  border-color: $primary-blue;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
+
+*/
 
 /* 列选择器 */
 .column-selector {
@@ -2451,8 +2478,8 @@ td.cell-changed::after {
 }
 
 .column-checkbox-item input:checked + .custom-checkbox {
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  border-color: #007aff;
+  background: linear-gradient(135deg, $primary-blue, #0051d5);
+  border-color: $primary-blue;
   transform: scale(1.1);
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.4);
 }
@@ -2482,14 +2509,14 @@ td.cell-changed::after {
 }
 
 .column-checkbox-item input:checked ~ .label-text {
-  color: #007aff;
+  color: $primary-blue;
   font-weight: 600;
 }
 
 .column-checkbox-item .label-text {
   font-size: 13px;
-  color: #333;
-  transition: all 0.2s;
+  color: $text-dark;
+  transition: all $transition-fast;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2518,7 +2545,7 @@ td.cell-changed::after {
 
 .radio-item span {
   font-size: 14px;
-  color: #333;
+  color: $text-dark;
   user-select: none;
 }
 
@@ -2542,7 +2569,7 @@ td.cell-changed::after {
   margin: 0 0 12px 0;
   font-size: 15px;
   font-weight: 600;
-  color: #007aff;
+  color: $primary-blue;
 }
 
 .preview-list {
@@ -2571,7 +2598,7 @@ td.cell-changed::after {
 .row-label {
   padding: 2px 8px;
   background: rgba(0, 122, 255, 0.1);
-  color: #007aff;
+  color: $primary-blue;
   border-radius: 4px;
   font-weight: 600;
 }
@@ -2579,7 +2606,7 @@ td.cell-changed::after {
 .col-label {
   padding: 2px 8px;
   background: rgba(52, 199, 89, 0.1);
-  color: #34c759;
+  color: $success-green;
   border-radius: 4px;
   font-weight: 600;
 }
@@ -2598,19 +2625,19 @@ td.cell-changed::after {
 }
 
 .arrow {
-  color: #666;
+  color: $text-muted;
   font-weight: bold;
 }
 
 .new-value {
-  color: #34c759;
+  color: $success-green;
   font-weight: 600;
 }
 
 .preview-more {
   text-align: center;
   padding: 8px;
-  color: #666;
+  color: $text-muted;
   font-size: 12px;
   font-style: italic;
 }
@@ -2627,7 +2654,7 @@ td.cell-changed::after {
   margin: 0 0 12px 0;
   font-size: 15px;
   font-weight: 600;
-  color: #ff9800;
+  color: $warning-orange;
 }
 
 .stats-box {
@@ -2646,12 +2673,12 @@ td.cell-changed::after {
 }
 
 .stats-item .label {
-  color: #666;
+  color: $text-muted;
   font-weight: 500;
 }
 
 .stats-item .value {
-  color: #ff9800;
+  color: $warning-orange;
   font-weight: 600;
   font-size: 16px;
 }
@@ -2661,7 +2688,7 @@ td.cell-changed::after {
   padding: 10px;
   background: rgba(255, 152, 0, 0.1);
   border-radius: 6px;
-  color: #ff6f00;
+  color: $warning-dark;
   font-size: 13px;
   font-weight: 500;
   text-align: center;
@@ -2679,12 +2706,12 @@ td.cell-changed::after {
 }
 
 .radio-item.highlight-option input[type="radio"]:checked + span {
-  color: #ff9800;
+  color: $warning-orange;
   font-weight: 600;
 }
 
 .help-text.warning-help {
-  color: #ff6f00;
+  color: $warning-dark;
   background: rgba(255, 152, 0, 0.1);
   padding: 8px 12px;
   border-radius: 6px;

@@ -323,17 +323,37 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-.help-trigger {
-  font-size: 13px;
-  color: #007aff;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  text-decoration: none;
+$primary-blue: #007aff;
+$success-green: #52c41a;
+$transition-duration: 0.2s;
+$glass-blur: 12px;
+
+.query-box {
+  width: 100%;
+  margin: 10px auto 0;
+
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding-right: 40px;
+  }
+
+  :deep(textarea) {
+    margin-bottom: 0;
+  }
 }
 
-.help-trigger:hover {
-  opacity: 0.7;
-  text-decoration: underline;
+.help-trigger {
+  color: $primary-blue;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity $transition-duration;
+
+  &:hover {
+    text-decoration: underline;
+    opacity: 0.7;
+  }
 }
 
 .textarea-wrapper {
@@ -343,61 +363,54 @@ defineExpose({
 
 .success-checkmark {
   position: absolute;
-  right: 12px;
   top: 50%;
-  transform: translateY(-50%);
+  right: 12px;
+  color: $success-green;
   font-size: 20px;
   font-weight: bold;
-  color: #52c41a;
   pointer-events: none;
+  transform: translateY(-50%);
 }
 
-.query-box {
-  width: 100%;
-  margin: 10px auto 0px;
-}
-
-.query-box textarea {
-  width: 100%;
-  padding-right: 40px;
-  box-sizing: border-box;
-}
-
-.query-box :deep(textarea) {
-  margin-bottom: 0;
-}
-
+/*
+ * 该元素通过 Teleport 挂载到 body，
+ * 因此不能嵌套在 .query-box 或其他组件容器选择器中。
+ */
 .inline-suggestion {
   position: absolute !important;
-  background: var(--glass-medium2) !important;
-  border: 1px solid var(--border-gray-light) !important;
-  box-shadow: var(--shadow-lg2);
-  padding: 8px 12px;
-  border-radius: 12px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  white-space: pre-line;
-  font-size: 14px;
-  color: var(--text-dark);
+  z-index: 99999 !important;
+  width: max-content;
   min-width: 140px;
   max-width: min(240px, 60vw);
-  width: max-content;
-  z-index: 99999 !important;
-  pointer-events: auto !important;
   max-height: 20dvh;
+  padding: 8px 12px;
   overflow-y: auto;
-  transition: background-color 0.2s ease;
+  color: var(--text-dark);
+  font-size: 14px;
+  white-space: pre-line;
+  pointer-events: auto !important;
+  background: var(--glass-medium2) !important;
+  border: 1px solid var(--border-gray-light) !important;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg2);
+  backdrop-filter: blur($glass-blur);
+  -webkit-backdrop-filter: blur($glass-blur);
+  transition: background-color $transition-duration ease;
 }
 
 .suggest-line {
   display: flex;
+  gap: 12px;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
   padding: 4px 8px;
   cursor: pointer;
   border-radius: 6px;
-  transition: background-color 0.2s ease;
+  transition: background-color $transition-duration ease;
+
+  &:hover {
+    background-color: var(--bg-blue-hover);
+  }
 }
 
 .suggest-text {
@@ -406,11 +419,11 @@ defineExpose({
 
 .suggest-counts {
   display: inline-flex;
-  align-items: center;
-  gap: 8px;
   flex-shrink: 0;
-  font-size: 12px;
+  gap: 8px;
+  align-items: center;
   color: var(--text-dark-medium);
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -420,43 +433,39 @@ defineExpose({
   justify-content: center;
   min-width: 22px;
   padding: 1px 6px;
-  border-radius: 999px;
-  border: 1px solid transparent;
   line-height: 1.35;
+  border: 1px solid transparent;
+  border-radius: 999px;
   box-shadow: var(--shadow-sm2);
-}
 
-.suggest-count--locations {
-  color: #3d7bd9;
-  background: rgba(0, 122, 255, 0.08);
-  border-color: rgba(0, 122, 255, 0.14);
-}
+  &--locations {
+    color: #3d7bd9;
+    background: rgba($primary-blue, 0.08);
+    border-color: rgba($primary-blue, 0.14);
+  }
 
-.suggest-count--total {
-  color: #0f5fc4;
-  background: rgba(0, 122, 255, 0.14);
-  border-color: rgba(0, 122, 255, 0.22);
-}
-
-.suggest-line:hover {
-  background-color: var(--bg-blue-hover);
+  &--total {
+    color: #0f5fc4;
+    background: rgba($primary-blue, 0.14);
+    border-color: rgba($primary-blue, 0.22);
+  }
 }
 
 .input-limit-hint {
-  margin: 2px auto 0;
-  max-width: 250px;
   min-width: 80%;
+  max-width: 250px;
+  margin: 2px auto 0;
   padding: 4px 12px;
+  color: var(--color-warning);
   font-size: 13px;
   line-height: 1.4;
-  color: var(--color-warning);
   text-align: center;
   background: var(--glass-lighter2);
   border: 1px solid var(--border-gray-lighter);
   border-radius: 12px;
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
   box-shadow: var(--shadow-sm2);
   opacity: 0.95;
+  backdrop-filter: blur($glass-blur) saturate(160%);
+  -webkit-backdrop-filter: blur($glass-blur) saturate(160%);
 }
 </style>

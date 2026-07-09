@@ -111,62 +111,83 @@ const leave = (el) => {
 };
 </script>
 
-<style scoped>
-/* 這裡放 TreeItem 獨有的樣式 */
-.tree-node {
-  margin-bottom: 8px;
-}
-.node-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 10px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.node-content:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
-.node-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #333;
-}
-.children-container {
-  padding-left: 20px;
-  border-left: 2px solid rgba(0, 122, 255, 0.1);
-  margin-left: 14px;
-  transition: height 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-.expand-btn {
-  background: transparent;
-  border: none;
-  color: #007AFF;
-  font-size: 16px;
-  width: 24px;
-  height: 24px;
+<style scoped lang="scss">
+$primary-blue: #007aff;
+$text-dark: #333;
+$transition-fast: 0.2s;
+$transition-expand: 0.3s;
+
+@mixin flex-center {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+}
+
+/* TreeItem 独有样式 */
+.tree-node {
+  margin-bottom: 8px;
+}
+
+.node-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  border-radius: 12px;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
 }
-.expand-btn:hover {
-  background: rgba(0, 122, 255, 0.1);
+
+.node-label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: $text-dark;
+  font-size: 15px;
+  font-weight: 500;
 }
-.expand-btn.is-open {
-  transform: rotate(45deg);
+
+.children-container {
+  margin-left: 14px;
+  padding-left: 20px;
+  border-left: 2px solid rgba(0, 122, 255, 0.1);
+  transition: height $transition-expand cubic-bezier(0.25, 0.8, 0.25, 1);
 }
-/* 深度選擇器處理 v-html 內的樣式 */
+
+.expand-btn {
+  @include flex-center;
+
+  width: 24px;
+  height: 24px;
+  color: $primary-blue;
+  font-size: 16px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  transition: all $transition-expand ease;
+
+  &:hover {
+    background: rgba(0, 122, 255, 0.1);
+  }
+
+  &.is-open {
+    transform: rotate(45deg);
+  }
+}
+
+/*
+ * highlight 元素由 v-html 动态插入，
+ * scoped 样式必须使用 :deep() 才能生效。
+ */
 :deep(.highlight) {
-  background: rgba(255, 255, 0, 0.4);
-  border-radius: 4px;
   padding: 0 2px;
   color: #000;
+  background: rgba(255, 255, 0, 0.4);
+  border-radius: 4px;
 }
 </style>

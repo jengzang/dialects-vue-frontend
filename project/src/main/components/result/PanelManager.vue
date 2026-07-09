@@ -410,36 +410,71 @@ onUnmounted(() => {
 
 </style>
 
-<style scoped>
-/* 各种弹窗的关闭按钮 */
+<style scoped lang="scss">
+$primary-blue: #007aff;
+$panel-radius: 12px;
+$panel-blur: 8px;
+$border-breath-duration: 1.5s;
+
+.panel-manager-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000 !important;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  container-name: panel-manager;
+  container-type: inline-size;
+}
+
 .query-detail-panel {
   pointer-events: auto;
+  container-name: query-panel;
+  container-type: inline-size;
+
+  &.border-breath {
+    background-clip: padding-box;
+    border: 2px solid transparent;
+    border-radius: $panel-radius;
+    box-shadow: 0 0 0 2px rgba($primary-blue, 0.6);
+    animation: border-breath $border-breath-duration ease-in-out;
+  }
 }
 
-.query-detail-panel.border-breath {
-  animation: border-breath 1.5s ease-in-out;
-  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.6);
-  border: 2px solid transparent;
-  border-radius: 12px;
+/* 必要的 Loading 樣式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  height: 100%;
+  color: #666;
 }
 
-@keyframes border-breath {
-  0% {
-    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.6);
-  }
-  50% {
-    box-shadow: 0 0 12px 4px rgba(0, 122, 255, 0.3);
-  }
-  100% {
-    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.6);
-  }
+.loading-text {
+  color: #888;
+  font-size: 14px;
 }
 
 .result-panel-vue {
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
   border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: $panel-radius;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur($panel-blur);
+  -webkit-backdrop-filter: blur($panel-blur);
+}
+
+@keyframes border-breath {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba($primary-blue, 0.6);
+  }
+
+  50% {
+    box-shadow: 0 0 12px 4px rgba($primary-blue, 0.3);
+  }
 }
 </style>
