@@ -125,64 +125,88 @@ onMounted(() => document.addEventListener('click', handleGlobalClick));
 onUnmounted(() => document.removeEventListener('click', handleGlobalClick));
 </script>
 
-<style scoped>
-/* 弹窗的基本样式 */
+<style scoped lang="scss">
+$popup-text-color: #222;
+$popup-radius: 12px;
+
+$glass-background: rgba(255, 255, 255, 0.3);
+$glass-background-light: rgba(255, 255, 255, 0.05);
+$glass-highlight: rgba(255, 255, 255, 0.2);
+
+$transition-duration: 0.3s;
+$animation-duration: 0.4s;
+
+@mixin glass-blur($blur, $saturation) {
+  backdrop-filter: blur($blur) saturate($saturation);
+  -webkit-backdrop-filter: blur($blur) saturate($saturation);
+}
+
+/* 弹窗基本样式 */
 .popup-vue {
   position: fixed;
   left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05));
-  backdrop-filter: blur(5px) saturate(180%);
-  -webkit-backdrop-filter: blur(5px) saturate(180%);
-  padding: 6px 10px;
-  max-width: 300px;
-  border-radius: 12px;
-  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.3), 0 4px 14px rgba(0, 0, 0, 0.2), 0 0 8px rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
   z-index: 90000;
-  text-align: center;
-  color: #222;
-  font-weight: 500;
-  opacity: 1;
+  max-width: 300px;
+  padding: 6px 10px;
   visibility: visible;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
+  opacity: 1;
+  background: linear-gradient(
+    135deg,
+    $glass-background,
+    $glass-background-light
+  );
+  border: 1px solid $glass-background;
+  border-radius: $popup-radius;
+  box-shadow:
+    inset 0 0 1px $glass-background,
+    0 4px 14px rgba(0, 0, 0, 0.2),
+    0 0 8px $glass-highlight;
+  color: $popup-text-color;
+  text-align: center;
+  font-weight: 500;
+  transform: translateX(-50%);
 
-.popup-vue p {
-  font-size: 14px;
-  font-weight: bold;
-  margin-top: 1px;
-  margin-bottom: 2px;
-  line-height: 1.2;
-  display: block;
-}
+  @include glass-blur(5px, 180%);
 
-.popup-vue span {
-  font-size: 13px;
-  font-weight: normal;
-  margin-top: 1px;
-  margin-bottom: 1px;
-  line-height: 1.1;
-  display: block;
+  transition:
+    transform $transition-duration ease,
+    opacity $transition-duration ease;
+
+  p {
+    display: block;
+    margin: 1px 0 2px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  span {
+    display: block;
+    margin: 1px 0;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.1;
+  }
 }
 
 /* 弹窗入场动画 */
 .popup-animated {
-  animation: popup-bounce-in 0.4s ease-out forwards;
+  animation: popup-bounce-in $animation-duration ease-out forwards;
 }
 
 @keyframes popup-bounce-in {
   0% {
-    transform: translateX(-50%) translateY(0px) scale(0.8);
     opacity: 0;
+    transform: translateX(-50%) translateY(0) scale(0.8);
   }
+
   60% {
-    transform: translateX(-50%) translateY(10px) scale(1.05);
     opacity: 1;
+    transform: translateX(-50%) translateY(10px) scale(1.05);
   }
+
   100% {
     transform: translateX(-50%) translateY(20px) scale(1);
   }
 }
-
 </style>

@@ -155,45 +155,57 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$primary: #007aff;
+$primary-dark: #005ecb;
+$text-main: #1d1d1f;
+$text-secondary: rgba(0, 0, 0, 0.6);
+$text-secondary-strong: rgba(0, 0, 0, 0.7);
+$text-white: #fff;
+
+$primary-background: rgba(0, 122, 255, 0.05);
+$primary-background-hover: rgba(0, 122, 255, 0.08);
+$primary-border-light: rgba(0, 122, 255, 0.1);
+$primary-shadow: rgba(0, 122, 255, 0.3);
+$primary-shadow-hover: rgba(0, 122, 255, 0.4);
+
+$card-radius: 12px;
+$transition-fast: 0.2s;
+$transition-button: 0.25s;
+
 .update-notice-header {
   display: flex;
   align-items: center;
   gap: 1rem;
   width: 100%;
-}
 
-.update-icon {
-  font-size: 3rem;
-  line-height: 1;
-  animation: bounce 1s ease infinite;
-}
+  .update-icon {
+    font-size: 3rem;
+    line-height: 1;
+    animation: bounce 1s ease infinite;
+  }
 
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
+  .update-notice-header-main {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
 
-.update-notice-header-main {
-  flex: 1;
-  min-width: 0;
-  text-align: center;
-}
+  .update-notice-title {
+    margin: 0;
+    color: $primary;
+    white-space: nowrap;
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
 
-.update-notice-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #007aff;
-  white-space: nowrap;
-  margin: 0;
-}
-
-.update-version {
-  font-size: 0.9375rem;
-  color: rgba(0, 0, 0, 0.6);
-  font-weight: 500;
-  margin: 0;
-  white-space: nowrap;
+  .update-version {
+    margin: 0;
+    color: $text-secondary;
+    white-space: nowrap;
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
 }
 
 .update-notice-content {
@@ -204,108 +216,109 @@ onMounted(() => {
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  padding: 0.875rem 1rem;
-  background: rgba(0, 122, 255, 0.05);
-  border-radius: 12px;
   margin-bottom: 0.75rem;
-  border-left: 3px solid #007aff;
-  transition: all 0.2s ease;
-}
+  padding: 0.875rem 1rem;
+  background: $primary-background;
+  border-left: 3px solid $primary;
+  border-radius: $card-radius;
+  transition:
+    background $transition-fast ease,
+    transform $transition-fast ease;
 
-.update-item:hover {
-  background: rgba(0, 122, 255, 0.08);
-  transform: translateX(4px);
-}
+  &:hover {
+    background: $primary-background-hover;
+    transform: translateX(4px);
+  }
 
-.update-item:last-child {
-  margin-bottom: 0;
-}
+  &:last-child {
+    margin-bottom: 0;
+  }
 
-.item-icon {
-  font-size: 1.25rem;
-  flex-shrink: 0;
-  line-height: 1.5;
-}
+  .item-icon {
+    flex-shrink: 0;
+    font-size: 1.25rem;
+    line-height: 1.5;
+  }
 
-.item-text {
-  font-size: 0.9375rem;
-  color: #1d1d1f;
-  line-height: 1.8 !important;
-  font-weight: 500;
-}
+  .item-text {
+    color: $text-main;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.8 !important;
 
-.item-text * {
-  line-height: 1.8 !important;
-}
-
-.update-notice-footer {
-  padding: 1.5rem 2rem;
-  border-top: 1px solid rgba(0, 122, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
+    * {
+      line-height: 1.8 !important;
+    }
+  }
 }
 
 .no-show-checkbox {
   display: flex;
   align-items: center;
-  cursor: pointer;
-  font-size: 0.9375rem;
-  color: rgba(0, 0, 0, 0.7);
-  user-select: none;
   padding: 0.5rem 0.75rem;
   border-radius: 8px;
-  transition: background 0.2s ease;
-}
+  color: $text-secondary-strong;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background $transition-fast ease;
 
-.no-show-checkbox:hover {
-  background: rgba(0, 122, 255, 0.05);
+  &:hover {
+    background: $primary-background;
+  }
 }
 
 .confirm-btn {
   padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, #007aff 0%, #005ecb 100%);
-  color: white;
+  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
   border: none;
-  border-radius: 12px;
+  border-radius: $card-radius;
+  box-shadow: 0 4px 16px $primary-shadow;
+  color: $text-white;
+  white-space: nowrap;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
-  white-space: nowrap;
+  transition:
+    box-shadow $transition-button ease,
+    transform $transition-button ease;
+
+  &:hover {
+    box-shadow: 0 6px 24px $primary-shadow-hover;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
-.confirm-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(0, 122, 255, 0.4);
-}
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
 
-.confirm-btn:active {
-  transform: translateY(0);
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @media (max-width: 600px) {
   .update-notice-header {
     gap: 0.75rem;
-  }
 
-  .update-icon {
-    font-size: 2.5rem;
-  }
+    .update-icon {
+      font-size: 2.5rem;
+    }
 
-  .update-notice-title {
-    font-size: 1.5rem;
+    .update-notice-title {
+      font-size: 1.5rem;
+    }
   }
 
   .update-notice-content {
     padding: 1.5rem;
-  }
-
-  .update-notice-footer {
-    padding: 1.25rem 1.5rem;
   }
 }
 </style>

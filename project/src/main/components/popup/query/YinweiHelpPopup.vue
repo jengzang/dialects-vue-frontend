@@ -99,96 +99,121 @@ function handleClose() {
 }
 </script>
 
-<style scoped>
-.empty-state {
-  text-align: center;
-  padding: 30px 0;
-  color: #666;
-}
+<style scoped lang="scss">
+$text-main: #333;
+$text-secondary: #666;
+$text-muted: #8e8e93;
+$primary: #007aff;
 
-.empty-text {
-  white-space: pre-line;
-}
+$divider-color: rgba(0, 0, 0, 0.05);
+$glass-background: rgba(255, 255, 255, 0.4);
+$glass-background-medium: rgba(255, 255, 255, 0.5);
+$glass-background-hover: rgba(255, 255, 255, 0.8);
+$glass-border: rgba(255, 255, 255, 0.5);
+$glass-border-strong: rgba(255, 255, 255, 0.6);
 
-.icon-warn {
-  font-size: 40px;
-  margin-bottom: 10px;
-}
+$transition-fast: 0.2s;
+$transition-normal: 0.3s;
 
-.glass-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.glass-list-item {
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.glass-list-item:last-child {
-  border-bottom: none;
-}
-
-.popup-opening-state {
-  min-height: 160px;
+@mixin flex-center {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.popup-opening-loader {
-  transform: scale(1.2);
+.empty-state {
+  padding: 30px 0;
+  color: $text-secondary;
+  text-align: center;
+
+  .icon-warn {
+    margin-bottom: 10px;
+    font-size: 40px;
+  }
+
+  .empty-text {
+    white-space: pre-line;
+  }
+}
+
+.popup-opening-state {
+  min-height: 160px;
+
+  @include flex-center;
+
+  .popup-opening-loader {
+    transform: scale(1.2);
+  }
+}
+
+.glass-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  .glass-list-item {
+    padding: 12px 0;
+    border-bottom: 1px solid $divider-color;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
 }
 
 .item-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
+
+  .loc-name {
+    font-size: 16px;
+    font-weight: 500;
+  }
 }
 
-.loc-name {
-  font-weight: 500;
-  font-size: 16px;
-}
+/* 统计结果展开动画 */
+.slide-down {
+  &-enter-active,
+  &-leave-active {
+    max-height: 200px;
+    opacity: 1;
+    transition:
+      max-height $transition-normal ease,
+      opacity $transition-normal ease;
+  }
 
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition: all 0.3s ease;
-  max-height: 200px;
-  opacity: 1;
-}
-
-.slide-down-enter-from,
-.slide-down-leave-to {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
+  &-enter-from,
+  &-leave-to {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+  }
 }
 
 .result-box {
   margin-top: 10px;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 12px;
   padding: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-}
+  background: $glass-background;
+  border: 1px solid $glass-border;
+  border-radius: 12px;
 
-.stat-section {
-  margin-bottom: 12px;
-}
+  .stat-section {
+    margin-bottom: 12px;
 
-.stat-section:last-child {
-  margin-bottom: 0;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .stat-title {
+  margin: 0 0 6px 4px;
+  color: $text-muted;
+  text-transform: uppercase;
   font-size: 12px;
   font-weight: 700;
-  color: #8e8e93;
-  margin: 0 0 6px 4px;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
@@ -202,34 +227,36 @@ function handleClose() {
   display: inline-flex;
   align-items: center;
   padding: 4px 10px;
+  background: $glass-background-medium;
+  border: 1px solid $glass-border-strong;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px $divider-color;
+  color: $text-main;
   font-size: 13px;
-  color: #333;
-  transition: transform 0.2s;
-}
+  transition:
+    transform $transition-fast,
+    background $transition-fast;
 
-.glass-tag:hover {
-  transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.8);
-}
+  &:hover {
+    background: $glass-background-hover;
+    transform: translateY(-1px);
+  }
 
-.tag-key {
-  font-family: 'Menlo', 'Consolas', monospace;
-  font-weight: 600;
-  margin-right: 6px;
-}
+  .tag-key {
+    margin-right: 6px;
+    font-family: "Menlo", "Consolas", monospace;
+    font-weight: 600;
+  }
 
-.tag-count {
-  background: rgba(0, 122, 255, 0.1);
-  color: #007aff;
-  font-weight: 700;
-  font-size: 11px;
-  padding: 1px 5px;
-  border-radius: 8px;
-  min-width: 14px;
-  text-align: center;
+  .tag-count {
+    min-width: 14px;
+    padding: 1px 5px;
+    background: rgba(0, 122, 255, 0.1);
+    border-radius: 8px;
+    color: $primary;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
 }
 </style>

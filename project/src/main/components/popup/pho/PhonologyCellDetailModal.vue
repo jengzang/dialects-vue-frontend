@@ -90,7 +90,12 @@ function handleVisibilityChange(value) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$text-dark: #0f172a;
+$text-main: #111827;
+$text-body: #1f2937;
+$text-secondary: #4b5563;
+
 .cell-detail-content {
   min-height: 0;
 }
@@ -100,7 +105,7 @@ function handleVisibilityChange(value) {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4b5563;
+  color: $text-secondary;
 }
 
 .tone-section-list {
@@ -109,28 +114,28 @@ function handleVisibilityChange(value) {
 }
 
 .tone-section {
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.78);
-  overflow: hidden;
 }
 
 .tone-title {
   padding: 10px 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.12),
+    rgba(37, 99, 235, 0.04)
+  );
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  color: $text-dark;
   font-size: 14px;
   font-weight: 700;
-  color: #0f172a;
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.04));
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .detail-item {
   padding: 10px 12px;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.detail-item:first-of-type {
-  border-top: none;
 }
 
 .item-head {
@@ -141,30 +146,30 @@ function handleVisibilityChange(value) {
 }
 
 .item-label {
+  color: $text-main;
   font-size: 13px;
   font-weight: 700;
-  color: #111827;
 }
 
 .item-count {
-  font-size: 12px;
-  color: #4b5563;
+  padding: 1px 8px;
   background: rgba(0, 0, 0, 0.06);
   border-radius: 999px;
-  padding: 1px 8px;
+  color: $text-secondary;
+  font-size: 12px;
 }
 
 .item-chars {
+  color: $text-body;
+  word-break: break-all;
   font-size: 13px;
   line-height: 1.6;
-  color: #1f2937;
-  word-break: break-all;
 }
 
 .detail-row {
   display: flex;
-  gap: 0.5em;
   align-items: baseline;
+  gap: 0.5em;
 }
 
 .detail-char {
@@ -172,22 +177,6 @@ function handleVisibilityChange(value) {
 }
 
 .detail-values {
-  color: #4b5563;
-}
-
-.detail-char--wendu {
-  color: v-bind('READING_COLORS.wendu');
-}
-
-.detail-char--baidu {
-  color: v-bind('READING_COLORS.baidu');
-}
-
-.detail-char--both {
-  color: v-bind('READING_COLORS.both');
-}
-
-.detail-char--polyphonic {
-  color: v-bind('READING_COLORS.polyphonic');
+  color: $text-secondary;
 }
 </style>

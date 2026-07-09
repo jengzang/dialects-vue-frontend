@@ -624,36 +624,52 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$primary: #007aff;
+$primary-hover: #0062cc;
+$text-dark: #1d1d1f;
+$success: #34c759;
+
+@mixin glass-blur($blur, $saturation: null) {
+  @if $saturation {
+    backdrop-filter: blur($blur) saturate($saturation);
+    -webkit-backdrop-filter: blur($blur) saturate($saturation);
+  } @else {
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+  }
+}
+
 /* 地图容器 */
 .map-modal-container {
   width: 90vw;
   max-width: 1200px;
   height: 80dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background: linear-gradient(
     145deg,
     rgba(255, 255, 255, 0.95),
     rgba(255, 255, 255, 0.85)
   );
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 24px;
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.25),
     0 8px 16px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
 
-.map-modal-container.fullscreen {
-  width: 100dvw !important;
-  height: 100dvh !important;
-  max-width: none !important;
-  border-radius: 0 !important;
-  margin: 0 !important;
+  @include glass-blur(40px, 180%);
+
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  &.fullscreen {
+    width: 100dvw !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
 }
 
 /* 头部 */
@@ -662,33 +678,33 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 20px 24px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   background: rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .map-popup-title {
+  flex-shrink: 0;
   margin: 0;
+  color: $text-dark;
   font-size: 20px;
   font-weight: 600;
-  color: #1d1d1f;
-  flex-shrink: 0;
 }
 
 .village-count {
+  flex-shrink: 0;
   padding: 6px 12px;
-  border-radius: 10px;
   background: rgba(52, 199, 89, 0.15);
-  color: #34c759;
+  border-radius: 10px;
+  color: $success;
+  white-space: nowrap;
   font-size: 13px;
   font-weight: 600;
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 
 /* 地图内容 */
 .map-content {
-  flex: 1;
   position: relative;
+  flex: 1;
   overflow: hidden;
 }
 
@@ -697,55 +713,40 @@ onBeforeUnmount(() => {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  padding: 12px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  min-width: 140px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  z-index: 10;
-  min-width: 140px;
-}
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-.map-controls .select-wrapper {
-  width: 100%;
-}
+  @include glass-blur(12px);
 
-.map-controls select {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: white;
-  font-size: 13px;
-  cursor: pointer;
-  outline: none;
-  transition: border 0.2s;
-}
-
-.map-controls select:focus {
-  border-color: #007aff;
+  .select-wrapper {
+    width: 100%;
+  }
 }
 
 .toggle-display-btn {
   width: 100%;
   padding: 8px 12px;
+  background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  background: white;
   color: #333;
+  white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  white-space: nowrap;
-}
 
-.toggle-display-btn:hover {
-  background: #f5f5f7;
-  border-color: #007aff;
+  &:hover {
+    background: #f5f5f7;
+    border-color: $primary;
+  }
 }
 
 .button-row {
@@ -754,21 +755,21 @@ onBeforeUnmount(() => {
 }
 
 .control-btn {
-  white-space: nowrap;
   flex: 1;
   padding: 8px 12px;
+  background: $primary;
   border: none;
   border-radius: 8px;
-  background: #007aff;
-  color: white;
+  color: #fff;
+  white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-}
 
-.control-btn:hover {
-  background: #0062cc;
+  &:hover {
+    background: $primary-hover;
+  }
 }
 
 /* 全屏退出按钮 */
@@ -779,76 +780,57 @@ onBeforeUnmount(() => {
   z-index: 10;
   padding: 10px 20px;
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: $text-dark;
   font-size: 14px;
   font-weight: 600;
-  color: #1d1d1f;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.2s;
-}
-
-.exit-fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 1);
-  transform: scale(1.05);
-}
-
-/* 村落标记样式 */
-:deep(.village-marker) {
-  /* 背景色和文字色通过 JS 动态设置，这里只定义共同样式 */
-  padding: 3px 6px;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  white-space: nowrap;
-  font-family: "SimHei", "黑体", sans-serif;
   cursor: pointer;
-  text-align: center;
-  font-weight: 500;
+
+  @include glass-blur(10px);
+
   transition: all 0.2s;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background: #fff;
+    transform: scale(1.05);
+  }
 }
 
-:deep(.village-marker:hover) {
-  transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  z-index: 1000;
-  filter: brightness(1.1);
-}
-
-/* 方言模式标记样式（与 MapLibre.vue 保持一致）*/
+/* 方言模式下由脚本动态创建的 DOM Marker */
 :deep(.marker-text-feature) {
   padding: 2px 4px;
+  background: transparent;
+  border: 0.7px solid #000;
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
-  font-size: 15px;
-  color: black;
+  color: #000;
   white-space: nowrap;
   font-family: "Times New Roman", serif;
-  border: 0.7px solid black;
+  font-size: 15px;
   cursor: pointer;
-  /* 背景色在 JS 中动态设置 */
 }
 
-/* 弹窗样式 */
+/* MapLibre 动态弹窗 */
 :deep(.maplibregl-popup-content) {
   padding: 10px 12px;
-  border-radius: 8px;
   background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(10px);
+  border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: #333;
   font-size: 13px;
   line-height: 1.6;
-  color: #333;
+
+  @include glass-blur(10px);
+
+  strong {
+    color: $text-dark;
+    font-weight: 600;
+  }
 }
 
-:deep(.maplibregl-popup-content strong) {
-  color: #1d1d1f;
-  font-weight: 600;
-}
-
-/* 响应式 */
+/* 移动端 */
 @media (max-width: 768px) {
   .map-modal-container {
     width: 95vw;
@@ -857,14 +839,13 @@ onBeforeUnmount(() => {
   }
 
   .map-popup-header {
-    padding: 16px;
     flex-wrap: wrap;
     gap: 8px;
+    padding: 16px;
   }
 
   .map-popup-title {
     font-size: 18px;
-    /* width: 100%; */
   }
 
   .map-controls {

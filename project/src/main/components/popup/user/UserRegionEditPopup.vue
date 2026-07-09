@@ -201,7 +201,30 @@ function handleLocationInput(event) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$primary: #007aff;
+$primary-dark: #0051d5;
+$success: #34c759;
+
+$text-label: #2c3e50;
+$text-hint: #999;
+$white: #fff;
+
+$surface-background: rgba(255, 255, 255, 0.9);
+$surface-border: rgba(0, 0, 0, 0.1);
+$disabled-background: rgba(0, 0, 0, 0.05);
+
+$primary-background: rgba(0, 122, 255, 0.1);
+$primary-border: rgba(0, 122, 255, 0.3);
+$primary-shadow: rgba(0, 122, 255, 0.3);
+
+$success-background: rgba(52, 199, 89, 0.15);
+$success-border: rgba(52, 199, 89, 0.3);
+
+$control-radius: 8px;
+$transition-fast: 0.2s;
+$transition-normal: 0.3s;
+
 .popup-form {
   display: flex;
   flex-direction: column;
@@ -209,56 +232,93 @@ function handleLocationInput(event) {
 
 .form-group {
   margin-bottom: 20px;
-}
 
-.form-group:last-child {
-  margin-bottom: 0;
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .form-label {
   display: block;
+  margin-bottom: 8px;
+  color: $text-label;
   font-size: 14px;
   font-weight: 500;
-  color: #2c3e50;
-  margin-bottom: 8px;
 }
 
 .form-input,
 .form-textarea {
+  box-sizing: border-box;
+  width: 100%;
   height: auto;
   max-height: 120px;
-  width: 100%;
   padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  background: $surface-background;
+  border: 1px solid $surface-border;
+  border-radius: $control-radius;
   font-family: inherit;
-  box-sizing: border-box;
-}
+  font-size: 14px;
+  transition:
+    background $transition-normal ease,
+    border-color $transition-normal ease,
+    box-shadow $transition-normal ease;
 
-.form-input:focus,
-.form-textarea:focus {
-  outline: none;
-  border-color: #007aff;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-}
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 3px $primary-background;
+  }
 
-.form-input:disabled,
-.form-textarea:disabled {
-  background: rgba(0, 0, 0, 0.05);
-  cursor: not-allowed;
+  &:disabled {
+    background: $disabled-background;
+    cursor: not-allowed;
+  }
 }
 
 .form-hint {
   margin-top: 6px;
+  color: $text-hint;
   font-size: 12px;
-  color: #999;
+}
+
+.location-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.select-location-btn {
+  padding: 2px 8px;
+  appearance: none;
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-primary-border2);
+  border-radius: $control-radius;
+  color: var(--color-primary);
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background $transition-fast ease,
+    box-shadow $transition-fast ease,
+    transform $transition-fast ease;
+
+  &:hover {
+    background: var(--color-primary-light2);
+    box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 .location-input {
-  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
   line-height: 2;
   resize: vertical;
 }
@@ -271,35 +331,35 @@ function handleLocationInput(event) {
 }
 
 .stat-badge {
-  flex: 1;
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
   gap: 6px;
   padding: 10px 16px;
-  background: rgba(0, 122, 255, 0.1);
-  border-radius: 8px;
+  background: $primary-background;
+  border-radius: $control-radius;
+  color: $primary;
   font-size: 13px;
-  color: #007aff;
   font-weight: 500;
-}
 
-.stat-badge.primary {
-  background: rgba(52, 199, 89, 0.15);
-  color: #34c759;
-}
+  &.primary {
+    background: $success-background;
+    color: $success;
+  }
 
-.stat-icon {
-  font-size: 14px;
-  font-weight: 700;
+  .stat-icon {
+    font-size: 14px;
+    font-weight: 700;
+  }
 }
 
 .selected-locations-display {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  padding: 12px;
   margin-top: 12px;
+  padding: 12px;
+  background: $surface-background;
+  border: 1px solid $surface-border;
+  border-radius: $control-radius;
 }
 
 .location-tags {
@@ -312,66 +372,17 @@ function handleLocationInput(event) {
 
 .location-tag {
   padding: 4px 10px;
-  background: rgba(0, 122, 255, 0.1);
-  color: #007aff;
+  background: $primary-background;
   border-radius: 6px;
+  color: $primary;
   font-size: 12px;
   font-weight: 500;
-}
 
-.location-tag.from-tree {
-  background: rgba(52, 199, 89, 0.15);
-  color: #34c759;
-  border: 1px solid rgba(52, 199, 89, 0.3);
-}
-
-.location-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-  gap: 6px;
-}
-
-.select-location-btn {
-  appearance: none;
-  border: 1px solid var(--color-primary-border2);
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-  font-weight: 500;
-}
-
-.select-location-btn:hover {
-  background: var(--color-primary-light2);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
-}
-
-.select-location-btn:active {
-  transform: translateY(0);
-}
-
-.popup-footer {
-  position: sticky;
-  bottom: calc(-1 * var(--modal-content-padding-bottom));
-  margin:
-    20px
-    calc(-1 * var(--modal-content-padding-inline))
-    calc(-1 * var(--modal-content-padding-bottom));
-  padding: 16px var(--modal-content-padding-inline) 20px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
+  &.from-tree {
+    background: $success-background;
+    border: 1px solid $success-border;
+    color: $success;
+  }
 }
 
 .btn-primary,
@@ -380,37 +391,41 @@ function handleLocationInput(event) {
   align-items: center;
   gap: 6px;
   padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  border: none;
+  border-radius: $control-radius;
   font-size: 14px;
   font-weight: 500;
-  border: none;
+  cursor: pointer;
+  transition:
+    background $transition-normal ease,
+    box-shadow $transition-normal ease,
+    opacity $transition-normal ease,
+    transform $transition-normal ease;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  color: white;
-}
+  background: linear-gradient(135deg, $primary, $primary-dark);
+  color: $white;
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-}
+  &:hover {
+    box-shadow: 0 4px 12px $primary-shadow;
+    transform: translateY(-2px);
+  }
 
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.9);
-  color: #007aff;
-  border: 1px solid rgba(0, 122, 255, 0.3);
-}
+  background: $surface-background;
+  border: 1px solid $primary-border;
+  color: $primary;
 
-.btn-secondary:hover {
-  background: rgba(0, 122, 255, 0.1);
+  &:hover {
+    background: $primary-background;
+  }
 }
 </style>

@@ -483,9 +483,15 @@ const helpStepsItems = computed(() => [
 
 <style scoped lang="scss">
 $primary-blue: #007aff;
+$primary-blue-dark: #0050b3;
+$success-green: #34c759;
+$usage-green: #2e7d32;
+$location-orange: #ff9500;
+
 $text-main: #333;
 $text-secondary: #555;
 $text-muted: #999;
+
 $glass-card: rgba(255, 255, 255, 0.5);
 
 .help-content {
@@ -496,8 +502,8 @@ $glass-card: rgba(255, 255, 255, 0.5);
 
 .help-section {
   padding: 15px;
-  border-radius: 10px;
   background: $glass-card;
+  border-radius: 10px;
 
   &--blue {
     border-left: 4px solid $primary-blue;
@@ -506,15 +512,15 @@ $glass-card: rgba(255, 255, 255, 0.5);
 
 .section-title {
   margin: 0 0 12px;
+  color: $primary-blue;
   font-size: 16px;
   font-weight: 600;
-  color: $primary-blue;
 }
 
 .help-list {
-  list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
+  list-style: none;
 
   &--daily {
     margin-top: 8px;
@@ -522,9 +528,9 @@ $glass-card: rgba(255, 255, 255, 0.5);
 
   li {
     padding: 8px 0;
+    color: $text-secondary;
     font-size: 14px;
     line-height: 1.6;
-    color: $text-secondary;
 
     strong {
       color: $text-main;
@@ -533,9 +539,9 @@ $glass-card: rgba(255, 255, 255, 0.5);
 
     code {
       padding: 1px 5px;
-      border-radius: 4px;
       background: rgba(0, 122, 255, 0.08);
-      color: #0050b3;
+      border-radius: 4px;
+      color: $primary-blue-dark;
       font-size: 12px;
     }
   }
@@ -543,15 +549,15 @@ $glass-card: rgba(255, 255, 255, 0.5);
 
 .help-paragraph {
   margin: 0 0 12px;
+  color: $text-secondary;
   font-size: 14px;
   line-height: 1.6;
-  color: $text-secondary;
 }
 
 .example-hint {
   padding: 8px 12px;
-  border-radius: 6px;
   background: rgba(0, 0, 0, 0.03);
+  border-radius: 6px;
   color: #666;
   font-size: 12px;
 
@@ -569,28 +575,29 @@ $glass-card: rgba(255, 255, 255, 0.5);
   }
 }
 
+/* 示例表格 */
 .table-container {
   margin-bottom: 8px;
   overflow-x: auto;
+  background: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  background: #fff;
 }
 
 .example-table {
   width: 100%;
   min-width: 500px;
   border-collapse: collapse;
-  font-size: 12px;
   text-align: left;
+  font-size: 12px;
 
   th {
     padding: 8px 6px;
-    border-bottom: 2px solid #d9d9d9;
     background-color: #f5f7fa;
+    border-bottom: 2px solid #d9d9d9;
     color: $text-main;
-    font-weight: 600;
     white-space: nowrap;
+    font-weight: 600;
   }
 
   td {
@@ -628,10 +635,10 @@ $glass-card: rgba(255, 255, 255, 0.5);
 .value-tag {
   display: inline-block;
   padding: 1px 6px;
+  background: #e6f7ff;
   border: 1px solid #91d5ff;
   border-radius: 4px;
-  background: #e6f7ff;
-  color: #0050b3;
+  color: $primary-blue-dark;
   font-weight: 700;
 }
 
@@ -641,6 +648,7 @@ $glass-card: rgba(255, 255, 255, 0.5);
   font-style: italic;
 }
 
+/* 使用方式示意图 */
 .usage-diagram {
   display: flex;
   flex-direction: column;
@@ -651,13 +659,13 @@ $glass-card: rgba(255, 255, 255, 0.5);
 
 .usage-level {
   position: relative;
-  display: flex;
-  align-items: center;
   width: 90%;
   max-width: 400px;
+  display: flex;
+  align-items: center;
   padding: 12px;
-  border-radius: 10px;
   background: #fff;
+  border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -666,20 +674,20 @@ $glass-card: rgba(255, 255, 255, 0.5);
 }
 
 .location-level {
-  border-left: 5px solid #ff9500;
+  border-left: 5px solid $location-orange;
 }
 
 .data-level {
   flex-direction: column;
   padding: 10px;
-  border-left: 5px solid #34c759;
+  border-left: 5px solid $success-green;
 }
 
 .level-icon {
   width: 30px;
   margin-right: 15px;
-  font-size: 24px;
   text-align: center;
+  font-size: 24px;
 }
 
 .level-content {
@@ -702,8 +710,8 @@ $glass-card: rgba(255, 255, 255, 0.5);
 .usage-example {
   display: inline-block;
   padding: 4px 8px;
-  border-radius: 4px;
   background: rgba(0, 122, 255, 0.08);
+  border-radius: 4px;
   color: $primary-blue;
   font-family: monospace;
   font-size: 12px;
@@ -718,10 +726,10 @@ $glass-card: rgba(255, 255, 255, 0.5);
 }
 
 .level-group {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
 }
 
 .sub-level {
@@ -729,8 +737,8 @@ $glass-card: rgba(255, 255, 255, 0.5);
   display: flex;
   align-items: center;
   padding: 8px;
-  border-radius: 6px;
   background: #f5fcf5;
+  border-radius: 6px;
 }
 
 .feature-box {
@@ -747,7 +755,7 @@ $glass-card: rgba(255, 255, 255, 0.5);
 }
 
 .field-tag-sm {
-  color: #2e7d32;
+  color: $usage-green;
   font-size: 12px;
   font-weight: 700;
 }
@@ -759,7 +767,7 @@ $glass-card: rgba(255, 255, 255, 0.5);
 
 .usage-example-sm {
   margin-top: 2px;
-  color: #2e7d32;
+  color: $usage-green;
   font-family: monospace;
   font-size: 11px;
   font-weight: 700;
@@ -771,6 +779,7 @@ $glass-card: rgba(255, 255, 255, 0.5);
   font-size: 14px;
 }
 
+/* 竖屏 */
 @media (max-aspect-ratio: 1/1) {
   .help-section {
     padding: 12px;

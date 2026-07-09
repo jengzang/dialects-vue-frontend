@@ -82,99 +82,114 @@ const tableLabel = computed(() => {
 })
 </script>
 
-<style scoped>
-.help-content {
-  max-height: 65vh;
-  overflow-y: auto;
-  padding-right: 8px;
+<style scoped lang="scss">
+$text-heading: #333;
+$text-body: #444;
+$text-note: #888;
+
+$list-font-size: 14px;
+$list-line-height: 1.6;
+$list-indent: 20px;
+$list-item-gap: 6px;
+
+$section-gap: 20px;
+$table-radius: 8px;
+
+@mixin help-list($list-style) {
+  margin: 0;
+  padding-left: $list-indent;
+  list-style: $list-style;
+
+  li {
+    margin-bottom: $list-item-gap;
+    color: $text-body;
+    font-size: $list-font-size;
+    line-height: $list-line-height;
+  }
 }
 
-.help-section {
-  margin-bottom: 20px;
+.help-content {
+  max-height: 65vh;
+  padding-right: 8px;
+  overflow-y: auto;
+
+  .help-section {
+    margin-bottom: $section-gap;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .help-subtitle {
   margin: 0 0 10px;
-  color: #333;
+  color: $text-heading;
   font-size: 16px;
   font-weight: 600;
 }
 
 .help-examples-note {
   margin: 0 0 8px;
-  color: #888;
+  color: $text-note;
   font-size: 12px;
   font-style: italic;
 }
 
 .help-rules {
-  margin: 0;
-  padding-left: 20px;
-  list-style: decimal;
-}
-
-.help-rules li {
-  margin-bottom: 6px;
-  color: #444;
-  font-size: 14px;
-  line-height: 1.6;
+  @include help-list(decimal);
 }
 
 .help-examples {
-  margin: 0;
-  padding-left: 20px;
-  list-style: disc;
-}
-
-.help-examples li {
-  margin-bottom: 6px;
-  color: #444;
-  font-size: 14px;
-  line-height: 1.6;
+  @include help-list(disc);
 }
 
 .help-table-wrapper {
   max-height: 300px;
   overflow-y: auto;
   border: 1px solid var(--border-light, #e0e0e0);
-  border-radius: 8px;
+  border-radius: $table-radius;
 }
 
 .help-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
-}
 
-.help-table thead {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
 
-.help-table th {
-  padding: 10px 12px;
-  background: var(--glass-medium-strong, #f0f0f0);
-  color: #333;
-  font-weight: 600;
-  text-align: left;
-  border-bottom: 2px solid var(--border-medium, #ddd);
-}
+  th {
+    padding: 10px 12px;
+    background: var(--glass-medium-strong, #f0f0f0);
+    border-bottom: 2px solid var(--border-medium, #ddd);
+    color: $text-heading;
+    text-align: left;
+    font-weight: 600;
+  }
 
-.help-table td {
-  padding: 8px 12px;
-  color: #444;
-  border-bottom: 1px solid var(--border-light, #eee);
-  vertical-align: top;
-}
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-light, #eee);
+    color: $text-body;
+    vertical-align: top;
 
-.help-table td:first-child {
-  font-weight: 600;
-  white-space: nowrap;
-  color: var(--color-blue-custom, #007aff);
-}
+    &:first-child {
+      color: var(--color-blue-custom, #007aff);
+      white-space: nowrap;
+      font-weight: 600;
+    }
+  }
 
-.help-table tr:last-child td {
-  border-bottom: none;
+  tbody {
+    tr:last-child {
+      td {
+        border-bottom: none;
+      }
+    }
+  }
 }
 </style>

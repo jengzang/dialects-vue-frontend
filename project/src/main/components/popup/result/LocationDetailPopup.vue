@@ -138,147 +138,150 @@ const handleClose = () => {
 };
 </script>
 
-<style scoped>
-/* 加载状态 */
-.location-detail-loading-state-unused {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 40px 20px;
-  color: #666;
-  font-size: 14px;
-}
+<style scoped lang="scss">
+$text-main: #1d1d1f;
+$text-body: #333;
+$text-secondary: #666;
 
+$primary: #007aff;
+$primary-divider: rgba(0, 122, 255, 0.2);
+$primary-background-light: rgba(0, 122, 255, 0.05);
+$primary-background-medium: rgba(0, 122, 255, 0.08);
+$primary-background-strong: rgba(0, 122, 255, 0.1);
 
+$border-light: rgba(0, 0, 0, 0.05);
+$border-medium: rgba(0, 0, 0, 0.08);
+$border-strong: rgba(0, 0, 0, 0.1);
 
-/* 错误状态 */
-.location-detail-error-state-unused {
-  padding: 40px 20px;
-  text-align: center;
-  color: #999;
-  font-size: 14px;
-}
+$transition-fast: 0.2s;
 
 /* 内容区域 */
 .location-content {
   font-size: 14px;
 }
 
-/* 信息区域 */
+/* 基本信息 */
 .info-section {
   margin-bottom: 20px;
 }
 
 .info-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1d1d1f;
   margin-bottom: 16px;
   padding-bottom: 8px;
-  border-bottom: 2px solid rgba(0, 122, 255, 0.2);
+  border-bottom: 2px solid $primary-divider;
+  color: $text-main;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .info-item {
-  padding: 10px 0;
-  line-height: 1.6;
   display: flex;
   align-items: baseline;
-  transition: all 0.2s ease;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
+  padding: 10px 0;
+  border-bottom: 1px solid $border-light;
+  line-height: 1.6;
+  transition:
+    padding $transition-fast ease,
+    margin $transition-fast ease,
+    background $transition-fast ease,
+    border-radius $transition-fast ease;
 
-.info-item:last-child {
-  border-bottom: none;
-}
+  &:last-child {
+    border-bottom: none;
+  }
 
-.info-item:hover {
-  background: rgba(0, 122, 255, 0.05);
-  padding-left: 8px;
-  margin-left: -8px;
-  margin-right: -8px;
-  padding-right: 8px;
-  border-radius: 6px;
-}
+  &:hover {
+    margin-right: -8px;
+    margin-left: -8px;
+    padding-right: 8px;
+    padding-left: 8px;
+    background: $primary-background-light;
+    border-radius: 6px;
+  }
 
-.info-label {
-  color: #666;
-  font-weight: 600;
-  flex-shrink: 0;
-  white-space: nowrap;
-  min-width: 110px;
-}
+  .info-label {
+    flex-shrink: 0;
+    min-width: 110px;
+    color: $text-secondary;
+    white-space: nowrap;
+    font-weight: 600;
+  }
 
-.info-value {
-  color: #1d1d1f;
-  margin-left: 12px;
-  word-break: break-all;
+  .info-value {
+    margin-left: 12px;
+    color: $text-main;
+    word-break: break-all;
+  }
 }
 
 /* 调值区域 */
 .tone-section {
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 2px solid rgba(0, 0, 0, 0.08);
+  border-top: 2px solid $border-medium;
 }
 
 .section-title {
+  margin-bottom: 12px;
+  color: $text-main;
   font-size: 15px;
   font-weight: 600;
-  color: #1d1d1f;
-  margin-bottom: 12px;
 }
 
-/* 表格样式 */
+/* 调值表格 */
 .tone-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 13px;
-  border-radius: 8px;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
+  border: 1px solid $border-strong;
+  border-spacing: 0;
+  border-collapse: separate;
+  border-radius: 8px;
+  font-size: 13px;
 
-.tone-table th,
-.tone-table td {
-  padding: 10px 12px;
-  text-align: left;
-}
-
-.tone-table th {
-  background: rgba(0, 122, 255, 0.1);
-  font-weight: 600;
-  color: #1d1d1f;
-  border-bottom: 2px solid rgba(0, 122, 255, 0.2);
-}
-
-.tone-table tbody tr {
-  transition: all 0.2s ease;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.tone-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.tone-table tbody tr:hover {
-  background: rgba(0, 122, 255, 0.08);
-}
-
-.tone-table td {
-  color: #333;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .info-label {
-    min-width: 90px;
-    font-size: 13px;
+  th,
+  td {
+    padding: 10px 12px;
+    text-align: left;
   }
 
-  .info-value {
-    font-size: 13px;
+  th {
+    background: $primary-background-strong;
+    border-bottom: 2px solid $primary-divider;
+    color: $text-main;
+    font-weight: 600;
+  }
+
+  td {
+    color: $text-body;
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-light;
+      transition: background $transition-fast ease;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background: $primary-background-medium;
+      }
+    }
+  }
+}
+
+/* 移动端 */
+@media (max-width: 768px) {
+  .info-item {
+    .info-label {
+      min-width: 90px;
+      font-size: 13px;
+    }
+
+    .info-value {
+      font-size: 13px;
+    }
   }
 }
 </style>

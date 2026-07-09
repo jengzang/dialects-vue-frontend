@@ -352,7 +352,40 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$orange: #ff9500;
+$orange-dark: #ff8000;
+$green: #34c759;
+$green-light: #30d158;
+
+$text-main: #1d1d1f;
+$text-secondary: #86868b;
+$text-white: #fff;
+
+$orange-bg-subtle: rgba(255, 149, 0, 0.04);
+$orange-bg-light: rgba(255, 149, 0, 0.05);
+$orange-bg-medium: rgba(255, 149, 0, 0.08);
+$orange-bg-strong: rgba(255, 149, 0, 0.12);
+$orange-bg-highlight: rgba(255, 149, 0, 0.2);
+
+$orange-border: rgba(255, 149, 0, 0.2);
+$orange-shadow: rgba(255, 149, 0, 0.4);
+$orange-shadow-hover: rgba(255, 149, 0, 0.5);
+
+$border-light: rgba(0, 0, 0, 0.04);
+$border-medium: rgba(0, 0, 0, 0.06);
+
+$transition-fast: 0.2s;
+$transition-normal: 0.3s;
+
+@mixin orange-gradient($start-alpha, $end-alpha) {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 149, 0, $start-alpha),
+    rgba(255, 149, 0, $end-alpha)
+  );
+}
+
 .benefits-content,
 .benefits-content-inner {
   overflow-x: hidden;
@@ -360,24 +393,25 @@ onBeforeUnmount(() => {
 
 .benefits-section {
   margin-bottom: 28px;
-}
 
-.benefits-section:last-child {
-  margin-bottom: 0;
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .section-title {
+  margin: 0 0 16px;
+  color: $text-main;
   font-size: 18px;
   font-weight: 600;
-  color: #1d1d1f;
-  margin: 0 0 16px 0;
   letter-spacing: -0.01em;
 }
 
+/* 权益对比表 */
 .comparison-table-wrapper {
   overflow-x: auto;
-  border-radius: 12px;
   background: rgba(247, 247, 247, 0.5);
+  border-radius: 12px;
 }
 
 .comparison-table {
@@ -385,106 +419,114 @@ onBeforeUnmount(() => {
   border-collapse: separate;
   border-spacing: 0;
   font-size: 14px;
+
+  thead {
+    @include orange-gradient(0.12, 0.08);
+  }
+
+  th,
+  td {
+    padding: 14px 12px;
+    color: $text-main;
+    text-align: center;
+  }
+
+  th {
+    border-bottom: 2px solid $orange-border;
+    white-space: nowrap;
+    font-size: 15px;
+    font-weight: 600;
+
+    &:first-child {
+      padding-left: 16px;
+      text-align: left;
+    }
+  }
+
+  td {
+    border-bottom: 1px solid $border-light;
+    font-size: 15px;
+  }
+
+  tbody {
+    tr {
+      transition: background $transition-fast ease;
+
+      &:hover {
+        background: $orange-bg-light;
+      }
+
+      &:last-child {
+        td {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+
+  .visitor-col {
+    color: $text-secondary;
+    font-weight: 500;
+  }
+
+  .member-col {
+    color: $orange;
+    font-weight: 700;
+
+    @include orange-gradient(0.15, 0.08);
+  }
+
+  .feature-name {
+    padding-left: 16px !important;
+    color: $text-main;
+    text-align: left !important;
+    font-weight: 600;
+  }
+
+  .visitor-cell {
+    color: $text-secondary;
+    font-weight: 500;
+  }
+
+  .member-cell {
+    position: relative;
+    color: $orange;
+    font-weight: 700;
+
+    @include orange-gradient(0.12, 0.06);
+
+    .member-value {
+      font-size: 16px;
+    }
+
+    .upgrade-badge {
+      display: inline-block;
+      margin-left: 4px;
+      padding: 2px 8px;
+      background: linear-gradient(135deg, $green, $green-light);
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(52, 199, 89, 0.3);
+      color: $text-white;
+      font-size: 11px;
+      font-weight: 700;
+    }
+  }
+
+  .cell-highlight {
+    background: $orange-bg-highlight;
+    box-shadow: inset 0 0 0 2px rgba(255, 149, 0, 0.3);
+    color: rgba(255, 149, 0, 0.76);
+    font-weight: 700;
+  }
+
+  .cell-unlimited {
+    color: $green;
+    font-size: 16px;
+    font-weight: 700;
+  }
 }
 
-.comparison-table thead {
-  background: linear-gradient(135deg, rgba(255, 149, 0, 0.12), rgba(255, 149, 0, 0.08));
-}
-
-.comparison-table th {
-  padding: 14px 12px;
-  text-align: center;
-  font-weight: 600;
-  color: #1d1d1f;
-  border-bottom: 2px solid rgba(255, 149, 0, 0.2);
-  white-space: nowrap;
-  font-size: 15px;
-}
-
-.comparison-table th:first-child {
-  text-align: left;
-  padding-left: 16px;
-}
-
-.visitor-col {
-  color: #86868b;
-  font-weight: 500;
-}
-
-.member-col {
-  color: #ff9500;
-  font-weight: 700;
-  background: linear-gradient(135deg, rgba(255, 149, 0, 0.15), rgba(255, 149, 0, 0.08));
-}
-
-.comparison-table tbody tr {
-  transition: background 0.2s ease;
-}
-
-.comparison-table tbody tr:hover {
-  background: rgba(255, 149, 0, 0.05);
-}
-
-.comparison-table td {
-  padding: 14px 12px;
-  text-align: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  color: #1d1d1f;
-  font-size: 15px;
-}
-
-.comparison-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.feature-name {
-  font-weight: 600;
-  text-align: left !important;
-  padding-left: 16px !important;
-  color: #1d1d1f;
-}
-
-.visitor-cell {
-  color: #86868b;
-  font-weight: 500;
-}
-
-.member-cell {
-  font-weight: 700;
-  color: #ff9500;
-  background: linear-gradient(135deg, rgba(255, 149, 0, 0.12), rgba(255, 149, 0, 0.06));
-  position: relative;
-}
-
-.member-value {
-  font-size: 16px;
-}
-
-.upgrade-badge {
-  display: inline-block;
-  margin-left: 4px;
-  padding: 2px 8px;
-  background: linear-gradient(135deg, #34c759, #30d158);
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(52, 199, 89, 0.3);
-}
-
-.cell-highlight {
-  background: rgba(255, 149, 0, 0.2);
-  font-weight: 700;
-  color: rgba(255, 149, 0, 0.76);
-  box-shadow: inset 0 0 0 2px rgba(255, 149, 0, 0.3);
-}
-
-.cell-unlimited {
-  color: #34c759;
-  font-weight: 700;
-  font-size: 16px;
-}
-
+/* 核心功能 */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -497,80 +539,89 @@ onBeforeUnmount(() => {
   gap: 10px;
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.7);
+  border: 1px solid $border-medium;
+  border-radius: 12px;
   backdrop-filter: blur(20px);
-  border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  transition: all 0.2s ease;
+  transition:
+    background $transition-fast ease,
+    transform $transition-fast ease,
+    box-shadow $transition-fast ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 12px $orange-border;
+    transform: translateY(-2px);
+  }
+
+  .feature-icon {
+    font-size: 24px;
+  }
+
+  .feature-text {
+    color: $text-main;
+    font-size: 15px;
+    font-weight: 500;
+  }
 }
 
-.feature-item:hover {
-  background: rgba(255, 255, 255, 0.9);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.2);
-}
-
-.feature-icon {
-  font-size: 24px;
-}
-
-.feature-text {
-  font-size: 15px;
-  font-weight: 500;
-  color: #1d1d1f;
-}
-
-.benefits-cta {
-  margin-top: 24px;
-  text-align: center;
-}
-
-.btn-register {
-  background: linear-gradient(135deg, #ff9500, #ff8000);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 16px 32px;
-  font-size: 17px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 6px 16px rgba(255, 149, 0, 0.4);
-  width: 100%;
-}
-
-.btn-register:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 149, 0, 0.5);
-}
-
-.btn-register:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.4);
-}
-
-.cta-hint {
-  margin-top: 12px;
-  font-size: 13px;
-  color: #86868b;
-  font-weight: 500;
-}
-
+/* 提示说明 */
 .benefits-notice {
   margin: 20px 0;
   padding: 14px 18px;
-  background: linear-gradient(135deg, rgba(255, 149, 0, 0.08), rgba(255, 149, 0, 0.04));
-  border-left: 3px solid #ff9500;
+  border-left: 3px solid $orange;
   border-radius: 12px;
+
+  @include orange-gradient(0.08, 0.04);
+
+  p {
+    margin: 0;
+    color: $text-main;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.6;
+  }
 }
 
-.benefits-notice p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #1d1d1f;
-  font-weight: 500;
+/* 注册引导 */
+.benefits-cta {
+  margin-top: 24px;
+  text-align: center;
+
+  .btn-register {
+    width: 100%;
+    padding: 16px 32px;
+    background: linear-gradient(135deg, $orange, $orange-dark);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px $orange-shadow;
+    color: $text-white;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      transform $transition-normal cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow $transition-normal cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      box-shadow: 0 8px 20px $orange-shadow-hover;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      box-shadow: 0 4px 12px $orange-shadow;
+      transform: translateY(0);
+    }
+  }
+
+  .cta-hint {
+    margin-top: 12px;
+    color: $text-secondary;
+    font-size: 13px;
+    font-weight: 500;
+  }
 }
 
+/* 弹窗内容入场动画 */
 .popup-animated {
   animation: popup-bounce-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -591,6 +642,7 @@ onBeforeUnmount(() => {
   }
 }
 
+/* 竖屏 */
 @media (max-aspect-ratio: 1/1) {
   .benefits-content-inner {
     padding: 0;
@@ -602,15 +654,15 @@ onBeforeUnmount(() => {
 
   .comparison-table {
     font-size: 12px;
-  }
 
-  .comparison-table th,
-  .comparison-table td {
-    padding: 10px 6px;
-  }
+    th,
+    td {
+      padding: 10px 6px;
+    }
 
-  .feature-name {
-    padding-left: 12px !important;
+    .feature-name {
+      padding-left: 12px !important;
+    }
   }
 
   .features-grid {
@@ -620,21 +672,22 @@ onBeforeUnmount(() => {
 
   .feature-item {
     padding: 10px 14px;
+
+    .feature-icon {
+      font-size: 20px;
+    }
+
+    .feature-text {
+      font-size: 14px;
+    }
   }
 
-  .feature-icon {
-    font-size: 20px;
-  }
-
-  .feature-text {
-    font-size: 14px;
-  }
-
-  .btn-register {
-    width: 100%;
-    padding: 12px 20px;
-    font-size: 15px;
+  .benefits-cta {
+    .btn-register {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 15px;
+    }
   }
 }
-
 </style>

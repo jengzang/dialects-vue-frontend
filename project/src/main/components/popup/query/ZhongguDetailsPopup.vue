@@ -49,50 +49,56 @@ function handleClose() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$accent-color: var(--color-blue-custom);
+$accent-background: var(--color-blue-custom-bg);
+$content-gap: 24px;
+$item-padding-bottom: 16px;
+$header-gap: 10px;
+
 .zhonggu-modal-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-}
+  gap: $content-gap;
 
-.full-item {
-  border-bottom: 1px dashed var(--border-medium);
-  padding-bottom: 16px;
-}
+  .full-item {
+    padding-bottom: $item-padding-bottom;
+    border-bottom: 1px dashed var(--border-medium);
 
-.full-item:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
+    &:last-child {
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+  }
 }
 
 .full-item-header {
-  margin-bottom: 10px;
   display: flex;
   align-items: center;
-  gap: 10px;
-}
+  gap: $header-gap;
+  margin-bottom: $header-gap;
 
-.combo-name {
-  font-size: 16px;
-  font-weight: bold;
-  color: var(--color-blue-custom);
-}
+  .combo-name {
+    color: $accent-color;
+    font-size: 16px;
+    font-weight: 700;
+  }
 
-.count-badge {
-  background: var(--color-blue-custom-bg);
-  color: var(--color-blue-custom);
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 12px;
+  .count-badge {
+    padding: 2px 8px;
+    background: $accent-background;
+    border-radius: 10px;
+    color: $accent-color;
+    font-size: 12px;
+  }
 }
 
 .full-chars {
+  color: var(--text-dark);
+  word-break: break-word;
   font-size: 18px;
   line-height: 1.6;
-  color: var(--text-dark);
   letter-spacing: 0.5em;
   font-variant-ligatures: none;
-  word-break: break-word;
 }
 </style>
