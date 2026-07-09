@@ -47,7 +47,7 @@
             <input
               ref="refInput"
               type="file"
-              accept=".xlsx,.xls"
+              accept=".xlsx,.xls,.csv"
               @change="handleRefSelect"
               style="display: none"
             />
@@ -67,6 +67,9 @@
                     <span>{{ t('tools.merge.reference.charCount') }}: {{ referenceStats.charCount }}</span>
                     <span>{{ t('tools.merge.reference.columnCount') }}: {{ referenceStats.columnCount }}</span>
                   </div>
+                  <div v-if="referenceImportSummary" class="file-meta file-meta--summary">
+                    <span>{{ referenceImportSummary }}</span>
+                  </div>
                 </div>
                 <button
                   class="remove-btn"
@@ -79,7 +82,35 @@
             </template>
           </div>
 
+          <TabularImportPreview
+            v-if="pendingReferenceFile"
+            :key="referenceImportConfirmKey"
+            :title="t('common.importPreview.referenceTitle')"
+            :description="t('common.importPreview.referenceDescription')"
+            :file="pendingReferenceFile"
+            :schema="referenceImportSchema"
+            :loading="referencePreviewState.loading"
+            :preview-table="referencePreviewState.previewTable"
+            :diagnostics="referencePreviewState.diagnostics"
+            :mapping="referencePreviewState.mapping"
+            :selected-sheet-id="referencePreviewState.selectedSheetId"
+            :header-row-index="referencePreviewState.headerRowIndex"
+            :sheets="referencePreviewState.parsedFile?.sheets || []"
+            @update:selectedSheetId="referencePreviewState.selectedSheetId = $event"
+            @update:headerRowIndex="referencePreviewState.headerRowIndex = $event"
+            @update:mapping="handleReferenceMappingUpdate"
+            @reset="clearPendingReference"
+          />
+
           <div class="step-actions">
+            <button
+              v-if="pendingReferenceFile"
+              class="main-glass-button"
+              data-variant="secondary"
+              @click="clearPendingReference"
+            >
+              {{ t('common.button.cancel') }}
+            </button>
             <button
               class="main-glass-button"
               data-variant="secondary"
@@ -95,10 +126,10 @@
               class="main-glass-button"
               data-variant="primary"
               data-size="large"
-              :disabled="!referenceFile"
-              @click="nextStep"
+              :disabled="!referenceFile && !isReferenceImportReady"
+              @click="handleReferenceConfirm"
             >
-              {{ t('tools.merge.reference.next') }} →
+              {{ referenceFile ? `${t('tools.merge.reference.next')} →` : t('common.importPreview.actions.confirmAndUse') }}
             </button>
           </div>
         </div>
@@ -348,11 +379,13 @@ import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as XLSX from 'xlsx'
 import AppModal from '@/components/common/AppModal.vue'
+import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { downloadMerge, executeMerge, getMergeProgress, uploadFiles, uploadReference } from '@/api'
 import { showError, showSuccess } from '@/utils/message.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
+import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import defaultReferenceWorkbookUrl from '/data/参考表.xlsx?url'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
@@ -369,6 +402,9 @@ const MERGE_RESULT_FILE_NAME = '方音圖鑑_合併字表.xlsx'
 
 const currentStep = ref(1)
 const referenceFile = ref(null)
+const pendingReferenceFile = ref(null)
+const referenceImportConfirmKey = ref(0)
+const referenceImportPayload = ref(null)
 const mergeFiles = ref([])
 const processing = ref(false)
 const progress = ref(0)
@@ -379,6 +415,7 @@ const taskId = ref(null)
 
 const refInput = ref(null)
 const filesInput = ref(null)
+const shouldAlwaysConfirmReferenceImport = ref(false)
 
 const referenceStats = reactive({
   charCount: 0,
@@ -415,6 +452,61 @@ const isLoadingRef = loadDefaultReferenceTask.loading
 // 计算属性：限制显示的数据量
 const displayedMainData = computed(() => mainTableData.value.slice(0, maxDisplayRows))
 const displayedSupplementData = computed(() => supplementTableData.value.slice(0, maxDisplayRows))
+const referenceImportSchema = computed(() => ([
+  {
+    key: 'char',
+    label: t('common.importPreview.schemas.mergeReference.char.label'),
+    required: true,
+    aliases: [
+      t('common.importPreview.schemas.mergeReference.char.aliases.char'),
+      t('common.importPreview.schemas.mergeReference.char.aliases.character'),
+      t('common.importPreview.schemas.mergeReference.char.aliases.word')
+    ],
+    description: t('common.importPreview.schemas.mergeReference.char.description'),
+    example: t('common.importPreview.schemas.mergeReference.char.example')
+  },
+  {
+    key: 'pronunciation',
+    label: t('common.importPreview.schemas.mergeReference.pronunciation.label'),
+    required: true,
+    aliases: [
+      t('common.importPreview.schemas.mergeReference.pronunciation.aliases.ipa'),
+      t('common.importPreview.schemas.mergeReference.pronunciation.aliases.phonetic'),
+      t('common.importPreview.schemas.mergeReference.pronunciation.aliases.sound')
+    ],
+    description: t('common.importPreview.schemas.mergeReference.pronunciation.description'),
+    example: t('common.importPreview.schemas.mergeReference.pronunciation.example')
+  },
+  {
+    key: 'note',
+    label: t('common.importPreview.schemas.mergeReference.note.label'),
+    required: false,
+    aliases: [
+      t('common.importPreview.schemas.mergeReference.note.aliases.remark'),
+      t('common.importPreview.schemas.mergeReference.note.aliases.comment')
+    ],
+    description: t('common.importPreview.schemas.mergeReference.note.description'),
+    example: t('common.importPreview.schemas.mergeReference.note.example')
+  }
+]))
+const referencePreviewState = useTabularImportPreview({
+  schema: referenceImportSchema,
+  previewRowCount: 8,
+  requireExplicitConfirmation: () => shouldAlwaysConfirmReferenceImport.value
+})
+const isReferenceImportReady = computed(() => !!referenceImportPayload.value?.isComplete)
+const referenceImportSummary = computed(() => {
+  if (!referenceImportPayload.value) {
+    return ''
+  }
+
+  const mappedCount = Object.values(referenceImportPayload.value.mapping || {}).filter(Boolean).length
+  const columnCount = referenceImportPayload.value.sourceColumns?.length || 0
+  return t('common.importPreview.mergeReferenceSummary', {
+    mappedCount,
+    columnCount
+  })
+})
 const hasMoreData = computed(() => {
   if (currentTab.value === 'main') {
     return mainTableData.value.length > maxDisplayRows
@@ -426,7 +518,7 @@ const hasMoreData = computed(() => {
 const handleRefSelect = (event) => {
   const file = event.target.files[0]
   if (file) {
-    setReferenceFile(file)
+    previewReferenceFile(file)
   }
 }
 
@@ -434,7 +526,7 @@ const handleRefDrop = (event) => {
   dragOver1.value = false
   const file = event.dataTransfer.files[0]
   if (file) {
-    setReferenceFile(file)
+    previewReferenceFile(file)
   }
 }
 
@@ -458,7 +550,7 @@ const normalizePercentProgress = (value) => {
   return Math.min(100, Math.max(0, Math.round(numeric)))
 }
 
-const setReferenceFile = async (file) => {
+const setReferenceFile = async (file, options = {}) => {
   const authed = await requireAuth({
     message: t('tools.merge.validation.loginRequired'),
     redirect: '/explore/tools/merge',
@@ -467,7 +559,7 @@ const setReferenceFile = async (file) => {
     return
   }
 
-  if (!file.name.match(/\.(xlsx|xls)$/i)) {
+  if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
     showError(t('tools.merge.validation.invalidFileType'))
     return
   }
@@ -478,22 +570,79 @@ const setReferenceFile = async (file) => {
   }
 
   try {
-    const data = await uploadReference(file)
+    const data = await uploadReference(file, options)
 
     referenceFile.value = file
     taskId.value = data.task_id
 
     referenceStats.charCount = data.char_count || 0
     referenceStats.columnCount = data.column_count || 0
+    pendingReferenceFile.value = null
+    referenceImportPayload.value = null
+    referencePreviewState.resetState()
   } catch (error) {
     showError(t('tools.merge.messages.uploadFailed', { message: error.message }))
   }
 }
 
+const previewReferenceFile = async (file) => {
+  const authed = await requireAuth({
+    message: t('tools.merge.validation.loginRequired'),
+    redirect: '/explore/tools/merge',
+  })
+  if (!authed) {
+    return
+  }
+
+  if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
+    showError(t('tools.merge.validation.invalidFileType'))
+    return
+  }
+
+  if (file.size > 3 * 1024 * 1024) {
+    showError(t('tools.merge.validation.referenceFileTooLarge'))
+    return
+  }
+
+  pendingReferenceFile.value = file
+  referenceImportConfirmKey.value += 1
+
+  try {
+    await referencePreviewState.loadFile(file)
+    referenceImportPayload.value = referencePreviewState.summary.value
+
+    if (referencePreviewState.canAutoApply.value) {
+      await handleReferenceConfirm()
+    }
+  } catch (error) {
+    pendingReferenceFile.value = null
+    referenceImportPayload.value = null
+    referencePreviewState.resetState()
+    showError(t('tools.merge.messages.previewFailed', { message: error.message }))
+  }
+}
+
+const handleReferenceMappingUpdate = ({ fieldKey, sourceKey }) => {
+  referencePreviewState.updateMapping(fieldKey, sourceKey)
+  referenceImportPayload.value = referencePreviewState.summary.value
+}
+
+const clearPendingReference = () => {
+  pendingReferenceFile.value = null
+  referenceImportPayload.value = null
+  referencePreviewState.resetState()
+  if (refInput.value) {
+    refInput.value.value = ''
+  }
+}
+
 const removeReference = () => {
   referenceFile.value = null
+  pendingReferenceFile.value = null
+  referenceImportPayload.value = null
   referenceStats.charCount = 0
   referenceStats.columnCount = 0
+  referencePreviewState.resetState()
   if (refInput.value) {
     refInput.value.value = ''
   }
@@ -551,6 +700,34 @@ const goToStep = (step) => {
 const nextStep = () => {
   if (currentStep.value < 3) {
     currentStep.value++
+  }
+}
+
+const handleReferenceConfirm = async () => {
+  if (referenceFile.value) {
+    nextStep()
+    return
+  }
+
+  if (!pendingReferenceFile.value || !referenceImportPayload.value?.isComplete) {
+    showError(t('common.importPreview.messages.mappingIncomplete'))
+    return
+  }
+
+  const activeSheet = referencePreviewState.previewTable.value?.activeSheet
+  const columnMapping = {
+    headerChar: referencePreviewState.mapping.value.char || null,
+    headerIpa: referencePreviewState.mapping.value.pronunciation || null,
+    headerNotes: referencePreviewState.mapping.value.note || null
+  }
+
+  await setReferenceFile(pendingReferenceFile.value, {
+    columnMapping,
+    headerRowIndex: referencePreviewState.headerRowIndex.value,
+    sheetName: activeSheet?.name || null
+  })
+  if (referenceFile.value) {
+    nextStep()
   }
 }
 

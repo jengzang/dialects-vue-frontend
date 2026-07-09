@@ -111,7 +111,8 @@
       "progressFailed": "獲取進度失敗：{message}",
       "processFailed": "處理失敗：{message}",
       "taskMissing": "未找到任務 ID",
-      "downloadFailed": "下載失敗：{message}"
+      "downloadFailed": "下載失敗：{message}",
+      "previewFailed": "預覽字表失敗：{message}"
     },
     "export": {
       "configFileName": "jyut2ipa-rules.json",
@@ -178,7 +179,7 @@
     },
     "validation": {
       "loginRequired": "請先登錄",
-      "invalidFileType": "請上傳 Excel 檔案（.xlsx 或 .xls 格式）",
+      "invalidFileType": "請上傳表格檔案（.xlsx、.xls 或 .csv 格式）",
       "partialInvalid": "部分檔案格式不正確，僅支持 .xlsx 與 .xls 格式",
       "fileTooLarge": "以下檔案超過 3MB 限制：{files}",
       "referenceFileTooLarge": "檔案大小不得超過 3MB",
@@ -193,7 +194,8 @@
       "readDefaultFailed": "讀取默認參考表失敗：{message}",
       "defaultDownloaded": "默認參考表已下載",
       "useDefaultSuccess": "已使用默認參考表",
-      "useDefaultFailed": "使用參考表失敗：{message}"
+      "useDefaultFailed": "使用參考表失敗：{message}",
+      "previewFailed": "預覽參考表失敗：{message}"
     },
     "export": {
       "resultFileName": "方音圖鑑_合併字表.xlsx",
@@ -431,6 +433,8 @@
       "invalidFileType": "請上傳支持的文件格式（.xlsx, .xls, .doc, .docx, .tsv）",
       "fileTooLarge": "文件大小不得超過3MB",
       "uploadFailed": "上傳失敗：{message}",
+      "previewInvalidFileType": "預覽僅支持 .xlsx 和 .xls 文件",
+      "previewFailed": "預覽文件失敗：{message}",
       "analyzeFailed": "分析失敗：{message}",
       "confirmChangeFile": "確定要更換文件？未保存的修改將丟失。",
       "nothingToSave": "沒有需要保存的更改",

@@ -10,7 +10,7 @@
         <div
           class="upload-zone"
           :class="{ 'drag-over': isDragOver }"
-          @click="$refs.fileInput.click()"
+          @click="!pendingPreviewFile && $refs.fileInput.click()"
           @dragover.prevent="isDragOver = true"
           @dragleave.prevent="isDragOver = false"
           @drop.prevent="handleDrop"
@@ -27,8 +27,44 @@
           <p class="upload-hint">{{ t('tools.jyut2ipa.upload.hint') }}</p>
         </div>
 
+        <TabularImportPreview
+          v-if="pendingPreviewFile"
+          :key="previewConfirmKey"
+          :title="t('common.importPreview.jyut2ipaTitle')"
+          :description="t('common.importPreview.jyut2ipaDescription')"
+          :file="pendingPreviewFile"
+          :schema="jyutImportSchema"
+          :loading="jyutPreviewState.loading"
+          :preview-table="jyutPreviewState.previewTable"
+          :diagnostics="jyutPreviewState.diagnostics"
+          :mapping="jyutPreviewState.mapping"
+          :selected-sheet-id="jyutPreviewState.selectedSheetId"
+          :header-row-index="jyutPreviewState.headerRowIndex"
+          :sheets="jyutPreviewState.parsedFile?.sheets || []"
+          @update:selectedSheetId="jyutPreviewState.selectedSheetId = $event"
+          @update:headerRowIndex="jyutPreviewState.headerRowIndex = $event"
+          @update:mapping="handleJyutMappingUpdate"
+          @reset="clearPendingPreview"
+        />
+
         <div class="info-section">
           <p class="info-text">{{ t('tools.jyut2ipa.upload.info') }}</p>
+          <p v-if="jyutImportSummary" class="info-text info-text--summary">{{ jyutImportSummary }}</p>
+
+          <div class="upload-preview-actions" v-if="pendingPreviewFile">
+            <button class="main-glass-button" data-variant="secondary" type="button" @click="clearPendingPreview">
+              {{ t('common.button.cancel') }}
+            </button>
+            <button
+              class="main-glass-button"
+              data-variant="primary"
+              type="button"
+              :disabled="!isJyutImportReady"
+              @click="confirmPreviewAndProcess"
+            >
+              {{ t('common.importPreview.actions.confirmAndUse') }}
+            </button>
+          </div>
 
           <div class="config-card" @click="showConfigModal = true">
             <div class="config-icon">⚙️</div>
@@ -290,9 +326,11 @@ import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
+import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
+import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import {
   downloadJyut2IpaResult,
   processJyut2Ipa,
@@ -309,7 +347,11 @@ const JYUT2IPA_RESULT_FILE_PREFIX = '方音圖鑒_'
 const fileName = ref('')
 const taskId = ref(null)
 const fileInput = ref(null)
+const pendingPreviewFile = ref(null)
+const previewConfirmKey = ref(0)
+const fileImportPayload = ref(null)
 const importInput = ref(null)
+const shouldAlwaysConfirmImport = ref(false)
 const isDragOver = ref(false)
 const processing = ref(false)
 const completed = ref(false)
@@ -329,6 +371,50 @@ const stats = reactive({
 })
 
 const previewData = ref([])
+const jyutImportSchema = computed(() => ([
+  {
+    key: 'jyutping',
+    label: t('common.importPreview.schemas.jyut2ipa.jyutping.label'),
+    required: true,
+    aliases: [
+      t('common.importPreview.schemas.jyut2ipa.jyutping.aliases.jyutping'),
+      t('common.importPreview.schemas.jyut2ipa.jyutping.aliases.cantonese'),
+      t('common.importPreview.schemas.jyut2ipa.jyutping.aliases.pronunciation')
+    ],
+    description: t('common.importPreview.schemas.jyut2ipa.jyutping.description'),
+    example: t('common.importPreview.schemas.jyut2ipa.jyutping.example')
+  },
+  {
+    key: 'char',
+    label: t('common.importPreview.schemas.jyut2ipa.char.label'),
+    required: false,
+    aliases: [
+      t('common.importPreview.schemas.jyut2ipa.char.aliases.char'),
+      t('common.importPreview.schemas.jyut2ipa.char.aliases.character'),
+      t('common.importPreview.schemas.jyut2ipa.char.aliases.word')
+    ],
+    description: t('common.importPreview.schemas.jyut2ipa.char.description'),
+    example: t('common.importPreview.schemas.jyut2ipa.char.example')
+  }
+]))
+const jyutPreviewState = useTabularImportPreview({
+  schema: jyutImportSchema,
+  previewRowCount: 8,
+  requireExplicitConfirmation: () => shouldAlwaysConfirmImport.value
+})
+const isJyutImportReady = computed(() => !!fileImportPayload.value?.isComplete)
+const jyutImportSummary = computed(() => {
+  if (!fileImportPayload.value) {
+    return ''
+  }
+
+  const mappedCount = Object.values(fileImportPayload.value.mapping || {}).filter(Boolean).length
+  const columnCount = fileImportPayload.value.sourceColumns?.length || 0
+  return t('common.importPreview.mergeReferenceSummary', {
+    mappedCount,
+    columnCount
+  })
+})
 
 // 默认规则（从default-rules.js迁移）
 const DEFAULT_RULES = [
@@ -505,7 +591,7 @@ const handleImportFile = async (event) => {
 const handleFileSelect = (event) => {
   const file = event.target.files[0]
   if (file) {
-    processFile(file)
+    previewFile(file)
   }
 }
 
@@ -513,7 +599,7 @@ const handleDrop = (event) => {
   isDragOver.value = false
   const file = event.dataTransfer.files[0]
   if (file) {
-    processFile(file)
+    previewFile(file)
   }
 }
 
@@ -615,6 +701,67 @@ const processFile = async (file) => {
     showError(t('tools.jyut2ipa.messages.processFailed', { message: error.message }))
     reset()
   }
+}
+
+const previewFile = async (file) => {
+  const isAllowed = await requireAuth({
+    message: t('tools.jyut2ipa.validation.loginRequired'),
+  })
+  if (!isAllowed) {
+    return
+  }
+
+  if (!file.name.match(/\.(xlsx|xls)$/i)) {
+    showError(t('tools.jyut2ipa.validation.invalidFileType'))
+    return
+  }
+
+  if (file.size > 3 * 1024 * 1024) {
+    showError(t('tools.jyut2ipa.validation.fileTooLarge'))
+    return
+  }
+
+  pendingPreviewFile.value = file
+  previewConfirmKey.value += 1
+
+  try {
+    await jyutPreviewState.loadFile(file)
+    fileImportPayload.value = jyutPreviewState.summary.value
+
+    if (jyutPreviewState.canAutoApply.value) {
+      await confirmPreviewAndProcess()
+    }
+  } catch (error) {
+    pendingPreviewFile.value = null
+    fileImportPayload.value = null
+    jyutPreviewState.resetState()
+    showError(t('tools.jyut2ipa.messages.previewFailed', { message: error.message }))
+  }
+}
+
+const handleJyutMappingUpdate = ({ fieldKey, sourceKey }) => {
+  jyutPreviewState.updateMapping(fieldKey, sourceKey)
+  fileImportPayload.value = jyutPreviewState.summary.value
+}
+
+const clearPendingPreview = () => {
+  pendingPreviewFile.value = null
+  fileImportPayload.value = null
+  jyutPreviewState.resetState()
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
+
+const confirmPreviewAndProcess = async () => {
+  if (!pendingPreviewFile.value || !fileImportPayload.value?.isComplete) {
+    showError(t('common.importPreview.messages.mappingIncomplete'))
+    return
+  }
+
+  const selectedFile = pendingPreviewFile.value
+  clearPendingPreview()
+  await processFile(selectedFile)
 }
 
 const downloadResult = async () => {

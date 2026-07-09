@@ -55,7 +55,7 @@
         <div
           class="upload-zone-drop"
           :class="{ 'drag-over': isDragOver, 'uploading': isUploading }"
-          @click="!isUploading && $refs.fileInput.click()"
+          @click="!isUploading && !pendingPreviewFile && $refs.fileInput.click()"
           @dragover.prevent="!isUploading && (isDragOver = true)"
           @dragleave.prevent="isDragOver = false"
           @drop.prevent="!isUploading && handleDrop($event)"
@@ -70,6 +70,44 @@
             <h3 class="upload-text">{{ t('tools.checkTool.welcome.uploadingTitle') }}</h3>
             <p class="hint-text">{{ t('tools.checkTool.welcome.uploadingHint') }}</p>
           </template>
+        </div>
+
+        <TabularImportPreview
+          v-if="pendingPreviewFile"
+          :key="previewConfirmKey"
+          :title="t('common.importPreview.checkToolTitle')"
+          :description="t('common.importPreview.checkToolDescription')"
+          :file="pendingPreviewFile"
+          :schema="checkImportSchema"
+          :loading="checkPreviewState.loading"
+          :preview-table="checkPreviewState.previewTable"
+          :diagnostics="checkPreviewState.diagnostics"
+          :mapping="checkPreviewState.mapping"
+          :selected-sheet-id="checkPreviewState.selectedSheetId"
+          :header-row-index="checkPreviewState.headerRowIndex"
+          :sheets="checkPreviewState.parsedFile?.sheets || []"
+          @update:selectedSheetId="checkPreviewState.selectedSheetId = $event"
+          @update:headerRowIndex="checkPreviewState.headerRowIndex = $event"
+          @update:mapping="handleCheckMappingUpdate"
+          @reset="clearPendingPreview"
+        />
+
+        <div v-if="pendingPreviewFile" class="upload-preview-actions upload-preview-actions--check">
+          <p v-if="checkImportSummary" class="hint-text hint-text--summary">{{ checkImportSummary }}</p>
+          <div class="upload-preview-actions__buttons">
+            <button class="main-glass-button" data-variant="secondary" type="button" @click="clearPendingPreview">
+              {{ t('common.button.cancel') }}
+            </button>
+            <button
+              class="main-glass-button"
+              data-variant="primary"
+              type="button"
+              :disabled="!isCheckImportReady"
+              @click="confirmPreviewAndUpload"
+            >
+              {{ t('common.importPreview.actions.confirmAndUse') }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -894,11 +932,13 @@ import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RecycleScroller } from 'vue-virtual-scroller'
 import AppModal from '@/components/common/AppModal.vue'
+import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
+import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import {
   uploadCheckFile,
   analyzeFile as analyzeFileApi,
@@ -925,6 +965,10 @@ const isDragOver = ref(false)
 const selectedFormat = ref('音典') // 文件格式类型
 const isSimplified = ref(false) // 新增：默认为 false (繁体)
 const isUploading = ref(false) // 上传加载状态
+const pendingPreviewFile = ref(null)
+const previewConfirmKey = ref(0)
+const checkImportPayload = ref(null)
+const shouldAlwaysConfirmImport = ref(false)
 
 // 数据
 const allData = ref([])
@@ -1012,6 +1056,62 @@ const scriptOptions = computed(() => [
   { label: t('tools.checkTool.welcome.traditionalRecommended'), value: false },
   { label: t('tools.checkTool.welcome.simplifiedConvert'), value: true }
 ])
+
+const checkImportSchema = computed(() => ([
+  {
+    key: 'char',
+    label: t('common.importPreview.schemas.checkTool.char.label'),
+    required: true,
+    aliases: [
+      t('common.importPreview.schemas.checkTool.char.aliases.char'),
+      t('common.importPreview.schemas.checkTool.char.aliases.character'),
+      t('common.importPreview.schemas.checkTool.char.aliases.word')
+    ],
+    description: t('common.importPreview.schemas.checkTool.char.description'),
+    example: t('common.importPreview.schemas.checkTool.char.example')
+  },
+  {
+    key: 'ipa',
+    label: t('common.importPreview.schemas.checkTool.ipa.label'),
+    required: true,
+    aliases: [
+      t('common.importPreview.schemas.checkTool.ipa.aliases.ipa'),
+      t('common.importPreview.schemas.checkTool.ipa.aliases.phonetic'),
+      t('common.importPreview.schemas.checkTool.ipa.aliases.pronunciation')
+    ],
+    description: t('common.importPreview.schemas.checkTool.ipa.description'),
+    example: t('common.importPreview.schemas.checkTool.ipa.example')
+  },
+  {
+    key: 'note',
+    label: t('common.importPreview.schemas.checkTool.note.label'),
+    required: false,
+    aliases: [
+      t('common.importPreview.schemas.checkTool.note.aliases.note'),
+      t('common.importPreview.schemas.checkTool.note.aliases.comment')
+    ],
+    description: t('common.importPreview.schemas.checkTool.note.description'),
+    example: t('common.importPreview.schemas.checkTool.note.example')
+  }
+]))
+const checkPreviewState = useTabularImportPreview({
+  schema: checkImportSchema,
+  previewRowCount: 8,
+  requireExplicitConfirmation: () => shouldAlwaysConfirmImport.value
+})
+const isCheckImportReady = computed(() => !!checkImportPayload.value?.isComplete)
+const checkImportSummary = computed(() => {
+  if (!checkImportPayload.value) {
+    return ''
+  }
+
+  const mappedCount = Object.values(checkImportPayload.value.mapping || {}).filter(Boolean).length
+  const columnCount = checkImportPayload.value.sourceColumns?.length || 0
+  return t('common.importPreview.mergeReferenceSummary', {
+    mappedCount,
+    columnCount
+  })
+})
 
 // 计算属性
 const totalPendingChanges = computed(() => {
@@ -1180,19 +1280,18 @@ const handleDrop = (event) => {
   isDragOver.value = false
   const file = event.dataTransfer.files[0]
   if (file) {
-    uploadFile(file)
+    previewFile(file)
   }
 }
 
 const handleFileUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
-    uploadFile(file)
+    previewFile(file)
   }
 }
 
 const uploadFile = async (file) => {
-  // 检查登录状态
   const isAllowed = await requireAuth({
     message: t('tools.checkTool.messages.loginRequired'),
   })
@@ -1235,6 +1334,70 @@ const uploadFile = async (file) => {
       }
     }
   )
+}
+
+const previewFile = async (file) => {
+  const isAllowed = await requireAuth({
+    message: t('tools.checkTool.messages.loginRequired'),
+  })
+  if (!isAllowed) {
+    return
+  }
+
+  const allowedExts = ['.xlsx', '.xls']
+  const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
+
+  if (!allowedExts.includes(ext)) {
+    showError(t('tools.checkTool.messages.previewInvalidFileType'))
+    return
+  }
+
+  if (file.size > 3 * 1024 * 1024) {
+    showError(t('tools.checkTool.messages.fileTooLarge'))
+    return
+  }
+
+  pendingPreviewFile.value = file
+  previewConfirmKey.value += 1
+
+  try {
+    await checkPreviewState.loadFile(file)
+    checkImportPayload.value = checkPreviewState.summary.value
+
+    if (checkPreviewState.canAutoApply.value) {
+      await confirmPreviewAndUpload()
+    }
+  } catch (error) {
+    pendingPreviewFile.value = null
+    checkImportPayload.value = null
+    checkPreviewState.resetState()
+    showError(t('tools.checkTool.messages.previewFailed', { message: error.message }))
+  }
+}
+
+const handleCheckMappingUpdate = ({ fieldKey, sourceKey }) => {
+  checkPreviewState.updateMapping(fieldKey, sourceKey)
+  checkImportPayload.value = checkPreviewState.summary.value
+}
+
+const clearPendingPreview = () => {
+  pendingPreviewFile.value = null
+  checkImportPayload.value = null
+  checkPreviewState.resetState()
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
+
+const confirmPreviewAndUpload = async () => {
+  if (!pendingPreviewFile.value || !checkImportPayload.value?.isComplete) {
+    showError(t('common.importPreview.messages.mappingIncomplete'))
+    return
+  }
+
+  const selectedFile = pendingPreviewFile.value
+  clearPendingPreview()
+  await uploadFile(selectedFile)
 }
 
 const analyzeFile = async () => {
@@ -1350,6 +1513,9 @@ const resetUpload = async () => {
     rowsToDelete.value.clear()
     isEditMode.value = false
     clearAllColumnFilters()
+    pendingPreviewFile.value = null
+    checkImportPayload.value = null
+    checkPreviewState.resetState()
     if (fileInput.value) {
       fileInput.value.value = ''
     }
@@ -1984,7 +2150,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   }
 
   &-card {
-    max-width: 800px;
+    max-width: 980px;
     width: 100%;
     padding: 20px 30px;
     text-align: center;
@@ -2091,6 +2257,52 @@ $success-soft: rgba(52, 199, 89, 0.1);
   }
 }
 
+.upload-zone-drop {
+  @include glass-blur(rgba(255, 255, 255, 0.45), 12px, 22px, rgba(255, 255, 255, 0.58));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 26px 28px;
+  border: 2px dashed rgba(0, 122, 255, 0.28);
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &.drag-over {
+    border-color: rgba(0, 122, 255, 0.58);
+    background: rgba(0, 122, 255, 0.08);
+  }
+
+  &.uploading {
+    cursor: progress;
+  }
+}
+
+.upload-preview-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &--check {
+    margin-top: 8px;
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+}
+
+.hint-text--summary {
+  margin: 0;
+  color: rgba(11, 37, 64, 0.72);
+}
+
 .work {
   &-area {
     height: 100%;
@@ -2102,6 +2314,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     position: relative;
   }
 }
+
 
 .sidebar {
   /* 侧边栏 */

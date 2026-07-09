@@ -21,16 +21,36 @@ import { showError } from '@/utils/message.js'
 
 /**
  * 上传参考字表
- * @param {File} file - 参考字表文件（.xlsx 或 .xls）
+ * @param {File} file - 参考字表文件（.xlsx、.xls 或 .csv）
+ * @param {Object} [options] - 附加选项
+ * @param {Object|null} [options.columnMapping] - 参考表列匹配结果
+ * @param {number|null} [options.headerRowIndex] - 表头所在行（从 0 开始）
+ * @param {string|null} [options.sheetName] - 选中的工作表名称
  * @returns {Promise<ReferenceUploadResponse>} 上传结果
  * @throws {Error} 上传失败
  * @example
- * const result = await uploadReference(referenceFile)
+ * const result = await uploadReference(referenceFile, {
+ *   columnMapping: { char: 'column_1', pronunciation: 'column_2' }
+ * })
  * console.log(result.task_id) // "task-uuid-xxx"
  */
-export async function uploadReference(file) {
+export async function uploadReference(file, options = {}) {
   const formData = new FormData()
   formData.append('file', file)
+
+  const { columnMapping = null, headerRowIndex = null, sheetName = null } = options
+
+  if (columnMapping) {
+    formData.append('column_mapping', JSON.stringify(columnMapping))
+  }
+
+  if (headerRowIndex !== null && headerRowIndex !== undefined) {
+    formData.append('header_row_index', String(headerRowIndex))
+  }
+
+  if (sheetName) {
+    formData.append('sheet_name', sheetName)
+  }
 
   try {
     return await api('/api/tools/merge/upload_reference', {
