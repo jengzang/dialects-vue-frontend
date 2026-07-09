@@ -245,155 +245,208 @@ const columnOptions = computed(() => ([
   flex-direction: column;
   gap: 16px;
   padding: 18px;
-}
 
-.tabular-import-preview__header,
-.tabular-import-preview__toolbar,
-.tabular-import-preview__body,
-.tabular-import-preview__section-head,
-.tabular-import-preview__mapping-row,
-.tabular-import-preview__mapping-name-row,
-.tabular-import-preview__toolbar-item,
-.tabular-import-preview__toolbar-meta {
-  display: flex;
-}
+  &__header,
+  &__toolbar,
+  &__body,
+  &__section-head,
+  &__mapping-row,
+  &__mapping-name-row,
+  &__toolbar-item,
+  &__toolbar-meta {
+    display: flex;
+  }
 
-.tabular-import-preview__header,
-.tabular-import-preview__section-head {
-  justify-content: space-between;
-  gap: 12px;
-}
+  &__header,
+  &__section-head {
+    justify-content: space-between;
+    gap: 12px;
+  }
 
-.tabular-import-preview__header {
-  align-items: flex-start;
-}
+  &__header {
+    align-items: flex-start;
+  }
 
-.tabular-import-preview__eyebrow {
-  margin: 0 0 6px;
-  font-size: 12px;
-  color: rgba(11, 37, 64, 0.55);
-}
+  &__eyebrow {
+    margin: 0 0 6px;
+    font-size: 12px;
+    color: rgba(11, 37, 64, 0.55);
+  }
 
-.tabular-import-preview__title {
-  margin: 0;
-  font-size: 18px;
-  color: #0b2540;
-}
+  &__title {
+    margin: 0;
+    font-size: 18px;
+    color: #0b2540;
+  }
 
-.tabular-import-preview__empty {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  min-height: 140px;
-  padding: 20px;
-  border: 1px dashed rgba(0, 122, 255, 0.22);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.42);
-}
+  &__empty {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 140px;
+    padding: 20px;
+    border: 1px dashed rgba(0, 122, 255, 0.22);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.42);
 
-.tabular-import-preview__empty-icon {
-  font-size: 36px;
-}
+    &-icon {
+      font-size: 36px;
+    }
 
-.tabular-import-preview__empty-title,
-.tabular-import-preview__section-head h4 {
-  margin: 0;
-  color: #0b2540;
-}
+    &-title {
+      margin: 0;
+      color: #0b2540;
+    }
 
-.tabular-import-preview__empty-text,
-.tabular-import-preview__section-head p,
-.tabular-import-preview__mapping-desc,
-.tabular-import-preview__mapping-example,
-.diagnostic {
-  margin: 0;
-  color: rgba(11, 37, 64, 0.68);
-}
+    &-text {
+      margin: 0;
+      color: rgba(11, 37, 64, 0.68);
+    }
+  }
 
-.tabular-import-preview__toolbar {
-  flex-wrap: wrap;
-  gap: 12px 18px;
-  align-items: flex-end;
-}
+  &__toolbar {
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    align-items: flex-end;
 
-.tabular-import-preview__toolbar-item {
-  flex-direction: column;
-  gap: 6px;
-}
+    &-item {
+      flex-direction: column;
+      gap: 6px;
 
-.tabular-import-preview__toolbar-item--compact {
-  min-width: 160px;
-}
+      &--compact {
+        min-width: 160px;
+      }
+    }
 
-.tabular-import-preview__toolbar-label {
-  font-size: 12px;
-  color: rgba(11, 37, 64, 0.58);
-}
+    &-label {
+      font-size: 12px;
+      color: rgba(11, 37, 64, 0.58);
+    }
 
-.tabular-import-preview__toolbar-meta {
-  flex: 1 1 100%;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-size: 12px;
-  color: rgba(11, 37, 64, 0.62);
-}
+    &-meta {
+      flex: 1 1 100%;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: rgba(11, 37, 64, 0.62);
+    }
+  }
 
-.tabular-import-preview__loading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 120px;
-  justify-content: center;
-}
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 120px;
+  }
 
-.tabular-import-preview__body {
-  gap: 16px;
-  align-items: stretch;
-}
+  &__body {
+    gap: 16px;
+    align-items: stretch;
+  }
 
-.tabular-import-preview__mapping,
-.tabular-import-preview__preview {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-}
+  &__mapping,
+  &__preview {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
 
-.tabular-import-preview__mapping-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 360px;
-  overflow: auto;
-  padding-right: 4px;
-}
+  &__mapping {
+    &-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 360px;
+      overflow: auto;
+      padding-right: 4px;
+    }
 
-.tabular-import-preview__mapping-row {
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.48);
-}
+    &-row {
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.48);
+    }
 
-.tabular-import-preview__mapping-meta {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+    &-meta {
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-.tabular-import-preview__mapping-name {
-  font-weight: 600;
-  color: #0b2540;
-}
+    &-name {
+      font-weight: 600;
+      color: #0b2540;
+    }
 
-.tabular-import-preview__mapping-control {
-  width: 260px;
-  max-width: 100%;
+    &-desc,
+    &-example {
+      margin: 0;
+      color: rgba(11, 37, 64, 0.68);
+    }
+
+    &-control {
+      width: 260px;
+      max-width: 100%;
+    }
+  }
+
+  &__section-head {
+    h4 {
+      margin: 0;
+      color: #0b2540;
+    }
+
+    p {
+      margin: 0;
+      color: rgba(11, 37, 64, 0.68);
+    }
+  }
+
+  &__diagnostics {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__table-wrap {
+    overflow: auto;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.36);
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(11, 37, 64, 0.08);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: rgba(231, 241, 255, 0.92);
+      color: #0b2540;
+    }
+
+    &-empty {
+      text-align: center;
+      color: rgba(11, 37, 64, 0.58);
+    }
+  }
 }
 
 .mapping-required,
@@ -401,9 +454,9 @@ const columnOptions = computed(() => ([
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 2px 8px;
   border-radius: 999px;
   font-size: 11px;
-  padding: 2px 8px;
 }
 
 .mapping-required {
@@ -411,66 +464,45 @@ const columnOptions = computed(() => ([
   background: rgba(0, 122, 255, 0.12);
 }
 
-.mapping-badge.is-success,
-.diagnostic--success {
-  color: #1f8a36;
+.mapping-badge {
+  &.is-success {
+    color: #1f8a36;
+  }
+
+  &.is-warning {
+    color: #b26a00;
+  }
 }
 
-.mapping-badge.is-warning,
-.diagnostic--warning {
-  color: #b26a00;
-}
+.diagnostic {
+  margin: 0;
+  color: rgba(11, 37, 64, 0.68);
 
-.tabular-import-preview__diagnostics {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+  &--success {
+    color: #1f8a36;
+  }
 
-.tabular-import-preview__table-wrap {
-  overflow: auto;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.36);
-}
-
-.tabular-import-preview__table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-.tabular-import-preview__table th,
-.tabular-import-preview__table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(11, 37, 64, 0.08);
-  text-align: left;
-  vertical-align: top;
-}
-
-.tabular-import-preview__table th {
-  position: sticky;
-  top: 0;
-  background: rgba(231, 241, 255, 0.92);
-  color: #0b2540;
-}
-
-.tabular-import-preview__table-empty {
-  text-align: center;
-  color: rgba(11, 37, 64, 0.58);
+  &--warning {
+    color: #b26a00;
+  }
 }
 
 @media (max-width: 1100px) {
-  .tabular-import-preview__body {
-    flex-direction: column;
-  }
+  .tabular-import-preview {
+    &__body {
+      flex-direction: column;
+    }
 
-  .tabular-import-preview__mapping-control {
-    width: 100%;
-  }
+    &__mapping {
+      &-control {
+        width: 100%;
+      }
 
-  .tabular-import-preview__mapping-row {
-    flex-direction: column;
-    align-items: stretch;
+      &-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
   }
 }
 </style>

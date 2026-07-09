@@ -429,7 +429,23 @@ watch(showPartitionInfoModal, (isVisible) => {
 })
 </script>
 
-<style scoped>
+```scss
+<style scoped lang="scss">
+$success-green: #52c41a;
+$warning-orange: #ff9800;
+$portrait-ratio: 1 / 1;
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin glass-blur($amount: 12px) {
+  backdrop-filter: blur($amount);
+  -webkit-backdrop-filter: blur($amount);
+}
+
 .location-multi-input {
   width: 100%;
   display: flex;
@@ -437,19 +453,56 @@ watch(showPartitionInfoModal, (isVisible) => {
   gap: 15px;
 }
 
+/* 输入区域 */
 .input-section {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  label {
+    flex-shrink: 0;
+    color: var(--text-dark);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 12px 40px 12px 14px;
+    resize: vertical;
+    background: var(--glass-medium2);
+    border: 1px solid var(--border-gray-light);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    color: var(--text-dark);
+    font-family: inherit;
+    font-size: 14px;
+    transition: all 0.3s ease;
+
+    @include glass-blur;
+
+    &:focus {
+      background: var(--glass-medium-strong);
+      border-color: var(--color-primary);
+      outline: none;
+      box-shadow:
+        0 0 0 3px var(--color-primary-light),
+        var(--shadow-md);
+    }
+
+    &::placeholder {
+      color: var(--text-secondary);
+    }
+  }
 }
 
 .input-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
   flex-wrap: nowrap;
+  gap: 10px;
 }
 
 .header-left {
@@ -458,133 +511,102 @@ watch(showPartitionInfoModal, (isVisible) => {
   gap: 8px;
 }
 
-.input-section label {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-dark);
-  flex-shrink: 0;
-}
-
-/* 選擇地點按鈕 */
+/* 选择地点按钮 */
 .select-location-btn {
-  appearance: none;
-  border: 1px solid var(--color-primary-border2);
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  font-size: 12px;
   padding: 2px 8px;
+  appearance: none;
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-primary-border2);
   border-radius: 8px;
+  color: var(--color-primary);
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
   user-select: none;
-  white-space: nowrap;
   transition: all 0.2s ease;
-  font-weight: 500;
+
+  &:hover {
+    background: var(--color-primary-light2);
+    box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
-.select-location-btn:hover {
-  background: var(--color-primary-light2);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
-}
-
-.select-location-btn:active {
-  transform: translateY(0);
-}
-
+/* 已匹配地点预览 */
 .locations-inline {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  max-width: 250px;
   min-width: 0;
+  max-width: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .count-inline {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-primary);
+  flex-shrink: 0;
   padding: 2px 8px;
   background: var(--color-primary-light);
-  border-radius: 999px;
   border: 1px solid var(--color-primary-border);
+  border-radius: 999px;
+  color: var(--color-primary);
   white-space: nowrap;
-  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .preview-inline {
-  font-size: 13px;
-  color: var(--text-dark-medium);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   min-width: 0;
+  overflow: hidden;
+  color: var(--text-dark-medium);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
 }
 
 .expand-btn-inline {
+  flex-shrink: 0;
   padding: 2px 10px;
   background: var(--color-primary-light);
-  color: var(--color-primary);
   border: 1px solid var(--color-primary-border2);
   border-radius: 999px;
+  color: var(--color-primary);
+  white-space: nowrap;
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap;
-  flex-shrink: 0;
+
+  &:hover {
+    background: var(--color-primary-light2);
+  }
 }
 
-.expand-btn-inline:hover {
-  background: var(--color-primary-light2);
-}
-
+/* 警告信息 */
 .warning-message {
-  font-size: 13px;
-  color: #ff9800;
-  background: rgba(255, 152, 0, 0.1);
   padding: 8px 12px;
+  background: rgba(255, 152, 0, 0.1);
+  border-left: 3px solid $warning-orange;
   border-radius: var(--radius-sm);
-  border-left: 3px solid #ff9800;
+  color: $warning-orange;
+  font-size: 13px;
   font-weight: 500;
 }
 
-.input-section textarea {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--border-gray-light);
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  resize: vertical;
-  background: var(--glass-medium2);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: all 0.3s ease;
-  font-family: inherit;
-  color: var(--text-dark);
-  box-shadow: var(--shadow-sm);
-}
-
-.input-section textarea:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: var(--glass-medium-strong);
-  box-shadow: 0 0 0 3px var(--color-primary-light), var(--shadow-md);
-}
-
-.input-section textarea::placeholder {
-  color: var(--text-secondary);
-}
-
+/* 匹配成功标记 */
 .success-checkmark {
   position: absolute;
-  right: 12px;
   top: 50%;
-  transform: translateY(-50%);
+  right: 12px;
+  color: $success-green;
   font-size: 20px;
   font-weight: bold;
-  color: #52c41a;
   pointer-events: none;
+  transform: translateY(-50%);
   animation: checkmark-appear 0.3s ease;
 }
 
@@ -593,51 +615,49 @@ watch(showPartitionInfoModal, (isVisible) => {
     opacity: 0;
     transform: translateY(-50%) scale(0.5);
   }
+
   to {
     opacity: 1;
     transform: translateY(-50%) scale(1);
   }
 }
 
-/* Add right padding to textarea to prevent text overlap */
-.input-section textarea {
-  padding-right: 40px;
-}
-
+/* 建议下拉框 */
 .suggestions-dropdown {
   position: absolute !important;
+  z-index: 99999 !important;
+  max-height: 30vh;
+  padding: 8px;
+  overflow-y: auto;
   background: var(--glass-medium2);
   border: 1px solid var(--border-gray-light);
-  box-shadow: var(--shadow-lg2);
-  padding: 8px;
   border-radius: var(--radius-md);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  max-height: 30vh;
-  overflow-y: auto;
-  z-index: 99999 !important;
+  box-shadow: var(--shadow-lg2);
+
+  @include glass-blur(16px);
 }
 
 .success-message {
-  color: var(--color-success);
-  font-weight: 600;
   padding: 6px 8px;
+  color: var(--color-success);
   font-size: 13px;
+  font-weight: 600;
 }
 
 .suggestion-item {
   padding: 8px 10px;
-  cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: background-color 0.2s ease;
-  font-size: 14px;
   color: var(--text-dark);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: var(--bg-blue-hover);
+  }
 }
 
-.suggestion-item:hover {
-  background: var(--bg-blue-hover);
-}
-
+/* 地点详情列表 */
 .locations-list {
   display: flex;
   flex-wrap: wrap;
@@ -651,15 +671,17 @@ watch(showPartitionInfoModal, (isVisible) => {
   background: var(--glass-lighter3);
   border: 1px solid var(--border-gray-light2);
   border-radius: 999px;
-  font-size: 14px;
-  color: var(--text-dark-lightest);
   box-shadow: var(--shadow-sm2);
+  color: var(--text-dark-lightest);
+  font-size: 14px;
 }
 
-/* 移动端适配 */
-@media (max-aspect-ratio: 1/1) {
-  .input-section textarea {
-    font-size: 14px; /* 防止 iOS 自动缩放 */
+/* 竖屏 */
+@media (max-aspect-ratio: $portrait-ratio) {
+  .input-section {
+    textarea {
+      font-size: 14px;
+    }
   }
 
   .input-header {
@@ -669,8 +691,8 @@ watch(showPartitionInfoModal, (isVisible) => {
 
   .locations-inline {
     width: 100%;
-    gap: 1px;
     max-width: 180px;
+    gap: 1px;
   }
 
   .preview-inline {
@@ -678,13 +700,13 @@ watch(showPartitionInfoModal, (isVisible) => {
   }
 
   .count-inline {
+    padding: 2px;
     font-size: 11px;
-    padding:2px 2px;
   }
 
   .expand-btn-inline {
-    font-size: 10px;
     padding: 2px 8px;
+    font-size: 10px;
   }
 
   .locations-list {
@@ -692,8 +714,9 @@ watch(showPartitionInfoModal, (isVisible) => {
   }
 
   .location-chip {
-    font-size: 13px;
     padding: 4px 8px;
+    font-size: 13px;
   }
 }
 </style>
+```

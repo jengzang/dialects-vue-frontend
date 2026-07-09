@@ -884,51 +884,67 @@ onBeforeUnmount(() => {
 defineExpose({ togglePopup, openPopup, closePopup })
 </script>
 
-<style scoped>
-/* ===== 選框（液態玻璃） ===== */
-.region-select-box {
-  width: 98%;
-  min-height: 38px;
-  border-radius: 14px;
-  padding: 8px 34px 8px 10px;
-  box-sizing: border-box;
+<style scoped lang="scss">
+$primary: #007aff;
+$primary-dark: #0051d5;
+$success: #34c759;
+$danger: #ff3b30;
+$portrait-ratio: 1 / 1;
 
-  display: flex;
-  gap: 8px;
-  cursor: pointer;
-  position: relative;
-
-  background: rgba(255, 255, 255, 0.40);
-  border: 1px solid rgba(200, 200, 200, 0.45);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.10);
-
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  max-height: 60px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  align-items: flex-start;
+@mixin glass-blur($blur, $saturation: 100%) {
+  backdrop-filter: blur($blur) saturate($saturation);
+  -webkit-backdrop-filter: blur($blur) saturate($saturation);
 }
 
-.region-select-box.open {
-  border-color: rgba(0, 122, 255, 0.35);
-  box-shadow: 0 12px 36px rgba(0, 122, 255, 0.16);
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 选择框 */
+.region-select-box {
+  position: relative;
+  width: 98%;
+  min-height: 38px;
+  max-height: 60px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 34px 8px 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(200, 200, 200, 0.45);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+  @include glass-blur(16px, 160%);
+
+  cursor: pointer;
+
+  &.open {
+    border-color: rgba(0, 122, 255, 0.35);
+    box-shadow: 0 12px 36px rgba(0, 122, 255, 0.16);
+  }
 }
 
 .region-placeholder {
-  font-size: 13px;
+  overflow: hidden;
   color: rgba(60, 60, 60, 0.72);
   white-space: nowrap;
-  overflow: hidden;
+  font-size: 13px;
 }
 
 .region-caret {
   position: absolute;
-  right: 10px;
   top: 50%;
-  transform: translateY(-50%);
+  right: 10px;
   color: rgba(0, 0, 0, 0.55);
   font-weight: 700;
+  transform: translateY(-50%);
 }
 
 .region-tags {
@@ -940,78 +956,84 @@ defineExpose({ togglePopup, openPopup, closePopup })
 .region-tag,
 .topbar-tag {
   position: relative;
+  max-width: 100%;
   display: inline-flex;
   align-items: center;
   gap: 2px;
   padding: 4px 8px;
-  border-radius: 999px;
-  font-size: 13px;
-  color: rgba(25, 25, 25, 0.86);
+
   background: rgba(255, 255, 255, 0.48);
   border: 1px solid rgba(160, 160, 160, 0.22);
+  border-radius: 999px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-  max-width: 100%;
+
+  color: rgba(25, 25, 25, 0.86);
   white-space: nowrap;
+  font-size: 13px;
+
+  &.custom-region-tag {
+    background: rgba(0, 123, 255, 0.5);
+    border-color: rgba(52, 199, 89, 0.3);
+    color: #fff;
+  }
 }
 
 .tag-remove {
-  border: none;
-  background: rgba(0, 0, 0, 0.06);
+  flex: 0 0 auto;
   width: 18px;
   height: 18px;
+  background: rgba(0, 0, 0, 0.06);
+  border: none;
   border-radius: 8px;
   cursor: pointer;
-  flex: 0 0 auto;
 }
 
-/* ===== Overlay ===== */
+/* 全屏遮罩 */
 .partition-overlay {
   position: fixed;
   inset: 0;
   z-index: 20000;
-  background: rgba(0, 0, 0, 0.10);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(4px);
   overflow: auto;
+  background: rgba(0, 0, 0, 0.1);
+
+  @include glass-blur(5px);
 }
 
-/* ===== 頂部確認欄 ===== */
+/* 顶部确认栏 */
 .partition-topbar {
   position: sticky;
   top: 0;
   z-index: 20010;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-
   align-items: flex-start;
   justify-content: space-between;
-
+  gap: 6px;
   padding: 10px 12px;
+
   background: rgba(255, 255, 255, 0.28);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.30);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
 
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  @include glass-blur(14px, 160%);
 }
 
-/* 第一行：左右对齐 */
-.topbar-row-1 {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
+.topbar-row {
+  &-1 {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-/* 第二行：tags 自动滚动 */
-.topbar-row-2 {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 40px;
-  width: 100%;
+  &-2 {
+    width: 100%;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
 }
 
 .topbar-tags {
@@ -1024,31 +1046,31 @@ defineExpose({ togglePopup, openPopup, closePopup })
 
 .topbar-empty {
   flex: 1;
+  color: rgba(60, 60, 60, 0.7);
   font-size: 13px;
-  color: rgba(60, 60, 60, 0.70);
 }
 
 .topbar-right-actions {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
   margin-left: auto;
 }
 
 .topbar-title {
+  color: rgba(20, 20, 20, 0.85);
   font-size: 13px;
   font-weight: 700;
-  color: rgba(20, 20, 20, 0.85);
 }
 
 .topbar-count {
-  font-weight: 600;
-  color: rgba(20, 20, 20, 0.55);
   margin-left: 6px;
+  color: rgba(20, 20, 20, 0.55);
+  font-weight: 600;
 }
 
-/* Custom region button states */
+/* 自定义分区按钮 */
 .custom-region-btn {
   display: flex;
   align-items: center;
@@ -1056,122 +1078,110 @@ defineExpose({ togglePopup, openPopup, closePopup })
   padding: 6px 12px;
   border: none;
   border-radius: 6px;
-  cursor: pointer;
+  white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
+  cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap;
-}
 
-.custom-region-btn.btn-red {
-  background: rgba(255, 59, 48, 0.15);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(255, 59, 48, 0.3);
-  color: #ff3b30;
-  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.15);
-}
+  &.btn-red {
+    background: rgba(255, 59, 48, 0.15);
+    border: 1px solid rgba(255, 59, 48, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.15);
+    color: $danger;
 
-.custom-region-btn.btn-blue {
-  background: rgba(0, 122, 255, 0.15);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(0, 122, 255, 0.3);
-  color: #007aff;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
-}
+    @include glass-blur(12px, 180%);
+  }
 
-.custom-region-btn.btn-green {
-  background: rgba(52, 199, 89, 0.15);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(52, 199, 89, 0.3);
-  color: #34c759;
-  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.15);
-}
+  &.btn-blue {
+    background: rgba(0, 122, 255, 0.15);
+    border: 1px solid rgba(0, 122, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
+    color: $primary;
 
-.custom-region-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
+    @include glass-blur(12px, 180%);
+  }
 
-.custom-region-btn .btn-icon {
-  font-size: 14px;
-}
+  &.btn-green {
+    background: rgba(52, 199, 89, 0.15);
+    border: 1px solid rgba(52, 199, 89, 0.3);
+    box-shadow: 0 4px 12px rgba(52, 199, 89, 0.15);
+    color: $success;
 
-.custom-region-btn .btn-text {
-  font-size: 12px;
-}
+    @include glass-blur(12px, 180%);
+  }
 
-/* Custom region tag styling */
-.topbar-tag.custom-region-tag,
-.region-tag.custom-region-tag {
-  background: rgba(0, 123, 255, 0.5);
-  color: white;
-  border: 1px solid rgba(52, 199, 89, 0.3);
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .btn-icon {
+    font-size: 14px;
+  }
+
+  .btn-text {
+    font-size: 12px;
+  }
 }
 
 .topbar-right {
+  flex: 0 0 auto;
   display: flex;
   gap: 10px;
-  flex: 0 0 auto;
-  padding-top: 2px;
   margin-left: auto;
+  padding-top: 2px;
 }
 
 .topbar-btn {
-  border: 1px solid rgba(0, 122, 255, 0.35);
-  background: rgba(0, 122, 255, 0.85);
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
   padding: 8px 12px;
+  background: rgba(0, 122, 255, 0.85);
+  border: 1px solid rgba(0, 122, 255, 0.35);
   border-radius: 12px;
-  cursor: pointer;
   box-shadow: 0 10px 26px rgba(0, 122, 255, 0.18);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &.ghost {
+    background: rgba(255, 255, 255, 0.42);
+    border-color: rgba(160, 160, 160, 0.26);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
+    color: rgba(20, 20, 20, 0.82);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
 }
 
-.topbar-btn.ghost {
-  background: rgba(255, 255, 255, 0.42);
-  color: rgba(20, 20, 20, 0.82);
-  border: 1px solid rgba(160, 160, 160, 0.26);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
-}
-
-.topbar-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-/* ===== Stage（lvl1 在流式；lvl2/lvl3 fixed 浮层） ===== */
+/* 分区级联区域 */
 .partition-stage {
-  padding: 12px;
   display: flex;
+  padding: 12px;
 }
 
-/* ===== 三级容器：仍保留你的玻璃风格 ===== */
 .partition-popup {
+  z-index: 20020;
   min-width: 80px;
   max-width: 140px;
-
-  background: rgba(255, 255, 255, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.30);
-  border-radius: 12px;
-
-  padding: 8px;
   display: flex;
   flex-direction: column;
+  padding: 8px;
+
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
   user-select: none;
 
-  z-index: 20020; /* ✅ 确保在 overlay 内但不被 topbar 压住（topbar 更高） */
-}
-
-/* ✅ 兜底：lvl2/lvl3 固定定位（真正跟随靠 :style 写 top/left） */
-.partition-popup.partition-lvl2,
-.partition-popup.partition-lvl3 {
-  position: fixed;
-  max-height: 240px;
-  overflow-y: auto;
+  &.partition-lvl2,
+  &.partition-lvl3 {
+    position: fixed;
+    max-height: 240px;
+    overflow-y: auto;
+  }
 }
 
 .partition-line {
@@ -1182,107 +1192,99 @@ defineExpose({ togglePopup, openPopup, closePopup })
   padding: 3px 6px;
   border-radius: 999px;
   cursor: default;
-  transition: background 0.2s, box-shadow 0.2s;
-}
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
 
-.partition-line:hover {
-  background: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.55) inset;
-}
+  &:hover {
+    background: rgba(255, 255, 255, 0.28);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.55) inset;
+  }
 
-.partition-line.active {
-  background: rgba(180, 223, 244, 0.72);
-  box-shadow: 0 0 8px rgba(0, 122, 255, 0.28);
+  &.active {
+    background: rgba(180, 223, 244, 0.72);
+    box-shadow: 0 0 8px rgba(0, 122, 255, 0.28);
+  }
 }
 
 .partition-item {
   flex: 1 1 auto;
-  white-space: nowrap;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
-  cursor: pointer;
   font-size: 15px;
-}
+  cursor: pointer;
 
-@media (max-aspect-ratio: 1/1)  {
-  .partition-item {
-    font-size: 18px;
+  &.chosen {
+    color: rgba(0, 60, 140, 0.92);
+    font-weight: 800;
   }
-}
-
-.partition-item.chosen {
-  font-weight: 800;
-  color: rgba(0, 60, 140, 0.92);
 }
 
 .partition-arrow {
   flex: 0 0 auto;
-  font-size: 13px;
-  color: rgba(0, 0, 139, 0.85);
-  font-weight: 700;
-  opacity: 0.85;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 0 6px;
+
   border-radius: 10px;
+  color: rgba(0, 0, 139, 0.85);
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0.85;
   cursor: pointer;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+    opacity: 1;
+  }
 }
 
-.partition-arrow:hover {
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.05);
-}
-
-/* Custom Region Trigger */
+/* 旧入口保留，但当前隐藏 */
 .custom-region-trigger {
-  display: none;  /* Hide old button - moved to topbar-row-2 */
+  display: none;
 }
 
-/* Custom Region Popup */
+/* 自定义分区弹窗 */
 .custom-region-content {
   padding: 0;
   overflow: visible;
 }
 
 .loading {
-  display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   padding: 40px 20px;
   color: #666;
+
+  @include flex-center;
 }
-
-
 
 .empty-custom-regions {
-  text-align: center;
   padding: 40px 20px;
-}
+  text-align: center;
 
-.empty-custom-regions p {
-  color: #666;
-  margin-bottom: 20px;
+  p {
+    margin-bottom: 20px;
+    color: #666;
+  }
 }
 
 .btn-create {
   padding: 10px 24px;
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  color: white;
+  background: linear-gradient(135deg, $primary, $primary-dark);
   border: none;
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  color: #fff;
   font-size: 14px;
   font-weight: 500;
-}
+  cursor: pointer;
+  transition: all 0.3s ease;
 
-.btn-create:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    transform: translateY(-2px);
+  }
 }
 
 .region-list {
@@ -1298,53 +1300,51 @@ defineExpose({ togglePopup, openPopup, closePopup })
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-}
 
-.region-item:hover {
-  background: rgba(0, 122, 255, 0.05);
-  border-color: rgba(0, 122, 255, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+  &:hover {
+    background: rgba(0, 122, 255, 0.05);
+    border-color: rgba(0, 122, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+    transform: translateY(-2px);
+  }
 }
 
 .region-name {
+  margin-bottom: 6px;
+  color: #2c3e50;
   font-size: 16px;
   font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 6px;
 }
 
 .region-info {
-  font-size: 13px;
   color: #666;
+  font-size: 13px;
 }
 
 .region-desc {
   color: #999;
 }
 
-.custom-region-footer {
-  margin-top: 16px;
-  padding: 16px 0 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: center;
-}
-
 .btn-manage {
   padding: 10px 24px;
   background: rgba(255, 255, 255, 0.9);
-  color: #007aff;
   border: 1px solid rgba(0, 122, 255, 0.3);
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  color: $primary;
   font-size: 14px;
   font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(0, 122, 255, 0.1);
+  }
 }
 
-.btn-manage:hover {
-  background: rgba(0, 122, 255, 0.1);
+/* 竖屏 */
+@media (max-aspect-ratio: $portrait-ratio) {
+  .partition-item {
+    font-size: 18px;
+  }
 }
-
 </style>

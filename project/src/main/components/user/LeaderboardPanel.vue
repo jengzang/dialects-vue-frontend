@@ -618,7 +618,40 @@ const tableData = computed(() => {
   </div>
 </template>
 
-<style scoped>
+```scss
+<style scoped lang="scss">
+$primary: #007aff;
+$primary-dark: #0051d5;
+$text-primary: #1d1d1f;
+$text-secondary: #86868b;
+$danger: #ff3b30;
+
+$gold: #ffd700;
+$gold-text: #d4af37;
+$silver: #c0c0c0;
+$bronze: #cd7f32;
+
+@mixin glass($blur: 40px, $saturate: 180%) {
+  backdrop-filter: blur($blur) saturate($saturate);
+  -webkit-backdrop-filter: blur($blur) saturate($saturate);
+}
+
+@mixin gradient-text($from, $to) {
+  color: $from;
+  background: linear-gradient(135deg, $from, $to);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@mixin rank-row-background($from, $to) {
+  background: linear-gradient(
+    90deg,
+    rgba($from, 0.15),
+    rgba($to, 0.08)
+  );
+}
+
 .leaderboard-container {
   max-width: 1000px;
   margin: 0 auto;
@@ -627,31 +660,31 @@ const tableData = computed(() => {
 
 .loading-container,
 .error-container {
-  text-align: center;
   padding: 40px 20px;
+  text-align: center;
 }
 
-
-
-.error-container .err {
-  color: #ff3b30;
-  margin-bottom: 20px;
+.error-container {
+  .err {
+    margin-bottom: 20px;
+    color: $danger;
+  }
 }
 
 .retry-btn {
   padding: 10px 24px;
-  background: #007aff;
+  background: $primary;
   color: white;
   border: none;
   border-radius: 12px;
   cursor: pointer;
   font-size: 16px;
   transition: all 0.3s ease;
-}
 
-.retry-btn:hover {
-  background: #0051d5;
-  transform: translateY(-2px);
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
 }
 
 .leaderboard-content {
@@ -671,16 +704,13 @@ const tableData = computed(() => {
 }
 
 .page-title {
+  margin: 12px;
   font-size: 28px;
   font-weight: 700;
-  color: #007aff;
-  margin: 12px;
   text-align: center;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+
+  @include gradient-text($primary, $primary-dark);
 }
 
 .top-metrics-cards {
@@ -690,134 +720,137 @@ const tableData = computed(() => {
   margin-bottom: 32px;
 }
 
-.metric-card {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 8px 32px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
-  border: 0.5px solid rgba(255, 255, 255, 0.8);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+.metric {
+  &-card {
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.72);
+    @include glass;
+    border: 0.5px solid rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      0 8px 32px rgba(0, 0, 0, 0.08),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-.metric-card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.06),
-    0 12px 40px rgba(0, 0, 0, 0.12);
-}
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.06),
+        0 12px 40px rgba(0, 0, 0, 0.12);
+    }
 
-.metric-card.first-place {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.08));
-  border-left: 4px solid #ffd700;
-}
+    &.first-place {
+      background: linear-gradient(
+        135deg,
+        rgba(255, 215, 0, 0.15),
+        rgba(255, 215, 0, 0.08)
+      );
+      border-left: 4px solid $gold;
+    }
 
-.metric-card.second-place {
-  background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(224, 224, 224, 0.08));
-  border-left: 4px solid #c0c0c0;
-}
+    &.second-place {
+      background: linear-gradient(
+        135deg,
+        rgba(192, 192, 192, 0.15),
+        rgba(224, 224, 224, 0.08)
+      );
+      border-left: 4px solid $silver;
+    }
 
-.metric-card.third-place {
-  background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(255, 160, 122, 0.08));
-  border-left: 4px solid #cd7f32;
-}
+    &.third-place {
+      background: linear-gradient(
+        135deg,
+        rgba(205, 127, 50, 0.15),
+        rgba(255, 160, 122, 0.08)
+      );
+      border-left: 4px solid $bronze;
+    }
+  }
 
-.metric-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
+  &-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
 
-.metric-icon {
-  font-size: 24px;
-}
+  &-icon {
+    font-size: 24px;
+  }
 
-.metric-label {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1d1d1f;
-  letter-spacing: -0.01em;
-}
+  &-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-primary;
+    letter-spacing: -0.01em;
+  }
 
-.metric-rank {
-  font-size: 36px;
-  font-weight: 700;
-  color: #007aff;
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+  &-rank {
+    font-size: 36px;
+    font-weight: 700;
 
-.metric-rank.gold {
-  color: #d4af37;
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+    @include gradient-text($primary, $primary-dark);
 
-.metric-rank.silver {
-  color: #a0a0a0;
-  background: linear-gradient(135deg, #c0c0c0, #e0e0e0);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
-}
+    &.gold {
+      @include gradient-text($gold, #ffed4e);
+    }
 
-.metric-rank.bronze {
-  color: #a0522d;
-  background: linear-gradient(135deg, #cd7f32, #ffab73);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+    &.silver {
+      @include gradient-text($silver, #e0e0e0);
 
-.metric-value {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1d1d1f;
-}
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+    }
 
-.metric-details {
-  font-size: 14px;
-  color: #86868b;
-  line-height: 1.6;
-}
+    &.bronze {
+      @include gradient-text($bronze, #ffab73);
+    }
+  }
 
-.metric-gap {
-  color: #ff9500;
-  font-weight: 500;
-}
+  &-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: $text-primary;
+  }
 
-.metric-first {
-  color: #86868b;
+  &-details {
+    font-size: 14px;
+    line-height: 1.6;
+    color: $text-secondary;
+  }
+
+  &-gap {
+    font-weight: 500;
+    color: #ff9500;
+  }
+
+  &-first {
+    color: $text-secondary;
+  }
+
+  &-name {
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
 }
 
 .table-wrapper {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-radius: 20px;
   padding: 20px;
+  background: rgba(255, 255, 255, 0.72);
+  @include glass;
+  border: 0.5px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 8px 32px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px rgba(255, 255, 255, 0.9);
-  border: 0.5px solid rgba(255, 255, 255, 0.8);
 }
 
 .table-container {
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(20px);
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
 }
 
@@ -825,26 +858,26 @@ const tableData = computed(() => {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-}
 
-.rankings-table thead {
-  position: sticky;
-  top: 0;
-  background: rgba(247, 247, 247, 0.95);
-  backdrop-filter: blur(20px) saturate(180%);
-  z-index: 10;
-}
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(247, 247, 247, 0.95);
+    @include glass(20px);
+  }
 
-.rankings-table th {
-  padding: 14px 12px;
-  text-align: left;
-  font-weight: 600;
-  font-size: 14px;
-  white-space: nowrap;
-  color: #86868b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  th {
+    padding: 14px 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    white-space: nowrap;
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: $text-secondary;
+  }
 }
 
 .col-gap,
@@ -853,59 +886,93 @@ const tableData = computed(() => {
   font-size: 12px !important;
 }
 
-.category-column {
-  width: 100px;
-}
+.category {
+  &-column {
+    width: 100px;
+  }
 
-.category-cell {
-  font-weight: 600;
-  font-size: 14px;
-  color: #007aff;
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.12), rgba(0, 122, 255, 0.06));
-  border-right: 2px solid rgba(0, 122, 255, 0.3);
-  vertical-align: middle;
-  text-align: center;
-  letter-spacing: -0.01em;
-  padding: 12px 8px;
-}
+  &-cell {
+    padding: 12px 8px;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 122, 255, 0.12),
+      rgba(0, 122, 255, 0.06)
+    );
+    border-right: 2px solid rgba(0, 122, 255, 0.3);
+    vertical-align: middle;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: $primary;
 
-.category-cell.gold {
-  color: #b8860b;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.18), rgba(255, 215, 0, 0.08));
-  border-right: 2px solid rgba(255, 215, 0, 0.4);
-}
+    &.gold {
+      background: linear-gradient(
+        135deg,
+        rgba(255, 215, 0, 0.18),
+        rgba(255, 215, 0, 0.08)
+      );
+      border-right-color: rgba(255, 215, 0, 0.4);
+      color: #b8860b;
+    }
 
-.category-cell.silver {
-  color: #5a6c6e;
-  background: linear-gradient(135deg, rgba(192, 192, 192, 0.18), rgba(192, 192, 192, 0.08));
-  border-right: 2px solid rgba(192, 192, 192, 0.4);
-}
+    &.silver {
+      background: linear-gradient(
+        135deg,
+        rgba(192, 192, 192, 0.18),
+        rgba(192, 192, 192, 0.08)
+      );
+      border-right-color: rgba(192, 192, 192, 0.4);
+      color: #5a6c6e;
+    }
 
-.category-cell.bronze {
-  color: #8b5a2b;
-  background: linear-gradient(135deg, rgba(205, 127, 50, 0.18), rgba(205, 127, 50, 0.08));
-  border-right: 2px solid rgba(205, 127, 50, 0.4);
-}
+    &.bronze {
+      background: linear-gradient(
+        135deg,
+        rgba(205, 127, 50, 0.18),
+        rgba(205, 127, 50, 0.08)
+      );
+      border-right-color: rgba(205, 127, 50, 0.4);
+      color: #8b5a2b;
+    }
+  }
 
-.category-data {
-  background: linear-gradient(90deg, rgba(0, 122, 255, 0.06), rgba(0, 122, 255, 0.03));
-  font-weight: 600;
-  border-right: 1px solid rgba(0, 122, 255, 0.15);
-}
+  &-data {
+    background: linear-gradient(
+      90deg,
+      rgba(0, 122, 255, 0.06),
+      rgba(0, 122, 255, 0.03)
+    );
+    border-right: 1px solid rgba(0, 122, 255, 0.15);
+    font-weight: 600;
 
-.category-data.category-gold {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.12), rgba(255, 215, 0, 0.05));
-  border-right: 1px solid rgba(255, 215, 0, 0.3);
-}
+    &.category-gold {
+      background: linear-gradient(
+        90deg,
+        rgba(255, 215, 0, 0.12),
+        rgba(255, 215, 0, 0.05)
+      );
+      border-right-color: rgba(255, 215, 0, 0.3);
+    }
 
-.category-data.category-silver {
-  background: linear-gradient(90deg, rgba(192, 192, 192, 0.12), rgba(192, 192, 192, 0.05));
-  border-right: 1px solid rgba(192, 192, 192, 0.3);
-}
+    &.category-silver {
+      background: linear-gradient(
+        90deg,
+        rgba(192, 192, 192, 0.12),
+        rgba(192, 192, 192, 0.05)
+      );
+      border-right-color: rgba(192, 192, 192, 0.3);
+    }
 
-.category-data.category-bronze {
-  background: linear-gradient(90deg, rgba(205, 127, 50, 0.12), rgba(205, 127, 50, 0.05));
-  border-right: 1px solid rgba(205, 127, 50, 0.3);
+    &.category-bronze {
+      background: linear-gradient(
+        90deg,
+        rgba(205, 127, 50, 0.12),
+        rgba(205, 127, 50, 0.05)
+      );
+      border-right-color: rgba(205, 127, 50, 0.3);
+    }
+  }
 }
 
 .desktop-table {
@@ -917,178 +984,238 @@ const tableData = computed(() => {
 }
 
 .data-row {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-}
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-.data-row.category-summary {
-  background: linear-gradient(90deg, rgba(0, 122, 255, 0.08), rgba(0, 122, 255, 0.04));
-  font-weight: 600;
-}
+  &:hover {
+    background: transparent;
+  }
 
-.data-row.category-summary .metric-name {
-  color: #007aff;
-  font-weight: 600;
-}
+  td {
+    padding: 12px;
+    font-size: 15px;
+    color: $text-primary;
 
-.data-row:hover {
-  background: transparent;
-}
+    &.first-place {
+      background: linear-gradient(
+        90deg,
+        rgba(255, 215, 0, 0.15),
+        rgba(255, 215, 0, 0.08)
+      );
+    }
 
-.data-row.category-summary:hover {
-  background: linear-gradient(90deg, rgba(0, 122, 255, 0.12), rgba(0, 122, 255, 0.06));
-}
+    &.second-place {
+      background: linear-gradient(
+        90deg,
+        rgba(192, 192, 192, 0.15),
+        rgba(224, 224, 224, 0.08)
+      );
+    }
 
-/* Rank-specific cell backgrounds — applied to right-side cells only, not merged cells */
-.data-row td.first-place {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.08));
-}
+    &.third-place {
+      background: linear-gradient(
+        90deg,
+        rgba(205, 127, 50, 0.15),
+        rgba(255, 160, 122, 0.08)
+      );
+    }
 
-.data-row td.second-place {
-  background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), rgba(224, 224, 224, 0.08));
-}
+    &.metric-name {
+      &.first-place {
+        border-left: 3px solid $gold;
+      }
 
-.data-row td.third-place {
-  background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), rgba(255, 160, 122, 0.08));
-}
+      &.second-place {
+        border-left: 3px solid $silver;
+      }
 
-.data-row td.metric-name.first-place {
-  border-left: 3px solid #ffd700;
-}
+      &.third-place {
+        border-left: 3px solid $bronze;
+      }
+    }
+  }
 
-.data-row td.metric-name.second-place {
-  border-left: 3px solid #c0c0c0;
-}
+  &.first-place {
+    td {
+      background: linear-gradient(
+        90deg,
+        rgba(255, 215, 0, 0.15),
+        rgba(255, 215, 0, 0.08)
+      );
+    }
 
-.data-row td.metric-name.third-place {
-  border-left: 3px solid #cd7f32;
-}
+    .metric-name {
+      border-left: 3px solid $gold;
+    }
+  }
 
-/* Mobile table: rank classes are on <tr> instead of <td> */
-.data-row.first-place td {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.08));
-}
-.data-row.first-place .metric-name {
-  border-left: 3px solid #ffd700;
-}
-.data-row.second-place td {
-  background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), rgba(224, 224, 224, 0.08));
-}
-.data-row.second-place .metric-name {
-  border-left: 3px solid #c0c0c0;
-}
-.data-row.third-place td {
-  background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), rgba(255, 160, 122, 0.08));
-}
-.data-row.third-place .metric-name {
-  border-left: 3px solid #cd7f32;
-}
+  &.second-place {
+    td {
+      background: linear-gradient(
+        90deg,
+        rgba(192, 192, 192, 0.15),
+        rgba(224, 224, 224, 0.08)
+      );
+    }
 
-/* Mobile table: category summary rank colors */
-.data-row.category-summary.first-place {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.18), rgba(255, 215, 0, 0.08));
-}
-.data-row.category-summary.first-place .metric-name {
-  color: #b8860b;
-}
-.data-row.category-summary.second-place {
-  background: linear-gradient(90deg, rgba(192, 192, 192, 0.18), rgba(192, 192, 192, 0.08));
-}
-.data-row.category-summary.second-place .metric-name {
-  color: #5a6c6e;
-}
-.data-row.category-summary.third-place {
-  background: linear-gradient(90deg, rgba(205, 127, 50, 0.18), rgba(205, 127, 50, 0.08));
-}
-.data-row.category-summary.third-place .metric-name {
-  color: #8b5a2b;
-}
+    .metric-name {
+      border-left: 3px solid $silver;
+    }
+  }
 
-.data-row td {
-  padding: 12px;
-  font-size: 15px;
-  color: #1d1d1f;
-}
+  &.third-place {
+    td {
+      background: linear-gradient(
+        90deg,
+        rgba(205, 127, 50, 0.15),
+        rgba(255, 160, 122, 0.08)
+      );
+    }
 
-.metric-name {
-  font-weight: 500;
-  letter-spacing: -0.01em;
+    .metric-name {
+      border-left: 3px solid $bronze;
+    }
+  }
+
+  &.category-summary {
+    background: linear-gradient(
+      90deg,
+      rgba(0, 122, 255, 0.08),
+      rgba(0, 122, 255, 0.04)
+    );
+    font-weight: 600;
+
+    .metric-name {
+      font-weight: 600;
+      color: $primary;
+    }
+
+    &:hover {
+      background: linear-gradient(
+        90deg,
+        rgba(0, 122, 255, 0.12),
+        rgba(0, 122, 255, 0.06)
+      );
+    }
+
+    &.first-place {
+      background: linear-gradient(
+        90deg,
+        rgba(255, 215, 0, 0.18),
+        rgba(255, 215, 0, 0.08)
+      );
+
+      .metric-name {
+        color: #b8860b;
+      }
+    }
+
+    &.second-place {
+      background: linear-gradient(
+        90deg,
+        rgba(192, 192, 192, 0.18),
+        rgba(192, 192, 192, 0.08)
+      );
+
+      .metric-name {
+        color: #5a6c6e;
+      }
+    }
+
+    &.third-place {
+      background: linear-gradient(
+        90deg,
+        rgba(205, 127, 50, 0.18),
+        rgba(205, 127, 50, 0.08)
+      );
+
+      .metric-name {
+        color: #8b5a2b;
+      }
+    }
+  }
 }
 
 .rank-badge {
   display: inline-block;
   padding: 4px 10px;
-  border-radius: 6px;
   background: rgba(0, 122, 255, 0.1);
-  color: #007aff;
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: -0.01em;
+  border-radius: 6px;
   white-space: nowrap;
-}
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: $primary;
 
-.rank-badge.gold {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.15));
-  color: #d4af37;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
-}
+  &.gold {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 215, 0, 0.2),
+      rgba(255, 215, 0, 0.15)
+    );
+    color: $gold-text;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  }
 
-.rank-badge.silver {
-  background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(220, 220, 220, 0.15));
-  color: #7f8c8d;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
-}
+  &.silver {
+    background: linear-gradient(
+      135deg,
+      rgba(192, 192, 192, 0.2),
+      rgba(220, 220, 220, 0.15)
+    );
+    color: #7f8c8d;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
+  }
 
-.rank-badge.bronze {
-  background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(255, 160, 122, 0.15));
-  color: #a0522d;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
+  &.bronze {
+    background: linear-gradient(
+      135deg,
+      rgba(205, 127, 50, 0.2),
+      rgba(255, 160, 122, 0.15)
+    );
+    color: #a0522d;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
+  }
 }
 
 .value {
   font-weight: 600;
-  color: #007aff;
+  color: $primary;
 }
 
-.gap {
-  padding: 6px 8px !important;
-  font-size: 13px !important;
-  color: #aaa;
-  font-weight: 400;
-}
-
+.gap,
 .first-place-value {
   padding: 6px 8px !important;
   font-size: 13px !important;
-  color: #aaa;
   font-weight: 400;
+  color: #aaa;
 }
 
 .total-users {
-  text-align: center;
-  color: #86868b;
-  font-size: 14px;
   margin-top: 20px;
   padding-top: 16px;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: center;
+  font-size: 14px;
+  color: $text-secondary;
 }
 
 @media (orientation: portrait) {
   .leaderboard-container {
-    padding: 16px 12px;
     width: 100%;
+    padding: 16px 12px;
     box-sizing: border-box;
     overflow-x: clip;
   }
 
   .leaderboard-content {
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
   }
 
   .desktop-table {
@@ -1104,49 +1231,55 @@ const tableData = computed(() => {
   }
 
   .top-metrics-cards {
-    display: flex;
     width: 100%;
+    display: flex;
     justify-content: center;
     gap: 16px;
     margin-bottom: 24px;
     overflow-x: auto;
   }
 
-  .metric-card {
-    min-width: 100px;
-    flex-shrink: 0;
-    padding: 16px;
-    max-width: 48dvw;
-  }
+  .metric {
+    &-card {
+      min-width: 100px;
+      max-width: 48dvw;
+      flex-shrink: 0;
+      padding: 16px;
+    }
 
-  .metric-header {
-    margin-bottom: 12px;
-  }
+    &-header {
+      margin-bottom: 12px;
+    }
 
-  .metric-icon {
-    font-size: 20px;
-  }
+    &-icon {
+      font-size: 20px;
+    }
 
-  .metric-label {
-    font-size: 15px;
-  }
+    &-label {
+      font-size: 15px;
+    }
 
-  .metric-rank {
-    font-size: 28px;
-  }
+    &-rank {
+      font-size: 28px;
+    }
 
-  .metric-value {
-    font-size: 20px;
-  }
+    &-value {
+      font-size: 20px;
+    }
 
-  .metric-details {
-    font-size: 12px;
+    &-details {
+      font-size: 12px;
+    }
+
+    &-name {
+      font-size: 13px;
+    }
   }
 
   .table-wrapper {
     width: 98dvw;
-    align-self: stretch;
     min-width: 0;
+    align-self: stretch;
     padding: 12px 0;
     box-sizing: border-box;
     overflow: hidden;
@@ -1154,42 +1287,40 @@ const tableData = computed(() => {
 
   .table-container {
     width: 100%;
-    overflow-x: auto;
     padding: 0 12px;
     box-sizing: border-box;
+    overflow-x: auto;
     border-radius: 0;
     box-shadow: none;
   }
 
   .rankings-table {
     min-width: 100px;
-  }
 
-  .rankings-table th {
-    padding: 10px 6px;
-    font-size: 11px;
+    th {
+      padding: 10px 6px;
+      font-size: 11px;
+    }
   }
 
   .col-gap,
   .col-first-place {
-    padding: 4px 4px !important;
+    padding: 4px !important;
     font-size: 10px !important;
   }
 
-  .data-row td {
-    padding: 10px 6px;
-    font-size: 14px;
-    white-space: nowrap;
-  }
+  .data-row {
+    td {
+      padding: 10px 6px;
+      white-space: nowrap;
+      font-size: 14px;
 
-  .data-row td.gap,
-  .data-row td.first-place-value {
-    padding: 4px 4px !important;
-    font-size: 12px !important;
-  }
-
-  .metric-name {
-    font-size: 13px;
+      &.gap,
+      &.first-place-value {
+        padding: 4px !important;
+        font-size: 12px !important;
+      }
+    }
   }
 
   .rank-badge {
@@ -1198,9 +1329,10 @@ const tableData = computed(() => {
   }
 
   .total-users {
-    font-size: 12px;
     margin-top: 16px;
     padding-top: 12px;
+    font-size: 12px;
   }
 }
 </style>
+```

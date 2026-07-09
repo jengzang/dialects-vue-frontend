@@ -553,21 +553,50 @@ function resolveTabRoute(tabName) {
 }
 </script>
 
+```scss
 <style lang="scss" scoped>
+$primary: #007aff;
+$zhihu-blue: #0066ff;
+$github-dark: #24292f;
+$danger: #c52f27;
+
+$text-primary: #333;
+$text-heading: #1a1a1a;
+$text-secondary: #555;
+$text-muted: #666;
+$text-light: #999;
+
+$ease-standard: 0.3s ease;
+
+@mixin glass-blur($amount: 6px) {
+  backdrop-filter: blur($amount);
+  -webkit-backdrop-filter: blur($amount);
+}
+
+@mixin glass-card(
+  $background: rgba(255, 255, 255, 0.4),
+  $border: rgba(255, 255, 255, 0.42)
+) {
+  background: $background;
+  border: 1px solid $border;
+
+  @include glass-blur;
+}
+
 .tabs-title {
+  width: 100%;
+  margin-top: 3rem !important;
+  margin-bottom: 0.5rem !important;
   font-size: 1.8rem;
   font-weight: bold;
-  margin-top: 3rem!important;
-  margin-bottom: 0.5rem!important;
-  width: 100%;
-  // color: #007aff;
 }
+
 .about-page-wrapper {
   width: 100%;
   height: 100%;
 }
 
-/* === 內容區塊 === */
+/* 教程开关 */
 .tutorial-toggle-section {
   display: flex;
   align-items: center;
@@ -590,15 +619,15 @@ function resolveTabRoute(tabName) {
     font-weight: 700;
 
     &.is-on {
-      background: #007aff;
+      background: $primary;
       color: #fff;
     }
   }
 
   :deep(.switch-toggle__label--inside) {
+    white-space: nowrap;
     color: inherit;
     font-weight: 700;
-    white-space: nowrap;
   }
 
   :deep(.switch-toggle__thumb) {
@@ -606,41 +635,32 @@ function resolveTabRoute(tabName) {
   }
 }
 
+/* 建议页面 */
 .page2 {
+  max-width: 500px;
   display: flex;
   justify-content: center;
-  max-width: 500px;
   margin: 0 auto;
   padding: 1dvw 8dvw;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
   font-size: 18px;
+
+  @include glass-blur(8px);
 }
 
-@keyframes fade {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* 通用正文 */
 p {
   margin-bottom: 20px;
-  color: #333;
-  font-family: 'Arial', sans-serif;
+  color: $text-primary;
+  font-family: Arial, sans-serif;
   font-size: 16px;
   line-height: 1.6;
 
   a {
-    color: #007aff;
+    color: $primary;
     text-decoration: none;
 
     &:hover {
@@ -650,8 +670,8 @@ p {
 
   strong {
     padding: 2px 6px;
-    border-radius: 4px;
     background-color: rgba(0, 122, 255, 0.1);
+    border-radius: 4px;
   }
 
   em.emoji {
@@ -665,7 +685,7 @@ p {
 }
 
 strong {
-  color: #007aff;
+  color: $primary;
   font-weight: bold;
 }
 
@@ -673,6 +693,7 @@ em {
   font-style: italic;
 }
 
+/* 简介与鸣谢 */
 .thanks-list {
   li {
     margin-bottom: 0.5rem;
@@ -682,7 +703,7 @@ em {
 .customlist {
   margin-left: 20px;
   padding-left: 20px;
-  color: #333;
+  color: $text-primary;
   font-size: 16px;
   list-style-type: none;
 
@@ -700,7 +721,7 @@ em {
     text-align: left;
 
     a {
-      color: #007aff;
+      color: $primary;
       text-decoration: none;
 
       &:hover {
@@ -718,21 +739,21 @@ em {
 
 .feature-heading {
   margin: 0 0 4px;
-  color: #1a1a1a;
+  color: $text-heading;
   font-size: 18px;
   font-weight: 700;
 }
 
 .feature-subtitle {
   margin: 0 0 6px;
-  color: #007aff;
+  color: $primary;
   font-size: 14px;
   font-weight: 500;
 }
 
 .feature-intro {
   margin: 0 0 12px;
-  color: #555;
+  color: $text-secondary;
   font-size: 15px;
   line-height: 1.6;
 }
@@ -740,7 +761,7 @@ em {
 .zhihu-article-link {
   display: inline-block;
   margin-top: 8px;
-  color: #0066FF;
+  color: $zhihu-blue;
   font-size: 14px;
   text-decoration: none;
 
@@ -767,25 +788,25 @@ em {
 
 .subfeature-body {
   margin: 0;
-  color: #555;
+  color: $text-secondary;
   font-size: 14px;
   line-height: 1.65;
 }
 
+/* 感悟 */
 .thoughts {
-  p {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    border-radius: 8px;
-    color: #333;
-    font-family: 'Georgia', serif;
-    font-size: 18px;
-    line-height: 1.8;
-    text-align: left;
-    text-indent: 2em;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background: transparent;
+  border-radius: 8px;
+  color: $text-primary;
+  font-family: Georgia, serif;
+  font-size: 18px;
+  line-height: 1.8;
+  text-align: left;
+  text-indent: 2em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   em {
     color: #000;
@@ -799,54 +820,54 @@ em {
   max-width: 800px;
 }
 
+/* 项目卡片 */
 .cards-container {
+  max-width: 1000px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  max-width: 1000px;
   gap: 1rem;
   text-align: center;
 }
 
 .project-card {
   position: relative;
-  display: block;
   flex: 1 1 280px;
-  box-sizing: border-box;
+  display: block;
   width: 100%;
   max-width: 300px;
   margin: 0 auto;
   padding: 1.1rem;
+  box-sizing: border-box;
+
+  @include glass-card;
+
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow: 0 2px 10px rgba(0, 122, 255, 0.08);
   color: inherit;
   text-decoration: none;
-  box-shadow: 0 2px 10px rgba(0, 122, 255, 0.08);
   transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+    transform $ease-standard,
+    box-shadow $ease-standard;
 
   &:hover {
-    transform: translateY(-6px) scale(1.01);
     background: rgba(255, 255, 255, 0.8);
     box-shadow: 0 4px 16px rgba(0, 122, 255, 0.15);
+    transform: translateY(-6px) scale(1.01);
   }
 
   p {
     margin: 0.5rem 0.5rem 0.2rem;
+    overflow: hidden;
     color: #444;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-size: 1rem;
     line-height: 1.6;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .desc-sub {
-    color: #999;
+    color: $text-light;
     font-size: 0.85em;
   }
 }
@@ -867,13 +888,14 @@ em {
   margin-right: 0.5rem;
 }
 
+/* 关注与支持按钮 */
 .like-author-title {
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  width: 100%;
 }
 
 .follow-buttons {
@@ -889,10 +911,6 @@ em {
   cursor: pointer;
 }
 
-.support-button {
-  color: #fff;
-}
-
 .follow-button {
   display: inline-flex;
   align-items: center;
@@ -901,17 +919,23 @@ em {
   font-size: 1.2rem;
   text-decoration: none;
   transition:
-    background-color 0.3s ease,
+    background-color $ease-standard,
     transform 0.2s ease;
+}
+
+.follow-logo {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
 }
 
 .zhihu-follow {
   background: rgba(0, 102, 255, 0.12);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  color: #0066FF;
   border: 1px solid rgba(0, 102, 255, 0.25);
   box-shadow: none;
+  color: $zhihu-blue;
+
+  @include glass-blur;
 
   &:hover {
     background: rgba(0, 102, 255, 0.22);
@@ -919,16 +943,10 @@ em {
   }
 }
 
-.follow-logo {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
 .github-follow {
-  background-color: #24292f;
-  color: #fff;
+  background-color: $github-dark;
   box-shadow: 0 2px 5px rgba(36, 41, 47, 0.3);
+  color: #fff;
 
   &:hover {
     background-color: #3a3f44;
@@ -939,9 +957,10 @@ em {
 .support-button {
   margin-top: 1rem;
   padding: 0.5rem 1.1rem;
-  background-color: #c52f27;
-  font-size: 1rem;
+  background-color: $danger;
   box-shadow: 0 2px 6px rgba(255, 59, 48, 0.35);
+  color: #fff;
+  font-size: 1rem;
   transition: all 0.2s ease;
 
   &:hover {
@@ -954,18 +973,25 @@ em {
   display: inline-block;
   max-width: 500px;
   margin-top: 0.5rem;
-  color: #555;
+  color: $text-secondary;
   font-size: 0.88rem;
   line-height: 1.5;
 }
 
+/* 建议入口 */
 .suggestion-box {
   max-width: 700px;
   margin: 0 auto;
-  color: #1f2937;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  text-align: center;
   justify-content: center;
+  color: #1f2937;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    sans-serif;
+  text-align: center;
 
   p {
     margin: 10px 0;
@@ -988,30 +1014,29 @@ em {
 
 .card {
   position: relative;
+  flex: 1 1 200px;
+  min-width: 180px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1 1 200px;
-  min-width: 180px;
   padding: 20px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.42);
+
+  @include glass-card;
+
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 6px 12px rgba(0, 122, 255, 0.1);
   color: #000;
   font-size: 18px;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  box-shadow: 0 6px 12px rgba(0, 122, 255, 0.1);
   transform: scale(1);
-  transition: all 0.3s ease;
+  transition: all $ease-standard;
 
   &:hover {
-    border-color: rgba(0, 122, 255, 0.35);
     background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 122, 255, 0.35);
     box-shadow: 0 10px 20px rgba(0, 122, 255, 0.2);
     transform: scale(1.02) translateY(-2px);
   }
@@ -1019,18 +1044,18 @@ em {
   span {
     margin-top: 10px;
     font-size: 15px;
-    transition: color 0.3s ease;
+    transition: color $ease-standard;
   }
 }
 
 .card-icon {
+  flex-shrink: 0;
   width: 28px;
   height: 28px;
   margin-bottom: 4px;
-  flex-shrink: 0;
 }
 
-/* === 设置页面样式 === */
+/* 设置页面 */
 .settings-container {
   max-width: 800px;
   margin: 0 auto;
@@ -1041,14 +1066,15 @@ em {
   margin-bottom: 24px;
   padding: 24px;
   border-radius: 16px;
-  backdrop-filter: blur(10px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  @include glass-blur(10px);
 }
 
 .setting-split {
   display: flex;
-  gap: 24px;
   align-items: flex-start;
+  gap: 24px;
 }
 
 .setting-split-item {
@@ -1057,23 +1083,23 @@ em {
 }
 
 .setting-split-divider {
-  border: none;
-  width: 1px;
-  background: rgba(0, 0, 0, 0.12);
   align-self: stretch;
+  width: 1px;
   margin: 0;
+  background: rgba(0, 0, 0, 0.12);
+  border: none;
 }
 
 .section-title {
   margin: 0 0 8px;
-  color: #333;
+  color: $text-primary;
   font-size: 20px;
   font-weight: 600;
 }
 
 .section-description {
   margin: 0 0 20px;
-  color: #666;
+  color: $text-muted;
   font-size: 14px;
 }
 
@@ -1090,18 +1116,13 @@ em {
   }
 }
 
-.language-radio-group {
-  :deep(.liquid-radio-text) {
-    font-size: 15px;
-  }
-}
-
 .interface-mode-radio-group {
   :deep(.liquid-radio-text) {
     font-size: 14px;
   }
 }
 
+/* 语言设置 */
 .language-options {
   display: flex;
   justify-content: center;
@@ -1113,33 +1134,28 @@ em {
   align-items: center;
   justify-content: center;
   padding: 16px;
+  background: rgba(255, 255, 255, 0.8);
   border: 2px solid #e0e0e0;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.8);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all $ease-standard;
 
   &:hover {
-    border-color: #007aff;
     background: #fff;
+    border-color: $primary;
     box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
     transform: translateY(-2px);
   }
 
   &.active {
-    border-color: #007aff;
     background: linear-gradient(
       135deg,
       rgba(0, 122, 255, 0.1),
       rgba(0, 122, 255, 0.05)
     );
+    border-color: $primary;
     box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
   }
-}
-
-.language-flag {
-  margin-right: 12px;
-  font-size: 32px;
 }
 
 .language-info {
@@ -1149,25 +1165,25 @@ em {
 
 .language-name {
   margin-bottom: 4px;
-  color: #333;
+  color: $text-primary;
   font-size: 16px;
   font-weight: 600;
 }
 
 .language-code {
-  color: #999;
+  color: $text-light;
   font-size: 12px;
 }
 
 .language-check {
   margin-left: 20px;
-  color: #007aff;
+  color: $primary;
   font-size: 24px;
   font-weight: bold;
 }
 
-/* === 竖屏 / 移动端：按宽高比判断 === */
-@media (max-aspect-ratio: 1/1) {
+/* 竖屏 */
+@media (max-aspect-ratio: 1 / 1) {
   .tutorial-toggle-section {
     align-items: flex-start;
     gap: 12px;
@@ -1235,12 +1251,10 @@ em {
   }
 
   .thoughts {
-    p {
-      margin: 24px auto;
-      padding: 14px;
-      font-size: 16px;
-      line-height: 1.65;
-    }
+    margin: 24px auto;
+    padding: 14px;
+    font-size: 16px;
+    line-height: 1.65;
   }
 
   .cards-container {
@@ -1254,9 +1268,9 @@ em {
 
     p {
       margin: 6px 4px 2px;
+      white-space: normal;
       font-size: 15px;
       line-height: 1.45;
-      white-space: normal;
     }
   }
 
@@ -1278,10 +1292,6 @@ em {
   .follow-button {
     padding: 6px 12px;
     font-size: 16px;
-  }
-
-  .zhihu-follow:hover {
-    background: rgba(0, 102, 255, 0.22);
   }
 
   .follow-logo {
@@ -1381,12 +1391,6 @@ em {
     }
   }
 
-  .language-radio-group {
-    :deep(.liquid-radio-text) {
-      font-size: 14px;
-    }
-  }
-
   .interface-mode-radio-group {
     :deep(.liquid-radio-text) {
       font-size: 13px;
@@ -1403,15 +1407,10 @@ em {
     border-width: 1.5px;
   }
 
-  .language-flag {
-    margin-right: 8px;
-    font-size: 26px;
-  }
-
   .language-info {
-    gap: 0px;
-    align-items: center;
     flex-direction: column;
+    align-items: center;
+    gap: 0;
   }
 
   .language-name {
@@ -1429,3 +1428,4 @@ em {
   }
 }
 </style>
+```
