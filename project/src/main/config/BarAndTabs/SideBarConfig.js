@@ -81,8 +81,8 @@ export function useSidebarConfig() {
             icon: '🏘️',
             path: withRouteLocale(route, '/menu/villages'),
             children: [
-                { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
                 { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: withRouteLocale(route, '/explore/villages/ml') },
+                { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
                 { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
                 { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/villages/yc') },
                 { label: t('navigation.submenu.villages.allVillages'), icon: '📋', path: withRouteLocale(route, '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }

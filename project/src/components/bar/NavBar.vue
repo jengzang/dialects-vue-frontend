@@ -111,7 +111,7 @@
           @mouseleave="!isMobile ? scheduleCloseSubmenu() : null"
         >
           <div
-            v-for="(child, index) in menuConfigData[activeSubmenu]?.children"
+            v-for="(child, index) in getFilteredChildren(menuConfigData[activeSubmenu]?.children)"
             :key="index"
             class="submenu-item main-sidebar-submenu-item"
             @click="handleSubmenuClick(child)"
@@ -298,6 +298,16 @@ const filteredMenuConfig = computed(() => {
 })
 
 const menuConfigData = computed(() => menuConfigRef.value)
+
+const getFilteredChildren = (children) => {
+  if (!children) return []
+  return children.filter((child) => {
+    if (typeof child.visibleWhen === 'function') {
+      return child.visibleWhen()
+    }
+    return true
+  })
+}
 
 // 访问统计相关
 const isStatsExpanded = ref(false);

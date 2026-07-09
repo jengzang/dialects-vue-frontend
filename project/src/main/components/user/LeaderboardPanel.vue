@@ -382,13 +382,13 @@ const tableData = computed(() => {
                 <th class="category-column">{{ t('user.leaderboard.columns.category') }}</th>
                 <th>{{ t('user.leaderboard.columns.rank') }}</th>
                 <th>{{ t('user.leaderboard.columns.count') }}</th>
-                <th>{{ t('user.leaderboard.columns.gap') }}</th>
-                <th>{{ t('user.leaderboard.columns.firstPlace') }}</th>
+                <th class="col-gap">{{ t('user.leaderboard.columns.gap') }}</th>
+                <th class="col-first-place">{{ t('user.leaderboard.columns.firstPlace') }}</th>
                 <th>{{ t('user.leaderboard.columns.metric') }}</th>
                 <th>{{ t('user.leaderboard.columns.rank') }}</th>
                 <th>{{ t('user.leaderboard.columns.count') }}</th>
-                <th>{{ t('user.leaderboard.columns.gap') }}</th>
-                <th>{{ t('user.leaderboard.columns.firstPlace') }}</th>
+                <th class="col-gap">{{ t('user.leaderboard.columns.gap') }}</th>
+                <th class="col-first-place">{{ t('user.leaderboard.columns.firstPlace') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -535,8 +535,8 @@ const tableData = computed(() => {
                 <th>{{ t('user.leaderboard.columns.metric') }}</th>
                 <th>{{ t('user.leaderboard.columns.rank') }}</th>
                 <th>{{ t('user.leaderboard.columns.count') }}</th>
-                <th>{{ t('user.leaderboard.columns.gap') }}</th>
-                <th>{{ t('user.leaderboard.columns.firstPlace') }}</th>
+                <th class="col-gap">{{ t('user.leaderboard.columns.gap') }}</th>
+                <th class="col-first-place">{{ t('user.leaderboard.columns.firstPlace') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -673,12 +673,13 @@ const tableData = computed(() => {
 .page-title {
   font-size: 28px;
   font-weight: 700;
-  color: #1d1d1f;
+  color: #007aff;
   margin: 12px;
   text-align: center;
   letter-spacing: -0.02em;
   background: linear-gradient(135deg, #007aff, #0051d5);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -749,25 +750,32 @@ const tableData = computed(() => {
   color: #007aff;
   background: linear-gradient(135deg, #007aff, #0051d5);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .metric-rank.gold {
+  color: #d4af37;
   background: linear-gradient(135deg, #ffd700, #ffed4e);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .metric-rank.silver {
+  color: #a0a0a0;
   background: linear-gradient(135deg, #c0c0c0, #e0e0e0);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
 }
 
 .metric-rank.bronze {
+  color: #a0522d;
   background: linear-gradient(135deg, #cd7f32, #ffab73);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -831,12 +839,18 @@ const tableData = computed(() => {
   padding: 14px 12px;
   text-align: left;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
   white-space: nowrap;
   color: #86868b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.col-gap,
+.col-first-place {
+  padding: 6px 8px !important;
+  font-size: 12px !important;
 }
 
 .category-column {
@@ -950,9 +964,49 @@ const tableData = computed(() => {
   border-left: 3px solid #cd7f32;
 }
 
+/* Mobile table: rank classes are on <tr> instead of <td> */
+.data-row.first-place td {
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.08));
+}
+.data-row.first-place .metric-name {
+  border-left: 3px solid #ffd700;
+}
+.data-row.second-place td {
+  background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), rgba(224, 224, 224, 0.08));
+}
+.data-row.second-place .metric-name {
+  border-left: 3px solid #c0c0c0;
+}
+.data-row.third-place td {
+  background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), rgba(255, 160, 122, 0.08));
+}
+.data-row.third-place .metric-name {
+  border-left: 3px solid #cd7f32;
+}
+
+/* Mobile table: category summary rank colors */
+.data-row.category-summary.first-place {
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.18), rgba(255, 215, 0, 0.08));
+}
+.data-row.category-summary.first-place .metric-name {
+  color: #b8860b;
+}
+.data-row.category-summary.second-place {
+  background: linear-gradient(90deg, rgba(192, 192, 192, 0.18), rgba(192, 192, 192, 0.08));
+}
+.data-row.category-summary.second-place .metric-name {
+  color: #5a6c6e;
+}
+.data-row.category-summary.third-place {
+  background: linear-gradient(90deg, rgba(205, 127, 50, 0.18), rgba(205, 127, 50, 0.08));
+}
+.data-row.category-summary.third-place .metric-name {
+  color: #8b5a2b;
+}
+
 .data-row td {
   padding: 12px;
-  font-size: 14px;
+  font-size: 15px;
   color: #1d1d1f;
 }
 
@@ -1000,13 +1054,17 @@ const tableData = computed(() => {
 }
 
 .gap {
-  color: #ff9500;
-  font-weight: 500;
+  padding: 6px 8px !important;
+  font-size: 13px !important;
+  color: #aaa;
+  font-weight: 400;
 }
 
 .first-place-value {
-  color: #86868b;
-  font-weight: 500;
+  padding: 6px 8px !important;
+  font-size: 13px !important;
+  color: #aaa;
+  font-weight: 400;
 }
 
 .total-users {
@@ -1023,7 +1081,7 @@ const tableData = computed(() => {
     padding: 16px 12px;
     width: 100%;
     box-sizing: border-box;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   .leaderboard-content {
@@ -1112,10 +1170,22 @@ const tableData = computed(() => {
     font-size: 11px;
   }
 
+  .col-gap,
+  .col-first-place {
+    padding: 4px 4px !important;
+    font-size: 10px !important;
+  }
+
   .data-row td {
     padding: 10px 6px;
-    font-size: 12px;
+    font-size: 14px;
     white-space: nowrap;
+  }
+
+  .data-row td.gap,
+  .data-row td.first-place-value {
+    padding: 4px 4px !important;
+    font-size: 12px !important;
   }
 
   .metric-name {

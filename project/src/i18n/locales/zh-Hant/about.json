@@ -281,11 +281,11 @@
     "projects": {
       "frontend": {
         "name": "dialects-vue-frontend",
-        "description": "前端倉庫 - 使用vue框架和原生js開發"
+        "description": "前端倉庫 - 基於 Vue3 + js + scss開發"
       },
       "backend": {
         "name": "dialects-backend",
-        "description": "後端倉庫 - 基於fastapi"
+        "description": "後端倉庫 - 基於FastAPI + Python + SQLAlchemy"
       },
       "build": {
         "name": "dialects-build",

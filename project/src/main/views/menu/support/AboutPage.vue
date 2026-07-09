@@ -120,9 +120,26 @@
         <div v-if="currentTab === 'like'" class="cards-container">
           <h2 class="tabs-title like-author-title">
             {{ $t('about.like.title') }}
-            <button class="follow-button" @click="followClicked">
-              {{ $t('about.like.followButton') }}
-            </button>
+            <span class="follow-buttons">
+              <button class="follow-button zhihu-follow" @click="followClicked">
+                <img
+                  class="follow-logo"
+                  src="https://static.zhihu.com/heifetz/favicon.ico"
+                  alt="Zhihu"
+                  @error="e => e.target.src = zhihuFallback"
+                />
+                {{ $t('about.like.followButton') }}
+              </button>
+              <a class="follow-button github-follow" href="https://github.com/jengzang" target="_blank" rel="noopener noreferrer">
+                <img
+                  class="follow-logo"
+                  src="https://github.githubassets.com/favicons/favicon-dark.svg"
+                  alt="GitHub"
+                  @error="e => e.target.src = githubFallback"
+                />
+                GitHub
+              </a>
+            </span>
           </h2>
           <p style="display: block; width: 100%; clear: both; margin: 0;">
             {{ $t('about.like.starMessage') }}
@@ -140,7 +157,7 @@
               <img class="github-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
               <span class="thanks-link" style="font-weight: bold">{{ project.name }}</span>
             </div>
-            <p>{{ project.description }}</p>
+            <p :title="project.description">{{ splitDesc(project.description)[0] }}<span class="desc-sub">{{ splitDesc(project.description)[1] }}</span></p>
             <div class="glow-border"></div>
           </a>
 
@@ -305,6 +322,9 @@ const route = useRoute()
 const router = useRouter()
 const showQRCodes = ref(false)
 
+const zhihuFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#0066FF"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="sans-serif">知</text></svg>')
+const githubFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#24292f"/><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.78.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z" fill="white"/></svg>')
+
 const featureList = computed(() => {
   const messages = i18n.global.messages.value[locale.value]
   return Array.from({ length: 9 }, (_, i) => {
@@ -369,6 +389,11 @@ const localizedProjects = computed(() => [
 
 function followClicked() {
   window.open('https://www.zhihu.com/people/da-shu-18-11', '_blank')
+}
+
+function splitDesc(text) {
+  const idx = text.indexOf(' - ')
+  return idx === -1 ? [text, ''] : [text.slice(0, idx), text.slice(idx)]
 }
 
 // 语言设置相关
@@ -554,17 +579,6 @@ function resolveTabRoute(tabName) {
   }
 }
 
-@keyframes breathing {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
 p {
   margin-bottom: 20px;
   color: #333;
@@ -704,6 +718,7 @@ em {
     font-size: 18px;
     line-height: 1.8;
     text-align: left;
+    text-indent: 2em;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
@@ -723,25 +738,25 @@ em {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  max-width: 900px;
+  max-width: 1000px;
   gap: 1rem;
   text-align: center;
 }
 
 .project-card {
   position: relative;
-  z-index: 0;
   display: block;
   flex: 1 1 280px;
   box-sizing: border-box;
   width: 100%;
-  max-width: 320px;
+  max-width: 300px;
   margin: 0 auto;
   padding: 1.1rem;
-  overflow: hidden;
-  border: 2px solid transparent;
   border-radius: 12px;
-  background-color: #fff;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.42);
   color: inherit;
   text-decoration: none;
   box-shadow: 0 2px 10px rgba(0, 122, 255, 0.08);
@@ -751,20 +766,8 @@ em {
 
   &:hover {
     transform: translateY(-6px) scale(1.01);
-    box-shadow: 0 0 12px rgba(63, 142, 255, 0.2);
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    z-index: -1;
-    border-radius: 14px;
-    background: linear-gradient(45deg, #7ec8ff, #d0eaff, #7ec8ff);
-    background-size: 400% 400%;
-    filter: blur(4px);
-    opacity: 0.5;
-    animation: breathing 6s ease infinite;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 16px rgba(0, 122, 255, 0.15);
   }
 
   p {
@@ -773,6 +776,13 @@ em {
     font-size: 1rem;
     line-height: 1.6;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .desc-sub {
+    color: #999;
+    font-size: 0.85em;
   }
 }
 
@@ -801,25 +811,62 @@ em {
   width: 100%;
 }
 
+.follow-buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .follow-button,
 .support-button {
-  color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
 }
 
+.support-button {
+  color: #fff;
+}
+
 .follow-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.4rem 0.9rem;
-  background-color: #3f8eff;
   font-size: 1.2rem;
-  box-shadow: 0 2px 5px rgba(63, 142, 255, 0.3);
+  text-decoration: none;
   transition:
     background-color 0.3s ease,
     transform 0.2s ease;
+}
+
+.zhihu-follow {
+  background: rgba(0, 102, 255, 0.12);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #0066FF;
+  border: 1px solid rgba(0, 102, 255, 0.25);
+  box-shadow: none;
 
   &:hover {
-    background-color: #5fa4ff;
+    background: rgba(0, 102, 255, 0.22);
+    transform: scale(1.05);
+  }
+}
+
+.follow-logo {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.github-follow {
+  background-color: #24292f;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(36, 41, 47, 0.3);
+
+  &:hover {
+    background-color: #3a3f44;
     transform: scale(1.05);
   }
 }
@@ -881,10 +928,11 @@ em {
   align-items: center;
   padding: 20px;
   overflow: hidden;
-  border: 2px solid transparent;
+  border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 16px;
-  background: linear-gradient(to bottom right, #b7cffa, #fff);
-  backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   color: #000;
   font-size: 18px;
   font-weight: 600;
@@ -895,17 +943,15 @@ em {
   transition: all 0.3s ease;
 
   &:hover {
-    border-color: #007aff;
-    background: linear-gradient(to bottom right, #a5c1f6, #fff);
+    border-color: rgba(0, 122, 255, 0.35);
+    background: rgba(255, 255, 255, 0.8);
     box-shadow: 0 10px 20px rgba(0, 122, 255, 0.2);
     transform: scale(1.02) translateY(-2px);
   }
 
   span {
     margin-top: 10px;
-    color: #003cff;
     font-size: 15px;
-    text-decoration: underline;
     transition: color 0.3s ease;
   }
 }
@@ -1154,6 +1200,15 @@ em {
   .follow-button {
     padding: 6px 12px;
     font-size: 16px;
+  }
+
+  .zhihu-follow:hover {
+    background: rgba(0, 102, 255, 0.22);
+  }
+
+  .follow-logo {
+    width: 16px;
+    height: 16px;
   }
 
   .support-button {

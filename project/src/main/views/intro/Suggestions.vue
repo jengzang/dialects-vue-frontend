@@ -84,9 +84,9 @@
 
 .card span {
   font-size: 15px;
-  color: #003cff; /* Apple 藍 */
+  /* color: #003cff; Apple 藍 */
   margin-top: 10px;
-  text-decoration: underline;
+  /* text-decoration: underline; */
   transition: color 0.3s ease;
 }
 

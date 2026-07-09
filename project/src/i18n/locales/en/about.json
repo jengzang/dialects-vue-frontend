@@ -281,15 +281,15 @@
     "projects": {
       "frontend": {
         "name": "dialects-vue-frontend",
-        "description": "Frontend repository - Developed with Vue framework and vanilla JS"
+        "description": "FrontendRepo - Vue 3 + JS + SCSS"
       },
       "backend": {
         "name": "dialects-backend",
-        "description": "Backend repository - Based on FastAPI"
+        "description": "BackendRepo - FastAPI + Python + SQLAlchemy"
       },
       "build": {
         "name": "dialects-build",
-        "description": "Character table preprocessing repository - Extract initials, finals, and tones"
+        "description": "Data pipeline - Character table preprocessing"
       }
     },
     "supportMessage": "\"If this website has helped you, you can buy the author a coffee☕️. Your support will be the motivation for the author to continue maintaining it🙏\"",
