@@ -222,7 +222,7 @@ function handleClose(value = false) {
 
 .scope-clear-btn {
   border: 1px solid rgba(var(--color-error-light-rgb), 0.28);
-  background: rgba(254, 226, 226, 0.92);
+  background: var(--bg-error-light);
   color: var(--color-error-dark);
   font-size: 12px;
   font-weight: 700;
@@ -234,7 +234,7 @@ function handleClose(value = false) {
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    background: rgba(254, 202, 202, 0.98);
+    background: rgba(var(--color-error-rgb), 0.08);
     border-color: rgba(var(--color-error-rgb), 0.38);
     box-shadow: 0 10px 22px rgba(var(--color-error-light-rgb), 0.18);
     transform: translateY(-1px);

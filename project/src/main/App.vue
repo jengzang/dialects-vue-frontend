@@ -163,7 +163,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(234, 245, 255, 0.55);
+  background: rgba(var(--bg-blue-tint-rgb), 0.55);
   pointer-events: none;
 }
 

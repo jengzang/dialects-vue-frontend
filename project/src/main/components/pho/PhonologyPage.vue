@@ -291,7 +291,7 @@ watch(locationQuery, (urlLocations) => {
       );
       box-shadow:
         0 6px 16px var(--color-primary-shadow-light),
-        0 3px 6px rgba(0, 0, 0, 0.12);
+        var(--shadow-sm-dark);
       transform: translateY(-1px);
     }
 

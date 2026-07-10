@@ -31,6 +31,6 @@
 
 .derive-tool-placeholder__text {
   font-size: 16px;
-  color: rgba(29, 29, 31, 0.48);
+  color: rgba(var(--text-secondary-rgb), 0.48);
 }
 </style>

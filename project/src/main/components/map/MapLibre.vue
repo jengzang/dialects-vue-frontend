@@ -952,7 +952,7 @@ const resetView = () => {
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   background-color: var(--glass-30);
   border: 1px solid var(--glass-40);
-  color: #c28f00;
+  color: var(--color-gold);
   text-shadow: 0 0 1px var(--bg-overlay);
   text-align: center;
   border-radius: 12px;
@@ -966,7 +966,7 @@ const resetView = () => {
   line-height: 1.5;
   opacity: 0;
   transition: opacity 0.4s ease, transform 0.4s ease;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-map);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
@@ -1013,7 +1013,7 @@ const resetView = () => {
   color: var(--color-cyan);
   padding: 2px 4px;
   border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
+  box-shadow: var(--shadow-focus-ring);
   white-space: nowrap;
   font-family: "SimHei", "黑体", sans-serif;
   cursor: pointer;
@@ -1035,7 +1035,7 @@ const resetView = () => {
 :deep(.marker-text-feature) {
   padding: 2px 4px;
   border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
+  box-shadow: var(--shadow-focus-ring);
   font-size: 15px;
   color: black;
   white-space: nowrap;

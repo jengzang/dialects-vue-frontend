@@ -99,8 +99,8 @@
 }
 
 .main-glow-switch.open:hover {
-  background: linear-gradient(135deg, #00bfff, #66ccff);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, var(--color-primary-cyan), var(--color-primary-cyan));
+  box-shadow: var(--shadow-spread);
 }
 
 .main-glow-switch.open:hover .custom-switch-slider-base::before {

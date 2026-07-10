@@ -683,7 +683,7 @@ watch(
 .modal-table-container {
   overflow-x: auto;
   border-radius: $radius-md;
-  border: 1px solid rgba($text-light, 0.16);
+  border: 1px solid rgba(var(--text-slate-light-rgb), 0.16);
   background: var(--glass-50);
 }
 

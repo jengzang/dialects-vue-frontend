@@ -364,7 +364,7 @@ onBeforeUnmount(() => {
   font-size: 11px;
   line-height: 1.2;
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
+  box-shadow: var(--shadow-focus-ring);
   font-family: 'SimHei', '黑体', sans-serif;
   cursor: pointer;
   text-align: center;

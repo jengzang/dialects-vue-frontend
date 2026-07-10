@@ -6,13 +6,13 @@
   justify-content: center;
   z-index: var(--overlay-z-index, 10000);
   padding: var(--overlay-padding, 18px);
-  background: rgba(0, 0, 0, 0.36);
+  background: var(--bg-overlay);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
 
 .global-overlay-blur {
-  background: rgba(0, 0, 0, 0.36);
+  background: var(--bg-overlay);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
@@ -28,7 +28,7 @@
   border-radius: 20px;
   border: 1px solid var(--glass-40);
   box-shadow:
-    0 16px 40px rgba(0, 0, 0, 0.18),
+    var(--shadow-popup),
     0 4px 12px var(--bg-hover-strong),
     inset 0 0 0 0.5px var(--glass-20);
 }
@@ -137,7 +137,7 @@
 .global-action-btn-primary:hover {
   background: linear-gradient(
     135deg,
-    rgba(0, 112, 245, 1),
+    var(--color-primary),
     rgba(var(--color-primary-rgb), 1)
   );
   transform: translateY(-1px);

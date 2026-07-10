@@ -86,7 +86,7 @@ $card-transition: 0.24s ease;
   background: var(--glass-90);
   border: 1px solid var(--glass-30);
   border-radius: var(--radius-lg);
-  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--shadow-popup);
 
   @include glass-blur(18px, 160%);
 
@@ -120,7 +120,7 @@ $card-transition: 0.24s ease;
     width: 320px;
     pointer-events: auto;
     border: 1px solid var(--border-medium);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-card-sm);
 
     &:not(.is-pinned) {
       pointer-events: none;

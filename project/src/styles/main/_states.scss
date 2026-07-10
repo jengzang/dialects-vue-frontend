@@ -19,7 +19,7 @@
 }
 
 .main-list-state[data-state='error'] {
-  border-color: rgba(220, 38, 38, 0.15);
+  border-color: rgba(var(--color-error-rgb), 0.15);
 }
 
 .main-list-state-title {

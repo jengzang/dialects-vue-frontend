@@ -96,7 +96,7 @@ $animation-duration: 0.4s;
   border-radius: $popup-radius;
   box-shadow:
     inset 0 0 1px $glass-color,
-    0 4px 14px rgba(0, 0, 0, 0.2),
+    var(--shadow-above),
     0 0 8px var(--glass-20);
   color: $popup-text-color;
   text-align: center;

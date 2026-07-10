@@ -29,20 +29,20 @@
 
 .close-btn:hover {
   background: var(--glass-90);
-  border-color: rgba(220, 38, 38, 0.5);
-  color: rgba(127, 29, 29, 0.98);
+  border-color: rgba(var(--color-error-rgb), 0.5);
+  color: var(--color-error-dark);
   transform: scale(1.06);
   box-shadow:
     0 8px 20px rgba(var(--color-shadow-rgb), 0.14),
-    0 0 0 3px rgba(239, 68, 68, 0.12);
+    0 0 0 3px rgba(var(--color-error-light-rgb), 0.12);
 }
 
 .close-btn:active {
-  border-color: rgba(220, 38, 38, 0.58);
+  border-color: rgba(var(--color-error-rgb), 0.58);
   transform: scale(0.95);
   box-shadow:
     0 4px 10px rgba(var(--color-shadow-rgb), 0.14),
-    0 0 0 2px rgba(239, 68, 68, 0.16);
+    0 0 0 2px rgba(var(--color-error-light-rgb), 0.16);
 }
 
 .close-btn-sm {

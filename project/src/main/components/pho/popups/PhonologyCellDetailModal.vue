@@ -124,8 +124,8 @@ $text-secondary: var(--text-slate);
   padding: 10px 12px;
   background: linear-gradient(
     135deg,
-    rgba(37, 99, 235, 0.12),
-    rgba(37, 99, 235, 0.04)
+    rgba(var(--color-primary-rgb), 0.12),
+    rgba(var(--color-primary-rgb), 0.04)
   );
   border-bottom: 1px solid var(--bg-overlay-light2);
   color: $text-dark;

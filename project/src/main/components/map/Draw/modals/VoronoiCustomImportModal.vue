@@ -326,26 +326,26 @@ function confirmImport() {
 }
 
 .voronoi-custom-import-modal__diagnostic.is-success {
-  color: #19653a;
-  background: rgba(34, 197, 94, 0.12);
-  border-color: rgba(34, 197, 94, 0.22);
+  color: var(--color-success);
+  background: rgba(var(--color-success-rgb), 0.12);
+  border-color: rgba(var(--color-success-rgb), 0.22);
 }
 
 .voronoi-custom-import-modal__diagnostic.is-warning {
-  color: #9a5a00;
-  background: rgba(245, 158, 11, 0.14);
-  border-color: rgba(245, 158, 11, 0.24);
+  color: var(--color-warning-dark);
+  background: rgba(var(--color-warning-rgb), 0.14);
+  border-color: rgba(var(--color-warning-rgb), 0.24);
 }
 
 .voronoi-custom-import-modal__diagnostic.is-info {
-  color: #0b62c4;
-  background: rgba(59, 130, 246, 0.12);
-  border-color: rgba(59, 130, 246, 0.22);
+  color: var(--color-primary-hover);
+  background: rgba(var(--color-primary-rgb), 0.12);
+  border-color: rgba(var(--color-primary-rgb), 0.22);
 }
 
 .voronoi-custom-import-modal__error {
   margin-top: 0.85rem;
-  color: #b42318;
+  color: var(--color-error-dark);
   font-size: 0.85rem;
 }
 

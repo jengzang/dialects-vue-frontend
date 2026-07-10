@@ -112,7 +112,7 @@
   background: var(--color-gradient);
   border: none;
   border-radius: 30px;
-  box-shadow: 0 0 12px rgba(0, 195, 255, 0.6), 0 0 30px rgba(110, 0, 255, 0.3);
+  box-shadow: var(--shadow-glow-sm);
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   letter-spacing: 1px;
@@ -123,7 +123,7 @@
 
 .run-btn:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 20px rgba(0, 195, 255, 0.8), 0 0 50px rgba(110, 0, 255, 0.5);
+  box-shadow: var(--shadow-glow);
 }
 
 .run-btn span {

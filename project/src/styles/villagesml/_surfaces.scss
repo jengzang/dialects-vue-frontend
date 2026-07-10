@@ -52,7 +52,7 @@
 .solid-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background: linear-gradient(135deg, #a0a0a0 0%, #808080 100%);
+  background: linear-gradient(135deg, var(--color-silver) 0%, var(--text-muted) 100%);
 }
 
 .solid-button.secondary {
@@ -60,7 +60,7 @@
 }
 
 .solid-button.secondary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #a8b5b6, #8d9a9b);
+  background: linear-gradient(135deg, var(--text-slate-light), var(--text-slate));
 }
 
 .solid-button.small {

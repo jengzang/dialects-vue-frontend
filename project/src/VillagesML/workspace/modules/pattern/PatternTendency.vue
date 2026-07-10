@@ -254,7 +254,7 @@ watch(
 }
 
 .tendency-item.moderate-tendency {
-  background: rgba(241, 196, 15, 0.1);
+  background: rgba(var(--color-gold-rgb), 0.1);
   border-left: 4px solid var(--color-gold);
 }
 

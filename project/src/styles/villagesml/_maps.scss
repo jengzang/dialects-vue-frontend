@@ -21,7 +21,7 @@
   background: var(--glass-90);
   backdrop-filter: blur(8px);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-sm-dark);
   border: 1px solid var(--glass-50);
   min-width: 200px;
 }
@@ -113,7 +113,7 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm-strong);
   transition: all 0.3s ease;
 
   &:hover {

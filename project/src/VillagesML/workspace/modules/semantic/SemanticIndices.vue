@@ -420,7 +420,7 @@ const getRegionLevelName = (level) => {
 .vml-number-input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: rgba(200, 200, 200, 0.3);
+  background: var(--border-gray-medium);
 }
 
 .indices-table {

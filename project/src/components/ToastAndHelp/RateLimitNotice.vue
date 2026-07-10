@@ -201,6 +201,15 @@ $text-primary: rgba(35, 29, 15, 0.9);
 $text-message: rgba(38, 30, 12, 0.92);
 $text-meta: rgba(76, 60, 23, 0.72);
 $text-brown: rgba(63, 49, 9, 0.92);
+$text-icon: rgba(111, 71, 0, 0.95);
+$text-chip: rgba(92, 60, 0, 0.92);
+$bg-chip: rgba(255, 245, 219, 0.72);
+$bg-cream: rgba(255, 250, 237, 0.58);
+$gold-accent: rgba(255, 214, 102, 0.26);
+$gold-glow: rgba(255, 214, 102, 0.34);
+$gold-bg: rgba(255, 214, 102, 0.42);
+$warm-shadow: rgba(120, 90, 20, 0.14);
+$warm-shadow-strong: rgba(160, 120, 26, 0.2);
 
 $white: var(--text-white);
 $primary-blue: rgba(var(--color-primary-rgb), 0.95);
@@ -257,17 +266,17 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
     linear-gradient(
       135deg,
       var(--glass-70),
-      rgba(255, 250, 237, 0.58)
+      $bg-cream
     ),
     linear-gradient(
       135deg,
-      rgba(255, 214, 102, 0.26),
+      $gold-accent,
       var(--glass-10)
     );
   border: 1px solid var(--glass-40);
   border-radius: 26px;
   box-shadow:
-    0 24px 54px rgba(120, 90, 20, 0.14),
+    0 24px 54px $warm-shadow,
     0 8px 18px var(--bg-overlay-light2),
     inset 0 0 0 0.5px var(--glass-50);
 
@@ -289,8 +298,8 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
   background: radial-gradient(
     circle,
-    rgba(255, 214, 102, 0.34),
-    rgba(255, 214, 102, 0)
+    $gold-glow,
+    transparent
   );
   border-radius: 50%;
 }
@@ -300,18 +309,18 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 1;
   width: 42px;
   height: 42px;
-  color: rgba(111, 71, 0, 0.95);
+  color: $text-icon;
   font-size: 20px;
   font-weight: 700;
   background: linear-gradient(
     180deg,
     var(--glass-80),
-    rgba(255, 214, 102, 0.42)
+    $gold-bg
   );
   border: 1px solid var(--glass-50);
   border-radius: 15px;
   box-shadow:
-    0 10px 24px rgba(160, 120, 26, 0.2),
+    0 10px 24px $warm-shadow-strong,
     inset 0 1px 0 var(--glass-60);
 
   @include flex-center;
@@ -346,8 +355,8 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .notice-chip {
-  color: rgba(92, 60, 0, 0.92);
-  background: rgba(255, 245, 219, 0.72);
+  color: $text-chip;
+  background: $bg-chip;
   border: 1px solid var(--glass-50);
 }
 
@@ -418,13 +427,13 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
   background: linear-gradient(
     135deg,
     $primary-blue,
-    rgba(79, 146, 255, 0.95)
+    rgba(var(--color-primary-rgb), 0.95)
   );
   box-shadow: 0 10px 24px rgba(var(--color-primary-rgb), 0.24);
 }
 
 .ghost-button {
-  color: rgba(63, 49, 9, 0.88);
+  color: $text-brown;
   background: var(--glass-50);
   border-color: var(--glass-40);
   box-shadow: inset 0 1px 0 var(--glass-30);

@@ -338,7 +338,7 @@ watch(
   padding: 10px 12px;
   border-radius: 14px;
   background: var(--glass-70);
-  border: 1px solid rgba($text-light, 0.22);
+  border: 1px solid rgba(var(--text-slate-light-rgb), 0.22);
 }
 
 .scope-radio-item {

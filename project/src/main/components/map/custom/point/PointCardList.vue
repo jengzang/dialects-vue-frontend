@@ -147,7 +147,7 @@ const filteredItems = computed(() => {
 
 .skeleton-line {
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(226, 232, 240, 0.9), $bg-light, rgba(226, 232, 240, 0.9));
+  background: linear-gradient(90deg, rgba(var(--text-slate-light-rgb), 0.9), $bg-light, rgba(var(--text-slate-light-rgb), 0.9));
   background-size: 200% 100%;
   animation: shimmer 1.2s linear infinite;
 

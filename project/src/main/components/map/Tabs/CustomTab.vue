@@ -703,7 +703,7 @@ const openEntryModal = () => {
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-above-sm);
   }
 
   &:active:not(:disabled) {
@@ -734,7 +734,7 @@ const openEntryModal = () => {
   background: linear-gradient(
     135deg,
     rgba(var(--color-primary-rgb), 0.9),
-    rgba(0, 81, 213, 0.9)
+    rgba(var(--color-primary-hover-rgb), 0.9)
   );
   color: var(--text-white);
   font-size: 15px;
@@ -748,7 +748,7 @@ const openEntryModal = () => {
     background: linear-gradient(
       135deg,
       rgba(var(--color-primary-rgb), 1),
-      rgba(0, 81, 213, 1)
+      rgba(var(--color-primary-hover-rgb), 1)
     );
     box-shadow: 0 6px 14px rgba(var(--color-primary-rgb), 0.35);
   }
@@ -967,7 +967,7 @@ const openEntryModal = () => {
   outline: none;
 
   &::placeholder {
-    color: rgba(100, 116, 139, 0.72);
+    color: rgba(var(--text-slate-rgb), 0.72);
   }
 }
 
@@ -1000,7 +1000,7 @@ const openEntryModal = () => {
   background: $glass-white;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--shadow-inset-subtle);
   box-sizing: border-box;
 }
 
@@ -1147,7 +1147,7 @@ const openEntryModal = () => {
   text-align: left;
   cursor: pointer;
   box-sizing: border-box;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--shadow-hairline);
   transition: $motion-fast;
 
   &:hover {
@@ -1159,7 +1159,7 @@ const openEntryModal = () => {
 
   &:active {
     transform: translateY(0);
-    background: rgba(240, 247, 255, 0.85);
+    background: rgba(var(--bg-blue-tint-rgb), 0.85);
   }
 
   .feature-name {

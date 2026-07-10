@@ -481,7 +481,7 @@ onMounted(async () => {
 }
 
 .position-middle {
-  background: rgba(155, 89, 182, 0.2);
+  background: rgba(var(--color-purple-light-rgb), 0.2);
   color: var(--color-purple);
 }
 
@@ -593,7 +593,7 @@ onMounted(async () => {
 }
 
 .type-middle {
-  background: rgba(155, 89, 182, 0.2);
+  background: rgba(var(--color-purple-light-rgb), 0.2);
   color: var(--color-purple);
 }
 

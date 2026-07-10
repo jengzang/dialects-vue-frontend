@@ -1179,12 +1179,12 @@ watch(
 .add-row-btn {
   background: rgba(var(--color-success-rgb), 0.08);
   border-color: rgba(var(--color-success-rgb), 0.24);
-  color: #059669;
+  color: var(--color-success);
 
   &:hover:not(:disabled) {
     background: rgba(var(--color-success-rgb), 0.15);
     border-color: rgba(var(--color-success-rgb), 0.4);
-    color: #047857;
+    color: var(--color-success);
     box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.08);
   }
 }
@@ -1235,7 +1235,7 @@ watch(
 .modal-table-container {
   overflow-x: auto;
   border-radius: $radius-md;
-  border: 1px solid rgba($text-light, 0.16);
+  border: 1px solid rgba(var(--text-slate-light-rgb), 0.16);
   background: var(--glass-50);
 }
 
