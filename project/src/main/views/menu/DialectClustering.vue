@@ -284,7 +284,7 @@ const {
     display: inline-flex;
     gap: 10px;
     align-items: center;
-    color: #334155;
+    color: var(--text-dark);
   }
 
   .form-grid {
@@ -301,7 +301,7 @@ const {
   }
 
   .field > span {
-    color: #334155;
+    color: var(--text-dark);
     font-weight: 600;
   }
 
@@ -329,7 +329,7 @@ const {
   .source-hint,
   .preview-empty {
     margin: 0;
-    color: #64748b;
+    color: var(--text-tertiary);
   }
 
   .preview-box {
@@ -374,7 +374,7 @@ const {
   }
 
   .summary-card__label {
-    color: #475569;
+    color: var(--text-slate);
     font-size: 14px;
   }
 
@@ -423,7 +423,7 @@ const {
 
   .status-badge.is-idle {
     background: rgba(100, 116, 139, 0.16);
-    color: #475569;
+    color: var(--text-slate);
   }
 
   .quick-run-summary {
@@ -455,7 +455,7 @@ const {
     text-align: left;
     padding: 12px 10px;
     border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-    color: #334155;
+    color: var(--text-dark);
   }
 
   .result-table th {
@@ -484,7 +484,7 @@ const {
     margin: 0;
     white-space: pre-wrap;
     word-break: break-word;
-    color: #475569;
+    color: var(--text-slate);
     font-size: 12px;
   }
 

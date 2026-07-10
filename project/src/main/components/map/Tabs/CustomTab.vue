@@ -1110,7 +1110,7 @@ const openEntryModal = () => {
 
 .category-name {
   flex: 1;
-  color: #334155;
+  color: var(--text-dark);
   font-size: 14px;
   font-weight: 700;
 }

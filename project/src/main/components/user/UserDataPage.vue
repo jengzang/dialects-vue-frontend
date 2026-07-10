@@ -753,7 +753,7 @@ onMounted(() => {
 
 
 $user-text: var(--text-deep);
-$user-muted: #64748b;
+$user-muted: var(--text-tertiary);
 $user-border: rgba(148, 163, 184, 0.24);
 $user-glass-border: rgba(255, 255, 255, 0.58);
 $user-accent: var(--color-primary);
@@ -1073,7 +1073,7 @@ $user-success: var(--color-success);
     background-color 0.18s ease;
 
   &::placeholder {
-    color: #94a3b8;
+    color: var(--text-slate-light);
   }
 
   &:focus {
@@ -1149,7 +1149,7 @@ $user-success: var(--color-success);
     position: sticky;
     top: 0;
     z-index: 10;
-    color: #475569;
+    color: var(--text-slate);
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.02em;
@@ -1186,7 +1186,7 @@ $user-success: var(--color-success);
   }
 
   tbody td {
-    color: #334155;
+    color: var(--text-dark);
     background: rgba(255, 255, 255, 0.46);
     border-top: 1px solid rgba(255, 255, 255, 0.52);
     border-bottom: 1px solid rgba(148, 163, 184, 0.12);
@@ -1219,7 +1219,7 @@ $user-success: var(--color-success);
 
 .table-empty-cell {
   padding: 42px 20px !important;
-  color: #94a3b8 !important;
+  color: var(--text-slate-light) !important;
   text-align: center !important;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.46) !important;
@@ -1266,7 +1266,7 @@ $user-success: var(--color-success);
   min-width: 38px;
   min-height: 36px;
   padding: 8px 12px;
-  color: #334155;
+  color: var(--text-dark);
   font-size: 13px;
 
   &:hover:not(:disabled) {
@@ -1294,7 +1294,7 @@ $user-success: var(--color-success);
   padding: 10px 12px;
   border: 1px solid rgba(0, 122, 255, 0.12);
   border-radius: 14px;
-  color: #475569;
+  color: var(--text-slate);
   font-size: 13px;
   font-weight: 600;
   background: rgba(0, 122, 255, 0.06);
@@ -1350,7 +1350,7 @@ $user-success: var(--color-success);
   }
 
   th {
-    color: #475569;
+    color: var(--text-slate);
     font-weight: 800;
     background:
       linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(241, 245, 249, 0.76)),
@@ -1360,7 +1360,7 @@ $user-success: var(--color-success);
   }
 
   td {
-    color: #334155;
+    color: var(--text-dark);
     background: rgba(255, 255, 255, 0.34);
   }
 
@@ -1440,7 +1440,7 @@ $user-success: var(--color-success);
   label {
     display: block;
     margin-bottom: 7px;
-    color: #334155;
+    color: var(--text-dark);
     font-size: 13px;
     font-weight: 800;
   }

@@ -511,8 +511,8 @@ onMounted(() => {
 
 
 $region-text: var(--text-deep);
-$region-muted: #64748b;
-$region-soft: #94a3b8;
+$region-muted: var(--text-tertiary);
+$region-soft: var(--text-slate-light);
 $region-accent: var(--color-primary);
 $region-danger: var(--color-error-light);
 $region-success: var(--color-success);
@@ -1043,7 +1043,7 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
 .region-description {
   flex-basis: 100%;
   margin: 0;
-  color: #475569;
+  color: var(--text-slate);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -1057,7 +1057,7 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
 }
 
 .location-tag {
-  color: #475569;
+  color: var(--text-slate);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.36)),
     rgba(15, 23, 42, 0.045);

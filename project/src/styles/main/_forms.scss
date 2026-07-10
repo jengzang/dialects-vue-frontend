@@ -48,7 +48,7 @@
 }
 
 .main-search-field::placeholder {
-  color: #94a3b8;
+  color: var(--text-slate-light);
 }
 
 .main-search-field:focus {
@@ -74,7 +74,7 @@
 }
 
 .main-input-field::placeholder {
-  color: #94a3b8;
+  color: var(--text-slate-light);
 }
 
 .main-input-field:focus {

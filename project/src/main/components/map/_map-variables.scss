@@ -8,12 +8,12 @@ $primary-dark: var(--color-primary-hover);
 
 // Text
 $text-strong: var(--text-deep);
-$text-main: #1e293b;
-$text-dark: #334155;
-$text-secondary: #475569;
-$text-muted: #64748b;
-$text-light: #94a3b8;
-$text-subtle: #8e8e93;
+$text-main: var(--text-primary);
+$text-dark: var(--text-dark);
+$text-secondary: var(--text-slate);
+$text-muted: var(--text-tertiary);
+$text-light: var(--text-slate-light);
+$text-subtle: var(--text-secondary);
 
 // Glass / Surfaces
 $glass-white: rgba(255, 255, 255, 0.45);
@@ -27,12 +27,12 @@ $bg-subtle: rgba(15, 23, 42, 0.08);
 
 // Semantic
 $success: var(--color-success);
-$success-bg: #e8f8ef;
+$success-bg: var(--bg-success-light);
 $danger: var(--color-error);
 $danger-light: var(--color-error-light);
-$danger-bg: #fde4ec;
+$danger-bg: var(--bg-error-light);
 $warning: var(--color-warning);
-$warning-dark: #d97706;
+$warning-dark: var(--color-warning-dark);
 $purple: var(--color-purple-light);
 $teal: var(--color-teal);
 $deep-blue: var(--text-deep);

@@ -1742,7 +1742,7 @@ onBeforeUnmount(() => {
 
 .voronoi-export-progress-text {
   font-size: 0.92rem;
-  color: #334155;
+  color: var(--text-dark);
 }
 
 .draw-feature-count-badge {

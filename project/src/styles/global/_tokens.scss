@@ -133,8 +133,17 @@
   --color-teal: #00887a;
   --color-teal-rgb: 0, 136, 122;
 
+  /* Slate 文字色阶 — 地图和详情页正文/辅助文本 */
+  --text-slate: #475569;
+  --text-slate-light: #94a3b8;
+
+  /* 语义背景色 */
+  --bg-success-light: #e8f8ef;
+  --bg-error-light: #fde4ec;
+
   /* 错误色深色变体 */
   --color-error-dark: #962020;
+  --color-warning-dark: #d97706;
 
   /* 圆角 */
   --radius-sm: 6px;
