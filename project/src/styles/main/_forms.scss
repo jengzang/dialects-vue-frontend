@@ -170,3 +170,28 @@
     text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
   }
 }
+
+// == Legacy form classes migrated from _legacy.scss ==
+
+.query-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 6px;
+}
+
+.query-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 95%;
+  padding: 0 4px;
+  max-width: 600px;
+}
+
+.query-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}

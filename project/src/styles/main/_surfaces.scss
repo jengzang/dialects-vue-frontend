@@ -88,3 +88,59 @@
 .main-data-card[aria-hidden='true'] {
   cursor: default;
 }
+
+// == Legacy surface classes migrated from _legacy.scss ==
+
+.glass-panel-inner {
+  background: var(--glass-light);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border-weak);
+  transition: border-color 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.glass-card {
+  background: var(--glass-light);
+  backdrop-filter: blur(14px) saturate(145%);
+  -webkit-backdrop-filter: blur(14px) saturate(145%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-xl);
+  transition: background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.page {
+  padding: 2dvh;
+  font-size: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-md);
+  justify-content: center;
+  display: flex;
+  margin: 0 auto;
+  max-height: 35dvh;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .panel-title {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 10px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .panel-title {
+    font-size: 2.4rem;
+  }
+}

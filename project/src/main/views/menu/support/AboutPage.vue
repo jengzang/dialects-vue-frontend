@@ -694,9 +694,65 @@ em {
 }
 
 /* 简介与鸣谢 */
+.thanks-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text-primary);
+}
+
 .thanks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.8;
+
   li {
     margin-bottom: 0.5rem;
+  }
+}
+
+.thanks-link {
+  font-weight: 500;
+  color: var(--color-primary);
+  text-decoration: none;
+  position: relative;
+  transition: all 0.3s ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0%;
+    height: 2px;
+    background: linear-gradient(90deg, #007aff, #00c6ff);
+    transition: width 0.3s ease, left 0.3s ease;
+  }
+
+  &:hover {
+    color: #0051a8;
+    transform: scale(1.05);
+
+    &::after {
+      width: 100%;
+      left: 0;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .thanks-list {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .thanks-list {
+    font-size: 1.35rem;
   }
 }
 

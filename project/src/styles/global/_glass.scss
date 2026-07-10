@@ -186,3 +186,18 @@
     0 6px 18px rgba(0, 0, 0, 0.12),
     0 0 0 0.5px rgba(255, 255, 255, 0.08);
 }
+
+// Shared glass panel — used by both VillagesML and main app
+.glass-panel {
+  background: var(--glass-medium);
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+  transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+}
+
+.glass-panel:hover {
+  box-shadow: var(--shadow-glass-hover);
+}
