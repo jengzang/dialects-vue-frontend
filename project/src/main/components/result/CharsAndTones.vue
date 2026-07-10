@@ -534,32 +534,6 @@ onMounted(() => {
 
 <style lang="scss">
 .chartonepage {
-  max-width: 85dvw;
-  min-width: 60dvw;
-  height: 66dvh;
-  overflow-y: auto;
-  overflow-x: auto;
-  padding: 8px;
-  font-size: 18px;
-  background: var(--glass-05);
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
-  border: 2px solid var(--glass-10);
-  box-shadow: 0 8px 24px var(--bg-hover);
-
-  display: flex;
-  margin: 0 auto;
-}
-
-@media (max-aspect-ratio: 1/1) {
-  .chartonepage {
-    height: 60dvh;
-  }
-}
-</style>
-
-<style lang="scss">
-.chartonepage {
   display: flex;
   min-width: 60dvw;
   max-width: 85dvw;
@@ -579,8 +553,6 @@ onMounted(() => {
     height: 60dvh;
   }
 }
-</style>
-
 
 $primary-blue: var(--color-primary);
 $deep-blue: var(--text-deep);
@@ -689,7 +661,7 @@ $glass-blur: 8px;
   width: 32px;
   height: 32px;
   padding: 0;
-  color: #4f5663;
+  color: var(--text-slate);
   cursor: pointer;
   background: var(--glass-60);
   border: 0;
@@ -776,7 +748,7 @@ $glass-blur: 8px;
 
 .annotation {
   max-width: 400px;
-  color: var(--text-muted)
+  color: var(--text-muted);
   font-size: 0.85em;
   white-space: normal;
   word-break: break-word;
@@ -808,7 +780,7 @@ $glass-blur: 8px;
   margin-right: 15px;
   margin-bottom: 5px;
   padding: 2px 8px;
-  color: #0d5bae;
+  color: var(--color-primary-hover);
   font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
@@ -993,7 +965,7 @@ $glass-blur: 8px;
   transition: color $transition-fast ease;
 
   &:hover {
-    color: #d33;
+    color: var(--color-error);
   }
 
   &::after {
@@ -1009,7 +981,7 @@ $glass-blur: 8px;
     visibility: hidden;
     content: attr(data-title);
     pointer-events: none;
-    background-color: var(--text-dark)
+    background-color: var(--text-dark);
     border-radius: 4px;
     opacity: 0;
     transform: translateX(-50%);
@@ -1023,3 +995,4 @@ $glass-blur: 8px;
     opacity: 1;
   }
 }
+</style>
