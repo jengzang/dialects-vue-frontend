@@ -194,24 +194,26 @@ onUnmounted(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$transition-avatar: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
 .nav-avatar {
-  width: 100%;
-  height: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
   font-size: 2.1dvh;
   font-weight: 1000;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-sizing: border-box;
   text-align: center;
-  user-select: none;
   cursor: pointer;
-}
+  user-select: none;
+  transition: all $transition-avatar;
 
-.nav-avatar:hover {
-  transform: scale(1.08) rotate(2deg);
+  &:hover {
+    transform: scale(1.08) rotate(2deg);
+  }
 }
 
 .login-text-content {

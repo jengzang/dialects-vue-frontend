@@ -97,73 +97,72 @@ const handleTabClick = (tabName) => {
 }
 </script>
 
-<style scoped>
-/* Tabs 包装器 */
+<style scoped lang="scss">
+$primary-blue: #007aff;
+$text-default: #444;
+$white: #fff;
+$transition-duration: 0.5s;
+
 .tabs-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0;
-  min-height: 80dvh;
   width: 100%;
+  min-height: 80dvh;
+  padding: 0;
 }
 
-/* Tab 标签页样式 */
 .tabs {
   display: flex;
-  justify-content: flex-start;
-  gap: 16px;
   flex-wrap: nowrap;
-  overflow-x: auto;
+  gap: 16px;
+  justify-content: flex-start;
   max-width: 100%;
   padding: 8px 12px;
+  overflow-x: auto;
+
+  @media (max-width: 600px) {
+    gap: 6px;
+    padding: 8px;
+  }
 }
 
 .tab {
   flex-shrink: 0;
-  white-space: nowrap;
   padding: 12px 24px;
+  color: $text-default;
   font-size: 16px;
   font-weight: 500;
-  border-radius: 16px;
+  white-space: nowrap;
   cursor: pointer;
-  color: #444;
+  user-select: none;
   background: rgba(255, 255, 255, 0.05);
+  border: 1px solid $primary-blue;
+  border-radius: 16px;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  transition: all 0.5s ease;
-  user-select: none;
-  border: 1px solid #007aff;
-}
+  transition: all $transition-duration ease;
 
-.tab:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #007aff;
-}
+  &:hover {
+    color: $primary-blue;
+    background: rgba(255, 255, 255, 0.1);
+  }
 
-.tab.active {
-  color: #fff;
-  background: rgba(0, 122, 255, 0.7);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
-}
+  &.active {
+    color: $white;
+    background: rgba(0, 122, 255, 0.7);
+    box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
 
-/* 移动端适配 */
-@media (max-width: 600px) {
-  .tab {
+  @media (max-width: 600px) {
     padding: 12px 14px;
     font-size: 14px;
     border-radius: 12px;
   }
-
-  .tabs {
-    gap: 6px;
-    padding: 8px 8px;
-  }
 }
 
-/* Tab 内容区域 */
 .tab-content {
   width: 100%;
   animation: fade 0.6s ease;
@@ -174,6 +173,7 @@ const handleTabClick = (tabName) => {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

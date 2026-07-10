@@ -241,7 +241,30 @@ watch(() => props.triggerEl, () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$primary-blue: #02469e;
+$selected-background: #e6f0ff;
+$text-primary: rgba(0, 0, 0, 0.85);
+$text-secondary: rgba(0, 0, 0, 0.75);
+$text-muted: rgba(0, 0, 0, 0.45);
+$divider-color: rgba(0, 0, 0, 0.08);
+
+$transition-fast: 0.2s;
+
+@mixin glass-blur($blur, $saturation: null) {
+  @if $saturation {
+    backdrop-filter: blur($blur) saturate($saturation);
+    -webkit-backdrop-filter: blur($blur) saturate($saturation);
+  } @else {
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+  }
+}
+
+/*
+ * 下拉层通过 Teleport 渲染到 body，
+ * 因此保持为顶层选择器。
+ */
 .dropdown-overlay {
   position: fixed;
   inset: 0;
@@ -250,93 +273,92 @@ watch(() => props.triggerEl, () => {
 }
 
 .dropdown-panel {
+  display: flex;
+  flex-direction: column;
   min-width: 80px;
   max-width: 300px;
+  padding: 6px 0;
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(200, 200, 200, 0.3);
   border-radius: 10px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: 6px 0;
+
+  @include glass-blur(12px);
 }
 
 .search-wrapper {
   padding: 8px 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid $divider-color;
 }
 
 .search-input {
   width: 100%;
   padding: 6px 10px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 6px;
-  font-size: 13px;
   outline: none;
-  background: rgba(255, 255, 255, 0.9);
-}
 
-.search-input:focus {
-  border-color: rgba(0, 122, 255, 0.5);
+  &:focus {
+    border-color: rgba(0, 122, 255, 0.5);
+  }
 }
 
 .options-list {
   max-height: 40dvh;
-  overflow-y: auto;
   padding: 0;
+  overflow-y: auto;
 }
 
 .dropdown-item {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   padding: 8px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.85);
-  transition: background-color 0.2s;
-  white-space: nowrap;
   overflow: hidden;
+  color: $text-primary;
+  font-size: 14px;
   text-overflow: ellipsis;
-}
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color $transition-fast;
 
-.dropdown-item:hover {
-  background-color: #e6f0ff;
-}
+  &:hover {
+    background-color: $selected-background;
+  }
 
-.dropdown-item.active {
-  background-color: #e6f0ff;
-  color: #02469e;
-  font-weight: bold;
+  &.active {
+    color: $primary-blue;
+    font-weight: bold;
+    background-color: $selected-background;
+  }
 }
 
 .select-all-item {
+  color: $text-secondary;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.75);
   border-bottom: 1px solid #f0f0f0;
 }
 
 .check-icon {
   width: 16px;
-  text-align: center;
+  color: $primary-blue;
   font-weight: 700;
-  color: #02469e;
+  text-align: center;
 }
 
 .dropdown-divider {
   height: 1px;
-  background: rgba(0, 0, 0, 0.08);
   margin: 4px 8px;
+  background: $divider-color;
 }
 
 .empty-message {
   padding: 20px;
-  text-align: center;
-  color: rgba(0, 0, 0, 0.45);
+  color: $text-muted;
   font-size: 13px;
+  text-align: center;
 }
-
 </style>

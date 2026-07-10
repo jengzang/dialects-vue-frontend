@@ -196,38 +196,89 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$text-primary: rgba(35, 29, 15, 0.9);
+$text-message: rgba(38, 30, 12, 0.92);
+$text-meta: rgba(76, 60, 23, 0.72);
+$text-brown: rgba(63, 49, 9, 0.92);
+
+$white: #fff;
+$primary-blue: rgba(0, 122, 255, 0.95);
+
+$button-transition-duration: 0.18s;
+$enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin glass-blur($blur, $saturation: null) {
+  @if $saturation {
+    backdrop-filter: blur($blur) saturate($saturation);
+    -webkit-backdrop-filter: blur($blur) saturate($saturation);
+  } @else {
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+  }
+}
+
+/*
+ * 提示组件通过 Teleport 渲染到 body，
+ * 因此相关样式保持为顶层选择器。
+ */
 .rate-limit-shell {
   position: fixed;
   top: 92px;
   left: 50%;
   z-index: 99990;
   width: min(720px, calc(100vw - 32px));
-  transform: translateX(-50%);
   pointer-events: none;
+  transform: translateX(-50%);
+
+  @media (max-width: 768px) {
+    top: 72px;
+    width: calc(100vw - 20px);
+  }
 }
 
 .rate-limit-notice {
   position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
   gap: 18px;
+  align-items: center;
   padding: 18px 20px;
-  border-radius: 26px;
   overflow: hidden;
+  color: $text-primary;
   pointer-events: auto;
-  color: rgba(35, 29, 15, 0.9);
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 250, 237, 0.58)),
-    linear-gradient(135deg, rgba(255, 214, 102, 0.26), rgba(255, 255, 255, 0.08));
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.72),
+      rgba(255, 250, 237, 0.58)
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 214, 102, 0.26),
+      rgba(255, 255, 255, 0.08)
+    );
   border: 1px solid rgba(255, 255, 255, 0.42);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-radius: 26px;
   box-shadow:
     0 24px 54px rgba(120, 90, 20, 0.14),
     0 8px 18px rgba(0, 0, 0, 0.08),
     inset 0 0 0 0.5px rgba(255, 255, 255, 0.46);
+
+  @include glass-blur(28px, 180%);
+
+  @media (max-width: 768px) {
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 22px;
+  }
 }
 
 .notice-glow {
@@ -235,28 +286,35 @@ onBeforeUnmount(() => {
   inset: -35% auto auto -12%;
   width: 220px;
   height: 220px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 214, 102, 0.34), rgba(255, 214, 102, 0));
   pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(255, 214, 102, 0.34),
+    rgba(255, 214, 102, 0)
+  );
+  border-radius: 50%;
 }
 
 .notice-icon {
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 42px;
   height: 42px;
-  border-radius: 15px;
+  color: rgba(111, 71, 0, 0.95);
   font-size: 20px;
   font-weight: 700;
-  color: rgba(111, 71, 0, 0.95);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 214, 102, 0.42));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.82),
+    rgba(255, 214, 102, 0.42)
+  );
   border: 1px solid rgba(255, 255, 255, 0.52);
+  border-radius: 15px;
   box-shadow:
     0 10px 24px rgba(160, 120, 26, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  @include flex-center;
 }
 
 .notice-content {
@@ -279,12 +337,12 @@ onBeforeUnmount(() => {
   align-items: center;
   min-height: 28px;
   padding: 0 12px;
-  border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  border-radius: 999px;
+
+  @include glass-blur(20px);
 }
 
 .notice-chip {
@@ -294,24 +352,32 @@ onBeforeUnmount(() => {
 }
 
 .countdown-chip {
-  color: rgba(63, 49, 9, 0.92);
+  color: $text-brown;
   background: rgba(255, 255, 255, 0.62);
   border: 1px solid rgba(255, 255, 255, 0.38);
 }
 
 .notice-message {
   margin: 0;
+  color: $text-message;
   font-size: 15px;
   font-weight: 600;
   line-height: 1.45;
-  color: rgba(38, 30, 12, 0.92);
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
 }
 
 .notice-meta {
   margin: 6px 0 0;
+  color: $text-meta;
   font-size: 13px;
   line-height: 1.45;
-  color: rgba(76, 60, 23, 0.72);
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
 }
 
 .notice-actions {
@@ -320,30 +386,40 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 10px;
   align-items: center;
+
+  @media (max-width: 768px) {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+    padding-left: 56px;
+  }
 }
 
 .notice-button {
   min-height: 40px;
   padding: 0 16px;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  cursor: pointer;
   font-size: 14px;
   font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 999px;
   transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    background 0.18s ease,
-    border-color 0.18s ease;
-}
+    transform $button-transition-duration ease,
+    box-shadow $button-transition-duration ease,
+    background $button-transition-duration ease,
+    border-color $button-transition-duration ease;
 
-.notice-button:hover {
-  transform: translateY(-1px);
+  &:hover {
+    transform: translateY(-1px);
+  }
 }
 
 .login-button {
-  color: white;
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.95), rgba(79, 146, 255, 0.95));
+  color: $white;
+  background: linear-gradient(
+    135deg,
+    $primary-blue,
+    rgba(79, 146, 255, 0.95)
+  );
   box-shadow: 0 10px 24px rgba(0, 122, 255, 0.24);
 }
 
@@ -355,7 +431,7 @@ onBeforeUnmount(() => {
 }
 
 .rate-limit-slide-enter-active {
-  animation: rate-limit-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: rate-limit-in 0.35s $enter-easing;
 }
 
 .rate-limit-slide-leave-active {
@@ -367,6 +443,7 @@ onBeforeUnmount(() => {
     opacity: 0;
     transform: translateY(-12px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -378,37 +455,10 @@ onBeforeUnmount(() => {
     opacity: 1;
     transform: translateY(0);
   }
+
   100% {
     opacity: 0;
     transform: translateY(-8px);
-  }
-}
-
-@media (max-width: 768px) {
-  .rate-limit-shell {
-    top: 72px;
-    width: calc(100vw - 20px);
-  }
-
-  .rate-limit-notice {
-    grid-template-columns: auto 1fr;
-    gap: 14px;
-    padding: 16px;
-    border-radius: 22px;
-  }
-
-  .notice-actions {
-    grid-column: 1 / -1;
-    justify-content: flex-end;
-    padding-left: 56px;
-  }
-
-  .notice-message {
-    font-size: 14px;
-  }
-
-  .notice-meta {
-    font-size: 12px;
   }
 }
 </style>

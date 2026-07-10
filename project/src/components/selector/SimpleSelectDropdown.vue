@@ -121,7 +121,9 @@ defineExpose({
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$arrow-transition: 0.2s ease;
+
 .simple-select-dropdown {
   position: relative;
   display: inline-block;
@@ -136,12 +138,16 @@ defineExpose({
 
 .select-arrow {
   margin-left: 8px;
-  font-size: 12px;
   color: rgba(0, 0, 0, 0.6);
-  transition: transform 0.2s ease;
+  font-size: 12px;
+  transition: transform $arrow-transition;
 }
 
-.select-trigger.is-open .select-arrow {
-  transform: rotate(180deg);
+.select-trigger {
+  &.is-open {
+    .select-arrow {
+      transform: rotate(180deg);
+    }
+  }
 }
 </style>

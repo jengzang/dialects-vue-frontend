@@ -471,111 +471,157 @@ const goToAuthPage = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$primary-blue: #007aff;
+$primary-blue-dark: #005fd3;
+$active-blue: darkblue;
+$text-primary: #333;
+
+$transition-fast: 0.2s;
+$transition-base: 0.3s;
+$submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin glass-blur($blur, $saturation: null) {
+  @if $saturation {
+    backdrop-filter: blur($blur) saturate($saturation);
+    -webkit-backdrop-filter: blur($blur) saturate($saturation);
+  } @else {
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+  }
+}
+
+@mixin glass-control {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
+  border: 3px solid rgba(255, 255, 255, 0.4);
+}
+
 .commonbar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
   z-index: 999;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15));
+  width: 100%;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.15)
+  );
   border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  @include glass-blur(12px, 160%);
 }
 
 /* 桌面端：单行，7.5dvh 高度 */
 .commonbar-desktop {
   display: flex;
+  gap: 10px;
   align-items: center;
   justify-content: space-between;
   height: v-bind(height);
   padding: 0 1%;
-  gap: 10px;
 }
 
 .logo-and-title {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
   flex-shrink: 0;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
 }
 
 .commonbar-tabs {
   display: flex;
+  flex: 1 1 auto;
+  gap: 8px;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  flex: 1 1 auto;
   min-width: 0;
+  height: v-bind(height);
   margin: 0 10px;
   overflow-x: auto;
   overflow-y: hidden;
-  height: v-bind(height);
 }
 
 .tab-item {
-  height: 6.5dvh;
   display: flex;
-  align-items: center;
-  white-space: nowrap;
-  justify-content: center;
-  font-size: 1.3rem;
   flex: 1 1 0;
+  gap: 1px;
+  align-items: center;
+  justify-content: center;
   min-width: 0;
+  height: 6.5dvh;
+  color: $primary-blue;
+  font-size: 1.3rem;
   text-align: center;
   text-decoration: none;
-  border-radius: 12px;
-  transition: all 0.25s ease;
-  gap: 1px;
+  white-space: nowrap;
   cursor: pointer;
   user-select: none;
   background: rgba(255, 255, 255, 0.1);
-  color: #007aff;
-}
+  border-radius: 12px;
+  transition: all 0.25s ease;
 
-.tab-item:hover {
-  background: rgba(0, 122, 255, 0.12);
-  height: 90%;
-  color: #007aff;
-}
+  &:hover {
+    height: 90%;
+    color: $primary-blue;
+    background: rgba(0, 122, 255, 0.12);
+  }
 
-.tab-item.active {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-  color: darkblue;
-  font-weight: 1000;
-  border-radius: 0 0 25px 25px;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.08);
-  border: 3px solid rgba(255, 255, 255, 0.4);
-  transition: all 0.3s ease;
-}
+  &.active {
+    color: $active-blue;
+    font-weight: 1000;
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.1)
+    );
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-radius: 0 0 25px 25px;
+    box-shadow:
+      0 6px 10px rgba(0, 0, 0, 0.1),
+      0 1px 4px rgba(0, 0, 0, 0.08);
+    transition: all $transition-base ease;
 
-.tab-item.active:hover {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-  margin: 0;
+    &:hover {
+      margin: 0;
+      background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.5),
+        rgba(255, 255, 255, 0.3)
+      );
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    }
+  }
 }
 
 .logo-container {
-  width: 6dvh;
-  height: 6dvh;
-  min-width: 5dvh;
   flex-shrink: 0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-  border: 3px solid rgba(255, 255, 255, 0.4);
+  width: 6dvh;
+  min-width: 5dvh;
+  height: 6dvh;
   cursor: pointer;
-  transition: all 0.3s ease;
-}
+  border-radius: 50%;
+  transition: all $transition-base ease;
 
-.logo-container:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  @include flex-center;
+  @include glass-control;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.1);
+  }
 }
 
 .logo {
@@ -586,50 +632,50 @@ const goToAuthPage = () => {
 .title {
   display: flex;
   align-items: center;
-}
 
-.title img {
-  height: 7dvh;
-  object-fit: contain;
+  img {
+    height: 7dvh;
+    object-fit: contain;
+  }
 }
 
 .title-text {
-  height: 7dvh;
   display: flex;
   align-items: center;
+  height: 7dvh;
+  color: var(--text-primary, #2c3e50);
   font-size: 1.8rem;
   font-weight: 600;
-  color: var(--text-primary, #2c3e50);
   white-space: nowrap;
 }
 
 .login-container {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
   min-width: 6dvh;
   max-width: 10dvh;
   height: 6dvh;
   padding: 0 12px;
-  border-radius: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-  border: 3px solid rgba(255, 255, 255, 0.4);
-  color: #005fd3;
+  color: $primary-blue-dark;
   cursor: pointer;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
+  border-radius: 30px;
+  transition: all $transition-base ease;
 
-.login-container:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  @include glass-control;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+  }
 }
 
 .login-text {
-  font-size: 1.15rem;
-  font-weight: 600;
   max-width: 80px;
   overflow: hidden;
+  font-size: 1.15rem;
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -639,11 +685,25 @@ const goToAuthPage = () => {
 }
 
 .title-text-mobile {
+  flex-shrink: 0;
+  color: var(--text-primary, #2c3e50);
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--text-primary, #2c3e50);
   white-space: nowrap;
+}
+
+.avatar-container {
+  display: flex;
   flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 6dvh;
+  min-width: 6dvh;
+  max-width: 6dvh;
+  height: 6dvh;
+  cursor: pointer;
+  user-select: none;
 }
 
 @media (max-aspect-ratio: 1/1) {
@@ -653,87 +713,107 @@ const goToAuthPage = () => {
 
   .commonbar-mobile {
     display: flex;
+    gap: 3px;
     align-items: center;
     justify-content: space-between;
     height: max(v-bind(mobileHeight), 44px);
     padding: 0 1%;
-    gap: 3px;
-  }
 
-  .commonbar-mobile .commonbar-tabs {
-    display: flex;
-    gap: 4px;
-    flex: 1 1 auto;
-    min-width: 0;
-    margin: 0 6px;
-    overflow-x: auto;
-    overflow-y: hidden;
-  }
+    .commonbar-tabs {
+      display: flex;
+      flex: 1 1 auto;
+      gap: 4px;
+      min-width: 0;
+      margin: 0 6px;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
 
-.commonbar-mobile .tab-item {
-    height: max(6dvh, 40px);
-    border-radius: 30px;
-    flex-shrink: 0;
-  }
+    .tab-item {
+      flex-shrink: 0;
+      height: max(6dvh, 40px);
+      border-radius: 30px;
 
-  .commonbar-mobile .tab-item.active {
-    border-radius: 30px;
-  }
+      &.active {
+        border-radius: 30px;
+      }
+    }
 
-  .commonbar-mobile .logo-container {
-    width: 5dvh;
-    height: 5dvh;
-    min-width: 5dvh;
-    flex-shrink: 0;
-  }
+    .logo-container {
+      flex-shrink: 0;
+      width: 5dvh;
+      min-width: 5dvh;
+      height: 5dvh;
+    }
 
-  .commonbar-mobile .login-container {
-    min-width: 6dvh;
-    height: 6dvh;
-    flex-shrink: 0;
+    .login-container {
+      flex-shrink: 0;
+      min-width: 6dvh;
+      height: 6dvh;
+    }
   }
 }
 
-/* Submenu panel - liquid glass style */
+/*
+ * 子菜单通过 Teleport 渲染到 body，
+ * 必须保留为顶层选择器。
+ */
 .main-submenu-panel {
   position: fixed;
+  z-index: 10001;
   width: auto;
   max-width: min(300px, calc(100vw - 20px));
-  z-index: 10001;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  padding: 8px;
+  overflow: hidden;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.85)
+  );
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 16px;
   box-shadow:
     inset 0 0 0.5px rgba(255, 255, 255, 0.3),
     0 12px 40px rgba(0, 0, 0, 0.2),
     0 0 0 0.5px rgba(255, 255, 255, 0.1);
-  padding: 8px;
-  overflow: hidden;
+
+  @include glass-blur(20px, 180%);
+
+  @media (max-aspect-ratio: 1/1) {
+    max-width: calc(100vw - 20px);
+  }
 }
 
 .submenu-item {
   display: flex;
-  align-items: center;
   gap: 12px;
+  align-items: center;
   padding: 12px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  color: $text-primary;
   font-size: 15px;
   font-weight: 500;
-  color: #333;
-}
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all $transition-fast $submenu-easing;
 
-.submenu-item:hover {
-  background: linear-gradient(145deg, rgba(0, 122, 255, 0.15), rgba(0, 122, 255, 0.08));
-  transform: translateX(4px);
+  &:hover {
+    background: linear-gradient(
+      145deg,
+      rgba(0, 122, 255, 0.15),
+      rgba(0, 122, 255, 0.08)
+    );
+    transform: translateX(4px);
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
 }
 
 .submenu-icon {
-  font-size: 18px;
   flex-shrink: 0;
+  font-size: 18px;
 }
 
 .submenu-label {
@@ -741,45 +821,15 @@ const goToAuthPage = () => {
   white-space: nowrap;
 }
 
-/* Submenu fade transition */
+/* 子菜单过渡 */
 .submenu-fade-enter-active,
 .submenu-fade-leave-active {
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all $transition-fast $submenu-easing;
 }
 
-.submenu-fade-enter-from {
-  opacity: 0;
-  transform: translateY(-10px) scale(0.95);
-}
-
+.submenu-fade-enter-from,
 .submenu-fade-leave-to {
   opacity: 0;
   transform: translateY(-10px) scale(0.95);
-}
-
-/* Mobile responsive */
-@media (max-aspect-ratio: 1/1) {
-  .main-submenu-panel {
-    max-width: calc(100vw - 20px);
-  }
-
-  .submenu-item {
-    padding: 10px 14px;
-    font-size: 14px;
-  }
-}
-
-.avatar-container {
-  width: 6dvh;
-  min-width: 6dvh;
-  max-width: 6dvh;
-  height: 6dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  user-select: none;
-  flex-shrink: 0;
-  box-sizing: border-box;
 }
 </style>

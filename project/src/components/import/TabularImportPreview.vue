@@ -240,10 +240,33 @@ const columnOptions = computed(() => ([
 </script>
 
 <style scoped lang="scss">
-.tabular-import-preview {
+$text-primary: #0b2540;
+$text-secondary: rgba(11, 37, 64, 0.68);
+$text-muted: rgba(11, 37, 64, 0.58);
+$text-light: rgba(11, 37, 64, 0.55);
+
+$primary-blue: #0b62c4;
+$success-green: #1f8a36;
+$warning-orange: #b26a00;
+
+$panel-gap: 16px;
+$section-gap: 12px;
+
+@mixin flex-column {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tabular-import-preview {
+  @include flex-column;
+
+  gap: $panel-gap;
   padding: 18px;
 
   &__header,
@@ -259,8 +282,8 @@ const columnOptions = computed(() => ([
 
   &__header,
   &__section-head {
+    gap: $section-gap;
     justify-content: space-between;
-    gap: 12px;
   }
 
   &__header {
@@ -269,25 +292,25 @@ const columnOptions = computed(() => ([
 
   &__eyebrow {
     margin: 0 0 6px;
+    color: $text-light;
     font-size: 12px;
-    color: rgba(11, 37, 64, 0.55);
   }
 
   &__title {
     margin: 0;
+    color: $text-primary;
     font-size: 18px;
-    color: #0b2540;
   }
 
   &__empty {
     display: flex;
-    align-items: center;
     gap: 16px;
+    align-items: center;
     min-height: 140px;
     padding: 20px;
+    background: rgba(255, 255, 255, 0.42);
     border: 1px dashed rgba(0, 122, 255, 0.22);
     border-radius: 18px;
-    background: rgba(255, 255, 255, 0.42);
 
     &-icon {
       font-size: 36px;
@@ -295,12 +318,12 @@ const columnOptions = computed(() => ([
 
     &-title {
       margin: 0;
-      color: #0b2540;
+      color: $text-primary;
     }
 
     &-text {
       margin: 0;
-      color: rgba(11, 37, 64, 0.68);
+      color: $text-secondary;
     }
   }
 
@@ -319,77 +342,76 @@ const columnOptions = computed(() => ([
     }
 
     &-label {
+      color: $text-muted;
       font-size: 12px;
-      color: rgba(11, 37, 64, 0.58);
     }
 
     &-meta {
       flex: 1 1 100%;
-      gap: 12px;
       flex-wrap: wrap;
-      font-size: 12px;
+      gap: 12px;
       color: rgba(11, 37, 64, 0.62);
+      font-size: 12px;
     }
   }
 
   &__loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
+
     gap: 8px;
     min-height: 120px;
   }
 
   &__body {
-    gap: 16px;
+    gap: $panel-gap;
     align-items: stretch;
   }
 
   &__mapping,
   &__preview {
+    @include flex-column;
+
     flex: 1 1 0;
+    gap: $section-gap;
     min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
     padding: 16px;
   }
 
   &__mapping {
     &-list {
-      display: flex;
-      flex-direction: column;
+      @include flex-column;
+
       gap: 10px;
       max-height: 360px;
-      overflow: auto;
       padding-right: 4px;
+      overflow: auto;
     }
 
     &-row {
+      gap: $section-gap;
       align-items: center;
-      gap: 12px;
       padding: 12px;
-      border-radius: 14px;
       background: rgba(255, 255, 255, 0.48);
+      border-radius: 14px;
     }
 
     &-meta {
+      @include flex-column;
+
       flex: 1 1 0;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
       gap: 4px;
+      min-width: 0;
     }
 
     &-name {
+      color: $text-primary;
       font-weight: 600;
-      color: #0b2540;
     }
 
     &-desc,
     &-example {
       margin: 0;
-      color: rgba(11, 37, 64, 0.68);
+      color: $text-secondary;
     }
 
     &-control {
@@ -401,94 +423,54 @@ const columnOptions = computed(() => ([
   &__section-head {
     h4 {
       margin: 0;
-      color: #0b2540;
+      color: $text-primary;
     }
 
     p {
       margin: 0;
-      color: rgba(11, 37, 64, 0.68);
+      color: $text-secondary;
     }
   }
 
   &__diagnostics {
-    display: flex;
-    flex-direction: column;
+    @include flex-column;
+
     gap: 4px;
   }
 
   &__table-wrap {
     overflow: auto;
-    border-radius: 14px;
     background: rgba(255, 255, 255, 0.36);
+    border-radius: 14px;
   }
 
   &__table {
     width: 100%;
-    border-collapse: collapse;
     font-size: 13px;
+    border-collapse: collapse;
 
     th,
     td {
       padding: 10px 12px;
-      border-bottom: 1px solid rgba(11, 37, 64, 0.08);
       text-align: left;
       vertical-align: top;
+      border-bottom: 1px solid rgba(11, 37, 64, 0.08);
     }
 
     th {
       position: sticky;
       top: 0;
+      color: $text-primary;
       background: rgba(231, 241, 255, 0.92);
-      color: #0b2540;
     }
 
     &-empty {
+      color: $text-muted;
       text-align: center;
-      color: rgba(11, 37, 64, 0.58);
     }
   }
-}
 
-.mapping-required,
-.mapping-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-}
-
-.mapping-required {
-  color: #0b62c4;
-  background: rgba(0, 122, 255, 0.12);
-}
-
-.mapping-badge {
-  &.is-success {
-    color: #1f8a36;
-  }
-
-  &.is-warning {
-    color: #b26a00;
-  }
-}
-
-.diagnostic {
-  margin: 0;
-  color: rgba(11, 37, 64, 0.68);
-
-  &--success {
-    color: #1f8a36;
-  }
-
-  &--warning {
-    color: #b26a00;
-  }
-}
-
-@media (max-width: 1100px) {
-  .tabular-import-preview {
+  @media (max-width: 1100px) {
     &__body {
       flex-direction: column;
     }
@@ -503,6 +485,43 @@ const columnOptions = computed(() => ([
         align-items: stretch;
       }
     }
+  }
+}
+
+.mapping-required,
+.mapping-badge {
+  @include flex-center;
+
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 999px;
+}
+
+.mapping-required {
+  color: $primary-blue;
+  background: rgba(0, 122, 255, 0.12);
+}
+
+.mapping-badge {
+  &.is-success {
+    color: $success-green;
+  }
+
+  &.is-warning {
+    color: $warning-orange;
+  }
+}
+
+.diagnostic {
+  margin: 0;
+  color: $text-secondary;
+
+  &--success {
+    color: $success-green;
+  }
+
+  &--warning {
+    color: $warning-orange;
   }
 }
 </style>

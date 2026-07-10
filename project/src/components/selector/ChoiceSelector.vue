@@ -53,71 +53,73 @@ function handleSelect(value) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$group-radius: 12px;
+$transition-fast: 0.2s ease;
+
 .card-group {
   display: flex;
   flex-direction: row;
-  border-radius: 12px;
-  overflow: hidden;
   width: fit-content;
   max-width: 100%;
   max-height: 45px;
+  overflow: hidden;
+  border-radius: $group-radius;
   box-shadow: var(--shadow-md);
 }
 
 .card-group-item {
-  padding: 10px 16px;
   flex: 1;
-  text-align: center;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: inherit;
-  line-height: inherit;
+  padding: 10px 16px;
   color: inherit;
+  font-size: inherit;
+  font-weight: 500;
+  line-height: inherit;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
   user-select: none;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--color-primary-medium);
   border-right-color: var(--border-gray-medium);
   border-left-color: var(--border-gray-medium);
-  transition: background 0.2s ease;
-  white-space: nowrap;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background $transition-fast;
+
   /* overflow: hidden; */
-  text-overflow: ellipsis;
-}
 
-.card-group-item:hover:not(.disabled) {
-  background: var(--glass-medium);
-}
+  &:hover:not(.disabled) {
+    background: var(--glass-medium);
+  }
 
-.card-group-item.disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
-}
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
 
-.card-group-item.first {
-  border-radius: 12px 0 0 12px;
-  border-left-color: var(--color-primary-medium);
-}
+  &.first {
+    border-left-color: var(--color-primary-medium);
+    border-radius: $group-radius 0 0 $group-radius;
+  }
 
-.card-group-item.last {
-  border-radius: 0 12px 12px 0;
-  border-right-color: var(--color-primary-medium);
-}
+  &.last {
+    border-right-color: var(--color-primary-medium);
+    border-radius: 0 $group-radius $group-radius 0;
+  }
 
-.card-group-item.active {
-  background: var(--color-primary-medium);
-  color: var(--color-primary);
-  font-weight: 600;
-}
+  &.active {
+    color: var(--color-primary);
+    font-weight: 600;
+    background: var(--color-primary-medium);
 
-.card-group-item.active:hover:not(.disabled) {
-  background: var(--color-primary-medium2);
-}
+    &:hover:not(.disabled) {
+      background: var(--color-primary-medium2);
+    }
+  }
 
-@media (max-aspect-ratio: 1/1) {
-  .card-group-item {
-    padding: 12px 12px;
+  @media (max-aspect-ratio: 1/1) {
+    padding: 12px;
   }
 }
 </style>

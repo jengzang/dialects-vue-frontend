@@ -295,7 +295,18 @@ watch(searchQuery, () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+$primary-blue: #02469e;
+$active-background: #e6f0ff;
+$text-primary: rgba(0, 0, 0, 0.85);
+$text-muted: rgba(0, 0, 0, 0.45);
+$divider-color: rgba(0, 0, 0, 0.08);
+$transition-fast: 0.2s;
+
+/*
+ * 下拉层通过 Teleport 渲染到 body，
+ * 因此保持为顶层选择器。
+ */
 .dropdown-overlay {
   position: fixed;
   inset: 0;
@@ -310,66 +321,65 @@ watch(searchQuery, () => {
 
 .search-wrapper {
   padding: 8px 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid $divider-color;
 }
 
 .search-input {
   width: 100%;
   padding: 6px 10px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 6px;
-  font-size: 13px;
   outline: none;
-  background: rgba(255, 255, 255, 0.9);
-}
 
-.search-input:focus {
-  border-color: rgba(0, 122, 255, 0.5);
+  &:focus {
+    border-color: rgba(0, 122, 255, 0.5);
+  }
 }
 
 .options-list {
   max-height: 40dvh;
-  overflow-y: auto;
   padding: 0;
+  overflow-y: auto;
 }
 
 .dropdown-item {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   padding: 8px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.85);
-  transition: background-color 0.2s;
-  white-space: nowrap;
   overflow: hidden;
+  color: $text-primary;
+  font-size: 14px;
   text-overflow: ellipsis;
-}
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color $transition-fast;
 
-.dropdown-item:hover,
-.dropdown-item.focused {
-  background-color: #e6f0ff;
-}
+  &:hover,
+  &.focused {
+    background-color: $active-background;
+  }
 
-.dropdown-item.active {
-  background-color: #e6f0ff;
-  color: #02469e;
-  font-weight: bold;
+  &.active {
+    color: $primary-blue;
+    font-weight: bold;
+    background-color: $active-background;
+  }
 }
 
 .check-icon {
   width: 16px;
-  text-align: center;
+  color: $primary-blue;
   font-weight: 700;
-  color: #02469e;
+  text-align: center;
 }
 
 .empty-message {
   padding: 20px;
-  text-align: center;
-  color: rgba(0, 0, 0, 0.45);
+  color: $text-muted;
   font-size: 13px;
+  text-align: center;
 }
-
 </style>
