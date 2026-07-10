@@ -39,7 +39,7 @@
                   size="sm"
                   placement="right"
                   icon="?"
-                  icon-color="#007aff"
+                  icon-color="var(--color-primary)"
                   style="margin-right: 2px; vertical-align: bottom;"
               />
               {{ t('map.customDataPanel.labels.region') }}<span class="required">*</span>
@@ -92,7 +92,7 @@
                   size="sm"
                   placement="right"
                   icon="?"
-                  icon-color="#007aff"
+                  icon-color="var(--color-primary)"
                   style="margin-right: 2px; vertical-align: bottom;"
               />
               {{ t('map.customDataPanel.labels.value') }}<span class="required">*</span></label>
@@ -394,7 +394,7 @@ const resetForm = () => {
   transform: translateY(-50%);
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, var(--color-primary), #0051d5);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   color: white;
   border: none;
   border-radius: 12px 0 0 12px;

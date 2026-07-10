@@ -52,7 +52,7 @@ const props = defineProps({
   },
   iconColor: {
     type: String,
-    default: '#007aff'
+    default: 'var(--color-primary)'
   },
   fontSize: {
     type: String,

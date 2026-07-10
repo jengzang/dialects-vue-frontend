@@ -514,8 +514,8 @@ $region-text: var(--text-deep);
 $region-muted: #64748b;
 $region-soft: #94a3b8;
 $region-accent: var(--color-primary);
-$region-danger: #ff3b30;
-$region-success: #34c759;
+$region-danger: var(--color-error-light);
+$region-success: var(--color-success);
 $region-border: rgba(148, 163, 184, 0.22);
 $region-glass-border: rgba(255, 255, 255, 0.58);
 

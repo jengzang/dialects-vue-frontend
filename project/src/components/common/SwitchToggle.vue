@@ -129,9 +129,9 @@ const insetNumber = computed(() => Math.max((heightNumber.value - thumbNumber.va
 const translateXNumber = computed(() => Math.max(widthNumber.value - thumbNumber.value - insetNumber.value * 2, 0))
 
 const colorPresets = {
-  blue: '#007aff',
-  green: '#34c759',
-  purple: '#5856d6',
+  blue: 'var(--color-primary)',
+  green: 'var(--color-success)',
+  purple: 'var(--color-purple)',
   gray: '#8e8e93',
 }
 

@@ -405,7 +405,7 @@ const initPitchChart = () => {
     title: {
       text: t('praat.pitchTone.step1.chart.title'),
       left: 'center',
-      textStyle: { fontSize: 14, color: '#666' }
+      textStyle: { fontSize: 14, color: 'var(--text-tertiary)' }
     },
     tooltip: {
       trigger: 'axis',
@@ -448,7 +448,7 @@ const initPitchChart = () => {
       data: rawData,
       symbol: 'none',
       smooth: true,
-      lineStyle: { color: '#007aff', width: 2 },
+      lineStyle: { color: 'var(--color-primary)', width: 2 },
       markArea: markAreaData.length > 0 ? {
         data: markAreaData,
         silent: true
@@ -1068,7 +1068,7 @@ const initContinuousChart = (isZScore) => {
 
 $primary: var(--color-primary, #4a90e2);
 $primary-blue: var(--color-primary);
-$primary-purple: #5856d6;
+$primary-purple: var(--color-purple);
 $primary-hover: #3a7bc8;
 
 $success: var(--color-success);
@@ -1076,8 +1076,8 @@ $success-dark: #3aa65d;
 $error: var(--color-error, #e74c3c);
 
 $text-primary: var(--color-text-primary);
-$text-secondary: var(--color-text-secondary, #666);
-$text-muted: var(--color-text-secondary, #999);
+$text-secondary: var(--color-text-secondary, var(--text-tertiary));
+$text-muted: var(--color-text-secondary, var(--text-lightest));
 
 $white: #fff;
 $surface: rgba(255, 255, 255, 0.5);

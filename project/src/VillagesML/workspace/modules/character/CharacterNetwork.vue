@@ -123,7 +123,7 @@ const graphReady = ref(false)
 const chartRef = ref(null)
 let chartInstance = null
 
-const DEPTH_COLORS = { 0: '#007aff', 1: '#34c759', 2: '#ff9500', 3: '#ff3b30', 4: '#af52de' }
+const DEPTH_COLORS = { 0: 'var(--color-primary)', 1: 'var(--color-success)', 2: 'var(--color-warning)', 3: 'var(--color-error-light)', 4: 'var(--color-purple-light)' }
 
 // Options for SimpleSelectDropdown
 const depthOptions = [

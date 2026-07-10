@@ -623,7 +623,7 @@ const handlePointClick = (properties) => {
 
 // 根据倾向性值返回颜色
 const getTendencyColor = (tendency) => {
-  if (!tendency) return '#666'
+  if (!tendency) return 'var(--text-tertiary)'
   if (tendency > 1) return '#228B22'  // 深绿色（高倾向性）
   if (tendency > 0.5) return '#50c878'  // 绿色
   if (tendency > 0) return '#90EE90'  // 浅绿色
@@ -634,7 +634,7 @@ const getTendencyColor = (tendency) => {
 
 // 根据偏差值返回颜色
 const getDeviationColor = (deviation) => {
-  if (!deviation) return '#666'
+  if (!deviation) return 'var(--text-tertiary)'
   if (deviation > 0.5) return '#228B22'  // 深绿色（正偏差）
   if (deviation > 0.2) return '#50c878'  // 绿色
   if (deviation > 0) return '#90EE90'  // 浅绿色

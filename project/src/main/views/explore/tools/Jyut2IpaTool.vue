@@ -827,9 +827,9 @@ loadConfig()
 
 $color-text: var(--text-deep);
 $color-primary: var(--color-primary);
-$color-success: #34c759;
-$color-danger: #ff3b30;
-$color-disabled: #999;
+$color-success: var(--color-success);
+$color-danger: var(--color-error-light);
+$color-disabled: var(--text-lightest);
 
 $text-70: rgba(11, 37, 64, 0.7);
 $text-60: rgba(11, 37, 64, 0.6);

@@ -74,7 +74,7 @@ const togglePasswordVisibility = () => {
 $primary-color: var(--color-primary);
 $error-color: var(--color-error-light);
 $text-color: var(--text-dark);
-$placeholder-color: #999;
+$placeholder-color: var(--text-lightest);
 $control-right: 15px;
 $transition-duration: 0.3s;
 $glass-blur: 12px;

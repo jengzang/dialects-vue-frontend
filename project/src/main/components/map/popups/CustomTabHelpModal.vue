@@ -486,7 +486,7 @@ $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
 $success-green: var(--color-success);
 $usage-green: #2e7d32;
-$location-orange: #ff9500;
+$location-orange: var(--color-warning);
 
 $text-main: var(--text-dark);
 $text-secondary: var(--text-medium);
@@ -580,7 +580,7 @@ $glass-card: rgba(255, 255, 255, 0.5);
   margin-bottom: 8px;
   overflow-x: auto;
   background: #fff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-light-gray);
   border-radius: 8px;
 }
 
@@ -594,7 +594,7 @@ $glass-card: rgba(255, 255, 255, 0.5);
   th {
     padding: 8px 6px;
     background-color: #f5f7fa;
-    border-bottom: 2px solid #d9d9d9;
+    border-bottom: 2px solid var(--border-gray);
     color: $text-main;
     white-space: nowrap;
     font-weight: 600;
@@ -602,7 +602,7 @@ $glass-card: rgba(255, 255, 255, 0.5);
 
   td {
     padding: 8px 6px;
-    border-right: 1px solid #f0f0f0;
+    border-right: 1px solid var(--bg-light);
     border-bottom: 1px solid #eee;
     color: $text-secondary;
     vertical-align: middle;
@@ -626,7 +626,7 @@ $glass-card: rgba(255, 255, 255, 0.5);
 }
 
 .highlight-geo {
-  background-color: #fafafa;
+  background-color: var(--bg-light-gray);
   color: var(--text-muted)
   font-family: monospace;
   font-size: 11px;

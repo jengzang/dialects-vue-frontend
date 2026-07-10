@@ -93,7 +93,7 @@ function handleVisibilityChange(value) {
 <style scoped lang="scss">
 $text-dark: var(--text-deep);
 $text-main: #111827;
-$text-body: #1f2937;
+$text-body: var(--text-deep);
 $text-secondary: #4b5563;
 
 .cell-detail-content {

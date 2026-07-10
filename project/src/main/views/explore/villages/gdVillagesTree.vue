@@ -572,7 +572,7 @@ $success-green: var(--color-success);
 $error-red: var(--color-error);
 $text-primary: var(--text-primary);
 $text-secondary: #6e6e73;
-$text-muted: #8e8e93;
+$text-muted: var(--text-secondary);
 $white: #fff;
 
 $transition-fast: 0.2s;

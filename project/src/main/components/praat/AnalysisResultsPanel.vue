@@ -282,14 +282,14 @@ const initPitchChart = () => {
     yAxis: {
       type: 'value',
       name: t('praat.results.charts.pitch.yAxis'),
-      axisLine: { lineStyle: { color: '#007aff' } }
+      axisLine: { lineStyle: { color: 'var(--color-primary)' } }
     },
     series: [{
       name: t('praat.results.charts.pitch.seriesName'),
       type: 'line',
       data: pitchData,
       smooth: true,
-      lineStyle: { color: '#007aff', width: 2 },
+      lineStyle: { color: 'var(--color-primary)', width: 2 },
       showSymbol: false,
       markArea: markAreaData.length > 0 ? { data: markAreaData } : undefined
     }],
@@ -334,14 +334,14 @@ const initIntensityChart = () => {
     yAxis: {
       type: 'value',
       name: t('praat.results.charts.intensity.yAxis'),
-      axisLine: { lineStyle: { color: '#ff3b30' } }
+      axisLine: { lineStyle: { color: 'var(--color-error-light)' } }
     },
     series: [{
       name: t('praat.results.charts.intensity.seriesName'),
       type: 'line',
       data: intensityData,
       smooth: true,
-      lineStyle: { color: '#ff3b30', width: 2 },
+      lineStyle: { color: 'var(--color-error-light)', width: 2 },
       showSymbol: false
     }],
     grid: {
@@ -367,7 +367,7 @@ const initFormantChart = () => {
   formantChart = echarts.init(formantChartContainer.value)
   const ts = props.results.timeseries
 
-  const formantColors = ['#34c759', '#ff9500', '#5856d6', '#ff2d55', '#5ac8fa']
+  const formantColors = ['var(--color-success)', 'var(--color-warning)', 'var(--color-purple)', '#ff2d55', '#5ac8fa']
   const formantKeys = ['f1', 'f2', 'f3', 'f4', 'f5']
 
   const formantSeries = formantKeys.map((key, i) => {
@@ -648,7 +648,7 @@ const addSpectrogramOverlays = (option) => {
       data: overlays.map(s => s.name),
       top: 'bottom',
       textStyle: {
-        color: '#333'
+        color: 'var(--text-dark)'
       }
     }
   }
@@ -669,7 +669,7 @@ const renderTimeSeriesCharts = () => {
 const getHnrClass = (hnr) => hnr >= 15 ? 'quality-good' : hnr >= 10 ? 'quality-fair' : 'quality-poor'
 const getHnrBarStyle = (hnr) => ({
   width: `${Math.min((hnr / 20) * 100, 100)}%`,
-  backgroundColor: hnr >= 15 ? '#34c759' : hnr >= 10 ? '#ff9500' : '#ff3b30'
+  backgroundColor: hnr >= 15 ? 'var(--color-success)' : hnr >= 10 ? 'var(--color-warning)' : 'var(--color-error-light)'
 })
 const getHnrStatus = (hnr) => hnr >= 15
   ? t('praat.results.voiceQuality.hnr.status.good')
@@ -680,7 +680,7 @@ const getHnrStatus = (hnr) => hnr >= 15
 const getJitterClass = (j) => j < 0.01 ? 'quality-good' : j < 0.02 ? 'quality-fair' : 'quality-poor'
 const getJitterBarStyle = (j) => ({
   width: `${Math.min((j / 0.05) * 100, 100)}%`,
-  backgroundColor: j < 0.01 ? '#34c759' : j < 0.02 ? '#ff9500' : '#ff3b30'
+  backgroundColor: j < 0.01 ? 'var(--color-success)' : j < 0.02 ? 'var(--color-warning)' : 'var(--color-error-light)'
 })
 const getJitterStatus = (j) => j < 0.01
   ? t('praat.results.voiceQuality.jitter.status.good')
@@ -691,7 +691,7 @@ const getJitterStatus = (j) => j < 0.01
 const getShimmerClass = (s) => s < 0.03 ? 'quality-good' : s < 0.06 ? 'quality-fair' : 'quality-poor'
 const getShimmerBarStyle = (s) => ({
   width: `${Math.min((s / 0.1) * 100, 100)}%`,
-  backgroundColor: s < 0.03 ? '#34c759' : s < 0.06 ? '#ff9500' : '#ff3b30'
+  backgroundColor: s < 0.03 ? 'var(--color-success)' : s < 0.06 ? 'var(--color-warning)' : 'var(--color-error-light)'
 })
 const getShimmerStatus = (s) => s < 0.03
   ? t('praat.results.voiceQuality.shimmer.status.good')
@@ -725,9 +725,9 @@ onBeforeUnmount(() => {
 
 
 $primary-blue: var(--color-primary);
-$quality-good: #34c759;
-$quality-fair: #ff9500;
-$quality-poor: #ff3b30;
+$quality-good: var(--color-success);
+$quality-fair: var(--color-warning);
+$quality-poor: var(--color-error-light);
 
 $text-primary: var(--color-text-primary);
 $text-secondary: var(--color-text-secondary);

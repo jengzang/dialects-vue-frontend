@@ -658,12 +658,12 @@ const generatePieChartOption = (pieData) => {
       textStyle: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#333',
+        color: 'var(--text-dark)',
         lineHeight: 14
       },
       subtextStyle: {
         fontSize: 11,
-        color: '#666'
+        color: 'var(--text-tertiary)'
       }
     },
     tooltip: {
@@ -1098,7 +1098,7 @@ const generateSankeyOption = () => {
       textStyle: {
         fontSize: 15,
         fontWeight: 'bold',
-        color: '#333'
+        color: 'var(--text-dark)'
       }
     },
     tooltip: {
@@ -1138,7 +1138,7 @@ const generateSankeyOption = () => {
         opacity: 0.35
       },
       label: {
-        color: '#333',
+        color: 'var(--text-dark)',
         fontSize: 12,
         formatter: ({ data }) => data.rawLabel
       },

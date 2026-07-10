@@ -150,7 +150,7 @@
             <button
                 class="main-glass-button"
                 data-size="small"
-                style="display: inline-block; padding: 2px 8px; margin: 0 2px; vertical-align: middle;background: #007aff;color:white"
+                style="display: inline-block; padding: 2px 8px; margin: 0 2px; vertical-align: middle;background: var(--color-primary);color:white"
                 @click="$router.push(buildLocalePath(resolveRouteLocale(route), '/explore/tools/check'))"
             >
               {{ t('tools.merge.files.checkTool') }}
@@ -787,8 +787,8 @@ const reset = () => {
 
 $color-text: var(--text-deep);
 $color-primary: var(--color-primary);
-$color-success: #34c759;
-$color-danger: #ff3b30;
+$color-success: var(--color-success);
+$color-danger: var(--color-error-light);
 
 .merge-tool-container {
   height: 80%;

@@ -957,7 +957,7 @@ watch(() => props.activeTab, () => {
 .mode-switcher {
   display: flex;
   gap: 4px;
-  background: #f0f0f0;
+  background: var(--bg-light);
   border-radius: 8px;
   padding: 4px;
 }
@@ -1016,7 +1016,7 @@ watch(() => props.activeTab, () => {
 }
 
 .fullscreen-btn {
-  background: #34c759;
+  background: var(--color-success);
 }
 
 .fullscreen-btn:hover {
@@ -1204,14 +1204,14 @@ watch(() => props.activeTab, () => {
 
 /* 分区行特殊样式 */
 .category-row .value {
-  color: #af52de;
+  color: var(--color-purple-light);
   font-weight: 600;
   font-size: 14px;
 }
 
 .info-line {
   padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--bg-light);
   font-size: 14px;
   line-height: 1.6;
 }

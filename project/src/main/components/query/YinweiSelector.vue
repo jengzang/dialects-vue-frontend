@@ -324,7 +324,7 @@ defineExpose({
 
 
 $primary-blue: var(--color-primary);
-$success-green: #52c41a;
+$success-green: var(--color-success);
 $transition-duration: 0.2s;
 $glass-blur: 12px;
 
@@ -445,7 +445,7 @@ $glass-blur: 12px;
   }
 
   &--total {
-    color: #0f5fc4;
+    color: var(--color-primary-hover);
     background: rgba(var(--color-primary-rgb), 0.14);
     border-color: rgba(var(--color-primary-rgb), 0.22);
   }

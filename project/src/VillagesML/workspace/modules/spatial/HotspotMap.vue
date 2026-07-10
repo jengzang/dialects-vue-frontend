@@ -512,7 +512,7 @@ const resetView = () => {
 .info-row {
   display: flex;
   padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--bg-light);
 }
 
 .info-row:last-child {

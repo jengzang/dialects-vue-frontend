@@ -2322,7 +2322,7 @@ $text-muted: var(--text-lightest);
     display: flex;
     flex-direction: column;
     gap: 1px;
-    color: var(--text-secondary, #666);
+    color: var(--text-secondary, var(--text-tertiary));
     font-size: 12px;
     line-height: 1.35;
 

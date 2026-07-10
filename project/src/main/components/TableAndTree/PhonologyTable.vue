@@ -807,7 +807,7 @@ $transition-duration: 0.25s;
 
   tbody {
     tr:hover {
-      background: #f9f9f9;
+      background: var(--bg-light-gray);
     }
   }
 }

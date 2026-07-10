@@ -353,7 +353,7 @@ onBeforeUnmount(() => {
 </script>
 
 
-$orange: #ff9500;
+$orange: var(--color-warning);
 $orange-dark: #ff8000;
 $green: var(--color-success);
 $green-light: #30d158;

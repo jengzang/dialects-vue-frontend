@@ -508,7 +508,7 @@ $system-font:
   height: 78dvh;
   overflow: auto;
   resize: both;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-light-gray);
   border-radius: $panel-radius;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   transition:

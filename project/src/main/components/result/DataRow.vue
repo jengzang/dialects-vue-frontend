@@ -313,7 +313,7 @@ const handleFeatureStatsClick = async () => {
 
 
 $primary-blue: var(--color-primary);
-$clickable-blue: #007bff;
+$clickable-blue: var(--color-primary);
 $text-dark: var(--text-dark);
 $text-muted: var(--text-tertiary);
 $transition-duration: 0.2s;
@@ -400,7 +400,7 @@ $glass-blur: 8px;
     cursor: pointer;
 
     &:hover {
-      background-color: #f9f9f9;
+      background-color: var(--bg-light-gray);
       border-radius: 4px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }

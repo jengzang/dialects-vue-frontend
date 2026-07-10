@@ -729,7 +729,7 @@ const PartitionTreeNode = defineComponent({
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
 $danger: #b42318;
-$error: #d32f2f;
+$error: var(--color-error);
 $warning: #d35400;
 
 $mobile-breakpoint: 768px;
@@ -910,7 +910,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
     .count {
       margin-left: 4px;
-      color: #8e8e93;
+      color: var(--text-secondary);
       font-size: 12px;
     }
 

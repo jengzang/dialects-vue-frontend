@@ -626,10 +626,10 @@ $text-primary: var(--text-primary);
 $text-secondary: var(--text-secondary);
 $danger: var(--color-error-light);
 
-$gold: #ffd700;
+$gold: var(--color-gold);
 $gold-text: #d4af37;
-$silver: #c0c0c0;
-$bronze: #cd7f32;
+$silver: var(--color-silver);
+$bronze: var(--color-bronze);
 
 @mixin glass($blur: 40px, $saturate: 180%) {
   backdrop-filter: blur($blur) saturate($saturate);
@@ -797,7 +797,7 @@ $bronze: #cd7f32;
     }
 
     &.silver {
-      @include gradient-text($silver, #e0e0e0);
+      @include gradient-text($silver, var(--border-light-gray));
 
       filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
     }

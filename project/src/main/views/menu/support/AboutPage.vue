@@ -262,7 +262,7 @@
                     size="sm"
                     placement="right"
                     icon="?"
-                    icon-color="#007aff"
+                    icon-color="var(--color-primary)"
                     style="margin-right: 2px; vertical-align: bottom;"
                 />
               </h3>
@@ -298,7 +298,7 @@
               :width="100"
               :height="40"
               :thumb-size="32"
-              color="#007aff"
+              color="var(--color-primary)"
               variant="solid"
               show-label
               :active-text="$t('about.settings.tutorialToggle.enabled')"
@@ -558,10 +558,10 @@ function resolveTabRoute(tabName) {
 $primary: var(--color-primary);
 $zhihu-blue: #0066ff;
 $github-dark: #24292f;
-$danger: #c52f27;
+$danger: var(--color-error);
 
 $text-primary: var(--text-dark);
-$text-heading: #1a1a1a;
+$text-heading: var(--text-primary);
 $text-secondary: var(--text-medium);
 $text-muted: var(--text-tertiary);
 $text-light: var(--text-lightest);
@@ -729,7 +729,7 @@ em {
     left: 50%;
     width: 0%;
     height: 2px;
-    background: linear-gradient(90deg, var(--color-primary), #00c6ff);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-cyan));
     transition: width 0.3s ease, left 0.3s ease;
   }
 
@@ -933,7 +933,7 @@ em {
   align-items: center;
   justify-content: center;
   margin-bottom: 0.5rem;
-  color: #3f8eff;
+  color: var(--color-primary);
   font-size: 1.2rem;
   font-weight: bold;
 }
@@ -1039,7 +1039,7 @@ em {
   max-width: 700px;
   margin: 0 auto;
   justify-content: center;
-  color: #1f2937;
+  color: var(--text-deep);
   font-family:
     -apple-system,
     BlinkMacSystemFont,
@@ -1051,13 +1051,13 @@ em {
 
   p {
     margin: 10px 0;
-    color: #4b5563;
+    color: var(--text-secondary);
     font-size: 18px;
   }
 }
 
 .subtext {
-  color: #6b7280;
+  color: var(--text-tertiary);
   font-size: 16px;
 }
 
@@ -1191,7 +1191,7 @@ em {
   justify-content: center;
   padding: 16px;
   background: rgba(255, 255, 255, 0.8);
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-light-gray);
   border-radius: 12px;
   cursor: pointer;
   transition: all $ease-standard;

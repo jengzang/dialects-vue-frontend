@@ -62,10 +62,10 @@ const getDefaultConfig = () => {
     bgType: 'solid',
     glass: true,
     bgColor: '#ffffff',
-    gradientFrom: '#007aff',
-    gradientTo: '#00c6ff',
+    gradientFrom: 'var(--color-primary)',
+    gradientTo: 'var(--color-primary-cyan)',
     gradientAngle: 145,
-    textColor: '#005fd3',
+    textColor: 'var(--color-primary-hover)',
     glow: true
   }
 }
@@ -237,7 +237,7 @@ onMounted(() => {
 
 
 $primary-blue: var(--color-primary);
-$secondary-blue: #00c6ff;
+$secondary-blue: var(--color-primary-cyan);
 $white: #fff;
 
 $avatar-size: 64px;

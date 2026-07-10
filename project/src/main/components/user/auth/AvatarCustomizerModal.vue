@@ -241,19 +241,19 @@ let backupConfig = null;
 let isSaved = false;
 
 const presetSolids = [
-  '#007aff', // Apple Blue
-  '#34c759', // Apple Green
-  '#ff9500', // Apple Orange
+  'var(--color-primary)', // Apple Blue
+  'var(--color-success)', // Apple Green
+  'var(--color-warning)', // Apple Orange
   '#ff2d55', // Apple Pink/Red
-  '#af52de', // Apple Purple
-  '#5856d6', // Apple Indigo
+  'var(--color-purple-light)', // Apple Purple
+  'var(--color-purple)', // Apple Indigo
   '#ffcc00', // Apple Yellow
   '#8e8e93', // Apple Gray
 ];
 
 const presetGradients = [
   { name: 'auth.profile.avatar.presetSunset', from: '#ff5e62', to: '#ff9966' },
-  { name: 'auth.profile.avatar.presetOcean', from: '#00c6ff', to: '#0072ff' },
+  { name: 'auth.profile.avatar.presetOcean', from: 'var(--color-primary-cyan)', to: '#0072ff' },
   { name: 'auth.profile.avatar.presetAurora', from: '#a18cd1', to: '#fbc2eb' },
   { name: 'auth.profile.avatar.presetSpring', from: '#11998e', to: '#38ef7d' },
   { name: 'auth.profile.avatar.presetMidnight', from: '#1e3c72', to: '#2a5298' },
@@ -269,10 +269,10 @@ const getDefaultConfig = () => {
     bgType: 'solid',
     glass: true,
     bgColor: '#ffffff',
-    gradientFrom: '#007aff',
-    gradientTo: '#00c6ff',
+    gradientFrom: 'var(--color-primary)',
+    gradientTo: 'var(--color-primary-cyan)',
     gradientAngle: 145,
-    textColor: '#005fd3',
+    textColor: 'var(--color-primary-hover)',
     glow: true,
   };
 };
@@ -285,10 +285,10 @@ const avatarConfig = ref({
   bgType: 'solid',
   glass: true,
   bgColor: '#ffffff',
-  gradientFrom: '#007aff',
-  gradientTo: '#00c6ff',
+  gradientFrom: 'var(--color-primary)',
+  gradientTo: 'var(--color-primary-cyan)',
   gradientAngle: 145,
-  textColor: '#005fd3',
+  textColor: 'var(--color-primary-hover)',
   glow: true,
 });
 
@@ -467,7 +467,7 @@ watch(
 ```vue
 
 $primary-blue: var(--color-primary);
-$primary-blue-dark: #0063cc;
+$primary-blue-dark: var(--color-primary-hover);
 $text-primary: var(--text-primary);
 $text-secondary: var(--text-secondary);
 $text-button: #48484a;

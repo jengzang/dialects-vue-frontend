@@ -431,7 +431,7 @@ watch(showPartitionInfoModal, (isVisible) => {
 
 ```scss
 <style scoped lang="scss">
-$success-green: #52c41a;
+$success-green: var(--color-success);
 $warning-orange: #ff9800;
 $portrait-ratio: 1 / 1;
 

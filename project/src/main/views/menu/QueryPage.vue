@@ -1029,7 +1029,7 @@ $transition-base: 0.3s;
 .select-all-item {
   color: var(--text-tertiary);
   font-size: 0.9em;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--bg-light);
 }
 
 .check-icon {

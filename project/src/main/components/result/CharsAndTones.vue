@@ -583,7 +583,7 @@ onMounted(() => {
 
 
 $primary-blue: var(--color-primary);
-$deep-blue: #0038a1;
+$deep-blue: var(--text-deep);
 $text-black: #000;
 $text-gray: var(--text-tertiary);
 $transition-fast: 0.2s;

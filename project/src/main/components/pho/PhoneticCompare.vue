@@ -550,7 +550,7 @@ const renderSankey = async (queryLocs) => {
         opacity: 0.25
       },
       label: {
-        color: '#333',
+        color: 'var(--text-dark)',
         fontSize: 12,
         fontWeight: 'bold',
         formatter: ({ data }) => data.rawLabel
@@ -733,7 +733,7 @@ onUnmounted(() => {
 
 
 $primary: var(--color-primary);
-$error: #d32f2f;
+$error: var(--color-error);
 $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 @mixin flex-center {
@@ -782,7 +782,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   @include flex-center;
 
   p {
-    color: var(--text-secondary, #666);
+    color: var(--text-secondary, var(--text-tertiary));
     font-size: 14px;
   }
 }
@@ -817,7 +817,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   background: var(--glass-light, rgba(255, 255, 255, 0.3));
   border: 1px solid var(--border-gray-light, rgba(200, 200, 200, 0.5));
   border-radius: var(--radius-md, 12px);
-  color: var(--text-dark, #333);
+  color: var(--text-dark, var(--text-dark));
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -929,7 +929,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .detail-card-title {
   overflow: hidden;
-  color: var(--text-dark, #333);
+  color: var(--text-dark, var(--text-dark));
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 15px;
@@ -939,7 +939,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .detail-card-subtitle {
   margin-top: 4px;
-  color: var(--text-secondary, #666);
+  color: var(--text-secondary, var(--text-tertiary));
   font-size: 12px;
   line-height: 1.4;
 }
@@ -952,7 +952,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .detail-card-chars {
-  color: var(--text-dark, #333);
+  color: var(--text-dark, var(--text-dark));
   word-break: break-all;
   white-space: pre-wrap;
   font-size: 14px;

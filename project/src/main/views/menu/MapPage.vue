@@ -28,7 +28,7 @@
           size="sm"
           placement="bottom"
           icon="?"
-          icon-color="#007aff"
+          icon-color="var(--color-primary)"
           style="margin-left: 5px;"
         />
         <div

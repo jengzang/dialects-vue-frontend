@@ -323,9 +323,9 @@ $primary: var(--color-primary);
 $primary-hover: #0066cc;
 
 $text-main: var(--color-text-primary);
-$text-secondary: var(--color-text-secondary, #666);
+$text-secondary: var(--color-text-secondary, var(--text-tertiary));
 $text-radio-title: var(--text-dark);
-$text-radio-desc: #666;
+$text-radio-desc: var(--text-tertiary);
 
 $surface-light: var(--glass-light);
 $surface-medium: var(--glass-medium);

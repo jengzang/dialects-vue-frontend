@@ -37,7 +37,7 @@ $mobile-aspect-ratio: 1 / 1;
 $solid-variants: (
   blue: (
     background: var(--color-primary),
-    hover: #005fcc
+    hover: var(--color-primary-hover)
   ),
   green: (
     background: #28a745,

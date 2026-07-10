@@ -596,7 +596,7 @@ watch(
 
 
 $primary-blue: var(--color-primary);
-$system-blue: #0a84ff;
+$system-blue: var(--color-primary);
 $dark-blue: var(--color-primary-hover);
 $danger-red: #d70015;
 $danger-text: #c21b31;

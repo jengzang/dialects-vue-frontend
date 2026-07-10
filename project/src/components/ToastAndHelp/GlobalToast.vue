@@ -47,7 +47,7 @@ function getIcon(type) {
 
 
 $apple-blue: var(--color-primary);
-$action-blue: #0067d8;
+$action-blue: var(--color-primary-hover);
 $white: #fff;
 
 $text-default: rgba(24, 32, 46, 0.86);

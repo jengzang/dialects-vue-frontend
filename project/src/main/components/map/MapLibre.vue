@@ -1180,7 +1180,7 @@ const resetView = () => {
 
 /* ✨ 全屏按鈕樣式 (綠色區分) */
 .fullscreen-btn {
-  background: #34c759; /* Apple Green */
+  background: var(--color-success); /* Apple Green */
 }
 
 .fullscreen-btn:hover {
@@ -1271,7 +1271,7 @@ const resetView = () => {
 
 .info-line {
   padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--bg-light);
 }
 
 .info-line:last-of-type {
@@ -1317,7 +1317,7 @@ const resetView = () => {
 }
 
 .tone-table tbody tr:hover {
-  background: #f9f9f9;
+  background: var(--bg-light-gray);
 }
 
 .data-display pre {

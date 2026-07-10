@@ -127,7 +127,7 @@ const buildTag = (text, bgColor) => {
 
 const buildHoverHtml = (name, pathStr, tagText, tagColor) => {
   let html = `<div style="text-align:center"><strong>${name}</strong></div>`
-  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:#999;margin-top:2px">${pathStr}</div>`
+  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:var(--text-lightest);margin-top:2px">${pathStr}</div>`
   if (tagText && tagColor) html += `<div style="text-align:center">${buildTag(tagText, tagColor)}</div>`
   return html
 }
@@ -538,7 +538,7 @@ onBeforeUnmount(() => {
 
 
 $primary: var(--color-primary);
-$primary-hover: #0062cc;
+$primary-hover: var(--color-primary-hover);
 $text-dark: var(--text-primary);
 $mobile-breakpoint: 768px;
 

@@ -102,7 +102,7 @@ function handleClose() {
 
 $text-main: var(--text-dark);
 $text-secondary: var(--text-tertiary);
-$text-muted: #8e8e93;
+$text-muted: var(--text-secondary);
 $primary: var(--color-primary);
 
 $divider-color: rgba(0, 0, 0, 0.05);

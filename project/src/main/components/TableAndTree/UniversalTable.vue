@@ -1738,7 +1738,7 @@ td {
   &.editable-cell {
     cursor: text;
     background: #fffbf0;
-    border: 1px solid #ffd700;
+    border: 1px solid var(--color-gold);
     transition: all $transition-fast;
 
     &:hover {
@@ -2467,7 +2467,7 @@ td {
   width: 20px;
   height: 20px;
   border-radius: 5px;
-  border: 2px solid #d1d5db;
+  border: 2px solid var(--border-gray);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2478,7 +2478,7 @@ td {
 }
 
 .column-checkbox-item input:checked + .custom-checkbox {
-  background: linear-gradient(135deg, $primary-blue, #0051d5);
+  background: linear-gradient(135deg, $primary-blue, var(--color-primary-hover));
   border-color: $primary-blue;
   transform: scale(1.1);
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.4);

@@ -147,7 +147,7 @@ $table-radius: 8px;
 .help-table-wrapper {
   max-height: 300px;
   overflow-y: auto;
-  border: 1px solid var(--border-light, #e0e0e0);
+  border: 1px solid var(--border-light, var(--border-light-gray));
   border-radius: $table-radius;
 }
 
@@ -164,7 +164,7 @@ $table-radius: 8px;
 
   th {
     padding: 10px 12px;
-    background: var(--glass-medium-strong, #f0f0f0);
+    background: var(--glass-medium-strong, var(--bg-light));
     border-bottom: 2px solid var(--border-medium, #ddd);
     color: $text-heading;
     text-align: left;

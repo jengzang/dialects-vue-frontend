@@ -83,7 +83,7 @@ const handleChange = (event) => {
 
 
 $primary-color: var(--color-primary);
-$text-color: var(--text-dark, #333);
+$text-color: var(--text-dark, var(--text-dark));
 $white: #fff;
 
 $transition-fast: 0.2s ease;

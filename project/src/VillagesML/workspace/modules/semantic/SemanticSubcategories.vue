@@ -406,7 +406,7 @@ export default {
           splitNumber: 5,
           name: {
             textStyle: {
-              color: '#333',
+              color: 'var(--text-dark)',
               fontSize: 12
             }
           },
@@ -839,17 +839,17 @@ tr.significant {
 }
 
 .rank-badge.gold {
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  background: linear-gradient(135deg, var(--color-gold), #ffed4e);
   color: var(--text-dark)
 }
 
 .rank-badge.silver {
-  background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+  background: linear-gradient(135deg, var(--color-silver), #e8e8e8);
   color: var(--text-dark)
 }
 
 .rank-badge.bronze {
-  background: linear-gradient(135deg, #cd7f32, #e8a87c);
+  background: linear-gradient(135deg, var(--color-bronze), #e8a87c);
   color: var(--text-dark)
 }
 

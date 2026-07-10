@@ -148,7 +148,7 @@ defineExpose({ pathStrings, chars, positionInput, charInput })
 
 
 $primary-color: var(--color-blue-custom, var(--color-primary));
-$text-medium-color: var(--text-medium, #555);
+$text-medium-color: var(--text-medium, var(--text-medium));
 $error-color: var(--color-error-light);
 $warning-color: var(--color-warning);
 $transition-duration: 0.2s;

@@ -224,11 +224,11 @@ let regionsPlugin = null
 
 // Region colors
 const regionColors = [
-  '#34c759',  // Green
-  '#007aff',  // Blue
-  '#ff9500',  // Orange
+  'var(--color-success)',  // Green
+  'var(--color-primary)',  // Blue
+  'var(--color-warning)',  // Orange
   '#ff2d55',  // Pink
-  '#5856d6',  // Purple
+  'var(--color-purple)',  // Purple
 ]
 
 const effectiveSegments = computed(() => {
@@ -299,8 +299,8 @@ const initFullWaveform = async () => {
   fullWaveform.value = WaveSurfer.create({
     container: fullWaveformContainer.value,
     waveColor: 'rgba(0, 122, 255, 0.3)',
-    progressColor: '#007aff',
-    cursorColor: '#007aff',
+    progressColor: 'var(--color-primary)',
+    cursorColor: 'var(--color-primary)',
     height: 120,
     responsive: true,
     barWidth: 2,
@@ -810,8 +810,8 @@ const initWaveSurfers = async () => {
     const wavesurfer = WaveSurfer.create({
       container: container,
       waveColor: 'rgba(0, 122, 255, 0.3)',
-      progressColor: '#007aff',
-      cursorColor: '#007aff',
+      progressColor: 'var(--color-primary)',
+      cursorColor: 'var(--color-primary)',
       height: 60,
       responsive: true,
       barWidth: 2,

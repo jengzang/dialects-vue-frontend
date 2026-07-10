@@ -275,7 +275,7 @@ onUnmounted(() => {
 $dropdown-item-padding: 8px 16px;
 $dropdown-font-size: 14px;
 $transition-duration: 0.2s;
-$dropdown-selected-bg: #e6f0ff;
+$dropdown-selected-bg: var(--bg-blue-light);
 $dropdown-selected-color: var(--color-primary-hover);
 
 .key-dropdown-group {
@@ -395,7 +395,7 @@ $dropdown-selected-color: var(--color-primary-hover);
 .select-all-item {
   color: var(--text-tertiary);
   font-size: 0.9em;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--bg-light);
 }
 
 .dropdown-divider {

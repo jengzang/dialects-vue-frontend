@@ -590,7 +590,7 @@ $portrait-ratio: 1 / 1;
 
 .icp-number {
   text-align: center;
-  color: #575757;
+  color: var(--text-gray);
   font-size: 14px;
 }
 

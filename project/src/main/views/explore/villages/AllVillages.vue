@@ -668,7 +668,7 @@ $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
 $text-primary: var(--text-primary);
 $text-secondary: #6e6e73;
-$text-muted: #8e8e93;
+$text-muted: var(--text-secondary);
 $error-color: var(--color-error);
 $white: #fff;
 

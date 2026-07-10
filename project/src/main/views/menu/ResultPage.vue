@@ -351,8 +351,8 @@ export default {
 
 
 $primary-blue: var(--color-primary);
-$primary-blue-hover: #0062cc;
-$apple-red: #ff3b30;
+$primary-blue-hover: var(--color-primary-hover);
+$apple-red: var(--color-error-light);
 
 $text-primary: var(--text-dark);
 $text-secondary: var(--text-tertiary);

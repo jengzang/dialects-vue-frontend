@@ -135,7 +135,7 @@ $primary-blue: var(--color-primary);
 $text-primary: var(--text-dark);
 $text-secondary: var(--text-tertiary);
 $text-muted: var(--text-lightest);
-$border-color: #e0e0e0;
+$border-color: var(--border-light-gray);
 $white: #fff;
 
 $transition-duration: 0.3s;

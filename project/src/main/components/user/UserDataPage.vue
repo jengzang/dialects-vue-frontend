@@ -757,9 +757,9 @@ $user-muted: #64748b;
 $user-border: rgba(148, 163, 184, 0.24);
 $user-glass-border: rgba(255, 255, 255, 0.58);
 $user-accent: var(--color-primary);
-$user-danger: #ff3b30;
-$user-warning: #ff9500;
-$user-success: #34c759;
+$user-danger: var(--color-error-light);
+$user-warning: var(--color-warning);
+$user-success: var(--color-success);
 
 @mixin glass-panel($radius: 24px, $padding: 18px) {
   position: relative;

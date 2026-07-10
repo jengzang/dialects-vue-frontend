@@ -243,7 +243,7 @@ watch(() => props.triggerEl, () => {
 
 
 $primary-blue: var(--color-primary-hover);
-$selected-background: #e6f0ff;
+$selected-background: var(--bg-blue-light);
 $text-primary: rgba(0, 0, 0, 0.85);
 $text-secondary: rgba(0, 0, 0, 0.75);
 $text-muted: rgba(0, 0, 0, 0.45);
@@ -339,7 +339,7 @@ $transition-fast: 0.2s;
 .select-all-item {
   color: $text-secondary;
   font-weight: 600;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--bg-light);
 }
 
 .check-icon {

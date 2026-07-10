@@ -902,7 +902,7 @@ watch(viewMode, async (newMode) => {
 
 $primary: #0071e3;
 $white: #fff;
-$purple: #af52de;
+$purple: var(--color-purple-light);
 
 $text-primary: var(--text-primary);
 $text-secondary: #6e6e73;

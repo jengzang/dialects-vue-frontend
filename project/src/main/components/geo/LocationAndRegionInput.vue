@@ -1355,7 +1355,7 @@ defineExpose({
 ```scss
 
 $primary: var(--color-primary);
-$success: #52c41a;
+$success: var(--color-success);
 $custom-purple: #667eea;
 $portrait-ratio: 1 / 1;
 

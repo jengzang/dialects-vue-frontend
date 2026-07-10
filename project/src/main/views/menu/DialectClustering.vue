@@ -312,7 +312,7 @@ const {
     border-radius: 14px;
     padding: 12px 14px;
     background: rgba(255, 255, 255, 0.82);
-    color: #1f2937;
+    color: var(--text-deep);
   }
 
   .field textarea {
