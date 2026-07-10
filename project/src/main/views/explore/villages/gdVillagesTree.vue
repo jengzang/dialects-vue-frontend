@@ -118,7 +118,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import VillagesTreeItem from '@/main/components/TableAndTree/VillagesTreeItem.vue';
-import VillageMapPopup from '@/main/components/popup/map/VillageMapPopup.vue';
+import VillageMapPopup from '@/main/components/map/popups/VillageMapPopup.vue';
 import { lazyLoadTree, loadFullTree } from '@/api';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js'

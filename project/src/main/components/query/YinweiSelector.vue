@@ -62,7 +62,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getFeatureCounts } from '@/api'
-import YinweiHelpPopup from '@/main/components/popup/query/YinweiHelpPopup.vue'
+import YinweiHelpPopup from '@/main/components/query/popups/YinweiHelpPopup.vue'
 import { LOCATION_LIMITS } from '@/main/config/constants.js'
 import { userStore, setTabContentDisabled } from '@/main/store/store.js'
 import {

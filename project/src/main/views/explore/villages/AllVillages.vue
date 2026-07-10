@@ -131,7 +131,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { decompressSync, strFromU8 } from 'fflate'
 import VillagesTreeItem from '@/main/components/TableAndTree/VillagesTreeItem.vue';
-import AllVillagesMapPopup from '@/main/components/popup/map/AllVillagesMapPopup.vue';
+import AllVillagesMapPopup from '@/main/components/map/popups/AllVillagesMapPopup.vue';
 import { lazyLoadTree, loadFullTree } from '@/api';
 import { getPlaceTypeInfo, default as PLACE_TYPE_MAPPING } from '@/main/config/placeTypeMapping.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'

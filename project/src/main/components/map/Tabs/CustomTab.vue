@@ -227,7 +227,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import CustomDataEntryModal from '@/main/components/map/custom/CustomDataEntryModal.vue';
-import CustomTabHelpModal from '@/main/components/popup/map/CustomTabHelpModal.vue';
+import CustomTabHelpModal from '@/main/components/map/popups/CustomTabHelpModal.vue';
 import { getUserFeatures, getDataByFeature } from '@/api';
 import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js';
 import {

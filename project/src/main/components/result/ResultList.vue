@@ -122,8 +122,8 @@ import { useI18n } from 'vue-i18n';
 import DataRow from './DataRow.vue';
 import { parseFeatureString,get_detail } from '@/main/utils/query/ResultTable.js';
 import { READING_COLORS } from '@/main/config/readingColors.js';
-import ValuePopup from "../popup/result/ValuePopup.vue";
-import FeaturePopup from "../popup/result/FeaturePopup.vue";
+import ValuePopup from "./popups/ValuePopup.vue";
+import FeaturePopup from "./popups/FeaturePopup.vue";
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { resultCache } from '@/main/store/store.js';
 

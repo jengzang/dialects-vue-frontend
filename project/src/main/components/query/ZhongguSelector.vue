@@ -56,7 +56,7 @@
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getCharList } from '@/api'
-import ZhongguDetailsPopup from '@/main/components/popup/query/ZhongguDetailsPopup.vue'
+import ZhongguDetailsPopup from '@/main/components/query/popups/ZhongguDetailsPopup.vue'
 import { userStore, setTabContentDisabled } from '@/main/store/store.js'
 import { ROLE_LIMITS, QUERY_CONFIG } from '@/main/config/constants.js'
 

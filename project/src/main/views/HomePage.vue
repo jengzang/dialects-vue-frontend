@@ -589,7 +589,7 @@ import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
 
 // ✅ 条件渲染的组件懒加载
 const UserBenefitsPopup = defineAsyncComponent(() =>
-  import('@/main/components/popup/user/UserBenefitsPopup.vue')
+  import('@/main/components/user/popups/UserBenefitsPopup.vue')
 )
 const SupportPopup = defineAsyncComponent(() =>
   import('@/main/components/popup/SupportPopup.vue')
