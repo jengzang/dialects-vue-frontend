@@ -472,7 +472,7 @@ $transition-duration: 0.25s;
   margin-bottom: 15px;
   overflow-x: auto;
   overflow-y: auto;
-  background: var(--glass-medium2);
+  background: var(--glass-60);
   border: 1px solid var(--border-gray-light);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md2);
@@ -499,7 +499,7 @@ $transition-duration: 0.25s;
   min-width: 60px;
   padding: 10px;
   font-weight: 700;
-  background: var(--glass-lighter2);
+  background: var(--glass-50);
 }
 
 .initial-header {
@@ -542,14 +542,14 @@ $transition-duration: 0.25s;
   padding: 8px;
   vertical-align: top;
   cursor: default;
-  background: var(--glass-very-light2);
+  background: var(--glass-10);
   border: 1px solid var(--border-gray-lightest);
 
   /* Layout isolation for better rendering performance */
   contain: layout style paint;
 
   &:hover {
-    background: var(--glass-light2);
+    background: var(--glass-20);
   }
 
   &.is-clickable {

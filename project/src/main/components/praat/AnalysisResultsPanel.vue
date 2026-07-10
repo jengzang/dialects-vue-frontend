@@ -835,7 +835,7 @@ $transition-normal: 0.3s;
   width: $chart-width;
   height: $chart-height;
   padding: 1rem;
-  background: var(--glass-light);
+  background: var(--glass-30);
   border-radius: var(--radius-lg);
 }
 

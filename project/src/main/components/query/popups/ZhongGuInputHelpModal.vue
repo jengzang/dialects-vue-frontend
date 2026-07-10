@@ -164,7 +164,7 @@ $table-radius: 8px;
 
   th {
     padding: 10px 12px;
-    background: var(--glass-medium-strong, var(--bg-light));
+    background: var(--glass-70, var(--bg-light));
     border-bottom: 2px solid var(--border-medium, #ddd);
     color: $text-heading;
     text-align: left;

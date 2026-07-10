@@ -327,8 +327,8 @@ $text-secondary: var(--color-text-secondary, var(--text-tertiary));
 $text-radio-title: var(--text-dark);
 $text-radio-desc: var(--text-tertiary);
 
-$surface-light: var(--glass-light);
-$surface-medium: var(--glass-medium);
+$surface-light: var(--glass-30);
+$surface-medium: var(--glass-60);
 $surface-white: #fff;
 
 $border-default: rgba(0, 0, 0, 0.1);
@@ -345,7 +345,7 @@ $transition-normal: 0.3s;
 .setting-group {
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--glass-40);
 
   &:last-child {
     border-bottom: none;
@@ -463,7 +463,7 @@ $transition-normal: 0.3s;
   input[type="number"] {
     padding: 0.75rem;
     background: $surface-light;
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--glass-40);
     border-radius: $radius-control;
     color: $text-main;
     font-size: 1rem;

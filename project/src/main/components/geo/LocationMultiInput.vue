@@ -471,7 +471,7 @@ $portrait-ratio: 1 / 1;
     width: 100%;
     padding: 12px 40px 12px 14px;
     resize: vertical;
-    background: var(--glass-medium2);
+    background: var(--glass-60);
     border: 1px solid var(--border-gray-light);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
@@ -483,7 +483,7 @@ $portrait-ratio: 1 / 1;
     @include glass-blur;
 
     &:focus {
-      background: var(--glass-medium-strong);
+      background: var(--glass-70);
       border-color: var(--color-primary);
       outline: none;
       box-shadow:
@@ -629,7 +629,7 @@ $portrait-ratio: 1 / 1;
   max-height: 30vh;
   padding: 8px;
   overflow-y: auto;
-  background: var(--glass-medium2);
+  background: var(--glass-60);
   border: 1px solid var(--border-gray-light);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg2);
@@ -668,7 +668,7 @@ $portrait-ratio: 1 / 1;
   display: inline-flex;
   align-items: center;
   padding: 5px 10px;
-  background: var(--glass-lighter3);
+  background: var(--glass-80);
   border: 1px solid var(--border-gray-light2);
   border-radius: 999px;
   box-shadow: var(--shadow-sm2);

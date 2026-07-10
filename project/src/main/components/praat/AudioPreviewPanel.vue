@@ -992,7 +992,7 @@ $transition-normal: 0.3s;
   flex: 1;
   padding: 0.5rem 1rem;
   background: $surface-medium;
-  border: 2px solid var(--glass-border);
+  border: 2px solid var(--glass-40);
   border-radius: var(--radius-md);
   font-size: 0.9rem;
   font-weight: 500;
@@ -1423,7 +1423,7 @@ $transition-normal: 0.3s;
     width: 60px;
     padding: 0.25rem 0.5rem;
     background: $surface-strong;
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--glass-40);
     border-radius: var(--radius-sm);
     font-size: 0.8rem;
   }

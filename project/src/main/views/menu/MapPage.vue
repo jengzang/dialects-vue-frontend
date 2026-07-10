@@ -393,7 +393,7 @@ $transition-base: 0.3s;
   font-size: 14px;
   white-space: nowrap;
   cursor: pointer;
-  background: var(--glass-light);
+  background: var(--glass-30);
   border: 1px solid rgba(200, 200, 200, 0.5);
   border-radius: var(--radius-md);
   backdrop-filter: blur(10px);
@@ -401,7 +401,7 @@ $transition-base: 0.3s;
   transition: all $transition-fast;
 
   &:hover {
-    background: var(--glass-medium);
+    background: var(--glass-60);
     border-color: var(--color-primary);
   }
 }

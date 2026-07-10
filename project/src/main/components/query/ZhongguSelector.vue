@@ -325,12 +325,12 @@ $card-radius: 8px;
   overflow: hidden;
   font-size: $font-size-base;
   white-space: nowrap;
-  background: var(--glass-lighter);
+  background: var(--glass-40);
   border-radius: $card-radius;
   transition: background $transition-duration;
 
   &:hover {
-    background: var(--glass-medium-strong);
+    background: var(--glass-70);
   }
 }
 

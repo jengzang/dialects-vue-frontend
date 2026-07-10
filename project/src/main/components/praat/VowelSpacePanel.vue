@@ -551,7 +551,7 @@ $transition-duration: 0.3s;
 
 @mixin empty-message {
   padding: 1rem;
-  background: var(--glass-light);
+  background: var(--glass-30);
   border-radius: var(--radius-md);
   color: $text-secondary;
   text-align: center;
@@ -713,7 +713,7 @@ $transition-duration: 0.3s;
   width: 80%;
   height: 500px;
   padding: 1rem;
-  background: var(--glass-light);
+  background: var(--glass-30);
   border-radius: var(--radius-lg);
 }
 
@@ -783,7 +783,7 @@ $transition-duration: 0.3s;
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: var(--glass-light);
+  background: var(--glass-30);
   border-radius: var(--radius-md);
 }
 

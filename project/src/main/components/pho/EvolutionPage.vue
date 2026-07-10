@@ -1472,10 +1472,10 @@ $portrait-ratio: 1 / 1;
 
 /* 控制面板 */
 .main-glass-panel {
-  --main-glass-panel-background: var(--glass-medium2);
+  --main-glass-panel-background: var(--glass-60);
   --main-glass-panel-backdrop-filter: blur(12px);
   --main-glass-panel-border-radius: var(--radius-lg);
-  --main-glass-panel-border: 1px solid var(--glass-border-weak);
+  --main-glass-panel-border: 1px solid var(--glass-30);
   --main-glass-panel-shadow:
     0 4px 16px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px rgba(255, 255, 255, 0.3);
@@ -1642,8 +1642,8 @@ $portrait-ratio: 1 / 1;
 
 .feature-tab {
   padding: 10px 20px;
-  background: var(--glass-light);
-  border: 1px solid var(--glass-border-weak);
+  background: var(--glass-30);
+  border: 1px solid var(--glass-30);
   border-radius: var(--radius-md);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   color: var(--text-dark);
@@ -1655,7 +1655,7 @@ $portrait-ratio: 1 / 1;
   @include glass-blur;
 
   &:hover {
-    background: var(--glass-medium);
+    background: var(--glass-60);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transform: translateY(-1px);
   }

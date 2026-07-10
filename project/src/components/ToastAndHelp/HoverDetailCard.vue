@@ -84,7 +84,7 @@ $card-transition: 0.24s ease;
   z-index: 1200;
   overscroll-behavior: contain;
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid var(--glass-border-weak);
+  border: 1px solid var(--glass-30);
   border-radius: var(--radius-lg);
   box-shadow: 0 16px 44px rgba(0, 0, 0, 0.18);
 

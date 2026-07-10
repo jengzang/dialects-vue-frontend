@@ -90,7 +90,7 @@ $transition-fast: 0.2s ease;
   /* overflow: hidden; */
 
   &:hover:not(.disabled) {
-    background: var(--glass-medium);
+    background: var(--glass-60);
   }
 
   &.disabled {

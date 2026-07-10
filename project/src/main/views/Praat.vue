@@ -1194,7 +1194,7 @@ onBeforeUnmount(() => {
 }
 
 .mode-options .radio-option:not(.active):hover {
-  background: var(--glass-medium);
+  background: var(--glass-60);
   transform: translateY(-1px);
 }
 

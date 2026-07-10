@@ -412,7 +412,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
   padding: 12px 16px;
   border: 1px solid rgba(200, 200, 200, 0.45);
   border-radius: var(--radius-lg);
-  background: var(--glass-light);
+  background: var(--glass-30);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -473,7 +473,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
 .dropdown {
   padding: 6px 12px;
   border-radius: var(--radius-md);
-  background: var(--glass-light);
+  background: var(--glass-30);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   cursor: pointer;
@@ -491,7 +491,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
   white-space: nowrap;
 
   &:hover {
-    background: var(--glass-medium);
+    background: var(--glass-60);
     border-color: var(--color-primary);
   }
 }

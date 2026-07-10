@@ -658,10 +658,10 @@ onMounted(async () => {
 <style scoped>
 .spatial-visualization-tab {
   padding: 16px;
-  background: var(--glass-medium);
+  background: var(--glass-60);
   backdrop-filter: blur(40px) saturate(180%);
   border-radius: var(--radius-xl);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-40);
   box-shadow: var(--shadow-glass);
 }
 

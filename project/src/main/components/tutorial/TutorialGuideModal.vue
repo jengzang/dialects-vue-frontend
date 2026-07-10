@@ -1013,10 +1013,10 @@ $float-catalog-button-left:0;
     max-height: 40dvh !important;
     padding: 10px;
     border-radius: var(--radius-xl);
-    background: var(--glass-medium);
+    background: var(--glass-60);
     backdrop-filter: blur(18px) saturate(145%);
     -webkit-backdrop-filter: blur(18px) saturate(145%);
-    border: 2px solid var(--glass-border);
+    border: 2px solid var(--glass-40);
     // box-shadow: var(--shadow-glass);
     overflow: auto;
     box-shadow:

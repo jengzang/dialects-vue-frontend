@@ -2,10 +2,10 @@
 // 注意：.glass-panel 由 global/_legacy.scss 提供，此处只定义 VillagesML 专属变体
 
 .vml-glass-panel {
-  background: var(--glass-medium);
+  background: var(--glass-60);
   backdrop-filter: blur(18px) saturate(145%);
   -webkit-backdrop-filter: blur(18px) saturate(145%);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-40);
   border-radius: var(--radius-xl);
   padding: 24px;
   box-shadow: var(--shadow-glass);

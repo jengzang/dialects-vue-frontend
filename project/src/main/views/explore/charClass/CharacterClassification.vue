@@ -829,7 +829,7 @@ $panel-radius-portrait: 24px;
   font-size: 11px;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.7);
-  border: 1px solid var(--glass-border-weak);
+  border: 1px solid var(--glass-30);
   border-radius: 999px;
 }
 
@@ -961,8 +961,8 @@ $panel-radius-portrait: 24px;
 .glass-input {
   padding: 11px 14px 11px 40px;
   color: $text-primary;
-  background: var(--glass-light);
-  border: 1px solid var(--glass-border-weak);
+  background: var(--glass-30);
+  border: 1px solid var(--glass-30);
   border-radius: 16px;
   outline: none;
   transition:

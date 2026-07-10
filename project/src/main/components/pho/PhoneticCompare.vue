@@ -814,7 +814,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .feature-tab {
   padding: 8px 18px;
-  background: var(--glass-light, rgba(255, 255, 255, 0.3));
+  background: var(--glass-30, rgba(255, 255, 255, 0.3));
   border: 1px solid var(--border-gray-light, rgba(200, 200, 200, 0.5));
   border-radius: var(--radius-md, 12px);
   color: var(--text-dark, var(--text-dark));
@@ -826,7 +826,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   @include glass-blur(10px);
 
   &:hover {
-    background: var(--glass-medium, rgba(255, 255, 255, 0.5));
+    background: var(--glass-60, rgba(255, 255, 255, 0.5));
     transform: translateY(-1px);
   }
 

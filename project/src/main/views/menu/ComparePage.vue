@@ -1887,7 +1887,7 @@ $text-muted: var(--text-lightest);
   justify-content: space-between;
   margin: auto;
   padding: 6px 12px;
-  background: var(--glass-light);
+  background: var(--glass-30);
   @include glass-blur;
   border: 1px solid rgba(200, 200, 200, 0.5);
   border-radius: var(--radius-md);
@@ -1897,7 +1897,7 @@ $text-muted: var(--text-lightest);
   transition: all 0.2s;
 
   &:hover {
-    background: var(--glass-medium);
+    background: var(--glass-60);
     border-color: var(--color-primary);
   }
 }
@@ -2305,7 +2305,7 @@ $text-muted: var(--text-lightest);
     justify-content: center;
     gap: 8px;
     padding: 4px 10px;
-    background: var(--glass-light);
+    background: var(--glass-30);
     border: 1px solid rgba(200, 200, 200, 0.35);
     border-radius: 12px;
   }

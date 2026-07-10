@@ -1307,7 +1307,7 @@ $mobile-breakpoint: 768px;
   /* 汇总与地点详情玻璃容器 */
   .aggregated-section,
   .locations-section {
-    background: var(--glass-medium2);
+    background: var(--glass-60);
     border: 1px solid var(--border-gray-light);
     border-radius: var(--radius-lg);
     backdrop-filter: blur(12px);
@@ -1427,13 +1427,13 @@ $mobile-breakpoint: 768px;
 
   .syllable-card {
     padding: 12px;
-    background: var(--glass-very-light2);
+    background: var(--glass-10);
     border: 1px solid var(--border-gray-lighter);
     border-radius: 8px;
     transition: all 0.2s ease;
 
     &:hover {
-      background: var(--glass-light2);
+      background: var(--glass-20);
       box-shadow: var(--shadow-sm);
       transform: translateY(-2px);
     }

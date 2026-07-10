@@ -66,11 +66,11 @@
 
 .glass-button {
   white-space: nowrap;
-  background: var(--glass-light);
+  background: var(--glass-30);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-md);
-  border: 1px solid var(--glass-border-weak);
+  border: 1px solid var(--glass-30);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
   cursor: pointer;
 }

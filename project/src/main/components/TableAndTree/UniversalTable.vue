@@ -1553,11 +1553,11 @@ $system-font:
 
 .universal-table.glass-container {
   /* 使用全局变量替代局部变量 */
-  background: var(--glass-light);
+  background: var(--glass-30);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: var(--radius-xl);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-40);
   box-shadow: var(--shadow-md);
   padding: 12px 4px;
   font-family: $system-font;
@@ -1591,7 +1591,7 @@ $system-font:
   padding: 10px 12px 10px 36px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: var(--glass-medium);
+  background: var(--glass-60);
   font-size: 14px;
   outline: none;
   transition: all 0.3s;
@@ -1687,7 +1687,7 @@ $system-font:
   overflow-x: auto;
   overflow-y: auto;
   border-radius: var(--radius-md);
-  background: var(--glass-light);
+  background: var(--glass-30);
   min-height: 200px;
 }
 
@@ -1839,7 +1839,7 @@ td {
 
 /* Filter Popup */
 .main-glass-panel[data-surface='filter-popup'] {
-  --main-glass-panel-background: var(--glass-light);
+  --main-glass-panel-background: var(--glass-30);
   --main-glass-panel-backdrop-filter: blur(25px);
   --main-glass-panel-border: 1px solid rgba(255, 255, 255, 0.8);
   --main-glass-panel-shadow: var(--shadow-lg);

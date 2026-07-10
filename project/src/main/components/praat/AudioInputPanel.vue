@@ -443,8 +443,8 @@ $transition-duration: 0.3s;
 
 .upload-area {
   padding: 1rem 2rem;
-  background: var(--glass-light);
-  border: 2px dashed var(--glass-border);
+  background: var(--glass-30);
+  border: 2px dashed var(--glass-40);
   border-radius: var(--radius-xl);
   text-align: center;
   cursor: pointer;
@@ -455,7 +455,7 @@ $transition-duration: 0.3s;
 
   &:hover,
   &.drag-over {
-    background: var(--glass-medium);
+    background: var(--glass-60);
     border-color: var(--color-primary);
     transform: translateY(-2px);
   }
@@ -491,7 +491,7 @@ $transition-duration: 0.3s;
   .divider-inline {
     flex-shrink: 0;
     padding: 0.5rem 1rem;
-    background: var(--glass-light);
+    background: var(--glass-30);
     border-radius: var(--radius-md);
     color: $text-secondary;
     font-size: 0.9rem;
@@ -562,7 +562,7 @@ $transition-duration: 0.3s;
 
   .clear-button {
     padding: 0.5rem 0.75rem;
-    background: var(--glass-light);
+    background: var(--glass-30);
     border: none;
     border-radius: var(--radius-md);
     cursor: pointer;

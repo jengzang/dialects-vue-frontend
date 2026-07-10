@@ -303,7 +303,7 @@ $dropdown-selected-color: var(--color-primary-hover);
   display: flex;
   align-items: stretch;
   overflow: hidden;
-  background: var(--glass-light);
+  background: var(--glass-30);
   border: 1px solid var(--color-primary-medium);
   border-radius: 8px;
 }

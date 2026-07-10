@@ -64,27 +64,17 @@
   --bg-light: #f0f0f0;
   --bg-blue-hover: rgba(175, 217, 251, 0.8);
 
-  /* 毛玻璃效果变量 */
-  --glass-light: rgba(255, 255, 255, 0.34);
-  --glass-lighter: rgba(255, 255, 255, 0.43);
-  --glass-lighter2: rgba(255, 255, 255, 0.46);
-  --glass-lighter3: rgba(255, 255, 255, 0.82);
-  --glass-medium: rgba(255, 255, 255, 0.56);
-  --glass-medium2: rgba(255, 255, 255, 0.64);
-  --glass-medium-strong: rgba(255, 255, 255, 0.72);
-  --glass-heavy: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(255, 255, 255, 0.44);
-  --glass-border-strong: rgba(255, 255, 255, 0.54);
-  --glass-very-light: rgba(255, 255, 255, 0.06);
-  --glass-very-light2: rgba(255, 255, 255, 0.11);
-  --glass-very-light3: rgba(255, 255, 255, 0.16);
-  --glass-light2: rgba(255, 255, 255, 0.22);
-  --glass-border-weak: rgba(255, 255, 255, 0.31);
-
-  /* 玻璃效果渐变 */
-  --glass-gradient-soft: linear-gradient(145deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.12));
-  --glass-gradient-medium: linear-gradient(145deg, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0.34));
-  --glass-gradient-nav: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+  /* 毛玻璃效果 — 整数透明度档位 */
+  --glass-05: rgba(255, 255, 255, 0.05);
+  --glass-10: rgba(255, 255, 255, 0.10);
+  --glass-20: rgba(255, 255, 255, 0.20);
+  --glass-30: rgba(255, 255, 255, 0.30);
+  --glass-40: rgba(255, 255, 255, 0.40);
+  --glass-50: rgba(255, 255, 255, 0.50);
+  --glass-60: rgba(255, 255, 255, 0.60);
+  --glass-70: rgba(255, 255, 255, 0.70);
+  --glass-80: rgba(255, 255, 255, 0.80);
+  --glass-90: rgba(255, 255, 255, 0.90);
 
   /* 边框颜色 */
   --border-light: rgba(0, 0, 0, 0.05);
