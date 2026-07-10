@@ -1005,7 +1005,7 @@ em {
   color: #fff;
 
   &:hover {
-    background-color: #3a3f44;
+    background-color: var(--text-dark);
     transform: scale(1.05);
   }
 }
@@ -1020,7 +1020,7 @@ em {
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: #ff615c;
+    background-color: var(--color-error-light);
     transform: scale(1.05);
   }
 }

@@ -176,7 +176,7 @@ export default {
 
 .global-route-loading-text {
   margin: 0;
-  color: #4a5568;
+  color: var(--text-slate);
   font-size: 14px;
   font-weight: 500;
 }

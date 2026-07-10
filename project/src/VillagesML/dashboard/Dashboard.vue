@@ -376,7 +376,7 @@ onMounted(() => {
 }
 
 .notice-content strong {
-  color: #d68910;
+  color: var(--color-warning);
 }
 
 .stat-card {
@@ -456,7 +456,7 @@ onMounted(() => {
 }
 
 .search-button:hover {
-  background: #3a7bc8;
+  background: var(--color-map-draw);
   transform: translateY(-2px);
 }
 
@@ -522,12 +522,12 @@ onMounted(() => {
 
 .badge-public {
   background: rgba(80, 200, 120, 0.2);
-  color: #2d8659;
+  color: var(--color-success);
 }
 
 .badge-auth {
   background: rgba(243, 156, 18, 0.2);
-  color: #c87f0a;
+  color: var(--color-warning-dark);
 }
 
 /* Introduction Section */
@@ -571,7 +571,7 @@ onMounted(() => {
   border-radius: 20px;
   background: rgba(36, 41, 47, 0.08);
   border: 1px solid rgba(36, 41, 47, 0.2);
-  color: #24292f;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
