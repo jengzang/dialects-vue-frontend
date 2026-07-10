@@ -117,7 +117,7 @@ const renderChart = () => {
         return {
           value: value,
           itemStyle: {
-            color: value > 0 ? '#50c878' : '#e74c3c'
+            color: value > 0 ? 'var(--color-success)' : 'var(--color-error)'
           }
         }
       })
@@ -192,7 +192,7 @@ onBeforeUnmount(() => {
 .metric-selector {
   display: flex;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   padding: 4px;
   border-radius: 10px;
 }
@@ -210,7 +210,7 @@ onBeforeUnmount(() => {
 }
 
 .metric-button:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .metric-button.active {

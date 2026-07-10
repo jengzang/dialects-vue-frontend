@@ -6,7 +6,7 @@
 .vml-textarea,
 .vml-number-input {
   padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 14px;
   background: rgba(255, 255, 255, 0.5);
@@ -17,7 +17,7 @@
     outline: none;
     border-color: var(--color-primary);
     background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
   }
 
   &::placeholder {
@@ -33,7 +33,7 @@
 
 .vml-search-field {
   padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 12px;
   font-size: 14px;
   background: rgba(255, 255, 255, 0.5);
@@ -44,7 +44,7 @@
   &:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+    box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.15);
   }
 }
 
@@ -75,7 +75,7 @@
 
 .vml-char-input {
   padding: 10px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 12px;
   font-size: 16px;
   text-align: center;

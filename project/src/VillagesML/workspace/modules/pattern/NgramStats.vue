@@ -233,7 +233,7 @@
                   class="bar-fill"
                   :style="{
                     width: `${item.z_score != null ? (Math.abs(item.z_score) / maxTendencyZScore * 100) : 0}%`,
-                    background: (item.z_score || 0) >= 0 ? 'var(--color-primary)' : '#e74c3c'
+                    background: (item.z_score || 0) >= 0 ? 'var(--color-primary)' : 'var(--color-error)'
                   }"
                 ></div>
               </div>
@@ -595,7 +595,7 @@ watch(
   align-items: center;
   padding: 12px 16px;
   margin-bottom: 16px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 10px;
   font-size: 14px;
 }
@@ -613,7 +613,7 @@ watch(
 .text-button {
   padding: 6px 12px;
   background: transparent;
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 6px;
   color: var(--color-primary);
   cursor: pointer;
@@ -622,7 +622,7 @@ watch(
 }
 
 .text-button:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-color: var(--color-primary);
 }
 
@@ -642,8 +642,8 @@ watch(
 
 .toggle-section-btn {
   padding: 6px 16px;
-  background: rgba(74, 144, 226, 0.2);
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 6px;
   font-size: 13px;
   color: var(--color-primary);
@@ -652,7 +652,7 @@ watch(
 }
 
 .toggle-section-btn:hover {
-  background: rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.3);
   border-color: var(--color-primary);
 }
 
@@ -679,8 +679,8 @@ watch(
 
 .load-list-btn {
   padding: 10px 14px;
-  background: rgba(74, 144, 226, 0.1);
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
@@ -689,7 +689,7 @@ watch(
 }
 
 .load-list-btn:hover:not(:disabled) {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   border-color: var(--color-primary);
 }
 
@@ -701,10 +701,10 @@ watch(
 .vml-input {
   flex: 1;
   padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 }
 
 
@@ -718,8 +718,8 @@ watch(
 
 .tab-button {
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  background: var(--glass-50);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
@@ -729,7 +729,7 @@ watch(
 }
 
 .tab-button:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-color: var(--color-primary);
 }
 
@@ -745,7 +745,7 @@ watch(
   align-items: center;
   padding: 8px 12px;
   margin-bottom: 12px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 8px;
 }
 
@@ -761,8 +761,8 @@ watch(
 
 .control-btn {
   padding: 4px 12px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  background: var(--glass-80);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 6px;
   font-size: 12px;
   color: var(--text-primary);
@@ -771,7 +771,7 @@ watch(
 }
 
 .control-btn:hover {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   border-color: var(--color-primary);
 }
 
@@ -781,7 +781,7 @@ watch(
   align-items: center;
   padding: 8px 12px;
   margin-bottom: 12px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 8px;
 }
 
@@ -797,8 +797,8 @@ watch(
 
 .control-btn {
   padding: 4px 12px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  background: var(--glass-80);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 6px;
   font-size: 12px;
   color: var(--text-primary);
@@ -807,14 +807,14 @@ watch(
 }
 
 .control-btn:hover {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   border-color: var(--color-primary);
 }
 
 .results-info {
   padding: 8px 12px;
   margin-bottom: 12px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 8px;
   font-size: 13px;
   color: var(--text-secondary);
@@ -832,13 +832,13 @@ watch(
   flex-direction: column;
   gap: 8px;
   padding: 8px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 8px;
   transition: background 0.3s ease;
 }
 
 .regional-bar:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .region-info-row {
@@ -887,23 +887,23 @@ watch(
 }
 
 .stat-value.strong-preference {
-  background: rgba(46, 204, 113, 0.2);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .stat-value.moderate-preference {
-  background: rgba(52, 152, 219, 0.2);
-  color: #2980b9;
+  background: rgba(var(--vml-blue-medium-rgb), 0.2);
+  color: var(--vml-blue-darkest);
 }
 
 .stat-value.strong-avoidance {
-  background: rgba(231, 76, 60, 0.2);
-  color: #c0392b;
+  background: rgba(var(--color-error-rgb), 0.2);
+  color: var(--color-error-dark);
 }
 
 .stat-value.moderate-avoidance {
-  background: rgba(243, 156, 18, 0.2);
-  color: #d68910;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning-dark);
 }
 
 .region-name {
@@ -914,7 +914,7 @@ watch(
 
 .bar-container {
   height: 20px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -950,7 +950,7 @@ watch(
 }
 
 .table-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
@@ -962,7 +962,7 @@ watch(
 }
 
 .table-row {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: background 0.3s ease;
   text-align: center;
@@ -973,29 +973,29 @@ watch(
 }
 
 .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .table-row.significant {
-  background: rgba(255, 215, 0, 0.1);
-  border-left: 3px solid #FFD700;
+  background: rgba(var(--color-gold-rgb), 0.1);
+  border-left: 3px solid var(--color-gold);
 }
 
 .table-row.strong-tendency {
-  background: rgba(243, 156, 18, 0.15);
+  background: rgba(var(--color-warning-rgb), 0.15);
 }
 
 .table-row.moderate-tendency {
-  background: rgba(243, 156, 18, 0.08);
+  background: rgba(var(--color-warning-rgb), 0.08);
 }
 
 .table-row.significant {
-  background: rgba(80, 200, 120, 0.1);
+  background: rgba(var(--color-success-rgb), 0.1);
 }
 
 .tendency-bar {
   height: 20px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -1006,17 +1006,17 @@ watch(
 }
 
 .p-very-significant {
-  color: #27ae60;
+  color: var(--color-success);
   font-weight: 700;
 }
 
 .p-significant {
-  color: #2ecc71;
+  color: var(--color-success);
   font-weight: 600;
 }
 
 .p-marginal {
-  color: #f39c12;
+  color: var(--color-warning);
   font-weight: 500;
 }
 
@@ -1032,23 +1032,23 @@ watch(
 }
 
 .badge-very-significant {
-  background: rgba(39, 174, 96, 0.2);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .badge-significant {
-  background: rgba(46, 204, 113, 0.2);
-  color: #2ecc71;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .badge-marginal {
-  background: rgba(243, 156, 18, 0.2);
-  color: #f39c12;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning);
 }
 
 .badge-not-significant {
   background: rgba(149, 165, 166, 0.2);
-  color: #95a5a6;
+  color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {

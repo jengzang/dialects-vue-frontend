@@ -73,16 +73,16 @@ const getCategoryName = (category) => getCategoryDisplayName(category, props.det
 
 // 社区颜色映射
 const communityColors = [
-  '#4a90e2', // 蓝色
-  '#50c878', // 绿色
-  '#f39c12', // 橙色
-  '#e74c3c', // 红色
-  '#9b59b6', // 紫色
-  '#1abc9c', // 青色
-  '#e67e22', // 深橙
-  '#3498db', // 天蓝
-  '#2ecc71', // 翠绿
-  '#f1c40f'  // 黄色
+  'var(--vml-blue)', // 蓝色
+  'var(--color-success)', // 绿色
+  'var(--color-warning)', // 橙色
+  'var(--color-error)', // 红色
+  'var(--color-purple)', // 紫色
+  'var(--color-teal)', // 青色
+  'var(--color-warning)', // 深橙
+  'var(--vml-blue-medium)', // 天蓝
+  'var(--color-success)', // 翠绿
+  'var(--color-gold)'  // 黄色
 ]
 
 const getCommunityColor = (communityId) => {
@@ -121,7 +121,7 @@ const transformNodes = (nodes, communities) => {
       symbolSize: normalizedSize,
       value: node.degree,
       itemStyle: {
-        color: communityId !== undefined ? getCommunityColor(communityId) : '#95a5a6'
+        color: communityId !== undefined ? getCommunityColor(communityId) : 'var(--text-secondary)'
       },
       label: {
         show: true,
@@ -276,7 +276,7 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
   gap: 16px;
   padding: 12px 16px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 10px;
   margin-bottom: 16px;
   font-size: 13px;
@@ -293,8 +293,8 @@ onBeforeUnmount(() => {
 
 .cache-badge {
   padding: 4px 10px;
-  background: rgba(80, 200, 120, 0.2);
-  color: #2d8659;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
@@ -303,7 +303,7 @@ onBeforeUnmount(() => {
 .chart-container {
   width: 100%;
   height: 600px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
   margin-bottom: 16px;
 }
@@ -321,7 +321,7 @@ onBeforeUnmount(() => {
 
 .communities-legend {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
 }
 
@@ -343,7 +343,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 8px;
   font-size: 13px;
 }
@@ -352,7 +352,7 @@ onBeforeUnmount(() => {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  border: 2px solid var(--glass-80);
 }
 
 .legend-label {

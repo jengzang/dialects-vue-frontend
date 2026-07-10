@@ -102,7 +102,7 @@ const parseSequence = (sequence) => {
   display: flex;
   justify-content: space-between;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 6px;
 }
 
@@ -119,7 +119,7 @@ const parseSequence = (sequence) => {
 .section {
   margin-bottom: 6px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
 }
 
@@ -155,7 +155,7 @@ const parseSequence = (sequence) => {
   display: flex;
   justify-content: space-between;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 8px;
 }
 
@@ -168,7 +168,7 @@ const parseSequence = (sequence) => {
   font-size: 13px;
   color: var(--text-secondary);
   padding: 2px 10px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 12px;
 }
 
@@ -182,7 +182,7 @@ const parseSequence = (sequence) => {
   display: flex;
   flex-direction: column;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 8px;
 }
 

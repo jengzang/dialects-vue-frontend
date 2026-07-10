@@ -215,7 +215,7 @@ const runAnalysis = () => {
 
 .error-hint {
   font-size: 12px;
-  color: #e74c3c;
+  color: var(--color-error);
   font-weight: 500;
   margin-top: 4px;
   display: block;
@@ -230,9 +230,9 @@ const runAnalysis = () => {
 .setting-input,
 .setting-select {
   padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--glass-30);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
 }
@@ -241,7 +241,7 @@ const runAnalysis = () => {
 .setting-select:focus {
   outline: none;
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
 }
 
 .checkbox-group {
@@ -266,8 +266,8 @@ const runAnalysis = () => {
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: rgba(255, 193, 7, 0.15);
-  border: 1px solid rgba(255, 193, 7, 0.3);
+  background: rgba(var(--color-warning-rgb), 0.15);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.3);
   border-radius: 10px;
   margin-bottom: 16px;
 }
@@ -278,7 +278,7 @@ const runAnalysis = () => {
 
 .notice-text {
   font-size: 13px;
-  color: #856404;
+  color: var(--color-warning-dark);
   font-weight: 500;
 }
 

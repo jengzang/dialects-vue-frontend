@@ -255,8 +255,8 @@ watch(() => route.query.villageId, (newId) => {
 
 .clear-button {
   padding: 6px 16px;
-  background: rgba(231, 76, 60, 0.1);
-  color: #e74c3c;
+  background: rgba(var(--color-error-rgb), 0.1);
+  color: var(--color-error);
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -265,7 +265,7 @@ watch(() => route.query.villageId, (newId) => {
 }
 
 .clear-button:hover {
-  background: rgba(231, 76, 60, 0.2);
+  background: rgba(var(--color-error-rgb), 0.2);
 }
 
 .search-group {
@@ -275,17 +275,17 @@ watch(() => route.query.villageId, (newId) => {
 .search-input {
   width: 100%;
   padding: 12px 20px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 12px;
   font-size: 16px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   transition: all 0.3s ease;
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
 }
 
 .search-results {
@@ -299,15 +299,15 @@ watch(() => route.query.villageId, (newId) => {
   cursor: pointer;
   transition: all 0.3s ease;
   margin-bottom: 8px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
 }
 
 .result-item:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .result-item.selected {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   border: 2px solid var(--color-primary);
 }
 

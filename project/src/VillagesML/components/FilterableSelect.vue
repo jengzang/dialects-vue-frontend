@@ -492,9 +492,9 @@ onUnmounted(() => {
 
 .level-select {
   padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--glass-30);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
   cursor: pointer;
@@ -508,7 +508,7 @@ onUnmounted(() => {
 
 .level-select:hover {
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--glass-70);
 }
 
 .level-select .arrow-icon {
@@ -522,7 +522,7 @@ onUnmounted(() => {
   position: relative;
   border: 2px solid var(--color-primary-hover);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   backdrop-filter: blur(10px);
   overflow: hidden;
   transition: all 0.3s ease;
@@ -532,7 +532,7 @@ onUnmounted(() => {
 
 .dropdown-wrapper:focus-within {
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--glass-70);
 }
 
 .vml-select {
@@ -573,9 +573,9 @@ onUnmounted(() => {
 }
 
 .select-dropdown {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--glass-90);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--glass-80);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -613,11 +613,11 @@ onUnmounted(() => {
 
 .dropdown-option:hover,
 .dropdown-option.highlighted {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .dropdown-option.selected {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
 }
 

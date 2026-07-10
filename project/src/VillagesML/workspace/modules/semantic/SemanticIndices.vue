@@ -386,9 +386,9 @@ const getRegionLevelName = (level) => {
 
 .clear-button {
   padding: 8px 12px;
-  background: rgba(231, 76, 60, 0.1);
-  color: #e74c3c;
-  border: 1px solid rgba(231, 76, 60, 0.3);
+  background: rgba(var(--color-error-rgb), 0.1);
+  color: var(--color-error);
+  border: 1px solid rgba(var(--color-error-rgb), 0.3);
   border-radius: 6px;
   font-size: 14px;
   cursor: pointer;
@@ -397,8 +397,8 @@ const getRegionLevelName = (level) => {
 }
 
 .clear-button:hover {
-  background: rgba(231, 76, 60, 0.2);
-  border-color: #e74c3c;
+  background: rgba(var(--color-error-rgb), 0.2);
+  border-color: var(--color-error);
 }
 
 .input-label {
@@ -447,25 +447,25 @@ const getRegionLevelName = (level) => {
 }
 
 .indices-table .table-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .indices-table .table-row {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: background 0.3s ease;
 }
 
 .indices-table .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .category-badge {
   display: inline-block;
   padding: 4px 12px;
-  background: rgba(74, 144, 226, 0.15);
+  background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
   border-radius: 12px;
   font-size: 13px;
@@ -475,8 +475,8 @@ const getRegionLevelName = (level) => {
 .level-badge {
   display: inline-block;
   padding: 4px 10px;
-  background: rgba(80, 200, 120, 0.15);
-  color: #2ecc71;
+  background: rgba(var(--color-success-rgb), 0.15);
+  color: var(--color-success);
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
@@ -491,22 +491,22 @@ const getRegionLevelName = (level) => {
 }
 
 .rank-gold {
-  background: linear-gradient(135deg, var(--color-gold), #ffed4e);
-  color: #8b6914;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold));
+  color: var(--color-warning-dark);
 }
 
 .rank-silver {
-  background: linear-gradient(135deg, var(--color-silver), #e8e8e8);
-  color: #5a5a5a;
+  background: linear-gradient(135deg, var(--color-silver), var(--border-light-gray));
+  color: var(--text-medium);
 }
 
 .rank-bronze {
-  background: linear-gradient(135deg, var(--color-bronze), #e8a87c);
-  color: #6b3e1a;
+  background: linear-gradient(135deg, var(--color-bronze), var(--vml-terracotta));
+  color: var(--vml-brown-dark);
 }
 
 .rank-normal {
-  background: rgba(74, 144, 226, 0.15);
+  background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
 }
 
@@ -582,7 +582,7 @@ const getRegionLevelName = (level) => {
 .lexicon-button:hover {
   background: var(--color-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.3);
 }
 
 /* Lexicon Modal Styles */
@@ -616,9 +616,9 @@ const getRegionLevelName = (level) => {
 
 .category-item {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 12px;
-  border: 1px solid rgba(74, 144, 226, 0.1);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .category-header {
@@ -638,7 +638,7 @@ const getRegionLevelName = (level) => {
   font-size: 13px;
   color: var(--text-secondary);
   padding: 4px 12px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 12px;
 }
 
@@ -650,7 +650,7 @@ const getRegionLevelName = (level) => {
 
 .char-tag {
   padding: 6px 12px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   color: var(--text-primary);
   border-radius: 6px;
   font-size: 14px;

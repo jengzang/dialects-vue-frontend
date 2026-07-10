@@ -193,12 +193,12 @@ const selectedProfile = ref(null)
 
 // Cluster color mapping
 const clusterColors = [
-  '#4a90e2', '#50c878', '#f39c12', '#e74c3c', '#9b59b6',
-  '#1abc9c', '#34495e', '#e67e22', '#3498db', '#2ecc71'
+  'var(--vml-blue)', 'var(--color-success)', 'var(--color-warning)', 'var(--color-error)', 'var(--color-purple)',
+  'var(--color-teal)', 'var(--text-deep)', 'var(--color-warning)', 'var(--vml-blue-medium)', 'var(--color-success)'
 ]
 
 const getClusterColor = (clusterId) => {
-  if (clusterId === -1) return '#95a5a6' // gray for noise
+  if (clusterId === -1) return 'var(--text-secondary)' // gray for noise
   return clusterColors[clusterId % clusterColors.length]
 }
 
@@ -355,7 +355,7 @@ const handleQuickAdjust = (action) => {
 
 .metric-card {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
   text-align: center;
 }
@@ -387,7 +387,7 @@ const handleQuickAdjust = (action) => {
 
 .profile-card {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
   border-left: 4px solid;
 }
@@ -426,7 +426,7 @@ const handleQuickAdjust = (action) => {
 
 .region-tag {
   padding: 4px 10px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 8px;
   font-size: 12px;
   color: var(--text-primary);
@@ -434,19 +434,19 @@ const handleQuickAdjust = (action) => {
 
 .expand-button {
   padding: 4px 10px;
-  background: rgba(74, 144, 226, 0.15);
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.15);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 12px;
-  color: #4a90e2;
+  color: var(--vml-blue);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .expand-button:hover {
-  background: rgba(74, 144, 226, 0.25);
-  border-color: rgba(74, 144, 226, 0.5);
+  background: rgba(var(--vml-blue-rgb), 0.25);
+  border-color: rgba(var(--vml-blue-rgb), 0.5);
   transform: translateY(-1px);
 }
 
@@ -472,7 +472,7 @@ const handleQuickAdjust = (action) => {
 
 .table-container {
   overflow: auto;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
   padding: 16px;
   max-height: 500px;
@@ -484,7 +484,7 @@ const handleQuickAdjust = (action) => {
 }
 
 .assignments-table thead {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .assignments-table th,
@@ -528,20 +528,20 @@ const handleQuickAdjust = (action) => {
   margin-bottom: 20px;
   border-radius: 12px;
   border-left: 4px solid;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
   backdrop-filter: blur(10px);
 }
 
 .alert-too_loose,
 .alert-too_strict,
 .alert-high_noise {
-  border-left-color: #f39c12;
-  background: rgba(243, 156, 18, 0.1);
+  border-left-color: var(--color-warning);
+  background: rgba(var(--color-warning-rgb), 0.1);
 }
 
 .alert-good {
   border-left-color: var(--color-success);
-  background: rgba(80, 200, 120, 0.1);
+  background: rgba(var(--color-success-rgb), 0.1);
 }
 
 .alert-header {
@@ -573,8 +573,8 @@ const handleQuickAdjust = (action) => {
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 500;
-  background: rgba(74, 144, 226, 0.15);
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.15);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   color: var(--text-primary);
   cursor: pointer;
@@ -582,8 +582,8 @@ const handleQuickAdjust = (action) => {
 }
 
 .quick-adjust-button:hover {
-  background: rgba(74, 144, 226, 0.25);
-  border-color: rgba(74, 144, 226, 0.5);
+  background: rgba(var(--vml-blue-rgb), 0.25);
+  border-color: rgba(var(--vml-blue-rgb), 0.5);
   transform: translateY(-1px);
 }
 

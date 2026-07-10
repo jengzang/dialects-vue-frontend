@@ -113,6 +113,6 @@ function updateFeature(key, value) {
 .morphology-params {
   margin-left: 1rem;
   padding-left: 1rem;
-  border-left: 2px solid rgba(74, 144, 226, 0.2);
+  border-left: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 

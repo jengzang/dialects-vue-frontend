@@ -125,7 +125,7 @@ defineProps({
   align-items: center;
   transition: transform 0.3s ease;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
 }
 
@@ -157,7 +157,7 @@ defineProps({
 .coordinates-line {
   margin-top: 16px;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-20);
   border-radius: 8px;
   font-size: 14px;
   color: var(--text-primary);
@@ -167,7 +167,7 @@ defineProps({
 .map-placeholder {
   padding: 60px 20px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
 }
 

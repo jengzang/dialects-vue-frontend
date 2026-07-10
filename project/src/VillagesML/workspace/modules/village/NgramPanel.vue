@@ -126,7 +126,7 @@ const parseTrigrams = (trigrams) => {
   display: flex;
   justify-content: space-between;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 6px;
 }
 
@@ -143,7 +143,7 @@ const parseTrigrams = (trigrams) => {
 .ngram-section {
   margin-bottom: 6px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
 }
 
@@ -173,18 +173,18 @@ const parseTrigrams = (trigrams) => {
 }
 
 .unigram {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
 }
 
 .bigram {
-  background: rgba(80, 200, 120, 0.2);
-  color: #2d8659;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .trigram {
-  background: rgba(243, 156, 18, 0.2);
-  color: #c87f0a;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning-dark);
 }
 
 .ngram-stats {
@@ -192,7 +192,7 @@ const parseTrigrams = (trigrams) => {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
 }
 
@@ -201,7 +201,7 @@ const parseTrigrams = (trigrams) => {
   flex-direction: column;
   align-items: center;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 8px;
 }
 

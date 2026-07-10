@@ -260,7 +260,7 @@ const goToTendency = (pattern) => {
 
 .pattern-card {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
   transition: all 0.3s ease;
   position: relative;
@@ -268,12 +268,12 @@ const goToTendency = (pattern) => {
 
 .pattern-card:hover {
   transform: translateY(-5px);
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .pattern-card.top-5 {
-  background: rgba(243, 156, 18, 0.15);
-  border: 2px solid rgba(243, 156, 18, 0.3);
+  background: rgba(var(--color-warning-rgb), 0.15);
+  border: 2px solid rgba(var(--color-warning-rgb), 0.3);
 }
 
 .pattern-rank {
@@ -330,7 +330,7 @@ const goToTendency = (pattern) => {
 
 .pattern-bar {
   height: 8px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 12px;
@@ -338,16 +338,16 @@ const goToTendency = (pattern) => {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), #3a7bc8);
+  background: linear-gradient(90deg, var(--color-primary), var(--vml-blue-dark));
   transition: width 0.5s ease;
 }
 
 .action-button {
   width: 100%;
   padding: 8px 16px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   color: var(--color-primary);
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
@@ -356,7 +356,7 @@ const goToTendency = (pattern) => {
 }
 
 .action-button:hover {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   border-color: var(--color-primary);
 }
 

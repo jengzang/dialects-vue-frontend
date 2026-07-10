@@ -45,7 +45,7 @@
               class="tendency-fill"
               :style="{
                 width: `${Math.min(Math.abs(item.z_score) * 10, 100)}%`,
-                background: item.z_score >= 0 ? 'var(--color-primary)' : '#e74c3c'
+                background: item.z_score >= 0 ? 'var(--color-primary)' : 'var(--color-error)'
               }"
             ></div>
           </div>
@@ -302,13 +302,13 @@ const loadRegionalNgrams = async () => {
   align-items: center;
   gap: 12px;
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 8px;
   transition: background 0.3s ease;
 }
 
 .tendency-item:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .tendency-category {
@@ -319,7 +319,7 @@ const loadRegionalNgrams = async () => {
 
 .tendency-bar {
   height: 24px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -390,23 +390,23 @@ const loadRegionalNgrams = async () => {
 }
 
 .ngram-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .ngram-row {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: background 0.3s ease;
 }
 
 .ngram-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .ngram-row.top-10 {
-  background: rgba(243, 156, 18, 0.1);
+  background: rgba(var(--color-warning-rgb), 0.1);
 }
 
 .col-ngram {
@@ -422,7 +422,7 @@ const loadRegionalNgrams = async () => {
 .region-badge {
   display: inline-block;
   padding: 3px 8px;
-  background: rgba(74, 144, 226, 0.15);
+  background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
   border-radius: 6px;
   font-size: 12px;
@@ -432,7 +432,7 @@ const loadRegionalNgrams = async () => {
 
 .bar-container {
   height: 24px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 12px;
   overflow: hidden;
 }

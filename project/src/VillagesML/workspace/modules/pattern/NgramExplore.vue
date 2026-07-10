@@ -331,8 +331,8 @@ onMounted(async () => {
   align-items: center;
   gap: 8px 0;
   padding: 10px 14px;
-  background: rgba(74, 144, 226, 0.08);
-  border: 1px solid rgba(74, 144, 226, 0.25);
+  background: rgba(var(--vml-blue-rgb), 0.08);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.25);
   border-radius: 10px;
   font-size: 13px;
 }
@@ -356,13 +356,13 @@ onMounted(async () => {
 }
 
 .banner-value.highlight {
-  color: var(--color-primary-hover, #4a90e2);
+  color: var(--color-primary-hover, var(--vml-blue));
 }
 
 .banner-divider {
   width: 1px;
   height: 32px;
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .banner-tip {
@@ -376,10 +376,10 @@ onMounted(async () => {
 .vml-number-input,
 .pattern-input {
   padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 }
 
 .vml-number-input {
@@ -415,23 +415,23 @@ onMounted(async () => {
 }
 
 .results-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .result-row {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: background 0.3s ease;
 }
 
 .result-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .result-row.top-10 {
-  background: rgba(243, 156, 18, 0.1);
+  background: rgba(var(--color-warning-rgb), 0.1);
 }
 
 .col-ngram {
@@ -472,27 +472,27 @@ onMounted(async () => {
 
 .position-all {
   background: rgba(149, 165, 166, 0.2);
-  color: #7f8c8d;
+  color: var(--text-secondary);
 }
 
 .position-prefix {
-  background: rgba(52, 152, 219, 0.2);
-  color: #2980b9;
+  background: rgba(var(--vml-blue-medium-rgb), 0.2);
+  color: var(--vml-blue-darkest);
 }
 
 .position-middle {
   background: rgba(155, 89, 182, 0.2);
-  color: #8e44ad;
+  color: var(--color-purple);
 }
 
 .position-suffix {
-  background: rgba(46, 204, 113, 0.2);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .bar-container {
   height: 20px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -511,7 +511,7 @@ onMounted(async () => {
 
 .pattern-count {
   padding: 12px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 8px;
   margin-bottom: 16px;
   color: var(--text-primary);
@@ -526,7 +526,7 @@ onMounted(async () => {
 
 .pattern-item {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
   display: grid;
   grid-template-columns: 150px 100px 100px 1fr;
@@ -568,7 +568,7 @@ onMounted(async () => {
 
 .example-tag {
   padding: 4px 12px;
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
   border-radius: 12px;
   font-size: 13px;
@@ -583,23 +583,23 @@ onMounted(async () => {
 }
 
 .type-prefix {
-  background: rgba(52, 152, 219, 0.2);
-  color: #2980b9;
+  background: rgba(var(--vml-blue-medium-rgb), 0.2);
+  color: var(--vml-blue-darkest);
 }
 
 .type-suffix {
-  background: rgba(46, 204, 113, 0.2);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .type-middle {
   background: rgba(155, 89, 182, 0.2);
-  color: #8e44ad;
+  color: var(--color-purple);
 }
 
 .type-all {
   background: rgba(149, 165, 166, 0.2);
-  color: #7f8c8d;
+  color: var(--text-secondary);
 }
 
 @media (min-aspect-ratio: 1/1) {

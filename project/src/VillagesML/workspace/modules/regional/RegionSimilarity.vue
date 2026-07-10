@@ -555,7 +555,7 @@ export default {
           left: 'center',
           bottom: '5%',
           inRange: {
-            color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+            color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', 'var(--color-error)', 'var(--color-error-dark)']
           }
         },
         series: [{
@@ -692,16 +692,16 @@ export default {
 
 .vml-number-input {
   padding: 10px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   font-size: 14px;
   transition: border-color 0.3s ease;
 }
 
 .vml-number-input:focus {
   outline: none;
-  border-color: var(--color-primary, #4a90e2);
+  border-color: var(--color-primary, var(--vml-blue));
 }
 
 .results-header h3 {
@@ -728,7 +728,7 @@ export default {
 }
 
 .rank-badge {
-  background: var(--color-primary, #4a90e2);
+  background: var(--color-primary, var(--vml-blue));
   color: white;
   padding: 4px 12px;
   border-radius: 12px;
@@ -755,14 +755,14 @@ export default {
 
 .similarity-bar {
   height: 24px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 12px;
   overflow: hidden;
 }
 
 .similarity-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary, #4a90e2), var(--color-success));
+  background: linear-gradient(90deg, var(--color-primary, var(--vml-blue)), var(--color-success));
   transition: width 0.3s ease;
 }
 
@@ -790,9 +790,9 @@ export default {
 .detail-button {
   width: 100%;
   padding: 8px 16px;
-  background: rgba(74, 144, 226, 0.1);
-  color: var(--color-primary, #4a90e2);
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  color: var(--color-primary, var(--vml-blue));
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -801,8 +801,8 @@ export default {
 }
 
 .detail-button:hover {
-  background: rgba(74, 144, 226, 0.2);
-  border-color: var(--color-primary, #4a90e2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  border-color: var(--color-primary, var(--vml-blue));
 }
 
 .similarity-metrics h3,
@@ -821,7 +821,7 @@ export default {
 .metric-card {
   text-align: center;
   padding: 20px;
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
   border-radius: 8px;
 }
 
@@ -834,7 +834,7 @@ export default {
 .metric-value {
   font-size: 32px;
   font-weight: 600;
-  color: var(--color-primary, #4a90e2);
+  color: var(--color-primary, var(--vml-blue));
 }
 
 .comparison-grid {
@@ -862,18 +862,18 @@ export default {
 }
 
 .char-tag.common {
-  background: rgba(80, 200, 120, 0.2);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .char-tag.unique1 {
-  background: rgba(74, 144, 226, 0.2);
-  color: #4a90e2;
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  color: var(--vml-blue);
 }
 
 .char-tag.unique2 {
-  background: rgba(243, 156, 18, 0.2);
-  color: #f39c12;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning);
 }
 
 .region-selector {
@@ -895,11 +895,11 @@ export default {
 }
 
 .add-button:hover:not(:disabled) {
-  background: #45b369;
+  background: var(--color-success);
 }
 
 .add-button:disabled {
-  background: #ccc;
+  background: var(--border-gray);
   cursor: not-allowed;
 }
 
@@ -915,8 +915,8 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background: rgba(74, 144, 226, 0.1);
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 20px;
   font-size: 14px;
   color: var(--text-primary);
@@ -925,7 +925,7 @@ export default {
 .remove-button {
   background: none;
   border: none;
-  color: #e74c3c;
+  color: var(--color-error);
   font-size: 20px;
   font-weight: bold;
   cursor: pointer;
@@ -940,7 +940,7 @@ export default {
 }
 
 .remove-button:hover {
-  background: rgba(231, 76, 60, 0.1);
+  background: rgba(var(--color-error-rgb), 0.1);
 }
 
 .heatmap-container {

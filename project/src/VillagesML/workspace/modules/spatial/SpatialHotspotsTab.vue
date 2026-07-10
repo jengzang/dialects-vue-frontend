@@ -177,7 +177,7 @@ h2 {
 }
 
 .load-button:hover:not(:disabled) {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .load-button:disabled {
@@ -204,7 +204,7 @@ h2 {
 
 .hotspot-card {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -212,11 +212,11 @@ h2 {
 }
 
 .hotspot-card:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .hotspot-card.selected {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   border-color: var(--color-primary);
 }
 
@@ -235,8 +235,8 @@ h2 {
 
 .hotspot-count {
   padding: 4px 12px;
-  background: rgba(243, 156, 18, 0.2);
-  color: #c87f0a;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning-dark);
   border-radius: 12px;
   font-size: 13px;
   font-weight: 500;
@@ -266,7 +266,7 @@ h2 {
 
 .hotspot-detail {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
 }
 
@@ -289,7 +289,7 @@ h2 {
 
 .stat-card {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 8px;
   text-align: center;
 }

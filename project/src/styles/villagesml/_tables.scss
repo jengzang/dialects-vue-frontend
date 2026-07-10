@@ -14,7 +14,7 @@
 }
 
 .vml-table-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   font-size: 14px;
   color: var(--text-primary);
@@ -26,7 +26,7 @@
   transition: background 0.3s ease;
 
   &:hover {
-    background: rgba(74, 144, 226, 0.1);
+    background: rgba(var(--vml-blue-rgb), 0.1);
   }
 }
 

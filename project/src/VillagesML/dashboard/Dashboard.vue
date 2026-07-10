@@ -357,8 +357,8 @@ onMounted(() => {
   gap: 12px;
   padding: 14px 18px;
   margin-bottom: 20px;
-  background: rgba(243, 156, 18, 0.12);
-  border: 1px solid rgba(243, 156, 18, 0.4);
+  background: rgba(var(--color-warning-rgb), 0.12);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.4);
   border-radius: 12px;
   font-size: 14px;
   color: var(--text-primary);
@@ -430,17 +430,17 @@ onMounted(() => {
 .search-input {
   flex: 1;
   padding: 12px 20px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 12px;
   font-size: 16px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   transition: all 0.3s ease;
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
 }
 
 .search-button {
@@ -521,12 +521,12 @@ onMounted(() => {
 }
 
 .badge-public {
-  background: rgba(80, 200, 120, 0.2);
+  background: rgba(var(--color-success-rgb), 0.2);
   color: var(--color-success);
 }
 
 .badge-auth {
-  background: rgba(243, 156, 18, 0.2);
+  background: rgba(var(--color-warning-rgb), 0.2);
   color: var(--color-warning-dark);
 }
 
@@ -534,7 +534,7 @@ onMounted(() => {
 .intro-section {
   padding: 30px;
   margin-bottom: 30px;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-60);
 }
 
 .intro-text {

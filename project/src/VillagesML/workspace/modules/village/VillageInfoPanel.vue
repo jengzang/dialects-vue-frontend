@@ -93,7 +93,7 @@ defineProps({
   display: flex;
   justify-content: space-between;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 8px;
 }
 
@@ -110,7 +110,7 @@ defineProps({
 .additional-info {
   margin-top: 20px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 8px;
 }
 

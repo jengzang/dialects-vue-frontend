@@ -412,18 +412,18 @@ export default {
           },
           splitLine: {
             lineStyle: {
-              color: 'rgba(74, 144, 226, 0.2)'
+              color: 'rgba(var(--vml-blue-rgb), 0.2)'
             }
           },
           splitArea: {
             show: true,
             areaStyle: {
-              color: ['rgba(74, 144, 226, 0.05)', 'rgba(74, 144, 226, 0.1)']
+              color: ['rgba(var(--vml-blue-rgb), 0.05)', 'rgba(var(--vml-blue-rgb), 0.1)']
             }
           },
           axisLine: {
             lineStyle: {
-              color: 'rgba(74, 144, 226, 0.3)'
+              color: 'rgba(var(--vml-blue-rgb), 0.3)'
             }
           }
         },
@@ -434,14 +434,14 @@ export default {
             value: data,
             name: regionalData.value.region_name,
             areaStyle: {
-              color: 'rgba(74, 144, 226, 0.3)'
+              color: 'rgba(var(--vml-blue-rgb), 0.3)'
             },
             lineStyle: {
-              color: '#4a90e2',
+              color: 'var(--vml-blue)',
               width: 2
             },
             itemStyle: {
-              color: '#4a90e2'
+              color: 'var(--vml-blue)'
             }
           }]
         }]
@@ -521,7 +521,7 @@ export default {
           data: values,
           itemStyle: {
             color: (params) => {
-              const colors = ['#d73027', '#f46d43', '#fdae61', '#fee090', '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']
+              const colors = ['var(--color-error)', '#f46d43', '#fdae61', '#fee090', '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']
               return colors[Math.min(params.dataIndex, colors.length - 1)]
             }
           },
@@ -666,13 +666,13 @@ export default {
   width: 100%;
   padding: 10px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   transition: border-color 0.3s ease;
 }
 
 .vml-number-input:focus {
   outline: none;
-  border-color: var(--color-primary, #4a90e2);
+  border-color: var(--color-primary, var(--vml-blue));
 }
 
 .results-header h3 {
@@ -705,8 +705,8 @@ export default {
 }
 
 .parent-badge {
-  background: rgba(74, 144, 226, 0.2);
-  color: #4a90e2;
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  color: var(--vml-blue);
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 12px;
@@ -753,9 +753,9 @@ export default {
 .detail-button {
   width: 100%;
   padding: 8px 16px;
-  background: rgba(74, 144, 226, 0.1);
-  color: var(--color-primary, #4a90e2);
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  color: var(--color-primary, var(--vml-blue));
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -764,8 +764,8 @@ export default {
 }
 
 .detail-button:hover {
-  background: rgba(74, 144, 226, 0.2);
-  border-color: var(--color-primary, #4a90e2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  border-color: var(--color-primary, var(--vml-blue));
 }
 
 .regional-header h3,
@@ -794,14 +794,14 @@ table {
 }
 
 thead {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 th,
 td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 th {
@@ -810,7 +810,7 @@ th {
 }
 
 tr.significant {
-  background: rgba(80, 200, 120, 0.05);
+  background: rgba(var(--color-success-rgb), 0.05);
 }
 
 .tendency-badge {
@@ -821,13 +821,13 @@ tr.significant {
 }
 
 .tendency-badge.positive {
-  background: rgba(80, 200, 120, 0.2);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .tendency-badge.negative {
-  background: rgba(231, 76, 60, 0.2);
-  color: #e74c3c;
+  background: rgba(var(--color-error-rgb), 0.2);
+  color: var(--color-error);
 }
 
 .rank-badge {
@@ -839,22 +839,22 @@ tr.significant {
 }
 
 .rank-badge.gold {
-  background: linear-gradient(135deg, var(--color-gold), #ffed4e);
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold));
   color: var(--text-dark)
 }
 
 .rank-badge.silver {
-  background: linear-gradient(135deg, var(--color-silver), #e8e8e8);
+  background: linear-gradient(135deg, var(--color-silver), var(--border-light-gray));
   color: var(--text-dark)
 }
 
 .rank-badge.bronze {
-  background: linear-gradient(135deg, var(--color-bronze), #e8a87c);
+  background: linear-gradient(135deg, var(--color-bronze), var(--vml-terracotta));
   color: var(--text-dark)
 }
 
 .rank-badge:not(.gold):not(.silver):not(.bronze) {
-  background: var(--color-primary, #4a90e2);
+  background: var(--color-primary, var(--vml-blue));
 }
 
 @media (min-aspect-ratio: 1/1) {

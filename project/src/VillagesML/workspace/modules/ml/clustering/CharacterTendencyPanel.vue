@@ -264,8 +264,8 @@ async function runClustering() {
 
 .dbscan-params {
   padding: 16px;
-  background: rgba(74, 144, 226, 0.08);
-  border: 1px solid rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.08);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
   border-radius: 12px;
 }
 

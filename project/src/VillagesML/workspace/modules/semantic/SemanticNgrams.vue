@@ -456,7 +456,7 @@ watch(detailMode, () => {
   grid-template-columns: 2fr 1fr 2fr;
   gap: 12px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 8px;
   align-items: center;
 }
@@ -485,7 +485,7 @@ watch(detailMode, () => {
 
 .stat-item {
   padding: 4px 10px;
-  background: rgba(74, 144, 226, 0.15);
+  background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
   border-radius: 12px;
   font-size: 12px;
@@ -525,31 +525,31 @@ watch(detailMode, () => {
 }
 
 .pmi-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .pmi-row {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: background 0.3s ease;
 }
 
 .pmi-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .pmi-row.pmi-very-strong {
-  background: rgba(39, 174, 96, 0.15);
+  background: rgba(var(--color-success-rgb), 0.15);
 }
 
 .pmi-row.pmi-strong {
-  background: rgba(46, 204, 113, 0.1);
+  background: rgba(var(--color-success-rgb), 0.1);
 }
 
 .pmi-row.pmi-moderate {
-  background: rgba(243, 156, 18, 0.1);
+  background: rgba(var(--color-warning-rgb), 0.1);
 }
 
 .col-pair {
@@ -568,7 +568,7 @@ watch(detailMode, () => {
 
 .strength-bar {
   height: 20px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -580,7 +580,7 @@ watch(detailMode, () => {
 }
 
 .strength-fill.negative {
-  background: linear-gradient(90deg, #e74c3c, #c0392b);
+  background: linear-gradient(90deg, var(--color-error), var(--color-error-dark));
 }
 
 @media (max-width: 600px) {
@@ -665,7 +665,7 @@ watch(detailMode, () => {
 .lexicon-button:hover {
   background: var(--color-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.3);
 }
 
 /* Lexicon Modal Styles */
@@ -699,9 +699,9 @@ watch(detailMode, () => {
 
 .category-item {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 12px;
-  border: 1px solid rgba(74, 144, 226, 0.1);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .category-header {
@@ -721,7 +721,7 @@ watch(detailMode, () => {
   font-size: 13px;
   color: var(--text-secondary);
   padding: 4px 12px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 12px;
 }
 
@@ -733,7 +733,7 @@ watch(detailMode, () => {
 
 .char-tag {
   padding: 6px 12px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   color: var(--text-primary);
   border-radius: 6px;
   font-size: 14px;

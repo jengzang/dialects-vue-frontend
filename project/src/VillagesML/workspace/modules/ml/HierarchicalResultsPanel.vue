@@ -121,13 +121,13 @@ function toggleNode(level, key) {
 }
 
 const levelColors = {
-  city:     ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
-  county:   ['#e67e22', '#1abc9c', '#e74c3c', '#3498db', '#f39c12', '#9b59b6', '#2ecc71', '#34495e', '#16a085', '#c0392b'],
-  township: ['#4a90e2', '#50c878', '#f39c12', '#e74c3c', '#9b59b6', '#1abc9c', '#e67e22', '#3498db', '#2ecc71', '#34495e']
+  city:     ['var(--color-error)', 'var(--vml-blue-medium)', 'var(--color-success)', 'var(--color-warning)', 'var(--color-purple)'],
+  county:   ['var(--color-warning)', 'var(--color-teal)', 'var(--color-error)', 'var(--vml-blue-medium)', 'var(--color-warning)', 'var(--color-purple)', 'var(--color-success)', 'var(--text-deep)', 'var(--color-teal)', 'var(--color-error-dark)'],
+  township: ['var(--vml-blue)', 'var(--color-success)', 'var(--color-warning)', 'var(--color-error)', 'var(--color-purple)', 'var(--color-teal)', 'var(--color-warning)', 'var(--vml-blue-medium)', 'var(--color-success)', 'var(--text-deep)']
 }
 
 function levelColor(level, clusterId) {
-  if (clusterId === -1) return '#95a5a6'
+  if (clusterId === -1) return 'var(--text-secondary)'
   const palette = levelColors[level] || levelColors.township
   return palette[clusterId % palette.length]
 }
@@ -155,7 +155,7 @@ function levelColor(level, clusterId) {
 
 .metric-card {
   padding: 14px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
   text-align: center;
 }
@@ -199,13 +199,13 @@ function levelColor(level, clusterId) {
 }
 
 .node-row.expandable:hover {
-  background: rgba(74, 144, 226, 0.08);
+  background: rgba(var(--vml-blue-rgb), 0.08);
 }
 
 .city-row {
   font-size: 14px;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-20);
   margin-bottom: 2px;
 }
 
@@ -221,14 +221,14 @@ function levelColor(level, clusterId) {
 
 .county-list {
   margin-left: 20px;
-  border-left: 2px solid rgba(74, 144, 226, 0.15);
+  border-left: 2px solid rgba(var(--vml-blue-rgb), 0.15);
   padding-left: 8px;
   margin-bottom: 4px;
 }
 
 .township-list {
   margin-left: 20px;
-  border-left: 2px solid rgba(80, 200, 120, 0.15);
+  border-left: 2px solid rgba(var(--color-success-rgb), 0.15);
   padding-left: 8px;
 }
 

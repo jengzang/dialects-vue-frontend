@@ -49,7 +49,7 @@
             v-for="(value, index) in data.feature_vector.slice(0, 50)"
             :key="index"
             class="vector-bar"
-            :style="{ height: `${Math.abs(value) * 100}%`, background: value >= 0 ? 'var(--color-primary)' : '#e74c3c' }"
+            :style="{ height: `${Math.abs(value) * 100}%`, background: value >= 0 ? 'var(--color-primary)' : 'var(--color-error)' }"
             :title="`維度 ${index}: ${value.toFixed(2)}`"
           ></div>
         </div>
@@ -106,7 +106,7 @@ const formatValue = (value) => {
 
 .feature-type {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
 }
 
@@ -127,7 +127,7 @@ const formatValue = (value) => {
   display: flex;
   justify-content: space-between;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 6px;
   font-size: 14px;
 }
@@ -143,7 +143,7 @@ const formatValue = (value) => {
 
 .vector-visualization {
   padding: 20px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
 }
 
@@ -159,7 +159,7 @@ const formatValue = (value) => {
   height: 100px;
   gap: 2px;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 8px;
 }
 

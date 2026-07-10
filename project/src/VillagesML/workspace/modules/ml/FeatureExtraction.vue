@@ -917,8 +917,8 @@ const renderAggregationChart = () => {
       data: values,
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: '#4a90e2' },
-          { offset: 1, color: '#50c878' }
+          { offset: 0, color: 'var(--vml-blue)' },
+          { offset: 1, color: 'var(--color-success)' }
         ])
       }
     }]
@@ -1104,10 +1104,10 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 12px 20px;
-  background: rgba(231, 76, 60, 0.1);
-  border: 2px solid rgba(231, 76, 60, 0.3);
+  background: rgba(var(--color-error-rgb), 0.1);
+  border: 2px solid rgba(var(--color-error-rgb), 0.3);
   border-radius: 12px;
-  color: #e74c3c;
+  color: var(--color-error);
   font-weight: 500;
 }
 
@@ -1125,7 +1125,7 @@ onBeforeUnmount(() => {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .panel-header h3 {
@@ -1135,7 +1135,7 @@ onBeforeUnmount(() => {
 }
 
 .count-badge {
-  background: #4a90e2;
+  background: var(--vml-blue);
   color: white;
   padding: 4px 12px;
   border-radius: 12px;
@@ -1149,8 +1149,8 @@ onBeforeUnmount(() => {
 
 .glass-input {
   padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  background: var(--glass-50);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 14px;
   transition: all 0.3s ease;
@@ -1158,8 +1158,8 @@ onBeforeUnmount(() => {
 
 .glass-input:focus {
   outline: none;
-  border-color: #4a90e2;
-  background: rgba(255, 255, 255, 0.8);
+  border-color: var(--vml-blue);
+  background: var(--glass-80);
 }
 
 .filters-row {
@@ -1207,15 +1207,15 @@ onBeforeUnmount(() => {
 .empty-hint {
   padding: 40px 20px;
   text-align: center;
-  background: rgba(243, 156, 18, 0.1);
-  border: 2px dashed rgba(243, 156, 18, 0.3);
+  background: rgba(var(--color-warning-rgb), 0.1);
+  border: 2px dashed rgba(var(--color-warning-rgb), 0.3);
   border-radius: 8px;
   margin-bottom: 16px;
 }
 
 .empty-hint p {
   font-size: 15px;
-  color: #f39c12;
+  color: var(--color-warning);
   margin: 0;
   font-weight: 500;
 }
@@ -1240,8 +1240,8 @@ onBeforeUnmount(() => {
 
 .glass-select {
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  background: var(--glass-50);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 14px;
   transition: all 0.3s ease;
@@ -1249,14 +1249,14 @@ onBeforeUnmount(() => {
 
 .glass-select:focus {
   outline: none;
-  border-color: #4a90e2;
-  background: rgba(255, 255, 255, 0.8);
+  border-color: var(--vml-blue);
+  background: var(--glass-80);
 }
 
 .village-list {
   max-height: 400px;
   overflow-y: auto;
-  border: 1px solid rgba(74, 144, 226, 0.2);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
   border-radius: 8px;
   margin-bottom: 16px;
 }
@@ -1266,17 +1266,17 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.1);
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .village-item:hover {
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
 }
 
 .village-item.selected {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .village-info {
@@ -1302,7 +1302,7 @@ onBeforeUnmount(() => {
 .village-id {
   font-size: 11px;
   color: var(--text-secondary);
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   padding: 2px 8px;
   border-radius: 8px;
   font-family: monospace;
@@ -1317,10 +1317,10 @@ onBeforeUnmount(() => {
 
 .location-item {
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   padding: 2px 8px;
   border-radius: 6px;
-  border: 1px solid rgba(74, 144, 226, 0.2);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .pagination {
@@ -1346,16 +1346,16 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  background: var(--glass-50);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .feature-type-item:hover {
-  background: rgba(255, 255, 255, 0.7);
-  border-color: rgba(74, 144, 226, 0.4);
+  background: var(--glass-70);
+  border-color: rgba(var(--vml-blue-rgb), 0.4);
 }
 
 .type-label {
@@ -1429,10 +1429,10 @@ onBeforeUnmount(() => {
 
 .stat-card {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-60);
   border-radius: 12px;
   text-align: center;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .stat-label {
@@ -1444,7 +1444,7 @@ onBeforeUnmount(() => {
 .stat-value {
   font-size: 24px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .stat-breakdown {
@@ -1456,7 +1456,7 @@ onBeforeUnmount(() => {
 }
 
 .breakdown-item {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   padding: 2px 8px;
   border-radius: 8px;
   color: var(--text-secondary);
@@ -1474,7 +1474,7 @@ onBeforeUnmount(() => {
 }
 
 .glass-table thead {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -1484,7 +1484,7 @@ onBeforeUnmount(() => {
 .glass-table td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.1);
   white-space: nowrap;
 }
 
@@ -1530,8 +1530,8 @@ onBeforeUnmount(() => {
 
 /* Aggregation Results Styles */
 .stat-badge {
-  background: rgba(74, 144, 226, 0.2);
-  color: #4a90e2;
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  color: var(--vml-blue);
   padding: 6px 12px;
   border-radius: 12px;
   font-size: 13px;
@@ -1541,7 +1541,7 @@ onBeforeUnmount(() => {
 .agg-section {
   margin-bottom: 32px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
 }
 
@@ -1550,7 +1550,7 @@ onBeforeUnmount(() => {
   color: var(--text-primary);
   margin: 0 0 16px 0;
   padding-bottom: 8px;
-  border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .agg-section h5 {
@@ -1567,10 +1567,10 @@ onBeforeUnmount(() => {
 
 .category-card {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-60);
   border-radius: 8px;
   text-align: center;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .category-name {
@@ -1589,7 +1589,7 @@ onBeforeUnmount(() => {
 .category-percentage {
   font-size: 16px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .struct-grid {
@@ -1599,7 +1599,7 @@ onBeforeUnmount(() => {
 }
 
 .struct-subsection {
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
   padding: 16px;
   border-radius: 8px;
 }
@@ -1614,13 +1614,13 @@ onBeforeUnmount(() => {
 .mini-table td {
   padding: 8px;
   text-align: left;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .mini-table th {
   font-weight: 600;
   color: var(--text-primary);
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .cluster-grid {
@@ -1630,7 +1630,7 @@ onBeforeUnmount(() => {
 }
 
 .cluster-subsection {
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
   padding: 12px;
   border-radius: 8px;
 }
@@ -1647,9 +1647,9 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   padding: 10px 14px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 8px;
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
 }
 
 .cluster-id {
@@ -1661,7 +1661,7 @@ onBeforeUnmount(() => {
 
 .cluster-count {
   font-size: 13px;
-  color: #4a90e2;
+  color: var(--vml-blue);
   font-weight: 500;
 }
 
@@ -1673,16 +1673,16 @@ onBeforeUnmount(() => {
 
 .coverage-item {
   padding: 20px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 12px;
   text-align: center;
   min-width: 120px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .coverage-item.highlight {
-  background: rgba(74, 144, 226, 0.1);
-  border-color: #4a90e2;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border-color: var(--vml-blue);
 }
 
 .coverage-label {
@@ -1694,7 +1694,7 @@ onBeforeUnmount(() => {
 .coverage-value {
   font-size: 24px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .char-grid {
@@ -1705,10 +1705,10 @@ onBeforeUnmount(() => {
 
 .char-card {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-60);
   border-radius: 8px;
   text-align: center;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .char-text {
@@ -1720,22 +1720,22 @@ onBeforeUnmount(() => {
 
 .char-percentage {
   font-size: 12px;
-  color: #4a90e2;
+  color: var(--vml-blue);
   font-weight: 500;
 }
 
 .empty-cluster-hint {
   padding: 30px 20px;
   text-align: center;
-  background: rgba(243, 156, 18, 0.1);
-  border: 2px dashed rgba(243, 156, 18, 0.3);
+  background: rgba(var(--color-warning-rgb), 0.1);
+  border: 2px dashed rgba(var(--color-warning-rgb), 0.3);
   border-radius: 8px;
 }
 
 .empty-cluster-hint p {
   margin: 8px 0;
   font-size: 14px;
-  color: #f39c12;
+  color: var(--color-warning);
 }
 
 .empty-cluster-hint .hint-text {
@@ -1832,7 +1832,7 @@ onBeforeUnmount(() => {
   .glass-table td:first-child {
     position: sticky;
     left: 0;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--glass-90);
     z-index: 5;
     box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
   }

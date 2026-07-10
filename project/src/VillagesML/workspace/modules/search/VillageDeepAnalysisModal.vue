@@ -200,7 +200,7 @@ const loadCompleteData = async () => {
 .info-section {
   margin-bottom: 24px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-60);
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.05);
 }

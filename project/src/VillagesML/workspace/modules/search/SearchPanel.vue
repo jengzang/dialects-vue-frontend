@@ -158,9 +158,9 @@ const clearFilters = () => {
 .search-input {
   flex: 1;
   padding: 12px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--glass-30);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
   transition: all 0.3s ease;
@@ -169,7 +169,7 @@ const clearFilters = () => {
 .search-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--glass-70);
 }
 
 .search-button {
@@ -188,7 +188,7 @@ const clearFilters = () => {
   padding: 10px 16px;
   border: none;
   border-radius: 10px;
-  background: rgba(243, 156, 18, 0.2);
+  background: rgba(var(--color-warning-rgb), 0.2);
   color: var(--color-warning);
   font-size: 13px;
   cursor: pointer;
@@ -196,7 +196,7 @@ const clearFilters = () => {
 }
 
 .clear-filters-button:hover {
-  background: rgba(243, 156, 18, 0.3);
+  background: rgba(var(--color-warning-rgb), 0.3);
 }
 
 @media (max-width: 768px) {

@@ -461,16 +461,16 @@ onBeforeUnmount(() => {
 .filter-input {
   flex: 1;
   padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 }
 
 .filter-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
 }
 
 .summary-stats {
@@ -482,7 +482,7 @@ onBeforeUnmount(() => {
 
 .stat-card {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
   text-align: center;
 }
@@ -523,19 +523,19 @@ onBeforeUnmount(() => {
 }
 
 .table-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .table-row {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: background 0.3s ease;
 }
 
 .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .col-region {
@@ -554,7 +554,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
   border-radius: 4px;
   font-size: 11px;
@@ -575,7 +575,7 @@ onBeforeUnmount(() => {
 }
 
 .detail-button:hover {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .pagination {
@@ -597,7 +597,7 @@ onBeforeUnmount(() => {
 }
 
 .pagination button:hover:not(:disabled) {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .pagination button:disabled {
@@ -622,7 +622,7 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: space-between;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 8px;
 }
 
@@ -667,7 +667,7 @@ onBeforeUnmount(() => {
 
 .bar-container {
   height: 24px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -699,7 +699,7 @@ onBeforeUnmount(() => {
 
 .stat-item {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 8px;
   text-align: center;
 }

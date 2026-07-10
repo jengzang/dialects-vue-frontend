@@ -28,25 +28,25 @@
   padding: 10px 24px;
   font-size: 14px;
   white-space: nowrap;
-  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  background: linear-gradient(135deg, var(--vml-blue) 0%, var(--vml-blue-darker) 100%);
   border-radius: var(--radius-md);
   border: none;
   color: #ffffff;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
 .solid-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #5ba3f5 0%, #4a90e2 100%);
+  background: linear-gradient(135deg, #5ba3f5 0%, var(--vml-blue) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.4);
 }
 
 .solid-button:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 2px 6px rgba(var(--vml-blue-rgb), 0.3);
 }
 
 .solid-button:disabled {
@@ -56,7 +56,7 @@
 }
 
 .solid-button.secondary {
-  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  background: linear-gradient(135deg, var(--text-secondary), var(--text-secondary));
 }
 
 .solid-button.secondary:hover:not(:disabled) {
@@ -79,7 +79,7 @@
   color: var(--text-deep);
   margin: 0;
   padding: 8px 12px;
-  background: rgba(74, 144, 226, 0.08);
-  border-left: 3px solid #4a90e2;
+  background: rgba(var(--vml-blue-rgb), 0.08);
+  border-left: 3px solid var(--vml-blue);
   border-radius: 4px;
 }

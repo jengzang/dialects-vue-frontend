@@ -133,15 +133,15 @@ const getTendencyClass = (zScore) => {
 
 const getBarColor = (zScore) => {
   const absZ = Math.abs(zScore)
-  if (absZ >= 2) return '#f39c12'
-  if (absZ >= 1) return '#f1c40f'
+  if (absZ >= 2) return 'var(--color-warning)'
+  if (absZ >= 1) return 'var(--color-gold)'
   return 'var(--color-primary)'
 }
 
 const getZScoreColor = (zScore) => {
   const absZ = Math.abs(zScore)
-  if (absZ >= 2) return '#e67e22'
-  if (absZ >= 1) return '#f39c12'
+  if (absZ >= 2) return 'var(--color-warning)'
+  if (absZ >= 1) return 'var(--color-warning)'
   return 'var(--color-primary)'
 }
 
@@ -184,10 +184,10 @@ watch(
   flex: 1;
   min-width: 200px;
   padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 }
 
 .significance-legend {
@@ -195,7 +195,7 @@ watch(
   gap: 24px;
   margin-bottom: 16px;
   padding: 12px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: 8px;
   flex-wrap: wrap;
 }
@@ -215,11 +215,11 @@ watch(
 }
 
 .legend-dot.strong {
-  background: #f39c12;
+  background: var(--color-warning);
 }
 
 .legend-dot.moderate {
-  background: #f1c40f;
+  background: var(--color-gold);
 }
 
 .legend-dot.weak {
@@ -237,25 +237,25 @@ watch(
   grid-template-columns: 150px 1fr 200px;
   gap: 12px;
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 8px;
   align-items: center;
   transition: all 0.3s ease;
 }
 
 .tendency-item:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   transform: translateX(5px);
 }
 
 .tendency-item.strong-tendency {
-  background: rgba(243, 156, 18, 0.15);
-  border-left: 4px solid #f39c12;
+  background: rgba(var(--color-warning-rgb), 0.15);
+  border-left: 4px solid var(--color-warning);
 }
 
 .tendency-item.moderate-tendency {
   background: rgba(241, 196, 15, 0.1);
-  border-left: 4px solid #f1c40f;
+  border-left: 4px solid var(--color-gold);
 }
 
 .tendency-item.weak-tendency {
@@ -270,7 +270,7 @@ watch(
 
 .tendency-bar {
   height: 24px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 12px;
   overflow: hidden;
 }

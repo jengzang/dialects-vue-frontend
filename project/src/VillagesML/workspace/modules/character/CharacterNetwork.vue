@@ -242,7 +242,7 @@ onBeforeUnmount(() => {
 .auth-warning {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 16px; margin-bottom: 12px;
-  background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.3);
+  background: rgba(var(--color-error-light-rgb), 0.1); border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
   border-radius: 10px; font-size: 14px; color: var(--color-error-light);
 }
 
@@ -259,13 +259,13 @@ onBeforeUnmount(() => {
   min-width: 56px;
   width: 100px;
   font-size: 14px;
-  border-color: rgba(0, 122, 255, 0.3);
+  border-color: rgba(var(--color-primary-rgb), 0.3);
 }
 
 .glass-select, .glass-input {
   padding: 8px 10px; border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-60);
+  background: var(--glass-50);
   font-size: 14px;
 }
 .glass-input.small { min-width: 56px; width: 80px; flex: 1; }
@@ -277,7 +277,7 @@ onBeforeUnmount(() => {
   border-radius: 3px; margin-top: 4px;
 }
 .progress-bar-fill {
-  height: 100%; background: var(--color-primary, #4a90e2);
+  height: 100%; background: var(--color-primary, var(--vml-blue));
   border-radius: 3px; transition: width 0.3s ease;
 }
 
@@ -288,5 +288,5 @@ onBeforeUnmount(() => {
 
 .network-chart { width: 100%; height: clamp(320px, 70dvh, 520px); }
 
-.empty-state { text-align: center; color: var(--text-secondary, #888); padding: 40px; }
+.empty-state { text-align: center; color: var(--text-secondary, var(--text-muted)); padding: 40px; }
 

@@ -465,13 +465,13 @@ const renderComparisonChart = () => {
         name: region1.value,
         type: 'bar',
         data: comparisonData.value.region1_vector || [],
-        itemStyle: { color: '#4a90e2' }
+        itemStyle: { color: 'var(--vml-blue)' }
       },
       {
         name: region2.value,
         type: 'bar',
         data: comparisonData.value.region2_vector || [],
-        itemStyle: { color: '#50c878' }
+        itemStyle: { color: 'var(--color-success)' }
       }
     ]
   })
@@ -534,7 +534,7 @@ const renderHeatmap = () => {
       left: 'center',
       bottom: isMobile ? '2%' : '5%',
       inRange: {
-        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', 'var(--color-error)', 'var(--color-error-dark)']
       }
     },
     series: [{
@@ -598,8 +598,8 @@ const renderScatterPlot = () => {
       data: scatterData,
       symbolSize: isMobile ? 15 : 20,
       itemStyle: {
-        color: '#4a90e2',
-        borderColor: '#357abd',
+        color: 'var(--vml-blue)',
+        borderColor: 'var(--vml-blue-darker)',
         borderWidth: 2
       },
       label: {
@@ -611,7 +611,7 @@ const renderScatterPlot = () => {
       emphasis: {
         itemStyle: {
           shadowBlur: 10,
-          shadowColor: 'rgba(74, 144, 226, 0.5)'
+          shadowColor: 'rgba(var(--vml-blue-rgb), 0.5)'
         }
       }
     }]
@@ -698,7 +698,7 @@ onUnmounted(() => {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .panel-header h3 {
@@ -708,7 +708,7 @@ onUnmounted(() => {
 }
 
 .region-label {
-  background: linear-gradient(135deg, #4a90e2, var(--color-success));
+  background: linear-gradient(135deg, var(--vml-blue), var(--color-success));
   color: white;
   padding: 4px 12px;
   border-radius: 12px;
@@ -731,9 +731,9 @@ onUnmounted(() => {
 
 .region-group {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
-  border: 1px solid rgba(74, 144, 226, 0.2);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .group-title {
@@ -742,7 +742,7 @@ onUnmounted(() => {
   color: var(--text-primary);
   margin: 0 0 16px 0;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.15);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.15);
 }
 
 .action-button {
@@ -755,13 +755,13 @@ onUnmounted(() => {
   cursor: pointer;
   transition: all 0.3s ease;
   color: white;
-  background: linear-gradient(135deg, #4a90e2, #357abd);
+  background: linear-gradient(135deg, var(--vml-blue), var(--vml-blue-darker));
 }
 
 .action-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #357abd, #2868a8);
+  background: linear-gradient(135deg, var(--vml-blue-darker), var(--vml-blue-darker));
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.4);
 }
 
 .action-button:disabled {
@@ -777,7 +777,7 @@ onUnmounted(() => {
 }
 
 .action-button.add-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--color-success), #2d8a4a);
+  background: linear-gradient(135deg, var(--color-success), var(--color-success));
 }
 
 /* Multi-region panel */
@@ -802,7 +802,7 @@ onUnmounted(() => {
   flex-wrap: wrap;
   gap: 8px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 8px;
   min-height: 50px;
 }
@@ -812,7 +812,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background: linear-gradient(135deg, #4a90e2, #357abd);
+  background: linear-gradient(135deg, var(--vml-blue), var(--vml-blue-darker));
   color: white;
   border-radius: 16px;
   font-size: 13px;
@@ -844,7 +844,7 @@ onUnmounted(() => {
 }
 
 .remove-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-20);
 }
 
 .batch-actions {
@@ -859,7 +859,7 @@ onUnmounted(() => {
 .info-label {
   font-size: 13px;
   color: var(--text-secondary);
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   padding: 4px 10px;
   border-radius: 8px;
 }
@@ -893,7 +893,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 8px;
 }
 
@@ -945,7 +945,7 @@ onUnmounted(() => {
 }
 
 .region-badge.primary {
-  background: linear-gradient(135deg, #4a90e2, #357abd);
+  background: linear-gradient(135deg, var(--vml-blue), var(--vml-blue-darker));
   color: white;
 }
 
@@ -971,10 +971,10 @@ onUnmounted(() => {
   flex: 1;
   min-width: 150px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-60);
   border-radius: 12px;
   text-align: center;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .metric-label {
@@ -986,7 +986,7 @@ onUnmounted(() => {
 .metric-value {
   font-size: 26px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .loading-overlay {

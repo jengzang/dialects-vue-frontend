@@ -72,7 +72,7 @@ const algorithmHint = computed(() => {
   padding: 0.5rem;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -85,7 +85,7 @@ const algorithmHint = computed(() => {
 .setting-select:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
 }
 
 </style>

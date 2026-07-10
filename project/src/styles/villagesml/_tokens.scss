@@ -1,0 +1,20 @@
+// VillagesML 专属设计 token
+// 品牌色与 global/_tokens.scss 不同，VillagesML 有自己的视觉体系
+
+:root {
+  /* VillagesML 品牌蓝 — 与主应用 --color-primary(#007aff) 不同 */
+  --vml-blue: #4a90e2;
+  --vml-blue-rgb: 74, 144, 226;
+  --vml-blue-dark: #3a7bc8;
+  --vml-blue-dark-rgb: 58, 123, 200;
+  --vml-blue-darker: #357abd;
+  --vml-blue-darker-rgb: 53, 122, 189;
+  --vml-blue-darkest: #2980b9;
+  --vml-blue-darkest-rgb: 41, 128, 185;
+  --vml-blue-medium: #3498db;
+  --vml-blue-medium-rgb: 52, 152, 219;
+
+  /* VillagesML 专属语义色 */
+  --vml-terracotta: #e8a87c;
+  --vml-brown-dark: #6b3e1a;
+}

@@ -174,7 +174,7 @@ h3 { font-size: 16px; margin-top: 20px; }
 .run-selector label { font-size: 12px; color: var(--text-secondary); }
 .run-select {
   padding: 8px 12px; border-radius: 8px; font-size: 13px;
-  border: 1px solid rgba(255,255,255,0.6); background: rgba(255,255,255,0.5);
+  border: 1px solid var(--glass-60); background: var(--glass-50);
   max-width: 360px;
 }
 
@@ -183,20 +183,20 @@ h3 { font-size: 16px; margin-top: 20px; }
   border: none; border-radius: 8px; font-size: 14px; font-weight: 500;
   cursor: pointer; transition: all 0.3s ease;
 }
-.load-button.secondary { background: rgba(74,144,226,0.2); color: var(--color-primary); }
+.load-button.secondary { background: rgba(var(--vml-blue-rgb), 0.2); color: var(--color-primary); }
 .load-button:hover:not(:disabled) { opacity: 0.85; }
 .load-button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .clusters-content { margin-top: 20px; width: 100%;  display: flex; flex-direction: column; }
 .clusters-metadata {
   display: flex; flex-wrap: wrap; gap: 16px; padding: 16px;
-  background: rgba(74,144,226,0.1); border-radius: 8px; margin-bottom: 16px; font-size: 14px;
+  background: rgba(var(--vml-blue-rgb), 0.1); border-radius: 8px; margin-bottom: 16px; font-size: 14px;
 }
 .metadata-item strong { color: var(--color-primary); margin-right: 4px; }
 
-.summary-panel { margin-top: 30px; padding: 12px; background: rgba(255,255,255,0.3); border-radius: 12px; width:100%}
+.summary-panel { margin-top: 30px; padding: 12px; background: var(--glass-30); border-radius: 12px; width:100%}
 .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 16px; }
-.summary-card { padding: 12px; background: rgba(255,255,255,0.5); border-radius: 12px; text-align: center; }
+.summary-card { padding: 12px; background: var(--glass-50); border-radius: 12px; text-align: center; }
 .summary-icon { font-size: 32px; margin-bottom: 8px; }
 .summary-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
 .summary-value { font-size: 26px; font-weight: 700; color: var(--color-primary); }

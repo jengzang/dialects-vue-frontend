@@ -483,7 +483,7 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 2px solid rgba(0, 122, 255, 0.2);
+  border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
 }
 
 .panel-header h3 {
@@ -514,13 +514,13 @@ onMounted(() => {
   color: var(--text-primary);
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 2px solid rgba(0, 122, 255, 0.2);
+  border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
 }
 
 .level-card {
   padding: 16px;
-  background: rgba(0, 122, 255, 0.06);
-  border: 1px solid rgba(0, 122, 255, 0.2);
+  background: rgba(var(--color-primary-rgb), 0.06);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: 12px;
   text-align: center;
 }
@@ -549,7 +549,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 4px 0;
-  border-bottom: 1px solid rgba(0, 122, 255, 0.1);
+  border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.1);
 }
 
 .level-detail-row:last-child {
@@ -569,8 +569,8 @@ onMounted(() => {
 .note-section {
   margin-top: 20px;
   padding: 16px;
-  background: rgba(255, 193, 7, 0.1);
-  border: 1px solid rgba(255, 193, 7, 0.3);
+  background: rgba(var(--color-warning-rgb), 0.1);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.3);
   border-radius: 12px;
   display: flex;
   gap: 12px;
@@ -595,8 +595,8 @@ onMounted(() => {
 .glass-input,
 .glass-select {
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(0, 122, 255, 0.3);
+  background: var(--glass-50);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.3);
   border-radius: 8px;
   font-size: 14px;
   transition: all 0.3s ease;
@@ -606,7 +606,7 @@ onMounted(() => {
 .glass-select:focus {
   outline: none;
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
 }
 
 .glass-input.small,
@@ -617,7 +617,7 @@ onMounted(() => {
 
 .solid-button {
   padding: 8px 16px;
-  background: linear-gradient(135deg, var(--color-primary), #0051D5);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   color: white;
   border: none;
   border-radius: 10px;
@@ -629,7 +629,7 @@ onMounted(() => {
 
 .solid-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.35);
 }
 
 .solid-button:disabled {
@@ -653,9 +653,9 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-60);
   border-radius: 12px;
-  border: 2px solid rgba(0, 122, 255, 0.2);
+  border: 2px solid rgba(var(--color-primary-rgb), 0.2);
 }
 
 .overview-card.large-card {
@@ -678,7 +678,7 @@ onMounted(() => {
   color: var(--text-secondary);
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid rgba(0, 122, 255, 0.15);
+  border-top: 1px solid rgba(var(--color-primary-rgb), 0.15);
 }
 
 .meta-row {
@@ -735,7 +735,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   padding: 12px;
-  background: rgba(0, 122, 255, 0.05);
+  background: rgba(var(--color-primary-rgb), 0.05);
   border-radius: 8px;
 }
 
@@ -766,14 +766,14 @@ onMounted(() => {
 }
 
 .glass-table thead {
-  background: rgba(0, 122, 255, 0.1);
+  background: rgba(var(--color-primary-rgb), 0.1);
 }
 
 .glass-table th,
 .glass-table td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(0, 122, 255, 0.1);
+  border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.1);
 }
 
 .glass-table th {
@@ -787,7 +787,7 @@ onMounted(() => {
 }
 
 .glass-table th.sortable:hover {
-  background: rgba(0, 122, 255, 0.15);
+  background: rgba(var(--color-primary-rgb), 0.15);
 }
 
 .table-name {
@@ -818,7 +818,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 12px;
-  background: rgba(0, 122, 255, 0.05);
+  background: rgba(var(--color-primary-rgb), 0.05);
   border-radius: 8px;
 }
 
@@ -852,7 +852,7 @@ onMounted(() => {
 
 .initial-state p {
   font-size: 16px;
-  color: #6e6e73;
+  color: var(--text-secondary);
 }
 
 /* Responsive */

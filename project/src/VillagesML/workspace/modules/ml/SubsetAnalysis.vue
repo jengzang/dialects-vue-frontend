@@ -1048,7 +1048,7 @@ const renderComparisonChart = () => {
   }))
 
   comparisonChartInstance.setOption({
-    title: { text: '子集語義特徵比較', left: 'center', textStyle: { color: '#2c3e50', fontWeight: 600 } },
+    title: { text: '子集語義特徵比較', left: 'center', textStyle: { color: 'var(--text-deep)', fontWeight: 600 } },
     tooltip: {
       trigger: 'item',
       formatter: (params) => {
@@ -1074,13 +1074,13 @@ const renderComparisonChart = () => {
         {
           value: groupAValues,
           name: '子集 A',
-          itemStyle: { color: '#4a90e2' },
-          areaStyle: { color: 'rgba(74, 144, 226, 0.3)' }
+          itemStyle: { color: 'var(--vml-blue)' },
+          areaStyle: { color: 'rgba(var(--vml-blue-rgb), 0.3)' }
         },
         {
           value: groupBValues,
           name: '子集 B',
-          itemStyle: { color: '#ff9800' },
+          itemStyle: { color: 'var(--color-warning)' },
           areaStyle: { color: 'rgba(255, 152, 0, 0.3)' }
         }
       ]
@@ -1253,10 +1253,10 @@ const handleApiError = (error) => {
   align-items: center;
   gap: 12px;
   padding: 12px 20px;
-  background: rgba(231, 76, 60, 0.1);
-  border: 2px solid rgba(231, 76, 60, 0.3);
+  background: rgba(var(--color-error-rgb), 0.1);
+  border: 2px solid rgba(var(--color-error-rgb), 0.3);
   border-radius: 12px;
-  color: #e74c3c;
+  color: var(--color-error);
   font-weight: 500;
 }
 
@@ -1276,7 +1276,7 @@ const handleApiError = (error) => {
 }
 
 .glass-panel:hover {
-  box-shadow: 0 12px 40px rgba(74, 144, 226, 0.15);
+  box-shadow: 0 12px 40px rgba(var(--vml-blue-rgb), 0.15);
 }
 
 .panel-header {
@@ -1285,7 +1285,7 @@ const handleApiError = (error) => {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .panel-header h3 {
@@ -1336,8 +1336,8 @@ const handleApiError = (error) => {
 .glass-input {
   width: 100%;
   padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  background: var(--glass-50);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 10px;
   font-size: 14px;
   transition: all 0.3s ease;
@@ -1345,9 +1345,9 @@ const handleApiError = (error) => {
 
 .glass-input:focus {
   outline: none;
-  border-color: #4a90e2;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  border-color: var(--vml-blue);
+  background: var(--glass-80);
+  box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .glass-input.small {
@@ -1355,12 +1355,12 @@ const handleApiError = (error) => {
 }
 
 .solid-button.danger {
-  background: linear-gradient(135deg, #e57373, var(--color-error));
+  background: linear-gradient(135deg, var(--color-error-light), var(--color-error));
   box-shadow: 0 4px 12px rgba(229, 115, 115, 0.25);
 }
 
 .solid-button.danger:hover:not(:disabled) {
-  background: linear-gradient(135deg, #ef5350, #c62828);
+  background: linear-gradient(135deg, var(--color-error-light), var(--color-error-dark));
   box-shadow: 0 6px 20px rgba(229, 115, 115, 0.45);
 }
 
@@ -1375,9 +1375,9 @@ const handleApiError = (error) => {
 .subset-info {
   margin-top: 20px;
   padding: 16px;
-  background: linear-gradient(135deg, rgba(74, 144, 226, 0.12), rgba(91, 163, 245, 0.08));
+  background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.12), rgba(91, 163, 245, 0.08));
   border-radius: 12px;
-  border: 1px solid rgba(74, 144, 226, 0.25);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.25);
 }
 
 .info-label {
@@ -1387,7 +1387,7 @@ const handleApiError = (error) => {
 }
 
 .info-value {
-  color: #4a90e2;
+  color: var(--vml-blue);
   font-weight: 600;
   font-size: 16px;
 }
@@ -1410,16 +1410,16 @@ const handleApiError = (error) => {
 .subset-card {
   flex: 1;
   padding: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+  background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
   backdrop-filter: blur(10px);
   border-radius: 16px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   transition: all 0.3s ease;
 }
 
 .subset-card:hover {
-  border-color: rgba(74, 144, 226, 0.4);
-  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.15);
+  border-color: rgba(var(--vml-blue-rgb), 0.4);
+  box-shadow: 0 8px 24px rgba(var(--vml-blue-rgb), 0.15);
 }
 
 .subset-card h4 {
@@ -1450,14 +1450,14 @@ const handleApiError = (error) => {
 .stat-item .value {
   font-weight: 600;
   font-size: 16px;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .vs-divider {
   font-size: 28px;
   font-weight: 700;
-  color: #4a90e2;
-  text-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+  color: var(--vml-blue);
+  text-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.3);
 }
 
 .comparison-actions {
@@ -1476,18 +1476,18 @@ const handleApiError = (error) => {
 
 .metric-card {
   padding: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+  background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
   backdrop-filter: blur(10px);
   border-radius: 16px;
   text-align: center;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   transition: all 0.3s ease;
 }
 
 .metric-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.2);
-  border-color: rgba(74, 144, 226, 0.4);
+  box-shadow: 0 8px 24px rgba(var(--vml-blue-rgb), 0.2);
+  border-color: rgba(var(--vml-blue-rgb), 0.4);
 }
 
 .metric-label {
@@ -1502,8 +1502,8 @@ const handleApiError = (error) => {
 .metric-value {
   font-size: 28px;
   font-weight: 700;
-  color: #4a90e2;
-  text-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+  color: var(--vml-blue);
+  text-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.2);
 }
 
 /* Chart Container */
@@ -1526,14 +1526,14 @@ const handleApiError = (error) => {
 }
 
 .glass-table thead {
-  background: linear-gradient(135deg, rgba(74, 144, 226, 0.15), rgba(91, 163, 245, 0.1));
+  background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.15), rgba(91, 163, 245, 0.1));
 }
 
 .glass-table th,
 .glass-table td {
   padding: 10px 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .glass-table th {
@@ -1549,7 +1549,7 @@ const handleApiError = (error) => {
 }
 
 .glass-table tbody tr:hover {
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
 }
 
 .diff-value {
@@ -1557,11 +1557,11 @@ const handleApiError = (error) => {
 }
 
 .diff-value.positive {
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .diff-value.negative {
-  color: #2b6cb0;
+  color: var(--vml-blue-darker);
 }
 
 /* Clustering Controls */
@@ -1595,9 +1595,9 @@ const handleApiError = (error) => {
   flex-direction: column;
   align-items: flex-start;
   padding: 12px;
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
   border-radius: 10px;
-  border: 1px solid rgba(74, 144, 226, 0.2);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .feature-checkboxes {
@@ -1612,7 +1612,7 @@ const handleApiError = (error) => {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1621,7 +1621,7 @@ const handleApiError = (error) => {
 }
 
 .feature-checkbox:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .checkbox-label {
@@ -1645,17 +1645,17 @@ const handleApiError = (error) => {
 
 .stat-card {
   padding: 16px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+  background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
   border-radius: 12px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   text-align: center;
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
-  border-color: rgba(74, 144, 226, 0.4);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.2);
+  border-color: rgba(var(--vml-blue-rgb), 0.4);
 }
 
 .stat-card .stat-label {
@@ -1668,7 +1668,7 @@ const handleApiError = (error) => {
 .stat-card .stat-value {
   font-size: 24px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .clusters-grid {
@@ -1679,15 +1679,15 @@ const handleApiError = (error) => {
 
 .cluster-card {
   padding: 16px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+  background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
   border-radius: 12px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   transition: all 0.3s ease;
 }
 
 .cluster-card:hover {
-  border-color: rgba(74, 144, 226, 0.4);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+  border-color: rgba(var(--vml-blue-rgb), 0.4);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.15);
 }
 
 .cluster-header {
@@ -1696,13 +1696,13 @@ const handleApiError = (error) => {
   align-items: center;
   margin-bottom: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .cluster-id {
   font-size: 16px;
   font-weight: 600;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .cluster-size {
@@ -1732,8 +1732,8 @@ const handleApiError = (error) => {
 .village-tag {
   display: inline-block;
   padding: 4px 10px;
-  background: rgba(74, 144, 226, 0.1);
-  border: 1px solid rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
   border-radius: 6px;
   font-size: 13px;
   color: var(--text-primary);
@@ -1741,8 +1741,8 @@ const handleApiError = (error) => {
 }
 
 .village-tag:hover {
-  background: rgba(74, 144, 226, 0.2);
-  border-color: rgba(74, 144, 226, 0.4);
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  border-color: rgba(var(--vml-blue-rgb), 0.4);
 }
 
 /* Loading Overlay */
@@ -1894,7 +1894,7 @@ const handleApiError = (error) => {
 .total-count {
   font-size: 14px;
   font-weight: 600;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .display-note {
@@ -1932,7 +1932,7 @@ const handleApiError = (error) => {
   align-items: center;
   gap: 16px;
   padding-top: 16px;
-  border-top: 1px solid rgba(74, 144, 226, 0.1);
+  border-top: 1px solid rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .page-info {
@@ -1947,8 +1947,8 @@ const handleApiError = (error) => {
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: linear-gradient(135deg, rgba(74, 144, 226, 0.08), rgba(91, 163, 245, 0.05));
-  border-left: 3px solid #4a90e2;
+  background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.08), rgba(91, 163, 245, 0.05));
+  border-left: 3px solid var(--vml-blue);
   border-radius: 8px;
   margin-bottom: 16px;
 }
@@ -1970,7 +1970,7 @@ const handleApiError = (error) => {
   gap: 16px;
   margin: 20px 0;
   padding: 16px;
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
   border-radius: 12px;
 }
 
@@ -1986,9 +1986,9 @@ const handleApiError = (error) => {
 .timings-section {
   margin-bottom: 24px;
   padding: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+  background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
   border-radius: 16px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .timings-section h4 {
@@ -2009,17 +2009,17 @@ const handleApiError = (error) => {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
   border-radius: 12px;
-  border: 1px solid rgba(74, 144, 226, 0.15);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.15);
   transition: all 0.3s ease;
 }
 
 .timing-card:hover {
-  background: rgba(74, 144, 226, 0.1);
-  border-color: rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border-color: rgba(var(--vml-blue-rgb), 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.15);
 }
 
 .timing-icon {
@@ -2043,7 +2043,7 @@ const handleApiError = (error) => {
 .timing-value {
   font-size: 16px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--vml-blue);
   font-family: 'Courier New', monospace;
 }
 
@@ -2059,19 +2059,19 @@ const handleApiError = (error) => {
 }
 
 .lift-value.high {
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .lift-value.low {
-  color: #90a4ae;
+  color: var(--text-slate-light);
 }
 
 .lift-value.zero {
-  color: #e57373;
+  color: var(--color-error-light);
 }
 
 .lift-value.infinite {
-  color: #ff9800;
+  color: var(--color-warning);
   font-size: 16px;
 }
 
@@ -2079,9 +2079,9 @@ const handleApiError = (error) => {
 .spatial-comparison-section {
   margin-top: 24px;
   padding: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+  background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
   border-radius: 16px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .spatial-comparison-section h4 {
@@ -2102,7 +2102,7 @@ const handleApiError = (error) => {
   margin: 0 0 12px 0;
   font-size: 16px;
   font-weight: 600;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .spatial-stats {
@@ -2116,7 +2116,7 @@ const handleApiError = (error) => {
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
   border-radius: 8px;
 }
 
@@ -2139,9 +2139,9 @@ const handleApiError = (error) => {
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: linear-gradient(135deg, rgba(74, 144, 226, 0.15), rgba(91, 163, 245, 0.1));
+  background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.15), rgba(91, 163, 245, 0.1));
   border-radius: 12px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
 }
 
 .distance-label {
@@ -2153,8 +2153,8 @@ const handleApiError = (error) => {
 .distance-value {
   font-size: 24px;
   font-weight: 700;
-  color: #4a90e2;
-  text-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+  color: var(--vml-blue);
+  text-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.2);
 }
 
 @media (max-width: 768px) {

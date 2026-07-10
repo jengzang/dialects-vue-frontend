@@ -199,19 +199,19 @@ const translatePattern = (patternStr) => {
 }
 
 .table-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .table-row {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: background 0.3s ease;
 }
 
 .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .col-components {
@@ -230,12 +230,12 @@ const translatePattern = (patternStr) => {
 }
 
 .component-tag.modifier {
-  background: rgba(243, 156, 18, 0.2);
-  color: #d68910;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning-dark);
 }
 
 .component-tag.head {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
 }
 

@@ -22,18 +22,18 @@
 }
 
 .vml-badge-significant {
-  background: rgba(46, 204, 113, 0.15);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.15);
+  color: var(--color-success);
 }
 
 .vml-badge-very-significant {
-  background: rgba(39, 174, 96, 0.2);
+  background: rgba(var(--color-success-rgb), 0.2);
   color: #1e8449;
 }
 
 .vml-badge-marginal {
-  background: rgba(243, 156, 18, 0.15);
-  color: #e67e22;
+  background: rgba(var(--color-warning-rgb), 0.15);
+  color: var(--color-warning);
 }
 
 .vml-badge-not-significant {
@@ -42,16 +42,16 @@
 }
 
 .vml-rank-gold {
-  background: linear-gradient(135deg, var(--color-gold), #ffed4e);
-  color: #8b6914;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold));
+  color: var(--color-warning-dark);
 }
 
 .vml-rank-silver {
-  background: linear-gradient(135deg, var(--color-silver), #e8e8e8);
-  color: #5a5a5a;
+  background: linear-gradient(135deg, var(--color-silver), var(--border-light-gray));
+  color: var(--text-medium);
 }
 
 .vml-rank-bronze {
-  background: linear-gradient(135deg, var(--color-bronze), #e8a87c);
-  color: #6b3e1a;
+  background: linear-gradient(135deg, var(--color-bronze), var(--vml-terracotta));
+  color: var(--vml-brown-dark);
 }

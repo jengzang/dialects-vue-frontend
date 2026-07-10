@@ -390,7 +390,7 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .table-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   font-size: 14px;
   color: var(--text-primary);
@@ -398,18 +398,18 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .table-row {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: background 0.3s ease;
   font-size: 14px;
 }
 
 .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .table-row.significant {
-  background: rgba(80, 200, 120, 0.1);
+  background: rgba(var(--color-success-rgb), 0.1);
 }
 
 .col {
@@ -419,17 +419,17 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .p-very-significant {
-  color: #27ae60;
+  color: var(--color-success);
   font-weight: 700;
 }
 
 .p-significant {
-  color: #2ecc71;
+  color: var(--color-success);
   font-weight: 600;
 }
 
 .p-marginal {
-  color: #f39c12;
+  color: var(--color-warning);
   font-weight: 500;
 }
 
@@ -445,23 +445,23 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .badge-very-significant {
-  background: rgba(39, 174, 96, 0.2);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .badge-significant {
-  background: rgba(46, 204, 113, 0.2);
-  color: #2ecc71;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .badge-marginal {
-  background: rgba(243, 156, 18, 0.2);
-  color: #f39c12;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning);
 }
 
 .badge-not-significant {
   background: rgba(149, 165, 166, 0.2);
-  color: #95a5a6;
+  color: var(--text-secondary);
 }
 
 .summary-panel {
@@ -482,7 +482,7 @@ const getSignificanceBadge = (pValue) => {
 
 .summary-item {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
   text-align: center;
 }

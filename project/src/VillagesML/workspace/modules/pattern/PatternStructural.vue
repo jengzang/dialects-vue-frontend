@@ -143,16 +143,16 @@ const goToTendency = (pattern) => {
 
 .structural-item {
   /* 1. 基础背景：极高透明度的白色 */
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--glass-20);
 
 
   /* 3. 液态玻璃边框：使用半透明实线 */
   /* 关键点：边框颜色要比背景稍微亮一点，模拟玻璃边缘的折射 */
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--glass-40);
 
   /* 4. 增强液态感：内阴影（Inset Shadow）模拟厚度和光泽 */
   box-shadow:
-      inset 0 0 12px rgba(255, 255, 255, 0.2), /* 内发光 */
+      inset 0 0 12px var(--glass-20), /* 内发光 */
       0 8px 32px 0 rgba(31, 38, 135, 0.1);    /* 外层淡淡的投影，增加悬浮感 */
 
   padding: 12px;
@@ -162,10 +162,10 @@ const goToTendency = (pattern) => {
 
 /* 悬停效果：增加亮度，模拟光线照射在液面上的感觉 */
 .structural-item:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: var(--glass-30);
+  border: 1px solid var(--glass-60);
   box-shadow:
-      inset 0 0 20px rgba(255, 255, 255, 0.4),
+      inset 0 0 20px var(--glass-40),
       0 12px 40px 0 rgba(31, 38, 135, 0.15);
   transform: translateY(-2px); /* 轻微浮动 */
 }
@@ -191,7 +191,7 @@ const goToTendency = (pattern) => {
 
 .item-count {
   padding: 4px 12px;
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
   border-radius: 12px;
   font-size: 13px;
@@ -241,8 +241,8 @@ const goToTendency = (pattern) => {
 
 .example-tag {
   padding: 4px 12px;
-  background: rgba(80, 200, 120, 0.2);
-  color: #2d8659;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
   border-radius: 12px;
   font-size: 13px;
   cursor: pointer;
@@ -250,15 +250,15 @@ const goToTendency = (pattern) => {
 }
 
 .example-tag:hover {
-  background: rgba(80, 200, 120, 0.3);
+  background: rgba(var(--color-success-rgb), 0.3);
   transform: translateY(-2px);
 }
 
 .action-button-small {
   padding: 6px 12px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   color: var(--color-primary);
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 12px;
   font-weight: 500;
@@ -268,7 +268,7 @@ const goToTendency = (pattern) => {
 }
 
 .action-button-small:hover {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   border-color: var(--color-primary);
 }
 

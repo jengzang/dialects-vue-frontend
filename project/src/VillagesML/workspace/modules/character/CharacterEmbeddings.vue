@@ -236,7 +236,7 @@ const renderVizChart = () => {
       name: searchChar.value,
       value: 1,
       symbolSize: 60,
-      itemStyle: { color: '#4a90e2' },
+      itemStyle: { color: 'var(--vml-blue)' },
       label: { fontSize: 20, fontWeight: 'bold' }
     },
     ...filteredSimilarities.map((item, index) => ({
@@ -383,7 +383,7 @@ onBeforeUnmount(() => {
 }
 
 .search-button:hover:not(:disabled) {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .search-button:disabled {
@@ -424,7 +424,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 6px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 8px;
   transition: transform 0.3s ease;
 }
@@ -434,7 +434,7 @@ onBeforeUnmount(() => {
 }
 
 .similarity-item.top-3 {
-  background: rgba(243, 156, 18, 0.2);
+  background: rgba(var(--color-warning-rgb), 0.2);
 }
 
 .rank {
@@ -453,7 +453,7 @@ onBeforeUnmount(() => {
 
 .similarity-bar {
   height: 24px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -473,7 +473,7 @@ onBeforeUnmount(() => {
 
 .viz-placeholder {
   padding: 80px 20px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
   text-align: center;
 }
@@ -527,7 +527,7 @@ onBeforeUnmount(() => {
 }
 
 .pagination-controls button:hover:not(:disabled) {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .pagination-controls button:disabled {
@@ -561,20 +561,20 @@ onBeforeUnmount(() => {
 }
 
 .table-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap; /* 防止表头换行 */
 }
 
 .table-row {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: background 0.3s ease;
 }
 
 .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .col-char {
@@ -608,7 +608,7 @@ onBeforeUnmount(() => {
 }
 
 .action-button:hover {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 @media (max-width: 600px) {

@@ -85,11 +85,11 @@
                 <span>熱點區域</span>
               </div>
               <div v-if="layers.clusters" class="legend-item">
-                <span class="legend-color" style="background: rgba(74, 144, 226, 0.7);"></span>
+                <span class="legend-color" style="background: rgba(var(--vml-blue-rgb), 0.7);"></span>
                 <span>聚類中心</span>
               </div>
               <div v-if="layers.ngrams" class="legend-item">
-                <span class="legend-color" style="background: rgba(80, 200, 120, 0.7);"></span>
+                <span class="legend-color" style="background: rgba(var(--color-success-rgb), 0.7);"></span>
                 <span>N-gram 分佈</span>
               </div>
               <div v-if="layers.characters" class="legend-item">
@@ -360,10 +360,10 @@ const loadHotspotsLayer = async () => {
           50, 18,
           100, 28
         ],
-        'circle-color': '#ff6464',
+        'circle-color': 'var(--color-error-light)',
         'circle-opacity': 0.3,
         'circle-stroke-width': 3,
-        'circle-stroke-color': '#ff6464',
+        'circle-stroke-color': 'var(--color-error-light)',
         'circle-stroke-opacity': 0.8
       }
     })
@@ -418,7 +418,7 @@ const loadClustersLayer = async () => {
           1000, 14,
           10000, 18
         ],
-        'circle-color': '#4a90e2',
+        'circle-color': 'var(--vml-blue)',
         'circle-opacity': 0.5,
         'circle-stroke-width': 2,
         'circle-stroke-color': '#ffffff'
@@ -503,7 +503,7 @@ const loadNgramsLayer = async () => {
         ],
         'circle-color': [
           'interpolate', ['linear'], ['get', 'tendency_score'],
-          0, '#90EE90', 1, '#50c878', 2, '#228B22'
+          0, '#90EE90', 1, 'var(--color-success)', 2, 'var(--color-success-green)'
         ],
         'circle-opacity': 0.5,
         'circle-stroke-width': 2,
@@ -595,7 +595,7 @@ const loadCharactersLayer = async () => {
           0, 'rgba(0, 0, 255, 0)',
           0.2, 'rgba(0, 0, 255, 0.5)',
           0.4, 'rgba(100, 149, 237, 0.7)',
-          0.6, 'rgba(255, 255, 255, 0.8)',
+          0.6, 'var(--glass-80)',
           0.8, 'rgba(255, 107, 107, 0.7)',
           1, 'rgba(255, 0, 0, 0.9)'
         ],
@@ -619,11 +619,11 @@ const loadCharactersLayer = async () => {
         'circle-radius': 4,
         'circle-color': [
           'interpolate', ['linear'], ['get', 'lift'],
-          0, '#0000ff',
+          0, 'var(--color-primary)',
           0.5, '#6495ed',
           1, '#ffffff',
-          2, '#ff6b6b',
-          4, '#ff0000'
+          2, 'var(--color-error-light)',
+          4, 'var(--color-error-light)'
         ],
         'circle-opacity': 0.4,
         'circle-stroke-width': 2,
@@ -682,7 +682,7 @@ h2 {
 .control-panel {
   position: relative;
   width: 280px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-80);
   backdrop-filter: blur(12px);
   border-radius: 12px;
   padding: 16px;
@@ -700,8 +700,8 @@ h2 {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(74, 144, 226, 0.1);
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 6px;
   padding: 4px 8px;
   cursor: pointer;
@@ -711,7 +711,7 @@ h2 {
 }
 
 .collapse-btn:hover {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .panel-content {
@@ -754,7 +754,7 @@ h2 {
 }
 
 .checkbox-item:hover {
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
 }
 
 .checkbox-item span {
@@ -776,7 +776,7 @@ h2 {
 
 .filter-input{
   padding: 8px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-light-gray);
   border-radius: 8px;
   font-size: 14px;
   outline: none;
@@ -785,7 +785,7 @@ h2 {
 }
 
 .filter-input:focus{
-  border-color: #4a90e2;
+  border-color: var(--vml-blue);
 }
 
 .layer-note {
@@ -793,7 +793,7 @@ h2 {
   color: var(--text-secondary);
   margin-top: 12px;
   padding: 8px;
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
   border-radius: 6px;
   line-height: 1.4;
 }
@@ -802,7 +802,7 @@ h2 {
 .apply-btn {
   width: 100%;
   padding: 10px;
-  background: #4a90e2;
+  background: var(--vml-blue);
   color: white;
   border: none;
   border-radius: 8px;
@@ -813,17 +813,17 @@ h2 {
 }
 
 .apply-btn:hover:not(:disabled) {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .apply-btn:disabled {
-  background: #ccc;
+  background: var(--border-gray);
   cursor: not-allowed;
 }
 
 /* 圖例 */
 .legend-section {
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
   padding: 12px;
   border-radius: 8px;
 }
@@ -853,13 +853,13 @@ h2 {
   width: 40px;
   height: 16px;
   border-radius: 4px;
-  background: linear-gradient(to right, #0000ff, #ffffff, #ff0000);
+  background: linear-gradient(to right, var(--color-primary), var(--text-white), var(--color-error-light));
   flex-shrink: 0;
 }
 
 /* 統計信息 */
 .stats-section {
-  background: rgba(80, 200, 120, 0.05);
+  background: rgba(var(--color-success-rgb), 0.05);
   padding: 12px;
   border-radius: 8px;
 }
@@ -899,7 +899,7 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-radius: 12px;
 }
 
