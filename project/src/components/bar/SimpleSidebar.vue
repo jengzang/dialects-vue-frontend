@@ -798,8 +798,8 @@ $portrait-ratio: 1 / 1;
   &:hover {
     background: linear-gradient(
       145deg,
-      rgba(0, 122, 255, 0.15),
-      rgba(0, 122, 255, 0.08)
+      rgba(var(--color-primary-rgb), 0.15),
+      rgba(var(--color-primary-rgb), 0.08)
     );
     transform: translateX(4px);
   }

@@ -111,13 +111,13 @@ $glass-blur: 12px;
   &:focus {
     box-shadow:
       0 0 0 2px $primary-color,
-      0 0 12px rgba(0, 122, 255, 0.2);
+      0 0 12px rgba(var(--color-primary-rgb), 0.2);
   }
 
   &.has-error {
     box-shadow:
       0 0 0 2px $error-color,
-      0 0 12px rgba(255, 59, 48, 0.2);
+      0 0 12px rgba(var(--color-error-light-rgb), 0.2);
   }
 
   @media (max-aspect-ratio: 1/1) {

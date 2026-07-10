@@ -508,8 +508,8 @@ $glass-blur: 8px;
   white-space: nowrap;
   appearance: none;
   cursor: pointer;
-  background-color: rgba(0, 122, 255, 0.08);
-  border: 1px solid rgba(0, 122, 255, 0.2);
+  background-color: rgba(var(--color-primary-rgb), 0.08);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: 999px;
   box-shadow: none;
   backdrop-filter: blur($glass-blur);
@@ -517,13 +517,13 @@ $glass-blur: 8px;
   transition: all $transition-duration cubic-bezier(0.25, 0.1, 0.25, 1);
 
   &:hover:not(:disabled) {
-    background-color: rgba(0, 122, 255, 0.15);
-    border-color: rgba(0, 122, 255, 0.4);
+    background-color: rgba(var(--color-primary-rgb), 0.15);
+    border-color: rgba(var(--color-primary-rgb), 0.4);
     transform: translateY(-0.5px);
   }
 
   &:active {
-    background-color: rgba(0, 122, 255, 0.2);
+    background-color: rgba(var(--color-primary-rgb), 0.2);
     transform: scale(0.98);
   }
 
@@ -547,8 +547,8 @@ $glass-blur: 8px;
   font-weight: 500;
   white-space: nowrap;
   text-overflow: ellipsis;
-  background: rgba(0, 122, 255, 0.05);
-  border: 1px solid rgba(0, 122, 255, 0.1);
+  background: rgba(var(--color-primary-rgb), 0.05);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.1);
   border-radius: 6px;
 }
 

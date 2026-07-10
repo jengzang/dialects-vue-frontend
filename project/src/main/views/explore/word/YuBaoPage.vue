@@ -1127,7 +1127,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   &:focus {
     background: $white;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
   }
 
   &::placeholder {

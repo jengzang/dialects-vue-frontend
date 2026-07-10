@@ -670,7 +670,7 @@ p {
 
   strong {
     padding: 2px 6px;
-    background-color: rgba(0, 122, 255, 0.1);
+    background-color: rgba(var(--color-primary-rgb), 0.1);
     border-radius: 4px;
   }
 
@@ -899,7 +899,7 @@ em {
   @include glass-card;
 
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 122, 255, 0.08);
+  box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.08);
   color: inherit;
   text-decoration: none;
   transition:
@@ -908,7 +908,7 @@ em {
 
   &:hover {
     background: var(--glass-80);
-    box-shadow: 0 4px 16px rgba(0, 122, 255, 0.15);
+    box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.15);
     transform: translateY(-6px) scale(1.01);
   }
 
@@ -1014,7 +1014,7 @@ em {
   margin-top: 1rem;
   padding: 0.5rem 1.1rem;
   background-color: $danger;
-  box-shadow: 0 2px 6px rgba(255, 59, 48, 0.35);
+  box-shadow: 0 2px 6px rgba(var(--color-error-light-rgb), 0.35);
   color: var(--text-white);
   font-size: 1rem;
   transition: all 0.2s ease;
@@ -1081,7 +1081,7 @@ em {
   @include glass-card;
 
   border-radius: 16px;
-  box-shadow: 0 6px 12px rgba(0, 122, 255, 0.1);
+  box-shadow: 0 6px 12px rgba(var(--color-primary-rgb), 0.1);
   color: var(--text-primary);
   font-size: 18px;
   font-weight: 600;
@@ -1092,8 +1092,8 @@ em {
 
   &:hover {
     background: var(--glass-80);
-    border-color: rgba(0, 122, 255, 0.35);
-    box-shadow: 0 10px 20px rgba(0, 122, 255, 0.2);
+    border-color: rgba(var(--color-primary-rgb), 0.35);
+    box-shadow: 0 10px 20px rgba(var(--color-primary-rgb), 0.2);
     transform: scale(1.02) translateY(-2px);
   }
 
@@ -1199,18 +1199,18 @@ em {
   &:hover {
     background: var(--bg-white);
     border-color: $primary;
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
     transform: translateY(-2px);
   }
 
   &.active {
     background: linear-gradient(
       135deg,
-      rgba(0, 122, 255, 0.1),
-      rgba(0, 122, 255, 0.05)
+      rgba(var(--color-primary-rgb), 0.1),
+      rgba(var(--color-primary-rgb), 0.05)
     );
     border-color: $primary;
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
   }
 }
 

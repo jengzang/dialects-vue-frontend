@@ -393,7 +393,7 @@ const initPitchChart = () => {
     {
       xAxis: seg.start_s,
       itemStyle: {
-        color: seg.type === 'rime_core' ? 'rgba(255,215,0,0.2)' :
+        color: seg.type === 'rime_core' ? 'rgba(var(--color-gold-rgb), 0.2)' :
             seg.type === 'silence' ? 'rgba(200,200,200,0.1)' :
                 'rgba(100,150,255,0.15)'
       }
@@ -1137,7 +1137,7 @@ $transition-normal: 0.3s;
     height: 2.5rem;
     background: $primary-gradient;
     border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
     color: $white;
     font-size: 1.2rem;
     font-weight: 700;
@@ -1416,7 +1416,7 @@ $transition-normal: 0.3s;
   background: $primary-gradient;
   border: none;
   border-radius: var(--radius-2xl);
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.4);
   color: $white;
   font-size: 1.2rem;
   font-weight: 700;
@@ -1442,7 +1442,7 @@ $transition-normal: 0.3s;
   }
 
   &:hover {
-    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.5);
+    box-shadow: 0 6px 20px rgba(var(--color-primary-rgb), 0.5);
     transform: translateY(-2px);
 
     &::before {

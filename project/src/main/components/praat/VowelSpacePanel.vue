@@ -540,9 +540,9 @@ $warning: var(--color-warning);
 $text-primary: var(--color-text-primary);
 $text-secondary: var(--color-text-secondary, var(--text-tertiary));
 
-$primary-background: rgba(0, 122, 255, 0.2);
-$success-background: rgba(52, 199, 89, 0.2);
-$warning-background: rgba(255, 149, 0, 0.2);
+$primary-background: rgba(var(--color-primary-rgb), 0.2);
+$success-background: rgba(var(--color-success-rgb), 0.2);
+$warning-background: rgba(var(--color-warning-rgb), 0.2);
 
 $surface-hover: var(--glass-20);
 $divider-light: var(--glass-20);

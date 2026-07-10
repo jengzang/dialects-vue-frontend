@@ -298,7 +298,7 @@ const initFullWaveform = async () => {
   // Create WaveSurfer instance
   fullWaveform.value = WaveSurfer.create({
     container: fullWaveformContainer.value,
-    waveColor: 'rgba(0, 122, 255, 0.3)',
+    waveColor: 'rgba(var(--color-primary-rgb), 0.3)',
     progressColor: 'var(--color-primary)',
     cursorColor: 'var(--color-primary)',
     height: 120,
@@ -316,7 +316,7 @@ const initFullWaveform = async () => {
   regionsPlugin = fullWaveform.value.registerPlugin(RegionsPlugin.create({
     dragSelection: {
       slop: 5,
-      color: 'rgba(0, 122, 255, 0.2)'
+      color: 'rgba(var(--color-primary-rgb), 0.2)'
     }
   }))
 
@@ -325,7 +325,7 @@ const initFullWaveform = async () => {
   regionsPlugin.on('region-updated', handleRegionUpdated)
 
   regionsPlugin.enableDragSelection({
-    color: 'rgba(0, 122, 255, 0.2)'
+    color: 'rgba(var(--color-primary-rgb), 0.2)'
   })
 }
 
@@ -561,7 +561,7 @@ const initRegionWaveform = async (regionData) => {
   // Create WaveSurfer for region preview
   const wavesurfer = WaveSurfer.create({
     container: container,
-    waveColor: 'rgba(0, 122, 255, 0.3)',
+    waveColor: 'rgba(var(--color-primary-rgb), 0.3)',
     progressColor: regionData.color,
     height: 60,
     responsive: true,
@@ -809,7 +809,7 @@ const initWaveSurfers = async () => {
 
     const wavesurfer = WaveSurfer.create({
       container: container,
-      waveColor: 'rgba(0, 122, 255, 0.3)',
+      waveColor: 'rgba(var(--color-primary-rgb), 0.3)',
       progressColor: 'var(--color-primary)',
       cursorColor: 'var(--color-primary)',
       height: 60,
@@ -938,13 +938,13 @@ $success: var(--color-success);
 $warning: var(--color-warning);
 $gray: var(--text-secondary);
 
-$primary-background: rgba(0, 122, 255, 0.05);
-$primary-background-medium: rgba(0, 122, 255, 0.1);
-$primary-border: rgba(0, 122, 255, 0.3);
-$primary-shadow: rgba(0, 122, 255, 0.2);
+$primary-background: rgba(var(--color-primary-rgb), 0.05);
+$primary-background-medium: rgba(var(--color-primary-rgb), 0.1);
+$primary-border: rgba(var(--color-primary-rgb), 0.3);
+$primary-shadow: rgba(var(--color-primary-rgb), 0.2);
 
-$error-background: rgba(255, 59, 48, 0.1);
-$error-border: rgba(255, 59, 48, 0.3);
+$error-background: rgba(var(--color-error-light-rgb), 0.1);
+$error-border: rgba(var(--color-error-light-rgb), 0.3);
 
 $surface-medium: var(--glass-50);
 $surface-strong: var(--glass-70);

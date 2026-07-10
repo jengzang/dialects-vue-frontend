@@ -362,15 +362,15 @@ $text-main: var(--text-primary);
 $text-secondary: var(--text-secondary);
 $text-white: var(--text-white);
 
-$orange-bg-subtle: rgba(255, 149, 0, 0.04);
-$orange-bg-light: rgba(255, 149, 0, 0.05);
-$orange-bg-medium: rgba(255, 149, 0, 0.08);
-$orange-bg-strong: rgba(255, 149, 0, 0.12);
-$orange-bg-highlight: rgba(255, 149, 0, 0.2);
+$orange-bg-subtle: rgba(var(--color-warning-rgb), 0.04);
+$orange-bg-light: rgba(var(--color-warning-rgb), 0.05);
+$orange-bg-medium: rgba(var(--color-warning-rgb), 0.08);
+$orange-bg-strong: rgba(var(--color-warning-rgb), 0.12);
+$orange-bg-highlight: rgba(var(--color-warning-rgb), 0.2);
 
-$orange-border: rgba(255, 149, 0, 0.2);
-$orange-shadow: rgba(255, 149, 0, 0.4);
-$orange-shadow-hover: rgba(255, 149, 0, 0.5);
+$orange-border: rgba(var(--color-warning-rgb), 0.2);
+$orange-shadow: rgba(var(--color-warning-rgb), 0.4);
+$orange-shadow-hover: rgba(var(--color-warning-rgb), 0.5);
 
 $border-light: rgba(0, 0, 0, 0.04);
 $border-medium: rgba(0, 0, 0, 0.06);
@@ -505,7 +505,7 @@ $transition-normal: 0.3s;
       padding: 2px 8px;
       background: linear-gradient(135deg, $green, $green-light);
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(52, 199, 89, 0.3);
+      box-shadow: 0 2px 6px rgba(var(--color-success-rgb), 0.3);
       color: $text-white;
       font-size: 11px;
       font-weight: 700;
@@ -514,8 +514,8 @@ $transition-normal: 0.3s;
 
   .cell-highlight {
     background: $orange-bg-highlight;
-    box-shadow: inset 0 0 0 2px rgba(255, 149, 0, 0.3);
-    color: rgba(255, 149, 0, 0.76);
+    box-shadow: inset 0 0 0 2px rgba(var(--color-warning-rgb), 0.3);
+    color: rgba(var(--color-warning-rgb), 0.76);
     font-weight: 700;
   }
 

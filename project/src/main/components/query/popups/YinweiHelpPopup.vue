@@ -251,7 +251,7 @@ $transition-normal: 0.3s;
   .tag-count {
     min-width: 14px;
     padding: 1px 5px;
-    background: rgba(0, 122, 255, 0.1);
+    background: rgba(var(--color-primary-rgb), 0.1);
     border-radius: 8px;
     color: $primary;
     text-align: center;

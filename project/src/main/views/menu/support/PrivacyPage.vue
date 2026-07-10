@@ -162,7 +162,7 @@ $transition-base: 0.3s;
   justify-content: space-between;
   padding-bottom: 20px;
   margin-bottom: 30px;
-  border-bottom: 2px solid rgba(0, 122, 255, 0.2);
+  border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -199,7 +199,7 @@ $transition-base: 0.3s;
     color: $text-primary;
     font-size: 24px;
     font-weight: 700;
-    border-bottom: 2px solid rgba(0, 122, 255, 0.15);
+    border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.15);
 
     @media (max-width: 768px) {
       font-size: 20px;
@@ -247,7 +247,7 @@ $transition-base: 0.3s;
   margin: 20px 0;
   background: linear-gradient(
     135deg,
-    rgba(0, 122, 255, 0.05),
+    rgba(var(--color-primary-rgb), 0.05),
     rgba(88, 86, 214, 0.05)
   );
   border-left: 4px solid $primary-blue;
@@ -294,7 +294,7 @@ $transition-base: 0.3s;
   transition: all $transition-base;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.4);
     transform: translateY(-2px);
   }
 
@@ -309,7 +309,7 @@ $transition-base: 0.3s;
   color: $text-muted;
   font-size: 14px;
   font-style: italic;
-  background: rgba(0, 122, 255, 0.03);
+  background: rgba(var(--color-primary-rgb), 0.03);
   border-radius: $radius-sm;
 }
 

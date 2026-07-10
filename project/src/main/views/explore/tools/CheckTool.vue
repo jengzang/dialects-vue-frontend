@@ -2093,12 +2093,12 @@ $glass-panel: var(--glass-50);
 $glass-strong: var(--glass-60);
 $glass-solid: var(--glass-80);
 
-$primary-soft: rgba(0, 122, 255, 0.1);
-$primary-hover: rgba(0, 122, 255, 0.15);
-$primary-selected: rgba(0, 122, 255, 0.2);
-$danger-soft: rgba(255, 59, 48, 0.1);
-$warning-soft: rgba(255, 149, 0, 0.15);
-$success-soft: rgba(52, 199, 89, 0.1);
+$primary-soft: rgba(var(--color-primary-rgb), 0.1);
+$primary-hover: rgba(var(--color-primary-rgb), 0.15);
+$primary-selected: rgba(var(--color-primary-rgb), 0.2);
+$danger-soft: rgba(var(--color-error-light-rgb), 0.1);
+$warning-soft: rgba(var(--color-warning-rgb), 0.15);
+$success-soft: rgba(var(--color-success-rgb), 0.1);
 
 @mixin glass-blur($bg: $glass-panel, $blur: 10px, $radius: 16px, $border: var(--glass-50)) {
   background: $bg;
@@ -2197,7 +2197,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     width: 24px;
     height: 24px;
     @include flex-center;
-    background: rgba(52, 199, 89, 0.2);
+    background: rgba(var(--color-success-rgb), 0.2);
     border-radius: 50%;
     color: $success;
     font-weight: 700;
@@ -2257,7 +2257,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-subsection {
     margin-top: 16px;
     padding-left: 16px;
-    border-left: 3px solid rgba(0, 122, 255, 0.3);
+    border-left: 3px solid rgba(var(--color-primary-rgb), 0.3);
 
     h5 {
       margin: 0 0 8px 0;
@@ -2277,13 +2277,13 @@ $success-soft: rgba(52, 199, 89, 0.1);
   gap: 12px;
   width: 100%;
   padding: 26px 28px;
-  border: 2px dashed rgba(0, 122, 255, 0.28);
+  border: 2px dashed rgba(var(--color-primary-rgb), 0.28);
   cursor: pointer;
   transition: all 0.25s ease;
 
   &.drag-over {
-    border-color: rgba(0, 122, 255, 0.58);
-    background: rgba(0, 122, 255, 0.08);
+    border-color: rgba(var(--color-primary-rgb), 0.58);
+    background: rgba(var(--color-primary-rgb), 0.08);
   }
 
   &.uploading {
@@ -2311,7 +2311,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
 .hint-text--summary {
   margin: 0;
-  color: rgba(11, 37, 64, 0.72);
+  color: rgba(var(--text-deep-rgb), 0.72);
 }
 
 .work {
@@ -2520,7 +2520,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     font-weight: 500;
 
     &.nonSingleChar {
-      background: rgba(255, 59, 48, 0.15);
+      background: rgba(var(--color-error-light-rgb), 0.15);
       color: $danger;
     }
 
@@ -2530,7 +2530,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     }
 
     &.missingTone {
-      background: rgba(0, 122, 255, 0.15);
+      background: rgba(var(--color-primary-rgb), 0.15);
       color: $primary;
     }
   }
@@ -2632,7 +2632,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
       background: $danger-soft;
 
       &:hover {
-        background: rgba(255, 59, 48, 0.2);
+        background: rgba(var(--color-error-light-rgb), 0.2);
       }
     }
 
@@ -2721,7 +2721,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
     &.filtered {
       background: $primary-selected;
-      border: 1px solid rgba(0, 122, 255, 0.4);
+      border: 1px solid rgba(var(--color-primary-rgb), 0.4);
     }
   }
 
@@ -2795,7 +2795,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
     &.selected {
       background: $primary-selected;
-      border: 1px solid rgba(0, 122, 255, 0.4);
+      border: 1px solid rgba(var(--color-primary-rgb), 0.4);
 
       .checkbox {
         background: $primary-selected;
@@ -2808,7 +2808,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
       height: 20px;
       @include flex-center;
       background: $glass-panel;
-      border: 2px solid rgba(0, 122, 255, 0.3);
+      border: 2px solid rgba(var(--color-primary-rgb), 0.3);
       border-radius: 4px;
       font-size: 12px;
       font-weight: 600;
@@ -2897,7 +2897,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     background: transparent;
     border: 1px solid transparent;
     border-radius: 10px;
-    color: rgba(11, 37, 64, 0.7);
+    color: rgba(var(--text-deep-rgb), 0.7);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -2905,11 +2905,11 @@ $success-soft: rgba(52, 199, 89, 0.1);
     white-space: nowrap;
 
     &.active {
-      background: rgba(0, 122, 255, 0.7);
+      background: rgba(var(--color-primary-rgb), 0.7);
       backdrop-filter: blur(14px);
-      border-color: rgba(0, 122, 255, 0.6);
+      border-color: rgba(var(--color-primary-rgb), 0.6);
       color: white;
-      box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
+      box-shadow: 0 4px 20px rgba(var(--color-primary-rgb), 0.3);
     }
   }
 }
@@ -3031,7 +3031,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     position: sticky;
     top: 0;
     z-index: 10;
-    border-bottom: 2px solid rgba(0, 122, 255, 0.2);
+    border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
   }
 
   &-table-scroller {
@@ -3049,7 +3049,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     transition: background 0.2s ease;
 
     &:hover {
-      background: rgba(0, 122, 255, 0.05);
+      background: rgba(var(--color-primary-rgb), 0.05);
     }
 
     &.modified-row {
@@ -3103,11 +3103,11 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
 @keyframes highlight {
   0%, 100% {
-    background: rgba(0, 122, 255, 0.05);
+    background: rgba(var(--color-primary-rgb), 0.05);
   }
 
   50% {
-    background: rgba(0, 122, 255, 0.3);
+    background: rgba(var(--color-primary-rgb), 0.3);
   }
 }
 
@@ -3143,12 +3143,12 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-cell {
     cursor: pointer;
     position: relative;
-    background: rgba(0, 122, 255, 0.02);
-    border: 1px dashed rgba(0, 122, 255, 0.2) !important;
+    background: rgba(var(--color-primary-rgb), 0.02);
+    border: 1px dashed rgba(var(--color-primary-rgb), 0.2) !important;
 
     &:hover {
-      background: rgba(0, 122, 255, 0.08);
-      border-color: rgba(0, 122, 255, 0.4) !important;
+      background: rgba(var(--color-primary-rgb), 0.08);
+      border-color: rgba(var(--color-primary-rgb), 0.4) !important;
     }
   }
 }
@@ -3157,23 +3157,23 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-btn-icon {
     padding: 4px 8px;
     background: $danger-soft;
-    border: 1px solid rgba(255, 59, 48, 0.3);
+    border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
     border-radius: 6px;
     font-size: 16px;
     cursor: pointer;
     transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(255, 59, 48, 0.2);
+      background: rgba(var(--color-error-light-rgb), 0.2);
       transform: scale(1.1);
     }
 
     &.delete-active {
-      background: rgba(52, 199, 89, 0.2);
-      border-color: rgba(52, 199, 89, 0.5);
+      background: rgba(var(--color-success-rgb), 0.2);
+      border-color: rgba(var(--color-success-rgb), 0.5);
 
       &:hover {
-        background: rgba(52, 199, 89, 0.3);
+        background: rgba(var(--color-success-rgb), 0.3);
       }
     }
   }
@@ -3218,8 +3218,8 @@ $success-soft: rgba(52, 199, 89, 0.1);
     &:focus {
       outline: none;
       background: var(--glass-70);
-      border-color: rgba(0, 122, 255, 0.5);
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+      border-color: rgba(var(--color-primary-rgb), 0.5);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
     }
   }
 
@@ -3299,8 +3299,8 @@ $success-soft: rgba(52, 199, 89, 0.1);
     &:focus {
       outline: none;
       background: $glass-solid;
-      border-color: rgba(0, 122, 255, 0.5);
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+      border-color: rgba(var(--color-primary-rgb), 0.5);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
     }
   }
 }
@@ -3314,7 +3314,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
 .subtitle {
   font-size: 14px;
-  color: rgba(11, 37, 64, 0.7);
+  color: rgba(var(--text-deep-rgb), 0.7);
   margin: 0 0 24px 0;
 }
 
@@ -3323,7 +3323,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     padding: 20px 40px;
     background: $glass-soft;
     backdrop-filter: blur(10px);
-    border: 2px dashed rgba(0, 122, 255, 0.3);
+    border: 2px dashed rgba(var(--color-primary-rgb), 0.3);
     border-radius: 24px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -3334,15 +3334,15 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
     &:hover,
     &.drag-over {
-      background: rgba(0, 122, 255, 0.05);
-      border-color: rgba(0, 122, 255, 0.6);
+      background: rgba(var(--color-primary-rgb), 0.05);
+      border-color: rgba(var(--color-primary-rgb), 0.6);
       transform: scale(1.02);
     }
 
     &.uploading {
       cursor: not-allowed;
-      background: rgba(0, 122, 255, 0.03);
-      border-color: rgba(0, 122, 255, 0.2);
+      background: rgba(var(--color-primary-rgb), 0.03);
+      border-color: rgba(var(--color-primary-rgb), 0.2);
       pointer-events: none;
     }
   }
@@ -3434,7 +3434,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
       margin: 8px 0;
       font-size: 13px;
       line-height: 1.6;
-      color: rgba(11, 37, 64, 0.8);
+      color: rgba(var(--text-deep-rgb), 0.8);
     }
   }
 
@@ -3765,8 +3765,8 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
   .editable {
     &-cell {
-      border: 1px dashed rgba(0, 122, 255, 0.3) !important;
-      background: rgba(0, 122, 255, 0.05);
+      border: 1px dashed rgba(var(--color-primary-rgb), 0.3) !important;
+      background: rgba(var(--color-primary-rgb), 0.05);
 
       &::after {
         content: "✏️";
@@ -4116,16 +4116,16 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
 // "说明" help buttons — stand out from the glass background with a visible border and hover glow
 .info-help-btn {
-  border: 1px dashed rgba(0, 122, 255, 0.45) !important;
-  background: rgba(0, 122, 255, 0.07) !important;
+  border: 1px dashed rgba(var(--color-primary-rgb), 0.45) !important;
+  background: rgba(var(--color-primary-rgb), 0.07) !important;
   color: var(--color-primary-hover) !important;
   font-weight: 600 !important;
   transition: all 0.22s ease !important;
 
   &:hover:not(:disabled) {
-    background: rgba(0, 122, 255, 0.14) !important;
-    border-color: rgba(0, 122, 255, 0.65) !important;
-    box-shadow: 0 2px 12px rgba(0, 122, 255, 0.18) !important;
+    background: rgba(var(--color-primary-rgb), 0.14) !important;
+    border-color: rgba(var(--color-primary-rgb), 0.65) !important;
+    box-shadow: 0 2px 12px rgba(var(--color-primary-rgb), 0.18) !important;
     transform: translateY(-2px) !important;
   }
 }

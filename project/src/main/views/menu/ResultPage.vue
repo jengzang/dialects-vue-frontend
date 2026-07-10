@@ -431,7 +431,7 @@ $transition-fast: 0.2s;
   color: $apple-red;
   font-size: 0.85em;
   line-height: 1.4;
-  background: rgba(255, 59, 48, 0.1);
+  background: rgba(var(--color-error-light-rgb), 0.1);
   border-radius: 12px;
   animation: fadeIn 0.5s ease-out;
 }
@@ -455,12 +455,12 @@ $transition-fast: 0.2s;
   background-color: $primary-blue;
   border: none;
   border-radius: 20px;
-  box-shadow: 0 4px 6px rgba(0, 122, 255, 0.2);
+  box-shadow: 0 4px 6px rgba(var(--color-primary-rgb), 0.2);
   transition: all $transition-fast ease;
 
   &:hover {
     background-color: $primary-blue-hover;
-    box-shadow: 0 6px 8px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 6px 8px rgba(var(--color-primary-rgb), 0.3);
     transform: translateY(-1px);
   }
 

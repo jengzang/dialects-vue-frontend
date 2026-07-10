@@ -1660,10 +1660,10 @@ $system-font:
 
 @keyframes pulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(255, 149, 0, 0.4);
+    box-shadow: 0 0 0 0 rgba(var(--color-warning-rgb), 0.4);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(255, 149, 0, 0);
+    box-shadow: 0 0 0 8px rgba(var(--color-warning-rgb), 0);
   }
 }
 
@@ -1743,14 +1743,14 @@ td {
 
     &:hover {
       background: var(--bg-warning-light);
-      box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+      box-shadow: 0 0 0 2px rgba(var(--color-gold-rgb), 0.2);
     }
 
     &:focus {
       background: white;
       border-color: var(--color-primary);
       outline: none;
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.2);
     }
   }
 
@@ -2316,7 +2316,7 @@ td {
 .fullscreen-toggle-btn:hover {
   background: var(--color-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
 }
 
 .fullscreen-toggle-btn.exit-btn {
@@ -2420,7 +2420,7 @@ td {
 .batch-replace-modal-body .glass-input:focus {
   border-color: $primary-blue;
   background: var(--glass-90);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
 }
 
 */
@@ -2453,10 +2453,10 @@ td {
 }
 
 .column-checkbox-item:hover {
-  background: rgba(0, 122, 255, 0.05);
-  border-color: rgba(0, 122, 255, 0.3);
+  background: rgba(var(--color-primary-rgb), 0.05);
+  border-color: rgba(var(--color-primary-rgb), 0.3);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.15);
 }
 
 .column-checkbox-item input[type="checkbox"] {
@@ -2481,7 +2481,7 @@ td {
   background: linear-gradient(135deg, $primary-blue, var(--color-primary-hover));
   border-color: $primary-blue;
   transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.4);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.4);
 }
 
 .column-checkbox-item input:checked + .custom-checkbox::after {
@@ -2575,7 +2575,7 @@ td {
 .preview-list {
   max-height: 300px;
   overflow-y: auto;
-  background: rgba(0, 122, 255, 0.03);
+  background: rgba(var(--color-primary-rgb), 0.03);
   border-radius: 10px;
   padding: 12px;
 }
@@ -2597,7 +2597,7 @@ td {
 
 .row-label {
   padding: 2px 8px;
-  background: rgba(0, 122, 255, 0.1);
+  background: rgba(var(--color-primary-rgb), 0.1);
   color: $primary-blue;
   border-radius: 4px;
   font-weight: 600;
@@ -2605,7 +2605,7 @@ td {
 
 .col-label {
   padding: 2px 8px;
-  background: rgba(52, 199, 89, 0.1);
+  background: rgba(var(--color-success-rgb), 0.1);
   color: $success-green;
   border-radius: 4px;
   font-weight: 600;

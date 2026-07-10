@@ -128,10 +128,10 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     color: $white;
     background: linear-gradient(
       135deg,
-      rgba(52, 199, 89, 0.85),
+      rgba(var(--color-success-rgb), 0.85),
       rgba(48, 209, 88, 0.8)
     );
-    border-color: rgba(52, 199, 89, 0.5);
+    border-color: rgba(var(--color-success-rgb), 0.5);
 
     .toast-icon {
       @include toast-icon(var(--glass-30), 14px);
@@ -142,10 +142,10 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     color: $white;
     background: linear-gradient(
       135deg,
-      rgba(255, 59, 48, 0.85),
+      rgba(var(--color-error-light-rgb), 0.85),
       rgba(255, 69, 58, 0.8)
     );
-    border-color: rgba(255, 59, 48, 0.5);
+    border-color: rgba(var(--color-error-light-rgb), 0.5);
 
     .toast-icon {
       @include toast-icon(var(--glass-30), 16px);
@@ -170,10 +170,10 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     color: $white;
     background: linear-gradient(
       135deg,
-      rgba(0, 122, 255, 0.85),
+      rgba(var(--color-primary-rgb), 0.85),
       rgba(10, 132, 255, 0.8)
     );
-    border-color: rgba(0, 122, 255, 0.5);
+    border-color: rgba(var(--color-primary-rgb), 0.5);
 
     .toast-icon {
       @include toast-icon(var(--glass-30), 14px);
@@ -190,16 +190,16 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
       .toast-icon {
         color: $apple-blue;
-        background: rgba(0, 122, 255, 0.13);
+        background: rgba(var(--color-primary-rgb), 0.13);
       }
 
       .toast-action {
         color: $action-blue;
-        background: rgba(0, 122, 255, 0.12);
-        box-shadow: inset 0 0 0 1px rgba(0, 122, 255, 0.18);
+        background: rgba(var(--color-primary-rgb), 0.12);
+        box-shadow: inset 0 0 0 1px rgba(var(--color-primary-rgb), 0.18);
 
         &:hover {
-          background: rgba(0, 122, 255, 0.18);
+          background: rgba(var(--color-primary-rgb), 0.18);
         }
       }
     }

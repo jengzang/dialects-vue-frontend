@@ -230,7 +230,7 @@ h3 {
   border-radius: 999px;
   box-shadow:
     inset 0 1px 0 var(--glass-30),
-    0 10px 22px rgba(0, 122, 255, 0.22);
+    0 10px 22px rgba(var(--color-primary-rgb), 0.22);
   transition:
     transform $transition-fast ease,
     box-shadow $transition-fast ease,
@@ -239,7 +239,7 @@ h3 {
   &:hover {
     box-shadow:
       inset 0 1px 0 var(--glass-30),
-      0 14px 30px rgba(0, 122, 255, 0.3);
+      0 14px 30px rgba(var(--color-primary-rgb), 0.3);
     transform: translateY(-1px);
   }
 
@@ -278,7 +278,7 @@ h3 {
     opacity $transition-base ease;
 
   &:hover:not(:disabled) {
-    box-shadow: 0 10px 24px rgba(0, 122, 255, 0.24);
+    box-shadow: 0 10px 24px rgba(var(--color-primary-rgb), 0.24);
     transform: translateY(-1px);
   }
 

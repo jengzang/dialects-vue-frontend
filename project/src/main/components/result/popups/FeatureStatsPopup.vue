@@ -103,10 +103,10 @@ $text-main: var(--text-primary);
 $text-secondary: var(--text-tertiary);
 
 $primary: var(--color-primary);
-$primary-border: rgba(0, 122, 255, 0.2);
-$primary-border-hover: rgba(0, 122, 255, 0.3);
-$primary-shadow: rgba(0, 122, 255, 0.1);
-$primary-background-light: rgba(0, 122, 255, 0.03);
+$primary-border: rgba(var(--color-primary-rgb), 0.2);
+$primary-border-hover: rgba(var(--color-primary-rgb), 0.3);
+$primary-shadow: rgba(var(--color-primary-rgb), 0.1);
+$primary-background-light: rgba(var(--color-primary-rgb), 0.03);
 
 $border-color: rgba(0, 0, 0, 0.1);
 $border-light: rgba(0, 0, 0, 0.05);

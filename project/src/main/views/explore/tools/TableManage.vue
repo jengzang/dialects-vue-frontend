@@ -683,10 +683,10 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @mixin primary-button-shadow {
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
 
   &:hover {
-    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+    box-shadow: 0 6px 20px rgba(var(--color-primary-rgb), 0.4);
     transform: translateY(-2px);
   }
 
@@ -698,7 +698,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 @mixin input-focus {
   outline: none;
   border-color: $primary-blue;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
 }
 
 /* 主容器 */
@@ -729,7 +729,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--glass-30);
   border-radius: $radius-xl;
   box-shadow:
-    0 8px 32px rgba(0, 122, 255, 0.1),
+    0 8px 32px rgba(var(--color-primary-rgb), 0.1),
     inset 0 1px 0 var(--glass-50);
 
   @include glass-blur;
@@ -925,13 +925,13 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
       border-color: $primary-blue;
-      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
+      box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.15);
     }
 
     &:focus {
       outline: none;
       border-color: $primary-blue;
-      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+      box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
     }
   }
 }
@@ -952,7 +952,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   background: var(--glass-90);
   border: 2px solid $primary-blue;
   border-radius: $radius-md;
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.2);
   transition: all $transition-base $smooth-easing;
 
   @include glass-blur(10px, 100%);
@@ -960,7 +960,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   &:focus {
     outline: none;
     border-color: $primary-blue-dark;
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.15);
     transform: translateY(-2px);
   }
 }
@@ -982,10 +982,10 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     $success-green 0%,
     $success-green-dark 100%
   );
-  box-shadow: 0 4px 16px rgba(52, 199, 89, 0.3);
+  box-shadow: 0 4px 16px rgba(var(--color-success-rgb), 0.3);
 
   &:hover {
-    box-shadow: 0 6px 20px rgba(52, 199, 89, 0.4);
+    box-shadow: 0 6px 20px rgba(var(--color-success-rgb), 0.4);
     transform: translateY(-2px);
   }
 
@@ -1047,7 +1047,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
       transition: all $transition-base $smooth-easing;
 
       &:hover {
-        background: rgba(0, 122, 255, 0.08);
+        background: rgba(var(--color-primary-rgb), 0.08);
       }
     }
   }
@@ -1114,10 +1114,10 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   @include button-base(6px 12px, $radius-sm, 13px);
   @include primary-gradient;
 
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.4);
     transform: translateY(-1px);
   }
 }
@@ -1169,7 +1169,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   margin: 24px auto 0;
   overflow: hidden;
   font-weight: 700;
-  box-shadow: 0 8px 32px rgba(0, 122, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(var(--color-primary-rgb), 0.4);
   transition: all 0.4s $smooth-easing;
 
   &::before {
@@ -1189,7 +1189,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   &:hover {
-    box-shadow: 0 12px 48px rgba(0, 122, 255, 0.5);
+    box-shadow: 0 12px 48px rgba(var(--color-primary-rgb), 0.5);
     transform: translateY(-4px);
 
     &::before {
@@ -1293,7 +1293,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
         background: rgba(28, 28, 30, 0.8);
 
         &:hover {
-          background: rgba(0, 122, 255, 0.2);
+          background: rgba(var(--color-primary-rgb), 0.2);
         }
       }
     }

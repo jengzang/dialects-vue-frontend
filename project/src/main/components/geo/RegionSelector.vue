@@ -926,8 +926,8 @@ $portrait-ratio: 1 / 1;
   cursor: pointer;
 
   &.open {
-    border-color: rgba(0, 122, 255, 0.35);
-    box-shadow: 0 12px 36px rgba(0, 122, 255, 0.16);
+    border-color: rgba(var(--color-primary-rgb), 0.35);
+    box-shadow: 0 12px 36px rgba(var(--color-primary-rgb), 0.16);
   }
 }
 
@@ -973,7 +973,7 @@ $portrait-ratio: 1 / 1;
 
   &.custom-region-tag {
     background: rgba(0, 123, 255, 0.5);
-    border-color: rgba(52, 199, 89, 0.3);
+    border-color: rgba(var(--color-success-rgb), 0.3);
     color: var(--text-white);
   }
 }
@@ -1085,27 +1085,27 @@ $portrait-ratio: 1 / 1;
   transition: all 0.2s ease;
 
   &.btn-red {
-    background: rgba(255, 59, 48, 0.15);
-    border: 1px solid rgba(255, 59, 48, 0.3);
-    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.15);
+    background: rgba(var(--color-error-light-rgb), 0.15);
+    border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-error-light-rgb), 0.15);
     color: $danger;
 
     @include glass-blur(12px, 180%);
   }
 
   &.btn-blue {
-    background: rgba(0, 122, 255, 0.15);
-    border: 1px solid rgba(0, 122, 255, 0.3);
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
+    background: rgba(var(--color-primary-rgb), 0.15);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.15);
     color: $primary;
 
     @include glass-blur(12px, 180%);
   }
 
   &.btn-green {
-    background: rgba(52, 199, 89, 0.15);
-    border: 1px solid rgba(52, 199, 89, 0.3);
-    box-shadow: 0 4px 12px rgba(52, 199, 89, 0.15);
+    background: rgba(var(--color-success-rgb), 0.15);
+    border: 1px solid rgba(var(--color-success-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.15);
     color: $success;
 
     @include glass-blur(12px, 180%);
@@ -1135,10 +1135,10 @@ $portrait-ratio: 1 / 1;
 
 .topbar-btn {
   padding: 8px 12px;
-  background: rgba(0, 122, 255, 0.85);
-  border: 1px solid rgba(0, 122, 255, 0.35);
+  background: rgba(var(--color-primary-rgb), 0.85);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.35);
   border-radius: 12px;
-  box-shadow: 0 10px 26px rgba(0, 122, 255, 0.18);
+  box-shadow: 0 10px 26px rgba(var(--color-primary-rgb), 0.18);
   color: var(--text-white);
   font-size: 13px;
   font-weight: 700;
@@ -1203,7 +1203,7 @@ $portrait-ratio: 1 / 1;
 
   &.active {
     background: rgba(180, 223, 244, 0.72);
-    box-shadow: 0 0 8px rgba(0, 122, 255, 0.28);
+    box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.28);
   }
 }
 
@@ -1282,7 +1282,7 @@ $portrait-ratio: 1 / 1;
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
     transform: translateY(-2px);
   }
 }
@@ -1302,9 +1302,9 @@ $portrait-ratio: 1 / 1;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(0, 122, 255, 0.05);
-    border-color: rgba(0, 122, 255, 0.3);
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+    background: rgba(var(--color-primary-rgb), 0.05);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
     transform: translateY(-2px);
   }
 }
@@ -1328,7 +1328,7 @@ $portrait-ratio: 1 / 1;
 .btn-manage {
   padding: 10px 24px;
   background: var(--glass-90);
-  border: 1px solid rgba(0, 122, 255, 0.3);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.3);
   border-radius: 8px;
   color: $primary;
   font-size: 14px;
@@ -1337,7 +1337,7 @@ $portrait-ratio: 1 / 1;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(0, 122, 255, 0.1);
+    background: rgba(var(--color-primary-rgb), 0.1);
   }
 }
 

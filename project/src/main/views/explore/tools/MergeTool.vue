@@ -822,7 +822,7 @@ $color-danger: var(--color-error-light);
 .subtitle {
   margin: 0;
   font-size: 14px;
-  color: rgba(11, 37, 64, 0.7);
+  color: rgba(var(--text-deep-rgb), 0.7);
 }
 
 .steps-indicator {
@@ -847,8 +847,8 @@ $color-danger: var(--color-error-light);
     cursor: pointer;
 
     .step-number {
-      background: rgba(52, 199, 89, 0.7);
-      border-color: rgba(52, 199, 89, 0.6);
+      background: rgba(var(--color-success-rgb), 0.7);
+      border-color: rgba(var(--color-success-rgb), 0.6);
       color: white;
     }
   }
@@ -857,12 +857,12 @@ $color-danger: var(--color-error-light);
     .step-number {
       background: linear-gradient(
         135deg,
-        rgba(0, 122, 255, 0.8),
-        rgba(0, 122, 255, 0.6)
+        rgba(var(--color-primary-rgb), 0.8),
+        rgba(var(--color-primary-rgb), 0.6)
       );
-      border-color: rgba(0, 122, 255, 0.6);
+      border-color: rgba(var(--color-primary-rgb), 0.6);
       color: white;
-      box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+      box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
     }
 
     .step-label {
@@ -877,29 +877,29 @@ $color-danger: var(--color-error-light);
     align-items: center;
     justify-content: center;
     background: var(--glass-50);
-    border: 2px solid rgba(11, 37, 64, 0.2);
+    border: 2px solid rgba(var(--text-deep-rgb), 0.2);
     border-radius: 50%;
     font-size: 18px;
     font-weight: 600;
-    color: rgba(11, 37, 64, 0.5);
+    color: rgba(var(--text-deep-rgb), 0.5);
     transition: all 0.3s ease;
   }
 
   &-label {
     font-size: 13px;
     font-weight: 500;
-    color: rgba(11, 37, 64, 0.6);
+    color: rgba(var(--text-deep-rgb), 0.6);
     transition: color 0.3s ease;
   }
 
   &-line {
     width: 60px;
     height: 2px;
-    background: rgba(11, 37, 64, 0.2);
+    background: rgba(var(--text-deep-rgb), 0.2);
     transition: background 0.3s ease;
 
     &.active {
-      background: rgba(0, 122, 255, 0.6);
+      background: rgba(var(--color-primary-rgb), 0.6);
     }
   }
 }
@@ -928,7 +928,7 @@ $color-danger: var(--color-error-light);
 .step-desc {
   margin: 0;
   font-size: 14px;
-  color: rgba(11, 37, 64, 0.7);
+  color: rgba(var(--text-deep-rgb), 0.7);
   text-align: center;
 }
 
@@ -955,21 +955,21 @@ $color-danger: var(--color-error-light);
     background: var(--glass-40);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 2px dashed rgba(0, 122, 255, 0.3);
+    border: 2px dashed rgba(var(--color-primary-rgb), 0.3);
     border-radius: 24px;
     cursor: pointer;
     transition: all 0.3s ease;
 
     &:hover {
-      background: rgba(0, 122, 255, 0.05);
-      border-color: rgba(0, 122, 255, 0.6);
+      background: rgba(var(--color-primary-rgb), 0.05);
+      border-color: rgba(var(--color-primary-rgb), 0.6);
     }
 
     &.has-file {
       cursor: default;
       border-style: solid;
-      background: rgba(52, 199, 89, 0.05);
-      border-color: rgba(52, 199, 89, 0.4);
+      background: rgba(var(--color-success-rgb), 0.05);
+      border-color: rgba(var(--color-success-rgb), 0.4);
     }
   }
 
@@ -986,7 +986,7 @@ $color-danger: var(--color-error-light);
 
   &-hint {
     font-size: 13px;
-    color: rgba(11, 37, 64, 0.6);
+    color: rgba(var(--text-deep-rgb), 0.6);
   }
 }
 
@@ -1034,7 +1034,7 @@ $color-danger: var(--color-error-light);
     display: flex;
     gap: 16px;
     font-size: 13px;
-    color: rgba(11, 37, 64, 0.7);
+    color: rgba(var(--text-deep-rgb), 0.7);
   }
 
   &-items {
@@ -1073,15 +1073,15 @@ $color-danger: var(--color-error-light);
     &-remove {
       width: 28px;
       height: 28px;
-      background: rgba(255, 59, 48, 0.2);
-      border: 1px solid rgba(255, 59, 48, 0.3);
+      background: rgba(var(--color-error-light-rgb), 0.2);
+      border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
       border-radius: 6px;
       font-size: 14px;
       cursor: pointer;
       transition: all 0.2s ease;
 
       &:hover {
-        background: rgba(255, 59, 48, 0.7);
+        background: rgba(var(--color-error-light-rgb), 0.7);
         transform: scale(1.1);
       }
     }
@@ -1091,15 +1091,15 @@ $color-danger: var(--color-error-light);
 .remove-btn {
   width: 32px;
   height: 32px;
-  background: rgba(255, 59, 48, 0.2);
-  border: 1px solid rgba(255, 59, 48, 0.4);
+  background: rgba(var(--color-error-light-rgb), 0.2);
+  border: 1px solid rgba(var(--color-error-light-rgb), 0.4);
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: rgba(255, 59, 48, 0.7);
+    background: rgba(var(--color-error-light-rgb), 0.7);
     color: white;
     transform: scale(1.1);
   }
@@ -1154,7 +1154,7 @@ $color-danger: var(--color-error-light);
   &-text {
     margin: 0;
     font-size: 15px;
-    color: rgba(11, 37, 64, 0.7);
+    color: rgba(var(--text-deep-rgb), 0.7);
   }
 
   &-details {
@@ -1177,7 +1177,7 @@ $color-danger: var(--color-error-light);
   &-text {
     margin: 0;
     font-size: 15px;
-    color: rgba(11, 37, 64, 0.7);
+    color: rgba(var(--text-deep-rgb), 0.7);
   }
 
   &-icon {
@@ -1207,7 +1207,7 @@ $color-danger: var(--color-error-light);
     height: 100%;
     background: linear-gradient(
       90deg,
-      rgba(0, 122, 255, 0.8),
+      rgba(var(--color-primary-rgb), 0.8),
       rgba(0, 195, 255, 0.8)
     );
     border-radius: 6px;
@@ -1228,7 +1228,7 @@ $color-danger: var(--color-error-light);
   font-size: 14px;
 
   .label {
-    color: rgba(11, 37, 64, 0.7);
+    color: rgba(var(--text-deep-rgb), 0.7);
   }
 
   .value {
@@ -1297,7 +1297,7 @@ $color-danger: var(--color-error-light);
 
   &-label {
     font-size: 13px;
-    color: rgba(11, 37, 64, 0.7);
+    color: rgba(var(--text-deep-rgb), 0.7);
   }
 }
 
@@ -1337,11 +1337,11 @@ $color-danger: var(--color-error-light);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 122, 255, 0.2);
+    background: rgba(var(--color-primary-rgb), 0.2);
     border-radius: 50%;
     font-size: 12px;
     font-weight: 600;
-    color: rgba(0, 122, 255, 0.9);
+    color: rgba(var(--color-primary-rgb), 0.9);
   }
 
   &-name {
@@ -1395,7 +1395,7 @@ $color-danger: var(--color-error-light);
   border-radius: 10px;
   font-size: 14px;
   font-weight: 500;
-  color: rgba(11, 37, 64, 0.7);
+  color: rgba(var(--text-deep-rgb), 0.7);
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -1405,7 +1405,7 @@ $color-danger: var(--color-error-light);
   }
 
   &.active {
-    background: rgba(0, 122, 255, 0.12);
+    background: rgba(var(--color-primary-rgb), 0.12);
     color: $color-primary;
     font-weight: 600;
   }
@@ -1427,12 +1427,12 @@ $color-danger: var(--color-error-light);
     position: sticky;
     top: 0;
     z-index: 10;
-    background: rgba(0, 122, 255, 0.08);
+    background: rgba(var(--color-primary-rgb), 0.08);
   }
 
   th {
     padding: 10px 12px;
-    border-bottom: 2px solid rgba(0, 122, 255, 0.2);
+    border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
     text-align: left;
     white-space: nowrap;
     font-size: 13px;
@@ -1444,13 +1444,13 @@ $color-danger: var(--color-error-light);
     padding: 8px 12px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.04);
     font-size: 13px;
-    color: rgba(11, 37, 64, 0.85);
+    color: rgba(var(--text-deep-rgb), 0.85);
   }
 
   tbody {
     tr {
       &:hover {
-        background: rgba(0, 122, 255, 0.04);
+        background: rgba(var(--color-primary-rgb), 0.04);
       }
     }
   }
@@ -1463,7 +1463,7 @@ $color-danger: var(--color-error-light);
   border-radius: 8px;
   text-align: center;
   font-size: 12px;
-  color: rgba(11, 37, 64, 0.5);
+  color: rgba(var(--text-deep-rgb), 0.5);
 }
 
 @media (max-width: 768px) {

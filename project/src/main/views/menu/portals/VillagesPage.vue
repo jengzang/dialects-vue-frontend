@@ -113,7 +113,7 @@ const handleAllVillages = () => {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
   background: linear-gradient(145deg, var(--glass-50), var(--glass-30));
-  border-color: rgba(0, 122, 255, 0.3);
+  border-color: rgba(var(--color-primary-rgb), 0.3);
 }
 
 .village-btn:active {

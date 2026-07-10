@@ -260,7 +260,7 @@ const initPitchChart = () => {
     {
       xAxis: seg.start_s,
       itemStyle: {
-        color: seg.type === 'rime_core' ? 'rgba(255,215,0,0.2)' :
+        color: seg.type === 'rime_core' ? 'rgba(var(--color-gold-rgb), 0.2)' :
                seg.type === 'silence' ? 'rgba(200,200,200,0.1)' :
                'rgba(100,150,255,0.15)'
       }
@@ -738,8 +738,8 @@ $card-padding: 1.5rem;
 $section-spacing: 2rem;
 
 $border-light: rgba(0, 0, 0, 0.1);
-$blue-shadow: rgba(0, 122, 255, 0.2);
-$blue-shadow-hover: rgba(0, 122, 255, 0.3);
+$blue-shadow: rgba(var(--color-primary-rgb), 0.2);
+$blue-shadow-hover: rgba(var(--color-primary-rgb), 0.3);
 
 $transition-normal: 0.3s;
 

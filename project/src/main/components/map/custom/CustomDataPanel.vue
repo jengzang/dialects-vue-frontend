@@ -401,7 +401,7 @@ const resetForm = () => {
   font-size: 24px;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -411,7 +411,7 @@ const resetForm = () => {
 
 .expand-button:hover {
   background: linear-gradient(135deg, var(--color-primary-hover), var(--color-primary-hover));
-  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+  box-shadow: 0 6px 16px rgba(var(--color-primary-rgb), 0.4);
   transform: translateY(-50%) translateX(-4px); /* 悬停时稍微向左移 */
 }
 
@@ -486,7 +486,7 @@ const resetForm = () => {
   outline: none;
   border-color: var(--color-primary);
   background: white;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
 }
 
 .form-group textarea {
@@ -529,7 +529,7 @@ const resetForm = () => {
 }
 
 .suggestion-item:hover {
-  background: rgba(0, 122, 255, 0.1);
+  background: rgba(var(--color-primary-rgb), 0.1);
 }
 
 /* 提交按钮 */
@@ -542,14 +542,14 @@ const resetForm = () => {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.3);
   transition: all 0.3s ease;
   margin-top: 8px;
 }
 
 .submit-btn:hover {
   background: linear-gradient(135deg, var(--color-success), var(--color-success));
-  box-shadow: 0 6px 16px rgba(52, 199, 89, 0.4);
+  box-shadow: 0 6px 16px rgba(var(--color-success-rgb), 0.4);
   transform: translateY(-2px);
 }
 

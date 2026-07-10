@@ -233,17 +233,17 @@ textarea {
 
   &:focus {
     border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.15);
   }
 
   &.input-error {
     border-color: $error-color;
-    box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.12);
+    box-shadow: 0 0 0 3px rgba(var(--color-error-light-rgb), 0.12);
   }
 
   &.input-warning {
     border-color: $warning-color;
-    box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.12);
+    box-shadow: 0 0 0 3px rgba(var(--color-warning-rgb), 0.12);
   }
 }
 

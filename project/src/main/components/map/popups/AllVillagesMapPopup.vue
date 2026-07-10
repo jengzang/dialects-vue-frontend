@@ -605,7 +605,7 @@ $mobile-breakpoint: 768px;
 .village-count {
   flex-shrink: 0;
   padding: 6px 12px;
-  background: rgba(52, 199, 89, 0.15);
+  background: rgba(var(--color-success-rgb), 0.15);
   border-radius: 10px;
   color: var(--color-success);
   white-space: nowrap;

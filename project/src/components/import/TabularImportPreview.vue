@@ -241,9 +241,9 @@ const columnOptions = computed(() => ([
 
 <style scoped lang="scss">
 $text-primary: var(--text-deep);
-$text-secondary: rgba(11, 37, 64, 0.68);
-$text-muted: rgba(11, 37, 64, 0.58);
-$text-light: rgba(11, 37, 64, 0.55);
+$text-secondary: rgba(var(--text-deep-rgb), 0.68);
+$text-muted: rgba(var(--text-deep-rgb), 0.58);
+$text-light: rgba(var(--text-deep-rgb), 0.55);
 
 $primary-blue: var(--color-primary);
 $success-green: var(--color-success);
@@ -309,7 +309,7 @@ $section-gap: 12px;
     min-height: 140px;
     padding: 20px;
     background: var(--glass-40);
-    border: 1px dashed rgba(0, 122, 255, 0.22);
+    border: 1px dashed rgba(var(--color-primary-rgb), 0.22);
     border-radius: 18px;
 
     &-icon {
@@ -350,7 +350,7 @@ $section-gap: 12px;
       flex: 1 1 100%;
       flex-wrap: wrap;
       gap: 12px;
-      color: rgba(11, 37, 64, 0.62);
+      color: rgba(var(--text-deep-rgb), 0.62);
       font-size: 12px;
     }
   }
@@ -454,7 +454,7 @@ $section-gap: 12px;
       padding: 10px 12px;
       text-align: left;
       vertical-align: top;
-      border-bottom: 1px solid rgba(11, 37, 64, 0.08);
+      border-bottom: 1px solid rgba(var(--text-deep-rgb), 0.08);
     }
 
     th {
@@ -499,7 +499,7 @@ $section-gap: 12px;
 
 .mapping-required {
   color: $primary-blue;
-  background: rgba(0, 122, 255, 0.12);
+  background: rgba(var(--color-primary-rgb), 0.12);
 }
 
 .mapping-badge {

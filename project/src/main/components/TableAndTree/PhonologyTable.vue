@@ -514,8 +514,8 @@ $transition-duration: 0.25s;
   text-align: center;
   background: linear-gradient(
     145deg,
-    rgba(0, 122, 255, 0.08),
-    rgba(0, 122, 255, 0.04)
+    rgba(var(--color-primary-rgb), 0.08),
+    rgba(var(--color-primary-rgb), 0.04)
   );
 }
 
@@ -678,9 +678,9 @@ $transition-duration: 0.25s;
 
   &:hover:not(:disabled) {
     background: var(--glass-80);
-    border-color: rgba(0, 122, 255, 0.3);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
     box-shadow:
-      0 4px 12px rgba(0, 122, 255, 0.15),
+      0 4px 12px rgba(var(--color-primary-rgb), 0.15),
       inset 0 1px 0 var(--glass-60);
     transform: translateY(-2px);
   }

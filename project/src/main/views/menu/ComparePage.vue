@@ -1945,7 +1945,7 @@ $text-muted: var(--text-lightest);
   max-width: 180px;
   height: 38px;
   background: var(--glass-90);
-  border: 1px solid rgba(0, 122, 255, 0.35);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.35);
   border-radius: 8px;
   outline: none;
   text-align: center;
@@ -1954,7 +1954,7 @@ $text-muted: var(--text-lightest);
 
   &:focus {
     border-color: $primary;
-    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
   }
 }
 
@@ -1970,11 +1970,11 @@ $text-muted: var(--text-lightest);
   padding: 0.4rem 1rem;
   background: linear-gradient(
     135deg,
-    rgba(0, 122, 255, 0.15),
-    rgba(0, 122, 255, 0.25)
+    rgba(var(--color-primary-rgb), 0.15),
+    rgba(var(--color-primary-rgb), 0.25)
   );
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.2);
   color: $primary;
   font-size: 0.95rem;
   font-weight: 600;
@@ -2077,7 +2077,7 @@ $text-muted: var(--text-lightest);
   max-width: 38dvw;
   padding: 1rem;
   background: var(--glass-50);
-  border: 2px solid rgba(0, 122, 255, 0.3);
+  border: 2px solid rgba(var(--color-primary-rgb), 0.3);
   border-radius: 12px;
 
   &.group1-style {
@@ -2106,7 +2106,7 @@ $text-muted: var(--text-lightest);
   gap: 0.5rem;
   margin-bottom: 0.8rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgba(0, 122, 255, 0.2);
+  border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
   white-space: nowrap;
   color: $primary;
   font-size: 1.1rem;
@@ -2133,7 +2133,7 @@ $text-muted: var(--text-lightest);
   justify-content: space-between;
   padding: 0.6rem 0.8rem;
   background: var(--glass-80);
-  border: 1px solid rgba(0, 122, 255, 0.2);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: 8px;
   transition: all 0.2s ease;
 
@@ -2215,14 +2215,14 @@ $text-muted: var(--text-lightest);
   gap: 0.5rem;
   padding: 0.6rem 1.2rem;
   background: var(--glass-70);
-  border: 2px solid rgba(0, 122, 255, 0.3);
+  border: 2px solid rgba(var(--color-primary-rgb), 0.3);
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(0, 122, 255, 0.1);
-    border-color: rgba(0, 122, 255, 0.5);
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border-color: rgba(var(--color-primary-rgb), 0.5);
   }
 
   input {

@@ -508,7 +508,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   &:hover {
     height: 90%;
     color: $primary-blue;
-    background: rgba(0, 122, 255, 0.12);
+    background: rgba(var(--color-primary-rgb), 0.12);
   }
 
   &.active {
@@ -712,8 +712,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   &:hover {
     background: linear-gradient(
       145deg,
-      rgba(0, 122, 255, 0.15),
-      rgba(0, 122, 255, 0.08)
+      rgba(var(--color-primary-rgb), 0.15),
+      rgba(var(--color-primary-rgb), 0.08)
     );
     transform: translateX(4px);
   }

@@ -434,7 +434,7 @@ $mobile-width: 150px;
     height: 30px;
     margin-right: 5px;
     background: var(--glass-70);
-    border: 1px solid rgba(0, 122, 255, 0.14);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.14);
     border-radius: 999px;
     box-shadow:
       0 8px 18px rgba(24, 38, 64, 0.1),
@@ -457,7 +457,7 @@ $mobile-width: 150px;
       background: var(--glass-90);
       box-shadow:
         0 10px 22px rgba(24, 38, 64, 0.14),
-        0 4px 10px rgba(0, 122, 255, 0.1);
+        0 4px 10px rgba(var(--color-primary-rgb), 0.1);
       transform: translateY(-1px);
     }
 
@@ -578,8 +578,8 @@ $mobile-width: 150px;
 
       .count-location-jump-nav-dot {
         box-shadow:
-          0 0 0 5px rgba(0, 122, 255, 0.18),
-          0 4px 12px rgba(0, 122, 255, 0.2);
+          0 0 0 5px rgba(var(--color-primary-rgb), 0.18),
+          0 4px 12px rgba(var(--color-primary-rgb), 0.2);
       }
     }
 
@@ -592,10 +592,10 @@ $mobile-width: 150px;
         max-width: 158px;
         padding: 7px 12px;
         background: var(--glass-90);
-        border-color: rgba(0, 122, 255, 0.18);
+        border-color: rgba(var(--color-primary-rgb), 0.18);
         box-shadow:
           0 12px 26px rgba(24, 38, 64, 0.14),
-          0 5px 12px rgba(0, 122, 255, 0.08),
+          0 5px 12px rgba(var(--color-primary-rgb), 0.08),
           inset 0 1px 0 var(--glass-80);
       }
 
@@ -613,8 +613,8 @@ $mobile-width: 150px;
         margin-top: -7px;
         background: linear-gradient(135deg, $primary, $primary-deep);
         box-shadow:
-          0 0 0 6px rgba(0, 122, 255, 0.16),
-          0 6px 16px rgba(0, 122, 255, 0.24);
+          0 0 0 6px rgba(var(--color-primary-rgb), 0.16),
+          0 6px 16px rgba(var(--color-primary-rgb), 0.24);
       }
     }
 
@@ -622,8 +622,8 @@ $mobile-width: 150px;
       .count-location-jump-nav-dot {
         background: linear-gradient(135deg, $primary-dark, var(--color-primary-hover));
         box-shadow:
-          0 0 0 4px rgba(0, 122, 255, 0.16),
-          0 4px 12px rgba(0, 122, 255, 0.18);
+          0 0 0 4px rgba(var(--color-primary-rgb), 0.16),
+          0 4px 12px rgba(var(--color-primary-rgb), 0.18);
       }
     }
 
@@ -685,8 +685,8 @@ $mobile-width: 150px;
 
       .count-location-jump-nav-dot {
         box-shadow:
-          0 0 0 4px rgba(0, 122, 255, 0.16),
-          0 4px 12px rgba(0, 122, 255, 0.2);
+          0 0 0 4px rgba(var(--color-primary-rgb), 0.16),
+          0 4px 12px rgba(var(--color-primary-rgb), 0.2);
         transform: scale(1.16);
       }
     }
@@ -701,7 +701,7 @@ $mobile-width: 150px;
     padding: 5px 10px;
     opacity: 0;
     background: var(--glass-80);
-    border: 1px solid rgba(0, 122, 255, 0.12);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.12);
     border-radius: 999px;
     box-shadow:
       0 8px 20px rgba(24, 38, 64, 0.1),
@@ -746,13 +746,13 @@ $mobile-width: 150px;
     margin-top: -4.5px;
     background: linear-gradient(
       135deg,
-      rgba(0, 122, 255, 0.88),
+      rgba(var(--color-primary-rgb), 0.88),
       rgba(0, 81, 213, 0.88)
     );
     border-radius: 50%;
     box-shadow:
-      0 0 0 3px rgba(0, 122, 255, 0.1),
-      0 3px 8px rgba(0, 122, 255, 0.14);
+      0 0 0 3px rgba(var(--color-primary-rgb), 0.1),
+      0 3px 8px rgba(var(--color-primary-rgb), 0.14);
 
     transition:
       width 0.18s ease,

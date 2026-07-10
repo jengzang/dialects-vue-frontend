@@ -528,7 +528,7 @@ $portrait-ratio: 1 / 1;
 
   &:hover {
     background: var(--color-primary-light2);
-    box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(var(--color-primary-rgb), 0.2);
     transform: translateY(-1px);
   }
 

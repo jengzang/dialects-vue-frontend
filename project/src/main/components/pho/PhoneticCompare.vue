@@ -765,7 +765,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   max-width: 520px;
   margin-top: 15px;
   padding: 10px 14px;
-  background: rgba(255, 59, 48, 0.08);
+  background: rgba(var(--color-error-light-rgb), 0.08);
   border-left: 3px solid var(--color-error, #{$error});
   border-radius: var(--radius-sm, 6px);
   color: var(--color-error, #{$error});
@@ -833,7 +833,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   &.active {
     background: var(--color-primary, #{$primary});
     border-color: var(--color-primary, #{$primary});
-    box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2);
+    box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.2);
     color: #fff;
   }
 }

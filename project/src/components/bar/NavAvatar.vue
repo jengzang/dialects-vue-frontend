@@ -134,7 +134,7 @@ const avatarStyle = computed(() => {
           styles.boxShadow = `0 8px 20px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4), inset 0 0 8px var(--glass-20)`;
         } else {
           styles.boxShadow =
-            '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px var(--glass-20)';
+            '0 8px 20px rgba(var(--color-primary-rgb), 0.3), inset 0 0 8px var(--glass-20)';
         }
       }
     } else if (avatarConfig.value.bgType === 'gradient') {
@@ -149,7 +149,7 @@ const avatarStyle = computed(() => {
           styles.boxShadow = `0 8px 20px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 4px 12px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 0 8px var(--glass-20)`;
         } else {
           styles.boxShadow =
-            '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px var(--glass-20)';
+            '0 8px 20px rgba(var(--color-primary-rgb), 0.3), inset 0 0 8px var(--glass-20)';
         }
       }
     }

@@ -539,7 +539,7 @@ $glass-card: var(--glass-50);
 
     code {
       padding: 1px 5px;
-      background: rgba(0, 122, 255, 0.08);
+      background: rgba(var(--color-primary-rgb), 0.08);
       border-radius: 4px;
       color: $primary-blue-dark;
       font-size: 12px;
@@ -710,7 +710,7 @@ $glass-card: var(--glass-50);
 .usage-example {
   display: inline-block;
   padding: 4px 8px;
-  background: rgba(0, 122, 255, 0.08);
+  background: rgba(var(--color-primary-rgb), 0.08);
   border-radius: 4px;
   color: $primary-blue;
   font-family: monospace;

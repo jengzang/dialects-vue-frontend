@@ -236,7 +236,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
 
   &:hover {
     color: $primary-blue;
-    text-shadow: 0 0 8px rgba(0, 122, 255, 0.6);
+    text-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.6);
     transform: scale(1.05);
   }
 
@@ -329,16 +329,16 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    background: rgba(0, 122, 255, 0.1);
-    border: 0.5px solid rgba(0, 122, 255, 0.3);
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border: 0.5px solid rgba(var(--color-primary-rgb), 0.3);
     border-radius: $radius-sm;
     transition: all $transition-base $smooth-easing;
 
     @include glass-blur(10px);
 
     &:hover {
-      background: rgba(0, 122, 255, 0.15);
-      border-color: rgba(0, 122, 255, 0.5);
+      background: rgba(var(--color-primary-rgb), 0.15);
+      border-color: rgba(var(--color-primary-rgb), 0.5);
       transform: translateY(-1px);
     }
 
@@ -358,14 +358,14 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
     letter-spacing: -0.01em;
     background: linear-gradient(
       135deg,
-      rgba(0, 122, 255, 0.1),
-      rgba(0, 122, 255, 0.05)
+      rgba(var(--color-primary-rgb), 0.1),
+      rgba(var(--color-primary-rgb), 0.05)
     );
-    border: 0.5px solid rgba(0, 122, 255, 0.3);
+    border: 0.5px solid rgba(var(--color-primary-rgb), 0.3);
     border-radius: $radius-lg;
     box-shadow:
-      0 2px 8px rgba(0, 122, 255, 0.12),
-      inset 0 0 0 1px rgba(0, 122, 255, 0.2);
+      0 2px 8px rgba(var(--color-primary-rgb), 0.12),
+      inset 0 0 0 1px rgba(var(--color-primary-rgb), 0.2);
 
     @include glass-blur(20px);
 
@@ -431,7 +431,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
         font-size: 18px;
         font-weight: 700;
         letter-spacing: -0.02em;
-        background: rgba(0, 122, 255, 0.08);
+        background: rgba(var(--color-primary-rgb), 0.08);
         border-radius: $radius-sm;
       }
 
@@ -476,10 +476,10 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
 
       &:hover {
         background: var(--glass-90);
-        border-color: rgba(0, 122, 255, 0.5);
+        border-color: rgba(var(--color-primary-rgb), 0.5);
         box-shadow:
-          0 4px 12px rgba(0, 122, 255, 0.15),
-          inset 0 0 0 1.5px rgba(0, 122, 255, 0.4);
+          0 4px 12px rgba(var(--color-primary-rgb), 0.15),
+          inset 0 0 0 1.5px rgba(var(--color-primary-rgb), 0.4);
         transform: translateY(-2px) scale(1.03);
       }
 
@@ -544,8 +544,8 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
   transition: all $transition-fast $standard-easing;
 
   &:hover {
-    border-color: rgba(255, 149, 0, 0.3);
-    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.15);
+    border-color: rgba(var(--color-warning-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-warning-rgb), 0.15);
     transform: translateY(-1px);
   }
 
@@ -572,10 +572,10 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
   @include glass-blur(20px, 180%);
 
   &:hover {
-    border-color: rgba(0, 122, 255, 0.15);
+    border-color: rgba(var(--color-primary-rgb), 0.15);
     box-shadow:
       0 1px 2px rgba(0, 0, 0, 0.04),
-      0 20px 48px rgba(0, 122, 255, 0.08),
+      0 20px 48px rgba(var(--color-primary-rgb), 0.08),
       inset 0 0 0 1px var(--glass-90);
     transform: translateY(-2px);
   }
@@ -596,7 +596,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
 
   &:hover {
     :deep(.profile-avatar) {
-      box-shadow: 0 8px 18px rgba(0, 122, 255, 0.3);
+      box-shadow: 0 8px 18px rgba(var(--color-primary-rgb), 0.3);
       transform: scale(1.06) rotate(3deg);
     }
   }
@@ -712,10 +712,10 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
 
   &:hover {
     background: $white;
-    border-color: rgba(0, 122, 255, 0.3);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
     box-shadow:
       0 8px 24px rgba(0, 0, 0, 0.05),
-      inset 0 0 0 1.5px rgba(0, 122, 255, 0.2);
+      inset 0 0 0 1.5px rgba(var(--color-primary-rgb), 0.2);
     transform: translateY(-2px);
   }
 
@@ -723,11 +723,11 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
 
     &:hover {
-      background: rgba(0, 122, 255, 0.04);
-      border-color: rgba(0, 122, 255, 0.4);
+      background: rgba(var(--color-primary-rgb), 0.04);
+      border-color: rgba(var(--color-primary-rgb), 0.4);
       box-shadow:
-        0 8px 24px rgba(0, 122, 255, 0.08),
-        inset 0 0 0 1.5px rgba(0, 122, 255, 0.25);
+        0 8px 24px rgba(var(--color-primary-rgb), 0.08),
+        inset 0 0 0 1.5px rgba(var(--color-primary-rgb), 0.25);
     }
 
     &:active {

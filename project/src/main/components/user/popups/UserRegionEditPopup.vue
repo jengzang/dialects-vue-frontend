@@ -214,12 +214,12 @@ $surface-background: var(--glass-90);
 $surface-border: rgba(0, 0, 0, 0.1);
 $disabled-background: rgba(0, 0, 0, 0.05);
 
-$primary-background: rgba(0, 122, 255, 0.1);
-$primary-border: rgba(0, 122, 255, 0.3);
-$primary-shadow: rgba(0, 122, 255, 0.3);
+$primary-background: rgba(var(--color-primary-rgb), 0.1);
+$primary-border: rgba(var(--color-primary-rgb), 0.3);
+$primary-shadow: rgba(var(--color-primary-rgb), 0.3);
 
-$success-background: rgba(52, 199, 89, 0.15);
-$success-border: rgba(52, 199, 89, 0.3);
+$success-background: rgba(var(--color-success-rgb), 0.15);
+$success-border: rgba(var(--color-success-rgb), 0.3);
 
 $control-radius: 8px;
 $transition-fast: 0.2s;
@@ -308,7 +308,7 @@ $transition-normal: 0.3s;
 
   &:hover {
     background: var(--color-primary-light2);
-    box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(var(--color-primary-rgb), 0.2);
     transform: translateY(-1px);
   }
 

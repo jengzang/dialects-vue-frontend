@@ -89,10 +89,10 @@ $warning: var(--color-warning);
 $text-primary: var(--color-text-primary);
 $text-secondary: var(--color-text-secondary);
 
-$error-background: rgba(255, 59, 48, 0.15);
-$error-background-hover: rgba(255, 59, 48, 0.25);
-$error-border: rgba(255, 59, 48, 0.3);
-$error-border-hover: rgba(255, 59, 48, 0.5);
+$error-background: rgba(var(--color-error-light-rgb), 0.15);
+$error-background-hover: rgba(var(--color-error-light-rgb), 0.25);
+$error-border: rgba(var(--color-error-light-rgb), 0.3);
+$error-border-hover: rgba(var(--color-error-light-rgb), 0.5);
 
 $panel-divider: var(--glass-20);
 $progress-background: rgba(0, 0, 0, 0.1);

@@ -813,16 +813,16 @@ $glass-blur: 8px;
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
-  background: rgba(0, 122, 255, 0.04);
+  background: rgba(var(--color-primary-rgb), 0.04);
   border: 1px solid transparent;
   border-radius: 6px;
   transition: all $transition-fast ease;
 
   &:hover {
     color: $primary-blue;
-    background: rgba(0, 122, 255, 0.1);
-    border-color: rgba(0, 122, 255, 0.25);
-    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.12);
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border-color: rgba(var(--color-primary-rgb), 0.25);
+    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.12);
     transform: translateY(-1px);
   }
 }
@@ -834,8 +834,8 @@ $glass-blur: 8px;
   font-size: 14px;
   font-weight: 600;
   text-align: center;
-  background: rgba(255, 59, 48, 0.1);
-  border: 1px solid rgba(255, 59, 48, 0.3);
+  background: rgba(var(--color-error-light-rgb), 0.1);
+  border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
   border-radius: 8px;
 }
 

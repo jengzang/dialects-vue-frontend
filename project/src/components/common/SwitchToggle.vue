@@ -296,10 +296,10 @@ $transition-ease: ease;
   0%,
   100% {
     box-shadow:
-      0 0 5px rgba(0, 122, 255, 0.4),
-      0 0 10px rgba(0, 122, 255, 0.6),
-      0 0 20px rgba(0, 122, 255, 0.8),
-      0 0 30px rgba(0, 122, 255, 0.9);
+      0 0 5px rgba(var(--color-primary-rgb), 0.4),
+      0 0 10px rgba(var(--color-primary-rgb), 0.6),
+      0 0 20px rgba(var(--color-primary-rgb), 0.8),
+      0 0 30px rgba(var(--color-primary-rgb), 0.9);
   }
 
   50% {

@@ -642,7 +642,7 @@ $system-font:
   &:hover {
     color: $primary-blue;
     background: var(--glass-40);
-    box-shadow: 0 0 8px rgba(0, 122, 255, 0.22);
+    box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.22);
   }
 }
 
@@ -673,12 +673,12 @@ $system-font:
 
   &:hover {
     color: $primary-blue;
-    background: rgba(0, 122, 255, 0.08);
+    background: rgba(var(--color-primary-rgb), 0.08);
   }
 
   &.active {
     color: $primary-blue;
-    background: rgba(0, 122, 255, 0.12);
+    background: rgba(var(--color-primary-rgb), 0.12);
   }
 }
 
@@ -707,7 +707,7 @@ $system-font:
   cursor: pointer;
   user-select: none;
   background: var(--glass-20);
-  border: 1px solid rgba(0, 122, 255, 0.2);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: 14px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -715,7 +715,7 @@ $system-font:
 
   &:hover {
     background: var(--glass-40);
-    box-shadow: 0 0 8px rgba(0, 122, 255, 0.4);
+    box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.4);
   }
 }
 

@@ -1757,7 +1757,7 @@ onBeforeUnmount(() => {
   font-size: 0.92rem;
   box-shadow:
     inset 0 0 0.5px var(--glass-50),
-    0 8px 18px rgba(0, 122, 255, 0.08);
+    0 8px 18px rgba(var(--color-primary-rgb), 0.08);
 }
 
 .draw-workbench {
@@ -1800,7 +1800,7 @@ onBeforeUnmount(() => {
   background: var(--glass-80);
   border-color: var(--color-primary);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.08);
+  box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.08);
 }
 
 .draw-modal-card-btn:disabled {
@@ -1827,7 +1827,7 @@ onBeforeUnmount(() => {
 
 .draw-card-desc {
   font-size: 0.85rem;
-  color: rgba(11, 37, 64, 0.65);
+  color: rgba(var(--text-deep-rgb), 0.65);
 }
 
 .draw-text-input {
@@ -1841,8 +1841,8 @@ onBeforeUnmount(() => {
 
 .draw-text-input:focus {
   outline: none;
-  border-color: rgba(0, 122, 255, 0.5);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+  border-color: rgba(var(--color-primary-rgb), 0.5);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.12);
 }
 
 .scope-modal-footer {

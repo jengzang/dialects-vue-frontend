@@ -743,8 +743,8 @@ $bronze: var(--color-bronze);
     &.first-place {
       background: linear-gradient(
         135deg,
-        rgba(255, 215, 0, 0.15),
-        rgba(255, 215, 0, 0.08)
+        rgba(var(--color-gold-rgb), 0.15),
+        rgba(var(--color-gold-rgb), 0.08)
       );
       border-left: 4px solid $gold;
     }
@@ -895,10 +895,10 @@ $bronze: var(--color-bronze);
     padding: 12px 8px;
     background: linear-gradient(
       135deg,
-      rgba(0, 122, 255, 0.12),
-      rgba(0, 122, 255, 0.06)
+      rgba(var(--color-primary-rgb), 0.12),
+      rgba(var(--color-primary-rgb), 0.06)
     );
-    border-right: 2px solid rgba(0, 122, 255, 0.3);
+    border-right: 2px solid rgba(var(--color-primary-rgb), 0.3);
     vertical-align: middle;
     text-align: center;
     font-size: 14px;
@@ -909,10 +909,10 @@ $bronze: var(--color-bronze);
     &.gold {
       background: linear-gradient(
         135deg,
-        rgba(255, 215, 0, 0.18),
-        rgba(255, 215, 0, 0.08)
+        rgba(var(--color-gold-rgb), 0.18),
+        rgba(var(--color-gold-rgb), 0.08)
       );
-      border-right-color: rgba(255, 215, 0, 0.4);
+      border-right-color: rgba(var(--color-gold-rgb), 0.4);
       color: #b8860b;
     }
 
@@ -940,19 +940,19 @@ $bronze: var(--color-bronze);
   &-data {
     background: linear-gradient(
       90deg,
-      rgba(0, 122, 255, 0.06),
-      rgba(0, 122, 255, 0.03)
+      rgba(var(--color-primary-rgb), 0.06),
+      rgba(var(--color-primary-rgb), 0.03)
     );
-    border-right: 1px solid rgba(0, 122, 255, 0.15);
+    border-right: 1px solid rgba(var(--color-primary-rgb), 0.15);
     font-weight: 600;
 
     &.category-gold {
       background: linear-gradient(
         90deg,
-        rgba(255, 215, 0, 0.12),
-        rgba(255, 215, 0, 0.05)
+        rgba(var(--color-gold-rgb), 0.12),
+        rgba(var(--color-gold-rgb), 0.05)
       );
-      border-right-color: rgba(255, 215, 0, 0.3);
+      border-right-color: rgba(var(--color-gold-rgb), 0.3);
     }
 
     &.category-silver {
@@ -999,8 +999,8 @@ $bronze: var(--color-bronze);
     &.first-place {
       background: linear-gradient(
         90deg,
-        rgba(255, 215, 0, 0.15),
-        rgba(255, 215, 0, 0.08)
+        rgba(var(--color-gold-rgb), 0.15),
+        rgba(var(--color-gold-rgb), 0.08)
       );
     }
 
@@ -1039,8 +1039,8 @@ $bronze: var(--color-bronze);
     td {
       background: linear-gradient(
         90deg,
-        rgba(255, 215, 0, 0.15),
-        rgba(255, 215, 0, 0.08)
+        rgba(var(--color-gold-rgb), 0.15),
+        rgba(var(--color-gold-rgb), 0.08)
       );
     }
 
@@ -1080,8 +1080,8 @@ $bronze: var(--color-bronze);
   &.category-summary {
     background: linear-gradient(
       90deg,
-      rgba(0, 122, 255, 0.08),
-      rgba(0, 122, 255, 0.04)
+      rgba(var(--color-primary-rgb), 0.08),
+      rgba(var(--color-primary-rgb), 0.04)
     );
     font-weight: 600;
 
@@ -1093,16 +1093,16 @@ $bronze: var(--color-bronze);
     &:hover {
       background: linear-gradient(
         90deg,
-        rgba(0, 122, 255, 0.12),
-        rgba(0, 122, 255, 0.06)
+        rgba(var(--color-primary-rgb), 0.12),
+        rgba(var(--color-primary-rgb), 0.06)
       );
     }
 
     &.first-place {
       background: linear-gradient(
         90deg,
-        rgba(255, 215, 0, 0.18),
-        rgba(255, 215, 0, 0.08)
+        rgba(var(--color-gold-rgb), 0.18),
+        rgba(var(--color-gold-rgb), 0.08)
       );
 
       .metric-name {
@@ -1139,7 +1139,7 @@ $bronze: var(--color-bronze);
 .rank-badge {
   display: inline-block;
   padding: 4px 10px;
-  background: rgba(0, 122, 255, 0.1);
+  background: rgba(var(--color-primary-rgb), 0.1);
   border-radius: 6px;
   white-space: nowrap;
   font-size: 13px;
@@ -1150,12 +1150,12 @@ $bronze: var(--color-bronze);
   &.gold {
     background: linear-gradient(
       135deg,
-      rgba(255, 215, 0, 0.2),
-      rgba(255, 215, 0, 0.15)
+      rgba(var(--color-gold-rgb), 0.2),
+      rgba(var(--color-gold-rgb), 0.15)
     );
     color: $gold-text;
     font-weight: 700;
-    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(var(--color-gold-rgb), 0.3);
   }
 
   &.silver {

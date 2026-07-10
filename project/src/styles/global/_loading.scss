@@ -15,7 +15,7 @@
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: global-loading-spin 1s linear infinite;
-  box-shadow: 0 0 15px rgba(0, 122, 255, 0.2);
+  box-shadow: 0 0 15px rgba(var(--color-primary-rgb), 0.2);
 }
 
 .ui-loading--inline {

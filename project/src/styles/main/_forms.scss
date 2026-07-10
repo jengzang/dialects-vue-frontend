@@ -52,9 +52,9 @@
 }
 
 .main-search-field:focus {
-  border-color: rgba(0, 122, 255, 0.55);
+  border-color: rgba(var(--color-primary-rgb), 0.55);
   background: var(--glass-90);
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+  box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
 }
 
 .main-input-field {
@@ -78,9 +78,9 @@
 }
 
 .main-input-field:focus {
-  border-color: rgba(0, 122, 255, 0.55);
+  border-color: rgba(var(--color-primary-rgb), 0.55);
   background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+  box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
 }
 
 .main-glow-switch:hover {
@@ -140,10 +140,10 @@
 @keyframes main-glow-switch-pulse {
   0% {
     box-shadow:
-      0 0 5px rgba(0, 122, 255, 0.4),
-      0 0 10px rgba(0, 122, 255, 0.6),
-      0 0 20px rgba(0, 122, 255, 0.8),
-      0 0 30px rgba(0, 122, 255, 0.9);
+      0 0 5px rgba(var(--color-primary-rgb), 0.4),
+      0 0 10px rgba(var(--color-primary-rgb), 0.6),
+      0 0 20px rgba(var(--color-primary-rgb), 0.8),
+      0 0 30px rgba(var(--color-primary-rgb), 0.9);
   }
   50% {
     box-shadow:
@@ -154,10 +154,10 @@
   }
   100% {
     box-shadow:
-      0 0 5px rgba(0, 122, 255, 0.4),
-      0 0 10px rgba(0, 122, 255, 0.6),
-      0 0 20px rgba(0, 122, 255, 0.8),
-      0 0 30px rgba(0, 122, 255, 0.9);
+      0 0 5px rgba(var(--color-primary-rgb), 0.4),
+      0 0 10px rgba(var(--color-primary-rgb), 0.6),
+      0 0 20px rgba(var(--color-primary-rgb), 0.8),
+      0 0 30px rgba(var(--color-primary-rgb), 0.9);
   }
 }
 

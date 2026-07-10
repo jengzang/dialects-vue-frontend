@@ -193,7 +193,7 @@ const {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    border: 1px solid rgba(0, 122, 255, 0.18);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.18);
     background: var(--glass-70);
     border-radius: 999px;
     padding: 10px 14px;
@@ -208,7 +208,7 @@ const {
   .step-pill.active {
     background: linear-gradient(135deg, var(--glass-90), rgba(224, 238, 255, 0.88));
     color: var(--text-deep);
-    border-color: rgba(0, 122, 255, 0.34);
+    border-color: rgba(var(--color-primary-rgb), 0.34);
   }
 
   .step-pill__index {
@@ -218,7 +218,7 @@ const {
     width: 24px;
     height: 24px;
     border-radius: 999px;
-    background: rgba(0, 122, 255, 0.12);
+    background: rgba(var(--color-primary-rgb), 0.12);
     font-size: 12px;
     font-weight: 700;
   }
@@ -260,8 +260,8 @@ const {
   }
 
   .panel-alert--error {
-    background: rgba(255, 59, 48, 0.12);
-    border: 1px solid rgba(255, 59, 48, 0.18);
+    background: rgba(var(--color-error-light-rgb), 0.12);
+    border: 1px solid rgba(var(--color-error-light-rgb), 0.18);
     color: var(--color-error-dark);
   }
 
@@ -350,7 +350,7 @@ const {
   .preview-chip {
     padding: 6px 10px;
     border-radius: 999px;
-    background: rgba(0, 122, 255, 0.12);
+    background: rgba(var(--color-primary-rgb), 0.12);
     color: var(--color-primary);
     font-size: 13px;
   }
@@ -412,12 +412,12 @@ const {
   }
 
   .status-badge.is-completed {
-    background: rgba(52, 199, 89, 0.12);
+    background: rgba(var(--color-success-rgb), 0.12);
     color: var(--color-success);
   }
 
   .status-badge.is-pending {
-    background: rgba(0, 122, 255, 0.12);
+    background: rgba(var(--color-primary-rgb), 0.12);
     color: var(--color-primary);
   }
 

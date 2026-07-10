@@ -724,11 +724,11 @@ $transition-base: 0.3s;
   margin-left: auto;
 
   :deep(.select-trigger) {
-    background: rgba(0, 122, 255, 0.1);
-    border: 1px solid rgba(0, 122, 255, 0.3);
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.3);
 
     &:hover {
-      background: rgba(0, 122, 255, 0.2);
+      background: rgba(var(--color-primary-rgb), 0.2);
       border-color: $primary-blue;
     }
   }
@@ -759,7 +759,7 @@ $transition-base: 0.3s;
 
   &:focus {
     background: var(--glass-80);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3);
   }
 }
 
@@ -823,7 +823,7 @@ $transition-base: 0.3s;
 
   &.is-loaded {
     background: var(--glass-70);
-    border-color: rgba(0, 122, 255, 0.4);
+    border-color: rgba(var(--color-primary-rgb), 0.4);
   }
 }
 
@@ -859,11 +859,11 @@ $transition-base: 0.3s;
   );
   border: none;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
   transition: all $transition-fast;
 
   &:hover:not(:disabled) {
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.4);
     transform: scale(1.05);
   }
 
@@ -879,13 +879,13 @@ $transition-base: 0.3s;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  background: rgba(0, 122, 255, 0.05);
-  border: 1px solid rgba(0, 122, 255, 0.3);
+  background: rgba(var(--color-primary-rgb), 0.05);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.3);
   border-radius: 12px;
   transition: all $transition-fast;
 
   &:hover:not(:disabled) {
-    background: rgba(0, 122, 255, 0.12);
+    background: rgba(var(--color-primary-rgb), 0.12);
     border-color: $primary-blue;
   }
 
@@ -926,7 +926,7 @@ $transition-base: 0.3s;
   padding: 16px;
   color: $primary-blue;
   font-size: 14px;
-  background: rgba(0, 122, 255, 0.05);
+  background: rgba(var(--color-primary-rgb), 0.05);
   border-radius: 12px;
 }
 

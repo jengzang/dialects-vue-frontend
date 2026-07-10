@@ -144,10 +144,10 @@ $text-body: var(--text-dark);
 $text-secondary: var(--text-tertiary);
 
 $primary: var(--color-primary);
-$primary-divider: rgba(0, 122, 255, 0.2);
-$primary-background-light: rgba(0, 122, 255, 0.05);
-$primary-background-medium: rgba(0, 122, 255, 0.08);
-$primary-background-strong: rgba(0, 122, 255, 0.1);
+$primary-divider: rgba(var(--color-primary-rgb), 0.2);
+$primary-background-light: rgba(var(--color-primary-rgb), 0.05);
+$primary-background-medium: rgba(var(--color-primary-rgb), 0.08);
+$primary-background-strong: rgba(var(--color-primary-rgb), 0.1);
 
 $border-light: rgba(0, 0, 0, 0.05);
 $border-medium: rgba(0, 0, 0, 0.08);

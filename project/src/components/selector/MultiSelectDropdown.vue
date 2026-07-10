@@ -302,7 +302,7 @@ $transition-fast: 0.2s;
   outline: none;
 
   &:focus {
-    border-color: rgba(0, 122, 255, 0.5);
+    border-color: rgba(var(--color-primary-rgb), 0.5);
   }
 }
 

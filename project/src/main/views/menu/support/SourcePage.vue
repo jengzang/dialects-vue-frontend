@@ -160,18 +160,18 @@ $transition-duration: 0.3s;
   &:hover {
     background: $white;
     border-color: $primary-blue;
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
     transform: translateY(-2px);
   }
 
   &.active {
     background: linear-gradient(
       135deg,
-      rgba(0, 122, 255, 0.1),
-      rgba(0, 122, 255, 0.05)
+      rgba(var(--color-primary-rgb), 0.1),
+      rgba(var(--color-primary-rgb), 0.05)
     );
     border-color: $primary-blue;
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
   }
 }
 

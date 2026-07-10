@@ -664,7 +664,7 @@ $transition-base: 0.3s;
 
   &:focus {
     background: var(--glass-80);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3);
   }
 }
 
@@ -731,7 +731,7 @@ $transition-base: 0.3s;
 
   &.is-loaded {
     background: var(--glass-70);
-    border-color: rgba(0, 122, 255, 0.4);
+    border-color: rgba(var(--color-primary-rgb), 0.4);
   }
 }
 
@@ -769,11 +769,11 @@ $transition-base: 0.3s;
   );
   border: none;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
   transition: all $transition-fast;
 
   &:hover:not(:disabled) {
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.4);
     transform: scale(1.05);
   }
 
@@ -792,7 +792,7 @@ $transition-base: 0.3s;
   color: $success-green;
   font-size: 13px;
   font-weight: 600;
-  background: rgba(52, 199, 89, 0.15);
+  background: rgba(var(--color-success-rgb), 0.15);
   border-radius: 10px;
 }
 
@@ -809,7 +809,7 @@ $transition-base: 0.3s;
   transition: all $transition-fast ease;
 
   &:hover:not(:disabled) {
-    background: rgba(52, 199, 89, 0.15);
+    background: rgba(var(--color-success-rgb), 0.15);
     transform: scale(1.15);
   }
 
@@ -828,7 +828,7 @@ $transition-base: 0.3s;
   padding: 16px;
   color: $primary-blue;
   font-size: 14px;
-  background: rgba(0, 122, 255, 0.05);
+  background: rgba(var(--color-primary-rgb), 0.05);
   border-radius: 12px;
 }
 

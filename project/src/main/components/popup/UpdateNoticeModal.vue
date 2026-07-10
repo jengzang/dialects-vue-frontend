@@ -163,11 +163,11 @@ $text-secondary: rgba(0, 0, 0, 0.6);
 $text-secondary-strong: rgba(0, 0, 0, 0.7);
 $text-white: var(--text-white);
 
-$primary-background: rgba(0, 122, 255, 0.05);
-$primary-background-hover: rgba(0, 122, 255, 0.08);
-$primary-border-light: rgba(0, 122, 255, 0.1);
-$primary-shadow: rgba(0, 122, 255, 0.3);
-$primary-shadow-hover: rgba(0, 122, 255, 0.4);
+$primary-background: rgba(var(--color-primary-rgb), 0.05);
+$primary-background-hover: rgba(var(--color-primary-rgb), 0.08);
+$primary-border-light: rgba(var(--color-primary-rgb), 0.1);
+$primary-shadow: rgba(var(--color-primary-rgb), 0.3);
+$primary-shadow-hover: rgba(var(--color-primary-rgb), 0.4);
 
 $card-radius: 12px;
 $transition-fast: 0.2s;

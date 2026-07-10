@@ -587,7 +587,7 @@ $region-glass-border: var(--glass-60);
   &:focus-visible {
     outline: none;
     box-shadow:
-      0 0 0 3px rgba(0, 122, 255, 0.18),
+      0 0 0 3px rgba(var(--color-primary-rgb), 0.18),
       0 10px 26px rgba(15, 23, 42, 0.12);
   }
 }
@@ -615,9 +615,9 @@ $region-glass-border: var(--glass-60);
     z-index: -2;
     pointer-events: none;
     background:
-      radial-gradient(circle at 12% 10%, rgba(0, 122, 255, 0.16), transparent 30%),
+      radial-gradient(circle at 12% 10%, rgba(var(--color-primary-rgb), 0.16), transparent 30%),
       radial-gradient(circle at 84% 14%, rgba(88, 86, 214, 0.14), transparent 32%),
-      radial-gradient(circle at 70% 86%, rgba(52, 199, 89, 0.11), transparent 34%),
+      radial-gradient(circle at 70% 86%, rgba(var(--color-success-rgb), 0.11), transparent 34%),
       linear-gradient(180deg, var(--bg-blue-tint) 0%, var(--bg-blue-light) 48%, var(--bg-light-gray) 100%);
   }
 
@@ -671,7 +671,7 @@ $region-glass-border: var(--glass-60);
 
   .title-icon {
     display: inline-flex;
-    filter: drop-shadow(0 8px 18px rgba(0, 122, 255, 0.2));
+    filter: drop-shadow(0 8px 18px rgba(var(--color-primary-rgb), 0.2));
   }
 
   .header-stats {
@@ -692,10 +692,10 @@ $region-glass-border: var(--glass-60);
     border-radius: 999px;
     background:
       linear-gradient(135deg, var(--glass-70), var(--glass-40)),
-      rgba(0, 122, 255, 0.06);
+      rgba(var(--color-primary-rgb), 0.06);
     box-shadow:
       inset 0 1px 0 var(--glass-70),
-      0 8px 18px rgba(0, 122, 255, 0.06);
+      0 8px 18px rgba(var(--color-primary-rgb), 0.06);
   }
 
   .header-stat-label {
@@ -730,11 +730,11 @@ $region-glass-border: var(--glass-60);
     text-overflow: ellipsis;
     white-space: nowrap;
     background:
-      linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(88, 86, 214, 0.88)),
+      linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(88, 86, 214, 0.88)),
       $region-accent;
     box-shadow:
       inset 0 1px 0 var(--glass-40),
-      0 10px 24px rgba(0, 122, 255, 0.24);
+      0 10px 24px rgba(var(--color-primary-rgb), 0.24);
   }
 }
 
@@ -749,11 +749,11 @@ $region-glass-border: var(--glass-60);
   color: $region-text;
 
   &:hover:not(:disabled) {
-    border-color: rgba(0, 122, 255, 0.3);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
     color: $region-accent;
     background:
       linear-gradient(135deg, var(--glass-90), var(--glass-50)),
-      rgba(0, 122, 255, 0.08);
+      rgba(var(--color-primary-rgb), 0.08);
   }
 }
 
@@ -764,16 +764,16 @@ $region-glass-border: var(--glass-60);
 .btn-primary {
   color: var(--text-white);
   background:
-    linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
     $region-accent;
   box-shadow:
     inset 0 1px 0 var(--glass-30),
-    0 12px 28px rgba(0, 122, 255, 0.26);
+    0 12px 28px rgba(var(--color-primary-rgb), 0.26);
 
   &:hover:not(:disabled) {
     box-shadow:
       inset 0 1px 0 var(--glass-30),
-      0 16px 36px rgba(0, 122, 255, 0.34);
+      0 16px 36px rgba(var(--color-primary-rgb), 0.34);
   }
 }
 
@@ -823,10 +823,10 @@ $region-glass-border: var(--glass-60);
 
   &:focus {
     outline: none;
-    border-color: rgba(0, 122, 255, 0.56);
+    border-color: rgba(var(--color-primary-rgb), 0.56);
     background: var(--glass-80);
     box-shadow:
-      0 0 0 4px rgba(0, 122, 255, 0.11),
+      0 0 0 4px rgba(var(--color-primary-rgb), 0.11),
       inset 0 1px 0 var(--glass-80);
   }
 }
@@ -890,18 +890,18 @@ $region-glass-border: var(--glass-60);
     border-radius: inherit;
     pointer-events: none;
     background:
-      radial-gradient(circle at 10% 0%, rgba(0, 122, 255, 0.12), transparent 32%),
-      radial-gradient(circle at 92% 18%, rgba(52, 199, 89, 0.1), transparent 28%);
+      radial-gradient(circle at 10% 0%, rgba(var(--color-primary-rgb), 0.12), transparent 32%),
+      radial-gradient(circle at 92% 18%, rgba(var(--color-success-rgb), 0.1), transparent 28%);
     opacity: 0;
     transition: opacity 0.18s ease;
   }
 
   &:hover {
     transform: translateY(-2px);
-    border-color: rgba(0, 122, 255, 0.24);
+    border-color: rgba(var(--color-primary-rgb), 0.24);
     box-shadow:
       0 26px 76px rgba(15, 23, 42, 0.14),
-      0 12px 28px rgba(0, 122, 255, 0.08),
+      0 12px 28px rgba(var(--color-primary-rgb), 0.08),
       inset 0 1px 0 var(--glass-80);
 
     &::before {
@@ -962,10 +962,10 @@ $region-glass-border: var(--glass-60);
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
-    border-color: rgba(0, 122, 255, 0.32);
+    border-color: rgba(var(--color-primary-rgb), 0.32);
     background:
       linear-gradient(135deg, var(--glass-90), var(--glass-50)),
-      rgba(0, 122, 255, 0.08);
+      rgba(var(--color-primary-rgb), 0.08);
   }
 
   &:active:not(:disabled) {
@@ -979,16 +979,16 @@ $region-glass-border: var(--glass-60);
   }
 
   &.danger {
-    border-color: rgba(255, 59, 48, 0.2);
+    border-color: rgba(var(--color-error-light-rgb), 0.2);
     background:
       linear-gradient(135deg, var(--glass-70), var(--glass-40)),
-      rgba(255, 59, 48, 0.08);
+      rgba(var(--color-error-light-rgb), 0.08);
 
     &:hover:not(:disabled) {
-      border-color: rgba(255, 59, 48, 0.38);
+      border-color: rgba(var(--color-error-light-rgb), 0.38);
       background:
         linear-gradient(135deg, var(--glass-80), var(--glass-40)),
-        rgba(255, 59, 48, 0.13);
+        rgba(var(--color-error-light-rgb), 0.13);
     }
   }
 }
@@ -1030,7 +1030,7 @@ $region-glass-border: var(--glass-60);
 
 .info-badge {
   color: $region-accent;
-  background: rgba(0, 122, 255, 0.1);
+  background: rgba(var(--color-primary-rgb), 0.1);
   box-shadow: inset 0 1px 0 var(--glass-60);
 }
 
@@ -1066,8 +1066,8 @@ $region-glass-border: var(--glass-60);
 
 .location-more {
   color: $region-accent;
-  background: rgba(0, 122, 255, 0.1);
-  border: 1px solid rgba(0, 122, 255, 0.12);
+  background: rgba(var(--color-primary-rgb), 0.1);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.12);
 }
 
 @media (max-width: 768px) {

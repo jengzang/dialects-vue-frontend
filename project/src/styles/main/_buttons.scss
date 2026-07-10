@@ -23,14 +23,14 @@
 }
 
 .main-glass-button[data-variant='primary'] {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.78), rgba(0, 122, 255, 0.6));
+  background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.78), rgba(var(--color-primary-rgb), 0.6));
   color: white;
-  border-color: rgba(0, 122, 255, 0.52);
+  border-color: rgba(var(--color-primary-rgb), 0.52);
 }
 
 .main-glass-button[data-variant='primary']:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.86), rgba(0, 122, 255, 0.68));
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+  background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.86), rgba(var(--color-primary-rgb), 0.68));
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
   transform: translateY(-1px);
 }
 
@@ -59,7 +59,7 @@
 
 .main-glass-button[data-active='true'] {
   background: rgba(0, 123, 255, 0.5);
-  border-color: rgba(0, 122, 255, 0.5);
+  border-color: rgba(var(--color-primary-rgb), 0.5);
 }
 
 // == Legacy button classes migrated from _legacy.scss ==
@@ -139,7 +139,7 @@
 }
 
 .enter-btn {
-  background: rgba(0, 122, 255, 0.86);
+  background: rgba(var(--color-primary-rgb), 0.86);
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -148,7 +148,7 @@
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.3);
   white-space: nowrap;
 }
 

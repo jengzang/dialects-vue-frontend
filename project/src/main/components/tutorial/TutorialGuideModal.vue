@@ -1044,7 +1044,7 @@ $float-catalog-button-left:0;
       font-weight: 700;
       cursor: pointer;
       box-shadow:
-        0 10px 24px rgba(0, 122, 255, 0.32),
+        0 10px 24px rgba(var(--color-primary-rgb), 0.32),
         inset 0 1px 0 var(--glass-30);
 
       &__icon {

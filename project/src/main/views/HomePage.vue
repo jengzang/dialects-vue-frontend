@@ -754,7 +754,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
   overflow-x: hidden;
   background: linear-gradient(135deg, var(--bg-body) 0%, var(--bg-light-gray) 100%);
   border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(0, 122, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(var(--color-primary-rgb), 0.12);
 }
 
 .bg-gradient {
@@ -768,7 +768,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
   background:
     radial-gradient(
       circle at 20% 30%,
-      rgba(0, 122, 255, 0.12) 0%,
+      rgba(var(--color-primary-rgb), 0.12) 0%,
       transparent 50%
     ),
     radial-gradient(
@@ -799,7 +799,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     width: clamp(220px, 40vw, 380px);
     height: auto;
     margin-bottom: 1.5rem;
-    filter: drop-shadow(0 4px 12px rgba(0, 122, 255, 0.15));
+    filter: drop-shadow(0 4px 12px rgba(var(--color-primary-rgb), 0.15));
   }
 
   &-title {
@@ -807,7 +807,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     font-size: clamp(1.25rem, 3vw, 1.75rem);
     font-weight: 600;
     letter-spacing: 0.05em;
-    color: rgba(0, 122, 255, 0.85);
+    color: rgba(var(--color-primary-rgb), 0.85);
   }
 
   &-subtitle {
@@ -875,11 +875,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
   @include primary-gradient;
 
   color: white;
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(0, 122, 255, 0.4);
+    box-shadow: 0 6px 24px rgba(var(--color-primary-rgb), 0.4);
   }
 
   &.btn-explore {
@@ -888,10 +888,10 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
       $success 0%,
       $success-dark 100%
     );
-    box-shadow: 0 4px 16px rgba(52, 199, 89, 0.3);
+    box-shadow: 0 4px 16px rgba(var(--color-success-rgb), 0.3);
 
     &:hover {
-      box-shadow: 0 6px 24px rgba(52, 199, 89, 0.4);
+      box-shadow: 0 6px 24px rgba(var(--color-success-rgb), 0.4);
     }
   }
 }
@@ -899,12 +899,12 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 .btn-secondary {
   background: var(--glass-70);
   @include glass-blur;
-  border: 1.5px solid rgba(0, 122, 255, 0.3);
+  border: 1.5px solid rgba(var(--color-primary-rgb), 0.3);
   color: $primary;
 
   &:hover {
     background: var(--glass-90);
-    border-color: rgba(0, 122, 255, 0.5);
+    border-color: rgba(var(--color-primary-rgb), 0.5);
     transform: translateY(-2px);
   }
 }
@@ -949,9 +949,9 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 .feature-card {
   overflow: hidden;
   background: var(--glass-70);
-  border: 1px solid rgba(0, 122, 255, 0.15);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.15);
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.08);
   animation: cardFadeIn 0.4s ease backwards;
   transition: all 0.25s ease;
 
@@ -963,8 +963,8 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 
   &:hover {
     background: var(--glass-90);
-    border-color: rgba(0, 122, 255, 0.3);
-    box-shadow: 0 8px 20px rgba(0, 122, 255, 0.15);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
+    box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.15);
     transform: translateY(-2px);
 
     .card-icon {
@@ -974,8 +974,8 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 
   &.expanded {
     background: var(--glass-90);
-    border-color: rgba(0, 122, 255, 0.35);
-    box-shadow: 0 6px 18px rgba(0, 122, 255, 0.18);
+    border-color: rgba(var(--color-primary-rgb), 0.35);
+    box-shadow: 0 6px 18px rgba(var(--color-primary-rgb), 0.18);
 
     .card-icon {
       transform: scale(1.1);
@@ -1026,7 +1026,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     transition: all 0.3s $ease-apple;
 
     &:hover {
-      background: rgba(0, 122, 255, 0.03);
+      background: rgba(var(--color-primary-rgb), 0.03);
     }
 
     &:active {
@@ -1040,7 +1040,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     height: 48px;
     background: linear-gradient(
       135deg,
-      rgba(0, 122, 255, 0.1) 0%,
+      rgba(var(--color-primary-rgb), 0.1) 0%,
       rgba(0, 95, 211, 0.15) 100%
     );
     border-radius: 12px;
@@ -1088,7 +1088,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
   flex-shrink: 0;
   width: 32px;
   height: 32px;
-  background: rgba(0, 122, 255, 0.1);
+  background: rgba(var(--color-primary-rgb), 0.1);
   border: 2px solid $primary;
   border-radius: 50%;
   color: $primary;
@@ -1100,7 +1100,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
   @include flex-center;
 
   &:hover {
-    background: rgba(0, 122, 255, 0.2);
+    background: rgba(var(--color-primary-rgb), 0.2);
     transform: scale(1.1);
   }
 }
@@ -1112,7 +1112,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   background: var(--glass-80);
-  border: 1px solid rgba(0, 122, 255, 0.1);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.1);
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   color: inherit;
@@ -1123,20 +1123,20 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
   &::after {
     content: '→';
     margin-left: auto;
-    color: rgba(0, 122, 255, 0.6);
+    color: rgba(var(--color-primary-rgb), 0.6);
     font-size: 1.4rem;
     font-weight: bold;
     transition: all 0.2s ease;
   }
 
   &:hover {
-    background: rgba(0, 122, 255, 0.08);
-    border-color: rgba(0, 122, 255, 0.3);
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
+    background: rgba(var(--color-primary-rgb), 0.08);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.15);
     transform: translateX(4px);
 
     &::after {
-      color: rgba(0, 122, 255, 1);
+      color: rgba(var(--color-primary-rgb), 1);
       transform: translateX(3px);
     }
 
@@ -1219,14 +1219,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     padding: 0.875rem 1rem;
     background: var(--glass-60);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 122, 255, 0.12);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.12);
     border-radius: 10px;
     transition: all 0.3s ease;
 
     &:hover {
       background: var(--glass-80);
-      border-color: rgba(0, 122, 255, 0.2);
-      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.08);
+      border-color: rgba(var(--color-primary-rgb), 0.2);
+      box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.08);
       transform: translateY(-2px);
     }
   }
@@ -1243,7 +1243,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     height: 32px;
     background: linear-gradient(
       135deg,
-      rgba(0, 122, 255, 0.08) 0%,
+      rgba(var(--color-primary-rgb), 0.08) 0%,
       rgba(0, 95, 211, 0.12) 100%
     );
     border-radius: 8px;
@@ -1302,17 +1302,17 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     padding: 1rem 1.25rem;
     background: var(--glass-60);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(0, 122, 255, 0.15);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.15);
     border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.08);
+    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.08);
     text-decoration: none;
     transition: all 0.3s $ease-apple;
     will-change: transform;
 
     &:hover {
       background: var(--glass-80);
-      border-color: rgba(0, 122, 255, 0.3);
-      box-shadow: 0 12px 32px rgba(0, 122, 255, 0.18);
+      border-color: rgba(var(--color-primary-rgb), 0.3);
+      box-shadow: 0 12px 32px rgba(var(--color-primary-rgb), 0.18);
       transform: translateY(-3px) scale(1.02);
 
       .project-arrow {
@@ -1325,7 +1325,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     flex-shrink: 0;
     width: 36px;
     height: 36px;
-    background: rgba(0, 122, 255, 0.1);
+    background: rgba(var(--color-primary-rgb), 0.1);
     border-radius: 8px;
 
     @include flex-center;
@@ -1371,16 +1371,16 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     padding: 1.5rem;
     background: linear-gradient(
       135deg,
-      rgba(0, 122, 255, 0.1) 0%,
+      rgba(var(--color-primary-rgb), 0.1) 0%,
       rgba(0, 95, 211, 0.08) 100%
     );
-    border: 1px solid rgba(0, 122, 255, 0.2);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.2);
     border-radius: 16px;
     transition: all 0.25s ease;
 
     &:hover {
-      border-color: rgba(0, 122, 255, 0.3);
-      box-shadow: 0 8px 20px rgba(0, 122, 255, 0.18);
+      border-color: rgba(var(--color-primary-rgb), 0.3);
+      box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.18);
       transform: translateY(-2px);
     }
   }
@@ -1416,7 +1416,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 
     border: none;
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.25);
     color: white;
     font-size: 0.9375rem;
     font-weight: 600;
@@ -1424,7 +1424,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     transition: all 0.3s $ease-apple;
 
     &:hover {
-      box-shadow: 0 6px 20px rgba(0, 122, 255, 0.35);
+      box-shadow: 0 6px 20px rgba(var(--color-primary-rgb), 0.35);
       transform: translateY(-2px);
     }
   }
@@ -1448,18 +1448,18 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     padding: 2rem;
     background: linear-gradient(
       135deg,
-      rgba(0, 122, 255, 0.08) 0%,
+      rgba(var(--color-primary-rgb), 0.08) 0%,
       rgba(0, 95, 211, 0.05) 100%
     );
     backdrop-filter: blur(20px);
-    border: 1.5px solid rgba(0, 122, 255, 0.2);
+    border: 1.5px solid rgba(var(--color-primary-rgb), 0.2);
     border-radius: 20px;
-    box-shadow: 0 4px 16px rgba(0, 122, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.1);
     transition: all 0.3s $ease-apple;
 
     &:hover {
-      border-color: rgba(0, 122, 255, 0.3);
-      box-shadow: 0 12px 32px rgba(0, 122, 255, 0.18);
+      border-color: rgba(var(--color-primary-rgb), 0.3);
+      box-shadow: 0 12px 32px rgba(var(--color-primary-rgb), 0.18);
       transform: translateY(-3px);
     }
   }
@@ -1515,24 +1515,24 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
       @include primary-gradient;
 
       color: white;
-      box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+      box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
 
       &:hover {
-        box-shadow: 0 6px 24px rgba(0, 122, 255, 0.4);
+        box-shadow: 0 6px 24px rgba(var(--color-primary-rgb), 0.4);
         transform: translateY(-2px);
       }
     }
 
     &.secondary {
       background: var(--glass-80);
-      border: 1.5px solid rgba(0, 122, 255, 0.3);
-      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.1);
+      border: 1.5px solid rgba(var(--color-primary-rgb), 0.3);
+      box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.1);
       color: $primary;
 
       &:hover {
         background: white;
-        border-color: rgba(0, 122, 255, 0.5);
-        box-shadow: 0 4px 16px rgba(0, 122, 255, 0.2);
+        border-color: rgba(var(--color-primary-rgb), 0.5);
+        box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.2);
         transform: translateY(-2px);
       }
     }
@@ -1564,7 +1564,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
   padding: 2.5rem clamp(1.5rem, 4vw, 2.5rem);
   background: var(--glass-40);
   backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(0, 122, 255, 0.1);
+  border-top: 1px solid rgba(var(--color-primary-rgb), 0.1);
 
   &-content {
     max-width: 1300px;
@@ -1592,14 +1592,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     transition: all 0.3s ease;
 
     &:hover {
-      background: rgba(0, 122, 255, 0.08);
+      background: rgba(var(--color-primary-rgb), 0.08);
       color: $primary-dark;
       text-decoration: underline;
     }
   }
 
   &-divider {
-    color: rgba(0, 122, 255, 0.3);
+    color: rgba(var(--color-primary-rgb), 0.3);
     font-weight: 300;
   }
 

@@ -211,7 +211,7 @@ $transition-base: 0.3s;
 
   &:focus {
     background: var(--glass-80);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3);
   }
 }
 

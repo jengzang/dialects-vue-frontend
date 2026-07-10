@@ -267,8 +267,8 @@ $transition-expand: 0.3s;
   }
 
   &.is-match {
-    background: rgba(255, 215, 0, 0.15);
-    border: 1px solid rgba(255, 215, 0, 0.3);
+    background: rgba(var(--color-gold-rgb), 0.15);
+    border: 1px solid rgba(var(--color-gold-rgb), 0.3);
   }
 }
 
@@ -367,7 +367,7 @@ $transition-expand: 0.3s;
   gap: 8px;
   margin-left: 14px;
   padding-left: 20px;
-  border-left: 2px solid rgba(0, 122, 255, 0.1);
+  border-left: 2px solid rgba(var(--color-primary-rgb), 0.1);
   transition: height $transition-expand cubic-bezier(0.25, 0.8, 0.25, 1);
 
   @media (max-width: 768px) {
@@ -397,7 +397,7 @@ $transition-expand: 0.3s;
   transition: all $transition-expand ease;
 
   &:hover {
-    background: rgba(0, 122, 255, 0.1);
+    background: rgba(var(--color-primary-rgb), 0.1);
   }
 
   &.is-open {

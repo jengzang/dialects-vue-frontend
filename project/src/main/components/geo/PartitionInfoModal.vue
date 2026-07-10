@@ -805,7 +805,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   &.active {
     @include primary-gradient;
 
-    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
     color: var(--text-white);
   }
 }
@@ -831,7 +831,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
   border: none;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
   color: var(--text-white);
   font-size: 14px;
   font-weight: 600;
@@ -839,7 +839,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   transition: all 0.3s ease;
 
   &:hover:not(:disabled) {
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.4);
     transform: translateY(-1px);
   }
 
@@ -917,7 +917,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     .selected-count {
       margin-left: 0.5rem;
       padding: 0.2rem 0.5rem;
-      background: rgba(0, 122, 255, 0.15);
+      background: rgba(var(--color-primary-rgb), 0.15);
       border-radius: 10px;
       color: $primary;
       font-size: 0.85em;
@@ -946,20 +946,20 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     }
 
     &.select {
-      background: rgba(0, 122, 255, 0.12);
+      background: rgba(var(--color-primary-rgb), 0.12);
       color: $primary-dark;
 
       &:hover:not(:disabled) {
-        background: rgba(0, 122, 255, 0.2);
+        background: rgba(var(--color-primary-rgb), 0.2);
       }
     }
 
     &.cancel {
-      background: rgba(255, 59, 48, 0.14);
+      background: rgba(var(--color-error-light-rgb), 0.14);
       color: $danger;
 
       &:hover:not(:disabled) {
-        background: rgba(255, 59, 48, 0.24);
+        background: rgba(var(--color-error-light-rgb), 0.24);
       }
     }
   }
@@ -979,7 +979,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     transition: all 0.3s ease;
 
     &:hover {
-      background: rgba(0, 122, 255, 0.1);
+      background: rgba(var(--color-primary-rgb), 0.1);
     }
 
     &.is-open {
@@ -991,7 +991,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     margin-top: 8px;
     margin-left: 14px;
     padding-left: 20px;
-    border-left: 2px solid rgba(0, 122, 255, 0.1);
+    border-left: 2px solid rgba(var(--color-primary-rgb), 0.1);
     transition: height 0.3s $ease-fluid;
   }
 
@@ -1023,8 +1023,8 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     }
 
     &.selected {
-      background: rgba(0, 122, 255, 0.15);
-      border: 1px solid rgba(0, 122, 255, 0.3);
+      background: rgba(var(--color-primary-rgb), 0.15);
+      border: 1px solid rgba(var(--color-primary-rgb), 0.3);
     }
 
     &.disabled {

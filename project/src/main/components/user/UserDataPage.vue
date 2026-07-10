@@ -828,7 +828,7 @@ $user-success: var(--color-success);
   &:focus-visible {
     outline: none;
     box-shadow:
-      0 0 0 3px rgba(0, 122, 255, 0.18),
+      0 0 0 3px rgba(var(--color-primary-rgb), 0.18),
       0 10px 26px rgba(15, 23, 42, 0.12);
   }
 }
@@ -855,9 +855,9 @@ $user-success: var(--color-success);
     z-index: -2;
     pointer-events: none;
     background:
-      radial-gradient(circle at 12% 8%, rgba(0, 122, 255, 0.16), transparent 30%),
+      radial-gradient(circle at 12% 8%, rgba(var(--color-primary-rgb), 0.16), transparent 30%),
       radial-gradient(circle at 82% 12%, rgba(88, 86, 214, 0.15), transparent 32%),
-      radial-gradient(circle at 70% 86%, rgba(52, 199, 89, 0.12), transparent 34%),
+      radial-gradient(circle at 70% 86%, rgba(var(--color-success-rgb), 0.12), transparent 34%),
       linear-gradient(180deg, var(--bg-blue-tint) 0%, var(--bg-blue-light) 48%, var(--bg-light-gray) 100%);
   }
 
@@ -908,7 +908,7 @@ $user-success: var(--color-success);
 
 .title-icon {
   display: inline-flex;
-  filter: drop-shadow(0 8px 18px rgba(0, 122, 255, 0.2));
+  filter: drop-shadow(0 8px 18px rgba(var(--color-primary-rgb), 0.2));
 }
 
 .username-badge {
@@ -925,11 +925,11 @@ $user-success: var(--color-success);
   text-overflow: ellipsis;
   white-space: nowrap;
   background:
-    linear-gradient(135deg, rgba(0, 122, 255, 0.9), rgba(88, 86, 214, 0.86)),
-    rgba(0, 122, 255, 0.72);
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.9), rgba(88, 86, 214, 0.86)),
+    rgba(var(--color-primary-rgb), 0.72);
   box-shadow:
     inset 0 1px 0 var(--glass-40),
-    0 10px 24px rgba(0, 122, 255, 0.24);
+    0 10px 24px rgba(var(--color-primary-rgb), 0.24);
 }
 
 .stats {
@@ -983,10 +983,10 @@ $user-success: var(--color-success);
   color: $user-text;
 
   &:hover:not(:disabled) {
-    border-color: rgba(0, 122, 255, 0.28);
+    border-color: rgba(var(--color-primary-rgb), 0.28);
     background:
       linear-gradient(135deg, var(--glass-90), var(--glass-50)),
-      rgba(0, 122, 255, 0.08);
+      rgba(var(--color-primary-rgb), 0.08);
   }
 }
 
@@ -997,47 +997,47 @@ $user-success: var(--color-success);
 .btn-primary {
   color: var(--text-white);
   background:
-    linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
     $user-accent;
   box-shadow:
     inset 0 1px 0 var(--glass-30),
-    0 12px 28px rgba(0, 122, 255, 0.26);
+    0 12px 28px rgba(var(--color-primary-rgb), 0.26);
 
   &:hover:not(:disabled) {
     box-shadow:
       inset 0 1px 0 var(--glass-30),
-      0 16px 36px rgba(0, 122, 255, 0.34);
+      0 16px 36px rgba(var(--color-primary-rgb), 0.34);
   }
 }
 
 .btn-warning {
   color: var(--text-white);
   background:
-    linear-gradient(135deg, rgba(255, 149, 0, 0.96), rgba(255, 107, 0, 0.9)),
+    linear-gradient(135deg, rgba(var(--color-warning-rgb), 0.96), rgba(255, 107, 0, 0.9)),
     $user-warning;
   box-shadow:
     inset 0 1px 0 var(--glass-30),
-    0 12px 28px rgba(255, 149, 0, 0.22);
+    0 12px 28px rgba(var(--color-warning-rgb), 0.22);
 }
 
 .btn-danger {
   color: var(--text-white);
   background:
-    linear-gradient(135deg, rgba(255, 59, 48, 0.96), rgba(211, 47, 47, 0.92)),
+    linear-gradient(135deg, rgba(var(--color-error-light-rgb), 0.96), rgba(211, 47, 47, 0.92)),
     $user-danger;
   box-shadow:
     inset 0 1px 0 var(--glass-30),
-    0 12px 28px rgba(255, 59, 48, 0.22);
+    0 12px 28px rgba(var(--color-error-light-rgb), 0.22);
 }
 
 .btn-add-row {
   color: var(--text-white);
   background:
-    linear-gradient(135deg, rgba(52, 199, 89, 0.96), rgba(40, 167, 69, 0.9)),
+    linear-gradient(135deg, rgba(var(--color-success-rgb), 0.96), rgba(40, 167, 69, 0.9)),
     $user-success;
   box-shadow:
     inset 0 1px 0 var(--glass-30),
-    0 12px 28px rgba(52, 199, 89, 0.22);
+    0 12px 28px rgba(var(--color-success-rgb), 0.22);
 }
 
 .btn-edit {
@@ -1047,11 +1047,11 @@ $user-success: var(--color-success);
   color: var(--text-white);
   font-size: 12px;
   background:
-    linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
     $user-accent;
   box-shadow:
     inset 0 1px 0 var(--glass-30),
-    0 8px 18px rgba(0, 122, 255, 0.24);
+    0 8px 18px rgba(var(--color-primary-rgb), 0.24);
 }
 
 .liquid-input,
@@ -1078,10 +1078,10 @@ $user-success: var(--color-success);
 
   &:focus {
     outline: none;
-    border-color: rgba(0, 122, 255, 0.56);
+    border-color: rgba(var(--color-primary-rgb), 0.56);
     background: var(--glass-90);
     box-shadow:
-      0 0 0 4px rgba(0, 122, 255, 0.11),
+      0 0 0 4px rgba(var(--color-primary-rgb), 0.11),
       inset 0 1px 0 var(--glass-80);
   }
 }
@@ -1270,34 +1270,34 @@ $user-success: var(--color-success);
   font-size: 13px;
 
   &:hover:not(:disabled) {
-    border-color: rgba(0, 122, 255, 0.38);
+    border-color: rgba(var(--color-primary-rgb), 0.38);
     color: $user-accent;
     background:
       linear-gradient(135deg, var(--glass-90), var(--glass-50)),
-      rgba(0, 122, 255, 0.08);
+      rgba(var(--color-primary-rgb), 0.08);
   }
 
   &.active {
     color: var(--text-white);
-    border-color: rgba(0, 122, 255, 0.45);
+    border-color: rgba(var(--color-primary-rgb), 0.45);
     background:
-      linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
+      linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
       $user-accent;
     box-shadow:
       inset 0 1px 0 var(--glass-30),
-      0 12px 24px rgba(0, 122, 255, 0.24);
+      0 12px 24px rgba(var(--color-primary-rgb), 0.24);
   }
 }
 
 .hint {
   margin: 0 0 14px;
   padding: 10px 12px;
-  border: 1px solid rgba(0, 122, 255, 0.12);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.12);
   border-radius: 14px;
   color: var(--text-slate);
   font-size: 13px;
   font-weight: 600;
-  background: rgba(0, 122, 255, 0.06);
+  background: rgba(var(--color-primary-rgb), 0.06);
 }
 
 .batch-table-controls {
@@ -1365,7 +1365,7 @@ $user-success: var(--color-success);
   }
 
   tr:hover td {
-    background: rgba(0, 122, 255, 0.045);
+    background: rgba(var(--color-primary-rgb), 0.045);
   }
 
   input {
@@ -1417,11 +1417,11 @@ $user-success: var(--color-success);
   line-height: 1;
   cursor: pointer;
   background:
-    linear-gradient(135deg, rgba(255, 59, 48, 0.96), rgba(211, 47, 47, 0.92)),
+    linear-gradient(135deg, rgba(var(--color-error-light-rgb), 0.96), rgba(211, 47, 47, 0.92)),
     $user-danger;
   box-shadow:
     inset 0 1px 0 var(--glass-20),
-    0 8px 18px rgba(255, 59, 48, 0.2);
+    0 8px 18px rgba(var(--color-error-light-rgb), 0.2);
   transition:
     transform 0.16s ease,
     box-shadow 0.16s ease;
@@ -1430,7 +1430,7 @@ $user-success: var(--color-success);
     transform: translateY(-1px);
     box-shadow:
       inset 0 1px 0 var(--glass-30),
-      0 12px 24px rgba(255, 59, 48, 0.26);
+      0 12px 24px rgba(var(--color-error-light-rgb), 0.26);
   }
 }
 
@@ -1468,12 +1468,12 @@ $user-success: var(--color-success);
 .preview {
   margin-top: 12px;
   padding: 12px;
-  border: 1px solid rgba(0, 122, 255, 0.14);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.14);
   border-radius: 14px;
   color: $user-accent;
   font-size: 14px;
   font-weight: 700;
-  background: rgba(0, 122, 255, 0.07);
+  background: rgba(var(--color-primary-rgb), 0.07);
 }
 
 @media (max-width: 768px) {

@@ -59,7 +59,7 @@
 .draw-tool-panel-subtitle {
   margin-top: 0.3rem;
   font-size: 0.88rem;
-  color: rgba(11, 37, 64, 0.72);
+  color: rgba(var(--text-deep-rgb), 0.72);
 }
 
 .draw-tool-panel-body {
@@ -113,7 +113,7 @@
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: rgba(11, 37, 64, 0.68);
+  color: rgba(var(--text-deep-rgb), 0.68);
 }
 
 .draw-tool-inline-actions {
@@ -165,7 +165,7 @@
 
 .draw-style-hint {
   font-size: 0.88rem;
-  color: rgba(11, 37, 64, 0.72);
+  color: rgba(var(--text-deep-rgb), 0.72);
 }
 
 .draw-layer-list {
@@ -185,8 +185,8 @@
 }
 
 .draw-layer-row[data-active='true'] {
-  background: rgba(0, 122, 255, 0.12);
-  border-color: rgba(0, 122, 255, 0.35);
+  background: rgba(var(--color-primary-rgb), 0.12);
+  border-color: rgba(var(--color-primary-rgb), 0.35);
 }
 
 .draw-layer-row-button {
@@ -281,7 +281,7 @@
 }
 
 .draw-layer-empty {
-  color: rgba(11, 37, 64, 0.65);
+  color: rgba(var(--text-deep-rgb), 0.65);
   font-size: 0.92rem;
 }
 

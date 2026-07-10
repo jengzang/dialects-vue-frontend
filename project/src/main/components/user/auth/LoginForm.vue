@@ -239,8 +239,8 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   transition: all $transition-fast $smooth-easing;
 
   &:hover {
-    border-color: rgba(255, 149, 0, 0.3);
-    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.15);
+    border-color: rgba(var(--color-warning-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-warning-rgb), 0.15);
     transform: translateY(-1px);
   }
 

@@ -954,16 +954,16 @@ onBeforeUnmount(() => {
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
-  background: rgba(255, 59, 48, 0.15);
+  background: rgba(var(--color-error-light-rgb), 0.15);
   color: var(--color-error);
-  border: 1px solid rgba(255, 59, 48, 0.3);
+  border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
 }
 
 .login-button:hover {
   background: var(--color-error);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--color-error-light-rgb), 0.3);
 }
 
 .page-header {
@@ -1110,7 +1110,7 @@ onBeforeUnmount(() => {
 
 .start-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.3);
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent-purple));
 }
 
@@ -1190,7 +1190,7 @@ onBeforeUnmount(() => {
 .mode-options .radio-option.active {
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent-purple));
   color: white;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
 }
 
 .mode-options .radio-option:not(.active):hover {

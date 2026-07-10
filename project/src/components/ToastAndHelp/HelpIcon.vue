@@ -300,7 +300,7 @@ onBeforeUnmount(() => {
 
 
 $text-color: var(--text-primary);
-$primary-shadow: rgba(0, 122, 255, 0.25);
+$primary-shadow: rgba(var(--color-primary-rgb), 0.25);
 $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 
 @mixin touch-area($size) {
@@ -368,7 +368,7 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   &:active {
     box-shadow:
       inset 0 0 0.5px var(--glass-30),
-      0 2px 8px rgba(0, 122, 255, 0.2);
+      0 2px 8px rgba(var(--color-primary-rgb), 0.2);
     transform: scale(1.05);
   }
 }

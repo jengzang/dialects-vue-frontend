@@ -62,7 +62,7 @@ $mobile-aspect-ratio: 1 / 1;
   transition: all $transition-duration ease;
 
   &:hover {
-    background-color: rgba(0, 122, 255, 0.1);
+    background-color: rgba(var(--color-primary-rgb), 0.1);
   }
 
   &.active {

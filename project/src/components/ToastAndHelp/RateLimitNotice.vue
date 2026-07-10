@@ -203,7 +203,7 @@ $text-meta: rgba(76, 60, 23, 0.72);
 $text-brown: rgba(63, 49, 9, 0.92);
 
 $white: var(--text-white);
-$primary-blue: rgba(0, 122, 255, 0.95);
+$primary-blue: rgba(var(--color-primary-rgb), 0.95);
 
 $button-transition-duration: 0.18s;
 $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
@@ -420,7 +420,7 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
     $primary-blue,
     rgba(79, 146, 255, 0.95)
   );
-  box-shadow: 0 10px 24px rgba(0, 122, 255, 0.24);
+  box-shadow: 0 10px 24px rgba(var(--color-primary-rgb), 0.24);
 }
 
 .ghost-button {

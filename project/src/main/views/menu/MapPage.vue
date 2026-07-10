@@ -358,7 +358,7 @@ $transition-base: 0.3s;
     color: $white;
     background: $success-green;
     border-color: $success-green;
-    box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.3);
   }
 
   &:hover {

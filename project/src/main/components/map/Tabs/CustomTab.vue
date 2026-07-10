@@ -733,24 +733,24 @@ const openEntryModal = () => {
   border-radius: 20px;
   background: linear-gradient(
     135deg,
-    rgba(0, 122, 255, 0.9),
+    rgba(var(--color-primary-rgb), 0.9),
     rgba(0, 81, 213, 0.9)
   );
   color: #fff;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2);
+  box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.2);
   transition: $motion-fast;
 
   &:hover {
     transform: translateY(-1.5px);
     background: linear-gradient(
       135deg,
-      rgba(0, 122, 255, 1),
+      rgba(var(--color-primary-rgb), 1),
       rgba(0, 81, 213, 1)
     );
-    box-shadow: 0 6px 14px rgba(0, 122, 255, 0.35);
+    box-shadow: 0 6px 14px rgba(var(--color-primary-rgb), 0.35);
   }
 
   &:active {
@@ -784,7 +784,7 @@ const openEntryModal = () => {
   white-space: nowrap;
   box-shadow:
     inset 0 0 0.5px var(--glass-30),
-    0 4px 12px rgba(0, 122, 255, 0.15),
+    0 4px 12px rgba(var(--color-primary-rgb), 0.15),
     0 0 0 0.5px var(--glass-10);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -797,7 +797,7 @@ const openEntryModal = () => {
     );
     box-shadow:
       inset 0 0 0.5px var(--glass-50),
-      0 6px 16px rgba(0, 122, 255, 0.25),
+      0 6px 16px rgba(var(--color-primary-rgb), 0.25),
       0 0 0 0.5px var(--glass-20);
   }
 }
@@ -893,8 +893,8 @@ const openEntryModal = () => {
   }
 
   &.success {
-    border-color: rgba(0, 122, 255, 0.2);
-    background: rgba(0, 122, 255, 0.1);
+    border-color: rgba(var(--color-primary-rgb), 0.2);
+    background: rgba(var(--color-primary-rgb), 0.1);
     color: $primary;
   }
 }
@@ -926,7 +926,7 @@ const openEntryModal = () => {
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   box-shadow:
-    0 8px 22px rgba(0, 122, 255, 0.12),
+    0 8px 22px rgba(var(--color-primary-rgb), 0.12),
     inset 0 0 0.5px var(--glass-60);
   transition:
     width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
@@ -937,7 +937,7 @@ const openEntryModal = () => {
     width: min(320px, calc(100% - 24px));
     background: var(--glass-90);
     box-shadow:
-      0 10px 26px rgba(0, 122, 255, 0.16),
+      0 10px 26px rgba(var(--color-primary-rgb), 0.16),
       inset 0 0 0.5px var(--glass-70);
   }
 }
@@ -1118,7 +1118,7 @@ const openEntryModal = () => {
 .category-count-badge {
   padding: 1.5px 6px;
   border-radius: 10px;
-  background: rgba(0, 122, 255, 0.08);
+  background: rgba(var(--color-primary-rgb), 0.08);
   color: $primary;
   font-size: 10px;
   font-weight: 700;
@@ -1154,7 +1154,7 @@ const openEntryModal = () => {
     transform: translateY(-1.5px);
     border-color: $primary;
     background: #fff;
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.08);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.08);
   }
 
   &:active {
@@ -1199,7 +1199,7 @@ const openEntryModal = () => {
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(0, 122, 255, 0.06);
+    background: rgba(var(--color-primary-rgb), 0.06);
     text-decoration: underline;
   }
 }

@@ -259,12 +259,12 @@ function confirmImport() {
 .voronoi-custom-import-modal__intro-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: rgba(11, 37, 64, 0.92);
+  color: rgba(var(--text-deep-rgb), 0.92);
 }
 
 .voronoi-custom-import-modal__intro-text {
   margin: 0.35rem 0 0;
-  color: rgba(11, 37, 64, 0.68);
+  color: rgba(var(--text-deep-rgb), 0.68);
   line-height: 1.6;
 }
 
@@ -281,7 +281,7 @@ function confirmImport() {
   border-radius: 999px;
   background: var(--glass-70);
   border: 1px solid var(--glass-80);
-  color: rgba(11, 37, 64, 0.72);
+  color: rgba(var(--text-deep-rgb), 0.72);
   font-size: 0.8rem;
 }
 

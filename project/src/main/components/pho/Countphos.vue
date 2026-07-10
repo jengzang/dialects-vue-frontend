@@ -1289,7 +1289,7 @@ $mobile-breakpoint: 768px;
     align-items: center;
     justify-content: center;
     padding: 2px 10px;
-    background: rgba(0, 122, 255, 0.12);
+    background: rgba(var(--color-primary-rgb), 0.12);
     border-radius: 999px;
     color: var(--color-primary);
     white-space: nowrap;
@@ -1332,7 +1332,7 @@ $mobile-breakpoint: 768px;
   .chart-block {
     padding: 16px;
     background: var(--glass-60);
-    border: 1px solid rgba(0, 122, 255, 0.1);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.1);
     border-radius: 14px;
     box-shadow: 0 10px 24px rgba(20, 38, 60, 0.04);
   }
@@ -1367,7 +1367,7 @@ $mobile-breakpoint: 768px;
     min-width: 0;
     padding: 12px;
     background: var(--glass-80);
-    border: 1px solid rgba(0, 122, 255, 0.1);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.1);
     border-radius: 12px;
 
     &--wide {
@@ -1476,7 +1476,7 @@ $mobile-breakpoint: 768px;
 
   .location-tag {
     padding: 2px 8px;
-    background: rgba(0, 122, 255, 0.1);
+    background: rgba(var(--color-primary-rgb), 0.1);
     border-radius: 4px;
     color: var(--color-primary);
     font-size: 12px;
@@ -1489,7 +1489,7 @@ $mobile-breakpoint: 768px;
     background: linear-gradient(135deg, $primary, $primary-dark);
     border: none;
     border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.3);
     color: #fff;
     font-size: 12px;
     font-weight: 600;
@@ -1502,7 +1502,7 @@ $mobile-breakpoint: 768px;
         $primary-dark,
         $primary-deep
       );
-      box-shadow: 0 4px 8px rgba(0, 122, 255, 0.4);
+      box-shadow: 0 4px 8px rgba(var(--color-primary-rgb), 0.4);
       transform: translateY(-1px);
     }
 
@@ -1520,7 +1520,7 @@ $mobile-breakpoint: 768px;
       var(--glass-80),
       rgba(247, 251, 255, 0.66)
     );
-    border: 1px solid rgba(0, 122, 255, 0.12);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.12);
     border-radius: 12px;
     box-shadow: 0 10px 24px rgba(20, 38, 60, 0.06);
 
@@ -1532,7 +1532,7 @@ $mobile-breakpoint: 768px;
   .location-name {
     margin-bottom: 12px;
     padding-bottom: 8px;
-    border-bottom: 1px solid rgba(0, 122, 255, 0.12);
+    border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.12);
     color: var(--color-primary);
     font-size: 18px;
     font-weight: 700;
@@ -1565,13 +1565,13 @@ $mobile-breakpoint: 768px;
     gap: 8px;
     padding: 6px 10px;
     background: var(--glass-90);
-    border: 1px solid rgba(0, 122, 255, 0.12);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.12);
     border-radius: 999px;
     transition: all 0.2s ease;
 
     &:hover {
       background: var(--glass-90);
-      box-shadow: 0 8px 18px rgba(0, 122, 255, 0.08);
+      box-shadow: 0 8px 18px rgba(var(--color-primary-rgb), 0.08);
       transform: translateY(-1px);
     }
   }
@@ -1584,7 +1584,7 @@ $mobile-breakpoint: 768px;
 
   .tag-count {
     padding: 2px 8px;
-    background: rgba(0, 122, 255, 0.12);
+    background: rgba(var(--color-primary-rgb), 0.12);
     border-radius: 999px;
     color: var(--color-primary);
     font-size: 12px;
@@ -1709,7 +1709,7 @@ $mobile-breakpoint: 768px;
   font-size: 17px;
   font-weight: 800;
   letter-spacing: 0.02em;
-  text-shadow: 0 1px 8px rgba(0, 122, 255, 0.16);
+  text-shadow: 0 1px 8px rgba(var(--color-primary-rgb), 0.16);
 }
 
 .modal-locations-list {
