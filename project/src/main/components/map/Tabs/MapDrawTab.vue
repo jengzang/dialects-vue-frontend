@@ -1645,26 +1645,6 @@ onBeforeUnmount(() => {
 
 @use '../../../../styles/global/scrollbars' as scrollbars;
 
-@mixin draw-section-base {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  padding-bottom: 0.9rem;
-  border-bottom: 1px solid var(--glass-40);
-}
-
-@mixin draw-field-stack {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-@mixin draw-button-grid($columns) {
-  display: grid;
-  grid-template-columns: repeat($columns, minmax(0, 1fr));
-  gap: 0.5rem;
-}
-
 .map-draw-tab {
   position: relative;
   width: min(98dvw, 1200px);
