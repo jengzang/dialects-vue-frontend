@@ -74,18 +74,18 @@ $system-font:
   background:
     radial-gradient(
       1200px 800px at 10% -10%,
-      #dff1ff 0%,
+      var(--bg-blue-tint) 0%,
       rgba(223, 241, 255, 0) 60%
     ),
     radial-gradient(
       1000px 700px at 110% 10%,
-      #cfe7ff 0%,
+      var(--bg-blue-light) 0%,
       rgba(207, 231, 255, 0) 60%
     ),
     linear-gradient(
       180deg,
-      #eaf5ff,
-      #d7ecff
+      var(--bg-blue-tint),
+      var(--bg-blue-light)
     );
 }
 

@@ -140,10 +140,15 @@
   /* 语义背景色 */
   --bg-success-light: #e8f8ef;
   --bg-error-light: #fde4ec;
+  --bg-warning-light: #fffbf0;
 
   /* 错误色深色变体 */
   --color-error-dark: #962020;
   --color-warning-dark: #d97706;
+  --color-warning-text: #ff6f00;
+
+  /* 帮助文本色 */
+  --text-help: #88bffb;
 
   /* 圆角 */
   --radius-sm: 6px;

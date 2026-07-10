@@ -1529,8 +1529,8 @@ onUnmounted(() => {
 
 $primary-blue: var(--color-primary);
 $success-green: var(--color-success);
-$warning-orange: #ff9800;
-$warning-dark: #ff6f00;
+$warning-orange: var(--color-warning);
+$warning-dark: var(--color-warning-text);
 $danger-red: var(--color-error-light);
 $text-dark: var(--text-dark);
 $text-muted: var(--text-tertiary);
@@ -1675,7 +1675,7 @@ $system-font:
 
   &:disabled {
     cursor: not-allowed;
-    background: #ccc;
+    background: var(--border-gray);
     opacity: 0.5;
   }
 }
@@ -1737,12 +1737,12 @@ td {
 td {
   &.editable-cell {
     cursor: text;
-    background: #fffbf0;
+    background: var(--bg-warning-light);
     border: 1px solid var(--color-gold);
     transition: all $transition-fast;
 
     &:hover {
-      background: #fff9e6;
+      background: var(--bg-warning-light);
       box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
     }
 
@@ -1757,7 +1757,7 @@ td {
   &.cell-changed {
     position: relative;
     font-weight: 600;
-    background: #e6f7ff;
+    background: var(--bg-blue-tint);
     border-color: var(--color-primary);
 
     &::after {
@@ -2059,11 +2059,11 @@ td {
   /* 删除按钮专用样式（暗红色） */
   &.delete {
     color: white;
-    background: #8b0000;
+    background: var(--color-error-dark);
 
     &:hover {
       color: white;
-      background: #a52a2a;
+      background: var(--color-error);
       transform: scale(1.1);
     }
   }
@@ -2325,7 +2325,7 @@ td {
 }
 
 .fullscreen-toggle-btn.exit-btn:hover {
-  background: #ff6259;
+  background: var(--color-error-light);
 }
 
 .table-fullscreen-overlay {
@@ -2554,7 +2554,7 @@ td {
   display: block;
   margin-top: 6px;
   font-size: 12px;
-  color: #88bffb;
+  color: var(--text-help);
   font-weight: 500;
 }
 
@@ -2743,7 +2743,7 @@ td {
 
 .batch-replace-modal-footer .main-glass-button[data-variant='secondary'] {
   background: rgba(108, 117, 125, 0.1);
-  color: #495057;
+  color: var(--text-slate);
   border: 1px solid rgba(108, 117, 125, 0.2);
 }
 
