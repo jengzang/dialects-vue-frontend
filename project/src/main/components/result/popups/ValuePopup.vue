@@ -126,7 +126,6 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick));
 </script>
 
 <style scoped lang="scss">
-$popup-text-color: var(--text-dark);
 $popup-radius: 12px;
 
 $glass-background: var(--glass-30);
@@ -154,7 +153,7 @@ $animation-duration: 0.4s;/* 弹窗基本样式 */
     inset 0 0 1px $glass-background,
     var(--shadow-above),
     0 0 8px $glass-highlight;
-  color: $popup-text-color;
+  color: var(--text-dark);
   text-align: center;
   font-weight: 500;
   transform: translateX(-50%);

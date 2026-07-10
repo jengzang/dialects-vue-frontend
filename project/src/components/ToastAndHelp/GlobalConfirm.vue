@@ -44,9 +44,6 @@ function handleCancel() {
 </script>
 
 <style scoped lang="scss">
-$text-title: var(--text-dark-alpha);
-$text-message: var(--text-dark-medium);
-
 $desktop-gap: 12px;
 $mobile-gap: 10px;
 
@@ -75,7 +72,7 @@ $mobile-gap: 10px;
 
 .confirm-title {
   margin: 0;
-  color: $text-title;
+  color: var(--text-dark-alpha);
   font-size: 20px;
   font-weight: 600;
   text-align: center;
@@ -87,7 +84,7 @@ $mobile-gap: 10px;
 
 .confirm-message {
   padding: 0 0 24px;
-  color: $text-message;
+  color: var(--text-dark-medium);
   font-size: 15px;
   line-height: 1.5;
   text-align: center;

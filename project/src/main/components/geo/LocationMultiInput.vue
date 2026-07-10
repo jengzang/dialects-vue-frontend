@@ -431,7 +431,6 @@ watch(showPartitionInfoModal, (isVisible) => {
 
 ```scss
 <style scoped lang="scss">
-$success-green: var(--color-success);
 $warning-orange: var(--color-warning);
 $portrait-ratio: 1 / 1;.location-multi-input {
   width: 100%;
@@ -587,7 +586,7 @@ $portrait-ratio: 1 / 1;.location-multi-input {
   position: absolute;
   top: 50%;
   right: 12px;
-  color: $success-green;
+  color: var(--color-success);
   font-size: 20px;
   font-weight: bold;
   pointer-events: none;

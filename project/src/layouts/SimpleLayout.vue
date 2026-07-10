@@ -55,7 +55,6 @@ watch(() => route.path, (newPath) => {
 
 ```scss
 <style scoped lang="scss">
-$layout-text: var(--text-deep);
 $portrait-ratio: 1 / 1;
 
 $system-font:
@@ -109,7 +108,7 @@ $system-font:
   display: flex;
   justify-content: center;
   padding: 10px 6px;
-  color: $layout-text;
+  color: var(--text-deep);
   font-family: $system-font;
 }
 
