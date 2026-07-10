@@ -1440,13 +1440,7 @@ $text-secondary: var(--text-tertiary);
 $text-muted: var(--text-lightest);
 
 $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
-$portrait-ratio: 1 / 1;
-@mixin glass-blur($amount: 10px) {
-  backdrop-filter: blur($amount);
-  -webkit-backdrop-filter: blur($amount);
-}
-
-@mixin text-primary {
+$portrait-ratio: 1 / 1;@mixin text-primary {
   color: var(--text-dark, #{$text-primary});
 }
 

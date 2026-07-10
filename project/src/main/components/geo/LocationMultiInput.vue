@@ -433,13 +433,7 @@ watch(showPartitionInfoModal, (isVisible) => {
 <style scoped lang="scss">
 $success-green: var(--color-success);
 $warning-orange: var(--color-warning);
-$portrait-ratio: 1 / 1;
-@mixin glass-blur($amount: 12px) {
-  backdrop-filter: blur($amount);
-  -webkit-backdrop-filter: blur($amount);
-}
-
-.location-multi-input {
+$portrait-ratio: 1 / 1;.location-multi-input {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -473,7 +467,7 @@ $portrait-ratio: 1 / 1;
     font-size: 14px;
     transition: all 0.3s ease;
 
-    @include glass-blur;
+    @include glass-blur(12px);
 
     &:focus {
       background: var(--glass-70);

@@ -249,19 +249,7 @@ $text-secondary: rgba(0, 0, 0, 0.75);
 $text-muted: rgba(0, 0, 0, 0.45);
 $divider-color: rgba(0, 0, 0, 0.08);
 
-$transition-fast: 0.2s;
-
-@mixin glass-blur($blur, $saturation: null) {
-  @if $saturation {
-    backdrop-filter: blur($blur) saturate($saturation);
-    -webkit-backdrop-filter: blur($blur) saturate($saturation);
-  } @else {
-    backdrop-filter: blur($blur);
-    -webkit-backdrop-filter: blur($blur);
-  }
-}
-
-/*
+$transition-fast: 0.2s;/*
  * 下拉层通过 Teleport 渲染到 body，
  * 因此保持为顶层选择器。
  */

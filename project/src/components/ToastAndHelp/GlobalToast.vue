@@ -55,18 +55,7 @@ $text-dark: rgba(0, 0, 0, 0.85);
 $text-action-info: rgba(20, 34, 56, 0.88);
 
 $toast-enter-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-$toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-@mixin glass-blur($blur, $saturation: null) {
-  @if $saturation {
-    backdrop-filter: blur($blur) saturate($saturation);
-    -webkit-backdrop-filter: blur($blur) saturate($saturation);
-  } @else {
-    backdrop-filter: blur($blur);
-    -webkit-backdrop-filter: blur($blur);
-  }
-}
-
-@mixin toast-icon($background, $font-size, $color: null) {
+$toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);@mixin toast-icon($background, $font-size, $color: null) {
   width: 24px;
   height: 24px;
   font-size: $font-size;

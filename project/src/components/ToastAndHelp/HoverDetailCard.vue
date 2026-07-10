@@ -64,19 +64,7 @@ defineEmits(['close'])
 </script>
 
 <style scoped lang="scss">
-$card-transition: 0.24s ease;
-
-@mixin glass-blur($blur, $saturation: null) {
-  @if $saturation {
-    backdrop-filter: blur($blur) saturate($saturation);
-    -webkit-backdrop-filter: blur($blur) saturate($saturation);
-  } @else {
-    backdrop-filter: blur($blur);
-    -webkit-backdrop-filter: blur($blur);
-  }
-}
-
-.hover-detail-card {
+$card-transition: 0.24s ease;.hover-detail-card {
   position: fixed;
   right: 12px;
   bottom: calc(12px + env(safe-area-inset-bottom));

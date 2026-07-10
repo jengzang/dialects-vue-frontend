@@ -717,13 +717,7 @@ $success: var(--color-success);
 $success-dark: var(--color-success);
 $text-primary: var(--text-primary);
 
-$ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
-@mixin glass-blur($amount: 10px) {
-  backdrop-filter: blur($amount);
-  -webkit-backdrop-filter: blur($amount);
-}
-
-@mixin primary-gradient {
+$ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   background: linear-gradient(
     135deg,
     $primary 0%,

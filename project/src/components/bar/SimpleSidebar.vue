@@ -361,13 +361,7 @@ $text-secondary: var(--text-tertiary);
 $text-dark: var(--text-dark);
 $text-muted: var(--text-secondary);
 
-$portrait-ratio: 1 / 1;
-@mixin glass-blur($blur: 12px, $saturation: 160%) {
-  backdrop-filter: blur($blur) saturate($saturation);
-  -webkit-backdrop-filter: blur($blur) saturate($saturation);
-}
-
-@mixin soft-glass-background($opacity-start: 0.3, $opacity-end: 0.15) {
+$portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacity-end: 0.15) {
   background: linear-gradient(
     145deg,
     rgba(255, 255, 255, $opacity-start),
@@ -425,7 +419,7 @@ $portrait-ratio: 1 / 1;
     0 8px 32px rgba(0, 0, 0, 0.25),
     0 0 0 0.5px var(--glass-10);
 
-  @include glass-blur;
+  @include glass-blur(12px, 160%);
 }
 
 .sidebar-empty {

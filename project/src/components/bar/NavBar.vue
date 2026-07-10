@@ -540,13 +540,7 @@ $text-dark: var(--text-dark);
 $text-secondary: var(--text-tertiary);
 $text-muted: var(--text-secondary);
 
-$mobile-aspect-ratio: 1 / 1;
-@mixin glass-blur($blur: 15px, $saturation: 150%) {
-  backdrop-filter: blur($blur) saturate($saturation);
-  -webkit-backdrop-filter: blur($blur) saturate($saturation);
-}
-
-@mixin soft-glass-background {
+$mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
   background: linear-gradient(
     145deg,
     var(--glass-20),
@@ -636,7 +630,7 @@ $mobile-aspect-ratio: 1 / 1;
   gap: 4px;
   padding: 5px;
 
-  @include glass-blur;
+  @include glass-blur(15px, 150%);
   @include soft-glass-background;
   @include soft-glass-shadow;
 

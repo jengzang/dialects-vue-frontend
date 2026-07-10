@@ -201,18 +201,7 @@ $transition-base: 0.3s;
 $transition-slow: 0.4s;
 $standard-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
-$card-easing: cubic-bezier(0.16, 1, 0.3, 1);
-@mixin glass-blur($blur: 20px, $saturation: null) {
-  @if $saturation {
-    backdrop-filter: blur($blur) saturate($saturation);
-    -webkit-backdrop-filter: blur($blur) saturate($saturation);
-  } @else {
-    backdrop-filter: blur($blur);
-    -webkit-backdrop-filter: blur($blur);
-  }
-}
-
-.profile-overview {
+$card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
   text-align: center;
 }
 

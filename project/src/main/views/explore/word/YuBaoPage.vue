@@ -914,13 +914,7 @@ $transition-fast: 0.2s;
 $transition-control: 0.25s;
 $transition-base: 0.3s;
 
-$ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
-@mixin glass-blur($blur: 20px) {
-  backdrop-filter: blur($blur);
-  -webkit-backdrop-filter: blur($blur);
-}
-
-@mixin saturated-glass($blur: 30px, $saturation: 180%) {
+$ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px, $saturation: 180%) {
   backdrop-filter: blur($blur) saturate($saturation);
   -webkit-backdrop-filter: blur($blur) saturate($saturation);
 }
@@ -1171,7 +1165,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 16px;
   box-shadow: var(--shadow-md);
 
-  @include glass-blur;
+  @include glass-blur(20px);
 
   @media (max-width: 768px) {
     padding: 20px;

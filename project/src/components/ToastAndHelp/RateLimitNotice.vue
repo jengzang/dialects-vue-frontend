@@ -215,18 +215,7 @@ $white: var(--text-white);
 $primary-blue: rgba(var(--color-primary-rgb), 0.95);
 
 $button-transition-duration: 0.18s;
-$enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
-@mixin glass-blur($blur, $saturation: null) {
-  @if $saturation {
-    backdrop-filter: blur($blur) saturate($saturation);
-    -webkit-backdrop-filter: blur($blur) saturate($saturation);
-  } @else {
-    backdrop-filter: blur($blur);
-    -webkit-backdrop-filter: blur($blur);
-  }
-}
-
-/*
+$enter-easing: cubic-bezier(0.22, 1, 0.36, 1);/*
  * 提示组件通过 Teleport 渲染到 body，
  * 因此相关样式保持为顶层选择器。
  */

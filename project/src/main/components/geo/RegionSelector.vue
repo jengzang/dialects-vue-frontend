@@ -889,13 +889,7 @@ $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
 $success: var(--color-success);
 $danger: var(--color-error-light);
-$portrait-ratio: 1 / 1;
-
-@mixin glass-blur($blur, $saturation: 100%) {
-  backdrop-filter: blur($blur) saturate($saturation);
-  -webkit-backdrop-filter: blur($blur) saturate($saturation);
-}
-/* 选择框 */
+$portrait-ratio: 1 / 1;/* 选择框 */
 .region-select-box {
   position: relative;
   width: 98%;

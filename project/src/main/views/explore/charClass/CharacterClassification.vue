@@ -608,13 +608,7 @@ $white: var(--text-white);
 
 $transition-fast: 0.2s;
 $panel-radius: 28px;
-$panel-radius-portrait: 24px;
-@mixin glass-blur($blur: 16px, $saturation: 180%) {
-  backdrop-filter: blur($blur) saturate($saturation);
-  -webkit-backdrop-filter: blur($blur) saturate($saturation);
-}
-
-.char-class-page {
+$panel-radius-portrait: 24px;.char-class-page {
   width: 100%;
   padding: 12px 0 24px;
 }
@@ -963,7 +957,7 @@ $panel-radius-portrait: 24px;
     box-shadow $transition-fast ease,
     background $transition-fast ease;
 
-  @include glass-blur;
+  @include glass-blur(16px, 180%);
 
   &:focus {
     border-color: rgba(var(--color-primary-rgb), 0.35);

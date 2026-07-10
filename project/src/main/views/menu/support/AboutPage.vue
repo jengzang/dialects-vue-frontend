@@ -566,21 +566,14 @@ $text-secondary: var(--text-medium);
 $text-muted: var(--text-tertiary);
 $text-light: var(--text-lightest);
 
-$ease-standard: 0.3s ease;
-
-@mixin glass-blur($amount: 6px) {
-  backdrop-filter: blur($amount);
-  -webkit-backdrop-filter: blur($amount);
-}
-
-@mixin glass-card(
+$ease-standard: 0.3s ease;@mixin glass-card(
   $background: var(--glass-40),
   $border: var(--glass-40)
 ) {
   background: $background;
   border: 1px solid $border;
 
-  @include glass-blur;
+  @include glass-blur(6px);
 }
 
 .tabs-title {
@@ -991,7 +984,7 @@ em {
   box-shadow: none;
   color: $zhihu-blue;
 
-  @include glass-blur;
+  @include glass-blur(6px);
 
   &:hover {
     background: rgba(0, 102, 255, 0.22);

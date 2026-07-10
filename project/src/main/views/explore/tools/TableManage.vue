@@ -638,14 +638,7 @@ $radius-lg: 16px;
 $radius-xl: 20px;
 
 $transition-base: 0.3s;
-$smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
-
-@mixin glass-blur($blur: 20px, $saturation: 180%) {
-  backdrop-filter: blur($blur) saturate($saturation);
-  -webkit-backdrop-filter: blur($blur) saturate($saturation);
-}
-
-@mixin glass-panel(
+$smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
   $background: var(--glass-70),
   $radius: $radius-lg
 ) {
@@ -656,7 +649,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     0 8px 32px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 var(--glass-50);
 
-  @include glass-blur;
+  @include glass-blur(20px, 180%);
 }
 
 @mixin primary-gradient {
@@ -732,7 +725,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     0 8px 32px rgba(var(--color-primary-rgb), 0.1),
     inset 0 1px 0 var(--glass-50);
 
-  @include glass-blur;
+  @include glass-blur(20px, 180%);
 
   p {
     color: $primary-blue;
@@ -753,7 +746,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     0 8px 32px rgba(255, 193, 7, 0.2),
     inset 0 1px 0 var(--glass-50);
 
-  @include glass-blur;
+  @include glass-blur(20px, 180%);
 
   h2 {
     margin-bottom: 10px;
@@ -1083,7 +1076,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: $radius-md;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
 
-  @include glass-blur;
+  @include glass-blur(20px, 180%);
   
   h4 {
     margin: 0;

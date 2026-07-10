@@ -1804,13 +1804,7 @@ $group2-primary: #2196f3;
 $group2-text: #1565c0;
 $danger: #f44336;
 $text-primary: var(--text-dark);
-$text-muted: var(--text-lightest);
-
-@mixin glass-blur($amount: 10px) {
-  backdrop-filter: blur($amount);
-  -webkit-backdrop-filter: blur($amount);
-}
-/* 页面主体 */
+$text-muted: var(--text-lightest);/* 页面主体 */
 .tab-content-inner {
   width: 100%;
   flex-direction: column;

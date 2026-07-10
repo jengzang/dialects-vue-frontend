@@ -5,3 +5,13 @@
   align-items: center;
   justify-content: center;
 }
+
+@mixin glass-blur($blur: 10px, $saturation: null) {
+  @if $saturation {
+    backdrop-filter: blur($blur) saturate($saturation);
+    -webkit-backdrop-filter: blur($blur) saturate($saturation);
+  } @else {
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+  }
+}

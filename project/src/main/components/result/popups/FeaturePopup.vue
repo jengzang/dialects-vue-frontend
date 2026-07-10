@@ -74,14 +74,7 @@ $glass-color: var(--glass-30);
 $glass-color-light: var(--glass-05);
 
 $transition-duration: 0.3s;
-$animation-duration: 0.4s;
-
-@mixin glass-blur($blur, $saturation) {
-  backdrop-filter: blur($blur) saturate($saturation);
-  -webkit-backdrop-filter: blur($blur) saturate($saturation);
-}
-
-/* 弹窗基本样式 */
+$animation-duration: 0.4s;/* 弹窗基本样式 */
 .popup-vue {
   max-width: 300px;
   padding: 6px 10px;

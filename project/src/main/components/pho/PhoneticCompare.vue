@@ -734,18 +734,7 @@ onUnmounted(() => {
 
 $primary: var(--color-primary);
 $error: var(--color-error);
-$ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
-@mixin glass-blur($blur, $saturation: null) {
-  @if $saturation {
-    backdrop-filter: blur($blur) saturate($saturation);
-    -webkit-backdrop-filter: blur($blur) saturate($saturation);
-  } @else {
-    backdrop-filter: blur($blur);
-    -webkit-backdrop-filter: blur($blur);
-  }
-}
-
-.phonetic-compare-results-container {
+$ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-container {
   width: 100%;
   display: flex;
   flex-direction: column;

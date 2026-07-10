@@ -401,14 +401,7 @@ $primary-deep: #004fc4;
 
 $desktop-width: 214px;
 $tablet-width: 176px;
-$mobile-width: 150px;
-
-@mixin glass-blur($blur, $saturation) {
-  backdrop-filter: blur($blur) saturate($saturation);
-  -webkit-backdrop-filter: blur($blur) saturate($saturation);
-}
-
-.count-location-jump-nav {
+$mobile-width: 150px;.count-location-jump-nav {
   position: fixed;
   top: 50%;
   right: 10px;

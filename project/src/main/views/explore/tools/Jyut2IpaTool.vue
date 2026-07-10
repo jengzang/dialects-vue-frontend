@@ -832,14 +832,7 @@ $color-danger: var(--color-error-light);
 $color-disabled: var(--text-lightest);
 
 $text-70: rgba(var(--text-deep-rgb), 0.7);
-$text-60: rgba(var(--text-deep-rgb), 0.6);
-
-@mixin glass-blur($amount: 10px) {
-  backdrop-filter: blur($amount);
-  -webkit-backdrop-filter: blur($amount);
-}
-
-.jyut2ipa-container {
+$text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   display: flex;
   justify-content: center;
   align-items: center;

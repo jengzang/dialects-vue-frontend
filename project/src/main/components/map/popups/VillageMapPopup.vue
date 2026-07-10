@@ -628,19 +628,7 @@ onBeforeUnmount(() => {
 $primary: var(--color-primary);
 $primary-hover: var(--color-primary-hover);
 $text-dark: var(--text-primary);
-$success: var(--color-success);
-
-@mixin glass-blur($blur, $saturation: null) {
-  @if $saturation {
-    backdrop-filter: blur($blur) saturate($saturation);
-    -webkit-backdrop-filter: blur($blur) saturate($saturation);
-  } @else {
-    backdrop-filter: blur($blur);
-    -webkit-backdrop-filter: blur($blur);
-  }
-}
-
-/* 地图容器 */
+$success: var(--color-success);/* 地图容器 */
 .map-modal-container {
   width: 90vw;
   max-width: 1200px;
