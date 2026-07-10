@@ -731,8 +731,8 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $error: #d32f2f;
 $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
@@ -959,4 +959,3 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   line-height: 1.8;
   letter-spacing: 1px;
 }
-</style>

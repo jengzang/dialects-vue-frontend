@@ -620,8 +620,8 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $primary-blue-dark: #0056b3;
 $success-green: #34c759;
 $success-green-dark: #28a745;
@@ -1299,4 +1299,4 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 }
-</style>
+

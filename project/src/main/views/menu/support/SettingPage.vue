@@ -130,8 +130,8 @@ function changeInterfaceMode(mode) {
 </script>
 
 ```vue
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $text-primary: #333;
 $text-secondary: #666;
 $text-muted: #999;
@@ -289,6 +289,6 @@ $transition-duration: 0.3s;
     font-size: 11px;
   }
 }
-</style>
+
 ```
 

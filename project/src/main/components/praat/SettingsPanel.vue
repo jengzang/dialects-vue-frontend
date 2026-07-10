@@ -61,7 +61,7 @@
             </span>
         </label>
       </div>
-      <p class="hint-text" style="margin-top: 0.5rem; color: #666;">
+      <p class="hint-text" style="margin-top: 0.5rem; color: var(--text-tertiary);">
         {{ resolutionPresets[currentResolutionMode]?.description }}
       </p>
     </div>
@@ -318,8 +318,8 @@ watch(localSettings, (newSettings) => {
 }, { deep: true })
 </script>
 
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-hover: #0066cc;
 
 $text-main: var(--color-text-primary);
@@ -493,4 +493,3 @@ $transition-normal: 0.3s;
   font-size: 0.75rem;
   font-style: italic;
 }
-</style>

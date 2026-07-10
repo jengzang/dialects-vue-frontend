@@ -450,7 +450,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+
 .system-info-page {
   padding: 12px;
   max-width: 1600px;
@@ -535,7 +535,7 @@ onMounted(() => {
 .level-rate {
   font-size: 28px;
   font-weight: 700;
-  color: var(--color-primary, #007AFF);
+  color: var(--color-primary);
   margin-bottom: 12px;
 }
 
@@ -605,7 +605,7 @@ onMounted(() => {
 .glass-input:focus,
 .glass-select:focus {
   outline: none;
-  border-color: #007AFF;
+  border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.8);
 }
 
@@ -617,7 +617,7 @@ onMounted(() => {
 
 .solid-button {
   padding: 8px 16px;
-  background: linear-gradient(135deg, #007AFF, #0051D5);
+  background: linear-gradient(135deg, var(--color-primary), #0051D5);
   color: white;
   border: none;
   border-radius: 10px;
@@ -698,7 +698,7 @@ onMounted(() => {
 }
 
 .meta-row .highlight {
-  color: #007AFF;
+  color: var(--color-primary);
   font-weight: 700;
   font-size: 16px;
 }
@@ -720,7 +720,7 @@ onMounted(() => {
 .card-value {
   font-size: 24px;
   font-weight: 700;
-  color: #007AFF;
+  color: var(--color-primary);
 }
 
 .card-value-dual {
@@ -748,11 +748,11 @@ onMounted(() => {
 .dual-number {
   font-size: 28px;
   font-weight: 700;
-  color: #007AFF;
+  color: var(--color-primary);
 }
 
 .dual-number.highlight {
-  color: #007AFF;
+  color: var(--color-primary);
 }
 
 .table-wrapper {
@@ -792,7 +792,7 @@ onMounted(() => {
 
 .table-name {
   font-weight: 500;
-  color: #007AFF;
+  color: var(--color-primary);
 }
 
 .pagination {
@@ -865,4 +865,4 @@ onMounted(() => {
     flex-direction: column;
   }
 }
-</style>
+

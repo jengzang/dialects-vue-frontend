@@ -329,7 +329,7 @@ const runAction = async () => {
 }
 </script>
 
-<style scoped lang="scss">
+
 $apple-font:
   -apple-system,
   BlinkMacSystemFont,
@@ -501,7 +501,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(90deg, #007aff, mediumblue);
+  background: linear-gradient(90deg, var(--color-primary), mediumblue);
   border: none;
   border-radius: 30px;
   padding: 14px 28px;
@@ -533,4 +533,3 @@ $text-secondary: rgba(60, 60, 67, 0.72);
     box-shadow: none;
   }
 }
-</style>

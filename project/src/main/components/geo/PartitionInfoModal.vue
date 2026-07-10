@@ -725,8 +725,8 @@ const PartitionTreeNode = defineComponent({
 </script>
 
 ```scss
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-dark: #0051d5;
 $danger: #b42318;
 $error: #d32f2f;
@@ -791,7 +791,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   background: rgba(142, 142, 147, 0.15);
   border: none;
   border-radius: 12px;
-  color: #1d1d1f;
+  color: var(--text-primary);
   white-space: nowrap;
   font-size: 14px;
   font-weight: 600;
@@ -896,7 +896,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #333;
+    color: var(--text-dark)
     font-size: 15px;
     font-weight: 500;
 
@@ -1010,7 +1010,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     overflow: hidden;
     background: rgba(255, 255, 255, 0.5);
     border-radius: 10px;
-    color: #333;
+    color: var(--text-dark)
     white-space: nowrap;
     text-overflow: ellipsis;
     font-size: 14px;
@@ -1137,6 +1137,6 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     }
   }
 }
-</style>
+
 ```
 

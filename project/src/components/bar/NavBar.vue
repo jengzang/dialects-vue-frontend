@@ -42,7 +42,7 @@
       <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
         <NavAvatar />
       </div>
-      <div v-else class="logo-container" style="color: #005fd3;border-radius: 30px" @click="goToAuthPage">
+      <div v-else class="logo-container" style="color: var(--color-blue-logo);border-radius: 30px" @click="goToAuthPage">
         <!-- 显示用户名或"登录" -->
         <span class="login-text">
           {{ t('navigation.login') }}
@@ -186,7 +186,7 @@
         <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
           <NavAvatar />
         </div>
-        <div v-else class="logo-container" style="color: #005fd3; border-radius: 30px;height: 5dvh" @click="goToAuthPage">
+        <div v-else class="logo-container" style="color: var(--color-blue-logo); border-radius: 30px;height: 5dvh" @click="goToAuthPage">
           <!-- 显示用户名或"登录" -->
           <span class="login-text">
             {{ t('navigation.login') }}
@@ -531,8 +531,8 @@ onBeforeUnmount(() => {
 
 
 ```scss
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-dark: #005fd3;
 $primary-light: #0080ff;
 
@@ -1036,6 +1036,6 @@ $mobile-aspect-ratio: 1 / 1;
     max-width: calc(100vw - 20px);
   }
 }
-</style>
+
 ```
 

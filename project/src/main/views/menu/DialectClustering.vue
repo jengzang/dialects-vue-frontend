@@ -111,7 +111,7 @@ const {
 } = workspace
 </script>
 
-<style lang="scss">
+
 .dialect-clustering-page {
   display: flex;
   flex-direction: column;
@@ -137,7 +137,7 @@ const {
   .section-heading h3,
   .workspace-stage-head h2 {
     margin: 0;
-    color: #1d1d1f;
+    color: var(--text-primary);
   }
 
   .page-header p,
@@ -433,7 +433,7 @@ const {
     gap: 16px;
     align-items: center;
     font-weight: 700;
-    color: #1d1d1f;
+    color: var(--text-primary);
   }
 
   .quick-run-summary__label {
@@ -569,4 +569,4 @@ const {
     }
   }
 }
-</style>
+

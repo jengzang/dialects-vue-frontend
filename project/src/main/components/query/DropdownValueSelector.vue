@@ -271,12 +271,12 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
+
 $dropdown-item-padding: 8px 16px;
 $dropdown-font-size: 14px;
 $transition-duration: 0.2s;
 $dropdown-selected-bg: #e6f0ff;
-$dropdown-selected-color: #02469e;
+$dropdown-selected-color: var(--color-blue-custom);
 
 .key-dropdown-group {
   display: flex;
@@ -312,7 +312,7 @@ $dropdown-selected-color: #02469e;
   flex: 1;
   width: 75px;
   padding: 8px 0;
-  color: #333;
+  color: var(--text-dark);
   font-size: $dropdown-font-size;
   text-align: center;
   background: transparent;
@@ -408,4 +408,4 @@ $dropdown-selected-color: #02469e;
   display: inline-block;
   width: 16px;
 }
-</style>
+

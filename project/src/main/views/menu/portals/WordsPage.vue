@@ -45,7 +45,7 @@ const handleYuBaoGrammar = () => {
 };
 </script>
 
-<style scoped>
+
 .words-page {
   min-width: 80dvw;
   display: flex;
@@ -58,7 +58,7 @@ const handleYuBaoGrammar = () => {
 .page-title {
   font-size: 32px;
   font-weight: 700;
-  color: #1d1d1f;
+  color: var(--text-primary);
   margin-bottom: 30px;
   text-align: center;
 }
@@ -88,7 +88,7 @@ const handleYuBaoGrammar = () => {
 
 .word-btn:hover {
   transform: translateY(-4px);
-  border-color: #007aff;
+  border-color: var(--color-primary);
   box-shadow: 0 8px 24px rgba(0, 122, 255, 0.2);
   background: rgba(255, 255, 255, 1);
 }
@@ -101,12 +101,12 @@ const handleYuBaoGrammar = () => {
 .word-name {
   font-size: 20px;
   font-weight: 600;
-  color: #1d1d1f;
+  color: var(--text-primary);
 }
 
 .word-desc {
   font-size: 14px;
-  color: #666;
+  color: var(--text-tertiary)
   line-height: 1.5;
 }
 
@@ -119,4 +119,4 @@ const handleYuBaoGrammar = () => {
     font-size: 24px;
   }
 }
-</style>
+

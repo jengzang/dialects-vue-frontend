@@ -298,8 +298,8 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped lang="scss">
-$text-color: #1d1d1f;
+
+$text-color: var(--text-primary);
 $primary-shadow: rgba(0, 122, 255, 0.25);
 $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 
@@ -399,4 +399,4 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   opacity: 0;
   transform: translateY(-5px) scale(0.95);
 }
-</style>
+

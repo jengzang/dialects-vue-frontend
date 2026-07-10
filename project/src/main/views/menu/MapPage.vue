@@ -301,9 +301,9 @@ const resolveTabRoute = (tabName) => {
 </script>
 
 ```vue
-<style scoped lang="scss">
-$success-green: #34c759;
-$text-primary: #333;
+
+$success-green: var(--color-success);
+$text-primary: var(--text-dark);
 $white: #fff;
 
 $transition-fast: 0.2s;
@@ -417,7 +417,7 @@ $transition-base: 0.3s;
     transform: translateY(0);
   }
 }
-</style>
+
 ```
 
 

@@ -663,8 +663,8 @@ onMounted(() => {
 });
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $primary-blue-dark: #0051d5;
 $text-primary: #1d1d1f;
 $text-secondary: #6e6e73;
@@ -981,4 +981,4 @@ $transition-base: 0.3s;
   font-size: 14px;
   text-align: center;
 }
-</style>
+

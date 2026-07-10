@@ -405,8 +405,8 @@ const getToneData = (data) => {
 </script>
 
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $success-green: #34c759;
 $text-dark: #333;
 $text-muted: #666;
@@ -720,7 +720,7 @@ $transition-duration: 0.25s;
   right: 18px;
   z-index: 100000;
   padding: 10px 18px;
-  color: #1d1d1f;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -801,7 +801,7 @@ $transition-duration: 0.25s;
   }
 
   th {
-    color: #555;
+    color: var(--text-medium)
     font-weight: 600;
     background: #f5f5f5;
   }
@@ -819,5 +819,5 @@ $transition-duration: 0.25s;
   font-size: 13px;
   text-align: center;
 }
-</style>
+
 

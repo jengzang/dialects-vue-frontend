@@ -393,7 +393,7 @@ defineExpose({
 })
 </script>
 
-<style lang="scss" scoped>
+
 $radius-pill: 999px;
 $z-catalog-button: 20030;
 $z-catalog-panel: 20031;
@@ -1038,7 +1038,7 @@ $float-catalog-button-left:0;
       padding: 10px 6px 10px 0px;
       border: none;
       border-radius: 0 100px 100px 0;
-      background: #007aff;
+      background: var(--color-primary);
       color: #fff;
       font-size: 0.8rem;
       font-weight: 700;
@@ -1082,4 +1082,3 @@ $float-catalog-button-left:0;
     padding-top: 52px;
   }
 }
-</style>

@@ -394,8 +394,8 @@ onBeforeUnmount(() => {
   </Teleport>
 </template>
 
-<style lang="scss" scoped>
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-dark: #0051d5;
 $primary-deep: #004fc4;
 
@@ -891,4 +891,3 @@ $mobile-width: 150px;
     }
   }
 }
-</style>

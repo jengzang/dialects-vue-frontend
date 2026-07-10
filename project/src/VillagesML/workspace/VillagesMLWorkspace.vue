@@ -482,7 +482,7 @@ const handleAdjustParams = (action) => {
 }
 </script>
 
-<style scoped>
+
 /* VillagesML Module Container */
 .villagesml-module {
   width: 100%;
@@ -510,7 +510,7 @@ const handleAdjustParams = (action) => {
   justify-content: center;
   min-height: 400px;
   text-align: center;
-  color: #666;
+  color: var(--text-tertiary);
   font-size: 16px;
 }
 
@@ -532,4 +532,4 @@ const handleAdjustParams = (action) => {
     grid-template-columns: 1fr;
   }
 }
-</style>
+

@@ -45,8 +45,8 @@ const goToYCVillages = () => {
 </script>
 
 ```vue
-<style scoped lang="scss">
-$button-text-color: #005fd3;
+
+$button-text-color: var(--color-blue-logo);
 $transition-duration: 0.3s;
 
 .title-row {
@@ -94,6 +94,6 @@ $transition-duration: 0.3s;
     transform: scale(1.05);
   }
 }
-</style>
+
 ```
 

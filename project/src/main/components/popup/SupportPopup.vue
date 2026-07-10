@@ -130,8 +130,8 @@ function handleClose() {
 }
 </script>
 
-<style scoped lang="scss">
-$text-main: #1d1d1f;
+
+$text-main: var(--text-primary);
 $text-secondary: rgba(0, 0, 0, 0.6);
 
 $surface-border: rgba(0, 0, 0, 0.06);
@@ -284,4 +284,4 @@ $transition-duration: 0.3s;
     }
   }
 }
-</style>
+

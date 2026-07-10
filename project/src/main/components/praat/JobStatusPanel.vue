@@ -78,8 +78,8 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-light: #5ac8fa;
 
 $error: #ff3b30;
@@ -264,4 +264,4 @@ $transition-duration: 0.3s;
 .canceled-title {
   @include status-title($warning);
 }
-</style>
+

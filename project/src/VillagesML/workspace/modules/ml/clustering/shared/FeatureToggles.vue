@@ -79,7 +79,7 @@ function updateFeature(key, value) {
 }
 </script>
 
-<style scoped>
+
 .section-title {
   font-size: 1rem;
   font-weight: 600;
@@ -106,7 +106,7 @@ function updateFeature(key, value) {
 
 .setting-hint {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-tertiary);
   font-style: italic;
 }
 
@@ -115,4 +115,4 @@ function updateFeature(key, value) {
   padding-left: 1rem;
   border-left: 2px solid rgba(74, 144, 226, 0.2);
 }
-</style>
+

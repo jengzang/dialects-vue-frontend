@@ -58,7 +58,7 @@ function updateSetting(key, value) {
 }
 </script>
 
-<style scoped>
+
 .section-title {
   font-size: 1rem;
   font-weight: 600;
@@ -92,7 +92,7 @@ function updateSetting(key, value) {
 
 .setting-hint {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-tertiary);
   font-style: italic;
 }
-</style>
+

@@ -235,8 +235,8 @@ const leave = (el) => {
 };
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $success-green: #34c759;
 $text-dark: #333;
 $text-muted: #555;
@@ -426,4 +426,4 @@ $transition-expand: 0.3s;
     transform: rotate(360deg);
   }
 }
-</style>
+

@@ -465,8 +465,8 @@ watch(
 </script>
 
 ```vue
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $primary-blue-dark: #0063cc;
 $text-primary: #1d1d1f;
 $text-secondary: #86868b;
@@ -891,6 +891,6 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     }
   }
 }
-</style>
+
 ```
 

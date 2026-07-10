@@ -241,8 +241,8 @@ watch(() => props.triggerEl, () => {
 })
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #02469e;
+
+$primary-blue: var(--color-blue-custom);
 $selected-background: #e6f0ff;
 $text-primary: rgba(0, 0, 0, 0.85);
 $text-secondary: rgba(0, 0, 0, 0.75);
@@ -361,4 +361,4 @@ $transition-fast: 0.2s;
   font-size: 13px;
   text-align: center;
 }
-</style>
+

@@ -824,9 +824,9 @@ loadConfig()
 </script>
 
 ```scss
-<style scoped lang="scss">
+
 $color-text: #0b2540;
-$color-primary: #007aff;
+$color-primary: var(--color-primary);
 $color-success: #34c759;
 $color-danger: #ff3b30;
 $color-disabled: #999;
@@ -1757,6 +1757,6 @@ $text-60: rgba(11, 37, 64, 0.6);
     }
   }
 }
-</style>
+
 ```
 

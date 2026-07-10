@@ -97,8 +97,8 @@ const handleTabClick = (tabName) => {
 }
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $text-default: #444;
 $white: #fff;
 $transition-duration: 0.5s;
@@ -179,4 +179,4 @@ $transition-duration: 0.5s;
     transform: translateY(0);
   }
 }
-</style>
+

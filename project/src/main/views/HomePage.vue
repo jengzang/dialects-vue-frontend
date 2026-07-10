@@ -709,8 +709,8 @@ onMounted(() => {
 </script>
 
 ```scss
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-dark: #005ecb;
 $primary-deep: #005fd3;
 $success: #34c759;
@@ -1887,6 +1887,6 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     animation: none;
   }
 }
-</style>
+
 ```
 

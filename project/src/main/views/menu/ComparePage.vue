@@ -1796,8 +1796,8 @@ export default {
 </script>
 
 ```scss
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $group1-primary: #4caf50;
 $group1-text: #2e7d32;
 $group2-primary: #2196f3;
@@ -2407,5 +2407,5 @@ $text-muted: #999;
     gap: 12px;
   }
 }
-</style>
+
 ```

@@ -218,7 +218,7 @@ onBeforeUnmount(() => {
 
 </script>
 
-<style scoped lang="scss">
+
 @use '../../styles/global/scrollbars' as scrollbars;
 
 $transition-duration: 0.3s;
@@ -237,7 +237,7 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   --modal-header-border: 1px solid rgba(0, 0, 0, 0.08);
   --modal-title-size: 16px;
   --modal-title-weight: 650;
-  --modal-title-color: #1d1d1f;
+  --modal-title-color: var(--text-primary);
   --modal-content-padding-top: 16px;
   --modal-content-padding-inline: 18px;
   --modal-content-padding-bottom: 20px;
@@ -407,4 +407,4 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
     transform: translateY(12px) scale(0.98);
   }
 }
-</style>
+

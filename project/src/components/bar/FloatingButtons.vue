@@ -85,8 +85,8 @@ const goToAuth = () => {
 };
 </script>
 
-<style scoped lang="scss">
-$apple-blue: #005fd3;
+
+$apple-blue: var(--color-blue-logo);
 
 $desktop-auth-size: 60px;
 $desktop-float-size: 60px;
@@ -282,4 +282,4 @@ $transition-base: 0.3s ease;
     }
   }
 }
-</style>
+

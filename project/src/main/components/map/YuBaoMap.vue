@@ -827,7 +827,7 @@ watch(() => props.activeTab, () => {
 })
 </script>
 
-<style scoped>
+
 .yubao-map-container {
   width: 100%;
   height: 100%;
@@ -892,7 +892,7 @@ watch(() => props.activeTab, () => {
 .loading-text {
   font-size: 15px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: var(--text-primary);
   letter-spacing: 0.3px;
 }
 
@@ -940,7 +940,7 @@ watch(() => props.activeTab, () => {
 }
 
 .custom-select select:focus {
-  border-color: #007aff;
+  border-color: var(--color-primary);
 }
 
 .custom-select .arrow {
@@ -950,7 +950,7 @@ watch(() => props.activeTab, () => {
   transform: translateY(-50%);
   pointer-events: none;
   font-size: 12px;
-  color: #888;
+  color: var(--text-muted)
 }
 
 /* 模式切换按钮 */
@@ -971,7 +971,7 @@ watch(() => props.activeTab, () => {
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
-  color: #666;
+  color: var(--text-tertiary)
 }
 
 .mode-switcher button:hover {
@@ -980,7 +980,7 @@ watch(() => props.activeTab, () => {
 
 .mode-switcher button.active {
   background: white;
-  color: #007aff;
+  color: var(--color-primary);
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -1001,7 +1001,7 @@ watch(() => props.activeTab, () => {
 }
 
 .action-btn {
-  background: #007aff;
+  background: var(--color-primary);
   color: white;
   border: none;
   padding: 8px;
@@ -1031,7 +1031,7 @@ watch(() => props.activeTab, () => {
   padding: 12px 24px;
   font-size: 15px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-dark)
   background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -1055,9 +1055,9 @@ watch(() => props.activeTab, () => {
 .exit-fullscreen-btn:active {
   transform: scale(0.95);
 }
-</style>
 
-<style>
+
+
 /* 全局样式 - 标记 */
 .yubao-marker {
   padding: 4px 8px;
@@ -1113,7 +1113,7 @@ watch(() => props.activeTab, () => {
 .popup-header h3 {
   margin: 0;
   font-size: 18px;
-  color: #333;
+  color: var(--text-dark);
   font-weight: 600;
 }
 
@@ -1181,7 +1181,7 @@ watch(() => props.activeTab, () => {
   flex: 1;
   font-size: 15px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: var(--text-primary);
   line-height: 1.6;
   word-break: break-word;
 }
@@ -1199,7 +1199,7 @@ watch(() => props.activeTab, () => {
 .word-value {
   font-size: 17px;
   font-weight: 600;
-  color: #1d1d1f;
+  color: var(--text-primary);
 }
 
 /* 分区行特殊样式 */
@@ -1221,8 +1221,8 @@ watch(() => props.activeTab, () => {
 }
 
 .info-line strong {
-  color: #555;
+  color: var(--text-medium);
   margin-right: 8px;
   font-weight: 600;
 }
-</style>
+

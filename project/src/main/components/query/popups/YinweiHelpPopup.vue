@@ -99,11 +99,11 @@ function handleClose() {
 }
 </script>
 
-<style scoped lang="scss">
+
 $text-main: #333;
 $text-secondary: #666;
 $text-muted: #8e8e93;
-$primary: #007aff;
+$primary: var(--color-primary);
 
 $divider-color: rgba(0, 0, 0, 0.05);
 $glass-background: rgba(255, 255, 255, 0.4);
@@ -259,4 +259,4 @@ $transition-normal: 0.3s;
     font-weight: 700;
   }
 }
-</style>
+

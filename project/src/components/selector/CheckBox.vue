@@ -81,8 +81,8 @@ const handleChange = (event) => {
 }
 </script>
 
-<style scoped lang="scss">
-$primary-color: var(--color-primary, #007aff);
+
+$primary-color: var(--color-primary);
 $text-color: var(--text-dark, #333);
 $white: #fff;
 
@@ -184,4 +184,3 @@ $transition-checkmark: 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
   line-height: 1.2;
   transition: color $transition-fast;
 }
-</style>

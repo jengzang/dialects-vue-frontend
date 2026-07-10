@@ -45,8 +45,8 @@ function getIcon(type) {
 }
 </script>
 
-<style scoped lang="scss">
-$apple-blue: #007aff;
+
+$apple-blue: var(--color-primary);
 $action-blue: #0067d8;
 $white: #fff;
 
@@ -320,4 +320,4 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transform: translateY(-12px) scale(0.98);
   }
 }
-</style>
+

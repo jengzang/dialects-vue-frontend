@@ -161,8 +161,8 @@ const handleSavePassword = () => {
 </script>
 
 ```vue
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $primary-blue-dark: #0051d5;
 $back-gold: #b8860b;
 $back-gold-dark: #8a5a00;
@@ -324,5 +324,5 @@ h3 {
 .success {
   color: $success-color;
 }
-</style>
+
 ```

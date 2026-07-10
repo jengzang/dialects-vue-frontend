@@ -351,8 +351,8 @@ onBeforeUnmount(() => {
 </script>
 
 ```scss
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-dark: #005fd3;
 $primary-light: #0080ff;
 
@@ -859,6 +859,6 @@ $portrait-ratio: 1 / 1;
     max-width: calc(100vw - 20px);
   }
 }
-</style>
+
 ```
 

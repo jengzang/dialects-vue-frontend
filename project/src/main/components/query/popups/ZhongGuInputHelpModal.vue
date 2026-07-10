@@ -82,7 +82,7 @@ const tableLabel = computed(() => {
 })
 </script>
 
-<style scoped lang="scss">
+
 $text-heading: #333;
 $text-body: #444;
 $text-note: #888;
@@ -178,7 +178,7 @@ $table-radius: 8px;
     vertical-align: top;
 
     &:first-child {
-      color: var(--color-blue-custom, #007aff);
+      color: var(--color-blue-custom, var(--color-primary));
       white-space: nowrap;
       font-weight: 600;
     }
@@ -192,4 +192,4 @@ $table-radius: 8px;
     }
   }
 }
-</style>
+

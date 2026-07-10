@@ -509,11 +509,11 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
+
 $region-text: #0f172a;
 $region-muted: #64748b;
 $region-soft: #94a3b8;
-$region-accent: #007aff;
+$region-accent: var(--color-primary);
 $region-danger: #ff3b30;
 $region-success: #34c759;
 $region-border: rgba(148, 163, 184, 0.22);
@@ -1235,4 +1235,3 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
     font-size: 48px;
   }
 }
-</style>

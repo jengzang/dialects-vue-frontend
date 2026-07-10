@@ -322,8 +322,8 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $success-green: #52c41a;
 $transition-duration: 0.2s;
 $glass-blur: 12px;
@@ -468,4 +468,4 @@ $glass-blur: 12px;
   backdrop-filter: blur($glass-blur) saturate(160%);
   -webkit-backdrop-filter: blur($glass-blur) saturate(160%);
 }
-</style>
+

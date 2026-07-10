@@ -183,11 +183,11 @@ const loadCompleteData = async () => {
 }
 </script>
 
-<style scoped>
+
 .village-modal-title {
   font-size: 18px;
   font-weight: 650;
-  color: #333;
+  color: var(--text-dark);
 }
 
 /* Body */
@@ -246,4 +246,4 @@ const loadCompleteData = async () => {
     font-size: 15px;
   }
 }
-</style>
+

@@ -101,8 +101,8 @@ const handleSubmit = () => {
 }
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $primary-blue-dark: #0056b3;
 $success-green: #34c759;
 $title-color: #1c1c1e;
@@ -218,4 +218,4 @@ $mobile-aspect-ratio: 1 / 1;
     transform: translateY(0) scale(0.96);
   }
 }
-</style>
+

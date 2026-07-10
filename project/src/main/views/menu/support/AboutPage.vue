@@ -554,8 +554,8 @@ function resolveTabRoute(tabName) {
 </script>
 
 ```scss
-<style lang="scss" scoped>
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $zhihu-blue: #0066ff;
 $github-dark: #24292f;
 $danger: #c52f27;
@@ -729,7 +729,7 @@ em {
     left: 50%;
     width: 0%;
     height: 2px;
-    background: linear-gradient(90deg, #007aff, #00c6ff);
+    background: linear-gradient(90deg, var(--color-primary), #00c6ff);
     transition: width 0.3s ease, left 0.3s ease;
   }
 
@@ -1483,5 +1483,5 @@ em {
     font-size: 18px;
   }
 }
-</style>
+
 ```

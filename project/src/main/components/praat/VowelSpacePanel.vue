@@ -532,8 +532,8 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $success: #34c759;
 $warning: #ff9500;
 
@@ -824,4 +824,4 @@ $transition-duration: 0.3s;
     font-size: 0.8rem;
   }
 }
-</style>
+

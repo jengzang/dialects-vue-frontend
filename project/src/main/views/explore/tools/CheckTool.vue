@@ -2079,8 +2079,8 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $text-main: #0b2540;
 $text-muted: #666;
 $danger: #ff3b30;
@@ -4129,4 +4129,3 @@ $success-soft: rgba(52, 199, 89, 0.1);
     transform: translateY(-2px) !important;
   }
 }
-</style>

@@ -155,8 +155,8 @@ onMounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-dark: #005ecb;
 $text-main: #1d1d1f;
 $text-secondary: rgba(0, 0, 0, 0.6);
@@ -321,4 +321,4 @@ $transition-button: 0.25s;
     padding: 1.5rem;
   }
 }
-</style>
+

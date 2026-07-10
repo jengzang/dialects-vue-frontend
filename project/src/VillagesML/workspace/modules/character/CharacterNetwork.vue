@@ -236,14 +236,14 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+
 .character-network-page { padding: 12px; max-width: 1400px; margin: 0 auto; }
 
 .auth-warning {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 16px; margin-bottom: 12px;
   background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.3);
-  border-radius: 10px; font-size: 14px; color: #ff3b30;
+  border-radius: 10px; font-size: 14px; color: var(--color-error-light);
 }
 
 .controls-panel, .progress-panel, .graph-panel, .empty-state {
@@ -253,7 +253,7 @@ onBeforeUnmount(() => {
 .controls-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
 
 .control-group { display: flex; flex-direction: column; gap: 4px; }
-.control-group label { font-size: 12px; color: var(--text-secondary, #666); }
+.control-group label { font-size: 12px; color: var(--text-secondary, var(--text-tertiary)); }
 
 .vml-char-input {
   min-width: 56px;
@@ -271,7 +271,7 @@ onBeforeUnmount(() => {
 .glass-input.small { min-width: 56px; width: 80px; flex: 1; }
 
 .progress-panel { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.progress-text { font-size: 13px; color: var(--text-secondary, #666); margin: 0; }
+.progress-text { font-size: 13px; color: var(--text-secondary, var(--text-tertiary)); margin: 0; }
 .progress-bar-track {
   width: 100%; height: 6px; background: rgba(0, 0, 0, 0.08);
   border-radius: 3px; margin-top: 4px;
@@ -281,7 +281,7 @@ onBeforeUnmount(() => {
   border-radius: 3px; transition: width 0.3s ease;
 }
 
-.graph-stats { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; font-size: 13px; color: var(--text-secondary, #666); }
+.graph-stats { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; font-size: 13px; color: var(--text-secondary, var(--text-tertiary)); }
 .depth-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; font-size: 13px; }
 .legend-item { display: flex; align-items: center; gap: 4px; }
 .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
@@ -289,4 +289,4 @@ onBeforeUnmount(() => {
 .network-chart { width: 100%; height: clamp(320px, 70dvh, 520px); }
 
 .empty-state { text-align: center; color: var(--text-secondary, #888); padding: 40px; }
-</style>
+

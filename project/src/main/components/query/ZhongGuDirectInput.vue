@@ -146,8 +146,8 @@ watch(chars, (newVal) => {
 defineExpose({ pathStrings, chars, positionInput, charInput })
 </script>
 
-<style lang="scss" scoped>
-$primary-color: var(--color-blue-custom, #007aff);
+
+$primary-color: var(--color-blue-custom, var(--color-primary));
 $text-medium-color: var(--text-medium, #555);
 $error-color: #ff3b30;
 $warning-color: #ff9500;
@@ -262,4 +262,3 @@ textarea {
 .warning-item {
   @include status-item($warning-color);
 }
-</style>

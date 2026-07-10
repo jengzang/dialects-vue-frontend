@@ -1353,8 +1353,8 @@ defineExpose({
 
 
 ```scss
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $success: #52c41a;
 $custom-purple: #667eea;
 $portrait-ratio: 1 / 1;
@@ -1727,7 +1727,7 @@ $portrait-ratio: 1 / 1;
 }
 
 .region-label {
-  color: #333;
+  color: var(--text-dark)
   font-size: 14px;
   font-weight: 600;
 }
@@ -1782,6 +1782,6 @@ $portrait-ratio: 1 / 1;
     }
   }
 }
-</style>
+
 ```
 

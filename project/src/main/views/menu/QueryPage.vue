@@ -815,8 +815,8 @@ export default {
 </script>
 
 ```vue
-<style scoped lang="scss">
-$text-color: #333;
+
+$text-color: var(--text-dark);
 $placeholder-color: #6a6a6a;
 $white: #fff;
 $dark-blue: darkblue;
@@ -1077,6 +1077,6 @@ $transition-base: 0.3s;
     transform: translateY(0);
   }
 }
-</style>
+
 ```
 

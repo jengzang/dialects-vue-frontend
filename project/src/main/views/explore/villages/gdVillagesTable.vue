@@ -36,8 +36,8 @@ const spokenColumns = computed(() => [
 
 
 ```vue
-<style scoped lang="scss">
-$button-text-color: #005fd3;
+
+$button-text-color: var(--color-blue-logo);
 $button-transition: 0.3s ease;
 
 .title-row {
@@ -77,6 +77,6 @@ $button-transition: 0.3s ease;
     transform: scale(1.05);
   }
 }
-</style>
+
 ```
 

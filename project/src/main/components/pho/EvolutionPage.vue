@@ -685,7 +685,7 @@ const generatePieChartOption = (pieData) => {
     //
     //     if (item.level2 && item.level2.length > 0) {
     //       html += `<div style="border-top: 1px solid #eee; margin: 6px 0; padding-top: 6px;">
-    //         <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
+    //         <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">
     //           细分（按${level2Column.value}）：
     //         </div>`
     //
@@ -697,7 +697,7 @@ const generatePieChartOption = (pieData) => {
     //         if (l2.chars && l2.chars.length > 0) {
     //           const displayChars = l2.chars.slice(0, 10)
     //           const remaining = l2.chars.length - displayChars.length
-    //           html += `<div style="margin-left: 16px; font-size: 10px; color: #888;">
+    //           html += `<div style="margin-left: 16px; font-size: 10px; color: var(--text-muted);">
     //             字：${displayChars.join('、')}${remaining > 0 ? ` +${remaining}个` : ''}
     //           </div>`
     //         }
@@ -1431,8 +1431,8 @@ onUnmounted(() => {
 </script>
 
 ```scss
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $danger: #ff3b30;
 
 $text-primary: #333;
@@ -1884,5 +1884,5 @@ $portrait-ratio: 1 / 1;
     min-height: 520px;
   }
 }
-</style>
+
 ```

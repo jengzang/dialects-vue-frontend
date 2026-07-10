@@ -884,8 +884,8 @@ onBeforeUnmount(() => {
 defineExpose({ togglePopup, openPopup, closePopup })
 </script>
 
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-dark: #0051d5;
 $success: #34c759;
 $danger: #ff3b30;
@@ -1255,7 +1255,7 @@ $portrait-ratio: 1 / 1;
 .loading {
   flex-direction: column;
   padding: 40px 20px;
-  color: #666;
+  color: var(--text-tertiary)
 
   @include flex-center;
 }
@@ -1266,7 +1266,7 @@ $portrait-ratio: 1 / 1;
 
   p {
     margin-bottom: 20px;
-    color: #666;
+    color: var(--text-tertiary)
   }
 }
 
@@ -1317,7 +1317,7 @@ $portrait-ratio: 1 / 1;
 }
 
 .region-info {
-  color: #666;
+  color: var(--text-tertiary)
   font-size: 13px;
 }
 
@@ -1347,4 +1347,4 @@ $portrait-ratio: 1 / 1;
     font-size: 18px;
   }
 }
-</style>
+

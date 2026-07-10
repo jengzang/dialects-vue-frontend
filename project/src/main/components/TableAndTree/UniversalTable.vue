@@ -1526,8 +1526,8 @@ onUnmounted(() => {
 
 
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $success-green: #34c759;
 $warning-orange: #ff9800;
 $warning-dark: #ff6f00;
@@ -2619,7 +2619,7 @@ td {
 }
 
 .old-value {
-  color: #d32f2f;
+  color: var(--color-error);
   text-decoration: line-through;
   opacity: 0.7;
 }
@@ -2764,4 +2764,4 @@ td {
     gap:1px
   }
 }
-</style>
+

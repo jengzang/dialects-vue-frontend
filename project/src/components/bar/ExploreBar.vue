@@ -400,8 +400,8 @@ const goToAuthPage = () => {
 }
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $primary-blue-dark: #005fd3;
 $active-blue: darkblue;
 $text-primary: #333;
@@ -744,4 +744,3 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   opacity: 0;
   transform: translateY(-10px) scale(0.95);
 }
-</style>

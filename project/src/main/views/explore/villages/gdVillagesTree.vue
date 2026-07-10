@@ -564,8 +564,8 @@ onMounted(() => {
 </script>
 
 ```vue
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $primary-blue-dark: #0051d5;
 $button-blue: #005fd3;
 $success-green: #34c759;
@@ -922,6 +922,6 @@ $transition-base: 0.3s;
     transform: scale(1.05);
   }
 }
-</style>
+
 ```
 

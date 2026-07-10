@@ -27,8 +27,8 @@ defineProps({
 defineEmits(['update:modelValue'])
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $text-color: #333;
 $border-color: #d0d0d0;
 $switcher-background: #f0f0f5;
@@ -76,4 +76,4 @@ $mobile-aspect-ratio: 1 / 1;
     padding: 12px 6px;
   }
 }
-</style>
+

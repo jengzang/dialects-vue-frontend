@@ -1065,9 +1065,9 @@ const initContinuousChart = (isZScore) => {
 }
 </script>
 
-<style scoped lang="scss">
+
 $primary: var(--color-primary, #4a90e2);
-$primary-blue: #007aff;
+$primary-blue: var(--color-primary);
 $primary-purple: #5856d6;
 $primary-hover: #3a7bc8;
 
@@ -1340,7 +1340,7 @@ $transition-normal: 0.3s;
   }
 
   .tag-count {
-    color: #666;
+    color: var(--text-tertiary)
     font-size: 0.8rem;
     font-weight: 600;
   }
@@ -1642,4 +1642,4 @@ $transition-normal: 0.3s;
     font-size: 1.4rem;
   }
 }
-</style>
+

@@ -235,8 +235,8 @@ onMounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $secondary-blue: #00c6ff;
 $white: #fff;
 
@@ -326,4 +326,3 @@ $overlay-transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
   }
 }
-</style>

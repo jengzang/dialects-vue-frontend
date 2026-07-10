@@ -927,7 +927,7 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped lang="scss">
+
 $primary: var(--color-primary);
 $error: var(--color-error);
 $text-primary: var(--color-text-primary);
@@ -1114,7 +1114,7 @@ $transition-normal: 0.3s;
   }
 
   &.badge-auto-split {
-    background: #007aff;
+    background: var(--color-primary);
   }
 
   &.badge-manual {
@@ -1461,4 +1461,4 @@ $transition-normal: 0.3s;
     gap: 0.5rem;
   }
 }
-</style>
+

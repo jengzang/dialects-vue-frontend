@@ -481,8 +481,8 @@ const helpStepsItems = computed(() => [
 ]);
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $primary-blue-dark: #0050b3;
 $success-green: #34c759;
 $usage-green: #2e7d32;
@@ -558,7 +558,7 @@ $glass-card: rgba(255, 255, 255, 0.5);
   padding: 8px 12px;
   background: rgba(0, 0, 0, 0.03);
   border-radius: 6px;
-  color: #666;
+  color: var(--text-tertiary)
   font-size: 12px;
 
   &--result {
@@ -627,7 +627,7 @@ $glass-card: rgba(255, 255, 255, 0.5);
 
 .highlight-geo {
   background-color: #fafafa;
-  color: #888;
+  color: var(--text-muted)
   font-family: monospace;
   font-size: 11px;
 }
@@ -793,4 +793,3 @@ $glass-card: rgba(255, 255, 255, 0.5);
     padding: 7px;
   }
 }
-</style>

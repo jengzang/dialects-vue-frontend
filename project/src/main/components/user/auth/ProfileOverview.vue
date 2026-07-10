@@ -183,8 +183,8 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $primary-blue-dark: #0051d5;
 $text-primary: #1d1d1f;
 $text-secondary: #707077;
@@ -802,4 +802,3 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
     font-size: 15px;
   }
 }
-</style>

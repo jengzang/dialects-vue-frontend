@@ -751,12 +751,12 @@ onMounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
+
 $user-text: #0f172a;
 $user-muted: #64748b;
 $user-border: rgba(148, 163, 184, 0.24);
 $user-glass-border: rgba(255, 255, 255, 0.58);
-$user-accent: #007aff;
+$user-accent: var(--color-primary);
 $user-danger: #ff3b30;
 $user-warning: #ff9500;
 $user-success: #34c759;
@@ -1677,4 +1677,3 @@ $user-success: #34c759;
     min-width: 720px;
   }
 }
-</style>

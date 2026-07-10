@@ -349,8 +349,8 @@ export default {
 </script>
 
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $primary-blue-hover: #0062cc;
 $apple-red: #ff3b30;
 
@@ -527,4 +527,3 @@ $transition-fast: 0.2s;
     transform: translateY(0);
   }
 }
-</style>

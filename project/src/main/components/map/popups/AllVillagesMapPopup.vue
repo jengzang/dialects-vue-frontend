@@ -122,7 +122,7 @@ const buildTag = (text, bgColor) => {
   const r = parseInt(bgColor.slice(1, 3), 16)
   const g = parseInt(bgColor.slice(3, 5), 16)
   const b = parseInt(bgColor.slice(5, 7), 16)
-  return `<span style="display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:500;color:#333;background:rgba(${r},${g},${b},0.2);margin-top:2px">${text}</span>`
+  return `<span style="display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:500;color:var(--text-dark);background:rgba(${r},${g},${b},0.2);margin-top:2px">${text}</span>`
 }
 
 const buildHoverHtml = (name, pathStr, tagText, tagColor) => {
@@ -536,8 +536,8 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-hover: #0062cc;
 $text-dark: #1d1d1f;
 $mobile-breakpoint: 768px;
@@ -607,7 +607,7 @@ $mobile-breakpoint: 768px;
   padding: 6px 12px;
   background: rgba(52, 199, 89, 0.15);
   border-radius: 10px;
-  color: #34c759;
+  color: var(--color-success);
   white-space: nowrap;
   font-size: 13px;
   font-weight: 600;
@@ -648,7 +648,7 @@ $mobile-breakpoint: 768px;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  color: #333;
+  color: var(--text-dark)
   white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
@@ -716,7 +716,7 @@ $mobile-breakpoint: 768px;
   background: rgba(255, 255, 255, 0.98);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  color: #333;
+  color: var(--text-dark)
   font-size: 13px;
   line-height: 1.6;
 
@@ -755,4 +755,4 @@ $mobile-breakpoint: 768px;
     font-size: 13px;
   }
 }
-</style>
+

@@ -66,7 +66,7 @@ const handleAllVillages = () => {
 };
 </script>
 
-<style scoped>
+
 .villages-page {
   min-width: 80dvw;
   display: flex;
@@ -133,7 +133,7 @@ const handleAllVillages = () => {
 
 .village-desc {
   font-size: 13px;
-  color: #666;
+  color: var(--text-tertiary);
   line-height: 1.4;
 }
 
@@ -165,4 +165,4 @@ const handleAllVillages = () => {
     font-size: 12px;
   }
 }
-</style>
+

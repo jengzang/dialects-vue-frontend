@@ -9,7 +9,7 @@
           marginBottom: isCondensedMode ? '0' : '50px'
         }"
     >
-      <div v-if="!hasData" class="empty-tip" style="padding: 20px; text-align: center; color: #666;">
+      <div v-if="!hasData" class="empty-tip" style="padding: 20px; text-align: center; color: var(--text-tertiary);">
         {{ t('result.resultList.emptyState') }}
       </div>
 
@@ -459,8 +459,8 @@ onUnmounted(() => {
 });
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $text-dark: #333;
 $panel-radius: 12px;
 $dropdown-radius: 10px;
@@ -769,4 +769,3 @@ $system-font:
     }
   }
 }
-</style>

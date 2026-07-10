@@ -352,13 +352,13 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped lang="scss">
+
 $orange: #ff9500;
 $orange-dark: #ff8000;
-$green: #34c759;
+$green: var(--color-success);
 $green-light: #30d158;
 
-$text-main: #1d1d1f;
+$text-main: var(--text-primary);
 $text-secondary: #86868b;
 $text-white: #fff;
 
@@ -690,4 +690,4 @@ $transition-normal: 0.3s;
     }
   }
 }
-</style>
+

@@ -317,7 +317,7 @@ const resetView = () => {
 }
 </script>
 
-<style scoped>
+
 .hotspot-map-container {
   width: 100%;
   height: 500px;
@@ -395,7 +395,7 @@ const resetView = () => {
   transform: translateY(-50%);
   pointer-events: none;
   font-size: 12px;
-  color: #888;
+  color: var(--text-muted);
 }
 
 .button-row {
@@ -439,7 +439,7 @@ const resetView = () => {
   padding: 12px 24px;
   font-size: 15px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-dark);
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.5);
@@ -467,7 +467,7 @@ const resetView = () => {
   gap: 12px;
   z-index: 20;
   font-weight: 500;
-  color: #555;
+  color: var(--text-medium);
 }
 /* 村莊詳情彈窗 */
 .village-popup-overlay {
@@ -502,7 +502,7 @@ const resetView = () => {
 .popup-header h3 {
   margin: 0;
   font-size: 18px;
-  color: #333;
+  color: var(--text-dark);
 }
 
 .popup-body {
@@ -521,12 +521,12 @@ const resetView = () => {
 
 .info-row .label {
   font-weight: 600;
-  color: #555;
+  color: var(--text-medium);
   min-width: 80px;
 }
 
 .info-row .value {
-  color: #333;
+  color: var(--text-dark);
   flex: 1;
 }
-</style>
+

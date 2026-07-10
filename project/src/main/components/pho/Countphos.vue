@@ -1116,8 +1116,8 @@ onBeforeUnmount(() => {
   </div>
 </template>
 
-<style lang="scss" scoped>
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-dark: #0051d5;
 $primary-deep: #003d9e;
 $mobile-breakpoint: 768px;
@@ -1738,4 +1738,3 @@ $mobile-breakpoint: 768px;
   line-height: 1.9;
   letter-spacing: 0.015em;
 }
-</style>

@@ -55,7 +55,7 @@
       <div v-else-if="regionalData" class="regional-results">
         <div class="regional-header vml-glass-panel">
           <h3>{{ regionalData.region_name }} - {{ getSubcategoryName(regionalData.parent_category) || regionalData.parent_category }} 子類別分布</h3>
-          <p style="font-size: 14px; color: #666; margin-top: 8px;">
+          <p style="font-size: 14px; color: var(--text-tertiary); margin-top: 8px;">
             包含 {{ regionalData.subcategories?.length || 0 }} 個子類別：
             <span v-for="(subcat, index) in regionalData.subcategories" :key="subcat.subcategory" style="margin-left: 4px;">
               {{ getSubcategoryName(subcat.subcategory) || subcat.subcategory }}<span v-if="index < regionalData.subcategories.length - 1">、</span>
@@ -608,7 +608,7 @@ export default {
 }
 </script>
 
-<style scoped>
+
 .query-button{
   margin: 0 auto 0;
 }
@@ -725,7 +725,7 @@ export default {
 }
 
 .stat-label {
-  color: #666;
+  color: var(--text-tertiary);
 }
 
 .stat-value {
@@ -740,7 +740,7 @@ export default {
 .char-label {
   font-size: 13px;
   font-weight: 500;
-  color: #666;
+  color: var(--text-tertiary);
   margin-bottom: 4px;
 }
 
@@ -840,17 +840,17 @@ tr.significant {
 
 .rank-badge.gold {
   background: linear-gradient(135deg, #ffd700, #ffed4e);
-  color: #333;
+  color: var(--text-dark)
 }
 
 .rank-badge.silver {
   background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
-  color: #333;
+  color: var(--text-dark)
 }
 
 .rank-badge.bronze {
   background: linear-gradient(135deg, #cd7f32, #e8a87c);
-  color: #333;
+  color: var(--text-dark)
 }
 
 .rank-badge:not(.gold):not(.silver):not(.bronze) {
@@ -885,4 +885,4 @@ tr.significant {
     height: 400px;
   }
 }
-</style>
+

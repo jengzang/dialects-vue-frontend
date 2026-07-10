@@ -48,7 +48,7 @@ const legendItems = computed(() => {
 })
 </script>
 
-<style scoped>
+
 .map-legend {
   position: absolute;
   bottom: 30px;
@@ -65,7 +65,7 @@ const legendItems = computed(() => {
   font-weight: 600;
   font-size: 14px;
   margin-bottom: 8px;
-  color: #333;
+  color: var(--text-dark);
 }
 
 .legend-items {
@@ -90,6 +90,6 @@ const legendItems = computed(() => {
 
 .legend-label {
   font-size: 13px;
-  color: #555;
+  color: var(--text-medium);
 }
-</style>
+

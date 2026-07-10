@@ -899,12 +899,12 @@ watch(viewMode, async (newMode) => {
 </script>
 
 ```vue
-<style scoped lang="scss">
+
 $primary: #0071e3;
 $white: #fff;
 $purple: #af52de;
 
-$text-primary: #1d1d1f;
+$text-primary: var(--text-primary);
 $text-secondary: #6e6e73;
 $text-tertiary: #999;
 
@@ -1585,6 +1585,6 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
   }
 }
-</style>
+
 ```
 

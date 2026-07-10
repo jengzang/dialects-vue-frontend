@@ -581,8 +581,8 @@ onMounted(() => {
 }
 </style>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $deep-blue: #0038a1;
 $text-black: #000;
 $text-gray: #666;
@@ -776,7 +776,7 @@ $glass-blur: 8px;
 
 .annotation {
   max-width: 400px;
-  color: #888;
+  color: var(--text-muted)
   font-size: 0.85em;
   white-space: normal;
   word-break: break-word;
@@ -830,7 +830,7 @@ $glass-blur: 8px;
 .no-data-warning {
   margin: 10px 0;
   padding: 12px 20px;
-  color: #d32f2f;
+  color: var(--color-error);
   font-size: 14px;
   font-weight: 600;
   text-align: center;
@@ -1009,7 +1009,7 @@ $glass-blur: 8px;
     visibility: hidden;
     content: attr(data-title);
     pointer-events: none;
-    background-color: #333;
+    background-color: var(--text-dark)
     border-radius: 4px;
     opacity: 0;
     transform: translateX(-50%);
@@ -1023,4 +1023,3 @@ $glass-blur: 8px;
     opacity: 1;
   }
 }
-</style>

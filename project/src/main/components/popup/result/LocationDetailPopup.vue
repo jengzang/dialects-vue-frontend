@@ -138,12 +138,12 @@ const handleClose = () => {
 };
 </script>
 
-<style scoped lang="scss">
+
 $text-main: #1d1d1f;
 $text-body: #333;
 $text-secondary: #666;
 
-$primary: #007aff;
+$primary: var(--color-primary);
 $primary-divider: rgba(0, 122, 255, 0.2);
 $primary-background-light: rgba(0, 122, 255, 0.05);
 $primary-background-medium: rgba(0, 122, 255, 0.08);
@@ -284,4 +284,4 @@ $transition-fast: 0.2s;
     }
   }
 }
-</style>
+

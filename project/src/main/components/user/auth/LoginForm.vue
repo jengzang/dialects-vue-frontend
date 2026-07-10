@@ -132,8 +132,8 @@ watch(() => props.loginMode, () => {
 </script>
 
 ```vue
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $primary-blue-dark: #0056b3;
 $success-green: #34c759;
 $title-color: #1c1c1e;
@@ -249,6 +249,6 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     transform: translateY(0) scale(0.96);
   }
 }
-</style>
+
 ```
 

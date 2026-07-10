@@ -925,7 +925,7 @@ onBeforeUnmount(() => {
 // }
 </script>
 
-<style scoped>
+
 .praat-page {
   max-width: 1200px;
   margin: 0 auto;
@@ -1034,7 +1034,7 @@ onBeforeUnmount(() => {
 
 .tab-btn:hover:not(.active):not(:disabled) {
   background: rgba(0, 0, 0, 0.04);
-  color: #1d1d1f;
+  color: var(--text-primary);
   transform: translateX(2px);
 }
 
@@ -1424,7 +1424,7 @@ onBeforeUnmount(() => {
 .error-title {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #ff3b30;
+  color: var(--color-error-light);
   margin-bottom: 0.5rem;
 }
 
@@ -1467,7 +1467,7 @@ onBeforeUnmount(() => {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #007aff, #5ac8fa);
+  background: linear-gradient(90deg, var(--color-primary), #5ac8fa);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -1475,7 +1475,7 @@ onBeforeUnmount(() => {
 .progress-text {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #007aff;
+  color: var(--color-primary);
   text-align: center;
 }
 
@@ -1508,4 +1508,4 @@ onBeforeUnmount(() => {
   font-size: 1rem;
   color: var(--color-text-secondary);
 }
-</style>
+

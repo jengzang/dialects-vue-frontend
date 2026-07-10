@@ -619,8 +619,8 @@ const tableData = computed(() => {
 </template>
 
 ```scss
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-dark: #0051d5;
 $text-primary: #1d1d1f;
 $text-secondary: #86868b;
@@ -1334,5 +1334,5 @@ $bronze: #cd7f32;
     font-size: 12px;
   }
 }
-</style>
+
 ```

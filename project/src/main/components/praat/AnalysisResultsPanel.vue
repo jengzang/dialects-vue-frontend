@@ -723,8 +723,8 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $quality-good: #34c759;
 $quality-fair: #ff9500;
 $quality-poor: #ff3b30;
@@ -954,4 +954,4 @@ $transition-normal: 0.3s;
     transform: translateY(-2px);
   }
 }
-</style>
+

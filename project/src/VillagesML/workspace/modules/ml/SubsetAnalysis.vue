@@ -1218,7 +1218,7 @@ const handleApiError = (error) => {
 }
 </script>
 
-<style scoped>
+
 /* ========================================
    Apple Liquid Glass Blue Style
    ======================================== */
@@ -1355,7 +1355,7 @@ const handleApiError = (error) => {
 }
 
 .solid-button.danger {
-  background: linear-gradient(135deg, #e57373, #d32f2f);
+  background: linear-gradient(135deg, #e57373, var(--color-error));
   box-shadow: 0 4px 12px rgba(229, 115, 115, 0.25);
 }
 
@@ -2162,4 +2162,4 @@ const handleApiError = (error) => {
     grid-template-columns: 1fr;
   }
 }
-</style>
+

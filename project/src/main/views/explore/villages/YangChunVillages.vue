@@ -140,11 +140,11 @@ const displayData = computed(() => {
 </script>
 
 ```vue
-<style scoped lang="scss">
-$text-primary: #1d1d1f;
+
+$text-primary: var(--text-primary);
 $text-secondary: dimgrey;
-$text-muted: #888;
-$button-blue: #005fd3;
+$text-muted: var(--text-muted);
+$button-blue: var(--color-blue-logo);
 $transition-base: 0.3s;
 
 .glass-container {
@@ -261,6 +261,6 @@ $transition-base: 0.3s;
     transform: scale(1.05);
   }
 }
-</style>
+
 ```
 

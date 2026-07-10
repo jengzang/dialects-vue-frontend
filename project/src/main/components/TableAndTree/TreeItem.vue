@@ -111,8 +111,8 @@ const leave = (el) => {
 };
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $text-dark: #333;
 $transition-fast: 0.2s;
 $transition-expand: 0.3s;
@@ -190,4 +190,3 @@ $transition-expand: 0.3s;
   background: rgba(255, 255, 0, 0.4);
   border-radius: 4px;
 }
-</style>

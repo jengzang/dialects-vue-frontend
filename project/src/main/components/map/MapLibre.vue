@@ -1047,7 +1047,7 @@ const resetView = () => {
 
 </style>
 
-<style scoped>
+
 .map-page-container {
   width: 70dvw;
   height: 70vh;
@@ -1078,7 +1078,7 @@ const resetView = () => {
   padding: 12px 24px;
   font-size: 15px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-dark)
   background: rgba(255, 255, 255, 0.65); /* 半透明白 */
   backdrop-filter: blur(20px) saturate(180%); /* 液態模糊感 */
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -1141,7 +1141,7 @@ const resetView = () => {
 }
 .control-group label {
   font-size: 12px;
-  color: #666;
+  color: var(--text-tertiary)
   font-weight: bold;
   margin-bottom: 4px;
   display: block;
@@ -1164,7 +1164,7 @@ const resetView = () => {
 }
 
 .action-btn {
-  background: #007aff;
+  background: var(--color-primary);
   color: white;
   border: none;
   padding: 8px;
@@ -1196,7 +1196,7 @@ const resetView = () => {
   justify-content: center;
   z-index: 20;
   font-weight: bold;
-  color: #555;
+  color: var(--text-medium)
 }
 /* 整个容器样式 */
 .custom-switch-container1 {
@@ -1244,7 +1244,7 @@ const resetView = () => {
 .location-popup-header h3 {
   margin: 0;
   font-size: 18px;
-  color: #333;
+  color: var(--text-dark)
 }
 
 
@@ -1261,7 +1261,7 @@ const resetView = () => {
   align-items: center;
   justify-content: center;
   padding: 40px;
-  color: #666;
+  color: var(--text-tertiary)
 }
 
 .dialect-info {
@@ -1282,14 +1282,14 @@ const resetView = () => {
 .title-line {
   font-size: 20px;
   font-weight: bold;
-  color: #333;
+  color: var(--text-dark)
   padding: 12px 0;
   border-bottom: 2px solid #007bff;
   margin-bottom: 16px;
 }
 
 .info-line strong {
-  color: #555;
+  color: var(--text-medium)
   margin-right: 8px;
 }
 
@@ -1313,7 +1313,7 @@ const resetView = () => {
 .tone-table th {
   background: #f5f5f5;
   font-weight: 600;
-  color: #333;
+  color: var(--text-dark)
 }
 
 .tone-table tbody tr:hover {
@@ -1338,4 +1338,3 @@ const resetView = () => {
   color: #999;
   font-size: 16px;
 }
-</style>

@@ -1642,7 +1642,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped lang="scss">
+
 @use '../../../../styles/global/scrollbars' as scrollbars;
 
 @mixin draw-section-base {
@@ -1798,7 +1798,7 @@ onBeforeUnmount(() => {
 
 .draw-modal-card-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.8);
-  border-color: #007aff;
+  border-color: var(--color-primary);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 122, 255, 0.08);
 }
@@ -1951,4 +1951,4 @@ onBeforeUnmount(() => {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-</style>
+

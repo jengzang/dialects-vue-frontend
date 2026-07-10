@@ -174,8 +174,8 @@ const toggle = () => {
 }
 </script>
 
-<style scoped lang="scss">
-$active-blue: #007aff;
+
+$active-blue: var(--color-primary);
 $thumb-background: #fff;
 $inside-label-color: #111;
 
@@ -310,4 +310,4 @@ $transition-ease: ease;
       0 0 40px rgba(102, 204, 255, 1);
   }
 }
-</style>
+

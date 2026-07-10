@@ -30,13 +30,13 @@ defineProps({
 defineEmits(['click'])
 </script>
 
-<style scoped lang="scss">
+
 $transition-duration: 0.3s;
 $mobile-aspect-ratio: 1 / 1;
 
 $solid-variants: (
   blue: (
-    background: #007aff,
+    background: var(--color-primary),
     hover: #005fcc
   ),
   green: (
@@ -125,4 +125,4 @@ $gradient-variants: (
     }
   }
 }
-</style>
+

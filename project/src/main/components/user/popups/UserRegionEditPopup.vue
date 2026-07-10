@@ -201,8 +201,8 @@ function handleLocationInput(event) {
 }
 </script>
 
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-dark: #0051d5;
 $success: #34c759;
 
@@ -428,4 +428,4 @@ $transition-normal: 0.3s;
     background: $primary-background;
   }
 }
-</style>
+

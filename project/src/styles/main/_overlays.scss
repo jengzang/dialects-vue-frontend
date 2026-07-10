@@ -52,7 +52,7 @@
 .main-glass-modal-title {
   font-size: 15px;
   font-weight: 650;
-  color: #1d1d1f;
+  color: var(--text-primary);
 }
 
 .main-glass-modal-body {
@@ -110,7 +110,7 @@
   justify-content: center;
   gap: 12px;
   padding: 40px 20px;
-  color: #666;
+  color: var(--text-tertiary);
   font-size: 14px;
 }
 
@@ -157,7 +157,7 @@
 .main-crud-modal .modal-header h3 {
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-dark);
 }
 
 .main-cell-detail-modal .modal-header {

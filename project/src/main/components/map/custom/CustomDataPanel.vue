@@ -357,7 +357,7 @@ const resetForm = () => {
 }
 </script>
 
-<style scoped>
+
 /* 右侧面板容器 */
 .custom-data-panel {
   position: fixed;
@@ -394,7 +394,7 @@ const resetForm = () => {
   transform: translateY(-50%);
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #007aff, #0051d5);
+  background: linear-gradient(135deg, var(--color-primary), #0051d5);
   color: white;
   border: none;
   border-radius: 12px 0 0 12px;
@@ -460,7 +460,7 @@ const resetForm = () => {
 }
 
 .required {
-  color: #ff3b30;
+  color: var(--color-error-light);
   margin-left: 2px;
 }
 
@@ -478,13 +478,13 @@ const resetForm = () => {
 .form-group input[readonly] {
   background: rgba(240, 240, 240, 0.8);
   cursor: not-allowed;
-  color: #666;
+  color: var(--text-tertiary)
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #007aff;
+  border-color: var(--color-primary);
   background: white;
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
@@ -535,7 +535,7 @@ const resetForm = () => {
 /* 提交按钮 */
 .submit-btn {
   padding: 12px 24px;
-  background: #007aff;
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 12px;
@@ -738,4 +738,4 @@ const resetForm = () => {
     margin-top: 4px;
   }
 }
-</style>
+

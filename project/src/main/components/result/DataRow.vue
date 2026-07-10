@@ -311,8 +311,8 @@ const handleFeatureStatsClick = async () => {
 };
 </script>
 
-<style lang="scss" scoped>
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $clickable-blue: #007bff;
 $text-dark: #333;
 $text-muted: #666;
@@ -476,7 +476,7 @@ $glass-blur: 8px;
 .locations-vue {
   margin-top: 20px;
   margin-bottom: 0;
-  color: #1d1d1f;
+  color: var(--text-primary);
   font-family: "SimHei", "黑体", sans-serif;
   font-size: 20px;
   font-weight: bold;
@@ -594,4 +594,4 @@ $glass-blur: 8px;
 @container query-panel (max-width: 500px) {
   @include compact-feature-layout;
 }
-</style>
+

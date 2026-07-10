@@ -123,7 +123,7 @@ const getTagColor = (text) => {
 }
 
 const buildTag = (text, bgColor) =>
-  `<span style="display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:500;color:#555;background:${bgColor};margin-top:2px">${text}</span>`
+  `<span style="display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:500;color:var(--text-medium);background:${bgColor};margin-top:2px">${text}</span>`
 
 const buildHoverHtml = (name, pathStr, tagText, tagColor) => {
   let html = `<div style="text-align:center"><strong>${name}</strong></div>`
@@ -624,8 +624,8 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped lang="scss">
-$primary: #007aff;
+
+$primary: var(--color-primary);
 $primary-hover: #0062cc;
 $text-dark: #1d1d1f;
 $success: #34c759;
@@ -736,7 +736,7 @@ $success: #34c759;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  color: #333;
+  color: var(--text-dark)
   white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
@@ -818,7 +818,7 @@ $success: #34c759;
   background: rgba(255, 255, 255, 0.98);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  color: #333;
+  color: var(--text-dark)
   font-size: 13px;
   line-height: 1.6;
 
@@ -857,4 +857,4 @@ $success: #34c759;
     font-size: 13px;
   }
 }
-</style>
+

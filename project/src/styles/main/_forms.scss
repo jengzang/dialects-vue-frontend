@@ -24,7 +24,7 @@
 
 .choice-dropdown-item.active {
   background-color: #e6f0ff;
-  color: #02469e;
+  color: var(--color-blue-custom);
   font-weight: bold;
 }
 
@@ -94,7 +94,7 @@
 }
 
 .main-glow-switch.open {
-  background-color: #007aff;
+  background-color: var(--color-primary);
   animation: main-glow-switch-pulse 2s infinite ease-in-out;
 }
 

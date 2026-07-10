@@ -594,8 +594,8 @@ watch(
 )
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $system-blue: #0a84ff;
 $dark-blue: #0057d9;
 $danger-red: #d70015;
@@ -1017,4 +1017,3 @@ $panel-radius-portrait: 24px;
 .retry-button {
   margin-top: 4px;
 }
-</style>

@@ -1,7 +1,3 @@
-/* Phase 1 note:
-   Base element styles continue to come from ../_legacy.scss.
-   This file reserves the global base layer for later migration. */
-
 .toggle-switch-base {
   position: relative;
   width: 50px;
@@ -14,7 +10,7 @@
 }
 
 .toggle-switch-base.active {
-  background: #007aff;
+  background: var(--color-primary);
 }
 
 .toggle-switch-slider-base {
@@ -68,7 +64,7 @@
 }
 
 .input-switch-base input:checked + .input-switch-slider-base {
-  background-color: #007aff;
+  background-color: var(--color-primary);
 }
 
 .input-switch-base input:checked + .input-switch-slider-base::before {

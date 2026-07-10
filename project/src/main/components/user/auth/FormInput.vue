@@ -70,8 +70,8 @@ const togglePasswordVisibility = () => {
 </script>
 
 ```vue
-<style scoped lang="scss">
-$primary-color: #007aff;
+
+$primary-color: var(--color-primary);
 $error-color: #ff3b30;
 $text-color: #333;
 $placeholder-color: #999;
@@ -149,6 +149,6 @@ $glass-blur: 12px;
     transform: translateY(-50%) scale(1.1);
   }
 }
-</style>
+
 ```
 

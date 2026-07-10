@@ -109,8 +109,8 @@ const copyCitation = () => {
 </template>
 
 ```vue
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $primary-blue-dark: #0051d5;
 $purple: #5856d6;
 $warning-yellow: #ffcc00;
@@ -333,6 +333,6 @@ $transition-base: 0.3s;
     transform: translateY(0);
   }
 }
-</style>
+
 ```
 

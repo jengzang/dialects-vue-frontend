@@ -628,7 +628,7 @@ export default {
 }
 </script>
 
-<style scoped>
+
 .region-similarity-page {
   padding: 20px;
   max-width: 1400px;
@@ -777,7 +777,7 @@ export default {
 .char-label {
   font-size: 13px;
   font-weight: 500;
-  color: #666;
+  color: var(--text-tertiary);
   margin-bottom: 4px;
 }
 
@@ -827,7 +827,7 @@ export default {
 
 .metric-label {
   font-size: 14px;
-  color: #666;
+  color: var(--text-tertiary);
   margin-bottom: 8px;
 }
 
@@ -978,4 +978,4 @@ export default {
     width: 100%;
   }
 }
-</style>
+

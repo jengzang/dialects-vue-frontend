@@ -203,10 +203,10 @@ const leave = (el) => {
 }
 </script>
 
-<style scoped lang="scss">
-$primary-blue: #007aff;
+
+$primary-blue: var(--color-primary);
 $text-dark: #333;
-$error-color: #d32f2f;
+$error-color: var(--color-error);
 $transition-fast: 0.2s;
 $mobile-aspect-ratio: 1 / 1;
 
@@ -313,7 +313,7 @@ $mobile-aspect-ratio: 1 / 1;
 
 .chars-row {
   padding: 12px 16px;
-  color: #1d1d1f;
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 500;
   line-height: 1.8;
@@ -429,4 +429,4 @@ $mobile-aspect-ratio: 1 / 1;
     transform: rotate(360deg);
   }
 }
-</style>
+
