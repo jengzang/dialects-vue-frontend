@@ -620,7 +620,7 @@ $ease-standard: 0.3s ease;
 
     &.is-on {
       background: $primary;
-      color: #fff;
+      color: var(--text-white);
     }
   }
 
@@ -865,7 +865,7 @@ em {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   em {
-    color: #000;
+    color: var(--text-primary);
     font-weight: bold;
     text-decoration: underline;
   }
@@ -1002,7 +1002,7 @@ em {
 .github-follow {
   background-color: $github-dark;
   box-shadow: 0 2px 5px rgba(36, 41, 47, 0.3);
-  color: #fff;
+  color: var(--text-white);
 
   &:hover {
     background-color: var(--text-dark);
@@ -1015,7 +1015,7 @@ em {
   padding: 0.5rem 1.1rem;
   background-color: $danger;
   box-shadow: 0 2px 6px rgba(255, 59, 48, 0.35);
-  color: #fff;
+  color: var(--text-white);
   font-size: 1rem;
   transition: all 0.2s ease;
 
@@ -1082,7 +1082,7 @@ em {
 
   border-radius: 16px;
   box-shadow: 0 6px 12px rgba(0, 122, 255, 0.1);
-  color: #000;
+  color: var(--text-primary);
   font-size: 18px;
   font-weight: 600;
   text-decoration: none;
@@ -1197,7 +1197,7 @@ em {
   transition: all $ease-standard;
 
   &:hover {
-    background: #fff;
+    background: var(--bg-white);
     border-color: $primary;
     box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
     transform: translateY(-2px);

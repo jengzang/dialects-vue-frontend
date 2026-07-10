@@ -161,7 +161,7 @@ $primary-dark: var(--color-primary-hover);
 $text-main: var(--text-primary);
 $text-secondary: rgba(0, 0, 0, 0.6);
 $text-secondary-strong: rgba(0, 0, 0, 0.7);
-$text-white: #fff;
+$text-white: var(--text-white);
 
 $primary-background: rgba(0, 122, 255, 0.05);
 $primary-background-hover: rgba(0, 122, 255, 0.08);

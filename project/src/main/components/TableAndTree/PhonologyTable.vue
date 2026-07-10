@@ -702,7 +702,7 @@ $transition-duration: 0.25s;
 .fullscreen-btn {
   @include glass-button;
 
-  color: #1f7a35;
+  color: var(--color-success);
   background: rgba(var(--color-success-rgb), 0.15);
   border: 1px solid rgba(var(--color-success-rgb), 0.35);
   transition: all $transition-duration ease;
@@ -777,7 +777,7 @@ $transition-duration: 0.25s;
 .tone-section {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-divider);
 }
 
 .section-title {
@@ -796,13 +796,13 @@ $transition-duration: 0.25s;
   td {
     padding: 6px 8px;
     text-align: left;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-divider);
   }
 
   th {
     color: var(--text-medium)
     font-weight: 600;
-    background: #f5f5f5;
+    background: var(--bg-light-gray);
   }
 
   tbody {

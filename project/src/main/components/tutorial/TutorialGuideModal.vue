@@ -1039,7 +1039,7 @@ $float-catalog-button-left:0;
       border: none;
       border-radius: 0 100px 100px 0;
       background: var(--color-primary);
-      color: #fff;
+      color: var(--text-white);
       font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;

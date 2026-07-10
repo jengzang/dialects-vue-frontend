@@ -132,7 +132,7 @@ const colorPresets = {
   blue: 'var(--color-primary)',
   green: 'var(--color-success)',
   purple: 'var(--color-purple)',
-  gray: '#8e8e93',
+  gray: 'var(--text-secondary)',
 }
 
 const activeColor = computed(() => colorPresets[props.color] || props.color || colorPresets.blue)
@@ -176,8 +176,8 @@ const toggle = () => {
 
 
 $active-blue: var(--color-primary);
-$thumb-background: #fff;
-$inside-label-color: #111;
+$thumb-background: var(--bg-white);
+$inside-label-color: var(--text-primary);
 
 $transition-duration: 0.3s;
 $transition-ease: ease;
@@ -281,7 +281,7 @@ $transition-ease: ease;
       animation: switch-toggle-glow-pulse 2s infinite ease-in-out;
 
       &:hover:not(.is-disabled) {
-        background: linear-gradient(135deg, #00bfff, #66ccff);
+        background: linear-gradient(135deg, var(--color-primary-cyan), #66ccff);
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 
         .switch-toggle__thumb {

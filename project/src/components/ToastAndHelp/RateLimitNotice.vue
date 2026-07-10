@@ -202,7 +202,7 @@ $text-message: rgba(38, 30, 12, 0.92);
 $text-meta: rgba(76, 60, 23, 0.72);
 $text-brown: rgba(63, 49, 9, 0.92);
 
-$white: #fff;
+$white: var(--text-white);
 $primary-blue: rgba(0, 122, 255, 0.95);
 
 $button-transition-duration: 0.18s;

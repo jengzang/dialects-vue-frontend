@@ -728,9 +728,9 @@ const PartitionTreeNode = defineComponent({
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
-$danger: #b42318;
+$danger: var(--color-error-dark);
 $error: var(--color-error);
-$warning: #d35400;
+$warning: var(--color-warning-dark);
 
 $mobile-breakpoint: 768px;
 $desktop-large: 1201px;
@@ -806,7 +806,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     @include primary-gradient;
 
     box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-    color: #fff;
+    color: var(--text-white);
   }
 }
 
@@ -832,7 +832,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   border: none;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-  color: #fff;
+  color: var(--text-white);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -860,7 +860,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 .error-state {
   gap: 16px;
   padding: 80px 20px;
-  color: #6e6e73;
+  color: var(--text-secondary);
 }
 
 .error-state {

@@ -411,7 +411,7 @@ $transition-expand: 0.3s;
  */
 :deep(.highlight) {
   padding: 0 2px;
-  color: #000;
+  color: var(--text-primary);
   background: rgba(255, 255, 0, 0.4);
   border-radius: 4px;
 }

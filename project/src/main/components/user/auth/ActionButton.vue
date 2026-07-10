@@ -114,7 +114,7 @@ $gradient-variants: (
   }
 
   &.yellow {
-    color: #fff;
+    color: var(--text-white);
   }
 
   &.teal {

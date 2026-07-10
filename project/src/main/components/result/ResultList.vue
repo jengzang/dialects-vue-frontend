@@ -543,7 +543,7 @@ $system-font:
   justify-content: center;
   margin-bottom: 4px;
   padding: 6px 10px;
-  color: #4b5563;
+  color: var(--text-slate);
   font-size: 12px;
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -551,7 +551,7 @@ $system-font:
 }
 
 .reading-legend-title {
-  color: #374151;
+  color: var(--text-dark);
   font-weight: 600;
 }
 

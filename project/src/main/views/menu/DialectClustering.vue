@@ -148,13 +148,13 @@ const {
   .task-message,
   .workspace-stage-head p {
     margin: 6px 0 0;
-    color: #51606f;
+    color: var(--text-slate);
     line-height: 1.55;
   }
 
   .stage-kicker {
     margin: 0;
-    color: #0b57d0;
+    color: var(--color-primary);
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -197,7 +197,7 @@ const {
     background: rgba(255, 255, 255, 0.72);
     border-radius: 999px;
     padding: 10px 14px;
-    color: #425466;
+    color: var(--text-dark);
     cursor: not-allowed;
   }
 
@@ -207,7 +207,7 @@ const {
 
   .step-pill.active {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(224, 238, 255, 0.88));
-    color: #0b3d91;
+    color: var(--text-deep);
     border-color: rgba(0, 122, 255, 0.34);
   }
 
@@ -262,7 +262,7 @@ const {
   .panel-alert--error {
     background: rgba(255, 59, 48, 0.12);
     border: 1px solid rgba(255, 59, 48, 0.18);
-    color: #b42318;
+    color: var(--color-error-dark);
   }
 
   .location-section,
@@ -351,7 +351,7 @@ const {
     padding: 6px 10px;
     border-radius: 999px;
     background: rgba(0, 122, 255, 0.12);
-    color: #0b57d0;
+    color: var(--color-primary);
     font-size: 13px;
   }
 
@@ -413,12 +413,12 @@ const {
 
   .status-badge.is-completed {
     background: rgba(52, 199, 89, 0.12);
-    color: #207227;
+    color: var(--color-success);
   }
 
   .status-badge.is-pending {
     background: rgba(0, 122, 255, 0.12);
-    color: #0b57d0;
+    color: var(--color-primary);
   }
 
   .status-badge.is-idle {
@@ -437,7 +437,7 @@ const {
   }
 
   .quick-run-summary__label {
-    color: #0b57d0;
+    color: var(--color-primary);
   }
 
   .table-scroll {

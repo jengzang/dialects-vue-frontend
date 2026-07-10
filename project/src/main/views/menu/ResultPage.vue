@@ -357,7 +357,7 @@ $apple-red: var(--color-error-light);
 $text-primary: var(--text-dark);
 $text-secondary: var(--text-tertiary);
 $text-muted: var(--text-lightest);
-$white: #fff;
+$white: var(--text-white);
 
 $transition-fast: 0.2s;
 

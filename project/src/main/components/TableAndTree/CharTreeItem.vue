@@ -357,7 +357,7 @@ $mobile-aspect-ratio: 1 / 1;
   }
 
   .annotation {
-    color: #3a3a3c;
+    color: var(--text-primary);
     font-size: 14px;
     line-height: 1.6;
   }
@@ -415,7 +415,7 @@ $mobile-aspect-ratio: 1 / 1;
  */
 :deep(.highlight) {
   padding: 0 2px;
-  color: #000;
+  color: var(--text-primary);
   background: rgba(255, 255, 0, 0.4);
   border-radius: 4px;
 }

@@ -598,13 +598,13 @@ watch(
 $primary-blue: var(--color-primary);
 $system-blue: var(--color-primary);
 $dark-blue: var(--color-primary-hover);
-$danger-red: #d70015;
-$danger-text: #c21b31;
+$danger-red: var(--color-error-light);
+$danger-text: var(--color-error-dark);
 
 $text-primary: var(--text-primary);
-$text-secondary: #3a3a3c;
-$text-muted: #6e6e73;
-$white: #fff;
+$text-secondary: var(--text-primary);
+$text-muted: var(--text-secondary);
+$white: var(--text-white);
 
 $transition-fast: 0.2s;
 $panel-radius: 28px;

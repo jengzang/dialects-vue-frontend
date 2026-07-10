@@ -84,7 +84,7 @@ const handleChange = (event) => {
 
 $primary-color: var(--color-primary);
 $text-color: var(--text-dark, var(--text-dark));
-$white: #fff;
+$white: var(--text-white);
 
 $transition-fast: 0.2s ease;
 $transition-indicator: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);

@@ -187,9 +187,9 @@ onMounted(async () => {
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
 $text-primary: var(--text-primary);
-$text-secondary: #707077;
+$text-secondary: var(--text-secondary);
 $text-muted: var(--text-secondary);
-$white: #fff;
+$white: var(--text-white);
 
 $radius-sm: 8px;
 $radius-md: 12px;

@@ -164,12 +164,12 @@ const handleSavePassword = () => {
 
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
-$back-gold: #b8860b;
-$back-gold-dark: #8a5a00;
-$text-title: #1c1c1e;
+$back-gold: var(--color-warning-dark);
+$back-gold-dark: var(--color-warning-dark);
+$text-title: var(--text-primary);
 $error-color: var(--color-error-light);
 $success-color: var(--color-success);
-$white: #fff;
+$white: var(--text-white);
 
 $transition-fast: 0.18s;
 $transition-base: 0.2s;

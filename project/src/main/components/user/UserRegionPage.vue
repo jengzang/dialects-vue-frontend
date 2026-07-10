@@ -618,7 +618,7 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
       radial-gradient(circle at 12% 10%, rgba(0, 122, 255, 0.16), transparent 30%),
       radial-gradient(circle at 84% 14%, rgba(88, 86, 214, 0.14), transparent 32%),
       radial-gradient(circle at 70% 86%, rgba(52, 199, 89, 0.11), transparent 34%),
-      linear-gradient(180deg, #f8fbff 0%, #eef4ff 48%, #f9fbff 100%);
+      linear-gradient(180deg, var(--bg-blue-tint) 0%, var(--bg-blue-light) 48%, var(--bg-light-gray) 100%);
   }
 
   &::after {
@@ -724,7 +724,7 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 999px;
-    color: #fff;
+    color: var(--text-white);
     font-size: 14px;
     font-weight: 800;
     text-overflow: ellipsis;
@@ -762,7 +762,7 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
 }
 
 .btn-primary {
-  color: #fff;
+  color: var(--text-white);
   background:
     linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
     $region-accent;

@@ -105,9 +105,9 @@ const handleSubmit = () => {
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
 $success-green: var(--color-success);
-$title-color: #1c1c1e;
+$title-color: var(--text-primary);
 $error-color: red;
-$white: #fff;
+$white: var(--text-white);
 
 $transition-fast: 0.2s;
 $transition-medium: 0.3s;

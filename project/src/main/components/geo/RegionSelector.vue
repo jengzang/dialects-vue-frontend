@@ -974,7 +974,7 @@ $portrait-ratio: 1 / 1;
   &.custom-region-tag {
     background: rgba(0, 123, 255, 0.5);
     border-color: rgba(52, 199, 89, 0.3);
-    color: #fff;
+    color: var(--text-white);
   }
 }
 
@@ -1139,7 +1139,7 @@ $portrait-ratio: 1 / 1;
   border: 1px solid rgba(0, 122, 255, 0.35);
   border-radius: 12px;
   box-shadow: 0 10px 26px rgba(0, 122, 255, 0.18);
-  color: #fff;
+  color: var(--text-white);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -1275,7 +1275,7 @@ $portrait-ratio: 1 / 1;
   background: linear-gradient(135deg, $primary, $primary-dark);
   border: none;
   border-radius: 8px;
-  color: #fff;
+  color: var(--text-white);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;

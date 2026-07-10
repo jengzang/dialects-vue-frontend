@@ -1356,7 +1356,7 @@ defineExpose({
 
 $primary: var(--color-primary);
 $success: var(--color-success);
-$custom-purple: #667eea;
+$custom-purple: var(--color-purple);
 $portrait-ratio: 1 / 1;
 
 @mixin flex-center {
@@ -1422,7 +1422,7 @@ $portrait-ratio: 1 / 1;
       box-shadow:
         0 0 0 1px var(--color-primary-shadow-light),
         0 4px 12px var(--color-primary-shadow);
-      color: #fff;
+      color: var(--text-white);
       font-weight: 600;
     }
   }

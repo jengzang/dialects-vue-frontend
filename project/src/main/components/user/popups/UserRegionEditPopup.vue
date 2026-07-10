@@ -208,7 +208,7 @@ $success: var(--color-success);
 
 $text-label: var(--text-deep);
 $text-hint: var(--text-lightest);
-$white: #fff;
+$white: var(--text-white);
 
 $surface-background: rgba(255, 255, 255, 0.9);
 $surface-border: rgba(0, 0, 0, 0.1);

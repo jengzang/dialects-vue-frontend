@@ -354,13 +354,13 @@ onBeforeUnmount(() => {
 
 
 $orange: var(--color-warning);
-$orange-dark: #ff8000;
+$orange-dark: var(--color-warning);
 $green: var(--color-success);
-$green-light: #30d158;
+$green-light: var(--color-success);
 
 $text-main: var(--text-primary);
 $text-secondary: var(--text-secondary);
-$text-white: #fff;
+$text-white: var(--text-white);
 
 $orange-bg-subtle: rgba(255, 149, 0, 0.04);
 $orange-bg-light: rgba(255, 149, 0, 0.05);

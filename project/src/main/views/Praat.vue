@@ -1020,7 +1020,7 @@ onBeforeUnmount(() => {
   padding: 12px 16px;
   border: none;
   background: transparent;
-  color: #6e6e73;
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.01em;
@@ -1039,7 +1039,7 @@ onBeforeUnmount(() => {
 }
 
 .tab-btn.active {
-  background: #ffffff;
+  background: var(--bg-white);
   color: var(--color-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
               0 1px 2px rgba(0, 0, 0, 0.06);

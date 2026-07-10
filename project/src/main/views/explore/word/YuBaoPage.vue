@@ -900,12 +900,12 @@ watch(viewMode, async (newMode) => {
 
 ```vue
 
-$primary: #0071e3;
-$white: #fff;
+$primary: var(--color-primary);
+$white: var(--text-white);
 $purple: var(--color-purple-light);
 
 $text-primary: var(--text-primary);
-$text-secondary: #6e6e73;
+$text-secondary: var(--text-secondary);
 $text-tertiary: var(--text-lightest);
 
 $font-monospace: "Courier New", monospace;

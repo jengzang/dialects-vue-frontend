@@ -439,7 +439,7 @@ $glass-blur: 12px;
   box-shadow: var(--shadow-sm2);
 
   &--locations {
-    color: #3d7bd9;
+    color: var(--color-primary);
     background: rgba(var(--color-primary-rgb), 0.08);
     border-color: rgba(var(--color-primary-rgb), 0.14);
   }

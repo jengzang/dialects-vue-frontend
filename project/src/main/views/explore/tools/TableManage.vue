@@ -626,11 +626,11 @@ $primary-blue-dark: var(--color-primary-hover);
 $success-green: var(--color-success);
 $success-green-dark: var(--color-success);
 $danger-red: var(--color-error-light);
-$danger-red-dark: #c82333;
+$danger-red-dark: var(--color-error-dark);
 
-$text-primary: #1c1c1e;
-$text-dark: #495057;
-$white: #fff;
+$text-primary: var(--text-primary);
+$text-dark: var(--text-slate);
+$white: var(--text-white);
 
 $radius-sm: 8px;
 $radius-md: 12px;
@@ -757,7 +757,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
   h2 {
     margin-bottom: 10px;
-    color: #856404;
+    color: var(--color-warning-dark);
     font-weight: 700;
   }
 
@@ -1284,7 +1284,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
   .config-section label,
   .filter-item label {
-    color: #f5f5f7;
+    color: var(--bg-light-gray);
   }
 
   .column-config-table {

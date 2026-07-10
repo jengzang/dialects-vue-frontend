@@ -354,12 +354,12 @@ onBeforeUnmount(() => {
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
-$primary-light: #0080ff;
+$primary-light: var(--color-primary);
 
 $text-primary: var(--text-dark);
 $text-secondary: var(--text-tertiary);
 $text-dark: var(--text-dark);
-$text-muted: #8e8e93;
+$text-muted: var(--text-secondary);
 
 $portrait-ratio: 1 / 1;
 

@@ -304,7 +304,7 @@ const resolveTabRoute = (tabName) => {
 
 $success-green: var(--color-success);
 $text-primary: var(--text-dark);
-$white: #fff;
+$white: var(--text-white);
 
 $transition-fast: 0.2s;
 $transition-base: 0.3s;

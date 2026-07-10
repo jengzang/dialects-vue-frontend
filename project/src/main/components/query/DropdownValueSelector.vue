@@ -320,7 +320,7 @@ $dropdown-selected-color: var(--color-primary-hover);
   outline: none;
 
   &::placeholder {
-    color: #6a6a6a;
+    color: var(--text-tertiary);
     font-size: 12px;
     text-align: center;
   }

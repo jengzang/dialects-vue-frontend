@@ -472,7 +472,7 @@ $text-primary: var(--text-primary);
 $text-secondary: var(--text-secondary);
 $text-button: #48484a;
 $danger-color: var(--color-error-light);
-$white: #fff;
+$white: var(--text-white);
 
 $radius-sm: 8px;
 $radius-md: 10px;

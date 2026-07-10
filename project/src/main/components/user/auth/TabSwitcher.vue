@@ -31,8 +31,8 @@ defineEmits(['update:modelValue'])
 $primary-blue: var(--color-primary);
 $text-color: var(--text-dark);
 $border-color: var(--border-gray);
-$switcher-background: #f0f0f5;
-$white: #fff;
+$switcher-background: var(--bg-light);
+$white: var(--text-white);
 $transition-duration: 0.25s;
 $mobile-aspect-ratio: 1 / 1;
 

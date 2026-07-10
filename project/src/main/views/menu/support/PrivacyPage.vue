@@ -113,12 +113,12 @@ const copyCitation = () => {
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
 $purple: var(--color-purple);
-$warning-yellow: #ffcc00;
+$warning-yellow: var(--color-warning);
 
 $text-primary: var(--text-primary);
 $text-secondary: var(--text-dark);
 $text-muted: var(--text-tertiary);
-$white: #fff;
+$white: var(--text-white);
 
 $radius-sm: 8px;
 $radius-md: 12px;

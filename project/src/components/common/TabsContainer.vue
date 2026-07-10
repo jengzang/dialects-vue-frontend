@@ -100,7 +100,7 @@ const handleTabClick = (tabName) => {
 
 $primary-blue: var(--color-primary);
 $text-default: var(--text-dark);
-$white: #fff;
+$white: var(--text-white);
 $transition-duration: 0.5s;
 
 .tabs-wrapper {

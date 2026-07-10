@@ -245,9 +245,9 @@ $text-secondary: rgba(11, 37, 64, 0.68);
 $text-muted: rgba(11, 37, 64, 0.58);
 $text-light: rgba(11, 37, 64, 0.55);
 
-$primary-blue: #0b62c4;
-$success-green: #1f8a36;
-$warning-orange: #b26a00;
+$primary-blue: var(--color-primary);
+$success-green: var(--color-success);
+$warning-orange: var(--color-warning-dark);
 
 $panel-gap: 16px;
 $section-gap: 12px;

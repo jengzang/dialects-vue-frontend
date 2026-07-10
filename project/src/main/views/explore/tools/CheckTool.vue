@@ -4109,7 +4109,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
     &:focus {
       background: white;
-      box-shadow: inset 0 0 0 2px #4a90e2;
+      box-shadow: inset 0 0 0 2px var(--color-primary);
     }
   }
 }

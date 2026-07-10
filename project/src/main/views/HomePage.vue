@@ -752,7 +752,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
   min-height: 100vh;
   margin: 0 auto;
   overflow-x: hidden;
-  background: linear-gradient(135deg, #e0e6f6 0%, #f5f7fa 100%);
+  background: linear-gradient(135deg, var(--bg-body) 0%, var(--bg-light-gray) 100%);
   border-radius: 24px;
   box-shadow: 0 8px 32px rgba(0, 122, 255, 0.12);
 }

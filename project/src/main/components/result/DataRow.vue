@@ -430,7 +430,7 @@ $glass-blur: 8px;
     text-shadow 0.3s ease;
 
   &:hover {
-    color: #3c8dbc;
+    color: var(--color-primary);
     text-decoration: underline;
     text-shadow: 0 0 8px rgba(60, 141, 188, 0.6);
     transform: scale(1.3);
@@ -450,7 +450,7 @@ $glass-blur: 8px;
   z-index: 10001;
   max-width: 200px;
   padding: 5px 10px;
-  color: #fff;
+  color: var(--text-white);
   font-size: 12px;
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0.8);
@@ -577,7 +577,7 @@ $glass-blur: 8px;
     order: 4;
     margin: 1px;
     margin-left: 12px;
-    color: #6c757d;
+    color: var(--text-secondary);
     font-size: 13px;
     font-style: italic;
     text-align: right;

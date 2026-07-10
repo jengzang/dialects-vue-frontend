@@ -238,7 +238,7 @@ onMounted(() => {
 
 $primary-blue: var(--color-primary);
 $secondary-blue: var(--color-primary-cyan);
-$white: #fff;
+$white: var(--text-white);
 
 $avatar-size: 64px;
 $avatar-size-landscape: 72px;

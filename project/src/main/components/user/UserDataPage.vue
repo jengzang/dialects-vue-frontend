@@ -858,7 +858,7 @@ $user-success: var(--color-success);
       radial-gradient(circle at 12% 8%, rgba(0, 122, 255, 0.16), transparent 30%),
       radial-gradient(circle at 82% 12%, rgba(88, 86, 214, 0.15), transparent 32%),
       radial-gradient(circle at 70% 86%, rgba(52, 199, 89, 0.12), transparent 34%),
-      linear-gradient(180deg, #f8fbff 0%, #eef4ff 48%, #f9fbff 100%);
+      linear-gradient(180deg, var(--bg-blue-tint) 0%, var(--bg-blue-light) 48%, var(--bg-light-gray) 100%);
   }
 
   &::after {
@@ -919,7 +919,7 @@ $user-success: var(--color-success);
   border: 1px solid rgba(255, 255, 255, 0.52);
   border-radius: 999px;
   overflow: hidden;
-  color: #fff;
+  color: var(--text-white);
   font-size: 14px;
   font-weight: 800;
   text-overflow: ellipsis;
@@ -995,7 +995,7 @@ $user-success: var(--color-success);
 }
 
 .btn-primary {
-  color: #fff;
+  color: var(--text-white);
   background:
     linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
     $user-accent;
@@ -1011,7 +1011,7 @@ $user-success: var(--color-success);
 }
 
 .btn-warning {
-  color: #fff;
+  color: var(--text-white);
   background:
     linear-gradient(135deg, rgba(255, 149, 0, 0.96), rgba(255, 107, 0, 0.9)),
     $user-warning;
@@ -1021,7 +1021,7 @@ $user-success: var(--color-success);
 }
 
 .btn-danger {
-  color: #fff;
+  color: var(--text-white);
   background:
     linear-gradient(135deg, rgba(255, 59, 48, 0.96), rgba(211, 47, 47, 0.92)),
     $user-danger;
@@ -1031,7 +1031,7 @@ $user-success: var(--color-success);
 }
 
 .btn-add-row {
-  color: #fff;
+  color: var(--text-white);
   background:
     linear-gradient(135deg, rgba(52, 199, 89, 0.96), rgba(40, 167, 69, 0.9)),
     $user-success;
@@ -1044,7 +1044,7 @@ $user-success: var(--color-success);
   min-height: 30px;
   padding: 7px 12px;
   border-radius: 11px;
-  color: #fff;
+  color: var(--text-white);
   font-size: 12px;
   background:
     linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
@@ -1278,7 +1278,7 @@ $user-success: var(--color-success);
   }
 
   &.active {
-    color: #fff;
+    color: var(--text-white);
     border-color: rgba(0, 122, 255, 0.45);
     background:
       linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
@@ -1412,7 +1412,7 @@ $user-success: var(--color-success);
   height: 28px;
   border: none;
   border-radius: 10px;
-  color: #fff;
+  color: var(--text-white);
   font-size: 18px;
   line-height: 1;
   cursor: pointer;

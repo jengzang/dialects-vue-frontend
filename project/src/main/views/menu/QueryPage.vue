@@ -817,8 +817,8 @@ export default {
 ```vue
 
 $text-color: var(--text-dark);
-$placeholder-color: #6a6a6a;
-$white: #fff;
+$placeholder-color: var(--text-tertiary);
+$white: var(--text-white);
 $dark-blue: darkblue;
 
 $transition-fast: 0.2s;

@@ -344,9 +344,9 @@ const normalizeTreeData = (rawData, pathPrefix = []) => {
 const getDialect = (d) => d?.dialect?.[0] || d?.['方言分布']?.[0] || ''
 
 const gdTagPalette = [
-  '#e3f2fd', '#fce4ec', '#e8f5e9', '#fff3e0', '#f3e5f5',
-  '#e0f7fa', '#fbe9e7', '#e8eaf6', '#f1f8e9', '#fff8e1',
-  '#ede7f6', '#e1f5fe', '#f9fbe7', '#efebe9', '#e0f2f1'
+  'var(--bg-blue-light)', '#fce4ec', '#e8f5e9', '#fff3e0', '#f3e5f5',
+  'var(--bg-blue-tint)', '#fbe9e7', '#e8eaf6', '#f1f8e9', '#fff8e1',
+  'var(--bg-light-gray)', '#e1f5fe', '#f9fbe7', '#efebe9', '#e0f2f1'
 ]
 const gdTagColorMap = {}
 const getGdTagColor = (dialect) => {
@@ -369,7 +369,7 @@ const getGdTagInfo = (data) => {
     return { text: dialect, color: getGdTagColor(dialect) }
   }
   if (coordStr) {
-    return { text: coordStr, color: '#f5f5f5' }
+    return { text: coordStr, color: 'var(--bg-light-gray)' }
   }
   return null
 }
@@ -571,9 +571,9 @@ $button-blue: var(--color-primary-hover);
 $success-green: var(--color-success);
 $error-red: var(--color-error);
 $text-primary: var(--text-primary);
-$text-secondary: #6e6e73;
+$text-secondary: var(--text-secondary);
 $text-muted: var(--text-secondary);
-$white: #fff;
+$white: var(--text-white);
 
 $transition-fast: 0.2s;
 $transition-base: 0.3s;
