@@ -815,7 +815,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 .feature-tab {
   padding: 8px 18px;
   background: var(--glass-30, var(--glass-30));
-  border: 1px solid var(--border-gray-light, rgba(200, 200, 200, 0.5));
+  border: 1px solid var(--border-gray-light, rgba(var(--color-silver-rgb), 0.5));
   border-radius: var(--radius-md, 12px);
   color: var(--text-dark, var(--text-dark));
   font-size: 14px;
@@ -878,7 +878,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   flex-direction: column;
   background: var(--glass-90);
-  border: 1px solid var(--border-gray-light, rgba(200, 200, 200, 0.5));
+  border: 1px solid var(--border-gray-light, rgba(var(--color-silver-rgb), 0.5));
   border-radius: var(--radius-lg, 16px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
 

@@ -3,8 +3,8 @@
   --main-glass-panel-backdrop-filter: blur(18px) saturate(145%);
   --main-glass-panel-border-radius: var(--radius-xl);
   --main-glass-panel-border: 1px solid var(--glass-40);
-  --main-glass-panel-shadow: 0 4px 14px rgba(15, 23, 42, 0.08), 0 1px 4px rgba(15, 23, 42, 0.06);
-  --main-glass-panel-hover-shadow: 0 8px 22px rgba(15, 23, 42, 0.1), 0 2px 8px rgba(15, 23, 42, 0.08);
+  --main-glass-panel-shadow: 0 4px 14px rgba(var(--color-shadow-rgb), 0.08), 0 1px 4px rgba(var(--color-shadow-rgb), 0.06);
+  --main-glass-panel-hover-shadow: 0 8px 22px rgba(var(--color-shadow-rgb), 0.1), 0 2px 8px rgba(var(--color-shadow-rgb), 0.08);
   background: var(--main-glass-panel-background);
   backdrop-filter: var(--main-glass-panel-backdrop-filter);
   -webkit-backdrop-filter: var(--main-glass-panel-backdrop-filter);
@@ -82,7 +82,7 @@
 
 .main-data-card:hover:not([aria-hidden='true']) {
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 10px 20px rgba(var(--color-shadow-rgb), 0.1);
 }
 
 .main-data-card[aria-hidden='true'] {

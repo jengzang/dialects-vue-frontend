@@ -66,7 +66,7 @@ $mobile-gap: 10px;
 .confirm-icon {
   font-size: 48px;
   line-height: 1;
-  filter: drop-shadow(0 2px 8px rgba(255, 204, 0, 0.3));
+  filter: drop-shadow(0 2px 8px rgba(var(--color-gold-rgb), 0.3));
 
   @media (max-width: 768px) {
     font-size: 40px;

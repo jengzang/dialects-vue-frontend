@@ -345,8 +345,8 @@ $transition-expand: 0.3s;
   padding: 8px 12px;
   color: $error-color;
   font-size: 13px;
-  background: rgba(211, 47, 47, 0.06);
-  border: 1px solid rgba(211, 47, 47, 0.2);
+  background: rgba(var(--color-error-rgb), 0.06);
+  border: 1px solid rgba(var(--color-error-rgb), 0.2);
   border-radius: 10px;
 
   .retry-btn-small {
@@ -355,7 +355,7 @@ $transition-expand: 0.3s;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    background: rgba(211, 47, 47, 0.12);
+    background: rgba(var(--color-error-rgb), 0.12);
     border: none;
     border-radius: 6px;
   }

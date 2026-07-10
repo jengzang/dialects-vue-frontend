@@ -110,7 +110,12 @@
   --color-gold: #ffd700;
   --color-gold-rgb: 255, 215, 0;
   --color-silver: #c0c0c0;
+  --color-silver-rgb: 192, 192, 192;
   --color-bronze: #cd7f32;
+  --color-bronze-rgb: 205, 127, 50;
+  --color-cyan: #5ac8fa;
+  --color-cyan-rgb: 90, 200, 250;
+  --color-dark-teal: #1b2e2b;
 
   /* RGB 分量 — 用于 rgba(var(--xxx-rgb), alpha) 透明度组合 */
   --color-primary-rgb: 0, 122, 255;
@@ -121,6 +126,7 @@
   --color-warning-rgb: 255, 149, 0;
   --color-purple-light-rgb: 175, 82, 222;
   --text-deep-rgb: 11, 37, 64;
+  --color-shadow-rgb: 15, 23, 42;
   --color-teal: #00887a;
   --color-teal-rgb: 0, 136, 122;
 

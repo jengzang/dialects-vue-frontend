@@ -956,7 +956,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 @mixin field-focus {
   background: $white;
   border-color: $primary;
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
 }
 
 /* 页面主体 */
@@ -1271,7 +1271,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     color: $primary;
-    background: rgba(0, 113, 227, 0.08);
+    background: rgba(var(--color-primary-rgb), 0.08);
   }
 }
 
@@ -1334,7 +1334,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   @include saturated-glass;
 
   &:hover {
-    border-color: rgba(0, 113, 227, 0.2);
+    border-color: rgba(var(--color-primary-rgb), 0.2);
     box-shadow:
       0 12px 48px rgba(0, 0, 0, 0.08),
       0 4px 12px rgba(0, 0, 0, 0.06),
@@ -1426,7 +1426,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .row-2 {
-    background: rgba(0, 113, 227, 0.06);
+    background: rgba(var(--color-primary-rgb), 0.06);
   }
 
   .row-3 {

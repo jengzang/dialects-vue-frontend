@@ -2645,9 +2645,9 @@ td {
 /* ✅ 新增：全表预览统计样式 */
 .all-pages-preview {
   padding: 16px;
-  background: rgba(255, 152, 0, 0.05);
+  background: rgba(var(--color-warning-rgb), 0.05);
   border-radius: 10px;
-  border: 1px solid rgba(255, 152, 0, 0.2);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.2);
 }
 
 .all-pages-preview h4 {
@@ -2686,7 +2686,7 @@ td {
 .warning-text {
   margin: 12px 0 0 0;
   padding: 10px;
-  background: rgba(255, 152, 0, 0.1);
+  background: rgba(var(--color-warning-rgb), 0.1);
   border-radius: 6px;
   color: $warning-dark;
   font-size: 13px;
@@ -2696,13 +2696,13 @@ td {
 
 /* ✅ 新增：高亮全表替换选项 */
 .radio-item.highlight-option {
-  border: 2px solid rgba(255, 152, 0, 0.3);
-  background: rgba(255, 152, 0, 0.05);
+  border: 2px solid rgba(var(--color-warning-rgb), 0.3);
+  background: rgba(var(--color-warning-rgb), 0.05);
 }
 
 .radio-item.highlight-option:hover {
-  background: rgba(255, 152, 0, 0.1);
-  border-color: rgba(255, 152, 0, 0.5);
+  background: rgba(var(--color-warning-rgb), 0.1);
+  border-color: rgba(var(--color-warning-rgb), 0.5);
 }
 
 .radio-item.highlight-option input[type="radio"]:checked + span {
@@ -2712,7 +2712,7 @@ td {
 
 .help-text.warning-help {
   color: $warning-dark;
-  background: rgba(255, 152, 0, 0.1);
+  background: rgba(var(--color-warning-rgb), 0.1);
   padding: 8px 12px;
   border-radius: 6px;
   margin-top: 8px;

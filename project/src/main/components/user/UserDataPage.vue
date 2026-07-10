@@ -754,7 +754,7 @@ onMounted(() => {
 
 $user-text: var(--text-deep);
 $user-muted: var(--text-tertiary);
-$user-border: rgba(148, 163, 184, 0.24);
+$user-border: rgba(var(--text-slate-light-rgb), 0.24);
 $user-glass-border: var(--glass-60);
 $user-accent: var(--color-primary);
 $user-danger: var(--color-error-light);
@@ -770,8 +770,8 @@ $user-success: var(--color-success);
     linear-gradient(135deg, var(--glass-80), var(--glass-40)),
     linear-gradient(180deg, var(--glass-70), var(--glass-30));
   box-shadow:
-    0 24px 70px rgba(15, 23, 42, 0.12),
-    0 8px 22px rgba(15, 23, 42, 0.08),
+    0 24px 70px rgba(var(--color-shadow-rgb), 0.12),
+    0 8px 22px rgba(var(--color-shadow-rgb), 0.08),
     inset 0 1px 0 var(--glass-80),
     inset 0 -1px 0 var(--glass-30);
   backdrop-filter: blur(28px) saturate(180%);
@@ -785,7 +785,7 @@ $user-success: var(--color-success);
     var(--glass-60);
   box-shadow:
     inset 0 1px 0 var(--glass-80),
-    0 8px 22px rgba(15, 23, 42, 0.08);
+    0 8px 22px rgba(var(--color-shadow-rgb), 0.08);
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
 }
@@ -829,7 +829,7 @@ $user-success: var(--color-success);
     outline: none;
     box-shadow:
       0 0 0 3px rgba(var(--color-primary-rgb), 0.18),
-      0 10px 26px rgba(15, 23, 42, 0.12);
+      0 10px 26px rgba(var(--color-shadow-rgb), 0.12);
   }
 }
 
@@ -1023,7 +1023,7 @@ $user-success: var(--color-success);
 .btn-danger {
   color: var(--text-white);
   background:
-    linear-gradient(135deg, rgba(var(--color-error-light-rgb), 0.96), rgba(211, 47, 47, 0.92)),
+    linear-gradient(135deg, rgba(var(--color-error-light-rgb), 0.96), rgba(var(--color-error-rgb), 0.92)),
     $user-danger;
   box-shadow:
     inset 0 1px 0 var(--glass-30),
@@ -1059,14 +1059,14 @@ $user-success: var(--color-success);
 .form-group textarea,
 .batch-table input {
   width: 100%;
-  border: 1px solid rgba(148, 163, 184, 0.28);
+  border: 1px solid rgba(var(--text-slate-light-rgb), 0.28);
   color: $user-text;
   background:
     linear-gradient(135deg, var(--glass-80), var(--glass-50)),
     var(--glass-60);
   box-shadow:
     inset 0 1px 0 var(--glass-70),
-    0 8px 18px rgba(15, 23, 42, 0.04);
+    0 8px 18px rgba(var(--color-shadow-rgb), 0.04);
   transition:
     border-color 0.18s ease,
     box-shadow 0.18s ease,
@@ -1180,7 +1180,7 @@ $user-success: var(--color-success);
         background: var(--glass-70);
         box-shadow:
           inset 0 1px 0 var(--glass-80),
-          0 10px 24px rgba(15, 23, 42, 0.08);
+          0 10px 24px rgba(var(--color-shadow-rgb), 0.08);
       }
     }
   }
@@ -1189,7 +1189,7 @@ $user-success: var(--color-success);
     color: var(--text-dark);
     background: var(--glass-50);
     border-top: 1px solid var(--glass-50);
-    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    border-bottom: 1px solid rgba(var(--text-slate-light-rgb), 0.12);
     transition:
       background-color 0.16s ease,
       box-shadow 0.16s ease;
@@ -1325,7 +1325,7 @@ $user-success: var(--color-success);
     var(--glass-50);
   box-shadow:
     inset 0 1px 0 var(--glass-70),
-    0 16px 34px rgba(15, 23, 42, 0.08);
+    0 16px 34px rgba(var(--color-shadow-rgb), 0.08);
 }
 
 .batch-table {
@@ -1344,7 +1344,7 @@ $user-success: var(--color-success);
   th,
   td {
     padding: 9px 8px;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    border-bottom: 1px solid rgba(var(--text-slate-light-rgb), 0.14);
     text-align: left;
     white-space: nowrap;
   }
@@ -1417,7 +1417,7 @@ $user-success: var(--color-success);
   line-height: 1;
   cursor: pointer;
   background:
-    linear-gradient(135deg, rgba(var(--color-error-light-rgb), 0.96), rgba(211, 47, 47, 0.92)),
+    linear-gradient(135deg, rgba(var(--color-error-light-rgb), 0.96), rgba(var(--color-error-rgb), 0.92)),
     $user-danger;
   box-shadow:
     inset 0 1px 0 var(--glass-20),

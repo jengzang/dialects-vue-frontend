@@ -280,7 +280,7 @@ $transition-fast: 0.2s;
   padding: 6px 0;
   overflow: hidden;
   background: var(--glass-90);
-  border: 1px solid rgba(200, 200, 200, 0.3);
+  border: 1px solid rgba(var(--color-silver-rgb), 0.3);
   border-radius: 10px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 

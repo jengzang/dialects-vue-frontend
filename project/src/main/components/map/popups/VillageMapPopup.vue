@@ -107,16 +107,16 @@ const colorPalette = [
   "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
   "#911eb4", "#42d4f4", "#f032e6", "#bfe745", "#fabed4",
   "#469990", "#dcbaff", "#9a6324", "#fffac8", "#800000",
-  "#aaffc3", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
+  "var(--color-success)", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
 ]
 
 const tagPastelPalette = [
-  '#e3f2fd', '#fce4ec', '#e8f5e9', '#fff3e0', '#f3e5f5',
-  '#e0f7fa', '#fbe9e7', '#e8eaf6', '#f1f8e9', '#fff8e1',
+  '#e3f2fd', 'var(--bg-error-light)', '#e8f5e9', '#fff3e0', '#f3e5f5',
+  '#e0f7fa', 'var(--bg-error-light)', '#e8eaf6', '#f1f8e9', '#fff8e1',
   '#ede7f6', '#e1f5fe', '#f9fbe7', '#efebe9', '#e0f2f1'
 ]
 const getTagColor = (text) => {
-  if (!text) return '#f5f5f5'
+  if (!text) return 'var(--bg-light)'
   let hash = 0
   for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0
   return tagPastelPalette[Math.abs(hash) % tagPastelPalette.length]
@@ -310,9 +310,9 @@ const renderMarkers = () => {
     features: villagesToRender.map(village => {
       const label = displayMode.value === 'name' ? village.name : village.dialect
       const bgColor = displayMode.value === 'dialect'
-        ? (dialectColorMap[village.dialect] || '#1b2e2b')
-        : '#1b2e2b'
-      const textColor = displayMode.value === 'dialect' ? '#000000' : '#a6ffdc'
+        ? (dialectColorMap[village.dialect] || 'var(--color-dark-teal)')
+        : 'var(--color-dark-teal)'
+      const textColor = displayMode.value === 'dialect' ? '#000000' : 'var(--color-cyan)'
 
       return {
         type: 'Feature',
@@ -461,7 +461,7 @@ const renderWithoutClustering = (geojsonData) => {
       const el = document.createElement('div')
       el.className = 'marker-text-feature'
       el.innerText = dialect
-      el.style.backgroundColor = dialectColorMap[dialect] || '#1b2e2b'
+      el.style.backgroundColor = dialectColorMap[dialect] || 'var(--color-dark-teal)'
 
       // 创建 Marker
       const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
@@ -744,7 +744,7 @@ $success: var(--color-success);
   transition: all 0.2s;
 
   &:hover {
-    background: #f5f5f7;
+    background: var(--bg-light-gray);
     border-color: $primary;
   }
 }

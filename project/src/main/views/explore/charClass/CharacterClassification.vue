@@ -780,11 +780,11 @@ $panel-radius-portrait: 24px;
   font-weight: 700;
   white-space: nowrap;
   background: var(--color-primary);
-  border-color: rgba(10, 132, 255, 0.34);
-  box-shadow: 0 12px 28px rgba(10, 132, 255, 0.12);
+  border-color: rgba(var(--color-primary-rgb), 0.34);
+  box-shadow: 0 12px 28px rgba(var(--color-primary-rgb), 0.12);
 
   &:hover:not(:disabled) {
-    box-shadow: 0 16px 32px rgba(10, 132, 255, 0.16);
+    box-shadow: 0 16px 32px rgba(var(--color-primary-rgb), 0.16);
     transform: translateY(-1px);
   }
 
@@ -862,12 +862,12 @@ $panel-radius-portrait: 24px;
   cursor: pointer;
   background: linear-gradient(
     180deg,
-    rgba(10, 132, 255, 0.18),
+    rgba(var(--color-primary-rgb), 0.18),
     var(--glass-90)
   );
-  border: 1px solid rgba(10, 132, 255, 0.2);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: 10px;
-  box-shadow: 0 8px 18px rgba(10, 132, 255, 0.12);
+  box-shadow: 0 8px 18px rgba(var(--color-primary-rgb), 0.12);
   transition:
     transform $transition-fast ease,
     opacity $transition-fast ease,
@@ -895,11 +895,11 @@ $panel-radius-portrait: 24px;
   &:hover:not(:disabled) {
     background: linear-gradient(
       180deg,
-      rgba(10, 132, 255, 0.28),
+      rgba(var(--color-primary-rgb), 0.28),
       var(--glass-90)
     );
-    border-color: rgba(10, 132, 255, 0.38);
-    box-shadow: 0 10px 20px rgba(10, 132, 255, 0.16);
+    border-color: rgba(var(--color-primary-rgb), 0.38);
+    box-shadow: 0 10px 20px rgba(var(--color-primary-rgb), 0.16);
     transform: translateY(-1px) scale(1.02);
   }
 
@@ -913,20 +913,20 @@ $panel-radius-portrait: 24px;
     color: $danger-text;
     background: linear-gradient(
       180deg,
-      rgba(215, 0, 21, 0.16),
+      rgba(var(--color-error-rgb), 0.16),
       var(--glass-90)
     );
-    border-color: rgba(215, 0, 21, 0.2);
-    box-shadow: 0 8px 18px rgba(215, 0, 21, 0.12);
+    border-color: rgba(var(--color-error-rgb), 0.2);
+    box-shadow: 0 8px 18px rgba(var(--color-error-rgb), 0.12);
 
     &:hover:not(:disabled) {
       background: linear-gradient(
         180deg,
-        rgba(215, 0, 21, 0.24),
+        rgba(var(--color-error-rgb), 0.24),
         var(--glass-90)
       );
-      border-color: rgba(215, 0, 21, 0.34);
-      box-shadow: 0 10px 20px rgba(215, 0, 21, 0.16);
+      border-color: rgba(var(--color-error-rgb), 0.34);
+      box-shadow: 0 10px 20px rgba(var(--color-error-rgb), 0.16);
     }
   }
 }
@@ -973,8 +973,8 @@ $panel-radius-portrait: 24px;
   @include glass-blur;
 
   &:focus {
-    border-color: rgba(10, 132, 255, 0.35);
-    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.08);
+    border-color: rgba(var(--color-primary-rgb), 0.35);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.08);
   }
 }
 

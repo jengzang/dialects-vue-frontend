@@ -344,8 +344,8 @@ const normalizeTreeData = (rawData, pathPrefix = []) => {
 const getDialect = (d) => d?.dialect?.[0] || d?.['方言分布']?.[0] || ''
 
 const gdTagPalette = [
-  'var(--bg-blue-light)', '#fce4ec', '#e8f5e9', '#fff3e0', '#f3e5f5',
-  'var(--bg-blue-tint)', '#fbe9e7', '#e8eaf6', '#f1f8e9', '#fff8e1',
+  'var(--bg-blue-light)', 'var(--bg-error-light)', '#e8f5e9', '#fff3e0', '#f3e5f5',
+  'var(--bg-blue-tint)', 'var(--bg-error-light)', '#e8eaf6', '#f1f8e9', '#fff8e1',
   'var(--bg-light-gray)', '#e1f5fe', '#f9fbe7', '#efebe9', '#e0f2f1'
 ]
 const gdTagColorMap = {}
@@ -835,8 +835,8 @@ $transition-base: 0.3s;
 /* City Error State */
 .city-error {
   padding: 16px;
-  background: rgba(211, 47, 47, 0.05);
-  border: 1px solid rgba(211, 47, 47, 0.2);
+  background: rgba(var(--color-error-rgb), 0.05);
+  border: 1px solid rgba(var(--color-error-rgb), 0.2);
   border-radius: 12px;
 }
 

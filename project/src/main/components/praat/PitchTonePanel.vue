@@ -394,7 +394,7 @@ const initPitchChart = () => {
       xAxis: seg.start_s,
       itemStyle: {
         color: seg.type === 'rime_core' ? 'rgba(var(--color-gold-rgb), 0.2)' :
-            seg.type === 'silence' ? 'rgba(200,200,200,0.1)' :
+            seg.type === 'silence' ? 'rgba(var(--color-silver-rgb), 0.1)' :
                 'rgba(100,150,255,0.15)'
       }
     },

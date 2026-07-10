@@ -168,7 +168,7 @@ const segmentColors = [
   'var(--color-warning)',  // Orange - voiced
   '#ff2d55',  // Pink
   'var(--color-purple)',  // Purple
-  '#5ac8fa',  // Cyan
+  'var(--color-cyan)',  // Cyan
 ]
 
 const getSegmentTypeLabel = (type) => {
@@ -577,7 +577,7 @@ $transition-duration: 0.3s;
   background: linear-gradient(
     135deg,
     rgba(255, 193, 7, 0.15),
-    rgba(255, 152, 0, 0.1)
+    rgba(var(--color-warning-rgb), 0.1)
   );
   border-left: 4px solid #ffc107;
   border-radius: var(--radius-md, 8px);

@@ -203,7 +203,7 @@ h3 {
   border: 1px solid var(--glass-60);
   border-radius: 22px;
   box-shadow:
-    0 18px 46px rgba(15, 23, 42, 0.1),
+    0 18px 46px rgba(var(--color-shadow-rgb), 0.1),
     inset 0 1px 0 var(--glass-80);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);

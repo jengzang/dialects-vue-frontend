@@ -531,8 +531,8 @@ $transition-duration: 0.25s;
   text-align: center;
   background: linear-gradient(
     145deg,
-    rgba(255, 152, 0, 0.08),
-    rgba(255, 152, 0, 0.04)
+    rgba(var(--color-warning-rgb), 0.08),
+    rgba(var(--color-warning-rgb), 0.04)
   );
 }
 

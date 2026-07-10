@@ -59,7 +59,7 @@ $gradient-variants: (
     hover: linear-gradient(135deg, #5568d3, #5f3d8a)
   ),
   teal: (
-    background: linear-gradient(135deg, #5ac8fa, #4a9fd8),
+    background: linear-gradient(135deg, var(--color-cyan), #4a9fd8),
     hover: linear-gradient(135deg, #4ab8e8, #3a8fc6)
   )
 );

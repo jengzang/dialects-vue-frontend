@@ -410,7 +410,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
 
 .all-data-mode-panel {
   padding: 12px 16px;
-  border: 1px solid rgba(200, 200, 200, 0.45);
+  border: 1px solid rgba(var(--color-silver-rgb), 0.45);
   border-radius: var(--radius-lg);
   background: var(--glass-30);
   backdrop-filter: blur(10px);
@@ -481,7 +481,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
   font-weight: 500;
   letter-spacing: 0.01em;
   color: $text-main;
-  border: 1px solid rgba(200, 200, 200, 0.5);
+  border: 1px solid rgba(var(--color-silver-rgb), 0.5);
   display: flex;
   justify-content: space-between;
   align-items: center;

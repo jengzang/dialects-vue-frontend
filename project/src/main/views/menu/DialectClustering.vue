@@ -308,7 +308,7 @@ const {
   .field input,
   .field textarea {
     width: 100%;
-    border: 1px solid rgba(148, 163, 184, 0.28);
+    border: 1px solid rgba(var(--text-slate-light-rgb), 0.28);
     border-radius: 14px;
     padding: 12px 14px;
     background: var(--glass-80);
@@ -454,7 +454,7 @@ const {
   .result-table td {
     text-align: left;
     padding: 12px 10px;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    border-bottom: 1px solid rgba(var(--text-slate-light-rgb), 0.18);
     color: var(--text-dark);
   }
 
@@ -518,13 +518,13 @@ const {
     flex: 1;
     height: 10px;
     border-radius: 999px;
-    background: rgba(148, 163, 184, 0.22);
+    background: rgba(var(--text-slate-light-rgb), 0.22);
     overflow: hidden;
   }
 
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--color-primary), #5ac8fa);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-cyan));
     border-radius: inherit;
   }
 }

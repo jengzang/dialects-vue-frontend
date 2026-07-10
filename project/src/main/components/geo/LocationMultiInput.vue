@@ -589,7 +589,7 @@ $portrait-ratio: 1 / 1;
 /* 警告信息 */
 .warning-message {
   padding: 8px 12px;
-  background: rgba(255, 152, 0, 0.1);
+  background: rgba(var(--color-warning-rgb), 0.1);
   border-left: 3px solid $warning-orange;
   border-radius: var(--radius-sm);
   color: $warning-orange;

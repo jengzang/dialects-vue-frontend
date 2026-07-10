@@ -261,7 +261,7 @@ const initPitchChart = () => {
       xAxis: seg.start_s,
       itemStyle: {
         color: seg.type === 'rime_core' ? 'rgba(var(--color-gold-rgb), 0.2)' :
-               seg.type === 'silence' ? 'rgba(200,200,200,0.1)' :
+               seg.type === 'silence' ? 'rgba(var(--color-silver-rgb), 0.1)' :
                'rgba(100,150,255,0.15)'
       }
     },
@@ -367,7 +367,7 @@ const initFormantChart = () => {
   formantChart = echarts.init(formantChartContainer.value)
   const ts = props.results.timeseries
 
-  const formantColors = ['var(--color-success)', 'var(--color-warning)', 'var(--color-purple)', '#ff2d55', '#5ac8fa']
+  const formantColors = ['var(--color-success)', 'var(--color-warning)', 'var(--color-purple)', '#ff2d55', 'var(--color-cyan)']
   const formantKeys = ['f1', 'f2', 'f3', 'f4', 'f5']
 
   const formantSeries = formantKeys.map((key, i) => {

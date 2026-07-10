@@ -516,7 +516,7 @@ $region-soft: var(--text-slate-light);
 $region-accent: var(--color-primary);
 $region-danger: var(--color-error-light);
 $region-success: var(--color-success);
-$region-border: rgba(148, 163, 184, 0.22);
+$region-border: rgba(var(--text-slate-light-rgb), 0.22);
 $region-glass-border: var(--glass-60);
 
 @mixin glass-panel($radius: 24px, $padding: 18px) {
@@ -528,8 +528,8 @@ $region-glass-border: var(--glass-60);
     linear-gradient(135deg, var(--glass-80), var(--glass-40)),
     linear-gradient(180deg, var(--glass-70), var(--glass-30));
   box-shadow:
-    0 24px 70px rgba(15, 23, 42, 0.12),
-    0 8px 22px rgba(15, 23, 42, 0.08),
+    0 24px 70px rgba(var(--color-shadow-rgb), 0.12),
+    0 8px 22px rgba(var(--color-shadow-rgb), 0.08),
     inset 0 1px 0 var(--glass-80),
     inset 0 -1px 0 var(--glass-20);
   backdrop-filter: blur(28px) saturate(180%);
@@ -543,7 +543,7 @@ $region-glass-border: var(--glass-60);
     var(--glass-50);
   box-shadow:
     inset 0 1px 0 var(--glass-80),
-    0 8px 22px rgba(15, 23, 42, 0.08);
+    0 8px 22px rgba(var(--color-shadow-rgb), 0.08);
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
 }
@@ -588,7 +588,7 @@ $region-glass-border: var(--glass-60);
     outline: none;
     box-shadow:
       0 0 0 3px rgba(var(--color-primary-rgb), 0.18),
-      0 10px 26px rgba(15, 23, 42, 0.12);
+      0 10px 26px rgba(var(--color-shadow-rgb), 0.12);
   }
 }
 
@@ -861,7 +861,7 @@ $region-glass-border: var(--glass-60);
 
 .empty-icon {
   font-size: 58px;
-  filter: drop-shadow(0 12px 26px rgba(15, 23, 42, 0.12));
+  filter: drop-shadow(0 12px 26px rgba(var(--color-shadow-rgb), 0.12));
 }
 
 .empty-text {
@@ -900,7 +900,7 @@ $region-glass-border: var(--glass-60);
     transform: translateY(-2px);
     border-color: rgba(var(--color-primary-rgb), 0.24);
     box-shadow:
-      0 26px 76px rgba(15, 23, 42, 0.14),
+      0 26px 76px rgba(var(--color-shadow-rgb), 0.14),
       0 12px 28px rgba(var(--color-primary-rgb), 0.08),
       inset 0 1px 0 var(--glass-80);
 
@@ -1060,7 +1060,7 @@ $region-glass-border: var(--glass-60);
   color: var(--text-slate);
   background:
     linear-gradient(135deg, var(--glass-70), var(--glass-40)),
-    rgba(15, 23, 42, 0.045);
+    rgba(var(--color-shadow-rgb), 0.045);
   border: 1px solid var(--glass-50);
 }
 

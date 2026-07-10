@@ -1718,7 +1718,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  background: rgba(15, 23, 42, 0.24);
+  background: rgba(var(--color-shadow-rgb), 0.24);
   backdrop-filter: blur(10px);
 }
 
@@ -1731,7 +1731,7 @@ onBeforeUnmount(() => {
   padding: 1.2rem 1.4rem;
   text-align: center;
   border-radius: 20px;
-  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 20px 48px rgba(var(--color-shadow-rgb), 0.18);
 }
 
 .voronoi-export-progress-title {
@@ -1834,7 +1834,7 @@ onBeforeUnmount(() => {
   width: 100%;
   padding: 0.6rem 0.85rem;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.32);
+  border: 1px solid rgba(var(--text-slate-light-rgb), 0.32);
   background: var(--glass-80);
   color: var(--text-deep);
 }

@@ -306,7 +306,7 @@ onBeforeUnmount(() => {
   color: $text-secondary;
   font-size: 12px;
   line-height: 1;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 6px 18px rgba(var(--color-shadow-rgb), 0.12);
 
   @media (max-width: 768px) {
     right: 8px;
@@ -323,7 +323,7 @@ onBeforeUnmount(() => {
 :deep(.maplibregl-ctrl-group) {
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
+  box-shadow: 0 8px 20px rgba(var(--color-shadow-rgb), 0.16);
 }
 
 :deep(.maplibregl-canvas) {
@@ -359,8 +359,8 @@ onBeforeUnmount(() => {
 :deep(.mini-map-point-label) {
   padding: 2px 4px;
   border-radius: 4px;
-  background-color: #1b2e2b;
-  color: #a6ffdc;
+  background-color: var(--color-dark-teal);
+  color: var(--color-cyan);
   font-size: 11px;
   line-height: 1.2;
   white-space: nowrap;

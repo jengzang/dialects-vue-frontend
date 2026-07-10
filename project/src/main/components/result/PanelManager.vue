@@ -185,7 +185,7 @@ function showGridOverlays(origSlotIndex) {
     const rb = slotToRB(i);
     Object.assign(o.style, {
       position: 'fixed', pointerEvents: 'none', left: rb.left, bottom: rb.bottom,
-      width: rb.width, height: rb.height, border: '2px dashed rgba(0,123,255,0.35)',
+      width: rb.width, height: rb.height, border: '2px dashed rgba(var(--color-primary-rgb), 0.35)',
       borderRadius: '12px', boxSizing: 'border-box', zIndex: 9998, background: 'transparent',
     });
     if(rb.top !== undefined) { o.style.top = rb.top; o.style.bottom = 'auto'; }
@@ -199,8 +199,8 @@ function hideGridOverlays() { gridOverlays.forEach(el => el.remove()); gridOverl
 function highlightGridSlot(idx) {
   gridOverlays.forEach(el => {
     const active = Number(el.dataset.slotIndex) === idx;
-    el.style.borderColor = active ? 'rgba(0,123,255,0.9)' : 'rgba(0,123,255,0.35)';
-    el.style.boxShadow   = active ? '0 0 18px rgba(0,123,255,0.35)' : 'none';
+    el.style.borderColor = active ? 'rgba(var(--color-primary-rgb), 0.9)' : 'rgba(var(--color-primary-rgb), 0.35)';
+    el.style.boxShadow   = active ? '0 0 18px rgba(var(--color-primary-rgb), 0.35)' : 'none';
   });
 }
 function findNearestFreeSlot(cx, cy, origSlotIndex) {

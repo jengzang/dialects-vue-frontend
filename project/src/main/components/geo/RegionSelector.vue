@@ -917,7 +917,7 @@ $portrait-ratio: 1 / 1;
   box-sizing: border-box;
 
   background: var(--glass-40);
-  border: 1px solid rgba(200, 200, 200, 0.45);
+  border: 1px solid rgba(var(--color-silver-rgb), 0.45);
   border-radius: 14px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 
@@ -972,7 +972,7 @@ $portrait-ratio: 1 / 1;
   font-size: 13px;
 
   &.custom-region-tag {
-    background: rgba(0, 123, 255, 0.5);
+    background: rgba(var(--color-primary-rgb), 0.5);
     border-color: rgba(var(--color-success-rgb), 0.3);
     color: var(--text-white);
   }

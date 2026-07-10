@@ -773,7 +773,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     ),
     radial-gradient(
       circle at 80% 70%,
-      rgba(0, 95, 211, 0.08) 0%,
+      rgba(var(--color-primary-hover-rgb), 0.08) 0%,
       transparent 50%
     );
 }
@@ -1041,7 +1041,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     background: linear-gradient(
       135deg,
       rgba(var(--color-primary-rgb), 0.1) 0%,
-      rgba(0, 95, 211, 0.15) 100%
+      rgba(var(--color-primary-hover-rgb), 0.15) 100%
     );
     border-radius: 12px;
     font-size: 2rem;
@@ -1244,7 +1244,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     background: linear-gradient(
       135deg,
       rgba(var(--color-primary-rgb), 0.08) 0%,
-      rgba(0, 95, 211, 0.12) 100%
+      rgba(var(--color-primary-hover-rgb), 0.12) 100%
     );
     border-radius: 8px;
     font-size: 1.25rem;
@@ -1372,7 +1372,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     background: linear-gradient(
       135deg,
       rgba(var(--color-primary-rgb), 0.1) 0%,
-      rgba(0, 95, 211, 0.08) 100%
+      rgba(var(--color-primary-hover-rgb), 0.08) 100%
     );
     border: 1px solid rgba(var(--color-primary-rgb), 0.2);
     border-radius: 16px;
@@ -1449,7 +1449,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
     background: linear-gradient(
       135deg,
       rgba(var(--color-primary-rgb), 0.08) 0%,
-      rgba(0, 95, 211, 0.05) 100%
+      rgba(var(--color-primary-hover-rgb), 0.05) 100%
     );
     backdrop-filter: blur(20px);
     border: 1.5px solid rgba(var(--color-primary-rgb), 0.2);

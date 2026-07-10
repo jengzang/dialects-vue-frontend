@@ -67,7 +67,7 @@
   --main-query-modal-header-padding: 12px 14px;
   --main-query-modal-body-padding: 12px 14px 16px;
   --main-query-modal-background: var(--glass-70);
-  --main-query-modal-border-color: rgba(200, 200, 200, 0.34);
+  --main-query-modal-border-color: rgba(var(--color-silver-rgb), 0.34);
   --main-query-modal-radius: 18px;
   width: var(--main-query-modal-width);
   max-height: var(--main-query-modal-max-height);
@@ -77,7 +77,7 @@
   background: var(--main-query-modal-background);
   border: 1px solid var(--main-query-modal-border-color);
   border-radius: var(--main-query-modal-radius);
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+  box-shadow: 0 16px 36px rgba(var(--color-shadow-rgb), 0.16);
   backdrop-filter: blur(10px) saturate(145%);
   -webkit-backdrop-filter: blur(10px) saturate(145%);
 }
@@ -279,8 +279,8 @@
 
 .query-detail-panel:hover {
   background: var(--glass-60);
-  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3), 0 0 20px rgba(0, 123, 255, 0.4);
-  border-color: rgba(0, 123, 255, 0.6);
+  box-shadow: 0 8px 25px rgba(var(--color-primary-rgb), 0.3), 0 0 20px rgba(var(--color-primary-rgb), 0.4);
+  border-color: rgba(var(--color-primary-rgb), 0.6);
   opacity: 1;
   transform: translateY(-50%) scale(1.01);
   transition: all 0.3s ease;

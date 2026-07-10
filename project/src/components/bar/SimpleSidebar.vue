@@ -705,7 +705,7 @@ $portrait-ratio: 1 / 1;
   position: relative;
   height: 20px;
   overflow: hidden;
-  background: rgba(0, 95, 211, 0.1);
+  background: rgba(var(--color-primary-hover-rgb), 0.1);
   border-radius: 10px;
 }
 

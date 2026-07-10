@@ -1467,7 +1467,7 @@ onBeforeUnmount(() => {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), #5ac8fa);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-cyan));
   border-radius: 4px;
   transition: width 0.3s ease;
 }

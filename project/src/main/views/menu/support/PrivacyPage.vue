@@ -317,7 +317,7 @@ $transition-base: 0.3s;
   padding: 16px;
   margin-top: 24px;
   font-size: 14px;
-  background: rgba(255, 204, 0, 0.1);
+  background: rgba(var(--color-gold-rgb), 0.1);
   border-left: 4px solid $warning-yellow;
   border-radius: $radius-sm;
 }

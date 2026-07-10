@@ -58,7 +58,7 @@
 }
 
 .main-glass-button[data-active='true'] {
-  background: rgba(0, 123, 255, 0.5);
+  background: rgba(var(--color-primary-rgb), 0.5);
   border-color: rgba(var(--color-primary-rgb), 0.5);
 }
 

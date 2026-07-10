@@ -1274,7 +1274,7 @@ $transition-normal: 0.3s;
 
   &:hover:not(:disabled) {
     background: linear-gradient(135deg, #45a049, #3d8b40);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.3);
     transform: translateY(-2px);
   }
 

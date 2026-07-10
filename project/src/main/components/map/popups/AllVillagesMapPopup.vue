@@ -385,14 +385,14 @@ const renderMarkers = () => {
     const lineFeatures = lineVillages.value.map(v => {
       const displayValue = getDisplayValue(v)
       const tagText = isNameMode ? (v.place_type_name || '') : displayValue
-      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || '#1b2e2b')
+      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || 'var(--color-dark-teal)')
       return {
         type: 'Feature',
         geometry: { type: 'LineString', coordinates: v.coors },
         properties: {
           name: v.name,
           displayValue: displayValue,
-          color: categoryColorMap.value[displayValue] || '#1b2e2b',
+          color: categoryColorMap.value[displayValue] || 'var(--color-dark-teal)',
           _pathStr: (v._path && v._path.length) ? v._path.join(' > ') : '',
           tagText: tagText,
           tagColor: tagColor
@@ -436,7 +436,7 @@ const renderMarkers = () => {
     const pointFeatures = pointVillages.value.map(v => {
       const displayValue = getDisplayValue(v)
       const tagText = isNameMode ? (v.place_type_name || '') : displayValue
-      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || '#1b2e2b')
+      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || 'var(--color-dark-teal)')
       return {
         type: 'Feature',
         geometry: { type: 'Point', coordinates: v.coors[0] },
@@ -444,9 +444,9 @@ const renderMarkers = () => {
           name: v.name,
           displayValue: displayValue,
           label: isNameMode ? v.name : displayValue,
-          bgColor: '#1b2e2b',
-          textColor: '#a6ffdc',
-          color: categoryColorMap.value[displayValue] || '#1b2e2b',
+          bgColor: 'var(--color-dark-teal)',
+          textColor: 'var(--color-cyan)',
+          color: categoryColorMap.value[displayValue] || 'var(--color-dark-teal)',
           _pathStr: (v._path && v._path.length) ? v._path.join(' > ') : '',
           tagText: tagText,
           tagColor: tagColor
@@ -656,7 +656,7 @@ $mobile-breakpoint: 768px;
   transition: all 0.2s;
 
   &:hover {
-    background: #f5f5f7;
+    background: var(--bg-light-gray);
     border-color: $primary;
   }
 }

@@ -2,13 +2,13 @@
   --close-btn-size: 32px;
   --close-btn-font-size: 18px;
   appearance: none;
-  border: 1px solid rgba(15, 23, 42, 0.16);
+  border: 1px solid rgba(var(--color-shadow-rgb), 0.16);
   padding: 0;
   width: var(--close-btn-size);
   height: var(--close-btn-size);
   border-radius: 999px;
   background: var(--glass-90);
-  color: rgba(15, 23, 42, 0.96);
+  color: rgba(var(--color-shadow-rgb), 0.96);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -18,7 +18,7 @@
   font-size: var(--close-btn-font-size);
   font-weight: 800;
   line-height: 1;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 4px 14px rgba(var(--color-shadow-rgb), 0.12);
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
@@ -33,7 +33,7 @@
   color: rgba(127, 29, 29, 0.98);
   transform: scale(1.06);
   box-shadow:
-    0 8px 20px rgba(15, 23, 42, 0.14),
+    0 8px 20px rgba(var(--color-shadow-rgb), 0.14),
     0 0 0 3px rgba(239, 68, 68, 0.12);
 }
 
@@ -41,7 +41,7 @@
   border-color: rgba(220, 38, 38, 0.58);
   transform: scale(0.95);
   box-shadow:
-    0 4px 10px rgba(15, 23, 42, 0.14),
+    0 4px 10px rgba(var(--color-shadow-rgb), 0.14),
     0 0 0 2px rgba(239, 68, 68, 0.16);
 }
 

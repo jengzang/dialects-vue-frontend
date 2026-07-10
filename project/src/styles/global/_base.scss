@@ -155,7 +155,7 @@ textarea {
 
 textarea:hover {
   border-color: var(--color-primary);
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
+  box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.6);
 }
 
 textarea:focus {

@@ -156,10 +156,10 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     color: $text-dark;
     background: linear-gradient(
       135deg,
-      rgba(255, 204, 0, 0.85),
+      rgba(var(--color-gold-rgb), 0.85),
       rgba(255, 214, 10, 0.8)
     );
-    border-color: rgba(255, 204, 0, 0.5);
+    border-color: rgba(var(--color-gold-rgb), 0.5);
 
     .toast-icon {
       @include toast-icon(rgba(0, 0, 0, 0.15), 16px);
@@ -171,7 +171,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     background: linear-gradient(
       135deg,
       rgba(var(--color-primary-rgb), 0.85),
-      rgba(10, 132, 255, 0.8)
+      rgba(var(--color-primary-rgb), 0.8)
     );
     border-color: rgba(var(--color-primary-rgb), 0.5);
 

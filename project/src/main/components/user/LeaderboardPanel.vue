@@ -752,7 +752,7 @@ $bronze: var(--color-bronze);
     &.second-place {
       background: linear-gradient(
         135deg,
-        rgba(192, 192, 192, 0.15),
+        rgba(var(--color-silver-rgb), 0.15),
         rgba(224, 224, 224, 0.08)
       );
       border-left: 4px solid $silver;
@@ -761,7 +761,7 @@ $bronze: var(--color-bronze);
     &.third-place {
       background: linear-gradient(
         135deg,
-        rgba(205, 127, 50, 0.15),
+        rgba(var(--color-bronze-rgb), 0.15),
         rgba(255, 160, 122, 0.08)
       );
       border-left: 4px solid $bronze;
@@ -919,20 +919,20 @@ $bronze: var(--color-bronze);
     &.silver {
       background: linear-gradient(
         135deg,
-        rgba(192, 192, 192, 0.18),
-        rgba(192, 192, 192, 0.08)
+        rgba(var(--color-silver-rgb), 0.18),
+        rgba(var(--color-silver-rgb), 0.08)
       );
-      border-right-color: rgba(192, 192, 192, 0.4);
+      border-right-color: rgba(var(--color-silver-rgb), 0.4);
       color: #5a6c6e;
     }
 
     &.bronze {
       background: linear-gradient(
         135deg,
-        rgba(205, 127, 50, 0.18),
-        rgba(205, 127, 50, 0.08)
+        rgba(var(--color-bronze-rgb), 0.18),
+        rgba(var(--color-bronze-rgb), 0.08)
       );
-      border-right-color: rgba(205, 127, 50, 0.4);
+      border-right-color: rgba(var(--color-bronze-rgb), 0.4);
       color: #8b5a2b;
     }
   }
@@ -958,19 +958,19 @@ $bronze: var(--color-bronze);
     &.category-silver {
       background: linear-gradient(
         90deg,
-        rgba(192, 192, 192, 0.12),
-        rgba(192, 192, 192, 0.05)
+        rgba(var(--color-silver-rgb), 0.12),
+        rgba(var(--color-silver-rgb), 0.05)
       );
-      border-right-color: rgba(192, 192, 192, 0.3);
+      border-right-color: rgba(var(--color-silver-rgb), 0.3);
     }
 
     &.category-bronze {
       background: linear-gradient(
         90deg,
-        rgba(205, 127, 50, 0.12),
-        rgba(205, 127, 50, 0.05)
+        rgba(var(--color-bronze-rgb), 0.12),
+        rgba(var(--color-bronze-rgb), 0.05)
       );
-      border-right-color: rgba(205, 127, 50, 0.3);
+      border-right-color: rgba(var(--color-bronze-rgb), 0.3);
     }
   }
 }
@@ -1007,7 +1007,7 @@ $bronze: var(--color-bronze);
     &.second-place {
       background: linear-gradient(
         90deg,
-        rgba(192, 192, 192, 0.15),
+        rgba(var(--color-silver-rgb), 0.15),
         rgba(224, 224, 224, 0.08)
       );
     }
@@ -1015,7 +1015,7 @@ $bronze: var(--color-bronze);
     &.third-place {
       background: linear-gradient(
         90deg,
-        rgba(205, 127, 50, 0.15),
+        rgba(var(--color-bronze-rgb), 0.15),
         rgba(255, 160, 122, 0.08)
       );
     }
@@ -1053,7 +1053,7 @@ $bronze: var(--color-bronze);
     td {
       background: linear-gradient(
         90deg,
-        rgba(192, 192, 192, 0.15),
+        rgba(var(--color-silver-rgb), 0.15),
         rgba(224, 224, 224, 0.08)
       );
     }
@@ -1067,7 +1067,7 @@ $bronze: var(--color-bronze);
     td {
       background: linear-gradient(
         90deg,
-        rgba(205, 127, 50, 0.15),
+        rgba(var(--color-bronze-rgb), 0.15),
         rgba(255, 160, 122, 0.08)
       );
     }
@@ -1113,8 +1113,8 @@ $bronze: var(--color-bronze);
     &.second-place {
       background: linear-gradient(
         90deg,
-        rgba(192, 192, 192, 0.18),
-        rgba(192, 192, 192, 0.08)
+        rgba(var(--color-silver-rgb), 0.18),
+        rgba(var(--color-silver-rgb), 0.08)
       );
 
       .metric-name {
@@ -1125,8 +1125,8 @@ $bronze: var(--color-bronze);
     &.third-place {
       background: linear-gradient(
         90deg,
-        rgba(205, 127, 50, 0.18),
-        rgba(205, 127, 50, 0.08)
+        rgba(var(--color-bronze-rgb), 0.18),
+        rgba(var(--color-bronze-rgb), 0.08)
       );
 
       .metric-name {
@@ -1161,23 +1161,23 @@ $bronze: var(--color-bronze);
   &.silver {
     background: linear-gradient(
       135deg,
-      rgba(192, 192, 192, 0.2),
+      rgba(var(--color-silver-rgb), 0.2),
       rgba(220, 220, 220, 0.15)
     );
     color: #7f8c8d;
     font-weight: 700;
-    box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
+    box-shadow: 0 2px 8px rgba(var(--color-silver-rgb), 0.3);
   }
 
   &.bronze {
     background: linear-gradient(
       135deg,
-      rgba(205, 127, 50, 0.2),
+      rgba(var(--color-bronze-rgb), 0.2),
       rgba(255, 160, 122, 0.15)
     );
     color: #a0522d;
     font-weight: 700;
-    box-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
+    box-shadow: 0 2px 8px rgba(var(--color-bronze-rgb), 0.3);
   }
 }
 

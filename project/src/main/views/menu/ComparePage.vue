@@ -1889,7 +1889,7 @@ $text-muted: var(--text-lightest);
   padding: 6px 12px;
   background: var(--glass-30);
   @include glass-blur;
-  border: 1px solid rgba(200, 200, 200, 0.5);
+  border: 1px solid rgba(var(--color-silver-rgb), 0.5);
   border-radius: var(--radius-md);
   white-space: nowrap;
   font-size: 14px;
@@ -1984,10 +1984,10 @@ $text-muted: var(--text-lightest);
   .group-label {
     background: linear-gradient(
       135deg,
-      rgba(76, 175, 80, 0.15),
-      rgba(76, 175, 80, 0.25)
+      rgba(var(--color-success-rgb), 0.15),
+      rgba(var(--color-success-rgb), 0.25)
     );
-    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+    box-shadow: 0 2px 8px rgba(var(--color-success-rgb), 0.2);
     color: $group1-text;
   }
 }
@@ -2027,8 +2027,8 @@ $text-muted: var(--text-lightest);
 .add-to-group1 {
   background: linear-gradient(
     145deg,
-    rgba(76, 175, 80, 0.25),
-    rgba(76, 175, 80, 0.2)
+    rgba(var(--color-success-rgb), 0.25),
+    rgba(var(--color-success-rgb), 0.2)
   );
   border-color: $group1-primary;
   color: $group1-text;
@@ -2036,10 +2036,10 @@ $text-muted: var(--text-lightest);
   &:hover:not(:disabled) {
     background: linear-gradient(
       145deg,
-      rgba(76, 175, 80, 0.4),
-      rgba(76, 175, 80, 0.3)
+      rgba(var(--color-success-rgb), 0.4),
+      rgba(var(--color-success-rgb), 0.3)
     );
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.3);
     transform: translateY(-2px);
   }
 }
@@ -2081,10 +2081,10 @@ $text-muted: var(--text-lightest);
   border-radius: 12px;
 
   &.group1-style {
-    border-color: rgba(76, 175, 80, 0.7);
+    border-color: rgba(var(--color-success-rgb), 0.7);
 
     .selected-group-header {
-      border-bottom-color: rgba(76, 175, 80, 0.3);
+      border-bottom-color: rgba(var(--color-success-rgb), 0.3);
       color: $group1-text;
     }
   }
@@ -2241,11 +2241,11 @@ $text-muted: var(--text-lightest);
   }
 
   &-green {
-    background: rgba(76, 175, 80, 0.1);
+    background: rgba(var(--color-success-rgb), 0.1);
     border-color: $group1-primary;
 
     &:hover {
-      background: rgba(76, 175, 80, 0.2);
+      background: rgba(var(--color-success-rgb), 0.2);
       border-color: $group1-primary;
     }
 
@@ -2306,7 +2306,7 @@ $text-muted: var(--text-lightest);
     gap: 8px;
     padding: 4px 10px;
     background: var(--glass-30);
-    border: 1px solid rgba(200, 200, 200, 0.35);
+    border: 1px solid rgba(var(--color-silver-rgb), 0.35);
     border-radius: 12px;
   }
 

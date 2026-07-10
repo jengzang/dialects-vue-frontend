@@ -3053,7 +3053,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &.modified-row {
-      background: rgba(255, 204, 0, 0.1);
+      background: rgba(var(--color-gold-rgb), 0.1);
     }
 
     &.marked-for-delete {

@@ -345,7 +345,7 @@ const colorPalette = [
   "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
   "#911eb4", "#42d4f4", "#f032e6", "#bfe745", "#fabed4",
   "#469990", "#dcbaff", "#9a6324", "#fffac8", "#800000",
-  "#aaffc3", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
+  "var(--color-success)", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
 ];
 
 // --- 生命周期 ---
@@ -1009,8 +1009,8 @@ const resetView = () => {
 
 /* 1. 基礎地名 (create_map1) */
 :deep(.marker-text-base) {
-  background-color: #1b2e2b;
-  color: #a6ffdc;
+  background-color: var(--color-dark-teal);
+  color: var(--color-cyan);
   padding: 2px 4px;
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
@@ -1311,7 +1311,7 @@ const resetView = () => {
 }
 
 .tone-table th {
-  background: #f5f5f5;
+  background: var(--bg-light);
   font-weight: 600;
   color: var(--text-dark)
 }
@@ -1321,7 +1321,7 @@ const resetView = () => {
 }
 
 .data-display pre {
-  background: #f5f5f5;
+  background: var(--bg-light);
   padding: 16px;
   border-radius: 8px;
   overflow-x: auto;

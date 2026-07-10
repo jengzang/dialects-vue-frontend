@@ -269,10 +269,10 @@ $transition-ease: ease;
   .switch-toggle__button {
     &:hover:not(.is-disabled) {
       background-color: dimgray;
-      box-shadow: 0 0 10px 4px rgba(0, 123, 255, 0.7);
+      box-shadow: 0 0 10px 4px rgba(var(--color-primary-rgb), 0.7);
 
       .switch-toggle__thumb {
-        box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.5);
       }
     }
 

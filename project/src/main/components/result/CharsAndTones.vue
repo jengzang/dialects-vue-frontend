@@ -442,7 +442,7 @@ const colorArray = [
   { name: "Magenta", hex: "#9999FF" },
   { name: "Pink", hex: "#fabed4" },
   { name: "Beige", hex: "#fffac8" },
-  { name: "Mint", hex: "#aaffc3" },
+  { name: "Mint", hex: "var(--color-success)" },
   { name: "Lavender", hex: "#dcbfff" }
 ];
 

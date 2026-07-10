@@ -332,7 +332,7 @@ $surface-medium: var(--glass-60);
 $surface-white: #fff;
 
 $border-default: rgba(0, 0, 0, 0.1);
-$active-background: rgba(0, 123, 255, 0.206);
+$active-background: rgba(var(--color-primary-rgb), 0.206);
 
 $radius-control: var(--radius-md);
 $transition-fast: 0.2s;

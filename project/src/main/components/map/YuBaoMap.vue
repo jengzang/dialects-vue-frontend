@@ -395,8 +395,8 @@ const convertToGeoJSON = (data) => {
     // 计算颜色（基于合并后的文字）
     let bgColor, textColor
     if (displayMode.value === 'location') {
-      bgColor = '#1b2e2b'
-      textColor = '#a6ffdc'
+      bgColor = 'var(--color-dark-teal)'
+      textColor = 'var(--color-cyan)'
     } else {
       bgColor = assignColor(mergedText)
       textColor = 'var(--text-primary)'
@@ -1130,7 +1130,7 @@ watch(() => props.activeTab, () => {
   gap: 8px;
   padding: 10px 12px;
   margin-bottom: 16px;
-  background: rgba(0, 113, 227, 0.08);
+  background: rgba(var(--color-primary-rgb), 0.08);
   border-left: 3px solid var(--color-primary);
   border-radius: 6px;
   font-size: 13px;
@@ -1158,7 +1158,7 @@ watch(() => props.activeTab, () => {
 }
 
 .info-row:hover {
-  background-color: rgba(0, 113, 227, 0.02);
+  background-color: rgba(var(--color-primary-rgb), 0.02);
   margin: 0 -12px;
   padding-left: 12px;
   padding-right: 12px;
