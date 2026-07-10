@@ -168,12 +168,4 @@ const filteredItems = computed(() => {
   }
 }
 
-@keyframes shimmer {
-  from {
-    background-position: 200% 0;
-  }
-  to {
-    background-position: -200% 0;
-  }
-}
 </style>

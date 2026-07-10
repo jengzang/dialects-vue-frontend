@@ -608,10 +608,10 @@ $glass-blur: 8px;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transform: translate(-50%, -100%);
-  animation: fadeIn $transition-fast ease-out;
+  animation: fadeInCentered $transition-fast ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes fadeInCentered {
   from {
     opacity: 0;
     transform: translate(-50%, -90%);

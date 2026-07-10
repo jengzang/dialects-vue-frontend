@@ -108,11 +108,6 @@ defineProps({
   animation: fadeIn 0.3s ease;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
 .spatial-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

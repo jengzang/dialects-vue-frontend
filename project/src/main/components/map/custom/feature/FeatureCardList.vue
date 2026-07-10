@@ -224,12 +224,4 @@ function resolveToneType(item) {
   height: 24px;
 }
 
-@keyframes shimmer {
-  from {
-    background-position: 200% 0;
-  }
-  to {
-    background-position: -200% 0;
-  }
-}
 </style>

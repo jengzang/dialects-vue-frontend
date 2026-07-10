@@ -186,20 +186,4 @@ $animation-duration: 0.4s;/* 弹窗基本样式 */
 .popup-animated {
   animation: popup-bounce-in $animation-duration ease-out forwards;
 }
-
-@keyframes popup-bounce-in {
-  0% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(0) scale(0.8);
-  }
-
-  60% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(10px) scale(1.05);
-  }
-
-  100% {
-    transform: translateX(-50%) translateY(20px) scale(1);
-  }
-}
 </style>
