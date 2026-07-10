@@ -65,6 +65,8 @@
     "referenceDescription": "先选择工作表与表头，再完成必要列匹配，确认后再正式上传。",
     "jyut2ipaTitle": "导入前预览与粤拼列匹配",
     "jyut2ipaDescription": "先确认哪一列是粤拼，再开始转换，避免因列名不一致导致无法处理。",
+    "checkToolTitle": "导入前预览与检查列匹配",
+    "checkToolDescription": "先匹配字、音标与备注列，再进入检查工作台，可减少因列名不一致导致的导入失败。",
     "mergeReferenceSummary": "已匹配 {mappedCount} 列 / 来源 {columnCount} 列",
     "actions": {
       "reselect": "重新选择文件",
@@ -156,6 +158,64 @@
             "character": "单字",
             "word": "字头"
           }
+        }
+      },
+      "checkTool": {
+        "char": {
+          "label": "字",
+          "description": "检查工具的单字列，作为逐行检查与定位依据。",
+          "example": "天",
+          "aliases": {
+            "char": "字",
+            "character": "单字",
+            "word": "字头"
+          }
+        },
+        "ipa": {
+          "label": "音标",
+          "description": "检查工具的核心音标列，用于声韵调拆解与错误检查。",
+          "example": "tin55",
+          "aliases": {
+            "ipa": "音标",
+            "phonetic": "读音",
+            "pronunciation": "注音"
+          }
+        },
+        "note": {
+          "label": "备注",
+          "description": "可选附加说明列，用于保留人工注记。",
+          "example": "文读",
+          "aliases": {
+            "note": "备注",
+            "comment": "说明"
+          }
+        }
+      },
+      "voronoi": {
+        "name": {
+          "label": "地点名称",
+          "description": "Voronoi 点位名称，用于预览、去重点名与忽略点列表。",
+          "example": "梅县"
+        },
+        "lng": {
+          "label": "经度",
+          "description": "点位经度列，需与纬度共同组成有效坐标。",
+          "example": "116.104"
+        },
+        "lat": {
+          "label": "纬度",
+          "description": "点位纬度列，需与经度共同组成有效坐标。",
+          "example": "24.289"
+        },
+        "mapPartition": {
+          "label": "地图集分区",
+          "description": "按地图集分区计算时使用的分区列，支持 A-B-C 层级写法。",
+          "example": "客家话-粤台片-梅惠小片"
+        },
+        "yindianPartition": {
+          "label": "音典分区",
+          "description": "按音典分区计算时使用的分区列，支持 A-B-C 层级写法。",
+          "example": "客家話-粵臺片-梅惠小片"
         }
       }
     }

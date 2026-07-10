@@ -519,9 +519,13 @@
       "panelHint": "基於地點分區資料計算泰森多邊形，可預覽或導出為面圖層。",
       "summaryTitle": "資料概覽",
       "settingsTitle": "計算設定",
+      "dataSourceTitle": "資料來源",
       "actionsTitle": "操作",
       "totalPoints": "全部點位",
       "activePoints": "參與點位",
+      "officialPoints": "官方點位",
+      "customPoints": "自定義點位",
+      "useOfficialData": "同時使用官方分區資料",
       "ignoredPoints": "忽略點位",
       "partitionGroups": "分區組數",
       "loadPoints": "載入點位",
@@ -559,6 +563,42 @@
       "exportEmptyAfterClip": "裁剪後沒有可導出的圖層",
       "exportLoadingTitle": "正在導出國界裁剪圖層",
       "exportLoadingProgress": "已完成 {current}/{total}",
+      "customImportLoaded": "已導入 {count} 個自定義點位",
+      "customImportCleared": "已清空自定義點位",
+      "sourceUpdated": "目前參與計算的點位數：{count}",
+      "customImport": {
+        "modalTitle": "導入自定義 Voronoi 資料",
+        "introTitle": "預覽表格並完成列匹配",
+        "introText": "這裡僅負責預覽、工作表切換和列匹配；父組件會接收已匹配的資料並參與 Voronoi 計算。",
+        "fileLabel": "表格檔案",
+        "partitionModeLabel": "當前分區列",
+        "previewTitle": "自定義資料預覽",
+        "previewDescription": "請確認地點名稱、經緯度與分區列都已映射正確，再將資料接入 Voronoi。",
+        "partitionModeOptions": {
+          "map": "地圖集分區",
+          "yindian": "音典分區"
+        },
+        "actions": {
+          "selectFile": "選擇 xlsx / xls / csv",
+          "replace": "重新選擇檔案",
+          "clear": "清空自定義資料",
+          "confirm": "確認並接入"
+        },
+        "summary": {
+          "rows": "總行數 {count}",
+          "validRows": "有效點位 {count}",
+          "message": "已接入 {count} 個自定義點位（原始 {total} 行）"
+        },
+        "messages": {
+          "ready": "當前映射結果可接入 Voronoi 計算。",
+          "incomplete": "當前檔案仍需補齊列匹配或修正無效資料。",
+          "parseFailed": "表格解析失敗：{error}",
+          "invalidCoordinates": "有 {count} 行因經緯度無效被跳過。",
+          "missingPartition": "有 {count} 行因缺少當前分區列而被跳過。",
+          "duplicateNames": "檢測到 {count} 組重名點位，v1 先按並行點位保留。",
+          "noValidRows": "目前沒有可用於 Voronoi 的有效點位。"
+        }
+      },
       "regionStates": {
         "none": "未選擇",
         "partial": "部分選擇",

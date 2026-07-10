@@ -157,6 +157,64 @@
             "word": "Head Character"
           }
         }
+      },
+      "checkTool": {
+        "char": {
+          "label": "Character",
+          "description": "Primary character column used for row-by-row inspection and lookup.",
+          "example": "天",
+          "aliases": {
+            "char": "Character",
+            "character": "Single Character",
+            "word": "Head Character"
+          }
+        },
+        "ipa": {
+          "label": "IPA",
+          "description": "Core phonetic column used for onset/rime/tone parsing and validation.",
+          "example": "tin55",
+          "aliases": {
+            "ipa": "IPA",
+            "phonetic": "Pronunciation",
+            "pronunciation": "Phonetic"
+          }
+        },
+        "note": {
+          "label": "Note",
+          "description": "Optional note column for manual comments.",
+          "example": "Literary reading",
+          "aliases": {
+            "note": "Note",
+            "comment": "Comment"
+          }
+        }
+      },
+      "voronoi": {
+        "name": {
+          "label": "Location Name",
+          "description": "Voronoi point label used in preview, duplicate diagnostics, and ignored-point selection.",
+          "example": "Meixian"
+        },
+        "lng": {
+          "label": "Longitude",
+          "description": "Longitude column that must pair with latitude to form a valid point.",
+          "example": "116.104"
+        },
+        "lat": {
+          "label": "Latitude",
+          "description": "Latitude column that must pair with longitude to form a valid point.",
+          "example": "24.289"
+        },
+        "mapPartition": {
+          "label": "Atlas Partition",
+          "description": "Partition column used for atlas-based Voronoi calculation. Supports A-B-C hierarchical paths.",
+          "example": "Hakka-Yuetai-Meihui"
+        },
+        "yindianPartition": {
+          "label": "Mcpdict Partition",
+          "description": "Partition column used for mcpdict-based Voronoi calculation. Supports A-B-C hierarchical paths.",
+          "example": "Hakka-Yuetai-Meihui"
+        }
       }
     }
   },

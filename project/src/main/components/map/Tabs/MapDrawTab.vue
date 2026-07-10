@@ -158,8 +158,16 @@
           :is-points-preview-active="voronoiPreviewType === 'points'"
           :is-polygon-preview-active="voronoiPreviewType === 'polygons'"
           :offset-mode="voronoiPanelOffsetMode"
+          :use-official-data="useVoronoiOfficialData"
+          :has-custom-import="hasVoronoiCustomImport"
+          :official-point-count="voronoiOfficialPointCount"
+          :custom-point-count="voronoiCustomPointCount"
+          :custom-import-summary="voronoiCustomImportSummaryText"
           @update:partition-mode="voronoiPartitionMode = $event"
           @update:region-level="voronoiRegionLevel = $event"
+          @update:use-official-data="useVoronoiOfficialData = $event"
+          @open-custom-import="showVoronoiCustomImportModal = true"
+          @clear-custom-import="clearVoronoiCustomImport"
           @open-ignore-modal="openVoronoiIgnoreModal"
           @preview-points="previewVoronoiPoints"
           @export-layer="exportVoronoiToLayer"
@@ -470,6 +478,11 @@
         :ignored-locations="ignoredVoronoiLocations"
         @confirm="handleVoronoiIgnoreConfirm"
       />
+
+      <VoronoiCustomImportModal
+        v-model="showVoronoiCustomImportModal"
+        @confirm="handleVoronoiCustomImportConfirm"
+      />
     </template>
   </div>
 </template>
@@ -515,6 +528,7 @@ import MapDrawImageExportModal from '@/main/components/map/Draw/modals/MapDrawIm
 import MapDrawImagePreviewModal from '@/main/components/map/Draw/modals/MapDrawImagePreviewModal.vue';
 import VoronoiExportLayersModal from '@/main/components/map/Draw/modals/VoronoiExportLayersModal.vue';
 import VoronoiIgnorePointsModal from '@/main/components/map/Draw/modals/VoronoiIgnorePointsModal.vue';
+import VoronoiCustomImportModal from '@/main/components/map/Draw/modals/VoronoiCustomImportModal.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
 import AppModal from '@/components/common/AppModal.vue';
 
@@ -653,6 +667,11 @@ const handlePanelStyleUpdate = (value) => {
 
 const voronoiRawPartitionData = ref([]);
 const voronoiPartitionPoints = ref([]);
+const voronoiOfficialPoints = ref([]);
+const voronoiCustomImportRows = ref([]);
+const voronoiCustomImportMeta = ref(null);
+const useVoronoiOfficialData = ref(true);
+const showVoronoiCustomImportModal = ref(false);
 const ignoredVoronoiLocations = ref([]);
 const voronoiPreviewLayers = ref([]);
 const voronoiPreviewType = ref('');
@@ -674,7 +693,20 @@ const activeVoronoiPoints = computed(() => {
   return voronoiPartitionPoints.value.filter((item) => !ignored.has(normalizeVoronoiLocationName(item.name)));
 });
 
+const hasVoronoiCustomImport = computed(() => voronoiCustomImportRows.value.length > 0);
+
+const voronoiCustomImportSummaryText = computed(() => {
+  const meta = voronoiCustomImportMeta.value;
+  if (!meta) return '';
+  return t('map.drawTab.voronoi.customImport.summary.message', {
+    count: voronoiCustomImportRows.value.length,
+    total: meta.summary?.totalRowCount || voronoiCustomImportRows.value.length,
+  });
+});
+
 const voronoiTotalPointCount = computed(() => voronoiPartitionPoints.value.length);
+const voronoiOfficialPointCount = computed(() => voronoiOfficialPoints.value.length);
+const voronoiCustomPointCount = computed(() => voronoiCustomImportRows.value.length);
 const voronoiActivePointCount = computed(() => activeVoronoiPoints.value.length);
 const voronoiGroupCount = computed(() => {
   const level = Number(voronoiRegionLevel.value) || 3;
@@ -729,10 +761,54 @@ const setVoronoiStatus = (key, params = {}) => {
   voronoiStatusText.value = t(`map.drawTab.voronoi.${key}`, params);
 };
 
+const syncVoronoiPartitionPoints = () => {
+  const nextPoints = [];
+  if (useVoronoiOfficialData.value) {
+    nextPoints.push(...voronoiOfficialPoints.value);
+  }
+  if (voronoiCustomImportRows.value.length) {
+    nextPoints.push(...voronoiCustomImportRows.value);
+  }
+  voronoiPartitionPoints.value = nextPoints;
+};
+
 const normalizeVoronoiPoints = (partitionData = voronoiRawPartitionData.value) => {
-  voronoiPartitionPoints.value = buildPartitionPoints(partitionData, {
+  voronoiOfficialPoints.value = buildPartitionPoints(partitionData, {
     partitionMode: voronoiPartitionMode.value,
   });
+  syncVoronoiPartitionPoints();
+};
+
+const clearVoronoiPreviewState = () => {
+  ignoredVoronoiLocations.value = [];
+  voronoiLastResult.value = null;
+  voronoiExportSelections.value = [];
+  voronoiPreviewType.value = '';
+  voronoiPreviewLayers.value = [];
+};
+
+const clearVoronoiCustomImport = () => {
+  voronoiCustomImportRows.value = [];
+  voronoiCustomImportMeta.value = null;
+  syncVoronoiPartitionPoints();
+  clearVoronoiPreviewState();
+  setVoronoiStatus('customImportCleared');
+};
+
+const handleVoronoiCustomImportConfirm = ({ rows, partitionMode, summary }) => {
+  voronoiCustomImportRows.value = Array.isArray(rows)
+    ? rows.map((row, index) => ({
+      ...row,
+      name: String(row?.name || '').trim(),
+      source: row?.source || 'custom',
+      customRowId: row?.customRowId || `custom-${index + 1}`,
+      partitionMode,
+    }))
+    : [];
+  voronoiCustomImportMeta.value = { partitionMode, summary };
+  syncVoronoiPartitionPoints();
+  clearVoronoiPreviewState();
+  setVoronoiStatus('customImportLoaded', { count: voronoiCustomImportRows.value.length });
 };
 
 const loadVoronoiPoints = async () => {
@@ -1048,9 +1124,7 @@ const confirmVoronoiExport = async () => {
 
 watch(voronoiPartitionMode, async () => {
   normalizeVoronoiPoints();
-  ignoredVoronoiLocations.value = [];
-  voronoiLastResult.value = null;
-  voronoiExportSelections.value = [];
+  clearVoronoiPreviewState();
   await refreshVoronoiPreview();
   if (!voronoiPreviewType.value) {
     voronoiPreviewLayers.value = [];
@@ -1064,6 +1138,12 @@ watch(voronoiRegionLevel, async () => {
   if (!voronoiPreviewType.value) {
     voronoiPreviewLayers.value = [];
   }
+});
+
+watch(useVoronoiOfficialData, () => {
+  syncVoronoiPartitionPoints();
+  clearVoronoiPreviewState();
+  setVoronoiStatus('sourceUpdated', { count: voronoiPartitionPoints.value.length });
 });
 
 watch(selectedStoredDraftId, async (draftId) => {

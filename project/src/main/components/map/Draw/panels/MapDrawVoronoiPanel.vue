@@ -20,6 +20,54 @@
 
         <section class="draw-tool-section">
           <div class="draw-tool-section-title">
+            {{ t('map.drawTab.voronoi.dataSourceTitle') }}
+          </div>
+          <div class="voronoi-data-source-actions">
+            <button
+              class="main-glass-button"
+              :data-variant="hasCustomImport ? 'primary' : 'secondary'"
+              type="button"
+              @click="$emit('open-custom-import')"
+            >
+              {{ hasCustomImport
+                ? t('map.drawTab.voronoi.customImport.actions.replace')
+                : t('map.drawTab.voronoi.customImport.actions.selectFile') }}
+            </button>
+            <button
+              v-if="hasCustomImport"
+              class="main-glass-button"
+              data-variant="secondary"
+              type="button"
+              @click="$emit('clear-custom-import')"
+            >
+              {{ t('map.drawTab.voronoi.customImport.actions.clear') }}
+            </button>
+          </div>
+          <div class="voronoi-data-source-toggles">
+            <CheckBox
+              :model-value="useOfficialData"
+              @update:model-value="$emit('update:use-official-data', $event)"
+            >
+              {{ t('map.drawTab.voronoi.useOfficialData') }}
+            </CheckBox>
+          </div>
+          <div class="voronoi-source-summary-grid">
+            <div class="voronoi-summary-card">
+              <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.officialPoints') }}</span>
+              <strong class="voronoi-summary-value">{{ officialPointCount }}</strong>
+            </div>
+            <div class="voronoi-summary-card">
+              <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.customPoints') }}</span>
+              <strong class="voronoi-summary-value">{{ customPointCount }}</strong>
+            </div>
+          </div>
+          <div v-if="customImportSummary" class="draw-style-hint">
+            {{ customImportSummary }}
+          </div>
+        </section>
+
+        <section class="draw-tool-section">
+          <div class="draw-tool-section-title">
             {{ t('map.drawTab.voronoi.settingsTitle') }}
           </div>
           <div class="draw-basemap-select">
@@ -130,6 +178,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 
 const props = defineProps({
   isOpen: { type: Boolean, default: false },
@@ -145,11 +194,19 @@ const props = defineProps({
   isPointsPreviewActive: { type: Boolean, default: false },
   isPolygonPreviewActive: { type: Boolean, default: false },
   offsetMode: { type: String, default: 'none' },
+  useOfficialData: { type: Boolean, default: true },
+  hasCustomImport: { type: Boolean, default: false },
+  officialPointCount: { type: Number, default: 0 },
+  customPointCount: { type: Number, default: 0 },
+  customImportSummary: { type: String, default: '' },
 })
 
 defineEmits([
   'update:partition-mode',
   'update:region-level',
+  'update:use-official-data',
+  'open-custom-import',
+  'clear-custom-import',
   'open-ignore-modal',
   'preview-points',
   'export-layer',
@@ -191,7 +248,8 @@ const offsetClass = computed(() => {
   }
 }
 
-.voronoi-summary-grid {
+.voronoi-summary-grid,
+.voronoi-source-summary-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.6rem;
@@ -199,6 +257,16 @@ const offsetClass = computed(() => {
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
   }
+}
+
+.voronoi-data-source-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.voronoi-data-source-toggles {
+  margin-top: 0.85rem;
 }
 
 .voronoi-summary-card {

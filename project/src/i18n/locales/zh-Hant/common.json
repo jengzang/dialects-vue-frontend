@@ -190,6 +190,33 @@
             "comment": "說明"
           }
         }
+      },
+      "voronoi": {
+        "name": {
+          "label": "地點名稱",
+          "description": "Voronoi 點位名稱，用於預覽、去重點名與忽略點列表。",
+          "example": "梅縣"
+        },
+        "lng": {
+          "label": "經度",
+          "description": "點位經度列，需與緯度共同組成有效座標。",
+          "example": "116.104"
+        },
+        "lat": {
+          "label": "緯度",
+          "description": "點位緯度列，需與經度共同組成有效座標。",
+          "example": "24.289"
+        },
+        "mapPartition": {
+          "label": "地圖集分區",
+          "description": "按地圖集分區計算時使用的分區列，支援 A-B-C 層級寫法。",
+          "example": "客家話-粵臺片-梅惠小片"
+        },
+        "yindianPartition": {
+          "label": "音典分區",
+          "description": "按音典分區計算時使用的分區列，支援 A-B-C 層級寫法。",
+          "example": "客家話-粵臺片-梅惠小片"
+        }
       }
     }
   },
