@@ -25,7 +25,7 @@
 import { computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 
-import IntroLayout from '../layouts/IntroLayout.vue'
+// import IntroLayout from '../layouts/IntroLayout.vue'
 import MenuLayout from '../layouts/MenuLayout.vue'
 import SimpleLayout from '../layouts/SimpleLayout.vue'
 import ExploreLayout from '../layouts/ExploreLayout.vue'
@@ -68,9 +68,9 @@ export default {
       }
 
       // intro 已不再作为现用页面入口，保留分支仅作兼容兜底
-      if (normalizedPath.startsWith('/intro')) {
-        return IntroLayout
-      }
+      // if (normalizedPath.startsWith('/intro')) {
+      //   return IntroLayout
+      // }
 
       // /villagesML 路由使用 SimpleLayout
       if (normalizedPath === '/villagesML' || normalizedPath.startsWith('/villagesML/')) {
