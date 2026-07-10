@@ -556,7 +556,7 @@ onMounted(() => {
 
 $primary-blue: var(--color-primary);
 $deep-blue: var(--text-deep);
-$text-black: #000;
+$text-black: var(--text-primary);
 $text-gray: var(--text-tertiary);
 $transition-fast: 0.2s;
 $glass-blur: 8px;
@@ -863,7 +863,7 @@ $glass-blur: 8px;
   &:hover {
     color: $deep-blue;
     cursor: pointer;
-    background-color: #f4f4f4;
+    background-color: var(--bg-light-gray);
     transform: scale(1.15);
   }
 }
@@ -910,7 +910,7 @@ $glass-blur: 8px;
     width: 14px;
     height: 14px;
     margin: 4px;
-    background: #9aa0a6;
+    background: var(--text-slate-light);
     border-radius: 50%;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
     animation: bouncing 0.6s infinite ease-in-out;
