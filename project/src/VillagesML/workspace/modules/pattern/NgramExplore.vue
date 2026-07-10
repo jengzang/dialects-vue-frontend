@@ -391,7 +391,6 @@ onMounted(async () => {
 }
 
 
-
 .frequency-results-wrapper {
   overflow-x: auto;
   width: 100%;

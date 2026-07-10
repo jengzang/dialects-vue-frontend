@@ -708,7 +708,6 @@ watch(
 }
 
 
-
 .position-tabs {
   display: flex;
   gap: 8px;

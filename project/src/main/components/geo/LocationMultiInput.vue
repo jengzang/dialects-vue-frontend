@@ -548,10 +548,8 @@ $portrait-ratio: 1 / 1;.location-multi-input {
 
 .preview-inline {
   min-width: 0;
-  overflow: hidden;
+  @include text-truncate;
   color: var(--text-dark-medium);
-  white-space: nowrap;
-  text-overflow: ellipsis;
   font-size: 13px;
 }
 

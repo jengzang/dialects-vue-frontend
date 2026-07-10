@@ -486,5 +486,4 @@ watch(mode, () => {
   padding: 40px 20px;
 }
 
-
 </style>

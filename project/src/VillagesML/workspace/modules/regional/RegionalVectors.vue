@@ -821,9 +821,7 @@ onUnmounted(() => {
 
 .region-name {
   max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include text-truncate;
 }
 
 .remove-btn {
@@ -1002,7 +1000,6 @@ onUnmounted(() => {
   justify-content: center;
   z-index: 9999;
 }
-
 
 
 .loading-overlay p {

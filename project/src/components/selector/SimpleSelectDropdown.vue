@@ -131,9 +131,7 @@ $arrow-transition: 0.2s ease;
 
 .select-label {
   flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include text-truncate;
 }
 
 .select-arrow {

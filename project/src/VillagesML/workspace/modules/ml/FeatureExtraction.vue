@@ -1521,7 +1521,6 @@ onBeforeUnmount(() => {
 }
 
 
-
 .loading-overlay p {
   color: white;
   margin-top: 16px;

@@ -1254,5 +1254,4 @@ const openEntryModal = () => {
   }
 }
 
-
 </style>

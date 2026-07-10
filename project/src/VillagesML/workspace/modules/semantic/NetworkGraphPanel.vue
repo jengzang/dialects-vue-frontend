@@ -318,7 +318,6 @@ onBeforeUnmount(() => {
 }
 
 
-
 .communities-legend {
   padding: 16px;
   background: var(--glass-30);

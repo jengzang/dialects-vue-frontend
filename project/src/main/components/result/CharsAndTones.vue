@@ -854,10 +854,8 @@ $glass-blur: 8px;
 
 .location-tones {
   width: 100px;
-  overflow: hidden;
+  @include text-truncate;
   font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   transition:
     transform $transition-fast ease,
     background-color $transition-fast ease;
@@ -873,10 +871,8 @@ $glass-blur: 8px;
 .tones-cell-tones {
   box-sizing: border-box;
   width: 60px;
-  overflow: hidden;
+  @include text-truncate;
   font-size: 1em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 #loading-overlay {

@@ -237,9 +237,7 @@ $shadow-hover:
     color: var(--color-primary-hover);
     letter-spacing: 0.01em;
 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    @include text-truncate;
   }
 
   /* 竖屏 / 接近竖屏：宽高比 <= 1，统一隐藏骰子，只保留打开教程入口 */

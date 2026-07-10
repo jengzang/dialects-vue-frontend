@@ -536,7 +536,6 @@ onBeforeUnmount(() => {
 }
 
 
-
 .embeddings-table {
   border-radius: 12px;
   overflow: hidden;

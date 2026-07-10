@@ -6,6 +6,12 @@
   justify-content: center;
 }
 
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @mixin glass-blur($blur: 10px, $saturation: null) {
   @if $saturation {
     backdrop-filter: blur($blur) saturate($saturation);
