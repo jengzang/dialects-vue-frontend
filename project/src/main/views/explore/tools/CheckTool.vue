@@ -2100,7 +2100,7 @@ $danger-soft: rgba(var(--color-error-light-rgb), 0.1);
 $warning-soft: rgba(var(--color-warning-rgb), 0.15);
 $success-soft: rgba(var(--color-success-rgb), 0.1);
 
-@mixin glass-blur($bg: $glass-panel, $blur: 10px, $radius: 16px, $border: var(--glass-50)) {
+@mixin glass-surface($bg: $glass-panel, $blur: 10px, $radius: 16px, $border: var(--glass-50)) {
   background: $bg;
   backdrop-filter: blur($blur);
   -webkit-backdrop-filter: blur($blur);
@@ -2262,7 +2262,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 }
 
 .upload-zone-drop {
-  @include glass-blur(var(--glass-50), 12px, 22px, var(--glass-60));
+  @include glass-surface(var(--glass-50), 12px, 22px, var(--glass-60));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2351,7 +2351,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     z-index: 20;
     width: 40px;
     height: 40px;
-    @include glass-blur(var(--glass-80), 10px, 10px);
+    @include glass-surface(var(--glass-80), 10px, 10px);
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -3201,7 +3201,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-textarea {
     min-height: 300px;
     padding: 16px;
-    @include glass-blur($glass-panel, 10px, 16px);
+    @include glass-surface($glass-panel, 10px, 16px);
     color: $text-main;
     font-size: 14px;
     font-family: "SF Mono", Monaco, monospace;
@@ -3279,12 +3279,12 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-panel {
-    @include glass-blur($glass-panel, 10px, 16px);
+    @include glass-surface($glass-panel, 10px, 16px);
   }
 
   &-input {
     padding: 8px 12px;
-    @include glass-blur($glass-strong, 8px, 8px);
+    @include glass-surface($glass-strong, 8px, 8px);
     color: $text-main;
     font-size: 13px;
     transition: all 0.2s ease;
