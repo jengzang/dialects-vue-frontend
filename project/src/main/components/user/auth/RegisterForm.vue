@@ -113,13 +113,6 @@ $transition-fast: 0.2s;
 $transition-medium: 0.3s;
 $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 $mobile-aspect-ratio: 1 / 1;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .register-form {
   padding: 12px;
   text-align: center;

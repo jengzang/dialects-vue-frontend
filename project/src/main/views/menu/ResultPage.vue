@@ -360,13 +360,6 @@ $text-muted: var(--text-lightest);
 $white: var(--text-white);
 
 $transition-fast: 0.2s;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .result-page-container {
   position: relative;
   display: flex;

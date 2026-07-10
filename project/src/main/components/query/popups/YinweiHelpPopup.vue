@@ -114,13 +114,6 @@ $glass-border-strong: var(--glass-60);
 
 $transition-fast: 0.2s;
 $transition-normal: 0.3s;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .empty-state {
   padding: 30px 0;
   color: $text-secondary;

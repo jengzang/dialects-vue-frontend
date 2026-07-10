@@ -216,13 +216,6 @@ $primary-blue: rgba(var(--color-primary-rgb), 0.95);
 
 $button-transition-duration: 0.18s;
 $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin glass-blur($blur, $saturation: null) {
   @if $saturation {
     backdrop-filter: blur($blur) saturate($saturation);

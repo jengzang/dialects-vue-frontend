@@ -736,13 +736,6 @@ $mobile-breakpoint: 768px;
 $desktop-large: 1201px;
 
 $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin primary-gradient {
   background: linear-gradient(
     135deg,

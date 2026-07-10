@@ -209,13 +209,6 @@ $text-dark: var(--text-dark);
 $error-color: var(--color-error);
 $transition-fast: 0.2s;
 $mobile-aspect-ratio: 1 / 1;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .tree-node {
   margin-bottom: 8px;
 }

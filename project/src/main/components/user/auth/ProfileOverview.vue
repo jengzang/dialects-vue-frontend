@@ -202,13 +202,6 @@ $transition-slow: 0.4s;
 $standard-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin glass-blur($blur: 20px, $saturation: null) {
   @if $saturation {
     backdrop-filter: blur($blur) saturate($saturation);

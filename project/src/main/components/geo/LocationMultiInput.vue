@@ -434,13 +434,6 @@ watch(showPartitionInfoModal, (isVisible) => {
 $success-green: var(--color-success);
 $warning-orange: var(--color-warning);
 $portrait-ratio: 1 / 1;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin glass-blur($amount: 12px) {
   backdrop-filter: blur($amount);
   -webkit-backdrop-filter: blur($amount);

@@ -2107,13 +2107,6 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   border: 1px solid $border;
   border-radius: $radius;
 }
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .check {
   /* 基础布局 */
 

@@ -609,13 +609,6 @@ $white: var(--text-white);
 $transition-fast: 0.2s;
 $panel-radius: 28px;
 $panel-radius-portrait: 24px;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin glass-blur($blur: 16px, $saturation: 180%) {
   backdrop-filter: blur($blur) saturate($saturation);
   -webkit-backdrop-filter: blur($blur) saturate($saturation);

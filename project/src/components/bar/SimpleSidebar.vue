@@ -362,13 +362,6 @@ $text-dark: var(--text-dark);
 $text-muted: var(--text-secondary);
 
 $portrait-ratio: 1 / 1;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin glass-blur($blur: 12px, $saturation: 160%) {
   backdrop-filter: blur($blur) saturate($saturation);
   -webkit-backdrop-filter: blur($blur) saturate($saturation);

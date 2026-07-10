@@ -97,13 +97,6 @@ $desktop-offset: 20px;
 $mobile-offset: 15px;
 
 $transition-base: 0.3s ease;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin floating-glass {
   background: linear-gradient(
     145deg,

@@ -308,13 +308,6 @@ $white: var(--text-white);
 
 $transition-fast: 0.2s;
 $transition-base: 0.3s;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* 外层内容容器 */
 .tab-content {
   width: 100%;

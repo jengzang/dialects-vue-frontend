@@ -735,13 +735,6 @@ onUnmounted(() => {
 $primary: var(--color-primary);
 $error: var(--color-error);
 $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin glass-blur($blur, $saturation: null) {
   @if $saturation {
     backdrop-filter: blur($blur) saturate($saturation);

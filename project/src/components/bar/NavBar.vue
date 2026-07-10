@@ -541,13 +541,6 @@ $text-secondary: var(--text-tertiary);
 $text-muted: var(--text-secondary);
 
 $mobile-aspect-ratio: 1 / 1;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin glass-blur($blur: 15px, $saturation: 150%) {
   backdrop-filter: blur($blur) saturate($saturation);
   -webkit-backdrop-filter: blur($blur) saturate($saturation);

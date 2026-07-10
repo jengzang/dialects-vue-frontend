@@ -138,6 +138,13 @@ export default defineConfig(async ({ mode }) => {
     define: {
       __WEB_BASE__: JSON.stringify(webBase),
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `@use "@/styles/global/mixins" as *;\n`,
+        },
+      },
+    },
     server: {
       proxy: {
         '^/(api|user|logs|sql|upload|download|static|files)(?:/|$)': {

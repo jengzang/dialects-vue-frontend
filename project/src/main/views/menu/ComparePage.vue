@@ -1810,13 +1810,6 @@ $text-muted: var(--text-lightest);
   backdrop-filter: blur($amount);
   -webkit-backdrop-filter: blur($amount);
 }
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* 页面主体 */
 .tab-content-inner {
   width: 100%;

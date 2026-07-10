@@ -116,13 +116,6 @@ $primary-blue: var(--color-primary);
 $text-dark: var(--text-dark);
 $transition-fast: 0.2s;
 $transition-expand: 0.3s;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* TreeItem 独有样式 */
 .tree-node {
   margin-bottom: 8px;

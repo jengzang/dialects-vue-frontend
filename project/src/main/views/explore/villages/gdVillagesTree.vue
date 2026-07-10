@@ -577,13 +577,6 @@ $white: var(--text-white);
 
 $transition-fast: 0.2s;
 $transition-base: 0.3s;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* Glass Container */
 .glass-container {
   display: flex;

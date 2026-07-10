@@ -915,13 +915,6 @@ $transition-control: 0.25s;
 $transition-base: 0.3s;
 
 $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin glass-blur($blur: 20px) {
   backdrop-filter: blur($blur);
   -webkit-backdrop-filter: blur($blur);

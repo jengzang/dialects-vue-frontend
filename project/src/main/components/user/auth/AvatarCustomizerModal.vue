@@ -483,13 +483,6 @@ $transition-fast: 0.2s;
 $transition-medium: 0.25s;
 $transition-slow: 0.3s;
 $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin color-picker-input {
   width: 32px;
   height: 32px;

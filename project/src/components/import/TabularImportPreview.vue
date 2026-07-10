@@ -317,13 +317,6 @@ $section-gap: 12px;
   display: flex;
   flex-direction: column;
 }
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .tabular-import-preview {
   @include flex-column;
 

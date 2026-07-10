@@ -412,13 +412,6 @@ $desktop-tab-height: 6.5dvh;
 $transition-fast: 0.2s;
 $transition-base: 0.3s;
 $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin glass-blur($blur, $saturation: null) {
   @if $saturation {
     backdrop-filter: blur($blur) saturate($saturation);

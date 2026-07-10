@@ -1121,13 +1121,6 @@ $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
 $primary-deep: #003d9e;
 $mobile-breakpoint: 768px;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .phonology-page {
   min-width: 80dvw;
   margin-top: 20px;

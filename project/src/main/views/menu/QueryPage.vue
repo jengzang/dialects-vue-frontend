@@ -823,13 +823,6 @@ $dark-blue: darkblue;
 
 $transition-fast: 0.2s;
 $transition-base: 0.3s;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* 内容区块动画 */
 .tab-content-inner {
   width: 100%;

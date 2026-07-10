@@ -1358,13 +1358,6 @@ $primary: var(--color-primary);
 $success: var(--color-success);
 $custom-purple: var(--color-purple);
 $portrait-ratio: 1 / 1;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin suggestion-panel($max-width, $max-height) {
   position: absolute !important;
   z-index: 99999 !important;

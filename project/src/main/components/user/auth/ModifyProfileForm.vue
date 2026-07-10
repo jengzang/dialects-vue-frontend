@@ -173,13 +173,6 @@ $white: var(--text-white);
 
 $transition-fast: 0.18s;
 $transition-base: 0.2s;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .modify-profile-form {
   padding: 12px;
   text-align: center;

@@ -56,13 +56,6 @@ $text-action-info: rgba(20, 34, 56, 0.88);
 
 $toast-enter-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin glass-blur($blur, $saturation: null) {
   @if $saturation {
     backdrop-filter: blur($blur) saturate($saturation);

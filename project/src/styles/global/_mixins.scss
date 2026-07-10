@@ -1,0 +1,7 @@
+// Shared SCSS mixins — auto-injected into every SCSS block via Vite additionalData
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

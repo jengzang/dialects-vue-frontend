@@ -102,13 +102,6 @@ const handleChange = (event, value) => {
 $transition-control: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 $transition-dot: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 $transition-text: 0.3s ease;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .liquid-radio-group {
   display: flex;
   flex-wrap: wrap;

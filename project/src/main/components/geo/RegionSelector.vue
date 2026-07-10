@@ -895,13 +895,6 @@ $portrait-ratio: 1 / 1;
   backdrop-filter: blur($blur) saturate($saturation);
   -webkit-backdrop-filter: blur($blur) saturate($saturation);
 }
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* 选择框 */
 .region-select-box {
   position: relative;

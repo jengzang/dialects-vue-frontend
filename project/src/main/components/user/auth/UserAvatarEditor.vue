@@ -245,13 +245,6 @@ $avatar-size-landscape: 72px;
 
 $avatar-transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 $overlay-transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .user-avatar-editor {
   @include flex-center;
 

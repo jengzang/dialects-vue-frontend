@@ -242,13 +242,6 @@ $text-muted: var(--text-medium);
 $error-color: var(--color-error);
 $transition-fast: 0.2s;
 $transition-expand: 0.3s;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .tree-node {
   margin-bottom: 8px;
 }
