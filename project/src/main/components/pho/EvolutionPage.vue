@@ -1433,11 +1433,11 @@ onUnmounted(() => {
 ```scss
 
 $primary: var(--color-primary);
-$danger: #ff3b30;
+$danger: var(--color-error-light);
 
-$text-primary: #333;
-$text-secondary: #666;
-$text-muted: #999;
+$text-primary: var(--text-dark);
+$text-secondary: var(--text-tertiary);
+$text-muted: var(--text-lightest);
 
 $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 $portrait-ratio: 1 / 1;

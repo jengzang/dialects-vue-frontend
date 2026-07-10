@@ -627,8 +627,8 @@ onBeforeUnmount(() => {
 
 $primary: var(--color-primary);
 $primary-hover: #0062cc;
-$text-dark: #1d1d1f;
-$success: #34c759;
+$text-dark: var(--text-primary);
+$success: var(--color-success);
 
 @mixin glass-blur($blur, $saturation: null) {
   @if $saturation {

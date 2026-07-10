@@ -280,7 +280,7 @@ const offsetClass = computed(() => {
 
   .voronoi-summary-label {
     font-size: 0.78rem;
-    color: rgba($deep-blue, 0.68);
+    color: rgba(var(--text-deep-rgb), 0.68);
   }
 
   .voronoi-summary-value {

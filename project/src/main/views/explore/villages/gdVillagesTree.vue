@@ -566,11 +566,11 @@ onMounted(() => {
 ```vue
 
 $primary-blue: var(--color-primary);
-$primary-blue-dark: #0051d5;
-$button-blue: #005fd3;
-$success-green: #34c759;
-$error-red: #d32f2f;
-$text-primary: #1d1d1f;
+$primary-blue-dark: var(--color-primary-hover);
+$button-blue: var(--color-primary-hover);
+$success-green: var(--color-success);
+$error-red: var(--color-error);
+$text-primary: var(--text-primary);
 $text-secondary: #6e6e73;
 $text-muted: #8e8e93;
 $white: #fff;

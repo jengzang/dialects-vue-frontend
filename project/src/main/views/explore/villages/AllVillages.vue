@@ -665,11 +665,11 @@ onMounted(() => {
 
 
 $primary-blue: var(--color-primary);
-$primary-blue-dark: #0051d5;
-$text-primary: #1d1d1f;
+$primary-blue-dark: var(--color-primary-hover);
+$text-primary: var(--text-primary);
 $text-secondary: #6e6e73;
 $text-muted: #8e8e93;
-$error-color: #d32f2f;
+$error-color: var(--color-error);
 $white: #fff;
 
 $transition-fast: 0.2s;

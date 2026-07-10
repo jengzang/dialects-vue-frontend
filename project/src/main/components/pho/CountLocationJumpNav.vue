@@ -396,7 +396,7 @@ onBeforeUnmount(() => {
 
 
 $primary: var(--color-primary);
-$primary-dark: #0051d5;
+$primary-dark: var(--color-primary-hover);
 $primary-deep: #004fc4;
 
 $desktop-width: 214px;

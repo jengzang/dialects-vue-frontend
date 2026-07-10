@@ -100,8 +100,8 @@ function handleClose() {
 </script>
 
 
-$text-main: #333;
-$text-secondary: #666;
+$text-main: var(--text-dark);
+$text-secondary: var(--text-tertiary);
 $text-muted: #8e8e93;
 $primary: var(--color-primary);
 

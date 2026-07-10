@@ -132,9 +132,9 @@ function changeInterfaceMode(mode) {
 ```vue
 
 $primary-blue: var(--color-primary);
-$text-primary: #333;
-$text-secondary: #666;
-$text-muted: #999;
+$text-primary: var(--text-dark);
+$text-secondary: var(--text-tertiary);
+$text-muted: var(--text-lightest);
 $border-color: #e0e0e0;
 $white: #fff;
 

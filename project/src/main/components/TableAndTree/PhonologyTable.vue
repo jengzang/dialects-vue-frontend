@@ -407,9 +407,8 @@ const getToneData = (data) => {
 
 
 $primary-blue: var(--color-primary);
-$success-green: #34c759;
-$text-dark: #333;
-$text-muted: #666;
+$text-dark: var(--text-dark);
+$text-muted: var(--text-tertiary);
 $glass-blur: 12px;
 $button-blur: 20px;
 $transition-duration: 0.25s;
@@ -704,12 +703,12 @@ $transition-duration: 0.25s;
   @include glass-button;
 
   color: #1f7a35;
-  background: rgba($success-green, 0.15);
-  border: 1px solid rgba($success-green, 0.35);
+  background: rgba(var(--color-success-rgb), 0.15);
+  border: 1px solid rgba(var(--color-success-rgb), 0.35);
   transition: all $transition-duration ease;
 
   &:hover {
-    background: rgba($success-green, 0.22);
+    background: rgba(var(--color-success-rgb), 0.22);
     transform: translateY(-1px);
   }
 }

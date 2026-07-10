@@ -1528,12 +1528,12 @@ onUnmounted(() => {
 
 
 $primary-blue: var(--color-primary);
-$success-green: #34c759;
+$success-green: var(--color-success);
 $warning-orange: #ff9800;
 $warning-dark: #ff6f00;
-$danger-red: #ff3b30;
-$text-dark: #333;
-$text-muted: #666;
+$danger-red: var(--color-error-light);
+$text-dark: var(--text-dark);
+$text-muted: var(--text-tertiary);
 $transition-fast: 0.2s;
 $mobile-breakpoint: 768px;
 $system-font:

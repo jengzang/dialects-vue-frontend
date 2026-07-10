@@ -424,7 +424,7 @@ function formatRegionNames(regionNames) {
 
     &:focus {
       outline: none;
-      border-color: rgba($primary, 0.48);
+      border-color: rgba(var(--color-primary-rgb), 0.48);
       box-shadow: 0 0 0 3px $primary-border;
     }
   }
@@ -566,8 +566,8 @@ function formatRegionNames(regionNames) {
   }
 
   &.state-partial {
-    border-color: rgba($warning, 0.5);
-    background: rgba($warning, 0.12);
+    border-color: rgba(var(--color-warning-rgb), 0.5);
+    background: rgba(var(--color-warning-rgb), 0.12);
   }
 }
 

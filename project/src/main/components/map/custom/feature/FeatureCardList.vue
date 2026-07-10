@@ -158,7 +158,7 @@ function resolveToneType(item) {
   font-weight: 700;
 
   &[data-tone='initial'] {
-    background: rgba($primary, 0.06);
+    background: rgba(var(--color-primary-rgb), 0.06);
     color: $primary;
   }
 
@@ -168,12 +168,12 @@ function resolveToneType(item) {
   }
 
   &[data-tone='tone'] {
-    background: rgba($warning, 0.12);
+    background: rgba(var(--color-warning-rgb), 0.12);
     color: $warning;
   }
 
   &[data-tone='hanzi'] {
-    background: rgba($teal, 0.07);
+    background: rgba(var(--color-teal-rgb), 0.07);
     color: $teal;
   }
 
@@ -183,7 +183,7 @@ function resolveToneType(item) {
   }
 
   &[data-tone='lexicon'] {
-    background: rgba($purple, 0.09);
+    background: rgba(var(--color-purple-light-rgb), 0.09);
     color: $purple;
   }
 

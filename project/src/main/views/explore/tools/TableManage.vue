@@ -622,10 +622,10 @@ onMounted(async () => {
 
 
 $primary-blue: var(--color-primary);
-$primary-blue-dark: #0056b3;
-$success-green: #34c759;
-$success-green-dark: #28a745;
-$danger-red: #ff3b30;
+$primary-blue-dark: var(--color-primary-hover);
+$success-green: var(--color-success);
+$success-green-dark: var(--color-success);
+$danger-red: var(--color-error-light);
 $danger-red-dark: #c82333;
 
 $text-primary: #1c1c1e;

@@ -354,9 +354,9 @@ $primary-blue: var(--color-primary);
 $primary-blue-hover: #0062cc;
 $apple-red: #ff3b30;
 
-$text-primary: #333;
-$text-secondary: #666;
-$text-muted: #999;
+$text-primary: var(--text-dark);
+$text-secondary: var(--text-tertiary);
+$text-muted: var(--text-lightest);
 $white: #fff;
 
 $transition-fast: 0.2s;

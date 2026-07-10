@@ -560,11 +560,11 @@ $zhihu-blue: #0066ff;
 $github-dark: #24292f;
 $danger: #c52f27;
 
-$text-primary: #333;
+$text-primary: var(--text-dark);
 $text-heading: #1a1a1a;
-$text-secondary: #555;
-$text-muted: #666;
-$text-light: #999;
+$text-secondary: var(--text-medium);
+$text-muted: var(--text-tertiary);
+$text-light: var(--text-lightest);
 
 $ease-standard: 0.3s ease;
 

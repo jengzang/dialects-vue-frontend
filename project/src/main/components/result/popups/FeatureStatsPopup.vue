@@ -99,8 +99,8 @@ const handleClose = () => {
 </script>
 
 
-$text-main: #1d1d1f;
-$text-secondary: #666;
+$text-main: var(--text-primary);
+$text-secondary: var(--text-tertiary);
 
 $primary: var(--color-primary);
 $primary-border: rgba(0, 122, 255, 0.2);

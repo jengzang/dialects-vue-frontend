@@ -359,7 +359,7 @@ $green: var(--color-success);
 $green-light: #30d158;
 
 $text-main: var(--text-primary);
-$text-secondary: #86868b;
+$text-secondary: var(--text-secondary);
 $text-white: #fff;
 
 $orange-bg-subtle: rgba(255, 149, 0, 0.04);

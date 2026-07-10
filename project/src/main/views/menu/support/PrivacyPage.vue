@@ -111,13 +111,13 @@ const copyCitation = () => {
 ```vue
 
 $primary-blue: var(--color-primary);
-$primary-blue-dark: #0051d5;
+$primary-blue-dark: var(--color-primary-hover);
 $purple: #5856d6;
 $warning-yellow: #ffcc00;
 
-$text-primary: #1d1d1f;
-$text-secondary: #333;
-$text-muted: #666;
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-dark);
+$text-muted: var(--text-tertiary);
 $white: #fff;
 
 $radius-sm: 8px;

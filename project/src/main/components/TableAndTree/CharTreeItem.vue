@@ -205,7 +205,7 @@ const leave = (el) => {
 
 
 $primary-blue: var(--color-primary);
-$text-dark: #333;
+$text-dark: var(--text-dark);
 $error-color: var(--color-error);
 $transition-fast: 0.2s;
 $mobile-aspect-ratio: 1 / 1;

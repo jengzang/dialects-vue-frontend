@@ -534,8 +534,8 @@ onBeforeUnmount(() => {
 
 
 $primary: var(--color-primary);
-$success: #34c759;
-$warning: #ff9500;
+$success: var(--color-success);
+$warning: var(--color-warning);
 
 $text-primary: var(--color-text-primary);
 $text-secondary: var(--color-text-secondary, #666);

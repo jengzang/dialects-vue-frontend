@@ -597,11 +597,11 @@ watch(
 
 $primary-blue: var(--color-primary);
 $system-blue: #0a84ff;
-$dark-blue: #0057d9;
+$dark-blue: var(--color-primary-hover);
 $danger-red: #d70015;
 $danger-text: #c21b31;
 
-$text-primary: #1d1d1f;
+$text-primary: var(--text-primary);
 $text-secondary: #3a3a3c;
 $text-muted: #6e6e73;
 $white: #fff;

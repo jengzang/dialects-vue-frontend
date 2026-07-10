@@ -886,9 +886,9 @@ defineExpose({ togglePopup, openPopup, closePopup })
 
 
 $primary: var(--color-primary);
-$primary-dark: #0051d5;
-$success: #34c759;
-$danger: #ff3b30;
+$primary-dark: var(--color-primary-hover);
+$success: var(--color-success);
+$danger: var(--color-error-light);
 $portrait-ratio: 1 / 1;
 
 @mixin glass-blur($blur, $saturation: 100%) {

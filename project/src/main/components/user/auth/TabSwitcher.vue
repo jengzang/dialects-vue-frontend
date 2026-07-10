@@ -29,7 +29,7 @@ defineEmits(['update:modelValue'])
 
 
 $primary-blue: var(--color-primary);
-$text-color: #333;
+$text-color: var(--text-dark);
 $border-color: #d0d0d0;
 $switcher-background: #f0f0f5;
 $white: #fff;

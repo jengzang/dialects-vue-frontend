@@ -72,8 +72,8 @@ const togglePasswordVisibility = () => {
 ```vue
 
 $primary-color: var(--color-primary);
-$error-color: #ff3b30;
-$text-color: #333;
+$error-color: var(--color-error-light);
+$text-color: var(--text-dark);
 $placeholder-color: #999;
 $control-right: 15px;
 $transition-duration: 0.3s;

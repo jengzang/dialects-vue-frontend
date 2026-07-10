@@ -134,8 +134,8 @@ watch(() => props.loginMode, () => {
 ```vue
 
 $primary-blue: var(--color-primary);
-$primary-blue-dark: #0056b3;
-$success-green: #34c759;
+$primary-blue-dark: var(--color-primary-hover);
+$success-green: var(--color-success);
 $title-color: #1c1c1e;
 $error-color: red;
 $white: #fff;

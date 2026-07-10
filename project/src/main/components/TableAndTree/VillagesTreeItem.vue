@@ -237,10 +237,9 @@ const leave = (el) => {
 
 
 $primary-blue: var(--color-primary);
-$success-green: #34c759;
-$text-dark: #333;
-$text-muted: #555;
-$error-color: #d32f2f;
+$text-dark: var(--text-dark);
+$text-muted: var(--text-medium);
+$error-color: var(--color-error);
 $transition-fast: 0.2s;
 $transition-expand: 0.3s;
 
@@ -302,7 +301,7 @@ $transition-expand: 0.3s;
   transition: all $transition-fast ease;
 
   &:hover {
-    background: rgba($success-green, 0.15);
+    background: rgba(var(--color-success-rgb), 0.15);
     transform: scale(1.1);
   }
 

@@ -402,9 +402,9 @@ const goToAuthPage = () => {
 
 
 $primary-blue: var(--color-primary);
-$primary-blue-dark: #005fd3;
+$primary-blue-dark: var(--color-primary-hover);
 $active-blue: darkblue;
-$text-primary: #333;
+$text-primary: var(--text-dark);
 
 $desktop-bar-height: 7.5dvh;
 $desktop-tab-height: 6.5dvh;

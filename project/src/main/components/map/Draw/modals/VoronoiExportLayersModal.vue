@@ -221,22 +221,22 @@ function handleClose(value = false) {
 }
 
 .scope-clear-btn {
-  border: 1px solid rgba($danger-light, 0.28);
+  border: 1px solid rgba(var(--color-error-light-rgb), 0.28);
   background: rgba(254, 226, 226, 0.92);
-  color: darken($danger, 15%);
+  color: var(--color-error-dark);
   font-size: 12px;
   font-weight: 700;
   line-height: 1;
   padding: 9px 14px;
   border-radius: 999px;
-  box-shadow: 0 8px 18px rgba($danger-light, 0.14);
+  box-shadow: 0 8px 18px rgba(var(--color-error-light-rgb), 0.14);
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 
   &:hover {
     background: rgba(254, 202, 202, 0.98);
-    border-color: rgba($danger, 0.38);
-    box-shadow: 0 10px 22px rgba($danger-light, 0.18);
+    border-color: rgba(var(--color-error-rgb), 0.38);
+    box-shadow: 0 10px 22px rgba(var(--color-error-light-rgb), 0.18);
     transform: translateY(-1px);
   }
 

@@ -157,8 +157,8 @@ onMounted(() => {
 
 
 $primary: var(--color-primary);
-$primary-dark: #005ecb;
-$text-main: #1d1d1f;
+$primary-dark: var(--color-primary-hover);
+$text-main: var(--text-primary);
 $text-secondary: rgba(0, 0, 0, 0.6);
 $text-secondary-strong: rgba(0, 0, 0, 0.7);
 $text-white: #fff;

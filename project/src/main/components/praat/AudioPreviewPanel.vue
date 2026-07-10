@@ -934,8 +934,8 @@ $text-primary: var(--color-text-primary);
 $text-secondary: var(--color-text-secondary);
 $white: #fff;
 
-$success: #34c759;
-$warning: #ff9500;
+$success: var(--color-success);
+$warning: var(--color-warning);
 $gray: #8e8e93;
 
 $primary-background: rgba(0, 122, 255, 0.05);

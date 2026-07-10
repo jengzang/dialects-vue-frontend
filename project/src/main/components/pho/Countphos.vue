@@ -1118,7 +1118,7 @@ onBeforeUnmount(() => {
 
 
 $primary: var(--color-primary);
-$primary-dark: #0051d5;
+$primary-dark: var(--color-primary-hover);
 $primary-deep: #003d9e;
 $mobile-breakpoint: 768px;
 

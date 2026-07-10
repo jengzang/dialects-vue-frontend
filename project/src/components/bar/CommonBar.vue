@@ -473,9 +473,9 @@ const goToAuthPage = () => {
 
 
 $primary-blue: var(--color-primary);
-$primary-blue-dark: #005fd3;
+$primary-blue-dark: var(--color-primary-hover);
 $active-blue: darkblue;
-$text-primary: #333;
+$text-primary: var(--text-dark);
 
 $transition-fast: 0.2s;
 $transition-base: 0.3s;

@@ -533,11 +533,11 @@ onBeforeUnmount(() => {
 ```scss
 
 $primary: var(--color-primary);
-$primary-dark: #005fd3;
+$primary-dark: var(--color-primary-hover);
 $primary-light: #0080ff;
 
 $text-dark: var(--text-dark);
-$text-secondary: #666;
+$text-secondary: var(--text-tertiary);
 $text-muted: #8e8e93;
 
 $mobile-aspect-ratio: 1 / 1;

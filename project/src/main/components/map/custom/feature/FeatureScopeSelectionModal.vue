@@ -508,7 +508,7 @@ function formatRegionNames(regionNames) {
 
     &:focus {
       outline: none;
-      border-color: rgba($primary, 0.48);
+      border-color: rgba(var(--color-primary-rgb), 0.48);
       box-shadow: 0 0 0 3px $primary-border;
     }
   }
@@ -653,7 +653,7 @@ function formatRegionNames(regionNames) {
 
   &.state-full {
     border-color: $primary;
-    box-shadow: 0 0 0 1px rgba($primary, 0.18);
+    box-shadow: 0 0 0 1px rgba(var(--color-primary-rgb), 0.18);
   }
 
   &.state-partial {

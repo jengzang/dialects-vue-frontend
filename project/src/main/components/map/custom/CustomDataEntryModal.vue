@@ -138,9 +138,9 @@ watch(
   font-weight: 500;
   padding: 2px 8px;
   border-radius: 6px;
-  background: rgba($warning, 0.12);
+  background: rgba(var(--color-warning-rgb), 0.12);
   color: $warning-dark;
-  border: 1px solid rgba($warning, 0.24);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.24);
   white-space: nowrap;
 }
 

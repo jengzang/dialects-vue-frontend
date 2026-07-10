@@ -3,8 +3,8 @@
 // == Colors ==
 
 // Primary
-$primary: #007aff;
-$primary-dark: #0051d5;
+$primary: var(--color-primary);
+$primary-dark: var(--color-primary-hover);
 
 // Text
 $text-strong: var(--text-deep);
@@ -26,15 +26,15 @@ $bg-light: rgba(241, 245, 249, 0.9);
 $bg-subtle: rgba(15, 23, 42, 0.08);
 
 // Semantic
-$success: #34c759;
+$success: var(--color-success);
 $success-bg: #e8f8ef;
-$danger: #d32f2f;
+$danger: var(--color-error);
 $danger-light: var(--color-error-light);
 $danger-bg: #fde4ec;
-$warning: #ff9500;
+$warning: var(--color-warning);
 $warning-dark: #d97706;
 $purple: var(--color-purple-light);
-$teal: #00887a;
+$teal: var(--color-teal);
 $deep-blue: var(--text-deep);
 
 // Primary opacity variants

@@ -621,10 +621,10 @@ const tableData = computed(() => {
 ```scss
 
 $primary: var(--color-primary);
-$primary-dark: #0051d5;
-$text-primary: #1d1d1f;
-$text-secondary: #86868b;
-$danger: #ff3b30;
+$primary-dark: var(--color-primary-hover);
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-secondary);
+$danger: var(--color-error-light);
 
 $gold: #ffd700;
 $gold-text: #d4af37;

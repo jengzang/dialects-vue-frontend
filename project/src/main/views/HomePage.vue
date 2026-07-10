@@ -711,11 +711,11 @@ onMounted(() => {
 ```scss
 
 $primary: var(--color-primary);
-$primary-dark: #005ecb;
-$primary-deep: #005fd3;
-$success: #34c759;
-$success-dark: #28a745;
-$text-primary: #1d1d1f;
+$primary-dark: var(--color-primary-hover);
+$primary-deep: var(--color-primary-hover);
+$success: var(--color-success);
+$success-dark: var(--color-success);
+$text-primary: var(--text-primary);
 
 $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 

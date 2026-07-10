@@ -113,7 +113,7 @@ const leave = (el) => {
 
 
 $primary-blue: var(--color-primary);
-$text-dark: #333;
+$text-dark: var(--text-dark);
 $transition-fast: 0.2s;
 $transition-expand: 0.3s;
 

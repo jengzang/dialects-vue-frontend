@@ -461,7 +461,7 @@ onUnmounted(() => {
 
 
 $primary-blue: var(--color-primary);
-$text-dark: #333;
+$text-dark: var(--text-dark);
 $panel-radius: 12px;
 $dropdown-radius: 10px;
 $transition-duration: 0.2s;

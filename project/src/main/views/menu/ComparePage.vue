@@ -1803,8 +1803,8 @@ $group1-text: #2e7d32;
 $group2-primary: #2196f3;
 $group2-text: #1565c0;
 $danger: #f44336;
-$text-primary: #333;
-$text-muted: #999;
+$text-primary: var(--text-dark);
+$text-muted: var(--text-lightest);
 
 @mixin glass-blur($amount: 10px) {
   backdrop-filter: blur($amount);

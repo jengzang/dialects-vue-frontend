@@ -2082,10 +2082,10 @@ onUnmounted(() => {
 
 $primary: var(--color-primary);
 $text-main: var(--text-deep);
-$text-muted: #666;
-$danger: #ff3b30;
-$warning: #ff9500;
-$success: #34c759;
+$text-muted: var(--text-tertiary);
+$danger: var(--color-error-light);
+$warning: var(--color-warning);
+$success: var(--color-success);
 
 $glass-light: rgba(255, 255, 255, 0.3);
 $glass-soft: rgba(255, 255, 255, 0.4);

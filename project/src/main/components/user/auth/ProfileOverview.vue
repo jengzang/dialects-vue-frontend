@@ -185,10 +185,10 @@ onMounted(async () => {
 
 
 $primary-blue: var(--color-primary);
-$primary-blue-dark: #0051d5;
-$text-primary: #1d1d1f;
+$primary-blue-dark: var(--color-primary-hover);
+$text-primary: var(--text-primary);
 $text-secondary: #707077;
-$text-muted: #86868b;
+$text-muted: var(--text-secondary);
 $white: #fff;
 
 $radius-sm: 8px;

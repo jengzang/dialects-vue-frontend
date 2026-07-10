@@ -1026,7 +1026,7 @@ watch(
     color: $primary;
 
     .pill-region {
-      color: rgba($primary, 0.6);
+      color: rgba(var(--color-primary-rgb), 0.6);
     }
   }
 }
@@ -1104,7 +1104,7 @@ watch(
   padding: 10px 12px;
   border: none;
   border-radius: $radius-md;
-  background: rgba($danger-light, 0.12);
+  background: rgba(var(--color-error-light-rgb), 0.12);
   color: $danger;
   cursor: pointer;
 
@@ -1177,15 +1177,15 @@ watch(
 }
 
 .add-row-btn {
-  background: rgba(var(--color-success), 0.08);
-  border-color: rgba(var(--color-success), 0.24);
+  background: rgba(var(--color-success-rgb), 0.08);
+  border-color: rgba(var(--color-success-rgb), 0.24);
   color: #059669;
 
   &:hover:not(:disabled) {
-    background: rgba(var(--color-success), 0.15);
-    border-color: rgba(var(--color-success), 0.4);
+    background: rgba(var(--color-success-rgb), 0.15);
+    border-color: rgba(var(--color-success-rgb), 0.4);
     color: #047857;
-    box-shadow: 0 4px 12px rgba(var(--color-success), 0.08);
+    box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.08);
   }
 }
 

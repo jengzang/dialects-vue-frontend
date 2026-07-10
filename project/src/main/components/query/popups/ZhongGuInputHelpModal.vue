@@ -83,9 +83,9 @@ const tableLabel = computed(() => {
 </script>
 
 
-$text-heading: #333;
+$text-heading: var(--text-dark);
 $text-body: var(--text-dark);
-$text-note: #888;
+$text-note: var(--text-muted);
 
 $list-font-size: 14px;
 $list-line-height: 1.6;

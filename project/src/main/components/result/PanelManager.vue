@@ -437,7 +437,7 @@ $border-breath-duration: 1.5s;
     background-clip: padding-box;
     border: 2px solid transparent;
     border-radius: $panel-radius;
-    box-shadow: 0 0 0 2px rgba($primary-blue, 0.6);
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.6);
     animation: border-breath $border-breath-duration ease-in-out;
   }
 }
@@ -470,11 +470,11 @@ $border-breath-duration: 1.5s;
 @keyframes border-breath {
   0%,
   100% {
-    box-shadow: 0 0 0 2px rgba($primary-blue, 0.6);
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.6);
   }
 
   50% {
-    box-shadow: 0 0 12px 4px rgba($primary-blue, 0.3);
+    box-shadow: 0 0 12px 4px rgba(var(--color-primary-rgb), 0.3);
   }
 }
 

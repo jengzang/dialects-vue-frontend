@@ -468,10 +468,10 @@ watch(
 
 $primary-blue: var(--color-primary);
 $primary-blue-dark: #0063cc;
-$text-primary: #1d1d1f;
-$text-secondary: #86868b;
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-secondary);
 $text-button: #48484a;
-$danger-color: #ff3b30;
+$danger-color: var(--color-error-light);
 $white: #fff;
 
 $radius-sm: 8px;

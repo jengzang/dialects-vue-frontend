@@ -338,7 +338,7 @@ onBeforeUnmount(() => {
   border: 3px solid #fff;
   box-shadow:
     0 0 0 3px $primary-hover,
-    0 8px 16px rgba($primary, 0.28);
+    0 8px 16px rgba(var(--color-primary-rgb), 0.28);
 }
 
 :deep(.mini-map-point) {
@@ -348,11 +348,11 @@ onBeforeUnmount(() => {
   border-radius: 50%;
   background: $success;
   border: 2px solid #fff;
-  box-shadow: 0 6px 14px rgba($success, 0.28);
+  box-shadow: 0 6px 14px rgba(var(--color-success-rgb), 0.28);
 
   &.is-active {
     background: $primary;
-    box-shadow: 0 8px 18px rgba($primary, 0.34);
+    box-shadow: 0 8px 18px rgba(var(--color-primary-rgb), 0.34);
   }
 }
 

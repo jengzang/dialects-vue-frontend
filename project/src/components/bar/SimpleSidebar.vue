@@ -353,11 +353,11 @@ onBeforeUnmount(() => {
 ```scss
 
 $primary: var(--color-primary);
-$primary-dark: #005fd3;
+$primary-dark: var(--color-primary-hover);
 $primary-light: #0080ff;
 
-$text-primary: #333;
-$text-secondary: #666;
+$text-primary: var(--text-dark);
+$text-secondary: var(--text-tertiary);
 $text-dark: var(--text-dark);
 $text-muted: #8e8e93;
 

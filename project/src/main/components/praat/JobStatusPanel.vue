@@ -82,9 +82,9 @@ onUnmounted(() => {
 $primary: var(--color-primary);
 $primary-light: #5ac8fa;
 
-$error: #ff3b30;
-$success: #34c759;
-$warning: #ff9500;
+$error: var(--color-error-light);
+$success: var(--color-success);
+$warning: var(--color-warning);
 
 $text-primary: var(--color-text-primary);
 $text-secondary: var(--color-text-secondary);

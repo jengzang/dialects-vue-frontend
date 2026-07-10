@@ -906,7 +906,7 @@ $purple: #af52de;
 
 $text-primary: var(--text-primary);
 $text-secondary: #6e6e73;
-$text-tertiary: #999;
+$text-tertiary: var(--text-lightest);
 
 $font-monospace: "Courier New", monospace;
 

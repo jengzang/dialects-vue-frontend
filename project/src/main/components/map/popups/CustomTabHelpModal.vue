@@ -483,14 +483,14 @@ const helpStepsItems = computed(() => [
 
 
 $primary-blue: var(--color-primary);
-$primary-blue-dark: #0050b3;
-$success-green: #34c759;
+$primary-blue-dark: var(--color-primary-hover);
+$success-green: var(--color-success);
 $usage-green: #2e7d32;
 $location-orange: #ff9500;
 
-$text-main: #333;
-$text-secondary: #555;
-$text-muted: #999;
+$text-main: var(--text-dark);
+$text-secondary: var(--text-medium);
+$text-muted: var(--text-lightest);
 
 $glass-card: rgba(255, 255, 255, 0.5);
 

@@ -727,7 +727,7 @@ const PartitionTreeNode = defineComponent({
 ```scss
 
 $primary: var(--color-primary);
-$primary-dark: #0051d5;
+$primary-dark: var(--color-primary-hover);
 $danger: #b42318;
 $error: #d32f2f;
 $warning: #d35400;

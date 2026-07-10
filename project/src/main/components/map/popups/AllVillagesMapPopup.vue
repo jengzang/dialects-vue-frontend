@@ -539,7 +539,7 @@ onBeforeUnmount(() => {
 
 $primary: var(--color-primary);
 $primary-hover: #0062cc;
-$text-dark: #1d1d1f;
+$text-dark: var(--text-primary);
 $mobile-breakpoint: 768px;
 
 @mixin glass-blur($blur, $saturation: null) {

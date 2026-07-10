@@ -440,14 +440,14 @@ $glass-blur: 12px;
 
   &--locations {
     color: #3d7bd9;
-    background: rgba($primary-blue, 0.08);
-    border-color: rgba($primary-blue, 0.14);
+    background: rgba(var(--color-primary-rgb), 0.08);
+    border-color: rgba(var(--color-primary-rgb), 0.14);
   }
 
   &--total {
     color: #0f5fc4;
-    background: rgba($primary-blue, 0.14);
-    border-color: rgba($primary-blue, 0.22);
+    background: rgba(var(--color-primary-rgb), 0.14);
+    border-color: rgba(var(--color-primary-rgb), 0.22);
   }
 }
 

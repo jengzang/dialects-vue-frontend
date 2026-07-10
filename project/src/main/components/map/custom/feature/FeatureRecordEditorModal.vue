@@ -691,7 +691,7 @@ watch(
     color: $primary;
 
     .pill-region {
-      color: rgba($primary, 0.6);
+      color: rgba(var(--color-primary-rgb), 0.6);
     }
   }
 }

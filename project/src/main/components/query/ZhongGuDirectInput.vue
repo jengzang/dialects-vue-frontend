@@ -149,8 +149,8 @@ defineExpose({ pathStrings, chars, positionInput, charInput })
 
 $primary-color: var(--color-blue-custom, var(--color-primary));
 $text-medium-color: var(--text-medium, #555);
-$error-color: #ff3b30;
-$warning-color: #ff9500;
+$error-color: var(--color-error-light);
+$warning-color: var(--color-warning);
 $transition-duration: 0.2s;
 
 @mixin status-message {

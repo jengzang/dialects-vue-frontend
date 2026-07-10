@@ -163,12 +163,12 @@ const handleSavePassword = () => {
 ```vue
 
 $primary-blue: var(--color-primary);
-$primary-blue-dark: #0051d5;
+$primary-blue-dark: var(--color-primary-hover);
 $back-gold: #b8860b;
 $back-gold-dark: #8a5a00;
 $text-title: #1c1c1e;
-$error-color: #ff3b30;
-$success-color: #34c759;
+$error-color: var(--color-error-light);
+$success-color: var(--color-success);
 $white: #fff;
 
 $transition-fast: 0.18s;

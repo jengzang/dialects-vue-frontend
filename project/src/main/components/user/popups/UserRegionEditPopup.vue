@@ -203,11 +203,11 @@ function handleLocationInput(event) {
 
 
 $primary: var(--color-primary);
-$primary-dark: #0051d5;
-$success: #34c759;
+$primary-dark: var(--color-primary-hover);
+$success: var(--color-success);
 
 $text-label: var(--text-deep);
-$text-hint: #999;
+$text-hint: var(--text-lightest);
 $white: #fff;
 
 $surface-background: rgba(255, 255, 255, 0.9);

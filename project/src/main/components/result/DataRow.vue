@@ -314,8 +314,8 @@ const handleFeatureStatsClick = async () => {
 
 $primary-blue: var(--color-primary);
 $clickable-blue: #007bff;
-$text-dark: #333;
-$text-muted: #666;
+$text-dark: var(--text-dark);
+$text-muted: var(--text-tertiary);
 $transition-duration: 0.2s;
 $glass-blur: 8px;
 
