@@ -452,7 +452,7 @@ const handleQuickAdjust = (action) => {
 
 .profile-stats {
   padding-top: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 1px solid var(--bg-hover-strong);
 }
 
 .stat-item {
@@ -491,7 +491,7 @@ const handleQuickAdjust = (action) => {
 .assignments-table td {
   padding: 10px 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--bg-hover);
 }
 
 .assignments-table th {

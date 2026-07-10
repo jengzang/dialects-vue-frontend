@@ -721,7 +721,7 @@ function formatRegionNames(regionNames) {
 }
 
 .scope-confirm-btn {
-  color: #fff;
+  color: var(--text-white);
 }
 
 .scope-modal-footer {

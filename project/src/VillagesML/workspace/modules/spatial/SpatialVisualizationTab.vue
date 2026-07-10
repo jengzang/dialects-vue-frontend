@@ -688,7 +688,7 @@ h2 {
   padding: 16px;
   overflow-y: auto;
   transition: width 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px var(--bg-hover-strong);
 }
 
 .control-panel.is-collapsed {
@@ -722,7 +722,7 @@ h2 {
 
 .section {
   padding-bottom: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--bg-hover-strong);
 }
 
 .section:last-child {
@@ -890,7 +890,7 @@ h2 {
   flex: 1;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px var(--bg-hover-strong);
 }
 
 .map-placeholder {

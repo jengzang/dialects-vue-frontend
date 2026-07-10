@@ -44,8 +44,8 @@ function handleCancel() {
 </script>
 
 <style scoped lang="scss">
-$text-title: rgba(0, 0, 0, 0.85);
-$text-message: rgba(0, 0, 0, 0.7);
+$text-title: var(--text-dark-alpha);
+$text-message: var(--text-dark-medium);
 
 $desktop-gap: 12px;
 $mobile-gap: 10px;

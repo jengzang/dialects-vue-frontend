@@ -92,9 +92,9 @@ function handleVisibilityChange(value) {
 
 <style scoped lang="scss">
 $text-dark: var(--text-deep);
-$text-main: #111827;
+$text-main: var(--text-primary);
 $text-body: var(--text-deep);
-$text-secondary: #4b5563;
+$text-secondary: var(--text-slate);
 
 .cell-detail-content {
   min-height: 0;
@@ -116,7 +116,7 @@ $text-secondary: #4b5563;
 .tone-section {
   overflow: hidden;
   background: var(--glass-80);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--bg-hover-strong);
   border-radius: 12px;
 }
 
@@ -127,7 +127,7 @@ $text-secondary: #4b5563;
     rgba(37, 99, 235, 0.12),
     rgba(37, 99, 235, 0.04)
   );
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--bg-overlay-light2);
   color: $text-dark;
   font-size: 14px;
   font-weight: 700;
@@ -135,7 +135,7 @@ $text-secondary: #4b5563;
 
 .detail-item {
   padding: 10px 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid var(--bg-hover-medium);
 }
 
 .item-head {
@@ -153,7 +153,7 @@ $text-secondary: #4b5563;
 
 .item-count {
   padding: 1px 8px;
-  background: rgba(0, 0, 0, 0.06);
+  background: var(--bg-hover-medium);
   border-radius: 999px;
   color: $text-secondary;
   font-size: 12px;

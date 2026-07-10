@@ -726,7 +726,7 @@ watch(
     border-radius: var(--radius-md);
     box-shadow:
       0 4px 12px var(--color-primary-shadow),
-      0 2px 4px rgba(0, 0, 0, 0.08);
+      0 2px 4px var(--bg-overlay-light2);
     color: var(--text-white);
     white-space: nowrap;
     font-size: 16px;

@@ -96,7 +96,7 @@ $card-transition: 0.24s ease;
     align-items: flex-start;
     justify-content: space-between;
     padding: 14px 14px 10px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid var(--bg-overlay-light2);
   }
 
   &__header-content {

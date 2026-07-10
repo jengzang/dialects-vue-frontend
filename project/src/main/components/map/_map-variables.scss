@@ -22,7 +22,7 @@ $glass-medium: var(--glass-80);
 $glass-strong: var(--glass-80);
 $glass-heavy: var(--glass-90);
 $glass-solid: var(--glass-90);
-$bg-light: rgba(241, 245, 249, 0.9);
+$bg-light: rgba(var(--bg-blue-tint-rgb), 0.9);
 $bg-subtle: rgba(var(--color-shadow-rgb), 0.08);
 
 // Semantic

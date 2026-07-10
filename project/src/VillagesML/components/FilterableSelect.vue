@@ -513,7 +513,7 @@ onUnmounted(() => {
 
 .level-select .arrow-icon {
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-tertiary);
 }
 
 .dropdown-wrapper {
@@ -577,7 +577,7 @@ onUnmounted(() => {
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-80);
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px var(--bg-hover-strong);
   overflow: hidden;
 }
 

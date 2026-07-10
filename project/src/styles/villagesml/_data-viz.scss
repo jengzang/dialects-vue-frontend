@@ -37,7 +37,7 @@
 }
 
 .vml-badge-not-significant {
-  background: rgba(149, 165, 166, 0.15);
+  background: rgba(var(--text-secondary-rgb), 0.15);
   color: var(--text-secondary);
 }
 

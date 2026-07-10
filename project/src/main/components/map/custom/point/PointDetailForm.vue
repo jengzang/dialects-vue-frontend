@@ -899,7 +899,7 @@ watch(
 
   &:focus {
     border-color: $primary-focus;
-    background: #fff;
+    background: var(--text-white);
     box-shadow: 0 0 0 4px $primary-glass;
   }
 }
@@ -923,7 +923,7 @@ watch(
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid $muted-hover;
   border-radius: $radius-md;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 20px var(--bg-hover-strong);
   z-index: 1000;
   margin-top: 4px;
 }
@@ -1094,7 +1094,7 @@ watch(
     gap: $radius-md;
     padding: $spacing-md;
     border-radius: $radius-md;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--bg-overlay-light2);
     background: $glass-white;
     margin-bottom: $radius-sm;
   }
@@ -1252,7 +1252,7 @@ watch(
   }
 
   th {
-    background: rgba(241, 245, 249, 0.7);
+    background: rgba(var(--bg-blue-tint-rgb), 0.7);
     color: $text-secondary;
     font-weight: 700;
   }

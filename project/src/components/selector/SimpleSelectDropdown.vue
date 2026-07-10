@@ -138,7 +138,7 @@ $arrow-transition: 0.2s ease;
 
 .select-arrow {
   margin-left: 8px;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-tertiary);
   font-size: 12px;
   transition: transform $arrow-transition;
 }

@@ -335,7 +335,7 @@ onBeforeUnmount(() => {
   height: 16px;
   border-radius: 50%;
   background: $primary;
-  border: 3px solid #fff;
+  border: 3px solid var(--text-white);
   box-shadow:
     0 0 0 3px $primary-hover,
     0 8px 16px rgba(var(--color-primary-rgb), 0.28);
@@ -347,7 +347,7 @@ onBeforeUnmount(() => {
   height: 12px;
   border-radius: 50%;
   background: $success;
-  border: 2px solid #fff;
+  border: 2px solid var(--text-white);
   box-shadow: 0 6px 14px rgba(var(--color-success-rgb), 0.28);
 
   &.is-active {
@@ -371,7 +371,7 @@ onBeforeUnmount(() => {
 
   &.is-active {
     background-color: $primary;
-    color: #fff;
+    color: var(--text-white);
     box-shadow: 0 2px 8px $primary-ring;
   }
 }

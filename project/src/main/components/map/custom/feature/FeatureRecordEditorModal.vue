@@ -589,7 +589,7 @@ watch(
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid $muted-hover;
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 20px var(--bg-hover-strong);
   z-index: 1000;
   margin-top: 4px;
 }

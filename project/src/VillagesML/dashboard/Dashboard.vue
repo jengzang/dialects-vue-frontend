@@ -569,8 +569,8 @@ onMounted(() => {
   gap: 8px;
   padding: 9px 22px;
   border-radius: 20px;
-  background: rgba(36, 41, 47, 0.08);
-  border: 1px solid rgba(36, 41, 47, 0.2);
+  background: rgba(var(--text-deep-rgb), 0.08);
+  border: 1px solid rgba(var(--text-deep-rgb), 0.2);
   color: var(--text-primary);
   font-size: 14px;
   font-weight: 500;
@@ -579,8 +579,8 @@ onMounted(() => {
 }
 
 .github-link:hover {
-  background: rgba(36, 41, 47, 0.15);
-  border-color: rgba(36, 41, 47, 0.4);
+  background: rgba(var(--text-deep-rgb), 0.15);
+  border-color: rgba(var(--text-deep-rgb), 0.4);
 }
 
 .github-icon {

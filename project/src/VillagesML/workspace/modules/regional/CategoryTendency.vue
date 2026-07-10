@@ -397,7 +397,7 @@ const loadRegionalNgrams = async () => {
 
 .ngram-row {
   background: var(--glass-30);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--bg-hover);
   transition: background 0.3s ease;
 }
 

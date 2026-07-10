@@ -170,7 +170,7 @@ $transition-text: 0.3s ease;
   border-radius: var(--radius-full);
   box-shadow:
     inset 0 1px 3px var(--glass-50),
-    0 2px 4px rgba(0, 0, 0, 0.05);
+    0 2px 4px var(--bg-hover);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: all $transition-control;

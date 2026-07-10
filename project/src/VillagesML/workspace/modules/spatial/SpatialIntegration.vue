@@ -953,7 +953,7 @@ onMounted(() => {
   padding: 10px 12px;
   align-items: center;
   background: var(--glass-30);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--bg-hover);
   font-size: 13px;
   transition: background 0.3s ease;
   text-align: center;
@@ -1115,7 +1115,7 @@ onMounted(() => {
 
 .table-row {
   background: var(--glass-30);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--bg-hover);
   transition: background 0.3s ease;
   text-align: center;
 }

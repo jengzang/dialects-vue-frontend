@@ -1512,7 +1512,7 @@ onBeforeUnmount(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--bg-overlay);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1834,7 +1834,7 @@ onBeforeUnmount(() => {
     left: 0;
     background: var(--glass-90);
     z-index: 5;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 2px 0 4px var(--bg-hover);
   }
 
   .glass-table thead th:first-child {

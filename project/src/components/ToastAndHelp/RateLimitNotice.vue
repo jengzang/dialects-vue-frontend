@@ -268,7 +268,7 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
   border-radius: 26px;
   box-shadow:
     0 24px 54px rgba(120, 90, 20, 0.14),
-    0 8px 18px rgba(0, 0, 0, 0.08),
+    0 8px 18px var(--bg-overlay-light2),
     inset 0 0 0 0.5px var(--glass-50);
 
   @include glass-blur(28px, 180%);

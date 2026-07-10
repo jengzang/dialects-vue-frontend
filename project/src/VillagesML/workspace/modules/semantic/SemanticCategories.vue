@@ -965,7 +965,7 @@ onMounted(() => {
 /* Number input and hint styles */
 .vml-number-input {
   padding: 8px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--bg-hover-strong);
   border-radius: 6px;
   font-size: 14px;
   width: 120px;

@@ -399,7 +399,7 @@ const getSignificanceBadge = (pValue) => {
 
 .table-row {
   background: var(--glass-30);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--bg-hover);
   transition: background 0.3s ease;
   font-size: 14px;
 }
@@ -460,7 +460,7 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .badge-not-significant {
-  background: rgba(149, 165, 166, 0.2);
+  background: rgba(var(--text-secondary-rgb), 0.2);
   color: var(--text-secondary);
 }
 

@@ -535,7 +535,7 @@ watch(
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--bg-overlay-light2);
     padding: $radius-md;
     border-radius: $radius-md;
     background: $glass-white;
@@ -565,7 +565,7 @@ watch(
   @media (max-width: 768px) {
     justify-content: flex-end;
     margin-top: 4px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid var(--bg-hover-medium);
     padding-top: $radius-sm;
   }
 }
@@ -643,7 +643,7 @@ watch(
 
   &:focus {
     border-color: $primary-focus;
-    background: #fff;
+    background: var(--text-white);
     box-shadow: 0 0 0 3px $primary-glass;
   }
 }
@@ -700,7 +700,7 @@ watch(
   }
 
   th {
-    background: rgba(241, 245, 249, 0.7);
+    background: rgba(var(--bg-blue-tint-rgb), 0.7);
     color: $text-secondary;
     font-weight: 700;
   }

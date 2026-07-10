@@ -31,7 +31,7 @@
   background: linear-gradient(135deg, var(--vml-blue) 0%, var(--vml-blue-darker) 100%);
   border-radius: var(--radius-md);
   border: none;
-  color: #ffffff;
+  color: var(--bg-white);
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

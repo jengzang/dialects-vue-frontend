@@ -953,7 +953,7 @@ const resetView = () => {
   background-color: var(--glass-30);
   border: 1px solid var(--glass-40);
   color: #c28f00;
-  text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 0 1px var(--bg-overlay);
   text-align: center;
   border-radius: 12px;
   padding: 20px 28px;
@@ -986,7 +986,7 @@ const resetView = () => {
   transform: translateX(-50%);
   border-radius: 30px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px var(--bg-hover-strong);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   z-index: 100;
 }
@@ -1025,10 +1025,10 @@ const resetView = () => {
 :deep(.marker-dot) {
   width: 10px; height: 10px;
   border-radius: 50%;
-  border: 2px solid #000; /* 復刻 strokeColor: #000000 */
+  border: 2px solid var(--text-primary); /* 復刻 strokeColor: var(--text-primary) */
   opacity: 0.8;
   cursor: pointer;
-  box-shadow: 0 0 2px rgba(0,0,0,0.5);
+  box-shadow: 0 0 2px var(--bg-overlay-dark);
 }
 
 /* 3. 特徵值 (triggerDrawingFunction) */

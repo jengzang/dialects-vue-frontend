@@ -545,7 +545,7 @@ onMounted(() => {
   border-radius: 12px;
   backdrop-filter: blur(8px);
   border: 2px solid var(--glass-10);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 24px var(--bg-hover);
 
   display: flex;
   margin: 0 auto;
@@ -572,7 +572,7 @@ onMounted(() => {
   background: var(--glass-05);
   border: 2px solid var(--glass-10);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 24px var(--bg-hover);
   backdrop-filter: blur(8px);
 
   @media (max-aspect-ratio: 1/1) {

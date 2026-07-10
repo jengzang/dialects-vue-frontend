@@ -153,7 +153,7 @@ const goToTendency = (pattern) => {
   /* 4. 增强液态感：内阴影（Inset Shadow）模拟厚度和光泽 */
   box-shadow:
       inset 0 0 12px var(--glass-20), /* 内发光 */
-      0 8px 32px 0 rgba(31, 38, 135, 0.1);    /* 外层淡淡的投影，增加悬浮感 */
+      0 8px 32px 0 rgba(var(--color-shadow-rgb), 0.1);    /* 外层淡淡的投影，增加悬浮感 */
 
   padding: 12px;
   border-radius: 12px;
@@ -166,7 +166,7 @@ const goToTendency = (pattern) => {
   border: 1px solid var(--glass-60);
   box-shadow:
       inset 0 0 20px var(--glass-40),
-      0 12px 40px 0 rgba(31, 38, 135, 0.15);
+      0 12px 40px 0 rgba(var(--color-shadow-rgb), 0.15);
   transform: translateY(-2px); /* 轻微浮动 */
 }
 

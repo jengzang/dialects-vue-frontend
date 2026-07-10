@@ -699,7 +699,7 @@ const openEntryModal = () => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px var(--bg-hover-strong);
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
@@ -708,7 +708,7 @@ const openEntryModal = () => {
 
   &:active:not(:disabled) {
     transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--bg-hover-strong);
   }
 
   &:disabled {
@@ -720,7 +720,7 @@ const openEntryModal = () => {
 
 .primary-btn {
   background: linear-gradient(135deg, $primary, $primary-dark);
-  color: #fff;
+  color: var(--text-white);
 
   &:hover:not(:disabled) {
     background: linear-gradient(135deg, $primary-dark, var(--color-primary-hover));
@@ -736,7 +736,7 @@ const openEntryModal = () => {
     rgba(var(--color-primary-rgb), 0.9),
     rgba(0, 81, 213, 0.9)
   );
-  color: #fff;
+  color: var(--text-white);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -824,13 +824,13 @@ const openEntryModal = () => {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px var(--bg-hover);
 }
 
 .auth-warning-icon {
   margin-bottom: 16px;
   font-size: 44px;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0 4px 6px var(--bg-hover-strong));
   animation: floatIcon 3s ease-in-out infinite;
 }
 
@@ -887,8 +887,8 @@ const openEntryModal = () => {
   transition: all 0.3s ease;
 
   &.hint {
-    border-color: rgba(142, 142, 147, 0.2);
-    background: rgba(142, 142, 147, 0.1);
+    border-color: rgba(var(--text-secondary-rgb), 0.2);
+    background: rgba(var(--text-secondary-rgb), 0.1);
     color: var(--text-secondary);
   }
 
@@ -1153,7 +1153,7 @@ const openEntryModal = () => {
   &:hover {
     transform: translateY(-1.5px);
     border-color: $primary;
-    background: #fff;
+    background: var(--text-white);
     box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.08);
   }
 

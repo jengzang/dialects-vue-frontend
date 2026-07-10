@@ -70,7 +70,7 @@ const algorithmHint = computed(() => {
 
 .setting-select {
   padding: 0.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--bg-hover-strong);
   border-radius: 8px;
   background: var(--glass-90);
   font-size: 0.95rem;

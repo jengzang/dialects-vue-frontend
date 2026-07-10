@@ -156,7 +156,7 @@ watch(
   gap: 6px;
   padding: 4px;
   border-radius: 999px;
-  background: rgba(241, 245, 249, 0.96);
+  background: rgba(var(--bg-blue-tint-rgb), 0.96);
 
   .entry-mode-button {
     min-width: 128px;
@@ -174,7 +174,7 @@ watch(
       box-shadow 0.18s ease;
 
     &.active {
-      background: #fff;
+      background: var(--text-white);
       color: $primary;
       box-shadow: 0 8px 16px $bg-subtle;
     }

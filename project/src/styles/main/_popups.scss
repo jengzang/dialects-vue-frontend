@@ -99,7 +99,7 @@
   backdrop-filter: blur(4px);
   border: 1px solid var(--glass-30);
   border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1), inset 0 0 1px var(--glass-50);
+  box-shadow: 0 1px 4px var(--bg-hover-strong), inset 0 0 1px var(--glass-50);
   color: var(--text-dark);
 }
 
@@ -135,7 +135,7 @@
 }
 
 .maplibregl-popup.map-popup-wrapper .maplibregl-popup-tip {
-  border-top-color: #fff;
+  border-top-color: var(--text-white);
 }
 
 .maplibregl-popup.map-popup-wrapper .map-popup__label {

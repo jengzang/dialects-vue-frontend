@@ -431,7 +431,7 @@ onBeforeUnmount(() => {
 $text-primary: var(--color-text-primary);
 $text-secondary: var(--color-text-secondary);
 $error-color: var(--color-error);
-$white: #fff;
+$white: var(--text-white);
 
 $transition-duration: 0.3s;
 
