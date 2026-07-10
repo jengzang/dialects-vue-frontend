@@ -1642,7 +1642,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-
+<style scoped lang="scss">
 @use '../../../../styles/global/scrollbars' as scrollbars;
 
 .map-draw-tab {
@@ -1931,4 +1931,5 @@ onBeforeUnmount(() => {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+</style>
 
