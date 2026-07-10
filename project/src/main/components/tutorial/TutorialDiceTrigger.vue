@@ -174,7 +174,7 @@ $shadow-hover:
     height: 36px;
     flex: 0 0 auto;
 
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     box-shadow: none;
 
     transition:
@@ -216,8 +216,7 @@ $shadow-hover:
   }
 
   &__copy {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: flex-start;
     gap: 1px;
     min-width: 0;

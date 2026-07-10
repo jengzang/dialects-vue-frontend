@@ -345,8 +345,7 @@ onBeforeUnmount(() => {
 }
 
 .search-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   padding: 16px;
   margin-bottom: 20px;
@@ -366,7 +365,7 @@ onBeforeUnmount(() => {
 .vml-number-input {
   width: 120px;
   padding: 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .search-button {
@@ -375,7 +374,7 @@ onBeforeUnmount(() => {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -387,8 +386,7 @@ onBeforeUnmount(() => {
 }
 
 .search-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .results-section {
@@ -413,8 +411,7 @@ onBeforeUnmount(() => {
 }
 
 .similarity-items {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -425,7 +422,7 @@ onBeforeUnmount(() => {
   gap: 12px;
   padding: 6px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   transition: transform 0.3s ease;
 }
 
@@ -454,7 +451,7 @@ onBeforeUnmount(() => {
 .similarity-bar {
   height: 24px;
   background: var(--glass-50);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -474,7 +471,7 @@ onBeforeUnmount(() => {
 .viz-placeholder {
   padding: 80px 20px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   text-align: center;
 }
 
@@ -521,7 +518,7 @@ onBeforeUnmount(() => {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -531,13 +528,12 @@ onBeforeUnmount(() => {
 }
 
 .pagination-controls button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 
 .embeddings-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   display: inline-block; /* 让表格根据内容自适应宽度 */
   min-width: 100%;
@@ -600,7 +596,7 @@ onBeforeUnmount(() => {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;

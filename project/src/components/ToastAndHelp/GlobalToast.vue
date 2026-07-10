@@ -61,7 +61,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);@mixin toast-icon($bac
   font-size: $font-size;
   font-weight: 700;
   background: $background;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
 
   @include flex-center;
 
@@ -236,7 +236,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);@mixin toast-icon($bac
   cursor: pointer;
   background: var(--glass-50);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   box-shadow: inset 0 0 0 1px var(--glass-40);
 
   @include glass-blur(10px);

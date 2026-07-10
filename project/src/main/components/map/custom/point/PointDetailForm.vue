@@ -791,8 +791,7 @@ watch(
 @use '@/styles/main/_surfaces.scss';
 
 .point-detail-form {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: $spacing-lg;
 }
 
@@ -805,8 +804,7 @@ watch(
 }
 
 .point-detail-heading {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: $spacing-xs;
 }
 
@@ -973,7 +971,7 @@ watch(
   background: $primary-glass;
   color: $primary;
   padding: 2px 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   white-space: nowrap;
 
   &.archive {
@@ -984,8 +982,7 @@ watch(
 
 // -- Quick select pills --
 .user-points-quick-select {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: $spacing-xs;
   margin-top: $spacing-xs;
 }
@@ -1063,8 +1060,7 @@ watch(
 }
 
 .point-rows-table {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: $spacing-sm;
   margin-top: $spacing-md;
 }
@@ -1116,8 +1112,7 @@ watch(
 
 .point-cell {
   @media (max-width: 768px) {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: $spacing-xs;
 
     &::before {

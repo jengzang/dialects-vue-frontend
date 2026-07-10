@@ -262,7 +262,7 @@ $overlay-transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   font-weight: 700;
   background: linear-gradient(135deg, $primary-blue, $secondary-blue);
   border: 1.5px solid $white;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   box-shadow:
     0 6px 16px rgba(var(--color-primary-rgb), 0.2),
     inset 0 0 8px var(--glass-20);

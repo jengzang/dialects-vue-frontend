@@ -326,7 +326,7 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
  */
 .help-icon {
   position: relative;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
 
   &.size-sm {
     width: 20px;

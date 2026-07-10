@@ -194,13 +194,13 @@ onBeforeUnmount(() => {
   gap: 8px;
   background: var(--glass-30);
   padding: 4px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 
 .metric-button {
   padding: 8px 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   background: transparent;
   color: var(--text-primary);
   font-size: 13px;

@@ -264,8 +264,7 @@ $card-radius: 8px;
 
 /* 最外层容器：统一的大玻璃卡片 */
 .query-result-box {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   margin: 10px 0;
   padding: 8px;
 }
@@ -292,7 +291,7 @@ $card-radius: 8px;
   cursor: pointer;
   background: var(--color-primary-light);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   transition: all $transition-duration;
 
   &:hover {
@@ -362,7 +361,7 @@ $card-radius: 8px;
   text-align: center;
   background: var(--color-error-bg);
   border: 1px solid var(--color-error-border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   animation: fade-in 0.3s ease;
 }
 

@@ -1066,10 +1066,10 @@ const initContinuousChart = (isZScore) => {
 </script>
 
 
-$primary: var(--color-primary, #4a90e2);
+$primary: var(--color-primary, var(--vml-blue));
 $primary-blue: var(--color-primary);
 $primary-purple: var(--color-purple);
-$primary-hover: #3a7bc8;
+$primary-hover: var(--vml-blue-dark);
 
 $success: var(--color-success);
 $success-dark: #3aa65d;
@@ -1079,7 +1079,7 @@ $text-primary: var(--color-text-primary);
 $text-secondary: var(--color-text-secondary, var(--text-tertiary));
 $text-muted: var(--color-text-secondary, var(--text-lightest));
 
-$white: #fff;
+$white: var(--text-white);
 $surface: var(--glass-50);
 $surface-strong: var(--glass-80);
 $border-light: rgba(0, 0, 0, 0.05);
@@ -1096,8 +1096,7 @@ $transition-normal: 0.3s;
 
 .pitch-tone-panel {
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 1rem;
   width: 100%;
   max-width: 1200px;
@@ -1116,8 +1115,7 @@ $transition-normal: 0.3s;
 /* 步骤公共结构 */
 .step-section {
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 1rem;
   width: 96%;
   min-width: 0;
@@ -1136,7 +1134,7 @@ $transition-normal: 0.3s;
     width: 2.5rem;
     height: 2.5rem;
     background: $primary-gradient;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
     color: $white;
     font-size: 1.2rem;
@@ -1174,7 +1172,7 @@ $transition-normal: 0.3s;
   padding: 0.5rem;
   background: $white;
   border: 1px solid $border-light;
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-md, var(--radius-sm2));
   box-shadow: 0 2px 8px $border-light;
 
   &.result-chart {
@@ -1184,14 +1182,13 @@ $transition-normal: 0.3s;
 
 /* 无数据 */
 .no-data-message {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   padding: 3rem;
   background: $surface;
   border: 2px dashed $border-medium;
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-lg, var(--radius-md));
   color: $text-secondary;
 
   .no-data-icon {
@@ -1208,12 +1205,11 @@ $transition-normal: 0.3s;
   padding: 1.5rem;
   background: $surface;
   border: 1px solid $surface-strong;
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-lg, var(--radius-md));
 }
 
 .input-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.8rem;
 }
 
@@ -1236,7 +1232,7 @@ $transition-normal: 0.3s;
 .tone-input {
   padding: 0.7rem 1rem;
   border: 2px solid $border-medium;
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-md, var(--radius-sm2));
   font-size: 1rem;
   transition:
     border-color $transition-fast,
@@ -1252,7 +1248,7 @@ $transition-normal: 0.3s;
 .action-btn {
   padding: 0.7rem;
   border: none;
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-md, var(--radius-sm2));
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -1282,15 +1278,14 @@ $transition-normal: 0.3s;
 
 .persistence-hint {
   padding: 0.25rem 0;
-  color: var(--color-text-secondary, #888);
+  color: var(--color-text-secondary, var(--text-muted));
   font-size: 0.8rem;
   font-style: italic;
   line-height: 1.4;
 }
 
 .saved-list-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.8rem;
 }
 
@@ -1311,7 +1306,7 @@ $transition-normal: 0.3s;
   overflow-y: auto;
   padding: 0.5rem;
   background: $surface;
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-md, var(--radius-sm2));
 }
 
 .tone-tag {
@@ -1346,9 +1341,7 @@ $transition-normal: 0.3s;
   }
 
   .close-tag {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     width: 1.2rem;
     height: 1.2rem;
     padding: 0;
@@ -1379,8 +1372,7 @@ $transition-normal: 0.3s;
 
 /* 第二步：分析 */
 .analyze-action {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 1rem;
   padding: 1rem 0;
@@ -1463,7 +1455,7 @@ $transition-normal: 0.3s;
   margin-bottom: 1rem;
   padding: 1rem;
   background: $surface;
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-md, var(--radius-sm2));
   color: $text-primary;
   font-family: "Courier New", monospace;
   font-size: 0.95rem;
@@ -1471,9 +1463,7 @@ $transition-normal: 0.3s;
 }
 
 .export-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 1rem;
   margin-bottom: 1rem;
 }
@@ -1483,7 +1473,7 @@ $transition-normal: 0.3s;
   padding: 0.8rem 2rem;
   background: linear-gradient(135deg, $success, $success-dark);
   border: none;
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-lg, var(--radius-md));
   box-shadow: 0 2px 8px rgba(80, 200, 120, 0.3);
   color: $white;
   font-size: 1rem;
@@ -1524,8 +1514,7 @@ $transition-normal: 0.3s;
 
 /* 预览弹窗 */
 .preview-segments {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.75rem;
   min-height: 80px;
 }
@@ -1537,11 +1526,10 @@ $transition-normal: 0.3s;
   gap: 1rem;
   padding: 0.6rem 0.75rem;
   background: rgba(0, 0, 0, 0.03);
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-md, var(--radius-sm2));
 
   .preview-segment-info {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 0.2rem;
   }
 
@@ -1592,8 +1580,7 @@ $transition-normal: 0.3s;
   }
 
   .controls-section {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 1rem;
   }
 

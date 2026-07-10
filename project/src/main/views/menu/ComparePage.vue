@@ -1820,8 +1820,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
 }
 
 .page-content-stack {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 1.5dvh;
 }
@@ -1842,25 +1841,21 @@ $text-muted: var(--text-lightest);/* 页面主体 */
 .triple-select-box {
   width: 100%;
   max-width: 90dvw;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   justify-content: space-between;
   gap: 1.5dvw;
 }
 
 .card-row {
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   flex-wrap: wrap;
   gap: 20px;
 }
 
 .dropdown-row {
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
@@ -1904,9 +1899,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
 
   .compare-group {
     width: min(260px, 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     gap: 0.6rem;
   }
 
@@ -1933,7 +1926,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
   height: 38px;
   background: var(--glass-90);
   border: 1px solid rgba(var(--color-primary-rgb), 0.35);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   outline: none;
   text-align: center;
   font-size: 16px;
@@ -1947,7 +1940,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
 
 .compare-group {
   padding: 1rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   @include glass-blur;
 }
 
@@ -1960,7 +1953,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
     rgba(var(--color-primary-rgb), 0.15),
     rgba(var(--color-primary-rgb), 0.25)
   );
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.2);
   color: $primary;
   font-size: 0.95rem;
@@ -1998,7 +1991,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
   gap: 0.5rem;
   padding: 0.8rem 2rem;
   border: 2px solid;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   white-space: nowrap;
   font-size: 1rem;
   font-weight: 600;
@@ -2065,7 +2058,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
   padding: 1rem;
   background: var(--glass-50);
   border: 2px solid rgba(var(--color-primary-rgb), 0.3);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 
   &.group1-style {
     border-color: rgba(var(--color-success-rgb), 0.7);
@@ -2107,8 +2100,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
 }
 
 .selected-items-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
   max-height: 300px;
   overflow-y: auto;
@@ -2121,7 +2113,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
   padding: 0.6rem 0.8rem;
   background: var(--glass-80);
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   transition: all 0.2s ease;
 
   &:hover {
@@ -2144,7 +2136,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
   padding: 0;
   background: rgba(244, 67, 54, 0.1);
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   color: $danger;
   font-size: 1rem;
   cursor: pointer;
@@ -2171,7 +2163,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
 .feature-selection {
   width: 100%;
   padding: 0.3rem 0.4rem;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .feature-label {
@@ -2203,7 +2195,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
   padding: 0.6rem 1.2rem;
   background: var(--glass-70);
   border: 2px solid rgba(var(--color-primary-rgb), 0.3);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.2s;
 
@@ -2287,14 +2279,13 @@ $text-muted: var(--text-lightest);/* 页面主体 */
 
   &-sankey-controls {
     flex: 0 0 190px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     justify-content: center;
     gap: 8px;
     padding: 4px 10px;
     background: var(--glass-30);
     border: 1px solid rgba(var(--color-silver-rgb), 0.35);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   &-sankey-control-row {
@@ -2306,8 +2297,7 @@ $text-muted: var(--text-lightest);/* 页面主体 */
   }
 
   &-sankey-slider {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 1px;
     color: var(--text-secondary, var(--text-tertiary));
     font-size: 12px;

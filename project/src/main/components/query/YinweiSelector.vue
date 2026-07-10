@@ -391,7 +391,7 @@ $glass-blur: 12px;
   pointer-events: auto !important;
   background: var(--glass-60) !important;
   border: 1px solid var(--border-gray-light) !important;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg2);
   backdrop-filter: blur($glass-blur);
   -webkit-backdrop-filter: blur($glass-blur);
@@ -405,7 +405,7 @@ $glass-blur: 12px;
   justify-content: space-between;
   padding: 4px 8px;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: background-color $transition-duration ease;
 
   &:hover {
@@ -435,7 +435,7 @@ $glass-blur: 12px;
   padding: 1px 6px;
   line-height: 1.35;
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   box-shadow: var(--shadow-sm2);
 
   &--locations {
@@ -462,7 +462,7 @@ $glass-blur: 12px;
   text-align: center;
   background: var(--glass-50);
   border: 1px solid var(--border-gray-lighter);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm2);
   opacity: 0.95;
   backdrop-filter: blur($glass-blur) saturate(160%);

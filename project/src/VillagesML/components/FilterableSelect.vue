@@ -493,7 +493,7 @@ onUnmounted(() => {
 .level-select {
   padding: 10px 12px;
   border: 1px solid var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
@@ -521,7 +521,7 @@ onUnmounted(() => {
   display: flex;
   position: relative;
   border: 2px solid var(--color-primary-hover);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
   overflow: hidden;
@@ -547,16 +547,14 @@ onUnmounted(() => {
 
 .dropdown-trigger {
   flex: 0 0 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   border: none;
   background: var(--color-primary);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
   padding:10px 4px;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
 }
 
 .dropdown-trigger:hover:not(:disabled) {
@@ -564,8 +562,7 @@ onUnmounted(() => {
 }
 
 .dropdown-trigger:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .arrow-icon {
@@ -576,7 +573,7 @@ onUnmounted(() => {
   background: var(--glass-90);
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-80);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 32px var(--bg-hover-strong);
   overflow: hidden;
 }
@@ -589,8 +586,7 @@ onUnmounted(() => {
 }
 
 .dropdown-loading {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 10px;
 }

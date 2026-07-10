@@ -220,7 +220,7 @@ h3 {
   cursor: pointer;
   background: linear-gradient(135deg, $primary-blue, $primary-blue-dark);
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   box-shadow:
     inset 0 1px 0 var(--glass-30),
     0 10px 22px rgba(var(--color-primary-rgb), 0.22);
@@ -264,7 +264,7 @@ h3 {
   cursor: pointer;
   background: linear-gradient(135deg, $primary-blue, $primary-blue-dark);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   transition:
     transform $transition-base ease,
     box-shadow $transition-base ease,

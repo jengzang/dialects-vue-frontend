@@ -137,7 +137,7 @@ watch(
   font-size: 11px;
   font-weight: 500;
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: rgba(var(--color-warning-rgb), 0.12);
   color: $warning-dark;
   border: 1px solid rgba(var(--color-warning-rgb), 0.24);
@@ -155,14 +155,14 @@ watch(
   align-items: center;
   gap: 6px;
   padding: 4px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(var(--bg-blue-tint-rgb), 0.96);
 
   .entry-mode-button {
     min-width: 128px;
     padding: 8px 14px;
     border: none;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: transparent;
     color: $text-secondary;
     font-size: 13px;

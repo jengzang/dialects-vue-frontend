@@ -127,7 +127,7 @@ $transition-expand: 0.3s;
   justify-content: space-between;
   padding: 8px 10px;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   transition: background $transition-fast;
 
   &:hover {
@@ -161,7 +161,7 @@ $transition-expand: 0.3s;
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   transition: all $transition-expand ease;
 
   &:hover {
@@ -181,5 +181,5 @@ $transition-expand: 0.3s;
   padding: 0 2px;
   color: var(--text-primary);
   background: rgba(255, 255, 0, 0.4);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 }

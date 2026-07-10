@@ -199,8 +199,7 @@ const goToTendency = (pattern) => {
 }
 
 .vml-glass-panel {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 
 .vml-glass-panel h2 {
@@ -237,8 +236,7 @@ const goToTendency = (pattern) => {
 }
 
 .control-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -261,7 +259,7 @@ const goToTendency = (pattern) => {
 .pattern-card {
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   transition: all 0.3s ease;
   position: relative;
 }
@@ -284,10 +282,8 @@ const goToTendency = (pattern) => {
   height: 32px;
   background: var(--color-primary);
   color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: var(--radius-full);
+  @include flex-center;
   font-weight: 700;
   font-size: 14px;
 }
@@ -306,8 +302,7 @@ const goToTendency = (pattern) => {
 }
 
 .stat-item {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
@@ -331,7 +326,7 @@ const goToTendency = (pattern) => {
 .pattern-bar {
   height: 8px;
   background: var(--glass-50);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   overflow: hidden;
   margin-bottom: 12px;
 }
@@ -348,7 +343,7 @@ const goToTendency = (pattern) => {
   background: rgba(var(--vml-blue-rgb), 0.1);
   color: var(--color-primary);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;

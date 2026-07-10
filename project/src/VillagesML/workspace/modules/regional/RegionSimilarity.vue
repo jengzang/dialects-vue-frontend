@@ -656,8 +656,7 @@ export default {
 }
 
 .query-form {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 
 .query-form h3 {
@@ -693,7 +692,7 @@ export default {
 .vml-number-input {
   padding: 10px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   background: var(--glass-80);
   font-size: 14px;
   transition: border-color 0.3s ease;
@@ -731,7 +730,7 @@ export default {
   background: var(--color-primary, var(--vml-blue));
   color: white;
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   font-size: 14px;
 }
@@ -756,7 +755,7 @@ export default {
 .similarity-bar {
   height: 24px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -793,7 +792,7 @@ export default {
   background: rgba(var(--vml-blue-rgb), 0.1);
   color: var(--color-primary, var(--vml-blue));
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -822,7 +821,7 @@ export default {
   text-align: center;
   padding: 20px;
   background: rgba(var(--vml-blue-rgb), 0.05);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .metric-label {
@@ -856,7 +855,7 @@ export default {
 
 .char-tag {
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
 }
@@ -886,7 +885,7 @@ export default {
   background: var(--color-success);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -917,7 +916,7 @@ export default {
   padding: 6px 12px;
   background: rgba(var(--vml-blue-rgb), 0.1);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   font-size: 14px;
   color: var(--text-primary);
 }
@@ -932,10 +931,8 @@ export default {
   padding: 0;
   width: 20px;
   height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  @include flex-center;
+  border-radius: var(--radius-full);
   transition: background 0.3s ease;
 }
 

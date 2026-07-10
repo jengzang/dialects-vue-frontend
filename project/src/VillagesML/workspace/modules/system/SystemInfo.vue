@@ -521,7 +521,7 @@ onMounted(() => {
   padding: 16px;
   background: rgba(var(--color-primary-rgb), 0.06);
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   text-align: center;
 }
 
@@ -571,7 +571,7 @@ onMounted(() => {
   padding: 16px;
   background: rgba(var(--color-warning-rgb), 0.1);
   border: 1px solid rgba(var(--color-warning-rgb), 0.3);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: flex;
   gap: 12px;
   align-items: flex-start;
@@ -597,7 +597,7 @@ onMounted(() => {
   padding: 8px 16px;
   background: var(--glass-50);
   border: 1px solid rgba(var(--color-primary-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   transition: all 0.3s ease;
 }
@@ -620,7 +620,7 @@ onMounted(() => {
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -633,8 +633,7 @@ onMounted(() => {
 }
 
 .solid-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .solid-button.small {
@@ -654,7 +653,7 @@ onMounted(() => {
   gap: 16px;
   padding: 12px;
   background: var(--glass-60);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 2px solid rgba(var(--color-primary-rgb), 0.2);
 }
 
@@ -731,12 +730,11 @@ onMounted(() => {
 
 .dual-value {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   padding: 12px;
   background: rgba(var(--color-primary-rgb), 0.05);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .dual-label {
@@ -819,7 +817,7 @@ onMounted(() => {
   justify-content: space-between;
   padding: 12px;
   background: rgba(var(--color-primary-rgb), 0.05);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .detail-label {
@@ -842,8 +840,7 @@ onMounted(() => {
 }
 
 .initial-state {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   height: 60dvh;

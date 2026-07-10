@@ -444,8 +444,7 @@ $border-breath-duration: 1.5s;
 
 /* 必要的 Loading 樣式 */
 .loading-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   min-height: 150px;

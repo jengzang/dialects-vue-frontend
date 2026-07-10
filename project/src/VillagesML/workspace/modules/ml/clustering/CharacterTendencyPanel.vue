@@ -266,7 +266,7 @@ async function runClustering() {
   padding: 16px;
   background: rgba(var(--vml-blue-rgb), 0.08);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .section-title {

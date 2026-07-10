@@ -411,7 +411,7 @@ $transition-normal: 0.3s;
 .comparison-table-wrapper {
   overflow-x: auto;
   background: rgba(247, 247, 247, 0.5);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .comparison-table {
@@ -504,7 +504,7 @@ $transition-normal: 0.3s;
       margin-left: 4px;
       padding: 2px 8px;
       background: linear-gradient(135deg, $green, $green-light);
-      border-radius: 8px;
+      border-radius: var(--radius-sm2);
       box-shadow: 0 2px 6px rgba(var(--color-success-rgb), 0.3);
       color: $text-white;
       font-size: 11px;
@@ -540,7 +540,7 @@ $transition-normal: 0.3s;
   padding: 12px 16px;
   background: var(--glass-70);
   border: 1px solid $border-medium;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   backdrop-filter: blur(20px);
   transition:
     background $transition-fast ease,
@@ -569,7 +569,7 @@ $transition-normal: 0.3s;
   margin: 20px 0;
   padding: 14px 18px;
   border-left: 3px solid $orange;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 
   @include orange-gradient(0.08, 0.04);
 
@@ -592,7 +592,7 @@ $transition-normal: 0.3s;
     padding: 16px 32px;
     background: linear-gradient(135deg, $orange, $orange-dark);
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     box-shadow: 0 6px 16px $orange-shadow;
     color: $text-white;
     font-size: 17px;

@@ -265,8 +265,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .tendency-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 
 .tendency-section h3 {
@@ -291,8 +290,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .tendency-results {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -303,7 +301,7 @@ const loadRegionalNgrams = async () => {
   gap: 12px;
   padding: 6px 12px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   transition: background 0.3s ease;
 }
 
@@ -320,7 +318,7 @@ const loadRegionalNgrams = async () => {
 .tendency-bar {
   height: 24px;
   background: var(--glass-50);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -343,8 +341,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .ngram-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
@@ -374,7 +371,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .ngram-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   min-width: 700px;
 }
@@ -424,7 +421,7 @@ const loadRegionalNgrams = async () => {
   padding: 3px 8px;
   background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
@@ -433,7 +430,7 @@ const loadRegionalNgrams = async () => {
 .bar-container {
   height: 24px;
   background: var(--glass-50);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 

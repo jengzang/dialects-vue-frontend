@@ -101,9 +101,7 @@ $text-secondary: var(--text-slate);
 
 .empty-state {
   min-height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   color: $text-secondary;
 }
 
@@ -116,7 +114,7 @@ $text-secondary: var(--text-slate);
   overflow: hidden;
   background: var(--glass-80);
   border: 1px solid var(--bg-hover-strong);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .tone-title {
@@ -153,7 +151,7 @@ $text-secondary: var(--text-slate);
 .item-count {
   padding: 1px 8px;
   background: var(--bg-hover-medium);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: $text-secondary;
   font-size: 12px;
 }

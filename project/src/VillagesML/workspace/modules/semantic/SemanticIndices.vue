@@ -372,8 +372,7 @@ const getRegionLevelName = (level) => {
 }
 
 .input-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
@@ -389,7 +388,7 @@ const getRegionLevelName = (level) => {
   background: rgba(var(--color-error-rgb), 0.1);
   color: var(--color-error);
   border: 1px solid rgba(var(--color-error-rgb), 0.3);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -418,13 +417,12 @@ const getRegionLevelName = (level) => {
 }
 
 .vml-number-input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
   background: var(--border-gray-medium);
 }
 
 .indices-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow-x: auto;
   overflow-y: visible;
   margin-top: 20px;
@@ -467,7 +465,7 @@ const getRegionLevelName = (level) => {
   padding: 4px 12px;
   background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
 }
@@ -477,7 +475,7 @@ const getRegionLevelName = (level) => {
   padding: 4px 10px;
   background: rgba(var(--color-success-rgb), 0.15);
   color: var(--color-success);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
 }
@@ -485,7 +483,7 @@ const getRegionLevelName = (level) => {
 .rank-badge {
   display: inline-block;
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 600;
 }
@@ -572,7 +570,7 @@ const getRegionLevelName = (level) => {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -609,15 +607,14 @@ const getRegionLevelName = (level) => {
 }
 
 .category-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
 .category-item {
   padding: 16px;
   background: var(--glass-50);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.1);
 }
 
@@ -639,7 +636,7 @@ const getRegionLevelName = (level) => {
   color: var(--text-secondary);
   padding: 4px 12px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .char-list {
@@ -652,7 +649,7 @@ const getRegionLevelName = (level) => {
   padding: 6px 12px;
   background: rgba(var(--vml-blue-rgb), 0.1);
   color: var(--text-primary);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;

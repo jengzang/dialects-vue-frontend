@@ -1,13 +1,12 @@
+@use '@/styles/global/mixins' as *;
 .loading-state-base {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
 }
 
 .empty-state-base {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   text-align: center;

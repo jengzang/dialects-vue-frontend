@@ -14,8 +14,7 @@ const Dashboard = defineAsyncComponent(() => import('@/VillagesML/dashboard/Dash
 
 <style scoped>
 .villages-ml-page {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   height: 92dvh;
   width: 98dvw;
   max-width: 1600px;

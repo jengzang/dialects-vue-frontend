@@ -6,7 +6,7 @@
   padding: 0;
   width: var(--close-btn-size);
   height: var(--close-btn-size);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--glass-90);
   color: rgba(var(--color-shadow-rgb), 0.96);
   display: inline-flex;

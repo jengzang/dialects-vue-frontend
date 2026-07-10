@@ -491,7 +491,7 @@ onMounted(() => {
 .category-card {
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -510,9 +510,7 @@ onMounted(() => {
 }
 
 .category-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 8px;
   margin-bottom: 8px;
 }
@@ -568,8 +566,7 @@ onMounted(() => {
 }
 
 .vtf-chart {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
@@ -589,7 +586,7 @@ onMounted(() => {
 .vtf-bar {
   height: 24px;
   background: var(--glass-50);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -631,7 +628,7 @@ onMounted(() => {
   padding: 10px 20px;
   background: var(--glass-50);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -657,14 +654,14 @@ onMounted(() => {
   gap: 12px;
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .label-tag {
   padding: 6px 14px;
   background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   font-weight: 500;
   transition: all 0.3s ease;
   cursor: pointer;
@@ -676,8 +673,7 @@ onMounted(() => {
 }
 
 .labels-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
 }
 
@@ -686,7 +682,7 @@ onMounted(() => {
   justify-content: space-between;
   padding: 12px 16px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .label-name {
@@ -699,7 +695,7 @@ onMounted(() => {
   color: var(--text-secondary);
   padding: 2px 10px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .tendency-section {
@@ -722,7 +718,7 @@ onMounted(() => {
   gap: 12px;
   padding: 12px 24px;
   background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.15), rgba(var(--color-success-rgb), 0.15));
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.2);
 }
@@ -775,15 +771,13 @@ onMounted(() => {
   width: 32px;
   height: 32px;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: rgba(var(--color-error-rgb), 0.2);
   color: var(--color-error);
   font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
 }
 
 .close-button:hover {
@@ -806,8 +800,7 @@ onMounted(() => {
 }
 
 .prompt-message {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
@@ -837,8 +830,7 @@ onMounted(() => {
 }
 
 .ranking-results {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -855,13 +847,13 @@ onMounted(() => {
   background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
 }
 
 .ranking-item {
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   transition: background 0.3s ease;
 }
 
@@ -876,7 +868,7 @@ onMounted(() => {
 .rank-badge {
   display: inline-block;
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 600;
 }
@@ -966,7 +958,7 @@ onMounted(() => {
 .vml-number-input {
   padding: 8px 12px;
   border: 1px solid var(--bg-hover-strong);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   width: 120px;
   transition: all 0.3s ease;

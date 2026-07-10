@@ -154,8 +154,7 @@ $warning-color: var(--color-warning);
 $transition-duration: 0.2s;
 
 @mixin status-message {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 2px;
 }
 
@@ -168,8 +167,7 @@ $transition-duration: 0.2s;
 .zhonggu-direct-input {
   position: relative;
   left: 50%;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
   width: 80dvw;
   max-width: 600px;
@@ -185,8 +183,7 @@ $transition-duration: 0.2s;
 }
 
 .input-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -204,9 +201,7 @@ $transition-duration: 0.2s;
 }
 
 .help-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   width: 24px;
   height: 24px;
   color: $primary-color;
@@ -215,7 +210,7 @@ $transition-duration: 0.2s;
   cursor: pointer;
   background: transparent;
   border: 1.5px solid $primary-color;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   transition: all $transition-duration;
 
   &:hover {

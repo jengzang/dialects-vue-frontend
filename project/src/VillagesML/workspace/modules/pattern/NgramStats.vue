@@ -596,7 +596,7 @@ watch(
   padding: 12px 16px;
   margin-bottom: 16px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 14px;
 }
 
@@ -614,7 +614,7 @@ watch(
   padding: 6px 12px;
   background: transparent;
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   color: var(--color-primary);
   cursor: pointer;
   font-size: 13px;
@@ -644,7 +644,7 @@ watch(
   padding: 6px 16px;
   background: rgba(var(--vml-blue-rgb), 0.2);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   color: var(--color-primary);
   cursor: pointer;
@@ -681,7 +681,7 @@ watch(
   padding: 10px 14px;
   background: rgba(var(--vml-blue-rgb), 0.1);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -694,15 +694,14 @@ watch(
 }
 
 .load-list-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .vml-input {
   flex: 1;
   padding: 10px 16px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   background: var(--glass-50);
 }
@@ -719,7 +718,7 @@ watch(
   padding: 8px 16px;
   background: var(--glass-50);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
@@ -745,7 +744,7 @@ watch(
   padding: 8px 12px;
   margin-bottom: 12px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .results-count {
@@ -762,7 +761,7 @@ watch(
   padding: 4px 12px;
   background: var(--glass-80);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   color: var(--text-primary);
   cursor: pointer;
@@ -781,7 +780,7 @@ watch(
   padding: 8px 12px;
   margin-bottom: 12px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .results-count {
@@ -798,7 +797,7 @@ watch(
   padding: 4px 12px;
   background: var(--glass-80);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   color: var(--text-primary);
   cursor: pointer;
@@ -814,25 +813,23 @@ watch(
   padding: 8px 12px;
   margin-bottom: 12px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 13px;
   color: var(--text-secondary);
   text-align: center;
 }
 
 .regional-chart {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
 .regional-bar {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   padding: 8px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   transition: background 0.3s ease;
 }
 
@@ -881,7 +878,7 @@ watch(
 
 .stat-value.tendency {
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   font-size: 13px;
 }
 
@@ -914,7 +911,7 @@ watch(
 .bar-container {
   height: 20px;
   background: var(--glass-50);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -932,7 +929,7 @@ watch(
 }
 
 .significance-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   display: inline-block;
   min-width: 100%;
@@ -995,7 +992,7 @@ watch(
 .tendency-bar {
   height: 20px;
   background: var(--glass-50);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -1025,7 +1022,7 @@ watch(
 
 .sig-badge {
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 600;
 }

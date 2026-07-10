@@ -791,8 +791,7 @@ $color-danger: var(--color-error-light);
 .glass-container {
   width: min(95dvw, 800px);
   padding: 30px 40px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   overflow: hidden;
 }
@@ -815,18 +814,15 @@ $color-danger: var(--color-error-light);
 }
 
 .steps-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 16px;
   padding: 12px;
   background: var(--glass-40);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
 }
 
 .step {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 8px;
   cursor: default;
@@ -862,12 +858,10 @@ $color-danger: var(--color-error-light);
   &-number {
     width: 48px;
     height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     background: var(--glass-50);
     border: 2px solid rgba(var(--text-deep-rgb), 0.2);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     font-size: 18px;
     font-weight: 600;
     color: rgba(var(--text-deep-rgb), 0.5);
@@ -900,8 +894,7 @@ $color-danger: var(--color-error-light);
 }
 
 .step-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
   animation: fadeIn 0.4s ease;
 }
@@ -936,8 +929,7 @@ $color-danger: var(--color-error-light);
 .upload {
   &-zone {
     padding: 10px 40px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: center;
     gap: 5px;
@@ -945,7 +937,7 @@ $color-danger: var(--color-error-light);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 2px dashed rgba(var(--color-primary-rgb), 0.3);
-    border-radius: 24px;
+    border-radius: var(--radius-2xl);
     cursor: pointer;
     transition: all 0.3s ease;
 
@@ -999,7 +991,7 @@ $color-danger: var(--color-error-light);
     gap: 16px;
     padding: 20px 24px;
     background: var(--glass-60);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   &-icon {
@@ -1008,8 +1000,7 @@ $color-danger: var(--color-error-light);
 
   &-details {
     flex: 1;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 6px;
   }
 
@@ -1027,13 +1018,12 @@ $color-danger: var(--color-error-light);
   }
 
   &-items {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 8px;
     overflow-y: auto;
     padding: 12px;
     background: var(--glass-30);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   &-item {
@@ -1042,7 +1032,7 @@ $color-danger: var(--color-error-light);
     gap: 12px;
     padding: 12px 16px;
     background: var(--glass-50);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     transition: all 0.2s ease;
 
     &:hover {
@@ -1064,7 +1054,7 @@ $color-danger: var(--color-error-light);
       height: 28px;
       background: rgba(var(--color-error-light-rgb), 0.2);
       border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       font-size: 14px;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -1082,7 +1072,7 @@ $color-danger: var(--color-error-light);
   height: 32px;
   background: rgba(var(--color-error-light-rgb), 0.2);
   border: 1px solid rgba(var(--color-error-light-rgb), 0.4);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1095,8 +1085,7 @@ $color-danger: var(--color-error-light);
 }
 
 .files-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
@@ -1116,8 +1105,7 @@ $color-danger: var(--color-error-light);
 
 .processing-view,
 .complete-view {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   gap: 20px;
@@ -1128,9 +1116,7 @@ $color-danger: var(--color-error-light);
   &-icon {
     width: 80px;
     height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
   }
 
   &-title {
@@ -1151,7 +1137,7 @@ $color-danger: var(--color-error-light);
     gap: 24px;
     padding: 20px 32px;
     background: var(--glass-40);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -1179,8 +1165,7 @@ $color-danger: var(--color-error-light);
   &-container {
     width: 100%;
     max-width: 400px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 8px;
   }
 
@@ -1189,7 +1174,7 @@ $color-danger: var(--color-error-light);
     height: 12px;
     overflow: hidden;
     background: var(--glass-50);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
   }
 
   &-fill {
@@ -1199,7 +1184,7 @@ $color-danger: var(--color-error-light);
       rgba(var(--color-primary-rgb), 0.8),
       rgba(0, 195, 255, 0.8)
     );
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     transition: width 0.3s ease;
   }
 
@@ -1265,7 +1250,7 @@ $color-danger: var(--color-error-light);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--glass-60);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
   }
 
   &-icon {
@@ -1273,8 +1258,7 @@ $color-danger: var(--color-error-light);
   }
 
   &-content {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 4px;
   }
 
@@ -1302,7 +1286,7 @@ $color-danger: var(--color-error-light);
     overflow-y: auto;
     padding: 12px;
     background: var(--glass-30);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   &-item {
@@ -1312,7 +1296,7 @@ $color-danger: var(--color-error-light);
     margin-bottom: 8px;
     padding: 10px 12px;
     background: var(--glass-50);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-size: 14px;
 
     &:last-child {
@@ -1323,11 +1307,9 @@ $color-danger: var(--color-error-light);
   &-index {
     width: 24px;
     height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     background: rgba(var(--color-primary-rgb), 0.2);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     font-size: 12px;
     font-weight: 600;
     color: rgba(var(--color-primary-rgb), 0.9);
@@ -1381,7 +1363,7 @@ $color-danger: var(--color-error-light);
   padding: 8px 16px;
   background: transparent;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
   color: rgba(var(--text-deep-rgb), 0.7);
@@ -1449,7 +1431,7 @@ $color-danger: var(--color-error-light);
   margin-top: 8px;
   padding: 12px;
   background: var(--glass-40);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   text-align: center;
   font-size: 12px;
   color: rgba(var(--text-deep-rgb), 0.5);
@@ -1460,7 +1442,7 @@ $color-danger: var(--color-error-light);
     width: 100%;
     min-height: auto;
     padding: 20px 16px;
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
   }
 
   .title {
@@ -1512,7 +1494,7 @@ $color-danger: var(--color-error-light);
   .upload {
     &-zone {
       padding: 24px 20px;
-      border-radius: 16px;
+      border-radius: var(--radius-lg);
     }
 
     &-icon {

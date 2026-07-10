@@ -1,3 +1,4 @@
+@use '@/styles/global/mixins' as *;
 .popup-vue .popup-content {
   font-family: 'Arial', sans-serif;
   color: var(--text-dark);
@@ -11,7 +12,7 @@
   background-color: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
@@ -28,7 +29,7 @@
   background-color: var(--color-error-dark);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
@@ -40,7 +41,7 @@
 
 .maplibregl-popup.map-popup-wrapper .maplibregl-popup-content {
   padding: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   overflow: hidden;
   box-shadow: var(--shadow-above);
 }
@@ -56,7 +57,7 @@
   max-height: 300px;
   overflow: auto;
   width: 120px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: inset 0 0 1px var(--glass-30), var(--shadow-above), 0 0 8px var(--glass-20);
   border: 1px solid var(--glass-30);
   z-index: 99999;
@@ -98,7 +99,7 @@
   background: linear-gradient(135deg, rgba(240, 240, 240, 0.4), var(--glass-20));
   backdrop-filter: blur(4px);
   border: 1px solid var(--glass-30);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   box-shadow: 0 1px 4px var(--bg-hover-strong), inset 0 0 1px var(--glass-50);
   color: var(--text-dark);
 }
@@ -110,7 +111,7 @@
   background-color: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
@@ -150,15 +151,13 @@
 }
 
 .maplibregl-popup.map-popup-wrapper .map-popup__detail-groups {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
   margin-top: 4px;
 }
 
 .maplibregl-popup.map-popup-wrapper .map-popup__detail-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 4px;
 }
@@ -168,7 +167,7 @@
   align-items: center;
   justify-content: center;
   padding: 1px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--glass-60);
   border: 1px solid var(--glass-50);
   color: var(--text-slate);
@@ -188,7 +187,7 @@
   align-items: center;
   justify-content: center;
   padding: 2px 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--glass-70);
   border: 1px solid var(--glass-50);
   box-shadow: inset 0 0 1px var(--glass-50);

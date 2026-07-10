@@ -537,8 +537,7 @@ watch(
 }
 
 .feature-record-body {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
@@ -588,7 +587,7 @@ watch(
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid $muted-hover;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 20px var(--bg-hover-strong);
   z-index: 1000;
   margin-top: 4px;
@@ -639,7 +638,7 @@ watch(
   background: $primary-glass;
   color: $primary;
   padding: 2px 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   white-space: nowrap;
 
   &.archive {
@@ -649,8 +648,7 @@ watch(
 }
 
 .user-points-quick-select {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
   margin-top: 6px;
 }
@@ -677,7 +675,7 @@ watch(
   background: $glass-light;
   border: 1px solid $muted-hover;
   padding: 4px 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: $text-dark;
   cursor: pointer;
   transition: all 0.18s ease;

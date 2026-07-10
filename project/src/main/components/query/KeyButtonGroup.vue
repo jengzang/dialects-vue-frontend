@@ -75,7 +75,7 @@ function toggleKey(key) {
 .key-button {
   padding: 8px 16px;
   border: 1px solid var(--color-primary-medium);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--glass-30);
   cursor: pointer;
   transition: background 0.3s ease;

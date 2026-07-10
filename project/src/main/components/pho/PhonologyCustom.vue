@@ -671,8 +671,7 @@ watch(
   /* 输入区域 */
   .input-section {
     max-width: 600px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: center;
     gap: 5px;
@@ -697,8 +696,7 @@ watch(
 
   .selector-group {
     min-width: 150px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 6px;
 
     label {
@@ -712,9 +710,7 @@ watch(
   /* 查询按钮 */
   .load-btn {
     max-width: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     gap: 8px;
     padding: 12px 24px;
     background: linear-gradient(
@@ -762,8 +758,7 @@ watch(
   .loading,
   .error {
     min-height: 50vh;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: center;
     gap: 15px;
@@ -805,16 +800,13 @@ watch(
 
   /* 矩阵结果 */
   .matrix-container {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 30px;
   }
 
   /* 空状态 */
   .empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     color: var(--text-secondary);
     font-size: 16px;
   }

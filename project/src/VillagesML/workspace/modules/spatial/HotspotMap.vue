@@ -322,7 +322,7 @@ const resetView = () => {
   width: 100%;
   height: 500px;
   position: relative;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -352,10 +352,9 @@ const resetView = () => {
   background: var(--glass-80);
   backdrop-filter: blur(12px);
   padding: 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   z-index: 10;
   width: 160px;
@@ -377,7 +376,7 @@ const resetView = () => {
   background: white;
   border: 1px solid var(--border-light-gray);
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   cursor: pointer;
   outline: none;
@@ -410,7 +409,7 @@ const resetView = () => {
   color: white;
   border: none;
   padding: 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   font-size: 13px;
   transition: background 0.2s;
@@ -460,8 +459,7 @@ const resetView = () => {
   position: absolute;
   inset: 0;
   background: var(--glass-80);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -477,15 +475,13 @@ const resetView = () => {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   z-index: 10000;
 }
 
 .village-popup-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   width: 90%;
   max-width: 500px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);

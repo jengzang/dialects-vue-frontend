@@ -159,7 +159,7 @@ const clearFilters = () => {
   flex: 1;
   padding: 12px 16px;
   border: 1px solid var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
@@ -187,7 +187,7 @@ const clearFilters = () => {
 .clear-filters-button {
   padding: 10px 16px;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: rgba(var(--color-warning-rgb), 0.2);
   color: var(--color-warning);
   font-size: 13px;

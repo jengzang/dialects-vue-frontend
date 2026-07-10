@@ -420,8 +420,7 @@ watch(detailMode, () => {
 }
 
 .input-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
@@ -443,8 +442,7 @@ watch(detailMode, () => {
 
 .bigrams-list,
 .trigrams-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
   max-height: 500px;
   overflow-y: auto;
@@ -457,7 +455,7 @@ watch(detailMode, () => {
   gap: 12px;
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   align-items: center;
 }
 
@@ -487,7 +485,7 @@ watch(detailMode, () => {
   padding: 4px 10px;
   background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
 }
@@ -509,7 +507,7 @@ watch(detailMode, () => {
 }
 
 .pmi-results {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow-x: auto;
   overflow-y: visible;
 }
@@ -569,7 +567,7 @@ watch(detailMode, () => {
 .strength-bar {
   height: 20px;
   background: var(--glass-50);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -655,7 +653,7 @@ watch(detailMode, () => {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -692,15 +690,14 @@ watch(detailMode, () => {
 }
 
 .category-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
 .category-item {
   padding: 16px;
   background: var(--glass-50);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.1);
 }
 
@@ -722,7 +719,7 @@ watch(detailMode, () => {
   color: var(--text-secondary);
   padding: 4px 12px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .char-list {
@@ -735,7 +732,7 @@ watch(detailMode, () => {
   padding: 6px 12px;
   background: rgba(var(--vml-blue-rgb), 0.1);
   color: var(--text-primary);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;

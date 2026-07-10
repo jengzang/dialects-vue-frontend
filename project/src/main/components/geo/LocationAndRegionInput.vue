@@ -1368,7 +1368,7 @@ $portrait-ratio: 1 / 1;
   overflow-y: auto;
   background: var(--glass-60) !important;
   border: 1px solid var(--border-gray-light) !important;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg2);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -1388,7 +1388,7 @@ $portrait-ratio: 1 / 1;
   padding: 4px;
   background-color: var(--bg-light-gray);
   border: 1px solid var(--border-medium);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-inset);
 
   button {
@@ -1397,7 +1397,7 @@ $portrait-ratio: 1 / 1;
     appearance: none;
     background: none;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     color: var(--text-dark);
     text-align: center;
     font-size: 15px;
@@ -1433,7 +1433,7 @@ $portrait-ratio: 1 / 1;
 
 .suggest-line {
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background-color 0.2s ease;
 
@@ -1454,8 +1454,7 @@ $portrait-ratio: 1 / 1;
   width: 100%;
   min-width: 0;
   max-width: 250px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   justify-content: center;
 }
 
@@ -1472,9 +1471,7 @@ $portrait-ratio: 1 / 1;
 }
 
 .location-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 6px;
   margin-bottom: 4px;
 
@@ -1490,7 +1487,7 @@ $portrait-ratio: 1 / 1;
   appearance: none;
   background: var(--color-primary-light);
   border: 1px solid var(--color-primary-border2);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: var(--color-primary);
   white-space: nowrap;
   font-size: 12px;
@@ -1542,9 +1539,7 @@ $portrait-ratio: 1 / 1;
 .input-row {
   width: 90%;
   max-width: 600px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 16px;
   margin: 1dvh auto;
 }
@@ -1553,8 +1548,7 @@ $portrait-ratio: 1 / 1;
 .bottom-hint {
   min-width: 80%;
   max-width: 500px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   justify-self: center;
@@ -1582,7 +1576,7 @@ $portrait-ratio: 1 / 1;
   padding: 0 6px;
   background: var(--color-primary-light);
   border: 1px solid var(--color-primary-border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: var(--color-primary);
   font-weight: 700;
 }
@@ -1619,7 +1613,7 @@ $portrait-ratio: 1 / 1;
   appearance: none;
   background: var(--color-primary-light);
   border: 1px solid var(--color-primary-border2);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: var(--color-primary);
   white-space: nowrap;
   font-size: 13px;
@@ -1644,7 +1638,7 @@ $portrait-ratio: 1 / 1;
   padding: 3px 6px;
   background: var(--glass-80);
   border: 1px solid var(--border-gray-light2);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   box-shadow: var(--shadow-sm2);
   color: var(--text-dark-lightest);
   font-size: 14px;
@@ -1680,7 +1674,7 @@ $portrait-ratio: 1 / 1;
     var(--glass-20)
   );
   border: 1px solid var(--glass-60);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
@@ -1708,8 +1702,7 @@ $portrait-ratio: 1 / 1;
 /* 分区输入模式 */
 .region-input-section {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 1px;
 }
 
@@ -1740,7 +1733,7 @@ $portrait-ratio: 1 / 1;
   justify-content: space-between;
   gap: 6px;
   padding: 6px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background-color 0.2s ease;
 
@@ -1759,7 +1752,7 @@ $portrait-ratio: 1 / 1;
   margin-left: 8px;
   padding: 2px 6px;
   background: rgba(var(--color-primary-rgb), 0.1);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   color: $primary;
   white-space: nowrap;
   font-size: 11px;

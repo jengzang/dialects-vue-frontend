@@ -599,8 +599,7 @@ $ease-standard: 0.3s ease;@mixin glass-card(
 
 .tutorial-toggle-copy {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -637,7 +636,7 @@ $ease-standard: 0.3s ease;@mixin glass-card(
   padding: 1dvw 8dvw;
   background: var(--glass-05);
   border: 1px solid var(--glass-10);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
   font-size: 18px;
 
@@ -664,7 +663,7 @@ p {
   strong {
     padding: 2px 6px;
     background-color: rgba(var(--color-primary-rgb), 0.1);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
   }
 
   em.emoji {
@@ -848,7 +847,7 @@ em {
   margin: 20px auto;
   padding: 20px;
   background: transparent;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: $text-primary;
   font-family: Georgia, serif;
   font-size: 18px;
@@ -891,7 +890,7 @@ em {
 
   @include glass-card;
 
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.08);
   color: inherit;
   text-decoration: none;
@@ -922,9 +921,7 @@ em {
 }
 
 .card-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   margin-bottom: 0.5rem;
   color: var(--color-primary);
   font-size: 1.2rem;
@@ -956,7 +953,7 @@ em {
 .follow-button,
 .support-button {
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
 }
 
@@ -1065,15 +1062,14 @@ em {
   position: relative;
   flex: 1 1 200px;
   min-width: 180px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   padding: 20px;
   overflow: hidden;
 
   @include glass-card;
 
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow: 0 6px 12px rgba(var(--color-primary-rgb), 0.1);
   color: var(--text-primary);
   font-size: 18px;
@@ -1114,7 +1110,7 @@ em {
 .setting-section {
   margin-bottom: 24px;
   padding: 24px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
   @include glass-blur(10px);
@@ -1179,13 +1175,11 @@ em {
 }
 
 .language-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   padding: 16px;
   background: var(--glass-80);
   border: 2px solid var(--border-light-gray);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all $ease-standard;
 

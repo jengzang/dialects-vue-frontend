@@ -1,3 +1,4 @@
+@use '@/styles/global/mixins' as *;
 // VillagesML 控件样式（按钮、输入框、设置行）
 
 .vml-query-btn,
@@ -9,7 +10,7 @@
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -22,8 +23,7 @@
   }
 
   &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    @include disabled-state;
   }
 }
 
@@ -35,7 +35,7 @@
   padding: 8px 16px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   background: var(--glass-50);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -58,15 +58,14 @@
   padding: 12px 24px;
 
   &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    @include disabled-state;
   }
 }
 
 .vm-setting-input {
   padding: 10px 14px;
   border: 1px solid var(--glass-30);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
@@ -76,7 +75,7 @@
   width: 100px;
   padding: 0.5rem;
   border: 1px solid var(--bg-hover-strong);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   background: var(--glass-90);
   font-size: 0.95rem;
 

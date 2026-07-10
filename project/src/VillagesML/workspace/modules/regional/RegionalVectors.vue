@@ -711,14 +711,13 @@ onUnmounted(() => {
   background: linear-gradient(135deg, var(--vml-blue), var(--color-success));
   color: white;
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
 }
 
 .selector-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 20px;
 }
 
@@ -732,7 +731,7 @@ onUnmounted(() => {
 .region-group {
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
@@ -749,7 +748,7 @@ onUnmounted(() => {
   width: 100%;
   padding: 12px 24px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
@@ -765,8 +764,7 @@ onUnmounted(() => {
 }
 
 .action-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
   transform: none;
 }
 
@@ -782,8 +780,7 @@ onUnmounted(() => {
 
 /* Multi-region panel */
 .multi-region-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
@@ -803,7 +800,7 @@ onUnmounted(() => {
   gap: 8px;
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   min-height: 50px;
 }
 
@@ -814,7 +811,7 @@ onUnmounted(() => {
   padding: 6px 12px;
   background: linear-gradient(135deg, var(--vml-blue), var(--vml-blue-darker));
   color: white;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   font-size: 13px;
   font-weight: 500;
 }
@@ -834,10 +831,8 @@ onUnmounted(() => {
   padding: 0;
   width: 20px;
   height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  @include flex-center;
+  border-radius: var(--radius-full);
   transition: background 0.2s;
 }
 
@@ -859,13 +854,12 @@ onUnmounted(() => {
   color: var(--text-secondary);
   background: rgba(var(--vml-blue-rgb), 0.1);
   padding: 4px 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 /* 結果區域 */
 .results-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
@@ -892,7 +886,7 @@ onUnmounted(() => {
   justify-content: space-between;
   padding: 10px 14px;
   background: var(--glass-50);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .stat-item .label {
@@ -928,16 +922,14 @@ onUnmounted(() => {
 }
 
 .comparison-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 16px;
   margin-bottom: 24px;
 }
 
 .region-badge {
   padding: 8px 20px;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   font-weight: 600;
   font-size: 16px;
 }
@@ -970,7 +962,7 @@ onUnmounted(() => {
   min-width: 150px;
   padding: 16px;
   background: var(--glass-60);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   text-align: center;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
@@ -994,8 +986,7 @@ onUnmounted(() => {
   right: 0;
   bottom: 0;
   background: var(--bg-overlay);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   z-index: 9999;

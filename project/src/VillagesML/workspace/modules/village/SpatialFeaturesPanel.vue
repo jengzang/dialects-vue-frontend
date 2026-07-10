@@ -121,7 +121,7 @@ defineProps({
   transition: transform 0.3s ease;
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .spatial-item:hover {
@@ -153,7 +153,7 @@ defineProps({
   margin-top: 16px;
   padding: 12px 16px;
   background: var(--glass-20);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   color: var(--text-primary);
   text-align: center;
@@ -163,7 +163,7 @@ defineProps({
   padding: 60px 20px;
   text-align: center;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .map-placeholder p {

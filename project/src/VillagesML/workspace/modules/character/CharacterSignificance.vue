@@ -326,8 +326,7 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .form-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   margin-top: 16px;
 }
@@ -369,7 +368,7 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .table-container {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   display: inline-block;
   min-width: 100%;
@@ -439,7 +438,7 @@ const getSignificanceBadge = (pValue) => {
 
 .significance-badge {
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 600;
 }
@@ -483,7 +482,7 @@ const getSignificanceBadge = (pValue) => {
 .summary-item {
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   text-align: center;
 }
 

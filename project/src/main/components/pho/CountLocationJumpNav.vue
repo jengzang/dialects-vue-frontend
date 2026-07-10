@@ -408,8 +408,7 @@ $mobile-width: 150px;.count-location-jump-nav {
   z-index: 1600;
   width: $desktop-width;
   max-height: min(82vh, 620px);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: flex-end;
   gap: 6px;
   outline: none;
@@ -428,7 +427,7 @@ $mobile-width: 150px;.count-location-jump-nav {
     margin-right: 5px;
     background: var(--glass-70);
     border: 1px solid rgba(var(--color-primary-rgb), 0.14);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     box-shadow:
       0 8px 18px rgba(24, 38, 64, 0.1),
       inset 0 1px 0 var(--glass-80);
@@ -476,8 +475,7 @@ $mobile-width: 150px;.count-location-jump-nav {
   .count-location-jump-nav-items {
     position: relative;
     width: 100%;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: flex-end;
     gap: 4px;
     overflow: visible;
@@ -497,7 +495,7 @@ $mobile-width: 150px;.count-location-jump-nav {
         ),
         rgba(240, 246, 255, 0.24);
       border: 1px solid var(--glass-40);
-      border-radius: 999px;
+      border-radius: var(--radius-pill);
       box-shadow:
         0 12px 30px rgba(24, 38, 64, 0.1),
         inset 0 1px 0 var(--glass-70);
@@ -544,7 +542,7 @@ $mobile-width: 150px;.count-location-jump-nav {
     overflow: visible;
     background: transparent;
     border: none;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     text-align: right;
     cursor: pointer;
 
@@ -695,7 +693,7 @@ $mobile-width: 150px;.count-location-jump-nav {
     opacity: 0;
     background: var(--glass-80);
     border: 1px solid rgba(var(--color-primary-rgb), 0.12);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     box-shadow:
       0 8px 20px rgba(24, 38, 64, 0.1),
       inset 0 1px 0 var(--glass-80);
@@ -742,7 +740,7 @@ $mobile-width: 150px;.count-location-jump-nav {
       rgba(var(--color-primary-rgb), 0.88),
       rgba(0, 81, 213, 0.88)
     );
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     box-shadow:
       0 0 0 3px rgba(var(--color-primary-rgb), 0.1),
       0 3px 8px rgba(var(--color-primary-rgb), 0.14);

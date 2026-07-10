@@ -258,7 +258,7 @@ watch(() => route.query.villageId, (newId) => {
   background: rgba(var(--color-error-rgb), 0.1);
   color: var(--color-error);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -276,7 +276,7 @@ watch(() => route.query.villageId, (newId) => {
   width: 100%;
   padding: 12px 20px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 16px;
   background: var(--glass-50);
   transition: all 0.3s ease;
@@ -295,7 +295,7 @@ watch(() => route.query.villageId, (newId) => {
 
 .result-item {
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   transition: all 0.3s ease;
   margin-bottom: 8px;

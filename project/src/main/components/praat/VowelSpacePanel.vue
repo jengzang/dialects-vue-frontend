@@ -580,7 +580,7 @@ $transition-duration: 0.3s;
     rgba(var(--color-warning-rgb), 0.1)
   );
   border-left: 4px solid #ffc107;
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-md, var(--radius-sm2));
   box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);
   color: $text-primary;
   text-align: left;
@@ -614,8 +614,7 @@ $transition-duration: 0.3s;
   transition: opacity $transition-duration ease;
 
   &.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    @include disabled-state;
     pointer-events: none;
   }
 }
@@ -644,8 +643,7 @@ $transition-duration: 0.3s;
 }
 
 .segment-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.75rem;
 }
 
@@ -669,7 +667,7 @@ $transition-duration: 0.3s;
   flex-shrink: 0;
   width: 16px;
   height: 16px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
 }
 
 .segment-label {
@@ -703,9 +701,7 @@ $transition-duration: 0.3s;
 
 /* 元音空间图 */
 .chart-section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   margin-bottom: 2rem;
 }
 
@@ -744,7 +740,7 @@ $transition-duration: 0.3s;
     flex-shrink: 0;
     width: 12px;
     height: 12px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
   }
 
   .stat-label {
@@ -755,8 +751,7 @@ $transition-duration: 0.3s;
 }
 
 .stat-values {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
 }
 
@@ -779,9 +774,7 @@ $transition-duration: 0.3s;
 
 /* 描述区域 */
 .description-section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   padding: 1rem;
   background: var(--glass-30);
   border-radius: var(--radius-md);

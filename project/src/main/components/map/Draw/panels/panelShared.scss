@@ -1,8 +1,8 @@
 @use '../../../../../styles/global/scrollbars' as scrollbars;
+@use '@/styles/global/mixins' as *;
 
 @mixin draw-section-base {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.6rem;
   padding-bottom: 0.9rem;
   border-bottom: 1px solid var(--glass-40);
@@ -30,8 +30,7 @@
   z-index: 10;
   padding: 1rem 1.05rem;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.9rem;
   transition:
     right 0.35s cubic-bezier(0.4, 0, 0.2, 1),
@@ -65,8 +64,7 @@
 .draw-tool-panel-body {
   min-height: 0;
   overflow: auto;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.9rem;
   padding-right: 0.15rem;
   @include scrollbars.visible-scrollbar;
@@ -169,14 +167,12 @@
 }
 
 .draw-layer-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.55rem;
 }
 
 .draw-layer-row {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.45rem;
   padding: 0.65rem;
   border-radius: 14px;
@@ -208,8 +204,7 @@
 }
 
 .draw-layer-editor-form {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.85rem;
 }
 
@@ -233,7 +228,7 @@
 }
 
 .draw-input {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--glass-70);
   background: var(--glass-70);
   color: var(--text-deep);
@@ -266,7 +261,7 @@
 
 .draw-color-input {
   height: 2.8rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--glass-70);
   background: var(--glass-70);
   padding: 0.3rem;
@@ -287,8 +282,7 @@
 
 @media (max-width: 900px) {
   .draw-tool-section-header {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
   }
 
   .draw-tool-panel {

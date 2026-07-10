@@ -190,14 +190,12 @@ const runAnalysis = () => {
 }
 
 .settings-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
 .setting-row {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -231,7 +229,7 @@ const runAnalysis = () => {
 .setting-select {
   padding: 10px 14px;
   border: 1px solid var(--glass-30);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
@@ -245,8 +243,7 @@ const runAnalysis = () => {
 }
 
 .checkbox-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   padding: 8px 0;
 }
@@ -268,7 +265,7 @@ const runAnalysis = () => {
   padding: 12px 16px;
   background: rgba(var(--color-warning-rgb), 0.15);
   border: 1px solid rgba(var(--color-warning-rgb), 0.3);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   margin-bottom: 16px;
 }
 

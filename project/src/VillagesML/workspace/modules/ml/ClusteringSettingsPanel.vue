@@ -192,8 +192,7 @@ const runClustering = () => {
 }
 
 .settings-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
@@ -213,7 +212,7 @@ const runClustering = () => {
   flex: 1;
   padding: 10px 14px;
   border: 1px solid var(--glass-30);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
@@ -221,12 +220,11 @@ const runClustering = () => {
 }
 
 .feature-toggles {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 
 .feature-toggles label {
@@ -245,7 +243,7 @@ const runClustering = () => {
   padding: 12px 16px;
   background: rgba(var(--color-warning-rgb), 0.15);
   border: 1px solid rgba(var(--color-warning-rgb), 0.3);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   margin-bottom: 16px;
 }
 
@@ -260,13 +258,12 @@ const runClustering = () => {
 }
 
 .dbscan-config {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   padding: 16px;
   background: rgba(var(--vml-blue-rgb), 0.08);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .config-header {

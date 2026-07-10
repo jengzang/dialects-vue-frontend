@@ -329,7 +329,7 @@ $text-radio-desc: var(--text-tertiary);
 
 $surface-light: var(--glass-30);
 $surface-medium: var(--glass-60);
-$surface-white: #fff;
+$surface-white: var(--text-white);
 
 $border-default: rgba(0, 0, 0, 0.1);
 $active-background: rgba(var(--color-primary-rgb), 0.206);
@@ -397,7 +397,7 @@ $transition-normal: 0.3s;
   padding: 10px;
   background: $surface-white;
   border: 2px solid $border-default;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   transition:
     background $transition-fast ease,
@@ -426,8 +426,7 @@ $transition-normal: 0.3s;
   }
 
   .radio-label {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 4px;
   }
 
@@ -451,8 +450,7 @@ $transition-normal: 0.3s;
 }
 
 .param-item {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
 
   label {
@@ -480,8 +478,7 @@ $transition-normal: 0.3s;
 }
 
 .checkbox-options {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
   margin-top: 0.75rem;
 }

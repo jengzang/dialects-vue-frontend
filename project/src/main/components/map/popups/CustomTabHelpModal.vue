@@ -495,15 +495,14 @@ $text-muted: var(--text-lightest);
 $glass-card: var(--glass-50);
 
 .help-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 20px;
 }
 
 .help-section {
   padding: 15px;
   background: $glass-card;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 
   &--blue {
     border-left: 4px solid $primary-blue;
@@ -540,7 +539,7 @@ $glass-card: var(--glass-50);
     code {
       padding: 1px 5px;
       background: rgba(var(--color-primary-rgb), 0.08);
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       color: $primary-blue-dark;
       font-size: 12px;
     }
@@ -557,7 +556,7 @@ $glass-card: var(--glass-50);
 .example-hint {
   padding: 8px 12px;
   background: rgba(0, 0, 0, 0.03);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   color: var(--text-tertiary)
   font-size: 12px;
 
@@ -579,9 +578,9 @@ $glass-card: var(--glass-50);
 .table-container {
   margin-bottom: 8px;
   overflow-x: auto;
-  background: #fff;
+  background: var(--bg-white);
   border: 1px solid var(--border-light-gray);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .example-table {
@@ -620,7 +619,7 @@ $glass-card: var(--glass-50);
 }
 
 .highlight-region {
-  background-color: #f0f7ff;
+  background-color: var(--bg-blue-tint);
   color: $primary-blue;
   font-weight: 600;
 }
@@ -637,7 +636,7 @@ $glass-card: var(--glass-50);
   padding: 1px 6px;
   background: #e6f7ff;
   border: 1px solid #91d5ff;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   color: $primary-blue-dark;
   font-weight: 700;
 }
@@ -650,11 +649,10 @@ $glass-card: var(--glass-50);
 
 /* 使用方式示意图 */
 .usage-diagram {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   padding: 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .usage-level {
@@ -664,8 +662,8 @@ $glass-card: var(--glass-50);
   display: flex;
   align-items: center;
   padding: 12px;
-  background: #fff;
-  border-radius: 10px;
+  background: var(--bg-white);
+  border-radius: var(--radius-md);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -711,7 +709,7 @@ $glass-card: var(--glass-50);
   display: inline-block;
   padding: 4px 8px;
   background: rgba(var(--color-primary-rgb), 0.08);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   color: $primary-blue;
   font-family: monospace;
   font-size: 12px;
@@ -738,7 +736,7 @@ $glass-card: var(--glass-50);
   align-items: center;
   padding: 8px;
   background: #f5fcf5;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .feature-box {

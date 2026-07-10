@@ -486,8 +486,7 @@ const handleAdjustParams = (action) => {
 /* VillagesML Module Container */
 .villagesml-module {
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 
 .content-area {
@@ -505,9 +504,7 @@ const handleAdjustParams = (action) => {
 }
 
 .empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   min-height: 400px;
   text-align: center;
   color: var(--text-tertiary);

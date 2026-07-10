@@ -94,7 +94,7 @@ defineProps({
   justify-content: space-between;
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .info-label {
@@ -111,7 +111,7 @@ defineProps({
   margin-top: 20px;
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .additional-info h4 {

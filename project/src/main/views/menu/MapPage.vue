@@ -342,7 +342,7 @@ $transition-base: 0.3s;
   cursor: pointer;
   background: var(--glass-30);
   border: 1px solid rgba(var(--color-silver-rgb), 0.5);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: all $transition-base ease;

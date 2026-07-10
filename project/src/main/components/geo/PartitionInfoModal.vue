@@ -783,7 +783,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   padding: 8px 12px;
   background: rgba(142, 142, 147, 0.15);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   color: var(--text-primary);
   white-space: nowrap;
   font-size: 14px;
@@ -823,7 +823,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   @include primary-gradient;
 
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
   color: var(--text-white);
   font-size: 14px;
@@ -837,8 +837,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
   &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    @include disabled-state;
   }
 }
 
@@ -875,7 +874,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     align-items: center;
     justify-content: space-between;
     padding: 8px 10px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: background 0.2s;
 
@@ -911,7 +910,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
       margin-left: 0.5rem;
       padding: 0.2rem 0.5rem;
       background: rgba(var(--color-primary-rgb), 0.15);
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       color: $primary;
       font-size: 0.85em;
       font-weight: 600;
@@ -927,7 +926,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   :deep(.node-select-btn) {
     padding: 4px 10px;
     border: none;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -965,7 +964,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
     background: transparent;
     border: none;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     color: $primary;
     font-size: 16px;
     cursor: pointer;
@@ -1002,7 +1001,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     padding: 8px 10px;
     overflow: hidden;
     background: var(--glass-50);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     color: var(--text-dark)
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -1021,8 +1020,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     }
 
     &.disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+      @include disabled-state;
     }
   }
 

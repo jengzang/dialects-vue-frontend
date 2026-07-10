@@ -923,7 +923,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   padding: 4px;
   background: var(--glass-60);
   border: 0.5px solid var(--glass-80);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.06),
     0 2px 6px rgba(0, 0, 0, 0.04),
@@ -1021,7 +1021,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   transition: all $transition-control $ease-standard;
 
   &:hover:not(.active) {
@@ -1051,7 +1051,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   cursor: pointer;
   background: var(--glass-60);
   border: 0.5px solid var(--glass-80);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.06),
     0 2px 6px rgba(0, 0, 0, 0.04);
@@ -1107,7 +1107,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   resize: vertical;
   background: var(--bg-white);
   border: 1.5px solid var(--border-gray);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   outline: none;
   transition: all $transition-base $ease-standard;
 
@@ -1139,7 +1139,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   transition: all $transition-control $ease-standard;
 
   @include flex-center;
@@ -1162,7 +1162,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   overflow: auto;
   background: var(--glass-60);
   border: 1px solid var(--border-gray-light);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
 
   @include glass-blur(20px);
@@ -1196,7 +1196,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   pointer-events: auto !important;
   background: var(--glass-60) !important;
   border: 1px solid var(--border-gray-light) !important;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg2);
   transition: background-color $transition-fast ease;
 
@@ -1211,7 +1211,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   padding: 8px 12px;
   margin: 2px 0;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: background-color $transition-fast ease;
 
   &:hover {
@@ -1230,7 +1230,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   font-size: 14px;
   background: var(--glass-80);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   outline: none;
   transition: all $transition-fast;
 
@@ -1244,7 +1244,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   padding: 8px;
   overflow-y: auto;
   background: var(--glass-50);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .item-line {
@@ -1253,7 +1253,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   color: $text-primary;
   font-size: 14px;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   transition: all 0.15s;
 
   &:hover {
@@ -1277,8 +1277,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 }
 
 .cards-loading {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
   align-items: center;
   justify-content: center;
@@ -1304,14 +1303,13 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 }
 
 .card {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 14px;
   padding: 18px 20px;
   overflow: hidden;
   background: var(--glass-80);
   border: 0.5px solid var(--glass-90);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.06),
     0 2px 8px rgba(0, 0, 0, 0.04),
@@ -1409,7 +1407,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   .row-3 {
     padding: 10px 12px;
     margin: 0 -4px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
   }
 
   .row-2 {
@@ -1497,7 +1495,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   font-size: 14px;
   background: var(--glass-80);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   outline: none;
   transition: all $transition-fast;
 
@@ -1519,7 +1517,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   cursor: pointer;
   background: rgba(0, 0, 0, 0.1);
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   transform: translateY(-50%);
 
   @include flex-center;

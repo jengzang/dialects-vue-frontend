@@ -99,8 +99,7 @@ onMounted(() => {
 @use '../../_map-variables' as *;
 
 .feature-mode-shell {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: $spacing-md;
 }
 </style>

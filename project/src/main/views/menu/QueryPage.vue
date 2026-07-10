@@ -831,8 +831,7 @@ $transition-base: 0.3s;
   text-align: center;
   animation: fade 0.6s ease;
 
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
 }
@@ -845,8 +844,7 @@ $transition-base: 0.3s;
 }
 
 .triple-select-box {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   justify-content: space-between;
   gap: 1.5dvw;
   width: 100%;
@@ -857,8 +855,7 @@ $transition-base: 0.3s;
 }
 
 .page-content-stack {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 1.5dvh;
 }
@@ -902,7 +899,7 @@ $transition-base: 0.3s;
   cursor: pointer;
   background: var(--glass-30);
   border: 1px solid var(--color-primary-medium);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   transition: background $transition-base ease;
 
   &.active {
@@ -937,7 +934,7 @@ $transition-base: 0.3s;
     white-space: nowrap;
     text-overflow: ellipsis;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     transition: background-color $transition-fast;
 
     &:hover {
@@ -972,7 +969,7 @@ $transition-base: 0.3s;
   overflow: hidden;
   background: var(--glass-30);
   border: 1px solid var(--color-primary-medium);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .dropdown-input {

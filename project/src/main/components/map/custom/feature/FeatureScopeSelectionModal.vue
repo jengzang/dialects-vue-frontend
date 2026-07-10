@@ -465,8 +465,7 @@ function formatRegionNames(regionNames) {
 @use '../../_map-variables' as *;
 
 .feature-scope-modal {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 18px;
 }
 
@@ -500,7 +499,7 @@ function formatRegionNames(regionNames) {
     width: 80%;
     height: 38px;
     border: 1px solid $muted-active;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     padding: 0 14px;
     font-size: 13px;
     color: $text-strong;
@@ -524,8 +523,7 @@ function formatRegionNames(regionNames) {
 
   .summary-item {
     flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 2px;
   }
 
@@ -597,8 +595,7 @@ function formatRegionNames(regionNames) {
 }
 
 .scope-panel {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   min-height: 360px;
   max-height: 440px;

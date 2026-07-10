@@ -362,8 +362,7 @@ $white: var(--text-white);
 $transition-fast: 0.2s;
 .result-page-container {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   width: 100%;
   min-height: 200px;
 }
@@ -383,15 +382,14 @@ $transition-fast: 0.2s;
 }
 
 .glass-card {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   width: 280px;
   padding: 30px;
   text-align: center;
   background: var(--glass-30);
   border: 1px solid var(--glass-20);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -425,13 +423,12 @@ $transition-fast: 0.2s;
   font-size: 0.85em;
   line-height: 1.4;
   background: rgba(var(--color-error-light-rgb), 0.1);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   animation: fadeIn 0.5s ease-out;
 }
 
 .empty-state {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 15px;
   align-items: center;
   padding: 40px;
@@ -447,7 +444,7 @@ $transition-fast: 0.2s;
   cursor: pointer;
   background-color: $primary-blue;
   border: none;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   box-shadow: 0 4px 6px rgba(var(--color-primary-rgb), 0.2);
   transition: all $transition-fast ease;
 

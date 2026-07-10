@@ -438,8 +438,7 @@ $float-catalog-button-left:0;
 }
 
 .tutorial-modal-header {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
   width: 100%;
 
@@ -496,8 +495,7 @@ $float-catalog-button-left:0;
   --tutorial-content-max-height: min(52dvh, 520px);
 
   position: relative;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   min-height: 0;
 
   &__topbar {
@@ -509,8 +507,7 @@ $float-catalog-button-left:0;
   }
 
   &__current {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 3px;
     min-width: 0;
 
@@ -606,7 +603,7 @@ $float-catalog-button-left:0;
   min-width: 0;
   padding: 10px 12px;
   border: 1px solid var(--glass-50);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   background: var(--glass-40);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
@@ -704,8 +701,7 @@ $float-catalog-button-left:0;
 }
 
 .tutorial-catalog {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 14px;
   max-height: var(--tutorial-content-max-height);
   padding: 12px 10px;
@@ -718,8 +714,7 @@ $float-catalog-button-left:0;
   }
 
   &__category {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 10px;
 
     &-title {
@@ -735,8 +730,7 @@ $float-catalog-button-left:0;
   }
 
   &__group {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 7px;
 
     &-title {
@@ -887,7 +881,7 @@ $float-catalog-button-left:0;
 
     :deep(code) {
       padding: 2px 6px;
-      border-radius: 8px;
+      border-radius: var(--radius-sm2);
       background: rgba(226, 240, 255, 0.68);
     }
 

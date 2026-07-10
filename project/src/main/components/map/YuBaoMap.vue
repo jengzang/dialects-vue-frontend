@@ -832,7 +832,7 @@ watch(() => props.activeTab, () => {
   width: 100%;
   height: 100%;
   position: relative;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -864,9 +864,7 @@ watch(() => props.activeTab, () => {
   background: var(--glass-90);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   z-index: 1000;
   animation: fadeIn 0.2s ease-out;
 }
@@ -881,8 +879,7 @@ watch(() => props.activeTab, () => {
 }
 
 .loading-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 16px;
 }
@@ -905,10 +902,9 @@ watch(() => props.activeTab, () => {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding: 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
   z-index: 10;
   width: 160px;
@@ -932,7 +928,7 @@ watch(() => props.activeTab, () => {
   background: white;
   border: 1px solid var(--border-light-gray);
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   cursor: pointer;
   outline: none;
@@ -958,7 +954,7 @@ watch(() => props.activeTab, () => {
   display: flex;
   gap: 4px;
   background: var(--bg-light);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   padding: 4px;
 }
 
@@ -967,7 +963,7 @@ watch(() => props.activeTab, () => {
   padding: 6px 8px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
@@ -1005,7 +1001,7 @@ watch(() => props.activeTab, () => {
   color: white;
   border: none;
   padding: 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   font-size: 13px;
   transition: background 0.2s;
@@ -1061,7 +1057,7 @@ watch(() => props.activeTab, () => {
 /* 全局样式 - 标记 */
 .yubao-marker {
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   font-size: 13px;
   white-space: nowrap;
@@ -1081,9 +1077,7 @@ watch(() => props.activeTab, () => {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   z-index: 100000;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -1091,12 +1085,11 @@ watch(() => props.activeTab, () => {
 
 .yubao-popup-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   width: 90%;
   max-width: 500px;
   max-height: 80vh;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
@@ -1132,7 +1125,7 @@ watch(() => props.activeTab, () => {
   margin-bottom: 16px;
   background: rgba(var(--color-primary-rgb), 0.08);
   border-left: 3px solid var(--color-primary);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   color: var(--color-primary);
   font-weight: 500;
@@ -1162,7 +1155,7 @@ watch(() => props.activeTab, () => {
   margin: 0 -12px;
   padding-left: 12px;
   padding-right: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 /* 标签样式 */

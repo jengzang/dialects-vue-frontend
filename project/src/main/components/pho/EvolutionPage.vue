@@ -1451,8 +1451,7 @@ $portrait-ratio: 1 / 1;@mixin text-primary {
 /* 页面主体 */
 .evolution-page {
   width: 98%;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   padding: 10px;
 }
@@ -1501,8 +1500,7 @@ $portrait-ratio: 1 / 1;@mixin text-primary {
 
   &-field {
     min-width: 0;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 8px;
   }
 
@@ -1536,8 +1534,7 @@ $portrait-ratio: 1 / 1;@mixin text-primary {
 
   &-input-wrapper {
     flex: 1;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 4px;
   }
 }
@@ -1575,7 +1572,7 @@ $portrait-ratio: 1 / 1;@mixin text-primary {
   border: none;
   border-radius: var(--radius-md);
   box-shadow: 0 2px 8px var(--color-primary-shadow);
-  color: #fff;
+  color: var(--text-white);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -1588,8 +1585,7 @@ $portrait-ratio: 1 / 1;@mixin text-primary {
   }
 
   &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    @include disabled-state;
   }
 }
 
@@ -1599,16 +1595,14 @@ $portrait-ratio: 1 / 1;@mixin text-primary {
   padding: 12px;
   background: rgba(var(--color-error-light-rgb), 0.1);
   border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: $danger;
   font-size: 13px;
 }
 
 /* 特征切换 */
 .feature-tabs {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 20px;
@@ -1651,7 +1645,7 @@ $portrait-ratio: 1 / 1;@mixin text-primary {
     background: var(--color-primary);
     border-color: var(--color-primary);
     box-shadow: 0 4px 12px var(--color-primary-shadow);
-    color: #fff;
+    color: var(--text-white);
   }
 }
 
@@ -1762,8 +1756,7 @@ $portrait-ratio: 1 / 1;@mixin text-primary {
   }
 
   &__section {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 10px;
   }
 
@@ -1778,7 +1771,7 @@ $portrait-ratio: 1 / 1;@mixin text-primary {
     padding: 10px 12px;
     background: var(--glass-60);
     border: 1px solid var(--glass-50);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   &__item-row {

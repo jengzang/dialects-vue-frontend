@@ -1128,8 +1128,7 @@ $mobile-breakpoint: 768px;
   /* 输入与查询 */
   .input-section {
     max-width: 600px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: center;
     gap: 5px;
@@ -1138,9 +1137,7 @@ $mobile-breakpoint: 768px;
 
   .load-btn {
     max-width: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     gap: 8px;
     padding: 12px 24px;
     background: linear-gradient(
@@ -1188,8 +1185,7 @@ $mobile-breakpoint: 768px;
   .loading,
   .error {
     min-height: 50dvh;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: center;
     gap: 15px;
@@ -1232,8 +1228,7 @@ $mobile-breakpoint: 768px;
   /* 结果区域 */
   .results-container {
     position: relative;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 32px;
     margin-top: 24px;
 
@@ -1246,8 +1241,7 @@ $mobile-breakpoint: 768px;
     position: absolute;
     inset: 0;
     z-index: 5;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: center;
     gap: 15px;
@@ -1283,7 +1277,7 @@ $mobile-breakpoint: 768px;
     justify-content: center;
     padding: 2px 10px;
     background: rgba(var(--color-primary-rgb), 0.12);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     color: var(--color-primary);
     white-space: nowrap;
     font-size: 15px;
@@ -1316,8 +1310,7 @@ $mobile-breakpoint: 768px;
 
   /* 图表区域 */
   .charts-section {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 24px;
     margin: 18px 0 28px;
   }
@@ -1351,8 +1344,7 @@ $mobile-breakpoint: 768px;
   }
 
   .bar-chart-list {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 16px;
   }
 
@@ -1361,7 +1353,7 @@ $mobile-breakpoint: 768px;
     padding: 12px;
     background: var(--glass-80);
     border: 1px solid rgba(var(--color-primary-rgb), 0.1);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
 
     &--wide {
       width: 100%;
@@ -1422,7 +1414,7 @@ $mobile-breakpoint: 768px;
     padding: 12px;
     background: var(--glass-10);
     border: 1px solid var(--border-gray-lighter);
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     transition: all 0.2s ease;
 
     &:hover {
@@ -1470,7 +1462,7 @@ $mobile-breakpoint: 768px;
   .location-tag {
     padding: 2px 8px;
     background: rgba(var(--color-primary-rgb), 0.1);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     color: var(--color-primary);
     font-size: 12px;
   }
@@ -1481,9 +1473,9 @@ $mobile-breakpoint: 768px;
     padding: 4px 10px;
     background: linear-gradient(135deg, $primary, $primary-dark);
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.3);
-    color: #fff;
+    color: var(--text-white);
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -1514,7 +1506,7 @@ $mobile-breakpoint: 768px;
       rgba(247, 251, 255, 0.66)
     );
     border: 1px solid rgba(var(--color-primary-rgb), 0.12);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     box-shadow: 0 10px 24px rgba(20, 38, 60, 0.06);
 
     &:last-child {
@@ -1559,7 +1551,7 @@ $mobile-breakpoint: 768px;
     padding: 6px 10px;
     background: var(--glass-90);
     border: 1px solid rgba(var(--color-primary-rgb), 0.12);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     transition: all 0.2s ease;
 
     &:hover {
@@ -1578,7 +1570,7 @@ $mobile-breakpoint: 768px;
   .tag-count {
     padding: 2px 8px;
     background: rgba(var(--color-primary-rgb), 0.12);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     color: var(--color-primary);
     font-size: 12px;
     font-weight: 700;
@@ -1586,8 +1578,7 @@ $mobile-breakpoint: 768px;
 
   /* 空状态 */
   .empty {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: center;
     gap: 8px;
@@ -1649,8 +1640,7 @@ $mobile-breakpoint: 768px;
 
 .modal-loading-block {
   min-height: 160px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -1688,7 +1678,7 @@ $mobile-breakpoint: 768px;
   padding: 0 12px;
   background: var(--glass-50);
   border: 1px solid var(--glass-60);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 }
 
 .modal-stat-label {

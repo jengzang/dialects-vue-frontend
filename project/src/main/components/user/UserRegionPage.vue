@@ -647,8 +647,7 @@ $region-glass-border: var(--glass-60);
   margin-bottom: 18px;
 
   .page-title-group {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: center;
     min-width: 0;
@@ -656,9 +655,7 @@ $region-glass-border: var(--glass-60);
   }
 
   .page-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     min-width: 0;
     gap: 10px;
     margin: 0;
@@ -689,7 +686,7 @@ $region-glass-border: var(--glass-60);
     min-height: 28px;
     padding: 4px 10px;
     border: 1px solid var(--glass-50);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background:
       linear-gradient(135deg, var(--glass-70), var(--glass-40)),
       rgba(var(--color-primary-rgb), 0.06);
@@ -723,7 +720,7 @@ $region-glass-border: var(--glass-60);
     padding: 6px 13px;
     overflow: hidden;
     border: 1px solid var(--glass-50);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     color: var(--text-white);
     font-size: 14px;
     font-weight: 800;
@@ -832,9 +829,7 @@ $region-glass-border: var(--glass-60);
 }
 
 .status-panel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   min-height: 260px;
   margin-top: 18px;
   text-align: center;
@@ -951,7 +946,7 @@ $region-glass-border: var(--glass-60);
   width: 34px;
   height: 34px;
   padding: 0;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 15px;
   cursor: pointer;
   transition:
@@ -1022,7 +1017,7 @@ $region-glass-border: var(--glass-60);
   align-items: center;
   min-height: 26px;
   padding: 5px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 750;
   line-height: 1;

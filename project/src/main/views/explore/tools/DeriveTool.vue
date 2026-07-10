@@ -23,9 +23,7 @@
 }
 
 .derive-tool-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   min-height: 400px;
 }
 

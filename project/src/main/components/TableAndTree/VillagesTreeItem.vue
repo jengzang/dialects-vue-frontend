@@ -252,7 +252,7 @@ $transition-expand: 0.3s;
   justify-content: space-between;
   padding: 8px 10px;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   transition: background $transition-fast;
 
   &:hover {
@@ -290,7 +290,7 @@ $transition-expand: 0.3s;
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   transition: all $transition-fast ease;
 
   &:hover {
@@ -319,7 +319,7 @@ $transition-expand: 0.3s;
   font-size: 10px;
   font-weight: 500;
   white-space: nowrap;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .lazy-indicator {
@@ -340,7 +340,7 @@ $transition-expand: 0.3s;
   font-size: 13px;
   background: rgba(var(--color-error-rgb), 0.06);
   border: 1px solid rgba(var(--color-error-rgb), 0.2);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 
   .retry-btn-small {
     padding: 3px 10px;
@@ -350,7 +350,7 @@ $transition-expand: 0.3s;
     cursor: pointer;
     background: rgba(var(--color-error-rgb), 0.12);
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
   }
 }
 
@@ -386,7 +386,7 @@ $transition-expand: 0.3s;
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   transition: all $transition-expand ease;
 
   &:hover {
@@ -406,7 +406,7 @@ $transition-expand: 0.3s;
   padding: 0 2px;
   color: var(--text-primary);
   background: rgba(255, 255, 0, 0.4);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 }
 
 @keyframes spin {

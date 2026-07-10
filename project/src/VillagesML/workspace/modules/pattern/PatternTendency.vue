@@ -185,7 +185,7 @@ watch(
   min-width: 200px;
   padding: 10px 16px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   background: var(--glass-50);
 }
@@ -196,7 +196,7 @@ watch(
   margin-bottom: 16px;
   padding: 12px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   flex-wrap: wrap;
 }
 
@@ -211,7 +211,7 @@ watch(
 .legend-dot {
   width: 12px;
   height: 12px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
 }
 
 .legend-dot.strong {
@@ -227,8 +227,7 @@ watch(
 }
 
 .tendency-chart {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
@@ -238,7 +237,7 @@ watch(
   gap: 12px;
   padding: 6px 12px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   align-items: center;
   transition: all 0.3s ease;
 }
@@ -271,14 +270,14 @@ watch(
 .tendency-bar {
   height: 24px;
   background: var(--glass-50);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
 .tendency-fill {
   height: 100%;
   transition: width 0.5s ease;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .tendency-value {

@@ -389,8 +389,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
   width: 40dvw;
   max-width: 300px;
   height: 100dvh;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   justify-content: flex-end;
   gap: 10px;
   padding: 0 20px;
@@ -445,8 +444,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
 .sidebar-content {
   flex-grow: 1;
   max-height: 100dvh;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   gap: 15px;
@@ -454,8 +452,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
 
   ul {
     width: 100%;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: flex-start;
     gap: 12px;
@@ -471,9 +468,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
     flex: 1 1 0;
     min-width: 0;
     height: 10dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     gap: 8px;
     padding: 6px 15px;
 
@@ -530,8 +525,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
 
 .stat-item {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 2px;
 }
@@ -558,7 +552,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
   @include soft-glass-background(0.4, 0.2);
 
   border: 2px solid var(--glass-50);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   color: $primary-dark;
   font-size: 18px;
   cursor: pointer;
@@ -587,8 +581,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
 }
 
 .loading-state {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
@@ -610,7 +603,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
   padding: 12px;
   background: var(--glass-40);
   border: 1px solid var(--glass-60);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   transition: all 0.3s ease;
 
   &:hover {
@@ -626,8 +619,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
 }
 
 .stat-info {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
@@ -660,8 +652,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
 }
 
 .history-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -673,7 +664,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
   padding: 12px 14px;
   background: var(--glass-40);
   border: 1px solid var(--glass-50);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   transition: all 0.2s ease;
 
   &:hover {
@@ -693,7 +684,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
   height: 20px;
   overflow: hidden;
   background: rgba(var(--color-primary-hover-rgb), 0.1);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 
 .history-bar {
@@ -704,7 +695,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
     $primary-dark,
     $primary-light
   );
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   transition: width 0.5s ease;
 }
 
@@ -763,7 +754,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
   @include glass-blur(20px, 180%);
 
   border: 1px solid var(--glass-50);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow:
     inset 0 0 0.5px var(--glass-30),
     0 12px 40px rgba(0, 0, 0, 0.2),
@@ -775,7 +766,7 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: $text-primary;
   font-size: 15px;
   font-weight: 500;

@@ -726,7 +726,7 @@ onMounted(() => {
   margin: 0;
   padding: 4px 12px;
   background: rgba(var(--vml-blue-rgb), 0.05);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .form-group {
@@ -776,7 +776,7 @@ onMounted(() => {
 .map-placeholder {
   padding: 60px 20px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   text-align: center;
 }
 
@@ -800,7 +800,7 @@ onMounted(() => {
 .stat-card {
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   text-align: center;
 }
 
@@ -817,8 +817,7 @@ onMounted(() => {
 }
 
 .tendency-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
 }
 
@@ -829,7 +828,7 @@ onMounted(() => {
   gap: 6px;
   padding: 6px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .tendency-region {
@@ -841,7 +840,7 @@ onMounted(() => {
 .tendency-bar {
   height: 20px;
   background: var(--glass-50);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -866,7 +865,7 @@ onMounted(() => {
 .char-item {
   padding: 10px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   display: flex;
   justify-content: space-between;
 }
@@ -883,8 +882,7 @@ onMounted(() => {
 }
 
 .villages-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   max-height: 350px;
   overflow-y: auto;
@@ -897,7 +895,7 @@ onMounted(() => {
   align-items: center;
   padding: 8px 12px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   gap: 12px;
 }
 
@@ -907,15 +905,14 @@ onMounted(() => {
 }
 
 .characters-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   max-height: 400px;
   overflow-y: auto;
 }
 
 .characters-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   max-height: 500px;
   overflow-y: auto;
@@ -942,8 +939,7 @@ onMounted(() => {
 }
 
 .char-table-body {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 
 .char-table-row {
@@ -983,7 +979,7 @@ onMounted(() => {
   padding: 3px 8px;
   background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 11px;
   font-weight: 500;
 }
@@ -1013,7 +1009,7 @@ onMounted(() => {
   padding: 2px 8px;
   background: rgba(var(--color-gold-rgb), 0.2);
   color: var(--color-warning-dark);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-weight: 500;
 }
 
@@ -1033,7 +1029,7 @@ onMounted(() => {
   text-align: center;
   padding: 10px;
   background: rgba(var(--color-warning-rgb), 0.1);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: var(--text-secondary);
   font-size: 13px;
 }
@@ -1057,7 +1053,7 @@ onMounted(() => {
 .summary-card {
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   text-align: center;
 }
 
@@ -1085,7 +1081,7 @@ onMounted(() => {
 }
 
 .integration-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   display: inline-block;
   min-width: 100%;
@@ -1156,7 +1152,7 @@ onMounted(() => {
   padding: 4px 10px;
   background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
 }
@@ -1166,7 +1162,7 @@ onMounted(() => {
   padding: 4px 10px;
   background: rgba(var(--color-gold-rgb), 0.2);
   color: var(--color-warning-dark);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
 }

@@ -104,8 +104,7 @@ $white: var(--text-white);
 $transition-duration: 0.5s;
 
 .tabs-wrapper {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   width: 100%;
   min-height: 80dvh;
@@ -138,7 +137,7 @@ $transition-duration: 0.5s;
   user-select: none;
   background: var(--glass-05);
   border: 1px solid $primary-blue;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   transition: all $transition-duration ease;
@@ -159,7 +158,7 @@ $transition-duration: 0.5s;
   @media (max-width: 600px) {
     padding: 12px 14px;
     font-size: 14px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 }
 

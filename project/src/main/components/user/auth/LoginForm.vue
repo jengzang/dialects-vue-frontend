@@ -174,7 +174,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
   background-color: $primary-blue;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   transition:
     background-color $transition-medium,
     transform $transition-fast;
@@ -227,7 +227,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   user-select: none;
   background-color: $white;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: all $transition-fast $smooth-easing;
 

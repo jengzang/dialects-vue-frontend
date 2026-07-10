@@ -277,7 +277,7 @@ onBeforeUnmount(() => {
   gap: 16px;
   padding: 12px 16px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   margin-bottom: 16px;
   font-size: 13px;
 }
@@ -295,7 +295,7 @@ onBeforeUnmount(() => {
   padding: 4px 10px;
   background: rgba(var(--color-success-rgb), 0.2);
   color: var(--color-success);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
 }
@@ -304,13 +304,12 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 600px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   margin-bottom: 16px;
 }
 
 .empty-state {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   min-height: 400px;
@@ -321,7 +320,7 @@ onBeforeUnmount(() => {
 .communities-legend {
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .communities-legend h4 {
@@ -343,14 +342,14 @@ onBeforeUnmount(() => {
   gap: 8px;
   padding: 6px 12px;
   background: var(--glass-50);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 13px;
 }
 
 .legend-color {
   width: 16px;
   height: 16px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   border: 2px solid var(--glass-80);
 }
 

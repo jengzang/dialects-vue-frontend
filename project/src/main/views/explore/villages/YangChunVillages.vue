@@ -148,8 +148,7 @@ $button-blue: var(--color-primary-hover);
 $transition-base: 0.3s;
 
 .glass-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   width: 60dvw;
   height: 95%;
   margin: 20px auto;

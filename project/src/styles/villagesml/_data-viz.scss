@@ -3,7 +3,7 @@
 .vml-bar {
   height: 24px;
   background: var(--glass-50);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -16,7 +16,7 @@
 .vml-badge {
   display: inline-block;
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 600;
 }

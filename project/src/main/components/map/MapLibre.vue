@@ -955,7 +955,7 @@ const resetView = () => {
   color: var(--color-gold);
   text-shadow: 0 0 1px var(--bg-overlay);
   text-align: center;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 20px 28px;
   position: fixed;
   z-index: 99999;
@@ -1012,7 +1012,7 @@ const resetView = () => {
   background-color: var(--color-dark-teal);
   color: var(--color-cyan);
   padding: 2px 4px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   box-shadow: var(--shadow-focus-ring);
   white-space: nowrap;
   font-family: "SimHei", "黑体", sans-serif;
@@ -1024,7 +1024,7 @@ const resetView = () => {
 /* 2. 分區色點 (create_dot_all) */
 :deep(.marker-dot) {
   width: 10px; height: 10px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   border: 2px solid var(--text-primary); /* 復刻 strokeColor: var(--text-primary) */
   opacity: 0.8;
   cursor: pointer;
@@ -1034,7 +1034,7 @@ const resetView = () => {
 /* 3. 特徵值 (triggerDrawingFunction) */
 :deep(.marker-text-feature) {
   padding: 2px 4px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   box-shadow: var(--shadow-focus-ring);
   font-size: 15px;
   color: black;
@@ -1123,12 +1123,11 @@ const resetView = () => {
   background: var(--glass-90);
   backdrop-filter: blur(12px);
   padding: 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
   /* ✨ 關鍵佈局設置 */
-  display: flex;
-  flex-direction: column; /* 讓子元素垂直排列 (各佔一行) */
+  @include flex-col; /* 讓子元素垂直排列 (各佔一行) */
   gap: 5px;              /* 控制三行之間的間距 */
 
   z-index: 10;
@@ -1168,7 +1167,7 @@ const resetView = () => {
   color: white;
   border: none;
   padding: 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   font-size: 13px;
   transition: background 0.2s;
@@ -1191,9 +1190,7 @@ const resetView = () => {
   position: absolute;
   inset: 0;
   background: var(--glass-80);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   z-index: 20;
   font-weight: bold;
   color: var(--text-medium)
@@ -1216,20 +1213,17 @@ const resetView = () => {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   z-index: 10000;
 }
 
 .location-popup-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   width: 90%;
   max-width: 800px;
   max-height: 80vh;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
@@ -1256,8 +1250,7 @@ const resetView = () => {
 }
 
 .popup-loading {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   padding: 40px;
@@ -1323,7 +1316,7 @@ const resetView = () => {
 .data-display pre {
   background: var(--bg-light);
   padding: 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   overflow-x: auto;
   font-size: 13px;
   line-height: 1.6;

@@ -2113,11 +2113,10 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-tool-container {
     width: 100%;
     height: 90%;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     padding-top: 30px;
     --main-glass-button-padding: 8px 16px;
-    --main-glass-button-border-radius: 10px;
+    --main-glass-button-border-radius: var(--radius-md);
     --main-glass-button-font-size: 13px;
     --main-glass-button-small-padding: 6px 12px;
     --main-glass-button-small-font-size: 12px;
@@ -2165,8 +2164,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-features {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 6px;
     margin: 24px 0;
     text-align: left;
@@ -2183,7 +2181,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     gap: 12px;
     padding: 6px;
     background: $glass-light;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   &-icon {
@@ -2191,7 +2189,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     height: 24px;
     @include flex-center;
     background: rgba(var(--color-success-rgb), 0.2);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     color: $success;
     font-weight: 700;
   }
@@ -2202,7 +2200,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     margin: 10px 0;
     padding: 8px;
     background: $glass-soft;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     text-align: left;
   }
 
@@ -2235,7 +2233,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     margin-top: 8px;
     padding: 12px;
     background: $glass-light;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
 
     p {
       margin: 6px 0;
@@ -2263,8 +2261,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
 .upload-zone-drop {
   @include glass-surface(var(--glass-50), 12px, 22px, var(--glass-60));
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -2286,8 +2283,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
 .upload-preview-actions {
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
 
   &--check {
@@ -2326,8 +2322,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   width: 280px;
   min-width: 280px;
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   padding: 16px;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -2363,18 +2358,16 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-content {
     flex: 1;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 6px;
   }
 
   /* 侧边栏分区 */
 
   &-section {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     background: var(--glass-20);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     padding: 12px;
     overflow: hidden;
     transition: flex 0.3s ease;
@@ -2399,7 +2392,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding: 4px 8px;
     background: $glass-light;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -2416,7 +2409,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     align-items: center;
     padding: 8px;
     background: $primary-soft;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     cursor: pointer;
     font-weight: 600;
     font-size: 14px;
@@ -2438,8 +2431,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 12px;
     margin-top: 12px;
     min-height: 0;
@@ -2457,8 +2449,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   /* 错误统计 */
 
   &-stats {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 8px;
     flex-shrink: 0;
   }
@@ -2466,8 +2457,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   /* 错误列表 */
 
   &-list {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 4px;
     overflow-y: auto;
   }
@@ -2475,7 +2465,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-item {
     padding: 8px;
     background: $glass-light;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 12px;
@@ -2508,7 +2498,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-type-badge {
     display: inline-block;
     padding: 2px 6px;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     font-size: 10px;
     font-weight: 500;
 
@@ -2552,7 +2542,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     gap: 8px;
     padding: 10px;
     background: $glass-light;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -2593,8 +2583,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   /* 调值统计 */
 
   &-stats-content {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 12px;
     overflow-y: auto;
   }
@@ -2616,7 +2605,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   &-item {
     padding: 8px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     cursor: pointer;
     font-size: 12px;
     transition: all 0.2s ease;
@@ -2671,15 +2660,13 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   /* 声韵统计 */
 
   &-rime-stats-content {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 12px;
     overflow-y: auto;
   }
 
   &-rime-section {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 8px;
   }
 
@@ -2692,8 +2679,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-rime-items {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 4px;
   }
 
@@ -2703,7 +2689,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     align-items: center;
     padding: 6px 8px;
     background: $glass-light;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 12px;
@@ -2728,7 +2714,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     font-size: 11px;
     background: rgba(0, 0, 0, 0.05);
     padding: 2px 6px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     min-width: 24px;
     text-align: center;
   }
@@ -2752,8 +2738,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   &-modal-body {
     max-height: 60dvh;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 16px;
   }
 
@@ -2766,8 +2751,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-values-list {
     flex: 1;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 4px;
     max-height: 400px;
   }
@@ -2778,7 +2762,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     gap: 12px;
     padding: 10px 12px;
     background: $glass-light;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -2802,7 +2786,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
       @include flex-center;
       background: $glass-panel;
       border: 2px solid rgba(var(--color-primary-rgb), 0.3);
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       font-size: 12px;
       font-weight: 600;
       color: $primary;
@@ -2820,7 +2804,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
       color: $text-muted;
       background: rgba(0, 0, 0, 0.05);
       padding: 2px 8px;
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       flex-shrink: 0;
     }
   }
@@ -2839,8 +2823,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-work-area {
     flex: 1;
     height: 100%;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 12px;
     overflow: hidden;
   }
@@ -2889,7 +2872,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding: 10px 8px;
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     color: rgba(var(--text-deep-rgb), 0.7);
     font-size: 14px;
     font-weight: 500;
@@ -2912,8 +2895,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   &-view {
     flex: 1;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 12px;
     overflow: hidden;
   }
@@ -2964,8 +2946,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     bottom: 0;
     background: $glass-solid;
     backdrop-filter: blur(4px);
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: center;
     gap: 16px;
@@ -2986,7 +2967,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     gap: 4px;
     padding: 4px 10px;
     background: $primary-soft;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     font-size: 12px;
     color: $primary;
     font-weight: 500;
@@ -3107,9 +3088,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 .cell {
   padding: 10px 12px;
   text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   font-size: 13px;
   border-right: 1px solid var(--glass-10);
   overflow: hidden;
@@ -3151,7 +3130,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding: 4px 8px;
     background: $danger-soft;
     border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     font-size: 16px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -3182,8 +3161,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   &-panel {
     padding: 20px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 16px;
   }
 
@@ -3250,7 +3228,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-item {
     padding: 8px 12px;
     margin-bottom: 8px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     font-size: 13px;
     font-family: "SF Mono", Monaco, monospace;
 
@@ -3317,11 +3295,10 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     background: $glass-soft;
     backdrop-filter: blur(10px);
     border: 2px dashed rgba(var(--color-primary-rgb), 0.3);
-    border-radius: 24px;
+    border-radius: var(--radius-2xl);
     cursor: pointer;
     transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     gap: 12px;
 
@@ -3377,7 +3354,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-box {
     padding: 12px;
     background: $primary-soft;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     font-size: 12px;
     color: $text-muted;
   }
@@ -3387,8 +3364,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-group {
     margin-bottom: 16px;
     align-items: center;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
 
     label {
       display: block;
@@ -3452,7 +3428,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     code {
       background: $primary-soft;
       padding: 2px 6px;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       font-family: "SF Mono", Monaco, monospace;
       font-size: 11px;
     }
@@ -3472,7 +3448,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   .glass {
     &-container {
       padding: 20px 16px;
-      border-radius: 20px;
+      border-radius: var(--radius-xl);
     }
   }
 
@@ -3547,7 +3523,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   .upload {
     &-zone-drop {
       padding: 24px 20px;
-      border-radius: 20px;
+      border-radius: var(--radius-xl);
     }
 
     &-icon-large {
@@ -3707,7 +3683,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-container {
-      border-radius: 12px;
+      border-radius: var(--radius-md);
     }
   }
 
@@ -3726,7 +3702,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     &-dialog {
       width: calc(100vw - 20px);
       max-width: 100%;
-      border-radius: 16px;
+      border-radius: var(--radius-lg);
     }
   }
 

@@ -102,7 +102,7 @@ const formatValue = (value) => {
 .feature-type {
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .feature-type h4 {
@@ -113,8 +113,7 @@ const formatValue = (value) => {
 }
 
 .feature-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -123,7 +122,7 @@ const formatValue = (value) => {
   justify-content: space-between;
   padding: 8px 12px;
   background: var(--glass-50);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
 }
 
@@ -139,7 +138,7 @@ const formatValue = (value) => {
 .vector-visualization {
   padding: 20px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .vector-visualization h4 {
@@ -155,7 +154,7 @@ const formatValue = (value) => {
   gap: 2px;
   padding: 10px;
   background: var(--glass-50);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .vector-bar {

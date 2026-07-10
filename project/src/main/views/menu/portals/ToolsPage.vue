@@ -96,13 +96,12 @@ const handlePraatTables = () => {
   background: var(--glass-90);
   backdrop-filter: blur(10px);
   border: 2px solid rgba(var(--color-primary-rgb), 0.2);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 30px 20px;
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: center;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 12px;
 }

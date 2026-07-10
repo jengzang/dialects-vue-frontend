@@ -434,16 +434,14 @@ watch(showPartitionInfoModal, (isVisible) => {
 $warning-orange: var(--color-warning);
 $portrait-ratio: 1 / 1;.location-multi-input {
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 15px;
 }
 
 /* 输入区域 */
 .input-section {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 
   label {
@@ -503,7 +501,7 @@ $portrait-ratio: 1 / 1;.location-multi-input {
   appearance: none;
   background: var(--color-primary-light);
   border: 1px solid var(--color-primary-border2);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: var(--color-primary);
   white-space: nowrap;
   font-size: 12px;
@@ -527,9 +525,7 @@ $portrait-ratio: 1 / 1;.location-multi-input {
 .locations-inline {
   min-width: 0;
   max-width: 250px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 8px;
 }
 
@@ -538,7 +534,7 @@ $portrait-ratio: 1 / 1;.location-multi-input {
   padding: 2px 8px;
   background: var(--color-primary-light);
   border: 1px solid var(--color-primary-border);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: var(--color-primary);
   white-space: nowrap;
   font-size: 12px;
@@ -557,7 +553,7 @@ $portrait-ratio: 1 / 1;.location-multi-input {
   padding: 2px 10px;
   background: var(--color-primary-light);
   border: 1px solid var(--color-primary-border2);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: var(--color-primary);
   white-space: nowrap;
   font-size: 11px;
@@ -654,7 +650,7 @@ $portrait-ratio: 1 / 1;.location-multi-input {
   padding: 5px 10px;
   background: var(--glass-80);
   border: 1px solid var(--border-gray-light2);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   box-shadow: var(--shadow-sm2);
   color: var(--text-dark-lightest);
   font-size: 14px;

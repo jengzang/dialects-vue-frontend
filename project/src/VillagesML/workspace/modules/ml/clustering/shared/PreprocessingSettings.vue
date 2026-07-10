@@ -85,8 +85,7 @@ function updateSetting(key, value) {
 
 .setting-control {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
 }
 

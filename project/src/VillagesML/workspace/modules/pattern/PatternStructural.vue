@@ -156,7 +156,7 @@ const goToTendency = (pattern) => {
       0 8px 32px 0 rgba(var(--color-shadow-rgb), 0.1);    /* 外层淡淡的投影，增加悬浮感 */
 
   padding: 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   transition: all 0.3s ease;
 }
 
@@ -193,7 +193,7 @@ const goToTendency = (pattern) => {
   padding: 4px 12px;
   background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
 }
@@ -243,7 +243,7 @@ const goToTendency = (pattern) => {
   padding: 4px 12px;
   background: rgba(var(--color-success-rgb), 0.2);
   color: var(--color-success);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -259,7 +259,7 @@ const goToTendency = (pattern) => {
   background: rgba(var(--vml-blue-rgb), 0.1);
   color: var(--color-primary);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;

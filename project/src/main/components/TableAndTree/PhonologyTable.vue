@@ -435,7 +435,7 @@ $transition-duration: 0.25s;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   backdrop-filter: blur($button-blur) saturate(180%);
   -webkit-backdrop-filter: blur($button-blur) saturate(180%);
 }
@@ -725,7 +725,7 @@ $transition-duration: 0.25s;
   cursor: pointer;
   background: var(--glass-70);
   border: 1px solid var(--glass-60);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   backdrop-filter: blur($button-blur) saturate(180%);
   -webkit-backdrop-filter: blur($button-blur) saturate(180%);
   transition: all $transition-duration ease;

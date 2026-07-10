@@ -932,7 +932,7 @@ $primary: var(--color-primary);
 $error: var(--color-error);
 $text-primary: var(--color-text-primary);
 $text-secondary: var(--color-text-secondary);
-$white: #fff;
+$white: var(--text-white);
 
 $success: var(--color-success);
 $warning: var(--color-warning);
@@ -963,9 +963,7 @@ $transition-normal: 0.3s;
 }
 
 .panel-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 0.5rem;
   margin-bottom: 1rem;
   color: $text-primary;
@@ -1035,8 +1033,7 @@ $transition-normal: 0.3s;
 }
 
 .segments-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 1rem;
   max-height: 400px;
   padding-right: 0.25rem;
@@ -1159,9 +1156,7 @@ $transition-normal: 0.3s;
 
 .controls,
 .playback-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
 }
 
 .controls {
@@ -1169,14 +1164,12 @@ $transition-normal: 0.3s;
 }
 
 .control-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   width: 2rem;
   height: 2rem;
   background: var(--glass-60);
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   cursor: pointer;
   transition:
     background $transition-normal ease,
@@ -1193,9 +1186,7 @@ $transition-normal: 0.3s;
 }
 
 .time-display {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 0.25rem;
   min-width: 70px;
   color: $text-primary;
@@ -1209,8 +1200,7 @@ $transition-normal: 0.3s;
 
 /* 手动分段模式 */
 .manual-mode {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 1rem;
 }
 
@@ -1279,8 +1269,7 @@ $transition-normal: 0.3s;
   }
 
   &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    @include disabled-state;
     transform: none;
   }
 }
@@ -1306,8 +1295,7 @@ $transition-normal: 0.3s;
 }
 
 .regions-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.75rem;
   max-height: 20rem;
   overflow-y: auto;
@@ -1442,7 +1430,7 @@ $transition-normal: 0.3s;
     width: 2rem;
     height: 2rem;
     border: 1px solid rgba(128, 128, 128, 0.51);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     font-size: 0.9rem;
   }
 

@@ -503,8 +503,7 @@ $system-font:
   bottom: 1dvh;
   left: 2dvw;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   height: 78dvh;
   overflow: auto;
   resize: both;
@@ -547,7 +546,7 @@ $system-font:
   font-size: 12px;
   background: var(--glass-80);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 
 .reading-legend-title {
@@ -566,7 +565,7 @@ $system-font:
   flex-shrink: 0;
   width: 8px;
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 }
 
 .reading-legend-label {
@@ -588,7 +587,7 @@ $system-font:
   font-weight: bold;
   background: var(--glass-30);
   border-bottom: 1px solid rgba(204, 204, 204, 0.6);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   backdrop-filter: blur(2px);
   transition:
     background 0.3s ease,
@@ -697,9 +696,7 @@ $system-font:
 }
 
 .stickybar-filter-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   padding: 4px 12px;
   color: $primary-blue;
   font-weight: 500;
@@ -748,9 +745,7 @@ $system-font:
 .custom-switch-container {
   position: absolute;
   right: 5%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   font-family: "Arial", sans-serif;
   font-size: 16px;
   transform: translateX(-50%);

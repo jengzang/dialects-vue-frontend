@@ -77,7 +77,7 @@ $gradient-variants: (
   font-weight: 600;
   cursor: pointer;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all $transition-duration ease;
 

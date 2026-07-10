@@ -283,7 +283,7 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);/*
     $gold-glow,
     transparent
   );
-  border-radius: 50%;
+  border-radius: var(--radius-full);
 }
 
 .notice-icon {
@@ -331,7 +331,7 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);/*
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 
   @include glass-blur(20px);
 }
@@ -392,7 +392,7 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);/*
   font-weight: 600;
   cursor: pointer;
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   transition:
     transform $button-transition-duration ease,
     box-shadow $button-transition-duration ease,

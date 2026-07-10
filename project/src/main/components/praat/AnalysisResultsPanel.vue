@@ -819,14 +819,12 @@ $transition-normal: 0.3s;
 }
 
 .charts-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: $section-spacing;
 }
 
 .chart-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   margin-top: $section-spacing;
 }
@@ -855,8 +853,7 @@ $transition-normal: 0.3s;
 }
 
 .quality-card {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.75rem;
   padding: $card-padding;
   text-align: center;
@@ -891,11 +888,11 @@ $transition-normal: 0.3s;
   height: 8px;
   overflow: hidden;
   background: $border-light;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 
   .quality-fill {
     height: 100%;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     transition:
       width 0.5s ease,
       background-color $transition-normal ease;
@@ -910,9 +907,7 @@ $transition-normal: 0.3s;
 
 /* 频谱图占位区域 */
 .spectrogram-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   width: $chart-width;
   height: 300px;
   background: var(--glass-30);
@@ -921,8 +916,7 @@ $transition-normal: 0.3s;
 }
 
 .placeholder-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 1rem;
   text-align: center;
@@ -939,7 +933,7 @@ $transition-normal: 0.3s;
   border: none;
   border-radius: var(--radius-2xl);
   box-shadow: 0 4px 12px $blue-shadow;
-  color: #fff;
+  color: var(--text-white);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;

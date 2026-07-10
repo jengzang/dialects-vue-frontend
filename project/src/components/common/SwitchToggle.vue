@@ -225,7 +225,7 @@ $transition-ease: ease;
 .switch-toggle__thumb {
   position: absolute;
   background: $thumb-background;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: transform $transition-duration $transition-ease;
 }

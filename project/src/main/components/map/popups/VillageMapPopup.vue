@@ -123,7 +123,7 @@ const getTagColor = (text) => {
 }
 
 const buildTag = (text, bgColor) =>
-  `<span style="display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:500;color:var(--text-medium);background:${bgColor};margin-top:2px">${text}</span>`
+  `<span style="display:inline-block;padding:1px 8px;border-radius: var(--radius-md);font-size:10px;font-weight:500;color:var(--text-medium);background:${bgColor};margin-top:2px">${text}</span>`
 
 const buildHoverHtml = (name, pathStr, tagText, tagColor) => {
   let html = `<div style="text-align:center"><strong>${name}</strong></div>`
@@ -633,8 +633,7 @@ $success: var(--color-success);/* 地图容器 */
   width: 90vw;
   max-width: 1200px;
   height: 80dvh;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   overflow: hidden;
   background: linear-gradient(
     145deg,
@@ -642,7 +641,7 @@ $success: var(--color-success);/* 地图容器 */
     var(--glass-90)
   );
   border: 1px solid var(--glass-50);
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.25),
     0 8px 16px rgba(0, 0, 0, 0.15);
@@ -682,7 +681,7 @@ $success: var(--color-success);/* 地图容器 */
   flex-shrink: 0;
   padding: 6px 12px;
   background: rgba(var(--color-success-rgb), 0.15);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: $success;
   white-space: nowrap;
   font-size: 13px;
@@ -703,12 +702,11 @@ $success: var(--color-success);/* 地图容器 */
   right: 16px;
   z-index: 10;
   min-width: 140px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   padding: 12px;
   background: var(--glass-90);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
   @include glass-blur(12px);
@@ -721,9 +719,9 @@ $success: var(--color-success);/* 地图容器 */
 .toggle-display-btn {
   width: 100%;
   padding: 8px 12px;
-  background: #fff;
+  background: var(--bg-white);
   border: 1px solid var(--border-light-gray);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: var(--text-dark)
   white-space: nowrap;
   font-size: 13px;
@@ -747,8 +745,8 @@ $success: var(--color-success);/* 地图容器 */
   padding: 8px 12px;
   background: $primary;
   border: none;
-  border-radius: 8px;
-  color: #fff;
+  border-radius: var(--radius-sm2);
+  color: var(--text-white);
   white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
@@ -769,7 +767,7 @@ $success: var(--color-success);/* 地图容器 */
   padding: 10px 20px;
   background: var(--glass-90);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   color: $text-dark;
   font-size: 14px;
@@ -781,7 +779,7 @@ $success: var(--color-success);/* 地图容器 */
   transition: all 0.2s;
 
   &:hover {
-    background: #fff;
+    background: var(--bg-white);
     transform: scale(1.05);
   }
 }
@@ -791,7 +789,7 @@ $success: var(--color-success);/* 地图容器 */
   padding: 2px 4px;
   background: transparent;
   border: 0.7px solid #000;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
   color: #000;
   white-space: nowrap;
@@ -804,7 +802,7 @@ $success: var(--color-success);/* 地图容器 */
 :deep(.maplibregl-popup-content) {
   padding: 10px 12px;
   background: var(--glass-90);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   color: var(--text-dark)
   font-size: 13px;
@@ -823,7 +821,7 @@ $success: var(--color-success);/* 地图容器 */
   .map-modal-container {
     width: 95vw;
     height: 85dvh;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .map-popup-header {

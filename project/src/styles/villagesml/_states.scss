@@ -1,9 +1,9 @@
+@use '@/styles/global/mixins' as *;
 // VillagesML 状态占位（替代原 _workspace.scss）
 // loading spinner 统一使用 global/_loading.scss 的 .ui-loading--page
 
 .vml-loading {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -11,8 +11,7 @@
 }
 
 .vml-empty {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -21,8 +20,7 @@
 }
 
 .vml-error {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -38,7 +36,7 @@
   margin-bottom: 16px;
   background: rgba(var(--color-warning-rgb), 0.15);
   border: 1px solid rgba(var(--color-warning-rgb), 0.3);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   color: var(--color-warning-dark);
   font-weight: 500;
@@ -53,8 +51,7 @@
 // 全局 empty-state（通过 .villagesml-module 祖先选择器覆盖所有 scoped 组件）
 // 原在 _workspace.scss，删除该文件时遗漏，此处补回
 .villagesml-module .empty-state {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   text-align: center;

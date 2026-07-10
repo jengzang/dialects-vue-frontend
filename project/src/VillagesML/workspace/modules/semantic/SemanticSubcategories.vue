@@ -633,8 +633,7 @@ export default {
 
 
 .query-form {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 
 .query-form h3 {
@@ -665,7 +664,7 @@ export default {
 .vml-number-input {
   width: 100%;
   padding: 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   background: var(--glass-80);
   transition: border-color 0.3s ease;
 }
@@ -708,7 +707,7 @@ export default {
   background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--vml-blue);
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
 }
@@ -756,7 +755,7 @@ export default {
   background: rgba(var(--vml-blue-rgb), 0.1);
   color: var(--color-primary, var(--vml-blue));
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -815,7 +814,7 @@ tr.significant {
 
 .tendency-badge {
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
 }
@@ -832,7 +831,7 @@ tr.significant {
 
 .rank-badge {
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   font-size: 14px;
   color: white;

@@ -462,7 +462,7 @@ onBeforeUnmount(() => {
   flex: 1;
   padding: 10px 16px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   background: var(--glass-50);
 }
@@ -483,7 +483,7 @@ onBeforeUnmount(() => {
 .stat-card {
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   text-align: center;
 }
 
@@ -507,7 +507,7 @@ onBeforeUnmount(() => {
 }
 
 .aggregates-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   min-width: 600px;
 }
@@ -551,12 +551,10 @@ onBeforeUnmount(() => {
 
 .category-badge {
   padding: 2px 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   font-size: 11px;
   font-weight: 600;
   cursor: help;
@@ -568,7 +566,7 @@ onBeforeUnmount(() => {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -591,7 +589,7 @@ onBeforeUnmount(() => {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -601,8 +599,7 @@ onBeforeUnmount(() => {
 }
 
 .pagination button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .regional-detail-title {
@@ -612,8 +609,7 @@ onBeforeUnmount(() => {
 }
 
 .detail-info {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   margin-bottom: 24px;
 }
@@ -623,7 +619,7 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .info-label {
@@ -647,8 +643,7 @@ onBeforeUnmount(() => {
 }
 
 .chart-bars {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
@@ -668,7 +663,7 @@ onBeforeUnmount(() => {
 .bar-container {
   height: 24px;
   background: var(--glass-50);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -700,7 +695,7 @@ onBeforeUnmount(() => {
 .stat-item {
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   text-align: center;
 }
 

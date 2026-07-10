@@ -145,8 +145,7 @@ $shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.15);
 $transition-duration: 0.3s;
 
 .home-support-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 24px;
 }
 
@@ -163,15 +162,14 @@ $transition-duration: 0.3s;
 }
 
 .donate-qr-box {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
 
   img {
     width: 100%;
     max-width: 150px;
     height: auto;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     box-shadow: $shadow-default;
     cursor: pointer;
     transition:
@@ -194,8 +192,7 @@ $transition-duration: 0.3s;
 }
 
 .donor-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 

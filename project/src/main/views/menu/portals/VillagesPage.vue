@@ -95,15 +95,14 @@ const handleAllVillages = () => {
 .village-btn {
   padding: 24px 16px;
   border: 2px solid var(--glass-40);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   background: linear-gradient(145deg, var(--glass-30), var(--glass-20));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 12px;
   text-align: center;

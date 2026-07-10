@@ -58,8 +58,7 @@ $system-font:
 /* 页面背景 */
 .explore-layout {
   min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: flex-start;
   box-sizing: border-box;

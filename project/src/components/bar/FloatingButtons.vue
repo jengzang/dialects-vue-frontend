@@ -194,8 +194,7 @@ $transition-base: 0.3s ease;
   right: 30px;
   bottom: 30px;
   z-index: 998;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 
   @media (max-aspect-ratio: 1/1) {
@@ -212,7 +211,7 @@ $transition-base: 0.3s ease;
   font-size: 24px;
   cursor: pointer;
   user-select: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   transition: all $transition-base;
 
   @include flex-center;

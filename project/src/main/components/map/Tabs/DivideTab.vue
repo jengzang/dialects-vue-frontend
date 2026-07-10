@@ -377,8 +377,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
 /* 全部数据模式 */
 .all-data-toggle-row,
 .all-data-mode-panel {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 2px;
   margin-top: 14px;
@@ -419,9 +418,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
 
 /* 横向下拉区域 */
 .horizontal-dropdown {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   justify-items: center;
   gap: 6px;
   width: 100%;
@@ -498,9 +495,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
 
 /* 运行按钮 */
 .allmap-first {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   background: linear-gradient(90deg, var(--color-primary), mediumblue);
   border: none;
   border-radius: 30px;

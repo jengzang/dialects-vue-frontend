@@ -196,7 +196,7 @@ $transition-fast: 0.2s;
     padding-right: 8px;
     padding-left: 8px;
     background: $primary-background-light;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
   }
 
   .info-label {
@@ -235,7 +235,7 @@ $transition-fast: 0.2s;
   border: 1px solid $border-strong;
   border-spacing: 0;
   border-collapse: separate;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 13px;
 
   th,

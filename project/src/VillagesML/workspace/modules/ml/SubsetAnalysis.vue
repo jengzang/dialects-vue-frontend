@@ -1255,7 +1255,7 @@ const handleApiError = (error) => {
   padding: 12px 20px;
   background: rgba(var(--color-error-rgb), 0.1);
   border: 2px solid rgba(var(--color-error-rgb), 0.3);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   color: var(--color-error);
   font-weight: 500;
 }
@@ -1338,7 +1338,7 @@ const handleApiError = (error) => {
   padding: 10px 16px;
   background: var(--glass-50);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   transition: all 0.3s ease;
 }
@@ -1376,7 +1376,7 @@ const handleApiError = (error) => {
   margin-top: 20px;
   padding: 16px;
   background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.12), rgba(91, 163, 245, 0.08));
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.25);
 }
 
@@ -1412,7 +1412,7 @@ const handleApiError = (error) => {
   padding: 20px;
   background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
   backdrop-filter: blur(10px);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   transition: all 0.3s ease;
 }
@@ -1430,8 +1430,7 @@ const handleApiError = (error) => {
 }
 
 .subset-stats {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   margin-bottom: 20px;
 }
@@ -1478,7 +1477,7 @@ const handleApiError = (error) => {
   padding: 20px;
   background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
   backdrop-filter: blur(10px);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   text-align: center;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   transition: all 0.3s ease;
@@ -1511,7 +1510,7 @@ const handleApiError = (error) => {
   width: 100%;
   height: 400px;
   margin-bottom: 24px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -1521,7 +1520,7 @@ const handleApiError = (error) => {
   min-width: 600px;
   border-collapse: collapse;
   margin-top: 16px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -1596,13 +1595,12 @@ const handleApiError = (error) => {
   align-items: flex-start;
   padding: 12px;
   background: rgba(var(--vml-blue-rgb), 0.05);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .feature-checkboxes {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   margin-top: 8px;
 }
@@ -1613,7 +1611,7 @@ const handleApiError = (error) => {
   gap: 8px;
   padding: 8px 12px;
   background: var(--glass-50);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   transition: all 0.2s ease;
   max-width: 100%;
@@ -1646,7 +1644,7 @@ const handleApiError = (error) => {
 .stat-card {
   padding: 16px;
   background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   text-align: center;
   transition: all 0.3s ease;
@@ -1680,7 +1678,7 @@ const handleApiError = (error) => {
 .cluster-card {
   padding: 16px;
   background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   transition: all 0.3s ease;
 }
@@ -1712,8 +1710,7 @@ const handleApiError = (error) => {
 }
 
 .cluster-samples {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -1734,7 +1731,7 @@ const handleApiError = (error) => {
   padding: 4px 10px;
   background: rgba(var(--vml-blue-rgb), 0.1);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   color: var(--text-primary);
   transition: all 0.2s ease;
@@ -1754,8 +1751,7 @@ const handleApiError = (error) => {
   bottom: 0;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(8px);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   z-index: 9999;
@@ -1949,7 +1945,7 @@ const handleApiError = (error) => {
   padding: 12px 16px;
   background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.08), rgba(91, 163, 245, 0.05));
   border-left: 3px solid var(--vml-blue);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   margin-bottom: 16px;
 }
 
@@ -1971,7 +1967,7 @@ const handleApiError = (error) => {
   margin: 20px 0;
   padding: 16px;
   background: rgba(var(--vml-blue-rgb), 0.05);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 /* Category Cell */
@@ -1987,7 +1983,7 @@ const handleApiError = (error) => {
   margin-bottom: 24px;
   padding: 20px;
   background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
@@ -2010,7 +2006,7 @@ const handleApiError = (error) => {
   gap: 12px;
   padding: 12px 16px;
   background: rgba(var(--vml-blue-rgb), 0.05);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.15);
   transition: all 0.3s ease;
 }
@@ -2029,8 +2025,7 @@ const handleApiError = (error) => {
 
 .timing-info {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
@@ -2080,7 +2075,7 @@ const handleApiError = (error) => {
   margin-top: 24px;
   padding: 20px;
   background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
@@ -2106,8 +2101,7 @@ const handleApiError = (error) => {
 }
 
 .spatial-stats {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -2117,7 +2111,7 @@ const handleApiError = (error) => {
   align-items: center;
   padding: 8px 12px;
   background: rgba(var(--vml-blue-rgb), 0.05);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .stat-label {
@@ -2140,7 +2134,7 @@ const handleApiError = (error) => {
   gap: 12px;
   padding: 16px;
   background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.15), rgba(91, 163, 245, 0.1));
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
 }
 

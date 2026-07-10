@@ -168,7 +168,7 @@ h2 {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -181,8 +181,7 @@ h2 {
 }
 
 .load-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 
@@ -204,7 +203,7 @@ h2 {
 .hotspot-card {
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.3s ease;
   border: 2px solid transparent;
@@ -236,15 +235,14 @@ h2 {
   padding: 4px 12px;
   background: rgba(var(--color-warning-rgb), 0.2);
   color: var(--color-warning-dark);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .hotspot-info {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -266,7 +264,7 @@ h2 {
 .hotspot-detail {
   padding: 12px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .hotspot-detail h3 {
@@ -289,7 +287,7 @@ h2 {
 .stat-card {
   padding: 16px;
   background: var(--glass-50);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   text-align: center;
 }
 

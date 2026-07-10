@@ -49,8 +49,7 @@ $mobile-gap: 10px;
 
 /* 苹果液态玻璃风格确认对话框 */
 .confirm-header {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: $desktop-gap;
   align-items: center;
   width: 100%;

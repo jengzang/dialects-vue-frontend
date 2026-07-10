@@ -521,7 +521,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
   user-select: none;
   background-color: $white;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: all $transition-fast $standard-easing;
 
@@ -593,8 +593,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
 }
 
 .profile-user-meta {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: flex-start;
   text-align: left;
   white-space: nowrap;
@@ -743,8 +742,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
 }
 
 .metric-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   text-align: left;
 }
 

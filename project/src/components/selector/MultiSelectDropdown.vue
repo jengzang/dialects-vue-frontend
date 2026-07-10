@@ -261,15 +261,14 @@ $transition-fast: 0.2s;/*
 }
 
 .dropdown-panel {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   min-width: 80px;
   max-width: 300px;
   padding: 6px 0;
   overflow: hidden;
   background: var(--glass-90);
   border: 1px solid rgba(var(--color-silver-rgb), 0.3);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 
   @include glass-blur(12px);
@@ -286,7 +285,7 @@ $transition-fast: 0.2s;/*
   font-size: 13px;
   background: var(--glass-90);
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   outline: none;
 
   &:focus {

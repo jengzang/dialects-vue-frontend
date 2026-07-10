@@ -1,3 +1,4 @@
+@use '@/styles/global/mixins' as *;
 .main-glass-panel {
   --main-glass-panel-background: var(--glass-60);
   --main-glass-panel-backdrop-filter: blur(18px) saturate(145%);
@@ -69,8 +70,7 @@
 }
 
 .main-data-card {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: flex-start;
   gap: var(--main-data-card-gap, 8px);
   padding: var(--main-data-card-padding, 18px);

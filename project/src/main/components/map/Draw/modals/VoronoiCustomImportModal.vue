@@ -243,8 +243,7 @@ function confirmImport() {
 
 <style scoped lang="scss">
 .voronoi-custom-import-modal {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 1rem;
 }
 
@@ -278,7 +277,7 @@ function confirmImport() {
   display: inline-flex;
   align-items: center;
   padding: 0.32rem 0.75rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--glass-70);
   border: 1px solid var(--glass-80);
   color: rgba(var(--text-deep-rgb), 0.72);
@@ -294,8 +293,7 @@ function confirmImport() {
 
 .voronoi-custom-import-modal__upload-block,
 .voronoi-custom-import-modal__mode-block {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.55rem;
 }
 
@@ -320,7 +318,7 @@ function confirmImport() {
   display: inline-flex;
   align-items: center;
   padding: 0.35rem 0.7rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 0.8rem;
   border: 1px solid transparent;
 }

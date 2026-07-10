@@ -1694,9 +1694,7 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: 0;
   z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   padding: 1.5rem;
   background: rgba(var(--color-shadow-rgb), 0.24);
   backdrop-filter: blur(10px);
@@ -1704,13 +1702,12 @@ onBeforeUnmount(() => {
 
 .voronoi-export-progress-panel {
   min-width: min(92vw, 320px);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 0.8rem;
   padding: 1.2rem 1.4rem;
   text-align: center;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   box-shadow: 0 20px 48px rgba(var(--color-shadow-rgb), 0.18);
 }
 
@@ -1730,7 +1727,7 @@ onBeforeUnmount(() => {
   align-items: center;
   min-height: 2.5rem;
   padding: 0 0.95rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: linear-gradient(145deg, var(--glass-80), rgba(232, 244, 255, 0.72));
   border: 1px solid var(--glass-70);
   color: var(--text-deep);
@@ -1756,8 +1753,7 @@ onBeforeUnmount(() => {
 
 /* Modal Choices Styles */
 .draw-modal-choices {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 1rem;
   padding: 0.5rem 0;
 }
@@ -1784,8 +1780,7 @@ onBeforeUnmount(() => {
 }
 
 .draw-modal-card-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .draw-card-icon {
@@ -1794,8 +1789,7 @@ onBeforeUnmount(() => {
 }
 
 .draw-card-text {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.25rem;
 }
 
@@ -1813,7 +1807,7 @@ onBeforeUnmount(() => {
 .draw-text-input {
   width: 100%;
   padding: 0.6rem 0.85rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(var(--text-slate-light-rgb), 0.32);
   background: var(--glass-80);
   color: var(--text-deep);
@@ -1840,14 +1834,13 @@ onBeforeUnmount(() => {
 }
 
 .auth-warning-card {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   width: 100%;
   max-width: 360px;
   padding: 30px;
   border: 1px solid var(--glass-60);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   background: var(--glass-40);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -1883,8 +1876,7 @@ onBeforeUnmount(() => {
 @media (max-width: 900px) {
   .draw-tab-header,
   .draw-tool-section-header {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
   }
 
   .draw-toolbar--header {
@@ -1903,8 +1895,7 @@ onBeforeUnmount(() => {
   }
 
   .draw-workbench {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 0.9rem;
     overflow: visible;
   }

@@ -98,7 +98,7 @@ const parseSequence = (sequence) => {
   justify-content: space-between;
   padding: 10px;
   background: var(--glass-30);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .info-label {
@@ -115,7 +115,7 @@ const parseSequence = (sequence) => {
   margin-bottom: 6px;
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .section h4 {
@@ -135,14 +135,13 @@ const parseSequence = (sequence) => {
   padding: 6px 16px;
   background: var(--color-primary);
   color: white;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   font-size: 14px;
   font-weight: 500;
 }
 
 .label-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -151,7 +150,7 @@ const parseSequence = (sequence) => {
   justify-content: space-between;
   padding: 10px 14px;
   background: var(--glass-50);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .label-name {
@@ -164,21 +163,19 @@ const parseSequence = (sequence) => {
   color: var(--text-secondary);
   padding: 2px 10px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .composition-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
 }
 
 .composition-item {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   padding: 12px;
   background: var(--glass-50);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .comp-pattern {

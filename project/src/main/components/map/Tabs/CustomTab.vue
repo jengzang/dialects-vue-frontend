@@ -678,9 +678,7 @@ const openEntryModal = () => {
 }
 
 .page-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   width: 100%;
   gap: 12px;
 }
@@ -694,7 +692,7 @@ const openEntryModal = () => {
 .action-btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -712,8 +710,7 @@ const openEntryModal = () => {
   }
 
   &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    @include disabled-state;
     transform: none;
   }
 }
@@ -730,7 +727,7 @@ const openEntryModal = () => {
 .add-entry-btn-sm {
   padding: 10px 20px;
   border: none;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   background: linear-gradient(
     135deg,
     rgba(var(--color-primary-rgb), 0.9),
@@ -759,15 +756,13 @@ const openEntryModal = () => {
 }
 
 .help-icon-head {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   width: auto;
   min-width: 24px;
   height: 24px;
   padding: 0 10px;
   border: 1px solid var(--glass-50);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: linear-gradient(
     145deg,
     var(--glass-90),
@@ -812,14 +807,13 @@ const openEntryModal = () => {
 }
 
 .auth-warning-card {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   width: 100%;
   max-width: 360px;
   padding: 30px;
   border: 1px solid var(--glass-60);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   background: var(--glass-40);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -853,8 +847,7 @@ const openEntryModal = () => {
 }
 
 .interactive-search-layout {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-self: stretch;
   gap: 12px;
   width: 100%;
@@ -863,9 +856,7 @@ const openEntryModal = () => {
 }
 
 .custom-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 12px;
   width: 100%;
   min-width: 0;
@@ -879,7 +870,7 @@ const openEntryModal = () => {
   min-width: 0;
   padding: 5px 12px;
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 700;
   line-height: 1.35;
@@ -921,7 +912,7 @@ const openEntryModal = () => {
   height: 40px;
   overflow: hidden;
   border: 1px solid var(--glass-70);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--glass-70);
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
@@ -996,7 +987,7 @@ const openEntryModal = () => {
   padding: 12px;
   overflow-y: auto;
   border: 1px solid var(--glass-40);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   background: $glass-white;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -1006,8 +997,7 @@ const openEntryModal = () => {
 
 .tree-loading-state,
 .tree-empty-state {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   min-height: 160px;
@@ -1055,23 +1045,21 @@ const openEntryModal = () => {
 
 .inline-btn {
   padding: 6px 16px !important;
-  border-radius: 16px !important;
+  border-radius: var(--radius-lg) !important;
   font-size: 13px !important;
 }
 
 .tree-categories-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
 }
 
 .tree-category-node {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   justify-content: center;
   overflow: hidden;
   border: 1px solid var(--glass-40);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--glass-40);
   transition: $motion-fast;
 
@@ -1117,7 +1105,7 @@ const openEntryModal = () => {
 
 .category-count-badge {
   padding: 1.5px 6px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: rgba(var(--color-primary-rgb), 0.08);
   color: $primary;
   font-size: 10px;
@@ -1134,14 +1122,13 @@ const openEntryModal = () => {
 }
 
 .feature-leaf-node {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: flex-start;
   justify-content: space-between;
   min-height: 52px;
   padding: 10px 12px;
   border: 1px solid var(--glass-60);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--glass-80);
   font-family: inherit;
   text-align: left;
@@ -1190,7 +1177,7 @@ const openEntryModal = () => {
   gap: 5px;
   padding: 6px 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   background: none;
   color: $primary;
   font-size: 13px;
@@ -1227,8 +1214,7 @@ const openEntryModal = () => {
   }
 
   .tree-panel {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 10px;
   }
 

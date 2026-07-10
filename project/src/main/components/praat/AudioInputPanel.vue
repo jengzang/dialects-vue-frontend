@@ -518,8 +518,7 @@ $transition-duration: 0.3s;
     }
 
     &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+      @include disabled-state;
     }
 
     .record-icon {
@@ -544,8 +543,7 @@ $transition-duration: 0.3s;
   padding: 0.8rem;
 
   .file-details {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 0.25rem;
   }
 

@@ -245,9 +245,7 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   position: fixed;
   inset: 0;
   z-index: var(--app-modal-z-index, 20000);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   padding: 18px;
   overscroll-behavior: contain;
   background: rgba(0, 0, 0, 0.4);
@@ -303,8 +301,7 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .panel {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   width: var(--modal-width);
   max-height: var(--modal-max-height);
   overflow: hidden;
@@ -344,7 +341,7 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   -webkit-overflow-scrolling: touch;
 
   @include scrollbars.visible-scrollbar;

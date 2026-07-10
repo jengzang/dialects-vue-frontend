@@ -7,7 +7,7 @@
 .vml-number-input {
   padding: 10px 16px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   background: var(--glass-50);
   color: var(--text-primary);
@@ -34,7 +34,7 @@
 .vml-search-field {
   padding: 10px 16px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   background: var(--glass-50);
   backdrop-filter: blur(10px);
@@ -76,7 +76,7 @@
 .vml-char-input {
   padding: 10px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 16px;
   text-align: center;
   background: var(--glass-50);

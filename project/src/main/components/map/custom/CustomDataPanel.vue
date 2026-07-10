@@ -373,7 +373,7 @@ const resetForm = () => {
   );
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-radius: 20px 0 0 20px;
+  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
   box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.15),
       inset 0 0 0 0.5px var(--glass-50);
@@ -397,15 +397,13 @@ const resetForm = () => {
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   color: white;
   border: none;
-  border-radius: 12px 0 0 12px;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
   font-size: 24px;
   font-weight: bold;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
   transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   z-index: 10000; /* 比面板高一层 */
 }
 
@@ -436,8 +434,7 @@ const resetForm = () => {
 
 /* 表单样式 */
 .data-form {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;              /* 增加间距以容纳 hint */
 }
 
@@ -469,7 +466,7 @@ const resetForm = () => {
   flex: 1;               /* 占据剩余空间 */
   padding: 8px 10px;     /* 略微减小 padding 以适应更紧凑的布局 */
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   background: var(--glass-80);
   transition: all 0.3s ease;
@@ -513,7 +510,7 @@ const resetForm = () => {
   overflow-y: auto;
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   margin-top: 4px;
@@ -538,7 +535,7 @@ const resetForm = () => {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -563,7 +560,7 @@ const resetForm = () => {
   .custom-data-panel {
     width: calc(100vw - 80px);
     max-width: none;
-    border-radius: 16px 0 0 16px;
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
     top: 40%;
   }
 
@@ -583,7 +580,7 @@ const resetForm = () => {
     width: 40px;
     height: 40px;
     font-size: 20px;
-    border-radius: 10px 0 0 10px;
+    border-radius: var(--radius-md) 0 0 10px;
     top: 40%;
   }
 

@@ -333,13 +333,12 @@ onMounted(async () => {
   padding: 10px 14px;
   background: rgba(var(--vml-blue-rgb), 0.08);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.25);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 13px;
 }
 
 .banner-item {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   padding: 0 14px;
 }
@@ -377,7 +376,7 @@ onMounted(async () => {
 .pattern-input {
   padding: 10px 16px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   background: var(--glass-50);
 }
@@ -394,11 +393,11 @@ onMounted(async () => {
 .frequency-results-wrapper {
   overflow-x: auto;
   width: 100%;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .frequency-results {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   min-width: 600px;
   width: 100%;
@@ -463,7 +462,7 @@ onMounted(async () => {
 
 .position-badge {
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 11px;
   font-weight: 500;
   display: inline-block;
@@ -492,7 +491,7 @@ onMounted(async () => {
 .bar-container {
   height: 20px;
   background: var(--glass-50);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -503,30 +502,28 @@ onMounted(async () => {
 }
 
 .pattern-results {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   justify-content: center;
 }
 
 .pattern-count {
   padding: 12px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   margin-bottom: 16px;
   color: var(--text-primary);
   font-weight: 500;
 }
 
 .pattern-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
 .pattern-item {
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: grid;
   grid-template-columns: 150px 100px 100px 1fr;
   gap: 16px;
@@ -569,13 +566,13 @@ onMounted(async () => {
   padding: 4px 12px;
   background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
 }
 
 .type-badge {
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 11px;
   font-weight: 500;
   display: inline-block;

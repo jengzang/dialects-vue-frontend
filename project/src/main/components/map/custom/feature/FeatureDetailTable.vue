@@ -438,8 +438,7 @@ watch(
 @use '@/styles/main/_surfaces.scss';
 
 .feature-detail-table {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: $spacing-lg;
 }
 
@@ -451,8 +450,7 @@ watch(
 }
 
 .feature-detail-heading {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: $spacing-xs;
   flex: 1;
 }
@@ -489,8 +487,7 @@ watch(
 
 // -- States --
 .feature-detail-state {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: $radius-md;
   align-items: center;
   justify-content: center;
@@ -504,8 +501,7 @@ watch(
 
 // -- Table body --
 .feature-detail-table-body {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: $spacing-sm;
 }
 

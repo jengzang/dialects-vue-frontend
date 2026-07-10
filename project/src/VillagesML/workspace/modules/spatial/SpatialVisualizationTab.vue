@@ -684,7 +684,7 @@ h2 {
   width: 280px;
   background: var(--glass-80);
   backdrop-filter: blur(12px);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 16px;
   overflow-y: auto;
   transition: width 0.3s ease;
@@ -702,7 +702,7 @@ h2 {
   right: 8px;
   background: rgba(var(--vml-blue-rgb), 0.1);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 4px 8px;
   cursor: pointer;
   font-size: 14px;
@@ -715,8 +715,7 @@ h2 {
 }
 
 .panel-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
@@ -738,8 +737,7 @@ h2 {
 
 /* 圖層複選框 */
 .layer-checkboxes {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -749,7 +747,7 @@ h2 {
   gap: 8px;
   cursor: pointer;
   padding: 6px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: background 0.2s;
 }
 
@@ -777,7 +775,7 @@ h2 {
 .filter-input{
   padding: 8px 12px;
   border: 1px solid var(--border-light-gray);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   outline: none;
   transition: border 0.3s;
@@ -794,7 +792,7 @@ h2 {
   margin-top: 12px;
   padding: 8px;
   background: rgba(var(--vml-blue-rgb), 0.05);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   line-height: 1.4;
 }
 
@@ -805,7 +803,7 @@ h2 {
   background: var(--vml-blue);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -825,12 +823,11 @@ h2 {
 .legend-section {
   background: rgba(var(--vml-blue-rgb), 0.05);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .legend-items {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -845,14 +842,14 @@ h2 {
 .legend-color {
   width: 16px;
   height: 16px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   flex-shrink: 0;
 }
 
 .legend-gradient {
   width: 40px;
   height: 16px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   background: linear-gradient(to right, var(--color-primary), var(--text-white), var(--color-error-light));
   flex-shrink: 0;
 }
@@ -861,12 +858,11 @@ h2 {
 .stats-section {
   background: rgba(var(--color-success-rgb), 0.05);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .stats-items {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -888,7 +884,7 @@ h2 {
 /* 地圖面板 */
 .map-panel {
   flex: 1;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: 0 4px 20px var(--bg-hover-strong);
 }
@@ -896,11 +892,9 @@ h2 {
 .map-placeholder {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .map-placeholder p {

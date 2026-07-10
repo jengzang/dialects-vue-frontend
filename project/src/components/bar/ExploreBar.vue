@@ -484,7 +484,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);@mixin glass-control {
   cursor: pointer;
   user-select: none;
   background: var(--glass-10);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   transition: all 0.25s ease;
 
   &:hover {
@@ -526,7 +526,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);@mixin glass-control {
   min-width: 5dvh;
   height: 6dvh;
   cursor: pointer;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   transition: all $transition-base ease;
 
   @include flex-center;
@@ -666,7 +666,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);@mixin glass-control {
     var(--glass-90)
   );
   border: 1px solid var(--glass-50);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow:
     inset 0 0 0.5px var(--glass-30),
     0 12px 40px rgba(0, 0, 0, 0.2),
@@ -688,7 +688,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);@mixin glass-control {
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   transition: all $transition-fast $submenu-easing;
 
   &:hover {

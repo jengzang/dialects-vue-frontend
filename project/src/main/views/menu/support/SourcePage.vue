@@ -114,7 +114,7 @@ $transition-duration: 0.3s;
 .setting-section {
   padding: 24px;
   background: var(--glass-90);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -139,8 +139,7 @@ $transition-duration: 0.3s;
 
 .language-options,
 .mode-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
@@ -154,7 +153,7 @@ $transition-duration: 0.3s;
   cursor: pointer;
   background: var(--glass-80);
   border: 2px solid $border-color;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   transition: all $transition-duration ease;
 
   &:hover {

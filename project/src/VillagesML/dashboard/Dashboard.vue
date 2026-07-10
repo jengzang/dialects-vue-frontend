@@ -339,7 +339,7 @@ onMounted(() => {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -359,7 +359,7 @@ onMounted(() => {
   margin-bottom: 20px;
   background: rgba(var(--color-warning-rgb), 0.12);
   border: 1px solid rgba(var(--color-warning-rgb), 0.4);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   color: var(--text-primary);
 }
@@ -370,8 +370,7 @@ onMounted(() => {
 }
 
 .notice-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
@@ -431,7 +430,7 @@ onMounted(() => {
   flex: 1;
   padding: 12px 20px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 16px;
   background: var(--glass-50);
   transition: all 0.3s ease;
@@ -448,7 +447,7 @@ onMounted(() => {
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
@@ -472,8 +471,7 @@ onMounted(() => {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 
 .feature-card:hover {
@@ -513,7 +511,7 @@ onMounted(() => {
 .feature-badge {
   display: inline-block;
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
   flex-shrink: 0; /* Don't shrink badge */
@@ -551,8 +549,7 @@ onMounted(() => {
 }
 
 .github-row {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 10px;
   margin-top: 4px;
@@ -568,7 +565,7 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   padding: 9px 22px;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   background: rgba(var(--text-deep-rgb), 0.08);
   border: 1px solid rgba(var(--text-deep-rgb), 0.2);
   color: var(--text-primary);

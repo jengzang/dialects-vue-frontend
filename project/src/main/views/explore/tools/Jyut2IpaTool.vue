@@ -844,8 +844,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   position: relative;
   width: min(95dvw, 800px);
   padding: 40px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   overflow: hidden;
 }
 
@@ -877,7 +876,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   background: var(--glass-50);
   @include glass-blur;
   border: 1px solid var(--glass-50);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -890,16 +889,14 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
 .upload {
   &-area {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     justify-content: center;
     align-items: center;
     gap: 24px;
   }
 
   &-zone {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: center;
     gap: 16px;
@@ -907,7 +904,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     background: var(--glass-40);
     @include glass-blur;
     border: 2px dashed rgba(var(--color-primary-rgb), 0.3);
-    border-radius: 24px;
+    border-radius: var(--radius-2xl);
     cursor: pointer;
     transition: all 0.3s ease;
 
@@ -965,14 +962,13 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     background: var(--glass-50);
     @include glass-blur;
     border: 1px solid var(--glass-60);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
   }
 
   &-section {
     width: 100%;
     max-width: 600px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 24px;
   }
 
@@ -1010,8 +1006,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 .processing-area,
 .complete-area {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   gap: 20px;
@@ -1021,9 +1016,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   &-icon {
     width: 80px;
     height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
   }
 
   &-title {
@@ -1044,7 +1037,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     gap: 24px;
     padding: 20px 32px;
     background: var(--glass-40);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -1072,8 +1065,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   &-bar-container {
     width: 100%;
     max-width: 400px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 8px;
   }
 
@@ -1082,7 +1074,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     height: 12px;
     overflow: hidden;
     background: var(--glass-50);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
   }
 
   &-fill {
@@ -1092,7 +1084,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
       rgba(var(--color-primary-rgb), 0.8),
       rgba(0, 195, 255, 0.8)
     );
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     transition: width 0.3s ease;
   }
 
@@ -1145,15 +1137,14 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
   &-card {
     min-width: 120px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     gap: 8px;
     padding: 24px 32px;
     background: var(--glass-50);
     @include glass-blur;
     border: 1px solid var(--glass-60);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
   }
 
   &-number {
@@ -1198,7 +1189,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     max-height: 200px;
     overflow: auto;
     background: var(--glass-40);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   &-table {
@@ -1344,7 +1335,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     margin-bottom: 16px;
     overflow: hidden;
     background: var(--glass-30);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   &-table {
@@ -1388,7 +1379,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   padding: 6px 10px;
   background: var(--glass-80);
   border: 1px solid rgba(var(--color-primary-rgb), 0.15);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-family: 'Courier New', monospace;
   font-size: 13px;
   transition: all 0.2s ease;
@@ -1405,7 +1396,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 .category-badge {
   display: inline-block;
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
   font-size: 11px;
   font-weight: 600;
@@ -1437,7 +1428,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     padding: 5px 10px;
     background: rgba(var(--color-error-light-rgb), 0.1);
     border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     font-size: 13px;
     color: $color-danger;
     cursor: pointer;
@@ -1460,7 +1451,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
       rgba(var(--color-success-rgb), 0.5)
     );
     border: 1px solid rgba(var(--color-success-rgb), 0.5);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-size: 15px;
     font-weight: 600;
     color: white;
@@ -1486,7 +1477,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   padding: 0;
   background: var(--glass-50);
   border: 1px solid var(--glass-50);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1506,7 +1497,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     background: var(--glass-50);
     @include glass-blur(20px);
     border: 1px solid var(--glass-70);
-    border-radius: 24px;
+    border-radius: var(--radius-2xl);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1535,8 +1526,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
   &-content {
     flex: 1;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 6px;
   }
 
@@ -1567,7 +1557,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     width: 100%;
     min-height: auto;
     padding: 20px 16px;
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
   }
 
   .header-section {
@@ -1721,7 +1711,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
   .rules {
     &-table-container {
-      border-radius: 12px;
+      border-radius: var(--radius-md);
     }
 
     &-table {

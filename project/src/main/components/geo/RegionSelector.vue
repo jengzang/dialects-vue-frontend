@@ -951,7 +951,7 @@ $portrait-ratio: 1 / 1;/* 选择框 */
 
   background: var(--glass-50);
   border: 1px solid rgba(160, 160, 160, 0.22);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 
   color: rgba(25, 25, 25, 0.86);
@@ -971,7 +971,7 @@ $portrait-ratio: 1 / 1;/* 选择框 */
   height: 18px;
   background: rgba(0, 0, 0, 0.06);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
 }
 
@@ -991,8 +991,7 @@ $portrait-ratio: 1 / 1;/* 选择框 */
   position: sticky;
   top: 0;
   z-index: 20010;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: flex-start;
   justify-content: space-between;
   gap: 6px;
@@ -1064,7 +1063,7 @@ $portrait-ratio: 1 / 1;/* 选择框 */
   gap: 6px;
   padding: 6px 12px;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
@@ -1124,7 +1123,7 @@ $portrait-ratio: 1 / 1;/* 选择框 */
   padding: 8px 12px;
   background: rgba(var(--color-primary-rgb), 0.85);
   border: 1px solid rgba(var(--color-primary-rgb), 0.35);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 10px 26px rgba(var(--color-primary-rgb), 0.18);
   color: var(--text-white);
   font-size: 13px;
@@ -1154,13 +1153,12 @@ $portrait-ratio: 1 / 1;/* 选择框 */
   z-index: 20020;
   min-width: 80px;
   max-width: 140px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   padding: 8px;
 
   background: var(--glass-40);
   border: 1px solid var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   user-select: none;
 
   &.partition-lvl2,
@@ -1177,7 +1175,7 @@ $portrait-ratio: 1 / 1;/* 选择框 */
   justify-content: space-between;
   gap: 8px;
   padding: 3px 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   cursor: default;
   transition:
     background 0.2s,
@@ -1210,12 +1208,10 @@ $portrait-ratio: 1 / 1;/* 选择框 */
 
 .partition-arrow {
   flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   padding: 0 6px;
 
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: rgba(0, 0, 139, 0.85);
   font-size: 13px;
   font-weight: 700;
@@ -1261,7 +1257,7 @@ $portrait-ratio: 1 / 1;/* 选择框 */
   padding: 10px 24px;
   background: linear-gradient(135deg, $primary, $primary-dark);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: var(--text-white);
   font-size: 14px;
   font-weight: 500;
@@ -1275,8 +1271,7 @@ $portrait-ratio: 1 / 1;/* 选择框 */
 }
 
 .region-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
@@ -1284,7 +1279,7 @@ $portrait-ratio: 1 / 1;/* 选择框 */
   padding: 16px;
   background: var(--glass-90);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -1316,7 +1311,7 @@ $portrait-ratio: 1 / 1;/* 选择框 */
   padding: 10px 24px;
   background: var(--glass-90);
   border: 1px solid rgba(var(--color-primary-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: $primary;
   font-size: 14px;
   font-weight: 500;

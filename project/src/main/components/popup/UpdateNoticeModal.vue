@@ -256,7 +256,7 @@ $transition-button: 0.25s;
   display: flex;
   align-items: center;
   padding: 0.5rem 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: $text-secondary-strong;
   font-size: 0.9375rem;
   cursor: pointer;

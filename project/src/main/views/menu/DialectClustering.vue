@@ -113,8 +113,7 @@ const {
 
 
 .dialect-clustering-page {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 20px;
   padding: 16px;
   min-height: 100%;
@@ -162,8 +161,7 @@ const {
   }
 
   .workspace-stage-shell {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 20px;
   }
 
@@ -195,7 +193,7 @@ const {
     gap: 10px;
     border: 1px solid rgba(var(--color-primary-rgb), 0.18);
     background: var(--glass-70);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     padding: 10px 14px;
     color: var(--text-dark);
     cursor: not-allowed;
@@ -217,7 +215,7 @@ const {
     justify-content: center;
     width: 24px;
     height: 24px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: rgba(var(--color-primary-rgb), 0.12);
     font-size: 12px;
     font-weight: 700;
@@ -238,8 +236,7 @@ const {
   .groups-stack,
   .result-stack,
   .advanced-stack {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 20px;
   }
 
@@ -295,8 +292,7 @@ const {
   }
 
   .field {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 8px;
   }
 
@@ -321,8 +317,7 @@ const {
 
   .source-section {
     margin-top: 16px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 14px;
   }
 
@@ -333,8 +328,7 @@ const {
   }
 
   .preview-box {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 10px;
     padding: 12px;
     border-radius: 14px;
@@ -349,7 +343,7 @@ const {
 
   .preview-chip {
     padding: 6px 10px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: rgba(var(--color-primary-rgb), 0.12);
     color: var(--color-primary);
     font-size: 13px;
@@ -368,8 +362,7 @@ const {
   }
 
   .summary-card {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 10px;
   }
 
@@ -406,7 +399,7 @@ const {
 
   .status-badge {
     padding: 6px 10px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     font-size: 13px;
     font-weight: 700;
   }
@@ -489,8 +482,7 @@ const {
   }
 
   .performance-list {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 10px;
     margin-top: 12px;
   }
@@ -503,8 +495,7 @@ const {
   }
 
   .task-status-card {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 12px;
   }
 
@@ -517,7 +508,7 @@ const {
   .progress-track {
     flex: 1;
     height: 10px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: rgba(var(--text-slate-light-rgb), 0.22);
     overflow: hidden;
   }

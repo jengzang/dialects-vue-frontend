@@ -156,7 +156,7 @@ function levelColor(level, clusterId) {
 .metric-card {
   padding: 14px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   text-align: center;
 }
 
@@ -190,7 +190,7 @@ function levelColor(level, clusterId) {
   align-items: center;
   gap: 8px;
   padding: 6px 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   transition: background 0.15s;
 }
 
@@ -241,7 +241,7 @@ function levelColor(level, clusterId) {
 
 .cluster-badge {
   padding: 2px 8px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: white;
   font-size: 11px;
   font-weight: 700;
@@ -260,9 +260,7 @@ function levelColor(level, clusterId) {
 }
 
 .empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   min-height: 300px;
   color: var(--text-secondary);
   gap: 8px;

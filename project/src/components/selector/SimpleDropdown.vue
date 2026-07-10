@@ -330,7 +330,7 @@ $transition-fast: 0.2s;
   font-size: 13px;
   background: var(--glass-90);
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   outline: none;
 
   &:focus {

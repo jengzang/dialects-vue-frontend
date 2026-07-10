@@ -740,7 +740,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   margin: 0 auto;
   overflow-x: hidden;
   background: linear-gradient(135deg, var(--bg-body) 0%, var(--bg-light-gray) 100%);
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
   box-shadow: 0 8px 32px rgba(var(--color-primary-rgb), 0.12);
 }
 
@@ -851,7 +851,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   gap: 0.5rem;
   padding: 0.875rem 2rem;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -937,7 +937,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   overflow: hidden;
   background: var(--glass-70);
   border: 1px solid rgba(var(--color-primary-rgb), 0.15);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.08);
   animation: cardFadeIn 0.4s ease backwards;
   transition: all 0.25s ease;
@@ -1030,7 +1030,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       rgba(var(--color-primary-rgb), 0.1) 0%,
       rgba(var(--color-primary-hover-rgb), 0.15) 100%
     );
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     font-size: 2rem;
     transition: transform 0.25s ease;
 
@@ -1063,8 +1063,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-body {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 0.5rem;
     padding: 0 1.25rem 1.25rem;
     transform-origin: top;
@@ -1077,7 +1076,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   height: 32px;
   background: rgba(var(--color-primary-rgb), 0.1);
   border: 2px solid $primary;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   color: $primary;
   font-size: 1.25rem;
   font-weight: 600;
@@ -1100,7 +1099,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   padding: 0.75rem 1rem;
   background: var(--glass-80);
   border: 1px solid rgba(var(--color-primary-rgb), 0.1);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   color: inherit;
   text-decoration: none;
@@ -1187,7 +1186,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       var(--glass-50) 0%,
       rgba(240, 248, 255, 0.6) 100%
     );
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
   }
 
   &-list {
@@ -1200,14 +1199,13 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-item {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 0.5rem;
     padding: 0.875rem 1rem;
     background: var(--glass-60);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(var(--color-primary-rgb), 0.12);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     transition: all 0.3s ease;
 
     &:hover {
@@ -1233,7 +1231,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       rgba(var(--color-primary-rgb), 0.08) 0%,
       rgba(var(--color-primary-hover-rgb), 0.12) 100%
     );
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     font-size: 1.25rem;
 
     @include flex-center;
@@ -1313,7 +1311,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     width: 36px;
     height: 36px;
     background: rgba(var(--color-primary-rgb), 0.1);
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
 
     @include flex-center;
 
@@ -1362,7 +1360,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       rgba(var(--color-primary-hover-rgb), 0.08) 100%
     );
     border: 1px solid rgba(var(--color-primary-rgb), 0.2);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     transition: all 0.25s ease;
 
     &:hover {
@@ -1402,7 +1400,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     @include primary-gradient;
 
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.25);
     color: white;
     font-size: 0.9375rem;
@@ -1440,7 +1438,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     );
     backdrop-filter: blur(20px);
     border: 1.5px solid rgba(var(--color-primary-rgb), 0.2);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.1);
     transition: all 0.3s $ease-apple;
 
@@ -1483,15 +1481,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-actions {
     flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 0.75rem;
   }
 
   &-btn {
     padding: 0.875rem 1.75rem;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     white-space: nowrap;
     font-size: 0.9375rem;
     font-weight: 600;
@@ -1533,7 +1530,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     gap: 0.5rem;
     padding: 0.625rem 0.875rem;
     background: var(--glass-60);
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     font-size: 0.875rem;
     font-weight: 500;
     color: $text-primary;
@@ -1570,7 +1567,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-link {
     padding: 0.25rem 0.5rem;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     color: $primary;
     font-size: 0.9375rem;
     font-weight: 500;
@@ -1596,9 +1593,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     gap: 1rem;
 
     &-secondary {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      @include flex-center;
       flex-wrap: nowrap;
       gap: 1rem 3rem;
       margin-top: -0.2rem;
@@ -1606,8 +1601,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-info {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 0.375rem;
   }
 
@@ -1633,8 +1627,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 .home-support {
   &-shell {
     position: relative;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     height: calc(
       100% +
       var(--modal-content-padding-top) +
@@ -1671,15 +1664,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-box {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
 
     img {
       width: 100%;
       max-width: 150px;
       height: auto;
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       cursor: pointer;
       transition: all 0.3s ease;

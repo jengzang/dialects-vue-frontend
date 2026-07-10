@@ -160,16 +160,13 @@ export default {
   position: fixed;
   inset: 0;
   z-index: 9998;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   background: rgba(var(--bg-blue-tint-rgb), 0.55);
   pointer-events: none;
 }
 
 .global-route-loading-shell {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 12px;
 }

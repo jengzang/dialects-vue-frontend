@@ -675,8 +675,7 @@ $white: var(--text-white);
 $transition-fast: 0.2s;
 $transition-base: 0.3s;
 .glass-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   width: 90dvw;
   max-width: 1400px;
   height: 90dvh;
@@ -687,7 +686,7 @@ $transition-base: 0.3s;
   @media (max-aspect-ratio: 1/1) {
     width: 92dvw;
     height: 88dvh;
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
   }
 }
 
@@ -803,7 +802,7 @@ $transition-base: 0.3s;
   overflow-x: auto;
   background: var(--glass-50);
   border: 1px solid var(--glass-60);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
@@ -851,7 +850,7 @@ $transition-base: 0.3s;
     $primary-blue-dark 100%
   );
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
   transition: all $transition-fast;
 
@@ -874,7 +873,7 @@ $transition-base: 0.3s;
   cursor: pointer;
   background: rgba(var(--color-primary-rgb), 0.05);
   border: 1px solid rgba(var(--color-primary-rgb), 0.3);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   transition: all $transition-fast;
 
   &:hover:not(:disabled) {
@@ -897,7 +896,7 @@ $transition-base: 0.3s;
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   transition: all $transition-fast ease;
 
   &:hover:not(:disabled) {
@@ -920,14 +919,14 @@ $transition-base: 0.3s;
   color: $primary-blue;
   font-size: 14px;
   background: rgba(var(--color-primary-rgb), 0.05);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .city-error {
   padding: 16px;
   background: rgba(var(--color-error-rgb), 0.05);
   border: 1px solid rgba(var(--color-error-rgb), 0.2);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .error-text {
@@ -953,13 +952,13 @@ $transition-base: 0.3s;
 .retry-btn {
   padding: 10px 24px;
   font-size: 15px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .retry-btn-small {
   padding: 6px 14px;
   font-size: 13px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .tree-container {

@@ -1,3 +1,4 @@
+@use '@/styles/global/mixins' as *;
 // VillagesML 布局
 
 .vml-page {
@@ -17,8 +18,7 @@
 }
 
 .vml-settings-form {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 

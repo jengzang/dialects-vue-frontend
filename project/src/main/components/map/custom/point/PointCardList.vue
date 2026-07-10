@@ -87,8 +87,7 @@ const filteredItems = computed(() => {
 @use '@/styles/main/_surfaces.scss';
 
 .point-card-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 18px;
 }
 
@@ -101,8 +100,7 @@ const filteredItems = computed(() => {
 }
 
 .point-card-heading {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 
   .point-card-title {
@@ -146,7 +144,7 @@ const filteredItems = computed(() => {
 }
 
 .skeleton-line {
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: linear-gradient(90deg, rgba(var(--text-slate-light-rgb), 0.9), $bg-light, rgba(var(--text-slate-light-rgb), 0.9));
   background-size: 200% 100%;
   animation: shimmer 1.2s linear infinite;

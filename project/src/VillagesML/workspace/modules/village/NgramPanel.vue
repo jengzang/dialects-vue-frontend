@@ -122,7 +122,7 @@ const parseTrigrams = (trigrams) => {
   justify-content: space-between;
   padding: 10px;
   background: var(--glass-30);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .info-label {
@@ -139,7 +139,7 @@ const parseTrigrams = (trigrams) => {
   margin-bottom: 6px;
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .ngram-section h4 {
@@ -157,7 +157,7 @@ const parseTrigrams = (trigrams) => {
 
 .ngram-item {
   padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 15px;
   font-weight: 500;
   transition: transform 0.3s ease;
@@ -188,16 +188,15 @@ const parseTrigrams = (trigrams) => {
   gap: 12px;
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .stat-item {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   padding: 12px;
   background: var(--glass-50);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .stat-label {

@@ -63,15 +63,14 @@ const algorithmHint = computed(() => {
 
 .setting-control {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
 }
 
 .setting-select {
   padding: 0.5rem;
   border: 1px solid var(--bg-hover-strong);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   background: var(--glass-90);
   font-size: 0.95rem;
   cursor: pointer;

@@ -95,7 +95,7 @@ $glass-blur: 12px;
   font-size: 16px;
   background: var(--glass-30);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   outline: none;
   box-shadow:
     inset 0 0 1px var(--glass-40),

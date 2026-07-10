@@ -112,8 +112,7 @@ function handleClose(value = false) {
 @use '../../_map-variables' as *;
 
 .voronoi-export-modal {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 14px;
 }
 
@@ -139,8 +138,7 @@ function handleClose(value = false) {
 
   .summary-item {
     flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 2px;
   }
 
@@ -228,7 +226,7 @@ function handleClose(value = false) {
   font-weight: 700;
   line-height: 1;
   padding: 9px 14px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   box-shadow: 0 8px 18px rgba(var(--color-error-light-rgb), 0.14);
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
@@ -253,8 +251,7 @@ function handleClose(value = false) {
 }
 
 .scope-panel {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
   min-height: 240px;
   max-height: 360px;
@@ -268,8 +265,7 @@ function handleClose(value = false) {
 }
 
 .voronoi-export-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -278,7 +274,7 @@ function handleClose(value = false) {
   align-items: flex-start;
   gap: 10px;
   padding: 12px 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid $muted-hover;
   background: $glass-heavy;
 

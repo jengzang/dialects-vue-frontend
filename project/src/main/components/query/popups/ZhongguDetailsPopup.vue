@@ -57,8 +57,7 @@ $item-padding-bottom: 16px;
 $header-gap: 10px;
 
 .zhonggu-modal-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: $content-gap;
 
   .full-item {
@@ -87,7 +86,7 @@ $header-gap: 10px;
   .count-badge {
     padding: 2px 8px;
     background: $accent-background;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     color: $accent-color;
     font-size: 12px;
   }

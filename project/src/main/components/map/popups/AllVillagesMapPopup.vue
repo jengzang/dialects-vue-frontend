@@ -122,7 +122,7 @@ const buildTag = (text, bgColor) => {
   const r = parseInt(bgColor.slice(1, 3), 16)
   const g = parseInt(bgColor.slice(3, 5), 16)
   const b = parseInt(bgColor.slice(5, 7), 16)
-  return `<span style="display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:500;color:var(--text-dark);background:rgba(${r},${g},${b},0.2);margin-top:2px">${text}</span>`
+  return `<span style="display:inline-block;padding:1px 8px;border-radius: var(--radius-md);font-size:10px;font-weight:500;color:var(--text-dark);background:rgba(${r},${g},${b},0.2);margin-top:2px">${text}</span>`
 }
 
 const buildHoverHtml = (name, pathStr, tagText, tagColor) => {
@@ -545,8 +545,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   width: 90vw;
   max-width: 1200px;
   height: 80dvh;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   overflow: hidden;
   background: linear-gradient(
     145deg,
@@ -554,7 +553,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
     var(--glass-90)
   );
   border: 1px solid var(--glass-50);
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.25),
     0 8px 16px rgba(0, 0, 0, 0.15);
@@ -594,7 +593,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   flex-shrink: 0;
   padding: 6px 12px;
   background: rgba(var(--color-success-rgb), 0.15);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: var(--color-success);
   white-space: nowrap;
   font-size: 13px;
@@ -615,12 +614,11 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   right: 16px;
   z-index: 10;
   min-width: 140px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   padding: 12px;
   background: var(--glass-90);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
   @include glass-blur(12px);
@@ -633,9 +631,9 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
 .toggle-display-btn {
   width: 100%;
   padding: 8px 12px;
-  background: #fff;
+  background: var(--bg-white);
   border: 1px solid var(--border-light-gray);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: var(--text-dark)
   white-space: nowrap;
   font-size: 13px;
@@ -659,8 +657,8 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   padding: 8px 12px;
   background: $primary;
   border: none;
-  border-radius: 8px;
-  color: #fff;
+  border-radius: var(--radius-sm2);
+  color: var(--text-white);
   white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
@@ -681,7 +679,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   padding: 10px 20px;
   background: var(--glass-90);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   color: $text-dark;
   font-size: 14px;
@@ -693,7 +691,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   transition: all 0.2s;
 
   &:hover {
-    background: #fff;
+    background: var(--bg-white);
     transform: scale(1.05);
   }
 }
@@ -702,7 +700,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
 :deep(.maplibregl-popup-content) {
   padding: 10px 12px;
   background: var(--glass-90);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   color: var(--text-dark)
   font-size: 13px;
@@ -721,7 +719,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   .map-modal-container {
     width: 95vw;
     height: 85dvh;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .map-popup-header {

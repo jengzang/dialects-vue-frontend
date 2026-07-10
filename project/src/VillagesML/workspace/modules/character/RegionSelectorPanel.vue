@@ -85,8 +85,7 @@ const handleAnalyze = () => {
 }
 
 .analyze-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .selector-wrapper {

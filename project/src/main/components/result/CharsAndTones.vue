@@ -545,7 +545,7 @@ onMounted(() => {
   font-size: 18px;
   background: var(--glass-05);
   border: 2px solid var(--glass-10);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 24px var(--bg-hover);
   backdrop-filter: blur(8px);
 
@@ -567,7 +567,7 @@ $glass-blur: 8px;
   max-height: calc(100% - 70px);
   padding: 20px;
   overflow-y: auto;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   scroll-behavior: smooth;
 }
 
@@ -605,7 +605,7 @@ $glass-blur: 8px;
   font-size: 12px;
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0.8);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transform: translate(-50%, -100%);
   animation: fadeInCentered $transition-fast ease-out;
@@ -632,14 +632,13 @@ $glass-blur: 8px;
   top: 50%;
   right: 18px;
   z-index: 9998;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   align-items: center;
   padding: 10px 7px;
   background: var(--glass-60);
   border: 1px solid var(--glass-60);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   box-shadow:
     inset 0 0 1px var(--glass-50),
     0 8px 24px rgba(0, 0, 0, 0.12);
@@ -665,7 +664,7 @@ $glass-blur: 8px;
   cursor: pointer;
   background: var(--glass-60);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   transition:
     transform 0.18s ease,
     color 0.18s ease,
@@ -704,9 +703,7 @@ $glass-blur: 8px;
 }
 
 .info-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   padding: 8px 5px;
 }
 
@@ -787,7 +784,7 @@ $glass-blur: 8px;
   cursor: pointer;
   background: rgba(var(--color-primary-rgb), 0.04);
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: all $transition-fast ease;
 
   &:hover {
@@ -808,7 +805,7 @@ $glass-blur: 8px;
   text-align: center;
   background: rgba(var(--color-error-light-rgb), 0.1);
   border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .syllables {
@@ -880,9 +877,7 @@ $glass-blur: 8px;
   top: 0;
   left: 0;
   z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   width: 100%;
   height: 100%;
   background: white;
@@ -895,15 +890,12 @@ $glass-blur: 8px;
 }
 
 .bouncing-wrapper {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
 }
 
 .bouncing-loader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   margin-bottom: 16px;
 
   > div {
@@ -911,7 +903,7 @@ $glass-blur: 8px;
     height: 14px;
     margin: 4px;
     background: var(--text-slate-light);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
     animation: bouncing 0.6s infinite ease-in-out;
 
@@ -978,7 +970,7 @@ $glass-blur: 8px;
     content: attr(data-title);
     pointer-events: none;
     background-color: var(--text-dark);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     opacity: 0;
     transform: translateX(-50%);
     transition:

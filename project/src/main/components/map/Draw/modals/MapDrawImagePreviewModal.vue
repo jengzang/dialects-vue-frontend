@@ -833,8 +833,7 @@ onBeforeUnmount(() => {
 @use '../../_map-variables' as *;
 
 .image-export-preview-modal {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 14px;
 }
 
@@ -850,8 +849,7 @@ onBeforeUnmount(() => {
 
   .summary-item {
     min-width: 0;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 4px;
   }
 
@@ -889,8 +887,7 @@ onBeforeUnmount(() => {
 }
 
 .image-export-preview-sidebar {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
 
   .sidebar-title {
@@ -923,7 +920,7 @@ onBeforeUnmount(() => {
   .image-export-preview-map {
     width: 100%;
     min-height: 420px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
 
     @media (max-width: 900px) {

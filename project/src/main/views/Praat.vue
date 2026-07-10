@@ -931,8 +931,7 @@ onBeforeUnmount(() => {
   margin: 0 auto;
   padding: 0;
   position: relative;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   justify-content: center;
   align-items: center;
   height: 95dvh;
@@ -1003,14 +1002,13 @@ onBeforeUnmount(() => {
 }
 
 .tab-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
   padding: 4px;
   background: var(--glass-80);
   backdrop-filter: blur(60px) saturate(200%);
   -webkit-backdrop-filter: blur(60px) saturate(200%);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--glass-40);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
               inset 0 1px 0 var(--glass-60);
@@ -1024,7 +1022,7 @@ onBeforeUnmount(() => {
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.01em;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
@@ -1115,8 +1113,7 @@ onBeforeUnmount(() => {
 }
 
 .start-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
   filter: grayscale(0.8); /* 让颜色变灰，提示不可用 */
   box-shadow: none;
 }
@@ -1221,7 +1218,7 @@ onBeforeUnmount(() => {
   max-width: calc(100vw - 30px);
 
   /* 1. 圆角：苹果风格的核心，大圆角才会显得圆润 */
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
 
   /* 2. 背景：降低透明度，让底色更透 */
   background: var(--glass-40);
@@ -1240,8 +1237,7 @@ onBeforeUnmount(() => {
   border: none;
 
   z-index: 1000;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   overflow: hidden;
   transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
@@ -1401,16 +1397,14 @@ onBeforeUnmount(() => {
 
 
 .loading-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   text-align: center;
   padding: 2rem 0;
 }
 
 .error-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   text-align: center;
   padding: 2rem 0;
@@ -1452,8 +1446,7 @@ onBeforeUnmount(() => {
 .loading-progress {
   width: 100%;
   max-width: 400px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
 }
 
@@ -1461,14 +1454,14 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 8px;
   background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--color-primary), var(--color-cyan));
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   transition: width 0.3s ease;
 }
 
@@ -1481,8 +1474,7 @@ onBeforeUnmount(() => {
 
 /* No Results State */
 .no-results-state {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   padding: 4rem 2rem;

@@ -1,0 +1,30 @@
+// Shared keyframes — auto-injected into every SCSS block via Vite additionalData
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popup-bounce-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0) scale(0.8);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(10px) scale(1.05);
+  }
+
+  100% {
+    transform: translateX(-50%) translateY(20px) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}

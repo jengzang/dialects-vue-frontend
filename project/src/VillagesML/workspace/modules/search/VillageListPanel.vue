@@ -142,8 +142,7 @@ const changePage = (page) => {
 }
 
 .results-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
@@ -202,7 +201,7 @@ const changePage = (page) => {
 .analyze-button {
   padding: 6px 12px;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
   font-size: 12px;
@@ -227,7 +226,7 @@ const changePage = (page) => {
 .page-button {
   padding: 8px 16px;
   border: 1px solid var(--glass-30);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 13px;
@@ -241,8 +240,7 @@ const changePage = (page) => {
 }
 
 .page-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .page-info {

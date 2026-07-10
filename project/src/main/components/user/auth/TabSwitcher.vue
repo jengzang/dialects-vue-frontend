@@ -41,7 +41,7 @@ $mobile-aspect-ratio: 1 / 1;
   padding: 4px;
   background-color: $switcher-background;
   border: 1px solid $border-color;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 
   @media (max-aspect-ratio: $mobile-aspect-ratio) {
@@ -58,7 +58,7 @@ $mobile-aspect-ratio: 1 / 1;
   appearance: none;
   background: none;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   transition: all $transition-duration ease;
 
   &:hover {

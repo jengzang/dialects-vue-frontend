@@ -56,7 +56,7 @@ const legendItems = computed(() => {
   background: var(--glass-90);
   backdrop-filter: blur(10px);
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
 }
@@ -69,8 +69,7 @@ const legendItems = computed(() => {
 }
 
 .legend-items {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -83,7 +82,7 @@ const legendItems = computed(() => {
 .legend-color {
   width: 16px;
   height: 16px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   border: 2px solid white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }

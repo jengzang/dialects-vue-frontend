@@ -356,7 +356,7 @@ const handleQuickAdjust = (action) => {
 .metric-card {
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   text-align: center;
 }
 
@@ -388,7 +388,7 @@ const handleQuickAdjust = (action) => {
 .profile-card {
   padding: 16px;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border-left: 4px solid;
 }
 
@@ -401,7 +401,7 @@ const handleQuickAdjust = (action) => {
 
 .cluster-badge {
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   color: white;
   font-size: 13px;
   font-weight: 600;
@@ -427,7 +427,7 @@ const handleQuickAdjust = (action) => {
 .region-tag {
   padding: 4px 10px;
   background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 12px;
   color: var(--text-primary);
 }
@@ -436,7 +436,7 @@ const handleQuickAdjust = (action) => {
   padding: 4px 10px;
   background: rgba(var(--vml-blue-rgb), 0.15);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 12px;
   color: var(--vml-blue);
   font-weight: 500;
@@ -473,7 +473,7 @@ const handleQuickAdjust = (action) => {
 .table-container {
   overflow: auto;
   background: var(--glass-30);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 16px;
   max-height: 500px;
 }
@@ -515,9 +515,7 @@ const handleQuickAdjust = (action) => {
 }
 
 .empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   min-height: 300px;
   color: var(--text-secondary);
 }
@@ -526,7 +524,7 @@ const handleQuickAdjust = (action) => {
 .param-suggestion-alert {
   padding: 16px 20px;
   margin-bottom: 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border-left: 4px solid;
   background: var(--glass-40);
   backdrop-filter: blur(10px);
@@ -575,7 +573,7 @@ const handleQuickAdjust = (action) => {
   font-weight: 500;
   background: rgba(var(--vml-blue-rgb), 0.15);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;

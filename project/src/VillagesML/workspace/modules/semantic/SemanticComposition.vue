@@ -130,8 +130,7 @@ const translatePattern = (patternStr) => {
 .patterns-section {
   padding: 16px;
   margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
 }
 
@@ -155,8 +154,7 @@ const translatePattern = (patternStr) => {
 }
 
 .input-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
@@ -177,7 +175,7 @@ const translatePattern = (patternStr) => {
 }
 
 .patterns-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow-x: auto;
   overflow-y: visible;
   width: 100%;
@@ -223,7 +221,7 @@ const translatePattern = (patternStr) => {
 
 .component-tag {
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;

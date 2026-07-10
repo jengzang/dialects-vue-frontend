@@ -1,10 +1,11 @@
+@use '@/styles/global/mixins' as *;
 .main-glass-button {
   padding: var(--main-glass-button-padding, 12px 32px);
   background: var(--glass-50);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   border: 1px solid var(--glass-40);
-  border-radius: var(--main-glass-button-border-radius, 16px);
+  border-radius: var(--main-glass-button-border-radius, var(--radius-lg));
   color: var(--text-deep);
   font-size: var(--main-glass-button-font-size, 15px);
   font-weight: var(--main-glass-button-font-weight, 500);
@@ -85,8 +86,7 @@
 }
 
 .glass-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .run-container {

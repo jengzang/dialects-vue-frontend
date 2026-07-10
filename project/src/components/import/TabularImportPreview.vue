@@ -314,8 +314,7 @@ $panel-gap: 16px;
 $section-gap: 12px;
 
 @mixin flex-column {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 .tabular-import-preview {
   @include flex-column;
@@ -523,8 +522,7 @@ $section-gap: 12px;
   }
 
   &__diagnostics {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 8px;
   }
 
@@ -575,7 +573,7 @@ $section-gap: 12px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
 }
 

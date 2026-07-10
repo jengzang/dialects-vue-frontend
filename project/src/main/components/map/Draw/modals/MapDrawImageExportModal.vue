@@ -275,8 +275,7 @@ watch(
 @use '../../_map-variables' as *;
 
 .image-export-modal {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 14px;
 }
 
@@ -288,8 +287,7 @@ watch(
 
   .summary-item {
     min-width: 0;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 4px;
   }
 
@@ -356,8 +354,7 @@ watch(
 
 .scope-selection-copy {
   min-width: 0;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 2px;
 
   .scope-selection-title {
@@ -373,8 +370,7 @@ watch(
 }
 
 .draw-field {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 
   .draw-field-label {
@@ -388,7 +384,7 @@ watch(
 .draw-text-input {
   width: 80%;
   padding: 0.6rem 0.85rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid $muted-ring;
   background: $glass-strong;
   color: $deep-blue;
@@ -405,8 +401,7 @@ watch(
 }
 
 .image-export-layer-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   max-height: 220px;
   overflow-y: auto;

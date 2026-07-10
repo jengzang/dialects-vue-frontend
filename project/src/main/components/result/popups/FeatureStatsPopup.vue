@@ -140,15 +140,14 @@ $transition-duration: 0.2s;
 }
 
 .stats-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
 .stat-item {
   overflow: hidden;
   border: 1px solid $border-color;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   transition:
     border-color $transition-duration ease,
     box-shadow $transition-duration ease;

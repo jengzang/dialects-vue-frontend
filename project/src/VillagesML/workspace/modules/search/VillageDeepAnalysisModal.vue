@@ -201,7 +201,7 @@ const loadCompleteData = async () => {
   margin-bottom: 24px;
   padding: 16px;
   background: var(--glass-60);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -228,8 +228,7 @@ const loadCompleteData = async () => {
 
 /* Analysis Panels */
 .analysis-panels {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 

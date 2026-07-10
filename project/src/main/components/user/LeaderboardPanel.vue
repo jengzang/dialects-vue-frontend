@@ -676,7 +676,7 @@ $bronze: var(--color-bronze);
   background: $primary;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 16px;
   transition: all 0.3s ease;
@@ -726,7 +726,7 @@ $bronze: var(--color-bronze);
     background: var(--glass-70);
     @include glass;
     border: 0.5px solid var(--glass-80);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     box-shadow:
       0 1px 2px rgba(0, 0, 0, 0.04),
       0 8px 32px rgba(0, 0, 0, 0.08),
@@ -839,7 +839,7 @@ $bronze: var(--color-bronze);
   background: var(--glass-70);
   @include glass;
   border: 0.5px solid var(--glass-80);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 8px 32px rgba(0, 0, 0, 0.08),
@@ -850,7 +850,7 @@ $bronze: var(--color-bronze);
   overflow: hidden;
   background: var(--glass-50);
   backdrop-filter: blur(20px);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: inset 0 0 0 1px var(--glass-60);
 }
 
@@ -1140,7 +1140,7 @@ $bronze: var(--color-bronze);
   display: inline-block;
   padding: 4px 10px;
   background: rgba(var(--color-primary-rgb), 0.1);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
   font-size: 13px;
   font-weight: 600;
@@ -1213,8 +1213,7 @@ $bronze: var(--color-bronze);
 
   .leaderboard-content {
     width: 100%;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
   }
 

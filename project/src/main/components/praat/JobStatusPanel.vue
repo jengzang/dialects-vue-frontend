@@ -100,8 +100,7 @@ $progress-background: rgba(0, 0, 0, 0.1);
 $transition-duration: 0.3s;
 
 @mixin status-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   padding: 2rem 0;
   text-align: center;
@@ -190,8 +189,7 @@ $transition-duration: 0.3s;
 }
 
 .loading-progress {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
   width: 100%;
   max-width: 400px;
@@ -202,12 +200,12 @@ $transition-duration: 0.3s;
   height: 8px;
   overflow: hidden;
   background: $progress-background;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 
   .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, $primary, $primary-light);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     transition: width $transition-duration ease;
   }
 }

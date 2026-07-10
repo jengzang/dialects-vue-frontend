@@ -168,8 +168,8 @@
             <button
               type="button"
               class="text-color-btn text-white"
-              :class="{ active: avatarConfig.textColor === '#ffffff' }"
-              @click="avatarConfig.textColor = '#ffffff'"
+              :class="{ active: avatarConfig.textColor === 'var(--text-white)' }"
+              @click="avatarConfig.textColor = 'var(--text-white)'"
             >
               {{ $t('auth.profile.avatar.textColorWhite') }}
             </button>
@@ -490,7 +490,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
   background: none;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.1),
     0 2px 6px rgba(0, 0, 0, 0.08);
@@ -503,7 +503,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &::-webkit-color-swatch {
     border: 2px solid $white;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
   }
 
   &:hover {
@@ -512,8 +512,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .avatar-config-modal {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 20px;
   align-items: center;
   padding: 4px;
@@ -521,8 +520,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .preview-section {
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   align-items: center;
   width: 100%;
@@ -552,8 +550,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .config-controls {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
   width: 100%;
 }
@@ -585,8 +582,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .control-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   width: 100%;
   text-align: left;
@@ -675,7 +671,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   aspect-ratio: 1;
   cursor: pointer;
   border: 2px solid $white;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   transition: all $transition-fast $smooth-easing;
 
@@ -789,7 +785,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       cursor: pointer;
       background: $white;
       border: 1px solid rgba(0, 0, 0, 0.15);
-      border-radius: 50%;
+      border-radius: var(--radius-full);
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
       transition: transform 0.1s ease;
       -webkit-appearance: none;

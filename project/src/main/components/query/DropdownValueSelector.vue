@@ -305,7 +305,7 @@ $dropdown-selected-color: var(--color-primary-hover);
   overflow: hidden;
   background: var(--glass-30);
   border: 1px solid var(--color-primary-medium);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .dropdown-input {
@@ -366,7 +366,7 @@ $dropdown-selected-color: var(--color-primary-hover);
   padding: 6px 0;
   overflow: auto;
   background: var(--glass-90);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);

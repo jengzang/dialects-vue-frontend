@@ -917,7 +917,7 @@ $user-success: var(--color-success);
   max-width: 220px;
   padding: 5px 12px;
   border: 1px solid var(--glass-50);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   overflow: hidden;
   color: var(--text-white);
   font-size: 14px;
@@ -947,7 +947,7 @@ $user-success: var(--color-success);
     align-items: center;
     min-height: 34px;
     padding: 7px 12px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
   }
 }
 
@@ -1104,9 +1104,7 @@ $user-success: var(--color-success);
   position: absolute;
   inset: 0;
   z-index: 30;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   border-radius: inherit;
   background: var(--glass-70);
   backdrop-filter: blur(18px) saturate(180%);
@@ -1116,8 +1114,7 @@ $user-success: var(--color-success);
 .loading-content {
   @include glass-panel(20px, 18px 22px);
 
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 14px;
 }
@@ -1223,7 +1220,7 @@ $user-success: var(--color-success);
   text-align: center !important;
   font-weight: 700;
   background: var(--glass-50) !important;
-  border-radius: 16px !important;
+  border-radius: var(--radius-lg) !important;
 }
 
 .pagination {
@@ -1372,7 +1369,7 @@ $user-success: var(--color-success);
     min-width: 0;
     height: 34px;
     padding: 7px 9px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-size: 13px;
   }
 
@@ -1411,7 +1408,7 @@ $user-success: var(--color-success);
   width: 28px;
   height: 28px;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: var(--text-white);
   font-size: 18px;
   line-height: 1;
@@ -1624,7 +1621,7 @@ $user-success: var(--color-success);
   .page-header,
   .toolbar,
   .pagination {
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .header-left {

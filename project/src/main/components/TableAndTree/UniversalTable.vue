@@ -1562,8 +1562,7 @@ $system-font:
   padding: 12px 4px;
   font-family: $system-font;
   color: var(--text-primary);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
   height: 85dvh;
   width: 88dvw;
@@ -1818,8 +1817,7 @@ td {
 }
 
 .sort-controls {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   height: 16px;
   justify-content: center;
   opacity: 0.2;
@@ -1850,8 +1848,7 @@ td {
   top: 100%;
   left: 0;
   z-index: 10000;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   min-width: 240px;
   max-width: 300px;
   max-height: 50dvh;
@@ -1879,8 +1876,7 @@ td {
 .filter-list {
   overflow-y: auto;
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
   min-height: 0;
 }
@@ -1978,7 +1974,7 @@ td {
 @media (max-width: 768px) {
   .universal-table.glass-container {
     padding: 8px 2px;
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     height: 85dvh;
     border: none;
   }
@@ -2040,9 +2036,7 @@ td {
 }
 
 .icon-action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   width: 28px;
   height: 28px;
   cursor: pointer;
@@ -2079,9 +2073,7 @@ td {
 
 .page-info-wrapper {
   min-width: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
 }
 
 .page-info {
@@ -2177,8 +2169,7 @@ td {
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   z-index: 10;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   gap: 10px;
@@ -2204,8 +2195,7 @@ td {
    ======================================== */
 
 .form-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
   overflow-y: auto;
   max-height: 50dvh;
@@ -2333,9 +2323,7 @@ td {
   inset: 0;
   background: rgba(0, 0, 0, 0.95);
   z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -2343,8 +2331,7 @@ td {
 .fullscreen-container {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   background: var(--glass-50);
 }
 
@@ -2410,7 +2397,7 @@ td {
   width: 80%;
   padding: 10px 14px;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--glass-60);
   font-size: 14px;
   outline: none;
@@ -2432,7 +2419,7 @@ td {
   gap: 10px;
   padding: 12px;
   background: rgba(0, 0, 0, 0.02);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow-y: auto;
 }
 
@@ -2443,7 +2430,7 @@ td {
   gap: 10px;
   cursor: pointer;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   background: white;
   border: 2px solid rgba(0, 0, 0, 0.08);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2468,9 +2455,7 @@ td {
   height: 20px;
   border-radius: 5px;
   border: 2px solid var(--border-gray);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: white;
   flex-shrink: 0;
@@ -2576,7 +2561,7 @@ td {
   max-height: 300px;
   overflow-y: auto;
   background: rgba(var(--color-primary-rgb), 0.03);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 12px;
 }
 
@@ -2584,7 +2569,7 @@ td {
   padding: 10px;
   margin-bottom: 8px;
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -2599,7 +2584,7 @@ td {
   padding: 2px 8px;
   background: rgba(var(--color-primary-rgb), 0.1);
   color: $primary-blue;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   font-weight: 600;
 }
 
@@ -2607,7 +2592,7 @@ td {
   padding: 2px 8px;
   background: rgba(var(--color-success-rgb), 0.1);
   color: $success-green;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   font-weight: 600;
 }
 
@@ -2646,7 +2631,7 @@ td {
 .all-pages-preview {
   padding: 16px;
   background: rgba(var(--color-warning-rgb), 0.05);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(var(--color-warning-rgb), 0.2);
 }
 
@@ -2659,7 +2644,7 @@ td {
 
 .stats-box {
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   padding: 12px;
   margin-bottom: 12px;
 }
@@ -2687,7 +2672,7 @@ td {
   margin: 12px 0 0 0;
   padding: 10px;
   background: rgba(var(--color-warning-rgb), 0.1);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   color: $warning-dark;
   font-size: 13px;
   font-weight: 500;
@@ -2714,7 +2699,7 @@ td {
   color: $warning-dark;
   background: rgba(var(--color-warning-rgb), 0.1);
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   margin-top: 8px;
   display: block;
   font-weight: 500;
@@ -2737,8 +2722,7 @@ td {
 }
 
 .batch-replace-modal-footer .main-glass-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .batch-replace-modal-footer .main-glass-button[data-variant='secondary'] {

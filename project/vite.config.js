@@ -141,7 +141,7 @@ export default defineConfig(async ({ mode }) => {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: `@use "@/styles/global/mixins" as *;\n`,
+          additionalData: `@use "@/styles/global/mixins" as *;\n@use "@/styles/global/keyframes" as *;\n`,
         },
       },
     },

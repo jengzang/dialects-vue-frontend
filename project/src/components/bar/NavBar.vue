@@ -589,9 +589,7 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
   width: 100%;
   max-width: 900px;
   height: 10dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   margin: 0 30px;
 }
 
@@ -623,8 +621,7 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
   min-width: 9dvh;
   max-width: 15dvh;
   height: 6dvh;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   gap: 4px;
@@ -635,7 +632,7 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
   @include soft-glass-shadow;
 
   border: 3px solid var(--glass-40);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   color: darkblue;
   text-align: center;
   font-weight: 1000;
@@ -661,13 +658,11 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
   flex: 1 1 0;
   min-width: 0;
   height: 10dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 1px;
 
   background: var(--glass-10);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   color: $primary;
   white-space: nowrap;
   text-align: center;
@@ -752,11 +747,9 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
   .logo-container {
     width: 6dvh;
     height: 6dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     background: var(--glass-20);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     color: $primary-dark;
     cursor: pointer;
     user-select: none;
@@ -789,8 +782,7 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
 
 .stat-item {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 2px;
 }
@@ -814,8 +806,7 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
 }
 
 .loading-state {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
@@ -837,7 +828,7 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
   padding: 12px;
   background: var(--glass-40);
   border: 1px solid var(--glass-60);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   transition: all 0.3s ease;
 
   &:hover {
@@ -853,8 +844,7 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
 }
 
 .stat-info {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
@@ -886,8 +876,7 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
 }
 
 .history-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -899,7 +888,7 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
   padding: 12px 14px;
   background: var(--glass-40);
   border: 1px solid var(--glass-50);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   transition: all 0.2s ease;
 
   &:hover {
@@ -919,7 +908,7 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
   height: 20px;
   overflow: hidden;
   background: rgba(var(--color-primary-hover-rgb), 0.1);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 
 .history-bar {
@@ -930,7 +919,7 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
     $primary-dark,
     $primary-light
   );
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   transition: width 0.5s ease;
 }
 

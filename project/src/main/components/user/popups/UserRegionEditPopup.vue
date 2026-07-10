@@ -226,8 +226,7 @@ $transition-fast: 0.2s;
 $transition-normal: 0.3s;
 
 .popup-form {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 
 .form-group {
@@ -373,7 +372,7 @@ $transition-normal: 0.3s;
 .location-tag {
   padding: 4px 10px;
   background: $primary-background;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   color: $primary;
   font-size: 12px;
   font-weight: 500;
@@ -413,8 +412,7 @@ $transition-normal: 0.3s;
   }
 
   &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    @include disabled-state;
     transform: none;
   }
 }

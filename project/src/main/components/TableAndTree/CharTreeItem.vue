@@ -219,7 +219,7 @@ $mobile-aspect-ratio: 1 / 1;
   justify-content: space-between;
   padding: 6px 10px;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   transition: background $transition-fast;
 
   &:hover {
@@ -283,7 +283,7 @@ $mobile-aspect-ratio: 1 / 1;
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   transition: all 0.3s ease;
 
   &:hover {
@@ -313,7 +313,7 @@ $mobile-aspect-ratio: 1 / 1;
   letter-spacing: 2px;
   word-spacing: 8px;
   background: rgba(var(--color-primary-rgb), 0.05);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 
   @media (max-aspect-ratio: $mobile-aspect-ratio) {
     padding: 10px 12px;
@@ -322,8 +322,7 @@ $mobile-aspect-ratio: 1 / 1;
 }
 
 .char-annotation-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -334,7 +333,7 @@ $mobile-aspect-ratio: 1 / 1;
   padding: 10px 14px;
   background: var(--glass-50);
   border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   transition: background $transition-fast;
 
   &:hover {
@@ -388,7 +387,7 @@ $mobile-aspect-ratio: 1 / 1;
   font-size: 13px;
   background: rgba(var(--color-error-rgb), 0.06);
   border: 1px solid rgba(var(--color-error-rgb), 0.2);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 
   .retry-btn-small {
     padding: 3px 10px;
@@ -398,7 +397,7 @@ $mobile-aspect-ratio: 1 / 1;
     cursor: pointer;
     background: rgba(var(--color-error-rgb), 0.12);
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
   }
 }
 
@@ -410,7 +409,7 @@ $mobile-aspect-ratio: 1 / 1;
   padding: 0 2px;
   color: var(--text-primary);
   background: rgba(255, 255, 0, 0.4);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 }
 
 @keyframes spin {

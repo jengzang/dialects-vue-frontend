@@ -301,7 +301,7 @@ onBeforeUnmount(() => {
   right: 12px;
   bottom: 12px;
   padding: 6px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--glass-90);
   color: $text-secondary;
   font-size: 12px;
@@ -321,7 +321,7 @@ onBeforeUnmount(() => {
 }
 
 :deep(.maplibregl-ctrl-group) {
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: 0 8px 20px rgba(var(--color-shadow-rgb), 0.16);
 }
@@ -333,7 +333,7 @@ onBeforeUnmount(() => {
 :deep(.mini-map-pin) {
   width: 16px;
   height: 16px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: $primary;
   border: 3px solid var(--text-white);
   box-shadow:
@@ -345,7 +345,7 @@ onBeforeUnmount(() => {
   position: relative;
   width: 12px;
   height: 12px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: $success;
   border: 2px solid var(--text-white);
   box-shadow: 0 6px 14px rgba(var(--color-success-rgb), 0.28);
@@ -358,7 +358,7 @@ onBeforeUnmount(() => {
 
 :deep(.mini-map-point-label) {
   padding: 2px 4px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   background-color: var(--color-dark-teal);
   color: var(--color-cyan);
   font-size: 11px;

@@ -190,7 +190,7 @@ $transition-normal: 0.3s;
   padding: 15px;
   background: $glass-background;
   border: 1px solid $glass-border;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 
   .stat-section {
     margin-bottom: 12px;
@@ -222,7 +222,7 @@ $transition-normal: 0.3s;
   padding: 4px 10px;
   background: $glass-background-medium;
   border: 1px solid $glass-border-strong;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   box-shadow: 0 1px 2px $divider-color;
   color: $text-main;
   font-size: 13px;
@@ -245,7 +245,7 @@ $transition-normal: 0.3s;
     min-width: 14px;
     padding: 1px 5px;
     background: rgba(var(--color-primary-rgb), 0.1);
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     color: $primary;
     text-align: center;
     font-size: 11px;

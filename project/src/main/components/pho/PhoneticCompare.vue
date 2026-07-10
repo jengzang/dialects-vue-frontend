@@ -736,8 +736,7 @@ $primary: var(--color-primary);
 $error: var(--color-error);
 $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-container {
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
 }
 
@@ -749,7 +748,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
   padding: 10px 14px;
   background: rgba(var(--color-error-light-rgb), 0.08);
   border-left: 3px solid var(--color-error, #{$error});
-  border-radius: var(--radius-sm, 6px);
+  border-radius: var(--radius-sm, var(--radius-sm));
   color: var(--color-error, #{$error});
   text-align: left;
   font-size: 14px;
@@ -772,17 +771,14 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
 /* 结果区域 */
 .results-area {
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   margin-top: 25px;
 }
 
 /* 声韵调切换 */
 .feature-control-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   flex-wrap: wrap;
   gap: 18px;
   margin-bottom: 5px;
@@ -798,7 +794,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
   padding: 8px 18px;
   background: var(--glass-30, var(--glass-30));
   border: 1px solid var(--border-gray-light, rgba(var(--color-silver-rgb), 0.5));
-  border-radius: var(--radius-md, 12px);
+  border-radius: var(--radius-md, var(--radius-md));
   color: var(--text-dark, var(--text-dark));
   font-size: 14px;
   font-weight: 500;
@@ -816,7 +812,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
     background: var(--color-primary, #{$primary});
     border-color: var(--color-primary, #{$primary});
     box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.2);
-    color: #fff;
+    color: var(--text-white);
   }
 }
 
@@ -857,11 +853,10 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
 
 /* 详情卡片根容器 */
 :deep(.sankey-detail-card) {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   background: var(--glass-90);
   border: 1px solid var(--border-gray-light, rgba(var(--color-silver-rgb), 0.5));
-  border-radius: var(--radius-lg, 16px);
+  border-radius: var(--radius-lg, var(--radius-lg));
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
 
   @include glass-blur(20px, 180%);

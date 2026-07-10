@@ -401,7 +401,7 @@ $glass-blur: 8px;
 
     &:hover {
       background-color: var(--bg-light-gray);
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
   }
@@ -454,7 +454,7 @@ $glass-blur: 8px;
   font-size: 12px;
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0.8);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transform: translate(-50%, -100%);
   animation: fade-in $transition-duration ease-out;
@@ -510,7 +510,7 @@ $glass-blur: 8px;
   cursor: pointer;
   background-color: rgba(var(--color-primary-rgb), 0.08);
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   box-shadow: none;
   backdrop-filter: blur($glass-blur);
   -webkit-backdrop-filter: blur($glass-blur);
@@ -549,7 +549,7 @@ $glass-blur: 8px;
   text-overflow: ellipsis;
   background: rgba(var(--color-primary-rgb), 0.05);
   border: 1px solid rgba(var(--color-primary-rgb), 0.1);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 /* feature-row 佈局：寬屏左右對齊 */

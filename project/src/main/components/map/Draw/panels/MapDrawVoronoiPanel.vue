@@ -270,8 +270,7 @@ const offsetClass = computed(() => {
 }
 
 .voronoi-summary-card {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.25rem;
   padding: 0.8rem;
   border-radius: 14px;

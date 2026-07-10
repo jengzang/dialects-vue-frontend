@@ -669,8 +669,7 @@ $panel-radius-portrait: 24px;.char-class-page {
 
 .panel-title-group,
 .tree-title-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -716,8 +715,7 @@ $panel-radius-portrait: 24px;.char-class-page {
 }
 
 .control-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   margin-top: 20px;
 }
@@ -817,7 +815,7 @@ $panel-radius-portrait: 24px;.char-class-page {
   font-weight: 700;
   background: var(--glass-70);
   border: 1px solid var(--glass-30);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 }
 
 .level-select {
@@ -853,7 +851,7 @@ $panel-radius-portrait: 24px;.char-class-page {
     var(--glass-90)
   );
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 18px rgba(var(--color-primary-rgb), 0.12);
   transition:
     transform $transition-fast ease,
@@ -923,8 +921,7 @@ $panel-radius-portrait: 24px;.char-class-page {
 }
 
 .tree-panel {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   min-width: 0;
 }
 
@@ -950,7 +947,7 @@ $panel-radius-portrait: 24px;.char-class-page {
   color: $text-primary;
   background: var(--glass-30);
   border: 1px solid var(--glass-30);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   outline: none;
   transition:
     border-color $transition-fast ease,
@@ -976,8 +973,7 @@ $panel-radius-portrait: 24px;.char-class-page {
 }
 
 .tree-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
 }
 
