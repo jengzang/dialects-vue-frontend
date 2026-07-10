@@ -1,3 +1,133 @@
-/* Phase 1 note:
-   Tokens continue to be sourced from ../_legacy.scss to keep visual output unchanged.
-   This file is kept as the long-term home for future token migration. */
+// CSS custom properties (design tokens)
+// Migrated from _legacy.scss :root block
+
+:root {
+  /* 主题色 */
+  --color-primary: #007aff;
+  --color-primary-hover: #005ecb;
+  --color-primary-light: rgba(0, 122, 255, 0.1);
+  --color-primary-light2: rgba(0, 122, 255, 0.16);
+  --color-primary-light3: rgba(0, 122, 255, 0.12);
+  --color-primary-medium: rgba(0, 122, 255, 0.2);
+  --color-primary-medium2: rgba(0, 122, 255, 0.5);
+  --color-primary-border: rgba(0, 122, 255, 0.18);
+  --color-primary-border2: rgba(0, 122, 255, 0.22);
+  --color-primary-shadow: rgba(0, 122, 255, 0.2);
+  --color-primary-shadow-light: rgba(0, 122, 255, 0.3);
+  --color-gradient: linear-gradient(135deg, #6e00ff, #00c3ff);
+
+  /* 自定义蓝色 - 用于特定组件 */
+  --color-blue-custom: #02469e;
+  --color-blue-custom-light: rgba(2, 70, 158, 0.1);
+  --color-blue-custom-bg: #f0f7ff;
+  --color-blue-dark: #013173;
+  --color-blue-very-light: #e6f0ff;
+  --color-blue-logo: #005fd3;
+
+  /* 错误/警告色 */
+  --color-error: #d32f2f;
+  --color-error-light: #ff3b30;
+  --color-error-bg: rgba(255, 59, 48, 0.1);
+  --color-error-border: rgba(255, 59, 48, 0.3);
+
+  /* 成功色 */
+  --color-success: #28a745;
+  --color-success-green: green;
+
+  /* 警告色 */
+  --color-warning: darkgoldenrod;
+
+  /* 文字颜色 */
+  --text-primary: #1d1d1f;
+  --text-secondary: #86868b;
+  --text-tertiary: #666;
+  --text-muted: #888;
+  --text-dark: #333;
+  --text-dark-alpha: rgba(30, 30, 30, 0.88);
+  --text-dark-medium: rgba(60, 60, 60, 0.85);
+  --text-dark-light: rgba(20, 20, 20, 0.88);
+  --text-dark-lighter: rgba(20, 20, 20, 0.75);
+  --text-dark-lightest: rgba(25, 25, 25, 0.85);
+  --text-medium: #555;
+  --text-white: #fff;
+  --text-gray: #575757;
+
+  /* Aliases for consistency */
+  --color-text-primary: #1d1d1f;
+  --color-text-secondary: #86868b;
+
+  /* 背景色 */
+  --bg-body: #e0e6f6;
+  --bg-white: #ffffff;
+  --bg-light-gray: #f9f9fb;
+  --bg-blue-hover: rgba(175, 217, 251, 0.8);
+
+  /* 毛玻璃效果变量 */
+  --glass-light: rgba(255, 255, 255, 0.34);
+  --glass-lighter: rgba(255, 255, 255, 0.43);
+  --glass-lighter2: rgba(255, 255, 255, 0.46);
+  --glass-lighter3: rgba(255, 255, 255, 0.82);
+  --glass-medium: rgba(255, 255, 255, 0.56);
+  --glass-medium2: rgba(255, 255, 255, 0.64);
+  --glass-medium-strong: rgba(255, 255, 255, 0.72);
+  --glass-heavy: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.44);
+  --glass-border-strong: rgba(255, 255, 255, 0.54);
+  --glass-very-light: rgba(255, 255, 255, 0.06);
+  --glass-very-light2: rgba(255, 255, 255, 0.11);
+  --glass-very-light3: rgba(255, 255, 255, 0.16);
+  --glass-light2: rgba(255, 255, 255, 0.22);
+  --glass-border-weak: rgba(255, 255, 255, 0.31);
+
+  /* 玻璃效果渐变 */
+  --glass-gradient-soft: linear-gradient(145deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.12));
+  --glass-gradient-medium: linear-gradient(145deg, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0.34));
+  --glass-gradient-nav: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+
+  /* 边框颜色 */
+  --border-light: rgba(0, 0, 0, 0.05);
+  --border-medium: rgba(0, 0, 0, 0.1);
+  --border-gray: #d1d1d6;
+  --border-gray-light: rgba(200, 200, 200, 0.5);
+  --border-gray-lighter: rgba(200, 200, 200, 0.45);
+  --border-gray-lightest: rgba(180, 180, 180, 0.25);
+  --border-gray-light2: rgba(160, 160, 160, 0.25);
+  --border-gray-medium: rgba(200, 200, 200, 0.3);
+  --border-divider: #eee;
+
+  /* 背景颜色 - 交互态 */
+  --bg-hover-light: rgba(0, 0, 0, 0.03);
+  --bg-hover: rgba(0, 0, 0, 0.05);
+  --bg-hover-medium: rgba(0, 0, 0, 0.06);
+  --bg-hover-strong: rgba(0, 0, 0, 0.10);
+  --bg-overlay: rgba(0, 0, 0, 0.3);
+  --bg-overlay-dark: rgba(0, 0, 0, 0.5);
+  --bg-overlay-light: rgba(0, 0, 0, 0.1);
+  --bg-overlay-light2: rgba(0, 0, 0, 0.08);
+  --bg-overlay-very-light: rgba(0, 0, 0, 0.25);
+
+  /* 强调色 */
+  --color-accent-purple: #6e00ff;
+  --color-accent-purple-light: rgba(110, 0, 255, 0.1);
+
+  /* 圆角 */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 50%;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-sm2: 0 6px 18px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-md2: 0 10px 26px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-lg2: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 18px 60px rgba(0, 0, 0, 0.18);
+  --shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-glass: 0 4px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-glass-hover: 0 6px 12px rgba(0, 0, 0, 0.14);
+  --shadow-glass-inset: inset 0 0 0.5px rgba(255, 255, 255, 0.24), 0 6px 20px rgba(0, 0, 0, 0.16), 0 0 0 0.5px rgba(255, 255, 255, 0.08);
+}

@@ -1,7 +1,7 @@
-@use './_legacy' as legacy;
-
 @use './global/tokens' as global-tokens;
 @use './global/base' as global-base;
+
+@use './_legacy' as legacy;
 @use './global/close-buttons' as global-close-buttons;
 @use './global/loading' as global-loading;
 @use './global/scrollbars' as global-scrollbars;

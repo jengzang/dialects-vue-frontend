@@ -1,164 +1,6 @@
-/* ========================================
-   全局样式 - src/style.css
-   ======================================== */
-
-/* ========================================
-   CSS 变量定义
-   ======================================== */
-:root {
-  /* 主题色 */
-  --color-primary: #007aff;
-  --color-primary-hover: #005ecb;
-  --color-primary-light: rgba(0, 122, 255, 0.1);
-  --color-primary-light2: rgba(0, 122, 255, 0.16);
-  --color-primary-light3: rgba(0, 122, 255, 0.12);
-  --color-primary-medium: rgba(0, 122, 255, 0.2);
-  --color-primary-medium2: rgba(0, 122, 255, 0.5);
-  --color-primary-border: rgba(0, 122, 255, 0.18);
-  --color-primary-border2: rgba(0, 122, 255, 0.22);
-  --color-primary-shadow: rgba(0, 122, 255, 0.2);
-  --color-primary-shadow-light: rgba(0, 122, 255, 0.3);
-  --color-gradient: linear-gradient(135deg, #6e00ff, #00c3ff);
-
-  /* 自定义蓝色 - 用于特定组件 */
-  --color-blue-custom: #02469e;
-  --color-blue-custom-light: rgba(2, 70, 158, 0.1);
-  --color-blue-custom-bg: #f0f7ff;
-  --color-blue-dark: #013173;
-  --color-blue-very-light: #e6f0ff;
-  --color-blue-logo: #005fd3;
-
-  /* 错误/警告色 */
-  --color-error: #d32f2f;
-  --color-error-light: #ff3b30;
-  --color-error-bg: rgba(255, 59, 48, 0.1);
-  --color-error-border: rgba(255, 59, 48, 0.3);
-
-  /* 成功色 */
-  --color-success: #28a745;
-  --color-success-green: green;
-
-  /* 警告色 */
-  --color-warning: darkgoldenrod;
-
-  /* 文字颜色 */
-  --text-primary: #1d1d1f;
-  --text-secondary: #86868b;
-  --text-tertiary: #666;
-  --text-muted: #888;
-  --text-dark: #333;
-  --text-dark-alpha: rgba(30, 30, 30, 0.88);
-  --text-dark-medium: rgba(60, 60, 60, 0.85);
-  --text-dark-light: rgba(20, 20, 20, 0.88);
-  --text-dark-lighter: rgba(20, 20, 20, 0.75);
-  --text-dark-lightest: rgba(25, 25, 25, 0.85);
-  --text-medium: #555;
-  --text-white: #fff;
-  --text-gray: #575757;
-
-  /* Aliases for consistency */
-  --color-text-primary: #1d1d1f;
-  --color-text-secondary: #86868b;
-
-  /* 背景色 */
-  --bg-body: #e0e6f6;
-  --bg-white: #ffffff;
-  --bg-light-gray: #f9f9fb;
-  --bg-blue-hover: rgba(175, 217, 251, 0.8);
-
-  /* 毛玻璃效果变量 */
-  --glass-light: rgba(255, 255, 255, 0.34);
-  --glass-lighter: rgba(255, 255, 255, 0.43);
-  --glass-lighter2: rgba(255, 255, 255, 0.46);
-  --glass-lighter3: rgba(255, 255, 255, 0.82);
-  --glass-medium: rgba(255, 255, 255, 0.56);
-  --glass-medium2: rgba(255, 255, 255, 0.64);
-  --glass-medium-strong: rgba(255, 255, 255, 0.72);
-  --glass-heavy: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(255, 255, 255, 0.44);
-  --glass-border-strong: rgba(255, 255, 255, 0.54);
-  --glass-very-light: rgba(255, 255, 255, 0.06);
-  --glass-very-light2: rgba(255, 255, 255, 0.11);
-  --glass-very-light3: rgba(255, 255, 255, 0.16);
-  --glass-light2: rgba(255, 255, 255, 0.22);
-  --glass-border-weak: rgba(255, 255, 255, 0.31);
-
-  /* 玻璃效果渐变 */
-  --glass-gradient-soft: linear-gradient(145deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.12));
-  --glass-gradient-medium: linear-gradient(145deg, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0.34));
-  --glass-gradient-nav: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
-
-  /* 边框颜色 */
-  --border-light: rgba(0, 0, 0, 0.05);
-  --border-medium: rgba(0, 0, 0, 0.1);
-  --border-gray: #d1d1d6;
-  --border-gray-light: rgba(200, 200, 200, 0.5);
-  --border-gray-lighter: rgba(200, 200, 200, 0.45);
-  --border-gray-lightest: rgba(180, 180, 180, 0.25);
-  --border-gray-light2: rgba(160, 160, 160, 0.25);
-  --border-gray-medium: rgba(200, 200, 200, 0.3);
-  --border-divider: #eee;
-
-  /* 背景颜色 - 交互态 */
-  --bg-hover-light: rgba(0, 0, 0, 0.03);
-  --bg-hover: rgba(0, 0, 0, 0.05);
-  --bg-hover-medium: rgba(0, 0, 0, 0.06);
-  --bg-hover-strong: rgba(0, 0, 0, 0.10);
-  --bg-overlay: rgba(0, 0, 0, 0.3);
-  --bg-overlay-dark: rgba(0, 0, 0, 0.5);
-  --bg-overlay-light: rgba(0, 0, 0, 0.1);
-  --bg-overlay-light2: rgba(0, 0, 0, 0.08);
-  --bg-overlay-very-light: rgba(0, 0, 0, 0.25);
-
-  /* 强调色 */
-  --color-accent-purple: #6e00ff;
-  --color-accent-purple-light: rgba(110, 0, 255, 0.1);
-
-  /* 圆角 */
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
-  --radius-full: 50%;
-
-  /* 阴影 */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-sm2: 0 6px 18px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-md2: 0 10px 26px rgba(0, 0, 0, 0.10);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
-  --shadow-lg2: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --shadow-xl: 0 18px 60px rgba(0, 0, 0, 0.18);
-  --shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.08);
-  --shadow-glass: 0 4px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
-  --shadow-glass-hover: 0 6px 12px rgba(0, 0, 0, 0.14);
-  --shadow-glass-inset: inset 0 0 0.5px rgba(255, 255, 255, 0.24), 0 6px 20px rgba(0, 0, 0, 0.16), 0 0 0 0.5px rgba(255, 255, 255, 0.08);
-}
-
-/* ========================================
-   基础样式
-   ======================================== */
-body {
-  margin: 0;
-  background: var(--bg-body);
-  font-size: 16px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: transparent;
-  color: var(--text-primary);
-  font-family: "PingFang TC", "PingFang SC", "Microsoft YaHei", "Segoe UI", -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, Helvetica, Arial, sans-serif;
-}
-
-:lang(zh-CN) body, :lang(zh-CN) {
-  font-family: "PingFang SC", "Microsoft YaHei", "PingFang TC", "Segoe UI", -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, Helvetica, Arial, sans-serif;
-}
-
-@media (min-width: 768px) {
-  body {
-    font-size: 18px;
-  }
-}
+// Shared component-level classes
+// CSS variables (design tokens) have been migrated to global/_tokens.scss
+// Base element styles (body, textarea) have been migrated to global/_base.scss
 
 /* ========================================
    页面容器样式
@@ -172,16 +14,6 @@ body {
   text-align: center;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--text-primary);
-}
-
-/* Tabs 包装器 */
-.tabs-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0;
-  min-height: 80dvh;
-  width: 100%;
 }
 
 /* ========================================
@@ -270,78 +102,6 @@ body {
   font-size: 15px;
   font-weight: 600;
   color: var(--text-tertiary);
-}
-
-/* Textarea 文本域 */
-textarea {
-  width: 100%;
-  height: 60px;
-  box-sizing: border-box;
-  font-family: monospace;
-  font-size: 13px;
-  margin-top: 0px;
-  padding: 6px 10px;
-  resize: none;
-  border: 1px solid #ccc;
-  border-radius: var(--radius-sm);
-  background: var(--bg-white);
-  min-width: 50px;
-  max-width: 600px;
-  transition: all 0.2s;
-}
-
-textarea:hover {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
-}
-
-textarea:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
-}
-
-/* ========================================
-   Tab 标签页样式
-   ======================================== */
-.tabs {
-  display: flex;
-  justify-content: flex-start;
-  gap: 16px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  max-width: 100%;
-  padding: 8px 12px;
-}
-
-.tab {
-  flex-shrink: 0;
-  white-space: nowrap;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 500;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  color: #444;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  transition: all 0.5s ease;
-  user-select: none;
-  border: 1px solid var(--color-primary);
-}
-
-.tab:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--color-primary);
-}
-
-.tab.active {
-  color: var(--bg-white);
-  background: rgba(0, 122, 255, 0.7);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
 }
 
 /* Page 页面内容区 */
@@ -464,7 +224,7 @@ textarea:focus {
 }
 
 /* ========================================
-   毛玻璃效果样式（已存在的类名保持不变）
+   毛玻璃效果样式
    ======================================== */
 
 /* 玻璃卡片 */
@@ -477,235 +237,6 @@ textarea:focus {
   border-radius: var(--radius-xl);
   transition: background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
 }
-
-/* 关闭按钮 */
-/* ========================================
-   下拉菜单样式
-   ======================================== */
-.arrow {
-  font-size: 18px;
-}
-
-
-/* ========================================
-   开关按钮样式
-   ======================================== */
-.custom-slider:before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 26px;
-  height: 26px;
-  background-color: white;
-  border-radius: var(--radius-full);
-  transition: all 0.3s ease;
-}
-
-.custom-switch.open .custom-slider:before {
-  transform: translateX(20px);
-}
-
-.custom-switch:hover {
-  background-color: dimgray;
-  box-shadow: 0 0 10px 4px rgba(0, 123, 255, 0.7);
-  transform: scale(1.3);
-}
-
-.custom-switch:hover .custom-slider:before {
-  background-color: white;
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
-}
-
-.custom-switch.open {
-  background-color: var(--color-primary);
-  animation: blueGlow 2s infinite ease-in-out;
-}
-
-.custom-switch.open:hover {
-  background: linear-gradient(135deg, #00bfff, #66ccff);
-  transform: scale(1.3);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-}
-
-.custom-switch.open:hover .custom-slider:before {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-}
-
-.switch-text {
-  color: black;
-  font-size: 12px;
-  font-weight: bold;
-  text-transform: uppercase;
-  position: absolute;
-  z-index: 1;
-  transition: transform 0.3s ease, color 0.3s ease;
-  pointer-events: none;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.custom-switch.open .switch-text {
-  color: black;
-  transform: translateX(-25px) translateY(-50%);
-  top: 50%;
-  position: absolute;
-  z-index: 1;
-  pointer-events: none;
-  transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
-  animation: glowing 2s infinite linear;
-  white-space: nowrap;
-}
-
-/* 蓝色发光动画 */
-@keyframes blueGlow {
-  0% {
-    box-shadow:
-            0 0 5px rgba(0, 122, 255, 0.4),
-            0 0 10px rgba(0, 122, 255, 0.6),
-            0 0 20px rgba(0, 122, 255, 0.8),
-            0 0 30px rgba(0, 122, 255, 0.9);
-  }
-  50% {
-    box-shadow:
-            0 0 10px rgba(102, 204, 255, 0.6),
-            0 0 20px rgba(102, 204, 255, 0.8),
-            0 0 30px rgba(102, 204, 255, 1),
-            0 0 40px rgba(102, 204, 255, 1);
-  }
-  100% {
-    box-shadow:
-            0 0 5px rgba(0, 122, 255, 0.4),
-            0 0 10px rgba(0, 122, 255, 0.6),
-            0 0 20px rgba(0, 122, 255, 0.8),
-            0 0 30px rgba(0, 122, 255, 0.9);
-  }
-}
-
-/* ========================================
-   其他组件样式
-   ======================================== */
-.result-panel-vue {
-  margin-bottom: 50px;
-}
-
-/* ========================================
-   响应式断点 - 移动端优化
-   ======================================== */
-
-/* 平板设备 */
-@media (max-width: 768px) {
-  .panel-title {
-    font-size: 2.2rem;
-  }
-
-  .thanks-list {
-    font-size: 1.2rem;
-  }
-}
-
-/* 手机设备 */
-@media (max-width: 600px) {
-  .tab {
-    padding: 12px 14px;
-    font-size: 14px;
-    border-radius: var(--radius-md);
-  }
-
-  .tabs {
-    gap: 6px;
-    padding: 8px 8px;
-  }
-
-  .page {
-    padding: 10px;
-    font-size: 16px;
-  }
-
-  .frun-btn {
-    font-size: 16px;
-    padding: 10px 20px;
-    border-radius: 24px;
-  }
-
-  .enter-btn {
-    padding: 5px !important;
-    font-size: 12px !important;
-  }
-}
-
-/* 小屏手机 */
-@media (max-width: 480px) {
-  .panel-title {
-    font-size: 2.4rem;
-  }
-
-  .thanks-list {
-    font-size: 1.35rem;
-  }
-}
-
-/* ========================================
-   补充：常用工具类
-   ======================================== */
-
-/* Flexbox 布局 */
-.flex { display: flex; }
-.flex-center { display: flex; align-items: center; justify-content: center; }
-.flex-between { display: flex; align-items: center; justify-content: space-between; }
-.flex-col { display: flex; flex-direction: column; }
-.flex-wrap { flex-wrap: wrap; }
-
-/* 间距工具类 */
-.gap-xs { gap: 4px; }
-.gap-sm { gap: 8px; }
-.gap-md { gap: 12px; }
-.gap-lg { gap: 16px; }
-.gap-xl { gap: 24px; }
-
-/* 文本工具类 */
-.text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
-.text-nowrap { white-space: nowrap; }
-
-/* 字体粗细 */
-.font-normal { font-weight: 400; }
-.font-medium { font-weight: 500; }
-.font-semibold { font-weight: 600; }
-.font-bold { font-weight: 700; }
-
-/* 光标样式 */
-.cursor-pointer { cursor: pointer; }
-.cursor-not-allowed { cursor: not-allowed; }
-
-/* 用户选择 */
-.select-none { user-select: none; }
-
-/* 溢出处理 */
-.overflow-hidden { overflow: hidden; }
-.overflow-auto { overflow: auto; }
-.overflow-y-auto { overflow-y: auto; }
-.overflow-x-auto { overflow-x: auto; }
-
-/* 滚动条优化 */
-
-/* 隐藏滚动条 */
-
-/* 阴影工具类 */
-.shadow-sm { box-shadow: var(--shadow-sm); }
-.shadow-md { box-shadow: var(--shadow-md); }
-.shadow-lg { box-shadow: var(--shadow-lg); }
-
-/* 圆角工具类 */
-.rounded-sm { border-radius: var(--radius-sm); }
-.rounded-md { border-radius: var(--radius-md); }
-.rounded-lg { border-radius: var(--radius-lg); }
-.rounded-xl { border-radius: var(--radius-xl); }
-.rounded-full { border-radius: var(--radius-full); }
-
-/* 过渡动画 */
-.transition { transition: all 0.2s ease; }
 
 /* ========================================
    Glass Morphism Components
@@ -749,7 +280,6 @@ textarea:focus {
 }
 
 .glass-button:hover:not(:disabled) {
-  /*background: var(--glass-medium);*/
   transform: translateY(-1px);
   box-shadow: var(--shadow-glass-hover);
 }
@@ -763,117 +293,53 @@ textarea:focus {
   cursor: not-allowed;
 }
 
-/* Solid Button - 实心按钮样式（用于 VillagesML） */
-
-/* VillagesML Subtab Title - 小标题样式 */
-.transition-fast { transition: all 0.15s ease; }
-.transition-slow { transition: all 0.3s ease; }
-
-/* 透明度 */
-.opacity-0 { opacity: 0; }
-.opacity-50 { opacity: 0.5; }
-.opacity-75 { opacity: 0.75; }
-.opacity-100 { opacity: 1; }
-
-/* 定位 */
-.relative { position: relative; }
-.absolute { position: absolute; }
-.fixed { position: fixed; }
-
-/* z-index */
-.z-0 { z-index: 0; }
-.z-10 { z-index: 10; }
-.z-50 { z-index: 50; }
-.z-100 { z-index: 100; }
-.z-999 { z-index: 999; }
-.z-9999 { z-index: 9999; }
-
-/* 宽度 */
-.w-full { width: 100%; }
-.w-auto { width: auto; }
-
-/* 高度 */
-.h-full { height: 100%; }
-.h-auto { height: auto; }
-
 /* ========================================
-   补充：常用毛玻璃变体
+   其他组件样式
    ======================================== */
-
-/* 轻度毛玻璃 */
-.glass-light {
-  background: var(--glass-light);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-/* 中度毛玻璃 */
-.glass-medium {
-  background: var(--glass-medium);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-/* 重度毛玻璃 */
-.glass-heavy {
-  background: var(--glass-heavy);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-/* 毛玻璃边框 */
-.glass-border {
-  border: 1px solid var(--glass-border);
+.result-panel-vue {
+  margin-bottom: 50px;
 }
 
 /* ========================================
-   动画效果
+   响应式断点 - 移动端优化
    ======================================== */
 
-/* 淡入 */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* 滑入 */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+/* 平板设备 */
+@media (max-width: 768px) {
+  .panel-title {
+    font-size: 2.2rem;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .thanks-list {
+    font-size: 1.2rem;
   }
 }
 
-/* 放大 */
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
+/* 手机设备 */
+@media (max-width: 600px) {
+  .page {
+    padding: 10px;
+    font-size: 16px;
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
+
+  .enter-btn {
+    padding: 5px !important;
+    font-size: 12px !important;
   }
 }
 
-/* 动画类 */
-.animate-fade-in {
-  animation: fadeIn 0.3s ease;
+/* 小屏手机 */
+@media (max-width: 480px) {
+  .panel-title {
+    font-size: 2.4rem;
+  }
+
+  .thanks-list {
+    font-size: 1.35rem;
+  }
 }
 
-.animate-slide-in {
-  animation: slideIn 0.3s ease;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.3s ease;
-}
-
-/* 🍏 Apple 风格液态玻璃弹窗背景和基本样式 */
+/* 🍏 Apple 风格液态玻璃弹窗 */
 .query-detail-panel {
   position: fixed;
   resize: both;
@@ -903,7 +369,7 @@ textarea:focus {
 }
 
 /* 鼠标悬停时：提升亮度 + 发光 + 不透明 */
-.query-detail-panel:hover{
+.query-detail-panel:hover {
   background: rgba(255, 255, 255, 0.6);
   box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3), 0 0 20px rgba(0, 123, 255, 0.4);
   border-color: rgba(0, 123, 255, 0.6);
