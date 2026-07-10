@@ -67,6 +67,8 @@
     "jyut2ipaDescription": "Confirm which column contains Jyutping before conversion so inconsistent column names do not block processing.",
     "mergeReferenceSummary": "{mappedCount} mapped / {columnCount} source columns",
     "actions": {
+      "exportSource": "Export source file",
+      "exporting": "Exporting...",
       "reselect": "Choose Another File",
       "confirmAndUse": "Confirm Mapping and Use File"
     },

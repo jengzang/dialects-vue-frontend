@@ -69,6 +69,8 @@
     "checkToolDescription": "先匹配字、音标与备注列，再进入检查工作台，可减少因列名不一致导致的导入失败。",
     "mergeReferenceSummary": "已匹配 {mappedCount} 列 / 来源 {columnCount} 列",
     "actions": {
+      "exportSource": "导出源文件",
+      "exporting": "导出中...",
       "reselect": "重新选择文件",
       "confirmAndUse": "确认列匹配并使用"
     },

@@ -7,6 +7,17 @@
       </div>
       <div class="tabular-import-preview__header-actions">
         <button
+          v-if="canExport"
+          class="main-glass-button"
+          data-variant="secondary"
+          data-size="small"
+          type="button"
+          :disabled="isExporting"
+          @click="handleExport"
+        >
+          {{ isExporting ? t('common.importPreview.actions.exporting') : resolvedExportLabel }}
+        </button>
+        <button
           v-if="file"
           class="main-glass-button"
           data-variant="secondary"
@@ -148,9 +159,10 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import { downloadTabularSource, isTabularSourceExportable } from '@/utils/import/downloadTabularSource.js'
 
 const props = defineProps({
   title: {
@@ -161,9 +173,17 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  source: {
+    type: Object,
+    default: null
+  },
   file: {
     type: Object,
     default: null
+  },
+  showExport: {
+    type: Boolean,
+    default: true
   },
   schema: {
     type: Array,
@@ -207,14 +227,55 @@ const props = defineProps({
   }
 })
 
-defineEmits(['update:selectedSheetId', 'update:headerRowIndex', 'update:mapping', 'reset'])
+const emit = defineEmits(['update:selectedSheetId', 'update:headerRowIndex', 'update:mapping', 'reset', 'export-start', 'export-success', 'export-error'])
 
 const { t } = useI18n()
+const isExporting = ref(false)
 
 const sheetOptions = computed(() => props.sheets.map((sheet) => ({
   label: `${sheet.name} (${sheet.rowCount})`,
   value: sheet.id
 })))
+
+const effectiveSource = computed(() => {
+  if (props.source) {
+    return props.source
+  }
+
+  if (props.file) {
+    return {
+      kind: 'upload',
+      file: props.file,
+      fileName: props.file.name,
+      displayName: props.file.name,
+      downloadable: true
+    }
+  }
+
+  return null
+})
+
+const canExport = computed(() => props.showExport && isTabularSourceExportable(effectiveSource.value))
+
+const resolvedExportLabel = computed(() => effectiveSource.value?.exportLabel || t('common.importPreview.actions.exportSource'))
+
+async function handleExport() {
+  if (!canExport.value || isExporting.value) {
+    return
+  }
+
+  isExporting.value = true
+  emit('export-start', effectiveSource.value)
+
+  try {
+    const result = await downloadTabularSource(effectiveSource.value)
+    emit('export-success', result)
+  } catch (error) {
+    emit('export-error', error)
+  } finally {
+    isExporting.value = false
+  }
+}
 
 const headerRowOptions = computed(() => {
   const rowCount = props.previewTable?.activeSheet?.rowCount || 0
@@ -290,6 +351,13 @@ $section-gap: 12px;
     align-items: flex-start;
   }
 
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
   &__eyebrow {
     margin: 0 0 6px;
     color: $text-light;
@@ -317,49 +385,55 @@ $section-gap: 12px;
     }
 
     &-title {
-      margin: 0;
+      margin: 0 0 4px;
       color: $text-primary;
+      font-size: 16px;
+      font-weight: 600;
     }
 
     &-text {
       margin: 0;
       color: $text-secondary;
+      font-size: 14px;
+      line-height: 1.5;
     }
   }
 
   &__toolbar {
     flex-wrap: wrap;
-    gap: 12px 18px;
+    gap: 12px;
     align-items: flex-end;
+    justify-content: space-between;
+  }
 
-    &-item {
-      flex-direction: column;
-      gap: 6px;
+  &__toolbar-item {
+    flex-direction: column;
+    gap: 8px;
 
-      &--compact {
-        min-width: 160px;
-      }
+    &--compact {
+      min-width: 160px;
     }
+  }
 
-    &-label {
-      color: $text-muted;
-      font-size: 12px;
-    }
+  &__toolbar-label {
+    color: $text-secondary;
+    font-size: 13px;
+  }
 
-    &-meta {
-      flex: 1 1 100%;
-      flex-wrap: wrap;
-      gap: 12px;
-      color: rgba(var(--text-deep-rgb), 0.62);
-      font-size: 12px;
-    }
+  &__toolbar-meta {
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-end;
+    color: $text-muted;
+    font-size: 12px;
   }
 
   &__loading {
     @include flex-center;
 
-    gap: 8px;
-    min-height: 120px;
+    gap: 10px;
+    min-height: 140px;
+    color: $text-secondary;
   }
 
   &__body {
@@ -371,157 +445,205 @@ $section-gap: 12px;
   &__preview {
     @include flex-column;
 
-    flex: 1 1 0;
-    gap: $section-gap;
-    min-width: 0;
+    gap: 14px;
     padding: 16px;
   }
 
-  &__mapping {
-    &-list {
-      @include flex-column;
-
-      gap: 10px;
-      max-height: 360px;
-      padding-right: 4px;
-      overflow: auto;
-    }
-
-    &-row {
-      gap: $section-gap;
-      align-items: center;
-      padding: 12px;
-      background: var(--glass-50);
-      border-radius: 14px;
-    }
-
-    &-meta {
-      @include flex-column;
-
-      flex: 1 1 0;
-      gap: 4px;
-      min-width: 0;
-    }
-
-    &-name {
-      color: $text-primary;
-      font-weight: 600;
-    }
-
-    &-desc,
-    &-example {
-      margin: 0;
-      color: $text-secondary;
-    }
-
-    &-control {
-      width: 260px;
-      max-width: 100%;
-    }
+  &__mapping,
+  &__preview,
+  &__table-wrap {
+    min-width: 0;
   }
 
   &__section-head {
+    align-items: flex-start;
+
     h4 {
-      margin: 0;
+      margin: 0 0 4px;
       color: $text-primary;
+      font-size: 16px;
     }
 
     p {
       margin: 0;
       color: $text-secondary;
+      font-size: 13px;
+      line-height: 1.5;
     }
   }
 
-  &__diagnostics {
-    @include flex-column;
+  &__mapping-summary {
+    display: flex;
+    align-items: center;
+  }
 
-    gap: 4px;
+  &__mapping-list {
+    display: grid;
+    gap: 12px;
+    max-height: 280px;
+    padding-right: 4px;
+    overflow: auto;
+  }
+
+  &__mapping-row {
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 12px;
+    background: var(--glass-35);
+    border: 1px solid var(--glass-30);
+    border-radius: 14px;
+  }
+
+  &__mapping-meta {
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__mapping-name-row {
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  &__mapping-name {
+    color: $text-primary;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  &__mapping-desc,
+  &__mapping-example {
+    margin: 0;
+    color: $text-secondary;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  &__mapping-example {
+    margin-top: 4px;
+    color: $text-muted;
+  }
+
+  &__mapping-control {
+    min-width: 220px;
+  }
+
+  &__diagnostics {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
   &__table-wrap {
     overflow: auto;
-    background: var(--glass-40);
+    border: 1px solid var(--glass-30);
     border-radius: 14px;
   }
 
   &__table {
     width: 100%;
-    font-size: 13px;
     border-collapse: collapse;
+    font-size: 13px;
+
+    thead {
+      background: var(--glass-45);
+    }
 
     th,
     td {
       padding: 10px 12px;
+      border-bottom: 1px solid var(--glass-20);
       text-align: left;
       vertical-align: top;
-      border-bottom: 1px solid rgba(var(--text-deep-rgb), 0.08);
     }
 
     th {
-      position: sticky;
-      top: 0;
       color: $text-primary;
-      background: rgba(231, 241, 255, 0.92);
+      font-weight: 600;
+      white-space: nowrap;
     }
 
-    &-empty {
-      color: $text-muted;
-      text-align: center;
+    td {
+      color: $text-secondary;
+      line-height: 1.5;
     }
   }
 
-  @media (max-width: 1100px) {
-    &__body {
-      flex-direction: column;
-    }
-
-    &__mapping {
-      &-control {
-        width: 100%;
-      }
-
-      &-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
-    }
+  &__table-empty {
+    text-align: center !important;
+    color: $text-muted !important;
   }
 }
 
+.mapping-badge,
 .mapping-required,
-.mapping-badge {
-  @include flex-center;
-
-  padding: 2px 8px;
-  font-size: 11px;
+.diagnostic {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   border-radius: 999px;
-}
-
-.mapping-required {
-  color: $primary-blue;
-  background: rgba(var(--color-primary-rgb), 0.12);
+  font-size: 12px;
 }
 
 .mapping-badge {
+  padding: 6px 12px;
+  border: 1px solid transparent;
+
   &.is-success {
     color: $success-green;
+    background: rgba(var(--color-success-rgb), 0.12);
+    border-color: rgba(var(--color-success-rgb), 0.22);
   }
 
   &.is-warning {
     color: $warning-orange;
+    background: rgba(var(--color-warning-rgb), 0.12);
+    border-color: rgba(var(--color-warning-rgb), 0.22);
   }
 }
 
-.diagnostic {
-  margin: 0;
-  color: $text-secondary;
+.mapping-required {
+  padding: 2px 8px;
+  color: $warning-orange;
+  background: rgba(var(--color-warning-rgb), 0.12);
+}
 
-  &--success {
-    color: $success-green;
-  }
+.diagnostic {
+  width: fit-content;
+  padding: 6px 12px;
+  line-height: 1.4;
 
   &--warning {
     color: $warning-orange;
+    background: rgba(var(--color-warning-rgb), 0.12);
+  }
+
+  &--success {
+    color: $success-green;
+    background: rgba(var(--color-success-rgb), 0.12);
+  }
+}
+
+@media (max-width: 960px) {
+  .tabular-import-preview {
+    &__body,
+    &__mapping-row,
+    &__section-head,
+    &__header,
+    &__toolbar {
+      flex-direction: column;
+    }
+
+    &__mapping-control {
+      width: 100%;
+      min-width: 0;
+    }
+
+    &__toolbar-meta,
+    &__header-actions {
+      justify-content: flex-start;
+    }
   }
 }
 </style>

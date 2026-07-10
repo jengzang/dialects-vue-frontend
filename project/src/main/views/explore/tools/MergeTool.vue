@@ -87,6 +87,7 @@
             :key="referenceImportConfirmKey"
             :title="t('common.importPreview.referenceTitle')"
             :description="t('common.importPreview.referenceDescription')"
+            :source="referencePreviewSource"
             :file="pendingReferenceFile"
             :schema="referenceImportSchema"
             :loading="referencePreviewState.loading"
@@ -121,15 +122,6 @@
               <span>
                 {{ isLoadingRef ? t('tools.merge.reference.loadingDefault') : t('tools.merge.reference.viewDefault') }}
               </span>
-            </button>
-            <button
-              v-if="!pendingReferenceFile"
-              class="main-glass-button"
-              data-variant="secondary"
-              @click="downloadDefaultReference"
-            >
-              <span class="icon">⬇️</span>
-              <span>{{ t('tools.merge.reference.downloadDefault') }}</span>
             </button>
             <button
               class="main-glass-button"
@@ -305,7 +297,7 @@ import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { downloadMerge, executeMerge, getMergeProgress, uploadFiles, uploadReference } from '@/api'
-import { showError, showSuccess } from '@/utils/message.js'
+import { showError } from '@/utils/message.js'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
@@ -319,7 +311,6 @@ const { requireAuth } = useAuthGuard({
 })
 
 const DEFAULT_REFERENCE_PATH = defaultReferenceWorkbookUrl
-const DEFAULT_REFERENCE_SENTINEL = '__default_reference__'
 const DEFAULT_REFERENCE_FILE_NAME = '参考表.xlsx'
 const MERGE_RESULT_FILE_NAME = '方音圖鑑_合併字表.xlsx'
 
@@ -361,6 +352,24 @@ const mergePollingTask = usePollingTask({
 })
 
 const isLoadingRef = computed(() => referencePreviewState.loading.value)
+const defaultReferenceSource = {
+  id: 'merge-default-reference',
+  kind: 'preset',
+  fileName: DEFAULT_REFERENCE_FILE_NAME,
+  displayName: DEFAULT_REFERENCE_FILE_NAME,
+  exportLabel: t('tools.merge.reference.downloadDefault'),
+  downloadable: true,
+  async resolveFile() {
+    const response = await fetch(DEFAULT_REFERENCE_PATH)
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+    const blob = await response.blob()
+    return new File([blob], DEFAULT_REFERENCE_FILE_NAME, {
+      type: blob.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    })
+  }
+}
 const referenceImportSchema = computed(() => ([
   {
     key: 'char',
@@ -429,19 +438,7 @@ const referenceImportFlow = useTabularImportFlow({
 
     return true
   },
-  createPreviewFile: async (file) => {
-    if (file === DEFAULT_REFERENCE_SENTINEL) {
-      const response = await fetch(DEFAULT_REFERENCE_PATH)
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
-      }
-      const blob = await response.blob()
-      return new File([blob], DEFAULT_REFERENCE_FILE_NAME, {
-        type: blob.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      })
-    }
-    return file
-  },
+  createPreviewFile: async (file) => file,
   onAutoApply: async () => {
     await handleReferenceConfirm()
   },
@@ -455,6 +452,24 @@ const referenceImportFlow = useTabularImportFlow({
   }
 })
 const isReferenceImportReady = computed(() => referenceImportFlow.isReady.value)
+const referencePreviewSource = computed(() => {
+  if (!pendingReferenceFile.value) {
+    return null
+  }
+
+  const isDefaultReference = pendingReferenceFile.value.name === DEFAULT_REFERENCE_FILE_NAME
+  if (isDefaultReference) {
+    return defaultReferenceSource
+  }
+
+  return {
+    kind: 'upload',
+    file: pendingReferenceFile.value,
+    fileName: pendingReferenceFile.value.name,
+    displayName: pendingReferenceFile.value.name,
+    downloadable: true
+  }
+})
 const referenceImportSummary = computed(() => {
   if (!referenceImportPayload.value) {
     return ''
@@ -536,10 +551,6 @@ const setReferenceFile = async (file, options = {}) => {
   } catch (error) {
     showError(t('tools.merge.messages.uploadFailed', { message: error.message }))
   }
-}
-
-const previewReferenceFile = async (file) => {
-  await referenceImportFlow.loadPreview(file)
 }
 
 const handleReferenceMappingUpdate = ({ fieldKey, sourceKey }) => {
@@ -737,30 +748,8 @@ const downloadMerged = async () => {
 const previewDefaultReference = async () => {
   if (isLoadingRef.value) return
 
-  await referenceImportFlow.loadPreview(DEFAULT_REFERENCE_SENTINEL)
-}
-
-const downloadDefaultReference = async () => {
-  try {
-    const response = await fetch(DEFAULT_REFERENCE_PATH)
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`)
-    }
-    const blob = await response.blob()
-
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = DEFAULT_REFERENCE_FILE_NAME
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
-
-    showSuccess(t('tools.merge.messages.defaultDownloaded'))
-  } catch (error) {
-    showError(t('tools.merge.messages.downloadFailed', { message: error.message }))
-  }
+  const file = await defaultReferenceSource.resolveFile()
+  await referenceImportFlow.loadPreview(file)
 }
 
 const reset = () => {
