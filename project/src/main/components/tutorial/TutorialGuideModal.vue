@@ -398,8 +398,8 @@ $radius-pill: 999px;
 $z-catalog-button: 20030;
 $z-catalog-panel: 20031;
 
-$glass-border: rgba(255, 255, 255, 0.66);
-$glass-border-strong: rgba(255, 255, 255, 0.72);
+$glass-border: var(--glass-70);
+$glass-border-strong: var(--glass-70);
 
 $blue-border-soft: rgba(122, 176, 230, 0.18);
 $blue-border-panel: rgba(110, 160, 214, 0.18);
@@ -409,11 +409,11 @@ $float-catalog-left: max(10px, calc(env(safe-area-inset-left, 0px) + 10px));
 $float-catalog-button-left:0;
 
 @mixin glass-panel {
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid var(--glass-60);
+  background: var(--glass-50);
   box-shadow:
     0 14px 34px rgba(38, 105, 176, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+    inset 0 1px 0 var(--glass-90);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
 }
@@ -605,13 +605,13 @@ $float-catalog-button-left:0;
   gap: 12px;
   min-width: 0;
   padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-50);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.42);
+  background: var(--glass-40);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    inset 0 1px 0 var(--glass-80),
     0 8px 20px rgba(45, 103, 160, 0.08);
 
   &__body {
@@ -660,7 +660,7 @@ $float-catalog-button-left:0;
     min-height: 34px;
     max-width: 180px;
     padding: 7px 12px;
-    border: 1px solid rgba(255, 255, 255, 0.42);
+    border: 1px solid var(--glass-40);
     border-radius: $radius-pill;
     background:
       linear-gradient(180deg, rgba(86, 166, 255, 0.98), rgba(42, 120, 216, 0.98));
@@ -671,7 +671,7 @@ $float-catalog-button-left:0;
     cursor: pointer;
     box-shadow:
       0 10px 20px rgba(45, 128, 224, 0.24),
-      inset 0 1px 0 rgba(255, 255, 255, 0.42);
+      inset 0 1px 0 var(--glass-40);
     transition:
       transform 0.18s ease,
       box-shadow 0.18s ease;
@@ -680,7 +680,7 @@ $float-catalog-button-left:0;
       transform: translateY(-1px);
       box-shadow:
         0 12px 24px rgba(45, 128, 224, 0.28),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        inset 0 1px 0 var(--glass-50);
     }
 
     &:active {
@@ -752,15 +752,15 @@ $float-catalog-button-left:0;
 .tutorial-entry {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.42);
+  border: 1px solid var(--glass-40);
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.38);
+  background: var(--glass-40);
   backdrop-filter: blur(18px) saturate(150%);
   -webkit-backdrop-filter: blur(18px) saturate(150%);
   text-align: left;
   cursor: pointer;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 1px 0 var(--glass-70),
     0 6px 14px rgba(45, 103, 160, 0.06);
   transition:
     transform 0.18s ease,
@@ -770,10 +770,10 @@ $float-catalog-button-left:0;
 
   &:hover {
     transform: translateY(-1px);
-    border-color: rgba(255, 255, 255, 0.62);
-    background: rgba(255, 255, 255, 0.52);
+    border-color: var(--glass-60);
+    background: var(--glass-50);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.82),
+      inset 0 1px 0 var(--glass-80),
       0 8px 18px rgba(45, 103, 160, 0.1);
   }
 
@@ -784,11 +784,11 @@ $float-catalog-button-left:0;
     -webkit-backdrop-filter: blur(24px) saturate(160%);
     box-shadow:
       0 10px 22px rgba(62, 132, 211, 0.14),
-      inset 0 1px 0 rgba(255, 255, 255, 0.86);
+      inset 0 1px 0 var(--glass-90);
   }
 
   &.is-current-route:not(.is-active) {
-    border-color: rgba(255, 255, 255, 0.55);
+    border-color: var(--glass-60);
   }
 
   &__title-row {
@@ -924,9 +924,9 @@ $float-catalog-button-left:0;
     min-width: 82px;
     min-height: 34px;
     padding: 7px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--glass-50);
     border-radius: $radius-pill;
-    background: rgba(255, 255, 255, 0.44);
+    background: var(--glass-40);
     backdrop-filter: blur(20px) saturate(150%);
     -webkit-backdrop-filter: blur(20px) saturate(150%);
     color: var(--color-primary-hover);
@@ -935,7 +935,7 @@ $float-catalog-button-left:0;
     cursor: pointer;
     box-shadow:
       0 8px 18px rgba(56, 123, 196, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.82);
+      inset 0 1px 0 var(--glass-80);
     transition:
       transform 0.18s ease,
       box-shadow 0.18s ease,
@@ -953,7 +953,7 @@ $float-catalog-button-left:0;
       transform: translateY(-1px);
       box-shadow:
         0 10px 22px rgba(56, 123, 196, 0.16),
-        inset 0 1px 0 rgba(255, 255, 255, 0.88);
+        inset 0 1px 0 var(--glass-90);
     }
 
     &:not(:disabled):active {
@@ -1022,7 +1022,7 @@ $float-catalog-button-left:0;
     box-shadow:
       0 18px 42px rgba(38, 105, 176, 0.2),
       0 8px 20px rgba(45, 103, 160, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.84);
+      inset 0 1px 0 var(--glass-80);
 
     &-float-button {
       position: fixed;
@@ -1045,7 +1045,7 @@ $float-catalog-button-left:0;
       cursor: pointer;
       box-shadow:
         0 10px 24px rgba(0, 122, 255, 0.32),
-        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        inset 0 1px 0 var(--glass-30);
 
       &__icon {
         font-size: 0.85rem;
@@ -1069,7 +1069,7 @@ $float-catalog-button-left:0;
       padding: 9px 10px;
       border-bottom: 1px solid rgba(223, 220, 220, 0.42);
       border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-      background: rgba(255, 255, 255, 0.5);
+      background: var(--glass-50);
       color: var(--color-primary-hover);
       font-size: 0.86rem;
       font-weight: 850;

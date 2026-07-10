@@ -105,14 +105,14 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   color: $text-default;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.68),
+    var(--glass-70),
     rgba(242, 247, 255, 0.44)
   );
-  border: 1px solid rgba(255, 255, 255, 0.42);
+  border: 1px solid var(--glass-40);
   border-radius: 22px;
   box-shadow:
     0 18px 48px rgba(31, 45, 74, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    inset 0 1px 0 var(--glass-50);
   transform: translateX(-50%);
 
   @include glass-blur(22px, 180%);
@@ -134,7 +134,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     border-color: rgba(52, 199, 89, 0.5);
 
     .toast-icon {
-      @include toast-icon(rgba(255, 255, 255, 0.25), 14px);
+      @include toast-icon(var(--glass-30), 14px);
     }
   }
 
@@ -148,7 +148,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     border-color: rgba(255, 59, 48, 0.5);
 
     .toast-icon {
-      @include toast-icon(rgba(255, 255, 255, 0.25), 16px);
+      @include toast-icon(var(--glass-30), 16px);
     }
   }
 
@@ -176,17 +176,17 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     border-color: rgba(0, 122, 255, 0.5);
 
     .toast-icon {
-      @include toast-icon(rgba(255, 255, 255, 0.25), 14px);
+      @include toast-icon(var(--glass-30), 14px);
     }
 
     &.has-action {
       color: $text-action-info;
       background: linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.6),
+        var(--glass-60),
         rgba(234, 243, 255, 0.4)
       );
-      border-color: rgba(255, 255, 255, 0.48);
+      border-color: var(--glass-50);
 
       .toast-icon {
         color: $apple-blue;
@@ -252,15 +252,15 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.46);
+  background: var(--glass-50);
   border: 0;
   border-radius: 999px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.38);
+  box-shadow: inset 0 0 0 1px var(--glass-40);
 
   @include glass-blur(10px);
 
   &:hover {
-    background: rgba(255, 255, 255, 0.62);
+    background: var(--glass-60);
   }
 }
 

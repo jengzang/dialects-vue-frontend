@@ -111,7 +111,7 @@ $primary-background-light: rgba(0, 122, 255, 0.03);
 $border-color: rgba(0, 0, 0, 0.1);
 $border-light: rgba(0, 0, 0, 0.05);
 
-$card-background: rgba(255, 255, 255, 0.5);
+$card-background: var(--glass-50);
 
 $content-padding: 12px 16px;
 $content-padding-mobile: 10px 12px;

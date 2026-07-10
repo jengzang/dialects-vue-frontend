@@ -766,12 +766,12 @@ const openEntryModal = () => {
   min-width: 24px;
   height: 24px;
   padding: 0 10px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-50);
   border-radius: 50%;
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.9),
-    rgba(255, 255, 255, 0.7)
+    var(--glass-90),
+    var(--glass-70)
   );
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -783,22 +783,22 @@ const openEntryModal = () => {
   user-select: none;
   white-space: nowrap;
   box-shadow:
-    inset 0 0 0.5px rgba(255, 255, 255, 0.3),
+    inset 0 0 0.5px var(--glass-30),
     0 4px 12px rgba(0, 122, 255, 0.15),
-    0 0 0 0.5px rgba(255, 255, 255, 0.1);
+    0 0 0 0.5px var(--glass-10);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     transform: scale(1.1);
     background: linear-gradient(
       145deg,
-      rgba(255, 255, 255, 1),
-      rgba(255, 255, 255, 0.85)
+      var(--text-white),
+      var(--glass-90)
     );
     box-shadow:
-      inset 0 0 0.5px rgba(255, 255, 255, 0.5),
+      inset 0 0 0.5px var(--glass-50),
       0 6px 16px rgba(0, 122, 255, 0.25),
-      0 0 0 0.5px rgba(255, 255, 255, 0.2);
+      0 0 0 0.5px var(--glass-20);
   }
 }
 
@@ -818,9 +818,9 @@ const openEntryModal = () => {
   width: 100%;
   max-width: 360px;
   padding: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--glass-60);
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   text-align: center;
@@ -889,7 +889,7 @@ const openEntryModal = () => {
   &.hint {
     border-color: rgba(142, 142, 147, 0.2);
     background: rgba(142, 142, 147, 0.1);
-    color: #8e8e93;
+    color: var(--text-secondary);
   }
 
   &.success {
@@ -920,14 +920,14 @@ const openEntryModal = () => {
   width: 40px;
   height: 40px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--glass-70);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--glass-70);
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   box-shadow:
     0 8px 22px rgba(0, 122, 255, 0.12),
-    inset 0 0 0.5px rgba(255, 255, 255, 0.55);
+    inset 0 0 0.5px var(--glass-60);
   transition:
     width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
     background 0.2s ease,
@@ -935,10 +935,10 @@ const openEntryModal = () => {
 
   &.active {
     width: min(320px, calc(100% - 24px));
-    background: rgba(255, 255, 255, 0.86);
+    background: var(--glass-90);
     box-shadow:
       0 10px 26px rgba(0, 122, 255, 0.16),
-      inset 0 0 0.5px rgba(255, 255, 255, 0.65);
+      inset 0 0 0.5px var(--glass-70);
   }
 }
 
@@ -995,7 +995,7 @@ const openEntryModal = () => {
   min-height: 220px;
   padding: 12px;
   overflow-y: auto;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--glass-40);
   border-radius: 16px;
   background: $glass-white;
   backdrop-filter: blur(10px);
@@ -1070,13 +1070,13 @@ const openEntryModal = () => {
   flex-direction: column;
   justify-content: center;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--glass-40);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--glass-40);
   transition: $motion-fast;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.55);
+    background: var(--glass-60);
   }
 
   &.collapsed {
@@ -1129,8 +1129,8 @@ const openEntryModal = () => {
   grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   gap: 8px;
   padding: 4px 10px 10px 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.15);
+  border-top: 1px solid var(--glass-30);
+  background: var(--glass-20);
 }
 
 .feature-leaf-node {
@@ -1140,9 +1140,9 @@ const openEntryModal = () => {
   justify-content: space-between;
   min-height: 52px;
   padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--glass-60);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   font-family: inherit;
   text-align: left;
   cursor: pointer;

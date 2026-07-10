@@ -46,7 +46,7 @@
   position: absolute;
   cursor: pointer;
   inset: 0;
-  background-color: #ccc;
+  background-color: var(--border-gray);
   transition: 0.3s;
   border-radius: 22px;
 }
@@ -75,7 +75,7 @@
   position: relative;
   width: 50px;
   height: 30px;
-  background-color: #ccc;
+  background-color: var(--border-gray);
   border-radius: 30px;
   display: flex;
   align-items: center;
@@ -145,7 +145,7 @@ textarea {
   margin-top: 0;
   padding: 6px 10px;
   resize: none;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-gray);
   border-radius: var(--radius-sm);
   background: var(--bg-white);
   min-width: 50px;

@@ -7,7 +7,7 @@
   width: var(--close-btn-size);
   height: var(--close-btn-size);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--glass-90);
   color: rgba(15, 23, 42, 0.96);
   display: inline-flex;
   align-items: center;
@@ -28,7 +28,7 @@
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.98);
+  background: var(--glass-90);
   border-color: rgba(220, 38, 38, 0.5);
   color: rgba(127, 29, 29, 0.98);
   transform: scale(1.06);

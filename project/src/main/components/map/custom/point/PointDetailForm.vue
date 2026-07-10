@@ -1236,7 +1236,7 @@ watch(
   overflow-x: auto;
   border-radius: $radius-md;
   border: 1px solid rgba($text-light, 0.16);
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 }
 
 .modal-records-table {

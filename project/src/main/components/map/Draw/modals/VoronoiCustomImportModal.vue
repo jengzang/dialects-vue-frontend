@@ -279,8 +279,8 @@ function confirmImport() {
   align-items: center;
   padding: 0.32rem 0.75rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.78);
+  background: var(--glass-70);
+  border: 1px solid var(--glass-80);
   color: rgba(11, 37, 64, 0.72);
   font-size: 0.8rem;
 }

@@ -916,7 +916,7 @@ $portrait-ratio: 1 / 1;
   overflow-y: auto;
   box-sizing: border-box;
 
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
   border: 1px solid rgba(200, 200, 200, 0.45);
   border-radius: 14px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -962,7 +962,7 @@ $portrait-ratio: 1 / 1;
   gap: 2px;
   padding: 4px 8px;
 
-  background: rgba(255, 255, 255, 0.48);
+  background: var(--glass-50);
   border: 1px solid rgba(160, 160, 160, 0.22);
   border-radius: 999px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
@@ -1011,8 +1011,8 @@ $portrait-ratio: 1 / 1;
   gap: 6px;
   padding: 10px 12px;
 
-  background: rgba(255, 255, 255, 0.28);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
+  border-bottom: 1px solid var(--glass-30);
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
 
   @include glass-blur(14px, 160%);
@@ -1145,7 +1145,7 @@ $portrait-ratio: 1 / 1;
   cursor: pointer;
 
   &.ghost {
-    background: rgba(255, 255, 255, 0.42);
+    background: var(--glass-40);
     border-color: rgba(160, 160, 160, 0.26);
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
     color: rgba(20, 20, 20, 0.82);
@@ -1171,8 +1171,8 @@ $portrait-ratio: 1 / 1;
   flex-direction: column;
   padding: 8px;
 
-  background: rgba(255, 255, 255, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--glass-40);
+  border: 1px solid var(--glass-30);
   border-radius: 12px;
   user-select: none;
 
@@ -1197,8 +1197,8 @@ $portrait-ratio: 1 / 1;
     box-shadow 0.2s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.28);
-    box-shadow: 0 0 6px rgba(255, 255, 255, 0.55) inset;
+    background: var(--glass-30);
+    box-shadow: 0 0 6px var(--glass-60) inset;
   }
 
   &.active {
@@ -1295,7 +1295,7 @@ $portrait-ratio: 1 / 1;
 
 .region-item {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   cursor: pointer;
@@ -1327,7 +1327,7 @@ $portrait-ratio: 1 / 1;
 
 .btn-manage {
   padding: 10px 24px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   border: 1px solid rgba(0, 122, 255, 0.3);
   border-radius: 8px;
   color: $primary;

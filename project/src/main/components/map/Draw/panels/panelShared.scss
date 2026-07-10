@@ -5,7 +5,7 @@
   flex-direction: column;
   gap: 0.6rem;
   padding-bottom: 0.9rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.42);
+  border-bottom: 1px solid var(--glass-40);
 }
 
 @mixin draw-field-stack {
@@ -180,8 +180,8 @@
   gap: 0.45rem;
   padding: 0.65rem;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.46);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: var(--glass-50);
+  border: 1px solid var(--glass-60);
 }
 
 .draw-layer-row[data-active='true'] {
@@ -234,8 +234,8 @@
 
 .draw-input {
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--glass-70);
+  background: var(--glass-70);
   color: var(--text-deep);
   padding: 0.5rem 0.75rem;
 }
@@ -267,8 +267,8 @@
 .draw-color-input {
   height: 2.8rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--glass-70);
+  background: var(--glass-70);
   padding: 0.3rem;
 }
 

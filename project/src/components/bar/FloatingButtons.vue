@@ -107,10 +107,10 @@ $transition-base: 0.3s ease;
 @mixin floating-glass {
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.3),
-    rgba(255, 255, 255, 0.15)
+    var(--glass-30),
+    var(--glass-20)
   );
-  border: 3px solid rgba(255, 255, 255, 0.5);
+  border: 3px solid var(--glass-50);
   box-shadow:
     0 8px 16px rgba(0, 0, 0, 0.15),
     0 2px 6px rgba(0, 0, 0, 0.1);
@@ -121,8 +121,8 @@ $transition-base: 0.3s ease;
 @mixin floating-hover {
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.5),
-    rgba(255, 255, 255, 0.3)
+    var(--glass-50),
+    var(--glass-30)
   );
   box-shadow:
     0 12px 24px rgba(0, 0, 0, 0.2),

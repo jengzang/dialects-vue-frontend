@@ -228,8 +228,8 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
 .app-modal {
   --modal-width: min(720px, 94dvw);
   --modal-max-height: min(70dvh, 640px);
-  --modal-background: rgba(255, 255, 255, 0.8);
-  --modal-border: 1px solid rgba(255, 255, 255, 0.55);
+  --modal-background: var(--glass-80);
+  --modal-border: 1px solid var(--glass-60);
   --modal-radius: 18px;
   --modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
   --modal-backdrop-filter: blur(20px) saturate(160%);
@@ -357,7 +357,7 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   justify-content: flex-end;
   padding: 16px 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  border-top: 1px solid var(--glass-50);
 }
 
 .modal-fade-enter-active,

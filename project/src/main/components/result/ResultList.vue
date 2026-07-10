@@ -545,7 +545,7 @@ $system-font:
   padding: 6px 10px;
   color: var(--text-slate);
   font-size: 12px;
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--glass-80);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 10px;
 }
@@ -586,7 +586,7 @@ $system-font:
   color: $text-dark;
   font-size: 14px;
   font-weight: bold;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(204, 204, 204, 0.6);
   border-radius: 10px;
   backdrop-filter: blur(2px);
@@ -600,7 +600,7 @@ $system-font:
   }
 
   &.sticky-scrolled {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--glass-10);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   }
 
@@ -641,14 +641,14 @@ $system-font:
 
   &:hover {
     color: $primary-blue;
-    background: rgba(255, 255, 255, 0.35);
+    background: var(--glass-40);
     box-shadow: 0 0 8px rgba(0, 122, 255, 0.22);
   }
 }
 
 .stickybar-location-dropdown {
   @include glass-dropdown(
-    rgba(255, 255, 255, 0.95),
+    var(--glass-90),
     220px,
     120px
   );
@@ -706,7 +706,7 @@ $system-font:
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-20);
   border: 1px solid rgba(0, 122, 255, 0.2);
   border-radius: 14px;
   backdrop-filter: blur(10px);
@@ -714,14 +714,14 @@ $system-font:
   transition: all 0.25s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: var(--glass-40);
     box-shadow: 0 0 8px rgba(0, 122, 255, 0.4);
   }
 }
 
 .stickybar-filter-dropdown {
   @include glass-dropdown(
-    rgba(255, 255, 255, 0.9),
+    var(--glass-90),
     200px,
     70px
   );

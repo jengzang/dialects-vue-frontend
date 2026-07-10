@@ -934,13 +934,13 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
 @mixin segmented-shell {
   padding: 4px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 0.5px solid rgba(255, 255, 255, 0.8);
+  background: var(--glass-60);
+  border: 0.5px solid var(--glass-80);
   border-radius: 12px;
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.06),
     0 2px 6px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    inset 0 1px 0 var(--glass-90);
 
   @include saturated-glass;
 }
@@ -1062,8 +1062,8 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
   color: $primary;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.6);
-  border: 0.5px solid rgba(255, 255, 255, 0.8);
+  background: var(--glass-60);
+  border: 0.5px solid var(--glass-80);
   border-radius: 12px;
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.06),
@@ -1074,7 +1074,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   @include saturated-glass;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--glass-90);
     box-shadow:
       0 6px 30px rgba(0, 0, 0, 0.08),
       0 3px 8px rgba(0, 0, 0, 0.06);
@@ -1241,7 +1241,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
   padding: 10px 16px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   outline: none;
@@ -1256,7 +1256,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   flex: 1;
   padding: 8px;
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: 12px;
 }
 
@@ -1322,13 +1322,13 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   gap: 14px;
   padding: 18px 20px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.75);
-  border: 0.5px solid rgba(255, 255, 255, 0.9);
+  background: var(--glass-80);
+  border: 0.5px solid var(--glass-90);
   border-radius: 16px;
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.06),
     0 2px 8px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
+    inset 0 1px 0 var(--text-white);
   transition: all $transition-base $ease-standard;
 
   @include saturated-glass;
@@ -1338,7 +1338,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow:
       0 12px 48px rgba(0, 0, 0, 0.08),
       0 4px 12px rgba(0, 0, 0, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 1);
+      inset 0 1px 0 var(--text-white);
     transform: translateY(-2px);
   }
 
@@ -1508,7 +1508,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 .local-filter-input {
   padding: 8px 32px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   outline: none;

@@ -538,7 +538,7 @@ $transition-normal: 0.3s;
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--glass-70);
   border: 1px solid $border-medium;
   border-radius: 12px;
   backdrop-filter: blur(20px);
@@ -548,7 +548,7 @@ $transition-normal: 0.3s;
     box-shadow $transition-fast ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--glass-90);
     box-shadow: 0 4px 12px $orange-border;
     transform: translateY(-2px);
   }

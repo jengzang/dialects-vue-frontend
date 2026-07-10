@@ -151,11 +151,11 @@ $transition-checkmark: 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
   position: relative;
   width: 18px;
   height: 18px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-20);
   border: 1px solid rgba(150, 150, 150, 0.3);
   border-radius: 4px;
   box-shadow:
-    inset 0 1px 3px rgba(255, 255, 255, 0.5),
+    inset 0 1px 3px var(--glass-50),
     0 2px 4px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);

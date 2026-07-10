@@ -433,12 +433,12 @@ $mobile-width: 150px;
     width: 30px;
     height: 30px;
     margin-right: 5px;
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--glass-70);
     border: 1px solid rgba(0, 122, 255, 0.14);
     border-radius: 999px;
     box-shadow:
       0 8px 18px rgba(24, 38, 64, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.78);
+      inset 0 1px 0 var(--glass-80);
     color: var(--color-primary);
     font-size: 18px;
     font-weight: 800;
@@ -454,7 +454,7 @@ $mobile-width: 150px;
       box-shadow 0.18s ease;
 
     &:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.92);
+      background: var(--glass-90);
       box-shadow:
         0 10px 22px rgba(24, 38, 64, 0.14),
         0 4px 10px rgba(0, 122, 255, 0.1);
@@ -499,15 +499,15 @@ $mobile-width: 150px;
       background:
         linear-gradient(
           180deg,
-          rgba(255, 255, 255, 0.52),
-          rgba(255, 255, 255, 0.24)
+          var(--glass-50),
+          var(--glass-20)
         ),
         rgba(240, 246, 255, 0.24);
-      border: 1px solid rgba(255, 255, 255, 0.44);
+      border: 1px solid var(--glass-40);
       border-radius: 999px;
       box-shadow:
         0 12px 30px rgba(24, 38, 64, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.72);
+        inset 0 1px 0 var(--glass-70);
       pointer-events: none;
 
       @include glass-blur(16px, 160%);
@@ -591,12 +591,12 @@ $mobile-width: 150px;
       .count-location-jump-nav-label {
         max-width: 158px;
         padding: 7px 12px;
-        background: rgba(255, 255, 255, 0.9);
+        background: var(--glass-90);
         border-color: rgba(0, 122, 255, 0.18);
         box-shadow:
           0 12px 26px rgba(24, 38, 64, 0.14),
           0 5px 12px rgba(0, 122, 255, 0.08),
-          inset 0 1px 0 rgba(255, 255, 255, 0.82);
+          inset 0 1px 0 var(--glass-80);
       }
 
       .count-location-jump-nav-text {
@@ -700,12 +700,12 @@ $mobile-width: 150px;
     max-width: 150px;
     padding: 5px 10px;
     opacity: 0;
-    background: rgba(255, 255, 255, 0.78);
+    background: var(--glass-80);
     border: 1px solid rgba(0, 122, 255, 0.12);
     border-radius: 999px;
     box-shadow:
       0 8px 20px rgba(24, 38, 64, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.78);
+      inset 0 1px 0 var(--glass-80);
     pointer-events: none;
     transform: translateY(-50%) translateX(8px);
 
@@ -832,7 +832,7 @@ $mobile-width: 150px;
       width: 28px;
       height: 28px;
       margin-right: 4px;
-      background: rgba(255, 255, 255, 0.84);
+      background: var(--glass-80);
     }
 
     .count-location-jump-nav-items {

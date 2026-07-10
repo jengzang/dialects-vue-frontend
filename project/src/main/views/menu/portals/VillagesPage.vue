@@ -94,9 +94,9 @@ const handleAllVillages = () => {
 
 .village-btn {
   padding: 24px 16px;
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid var(--glass-40);
   border-radius: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15));
+  background: linear-gradient(145deg, var(--glass-30), var(--glass-20));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
@@ -112,7 +112,7 @@ const handleAllVillages = () => {
 .village-btn:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
+  background: linear-gradient(145deg, var(--glass-50), var(--glass-30));
   border-color: rgba(0, 122, 255, 0.3);
 }
 

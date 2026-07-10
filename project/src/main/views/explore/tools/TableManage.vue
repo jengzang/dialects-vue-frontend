@@ -646,15 +646,15 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @mixin glass-panel(
-  $background: rgba(255, 255, 255, 0.7),
+  $background: var(--glass-70),
   $radius: $radius-lg
 ) {
   background: $background;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--glass-30);
   border-radius: $radius;
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    inset 0 1px 0 var(--glass-50);
 
   @include glass-blur;
 }
@@ -725,12 +725,12 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 .loading-container {
   padding: 60px 20px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--glass-70);
+  border: 1px solid var(--glass-30);
   border-radius: $radius-xl;
   box-shadow:
     0 8px 32px rgba(0, 122, 255, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    inset 0 1px 0 var(--glass-50);
 
   @include glass-blur;
 
@@ -751,7 +751,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: $radius-xl;
   box-shadow:
     0 8px 32px rgba(255, 193, 7, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    inset 0 1px 0 var(--glass-50);
 
   @include glass-blur;
 
@@ -782,7 +782,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   &:hover {
     box-shadow:
       0 12px 40px rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      inset 0 1px 0 var(--glass-50);
   }
 }
 
@@ -846,7 +846,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.3),
+      var(--glass-30),
       transparent
     );
     transition: left 0.5s;
@@ -881,7 +881,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   &:hover {
     box-shadow:
       0 12px 40px rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      inset 0 1px 0 var(--glass-50);
     transform: translateY(-2px);
   }
 
@@ -915,7 +915,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     padding: 12px 16px;
     font-size: 15px;
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--glass-90);
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: $radius-md;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -949,7 +949,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   max-width: 350px;
   padding: 12px 16px;
   font-size: 15px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--glass-90);
   border: 2px solid $primary-blue;
   border-radius: $radius-md;
   box-shadow: 0 4px 16px rgba(0, 122, 255, 0.2);
@@ -1000,7 +1000,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 16px;
   overflow-x: auto;
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border-radius: $radius-md;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
 
@@ -1043,7 +1043,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
   tbody {
     tr {
-      background: rgba(255, 255, 255, 0.8);
+      background: var(--glass-80);
       transition: all $transition-base $smooth-easing;
 
       &:hover {
@@ -1064,7 +1064,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   width: 80%;
   padding: 6px 12px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: $radius-sm;
   transition: all $transition-base $smooth-easing;
@@ -1079,7 +1079,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 20px;
   padding: 20px;
   background: rgba(233, 236, 239, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--glass-30);
   border-radius: $radius-md;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
 
@@ -1146,7 +1146,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     width: 100%;
     padding: 8px 12px;
     font-size: 14px;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--glass-90);
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: $radius-sm;
     transition: all $transition-base $smooth-easing;
@@ -1182,7 +1182,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.3),
+      var(--glass-30),
       transparent
     );
     transition: left 0.6s;
@@ -1261,7 +1261,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 @media (prefers-color-scheme: dark) {
   .config-section {
     background: rgba(28, 28, 30, 0.7);
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--glass-10);
 
     select,
     label {
@@ -1270,7 +1270,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
     select {
       background: rgba(44, 44, 46, 0.9);
-      border-color: rgba(255, 255, 255, 0.2);
+      border-color: var(--glass-20);
     }
   }
 
@@ -1279,7 +1279,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   .width-input {
     color: $white;
     background: rgba(44, 44, 46, 0.9);
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--glass-20);
   }
 
   .config-section label,

@@ -755,7 +755,7 @@ onMounted(() => {
 $user-text: var(--text-deep);
 $user-muted: var(--text-tertiary);
 $user-border: rgba(148, 163, 184, 0.24);
-$user-glass-border: rgba(255, 255, 255, 0.58);
+$user-glass-border: var(--glass-60);
 $user-accent: var(--color-primary);
 $user-danger: var(--color-error-light);
 $user-warning: var(--color-warning);
@@ -767,24 +767,24 @@ $user-success: var(--color-success);
   border: 1px solid $user-glass-border;
   border-radius: $radius;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.42)),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.32));
+    linear-gradient(135deg, var(--glass-80), var(--glass-40)),
+    linear-gradient(180deg, var(--glass-70), var(--glass-30));
   box-shadow:
     0 24px 70px rgba(15, 23, 42, 0.12),
     0 8px 22px rgba(15, 23, 42, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.26);
+    inset 0 1px 0 var(--glass-80),
+    inset 0 -1px 0 var(--glass-30);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
 }
 
 @mixin control-glass {
-  border: 1px solid rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--glass-60);
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.38)),
-    rgba(255, 255, 255, 0.56);
+    linear-gradient(135deg, var(--glass-80), var(--glass-40)),
+    var(--glass-60);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.76),
+    inset 0 1px 0 var(--glass-80),
     0 8px 22px rgba(15, 23, 42, 0.08);
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
@@ -868,8 +868,8 @@ $user-success: var(--color-success);
     z-index: -1;
     pointer-events: none;
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+      linear-gradient(var(--glass-30) 1px, transparent 1px),
+      linear-gradient(90deg, var(--glass-20) 1px, transparent 1px);
     background-size: 42px 42px;
     mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.32), transparent 72%);
   }
@@ -916,7 +916,7 @@ $user-success: var(--color-success);
   align-items: center;
   max-width: 220px;
   padding: 5px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.52);
+  border: 1px solid var(--glass-50);
   border-radius: 999px;
   overflow: hidden;
   color: var(--text-white);
@@ -928,7 +928,7 @@ $user-success: var(--color-success);
     linear-gradient(135deg, rgba(0, 122, 255, 0.9), rgba(88, 86, 214, 0.86)),
     rgba(0, 122, 255, 0.72);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 1px 0 var(--glass-40),
     0 10px 24px rgba(0, 122, 255, 0.24);
 }
 
@@ -985,7 +985,7 @@ $user-success: var(--color-success);
   &:hover:not(:disabled) {
     border-color: rgba(0, 122, 255, 0.28);
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.5)),
+      linear-gradient(135deg, var(--glass-90), var(--glass-50)),
       rgba(0, 122, 255, 0.08);
   }
 }
@@ -1000,12 +1000,12 @@ $user-success: var(--color-success);
     linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
     $user-accent;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 1px 0 var(--glass-30),
     0 12px 28px rgba(0, 122, 255, 0.26);
 
   &:hover:not(:disabled) {
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      inset 0 1px 0 var(--glass-30),
       0 16px 36px rgba(0, 122, 255, 0.34);
   }
 }
@@ -1016,7 +1016,7 @@ $user-success: var(--color-success);
     linear-gradient(135deg, rgba(255, 149, 0, 0.96), rgba(255, 107, 0, 0.9)),
     $user-warning;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 1px 0 var(--glass-30),
     0 12px 28px rgba(255, 149, 0, 0.22);
 }
 
@@ -1026,7 +1026,7 @@ $user-success: var(--color-success);
     linear-gradient(135deg, rgba(255, 59, 48, 0.96), rgba(211, 47, 47, 0.92)),
     $user-danger;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    inset 0 1px 0 var(--glass-30),
     0 12px 28px rgba(255, 59, 48, 0.22);
 }
 
@@ -1036,7 +1036,7 @@ $user-success: var(--color-success);
     linear-gradient(135deg, rgba(52, 199, 89, 0.96), rgba(40, 167, 69, 0.9)),
     $user-success;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 1px 0 var(--glass-30),
     0 12px 28px rgba(52, 199, 89, 0.22);
 }
 
@@ -1050,7 +1050,7 @@ $user-success: var(--color-success);
     linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
     $user-accent;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 1px 0 var(--glass-30),
     0 8px 18px rgba(0, 122, 255, 0.24);
 }
 
@@ -1062,10 +1062,10 @@ $user-success: var(--color-success);
   border: 1px solid rgba(148, 163, 184, 0.28);
   color: $user-text;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.48)),
-    rgba(255, 255, 255, 0.62);
+    linear-gradient(135deg, var(--glass-80), var(--glass-50)),
+    var(--glass-60);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 1px 0 var(--glass-70),
     0 8px 18px rgba(15, 23, 42, 0.04);
   transition:
     border-color 0.18s ease,
@@ -1079,10 +1079,10 @@ $user-success: var(--color-success);
   &:focus {
     outline: none;
     border-color: rgba(0, 122, 255, 0.56);
-    background: rgba(255, 255, 255, 0.86);
+    background: var(--glass-90);
     box-shadow:
       0 0 0 4px rgba(0, 122, 255, 0.11),
-      inset 0 1px 0 rgba(255, 255, 255, 0.76);
+      inset 0 1px 0 var(--glass-80);
   }
 }
 
@@ -1108,7 +1108,7 @@ $user-success: var(--color-success);
   align-items: center;
   justify-content: center;
   border-radius: inherit;
-  background: rgba(255, 255, 255, 0.68);
+  background: var(--glass-70);
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
 }
@@ -1154,8 +1154,8 @@ $user-success: var(--color-success);
     font-weight: 800;
     letter-spacing: 0.02em;
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(241, 245, 249, 0.68)),
-      rgba(255, 255, 255, 0.76);
+      linear-gradient(135deg, var(--glass-90), rgba(241, 245, 249, 0.68)),
+      var(--glass-80);
     backdrop-filter: blur(18px) saturate(180%);
     -webkit-backdrop-filter: blur(18px) saturate(180%);
 
@@ -1177,9 +1177,9 @@ $user-success: var(--color-success);
       transform: translateY(-1px);
 
       td {
-        background: rgba(255, 255, 255, 0.74);
+        background: var(--glass-70);
         box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.78),
+          inset 0 1px 0 var(--glass-80),
           0 10px 24px rgba(15, 23, 42, 0.08);
       }
     }
@@ -1187,20 +1187,20 @@ $user-success: var(--color-success);
 
   tbody td {
     color: var(--text-dark);
-    background: rgba(255, 255, 255, 0.46);
-    border-top: 1px solid rgba(255, 255, 255, 0.52);
+    background: var(--glass-50);
+    border-top: 1px solid var(--glass-50);
     border-bottom: 1px solid rgba(148, 163, 184, 0.12);
     transition:
       background-color 0.16s ease,
       box-shadow 0.16s ease;
 
     &:first-child {
-      border-left: 1px solid rgba(255, 255, 255, 0.52);
+      border-left: 1px solid var(--glass-50);
       border-radius: 14px 0 0 14px;
     }
 
     &:last-child {
-      border-right: 1px solid rgba(255, 255, 255, 0.52);
+      border-right: 1px solid var(--glass-50);
       border-radius: 0 14px 14px 0;
     }
   }
@@ -1222,7 +1222,7 @@ $user-success: var(--color-success);
   color: var(--text-slate-light) !important;
   text-align: center !important;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.46) !important;
+  background: var(--glass-50) !important;
   border-radius: 16px !important;
 }
 
@@ -1273,7 +1273,7 @@ $user-success: var(--color-success);
     border-color: rgba(0, 122, 255, 0.38);
     color: $user-accent;
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.52)),
+      linear-gradient(135deg, var(--glass-90), var(--glass-50)),
       rgba(0, 122, 255, 0.08);
   }
 
@@ -1284,7 +1284,7 @@ $user-success: var(--color-success);
       linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
       $user-accent;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      inset 0 1px 0 var(--glass-30),
       0 12px 24px rgba(0, 122, 255, 0.24);
   }
 }
@@ -1318,13 +1318,13 @@ $user-success: var(--color-success);
 .batch-table-wrapper {
   max-height: 500px;
   overflow: auto;
-  border: 1px solid rgba(255, 255, 255, 0.54);
+  border: 1px solid var(--glass-50);
   border-radius: 18px;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.38)),
-    rgba(255, 255, 255, 0.46);
+    linear-gradient(135deg, var(--glass-70), var(--glass-40)),
+    var(--glass-50);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 1px 0 var(--glass-70),
     0 16px 34px rgba(15, 23, 42, 0.08);
 }
 
@@ -1353,15 +1353,15 @@ $user-success: var(--color-success);
     color: var(--text-slate);
     font-weight: 800;
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(241, 245, 249, 0.76)),
-      rgba(255, 255, 255, 0.78);
+      linear-gradient(135deg, var(--glass-90), rgba(241, 245, 249, 0.76)),
+      var(--glass-80);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
   }
 
   td {
     color: var(--text-dark);
-    background: rgba(255, 255, 255, 0.34);
+    background: var(--glass-30);
   }
 
   tr:hover td {
@@ -1420,7 +1420,7 @@ $user-success: var(--color-success);
     linear-gradient(135deg, rgba(255, 59, 48, 0.96), rgba(211, 47, 47, 0.92)),
     $user-danger;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 1px 0 var(--glass-20),
     0 8px 18px rgba(255, 59, 48, 0.2);
   transition:
     transform 0.16s ease,
@@ -1429,7 +1429,7 @@ $user-success: var(--color-success);
   &:hover {
     transform: translateY(-1px);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      inset 0 1px 0 var(--glass-30),
       0 12px 24px rgba(255, 59, 48, 0.26);
   }
 }

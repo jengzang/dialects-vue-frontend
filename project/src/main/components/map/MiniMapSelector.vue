@@ -302,7 +302,7 @@ onBeforeUnmount(() => {
   bottom: 12px;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--glass-90);
   color: $text-secondary;
   font-size: 12px;
   line-height: 1;

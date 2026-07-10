@@ -176,8 +176,8 @@
             <button
               type="button"
               class="text-color-btn text-black"
-              :class="{ active: avatarConfig.textColor === '#1d1d1f' }"
-              @click="avatarConfig.textColor = '#1d1d1f'"
+              :class="{ active: avatarConfig.textColor === 'var(--text-primary)' }"
+              @click="avatarConfig.textColor = 'var(--text-primary)'"
             >
               {{ $t('auth.profile.avatar.textColorBlack') }}
             </button>
@@ -248,7 +248,7 @@ const presetSolids = [
   'var(--color-purple-light)', // Apple Purple
   'var(--color-purple)', // Apple Indigo
   '#ffcc00', // Apple Yellow
-  '#8e8e93', // Apple Gray
+  'var(--text-secondary)', // Apple Gray
 ];
 
 const presetGradients = [
@@ -365,11 +365,11 @@ const avatarStyle = computed(() => {
       if (avatarConfig.value.bgColor === '#ffffff') {
         styles.backdropFilter = 'blur(15px) saturate(150%)';
         styles.webkitBackdropFilter = 'blur(15px) saturate(150%)';
-        styles.border = '3px solid rgba(255, 255, 255, 0.4)';
+        styles.border = '3px solid var(--glass-40)';
       } else {
         styles.backdropFilter = 'blur(16px) saturate(160%)';
         styles.webkitBackdropFilter = 'blur(16px) saturate(160%)';
-        styles.border = '2.5px solid rgba(255, 255, 255, 0.5)';
+        styles.border = '2.5px solid var(--glass-50)';
       }
     } else {
       styles.background = avatarConfig.value.bgColor;
@@ -381,7 +381,7 @@ const avatarStyle = computed(() => {
       styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.55), rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25))`;
       styles.backdropFilter = 'blur(20px) saturate(190%)';
       styles.webkitBackdropFilter = 'blur(20px) saturate(190%)';
-      styles.border = '2.5px solid rgba(255, 255, 255, 0.5)';
+      styles.border = '2.5px solid var(--glass-50)';
     } else {
       styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, ${avatarConfig.value.gradientFrom}, ${avatarConfig.value.gradientTo})`;
     }
@@ -394,30 +394,30 @@ const avatarStyle = computed(() => {
           styles.boxShadow = '0 6px 10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.08)';
         } else {
           const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 0, g: 122, b: 255 };
-          styles.boxShadow = `0 8px 24px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2), inset 0 0 12px rgba(255, 255, 255, 0.3)`;
+          styles.boxShadow = `0 8px 24px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2), inset 0 0 12px var(--glass-30)`;
         }
       } else {
         const rgb = hexToRgb(avatarConfig.value.bgColor);
         if (rgb) {
-          styles.boxShadow = `0 8px 20px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.2)`;
+          styles.boxShadow = `0 8px 20px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4), inset 0 0 8px var(--glass-20)`;
         } else {
           styles.boxShadow =
-            '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)';
+            '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px var(--glass-20)';
         }
       }
     } else if (avatarConfig.value.bgType === 'gradient') {
       if (isGlass) {
         const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom) || { r: 0, g: 122, b: 255 };
         const rgbTo = hexToRgb(avatarConfig.value.gradientTo) || { r: 0, g: 198, b: 255 };
-        styles.boxShadow = `0 10px 25px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 5px 15px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)`;
+        styles.boxShadow = `0 10px 25px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 5px 15px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 2px 4px var(--glass-60), inset 0 -2px 4px rgba(0, 0, 0, 0.08)`;
       } else {
         const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom);
         const rgbTo = hexToRgb(avatarConfig.value.gradientTo);
         if (rgbFrom && rgbTo) {
-          styles.boxShadow = `0 8px 20px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 4px 12px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 0 8px rgba(255, 255, 255, 0.2)`;
+          styles.boxShadow = `0 8px 20px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 4px 12px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 0 8px var(--glass-20)`;
         } else {
           styles.boxShadow =
-            '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)';
+            '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px var(--glass-20)';
         }
       }
     }
@@ -427,10 +427,10 @@ const avatarStyle = computed(() => {
         styles.boxShadow =
           avatarConfig.value.bgColor === '#ffffff'
             ? 'none'
-            : 'inset 0 0 12px rgba(255, 255, 255, 0.3)';
+            : 'inset 0 0 12px var(--glass-30)';
       } else if (avatarConfig.value.bgType === 'gradient') {
         styles.boxShadow =
-          'inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)';
+          'inset 0 2px 4px var(--glass-60), inset 0 -2px 4px rgba(0, 0, 0, 0.08)';
       }
     } else {
       styles.boxShadow = 'none';
@@ -535,7 +535,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   width: 100%;
   max-width: 280px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.45);
+  background: var(--glass-50);
   border: 1px dashed rgba(0, 0, 0, 0.15);
   border-radius: $radius-xl;
 }
@@ -623,7 +623,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   padding: 10px 14px;
   font-size: 15px;
   font-weight: 500;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: $radius-lg;
   outline: none;
@@ -652,7 +652,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-60);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: $radius-md;
   transition: all $transition-fast $smooth-easing;
@@ -732,7 +732,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   text-align: center;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--glass-40);
   border-radius: $radius-md;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   transition: all $transition-medium $smooth-easing;

@@ -936,7 +936,7 @@ $white: #fff;
 
 $success: var(--color-success);
 $warning: var(--color-warning);
-$gray: #8e8e93;
+$gray: var(--text-secondary);
 
 $primary-background: rgba(0, 122, 255, 0.05);
 $primary-background-medium: rgba(0, 122, 255, 0.1);
@@ -946,9 +946,9 @@ $primary-shadow: rgba(0, 122, 255, 0.2);
 $error-background: rgba(255, 59, 48, 0.1);
 $error-border: rgba(255, 59, 48, 0.3);
 
-$surface-medium: rgba(255, 255, 255, 0.5);
-$surface-strong: rgba(255, 255, 255, 0.7);
-$surface-hover: rgba(255, 255, 255, 0.8);
+$surface-medium: var(--glass-50);
+$surface-strong: var(--glass-70);
+$surface-hover: var(--glass-80);
 
 $transition-normal: 0.3s;
 
@@ -1174,7 +1174,7 @@ $transition-normal: 0.3s;
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-60);
   border: none;
   border-radius: 50%;
   cursor: pointer;

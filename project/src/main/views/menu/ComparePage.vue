@@ -1494,26 +1494,26 @@ const runAction = async () => {
       if (compareType === 'chars') {
         // 漢字比較：4種狀態
         mapStore.compareGroups = {
-          same: { color: '#4CAF50', label: t('compare.legend.same') },
-          partial: { color: '#FFC107', label: t('compare.legend.partial') },
-          diff: { color: '#F44336', label: t('compare.legend.diff') },
+          same: { color: 'var(--color-success)', label: t('compare.legend.same') },
+          partial: { color: 'var(--color-warning)', label: t('compare.legend.partial') },
+          diff: { color: 'var(--color-error)', label: t('compare.legend.diff') },
           unknown: { color: '#9E9E9E', label: t('compare.legend.unknown') }
         }
       } else if (compareType === 'zhonggu') {
         // 中古比較：相似度百分比
         mapStore.compareGroups = {
-          same: { color: '#4CAF50', label: t('compare.legend.samePercent') },
+          same: { color: 'var(--color-success)', label: t('compare.legend.samePercent') },
           high_similar: { color: '#8BC34A', label: t('compare.legend.highSimilar') },
-          partial: { color: '#FFC107', label: t('compare.legend.partialSimilar') },
-          diff: { color: '#F44336', label: t('compare.legend.diffPercent') },
+          partial: { color: 'var(--color-warning)', label: t('compare.legend.partialSimilar') },
+          diff: { color: 'var(--color-error)', label: t('compare.legend.diffPercent') },
           unknown: { color: '#9E9E9E', label: t('compare.legend.unknown') }
         }
       } else if (compareType === 'tones') {
         // 調類比較：合併狀態
         mapStore.compareGroups = {
-          same: { color: '#4CAF50', label: t('compare.legend.merged') },
+          same: { color: 'var(--color-success)', label: t('compare.legend.merged') },
           maybe: { color: '#8BC34A', label: t('compare.legend.maybeMerged') },  // 使用黃綠色，與中古比較的高度相似顏色一致
-          diff: { color: '#F44336', label: t('compare.legend.notMerged') },
+          diff: { color: 'var(--color-error)', label: t('compare.legend.notMerged') },
           unknown: { color: '#9E9E9E', label: t('compare.legend.unknown') }
         }
       }
@@ -1615,10 +1615,10 @@ function createComparisonItem(location, coordinate, feature, status, data, pair)
   let displayValue = ''
 
   if (status === 'same') {
-    color = '#4CAF50'
+    color = 'var(--color-success)'
     displayValue = data.value || t('compare.legend.same')
   } else if (status === 'diff') {
-    color = '#F44336'
+    color = 'var(--color-error)'
     if (data.values) {
       const values = Object.entries(data.values)
         .map(([char, vals]) => `${char}:${vals.join('/')}`)
@@ -1632,7 +1632,7 @@ function createComparisonItem(location, coordinate, feature, status, data, pair)
       displayValue = t('compare.legend.diff')
     }
   } else if (status === 'partial') {
-    color = '#FFC107'
+    color = 'var(--color-warning)'
     if (data.t1_value || data.t2_value) {
       const t1 = data.t1_value?.join('/') || t('common.label.noData')
       const t2 = data.t2_value?.join('/') || t('common.label.noData')
@@ -1703,7 +1703,7 @@ function createZhongGuComparisonItem(location, coordinate, feature, featureData)
 
   let color, status, statusText
   if (overlap >= 80) {
-    color = '#4CAF50'
+    color = 'var(--color-success)'
     status = 'same'
     statusText = t('compare.legend.samePercent')
   } else if (overlap >= 60) {
@@ -1711,11 +1711,11 @@ function createZhongGuComparisonItem(location, coordinate, feature, featureData)
     status = 'high_similar'
     statusText = t('compare.legend.highSimilar')
   } else if (overlap >= 30) {
-    color = '#FFC107'
+    color = 'var(--color-warning)'
     status = 'partial'
     statusText = t('compare.legend.partialSimilar')
   } else {
-    color = '#F44336'
+    color = 'var(--color-error)'
     status = 'diff'
     statusText = t('compare.legend.diffPercent')
   }
@@ -1944,7 +1944,7 @@ $text-muted: var(--text-lightest);
   width: 100%;
   max-width: 180px;
   height: 38px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   border: 1px solid rgba(0, 122, 255, 0.35);
   border-radius: 8px;
   outline: none;
@@ -2076,7 +2076,7 @@ $text-muted: var(--text-lightest);
 .selected-group {
   max-width: 38dvw;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   border: 2px solid rgba(0, 122, 255, 0.3);
   border-radius: 12px;
 
@@ -2132,7 +2132,7 @@ $text-muted: var(--text-lightest);
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem 0.8rem;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   border: 1px solid rgba(0, 122, 255, 0.2);
   border-radius: 8px;
   transition: all 0.2s ease;
@@ -2214,7 +2214,7 @@ $text-muted: var(--text-lightest);
   align-items: center;
   gap: 0.5rem;
   padding: 0.6rem 1.2rem;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--glass-70);
   border: 2px solid rgba(0, 122, 255, 0.3);
   border-radius: 10px;
   cursor: pointer;

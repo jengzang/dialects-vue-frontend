@@ -337,7 +337,7 @@ watch(
   gap: 10px;
   padding: 10px 12px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.74);
+  background: var(--glass-70);
   border: 1px solid rgba($text-light, 0.22);
 }
 

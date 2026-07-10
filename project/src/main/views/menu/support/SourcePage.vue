@@ -113,7 +113,7 @@ $transition-duration: 0.3s;
 
 .setting-section {
   padding: 24px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
@@ -152,7 +152,7 @@ $transition-duration: 0.3s;
   padding: 16px;
   text-align: left;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   border: 2px solid $border-color;
   border-radius: 12px;
   transition: all $transition-duration ease;

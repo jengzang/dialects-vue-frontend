@@ -361,7 +361,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
     line-height: 1.25;
     letter-spacing: -0.02em;
     color: $text-strong;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.45);
+    text-shadow: 0 1px 2px var(--glass-50);
   }
 
   .hint {
@@ -527,7 +527,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
 
   &:disabled,
   &.disabled-style {
-    background: #ccc;
+    background: var(--border-gray);
     cursor: not-allowed;
     transform: none !important;
     box-shadow: none;

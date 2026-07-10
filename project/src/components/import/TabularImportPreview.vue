@@ -308,7 +308,7 @@ $section-gap: 12px;
     align-items: center;
     min-height: 140px;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.42);
+    background: var(--glass-40);
     border: 1px dashed rgba(0, 122, 255, 0.22);
     border-radius: 18px;
 
@@ -391,7 +391,7 @@ $section-gap: 12px;
       gap: $section-gap;
       align-items: center;
       padding: 12px;
-      background: rgba(255, 255, 255, 0.48);
+      background: var(--glass-50);
       border-radius: 14px;
     }
 
@@ -440,7 +440,7 @@ $section-gap: 12px;
 
   &__table-wrap {
     overflow: auto;
-    background: rgba(255, 255, 255, 0.36);
+    background: var(--glass-40);
     border-radius: 14px;
   }
 

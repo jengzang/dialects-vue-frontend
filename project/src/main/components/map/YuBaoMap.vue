@@ -399,7 +399,7 @@ const convertToGeoJSON = (data) => {
       textColor = '#a6ffdc'
     } else {
       bgColor = assignColor(mergedText)
-      textColor = '#1d1d1f'
+      textColor = 'var(--text-primary)'
     }
 
     deduplicatedFeatures.push({
@@ -605,7 +605,7 @@ const handleStyleChange = () => {
         'circle-color': ['get', 'bgColor'],
         'circle-opacity': 0.9,
         'circle-stroke-width': 1.5,
-        'circle-stroke-color': 'rgba(255, 255, 255, 0.8)'
+        'circle-stroke-color': 'var(--glass-80)'
       }
     })
 
@@ -721,7 +721,7 @@ const initMap = () => {
         'circle-color': ['get', 'bgColor'],
         'circle-opacity': 0.9,
         'circle-stroke-width': 1.5,
-        'circle-stroke-color': 'rgba(255, 255, 255, 0.8)'
+        'circle-stroke-color': 'var(--glass-80)'
       }
     })
 
@@ -861,7 +861,7 @@ watch(() => props.activeTab, () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
@@ -901,7 +901,7 @@ watch(() => props.activeTab, () => {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-90);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding: 12px;
@@ -930,7 +930,7 @@ watch(() => props.activeTab, () => {
   width: 100%;
   appearance: none;
   background: white;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-light-gray);
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 14px;
@@ -1032,10 +1032,10 @@ watch(() => props.activeTab, () => {
   font-size: 15px;
   font-weight: 600;
   color: var(--text-dark)
-  background: rgba(255, 255, 255, 0.65);
+  background: var(--glass-70);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-50);
   border-radius: 50px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
   cursor: pointer;
@@ -1047,7 +1047,7 @@ watch(() => props.activeTab, () => {
 }
 
 .exit-fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-90);
   transform: scale(1.05);
   box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
 }
@@ -1106,7 +1106,7 @@ watch(() => props.activeTab, () => {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-divider);
   background: #f8f8f8;
 }
 

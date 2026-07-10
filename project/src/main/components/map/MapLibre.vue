@@ -803,7 +803,7 @@ const drawCompareMap = () => {
 
     // 鼠标悬停效果 - 使用 box-shadow 而不是 transform 避免位置偏移
     el.addEventListener('mouseenter', () => {
-      el.style.boxShadow = '0 0 0 3px rgba(255,255,255,0.8), 0 4px 12px rgba(0,0,0,0.4)';
+      el.style.boxShadow = '0 0 0 3px var(--glass-80), 0 4px 12px rgba(0,0,0,0.4)';
       el.style.width = '18px';
       el.style.height = '18px';
       el.style.zIndex = '1000';
@@ -950,8 +950,8 @@ const resetView = () => {
   max-width: 80%;
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
-  background-color: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background-color: var(--glass-30);
+  border: 1px solid var(--glass-40);
   color: #c28f00;
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
   text-align: center;
@@ -1079,10 +1079,10 @@ const resetView = () => {
   font-size: 15px;
   font-weight: 600;
   color: var(--text-dark)
-  background: rgba(255, 255, 255, 0.65); /* 半透明白 */
+  background: var(--glass-70); /* 半透明白 */
   backdrop-filter: blur(20px) saturate(180%); /* 液態模糊感 */
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.5); /* 玻璃邊緣反光 */
+  border: 1px solid var(--glass-50); /* 玻璃邊緣反光 */
   border-radius: 50px; /* 膠囊形狀 */
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); /* 柔和陰影 */
   cursor: pointer;
@@ -1094,7 +1094,7 @@ const resetView = () => {
 }
 
 .exit-fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-90);
   transform: scale(1.05);
   box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
 }
@@ -1120,7 +1120,7 @@ const resetView = () => {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-90);
   backdrop-filter: blur(12px);
   padding: 12px;
   border-radius: 12px;
@@ -1190,7 +1190,7 @@ const resetView = () => {
 .loading-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1238,7 +1238,7 @@ const resetView = () => {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-divider);
 }
 
 .location-popup-header h3 {
@@ -1307,7 +1307,7 @@ const resetView = () => {
 .tone-table td {
   padding: 10px;
   text-align: left;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-light-gray);
 }
 
 .tone-table th {

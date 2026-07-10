@@ -684,7 +684,7 @@ const generatePieChartOption = (pieData) => {
     //       </div>`
     //
     //     if (item.level2 && item.level2.length > 0) {
-    //       html += `<div style="border-top: 1px solid #eee; margin: 6px 0; padding-top: 6px;">
+    //       html += `<div style="border-top: 1px solid var(--border-divider); margin: 6px 0; padding-top: 6px;">
     //         <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">
     //           细分（按${level2Column.value}）：
     //         </div>`
@@ -707,7 +707,7 @@ const generatePieChartOption = (pieData) => {
     //     } else if (item.chars && item.chars.length > 0) {
     //       const displayChars = item.chars.slice(0, 15)
     //       const remaining = item.chars.length - displayChars.length
-    //       html += `<div style="border-top: 1px solid #eee; margin: 6px 0; padding-top: 6px; font-size: 11px;">
+    //       html += `<div style="border-top: 1px solid var(--border-divider); margin: 6px 0; padding-top: 6px; font-size: 11px;">
     //         字：${displayChars.join('、')}${remaining > 0 ? ` +${remaining}个` : ''}
     //       </div>`
     //     }
@@ -1144,7 +1144,7 @@ const generateSankeyOption = () => {
       },
       itemStyle: {
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.8)'
+        borderColor: 'var(--glass-80)'
       },
       levels: [
         { depth: 0, itemStyle: { color: '#4f7cff' }, lineStyle: { opacity: 0.35 } },
@@ -1478,10 +1478,10 @@ $portrait-ratio: 1 / 1;
   --main-glass-panel-border: 1px solid var(--glass-30);
   --main-glass-panel-shadow:
     0 4px 16px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+    inset 0 0 0 1px var(--glass-30);
   --main-glass-panel-hover-shadow:
     0 4px 16px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+    inset 0 0 0 1px var(--glass-30);
 
   max-width: 600px;
   margin-bottom: 20px;
@@ -1709,7 +1709,7 @@ $portrait-ratio: 1 / 1;
   inset: 0;
   z-index: 30;
   min-height: 300px;
-  background: rgba(255, 255, 255, 0.45);
+  background: var(--glass-50);
   pointer-events: auto;
 
   @include flex-center;
@@ -1789,8 +1789,8 @@ $portrait-ratio: 1 / 1;
 
   &__item {
     padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.45);
+    background: var(--glass-60);
+    border: 1px solid var(--glass-50);
     border-radius: 12px;
   }
 

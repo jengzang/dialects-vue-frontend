@@ -263,7 +263,7 @@ $transition-expand: 0.3s;
   transition: background $transition-fast;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--glass-40);
   }
 
   &.is-match {

@@ -459,8 +459,8 @@ $border-breath-duration: 1.5s;
 }
 
 .result-panel-vue {
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: var(--glass-05);
+  border: 2px solid var(--glass-10);
   border-radius: $panel-radius;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur($panel-blur);

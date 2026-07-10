@@ -335,7 +335,7 @@ $dropdown-selected-color: var(--color-primary-hover);
   cursor: pointer;
   user-select: none;
   background: var(--color-primary-medium);
-  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  border-left: 1px solid var(--glass-30);
   transition: all $transition-duration ease;
 
   &:hover {
@@ -365,7 +365,7 @@ $dropdown-selected-color: var(--color-primary-hover);
   max-height: 40dvh;
   padding: 6px 0;
   overflow: auto;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-90);
   border-radius: 10px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(12px);

@@ -1007,13 +1007,13 @@ onBeforeUnmount(() => {
   flex-direction: column;
   gap: 4px;
   padding: 4px;
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--glass-80);
   backdrop-filter: blur(60px) saturate(200%);
   -webkit-backdrop-filter: blur(60px) saturate(200%);
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--glass-40);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
-              inset 0 1px 0 rgba(255, 255, 255, 0.6);
+              inset 0 1px 0 var(--glass-60);
 }
 
 .tab-btn {
@@ -1224,7 +1224,7 @@ onBeforeUnmount(() => {
   border-radius: 24px;
 
   /* 2. 背景：降低透明度，让底色更透 */
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
 
   /* 3. 增强模糊：saturate 稍微拉高一点点，模拟折射 */
   backdrop-filter: blur(40px) saturate(200%);
@@ -1233,8 +1233,8 @@ onBeforeUnmount(() => {
   /* 4. 复合阴影：这是液态感的关键 */
   box-shadow:
       0 20px 50px rgba(0, 0, 0, 0.1),            /* 整体浮动感 */
-      inset 0 0 0 1.5px rgba(255, 255, 255, 0.5), /* 环绕的高光边框，模拟玻璃边缘折射 */
-      inset 0 1px 1px rgba(255, 255, 255, 0.8);   /* 顶部微弱亮边 */
+      inset 0 0 0 1.5px var(--glass-50), /* 环绕的高光边框，模拟玻璃边缘折射 */
+      inset 0 1px 1px var(--glass-80);   /* 顶部微弱亮边 */
 
   /* 取消原来的 border-right，改用阴影里的 inset 模拟更高级 */
   border: none;
@@ -1307,14 +1307,14 @@ onBeforeUnmount(() => {
   right: 2rem;
   width: 320px;
   max-width: calc(100vw - 4rem);
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--glass-80);
   backdrop-filter: blur(60px) saturate(200%);
   -webkit-backdrop-filter: blur(60px) saturate(200%);
   border-radius: var(--radius-xl);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--glass-40);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    inset 0 1px 0 var(--glass-60);
   z-index: 100;
   overflow: hidden;
   max-height: 95dvh;

@@ -368,15 +368,15 @@ const resetForm = () => {
   max-height: 90vh;
   background: linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.9),
-      rgba(255, 255, 255, 0.85)
+      var(--glass-90),
+      var(--glass-90)
   );
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
   border-radius: 20px 0 0 20px;
   box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.15),
-      inset 0 0 0 0.5px rgba(255, 255, 255, 0.5);
+      inset 0 0 0 0.5px var(--glass-50);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 9999;
   overflow-y: auto;
@@ -471,7 +471,7 @@ const resetForm = () => {
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   transition: all 0.3s ease;
 }
 
@@ -499,7 +499,7 @@ const resetForm = () => {
   bottom: -18px;         /* 放在 form-group 下方 */
   left: 88px;            /* 与 input 左对齐（80px label + 8px gap） */
   font-size: 11px;
-  color: #8e8e93;
+  color: var(--text-secondary);
   white-space: nowrap;   /* 防止换行 */
 }
 

@@ -200,11 +200,11 @@ h3 {
   max-width: 100%;
   margin: 0 auto 16px;
   padding: 14px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--glass-60);
   border-radius: 22px;
   box-shadow:
     0 18px 46px rgba(15, 23, 42, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    inset 0 1px 0 var(--glass-80);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
 
@@ -229,7 +229,7 @@ h3 {
   border: none;
   border-radius: 999px;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 1px 0 var(--glass-30),
     0 10px 22px rgba(0, 122, 255, 0.22);
   transition:
     transform $transition-fast ease,
@@ -238,7 +238,7 @@ h3 {
 
   &:hover {
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      inset 0 1px 0 var(--glass-30),
       0 14px 30px rgba(0, 122, 255, 0.3);
     transform: translateY(-1px);
   }

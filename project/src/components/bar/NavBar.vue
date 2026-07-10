@@ -556,8 +556,8 @@ $mobile-aspect-ratio: 1 / 1;
 @mixin soft-glass-background {
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.1)
+    var(--glass-20),
+    var(--glass-10)
   );
 }
 
@@ -647,7 +647,7 @@ $mobile-aspect-ratio: 1 / 1;
   @include soft-glass-background;
   @include soft-glass-shadow;
 
-  border: 3px solid rgba(255, 255, 255, 0.4);
+  border: 3px solid var(--glass-40);
   border-radius: 50%;
   color: darkblue;
   text-align: center;
@@ -679,7 +679,7 @@ $mobile-aspect-ratio: 1 / 1;
   justify-content: center;
   gap: 1px;
 
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--glass-10);
   border-radius: 12px;
   color: $primary;
   white-space: nowrap;
@@ -699,7 +699,7 @@ $mobile-aspect-ratio: 1 / 1;
     @include soft-glass-background;
     @include soft-glass-shadow;
 
-    border: 3px solid rgba(255, 255, 255, 0.4);
+    border: 3px solid var(--glass-40);
     border-radius: 0 0 25px 25px;
     color: darkblue;
     font-weight: 1000;
@@ -709,8 +709,8 @@ $mobile-aspect-ratio: 1 / 1;
       margin: 0;
       background: linear-gradient(
         145deg,
-        rgba(255, 255, 255, 0.5),
-        rgba(255, 255, 255, 0.3)
+        var(--glass-50),
+        var(--glass-30)
       );
       box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
     }
@@ -768,7 +768,7 @@ $mobile-aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--glass-20);
     border-radius: 50%;
     color: $primary-dark;
     cursor: pointer;
@@ -848,13 +848,13 @@ $mobile-aspect-ratio: 1 / 1;
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: var(--glass-40);
+  border: 1px solid var(--glass-60);
   border-radius: 16px;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--glass-60);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
@@ -910,13 +910,13 @@ $mobile-aspect-ratio: 1 / 1;
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: var(--glass-40);
+  border: 1px solid var(--glass-50);
   border-radius: 10px;
   transition: all 0.2s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--glass-60);
   }
 }
 

@@ -138,11 +138,11 @@ const avatarStyle = computed(() => {
       if (avatarConfig.value.bgColor === '#ffffff') {
         styles.backdropFilter = 'blur(15px) saturate(150%)'
         styles.webkitBackdropFilter = 'blur(15px) saturate(150%)'
-        styles.border = '3px solid rgba(255, 255, 255, 0.4)'
+        styles.border = '3px solid var(--glass-40)'
       } else {
         styles.backdropFilter = 'blur(16px) saturate(160%)'
         styles.webkitBackdropFilter = 'blur(16px) saturate(160%)'
-        styles.border = '2.5px solid rgba(255, 255, 255, 0.5)'
+        styles.border = '2.5px solid var(--glass-50)'
       }
     } else {
       styles.background = avatarConfig.value.bgColor
@@ -155,7 +155,7 @@ const avatarStyle = computed(() => {
       styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.55), rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25))`
       styles.backdropFilter = 'blur(20px) saturate(190%)'
       styles.webkitBackdropFilter = 'blur(20px) saturate(190%)'
-      styles.border = '2.5px solid rgba(255, 255, 255, 0.5)'
+      styles.border = '2.5px solid var(--glass-50)'
     } else {
       styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, ${avatarConfig.value.gradientFrom}, ${avatarConfig.value.gradientTo})`
     }
@@ -169,16 +169,16 @@ const avatarStyle = computed(() => {
         } else {
           const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 0, g: 122, b: 255 }
 
-          styles.boxShadow = `0 8px 24px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2), inset 0 0 12px rgba(255, 255, 255, 0.3)`
+          styles.boxShadow = `0 8px 24px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2), inset 0 0 12px var(--glass-30)`
         }
       } else {
         const rgb = hexToRgb(avatarConfig.value.bgColor)
 
         if (rgb) {
-          styles.boxShadow = `0 8px 20px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.2)`
+          styles.boxShadow = `0 8px 20px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4), inset 0 0 8px var(--glass-20)`
         } else {
           styles.boxShadow =
-            '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)'
+            '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px var(--glass-20)'
         }
       }
     } else if (avatarConfig.value.bgType === 'gradient') {
@@ -186,16 +186,16 @@ const avatarStyle = computed(() => {
         const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom) || { r: 0, g: 122, b: 255 }
         const rgbTo = hexToRgb(avatarConfig.value.gradientTo) || { r: 0, g: 198, b: 255 }
 
-        styles.boxShadow = `0 10px 25px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 5px 15px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)`
+        styles.boxShadow = `0 10px 25px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 5px 15px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 2px 4px var(--glass-60), inset 0 -2px 4px rgba(0, 0, 0, 0.08)`
       } else {
         const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom)
         const rgbTo = hexToRgb(avatarConfig.value.gradientTo)
 
         if (rgbFrom && rgbTo) {
-          styles.boxShadow = `0 8px 20px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 4px 12px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 0 8px rgba(255, 255, 255, 0.2)`
+          styles.boxShadow = `0 8px 20px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 4px 12px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 0 8px var(--glass-20)`
         } else {
           styles.boxShadow =
-            '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.2)'
+            '0 8px 20px rgba(0, 122, 255, 0.3), inset 0 0 8px var(--glass-20)'
         }
       }
     }
@@ -205,10 +205,10 @@ const avatarStyle = computed(() => {
         styles.boxShadow =
           avatarConfig.value.bgColor === '#ffffff'
             ? 'none'
-            : 'inset 0 0 12px rgba(255, 255, 255, 0.3)'
+            : 'inset 0 0 12px var(--glass-30)'
       } else if (avatarConfig.value.bgType === 'gradient') {
         styles.boxShadow =
-          'inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.08)'
+          'inset 0 2px 4px var(--glass-60), inset 0 -2px 4px rgba(0, 0, 0, 0.08)'
       }
     } else {
       styles.boxShadow = 'none'
@@ -272,7 +272,7 @@ $overlay-transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   border-radius: 50%;
   box-shadow:
     0 6px 16px rgba(0, 122, 255, 0.2),
-    inset 0 0 8px rgba(255, 255, 255, 0.2);
+    inset 0 0 8px var(--glass-20);
   transition: all $avatar-transition;
 
   @media (min-aspect-ratio: 1/1) {

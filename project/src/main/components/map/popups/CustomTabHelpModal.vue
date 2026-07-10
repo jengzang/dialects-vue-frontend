@@ -492,7 +492,7 @@ $text-main: var(--text-dark);
 $text-secondary: var(--text-medium);
 $text-muted: var(--text-lightest);
 
-$glass-card: rgba(255, 255, 255, 0.5);
+$glass-card: var(--glass-50);
 
 .help-content {
   display: flex;
@@ -603,7 +603,7 @@ $glass-card: rgba(255, 255, 255, 0.5);
   td {
     padding: 8px 6px;
     border-right: 1px solid var(--bg-light);
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-divider);
     color: $text-secondary;
     vertical-align: middle;
 

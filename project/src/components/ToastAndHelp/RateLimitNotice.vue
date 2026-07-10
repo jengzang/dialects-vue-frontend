@@ -256,20 +256,20 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
   background:
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.72),
+      var(--glass-70),
       rgba(255, 250, 237, 0.58)
     ),
     linear-gradient(
       135deg,
       rgba(255, 214, 102, 0.26),
-      rgba(255, 255, 255, 0.08)
+      var(--glass-10)
     );
-  border: 1px solid rgba(255, 255, 255, 0.42);
+  border: 1px solid var(--glass-40);
   border-radius: 26px;
   box-shadow:
     0 24px 54px rgba(120, 90, 20, 0.14),
     0 8px 18px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.46);
+    inset 0 0 0 0.5px var(--glass-50);
 
   @include glass-blur(28px, 180%);
 
@@ -305,14 +305,14 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
   font-weight: 700;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.82),
+    var(--glass-80),
     rgba(255, 214, 102, 0.42)
   );
-  border: 1px solid rgba(255, 255, 255, 0.52);
+  border: 1px solid var(--glass-50);
   border-radius: 15px;
   box-shadow:
     0 10px 24px rgba(160, 120, 26, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    inset 0 1px 0 var(--glass-60);
 
   @include flex-center;
 }
@@ -348,13 +348,13 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
 .notice-chip {
   color: rgba(92, 60, 0, 0.92);
   background: rgba(255, 245, 219, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--glass-50);
 }
 
 .countdown-chip {
   color: $text-brown;
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid rgba(255, 255, 255, 0.38);
+  background: var(--glass-60);
+  border: 1px solid var(--glass-40);
 }
 
 .notice-message {
@@ -425,9 +425,9 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
 
 .ghost-button {
   color: rgba(63, 49, 9, 0.88);
-  background: rgba(255, 255, 255, 0.52);
-  border-color: rgba(255, 255, 255, 0.44);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
+  background: var(--glass-50);
+  border-color: var(--glass-40);
+  box-shadow: inset 0 1px 0 var(--glass-30);
 }
 
 .rate-limit-slide-enter-active {

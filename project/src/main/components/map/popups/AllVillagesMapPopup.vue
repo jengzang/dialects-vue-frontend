@@ -308,7 +308,7 @@ const renderWithClustering = (pointFeatures) => {
       'circle-color': ['get', 'bgColor'],
       'circle-opacity': 0.9,
       'circle-stroke-width': 1.5,
-      'circle-stroke-color': 'rgba(255, 255, 255, 0.8)'
+      'circle-stroke-color': 'var(--glass-80)'
     }
   })
 
@@ -562,10 +562,10 @@ $mobile-breakpoint: 768px;
   overflow: hidden;
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.95),
-    rgba(255, 255, 255, 0.85)
+    var(--glass-90),
+    var(--glass-90)
   );
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-50);
   border-radius: 24px;
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.25),
@@ -590,7 +590,7 @@ $mobile-breakpoint: 768px;
   align-items: center;
   gap: 12px;
   padding: 20px 24px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -631,7 +631,7 @@ $mobile-breakpoint: 768px;
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
@@ -646,7 +646,7 @@ $mobile-breakpoint: 768px;
   width: 100%;
   padding: 8px 12px;
   background: #fff;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-light-gray);
   border-radius: 8px;
   color: var(--text-dark)
   white-space: nowrap;
@@ -691,7 +691,7 @@ $mobile-breakpoint: 768px;
   right: 16px;
   z-index: 10;
   padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--glass-90);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -713,7 +713,7 @@ $mobile-breakpoint: 768px;
 /* MapLibre 动态弹窗 */
 :deep(.maplibregl-popup-content) {
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.98);
+  background: var(--glass-90);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   color: var(--text-dark)

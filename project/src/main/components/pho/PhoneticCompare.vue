@@ -557,7 +557,7 @@ const renderSankey = async (queryLocs) => {
       },
       itemStyle: {
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.8)'
+        borderColor: 'var(--glass-80)'
       },
       levels: [
         { depth: 0, itemStyle: { color: '#4f7cff' } },
@@ -814,7 +814,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .feature-tab {
   padding: 8px 18px;
-  background: var(--glass-30, rgba(255, 255, 255, 0.3));
+  background: var(--glass-30, var(--glass-30));
   border: 1px solid var(--border-gray-light, rgba(200, 200, 200, 0.5));
   border-radius: var(--radius-md, 12px);
   color: var(--text-dark, var(--text-dark));
@@ -826,7 +826,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   @include glass-blur(10px);
 
   &:hover {
-    background: var(--glass-60, rgba(255, 255, 255, 0.5));
+    background: var(--glass-60, var(--glass-50));
     transform: translateY(-1px);
   }
 
@@ -860,7 +860,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   inset: 0;
   z-index: 20;
   min-height: 400px;
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--glass-60);
   pointer-events: auto;
 
   @include flex-center;
@@ -877,7 +877,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 :deep(.sankey-detail-card) {
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--glass-90);
   border: 1px solid var(--border-gray-light, rgba(200, 200, 200, 0.5));
   border-radius: var(--radius-lg, 16px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);

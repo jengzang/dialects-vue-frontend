@@ -624,7 +624,7 @@ const addSpectrogramOverlays = (option) => {
         xAxis: startIndex,
         xAxisEnd: endIndex,
         itemStyle: {
-          color: 'rgba(255, 255, 255, 0.1)',
+          color: 'var(--glass-10)',
           borderColor: '#ffffff',
           borderWidth: 1,
           borderType: 'dashed'
@@ -915,7 +915,7 @@ $transition-normal: 0.3s;
   justify-content: center;
   width: $chart-width;
   height: 300px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border: 1px dashed $border-light;
   border-radius: var(--radius-lg);
 }

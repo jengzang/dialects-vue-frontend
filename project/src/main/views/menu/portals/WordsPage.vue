@@ -72,7 +72,7 @@ const handleYuBaoGrammar = () => {
 }
 
 .word-btn {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   backdrop-filter: blur(10px);
   border: 2px solid rgba(0, 122, 255, 0.2);
   border-radius: 16px;
@@ -90,7 +90,7 @@ const handleYuBaoGrammar = () => {
   transform: translateY(-4px);
   border-color: var(--color-primary);
   box-shadow: 0 8px 24px rgba(0, 122, 255, 0.2);
-  background: rgba(255, 255, 255, 1);
+  background: var(--text-white);
 }
 
 .word-icon {

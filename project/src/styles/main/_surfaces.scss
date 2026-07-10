@@ -1,8 +1,8 @@
 .main-glass-panel {
-  --main-glass-panel-background: rgba(255, 255, 255, 0.62);
+  --main-glass-panel-background: var(--glass-60);
   --main-glass-panel-backdrop-filter: blur(18px) saturate(145%);
   --main-glass-panel-border-radius: var(--radius-xl);
-  --main-glass-panel-border: 1px solid rgba(255, 255, 255, 0.44);
+  --main-glass-panel-border: 1px solid var(--glass-40);
   --main-glass-panel-shadow: 0 4px 14px rgba(15, 23, 42, 0.08), 0 1px 4px rgba(15, 23, 42, 0.06);
   --main-glass-panel-hover-shadow: 0 8px 22px rgba(15, 23, 42, 0.1), 0 2px 8px rgba(15, 23, 42, 0.08);
   background: var(--main-glass-panel-background);
@@ -19,10 +19,10 @@
 }
 
 .main-glass-panel-inner {
-  --main-glass-panel-inner-background: rgba(255, 255, 255, 0.52);
+  --main-glass-panel-inner-background: var(--glass-50);
   --main-glass-panel-inner-backdrop-filter: blur(10px) saturate(135%);
   --main-glass-panel-inner-border-radius: var(--radius-md);
-  --main-glass-panel-inner-border: 1px solid rgba(255, 255, 255, 0.3);
+  --main-glass-panel-inner-border: 1px solid var(--glass-30);
   background: var(--main-glass-panel-inner-background);
   backdrop-filter: var(--main-glass-panel-inner-backdrop-filter);
   -webkit-backdrop-filter: var(--main-glass-panel-inner-backdrop-filter);
@@ -32,9 +32,9 @@
 }
 
 .main-glass-shell {
-  --main-glass-shell-background: rgba(255, 255, 255, 0.96);
+  --main-glass-shell-background: var(--glass-90);
   --main-glass-shell-backdrop-filter: blur(12px) saturate(145%);
-  --main-glass-shell-border: 1px solid rgba(255, 255, 255, 0.72);
+  --main-glass-shell-border: 1px solid var(--glass-70);
   --main-glass-shell-radius: 30px;
   --main-glass-shell-shadow: 0 8px 24px rgba(31, 38, 135, 0.08);
   background: var(--main-glass-shell-background);
@@ -47,19 +47,19 @@
 
 .tool-glass-container,
 .glass-container-shell {
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--glass-80);
   backdrop-filter: blur(12px) saturate(145%);
   -webkit-backdrop-filter: blur(12px) saturate(145%);
-  border: 1px solid rgba(255, 255, 255, 0.42);
+  border: 1px solid var(--glass-40);
   border-radius: 30px;
   box-shadow: 0 8px 24px rgba(31, 38, 135, 0.08);
 }
 
 .glass-container-soft {
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--glass-90);
   backdrop-filter: blur(10px) saturate(140%);
   -webkit-backdrop-filter: blur(10px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--glass-70);
 }
 
 .main-card-grid {
@@ -74,7 +74,7 @@
   align-items: flex-start;
   gap: var(--main-data-card-gap, 8px);
   padding: var(--main-data-card-padding, 18px);
-  border: 1px solid rgba(255, 255, 255, 0.54);
+  border: 1px solid var(--glass-50);
   text-align: left;
   cursor: pointer;
   transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
@@ -105,7 +105,7 @@
   backdrop-filter: blur(14px) saturate(145%);
   -webkit-backdrop-filter: blur(14px) saturate(145%);
   border: 1px solid var(--glass-40);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04), inset 0 0 0 1px var(--glass-30);
   border-radius: var(--radius-xl);
   transition: background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
 }
@@ -113,11 +113,11 @@
 .page {
   padding: 2dvh;
   font-size: 18px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-05);
   border-radius: var(--radius-md);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--glass-10);
   box-shadow: var(--shadow-md);
   justify-content: center;
   display: flex;

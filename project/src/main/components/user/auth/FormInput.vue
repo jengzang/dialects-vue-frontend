@@ -93,12 +93,12 @@ $glass-blur: 12px;
   padding: 14px 2em 14px 16px;
   color: $text-color;
   font-size: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border: none;
   border-radius: 12px;
   outline: none;
   box-shadow:
-    inset 0 0 1px rgba(255, 255, 255, 0.4),
+    inset 0 0 1px var(--glass-40),
     0 4px 12px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur($glass-blur) saturate(180%);
   -webkit-backdrop-filter: blur($glass-blur) saturate(180%);

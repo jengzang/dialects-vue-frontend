@@ -328,7 +328,7 @@ $transition-fast: 0.2s;
   width: 100%;
   padding: 6px 10px;
   font-size: 13px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 6px;
   outline: none;

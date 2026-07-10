@@ -1080,8 +1080,8 @@ $text-secondary: var(--color-text-secondary, var(--text-tertiary));
 $text-muted: var(--color-text-secondary, var(--text-lightest));
 
 $white: #fff;
-$surface: rgba(255, 255, 255, 0.5);
-$surface-strong: rgba(255, 255, 255, 0.8);
+$surface: var(--glass-50);
+$surface-strong: var(--glass-80);
 $border-light: rgba(0, 0, 0, 0.05);
 $border-medium: rgba(0, 0, 0, 0.1);
 
@@ -1273,7 +1273,7 @@ $transition-normal: 0.3s;
     }
 
     &:disabled {
-      background: #ccc;
+      background: var(--border-gray);
       box-shadow: none;
       cursor: not-allowed;
     }
@@ -1434,7 +1434,7 @@ $transition-normal: 0.3s;
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.3),
+      var(--glass-30),
       transparent
     );
     content: "";

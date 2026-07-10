@@ -347,7 +347,7 @@ $transition-base: 0.3s;
   font-size: 14px;
   white-space: nowrap;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border: 1px solid rgba(200, 200, 200, 0.5);
   border-radius: 20px;
   backdrop-filter: blur(10px);

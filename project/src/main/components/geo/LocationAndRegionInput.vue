@@ -1683,10 +1683,10 @@ $portrait-ratio: 1 / 1;
   padding: 8px;
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.4),
-    rgba(255, 255, 255, 0.2)
+    var(--glass-40),
+    var(--glass-20)
   );
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--glass-60);
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(15px);
@@ -1700,8 +1700,8 @@ $portrait-ratio: 1 / 1;
   &:hover {
     background: linear-gradient(
       145deg,
-      rgba(255, 255, 255, 0.5),
-      rgba(255, 255, 255, 0.3)
+      var(--glass-50),
+      var(--glass-30)
     );
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
     transform: scale(1.05);

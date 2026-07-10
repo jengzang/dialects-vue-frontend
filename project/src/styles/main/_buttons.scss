@@ -1,9 +1,9 @@
 .main-glass-button {
   padding: var(--main-glass-button-padding, 12px 32px);
-  background: rgba(255, 255, 255, 0.54);
+  background: var(--glass-50);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.42);
+  border: 1px solid var(--glass-40);
   border-radius: var(--main-glass-button-border-radius, 16px);
   color: var(--text-deep);
   font-size: var(--main-glass-button-font-size, 15px);
@@ -18,7 +18,7 @@
 }
 
 .main-glass-button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.68);
+  background: var(--glass-70);
   transform: translateY(-1px);
 }
 
@@ -35,11 +35,11 @@
 }
 
 .main-glass-button[data-variant='secondary'] {
-  background: rgba(255, 255, 255, 0.58);
+  background: var(--glass-60);
 }
 
 .main-glass-button[data-variant='secondary']:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--glass-70);
 }
 
 .main-glass-button:disabled {
@@ -131,7 +131,7 @@
 }
 
 .run-btn:disabled {
-  background: #ccc;
+  background: var(--border-gray);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;

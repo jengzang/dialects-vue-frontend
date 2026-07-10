@@ -165,7 +165,7 @@ $table-radius: 8px;
   th {
     padding: 10px 12px;
     background: var(--glass-70, var(--bg-light));
-    border-bottom: 2px solid var(--border-medium, #ddd);
+    border-bottom: 2px solid var(--border-medium, var(--border-light-gray));
     color: $text-heading;
     text-align: left;
     font-weight: 600;
@@ -173,7 +173,7 @@ $table-radius: 8px;
 
   td {
     padding: 8px 12px;
-    border-bottom: 1px solid var(--border-light, #eee);
+    border-bottom: 1px solid var(--border-light, var(--border-divider));
     color: $text-body;
     vertical-align: top;
 

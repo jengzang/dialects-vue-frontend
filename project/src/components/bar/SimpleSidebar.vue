@@ -426,11 +426,11 @@ $portrait-ratio: 1 / 1;
       rgba(215, 236, 255, 0.92)
     );
 
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--glass-40);
   box-shadow:
-    inset 0 0 0.5px rgba(255, 255, 255, 0.3),
+    inset 0 0 0.5px var(--glass-30),
     0 8px 32px rgba(0, 0, 0, 0.25),
-    0 0 0 0.5px rgba(255, 255, 255, 0.1);
+    0 0 0 0.5px var(--glass-10);
 
   @include glass-blur;
 }
@@ -445,7 +445,7 @@ $portrait-ratio: 1 / 1;
   align-items: center;
   justify-content: flex-start;
   padding: 15px 0 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid var(--glass-30);
 }
 
 .title-img {
@@ -490,8 +490,8 @@ $portrait-ratio: 1 / 1;
     gap: 8px;
     padding: 6px 15px;
 
-    background: rgba(255, 255, 255, 0.7);
-    border: 3px solid rgba(255, 255, 255, 0.4);
+    background: var(--glass-70);
+    border: 3px solid var(--glass-40);
     border-radius: 25px;
     box-shadow:
       0 6px 10px rgba(0, 0, 0, 0.1),
@@ -511,8 +511,8 @@ $portrait-ratio: 1 / 1;
       margin: 0;
       background: linear-gradient(
         145deg,
-        rgba(255, 255, 255, 0.5),
-        rgba(255, 255, 255, 0.3)
+        var(--glass-50),
+        var(--glass-30)
       );
       box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
       transform: scale(1.1);
@@ -536,7 +536,7 @@ $portrait-ratio: 1 / 1;
 
   @include soft-glass-background;
 
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid var(--glass-40);
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -570,7 +570,7 @@ $portrait-ratio: 1 / 1;
   @include flex-center;
   @include soft-glass-background(0.4, 0.2);
 
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: 2px solid var(--glass-50);
   border-radius: 50%;
   color: $primary-dark;
   font-size: 18px;
@@ -580,8 +580,8 @@ $portrait-ratio: 1 / 1;
   &:hover {
     background: linear-gradient(
       145deg,
-      rgba(255, 255, 255, 0.6),
-      rgba(255, 255, 255, 0.4)
+      var(--glass-60),
+      var(--glass-40)
     );
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: scale(1.15);
@@ -621,13 +621,13 @@ $portrait-ratio: 1 / 1;
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: var(--glass-40);
+  border: 1px solid var(--glass-60);
   border-radius: 16px;
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--glass-60);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
@@ -684,13 +684,13 @@ $portrait-ratio: 1 / 1;
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: var(--glass-40);
+  border: 1px solid var(--glass-50);
   border-radius: 10px;
   transition: all 0.2s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--glass-60);
   }
 }
 
@@ -769,18 +769,18 @@ $portrait-ratio: 1 / 1;
 
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.95),
-    rgba(255, 255, 255, 0.85)
+    var(--glass-90),
+    var(--glass-90)
   );
 
   @include glass-blur(20px, 180%);
 
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-50);
   border-radius: 16px;
   box-shadow:
-    inset 0 0 0.5px rgba(255, 255, 255, 0.3),
+    inset 0 0 0.5px var(--glass-30),
     0 12px 40px rgba(0, 0, 0, 0.2),
-    0 0 0 0.5px rgba(255, 255, 255, 0.1);
+    0 0 0 0.5px var(--glass-10);
 }
 
 .submenu-item {

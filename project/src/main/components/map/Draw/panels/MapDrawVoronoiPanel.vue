@@ -275,8 +275,8 @@ const offsetClass = computed(() => {
   gap: 0.25rem;
   padding: 0.8rem;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.46);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: var(--glass-50);
+  border: 1px solid var(--glass-60);
 
   .voronoi-summary-label {
     font-size: 0.78rem;

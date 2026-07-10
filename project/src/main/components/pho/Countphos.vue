@@ -1258,7 +1258,7 @@ $mobile-breakpoint: 768px;
     align-items: center;
     justify-content: center;
     gap: 15px;
-    background: rgba(255, 255, 255, 0.58);
+    background: var(--glass-60);
     border-radius: var(--radius-lg);
     backdrop-filter: blur(10px);
 
@@ -1331,7 +1331,7 @@ $mobile-breakpoint: 768px;
 
   .chart-block {
     padding: 16px;
-    background: rgba(255, 255, 255, 0.58);
+    background: var(--glass-60);
     border: 1px solid rgba(0, 122, 255, 0.1);
     border-radius: 14px;
     box-shadow: 0 10px 24px rgba(20, 38, 60, 0.04);
@@ -1366,7 +1366,7 @@ $mobile-breakpoint: 768px;
   .chart-card {
     min-width: 0;
     padding: 12px;
-    background: rgba(255, 255, 255, 0.78);
+    background: var(--glass-80);
     border: 1px solid rgba(0, 122, 255, 0.1);
     border-radius: 12px;
 
@@ -1517,7 +1517,7 @@ $mobile-breakpoint: 768px;
     padding: 18px;
     background: linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.78),
+      var(--glass-80),
       rgba(247, 251, 255, 0.66)
     );
     border: 1px solid rgba(0, 122, 255, 0.12);
@@ -1564,13 +1564,13 @@ $mobile-breakpoint: 768px;
     align-items: center;
     gap: 8px;
     padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.85);
+    background: var(--glass-90);
     border: 1px solid rgba(0, 122, 255, 0.12);
     border-radius: 999px;
     transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.96);
+      background: var(--glass-90);
       box-shadow: 0 8px 18px rgba(0, 122, 255, 0.08);
       transform: translateY(-1px);
     }
@@ -1677,14 +1677,14 @@ $mobile-breakpoint: 768px;
   padding: 14px 16px;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.72),
+    var(--glass-70),
     rgba(245, 250, 255, 0.46)
   );
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--glass-70);
   border-radius: 18px;
   box-shadow:
     0 12px 30px rgba(31, 78, 121, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    inset 0 1px 0 var(--glass-90);
   backdrop-filter: blur(18px) saturate(1.35);
 }
 
@@ -1693,8 +1693,8 @@ $mobile-breakpoint: 768px;
   align-items: center;
   gap: 8px;
   padding: 0 12px;
-  background: rgba(255, 255, 255, 0.48);
-  border: 1px solid rgba(255, 255, 255, 0.56);
+  background: var(--glass-50);
+  border: 1px solid var(--glass-60);
   border-radius: 999px;
 }
 
@@ -1717,14 +1717,14 @@ $mobile-breakpoint: 768px;
   padding: 16px 18px;
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.68),
+    var(--glass-70),
     rgba(248, 251, 255, 0.42)
   );
-  border: 1px solid rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--glass-60);
   border-radius: 18px;
   box-shadow:
     0 14px 34px rgba(20, 38, 60, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    inset 0 1px 0 var(--glass-90);
   backdrop-filter: blur(18px) saturate(1.3);
 }
 

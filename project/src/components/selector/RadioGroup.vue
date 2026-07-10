@@ -145,7 +145,7 @@ $transition-text: 0.3s ease;
       border-color: var(--color-primary);
       box-shadow:
         0 4px 12px var(--color-primary-shadow-light),
-        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        inset 0 2px 4px var(--glass-30);
 
       &::after {
         opacity: 1;
@@ -169,7 +169,7 @@ $transition-text: 0.3s ease;
   border: 2px solid var(--border-gray);
   border-radius: var(--radius-full);
   box-shadow:
-    inset 0 1px 3px rgba(255, 255, 255, 0.5),
+    inset 0 1px 3px var(--glass-50),
     0 2px 4px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);

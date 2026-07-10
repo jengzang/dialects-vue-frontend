@@ -2087,11 +2087,11 @@ $danger: var(--color-error-light);
 $warning: var(--color-warning);
 $success: var(--color-success);
 
-$glass-light: rgba(255, 255, 255, 0.3);
-$glass-soft: rgba(255, 255, 255, 0.4);
-$glass-panel: rgba(255, 255, 255, 0.5);
-$glass-strong: rgba(255, 255, 255, 0.6);
-$glass-solid: rgba(255, 255, 255, 0.8);
+$glass-light: var(--glass-30);
+$glass-soft: var(--glass-40);
+$glass-panel: var(--glass-50);
+$glass-strong: var(--glass-60);
+$glass-solid: var(--glass-80);
 
 $primary-soft: rgba(0, 122, 255, 0.1);
 $primary-hover: rgba(0, 122, 255, 0.15);
@@ -2100,7 +2100,7 @@ $danger-soft: rgba(255, 59, 48, 0.1);
 $warning-soft: rgba(255, 149, 0, 0.15);
 $success-soft: rgba(52, 199, 89, 0.1);
 
-@mixin glass-blur($bg: $glass-panel, $blur: 10px, $radius: 16px, $border: rgba(255, 255, 255, 0.5)) {
+@mixin glass-blur($bg: $glass-panel, $blur: 10px, $radius: 16px, $border: var(--glass-50)) {
   background: $bg;
   backdrop-filter: blur($blur);
   -webkit-backdrop-filter: blur($blur);
@@ -2137,7 +2137,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     gap: 12px;
     margin: 20px -18px -20px;
     padding: 16px 18px;
-    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    border-top: 1px solid var(--glass-50);
   }
 
   &-tool-batch-replace-content {
@@ -2269,7 +2269,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 }
 
 .upload-zone-drop {
-  @include glass-blur(rgba(255, 255, 255, 0.45), 12px, 22px, rgba(255, 255, 255, 0.58));
+  @include glass-blur(var(--glass-50), 12px, 22px, var(--glass-60));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2358,12 +2358,12 @@ $success-soft: rgba(52, 199, 89, 0.1);
     z-index: 20;
     width: 40px;
     height: 40px;
-    @include glass-blur(rgba(255, 255, 255, 0.75), 10px, 10px);
+    @include glass-blur(var(--glass-80), 10px, 10px);
     cursor: pointer;
     transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.9);
+      background: var(--glass-90);
     }
   }
 
@@ -2380,7 +2380,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-section {
     display: flex;
     flex-direction: column;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--glass-20);
     border-radius: 12px;
     padding: 12px;
     overflow: hidden;
@@ -2790,7 +2790,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.97);
+      background: var(--glass-90);
     }
 
     &.selected {
@@ -3045,7 +3045,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     width: max-content;
     min-width: 100%;
     min-height: 40px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid var(--glass-30);
     transition: background 0.2s ease;
 
     &:hover {
@@ -3075,7 +3075,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     font-weight: 600;
     color: $text-main;
     font-size: 13px;
-    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    border-right: 1px solid var(--glass-30);
 
     &:last-child {
       border-right: none;
@@ -3118,7 +3118,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   align-items: center;
   justify-content: center;
   font-size: 13px;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid var(--glass-10);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3217,7 +3217,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
     &:focus {
       outline: none;
-      background: rgba(255, 255, 255, 0.7);
+      background: var(--glass-70);
       border-color: rgba(0, 122, 255, 0.5);
       box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
     }
@@ -3277,10 +3277,10 @@ $success-soft: rgba(52, 199, 89, 0.1);
   /* 通用样式 */
 
   &-container {
-    background: rgba(255, 255, 255, 0.65);
+    background: var(--glass-70);
     backdrop-filter: blur(25px) saturate(180%);
     -webkit-backdrop-filter: blur(25px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--glass-50);
     border-radius: 30px;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
   }
@@ -3447,7 +3447,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     th,
     td {
       padding: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      border: 1px solid var(--glass-30);
       text-align: left;
     }
 
@@ -4103,7 +4103,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     padding: 4px;
     text-align: center; /* 让文字居中 */
     border: none;
-    background: rgba(255, 255, 255, 0.5); /* 稍微明显的背景 */
+    background: var(--glass-50); /* 稍微明显的背景 */
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
 

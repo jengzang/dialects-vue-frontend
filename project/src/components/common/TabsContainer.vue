@@ -136,7 +136,7 @@ $transition-duration: 0.5s;
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-05);
   border: 1px solid $primary-blue;
   border-radius: 16px;
   backdrop-filter: blur(4px);
@@ -145,7 +145,7 @@ $transition-duration: 0.5s;
 
   &:hover {
     color: $primary-blue;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--glass-10);
   }
 
   &.active {

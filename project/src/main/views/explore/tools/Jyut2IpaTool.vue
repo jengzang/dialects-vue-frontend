@@ -881,9 +881,9 @@ $text-60: rgba(11, 37, 64, 0.6);
   right: 0;
   width: 40px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   @include glass-blur;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-50);
   border-radius: 12px;
   font-size: 20px;
   cursor: pointer;
@@ -911,7 +911,7 @@ $text-60: rgba(11, 37, 64, 0.6);
     justify-content: center;
     gap: 16px;
     padding: 30px 40px;
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--glass-40);
     @include glass-blur;
     border: 2px dashed rgba(0, 122, 255, 0.3);
     border-radius: 24px;
@@ -969,9 +969,9 @@ $text-60: rgba(11, 37, 64, 0.6);
     align-items: center;
     gap: 16px;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--glass-50);
     @include glass-blur;
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--glass-60);
     border-radius: 20px;
   }
 
@@ -1050,7 +1050,7 @@ $text-60: rgba(11, 37, 64, 0.6);
     display: flex;
     gap: 24px;
     padding: 20px 32px;
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--glass-40);
     border-radius: 16px;
   }
 }
@@ -1088,7 +1088,7 @@ $text-60: rgba(11, 37, 64, 0.6);
     width: 100%;
     height: 12px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--glass-50);
     border-radius: 6px;
   }
 
@@ -1157,9 +1157,9 @@ $text-60: rgba(11, 37, 64, 0.6);
     align-items: center;
     gap: 8px;
     padding: 24px 32px;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--glass-50);
     @include glass-blur;
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--glass-60);
     border-radius: 20px;
   }
 
@@ -1204,7 +1204,7 @@ $text-60: rgba(11, 37, 64, 0.6);
   &-table-wrapper {
     max-height: 200px;
     overflow: auto;
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--glass-40);
     border-radius: 16px;
   }
 
@@ -1216,14 +1216,14 @@ $text-60: rgba(11, 37, 64, 0.6);
     thead {
       position: sticky;
       top: 0;
-      background: rgba(255, 255, 255, 0.6);
+      background: var(--glass-60);
       @include glass-blur;
     }
 
     th,
     td {
       padding: 10px 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      border-bottom: 1px solid var(--glass-30);
       text-align: left;
     }
 
@@ -1265,7 +1265,7 @@ $text-60: rgba(11, 37, 64, 0.6);
     gap: 12px;
     margin: 20px -24px -20px;
     padding: 20px 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    border-top: 1px solid var(--glass-50);
   }
 }
 
@@ -1350,7 +1350,7 @@ $text-60: rgba(11, 37, 64, 0.6);
   &-table-container {
     margin-bottom: 16px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--glass-30);
     border-radius: 12px;
   }
 
@@ -1377,7 +1377,7 @@ $text-60: rgba(11, 37, 64, 0.6);
 
     td {
       padding: 10px 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      border-bottom: 1px solid var(--glass-30);
     }
 
     tbody {
@@ -1393,7 +1393,7 @@ $text-60: rgba(11, 37, 64, 0.6);
 .table-input {
   width: 100%;
   padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   border: 1px solid rgba(0, 122, 255, 0.15);
   border-radius: 6px;
   font-family: 'Courier New', monospace;
@@ -1491,8 +1491,8 @@ $text-60: rgba(11, 37, 64, 0.6);
   width: 32px;
   height: 32px;
   padding: 0;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
+  border: 1px solid var(--glass-50);
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
@@ -1510,16 +1510,16 @@ $text-60: rgba(11, 37, 64, 0.6);
     align-items: center;
     gap: 20px;
     padding: 20px 32px;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--glass-50);
     @include glass-blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--glass-70);
     border-radius: 24px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     cursor: pointer;
     transition: all 0.3s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.65);
+      background: var(--glass-70);
       border-color: rgba(0, 122, 255, 0.5);
       box-shadow: 0 8px 30px rgba(0, 122, 255, 0.15);
       transform: translateY(-2px);

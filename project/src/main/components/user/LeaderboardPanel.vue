@@ -723,14 +723,14 @@ $bronze: var(--color-bronze);
 .metric {
   &-card {
     padding: 24px;
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--glass-70);
     @include glass;
-    border: 0.5px solid rgba(255, 255, 255, 0.8);
+    border: 0.5px solid var(--glass-80);
     border-radius: 20px;
     box-shadow:
       0 1px 2px rgba(0, 0, 0, 0.04),
       0 8px 32px rgba(0, 0, 0, 0.08),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+      inset 0 0 0 1px var(--glass-90);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
@@ -836,22 +836,22 @@ $bronze: var(--color-bronze);
 
 .table-wrapper {
   padding: 20px;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--glass-70);
   @include glass;
-  border: 0.5px solid rgba(255, 255, 255, 0.8);
+  border: 0.5px solid var(--glass-80);
   border-radius: 20px;
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 8px 32px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+    inset 0 0 0 1px var(--glass-90);
 }
 
 .table-container {
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   backdrop-filter: blur(20px);
   border-radius: 12px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 0 0 1px var(--glass-60);
 }
 
 .rankings-table {

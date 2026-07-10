@@ -135,9 +135,9 @@ $text-main: var(--text-primary);
 $text-secondary: rgba(0, 0, 0, 0.6);
 
 $surface-border: rgba(0, 0, 0, 0.06);
-$surface-background: rgba(255, 255, 255, 0.56);
-$surface-header: rgba(255, 255, 255, 0.72);
-$surface-row-even: rgba(255, 255, 255, 0.38);
+$surface-background: var(--glass-60);
+$surface-header: var(--glass-70);
+$surface-row-even: var(--glass-40);
 
 $shadow-default: 0 4px 12px rgba(0, 0, 0, 0.1);
 $shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.15);

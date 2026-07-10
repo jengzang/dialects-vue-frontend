@@ -9,14 +9,14 @@
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   color: var(--text-primary);
   transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 
   &:focus {
     outline: none;
     border-color: var(--color-primary);
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--glass-80);
     box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
   }
 
@@ -36,7 +36,7 @@
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 12px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   backdrop-filter: blur(10px);
   color: var(--text-primary);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -79,11 +79,11 @@
   border-radius: 12px;
   font-size: 16px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 
   &:focus {
     outline: none;
     border-color: var(--color-primary);
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--glass-80);
   }
 }

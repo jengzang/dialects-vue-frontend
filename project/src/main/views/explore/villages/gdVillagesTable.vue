@@ -57,10 +57,10 @@ $button-transition: 0.3s ease;
   user-select: none;
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.1)
+    var(--glass-20),
+    var(--glass-10)
   );
-  border: 3px solid rgba(255, 255, 255, 0.4);
+  border: 3px solid var(--glass-40);
   border-radius: 25px;
   box-shadow:
     0 6px 10px rgba(0, 0, 0, 0.1),
@@ -70,8 +70,8 @@ $button-transition: 0.3s ease;
   &:hover {
     background: linear-gradient(
       145deg,
-      rgba(255, 255, 255, 0.5),
-      rgba(255, 255, 255, 0.3)
+      var(--glass-50),
+      var(--glass-30)
     );
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
     transform: scale(1.05);

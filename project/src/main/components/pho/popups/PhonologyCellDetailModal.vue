@@ -115,7 +115,7 @@ $text-secondary: #4b5563;
 
 .tone-section {
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--glass-80);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
 }

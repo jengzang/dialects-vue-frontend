@@ -605,7 +605,7 @@ $transition-base: 0.3s;
 /* Header Section */
 .header-section {
   padding: 24px 28px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
   @media (max-aspect-ratio: 1/1) {
@@ -663,7 +663,7 @@ $transition-base: 0.3s;
   transition: all $transition-base;
 
   &:focus {
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--glass-80);
     box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
   }
 }
@@ -717,8 +717,8 @@ $transition-base: 0.3s;
 .city-card {
   padding: 20px;
   overflow-x: auto;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: var(--glass-50);
+  border: 1px solid var(--glass-60);
   border-radius: 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(15px);
@@ -730,7 +730,7 @@ $transition-base: 0.3s;
   }
 
   &.is-loaded {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--glass-70);
     border-color: rgba(0, 122, 255, 0.4);
   }
 }
@@ -902,10 +902,10 @@ $transition-base: 0.3s;
   user-select: none;
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.1)
+    var(--glass-20),
+    var(--glass-10)
   );
-  border: 3px solid rgba(255, 255, 255, 0.4);
+  border: 3px solid var(--glass-40);
   border-radius: 25px;
   box-shadow:
     0 6px 10px rgba(0, 0, 0, 0.1),
@@ -915,8 +915,8 @@ $transition-base: 0.3s;
   &:hover {
     background: linear-gradient(
       145deg,
-      rgba(255, 255, 255, 0.5),
-      rgba(255, 255, 255, 0.3)
+      var(--glass-50),
+      var(--glass-30)
     );
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
     transform: scale(1.05);

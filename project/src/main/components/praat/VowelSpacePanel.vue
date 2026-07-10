@@ -368,7 +368,7 @@ const initChart = () => {
       data: referenceVowelsData.map(v => [v.F2, v.F1]),
       symbolSize: 10,
       itemStyle: {
-        color: '#8e8e93',
+        color: 'var(--text-secondary)',
         opacity: 0.7,
         borderColor: '#fff',
         borderWidth: 1
@@ -381,7 +381,7 @@ const initChart = () => {
         },
         position: 'top',
         fontSize: 12,
-        color: '#8e8e93',
+        color: 'var(--text-secondary)',
         fontWeight: 'bold'
       },
       emphasis: {
@@ -544,8 +544,8 @@ $primary-background: rgba(0, 122, 255, 0.2);
 $success-background: rgba(52, 199, 89, 0.2);
 $warning-background: rgba(255, 149, 0, 0.2);
 
-$surface-hover: rgba(255, 255, 255, 0.15);
-$divider-light: rgba(255, 255, 255, 0.2);
+$surface-hover: var(--glass-20);
+$divider-light: var(--glass-20);
 
 $transition-duration: 0.3s;
 

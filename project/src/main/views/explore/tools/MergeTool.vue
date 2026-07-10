@@ -831,7 +831,7 @@ $color-danger: var(--color-error-light);
   justify-content: center;
   gap: 16px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
   border-radius: 20px;
 }
 
@@ -876,7 +876,7 @@ $color-danger: var(--color-error-light);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--glass-50);
     border: 2px solid rgba(11, 37, 64, 0.2);
     border-radius: 50%;
     font-size: 18px;
@@ -952,7 +952,7 @@ $color-danger: var(--color-error-light);
     align-items: center;
     justify-content: center;
     gap: 5px;
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--glass-40);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 2px dashed rgba(0, 122, 255, 0.3);
@@ -1009,7 +1009,7 @@ $color-danger: var(--color-error-light);
     align-items: center;
     gap: 16px;
     padding: 20px 24px;
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--glass-60);
     border-radius: 16px;
   }
 
@@ -1043,7 +1043,7 @@ $color-danger: var(--color-error-light);
     gap: 8px;
     overflow-y: auto;
     padding: 12px;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--glass-30);
     border-radius: 16px;
   }
 
@@ -1052,12 +1052,12 @@ $color-danger: var(--color-error-light);
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--glass-50);
     border-radius: 12px;
     transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.7);
+      background: var(--glass-70);
     }
 
     &-icon {
@@ -1161,7 +1161,7 @@ $color-danger: var(--color-error-light);
     display: flex;
     gap: 24px;
     padding: 20px 32px;
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--glass-40);
     border-radius: 16px;
   }
 }
@@ -1199,7 +1199,7 @@ $color-danger: var(--color-error-light);
     width: 100%;
     height: 12px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--glass-50);
     border-radius: 6px;
   }
 
@@ -1272,10 +1272,10 @@ $color-danger: var(--color-error-light);
     align-items: center;
     gap: 16px;
     padding: 12px 28px;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--glass-50);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--glass-60);
     border-radius: 20px;
   }
 
@@ -1312,7 +1312,7 @@ $color-danger: var(--color-error-light);
     max-height: 150px;
     overflow-y: auto;
     padding: 12px;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--glass-30);
     border-radius: 16px;
   }
 
@@ -1322,7 +1322,7 @@ $color-danger: var(--color-error-light);
     gap: 12px;
     margin-bottom: 8px;
     padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--glass-50);
     border-radius: 10px;
     font-size: 14px;
 
@@ -1369,7 +1369,7 @@ $color-danger: var(--color-error-light);
     display: flex;
     gap: 8px;
     padding: 12px 28px;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--glass-30);
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   }
 
@@ -1383,7 +1383,7 @@ $color-danger: var(--color-error-light);
     gap: 12px;
     margin: 0 -24px -20px;
     padding: 16px 24px;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--glass-30);
     border-top: 1px solid rgba(0, 0, 0, 0.08);
   }
 }
@@ -1400,7 +1400,7 @@ $color-danger: var(--color-error-light);
   transition: all 0.2s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--glass-60);
     color: $color-text;
   }
 
@@ -1459,7 +1459,7 @@ $color-danger: var(--color-error-light);
 .load-more-hint {
   margin-top: 8px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
   border-radius: 8px;
   text-align: center;
   font-size: 12px;

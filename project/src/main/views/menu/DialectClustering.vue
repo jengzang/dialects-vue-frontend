@@ -194,7 +194,7 @@ const {
     align-items: center;
     gap: 10px;
     border: 1px solid rgba(0, 122, 255, 0.18);
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--glass-70);
     border-radius: 999px;
     padding: 10px 14px;
     color: var(--text-dark);
@@ -206,7 +206,7 @@ const {
   }
 
   .step-pill.active {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(224, 238, 255, 0.88));
+    background: linear-gradient(135deg, var(--glass-90), rgba(224, 238, 255, 0.88));
     color: var(--text-deep);
     border-color: rgba(0, 122, 255, 0.34);
   }
@@ -311,7 +311,7 @@ const {
     border: 1px solid rgba(148, 163, 184, 0.28);
     border-radius: 14px;
     padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.82);
+    background: var(--glass-80);
     color: var(--text-deep);
   }
 
@@ -338,7 +338,7 @@ const {
     gap: 10px;
     padding: 12px;
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.54);
+    background: var(--glass-50);
   }
 
   .preview-chip-list {
@@ -471,7 +471,7 @@ const {
 
   .diagnostic-card {
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.66);
+    background: var(--glass-70);
     padding: 14px;
   }
 

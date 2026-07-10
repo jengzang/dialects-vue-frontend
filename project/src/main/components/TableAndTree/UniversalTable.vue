@@ -1629,7 +1629,7 @@ $system-font:
   padding: 8px 16px;
   white-space: nowrap;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   border: 1px solid var(--border-light);
   transition: all $transition-fast;
 
@@ -1703,7 +1703,7 @@ thead {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -1841,7 +1841,7 @@ td {
 .main-glass-panel[data-surface='filter-popup'] {
   --main-glass-panel-background: var(--glass-30);
   --main-glass-panel-backdrop-filter: blur(25px);
-  --main-glass-panel-border: 1px solid rgba(255, 255, 255, 0.8);
+  --main-glass-panel-border: 1px solid var(--glass-80);
   --main-glass-panel-shadow: var(--shadow-lg);
   --main-glass-panel-hover-shadow: var(--shadow-lg);
   --main-glass-panel-border-radius: var(--radius-lg);
@@ -2094,7 +2094,7 @@ td {
 
   &.clickable {
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--glass-50);
     border: 1px solid var(--border-light);
 
     &:hover {
@@ -2173,7 +2173,7 @@ td {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   z-index: 10;
@@ -2345,14 +2345,14 @@ td {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 }
 
 .fullscreen-table {
   flex: 1;
   margin: 0;
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 }
 
 .fullscreen-pagination {
@@ -2411,7 +2411,7 @@ td {
   padding: 10px 14px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-60);
   font-size: 14px;
   outline: none;
   transition: all $transition-fast;
@@ -2419,7 +2419,7 @@ td {
 
 .batch-replace-modal-body .glass-input:focus {
   border-color: $primary-blue;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
@@ -2729,7 +2729,7 @@ td {
   margin: 20px -18px -20px;
   padding: 16px 18px;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 }
 
 .batch-replace-modal-footer .main-glass-button {

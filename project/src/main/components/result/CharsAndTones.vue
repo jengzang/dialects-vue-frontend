@@ -541,10 +541,10 @@ onMounted(() => {
   overflow-x: auto;
   padding: 8px;
   font-size: 18px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-05);
   border-radius: 12px;
   backdrop-filter: blur(8px);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--glass-10);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
 
   display: flex;
@@ -569,8 +569,8 @@ onMounted(() => {
   overflow-x: auto;
   overflow-y: auto;
   font-size: 18px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: var(--glass-05);
+  border: 2px solid var(--glass-10);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(8px);
@@ -665,11 +665,11 @@ $glass-blur: 8px;
   gap: 8px;
   align-items: center;
   padding: 10px 7px;
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid rgba(255, 255, 255, 0.58);
+  background: var(--glass-60);
+  border: 1px solid var(--glass-60);
   border-radius: 999px;
   box-shadow:
-    inset 0 0 1px rgba(255, 255, 255, 0.45),
+    inset 0 0 1px var(--glass-50),
     0 8px 24px rgba(0, 0, 0, 0.12);
   transform: translateY(-50%);
   backdrop-filter: blur(18px) saturate(140%);
@@ -691,7 +691,7 @@ $glass-blur: 8px;
   padding: 0;
   color: #4f5663;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--glass-60);
   border: 0;
   border-radius: 999px;
   transition:
@@ -702,7 +702,7 @@ $glass-blur: 8px;
 
   &:hover {
     color: $deep-blue;
-    background: rgba(255, 255, 255, 0.86);
+    background: var(--glass-90);
     box-shadow: 0 4px 12px rgba(0, 56, 161, 0.12);
     transform: translateX(-2px) scale(1.06);
   }
@@ -788,7 +788,7 @@ $glass-blur: 8px;
 
 .separator {
   margin: 0 5px;
-  color: #ccc;
+  color: var(--border-gray);
   font-weight: bold;
 }
 
@@ -858,7 +858,7 @@ $glass-blur: 8px;
     text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-light-gray);
   }
 
   th:first-child,
@@ -866,7 +866,7 @@ $glass-blur: 8px;
     position: sticky;
     left: 0;
     z-index: 10;
-    background: rgba(255, 255, 255, 0.75);
+    background: var(--glass-80);
     background-clip: padding-box;
     border-right: 1px solid rgba(0, 0, 0, 0.1);
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -876,7 +876,7 @@ $glass-blur: 8px;
 
   th:first-child {
     z-index: 20;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--glass-90);
   }
 }
 

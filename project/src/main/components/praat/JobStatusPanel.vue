@@ -94,7 +94,7 @@ $error-background-hover: rgba(255, 59, 48, 0.25);
 $error-border: rgba(255, 59, 48, 0.3);
 $error-border-hover: rgba(255, 59, 48, 0.5);
 
-$panel-divider: rgba(255, 255, 255, 0.2);
+$panel-divider: var(--glass-20);
 $progress-background: rgba(0, 0, 0, 0.1);
 
 $transition-duration: 0.3s;

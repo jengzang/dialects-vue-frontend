@@ -20,17 +20,17 @@
 .global-dialog-surface {
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.97),
-    rgba(255, 255, 255, 0.9)
+    var(--glass-90),
+    var(--glass-90)
   );
   backdrop-filter: blur(18px) saturate(145%);
   -webkit-backdrop-filter: blur(18px) saturate(145%);
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.44);
+  border: 1px solid var(--glass-40);
   box-shadow:
     0 16px 40px rgba(0, 0, 0, 0.18),
     0 4px 12px rgba(0, 0, 0, 0.1),
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.22);
+    inset 0 0 0 0.5px var(--glass-20);
 }
 
 .global-toast-shell {
@@ -46,14 +46,14 @@
   box-shadow:
     0 6px 22px rgba(0, 0, 0, 0.1),
     0 2px 6px rgba(0, 0, 0, 0.06),
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.2);
+    inset 0 0 0 0.5px var(--glass-20);
   max-width: 90vw;
   word-break: break-word;
-  border: 1px solid rgba(255, 255, 255, 0.26);
+  border: 1px solid var(--glass-30);
 }
 
 .global-floating-panel {
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--glass-90);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(200, 200, 200, 0.24);
@@ -71,8 +71,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.66);
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: var(--glass-70);
+  border: 1px solid var(--glass-20);
   border-radius: 10px;
   backdrop-filter: blur(6px);
   font-size: 14px;
@@ -83,12 +83,12 @@
 
 .global-select-trigger:hover:not(.is-disabled) {
   border-color: var(--color-primary, #4a90e2);
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--glass-80);
 }
 
 .global-select-trigger.is-open {
   border-color: var(--color-primary, #4a90e2);
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--glass-80);
 }
 
 .global-select-trigger.is-disabled {
@@ -158,33 +158,33 @@
   user-select: none;
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.94),
-    rgba(255, 255, 255, 0.82)
+    var(--glass-90),
+    var(--glass-80)
   );
   backdrop-filter: blur(10px) saturate(145%);
   -webkit-backdrop-filter: blur(10px) saturate(145%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--glass-40);
   box-shadow:
-    inset 0 0 0.5px rgba(255, 255, 255, 0.22),
+    inset 0 0 0.5px var(--glass-20),
     0 4px 10px rgba(0, 122, 255, 0.1),
-    0 0 0 0.5px rgba(255, 255, 255, 0.08);
+    0 0 0 0.5px var(--glass-10);
   transition: box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 
 .global-tooltip-surface {
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.97),
-    rgba(255, 255, 255, 0.9)
+    var(--glass-90),
+    var(--glass-90)
   );
   backdrop-filter: blur(10px) saturate(145%);
   -webkit-backdrop-filter: blur(10px) saturate(145%);
-  border: 1px solid rgba(255, 255, 255, 0.42);
+  border: 1px solid var(--glass-40);
   border-radius: 12px;
   box-shadow:
-    inset 0 0 0.5px rgba(255, 255, 255, 0.22),
+    inset 0 0 0.5px var(--glass-20),
     0 6px 18px rgba(0, 0, 0, 0.12),
-    0 0 0 0.5px rgba(255, 255, 255, 0.08);
+    0 0 0 0.5px var(--glass-10);
 }
 
 // Shared glass panel — used by both VillagesML and main app

@@ -106,11 +106,11 @@ $text-muted: var(--text-secondary);
 $primary: var(--color-primary);
 
 $divider-color: rgba(0, 0, 0, 0.05);
-$glass-background: rgba(255, 255, 255, 0.4);
-$glass-background-medium: rgba(255, 255, 255, 0.5);
-$glass-background-hover: rgba(255, 255, 255, 0.8);
-$glass-border: rgba(255, 255, 255, 0.5);
-$glass-border-strong: rgba(255, 255, 255, 0.6);
+$glass-background: var(--glass-40);
+$glass-background-medium: var(--glass-50);
+$glass-background-hover: var(--glass-80);
+$glass-border: var(--glass-50);
+$glass-border-strong: var(--glass-60);
 
 $transition-fast: 0.2s;
 $transition-normal: 0.3s;

@@ -355,19 +355,19 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   &:hover {
     background: linear-gradient(
       145deg,
-      rgba(255, 255, 255, 1),
-      rgba(255, 255, 255, 0.85)
+      var(--text-white),
+      var(--glass-90)
     );
     box-shadow:
-      inset 0 0 0.5px rgba(255, 255, 255, 0.5),
+      inset 0 0 0.5px var(--glass-50),
       0 6px 16px $primary-shadow,
-      0 0 0 0.5px rgba(255, 255, 255, 0.2);
+      0 0 0 0.5px var(--glass-20);
     transform: scale(1.1);
   }
 
   &:active {
     box-shadow:
-      inset 0 0 0.5px rgba(255, 255, 255, 0.3),
+      inset 0 0 0.5px var(--glass-30),
       0 2px 8px rgba(0, 122, 255, 0.2);
     transform: scale(1.05);
   }

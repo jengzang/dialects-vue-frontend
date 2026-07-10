@@ -537,13 +537,13 @@ const { requireAuth, isAuthenticated } = useAuthGuard();
 const { getPartitionData } = usePartitionCache();
 
 const defaultLayerStyle = {
-  stroke: '#2563eb',
+  stroke: 'var(--color-map-draw)',
   strokeWidth: 3,
   fill: '#60a5fa',
   fillOpacity: 0.22,
   pointRadius: 6,
   pointColor: '#60a5fa',
-  pointStrokeColor: '#2563eb',
+  pointStrokeColor: 'var(--color-map-draw)',
   visible: true,
   locked: false,
 };
@@ -1079,7 +1079,7 @@ const confirmVoronoiExport = async () => {
           id: feature.id ?? `voronoi-${group.key}-${index + 1}`,
           properties: {
             ...(feature.properties ?? {}),
-            stroke: feature.properties?.stroke ?? '#2563eb',
+            stroke: feature.properties?.stroke ?? 'var(--color-map-draw)',
             strokeWidth: feature.properties?.strokeWidth ?? 2,
             fill: feature.properties?.fill ?? '#60a5fa',
             fillOpacity: feature.properties?.fillOpacity ?? 0.22,
@@ -1090,7 +1090,7 @@ const confirmVoronoiExport = async () => {
       };
 
       layer.name = group.name;
-      layer.stroke = styledFeatureCollection.features[0]?.properties?.stroke ?? '#2563eb';
+      layer.stroke = styledFeatureCollection.features[0]?.properties?.stroke ?? 'var(--color-map-draw)';
       layer.strokeWidth = styledFeatureCollection.features[0]?.properties?.strokeWidth ?? 2;
       layer.fill = styledFeatureCollection.features[0]?.properties?.fill ?? '#60a5fa';
       layer.fillOpacity = styledFeatureCollection.features[0]?.properties?.fillOpacity ?? 0.22;
@@ -1650,7 +1650,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   gap: 0.6rem;
   padding-bottom: 0.9rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.42);
+  border-bottom: 1px solid var(--glass-40);
 }
 
 @mixin draw-field-stack {
@@ -1751,12 +1751,12 @@ onBeforeUnmount(() => {
   min-height: 2.5rem;
   padding: 0 0.95rem;
   border-radius: 999px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(232, 244, 255, 0.72));
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: linear-gradient(145deg, var(--glass-80), rgba(232, 244, 255, 0.72));
+  border: 1px solid var(--glass-70);
   color: var(--text-deep);
   font-size: 0.92rem;
   box-shadow:
-    inset 0 0 0.5px rgba(255, 255, 255, 0.5),
+    inset 0 0 0.5px var(--glass-50),
     0 8px 18px rgba(0, 122, 255, 0.08);
 }
 
@@ -1789,15 +1789,15 @@ onBeforeUnmount(() => {
   width: 100%;
   padding: 1.2rem;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: var(--glass-50);
+  border: 1px solid var(--glass-60);
   cursor: pointer;
   text-align: left;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .draw-modal-card-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   border-color: var(--color-primary);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 122, 255, 0.08);
@@ -1835,7 +1835,7 @@ onBeforeUnmount(() => {
   padding: 0.6rem 0.85rem;
   border-radius: 12px;
   border: 1px solid rgba(148, 163, 184, 0.32);
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--glass-80);
   color: var(--text-deep);
 }
 
@@ -1866,9 +1866,9 @@ onBeforeUnmount(() => {
   width: 100%;
   max-width: 360px;
   padding: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--glass-60);
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   text-align: center;

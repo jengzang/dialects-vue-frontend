@@ -828,7 +828,7 @@ $panel-radius-portrait: 24px;
   color: $text-secondary;
   font-size: 11px;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--glass-70);
   border: 1px solid var(--glass-30);
   border-radius: 999px;
 }
@@ -863,7 +863,7 @@ $panel-radius-portrait: 24px;
   background: linear-gradient(
     180deg,
     rgba(10, 132, 255, 0.18),
-    rgba(255, 255, 255, 0.94)
+    var(--glass-90)
   );
   border: 1px solid rgba(10, 132, 255, 0.2);
   border-radius: 10px;
@@ -896,7 +896,7 @@ $panel-radius-portrait: 24px;
     background: linear-gradient(
       180deg,
       rgba(10, 132, 255, 0.28),
-      rgba(255, 255, 255, 0.98)
+      var(--glass-90)
     );
     border-color: rgba(10, 132, 255, 0.38);
     box-shadow: 0 10px 20px rgba(10, 132, 255, 0.16);
@@ -914,7 +914,7 @@ $panel-radius-portrait: 24px;
     background: linear-gradient(
       180deg,
       rgba(215, 0, 21, 0.16),
-      rgba(255, 255, 255, 0.94)
+      var(--glass-90)
     );
     border-color: rgba(215, 0, 21, 0.2);
     box-shadow: 0 8px 18px rgba(215, 0, 21, 0.12);
@@ -923,7 +923,7 @@ $panel-radius-portrait: 24px;
       background: linear-gradient(
         180deg,
         rgba(215, 0, 21, 0.24),
-        rgba(255, 255, 255, 0.98)
+        var(--glass-90)
       );
       border-color: rgba(215, 0, 21, 0.34);
       box-shadow: 0 10px 20px rgba(215, 0, 21, 0.16);

@@ -548,7 +548,7 @@ function formatRegionNames(regionNames) {
 .scope-checkbox-item {
   border: 1px solid $muted-active;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.62);
+  background: var(--glass-60);
   padding: 12px;
 }
 

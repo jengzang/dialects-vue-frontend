@@ -669,26 +669,26 @@ $transition-duration: 0.25s;
   @include glass-button;
 
   color: $primary-blue;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--glass-60);
+  border: 1px solid var(--glass-30);
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    inset 0 1px 0 var(--glass-50);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--glass-80);
     border-color: rgba(0, 122, 255, 0.3);
     box-shadow:
       0 4px 12px rgba(0, 122, 255, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      inset 0 1px 0 var(--glass-60);
     transform: translateY(-2px);
   }
 
   &:active:not(:disabled) {
     box-shadow:
       0 1px 4px rgba(0, 0, 0, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      inset 0 1px 0 var(--glass-40);
     transform: translateY(0);
   }
 
@@ -723,15 +723,15 @@ $transition-duration: 0.25s;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: var(--glass-70);
+  border: 1px solid var(--glass-60);
   border-radius: 999px;
   backdrop-filter: blur($button-blur) saturate(180%);
   -webkit-backdrop-filter: blur($button-blur) saturate(180%);
   transition: all $transition-duration ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--glass-90);
     transform: scale(1.04);
   }
 }

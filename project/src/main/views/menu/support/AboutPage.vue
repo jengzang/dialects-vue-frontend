@@ -574,8 +574,8 @@ $ease-standard: 0.3s ease;
 }
 
 @mixin glass-card(
-  $background: rgba(255, 255, 255, 0.4),
-  $border: rgba(255, 255, 255, 0.42)
+  $background: var(--glass-40),
+  $border: var(--glass-40)
 ) {
   background: $background;
   border: 1px solid $border;
@@ -642,8 +642,8 @@ $ease-standard: 0.3s ease;
   justify-content: center;
   margin: 0 auto;
   padding: 1dvw 8dvw;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--glass-05);
+  border: 1px solid var(--glass-10);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
   font-size: 18px;
@@ -907,7 +907,7 @@ em {
     box-shadow $ease-standard;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--glass-80);
     box-shadow: 0 4px 16px rgba(0, 122, 255, 0.15);
     transform: translateY(-6px) scale(1.01);
   }
@@ -1091,7 +1091,7 @@ em {
   transition: all $ease-standard;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--glass-80);
     border-color: rgba(0, 122, 255, 0.35);
     box-shadow: 0 10px 20px rgba(0, 122, 255, 0.2);
     transform: scale(1.02) translateY(-2px);
@@ -1190,7 +1190,7 @@ em {
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   border: 2px solid var(--border-light-gray);
   border-radius: 12px;
   cursor: pointer;

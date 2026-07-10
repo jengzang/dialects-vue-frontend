@@ -16,12 +16,12 @@ $text-light: var(--text-slate-light);
 $text-subtle: var(--text-secondary);
 
 // Glass / Surfaces
-$glass-white: rgba(255, 255, 255, 0.45);
-$glass-light: rgba(255, 255, 255, 0.6);
-$glass-medium: rgba(255, 255, 255, 0.75);
-$glass-strong: rgba(255, 255, 255, 0.82);
-$glass-heavy: rgba(255, 255, 255, 0.9);
-$glass-solid: rgba(255, 255, 255, 0.95);
+$glass-white: var(--glass-50);
+$glass-light: var(--glass-60);
+$glass-medium: var(--glass-80);
+$glass-strong: var(--glass-80);
+$glass-heavy: var(--glass-90);
+$glass-solid: var(--glass-90);
 $bg-light: rgba(241, 245, 249, 0.9);
 $bg-subtle: rgba(15, 23, 42, 0.08);
 
@@ -38,20 +38,20 @@ $teal: var(--color-teal);
 $deep-blue: var(--text-deep);
 
 // Primary opacity variants
-$primary-subtle: rgba(0, 122, 255, 0.08);
-$primary-glass: rgba(0, 122, 255, 0.1);
-$primary-border: rgba(0, 122, 255, 0.12);
-$primary-hover: rgba(0, 122, 255, 0.25);
-$primary-active: rgba(0, 122, 255, 0.3);
-$primary-ring: rgba(0, 122, 255, 0.5);
-$primary-focus: rgba(0, 122, 255, 0.55);
+$primary-subtle: rgba(var(--color-primary-rgb), 0.08);
+$primary-glass: rgba(var(--color-primary-rgb), 0.1);
+$primary-border: rgba(var(--color-primary-rgb), 0.12);
+$primary-hover: rgba(var(--color-primary-rgb), 0.25);
+$primary-active: rgba(var(--color-primary-rgb), 0.3);
+$primary-ring: rgba(var(--color-primary-rgb), 0.5);
+$primary-focus: rgba(var(--color-primary-rgb), 0.55);
 
 // Muted opacity variants
-$muted-border: rgba(148, 163, 184, 0.08);
-$muted-subtle: rgba(148, 163, 184, 0.12);
-$muted-hover: rgba(148, 163, 184, 0.24);
-$muted-active: rgba(148, 163, 184, 0.28);
-$muted-ring: rgba(148, 163, 184, 0.32);
+$muted-border: rgba(var(--text-slate-light-rgb), 0.08);
+$muted-subtle: rgba(var(--text-slate-light-rgb), 0.12);
+$muted-hover: rgba(var(--text-slate-light-rgb), 0.24);
+$muted-active: rgba(var(--text-slate-light-rgb), 0.28);
+$muted-ring: rgba(var(--text-slate-light-rgb), 0.32);
 
 // == Typography ==
 $font-system:

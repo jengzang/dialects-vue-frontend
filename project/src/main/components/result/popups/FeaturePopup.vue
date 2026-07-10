@@ -70,8 +70,8 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick));
 $popup-text-color: var(--text-dark);
 $popup-radius: 12px;
 
-$glass-color: rgba(255, 255, 255, 0.3);
-$glass-color-light: rgba(255, 255, 255, 0.05);
+$glass-color: var(--glass-30);
+$glass-color-light: var(--glass-05);
 
 $transition-duration: 0.3s;
 $animation-duration: 0.4s;
@@ -97,7 +97,7 @@ $animation-duration: 0.4s;
   box-shadow:
     inset 0 0 1px $glass-color,
     0 4px 14px rgba(0, 0, 0, 0.2),
-    0 0 8px rgba(255, 255, 255, 0.2);
+    0 0 8px var(--glass-20);
   color: $popup-text-color;
   text-align: center;
   font-weight: 500;

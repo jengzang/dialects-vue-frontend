@@ -777,7 +777,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   justify-content: space-between;
   padding: 8px 10px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -852,7 +852,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 /* 弹窗主体 */
 .partition-modal-body {
   padding: 24px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
 }
 
 /* 加载与错误状态 */
@@ -887,7 +887,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     transition: background 0.2s;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.4);
+      background: var(--glass-40);
     }
   }
 
@@ -1008,7 +1008,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     gap: 8px;
     padding: 8px 10px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--glass-50);
     border-radius: 10px;
     color: var(--text-dark)
     white-space: nowrap;
@@ -1019,7 +1019,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     transition: all 0.2s;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.7);
+      background: var(--glass-70);
     }
 
     &.selected {

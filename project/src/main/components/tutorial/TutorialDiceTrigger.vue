@@ -66,24 +66,24 @@ const diceTitle = computed(() => {
 $trigger-radius: 999px;
 $trigger-z-index: 1200;
 
-$glass-border: rgba(255, 255, 255, 0.72);
-$glass-border-hover: rgba(255, 255, 255, 0.9);
+$glass-border: var(--glass-70);
+$glass-border-hover: var(--glass-90);
 
 $shadow-base:
   0 12px 30px rgba(34, 109, 192, 0.2),
   0 3px 10px rgba(64, 125, 190, 0.12),
-  inset 0 1px 0 rgba(255, 255, 255, 0.86),
+  inset 0 1px 0 var(--glass-90),
   inset 0 -1px 0 rgba(91, 139, 186, 0.08);
 
 $shadow-hover:
   0 16px 36px rgba(34, 109, 192, 0.25),
   0 6px 16px rgba(64, 125, 190, 0.16),
-  inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  inset 0 1px 0 var(--glass-90);
 
 @mixin glass-bg {
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(226, 241, 255, 0.46)),
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.92), transparent 40%);
+    linear-gradient(135deg, var(--glass-80), rgba(226, 241, 255, 0.46)),
+    radial-gradient(circle at 18% 0%, var(--glass-90), transparent 40%);
   backdrop-filter: blur(20px) saturate(165%);
   -webkit-backdrop-filter: blur(20px) saturate(165%);
 }
@@ -148,7 +148,7 @@ $shadow-hover:
     inset: 1px;
     border-radius: inherit;
     pointer-events: none;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.52), transparent 44%);
+    background: linear-gradient(135deg, var(--glass-50), transparent 44%);
   }
 
   &:hover {

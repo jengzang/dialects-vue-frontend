@@ -298,13 +298,13 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
   max-width: 1000px;
   margin: 20px auto;
   padding: 16px 28px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 0.5px solid rgba(255, 255, 255, 0.8);
+  background: var(--glass-70);
+  border: 0.5px solid var(--glass-80);
   border-radius: $radius-xl;
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 8px 32px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+    inset 0 0 0 1px var(--glass-90);
 
   @include glass-blur(40px, 180%);
 
@@ -396,11 +396,11 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
   .stat-category {
     padding: 12px;
     background: rgba(247, 247, 247, 0.5);
-    border: 0.5px solid rgba(255, 255, 255, 0.5);
+    border: 0.5px solid var(--glass-50);
     border-radius: $radius-lg;
     box-shadow:
       0 1px 2px rgba(0, 0, 0, 0.04),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+      inset 0 0 0 1px var(--glass-60);
 
     @include glass-blur(20px);
 
@@ -464,18 +464,18 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
       padding: 8px 12px;
       text-align: center;
       cursor: default;
-      background: rgba(255, 255, 255, 0.7);
-      border: 0.5px solid rgba(255, 255, 255, 0.6);
+      background: var(--glass-70);
+      border: 0.5px solid var(--glass-60);
       border-radius: $radius-md;
       box-shadow:
         0 1px 2px rgba(0, 0, 0, 0.04),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+        inset 0 0 0 1px var(--glass-80);
       transition: all $transition-base $smooth-easing;
 
       @include glass-blur(20px, 180%);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.9);
+        background: var(--glass-90);
         border-color: rgba(0, 122, 255, 0.5);
         box-shadow:
           0 4px 12px rgba(0, 122, 255, 0.15),
@@ -560,13 +560,13 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
   max-width: 600px;
   margin: 16px auto;
   padding: 20px 24px;
-  background: rgba(255, 255, 255, 0.65);
-  border: 0.5px solid rgba(255, 255, 255, 0.5);
+  background: var(--glass-70);
+  border: 0.5px solid var(--glass-50);
   border-radius: $radius-xl;
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 12px 40px rgba(0, 0, 0, 0.06),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+    inset 0 0 0 1px var(--glass-70);
   transition: all $transition-slow $card-easing;
 
   @include glass-blur(20px, 180%);
@@ -576,7 +576,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow:
       0 1px 2px rgba(0, 0, 0, 0.04),
       0 20px 48px rgba(0, 122, 255, 0.08),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+      inset 0 0 0 1px var(--glass-90);
     transform: translateY(-2px);
   }
 
@@ -702,12 +702,12 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);
   gap: 12px;
   align-items: center;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-90);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
   border-radius: 18px;
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.02),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+    inset 0 0 0 1px var(--glass-90);
   transition: all $transition-base $standard-easing;
 
   &:hover {

@@ -53,7 +53,7 @@ const legendItems = computed(() => {
   position: absolute;
   bottom: 30px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--glass-90);
   backdrop-filter: blur(10px);
   padding: 12px 16px;
   border-radius: 8px;

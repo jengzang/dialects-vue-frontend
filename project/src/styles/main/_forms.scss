@@ -6,7 +6,7 @@
   z-index: 1000;
   padding: 6px 0;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-90);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -37,7 +37,7 @@
   padding: 10px 14px;
   border: 1px solid rgba(148, 163, 184, 0.32);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--glass-70);
   color: var(--text-deep);
   font-size: 14px;
   outline: none;
@@ -53,7 +53,7 @@
 
 .main-search-field:focus {
   border-color: rgba(0, 122, 255, 0.55);
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--glass-90);
   box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
 }
 
@@ -62,7 +62,7 @@
   padding: 10px 14px;
   border: 1px solid rgba(148, 163, 184, 0.32);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--glass-80);
   color: var(--text-deep);
   font-size: 14px;
   outline: none;
@@ -164,10 +164,10 @@
 @keyframes main-switch-text-glow {
   0%,
   100% {
-    text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+    text-shadow: 0 0 2px var(--glass-50);
   }
   50% {
-    text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 4px var(--glass-80);
   }
 }
 

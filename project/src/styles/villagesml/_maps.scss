@@ -18,11 +18,11 @@
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-90);
   backdrop-filter: blur(8px);
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-50);
   min-width: 200px;
 }
 
@@ -41,7 +41,7 @@
   padding: 8px 12px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   font-size: 14px;
   color: var(--text-primary);
   cursor: pointer;
@@ -86,9 +86,9 @@
   right: 12px;
   z-index: 10;
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-90);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-50);
   border-radius: 8px;
   font-size: 13px;
   cursor: pointer;
@@ -130,7 +130,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--glass-70);
   backdrop-filter: blur(4px);
   z-index: 20;
   border-radius: 12px;

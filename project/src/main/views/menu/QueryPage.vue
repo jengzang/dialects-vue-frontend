@@ -1008,7 +1008,7 @@ $transition-base: 0.3s;
   cursor: pointer;
   user-select: none;
   background: var(--color-primary-medium);
-  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  border-left: 1px solid var(--glass-30);
   transition: all $transition-fast ease;
 
   &:hover {
