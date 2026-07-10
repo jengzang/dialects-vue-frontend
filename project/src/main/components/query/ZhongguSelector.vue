@@ -285,19 +285,19 @@ $card-radius: 8px;
 /* 全局展开按钮 */
 .global-expand-btn {
   padding: 4px 12px;
-  color: var(--color-blue-custom);
+  color: var(--color-primary-hover);
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
-  background: var(--color-blue-custom-light);
+  background: var(--color-primary-light);
   border: none;
   border-radius: 12px;
   transition: all $transition-duration;
 
   &:hover {
     color: white;
-    background: var(--color-blue-custom);
+    background: var(--color-primary-hover);
   }
 }
 
@@ -342,7 +342,7 @@ $card-radius: 8px;
 
 .compact-count {
   margin-right: 8px;
-  color: var(--color-blue-custom);
+  color: var(--color-primary-hover);
   font-size: 0.9em;
   font-weight: 600;
 }

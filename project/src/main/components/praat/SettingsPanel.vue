@@ -412,7 +412,7 @@ $transition-normal: 0.3s;
   }
 
   &:hover {
-    border-color: #999;
+    border-color: var(--text-lightest);
     transform: translateY(-2px);
   }
 

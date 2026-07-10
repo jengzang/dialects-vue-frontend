@@ -779,7 +779,7 @@ $panel-radius-portrait: 24px;
   color: $white;
   font-weight: 700;
   white-space: nowrap;
-  background: #007bffea;
+  background: var(--color-primary);
   border-color: rgba(10, 132, 255, 0.34);
   box-shadow: 0 12px 28px rgba(10, 132, 255, 0.12);
 

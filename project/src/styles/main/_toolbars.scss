@@ -63,7 +63,7 @@
 
 .main-sidebar-item {
   background: rgba(255, 255, 255, 0.76);
-  color: var(--color-blue-logo);
+  color: var(--color-primary-hover);
   font-weight: 1000;
   border-radius: 25px;
   padding: 5px 15px;
@@ -117,7 +117,7 @@
   border-radius: 50%;
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
   border: 2px solid rgba(255, 255, 255, 0.5);
-  color: var(--color-blue-logo);
+  color: var(--color-primary-hover);
   font-size: 18px;
   cursor: pointer;
   transition: all 0.3s ease;

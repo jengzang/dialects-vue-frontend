@@ -17,7 +17,7 @@
 }
 
 .popup-vue .mini-button:hover {
-  background-color: #005fcc;
+  background-color: var(--color-primary-hover);
   transform: scale(1.2);
 }
 
@@ -64,7 +64,7 @@
   visibility: hidden;
   transition: opacity 0.3s ease, transform 0.3s ease;
   text-align: center;
-  color: #222;
+  color: var(--text-dark);
   font-weight: 500;
 }
 
@@ -116,7 +116,7 @@
 }
 
 .maplibregl-popup.map-popup-wrapper .map-popup__action:hover {
-  background-color: #005fcc;
+  background-color: var(--color-primary-hover);
   transform: scale(1.2);
 }
 

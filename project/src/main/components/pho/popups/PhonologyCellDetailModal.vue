@@ -91,7 +91,7 @@ function handleVisibilityChange(value) {
 </script>
 
 <style scoped lang="scss">
-$text-dark: #0f172a;
+$text-dark: var(--text-deep);
 $text-main: #111827;
 $text-body: #1f2937;
 $text-secondary: #4b5563;

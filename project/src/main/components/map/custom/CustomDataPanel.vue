@@ -410,7 +410,7 @@ const resetForm = () => {
 }
 
 .expand-button:hover {
-  background: linear-gradient(135deg, #0051d5, #003a99);
+  background: linear-gradient(135deg, var(--color-primary-hover), var(--color-primary-hover));
   box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
   transform: translateY(-50%) translateX(-4px); /* 悬停时稍微向左移 */
 }
@@ -429,7 +429,7 @@ const resetForm = () => {
 .panel-title {
   font-size: 20px;
   font-weight: 600;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
   text-align: center;
   margin:10px 0;
 }
@@ -452,7 +452,7 @@ const resetForm = () => {
 .form-group label {
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
   max-width: 60px;       /* 限定 label 最大宽度 */
   min-width: 60px;       /* 保持 label 宽度一致 */
   flex-shrink: 0;        /* 防止 label 被压缩 */
@@ -548,7 +548,7 @@ const resetForm = () => {
 }
 
 .submit-btn:hover {
-  background: linear-gradient(135deg, #30d158, #28cd4c);
+  background: linear-gradient(135deg, var(--color-success), var(--color-success));
   box-shadow: 0 6px 16px rgba(52, 199, 89, 0.4);
   transform: translateY(-2px);
 }

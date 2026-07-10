@@ -86,7 +86,7 @@ const goToAuth = () => {
 </script>
 
 
-$apple-blue: var(--color-blue-logo);
+$apple-blue: var(--color-primary-hover);
 
 $desktop-auth-size: 60px;
 $desktop-float-size: 60px;

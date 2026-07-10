@@ -524,7 +524,7 @@ $float-catalog-button-left:0;
       max-width: 100%;
       font-size: 1.02rem;
       line-height: 1.25;
-      color: var(--color-blue-custom);
+      color: var(--color-primary-hover);
 
       @include single-line;
     }
@@ -637,7 +637,7 @@ $float-catalog-button-left:0;
   }
 
   &__title {
-    color: var(--color-blue-dark);
+    color: var(--color-primary-hover);
     font-size: 0.92rem;
     font-weight: 800;
     white-space: nowrap;
@@ -727,7 +727,7 @@ $float-catalog-button-left:0;
       padding: 4px 6px;
       font-size: 0.78rem;
       font-weight: 800;
-      color: var(--color-blue-logo);
+      color: var(--color-primary-hover);
       letter-spacing: 0.06em;
       text-transform: uppercase;
       border-bottom: 1px solid rgba(110, 160, 214, 0.16);
@@ -800,7 +800,7 @@ $float-catalog-button-left:0;
 
   &__title {
     min-width: 0;
-    color: var(--color-blue-custom);
+    color: var(--color-primary-hover);
     font-weight: 800;
 
     @include single-line;
@@ -813,7 +813,7 @@ $float-catalog-button-left:0;
     padding: 2px 8px;
     border-radius: $radius-pill;
     background: rgba(210, 232, 255, 0.82);
-    color: var(--color-blue-logo);
+    color: var(--color-primary-hover);
     font-size: 0.7rem;
     font-weight: 800;
   }
@@ -848,7 +848,7 @@ $float-catalog-button-left:0;
 
   &__title {
     margin: 0;
-    color: var(--color-blue-dark);
+    color: var(--color-primary-hover);
     font-size: clamp(1.18rem, 1.8vw, 1.54rem);
     line-height: 1.25;
   }
@@ -872,7 +872,7 @@ $float-catalog-button-left:0;
     :deep(h1),
     :deep(h2),
     :deep(h3) {
-      color: var(--color-blue-dark);
+      color: var(--color-primary-hover);
       line-height: 1.3;
     }
 
@@ -929,7 +929,7 @@ $float-catalog-button-left:0;
     background: rgba(255, 255, 255, 0.44);
     backdrop-filter: blur(20px) saturate(150%);
     -webkit-backdrop-filter: blur(20px) saturate(150%);
-    color: var(--color-blue-logo);
+    color: var(--color-primary-hover);
     font-size: 0.86rem;
     font-weight: 800;
     cursor: pointer;
@@ -1070,7 +1070,7 @@ $float-catalog-button-left:0;
       border-bottom: 1px solid rgba(223, 220, 220, 0.42);
       border-radius: var(--radius-xl) var(--radius-xl) 0 0;
       background: rgba(255, 255, 255, 0.5);
-      color: var(--color-blue-dark);
+      color: var(--color-primary-hover);
       font-size: 0.86rem;
       font-weight: 850;
       backdrop-filter: blur(28px) saturate(160%);

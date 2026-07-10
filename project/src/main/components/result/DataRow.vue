@@ -10,7 +10,7 @@
         <p class="feature-inline-row">
           <span
               class="feature-value-clickable"
-              style="cursor: pointer; color: #007bff"
+              style="cursor: pointer; color: var(--color-primary)"
               @click.stop="(e) => $emit('trigger-popup', 'feature', item, featureKey, featureVal, e)"
           >
             {{ featureKeyDisplay }}
@@ -18,7 +18,7 @@
           <span> ☞ </span>
           <span
               class="feature-value-clickable"
-              style="cursor: pointer; color: #007bff"
+              style="cursor: pointer; color: var(--color-primary)"
               @click.stop="(e) => $emit('trigger-popup', 'value', item, featureKey, featureVal, e)"
           >
             {{ String(featureVal) }}

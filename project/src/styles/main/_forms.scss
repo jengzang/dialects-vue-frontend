@@ -24,7 +24,7 @@
 
 .choice-dropdown-item.active {
   background-color: #e6f0ff;
-  color: var(--color-blue-custom);
+  color: var(--color-primary-hover);
   font-weight: bold;
 }
 
@@ -38,7 +38,7 @@
   border: 1px solid rgba(148, 163, 184, 0.32);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.72);
-  color: #0f172a;
+  color: var(--text-deep);
   font-size: 14px;
   outline: none;
   transition:
@@ -63,7 +63,7 @@
   border: 1px solid rgba(148, 163, 184, 0.32);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.75);
-  color: #0f172a;
+  color: var(--text-deep);
   font-size: 14px;
   outline: none;
   transition:

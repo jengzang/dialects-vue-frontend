@@ -815,7 +815,7 @@ $transition-duration: 0.25s;
 
 .popup-no-data {
   padding: 20px;
-  color: #999;
+  color: var(--text-lightest);
   font-size: 13px;
   text-align: center;
 }

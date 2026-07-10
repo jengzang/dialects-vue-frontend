@@ -7,7 +7,7 @@ $primary: #007aff;
 $primary-dark: #0051d5;
 
 // Text
-$text-strong: #0f172a;
+$text-strong: var(--text-deep);
 $text-main: #1e293b;
 $text-dark: #334155;
 $text-secondary: #475569;
@@ -28,14 +28,14 @@ $bg-subtle: rgba(15, 23, 42, 0.08);
 // Semantic
 $success: #34c759;
 $success-bg: #e8f8ef;
-$danger: #dc2626;
-$danger-light: #ef4444;
+$danger: #d32f2f;
+$danger-light: var(--color-error-light);
 $danger-bg: #fde4ec;
 $warning: #ff9500;
 $warning-dark: #d97706;
-$purple: #af52de;
+$purple: var(--color-purple-light);
 $teal: #00887a;
-$deep-blue: #0b2540;
+$deep-blue: var(--text-deep);
 
 // Primary opacity variants
 $primary-subtle: rgba(0, 122, 255, 0.08);

@@ -206,7 +206,7 @@ $primary: var(--color-primary);
 $primary-dark: #0051d5;
 $success: #34c759;
 
-$text-label: #2c3e50;
+$text-label: var(--text-deep);
 $text-hint: #999;
 $white: #fff;
 

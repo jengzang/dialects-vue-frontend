@@ -144,7 +144,7 @@ const displayData = computed(() => {
 $text-primary: var(--text-primary);
 $text-secondary: dimgrey;
 $text-muted: var(--text-muted);
-$button-blue: var(--color-blue-logo);
+$button-blue: var(--color-primary-hover);
 $transition-base: 0.3s;
 
 .glass-container {

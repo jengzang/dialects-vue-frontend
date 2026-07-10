@@ -806,7 +806,7 @@ const resetView = () => {
 }
 
 .fullscreen-btn {
-  background: #50c878;
+  background: var(--color-success);
 }
 
 .fullscreen-btn:hover {

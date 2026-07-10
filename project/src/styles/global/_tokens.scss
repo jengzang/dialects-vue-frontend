@@ -17,12 +17,12 @@
   --color-gradient: linear-gradient(135deg, #6e00ff, #00c3ff);
 
   /* 自定义蓝色 - 用于特定组件 */
-  --color-blue-custom: #02469e;
-  --color-blue-custom-light: rgba(2, 70, 158, 0.1);
-  --color-blue-custom-bg: #f0f7ff;
-  --color-blue-dark: #013173;
-  --color-blue-very-light: #e6f0ff;
-  --color-blue-logo: #005fd3;
+  --bg-blue-tint: #f0f7ff;
+  --bg-blue-light: #e6f0ff;
+  --color-map-draw: #2563eb;
+
+  /* 深色文字 */
+  --text-deep: #0b2540;
 
   /* 错误/警告色 */
   --color-error: #d32f2f;
@@ -35,13 +35,14 @@
   --color-success-green: green;
 
   /* 警告色 */
-  --color-warning: darkgoldenrod;
+  --color-warning: #ff9500;
 
   /* 文字颜色 */
   --text-primary: #1d1d1f;
   --text-secondary: #86868b;
   --text-tertiary: #666;
   --text-muted: #888;
+  --text-lightest: #999;
   --text-dark: #333;
   --text-dark-alpha: rgba(30, 30, 30, 0.88);
   --text-dark-medium: rgba(60, 60, 60, 0.85);
@@ -109,6 +110,13 @@
   /* 强调色 */
   --color-accent-purple: #6e00ff;
   --color-accent-purple-light: rgba(110, 0, 255, 0.1);
+
+  /* 辅助色 */
+  --color-purple: #5856d6;
+  --color-purple-light: #af52de;
+  --color-gold: #ffd700;
+  --color-silver: #c0c0c0;
+  --color-bronze: #cd7f32;
 
   /* 圆角 */
   --radius-sm: 6px;

@@ -708,7 +708,7 @@ onUnmounted(() => {
 }
 
 .region-label {
-  background: linear-gradient(135deg, #4a90e2, #50c878);
+  background: linear-gradient(135deg, #4a90e2, var(--color-success));
   color: white;
   padding: 4px 12px;
   border-radius: 12px;
@@ -773,11 +773,11 @@ onUnmounted(() => {
 .action-button.add-button {
   width: auto;
   padding: 10px 20px;
-  background: linear-gradient(135deg, #50c878, #3da35d);
+  background: linear-gradient(135deg, var(--color-success), var(--color-success));
 }
 
 .action-button.add-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #3da35d, #2d8a4a);
+  background: linear-gradient(135deg, var(--color-success), #2d8a4a);
 }
 
 /* Multi-region panel */
@@ -950,7 +950,7 @@ onUnmounted(() => {
 }
 
 .region-badge.compare {
-  background: linear-gradient(135deg, #50c878, #3da35d);
+  background: linear-gradient(135deg, var(--color-success), var(--color-success));
   color: white;
 }
 

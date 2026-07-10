@@ -1012,7 +1012,7 @@ watch(() => props.activeTab, () => {
 }
 
 .action-btn:hover {
-  background: #0062cc;
+  background: var(--color-primary-hover);
 }
 
 .fullscreen-btn {
@@ -1131,10 +1131,10 @@ watch(() => props.activeTab, () => {
   padding: 10px 12px;
   margin-bottom: 16px;
   background: rgba(0, 113, 227, 0.08);
-  border-left: 3px solid #0071e3;
+  border-left: 3px solid var(--color-primary);
   border-radius: 6px;
   font-size: 13px;
-  color: #0071e3;
+  color: var(--color-primary);
   font-weight: 500;
 }
 
@@ -1189,7 +1189,7 @@ watch(() => props.activeTab, () => {
 /* 发音行特殊样式 */
 .pronunciation-row .value {
   font-family: 'Courier New', 'Monaco', monospace;
-  color: #0071e3;
+  color: var(--color-primary);
   letter-spacing: 0.5px;
   font-size: 16px;
   font-weight: bold;

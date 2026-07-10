@@ -510,7 +510,7 @@ onMounted(() => {
 </script>
 
 
-$region-text: #0f172a;
+$region-text: var(--text-deep);
 $region-muted: #64748b;
 $region-soft: #94a3b8;
 $region-accent: var(--color-primary);

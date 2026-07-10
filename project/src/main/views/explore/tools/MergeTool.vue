@@ -785,7 +785,7 @@ const reset = () => {
 
 ```scss
 
-$color-text: #0b2540;
+$color-text: var(--text-deep);
 $color-primary: var(--color-primary);
 $color-success: #34c759;
 $color-danger: #ff3b30;

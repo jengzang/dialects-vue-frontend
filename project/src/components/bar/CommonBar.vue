@@ -643,7 +643,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   align-items: center;
   height: 7dvh;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
   font-size: 1.8rem;
   font-weight: 600;
   white-space: nowrap;
@@ -686,7 +686,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .title-text-mobile {
   flex-shrink: 0;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
   font-size: 1.2rem;
   font-weight: 600;
   white-space: nowrap;

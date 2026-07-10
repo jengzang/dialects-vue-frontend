@@ -126,7 +126,7 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick));
 </script>
 
 <style scoped lang="scss">
-$popup-text-color: #222;
+$popup-text-color: var(--text-dark);
 $popup-radius: 12px;
 
 $glass-background: rgba(255, 255, 255, 0.3);

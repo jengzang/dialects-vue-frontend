@@ -132,7 +132,7 @@ $shadow-hover:
   border-radius: $trigger-radius;
   box-shadow: $shadow-base;
 
-  color: var(--color-blue-dark);
+  color: var(--color-primary-hover);
   overflow: hidden;
 
   @include glass-bg;
@@ -234,7 +234,7 @@ $shadow-hover:
 
     font-size: 0.86rem;
     font-weight: 800;
-    color: var(--color-blue-dark);
+    color: var(--color-primary-hover);
     letter-spacing: 0.01em;
 
     overflow: hidden;

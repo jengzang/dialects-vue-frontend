@@ -296,7 +296,7 @@ watch(searchQuery, () => {
 </script>
 
 
-$primary-blue: var(--color-blue-custom);
+$primary-blue: var(--color-primary-hover);
 $active-background: #e6f0ff;
 $text-primary: rgba(0, 0, 0, 0.85);
 $text-muted: rgba(0, 0, 0, 0.45);

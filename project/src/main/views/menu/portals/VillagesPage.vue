@@ -81,7 +81,7 @@ const handleAllVillages = () => {
   margin: 0 0 40px 0;
   font-size: 28px;
   font-weight: 700;
-  color: #0b2540;
+  color: var(--text-deep);
   text-align: center;
 }
 
@@ -128,7 +128,7 @@ const handleAllVillages = () => {
 .village-name {
   font-size: 20px;
   font-weight: 700;
-  color: #005fd3;
+  color: var(--color-primary-hover);
 }
 
 .village-desc {

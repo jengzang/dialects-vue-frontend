@@ -821,7 +821,7 @@ $bronze: #cd7f32;
 
   &-gap {
     font-weight: 500;
-    color: #ff9500;
+    color: var(--color-warning);
   }
 
   &-first {

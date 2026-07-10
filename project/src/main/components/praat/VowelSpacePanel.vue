@@ -537,7 +537,7 @@ $primary: var(--color-primary);
 $success: #34c759;
 $warning: #ff9500;
 
-$text-primary: var(--color-text-primary, #2c3e50);
+$text-primary: var(--color-text-primary);
 $text-secondary: var(--color-text-secondary, #666);
 
 $primary-background: rgba(0, 122, 255, 0.2);

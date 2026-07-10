@@ -242,7 +242,7 @@ watch(() => props.triggerEl, () => {
 </script>
 
 
-$primary-blue: var(--color-blue-custom);
+$primary-blue: var(--color-primary-hover);
 $selected-background: #e6f0ff;
 $text-primary: rgba(0, 0, 0, 0.85);
 $text-secondary: rgba(0, 0, 0, 0.75);

@@ -1652,7 +1652,7 @@ $system-font:
 
     &[data-state='edit-mode'] {
       color: white;
-      background: #ff9500;
+      background: var(--color-warning);
       animation: pulse 2s ease-in-out infinite;
     }
   }
@@ -1671,7 +1671,7 @@ $system-font:
 .main-glass-button[data-role='submit'] {
   color: white;
   font-weight: 600;
-  background: linear-gradient(135deg, $success-green, #28a745);
+  background: linear-gradient(135deg, $success-green, var(--color-success));
 
   &:disabled {
     cursor: not-allowed;

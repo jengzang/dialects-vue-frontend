@@ -287,7 +287,7 @@ watch(locationQuery, (urlLocations) => {
       background: linear-gradient(
         135deg,
         var(--color-primary-hover) 0%,
-        #004ba0 100%
+        var(--color-primary-hover) 100%
       );
       box-shadow:
         0 6px 16px var(--color-primary-shadow-light),

@@ -620,7 +620,7 @@ $mobile-width: 150px;
 
     &.is-active:not(.is-center) {
       .count-location-jump-nav-dot {
-        background: linear-gradient(135deg, $primary-dark, #003d9e);
+        background: linear-gradient(135deg, $primary-dark, var(--color-primary-hover));
         box-shadow:
           0 0 0 4px rgba(0, 122, 255, 0.16),
           0 4px 12px rgba(0, 122, 255, 0.18);

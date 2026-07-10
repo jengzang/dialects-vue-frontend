@@ -1311,7 +1311,7 @@ $portrait-ratio: 1 / 1;
 
 .region-name {
   margin-bottom: 6px;
-  color: #2c3e50;
+  color: var(--text-deep);
   font-size: 16px;
   font-weight: 600;
 }
@@ -1322,7 +1322,7 @@ $portrait-ratio: 1 / 1;
 }
 
 .region-desc {
-  color: #999;
+  color: var(--text-lightest);
 }
 
 .btn-manage {

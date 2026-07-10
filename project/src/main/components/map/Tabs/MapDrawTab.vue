@@ -1737,7 +1737,7 @@ onBeforeUnmount(() => {
 .voronoi-export-progress-title {
   font-size: 1rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-deep);
 }
 
 .voronoi-export-progress-text {
@@ -1753,7 +1753,7 @@ onBeforeUnmount(() => {
   border-radius: 999px;
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(232, 244, 255, 0.72));
   border: 1px solid rgba(255, 255, 255, 0.7);
-  color: #0b2540;
+  color: var(--text-deep);
   font-size: 0.92rem;
   box-shadow:
     inset 0 0 0.5px rgba(255, 255, 255, 0.5),
@@ -1822,7 +1822,7 @@ onBeforeUnmount(() => {
 .draw-card-title {
   font-size: 1.05rem;
   font-weight: 600;
-  color: #0b2540;
+  color: var(--text-deep);
 }
 
 .draw-card-desc {
@@ -1836,7 +1836,7 @@ onBeforeUnmount(() => {
   border-radius: 12px;
   border: 1px solid rgba(148, 163, 184, 0.32);
   background: rgba(255, 255, 255, 0.78);
-  color: #0b2540;
+  color: var(--text-deep);
 }
 
 .draw-text-input:focus {

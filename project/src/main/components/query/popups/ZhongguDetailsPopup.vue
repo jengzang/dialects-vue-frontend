@@ -50,8 +50,8 @@ function handleClose() {
 </script>
 
 <style scoped lang="scss">
-$accent-color: var(--color-blue-custom);
-$accent-background: var(--color-blue-custom-bg);
+$accent-color: var(--color-primary-hover);
+$accent-background: var(--bg-blue-tint);
 $content-gap: 24px;
 $item-padding-bottom: 16px;
 $header-gap: 10px;

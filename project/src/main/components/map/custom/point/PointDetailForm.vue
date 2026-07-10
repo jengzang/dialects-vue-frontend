@@ -1177,15 +1177,15 @@ watch(
 }
 
 .add-row-btn {
-  background: rgba(#10b981, 0.08);
-  border-color: rgba(#10b981, 0.24);
+  background: rgba(var(--color-success), 0.08);
+  border-color: rgba(var(--color-success), 0.24);
   color: #059669;
 
   &:hover:not(:disabled) {
-    background: rgba(#10b981, 0.15);
-    border-color: rgba(#10b981, 0.4);
+    background: rgba(var(--color-success), 0.15);
+    border-color: rgba(var(--color-success), 0.4);
     color: #047857;
-    box-shadow: 0 4px 12px rgba(#10b981, 0.08);
+    box-shadow: 0 4px 12px rgba(var(--color-success), 0.08);
   }
 }
 

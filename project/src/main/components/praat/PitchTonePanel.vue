@@ -1071,11 +1071,11 @@ $primary-blue: var(--color-primary);
 $primary-purple: #5856d6;
 $primary-hover: #3a7bc8;
 
-$success: var(--color-success, #50c878);
+$success: var(--color-success);
 $success-dark: #3aa65d;
 $error: var(--color-error, #e74c3c);
 
-$text-primary: var(--color-text-primary, #2c3e50);
+$text-primary: var(--color-text-primary);
 $text-secondary: var(--color-text-secondary, #666);
 $text-muted: var(--color-text-secondary, #999);
 
@@ -1354,7 +1354,7 @@ $transition-normal: 0.3s;
     padding: 0;
     background: none;
     border: none;
-    color: #999;
+    color: var(--text-lightest);
     font-size: 1.2rem;
     line-height: 1;
     cursor: pointer;

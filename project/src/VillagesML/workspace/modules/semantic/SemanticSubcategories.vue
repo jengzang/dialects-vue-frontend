@@ -623,7 +623,7 @@ export default {
   font-size: 28px;
   font-weight: 600;
   margin-bottom: 24px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .vml-glass-panel {
@@ -640,7 +640,7 @@ export default {
 .query-form h3 {
   margin: 0;
   font-size: 16px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -653,7 +653,7 @@ export default {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .form-row {
@@ -678,7 +678,7 @@ export default {
 .results-header h3 {
   margin: 0;
   font-size: 20px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .subcategory-grid {
@@ -701,7 +701,7 @@ export default {
 .subcat-header h4 {
   margin: 0;
   font-size: 16px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .parent-badge {
@@ -730,7 +730,7 @@ export default {
 
 .stat-value {
   font-weight: 600;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .char-preview {
@@ -746,7 +746,7 @@ export default {
 
 .char-list {
   font-size: 14px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
   line-height: 1.6;
 }
 
@@ -774,7 +774,7 @@ export default {
 .ranking-table h4 {
   margin: 0 0 16px 0;
   font-size: 18px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .radar-container,
@@ -806,7 +806,7 @@ td {
 
 th {
   font-weight: 600;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 tr.significant {

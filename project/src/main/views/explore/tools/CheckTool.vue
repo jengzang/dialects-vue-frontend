@@ -2081,7 +2081,7 @@ onUnmounted(() => {
 
 
 $primary: var(--color-primary);
-$text-main: #0b2540;
+$text-main: var(--text-deep);
 $text-muted: #666;
 $danger: #ff3b30;
 $warning: #ff9500;
@@ -4118,7 +4118,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 .info-help-btn {
   border: 1px dashed rgba(0, 122, 255, 0.45) !important;
   background: rgba(0, 122, 255, 0.07) !important;
-  color: #0059c8 !important;
+  color: var(--color-primary-hover) !important;
   font-weight: 600 !important;
   transition: all 0.22s ease !important;
 

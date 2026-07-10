@@ -240,7 +240,7 @@ const columnOptions = computed(() => ([
 </script>
 
 <style scoped lang="scss">
-$text-primary: #0b2540;
+$text-primary: var(--text-deep);
 $text-secondary: rgba(11, 37, 64, 0.68);
 $text-muted: rgba(11, 37, 64, 0.58);
 $text-light: rgba(11, 37, 64, 0.55);

@@ -99,7 +99,7 @@ const handleTabClick = (tabName) => {
 
 
 $primary-blue: var(--color-primary);
-$text-default: #444;
+$text-default: var(--text-dark);
 $white: #fff;
 $transition-duration: 0.5s;
 

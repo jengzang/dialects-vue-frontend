@@ -46,7 +46,7 @@ const goToYCVillages = () => {
 
 ```vue
 
-$button-text-color: var(--color-blue-logo);
+$button-text-color: var(--color-primary-hover);
 $transition-duration: 0.3s;
 
 .title-row {

@@ -65,7 +65,7 @@ function toggleKey(key) {
   flex-wrap: wrap;
   display: flex;
   justify-content: center;
-  border-bottom: 1px solid var(--color-blue-dark);
+  border-bottom: 1px solid var(--color-primary-hover);
 }
 
 .key-item {

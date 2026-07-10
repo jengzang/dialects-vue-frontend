@@ -752,7 +752,7 @@ onMounted(() => {
 </script>
 
 
-$user-text: #0f172a;
+$user-text: var(--text-deep);
 $user-muted: #64748b;
 $user-border: rgba(148, 163, 184, 0.24);
 $user-glass-border: rgba(255, 255, 255, 0.58);

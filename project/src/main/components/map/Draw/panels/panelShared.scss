@@ -53,7 +53,7 @@
 .draw-tool-panel-title {
   font-size: 1rem;
   font-weight: 700;
-  color: #0b2540;
+  color: var(--text-deep);
 }
 
 .draw-tool-panel-subtitle {
@@ -221,7 +221,7 @@
 .draw-field-label {
   white-space: nowrap;
   font-size: 0.9rem;
-  color: #0b2540;
+  color: var(--text-deep);
   font-weight: 600;
 }
 
@@ -236,7 +236,7 @@
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.7);
   background: rgba(255, 255, 255, 0.72);
-  color: #0b2540;
+  color: var(--text-deep);
   padding: 0.5rem 0.75rem;
 }
 
@@ -276,7 +276,7 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  color: #0b2540;
+  color: var(--text-deep);
   font-size: 0.92rem;
 }
 

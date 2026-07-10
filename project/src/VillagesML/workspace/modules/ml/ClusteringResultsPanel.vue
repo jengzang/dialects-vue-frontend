@@ -540,7 +540,7 @@ const handleQuickAdjust = (action) => {
 }
 
 .alert-good {
-  border-left-color: #50c878;
+  border-left-color: var(--color-success);
   background: rgba(80, 200, 120, 0.1);
 }
 

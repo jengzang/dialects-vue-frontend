@@ -43,7 +43,7 @@ const keepAliveViewNames = [
 
 ```scss
 <style scoped lang="scss">
-$layout-text: #0b2540;
+$layout-text: var(--text-deep);
 $fade-duration: 0.14s;
 $portrait-ratio: 1 / 1;
 

@@ -639,7 +639,7 @@ export default {
   font-size: 28px;
   font-weight: 600;
   margin-bottom: 24px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .vml-glass-panel {
@@ -663,7 +663,7 @@ export default {
 .query-form h3 {
   margin: 0;
   font-size: 16px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -676,7 +676,7 @@ export default {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .form-row {
@@ -707,7 +707,7 @@ export default {
 .results-header h3 {
   margin: 0;
   font-size: 20px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .results-grid {
@@ -739,7 +739,7 @@ export default {
 .card-header h4 {
   margin: 0;
   font-size: 18px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .similarity-bar-container {
@@ -750,7 +750,7 @@ export default {
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 8px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .similarity-bar {
@@ -762,7 +762,7 @@ export default {
 
 .similarity-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary, #4a90e2), var(--color-success, #50c878));
+  background: linear-gradient(90deg, var(--color-primary, #4a90e2), var(--color-success));
   transition: width 0.3s ease;
 }
 
@@ -783,7 +783,7 @@ export default {
 
 .char-list {
   font-size: 14px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
   line-height: 1.6;
 }
 
@@ -809,7 +809,7 @@ export default {
 .comparison-details h3 {
   margin-bottom: 16px;
   font-size: 20px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .metrics-grid {
@@ -845,7 +845,7 @@ export default {
 .comparison-section h4 {
   margin-bottom: 12px;
   font-size: 16px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .char-cloud {
@@ -883,7 +883,7 @@ export default {
 
 .add-button {
   padding: 10px 24px;
-  background: var(--color-success, #50c878);
+  background: var(--color-success);
   color: white;
   border: none;
   border-radius: 8px;
@@ -919,7 +919,7 @@ export default {
   border: 2px solid rgba(74, 144, 226, 0.3);
   border-radius: 20px;
   font-size: 14px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .remove-button {

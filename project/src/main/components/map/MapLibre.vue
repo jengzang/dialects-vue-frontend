@@ -1175,7 +1175,7 @@ const resetView = () => {
 }
 
 .action-btn:hover {
-  background: #0062cc;
+  background: var(--color-primary-hover);
 }
 
 /* ✨ 全屏按鈕樣式 (綠色區分) */
@@ -1284,7 +1284,7 @@ const resetView = () => {
   font-weight: bold;
   color: var(--text-dark)
   padding: 12px 0;
-  border-bottom: 2px solid #007bff;
+  border-bottom: 2px solid var(--color-primary);
   margin-bottom: 16px;
 }
 
@@ -1335,6 +1335,6 @@ const resetView = () => {
 .no-data {
   text-align: center;
   padding: 40px;
-  color: #999;
+  color: var(--text-lightest);
   font-size: 16px;
 }

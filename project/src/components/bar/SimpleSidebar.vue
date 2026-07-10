@@ -358,7 +358,7 @@ $primary-light: #0080ff;
 
 $text-primary: #333;
 $text-secondary: #666;
-$text-dark: #444;
+$text-dark: var(--text-dark);
 $text-muted: #8e8e93;
 
 $portrait-ratio: 1 / 1;

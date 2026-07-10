@@ -894,7 +894,7 @@ $transition-base: 0.3s;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  border-bottom: 1px solid var(--color-blue-dark);
+  border-bottom: 1px solid var(--color-primary-hover);
 }
 
 .key-item {
@@ -948,7 +948,7 @@ $transition-base: 0.3s;
     transition: background-color $transition-fast;
 
     &:hover {
-      background-color: var(--color-blue-very-light);
+      background-color: var(--bg-blue-light);
     }
 
     &.active {
@@ -969,7 +969,7 @@ $transition-base: 0.3s;
 }
 
 .key-name-text {
-  color: var(--color-blue-custom);
+  color: var(--color-primary-hover);
 }
 
 /* 下拉输入框包装器 */

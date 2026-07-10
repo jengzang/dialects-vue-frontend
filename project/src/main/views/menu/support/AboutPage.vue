@@ -734,7 +734,7 @@ em {
   }
 
   &:hover {
-    color: #0051a8;
+    color: var(--color-primary-hover);
     transform: scale(1.05);
 
     &::after {
@@ -837,7 +837,7 @@ em {
 
 .subfeature-title {
   margin: 0 0 2px;
-  color: #2c3e50;
+  color: var(--text-deep);
   font-size: 15px;
   font-weight: 600;
 }
@@ -915,7 +915,7 @@ em {
   p {
     margin: 0.5rem 0.5rem 0.2rem;
     overflow: hidden;
-    color: #444;
+    color: var(--text-dark);
     white-space: nowrap;
     text-overflow: ellipsis;
     font-size: 1rem;

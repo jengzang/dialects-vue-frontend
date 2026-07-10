@@ -381,7 +381,7 @@ const {
   .summary-card strong,
   .performance-row strong,
   .task-row strong {
-    color: #0f172a;
+    color: var(--text-deep);
     font-size: 20px;
   }
 
@@ -401,7 +401,7 @@ const {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #0f172a;
+    color: var(--text-deep);
   }
 
   .status-badge {
@@ -459,7 +459,7 @@ const {
   }
 
   .result-table th {
-    color: #0f172a;
+    color: var(--text-deep);
     font-weight: 700;
   }
 
@@ -477,7 +477,7 @@ const {
 
   .diagnostic-card h4 {
     margin: 0 0 10px;
-    color: #0f172a;
+    color: var(--text-deep);
   }
 
   .diagnostic-card pre {
@@ -524,7 +524,7 @@ const {
 
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #0a84ff, #5ac8fa);
+    background: linear-gradient(90deg, var(--color-primary), #5ac8fa);
     border-radius: inherit;
   }
 }

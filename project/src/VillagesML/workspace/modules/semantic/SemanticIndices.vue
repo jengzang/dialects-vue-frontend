@@ -491,17 +491,17 @@ const getRegionLevelName = (level) => {
 }
 
 .rank-gold {
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  background: linear-gradient(135deg, var(--color-gold), #ffed4e);
   color: #8b6914;
 }
 
 .rank-silver {
-  background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+  background: linear-gradient(135deg, var(--color-silver), #e8e8e8);
   color: #5a5a5a;
 }
 
 .rank-bronze {
-  background: linear-gradient(135deg, #cd7f32, #e8a87c);
+  background: linear-gradient(135deg, var(--color-bronze), #e8a87c);
   color: #6b3e1a;
 }
 

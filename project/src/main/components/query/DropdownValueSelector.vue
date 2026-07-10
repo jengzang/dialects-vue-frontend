@@ -276,7 +276,7 @@ $dropdown-item-padding: 8px 16px;
 $dropdown-font-size: 14px;
 $transition-duration: 0.2s;
 $dropdown-selected-bg: #e6f0ff;
-$dropdown-selected-color: var(--color-blue-custom);
+$dropdown-selected-color: var(--color-primary-hover);
 
 .key-dropdown-group {
   display: flex;
@@ -295,7 +295,7 @@ $dropdown-selected-color: var(--color-blue-custom);
   align-self: center;
 
   &-text {
-    color: var(--color-blue-custom);
+    color: var(--color-primary-hover);
   }
 }
 

@@ -723,7 +723,7 @@ const openEntryModal = () => {
   color: #fff;
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, $primary-dark, #003db3);
+    background: linear-gradient(135deg, $primary-dark, var(--color-primary-hover));
   }
 }
 
@@ -962,7 +962,7 @@ const openEntryModal = () => {
   padding: 0 8px 0 0;
   border: none;
   background: transparent;
-  color: #0f172a;
+  color: var(--text-deep);
   font-size: 13px;
   outline: none;
 
