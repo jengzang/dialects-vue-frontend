@@ -763,24 +763,6 @@ const downloadDefaultReference = async () => {
   }
 }
 
-const useDefaultReference = async () => {
-  try {
-    const wbout = XLSX.write(defaultRefWorkbook.value, { bookType: 'xlsx', type: 'array' })
-    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-
-    const file = new File([blob], DEFAULT_REFERENCE_FILE_NAME, {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    })
-
-    await setReferenceFile(file)
-
-    showDefaultRefModal.value = false
-    showSuccess(t('tools.merge.messages.useDefaultSuccess'))
-  } catch (error) {
-    showError(t('tools.merge.messages.useDefaultFailed', { message: error.message }))
-  }
-}
-
 const reset = () => {
   mergePollingTask.stop()
   currentStep.value = 1

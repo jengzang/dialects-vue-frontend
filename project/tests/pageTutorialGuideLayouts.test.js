@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick, reactive } from 'vue'
 
+globalThis.__WEB_BASE__ = ''
+
 let route
 
 vi.mock('vue-router', () => ({

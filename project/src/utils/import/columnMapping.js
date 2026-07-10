@@ -2,7 +2,7 @@ function normalizeText(value) {
   return String(value ?? '')
     .trim()
     .toLowerCase()
-    .replace(/[\s_\-—–()（）【】\[\]：:]/g, '')
+    .replace(/[\s_\-—–()（）【】[]：:]/g, '')
 }
 
 export function autoMatchColumns(schema = [], sourceColumns = []) {
