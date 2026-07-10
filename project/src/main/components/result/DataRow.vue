@@ -93,7 +93,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getCorrespondingCharacters, getReadingClass, getYinWeiCharReadingType, getZhongGuCharReadingType } from '@/main/utils/ResultTable.js';
+import { getCorrespondingCharacters, getReadingClass, getYinWeiCharReadingType, getZhongGuCharReadingType } from '@/main/utils/query/ResultTable.js';
 import { READING_COLORS } from '@/main/config/readingColors.js';
 import { getFeatureStats, getLocationDetail } from '@/api';
 import { globalPayload, mapStore } from '@/main/store/store.js';

@@ -1,4 +1,4 @@
-import { GET_LOCS_EXPLICIT_LOCATIONS_LIMIT } from '../config/constants.js';
+import { GET_LOCS_EXPLICIT_LOCATIONS_LIMIT } from '../../config/constants.js';
 
 // 允许的 CJK 汉字 Unicode 区间
 const CJK_IDEOGRAPH_RANGES = [

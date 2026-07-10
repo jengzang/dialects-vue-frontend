@@ -28,7 +28,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { parseFeatureString } from '@/main/utils/ResultTable.js';
+import { parseFeatureString } from '@/main/utils/query/ResultTable.js';
 import { resultCache } from '@/main/store/store.js';
 
 

@@ -262,7 +262,7 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
-import { resolveHoverDetailCardPosition } from '@/components/ToastAndHelp/hoverDetailCardPosition.js'
+import { resolveHoverDetailCardPosition } from '@/main/utils/hoverDetailCardPosition.js'
 import LocationMultiInput from '../geo/LocationMultiInput.vue'
 import { postPhoPieByValue, postPhoPieByStatus } from '@/api'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'

@@ -126,7 +126,7 @@ import { useI18n } from 'vue-i18n';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { mapStyle, mapStyleConfig, calculateMapCenterAndZoom } from '@/utils/map/MapSource.js';
-import {get_detail} from "@/main/utils/ResultTable.js";
+import {get_detail} from "@/main/utils/query/ResultTable.js";
 import {mapStore, userStore, resultCache} from "@/main/store/store.js";
 import { showSuccess, showError, showWarning, showConfirm } from '@/utils/message.js';
 import { getLocationDetail } from '@/api'

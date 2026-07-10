@@ -70,7 +70,7 @@ import {
   filterYinweiSuggestions,
   getFeatureSuggestionsByCard,
   normalizeYinweiTokens
-} from '@/main/utils/yinweiInput.js'
+} from '@/main/utils/query/yinweiInput.js'
 
 const { t } = useI18n()
 

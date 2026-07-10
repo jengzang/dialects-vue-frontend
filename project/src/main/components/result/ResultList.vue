@@ -120,7 +120,7 @@
 import { ref, computed, watch, onMounted, nextTick, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DataRow from './DataRow.vue';
-import { parseFeatureString,get_detail } from '@/main/utils/ResultTable.js';
+import { parseFeatureString,get_detail } from '@/main/utils/query/ResultTable.js';
 import { READING_COLORS } from '@/main/config/readingColors.js';
 import ValuePopup from "../popup/result/ValuePopup.vue";
 import FeaturePopup from "../popup/result/FeaturePopup.vue";

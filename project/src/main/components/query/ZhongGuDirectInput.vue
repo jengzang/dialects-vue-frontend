@@ -71,7 +71,7 @@
 import { ref, computed, watch } from 'vue'
 import ZhongGuSelector from '@/main/components/query/ZhongGuSelector.vue'
 import ZhongGuInputHelpModal from '@/main/components/popup/query/ZhongGuInputHelpModal.vue'
-import { validateAll, parseTokens, tokensToPathStrings } from '@/main/utils/zhongguDirectInputValidator.js'
+import { validateAll, parseTokens, tokensToPathStrings } from '@/main/utils/query/zhongguDirectInputValidator.js'
 import { ROLE_LIMITS } from '@/main/config/constants.js'
 import { userStore } from '@/main/store/store.js'
 

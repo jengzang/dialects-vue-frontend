@@ -56,7 +56,7 @@ import DataRow from "./DataRow.vue";
 // [修復] 導入漏掉的組件和工具函數
 import ValuePopup from '../popup/result/ValuePopup.vue';
 import FeaturePopup from '../popup/result/FeaturePopup.vue';
-import { parseFeatureString, get_detail } from '@/main/utils/ResultTable.js';
+import { parseFeatureString, get_detail } from '@/main/utils/query/ResultTable.js';
 import { PANEL_CONFIG, LAYOUT_CONFIG } from '@/main/config/constants.js';
 import { resultCache } from '@/main/store/store.js';
 
