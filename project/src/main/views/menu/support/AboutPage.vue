@@ -1230,7 +1230,7 @@ em {
 }
 
 /* 竖屏 */
-@media (max-aspect-ratio: 1 / 1) {
+@media (max-aspect-ratio: #{1 / 1}) {
   .tutorial-toggle-section {
     align-items: flex-start;
     gap: 12px;

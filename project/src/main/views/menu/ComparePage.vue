@@ -2333,7 +2333,7 @@ $text-muted: var(--text-lightest);
   }
 }
 
-@media (max-aspect-ratio: 1 / 1) {
+@media (max-aspect-ratio: #{1 / 1}) {
   .card-row {
     gap: 0;
   }

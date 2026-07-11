@@ -891,7 +891,9 @@ $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
 $success: var(--color-success);
 $danger: var(--color-error-light);
-$portrait-ratio: 1 / 1;/* 选择框 */
+$portrait-ratio: 1;
+
+/* 选择框 */
 .region-select-box {
   position: relative;
   width: 98%;

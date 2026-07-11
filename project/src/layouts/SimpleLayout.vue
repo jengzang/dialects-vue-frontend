@@ -55,7 +55,7 @@ watch(() => route.path, (newPath) => {
 
 
 <style scoped lang="scss">
-$portrait-ratio: 1 / 1;
+$portrait-ratio: 1;
 
 $system-font:
   -apple-system,

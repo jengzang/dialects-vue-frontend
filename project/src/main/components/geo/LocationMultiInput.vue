@@ -434,7 +434,9 @@ watch(showPartitionInfoModal, (isVisible) => {
 @use '@/styles/global/mixins' as *;
 
 $warning-orange: var(--color-warning);
-$portrait-ratio: 1 / 1;.location-multi-input {
+$portrait-ratio: 1;
+
+.location-multi-input {
   width: 100%;
   @include flex-col;
   gap: 15px;

@@ -46,7 +46,7 @@ const keepAliveViewNames = [
 @use '@/styles/global/mixins' as *;
 
 $fade-duration: 0.14s;
-$portrait-ratio: 1 / 1;
+$portrait-ratio: 1;
 
 $system-font:
   -apple-system,

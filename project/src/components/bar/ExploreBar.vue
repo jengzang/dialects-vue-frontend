@@ -413,7 +413,9 @@ $desktop-tab-height: 6.5dvh;
 
 $transition-fast: 0.2s;
 $transition-base: 0.3s;
-$submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);@mixin glass-control {
+$submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
+
+@mixin glass-control {
   background: linear-gradient(
     145deg,
     var(--glass-20),

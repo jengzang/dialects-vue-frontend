@@ -48,7 +48,7 @@ const keepAliveViewNames = [
 
 <style scoped lang="scss">
 $fade-duration: 0.14s;
-$portrait-ratio: 1 / 1;
+$portrait-ratio: 1;
 
 $system-font:
   -apple-system,

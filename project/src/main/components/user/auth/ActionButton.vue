@@ -34,7 +34,7 @@ defineEmits(['click'])
 @use '@/styles/global/mixins' as *;
 
 $transition-duration: 0.3s;
-$mobile-aspect-ratio: 1 / 1;
+$mobile-aspect-ratio: 1;
 
 $solid-variants: (
   blue: (

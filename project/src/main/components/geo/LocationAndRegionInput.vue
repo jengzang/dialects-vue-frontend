@@ -1360,7 +1360,7 @@ defineExpose({
 $primary: var(--color-primary);
 $success: var(--color-success);
 $custom-purple: var(--color-purple);
-$portrait-ratio: 1 / 1;
+$portrait-ratio: 1;
 @mixin suggestion-panel($max-width, $max-height) {
   position: absolute !important;
   z-index: 99999 !important;

@@ -210,7 +210,7 @@ $primary-blue: var(--color-primary);
 $text-dark: var(--text-dark);
 $error-color: var(--color-error);
 $transition-fast: 0.2s;
-$mobile-aspect-ratio: 1 / 1;
+$mobile-aspect-ratio: 1;
 .tree-node {
   margin-bottom: 8px;
 }

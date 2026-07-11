@@ -363,7 +363,9 @@ $text-secondary: var(--text-tertiary);
 $text-dark: var(--text-dark);
 $text-muted: var(--text-secondary);
 
-$portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacity-end: 0.15) {
+$portrait-ratio: 1;
+
+@mixin soft-glass-background($opacity-start: 0.3, $opacity-end: 0.15) {
   background: linear-gradient(
     145deg,
     rgba(255, 255, 255, $opacity-start),

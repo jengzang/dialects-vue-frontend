@@ -542,7 +542,9 @@ $text-dark: var(--text-dark);
 $text-secondary: var(--text-tertiary);
 $text-muted: var(--text-secondary);
 
-$mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
+$mobile-aspect-ratio: 1;
+
+@mixin soft-glass-background {
   background: linear-gradient(
     145deg,
     var(--glass-20),

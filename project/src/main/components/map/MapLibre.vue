@@ -978,7 +978,7 @@ $glass-transition: all 0.3s ease;
     border-radius: 0;
   }
 
-  @media (max-aspect-ratio: 1 / 1) {
+  @media (max-aspect-ratio: #{1 / 1}) {
     width: 90dvw;
     height: 65dvh;
 

@@ -36,7 +36,7 @@ $border-color: var(--border-gray);
 $switcher-background: var(--bg-light);
 $white: var(--text-white);
 $transition-duration: 0.25s;
-$mobile-aspect-ratio: 1 / 1;
+$mobile-aspect-ratio: 1;
 
 .tab-switcher {
   display: inline-flex;
