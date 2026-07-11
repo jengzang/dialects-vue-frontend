@@ -65,6 +65,8 @@
     "referenceDescription": "Choose the sheet and header row first, then finish required column mapping before the actual upload.",
     "jyut2ipaTitle": "Pre-import Preview & Jyutping Column Mapping",
     "jyut2ipaDescription": "Confirm which column contains Jyutping before conversion so inconsistent column names do not block processing.",
+    "checkToolTitle": "Pre-import Preview & Check Column Mapping",
+    "checkToolDescription": "Map the character, IPA, and note columns before entering the check workspace to reduce import failures from inconsistent column names.",
     "mergeReferenceSummary": "{mappedCount} mapped / {columnCount} source columns",
     "actions": {
       "exportSource": "Export source file",

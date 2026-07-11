@@ -94,6 +94,7 @@
       </div>
 
       <TabularImportPreview
+        embedded
         :title="t('map.drawTab.voronoi.customImport.previewTitle')"
         :description="t('map.drawTab.voronoi.customImport.previewDescription')"
         :file="tabularState.file.value"

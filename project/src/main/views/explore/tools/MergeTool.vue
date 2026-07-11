@@ -85,6 +85,7 @@
           <TabularImportPreview
             v-if="pendingReferenceFile"
             :key="referenceImportConfirmKey"
+            :model-value="Boolean(pendingReferenceFile)"
             :title="t('common.importPreview.referenceTitle')"
             :description="t('common.importPreview.referenceDescription')"
             :source="referencePreviewSource"
@@ -101,17 +102,10 @@
             @update:headerRowIndex="referencePreviewState.headerRowIndex = $event"
             @update:mapping="handleReferenceMappingUpdate"
             @reset="clearPendingReference"
+            @confirm="handleReferenceConfirm"
           />
 
           <div class="step-actions">
-            <button
-              v-if="pendingReferenceFile"
-              class="main-glass-button"
-              data-variant="secondary"
-              @click="clearPendingReference"
-            >
-              {{ t('common.button.cancel') }}
-            </button>
             <button
               class="main-glass-button"
               data-variant="secondary"
@@ -127,10 +121,10 @@
               class="main-glass-button"
               data-variant="primary"
               data-size="large"
-              :disabled="!referenceFile && !isReferenceImportReady"
+              :disabled="!referenceFile"
               @click="handleReferenceConfirm"
             >
-              {{ referenceFile ? `${t('tools.merge.reference.next')} →` : t('common.importPreview.actions.confirmAndUse') }}
+              {{ `${t('tools.merge.reference.next')} →` }}
             </button>
           </div>
         </div>
@@ -451,7 +445,6 @@ const referenceImportFlow = useTabularImportFlow({
     }
   }
 })
-const isReferenceImportReady = computed(() => referenceImportFlow.isReady.value)
 const referencePreviewSource = computed(() => {
   if (!pendingReferenceFile.value) {
     return null

@@ -75,6 +75,7 @@
         <TabularImportPreview
           v-if="pendingPreviewFile"
           :key="previewConfirmKey"
+          :model-value="Boolean(pendingPreviewFile)"
           :title="t('common.importPreview.checkToolTitle')"
           :description="t('common.importPreview.checkToolDescription')"
           :file="pendingPreviewFile"
@@ -90,25 +91,9 @@
           @update:headerRowIndex="checkPreviewState.headerRowIndex = $event"
           @update:mapping="handleCheckMappingUpdate"
           @reset="clearPendingPreview"
+          @confirm="confirmPreviewAndUpload"
         />
 
-        <div v-if="pendingPreviewFile" class="upload-preview-actions upload-preview-actions--check">
-          <p v-if="checkImportSummary" class="hint-text hint-text--summary">{{ checkImportSummary }}</p>
-          <div class="upload-preview-actions__buttons">
-            <button class="main-glass-button" data-variant="secondary" type="button" @click="clearPendingPreview">
-              {{ t('common.button.cancel') }}
-            </button>
-            <button
-              class="main-glass-button"
-              data-variant="primary"
-              type="button"
-              :disabled="!isCheckImportReady"
-              @click="confirmPreviewAndUpload"
-            >
-              {{ t('common.importPreview.actions.confirmAndUse') }}
-            </button>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -1140,20 +1125,6 @@ const checkImportFlow = useTabularImportFlow({
     }
   }
 })
-const isCheckImportReady = computed(() => checkImportFlow.isReady.value)
-const checkImportSummary = computed(() => {
-  if (!checkImportPayload.value) {
-    return ''
-  }
-
-  const mappedCount = Object.values(checkImportPayload.value.mapping || {}).filter(Boolean).length
-  const columnCount = checkImportPayload.value.sourceColumns?.length || 0
-  return t('common.importPreview.mergeReferenceSummary', {
-    mappedCount,
-    columnCount
-  })
-})
-
 // 计算属性
 const totalPendingChanges = computed(() => {
   return pendingChanges.value.size + rowsToDelete.value.size
@@ -2281,28 +2252,6 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &.uploading {
     cursor: progress;
   }
-}
-
-.upload-preview-actions {
-  width: 100%;
-  @include flex-col;
-  gap: 10px;
-
-  &--check {
-    margin-top: 8px;
-  }
-
-  &__buttons {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-}
-
-.hint-text--summary {
-  margin: 0;
-  color: rgba(var(--text-deep-rgb), 0.72);
 }
 
 .work {

@@ -30,6 +30,7 @@
         <TabularImportPreview
           v-if="pendingPreviewFile"
           :key="previewConfirmKey"
+          :model-value="Boolean(pendingPreviewFile)"
           :title="t('common.importPreview.jyut2ipaTitle')"
           :description="t('common.importPreview.jyut2ipaDescription')"
           :file="pendingPreviewFile"
@@ -45,26 +46,12 @@
           @update:headerRowIndex="jyutPreviewState.headerRowIndex = $event"
           @update:mapping="handleJyutMappingUpdate"
           @reset="clearPendingPreview"
+          @confirm="confirmPreviewAndProcess"
         />
 
         <div class="info-section">
           <p class="info-text">{{ t('tools.jyut2ipa.upload.info') }}</p>
           <p v-if="jyutImportSummary" class="info-text info-text--summary">{{ jyutImportSummary }}</p>
-
-          <div class="upload-preview-actions" v-if="pendingPreviewFile">
-            <button class="main-glass-button" data-variant="secondary" type="button" @click="clearPendingPreview">
-              {{ t('common.button.cancel') }}
-            </button>
-            <button
-              class="main-glass-button"
-              data-variant="primary"
-              type="button"
-              :disabled="!isJyutImportReady"
-              @click="confirmPreviewAndProcess"
-            >
-              {{ t('common.importPreview.actions.confirmAndUse') }}
-            </button>
-          </div>
 
           <div class="config-card" @click="showConfigModal = true">
             <div class="config-icon">⚙️</div>
@@ -440,7 +427,6 @@ const fileImportFlow = useTabularImportFlow({
     }
   }
 })
-const isJyutImportReady = computed(() => fileImportFlow.isReady.value)
 const jyutImportSummary = computed(() => {
   if (!fileImportPayload.value) {
     return ''
