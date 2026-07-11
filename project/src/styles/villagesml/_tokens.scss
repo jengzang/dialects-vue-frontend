@@ -18,3 +18,29 @@
   --vml-terracotta: #e8a87c;
   --vml-brown-dark: #6b3e1a;
 }
+
+:root[data-color-theme='light'] {
+  --vml-blue: #8a6a2f;
+  --vml-blue-rgb: 138, 106, 47;
+  --vml-blue-dark: #6f5424;
+  --vml-blue-dark-rgb: 111, 84, 36;
+  --vml-blue-darker: #5c451d;
+  --vml-blue-darker-rgb: 92, 69, 29;
+  --vml-blue-darkest: #493719;
+  --vml-blue-darkest-rgb: 73, 55, 25;
+  --vml-blue-medium: #b8944d;
+  --vml-blue-medium-rgb: 184, 148, 77;
+}
+
+:root[data-color-theme='dark'] {
+  --vml-blue: #d8c08a;
+  --vml-blue-rgb: 216, 192, 138;
+  --vml-blue-dark: #f0d79d;
+  --vml-blue-dark-rgb: 240, 215, 157;
+  --vml-blue-darker: #c7a96d;
+  --vml-blue-darker-rgb: 199, 169, 109;
+  --vml-blue-darkest: #a8874b;
+  --vml-blue-darkest-rgb: 168, 135, 75;
+  --vml-blue-medium: #e2c992;
+  --vml-blue-medium-rgb: 226, 201, 146;
+}

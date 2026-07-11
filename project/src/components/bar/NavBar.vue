@@ -637,7 +637,7 @@ $mobile-aspect-ratio: 1;
 
   border: 3px solid var(--glass-40);
   border-radius: var(--radius-full);
-  color: darkblue;
+  color: var(--color-primary-hover);
   text-align: center;
   font-weight: 1000;
   cursor: pointer;
@@ -687,7 +687,7 @@ $mobile-aspect-ratio: 1;
 
     border: 3px solid var(--glass-40);
     border-radius: 0 0 25px 25px;
-    color: darkblue;
+    color: var(--color-primary-hover);
     font-weight: 1000;
     transition: all 0.3s ease;
 
@@ -1017,4 +1017,3 @@ $mobile-aspect-ratio: 1;
   }
 }
 </style>
-

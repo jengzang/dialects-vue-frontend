@@ -202,25 +202,26 @@
 }
 
 :root[data-color-theme='light'] {
-  --color-primary: #2f80ed;
-  --color-primary-hover: #1f6fd2;
-  --color-primary-light: rgba(47, 128, 237, 0.10);
-  --color-primary-light2: rgba(47, 128, 237, 0.15);
-  --color-primary-light3: rgba(47, 128, 237, 0.12);
-  --color-primary-medium: rgba(47, 128, 237, 0.20);
-  --color-primary-medium2: rgba(47, 128, 237, 0.48);
-  --color-primary-border: rgba(47, 128, 237, 0.18);
-  --color-primary-border2: rgba(47, 128, 237, 0.24);
-  --color-primary-shadow: rgba(47, 128, 237, 0.16);
-  --color-primary-shadow-light: rgba(47, 128, 237, 0.24);
-  --color-gradient: linear-gradient(135deg, #7c8df5, #4fb3ff);
+  --color-primary: #8a6a2f;
+  --color-primary-hover: #6f5424;
+  --color-primary-light: rgba(138, 106, 47, 0.10);
+  --color-primary-light2: rgba(138, 106, 47, 0.15);
+  --color-primary-light3: rgba(138, 106, 47, 0.12);
+  --color-primary-medium: rgba(138, 106, 47, 0.20);
+  --color-primary-medium2: rgba(138, 106, 47, 0.48);
+  --color-primary-border: rgba(138, 106, 47, 0.20);
+  --color-primary-border2: rgba(138, 106, 47, 0.28);
+  --color-primary-shadow: rgba(138, 106, 47, 0.16);
+  --color-primary-shadow-light: rgba(138, 106, 47, 0.24);
+  --color-gradient: linear-gradient(135deg, #8a6a2f, #d0a85a);
 
   --bg-blue-tint: #f7f8f3;
   --bg-blue-light: #f2f0e7;
   --bg-blue-hover: rgba(236, 231, 214, 0.82);
+  --color-map-draw: #8a6a2f;
   --bg-blue-tint-rgb: 247, 248, 243;
   --bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #fff8df, #fff8df00 58%),
-    radial-gradient(1000px 720px at 112% 4%, #e8f3ff, #e8f3ff00 60%),
+    radial-gradient(1000px 720px at 112% 4%, #f1eadb, #f1eadb00 60%),
     linear-gradient(180deg, #fffdf7, #f4efe3);
 
   --text-deep: #243040;
@@ -277,10 +278,17 @@
   --bg-overlay-light2: rgba(25, 30, 38, 0.08);
   --bg-overlay-very-light: rgba(25, 30, 38, 0.22);
 
-  --color-primary-rgb: 47, 128, 237;
-  --color-primary-hover-rgb: 31, 111, 210;
+  --color-primary-cyan: #9a7a3a;
+  --color-accent-purple: #7d5f2b;
+  --color-accent-purple-light: rgba(125, 95, 43, 0.10);
+  --color-cyan: #b8944d;
+  --color-cyan-rgb: 184, 148, 77;
+  --color-primary-rgb: 138, 106, 47;
+  --color-primary-hover-rgb: 111, 84, 36;
   --text-deep-rgb: 36, 48, 64;
   --color-shadow-rgb: 31, 35, 40;
+  --color-primary-cyan-rgb: 154, 122, 58;
+  --color-accent-purple-rgb: 125, 95, 43;
   --text-secondary-rgb: 102, 112, 133;
   --text-slate: #526071;
   --text-slate-rgb: 82, 96, 113;
@@ -295,26 +303,27 @@
 }
 
 :root[data-color-theme='dark'] {
-  --color-primary: #62a8ff;
-  --color-primary-hover: #8fc2ff;
-  --color-primary-light: rgba(98, 168, 255, 0.12);
-  --color-primary-light2: rgba(98, 168, 255, 0.18);
-  --color-primary-light3: rgba(98, 168, 255, 0.14);
-  --color-primary-medium: rgba(98, 168, 255, 0.24);
-  --color-primary-medium2: rgba(98, 168, 255, 0.55);
-  --color-primary-border: rgba(98, 168, 255, 0.28);
-  --color-primary-border2: rgba(98, 168, 255, 0.34);
-  --color-primary-shadow: rgba(98, 168, 255, 0.24);
-  --color-primary-shadow-light: rgba(98, 168, 255, 0.36);
-  --color-gradient: linear-gradient(135deg, #8f7cff, #45c6ff);
+  --color-primary: #d8c08a;
+  --color-primary-hover: #f0d79d;
+  --color-primary-light: rgba(216, 192, 138, 0.12);
+  --color-primary-light2: rgba(216, 192, 138, 0.18);
+  --color-primary-light3: rgba(216, 192, 138, 0.14);
+  --color-primary-medium: rgba(216, 192, 138, 0.24);
+  --color-primary-medium2: rgba(216, 192, 138, 0.55);
+  --color-primary-border: rgba(216, 192, 138, 0.30);
+  --color-primary-border2: rgba(216, 192, 138, 0.38);
+  --color-primary-shadow: rgba(216, 192, 138, 0.24);
+  --color-primary-shadow-light: rgba(216, 192, 138, 0.36);
+  --color-gradient: linear-gradient(135deg, #d8c08a, #8f6f3a);
 
-  --bg-blue-tint: #111827;
-  --bg-blue-light: #172033;
-  --bg-blue-hover: rgba(54, 72, 102, 0.62);
-  --bg-blue-tint-rgb: 17, 24, 39;
-  --bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #17324f, #17324f00 58%),
-    radial-gradient(1000px 720px at 110% 4%, #261f45, #261f4500 62%),
-    linear-gradient(180deg, #05070c, #111827);
+  --bg-blue-tint: #0f0f10;
+  --bg-blue-light: #191817;
+  --bg-blue-hover: rgba(84, 78, 68, 0.46);
+  --color-map-draw: #d8c08a;
+  --bg-blue-tint-rgb: 15, 15, 16;
+  --bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #2a2419, #2a241900 58%),
+    radial-gradient(1000px 720px at 110% 4%, #181818, #18181800 62%),
+    linear-gradient(180deg, #050505, #11100f);
 
   --text-deep: #e8eef7;
   --text-primary: #f4f7fb;
@@ -333,10 +342,10 @@
   --color-text-primary: #f4f7fb;
   --color-text-secondary: #b8c2d0;
 
-  --bg-body: #05070c;
-  --bg-white: #151b27;
-  --bg-light-gray: #101722;
-  --bg-light: #1a2332;
+  --bg-body: #050505;
+  --bg-white: #161514;
+  --bg-light-gray: #10100f;
+  --bg-light: #1d1b19;
 
   --glass-05: rgba(255, 255, 255, 0.05);
   --glass-10: rgba(255, 255, 255, 0.08);
@@ -370,10 +379,17 @@
   --bg-overlay-light2: rgba(255, 255, 255, 0.08);
   --bg-overlay-very-light: rgba(0, 0, 0, 0.42);
 
-  --color-primary-rgb: 98, 168, 255;
-  --color-primary-hover-rgb: 143, 194, 255;
+  --color-primary-cyan: #d8c08a;
+  --color-accent-purple: #b99555;
+  --color-accent-purple-light: rgba(185, 149, 85, 0.16);
+  --color-cyan: #e2c992;
+  --color-cyan-rgb: 226, 201, 146;
+  --color-primary-rgb: 216, 192, 138;
+  --color-primary-hover-rgb: 240, 215, 157;
   --text-deep-rgb: 232, 238, 247;
   --color-shadow-rgb: 0, 0, 0;
+  --color-primary-cyan-rgb: 216, 192, 138;
+  --color-accent-purple-rgb: 185, 149, 85;
   --text-secondary-rgb: 184, 194, 208;
   --text-slate: #c6d0df;
   --text-slate-rgb: 198, 208, 223;
