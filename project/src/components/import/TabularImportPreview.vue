@@ -62,7 +62,7 @@
         </div>
         <div class="tabular-import-preview__toolbar-meta">
           <span>{{ t('common.importPreview.controls.fileName') }}: {{ file.name }}</span>
-          <span>{{ t('common.importPreview.controls.columns') }}: {{ previewTable.sourceColumns.length }}</span>
+          <span>{{ t('common.importPreview.controls.columns') }}: {{ previewTable?.sourceColumns?.length ?? 0 }}</span>
           <span>{{ t('common.importPreview.controls.rows') }}: {{ previewTable.activeSheet?.rowCount || 0 }}</span>
         </div>
       </div>
@@ -145,7 +145,7 @@
                   <td v-for="(cell, cellIndex) in row" :key="`${rowIndex}-${cellIndex}`">{{ cell || '—' }}</td>
                 </tr>
                 <tr v-if="!previewTable.previewRows.length">
-                  <td :colspan="Math.max(previewTable.sourceColumns.length, 1)" class="tabular-import-preview__table-empty">
+                  <td :colspan="Math.max(previewTable?.sourceColumns?.length ?? 0, 1)" class="tabular-import-preview__table-empty">
                     {{ t('common.importPreview.preview.empty') }}
                   </td>
                 </tr>
