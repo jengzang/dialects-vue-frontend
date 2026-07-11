@@ -222,6 +222,18 @@
         <!-- <h2 class="tabs-title">{{ $t('navigation.tabs.settings') }}</h2> -->
 
           <div class="setting-section">
+            <h3 class="section-title">{{ $t('navigation.settings.colorTheme.title') }}</h3>
+            <p class="section-description">{{ $t('navigation.settings.colorTheme.description') }}</p>
+
+            <RadioGroup
+              v-model="colorThemeModel"
+              :options="colorThemeRadioOptions"
+              name="about-color-theme"
+              class="settings-radio-group color-theme-radio-group"
+            />
+          </div>
+
+          <div class="setting-section">
             <h3 class="section-title">{{ $t('navigation.settings.language.title') }}</h3>
 <!--          <p class="section-description">{{ $t('navigation.settings.language.description') }}</p>-->
 
@@ -336,9 +348,14 @@ import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
 import {
+  COLOR_THEME_BLUE,
+  COLOR_THEME_DARK,
+  COLOR_THEME_LIGHT,
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
+  getStoredColorTheme,
   getStoredInterfaceMode,
+  setColorTheme,
   setInterfaceMode,
 } from '@/composables/core/uiPreferences.js'
 import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
@@ -459,6 +476,34 @@ const languages = ref([
 ])
 
 const interfaceMode = ref(getStoredInterfaceMode())
+const colorTheme = ref(getStoredColorTheme())
+
+const colorThemeOptions = computed(() => [
+  {
+    value: COLOR_THEME_BLUE,
+    label: t('navigation.settings.colorTheme.options.blue')
+  },
+  {
+    value: COLOR_THEME_LIGHT,
+    label: t('navigation.settings.colorTheme.options.light')
+  },
+  {
+    value: COLOR_THEME_DARK,
+    label: t('navigation.settings.colorTheme.options.dark')
+  }
+])
+
+const colorThemeRadioOptions = computed(() =>
+  colorThemeOptions.value.map(option => ({
+    value: option.value,
+    label: option.label
+  }))
+)
+
+const colorThemeModel = computed({
+  get: () => colorTheme.value,
+  set: (theme) => changeColorTheme(theme)
+})
 
 const interfaceModeOptions = computed(() => [
   {
@@ -542,6 +587,15 @@ function changeInterfaceMode(mode) {
 
   interfaceMode.value = setInterfaceMode(mode)
   showSuccess(t('messages.success.interfaceModeChanged'))
+}
+
+function changeColorTheme(theme) {
+  if (theme === colorTheme.value) {
+    return
+  }
+
+  colorTheme.value = setColorTheme(theme)
+  showSuccess(t('messages.success.colorThemeChanged'))
 }
 
 function resolveTabRoute(tabName) {

@@ -96,6 +96,16 @@
       "title": "語言設置",
       "description": "選擇您偏好的界面語言"
     },
+    "colorTheme": {
+      "title": "主題配色",
+      "description": "選擇頁面背景、玻璃面板與文字的整體配色。",
+      "label": "目前配色",
+      "options": {
+        "blue": "藍色",
+        "light": "淺色",
+        "dark": "深色"
+      }
+    },
     "interfaceMode": {
       "title": "頁面風格",
       "description": "選擇標準或簡潔界面風格；簡潔模式會關閉動畫、陰影、模糊等視覺效果，以提升低性能設備上的流暢度。",

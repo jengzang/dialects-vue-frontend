@@ -6,7 +6,8 @@
     "created": "Created successfully",
     "copied": "Copied successfully",
     "languageChanged": "Language changed successfully",
-    "interfaceModeChanged": "Interface mode updated"
+    "interfaceModeChanged": "Interface mode updated",
+    "colorThemeChanged": "Color theme updated"
   },
   "error": {
     "saveFailed": "Save failed",
