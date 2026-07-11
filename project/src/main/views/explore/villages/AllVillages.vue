@@ -542,6 +542,8 @@ const filterByPlaceTypeCode = (nodes, codes) => {
     } else if (node.children && node.children.length > 0) {
       const filtered = filterByPlaceTypeCode(node.children, codes)
       if (filtered.length > 0) acc.push({ ...node, children: filtered })
+    } else if (node._lazy) {
+      acc.push(node)
     }
     return acc
   }, [])

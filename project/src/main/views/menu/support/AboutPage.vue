@@ -690,6 +690,7 @@ em {
 
 /* 简介与鸣谢 */
 .thanks-container {
+  // font-family: Georgia, serif;
   max-width: 900px;
   margin: 0 auto;
   padding: 2rem 1rem;

@@ -1,6 +1,6 @@
 @use '@/styles/global/mixins' as *;
 .popup-vue .popup-content {
-  font-family: 'Arial', sans-serif;
+  font-family: 'Arial', sans-serif, Georgia, serif;
   color: var(--text-dark);
   text-align: center;
 }
