@@ -569,7 +569,6 @@ $section-gap: 12px;
   }
 }
 
-.mapping-badge,
 .mapping-required,
 .diagnostic {
   display: inline-flex;
@@ -580,6 +579,8 @@ $section-gap: 12px;
 }
 
 .mapping-badge {
+  display: flex;
+  align-items: center;
   padding: 6px 12px;
   border: 1px solid transparent;
 

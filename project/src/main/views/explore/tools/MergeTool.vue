@@ -771,9 +771,6 @@ const reset = () => {
   if (filesInput.value) filesInput.value.value = ''
 }
 </script>
-
-
-
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 
@@ -781,7 +778,6 @@ $color-text: var(--text-deep);
 $color-primary: var(--color-primary);
 $color-success: var(--color-success);
 $color-danger: var(--color-error-light);
-
 .merge-tool-container {
   height: 80%;
   display: flex;
