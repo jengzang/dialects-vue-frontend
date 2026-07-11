@@ -80,4 +80,24 @@ describe('tabular import preview modal shell', () => {
     expect(zhHantTools.merge.reference.downloadDefault).toBeTruthy()
     expect(enTools.merge.reference.downloadDefault).toBeTruthy()
   })
+
+  it('passes unwrapped preview state refs into TabularImportPreview callers', () => {
+    const callerStates = [
+      { source: readSource(mergeToolPath), state: 'referencePreviewState' },
+      { source: readSource(checkToolPath), state: 'checkPreviewState' },
+      { source: readSource(jyut2IpaToolPath), state: 'jyutPreviewState' }
+    ]
+
+    for (const { source, state } of callerStates) {
+      expect(source).toContain(`:loading="${state}.loading.value"`)
+      expect(source).toContain(`:preview-table="${state}.previewTable.value"`)
+      expect(source).toContain(`:diagnostics="${state}.diagnostics.value"`)
+      expect(source).toContain(`:mapping="${state}.mapping.value"`)
+      expect(source).toContain(`:selected-sheet-id="${state}.selectedSheetId.value"`)
+      expect(source).toContain(`:header-row-index="${state}.headerRowIndex.value"`)
+      expect(source).toContain(`:sheets="${state}.parsedFile.value?.sheets || []"`)
+      expect(source).toContain(`@update:selectedSheetId="${state}.selectedSheetId.value = $event"`)
+      expect(source).toContain(`@update:headerRowIndex="${state}.headerRowIndex.value = $event"`)
+    }
+  })
 })
