@@ -138,6 +138,7 @@
       "columnCount": "Columns",
       "viewDefault": "View Default Reference",
       "loadingDefault": "Loading reference sheet...",
+      "downloadDefault": "Download Default Reference",
       "next": "Next"
     },
     "files": {

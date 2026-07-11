@@ -12,6 +12,9 @@ const mergeToolPath = resolve(projectRoot, 'src/main/views/explore/tools/MergeTo
 const jyut2IpaToolPath = resolve(projectRoot, 'src/main/views/explore/tools/Jyut2IpaTool.vue')
 const voronoiCustomImportPath = resolve(projectRoot, 'src/main/components/map/Draw/modals/VoronoiCustomImportModal.vue')
 const enCommonLocalePath = resolve(projectRoot, 'src/i18n/locales/en/common.json')
+const zhCnToolsLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-CN/tools.json')
+const zhHantToolsLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-Hant/tools.json')
+const enToolsLocalePath = resolve(projectRoot, 'src/i18n/locales/en/tools.json')
 
 function readSource(path) {
   return readFileSync(path, 'utf8')
@@ -57,5 +60,24 @@ describe('tabular import preview modal shell', () => {
 
     expect(enCommon.importPreview.checkToolTitle).toBeTruthy()
     expect(enCommon.importPreview.checkToolDescription).toBeTruthy()
+  })
+
+  it('forces the MergeTool default reference sheet through preview instead of auto-apply', () => {
+    const source = readSource(mergeToolPath)
+
+    expect(source).toContain('const forceReferencePreview = ref(false)')
+    expect(source).toContain('forceReferencePreview.value || requireExplicitConfirmation.value')
+    expect(source).toContain('forceReferencePreview.value = true')
+    expect(source).toContain("showError(t('tools.merge.messages.readDefaultFailed'")
+  })
+
+  it('adds the default reference export label to all tool locales', () => {
+    const zhCnTools = readJson(zhCnToolsLocalePath)
+    const zhHantTools = readJson(zhHantToolsLocalePath)
+    const enTools = readJson(enToolsLocalePath)
+
+    expect(zhCnTools.merge.reference.downloadDefault).toBeTruthy()
+    expect(zhHantTools.merge.reference.downloadDefault).toBeTruthy()
+    expect(enTools.merge.reference.downloadDefault).toBeTruthy()
   })
 })

@@ -138,6 +138,7 @@
       "columnCount": "列数",
       "viewDefault": "查看默认参考表",
       "loadingDefault": "正在载入参考表...",
+      "downloadDefault": "下载默认参考表",
       "next": "下一步"
     },
     "files": {

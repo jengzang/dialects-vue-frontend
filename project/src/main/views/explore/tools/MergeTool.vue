@@ -324,6 +324,7 @@ const taskId = ref(null)
 const refInput = ref(null)
 const filesInput = ref(null)
 const requireExplicitConfirmation = ref(false)
+const forceReferencePreview = ref(false)
 
 const referenceStats = reactive({
   charCount: 0,
@@ -404,7 +405,7 @@ const referenceImportSchema = computed(() => ([
 const referencePreviewState = useTabularImportPreview({
   schema: referenceImportSchema,
   previewRowCount: 8,
-  requireExplicitConfirmation: () => requireExplicitConfirmation.value
+  requireExplicitConfirmation: () => forceReferencePreview.value || requireExplicitConfirmation.value
 })
 const referenceImportFlow = useTabularImportFlow({
   previewState: referencePreviewState,
@@ -741,8 +742,15 @@ const downloadMerged = async () => {
 const previewDefaultReference = async () => {
   if (isLoadingRef.value) return
 
-  const file = await defaultReferenceSource.resolveFile()
-  await referenceImportFlow.loadPreview(file)
+  forceReferencePreview.value = true
+  try {
+    const file = await defaultReferenceSource.resolveFile()
+    await referenceImportFlow.loadPreview(file)
+  } catch (error) {
+    showError(t('tools.merge.messages.readDefaultFailed', { message: error.message }))
+  } finally {
+    forceReferencePreview.value = false
+  }
 }
 
 const reset = () => {
