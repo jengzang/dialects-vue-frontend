@@ -203,6 +203,8 @@ const leave = (el) => {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $text-dark: var(--text-dark);
@@ -421,4 +423,4 @@ $mobile-aspect-ratio: 1 / 1;
     transform: rotate(360deg);
   }
 }
-
+</style>

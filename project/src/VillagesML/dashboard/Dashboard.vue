@@ -312,7 +312,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .dashboard-page {
   padding: 20px;
   max-width: 1400px;

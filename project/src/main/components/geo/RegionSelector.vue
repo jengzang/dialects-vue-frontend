@@ -884,6 +884,8 @@ onBeforeUnmount(() => {
 defineExpose({ togglePopup, openPopup, closePopup })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
@@ -1238,7 +1240,7 @@ $portrait-ratio: 1 / 1;/* 选择框 */
 .loading {
   flex-direction: column;
   padding: 40px 20px;
-  color: var(--text-tertiary)
+  color: var(--text-tertiary);
 
   @include flex-center;
 }
@@ -1299,7 +1301,7 @@ $portrait-ratio: 1 / 1;/* 选择框 */
 }
 
 .region-info {
-  color: var(--text-tertiary)
+  color: var(--text-tertiary);
   font-size: 13px;
 }
 
@@ -1329,4 +1331,4 @@ $portrait-ratio: 1 / 1;/* 选择框 */
     font-size: 18px;
   }
 }
-
+</style>

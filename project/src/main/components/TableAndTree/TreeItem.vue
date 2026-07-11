@@ -111,6 +111,8 @@ const leave = (el) => {
 };
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $text-dark: var(--text-dark);
@@ -183,3 +185,4 @@ $transition-expand: 0.3s;
   background: rgba(255, 255, 0, 0.4);
   border-radius: var(--radius-xs);
 }
+</style>

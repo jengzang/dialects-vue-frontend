@@ -129,7 +129,10 @@ function changeInterfaceMode(mode) {
 }
 </script>
 
-```vue
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $text-primary: var(--text-dark);
@@ -288,6 +291,4 @@ $transition-duration: 0.3s;
     font-size: 11px;
   }
 }
-
-```
-
+</style>

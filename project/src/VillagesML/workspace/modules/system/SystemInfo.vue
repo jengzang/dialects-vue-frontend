@@ -450,6 +450,8 @@ onMounted(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 .system-info-page {
   padding: 12px;
@@ -862,4 +864,4 @@ onMounted(() => {
     flex-direction: column;
   }
 }
-
+</style>

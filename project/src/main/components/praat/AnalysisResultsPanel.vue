@@ -723,6 +723,8 @@ onBeforeUnmount(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $quality-good: var(--color-success);
@@ -948,4 +950,4 @@ $transition-normal: 0.3s;
     transform: translateY(-2px);
   }
 }
-
+</style>

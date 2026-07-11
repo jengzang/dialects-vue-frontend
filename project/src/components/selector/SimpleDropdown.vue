@@ -295,6 +295,8 @@ watch(searchQuery, () => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary-hover);
 $active-background: var(--bg-blue-light);
@@ -382,4 +384,4 @@ $transition-fast: 0.2s;
   font-size: 13px;
   text-align: center;
 }
-
+</style>

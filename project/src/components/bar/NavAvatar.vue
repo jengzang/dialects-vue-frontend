@@ -195,6 +195,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $transition-avatar: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .nav-avatar {

@@ -823,7 +823,10 @@ const loadConfig = () => {
 loadConfig()
 </script>
 
-```scss
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $color-text: var(--text-deep);
 $color-primary: var(--color-primary);
@@ -1740,6 +1743,4 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     }
   }
 }
-
-```
-
+</style>

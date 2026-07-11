@@ -329,6 +329,8 @@ const runAction = async () => {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $apple-font:
   -apple-system,
@@ -528,3 +530,4 @@ $text-secondary: rgba(60, 60, 67, 0.72);
     box-shadow: none;
   }
 }
+</style>

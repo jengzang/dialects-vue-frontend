@@ -70,7 +70,7 @@ const displayClass = computed(() => ({
 }))
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .region-display {
   display: inline-flex;
   align-items: center;

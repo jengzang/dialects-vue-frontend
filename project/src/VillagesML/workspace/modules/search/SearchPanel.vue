@@ -143,7 +143,7 @@ const clearFilters = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .vml-glass-panel {
   padding: 20px;
   margin-bottom: 20px;

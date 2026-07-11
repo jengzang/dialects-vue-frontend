@@ -428,6 +428,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $text-primary: var(--color-text-primary);
 $text-secondary: var(--color-text-secondary);
 $error-color: var(--color-error);

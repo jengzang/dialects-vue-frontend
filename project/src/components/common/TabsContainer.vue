@@ -97,6 +97,8 @@ const handleTabClick = (tabName) => {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $text-default: var(--text-dark);
@@ -178,4 +180,4 @@ $transition-duration: 0.5s;
     transform: translateY(0);
   }
 }
-
+</style>

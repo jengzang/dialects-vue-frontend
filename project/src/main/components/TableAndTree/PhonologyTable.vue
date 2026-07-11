@@ -404,7 +404,8 @@ const getToneData = (data) => {
 };
 </script>
 
-
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $text-dark: var(--text-dark);
@@ -800,7 +801,7 @@ $transition-duration: 0.25s;
   }
 
   th {
-    color: var(--text-medium)
+    color: var(--text-medium);
     font-weight: 600;
     background: var(--bg-light-gray);
   }
@@ -818,5 +819,4 @@ $transition-duration: 0.25s;
   font-size: 13px;
   text-align: center;
 }
-
-
+</style>

@@ -59,7 +59,7 @@ const handleAnalyze = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .region-selector-panel {
   display: flex;
   flex-wrap: wrap;

@@ -53,7 +53,7 @@ watch(() => route.path, (newPath) => {
 }, { immediate: true });
 </script>
 
-```scss
+
 <style scoped lang="scss">
 $portrait-ratio: 1 / 1;
 
@@ -128,5 +128,5 @@ $system-font:
   }
 }
 </style>
-```
+
 

@@ -620,6 +620,8 @@ onMounted(async () => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
@@ -1292,4 +1294,4 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
     }
   }
 }
-
+</style>

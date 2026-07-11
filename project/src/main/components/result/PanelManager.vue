@@ -389,27 +389,9 @@ onUnmounted(() => {
 </script>
 
 
-.panel-manager-container {
-  pointer-events: none;
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000!important;
-  container-type: inline-size;
-  container-name: panel-manager;
-}
 
-.query-detail-panel {
-  container-type: inline-size;
-  container-name: query-panel;
-}
-
-/* 必要的 Loading 樣式 */
-.loading-container {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100%; min-height: 150px; color: var(--text-tertiary);
-}
-.loading-text { font-size: 14px; color: var(--text-muted) }
-
-
-
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $panel-radius: 12px;
@@ -428,20 +410,6 @@ $border-breath-duration: 1.5s;
   container-type: inline-size;
 }
 
-.query-detail-panel {
-  pointer-events: auto;
-  container-name: query-panel;
-  container-type: inline-size;
-
-  &.border-breath {
-    background-clip: padding-box;
-    border: 2px solid transparent;
-    border-radius: $panel-radius;
-    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.6);
-    animation: border-breath $border-breath-duration ease-in-out;
-  }
-}
-
 /* 必要的 Loading 樣式 */
 .loading-container {
   @include flex-col;
@@ -449,11 +417,11 @@ $border-breath-duration: 1.5s;
   justify-content: center;
   min-height: 150px;
   height: 100%;
-  color: var(--text-tertiary)
+  color: var(--text-tertiary);
 }
 
 .loading-text {
-  color: var(--text-muted)
+  color: var(--text-muted);
   font-size: 14px;
 }
 
@@ -476,4 +444,4 @@ $border-breath-duration: 1.5s;
     box-shadow: 0 0 12px 4px rgba(var(--color-primary-rgb), 0.3);
   }
 }
-
+</style>

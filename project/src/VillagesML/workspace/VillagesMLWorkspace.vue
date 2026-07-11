@@ -482,6 +482,8 @@ const handleAdjustParams = (action) => {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 /* VillagesML Module Container */
 .villagesml-module {
@@ -529,4 +531,4 @@ const handleAdjustParams = (action) => {
     grid-template-columns: 1fr;
   }
 }
-
+</style>

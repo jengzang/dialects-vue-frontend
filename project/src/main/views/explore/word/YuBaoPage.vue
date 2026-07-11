@@ -898,7 +898,10 @@ watch(viewMode, async (newMode) => {
 
 </script>
 
-```vue
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $white: var(--text-white);
@@ -1570,6 +1573,4 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
     height: 100%;
   }
 }
-
-```
-
+</style>

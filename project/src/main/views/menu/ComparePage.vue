@@ -1497,24 +1497,24 @@ const runAction = async () => {
           same: { color: 'var(--color-success)', label: t('compare.legend.same') },
           partial: { color: 'var(--color-warning)', label: t('compare.legend.partial') },
           diff: { color: 'var(--color-error)', label: t('compare.legend.diff') },
-          unknown: { color: '#9E9E9E', label: t('compare.legend.unknown') }
+          unknown: { color: 'var(--text-lightest)', label: t('compare.legend.unknown') }
         }
       } else if (compareType === 'zhonggu') {
         // 中古比較：相似度百分比
         mapStore.compareGroups = {
           same: { color: 'var(--color-success)', label: t('compare.legend.samePercent') },
-          high_similar: { color: '#8BC34A', label: t('compare.legend.highSimilar') },
+          high_similar: { color: 'var(--text-slate)', label: t('compare.legend.highSimilar') },
           partial: { color: 'var(--color-warning)', label: t('compare.legend.partialSimilar') },
           diff: { color: 'var(--color-error)', label: t('compare.legend.diffPercent') },
-          unknown: { color: '#9E9E9E', label: t('compare.legend.unknown') }
+          unknown: { color: 'var(--text-lightest)', label: t('compare.legend.unknown') }
         }
       } else if (compareType === 'tones') {
         // 調類比較：合併狀態
         mapStore.compareGroups = {
           same: { color: 'var(--color-success)', label: t('compare.legend.merged') },
-          maybe: { color: '#8BC34A', label: t('compare.legend.maybeMerged') },  // 使用黃綠色，與中古比較的高度相似顏色一致
+          maybe: { color: 'var(--text-slate)', label: t('compare.legend.maybeMerged') },  // 使用中性色 token，保持与其他状态一致的 token 约束
           diff: { color: 'var(--color-error)', label: t('compare.legend.notMerged') },
-          unknown: { color: '#9E9E9E', label: t('compare.legend.unknown') }
+          unknown: { color: 'var(--text-lightest)', label: t('compare.legend.unknown') }
         }
       }
 
@@ -1795,7 +1795,9 @@ export default {
 }
 </script>
 
-```scss
+
+
+<style scoped lang="scss">
 
 $primary: var(--color-primary);
 $group1-primary: #4caf50;
@@ -1804,12 +1806,16 @@ $group2-primary: #2196f3;
 $group2-text: #1565c0;
 $danger: #f44336;
 $text-primary: var(--text-dark);
-$text-muted: var(--text-lightest);/* 页面主体 */
+$text-muted: var(--text-lightest);
+
+/* 页面主体 */
 .tab-content-inner {
-  width: 100%;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  width: 100%;
   padding: 1rem 0;
   text-align: center;
   animation: fade 0.6s ease;
@@ -2384,5 +2390,4 @@ $text-muted: var(--text-lightest);/* 页面主体 */
     gap: 12px;
   }
 }
-
-```
+</style>

@@ -235,6 +235,8 @@ const leave = (el) => {
 };
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $text-dark: var(--text-dark);
@@ -418,4 +420,4 @@ $transition-expand: 0.3s;
     transform: rotate(360deg);
   }
 }
-
+</style>

@@ -242,6 +242,8 @@ function confirmImport() {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .voronoi-custom-import-modal {
   @include flex-col;
   gap: 1rem;

@@ -1065,6 +1065,8 @@ const initContinuousChart = (isZScore) => {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary, var(--vml-blue));
 $primary-blue: var(--color-primary);
@@ -1335,7 +1337,7 @@ $transition-normal: 0.3s;
   }
 
   .tag-count {
-    color: var(--text-tertiary)
+    color: var(--text-tertiary);
     font-size: 0.8rem;
     font-weight: 600;
   }
@@ -1629,4 +1631,4 @@ $transition-normal: 0.3s;
     font-size: 1.4rem;
   }
 }
-
+</style>

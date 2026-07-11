@@ -350,7 +350,9 @@ onBeforeUnmount(() => {
 });
 </script>
 
-```scss
+
+
+<style scoped lang="scss">
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
@@ -837,6 +839,5 @@ $portrait-ratio: 1 / 1;@mixin soft-glass-background($opacity-start: 0.3, $opacit
     max-width: calc(100vw - 20px);
   }
 }
-
-```
+</style>
 

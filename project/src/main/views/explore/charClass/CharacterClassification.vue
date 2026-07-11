@@ -594,6 +594,8 @@ watch(
 )
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $system-blue: var(--color-primary);
@@ -1000,3 +1002,4 @@ $panel-radius-portrait: 24px;.char-class-page {
 .retry-button {
   margin-top: 4px;
 }
+</style>

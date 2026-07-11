@@ -85,6 +85,8 @@ const goToAuth = () => {
 };
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $apple-blue: var(--color-primary-hover);
 
@@ -274,4 +276,4 @@ $transition-base: 0.3s ease;
     }
   }
 }
-
+</style>

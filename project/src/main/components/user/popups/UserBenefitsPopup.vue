@@ -352,6 +352,8 @@ onBeforeUnmount(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $orange: var(--color-warning);
 $orange-dark: var(--color-warning);
@@ -690,4 +692,4 @@ $transition-normal: 0.3s;
     }
   }
 }
-
+</style>

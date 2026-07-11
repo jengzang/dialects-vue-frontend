@@ -662,6 +662,8 @@ const openEntryModal = () => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 @use '../_map-variables' as *;
 
 .custom-tab-container {

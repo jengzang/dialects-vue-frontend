@@ -243,7 +243,7 @@ function handleClick() {
   <div>{{ doubleCount }}</div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 /* Component styles */
 </style>
 ```
@@ -374,7 +374,7 @@ watch(state, () => {})
   <!-- Template -->
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 /* Styles */
 </style>
 ```
@@ -415,7 +415,7 @@ emit('itemSelected', item)
 ### Scoped Styles
 
 ```vue
-<style scoped>
+<style scoped lang="scss">
 /* Use CSS variables from design system */
 .component {
   color: var(--text-primary);

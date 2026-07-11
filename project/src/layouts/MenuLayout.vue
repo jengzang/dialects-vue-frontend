@@ -45,7 +45,7 @@ const keepAliveViewNames = [
 // })
 </script>
 
-```scss
+
 <style scoped lang="scss">
 $fade-duration: 0.14s;
 $portrait-ratio: 1 / 1;
@@ -142,5 +142,3 @@ $system-font:
   }
 }
 </style>
-```
-

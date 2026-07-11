@@ -674,7 +674,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .spatial-integration-page {
   padding: 12px;
   max-width: 1400px;

@@ -78,6 +78,8 @@ onUnmounted(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $primary-light: var(--color-cyan);
@@ -262,4 +264,4 @@ $transition-duration: 0.3s;
 .canceled-title {
   @include status-title($warning);
 }
-
+</style>

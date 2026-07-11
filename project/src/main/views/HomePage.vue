@@ -708,8 +708,9 @@ onMounted(() => {
 })
 </script>
 
-```scss
 
+
+<style scoped lang="scss">
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
 $primary-deep: var(--color-primary-hover);
@@ -1866,6 +1867,5 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     animation: none;
   }
 }
-
-```
+</style>
 

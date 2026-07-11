@@ -155,6 +155,8 @@ onMounted(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
@@ -321,4 +323,4 @@ $transition-button: 0.25s;
     padding: 1.5rem;
   }
 }
-
+</style>

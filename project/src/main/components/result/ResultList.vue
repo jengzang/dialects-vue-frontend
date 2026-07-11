@@ -459,6 +459,8 @@ onUnmounted(() => {
 });
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $text-dark: var(--text-dark);
@@ -764,3 +766,4 @@ $system-font:
     }
   }
 }
+</style>

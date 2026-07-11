@@ -183,6 +183,8 @@ onMounted(async () => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
@@ -782,3 +784,4 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
     font-size: 15px;
   }
 }
+</style>

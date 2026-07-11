@@ -213,7 +213,7 @@
             <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
             <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
             <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
-            <p class="thoughts"><em v-html="$t('about.reflection.poem')"></em></p>
+            <p class="thoughts" style="text-align: center;"><em v-html="$t('about.reflection.poem')"></em></p>
           </div>
         </div>
 
@@ -553,7 +553,10 @@ function resolveTabRoute(tabName) {
 }
 </script>
 
-```scss
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $zhihu-blue: #0066ff;
@@ -1470,5 +1473,4 @@ em {
     font-size: 18px;
   }
 }
-
-```
+</style>

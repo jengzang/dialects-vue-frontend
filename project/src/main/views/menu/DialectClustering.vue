@@ -111,6 +111,8 @@ const {
 } = workspace
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 .dialect-clustering-page {
   @include flex-col;
@@ -560,4 +562,4 @@ const {
     }
   }
 }
-
+</style>

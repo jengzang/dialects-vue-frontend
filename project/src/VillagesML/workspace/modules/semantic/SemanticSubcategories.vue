@@ -608,6 +608,8 @@ export default {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 .query-button{
   margin: 0 auto 0;
@@ -884,4 +886,4 @@ tr.significant {
     height: 400px;
   }
 }
-
+</style>

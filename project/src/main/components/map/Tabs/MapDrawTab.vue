@@ -1643,6 +1643,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 @use '../../../../styles/global/scrollbars' as scrollbars;
 
 .map-draw-tab {

@@ -41,8 +41,10 @@ const keepAliveViewNames = [
 
 </script>
 
-```scss
+
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $fade-duration: 0.14s;
 $portrait-ratio: 1 / 1;
 
@@ -119,5 +121,5 @@ $system-font:
   }
 }
 </style>
-```
+
 

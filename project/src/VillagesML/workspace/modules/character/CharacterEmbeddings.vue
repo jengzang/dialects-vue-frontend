@@ -329,7 +329,7 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .character-embeddings-page {
   padding: 12px;
   max-width: 1400px;

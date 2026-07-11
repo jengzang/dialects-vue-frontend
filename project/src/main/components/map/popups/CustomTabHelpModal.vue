@@ -481,6 +481,8 @@ const helpStepsItems = computed(() => [
 ]);
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
@@ -557,7 +559,7 @@ $glass-card: var(--glass-50);
   padding: 8px 12px;
   background: rgba(0, 0, 0, 0.03);
   border-radius: var(--radius-sm);
-  color: var(--text-tertiary)
+  color: var(--text-tertiary);
   font-size: 12px;
 
   &--result {
@@ -626,7 +628,7 @@ $glass-card: var(--glass-50);
 
 .highlight-geo {
   background-color: var(--bg-light-gray);
-  color: var(--text-muted)
+  color: var(--text-muted);
   font-family: monospace;
   font-size: 11px;
 }
@@ -791,3 +793,4 @@ $glass-card: var(--glass-50);
     padding: 7px;
   }
 }
+</style>

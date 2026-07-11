@@ -293,7 +293,7 @@ const getSignificanceBadge = (pValue) => {
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .query-button{
   margin: 0 auto 0;
 }

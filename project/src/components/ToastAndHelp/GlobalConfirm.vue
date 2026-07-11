@@ -44,6 +44,8 @@ function handleCancel() {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $desktop-gap: 12px;
 $mobile-gap: 10px;
 

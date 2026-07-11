@@ -258,6 +258,8 @@ defineExpose({ combinations })
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $font-size-base: 14px;
 $transition-duration: 0.2s;
 $card-radius: 8px;

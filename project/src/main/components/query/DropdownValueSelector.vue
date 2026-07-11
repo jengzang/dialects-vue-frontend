@@ -271,6 +271,8 @@ onUnmounted(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $dropdown-item-padding: 8px 16px;
 $dropdown-font-size: 14px;
@@ -408,4 +410,4 @@ $dropdown-selected-color: var(--color-primary-hover);
   display: inline-block;
   width: 16px;
 }
-
+</style>

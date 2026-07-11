@@ -1430,7 +1430,10 @@ onUnmounted(() => {
 })
 </script>
 
-```scss
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $danger: var(--color-error-light);
@@ -1864,5 +1867,4 @@ $portrait-ratio: 1 / 1;@mixin text-primary {
     min-height: 520px;
   }
 }
-
-```
+</style>

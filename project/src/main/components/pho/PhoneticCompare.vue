@@ -731,6 +731,8 @@ onUnmounted(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $error: var(--color-error);
@@ -936,3 +938,4 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
   line-height: 1.8;
   letter-spacing: 1px;
 }
+</style>

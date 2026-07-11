@@ -377,6 +377,7 @@ onBeforeUnmount(() => {
             <span class="count-location-jump-nav-dot" aria-hidden="true"></span>
           </button>
         </template>
+
       </div>
 
       <button
@@ -394,6 +395,9 @@ onBeforeUnmount(() => {
   </Teleport>
 </template>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
@@ -401,7 +405,9 @@ $primary-deep: #004fc4;
 
 $desktop-width: 214px;
 $tablet-width: 176px;
-$mobile-width: 150px;.count-location-jump-nav {
+$mobile-width: 150px;
+
+.count-location-jump-nav {
   position: fixed;
   top: 50%;
   right: 10px;
@@ -882,3 +888,4 @@ $mobile-width: 150px;.count-location-jump-nav {
     }
   }
 }
+</style>

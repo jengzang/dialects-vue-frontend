@@ -474,7 +474,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .filterable-select {
   display: flex;
   gap: 8px;

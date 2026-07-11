@@ -27,6 +27,8 @@ defineProps({
 defineEmits(['update:modelValue'])
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $text-color: var(--text-dark);
@@ -76,4 +78,4 @@ $mobile-aspect-ratio: 1 / 1;
     padding: 12px 6px;
   }
 }
-
+</style>

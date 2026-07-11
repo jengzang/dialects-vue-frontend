@@ -1524,8 +1524,8 @@ onUnmounted(() => {
 });
 </script>
 
-
-
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $success-green: var(--color-success);
@@ -2748,4 +2748,4 @@ td {
     gap:1px
   }
 }
-
+</style>

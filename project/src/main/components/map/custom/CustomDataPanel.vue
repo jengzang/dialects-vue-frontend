@@ -357,6 +357,8 @@ const resetForm = () => {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 /* 右侧面板容器 */
 .custom-data-panel {
@@ -735,4 +737,4 @@ const resetForm = () => {
     margin-top: 4px;
   }
 }
-
+</style>

@@ -50,6 +50,8 @@ function handleClose() {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $accent-color: var(--color-primary-hover);
 $accent-background: var(--bg-blue-tint);
 $content-gap: 24px;

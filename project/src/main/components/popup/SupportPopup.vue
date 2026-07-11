@@ -130,6 +130,8 @@ function handleClose() {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $text-main: var(--text-primary);
 $text-secondary: rgba(0, 0, 0, 0.6);
@@ -281,4 +283,4 @@ $transition-duration: 0.3s;
     }
   }
 }
-
+</style>

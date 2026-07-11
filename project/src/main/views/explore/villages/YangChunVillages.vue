@@ -139,7 +139,10 @@ const displayData = computed(() => {
 
 </script>
 
-```vue
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $text-primary: var(--text-primary);
 $text-secondary: dimgrey;
@@ -260,6 +263,4 @@ $transition-base: 0.3s;
     transform: scale(1.05);
   }
 }
-
-```
-
+</style>

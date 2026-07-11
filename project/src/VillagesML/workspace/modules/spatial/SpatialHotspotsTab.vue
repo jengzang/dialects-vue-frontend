@@ -143,7 +143,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .spatial-hotspots-tab {
   display: flex;
   align-items: center;

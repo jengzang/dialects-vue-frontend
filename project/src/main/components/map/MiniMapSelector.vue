@@ -272,6 +272,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 @use './_map-variables' as *;
 @use '@/styles/main/_surfaces.scss';
 

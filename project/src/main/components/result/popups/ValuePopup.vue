@@ -126,6 +126,8 @@ onUnmounted(() => document.removeEventListener('click', handleGlobalClick));
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $popup-radius: 12px;
 
 $glass-background: var(--glass-30);

@@ -197,6 +197,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $text-primary: rgba(35, 29, 15, 0.9);
 $text-message: rgba(38, 30, 12, 0.92);
 $text-meta: rgba(76, 60, 23, 0.72);

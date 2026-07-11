@@ -509,6 +509,8 @@ onMounted(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $region-text: var(--text-deep);
 $region-muted: var(--text-tertiary);
@@ -1230,3 +1232,4 @@ $region-glass-border: var(--glass-60);
     font-size: 48px;
   }
 }
+</style>

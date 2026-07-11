@@ -138,6 +138,8 @@ const handleClose = () => {
 };
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $text-main: var(--text-primary);
 $text-body: var(--text-dark);
@@ -284,4 +286,4 @@ $transition-fast: 0.2s;
     }
   }
 }
-
+</style>

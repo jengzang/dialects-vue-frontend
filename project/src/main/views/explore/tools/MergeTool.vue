@@ -772,7 +772,10 @@ const reset = () => {
 }
 </script>
 
-```scss
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $color-text: var(--text-deep);
 $color-primary: var(--color-primary);
@@ -1739,6 +1742,4 @@ $color-danger: var(--color-error-light);
     }
   }
 }
-
-```
-
+</style>

@@ -1218,6 +1218,8 @@ const handleApiError = (error) => {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 /* ========================================
    Apple Liquid Glass Blue Style
@@ -2156,4 +2158,4 @@ const handleApiError = (error) => {
     grid-template-columns: 1fr;
   }
 }
-
+</style>

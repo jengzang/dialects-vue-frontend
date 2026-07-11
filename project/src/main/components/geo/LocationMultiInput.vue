@@ -429,8 +429,10 @@ watch(showPartitionInfoModal, (isVisible) => {
 })
 </script>
 
-```scss
+
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $warning-orange: var(--color-warning);
 $portrait-ratio: 1 / 1;.location-multi-input {
   width: 100%;
@@ -699,4 +701,4 @@ $portrait-ratio: 1 / 1;.location-multi-input {
   }
 }
 </style>
-```
+

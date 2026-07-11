@@ -218,6 +218,8 @@ onBeforeUnmount(() => {
 
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 @use '../../styles/global/scrollbars' as scrollbars;
 
@@ -404,4 +406,4 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
     transform: translateY(12px) scale(0.98);
   }
 }
-
+</style>

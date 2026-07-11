@@ -464,7 +464,10 @@ watch(
 );
 </script>
 
-```vue
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
@@ -880,6 +883,4 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     }
   }
 }
-
-```
-
+</style>

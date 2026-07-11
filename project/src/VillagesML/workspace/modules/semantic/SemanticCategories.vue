@@ -458,7 +458,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .semantic-categories-page {
   padding: 12px;
   max-width: 1400px;

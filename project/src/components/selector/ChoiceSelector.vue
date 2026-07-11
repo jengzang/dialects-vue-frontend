@@ -54,6 +54,8 @@ function handleSelect(value) {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $group-radius: 12px;
 $transition-fast: 0.2s ease;
 

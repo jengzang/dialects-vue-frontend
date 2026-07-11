@@ -158,7 +158,7 @@ watch(
 )
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pattern-tendency-page {
   padding: 12px;
   max-width: 1400px;

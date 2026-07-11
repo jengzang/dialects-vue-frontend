@@ -2079,6 +2079,8 @@ onUnmounted(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $text-main: var(--text-deep);
@@ -2265,7 +2267,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   align-items: center;
   justify-content: center;
   gap: 12px;
-  width: 100%;
+  // width: 100%;
   padding: 26px 28px;
   border: 2px dashed rgba(var(--color-primary-rgb), 0.28);
   cursor: pointer;
@@ -4098,3 +4100,4 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     transform: translateY(-2px) !important;
   }
 }
+</style>

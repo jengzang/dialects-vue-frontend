@@ -937,7 +937,7 @@ defineExpose({
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .editable-map-shell {
   width: 100%;
   min-height: 70dvh;

@@ -101,6 +101,8 @@ const handleSubmit = () => {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
@@ -211,4 +213,4 @@ $mobile-aspect-ratio: 1 / 1;
     transform: translateY(0) scale(0.96);
   }
 }
-
+</style>

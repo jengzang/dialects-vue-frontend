@@ -64,6 +64,8 @@ defineEmits(['close'])
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $card-transition: 0.24s ease;.hover-detail-card {
   position: fixed;
   right: 12px;

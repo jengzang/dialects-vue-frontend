@@ -318,6 +318,8 @@ watch(localSettings, (newSettings) => {
 }, { deep: true })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $primary-hover: #0066cc;
@@ -490,3 +492,4 @@ $transition-normal: 0.3s;
   font-size: 0.75rem;
   font-style: italic;
 }
+</style>

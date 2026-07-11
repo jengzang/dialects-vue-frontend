@@ -98,6 +98,8 @@ const handleClose = () => {
 };
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $text-main: var(--text-primary);
 $text-secondary: var(--text-tertiary);
@@ -197,4 +199,4 @@ $transition-duration: 0.2s;
     font-size: 13px;
   }
 }
-
+</style>

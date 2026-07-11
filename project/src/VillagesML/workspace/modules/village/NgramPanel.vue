@@ -105,7 +105,7 @@ const parseTrigrams = (trigrams) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .ngram-content {
   animation: fadeIn 0.3s ease;
 }

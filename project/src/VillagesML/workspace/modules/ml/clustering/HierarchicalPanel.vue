@@ -131,7 +131,7 @@ async function runClustering() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .hierarchical-panel {
   padding: 12px;
 }

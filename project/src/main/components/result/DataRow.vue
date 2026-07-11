@@ -311,6 +311,8 @@ const handleFeatureStatsClick = async () => {
 };
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $clickable-blue: var(--color-primary);
@@ -594,4 +596,4 @@ $glass-blur: 8px;
 @container query-panel (max-width: 500px) {
   @include compact-feature-layout;
 }
-
+</style>

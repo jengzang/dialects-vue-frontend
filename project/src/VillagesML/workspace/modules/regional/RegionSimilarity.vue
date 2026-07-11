@@ -628,6 +628,8 @@ export default {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 .region-similarity-page {
   padding: 20px;
@@ -975,4 +977,4 @@ export default {
     width: 100%;
   }
 }
-
+</style>

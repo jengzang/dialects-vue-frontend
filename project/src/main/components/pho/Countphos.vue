@@ -1111,10 +1111,14 @@ onBeforeUnmount(() => {
             </span>
           </div>
         </template>
+
       </div>
     </AppModal>
   </div>
 </template>
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 
 $primary: var(--color-primary);
@@ -1721,3 +1725,4 @@ $mobile-breakpoint: 768px;
   line-height: 1.9;
   letter-spacing: 0.015em;
 }
+</style>

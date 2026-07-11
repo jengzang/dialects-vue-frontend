@@ -152,7 +152,7 @@ watch(selectedRunId, (newRunId) => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .spatial-clusters-tab {
   display: flex;
   align-items: center;

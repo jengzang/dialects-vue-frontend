@@ -45,6 +45,8 @@ const handleYuBaoGrammar = () => {
 };
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 .words-page {
   min-width: 80dvw;
@@ -105,7 +107,7 @@ const handleYuBaoGrammar = () => {
 
 .word-desc {
   font-size: 14px;
-  color: var(--text-tertiary)
+  color: var(--text-tertiary);
   line-height: 1.5;
 }
 
@@ -118,4 +120,4 @@ const handleYuBaoGrammar = () => {
     font-size: 24px;
   }
 }
-
+</style>

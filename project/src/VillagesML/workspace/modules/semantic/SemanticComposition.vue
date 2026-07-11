@@ -120,7 +120,7 @@ const translatePattern = (patternStr) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .semantic-composition-page {
   padding: 12px;
   max-width: 1400px;

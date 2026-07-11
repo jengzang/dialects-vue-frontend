@@ -751,6 +751,8 @@ onMounted(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $user-text: var(--text-deep);
 $user-muted: var(--text-tertiary);
@@ -1674,3 +1676,4 @@ $user-success: var(--color-success);
     min-width: 720px;
   }
 }
+</style>

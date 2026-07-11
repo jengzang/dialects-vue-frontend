@@ -12,6 +12,8 @@
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .derive-tool-page {
   min-height: 100vh;
   padding: clamp(24px, 4vw, 40px);

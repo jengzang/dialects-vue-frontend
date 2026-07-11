@@ -925,6 +925,8 @@ onBeforeUnmount(() => {
 // }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 .praat-page {
   max-width: 1200px;
@@ -1500,4 +1502,4 @@ onBeforeUnmount(() => {
   font-size: 1rem;
   color: var(--color-text-secondary);
 }
-
+</style>

@@ -238,7 +238,7 @@ async function runClustering() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .char-tendency-panel {
   padding: 12px;
 }

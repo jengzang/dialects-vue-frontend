@@ -339,7 +339,7 @@ const getRegionLevelName = (level) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .semantic-indices-page {
   padding: 12px;
   max-width: 1400px;

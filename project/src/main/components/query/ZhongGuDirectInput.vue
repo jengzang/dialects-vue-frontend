@@ -146,6 +146,8 @@ watch(chars, (newVal) => {
 defineExpose({ pathStrings, chars, positionInput, charInput })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-color: var(--color-blue-custom, var(--color-primary));
 $text-medium-color: var(--text-medium, var(--text-medium));
@@ -257,3 +259,4 @@ textarea {
 .warning-item {
   @include status-item($warning-color);
 }
+</style>

@@ -582,7 +582,7 @@ watch(
 )
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .ngram-stats-page {
   padding: 12px;
   max-width: 1400px;

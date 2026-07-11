@@ -160,7 +160,10 @@ const handleSavePassword = () => {
 }
 </script>
 
-```vue
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
@@ -317,5 +320,4 @@ h3 {
 .success {
   color: $success-color;
 }
-
-```
+</style>

@@ -99,6 +99,8 @@ function handleClose() {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $text-main: var(--text-dark);
 $text-secondary: var(--text-tertiary);
@@ -252,4 +254,4 @@ $transition-normal: 0.3s;
     font-weight: 700;
   }
 }
-
+</style>

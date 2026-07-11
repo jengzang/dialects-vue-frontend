@@ -66,6 +66,8 @@ const handleAllVillages = () => {
 };
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 .villages-page {
   min-width: 80dvw;
@@ -164,4 +166,4 @@ const handleAllVillages = () => {
     font-size: 12px;
   }
 }
-
+</style>

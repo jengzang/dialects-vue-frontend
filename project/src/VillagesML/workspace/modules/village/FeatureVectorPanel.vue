@@ -87,7 +87,7 @@ const formatValue = (value) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .feature-content {
   animation: fadeIn 0.3s ease;
 }

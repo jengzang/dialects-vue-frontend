@@ -180,7 +180,7 @@ async function runClustering() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .sampled-villages-panel {
   padding: 12px;
 }

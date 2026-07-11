@@ -91,6 +91,8 @@ function handleVisibilityChange(value) {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $text-main: var(--text-primary);
 $text-body: var(--text-deep);
 $text-secondary: var(--text-slate);

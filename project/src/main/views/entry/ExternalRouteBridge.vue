@@ -17,7 +17,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .route-bridge {
   width: 0;
   height: 0;

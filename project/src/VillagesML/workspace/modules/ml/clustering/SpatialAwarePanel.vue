@@ -133,7 +133,7 @@ async function runClustering() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .spatial-aware-panel {
   padding: 12px;
 }

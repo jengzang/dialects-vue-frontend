@@ -118,7 +118,7 @@ const goToTendency = (pattern) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pattern-structural-page {
   padding: 12px;
   max-width: 1400px;

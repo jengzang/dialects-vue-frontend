@@ -927,6 +927,8 @@ onBeforeUnmount(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $error: var(--color-error);
@@ -1449,4 +1451,4 @@ $transition-normal: 0.3s;
     gap: 0.5rem;
   }
 }
-
+</style>

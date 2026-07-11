@@ -724,7 +724,10 @@ const PartitionTreeNode = defineComponent({
 })
 </script>
 
-```scss
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
@@ -888,7 +891,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--text-dark)
+    color: var(--text-dark);
     font-size: 15px;
     font-weight: 500;
 
@@ -1002,7 +1005,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     overflow: hidden;
     background: var(--glass-50);
     border-radius: var(--radius-md);
-    color: var(--text-dark)
+    color: var(--text-dark);
     white-space: nowrap;
     text-overflow: ellipsis;
     font-size: 14px;
@@ -1128,6 +1131,4 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     }
   }
 }
-
-```
-
+</style>

@@ -99,6 +99,8 @@ const handleChange = (event, value) => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $transition-control: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 $transition-dot: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 $transition-text: 0.3s ease;

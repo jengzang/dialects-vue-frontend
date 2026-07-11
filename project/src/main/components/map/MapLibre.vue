@@ -943,170 +943,49 @@ const resetView = () => {
 };
 </script>
 
-<style>
-#toast {
-  visibility: hidden;
-  min-width: 220px;
-  max-width: 80%;
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  background-color: var(--glass-30);
-  border: 1px solid var(--glass-40);
-  color: var(--color-gold);
-  text-shadow: 0 0 1px var(--bg-overlay);
-  text-align: center;
-  border-radius: var(--radius-md);
-  padding: 20px 28px;
-  position: fixed;
-  z-index: 99999;
-  left: 50%;
-  top: 70%;
-  transform: translate(-50%, -50%);
-  font-size: 20px;
-  line-height: 1.5;
-  opacity: 0;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  box-shadow: var(--shadow-map);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-}
+<style scoped lang="scss">
+$map-border-radius: var(--radius-2xl);
+$map-transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+$control-panel-width: 160px;
+$popup-max-width: 800px;
+$glass-transition: all 0.3s ease;
 
-#toast.show {
-  visibility: visible;
-  opacity: 1;
-}
-
-</style>
-
-<style scoped>
 .map-page-container {
-  width: 90vw;
-  height: 70vh;
   position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 30px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px var(--bg-hover-strong);
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  // left: 50%;
   z-index: 100;
-}
 
-.map-page-container.is-fullscreen {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100dvh;
-  border-radius: 0;
-  z-index: 9999!important;
-  transform: none;
-}
-
-.map-container { width: 100%; height: 100%; }
-
-
-/* ========================================= */
-/* 復刻原代碼中的 Marker CSS (使用 :deep) */
-/* ========================================= */
-
-/* 1. 基礎地名 (create_map1) */
-:deep(.marker-text-base) {
-  background-color: var(--color-dark-teal);
-  color: var(--color-cyan);
-  padding: 2px 4px;
-  border-radius: var(--radius-xs);
-  box-shadow: var(--shadow-focus-ring);
-  white-space: nowrap;
-  font-family: "SimHei", "黑体", sans-serif;
-  cursor: pointer;
-  text-align: center;
-  width: auto;
-}
-
-/* 2. 分區色點 (create_dot_all) */
-:deep(.marker-dot) {
-  width: 10px; height: 10px;
-  border-radius: var(--radius-full);
-  border: 2px solid var(--text-primary); /* 復刻 strokeColor: var(--text-primary) */
-  opacity: 0.8;
-  cursor: pointer;
-  box-shadow: 0 0 2px var(--bg-overlay-dark);
-}
-
-/* 3. 特徵值 (triggerDrawingFunction) */
-:deep(.marker-text-feature) {
-  padding: 2px 4px;
-  border-radius: var(--radius-xs);
-  box-shadow: var(--shadow-focus-ring);
-  font-size: 15px;
-  color: black;
-  white-space: nowrap;
-  font-family: "Times New Roman", serif;
-  border: 0.7px solid black;
-  cursor: pointer;
-  /* 背景色在JS中動態設置 */
-}
-
-</style>
-
-
-.map-page-container {
   width: 70dvw;
-  height: 70vh;
-  position: relative;
-  border-radius: 30px;
+  height: 70dvh;
+
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* ✨ 添加平滑過渡 */
-  z-index: 100; /* 確保不被其他元素遮擋 */
-}
+  // transform: translateX(-50%);
 
-/* ✨ 全屏樣式 */
-.map-page-container.is-fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100dvh;
-  border-radius: 0;
-  z-index: 99999;
-}
+  border-radius: $map-border-radius;
+  box-shadow: 0 4px 20px var(--bg-hover-strong);
 
-/* ✨ 蘋果液態玻璃風格 - 退出按鈕 */
-.exit-fullscreen-btn {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  padding: 12px 24px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-dark)
-  background: var(--glass-70); /* 半透明白 */
-  backdrop-filter: blur(20px) saturate(180%); /* 液態模糊感 */
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid var(--glass-50); /* 玻璃邊緣反光 */
-  border-radius: 50px; /* 膠囊形狀 */
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); /* 柔和陰影 */
-  cursor: pointer;
-  z-index: 2000;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+  transition: $map-transition;
 
-.exit-fullscreen-btn:hover {
-  background: var(--glass-90);
-  transform: scale(1.05);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
-}
+  &.is-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
 
-.exit-fullscreen-btn:active {
-  transform: scale(0.95);
-}
+    width: 100vw;
+    height: 100dvh;
 
-@media (max-aspect-ratio: 1/1 ) {
-  .map-page-container {
-    height: 65dvh;
+    transform: none;
+    border-radius: 0;
+  }
+
+  @media (max-aspect-ratio: 1 / 1) {
     width: 90dvw;
+    height: 65dvh;
+
+    &.is-fullscreen {
+      width: 100vw;
+      height: 100dvh;
+    }
   }
 }
 
@@ -1115,146 +994,230 @@ const resetView = () => {
   height: 100%;
 }
 
-/* 浮動控制面板樣式 - 玻璃擬態 */
+/* =========================
+ * 地图控制面板
+ * ========================= */
+
 .map-controls {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: var(--glass-90);
-  backdrop-filter: blur(12px);
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  width: $control-panel-width;
   padding: 12px;
+
+  background: var(--glass-90);
   border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-  /* ✨ 關鍵佈局設置 */
-  @include flex-col; /* 讓子元素垂直排列 (各佔一行) */
-  gap: 5px;              /* 控制三行之間的間距 */
-
-  z-index: 10;
-  width: 160px; /* 給個固定寬度，保證佈局穩定 */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
+
 .control-group {
-  width: 100%; /* 填滿父容器寬度 */
-  position: relative; /* 保持相對定位，不要用 absolute */
-  display: flex; /* 確保它是塊級元素 */
-}
-.control-group label {
-  font-size: 12px;
-  color: var(--text-tertiary)
-  font-weight: bold;
-  margin-bottom: 4px;
-  display: block;
+  position: relative;
+
+  display: flex;
+  width: 100%;
+
+  label {
+    display: block;
+    margin-bottom: 4px;
+
+    color: var(--text-tertiary);
+    font-size: 12px;
+    font-weight: 700;
+  }
 }
 
-/* ✨ 新增：按鈕並排容器 */
-.button-row {
+.custom-switch-container1 {
+  position: relative;
+
   display: flex;
-  gap: 10px;        /* 按鈕之間的間距 */
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
   width: 100%;
 }
 
-/* 讓按鈕平均分佈，或者根據需要調整寬度 */
-.button-row .action-btn {
-  flex: 1;          /* 兩個按鈕平分寬度 */
+.button-row {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  white-space: nowrap;
+  gap: 10px;
+
+  width: 100%;
+
+  .action-btn {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+
+    white-space: nowrap;
+  }
 }
 
 .action-btn {
-  background: var(--color-primary);
-  color: white;
-  border: none;
   padding: 8px;
-  border-radius: var(--radius-sm2);
-  cursor: pointer;
+
+  color: white;
   font-size: 13px;
-  transition: background 0.2s;
+
+  background: var(--color-primary);
+  border: 0;
+  border-radius: var(--radius-sm2);
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: var(--color-primary-hover);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
 }
 
-.action-btn:hover {
-  background: var(--color-primary-hover);
-}
-
-/* ✨ 全屏按鈕樣式 (綠色區分) */
 .fullscreen-btn {
-  background: var(--color-success); /* Apple Green */
+  background: var(--color-success);
+
+  &:hover {
+    background: #2db34e;
+  }
 }
 
-.fullscreen-btn:hover {
-  background: #2db34e;
+/* =========================
+ * 全屏退出按钮
+ * ========================= */
+
+.exit-fullscreen-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 12px 24px;
+
+  color: var(--text-dark);
+  font-size: 15px;
+  font-weight: 600;
+
+  background: var(--glass-70);
+  border: 1px solid var(--glass-50);
+  border-radius: var(--radius-full);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+  cursor: pointer;
+  transition: $glass-transition;
+
+  &:hover {
+    background: var(--glass-90);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
 }
+
+/* =========================
+ * 页面加载遮罩
+ * ========================= */
 
 .loading-overlay {
   position: absolute;
   inset: 0;
-  background: var(--glass-80);
-  @include flex-center;
   z-index: 20;
-  font-weight: bold;
-  color: var(--text-medium)
-}
-/* 整个容器样式 */
-.custom-switch-container1 {
-  width: 100%;
+
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 12px;
-  position: relative;
+  justify-content: center;
+  gap: 10px;
+
+  color: var(--text-medium);
+  font-weight: 700;
+
+  background: var(--glass-80);
 }
 
-/* 地名點擊彈窗樣式 */
+/* =========================
+ * 地点详情弹窗
+ * ========================= */
+
 .location-popup-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  @include flex-center;
+  inset: 0;
   z-index: 10000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .location-popup-content {
+  display: flex;
+  flex-direction: column;
+
+  width: 90%;
+  max-width: $popup-max-width;
+  max-height: 80vh;
+
+  overflow: hidden;
+
   background: white;
   border-radius: var(--radius-md);
-  width: 90%;
-  max-width: 800px;
-  max-height: 80vh;
-  @include flex-col;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .location-popup-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+
   padding: 20px;
+
   border-bottom: 1px solid var(--border-divider);
+
+  h3 {
+    margin: 0;
+
+    color: var(--text-dark);
+    font-size: 18px;
+  }
 }
-
-.location-popup-header h3 {
-  margin: 0;
-  font-size: 18px;
-  color: var(--text-dark)
-}
-
-
 
 .location-popup-body {
+  flex: 1;
+
   padding: 20px;
   overflow-y: auto;
-  flex: 1;
 }
 
 .popup-loading {
-  @include flex-col;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+
   padding: 40px;
-  color: var(--text-tertiary)
+
+  color: var(--text-tertiary);
 }
 
 .dialect-info {
@@ -1264,26 +1227,31 @@ const resetView = () => {
 
 .info-line {
   padding: 8px 0;
+
   border-bottom: 1px solid var(--bg-light);
-}
 
-.info-line:last-of-type {
-  border-bottom: none;
-  margin-bottom: 20px;
-}
+  strong {
+    margin-right: 8px;
 
-.title-line {
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--text-dark)
-  padding: 12px 0;
-  border-bottom: 2px solid var(--color-primary);
-  margin-bottom: 16px;
-}
+    color: var(--text-medium);
+  }
 
-.info-line strong {
-  color: var(--text-medium)
-  margin-right: 8px;
+  &:last-of-type {
+    margin-bottom: 20px;
+
+    border-bottom: 0;
+  }
+
+  &.title-line {
+    margin-bottom: 16px;
+    padding: 12px 0;
+
+    color: var(--text-dark);
+    font-size: 20px;
+    font-weight: 700;
+
+    border-bottom: 2px solid var(--color-primary);
+  }
 }
 
 .tone-table-container {
@@ -1292,42 +1260,111 @@ const resetView = () => {
 
 .tone-table {
   width: 100%;
-  border-collapse: collapse;
+
   font-size: 14px;
+
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 10px;
+
+    text-align: left;
+
+    border: 1px solid var(--border-light-gray);
+  }
+
+  th {
+    color: var(--text-dark);
+    font-weight: 600;
+
+    background: var(--bg-light);
+  }
+
+  tbody {
+    tr {
+      &:hover {
+        background: var(--bg-light-gray);
+      }
+    }
+  }
 }
 
-.tone-table th,
-.tone-table td {
-  padding: 10px;
-  text-align: left;
-  border: 1px solid var(--border-light-gray);
-}
+.data-display {
+  pre {
+    margin: 0;
+    padding: 16px;
 
-.tone-table th {
-  background: var(--bg-light);
-  font-weight: 600;
-  color: var(--text-dark)
-}
+    overflow-x: auto;
 
-.tone-table tbody tr:hover {
-  background: var(--bg-light-gray);
-}
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
 
-.data-display pre {
-  background: var(--bg-light);
-  padding: 16px;
-  border-radius: var(--radius-sm2);
-  overflow-x: auto;
-  font-size: 13px;
-  line-height: 1.6;
-  margin: 0;
-  white-space: pre-wrap;
-  word-wrap: break-word;
+    background: var(--bg-light);
+    border-radius: var(--radius-sm2);
+  }
 }
 
 .no-data {
-  text-align: center;
   padding: 40px;
+
   color: var(--text-lightest);
   font-size: 16px;
+  text-align: center;
 }
+
+/* =========================
+ * MapLibre 动态 Marker
+ *
+ * 这些元素由 JavaScript 创建，没有 Vue 的
+ * scoped 属性，因此必须使用 :deep()
+ * ========================= */
+
+:deep(.marker-text-base) {
+  width: auto;
+  padding: 2px 4px;
+
+  color: var(--color-cyan);
+  font-family: "SimHei", "黑体", sans-serif;
+  text-align: center;
+  white-space: nowrap;
+
+  background-color: var(--color-dark-teal);
+  border-radius: var(--radius-xs);
+  box-shadow: var(--shadow-focus-ring);
+
+  cursor: pointer;
+}
+
+:deep(.marker-dot) {
+  width: 10px;
+  height: 10px;
+
+  opacity: 0.8;
+  background-clip: padding-box;
+  border: 2px solid var(--text-primary);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 2px var(--bg-overlay-dark);
+
+  cursor: pointer;
+}
+
+:deep(.marker-text-feature) {
+  padding: 2px 4px;
+
+  color: black;
+  font-family: "Times New Roman", serif;
+  font-size: 15px;
+  white-space: nowrap;
+
+  border: 0.7px solid black;
+  border-radius: var(--radius-xs);
+  box-shadow: var(--shadow-focus-ring);
+
+  cursor: pointer;
+
+  // 背景色由 JavaScript 根据 item.color 动态设置。
+}
+</style>

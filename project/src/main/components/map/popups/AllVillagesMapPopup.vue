@@ -536,6 +536,8 @@ onBeforeUnmount(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $primary-hover: var(--color-primary-hover);
@@ -634,7 +636,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   background: var(--bg-white);
   border: 1px solid var(--border-light-gray);
   border-radius: var(--radius-sm2);
-  color: var(--text-dark)
+  color: var(--text-dark);
   white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
@@ -702,7 +704,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   background: var(--glass-90);
   border-radius: var(--radius-sm2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  color: var(--text-dark)
+  color: var(--text-dark);
   font-size: 13px;
   line-height: 1.6;
 
@@ -741,4 +743,4 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
     font-size: 13px;
   }
 }
-
+</style>

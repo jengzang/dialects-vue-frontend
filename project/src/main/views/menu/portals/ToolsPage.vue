@@ -66,6 +66,8 @@ const handlePraatTables = () => {
 };
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 .tools-page {
   min-width: 80dvw;
@@ -126,7 +128,7 @@ const handlePraatTables = () => {
 
 .tool-desc {
   font-size: 14px;
-  color: var(--text-tertiary)
+  color: var(--text-tertiary);
   line-height: 1.5;
 }
 
@@ -139,4 +141,4 @@ const handlePraatTables = () => {
     font-size: 24px;
   }
 }
-
+</style>

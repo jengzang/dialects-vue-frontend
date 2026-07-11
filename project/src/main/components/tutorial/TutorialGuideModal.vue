@@ -393,6 +393,8 @@ defineExpose({
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $radius-pill: 999px;
 $z-catalog-button: 20030;
@@ -1076,3 +1078,4 @@ $float-catalog-button-left:0;
     padding-top: 52px;
   }
 }
+</style>

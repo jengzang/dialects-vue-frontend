@@ -298,6 +298,8 @@ onBeforeUnmount(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $text-color: var(--text-primary);
 $primary-shadow: rgba(var(--color-primary-rgb), 0.25);
@@ -399,4 +401,4 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   opacity: 0;
   transform: translateY(-5px) scale(0.95);
 }
-
+</style>

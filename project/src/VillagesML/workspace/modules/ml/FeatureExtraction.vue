@@ -1075,7 +1075,7 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .feature-extraction-page {
   padding: 12px;
   max-width: 1600px;

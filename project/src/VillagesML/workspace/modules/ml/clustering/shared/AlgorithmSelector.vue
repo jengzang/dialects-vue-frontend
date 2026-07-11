@@ -46,7 +46,7 @@ const algorithmHint = computed(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .setting-row {
   display: flex;
   align-items: flex-start;

@@ -1352,7 +1352,10 @@ defineExpose({
 </script>
 
 
-```scss
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $success: var(--color-success);
@@ -1713,7 +1716,7 @@ $portrait-ratio: 1 / 1;
 }
 
 .region-label {
-  color: var(--text-dark)
+  color: var(--text-dark);
   font-size: 14px;
   font-weight: 600;
 }
@@ -1768,6 +1771,4 @@ $portrait-ratio: 1 / 1;
     }
   }
 }
-
-```
-
+</style>

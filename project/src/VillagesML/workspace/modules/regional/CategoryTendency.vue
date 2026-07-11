@@ -253,7 +253,7 @@ const loadRegionalNgrams = async () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .category-tendency-page {
   padding: 12px;
   max-width: 1400px;

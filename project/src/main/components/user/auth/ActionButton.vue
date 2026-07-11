@@ -30,6 +30,8 @@ defineProps({
 defineEmits(['click'])
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $transition-duration: 0.3s;
 $mobile-aspect-ratio: 1 / 1;
@@ -125,4 +127,4 @@ $gradient-variants: (
     }
   }
 }
-
+</style>

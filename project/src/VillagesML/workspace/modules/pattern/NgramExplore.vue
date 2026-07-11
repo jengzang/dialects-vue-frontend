@@ -292,7 +292,7 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .ngram-explore-page {
   padding: 12px;
   max-width: 1400px;

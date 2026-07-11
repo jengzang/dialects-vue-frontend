@@ -301,6 +301,8 @@ const columnOptions = computed(() => ([
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $text-primary: var(--text-deep);
 $text-secondary: rgba(var(--text-deep-rgb), 0.68);
 $text-muted: rgba(var(--text-deep-rgb), 0.58);

@@ -60,7 +60,7 @@ function toggleKey(key) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .button-group {
   flex-wrap: wrap;
   display: flex;

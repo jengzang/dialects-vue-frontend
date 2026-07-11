@@ -618,7 +618,10 @@ const tableData = computed(() => {
   </div>
 </template>
 
-```scss
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
@@ -1333,5 +1336,4 @@ $bronze: var(--color-bronze);
     font-size: 12px;
   }
 }
-
-```
+</style>

@@ -201,6 +201,8 @@ function handleLocationInput(event) {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
@@ -426,4 +428,4 @@ $transition-normal: 0.3s;
     background: $primary-background;
   }
 }
-
+</style>

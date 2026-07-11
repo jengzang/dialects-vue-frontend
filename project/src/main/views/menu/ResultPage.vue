@@ -348,7 +348,8 @@ export default {
 }
 </script>
 
-
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $primary-blue-hover: var(--color-primary-hover);
@@ -517,3 +518,4 @@ $transition-fast: 0.2s;
     transform: translateY(0);
   }
 }
+</style>

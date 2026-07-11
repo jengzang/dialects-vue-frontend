@@ -479,7 +479,7 @@ watch(mode, () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* Loading State - 与排行榜保持一致的样式 */
 .loading-container {
   text-align: center;

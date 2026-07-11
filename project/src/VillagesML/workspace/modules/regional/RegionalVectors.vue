@@ -681,7 +681,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .regional-vectors-page {
   padding: 12px;
   max-width: 1600px;

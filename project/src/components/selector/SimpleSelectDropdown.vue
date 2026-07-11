@@ -122,6 +122,8 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $arrow-transition: 0.2s ease;
 
 .simple-select-dropdown {

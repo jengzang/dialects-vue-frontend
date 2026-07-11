@@ -69,7 +69,10 @@ const togglePasswordVisibility = () => {
 }
 </script>
 
-```vue
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-color: var(--color-primary);
 $error-color: var(--color-error-light);
@@ -149,6 +152,4 @@ $glass-blur: 12px;
     transform: translateY(-50%) scale(1.1);
   }
 }
-
-```
-
+</style>

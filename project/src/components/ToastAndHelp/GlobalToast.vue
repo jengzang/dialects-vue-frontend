@@ -45,6 +45,8 @@ function getIcon(type) {
 }
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $apple-blue: var(--color-primary);
 $action-blue: var(--color-primary-hover);
@@ -302,4 +304,4 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);@mixin toast-icon($bac
     transform: translateY(-12px) scale(0.98);
   }
 }
-
+</style>

@@ -322,6 +322,8 @@ defineExpose({
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $success-green: var(--color-success);
@@ -468,4 +470,4 @@ $glass-blur: 12px;
   backdrop-filter: blur($glass-blur) saturate(160%);
   -webkit-backdrop-filter: blur($glass-blur) saturate(160%);
 }
-
+</style>

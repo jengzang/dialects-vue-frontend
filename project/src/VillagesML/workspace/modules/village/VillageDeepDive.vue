@@ -222,7 +222,7 @@ watch(() => route.query.villageId, (newId) => {
 }, { immediate: true })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .village-deep-dive-page {
   padding: 20px;
   max-width: 1400px;

@@ -655,7 +655,7 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .spatial-visualization-tab {
   padding: 16px;
   background: var(--glass-60);

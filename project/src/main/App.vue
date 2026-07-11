@@ -155,7 +155,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .global-route-loading {
   position: fixed;
   inset: 0;

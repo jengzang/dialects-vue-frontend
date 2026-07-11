@@ -35,7 +35,10 @@ const spokenColumns = computed(() => [
 </script>
 
 
-```vue
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $button-text-color: var(--color-primary-hover);
 $button-transition: 0.3s ease;
@@ -77,6 +80,4 @@ $button-transition: 0.3s ease;
     transform: scale(1.05);
   }
 }
-
-```
-
+</style>

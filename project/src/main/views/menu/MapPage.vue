@@ -300,7 +300,10 @@ const resolveTabRoute = (tabName) => {
 
 </script>
 
-```vue
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $success-green: var(--color-success);
 $text-primary: var(--text-dark);
@@ -310,14 +313,14 @@ $transition-fast: 0.2s;
 $transition-base: 0.3s;
 /* 外层内容容器 */
 .tab-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
   width: 100%;
   padding: 1rem 0;
   text-align: center;
   animation: fade 0.6s ease;
-
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 
 /* 地图上方的特征控制区 */
@@ -410,7 +413,4 @@ $transition-base: 0.3s;
     transform: translateY(0);
   }
 }
-
-```
-
-
+</style>

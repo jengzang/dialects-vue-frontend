@@ -108,7 +108,10 @@ const copyCitation = () => {
   </div>
 </template>
 
-```vue
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
@@ -333,6 +336,4 @@ $transition-base: 0.3s;
     transform: translateY(0);
   }
 }
-
-```
-
+</style>

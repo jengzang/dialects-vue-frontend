@@ -103,7 +103,7 @@ defineProps({
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .spatial-content {
   animation: fadeIn 0.3s ease;
 }

@@ -44,7 +44,10 @@ const goToYCVillages = () => {
 };
 </script>
 
-```vue
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $button-text-color: var(--color-primary-hover);
 $transition-duration: 0.3s;
@@ -94,6 +97,4 @@ $transition-duration: 0.3s;
     transform: scale(1.05);
   }
 }
-
-```
-
+</style>

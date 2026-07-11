@@ -238,6 +238,8 @@ const offsetClass = computed(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 @use '../../_map-variables' as *;
 
 @use './panelShared';

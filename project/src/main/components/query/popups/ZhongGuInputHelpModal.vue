@@ -82,6 +82,8 @@ const tableLabel = computed(() => {
 })
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $text-heading: var(--text-dark);
 $text-body: var(--text-dark);
@@ -192,4 +194,4 @@ $table-radius: 8px;
     }
   }
 }
-
+</style>

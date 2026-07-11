@@ -530,7 +530,9 @@ onBeforeUnmount(() => {
 </script>
 
 
-```scss
+
+
+<style scoped lang="scss">
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
@@ -1012,6 +1014,5 @@ $mobile-aspect-ratio: 1 / 1;@mixin soft-glass-background {
     max-width: calc(100vw - 20px);
   }
 }
-
-```
+</style>
 
