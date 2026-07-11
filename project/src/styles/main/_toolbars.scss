@@ -21,7 +21,7 @@
     inset 0 0 0.5px var(--glass-20),
     0 10px 24px rgba(0, 0, 0, 0.16),
     0 0 0 0.5px var(--glass-10);
-  background: rgba(var(--bg-blue-tint-rgb), 0.94) !important;
+  background: var(--bg-page-gradient);
   border: 1px solid var(--glass-30);
   backdrop-filter: blur(6px) saturate(145%);
   -webkit-backdrop-filter: blur(6px) saturate(145%);

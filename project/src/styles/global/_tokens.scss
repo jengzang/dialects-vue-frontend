@@ -21,6 +21,11 @@
   --bg-blue-light: #e6f0ff;
   --color-map-draw: #2563eb;
 
+  /* 页面背景渐变 - 三層藍色漸變 */
+  --bg-page-gradient: radial-gradient(1200px 800px at 10% -10%, #dff1ff, #dff1ff00 60%),
+    radial-gradient(1000px 700px at 110% 10%, #cfe7ff, #cfe7ff00 60%),
+    linear-gradient(180deg, #eaf5ff, #d7ecff);
+
   /* 深色文字 */
   --text-deep: #0b2540;
 

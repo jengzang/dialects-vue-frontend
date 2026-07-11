@@ -71,22 +71,7 @@ $system-font:
     max(16px, env(safe-area-inset-bottom))
     max(16px, env(safe-area-inset-left));
 
-  background:
-    radial-gradient(
-      1200px 800px at 10% -10%,
-      var(--bg-blue-tint) 0%,
-      rgba(var(--bg-blue-tint-rgb), 0) 60%
-    ),
-    radial-gradient(
-      1000px 700px at 110% 10%,
-      var(--bg-blue-light) 0%,
-      rgba(var(--bg-blue-tint-rgb), 0) 60%
-    ),
-    linear-gradient(
-      180deg,
-      var(--bg-blue-tint),
-      var(--bg-blue-light)
-    );
+  background: var(--bg-page-gradient);
 }
 
 /* 内容区域 */
