@@ -395,11 +395,11 @@ const convertToGeoJSON = (data) => {
     // 计算颜色（基于合并后的文字）
     let bgColor, textColor
     if (displayMode.value === 'location') {
-      bgColor = 'var(--color-dark-teal)'
-      textColor = 'var(--color-cyan)'
+       bgColor = '#1b2e2b'
+       textColor = '#a6ffdc'
     } else {
       bgColor = assignColor(mergedText)
-      textColor = 'var(--text-primary)'
+      textColor = '#1d1d1f'
     }
 
     deduplicatedFeatures.push({
@@ -605,7 +605,7 @@ const handleStyleChange = () => {
         'circle-color': ['get', 'bgColor'],
         'circle-opacity': 0.9,
         'circle-stroke-width': 1.5,
-        'circle-stroke-color': 'var(--glass-80)'
+        'circle-stroke-color': 'rgba(255, 255, 255, 0.8)'
       }
     })
 
@@ -721,7 +721,7 @@ const initMap = () => {
         'circle-color': ['get', 'bgColor'],
         'circle-opacity': 0.9,
         'circle-stroke-width': 1.5,
-        'circle-stroke-color': 'var(--glass-80)'
+        'circle-stroke-color': 'rgba(255, 255, 255, 0.8)'
       }
     })
 
@@ -828,6 +828,7 @@ watch(() => props.activeTab, () => {
 </script>
 
 
+<style scoped lang="scss">
 .yubao-map-container {
   width: 100%;
   height: 100%;
@@ -1027,7 +1028,7 @@ watch(() => props.activeTab, () => {
   padding: 12px 24px;
   font-size: 15px;
   font-weight: 600;
-  color: var(--text-dark)
+  color: var(--text-dark);
   background: var(--glass-70);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -1218,4 +1219,4 @@ watch(() => props.activeTab, () => {
   margin-right: 8px;
   font-weight: 600;
 }
-
+</style>
