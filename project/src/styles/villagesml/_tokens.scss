@@ -13,6 +13,7 @@
   --vml-blue-darkest-rgb: 41, 128, 185;
   --vml-blue-medium: #3498db;
   --vml-blue-medium-rgb: 52, 152, 219;
+  --vml-blue-highlight: #5ba3f5;
 
   /* VillagesML 专属语义色 */
   --vml-terracotta: #e8a87c;
@@ -20,27 +21,29 @@
 }
 
 :root[data-color-theme='light'] {
-  --vml-blue: #8a6a2f;
-  --vml-blue-rgb: 138, 106, 47;
-  --vml-blue-dark: #6f5424;
-  --vml-blue-dark-rgb: 111, 84, 36;
-  --vml-blue-darker: #5c451d;
-  --vml-blue-darker-rgb: 92, 69, 29;
-  --vml-blue-darkest: #493719;
-  --vml-blue-darkest-rgb: 73, 55, 25;
-  --vml-blue-medium: #b8944d;
-  --vml-blue-medium-rgb: 184, 148, 77;
+  --vml-blue: #6f6a60;
+  --vml-blue-rgb: 111, 106, 96;
+  --vml-blue-dark: #4f4b43;
+  --vml-blue-dark-rgb: 79, 75, 67;
+  --vml-blue-darker: #423f38;
+  --vml-blue-darker-rgb: 66, 63, 56;
+  --vml-blue-darkest: #34322d;
+  --vml-blue-darkest-rgb: 52, 50, 45;
+  --vml-blue-medium: #aaa69d;
+  --vml-blue-medium-rgb: 170, 166, 157;
+  --vml-blue-highlight: #8f8a80;
 }
 
 :root[data-color-theme='dark'] {
-  --vml-blue: #d8c08a;
-  --vml-blue-rgb: 216, 192, 138;
-  --vml-blue-dark: #f0d79d;
-  --vml-blue-dark-rgb: 240, 215, 157;
-  --vml-blue-darker: #c7a96d;
-  --vml-blue-darker-rgb: 199, 169, 109;
-  --vml-blue-darkest: #a8874b;
-  --vml-blue-darkest-rgb: 168, 135, 75;
-  --vml-blue-medium: #e2c992;
-  --vml-blue-medium-rgb: 226, 201, 146;
+  --vml-blue: #f5f5f7;
+  --vml-blue-rgb: 245, 245, 247;
+  --vml-blue-dark: #ffffff;
+  --vml-blue-dark-rgb: 255, 255, 255;
+  --vml-blue-darker: #d1d1d6;
+  --vml-blue-darker-rgb: 209, 209, 214;
+  --vml-blue-darkest: #a1a1a6;
+  --vml-blue-darkest-rgb: 161, 161, 166;
+  --vml-blue-medium: #e5e5ea;
+  --vml-blue-medium-rgb: 229, 229, 234;
+  --vml-blue-highlight: #ffffff;
 }
