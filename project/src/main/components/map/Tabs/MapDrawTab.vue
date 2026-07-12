@@ -166,7 +166,7 @@
           @update:partition-mode="voronoiPartitionMode = $event"
           @update:region-level="voronoiRegionLevel = $event"
           @update:use-official-data="useVoronoiOfficialData = $event"
-          @open-custom-import="showVoronoiCustomImportModal = true"
+          @open-custom-import="triggerVoronoiFileImport"
           @clear-custom-import="clearVoronoiCustomImport"
           @open-ignore-modal="openVoronoiIgnoreModal"
           @preview-points="previewVoronoiPoints"
@@ -479,9 +479,32 @@
         @confirm="handleVoronoiIgnoreConfirm"
       />
 
-      <VoronoiCustomImportModal
-        v-model="showVoronoiCustomImportModal"
-        @confirm="handleVoronoiCustomImportConfirm"
+      <input
+        ref="voronoiImportFileInputRef"
+        class="draw-import-input"
+        type="file"
+        accept=".xlsx,.xls,.csv,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        @change="handleVoronoiFileChange"
+      >
+
+      <TabularImportPreview
+        v-model="showVoronoiPreviewModal"
+        :title="t('map.drawTab.voronoi.customImport.previewTitle')"
+        :description="t('map.drawTab.voronoi.customImport.previewDescription')"
+        :file="voronoiTabularState.file.value"
+        :schema="voronoiImport.schema.value"
+        :loading="voronoiTabularState.loading.value"
+        :preview-table="voronoiTabularState.previewTable.value"
+        :diagnostics="voronoiTabularState.diagnostics.value"
+        :mapping="voronoiTabularState.mapping.value"
+        :selected-sheet-id="voronoiTabularState.selectedSheetId.value"
+        :header-row-index="voronoiTabularState.headerRowIndex.value"
+        :sheets="voronoiTabularState.parsedFile.value?.sheets || []"
+        @update:selected-sheet-id="voronoiTabularState.selectedSheetId.value = $event"
+        @update:header-row-index="voronoiTabularState.headerRowIndex.value = $event"
+        @update:mapping="voronoiTabularState.updateMapping($event.fieldKey, $event.sourceKey)"
+        @reset="handleVoronoiPreviewReset"
+        @confirm="handleVoronoiPreviewConfirm"
       />
     </template>
   </div>
@@ -528,7 +551,9 @@ import MapDrawImageExportModal from '@/main/components/map/Draw/modals/MapDrawIm
 import MapDrawImagePreviewModal from '@/main/components/map/Draw/modals/MapDrawImagePreviewModal.vue';
 import VoronoiExportLayersModal from '@/main/components/map/Draw/modals/VoronoiExportLayersModal.vue';
 import VoronoiIgnorePointsModal from '@/main/components/map/Draw/modals/VoronoiIgnorePointsModal.vue';
-import VoronoiCustomImportModal from '@/main/components/map/Draw/modals/VoronoiCustomImportModal.vue';
+import TabularImportPreview from '@/components/import/TabularImportPreview.vue';
+import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js';
+import { useVoronoiCustomImport } from '@/composables/import/useVoronoiCustomImport.js';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
 import AppModal from '@/components/common/AppModal.vue';
 
@@ -671,7 +696,14 @@ const voronoiOfficialPoints = ref([]);
 const voronoiCustomImportRows = ref([]);
 const voronoiCustomImportMeta = ref(null);
 const useVoronoiOfficialData = ref(true);
-const showVoronoiCustomImportModal = ref(false);
+const showVoronoiPreviewModal = ref(false);
+const voronoiImportFileInputRef = ref(null);
+
+const voronoiImport = useVoronoiCustomImport();
+const voronoiTabularState = useTabularImportPreview({
+  schema: voronoiImport.schema,
+  requireExplicitConfirmation: true,
+});
 const ignoredVoronoiLocations = ref([]);
 const voronoiPreviewLayers = ref([]);
 const voronoiPreviewType = ref('');
@@ -794,6 +826,49 @@ const clearVoronoiCustomImport = () => {
   clearVoronoiPreviewState();
   setVoronoiStatus('customImportCleared');
 };
+
+function triggerVoronoiFileImport() {
+  voronoiImportFileInputRef.value?.click();
+}
+
+async function handleVoronoiFileChange(event) {
+  const nextFile = event?.target?.files?.[0];
+  if (!nextFile) return;
+
+  try {
+    await voronoiTabularState.loadFile(nextFile);
+    showVoronoiPreviewModal.value = true;
+  } catch (error) {
+    showError(t('map.drawTab.voronoi.customImport.messages.parseFailed', {
+      error: error?.message || String(error || ''),
+    }));
+  } finally {
+    if (event?.target) {
+      event.target.value = '';
+    }
+  }
+}
+
+function handleVoronoiPreviewReset() {
+  voronoiTabularState.resetState();
+  voronoiImport.clearImportedData();
+  showVoronoiPreviewModal.value = false;
+}
+
+function handleVoronoiPreviewConfirm() {
+  const rows = voronoiImport.applyPreviewSummary(voronoiTabularState.summary.value);
+  if (!rows.length) {
+    showError(t('map.drawTab.voronoi.customImport.messages.noValidRows'));
+    return;
+  }
+
+  handleVoronoiCustomImportConfirm({
+    rows,
+    partitionMode: voronoiImport.partitionMode.value,
+    summary: voronoiImport.summary.value,
+  });
+  showVoronoiPreviewModal.value = false;
+}
 
 const handleVoronoiCustomImportConfirm = ({ rows, partitionMode, summary }) => {
   voronoiCustomImportRows.value = Array.isArray(rows)

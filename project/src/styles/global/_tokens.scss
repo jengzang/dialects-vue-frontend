@@ -389,147 +389,165 @@
 }
 
 :root[data-color-theme='dark'] {
-  --color-primary: #f5f5f7;
+  /* ── 主色（反轉為淺色）── */
+  --color-primary: #f0f6fc;
   --color-primary-hover: #ffffff;
-  --color-primary-light: rgba(245, 245, 247, 0.10);
-  --color-primary-light2: rgba(245, 245, 247, 0.16);
-  --color-primary-light3: rgba(245, 245, 247, 0.12);
-  --color-primary-medium: rgba(245, 245, 247, 0.20);
-  --color-primary-medium2: rgba(245, 245, 247, 0.48);
-  --color-primary-border: rgba(245, 245, 247, 0.28);
-  --color-primary-border2: rgba(245, 245, 247, 0.36);
-  --color-primary-shadow: rgba(245, 245, 247, 0.12);
-  --color-primary-shadow-light: rgba(245, 245, 247, 0.20);
-  --color-gradient: linear-gradient(135deg, #ffffff, #a1a1a6);
+  --color-primary-light: rgba(240, 246, 252, 0.08);
+  --color-primary-light2: rgba(240, 246, 252, 0.14);
+  --color-primary-light3: rgba(240, 246, 252, 0.10);
+  --color-primary-medium: rgba(240, 246, 252, 0.18);
+  --color-primary-medium2: rgba(240, 246, 252, 0.42);
+  --color-primary-border: rgba(240, 246, 252, 0.22);
+  --color-primary-border2: rgba(240, 246, 252, 0.30);
+  --color-primary-shadow: rgba(240, 246, 252, 0.10);
+  --color-primary-shadow-light: rgba(240, 246, 252, 0.18);
+  --color-gradient: linear-gradient(135deg, #e6edf3, #8b949e);
 
-  --bg-blue-tint: #0f0f10;
-  --bg-blue-light: #1c1c1e;
-  --bg-blue-hover: rgba(255, 255, 255, 0.12);
-  --color-map-draw: #f5f5f7;
-  --bg-blue-tint-rgb: 15, 15, 16;
-  --bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #202022, #20202200 58%),
-    radial-gradient(1000px 720px at 110% 4%, #171719, #17171900 62%),
-    linear-gradient(180deg, #050505, #111113);
-
-  --text-deep: #e8eef7;
-  --text-primary: #f4f7fb;
-  --text-secondary: #b8c2d0;
-  --text-tertiary: #a6b0bf;
-  --text-muted: #9aa6b6;
-  --text-lightest: #7f8da1;
-  --text-dark: #edf2f8;
-  --text-dark-alpha: rgba(237, 242, 248, 0.90);
-  --text-dark-medium: rgba(221, 228, 238, 0.84);
-  --text-dark-light: rgba(237, 242, 248, 0.88);
-  --text-dark-lighter: rgba(221, 228, 238, 0.72);
-  --text-dark-lightest: rgba(221, 228, 238, 0.82);
-  --text-medium: #c4ccd8;
-  --text-gray: #b3bdcb;
-  --color-text-primary: #f4f7fb;
-  --color-text-secondary: #b8c2d0;
-
-  --bg-body: #050505;
-  --bg-white: #161618;
-  --bg-light-gray: #101012;
-  --bg-light: #1c1c1e;
-  --sidebar-shell-background: linear-gradient(145deg, rgba(24, 24, 26, 0.90), rgba(10, 10, 12, 0.84));
-  --sidebar-shell-border: rgba(255, 255, 255, 0.16);
-  --sidebar-shell-shadow: inset 0 0 0.5px rgba(255, 255, 255, 0.18), 0 18px 42px rgba(0, 0, 0, 0.48), 0 0 0 0.5px rgba(255, 255, 255, 0.08);
-  --surface-page: #050505;
-  --surface-panel: rgba(28, 28, 30, 0.72);
-  --surface-panel-hover: rgba(44, 44, 46, 0.84);
-  --surface-panel-strong: rgba(28, 28, 30, 0.92);
-  --surface-panel-subtle: rgba(255, 255, 255, 0.10);
-  --surface-glass-button: rgba(44, 44, 46, 0.62);
-  --surface-glass-button-hover: rgba(58, 58, 60, 0.76);
-  --surface-selected: rgba(255, 255, 255, 0.12);
-  --text-selected: #ffffff;
-  --border-glass: rgba(255, 255, 255, 0.16);
-  --border-glass-subtle: rgba(255, 255, 255, 0.10);
-  --border-control: rgba(255, 255, 255, 0.16);
-  --border-control-focus: rgba(255, 255, 255, 0.38);
-  --focus-ring: 0 0 0 4px rgba(255, 255, 255, 0.10);
-  --action-primary-bg: #f5f5f7;
-  --action-primary-bg-hover: #ffffff;
-  --action-primary-text: #050505;
-  --action-primary-border: rgba(255, 255, 255, 0.22);
-  --action-primary-shadow: 0 4px 14px rgba(255, 255, 255, 0.14);
-  --action-active-bg: rgba(255, 255, 255, 0.18);
-  --action-active-border: rgba(255, 255, 255, 0.32);
-  --enter-button-bg: #f5f5f7;
-  --enter-button-bg-hover: #ffffff;
-  --enter-button-text: #050505;
-  --enter-button-shadow: 0 2px 10px rgba(255, 255, 255, 0.14);
-  --switch-hover-background: rgba(255, 255, 255, 0.14);
-  --switch-thumb-background: #ffffff;
-  --switch-label-text: rgba(255, 255, 255, 0.92);
-  --switch-thumb-shadow: 0 0 8px rgba(255, 255, 255, 0.20);
-  --sidebar-item-background: rgba(44, 44, 46, 0.78);
-  --sidebar-item-background-hover: rgba(58, 58, 60, 0.88);
-  --sidebar-item-text: rgba(255, 255, 255, 0.92);
-  --sidebar-item-border: rgba(255, 255, 255, 0.14);
-  --sidebar-stats-background: linear-gradient(145deg, rgba(44, 44, 46, 0.72), rgba(28, 28, 30, 0.58));
-  --sidebar-stats-border: rgba(255, 255, 255, 0.14);
-  --sidebar-expand-background: linear-gradient(145deg, rgba(58, 58, 60, 0.68), rgba(28, 28, 30, 0.54));
-  --sidebar-expand-background-hover: linear-gradient(145deg, rgba(72, 72, 74, 0.78), rgba(44, 44, 46, 0.66));
-  --sidebar-expand-border: rgba(255, 255, 255, 0.16);
-  --submenu-hover-background: rgba(255, 255, 255, 0.10);
-
-  --glass-05: rgba(255, 255, 255, 0.05);
-  --glass-10: rgba(255, 255, 255, 0.08);
-  --glass-20: rgba(255, 255, 255, 0.12);
-  --glass-30: rgba(255, 255, 255, 0.16);
-  --glass-40: rgba(255, 255, 255, 0.20);
-  --glass-50: rgba(22, 29, 42, 0.52);
-  --glass-60: rgba(22, 29, 42, 0.64);
-  --glass-70: rgba(22, 29, 42, 0.74);
-  --glass-80: rgba(22, 29, 42, 0.84);
-  --glass-90: rgba(22, 29, 42, 0.92);
-
-  --border-light: rgba(255, 255, 255, 0.07);
-  --border-medium: rgba(255, 255, 255, 0.12);
-  --border-gray: #334155;
-  --border-gray-light: rgba(148, 163, 184, 0.28);
-  --border-gray-lighter: rgba(148, 163, 184, 0.22);
-  --border-gray-lightest: rgba(148, 163, 184, 0.16);
-  --border-gray-light2: rgba(148, 163, 184, 0.18);
-  --border-gray-medium: rgba(148, 163, 184, 0.20);
-  --border-divider: rgba(148, 163, 184, 0.18);
-  --border-light-gray: rgba(148, 163, 184, 0.24);
-
-  --bg-hover-light: rgba(255, 255, 255, 0.04);
-  --bg-hover: rgba(255, 255, 255, 0.07);
-  --bg-hover-medium: rgba(255, 255, 255, 0.10);
-  --bg-hover-strong: rgba(255, 255, 255, 0.14);
-  --bg-overlay: rgba(0, 0, 0, 0.54);
-  --bg-overlay-dark: rgba(0, 0, 0, 0.72);
-  --bg-overlay-light: rgba(255, 255, 255, 0.10);
-  --bg-overlay-light2: rgba(255, 255, 255, 0.08);
-  --bg-overlay-very-light: rgba(0, 0, 0, 0.42);
-
-  --color-primary-cyan: #f5f5f7;
-  --color-accent-purple: #d1d1d6;
-  --color-accent-purple-light: rgba(209, 209, 214, 0.14);
-  --color-cyan: #e5e5ea;
-  --color-cyan-rgb: 229, 229, 234;
-  --color-primary-rgb: 245, 245, 247;
+  /* ── RGB 分量 ── */
+  --color-primary-rgb: 240, 246, 252;
   --color-primary-hover-rgb: 255, 255, 255;
-  --text-deep-rgb: 232, 238, 247;
-  --color-shadow-rgb: 0, 0, 0;
-  --color-primary-cyan-rgb: 245, 245, 247;
-  --color-accent-purple-rgb: 209, 209, 214;
-  --text-secondary-rgb: 184, 194, 208;
-  --text-slate: #c6d0df;
-  --text-slate-rgb: 198, 208, 223;
-  --text-slate-light: #8fa0b5;
-  --text-slate-light-rgb: 143, 160, 181;
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.22);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.28);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.34);
-  --shadow-card: 0 16px 36px rgba(0, 0, 0, 0.34);
-  --shadow-popup: 0 20px 52px rgba(0, 0, 0, 0.48);
-  --shadow-glass: 0 10px 28px rgba(0, 0, 0, 0.36), inset 0 0 0.5px rgba(255, 255, 255, 0.18);
-  --shadow-glass-hover: 0 14px 34px rgba(0, 0, 0, 0.46);
-  --shadow-glass-inset: inset 0 0 0.5px rgba(255, 255, 255, 0.22), 0 10px 28px rgba(0, 0, 0, 0.40), 0 0 0 0.5px rgba(255, 255, 255, 0.10);
+  /* ── 頁面背景（GitHub canvas.default → canvas.subtle → canvas.overlay）── */
+  --bg-body: #0d1117;
+  --bg-white: #161b22;
+  --bg-light-gray: #0d1117;
+  --bg-light: #21262d;
+  --surface-page: #0d1117;
+
+  --bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #21262d, #21262d00 58%),
+    radial-gradient(1000px 720px at 110% 4%, #161b22, #161b2200 62%),
+    linear-gradient(180deg, #0d1117, #161b22);
+
+  --bg-blue-tint: #0d1117;
+  --bg-blue-light: #161b22;
+  --bg-blue-hover: rgba(240, 246, 252, 0.08);
+  --bg-blue-tint-rgb: 13, 17, 23;
+  --color-map-draw: #e6edf3;
+
+  /* ── 文字（GitHub fg.default → fg.muted → fg.subtle）── */
+  --text-deep: #e6edf3;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-tertiary: #7d8590;
+  --text-muted: #8b949e;
+  --text-lightest: #6e7681;
+  --text-dark: #e6edf3;
+  --text-dark-alpha: rgba(230, 237, 243, 0.90);
+  --text-dark-medium: rgba(195, 205, 218, 0.84);
+  --text-dark-light: rgba(230, 237, 243, 0.86);
+  --text-dark-lighter: rgba(195, 205, 218, 0.70);
+  --text-dark-lightest: rgba(195, 205, 218, 0.80);
+  --text-medium: #a5adba;
+  --text-gray: #8b949e;
+  --color-text-primary: #e6edf3;
+  --color-text-secondary: #8b949e;
+  --text-deep-rgb: 230, 237, 243;
+  --text-secondary-rgb: 139, 148, 158;
+  --text-slate: #c3cdda;
+  --text-slate-rgb: 195, 205, 218;
+  --text-slate-light: #7d8590;
+  --text-slate-light-rgb: 125, 133, 144;
+
+  /* ── 毛玻璃（全部白色疊加，暗色背景上的真正玻璃質感）── */
+  --glass-05: rgba(255, 255, 255, 0.03);
+  --glass-10: rgba(255, 255, 255, 0.05);
+  --glass-20: rgba(255, 255, 255, 0.08);
+  --glass-30: rgba(255, 255, 255, 0.10);
+  --glass-40: rgba(255, 255, 255, 0.13);
+  --glass-50: rgba(255, 255, 255, 0.16);
+  --glass-60: rgba(255, 255, 255, 0.20);
+  --glass-70: rgba(255, 255, 255, 0.24);
+  --glass-80: rgba(255, 255, 255, 0.28);
+  --glass-90: rgba(255, 255, 255, 0.32);
+
+  /* ── 語義表面（GitHub 層級：canvas.subtle / overlay / inset）── */
+  --surface-panel: #161b22;
+  --surface-panel-hover: #1c2128;
+  --surface-panel-strong: #21262d;
+  --surface-panel-subtle: rgba(240, 246, 252, 0.06);
+  --surface-glass-button: #21262d;
+  --surface-glass-button-hover: #30363d;
+  --surface-selected: rgba(240, 246, 252, 0.10);
+  --text-selected: #ffffff;
+
+  /* ── 邊框（GitHub border.default / muted）── */
+  --border-glass: rgba(240, 246, 252, 0.14);
+  --border-glass-subtle: rgba(240, 246, 252, 0.08);
+  --border-control: rgba(240, 246, 252, 0.14);
+  --border-control-focus: rgba(240, 246, 252, 0.32);
+  --border-light: rgba(240, 246, 252, 0.06);
+  --border-medium: rgba(240, 246, 252, 0.10);
+  --border-gray: #30363d;
+  --border-gray-light: rgba(240, 246, 252, 0.16);
+  --border-gray-lighter: rgba(240, 246, 252, 0.12);
+  --border-gray-lightest: rgba(240, 246, 252, 0.08);
+  --border-gray-light2: rgba(240, 246, 252, 0.10);
+  --border-gray-medium: rgba(240, 246, 252, 0.12);
+  --border-divider: rgba(240, 246, 252, 0.10);
+  --border-light-gray: rgba(240, 246, 252, 0.14);
+
+  /* ── hover / overlay ── */
+  --bg-hover-light: rgba(240, 246, 252, 0.04);
+  --bg-hover: rgba(240, 246, 252, 0.06);
+  --bg-hover-medium: rgba(240, 246, 252, 0.08);
+  --bg-hover-strong: rgba(240, 246, 252, 0.12);
+  --bg-overlay: rgba(0, 0, 0, 0.60);
+  --bg-overlay-dark: rgba(0, 0, 0, 0.78);
+  --bg-overlay-light: rgba(240, 246, 252, 0.08);
+  --bg-overlay-light2: rgba(240, 246, 252, 0.06);
+  --bg-overlay-very-light: rgba(0, 0, 0, 0.48);
+
+  /* ── 交互 ── */
+  --focus-ring: 0 0 0 3px rgba(88, 166, 255, 0.25);
+  --action-primary-bg: #f0f6fc;
+  --action-primary-bg-hover: #ffffff;
+  --action-primary-text: #0d1117;
+  --action-primary-border: rgba(240, 246, 252, 0.18);
+  --action-primary-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --action-active-bg: rgba(240, 246, 252, 0.14);
+  --action-active-border: rgba(240, 246, 252, 0.26);
+  --enter-button-bg: #238636;
+  --enter-button-bg-hover: #2ea043;
+  --enter-button-text: #ffffff;
+  --enter-button-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  --switch-hover-background: rgba(240, 246, 252, 0.12);
+  --switch-thumb-background: #e6edf3;
+  --switch-label-text: #e6edf3;
+  --switch-thumb-shadow: 0 0 8px rgba(88, 166, 255, 0.2);
+
+  /* ── 側邊欄 ── */
+  --sidebar-shell-background: linear-gradient(145deg, #161b22, #0d1117);
+  --sidebar-shell-border: rgba(240, 246, 252, 0.10);
+  --sidebar-shell-shadow: inset 0 0 0.5px rgba(240, 246, 252, 0.12), 0 14px 32px rgba(0, 0, 0, 0.48), 0 0 0 0.5px rgba(240, 246, 252, 0.06);
+  --sidebar-item-background: #161b22;
+  --sidebar-item-background-hover: #1c2128;
+  --sidebar-item-text: #e6edf3;
+  --sidebar-item-border: rgba(240, 246, 252, 0.10);
+  --sidebar-stats-background: linear-gradient(145deg, #161b22, #0d1117);
+  --sidebar-stats-border: rgba(240, 246, 252, 0.10);
+  --sidebar-expand-background: linear-gradient(145deg, #21262d, #161b22);
+  --sidebar-expand-background-hover: linear-gradient(145deg, #30363d, #21262d);
+  --sidebar-expand-border: rgba(240, 246, 252, 0.12);
+  --submenu-hover-background: rgba(240, 246, 252, 0.06);
+
+  /* ── 強調色 ── */
+  --color-primary-cyan: #79c0ff;
+  --color-primary-cyan-rgb: 121, 192, 255;
+  --color-accent-purple: #d2a8ff;
+  --color-accent-purple-rgb: 210, 168, 255;
+  --color-accent-purple-light: rgba(210, 168, 255, 0.10);
+  --color-cyan: #a5d6ff;
+  --color-cyan-rgb: 165, 214, 255;
+
+  --color-shadow-rgb: 0, 0, 0;
+
+  /* ── 陰影（暗色模式下更深、更柔）── */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.30);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.36);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.44);
+  --shadow-card: 0 16px 36px rgba(0, 0, 0, 0.42);
+  --shadow-popup: 0 20px 52px rgba(0, 0, 0, 0.54);
+  --shadow-glass: 0 10px 28px rgba(0, 0, 0, 0.44), inset 0 0 0.5px rgba(240, 246, 252, 0.12);
+  --shadow-glass-hover: 0 14px 34px rgba(0, 0, 0, 0.54);
+  --shadow-glass-inset: inset 0 0 0.5px rgba(240, 246, 252, 0.16), 0 10px 28px rgba(0, 0, 0, 0.48), 0 0 0 0.5px rgba(240, 246, 252, 0.06);
 }

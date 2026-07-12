@@ -40,7 +40,7 @@
             type="button"
             class="close-btn close-btn-lg close-btn-inline"
             :aria-label="t('common.button.close')"
-            @click="isModalOpen = false"
+            @click="closeModal"
           >
             ×
           </button>
@@ -374,7 +374,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RecycleScroller } from 'vue-virtual-scroller'
 import AppModal from '@/components/common/AppModal.vue'
@@ -482,9 +482,16 @@ const emit = defineEmits([
 const { t } = useI18n()
 const isExporting = ref(false)
 
-const isModalOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+const isModalOpen = ref(false)
+
+watch(() => props.modelValue, (val) => {
+  isModalOpen.value = val
+}, { immediate: true })
+
+watch(isModalOpen, (val) => {
+  if (val !== props.modelValue) {
+    emit('update:modelValue', val)
+  }
 })
 
 const sheetOptions = computed(() => props.sheets.map((sheet) => ({
@@ -544,6 +551,10 @@ async function handleExport() {
   }
 }
 
+function closeModal() {
+  isModalOpen.value = false
+}
+
 function handleCancel() {
   isModalOpen.value = false
   emit('reset')
@@ -595,7 +606,7 @@ $warning-orange: var(--color-warning-dark);
 
 $panel-gap: 16px;
 $section-gap: 12px;
-$preview-padding: 12px;
+$preview-padding: 10px;
 $preview-panel-padding: 12px;
 $preview-row-height: 40px;
 $preview-min-column-width: 120px;
@@ -704,7 +715,7 @@ $preview-min-column-width: 120px;
   }
 
   &__toolbar-item {
-    flex-direction: column;
+    // flex-direction: column;
     gap: 8px;
 
     &--compact {
@@ -715,6 +726,7 @@ $preview-min-column-width: 120px;
   &__toolbar-label {
     color: $text-secondary;
     font-size: 13px;
+    align-self: center;
   }
 
   &__toolbar-meta {
@@ -895,6 +907,7 @@ $preview-min-column-width: 120px;
       color: $text-primary;
       font-weight: 600;
       white-space: nowrap;
+      border-bottom: 0.5px solid var(--text-lightest);
     }
   }
 
