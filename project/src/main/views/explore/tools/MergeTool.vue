@@ -91,6 +91,7 @@
             :source="referencePreviewSource"
             :file="pendingReferenceFile"
             :schema="referenceImportSchema"
+            :mapping-enabled="!isDefaultReferencePreview"
             :loading="referencePreviewState.loading.value"
             :preview-table="referencePreviewState.previewTable.value"
             :diagnostics="referencePreviewState.diagnostics.value"
@@ -464,6 +465,7 @@ const referencePreviewSource = computed(() => {
     downloadable: true
   }
 })
+const isDefaultReferencePreview = computed(() => referencePreviewSource.value?.kind === 'preset')
 const referenceImportSummary = computed(() => {
   if (!referenceImportPayload.value) {
     return ''
@@ -621,6 +623,14 @@ const nextStep = () => {
 const handleReferenceConfirm = async () => {
   if (referenceFile.value) {
     nextStep()
+    return
+  }
+
+  if (isDefaultReferencePreview.value) {
+    await setReferenceFile(pendingReferenceFile.value)
+    if (referenceFile.value) {
+      nextStep()
+    }
     return
   }
 

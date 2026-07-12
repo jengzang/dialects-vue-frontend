@@ -33,6 +33,26 @@ describe('tabular import preview modal shell', () => {
     expect(source).toContain('v-model="isModalOpen"')
     expect(source).toContain('<template #footer>')
     expect(source).toContain("emit('confirm')")
+    expect(source).toContain('mappingEnabled')
+    expect(source).toContain('v-if="mappingEnabled"')
+    expect(source).toContain(':disabled="mappingEnabled && !diagnostics.isComplete"')
+  })
+
+  it('keeps import preview responsive styles orientation-based and tokenized', () => {
+    const source = readSource(previewPath)
+
+    expect(source).not.toMatch(/@media\s*\(\s*(?:max|min)-width/i)
+    expect(source).toContain('@media (orientation: portrait)')
+    expect(source).toContain('border-radius: var(--radius-xl)')
+    expect(source).toContain('border-radius: var(--radius-lg)')
+    expect(source).not.toContain('@mixin flex-column')
+    expect(source).not.toContain('$primary-blue')
+  })
+
+  it('keeps the import preview table panel stretched across available space', () => {
+    const source = readSource(previewPath)
+
+    expect(source).toMatch(/&__preview\s*\{[^}]*flex:\s*1 1 0/s)
   })
 
   it('keeps import preview callers wired to the component modal instead of inline actions', () => {
@@ -69,6 +89,18 @@ describe('tabular import preview modal shell', () => {
     expect(source).toContain('forceReferencePreview.value || requireExplicitConfirmation.value')
     expect(source).toContain('forceReferencePreview.value = true')
     expect(source).toContain("showError(t('tools.merge.messages.readDefaultFailed'")
+  })
+
+  it('keeps the MergeTool default reference preview out of manual column mapping', () => {
+    const source = readSource(mergeToolPath)
+
+    expect(source).toContain('const isDefaultReferencePreview = computed(')
+    expect(source).toContain(':mapping-enabled="!isDefaultReferencePreview"')
+    expect(source).toContain('if (isDefaultReferencePreview.value) {')
+    expect(source).toContain('await setReferenceFile(pendingReferenceFile.value)')
+    expect(source).not.toContain('defaultReferenceDiagnostics')
+    expect(source).not.toContain('referencePreviewDiagnostics')
+    expect(source).not.toContain('referencePreviewSchema')
   })
 
   it('adds the default reference export label to all tool locales', () => {

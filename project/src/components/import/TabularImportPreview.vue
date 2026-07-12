@@ -91,7 +91,7 @@
         </div>
 
         <div v-else class="tabular-import-preview__body">
-          <div class="tabular-import-preview__mapping main-glass-panel-inner">
+          <div v-if="mappingEnabled" class="tabular-import-preview__mapping main-glass-panel-inner">
             <div class="tabular-import-preview__section-head">
               <div>
                 <h4>{{ t('common.importPreview.mapping.title') }}</h4>
@@ -183,7 +183,7 @@
         class="main-glass-button"
         data-variant="primary"
         type="button"
-        :disabled="!diagnostics.isComplete"
+        :disabled="mappingEnabled && !diagnostics.isComplete"
         @click="emit('confirm')"
       >
         {{ t('common.importPreview.actions.confirmAndUse') }}
@@ -265,7 +265,7 @@
       </div>
 
       <div v-else class="tabular-import-preview__body">
-        <div class="tabular-import-preview__mapping main-glass-panel-inner">
+        <div v-if="mappingEnabled" class="tabular-import-preview__mapping main-glass-panel-inner">
           <div class="tabular-import-preview__section-head">
             <div>
               <h4>{{ t('common.importPreview.mapping.title') }}</h4>
@@ -433,6 +433,10 @@ const props = defineProps({
   embedded: {
     type: Boolean,
     default: false
+  },
+  mappingEnabled: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -527,18 +531,14 @@ $text-secondary: rgba(var(--text-deep-rgb), 0.68);
 $text-muted: rgba(var(--text-deep-rgb), 0.58);
 $text-light: rgba(var(--text-deep-rgb), 0.55);
 
-$primary-blue: var(--color-primary);
 $success-green: var(--color-success);
 $warning-orange: var(--color-warning-dark);
 
 $panel-gap: 16px;
 $section-gap: 12px;
 
-@mixin flex-column {
-  @include flex-col;
-}
 .tabular-import-preview {
-  @include flex-column;
+  @include flex-col;
 
   gap: $panel-gap;
   padding: 18px;
@@ -591,7 +591,7 @@ $section-gap: 12px;
     padding: 20px;
     background: var(--glass-40);
     border: 1px dashed rgba(var(--color-primary-rgb), 0.22);
-    border-radius: 18px;
+    border-radius: var(--radius-xl);
 
     &-icon {
       font-size: 36px;
@@ -656,7 +656,7 @@ $section-gap: 12px;
 
   &__mapping,
   &__preview {
-    @include flex-column;
+    @include flex-col;
 
     gap: 14px;
     padding: 16px;
@@ -666,6 +666,10 @@ $section-gap: 12px;
   &__preview,
   &__table-wrap {
     min-width: 0;
+  }
+
+  &__preview {
+    flex: 1 1 0;
   }
 
   &__section-head {
@@ -705,7 +709,7 @@ $section-gap: 12px;
     padding: 12px;
     background: var(--glass-35);
     border: 1px solid var(--glass-30);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   &__mapping-meta {
@@ -750,7 +754,7 @@ $section-gap: 12px;
   &__table-wrap {
     overflow: auto;
     border: 1px solid var(--glass-30);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   &__table {
@@ -838,7 +842,7 @@ $section-gap: 12px;
   }
 }
 
-@media (max-width: 960px) {
+@media (orientation: portrait) {
   .tabular-import-preview {
     &__body,
     &__mapping-row,
