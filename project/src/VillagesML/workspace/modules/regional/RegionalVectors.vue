@@ -465,13 +465,13 @@ const renderComparisonChart = () => {
         name: region1.value,
         type: 'bar',
         data: comparisonData.value.region1_vector || [],
-        itemStyle: { color: 'var(--vml-blue)' }
+        itemStyle: { color: '#4a90e2' }
       },
       {
         name: region2.value,
         type: 'bar',
         data: comparisonData.value.region2_vector || [],
-        itemStyle: { color: 'var(--color-success)' }
+        itemStyle: { color: '#34c759' }
       }
     ]
   })
@@ -534,7 +534,7 @@ const renderHeatmap = () => {
       left: 'center',
       bottom: isMobile ? '2%' : '5%',
       inRange: {
-        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', 'var(--color-error)', 'var(--color-error-dark)']
+        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d32f2f', '#962020']
       }
     },
     series: [{
@@ -598,8 +598,8 @@ const renderScatterPlot = () => {
       data: scatterData,
       symbolSize: isMobile ? 15 : 20,
       itemStyle: {
-        color: 'var(--vml-blue)',
-        borderColor: 'var(--vml-blue-darker)',
+        color: '#4a90e2',
+        borderColor: '#357abd',
         borderWidth: 2
       },
       label: {
@@ -611,7 +611,7 @@ const renderScatterPlot = () => {
       emphasis: {
         itemStyle: {
           shadowBlur: 10,
-          shadowColor: 'rgba(var(--vml-blue-rgb), 0.5)'
+          shadowColor: 'rgba(74, 144, 226, 0.5)'
         }
       }
     }]

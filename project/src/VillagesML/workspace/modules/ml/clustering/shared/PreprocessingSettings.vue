@@ -58,7 +58,7 @@ function updateSetting(key, value) {
 }
 </script>
 
-
+<style scoped lang="scss">
 .section-title {
   font-size: 1rem;
   font-weight: 600;
@@ -94,4 +94,4 @@ function updateSetting(key, value) {
   color: var(--text-tertiary);
   font-style: italic;
 }
-
+</style>

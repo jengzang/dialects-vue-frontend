@@ -121,13 +121,13 @@ function toggleNode(level, key) {
 }
 
 const levelColors = {
-  city:     ['var(--color-error)', 'var(--vml-blue-medium)', 'var(--color-success)', 'var(--color-warning)', 'var(--color-purple)'],
-  county:   ['var(--color-warning)', 'var(--color-teal)', 'var(--color-error)', 'var(--vml-blue-medium)', 'var(--color-warning)', 'var(--color-purple)', 'var(--color-success)', 'var(--text-deep)', 'var(--color-teal)', 'var(--color-error-dark)'],
-  township: ['var(--vml-blue)', 'var(--color-success)', 'var(--color-warning)', 'var(--color-error)', 'var(--color-purple)', 'var(--color-teal)', 'var(--color-warning)', 'var(--vml-blue-medium)', 'var(--color-success)', 'var(--text-deep)']
+  city:     ['#d32f2f', '#3498db', '#34c759', '#ff9500', '#5856d6'],
+  county:   ['#ff9500', '#00887a', '#d32f2f', '#3498db', '#ff9500', '#5856d6', '#34c759', '#0b2540', '#00887a', '#962020'],
+  township: ['#4a90e2', '#34c759', '#ff9500', '#d32f2f', '#5856d6', '#00887a', '#ff9500', '#3498db', '#34c759', '#0b2540']
 }
 
 function levelColor(level, clusterId) {
-  if (clusterId === -1) return 'var(--text-secondary)'
+  if (clusterId === -1) return '#86868b'
   const palette = levelColors[level] || levelColors.township
   return palette[clusterId % palette.length]
 }

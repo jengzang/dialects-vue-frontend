@@ -360,10 +360,10 @@ const loadHotspotsLayer = async () => {
           50, 18,
           100, 28
         ],
-        'circle-color': 'var(--color-error-light)',
+        'circle-color': '#ff3b30',
         'circle-opacity': 0.3,
         'circle-stroke-width': 3,
-        'circle-stroke-color': 'var(--color-error-light)',
+        'circle-stroke-color': '#ff3b30',
         'circle-stroke-opacity': 0.8
       }
     })
@@ -418,7 +418,7 @@ const loadClustersLayer = async () => {
           1000, 14,
           10000, 18
         ],
-        'circle-color': 'var(--vml-blue)',
+        'circle-color': '#4a90e2',
         'circle-opacity': 0.5,
         'circle-stroke-width': 2,
         'circle-stroke-color': '#ffffff'
@@ -503,7 +503,7 @@ const loadNgramsLayer = async () => {
         ],
         'circle-color': [
           'interpolate', ['linear'], ['get', 'tendency_score'],
-          0, '#90EE90', 1, 'var(--color-success)', 2, 'var(--color-success-green)'
+          0, '#90EE90', 1, '#34c759', 2, 'green'
         ],
         'circle-opacity': 0.5,
         'circle-stroke-width': 2,
@@ -595,7 +595,7 @@ const loadCharactersLayer = async () => {
           0, 'rgba(0, 0, 255, 0)',
           0.2, 'rgba(0, 0, 255, 0.5)',
           0.4, 'rgba(100, 149, 237, 0.7)',
-          0.6, 'var(--glass-80)',
+          0.6, 'rgba(255, 255, 255, 0.80)',
           0.8, 'rgba(255, 107, 107, 0.7)',
           1, 'rgba(255, 0, 0, 0.9)'
         ],
@@ -619,11 +619,11 @@ const loadCharactersLayer = async () => {
         'circle-radius': 4,
         'circle-color': [
           'interpolate', ['linear'], ['get', 'lift'],
-          0, 'var(--color-primary)',
+          0, '#007aff',
           0.5, '#6495ed',
           1, '#ffffff',
-          2, 'var(--color-error-light)',
-          4, 'var(--color-error-light)'
+          2, '#ff3b30',
+          4, '#ff3b30'
         ],
         'circle-opacity': 0.4,
         'circle-stroke-width': 2,

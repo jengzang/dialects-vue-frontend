@@ -174,6 +174,7 @@ const clearFilters = () => {
 
 .search-button {
   padding: 12px 24px;
+  max-width: 100px;
   white-space: nowrap;
 }
 

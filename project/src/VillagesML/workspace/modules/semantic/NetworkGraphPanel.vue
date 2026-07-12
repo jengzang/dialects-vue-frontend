@@ -73,16 +73,16 @@ const getCategoryName = (category) => getCategoryDisplayName(category, props.det
 
 // 社区颜色映射
 const communityColors = [
-  'var(--vml-blue)', // 蓝色
-  'var(--color-success)', // 绿色
-  'var(--color-warning)', // 橙色
-  'var(--color-error)', // 红色
-  'var(--color-purple)', // 紫色
-  'var(--color-teal)', // 青色
-  'var(--color-warning)', // 深橙
-  'var(--vml-blue-medium)', // 天蓝
-  'var(--color-success)', // 翠绿
-  'var(--color-gold)'  // 黄色
+  '#4a90e2', // 蓝色
+  '#34c759', // 绿色
+  '#ff9500', // 橙色
+  '#d32f2f', // 红色
+  '#5856d6', // 紫色
+  '#00887a', // 青色
+  '#ff9500', // 深橙
+  '#3498db', // 天蓝
+  '#34c759', // 翠绿
+  '#ffd700'  // 黄色
 ]
 
 const getCommunityColor = (communityId) => {
@@ -121,7 +121,7 @@ const transformNodes = (nodes, communities) => {
       symbolSize: normalizedSize,
       value: node.degree,
       itemStyle: {
-        color: communityId !== undefined ? getCommunityColor(communityId) : 'var(--text-secondary)'
+        color: communityId !== undefined ? getCommunityColor(communityId) : '#86868b'
       },
       label: {
         show: true,

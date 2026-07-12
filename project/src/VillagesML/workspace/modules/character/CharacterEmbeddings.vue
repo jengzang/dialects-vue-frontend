@@ -236,7 +236,7 @@ const renderVizChart = () => {
       name: searchChar.value,
       value: 1,
       symbolSize: 60,
-      itemStyle: { color: 'var(--vml-blue)' },
+      itemStyle: { color: '#4a90e2' },
       label: { fontSize: 20, fontWeight: 'bold' }
     },
     ...filteredSimilarities.map((item, index) => ({
@@ -358,6 +358,8 @@ onBeforeUnmount(() => {
 
 .search-group {
   display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 12px;
   flex: 1;
 }
@@ -379,6 +381,7 @@ onBeforeUnmount(() => {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  max-width: 100px;
 }
 
 .search-button:hover:not(:disabled) {

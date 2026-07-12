@@ -555,7 +555,7 @@ export default {
           left: 'center',
           bottom: '5%',
           inRange: {
-            color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', 'var(--color-error)', 'var(--color-error-dark)']
+            color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d32f2f', '#962020']
           }
         },
         series: [{

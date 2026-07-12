@@ -452,6 +452,7 @@ onMounted(() => {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  max-width: 100px;
 }
 
 .search-button:hover {

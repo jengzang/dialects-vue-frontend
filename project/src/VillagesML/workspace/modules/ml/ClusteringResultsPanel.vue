@@ -193,12 +193,12 @@ const selectedProfile = ref(null)
 
 // Cluster color mapping
 const clusterColors = [
-  'var(--vml-blue)', 'var(--color-success)', 'var(--color-warning)', 'var(--color-error)', 'var(--color-purple)',
-  'var(--color-teal)', 'var(--text-deep)', 'var(--color-warning)', 'var(--vml-blue-medium)', 'var(--color-success)'
+  '#4a90e2', '#34c759', '#ff9500', '#d32f2f', '#5856d6',
+  '#00887a', '#0b2540', '#ff9500', '#3498db', '#34c759'
 ]
 
 const getClusterColor = (clusterId) => {
-  if (clusterId === -1) return 'var(--text-secondary)' // gray for noise
+  if (clusterId === -1) return '#86868b' // gray for noise
   return clusterColors[clusterId % clusterColors.length]
 }
 

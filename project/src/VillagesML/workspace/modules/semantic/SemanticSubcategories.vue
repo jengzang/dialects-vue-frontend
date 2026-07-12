@@ -406,24 +406,24 @@ export default {
           splitNumber: 5,
           name: {
             textStyle: {
-              color: 'var(--text-dark)',
+              color: '#333',
               fontSize: 12
             }
           },
           splitLine: {
             lineStyle: {
-              color: 'rgba(var(--vml-blue-rgb), 0.2)'
+              color: 'rgba(74, 144, 226, 0.2)'
             }
           },
           splitArea: {
             show: true,
             areaStyle: {
-              color: ['rgba(var(--vml-blue-rgb), 0.05)', 'rgba(var(--vml-blue-rgb), 0.1)']
+              color: ['rgba(74, 144, 226, 0.05)', 'rgba(74, 144, 226, 0.1)']
             }
           },
           axisLine: {
             lineStyle: {
-              color: 'rgba(var(--vml-blue-rgb), 0.3)'
+              color: 'rgba(74, 144, 226, 0.3)'
             }
           }
         },
@@ -434,14 +434,14 @@ export default {
             value: data,
             name: regionalData.value.region_name,
             areaStyle: {
-              color: 'rgba(var(--vml-blue-rgb), 0.3)'
+              color: 'rgba(74, 144, 226, 0.3)'
             },
             lineStyle: {
-              color: 'var(--vml-blue)',
+              color: '#4a90e2',
               width: 2
             },
             itemStyle: {
-              color: 'var(--vml-blue)'
+              color: '#4a90e2'
             }
           }]
         }]
@@ -521,7 +521,7 @@ export default {
           data: values,
           itemStyle: {
             color: (params) => {
-              const colors = ['var(--color-error)', '#f46d43', '#fdae61', '#fee090', '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']
+              const colors = ['#d32f2f', '#f46d43', '#fdae61', '#fee090', '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']
               return colors[Math.min(params.dataIndex, colors.length - 1)]
             }
           },

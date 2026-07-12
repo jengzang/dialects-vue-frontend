@@ -213,7 +213,7 @@ const renderHotspot = () => {
       },
       'circle-color': 'rgba(255, 100, 100, 0.2)',
       'circle-stroke-width': 2,
-      'circle-stroke-color': 'var(--color-error-light)'
+      'circle-stroke-color': '#ff3b30'
     }
   })
 
@@ -248,7 +248,7 @@ const renderHotspot = () => {
       source: 'villages-source',
       paint: {
         'circle-radius': 6,
-        'circle-color': 'var(--vml-blue)',
+        'circle-color': '#4a90e2',
         'circle-stroke-width': 2,
         'circle-stroke-color': '#ffffff'
       }
@@ -317,7 +317,7 @@ const resetView = () => {
 }
 </script>
 
-
+<style scoped lang="scss">
 .hotspot-map-container {
   width: 100%;
   height: 500px;
@@ -525,4 +525,4 @@ const resetView = () => {
   color: var(--text-dark);
   flex: 1;
 }
-
+</style>

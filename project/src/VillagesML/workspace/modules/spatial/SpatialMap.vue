@@ -205,7 +205,7 @@ const renderMultipleLayers = () => {
         source: sourceId,
         paint: layer.paint || {
           'circle-radius': 6,
-          'circle-color': 'var(--vml-blue)',
+          'circle-color': '#4a90e2',
           'circle-opacity': 0.7
         }
       })
@@ -276,7 +276,7 @@ const showPopup = (feature, lngLat) => {
       <p style="margin: 4px 0;"><strong>空間一致性:</strong> ${props.spatial_coherence?.toFixed(3)}</p>
       <p style="margin: 4px 0;"><strong>主要城市:</strong> ${props.dominant_city || 'N/A'}</p>
       <p style="margin: 4px 0;"><strong>主要區縣:</strong> ${props.dominant_county || 'N/A'}</p>
-      ${props.is_significant ? '<p style="margin: 4px 0; color: var(--color-gold); font-weight: bold;">✨ 統計顯著</p>' : ''}
+      ${props.is_significant ? '<p style="margin: 4px 0; color: #ffd700; font-weight: bold;">✨ 統計顯著</p>' : ''}
       ${props.avg_p_value ? `<p style="margin: 4px 0;"><strong>P值:</strong> ${props.avg_p_value?.toFixed(4)}</p>` : ''}
     `
   } else if (props.type === 'village') {
@@ -424,7 +424,7 @@ const renderHotspot = () => {
       },
       'circle-color': 'rgba(255, 100, 100, 0.2)',
       'circle-stroke-width': 2,
-      'circle-stroke-color': 'var(--color-error-light)'
+      'circle-stroke-color': '#ff3b30'
     }
   })
 
@@ -460,7 +460,7 @@ const renderHotspot = () => {
       source: 'villages-source',
       paint: {
         'circle-radius': 6,
-        'circle-color': 'var(--vml-blue)',
+        'circle-color': '#4a90e2',
         'circle-stroke-width': 2,
         'circle-stroke-color': '#ffffff'
       }
@@ -550,7 +550,7 @@ const renderClusters = () => {
         10000, 20,
         100000, 30
       ],
-      'circle-color': 'var(--vml-blue)',
+      'circle-color': '#4a90e2',
       'circle-opacity': 0.7,
       'circle-stroke-width': 2,
       'circle-stroke-color': '#ffffff'
@@ -650,7 +650,7 @@ const renderPoints = () => {
     source: 'points-source',
     paint: {
       'circle-radius': 6,
-      'circle-color': 'var(--vml-blue)',
+      'circle-color': '#4a90e2',
       'circle-stroke-width': 2,
       'circle-stroke-color': '#ffffff'
     }
@@ -699,12 +699,12 @@ const resetView = () => {
 }
 </script>
 
-
+<style scoped lang="scss">
 .spatial-map-container {
   width: 100%;
   height: 100%;
   position: relative;
-  border-radius: var(--radius-md);
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -734,9 +734,10 @@ const resetView = () => {
   background: var(--glass-80);
   backdrop-filter: blur(12px);
   padding: 12px;
-  border-radius: var(--radius-md);
+  border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  @include flex-col;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   z-index: 10;
   width: 160px;
@@ -758,7 +759,7 @@ const resetView = () => {
   background: white;
   border: 1px solid var(--border-light-gray);
   padding: 8px 12px;
-  border-radius: var(--radius-sm2);
+  border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
   outline: none;
@@ -791,7 +792,7 @@ const resetView = () => {
   color: white;
   border: none;
   padding: 8px;
-  border-radius: var(--radius-sm2);
+  border-radius: 8px;
   cursor: pointer;
   font-size: 13px;
   transition: background 0.2s;
@@ -839,7 +840,8 @@ const resetView = () => {
   position: absolute;
   inset: 0;
   background: var(--glass-80);
-  @include flex-col;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -847,6 +849,4 @@ const resetView = () => {
   font-weight: 500;
   color: var(--text-medium);
 }
-
-
-
+</style>

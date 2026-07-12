@@ -917,8 +917,8 @@ const renderAggregationChart = () => {
       data: values,
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: 'var(--vml-blue)' },
-          { offset: 1, color: 'var(--color-success)' }
+          { offset: 0, color: '#4a90e2' },
+          { offset: 1, color: '#34c759' }
         ])
       }
     }]

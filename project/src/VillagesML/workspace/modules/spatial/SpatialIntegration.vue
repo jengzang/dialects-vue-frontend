@@ -471,7 +471,7 @@ const charMapLayers = computed(() => {
       'circle-stroke-color': [
         'case',
         ['==', ['get', 'is_significant'], 1],
-        'var(--color-gold)',
+        '#ffd700',
         '#ffffff'
       ]
     }
@@ -522,10 +522,10 @@ const clusterMapLayers = computed(() => {
         500, 30,
         1000, 35
       ],
-      'circle-color': 'rgba(var(--vml-blue-rgb), 0.6)',
+      'circle-color': 'rgba(74, 144, 226, 0.6)',
       'circle-opacity': 0.7,
       'circle-stroke-width': 3,
-      'circle-stroke-color': 'var(--vml-blue)'
+      'circle-stroke-color': '#4a90e2'
     }
   }]
 })
@@ -623,24 +623,24 @@ const handlePointClick = (properties) => {
 
 // 根据倾向性值返回颜色
 const getTendencyColor = (tendency) => {
-  if (!tendency) return 'var(--text-tertiary)'
-  if (tendency > 1) return 'var(--color-success-green)'  // 深绿色（高倾向性）
-  if (tendency > 0.5) return 'var(--color-success)'  // 绿色
+  if (!tendency) return '#666'
+  if (tendency > 1) return 'green'  // 深绿色（高倾向性）
+  if (tendency > 0.5) return '#34c759'  // 绿色
   if (tendency > 0) return '#90EE90'  // 浅绿色
-  if (tendency > -0.5) return 'var(--color-error-light)'  // 浅红色
-  if (tendency > -1) return 'var(--color-error)'  // 红色
-  return 'var(--color-error-dark)'  // 深红色（低倾向性）
+  if (tendency > -0.5) return '#ff3b30'  // 浅红色
+  if (tendency > -1) return '#d32f2f'  // 红色
+  return '#962020'  // 深红色（低倾向性）
 }
 
 // 根据偏差值返回颜色
 const getDeviationColor = (deviation) => {
-  if (!deviation) return 'var(--text-tertiary)'
-  if (deviation > 0.5) return 'var(--color-success-green)'  // 深绿色（正偏差）
-  if (deviation > 0.2) return 'var(--color-success)'  // 绿色
+  if (!deviation) return '#666'
+  if (deviation > 0.5) return 'green'  // 深绿色（正偏差）
+  if (deviation > 0.2) return '#34c759'  // 绿色
   if (deviation > 0) return '#90EE90'  // 浅绿色
-  if (deviation > -0.2) return 'var(--color-error-light)'  // 浅红色
-  if (deviation > -0.5) return 'var(--color-error)'  // 红色
-  return 'var(--color-error-dark)'  // 深红色（负偏差）
+  if (deviation > -0.2) return '#ff3b30'  // 浅红色
+  if (deviation > -0.5) return '#d32f2f'  // 红色
+  return '#962020'  // 深红色（负偏差）
 }
 
 // 监听 queryMode 变化，自动加载对应数据

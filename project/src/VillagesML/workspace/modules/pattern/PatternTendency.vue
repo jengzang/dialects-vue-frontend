@@ -133,16 +133,16 @@ const getTendencyClass = (zScore) => {
 
 const getBarColor = (zScore) => {
   const absZ = Math.abs(zScore)
-  if (absZ >= 2) return 'var(--color-warning)'
-  if (absZ >= 1) return 'var(--color-gold)'
-  return 'var(--color-primary)'
+  if (absZ >= 2) return '#ff9500'
+  if (absZ >= 1) return '#ffd700'
+  return '#007aff'
 }
 
 const getZScoreColor = (zScore) => {
   const absZ = Math.abs(zScore)
-  if (absZ >= 2) return 'var(--color-warning)'
-  if (absZ >= 1) return 'var(--color-warning)'
-  return 'var(--color-primary)'
+  if (absZ >= 2) return '#ff9500'
+  if (absZ >= 1) return '#ff9500'
+  return '#007aff'
 }
 
 // Initialize from URL query and watch for changes

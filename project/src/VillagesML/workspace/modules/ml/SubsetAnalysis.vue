@@ -1048,7 +1048,7 @@ const renderComparisonChart = () => {
   }))
 
   comparisonChartInstance.setOption({
-    title: { text: '子集語義特徵比較', left: 'center', textStyle: { color: 'var(--text-deep)', fontWeight: 600 } },
+    title: { text: '子集語義特徵比較', left: 'center', textStyle: { color: '#0b2540', fontWeight: 600 } },
     tooltip: {
       trigger: 'item',
       formatter: (params) => {
@@ -1074,13 +1074,13 @@ const renderComparisonChart = () => {
         {
           value: groupAValues,
           name: '子集 A',
-          itemStyle: { color: 'var(--vml-blue)' },
-          areaStyle: { color: 'rgba(var(--vml-blue-rgb), 0.3)' }
+          itemStyle: { color: '#4a90e2' },
+          areaStyle: { color: 'rgba(74, 144, 226, 0.3)' }
         },
         {
           value: groupBValues,
           name: '子集 B',
-          itemStyle: { color: 'var(--color-warning)' },
+          itemStyle: { color: '#ff9500' },
           areaStyle: { color: 'rgba(255, 152, 0, 0.3)' }
         }
       ]

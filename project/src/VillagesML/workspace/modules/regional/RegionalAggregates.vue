@@ -396,7 +396,7 @@ function renderSpatialChart() {
         formatter: p => p.data.name,
         position: 'top',
         fontSize: 11,
-        color: 'var(--text-medium)'
+        color: '#555'
       },
       emphasis: { scale: 1.2 }
     }]
