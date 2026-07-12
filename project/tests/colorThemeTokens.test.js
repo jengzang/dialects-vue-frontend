@@ -23,6 +23,8 @@ const mapLibrePath = resolve(projectRoot, 'src/main/components/map/MapLibre.vue'
 const countphosPath = resolve(projectRoot, 'src/main/components/pho/Countphos.vue')
 const regionSelectorPath = resolve(projectRoot, 'src/main/components/geo/RegionSelector.vue')
 const jyut2IpaToolPath = resolve(projectRoot, 'src/main/views/explore/tools/Jyut2IpaTool.vue')
+const simpleDropdownPath = resolve(projectRoot, 'src/components/selector/SimpleDropdown.vue')
+const multiSelectDropdownPath = resolve(projectRoot, 'src/components/selector/MultiSelectDropdown.vue')
 
 function readSource(path) {
   return readFileSync(path, 'utf8')
@@ -142,6 +144,25 @@ describe('color theme token coverage', () => {
     expect(readSource(countphosPath)).not.toContain('color: #35679b;')
     expect(readSource(regionSelectorPath)).not.toContain('color: rgba(0, 0, 0, 0.55);')
     expect(readSource(jyut2IpaToolPath)).not.toContain('color: #1e40af;')
+  })
+
+  it('uses theme-aware text and border tokens in selector dropdowns', () => {
+    const simpleDropdownSource = readSource(simpleDropdownPath)
+    const multiSelectDropdownSource = readSource(multiSelectDropdownPath)
+
+    for (const source of [simpleDropdownSource, multiSelectDropdownSource]) {
+      expect(source).not.toContain('$text-primary: rgba(0, 0, 0')
+      expect(source).not.toContain('$text-secondary: rgba(0, 0, 0')
+      expect(source).not.toContain('$text-muted: rgba(0, 0, 0')
+      expect(source).not.toContain('$divider-color: rgba(0, 0, 0')
+      expect(source).not.toContain('border: 1px solid rgba(0, 0, 0, 0.15);')
+      expect(source).toContain('$text-primary: var(--text-primary);')
+      expect(source).toContain('$text-muted: var(--text-muted);')
+      expect(source).toContain('$divider-color: var(--border-light);')
+      expect(source).toContain('border: 1px solid var(--border-control);')
+    }
+
+    expect(multiSelectDropdownSource).toContain('$text-secondary: var(--text-secondary);')
   })
 
   it('gives the sidebar shell dedicated theme-aware glass surface tokens', () => {

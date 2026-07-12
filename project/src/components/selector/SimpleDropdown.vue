@@ -300,9 +300,9 @@ watch(searchQuery, () => {
 
 $primary-blue: var(--color-primary-hover);
 $active-background: var(--bg-blue-light);
-$text-primary: rgba(0, 0, 0, 0.85);
-$text-muted: rgba(0, 0, 0, 0.45);
-$divider-color: rgba(0, 0, 0, 0.08);
+$text-primary: var(--text-primary);
+$text-muted: var(--text-muted);
+$divider-color: var(--border-light);
 $transition-fast: 0.2s;
 
 /*
@@ -329,14 +329,19 @@ $transition-fast: 0.2s;
 .search-input {
   width: 100%;
   padding: 6px 10px;
+  color: $text-primary;
   font-size: 13px;
   background: var(--glass-90);
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border-control);
   border-radius: var(--radius-sm);
   outline: none;
 
   &:focus {
     border-color: rgba(var(--color-primary-rgb), 0.5);
+  }
+
+  &::placeholder {
+    color: $text-muted;
   }
 }
 
