@@ -541,6 +541,7 @@ $section-gap: 12px;
   @include flex-col;
 
   gap: $panel-gap;
+  min-height: 0;
   padding: 18px;
 
   &__header,
@@ -652,6 +653,7 @@ $section-gap: 12px;
   &__body {
     gap: $panel-gap;
     align-items: stretch;
+    min-height: 0;
   }
 
   &__mapping,
@@ -670,6 +672,7 @@ $section-gap: 12px;
 
   &__preview {
     flex: 1 1 0;
+    min-height: 0;
   }
 
   &__section-head {
@@ -752,6 +755,8 @@ $section-gap: 12px;
   }
 
   &__table-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
     overflow: auto;
     border: 1px solid var(--glass-30);
     border-radius: var(--radius-lg);

@@ -55,6 +55,15 @@ describe('tabular import preview modal shell', () => {
     expect(source).toMatch(/&__preview\s*\{[^}]*flex:\s*1 1 0/s)
   })
 
+  it('keeps the import preview table constrained so its own scrollbar can work', () => {
+    const source = readSource(previewPath)
+
+    expect(source).toMatch(/\.tabular-import-preview\s*\{[^}]*min-height:\s*0/s)
+    expect(source).toMatch(/&__body\s*\{[^}]*min-height:\s*0/s)
+    expect(source).toMatch(/&__preview\s*\{[^}]*min-height:\s*0/s)
+    expect(source).toMatch(/&__table-wrap\s*\{[^}]*flex:\s*1 1 auto[^}]*min-height:\s*0[^}]*overflow:\s*auto/s)
+  })
+
   it('keeps import preview callers wired to the component modal instead of inline actions', () => {
     const checkTool = readSource(checkToolPath)
     const mergeTool = readSource(mergeToolPath)
