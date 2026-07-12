@@ -73,7 +73,16 @@ describe('tabular import preview modal shell', () => {
     expect(source).toContain('class="tabular-import-preview__table-scroller ui-scrollbar"')
     expect(source).toContain('class="tabular-import-preview__table-header"')
     expect(source).toContain('class="tabular-import-preview__table-row"')
+    expect(source).toMatch(/&__table-scroller\s*\{[^}]*height:\s*calc\(100% - #\{\$preview-row-height\}\)/s)
+    expect(source).toMatch(/&__table-header\s*\{[^}]*height:\s*\$preview-row-height/s)
     expect(source).not.toContain('<tbody>')
+  })
+
+  it('keeps preview copy out of the table panel chrome', () => {
+    const source = readSource(previewPath)
+
+    expect(source).not.toContain("t('common.importPreview.preview.title')")
+    expect(source).not.toContain("t('common.importPreview.preview.description')")
   })
 
   it('keeps the import preview table panel stretched across available space', () => {

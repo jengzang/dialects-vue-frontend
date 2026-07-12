@@ -145,50 +145,43 @@
           </div>
 
           <div class="tabular-import-preview__preview main-glass-panel-inner">
-            <div class="tabular-import-preview__section-head">
-              <div>
-                <h4>{{ t('common.importPreview.preview.title') }}</h4>
-                <p>{{ t('common.importPreview.preview.description') }}</p>
-              </div>
-            </div>
-
-          <div class="tabular-import-preview__table-wrap ui-scrollbar" :style="tableStyle">
-            <div class="tabular-import-preview__table">
-              <div class="tabular-import-preview__table-header">
-                <div
-                  v-for="column in previewTable.sourceColumns"
-                  :key="column.key"
-                  class="tabular-import-preview__table-cell tabular-import-preview__table-cell--head"
-                >
-                  {{ column.label }}
-                </div>
-              </div>
-
-              <RecycleScroller
-                v-if="virtualPreviewRows.length"
-                v-slot="{ item: row }"
-                :items="virtualPreviewRows"
-                :item-size="40"
-                :buffer="200"
-                key-field="__rowKey"
-                class="tabular-import-preview__table-scroller ui-scrollbar"
-              >
-                <div class="tabular-import-preview__table-row">
+            <div class="tabular-import-preview__table-wrap ui-scrollbar" :style="tableStyle">
+              <div class="tabular-import-preview__table">
+                <div class="tabular-import-preview__table-header">
                   <div
-                    v-for="(cell, cellIndex) in row.cells"
-                    :key="`${row.__rowKey}-${cellIndex}`"
-                    class="tabular-import-preview__table-cell"
+                    v-for="column in previewTable.sourceColumns"
+                    :key="column.key"
+                    class="tabular-import-preview__table-cell tabular-import-preview__table-cell--head"
                   >
-                    {{ cell || '—' }}
+                    {{ column.label }}
                   </div>
                 </div>
-              </RecycleScroller>
 
-              <div v-else class="tabular-import-preview__table-empty">
-                {{ t('common.importPreview.preview.empty') }}
+                <RecycleScroller
+                  v-if="virtualPreviewRows.length"
+                  v-slot="{ item: row }"
+                  :items="virtualPreviewRows"
+                  :item-size="40"
+                  :buffer="200"
+                  key-field="__rowKey"
+                  class="tabular-import-preview__table-scroller ui-scrollbar"
+                >
+                  <div class="tabular-import-preview__table-row">
+                    <div
+                      v-for="(cell, cellIndex) in row.cells"
+                      :key="`${row.__rowKey}-${cellIndex}`"
+                      class="tabular-import-preview__table-cell"
+                    >
+                      {{ cell || '—' }}
+                    </div>
+                  </div>
+                </RecycleScroller>
+
+                <div v-else class="tabular-import-preview__table-empty">
+                  {{ t('common.importPreview.preview.empty') }}
+                </div>
               </div>
             </div>
-          </div>
           </div>
         </div>
       </template>
@@ -337,50 +330,43 @@
         </div>
 
         <div class="tabular-import-preview__preview main-glass-panel-inner">
-          <div class="tabular-import-preview__section-head">
-            <div>
-              <h4>{{ t('common.importPreview.preview.title') }}</h4>
-              <p>{{ t('common.importPreview.preview.description') }}</p>
-            </div>
-          </div>
-
-            <div class="tabular-import-preview__table-wrap ui-scrollbar" :style="tableStyle">
-              <div class="tabular-import-preview__table">
-                <div class="tabular-import-preview__table-header">
-                  <div
-                    v-for="column in previewTable.sourceColumns"
-                    :key="column.key"
-                    class="tabular-import-preview__table-cell tabular-import-preview__table-cell--head"
-                  >
-                    {{ column.label }}
-                  </div>
-                </div>
-
-                <RecycleScroller
-                  v-if="virtualPreviewRows.length"
-                  v-slot="{ item: row }"
-                  :items="virtualPreviewRows"
-                  :item-size="40"
-                  :buffer="200"
-                  key-field="__rowKey"
-                  class="tabular-import-preview__table-scroller ui-scrollbar"
+          <div class="tabular-import-preview__table-wrap ui-scrollbar" :style="tableStyle">
+            <div class="tabular-import-preview__table">
+              <div class="tabular-import-preview__table-header">
+                <div
+                  v-for="column in previewTable.sourceColumns"
+                  :key="column.key"
+                  class="tabular-import-preview__table-cell tabular-import-preview__table-cell--head"
                 >
-                  <div class="tabular-import-preview__table-row">
-                    <div
-                      v-for="(cell, cellIndex) in row.cells"
-                      :key="`${row.__rowKey}-${cellIndex}`"
-                      class="tabular-import-preview__table-cell"
-                    >
-                      {{ cell || '—' }}
-                    </div>
-                  </div>
-                </RecycleScroller>
-
-                <div v-else class="tabular-import-preview__table-empty">
-                  {{ t('common.importPreview.preview.empty') }}
+                  {{ column.label }}
                 </div>
               </div>
+
+              <RecycleScroller
+                v-if="virtualPreviewRows.length"
+                v-slot="{ item: row }"
+                :items="virtualPreviewRows"
+                :item-size="40"
+                :buffer="200"
+                key-field="__rowKey"
+                class="tabular-import-preview__table-scroller ui-scrollbar"
+              >
+                <div class="tabular-import-preview__table-row">
+                  <div
+                    v-for="(cell, cellIndex) in row.cells"
+                    :key="`${row.__rowKey}-${cellIndex}`"
+                    class="tabular-import-preview__table-cell"
+                  >
+                    {{ cell || '—' }}
+                  </div>
+                </div>
+              </RecycleScroller>
+
+              <div v-else class="tabular-import-preview__table-empty">
+                {{ t('common.importPreview.preview.empty') }}
+              </div>
             </div>
+          </div>
         </div>
       </div>
     </template>
@@ -881,16 +867,19 @@ $preview-min-column-width: 120px;
     top: 0;
     z-index: 2;
     flex: 0 0 auto;
+    height: $preview-row-height;
     background: var(--glass-45);
   }
 
   &__table-scroller {
-    flex: 1 1 auto;
+    height: calc(100% - #{$preview-row-height});
     min-height: 0;
+    min-width: 100%;
     overflow-y: auto;
   }
 
   &__table-row {
+    width: 100%;
     min-height: $preview-row-height;
     border-bottom: 1px solid var(--glass-20);
   }
