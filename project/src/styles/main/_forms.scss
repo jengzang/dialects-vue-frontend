@@ -85,13 +85,13 @@
 }
 
 .main-glow-switch:hover {
-  background-color: dimgray;
+  background-color: var(--switch-hover-background);
   box-shadow: 0 0 10px 4px rgba(var(--color-primary-rgb), 0.7);
 }
 
 .main-glow-switch:hover .custom-switch-slider-base::before {
-  background-color: white;
-  box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.5);
+  background-color: var(--switch-thumb-background);
+  box-shadow: var(--switch-thumb-shadow);
 }
 
 .main-glow-switch.open {
@@ -109,7 +109,7 @@
 }
 
 .main-glow-switch-text {
-  color: black;
+  color: var(--switch-label-text);
   font-size: 12px;
   font-weight: bold;
   text-transform: uppercase;
@@ -124,7 +124,7 @@
 }
 
 .main-glow-switch.open .main-glow-switch-text {
-  color: black;
+  color: var(--switch-label-text);
   transform: translateX(-25px) translateY(-50%);
   top: 50%;
   position: absolute;

@@ -1397,7 +1397,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
   &.cat-sm {
     background: #dbeafe;
-    color: #1e40af;
+    color: var(--color-primary-hover);
   }
 
   &.cat-jd {

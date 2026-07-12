@@ -1354,12 +1354,12 @@ $glass-transition: all 0.3s ease;
 :deep(.marker-text-feature) {
   padding: 2px 4px;
 
-  color: black;
+  color: var(--text-primary);
   font-family: "Times New Roman", serif;
   font-size: 15px;
   white-space: nowrap;
 
-  border: 0.7px solid black;
+  border: 0.7px solid var(--text-primary);
   border-radius: var(--radius-xs);
   box-shadow: var(--shadow-focus-ring);
 

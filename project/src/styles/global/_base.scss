@@ -21,7 +21,7 @@
   width: 24px;
   height: 24px;
   border-radius: var(--radius-full);
-  background: white;
+  background: var(--switch-thumb-background);
   box-shadow: var(--shadow-xs);
   transition: transform 0.3s ease;
 }
@@ -59,7 +59,7 @@
   width: 16px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background-color: var(--switch-thumb-background);
   transition: 0.3s;
   border-radius: var(--radius-full);
 }
@@ -96,7 +96,7 @@
   left: 2px;
   width: 26px;
   height: 26px;
-  background-color: white;
+  background-color: var(--switch-thumb-background);
   border-radius: var(--radius-full);
   transition: all 0.3s ease;
 }
@@ -160,4 +160,3 @@ textarea:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-light);
 }
-

@@ -98,6 +98,10 @@
   --enter-button-bg-hover: var(--color-primary-hover);
   --enter-button-text: white;
   --enter-button-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.3);
+  --switch-hover-background: dimgray;
+  --switch-thumb-background: white;
+  --switch-label-text: black;
+  --switch-thumb-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.5);
   --sidebar-item-background: var(--glass-80);
   --sidebar-item-background-hover: var(--glass-60);
   --sidebar-item-text: var(--color-primary-hover);
@@ -242,27 +246,27 @@
 }
 
 :root[data-color-theme='light'] {
-  --color-primary: #6f6a60;
-  --color-primary-hover: #4f4b43;
-  --color-primary-light: rgba(111, 106, 96, 0.10);
-  --color-primary-light2: rgba(111, 106, 96, 0.14);
-  --color-primary-light3: rgba(111, 106, 96, 0.11);
-  --color-primary-medium: rgba(111, 106, 96, 0.18);
-  --color-primary-medium2: rgba(111, 106, 96, 0.42);
-  --color-primary-border: rgba(111, 106, 96, 0.18);
-  --color-primary-border2: rgba(111, 106, 96, 0.24);
-  --color-primary-shadow: rgba(111, 106, 96, 0.10);
-  --color-primary-shadow-light: rgba(111, 106, 96, 0.16);
-  --color-gradient: linear-gradient(135deg, #6f6a60, #b9b3a7);
+  --color-primary: #5f6368;
+  --color-primary-hover: #3c4043;
+  --color-primary-light: rgba(95, 99, 104, 0.10);
+  --color-primary-light2: rgba(95, 99, 104, 0.14);
+  --color-primary-light3: rgba(95, 99, 104, 0.11);
+  --color-primary-medium: rgba(95, 99, 104, 0.18);
+  --color-primary-medium2: rgba(95, 99, 104, 0.42);
+  --color-primary-border: rgba(95, 99, 104, 0.18);
+  --color-primary-border2: rgba(95, 99, 104, 0.24);
+  --color-primary-shadow: rgba(95, 99, 104, 0.10);
+  --color-primary-shadow-light: rgba(95, 99, 104, 0.16);
+  --color-gradient: linear-gradient(135deg, #5f6368, #c7c7cc);
 
   --bg-blue-tint: #fdfdfd;
-  --bg-blue-light: #f7f7f5;
-  --bg-blue-hover: rgba(229, 229, 226, 0.70);
-  --color-map-draw: #6f6a60;
+  --bg-blue-light: #f8fafc;
+  --bg-blue-hover: rgba(229, 231, 235, 0.70);
+  --color-map-draw: #5f6368;
   --bg-blue-tint-rgb: 253, 253, 253;
   --bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #ffffff, #ffffff00 58%),
-    radial-gradient(1000px 720px at 112% 4%, #f6f6f4, #f6f6f400 60%),
-    linear-gradient(180deg, #fdfdfd, #f7f7f5);
+    radial-gradient(1000px 720px at 112% 4%, #f8fafc, #f8fafc00 60%),
+    linear-gradient(180deg, #fdfdfd, #f8fafc);
 
   --text-deep: #243040;
   --text-primary: #1f2328;
@@ -284,10 +288,10 @@
   --bg-body: #fdfdfd;
   --bg-white: #ffffff;
   --bg-light-gray: #fafafa;
-  --bg-light: #f4f4f2;
+  --bg-light: #f8fafc;
   --sidebar-shell-background: linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(253, 253, 253, 0.76));
-  --sidebar-shell-border: rgba(210, 210, 206, 0.58);
-  --sidebar-shell-shadow: inset 0 0 0.5px rgba(255, 255, 255, 0.70), 0 14px 34px rgba(30, 30, 30, 0.10), 0 0 0 0.5px rgba(180, 180, 176, 0.20);
+  --sidebar-shell-border: rgba(229, 231, 235, 0.66);
+  --sidebar-shell-shadow: inset 0 0 0.5px rgba(255, 255, 255, 0.70), 0 14px 34px rgba(30, 30, 30, 0.10), 0 0 0 0.5px rgba(188, 194, 204, 0.18);
   --surface-page: #fdfdfd;
   --surface-panel: rgba(255, 255, 255, 0.72);
   --surface-panel-hover: rgba(255, 255, 255, 0.88);
@@ -295,34 +299,38 @@
   --surface-panel-subtle: rgba(255, 255, 255, 0.50);
   --surface-glass-button: rgba(255, 255, 255, 0.62);
   --surface-glass-button-hover: rgba(255, 255, 255, 0.80);
-  --surface-selected: #f3f3f1;
-  --text-selected: #4f4b43;
-  --border-glass: rgba(210, 210, 206, 0.42);
-  --border-glass-subtle: rgba(210, 210, 206, 0.30);
+  --surface-selected: #f4f6f8;
+  --text-selected: #3c4043;
+  --border-glass: rgba(229, 231, 235, 0.48);
+  --border-glass-subtle: rgba(229, 231, 235, 0.34);
   --border-control: rgba(120, 120, 116, 0.28);
-  --border-control-focus: rgba(111, 106, 96, 0.36);
-  --focus-ring: 0 0 0 4px rgba(111, 106, 96, 0.10);
+  --border-control-focus: rgba(95, 99, 104, 0.36);
+  --focus-ring: 0 0 0 4px rgba(95, 99, 104, 0.10);
   --action-primary-bg: #1d1d1f;
   --action-primary-bg-hover: #000000;
   --action-primary-text: #ffffff;
   --action-primary-border: rgba(29, 29, 31, 0.22);
   --action-primary-shadow: 0 4px 12px rgba(29, 29, 31, 0.16);
-  --action-active-bg: rgba(111, 106, 96, 0.18);
-  --action-active-border: rgba(111, 106, 96, 0.32);
+  --action-active-bg: rgba(95, 99, 104, 0.18);
+  --action-active-border: rgba(95, 99, 104, 0.32);
   --enter-button-bg: #1d1d1f;
   --enter-button-bg-hover: #000000;
   --enter-button-text: #ffffff;
   --enter-button-shadow: 0 2px 8px rgba(29, 29, 31, 0.18);
+  --switch-hover-background: rgba(95, 99, 104, 0.20);
+  --switch-thumb-background: #ffffff;
+  --switch-label-text: #3c4043;
+  --switch-thumb-shadow: 0 0 8px rgba(95, 99, 104, 0.18);
   --sidebar-item-background: rgba(255, 255, 255, 0.84);
   --sidebar-item-background-hover: rgba(255, 255, 255, 0.96);
   --sidebar-item-text: #2f343b;
-  --sidebar-item-border: rgba(210, 210, 206, 0.44);
-  --sidebar-stats-background: linear-gradient(145deg, rgba(255, 255, 255, 0.74), rgba(247, 247, 245, 0.62));
-  --sidebar-stats-border: rgba(210, 210, 206, 0.48);
-  --sidebar-expand-background: linear-gradient(145deg, rgba(255, 255, 255, 0.80), rgba(247, 247, 245, 0.62));
-  --sidebar-expand-background-hover: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(247, 247, 245, 0.76));
-  --sidebar-expand-border: rgba(210, 210, 206, 0.52);
-  --submenu-hover-background: rgba(111, 106, 96, 0.08);
+  --sidebar-item-border: rgba(229, 231, 235, 0.50);
+  --sidebar-stats-background: linear-gradient(145deg, rgba(255, 255, 255, 0.76), rgba(248, 250, 252, 0.64));
+  --sidebar-stats-border: rgba(229, 231, 235, 0.54);
+  --sidebar-expand-background: linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(248, 250, 252, 0.64));
+  --sidebar-expand-background-hover: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.78));
+  --sidebar-expand-border: rgba(229, 231, 235, 0.58);
+  --submenu-hover-background: rgba(95, 99, 104, 0.08);
 
   --glass-05: rgba(255, 255, 255, 0.05);
   --glass-10: rgba(255, 255, 255, 0.14);
@@ -356,28 +364,28 @@
   --bg-overlay-light2: rgba(25, 30, 38, 0.08);
   --bg-overlay-very-light: rgba(25, 30, 38, 0.22);
 
-  --color-primary-cyan: #8f8a80;
-  --color-accent-purple: #706a60;
-  --color-accent-purple-light: rgba(112, 106, 96, 0.10);
-  --color-cyan: #aaa69d;
-  --color-cyan-rgb: 170, 166, 157;
-  --color-primary-rgb: 111, 106, 96;
-  --color-primary-hover-rgb: 79, 75, 67;
+  --color-primary-cyan: #8e9196;
+  --color-accent-purple: #6b7078;
+  --color-accent-purple-light: rgba(107, 112, 120, 0.10);
+  --color-cyan: #a7aab0;
+  --color-cyan-rgb: 167, 170, 176;
+  --color-primary-rgb: 95, 99, 104;
+  --color-primary-hover-rgb: 60, 64, 67;
   --text-deep-rgb: 36, 48, 64;
   --color-shadow-rgb: 31, 35, 40;
-  --color-primary-cyan-rgb: 143, 138, 128;
-  --color-accent-purple-rgb: 112, 106, 96;
+  --color-primary-cyan-rgb: 142, 145, 150;
+  --color-accent-purple-rgb: 107, 112, 120;
   --text-secondary-rgb: 102, 112, 133;
   --text-slate: #526071;
   --text-slate-rgb: 82, 96, 113;
   --text-slate-light: #98a2b3;
   --text-slate-light-rgb: 152, 162, 179;
 
-  --shadow-card: 0 14px 30px rgba(79, 70, 56, 0.08);
-  --shadow-popup: 0 18px 48px rgba(79, 70, 56, 0.12);
-  --shadow-glass: 0 8px 22px rgba(79, 70, 56, 0.07), inset 0 0 0.5px rgba(255, 255, 255, 0.46);
-  --shadow-glass-hover: 0 12px 28px rgba(79, 70, 56, 0.12);
-  --shadow-glass-inset: inset 0 0 0.5px rgba(255, 255, 255, 0.58), 0 8px 22px rgba(79, 70, 56, 0.10), 0 0 0 0.5px rgba(255, 255, 255, 0.20);
+  --shadow-card: 0 14px 30px rgba(60, 64, 67, 0.08);
+  --shadow-popup: 0 18px 48px rgba(60, 64, 67, 0.12);
+  --shadow-glass: 0 8px 22px rgba(60, 64, 67, 0.07), inset 0 0 0.5px rgba(255, 255, 255, 0.46);
+  --shadow-glass-hover: 0 12px 28px rgba(60, 64, 67, 0.12);
+  --shadow-glass-inset: inset 0 0 0.5px rgba(255, 255, 255, 0.58), 0 8px 22px rgba(60, 64, 67, 0.10), 0 0 0 0.5px rgba(255, 255, 255, 0.20);
 }
 
 :root[data-color-theme='dark'] {
@@ -452,6 +460,10 @@
   --enter-button-bg-hover: #ffffff;
   --enter-button-text: #050505;
   --enter-button-shadow: 0 2px 10px rgba(255, 255, 255, 0.14);
+  --switch-hover-background: rgba(255, 255, 255, 0.14);
+  --switch-thumb-background: #ffffff;
+  --switch-label-text: rgba(255, 255, 255, 0.92);
+  --switch-thumb-shadow: 0 0 8px rgba(255, 255, 255, 0.20);
   --sidebar-item-background: rgba(44, 44, 46, 0.78);
   --sidebar-item-background-hover: rgba(58, 58, 60, 0.88);
   --sidebar-item-text: rgba(255, 255, 255, 0.92);

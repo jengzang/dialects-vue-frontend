@@ -1369,7 +1369,7 @@ $mobile-breakpoint: 768px;
     align-items: center;
     gap: 8px;
     margin: 0;
-    color: #274b73;
+    color: var(--color-primary-hover);
     font-size: 15px;
     font-weight: 700;
   }
@@ -1537,7 +1537,7 @@ $mobile-breakpoint: 768px;
 
   .feature-type {
     margin-bottom: 10px;
-    color: #35679b;
+    color: var(--color-primary);
     font-size: 15px;
     font-weight: 700;
   }
@@ -1566,7 +1566,7 @@ $mobile-breakpoint: 768px;
   }
 
   .tag-syllable {
-    color: #274b73;
+    color: var(--color-primary-hover);
     font-size: 14px;
     font-weight: 700;
   }

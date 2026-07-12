@@ -803,7 +803,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     font-size: clamp(0.95rem, 2vw, 1.25rem);
     line-height: 1.5;
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.65);
+    color: var(--text-dark-lighter);
   }
 
   &-actions {
@@ -920,7 +920,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     text-align: center;
     font-size: 0.9375rem;
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--text-dark-lighter);
   }
 }
 
@@ -1053,7 +1053,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-desc {
     margin: 0;
     font-size: 0.875rem;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--text-dark-lighter);
   }
 
   &-arrow {
@@ -1254,7 +1254,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     margin: 0;
     font-size: 0.8rem;
     line-height: 1.5;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--text-dark-lighter);
   }
 }
 
@@ -1338,7 +1338,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-desc {
     margin: 0;
     font-size: 0.8125rem;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--text-dark-lighter);
   }
 
   &-arrow {
@@ -1391,7 +1391,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-desc {
     margin: 0;
     font-size: 0.9375rem;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--text-dark-lighter);
   }
 
   &-btn {
@@ -1471,7 +1471,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     margin-bottom: 1rem;
     font-size: 0.9375rem;
     line-height: 1.5;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--text-dark-lighter);
   }
 
   &-benefits {
@@ -1609,18 +1609,18 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-text {
     margin: 0;
     font-size: 0.8125rem;
-    color: rgba(0, 0, 0, 0.5);
+    color: var(--text-secondary);
   }
 }
 
 .stat-text {
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-dark-lighter);
 
   &-muted {
     font-size: 0.8125rem;
-    color: rgba(0, 0, 0, 0.48);
+    color: var(--text-secondary);
   }
 }
 
@@ -1653,7 +1653,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-subtitle {
     margin-bottom: 2rem;
     text-align: center;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--text-dark-lighter);
   }
 }
 
@@ -1868,4 +1868,3 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 }
 </style>
-

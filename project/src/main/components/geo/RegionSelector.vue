@@ -933,7 +933,7 @@ $portrait-ratio: 1;
   position: absolute;
   top: 50%;
   right: 10px;
-  color: rgba(0, 0, 0, 0.55);
+  color: var(--text-dark-lighter);
   font-weight: 700;
   transform: translateY(-50%);
 }

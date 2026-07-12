@@ -990,7 +990,7 @@ export default {
   font-size: 14px;
   background: transparent;
   width: 80px;
-  color: #333;
+  color: var(--text-dark);
   text-align: center;
 }
 
