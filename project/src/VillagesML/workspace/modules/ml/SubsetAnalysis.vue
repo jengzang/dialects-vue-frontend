@@ -524,8 +524,8 @@
       </div>
     </div>
 
-    <!-- Loading -->
-    <div v-if="loading" class="vml-loading">
+    <!-- Loading Overlay -->
+    <div v-if="loading" class="loading-overlay">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>{{ loadingMessage }}</p>
     </div>
@@ -1673,6 +1673,22 @@ const handleApiError = (error) => {
 .village-tag:hover {
   background: rgba(var(--vml-blue-rgb), 0.2);
   border-color: rgba(var(--vml-blue-rgb), 0.4);
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg-overlay);
+  @include flex-col;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-overlay p {
+  color: var(--text-on-overlay, white);
+  margin-top: 16px;
+  font-size: 16px;
 }
 
 /* Responsive Design */
