@@ -152,25 +152,43 @@
               </div>
             </div>
 
-            <div class="tabular-import-preview__table-wrap ui-scrollbar">
-              <table class="tabular-import-preview__table">
-                <thead>
-                  <tr>
-                    <th v-for="column in previewTable.sourceColumns" :key="column.key">{{ column.label }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(row, rowIndex) in previewTable.previewRows" :key="rowIndex">
-                    <td v-for="(cell, cellIndex) in row" :key="`${rowIndex}-${cellIndex}`">{{ cell || '—' }}</td>
-                  </tr>
-                  <tr v-if="!previewTable.previewRows.length">
-                    <td :colspan="Math.max(previewTable?.sourceColumns?.length ?? 0, 1)" class="tabular-import-preview__table-empty">
-                      {{ t('common.importPreview.preview.empty') }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+          <div class="tabular-import-preview__table-wrap ui-scrollbar" :style="tableStyle">
+            <div class="tabular-import-preview__table">
+              <div class="tabular-import-preview__table-header">
+                <div
+                  v-for="column in previewTable.sourceColumns"
+                  :key="column.key"
+                  class="tabular-import-preview__table-cell tabular-import-preview__table-cell--head"
+                >
+                  {{ column.label }}
+                </div>
+              </div>
+
+              <RecycleScroller
+                v-if="virtualPreviewRows.length"
+                v-slot="{ item: row }"
+                :items="virtualPreviewRows"
+                :item-size="40"
+                :buffer="200"
+                key-field="__rowKey"
+                class="tabular-import-preview__table-scroller ui-scrollbar"
+              >
+                <div class="tabular-import-preview__table-row">
+                  <div
+                    v-for="(cell, cellIndex) in row.cells"
+                    :key="`${row.__rowKey}-${cellIndex}`"
+                    class="tabular-import-preview__table-cell"
+                  >
+                    {{ cell || '—' }}
+                  </div>
+                </div>
+              </RecycleScroller>
+
+              <div v-else class="tabular-import-preview__table-empty">
+                {{ t('common.importPreview.preview.empty') }}
+              </div>
             </div>
+          </div>
           </div>
         </div>
       </template>
@@ -326,25 +344,43 @@
             </div>
           </div>
 
-          <div class="tabular-import-preview__table-wrap ui-scrollbar">
-            <table class="tabular-import-preview__table">
-              <thead>
-                <tr>
-                  <th v-for="column in previewTable.sourceColumns" :key="column.key">{{ column.label }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(row, rowIndex) in previewTable.previewRows" :key="rowIndex">
-                  <td v-for="(cell, cellIndex) in row" :key="`${rowIndex}-${cellIndex}`">{{ cell || '—' }}</td>
-                </tr>
-                <tr v-if="!previewTable.previewRows.length">
-                  <td :colspan="Math.max(previewTable?.sourceColumns?.length ?? 0, 1)" class="tabular-import-preview__table-empty">
-                    {{ t('common.importPreview.preview.empty') }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <div class="tabular-import-preview__table-wrap ui-scrollbar" :style="tableStyle">
+              <div class="tabular-import-preview__table">
+                <div class="tabular-import-preview__table-header">
+                  <div
+                    v-for="column in previewTable.sourceColumns"
+                    :key="column.key"
+                    class="tabular-import-preview__table-cell tabular-import-preview__table-cell--head"
+                  >
+                    {{ column.label }}
+                  </div>
+                </div>
+
+                <RecycleScroller
+                  v-if="virtualPreviewRows.length"
+                  v-slot="{ item: row }"
+                  :items="virtualPreviewRows"
+                  :item-size="40"
+                  :buffer="200"
+                  key-field="__rowKey"
+                  class="tabular-import-preview__table-scroller ui-scrollbar"
+                >
+                  <div class="tabular-import-preview__table-row">
+                    <div
+                      v-for="(cell, cellIndex) in row.cells"
+                      :key="`${row.__rowKey}-${cellIndex}`"
+                      class="tabular-import-preview__table-cell"
+                    >
+                      {{ cell || '—' }}
+                    </div>
+                  </div>
+                </RecycleScroller>
+
+                <div v-else class="tabular-import-preview__table-empty">
+                  {{ t('common.importPreview.preview.empty') }}
+                </div>
+              </div>
+            </div>
         </div>
       </div>
     </template>
@@ -354,9 +390,11 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { RecycleScroller } from 'vue-virtual-scroller'
 import AppModal from '@/components/common/AppModal.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import { downloadTabularSource, isTabularSourceExportable } from '@/utils/import/downloadTabularSource.js'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 const props = defineProps({
   modelValue: {
@@ -468,6 +506,18 @@ const sheetOptions = computed(() => props.sheets.map((sheet) => ({
   value: sheet.id
 })))
 
+const virtualPreviewRows = computed(() => props.previewTable.previewRows.map((row, index) => ({
+  __rowKey: `row-${index}`,
+  cells: row
+})))
+
+const tableStyle = computed(() => {
+  const columnCount = Math.max(props.previewTable.sourceColumns.length, 1)
+  return {
+    '--tabular-import-preview-column-count': columnCount
+  }
+})
+
 const effectiveSource = computed(() => {
   if (props.source) {
     return props.source
@@ -559,13 +609,17 @@ $warning-orange: var(--color-warning-dark);
 
 $panel-gap: 16px;
 $section-gap: 12px;
+$preview-padding: 12px;
+$preview-panel-padding: 12px;
+$preview-row-height: 40px;
+$preview-min-column-width: 120px;
 
 .tabular-import-preview {
   @include flex-col;
 
   gap: $panel-gap;
   min-height: 0;
-  padding: 18px;
+  padding: $preview-padding;
 
   &--modal {
     box-sizing: border-box;
@@ -705,7 +759,7 @@ $section-gap: 12px;
     @include flex-col;
 
     gap: 14px;
-    padding: 16px;
+    padding: $preview-panel-padding;
   }
 
   &__mapping,
@@ -807,37 +861,58 @@ $section-gap: 12px;
   }
 
   &__table {
-    width: 100%;
-    border-collapse: collapse;
+    @include flex-col;
+
+    width: max(100%, calc(var(--tabular-import-preview-column-count) * #{$preview-min-column-width}));
+    height: 100%;
+    min-height: 100%;
     font-size: 13px;
+  }
 
-    thead {
-      background: var(--glass-45);
-    }
+  &__table-header,
+  &__table-row {
+    display: grid;
+    grid-template-columns: repeat(var(--tabular-import-preview-column-count), minmax($preview-min-column-width, 1fr));
+    min-width: 100%;
+  }
 
-    th,
-    td {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--glass-20);
-      text-align: left;
-      vertical-align: top;
-    }
+  &__table-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    flex: 0 0 auto;
+    background: var(--glass-45);
+  }
 
-    th {
+  &__table-scroller {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  &__table-row {
+    min-height: $preview-row-height;
+    border-bottom: 1px solid var(--glass-20);
+  }
+
+  &__table-cell {
+    padding: 8px 10px;
+    color: $text-secondary;
+    line-height: 1.5;
+    text-align: left;
+    vertical-align: top;
+
+    &--head {
       color: $text-primary;
       font-weight: 600;
       white-space: nowrap;
     }
-
-    td {
-      color: $text-secondary;
-      line-height: 1.5;
-    }
   }
 
   &__table-empty {
-    text-align: center !important;
-    color: $text-muted !important;
+    padding: 16px;
+    color: $text-muted;
+    text-align: center;
   }
 }
 

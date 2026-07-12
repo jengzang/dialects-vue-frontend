@@ -50,6 +50,32 @@ describe('tabular import preview modal shell', () => {
     expect(source).not.toContain('$primary-blue')
   })
 
+  it('keeps the import preview chrome compact', () => {
+    const source = readSource(previewPath)
+
+    expect(source).toContain('$preview-padding: 12px;')
+    expect(source).toContain('$preview-panel-padding: 12px;')
+    expect(source).toMatch(/\.tabular-import-preview\s*\{[^}]*padding:\s*\$preview-padding/s)
+    expect(source).toMatch(/&__mapping,\s*\n\s*&__preview\s*\{[^}]*padding:\s*\$preview-panel-padding/s)
+    expect(source).not.toContain('padding: 18px')
+  })
+
+  it('uses the existing virtual scroller for full-row import previews', () => {
+    const source = readSource(previewPath)
+
+    expect(source).toContain("import { RecycleScroller } from 'vue-virtual-scroller'")
+    expect(source).toContain("import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'")
+    expect(source).toContain('<RecycleScroller')
+    expect(source).toContain(':items="virtualPreviewRows"')
+    expect(source).toContain(':item-size="40"')
+    expect(source).toContain(':buffer="200"')
+    expect(source).toContain('key-field="__rowKey"')
+    expect(source).toContain('class="tabular-import-preview__table-scroller ui-scrollbar"')
+    expect(source).toContain('class="tabular-import-preview__table-header"')
+    expect(source).toContain('class="tabular-import-preview__table-row"')
+    expect(source).not.toContain('<tbody>')
+  })
+
   it('keeps the import preview table panel stretched across available space', () => {
     const source = readSource(previewPath)
 
