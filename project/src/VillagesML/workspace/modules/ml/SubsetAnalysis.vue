@@ -58,7 +58,18 @@
             :placeholder="`選擇${FILTER_FIELDS.find(f => f.value === filter.field)?.label}`"
           />
 
-          <!-- Text field: use text input (name, length) -->
+          <!-- Number field: use number input (length) -->
+          <input
+            v-else-if="getFieldInputType(filter.field) === 'number'"
+            v-model.number="filter.value"
+            type="number"
+            min="2"
+            max="10"
+            placeholder="2-10"
+            class="glass-input"
+          >
+
+          <!-- Text field: use text input (name, suffix, prefix) -->
           <input
             v-else
             v-model="filter.value"
@@ -741,12 +752,27 @@ const applyFilters = async () => {
           }
         }
       } else if (filter.field === 'length') {
-        if (filter.operator === 'gt') apiParams.minLength = parseInt(filter.value)
-        else if (filter.operator === 'lt') apiParams.maxLength = parseInt(filter.value)
+        const val = parseInt(filter.value)
+        if (!isNaN(val) && val >= 2 && val <= 10) {
+          apiParams.minLength = val
+          apiParams.maxLength = val
+        }
+      } else if (filter.field === 'semantic') {
+        if (filter.value) {
+          apiParams.semanticCategories = [filter.value]
+        }
+      } else if (filter.field === 'structure') {
+        if (filter.value) {
+          apiParams.structurePatterns = [filter.value]
+        }
+      } else if (filter.field === 'suffix') {
+        if (filter.value) apiParams.suffix = filter.value
+      } else if (filter.field === 'prefix') {
+        if (filter.value) apiParams.prefix = filter.value
       }
     })
 
-    const response = await fetchSubsetFilter(apiParams)
+    const response = await fetchSubsetFilter({ ...apiParams, maxResults: 100000 })
 
     let results = (response.villages || []).map(v => ({
       id: v.id,
