@@ -153,7 +153,7 @@
               </div>
               <div class="stat-item">
                 <span class="label">篩選條件:</span>
-                <span class="value">{{ formatFilterSummary(subsetA.filter) }}</span>
+                <span class="value">{{ formatFilterSummary(subsetA.filterParams) }}</span>
               </div>
             </div>
             <button @click="saveAsSubsetA" :disabled="!canSaveSubset" class="solid-button small">
@@ -170,7 +170,7 @@
               </div>
               <div class="stat-item">
                 <span class="label">篩選條件:</span>
-                <span class="value">{{ formatFilterSummary(subsetB.filter) }}</span>
+                <span class="value">{{ formatFilterSummary(subsetB.filterParams) }}</span>
               </div>
             </div>
             <button @click="saveAsSubsetB" :disabled="!canSaveSubset" class="solid-button small">
@@ -526,8 +526,8 @@ import { ref, computed, nextTick, onBeforeUnmount } from 'vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'
 import * as echarts from 'echarts'
-import { clusterSubset, compareSubsets as compareSubsetsAPI, searchVillages } from '@/api/index.js'
-import { showError, showSuccess, showWarning, showInfo } from '@/utils/message.js'
+import { clusterSubset, compareSubsets as compareSubsetsAPI, fetchSubsetFilter } from '@/api/index.js'
+import { showError, showSuccess, showWarning } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
@@ -716,120 +716,50 @@ const applyFilters = async () => {
 
   loading.value = true
   loadingMessage.value = '正在應用篩選...'
-
-  // Reset pagination
   currentPage.value = 1
 
   try {
-    // Build filter object for backend
-    const filterObj = {
-      cities: [],
-      counties: [],
-      semantic_tags: [],
-      structure_patterns: [],
-      name_pattern: null,
-      sample_size: 1000
-    }
+    const apiParams = {}
 
-    // Build API parameters from filters
-    const baseParams = {
-      page_size: 1000
-    }
-    let nameFilter = null
-
-    // Extract filters
     filters.value.forEach(filter => {
       if (filter.field === 'region' && filter.operator === 'equals') {
         if (filter.hierarchy) {
-          if (filter.hierarchy.city) {
-            baseParams.city = filter.hierarchy.city
-            filterObj.cities.push(filter.hierarchy.city)
-          }
-          if (filter.hierarchy.county) {
-            baseParams.county = filter.hierarchy.county
-            filterObj.counties.push(filter.hierarchy.county)
-          }
-          if (filter.hierarchy.township) {
-            baseParams.township = filter.hierarchy.township
-          }
+          if (filter.hierarchy.city) apiParams.city = filter.hierarchy.city
+          if (filter.hierarchy.county) apiParams.county = filter.hierarchy.county
+          if (filter.hierarchy.township) apiParams.township = filter.hierarchy.township
         } else if (filter.value) {
-          baseParams.region_name = filter.value
-          filterObj.cities.push(filter.value)
+          apiParams.city = filter.value
         }
-      } else if (filter.field === 'semantic' && filter.operator === 'equals') {
-        filterObj.semantic_tags.push(filter.value)
-      } else if (filter.field === 'structure' && filter.operator === 'equals') {
-        filterObj.structure_patterns.push(filter.value)
       } else if (filter.field === 'name') {
-        nameFilter = filter
-        filterObj.name_pattern = filter.value
-        // 對於所有名稱操作符，都傳遞 keyword 給後端進行初步篩選
-        // 後端的 keyword 是 contains 搜索，可以減少返回的數據量
-        // 然後前端再進行精確的 startsWith/endsWith/equals 過濾
         if (filter.value) {
-          baseParams.keyword = filter.value
+          apiParams.keyword = filter.value
+          if (filter.operator !== 'contains') {
+            apiParams.nameMatchMode = filter.operator === 'startsWith' ? 'startsWith'
+              : filter.operator === 'endsWith' ? 'endsWith'
+              : filter.operator === 'equals' ? 'equals'
+              : undefined
+          }
         }
       } else if (filter.field === 'length') {
-        if (filter.operator === 'gt') baseParams.min_length = parseInt(filter.value)
-        else if (filter.operator === 'lt') baseParams.max_length = parseInt(filter.value)
+        if (filter.operator === 'gt') apiParams.minLength = parseInt(filter.value)
+        else if (filter.operator === 'lt') apiParams.maxLength = parseInt(filter.value)
       }
     })
 
-    // 自動分頁加載所有數據
-    let allResults = []
-    let currentPageNum = 1
-    let totalCount = 0
+    const response = await fetchSubsetFilter(apiParams)
 
-    // 第一次請求
-    loadingMessage.value = `正在載入第 ${currentPageNum} 頁...`
-    const firstResponse = await searchVillages({ ...baseParams, page: currentPageNum })
-    totalCount = firstResponse.total || 0
-
-    let firstPageResults = (firstResponse.data || []).map(v => ({
-      id: v.village_id,
-      name: v.village_name,
+    let results = (response.villages || []).map(v => ({
+      id: v.id,
+      name: v.name,
       region: v.county ? `${v.city}-${v.county}` : v.city,
-      length: v.village_name.length
+      length: v.name_length ?? v.nameLength ?? v.name.length
     }))
 
-    // Apply client-side filters
-    if (nameFilter) {
-      firstPageResults = applyNameFilter(firstPageResults, nameFilter)
-    }
+    currentFilteredVillages.value = results
+    currentFilteredVillages.value.filterParams = apiParams
+    currentFilteredVillages.value.totalCount = response.total
 
-    allResults = [...firstPageResults]
-
-    // 如果還有更多頁，繼續請求
-    const totalPages = Math.ceil(totalCount / baseParams.page_size)
-    if (totalPages > 1) {
-      showInfo(`檢測到 ${totalCount} 個村莊，正在自動載入全部數據...`)
-
-      for (let page = 2; page <= totalPages; page++) {
-        currentPageNum = page
-        loadingMessage.value = `正在載入第 ${currentPageNum}/${totalPages} 頁...`
-
-        const response = await searchVillages({ ...baseParams, page })
-        let pageResults = (response.data || []).map(v => ({
-          id: v.village_id,
-          name: v.village_name,
-          region: v.county ? `${v.city}-${v.county}` : v.city,
-          length: v.village_name.length
-        }))
-
-        // Apply client-side filters
-        if (nameFilter) {
-          pageResults = applyNameFilter(pageResults, nameFilter)
-        }
-
-        allResults = [...allResults, ...pageResults]
-      }
-    }
-
-    currentFilteredVillages.value = allResults
-    currentFilteredVillages.value.filterObj = filterObj
-    currentFilteredVillages.value.totalCount = totalCount
-
-    showSuccess(`篩選完成，已載入全部 ${allResults.length} 個村莊`)
+    showSuccess(`篩選完成，共 ${results.length} 個村莊`)
   } catch (error) {
     showError(error.message || '篩選失敗')
   } finally {
@@ -837,24 +767,8 @@ const applyFilters = async () => {
   }
 }
 
-// 輔助函數：應用名稱篩選
-const applyNameFilter = (results, nameFilter) => {
-  if (!nameFilter) return results
-
-  if (nameFilter.operator === 'contains') {
-    return results.filter(v => v.name.includes(nameFilter.value))
-  } else if (nameFilter.operator === 'startsWith') {
-    return results.filter(v => v.name.startsWith(nameFilter.value))
-  } else if (nameFilter.operator === 'endsWith') {
-    return results.filter(v => v.name.endsWith(nameFilter.value))
-  } else if (nameFilter.operator === 'equals') {
-    return results.filter(v => v.name === nameFilter.value)
-  }
-  return results
-}
-
 const saveAsSubsetA = () => {
-  if (!currentFilteredVillages.value.filterObj) {
+  if (!currentFilteredVillages.value.filterParams) {
     showError('請先應用篩選條件')
     return
   }
@@ -863,7 +777,7 @@ const saveAsSubsetA = () => {
 
   subsetA.value = {
     label: `子集A (${count}個村莊)`,
-    filter: currentFilteredVillages.value.filterObj,
+    filterParams: { ...currentFilteredVillages.value.filterParams },
     villages: [...currentFilteredVillages.value],
     totalCount: count
   }
@@ -872,7 +786,7 @@ const saveAsSubsetA = () => {
 }
 
 const saveAsSubsetB = () => {
-  if (!currentFilteredVillages.value.filterObj) {
+  if (!currentFilteredVillages.value.filterParams) {
     showError('請先應用篩選條件')
     return
   }
@@ -881,7 +795,7 @@ const saveAsSubsetB = () => {
 
   subsetB.value = {
     label: `子集B (${count}個村莊)`,
-    filter: currentFilteredVillages.value.filterObj,
+    filterParams: { ...currentFilteredVillages.value.filterParams },
     villages: [...currentFilteredVillages.value],
     totalCount: count
   }
@@ -889,20 +803,11 @@ const saveAsSubsetB = () => {
   showSuccess(`已保存為子集 B (${count} 個村莊)`)
 }
 
-const calculateAvgLength = (villages) => {
-  if (villages.length === 0) return null
-  const sum = villages.reduce((acc, v) => acc + v.length, 0)
-  return (sum / villages.length).toFixed(2)
-}
-
-/**
- * 构建子集参数
- * 前端已自動分頁載入全部數據，直接傳遞 village_ids 數組
- */
 const buildGroupParams = (subset) => {
   return {
     label: subset.label,
-    village_ids: subset.villages.map(v => v.id)
+    village_ids: subset.villages.map(v => v.id),
+    filterParams: subset.filterParams
   }
 }
 
@@ -971,7 +876,7 @@ const runSubsetClustering = async () => {
       return
     }
 
-    if (!subset.filter) {
+    if (!subset.villages || subset.villages.length === 0) {
       showError('請先構建子集')
       loading.value = false
       return
@@ -986,14 +891,15 @@ const runSubsetClustering = async () => {
 
     // Build parameters matching backend API spec
     const params = {
+      village_ids: subset.villages.map(v => v.id),
       filter: {
-        ...subset.filter,
+        ...subset.filterParams,
         sample_size: 1000
       },
       clustering: {
         algorithm: clusterAlgorithm.value,
         k: clusterK.value,
-        features: clusterFeatures.value,  // 使用用户选择的特征
+        features: clusterFeatures.value,
         random_state: 42
       }
     }
@@ -1184,21 +1090,20 @@ const formatVector = (vec) => {
 const formatFilterSummary = (filter) => {
   if (!filter) return 'N/A'
   const parts = []
-  if (filter.cities && filter.cities.length > 0) {
-    parts.push(`城市: ${filter.cities.join(', ')}`)
+  if (filter.city) parts.push(`城市: ${filter.city}`)
+  if (filter.county) parts.push(`區縣: ${filter.county}`)
+  if (filter.township) parts.push(`鄉鎮: ${filter.township}`)
+  if (filter.keyword) parts.push(`關鍵詞: ${filter.keyword}`)
+  if (filter.minLength) parts.push(`最小長度: ${filter.minLength}`)
+  if (filter.maxLength) parts.push(`最大長度: ${filter.maxLength}`)
+  if (filter.semanticCategories && filter.semanticCategories.length > 0) {
+    parts.push(`語義: ${filter.semanticCategories.join(', ')}`)
   }
-  if (filter.counties && filter.counties.length > 0) {
-    parts.push(`區縣: ${filter.counties.join(', ')}`)
+  if (filter.structurePatterns && filter.structurePatterns.length > 0) {
+    parts.push(`結構: ${filter.structurePatterns.join(', ')}`)
   }
-  if (filter.semantic_tags && filter.semantic_tags.length > 0) {
-    parts.push(`語義: ${filter.semantic_tags.join(', ')}`)
-  }
-  if (filter.structure_patterns && filter.structure_patterns.length > 0) {
-    parts.push(`結構: ${filter.structure_patterns.join(', ')}`)
-  }
-  if (filter.name_pattern) {
-    parts.push(`名稱: ${filter.name_pattern}`)
-  }
+  if (filter.suffix) parts.push(`後綴: ${filter.suffix}`)
+  if (filter.prefix) parts.push(`前綴: ${filter.prefix}`)
   return parts.length > 0 ? parts.join(' | ') : '無篩選條件'
 }
 
@@ -1569,7 +1474,7 @@ const handleApiError = (error) => {
 .clustering-controls {
   display: flex;
   gap: 16px;
-  align-items: flex-start;
+  // align-items: flex-start;
   margin-bottom: 24px;
   flex-wrap: wrap;
   width: 100%;
@@ -1581,7 +1486,7 @@ const handleApiError = (error) => {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 100%;
+  // width: 100%;
   max-width: 100%;
 }
 

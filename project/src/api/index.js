@@ -150,6 +150,7 @@ export {
   getVillageSpatialFeatures,
   getVillageSemanticStructure,
   getVillageNgrams,
+  fetchSubsetFilter,
   // 字頻統計
   getGlobalCharFrequency,
   getCharTendency,
