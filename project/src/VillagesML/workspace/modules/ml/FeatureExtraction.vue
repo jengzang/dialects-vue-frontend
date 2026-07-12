@@ -1386,6 +1386,7 @@ onBeforeUnmount(() => {
 }
 
 .controls-row {
+  // justify-content: center;
   display: flex;
   gap: 24px;
   flex-wrap: wrap;
