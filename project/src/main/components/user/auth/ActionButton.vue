@@ -32,35 +32,36 @@ defineEmits(['click'])
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+@use 'sass:map';
 
 $transition-duration: 0.3s;
 $mobile-aspect-ratio: 1;
 
 $solid-variants: (
-  blue: (
+  'blue': (
     background: var(--color-primary),
     hover: var(--color-primary-hover)
   ),
-  green: (
+  'green': (
     background: #28a745,
     hover: #1f8a36
   ),
-  danger: (
+  'danger': (
     background: darkred,
     hover: #a91f1f
   ),
-  yellow: (
+  'yellow': (
     background: #f39c12,
     hover: #e67e22
   )
 );
 
 $gradient-variants: (
-  info: (
+  'info': (
     background: linear-gradient(135deg, #667eea, #764ba2),
     hover: linear-gradient(135deg, #5568d3, #5f3d8a)
   ),
-  teal: (
+  'teal': (
     background: linear-gradient(135deg, var(--color-cyan), #4a9fd8),
     hover: linear-gradient(135deg, #4ab8e8, #3a8fc6)
   )
@@ -97,20 +98,20 @@ $gradient-variants: (
 .btn-action {
   @each $name, $colors in $solid-variants {
     &.#{$name} {
-      background-color: map-get($colors, background);
+      background-color: map.get($colors, background);
 
       &:hover:not(:disabled) {
-        background-color: map-get($colors, hover);
+        background-color: map.get($colors, hover);
       }
     }
   }
 
   @each $name, $colors in $gradient-variants {
     &.#{$name} {
-      background: map-get($colors, background);
+      background: map.get($colors, background);
 
       &:hover:not(:disabled) {
-        background: map-get($colors, hover);
+        background: map.get($colors, hover);
       }
     }
   }

@@ -169,7 +169,8 @@ async function runClustering() {
     results.value = data
     villagesMLStore.clusteringResults = data
 
-    showSuccess(`聚類完成！發現 ${data.n_clusters} 個聚類`)
+    const nClusters = data.n_clusters ?? data.k
+    showSuccess(`聚類完成！發現 ${nClusters} 個聚類`)
   } catch (error) {
     console.error('採樣村莊聚類失敗:', error)
     showError(error.message || '聚類失敗')
