@@ -69,8 +69,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 14px;
-  background: var(--glass-70);
-  border: 1px solid var(--glass-20);
+  background: var(--surface-panel);
+  border: 1px solid var(--border-glass-subtle);
   border-radius: var(--radius-md);
   backdrop-filter: blur(6px);
   font-size: 14px;
@@ -80,13 +80,13 @@
 }
 
 .global-select-trigger:hover:not(.is-disabled) {
-  border-color: var(--color-primary, var(--vml-blue));
-  background: var(--glass-80);
+  border-color: var(--border-control-focus);
+  background: var(--surface-panel-hover);
 }
 
 .global-select-trigger.is-open {
-  border-color: var(--color-primary, var(--vml-blue));
-  background: var(--glass-80);
+  border-color: var(--border-control-focus);
+  background: var(--surface-panel-hover);
 }
 
 .global-select-trigger.is-disabled {
@@ -122,23 +122,15 @@
 }
 
 .global-action-btn-primary {
-  background: linear-gradient(
-    135deg,
-    rgba(var(--color-primary-rgb), 1),
-    rgba(var(--color-primary-rgb), 1)
-  );
-  color: white;
-  box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.22);
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
+  box-shadow: var(--action-primary-shadow);
 }
 
 .global-action-btn-primary:hover {
-  background: linear-gradient(
-    135deg,
-    var(--color-primary),
-    rgba(var(--color-primary-rgb), 1)
-  );
+  background: var(--action-primary-bg-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(var(--color-primary-rgb), 0.28);
+  box-shadow: var(--action-primary-shadow);
 }
 
 .global-action-btn-primary:active {
@@ -184,11 +176,11 @@
 
 // Shared glass panel — used by both VillagesML and main app
 .glass-panel {
-  background: var(--glass-60);
+  background: var(--surface-panel);
   backdrop-filter: blur(18px) saturate(145%);
   -webkit-backdrop-filter: blur(18px) saturate(145%);
   border-radius: var(--radius-xl);
-  border: 1px solid var(--glass-40);
+  border: 1px solid var(--border-glass);
   box-shadow: var(--shadow-glass);
   transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
 }

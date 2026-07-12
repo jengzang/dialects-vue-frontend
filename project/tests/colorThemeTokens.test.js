@@ -12,6 +12,10 @@ const navBarPath = resolve(projectRoot, 'src/components/bar/NavBar.vue')
 const villagesMlTokensPath = resolve(projectRoot, 'src/styles/villagesml/_tokens.scss')
 const villagesMlSurfacesPath = resolve(projectRoot, 'src/styles/villagesml/_surfaces.scss')
 const toolbarsPath = resolve(projectRoot, 'src/styles/main/_toolbars.scss')
+const buttonsPath = resolve(projectRoot, 'src/styles/main/_buttons.scss')
+const formsPath = resolve(projectRoot, 'src/styles/main/_forms.scss')
+const mainSurfacesPath = resolve(projectRoot, 'src/styles/main/_surfaces.scss')
+const globalGlassPath = resolve(projectRoot, 'src/styles/global/_glass.scss')
 
 function readSource(path) {
   return readFileSync(path, 'utf8')
@@ -22,7 +26,52 @@ function themeBlock(source, theme) {
   return match?.[1] || ''
 }
 
+function rootBlock(source) {
+  const match = source.match(/:root \{([\s\S]*?)\n\}\n\n:root\[data-color-theme='light'\]/)
+  return match?.[1] || ''
+}
+
 describe('color theme token coverage', () => {
+  it('keeps default blue values stable and maps semantic aliases to existing blue tokens', () => {
+    const source = readSource(tokensPath)
+    const defaultBlock = rootBlock(source)
+
+    expect(defaultBlock).toContain('--color-primary: #007aff;')
+    expect(defaultBlock).toContain('--color-primary-hover: #0051d5;')
+    expect(defaultBlock).toContain('--color-primary-rgb: 0, 122, 255;')
+    expect(defaultBlock).toContain('--bg-page-gradient: radial-gradient(1200px 800px at 10% -10%, #dff1ff, #dff1ff00 60%),')
+
+    expect(defaultBlock).toContain('--surface-glass-button: var(--glass-50);')
+    expect(defaultBlock).toContain('--surface-glass-button-hover: var(--glass-70);')
+    expect(defaultBlock).toContain('--surface-selected: var(--bg-blue-light);')
+    expect(defaultBlock).toContain('--action-primary-bg: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.78), rgba(var(--color-primary-rgb), 0.6));')
+    expect(defaultBlock).toContain('--action-primary-bg-hover: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.86), rgba(var(--color-primary-rgb), 0.68));')
+    expect(defaultBlock).toContain('--action-primary-text: white;')
+    expect(defaultBlock).toContain('--focus-ring: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);')
+  })
+
+  it('uses semantic aliases in high-impact interactive surfaces', () => {
+    const buttonsSource = readSource(buttonsPath)
+    const formsSource = readSource(formsPath)
+    const mainSurfacesSource = readSource(mainSurfacesPath)
+    const globalGlassSource = readSource(globalGlassPath)
+    const toolbarsSource = readSource(toolbarsPath)
+
+    expect(buttonsSource).toContain('background: var(--surface-glass-button);')
+    expect(buttonsSource).toContain('background: var(--action-primary-bg);')
+    expect(buttonsSource).toContain('color: var(--action-primary-text);')
+    expect(buttonsSource).toContain('background: var(--action-primary-bg-hover);')
+    expect(buttonsSource).toContain('box-shadow: var(--action-primary-shadow);')
+    expect(formsSource).toContain('background-color: var(--surface-selected);')
+    expect(formsSource).toContain('color: var(--text-selected);')
+    expect(formsSource).toContain('border-color: var(--border-control-focus);')
+    expect(formsSource).toContain('box-shadow: var(--focus-ring);')
+    expect(mainSurfacesSource).toContain('--main-glass-panel-background: var(--surface-panel);')
+    expect(globalGlassSource).toContain('background: var(--surface-panel);')
+    expect(toolbarsSource).toContain('background: var(--sidebar-item-background);')
+    expect(toolbarsSource).toContain('color: var(--sidebar-item-text);')
+  })
+
   it('uses neutral primary accents for light and white primary accents for dark themes', () => {
     const source = readSource(tokensPath)
     const lightBlock = themeBlock(source, 'light')

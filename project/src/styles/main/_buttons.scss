@@ -1,10 +1,10 @@
 @use '@/styles/global/mixins' as *;
 .main-glass-button {
   padding: var(--main-glass-button-padding, 12px 32px);
-  background: var(--glass-50);
+  background: var(--surface-glass-button);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  border: 1px solid var(--glass-40);
+  border: 1px solid var(--border-glass);
   border-radius: var(--main-glass-button-border-radius, var(--radius-lg));
   color: var(--text-deep);
   font-size: var(--main-glass-button-font-size, 15px);
@@ -19,28 +19,28 @@
 }
 
 .main-glass-button:hover:not(:disabled) {
-  background: var(--glass-70);
+  background: var(--surface-glass-button-hover);
   transform: translateY(-1px);
 }
 
 .main-glass-button[data-variant='primary'] {
-  background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.78), rgba(var(--color-primary-rgb), 0.6));
-  color: white;
-  border-color: rgba(var(--color-primary-rgb), 0.52);
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
+  border-color: var(--action-primary-border);
 }
 
 .main-glass-button[data-variant='primary']:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.86), rgba(var(--color-primary-rgb), 0.68));
-  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
+  background: var(--action-primary-bg-hover);
+  box-shadow: var(--action-primary-shadow);
   transform: translateY(-1px);
 }
 
 .main-glass-button[data-variant='secondary'] {
-  background: var(--glass-60);
+  background: var(--surface-panel);
 }
 
 .main-glass-button[data-variant='secondary']:hover:not(:disabled) {
-  background: var(--glass-70);
+  background: var(--surface-panel-hover);
 }
 
 .main-glass-button:disabled {
@@ -59,17 +59,17 @@
 }
 
 .main-glass-button[data-active='true'] {
-  background: rgba(var(--color-primary-rgb), 0.5);
-  border-color: rgba(var(--color-primary-rgb), 0.5);
+  background: var(--action-active-bg);
+  border-color: var(--action-active-border);
 }
 
 .glass-button {
   white-space: nowrap;
-  background: var(--glass-30);
+  background: var(--surface-panel-subtle);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-md);
-  border: 1px solid var(--glass-30);
+  border: 1px solid var(--border-glass-subtle);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
   cursor: pointer;
 }
@@ -137,8 +137,8 @@
 }
 
 .enter-btn {
-  background: rgba(var(--color-primary-rgb), 0.86);
-  color: white;
+  background: var(--enter-button-bg);
+  color: var(--enter-button-text);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
@@ -146,12 +146,12 @@
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.3);
+  box-shadow: var(--enter-button-shadow);
   white-space: nowrap;
 }
 
 .enter-btn:hover {
-  background: var(--color-primary-hover);
+  background: var(--enter-button-bg-hover);
 }
 
 @media (max-width: 600px) {

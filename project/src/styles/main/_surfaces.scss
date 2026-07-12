@@ -1,9 +1,9 @@
 @use '@/styles/global/mixins' as *;
 .main-glass-panel {
-  --main-glass-panel-background: var(--glass-60);
+  --main-glass-panel-background: var(--surface-panel);
   --main-glass-panel-backdrop-filter: blur(18px) saturate(145%);
   --main-glass-panel-border-radius: var(--radius-xl);
-  --main-glass-panel-border: 1px solid var(--glass-40);
+  --main-glass-panel-border: 1px solid var(--border-glass);
   --main-glass-panel-shadow: 0 4px 14px rgba(var(--color-shadow-rgb), 0.08), 0 1px 4px rgba(var(--color-shadow-rgb), 0.06);
   --main-glass-panel-hover-shadow: 0 8px 22px rgba(var(--color-shadow-rgb), 0.1), 0 2px 8px rgba(var(--color-shadow-rgb), 0.08);
   background: var(--main-glass-panel-background);
@@ -20,10 +20,10 @@
 }
 
 .main-glass-panel-inner {
-  --main-glass-panel-inner-background: var(--glass-50);
+  --main-glass-panel-inner-background: var(--surface-glass-button);
   --main-glass-panel-inner-backdrop-filter: blur(10px) saturate(135%);
   --main-glass-panel-inner-border-radius: var(--radius-md);
-  --main-glass-panel-inner-border: 1px solid var(--glass-30);
+  --main-glass-panel-inner-border: 1px solid var(--border-glass-subtle);
   background: var(--main-glass-panel-inner-background);
   backdrop-filter: var(--main-glass-panel-inner-backdrop-filter);
   -webkit-backdrop-filter: var(--main-glass-panel-inner-backdrop-filter);
@@ -33,9 +33,9 @@
 }
 
 .main-glass-shell {
-  --main-glass-shell-background: var(--glass-90);
+  --main-glass-shell-background: var(--surface-panel-strong);
   --main-glass-shell-backdrop-filter: blur(12px) saturate(145%);
-  --main-glass-shell-border: 1px solid var(--glass-70);
+  --main-glass-shell-border: 1px solid var(--border-glass);
   --main-glass-shell-radius: 30px;
   --main-glass-shell-shadow: 0 8px 24px rgba(var(--color-shadow-rgb), 0.08);
   background: var(--main-glass-shell-background);
@@ -48,19 +48,19 @@
 
 .tool-glass-container,
 .glass-container-shell {
-  background: var(--glass-80);
+  background: var(--surface-panel-hover);
   backdrop-filter: blur(12px) saturate(145%);
   -webkit-backdrop-filter: blur(12px) saturate(145%);
-  border: 1px solid var(--glass-40);
+  border: 1px solid var(--border-glass);
   border-radius: 30px;
   box-shadow: 0 8px 24px rgba(var(--color-shadow-rgb), 0.08);
 }
 
 .glass-container-soft {
-  background: var(--glass-90);
+  background: var(--surface-panel-strong);
   backdrop-filter: blur(10px) saturate(140%);
   -webkit-backdrop-filter: blur(10px) saturate(140%);
-  border: 1px solid var(--glass-70);
+  border: 1px solid var(--border-glass);
 }
 
 .main-card-grid {
@@ -90,19 +90,19 @@
 }
 
 .glass-panel-inner {
-  background: var(--glass-30);
+  background: var(--surface-panel-subtle);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-md);
-  border: 1px solid var(--glass-30);
+  border: 1px solid var(--border-glass-subtle);
   transition: border-color 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease;
 }
 
 .glass-card {
-  background: var(--glass-30);
+  background: var(--surface-panel-subtle);
   backdrop-filter: blur(14px) saturate(145%);
   -webkit-backdrop-filter: blur(14px) saturate(145%);
-  border: 1px solid var(--glass-40);
+  border: 1px solid var(--border-glass);
   box-shadow: 0 6px 18px var(--bg-hover-light), inset 0 0 0 1px var(--glass-30);
   border-radius: var(--radius-xl);
   transition: background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
@@ -149,4 +149,3 @@
     font-size: 2.4rem;
   }
 }
-

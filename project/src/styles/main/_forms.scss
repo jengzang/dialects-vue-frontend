@@ -7,7 +7,7 @@
   z-index: 1000;
   padding: 6px 0;
   border-radius: var(--radius-md);
-  background: var(--glass-90);
+  background: var(--surface-panel-strong);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 8px 32px var(--bg-hover-strong);
@@ -24,21 +24,21 @@
 }
 
 .choice-dropdown-item.active {
-  background-color: var(--bg-blue-light);
-  color: var(--color-primary-hover);
+  background-color: var(--surface-selected);
+  color: var(--text-selected);
   font-weight: bold;
 }
 
 .choice-dropdown-item:hover {
-  background-color: var(--bg-blue-light);
+  background-color: var(--surface-selected);
 }
 
 .main-search-field {
   // width: min(360px, 100%);
   padding: 10px 14px;
-  border: 1px solid rgba(var(--text-slate-light-rgb), 0.32);
+  border: 1px solid var(--border-control);
   border-radius: var(--radius-pill);
-  background: var(--glass-70);
+  background: var(--surface-panel);
   color: var(--text-deep);
   font-size: 14px;
   outline: none;
@@ -53,17 +53,17 @@
 }
 
 .main-search-field:focus {
-  border-color: rgba(var(--color-primary-rgb), 0.55);
-  background: var(--glass-90);
-  box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
+  border-color: var(--border-control-focus);
+  background: var(--surface-panel-strong);
+  box-shadow: var(--focus-ring);
 }
 
 .main-input-field {
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid rgba(var(--text-slate-light-rgb), 0.32);
+  border: 1px solid var(--border-control);
   border-radius: var(--radius-md);
-  background: var(--glass-80);
+  background: var(--surface-panel-hover);
   color: var(--text-deep);
   font-size: 14px;
   outline: none;
@@ -79,9 +79,9 @@
 }
 
 .main-input-field:focus {
-  border-color: rgba(var(--color-primary-rgb), 0.55);
+  border-color: var(--border-control-focus);
   background: var(--bg-white);
-  box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
+  box-shadow: var(--focus-ring);
 }
 
 .main-glow-switch:hover {
