@@ -257,6 +257,13 @@ export const VILLAGESML_MODULES = [
                 label: '相似度分析',
                 icon: '🔍',
                 path: '/villagesML?module=regional&subtab=similarity'
+            },
+            {
+                id: 'feature-agg',
+                label: '特徵聚合',
+                icon: '🔬',
+                path: '/villagesML?module=regional&subtab=feature-agg',
+                requireAuth: true
             }
         ]
     },

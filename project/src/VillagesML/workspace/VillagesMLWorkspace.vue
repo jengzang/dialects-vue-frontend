@@ -214,6 +214,7 @@ const RegionalAggregates = defineAsyncComponent(() => import('@/VillagesML/works
 const RegionalVectors = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/regional/RegionalVectors.vue'))
 const CategoryTendency = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/regional/CategoryTendency.vue'))
 const RegionSimilarity = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/regional/RegionSimilarity.vue'))
+const FeatureAggregation = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/regional/FeatureAggregation.vue'))
 const FeatureExtraction = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/ml/FeatureExtraction.vue'))
 const SubsetAnalysis = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/ml/SubsetAnalysis.vue'))
 const SystemInfo = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/system/SystemInfo.vue'))
@@ -289,6 +290,7 @@ const currentComponent = computed(() => {
       'regional-vectors': RegionalVectors,
       'regional-tendency': CategoryTendency,
       'regional-similarity': RegionSimilarity,
+      'regional-feature-agg': FeatureAggregation,
       'compute-features': FeatureExtraction,
       'compute-subset': SubsetAnalysis,
       // New clustering types
