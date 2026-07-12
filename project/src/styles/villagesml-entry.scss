@@ -1,5 +1,7 @@
 @use './global-entry' as global-entry;
 
+@use './main/toolbars' as main-toolbars;
+
 @use './villagesml/tokens' as villagesml-tokens;
 @use './villagesml/surfaces' as villagesml-surfaces;
 @use './villagesml/panels' as villagesml-panels;
