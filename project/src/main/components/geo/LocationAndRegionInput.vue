@@ -1418,7 +1418,7 @@ $portrait-ratio: 1;
       box-shadow:
         0 0 0 1px var(--color-primary-shadow-light),
         0 4px 12px var(--color-primary-shadow);
-      color: var(--text-white);
+      color: var(--action-primary-text);
       font-weight: 600;
     }
   }
@@ -1498,6 +1498,10 @@ $portrait-ratio: 1;
   cursor: pointer;
   user-select: none;
   transition: all 0.2s ease;
+
+  :root[data-color-theme='dark'] & {
+    color: var(--text-primary);
+  }
 
   &:hover {
     background: var(--color-primary-light2);
@@ -1621,6 +1625,10 @@ $portrait-ratio: 1;
   font-size: 13px;
   cursor: pointer;
   user-select: none;
+
+  :root[data-color-theme='dark'] & {
+    color: var(--text-primary);
+  }
 
   &:hover {
     background: var(--color-primary-light2);

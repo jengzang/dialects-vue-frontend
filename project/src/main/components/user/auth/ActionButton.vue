@@ -75,7 +75,7 @@ $gradient-variants: (
   max-width: 180px;
   margin: 0 auto;
   padding: 14px 18px;
-  color: white;
+  color: var(--action-primary-text);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;

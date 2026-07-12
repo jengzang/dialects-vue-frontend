@@ -506,7 +506,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.04em;
-  color: white;
+  color: var(--action-primary-text);
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;

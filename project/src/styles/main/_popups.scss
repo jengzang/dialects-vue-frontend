@@ -10,7 +10,7 @@
   padding: 1px 2px;
   font-size: 11px;
   background-color: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-xs);
   cursor: pointer;
@@ -109,7 +109,7 @@
   padding: 1px 2px;
   font-size: 11px;
   background-color: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-xs);
   cursor: pointer;

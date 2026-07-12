@@ -733,7 +733,7 @@ watch(
 
 .tab-button.active {
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border-color: var(--color-primary);
 }
 

@@ -134,7 +134,7 @@ const parseSequence = (sequence) => {
 .category-tag {
   padding: 6px 16px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border-radius: var(--radius-xl);
   font-size: 14px;
   font-weight: 500;

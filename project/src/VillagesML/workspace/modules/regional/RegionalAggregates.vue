@@ -564,7 +564,7 @@ onBeforeUnmount(() => {
 .detail-button {
   padding: 6px 16px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm);
   font-size: 13px;
@@ -587,7 +587,7 @@ onBeforeUnmount(() => {
 .pagination button {
   padding: 8px 16px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm2);
   cursor: pointer;

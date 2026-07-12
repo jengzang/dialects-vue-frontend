@@ -926,7 +926,7 @@ watch(() => props.activeTab, () => {
 .custom-select select {
   width: 100%;
   appearance: none;
-  background: white;
+  background: var(--bg-white);
   border: 1px solid var(--border-light-gray);
   padding: 8px 12px;
   border-radius: var(--radius-sm2);
@@ -980,6 +980,11 @@ watch(() => props.activeTab, () => {
   color: var(--color-primary);
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  :root[data-color-theme='dark'] & {
+    color: var(--text-primary);
+    background: var(--surface-panel-strong);
+  }
 }
 
 /* 按钮行 */
@@ -999,7 +1004,7 @@ watch(() => props.activeTab, () => {
 
 .action-btn {
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   padding: 8px;
   border-radius: var(--radius-sm2);
@@ -1085,7 +1090,7 @@ watch(() => props.activeTab, () => {
 }
 
 .yubao-popup-content {
-  background: white;
+  background: var(--bg-white);
   border-radius: var(--radius-lg);
   width: 90%;
   max-width: 500px;

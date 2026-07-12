@@ -1577,7 +1577,7 @@ $portrait-ratio: 1;
   border: none;
   border-radius: var(--radius-md);
   box-shadow: 0 2px 8px var(--color-primary-shadow);
-  color: var(--text-white);
+  color: var(--action-primary-text);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -1623,6 +1623,10 @@ $portrait-ratio: 1;
     white-space: nowrap;
     font-size: 14px;
     font-weight: 700;
+
+    :root[data-color-theme='dark'] & {
+      color: var(--text-primary);
+    }
   }
 }
 
@@ -1650,7 +1654,7 @@ $portrait-ratio: 1;
     background: var(--color-primary);
     border-color: var(--color-primary);
     box-shadow: 0 4px 12px var(--color-primary-shadow);
-    color: var(--text-white);
+    color: var(--action-primary-text);
   }
 }
 

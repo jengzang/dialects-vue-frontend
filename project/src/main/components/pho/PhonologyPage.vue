@@ -273,7 +273,7 @@ watch(locationQuery, (urlLocations) => {
     box-shadow:
       0 4px 12px var(--color-primary-shadow),
       0 2px 4px var(--bg-overlay-light2);
-    color: var(--text-white);
+    color: var(--action-primary-text);
     white-space: nowrap;
     font-size: 16px;
     font-weight: 600;

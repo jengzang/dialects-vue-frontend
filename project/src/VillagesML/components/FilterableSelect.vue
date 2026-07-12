@@ -550,7 +550,7 @@ onUnmounted(() => {
   @include flex-center;
   border: none;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   cursor: pointer;
   transition: all 0.3s ease;
   padding:10px 4px;

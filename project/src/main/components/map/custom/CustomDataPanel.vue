@@ -535,7 +535,7 @@ const resetForm = () => {
 .submit-btn {
   padding: 12px 24px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-md);
   font-size: 16px;

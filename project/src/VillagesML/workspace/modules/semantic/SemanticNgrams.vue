@@ -651,7 +651,7 @@ watch(detailMode, () => {
 .lexicon-button {
   padding: 8px 16px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm2);
   font-size: 14px;
@@ -740,7 +740,7 @@ watch(detailMode, () => {
 
 .char-tag:hover {
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   transform: translateY(-2px);
 }
 

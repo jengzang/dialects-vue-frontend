@@ -565,6 +565,10 @@ $portrait-ratio: 1;
   cursor: pointer;
   transition: all 0.2s ease;
 
+  :root[data-color-theme='dark'] & {
+    color: var(--text-primary);
+  }
+
   &:hover {
     background: var(--color-primary-light2);
   }

@@ -337,7 +337,7 @@ onMounted(() => {
 .load-ngram-button {
   padding: 6px 14px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm);
   font-size: 13px;
@@ -445,7 +445,7 @@ onMounted(() => {
 .search-button {
   padding: 12px 30px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-md);
   font-size: 16px;

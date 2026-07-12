@@ -281,7 +281,7 @@ const goToTendency = (pattern) => {
   width: 32px;
   height: 32px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border-radius: var(--radius-full);
   @include flex-center;
   font-weight: 700;

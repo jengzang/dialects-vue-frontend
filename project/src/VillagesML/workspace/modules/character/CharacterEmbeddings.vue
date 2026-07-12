@@ -374,7 +374,7 @@ onBeforeUnmount(() => {
   flex: 1;
   padding: 10px 20px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-md);
   font-size: 14px;
@@ -519,7 +519,7 @@ onBeforeUnmount(() => {
 .pagination-controls button {
   padding: 8px 16px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm2);
   cursor: pointer;
@@ -597,7 +597,7 @@ onBeforeUnmount(() => {
 .action-button {
   padding: 6px 16px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm);
   font-size: 14px;

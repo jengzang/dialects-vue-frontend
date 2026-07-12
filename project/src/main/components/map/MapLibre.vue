@@ -1065,7 +1065,7 @@ $glass-transition: all 0.3s ease;
 .action-btn {
   padding: 8px;
 
-  color: white;
+  color: var(--action-primary-text);
   font-size: 13px;
 
   background: var(--color-primary);
@@ -1180,7 +1180,7 @@ $glass-transition: all 0.3s ease;
 
   overflow: hidden;
 
-  background: white;
+  background: var(--bg-white);
   border-radius: var(--radius-md);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }

@@ -862,7 +862,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 .btn-primary {
   @include primary-gradient;
 
-  color: white;
+  color: var(--action-primary-text);
   box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
 
   &:hover {
@@ -971,7 +971,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
     .expand-toggle {
       background: $primary;
-      color: white;
+      color: var(--action-primary-text);
       transform: rotate(180deg);
 
       &:hover {
@@ -1403,7 +1403,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     border: none;
     border-radius: var(--radius-md);
     box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.25);
-    color: white;
+    color: var(--action-primary-text);
     font-size: 0.9375rem;
     font-weight: 600;
     cursor: pointer;
@@ -1499,7 +1499,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     &.primary {
       @include primary-gradient;
 
-      color: white;
+      color: var(--action-primary-text);
       box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
 
       &:hover {
@@ -1519,6 +1519,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
         border-color: rgba(var(--color-primary-rgb), 0.5);
         box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.2);
         transform: translateY(-2px);
+
+        :root[data-color-theme='dark'] & {
+          color: var(--text-primary);
+          background: var(--surface-panel-strong);
+        }
       }
     }
   }

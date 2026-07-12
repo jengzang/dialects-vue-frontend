@@ -72,6 +72,11 @@ $mobile-aspect-ratio: 1;
     font-weight: 600;
     background-color: $white;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+
+    :root[data-color-theme='dark'] & {
+      color: var(--text-primary);
+      background-color: var(--surface-panel-strong);
+    }
   }
 
   @media (max-aspect-ratio: $mobile-aspect-ratio) {

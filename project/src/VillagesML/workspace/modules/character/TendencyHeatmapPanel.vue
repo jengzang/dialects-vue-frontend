@@ -226,7 +226,7 @@ onBeforeUnmount(() => {
 
 .metric-button.active {
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
 }
 
 .chart-container {

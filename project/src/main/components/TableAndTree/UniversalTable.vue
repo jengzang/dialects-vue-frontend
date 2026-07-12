@@ -1642,7 +1642,7 @@ $system-font:
   }
 
   &[data-variant='primary'] {
-    color: white;
+    color: var(--action-primary-text);
     background: var(--color-primary);
   }
 
@@ -1803,7 +1803,15 @@ td {
     .header-text {
       color: var(--color-primary);
       font-weight: bold;
+
+      :root[data-color-theme='dark'] & {
+        color: var(--color-primary-hover);
+      }
     }
+  }
+
+  :root[data-color-theme='dark'] & {
+    color: var(--text-primary);
   }
 }
 
@@ -2262,7 +2270,7 @@ td {
 
 .confirm-btn {
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
 }
 
 .confirm-btn:hover {
@@ -2295,7 +2303,7 @@ td {
   border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;

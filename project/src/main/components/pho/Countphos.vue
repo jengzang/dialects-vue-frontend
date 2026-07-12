@@ -1154,7 +1154,7 @@ $mobile-breakpoint: 768px;
     box-shadow:
       0 4px 12px var(--color-primary-shadow),
       0 2px 4px rgba(0, 0, 0, 0.08);
-    color: var(--text-white);
+    color: var(--action-primary-text);
     white-space: nowrap;
     font-size: 16px;
     font-weight: 600;
@@ -1479,7 +1479,7 @@ $mobile-breakpoint: 768px;
     border: none;
     border-radius: var(--radius-md);
     box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.3);
-    color: var(--text-white);
+    color: var(--action-primary-text);
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;

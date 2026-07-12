@@ -77,6 +77,7 @@ function toggleKey(key) {
   border: 1px solid var(--color-primary-medium);
   border-radius: var(--radius-md);
   background: var(--glass-30);
+  color: var(--text-primary);
   cursor: pointer;
   transition: background 0.3s ease;
   font-size: 14px;
@@ -92,7 +93,7 @@ function toggleKey(key) {
 
 .key-button.active {
   background: var(--color-primary-medium2);
-  color: white;
+  color: var(--action-primary-text);
   font-weight: 600;
 }
 </style>

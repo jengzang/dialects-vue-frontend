@@ -179,7 +179,7 @@ h3 { font-size: 16px; margin-top: 20px; }
 }
 
 .load-button {
-  padding: 10px 24px; background: var(--color-primary); color: white;
+  padding: 10px 24px; background: var(--color-primary); color: var(--action-primary-text);
   border: none; border-radius: var(--radius-sm2); font-size: 14px; font-weight: 500;
   cursor: pointer; transition: all 0.3s ease;
 }
