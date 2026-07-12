@@ -252,8 +252,16 @@ let closeSubmenuTimer = null
 
 // Mobile detection
 const isMobile = ref(false)
+let hoverMediaQuery = null
+
+const onHoverChange = (e) => {
+  isMobile.value = !e.matches
+}
+
 const checkMobile = () => {
-  isMobile.value = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  isMobile.value = !window.matchMedia('(hover: hover)').matches
+  hoverMediaQuery = window.matchMedia('(hover: hover)')
+  hoverMediaQuery.addEventListener('change', onHoverChange)
 }
 
 // Helper function to get children from submenuConfig
@@ -277,6 +285,10 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', closeSubmenu)
+  if (hoverMediaQuery) {
+    hoverMediaQuery.removeEventListener('change', onHoverChange)
+    hoverMediaQuery = null
+  }
   if (closeSubmenuTimer) {
     clearTimeout(closeSubmenuTimer)
     closeSubmenuTimer = null
@@ -692,7 +704,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   user-select: none;
 }
 
-@media (max-aspect-ratio: 1/1) {
+@media (max-aspect-ratio: 1/1) and (hover: none) {
   .commonbar-desktop {
     display: none;
   }
@@ -765,7 +777,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
   @include glass-blur(20px, 180%);
 
-  @media (max-aspect-ratio: 1/1) {
+  @media (max-aspect-ratio: 1/1) and (hover: none) {
     max-width: calc(100vw - 20px);
   }
 }
@@ -791,7 +803,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     transform: translateX(4px);
   }
 
-  @media (max-aspect-ratio: 1/1) {
+  @media (max-aspect-ratio: 1/1) and (hover: none) {
     padding: 10px 14px;
     font-size: 14px;
   }

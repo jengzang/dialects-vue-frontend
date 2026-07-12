@@ -222,18 +222,6 @@
         <!-- <h2 class="tabs-title">{{ $t('navigation.tabs.settings') }}</h2> -->
 
           <div class="setting-section">
-            <h3 class="section-title">{{ $t('navigation.settings.colorTheme.title') }}</h3>
-            <p class="section-description">{{ $t('navigation.settings.colorTheme.description') }}</p>
-
-            <RadioGroup
-              v-model="colorThemeModel"
-              :options="colorThemeRadioOptions"
-              name="about-color-theme"
-              class="settings-radio-group color-theme-radio-group"
-            />
-          </div>
-
-          <div class="setting-section">
             <h3 class="section-title">{{ $t('navigation.settings.language.title') }}</h3>
 <!--          <p class="section-description">{{ $t('navigation.settings.language.description') }}</p>-->
 
@@ -286,6 +274,18 @@
                 class="settings-radio-group"
               />
             </div>
+          </div>
+
+          <div class="setting-section">
+            <h3 class="section-title">{{ $t('navigation.settings.colorTheme.title') }}</h3>
+            <p class="section-description">{{ $t('navigation.settings.colorTheme.description') }}</p>
+
+            <RadioGroup
+              v-model="colorThemeModel"
+              :options="colorThemeRadioOptions"
+              name="about-color-theme"
+              class="settings-radio-group color-theme-radio-group"
+            />
           </div>
 
           <div class="setting-section">

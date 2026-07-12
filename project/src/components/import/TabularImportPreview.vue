@@ -11,7 +11,7 @@
       <div class="tabular-import-preview__modal-header">
         <div>
           <component :is="titleTag" class="tabular-import-preview__title">{{ title }}</component>
-          <p v-if="description" class="tabular-import-preview__description">{{ description }}</p>
+          <!-- <p v-if="description" class="tabular-import-preview__description">{{ description }}</p> -->
         </div>
         <div class="tabular-import-preview__header-actions">
           <button

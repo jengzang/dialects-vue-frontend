@@ -86,12 +86,17 @@ const renderChart = () => {
   if (chartInstance) chartInstance.dispose()
   chartInstance = echarts.init(chartRef.value)
 
+  const styles = getComputedStyle(document.documentElement)
+  const successColor = styles.getPropertyValue('--color-success').trim()
+  const errorColor = styles.getPropertyValue('--color-error').trim()
+
   const option = {
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'shadow' },
       formatter: (params) => {
         const item = props.data[params[0].dataIndex]
+
         return `
           <strong>${item.character}</strong><br/>
           Z-Score: ${item.z_score?.toFixed(3) || 'N/A'}<br/>
@@ -102,26 +107,32 @@ const renderChart = () => {
     },
     xAxis: {
       type: 'category',
-      data: props.data.map(item => item.character),
+      data: props.data.map((item) => item.character),
       axisLabel: { fontSize: 14 }
     },
     yAxis: {
       type: 'value',
       name: getMetricLabel(),
-      nameTextStyle: { fontSize: 14, fontWeight: 600 }
+      nameTextStyle: {
+        fontSize: 14,
+        fontWeight: 600
+      }
     },
-    series: [{
-      type: 'bar',
-      data: props.data.map(item => {
-        const value = getMetricValue(item)
-        return {
-          value: value,
-          itemStyle: {
-            color: value > 0 ? 'var(--color-success)' : 'var(--color-error)'
+    series: [
+      {
+        type: 'bar',
+        data: props.data.map((item) => {
+          const value = Number(getMetricValue(item))
+
+          return {
+            value,
+            itemStyle: {
+              color: value > 0 ? successColor : errorColor
+            }
           }
-        }
-      })
-    }]
+        })
+      }
+    ]
   }
 
   chartInstance.setOption(option)

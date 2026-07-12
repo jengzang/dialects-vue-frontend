@@ -154,8 +154,16 @@ const submenuPosition = ref({ top: 0, left: 0 })
 let closeSubmenuTimer = null
 
 const isMobile = ref(false)
+let hoverMediaQuery = null
+
+const onHoverChange = (e) => {
+  isMobile.value = !e.matches
+}
+
 const checkMobile = () => {
-  isMobile.value = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  isMobile.value = !window.matchMedia('(hover: hover)').matches
+  hoverMediaQuery = window.matchMedia('(hover: hover)')
+  hoverMediaQuery.addEventListener('change', onHoverChange)
 }
 
 const getTabChildren = (tabKey) => {
@@ -236,6 +244,10 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', closeSubmenu)
+  if (hoverMediaQuery) {
+    hoverMediaQuery.removeEventListener('change', onHoverChange)
+    hoverMediaQuery = null
+  }
   if (closeSubmenuTimer) {
     clearTimeout(closeSubmenuTimer)
     closeSubmenuTimer = null
@@ -605,7 +617,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   display: none;
 }
 
-@media (max-aspect-ratio: 1/1) {
+@media (max-aspect-ratio: 1/1) and (hover: none) {
   .explorebar-desktop {
     display: none;
   }
@@ -678,7 +690,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
   @include glass-blur(20px, 180%);
 
-  @media (max-aspect-ratio: 1/1) {
+  @media (max-aspect-ratio: 1/1) and (hover: none) {
     max-width: calc(100vw - 20px);
   }
 }
@@ -704,7 +716,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     transform: translateX(4px);
   }
 
-  @media (max-aspect-ratio: 1/1) {
+  @media (max-aspect-ratio: 1/1) and (hover: none) {
     padding: 10px 14px;
     font-size: 14px;
   }

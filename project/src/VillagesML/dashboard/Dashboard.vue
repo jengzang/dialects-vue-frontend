@@ -6,7 +6,7 @@
       <!-- Introduction Section -->
       <div class="intro-section glass-panel">
         <p class="intro-text">
-          <strong>自然村機器學習分析系統</strong>是一個基於廣東省285,860個自然村名稱的語言學分析平台。
+          <strong>自然村機器學習分析系統</strong>是一個基於廣東省283,070個自然村名稱的語言學分析平台。
           系統運用機器學習和自然語言處理技術，從多個維度分析村名的語義、結構、空間分佈等特徵，為地名學研究、文化地理學、語言學等領域提供數據支持。
         </p>
         <div class="github-row">
@@ -149,7 +149,7 @@ const statistics = computed(() => {
       icon: '🏘️',
       label: '自然村總數',
       value: metadata.value.total_villages || 0,
-      tooltip: '廣東省285,860個自然村名稱，數據來源於2020年全國地名普查。覆蓋21個地級市、123個區縣、1500+個鄉鎮'
+      tooltip: '廣東省283,070個自然村名稱，數據來源於各大地圖網站整理匯總。覆蓋21個地級市、123個區縣、1500+個鄉鎮'
     },
     {
       key: 'cities',
@@ -207,7 +207,7 @@ const features = [
     route: '/villagesML?module=character&subtab=frequency',
     badge: '公開',
     badgeClass: 'badge-public',
-    tooltip: '基於285,860條村名的字符統計分析。包含：①頻率傾向（Z-score/Lift/Log-odds三種指標衡量地區偏好）②嵌入相似（Word2Vec Skipgram模型，100維向量，餘弦相似度）③字符網絡（Louvain社群識別算法）④顯著性（卡方檢驗，Cramér\'s V效應量）'
+    tooltip: '基於283,070條村名的字符統計分析。包含：①頻率傾向（Z-score/Lift/Log-odds三種指標衡量地區偏好）②嵌入相似（Word2Vec Skipgram模型，100維向量，餘弦相似度）③字符網絡（Louvain社群識別算法）④顯著性（卡方檢驗，Cramér\'s V效應量）'
   },
   {
     id: 'semantic',

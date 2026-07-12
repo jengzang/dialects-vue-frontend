@@ -167,8 +167,16 @@ const closeSubmenuTimeout = ref(null)  // Timeout for delayed closing
 
 // Mobile detection
 const isMobile = ref(false)
+let hoverMediaQuery = null
+
+const onHoverChange = (e) => {
+  isMobile.value = !e.matches
+}
+
 const checkMobile = () => {
-  isMobile.value = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  isMobile.value = !window.matchMedia('(hover: hover)').matches
+  hoverMediaQuery = window.matchMedia('(hover: hover)')
+  hoverMediaQuery.addEventListener('change', onHoverChange)
 }
 
 // Filter menu items for SimpleSidebar (exclude items that should only show in NavBar)
@@ -347,6 +355,10 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', closeSubmenu);
+  if (hoverMediaQuery) {
+    hoverMediaQuery.removeEventListener('change', onHoverChange);
+    hoverMediaQuery = null;
+  }
 });
 </script>
 
@@ -811,7 +823,7 @@ $portrait-ratio: 1;
 }
 
 /* 竖屏调整 */
-@media (max-aspect-ratio: $portrait-ratio) {
+@media (max-aspect-ratio: $portrait-ratio) and (hover: none) {
   .title-img {
     height: 6dvh;
     max-height: 50px;
