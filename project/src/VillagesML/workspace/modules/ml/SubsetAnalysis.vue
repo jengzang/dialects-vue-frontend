@@ -772,7 +772,7 @@ const applyFilters = async () => {
       }
     })
 
-    const response = await fetchSubsetFilter({ ...apiParams, maxResults: 100000 })
+    const response = await fetchSubsetFilter({ ...apiParams, maxResults: 50000 })
 
     let results = (response.villages || []).map(v => ({
       id: v.id,
@@ -785,7 +785,11 @@ const applyFilters = async () => {
     currentFilteredVillages.value.filterParams = apiParams
     currentFilteredVillages.value.totalCount = response.total
 
-    showSuccess(`篩選完成，共 ${results.length} 個村莊`)
+    if (results.length >= 50000) {
+      showWarning(`已達到查詢上限，僅返回 ${results.length} 個村莊`)
+    } else {
+      showSuccess(`篩選完成，共 ${results.length} 個村莊`)
+    }
   } catch (error) {
     showError(error.message || '篩選失敗')
   } finally {
@@ -847,6 +851,11 @@ const compareSubsets = async () => {
   }
   if (!subsetB.value.villages || subsetB.value.villages.length === 0) {
     showError('子集 B 為空，請先構建子集')
+    return
+  }
+
+  if (subsetA.value.villages.length > 50000 || subsetB.value.villages.length > 50000) {
+    showWarning('子集村莊數量超過上限（50,000），請減少村莊數量後再比較')
     return
   }
 

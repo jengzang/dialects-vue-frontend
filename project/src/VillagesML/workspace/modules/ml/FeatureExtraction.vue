@@ -388,7 +388,7 @@ import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { extractFeatures as apiExtractFeatures, aggregateFeatures as apiAggregateFeatures, searchVillages } from '@/api/index.js'
+import { extractFeatures as apiExtractFeatures, aggregateFeatures as apiAggregateFeatures, fetchSubsetFilter } from '@/api/index.js'
 import { showError, showSuccess, showWarning } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
 import { cityHasCounties } from '@/VillagesML/utils/regionPreload.js'
@@ -548,7 +548,6 @@ const handleCountyChange = () => {
 
 // 载入村庄列表
 const loadVillages = async () => {
-  // 至少需要搜索关键词或区域筛选之一
   if (!searchKeyword.value && !hasFilters.value) {
     showWarning('請輸入搜索關鍵詞或選擇區域')
     return
@@ -557,35 +556,28 @@ const loadVillages = async () => {
   loading.value = true
   loadingMessage.value = '載入村莊列表...'
   try {
-    const params = {
-      keyword: searchKeyword.value || '',
-      page_size: 1000
-    }
-
-    // 根据选择的层级设置参数
+    const params = { maxResults: 50000 }
+    if (searchKeyword.value) params.keyword = searchKeyword.value
     if (filterCity.value) params.city = filterCity.value
     if (filterCounty.value) params.county = filterCounty.value
     if (filterTownship.value) params.township = filterTownship.value
 
-    const response = await searchVillages(params)
+    const response = await fetchSubsetFilter(params)
 
-    const villages = response.data || []
-    allVillages.value = villages.map(v => ({
-      id: String(v.village_id),  // 确保 id 是字符串类型
-      name: v.village_name,
+    allVillages.value = (response.villages || []).map(v => ({
+      id: String(v.id),
+      name: v.name,
       city: v.city,
       county: v.county,
-      township: v.township,
+      township: null,
       region: v.county || v.city
     }))
 
-    const total = response.total || 0
-    if (total > allVillages.value.length) {
-      showWarning(`載入了 ${allVillages.value.length} 個村莊（共 ${total} 個，已達到單次查詢上限）`)
+    if (allVillages.value.length >= 50000) {
+      showWarning(`已達到單次查詢上限，僅載入 ${allVillages.value.length} 個村莊`)
     } else {
       showSuccess(`載入了 ${allVillages.value.length} 個村莊`)
     }
-
     currentPage.value = 1
   } catch (error) {
     showError('載入村莊列表失敗: ' + error.message)
@@ -650,6 +642,11 @@ const nextResultsPage = () => {
 
 const extractFeatures = async () => {
   if (!canExtract.value) return
+
+  if (selectedVillages.value.length > 50000) {
+    showWarning('選擇的村莊數量超過上限（50,000），請減少選擇後再提取')
+    return
+  }
 
   loading.value = true
   loadingMessage.value = '正在提取特徵...'
