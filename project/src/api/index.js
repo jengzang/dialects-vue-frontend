@@ -158,6 +158,7 @@ export {
   getCharEmbeddingsList,
   getCharEmbeddingVector,
   getCharSimilarities,
+  fetchCharacterNetwork,
   getCharSignificanceByChar,
   getCharSignificanceByRegion,
   getCharSignificanceSummary,

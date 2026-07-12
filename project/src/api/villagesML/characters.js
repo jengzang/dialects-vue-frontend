@@ -133,6 +133,29 @@ export async function getCharSimilarities(params) {
 }
 
 /**
+ * 獲取字符相似性網絡圖數據（BFS 展開）
+ * @param {Object} params
+ * @param {string} params.rootChar - 根字符，長度為1
+ * @param {number} [params.depth=2] - BFS 擴展深度，範圍1-4
+ * @param {number} [params.topK=5] - 每節點保留前K個相似字符，範圍1-10
+ * @param {number} [params.minSimilarity=0.3] - 相似度閾值，範圍0.0-1.0
+ * @param {number} [params.maxNodes=50] - 最大節點數上限，範圍10-100
+ * @returns {Promise<{ nodes: Array<{ character: string, depth: number, similarity: number }>, edges: Array<{ source: string, target: string, similarity: number }> }>}
+ */
+export async function fetchCharacterNetwork(params) {
+  return api('/api/villages/character/network', {
+    method: 'POST',
+    body: {
+      root_char: params.rootChar,
+      depth: params.depth ?? 2,
+      top_k: params.topK ?? 5,
+      min_similarity: params.minSimilarity ?? 0.3,
+      max_nodes: params.maxNodes ?? 50
+    }
+  })
+}
+
+/**
  * 獲取字的顯著性（按字查詢）
  * @param {Object} params
  * @param {string} params.char - 字符

@@ -40,7 +40,7 @@
         </div>
         <div class="control-group">
           <label>最大節點數</label>
-          <input v-model.number="maxNodes" type="number" min="10" max="100" class="glass-input small" />
+          <input v-model.number="maxNodes" type="number" min="10" max="1000" class="glass-input small" />
         </div>
         <button
           class="solid-button"
@@ -90,7 +90,7 @@ import { useRoute, useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { getCharSimilarities } from '@/api/index.js'
+import { fetchCharacterNetwork } from '@/api/index.js'
 import { showWarning } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
 
@@ -110,7 +110,7 @@ const goToAuth = () => router.push({
 const rootChar = ref('')
 const depth = ref(2)
 const topK = ref(5)
-const minSimilarity = ref(0.6)
+const minSimilarity = ref(0.3)
 const maxNodes = ref(50)
 
 // State
@@ -133,74 +133,56 @@ const depthOptions = [
   { label: '4 層', value: 4 }
 ]
 
-// BFS network builder
 const buildNetwork = async () => {
   if (!rootChar.value || !isAuthenticated.value) return
+  if (maxNodes.value > 1000) {
+    showWarning('最大節點數不能超過 1000，已自動調整')
+    maxNodes.value = 1000
+  }
   loading.value = true
   graphReady.value = false
-  progressText.value = '正在查詢根節點...'
-  progressPct.value = 0
+  progressText.value = '正在請求網絡數據...'
+  progressPct.value = 30
 
-  const nodesMap = new Map()
-  const linksSet = new Set()
-  const linksArr = []
+  try {
+    const data = await fetchCharacterNetwork({
+      rootChar: rootChar.value,
+      depth: depth.value,
+      topK: topK.value,
+      minSimilarity: minSimilarity.value,
+      maxNodes: maxNodes.value
+    })
 
-  nodesMap.set(rootChar.value, { depth: 0, similarity: 1.0 })
-  let currentQueue = [{ char: rootChar.value, depth: 0 }]
+    progressPct.value = 80
+    progressText.value = '正在渲染圖表...'
 
-  for (let hop = 1; hop <= depth.value; hop++) {
-    if (!currentQueue.length) break
-    const nextQueue = []
-    let processed = 0
+    const nodes = (data.nodes || []).map(n => ({
+      id: n.character, name: n.character, value: n.similarity, depth: n.depth,
+      symbolSize: n.depth === 0 ? 60 : 28 + n.similarity * 22,
+      itemStyle: { color: DEPTH_COLORS[n.depth] ?? DEPTH_COLORS[4] },
+      label: { fontSize: n.depth === 0 ? 20 : 14, fontWeight: n.depth === 0 ? 'bold' : 'normal' }
+    }))
 
-    for (const { char } of currentQueue) {
-      if (nodesMap.size >= maxNodes.value) break
-      progressText.value = `正在擴展第 ${hop} 層... 已加載 ${nodesMap.size}/${maxNodes.value} 節點`
-      progressPct.value = Math.round(((hop - 1) / depth.value + processed / (currentQueue.length * depth.value)) * 100)
+    const links = (data.edges || []).map(l => ({
+      source: l.source, target: l.target, value: l.similarity,
+      lineStyle: { width: 1 + l.similarity * 3, opacity: 0.25 + l.similarity * 0.5 }
+    }))
 
-      try {
-        const result = await getCharSimilarities({ char, top_k: topK.value, min_similarity: minSimilarity.value })
-        const similarities = result.similarities || []
+    graphNodes.value = nodes
+    graphLinks.value = links
 
-        for (const item of similarities) {
-          if (nodesMap.size >= maxNodes.value) break
-          if (!item.character || item.similarity < minSimilarity.value) continue
+    if (nodes.length <= 1) showWarning('未找到足夠相似的字符，請降低相似度閾值')
 
-          const linkKey = [char, item.character].sort().join('->')
-          if (!linksSet.has(linkKey)) {
-            linksSet.add(linkKey)
-            linksArr.push({ source: char, target: item.character, value: item.similarity })
-          }
-          if (!nodesMap.has(item.character)) {
-            nodesMap.set(item.character, { depth: hop, similarity: item.similarity })
-            if (hop < depth.value) nextQueue.push({ char: item.character, depth: hop })
-          }
-        }
-      } catch { /* skip failed nodes */ }
-      processed++
-    }
-    currentQueue = nextQueue
+    progressText.value = `完成！共 ${nodes.length} 個節點，${links.length} 條邊`
+    progressPct.value = 100
+    loading.value = false
+    graphReady.value = true
+    await nextTick()
+    renderChart()
+  } catch {
+    loading.value = false
+    progressText.value = '網絡請求失敗，請稍後重試'
   }
-
-  graphNodes.value = Array.from(nodesMap.entries()).map(([char, meta]) => ({
-    id: char, name: char, value: meta.similarity, depth: meta.depth,
-    symbolSize: meta.depth === 0 ? 60 : 28 + meta.similarity * 22,
-    itemStyle: { color: DEPTH_COLORS[meta.depth] ?? DEPTH_COLORS[4] },
-    label: { fontSize: meta.depth === 0 ? 20 : 14, fontWeight: meta.depth === 0 ? 'bold' : 'normal' }
-  }))
-  graphLinks.value = linksArr.map(l => ({
-    source: l.source, target: l.target, value: l.value,
-    lineStyle: { width: 1 + l.value * 3, opacity: 0.25 + l.value * 0.5 }
-  }))
-
-  if (nodesMap.size <= 1) showWarning('未找到足夠相似的字符，請降低相似度閾值')
-
-  progressText.value = `完成！共 ${nodesMap.size} 個節點，${linksArr.length} 條邊`
-  progressPct.value = 100
-  loading.value = false
-  graphReady.value = true
-  await nextTick()
-  renderChart()
 }
 
 const renderChart = () => {
@@ -250,7 +232,9 @@ onBeforeUnmount(() => {
   margin-bottom: 16px; padding: 16px;
 }
 
-.controls-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.controls-row {
+  justify-content: center;
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
 
 .control-group { display: flex; flex-direction: column; gap: 4px; }
 .control-group label { font-size: 12px; color: var(--text-secondary, var(--text-tertiary)); }
