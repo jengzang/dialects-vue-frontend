@@ -10,7 +10,7 @@
   >
     <template #header>
       <div class="tabular-import-preview__modal-header">
-        <div>
+        <div class="tabular-import-preview__modal-heading">
           <component :is="titleTag" class="tabular-import-preview__title">{{ title }}</component>
           <!-- <p v-if="description" class="tabular-import-preview__description">{{ description }}</p> -->
         </div>
@@ -573,6 +573,7 @@ $section-gap: 12px;
   }
 
   &__header,
+  &__modal-header,
   &__toolbar,
   &__body,
   &__section-head,
@@ -584,9 +585,23 @@ $section-gap: 12px;
   }
 
   &__header,
+  &__modal-header,
   &__section-head {
     gap: $section-gap;
     justify-content: space-between;
+  }
+
+  &__modal-header {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  &__modal-heading {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   &__header {

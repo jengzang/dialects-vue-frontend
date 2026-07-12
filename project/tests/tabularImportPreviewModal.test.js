@@ -7,6 +7,7 @@ const testsDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(testsDir, '..')
 
 const previewPath = resolve(projectRoot, 'src/components/import/TabularImportPreview.vue')
+const tabularPreviewUtilPath = resolve(projectRoot, 'src/utils/import/tabularPreview.js')
 const checkToolPath = resolve(projectRoot, 'src/main/views/explore/tools/CheckTool.vue')
 const mergeToolPath = resolve(projectRoot, 'src/main/views/explore/tools/MergeTool.vue')
 const jyut2IpaToolPath = resolve(projectRoot, 'src/main/views/explore/tools/Jyut2IpaTool.vue')
@@ -65,6 +66,27 @@ describe('tabular import preview modal shell', () => {
     expect(source).toMatch(/&__body\s*\{[^}]*flex:\s*1 1 auto[^}]*min-height:\s*0/s)
     expect(source).toMatch(/&__preview\s*\{[^}]*min-height:\s*0/s)
     expect(source).toMatch(/&__table-wrap\s*\{[^}]*flex:\s*1 1 auto[^}]*min-height:\s*0[^}]*overflow:\s*auto/s)
+  })
+
+  it('keeps the import preview modal header full-width and single-row when space allows', () => {
+    const source = readSource(previewPath)
+
+    expect(source).toContain('class="tabular-import-preview__modal-heading"')
+    expect(source).toMatch(/&__modal-header\s*\{[^}]*display:\s*flex[^}]*width:\s*100%[^}]*align-items:\s*center[^}]*justify-content:\s*space-between/s)
+    expect(source).toMatch(/&__modal-heading\s*\{[^}]*flex:\s*1 1 auto[^}]*min-width:\s*0/s)
+  })
+
+  it('uses all parsed rows for import preview by default', () => {
+    const previewUtil = readSource(tabularPreviewUtilPath)
+    const mergeTool = readSource(mergeToolPath)
+    const checkTool = readSource(checkToolPath)
+    const jyut2IpaTool = readSource(jyut2IpaToolPath)
+
+    expect(previewUtil).toContain('export const DEFAULT_PREVIEW_ROW_COUNT = null')
+    expect(previewUtil).toContain('Number.isFinite(previewRowCount)')
+    expect(mergeTool).not.toContain('previewRowCount: 8')
+    expect(checkTool).not.toContain('previewRowCount: 8')
+    expect(jyut2IpaTool).not.toContain('previewRowCount: 8')
   })
 
   it('emits kebab-case sheet and header update events for reliable sheet switching', () => {

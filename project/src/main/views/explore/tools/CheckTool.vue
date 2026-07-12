@@ -1082,7 +1082,6 @@ const checkImportSchema = computed(() => ([
 ]))
 const checkPreviewState = useTabularImportPreview({
   schema: checkImportSchema,
-  previewRowCount: 8,
   requireExplicitConfirmation: () => requireExplicitConfirmation.value
 })
 const checkImportFlow = useTabularImportFlow({

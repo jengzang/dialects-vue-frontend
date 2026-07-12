@@ -4,7 +4,7 @@ const EXCEL_FILE_PATTERN = /\.(xlsx|xls)$/i
 const CSV_FILE_PATTERN = /\.csv$/i
 const TABULAR_FILE_PATTERN = /\.(xlsx|xls|csv)$/i
 
-export const DEFAULT_PREVIEW_ROW_COUNT = 8
+export const DEFAULT_PREVIEW_ROW_COUNT = null
 
 function normalizeCellValue(value) {
   if (value === null || value === undefined) {
@@ -139,7 +139,7 @@ export function derivePreviewTable(parsedFile, options = {}) {
   const {
     sheetId,
     headerRowIndex = 0,
-    previewRowCount = 8
+    previewRowCount = DEFAULT_PREVIEW_ROW_COUNT
   } = options
 
   const sheets = parsedFile?.sheets || []
@@ -160,7 +160,11 @@ export function derivePreviewTable(parsedFile, options = {}) {
   const fallbackHeaders = buildFallbackHeaders(columnCount)
   const headerRow = rows[safeHeaderIndex] || []
   const headers = fallbackHeaders.map((fallback, index) => normalizeCellValue(headerRow[index]) || fallback)
-  const previewRows = rows.slice(safeHeaderIndex + 1, safeHeaderIndex + 1 + previewRowCount).map((row) => padRow(row, headers.length))
+  const dataRows = rows.slice(safeHeaderIndex + 1)
+  const previewRows = (Number.isFinite(previewRowCount)
+    ? dataRows.slice(0, Math.max(0, previewRowCount))
+    : dataRows
+  ).map((row) => padRow(row, headers.length))
   const sourceColumns = headers.map((label, index) => ({
     key: `column_${index + 1}`,
     label,

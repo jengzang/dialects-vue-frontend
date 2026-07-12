@@ -387,7 +387,6 @@ const jyutImportSchema = computed(() => ([
 ]))
 const jyutPreviewState = useTabularImportPreview({
   schema: jyutImportSchema,
-  previewRowCount: 8,
   requireExplicitConfirmation: () => requireExplicitConfirmation.value
 })
 const fileImportFlow = useTabularImportFlow({

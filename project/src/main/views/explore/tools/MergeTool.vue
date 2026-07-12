@@ -405,7 +405,6 @@ const referenceImportSchema = computed(() => ([
 ]))
 const referencePreviewState = useTabularImportPreview({
   schema: referenceImportSchema,
-  previewRowCount: 8,
   requireExplicitConfirmation: () => forceReferencePreview.value || requireExplicitConfirmation.value
 })
 const referenceImportFlow = useTabularImportFlow({
