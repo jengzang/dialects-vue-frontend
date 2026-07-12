@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 100%">
     <!-- ✅ 同行輸入：地點 + 分區 -->
     <div class="input-row" >
 
@@ -1549,8 +1549,7 @@ $portrait-ratio: 1;
 
 /* 底部提示 */
 .bottom-hint {
-  min-width: 80%;
-  max-width: 500px;
+  width: min(80%, 500px);
   @include flex-col;
   align-items: center;
   justify-content: center;
