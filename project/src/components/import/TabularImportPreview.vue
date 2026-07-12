@@ -5,6 +5,7 @@
     size="lg"
     :title="title"
     :close-label="t('common.button.close')"
+    :height="modalMaxHeight"
     :max-height="modalMaxHeight"
   >
     <template #header>
@@ -47,7 +48,7 @@
       </div>
     </template>
 
-    <div class="tabular-import-preview">
+    <div class="tabular-import-preview tabular-import-preview--modal">
       <div v-if="!file" class="tabular-import-preview__empty">
         <div class="tabular-import-preview__empty-icon">📄</div>
         <div class="tabular-import-preview__empty-copy">
@@ -66,7 +67,7 @@
               searchable
               match-trigger-width
               width="220px"
-              @update:modelValue="$emit('update:selectedSheetId', $event)"
+              @update:modelValue="emitSheetChange"
             />
           </div>
           <div class="tabular-import-preview__toolbar-item tabular-import-preview__toolbar-item--compact">
@@ -75,7 +76,7 @@
               :model-value="headerRowIndex"
               :options="headerRowOptions"
               width="160px"
-              @update:modelValue="$emit('update:headerRowIndex', $event)"
+              @update:modelValue="emitHeaderRowChange"
             />
           </div>
           <div class="tabular-import-preview__toolbar-meta">
@@ -240,7 +241,7 @@
             searchable
             match-trigger-width
             width="220px"
-            @update:modelValue="$emit('update:selectedSheetId', $event)"
+            @update:modelValue="emitSheetChange"
           />
         </div>
         <div class="tabular-import-preview__toolbar-item tabular-import-preview__toolbar-item--compact">
@@ -249,7 +250,7 @@
             :model-value="headerRowIndex"
             :options="headerRowOptions"
             width="160px"
-            @update:modelValue="$emit('update:headerRowIndex', $event)"
+            @update:modelValue="emitHeaderRowChange"
           />
         </div>
         <div class="tabular-import-preview__toolbar-meta">
@@ -440,7 +441,19 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'update:selectedSheetId', 'update:headerRowIndex', 'update:mapping', 'reset', 'confirm', 'export-start', 'export-success', 'export-error'])
+const emit = defineEmits([
+  'update:modelValue',
+  'update:selectedSheetId',
+  'update:selected-sheet-id',
+  'update:headerRowIndex',
+  'update:header-row-index',
+  'update:mapping',
+  'reset',
+  'confirm',
+  'export-start',
+  'export-success',
+  'export-error'
+])
 
 const { t } = useI18n()
 const isExporting = ref(false)
@@ -500,6 +513,16 @@ function handleCancel() {
   emit('reset')
 }
 
+function emitSheetChange(value) {
+  emit('update:selectedSheetId', value)
+  emit('update:selected-sheet-id', value)
+}
+
+function emitHeaderRowChange(value) {
+  emit('update:headerRowIndex', value)
+  emit('update:header-row-index', value)
+}
+
 const headerRowOptions = computed(() => {
   const rowCount = props.previewTable?.activeSheet?.rowCount || 0
   const maxCount = Math.min(Math.max(rowCount, 1), 6)
@@ -543,6 +566,11 @@ $section-gap: 12px;
   gap: $panel-gap;
   min-height: 0;
   padding: 18px;
+
+  &--modal {
+    box-sizing: border-box;
+    height: 100%;
+  }
 
   &__header,
   &__toolbar,
@@ -651,6 +679,7 @@ $section-gap: 12px;
   }
 
   &__body {
+    flex: 1 1 auto;
     gap: $panel-gap;
     align-items: stretch;
     min-height: 0;

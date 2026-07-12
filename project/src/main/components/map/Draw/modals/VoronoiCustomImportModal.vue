@@ -106,8 +106,8 @@
         :selected-sheet-id="tabularState.selectedSheetId.value"
         :header-row-index="tabularState.headerRowIndex.value"
         :sheets="tabularState.parsedFile.value?.sheets || []"
-        @update:selectedSheetId="tabularState.selectedSheetId.value = $event"
-        @update:headerRowIndex="tabularState.headerRowIndex.value = $event"
+        @update:selected-sheet-id="tabularState.selectedSheetId.value = $event"
+        @update:header-row-index="tabularState.headerRowIndex.value = $event"
         @update:mapping="handleMappingChange"
         @reset="clearPreview"
       />

@@ -58,10 +58,24 @@ describe('tabular import preview modal shell', () => {
   it('keeps the import preview table constrained so its own scrollbar can work', () => {
     const source = readSource(previewPath)
 
-    expect(source).toMatch(/\.tabular-import-preview\s*\{[^}]*min-height:\s*0/s)
-    expect(source).toMatch(/&__body\s*\{[^}]*min-height:\s*0/s)
+    expect(source).toContain(':height="modalMaxHeight"')
+    expect(source).toContain('class="tabular-import-preview tabular-import-preview--modal"')
+    expect(source).toMatch(/&--modal\s*\{[^}]*height:\s*100%/s)
+    expect(source).toMatch(/&--modal\s*\{[^}]*box-sizing:\s*border-box/s)
+    expect(source).toMatch(/&__body\s*\{[^}]*flex:\s*1 1 auto[^}]*min-height:\s*0/s)
     expect(source).toMatch(/&__preview\s*\{[^}]*min-height:\s*0/s)
     expect(source).toMatch(/&__table-wrap\s*\{[^}]*flex:\s*1 1 auto[^}]*min-height:\s*0[^}]*overflow:\s*auto/s)
+  })
+
+  it('emits kebab-case sheet and header update events for reliable sheet switching', () => {
+    const source = readSource(previewPath)
+
+    expect(source).toContain("emitSheetChange")
+    expect(source).toContain("emit('update:selectedSheetId', value)")
+    expect(source).toContain("emit('update:selected-sheet-id', value)")
+    expect(source).toContain("emitHeaderRowChange")
+    expect(source).toContain("emit('update:headerRowIndex', value)")
+    expect(source).toContain("emit('update:header-row-index', value)")
   })
 
   it('keeps import preview callers wired to the component modal instead of inline actions', () => {
@@ -137,8 +151,8 @@ describe('tabular import preview modal shell', () => {
       expect(source).toContain(`:selected-sheet-id="${state}.selectedSheetId.value"`)
       expect(source).toContain(`:header-row-index="${state}.headerRowIndex.value"`)
       expect(source).toContain(`:sheets="${state}.parsedFile.value?.sheets || []"`)
-      expect(source).toContain(`@update:selectedSheetId="${state}.selectedSheetId.value = $event"`)
-      expect(source).toContain(`@update:headerRowIndex="${state}.headerRowIndex.value = $event"`)
+      expect(source).toContain(`@update:selected-sheet-id="${state}.selectedSheetId.value = $event"`)
+      expect(source).toContain(`@update:header-row-index="${state}.headerRowIndex.value = $event"`)
     }
   })
 })
