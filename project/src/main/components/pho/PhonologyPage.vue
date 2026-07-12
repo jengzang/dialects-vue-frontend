@@ -244,54 +244,51 @@ watch(locationQuery, (urlLocations) => {
 
 <style lang="scss" scoped>
 .phonology-matrix-page {
-  margin-top: 20px;
   width: 90dvw;
+  margin-top: 20px;
 
-  .page-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px 0;
-  }
-
-  .page-title {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text-dark-light);
-  }
-
+  /* 输入区域 */
   .input-section {
     max-width: 600px;
-    margin: 0 auto 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    justify-content: center;
+    @include flex-col;
     align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin: 0 auto 30px;
   }
 
+  /* 查询按钮 */
   .load-btn {
-    padding: 12px 24px;
     max-width: 100px;
-    white-space: nowrap;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
-    color: var(--text-white);
+    @include flex-center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-primary-hover) 100%
+    );
     border: none;
     border-radius: var(--radius-md);
+    box-shadow:
+      0 4px 12px var(--color-primary-shadow),
+      0 2px 4px var(--bg-overlay-light2);
+    color: var(--action-primary-text);
+    white-space: nowrap;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px var(--color-primary-shadow), 0 2px 4px rgba(0, 0, 0, 0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
 
     &:hover:not(:disabled) {
-      background: linear-gradient(135deg, var(--color-primary-hover) 0%, #004ba0 100%);
-      box-shadow: 0 6px 16px var(--color-primary-shadow-light), 0 3px 6px rgba(0, 0, 0, 0.12);
+      background: linear-gradient(
+        135deg,
+        var(--color-primary-hover) 0%,
+        var(--color-primary-hover) 100%
+      );
+      box-shadow:
+        0 6px 16px var(--color-primary-shadow-light),
+        var(--shadow-sm-dark);
       transform: translateY(-1px);
     }
 
@@ -301,21 +298,19 @@ watch(locationQuery, (urlLocations) => {
 
     &:disabled {
       background: var(--bg-hover-medium);
+      box-shadow: none;
       color: var(--text-secondary);
       cursor: not-allowed;
-      box-shadow: none;
     }
   }
 
-  /* 按钮内的小旋转器 */
-
+  /* 加载与错误状态 */
   .loading,
   .error {
-    display: flex;
-    flex-direction: column;
+    min-height: 50vh;
+    @include flex-col;
     align-items: center;
     justify-content: center;
-    min-height: 50vh;
     gap: 15px;
   }
 
@@ -337,14 +332,14 @@ watch(locationQuery, (urlLocations) => {
   .retry-btn {
     padding: 10px 20px;
     background: var(--color-primary);
-    color: var(--text-white);
     border: none;
     border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    color: var(--text-white);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-md);
 
     &:hover {
       background: var(--color-primary-hover);
@@ -353,34 +348,29 @@ watch(locationQuery, (urlLocations) => {
     }
   }
 
+  /* 矩阵结果 */
   .matrix-container {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 30px;
   }
 
+  /* 空状态 */
   .empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     min-height: 30dvh;
+    @include flex-center;
     color: var(--text-secondary);
     font-size: 16px;
   }
 
-  /* 移动端适配 */
+  /* 竖屏 */
   @media (max-aspect-ratio: 1/1) {
-    .page-title {
-      font-size: 24px;
-    }
-
     .input-section {
       max-width: 100%;
     }
 
     .load-btn {
-      font-size: 14px;
       padding: 10px 20px;
+      font-size: 14px;
     }
   }
 }

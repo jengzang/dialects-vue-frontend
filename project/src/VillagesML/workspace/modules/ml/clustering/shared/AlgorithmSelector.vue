@@ -46,7 +46,7 @@ const algorithmHint = computed(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .setting-row {
   display: flex;
   align-items: flex-start;
@@ -63,16 +63,15 @@ const algorithmHint = computed(() => {
 
 .setting-control {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
 }
 
 .setting-select {
   padding: 0.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--bg-hover-strong);
+  border-radius: var(--radius-sm2);
+  background: var(--glass-90);
   font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -85,7 +84,7 @@ const algorithmHint = computed(() => {
 .setting-select:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
 }
 
 </style>

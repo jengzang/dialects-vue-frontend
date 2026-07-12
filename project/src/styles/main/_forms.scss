@@ -1,3 +1,4 @@
+@use '@/styles/global/mixins' as *;
 .choice-dropdown-panel {
   position: absolute;
   min-width: 80px;
@@ -5,11 +6,11 @@
   overflow: auto;
   z-index: 1000;
   padding: 6px 0;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel-strong);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px var(--bg-hover-strong);
 }
 
 .choice-dropdown-item {
@@ -23,22 +24,22 @@
 }
 
 .choice-dropdown-item.active {
-  background-color: #e6f0ff;
-  color: #02469e;
+  background-color: var(--surface-selected);
+  color: var(--text-selected);
   font-weight: bold;
 }
 
 .choice-dropdown-item:hover {
-  background-color: #e6f0ff;
+  background-color: var(--surface-selected);
 }
 
 .main-search-field {
   // width: min(360px, 100%);
   padding: 10px 14px;
-  border: 1px solid rgba(148, 163, 184, 0.32);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  color: #0f172a;
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius-pill);
+  background: var(--surface-panel);
+  color: var(--text-deep);
   font-size: 14px;
   outline: none;
   transition:
@@ -48,22 +49,22 @@
 }
 
 .main-search-field::placeholder {
-  color: #94a3b8;
+  color: var(--text-slate-light);
 }
 
 .main-search-field:focus {
-  border-color: rgba(0, 122, 255, 0.55);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+  border-color: var(--border-control-focus);
+  background: var(--surface-panel-strong);
+  box-shadow: var(--focus-ring);
 }
 
 .main-input-field {
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid rgba(148, 163, 184, 0.32);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.75);
-  color: #0f172a;
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel-hover);
+  color: var(--text-deep);
   font-size: 14px;
   outline: none;
   transition:
@@ -74,41 +75,41 @@
 }
 
 .main-input-field::placeholder {
-  color: #94a3b8;
+  color: var(--text-slate-light);
 }
 
 .main-input-field:focus {
-  border-color: rgba(0, 122, 255, 0.55);
-  background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+  border-color: var(--border-control-focus);
+  background: var(--bg-white);
+  box-shadow: var(--focus-ring);
 }
 
 .main-glow-switch:hover {
-  background-color: dimgray;
-  box-shadow: 0 0 10px 4px rgba(0, 123, 255, 0.7);
+  background-color: var(--switch-hover-background);
+  box-shadow: 0 0 10px 4px rgba(var(--color-primary-rgb), 0.7);
 }
 
 .main-glow-switch:hover .custom-switch-slider-base::before {
-  background-color: white;
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+  background-color: var(--switch-thumb-background);
+  box-shadow: var(--switch-thumb-shadow);
 }
 
 .main-glow-switch.open {
-  background-color: #007aff;
+  background-color: var(--color-primary);
   animation: main-glow-switch-pulse 2s infinite ease-in-out;
 }
 
 .main-glow-switch.open:hover {
-  background: linear-gradient(135deg, #00bfff, #66ccff);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, var(--color-primary-cyan), var(--color-primary-cyan));
+  box-shadow: var(--shadow-spread);
 }
 
 .main-glow-switch.open:hover .custom-switch-slider-base::before {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 10px var(--bg-overlay);
 }
 
 .main-glow-switch-text {
-  color: black;
+  color: var(--switch-label-text);
   font-size: 12px;
   font-weight: bold;
   text-transform: uppercase;
@@ -123,7 +124,7 @@
 }
 
 .main-glow-switch.open .main-glow-switch-text {
-  color: black;
+  color: var(--switch-label-text);
   transform: translateX(-25px) translateY(-50%);
   top: 50%;
   position: absolute;
@@ -140,33 +141,57 @@
 @keyframes main-glow-switch-pulse {
   0% {
     box-shadow:
-      0 0 5px rgba(0, 122, 255, 0.4),
-      0 0 10px rgba(0, 122, 255, 0.6),
-      0 0 20px rgba(0, 122, 255, 0.8),
-      0 0 30px rgba(0, 122, 255, 0.9);
+      0 0 5px rgba(var(--color-primary-rgb), 0.4),
+      0 0 10px rgba(var(--color-primary-rgb), 0.6),
+      0 0 20px rgba(var(--color-primary-rgb), 0.8),
+      0 0 30px rgba(var(--color-primary-rgb), 0.9);
   }
   50% {
     box-shadow:
-      0 0 10px rgba(102, 204, 255, 0.6),
-      0 0 20px rgba(102, 204, 255, 0.8),
-      0 0 30px rgba(102, 204, 255, 1),
-      0 0 40px rgba(102, 204, 255, 1);
+      0 0 10px rgba(var(--color-cyan-rgb), 0.6),
+      0 0 20px rgba(var(--color-cyan-rgb), 0.8),
+      0 0 30px rgba(var(--color-cyan-rgb), 1),
+      0 0 40px rgba(var(--color-cyan-rgb), 1);
   }
   100% {
     box-shadow:
-      0 0 5px rgba(0, 122, 255, 0.4),
-      0 0 10px rgba(0, 122, 255, 0.6),
-      0 0 20px rgba(0, 122, 255, 0.8),
-      0 0 30px rgba(0, 122, 255, 0.9);
+      0 0 5px rgba(var(--color-primary-rgb), 0.4),
+      0 0 10px rgba(var(--color-primary-rgb), 0.6),
+      0 0 20px rgba(var(--color-primary-rgb), 0.8),
+      0 0 30px rgba(var(--color-primary-rgb), 0.9);
   }
 }
 
 @keyframes main-switch-text-glow {
   0%,
   100% {
-    text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+    text-shadow: 0 0 2px var(--glass-50);
   }
   50% {
-    text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 4px var(--glass-80);
   }
+}
+
+// == Legacy form classes migrated from _legacy.scss ==
+
+.query-box {
+  @include flex-col;
+  align-items: center;
+  width: 100%;
+  gap: 6px;
+}
+
+.query-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 95%;
+  padding: 0 4px;
+  max-width: 600px;
+}
+
+.query-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-tertiary);
 }

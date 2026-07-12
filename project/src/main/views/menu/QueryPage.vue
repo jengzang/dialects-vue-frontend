@@ -281,7 +281,7 @@ import { useQueryConfig } from '@/composables/domain/useQueryConfig.js'
 import { translateResultTerm } from '@/i18n/utils/resultI18n.js'
 import { readMenuBarMemory, writeMenuBarMemory } from '@/main/config/BarAndTabs/MenuBarConfig.js'
 import { showWarning } from '@/utils/message.js'
-import { limitEffectiveChars } from '@/main/utils/queryLimits.js'
+import { limitEffectiveChars } from '@/main/utils/query/queryLimits.js'
 
 const { t } = useI18n()
 const selectedCharacterTable = preferredCharacterTable
@@ -814,20 +814,21 @@ export default {
 }
 </script>
 
-<style scoped>
+
+
+<style scoped lang="scss">
 
 /* 📄 內容區塊動畫 */
 .tab-content-inner {
-  width: 100%;
-  max-width: 900px;
-  animation: fade 0.6s ease;
-
-  /* ✅ 新增這些 */
+  display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  justify-content: center; /* 垂直置中 */
+  justify-content: center;
+
+  width: 100%;
   padding: 1rem 0;
+  text-align: center;
+  animation: fade 0.6s ease;
 }
 
 
@@ -840,13 +841,6 @@ export default {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.run-label {
-  font-size: 18px;
-  font-weight: bold;
-  color: darkblue;
-  white-space: nowrap;
 }
 
 
@@ -909,7 +903,8 @@ export default {
   padding: 8px 16px;
   border: 1px solid var(--color-primary-medium);
   border-radius: 12px;
-  background: var(--glass-light);
+  background: var(--glass-30);
+  color: var(--text-primary);
   cursor: pointer;
   transition: background 0.3s ease;
   font-size: 14px;
@@ -925,7 +920,7 @@ export default {
 
 .key-button.active {
   background: var(--color-primary-medium2);
-  color: white;
+  color: var(--action-primary-text);
   font-weight: 600;
 }
 .key-dropdown-group{
@@ -996,7 +991,7 @@ export default {
   font-size: 14px;
   background: transparent;
   width: 80px;
-  color: #333;
+  color: var(--text-dark);
   text-align: center;
 }
 

@@ -415,6 +415,21 @@
       "exitFullscreen": "Exit"
     }
   },
+  "allVillagesMapPopup": {
+    "title": "All Villages Distribution Map",
+    "count": "{count} features",
+    "toggle": {
+      "name": "Name",
+      "level2": "Level 2",
+      "level3": "Level 3",
+      "code": "Raw"
+    },
+    "buttons": {
+      "reset": "Reset",
+      "fullscreen": "Fullscreen",
+      "exitFullscreen": "Exit"
+    }
+  },
   "legend": {
     "title": "Legend",
     "compareTypes": {
@@ -504,9 +519,13 @@
       "panelHint": "Calculate Voronoi polygons from location partition data. You can preview them or export them as a polygon layer.",
       "summaryTitle": "Data Summary",
       "settingsTitle": "Calculation Settings",
+      "dataSourceTitle": "Data Sources",
       "actionsTitle": "Actions",
       "totalPoints": "All Points",
       "activePoints": "Included Points",
+      "officialPoints": "Official Points",
+      "customPoints": "Custom Points",
+      "useOfficialData": "Include official partition data",
       "ignoredPoints": "Ignored Points",
       "partitionGroups": "Partition Groups",
       "loadPoints": "Load Points",
@@ -544,6 +563,42 @@
       "exportEmptyAfterClip": "No layers remained after clipping",
       "exportLoadingTitle": "Exporting clipped border layers",
       "exportLoadingProgress": "Completed {current}/{total}",
+      "customImportLoaded": "Imported {count} custom point(s)",
+      "customImportCleared": "Custom point set cleared",
+      "sourceUpdated": "Points currently included in calculation: {count}",
+      "customImport": {
+        "modalTitle": "Import Custom Voronoi Data",
+        "introTitle": "Preview the table and complete column mapping",
+        "introText": "This modal only handles preview, sheet switching, and column mapping. The parent workbench consumes the mapped rows for Voronoi calculation.",
+        "fileLabel": "Spreadsheet File",
+        "partitionModeLabel": "Partition Column",
+        "previewTitle": "Custom Data Preview",
+        "previewDescription": "Make sure the location name, coordinates, and partition column are mapped correctly before using the rows in Voronoi.",
+        "partitionModeOptions": {
+          "map": "Atlas Partition",
+          "yindian": "Mcpdict Partition"
+        },
+        "actions": {
+          "selectFile": "Choose xlsx / xls / csv",
+          "replace": "Choose Another File",
+          "clear": "Clear Custom Data",
+          "confirm": "Confirm and Use"
+        },
+        "summary": {
+          "rows": "Total rows {count}",
+          "validRows": "Valid points {count}",
+          "message": "Using {count} custom point(s) from {total} source row(s)"
+        },
+        "messages": {
+          "ready": "The current mapping can be used for Voronoi calculation.",
+          "incomplete": "The current file still needs mapping fixes or data cleanup before use.",
+          "parseFailed": "Failed to parse spreadsheet: {error}",
+          "invalidCoordinates": "Skipped {count} row(s) because the coordinates are invalid.",
+          "missingPartition": "Skipped {count} row(s) because the current partition column is missing.",
+          "duplicateNames": "Detected {count} duplicated point name group(s). V1 keeps them as parallel points.",
+          "noValidRows": "There are no valid Voronoi points in the current file."
+        }
+      },
       "regionStates": {
         "none": "Not selected",
         "partial": "Partially selected",

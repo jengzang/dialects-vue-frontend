@@ -504,7 +504,15 @@ const lazyLoadCharClassChildren = async (node) => {
       // Still too many rows — accumulate filters + shift level_columns further
       const bootstrap = result.lazy_bootstrap
       const children = bootstrap?.[node.name] || Object.values(bootstrap || {})[0] || []
-      const nextCol = node._lazyLevelColumns[0]
+      // level_columns[1] is the column consumed by this lazy_fallback response;
+      // level_columns.slice(1) is the shifted list for the next call (matches API doc pattern)
+      const nextCol = node._lazyLevelColumns[1]
+      if (nextCol == null) {
+        node.children = []
+        node._childrenLoaded = true
+        node._loadingChildren = false
+        return
+      }
       const nextShifted = node._lazyLevelColumns.slice(1)
       node.children = children.map(childName => ({
         id: childName,
@@ -587,75 +595,112 @@ watch(
 </script>
 
 <style scoped lang="scss">
-.char-class-page {
+@use '@/styles/global/mixins' as *;
+
+$primary-blue: var(--color-primary);
+$system-blue: var(--color-primary);
+$dark-blue: var(--color-primary-hover);
+$danger-red: var(--color-error-light);
+$danger-text: var(--color-error-dark);
+
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-primary);
+$text-muted: var(--text-secondary);
+$white: var(--text-white);
+
+$transition-fast: 0.2s;
+$panel-radius: 28px;
+$panel-radius-portrait: 24px;.char-class-page {
   width: 100%;
   padding: 12px 0 24px;
 }
 
 .page-shell {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 18px;
+  align-items: start;
   width: min(94dvw, 1380px);
   margin: 0 auto;
-  display: grid;
-  gap: 18px;
-  grid-template-columns: 1fr 2fr;
-  align-items: start;
+
+  @media (orientation: portrait) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .config-panel,
 .tree-panel {
-  border-radius: 28px;
-  padding: 22px;
-  color: var(--text-dark);
   height: 80dvh !important;
-  overflow-y: auto;
+  padding: 22px;
   overflow-x: hidden;
+  overflow-y: auto;
+  color: var(--text-dark);
+  border-radius: $panel-radius;
+
+  @media (orientation: portrait) {
+    padding: 18px;
+    border-radius: $panel-radius-portrait;
+  }
+}
+
+.config-panel {
+  @media (orientation: portrait) {
+    max-height: 55dvh;
+  }
 }
 
 .panel-header,
 .tree-header {
   display: flex;
+  gap: 16px;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+
+  @media (orientation: portrait) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .tree-actions {
   display: flex;
   flex-direction: row;
-  align-items: center;
   gap: 12px;
+  align-items: center;
 }
 
 .panel-title-group,
 .tree-title-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
 .page-title,
 .tree-title {
   margin: 0;
-  color: #1d1d1f;
+  color: $text-primary;
+  font-weight: 700;
 }
 
 .page-title {
   font-size: 25px;
-  font-weight: 700;
+
+  @media (orientation: portrait) {
+    font-size: 24px;
+  }
 }
 
 .tree-title {
   font-size: 20px;
-  font-weight: 700;
 }
 
 .page-subtitle,
 .tree-meta,
 .section-hint,
 .state-hint {
-  font-size: 14px;
   margin: 0;
-  color: #6e6e73;
+  color: $text-muted;
+  font-size: 14px;
 }
 
 .tree-meta {
@@ -672,28 +717,26 @@ watch(
 }
 
 .control-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   margin-top: 20px;
 }
 
 .preset-section {
-  display: flex;
   flex-direction: row;
   align-items: center;
   gap: 12px 16px;
+
+  .control-heading {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
 }
 
 .control-heading {
+  color: $text-secondary;
   font-size: 14px;
   font-weight: 700;
-  color: #3a3a3c;
-}
-
-.preset-section .control-heading {
-  flex: 0 0 auto;
-  white-space: nowrap;
 }
 
 .preset-list {
@@ -701,41 +744,41 @@ watch(
   min-width: 0;
   justify-content: flex-start;
   gap: 6px 12px;
-}
 
-.preset-list :deep(.liquid-radio-label) {
-  padding: 4px 6px;
-}
+  :deep(.liquid-radio-label) {
+    padding: 4px 6px;
+  }
 
-.preset-list :deep(.liquid-radio-text) {
-  font-size: 14px;
-  white-space: nowrap;
+  :deep(.liquid-radio-text) {
+    font-size: 14px;
+    white-space: nowrap;
+  }
 }
 
 .levels-header {
   display: flex;
+  gap: 14px;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
 }
 
 .add-level-button {
-  white-space: nowrap;
-  border-color: rgba(10, 132, 255, 0.34);
-  background:  #007bffea;
-  color: white;
+  color: $white;
   font-weight: 700;
-  box-shadow: 0 12px 28px rgba(10, 132, 255, 0.12);
-}
+  white-space: nowrap;
+  background: var(--color-primary);
+  border-color: rgba(var(--color-primary-rgb), 0.34);
+  box-shadow: 0 12px 28px rgba(var(--color-primary-rgb), 0.12);
 
-.add-level-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 16px 32px rgba(10, 132, 255, 0.16);
-}
+  &:hover:not(:disabled) {
+    box-shadow: 0 16px 32px rgba(var(--color-primary-rgb), 0.16);
+    transform: translateY(-1px);
+  }
 
-.add-level-button:disabled {
-  opacity: 0.55;
-  box-shadow: none;
+  &:disabled {
+    box-shadow: none;
+    opacity: 0.55;
+  }
 }
 
 .levels-list {
@@ -755,100 +798,124 @@ watch(
 .level-row-header {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
   gap: 8px 10px;
+  align-items: center;
   width: 100%;
   min-width: 0;
+
+  @media (orientation: portrait) {
+    justify-content: flex-start;
+  }
 }
 
 .level-badge {
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid var(--glass-border-weak);
   padding: 3px 6px;
+  color: $text-secondary;
   font-size: 11px;
   font-weight: 700;
-  color: #3a3a3c;
+  background: var(--glass-70);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-pill);
 }
 
 .level-select {
-  min-width: 0;
   width: 100%;
+  min-width: 0;
 }
 
 .level-actions {
   display: inline-flex;
-  align-items: center;
   gap: 5px;
+  align-items: center;
   justify-self: end;
+
+  @media (orientation: portrait) {
+    justify-content: flex-end;
+    margin-left: 0;
+  }
 }
 
 .level-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
+
   width: 34px;
   height: 34px;
-  border-radius: 10px;
-  border: 1px solid rgba(10, 132, 255, 0.2);
-  background: linear-gradient(180deg, rgba(10, 132, 255, 0.18), rgba(255, 255, 255, 0.94));
-  color: #0057d9;
-  cursor: pointer;
+  color: $dark-blue;
   font-size: 0;
   font-weight: 700;
   line-height: 1;
-  box-shadow: 0 8px 18px rgba(10, 132, 255, 0.12);
+  cursor: pointer;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--color-primary-rgb), 0.18),
+    var(--glass-90)
+  );
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 18px rgba(var(--color-primary-rgb), 0.12);
   transition:
-    transform 0.2s ease,
-    opacity 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
+    transform $transition-fast ease,
+    opacity $transition-fast ease,
+    background $transition-fast ease,
+    border-color $transition-fast ease,
+    box-shadow $transition-fast ease;
 
-.level-action::before {
-  font-size: 15px;
-  line-height: 1;
-}
+  &::before {
+    font-size: 15px;
+    line-height: 1;
+  }
 
-.level-action-up::before {
-  content: "\2191";
-}
+  &-up::before {
+    content: "\2191";
+  }
 
-.level-action-down::before {
-  content: "\2193";
-}
+  &-down::before {
+    content: "\2193";
+  }
 
-.level-action-close::before {
-  content: "\00D7";
-}
+  &-close::before {
+    content: "\00D7";
+  }
 
-.level-action:hover:not(:disabled) {
-  transform: translateY(-1px) scale(1.02);
-  border-color: rgba(10, 132, 255, 0.38);
-  background: linear-gradient(180deg, rgba(10, 132, 255, 0.28), rgba(255, 255, 255, 0.98));
-  box-shadow: 0 10px 20px rgba(10, 132, 255, 0.16);
-}
+  &:hover:not(:disabled) {
+    background: linear-gradient(
+      180deg,
+      rgba(var(--color-primary-rgb), 0.28),
+      var(--glass-90)
+    );
+    border-color: rgba(var(--color-primary-rgb), 0.38);
+    box-shadow: 0 10px 20px rgba(var(--color-primary-rgb), 0.16);
+    transform: translateY(-1px) scale(1.02);
+  }
 
-.level-action:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  box-shadow: none;
-}
+  &:disabled {
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.4;
+  }
 
-.level-action.danger {
-  border-color: rgba(215, 0, 21, 0.2);
-  background: linear-gradient(180deg, rgba(215, 0, 21, 0.16), rgba(255, 255, 255, 0.94));
-  color: #c21b31;
-  box-shadow: 0 8px 18px rgba(215, 0, 21, 0.12);
-}
+  &.danger {
+    color: $danger-text;
+    background: linear-gradient(
+      180deg,
+      rgba(var(--color-error-rgb), 0.16),
+      var(--glass-90)
+    );
+    border-color: rgba(var(--color-error-rgb), 0.2);
+    box-shadow: 0 8px 18px rgba(var(--color-error-rgb), 0.12);
 
-.level-action.danger:hover:not(:disabled) {
-  border-color: rgba(215, 0, 21, 0.34);
-  background: linear-gradient(180deg, rgba(215, 0, 21, 0.24), rgba(255, 255, 255, 0.98));
-  box-shadow: 0 10px 20px rgba(215, 0, 21, 0.16);
+    &:hover:not(:disabled) {
+      background: linear-gradient(
+        180deg,
+        rgba(var(--color-error-rgb), 0.24),
+        var(--glass-90)
+      );
+      border-color: rgba(var(--color-error-rgb), 0.34);
+      box-shadow: 0 10px 20px rgba(var(--color-error-rgb), 0.16);
+    }
+  }
 }
 
 .limit-hint {
@@ -856,62 +923,70 @@ watch(
 }
 
 .tree-panel {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   min-width: 0;
 }
 
 .search-wrapper {
   position: relative;
   min-width: 240px;
+
+  @media (orientation: portrait) {
+    min-width: 100%;
+  }
 }
 
 .search-icon {
   position: absolute;
-  left: 14px;
   top: 50%;
-  transform: translateY(-50%);
+  left: 14px;
   opacity: 0.6;
+  transform: translateY(-50%);
 }
 
 .glass-input {
   padding: 11px 14px 11px 40px;
-  border-radius: 16px;
-  border: 1px solid var(--glass-border-weak);
-  background: var(--glass-light);
-  color: #1d1d1f;
+  color: $text-primary;
+  background: var(--glass-30);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-lg);
   outline: none;
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
+  transition:
+    border-color $transition-fast ease,
+    box-shadow $transition-fast ease,
+    background $transition-fast ease;
 
-.glass-input:focus {
-  border-color: rgba(10, 132, 255, 0.35);
-  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.08);
+  @include glass-blur(16px, 180%);
+
+  &:focus {
+    border-color: rgba(var(--color-primary-rgb), 0.35);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.08);
+  }
 }
 
 .tree-body {
-  margin-top: 18px;
   flex: 1;
+  margin-top: 18px;
   overflow: auto;
+
+  @media (orientation: portrait) {
+    min-height: 52dvh;
+  }
 }
 
 .tree-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
 }
 
 .state-block {
-  min-height: 48dvh;
-  display: flex;
+  @include flex-center;
+
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   gap: 12px;
-  text-align: center;
+  min-height: 48dvh;
   padding: 24px;
+  text-align: center;
 }
 
 .state-icon {
@@ -920,54 +995,11 @@ watch(
 
 .state-message {
   margin: 0;
+  color: $text-primary;
   font-size: 16px;
-  color: #1d1d1f;
 }
 
 .retry-button {
   margin-top: 4px;
-}
-
-@media (orientation: portrait) {
-  .page-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .config-panel,
-  .tree-panel {
-    padding: 18px;
-    border-radius: 24px;
-  }
-
-  .config-panel {
-    max-height: 55dvh;
-  }
-
-  .panel-header,
-  .tree-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .level-row-header {
-    justify-content: flex-start;
-  }
-
-  .search-wrapper {
-    min-width: 100%;
-  }
-
-  .level-actions {
-    justify-content: flex-end;
-    margin-left: 0;
-  }
-
-  .tree-body {
-    min-height: 52dvh;
-  }
-
-  .page-title {
-    font-size: 24px;
-  }
 }
 </style>

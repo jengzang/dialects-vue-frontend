@@ -81,7 +81,7 @@
 // :root[data-ui-mode='compact'] .app-modal,
 // :root[data-ui-mode='compact'] .global-toast,
 // :root[data-ui-mode='compact'] .rate-limit-notice {
-//   background-color: rgba(255, 255, 255, 0.98) !important;
+//   background-color: var(--glass-90) !important;
 // }
 
 // :root[data-ui-mode='compact'] .notice-button,
@@ -90,7 +90,7 @@
 // :root[data-ui-mode='compact'] textarea,
 // :root[data-ui-mode='compact'] select,
 // :root[data-ui-mode='compact'] button {
-//   background-color: rgba(255, 255, 255, 1) !important;
+//   background-color: var(--text-white) !important;
 // }
 
 :root[data-ui-mode='compact'] .tab-content,

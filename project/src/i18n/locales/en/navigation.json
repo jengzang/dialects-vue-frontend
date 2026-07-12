@@ -47,7 +47,8 @@
       "gdVillages": "Guangdong Villages",
       "VillagesML": "Machine Learning",
       "gdVillagesTable": "Guangdong Villages Table",
-      "ycVillages": "Yangchun Villages"
+      "ycVillages": "Yangchun Villages",
+      "allVillages": "All Villages"
     },
     "tools": {
       "check": "Character Table Tool",
@@ -94,6 +95,16 @@
     "language": {
       "title": "Language Settings",
       "description": "Choose your preferred interface language"
+    },
+    "colorTheme": {
+      "title": "Color Theme",
+      "description": "Choose the overall palette for page backgrounds, glass panels, and text.",
+      "label": "Current Theme",
+      "options": {
+        "blue": "Blue",
+        "light": "Light",
+        "dark": "Dark"
+      }
     },
     "interfaceMode": {
       "title": "Interface Mode",

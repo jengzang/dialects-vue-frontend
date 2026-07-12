@@ -1,21 +1,20 @@
 <template>
-  <div class="vml-glass-panel">
-    <div class="panel-header">
-      <h3 class="panel-title">
-        區域選擇
-        <HelpIcon
-          content="選擇分析區域（市/縣/鎮），系統將計算該字符在各區域的TF-IDF傾向性得分。支持三級行政區切換"
-          size="md"
-          fontSize="16px"
-          trigger="both"
-        />
-      </h3>
-      <button class="analyze-button solid-button" @click="handleAnalyze" :disabled="!localName">
-        🔍 開始分析
-      </button>
-    </div>
+  <div class="vml-glass-panel region-selector-panel">
+    <h3 class="panel-title">
+      區域選擇
+      <HelpIcon
+        content="選擇分析區域（市/縣/鎮），系統將計算該字符在各區域的TF-IDF傾向性得分。支持三級行政區切換"
+        size="md"
+        fontSize="16px"
+        trigger="both"
+      />
+    </h3>
 
-    <div class="selector-group">
+    <button class="analyze-button solid-button" @click="handleAnalyze" :disabled="!localName">
+      🔍 開始分析
+    </button>
+
+    <div class="selector-wrapper">
       <FilterableSelect
         v-model="localName"
         :level="localLevel"
@@ -24,7 +23,6 @@
         @update:hierarchy="(h) => localHierarchy = h"
         placeholder="請選擇或輸入區域"
       />
-
     </div>
   </div>
 </template>
@@ -61,16 +59,13 @@ const handleAnalyze = () => {
 }
 </script>
 
-<style scoped>
-.vml-glass-panel {
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.panel-header {
+<style scoped lang="scss">
+.region-selector-panel {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
   align-items: center;
+  gap: 16px;
+  padding: 20px;
   margin-bottom: 20px;
 }
 
@@ -79,20 +74,38 @@ const handleAnalyze = () => {
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
-}
-
-.selector-group {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  white-space: nowrap;
+  flex: 1;
 }
 
 .analyze-button {
   padding: 12px 24px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .analyze-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
+}
+
+.selector-wrapper {
+  width: 100%;
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .region-selector-panel {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+
+  .panel-title {
+    flex: 0 0 auto;
+  }
+
+  .selector-wrapper {
+    width: auto;
+    flex: 1;
+    max-width: 360px;
+  }
 }
 </style>

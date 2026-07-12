@@ -20,7 +20,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { buildRegionPath, getRegionShortName, hasHierarchyInfo } from '@/utils/region/regionDisplay.js'
+import { buildRegionPath, getRegionShortName, hasHierarchyInfo } from '@/VillagesML/utils/regionDisplay.js'
 
 const { t } = useI18n()
 
@@ -70,7 +70,7 @@ const displayClass = computed(() => ({
 }))
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .region-display {
   display: inline-flex;
   align-items: center;

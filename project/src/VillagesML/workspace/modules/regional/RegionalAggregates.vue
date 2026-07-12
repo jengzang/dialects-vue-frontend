@@ -8,7 +8,7 @@
 <!--      <h1 class="page-title">🌍 區域聚合統計</h1>-->
 
       <!-- Aggregates Table -->
-      <div class="aggregates-section glass-panel">
+      <div class="aggregates-section vml-glass-panel">
         <h2>聚合结果表格</h2>
         <div class="aggregates-header">
           <SimpleSelectDropdown
@@ -18,7 +18,7 @@
           <button class="query-button" :disabled="loading" @click="loadAggregates">查詢</button>
         </div>
 
-        <div v-if="loading" class="loading-state">
+        <div v-if="loading" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
         </div>
 
@@ -159,7 +159,7 @@
       </AppModal>
 
       <!-- Spatial Aggregates -->
-      <div class="spatial-section glass-panel">
+      <div class="spatial-section vml-glass-panel">
         <div class="spatial-header">
           <h2 style="white-space: nowrap">空間聚合</h2>
           <div class="controls">
@@ -171,14 +171,14 @@
           </div>
         </div>
 
-        <div v-if="loadingSpatial" class="loading-state">
+        <div v-if="loadingSpatial" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
         </div>
 
-        <template v-else-if="spatialAggregates.length > 0">
+        <div v-show="!loadingSpatial && spatialAggregates.length > 0" style="width: 100%">
           <p class="spatial-desc">X軸：村莊密度 Y軸：隔離指數 氣泡大小：村莊總數 顏色：空間分散度</p>
           <div ref="spatialChart" class="spatial-chart"></div>
-        </template>
+        </div>
       </div>
 
     </div>
@@ -330,7 +330,6 @@ function renderSpatialChart() {
   if (spatialChartInstance) spatialChartInstance.dispose()
   spatialChartInstance = echarts.init(spatialChart.value)
 
-  // Deduplicate by region_name
   const seen = new Set()
   const items = spatialAggregates.value.filter(d => {
     if (seen.has(d.region_name)) return false
@@ -410,7 +409,9 @@ watch(currentLevel, loadAggregates)
 watch(spatialAggregates, async (val) => {
   if (!val.length) return
   await nextTick()
-  renderSpatialChart()
+  requestAnimationFrame(() => {
+    renderSpatialChart()
+  })
 })
 
 onBeforeUnmount(() => {
@@ -421,7 +422,7 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .regional-aggregates-page {
   padding: 12px;
   max-width: 1400px;
@@ -437,7 +438,10 @@ onBeforeUnmount(() => {
 }
 
 .aggregates-section {
-  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.aggregates-section h2 {
   margin-bottom: 16px;
 }
 
@@ -449,21 +453,6 @@ onBeforeUnmount(() => {
   margin-bottom: 16px;
 }
 
-.aggregates-header .select-input {
-  width: auto;
-}
-
-.filters-section {
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.filters-section h3 {
-  font-size: 16px;
-  margin-bottom: 15px;
-  color: var(--text-primary);
-}
-
 .filter-controls {
   display: flex;
   gap: 12px;
@@ -472,34 +461,16 @@ onBeforeUnmount(() => {
 .filter-input {
   flex: 1;
   padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 }
 
 .filter-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
-}
-
-.loading-state {
-  text-align: center;
-  padding: 60px 20px;
-}
-
-
-
-.aggregates-section {
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.aggregates-section h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: var(--text-primary);
+  background: var(--glass-80);
 }
 
 .summary-stats {
@@ -511,8 +482,8 @@ onBeforeUnmount(() => {
 
 .stat-card {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
   text-align: center;
 }
 
@@ -536,7 +507,7 @@ onBeforeUnmount(() => {
 }
 
 .aggregates-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   min-width: 600px;
 }
@@ -552,19 +523,19 @@ onBeforeUnmount(() => {
 }
 
 .table-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .table-row {
-  background: rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--glass-30);
+  border-bottom: 1px solid var(--bg-hover);
   transition: background 0.3s ease;
 }
 
 .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .col-region {
@@ -580,12 +551,10 @@ onBeforeUnmount(() => {
 
 .category-badge {
   padding: 2px 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(74, 144, 226, 0.2);
+  @include flex-center;
+  background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   font-size: 11px;
   font-weight: 600;
   cursor: help;
@@ -595,16 +564,16 @@ onBeforeUnmount(() => {
 .detail-button {
   padding: 6px 16px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .detail-button:hover {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .pagination {
@@ -618,20 +587,19 @@ onBeforeUnmount(() => {
 .pagination button {
   padding: 8px 16px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .pagination button:hover:not(:disabled) {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .pagination button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .regional-detail-title {
@@ -641,8 +609,7 @@ onBeforeUnmount(() => {
 }
 
 .detail-info {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   margin-bottom: 24px;
 }
@@ -651,8 +618,8 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: space-between;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
 }
 
 .info-label {
@@ -676,8 +643,7 @@ onBeforeUnmount(() => {
 }
 
 .chart-bars {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
@@ -696,8 +662,8 @@ onBeforeUnmount(() => {
 
 .bar-container {
   height: 24px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
+  background: var(--glass-50);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -728,8 +694,8 @@ onBeforeUnmount(() => {
 
 .stat-item {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
   text-align: center;
 }
 
@@ -746,7 +712,6 @@ onBeforeUnmount(() => {
 }
 
 .spatial-section {
-  padding: 16px;
   margin-bottom: 16px;
 }
 
@@ -758,9 +723,7 @@ onBeforeUnmount(() => {
 }
 
 .spatial-header h2 {
-  font-size: 16px;
   margin: 0;
-  color: var(--text-primary);
 }
 
 .spatial-desc {
@@ -770,30 +733,17 @@ onBeforeUnmount(() => {
 }
 
 .spatial-chart {
+  position: relative;
+  z-index: 0;
   width: 100%;
   height: 500px;
 }
 
 
-.spatial-section h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: var(--text-primary);
-}
-
 .controls {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
-}
-
-.select-input {
-  width: 150px;
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
 }
 
 @media (max-width: 768px) {

@@ -1,0 +1,36 @@
+// Info text utilities — migrated from _legacy.scss
+
+.tabs-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  margin-top: 0.5rem;
+  letter-spacing: 0.03em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.page-footer {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 auto;
+}
+
+.hint {
+  font-size: 14px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.info-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: pre-wrap;
+  font-size: 15px;
+}
+
+.info-text strong {
+  color: var(--color-primary-hover);
+}

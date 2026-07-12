@@ -121,7 +121,11 @@ defineExpose({
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$arrow-transition: 0.2s ease;
+
 .simple-select-dropdown {
   position: relative;
   display: inline-block;
@@ -129,19 +133,21 @@ defineExpose({
 
 .select-label {
   flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include text-truncate;
 }
 
 .select-arrow {
   margin-left: 8px;
+  color: var(--text-tertiary);
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.6);
-  transition: transform 0.2s ease;
+  transition: transform $arrow-transition;
 }
 
-.select-trigger.is-open .select-arrow {
-  transform: rotate(180deg);
+.select-trigger {
+  &.is-open {
+    .select-arrow {
+      transform: rotate(180deg);
+    }
+  }
 }
 </style>

@@ -312,14 +312,14 @@ const SEO_CONFIG = {
     },
     '/explore/villages/ml': {
       title: {
-        'zh-Hant': '廣東自然村分析｜方音圖鑑',
-        'zh-CN': '广东自然村分析｜方音图鉴',
-        en: 'Guangdong Village Analysis | Dialects Atlas',
+        'zh-Hant': '自然村機器學習｜方音圖鑑',
+        'zh-CN': '自然村机器学习｜方音图鉴',
+        en: 'Natural Villages Machine Learning | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '基於廣東自然村資料進行機器學習與語言學分析，涵蓋村名搜尋、字頻分析、語義分析、空間分析、模式分析、區域分析與 ML 計算。',
-        'zh-CN': '基于广东自然村资料进行机器学习与语言学分析，涵盖村名搜索、字频分析、语义分析、空间分析、模式分析、区域分析与 ML 计算。',
-        en: 'Analyze Guangdong natural village data with machine learning and linguistics workflows, including village search, character frequency, semantics, spatial analysis, patterns, regional analysis, and ML computation.',
+        'zh-Hant': '基於自然村資料進行機器學習與語言學分析，涵蓋村名搜尋、字頻分析、語義分析、空間分析、模式分析、區域分析與 ML 計算。',
+        'zh-CN': '基于自然村资料进行机器学习与语言学分析，涵盖村名搜索、字频分析、语义分析、空间分析、模式分析、区域分析与 ML 计算。',
+        en: 'Analyze natural village data with machine learning and linguistics workflows, including village search, character frequency, semantics, spatial analysis, patterns, regional analysis, and ML computation.',
       },
     },
     '/menu/tools': {
@@ -432,7 +432,6 @@ export const SITEMAP_PATHS = [
 
 export const NOINDEX_PATHS = new Set([
   '/intro',
-  '/auth',
   '/auth/data',
   '/auth/regions',
 ])

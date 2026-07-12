@@ -9,7 +9,7 @@
           marginBottom: isCondensedMode ? '0' : '50px'
         }"
     >
-      <div v-if="!hasData" class="empty-tip" style="padding: 20px; text-align: center; color: #666;">
+      <div v-if="!hasData" class="empty-tip" style="padding: 20px; text-align: center; color: var(--text-tertiary);">
         {{ t('result.resultList.emptyState') }}
       </div>
 
@@ -120,10 +120,10 @@
 import { ref, computed, watch, onMounted, nextTick, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DataRow from './DataRow.vue';
-import { parseFeatureString,get_detail } from '@/main/utils/ResultTable.js';
+import { parseFeatureString,get_detail } from '@/main/utils/query/ResultTable.js';
 import { READING_COLORS } from '@/main/config/readingColors.js';
-import ValuePopup from "../popup/result/ValuePopup.vue";
-import FeaturePopup from "../popup/result/FeaturePopup.vue";
+import ValuePopup from "./popups/ValuePopup.vue";
+import FeaturePopup from "./popups/FeaturePopup.vue";
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { resultCache } from '@/main/store/store.js';
 
@@ -460,82 +460,114 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-.Panel {
-  resize: both;
-  overflow: auto;
-  border-radius: 12px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
-  z-index: 1;
-  bottom: 1dvh;
-  left: 2dvw;
-  right: 2dvw;
-  height: 78dvh;
-  position: fixed;
+@use '@/styles/global/mixins' as *;
+
+$primary-blue: var(--color-primary);
+$text-dark: var(--text-dark);
+$panel-radius: 12px;
+$dropdown-radius: 10px;
+$transition-duration: 0.2s;
+$dropdown-blur: 12px;
+$system-font:
+  -apple-system,
+  BlinkMacSystemFont,
+  "Segoe UI",
+  Roboto,
+  Helvetica,
+  Arial,
+  sans-serif;
+
+@mixin glass-dropdown($background, $max-height, $min-width) {
+  position: absolute;
+  bottom: 110%;
+  left: 0;
+  z-index: 9999;
+  display: none;
+  min-width: $min-width;
+  max-height: $max-height;
+  padding: 8px;
+  overflow-y: auto;
+  background: $background;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: $dropdown-radius;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur($dropdown-blur);
+  -webkit-backdrop-filter: blur($dropdown-blur);
+
+  &.open {
+    display: block;
+  }
 }
 
-@media (orientation: portrait) {
-  .Panel {
-    height: 70dvh;
+.Panel {
+  position: fixed;
+  right: 2dvw;
+  bottom: 1dvh;
+  left: 2dvw;
+  z-index: 1;
+  @include flex-col;
+  height: 78dvh;
+  overflow: auto;
+  resize: both;
+  border: 1px solid var(--border-light-gray);
+  border-radius: $panel-radius;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+
+  @media (orientation: portrait) {
+    right: 1dvw;
     bottom: 2dvh;
     left: 1dvw;
-    right: 1dvw;
-  }
-  .stickybar-filter-wrapper{
-    left:55%!important;
-  }
-  .custom-switch-container{
-    right: 1%!important;
+    height: 70dvh;
   }
 }
 
 .panel-content {
-  flex: 1;
-  overflow: visible;
-  padding: 13px;
   box-sizing: border-box;
-  color: #333;
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 15px;
+  padding: 13px;
+  overflow: visible;
   overflow-y: auto;
+  color: $text-dark;
 }
 
 .reading-legend {
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-wrap: wrap;
   gap: 8px 12px;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 4px;
   padding: 6px 10px;
+  color: var(--text-slate);
   font-size: 12px;
-  color: #4b5563;
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--glass-80);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 
 .reading-legend-title {
+  color: var(--text-dark);
   font-weight: 600;
-  color: #374151;
 }
 
 .reading-legend-item {
   display: inline-flex;
-  align-items: center;
   gap: 6px;
+  align-items: center;
   white-space: nowrap;
 }
 
 .reading-legend-dot {
+  flex-shrink: 0;
   width: 8px;
   height: 8px;
-  border-radius: 999px;
-  flex-shrink: 0;
+  border-radius: var(--radius-pill);
 }
 
 .reading-legend-label {
@@ -544,22 +576,24 @@ onUnmounted(() => {
 
 .sticky-label2 {
   position: absolute;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.3);
-  left: 0;
   right: 0;
-  backdrop-filter: blur(2px);
-  padding: 9px 18px;
-  font-size: 14px;
-  font-weight: bold;
-  border-bottom: 1px solid rgba(204, 204, 204, 0.6);
+  bottom: 0;
+  left: 0;
   z-index: 999;
-  color: #333;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-radius: 10px;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
+  padding: 9px 18px;
+  color: $text-dark;
+  font-size: 14px;
+  font-weight: bold;
+  background: var(--glass-30);
+  border-bottom: 1px solid rgba(204, 204, 204, 0.6);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(2px);
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease;
 
   &:hover {
     background: rgba(240, 240, 240, 0.9);
@@ -567,166 +601,142 @@ onUnmounted(() => {
   }
 
   &.sticky-scrolled {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--glass-10);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   }
 
   &::before {
-    content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: inherit;
+    inset: 0;
     z-index: -1;
+    content: "";
+    background: inherit;
   }
 }
 
 .sticky-bar-inner {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  position: relative;
 }
 
 .stickybar-location-wrapper {
   position: relative;
   z-index: 2;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: $system-font;
 }
 
 .stickybar-location-trigger {
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
   padding: 4px 10px;
-  border-radius: 14px;
+  color: $text-dark;
+  white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  white-space: nowrap;
-  color: #333;
+  border-radius: 14px;
+  transition:
+    background $transition-duration,
+    color $transition-duration,
+    box-shadow $transition-duration;
 
   &:hover {
-    color: #007aff;
-    background: rgba(255, 255, 255, 0.35);
-    box-shadow: 0 0 8px rgba(0, 122, 255, 0.22);
+    color: $primary-blue;
+    background: var(--glass-40);
+    box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.22);
   }
 }
 
 .stickybar-location-dropdown {
-  position: absolute;
-  bottom: 110%;
-  left: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 10px;
-  padding: 8px;
-  display: none;
-  max-height: 220px;
-  overflow-y: auto;
-  min-width: 120px;
-  z-index: 9999;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-  &.open {
-    display: block;
-  }
+  @include glass-dropdown(
+    var(--glass-90),
+    220px,
+    120px
+  );
 }
 
 .stickybar-location-option {
-  width: 100%;
   display: block;
+  width: 100%;
   padding: 6px 9px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: #333;
+  color: $text-dark;
+  font-size: 14px;
+  font-weight: 600;
   text-align: left;
   white-space: nowrap;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: color 0.2s, background 0.2s;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  transition:
+    color $transition-duration,
+    background $transition-duration;
 
   &:hover {
-    color: #007aff;
-    background: rgba(0, 122, 255, 0.08);
+    color: $primary-blue;
+    background: rgba(var(--color-primary-rgb), 0.08);
   }
 
   &.active {
-    color: #007aff;
-    background: rgba(0, 122, 255, 0.12);
+    color: $primary-blue;
+    background: rgba(var(--color-primary-rgb), 0.12);
   }
 }
 
 .stickybar-filter-wrapper {
   position: absolute;
-  left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 14px;
+  left: 50%;
   z-index: 1;
+  font-family: $system-font;
+  font-size: 14px;
+  transform: translate(-50%, -50%);
+
+  @media (orientation: portrait) {
+    left: 55% !important;
+  }
 }
 
 .stickybar-filter-trigger {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 14px;
+  @include flex-center;
   padding: 4px 12px;
-  color: #007aff;
+  color: $primary-blue;
+  font-weight: 500;
+  white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  white-space: nowrap;
-  border: 1px solid rgba(0, 122, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 500;
+  background: var(--glass-20);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: all 0.25s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.35);
-    box-shadow: 0 0 8px rgba(0, 122, 255, 0.4);
+    background: var(--glass-40);
+    box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.4);
   }
 }
 
 .stickybar-filter-dropdown {
-  position: absolute;
-  bottom: 110%;
-  left: 0;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 10px;
-  padding: 8px;
-  display: none;
-  max-height: 200px;
-  overflow-y: auto;
-  min-width: 70px;
-  z-index: 9999;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-  &.open {
-    display: block;
-  }
+  @include glass-dropdown(
+    var(--glass-90),
+    200px,
+    70px
+  );
 }
 
 .stickybar-filter-option {
   display: flex;
   align-items: center;
   margin: 6px 0;
+  color: $text-dark;
   font-size: 14px;
-  color: #333;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color $transition-duration;
 
   &:hover {
-    color: #007aff;
+    color: $primary-blue;
   }
 
   input[type="checkbox"] {
@@ -737,19 +747,23 @@ onUnmounted(() => {
 .custom-switch-container {
   position: absolute;
   right: 5%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Arial', sans-serif;
+  @include flex-center;
+  font-family: "Arial", sans-serif;
   font-size: 16px;
+  transform: translateX(-50%);
+
+  @media (orientation: portrait) {
+    right: 1% !important;
+  }
 }
 
-.result-display-switch :deep(.switch-toggle__button) {
-  cursor: pointer;
-}
+.result-display-switch {
+  :deep(.switch-toggle__button) {
+    cursor: pointer;
 
-.result-display-switch :deep(.switch-toggle__button:hover:not(.is-disabled)) {
-  transform: scale(1.3);
+    &:hover:not(.is-disabled) {
+      transform: scale(1.3);
+    }
+  }
 }
 </style>

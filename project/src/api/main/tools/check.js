@@ -10,35 +10,41 @@ import { showError } from '@/utils/message.js'
  */
 
 /**
- * @typedef {Object} ToneStats
- * @property {Object<string, number>} tone_counts - 声调统计（调名 -> 数量）
- * @property {number} total - 总数
- */
-
-/**
- * @typedef {Object} TableDataResponse
- * @property {Array<Object>} data - 表格数据行
- * @property {number} total - 总行数
- * @property {number} page - 当前页码
- * @property {number} page_size - 每页大小
- */
-
-/**
  * 上传检查文件
  * @param {File} file - 字表文件
  * @param {string} [formatType] - 文件格式类型（'音典' | '跳跳老鼠' | '縣志' | undefined）
  * @param {boolean} [isSimplified=false] - 是否简体中文
+ * @param {Object} [options] - 附加选项
+ * @param {Object|null} [options.columnMapping] - 列匹配结果
+ * @param {number|null} [options.headerRowIndex] - 表头所在行（从 0 开始）
+ * @param {string|null} [options.sheetName] - 选中的工作表名称
  * @returns {Promise<CheckUploadResponse>} 上传结果
  * @throws {Error} 上传失败
  * @example
- * const result = await uploadCheckFile(file, '音典', false)
+ * const result = await uploadCheckFile(file, '音典', false, {
+ *   columnMapping: { char: 'column_1', ipa: 'column_2' }
+ * })
  */
-export async function uploadCheckFile(file, formatType, isSimplified = false) {
+export async function uploadCheckFile(file, formatType, isSimplified = false, options = {}) {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('format_type',formatType)
   // 繁体(false) -> '0', 简体(true) -> '1'
   formData.append('level', isSimplified ? '1' : '0')
+
+  const { columnMapping = null, headerRowIndex = null, sheetName = null } = options
+
+  if (columnMapping) {
+    formData.append('column_mapping', JSON.stringify(columnMapping))
+  }
+
+  if (headerRowIndex !== null && headerRowIndex !== undefined) {
+    formData.append('header_row_index', String(headerRowIndex))
+  }
+
+  if (sheetName) {
+    formData.append('sheet_name', sheetName)
+  }
 
   try {
     return await api('/api/tools/check/upload', {

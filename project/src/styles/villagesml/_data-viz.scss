@@ -1,0 +1,57 @@
+// VillagesML 数据可视化（进度条、徽章）
+
+.vml-bar {
+  height: 24px;
+  background: var(--glass-50);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.vml-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+  transition: width 0.5s ease;
+}
+
+.vml-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.vml-badge-significant {
+  background: rgba(var(--color-success-rgb), 0.15);
+  color: var(--color-success);
+}
+
+.vml-badge-very-significant {
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
+}
+
+.vml-badge-marginal {
+  background: rgba(var(--color-warning-rgb), 0.15);
+  color: var(--color-warning);
+}
+
+.vml-badge-not-significant {
+  background: rgba(var(--text-secondary-rgb), 0.15);
+  color: var(--text-secondary);
+}
+
+.vml-rank-gold {
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold));
+  color: var(--color-warning-dark);
+}
+
+.vml-rank-silver {
+  background: linear-gradient(135deg, var(--color-silver), var(--border-light-gray));
+  color: var(--text-medium);
+}
+
+.vml-rank-bronze {
+  background: linear-gradient(135deg, var(--color-bronze), var(--vml-terracotta));
+  color: var(--vml-brown-dark);
+}

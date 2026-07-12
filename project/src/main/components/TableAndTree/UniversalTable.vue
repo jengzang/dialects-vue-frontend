@@ -1524,9 +1524,28 @@ onUnmounted(() => {
 });
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
+$primary-blue: var(--color-primary);
+$success-green: var(--color-success);
+$warning-orange: var(--color-warning);
+$warning-dark: var(--color-warning-text);
+$danger-red: var(--color-error-light);
+$text-dark: var(--text-dark);
+$text-muted: var(--text-tertiary);
+$transition-fast: 0.2s;
+$mobile-breakpoint: 768px;
+$system-font:
+  -apple-system,
+  BlinkMacSystemFont,
+  "SF Pro Text",
+  "Segoe UI",
+  Roboto,
+  Helvetica,
+  Arial,
+  sans-serif;
 
-<style scoped>
 /* ========================================
    UniversalTable 组件样式
    使用全局 CSS 变量和工具类
@@ -1534,17 +1553,16 @@ onUnmounted(() => {
 
 .universal-table.glass-container {
   /* 使用全局变量替代局部变量 */
-  background: var(--glass-light);
+  background: var(--glass-30);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: var(--radius-xl);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-40);
   box-shadow: var(--shadow-md);
   padding: 12px 4px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: $system-font;
   color: var(--text-primary);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
   height: 85dvh;
   width: 88dvw;
@@ -1572,16 +1590,16 @@ onUnmounted(() => {
   padding: 10px 12px 10px 36px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: var(--glass-medium);
+  background: var(--glass-60);
   font-size: 14px;
   outline: none;
   transition: all 0.3s;
-}
 
-.search-input:focus {
-  background: var(--bg-white);
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+  &:focus {
+    background: var(--bg-white);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
 }
 
 .search-icon {
@@ -1602,63 +1620,63 @@ onUnmounted(() => {
   --main-glass-button-padding: 8px 16px;
   --main-glass-button-border-radius: var(--radius-md);
   --main-glass-button-font-size: 13px;
-  padding: 8px 16px;
-  border: 1px solid var(--border-light);
-  background: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
+
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s;
   max-width: 100px;
+  padding: 8px 16px;
   white-space: nowrap;
-}
+  cursor: pointer;
+  background: var(--glass-80);
+  border: 1px solid var(--border-light);
+  transition: all $transition-fast;
 
-.main-glass-button:hover:not(:disabled) {
-  background: var(--bg-white);
-  transform: translateY(-1px);
-}
+  &:hover:not(:disabled) {
+    background: var(--bg-white);
+    transform: translateY(-1px);
+  }
 
-.main-glass-button[data-size='compact'] {
-  --main-glass-button-padding: 8px 6px;
-}
+  &[data-size='compact'] {
+    --main-glass-button-padding: 8px 6px;
+  }
 
-.main-glass-button[data-variant='primary'] {
-  background: var(--color-primary);
-  color: white;
-}
+  &[data-variant='primary'] {
+    color: var(--action-primary-text);
+    background: var(--color-primary);
+  }
 
-.main-glass-button[data-role='edit-toggle'] {
-  background: darkgoldenrod;
-}
+  &[data-role='edit-toggle'] {
+    background: darkgoldenrod;
 
-/* 編輯模式按鈕樣式 */
-.main-glass-button[data-role='edit-toggle'][data-state='edit-mode'] {
-  background: #ff9500;
-  color: white;
-  animation: pulse 2s ease-in-out infinite;
+    &[data-state='edit-mode'] {
+      color: white;
+      background: var(--color-warning);
+      animation: pulse 2s ease-in-out infinite;
+    }
+  }
 }
 
 @keyframes pulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(255, 149, 0, 0.4);
+    box-shadow: 0 0 0 0 rgba(var(--color-warning-rgb), 0.4);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(255, 149, 0, 0);
+    box-shadow: 0 0 0 8px rgba(var(--color-warning-rgb), 0);
   }
 }
 
 /* 提交按鈕樣式 */
 .main-glass-button[data-role='submit'] {
-  background: linear-gradient(135deg, #34c759, #28a745);
   color: white;
   font-weight: 600;
-}
+  background: linear-gradient(135deg, $success-green, var(--color-success));
 
-.main-glass-button[data-role='submit']:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: #ccc;
+  &:disabled {
+    cursor: not-allowed;
+    background: var(--border-gray);
+    opacity: 0.5;
+  }
 }
 
 /* Table Area */
@@ -1668,7 +1686,7 @@ onUnmounted(() => {
   overflow-x: auto;
   overflow-y: auto;
   border-radius: var(--radius-md);
-  background: var(--glass-light);
+  background: var(--glass-30);
   min-height: 200px;
 }
 
@@ -1684,7 +1702,7 @@ thead {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -1715,40 +1733,41 @@ td {
 }
 
 /* 可編輯單元格樣式 */
-td.editable-cell {
-  cursor: text;
-  background: #fffbf0;
-  border: 1px solid #ffd700;
-  transition: all 0.2s;
-}
+td {
+  &.editable-cell {
+    cursor: text;
+    background: var(--bg-warning-light);
+    border: 1px solid var(--color-gold);
+    transition: all $transition-fast;
 
-td.editable-cell:hover {
-  background: #fff9e6;
-  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
-}
+    &:hover {
+      background: var(--bg-warning-light);
+      box-shadow: 0 0 0 2px rgba(var(--color-gold-rgb), 0.2);
+    }
 
-td.editable-cell:focus {
-  outline: none;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
-  border-color: var(--color-primary);
-}
+    &:focus {
+      background: white;
+      border-color: var(--color-primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.2);
+    }
+  }
 
-/* 已改變的單元格樣式 */
-td.cell-changed {
-  background: #e6f7ff;
-  border-color: var(--color-primary);
-  font-weight: 600;
-  position: relative;
-}
+  &.cell-changed {
+    position: relative;
+    font-weight: 600;
+    background: var(--bg-blue-tint);
+    border-color: var(--color-primary);
 
-td.cell-changed::after {
-  content: '✎';
-  position: absolute;
-  top: 2px;
-  right: 4px;
-  font-size: 10px;
-  color: var(--color-primary);
+    &::after {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      color: var(--color-primary);
+      font-size: 10px;
+      content: '✎';
+    }
+  }
 }
 
 /* Header & Filter */
@@ -1763,31 +1782,41 @@ td.cell-changed::after {
 
 .header-text-wrapper {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px;
-  border-radius: var(--radius-sm);
-  transition: background 0.2s;
   flex: 1;
+  gap: 4px;
+  align-items: center;
   min-width: 0;
+  padding: 4px;
   overflow: hidden;
+  border-radius: var(--radius-sm);
+  transition: background $transition-fast;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--bg-hover);
+    }
+  }
+
+  &.filtering {
+    .header-text {
+      color: var(--color-primary);
+      font-weight: bold;
+
+      :root[data-color-theme='dark'] & {
+        color: var(--color-primary-hover);
+      }
+    }
+  }
+
+  :root[data-color-theme='dark'] & {
+    color: var(--text-primary);
+  }
 }
 
 .header-text {
   white-space: nowrap;
-}
-
-.header-text-wrapper.clickable {
-  cursor: pointer;
-}
-
-.header-text-wrapper.clickable:hover {
-  background: var(--bg-hover);
-}
-
-.header-text-wrapper.filtering .header-text {
-  color: var(--color-primary);
-  font-weight: bold;
 }
 
 .filter-hint-icon {
@@ -1796,8 +1825,7 @@ td.cell-changed::after {
 }
 
 .sort-controls {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   height: 16px;
   justify-content: center;
   opacity: 0.2;
@@ -1817,32 +1845,28 @@ td.cell-changed::after {
 
 /* Filter Popup */
 .main-glass-panel[data-surface='filter-popup'] {
-  --main-glass-panel-background: var(--glass-light);
+  --main-glass-panel-background: var(--glass-30);
   --main-glass-panel-backdrop-filter: blur(25px);
-  --main-glass-panel-border: 1px solid rgba(255, 255, 255, 0.8);
+  --main-glass-panel-border: 1px solid var(--glass-80);
   --main-glass-panel-shadow: var(--shadow-lg);
   --main-glass-panel-hover-shadow: var(--shadow-lg);
   --main-glass-panel-border-radius: var(--radius-lg);
+
   position: absolute;
   top: 100%;
   left: 0;
-  margin-top: 8px;
   z-index: 10000;
+  @include flex-col;
   min-width: 240px;
   max-width: 300px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  max-height: 400px;
-}
-
-.main-glass-panel[data-surface='filter-popup'].align-right {
-  left: auto;
-  right: 0;
-}
-
-.main-glass-panel[data-surface='filter-popup'] {
   max-height: 50dvh;
+  padding: 10px;
+  margin-top: 8px;
+
+  &.align-right {
+    right: 0;
+    left: auto;
+  }
 }
 
 .filter-header {
@@ -1860,8 +1884,7 @@ td.cell-changed::after {
 .filter-list {
   overflow-y: auto;
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
   min-height: 0;
 }
@@ -1878,86 +1901,88 @@ td.cell-changed::after {
 /* Checkbox Styling */
 .checkbox-item {
   display: flex;
-  align-items: center;
   gap: 10px;
-  cursor: pointer;
+  align-items: center;
   padding: 3px;
+  cursor: pointer;
   border-radius: var(--radius-md);
-  transition: background 0.2s;
-}
+  transition: background $transition-fast;
 
-.checkbox-item:hover {
-  background: var(--bg-hover-light);
-}
+  &:hover {
+    background: var(--bg-hover-light);
+  }
 
-.checkbox-item input {
-  display: none;
+  input {
+    display: none;
+
+    &:checked {
+      + .custom-checkbox {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+
+        &::after {
+          display: block;
+          color: darkgreen;
+          font-size: 14px;
+          font-weight: bold;
+          line-height: 1;
+          content: '✓';
+        }
+      }
+    }
+  }
 }
 
 .custom-checkbox {
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
-  border: 2px solid var(--border-gray);
+  position: relative;
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  width: 20px;
+  height: 20px;
   background: white;
-  flex-shrink: 0;
-  position: relative;
-}
-
-.checkbox-item input:checked + .custom-checkbox {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-.checkbox-item input:checked + .custom-checkbox::after {
-  content: '✓';
-  color: darkgreen;
-  font-size: 14px;
-  font-weight: bold;
-  line-height: 1;
-  display: block;
+  border: 2px solid var(--border-gray);
+  border-radius: 5px;
+  transition: all $transition-fast;
 }
 
 .text-btn {
-  background: none;
-  border: none;
+  padding: 6px 12px;
   font-size: 13px;
   cursor: pointer;
-  padding: 6px 12px;
+  background: none;
+  border: none;
   border-radius: var(--radius-sm);
+
+  &.confirm {
+    color: white;
+    background: var(--color-gradient);
+  }
+
+  &.cancel {
+    color: var(--text-tertiary);
+
+    &:hover {
+      background: var(--bg-hover);
+    }
+  }
 }
 
 .toggle-select {
   color: var(--color-accent-purple);
   font-weight: bold;
-}
 
-.toggle-select:hover {
-  background: var(--color-accent-purple-light);
-}
-
-.text-btn.confirm {
-  background: var(--color-gradient);
-  color: white;
-}
-
-.text-btn.cancel {
-  color: var(--text-tertiary);
-}
-
-.text-btn.cancel:hover {
-  background: var(--bg-hover);
+  &:hover {
+    background: var(--color-accent-purple-light);
+  }
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .universal-table.glass-container {
     padding: 8px 2px;
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     height: 85dvh;
     border: none;
   }
@@ -2019,33 +2044,31 @@ td.cell-changed::after {
 }
 
 .icon-action-btn {
+  @include flex-center;
   width: 28px;
   height: 28px;
-  border-radius: var(--radius-full);
-  border: none;
-  background: var(--bg-hover-light);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: 0.2s;
-}
+  background: var(--bg-hover-light);
+  border: none;
+  border-radius: var(--radius-full);
+  transition: $transition-fast;
 
-.icon-action-btn:hover {
-  background: var(--color-primary);
-  color: white;
-}
+  &:hover {
+    color: white;
+    background: var(--color-primary);
+  }
 
-/* 删除按钮专用样式（暗红色） */
-.icon-action-btn.delete {
-  background: #8B0000; /* 暗红色 */
-  color: white;
-}
+  /* 删除按钮专用样式（暗红色） */
+  &.delete {
+    color: white;
+    background: var(--color-error-dark);
 
-.icon-action-btn.delete:hover {
-  background: #A52A2A; /* 悬停时更浅的红色 */
-  color: white;
-  transform: scale(1.1);
+    &:hover {
+      color: white;
+      background: var(--color-error);
+      transform: scale(1.1);
+    }
+  }
 }
 
 /* Pagination */
@@ -2058,30 +2081,28 @@ td.cell-changed::after {
 
 .page-info-wrapper {
   min-width: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
 }
 
 .page-info {
+  padding: 8px 12px;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-primary);
-  padding: 8px 12px;
   border-radius: var(--radius-md);
-  transition: all 0.2s;
-}
+  transition: all $transition-fast;
 
-.page-info.clickable {
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid var(--border-light);
-}
+  &.clickable {
+    cursor: pointer;
+    background: var(--glass-50);
+    border: 1px solid var(--border-light);
 
-.page-info.clickable:hover {
-  background: var(--color-primary-light);
-  border-color: var(--color-primary);
-  transform: translateY(-1px);
+    &:hover {
+      background: var(--color-primary-light);
+      border-color: var(--color-primary);
+      transform: translateY(-1px);
+    }
+  }
 }
 
 .page-input-wrapper {
@@ -2093,25 +2114,26 @@ td.cell-changed::after {
 .page-input {
   width: 50px;
   padding: 6px 8px;
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius-md);
-  background: white;
   font-size: 14px;
   font-weight: 600;
   text-align: center;
+  appearance: textfield;
+  background: white;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-md);
   outline: none;
-  transition: all 0.2s;
+  transition: all $transition-fast;
   -moz-appearance: textfield;
-}
 
-.page-input::-webkit-outer-spin-button,
-.page-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+  }
 
-.page-input:focus {
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+  &:focus {
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
 }
 
 .page-total {
@@ -2123,21 +2145,21 @@ td.cell-changed::after {
 .page-btn {
   width: 36px;
   height: 36px;
-  border-radius: var(--radius-full);
+  cursor: pointer;
   background: white;
   border: 1px solid var(--border-medium);
-  cursor: pointer;
-  transition: all 0.2s;
-}
+  border-radius: var(--radius-full);
+  transition: all $transition-fast;
 
-.page-btn:hover:not(:disabled) {
-  background: var(--color-primary-light);
-  border-color: var(--color-primary);
-}
+  &:hover:not(:disabled) {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+  }
 
-.page-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
 }
 
 .label-text {
@@ -2151,12 +2173,11 @@ td.cell-changed::after {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   z-index: 10;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   gap: 10px;
@@ -2182,8 +2203,7 @@ td.cell-changed::after {
    ======================================== */
 
 .form-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
   overflow-y: auto;
   max-height: 50dvh;
@@ -2236,7 +2256,7 @@ td.cell-changed::after {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all $transition-fast;
 }
 
 .cancel-btn {
@@ -2250,7 +2270,7 @@ td.cell-changed::after {
 
 .confirm-btn {
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
 }
 
 .confirm-btn:hover {
@@ -2283,27 +2303,27 @@ td.cell-changed::after {
   border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all $transition-fast;
   white-space: nowrap;
 }
 
 .fullscreen-toggle-btn:hover {
   background: var(--color-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
 }
 
 .fullscreen-toggle-btn.exit-btn {
-  background: #ff3b30;
+  background: $danger-red;
   margin-left: auto;
 }
 
 .fullscreen-toggle-btn.exit-btn:hover {
-  background: #ff6259;
+  background: var(--color-error-light);
 }
 
 .table-fullscreen-overlay {
@@ -2311,9 +2331,7 @@ td.cell-changed::after {
   inset: 0;
   background: rgba(0, 0, 0, 0.95);
   z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -2321,16 +2339,15 @@ td.cell-changed::after {
 .fullscreen-container {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: rgba(255, 255, 255, 0.5);
+  @include flex-col;
+  background: var(--glass-50);
 }
 
 .fullscreen-table {
   flex: 1;
   margin: 0;
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 }
 
 .fullscreen-pagination {
@@ -2355,6 +2372,9 @@ td.cell-changed::after {
 /* ==========================================
    批量替换对话框样式
 
+   原文件此处的标题注释没有闭合，因此以下规则当前不会生效。
+   为保持原有样式行为，继续将其保留在注释中。
+
 .modal-fade-enter-active,
 .modal-fade-leave-active {
   transition: opacity 0.3s ease;
@@ -2378,25 +2398,27 @@ td.cell-changed::after {
   margin-bottom: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: $text-dark;
 }
 
 .batch-replace-modal-body .glass-input {
   width: 80%;
   padding: 10px 14px;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-md);
+  background: var(--glass-60);
   font-size: 14px;
   outline: none;
-  transition: all 0.2s;
+  transition: all $transition-fast;
 }
 
 .batch-replace-modal-body .glass-input:focus {
-  border-color: #007aff;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  border-color: $primary-blue;
+  background: var(--glass-90);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
 }
+
+*/
 
 /* 列选择器 */
 .column-selector {
@@ -2405,7 +2427,7 @@ td.cell-changed::after {
   gap: 10px;
   padding: 12px;
   background: rgba(0, 0, 0, 0.02);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow-y: auto;
 }
 
@@ -2416,7 +2438,7 @@ td.cell-changed::after {
   gap: 10px;
   cursor: pointer;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   background: white;
   border: 2px solid rgba(0, 0, 0, 0.08);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2426,10 +2448,10 @@ td.cell-changed::after {
 }
 
 .column-checkbox-item:hover {
-  background: rgba(0, 122, 255, 0.05);
-  border-color: rgba(0, 122, 255, 0.3);
+  background: rgba(var(--color-primary-rgb), 0.05);
+  border-color: rgba(var(--color-primary-rgb), 0.3);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.15);
 }
 
 .column-checkbox-item input[type="checkbox"] {
@@ -2440,10 +2462,8 @@ td.cell-changed::after {
   width: 20px;
   height: 20px;
   border-radius: 5px;
-  border: 2px solid #d1d5db;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 2px solid var(--border-gray);
+  @include flex-center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: white;
   flex-shrink: 0;
@@ -2451,10 +2471,10 @@ td.cell-changed::after {
 }
 
 .column-checkbox-item input:checked + .custom-checkbox {
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  border-color: #007aff;
+  background: linear-gradient(135deg, $primary-blue, var(--color-primary-hover));
+  border-color: $primary-blue;
   transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.4);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.4);
 }
 
 .column-checkbox-item input:checked + .custom-checkbox::after {
@@ -2482,14 +2502,14 @@ td.cell-changed::after {
 }
 
 .column-checkbox-item input:checked ~ .label-text {
-  color: #007aff;
+  color: $primary-blue;
   font-weight: 600;
 }
 
 .column-checkbox-item .label-text {
   font-size: 13px;
-  color: #333;
-  transition: all 0.2s;
+  color: $text-dark;
+  transition: all $transition-fast;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2518,7 +2538,7 @@ td.cell-changed::after {
 
 .radio-item span {
   font-size: 14px;
-  color: #333;
+  color: $text-dark;
   user-select: none;
 }
 
@@ -2527,7 +2547,7 @@ td.cell-changed::after {
   display: block;
   margin-top: 6px;
   font-size: 12px;
-  color: #88bffb;
+  color: var(--text-help);
   font-weight: 500;
 }
 
@@ -2542,14 +2562,14 @@ td.cell-changed::after {
   margin: 0 0 12px 0;
   font-size: 15px;
   font-weight: 600;
-  color: #007aff;
+  color: $primary-blue;
 }
 
 .preview-list {
   max-height: 300px;
   overflow-y: auto;
-  background: rgba(0, 122, 255, 0.03);
-  border-radius: 10px;
+  background: rgba(var(--color-primary-rgb), 0.03);
+  border-radius: var(--radius-md);
   padding: 12px;
 }
 
@@ -2557,7 +2577,7 @@ td.cell-changed::after {
   padding: 10px;
   margin-bottom: 8px;
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -2570,17 +2590,17 @@ td.cell-changed::after {
 
 .row-label {
   padding: 2px 8px;
-  background: rgba(0, 122, 255, 0.1);
-  color: #007aff;
-  border-radius: 4px;
+  background: rgba(var(--color-primary-rgb), 0.1);
+  color: $primary-blue;
+  border-radius: var(--radius-xs);
   font-weight: 600;
 }
 
 .col-label {
   padding: 2px 8px;
-  background: rgba(52, 199, 89, 0.1);
-  color: #34c759;
-  border-radius: 4px;
+  background: rgba(var(--color-success-rgb), 0.1);
+  color: $success-green;
+  border-radius: var(--radius-xs);
   font-weight: 600;
 }
 
@@ -2592,25 +2612,25 @@ td.cell-changed::after {
 }
 
 .old-value {
-  color: #d32f2f;
+  color: var(--color-error);
   text-decoration: line-through;
   opacity: 0.7;
 }
 
 .arrow {
-  color: #666;
+  color: $text-muted;
   font-weight: bold;
 }
 
 .new-value {
-  color: #34c759;
+  color: $success-green;
   font-weight: 600;
 }
 
 .preview-more {
   text-align: center;
   padding: 8px;
-  color: #666;
+  color: $text-muted;
   font-size: 12px;
   font-style: italic;
 }
@@ -2618,21 +2638,21 @@ td.cell-changed::after {
 /* ✅ 新增：全表预览统计样式 */
 .all-pages-preview {
   padding: 16px;
-  background: rgba(255, 152, 0, 0.05);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 152, 0, 0.2);
+  background: rgba(var(--color-warning-rgb), 0.05);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.2);
 }
 
 .all-pages-preview h4 {
   margin: 0 0 12px 0;
   font-size: 15px;
   font-weight: 600;
-  color: #ff9800;
+  color: $warning-orange;
 }
 
 .stats-box {
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   padding: 12px;
   margin-bottom: 12px;
 }
@@ -2646,12 +2666,12 @@ td.cell-changed::after {
 }
 
 .stats-item .label {
-  color: #666;
+  color: $text-muted;
   font-weight: 500;
 }
 
 .stats-item .value {
-  color: #ff9800;
+  color: $warning-orange;
   font-weight: 600;
   font-size: 16px;
 }
@@ -2659,9 +2679,9 @@ td.cell-changed::after {
 .warning-text {
   margin: 12px 0 0 0;
   padding: 10px;
-  background: rgba(255, 152, 0, 0.1);
-  border-radius: 6px;
-  color: #ff6f00;
+  background: rgba(var(--color-warning-rgb), 0.1);
+  border-radius: var(--radius-sm);
+  color: $warning-dark;
   font-size: 13px;
   font-weight: 500;
   text-align: center;
@@ -2669,25 +2689,25 @@ td.cell-changed::after {
 
 /* ✅ 新增：高亮全表替换选项 */
 .radio-item.highlight-option {
-  border: 2px solid rgba(255, 152, 0, 0.3);
-  background: rgba(255, 152, 0, 0.05);
+  border: 2px solid rgba(var(--color-warning-rgb), 0.3);
+  background: rgba(var(--color-warning-rgb), 0.05);
 }
 
 .radio-item.highlight-option:hover {
-  background: rgba(255, 152, 0, 0.1);
-  border-color: rgba(255, 152, 0, 0.5);
+  background: rgba(var(--color-warning-rgb), 0.1);
+  border-color: rgba(var(--color-warning-rgb), 0.5);
 }
 
 .radio-item.highlight-option input[type="radio"]:checked + span {
-  color: #ff9800;
+  color: $warning-orange;
   font-weight: 600;
 }
 
 .help-text.warning-help {
-  color: #ff6f00;
-  background: rgba(255, 152, 0, 0.1);
+  color: $warning-dark;
+  background: rgba(var(--color-warning-rgb), 0.1);
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   margin-top: 8px;
   display: block;
   font-weight: 500;
@@ -2702,7 +2722,7 @@ td.cell-changed::after {
   margin: 20px -18px -20px;
   padding: 16px 18px;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 }
 
 .batch-replace-modal-footer .main-glass-button {
@@ -2710,13 +2730,12 @@ td.cell-changed::after {
 }
 
 .batch-replace-modal-footer .main-glass-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .batch-replace-modal-footer .main-glass-button[data-variant='secondary'] {
   background: rgba(108, 117, 125, 0.1);
-  color: #495057;
+  color: var(--text-slate);
   border: 1px solid rgba(108, 117, 125, 0.2);
 }
 

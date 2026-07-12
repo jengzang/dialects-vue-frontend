@@ -1,0 +1,49 @@
+// VillagesML 专属设计 token
+// 品牌色与 global/_tokens.scss 不同，VillagesML 有自己的视觉体系
+
+:root {
+  /* VillagesML 品牌蓝 — 与主应用 --color-primary(#007aff) 不同 */
+  --vml-blue: #4a90e2;
+  --vml-blue-rgb: 74, 144, 226;
+  --vml-blue-dark: #3a7bc8;
+  --vml-blue-dark-rgb: 58, 123, 200;
+  --vml-blue-darker: #357abd;
+  --vml-blue-darker-rgb: 53, 122, 189;
+  --vml-blue-darkest: #2980b9;
+  --vml-blue-darkest-rgb: 41, 128, 185;
+  --vml-blue-medium: #3498db;
+  --vml-blue-medium-rgb: 52, 152, 219;
+  --vml-blue-highlight: #5ba3f5;
+
+  /* VillagesML 专属语义色 */
+  --vml-terracotta: #e8a87c;
+  --vml-brown-dark: #6b3e1a;
+}
+
+:root[data-color-theme='light'] {
+  --vml-blue: #1d1d1f;
+  --vml-blue-rgb: 29, 29, 31;
+  --vml-blue-dark: #050505;
+  --vml-blue-dark-rgb: 5, 5, 5;
+  --vml-blue-darker: #111418;
+  --vml-blue-darker-rgb: 17, 20, 24;
+  --vml-blue-darkest: #050608;
+  --vml-blue-darkest-rgb: 5, 6, 8;
+  --vml-blue-medium: #64748b;
+  --vml-blue-medium-rgb: 100, 116, 139;
+  --vml-blue-highlight: #475569;
+}
+
+:root[data-color-theme='dark'] {
+  --vml-blue: #f5f5f7;
+  --vml-blue-rgb: 245, 245, 247;
+  --vml-blue-dark: #ffffff;
+  --vml-blue-dark-rgb: 255, 255, 255;
+  --vml-blue-darker: #d1d1d6;
+  --vml-blue-darker-rgb: 209, 209, 214;
+  --vml-blue-darkest: #a1a1a6;
+  --vml-blue-darkest-rgb: 161, 161, 166;
+  --vml-blue-medium: #e5e5ea;
+  --vml-blue-medium-rgb: 229, 229, 234;
+  --vml-blue-highlight: #ffffff;
+}

@@ -139,39 +139,52 @@ const displayData = computed(() => {
 
 </script>
 
-<style scoped>
-/* 父容器樣式 */
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$text-primary: var(--text-primary);
+$text-secondary: dimgrey;
+$text-muted: var(--text-muted);
+$button-blue: var(--color-primary-hover);
+$transition-base: 0.3s;
+
 .glass-container {
+  @include flex-col;
   width: 60dvw;
   height: 95%;
   margin: 20px auto;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
-  color: #1d1d1f;
-}
-@media (max-aspect-ratio: 1/1){
-  .glass-container{
-    height: 92%;
-    width: 90dvw;
-  }
+  color: $text-primary;
 
+  @media (max-aspect-ratio: 1/1) {
+    width: 90dvw;
+    height: 92%;
+  }
 }
 
 .header-section {
   padding: 20px 20px 10px;
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.3);
+
+  p {
+    margin: 0 0 12px;
+    color: $text-secondary;
+    font-size: 14px;
+  }
 }
 
-.header-section p{
-  margin: 0 0 12px 0;
-  color: dimgrey;
-  font-size: 14px;
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
 }
 
 .title {
-  margin:0;
+  margin: 0;
   font-size: 22px;
   font-weight: 700;
 }
@@ -192,54 +205,62 @@ const displayData = computed(() => {
 .glass-input {
   width: 100%;
   padding: 10px 16px 10px 36px;
+  background: rgba(0, 0, 0, 0.05);
   border: none;
   border-radius: 15px;
-  background: rgba(0, 0, 0, 0.05);
   outline: none;
-  transition: all 0.3s;
-}
+  transition: all $transition-base;
 
-.glass-input:focus {
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+  &:focus {
+    background: var(--glass-80);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3);
+  }
 }
 
 .tree-content {
   flex: 1;
-  overflow-y: auto;
   padding: 16px;
+  overflow-y: auto;
 }
 
 .empty-state {
-  text-align: center;
   padding: 40px 0;
-  color: #888;
+  color: $text-muted;
+  text-align: center;
 }
 
-.title-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 0;
-}
+/*
+ * 当前模板中的跳转按钮已注释。
+ * 保留样式，便于后续恢复。
+ */
 .village-link-btn {
   padding: 8px 6px;
-  border-radius: 25px;
-  border: 3px solid rgba(255, 255, 255, 0.4);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-  color: #005fd3;
-  font-weight: 1000;
+  color: $button-blue;
   font-size: 1rem;
+  font-weight: 1000;
+  white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
+  background: linear-gradient(
+    145deg,
+    var(--glass-20),
+    var(--glass-10)
+  );
+  border: 3px solid var(--glass-40);
+  border-radius: 25px;
+  box-shadow:
+    0 6px 10px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all $transition-base ease;
 
-.village-link-btn:hover {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-  transform: scale(1.05);
+  &:hover {
+    background: linear-gradient(
+      145deg,
+      var(--glass-50),
+      var(--glass-30)
+    );
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+  }
 }
 </style>

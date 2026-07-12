@@ -60,7 +60,170 @@
       "defaultLabel": "標籤"
     }
   },
+  "importPreview": {
+    "referenceTitle": "導入前預覽與列匹配",
+    "referenceDescription": "先選擇工作表與表頭，再完成必要列匹配，確認後再正式上傳。",
+    "jyut2ipaTitle": "導入前預覽與粵拼列匹配",
+    "jyut2ipaDescription": "先確認哪一列是粵拼，再開始轉換，避免因列名不一致導致無法處理。",
+    "checkToolTitle": "導入前預覽與檢查列匹配",
+    "checkToolDescription": "先匹配字、音標與備註列，再進入檢查工作台，可減少因列名不一致導致的導入失敗。",
+    "mergeReferenceSummary": "已匹配 {mappedCount} 列 / 來源 {columnCount} 列",
+    "actions": {
+      "exportSource": "導出源文件",
+      "exporting": "導出中...",
+      "reselect": "重新選擇檔案",
+      "confirmAndUse": "確認列匹配並使用"
+    },
+    "empty": {
+      "title": "請先選擇一個表格檔案",
+      "description": "這裡會展示工作表、表頭與前幾行樣例，方便先做列匹配。"
+    },
+    "controls": {
+      "sheet": "工作表",
+      "headerRow": "表頭所在行",
+      "fileName": "檔案",
+      "columns": "列數",
+      "rows": "行數",
+      "headerRowOption": "第 {row} 行"
+    },
+    "mapping": {
+      "title": "目標列匹配",
+      "description": "父組件定義所需列，這裡只負責把來源列映射到目標列。",
+      "required": "必填",
+      "example": "示例：{value}",
+      "unselected": "暫不匹配",
+      "ready": "可使用",
+      "incomplete": "需補齊"
+    },
+    "diagnostics": {
+      "missingRequired": "還有 {count} 個必填列未匹配。",
+      "duplicateSource": "有 {count} 個來源列被重複映射。",
+      "ok": "列匹配已通過基礎校驗。"
+    },
+    "preview": {
+      "title": "表格預覽",
+      "description": "僅展示表頭後的前幾行，避免整表渲染過重。",
+      "empty": "當前沒有可預覽的資料行。"
+    },
+    "messages": {
+      "mappingIncomplete": "請先完成必填列匹配後再繼續。"
+    },
+    "schemas": {
+      "mergeReference": {
+        "char": {
+          "label": "字",
+          "description": "參考表中的主鍵列，用於對齊單字。",
+          "example": "天",
+          "aliases": {
+            "char": "字",
+            "character": "單字",
+            "word": "字頭"
+          }
+        },
+        "pronunciation": {
+          "label": "讀音",
+          "description": "核心音值或音標列，用於參考表對齊。",
+          "example": "tin1",
+          "aliases": {
+            "ipa": "音標",
+            "phonetic": "讀音",
+            "sound": "音值"
+          }
+        },
+        "note": {
+          "label": "備註",
+          "description": "可選補充信息，用於保留人工說明。",
+          "example": "文讀",
+          "aliases": {
+            "remark": "備註",
+            "comment": "說明"
+          }
+        }
+      },
+      "jyut2ipa": {
+        "jyutping": {
+          "label": "粵拼",
+          "description": "轉換所需的核心列，需提供合法粵拼內容。",
+          "example": "jyut6ping3",
+          "aliases": {
+            "jyutping": "粵拼",
+            "cantonese": "粵語拼音",
+            "pronunciation": "讀音"
+          }
+        },
+        "char": {
+          "label": "字",
+          "description": "可選字頭列，用於結果預覽與人工校對。",
+          "example": "粵",
+          "aliases": {
+            "char": "字",
+            "character": "單字",
+            "word": "字頭"
+          }
+        }
+      },
+      "checkTool": {
+        "char": {
+          "label": "字",
+          "description": "檢查工具的單字列，作為逐行檢查與定位依據。",
+          "example": "天",
+          "aliases": {
+            "char": "字",
+            "character": "單字",
+            "word": "字頭"
+          }
+        },
+        "ipa": {
+          "label": "音標",
+          "description": "檢查工具的核心音標列，用於聲韻調拆解與錯誤檢查。",
+          "example": "tin55",
+          "aliases": {
+            "ipa": "音標",
+            "phonetic": "讀音",
+            "pronunciation": "注音"
+          }
+        },
+        "note": {
+          "label": "備註",
+          "description": "可選附加說明列，用於保留人工註記。",
+          "example": "文讀",
+          "aliases": {
+            "note": "備註",
+            "comment": "說明"
+          }
+        }
+      },
+      "voronoi": {
+        "name": {
+          "label": "地點名稱",
+          "description": "Voronoi 點位名稱，用於預覽、去重點名與忽略點列表。",
+          "example": "梅縣"
+        },
+        "lng": {
+          "label": "經度",
+          "description": "點位經度列，需與緯度共同組成有效座標。",
+          "example": "116.104"
+        },
+        "lat": {
+          "label": "緯度",
+          "description": "點位緯度列，需與經度共同組成有效座標。",
+          "example": "24.289"
+        },
+        "mapPartition": {
+          "label": "地圖集分區",
+          "description": "按地圖集分區計算時使用的分區列，支援 A-B-C 層級寫法。",
+          "example": "客家話-粵臺片-梅惠小片"
+        },
+        "yindianPartition": {
+          "label": "音典分區",
+          "description": "按音典分區計算時使用的分區列，支援 A-B-C 層級寫法。",
+          "example": "客家話-粵臺片-梅惠小片"
+        }
+      }
+    }
+  },
   "updateNotice": {
+
     "title": "更新通知",
     "defaultItem": "新功能提示",
     "dontShowAgain": "不再顯示此版本更新",

@@ -95,7 +95,7 @@ import {
 } from '@/api'
 import { userStore } from '@/main/store/store.js'
 import { computeQueryStats } from '@/main/store/userStats.js'
-import { initOnlineTimeTracker, manualReport, stopOnlineTimeTracker } from '@/utils/onlineTimeTracker.js'
+import { initOnlineTimeTracker, manualReport, stopOnlineTimeTracker } from '@/utils/user/onlineTimeTracker.js'
 import { WEB_BASE } from '@/env-config.js'
 import { showConfirm, showSuccess } from '@/utils/message.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
@@ -106,7 +106,7 @@ import LoginForm from '@/main/components/user/auth/LoginForm.vue'
 import RegisterForm from '@/main/components/user/auth/RegisterForm.vue'
 import ProfileOverview from '@/main/components/user/auth/ProfileOverview.vue'
 import ModifyProfileForm from '@/main/components/user/auth/ModifyProfileForm.vue'
-import UserBenefitsPopup from '@/main/components/popup/user/UserBenefitsPopup.vue'
+import UserBenefitsPopup from '@/main/components/user/popups/UserBenefitsPopup.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter()
@@ -479,12 +479,11 @@ watch(mode, () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* Loading State - 与排行榜保持一致的样式 */
 .loading-container {
   text-align: center;
   padding: 40px 20px;
 }
-
 
 </style>

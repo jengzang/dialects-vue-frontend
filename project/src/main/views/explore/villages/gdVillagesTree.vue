@@ -8,7 +8,7 @@
 <!--          <span role="img" aria-label="ycVillages">🏠</span> 陽春自然村-->
 <!--        </button>-->
       </div>
-      <p class="subtitle">{{ t('villages.pages.gdTree.subtitle') }}</p>
+      <!-- <p class="subtitle">{{ t('villages.pages.gdTree.subtitle') }}</p> -->
       <div class="search-wrapper">
         <span class="search-icon">🔍</span>
         <input
@@ -114,23 +114,35 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import VillagesTreeItem from '@/main/components/TableAndTree/VillagesTreeItem.vue';
-import VillageMapPopup from '@/main/components/popup/map/VillageMapPopup.vue';
+import VillageMapPopup from '@/main/components/map/popups/VillageMapPopup.vue';
 import { lazyLoadTree, loadFullTree } from '@/api';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { userStore } from '@/main/store/store.js'
 const { t } = useI18n();
 const router = useRouter();
+const route = useRoute();
 
-// API Configuration
-const API_CONFIG = {
-  db_key: "village",
-  table_name: "广东省自然村",
-  level_columns: [0, 1, 2, 3, 4],
-  data_columns: [6, 7, 8]
-};
+// API Configuration — admin reads from village_admin/gd, regular users from village/广东省自然村
+const API_CONFIG = computed(() => {
+  if (userStore.role === 'admin') {
+    return {
+      db_key: 'village_admin',
+      table_name: 'gd',
+      level_columns: [0, 1, 2, 3, 4],
+      data_columns: [5, 6, 7]
+    };
+  }
+  return {
+    db_key: 'village',
+    table_name: '广东省自然村',
+    level_columns: [0, 1, 2, 3, 4],
+    data_columns: [6, 7, 8]
+  };
+});
 
 // State Management
 const topLevelCities = ref([]);
@@ -157,9 +169,9 @@ const loadInitialCities = async () => {
   initialLoadError.value = null;
 
   const payload = {
-    db_key: API_CONFIG.db_key,
-    table_name: API_CONFIG.table_name,
-    level_columns: API_CONFIG.level_columns,
+    db_key: API_CONFIG.value.db_key,
+    table_name: API_CONFIG.value.table_name,
+    level_columns: API_CONFIG.value.level_columns,
     parent_path: []
   };
 
@@ -193,10 +205,10 @@ const loadCityData = async (cityName) => {
   cityLoadErrors.value[cityName] = null;
 
   const payload = {
-    db_key: API_CONFIG.db_key,
-    table_name: API_CONFIG.table_name,
-    level_columns: API_CONFIG.level_columns,
-    data_columns: API_CONFIG.data_columns,
+    db_key: API_CONFIG.value.db_key,
+    table_name: API_CONFIG.value.table_name,
+    level_columns: API_CONFIG.value.level_columns,
+    data_columns: API_CONFIG.value.data_columns,
     filters: { "0": [cityName] }
   };
 
@@ -209,7 +221,7 @@ const loadCityData = async (cityName) => {
       if (bootstrap && typeof bootstrap === 'object') {
         const districts = bootstrap[cityName] || Object.values(bootstrap)[0] || []
         // filters accumulate (AND), level_columns shift past consumed levels
-        const shifted = API_CONFIG.level_columns.slice(1)
+        const shifted = API_CONFIG.value.level_columns.slice(1)
         const nodes = districts.map(districtName => ({
           id: generateId(),
           name: districtName,
@@ -217,7 +229,8 @@ const loadCityData = async (cityName) => {
           children: [],
           _lazy: true,
           _lazyFilters: { "0": [cityName], "1": [districtName] },
-          _lazyLevelColumns: shifted
+          _lazyLevelColumns: shifted,
+          _path: [cityName, districtName]
         }))
         loadedCitiesData.value[cityName] = nodes
       } else {
@@ -225,7 +238,7 @@ const loadCityData = async (cityName) => {
       }
     } else if (result.tree && result.tree[cityName]) {
       // Normal full tree
-      const normalizedData = normalizeTreeData(result.tree[cityName]);
+      const normalizedData = normalizeTreeData(result.tree[cityName], [cityName]);
       loadedCitiesData.value[cityName] = normalizedData;
     } else {
       throw new Error(t('villages.pages.gdTree.errors.invalidCityData'));
@@ -241,7 +254,7 @@ const loadCityData = async (cityName) => {
 /**
  * Normalize tree data from API response (full tree mode)
  */
-const normalizeTreeData = (rawData) => {
+const normalizeTreeData = (rawData, pathPrefix = []) => {
   if (!rawData || typeof rawData !== 'object') {
     return [];
   }
@@ -255,41 +268,40 @@ const normalizeTreeData = (rawData) => {
     }
   }
 
-  const processNode = (data, name, level = 1) => {
+  const processNode = (data, name, level = 1, path = []) => {
     // Check if this is a leaf node (contains data fields)
-    const isLeaf = data['方言分布'] !== undefined ||
+    const isLeaf = data['dialect'] !== undefined ||
+                   data['方言分布'] !== undefined ||
                    data['longitude'] !== undefined ||
                    data['latitude'] !== undefined;
 
     if (isLeaf) {
       const lngs = Array.isArray(data['longitude']) ? data['longitude'] : []
       const lats = Array.isArray(data['latitude']) ? data['latitude'] : []
-      const dialects = Array.isArray(data['方言分布']) ? data['方言分布'] : []
+      const dialectKey = data['dialect'] !== undefined ? 'dialect' : '方言分布'; const dialects = Array.isArray(data[dialectKey]) ? data[dialectKey] : []
       const count = Math.max(lngs.length, lats.length, 1)
 
+      const makeLeafNode = (singleData) => ({
+        id: generateId(),
+        name: formatLeafNode(name, singleData),
+        rawName: name,
+        rawData: singleData,
+        _tag: getGdTagInfo(singleData),
+        _path: [...path, name],
+        children: []
+      })
+
       if (count <= 1) {
-        return {
-          id: generateId(),
-          name: formatLeafNode(name, data),
-          rawName: name,
-          rawData: data,
-          children: []
-        }
+        return makeLeafNode(data)
       }
 
       // Duplicate leaf names with multiple records — split into individual nodes
       return Array.from({ length: count }, (_, i) => {
         const single = {}
-        if (dialects[i] !== undefined) single['方言分布'] = [dialects[i]]
+        if (dialects[i] !== undefined) single[dialectKey] = [dialects[i]]
         if (lngs[i] !== undefined) single['longitude'] = [lngs[i]]
         if (lats[i] !== undefined) single['latitude'] = [lats[i]]
-        return {
-          id: generateId(),
-          name: formatLeafNode(name, single),
-          rawName: name,
-          rawData: single,
-          children: []
-        }
+        return makeLeafNode(single)
       })
     }
 
@@ -297,7 +309,7 @@ const normalizeTreeData = (rawData) => {
     const children = [];
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        pushChild(children, processNode(data[key], key, level + 1))
+        pushChild(children, processNode(data[key], key, level + 1, [...path, name]))
       }
     }
 
@@ -310,6 +322,7 @@ const normalizeTreeData = (rawData) => {
       id: generateId(),
       name: name,
       rawName: name,
+      _path: [...path, name],
       children: children
     };
   };
@@ -318,7 +331,7 @@ const normalizeTreeData = (rawData) => {
   const cityChildren = [];
   for (const districtName in rawData) {
     if (Object.prototype.hasOwnProperty.call(rawData, districtName)) {
-      pushChild(cityChildren, processNode(rawData[districtName], districtName, 1))
+      pushChild(cityChildren, processNode(rawData[districtName], districtName, 1, pathPrefix))
     }
   }
 
@@ -328,15 +341,41 @@ const normalizeTreeData = (rawData) => {
 /**
  * Format leaf node with data fields
  */
-const formatLeafNode = (name, data) => {
-  const dialect = data['方言分布']?.[0] || '';
-  const lng = data['longitude']?.[0] || '';
-  const lat = data['latitude']?.[0] || '';
+const getDialect = (d) => d?.dialect?.[0] || d?.['方言分布']?.[0] || ''
 
-  if (lng && lat) {
-    return `${name}  ${dialect} (${lng},${lat})`;
+const gdTagPalette = [
+  'var(--bg-blue-light)', 'var(--bg-error-light)', '#e8f5e9', '#fff3e0', '#f3e5f5',
+  'var(--bg-blue-tint)', 'var(--bg-error-light)', '#e8eaf6', '#f1f8e9', '#fff8e1',
+  'var(--bg-light-gray)', '#e1f5fe', '#f9fbe7', '#efebe9', '#e0f2f1'
+]
+const gdTagColorMap = {}
+const getGdTagColor = (dialect) => {
+  if (gdTagColorMap[dialect]) return gdTagColorMap[dialect]
+  let hash = 0
+  for (let i = 0; i < dialect.length; i++) hash = ((hash << 5) - hash + dialect.charCodeAt(i)) | 0
+  gdTagColorMap[dialect] = gdTagPalette[Math.abs(hash) % gdTagPalette.length]
+  return gdTagColorMap[dialect]
+}
+
+const getGdTagInfo = (data) => {
+  const dialect = getDialect(data)
+  const lng = data['longitude']?.[0]
+  const lat = data['latitude']?.[0]
+  const coordStr = (lng && lat) ? `(${Number(lng).toFixed(3)}, ${Number(lat).toFixed(3)})` : ''
+  if (lng && lat && dialect) {
+    return { text: `${dialect} ${coordStr}`, color: getGdTagColor(dialect) }
   }
-  return `${name}  ${dialect}`;
+  if (dialect) {
+    return { text: dialect, color: getGdTagColor(dialect) }
+  }
+  if (coordStr) {
+    return { text: coordStr, color: 'var(--bg-light-gray)' }
+  }
+  return null
+}
+
+const formatLeafNode = (name, data) => {
+  return name
 };
 
 /**
@@ -406,10 +445,10 @@ const lazyLoadChildren = async (node) => {
   node._loadingChildren = true
   try {
     const result = await loadFullTree({
-      db_key: API_CONFIG.db_key,
-      table_name: API_CONFIG.table_name,
+      db_key: API_CONFIG.value.db_key,
+      table_name: API_CONFIG.value.table_name,
       level_columns: node._lazyLevelColumns,
-      data_columns: API_CONFIG.data_columns,
+      data_columns: API_CONFIG.value.data_columns,
       filters: node._lazyFilters
     })
 
@@ -418,7 +457,15 @@ const lazyLoadChildren = async (node) => {
       const bootstrap = result.lazy_bootstrap
       const nodeKey = node.rawName || node.name
       const children = bootstrap?.[nodeKey] || Object.values(bootstrap || {})[0] || []
-      const nextCol = node._lazyLevelColumns[0]
+      // level_columns[1] is the column consumed by this lazy_fallback response;
+      // level_columns.slice(1) is the shifted list for the next call (matches API doc pattern)
+      const nextCol = node._lazyLevelColumns[1]
+      if (nextCol == null) {
+        node.children = []
+        node._childrenLoaded = true
+        node._loadingChildren = false
+        return
+      }
       const nextShifted = node._lazyLevelColumns.slice(1)
       node.children = children.map(childName => ({
         id: generateId(),
@@ -427,12 +474,13 @@ const lazyLoadChildren = async (node) => {
         children: [],
         _lazy: true,
         _lazyFilters: { ...node._lazyFilters, [String(nextCol)]: [childName] },
-        _lazyLevelColumns: nextShifted
+        _lazyLevelColumns: nextShifted,
+        _path: [...(node._path || []), childName]
       }))
     } else {
       // mode === 'full' — tree rooted at filter level, extract by node key
       const nodeKey = node.rawName || node.name
-      node.children = normalizeTreeData(result.tree?.[nodeKey] || {})
+      node.children = normalizeTreeData(result.tree?.[nodeKey] || {}, node._path || [])
     }
     node._childrenLoaded = true
   } catch (error) {
@@ -470,7 +518,7 @@ const collectAllLeafNodes = (nodes) => {
   const leaves = [];
   const traverse = (n) => {
     if (n.rawData) {
-      const dialects = n.rawData['方言分布'] || [];
+      const dialects = n.rawData['dialect'] || n.rawData['方言分布'] || [];
       const lngs = n.rawData['longitude'] || [];
       const lats = n.rawData['latitude'] || [];
       const count = Math.max(dialects.length, lngs.length, lats.length, 1);
@@ -480,6 +528,7 @@ const collectAllLeafNodes = (nodes) => {
           dialect: dialects[i] || '',
           longitude: parseFloat(lngs[i]) || 0,
           latitude: parseFloat(lats[i]) || 0,
+          _path: n._path || []
         });
       }
     }
@@ -514,36 +563,74 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary-blue: var(--color-primary);
+$primary-blue-dark: var(--color-primary-hover);
+$button-blue: var(--color-primary-hover);
+$success-green: var(--color-success);
+$error-red: var(--color-error);
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-secondary);
+$text-muted: var(--text-secondary);
+$white: var(--text-white);
+
+$transition-fast: 0.2s;
+$transition-base: 0.3s;
 /* Glass Container */
 .glass-container {
+  @include flex-col;
   width: 90dvw;
   max-width: 1400px;
   height: 90dvh;
-  margin:10px auto;
-  display: flex;
-  flex-direction: column;
+  margin: 10px auto;
   overflow: hidden;
-  color: #1d1d1f;
+  color: $text-primary;
+
+  @media (max-aspect-ratio: 1/1) {
+    width: 92dvw;
+    height: 88dvh;
+    border-radius: var(--radius-xl);
+  }
 }
 
 /* Header Section */
 .header-section {
   padding: 24px 28px;
+  background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.3);
+
+  @media (max-aspect-ratio: 1/1) {
+    padding: 16px;
+  }
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+
+  @media (max-aspect-ratio: 1/1) {
+    gap: 5px !important;
+    font-size: 14px;
+    white-space: nowrap;
+  }
 }
 
 .title {
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
+  color: $text-primary;
   font-size: 26px;
   font-weight: 700;
-  color: #1d1d1f;
 }
 
 .subtitle {
   margin: 3px;
-  color: #6e6e73;
+  color: $text-secondary;
   font-size: 14px;
 }
 
@@ -563,43 +650,46 @@ onMounted(() => {
 .glass-input {
   width: 100%;
   padding: 12px 18px 12px 42px;
+  font-size: 15px;
+  background: rgba(0, 0, 0, 0.05);
   border: none;
   border-radius: 15px;
-  background: rgba(0, 0, 0, 0.05);
   outline: none;
-  font-size: 15px;
-  transition: all 0.3s;
-}
+  transition: all $transition-base;
 
-.glass-input:focus {
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+  &:focus {
+    background: var(--glass-80);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3);
+  }
 }
 
 /* Content Area */
 .content-area {
   flex: 1;
-  overflow-y: auto;
   padding: 24px;
+  overflow-y: auto;
+
+  @media (max-aspect-ratio: 1/1) {
+    padding: 16px;
+  }
 }
 
 /* Initial Loading/Error States */
 .initial-state {
-  display: flex;
+  @include flex-center;
+
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
   gap: 16px;
-}
+  height: 100%;
 
-.initial-state p {
-  font-size: 16px;
-  color: #6e6e73;
-}
+  p {
+    color: $text-secondary;
+    font-size: 16px;
+  }
 
-.error-state {
-  color: #d32f2f;
+  &.error-state {
+    color: $error-red;
+  }
 }
 
 .error-icon {
@@ -607,13 +697,9 @@ onMounted(() => {
 }
 
 .error-message {
-  color: #d32f2f !important;
   margin: 0;
+  color: $error-red !important;
 }
-
-/* Loading Spinner */
-
-
 
 /* Cities Grid */
 .cities-grid {
@@ -624,232 +710,211 @@ onMounted(() => {
 
 /* City Card */
 .city-card {
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 20px;
   padding: 20px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   overflow-x: auto;
-}
+  background: var(--glass-50);
+  border: 1px solid var(--glass-60);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(15px);
+  transition: all $transition-base ease;
 
-.city-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+  }
 
-.city-card.is-loaded {
-  border-color: rgba(0, 122, 255, 0.4);
-  background: rgba(255, 255, 255, 0.7);
+  &.is-loaded {
+    background: var(--glass-70);
+    border-color: rgba(var(--color-primary-rgb), 0.4);
+  }
 }
 
 /* City Header */
 .city-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
 .city-name {
   margin: 0;
+  color: $text-primary;
   font-size: 20px;
   font-weight: 600;
-  color: #1d1d1f;
+}
+
+.city-header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 /* Load Button */
 .load-btn {
   padding: 8px 16px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-  color: white;
+  color: $white;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-}
+  background: linear-gradient(
+    135deg,
+    $primary-blue 0%,
+    $primary-blue-dark 100%
+  );
+  border: none;
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
+  transition: all $transition-fast;
 
-.load-btn:hover:not(:disabled) {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
-}
+  &:hover:not(:disabled) {
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.4);
+    transform: scale(1.05);
+  }
 
-.load-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 }
 
 /* Loaded Badge */
 .loaded-badge {
+  display: flex;
+  gap: 4px;
+  align-items: center;
   padding: 6px 12px;
-  border-radius: 10px;
-  background: rgba(52, 199, 89, 0.15);
-  color: #34c759;
+  color: $success-green;
   font-size: 13px;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.city-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  background: rgba(var(--color-success-rgb), 0.15);
+  border-radius: var(--radius-md);
 }
 
 .city-map-btn {
+  @include flex-center;
+
   width: 34px;
   height: 34px;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
   font-size: 18px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  transition: all $transition-fast ease;
 
-.city-map-btn:hover:not(:disabled) {
-  background: rgba(52, 199, 89, 0.15);
-  transform: scale(1.15);
-}
+  &:hover:not(:disabled) {
+    background: rgba(var(--color-success-rgb), 0.15);
+    transform: scale(1.15);
+  }
 
-.city-map-btn.is-disabled,
-.city-map-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
+  &.is-disabled,
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+  }
 }
 
 /* City Loading State */
 .city-loading {
   display: flex;
-  align-items: center;
   gap: 12px;
+  align-items: center;
   padding: 16px;
-  background: rgba(0, 122, 255, 0.05);
-  border-radius: 12px;
-  color: #007AFF;
+  color: $primary-blue;
   font-size: 14px;
+  background: rgba(var(--color-primary-rgb), 0.05);
+  border-radius: var(--radius-md);
 }
 
 /* City Error State */
 .city-error {
   padding: 16px;
-  background: rgba(211, 47, 47, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(211, 47, 47, 0.2);
+  background: rgba(var(--color-error-rgb), 0.05);
+  border: 1px solid rgba(var(--color-error-rgb), 0.2);
+  border-radius: var(--radius-md);
 }
 
 .error-text {
-  margin: 0 0 12px 0;
-  color: #d32f2f;
+  margin: 0 0 12px;
+  color: $error-red;
   font-size: 14px;
 }
 
 /* Retry Buttons */
-.retry-btn {
-  padding: 10px 24px;
-  border: none;
-  border-radius: 12px;
-  background: rgba(142, 142, 147, 0.2);
-  color: #1d1d1f;
-  font-size: 15px;
+.retry-btn,
+.retry-btn-small {
+  color: $text-primary;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  background: rgba(142, 142, 147, 0.2);
+  border: none;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(142, 142, 147, 0.3);
+  }
 }
 
-.retry-btn:hover {
-  background: rgba(142, 142, 147, 0.3);
+.retry-btn {
+  padding: 10px 24px;
+  font-size: 15px;
+  border-radius: var(--radius-md);
 }
 
 .retry-btn-small {
   padding: 6px 14px;
-  border: none;
-  border-radius: 8px;
-  background: rgba(142, 142, 147, 0.2);
-  color: #1d1d1f;
   font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.retry-btn-small:hover {
-  background: rgba(142, 142, 147, 0.3);
+  border-radius: var(--radius-sm2);
 }
 
 /* Tree Container */
 .tree-container {
-  margin-top: 12px;
   padding-top: 12px;
+  margin-top: 12px;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 /* Empty State */
 .empty-state {
-  text-align: center;
   padding: 24px 0;
-  color: #8e8e93;
+  color: $text-muted;
   font-size: 14px;
+  text-align: center;
 }
 
-/* Responsive Design */
-@media (max-aspect-ratio: 1/1) {
-  .glass-container {
-    width: 92dvw;
-    height: 88dvh;
-    border-radius: 20px;
-  }
-
-  .cities-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .header-section {
-    padding: 16px;
-  }
-
-  .title-row {
-    font-size: 14px;
-    white-space: nowrap;
-    gap:5px!important;
-  }
-
-  .content-area {
-    padding: 16px;
-  }
-}
-.title-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 0;
-}
+/*
+ * 当前模板中的按钮已注释。
+ * 保留样式，便于后续恢复。
+ */
 .village-link-btn {
   padding: 8px 16px;
-  border-radius: 25px;
-  border: 3px solid rgba(255, 255, 255, 0.4);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-  color: #005fd3;
-  font-weight: 1000;
+  color: $button-blue;
   font-size: 1rem;
+  font-weight: 1000;
+  white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
+  background: linear-gradient(
+    145deg,
+    var(--glass-20),
+    var(--glass-10)
+  );
+  border: 3px solid var(--glass-40);
+  border-radius: 25px;
+  box-shadow:
+    0 6px 10px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all $transition-base ease;
 
-.village-link-btn:hover {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-  transform: scale(1.05);
+  &:hover {
+    background: linear-gradient(
+      145deg,
+      var(--glass-50),
+      var(--glass-30)
+    );
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+  }
 }
 </style>

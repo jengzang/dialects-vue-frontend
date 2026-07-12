@@ -66,24 +66,24 @@ const diceTitle = computed(() => {
 $trigger-radius: 999px;
 $trigger-z-index: 1200;
 
-$glass-border: rgba(255, 255, 255, 0.72);
-$glass-border-hover: rgba(255, 255, 255, 0.9);
+$glass-border: var(--glass-70);
+$glass-border-hover: var(--glass-90);
 
 $shadow-base:
-  0 12px 30px rgba(34, 109, 192, 0.2),
-  0 3px 10px rgba(64, 125, 190, 0.12),
-  inset 0 1px 0 rgba(255, 255, 255, 0.86),
-  inset 0 -1px 0 rgba(91, 139, 186, 0.08);
+  0 12px 30px rgba(var(--color-primary-rgb), 0.2),
+  0 3px 10px rgba(var(--color-primary-rgb), 0.12),
+  inset 0 1px 0 var(--glass-90),
+  inset 0 -1px 0 rgba(var(--color-primary-rgb), 0.08);
 
 $shadow-hover:
-  0 16px 36px rgba(34, 109, 192, 0.25),
-  0 6px 16px rgba(64, 125, 190, 0.16),
-  inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  0 16px 36px rgba(var(--color-primary-rgb), 0.25),
+  0 6px 16px rgba(var(--color-primary-rgb), 0.16),
+  inset 0 1px 0 var(--glass-90);
 
 @mixin glass-bg {
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(226, 241, 255, 0.46)),
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.92), transparent 40%);
+    linear-gradient(135deg, var(--glass-80), rgba(226, 241, 255, 0.46)),
+    radial-gradient(circle at 18% 0%, var(--glass-90), transparent 40%);
   backdrop-filter: blur(20px) saturate(165%);
   -webkit-backdrop-filter: blur(20px) saturate(165%);
 }
@@ -97,7 +97,7 @@ $shadow-hover:
 }
 
 @mixin focus-ring {
-  outline: 3px solid rgba(79, 154, 255, 0.34);
+  outline: 3px solid rgba(var(--color-primary-rgb), 0.34);
   outline-offset: 3px;
   border-radius: $trigger-radius;
 }
@@ -132,7 +132,7 @@ $shadow-hover:
   border-radius: $trigger-radius;
   box-shadow: $shadow-base;
 
-  color: var(--color-blue-dark);
+  color: var(--color-primary-hover);
   overflow: hidden;
 
   @include glass-bg;
@@ -148,7 +148,7 @@ $shadow-hover:
     inset: 1px;
     border-radius: inherit;
     pointer-events: none;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.52), transparent 44%);
+    background: linear-gradient(135deg, var(--glass-50), transparent 44%);
   }
 
   &:hover {
@@ -174,7 +174,7 @@ $shadow-hover:
     height: 36px;
     flex: 0 0 auto;
 
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     box-shadow: none;
 
     transition:
@@ -183,7 +183,7 @@ $shadow-hover:
 
     &:hover {
       transform: rotate(-10deg) scale(1.12);
-      filter: drop-shadow(0 5px 10px rgba(42, 120, 216, 0.22));
+      filter: drop-shadow(0 5px 10px rgba(var(--color-primary-rgb), 0.22));
     }
 
     &:active {
@@ -200,8 +200,8 @@ $shadow-hover:
     line-height: 1;
 
     filter:
-      drop-shadow(0 2px 3px rgba(0, 56, 120, 0.18))
-      drop-shadow(0 8px 12px rgba(42, 120, 216, 0.16));
+      drop-shadow(0 2px 3px rgba(var(--color-primary-hover-rgb), 0.18))
+      drop-shadow(0 8px 12px rgba(var(--color-primary-rgb), 0.16));
   }
 
   &__main {
@@ -216,8 +216,7 @@ $shadow-hover:
   }
 
   &__copy {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: flex-start;
     gap: 1px;
     min-width: 0;
@@ -234,12 +233,10 @@ $shadow-hover:
 
     font-size: 0.86rem;
     font-weight: 800;
-    color: var(--color-blue-dark);
+    color: var(--color-primary-hover);
     letter-spacing: 0.01em;
 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    @include text-truncate;
   }
 
   /* 竖屏 / 接近竖屏：宽高比 <= 1，统一隐藏骰子，只保留打开教程入口 */

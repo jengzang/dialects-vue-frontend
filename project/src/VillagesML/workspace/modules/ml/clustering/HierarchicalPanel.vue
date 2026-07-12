@@ -4,56 +4,56 @@
       ML計算 - 層次聚類
       <HelpIcon content="市-縣-鎮三級層次聚類分析。先對市級聚類，再在每個市級聚類內對縣級聚類，最後在每個縣級聚類內對鎮級聚類。特徵包括語義類別、字符嵌入、結構特徵。適合發現多尺度的地名模式" />
     </h3>
-    <div class="two-col-layout">
+    <div class="vml-two-col">
     <div class="vml-glass-panel">
       <h3 class="panel-title">層次聚類</h3>
       <p class="panel-description">市-縣-鎮三級層次聚類分析</p>
 
-      <div v-if="!isAuthenticated" class="auth-notice">
+      <div v-if="!isAuthenticated" class="vml-auth-notice">
         <span class="notice-icon">🔒</span>
         <span>此功能需要登錄後使用</span>
       </div>
 
-      <div v-else class="settings-form">
+      <div v-else class="vml-settings-form">
         <AlgorithmSelector v-model="settings.algorithm" />
 
         <div class="hierarchical-k-settings">
           <h4 class="section-title">層次聚類數量</h4>
 
-          <div class="setting-row">
-            <label class="setting-label">市級 k</label>
+          <div class="vml-setting-row">
+            <label class="vml-setting-label">市級 k</label>
             <input
               type="number"
               v-model.number="settings.k_city"
               min="2"
               max="10"
-              class="setting-input"
+              class="vml-input"
             />
           </div>
 
-          <div class="setting-row">
-            <label class="setting-label">縣級 k</label>
+          <div class="vml-setting-row">
+            <label class="vml-setting-label">縣級 k</label>
             <input
               type="number"
               v-model.number="settings.k_county"
               min="2"
               max="15"
-              class="setting-input"
+              class="vml-input"
             />
           </div>
 
-          <div class="setting-row">
-            <label class="setting-label">鎮級 k</label>
+          <div class="vml-setting-row">
+            <label class="vml-setting-label">鎮級 k</label>
             <input
               type="number"
               v-model.number="settings.k_township"
               min="2"
               max="20"
-              class="setting-input"
+              class="vml-input"
             />
           </div>
 
-          <p class="setting-hint">建議：市級 2-5，縣級 3-10，鎮級 5-15</p>
+          <p class="vml-setting-hint">建議：市級 2-5，縣級 3-10，鎮級 5-15</p>
         </div>
 
         <FeatureToggles v-model="settings.features" />
@@ -131,18 +131,12 @@ async function runClustering() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .hierarchical-panel {
   padding: 12px;
 }
 
-.two-col-layout {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 16px;
-}
-
-.two-col-layout > .vml-glass-panel {
+.vml-two-col > .vml-glass-panel {
   padding: 20px;
   overflow-y: auto;
 }
@@ -161,31 +155,11 @@ async function runClustering() {
   line-height: 1.5;
 }
 
-.auth-notice {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: rgba(255, 193, 7, 0.15);
-  border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 10px;
-  margin-bottom: 16px;
-  font-size: 13px;
-  color: #856404;
-  font-weight: 500;
-}
-
-.settings-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
 .hierarchical-k-settings {
   padding: 16px;
-  background: rgba(74, 144, 226, 0.08);
-  border: 1px solid rgba(74, 144, 226, 0.2);
-  border-radius: 12px;
+  background: rgba(var(--vml-blue-rgb), 0.08);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
+  border-radius: var(--radius-md);
 }
 
 .section-title {
@@ -195,51 +169,7 @@ async function runClustering() {
   margin-bottom: 12px;
 }
 
-.setting-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.setting-label {
-  min-width: 80px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.setting-input {
-  padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  font-size: 14px;
-  width: 100px;
-}
-
-.setting-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.setting-hint {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-style: italic;
-  margin-top: 4px;
-}
-
-
 .results-section {
   overflow-y: auto;
-}
-
-@media (max-width: 600px) {
-  .two-col-layout {
-    grid-template-columns: 1fr;
-  }
 }
 </style>

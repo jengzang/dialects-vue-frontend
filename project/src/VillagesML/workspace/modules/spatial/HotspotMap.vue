@@ -213,7 +213,7 @@ const renderHotspot = () => {
       },
       'circle-color': 'rgba(255, 100, 100, 0.2)',
       'circle-stroke-width': 2,
-      'circle-stroke-color': '#ff6464'
+      'circle-stroke-color': '#ff3b30'
     }
   })
 
@@ -317,12 +317,12 @@ const resetView = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .hotspot-map-container {
   width: 100%;
   height: 500px;
   position: relative;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -349,13 +349,12 @@ const resetView = () => {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-80);
   backdrop-filter: blur(12px);
   padding: 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   z-index: 10;
   width: 160px;
@@ -375,9 +374,9 @@ const resetView = () => {
   width: 100%;
   appearance: none;
   background: white;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-light-gray);
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   cursor: pointer;
   outline: none;
@@ -385,7 +384,7 @@ const resetView = () => {
 }
 
 .custom-select select:focus {
-  border-color: #4a90e2;
+  border-color: var(--vml-blue);
 }
 
 .custom-select .arrow {
@@ -395,7 +394,7 @@ const resetView = () => {
   transform: translateY(-50%);
   pointer-events: none;
   font-size: 12px;
-  color: #888;
+  color: var(--text-muted);
 }
 
 .button-row {
@@ -406,11 +405,11 @@ const resetView = () => {
 
 .action-btn {
   flex: 1;
-  background: #4a90e2;
+  background: var(--vml-blue);
   color: white;
   border: none;
   padding: 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   font-size: 13px;
   transition: background 0.2s;
@@ -420,15 +419,15 @@ const resetView = () => {
 }
 
 .action-btn:hover {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .fullscreen-btn {
-  background: #50c878;
+  background: var(--color-success);
 }
 
 .fullscreen-btn:hover {
-  background: #40b368;
+  background: var(--color-success);
 }
 
 /* 全屏退出按鈕 */
@@ -439,10 +438,10 @@ const resetView = () => {
   padding: 12px 24px;
   font-size: 15px;
   font-weight: 600;
-  color: #333;
-  background: rgba(255, 255, 255, 0.85);
+  color: var(--text-dark);
+  background: var(--glass-80);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-50);
   border-radius: 50px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   cursor: pointer;
@@ -451,7 +450,7 @@ const resetView = () => {
 }
 
 .exit-fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--glass-90);
   transform: scale(1.05);
 }
 
@@ -459,15 +458,14 @@ const resetView = () => {
 .loading-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.8);
-  display: flex;
-  flex-direction: column;
+  background: var(--glass-80);
+  @include flex-col;
   align-items: center;
   justify-content: center;
   gap: 12px;
   z-index: 20;
   font-weight: 500;
-  color: #555;
+  color: var(--text-medium);
 }
 /* 村莊詳情彈窗 */
 .village-popup-overlay {
@@ -477,15 +475,13 @@ const resetView = () => {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   z-index: 10000;
 }
 
 .village-popup-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   width: 90%;
   max-width: 500px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -496,13 +492,13 @@ const resetView = () => {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-divider);
 }
 
 .popup-header h3 {
   margin: 0;
   font-size: 18px;
-  color: #333;
+  color: var(--text-dark);
 }
 
 .popup-body {
@@ -512,7 +508,7 @@ const resetView = () => {
 .info-row {
   display: flex;
   padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--bg-light);
 }
 
 .info-row:last-child {
@@ -521,12 +517,12 @@ const resetView = () => {
 
 .info-row .label {
   font-weight: 600;
-  color: #555;
+  color: var(--text-medium);
   min-width: 80px;
 }
 
 .info-row .value {
-  color: #333;
+  color: var(--text-dark);
   flex: 1;
 }
 </style>

@@ -60,12 +60,12 @@ function toggleKey(key) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .button-group {
   flex-wrap: wrap;
   display: flex;
   justify-content: center;
-  border-bottom: 1px solid var(--color-blue-dark);
+  border-bottom: 1px solid var(--color-primary-hover);
 }
 
 .key-item {
@@ -75,8 +75,9 @@ function toggleKey(key) {
 .key-button {
   padding: 8px 16px;
   border: 1px solid var(--color-primary-medium);
-  border-radius: 12px;
-  background: var(--glass-light);
+  border-radius: var(--radius-md);
+  background: var(--glass-30);
+  color: var(--text-primary);
   cursor: pointer;
   transition: background 0.3s ease;
   font-size: 14px;
@@ -92,7 +93,7 @@ function toggleKey(key) {
 
 .key-button.active {
   background: var(--color-primary-medium2);
-  color: white;
+  color: var(--action-primary-text);
   font-weight: 600;
 }
 </style>

@@ -129,10 +129,10 @@ const insetNumber = computed(() => Math.max((heightNumber.value - thumbNumber.va
 const translateXNumber = computed(() => Math.max(widthNumber.value - thumbNumber.value - insetNumber.value * 2, 0))
 
 const colorPresets = {
-  blue: '#007aff',
-  green: '#34c759',
-  purple: '#5856d6',
-  gray: '#8e8e93',
+  blue: 'var(--color-primary)',
+  green: 'var(--color-success)',
+  purple: 'var(--color-purple)',
+  gray: 'var(--text-secondary)',
 }
 
 const activeColor = computed(() => colorPresets[props.color] || props.color || colorPresets.blue)
@@ -175,6 +175,13 @@ const toggle = () => {
 </script>
 
 <style scoped lang="scss">
+$active-blue: var(--color-primary);
+$thumb-background: var(--bg-white);
+$inside-label-color: var(--text-primary);
+
+$transition-duration: 0.3s;
+$transition-ease: ease;
+
 .switch-toggle {
   display: inline-flex;
   align-items: center;
@@ -186,24 +193,27 @@ const toggle = () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
   padding: 0;
   cursor: pointer;
-  background: var(--switch-toggle-inactive-color, rgba(142, 142, 147, 0.3));
+  background: var(
+    --switch-toggle-inactive-color,
+    rgba(142, 142, 147, 0.3)
+  );
+  border: none;
   transition:
-    background 0.3s ease,
-    box-shadow 0.3s ease,
-    transform 0.3s ease,
-    opacity 0.3s ease;
-}
+    background $transition-duration $transition-ease,
+    box-shadow $transition-duration $transition-ease,
+    transform $transition-duration $transition-ease,
+    opacity $transition-duration $transition-ease;
 
-.switch-toggle__button.is-on {
-  background: var(--switch-toggle-active-color, #007aff);
-}
+  &.is-on {
+    background: var(--switch-toggle-active-color, $active-blue);
+  }
 
-.switch-toggle__button.is-disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
+  &.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 }
 
 .switch-toggle__track {
@@ -214,70 +224,84 @@ const toggle = () => {
 
 .switch-toggle__thumb {
   position: absolute;
-  border-radius: 50%;
-  background: #fff;
+  background: $thumb-background;
+  border-radius: var(--radius-full);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
+  transition: transform $transition-duration $transition-ease;
 }
 
 .switch-toggle__label {
   line-height: 1;
   user-select: none;
+
+  &--inside {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+    pointer-events: none;
+  }
 }
 
-.switch-toggle__label--inside {
-  position: relative;
-  z-index: 1;
-  white-space: nowrap;
-  pointer-events: none;
+.variant-solid,
+.variant-glow {
+  .switch-toggle__label--inside {
+    color: $inside-label-color;
+  }
 }
 
-.variant-solid .switch-toggle__label--inside,
-.variant-glow .switch-toggle__label--inside {
-  color: #111;
+.variant-minimal {
+  .switch-toggle__button {
+    background: transparent;
+    border: 1px solid rgba(142, 142, 147, 0.35);
+
+    &.is-on {
+      background: color-mix(
+        in srgb,
+        var(--switch-toggle-active-color, $active-blue) 18%,
+        transparent
+      );
+      border-color: var(--switch-toggle-active-color, $active-blue);
+    }
+  }
 }
 
-.variant-minimal .switch-toggle__button {
-  background: transparent;
-  border: 1px solid rgba(142, 142, 147, 0.35);
-}
+.variant-glow {
+  .switch-toggle__button {
+    &:hover:not(.is-disabled) {
+      background-color: dimgray;
+      box-shadow: 0 0 10px 4px rgba(var(--color-primary-rgb), 0.7);
 
-.variant-minimal .switch-toggle__button.is-on {
-  border-color: var(--switch-toggle-active-color, #007aff);
-  background: color-mix(in srgb, var(--switch-toggle-active-color, #007aff) 18%, transparent);
-}
+      .switch-toggle__thumb {
+        box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.5);
+      }
+    }
 
-.variant-glow .switch-toggle__button:hover:not(.is-disabled) {
-  background-color: dimgray;
-  box-shadow: 0 0 10px 4px rgba(0, 123, 255, 0.7);
-}
+    &.is-on {
+      background-color: var(--switch-toggle-active-color, $active-blue);
+      animation: switch-toggle-glow-pulse 2s infinite ease-in-out;
 
-.variant-glow .switch-toggle__button:hover:not(.is-disabled) .switch-toggle__thumb {
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
-}
+      &:hover:not(.is-disabled) {
+        background: linear-gradient(135deg, var(--color-primary-cyan), #66ccff);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 
-.variant-glow .switch-toggle__button.is-on {
-  background-color: var(--switch-toggle-active-color, #007aff);
-  animation: switch-toggle-glow-pulse 2s infinite ease-in-out;
-}
-
-.variant-glow .switch-toggle__button.is-on:hover:not(.is-disabled) {
-  background: linear-gradient(135deg, #00bfff, #66ccff);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-}
-
-.variant-glow .switch-toggle__button.is-on:hover:not(.is-disabled) .switch-toggle__thumb {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        .switch-toggle__thumb {
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+      }
+    }
+  }
 }
 
 @keyframes switch-toggle-glow-pulse {
-  0% {
+  0%,
+  100% {
     box-shadow:
-      0 0 5px rgba(0, 122, 255, 0.4),
-      0 0 10px rgba(0, 122, 255, 0.6),
-      0 0 20px rgba(0, 122, 255, 0.8),
-      0 0 30px rgba(0, 122, 255, 0.9);
+      0 0 5px rgba(var(--color-primary-rgb), 0.4),
+      0 0 10px rgba(var(--color-primary-rgb), 0.6),
+      0 0 20px rgba(var(--color-primary-rgb), 0.8),
+      0 0 30px rgba(var(--color-primary-rgb), 0.9);
   }
+
   50% {
     box-shadow:
       0 0 10px rgba(102, 204, 255, 0.6),
@@ -285,12 +309,6 @@ const toggle = () => {
       0 0 30px rgba(102, 204, 255, 1),
       0 0 40px rgba(102, 204, 255, 1);
   }
-  100% {
-    box-shadow:
-      0 0 5px rgba(0, 122, 255, 0.4),
-      0 0 10px rgba(0, 122, 255, 0.6),
-      0 0 20px rgba(0, 122, 255, 0.8),
-      0 0 30px rgba(0, 122, 255, 0.9);
-  }
 }
 </style>
+

@@ -724,24 +724,37 @@ const PartitionTreeNode = defineComponent({
 })
 </script>
 
-<style scoped>
-.partition-modal-header {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border-gray-lightest);
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary: var(--color-primary);
+$primary-dark: var(--color-primary-hover);
+$danger: var(--color-error-dark);
+$error: var(--color-error);
+$warning: var(--color-warning-dark);
+
+$mobile-breakpoint: 768px;
+$desktop-large: 1201px;
+
+$ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
+@mixin primary-gradient {
+  background: linear-gradient(
+    135deg,
+    $primary 0%,
+    $primary-dark 100%
+  );
 }
 
+/* 弹窗标题 */
 .partition-modal-title {
+  color: var(--text-dark-light);
   font-size: 15px;
   font-weight: 650;
-  color: var(--text-dark-light);
 }
 
-/* Selection mode toggle */
+/* 选择模式开关 */
 .selection-mode-toggle {
   display: flex;
   align-items: center;
@@ -749,50 +762,48 @@ const PartitionTreeNode = defineComponent({
 }
 
 .toggle-label {
+  color: var(--text-dark-medium);
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-dark-medium);
 }
 
-.partition-toggle-switch-unused {
-  position: relative;
-  width: 50px;
-  height: 30px;
-  border-radius: 15px;
-  border: none;
-  background: rgba(142, 142, 147, 0.3);
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.partition-toggle-switch-unused.active {
-  background: #007aff;
-}
-
-.partition-toggle-slider-unused {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
-}
-
-.partition-toggle-switch-unused.active .partition-toggle-slider-unused {
-  transform: translateX(20px);
-}
-
-/* Tabs row */
+/* Tab 与确认区域 */
 .partition-tabs-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 8px 10px;
+  background: var(--glass-40);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.4);
+}
+
+.partition-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.partition-tab-btn {
+  padding: 8px 12px;
+  background: rgba(142, 142, 147, 0.15);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(142, 142, 147, 0.25);
+  }
+
+  &.active {
+    @include primary-gradient;
+
+    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
+    color: var(--text-white);
+  }
 }
 
 .selection-actions {
@@ -802,281 +813,256 @@ const PartitionTreeNode = defineComponent({
   gap: 10px;
 }
 
-.partition-tabs {
-  display: flex;
-  gap: 10px;
-}
-
-.partition-tab-btn {
+.selection-warning-inline {
+  color: $warning;
   white-space: nowrap;
-  padding: 8px 12px;
-  border-radius: 12px;
-  border: none;
-  background: rgba(142, 142, 147, 0.15);
-  color: #1d1d1f;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.partition-tab-btn:hover {
-  background: rgba(142, 142, 147, 0.25);
-}
-
-.partition-tab-btn.active {
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-  color: white;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-}
-
-/* Confirm button */
 .confirm-btn {
   padding: 8px 20px;
-  border-radius: 12px;
+
+  @include primary-gradient;
+
   border: none;
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-  color: white;
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
+  color: var(--text-white);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.4);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    @include disabled-state;
+  }
 }
 
-.confirm-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
-}
-
-.confirm-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.selection-warning-inline {
-  color: #d35400;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-/* Modal body */
+/* 弹窗主体 */
 .partition-modal-body {
   padding: 24px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
 }
 
-/* Loading and error states */
+/* 加载与错误状态 */
 .loading-state,
 .error-state {
-  padding: 80px 20px;
   gap: 16px;
-  color: #6e6e73;
+  padding: 80px 20px;
+  color: var(--text-secondary);
 }
 
 .error-state {
-  color: #d32f2f;
+  color: $error;
   font-weight: 500;
 }
 
-/* Tree styles */
+/* 分区树 */
 .partition-tree-container {
   font-size: 14px;
   line-height: 1.6;
+
+  :deep(.tree-node) {
+    margin-bottom: 8px;
+  }
+
+  :deep(.node-content) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: var(--glass-40);
+    }
+  }
+
+  :deep(.node-label) {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-dark);
+    font-size: 15px;
+    font-weight: 500;
+
+    .icon {
+      font-size: 16px;
+    }
+
+    .text {
+      flex: 1;
+    }
+
+    .count {
+      margin-left: 4px;
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    .selected-count {
+      margin-left: 0.5rem;
+      padding: 0.2rem 0.5rem;
+      background: rgba(var(--color-primary-rgb), 0.15);
+      border-radius: var(--radius-md);
+      color: $primary;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+  }
+
+  :deep(.node-actions) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  :deep(.node-select-btn) {
+    padding: 4px 10px;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    &.select {
+      background: rgba(var(--color-primary-rgb), 0.12);
+      color: $primary-dark;
+
+      &:hover:not(:disabled) {
+        background: rgba(var(--color-primary-rgb), 0.2);
+      }
+    }
+
+    &.cancel {
+      background: rgba(var(--color-error-light-rgb), 0.14);
+      color: $danger;
+
+      &:hover:not(:disabled) {
+        background: rgba(var(--color-error-light-rgb), 0.24);
+      }
+    }
+  }
+
+  :deep(.expand-btn) {
+    width: 24px;
+    height: 24px;
+
+    @include flex-center;
+
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-full);
+    color: $primary;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(var(--color-primary-rgb), 0.1);
+    }
+
+    &.is-open {
+      transform: rotate(45deg);
+    }
+  }
+
+  :deep(.children-container) {
+    margin-top: 8px;
+    margin-left: 14px;
+    padding-left: 20px;
+    border-left: 2px solid rgba(var(--color-primary-rgb), 0.1);
+    transition: height 0.3s $ease-fluid;
+  }
+
+  :deep(.leaf-list) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  :deep(.leaf-item) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    overflow: hidden;
+    background: var(--glass-50);
+    border-radius: var(--radius-md);
+    color: var(--text-dark);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: default;
+    transition: all 0.2s;
+
+    &:hover {
+      background: var(--glass-70);
+    }
+
+    &.selected {
+      background: rgba(var(--color-primary-rgb), 0.15);
+      border: 1px solid rgba(var(--color-primary-rgb), 0.3);
+    }
+
+    &.disabled {
+      @include disabled-state;
+    }
+  }
+
+  :deep(.location-checkbox) {
+    width: 18px;
+    height: 18px;
+    accent-color: $primary;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  :deep(.location-name) {
+    flex: 1;
+  }
+
+  &.selection-mode {
+    :deep(.leaf-list) {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+
+    :deep(.leaf-item) {
+      cursor: pointer;
+
+      &.disabled {
+        cursor: not-allowed;
+      }
+    }
+  }
 }
 
-.partition-tree-container :deep(.tree-node) {
-  margin-bottom: 8px;
-}
-
-.partition-tree-container :deep(.node-content) {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 10px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.partition-tree-container :deep(.node-content:hover) {
-  background: rgba(255, 255, 255, 0.4);
-}
-
-.partition-tree-container :deep(.node-label) {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #333;
-  flex: 1;
-}
-
-.partition-tree-container :deep(.node-label .icon) {
-  font-size: 16px;
-}
-
-.partition-tree-container :deep(.node-label .text) {
-  flex: 1;
-}
-
-.partition-tree-container :deep(.node-label .count) {
-  font-size: 12px;
-  color: #8e8e93;
-  margin-left: 4px;
-}
-
-.partition-tree-container :deep(.node-label .selected-count) {
-  margin-left: 0.5rem;
-  padding: 0.2rem 0.5rem;
-  background: rgba(0, 122, 255, 0.15);
-  color: #007aff;
-  border-radius: 10px;
-  font-size: 0.85em;
-  font-weight: 600;
-}
-
-.partition-tree-container :deep(.node-actions) {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.partition-tree-container :deep(.node-select-btn) {
-  border: none;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.partition-tree-container :deep(.node-select-btn:disabled) {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.partition-tree-container :deep(.node-select-btn.select) {
-  background: rgba(0, 122, 255, 0.12);
-  color: #0051d5;
-}
-
-.partition-tree-container :deep(.node-select-btn.select:hover:not(:disabled)) {
-  background: rgba(0, 122, 255, 0.2);
-}
-
-.partition-tree-container :deep(.node-select-btn.cancel) {
-  background: rgba(255, 59, 48, 0.14);
-  color: #b42318;
-}
-
-.partition-tree-container :deep(.node-select-btn.cancel:hover:not(:disabled)) {
-  background: rgba(255, 59, 48, 0.24);
-}
-
-.partition-tree-container :deep(.expand-btn) {
-  background: transparent;
-  border: none;
-  color: #007AFF;
-  font-size: 16px;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.partition-tree-container :deep(.expand-btn:hover) {
-  background: rgba(0, 122, 255, 0.1);
-}
-
-.partition-tree-container :deep(.expand-btn.is-open) {
-  transform: rotate(45deg);
-}
-
-.partition-tree-container :deep(.children-container) {
-  padding-left: 20px;
-  border-left: 2px solid rgba(0, 122, 255, 0.1);
-  margin-left: 14px;
-  margin-top: 8px;
-  transition: height 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.partition-tree-container :deep(.leaf-list) {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-/* 选择模式下的 leaf-list：增加最小宽度以容纳复选框 */
-.partition-tree-container.selection-mode :deep(.leaf-list) {
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-}
-
-.partition-tree-container :deep(.leaf-item) {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: all 0.2s;
-  cursor: default;
-}
-
-/* 选择模式下的 leaf-item：可点击 */
-.partition-tree-container.selection-mode :deep(.leaf-item) {
-  cursor: pointer;
-}
-
-.partition-tree-container :deep(.leaf-item:hover) {
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.partition-tree-container :deep(.leaf-item.selected) {
-  background: rgba(0, 122, 255, 0.15);
-  border: 1px solid rgba(0, 122, 255, 0.3);
-}
-
-.partition-tree-container :deep(.leaf-item.disabled) {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.partition-tree-container :deep(.location-checkbox) {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: #007aff;
-}
-
-.partition-tree-container :deep(.location-checkbox:disabled) {
-  cursor: not-allowed;
-}
-
-.partition-tree-container :deep(.location-name) {
-  flex: 1;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
+/* 移动端 */
+@media (max-width: $mobile-breakpoint) {
   .partition-tabs-row {
     flex-direction: column;
-    gap: 12px;
     align-items: stretch;
+    gap: 12px;
   }
 
   .selection-actions {
@@ -1088,49 +1074,61 @@ const PartitionTreeNode = defineComponent({
     padding: 16px;
   }
 
-  .partition-tree-container :deep(.children-container) {
-    margin-left: 10px;
-    padding-left: 12px;
-  }
-
-  .partition-tree-container :deep(.leaf-list) {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 6px;
-  }
-
-  /* 选择模式下：移动端增加最小宽度 */
-  .partition-tree-container.selection-mode :deep(.leaf-list) {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  }
-
-  .partition-tree-container :deep(.leaf-item) {
-    font-size: 13px;
-    padding: 6px 8px;
-  }
   .partition-tab-btn {
-    padding:8px 6px;
+    padding: 8px 6px;
+  }
+
+  .partition-tree-container {
+    :deep(.children-container) {
+      margin-left: 10px;
+      padding-left: 12px;
+    }
+
+    :deep(.leaf-list) {
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 6px;
+    }
+
+    :deep(.leaf-item) {
+      padding: 6px 8px;
+      font-size: 13px;
+    }
+
+    &.selection-mode {
+      :deep(.leaf-list) {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      }
+    }
   }
 }
 
+/* 中等屏幕 */
 @media (min-width: 769px) and (max-width: 1200px) {
-  .partition-tree-container :deep(.leaf-list) {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  }
+  .partition-tree-container {
+    :deep(.leaf-list) {
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
 
-  /* 选择模式下：中等屏幕增加最小宽度 */
-  .partition-tree-container.selection-mode :deep(.leaf-list) {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    &.selection-mode {
+      :deep(.leaf-list) {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+    }
   }
 }
 
-@media (min-width: 1201px) {
-  .partition-tree-container :deep(.leaf-list) {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  }
+/* 大屏幕 */
+@media (min-width: $desktop-large) {
+  .partition-tree-container {
+    :deep(.leaf-list) {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
 
-  /* 选择模式下：大屏幕增加最小宽度 */
-  .partition-tree-container.selection-mode :deep(.leaf-list) {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    &.selection-mode {
+      :deep(.leaf-list) {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      }
+    }
   }
 }
 </style>

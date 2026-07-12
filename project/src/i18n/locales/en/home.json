@@ -56,7 +56,8 @@
       "gdVillages": "Guangdong Villages - Guangdong village tree diagram",
       "villagesML": "Machine Learning - Village name machine learning",
       "gdVillagesTable": "Guangdong Village Table - Detailed Guangdong village table",
-      "ycVillages": "Yangchun Villages - Yangchun village data"
+      "ycVillages": "Yangchun Villages - Yangchun village data",
+      "allVillages": "All Villages - All villages data (admin only)"
     },
     "tools": {
       "title": "Character Table Tools",
@@ -175,8 +176,8 @@
     },
     "suggestions": {
       "title": "I Have Suggestions",
-      "desc": "Found a bug? Have suggestions?<br />Welcome to submit via GitHub Issue!",
-      "subtext": "Click the cards below to jump to the corresponding repository",
+      "desc": "Found a bug? Have suggestions? Got ideas?<br />Welcome to submit via GitHub Issue or leave a comment on Zhihu!",
+      "subtext": "👇 Click the cards below to jump to the corresponding platform",
       "frontendCard": "🐞 Website has bugs❓<br />💡 Have suggestions for interaction or UI❓",
       "frontendLink": "Submit Issue to frontend repository",
       "buildCard": "🔤 Questions about character tables❓<br />🎯 Errors in initial/final/tone extraction❓",
@@ -186,9 +187,14 @@
       "title": "❤️ Support Author",
       "follow": "Follow",
       "starText": "\"If you think the project is good, can you give it a ⭐️!\"",
-      "frontendRepo": "Frontend repository - Developed with Vue framework and native JS",
-      "backendRepo": "Backend repository - Based on FastAPI",
-      "buildRepo": "Character table preprocessing repository - Extract initials, finals, and tones from character tables",
+      "zhihuLike": "\"If you like it, feel free to give it a like on Zhihu too 👍\"",
+      "frontendRepo":"FrontendRepo - Vue 3 + JS + SCSS",
+      "backendRepo": "BackendRepo - FastAPI + Python + SQLAlchemy",
+      "buildRepo": "Data pipeline - Character table preprocessing",
+      "zhihuProjectName": "方音圖鑑",
+      "zhihuProjectRepo": "Project - 方音圖鑑",
+      "zhihuColumnName": "知乎專欄",
+      "zhihuColumnRepo": "Column - Dialect-related",
       "villagesMLRepo": "Village Machine Learning - Village name and geographic data analysis",
       "supportText": "\"If the website is helpful to you, you can buy the author a coffee☕️. Your support will be the motivation for the author to continue maintaining🙏\"",
       "supportButton": "Support",

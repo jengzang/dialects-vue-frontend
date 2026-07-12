@@ -2,7 +2,7 @@
   <div class="vml-glass-panel">
     <h3 class="panel-title">🏷️ 語義結構</h3>
 
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>加載中...</p>
     </div>
@@ -82,14 +82,9 @@ const parseSequence = (sequence) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .semantic-content {
   animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .info-grid {
@@ -102,8 +97,8 @@ const parseSequence = (sequence) => {
   display: flex;
   justify-content: space-between;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm);
 }
 
 .info-label {
@@ -119,8 +114,8 @@ const parseSequence = (sequence) => {
 .section {
   margin-bottom: 6px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
 }
 
 .section h4 {
@@ -139,15 +134,14 @@ const parseSequence = (sequence) => {
 .category-tag {
   padding: 6px 16px;
   background: var(--color-primary);
-  color: white;
-  border-radius: 20px;
+  color: var(--action-primary-text);
+  border-radius: var(--radius-xl);
   font-size: 14px;
   font-weight: 500;
 }
 
 .label-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -155,8 +149,8 @@ const parseSequence = (sequence) => {
   display: flex;
   justify-content: space-between;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
+  background: var(--glass-50);
+  border-radius: var(--radius-sm2);
 }
 
 .label-name {
@@ -168,22 +162,20 @@ const parseSequence = (sequence) => {
   font-size: 13px;
   color: var(--text-secondary);
   padding: 2px 10px;
-  background: rgba(74, 144, 226, 0.1);
-  border-radius: 12px;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border-radius: var(--radius-md);
 }
 
 .composition-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
 }
 
 .composition-item {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
+  background: var(--glass-50);
+  border-radius: var(--radius-sm2);
 }
 
 .comp-pattern {

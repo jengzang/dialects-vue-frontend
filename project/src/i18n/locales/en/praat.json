@@ -354,34 +354,51 @@
           "idle": "Waiting for selection..."
         },
         "toneNameInput": "Enter a tone label (for example: Tone 1)",
-        "addButton": "Add to List"
+        "addButton": "Add to List",
+        "persistenceHint": "Added tone data is saved automatically and will persist even after refreshing or leaving the page."
       },
       "savedList": {
         "title": "Collected Tone Classes ({count})",
         "clearAll": "Clear All",
         "empty": "No data yet. Select a region in the chart above and add it first",
         "tagCount": "{count} segments",
-        "confirmClear": "Clear all saved tone classes?"
+        "confirmClear": "Clear all saved tone classes?",
+        "previewTitle": "Preview - {name}",
+        "segmentIndex": "Segment {index}",
+        "segmentPoints": "{count} points",
+        "deleteSegment": "Delete this segment",
+        "closePreview": "Close"
       }
     },
     "step2": {
       "title": "Run T-Value Analysis",
       "hint": "Calculate five-point tone contours for each tone class",
-      "analyzeButton": "Start Analysis ({count} tone classes)"
+      "analyzeButton": "Start Analysis ({count} tone classes)",
+      "logScaleLabel": "Log transform method",
+      "logScaleOptions": {
+        "log": "Plain Log",
+        "logZScore": "Log z-score"
+      },
+      "analysisModeCheckbox": "11-Point Standardized"
     },
     "step3": {
       "title": "Analysis Results",
       "hint": "Five-point tone contours with original durations preserved and aligned to the start",
       "stats": {
         "ceiling": "Reference upper bound: {max} Hz",
-        "floor": "Reference lower bound: {min} Hz"
+        "floor": "Reference lower bound: {min} Hz",
+        "logMean": "Log mean: {mean}",
+        "logSd": "Log SD: {sd}"
       },
       "exportButton": "Export to Excel",
       "chart": {
         "title": "Shi Feng T-Value Curves",
         "tooltipTime": "Time: {time} ms",
+        "tooltipTimeElevenPoint": "Position: {percent}%",
         "xAxis": "Time (ms)",
+        "xAxisElevenPoint": "Normalized Duration (%)",
         "yAxis": "T Value",
+        "yAxisZScore": "Log z-score",
         "toolbox": {
           "zoom": "Zoom",
           "back": "Back",
@@ -396,7 +413,8 @@
         "fileName": "方音圖鑑_T值法定調_{timestamp}.xlsx",
         "sheetName": "石鋒T值分析",
         "columns": {
-          "time": "時間 (ms)"
+          "time": "時間 (ms)",
+          "timeElevenPoint": "Normalized Duration (%)"
         }
       }
     },

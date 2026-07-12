@@ -13,9 +13,9 @@
 <!--      <h1 class="page-title">🏷️ 語義類別與標籤</h1>-->
 
       <!-- Category List -->
-      <div class="category-list glass-panel">
+      <div class="category-list vml-glass-panel">
         <h2>語義類別</h2>
-        <div v-if="loadingCategories" class="loading-state">
+        <div v-if="loadingCategories" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>加載中...</p>
         </div>
@@ -39,7 +39,7 @@
 
       <!-- VTF Analysis -->
       <div class="vtf-section">
-        <div class="vtf-global glass-panel">
+        <div class="vtf-global vml-glass-panel">
           <h3>
             全局虛擬詞頻 (VTF)
             <HelpIcon
@@ -49,7 +49,7 @@
               trigger="both"
             />
           </h3>
-          <div v-if="loadingVTFGlobal" class="loading-state">
+          <div v-if="loadingVTFGlobal" class="vml-loading">
             <div class="ui-loading--page" aria-hidden="true"></div>
           </div>
           <div v-else class="vtf-chart">
@@ -70,7 +70,7 @@
           </div>
         </div>
 
-        <div class="vtf-regional glass-panel">
+        <div class="vtf-regional vml-glass-panel">
           <h3>
             區域虛擬詞頻
             <HelpIcon
@@ -96,7 +96,7 @@
               查詢
             </button>
           </div>
-          <div v-if="loadingVTFRegional" class="loading-state">
+          <div v-if="loadingVTFRegional" class="vml-loading">
             <div class="ui-loading--page" aria-hidden="true"></div>
           </div>
           <div v-else-if="vtfRegional.length > 0" class="vtf-chart">
@@ -119,7 +119,7 @@
       </div>
 
       <!-- Category Regional Ranking -->
-      <div ref="tendencySection" class="tendency-section glass-panel">
+      <div ref="tendencySection" class="tendency-section vml-glass-panel">
         <div class="section-header-centered" v-if="selectedCategory">
           <div class="category-title-card">
             <span class="category-icon-large">{{ getCategoryIcon(selectedCategory.category) }}</span>
@@ -152,12 +152,12 @@
               type="number"
               min="1"
               placeholder="例如：100"
-              class="number-input"
+              class="vml-number-input"
               @change="loadCategoryRanking"
             />
             <span class="input-hint">（過濾小樣本區域）</span>
           </div>
-          <div v-if="loadingRanking" class="loading-state">
+          <div v-if="loadingRanking" class="vml-loading">
             <div class="ui-loading--page" aria-hidden="true"></div>
           </div>
           <div v-else-if="categoryRanking.length > 0" class="ranking-results">
@@ -188,7 +188,7 @@
       </div>
 
 <!--      &lt;!&ndash; Labels Section &ndash;&gt;-->
-<!--      <div class="labels-section glass-panel">-->
+<!--      <div class="labels-section vml-glass-panel">-->
 <!--        <h3>語義標籤</h3>-->
 <!--        <div class="labels-tabs">-->
 <!--          <button-->
@@ -214,7 +214,7 @@
 <!--            :options="categoryOptionsForLabels"-->
 <!--            @update:modelValue="loadLabelsByCategory"-->
 <!--          />-->
-<!--          <div v-if="loadingLabels" class="loading-state">-->
+<!--          <div v-if="loadingLabels" class="vml-loading">-->
 <!--            <div class="ui-loading--page" aria-hidden="true"></div>-->
 <!--          </div>-->
 <!--          <div v-else-if="labels.length > 0" class="labels-cloud">-->
@@ -239,7 +239,7 @@
 <!--              class="char-input"-->
 <!--              @input="loadLabelsByChar"-->
 <!--          />-->
-<!--          <div v-if="loadingLabels" class="loading-state">-->
+<!--          <div v-if="loadingLabels" class="vml-loading">-->
 <!--            <div class="ui-loading--page" aria-hidden="true"></div>-->
 <!--          </div>-->
 <!--          <div v-else-if="labels.length > 0" class="labels-list">-->
@@ -458,7 +458,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .semantic-categories-page {
   padding: 12px;
   max-width: 1400px;
@@ -479,9 +479,7 @@ onMounted(() => {
 }
 
 .category-list h2 {
-  font-size: 16px;
   margin-bottom: 16px;
-  color: var(--text-primary);
 }
 
 .category-grid {
@@ -492,8 +490,8 @@ onMounted(() => {
 
 .category-card {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -502,19 +500,17 @@ onMounted(() => {
 
 .category-card:hover {
   transform: translateY(-5px);
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .category-card.selected {
-  background: rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.3);
   border-color: var(--color-primary);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.3);
 }
 
 .category-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 8px;
   margin-bottom: 8px;
 }
@@ -569,26 +565,8 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
-.select-input,
-.text-input {
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.select-input {
-  flex: 0 0 120px;
-}
-
-.text-input {
-  flex: 1;
-}
-
 .vtf-chart {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
@@ -607,8 +585,8 @@ onMounted(() => {
 
 .vtf-bar {
   height: 24px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
+  background: var(--glass-50);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -619,7 +597,7 @@ onMounted(() => {
 }
 
 .vtf-fill.regional {
-  background: linear-gradient(90deg, #f39c12, #e74c3c);
+  background: linear-gradient(90deg, var(--color-warning), var(--color-error));
 }
 
 .vtf-value {
@@ -648,21 +626,21 @@ onMounted(() => {
 
 .tab-button {
   padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
+  background: var(--glass-50);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .tab-button:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .tab-button.active {
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border-color: var(--color-primary);
 }
 
@@ -670,42 +648,32 @@ onMounted(() => {
   margin-top: 20px;
 }
 
-.char-input {
-  padding: 12px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 16px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.5);
-}
-
 .labels-cloud {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
 }
 
 .label-tag {
   padding: 6px 14px;
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   font-weight: 500;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .label-tag:hover {
-  background: rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.3);
   transform: scale(1.05);
 }
 
 .labels-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
 }
 
@@ -713,8 +681,8 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
 }
 
 .label-name {
@@ -726,8 +694,8 @@ onMounted(() => {
   font-size: 13px;
   color: var(--text-secondary);
   padding: 2px 10px;
-  background: rgba(74, 144, 226, 0.1);
-  border-radius: 12px;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border-radius: var(--radius-md);
 }
 
 .tendency-section {
@@ -749,10 +717,10 @@ onMounted(() => {
   align-items: center;
   gap: 12px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, rgba(74, 144, 226, 0.15), rgba(80, 200, 120, 0.15));
-  border-radius: 12px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+  background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.15), rgba(var(--color-success-rgb), 0.15));
+  border-radius: var(--radius-md);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .category-icon-large {
@@ -803,19 +771,17 @@ onMounted(() => {
   width: 32px;
   height: 32px;
   border: none;
-  border-radius: 50%;
-  background: rgba(231, 76, 60, 0.2);
-  color: #e74c3c;
+  border-radius: var(--radius-full);
+  background: rgba(var(--color-error-rgb), 0.2);
+  color: var(--color-error);
   font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
 }
 
 .close-button:hover {
-  background: rgba(231, 76, 60, 0.3);
+  background: rgba(var(--color-error-rgb), 0.3);
   transform: scale(1.1);
 }
 
@@ -834,8 +800,7 @@ onMounted(() => {
 }
 
 .prompt-message {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
@@ -865,8 +830,7 @@ onMounted(() => {
 }
 
 .ranking-results {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -880,21 +844,21 @@ onMounted(() => {
 }
 
 .ranking-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
 }
 
 .ranking-item {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
   transition: background 0.3s ease;
 }
 
 .ranking-item:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .col-rank {
@@ -904,28 +868,28 @@ onMounted(() => {
 .rank-badge {
   display: inline-block;
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 600;
 }
 
 .rank-gold {
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
-  color: #8b6914;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold));
+  color: var(--color-warning-dark);
 }
 
 .rank-silver {
-  background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
-  color: #5a5a5a;
+  background: linear-gradient(135deg, var(--color-silver), var(--border-light-gray));
+  color: var(--text-medium);
 }
 
 .rank-bronze {
-  background: linear-gradient(135deg, #cd7f32, #e8a87c);
-  color: #6b3e1a;
+  background: linear-gradient(135deg, var(--color-bronze), var(--vml-terracotta));
+  color: var(--vml-brown-dark);
 }
 
 .rank-normal {
-  background: rgba(74, 144, 226, 0.15);
+  background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
 }
 
@@ -963,10 +927,6 @@ onMounted(() => {
     flex-direction: column;
   }
 
-  .select-input {
-    flex: 1;
-  }
-
   /* Level selector responsive layout */
   .level-selector {
     flex-wrap: wrap;
@@ -983,7 +943,7 @@ onMounted(() => {
     min-width: 150px;
   }
 
-  .level-selector .number-input {
+  .level-selector .vml-number-input {
     flex: 1;
     min-width: 120px;
   }
@@ -995,19 +955,19 @@ onMounted(() => {
 }
 
 /* Number input and hint styles */
-.number-input {
+.vml-number-input {
   padding: 8px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 6px;
+  border: 1px solid var(--bg-hover-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   width: 120px;
   transition: all 0.3s ease;
 }
 
-.number-input:focus {
+.vml-number-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
 }
 
 .input-hint {

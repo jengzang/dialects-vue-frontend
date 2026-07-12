@@ -16,7 +16,7 @@
     </div>
 
     <!-- Village Selector -->
-    <div class="glass-panel selector-panel">
+    <div class="vml-glass-panel selector-panel">
       <div class="panel-header">
         <h3>選擇村莊</h3>
         <span class="count-badge">已選擇: {{ selectedVillages.length }}</span>
@@ -128,7 +128,7 @@
     </div>
 
     <!-- Feature Type Selector -->
-    <div class="glass-panel feature-type-panel">
+    <div class="vml-glass-panel feature-type-panel">
       <div class="panel-header">
         <h3>特徵類型</h3>
       </div>
@@ -147,7 +147,7 @@
     </div>
 
     <!-- Extraction Controls -->
-    <div class="glass-panel controls-panel">
+    <div class="vml-glass-panel controls-panel">
       <div class="panel-header">
         <h3>提取控制</h3>
       </div>
@@ -187,7 +187,7 @@
     </div>
 
     <!-- Extraction Results -->
-    <div v-if="extractionResults" class="glass-panel results-panel">
+    <div v-if="extractionResults" class="vml-glass-panel results-panel">
       <div class="panel-header">
         <h3>提取結果</h3>
         <button @click="exportResults" class="solid-button small">導出CSV</button>
@@ -248,7 +248,7 @@
     </div>
 
     <!-- Aggregation Results -->
-    <div v-if="aggregationResults" class="glass-panel aggregation-panel">
+    <div v-if="aggregationResults" class="vml-glass-panel aggregation-panel">
       <div class="panel-header">
         <h3>聚合結果 - 特徵分布分析</h3>
         <span class="stat-badge">共 {{ aggregationResults.village_count }} 個村莊</span>
@@ -388,10 +388,10 @@ import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { extractFeatures as apiExtractFeatures, aggregateFeatures as apiAggregateFeatures, searchVillages } from '@/api/index.js'
+import { extractFeatures as apiExtractFeatures, fetchSubsetFilter } from '@/api/index.js'
 import { showError, showSuccess, showWarning } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
-import { cityHasCounties } from '@/utils/region/regionPreload.js'
+import { cityHasCounties } from '@/VillagesML/utils/regionPreload.js'
 import { SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 
 // Router
@@ -548,7 +548,6 @@ const handleCountyChange = () => {
 
 // 载入村庄列表
 const loadVillages = async () => {
-  // 至少需要搜索关键词或区域筛选之一
   if (!searchKeyword.value && !hasFilters.value) {
     showWarning('請輸入搜索關鍵詞或選擇區域')
     return
@@ -557,35 +556,28 @@ const loadVillages = async () => {
   loading.value = true
   loadingMessage.value = '載入村莊列表...'
   try {
-    const params = {
-      keyword: searchKeyword.value || '',
-      page_size: 1000
-    }
-
-    // 根据选择的层级设置参数
+    const params = { maxResults: 50000 }
+    if (searchKeyword.value) params.keyword = searchKeyword.value
     if (filterCity.value) params.city = filterCity.value
     if (filterCounty.value) params.county = filterCounty.value
     if (filterTownship.value) params.township = filterTownship.value
 
-    const response = await searchVillages(params)
+    const response = await fetchSubsetFilter(params)
 
-    const villages = response.data || []
-    allVillages.value = villages.map(v => ({
-      id: String(v.village_id),  // 确保 id 是字符串类型
-      name: v.village_name,
+    allVillages.value = (response.villages || []).map(v => ({
+      id: String(v.id),
+      name: v.name,
       city: v.city,
       county: v.county,
-      township: v.township,
+      township: null,
       region: v.county || v.city
     }))
 
-    const total = response.total || 0
-    if (total > allVillages.value.length) {
-      showWarning(`載入了 ${allVillages.value.length} 個村莊（共 ${total} 個，已達到單次查詢上限）`)
+    if (allVillages.value.length >= 50000) {
+      showWarning(`已達到單次查詢上限，僅載入 ${allVillages.value.length} 個村莊`)
     } else {
       showSuccess(`載入了 ${allVillages.value.length} 個村莊`)
     }
-
     currentPage.value = 1
   } catch (error) {
     showError('載入村莊列表失敗: ' + error.message)
@@ -650,6 +642,11 @@ const nextResultsPage = () => {
 
 const extractFeatures = async () => {
   if (!canExtract.value) return
+
+  if (selectedVillages.value.length > 50000) {
+    showWarning('選擇的村莊數量超過上限（50,000），請減少選擇後再提取')
+    return
+  }
 
   loading.value = true
   loadingMessage.value = '正在提取特徵...'
@@ -918,7 +915,7 @@ const renderAggregationChart = () => {
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
           { offset: 0, color: '#4a90e2' },
-          { offset: 1, color: '#50c878' }
+          { offset: 1, color: '#34c759' }
         ])
       }
     }]
@@ -1075,7 +1072,7 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .feature-extraction-page {
   padding: 12px;
   max-width: 1600px;
@@ -1104,10 +1101,10 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 12px 20px;
-  background: rgba(231, 76, 60, 0.1);
-  border: 2px solid rgba(231, 76, 60, 0.3);
-  border-radius: 12px;
-  color: #e74c3c;
+  background: rgba(var(--color-error-rgb), 0.1);
+  border: 2px solid rgba(var(--color-error-rgb), 0.3);
+  border-radius: var(--radius-md);
+  color: var(--color-error);
   font-weight: 500;
 }
 
@@ -1125,7 +1122,7 @@ onBeforeUnmount(() => {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .panel-header h3 {
@@ -1135,10 +1132,10 @@ onBeforeUnmount(() => {
 }
 
 .count-badge {
-  background: #4a90e2;
+  background: var(--vml-blue);
   color: white;
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
 }
@@ -1149,17 +1146,17 @@ onBeforeUnmount(() => {
 
 .glass-input {
   padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
+  background: var(--glass-50);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   transition: all 0.3s ease;
 }
 
 .glass-input:focus {
   outline: none;
-  border-color: #4a90e2;
-  background: rgba(255, 255, 255, 0.8);
+  border-color: var(--vml-blue);
+  background: var(--glass-80);
 }
 
 .filters-row {
@@ -1173,8 +1170,7 @@ onBeforeUnmount(() => {
 .filter-group {
   flex: 1;
   min-width: 150px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -1207,15 +1203,15 @@ onBeforeUnmount(() => {
 .empty-hint {
   padding: 40px 20px;
   text-align: center;
-  background: rgba(243, 156, 18, 0.1);
-  border: 2px dashed rgba(243, 156, 18, 0.3);
-  border-radius: 8px;
+  background: rgba(var(--color-warning-rgb), 0.1);
+  border: 2px dashed rgba(var(--color-warning-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   margin-bottom: 16px;
 }
 
 .empty-hint p {
   font-size: 15px;
-  color: #f39c12;
+  color: var(--color-warning);
   margin: 0;
   font-weight: 500;
 }
@@ -1240,24 +1236,24 @@ onBeforeUnmount(() => {
 
 .glass-select {
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
+  background: var(--glass-50);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   transition: all 0.3s ease;
 }
 
 .glass-select:focus {
   outline: none;
-  border-color: #4a90e2;
-  background: rgba(255, 255, 255, 0.8);
+  border-color: var(--vml-blue);
+  background: var(--glass-80);
 }
 
 .village-list {
   max-height: 400px;
   overflow-y: auto;
-  border: 1px solid rgba(74, 144, 226, 0.2);
-  border-radius: 8px;
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
+  border-radius: var(--radius-sm2);
   margin-bottom: 16px;
 }
 
@@ -1266,17 +1262,17 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.1);
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .village-item:hover {
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
 }
 
 .village-item.selected {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .village-info {
@@ -1302,9 +1298,9 @@ onBeforeUnmount(() => {
 .village-id {
   font-size: 11px;
   color: var(--text-secondary);
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   padding: 2px 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-family: monospace;
 }
 
@@ -1317,10 +1313,10 @@ onBeforeUnmount(() => {
 
 .location-item {
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   padding: 2px 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .pagination {
@@ -1346,16 +1342,16 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 2px solid rgba(74, 144, 226, 0.2);
-  border-radius: 8px;
+  background: var(--glass-50);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .feature-type-item:hover {
-  background: rgba(255, 255, 255, 0.7);
-  border-color: rgba(74, 144, 226, 0.4);
+  background: var(--glass-70);
+  border-color: rgba(var(--vml-blue-rgb), 0.4);
 }
 
 .type-label {
@@ -1371,13 +1367,23 @@ onBeforeUnmount(() => {
   flex: 1;
 }
 
+.controls-panel {
+  @include flex-col;
+}
+
+.controls-panel .panel-header h3 {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .controls-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
+  flex: 1;
 }
 
 .controls-row {
+  // justify-content: center;
   display: flex;
   gap: 24px;
   flex-wrap: wrap;
@@ -1418,10 +1424,10 @@ onBeforeUnmount(() => {
 
 .stat-card {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
+  background: var(--glass-60);
+  border-radius: var(--radius-md);
   text-align: center;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .stat-label {
@@ -1433,7 +1439,7 @@ onBeforeUnmount(() => {
 .stat-value {
   font-size: 24px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .stat-breakdown {
@@ -1445,9 +1451,9 @@ onBeforeUnmount(() => {
 }
 
 .breakdown-item {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   padding: 2px 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   color: var(--text-secondary);
 }
 
@@ -1463,7 +1469,7 @@ onBeforeUnmount(() => {
 }
 
 .glass-table thead {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -1473,7 +1479,7 @@ onBeforeUnmount(() => {
 .glass-table td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.1);
   white-space: nowrap;
 }
 
@@ -1501,14 +1507,12 @@ onBeforeUnmount(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
+  background: var(--bg-overlay);
+  @include flex-col;
   align-items: center;
   justify-content: center;
   z-index: 9999;
 }
-
 
 
 .loading-overlay p {
@@ -1519,10 +1523,10 @@ onBeforeUnmount(() => {
 
 /* Aggregation Results Styles */
 .stat-badge {
-  background: rgba(74, 144, 226, 0.2);
-  color: #4a90e2;
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  color: var(--vml-blue);
   padding: 6px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
 }
@@ -1530,8 +1534,8 @@ onBeforeUnmount(() => {
 .agg-section {
   margin-bottom: 32px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
 }
 
 .agg-section h4 {
@@ -1539,7 +1543,7 @@ onBeforeUnmount(() => {
   color: var(--text-primary);
   margin: 0 0 16px 0;
   padding-bottom: 8px;
-  border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .agg-section h5 {
@@ -1556,10 +1560,10 @@ onBeforeUnmount(() => {
 
 .category-card {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 8px;
+  background: var(--glass-60);
+  border-radius: var(--radius-sm2);
   text-align: center;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .category-name {
@@ -1578,7 +1582,7 @@ onBeforeUnmount(() => {
 .category-percentage {
   font-size: 16px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .struct-grid {
@@ -1588,9 +1592,9 @@ onBeforeUnmount(() => {
 }
 
 .struct-subsection {
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
   padding: 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .mini-table {
@@ -1603,13 +1607,13 @@ onBeforeUnmount(() => {
 .mini-table td {
   padding: 8px;
   text-align: left;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .mini-table th {
   font-weight: 600;
   color: var(--text-primary);
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .cluster-grid {
@@ -1619,9 +1623,9 @@ onBeforeUnmount(() => {
 }
 
 .cluster-subsection {
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .cluster-badges {
@@ -1633,12 +1637,11 @@ onBeforeUnmount(() => {
 }
 
 .cluster-badge {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   padding: 10px 14px;
-  background: rgba(74, 144, 226, 0.1);
-  border-radius: 8px;
-  border: 1px solid rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border-radius: var(--radius-sm2);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
 }
 
 .cluster-id {
@@ -1650,7 +1653,7 @@ onBeforeUnmount(() => {
 
 .cluster-count {
   font-size: 13px;
-  color: #4a90e2;
+  color: var(--vml-blue);
   font-weight: 500;
 }
 
@@ -1662,16 +1665,16 @@ onBeforeUnmount(() => {
 
 .coverage-item {
   padding: 20px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
+  background: var(--glass-50);
+  border-radius: var(--radius-md);
   text-align: center;
   min-width: 120px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .coverage-item.highlight {
-  background: rgba(74, 144, 226, 0.1);
-  border-color: #4a90e2;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border-color: var(--vml-blue);
 }
 
 .coverage-label {
@@ -1683,7 +1686,7 @@ onBeforeUnmount(() => {
 .coverage-value {
   font-size: 24px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .char-grid {
@@ -1694,10 +1697,10 @@ onBeforeUnmount(() => {
 
 .char-card {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 8px;
+  background: var(--glass-60);
+  border-radius: var(--radius-sm2);
   text-align: center;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .char-text {
@@ -1709,22 +1712,22 @@ onBeforeUnmount(() => {
 
 .char-percentage {
   font-size: 12px;
-  color: #4a90e2;
+  color: var(--vml-blue);
   font-weight: 500;
 }
 
 .empty-cluster-hint {
   padding: 30px 20px;
   text-align: center;
-  background: rgba(243, 156, 18, 0.1);
-  border: 2px dashed rgba(243, 156, 18, 0.3);
-  border-radius: 8px;
+  background: rgba(var(--color-warning-rgb), 0.1);
+  border: 2px dashed rgba(var(--color-warning-rgb), 0.3);
+  border-radius: var(--radius-sm2);
 }
 
 .empty-cluster-hint p {
   margin: 8px 0;
   font-size: 14px;
-  color: #f39c12;
+  color: var(--color-warning);
 }
 
 .empty-cluster-hint .hint-text {
@@ -1732,8 +1735,22 @@ onBeforeUnmount(() => {
   color: var(--text-secondary);
 }
 
+/* Responsive - Landscape orientation */
+@media (min-aspect-ratio: 1/1) {
+  .controls-panel {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .controls-panel .panel-header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
 /* Responsive - Portrait orientation */
-@media (orientation: portrait) {
+@media (max-aspect-ratio: 1/1) {
   .feature-extraction-page {
     padding: 8px;
   }
@@ -1807,9 +1824,9 @@ onBeforeUnmount(() => {
   .glass-table td:first-child {
     position: sticky;
     left: 0;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--glass-90);
     z-index: 5;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 2px 0 4px var(--bg-hover);
   }
 
   .glass-table thead th:first-child {

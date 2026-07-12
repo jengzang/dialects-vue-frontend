@@ -11,7 +11,7 @@
     </h3>
 
     <!-- Detail Mode Toggle -->
-    <div class="detail-toggle glass-panel">
+    <div class="detail-toggle vml-glass-panel">
       <div class="toggle-left">
         <label class="toggle-container">
           <SwitchToggle
@@ -38,7 +38,7 @@
 
     <!-- Bigrams and Trigrams -->
     <div class="ngrams-section">
-      <div class="bigrams glass-panel">
+      <div class="bigrams vml-glass-panel">
         <h3>二元組合 (Bigrams)</h3>
         <p class="subsection-description">
           分析相鄰兩個語義類別的組合，顯示頻率、佔比和PMI關聯強度。
@@ -51,7 +51,7 @@
               type="number"
               min="1"
               placeholder="例如：5"
-              class="number-input"
+              class="vml-number-input"
             />
           </div>
           <button
@@ -63,7 +63,7 @@
           </button>
         </div>
 
-        <div v-if="loadingBigrams" class="loading-state">
+        <div v-if="loadingBigrams" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
         </div>
 
@@ -83,7 +83,7 @@
         </div>
       </div>
 
-      <div class="trigrams glass-panel">
+      <div class="trigrams vml-glass-panel">
         <h3>三元組合 (Trigrams)</h3>
         <p class="subsection-description">
           分析連續三個語義類別的組合模式，顯示頻率和佔比。
@@ -96,7 +96,7 @@
               type="number"
               min="1"
               placeholder="例如：3"
-              class="number-input"
+              class="vml-number-input"
             />
           </div>
           <button
@@ -108,7 +108,7 @@
           </button>
         </div>
 
-        <div v-if="loadingTrigrams" class="loading-state">
+        <div v-if="loadingTrigrams" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
         </div>
 
@@ -130,7 +130,7 @@
     </div>
 
     <!-- PMI Analysis -->
-    <div class="pmi-section glass-panel">
+    <div class="pmi-section vml-glass-panel">
       <h2>點互信息 (PMI) 分析</h2>
       <p class="section-description">
         PMI 衡量兩個類別共現的關聯強度。PMI > 0 表示正相關（傾向共現），PMI &lt; 0 表示負相關（傾向不共現）。
@@ -143,7 +143,7 @@
             type="number"
             step="0.1"
             placeholder="例如：0"
-            class="number-input"
+            class="vml-number-input"
           />
           <span class="input-hint">過濾PMI分數低於此值的組合</span>
         </div>
@@ -155,7 +155,7 @@
             min="10"
             max="1000"
             placeholder="例如：50"
-            class="number-input"
+            class="vml-number-input"
           />
           <span class="input-hint">返回前N個最高PMI的組合</span>
         </div>
@@ -168,7 +168,7 @@
         </button>
       </div>
 
-      <div v-if="loadingPMI" class="loading-state">
+      <div v-if="loadingPMI" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
 
@@ -376,7 +376,7 @@ watch(detailMode, () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .semantic-ngrams-page {
   padding: 12px;
   max-width: 1400px;
@@ -420,8 +420,7 @@ watch(detailMode, () => {
 }
 
 .input-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
@@ -437,25 +436,13 @@ watch(detailMode, () => {
   margin-top: 2px;
 }
 
-.number-input {
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+.vml-number-input {
   width: 150px;
-}
-
-.number-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
 }
 
 .bigrams-list,
 .trigrams-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
   max-height: 500px;
   overflow-y: auto;
@@ -467,8 +454,8 @@ watch(detailMode, () => {
   grid-template-columns: 2fr 1fr 2fr;
   gap: 12px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
   align-items: center;
 }
 
@@ -496,9 +483,9 @@ watch(detailMode, () => {
 
 .stat-item {
   padding: 4px 10px;
-  background: rgba(74, 144, 226, 0.15);
+  background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
 }
@@ -509,9 +496,7 @@ watch(detailMode, () => {
 }
 
 .pmi-section h2 {
-  font-size: 16px;
   margin-bottom: 10px;
-  color: var(--text-primary);
 }
 
 .section-description {
@@ -522,7 +507,7 @@ watch(detailMode, () => {
 }
 
 .pmi-results {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow-x: auto;
   overflow-y: visible;
 }
@@ -538,31 +523,31 @@ watch(detailMode, () => {
 }
 
 .pmi-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .pmi-row {
-  background: rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--glass-30);
+  border-bottom: 1px solid var(--bg-hover);
   transition: background 0.3s ease;
 }
 
 .pmi-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .pmi-row.pmi-very-strong {
-  background: rgba(39, 174, 96, 0.15);
+  background: rgba(var(--color-success-rgb), 0.15);
 }
 
 .pmi-row.pmi-strong {
-  background: rgba(46, 204, 113, 0.1);
+  background: rgba(var(--color-success-rgb), 0.1);
 }
 
 .pmi-row.pmi-moderate {
-  background: rgba(243, 156, 18, 0.1);
+  background: rgba(var(--color-warning-rgb), 0.1);
 }
 
 .col-pair {
@@ -581,8 +566,8 @@ watch(detailMode, () => {
 
 .strength-bar {
   height: 20px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
+  background: var(--glass-50);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -593,7 +578,7 @@ watch(detailMode, () => {
 }
 
 .strength-fill.negative {
-  background: linear-gradient(90deg, #e74c3c, #c0392b);
+  background: linear-gradient(90deg, var(--color-error), var(--color-error-dark));
 }
 
 @media (max-width: 600px) {
@@ -616,7 +601,7 @@ watch(detailMode, () => {
     align-items: stretch;
   }
 
-  .number-input {
+  .vml-number-input {
     width: 100%;
   }
 }
@@ -666,9 +651,9 @@ watch(detailMode, () => {
 .lexicon-button {
   padding: 8px 16px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -678,7 +663,7 @@ watch(detailMode, () => {
 .lexicon-button:hover {
   background: var(--color-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.3);
 }
 
 /* Lexicon Modal Styles */
@@ -705,16 +690,15 @@ watch(detailMode, () => {
 }
 
 .category-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
 .category-item {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
-  border: 1px solid rgba(74, 144, 226, 0.1);
+  background: var(--glass-50);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .category-header {
@@ -734,8 +718,8 @@ watch(detailMode, () => {
   font-size: 13px;
   color: var(--text-secondary);
   padding: 4px 12px;
-  background: rgba(74, 144, 226, 0.1);
-  border-radius: 12px;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border-radius: var(--radius-md);
 }
 
 .char-list {
@@ -746,9 +730,9 @@ watch(detailMode, () => {
 
 .char-tag {
   padding: 6px 12px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   color: var(--text-primary);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;
@@ -756,7 +740,7 @@ watch(detailMode, () => {
 
 .char-tag:hover {
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   transform: translateY(-2px);
 }
 

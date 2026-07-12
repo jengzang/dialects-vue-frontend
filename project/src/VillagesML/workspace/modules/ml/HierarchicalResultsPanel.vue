@@ -121,19 +121,19 @@ function toggleNode(level, key) {
 }
 
 const levelColors = {
-  city:     ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
-  county:   ['#e67e22', '#1abc9c', '#e74c3c', '#3498db', '#f39c12', '#9b59b6', '#2ecc71', '#34495e', '#16a085', '#c0392b'],
-  township: ['#4a90e2', '#50c878', '#f39c12', '#e74c3c', '#9b59b6', '#1abc9c', '#e67e22', '#3498db', '#2ecc71', '#34495e']
+  city:     ['#d32f2f', '#3498db', '#34c759', '#ff9500', '#5856d6'],
+  county:   ['#ff9500', '#00887a', '#d32f2f', '#3498db', '#ff9500', '#5856d6', '#34c759', '#0b2540', '#00887a', '#962020'],
+  township: ['#4a90e2', '#34c759', '#ff9500', '#d32f2f', '#5856d6', '#00887a', '#ff9500', '#3498db', '#34c759', '#0b2540']
 }
 
 function levelColor(level, clusterId) {
-  if (clusterId === -1) return '#95a5a6'
+  if (clusterId === -1) return '#86868b'
   const palette = levelColors[level] || levelColors.township
   return palette[clusterId % palette.length]
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .vml-glass-panel {
   padding: 20px;
   min-height: 400px;
@@ -155,8 +155,8 @@ function levelColor(level, clusterId) {
 
 .metric-card {
   padding: 14px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
   text-align: center;
 }
 
@@ -190,7 +190,7 @@ function levelColor(level, clusterId) {
   align-items: center;
   gap: 8px;
   padding: 6px 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   transition: background 0.15s;
 }
 
@@ -199,13 +199,13 @@ function levelColor(level, clusterId) {
 }
 
 .node-row.expandable:hover {
-  background: rgba(74, 144, 226, 0.08);
+  background: rgba(var(--vml-blue-rgb), 0.08);
 }
 
 .city-row {
   font-size: 14px;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-20);
   margin-bottom: 2px;
 }
 
@@ -221,14 +221,14 @@ function levelColor(level, clusterId) {
 
 .county-list {
   margin-left: 20px;
-  border-left: 2px solid rgba(74, 144, 226, 0.15);
+  border-left: 2px solid rgba(var(--vml-blue-rgb), 0.15);
   padding-left: 8px;
   margin-bottom: 4px;
 }
 
 .township-list {
   margin-left: 20px;
-  border-left: 2px solid rgba(80, 200, 120, 0.15);
+  border-left: 2px solid rgba(var(--color-success-rgb), 0.15);
   padding-left: 8px;
 }
 
@@ -241,7 +241,7 @@ function levelColor(level, clusterId) {
 
 .cluster-badge {
   padding: 2px 8px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   color: white;
   font-size: 11px;
   font-weight: 700;
@@ -260,9 +260,7 @@ function levelColor(level, clusterId) {
 }
 
 .empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   min-height: 300px;
   color: var(--text-secondary);
   gap: 8px;

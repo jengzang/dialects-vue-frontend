@@ -395,8 +395,8 @@ const convertToGeoJSON = (data) => {
     // 计算颜色（基于合并后的文字）
     let bgColor, textColor
     if (displayMode.value === 'location') {
-      bgColor = '#1b2e2b'
-      textColor = '#a6ffdc'
+       bgColor = '#1b2e2b'
+       textColor = '#a6ffdc'
     } else {
       bgColor = assignColor(mergedText)
       textColor = '#1d1d1f'
@@ -827,12 +827,13 @@ watch(() => props.activeTab, () => {
 })
 </script>
 
-<style scoped>
+
+<style scoped lang="scss">
 .yubao-map-container {
   width: 100%;
   height: 100%;
   position: relative;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -861,12 +862,10 @@ watch(() => props.activeTab, () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   z-index: 1000;
   animation: fadeIn 0.2s ease-out;
 }
@@ -881,8 +880,7 @@ watch(() => props.activeTab, () => {
 }
 
 .loading-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 16px;
 }
@@ -892,7 +890,7 @@ watch(() => props.activeTab, () => {
 .loading-text {
   font-size: 15px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: var(--text-primary);
   letter-spacing: 0.3px;
 }
 
@@ -901,14 +899,13 @@ watch(() => props.activeTab, () => {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-90);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding: 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
   z-index: 10;
   width: 160px;
@@ -929,10 +926,10 @@ watch(() => props.activeTab, () => {
 .custom-select select {
   width: 100%;
   appearance: none;
-  background: white;
-  border: 1px solid #ddd;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light-gray);
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   cursor: pointer;
   outline: none;
@@ -940,7 +937,7 @@ watch(() => props.activeTab, () => {
 }
 
 .custom-select select:focus {
-  border-color: #007aff;
+  border-color: var(--color-primary);
 }
 
 .custom-select .arrow {
@@ -950,15 +947,15 @@ watch(() => props.activeTab, () => {
   transform: translateY(-50%);
   pointer-events: none;
   font-size: 12px;
-  color: #888;
+  color: var(--text-muted)
 }
 
 /* 模式切换按钮 */
 .mode-switcher {
   display: flex;
   gap: 4px;
-  background: #f0f0f0;
-  border-radius: 8px;
+  background: var(--bg-light);
+  border-radius: var(--radius-sm2);
   padding: 4px;
 }
 
@@ -967,11 +964,11 @@ watch(() => props.activeTab, () => {
   padding: 6px 8px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
-  color: #666;
+  color: var(--text-tertiary)
 }
 
 .mode-switcher button:hover {
@@ -980,9 +977,14 @@ watch(() => props.activeTab, () => {
 
 .mode-switcher button.active {
   background: white;
-  color: #007aff;
+  color: var(--color-primary);
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  :root[data-color-theme='dark'] & {
+    color: var(--text-primary);
+    background: var(--surface-panel-strong);
+  }
 }
 
 /* 按钮行 */
@@ -1001,22 +1003,22 @@ watch(() => props.activeTab, () => {
 }
 
 .action-btn {
-  background: #007aff;
-  color: white;
+  background: var(--color-primary);
+  color: var(--action-primary-text);
   border: none;
   padding: 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   font-size: 13px;
   transition: background 0.2s;
 }
 
 .action-btn:hover {
-  background: #0062cc;
+  background: var(--color-primary-hover);
 }
 
 .fullscreen-btn {
-  background: #34c759;
+  background: var(--color-success);
 }
 
 .fullscreen-btn:hover {
@@ -1031,11 +1033,11 @@ watch(() => props.activeTab, () => {
   padding: 12px 24px;
   font-size: 15px;
   font-weight: 600;
-  color: #333;
-  background: rgba(255, 255, 255, 0.65);
+  color: var(--text-dark);
+  background: var(--glass-70);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-50);
   border-radius: 50px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
   cursor: pointer;
@@ -1047,7 +1049,7 @@ watch(() => props.activeTab, () => {
 }
 
 .exit-fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-90);
   transform: scale(1.05);
   box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
 }
@@ -1055,13 +1057,13 @@ watch(() => props.activeTab, () => {
 .exit-fullscreen-btn:active {
   transform: scale(0.95);
 }
-</style>
 
-<style>
+
+
 /* 全局样式 - 标记 */
 .yubao-marker {
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   font-size: 13px;
   white-space: nowrap;
@@ -1081,22 +1083,19 @@ watch(() => props.activeTab, () => {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   z-index: 100000;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
 }
 
 .yubao-popup-content {
-  background: white;
-  border-radius: 16px;
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
   width: 90%;
   max-width: 500px;
   max-height: 80vh;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
@@ -1106,14 +1105,14 @@ watch(() => props.activeTab, () => {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-divider);
   background: #f8f8f8;
 }
 
 .popup-header h3 {
   margin: 0;
   font-size: 18px;
-  color: #333;
+  color: var(--text-dark);
   font-weight: 600;
 }
 
@@ -1130,11 +1129,11 @@ watch(() => props.activeTab, () => {
   gap: 8px;
   padding: 10px 12px;
   margin-bottom: 16px;
-  background: rgba(0, 113, 227, 0.08);
-  border-left: 3px solid #0071e3;
-  border-radius: 6px;
+  background: rgba(var(--color-primary-rgb), 0.08);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
   font-size: 13px;
-  color: #0071e3;
+  color: var(--color-primary);
   font-weight: 500;
 }
 
@@ -1158,11 +1157,11 @@ watch(() => props.activeTab, () => {
 }
 
 .info-row:hover {
-  background-color: rgba(0, 113, 227, 0.02);
+  background-color: rgba(var(--color-primary-rgb), 0.02);
   margin: 0 -12px;
   padding-left: 12px;
   padding-right: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 /* 标签样式 */
@@ -1181,7 +1180,7 @@ watch(() => props.activeTab, () => {
   flex: 1;
   font-size: 15px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: var(--text-primary);
   line-height: 1.6;
   word-break: break-word;
 }
@@ -1189,7 +1188,7 @@ watch(() => props.activeTab, () => {
 /* 发音行特殊样式 */
 .pronunciation-row .value {
   font-family: 'Courier New', 'Monaco', monospace;
-  color: #0071e3;
+  color: var(--color-primary);
   letter-spacing: 0.5px;
   font-size: 16px;
   font-weight: bold;
@@ -1199,19 +1198,19 @@ watch(() => props.activeTab, () => {
 .word-value {
   font-size: 17px;
   font-weight: 600;
-  color: #1d1d1f;
+  color: var(--text-primary);
 }
 
 /* 分区行特殊样式 */
 .category-row .value {
-  color: #af52de;
+  color: var(--color-purple-light);
   font-weight: 600;
   font-size: 14px;
 }
 
 .info-line {
   padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--bg-light);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -1221,7 +1220,7 @@ watch(() => props.activeTab, () => {
 }
 
 .info-line strong {
-  color: #555;
+  color: var(--text-medium);
   margin-right: 8px;
   font-weight: 600;
 }

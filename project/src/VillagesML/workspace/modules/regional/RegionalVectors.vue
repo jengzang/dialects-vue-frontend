@@ -6,7 +6,7 @@
     </h3>
 
     <!-- Region Selector -->
-    <div class="glass-panel selector-panel">
+    <div class="vml-glass-panel selector-panel">
       <div class="panel-header">
         <h3>選擇兩個區域進行比較</h3>
       </div>
@@ -54,7 +54,7 @@
     <!-- Comparison Results -->
     <div v-if="comparisonData" class="results-section">
       <!-- Similarity Metrics -->
-      <div class="glass-panel similarity-panel">
+      <div class="vml-glass-panel similarity-panel">
         <div class="panel-header">
           <h3>相似度分析</h3>
         </div>
@@ -87,7 +87,7 @@
       <!-- Side-by-side Vector Charts -->
 <!--      <div class="vectors-row">-->
         <!-- Region 1 Vector -->
-<!--        <div class="glass-panel vector-panel">-->
+<!--        <div class="vml-glass-panel vector-panel">-->
 <!--          <div class="panel-header">-->
 <!--            <h3>{{ region1 }}</h3>-->
 <!--            <span class="region-label">{{ getLevelLabel(level1) }}</span>-->
@@ -106,7 +106,7 @@
 <!--        </div>-->
 
         <!-- Region 2 Vector -->
-<!--        <div class="glass-panel vector-panel">-->
+<!--        <div class="vml-glass-panel vector-panel">-->
 <!--          <div class="panel-header">-->
 <!--            <h3>{{ region2 }}</h3>-->
 <!--            <span class="region-label">{{ getLevelLabel(level2) }}</span>-->
@@ -128,7 +128,7 @@
     </div>
 
     <!-- Multi-Region Selector for Batch Analysis -->
-    <div class="glass-panel multi-region-panel">
+    <div class="vml-glass-panel multi-region-panel">
       <div class="panel-header">
         <h3>批量分析（熱力圖 & 散點圖）</h3>
       </div>
@@ -188,7 +188,7 @@
     <!-- Batch Analysis Results -->
     <div v-if="batchComparisonData || reductionData" class="batch-results-section">
       <!-- Heatmap -->
-      <div v-if="batchComparisonData" class="glass-panel heatmap-panel">
+      <div v-if="batchComparisonData" class="vml-glass-panel heatmap-panel">
         <div class="panel-header">
           <h3>相似度熱力圖</h3>
         </div>
@@ -198,7 +198,7 @@
       </div>
 
       <!-- Scatter Plot -->
-      <div v-if="reductionData" class="glass-panel scatter-panel">
+      <div v-if="reductionData" class="vml-glass-panel scatter-panel">
         <div class="panel-header">
           <h3>向量降維散點圖 (PCA)</h3>
           <span class="info-label">解釋方差: {{ formatVariance(reductionData.explained_variance) }}</span>
@@ -471,7 +471,7 @@ const renderComparisonChart = () => {
         name: region2.value,
         type: 'bar',
         data: comparisonData.value.region2_vector || [],
-        itemStyle: { color: '#50c878' }
+        itemStyle: { color: '#34c759' }
       }
     ]
   })
@@ -534,7 +534,7 @@ const renderHeatmap = () => {
       left: 'center',
       bottom: isMobile ? '2%' : '5%',
       inRange: {
-        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d32f2f', '#962020']
       }
     },
     series: [{
@@ -681,7 +681,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .regional-vectors-page {
   padding: 12px;
   max-width: 1600px;
@@ -698,7 +698,7 @@ onUnmounted(() => {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .panel-header h3 {
@@ -708,17 +708,16 @@ onUnmounted(() => {
 }
 
 .region-label {
-  background: linear-gradient(135deg, #4a90e2, #50c878);
+  background: linear-gradient(135deg, var(--vml-blue), var(--color-success));
   color: white;
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
 }
 
 .selector-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 20px;
 }
 
@@ -731,9 +730,9 @@ onUnmounted(() => {
 
 .region-group {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  border: 1px solid rgba(74, 144, 226, 0.2);
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .group-title {
@@ -742,48 +741,46 @@ onUnmounted(() => {
   color: var(--text-primary);
   margin: 0 0 16px 0;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.15);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.15);
 }
 
 .action-button {
   width: 100%;
   padding: 12px 24px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   color: white;
-  background: linear-gradient(135deg, #4a90e2, #357abd);
+  background: linear-gradient(135deg, var(--vml-blue), var(--vml-blue-darker));
 }
 
 .action-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #357abd, #2868a8);
+  background: linear-gradient(135deg, var(--vml-blue-darker), var(--vml-blue-darker));
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.4);
 }
 
 .action-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
   transform: none;
 }
 
 .action-button.add-button {
   width: auto;
   padding: 10px 20px;
-  background: linear-gradient(135deg, #50c878, #3da35d);
+  background: linear-gradient(135deg, var(--color-success), var(--color-success));
 }
 
 .action-button.add-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #3da35d, #2d8a4a);
+  background: linear-gradient(135deg, var(--color-success), var(--color-success));
 }
 
 /* Multi-region panel */
 .multi-region-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
@@ -802,8 +799,8 @@ onUnmounted(() => {
   flex-wrap: wrap;
   gap: 8px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
   min-height: 50px;
 }
 
@@ -812,18 +809,16 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background: linear-gradient(135deg, #4a90e2, #357abd);
+  background: linear-gradient(135deg, var(--vml-blue), var(--vml-blue-darker));
   color: white;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   font-size: 13px;
   font-weight: 500;
 }
 
 .region-name {
   max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include text-truncate;
 }
 
 .remove-btn {
@@ -836,15 +831,13 @@ onUnmounted(() => {
   padding: 0;
   width: 20px;
   height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  @include flex-center;
+  border-radius: var(--radius-full);
   transition: background 0.2s;
 }
 
 .remove-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-20);
 }
 
 .batch-actions {
@@ -859,15 +852,14 @@ onUnmounted(() => {
 .info-label {
   font-size: 13px;
   color: var(--text-secondary);
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   padding: 4px 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 /* 結果區域 */
 .results-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
@@ -893,8 +885,8 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
+  background: var(--glass-50);
+  border-radius: var(--radius-sm2);
 }
 
 .stat-item .label {
@@ -930,27 +922,25 @@ onUnmounted(() => {
 }
 
 .comparison-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 16px;
   margin-bottom: 24px;
 }
 
 .region-badge {
   padding: 8px 20px;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   font-weight: 600;
   font-size: 16px;
 }
 
 .region-badge.primary {
-  background: linear-gradient(135deg, #4a90e2, #357abd);
+  background: linear-gradient(135deg, var(--vml-blue), var(--vml-blue-darker));
   color: white;
 }
 
 .region-badge.compare {
-  background: linear-gradient(135deg, #50c878, #3da35d);
+  background: linear-gradient(135deg, var(--color-success), var(--color-success));
   color: white;
 }
 
@@ -971,10 +961,10 @@ onUnmounted(() => {
   flex: 1;
   min-width: 150px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
+  background: var(--glass-60);
+  border-radius: var(--radius-md);
   text-align: center;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .metric-label {
@@ -986,7 +976,7 @@ onUnmounted(() => {
 .metric-value {
   font-size: 26px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .loading-overlay {
@@ -995,14 +985,12 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
+  background: var(--bg-overlay);
+  @include flex-col;
   align-items: center;
   justify-content: center;
   z-index: 9999;
 }
-
 
 
 .loading-overlay p {

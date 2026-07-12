@@ -101,9 +101,9 @@
               <tbody>
                 <tr v-for="col in allColumns" :key="col.name">
                   <td>
-                    <CheckBox
-                      :model-value="selectedColumns[col.name]"
-                      @update:modelValue="selectedColumns[col.name] = $event"
+                    <input
+                      type="checkbox"
+                      v-model="selectedColumns[col.name]"
                     />
                   </td>
                   <td>{{ col.name }}</td>
@@ -119,9 +119,9 @@
                     />
                   </td>
                   <td>
-                    <CheckBox
-                      :model-value="filterableColumns[col.name]"
-                      @update:modelValue="filterableColumns[col.name] = $event"
+                    <input
+                      type="checkbox"
+                      v-model="filterableColumns[col.name]"
                     />
                   </td>
                 </tr>
@@ -173,8 +173,7 @@
 
 <script setup>
 import { computed, nextTick, onMounted, ref } from 'vue'
-import CheckBox from '@/components/selector/CheckBox.vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { userStore } from '@/main/store/store.js'
 import { getUserRole, ensureAuthenticated } from '@/api/auth/auth.js'
@@ -185,6 +184,7 @@ import { showError, showSuccess, showWarning } from '@/utils/message.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter()
+const route = useRoute()
 const { t } = useI18n()
 
 // 权限验证
@@ -620,285 +620,322 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary-blue: var(--color-primary);
+$primary-blue-dark: var(--color-primary-hover);
+$success-green: var(--color-success);
+$success-green-dark: var(--color-success);
+$danger-red: var(--color-error-light);
+$danger-red-dark: var(--color-error-dark);
+
+$text-primary: var(--text-primary);
+$text-dark: var(--text-slate);
+$white: var(--text-white);
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 20px;
+
+$transition-base: 0.3s;
+$smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
+  $background: var(--glass-70),
+  $radius: $radius-lg
+) {
+  background: $background;
+  border: 1px solid var(--glass-30);
+  border-radius: $radius;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 var(--glass-50);
+
+  @include glass-blur(20px, 180%);
+}
+
+@mixin primary-gradient {
+  background: linear-gradient(
+    135deg,
+    $primary-blue 0%,
+    $primary-blue-dark 100%
+  );
+}
+
+@mixin button-base(
+  $padding: 10px 20px,
+  $radius: $radius-md,
+  $font-size: 14px
+) {
+  padding: $padding;
+  color: $white;
+  font-size: $font-size;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: $radius;
+  transition: all $transition-base $smooth-easing;
+}
+
+@mixin primary-button-shadow {
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(var(--color-primary-rgb), 0.4);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@mixin input-focus {
+  outline: none;
+  border-color: $primary-blue;
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+}
+
 /* 主容器 */
 .admin-panel {
   width: 100%;
+
+  h2 {
+    margin-bottom: 24px;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(
+      135deg,
+      $text-primary 0%,
+      $primary-blue 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
-
-/* 加载容器 - 液态玻璃风格 */
+/* 加载容器 */
 .loading-container {
-  text-align: center;
   padding: 60px 20px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 122, 255, 0.1),
-              inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  text-align: center;
+  background: var(--glass-70);
+  border: 1px solid var(--glass-30);
+  border-radius: $radius-xl;
+  box-shadow:
+    0 8px 32px rgba(var(--color-primary-rgb), 0.1),
+    inset 0 1px 0 var(--glass-50);
+
+  @include glass-blur(20px, 180%);
+
+  p {
+    color: $primary-blue;
+    font-size: 18px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 }
 
-.loading-container p {
-  color: #007aff;
-  font-size: 18px;
-  font-weight: 600;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* 权限拒绝 - 液态玻璃风格 */
+/* 权限拒绝 */
 .access-denied {
-  text-align: center;
   padding: 60px 20px;
+  text-align: center;
   background: rgba(255, 243, 205, 0.8);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 20px;
   border: 1px solid rgba(255, 193, 7, 0.3);
-  box-shadow: 0 8px 32px rgba(255, 193, 7, 0.2),
-              inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-radius: $radius-xl;
+  box-shadow:
+    0 8px 32px rgba(255, 193, 7, 0.2),
+    inset 0 1px 0 var(--glass-50);
+
+  @include glass-blur(20px, 180%);
+
+  h2 {
+    margin-bottom: 10px;
+    color: var(--color-warning-dark);
+    font-weight: 700;
+  }
+
+  button {
+    @include button-base(12px 24px);
+    @include primary-gradient;
+    @include primary-button-shadow;
+
+    display: block;
+    margin: 20px auto 0;
+  }
 }
 
-.access-denied h2 {
-  color: #856404;
-  margin-bottom: 10px;
-  font-weight: 700;
-}
-
-.access-denied button {
-  margin: 20px auto 0;
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: block;
-}
-
-.access-denied button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
-}
-
-/* 折叠工具栏 - 液态玻璃风格 */
+/* 折叠工具栏 */
 .collapsed-toolbar {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 16px;
-  padding: 12px 24px;
   margin-bottom: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08),
-              inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  padding: 12px 24px;
+  transition: all $transition-base $smooth-easing;
 
-.collapsed-toolbar:hover {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12),
-              inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  @include glass-panel;
+
+  &:hover {
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 var(--glass-50);
+  }
 }
 
 .toolbar-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-}
+  justify-content: space-between;
 
-.toolbar-content h3 {
-  margin: 0;
-  background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: 18px;
-  font-weight: 700;
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(
+      135deg,
+      $primary-blue 0%,
+      $primary-blue-dark 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 .btn-toggle {
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  @include button-base;
+  @include primary-gradient;
+  @include primary-button-shadow;
+
   white-space: nowrap;
 }
 
-.btn-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
-}
-
-.btn-toggle:active {
-  transform: translateY(0);
-}
-
-/* 配置面板 - 液态玻璃风格 */
+/* 配置面板 */
 .config-panel {
-  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  animation: fadeInUp 0.4s $smooth-easing;
 }
 
 /* 配置操作按钮 */
 .config-actions {
   display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
   flex-wrap: wrap;
+  gap: 12px;
   justify-content: center;
+  margin-bottom: 24px;
 }
 
 .btn-action-small {
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  @include button-base;
+  @include primary-gradient;
+  @include primary-button-shadow;
+
   position: relative;
   overflow: hidden;
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    content: "";
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--glass-30),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+
+  &.danger {
+    background: linear-gradient(
+      135deg,
+      $danger-red 0%,
+      $danger-red-dark 100%
+    );
+    box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3);
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+    }
+  }
 }
 
-.btn-action-small::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s;
-}
-
-.btn-action-small:hover::before {
-  left: 100%;
-}
-
-.btn-action-small:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
-}
-
-.btn-action-small:active {
-  transform: translateY(0);
-}
-
-.btn-action-small.danger {
-  background: linear-gradient(135deg, #ff3b30 0%, #c82333 100%);
-  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3);
-}
-
-.btn-action-small.danger:hover {
-  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
-}
-
-.admin-panel h2 {
-  background: linear-gradient(135deg, #1c1c1e 0%, #007aff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 24px;
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-}
-
-/* 配置区块 - 液态玻璃卡片 */
+/* 配置区块 */
 .config-section {
-
   margin-bottom: 20px;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08),
-              inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  transition: all $transition-base $smooth-easing;
 
-.config-section:hover {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12),
-              inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
-}
+  @include glass-panel;
 
-.config-section h3 {
-  margin-top: 0;
-  margin-bottom: 16px;
-  background: linear-gradient(135deg, #1c1c1e 0%, #007aff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: 20px;
-  font-weight: 700;
-}
+  &:hover {
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 var(--glass-50);
+    transform: translateY(-2px);
+  }
 
-.config-section label {
-  display: block;
-  margin-top: 5px;
-  font-weight: 600;
-  color: #1c1c1e;
-  font-size: 15px;
+  h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(
+      135deg,
+      $text-primary 0%,
+      $primary-blue 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  label {
+    display: block;
+    margin-top: 5px;
+    color: $text-primary;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  select {
+    flex: 1;
+    min-width: 250px;
+    max-width: 350px;
+    padding: 12px 16px;
+    font-size: 15px;
+    cursor: pointer;
+    background: var(--glass-90);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: $radius-md;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all $transition-base $smooth-easing;
+
+    @include glass-blur(10px, 100%);
+
+    &:hover {
+      border-color: $primary-blue;
+      box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.15);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $primary-blue;
+      box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
+    }
+  }
 }
 
 .input-group {
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 12px;
   align-items: center;
-}
-
-.config-section select {
-  flex: 1;
-  min-width: 250px;
-  max-width: 350px;
-  padding: 12px 16px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  font-size: 15px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-}
-
-.config-section select:hover {
-  border-color: #007aff;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
-}
-
-.config-section select:focus {
-  outline: none;
-  border-color: #007aff;
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
 }
 
 .custom-input {
@@ -906,272 +943,294 @@ onMounted(async () => {
   min-width: 250px;
   max-width: 350px;
   padding: 12px 16px;
-  border: 2px solid #007aff;
-  border-radius: 12px;
   font-size: 15px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.2);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  background: var(--glass-90);
+  border: 2px solid $primary-blue;
+  border-radius: $radius-md;
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.2);
+  transition: all $transition-base $smooth-easing;
 
-.custom-input:focus {
-  outline: none;
-  border-color: #0056b3;
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
-  transform: translateY(-2px);
+  @include glass-blur(10px, 100%);
+
+  &:focus {
+    outline: none;
+    border-color: $primary-blue-dark;
+    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.15);
+    transform: translateY(-2px);
+  }
 }
 
 /* 预设按钮组 */
 .preset-buttons {
-  margin-bottom: 16px;
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 12px;
   justify-content: center;
+  margin-bottom: 16px;
 }
 
 .btn-preset {
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #34c759 0%, #28a745 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 4px 16px rgba(52, 199, 89, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  @include button-base;
+
+  background: linear-gradient(
+    135deg,
+    $success-green 0%,
+    $success-green-dark 100%
+  );
+  box-shadow: 0 4px 16px rgba(var(--color-success-rgb), 0.3);
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(var(--color-success-rgb), 0.4);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
-.btn-preset:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(52, 199, 89, 0.4);
-}
-
-.btn-preset:active {
-  transform: translateY(0);
-}
-
-/* 表格容器 - 液态玻璃 */
+/* 表格容器 */
 .table-wrapper {
-  overflow-x: auto;
   max-height: 500px;
-  overflow-y: auto;
-  border-radius: 12px;
   margin-top: 16px;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  overflow-x: auto;
+  overflow-y: auto;
+  background: var(--glass-50);
+  border-radius: $radius-md;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  @include glass-blur(10px, 100%);
 }
 
 .column-config-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: transparent;
   font-size: 14px;
-}
+  background: transparent;
+  border-spacing: 0;
+  border-collapse: separate;
 
-.column-config-table th,
-.column-config-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  text-align: left;
-  white-space: nowrap;
-}
+  th,
+  td {
+    padding: 12px 16px;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
 
-.column-config-table th {
-  background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
-  color: white;
-  font-weight: 600;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    color: $white;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 
-.column-config-table th:first-child {
-  border-top-left-radius: 12px;
-}
+    @include primary-gradient;
 
-.column-config-table th:last-child {
-  border-top-right-radius: 12px;
-}
+    &:first-child {
+      border-top-left-radius: $radius-md;
+    }
 
-.column-config-table tbody tr {
-  background: rgba(255, 255, 255, 0.8);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+    &:last-child {
+      border-top-right-radius: $radius-md;
+    }
+  }
 
-.column-config-table tbody tr:hover {
-  background: rgba(0, 122, 255, 0.08);
+  tbody {
+    tr {
+      background: var(--glass-80);
+      transition: all $transition-base $smooth-easing;
+
+      &:hover {
+        background: rgba(var(--color-primary-rgb), 0.08);
+      }
+    }
+  }
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: $primary-blue;
+  }
 }
 
 .width-input {
   width: 80%;
   padding: 6px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.9);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--glass-90);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: $radius-sm;
+  transition: all $transition-base $smooth-easing;
+
+  &:focus {
+    @include input-focus;
+  }
 }
 
-.width-input:focus {
-  outline: none;
-  border-color: #007aff;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-}
-
-/* 筛选配置 - 液态玻璃 */
+/* 筛选配置 */
 .filter-config {
   margin-top: 20px;
   padding: 20px;
   background: rgba(233, 236, 239, 0.6);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--glass-30);
+  border-radius: $radius-md;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  @include glass-blur(20px, 180%);
+  
+  h4 {
+    margin: 0;
+    color: $text-dark;
+    font-size: 17px;
+    font-weight: 700;
+    transition: color $transition-base;
+  }
 }
 
 .filter-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  cursor: pointer;
-  user-select: none;
+  justify-content: space-between;
   padding: 0;
   margin-bottom: 16px;
-}
+  cursor: pointer;
+  user-select: none;
 
-.filter-header:hover h4 {
-  color: #007aff;
-}
-
-.filter-config h4 {
-  margin: 0;
-  color: #495057;
-  font-size: 17px;
-  font-weight: 700;
-  transition: color 0.3s;
+  &:hover {
+    h4 {
+      color: $primary-blue;
+    }
+  }
 }
 
 .btn-toggle-filter {
-  padding: 6px 12px;
-  background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  @include button-base(6px 12px, $radius-sm, 13px);
+  @include primary-gradient;
 
-.btn-toggle-filter:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.4);
+    transform: translateY(-1px);
+  }
 }
 
 .filter-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 12px;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn $transition-base ease;
 }
 
 .filter-item {
   display: flex;
-  align-items: center;
   gap: 12px;
+  align-items: center;
+
+  label {
+    min-width: 60px;
+    margin: 0;
+    color: $text-primary;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    background: var(--glass-90);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: $radius-sm;
+    transition: all $transition-base $smooth-easing;
+
+    @include glass-blur(10px, 100%);
+
+    &:focus {
+      @include input-focus;
+    }
+  }
 }
 
-.filter-item label {
-  min-width: 60px;
-  font-weight: 600;
-  font-size: 14px;
-  color: #1c1c1e;
-  margin: 0;
-}
-
-.filter-item input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.filter-item input:focus {
-  outline: none;
-  border-color: #007aff;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-}
-
-/* 显示表格按钮 - 超大主操作按钮 */
+/* 显示表格按钮 */
 .btn-show {
-  margin: 24px auto 0;
-  padding: 16px 40px;
-  background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
-  color: white;
-  border: none;
-  border-radius: 16px;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: 700;
-  box-shadow: 0 8px 32px rgba(0, 122, 255, 0.4);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  @include button-base(16px 40px, $radius-lg, 18px);
+  @include primary-gradient;
+
   position: relative;
-  overflow: hidden;
   display: block;
-}
+  margin: 24px auto 0;
+  overflow: hidden;
+  font-weight: 700;
+  box-shadow: 0 8px 32px rgba(var(--color-primary-rgb), 0.4);
+  transition: all 0.4s $smooth-easing;
 
-.btn-show::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.6s;
-}
+  &::before {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    content: "";
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--glass-30),
+      transparent
+    );
+    transition: left 0.6s;
+  }
 
-.btn-show:hover::before {
-  left: 100%;
-}
+  &:hover {
+    box-shadow: 0 12px 48px rgba(var(--color-primary-rgb), 0.5);
+    transform: translateY(-4px);
 
-.btn-show:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 48px rgba(0, 122, 255, 0.5);
-}
+    &::before {
+      left: 100%;
+    }
+  }
 
-.btn-show:active {
-  transform: translateY(-2px);
+  &:active {
+    transform: translateY(-2px);
+  }
 }
 
 /* 表格显示区域 */
 .table-display {
-  margin-top: 20px;
   width: 100%;
+  margin-top: 20px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 /* 响应式优化 */
 @media (max-width: 768px) {
-
   .config-section {
-    padding: 16px;
-    gap: 10px!important;
     flex-direction: column;
+    gap: 10px !important;
+    padding: 16px;
   }
 
   .filter-grid {
@@ -1186,8 +1245,10 @@ onMounted(async () => {
     max-width: 320px;
   }
 
-  .admin-panel h2 {
-    font-size: 24px;
+  .admin-panel {
+    h2 {
+      font-size: 24px;
+    }
   }
 }
 
@@ -1195,29 +1256,42 @@ onMounted(async () => {
 @media (prefers-color-scheme: dark) {
   .config-section {
     background: rgba(28, 28, 30, 0.7);
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--glass-10);
+
+    select,
+    label {
+      color: $white;
+    }
+
+    select {
+      background: rgba(44, 44, 46, 0.9);
+      border-color: var(--glass-20);
+    }
   }
 
-  .config-section select,
   .custom-input,
   .filter-item input,
   .width-input {
+    color: $white;
     background: rgba(44, 44, 46, 0.9);
-    color: white;
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--glass-20);
   }
 
   .config-section label,
   .filter-item label {
-    color: #f5f5f7;
+    color: var(--bg-light-gray);
   }
 
-  .column-config-table tbody tr {
-    background: rgba(28, 28, 30, 0.8);
-  }
+  .column-config-table {
+    tbody {
+      tr {
+        background: rgba(28, 28, 30, 0.8);
 
-  .column-config-table tbody tr:hover {
-    background: rgba(0, 122, 255, 0.2);
+        &:hover {
+          background: rgba(var(--color-primary-rgb), 0.2);
+        }
+      }
+    }
   }
 }
 </style>

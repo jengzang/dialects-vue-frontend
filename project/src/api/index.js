@@ -150,6 +150,7 @@ export {
   getVillageSpatialFeatures,
   getVillageSemanticStructure,
   getVillageNgrams,
+  fetchSubsetFilter,
   // 字頻統計
   getGlobalCharFrequency,
   getCharTendency,
@@ -158,6 +159,7 @@ export {
   getCharEmbeddingsList,
   getCharEmbeddingVector,
   getCharSimilarities,
+  fetchCharacterNetwork,
   getCharSignificanceByChar,
   getCharSignificanceByRegion,
   getCharSignificanceSummary,

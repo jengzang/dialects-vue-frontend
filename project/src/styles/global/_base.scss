@@ -1,20 +1,17 @@
-/* Phase 1 note:
-   Base element styles continue to come from ../_legacy.scss.
-   This file reserves the global base layer for later migration. */
-
+@use '@/styles/global/mixins' as *;
 .toggle-switch-base {
   position: relative;
   width: 50px;
   height: 30px;
   border-radius: 15px;
   border: none;
-  background: rgba(142, 142, 147, 0.3);
+  background: rgba(var(--text-secondary-rgb), 0.3);
   cursor: pointer;
   transition: background 0.3s ease;
 }
 
 .toggle-switch-base.active {
-  background: #007aff;
+  background: var(--color-primary);
 }
 
 .toggle-switch-slider-base {
@@ -23,9 +20,9 @@
   left: 3px;
   width: 24px;
   height: 24px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-full);
+  background: var(--switch-thumb-background);
+  box-shadow: var(--shadow-xs);
   transition: transform 0.3s ease;
 }
 
@@ -50,7 +47,7 @@
   position: absolute;
   cursor: pointer;
   inset: 0;
-  background-color: #ccc;
+  background-color: var(--border-gray);
   transition: 0.3s;
   border-radius: 22px;
 }
@@ -62,13 +59,13 @@
   width: 16px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background-color: var(--switch-thumb-background);
   transition: 0.3s;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
 }
 
 .input-switch-base input:checked + .input-switch-slider-base {
-  background-color: #007aff;
+  background-color: var(--color-primary);
 }
 
 .input-switch-base input:checked + .input-switch-slider-base::before {
@@ -79,11 +76,9 @@
   position: relative;
   width: 50px;
   height: 30px;
-  background-color: #ccc;
+  background-color: var(--border-gray);
   border-radius: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   transition: background-color 0.3s ease;
 }
 
@@ -91,9 +86,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
 }
 
 .custom-switch-slider-base::before {
@@ -103,11 +96,67 @@
   left: 2px;
   width: 26px;
   height: 26px;
-  background-color: white;
-  border-radius: 50%;
+  background-color: var(--switch-thumb-background);
+  border-radius: var(--radius-full);
   transition: all 0.3s ease;
 }
 
 .custom-switch-base.open .custom-switch-slider-base::before {
   transform: translateX(20px);
+}
+
+// == Base element styles (migrated from _legacy.scss) ==
+
+body {
+  margin: 0;
+  background: var(--bg-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--text-primary);
+  font-family: 'PingFang TC', 'PingFang SC', 'Microsoft YaHei', 'Segoe UI',
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+:lang(zh-CN) body,
+:lang(zh-CN) {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'PingFang TC', 'Segoe UI',
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+@media (min-width: 768px) {
+  body {
+    font-size: 18px;
+  }
+}
+
+textarea {
+  width: 100%;
+  height: 60px;
+  box-sizing: border-box;
+  font-family: monospace;
+  font-size: 13px;
+  margin-top: 0;
+  padding: 6px 10px;
+  resize: none;
+  border: 1px solid var(--border-gray);
+  border-radius: var(--radius-sm);
+  background: var(--bg-white);
+  min-width: 50px;
+  max-width: 600px;
+  transition: all 0.2s;
+}
+
+textarea:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.6);
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
 }

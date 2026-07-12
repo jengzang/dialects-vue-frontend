@@ -111,10 +111,11 @@ const {
 } = workspace
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .dialect-clustering-page {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 20px;
   padding: 16px;
   min-height: 100%;
@@ -137,7 +138,7 @@ const {
   .section-heading h3,
   .workspace-stage-head h2 {
     margin: 0;
-    color: #1d1d1f;
+    color: var(--text-primary);
   }
 
   .page-header p,
@@ -148,13 +149,13 @@ const {
   .task-message,
   .workspace-stage-head p {
     margin: 6px 0 0;
-    color: #51606f;
+    color: var(--text-slate);
     line-height: 1.55;
   }
 
   .stage-kicker {
     margin: 0;
-    color: #0b57d0;
+    color: var(--color-primary);
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -162,8 +163,7 @@ const {
   }
 
   .workspace-stage-shell {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 20px;
   }
 
@@ -193,11 +193,11 @@ const {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    border: 1px solid rgba(0, 122, 255, 0.18);
-    background: rgba(255, 255, 255, 0.72);
-    border-radius: 999px;
+    border: 1px solid rgba(var(--color-primary-rgb), 0.18);
+    background: var(--glass-70);
+    border-radius: var(--radius-pill);
     padding: 10px 14px;
-    color: #425466;
+    color: var(--text-dark);
     cursor: not-allowed;
   }
 
@@ -206,9 +206,9 @@ const {
   }
 
   .step-pill.active {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(224, 238, 255, 0.88));
-    color: #0b3d91;
-    border-color: rgba(0, 122, 255, 0.34);
+    background: linear-gradient(135deg, var(--glass-90), rgba(224, 238, 255, 0.88));
+    color: var(--text-deep);
+    border-color: rgba(var(--color-primary-rgb), 0.34);
   }
 
   .step-pill__index {
@@ -217,8 +217,8 @@ const {
     justify-content: center;
     width: 24px;
     height: 24px;
-    border-radius: 999px;
-    background: rgba(0, 122, 255, 0.12);
+    border-radius: var(--radius-pill);
+    background: rgba(var(--color-primary-rgb), 0.12);
     font-size: 12px;
     font-weight: 700;
   }
@@ -238,8 +238,7 @@ const {
   .groups-stack,
   .result-stack,
   .advanced-stack {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 20px;
   }
 
@@ -260,9 +259,9 @@ const {
   }
 
   .panel-alert--error {
-    background: rgba(255, 59, 48, 0.12);
-    border: 1px solid rgba(255, 59, 48, 0.18);
-    color: #b42318;
+    background: rgba(var(--color-error-light-rgb), 0.12);
+    border: 1px solid rgba(var(--color-error-light-rgb), 0.18);
+    color: var(--color-error-dark);
   }
 
   .location-section,
@@ -284,7 +283,7 @@ const {
     display: inline-flex;
     gap: 10px;
     align-items: center;
-    color: #334155;
+    color: var(--text-dark);
   }
 
   .form-grid {
@@ -295,24 +294,23 @@ const {
   }
 
   .field {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 8px;
   }
 
   .field > span {
-    color: #334155;
+    color: var(--text-dark);
     font-weight: 600;
   }
 
   .field input,
   .field textarea {
     width: 100%;
-    border: 1px solid rgba(148, 163, 184, 0.28);
+    border: 1px solid rgba(var(--text-slate-light-rgb), 0.28);
     border-radius: 14px;
     padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.82);
-    color: #1f2937;
+    background: var(--glass-80);
+    color: var(--text-deep);
   }
 
   .field textarea {
@@ -321,24 +319,22 @@ const {
 
   .source-section {
     margin-top: 16px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 14px;
   }
 
   .source-hint,
   .preview-empty {
     margin: 0;
-    color: #64748b;
+    color: var(--text-tertiary);
   }
 
   .preview-box {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 10px;
     padding: 12px;
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.54);
+    background: var(--glass-50);
   }
 
   .preview-chip-list {
@@ -349,9 +345,9 @@ const {
 
   .preview-chip {
     padding: 6px 10px;
-    border-radius: 999px;
-    background: rgba(0, 122, 255, 0.12);
-    color: #0b57d0;
+    border-radius: var(--radius-pill);
+    background: rgba(var(--color-primary-rgb), 0.12);
+    color: var(--color-primary);
     font-size: 13px;
   }
 
@@ -368,20 +364,19 @@ const {
   }
 
   .summary-card {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 10px;
   }
 
   .summary-card__label {
-    color: #475569;
+    color: var(--text-slate);
     font-size: 14px;
   }
 
   .summary-card strong,
   .performance-row strong,
   .task-row strong {
-    color: #0f172a;
+    color: var(--text-deep);
     font-size: 20px;
   }
 
@@ -401,29 +396,29 @@ const {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #0f172a;
+    color: var(--text-deep);
   }
 
   .status-badge {
     padding: 6px 10px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     font-size: 13px;
     font-weight: 700;
   }
 
   .status-badge.is-completed {
-    background: rgba(52, 199, 89, 0.12);
-    color: #207227;
+    background: rgba(var(--color-success-rgb), 0.12);
+    color: var(--color-success);
   }
 
   .status-badge.is-pending {
-    background: rgba(0, 122, 255, 0.12);
-    color: #0b57d0;
+    background: rgba(var(--color-primary-rgb), 0.12);
+    color: var(--color-primary);
   }
 
   .status-badge.is-idle {
     background: rgba(100, 116, 139, 0.16);
-    color: #475569;
+    color: var(--text-slate);
   }
 
   .quick-run-summary {
@@ -433,11 +428,11 @@ const {
     gap: 16px;
     align-items: center;
     font-weight: 700;
-    color: #1d1d1f;
+    color: var(--text-primary);
   }
 
   .quick-run-summary__label {
-    color: #0b57d0;
+    color: var(--color-primary);
   }
 
   .table-scroll {
@@ -454,12 +449,12 @@ const {
   .result-table td {
     text-align: left;
     padding: 12px 10px;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-    color: #334155;
+    border-bottom: 1px solid rgba(var(--text-slate-light-rgb), 0.18);
+    color: var(--text-dark);
   }
 
   .result-table th {
-    color: #0f172a;
+    color: var(--text-deep);
     font-weight: 700;
   }
 
@@ -471,26 +466,25 @@ const {
 
   .diagnostic-card {
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.66);
+    background: var(--glass-70);
     padding: 14px;
   }
 
   .diagnostic-card h4 {
     margin: 0 0 10px;
-    color: #0f172a;
+    color: var(--text-deep);
   }
 
   .diagnostic-card pre {
     margin: 0;
     white-space: pre-wrap;
     word-break: break-word;
-    color: #475569;
+    color: var(--text-slate);
     font-size: 12px;
   }
 
   .performance-list {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 10px;
     margin-top: 12px;
   }
@@ -503,8 +497,7 @@ const {
   }
 
   .task-status-card {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 12px;
   }
 
@@ -517,14 +510,14 @@ const {
   .progress-track {
     flex: 1;
     height: 10px;
-    border-radius: 999px;
-    background: rgba(148, 163, 184, 0.22);
+    border-radius: var(--radius-pill);
+    background: rgba(var(--text-slate-light-rgb), 0.22);
     overflow: hidden;
   }
 
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #0a84ff, #5ac8fa);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-cyan));
     border-radius: inherit;
   }
 }

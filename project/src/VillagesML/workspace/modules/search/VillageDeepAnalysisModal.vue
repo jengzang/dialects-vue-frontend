@@ -183,11 +183,13 @@ const loadCompleteData = async () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .village-modal-title {
   font-size: 18px;
   font-weight: 650;
-  color: #333;
+  color: var(--text-dark);
 }
 
 /* Body */
@@ -200,8 +202,8 @@ const loadCompleteData = async () => {
 .info-section {
   margin-bottom: 24px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
+  background: var(--glass-60);
+  border-radius: var(--radius-md);
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -228,8 +230,7 @@ const loadCompleteData = async () => {
 
 /* Analysis Panels */
 .analysis-panels {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 

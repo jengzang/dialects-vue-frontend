@@ -57,7 +57,7 @@ function update(key, value) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .section-title {
   font-size: 14px;
   font-weight: 600;

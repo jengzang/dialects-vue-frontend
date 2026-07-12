@@ -6,7 +6,8 @@
     "created": "创建成功",
     "copied": "复制成功",
     "languageChanged": "语言切换成功",
-    "interfaceModeChanged": "界面模式已更新"
+    "interfaceModeChanged": "界面模式已更新",
+    "colorThemeChanged": "主题配色已更新"
   },
   "error": {
     "saveFailed": "保存失败",

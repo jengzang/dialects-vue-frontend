@@ -56,7 +56,7 @@
           type="number"
           min="1"
           placeholder="最小頻次 (≥1)"
-          class="number-input"
+          class="vml-number-input"
         />
         <input
           v-model.number="topK"
@@ -64,7 +64,7 @@
           min="1"
           max="1000"
           placeholder="返回數量 (1-1000)"
-          class="number-input"
+          class="vml-number-input"
         />
         <button
           class="query-button"
@@ -75,7 +75,7 @@
         </button>
       </div>
 
-      <div v-if="loadingFrequency" class="loading-state">
+      <div v-if="loadingFrequency" class="vml-loading"">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -150,7 +150,7 @@
         </button>
       </div>
 
-      <div v-if="loadingPatterns" class="loading-state">
+      <div v-if="loadingPatterns" class="vml-loading"">
         <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
 
@@ -292,7 +292,7 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .ngram-explore-page {
   padding: 12px;
   max-width: 1400px;
@@ -308,6 +308,21 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   flex-direction: column;
+  gap: 12px;
+}
+
+.frequency-section h2,
+.pattern-section h2 {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.controls,
+.search-controls {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  width: 100%;
 }
 
 .stats-banner {
@@ -316,15 +331,14 @@ onMounted(async () => {
   align-items: center;
   gap: 8px 0;
   padding: 10px 14px;
-  background: rgba(74, 144, 226, 0.08);
-  border: 1px solid rgba(74, 144, 226, 0.25);
-  border-radius: 10px;
+  background: rgba(var(--vml-blue-rgb), 0.08);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.25);
+  border-radius: var(--radius-md);
   font-size: 13px;
 }
 
 .banner-item {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   padding: 0 14px;
 }
@@ -341,13 +355,13 @@ onMounted(async () => {
 }
 
 .banner-value.highlight {
-  color: var(--color-primary-hover, #4a90e2);
+  color: var(--color-primary-hover, var(--vml-blue));
 }
 
 .banner-divider {
   width: 1px;
   height: 32px;
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .banner-tip {
@@ -358,35 +372,16 @@ onMounted(async () => {
   padding-left: 12px;
 }
 
-.frequency-section h2,
-.pattern-section h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: var(--text-primary);
-}
-
-.controls,
-.search-controls {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.select-input,
-.number-input,
+.vml-number-input,
 .pattern-input {
   padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
 }
 
-.select-input {
-  width: 150px;
-}
-
-.number-input {
+.vml-number-input {
   width: 150px;
 }
 
@@ -394,21 +389,15 @@ onMounted(async () => {
   flex: 1;
 }
 
-.loading-state {
-  text-align: center;
-  padding: 40px 20px;
-}
-
-
 
 .frequency-results-wrapper {
   overflow-x: auto;
   width: 100%;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .frequency-results {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   min-width: 600px;
   width: 100%;
@@ -424,23 +413,23 @@ onMounted(async () => {
 }
 
 .results-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .result-row {
-  background: rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--glass-30);
+  border-bottom: 1px solid var(--bg-hover);
   transition: background 0.3s ease;
 }
 
 .result-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .result-row.top-10 {
-  background: rgba(243, 156, 18, 0.1);
+  background: rgba(var(--color-warning-rgb), 0.1);
 }
 
 .col-ngram {
@@ -473,36 +462,36 @@ onMounted(async () => {
 
 .position-badge {
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 11px;
   font-weight: 500;
   display: inline-block;
 }
 
 .position-all {
-  background: rgba(149, 165, 166, 0.2);
-  color: #7f8c8d;
+  background: rgba(var(--text-secondary-rgb), 0.2);
+  color: var(--text-secondary);
 }
 
 .position-prefix {
-  background: rgba(52, 152, 219, 0.2);
-  color: #2980b9;
+  background: rgba(var(--vml-blue-medium-rgb), 0.2);
+  color: var(--vml-blue-darkest);
 }
 
 .position-middle {
-  background: rgba(155, 89, 182, 0.2);
-  color: #8e44ad;
+  background: rgba(var(--color-purple-light-rgb), 0.2);
+  color: var(--color-purple);
 }
 
 .position-suffix {
-  background: rgba(46, 204, 113, 0.2);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .bar-container {
   height: 20px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
+  background: var(--glass-50);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -513,30 +502,28 @@ onMounted(async () => {
 }
 
 .pattern-results {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   justify-content: center;
 }
 
 .pattern-count {
   padding: 12px;
-  background: rgba(74, 144, 226, 0.1);
-  border-radius: 8px;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border-radius: var(--radius-sm2);
   margin-bottom: 16px;
   color: var(--text-primary);
   font-weight: 500;
 }
 
 .pattern-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
 .pattern-item {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
   display: grid;
   grid-template-columns: 150px 100px 100px 1fr;
   gap: 16px;
@@ -577,38 +564,51 @@ onMounted(async () => {
 
 .example-tag {
   padding: 4px 12px;
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
 }
 
 .type-badge {
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 11px;
   font-weight: 500;
   display: inline-block;
 }
 
 .type-prefix {
-  background: rgba(52, 152, 219, 0.2);
-  color: #2980b9;
+  background: rgba(var(--vml-blue-medium-rgb), 0.2);
+  color: var(--vml-blue-darkest);
 }
 
 .type-suffix {
-  background: rgba(46, 204, 113, 0.2);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .type-middle {
-  background: rgba(155, 89, 182, 0.2);
-  color: #8e44ad;
+  background: rgba(var(--color-purple-light-rgb), 0.2);
+  color: var(--color-purple);
 }
 
 .type-all {
-  background: rgba(149, 165, 166, 0.2);
-  color: #7f8c8d;
+  background: rgba(var(--text-secondary-rgb), 0.2);
+  color: var(--text-secondary);
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .frequency-section,
+  .pattern-section {
+    flex-direction: row;
+  }
+
+  .controls,
+  .search-controls {
+    width: auto;
+    flex: 1;
+  }
 }
 
 @media (max-width: 768px) {

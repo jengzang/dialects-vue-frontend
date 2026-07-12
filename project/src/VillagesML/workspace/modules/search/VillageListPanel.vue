@@ -1,7 +1,7 @@
 <template>
   <div class="vml-glass-panel">
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>載入中...</p>
     </div>
@@ -125,13 +125,12 @@ const changePage = (page) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .vml-glass-panel {
   padding: 20px;
   min-height: 400px;
 }
 
-.loading-state,
 .empty-state {
   min-height: 300px;
   color: var(--text-primary);
@@ -143,8 +142,7 @@ const changePage = (page) => {
 }
 
 .results-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
@@ -153,7 +151,7 @@ const changePage = (page) => {
   justify-content: space-between;
   align-items: center;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid var(--glass-30);
 }
 
 .results-count {
@@ -177,14 +175,14 @@ const changePage = (page) => {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.3);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+  background: var(--glass-30);
+  border-bottom: 2px solid var(--glass-50);
 }
 
 .villages-table td {
   padding: 12px;
   font-size: 13px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid var(--glass-20);
 }
 
 .villages-table tbody tr {
@@ -192,7 +190,7 @@ const changePage = (page) => {
 }
 
 .villages-table tbody tr:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .village-name {
@@ -203,8 +201,8 @@ const changePage = (page) => {
 .analyze-button {
   padding: 6px 12px;
   border: none;
-  border-radius: 6px;
-  background: rgba(74, 144, 226, 0.2);
+  border-radius: var(--radius-sm);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
   font-size: 12px;
   cursor: pointer;
@@ -213,7 +211,7 @@ const changePage = (page) => {
 }
 
 .analyze-button:hover {
-  background: rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.3);
   transform: translateY(-1px);
 }
 
@@ -227,9 +225,9 @@ const changePage = (page) => {
 
 .page-button {
   padding: 8px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-sm2);
+  background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 13px;
   cursor: pointer;
@@ -237,13 +235,12 @@ const changePage = (page) => {
 }
 
 .page-button:hover:not(:disabled) {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   border-color: var(--color-primary);
 }
 
 .page-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .page-info {

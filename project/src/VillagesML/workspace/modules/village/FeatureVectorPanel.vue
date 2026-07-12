@@ -2,7 +2,7 @@
   <div class="vml-glass-panel">
     <h3 class="panel-title">🎯 特徵向量</h3>
 
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>加載中...</p>
     </div>
@@ -49,7 +49,7 @@
             v-for="(value, index) in data.feature_vector.slice(0, 50)"
             :key="index"
             class="vector-bar"
-            :style="{ height: `${Math.abs(value) * 100}%`, background: value >= 0 ? 'var(--color-primary)' : '#e74c3c' }"
+            :style="{ height: `${Math.abs(value) * 100}%`, background: value >= 0 ? 'var(--color-primary)' : 'var(--color-error)' }"
             :title="`維度 ${index}: ${value.toFixed(2)}`"
           ></div>
         </div>
@@ -87,14 +87,9 @@ const formatValue = (value) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .feature-content {
   animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .feature-types {
@@ -106,8 +101,8 @@ const formatValue = (value) => {
 
 .feature-type {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
 }
 
 .feature-type h4 {
@@ -118,8 +113,7 @@ const formatValue = (value) => {
 }
 
 .feature-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -127,8 +121,8 @@ const formatValue = (value) => {
   display: flex;
   justify-content: space-between;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 6px;
+  background: var(--glass-50);
+  border-radius: var(--radius-sm);
   font-size: 14px;
 }
 
@@ -143,8 +137,8 @@ const formatValue = (value) => {
 
 .vector-visualization {
   padding: 20px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
 }
 
 .vector-visualization h4 {
@@ -159,8 +153,8 @@ const formatValue = (value) => {
   height: 100px;
   gap: 2px;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
+  background: var(--glass-50);
+  border-radius: var(--radius-sm2);
 }
 
 .vector-bar {

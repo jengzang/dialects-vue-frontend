@@ -310,8 +310,8 @@ const tableData = computed(() => {
 <template>
   <div class="leaderboard-container">
     <div v-if="loading" class="loading-container">
-      <div class="ui-loading--page" aria-hidden="true"></div>
-      <p>{{ t('user.leaderboard.loading') }}</p>
+      <!-- <div class="ui-loading--page" aria-hidden="true"></div>
+      <p>{{ t('user.leaderboard.loading') }}</p> -->
     </div>
 
     <div v-else-if="error" class="error-container">
@@ -337,14 +337,14 @@ const tableData = computed(() => {
             <span class="metric-icon">{{ metric.icon }}</span>
             <span class="metric-label">
               {{ metric.label }}
-              <HelpIcon
+              <!-- <HelpIcon
                 v-if="metric.tooltip"
                 :content="metric.tooltip"
                 size="md"
                 fontSize="16px"
                 iconColor="#c7254e"
                 trigger="both"
-              />
+              /> -->
             </span>
           </div>
 
@@ -382,13 +382,13 @@ const tableData = computed(() => {
                 <th class="category-column">{{ t('user.leaderboard.columns.category') }}</th>
                 <th>{{ t('user.leaderboard.columns.rank') }}</th>
                 <th>{{ t('user.leaderboard.columns.count') }}</th>
-                <th>{{ t('user.leaderboard.columns.gap') }}</th>
-                <th>{{ t('user.leaderboard.columns.firstPlace') }}</th>
+                <th class="col-gap">{{ t('user.leaderboard.columns.gap') }}</th>
+                <th class="col-first-place">{{ t('user.leaderboard.columns.firstPlace') }}</th>
                 <th>{{ t('user.leaderboard.columns.metric') }}</th>
                 <th>{{ t('user.leaderboard.columns.rank') }}</th>
                 <th>{{ t('user.leaderboard.columns.count') }}</th>
-                <th>{{ t('user.leaderboard.columns.gap') }}</th>
-                <th>{{ t('user.leaderboard.columns.firstPlace') }}</th>
+                <th class="col-gap">{{ t('user.leaderboard.columns.gap') }}</th>
+                <th class="col-first-place">{{ t('user.leaderboard.columns.firstPlace') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -396,17 +396,28 @@ const tableData = computed(() => {
                 <tr
                   v-if="!row.isCategorySummary"
                   class="data-row"
-                  :class="{
-                    'first-place': row.isFirstPlace,
-                    'second-place': row.isSecondPlace,
-                    'third-place': row.isThirdPlace
-                  }"
                 >
                   <template v-if="row.isFirstEndpointInCategory">
-                    <td :rowspan="row.categoryEndpointCount" class="category-cell">
+                    <td
+                      :rowspan="row.categoryEndpointCount"
+                      class="category-cell"
+                      :class="{
+                        gold: row.categorySummary.isFirstPlace,
+                        silver: row.categorySummary.isSecondPlace,
+                        bronze: row.categorySummary.isThirdPlace
+                      }"
+                    >
                       {{ row.categoryIcon }} {{ row.categoryName }}
                     </td>
-                    <td :rowspan="row.categoryEndpointCount" class="rank category-data">
+                    <td
+                      :rowspan="row.categoryEndpointCount"
+                      class="rank category-data"
+                      :class="{
+                        'category-gold': row.categorySummary.isFirstPlace,
+                        'category-silver': row.categorySummary.isSecondPlace,
+                        'category-bronze': row.categorySummary.isThirdPlace
+                      }"
+                    >
                       <span
                         class="rank-badge"
                         :class="{
@@ -418,18 +429,49 @@ const tableData = computed(() => {
                         {{ getRankLabel(row.categorySummary.rank) }}
                       </span>
                     </td>
-                    <td :rowspan="row.categoryEndpointCount" class="value category-data">
+                    <td
+                      :rowspan="row.categoryEndpointCount"
+                      class="value category-data"
+                      :class="{
+                        'category-gold': row.categorySummary.isFirstPlace,
+                        'category-silver': row.categorySummary.isSecondPlace,
+                        'category-bronze': row.categorySummary.isThirdPlace
+                      }"
+                    >
                       {{ row.categorySummary.value }}
                     </td>
-                    <td :rowspan="row.categoryEndpointCount" class="gap category-data">
+                    <td
+                      :rowspan="row.categoryEndpointCount"
+                      class="gap category-data"
+                      :class="{
+                        'category-gold': row.categorySummary.isFirstPlace,
+                        'category-silver': row.categorySummary.isSecondPlace,
+                        'category-bronze': row.categorySummary.isThirdPlace
+                      }"
+                    >
                       {{ row.categorySummary.gap }}
                     </td>
-                    <td :rowspan="row.categoryEndpointCount" class="first-place-value category-data">
+                    <td
+                      :rowspan="row.categoryEndpointCount"
+                      class="first-place-value category-data"
+                      :class="{
+                        'category-gold': row.categorySummary.isFirstPlace,
+                        'category-silver': row.categorySummary.isSecondPlace,
+                        'category-bronze': row.categorySummary.isThirdPlace
+                      }"
+                    >
                       {{ row.categorySummary.firstPlace }}
                     </td>
                   </template>
 
-                  <td class="metric-name">
+                  <td
+                    class="metric-name"
+                    :class="{
+                      'first-place': row.isFirstPlace,
+                      'second-place': row.isSecondPlace,
+                      'third-place': row.isThirdPlace
+                    }"
+                  >
                     {{ row.label }}
                     <HelpIcon
                       v-if="row.tooltip"
@@ -439,7 +481,14 @@ const tableData = computed(() => {
                       trigger="both"
                     />
                   </td>
-                  <td class="rank">
+                  <td
+                    class="rank"
+                    :class="{
+                      'first-place': row.isFirstPlace,
+                      'second-place': row.isSecondPlace,
+                      'third-place': row.isThirdPlace
+                    }"
+                  >
                     <span
                       class="rank-badge"
                       :class="{
@@ -451,9 +500,30 @@ const tableData = computed(() => {
                       {{ getRankLabel(row.rank) }}
                     </span>
                   </td>
-                  <td class="value">{{ row.value }}</td>
-                  <td class="gap">{{ row.gap }}</td>
-                  <td class="first-place-value">{{ row.firstPlace }}</td>
+                  <td
+                    class="value"
+                    :class="{
+                      'first-place': row.isFirstPlace,
+                      'second-place': row.isSecondPlace,
+                      'third-place': row.isThirdPlace
+                    }"
+                  >{{ row.value }}</td>
+                  <td
+                    class="gap"
+                    :class="{
+                      'first-place': row.isFirstPlace,
+                      'second-place': row.isSecondPlace,
+                      'third-place': row.isThirdPlace
+                    }"
+                  >{{ row.gap }}</td>
+                  <td
+                    class="first-place-value"
+                    :class="{
+                      'first-place': row.isFirstPlace,
+                      'second-place': row.isSecondPlace,
+                      'third-place': row.isThirdPlace
+                    }"
+                  >{{ row.firstPlace }}</td>
                 </tr>
               </template>
             </tbody>
@@ -465,8 +535,8 @@ const tableData = computed(() => {
                 <th>{{ t('user.leaderboard.columns.metric') }}</th>
                 <th>{{ t('user.leaderboard.columns.rank') }}</th>
                 <th>{{ t('user.leaderboard.columns.count') }}</th>
-                <th>{{ t('user.leaderboard.columns.gap') }}</th>
-                <th>{{ t('user.leaderboard.columns.firstPlace') }}</th>
+                <th class="col-gap">{{ t('user.leaderboard.columns.gap') }}</th>
+                <th class="col-first-place">{{ t('user.leaderboard.columns.firstPlace') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -548,7 +618,43 @@ const tableData = computed(() => {
   </div>
 </template>
 
-<style scoped>
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary: var(--color-primary);
+$primary-dark: var(--color-primary-hover);
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-secondary);
+$danger: var(--color-error-light);
+
+$gold: var(--color-gold);
+$gold-text: #d4af37;
+$silver: var(--color-silver);
+$bronze: var(--color-bronze);
+
+@mixin glass($blur: 40px, $saturate: 180%) {
+  backdrop-filter: blur($blur) saturate($saturate);
+  -webkit-backdrop-filter: blur($blur) saturate($saturate);
+}
+
+@mixin gradient-text($from, $to) {
+  color: $from;
+  background: linear-gradient(135deg, $from, $to);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@mixin rank-row-background($from, $to) {
+  background: linear-gradient(
+    90deg,
+    rgba($from, 0.15),
+    rgba($to, 0.08)
+  );
+}
+
 .leaderboard-container {
   max-width: 1000px;
   margin: 0 auto;
@@ -557,31 +663,31 @@ const tableData = computed(() => {
 
 .loading-container,
 .error-container {
-  text-align: center;
   padding: 40px 20px;
+  text-align: center;
 }
 
-
-
-.error-container .err {
-  color: #ff3b30;
-  margin-bottom: 20px;
+.error-container {
+  .err {
+    margin-bottom: 20px;
+    color: $danger;
+  }
 }
 
 .retry-btn {
   padding: 10px 24px;
-  background: #007aff;
+  background: $primary;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 16px;
   transition: all 0.3s ease;
-}
 
-.retry-btn:hover {
-  background: #0051d5;
-  transform: translateY(-2px);
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
 }
 
 .leaderboard-content {
@@ -601,15 +707,13 @@ const tableData = computed(() => {
 }
 
 .page-title {
+  margin: 12px;
   font-size: 28px;
   font-weight: 700;
-  color: #1d1d1f;
-  margin: 12px;
   text-align: center;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+
+  @include gradient-text($primary, $primary-dark);
 }
 
 .top-metrics-cards {
@@ -619,176 +723,259 @@ const tableData = computed(() => {
   margin-bottom: 32px;
 }
 
-.metric-card {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 8px 32px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
-  border: 0.5px solid rgba(255, 255, 255, 0.8);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+.metric {
+  &-card {
+    padding: 24px;
+    background: var(--glass-70);
+    @include glass;
+    border: 0.5px solid var(--glass-80);
+    border-radius: var(--radius-xl);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      0 8px 32px rgba(0, 0, 0, 0.08),
+      inset 0 0 0 1px var(--glass-90);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-.metric-card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.06),
-    0 12px 40px rgba(0, 0, 0, 0.12);
-}
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.06),
+        0 12px 40px rgba(0, 0, 0, 0.12);
+    }
 
-.metric-card.first-place {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.08));
-  border-left: 4px solid #ffd700;
-}
+    &.first-place {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--color-gold-rgb), 0.15),
+        rgba(var(--color-gold-rgb), 0.08)
+      );
+      border-left: 4px solid $gold;
+    }
 
-.metric-card.second-place {
-  background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(224, 224, 224, 0.08));
-  border-left: 4px solid #c0c0c0;
-}
+    &.second-place {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--color-silver-rgb), 0.15),
+        rgba(224, 224, 224, 0.08)
+      );
+      border-left: 4px solid $silver;
+    }
 
-.metric-card.third-place {
-  background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(255, 160, 122, 0.08));
-  border-left: 4px solid #cd7f32;
-}
+    &.third-place {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--color-bronze-rgb), 0.15),
+        rgba(255, 160, 122, 0.08)
+      );
+      border-left: 4px solid $bronze;
+    }
+  }
 
-.metric-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
+  &-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
 
-.metric-icon {
-  font-size: 24px;
-}
+  &-icon {
+    font-size: 24px;
+  }
 
-.metric-label {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1d1d1f;
-  letter-spacing: -0.01em;
-}
+  &-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-primary;
+    letter-spacing: -0.01em;
+  }
 
-.metric-rank {
-  font-size: 36px;
-  font-weight: 700;
-  color: #007aff;
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+  &-rank {
+    font-size: 36px;
+    font-weight: 700;
 
-.metric-rank.gold {
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+    @include gradient-text($primary, $primary-dark);
 
-.metric-rank.silver {
-  background: linear-gradient(135deg, #c0c0c0, #e0e0e0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
-}
+    &.gold {
+      @include gradient-text($gold, #ffed4e);
+    }
 
-.metric-rank.bronze {
-  background: linear-gradient(135deg, #cd7f32, #ffab73);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+    &.silver {
+      @include gradient-text($silver, var(--border-light-gray));
 
-.metric-value {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1d1d1f;
-}
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+    }
 
-.metric-details {
-  font-size: 14px;
-  color: #86868b;
-  line-height: 1.6;
-}
+    &.bronze {
+      @include gradient-text($bronze, #ffab73);
+    }
+  }
 
-.metric-gap {
-  color: #ff9500;
-  font-weight: 500;
-}
+  &-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: $text-primary;
+  }
 
-.metric-first {
-  color: #86868b;
+  &-details {
+    font-size: 14px;
+    line-height: 1.6;
+    color: $text-secondary;
+  }
+
+  &-gap {
+    font-weight: 500;
+    color: var(--color-warning);
+  }
+
+  &-first {
+    color: $text-secondary;
+  }
+
+  &-name {
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
 }
 
 .table-wrapper {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-radius: 20px;
   padding: 20px;
+  background: var(--glass-70);
+  @include glass;
+  border: 0.5px solid var(--glass-80);
+  border-radius: var(--radius-xl);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 8px 32px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
-  border: 0.5px solid rgba(255, 255, 255, 0.8);
+    inset 0 0 0 1px var(--glass-90);
 }
 
 .table-container {
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(20px);
-  border-radius: 12px;
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  background: var(--glass-50);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 0 1px var(--glass-60);
 }
 
 .rankings-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(247, 247, 247, 0.95);
+    @include glass(20px);
+  }
+
+  th {
+    padding: 14px 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    white-space: nowrap;
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: $text-secondary;
+  }
 }
 
-.rankings-table thead {
-  position: sticky;
-  top: 0;
-  background: rgba(247, 247, 247, 0.95);
-  backdrop-filter: blur(20px) saturate(180%);
-  z-index: 10;
+.col-gap,
+.col-first-place {
+  padding: 6px 8px !important;
+  font-size: 12px !important;
 }
 
-.rankings-table th {
-  padding: 14px 12px;
-  text-align: left;
-  font-weight: 600;
-  font-size: 13px;
-  white-space: nowrap;
-  color: #86868b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
+.category {
+  &-column {
+    width: 100px;
+  }
 
-.category-column {
-  width: 100px;
-}
+  &-cell {
+    padding: 12px 8px;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--color-primary-rgb), 0.12),
+      rgba(var(--color-primary-rgb), 0.06)
+    );
+    border-right: 2px solid rgba(var(--color-primary-rgb), 0.3);
+    vertical-align: middle;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: $primary;
 
-.category-cell {
-  font-weight: 600;
-  font-size: 14px;
-  color: #007aff;
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.12), rgba(0, 122, 255, 0.06));
-  border-right: 2px solid rgba(0, 122, 255, 0.3);
-  vertical-align: middle;
-  text-align: center;
-  letter-spacing: -0.01em;
-  padding: 12px 8px;
-}
+    &.gold {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--color-gold-rgb), 0.18),
+        rgba(var(--color-gold-rgb), 0.08)
+      );
+      border-right-color: rgba(var(--color-gold-rgb), 0.4);
+      color: #b8860b;
+    }
 
-.category-data {
-  background: linear-gradient(90deg, rgba(0, 122, 255, 0.06), rgba(0, 122, 255, 0.03));
-  font-weight: 600;
-  border-right: 1px solid rgba(0, 122, 255, 0.15);
+    &.silver {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--color-silver-rgb), 0.18),
+        rgba(var(--color-silver-rgb), 0.08)
+      );
+      border-right-color: rgba(var(--color-silver-rgb), 0.4);
+      color: #5a6c6e;
+    }
+
+    &.bronze {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--color-bronze-rgb), 0.18),
+        rgba(var(--color-bronze-rgb), 0.08)
+      );
+      border-right-color: rgba(var(--color-bronze-rgb), 0.4);
+      color: #8b5a2b;
+    }
+  }
+
+  &-data {
+    background: linear-gradient(
+      90deg,
+      rgba(var(--color-primary-rgb), 0.06),
+      rgba(var(--color-primary-rgb), 0.03)
+    );
+    border-right: 1px solid rgba(var(--color-primary-rgb), 0.15);
+    font-weight: 600;
+
+    &.category-gold {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-gold-rgb), 0.12),
+        rgba(var(--color-gold-rgb), 0.05)
+      );
+      border-right-color: rgba(var(--color-gold-rgb), 0.3);
+    }
+
+    &.category-silver {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-silver-rgb), 0.12),
+        rgba(var(--color-silver-rgb), 0.05)
+      );
+      border-right-color: rgba(var(--color-silver-rgb), 0.3);
+    }
+
+    &.category-bronze {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-bronze-rgb), 0.12),
+        rgba(var(--color-bronze-rgb), 0.05)
+      );
+      border-right-color: rgba(var(--color-bronze-rgb), 0.3);
+    }
+  }
 }
 
 .desktop-table {
@@ -800,137 +987,237 @@ const tableData = computed(() => {
 }
 
 .data-row {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-}
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-.data-row.category-summary {
-  background: linear-gradient(90deg, rgba(0, 122, 255, 0.08), rgba(0, 122, 255, 0.04));
-  font-weight: 600;
-}
+  &:hover {
+    background: transparent;
+  }
 
-.data-row.category-summary .metric-name {
-  color: #007aff;
-  font-weight: 600;
-}
+  td {
+    padding: 12px;
+    font-size: 15px;
+    color: $text-primary;
 
-.data-row:hover {
-  background: linear-gradient(90deg, rgba(0, 122, 255, 0.08), rgba(0, 122, 255, 0.04));
-  transform: translateX(2px);
-}
+    &.first-place {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-gold-rgb), 0.15),
+        rgba(var(--color-gold-rgb), 0.08)
+      );
+    }
 
-.data-row.category-summary:hover {
-  background: linear-gradient(90deg, rgba(0, 122, 255, 0.12), rgba(0, 122, 255, 0.06));
-}
+    &.second-place {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-silver-rgb), 0.15),
+        rgba(224, 224, 224, 0.08)
+      );
+    }
 
-.data-row.first-place {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.08));
-  border-left: 3px solid #ffd700;
-}
+    &.third-place {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-bronze-rgb), 0.15),
+        rgba(255, 160, 122, 0.08)
+      );
+    }
 
-.data-row.first-place:hover {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.12));
-}
+    &.metric-name {
+      &.first-place {
+        border-left: 3px solid $gold;
+      }
 
-.data-row.second-place {
-  background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), rgba(224, 224, 224, 0.08));
-  border-left: 3px solid #c0c0c0;
-}
+      &.second-place {
+        border-left: 3px solid $silver;
+      }
 
-.data-row.second-place:hover {
-  background: linear-gradient(90deg, rgba(192, 192, 192, 0.2), rgba(192, 192, 192, 0.12));
-}
+      &.third-place {
+        border-left: 3px solid $bronze;
+      }
+    }
+  }
 
-.data-row.third-place {
-  background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), rgba(255, 160, 122, 0.08));
-  border-left: 3px solid #cd7f32;
-}
+  &.first-place {
+    td {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-gold-rgb), 0.15),
+        rgba(var(--color-gold-rgb), 0.08)
+      );
+    }
 
-.data-row.third-place:hover {
-  background: linear-gradient(90deg, rgba(205, 127, 50, 0.2), rgba(205, 127, 50, 0.12));
-}
+    .metric-name {
+      border-left: 3px solid $gold;
+    }
+  }
 
-.data-row td {
-  padding: 12px;
-  font-size: 14px;
-  color: #1d1d1f;
-}
+  &.second-place {
+    td {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-silver-rgb), 0.15),
+        rgba(224, 224, 224, 0.08)
+      );
+    }
 
-.metric-name {
-  font-weight: 500;
-  letter-spacing: -0.01em;
+    .metric-name {
+      border-left: 3px solid $silver;
+    }
+  }
+
+  &.third-place {
+    td {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-bronze-rgb), 0.15),
+        rgba(255, 160, 122, 0.08)
+      );
+    }
+
+    .metric-name {
+      border-left: 3px solid $bronze;
+    }
+  }
+
+  &.category-summary {
+    background: linear-gradient(
+      90deg,
+      rgba(var(--color-primary-rgb), 0.08),
+      rgba(var(--color-primary-rgb), 0.04)
+    );
+    font-weight: 600;
+
+    .metric-name {
+      font-weight: 600;
+      color: $primary;
+    }
+
+    &:hover {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-primary-rgb), 0.12),
+        rgba(var(--color-primary-rgb), 0.06)
+      );
+    }
+
+    &.first-place {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-gold-rgb), 0.18),
+        rgba(var(--color-gold-rgb), 0.08)
+      );
+
+      .metric-name {
+        color: #b8860b;
+      }
+    }
+
+    &.second-place {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-silver-rgb), 0.18),
+        rgba(var(--color-silver-rgb), 0.08)
+      );
+
+      .metric-name {
+        color: #5a6c6e;
+      }
+    }
+
+    &.third-place {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--color-bronze-rgb), 0.18),
+        rgba(var(--color-bronze-rgb), 0.08)
+      );
+
+      .metric-name {
+        color: #8b5a2b;
+      }
+    }
+  }
 }
 
 .rank-badge {
   display: inline-block;
   padding: 4px 10px;
-  border-radius: 6px;
-  background: rgba(0, 122, 255, 0.1);
-  color: #007aff;
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: -0.01em;
+  background: rgba(var(--color-primary-rgb), 0.1);
+  border-radius: var(--radius-sm);
   white-space: nowrap;
-}
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: $primary;
 
-.rank-badge.gold {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.15));
-  color: #d4af37;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
-}
+  &.gold {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--color-gold-rgb), 0.2),
+      rgba(var(--color-gold-rgb), 0.15)
+    );
+    color: $gold-text;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(var(--color-gold-rgb), 0.3);
+  }
 
-.rank-badge.silver {
-  background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(220, 220, 220, 0.15));
-  color: #7f8c8d;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
-}
+  &.silver {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--color-silver-rgb), 0.2),
+      rgba(220, 220, 220, 0.15)
+    );
+    color: #7f8c8d;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(var(--color-silver-rgb), 0.3);
+  }
 
-.rank-badge.bronze {
-  background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(255, 160, 122, 0.15));
-  color: #a0522d;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
+  &.bronze {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--color-bronze-rgb), 0.2),
+      rgba(255, 160, 122, 0.15)
+    );
+    color: #a0522d;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(var(--color-bronze-rgb), 0.3);
+  }
 }
 
 .value {
   font-weight: 600;
-  color: #007aff;
+  color: $primary;
 }
 
-.gap {
-  color: #ff9500;
-  font-weight: 500;
-}
-
+.gap,
 .first-place-value {
-  color: #86868b;
-  font-weight: 500;
+  padding: 6px 8px !important;
+  font-size: 13px !important;
+  font-weight: 400;
+  color: #aaa;
 }
 
 .total-users {
-  text-align: center;
-  color: #86868b;
-  font-size: 14px;
   margin-top: 20px;
   padding-top: 16px;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: center;
+  font-size: 14px;
+  color: $text-secondary;
 }
 
 @media (orientation: portrait) {
   .leaderboard-container {
-    padding: 16px 12px;
     width: 100%;
+    padding: 16px 12px;
     box-sizing: border-box;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   .leaderboard-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     width: 100%;
+    @include flex-col;
+    align-items: center;
   }
 
   .desktop-table {
@@ -946,49 +1233,55 @@ const tableData = computed(() => {
   }
 
   .top-metrics-cards {
-    display: flex;
     width: 100%;
+    display: flex;
     justify-content: center;
     gap: 16px;
     margin-bottom: 24px;
     overflow-x: auto;
   }
 
-  .metric-card {
-    min-width: 100px;
-    flex-shrink: 0;
-    padding: 16px;
-    max-width: 48dvw;
-  }
+  .metric {
+    &-card {
+      min-width: 100px;
+      max-width: 48dvw;
+      flex-shrink: 0;
+      padding: 16px;
+    }
 
-  .metric-header {
-    margin-bottom: 12px;
-  }
+    &-header {
+      margin-bottom: 12px;
+    }
 
-  .metric-icon {
-    font-size: 20px;
-  }
+    &-icon {
+      font-size: 20px;
+    }
 
-  .metric-label {
-    font-size: 15px;
-  }
+    &-label {
+      font-size: 15px;
+    }
 
-  .metric-rank {
-    font-size: 28px;
-  }
+    &-rank {
+      font-size: 28px;
+    }
 
-  .metric-value {
-    font-size: 20px;
-  }
+    &-value {
+      font-size: 20px;
+    }
 
-  .metric-details {
-    font-size: 12px;
+    &-details {
+      font-size: 12px;
+    }
+
+    &-name {
+      font-size: 13px;
+    }
   }
 
   .table-wrapper {
     width: 98dvw;
-    align-self: stretch;
     min-width: 0;
+    align-self: stretch;
     padding: 12px 0;
     box-sizing: border-box;
     overflow: hidden;
@@ -996,30 +1289,40 @@ const tableData = computed(() => {
 
   .table-container {
     width: 100%;
-    overflow-x: auto;
     padding: 0 12px;
     box-sizing: border-box;
+    overflow-x: auto;
     border-radius: 0;
     box-shadow: none;
   }
 
   .rankings-table {
     min-width: 100px;
+
+    th {
+      padding: 10px 6px;
+      font-size: 11px;
+    }
   }
 
-  .rankings-table th {
-    padding: 10px 6px;
-    font-size: 11px;
+  .col-gap,
+  .col-first-place {
+    padding: 4px !important;
+    font-size: 10px !important;
   }
 
-  .data-row td {
-    padding: 10px 6px;
-    font-size: 12px;
-    white-space: nowrap;
-  }
+  .data-row {
+    td {
+      padding: 10px 6px;
+      white-space: nowrap;
+      font-size: 14px;
 
-  .metric-name {
-    font-size: 13px;
+      &.gap,
+      &.first-place-value {
+        padding: 4px !important;
+        font-size: 12px !important;
+      }
+    }
   }
 
   .rank-badge {
@@ -1028,9 +1331,9 @@ const tableData = computed(() => {
   }
 
   .total-users {
-    font-size: 12px;
     margin-top: 16px;
     padding-top: 12px;
+    font-size: 12px;
   }
 }
 </style>

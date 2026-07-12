@@ -4,61 +4,61 @@
       ML計算 - 採樣村莊聚類
       <HelpIcon content="對採樣村莊進行聚類，適合大規模數據集。採樣策略：隨機採樣、分層採樣（按區域比例）、系統採樣（等間隔）。特徵包括語義、字符嵌入、結構。支持K-Means、DBSCAN、GMM算法" />
     </h3>
-    <div class="two-col-layout">
+    <div class="vml-two-col">
     <!-- 左側：參數設置 -->
     <div class="vml-glass-panel">
       <h3 class="panel-title">採樣村莊聚類</h3>
       <p class="panel-description">對採樣村莊進行聚類分析，適合大規模數據集</p>
 
       <!-- 認證提示 -->
-      <div v-if="!isAuthenticated" class="auth-notice">
+      <div v-if="!isAuthenticated" class="vml-auth-notice">
         <span class="notice-icon">🔒</span>
         <span>此功能需要登錄後使用</span>
       </div>
 
-      <div v-else class="settings-form">
+      <div v-else class="vml-settings-form">
         <!-- 算法選擇 -->
         <AlgorithmSelector v-model="settings.algorithm" />
 
         <!-- K值設置 -->
-        <div v-if="settings.algorithm !== 'dbscan'" class="setting-row">
-          <label class="setting-label">聚類數量 (k)</label>
-          <div class="setting-control">
+        <div v-if="settings.algorithm !== 'dbscan'" class="vml-setting-row">
+          <label class="vml-setting-label">聚類數量 (k)</label>
+          <div class="vml-setting-control">
             <input
               type="number"
               v-model.number="settings.k"
               min="2"
               max="20"
-              class="setting-input"
+              class="vml-input"
             />
           </div>
         </div>
 
         <!-- 採樣策略 -->
-        <div class="setting-row">
-          <label class="setting-label">採樣策略</label>
-          <div class="setting-control">
+        <div class="vml-setting-row">
+          <label class="vml-setting-label">採樣策略</label>
+          <div class="vml-setting-control">
             <SimpleSelectDropdown
               v-model="settings.sampling_strategy"
               :options="samplingStrategyOptions"
             />
-            <span class="setting-hint">{{ samplingStrategyHint }}</span>
+            <span class="vml-setting-hint">{{ samplingStrategyHint }}</span>
           </div>
         </div>
 
         <!-- 採樣大小 -->
-        <div class="setting-row">
-          <label class="setting-label">採樣大小</label>
-          <div class="setting-control">
+        <div class="vml-setting-row">
+          <label class="vml-setting-label">採樣大小</label>
+          <div class="vml-setting-control">
             <input
               type="number"
               v-model.number="settings.sample_size"
               min="100"
               max="20000"
               step="100"
-              class="setting-input"
+              class="vml-input"
             />
-            <span class="setting-hint">採樣村莊數量（100-20000）</span>
+            <span class="vml-setting-hint">採樣村莊數量（100-20000）</span>
           </div>
         </div>
 
@@ -169,7 +169,8 @@ async function runClustering() {
     results.value = data
     villagesMLStore.clusteringResults = data
 
-    showSuccess(`聚類完成！發現 ${data.n_clusters} 個聚類`)
+    const nClusters = data.n_clusters ?? data.k
+    showSuccess(`聚類完成！發現 ${nClusters} 個聚類`)
   } catch (error) {
     console.error('採樣村莊聚類失敗:', error)
     showError(error.message || '聚類失敗')
@@ -180,18 +181,12 @@ async function runClustering() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .sampled-villages-panel {
   padding: 12px;
 }
 
-.two-col-layout {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 16px;
-}
-
-.two-col-layout > .vml-glass-panel {
+.vml-two-col > .vml-glass-panel {
   padding: 20px;
   overflow-y: auto;
 }
@@ -210,79 +205,7 @@ async function runClustering() {
   line-height: 1.5;
 }
 
-.auth-notice {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: rgba(255, 193, 7, 0.15);
-  border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 10px;
-  margin-bottom: 16px;
-  font-size: 13px;
-  color: #856404;
-  font-weight: 500;
-}
-
-.settings-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.setting-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.setting-label {
-  min-width: 100px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
-  padding-top: 10px;
-}
-
-.setting-control {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.setting-input,
-.setting-select {
-  flex: 1;
-  padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  font-size: 14px;
-}
-
-.setting-input:focus,
-.setting-select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.setting-hint {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
-
 .results-section {
   overflow-y: auto;
-}
-
-@media (max-width: 600px) {
-  .two-col-layout {
-    grid-template-columns: 1fr;
-  }
 }
 </style>

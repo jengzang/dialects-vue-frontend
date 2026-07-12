@@ -11,6 +11,10 @@
         <link rel="preload" as="image" href="/src/assets/picture/title.png">
         <link rel="dns-prefetch" href="https://dialects.yzup.top">
         <link rel="preconnect" href="https://dialects.yzup.top" crossorigin>
+        <link rel="alternate" hreflang="zh-Hant" href="https://dialects.yzup.top/zh-Hant/" />
+        <link rel="alternate" hreflang="zh-CN" href="https://dialects.yzup.top/zh-CN/" />
+        <link rel="alternate" hreflang="en" href="https://dialects.yzup.top/en/" />
+        <link rel="alternate" hreflang="x-default" href="https://dialects.yzup.top/" />
         <script type="application/ld+json">
             {
                 "@context": "https://schema.org",
@@ -65,16 +69,91 @@
                     transform: rotate(360deg);
                 }
             }
+
+            .app-boot-seo {
+                overflow-y: auto;
+                justify-content: safe center;
+                padding: 24px;
+                text-align: center;
+                box-sizing: border-box;
+            }
+
+            .app-boot-title {
+                margin: 0;
+                font-size: 30px;
+                font-weight: 800;
+                letter-spacing: 0.04em;
+                color: #0b2540;
+            }
+
+            .app-boot-desc {
+                max-width: 720px;
+                margin: 0;
+                font-size: 15px;
+                line-height: 1.8;
+                color: rgba(11, 37, 64, 0.78);
+            }
+
+            .app-boot-links {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+                max-width: 760px;
+                margin: 0;
+            }
+
+            .app-boot-links a {
+                display: inline-flex;
+                align-items: center;
+                min-height: 32px;
+                padding: 0 12px;
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.58);
+                color: #007aff;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none;
+                box-shadow: inset 0 0 0 1px rgba(0, 122, 255, 0.14);
+            }
+
+            .app-boot-links a:hover {
+                background: rgba(255, 255, 255, 0.82);
+            }
+
+            .app-boot-seo noscript {
+                display: block;
+                max-width: 720px;
+                margin: 0;
+                font-size: 14px;
+                line-height: 1.7;
+                color: rgba(11, 37, 64, 0.72);
+            }
         </style>
     </head>
 
 
   <body>
-    <div id="app" >
-      <div class="app-boot-loading">
-        <div class="app-boot-spinner"></div>
-        <div class="app-boot-text">頁面載入中...</div>
-      </div>
+    <div id="app">
+      <main class="app-boot-loading app-boot-seo">
+        <div class="app-boot-spinner" aria-hidden="true"></div>
+        <h1 class="app-boot-title">方音圖鑑</h1>
+        <p class="app-boot-desc">方音圖鑑是一個漢語方言音韻查詢、方言比較、音系分析與地理可視化平台。提供查字、查中古、查音位、查調、方言比較、音系、音節統計、方言地圖、Praat 聲學分析、字表工具與自然村資料分析等功能。</p>
+        <nav class="app-boot-links" aria-label="主要功能">
+          <a href="/zh-Hant/menu/query/char/">查字</a>
+          <a href="/zh-Hant/menu/query/zhonggu/">查中古</a>
+          <a href="/zh-Hant/menu/compare/">方言比較</a>
+          <a href="/zh-Hant/menu/pho">音系</a>
+          <a href="/zh-Hant/menu/map/view/">方言地圖</a>
+          <a href="/zh-Hant/explore/tools/praat/">Praat 聲學分析</a>
+          <a href="/zh-Hant/explore/tools/check/">字表工具</a>
+          <a href="/zh-Hant/explore/villages/gd">自然村分析</a>
+        </nav>
+        <p class="app-boot-text">頁面載入中...</p>
+        <noscript>
+          <p>本網站需要 JavaScript 才能使用完整的方言查詢、比較、地圖和聲學分析功能。你仍可通過上方鏈接瀏覽主要工具入口。</p>
+        </noscript>
+      </main>
     </div>
     <script type="module" src="./src/main/main.js"></script>
   </body>

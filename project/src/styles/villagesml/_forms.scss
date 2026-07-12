@@ -1,0 +1,89 @@
+// VillagesML 表单控件
+// 统一 VillagesML 中所有 input、select、textarea 样式
+
+.vml-input,
+.vml-select,
+.vml-textarea,
+.vml-number-input {
+  padding: 10px 16px;
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
+  font-size: 14px;
+  background: var(--glass-50);
+  color: var(--text-primary);
+  transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--glass-80);
+    box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
+  }
+
+  &::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+  }
+}
+
+.vml-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.vml-search-field {
+  padding: 10px 16px;
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  background: var(--glass-50);
+  backdrop-filter: blur(10px);
+  color: var(--text-primary);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.15);
+  }
+}
+
+.vml-setting-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.vml-setting-label {
+  min-width: 100px;
+  padding-top: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.vml-setting-control {
+  flex: 1;
+}
+
+.vml-setting-hint {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
+.vml-char-input {
+  padding: 10px;
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  text-align: center;
+  background: var(--glass-50);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--glass-80);
+  }
+}

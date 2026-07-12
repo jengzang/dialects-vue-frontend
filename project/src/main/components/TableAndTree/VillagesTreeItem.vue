@@ -2,9 +2,10 @@
   <div class="tree-node">
     <div class="node-content" :class="{ 'is-match': isMatch }" @click="toggle">
       <div class="node-label">
-        <span class="icon">{{ hasChildren ? '📁' : '📍' }}</span>
+        <span class="icon">{{ leafIcon }}</span>
         <span class="text" v-if="isMatch" v-html="highlightName"></span>
         <span class="text" v-else>{{ displayName }}</span>
+        <span v-if="node._tag" class="node-tag" :style="{ backgroundColor: node._tag.color }">{{ node._tag.text }}</span>
         <span v-if="node._loadingChildren" class="lazy-indicator">↻</span>
       </div>
 
@@ -48,6 +49,7 @@
             :node="child"
             :search-query="searchQuery"
             :lazy-load-fn="lazyLoadFn"
+            :leaf-data-extractor="leafDataExtractor"
             @open-map="emit('open-map', $event)"
         />
       </div>
@@ -67,6 +69,10 @@ const props = defineProps({
   node: Object,
   searchQuery: String,
   lazyLoadFn: Function,
+  leafDataExtractor: {
+    type: Function,
+    default: null
+  }
 });
 
 const emit = defineEmits(['open-map']);
@@ -80,6 +86,12 @@ const hasChildren = computed(() => {
   }
   return props.node.children && props.node.children.length > 0;
 });
+
+const leafIcon = computed(() => {
+  if (hasChildren.value) return '📁'
+  if (props.node._coordCount > 1) return '📐'
+  return '📍'
+})
 
 // Replace "(空)" with "請展開"
 const displayName = computed(() => {
@@ -95,14 +107,12 @@ const mapButtonTitle = computed(() => {
     : t('tableTree.villagesTreeItem.drawCurrentVillageMap')
 })
 
-// Auto-expand based on _autoExpand flag
-watch(() => props.node, (newNode) => {
-  if (newNode && newNode._autoExpand) {
+// Auto-expand only when _autoExpand flag is explicitly set (e.g. search results)
+watch(() => props.node._autoExpand, (autoExpand) => {
+  if (autoExpand) {
     isOpen.value = true;
-  } else {
-    isOpen.value = false;
   }
-}, { immediate: true, deep: true });
+});
 
 const toggle = async () => {
   if (!isOpen.value && props.node._lazy && !props.node._childrenLoaded) {
@@ -136,16 +146,28 @@ const collectLeafNodes = (node) => {
   const traverse = (n) => {
     // If it's a leaf node (has rawData)
     if (n.rawData) {
-      const dialect = n.rawData['方言分布']?.[0] || '';
-      const lng = n.rawData['longitude']?.[0] || '';
-      const lat = n.rawData['latitude']?.[0] || '';
+      if (props.leafDataExtractor) {
+        const extracted = props.leafDataExtractor(n.rawData, n.rawName || n.name)
+        if (Array.isArray(extracted)) {
+          if (n._path) extracted.forEach(e => e._path = n._path)
+          leaves.push(...extracted)
+        } else if (extracted) {
+          if (n._path) extracted._path = n._path
+          leaves.push(extracted)
+        }
+      } else {
+        const dialect = (n.rawData['dialect'] || n.rawData['方言分布'])?.[0] || '';
+        const lng = n.rawData['longitude']?.[0] || '';
+        const lat = n.rawData['latitude']?.[0] || '';
 
-      leaves.push({
-        name: n.rawName || n.name,
-        dialect: dialect,
-        longitude: parseFloat(lng) || 0,
-        latitude: parseFloat(lat) || 0
-      });
+        leaves.push({
+          name: n.rawName || n.name,
+          dialect: dialect,
+          longitude: parseFloat(lng) || 0,
+          latitude: parseFloat(lat) || 0,
+          _path: n._path || []
+        });
+      }
     }
 
     // Recursively process children
@@ -173,25 +195,24 @@ const handleMapClick = () => {
     emit('open-map', leafNodes);
   } else {
     // Leaf node: show single node data
-    const dialect = props.node.rawData?.['方言分布']?.[0] || '';
-    const lng = props.node.rawData?.['longitude']?.[0] || '';
-    const lat = props.node.rawData?.['latitude']?.[0] || '';
+    if (props.leafDataExtractor) {
+      const extracted = props.leafDataExtractor(props.node.rawData, props.node.rawName || props.node.name)
+      const result = Array.isArray(extracted) ? extracted : [extracted]
+      if (props.node._path) result.forEach(e => e._path = props.node._path)
+      emit('open-map', result)
+    } else {
+      const dialect = (props.node.rawData?.['dialect'] || props.node.rawData?.['方言分布'])?.[0] || '';
+      const lng = props.node.rawData?.['longitude']?.[0] || '';
+      const lat = props.node.rawData?.['latitude']?.[0] || '';
 
-    // console.log(`=== ${props.node.rawName || props.node.name} ===`);
-    // console.log({
-    //   name: props.node.rawName || props.node.name,
-    //   dialect: dialect,
-    //   longitude: lng,
-    //   latitude: lat
-    // });
-
-    // Emit to parent component
-    emit('open-map', [{
-      name: props.node.rawName || props.node.name,
-      dialect: dialect,
-      longitude: parseFloat(lng) || 0,
-      latitude: parseFloat(lat) || 0
-    }]);
+      emit('open-map', [{
+        name: props.node.rawName || props.node.name,
+        dialect: dialect,
+        longitude: parseFloat(lng) || 0,
+        latitude: parseFloat(lat) || 0,
+        _path: props.node._path || []
+      }]);
+    }
   }
 };
 
@@ -214,173 +235,189 @@ const leave = (el) => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary-blue: var(--color-primary);
+$text-dark: var(--text-dark);
+$text-muted: var(--text-medium);
+$error-color: var(--color-error);
+$transition-fast: 0.2s;
+$transition-expand: 0.3s;
 .tree-node {
   margin-bottom: 8px;
 }
 
 .node-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 8px 10px;
-  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.2s;
-}
+  border-radius: var(--radius-md);
+  transition: background $transition-fast;
 
-.node-content:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
+  &:hover {
+    background: var(--glass-40);
+  }
 
-.node-content.is-match {
-  background: rgba(255, 215, 0, 0.15);
-  border: 1px solid rgba(255, 215, 0, 0.3);
+  &.is-match {
+    background: rgba(var(--color-gold-rgb), 0.15);
+    border: 1px solid rgba(var(--color-gold-rgb), 0.3);
+  }
 }
 
 .node-label {
   display: flex;
-  align-items: center;
+  flex: 1;
   gap: 8px;
+  align-items: center;
+  color: $text-dark;
   font-size: 15px;
   font-weight: 500;
-  color: #333;
-  flex: 1;
 }
 
 .buttons-group {
   display: flex;
-  align-items: center;
   gap: 6px;
+  align-items: center;
 }
 
 .map-btn {
-  background: transparent;
-  border: none;
-  font-size: 18px;
+  @include flex-center;
+
   width: 28px;
   height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  font-size: 18px;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.map-btn:hover {
-  background: rgba(52, 199, 89, 0.15);
-  transform: scale(1.1);
-}
-
-.map-btn.is-disabled,
-.map-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.map-btn.is-disabled:hover,
-.map-btn:disabled:hover {
   background: transparent;
-  transform: none;
+  border: none;
+  border-radius: var(--radius-full);
+  transition: all $transition-fast ease;
+
+  &:hover {
+    background: rgba(var(--color-success-rgb), 0.15);
+    transform: scale(1.1);
+  }
+
+  &.is-disabled,
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+
+    &:hover {
+      background: transparent;
+      transform: none;
+    }
+  }
+}
+
+.node-tag {
+  display: inline-block;
+  flex-shrink: 0;
+  margin-left: 6px;
+  padding: 1px 6px;
+  color: $text-muted;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: var(--radius-sm2);
 }
 
 .lazy-indicator {
   display: inline-block;
   margin-left: 6px;
+  color: $primary-blue;
   font-size: 14px;
-  color: #007AFF;
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 .lazy-error {
-  padding: 8px 12px;
-  margin: 4px 0 4px 20px;
-  background: rgba(211, 47, 47, 0.06);
-  border: 1px solid rgba(211, 47, 47, 0.2);
-  border-radius: 10px;
   display: flex;
-  align-items: center;
   gap: 10px;
+  align-items: center;
+  margin: 4px 0 4px 20px;
+  padding: 8px 12px;
+  color: $error-color;
   font-size: 13px;
-  color: #d32f2f;
-}
+  background: rgba(var(--color-error-rgb), 0.06);
+  border: 1px solid rgba(var(--color-error-rgb), 0.2);
+  border-radius: var(--radius-md);
 
-.lazy-error .retry-btn-small {
-  padding: 3px 10px;
-  border: none;
-  border-radius: 6px;
-  background: rgba(211, 47, 47, 0.12);
-  color: #d32f2f;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
+  .retry-btn-small {
+    padding: 3px 10px;
+    color: $error-color;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(var(--color-error-rgb), 0.12);
+    border: none;
+    border-radius: var(--radius-sm);
+  }
 }
 
 .children-container {
-  padding-left: 20px;
-  border-left: 2px solid rgba(0, 122, 255, 0.1);
-  margin-left: 14px;
-  transition: height 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-  /* Grid layout for children */
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 8px;
+  margin-left: 14px;
+  padding-left: 20px;
+  border-left: 2px solid rgba(var(--color-primary-rgb), 0.1);
+  transition: height $transition-expand cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 769px) and (max-width: 1200px) {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  @media (min-width: 1201px) {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
 }
 
 .expand-btn {
-  background: transparent;
-  border: none;
-  color: #007AFF;
-  font-size: 16px;
+  @include flex-center;
+
   width: 24px;
   height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  color: $primary-blue;
+  font-size: 16px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  transition: all $transition-expand ease;
+
+  &:hover {
+    background: rgba(var(--color-primary-rgb), 0.1);
+  }
+
+  &.is-open {
+    transform: rotate(45deg);
+  }
 }
 
-.expand-btn:hover {
-  background: rgba(0, 122, 255, 0.1);
-}
-
-.expand-btn.is-open {
-  transform: rotate(45deg);
-}
-
-/* Highlight style for search */
+/*
+ * highlight 元素由 v-html 动态插入，
+ * scoped 样式必须使用 :deep() 才能生效。
+ */
 :deep(.highlight) {
-  background: rgba(255, 255, 0, 0.4);
-  border-radius: 4px;
   padding: 0 2px;
-  color: #000;
+  color: var(--text-primary);
+  background: rgba(255, 255, 0, 0.4);
+  border-radius: var(--radius-xs);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .children-container {
-    grid-template-columns: 1fr;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
   }
-}
 
-@media (min-width: 769px) and (max-width: 1200px) {
-  .children-container {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  }
-}
-
-@media (min-width: 1201px) {
-  .children-container {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

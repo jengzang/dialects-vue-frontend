@@ -2,7 +2,7 @@
   <div class="vml-glass-panel">
     <h3 class="panel-title">🗺️ 空間特徵</h3>
 
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>加載中...</p>
     </div>
@@ -103,14 +103,9 @@ defineProps({
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .spatial-content {
   animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .spatial-grid {
@@ -125,8 +120,8 @@ defineProps({
   align-items: center;
   transition: transform 0.3s ease;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
 }
 
 .spatial-item:hover {
@@ -157,8 +152,8 @@ defineProps({
 .coordinates-line {
   margin-top: 16px;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  background: var(--glass-20);
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   color: var(--text-primary);
   text-align: center;
@@ -167,8 +162,8 @@ defineProps({
 .map-placeholder {
   padding: 60px 20px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
 }
 
 .map-placeholder p {

@@ -6,7 +6,7 @@
       <HelpIcon content="識別村莊密集分布的熱點區域。每個熱點包含中心坐標、半徑和密度分數，反映該區域的村莊聚集程度" />
     </h2>
 
-    <div v-if="loadingHotspots" class="loading-state">
+    <div v-if="loadingHotspots" class="vml-loading"">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>加載中...</p>
     </div>
@@ -44,7 +44,7 @@
       <div v-if="selectedHotspot" ref="hotspotDetailRef" class="hotspot-detail">
         <h3>熱點詳情 #{{ selectedHotspot.hotspot_id }}</h3>
 
-        <div v-if="loadingHotspotDetail" class="loading-state">
+        <div v-if="loadingHotspotDetail" class="vml-loading"">
           <div class="ui-loading--page" aria-hidden="true"></div>
         </div>
 
@@ -143,16 +143,16 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .spatial-hotspots-tab {
   display: flex;
   align-items: center;
   flex-direction: column;
   padding: 16px;
-  background: var(--glass-medium);
+  background: var(--glass-60);
   backdrop-filter: blur(40px) saturate(180%);
   border-radius: var(--radius-xl);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-40);
   box-shadow: var(--shadow-glass);
 }
 
@@ -166,9 +166,9 @@ h2 {
 .load-button {
   padding: 10px 24px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -177,19 +177,12 @@ h2 {
 }
 
 .load-button:hover:not(:disabled) {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .load-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
-
-.loading-state {
-  text-align: center;
-  padding: 40px 20px;
-}
-
 
 
 .hotspots-content {
@@ -209,19 +202,19 @@ h2 {
 
 .hotspot-card {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.3s ease;
   border: 2px solid transparent;
 }
 
 .hotspot-card:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .hotspot-card.selected {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   border-color: var(--color-primary);
 }
 
@@ -240,17 +233,16 @@ h2 {
 
 .hotspot-count {
   padding: 4px 12px;
-  background: rgba(243, 156, 18, 0.2);
-  color: #c87f0a;
-  border-radius: 12px;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning-dark);
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .hotspot-info {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -271,8 +263,8 @@ h2 {
 
 .hotspot-detail {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
 }
 
 .hotspot-detail h3 {
@@ -294,8 +286,8 @@ h2 {
 
 .stat-card {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
+  background: var(--glass-50);
+  border-radius: var(--radius-sm2);
   text-align: center;
 }
 

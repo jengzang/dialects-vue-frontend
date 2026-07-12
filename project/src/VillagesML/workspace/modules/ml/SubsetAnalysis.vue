@@ -16,7 +16,7 @@
     </div>
 
     <!-- Filter Builder -->
-    <div class="glass-panel filter-panel">
+    <div class="vml-glass-panel filter-panel">
       <div class="panel-header">
         <h3>📋 步驟 1：篩選器構建</h3>
         <button @click="addFilter" class="solid-button small">+ 添加篩選條件</button>
@@ -58,7 +58,18 @@
             :placeholder="`選擇${FILTER_FIELDS.find(f => f.value === filter.field)?.label}`"
           />
 
-          <!-- Text field: use text input (name, length) -->
+          <!-- Number field: use number input (length) -->
+          <input
+            v-else-if="getFieldInputType(filter.field) === 'number'"
+            v-model.number="filter.value"
+            type="number"
+            min="2"
+            max="10"
+            placeholder="2-10"
+            class="glass-input"
+          >
+
+          <!-- Text field: use text input (name, suffix, prefix) -->
           <input
             v-else
             v-model="filter.value"
@@ -83,7 +94,7 @@
     </div>
 
     <!-- Filtered Villages List -->
-    <div v-if="currentFilteredVillages.length > 0" class="glass-panel villages-list-panel">
+    <div v-if="currentFilteredVillages.length > 0" class="vml-glass-panel villages-list-panel">
       <div class="panel-header">
         <h3>📊 步驟 2：查看篩選結果</h3>
         <div class="header-info">
@@ -134,7 +145,7 @@
     </div>
 
     <!-- Subset Comparison -->
-    <div class="glass-panel comparison-panel">
+    <div class="vml-glass-panel comparison-panel">
       <div class="panel-header">
         <h3>⚖️ 步驟 3：子集比較</h3>
       </div>
@@ -153,7 +164,7 @@
               </div>
               <div class="stat-item">
                 <span class="label">篩選條件:</span>
-                <span class="value">{{ formatFilterSummary(subsetA.filter) }}</span>
+                <span class="value">{{ formatFilterSummary(subsetA.filterParams) }}</span>
               </div>
             </div>
             <button @click="saveAsSubsetA" :disabled="!canSaveSubset" class="solid-button small">
@@ -170,7 +181,7 @@
               </div>
               <div class="stat-item">
                 <span class="label">篩選條件:</span>
-                <span class="value">{{ formatFilterSummary(subsetB.filter) }}</span>
+                <span class="value">{{ formatFilterSummary(subsetB.filterParams) }}</span>
               </div>
             </div>
             <button @click="saveAsSubsetB" :disabled="!canSaveSubset" class="solid-button small">
@@ -191,7 +202,7 @@
     </div>
 
     <!-- Comparison Results -->
-    <div v-if="comparisonResults" class="glass-panel results-panel">
+    <div v-if="comparisonResults" class="vml-glass-panel results-panel">
       <div class="panel-header">
         <h3>比較結果</h3>
       </div>
@@ -420,7 +431,7 @@
     </div>
 
     <!-- Subset Clustering -->
-    <div class="glass-panel clustering-panel">
+    <div class="vml-glass-panel clustering-panel">
       <div class="panel-header">
         <h3>子集聚類</h3>
       </div>
@@ -526,8 +537,8 @@ import { ref, computed, nextTick, onBeforeUnmount } from 'vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'
 import * as echarts from 'echarts'
-import { clusterSubset, compareSubsets as compareSubsetsAPI, searchVillages } from '@/api/index.js'
-import { showError, showSuccess, showWarning, showInfo } from '@/utils/message.js'
+import { clusterSubset, compareSubsets as compareSubsetsAPI, fetchSubsetFilter } from '@/api/index.js'
+import { showError, showSuccess, showWarning } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
@@ -716,120 +727,69 @@ const applyFilters = async () => {
 
   loading.value = true
   loadingMessage.value = '正在應用篩選...'
-
-  // Reset pagination
   currentPage.value = 1
 
   try {
-    // Build filter object for backend
-    const filterObj = {
-      cities: [],
-      counties: [],
-      semantic_tags: [],
-      structure_patterns: [],
-      name_pattern: null,
-      sample_size: 1000
-    }
+    const apiParams = {}
 
-    // Build API parameters from filters
-    const baseParams = {
-      page_size: 1000
-    }
-    let nameFilter = null
-
-    // Extract filters
     filters.value.forEach(filter => {
       if (filter.field === 'region' && filter.operator === 'equals') {
         if (filter.hierarchy) {
-          if (filter.hierarchy.city) {
-            baseParams.city = filter.hierarchy.city
-            filterObj.cities.push(filter.hierarchy.city)
-          }
-          if (filter.hierarchy.county) {
-            baseParams.county = filter.hierarchy.county
-            filterObj.counties.push(filter.hierarchy.county)
-          }
-          if (filter.hierarchy.township) {
-            baseParams.township = filter.hierarchy.township
-          }
+          if (filter.hierarchy.city) apiParams.city = filter.hierarchy.city
+          if (filter.hierarchy.county) apiParams.county = filter.hierarchy.county
+          if (filter.hierarchy.township) apiParams.township = filter.hierarchy.township
         } else if (filter.value) {
-          baseParams.region_name = filter.value
-          filterObj.cities.push(filter.value)
+          apiParams.city = filter.value
         }
-      } else if (filter.field === 'semantic' && filter.operator === 'equals') {
-        filterObj.semantic_tags.push(filter.value)
-      } else if (filter.field === 'structure' && filter.operator === 'equals') {
-        filterObj.structure_patterns.push(filter.value)
       } else if (filter.field === 'name') {
-        nameFilter = filter
-        filterObj.name_pattern = filter.value
-        // 對於所有名稱操作符，都傳遞 keyword 給後端進行初步篩選
-        // 後端的 keyword 是 contains 搜索，可以減少返回的數據量
-        // 然後前端再進行精確的 startsWith/endsWith/equals 過濾
         if (filter.value) {
-          baseParams.keyword = filter.value
+          apiParams.keyword = filter.value
+          if (filter.operator !== 'contains') {
+            apiParams.nameMatchMode = filter.operator === 'startsWith' ? 'startsWith'
+              : filter.operator === 'endsWith' ? 'endsWith'
+              : filter.operator === 'equals' ? 'equals'
+              : undefined
+          }
         }
       } else if (filter.field === 'length') {
-        if (filter.operator === 'gt') baseParams.min_length = parseInt(filter.value)
-        else if (filter.operator === 'lt') baseParams.max_length = parseInt(filter.value)
+        const val = parseInt(filter.value)
+        if (!isNaN(val) && val >= 2 && val <= 10) {
+          apiParams.minLength = val
+          apiParams.maxLength = val
+        }
+      } else if (filter.field === 'semantic') {
+        if (filter.value) {
+          apiParams.semanticCategories = [filter.value]
+        }
+      } else if (filter.field === 'structure') {
+        if (filter.value) {
+          apiParams.structurePatterns = [filter.value]
+        }
+      } else if (filter.field === 'suffix') {
+        if (filter.value) apiParams.suffix = filter.value
+      } else if (filter.field === 'prefix') {
+        if (filter.value) apiParams.prefix = filter.value
       }
     })
 
-    // 自動分頁加載所有數據
-    let allResults = []
-    let currentPageNum = 1
-    let totalCount = 0
+    const response = await fetchSubsetFilter({ ...apiParams, maxResults: 50000 })
 
-    // 第一次請求
-    loadingMessage.value = `正在載入第 ${currentPageNum} 頁...`
-    const firstResponse = await searchVillages({ ...baseParams, page: currentPageNum })
-    totalCount = firstResponse.total || 0
-
-    let firstPageResults = (firstResponse.data || []).map(v => ({
-      id: v.village_id,
-      name: v.village_name,
+    let results = (response.villages || []).map(v => ({
+      id: v.id,
+      name: v.name,
       region: v.county ? `${v.city}-${v.county}` : v.city,
-      length: v.village_name.length
+      length: v.name_length ?? v.nameLength ?? v.name.length
     }))
 
-    // Apply client-side filters
-    if (nameFilter) {
-      firstPageResults = applyNameFilter(firstPageResults, nameFilter)
+    currentFilteredVillages.value = results
+    currentFilteredVillages.value.filterParams = apiParams
+    currentFilteredVillages.value.totalCount = response.total
+
+    if (results.length >= 50000) {
+      showWarning(`已達到查詢上限，僅返回 ${results.length} 個村莊`)
+    } else {
+      showSuccess(`篩選完成，共 ${results.length} 個村莊`)
     }
-
-    allResults = [...firstPageResults]
-
-    // 如果還有更多頁，繼續請求
-    const totalPages = Math.ceil(totalCount / baseParams.page_size)
-    if (totalPages > 1) {
-      showInfo(`檢測到 ${totalCount} 個村莊，正在自動載入全部數據...`)
-
-      for (let page = 2; page <= totalPages; page++) {
-        currentPageNum = page
-        loadingMessage.value = `正在載入第 ${currentPageNum}/${totalPages} 頁...`
-
-        const response = await searchVillages({ ...baseParams, page })
-        let pageResults = (response.data || []).map(v => ({
-          id: v.village_id,
-          name: v.village_name,
-          region: v.county ? `${v.city}-${v.county}` : v.city,
-          length: v.village_name.length
-        }))
-
-        // Apply client-side filters
-        if (nameFilter) {
-          pageResults = applyNameFilter(pageResults, nameFilter)
-        }
-
-        allResults = [...allResults, ...pageResults]
-      }
-    }
-
-    currentFilteredVillages.value = allResults
-    currentFilteredVillages.value.filterObj = filterObj
-    currentFilteredVillages.value.totalCount = totalCount
-
-    showSuccess(`篩選完成，已載入全部 ${allResults.length} 個村莊`)
   } catch (error) {
     showError(error.message || '篩選失敗')
   } finally {
@@ -837,24 +797,8 @@ const applyFilters = async () => {
   }
 }
 
-// 輔助函數：應用名稱篩選
-const applyNameFilter = (results, nameFilter) => {
-  if (!nameFilter) return results
-
-  if (nameFilter.operator === 'contains') {
-    return results.filter(v => v.name.includes(nameFilter.value))
-  } else if (nameFilter.operator === 'startsWith') {
-    return results.filter(v => v.name.startsWith(nameFilter.value))
-  } else if (nameFilter.operator === 'endsWith') {
-    return results.filter(v => v.name.endsWith(nameFilter.value))
-  } else if (nameFilter.operator === 'equals') {
-    return results.filter(v => v.name === nameFilter.value)
-  }
-  return results
-}
-
 const saveAsSubsetA = () => {
-  if (!currentFilteredVillages.value.filterObj) {
+  if (!currentFilteredVillages.value.filterParams) {
     showError('請先應用篩選條件')
     return
   }
@@ -863,7 +807,7 @@ const saveAsSubsetA = () => {
 
   subsetA.value = {
     label: `子集A (${count}個村莊)`,
-    filter: currentFilteredVillages.value.filterObj,
+    filterParams: { ...currentFilteredVillages.value.filterParams },
     villages: [...currentFilteredVillages.value],
     totalCount: count
   }
@@ -872,7 +816,7 @@ const saveAsSubsetA = () => {
 }
 
 const saveAsSubsetB = () => {
-  if (!currentFilteredVillages.value.filterObj) {
+  if (!currentFilteredVillages.value.filterParams) {
     showError('請先應用篩選條件')
     return
   }
@@ -881,7 +825,7 @@ const saveAsSubsetB = () => {
 
   subsetB.value = {
     label: `子集B (${count}個村莊)`,
-    filter: currentFilteredVillages.value.filterObj,
+    filterParams: { ...currentFilteredVillages.value.filterParams },
     villages: [...currentFilteredVillages.value],
     totalCount: count
   }
@@ -889,20 +833,11 @@ const saveAsSubsetB = () => {
   showSuccess(`已保存為子集 B (${count} 個村莊)`)
 }
 
-const calculateAvgLength = (villages) => {
-  if (villages.length === 0) return null
-  const sum = villages.reduce((acc, v) => acc + v.length, 0)
-  return (sum / villages.length).toFixed(2)
-}
-
-/**
- * 构建子集参数
- * 前端已自動分頁載入全部數據，直接傳遞 village_ids 數組
- */
 const buildGroupParams = (subset) => {
   return {
     label: subset.label,
-    village_ids: subset.villages.map(v => v.id)
+    village_ids: subset.villages.map(v => v.id),
+    filterParams: subset.filterParams
   }
 }
 
@@ -916,6 +851,11 @@ const compareSubsets = async () => {
   }
   if (!subsetB.value.villages || subsetB.value.villages.length === 0) {
     showError('子集 B 為空，請先構建子集')
+    return
+  }
+
+  if (subsetA.value.villages.length > 50000 || subsetB.value.villages.length > 50000) {
+    showWarning('子集村莊數量超過上限（50,000），請減少村莊數量後再比較')
     return
   }
 
@@ -971,7 +911,7 @@ const runSubsetClustering = async () => {
       return
     }
 
-    if (!subset.filter) {
+    if (!subset.villages || subset.villages.length === 0) {
       showError('請先構建子集')
       loading.value = false
       return
@@ -986,14 +926,15 @@ const runSubsetClustering = async () => {
 
     // Build parameters matching backend API spec
     const params = {
+      village_ids: subset.villages.map(v => v.id),
       filter: {
-        ...subset.filter,
+        ...subset.filterParams,
         sample_size: 1000
       },
       clustering: {
         algorithm: clusterAlgorithm.value,
         k: clusterK.value,
-        features: clusterFeatures.value,  // 使用用户选择的特征
+        features: clusterFeatures.value,
         random_state: 42
       }
     }
@@ -1048,7 +989,7 @@ const renderComparisonChart = () => {
   }))
 
   comparisonChartInstance.setOption({
-    title: { text: '子集語義特徵比較', left: 'center', textStyle: { color: '#2c3e50', fontWeight: 600 } },
+    title: { text: '子集語義特徵比較', left: 'center', textStyle: { color: '#0b2540', fontWeight: 600 } },
     tooltip: {
       trigger: 'item',
       formatter: (params) => {
@@ -1080,7 +1021,7 @@ const renderComparisonChart = () => {
         {
           value: groupBValues,
           name: '子集 B',
-          itemStyle: { color: '#ff9800' },
+          itemStyle: { color: '#ff9500' },
           areaStyle: { color: 'rgba(255, 152, 0, 0.3)' }
         }
       ]
@@ -1184,21 +1125,20 @@ const formatVector = (vec) => {
 const formatFilterSummary = (filter) => {
   if (!filter) return 'N/A'
   const parts = []
-  if (filter.cities && filter.cities.length > 0) {
-    parts.push(`城市: ${filter.cities.join(', ')}`)
+  if (filter.city) parts.push(`城市: ${filter.city}`)
+  if (filter.county) parts.push(`區縣: ${filter.county}`)
+  if (filter.township) parts.push(`鄉鎮: ${filter.township}`)
+  if (filter.keyword) parts.push(`關鍵詞: ${filter.keyword}`)
+  if (filter.minLength) parts.push(`最小長度: ${filter.minLength}`)
+  if (filter.maxLength) parts.push(`最大長度: ${filter.maxLength}`)
+  if (filter.semanticCategories && filter.semanticCategories.length > 0) {
+    parts.push(`語義: ${filter.semanticCategories.join(', ')}`)
   }
-  if (filter.counties && filter.counties.length > 0) {
-    parts.push(`區縣: ${filter.counties.join(', ')}`)
+  if (filter.structurePatterns && filter.structurePatterns.length > 0) {
+    parts.push(`結構: ${filter.structurePatterns.join(', ')}`)
   }
-  if (filter.semantic_tags && filter.semantic_tags.length > 0) {
-    parts.push(`語義: ${filter.semantic_tags.join(', ')}`)
-  }
-  if (filter.structure_patterns && filter.structure_patterns.length > 0) {
-    parts.push(`結構: ${filter.structure_patterns.join(', ')}`)
-  }
-  if (filter.name_pattern) {
-    parts.push(`名稱: ${filter.name_pattern}`)
-  }
+  if (filter.suffix) parts.push(`後綴: ${filter.suffix}`)
+  if (filter.prefix) parts.push(`前綴: ${filter.prefix}`)
   return parts.length > 0 ? parts.join(' | ') : '無篩選條件'
 }
 
@@ -1218,7 +1158,9 @@ const handleApiError = (error) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 /* ========================================
    Apple Liquid Glass Blue Style
    ======================================== */
@@ -1253,10 +1195,10 @@ const handleApiError = (error) => {
   align-items: center;
   gap: 12px;
   padding: 12px 20px;
-  background: rgba(231, 76, 60, 0.1);
-  border: 2px solid rgba(231, 76, 60, 0.3);
-  border-radius: 12px;
-  color: #e74c3c;
+  background: rgba(var(--color-error-rgb), 0.1);
+  border: 2px solid rgba(var(--color-error-rgb), 0.3);
+  border-radius: var(--radius-md);
+  color: var(--color-error);
   font-weight: 500;
 }
 
@@ -1276,7 +1218,7 @@ const handleApiError = (error) => {
 }
 
 .glass-panel:hover {
-  box-shadow: 0 12px 40px rgba(74, 144, 226, 0.15);
+  box-shadow: 0 12px 40px rgba(var(--vml-blue-rgb), 0.15);
 }
 
 .panel-header {
@@ -1285,7 +1227,7 @@ const handleApiError = (error) => {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .panel-header h3 {
@@ -1336,18 +1278,18 @@ const handleApiError = (error) => {
 .glass-input {
   width: 100%;
   padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(74, 144, 226, 0.3);
-  border-radius: 10px;
+  background: var(--glass-50);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-md);
   font-size: 14px;
   transition: all 0.3s ease;
 }
 
 .glass-input:focus {
   outline: none;
-  border-color: #4a90e2;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  border-color: var(--vml-blue);
+  background: var(--glass-80);
+  box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .glass-input.small {
@@ -1355,12 +1297,12 @@ const handleApiError = (error) => {
 }
 
 .solid-button.danger {
-  background: linear-gradient(135deg, #e57373, #d32f2f);
+  background: linear-gradient(135deg, var(--color-error-light), var(--color-error));
   box-shadow: 0 4px 12px rgba(229, 115, 115, 0.25);
 }
 
 .solid-button.danger:hover:not(:disabled) {
-  background: linear-gradient(135deg, #ef5350, #c62828);
+  background: linear-gradient(135deg, var(--color-error-light), var(--color-error-dark));
   box-shadow: 0 6px 20px rgba(229, 115, 115, 0.45);
 }
 
@@ -1375,9 +1317,9 @@ const handleApiError = (error) => {
 .subset-info {
   margin-top: 20px;
   padding: 16px;
-  background: linear-gradient(135deg, rgba(74, 144, 226, 0.12), rgba(91, 163, 245, 0.08));
-  border-radius: 12px;
-  border: 1px solid rgba(74, 144, 226, 0.25);
+  background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.12), rgba(91, 163, 245, 0.08));
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.25);
 }
 
 .info-label {
@@ -1387,7 +1329,7 @@ const handleApiError = (error) => {
 }
 
 .info-value {
-  color: #4a90e2;
+  color: var(--vml-blue);
   font-weight: 600;
   font-size: 16px;
 }
@@ -1410,16 +1352,16 @@ const handleApiError = (error) => {
 .subset-card {
   flex: 1;
   padding: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+  background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
   backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border-radius: var(--radius-lg);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   transition: all 0.3s ease;
 }
 
 .subset-card:hover {
-  border-color: rgba(74, 144, 226, 0.4);
-  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.15);
+  border-color: rgba(var(--vml-blue-rgb), 0.4);
+  box-shadow: 0 8px 24px rgba(var(--vml-blue-rgb), 0.15);
 }
 
 .subset-card h4 {
@@ -1430,8 +1372,7 @@ const handleApiError = (error) => {
 }
 
 .subset-stats {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   margin-bottom: 20px;
 }
@@ -1450,14 +1391,14 @@ const handleApiError = (error) => {
 .stat-item .value {
   font-weight: 600;
   font-size: 16px;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .vs-divider {
   font-size: 28px;
   font-weight: 700;
-  color: #4a90e2;
-  text-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+  color: var(--vml-blue);
+  text-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.3);
 }
 
 .comparison-actions {
@@ -1476,18 +1417,18 @@ const handleApiError = (error) => {
 
 .metric-card {
   padding: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+  background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
   backdrop-filter: blur(10px);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   text-align: center;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   transition: all 0.3s ease;
 }
 
 .metric-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.2);
-  border-color: rgba(74, 144, 226, 0.4);
+  box-shadow: 0 8px 24px rgba(var(--vml-blue-rgb), 0.2);
+  border-color: rgba(var(--vml-blue-rgb), 0.4);
 }
 
 .metric-label {
@@ -1502,8 +1443,8 @@ const handleApiError = (error) => {
 .metric-value {
   font-size: 28px;
   font-weight: 700;
-  color: #4a90e2;
-  text-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+  color: var(--vml-blue);
+  text-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.2);
 }
 
 /* Chart Container */
@@ -1511,7 +1452,7 @@ const handleApiError = (error) => {
   width: 100%;
   height: 400px;
   margin-bottom: 24px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -1521,19 +1462,19 @@ const handleApiError = (error) => {
   min-width: 600px;
   border-collapse: collapse;
   margin-top: 16px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
 .glass-table thead {
-  background: linear-gradient(135deg, rgba(74, 144, 226, 0.15), rgba(91, 163, 245, 0.1));
+  background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.15), rgba(91, 163, 245, 0.1));
 }
 
 .glass-table th,
 .glass-table td {
   padding: 10px 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .glass-table th {
@@ -1549,7 +1490,7 @@ const handleApiError = (error) => {
 }
 
 .glass-table tbody tr:hover {
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
 }
 
 .diff-value {
@@ -1557,18 +1498,18 @@ const handleApiError = (error) => {
 }
 
 .diff-value.positive {
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .diff-value.negative {
-  color: #2b6cb0;
+  color: var(--vml-blue-darker);
 }
 
 /* Clustering Controls */
 .clustering-controls {
   display: flex;
   gap: 16px;
-  align-items: flex-start;
+  // align-items: flex-start;
   margin-bottom: 24px;
   flex-wrap: wrap;
   width: 100%;
@@ -1580,7 +1521,7 @@ const handleApiError = (error) => {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 100%;
+  // width: 100%;
   max-width: 100%;
 }
 
@@ -1595,14 +1536,13 @@ const handleApiError = (error) => {
   flex-direction: column;
   align-items: flex-start;
   padding: 12px;
-  background: rgba(74, 144, 226, 0.05);
-  border-radius: 10px;
-  border: 1px solid rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.05);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .feature-checkboxes {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   margin-top: 8px;
 }
@@ -1612,8 +1552,8 @@ const handleApiError = (error) => {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
+  background: var(--glass-50);
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   transition: all 0.2s ease;
   max-width: 100%;
@@ -1621,7 +1561,7 @@ const handleApiError = (error) => {
 }
 
 .feature-checkbox:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .checkbox-label {
@@ -1645,17 +1585,17 @@ const handleApiError = (error) => {
 
 .stat-card {
   padding: 16px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
-  border-radius: 12px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
+  border-radius: var(--radius-md);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   text-align: center;
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
-  border-color: rgba(74, 144, 226, 0.4);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.2);
+  border-color: rgba(var(--vml-blue-rgb), 0.4);
 }
 
 .stat-card .stat-label {
@@ -1668,7 +1608,7 @@ const handleApiError = (error) => {
 .stat-card .stat-value {
   font-size: 24px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .clusters-grid {
@@ -1679,15 +1619,15 @@ const handleApiError = (error) => {
 
 .cluster-card {
   padding: 16px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
-  border-radius: 12px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
+  border-radius: var(--radius-md);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
   transition: all 0.3s ease;
 }
 
 .cluster-card:hover {
-  border-color: rgba(74, 144, 226, 0.4);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+  border-color: rgba(var(--vml-blue-rgb), 0.4);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.15);
 }
 
 .cluster-header {
@@ -1696,13 +1636,13 @@ const handleApiError = (error) => {
   align-items: center;
   margin-bottom: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .cluster-id {
   font-size: 16px;
   font-weight: 600;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .cluster-size {
@@ -1712,8 +1652,7 @@ const handleApiError = (error) => {
 }
 
 .cluster-samples {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -1732,43 +1671,33 @@ const handleApiError = (error) => {
 .village-tag {
   display: inline-block;
   padding: 4px 10px;
-  background: rgba(74, 144, 226, 0.1);
-  border: 1px solid rgba(74, 144, 226, 0.2);
-  border-radius: 6px;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
+  border-radius: var(--radius-sm);
   font-size: 13px;
   color: var(--text-primary);
   transition: all 0.2s ease;
 }
 
 .village-tag:hover {
-  background: rgba(74, 144, 226, 0.2);
-  border-color: rgba(74, 144, 226, 0.4);
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  border-color: rgba(var(--vml-blue-rgb), 0.4);
 }
 
-/* Loading Overlay */
 .loading-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
-  display: flex;
-  flex-direction: column;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg-overlay);
+  @include flex-col;
   align-items: center;
   justify-content: center;
   z-index: 9999;
 }
 
-
-
 .loading-overlay p {
-  color: white;
-  margin-top: 20px;
+  color: var(--text-on-overlay, white);
+  margin-top: 16px;
   font-size: 16px;
-  font-weight: 500;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Responsive Design */
@@ -1894,7 +1823,7 @@ const handleApiError = (error) => {
 .total-count {
   font-size: 14px;
   font-weight: 600;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .display-note {
@@ -1932,7 +1861,7 @@ const handleApiError = (error) => {
   align-items: center;
   gap: 16px;
   padding-top: 16px;
-  border-top: 1px solid rgba(74, 144, 226, 0.1);
+  border-top: 1px solid rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .page-info {
@@ -1947,9 +1876,9 @@ const handleApiError = (error) => {
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: linear-gradient(135deg, rgba(74, 144, 226, 0.08), rgba(91, 163, 245, 0.05));
-  border-left: 3px solid #4a90e2;
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.08), rgba(91, 163, 245, 0.05));
+  border-left: 3px solid var(--vml-blue);
+  border-radius: var(--radius-sm2);
   margin-bottom: 16px;
 }
 
@@ -1970,8 +1899,8 @@ const handleApiError = (error) => {
   gap: 16px;
   margin: 20px 0;
   padding: 16px;
-  background: rgba(74, 144, 226, 0.05);
-  border-radius: 12px;
+  background: rgba(var(--vml-blue-rgb), 0.05);
+  border-radius: var(--radius-md);
 }
 
 /* Category Cell */
@@ -1986,9 +1915,9 @@ const handleApiError = (error) => {
 .timings-section {
   margin-bottom: 24px;
   padding: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
-  border-radius: 16px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
+  border-radius: var(--radius-lg);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .timings-section h4 {
@@ -2009,17 +1938,17 @@ const handleApiError = (error) => {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: rgba(74, 144, 226, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(74, 144, 226, 0.15);
+  background: rgba(var(--vml-blue-rgb), 0.05);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.15);
   transition: all 0.3s ease;
 }
 
 .timing-card:hover {
-  background: rgba(74, 144, 226, 0.1);
-  border-color: rgba(74, 144, 226, 0.3);
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border-color: rgba(var(--vml-blue-rgb), 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.15);
 }
 
 .timing-icon {
@@ -2029,8 +1958,7 @@ const handleApiError = (error) => {
 
 .timing-info {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
@@ -2043,7 +1971,7 @@ const handleApiError = (error) => {
 .timing-value {
   font-size: 16px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--vml-blue);
   font-family: 'Courier New', monospace;
 }
 
@@ -2059,19 +1987,19 @@ const handleApiError = (error) => {
 }
 
 .lift-value.high {
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .lift-value.low {
-  color: #90a4ae;
+  color: var(--text-slate-light);
 }
 
 .lift-value.zero {
-  color: #e57373;
+  color: var(--color-error-light);
 }
 
 .lift-value.infinite {
-  color: #ff9800;
+  color: var(--color-warning);
   font-size: 16px;
 }
 
@@ -2079,9 +2007,9 @@ const handleApiError = (error) => {
 .spatial-comparison-section {
   margin-top: 24px;
   padding: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
-  border-radius: 16px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  background: linear-gradient(145deg, var(--glass-70), var(--glass-50));
+  border-radius: var(--radius-lg);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .spatial-comparison-section h4 {
@@ -2102,12 +2030,11 @@ const handleApiError = (error) => {
   margin: 0 0 12px 0;
   font-size: 16px;
   font-weight: 600;
-  color: #4a90e2;
+  color: var(--vml-blue);
 }
 
 .spatial-stats {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -2116,8 +2043,8 @@ const handleApiError = (error) => {
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background: rgba(74, 144, 226, 0.05);
-  border-radius: 8px;
+  background: rgba(var(--vml-blue-rgb), 0.05);
+  border-radius: var(--radius-sm2);
 }
 
 .stat-label {
@@ -2139,9 +2066,9 @@ const handleApiError = (error) => {
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: linear-gradient(135deg, rgba(74, 144, 226, 0.15), rgba(91, 163, 245, 0.1));
-  border-radius: 12px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
+  background: linear-gradient(135deg, rgba(var(--vml-blue-rgb), 0.15), rgba(91, 163, 245, 0.1));
+  border-radius: var(--radius-md);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
 }
 
 .distance-label {
@@ -2153,8 +2080,8 @@ const handleApiError = (error) => {
 .distance-value {
   font-size: 24px;
   font-weight: 700;
-  color: #4a90e2;
-  text-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+  color: var(--vml-blue);
+  text-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.2);
 }
 
 @media (max-width: 768px) {

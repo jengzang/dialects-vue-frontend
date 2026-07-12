@@ -6,7 +6,7 @@
     </h3>
 
     <div class="vml-glass-panel">
-      <div class="tendency-section">
+      <div class="tendency-section" style="flex-direction: column; gap: 12px;">
       <h3>區域語義類別傾向性</h3>
       <p class="section-description">
         分析特定區域中各語義類別的傾向性，使用Z分數和Lift值衡量該區域對不同語義類別的偏好程度。
@@ -29,7 +29,7 @@
         </button>
       </div>
 
-      <div v-if="loadingTendency" class="loading-state">
+      <div v-if="loadingTendency" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
 
@@ -45,7 +45,7 @@
               class="tendency-fill"
               :style="{
                 width: `${Math.min(Math.abs(item.z_score) * 10, 100)}%`,
-                background: item.z_score >= 0 ? 'var(--color-primary)' : '#e74c3c'
+                background: item.z_score >= 0 ? 'var(--color-primary)' : 'var(--color-error)'
               }"
             ></div>
           </div>
@@ -86,7 +86,7 @@
         min="1"
         max="500"
         placeholder="返回數量 (1-500)"
-        class="number-input"
+        class="vml-number-input"
       />
       <button
         class="query-button solid-button"
@@ -97,7 +97,7 @@
       </button>
     </div>
 
-    <div v-if="loadingNgram" class="loading-state">
+    <div v-if="loadingNgram" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
     </div>
 
@@ -253,7 +253,7 @@ const loadRegionalNgrams = async () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .category-tendency-page {
   padding: 12px;
   max-width: 1400px;
@@ -264,29 +264,33 @@ const loadRegionalNgrams = async () => {
   margin-top: 16px;
 }
 
+.tendency-section {
+  @include flex-col;
+}
+
 .tendency-section h3 {
   font-size: 16px;
-  margin-bottom: 10px;
+  margin: 0;
   color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .section-description {
   font-size: 14px;
   color: var(--text-secondary);
-  margin-bottom: 16px;
   line-height: 1.6;
+  width: 100%;
 }
 
 .region-selector {
   display: flex;
   gap: 12px;
-  margin-bottom: 16px;
   align-items: center;
 }
 
 .tendency-results {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -296,13 +300,13 @@ const loadRegionalNgrams = async () => {
   align-items: center;
   gap: 12px;
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
   transition: background 0.3s ease;
 }
 
 .tendency-item:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .tendency-category {
@@ -313,8 +317,8 @@ const loadRegionalNgrams = async () => {
 
 .tendency-bar {
   height: 24px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
+  background: var(--glass-50);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -336,41 +340,24 @@ const loadRegionalNgrams = async () => {
   text-align: right;
 }
 
-.select-input {
-  width: 150px;
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+.ngram-section {
+  @include flex-col;
+  gap: 12px;
 }
 
 .ngram-section h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .ngram-controls {
   display: flex;
   gap: 12px;
-  margin-bottom: 16px;
   flex-wrap: wrap;
 }
 
-.number-input {
+.vml-number-input {
   width: 180px;
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.number-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
 }
 
 .ngram-results {
@@ -384,7 +371,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .ngram-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   min-width: 700px;
 }
@@ -400,23 +387,23 @@ const loadRegionalNgrams = async () => {
 }
 
 .ngram-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .ngram-row {
-  background: rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--glass-30);
+  border-bottom: 1px solid var(--bg-hover);
   transition: background 0.3s ease;
 }
 
 .ngram-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .ngram-row.top-10 {
-  background: rgba(243, 156, 18, 0.1);
+  background: rgba(var(--color-warning-rgb), 0.1);
 }
 
 .col-ngram {
@@ -432,9 +419,9 @@ const loadRegionalNgrams = async () => {
 .region-badge {
   display: inline-block;
   padding: 3px 8px;
-  background: rgba(74, 144, 226, 0.15);
+  background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
@@ -442,8 +429,8 @@ const loadRegionalNgrams = async () => {
 
 .bar-container {
   height: 24px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
+  background: var(--glass-50);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -473,14 +460,35 @@ const loadRegionalNgrams = async () => {
     max-width: 100% !important;
   }
 
-  .number-input {
+  .vml-number-input {
     width: 100% !important;
   }
 
-  .select-input,
   .simple-select-dropdown,
   .filterable-select {
     width: 100% !important;
+  }
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .tendency-section {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px 16px;
+  }
+
+  .tendency-section .region-selector {
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .ngram-section {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .ngram-controls {
+    flex: 1;
   }
 }
 

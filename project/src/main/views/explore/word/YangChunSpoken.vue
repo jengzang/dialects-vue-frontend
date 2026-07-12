@@ -18,11 +18,12 @@
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n();
 const router = useRouter();
+const route = useRoute();
 
 const spokenColumns = computed(() => [
   { key: '本字考', label: t('words.ycSpoken.columns.character'), filterable: false, width: 1 },
@@ -43,17 +44,24 @@ const goToYCVillages = () => {
 };
 </script>
 
-<style lang="scss" scoped>
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$button-text-color: var(--color-primary-hover);
+$transition-duration: 0.3s;
+
 .title-row {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0;
   align-items: center;
   justify-content: center;
-  gap: 0px;
   margin: 0;
   font-size: 1em;
-  flex-wrap: wrap;
 
-  & h2 {
+  h2 {
     margin: 0 20px 0 0;
     white-space: nowrap;
   }
@@ -61,22 +69,32 @@ const goToYCVillages = () => {
 
 .village-link-btn {
   padding: 8px 16px;
-  border-radius: 25px;
-  border: 3px solid rgba(255, 255, 255, 0.4);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-  color: #005fd3;
-  font-weight: 1000;
+  color: $button-text-color;
   font-size: 1rem;
+  font-weight: 1000;
+  white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
+  background: linear-gradient(
+    145deg,
+    var(--glass-20),
+    var(--glass-10)
+  );
+  border: 3px solid var(--glass-40);
+  border-radius: 25px;
+  box-shadow:
+    0 6px 10px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all $transition-duration ease;
 
-.village-link-btn:hover {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-  transform: scale(1.05);
+  &:hover {
+    background: linear-gradient(
+      145deg,
+      var(--glass-50),
+      var(--glass-30)
+    );
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+  }
 }
 </style>

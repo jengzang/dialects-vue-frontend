@@ -111,7 +111,8 @@
       "progressFailed": "Failed to get progress: {message}",
       "processFailed": "Processing failed: {message}",
       "taskMissing": "Task ID not found.",
-      "downloadFailed": "Download failed: {message}"
+      "downloadFailed": "Download failed: {message}",
+      "previewFailed": "Failed to preview the table: {message}"
     },
     "export": {
       "configFileName": "jyut2ipa-rules.json",
@@ -137,6 +138,7 @@
       "columnCount": "Columns",
       "viewDefault": "View Default Reference",
       "loadingDefault": "Loading reference sheet...",
+      "downloadDefault": "Download Default Reference",
       "next": "Next"
     },
     "files": {
@@ -178,7 +180,7 @@
     },
     "validation": {
       "loginRequired": "Please sign in first.",
-      "invalidFileType": "Please upload an Excel file (.xlsx or .xls).",
+      "invalidFileType": "Please upload a spreadsheet file (.xlsx, .xls, or .csv).",
       "partialInvalid": "Some files have invalid formats. Only .xlsx and .xls are supported.",
       "fileTooLarge": "These files exceed the 3MB limit: {files}",
       "referenceFileTooLarge": "File size must not exceed 3MB.",
@@ -193,7 +195,8 @@
       "readDefaultFailed": "Failed to read the default reference sheet: {message}",
       "defaultDownloaded": "Default reference sheet downloaded.",
       "useDefaultSuccess": "Default reference sheet applied.",
-      "useDefaultFailed": "Failed to use the reference sheet: {message}"
+      "useDefaultFailed": "Failed to use the reference sheet: {message}",
+      "previewFailed": "Failed to preview the reference sheet: {message}"
     },
     "export": {
       "resultFileName": "方音圖鑑_合併字表.xlsx",

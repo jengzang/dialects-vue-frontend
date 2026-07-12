@@ -276,7 +276,7 @@ const showPopup = (feature, lngLat) => {
       <p style="margin: 4px 0;"><strong>空間一致性:</strong> ${props.spatial_coherence?.toFixed(3)}</p>
       <p style="margin: 4px 0;"><strong>主要城市:</strong> ${props.dominant_city || 'N/A'}</p>
       <p style="margin: 4px 0;"><strong>主要區縣:</strong> ${props.dominant_county || 'N/A'}</p>
-      ${props.is_significant ? '<p style="margin: 4px 0; color: #FFD700; font-weight: bold;">✨ 統計顯著</p>' : ''}
+      ${props.is_significant ? '<p style="margin: 4px 0; color: #ffd700; font-weight: bold;">✨ 統計顯著</p>' : ''}
       ${props.avg_p_value ? `<p style="margin: 4px 0;"><strong>P值:</strong> ${props.avg_p_value?.toFixed(4)}</p>` : ''}
     `
   } else if (props.type === 'village') {
@@ -424,7 +424,7 @@ const renderHotspot = () => {
       },
       'circle-color': 'rgba(255, 100, 100, 0.2)',
       'circle-stroke-width': 2,
-      'circle-stroke-color': '#ff6464'
+      'circle-stroke-color': '#ff3b30'
     }
   })
 
@@ -699,7 +699,7 @@ const resetView = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .spatial-map-container {
   width: 100%;
   height: 100%;
@@ -731,7 +731,7 @@ const resetView = () => {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-80);
   backdrop-filter: blur(12px);
   padding: 12px;
   border-radius: 12px;
@@ -757,7 +757,7 @@ const resetView = () => {
   width: 100%;
   appearance: none;
   background: white;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-light-gray);
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 14px;
@@ -767,7 +767,7 @@ const resetView = () => {
 }
 
 .custom-select select:focus {
-  border-color: #4a90e2;
+  border-color: var(--vml-blue);
 }
 
 .custom-select .arrow {
@@ -777,7 +777,7 @@ const resetView = () => {
   transform: translateY(-50%);
   pointer-events: none;
   font-size: 12px;
-  color: #888;
+  color: var(--text-muted);
 }
 
 .button-row {
@@ -788,7 +788,7 @@ const resetView = () => {
 
 .action-btn {
   flex: 1;
-  background: #4a90e2;
+  background: var(--vml-blue);
   color: white;
   border: none;
   padding: 8px;
@@ -802,15 +802,15 @@ const resetView = () => {
 }
 
 .action-btn:hover {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .fullscreen-btn {
-  background: #50c878;
+  background: var(--color-success);
 }
 
 .fullscreen-btn:hover {
-  background: #40b368;
+  background: var(--color-success);
 }
 
 .exit-fullscreen-btn {
@@ -820,10 +820,10 @@ const resetView = () => {
   padding: 12px 24px;
   font-size: 15px;
   font-weight: 600;
-  color: #333;
-  background: rgba(255, 255, 255, 0.85);
+  color: var(--text-dark);
+  background: var(--glass-80);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-50);
   border-radius: 50px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   cursor: pointer;
@@ -832,14 +832,14 @@ const resetView = () => {
 }
 
 .exit-fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--glass-90);
   transform: scale(1.05);
 }
 
 .loading-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -847,8 +847,6 @@ const resetView = () => {
   gap: 12px;
   z-index: 20;
   font-weight: 500;
-  color: #555;
+  color: var(--text-medium);
 }
-
-
 </style>

@@ -85,195 +85,195 @@ const goToAuth = () => {
 };
 </script>
 
-<style scoped>
-/* 认证按钮基础样式 */
-.auth-button {
-  position: fixed;
-  z-index: 998; /* 与 floating-buttons 同级 */
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
-  /* 尺寸和形状 */
-  min-width: 60px;
-  height: 45px;
-  padding: 0 10px;
-  border-radius: 25px; /* Pill shape */
+$apple-blue: var(--color-primary-hover);
 
-  /* 玻璃态效果 */
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15));
-  backdrop-filter: blur(15px) saturate(150%);
-  -webkit-backdrop-filter: blur(15px) saturate(150%);
+$desktop-auth-size: 60px;
+$desktop-float-size: 60px;
+$mobile-auth-size: 50px;
+$mobile-float-size: 50px;
 
-  /* 边框和阴影 */
-  border: 3px solid rgba(255, 255, 255, 0.5);
+$desktop-offset: 20px;
+$mobile-offset: 15px;
+
+$transition-base: 0.3s ease;
+@mixin floating-glass {
+  background: linear-gradient(
+    145deg,
+    var(--glass-30),
+    var(--glass-20)
+  );
+  border: 3px solid var(--glass-50);
   box-shadow:
     0 8px 16px rgba(0, 0, 0, 0.15),
     0 2px 6px rgba(0, 0, 0, 0.1);
-
-  /* 布局 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  /* 交互 */
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.3s ease;
+  backdrop-filter: blur(15px) saturate(150%);
+  -webkit-backdrop-filter: blur(15px) saturate(150%);
 }
 
-/* 位置变体 - 右上角（默认） */
-.auth-button.position-top-right {
-  top: 20px;
-  right: 20px;
-}
-
-/* 位置变体 - 左下角 */
-.auth-button.position-bottom-left {
-  bottom: 20px;
-  left: 20px;
-}
-
-.auth-button:hover {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
-  transform: scale(1.05) translateY(-2px);
+@mixin floating-hover {
+  background: linear-gradient(
+    145deg,
+    var(--glass-50),
+    var(--glass-30)
+  );
   box-shadow:
     0 12px 24px rgba(0, 0, 0, 0.2),
     0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.auth-button:active {
-  transform: scale(1.02);
+/* 认证按钮 */
+.auth-button {
+  position: fixed;
+  z-index: 998;
+  min-width: $desktop-auth-size;
+  height: 45px;
+  padding: 0 10px;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 25px;
+  transition: all $transition-base;
+
+  @include flex-center;
+  @include floating-glass;
+
+  &.position-top-right {
+    top: $desktop-offset;
+    right: $desktop-offset;
+  }
+
+  &.position-bottom-left {
+    bottom: $desktop-offset;
+    left: $desktop-offset;
+  }
+
+  &:hover {
+    transform: scale(1.05) translateY(-2px);
+
+    @include floating-hover;
+  }
+
+  &:active {
+    transform: scale(1.02);
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    min-width: $mobile-auth-size;
+    height: 35px;
+    padding: 0 10px;
+    border-radius: 22px;
+
+    &.position-top-right,
+    &.position-bottom-left {
+      top: auto;
+      right: auto;
+      bottom: $mobile-offset;
+      left: $mobile-offset;
+    }
+  }
 }
 
 .auth-text {
-  color: #005fd3; /* Apple 蓝色 */
+  max-width: 120px;
+  overflow: hidden;
+  color: $apple-blue;
   font-size: 16px;
   font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 120px;
+  white-space: nowrap;
+
+  @media (max-aspect-ratio: 1/1) {
+    max-width: 100px;
+    font-size: 14px;
+  }
 }
 
 /* 右下角功能按钮组 */
 .floating-buttons {
   position: fixed;
-  bottom: 30px;
   right: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  bottom: 30px;
   z-index: 998;
+  @include flex-col;
+  gap: 12px;
+
+  @media (max-aspect-ratio: 1/1) {
+    right: 20px;
+    bottom: 20px;
+    gap: 10px;
+  }
 }
 
 .float-btn {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.5);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15));
-  backdrop-filter: blur(15px) saturate(150%);
-  -webkit-backdrop-filter: blur(15px) saturate(150%);
-  box-shadow:
-    0 8px 16px rgba(0, 0, 0, 0.15),
-    0 2px 6px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  user-select: none;
+  width: $desktop-float-size;
+  height: $desktop-float-size;
   padding: 8px;
+  font-size: 24px;
+  cursor: pointer;
+  user-select: none;
+  border-radius: var(--radius-full);
+  transition: all $transition-base;
+
+  @include flex-center;
+  @include floating-glass;
+
+  &:hover {
+    transform: scale(1.1) translateY(-2px);
+
+    @include floating-hover;
+  }
+
+  &:active {
+    transform: scale(1.05);
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    width: $mobile-float-size;
+    height: $mobile-float-size;
+    font-size: 22px;
+  }
 }
 
-.float-btn:hover {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
-  transform: scale(1.1) translateY(-2px);
-  box-shadow:
-    0 12px 24px rgba(0, 0, 0, 0.2),
-    0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.float-btn:active {
-  transform: scale(1.05);
-}
-
-/* Logo 样式 - 与 navbar 保持一致 */
+/* Logo 样式 */
 .logo {
   width: 85%;
   height: auto;
 }
 
-/* 移动端适配 */
-@media (max-aspect-ratio: 1/1) {
-  /* 认证按钮移动端 - 统一到左下角 */
-  .auth-button {
-    min-width: 50px;
-    height: 35px;
-    padding: 0 10px;
-    border-radius: 22px;
-  }
-
-  .auth-button.position-top-right,
-  .auth-button.position-bottom-left {
-    top: auto;
-    left: 15px;
-    bottom: 15px;
-    right: auto;
-  }
-
-  .auth-text {
-    font-size: 14px;
-    max-width: 100px;
-  }
-
-  /* 功能按钮移动端 */
-  .floating-buttons {
-    bottom: 20px;
-    right: 20px;
-    gap: 10px;
-  }
-
-  .float-btn {
-    width: 50px;
-    height: 50px;
-    font-size: 22px;
-  }
-}
-
+/* 已登录头像按钮 */
 .avatar-container {
   position: fixed;
   z-index: 998;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: $desktop-auth-size;
+  height: $desktop-auth-size;
   cursor: pointer;
   user-select: none;
-}
 
-.avatar-container.position-top-right {
-  top: 20px;
-  right: 20px;
-}
+  @include flex-center;
 
-.avatar-container.position-bottom-left {
-  bottom: 20px;
-  left: 20px;
-}
-
-@media (max-aspect-ratio: 1/1) {
-  .avatar-container {
-    width: 50px;
-    height: 50px;
+  &.position-top-right {
+    top: $desktop-offset;
+    right: $desktop-offset;
   }
 
-  .avatar-container.position-top-right,
-  .avatar-container.position-bottom-left {
-    top: auto;
-    left: 15px;
-    bottom: 15px;
-    right: auto;
+  &.position-bottom-left {
+    bottom: $desktop-offset;
+    left: $desktop-offset;
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    width: $mobile-auth-size;
+    height: $mobile-auth-size;
+
+    &.position-top-right,
+    &.position-bottom-left {
+      top: auto;
+      right: auto;
+      bottom: $mobile-offset;
+      left: $mobile-offset;
+    }
   }
 }
 </style>

@@ -354,34 +354,51 @@
           "idle": "等待框選..."
         },
         "toneNameInput": "輸入調類名稱（例如：陰平）",
-        "addButton": "加入列表"
+        "addButton": "加入列表",
+        "persistenceHint": "已添加的調值資訊會自動儲存，重新整理或離開頁面後資料仍然保留。"
       },
       "savedList": {
         "title": "已採集調類（{count}）",
         "clearAll": "清空全部",
         "empty": "暫無資料，請在上方圖表框選並加入",
         "tagCount": "{count} 段",
-        "confirmClear": "確定要清空所有已儲存的調類嗎？"
+        "confirmClear": "確定要清空所有已儲存的調類嗎？",
+        "previewTitle": "預覽調類 - {name}",
+        "segmentIndex": "段 {index}",
+        "segmentPoints": "{count} 個採樣點",
+        "deleteSegment": "刪除此段",
+        "closePreview": "關閉預覽"
       }
     },
     "step2": {
       "title": "開始 T 值分析",
       "hint": "計算並產生各調類的五度值曲線",
-      "analyzeButton": "開始分析（{count} 個調類）"
+      "analyzeButton": "開始分析（{count} 個調類）",
+      "logScaleLabel": "對數變換方式",
+      "logScaleOptions": {
+        "log": "普通 Log",
+        "logZScore": "Log z-score"
+      },
+      "analysisModeCheckbox": "取 11 點標準化"
     },
     "step3": {
       "title": "分析結果",
       "hint": "五度值曲線（保留原始時長，對齊起點）",
       "stats": {
         "ceiling": "參考系上限：{max} Hz",
-        "floor": "參考系下限：{min} Hz"
+        "floor": "參考系下限：{min} Hz",
+        "logMean": "Log 均值：{mean}",
+        "logSd": "Log 標準差：{sd}"
       },
       "exportButton": "導出 Excel",
       "chart": {
         "title": "石鋒 T 值曲線",
         "tooltipTime": "時間: {time} ms",
+        "tooltipTimeElevenPoint": "時長位置：{percent}%",
         "xAxis": "時間 (ms)",
+        "xAxisElevenPoint": "歸一化時長 (%)",
         "yAxis": "五度值 (T)",
+        "yAxisZScore": "Log z-score",
         "toolbox": {
           "zoom": "縮放",
           "back": "還原",
@@ -396,7 +413,8 @@
         "fileName": "方音圖鑑_T值法定調_{timestamp}.xlsx",
         "sheetName": "石鋒T值分析",
         "columns": {
-          "time": "時間 (ms)"
+          "time": "時間 (ms)",
+          "timeElevenPoint": "歸一化時長 (%)"
         }
       }
     },

@@ -6,7 +6,7 @@
       <!-- Introduction Section -->
       <div class="intro-section glass-panel">
         <p class="intro-text">
-          <strong>自然村機器學習分析系統</strong>是一個基於廣東省285,860個自然村名稱的語言學分析平台。
+          <strong>自然村機器學習分析系統</strong>是一個基於廣東省283,070個自然村名稱的語言學分析平台。
           系統運用機器學習和自然語言處理技術，從多個維度分析村名的語義、結構、空間分佈等特徵，為地名學研究、文化地理學、語言學等領域提供數據支持。
         </p>
         <div class="github-row">
@@ -149,7 +149,7 @@ const statistics = computed(() => {
       icon: '🏘️',
       label: '自然村總數',
       value: metadata.value.total_villages || 0,
-      tooltip: '廣東省285,860個自然村名稱，數據來源於2020年全國地名普查。覆蓋21個地級市、123個區縣、1500+個鄉鎮'
+      tooltip: '廣東省283,070個自然村名稱，數據來源於各大地圖網站整理匯總。覆蓋21個地級市、123個區縣、1500+個鄉鎮'
     },
     {
       key: 'cities',
@@ -207,7 +207,7 @@ const features = [
     route: '/villagesML?module=character&subtab=frequency',
     badge: '公開',
     badgeClass: 'badge-public',
-    tooltip: '基於285,860條村名的字符統計分析。包含：①頻率傾向（Z-score/Lift/Log-odds三種指標衡量地區偏好）②嵌入相似（Word2Vec Skipgram模型，100維向量，餘弦相似度）③字符網絡（Louvain社群識別算法）④顯著性（卡方檢驗，Cramér\'s V效應量）'
+    tooltip: '基於283,070條村名的字符統計分析。包含：①頻率傾向（Z-score/Lift/Log-odds三種指標衡量地區偏好）②嵌入相似（Word2Vec Skipgram模型，100維向量，餘弦相似度）③字符網絡（Louvain社群識別算法）④顯著性（卡方檢驗，Cramér\'s V效應量）'
   },
   {
     id: 'semantic',
@@ -312,7 +312,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .dashboard-page {
   padding: 20px;
   max-width: 1400px;
@@ -337,9 +337,9 @@ onMounted(() => {
 .load-ngram-button {
   padding: 6px 14px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -357,9 +357,9 @@ onMounted(() => {
   gap: 12px;
   padding: 14px 18px;
   margin-bottom: 20px;
-  background: rgba(243, 156, 18, 0.12);
-  border: 1px solid rgba(243, 156, 18, 0.4);
-  border-radius: 12px;
+  background: rgba(var(--color-warning-rgb), 0.12);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.4);
+  border-radius: var(--radius-md);
   font-size: 14px;
   color: var(--text-primary);
 }
@@ -370,13 +370,12 @@ onMounted(() => {
 }
 
 .notice-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
 .notice-content strong {
-  color: #d68910;
+  color: var(--color-warning);
 }
 
 .stat-card {
@@ -430,33 +429,34 @@ onMounted(() => {
 .search-input {
   flex: 1;
   padding: 12px 20px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 12px;
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-md);
   font-size: 16px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   transition: all 0.3s ease;
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
 }
 
 .search-button {
   padding: 12px 30px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  max-width: 100px;
 }
 
 .search-button:hover {
-  background: #3a7bc8;
+  background: var(--color-map-draw);
   transform: translateY(-2px);
 }
 
@@ -472,13 +472,12 @@ onMounted(() => {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 
 .feature-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-card);
 }
 
 .feature-header {
@@ -513,7 +512,7 @@ onMounted(() => {
 .feature-badge {
   display: inline-block;
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
   flex-shrink: 0; /* Don't shrink badge */
@@ -521,20 +520,20 @@ onMounted(() => {
 }
 
 .badge-public {
-  background: rgba(80, 200, 120, 0.2);
-  color: #2d8659;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .badge-auth {
-  background: rgba(243, 156, 18, 0.2);
-  color: #c87f0a;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning-dark);
 }
 
 /* Introduction Section */
 .intro-section {
   padding: 30px;
   margin-bottom: 30px;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-60);
 }
 
 .intro-text {
@@ -551,8 +550,7 @@ onMounted(() => {
 }
 
 .github-row {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 10px;
   margin-top: 4px;
@@ -568,10 +566,10 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   padding: 9px 22px;
-  border-radius: 20px;
-  background: rgba(36, 41, 47, 0.08);
-  border: 1px solid rgba(36, 41, 47, 0.2);
-  color: #24292f;
+  border-radius: var(--radius-xl);
+  background: rgba(var(--text-deep-rgb), 0.08);
+  border: 1px solid rgba(var(--text-deep-rgb), 0.2);
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
@@ -579,8 +577,8 @@ onMounted(() => {
 }
 
 .github-link:hover {
-  background: rgba(36, 41, 47, 0.15);
-  border-color: rgba(36, 41, 47, 0.4);
+  background: rgba(var(--text-deep-rgb), 0.15);
+  border-color: rgba(var(--text-deep-rgb), 0.4);
 }
 
 .github-icon {

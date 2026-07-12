@@ -47,7 +47,8 @@
       "gdVillages": "广东自然村",
       "VillagesML": "机器学习",
       "gdVillagesTable": "全粤村情表格",
-      "ycVillages": "阳春自然村"
+      "ycVillages": "阳春自然村",
+      "allVillages": "全部自然村"
     },
     "tools": {
       "check": "字表工具",
@@ -94,6 +95,16 @@
     "language": {
       "title": "语言设置",
       "description": "选择您偏好的界面语言"
+    },
+    "colorTheme": {
+      "title": "主题配色",
+      "description": "选择页面背景、玻璃面板与文字的整体配色。",
+      "label": "当前配色",
+      "options": {
+        "blue": "蓝色",
+        "light": "浅色",
+        "dark": "深色"
+      }
     },
     "interfaceMode": {
       "title": "页面风格",

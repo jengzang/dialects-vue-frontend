@@ -27,6 +27,12 @@
           <div class="village-name">{{ $t('villages.ycVillages.name') }}</div>
           <div class="village-desc">{{ $t('villages.ycVillages.desc') }}</div>
         </button>
+
+        <button v-if="userStore.role === 'admin'" class="village-btn" @click="handleAllVillages">
+          <div class="village-icon">📋</div>
+          <div class="village-name">{{ $t('villages.allVillages.name') }}</div>
+          <div class="village-desc">{{ $t('villages.allVillages.desc') }}</div>
+        </button>
       </div>
   </div>
 </template>
@@ -34,6 +40,7 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { userStore } from '@/main/store/store.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -53,9 +60,15 @@ const handleYcVillages = () => {
 const handleVillagesML = () => {
   router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/ml'))
 };
+
+const handleAllVillages = () => {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/all'))
+};
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .villages-page {
   min-width: 80dvw;
   display: flex;
@@ -70,7 +83,7 @@ const handleVillagesML = () => {
   margin: 0 0 40px 0;
   font-size: 28px;
   font-weight: 700;
-  color: #0b2540;
+  color: var(--text-deep);
   text-align: center;
 }
 
@@ -83,16 +96,15 @@ const handleVillagesML = () => {
 
 .village-btn {
   padding: 24px 16px;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-radius: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15));
+  border: 2px solid var(--glass-40);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(145deg, var(--glass-30), var(--glass-20));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 12px;
   text-align: center;
@@ -101,8 +113,8 @@ const handleVillagesML = () => {
 .village-btn:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
-  border-color: rgba(0, 122, 255, 0.3);
+  background: linear-gradient(145deg, var(--glass-50), var(--glass-30));
+  border-color: rgba(var(--color-primary-rgb), 0.3);
 }
 
 .village-btn:active {
@@ -117,12 +129,12 @@ const handleVillagesML = () => {
 .village-name {
   font-size: 20px;
   font-weight: 700;
-  color: #005fd3;
+  color: var(--color-primary-hover);
 }
 
 .village-desc {
   font-size: 13px;
-  color: #666;
+  color: var(--text-tertiary);
   line-height: 1.4;
 }
 

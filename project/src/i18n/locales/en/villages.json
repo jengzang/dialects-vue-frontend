@@ -16,6 +16,10 @@
     "name": "Yangchun Villages",
     "desc": "Yangchun County natural villages (from county records)"
   },
+  "allVillages": {
+    "name": "All Villages",
+    "desc": "All villages data (admin only)"
+  },
   "pages": {
     "gdTree": {
       "title": "Guangdong Village Tree",
@@ -48,6 +52,35 @@
         "longitude": "Longitude",
         "latitude": "Latitude"
       }
+    },
+    "allVillages": {
+      "title": "All Villages",
+      "searchPlaceholder": "Search loaded villages...",
+      "loadingCities": "Loading list...",
+      "retry": "Retry",
+      "load": "Load",
+      "loading": "Loading...",
+      "loaded": "Loaded",
+      "fetching": "Fetching data...",
+      "noResults": "No matching results found",
+      "noData": "No data available",
+      "errors": {
+        "invalidCityList": "Unexpected list format returned",
+        "loadCities": "Failed to load the list. Please retry.",
+        "invalidCityData": "Unexpected data format returned, or no data",
+        "loadCity": "Load failed. Please retry."
+      },
+      "filter": {
+        "modeLabel": "Filter:",
+        "modeLevel1": "Level 1",
+        "modeLevel2": "Level 2",
+        "modeLevel3": "Level 3",
+        "modeRaw": "Raw Name",
+        "clear": "Clear",
+        "placeholder": "Select...",
+        "modeNone": "No Filter"
+      },
+      "reload": "Reload"
     },
     "yangChun": {
       "title": "Yangchun Administrative Divisions",

@@ -35,6 +35,10 @@
               :disabled="currentSelection.length === 0 || !toneNameInput"
               @click="saveTone"
             >➕ {{ t('praat.pitchTone.step1.controls.addButton') }}</button>
+
+          <div class="persistence-hint">
+            💡 {{ t('praat.pitchTone.step1.controls.persistenceHint') }}
+          </div>
         </div>
 
         <div class="saved-list-container">
@@ -44,10 +48,10 @@
           </div>
 
           <div class="tags-wrapper">
-            <div v-for="(tone, index) in savedTones" :key="index" class="tone-tag">
+            <div v-for="(tone, index) in savedTones" :key="index" class="tone-tag" @click="openPreview(index)">
               <span class="tag-name">{{ tone.name }}</span>
               <span class="tag-count">{{ t('praat.pitchTone.step1.savedList.tagCount', { count: getToneSegmentCount(tone) }) }}</span>
-              <button @click="removeTone(index)" class="close-tag">×</button>
+              <button @click.stop="removeTone(index)" class="close-tag">×</button>
             </div>
             <div v-if="savedTones.length === 0" class="empty-hint">{{ t('praat.pitchTone.step1.savedList.empty') }}</div>
           </div>
@@ -71,6 +75,19 @@
       </div>
 
       <div class="analyze-action">
+        <div class="analyze-options-row">
+          <div class="log-scale-selector">
+            <span class="log-scale-label">{{ t('praat.pitchTone.step2.logScaleLabel') }}</span>
+            <RadioGroup
+              v-model="logScaleMode"
+              :options="logScaleOptions"
+              name="logScaleMode"
+            />
+          </div>
+          <div class="analysis-mode-toggle">
+            <CheckBox v-model="analysisMode" :label="t('praat.pitchTone.step2.analysisModeCheckbox')" />
+          </div>
+        </div>
         <button
             class="analyze-btn"
             @click="performTValueAnalysis"
@@ -89,8 +106,14 @@
       </div>
 
       <div class="stats-info">
-        <span>{{ t('praat.pitchTone.step3.stats.ceiling', { max: globalStats.max.toFixed(1) }) }}</span>
-        <span>{{ t('praat.pitchTone.step3.stats.floor', { min: globalStats.min.toFixed(1) }) }}</span>
+        <template v-if="globalStats.mode === 'logZScore'">
+          <span>{{ t('praat.pitchTone.step3.stats.logMean', { mean: globalStats.logMean.toFixed(3) }) }}</span>
+          <span>{{ t('praat.pitchTone.step3.stats.logSd', { sd: globalStats.logSd.toFixed(3) }) }}</span>
+        </template>
+        <template v-else>
+          <span>{{ t('praat.pitchTone.step3.stats.ceiling', { max: globalStats.max.toFixed(1) }) }}</span>
+          <span>{{ t('praat.pitchTone.step3.stats.floor', { min: globalStats.min.toFixed(1) }) }}</span>
+        </template>
       </div>
 
       <div class="export-actions">
@@ -102,6 +125,43 @@
       <div ref="tValueChartContainer" class="chart-container result-chart"></div>
     </div>
 
+    <AppModal
+      v-model="showPreviewModal"
+      size="sm"
+      :title="previewTitle"
+      :close-label="t('praat.pitchTone.step1.savedList.closePreview')"
+    >
+      <div v-if="previewTone" class="preview-segments">
+        <div
+          v-for="(seg, si) in previewTone.segments"
+          :key="si"
+          class="preview-segment-row"
+        >
+          <div class="preview-segment-info">
+            <span class="preview-segment-label">
+              {{ t('praat.pitchTone.step1.savedList.segmentIndex', { index: si + 1 }) }}
+            </span>
+            <span class="preview-segment-meta">
+              {{ t('praat.pitchTone.step1.savedList.segmentPoints', { count: getSegmentValues(seg).length }) }}
+              <template v-if="getSegmentValues(seg).length > 0">
+                · {{ getSegmentHZRange(seg).min.toFixed(1) }} – {{ getSegmentHZRange(seg).max.toFixed(1) }} Hz
+              </template>
+            </span>
+            <span v-if="seg.savedAt" class="preview-segment-time">
+              {{ formatTime(seg.savedAt) }}
+            </span>
+          </div>
+          <button
+            class="text-btn danger"
+            @click="deleteSegment(si)"
+          >{{ t('praat.pitchTone.step1.savedList.deleteSegment') }}</button>
+        </div>
+      </div>
+      <div v-else class="preview-empty">
+        {{ t('praat.pitchTone.step1.savedList.empty') }}
+      </div>
+    </AppModal>
+
   </div>
 </template>
 
@@ -110,8 +170,13 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts'
 import * as XLSX from 'xlsx'
 import { useI18n } from 'vue-i18n'
-import { showSuccess, showWarning } from '@/utils/message.js'
+import { showSuccess, showWarning, showConfirm } from '@/utils/message.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
+import AppModal from '@/components/common/AppModal.vue'
+
+const STANDARD_POINT_COUNT = 11
 
 const props = defineProps({
   results: { type: Object, default: null }
@@ -120,6 +185,7 @@ const { t } = useI18n()
 const PITCH_TONE_EXPORT_FILE_PREFIX = '方音圖鑑_T值法定調_'
 const PITCH_TONE_EXPORT_SHEET_NAME = '石鋒T值分析'
 const PITCH_TONE_EXPORT_TIME_COLUMN = '時間 (ms)'
+const PITCH_TONE_EXPORT_TIME_COLUMN_ELEVEN_POINT = '归一化时长 (%)'
 
 // === 狀態變量 ===
 const pitchChartContainer = ref(null)
@@ -132,7 +198,26 @@ const toneNameInput = ref('')
 const currentSelection = ref([]) // 當前框選的Hz數組
 const savedTones = ref([])       // 已保存的調類列表 [{name, segments:[[]]}]
 const tValueResults = ref([])    // 計算後的T值結果
-const globalStats = ref({ max: 0, min: 0 })
+const globalStats = ref({ max: 0, min: 0, mode: 'log', logMean: 0, logSd: 0 })
+
+// 预览弹窗
+const showPreviewModal = ref(false)
+const previewToneIndex = ref(-1)
+const previewTone = computed(() => savedTones.value[previewToneIndex.value] ?? null)
+const previewTitle = computed(() => {
+  if (!previewTone.value) return ''
+  return t('praat.pitchTone.step1.savedList.previewTitle', { name: previewTone.value.name })
+})
+
+// 对数变换方式：'log' | 'logZScore'
+const logScaleMode = ref('log')
+const logScaleOptions = computed(() => [
+  { value: 'log', label: t('praat.pitchTone.step2.logScaleOptions.log') },
+  { value: 'logZScore', label: t('praat.pitchTone.step2.logScaleOptions.logZScore') }
+])
+
+// 分析模式：false = 完整曲线，true = 11 点标准化
+const analysisMode = ref(false)
 
 // 本地存儲 Key
 const STORAGE_KEY = 'shifeng_analysis_data'
@@ -155,6 +240,29 @@ const getToneSegmentCount = (tone) => {
     return 1
   }
   return 0
+}
+
+// Helper: extract Hz array from a segment regardless of old/new format
+const getSegmentValues = (seg) => {
+  if (Array.isArray(seg)) return seg
+  return seg?.values ?? []
+}
+
+const formatTime = (ts) => {
+  const d = new Date(ts)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+}
+
+const getSegmentHZRange = (seg) => {
+  const values = getSegmentValues(seg)
+  if (values.length === 0) return { min: 0, max: 0 }
+  let min = Infinity, max = -Infinity
+  for (const v of values) {
+    if (v < min) min = v
+    if (v > max) max = v
+  }
+  return { min, max }
 }
 
 // === 初始化與生命週期 ===
@@ -285,8 +393,8 @@ const initPitchChart = () => {
     {
       xAxis: seg.start_s,
       itemStyle: {
-        color: seg.type === 'rime_core' ? 'rgba(255,215,0,0.2)' :
-            seg.type === 'silence' ? 'rgba(200,200,200,0.1)' :
+        color: seg.type === 'rime_core' ? 'rgba(var(--color-gold-rgb), 0.2)' :
+            seg.type === 'silence' ? 'rgba(var(--color-silver-rgb), 0.1)' :
                 'rgba(100,150,255,0.15)'
       }
     },
@@ -297,7 +405,7 @@ const initPitchChart = () => {
     title: {
       text: t('praat.pitchTone.step1.chart.title'),
       left: 'center',
-      textStyle: { fontSize: 14, color: '#666' }
+      textStyle: { fontSize: 14, color: 'var(--text-tertiary)' }
     },
     tooltip: {
       trigger: 'axis',
@@ -340,7 +448,7 @@ const initPitchChart = () => {
       data: rawData,
       symbol: 'none',
       smooth: true,
-      lineStyle: { color: '#007aff', width: 2 },
+      lineStyle: { color: 'var(--color-primary)', width: 2 },
       markArea: markAreaData.length > 0 ? {
         data: markAreaData,
         silent: true
@@ -414,12 +522,12 @@ const saveTone = () => {
 
   if (existingTone) {
     // Add to existing tone class
-    existingTone.segments.push([...currentSelection.value])
+    existingTone.segments.push({ values: [...currentSelection.value], savedAt: Date.now() })
   } else {
     // Create new tone class
     savedTones.value.push({
       name: toneNameInput.value,
-      segments: [[...currentSelection.value]]
+      segments: [{ values: [...currentSelection.value], savedAt: Date.now() }]
     })
   }
 
@@ -439,20 +547,83 @@ const removeTone = (index) => {
   savedTones.value.splice(index, 1)
 }
 
-const clearAll = () => {
-  if (confirm(t('praat.pitchTone.step1.savedList.confirmClear'))) {
+const clearAll = async () => {
+  if (await showConfirm(t('praat.pitchTone.step1.savedList.confirmClear'))) {
     savedTones.value = []
     pitchToneStorage.remove()
     // Do NOT clear tValueResults - keep analysis results visible
   }
 }
 
+const openPreview = (index) => {
+  previewToneIndex.value = index
+  showPreviewModal.value = true
+}
+
+const deleteSegment = (segIndex) => {
+  if (!previewTone.value) return
+  previewTone.value.segments.splice(segIndex, 1)
+  if (previewTone.value.segments.length === 0) {
+    savedTones.value.splice(previewToneIndex.value, 1)
+    showPreviewModal.value = false
+  }
+}
+
 // === 3. 石鋒 T 值分析算法 ===
+
+const resampleToNPoints = (values, pointCount = STANDARD_POINT_COUNT) => {
+  const cleanValues = values.filter(v => Number.isFinite(v))
+  if (cleanValues.length === 0) return []
+  if (cleanValues.length === 1) return Array(pointCount).fill(cleanValues[0])
+
+  const result = []
+  const lastIndex = cleanValues.length - 1
+  for (let i = 0; i < pointCount; i++) {
+    const position = (i / (pointCount - 1)) * lastIndex
+    const leftIndex = Math.floor(position)
+    const rightIndex = Math.ceil(position)
+    const ratio = position - leftIndex
+    if (leftIndex === rightIndex) {
+      result.push(cleanValues[leftIndex])
+    } else {
+      result.push(cleanValues[leftIndex] * (1 - ratio) + cleanValues[rightIndex] * ratio)
+    }
+  }
+  return result
+}
+
+const averagePointwise = (segments) => {
+  if (!segments.length) return []
+  const pointCount = segments[0].length
+  const averaged = []
+  for (let i = 0; i < pointCount; i++) {
+    let sum = 0
+    let count = 0
+    for (const segment of segments) {
+      const value = segment[i]
+      if (Number.isFinite(value)) {
+        sum += value
+        count++
+      }
+    }
+    averaged.push(count > 0 ? sum / count : null)
+  }
+  return averaged
+}
+
+// === 4. 石鋒 T 值分析算法 ===
 const performTValueAnalysis = () => {
   if (savedTones.value.length === 0) return
 
   // A. Calculate global statistics from ALL collected segments
-  const allValues = savedTones.value.flatMap(t => t.segments.flat())
+  const allValues = analysisMode.value
+    ? savedTones.value.flatMap(t =>
+        t.segments.flatMap(seg => {
+          const clean = getSegmentValues(seg).filter(v => v !== null && v !== undefined && v > 0)
+          return resampleToNPoints(clean, STANDARD_POINT_COUNT)
+        })
+      )
+    : savedTones.value.flatMap(t => t.segments.flatMap(seg => getSegmentValues(seg)))
 
   if (allValues.length === 0) {
     showWarning(t('praat.pitchTone.alerts.noValidData'))
@@ -470,20 +641,31 @@ const performTValueAnalysis = () => {
 
   console.log('Statistics:', { mean, sd, ceiling, floor, realMax: ceiling, realMin: floor })
 
-  globalStats.value = { max: ceiling, min: floor }
-
   // B. Calculate T-values for each tone class
-  const lgMin = Math.log10(floor)
-  const lgMax = Math.log10(ceiling)
-  const denominator = lgMax - lgMin
+  const lgValues = allValues.map(v => Math.log10(v))
+  const lgMin = Math.min(...lgValues)
+  const lgMax = Math.max(...lgValues)
 
-  // ✅ 修复：调值范围改为 0~5（传统五度值）
-  // Helper: Convert Hz array to T-value array
+  const useZScore = logScaleMode.value === 'logZScore'
+
+  // Helper: Convert Hz array to T-value array based on selected log scale mode
+  let zMean, zSd
+  if (useZScore) {
+    zMean = lgValues.reduce((sum, v) => sum + v, 0) / lgValues.length
+    const varianceLog = lgValues.reduce((sum, v) => sum + Math.pow(v - zMean, 2), 0) / lgValues.length
+    zSd = Math.sqrt(varianceLog)
+    globalStats.value = { max: ceiling, min: floor, mode: 'logZScore', logMean: zMean, logSd: zSd }
+  } else {
+    globalStats.value = { max: ceiling, min: floor, mode: 'log' }
+  }
+
   const hzToTValues = (hzArray) => {
     return hzArray.map(hz => {
       const lgX = Math.log10(hz)
-      let T = ((lgX - lgMin) / denominator) * 5  // 映射到 [0, 5]
-      return Math.max(0, Math.min(5, T))  // Clamp to [0, 5]
+      if (useZScore) {
+        return (lgX - zMean) / zSd
+      }
+      return Math.max(0, Math.min(5, ((lgX - lgMin) / (lgMax - lgMin)) * 5))
     })
   }
 
@@ -499,42 +681,99 @@ const performTValueAnalysis = () => {
   console.log('Sampling interval:', samplingIntervalMs, 'ms')
 
   // C. Process each tone class
-  tValueResults.value = savedTones.value.map(tone => {
-    // ✅ 修复：不再归一化时长，保留原始点数
-    // Convert each segment to T-values (keep original length)
-    const tValueSegments = tone.segments.map(hzSegment => {
-      return hzToTValues(hzSegment)  // 不再调用 normalizeLength
-    })
+  const isElevenPoint = analysisMode.value
 
-    // 找出最长的音段，用于对齐
-    const maxLength = Math.max(...tValueSegments.map(seg => seg.length))
+  if (isElevenPoint) {
+    tValueResults.value = savedTones.value.map(tone => {
+      // Find this tone class's own longest token duration (ms) → determines x-axis extent
+      let classMaxMs = 0
+      tone.segments.forEach(seg => {
+        const clean = getSegmentValues(seg).filter(v => v !== null && v !== undefined && v > 0)
+        const dur = clean.length * samplingIntervalMs
+        if (dur > classMaxMs) classMaxMs = dur
+      })
 
-    // Average across all segments at each position (对齐到最长音段)
-    const avgTValues = []
-    for (let i = 0; i < maxLength; i++) {
-      let sum = 0
-      let count = 0
-      for (const seg of tValueSegments) {
-        if (i < seg.length) {
-          sum += seg[i]
-          count++
+      if (classMaxMs === 0) return { name: tone.name, data: [] }
+
+      const tokenData = []
+
+      tone.segments.forEach(seg => {
+        const cleanHz = getSegmentValues(seg).filter(v => v !== null && v !== undefined && v > 0)
+        if (cleanHz.length === 0) return
+
+        const tValues = hzToTValues(cleanHz)
+        const resampled11 = resampleToNPoints(tValues, STANDARD_POINT_COUNT)
+
+        const tokenDuration = cleanHz.length * samplingIntervalMs
+        const times = []
+        for (let i = 0; i < STANDARD_POINT_COUNT; i++) {
+          times.push((i / (STANDARD_POINT_COUNT - 1)) * tokenDuration)
+        }
+
+        tokenData.push({ times, values: resampled11 })
+      })
+
+      if (tokenData.length === 0) return { name: tone.name, data: [] }
+
+      const chartData = []
+      for (let i = 0; i < STANDARD_POINT_COUNT; i++) {
+        let sumT = 0, sumTime = 0, count = 0
+        for (const td of tokenData) {
+          const v = td.values[i]
+          if (Number.isFinite(v)) {
+            sumT += v
+            sumTime += td.times[i]
+            count++
+          }
+        }
+        if (count > 0) {
+          chartData.push([sumTime / count, sumT / count])
         }
       }
-      avgTValues.push(count > 0 ? sum / count : null)
-    }
 
-    // ✅ 修复：使用真实时间（毫秒）而不是百分比
-    // Convert to chart data format [time_ms, T-value]
-    const chartData = avgTValues.map((val, idx) => {
-      const timeMs = idx * samplingIntervalMs  // 真实时间（毫秒）
-      return [timeMs, val]
-    }).filter(([time, val]) => val !== null)  // 过滤掉无效点
+      return { name: tone.name, data: chartData }
+    })
 
-    return {
-      name: tone.name,
-      data: chartData
+    // Find global max x (ms) across all tone classes → 100% reference
+    let globalMaxX = 0
+    tValueResults.value.forEach(r => {
+      r.data.forEach(([x]) => { if (x > globalMaxX) globalMaxX = x })
+    })
+
+    // Convert ms x → percentage (0–100%)
+    if (globalMaxX > 0) {
+      tValueResults.value.forEach(r => {
+        r.data = r.data.map(([x, y]) => [(x / globalMaxX) * 100, y])
+      })
     }
-  })
+  } else {
+    tValueResults.value = savedTones.value.map(tone => {
+      const tValueSegments = tone.segments.map(seg => {
+        return hzToTValues(getSegmentValues(seg))
+      }).filter(seg => seg.length > 0)
+
+      if (tValueSegments.length === 0) return { name: tone.name, data: [] }
+
+      // Target length = average of all token lengths within this tone class
+      const totalLen = tValueSegments.reduce((s, seg) => s + seg.length, 0)
+      const avgLength = Math.round(totalLen / tValueSegments.length)
+
+      // Resample each token to the average length
+      const normalizedSegments = tValueSegments.map(seg => resampleToNPoints(seg, avgLength))
+
+      const avgTValues = averagePointwise(normalizedSegments)
+
+      const chartData = avgTValues.map((val, idx) => {
+        const timeMs = idx * samplingIntervalMs
+        return [timeMs, val]
+      }).filter(([, val]) => val !== null)
+
+      return {
+        name: tone.name,
+        data: chartData
+      }
+    })
+  }
 
   // D. Do NOT clear localStorage automatically
   // User will manually clear using the "清空" button
@@ -552,19 +791,22 @@ const exportToExcel = () => {
     return
   }
 
-  // 1. 找出最大时间点数（对齐到最长曲线）
+  const isElevenPoint = analysisMode.value
+  const timeColumnName = isElevenPoint
+    ? PITCH_TONE_EXPORT_TIME_COLUMN_ELEVEN_POINT
+    : PITCH_TONE_EXPORT_TIME_COLUMN
+
   const maxLength = Math.max(...tValueResults.value.map(r => r.data.length))
 
-  // 2. 构建表格数据
   const excelData = []
   for (let i = 0; i < maxLength; i++) {
     const row = {}
 
-    // 时间列
     const firstTime = tValueResults.value[0].data[i]?.[0]
-    row[PITCH_TONE_EXPORT_TIME_COLUMN] = firstTime?.toFixed(1) || ''
+    row[timeColumnName] = isElevenPoint
+      ? firstTime?.toFixed(0) || ''
+      : firstTime?.toFixed(1) || ''
 
-    // 每个调类的 T 值列
     tValueResults.value.forEach(result => {
       const point = result.data[i]
       row[result.name] = point ? point[1].toFixed(2) : ''
@@ -589,13 +831,164 @@ const initTValueChart = () => {
   if (!tValueChartContainer.value) return
   if (tValueChart) tValueChart.dispose()
 
-  // === 重新绑定 ResizeObserver ===
   if (resizeObserver && tValueChartContainer.value) {
     resizeObserver.observe(tValueChartContainer.value)
   }
 
   tValueChart = echarts.init(tValueChartContainer.value)
 
+  const isZScore = globalStats.value.mode === 'logZScore'
+  const isElevenPoint = analysisMode.value
+
+  if (isElevenPoint) {
+    initElevenPointChart()
+  } else {
+    initContinuousChart(isZScore)
+  }
+
+  setTimeout(() => {
+    tValueChart?.resize({ width: 'auto', height: 'auto' })
+  }, 100)
+}
+
+const ACADEMIC_SYMBOLS = [
+  'circle',
+  'rect',
+  'triangle',
+  'diamond',
+  'roundRect',
+  'pin',
+  'arrow',
+  'path://M-6,0L6,0M0,-6L0,6',
+  'path://M-5,-5L5,5M-5,5L5,-5',
+  'path://M0,-7L1.5,-2.5L6,-2.5L2.5,0.5L4,5.5L0,3L-4,5.5L-2.5,0.5L-6,-2.5L-1.5,-2.5Z',
+  'path://M0,6L5,-4L-5,-4Z',
+  'path://M0,-6L3.5,-3.5L6,0L3.5,3.5L0,6L-3.5,3.5L-6,0L-3.5,-3.5Z',
+]
+
+const ACADEMIC_COLORS = [
+  '#000000',
+  '#e41a1c',
+  '#377eb8',
+  '#4daf4a',
+  '#984ea3',
+  '#ff7f00',
+  '#a65628',
+  '#f781bf',
+]
+
+const initElevenPointChart = () => {
+  const isZScore = globalStats.value.mode === 'logZScore'
+
+  const series = tValueResults.value.map((res, idx) => ({
+    name: res.name,
+    type: 'line',
+    data: res.data,
+    smooth: false,
+    showSymbol: true,
+    symbol: ACADEMIC_SYMBOLS[idx % ACADEMIC_SYMBOLS.length],
+    symbolSize: 7,
+    lineStyle: {
+      width: 1.8,
+      color: ACADEMIC_COLORS[idx % ACADEMIC_COLORS.length],
+    },
+    itemStyle: {
+      color: ACADEMIC_COLORS[idx % ACADEMIC_COLORS.length],
+    },
+  }))
+
+  const option = {
+    backgroundColor: '#ffffff',
+    title: {
+      text: t('praat.pitchTone.step3.chart.title'),
+      left: 'center',
+      top: 8,
+      textStyle: { fontSize: 14, fontWeight: 'bold', color: '#000' },
+    },
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: '#fff',
+      borderColor: '#000',
+      borderWidth: 1,
+      textStyle: { color: '#000', fontSize: 12 },
+      formatter: (params) => {
+        let result = t('praat.pitchTone.step3.chart.tooltipTimeElevenPoint', {
+          percent: params[0].value[0].toFixed(0)
+        }) + '<br/>'
+        params.forEach(param => {
+          result += `${param.seriesName}: ${param.value[1].toFixed(2)}<br/>`
+        })
+        return result
+      },
+    },
+    legend: {
+      orient: 'vertical',
+      right: 8,
+      top: 50,
+      backgroundColor: '#ffffff',
+      borderColor: '#000000',
+      borderWidth: 1,
+      padding: [8, 12],
+      itemGap: 10,
+      itemWidth: 24,
+      textStyle: { fontSize: 12, color: '#000' },
+    },
+    toolbox: {
+      right: 10,
+      top: 8,
+      feature: {
+        saveAsImage: {
+          title: t('praat.pitchTone.step3.chart.toolbox.saveAsImage'),
+          name: t('praat.pitchTone.step3.chart.imageName'),
+          pixelRatio: 2,
+          backgroundColor: '#fff',
+        },
+      },
+    },
+    grid: {
+      top: 50,
+      bottom: 50,
+      left: 60,
+      right: 120,
+    },
+    xAxis: {
+      type: 'value',
+      name: t('praat.pitchTone.step3.chart.xAxisElevenPoint'),
+      nameLocation: 'center',
+      nameGap: 28,
+      nameTextStyle: { fontSize: 12, color: '#000' },
+      min: 0,
+      max: 100,
+      axisLabel: { formatter: '{value}%', color: '#000', fontSize: 11 },
+      axisLine: { lineStyle: { color: '#000', width: 1 } },
+      axisTick: { lineStyle: { color: '#000' } },
+      splitLine: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      name: isZScore
+        ? t('praat.pitchTone.step3.chart.yAxisZScore')
+        : t('praat.pitchTone.step3.chart.yAxis'),
+      nameTextStyle: { fontSize: 12, color: '#000' },
+      ...(isZScore
+        ? { scale: true }
+        : { min: 0, max: 5, interval: 1 }
+      ),
+      axisLabel: { color: '#000', fontSize: 11 },
+      axisLine: { lineStyle: { color: '#000', width: 1 } },
+      axisTick: { lineStyle: { color: '#000' } },
+      splitLine: {
+        show: true,
+        lineStyle: { color: '#555555', width: 0.8, type: 'solid' },
+      },
+    },
+    series: series,
+  }
+
+  tValueChart.setOption(option)
+}
+
+const initContinuousChart = (isZScore) => {
   const series = tValueResults.value.map(res => ({
     name: res.name,
     type: 'line',
@@ -621,9 +1014,9 @@ const initTValueChart = () => {
     },
     legend: {
       bottom: 0,
-      type: 'scroll',        // 添加滚动条（调类多时有用）
-      orient: 'horizontal',  // 水平排列
-      itemGap: 20,           // 增加间距
+      type: 'scroll',
+      orient: 'horizontal',
+      itemGap: 20,
       textStyle: {
         fontSize: 14,
         color: '#2c3e50'
@@ -639,10 +1032,10 @@ const initTValueChart = () => {
           }
         },
         restore: { title: t('praat.pitchTone.step3.chart.toolbox.restore') },
-        saveAsImage: {           // 新增 PNG 导出
+        saveAsImage: {
           title: t('praat.pitchTone.step3.chart.toolbox.saveAsImage'),
           name: t('praat.pitchTone.step3.chart.imageName'),
-          pixelRatio: 2,         // 高清图（2倍分辨率）
+          pixelRatio: 2,
           backgroundColor: '#fff'
         }
       }
@@ -656,296 +1049,254 @@ const initTValueChart = () => {
     },
     yAxis: {
       type: 'value',
-      name: t('praat.pitchTone.step3.chart.yAxis'),
-      min: 0,
-      max: 5,
-      interval: 1,
-      splitNumber: 5,
+      name: isZScore
+        ? t('praat.pitchTone.step3.chart.yAxisZScore')
+        : t('praat.pitchTone.step3.chart.yAxis'),
+      ...(isZScore
+        ? { scale: true }
+        : { min: 0, max: 5, interval: 1, splitNumber: 5 }
+      ),
       splitLine: { show: true }
     },
     series: series
   }
 
   tValueChart.setOption(option)
-
-  // 强制 resize 确保 T 值图表尺寸正确
-  setTimeout(() => {
-    tValueChart?.resize({ width: 'auto', height: 'auto' })
-  }, 100)
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary: var(--color-primary, var(--vml-blue));
+$primary-blue: var(--color-primary);
+$primary-purple: var(--color-purple);
+$primary-hover: var(--vml-blue-dark);
+
+$success: var(--color-success);
+$success-dark: #3aa65d;
+$error: var(--color-error, #e74c3c);
+
+$text-primary: var(--color-text-primary);
+$text-secondary: var(--color-text-secondary, var(--text-tertiary));
+$text-muted: var(--color-text-secondary, var(--text-lightest));
+
+$white: var(--text-white);
+$surface: var(--glass-50);
+$surface-strong: var(--glass-80);
+$border-light: rgba(0, 0, 0, 0.05);
+$border-medium: rgba(0, 0, 0, 0.1);
+
+$primary-gradient: linear-gradient(
+  135deg,
+  $primary-blue,
+  $primary-purple
+);
+
+$transition-fast: 0.2s;
+$transition-normal: 0.3s;
+
 .pitch-tone-panel {
-  padding: 1.5rem;
-  margin: 0 auto 1.5rem auto;
-  max-width: 1200px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+  box-sizing: border-box;
+  @include flex-col;
   gap: 1rem;
-}
-
-@media (max-aspect-ratio: 1/1) {
-  .pitch-tone-panel{
-    padding:0.5rem;
-  }
-
-  /* 控制面板改为单列布局 */
-  .controls-section{
-    display: flex!important;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  /* 图表容器高度调整 */
-  .chart-container {
-    height: 280px;
-  }
-
-  .result-chart {
-    height: 320px;
-  }
-
-  /* 统计信息纵向排列 */
-  .stats-info {
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: flex-start;
-  }
-
-  /* 导出按钮自适应 */
-  .export-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-
-}
-
-/* 额外的小屏幕适配 */
-@media (max-width: 600px) {
-  .step-number {
-    width: 2rem;
-    height: 2rem;
-    font-size: 1rem;
-  }
-
-  .step-title {
-    font-size: 1.1rem;
-  }
-
-  .step-hint {
-    font-size: 0.85rem;
-  }
-
-  .panel-title {
-    font-size: 1.4rem;
-  }
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 1.5rem;
+  padding: 1.5rem;
 }
 
 .panel-title {
+  margin: 0 0 1rem;
+  color: $text-primary;
+  text-align: center;
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--color-text-primary, #2c3e50);
-  margin: 0 0 1rem 0;
-  text-align: center;
 }
 
-/* Step Section */
+/* 步骤公共结构 */
 .step-section {
-  display: flex;
-  flex-direction: column;
+  box-sizing: border-box;
+  @include flex-col;
   gap: 1rem;
   width: 96%;
-  min-width: 0; /* 防止 Flex 子项坍塌 */
-  box-sizing: border-box;
+  min-width: 0;
 }
 
 .step-header {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
+
+  .step-number {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: $primary-gradient;
+    border-radius: var(--radius-full);
+    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
+    color: $white;
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .step-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .step-title {
+    margin: 0;
+    color: $text-primary;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  .step-hint {
+    color: $text-secondary;
+    font-size: 0.9rem;
+  }
 }
 
-.step-number {
-  flex-shrink: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  background: linear-gradient(135deg, #007aff, #5856d6);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-}
-
-.step-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  align-items: center;
-}
-
-.step-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: var(--color-text-primary, #2c3e50);
-  margin: 0;
-}
-
-.step-hint {
-  font-size: 0.9rem;
-  color: var(--color-text-secondary, #666);
-}
-
+/* 图表 */
 .chart-container {
+  position: relative;
+  box-sizing: border-box;
   width: 100%;
   height: 350px;
-  background: white;
-  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
   padding: 0.5rem;
-  border: 1px solid rgba(0,0,0,0.05);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  position: relative; /* 确保 ECharts 定位准确 */
-  overflow: hidden;   /* 防止内容溢出 */
-  box-sizing: border-box; /* 包含 padding */
+  background: $white;
+  border: 1px solid $border-light;
+  border-radius: var(--radius-md, var(--radius-sm2));
+  box-shadow: 0 2px 8px $border-light;
+
+  &.result-chart {
+    height: 400px;
+  }
 }
 
-.result-chart {
-  height: 400px;
-}
-
+/* 无数据 */
 .no-data-message {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  color: var(--color-text-secondary, #666);
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: var(--radius-lg, 12px);
-  border: 2px dashed rgba(0,0,0,0.1);
+  background: $surface;
+  border: 2px dashed $border-medium;
+  border-radius: var(--radius-lg, var(--radius-md));
+  color: $text-secondary;
+
+  .no-data-icon {
+    margin-bottom: 1rem;
+    font-size: 3rem;
+  }
 }
 
-.no-data-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
-/* 控制面板樣式 */
+/* 第一步：选择与保存 */
 .controls-section {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 1.5rem;
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: var(--radius-lg, 12px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: $surface;
+  border: 1px solid $surface-strong;
+  border-radius: var(--radius-lg, var(--radius-md));
 }
 
 .input-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.8rem;
 }
 
 .selection-info {
+  min-height: 1.5rem;
   font-size: 0.95rem;
   font-weight: 600;
-  min-height: 1.5rem;
-}
 
-.status-active {
-  color: var(--color-success, #50c878);
-  animation: pulse 2s ease-in-out infinite;
-}
+  .status-active {
+    color: $success;
+    animation: pulse 2s ease-in-out infinite;
+  }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-.status-idle {
-  color: var(--color-text-secondary, #999);
-  font-weight: 500;
+  .status-idle {
+    color: $text-muted;
+    font-weight: 500;
+  }
 }
 
 .tone-input {
   padding: 0.7rem 1rem;
-  border: 2px solid rgba(0,0,0,0.1);
-  border-radius: var(--radius-md, 8px);
+  border: 2px solid $border-medium;
+  border-radius: var(--radius-md, var(--radius-sm2));
   font-size: 1rem;
-  transition: all 0.2s;
-}
+  transition:
+    border-color $transition-fast,
+    box-shadow $transition-fast;
 
-.tone-input:focus {
-  outline: none;
-  border-color: var(--color-primary, #4a90e2);
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  }
 }
 
 .action-btn {
   padding: 0.7rem;
   border: none;
-  border-radius: var(--radius-md, 8px);
-  cursor: pointer;
-  font-weight: 600;
+  border-radius: var(--radius-md, var(--radius-sm2));
   font-size: 1rem;
-  transition: all 0.2s;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background $transition-fast,
+    box-shadow $transition-fast,
+    transform $transition-fast;
+
+  &.add-btn {
+    background: $primary;
+    box-shadow: 0 2px 6px rgba(74, 144, 226, 0.3);
+    color: $white;
+
+    &:hover:not(:disabled) {
+      background: $primary-hover;
+      box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      background: var(--border-gray);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+  }
 }
 
-.add-btn {
-  background: var(--color-primary, #4a90e2);
-  color: white;
-  box-shadow: 0 2px 6px rgba(74, 144, 226, 0.3);
-}
-
-.add-btn:hover:not(:disabled) {
-  background: #3a7bc8;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
-}
-
-.add-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  box-shadow: none;
+.persistence-hint {
+  padding: 0.25rem 0;
+  color: var(--color-text-secondary, var(--text-muted));
+  font-size: 0.8rem;
+  font-style: italic;
+  line-height: 1.4;
 }
 
 .saved-list-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.8rem;
 }
 
 .list-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  color: $text-primary;
   font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text-primary, #2c3e50);
-}
-
-.text-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 0.85rem;
-  text-decoration: underline;
-  transition: opacity 0.2s;
-}
-
-.text-btn:hover {
-  opacity: 0.7;
-}
-
-.text-btn.danger {
-  color: var(--color-error, #e74c3c);
   font-weight: 600;
 }
 
@@ -956,156 +1307,328 @@ const initTValueChart = () => {
   max-height: 140px;
   overflow-y: auto;
   padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: var(--radius-md, 8px);
+  background: $surface;
+  border-radius: var(--radius-md, var(--radius-sm2));
 }
 
 .tone-tag {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: white;
   padding: 0.4rem 0.8rem;
-  border: 2px solid rgba(0,0,0,0.5);
+  background: $white;
+  border: 2px solid rgba(0, 0, 0, 0.5);
   border-radius: var(--radius-2xl);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-size: 0.95rem;
-  transition: all 0.2s;
-}
-
-.tone-tag:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-.tag-name {
-  font-weight: 700;
-  color: var(--color-primary, #4a90e2);
-}
-
-.tag-count {
-  font-size: 0.8rem;
-  color: #666;
-  font-weight: 600;
-}
-
-.close-tag {
-  border: none;
-  background: none;
-  color: #999;
   cursor: pointer;
-  font-size: 1.2rem;
-  line-height: 1;
-  padding: 0;
-  width: 1.2rem;
-  height: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
+  transition:
+    box-shadow $transition-fast,
+    transform $transition-fast;
 
-.close-tag:hover {
-  color: var(--color-error, #e74c3c);
-  transform: scale(1.2);
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .tag-name {
+    color: $primary;
+    font-weight: 700;
+  }
+
+  .tag-count {
+    color: var(--text-tertiary);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .close-tag {
+    @include flex-center;
+    width: 1.2rem;
+    height: 1.2rem;
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--text-lightest);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      color $transition-fast,
+      transform $transition-fast;
+
+    &:hover {
+      color: $error;
+      transform: scale(1.2);
+    }
+  }
 }
 
 .empty-hint {
-  color: var(--color-text-secondary, #999);
+  padding: 1rem;
+  color: $text-muted;
+  text-align: center;
   font-size: 0.9rem;
   font-style: italic;
-  text-align: center;
-  padding: 1rem;
 }
 
+/* 第二步：分析 */
 .analyze-action {
-  display: flex;
-  justify-content: center;
+  @include flex-col;
+  align-items: center;
+  gap: 1rem;
   padding: 1rem 0;
 }
 
+.analyze-options-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.log-scale-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+
+  .log-scale-label {
+    color: $text-primary;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+}
+
 .analyze-btn {
-  background: linear-gradient(135deg, #007aff, #5856d6);
-  color: white;
-  border: none;
+  position: relative;
+  overflow: hidden;
   padding: 1rem 3rem;
+  background: $primary-gradient;
+  border: none;
   border-radius: var(--radius-2xl);
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.4);
+  color: $white;
   font-size: 1.2rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
+  transition:
+    box-shadow $transition-normal,
+    transform $transition-normal;
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--glass-30),
+      transparent
+    );
+    content: "";
+    transition: left 0.5s;
+  }
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(var(--color-primary-rgb), 0.5);
+    transform: translateY(-2px);
+
+    &::before {
+      left: 100%;
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
-.analyze-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  transition: left 0.5s;
-}
-
-.analyze-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 122, 255, 0.5);
-}
-
-.analyze-btn:hover::before {
-  left: 100%;
-}
-
-.analyze-btn:active {
-  transform: translateY(0);
-}
-
+/* 第三步：结果 */
 .stats-info {
   display: flex;
   justify-content: center;
   gap: 3rem;
   margin-bottom: 1rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: var(--radius-md, 8px);
+  background: $surface;
+  border-radius: var(--radius-md, var(--radius-sm2));
+  color: $text-primary;
+  font-family: "Courier New", monospace;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--color-text-primary, #2c3e50);
-  font-family: 'Courier New', monospace;
 }
 
 .export-actions {
-  display: flex;
+  @include flex-center;
   gap: 1rem;
-  justify-content: center;
   margin-bottom: 1rem;
-  align-items: center;
 }
 
 .export-btn {
-  background: linear-gradient(135deg, #50c878, #3aa65d);
-  color: white;
-  border: none;
+  max-width: 300px;
   padding: 0.8rem 2rem;
-  border-radius: var(--radius-lg, 12px);
+  background: linear-gradient(135deg, $success, $success-dark);
+  border: none;
+  border-radius: var(--radius-lg, var(--radius-md));
+  box-shadow: 0 2px 8px rgba(80, 200, 120, 0.3);
+  color: $white;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(80, 200, 120, 0.3);
-  transition: all 0.3s;
-  max-width: 300px;
+  transition:
+    box-shadow $transition-normal,
+    transform $transition-normal;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(80, 200, 120, 0.4);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
-.export-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(80, 200, 120, 0.4);
+/* 通用文字按钮 */
+.text-btn {
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: opacity $transition-fast;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &.danger {
+    color: $error;
+    font-weight: 600;
+  }
 }
 
-.export-btn:active {
-  transform: translateY(0);
+/* 预览弹窗 */
+.preview-segments {
+  @include flex-col;
+  gap: 0.75rem;
+  min-height: 80px;
 }
 
+.preview-segment-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: var(--radius-md, var(--radius-sm2));
+
+  .preview-segment-info {
+    @include flex-col;
+    gap: 0.2rem;
+  }
+
+  .preview-segment-label {
+    color: $text-primary;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .preview-segment-meta {
+    color: $text-secondary;
+    font-size: 0.8rem;
+  }
+
+  .preview-segment-time {
+    color: $text-muted;
+    font-size: 0.75rem;
+  }
+
+  .text-btn.danger {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+}
+
+.preview-empty {
+  padding: 2rem;
+  color: $text-muted;
+  text-align: center;
+  font-style: italic;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* 竖屏 */
+@media (max-aspect-ratio: 1/1) {
+  .pitch-tone-panel {
+    padding: 0.5rem;
+  }
+
+  .controls-section {
+    @include flex-col;
+    gap: 1rem;
+  }
+
+  .chart-container {
+    height: 280px;
+
+    &.result-chart {
+      height: 320px;
+    }
+  }
+
+  .stats-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .export-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .analyze-options-row {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .step-header {
+    .step-number {
+      width: 2rem;
+      height: 2rem;
+      font-size: 1rem;
+    }
+
+    .step-title {
+      font-size: 1.1rem;
+    }
+
+    .step-hint {
+      font-size: 0.85rem;
+    }
+  }
+
+  .panel-title {
+    font-size: 1.4rem;
+  }
+}
 </style>

@@ -260,8 +260,8 @@ const initPitchChart = () => {
     {
       xAxis: seg.start_s,
       itemStyle: {
-        color: seg.type === 'rime_core' ? 'rgba(255,215,0,0.2)' :
-               seg.type === 'silence' ? 'rgba(200,200,200,0.1)' :
+        color: seg.type === 'rime_core' ? 'rgba(var(--color-gold-rgb), 0.2)' :
+               seg.type === 'silence' ? 'rgba(var(--color-silver-rgb), 0.1)' :
                'rgba(100,150,255,0.15)'
       }
     },
@@ -282,14 +282,14 @@ const initPitchChart = () => {
     yAxis: {
       type: 'value',
       name: t('praat.results.charts.pitch.yAxis'),
-      axisLine: { lineStyle: { color: '#007aff' } }
+      axisLine: { lineStyle: { color: 'var(--color-primary)' } }
     },
     series: [{
       name: t('praat.results.charts.pitch.seriesName'),
       type: 'line',
       data: pitchData,
       smooth: true,
-      lineStyle: { color: '#007aff', width: 2 },
+      lineStyle: { color: 'var(--color-primary)', width: 2 },
       showSymbol: false,
       markArea: markAreaData.length > 0 ? { data: markAreaData } : undefined
     }],
@@ -334,14 +334,14 @@ const initIntensityChart = () => {
     yAxis: {
       type: 'value',
       name: t('praat.results.charts.intensity.yAxis'),
-      axisLine: { lineStyle: { color: '#ff3b30' } }
+      axisLine: { lineStyle: { color: 'var(--color-error-light)' } }
     },
     series: [{
       name: t('praat.results.charts.intensity.seriesName'),
       type: 'line',
       data: intensityData,
       smooth: true,
-      lineStyle: { color: '#ff3b30', width: 2 },
+      lineStyle: { color: 'var(--color-error-light)', width: 2 },
       showSymbol: false
     }],
     grid: {
@@ -367,7 +367,7 @@ const initFormantChart = () => {
   formantChart = echarts.init(formantChartContainer.value)
   const ts = props.results.timeseries
 
-  const formantColors = ['#34c759', '#ff9500', '#5856d6', '#ff2d55', '#5ac8fa']
+  const formantColors = ['var(--color-success)', 'var(--color-warning)', 'var(--color-purple)', '#ff2d55', 'var(--color-cyan)']
   const formantKeys = ['f1', 'f2', 'f3', 'f4', 'f5']
 
   const formantSeries = formantKeys.map((key, i) => {
@@ -624,7 +624,7 @@ const addSpectrogramOverlays = (option) => {
         xAxis: startIndex,
         xAxisEnd: endIndex,
         itemStyle: {
-          color: 'rgba(255, 255, 255, 0.1)',
+          color: 'var(--glass-10)',
           borderColor: '#ffffff',
           borderWidth: 1,
           borderType: 'dashed'
@@ -648,7 +648,7 @@ const addSpectrogramOverlays = (option) => {
       data: overlays.map(s => s.name),
       top: 'bottom',
       textStyle: {
-        color: '#333'
+        color: 'var(--text-dark)'
       }
     }
   }
@@ -669,7 +669,7 @@ const renderTimeSeriesCharts = () => {
 const getHnrClass = (hnr) => hnr >= 15 ? 'quality-good' : hnr >= 10 ? 'quality-fair' : 'quality-poor'
 const getHnrBarStyle = (hnr) => ({
   width: `${Math.min((hnr / 20) * 100, 100)}%`,
-  backgroundColor: hnr >= 15 ? '#34c759' : hnr >= 10 ? '#ff9500' : '#ff3b30'
+  backgroundColor: hnr >= 15 ? 'var(--color-success)' : hnr >= 10 ? 'var(--color-warning)' : 'var(--color-error-light)'
 })
 const getHnrStatus = (hnr) => hnr >= 15
   ? t('praat.results.voiceQuality.hnr.status.good')
@@ -680,7 +680,7 @@ const getHnrStatus = (hnr) => hnr >= 15
 const getJitterClass = (j) => j < 0.01 ? 'quality-good' : j < 0.02 ? 'quality-fair' : 'quality-poor'
 const getJitterBarStyle = (j) => ({
   width: `${Math.min((j / 0.05) * 100, 100)}%`,
-  backgroundColor: j < 0.01 ? '#34c759' : j < 0.02 ? '#ff9500' : '#ff3b30'
+  backgroundColor: j < 0.01 ? 'var(--color-success)' : j < 0.02 ? 'var(--color-warning)' : 'var(--color-error-light)'
 })
 const getJitterStatus = (j) => j < 0.01
   ? t('praat.results.voiceQuality.jitter.status.good')
@@ -691,7 +691,7 @@ const getJitterStatus = (j) => j < 0.01
 const getShimmerClass = (s) => s < 0.03 ? 'quality-good' : s < 0.06 ? 'quality-fair' : 'quality-poor'
 const getShimmerBarStyle = (s) => ({
   width: `${Math.min((s / 0.1) * 100, 100)}%`,
-  backgroundColor: s < 0.03 ? '#34c759' : s < 0.06 ? '#ff9500' : '#ff3b30'
+  backgroundColor: s < 0.03 ? 'var(--color-success)' : s < 0.06 ? 'var(--color-warning)' : 'var(--color-error-light)'
 })
 const getShimmerStatus = (s) => s < 0.03
   ? t('praat.results.voiceQuality.shimmer.status.good')
@@ -723,29 +723,50 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary-blue: var(--color-primary);
+$quality-good: var(--color-success);
+$quality-fair: var(--color-warning);
+$quality-poor: var(--color-error-light);
+
+$text-primary: var(--color-text-primary);
+$text-secondary: var(--color-text-secondary);
+
+$chart-width: 80%;
+$chart-height: 400px;
+$card-padding: 1.5rem;
+$section-spacing: 2rem;
+
+$border-light: rgba(0, 0, 0, 0.1);
+$blue-shadow: rgba(var(--color-primary-rgb), 0.2);
+$blue-shadow-hover: rgba(var(--color-primary-rgb), 0.3);
+
+$transition-normal: 0.3s;
+
 .analysis-results-panel {
-  padding: 1rem;
+  width: 95%;
   margin-bottom: 1.5rem;
-  width:95%;
+  padding: 1rem;
 }
 
 .panel-title {
+  margin-bottom: 1.5rem;
+  color: $text-primary;
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 1.5rem;
-  color: var(--color-text-primary);
 }
 
 .summary-section {
-  margin-bottom: 2rem;
+  margin-bottom: $section-spacing;
 }
 
 .section-title {
+  margin-bottom: 1rem;
+  color: $text-primary;
   font-size: 1.2rem;
   font-weight: 600;
-  margin-bottom: 1rem;
-  color: var(--color-text-primary);
 }
 
 .stats-grid {
@@ -755,72 +776,76 @@ onBeforeUnmount(() => {
 }
 
 .stat-card {
-  padding: 1.5rem;
+  padding: $card-padding;
   text-align: center;
 }
+
+/*
+ * 保留在基础图表规则之前。
+ * 原样式中 spectrogram-chart 的 400px 会被后面的 500px 覆盖，
+ * 当前整理不擅自改变这个实际效果。
+ */
 @media (max-aspect-ratio: 1/1) {
-  .stat-card{
-    padding:0.8rem;
-  }
-  .chart-container{
-    width: 96%!important;
-    padding:0.5rem!important;
-  }
-  .spectrogram-chart {
-    min-height: 400px;
-    height: 400px;
+  .stat-card {
+    padding: 0.8rem;
   }
 
+  .chart-container {
+    width: 96% !important;
+    padding: 0.5rem !important;
+  }
+
+  .spectrogram-chart {
+    height: 400px;
+    min-height: 400px;
+  }
 }
 
 .stat-label {
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
   margin-bottom: 0.5rem;
+  color: $text-secondary;
+  font-size: 0.9rem;
 }
 
 .stat-value {
+  color: $text-primary;
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--color-text-primary);
-}
 
-.stat-value.contour-display {
-  font-size: 1.1rem;
-  font-family: 'Courier New', monospace;
-  letter-spacing: 0.05em;
-  color: #007aff;
-}
-
-.chart-section {
-  margin-top: 2rem;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-}
-
-.chart-container {
-  width: 80%;
-  height: 400px;
-  background: var(--glass-light);
-  border-radius: var(--radius-lg);
-  padding: 1rem;
-}
-
-/* Spectrogram specific styling */
-.spectrogram-chart {
-  min-height: 500px;
-  height: 500px;
+  &.contour-display {
+    color: $primary-blue;
+    font-family: "Courier New", monospace;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+  }
 }
 
 .charts-section {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  @include flex-col;
+  gap: $section-spacing;
+}
+
+.chart-section {
+  @include flex-col;
+  align-items: center;
+  margin-top: $section-spacing;
+}
+
+.chart-container {
+  width: $chart-width;
+  height: $chart-height;
+  padding: 1rem;
+  background: var(--glass-30);
+  border-radius: var(--radius-lg);
+}
+
+.spectrogram-chart {
+  height: 500px;
+  min-height: 500px;
 }
 
 .voice-quality-section {
-  margin-top: 2rem;
+  margin-top: $section-spacing;
 }
 
 .quality-grid {
@@ -830,98 +855,99 @@ onBeforeUnmount(() => {
 }
 
 .quality-card {
-  padding: 1.5rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.75rem;
+  padding: $card-padding;
+  text-align: center;
 }
 
 .quality-label {
+  color: $text-secondary;
   font-size: 0.95rem;
-  color: var(--color-text-secondary);
   font-weight: 500;
 }
 
 .quality-value {
   font-size: 1.8rem;
   font-weight: 700;
-  transition: color 0.3s ease;
-}
+  transition: color $transition-normal ease;
 
-.quality-value.quality-good {
-  color: #34c759;
-}
+  &.quality-good {
+    color: $quality-good;
+  }
 
-.quality-value.quality-fair {
-  color: #ff9500;
-}
+  &.quality-fair {
+    color: $quality-fair;
+  }
 
-.quality-value.quality-poor {
-  color: #ff3b30;
+  &.quality-poor {
+    color: $quality-poor;
+  }
 }
 
 .quality-bar {
   width: 100%;
   height: 8px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
   overflow: hidden;
-}
+  background: $border-light;
+  border-radius: var(--radius-xs);
 
-.quality-fill {
-  height: 100%;
-  transition: width 0.5s ease, background-color 0.3s ease;
-  border-radius: 4px;
+  .quality-fill {
+    height: 100%;
+    border-radius: var(--radius-xs);
+    transition:
+      width 0.5s ease,
+      background-color $transition-normal ease;
+  }
 }
 
 .quality-status {
+  color: $text-secondary;
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--color-text-secondary);
 }
 
-/* 【新增】頻譜圖佔位區與按鈕樣式 */
+/* 频谱图占位区域 */
 .spectrogram-placeholder {
-  width: 80%;
+  @include flex-center;
+  width: $chart-width;
   height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.3); /* 半透明背景 */
+  background: var(--glass-30);
+  border: 1px dashed $border-light;
   border-radius: var(--radius-lg);
-  border: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .placeholder-content {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 1rem;
-}
+  text-align: center;
 
-.placeholder-icon {
-  font-size: 3rem;
-  opacity: 0.7;
+  .placeholder-icon {
+    opacity: 0.7;
+    font-size: 3rem;
+  }
 }
 
 .load-spectrogram-btn {
   padding: 0.8rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
   background: var(--color-primary);
-  color: white;
   border: none;
   border-radius: var(--radius-2xl);
+  box-shadow: 0 4px 12px $blue-shadow;
+  color: var(--text-white);
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
-}
+  transition:
+    opacity $transition-normal ease,
+    box-shadow $transition-normal ease,
+    transform $transition-normal ease;
 
-.load-spectrogram-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
-  opacity: 0.9;
+  &:hover {
+    opacity: 0.9;
+    box-shadow: 0 6px 16px $blue-shadow-hover;
+    transform: translateY(-2px);
+  }
 }
 </style>

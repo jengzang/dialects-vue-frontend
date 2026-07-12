@@ -111,62 +111,78 @@ const leave = (el) => {
 };
 </script>
 
-<style scoped>
-/* 這裡放 TreeItem 獨有的樣式 */
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary-blue: var(--color-primary);
+$text-dark: var(--text-dark);
+$transition-fast: 0.2s;
+$transition-expand: 0.3s;
+/* TreeItem 独有样式 */
 .tree-node {
   margin-bottom: 8px;
 }
+
 .node-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 8px 10px;
-  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.2s;
+  border-radius: var(--radius-md);
+  transition: background $transition-fast;
+
+  &:hover {
+    background: var(--glass-40);
+  }
 }
-.node-content:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
+
 .node-label {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
+  color: $text-dark;
   font-size: 15px;
   font-weight: 500;
-  color: #333;
 }
+
 .children-container {
-  padding-left: 20px;
-  border-left: 2px solid rgba(0, 122, 255, 0.1);
   margin-left: 14px;
-  transition: height 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding-left: 20px;
+  border-left: 2px solid rgba(var(--color-primary-rgb), 0.1);
+  transition: height $transition-expand cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+
 .expand-btn {
-  background: transparent;
-  border: none;
-  color: #007AFF;
-  font-size: 16px;
+  @include flex-center;
+
   width: 24px;
   height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  color: $primary-blue;
+  font-size: 16px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  transition: all $transition-expand ease;
+
+  &:hover {
+    background: rgba(var(--color-primary-rgb), 0.1);
+  }
+
+  &.is-open {
+    transform: rotate(45deg);
+  }
 }
-.expand-btn:hover {
-  background: rgba(0, 122, 255, 0.1);
-}
-.expand-btn.is-open {
-  transform: rotate(45deg);
-}
-/* 深度選擇器處理 v-html 內的樣式 */
+
+/*
+ * highlight 元素由 v-html 动态插入，
+ * scoped 样式必须使用 :deep() 才能生效。
+ */
 :deep(.highlight) {
-  background: rgba(255, 255, 0, 0.4);
-  border-radius: 4px;
   padding: 0 2px;
-  color: #000;
+  color: var(--text-primary);
+  background: rgba(255, 255, 0, 0.4);
+  border-radius: var(--radius-xs);
 }
 </style>

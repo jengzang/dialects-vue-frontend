@@ -130,17 +130,31 @@ function handleClose() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$text-main: var(--text-primary);
+$text-secondary: rgba(0, 0, 0, 0.6);
+
+$surface-border: rgba(0, 0, 0, 0.06);
+$surface-background: var(--glass-60);
+$surface-header: var(--glass-70);
+$surface-row-even: var(--glass-40);
+
+$shadow-default: 0 4px 12px rgba(0, 0, 0, 0.1);
+$shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.15);
+
+$transition-duration: 0.3s;
+
 .home-support-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 24px;
 }
 
 .home-support-subtitle {
-  text-align: center;
-  color: rgba(0, 0, 0, 0.6);
   margin: 0;
+  color: $text-secondary;
+  text-align: center;
 }
 
 .donate-qr-grid {
@@ -150,103 +164,111 @@ function handleClose() {
 }
 
 .donate-qr-box {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
-}
 
-.donate-qr-box img {
-  width: 100%;
-  max-width: 150px;
-  height: auto;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
+  img {
+    width: 100%;
+    max-width: 150px;
+    height: auto;
+    border-radius: var(--radius-md);
+    box-shadow: $shadow-default;
+    cursor: pointer;
+    transition:
+      box-shadow $transition-duration ease,
+      transform $transition-duration ease;
 
-.donate-qr-box img:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
+    &:hover {
+      box-shadow: $shadow-hover;
+      transform: scale(1.05);
+    }
+  }
 
-.donate-qr-label {
-  margin: 0.625rem 0 0;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #1d1d1f;
-  text-align: center;
+  .donate-qr-label {
+    margin: 0.625rem 0 0;
+    color: $text-main;
+    text-align: center;
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
 }
 
 .donor-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
 .donor-thanks {
   margin: 0;
+  color: $text-main;
+  text-align: center;
   font-size: 1rem;
   line-height: 1.6;
-  color: #1d1d1f;
-  text-align: center;
 }
 
 .donor-table-wrap {
   overflow-x: auto;
+  background: $surface-background;
+  border: 1px solid $surface-border;
   border-radius: 14px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  background: rgba(255, 255, 255, 0.56);
 }
 
 .donor-table {
   width: 100%;
   min-width: 200px;
   border-collapse: collapse;
-}
 
-.donor-table th,
-.donor-table td {
-  padding: 12px 14px;
-  font-size: 0.9375rem;
-  color: #1d1d1f;
-  text-align: left;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
+  th,
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid $surface-border;
+    color: $text-main;
+    text-align: left;
+    font-size: 0.9375rem;
+  }
 
-.donor-table th {
-  font-weight: 650;
-  background: rgba(255, 255, 255, 0.72);
-  white-space: nowrap;
-}
+  th {
+    background: $surface-header;
+    white-space: nowrap;
+    font-weight: 650;
+  }
 
-.donor-table tbody tr:last-child td {
-  border-bottom: none;
-}
+  tbody {
+    tr {
+      &:nth-child(even) {
+        background: $surface-row-even;
+      }
 
-.donor-table tbody tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.38);
-}
+      &:last-child {
+        td {
+          border-bottom: none;
+        }
+      }
+    }
+  }
 
-.donor-time,
-.donor-amount {
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
+  .donor-time,
+  .donor-amount {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
 
-.donor-amount {
-  font-weight: 650;
-}
+  .donor-amount {
+    font-weight: 650;
+  }
 
-.donor-method {
-  white-space: nowrap;
+  .donor-method {
+    white-space: nowrap;
+  }
 }
 
 @media (max-width: 640px) {
-  .donor-table th,
-  .donor-table td {
-    padding: 10px 12px;
-    font-size: 0.875rem;
+  .donor-table {
+    th,
+    td {
+      padding: 10px 12px;
+      font-size: 0.875rem;
+    }
   }
 }
 
@@ -255,8 +277,10 @@ function handleClose() {
     gap: 1rem;
   }
 
-  .donate-qr-box img {
-    max-width: 120px;
+  .donate-qr-box {
+    img {
+      max-width: 120px;
+    }
   }
 }
 </style>

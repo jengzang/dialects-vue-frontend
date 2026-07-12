@@ -1,13 +1,12 @@
+@use '@/styles/global/mixins' as *;
 .loading-state-base {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
 }
 
 .empty-state-base {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -19,18 +18,22 @@
 }
 
 .main-list-state[data-state='error'] {
-  border-color: rgba(220, 38, 38, 0.15);
+  border-color: rgba(var(--color-error-rgb), 0.15);
 }
 
 .main-list-state-title {
   font-size: 16px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-deep);
 }
 
 .main-list-state-text {
   margin: 10px 0 0;
-  color: #64748b;
+  color: var(--text-tertiary);
   font-size: 14px;
   line-height: 1.7;
+}
+
+.result-panel-vue {
+  margin-bottom: 50px;
 }

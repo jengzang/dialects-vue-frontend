@@ -415,6 +415,21 @@
       "exitFullscreen": "退出全屏"
     }
   },
+  "allVillagesMapPopup": {
+    "title": "全部自然村分布地图",
+    "count": "{count} 个要素",
+    "toggle": {
+      "name": "地名",
+      "level2": "级别2",
+      "level3": "级别3",
+      "code": "原始"
+    },
+    "buttons": {
+      "reset": "复位",
+      "fullscreen": "全屏",
+      "exitFullscreen": "退出全屏"
+    }
+  },
   "legend": {
     "title": "图例",
     "compareTypes": {
@@ -504,9 +519,13 @@
       "panelHint": "基于地点分区数据计算泰森多边形，可预览或导出为面图层。",
       "summaryTitle": "数据概览",
       "settingsTitle": "计算设置",
+      "dataSourceTitle": "数据来源",
       "actionsTitle": "操作",
       "totalPoints": "全部点位",
       "activePoints": "参与点位",
+      "officialPoints": "官方点位",
+      "customPoints": "自定义点位",
+      "useOfficialData": "同时使用官方分区数据",
       "ignoredPoints": "忽略点位",
       "partitionGroups": "分区组数",
       "loadPoints": "加载点位",
@@ -544,6 +563,42 @@
       "exportEmptyAfterClip": "裁剪后没有可导出的图层",
       "exportLoadingTitle": "正在导出国界裁剪图层",
       "exportLoadingProgress": "已完成 {current}/{total}",
+      "customImportLoaded": "已导入 {count} 个自定义点位",
+      "customImportCleared": "已清空自定义点位",
+      "sourceUpdated": "当前参与计算的点位数：{count}",
+      "customImport": {
+        "modalTitle": "导入自定义 Voronoi 数据",
+        "introTitle": "预览表格并完成列匹配",
+        "introText": "这里仅负责预览、工作表切换和列匹配；父组件会接收已匹配的数据并参与 Voronoi 计算。",
+        "fileLabel": "表格文件",
+        "partitionModeLabel": "当前分区列",
+        "previewTitle": "自定义数据预览",
+        "previewDescription": "请确认地点名称、经纬度与分区列都已映射正确，再将数据接入 Voronoi。",
+        "partitionModeOptions": {
+          "map": "地图集分区",
+          "yindian": "音典分区"
+        },
+        "actions": {
+          "selectFile": "选择 xlsx / xls / csv",
+          "replace": "重新选择文件",
+          "clear": "清空自定义数据",
+          "confirm": "确认并接入"
+        },
+        "summary": {
+          "rows": "总行数 {count}",
+          "validRows": "有效点位 {count}",
+          "message": "已接入 {count} 个自定义点位（原始 {total} 行）"
+        },
+        "messages": {
+          "ready": "当前映射结果可接入 Voronoi 计算。",
+          "incomplete": "当前文件仍需补齐列匹配或修正无效数据。",
+          "parseFailed": "表格解析失败：{error}",
+          "invalidCoordinates": "有 {count} 行因经纬度无效被跳过。",
+          "missingPartition": "有 {count} 行因缺少当前分区列而被跳过。",
+          "duplicateNames": "检测到 {count} 组重名点位，v1 先按并行点位保留。",
+          "noValidRows": "当前没有可用于 Voronoi 的有效点位。"
+        }
+      },
       "regionStates": {
         "none": "未选择",
         "partial": "部分选择",

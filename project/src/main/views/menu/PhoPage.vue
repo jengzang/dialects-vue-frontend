@@ -80,12 +80,15 @@ const resolveTabRoute = (tabName) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pho-page {
   width: 100%;
 }
 
 .pho-content {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
   width: 100%;
 }
 </style>

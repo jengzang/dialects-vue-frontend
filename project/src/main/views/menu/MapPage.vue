@@ -28,7 +28,7 @@
           size="sm"
           placement="bottom"
           icon="?"
-          icon-color="#007aff"
+          icon-color="var(--color-primary)"
           style="margin-left: 5px;"
         />
         <div
@@ -100,11 +100,11 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { mapStore } from '@/main/store/store.js'
 
 import TabsContainer from '@/components/common/TabsContainer.vue'
-import DivideTab from "@/main/components/map/DivideTab.vue";
-import CustomTab from '@/main/components/map/CustomTab.vue'
-import MapDrawTab from '@/main/components/map/MapDrawTab.vue'
+import DivideTab from "@/main/components/map/Tabs/DivideTab.vue";
+import CustomTab from '@/main/components/map/Tabs/CustomTab.vue'
+import MapDrawTab from '@/main/components/map/Tabs/MapDrawTab.vue'
 import MapLibre from "@/main/components/map/MapLibre.vue";
-import CustomDataPanel from '@/main/components/map/CustomDataPanel.vue'
+import CustomDataPanel from '@/main/components/map/custom/CustomDataPanel.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
 import { showSuccess, showError } from '@/utils/message.js'
@@ -138,6 +138,15 @@ const tabToRouteSub = {
   draw: 'draw'
 }
 const currentTab = computed(() => routeSubToTab[route.params.sub] || 'map')
+
+// 是否处于 map 路由（用于判断基于路由的自动加载等）
+const isMapRoute = computed(() => {
+  try {
+    return typeof route.path === 'string' && route.path.includes('/menu/map')
+  } catch (e) {
+    return false
+  }
+})
 
 const tabs = computed(() => [
   { name: 'map', label: t('map.tabs.map') },
@@ -291,32 +300,38 @@ const resolveTabRoute = (tabName) => {
 
 </script>
 
-<style scoped>
-/* 僅保留外層容器樣式 */
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$success-green: var(--color-success);
+$text-primary: var(--text-dark);
+$white: var(--text-white);
+
+$transition-fast: 0.2s;
+$transition-base: 0.3s;
+/* 外层内容容器 */
 .tab-content {
-  width: 100%;
-  animation: fade 0.6s ease;
+  display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  justify-content: center;
+
+  width: 100%;
   padding: 1rem 0;
+  text-align: center;
+  animation: fade 0.6s ease;
 }
 
-@keyframes fade {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* 特徵控制區 (放在地圖上方) */
+/* 地图上方的特征控制区 */
 .feature-control-area {
-  margin-left: 12px;
-  z-index: 200; /* 確保下拉框在地圖之上 */
   position: relative;
+  z-index: 200;
   display: flex;
   justify-content: center;
+  margin-left: 12px;
 }
-/* === 單一按鈕樣式 (復刻你之前的 Button 風格) === */
+
 .single-btn-wrapper {
   display: flex;
   justify-content: center;
@@ -324,64 +339,78 @@ const resolveTabRoute = (tabName) => {
 
 .feature-btn {
   padding: 10px 24px;
-  border-radius: 20px;
-  border: 1px solid rgba(200, 200, 200, 0.5);
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  cursor: pointer;
+  color: $text-primary;
   font-size: 14px;
-  color: #333;
-  transition: all 0.3s ease;
   white-space: nowrap;
+  cursor: pointer;
+  background: var(--glass-30);
+  border: 1px solid rgba(var(--color-silver-rgb), 0.5);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all $transition-base ease;
+
+  &.active {
+    color: $white;
+    background: $success-green;
+    border-color: $success-green;
+    box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.3);
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    padding: 10px 8px;
+  }
 }
 
-.feature-btn.active {
-  background: #34c759; /* 綠色表示激活 */
-  color: white;
-  border-color: #34c759;
-  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
-}
-
-.feature-btn:hover {
-  transform: translateY(-2px);
-}
-
-/* Dropdown 样式 */
+/* SimpleSelectDropdown 外层 */
 .dropdown-wrapper {
-  flex: 1;
   position: relative;
-  align-items: center;
   display: flex;
+  flex: 1;
+  align-items: center;
   justify-content: center;
 }
 
+/*
+ * 当前模板中未直接使用。
+ * 保留原有通用下拉触发器样式。
+ */
 .dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 80px;
   padding: 6px 12px;
+  margin: auto;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--glass-30);
+  border: 1px solid rgba(var(--color-silver-rgb), 0.5);
   border-radius: var(--radius-md);
-  background: var(--glass-light);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  cursor: pointer;
-  font-size: 14px;
-  border: 1px solid rgba(200, 200, 200, 0.5);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-width: 80px;
-  margin: auto;
-  transition: all 0.2s;
-  white-space: nowrap;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--glass-60);
+    border-color: var(--color-primary);
+  }
 }
 
-.dropdown:hover {
-  background: var(--glass-medium);
-  border-color: var(--color-primary);
-}
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 
-@media (max-aspect-ratio:1/1){
-  .feature-btn{
-    padding:10px 8px;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style>
-

@@ -14,7 +14,7 @@
           v-model="tendencyPattern"
           type="text"
           placeholder="輸入模式（如：新村）"
-          class="text-input"
+          class="vml-input"
         />
         <SimpleSelectDropdown :match-trigger-width="true"
           v-model="tendencyLevel"
@@ -30,7 +30,7 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="loading-state">
+      <div v-if="loading" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -133,16 +133,16 @@ const getTendencyClass = (zScore) => {
 
 const getBarColor = (zScore) => {
   const absZ = Math.abs(zScore)
-  if (absZ >= 2) return '#f39c12'
-  if (absZ >= 1) return '#f1c40f'
-  return 'var(--color-primary)'
+  if (absZ >= 2) return '#ff9500'
+  if (absZ >= 1) return '#ffd700'
+  return '#007aff'
 }
 
 const getZScoreColor = (zScore) => {
   const absZ = Math.abs(zScore)
-  if (absZ >= 2) return '#e67e22'
-  if (absZ >= 1) return '#f39c12'
-  return 'var(--color-primary)'
+  if (absZ >= 2) return '#ff9500'
+  if (absZ >= 1) return '#ff9500'
+  return '#007aff'
 }
 
 // Initialize from URL query and watch for changes
@@ -158,7 +158,7 @@ watch(
 )
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pattern-tendency-page {
   padding: 12px;
   max-width: 1400px;
@@ -166,9 +166,9 @@ watch(
 }
 
 .vml-glass-panel h2 {
-  font-size: 16px;
   margin-bottom: 16px;
-  color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .controls {
@@ -180,23 +180,14 @@ watch(
   align-items: center;
 }
 
-.text-input {
+.vml-input {
   flex: 1;
   min-width: 200px;
   padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.select-input {
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-  width: 150px;
+  background: var(--glass-50);
 }
 
 .significance-legend {
@@ -204,8 +195,8 @@ watch(
   gap: 24px;
   margin-bottom: 16px;
   padding: 12px;
-  background: rgba(74, 144, 226, 0.1);
-  border-radius: 8px;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border-radius: var(--radius-sm2);
   flex-wrap: wrap;
 }
 
@@ -220,15 +211,15 @@ watch(
 .legend-dot {
   width: 12px;
   height: 12px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
 }
 
 .legend-dot.strong {
-  background: #f39c12;
+  background: var(--color-warning);
 }
 
 .legend-dot.moderate {
-  background: #f1c40f;
+  background: var(--color-gold);
 }
 
 .legend-dot.weak {
@@ -236,8 +227,7 @@ watch(
 }
 
 .tendency-chart {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
@@ -246,25 +236,25 @@ watch(
   grid-template-columns: 150px 1fr 200px;
   gap: 12px;
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
   align-items: center;
   transition: all 0.3s ease;
 }
 
 .tendency-item:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   transform: translateX(5px);
 }
 
 .tendency-item.strong-tendency {
-  background: rgba(243, 156, 18, 0.15);
-  border-left: 4px solid #f39c12;
+  background: rgba(var(--color-warning-rgb), 0.15);
+  border-left: 4px solid var(--color-warning);
 }
 
 .tendency-item.moderate-tendency {
-  background: rgba(241, 196, 15, 0.1);
-  border-left: 4px solid #f1c40f;
+  background: rgba(var(--color-gold-rgb), 0.1);
+  border-left: 4px solid var(--color-gold);
 }
 
 .tendency-item.weak-tendency {
@@ -279,15 +269,15 @@ watch(
 
 .tendency-bar {
   height: 24px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
+  background: var(--glass-50);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
 .tendency-fill {
   height: 100%;
   transition: width 0.5s ease;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .tendency-value {

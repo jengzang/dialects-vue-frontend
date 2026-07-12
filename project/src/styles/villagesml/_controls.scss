@@ -1,15 +1,17 @@
-@mixin vm-query-button-styles($padding: 10px 20px, $radius: 8px, $font-size: 14px) {
-  display: block;
-  width: fit-content; /* 确保按钮包裹文字，而不是撑满整行 */
-  //margin: 0 auto 0; /* 核心：左右 margin 为 auto 实现绝对居中，上边距给 20px 留白 */
+@use '@/styles/global/mixins' as *;
+// VillagesML 控件样式（按钮、输入框、设置行）
 
+.vml-query-btn,
+.query-button {
+  display: block;
+  width: fit-content;
   white-space: nowrap;
-  padding: $padding;
+  padding: 10px 20px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
-  border-radius: $radius;
-  font-size: $font-size;
+  border-radius: var(--radius-sm2);
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -21,41 +23,50 @@
   }
 
   &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    @include disabled-state;
   }
 }
 
-@mixin vm-query-button-disabled-styles {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-@mixin vm-mode-button-styles($padding: 8px 16px, $radius: 8px, $font-size: 14px) {
+.vml-mode-btn {
   flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: $padding;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: $radius;
+  padding: 8px 16px;
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  background: var(--glass-50);
+  border-radius: var(--radius-sm2);
   cursor: pointer;
-  font-size: $font-size;
+  font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(var(--vml-blue-rgb), 0.1);
+    border-color: rgba(var(--vml-blue-rgb), 0.5);
+  }
+
+  &.active {
+    background: var(--color-primary, var(--vml-blue));
+    color: var(--action-primary-text);
+    border-color: var(--color-primary, var(--vml-blue));
+  }
 }
 
-@mixin vm-run-button-styles {
+.vml-run-btn {
   margin-top: 8px;
   padding: 12px 24px;
+
+  &:disabled {
+    @include disabled-state;
+  }
 }
 
 .vm-setting-input {
   padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-md);
+  background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
 }
@@ -63,59 +74,24 @@
 .vm-setting-input-compact {
   width: 100px;
   padding: 0.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--bg-hover-strong);
+  border-radius: var(--radius-sm2);
+  background: var(--glass-90);
   font-size: 0.95rem;
-}
 
-.vm-setting-input-compact:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
+  }
 }
 
 .vm-setting-hint-muted {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-tertiary);
   font-style: italic;
 }
 
 .vm-setting-indent {
   margin-left: 1.5rem;
-}
-
-.villagesml-module .query-button {
-  @include vm-query-button-styles;
-}
-
-.villagesml-module .query-button:hover:not(:disabled) {
-  background: #3a7bc8;
-}
-
-.villagesml-module .query-button:disabled {
-  @include vm-query-button-disabled-styles;
-}
-
-.villagesml-module .mode-button {
-  @include vm-mode-button-styles;
-}
-
-.villagesml-module .mode-button:hover {
-  background: rgba(74, 144, 226, 0.1);
-  border-color: rgba(74, 144, 226, 0.5);
-}
-
-.villagesml-module .mode-button.active {
-  background: var(--color-primary, #4a90e2);
-  color: white;
-  border-color: var(--color-primary, #4a90e2);
-}
-
-.villagesml-module .run-button {
-  @include vm-run-button-styles;
-}
-
-.villagesml-module .run-button:disabled {
-  @include vm-query-button-disabled-styles;
 }

@@ -85,11 +85,11 @@
                 <span>熱點區域</span>
               </div>
               <div v-if="layers.clusters" class="legend-item">
-                <span class="legend-color" style="background: rgba(74, 144, 226, 0.7);"></span>
+                <span class="legend-color" style="background: rgba(var(--vml-blue-rgb), 0.7);"></span>
                 <span>聚類中心</span>
               </div>
               <div v-if="layers.ngrams" class="legend-item">
-                <span class="legend-color" style="background: rgba(80, 200, 120, 0.7);"></span>
+                <span class="legend-color" style="background: rgba(var(--color-success-rgb), 0.7);"></span>
                 <span>N-gram 分佈</span>
               </div>
               <div v-if="layers.characters" class="legend-item">
@@ -360,10 +360,10 @@ const loadHotspotsLayer = async () => {
           50, 18,
           100, 28
         ],
-        'circle-color': '#ff6464',
+        'circle-color': '#ff3b30',
         'circle-opacity': 0.3,
         'circle-stroke-width': 3,
-        'circle-stroke-color': '#ff6464',
+        'circle-stroke-color': '#ff3b30',
         'circle-stroke-opacity': 0.8
       }
     })
@@ -503,7 +503,7 @@ const loadNgramsLayer = async () => {
         ],
         'circle-color': [
           'interpolate', ['linear'], ['get', 'tendency_score'],
-          0, '#90EE90', 1, '#50c878', 2, '#228B22'
+          0, '#90EE90', 1, '#34c759', 2, 'green'
         ],
         'circle-opacity': 0.5,
         'circle-stroke-width': 2,
@@ -595,7 +595,7 @@ const loadCharactersLayer = async () => {
           0, 'rgba(0, 0, 255, 0)',
           0.2, 'rgba(0, 0, 255, 0.5)',
           0.4, 'rgba(100, 149, 237, 0.7)',
-          0.6, 'rgba(255, 255, 255, 0.8)',
+          0.6, 'rgba(255, 255, 255, 0.80)',
           0.8, 'rgba(255, 107, 107, 0.7)',
           1, 'rgba(255, 0, 0, 0.9)'
         ],
@@ -619,11 +619,11 @@ const loadCharactersLayer = async () => {
         'circle-radius': 4,
         'circle-color': [
           'interpolate', ['linear'], ['get', 'lift'],
-          0, '#0000ff',
+          0, '#007aff',
           0.5, '#6495ed',
           1, '#ffffff',
-          2, '#ff6b6b',
-          4, '#ff0000'
+          2, '#ff3b30',
+          4, '#ff3b30'
         ],
         'circle-opacity': 0.4,
         'circle-stroke-width': 2,
@@ -655,13 +655,13 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .spatial-visualization-tab {
   padding: 16px;
-  background: var(--glass-medium);
+  background: var(--glass-60);
   backdrop-filter: blur(40px) saturate(180%);
   border-radius: var(--radius-xl);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-40);
   box-shadow: var(--shadow-glass);
 }
 
@@ -682,13 +682,13 @@ h2 {
 .control-panel {
   position: relative;
   width: 280px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-80);
   backdrop-filter: blur(12px);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 16px;
   overflow-y: auto;
   transition: width 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px var(--bg-hover-strong);
 }
 
 .control-panel.is-collapsed {
@@ -700,9 +700,9 @@ h2 {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(74, 144, 226, 0.1);
-  border: 1px solid rgba(74, 144, 226, 0.3);
-  border-radius: 6px;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm);
   padding: 4px 8px;
   cursor: pointer;
   font-size: 14px;
@@ -711,18 +711,17 @@ h2 {
 }
 
 .collapse-btn:hover {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
 }
 
 .panel-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
 .section {
   padding-bottom: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--bg-hover-strong);
 }
 
 .section:last-child {
@@ -738,8 +737,7 @@ h2 {
 
 /* 圖層複選框 */
 .layer-checkboxes {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -749,12 +747,12 @@ h2 {
   gap: 8px;
   cursor: pointer;
   padding: 6px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: background 0.2s;
 }
 
 .checkbox-item:hover {
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
 }
 
 .checkbox-item span {
@@ -776,8 +774,8 @@ h2 {
 
 .filter-input{
   padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid var(--border-light-gray);
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   outline: none;
   transition: border 0.3s;
@@ -785,7 +783,7 @@ h2 {
 }
 
 .filter-input:focus{
-  border-color: #4a90e2;
+  border-color: var(--vml-blue);
 }
 
 .layer-note {
@@ -793,8 +791,8 @@ h2 {
   color: var(--text-secondary);
   margin-top: 12px;
   padding: 8px;
-  background: rgba(74, 144, 226, 0.05);
-  border-radius: 6px;
+  background: rgba(var(--vml-blue-rgb), 0.05);
+  border-radius: var(--radius-sm);
   line-height: 1.4;
 }
 
@@ -802,10 +800,10 @@ h2 {
 .apply-btn {
   width: 100%;
   padding: 10px;
-  background: #4a90e2;
+  background: var(--vml-blue);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -813,24 +811,23 @@ h2 {
 }
 
 .apply-btn:hover:not(:disabled) {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .apply-btn:disabled {
-  background: #ccc;
+  background: var(--border-gray);
   cursor: not-allowed;
 }
 
 /* 圖例 */
 .legend-section {
-  background: rgba(74, 144, 226, 0.05);
+  background: rgba(var(--vml-blue-rgb), 0.05);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .legend-items {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -845,28 +842,27 @@ h2 {
 .legend-color {
   width: 16px;
   height: 16px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   flex-shrink: 0;
 }
 
 .legend-gradient {
   width: 40px;
   height: 16px;
-  border-radius: 4px;
-  background: linear-gradient(to right, #0000ff, #ffffff, #ff0000);
+  border-radius: var(--radius-xs);
+  background: linear-gradient(to right, var(--color-primary), var(--text-white), var(--color-error-light));
   flex-shrink: 0;
 }
 
 /* 統計信息 */
 .stats-section {
-  background: rgba(80, 200, 120, 0.05);
+  background: rgba(var(--color-success-rgb), 0.05);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
 }
 
 .stats-items {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -888,19 +884,17 @@ h2 {
 /* 地圖面板 */
 .map-panel {
   flex: 1;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px var(--bg-hover-strong);
 }
 
 .map-placeholder {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  @include flex-center;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
 }
 
 .map-placeholder p {

@@ -1,6 +1,6 @@
 import { WEB_BASE } from '../../env-config.js';
-import { showRateLimitNotice } from '../../utils/rateLimitNotice.js';
-import { recordLoginPromptApiHit } from '../../utils/loginPromptTracker.js';
+import { showRateLimitNotice } from '../../utils/user/rateLimitNotice.js';
+import { recordLoginPromptApiHit } from '../../utils/user/loginPromptTracker.js';
 import { userStore } from '../../main/store/store.js';
 
 import { getToken, getTokenExpiresAt } from './tokenStorage.js';

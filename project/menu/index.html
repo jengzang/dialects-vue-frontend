@@ -8,11 +8,33 @@
         <meta name="description" content="方音圖鑑深入分析中古地位、方言比較、地理語言學，呈現各方言點的聲韻層次及音位分合。
     支持：按中古地位整理讀音、分析音位的中古來源、查詢調值調類、查詢漢字讀音、用戶自定義繪圖等。">
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <style>
+            html, body, #app { min-height: 100%; margin: 0; }
+            .app-boot-loading {
+                position: fixed; inset: 0; z-index: 9999;
+                display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+                background: radial-gradient(1200px 800px at 10% -10%, #dff1ff 0%, rgba(223,241,255,0) 60%), radial-gradient(1000px 700px at 110% 10%, #cfe7ff 0%, rgba(207,231,255,0) 60%), linear-gradient(180deg, #eaf5ff, #d7ecff);
+                color: #0b2540;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            }
+            .app-boot-spinner {
+                width: 34px; height: 34px; border-radius: 999px;
+                border: 3px solid rgba(0,122,255,0.18); border-top-color: rgba(0,122,255,0.9);
+                animation: appBootSpin 0.8s linear infinite;
+            }
+            .app-boot-text { font-size: 14px; font-weight: 600; color: rgba(11,37,64,0.72); }
+            @keyframes appBootSpin { to { transform: rotate(360deg); } }
+        </style>
     </head>
 
 
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div class="app-boot-loading">
+        <div class="app-boot-spinner"></div>
+        <div class="app-boot-text">頁面載入中...</div>
+      </div>
+    </div>
     <script type="module" src="/src/main/main.js"></script>
   </body>
 </html>

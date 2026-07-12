@@ -30,7 +30,8 @@
             "title": "查調",
             "body": "查詢調值與調類，接口輕量，登錄用戶可不受限制地同時查詢多個地點。結果以表格呈現（不同調類標不同顏色），地圖可切換不同調類繪製，點擊可查看調類歸併詳情。"
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2047826401479364959"
       },
       "feature2": {
         "heading": "互動地圖與自定義數據",
@@ -53,7 +54,8 @@
             "title": "地圖繪製",
             "body": "提供繪圖工具，支持繪製Voronoi圖及圖層導出。"
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2047826401479364959"
       },
       "feature3": {
         "heading": "方言比較",
@@ -76,7 +78,8 @@
             "title": "音值比較",
             "body": "將各方言點的實際讀音並列對照，便於逐點比對。"
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2023530288848930082"
       },
       "feature4": {
         "heading": "深入分析單個方言點",
@@ -99,7 +102,8 @@
             "title": "演化圖",
             "body": "以桑基圖、餅圖等形式展示單個方言點聲母／韻母／聲調從中古到現代的演變脈絡，直觀呈現分合軌跡。"
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2002848348378521848"
       },
       "feature5": {
         "heading": "漢字字集查詢",
@@ -145,7 +149,8 @@
             "title": "字表推導",
             "body": "根據音韻規律自動推導生成缺失讀音。"
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2001363637311381604"
       },
       "feature7": {
         "heading": "詞句資料",
@@ -164,16 +169,17 @@
             "title": "陽春口語詞",
             "body": "收錄陽春地區口語常用詞彙。"
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2003637219919946701"
       },
       "feature8": {
-        "heading": "全粵村情方言數據",
-        "subtitle": "樹狀圖、互動地圖、原始表格、陽春自然村、機器學習",
-        "intro": "基於《全粵村情》叢書錄入的廣東自然村方言數據（作者逐村手動錄入，數據多集中在粵西：陽江、茂名、雲浮等）。",
+        "heading": "自然村數據",
+        "subtitle": "廣東省樹狀圖、互動地圖、原始表格、陽春自然村、機器學習",
+        "intro": "各地自然村的地理位置、行政區劃、方言數據等信息，本站提供廣東省自然村樹狀圖、互動地圖、原始表格、陽春自然村數據及機器學習分析等部分。",
         "items": [
           {
-            "title": "樹狀圖",
-            "body": "逐級展開市→縣→鎮→行政村→自然村，清晰展示層級結構，所有已加載數據支持搜索，目前僅有廣東省數據。"
+            "title": "廣東自然村樹狀圖",
+            "body": "基於《全粵村情》叢書錄入的廣東自然村方言數據（作者逐村手動錄入，數據多集中在粵西：陽江、茂名、雲浮等），支持逐級展開市→縣→鎮→行政村→自然村，清晰展示層級結構，支持搜索。"
           },
           {
             "title": "互動地圖",
@@ -191,7 +197,8 @@
             "title": "機器學習分析（VillagesML）",
             "body": "一個完整獨立子應用，包含七個模塊共二十八個分析Tab：字符分析（頻率傾向、嵌入相似、字符網絡、顯著性）；語義分析（類別標籤、組合模式、N-gram分析、語義指數、語義網絡、子類別分析）；空間分析（空間熱點、空間聚類、空間可視化、空間整合）；模式分析（頻率分析、結構分析、傾向性分析、N-gram探索、N-gram統計）；區域分析（聚合統計、特徵向量、類別傾向性、相似度分析）；ML計算（基礎聚類、字符傾向、採樣村莊、空間感知聚類、層次聚類、特徵提取、子集分析）；搜索。"
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2005418333642707057"
       },
       "feature9": {
         "heading": "聲學分析工具（Praat網頁版）",
@@ -222,7 +229,8 @@
             "title": "基頻定調",
             "body": "截取各調類的voiced／rime_core部分→加入列表→採用石峰T值法繪製五度圖，支持導出到Excel。一條錄音即可截取多個調類，移動端也可方便使用。"
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2007951324780713596"
       },
       "feature10": {
         "heading": "方言聚類分析",
@@ -231,7 +239,9 @@
         "items": []
       }
     },
-    "footer": "歡迎探索《方音圖鑑》，一起觸摸方言的歷史層次！"
+    "footer": "歡迎探索《方音圖鑑》，一起觸摸方言的歷史層次！",
+    "readZhihuArticle": "📖 知乎文章：了解详情 →",
+    "oldSiteZhihuArticle": "📖 旧版网站介绍 → 知乎文章"
   },
   "reflection": {
     "title": "🧑‍💻 開發感悟",
@@ -263,8 +273,8 @@
   },
   "suggestion": {
     "title": "我有建議",
-    "description": "發現 bug？有建議？<br />歡迎通過 GitHub Issue 提出！",
-    "subtext": "點擊下方卡片跳轉對應倉庫",
+    "description": "發現 bug？有建議？有想法？<br />歡迎通過 GitHub Issue 或知乎留言提出！",
+    "subtext": "👇 點擊下方卡片跳轉對應平台",
     "frontend": {
       "title": "🐞 網頁運行有 bug❓<br />💡 對交互、UI 有建議❓",
       "link": "到前端倉庫提 Issue"
@@ -272,24 +282,37 @@
     "backend": {
       "title": "🔤 對字表有疑問❓<br />🎯 聲/韻/調 提取出錯❓",
       "link": "到字表處理倉庫提 Issue"
+    },
+    "zhihu": {
+      "title": "💬 想交流討論❓<br />📝 對網站有想法❓",
+      "link": "到知乎項目評論"
     }
   },
   "like": {
     "title": "❤️ 喜歡作者",
     "followButton": "關注",
     "starMessage": "「如果你覺得項目不錯，可以給個 ⭐️ 嗎！」",
+    "zhihuLike": "「喜歡的話，也歡迎去知乎點個讚 👍」",
     "projects": {
       "frontend": {
         "name": "dialects-vue-frontend",
-        "description": "前端倉庫 - 使用vue框架和原生js開發"
+        "description": "前端倉庫 - 基於 Vue3 + js + scss開發"
       },
       "backend": {
         "name": "dialects-backend",
-        "description": "後端倉庫 - 基於fastapi"
+        "description": "後端倉庫 - 基於FastAPI + Python + SQLAlchemy"
       },
       "build": {
         "name": "dialects-build",
         "description": "字表預處理倉庫 - 提取字表的聲韻調"
+      },
+      "zhihuProject": {
+        "name": "方音圖鑑",
+        "description": "項目 - 知乎人文季"
+      },
+      "zhihuColumn": {
+        "name": "知乎專欄",
+        "description": "專欄 - 方言相關"
       }
     },
     "supportMessage": "「若網站對您有幫助，可以請作者喝杯咖啡☕️，您的支持將是作者持續維護的動力🙏」",

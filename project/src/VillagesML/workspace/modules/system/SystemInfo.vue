@@ -8,7 +8,7 @@
 <!--    </div>-->
 
     <!-- Database Overview -->
-    <div class="glass-panel overview-panel">
+    <div class="vml-glass-panel overview-panel">
       <div class="panel-header">
         <h3>數據庫概覽 Database Overview</h3>
         <button @click="refreshOverview" :disabled="loading" class="solid-button small">
@@ -65,7 +65,7 @@
     </div>
 
     <!-- N-gram Significance Statistics -->
-    <div class="glass-panel ngram-stats-panel">
+    <div class="vml-glass-panel ngram-stats-panel">
       <div class="panel-header">
         <h3>N-gram 顯著性統計 Significance Statistics</h3>
         <button @click="refreshNgramStats" :disabled="loadingNgram" class="solid-button small">
@@ -132,16 +132,21 @@
           </div>
         </div>
       </div>
-      <div v-else-if="loadingNgram" class="loading-state">
+      <div v-else-if="loadingNgram" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
     </div>
 
     <!-- Table Statistics -->
-    <div class="glass-panel tables-panel">
+    <div class="vml-glass-panel tables-panel">
       <div class="panel-header">
         <h3>表統計信息 Table Statistics</h3>
         <div class="header-controls">
+          <button @click="refreshTables" :disabled="loadingTables" class="solid-button small">
+            <span v-if="loadingTables">加載中...</span>
+            <span v-else-if="tables === null">加載</span>
+            <span v-else>🔄 刷新</span>
+          </button>
           <input
             v-model="tableSearch"
             type="text"
@@ -151,11 +156,10 @@
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model="tableSortBy"
             :options="sortOptions"
-            class="glass-select small"
           />
         </div>
       </div>
-      <div v-if="tables" class="tables-content">
+      <div v-if="tables !== null" class="tables-content">
         <div class="table-wrapper">
           <table class="glass-table">
             <thead>
@@ -170,7 +174,6 @@
                   大小 <span v-if="tableSortBy === 'size'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
                 </th>
                 <th>索引數</th>
-                <th>最後更新</th>
                 <th>操作</th>
               </tr>
             </thead>
@@ -180,7 +183,6 @@
                 <td>{{ formatNumber(table.records) }}</td>
                 <td>{{ formatSize(table.size) }}</td>
                 <td>{{ table.indexes }}</td>
-                <td>{{ formatDate(table.last_updated) }}</td>
                 <td>
                   <button @click="viewTableDetails(table)" class="solid-button small">詳情</button>
                 </td>
@@ -195,6 +197,9 @@
           <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 頁</span>
           <button @click="nextPage" :disabled="currentPage === totalPages" class="solid-button small">下一頁</button>
         </div>
+      </div>
+      <div v-else-if="loadingTables" class="vml-loading">
+        <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
     </div>
 
@@ -249,8 +254,8 @@
       </div>
     </AppModal>
 
-    <!-- Loading Overlay -->
-    <div v-if="loading" class="loading-overlay">
+    <!-- Loading -->
+    <div v-if="loading" class="initial-state">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>載入中...</p>
     </div>
@@ -267,10 +272,12 @@ import { useAsyncData } from '@/composables/core/useAsyncData.js'
 
 // State
 const overview = ref(null)
-const tables = ref([])
+const tables = ref(null)
 const overviewQuery = useAsyncData()
+const tablesQuery = useAsyncData()
 const ngramStatsQuery = useAsyncData()
 const loading = overviewQuery.loading
+const loadingTables = tablesQuery.loading
 const selectedTable = ref(null)
 const ngramStats = ref(null)
 const loadingNgram = ngramStatsQuery.loading
@@ -291,6 +298,7 @@ const sortOptions = [
 
 // Computed
 const filteredTables = computed(() => {
+  if (!tables.value) return []
   let filtered = tables.value
 
   if (tableSearch.value) {
@@ -315,6 +323,7 @@ const filteredTables = computed(() => {
 })
 
 const totalPages = computed(() => {
+  if (!tables.value) return 0
   let count = tables.value.length
   if (tableSearch.value) {
     count = tables.value.filter(t => t.name.toLowerCase().includes(tableSearch.value.toLowerCase())).length
@@ -327,36 +336,43 @@ const selectedTableTitle = computed(() => selectedTable.value ? `表詳情: ${se
 // Methods
 const refreshOverview = async () => {
   await overviewQuery.load(
-    () => Promise.all([
-      getMetadataOverview(),
-      getMetadataTables()
-    ]),
+    () => getMetadataOverview(),
     {
-      onSuccess: ([overviewRes, tablesRes]) => {
-        // Map API response to component data structure
+      onSuccess: (overviewRes) => {
         overview.value = {
-          database_size: (overviewRes.database_size_mb || 0) * 1024 * 1024, // Convert MB to bytes
-          total_tables: tablesRes?.length || 0,
-          total_records: overviewRes.total_villages || 0, // Use villages as main record count
+          database_size: (overviewRes.database_size_mb || 0) * 1024 * 1024,
+          total_tables: overviewRes.total_tables || 0,
+          total_records: overviewRes.total_villages || 0,
           village_count: overviewRes.total_villages || 0,
           character_count: overviewRes.unique_characters || overviewRes.total_characters || 0,
           region_count: (overviewRes.total_cities || 0) + (overviewRes.total_counties || 0) + (overviewRes.total_townships || 0)
         }
 
-        // Map table data from API response (use real field names)
-        tables.value = (tablesRes || []).map(table => ({
-          name: table.table_name || 'unknown',
-          records: table.row_count || 0,
-          size: (table.size_mb || 0) * 1024 * 1024, // Convert MB to bytes for display
-          indexes: table.index_count || 0,
-          last_updated: table.last_modified || new Date().toISOString(),
-          columns: table.columns || []
-        }))
-
         showSuccess('系統信息刷新成功')
       },
       onError: (error) => {
         showError(error.message || '刷新系統信息失敗')
+      }
+    }
+  )
+}
+
+const refreshTables = async () => {
+  await tablesQuery.load(
+    () => getMetadataTables(),
+    {
+      onSuccess: (tablesRes) => {
+        tables.value = (tablesRes || []).map(table => ({
+          name: table.table_name || 'unknown',
+          records: table.row_count || 0,
+          size: (table.size_mb || 0) * 1024 * 1024,
+          indexes: table.index_count || 0,
+          last_updated: table.last_modified || new Date().toISOString(),
+          columns: table.columns || []
+        }))
+      },
+      onError: (error) => {
+        showError(error.message || '加載表信息失敗')
       }
     }
   )
@@ -390,7 +406,7 @@ const closeModal = () => {
 
 const formatSize = (bytes) => {
   if (bytes === 0) return '0 B'
-  const k = 1024
+  const k = 1024 
   const sizes = ['B', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i]
@@ -434,7 +450,9 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .system-info-page {
   padding: 12px;
   max-width: 1600px;
@@ -467,7 +485,7 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
 }
 
 .panel-header h3 {
@@ -498,14 +516,14 @@ onMounted(() => {
   color: var(--text-primary);
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
 }
 
 .level-card {
   padding: 16px;
-  background: rgba(74, 144, 226, 0.06);
-  border: 1px solid rgba(74, 144, 226, 0.2);
-  border-radius: 12px;
+  background: rgba(var(--color-primary-rgb), 0.06);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: var(--radius-md);
   text-align: center;
 }
 
@@ -519,7 +537,7 @@ onMounted(() => {
 .level-rate {
   font-size: 28px;
   font-weight: 700;
-  color: var(--color-primary, #4a90e2);
+  color: var(--color-primary);
   margin-bottom: 12px;
 }
 
@@ -533,7 +551,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 4px 0;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+  border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.1);
 }
 
 .level-detail-row:last-child {
@@ -553,9 +571,9 @@ onMounted(() => {
 .note-section {
   margin-top: 20px;
   padding: 16px;
-  background: rgba(255, 193, 7, 0.1);
-  border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 12px;
+  background: rgba(var(--color-warning-rgb), 0.1);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.3);
+  border-radius: var(--radius-md);
   display: flex;
   gap: 12px;
   align-items: flex-start;
@@ -573,18 +591,15 @@ onMounted(() => {
   color: var(--text-primary);
 }
 
-.loading-state {
-  display: flex;
-  justify-content: center;
-  padding: 20px;
-}
+
+
 
 .glass-input,
 .glass-select {
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
+  background: var(--glass-50);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   transition: all 0.3s ease;
 }
@@ -592,8 +607,8 @@ onMounted(() => {
 .glass-input:focus,
 .glass-select:focus {
   outline: none;
-  border-color: #4a90e2;
-  background: rgba(255, 255, 255, 0.8);
+  border-color: var(--color-primary);
+  background: var(--glass-80);
 }
 
 .glass-input.small,
@@ -604,10 +619,10 @@ onMounted(() => {
 
 .solid-button {
   padding: 8px 16px;
-  background: linear-gradient(135deg, #4a90e2, #50c878);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -616,12 +631,11 @@ onMounted(() => {
 
 .solid-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.35);
 }
 
 .solid-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .solid-button.small {
@@ -640,9 +654,9 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
-  border: 2px solid rgba(74, 144, 226, 0.2);
+  background: var(--glass-60);
+  border-radius: var(--radius-md);
+  border: 2px solid rgba(var(--color-primary-rgb), 0.2);
 }
 
 .overview-card.large-card {
@@ -665,7 +679,7 @@ onMounted(() => {
   color: var(--text-secondary);
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid rgba(74, 144, 226, 0.15);
+  border-top: 1px solid rgba(var(--color-primary-rgb), 0.15);
 }
 
 .meta-row {
@@ -685,7 +699,7 @@ onMounted(() => {
 }
 
 .meta-row .highlight {
-  color: #4a90e2;
+  color: var(--color-primary);
   font-weight: 700;
   font-size: 16px;
 }
@@ -707,7 +721,7 @@ onMounted(() => {
 .card-value {
   font-size: 24px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--color-primary);
 }
 
 .card-value-dual {
@@ -718,12 +732,11 @@ onMounted(() => {
 
 .dual-value {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   padding: 12px;
-  background: rgba(74, 144, 226, 0.05);
-  border-radius: 8px;
+  background: rgba(var(--color-primary-rgb), 0.05);
+  border-radius: var(--radius-sm2);
 }
 
 .dual-label {
@@ -735,11 +748,11 @@ onMounted(() => {
 .dual-number {
   font-size: 28px;
   font-weight: 700;
-  color: #4a90e2;
+  color: var(--color-primary);
 }
 
 .dual-number.highlight {
-  color: #50c878;
+  color: var(--color-primary);
 }
 
 .table-wrapper {
@@ -753,14 +766,14 @@ onMounted(() => {
 }
 
 .glass-table thead {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--color-primary-rgb), 0.1);
 }
 
 .glass-table th,
 .glass-table td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+  border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.1);
 }
 
 .glass-table th {
@@ -774,12 +787,12 @@ onMounted(() => {
 }
 
 .glass-table th.sortable:hover {
-  background: rgba(74, 144, 226, 0.15);
+  background: rgba(var(--color-primary-rgb), 0.15);
 }
 
 .table-name {
   font-weight: 500;
-  color: #4a90e2;
+  color: var(--color-primary);
 }
 
 .pagination {
@@ -805,8 +818,8 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 12px;
-  background: rgba(74, 144, 226, 0.05);
-  border-radius: 8px;
+  background: rgba(var(--color-primary-rgb), 0.05);
+  border-radius: var(--radius-sm2);
 }
 
 .detail-label {
@@ -828,26 +841,17 @@ onMounted(() => {
   color: var(--text-primary);
 }
 
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
+.initial-state {
+  @include flex-col;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  height: 60dvh;
+  gap: 16px;
 }
 
-
-
-.loading-overlay p {
-  color: white;
-  margin-top: 16px;
+.initial-state p {
   font-size: 16px;
+  color: var(--text-secondary);
 }
 
 /* Responsive */

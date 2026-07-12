@@ -160,7 +160,22 @@ const handleSavePassword = () => {
 }
 </script>
 
+
+
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary-blue: var(--color-primary);
+$primary-blue-dark: var(--color-primary-hover);
+$back-gold: var(--color-warning-dark);
+$back-gold-dark: var(--color-warning-dark);
+$text-title: var(--text-primary);
+$error-color: var(--color-error-light);
+$success-color: var(--color-success);
+$white: var(--text-white);
+
+$transition-fast: 0.18s;
+$transition-base: 0.2s;
 .modify-profile-form {
   padding: 12px;
   text-align: center;
@@ -168,27 +183,31 @@ const handleSavePassword = () => {
 
 h3 {
   margin: 0 0 16px;
-  color: #1c1c1e;
+  color: $text-title;
   font-size: 30px;
   font-weight: 700;
 }
 
 .modify-avatar-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
+
   gap: 16px;
   width: fit-content;
   max-width: 100%;
   margin: 0 auto 16px;
   padding: 14px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--glass-60);
   border-radius: 22px;
   box-shadow:
-    0 18px 46px rgba(15, 23, 42, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    0 18px 46px rgba(var(--color-shadow-rgb), 0.1),
+    inset 0 1px 0 var(--glass-80);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 12px;
+  }
 }
 
 .modify-avatar-preview {
@@ -198,61 +217,65 @@ h3 {
 .avatar-edit-btn {
   min-height: 36px;
   padding: 8px 14px;
-  border: none;
-  border-radius: 999px;
-  color: #ffffff;
+  color: $white;
   font-size: 14px;
   font-weight: 800;
   cursor: pointer;
-  background: linear-gradient(135deg, #007aff, #0051d5);
+  background: linear-gradient(135deg, $primary-blue, $primary-blue-dark);
+  border: none;
+  border-radius: var(--radius-pill);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 10px 22px rgba(0, 122, 255, 0.22);
+    inset 0 1px 0 var(--glass-30),
+    0 10px 22px rgba(var(--color-primary-rgb), 0.22);
   transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    opacity 0.18s ease;
+    transform $transition-fast ease,
+    box-shadow $transition-fast ease,
+    opacity $transition-fast ease;
 
   &:hover {
-    transform: translateY(-1px);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.32),
-      0 14px 30px rgba(0, 122, 255, 0.3);
+      inset 0 1px 0 var(--glass-30),
+      0 14px 30px rgba(var(--color-primary-rgb), 0.3);
+    transform: translateY(-1px);
   }
 
   &:active {
     transform: translateY(0) scale(0.985);
   }
+
+  @media (max-width: 480px) {
+    width: 100%;
+  }
 }
 
 .form-row {
-  width: 100%;
-  margin: 12px 0;
   display: flex;
   justify-content: center;
-}
+  width: 100%;
+  margin: 12px 0;
 
-.form-row-back {
-  margin-top: 10px;
+  &-back {
+    margin-top: 10px;
+  }
 }
 
 .btn-search {
   padding: 12px 24px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  color: #ffffff;
+  color: $white;
   font-size: 17px;
   font-weight: 700;
   cursor: pointer;
+  background: linear-gradient(135deg, $primary-blue, $primary-blue-dark);
+  border: none;
+  border-radius: var(--radius-md);
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease;
+    transform $transition-base ease,
+    box-shadow $transition-base ease,
+    opacity $transition-base ease;
 
   &:hover:not(:disabled) {
+    box-shadow: 0 10px 24px rgba(var(--color-primary-rgb), 0.24);
     transform: translateY(-1px);
-    box-shadow: 0 10px 24px rgba(0, 122, 255, 0.24);
   }
 
   &:active:not(:disabled) {
@@ -260,13 +283,19 @@ h3 {
   }
 
   &:disabled {
-    opacity: 0.7;
     cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    width: 100%;
+    padding: 16px;
+    font-size: 18px;
   }
 }
 
 .btn-back {
-  background: linear-gradient(135deg, #b8860b, #8a5a00);
+  background: linear-gradient(135deg, $back-gold, $back-gold-dark);
 
   &:hover:not(:disabled) {
     box-shadow: 0 10px 24px rgba(184, 134, 11, 0.22);
@@ -278,37 +307,17 @@ h3 {
   margin-top: 10px;
   font-size: 15px;
   font-weight: 700;
+
+  @media (max-aspect-ratio: 1/1) {
+    font-size: 16px;
+  }
 }
 
 .err {
-  color: #ff3b30;
+  color: $error-color;
 }
 
 .success {
-  color: #34c759;
-}
-
-@media (max-width: 480px) {
-  .modify-avatar-card {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .avatar-edit-btn {
-    width: 100%;
-  }
-}
-
-@media (max-aspect-ratio: 1/1) {
-  .btn-search {
-    width: 100%;
-    padding: 16px;
-    font-size: 18px;
-  }
-
-  .err,
-  .success {
-    font-size: 16px;
-  }
+  color: $success-color;
 }
 </style>

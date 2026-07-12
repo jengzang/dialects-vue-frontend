@@ -41,7 +41,7 @@
       </div>
     </div>
 
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>載入中...</p>
     </div>
@@ -86,12 +86,17 @@ const renderChart = () => {
   if (chartInstance) chartInstance.dispose()
   chartInstance = echarts.init(chartRef.value)
 
+  const styles = getComputedStyle(document.documentElement)
+  const successColor = styles.getPropertyValue('--color-success').trim()
+  const errorColor = styles.getPropertyValue('--color-error').trim()
+
   const option = {
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'shadow' },
       formatter: (params) => {
         const item = props.data[params[0].dataIndex]
+
         return `
           <strong>${item.character}</strong><br/>
           Z-Score: ${item.z_score?.toFixed(3) || 'N/A'}<br/>
@@ -102,26 +107,32 @@ const renderChart = () => {
     },
     xAxis: {
       type: 'category',
-      data: props.data.map(item => item.character),
+      data: props.data.map((item) => item.character),
       axisLabel: { fontSize: 14 }
     },
     yAxis: {
       type: 'value',
       name: getMetricLabel(),
-      nameTextStyle: { fontSize: 14, fontWeight: 600 }
+      nameTextStyle: {
+        fontSize: 14,
+        fontWeight: 600
+      }
     },
-    series: [{
-      type: 'bar',
-      data: props.data.map(item => {
-        const value = getMetricValue(item)
-        return {
-          value: value,
-          itemStyle: {
-            color: value > 0 ? '#50c878' : '#e74c3c'
+    series: [
+      {
+        type: 'bar',
+        data: props.data.map((item) => {
+          const value = Number(getMetricValue(item))
+
+          return {
+            value,
+            itemStyle: {
+              color: value > 0 ? successColor : errorColor
+            }
           }
-        }
-      })
-    }]
+        })
+      }
+    ]
   }
 
   chartInstance.setOption(option)
@@ -164,13 +175,12 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .vml-glass-panel {
   padding: 20px;
   min-height: 400px;
 }
 
-.loading-state,
 .empty-state {
   min-height: 300px;
   color: var(--text-primary);
@@ -193,15 +203,15 @@ onBeforeUnmount(() => {
 .metric-selector {
   display: flex;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
   padding: 4px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 
 .metric-button {
   padding: 8px 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   background: transparent;
   color: var(--text-primary);
   font-size: 13px;
@@ -211,12 +221,12 @@ onBeforeUnmount(() => {
 }
 
 .metric-button:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .metric-button.active {
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
 }
 
 .chart-container {

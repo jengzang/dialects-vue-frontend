@@ -22,15 +22,22 @@ export async function extractFeatures(params) {
 }
 
 /**
- * 特徵聚合
+ * 特徵聚合（區域對比）- 統計增強版
+ * 返回 semantic_profile、z_scores、suffixes、distinctive_suffixes、
+ * distinctive_chars、diversity、structure_profile、cluster_distribution。
+ *
  * @param {Object} params
  * @param {string} params.region_level - 區域級別："city" | "county" | "township"
- * @param {Array<string>} params.region_names - 區域名稱列表
- * @param {Object} params.features - 特徵選擇
- * @param {boolean} params.features.semantic_distribution - 是否聚合語義分布
- * @param {boolean} params.features.morphology_patterns - 是否聚合形態模式
- * @param {number} params.top_n - 返回前N個結果
- * @returns {Promise<Object>} { aggregation_id, region_count, execution_time_ms, results, from_cache }
+ * @param {Array<string>} params.region_names - 區域名稱列表，最多 50 個
+ * @param {Object} [params.features] - 特徵開關，全部默認 true
+ * @param {boolean} [params.features.semantic_distribution] - 語義分布（semantic_profile + z_scores）
+ * @param {boolean} [params.features.morphology_freq] - 形態頻率（suffixes + distinctive_suffixes）
+ * @param {boolean} [params.features.cluster_distribution] - 空間聚類分布
+ * @param {boolean} [params.features.distinctive_chars] - 獨特字符（lift + z_score）
+ * @param {boolean} [params.features.diversity_metrics] - 多樣性指標（熵值）
+ * @param {boolean} [params.features.structure_profile] - 結構畫像（修飾/中心/聚落佔比）
+ * @param {number} [params.top_n=10] - 返回前 N 個後綴/字符
+ * @returns {Promise<Object>} { results: Array<{region, semantic_profile, z_scores, suffixes, distinctive_suffixes, distinctive_chars, diversity, structure_profile, cluster_distribution}>, execution_time_ms, from_cache }
  */
 export async function aggregateFeatures(params) {
   return api('/api/villages/compute/features/aggregate', {

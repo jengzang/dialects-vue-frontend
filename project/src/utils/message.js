@@ -4,7 +4,7 @@
 
 import { ref } from 'vue'
 import i18n from '@/i18n'
-import { rateLimitNoticeState } from '@/utils/rateLimitNotice.js'
+import { rateLimitNoticeState } from '@/utils/user/rateLimitNotice.js'
 
 // 获取 i18n 的 t 函数
 const getTranslate = () => {

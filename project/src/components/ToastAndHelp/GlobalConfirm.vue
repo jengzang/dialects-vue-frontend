@@ -43,73 +43,72 @@ function handleCancel() {
 }
 </script>
 
-<style scoped>
-/* 🍎 苹果液态玻璃风格确认对话框 */
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
-/* 头部 */
+$desktop-gap: 12px;
+$mobile-gap: 10px;
+
+/* 苹果液态玻璃风格确认对话框 */
 .confirm-header {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
+  gap: $desktop-gap;
   align-items: center;
   width: 100%;
-  gap: 12px;
+
+  @media (max-width: 768px) {
+    gap: $mobile-gap;
+  }
 }
 
 .confirm-icon {
   font-size: 48px;
   line-height: 1;
-  filter: drop-shadow(0 2px 8px rgba(255, 204, 0, 0.3));
+  filter: drop-shadow(0 2px 8px rgba(var(--color-gold-rgb), 0.3));
+
+  @media (max-width: 768px) {
+    font-size: 40px;
+  }
 }
 
 .confirm-title {
   margin: 0;
+  color: var(--text-dark-alpha);
   font-size: 20px;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.85);
   text-align: center;
-}
 
-/* 消息内容 */
-.confirm-message {
-  padding: 0 0 24px;
-  font-size: 15px;
-  line-height: 1.5;
-  color: rgba(0, 0, 0, 0.7);
-  text-align: center;
-  white-space: pre-line;
-}
-
-/* 按钮组 */
-.confirm-actions {
-  display: flex;
-  gap: 12px;
-  padding: 0;
-}
-
-/* 📱 移动端适配 */
-@media (max-width: 768px) {
-  .confirm-header {
-    gap: 10px;
-  }
-
-  .confirm-icon {
-    font-size: 40px;
-  }
-
-  .confirm-title {
+  @media (max-width: 768px) {
     font-size: 18px;
   }
+}
 
-  .confirm-message {
-    padding: 0 0 20px;
+.confirm-message {
+  padding: 0 0 24px;
+  color: var(--text-dark-medium);
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: center;
+  white-space: pre-line;
+
+  @media (max-width: 768px) {
+    padding-bottom: 20px;
     font-size: 14px;
   }
+}
 
-  .confirm-actions {
-    gap: 10px;
+.confirm-actions {
+  display: flex;
+  gap: $desktop-gap;
+  padding: 0;
+
+  @media (max-width: 768px) {
+    gap: $mobile-gap;
   }
+}
 
-  .confirm-btn {
+.confirm-btn {
+  @media (max-width: 768px) {
     padding: 10px 20px;
     font-size: 15px;
   }

@@ -1,0 +1,38 @@
+@use '@/styles/global/mixins' as *;
+// VillagesML 布局
+
+.vml-page {
+  padding: 12px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.vml-two-col {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vml-settings-form {
+  @include flex-col;
+  gap: 16px;
+}
+
+.vml-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(var(--vml-blue-rgb), 0.2);
+
+  h3 {
+    font-size: 16px;
+    color: var(--text-primary);
+    margin: 0;
+  }
+}

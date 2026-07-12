@@ -136,21 +136,18 @@ const hasChildren = computed(() => {
   return hasLeafContent.value || hasChildNodes.value
 })
 
+// Auto-expand when _autoExpand is set (e.g. search results) or for promoted leaf content
 watch(
-  () => props.node,
-  (newNode) => {
+  () => props.node._autoExpand,
+  (autoExpand) => {
     if (!hasDisplayName.value) {
       isOpen.value = true
       return
     }
-
-    if (newNode && newNode._autoExpand) {
+    if (autoExpand) {
       isOpen.value = true
-    } else {
-      isOpen.value = false
     }
-  },
-  { immediate: true, deep: true }
+  }
 )
 
 const toggle = async () => {
@@ -206,98 +203,128 @@ const leave = (el) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary-blue: var(--color-primary);
+$text-dark: var(--text-dark);
+$error-color: var(--color-error);
+$transition-fast: 0.2s;
+$mobile-aspect-ratio: 1;
 .tree-node {
   margin-bottom: 8px;
 }
 
 .node-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 6px 10px;
-  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.2s;
-}
+  border-radius: var(--radius-md);
+  transition: background $transition-fast;
 
-.node-content:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
+  &:hover {
+    background: var(--glass-40);
+  }
 
-.node-content.is-match {
-  background: rgba(255, 215, 0, 0.15);
-  border: 1px solid rgba(255, 215, 0, 0.3);
+  &.is-match {
+    background: rgba(var(--color-gold-rgb), 0.15);
+    border: 1px solid rgba(var(--color-gold-rgb), 0.3);
+  }
 }
 
 .node-label {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
+  color: $text-dark;
   font-size: 15px;
   font-weight: 500;
-  color: #333;
 }
 
 .children-container {
-  padding-left: 20px;
-  border-left: 2px solid rgba(0, 122, 255, 0.1);
   margin-left: 20px;
+  padding-left: 20px;
+  border-left: 2px solid rgba(var(--color-primary-rgb), 0.1);
   transition: height 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
 
-.children-container.promoted-content {
-  padding-left: 0;
-  border-left: none;
-  margin-left: 0;
-}
+  &.promoted-content {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: none;
 
-.children-container.promoted-content .leaf-content {
-  margin-top: 0;
+    .leaf-content {
+      margin-top: 0;
+    }
+  }
+
+  @media (max-aspect-ratio: $mobile-aspect-ratio) {
+    margin-left: 5px;
+    padding-left: 10px;
+
+    &.promoted-content {
+      margin-left: 0;
+      padding-left: 0;
+
+      .leaf-content {
+        margin-right: 0;
+        margin-left: 0;
+      }
+    }
+  }
 }
 
 .expand-btn {
-  background: transparent;
-  border: none;
-  color: #007AFF;
-  font-size: 16px;
+  @include flex-center;
+
   width: 24px;
   height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  color: $primary-blue;
+  font-size: 16px;
   cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
   transition: all 0.3s ease;
-}
 
-.expand-btn:hover {
-  background: rgba(0, 122, 255, 0.1);
-}
+  &:hover {
+    background: rgba(var(--color-primary-rgb), 0.1);
+  }
 
-.expand-btn.is-open {
-  transform: rotate(45deg);
+  &.is-open {
+    transform: rotate(45deg);
+  }
 }
 
 .leaf-content {
   margin-top: 8px;
+
+  @media (max-aspect-ratio: $mobile-aspect-ratio) {
+    margin-right: -10px;
+    margin-left: -10px;
+  }
 }
 
 .chars-row {
   padding: 12px 16px;
-  background: rgba(0, 122, 255, 0.05);
-  border-radius: 12px;
+  color: var(--text-primary);
   font-size: 16px;
-  line-height: 1.8;
-  word-spacing: 8px;
-  color: #1d1d1f;
   font-weight: 500;
+  line-height: 1.8;
   letter-spacing: 2px;
+  word-spacing: 8px;
+  background: rgba(var(--color-primary-rgb), 0.05);
+  border-radius: var(--radius-md);
+
+  @media (max-aspect-ratio: $mobile-aspect-ratio) {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
 }
 
 .char-annotation-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -306,112 +333,94 @@ const leave = (el) => {
   grid-template-columns: 40px 1fr;
   gap: 12px;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
+  background: var(--glass-50);
   border: 1px solid rgba(0, 0, 0, 0.05);
-  transition: background 0.2s;
-}
+  border-radius: var(--radius-md);
+  transition: background $transition-fast;
 
-.char-annotation-item:hover {
-  background: rgba(255, 255, 255, 0.7);
-}
+  &:hover {
+    background: var(--glass-70);
+  }
 
-.char-annotation-item .char {
-  font-size: 18px;
-  font-weight: 700;
-  color: #007AFF;
-  text-align: center;
-  margin-top: 1px;
-}
+  .char {
+    margin-top: 1px;
+    color: $primary-blue;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+  }
 
-.char-annotation-item .annotation {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #3a3a3c;
+  .annotation {
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  @media (max-aspect-ratio: $mobile-aspect-ratio) {
+    grid-template-columns: 32px 1fr;
+    gap: 8px;
+    padding: 8px 10px;
+
+    .char {
+      font-size: 16px;
+    }
+
+    .annotation {
+      font-size: 13px;
+    }
+  }
 }
 
 .lazy-indicator {
   display: inline-block;
   margin-left: 6px;
+  color: $primary-blue;
   font-size: 14px;
-  color: #007AFF;
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 .lazy-error {
-  padding: 8px 12px;
-  margin: 4px 0 4px 20px;
-  background: rgba(211, 47, 47, 0.06);
-  border: 1px solid rgba(211, 47, 47, 0.2);
-  border-radius: 10px;
   display: flex;
-  align-items: center;
   gap: 10px;
+  align-items: center;
+  margin: 4px 0 4px 20px;
+  padding: 8px 12px;
+  color: $error-color;
   font-size: 13px;
-  color: #d32f2f;
+  background: rgba(var(--color-error-rgb), 0.06);
+  border: 1px solid rgba(var(--color-error-rgb), 0.2);
+  border-radius: var(--radius-md);
+
+  .retry-btn-small {
+    padding: 3px 10px;
+    color: $error-color;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(var(--color-error-rgb), 0.12);
+    border: none;
+    border-radius: var(--radius-sm);
+  }
 }
 
-.lazy-error .retry-btn-small {
-  padding: 3px 10px;
-  border: none;
-  border-radius: 6px;
-  background: rgba(211, 47, 47, 0.12);
-  color: #d32f2f;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
+/*
+ * highlight 元素由 v-html 动态插入，
+ * 必须使用 :deep() 才能在 scoped 样式中生效。
+ */
 :deep(.highlight) {
-  background: rgba(255, 255, 0, 0.4);
-  border-radius: 4px;
   padding: 0 2px;
-  color: #000;
+  color: var(--text-primary);
+  background: rgba(255, 255, 0, 0.4);
+  border-radius: var(--radius-xs);
 }
 
-@media (max-aspect-ratio: 1/1) {
-  .children-container {
-    padding-left: 10px;
-    margin-left: 5px;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
   }
 
-  .children-container.promoted-content {
-    padding-left: 0;
-    margin-left: 0;
-  }
-
-  .leaf-content {
-    margin-left: -10px;
-    margin-right: -10px;
-  }
-
-  .children-container.promoted-content .leaf-content {
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  .char-annotation-item {
-    grid-template-columns: 32px 1fr;
-    gap: 8px;
-    padding: 8px 10px;
-  }
-
-  .char-annotation-item .char {
-    font-size: 16px;
-  }
-
-  .char-annotation-item .annotation {
-    font-size: 13px;
-  }
-
-  .chars-row {
-    font-size: 15px;
-    padding: 10px 12px;
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

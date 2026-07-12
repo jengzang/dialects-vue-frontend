@@ -37,7 +37,7 @@
             type="number"
             min="10"
             :max="queryMode === 'global' ? 100 : 50"
-            class="number-input"
+            class="vml-number-input"
           />
         </div>
 
@@ -50,7 +50,7 @@
             max="100"
             step="0.01"
             placeholder="如: 1"
-            class="number-input"
+            class="vml-number-input"
           />
         </div>
 
@@ -64,7 +64,7 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="loading-state">
+      <div v-if="loading" class="vml-loading"">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -191,23 +191,25 @@ const goToTendency = (pattern) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .pattern-frequency-page {
   padding: 12px;
   max-width: 1400px;
   margin: 0 auto;
 }
 
+.vml-glass-panel {
+  @include flex-col;
+}
+
 .vml-glass-panel h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .mode-selector {
   display: flex;
   gap: 24px;
-  margin-bottom: 16px;
 }
 
 .radio-label {
@@ -228,15 +230,13 @@ const goToTendency = (pattern) => {
 .controls {
   display: flex;
   gap: 12px;
-  margin-bottom: 16px;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
 }
 
 .control-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -246,12 +246,7 @@ const goToTendency = (pattern) => {
   font-weight: 500;
 }
 
-.number-input {
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+.vml-number-input {
   width: 150px;
 }
 
@@ -263,20 +258,20 @@ const goToTendency = (pattern) => {
 
 .pattern-card {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
   transition: all 0.3s ease;
   position: relative;
 }
 
 .pattern-card:hover {
   transform: translateY(-5px);
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .pattern-card.top-5 {
-  background: rgba(243, 156, 18, 0.15);
-  border: 2px solid rgba(243, 156, 18, 0.3);
+  background: rgba(var(--color-warning-rgb), 0.15);
+  border: 2px solid rgba(var(--color-warning-rgb), 0.3);
 }
 
 .pattern-rank {
@@ -286,11 +281,9 @@ const goToTendency = (pattern) => {
   width: 32px;
   height: 32px;
   background: var(--color-primary);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: var(--action-primary-text);
+  border-radius: var(--radius-full);
+  @include flex-center;
   font-weight: 700;
   font-size: 14px;
 }
@@ -309,8 +302,7 @@ const goToTendency = (pattern) => {
 }
 
 .stat-item {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
@@ -333,25 +325,25 @@ const goToTendency = (pattern) => {
 
 .pattern-bar {
   height: 8px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 4px;
+  background: var(--glass-50);
+  border-radius: var(--radius-xs);
   overflow: hidden;
   margin-bottom: 12px;
 }
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), #3a7bc8);
+  background: linear-gradient(90deg, var(--color-primary), var(--vml-blue-dark));
   transition: width 0.5s ease;
 }
 
 .action-button {
   width: 100%;
   padding: 8px 16px;
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
   color: var(--color-primary);
-  border: 1px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -359,8 +351,20 @@ const goToTendency = (pattern) => {
 }
 
 .action-button:hover {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   border-color: var(--color-primary);
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .vml-glass-panel {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .controls {
+    flex: 1;
+    justify-content: flex-end;
+  }
 }
 
 @media (max-width: 768px) {
@@ -368,7 +372,7 @@ const goToTendency = (pattern) => {
     flex-direction: column;
   }
 
-  .number-input {
+  .vml-number-input {
     width: 100%;
   }
 

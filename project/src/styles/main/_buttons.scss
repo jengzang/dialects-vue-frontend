@@ -1,11 +1,12 @@
+@use '@/styles/global/mixins' as *;
 .main-glass-button {
   padding: var(--main-glass-button-padding, 12px 32px);
-  background: rgba(255, 255, 255, 0.54);
+  background: var(--surface-glass-button);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.42);
-  border-radius: var(--main-glass-button-border-radius, 16px);
-  color: #0b2540;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--main-glass-button-border-radius, var(--radius-lg));
+  color: var(--text-deep);
   font-size: var(--main-glass-button-font-size, 15px);
   font-weight: var(--main-glass-button-font-weight, 500);
   cursor: pointer;
@@ -18,28 +19,28 @@
 }
 
 .main-glass-button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.68);
+  background: var(--surface-glass-button-hover);
   transform: translateY(-1px);
 }
 
 .main-glass-button[data-variant='primary'] {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.78), rgba(0, 122, 255, 0.6));
-  color: white;
-  border-color: rgba(0, 122, 255, 0.52);
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
+  border-color: var(--action-primary-border);
 }
 
 .main-glass-button[data-variant='primary']:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.86), rgba(0, 122, 255, 0.68));
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+  background: var(--action-primary-bg-hover);
+  box-shadow: var(--action-primary-shadow);
   transform: translateY(-1px);
 }
 
 .main-glass-button[data-variant='secondary'] {
-  background: rgba(255, 255, 255, 0.58);
+  background: var(--surface-panel);
 }
 
 .main-glass-button[data-variant='secondary']:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--surface-panel-hover);
 }
 
 .main-glass-button:disabled {
@@ -58,6 +59,104 @@
 }
 
 .main-glass-button[data-active='true'] {
-  background: rgba(0, 123, 255, 0.5);
-  border-color: rgba(0, 122, 255, 0.5);
+  background: var(--action-active-bg);
+  border-color: var(--action-active-border);
+}
+
+.glass-button {
+  white-space: nowrap;
+  background: var(--surface-panel-subtle);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-glass-subtle);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+  cursor: pointer;
+}
+
+.glass-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glass-hover);
+}
+
+.glass-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.glass-button:disabled {
+  @include disabled-state;
+}
+
+.run-container {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 0;
+  pointer-events: none;
+}
+
+.run-btn {
+  pointer-events: auto;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 14px 28px;
+  color: white;
+  background: var(--color-gradient);
+  border: none;
+  border-radius: 30px;
+  box-shadow: var(--shadow-glow-sm);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.run-btn:hover {
+  transform: scale(1.2);
+  box-shadow: var(--shadow-glow);
+}
+
+.run-btn span {
+  display: inline-block;
+}
+
+.run-btn:disabled {
+  background: var(--border-gray);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+.enter-btn {
+  background: var(--enter-button-bg);
+  color: var(--enter-button-text);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--enter-button-shadow);
+  white-space: nowrap;
+}
+
+.enter-btn:hover {
+  background: var(--enter-button-bg-hover);
+}
+
+@media (max-width: 600px) {
+  .enter-btn {
+    padding: 5px !important;
+    font-size: 12px !important;
+  }
 }

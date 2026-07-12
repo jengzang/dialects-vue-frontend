@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 100%">
     <!-- ✅ 同行輸入：地點 + 分區 -->
     <div class="input-row" >
 
@@ -230,7 +230,7 @@ import RegionSelector from "@/main/components/geo/RegionSelector.vue"
 import PartitionInfoModal from "@/main/components/geo/PartitionInfoModal.vue"
 import { userStore } from '@/main/store/store.js'
 import { LOCATION_LIMITS } from '@/main/config/constants.js'
-import { buildExplicitLocationsForGetLocs, isExplicitLocationsLimitExceeded } from '@/main/utils/queryLimits.js'
+import { buildExplicitLocationsForGetLocs, isExplicitLocationsLimitExceeded } from '@/main/utils/query/queryLimits.js'
 import * as OpenCC from 'opencc-js'
 import {STATIC_REGION_TREE, top_yindian} from "@/main/config/RegionTree.js";
 import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
@@ -1352,161 +1352,168 @@ defineExpose({
 </script>
 
 
-<style scoped>
 
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary: var(--color-primary);
+$success: var(--color-success);
+$custom-purple: var(--color-purple);
+$portrait-ratio: 1;
+@mixin suggestion-panel($max-width, $max-height) {
+  position: absolute !important;
+  z-index: 99999 !important;
+  width: fit-content;
+  max-width: $max-width;
+  max-height: $max-height;
+  padding: 8px 12px;
+  overflow-y: auto;
+  background: var(--glass-60) !important;
+  border: 1px solid var(--border-gray-light) !important;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  white-space: pre-line;
+  color: var(--text-dark);
+  font-size: 14px;
+  pointer-events: auto !important;
+  transition: background-color 0.2s ease;
+}
+
+/* 分区 Tab */
 .region-tabs {
   display: inline-flex;
-  border-radius: 16px;
-  padding: 4px;
-  box-shadow: var(--shadow-inset);
-  margin-bottom: 24px;
   gap: 4px;
-  border: 1px solid var(--border-medium);
-  background-color: var(--bg-light-gray);
   max-width: 250px;
+  margin-bottom: 24px;
+  padding: 4px;
+  background-color: var(--bg-light-gray);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-inset);
+
+  button {
+    min-width: 60px;
+    padding: 3px 6px;
+    appearance: none;
+    background: none;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--text-dark);
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background-color: var(--bg-hover-light);
+    }
+
+    &.active {
+      background-color: var(--color-primary);
+      box-shadow:
+        0 0 0 1px var(--color-primary-shadow-light),
+        0 4px 12px var(--color-primary-shadow);
+      color: var(--action-primary-text);
+      font-weight: 600;
+    }
+  }
 }
 
-.region-tabs button {
-  appearance: none;
-  background: none;
-  border: none;
-  padding: 3px 6px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 500;
-  transition: all 0.25s ease;
-  color: var(--text-dark);
-  min-width: 60px;
-  text-align: center;
-  user-select: none;
-}
-
-.region-tabs button:hover {
-  background-color: var(--bg-hover-light);
-}
-
-.region-tabs button.active {
-  background-color: var(--color-primary); /* Apple Blue */
-  color: white;
-  font-weight: 600;
-  box-shadow:
-      0 0 0 1px var(--color-primary-shadow-light),
-      0 4px 12px var(--color-primary-shadow);
-}
-
-/* 即時提示面板 */
+/* 地点即时建议 */
 .inline-suggestion {
-  position: absolute !important;
-  background: var(--glass-medium2) !important; /* 🔹 半透明背景 */
-  border: 1px solid var(--border-gray-light) !important;
-  box-shadow: var(--shadow-lg2);
-  padding: 8px 12px;
-  border-radius: 12px; /* 蘋果味更重一點 */
-  backdrop-filter: blur(12px); /* 🔹 液態玻璃效果 */
-  -webkit-backdrop-filter: blur(12px); /* for Safari */
-  white-space: pre-line;
-  font-size: 14px;
-  color: var(--text-dark);
-  max-width: 100px;
-  width: fit-content; /* ✅ 根據內容自動撐寬 */
-  z-index: 99999 !important;
-  pointer-events: auto !important;
-  max-height: 20dvh;
-  overflow-y: auto;
-  transition: background-color 0.2s ease;
+  @include suggestion-panel(100px, 20dvh);
+
+  .success {
+    color: var(--color-primary);
+    font-weight: bold;
+  }
 }
 
-/* ✅ 成功訊息 */
-.inline-suggestion .success {
-  color: var(--color-primary);
-  font-weight: bold;
-}
-
-/* ✅ 錯誤訊息 */
-.inline-suggestion .error {
-  color: var(--color-error-light);
-  font-weight: bold;
-}
-
-/* ✅ 建議項目 */
 .suggest-line {
   padding: 4px 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  border-radius: 6px;
   transition: background-color 0.2s ease;
-}
 
-/* ✅ Hover：蘋果淺藍 */
-.suggest-line:hover {
-  background-color: var(--bg-blue-hover);
+  &:hover {
+    background-color: var(--bg-blue-hover);
+  }
 }
-
 
 .success {
-  color: var(--color-success-green);
   padding: 4px 8px;
+  color: var(--color-success-green);
   font-weight: bold;
 }
 
+/* 地点和分区输入 */
 .location-input,
 .region-input {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  max-width: 250px;
-  min-width: 0;
   width: 100%;
+  min-width: 0;
+  max-width: 250px;
+  @include flex-col;
+  justify-content: center;
 }
-.location-input{
+
+.location-input {
   flex: 1;
+
+  textarea {
+    padding-right: 40px;
+  }
 }
-.region-input{
+
+.region-input {
   flex: 1.2;
 }
 
-/* Location header with label and button */
 .location-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
+  gap: 6px;
   margin-bottom: 4px;
-  gap:6px;
+
+  label {
+    color: var(--text-dark);
+    font-size: 14px;
+    font-weight: 600;
+  }
 }
 
-.location-header label {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-dark);
-}
-
-/* 選擇地點按鈕 */
 .select-location-btn {
-  appearance: none;
-  border: 1px solid var(--color-primary-border2);
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  font-size: 12px;
   padding: 2px 8px;
-  border-radius: 8px;
+  appearance: none;
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-primary-border2);
+  border-radius: var(--radius-sm2);
+  color: var(--color-primary);
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
   user-select: none;
-  white-space: nowrap;
   transition: all 0.2s ease;
-  font-weight: 500;
+
+  :root[data-color-theme='dark'] & {
+    color: var(--text-primary);
+  }
+
+  &:hover {
+    background: var(--color-primary-light2);
+    box-shadow: 0 2px 4px rgba(var(--color-primary-rgb), 0.2);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
-.select-location-btn:hover {
-  background: var(--color-primary-light2);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
-}
-
-.select-location-btn:active {
-  transform: translateY(0);
-}
-
-/* Textarea wrapper for checkmark positioning */
 .textarea-wrapper {
   position: relative;
   width: 100%;
@@ -1514,13 +1521,13 @@ defineExpose({
 
 .success-checkmark {
   position: absolute;
-  right: 12px;
   top: 50%;
-  transform: translateY(-50%);
+  right: 12px;
+  color: $success;
   font-size: 20px;
   font-weight: bold;
-  color: #52c41a;
   pointer-events: none;
+  transform: translateY(-50%);
   animation: checkmark-appear 0.3s ease;
 }
 
@@ -1529,112 +1536,106 @@ defineExpose({
     opacity: 0;
     transform: translateY(-50%) scale(0.5);
   }
+
   to {
     opacity: 1;
     transform: translateY(-50%) scale(1);
   }
 }
 
-/* Add right padding to textarea to prevent text overlap */
-.location-input textarea {
-  padding-right: 40px;
-}
-
 .input-row {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  justify-content: center; /* 居中子元素內容 */
-  max-width: 600px;        /* 限定總寬度 */
-  margin: 1dvh  auto 1dvh auto ;          /* 水平置中 */
   width: 90%;
+  max-width: 600px;
+  @include flex-center;
+  gap: 16px;
+  margin: 1dvh auto;
 }
 
+/* 底部提示 */
 .bottom-hint {
-  margin:  0 1dvw 3dvh  ;
-  max-width: 500px;
-  min-width: 80%;
-  padding: 6px 20px;
+  width: min(80%, 500px);
+  @include flex-col;
+  align-items: center;
+  justify-content: center;
   justify-self: center;
-  /* liquid glass */
-  background: var(--glass-lighter2);
+  gap: 6px;
+  margin: 0 1dvw 3dvh;
+  padding: 6px 20px;
+  background: var(--glass-50);
   border: 1px solid var(--border-gray-lighter);
   border-radius: 14px;
+  box-shadow: var(--shadow-md2);
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
-  box-shadow: var(--shadow-md2);
-
-  font-size: 14px;
   color: var(--text-dark-alpha);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
+  font-size: 14px;
   user-select: none;
 }
 
-.hint-num {
-  font-weight: 700;
-  color: var(--color-primary);
-  padding: 0 6px;
-  border-radius: 10px;
-  background: var(--color-primary-light);
-  border: 1px solid var(--color-primary-border);
-}
 .hint-main {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
+
   gap: 6px;
 }
 
-/* ⚠️ 限制提示：比主文案弱一級，但足夠醒目 */
+.hint-num {
+  padding: 0 6px;
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-primary-border);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
 .hint-warning {
-  font-size: 13px;
+  opacity: 0.9;
   color: var(--color-warning);
   text-align: center;
+  font-size: 13px;
   line-height: 1.4;
-  opacity: 0.9;
 }
-/* 預覽行：深灰色，與主文案分層 */
+
 .hint-preview {
   width: 100%;
   display: flex;
-  justify-content: center;
   align-items: baseline;
+  justify-content: center;
   gap: 10px;
   text-align: center;
 }
 
 .preview-text {
-  color: var(--text-dark-medium);
-  font-size: 13px;
-  line-height: 1.35;
   max-width: 520px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--text-dark-medium);
   white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  line-height: 1.35;
 }
 
-/* 展開按鈕：克制的蘋果藍 */
 .expand-btn {
-  appearance: none;
-  border: 1px solid var(--color-primary-border2);
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  font-size: 13px;
   padding: 2px 10px;
-  border-radius: 999px;
+  appearance: none;
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-primary-border2);
+  border-radius: var(--radius-pill);
+  color: var(--color-primary);
+  white-space: nowrap;
+  font-size: 13px;
   cursor: pointer;
   user-select: none;
-  white-space: nowrap;
+
+  :root[data-color-theme='dark'] & {
+    color: var(--text-primary);
+  }
+
+  &:hover {
+    background: var(--color-primary-light2);
+  }
 }
 
-.expand-btn:hover {
-  background: var(--color-primary-light2);
-}
-
+/* 地点列表弹窗 */
 .locations-list {
   display: flex;
   flex-wrap: wrap;
@@ -1645,18 +1646,22 @@ defineExpose({
   display: inline-flex;
   align-items: center;
   padding: 3px 6px;
-  border-radius: 999px;
-  font-size: 14px;
-  color: var(--text-dark-lightest);
-  background: var(--glass-lighter3);
+  background: var(--glass-80);
   border: 1px solid var(--border-gray-light2);
+  border-radius: var(--radius-pill);
   box-shadow: var(--shadow-sm2);
-}
+  color: var(--text-dark-lightest);
+  font-size: 14px;
 
-.custom-chip {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  color: #667eea;
+  &.custom-chip {
+    background: linear-gradient(
+      135deg,
+      rgba(102, 126, 234, 0.1),
+      rgba(118, 75, 162, 0.1)
+    );
+    border-color: rgba(102, 126, 234, 0.3);
+    color: $custom-purple;
+  }
 }
 
 .custom-preview {
@@ -1664,64 +1669,63 @@ defineExpose({
 }
 
 .preview-label {
+  margin-right: 6px;
+  color: $custom-purple;
   font-size: 12px;
   font-weight: 600;
-  color: #667eea;
-  margin-right: 6px;
 }
 
-/* =====================================
-   分区详情按钮
-   ===================================== */
-
+/* 分区详情按钮 */
 .info-btn {
   padding: 8px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+  background: linear-gradient(
+    145deg,
+    var(--glass-40),
+    var(--glass-20)
+  );
+  border: 1px solid var(--glass-60);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 14px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+  @include flex-center;
+
+  &:hover {
+    background: linear-gradient(
+      145deg,
+      var(--glass-50),
+      var(--glass-30)
+    );
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+    transform: scale(1.05);
+  }
+
+  .icon {
+    display: inline-block;
+  }
 }
 
-.info-btn:hover {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
-  transform: scale(1.05);
-}
-
-.info-btn .icon {
-  display: inline-block;
-}
-
-/* =====================================
-   Region Input Mode Styles
-   ===================================== */
-
+/* 分区输入模式 */
 .region-input-section {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 1px;
 }
 
 .region-input-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
+
   gap: 8px;
 }
 
 .region-label {
+  color: var(--text-dark);
   font-size: 14px;
   font-weight: 600;
-  color: #333;
 }
 
 .region-input-wrapper {
@@ -1729,65 +1733,49 @@ defineExpose({
   flex: 1;
 }
 
-/* Suggestions dropdown for region input */
 .suggestions-dropdown {
-  position: absolute !important;
-  background: var(--glass-medium2) !important;
-  border: 1px solid var(--border-gray-light) !important;
-  box-shadow: var(--shadow-lg2);
-  padding: 8px 12px;
-  border-radius: 12px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  white-space: pre-line;
-  font-size: 14px;
-  color: var(--text-dark);
-  max-width: 400px;
-  width: fit-content;
-  z-index: 99999 !important;
-  pointer-events: auto !important;
-  max-height: 30dvh;
-  overflow-y: auto;
-  transition: background-color 0.2s ease;
+  @include suggestion-panel(400px, 30dvh);
 }
 
 .suggestion-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 6px 8px;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
+  justify-content: space-between;
   gap: 6px;
-}
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 
-.suggestion-item:hover {
-  background-color: var(--bg-blue-hover);
+  &:hover {
+    background-color: var(--bg-blue-hover);
+  }
 }
 
 .suggestion-text {
   flex: 1;
-  font-size: 14px;
   color: var(--text-dark);
+  font-size: 14px;
 }
 
 .suggestion-source {
-  font-size: 11px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(0, 122, 255, 0.1);
-  color: #007aff;
   margin-left: 8px;
+  padding: 2px 6px;
+  background: rgba(var(--color-primary-rgb), 0.1);
+  border-radius: var(--radius-xs);
+  color: $primary;
   white-space: nowrap;
+  font-size: 11px;
   font-weight: 600;
 }
 
-@media (max-aspect-ratio: 1/1) {
-  .region-tabs button{
-    padding: 4px 2px;
-    min-width: 50px;
+/* 竖屏 */
+@media (max-aspect-ratio: $portrait-ratio) {
+  .region-tabs {
+    button {
+      min-width: 50px;
+      padding: 4px 2px;
+    }
   }
 }
-
 </style>

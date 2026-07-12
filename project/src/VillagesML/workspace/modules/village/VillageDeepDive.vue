@@ -4,7 +4,7 @@
       <h1 class="page-title">🏘️ 村名深度分析</h1>
 
       <!-- Village Selector -->
-      <div class="village-selector glass-panel">
+      <div class="village-selector vml-glass-panel">
         <div class="selector-header">
           <h2>選擇村莊</h2>
           <button v-if="selectedVillageId" class="clear-button" @click="clearSelection">
@@ -75,7 +75,7 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else class="empty-state glass-panel">
+      <div v-else class="empty-state vml-glass-panel">
         <div class="empty-icon">🔍</div>
         <p>請搜尋並選擇一個村莊以查看詳細分析</p>
       </div>
@@ -222,7 +222,7 @@ watch(() => route.query.villageId, (newId) => {
 }, { immediate: true })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .village-deep-dive-page {
   padding: 20px;
   max-width: 1400px;
@@ -251,22 +251,21 @@ watch(() => route.query.villageId, (newId) => {
 
 .selector-header h2 {
   font-size: 18px;
-  color: var(--text-primary);
 }
 
 .clear-button {
   padding: 6px 16px;
-  background: rgba(231, 76, 60, 0.1);
-  color: #e74c3c;
+  background: rgba(var(--color-error-rgb), 0.1);
+  color: var(--color-error);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .clear-button:hover {
-  background: rgba(231, 76, 60, 0.2);
+  background: rgba(var(--color-error-rgb), 0.2);
 }
 
 .search-group {
@@ -276,17 +275,17 @@ watch(() => route.query.villageId, (newId) => {
 .search-input {
   width: 100%;
   padding: 12px 20px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 12px;
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-md);
   font-size: 16px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-50);
   transition: all 0.3s ease;
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
 }
 
 .search-results {
@@ -296,19 +295,19 @@ watch(() => route.query.villageId, (newId) => {
 
 .result-item {
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   transition: all 0.3s ease;
   margin-bottom: 8px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-30);
 }
 
 .result-item:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .result-item.selected {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   border: 2px solid var(--color-primary);
 }
 

@@ -45,136 +45,184 @@ function getIcon(type) {
 }
 </script>
 
-<style scoped>
-/* 🍎 苹果液态玻璃风格 Toast */
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$apple-blue: var(--color-primary);
+$action-blue: var(--color-primary-hover);
+$white: var(--text-white);
+
+$text-default: rgba(24, 32, 46, 0.86);
+$text-dark: rgba(0, 0, 0, 0.85);
+$text-action-info: rgba(20, 34, 56, 0.88);
+
+$toast-enter-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+$toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+@mixin toast-icon($background, $font-size, $color: null) {
+  width: 24px;
+  height: 24px;
+  font-size: $font-size;
+  font-weight: 700;
+  background: $background;
+  border-radius: var(--radius-full);
+
+  @include flex-center;
+
+  @if $color {
+    color: $color;
+  }
+}
+
+/*
+ * Toast 通过 Teleport 渲染到 body，
+ * 因此保持为顶层选择器。
+ */
 .global-toast {
   position: fixed;
   top: 80px;
   left: 50%;
-  transform: translateX(-50%);
   z-index: 99999;
   display: flex;
-  align-items: center;
   gap: 10px;
+  align-items: center;
   max-width: min(420px, calc(100vw - 32px));
   padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.42);
+  color: $text-default;
+  background: linear-gradient(
+    135deg,
+    var(--glass-70),
+    rgba(242, 247, 255, 0.44)
+  );
+  border: 1px solid var(--glass-40);
   border-radius: 22px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.68), rgba(242, 247, 255, 0.44));
-  color: rgba(24, 32, 46, 0.86);
-  box-shadow: 0 18px 48px rgba(31, 45, 74, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(22px) saturate(180%);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-}
+  box-shadow:
+    0 18px 48px rgba(31, 45, 74, 0.18),
+    inset 0 1px 0 var(--glass-50);
+  transform: translateX(-50%);
 
-.global-toast.has-action {
-  left: auto;
-  right: 28px;
-  top:20dvh;
-  transform: none;
-}
+  @include glass-blur(22px, 180%);
 
-/* ✅ 成功消息 - 苹果绿 */
-.global-toast.success {
-  background: linear-gradient(
-    135deg,
-    rgba(52, 199, 89, 0.85),
-    rgba(48, 209, 88, 0.80)
-  );
-  border-color: rgba(52, 199, 89, 0.5);
-  color: white;
-}
+  &.has-action {
+    top: 20dvh;
+    right: 28px;
+    left: auto;
+    transform: none;
+  }
 
-.global-toast.success .toast-icon {
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-}
+  &.success {
+    color: $white;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--color-success-rgb), 0.85),
+      rgba(48, 209, 88, 0.8)
+    );
+    border-color: rgba(var(--color-success-rgb), 0.5);
 
-/* ❌ 错误消息 - 苹果红 */
-.global-toast.error {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 59, 48, 0.85),
-    rgba(255, 69, 58, 0.80)
-  );
-  border-color: rgba(255, 59, 48, 0.5);
-  color: white;
-}
+    .toast-icon {
+      @include toast-icon(var(--glass-30), 14px);
+    }
+  }
 
-.global-toast.error .toast-icon {
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 700;
-}
+  &.error {
+    color: $white;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--color-error-light-rgb), 0.85),
+      rgba(255, 69, 58, 0.8)
+    );
+    border-color: rgba(var(--color-error-light-rgb), 0.5);
 
-/* ⚠️ 警告消息 - 苹果橙黄 */
-.global-toast.warning {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 204, 0, 0.85),
-    rgba(255, 214, 10, 0.80)
-  );
-  border-color: rgba(255, 204, 0, 0.5);
-  color: rgba(0, 0, 0, 0.85);
-}
+    .toast-icon {
+      @include toast-icon(var(--glass-30), 16px);
+    }
+  }
 
-.global-toast.warning .toast-icon {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 700;
-}
+  &.warning {
+    color: $text-dark;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--color-gold-rgb), 0.85),
+      rgba(255, 214, 10, 0.8)
+    );
+    border-color: rgba(var(--color-gold-rgb), 0.5);
 
-/* ℹ️ 提示消息 - 苹果蓝 */
-.global-toast.info {
-  background: linear-gradient(
-    135deg,
-    rgba(0, 122, 255, 0.85),
-    rgba(10, 132, 255, 0.80)
-  );
-  border-color: rgba(0, 122, 255, 0.5);
-  color: white;
-}
+    .toast-icon {
+      @include toast-icon(rgba(0, 0, 0, 0.15), 16px);
+    }
+  }
 
-.global-toast.info .toast-icon {
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-}
+  &.info {
+    color: $white;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--color-primary-rgb), 0.85),
+      rgba(var(--color-primary-rgb), 0.8)
+    );
+    border-color: rgba(var(--color-primary-rgb), 0.5);
 
-.global-toast.has-action.info {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(234, 243, 255, 0.4));
-  border-color: rgba(255, 255, 255, 0.48);
-  color: rgba(20, 34, 56, 0.88);
-}
+    .toast-icon {
+      @include toast-icon(var(--glass-30), 14px);
+    }
 
-.global-toast.has-action.info .toast-icon {
-  background: rgba(0, 122, 255, 0.13);
-  color: #007aff;
+    &.has-action {
+      color: $text-action-info;
+      background: linear-gradient(
+        135deg,
+        var(--glass-60),
+        rgba(234, 243, 255, 0.4)
+      );
+      border-color: var(--glass-50);
+
+      .toast-icon {
+        color: $apple-blue;
+        background: rgba(var(--color-primary-rgb), 0.13);
+      }
+
+      .toast-action {
+        color: $action-blue;
+        background: rgba(var(--color-primary-rgb), 0.12);
+        box-shadow: inset 0 0 0 1px rgba(var(--color-primary-rgb), 0.18);
+
+        &:hover {
+          background: rgba(var(--color-primary-rgb), 0.18);
+        }
+      }
+    }
+  }
+
+  &.has-action {
+    &.toast-fade-enter-active {
+      animation-name: toast-in-side;
+    }
+
+    &.toast-fade-leave-active {
+      animation-name: toast-out-side;
+    }
+  }
+
+  @media (max-width: 768px) {
+    top: auto;
+    right: 16px;
+    bottom: 22px;
+    max-width: calc(100vw - 32px);
+    padding: 12px 14px;
+    font-size: 14px;
+    border-radius: 18px;
+
+    .toast-icon {
+      width: 22px;
+      height: 22px;
+      font-size: 13px;
+    }
+
+    &.has-action {
+      top: auto;
+      right: 16px;
+      bottom: 20dvh;
+      transform: none;
+    }
+  }
 }
 
 .toast-message {
@@ -183,53 +231,32 @@ function getIcon(type) {
   line-height: 1.4;
 }
 
-.toast-action{
-  border: 0;
-  font: inherit;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
 .toast-action {
   padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.46);
   color: inherit;
+  font: inherit;
   font-weight: 600;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.38);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--glass-50);
+  border: 0;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 1px var(--glass-40);
+
+  @include glass-blur(10px);
+
+  &:hover {
+    background: var(--glass-60);
+  }
 }
 
-.toast-action:hover {
-  background: rgba(255, 255, 255, 0.62);
-}
-
-.global-toast.has-action.info .toast-action {
-  background: rgba(0, 122, 255, 0.12);
-  color: #0067d8;
-  box-shadow: inset 0 0 0 1px rgba(0, 122, 255, 0.18);
-}
-
-.global-toast.has-action.info .toast-action:hover {
-  background: rgba(0, 122, 255, 0.18);
-}
-
-/* 🎬 苹果风格动画 - 轻量上浮 */
+/* Toast 进入与离开动画 */
 .toast-fade-enter-active {
-  animation: toast-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: toast-in 0.5s $toast-enter-easing;
 }
 
 .toast-fade-leave-active {
-  animation: toast-out 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.global-toast.has-action.toast-fade-enter-active {
-  animation-name: toast-in-side;
-}
-
-.global-toast.has-action.toast-fade-leave-active {
-  animation-name: toast-out-side;
+  animation: toast-out 0.35s $toast-leave-easing;
 }
 
 @keyframes toast-in {
@@ -237,6 +264,7 @@ function getIcon(type) {
     opacity: 0;
     transform: translateX(-50%) translateY(-18px) scale(0.96);
   }
+
   100% {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
@@ -248,6 +276,7 @@ function getIcon(type) {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
   }
+
   100% {
     opacity: 0;
     transform: translateX(-50%) translateY(-12px) scale(0.98);
@@ -259,6 +288,7 @@ function getIcon(type) {
     opacity: 0;
     transform: translateY(-18px) scale(0.96);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -270,34 +300,10 @@ function getIcon(type) {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
   100% {
     opacity: 0;
     transform: translateY(-12px) scale(0.98);
-  }
-}
-
-/* 📱 移动端适配 */
-@media (max-width: 768px) {
-  .global-toast {
-    top: auto;
-    right: 16px;
-    bottom: 22px;
-    font-size: 14px;
-    padding: 12px 14px;
-    max-width: calc(100vw - 32px);
-    border-radius: 18px;
-  }
-
-  .global-toast .toast-icon {
-    width: 22px;
-    height: 22px;
-    font-size: 13px;
-  }
-  .global-toast.has-action {
-    right: 16px;
-    top: auto;
-    bottom: 20dvh;
-    transform: none;
   }
 }
 </style>

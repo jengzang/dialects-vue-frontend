@@ -123,7 +123,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getReadingClass, getSearchCharReadingType } from '@/main/utils/ResultTable.js';
+import { getReadingClass, getSearchCharReadingType } from '@/main/utils/query/ResultTable.js';
 import { READING_COLORS } from '@/main/config/readingColors.js';
 import { getLocationDetail } from '@/api';
 import LocationDetailPopup from '../popup/result/LocationDetailPopup.vue';
@@ -442,7 +442,7 @@ const colorArray = [
   { name: "Magenta", hex: "#9999FF" },
   { name: "Pink", hex: "#fabed4" },
   { name: "Beige", hex: "#fffac8" },
-  { name: "Mint", hex: "#aaffc3" },
+  { name: "Mint", hex: "var(--color-success)" },
   { name: "Lavender", hex: "#dcbfff" }
 ];
 
@@ -534,78 +534,84 @@ onMounted(() => {
 
 <style lang="scss">
 .chartonepage {
-  max-width: 85dvw;
-  min-width: 60dvw;
-  height: 66dvh;
-  overflow-y: auto;
-  overflow-x: auto;
-  padding: 8px;
-  font-size: 18px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-
   display: flex;
+  min-width: 60dvw;
+  max-width: 85dvw;
+  height: 66dvh;
   margin: 0 auto;
-}
+  padding: 8px;
+  overflow-x: auto;
+  overflow-y: auto;
+  font-size: 18px;
+  background: var(--glass-05);
+  border: 2px solid var(--glass-10);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px var(--bg-hover);
+  backdrop-filter: blur(8px);
 
-@media (max-aspect-ratio: 1/1) {
-  .chartonepage {
+  @media (max-aspect-ratio: 1/1) {
     height: 60dvh;
   }
 }
-</style>
 
-<style scoped lang="scss">
+$primary-blue: var(--color-primary);
+$deep-blue: var(--text-deep);
+$text-black: var(--text-primary);
+$text-gray: var(--text-tertiary);
+$transition-fast: 0.2s;
+$glass-blur: 8px;
+
 .content-search {
-  padding: 20px;
-  overflow-y: auto;
+  position: relative;
   flex-grow: 1;
   max-height: calc(100% - 70px);
-  border-radius: 12px;
-  position: relative;
+  padding: 20px;
+  overflow-y: auto;
+  border-radius: var(--radius-md);
   scroll-behavior: smooth;
 }
 
 .char {
+  margin-top: 15px;
+  margin-bottom: 1px;
   font-size: 28px;
   font-weight: bold;
   text-align: center;
-  margin-top: 15px;
-  margin-bottom: 1px;
   scroll-margin-top: 12px;
 }
 
 .reading-char {
   color: inherit;
+
+  &--wendu {
+    color: v-bind('READING_COLORS.wendu');
+  }
+
+  &--baidu {
+    color: v-bind('READING_COLORS.baidu');
+  }
 }
 
-.reading-char--wendu {
-  color: v-bind('READING_COLORS.wendu');
-}
-
-.reading-char--baidu {
-  color: v-bind('READING_COLORS.baidu');
-}
-
+/*
+ * 该元素通过 Teleport 挂载到 body，
+ * 因此必须保持为顶层选择器。
+ */
 .global-tooltip-popup {
   position: fixed;
   z-index: 10001;
-  transform: translate(-50%, -100%);
-  background-color: rgba(0, 0, 0, 0.8);
-  color: #fff;
+  max-width: 200px;
   padding: 5px 10px;
-  border-radius: 4px;
+  color: var(--text-white);
   font-size: 12px;
   pointer-events: none;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: var(--radius-xs);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  max-width: 200px;
-  animation: fadeIn 0.2s ease-out;
+  transform: translate(-50%, -100%);
+  animation: fadeInCentered $transition-fast ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes fadeInCentered {
   from {
     opacity: 0;
     transform: translate(-50%, -90%);
@@ -617,39 +623,48 @@ onMounted(() => {
   }
 }
 
+/*
+ * 该元素通过 Teleport 挂载到 body，
+ * 因此不能嵌套在 .chartonepage 中。
+ */
 .char-nav-teleport {
   position: fixed;
-  right: 18px;
   top: 50%;
-  transform: translateY(-50%);
+  right: 18px;
   z-index: 9998;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  @include flex-col;
   gap: 8px;
+  align-items: center;
   padding: 10px 7px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid rgba(255, 255, 255, 0.58);
+  background: var(--glass-60);
+  border: 1px solid var(--glass-60);
+  border-radius: var(--radius-pill);
   box-shadow:
-    inset 0 0 1px rgba(255, 255, 255, 0.45),
+    inset 0 0 1px var(--glass-50),
     0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-50%);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
+
+  @media (max-aspect-ratio: 1/1) {
+    right: 10px;
+    gap: 6px;
+    padding: 8px 6px;
+  }
 }
 
 .char-nav-node {
-  width: 32px;
-  height: 32px;
-  border: 0;
-  border-radius: 999px;
-  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #4f5663;
-  background: rgba(255, 255, 255, 0.55);
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--text-slate);
   cursor: pointer;
+  background: var(--glass-60);
+  border: 0;
+  border-radius: var(--radius-pill);
   transition:
     transform 0.18s ease,
     color 0.18s ease,
@@ -657,18 +672,23 @@ onMounted(() => {
     box-shadow 0.18s ease;
 
   &:hover {
-    color: #0038a1;
-    background: rgba(255, 255, 255, 0.86);
-    transform: translateX(-2px) scale(1.06);
+    color: $deep-blue;
+    background: var(--glass-90);
     box-shadow: 0 4px 12px rgba(0, 56, 161, 0.12);
+    transform: translateX(-2px) scale(1.06);
   }
 
   &.active {
-    color: #0038a1;
+    color: $deep-blue;
     background: rgba(0, 56, 161, 0.12);
     box-shadow:
       inset 0 0 0 1px rgba(0, 56, 161, 0.24),
       0 4px 14px rgba(0, 56, 161, 0.16);
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    width: 29px;
+    height: 29px;
   }
 }
 
@@ -676,12 +696,14 @@ onMounted(() => {
   font-size: 17px;
   font-weight: 700;
   line-height: 1;
+
+  @media (max-aspect-ratio: 1/1) {
+    font-size: 16px;
+  }
 }
 
 .info-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include flex-center;
   padding: 8px 5px;
 }
 
@@ -695,53 +717,55 @@ onMounted(() => {
 .syllable-unit {
   display: inline-flex;
   flex-direction: row;
+  gap: 4px;
   align-items: baseline;
   white-space: nowrap;
-  gap: 4px;
 }
 
 .pronunciation {
-  color: #000;
-  font-weight: normal;
+  color: $text-black;
   font-size: 1.1em;
-}
+  font-weight: normal;
 
-.reading-char--wendu,
-.pronunciation--wendu {
-  color: v-bind('READING_COLORS.wendu');
-}
+  &--wendu {
+    color: v-bind('READING_COLORS.wendu');
+  }
 
-.reading-char--baidu,
-.pronunciation--baidu {
-  color: v-bind('READING_COLORS.baidu');
+  &--baidu {
+    color: v-bind('READING_COLORS.baidu');
+  }
 }
 
 .conversion-failed {
-  color: #666;
+  color: $text-gray;
   text-decoration: underline dashed;
   text-underline-offset: 3px;
   cursor: help;
 }
 
 .annotation {
-  color: #888;
-  font-size: 0.85em;
   max-width: 400px;
+  color: var(--text-muted);
+  font-size: 0.85em;
   white-space: normal;
   word-break: break-word;
+
+  @media (max-aspect-ratio: 1/1) {
+    max-width: 200px;
+  }
 }
 
 .separator {
   margin: 0 5px;
-  color: #ccc;
+  color: var(--border-gray);
   font-weight: bold;
 }
 
 .positions {
-  font-size: 13px;
-  color: gray;
-  text-align: center;
   margin-bottom: 15px;
+  color: gray;
+  font-size: 13px;
+  text-align: center;
 
   p {
     margin: 2px 0;
@@ -749,39 +773,39 @@ onMounted(() => {
 }
 
 .location {
-  font-size: 15px;
-  font-weight: 600;
-  color: #0d5bae;
-  margin-bottom: 5px;
   display: inline-block;
   margin-right: 15px;
+  margin-bottom: 5px;
+  padding: 2px 8px;
+  color: var(--color-primary-hover);
+  font-size: 15px;
+  font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: rgba(0, 122, 255, 0.04);
+  background: rgba(var(--color-primary-rgb), 0.04);
   border: 1px solid transparent;
-  transition: all 0.2s ease;
+  border-radius: var(--radius-sm);
+  transition: all $transition-fast ease;
 
   &:hover {
-    color: #007aff;
-    background: rgba(0, 122, 255, 0.1);
-    border-color: rgba(0, 122, 255, 0.25);
+    color: $primary-blue;
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border-color: rgba(var(--color-primary-rgb), 0.25);
+    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.12);
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.12);
   }
 }
 
 .no-data-warning {
-  text-align: center;
-  padding: 12px 20px;
   margin: 10px 0;
-  background: rgba(255, 59, 48, 0.1);
-  border: 1px solid rgba(255, 59, 48, 0.3);
-  border-radius: 8px;
-  color: #d32f2f;
+  padding: 12px 20px;
+  color: var(--color-error);
   font-size: 14px;
   font-weight: 600;
+  text-align: center;
+  background: rgba(var(--color-error-light-rgb), 0.1);
+  border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
+  border-radius: var(--radius-sm2);
 }
 
 .syllables {
@@ -792,18 +816,18 @@ onMounted(() => {
 
 .table-tones {
   width: 100%;
-  border-collapse: collapse;
   margin-top: 20px;
+  border-collapse: collapse;
 
   th,
   td {
-    border: 1px solid #ddd;
     padding: 3px;
-    text-align: center;
-    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
     font-size: 1em;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border: 1px solid var(--border-light-gray);
   }
 
   th:first-child,
@@ -811,84 +835,77 @@ onMounted(() => {
     position: sticky;
     left: 0;
     z-index: 10;
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    border-right: 1px solid rgba(0,0,0,0.1);
+    background: var(--glass-80);
     background-clip: padding-box;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur($glass-blur);
+    -webkit-backdrop-filter: blur($glass-blur);
   }
 
   th:first-child {
     z-index: 20;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--glass-90);
   }
 }
 
 .location-tones {
   width: 100px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
+  @include text-truncate;
   font-size: 12px;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition:
+    transform $transition-fast ease,
+    background-color $transition-fast ease;
 
   &:hover {
-    background-color: #f4f4f4;
-    transform: scale(1.15);
+    color: $deep-blue;
     cursor: pointer;
-    color: #0038a1;
+    background-color: var(--bg-light-gray);
+    transform: scale(1.15);
   }
 }
 
 .tones-cell-tones {
-  width: 60px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  font-size: 1em;
   box-sizing: border-box;
+  width: 60px;
+  @include text-truncate;
+  font-size: 1em;
 }
 
 #loading-overlay {
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 9999;
+  @include flex-center;
   width: 100%;
   height: 100%;
   background: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
   transition: opacity 0.3s ease;
 
   &.loading-hidden {
-    opacity: 0;
     pointer-events: none;
+    opacity: 0;
   }
 }
 
 .bouncing-wrapper {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
 }
 
 .bouncing-loader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include flex-center;
   margin-bottom: 16px;
 
   > div {
     width: 14px;
     height: 14px;
     margin: 4px;
-    background: #9aa0a6;
-    border-radius: 50%;
+    background: var(--text-slate-light);
+    border-radius: var(--radius-full);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
     animation: bouncing 0.6s infinite ease-in-out;
-    box-shadow: 0 0 8px rgba(0,0,0,0.05);
 
     &:nth-child(2) {
       animation-delay: 0.2s;
@@ -901,80 +918,69 @@ onMounted(() => {
 }
 
 @keyframes bouncing {
-  0%, 80%, 100% {
-    transform: scale(0.7);
+  0%,
+  80%,
+  100% {
     opacity: 0.5;
+    transform: scale(0.7);
   }
 
   40% {
-    transform: scale(1);
     opacity: 1;
+    transform: scale(1);
   }
 }
 
 .loading-text {
+  color: $text-gray;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    "Segoe UI",
+    sans-serif;
   font-size: 16px;
-  color: #666;
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", sans-serif;
 }
 
 .multi {
-  margin: 0 2px;
-  text-decoration: none;
-  transition: color 0.2s ease;
   position: relative;
   display: inline-block;
-  padding: 2px 2px;
-  cursor: pointer;
+  margin: 0 2px;
+  padding: 2px;
   font-size: 16px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color $transition-fast ease;
 
   &:hover {
-    color: #d33;
+    color: var(--color-error);
   }
 
   &::after {
-    content: attr(data-title);
     position: absolute;
     bottom: 100%;
     left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
-    padding: 5px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
     z-index: 9999;
-    pointer-events: none;
+    padding: 5px 8px;
+    color: var(--text-white);
+    font-size: 12px;
     font-style: normal;
+    white-space: nowrap;
+    visibility: hidden;
+    content: attr(data-title);
+    pointer-events: none;
+    background-color: var(--text-dark);
+    border-radius: var(--radius-xs);
+    opacity: 0;
+    transform: translateX(-50%);
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s ease;
   }
 
   &:hover::after {
-    opacity: 1;
     visibility: visible;
-  }
-}
-
-@media (max-aspect-ratio: 1/1) {
-  .char-nav-teleport {
-    right: 10px;
-    gap: 6px;
-    padding: 8px 6px;
-  }
-
-  .char-nav-node {
-    width: 29px;
-    height: 29px;
-  }
-
-  .char-nav-char {
-    font-size: 16px;
-  }
-  .annotation{
-    max-width: 200px;
+    opacity: 1;
   }
 }
 </style>

@@ -12,6 +12,8 @@
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .derive-tool-page {
   min-height: 100vh;
   padding: clamp(24px, 4vw, 40px);
@@ -23,14 +25,12 @@
 }
 
 .derive-tool-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   min-height: 400px;
 }
 
 .derive-tool-placeholder__text {
   font-size: 16px;
-  color: rgba(29, 29, 31, 0.48);
+  color: rgba(var(--text-secondary-rgb), 0.48);
 }
 </style>

@@ -177,7 +177,7 @@ const runAnalysis = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .vml-glass-panel {
   padding: 20px;
 }
@@ -190,14 +190,12 @@ const runAnalysis = () => {
 }
 
 .settings-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
 .setting-row {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -215,7 +213,7 @@ const runAnalysis = () => {
 
 .error-hint {
   font-size: 12px;
-  color: #e74c3c;
+  color: var(--color-error);
   font-weight: 500;
   margin-top: 4px;
   display: block;
@@ -230,9 +228,9 @@ const runAnalysis = () => {
 .setting-input,
 .setting-select {
   padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-md);
+  background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
 }
@@ -241,12 +239,11 @@ const runAnalysis = () => {
 .setting-select:focus {
   outline: none;
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
 }
 
 .checkbox-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   padding: 8px 0;
 }
@@ -266,9 +263,9 @@ const runAnalysis = () => {
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: rgba(255, 193, 7, 0.15);
-  border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 10px;
+  background: rgba(var(--color-warning-rgb), 0.15);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.3);
+  border-radius: var(--radius-md);
   margin-bottom: 16px;
 }
 
@@ -278,7 +275,7 @@ const runAnalysis = () => {
 
 .notice-text {
   font-size: 13px;
-  color: #856404;
+  color: var(--color-warning-dark);
   font-weight: 500;
 }
 

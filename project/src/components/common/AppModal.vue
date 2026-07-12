@@ -219,24 +219,19 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 @use '../../styles/global/scrollbars' as scrollbars;
 
-.app-modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--app-modal-z-index, 20000);
-  padding: 18px;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+$transition-duration: 0.3s;
+$transition-ease: ease;
+$panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
 
+.app-modal {
   --modal-width: min(720px, 94dvw);
   --modal-max-height: min(70dvh, 640px);
-  --modal-background: rgba(255, 255, 255, 0.8);
-  --modal-border: 1px solid rgba(255, 255, 255, 0.55);
+  --modal-background: var(--glass-80);
+  --modal-border: 1px solid var(--glass-60);
   --modal-radius: 18px;
   --modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
   --modal-backdrop-filter: blur(20px) saturate(160%);
@@ -244,19 +239,76 @@ onBeforeUnmount(() => {
   --modal-header-border: 1px solid rgba(0, 0, 0, 0.08);
   --modal-title-size: 16px;
   --modal-title-weight: 650;
-  --modal-title-color: #1d1d1f;
+  --modal-title-color: var(--text-primary);
   --modal-content-padding-top: 16px;
   --modal-content-padding-inline: 18px;
   --modal-content-padding-bottom: 20px;
+  --modal-content-padding-mobile: 6px;
+
+  position: fixed;
+  inset: 0;
+  z-index: var(--app-modal-z-index, 20000);
+  @include flex-center;
+  padding: 18px;
+  overscroll-behavior: contain;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  &[data-size='sm'] {
+    --modal-width: min(720px, 94dvw);
+    --modal-max-height: min(70dvh, 640px);
+    --modal-header-padding: 14px 18px;
+    --modal-title-size: 16px;
+    --modal-content-padding-top: 16px;
+    --modal-content-padding-inline: 16px;
+    --modal-content-padding-bottom: 20px;
+  }
+
+  &[data-size='lg'] {
+    --modal-width: min(1100px, 95dvw);
+    --modal-max-height: 88dvh;
+    --modal-header-padding: 16px 20px;
+    --modal-title-size: 20px;
+    --modal-content-padding-top: 16px;
+    --modal-content-padding-inline: 20px;
+    --modal-content-padding-bottom: 16px;
+  }
+
+  &.is-frameless {
+    padding: 0;
+
+    .panel {
+      width: auto;
+      max-height: none;
+      overflow: visible;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .content {
+      padding: 0;
+      overflow: visible;
+    }
+
+    .footer {
+      padding: 0;
+      border-top: none;
+    }
+  }
 }
 
 .panel {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   width: var(--modal-width);
   max-height: var(--modal-max-height);
   overflow: hidden;
+  overscroll-behavior: contain;
   background: var(--modal-background);
   border: var(--modal-border);
   border-radius: var(--modal-radius);
@@ -267,88 +319,49 @@ onBeforeUnmount(() => {
 
 .header {
   display: flex;
+  gap: 12px;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
   padding: var(--modal-header-padding);
   border-bottom: var(--modal-header-border);
 }
 
 .title {
   margin: 0;
-  line-height: 1.3;
+  color: var(--modal-title-color);
   font-size: var(--modal-title-size);
   font-weight: var(--modal-title-weight);
-  color: var(--modal-title-color);
+  line-height: 1.3;
 }
 
 .content {
   flex: 1;
   min-height: 0;
-  border-radius: 20px;
   padding:
     var(--modal-content-padding-top)
     var(--modal-content-padding-inline)
     var(--modal-content-padding-bottom);
   overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: var(--radius-xl);
+  -webkit-overflow-scrolling: touch;
+
   @include scrollbars.visible-scrollbar;
   @include scrollbars.visible-scrollbar-webkit;
+
+  @media (max-aspect-ratio: 1) {
+    padding: var(--modal-content-padding-mobile);
+  }
 }
 
 .footer {
-  flex-shrink: 0;
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: flex-end;
   padding: 16px 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.app-modal[data-size='sm'] {
-  --modal-width: min(720px, 94dvw);
-  --modal-max-height: min(70dvh, 640px);
-  --modal-header-padding: 14px 18px;
-  --modal-title-size: 16px;
-  --modal-content-padding-top: 16px;
-  --modal-content-padding-inline: 18px;
-  --modal-content-padding-bottom: 20px;
-}
-
-.app-modal[data-size='lg'] {
-  --modal-width: min(1100px, 95dvw);
-  --modal-max-height: 88dvh;
-  --modal-header-padding: 20px 24px;
-  --modal-title-size: 20px;
-  --modal-content-padding-top: 20px;
-  --modal-content-padding-inline: 24px;
-  --modal-content-padding-bottom: 20px;
-}
-
-.app-modal.is-frameless {
-  padding: 0;
-}
-
-.app-modal.is-frameless .panel {
-  width: auto;
-  max-height: none;
-  overflow: visible;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-.app-modal.is-frameless .content {
-  padding: 0;
-  overflow: visible;
-}
-
-.app-modal.is-frameless .footer {
-  padding: 0;
-  border-top: none;
+  border-top: 1px solid var(--glass-50);
 }
 
 .modal-fade-enter-active,
@@ -357,16 +370,13 @@ onBeforeUnmount(() => {
 .fade-scale-leave-active,
 .fade-modal-enter-active,
 .fade-modal-leave-active {
-  transition: opacity 0.3s ease;
-}
+  transition: opacity $transition-duration $transition-ease;
 
-.modal-fade-enter-active .panel,
-.modal-fade-leave-active .panel,
-.fade-scale-enter-active .panel,
-.fade-scale-leave-active .panel,
-.fade-modal-enter-active .panel,
-.fade-modal-leave-active .panel {
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;
+  .panel {
+    transition:
+      transform $transition-duration $panel-transition-ease,
+      opacity $transition-duration $transition-ease;
+  }
 }
 
 .modal-fade-enter-from,
@@ -378,34 +388,27 @@ onBeforeUnmount(() => {
   opacity: 0;
 }
 
-.modal-fade-enter-from .panel,
-.modal-fade-leave-to .panel {
-  opacity: 0;
-  transform: scale(0.97);
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  .panel {
+    opacity: 0;
+    transform: scale(0.97);
+  }
 }
 
-.fade-scale-enter-from .panel,
-.fade-scale-leave-to .panel {
-  opacity: 0;
-  transform: scale(0.95);
+.fade-scale-enter-from,
+.fade-scale-leave-to {
+  .panel {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 }
 
-.fade-modal-enter-from .panel,
-.fade-modal-leave-to .panel {
-  opacity: 0;
-  transform: translateY(12px) scale(0.98);
-}
-
-.app-modal {
-  overscroll-behavior: contain;
-}
-
-.panel {
-  overscroll-behavior: contain;
-}
-
-.content {
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+.fade-modal-enter-from,
+.fade-modal-leave-to {
+  .panel {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
 }
 </style>

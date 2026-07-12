@@ -1,16 +1,14 @@
-.glass-panel,
-.vml-glass-panel {
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(14px) saturate(145%);
-  -webkit-backdrop-filter: blur(10px) saturate(135%);
-  border: 1px solid rgba(255, 255, 255, 0.42);
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05);
-}
+// VillagesML 面板和表面样式
+// 注意：.glass-panel 由 global/_glass.scss 提供，此处只定义 VillagesML 专属变体
 
 .vml-glass-panel {
+  background: var(--glass-60);
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  border: 1px solid var(--glass-40);
+  border-radius: var(--radius-xl);
   padding: 24px;
+  box-shadow: var(--shadow-glass);
 }
 
 .vml-glass-panel > .panel-title {
@@ -20,43 +18,49 @@
   margin-bottom: 20px;
 }
 
+.vml-glass-panel h2 {
+  font-size: 16px;
+  margin: 0;
+  color: var(--text-primary);
+}
+
 .solid-button {
   padding: 10px 24px;
   font-size: 14px;
   white-space: nowrap;
-  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  background: linear-gradient(135deg, var(--vml-blue) 0%, var(--vml-blue-darker) 100%);
   border-radius: var(--radius-md);
   border: none;
-  color: #ffffff;
+  color: var(--bg-white);
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
 .solid-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #5ba3f5 0%, #4a90e2 100%);
+  background: linear-gradient(135deg, var(--vml-blue-highlight) 0%, var(--vml-blue) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.4);
 }
 
 .solid-button:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 2px 6px rgba(var(--vml-blue-rgb), 0.3);
 }
 
 .solid-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background: linear-gradient(135deg, #a0a0a0 0%, #808080 100%);
+  background: linear-gradient(135deg, var(--color-silver) 0%, var(--text-muted) 100%);
 }
 
 .solid-button.secondary {
-  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  background: linear-gradient(135deg, var(--text-secondary), var(--text-secondary));
 }
 
 .solid-button.secondary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #a8b5b6, #8d9a9b);
+  background: linear-gradient(135deg, var(--text-slate-light), var(--text-slate));
 }
 
 .solid-button.small {
@@ -72,10 +76,10 @@
 .villagesml-subtab-title {
   font-size: 14px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-deep);
   margin: 0;
   padding: 8px 12px;
-  background: rgba(74, 144, 226, 0.08);
-  border-left: 3px solid #4a90e2;
-  border-radius: 4px;
+  background: rgba(var(--vml-blue-rgb), 0.08);
+  border-left: 3px solid var(--vml-blue);
+  border-radius: var(--radius-xs);
 }

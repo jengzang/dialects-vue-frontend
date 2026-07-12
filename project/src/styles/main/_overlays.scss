@@ -1,3 +1,4 @@
+@use '@/styles/global/mixins' as *;
 .modal-header-base {
   display: flex;
   align-items: center;
@@ -18,17 +19,16 @@
 .modal-frame {
   position: relative;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 
 .main-glass-modal {
   --main-glass-modal-width: min(720px, 94vw);
   --main-glass-modal-max-height: min(70vh, 640px);
-  --main-glass-modal-background: rgba(255, 255, 255, 0.92);
-  --main-glass-modal-border: 1px solid rgba(255, 255, 255, 0.42);
+  --main-glass-modal-background: var(--glass-90);
+  --main-glass-modal-border: 1px solid var(--glass-40);
   --main-glass-modal-radius: 18px;
-  --main-glass-modal-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+  --main-glass-modal-shadow: var(--shadow-popup);
   --main-glass-modal-backdrop-filter: blur(10px) saturate(145%);
   width: var(--main-glass-modal-width);
   max-height: var(--main-glass-modal-max-height);
@@ -46,13 +46,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 14px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--bg-overlay-light2);
 }
 
 .main-glass-modal-title {
   font-size: 15px;
   font-weight: 650;
-  color: #1d1d1f;
+  color: var(--text-primary);
 }
 
 .main-glass-modal-body {
@@ -66,18 +66,17 @@
   --main-query-modal-body-offset: 100px;
   --main-query-modal-header-padding: 12px 14px;
   --main-query-modal-body-padding: 12px 14px 16px;
-  --main-query-modal-background: rgba(255, 255, 255, 0.72);
-  --main-query-modal-border-color: rgba(200, 200, 200, 0.34);
+  --main-query-modal-background: var(--glass-70);
+  --main-query-modal-border-color: rgba(var(--color-silver-rgb), 0.34);
   --main-query-modal-radius: 18px;
   width: var(--main-query-modal-width);
   max-height: var(--main-query-modal-max-height);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   overflow: hidden;
   background: var(--main-query-modal-background);
   border: 1px solid var(--main-query-modal-border-color);
   border-radius: var(--main-query-modal-radius);
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+  box-shadow: 0 16px 36px rgba(var(--color-shadow-rgb), 0.16);
   backdrop-filter: blur(10px) saturate(145%);
   -webkit-backdrop-filter: blur(10px) saturate(145%);
 }
@@ -105,35 +104,32 @@
 }
 
 .main-modal-loading-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 12px;
   padding: 40px 20px;
-  color: #666;
+  color: var(--text-tertiary);
   font-size: 14px;
 }
 
 .main-modal-error-state {
   padding: 40px 20px;
   text-align: center;
-  color: #999;
+  color: var(--text-lightest);
   font-size: 14px;
 }
 
 .main-crud-modal {
   --main-crud-modal-width: min(800px, 100%);
   --main-crud-modal-max-height: 90vh;
-  --main-crud-modal-background: rgba(255, 255, 255, 0.96);
-  --main-crud-modal-border: 1px solid rgba(255, 255, 255, 0.24);
+  --main-crud-modal-background: var(--glass-90);
+  --main-crud-modal-border: 1px solid var(--glass-20);
   --main-crud-modal-radius: 18px;
   --main-crud-modal-shadow: 0 18px 42px rgba(0, 0, 0, 0.2);
   --main-crud-modal-backdrop-filter: blur(12px) saturate(145%);
   width: 100%;
   max-width: var(--main-crud-modal-width);
   max-height: var(--main-crud-modal-max-height);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   overflow: hidden;
   background: var(--main-crud-modal-background);
   border: var(--main-crud-modal-border);
@@ -149,7 +145,7 @@
 
 .main-crud-modal .modal-header {
   padding: 20px 24px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--bg-hover-strong);
 }
 
 .main-crud-modal .modal-title-base,
@@ -157,37 +153,36 @@
 .main-crud-modal .modal-header h3 {
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-dark);
 }
 
 .main-cell-detail-modal .modal-header {
   gap: 12px;
   padding: 14px 18px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.56);
+  border-bottom: 1px solid var(--bg-overlay-light2);
+  background: var(--glass-60);
 }
 
 .main-cell-detail-modal .modal-title {
   font-size: 16px;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .main-tool-modal {
   --main-tool-modal-width: min(90vw, 700px);
   --main-tool-modal-max-height: 85vh;
   --main-tool-modal-header-padding: 20px 24px;
-  --main-tool-modal-header-border-color: rgba(255, 255, 255, 0.44);
+  --main-tool-modal-header-border-color: var(--glass-40);
   --main-tool-modal-body-padding: 20px 24px;
   --main-tool-modal-body-overflow-y: auto;
-  --main-tool-modal-background: rgba(255, 255, 255, 0.96);
-  --main-tool-modal-border-color: rgba(255, 255, 255, 0.5);
+  --main-tool-modal-background: var(--glass-90);
+  --main-tool-modal-border-color: var(--glass-50);
   --main-tool-modal-radius: 24px;
-  --main-tool-modal-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
+  --main-tool-modal-shadow: var(--shadow-overlay);
   width: var(--main-tool-modal-width);
   max-height: var(--main-tool-modal-max-height);
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   overflow: hidden;
   background: var(--main-tool-modal-background);
   border: 1px solid var(--main-tool-modal-border-color);
@@ -209,7 +204,7 @@
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: #0b2540;
+  color: var(--text-deep);
 }
 
 .main-tool-modal > .modal-body {
@@ -221,14 +216,13 @@
 }
 
 .tool-modal-shell {
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--glass-90);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 24px;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
-  display: flex;
-  flex-direction: column;
+  border: 1px solid var(--glass-50);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-overlay);
+  @include flex-col;
   overflow: hidden;
 }
 
@@ -246,5 +240,42 @@
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: #0b2540;
+  color: var(--text-deep);
+}
+
+.query-detail-panel {
+  position: fixed;
+  resize: both;
+  overflow: auto;
+  top: 50%;
+  left: 1%;
+  transform: translateY(-50%);
+  width: 21%;
+  height: 60vh;
+
+  background: linear-gradient(135deg, var(--glass-20), var(--glass-05));
+  backdrop-filter: blur(5px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-40);
+  box-shadow: inset 0 0 0.5px var(--glass-30), 0 8px 32px rgba(0, 0, 0, 0.25), 0 0 0 0.5px var(--glass-10);
+
+  display: none;
+  flex-direction: column;
+  padding: 12px 12px;
+  z-index: 90000;
+  font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", sans-serif;
+  transition: all 0.4s ease;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.query-detail-panel:hover {
+  background: var(--glass-60);
+  box-shadow: 0 8px 25px rgba(var(--color-primary-rgb), 0.3), 0 0 20px rgba(var(--color-primary-rgb), 0.4);
+  border-color: rgba(var(--color-primary-rgb), 0.6);
+  opacity: 1;
+  transform: translateY(-50%) scale(1.01);
+  transition: all 0.3s ease;
 }

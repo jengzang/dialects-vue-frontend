@@ -58,7 +58,7 @@ function updateSetting(key, value) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .section-title {
   font-size: 1rem;
   font-weight: 600;
@@ -85,14 +85,13 @@ function updateSetting(key, value) {
 
 .setting-control {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
 }
 
 .setting-hint {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-tertiary);
   font-style: italic;
 }
 </style>

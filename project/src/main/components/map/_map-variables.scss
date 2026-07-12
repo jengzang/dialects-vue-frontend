@@ -1,0 +1,81 @@
+// Shared SCSS variables for map components
+
+// == Colors ==
+
+// Primary
+$primary: var(--color-primary);
+$primary-dark: var(--color-primary-hover);
+
+// Text
+$text-strong: var(--text-deep);
+$text-main: var(--text-primary);
+$text-dark: var(--text-dark);
+$text-secondary: var(--text-slate);
+$text-muted: var(--text-tertiary);
+$text-light: var(--text-slate-light);
+$text-subtle: var(--text-secondary);
+
+// Glass / Surfaces
+$glass-white: var(--glass-50);
+$glass-light: var(--glass-60);
+$glass-medium: var(--glass-80);
+$glass-strong: var(--glass-80);
+$glass-heavy: var(--glass-90);
+$glass-solid: var(--glass-90);
+$bg-light: rgba(var(--bg-blue-tint-rgb), 0.9);
+$bg-subtle: rgba(var(--color-shadow-rgb), 0.08);
+
+// Semantic
+$success: var(--color-success);
+$success-bg: var(--bg-success-light);
+$danger: var(--color-error);
+$danger-light: var(--color-error-light);
+$danger-bg: var(--bg-error-light);
+$warning: var(--color-warning);
+$warning-dark: var(--color-warning-dark);
+$purple: var(--color-purple-light);
+$teal: var(--color-teal);
+$deep-blue: var(--text-deep);
+
+// Primary opacity variants
+$primary-subtle: rgba(var(--color-primary-rgb), 0.08);
+$primary-glass: rgba(var(--color-primary-rgb), 0.1);
+$primary-border: rgba(var(--color-primary-rgb), 0.12);
+$primary-hover: rgba(var(--color-primary-rgb), 0.25);
+$primary-active: rgba(var(--color-primary-rgb), 0.3);
+$primary-ring: rgba(var(--color-primary-rgb), 0.5);
+$primary-focus: rgba(var(--color-primary-rgb), 0.55);
+
+// Muted opacity variants
+$muted-border: rgba(var(--text-slate-light-rgb), 0.08);
+$muted-subtle: rgba(var(--text-slate-light-rgb), 0.12);
+$muted-hover: rgba(var(--text-slate-light-rgb), 0.24);
+$muted-active: rgba(var(--text-slate-light-rgb), 0.28);
+$muted-ring: rgba(var(--text-slate-light-rgb), 0.32);
+
+// == Typography ==
+$font-system:
+  -apple-system,
+  BlinkMacSystemFont,
+  'SF Pro Display',
+  'SF Pro Text',
+  'PingFang SC',
+  'Hiragino Sans GB',
+  'Microsoft YaHei',
+  Arial,
+  sans-serif;
+
+// == Motion ==
+$motion-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+$motion-smooth: all 0.25s ease;
+
+// == Spacing ==
+$spacing-xs: 6px;
+$spacing-sm: 10px;
+$spacing-md: 16px;
+$spacing-lg: 18px;
+
+// == Radius ==
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 14px;

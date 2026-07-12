@@ -131,110 +131,118 @@ watch(() => props.loginMode, () => {
 })
 </script>
 
-<style scoped>
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary-blue: var(--color-primary);
+$primary-blue-dark: var(--color-primary-hover);
+$success-green: var(--color-success);
+$title-color: var(--text-primary);
+$error-color: red;
+$white: var(--text-white);
+$transition-fast: 0.2s;
+$transition-medium: 0.3s;
+$smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .login-form {
   padding: 12px;
   text-align: center;
 }
 
 .form-title {
+  @include flex-center;
+
+  gap: 8px;
+  margin-bottom: 16px;
+  color: $title-color;
   font-size: 30px;
   font-weight: 700;
-  color: #1c1c1e;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
 }
 
 .form-row {
-  width: 100%;
-  margin: 12px 0;
   display: flex;
   justify-content: center;
+  width: 100%;
+  margin: 12px 0;
 }
 
 .btn-search {
-  background-color: #007aff;
-  color: white;
-  padding: 12px 24px;
-  font-size: 17px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
+
   gap: 8px;
-}
-
-.btn-search:hover:not(:disabled) {
-  background-color: #0056b3;
-  transform: scale(1.04);
-}
-
-.btn-search:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-
-
-.err {
-  color: red;
-  margin-top: 10px;
-  font-size: 15px;
-  font-weight: bold;
-}
-
-.success {
-  color: #34c759;
-  margin-top: 10px;
-  font-size: 15px;
-  font-weight: bold;
-}
-
-.benefit-circle-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 35px;
-  height: 35px;
-  padding: 0;
-  border-radius: 50%;
-  background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  font-size: 20px;
-  line-height: 1;
+  padding: 12px 24px;
+  color: $white;
+  font-size: 17px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-  user-select: none;
-}
+  background-color: $primary-blue;
+  border: none;
+  border-radius: var(--radius-sm2);
+  transition:
+    background-color $transition-medium,
+    transform $transition-fast;
 
-.benefit-circle-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.15);
-  border-color: rgba(255, 149, 0, 0.3);
-}
+  &:hover:not(:disabled) {
+    background-color: $primary-blue-dark;
+    transform: scale(1.04);
+  }
 
-.benefit-circle-btn:active {
-  transform: translateY(0) scale(0.96);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
 
-/* Mobile responsive */
-@media (max-aspect-ratio: 1/1) {
-  .btn-search {
+  @media (max-aspect-ratio: 1/1) {
     width: 100%;
     padding: 16px;
     font-size: 18px;
   }
+}
 
-  .err {
+.err,
+.success {
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.err {
+  color: $error-color;
+
+  @media (max-aspect-ratio: 1/1) {
     font-size: 16px;
+  }
+}
+
+.success {
+  color: $success-green;
+}
+
+.benefit-circle-btn {
+  @include flex-center;
+
+  width: 35px;
+  height: 35px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  background-color: $white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-full);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all $transition-fast $smooth-easing;
+
+  &:hover {
+    border-color: rgba(var(--color-warning-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-warning-rgb), 0.15);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    transform: translateY(0) scale(0.96);
   }
 }
 </style>

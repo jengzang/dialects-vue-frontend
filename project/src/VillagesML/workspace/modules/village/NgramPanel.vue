@@ -2,7 +2,7 @@
   <div class="vml-glass-panel">
     <h3 class="panel-title">📐 N-gram 分解</h3>
 
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>加載中...</p>
     </div>
@@ -105,14 +105,9 @@ const parseTrigrams = (trigrams) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .ngram-content {
   animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .info-grid {
@@ -126,8 +121,8 @@ const parseTrigrams = (trigrams) => {
   display: flex;
   justify-content: space-between;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm);
 }
 
 .info-label {
@@ -143,8 +138,8 @@ const parseTrigrams = (trigrams) => {
 .ngram-section {
   margin-bottom: 6px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
 }
 
 .ngram-section h4 {
@@ -162,7 +157,7 @@ const parseTrigrams = (trigrams) => {
 
 .ngram-item {
   padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 15px;
   font-weight: 500;
   transition: transform 0.3s ease;
@@ -173,18 +168,18 @@ const parseTrigrams = (trigrams) => {
 }
 
 .unigram {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
 }
 
 .bigram {
-  background: rgba(80, 200, 120, 0.2);
-  color: #2d8659;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .trigram {
-  background: rgba(243, 156, 18, 0.2);
-  color: #c87f0a;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning-dark);
 }
 
 .ngram-stats {
@@ -192,17 +187,16 @@ const parseTrigrams = (trigrams) => {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
 }
 
 .stat-item {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
+  background: var(--glass-50);
+  border-radius: var(--radius-sm2);
 }
 
 .stat-label {

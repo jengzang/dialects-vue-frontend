@@ -1,0 +1,34 @@
+// Shared SCSS mixins — auto-injected into every SCSS block via Vite additionalData
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin disabled-state {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin glass-blur($blur: 10px, $saturation: null) {
+  @if $saturation {
+    backdrop-filter: blur($blur) saturate($saturation);
+    -webkit-backdrop-filter: blur($blur) saturate($saturation);
+  } @else {
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+  }
+}
+

@@ -48,15 +48,15 @@ const legendItems = computed(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .map-legend {
   position: absolute;
   bottom: 30px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--glass-90);
   backdrop-filter: blur(10px);
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
 }
@@ -65,12 +65,11 @@ const legendItems = computed(() => {
   font-weight: 600;
   font-size: 14px;
   margin-bottom: 8px;
-  color: #333;
+  color: var(--text-dark);
 }
 
 .legend-items {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -83,13 +82,13 @@ const legendItems = computed(() => {
 .legend-color {
   width: 16px;
   height: 16px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   border: 2px solid white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .legend-label {
   font-size: 13px;
-  color: #555;
+  color: var(--text-medium);
 }
 </style>

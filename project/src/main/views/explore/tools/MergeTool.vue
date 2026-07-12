@@ -47,7 +47,7 @@
             <input
               ref="refInput"
               type="file"
-              accept=".xlsx,.xls"
+              accept=".xlsx,.xls,.csv"
               @change="handleRefSelect"
               style="display: none"
             />
@@ -67,6 +67,9 @@
                     <span>{{ t('tools.merge.reference.charCount') }}: {{ referenceStats.charCount }}</span>
                     <span>{{ t('tools.merge.reference.columnCount') }}: {{ referenceStats.columnCount }}</span>
                   </div>
+                  <div v-if="referenceImportSummary" class="file-meta file-meta--summary">
+                    <span>{{ referenceImportSummary }}</span>
+                  </div>
                 </div>
                 <button
                   class="remove-btn"
@@ -79,11 +82,35 @@
             </template>
           </div>
 
+          <TabularImportPreview
+            v-if="pendingReferenceFile"
+            :key="referenceImportConfirmKey"
+            :model-value="Boolean(pendingReferenceFile)"
+            :title="t('common.importPreview.referenceTitle')"
+            :description="t('common.importPreview.referenceDescription')"
+            :source="referencePreviewSource"
+            :file="pendingReferenceFile"
+            :schema="referenceImportSchema"
+            :mapping-enabled="!isDefaultReferencePreview"
+            :loading="referencePreviewState.loading.value"
+            :preview-table="referencePreviewState.previewTable.value"
+            :diagnostics="referencePreviewState.diagnostics.value"
+            :mapping="referencePreviewState.mapping.value"
+            :selected-sheet-id="referencePreviewState.selectedSheetId.value"
+            :header-row-index="referencePreviewState.headerRowIndex.value"
+            :sheets="referencePreviewState.parsedFile.value?.sheets || []"
+            @update:selected-sheet-id="referencePreviewState.selectedSheetId.value = $event"
+            @update:header-row-index="referencePreviewState.headerRowIndex.value = $event"
+            @update:mapping="handleReferenceMappingUpdate"
+            @reset="clearPendingReference"
+            @confirm="handleReferenceConfirm"
+          />
+
           <div class="step-actions">
             <button
               class="main-glass-button"
               data-variant="secondary"
-              @click="showDefaultReference"
+              @click="previewDefaultReference"
               :disabled="isLoadingRef"
             >
               <span class="icon">{{ isLoadingRef ? '⏳' : '👁️' }}</span>
@@ -96,9 +123,9 @@
               data-variant="primary"
               data-size="large"
               :disabled="!referenceFile"
-              @click="nextStep"
+              @click="handleReferenceConfirm"
             >
-              {{ t('tools.merge.reference.next') }} →
+              {{ `${t('tools.merge.reference.next')} →` }}
             </button>
           </div>
         </div>
@@ -110,7 +137,7 @@
             <button
                 class="main-glass-button"
                 data-size="small"
-                style="display: inline-block; padding: 2px 8px; margin: 0 2px; vertical-align: middle;background: #007aff;color:white"
+                style="display: inline-block; padding: 2px 8px; margin: 0 2px; vertical-align: middle;background: var(--color-primary);color:white"
                 @click="$router.push(buildLocalePath(resolveRouteLocale(route), '/explore/tools/check'))"
             >
               {{ t('tools.merge.files.checkTool') }}
@@ -257,102 +284,19 @@
         </div>
       </div>
     </div>
-
-    <AppModal
-      :model-value="showDefaultRefModal"
-      size="lg"
-      :title="t('tools.merge.modal.title')"
-      :close-label="t('tools.common.close')"
-      :z-index="1000"
-      @update:modelValue="showDefaultRefModal = false"
-    >
-      <div class="merge-default-ref-tabs">
-          <button
-            class="tab-btn"
-            :class="{ active: currentTab === 'main' }"
-            @click="currentTab = 'main'"
-          >
-            {{ t('tools.merge.modal.mainTable') }} ({{ mainTableData.length }})
-          </button>
-          <button
-            class="tab-btn"
-            :class="{ active: currentTab === 'supplement' }"
-            @click="currentTab = 'supplement'"
-          >
-            {{ t('tools.merge.modal.supplementTable') }} ({{ supplementTableData.length }})
-          </button>
-        </div>
-
-      <div class="merge-default-ref-content">
-        <div class="table-container ui-scrollbar">
-            <table v-if="currentTab === 'main'" class="data-table">
-              <thead>
-                <tr>
-                  <th v-for="(col, index) in mainTableHeaders" :key="index">{{ col }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(row, index) in displayedMainData" :key="index">
-                  <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell || '' }}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <table v-if="currentTab === 'supplement'" class="data-table">
-              <thead>
-                <tr>
-                  <th v-for="(col, index) in supplementTableHeaders" :key="index">{{ col }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(row, index) in displayedSupplementData" :key="index">
-                  <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell || '' }}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div v-if="hasMoreData" class="load-more-hint">
-              {{
-                t('tools.merge.modal.showingRows', {
-                  displayed: maxDisplayRows,
-                  total: currentTab === 'main' ? mainTableData.length : supplementTableData.length
-                })
-              }}
-            </div>
-        </div>
-      </div>
-
-      <template #footer>
-<!--        <div class="merge-default-ref-footer">-->
-        <button class="main-glass-button" data-variant="primary" @click="downloadDefaultReference">
-            <span class="icon">⬇️</span>
-            <span>{{ t('tools.merge.modal.downloadDefault') }}</span>
-          </button>
-          <button
-              class="main-glass-button"
-              data-variant="secondary"
-              @click="useDefaultReference"
-              style="background: rgba(31,138,54,0.43)"
-          >
-            <span class="icon">✅</span>
-            <span>{{ t('tools.merge.modal.useDefault') }}</span>
-        </button>
-<!--        </div>-->
-      </template>
-    </AppModal>
   </div>
 </template>
 
 <script setup>
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import * as XLSX from 'xlsx'
-import AppModal from '@/components/common/AppModal.vue'
+import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { downloadMerge, executeMerge, getMergeProgress, uploadFiles, uploadReference } from '@/api'
-import { showError, showSuccess } from '@/utils/message.js'
-import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
+import { showError } from '@/utils/message.js'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
+import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
+import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import defaultReferenceWorkbookUrl from '/data/参考表.xlsx?url'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
@@ -363,12 +307,13 @@ const { requireAuth } = useAuthGuard({
 
 const DEFAULT_REFERENCE_PATH = defaultReferenceWorkbookUrl
 const DEFAULT_REFERENCE_FILE_NAME = '参考表.xlsx'
-const MAIN_SHEET_NAME = '主表'
-const SUPPLEMENT_SHEET_NAME = '補充表'
 const MERGE_RESULT_FILE_NAME = '方音圖鑑_合併字表.xlsx'
 
 const currentStep = ref(1)
 const referenceFile = ref(null)
+const pendingReferenceFile = ref(null)
+const referenceImportConfirmKey = ref(0)
+const referenceImportPayload = ref(null)
 const mergeFiles = ref([])
 const processing = ref(false)
 const progress = ref(0)
@@ -379,6 +324,8 @@ const taskId = ref(null)
 
 const refInput = ref(null)
 const filesInput = ref(null)
+const requireExplicitConfirmation = ref(false)
+const forceReferencePreview = ref(false)
 
 const referenceStats = reactive({
   charCount: 0,
@@ -395,38 +342,146 @@ const mergeStats = reactive({
 })
 
 const mergedFilesList = ref([])
-const loadDefaultReferenceTask = useAsyncTask()
 const mergePollingTask = usePollingTask({
   intervalMs: 1000,
   maxFailures: 3,
 })
 
-// 默认参考表相关
-const showDefaultRefModal = ref(false)
-const currentTab = ref('main')
-const mainTableHeaders = ref([])
-const mainTableData = ref([])
-const supplementTableHeaders = ref([])
-const supplementTableData = ref([])
-const defaultRefWorkbook = ref(null)
-const maxDisplayRows = 500 // 限制显示行数，提升性能
-const isLoadingRef = loadDefaultReferenceTask.loading
-
-// 计算属性：限制显示的数据量
-const displayedMainData = computed(() => mainTableData.value.slice(0, maxDisplayRows))
-const displayedSupplementData = computed(() => supplementTableData.value.slice(0, maxDisplayRows))
-const hasMoreData = computed(() => {
-  if (currentTab.value === 'main') {
-    return mainTableData.value.length > maxDisplayRows
-  } else {
-    return supplementTableData.value.length > maxDisplayRows
+const isLoadingRef = computed(() => referencePreviewState.loading.value)
+const defaultReferenceSource = {
+  id: 'merge-default-reference',
+  kind: 'preset',
+  fileName: DEFAULT_REFERENCE_FILE_NAME,
+  displayName: DEFAULT_REFERENCE_FILE_NAME,
+  exportLabel: t('tools.merge.reference.downloadDefault'),
+  downloadable: true,
+  async resolveFile() {
+    const response = await fetch(DEFAULT_REFERENCE_PATH)
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+    const blob = await response.blob()
+    return new File([blob], DEFAULT_REFERENCE_FILE_NAME, {
+      type: blob.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    })
   }
+}
+const referenceImportSchema = computed(() => ([
+  {
+    key: 'char',
+    label: t('common.importPreview.schemas.mergeReference.char.label'),
+    required: true,
+    aliases: [
+      t('common.importPreview.schemas.mergeReference.char.aliases.char'),
+      t('common.importPreview.schemas.mergeReference.char.aliases.character'),
+      t('common.importPreview.schemas.mergeReference.char.aliases.word')
+    ],
+    description: t('common.importPreview.schemas.mergeReference.char.description'),
+    example: t('common.importPreview.schemas.mergeReference.char.example')
+  },
+  {
+    key: 'pronunciation',
+    label: t('common.importPreview.schemas.mergeReference.pronunciation.label'),
+    required: true,
+    aliases: [
+      t('common.importPreview.schemas.mergeReference.pronunciation.aliases.ipa'),
+      t('common.importPreview.schemas.mergeReference.pronunciation.aliases.phonetic'),
+      t('common.importPreview.schemas.mergeReference.pronunciation.aliases.sound')
+    ],
+    description: t('common.importPreview.schemas.mergeReference.pronunciation.description'),
+    example: t('common.importPreview.schemas.mergeReference.pronunciation.example')
+  },
+  {
+    key: 'note',
+    label: t('common.importPreview.schemas.mergeReference.note.label'),
+    required: false,
+    aliases: [
+      t('common.importPreview.schemas.mergeReference.note.aliases.remark'),
+      t('common.importPreview.schemas.mergeReference.note.aliases.comment')
+    ],
+    description: t('common.importPreview.schemas.mergeReference.note.description'),
+    example: t('common.importPreview.schemas.mergeReference.note.example')
+  }
+]))
+const referencePreviewState = useTabularImportPreview({
+  schema: referenceImportSchema,
+  requireExplicitConfirmation: () => forceReferencePreview.value || requireExplicitConfirmation.value
+})
+const referenceImportFlow = useTabularImportFlow({
+  previewState: referencePreviewState,
+  pendingFileRef: pendingReferenceFile,
+  payloadRef: referenceImportPayload,
+  confirmKeyRef: referenceImportConfirmKey,
+  beforePreview: async (file) => {
+    const authed = await requireAuth({
+      message: t('tools.merge.validation.loginRequired'),
+      redirect: '/explore/tools/merge',
+    })
+    if (!authed) {
+      return false
+    }
+
+    if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
+      showError(t('tools.merge.validation.invalidFileType'))
+      return false
+    }
+
+    if (file.size > 3 * 1024 * 1024) {
+      showError(t('tools.merge.validation.referenceFileTooLarge'))
+      return false
+    }
+
+    return true
+  },
+  createPreviewFile: async (file) => file,
+  onAutoApply: async () => {
+    await handleReferenceConfirm()
+  },
+  onPreviewError: (error) => {
+    showError(t('tools.merge.messages.previewFailed', { message: error.message }))
+  },
+  resetInput: () => {
+    if (refInput.value) {
+      refInput.value.value = ''
+    }
+  }
+})
+const referencePreviewSource = computed(() => {
+  if (!pendingReferenceFile.value) {
+    return null
+  }
+
+  const isDefaultReference = pendingReferenceFile.value.name === DEFAULT_REFERENCE_FILE_NAME
+  if (isDefaultReference) {
+    return defaultReferenceSource
+  }
+
+  return {
+    kind: 'upload',
+    file: pendingReferenceFile.value,
+    fileName: pendingReferenceFile.value.name,
+    displayName: pendingReferenceFile.value.name,
+    downloadable: true
+  }
+})
+const isDefaultReferencePreview = computed(() => referencePreviewSource.value?.kind === 'preset')
+const referenceImportSummary = computed(() => {
+  if (!referenceImportPayload.value) {
+    return ''
+  }
+
+  const mappedCount = Object.values(referenceImportPayload.value.mapping || {}).filter(Boolean).length
+  const columnCount = referenceImportPayload.value.sourceColumns?.length || 0
+  return t('common.importPreview.mergeReferenceSummary', {
+    mappedCount,
+    columnCount
+  })
 })
 
 const handleRefSelect = (event) => {
   const file = event.target.files[0]
   if (file) {
-    setReferenceFile(file)
+    referenceImportFlow.loadPreview(file)
   }
 }
 
@@ -434,7 +489,7 @@ const handleRefDrop = (event) => {
   dragOver1.value = false
   const file = event.dataTransfer.files[0]
   if (file) {
-    setReferenceFile(file)
+    referenceImportFlow.loadPreview(file)
   }
 }
 
@@ -458,7 +513,7 @@ const normalizePercentProgress = (value) => {
   return Math.min(100, Math.max(0, Math.round(numeric)))
 }
 
-const setReferenceFile = async (file) => {
+const setReferenceFile = async (file, options = {}) => {
   const authed = await requireAuth({
     message: t('tools.merge.validation.loginRequired'),
     redirect: '/explore/tools/merge',
@@ -467,7 +522,7 @@ const setReferenceFile = async (file) => {
     return
   }
 
-  if (!file.name.match(/\.(xlsx|xls)$/i)) {
+  if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
     showError(t('tools.merge.validation.invalidFileType'))
     return
   }
@@ -478,25 +533,35 @@ const setReferenceFile = async (file) => {
   }
 
   try {
-    const data = await uploadReference(file)
+    const data = await uploadReference(file, options)
 
     referenceFile.value = file
     taskId.value = data.task_id
 
     referenceStats.charCount = data.char_count || 0
     referenceStats.columnCount = data.column_count || 0
+    pendingReferenceFile.value = null
+    referenceImportPayload.value = null
+    referencePreviewState.resetState()
   } catch (error) {
     showError(t('tools.merge.messages.uploadFailed', { message: error.message }))
   }
 }
 
+const handleReferenceMappingUpdate = ({ fieldKey, sourceKey }) => {
+  referencePreviewState.updateMapping(fieldKey, sourceKey)
+  referenceImportPayload.value = referencePreviewState.summary.value
+}
+
+const clearPendingReference = () => {
+  referenceImportFlow.clearPreview()
+}
+
 const removeReference = () => {
   referenceFile.value = null
+  referenceImportFlow.clearPreview()
   referenceStats.charCount = 0
   referenceStats.columnCount = 0
-  if (refInput.value) {
-    refInput.value.value = ''
-  }
 }
 
 const handleFilesSelect = (event) => {
@@ -551,6 +616,42 @@ const goToStep = (step) => {
 const nextStep = () => {
   if (currentStep.value < 3) {
     currentStep.value++
+  }
+}
+
+const handleReferenceConfirm = async () => {
+  if (referenceFile.value) {
+    nextStep()
+    return
+  }
+
+  if (isDefaultReferencePreview.value) {
+    await setReferenceFile(pendingReferenceFile.value)
+    if (referenceFile.value) {
+      nextStep()
+    }
+    return
+  }
+
+  if (!pendingReferenceFile.value || !referenceImportPayload.value?.isComplete) {
+    showError(t('common.importPreview.messages.mappingIncomplete'))
+    return
+  }
+
+  const activeSheet = referencePreviewState.previewTable.value?.activeSheet
+  const columnMapping = {
+    headerChar: referencePreviewState.mapping.value.char || null,
+    headerIpa: referencePreviewState.mapping.value.pronunciation || null,
+    headerNotes: referencePreviewState.mapping.value.note || null
+  }
+
+  await setReferenceFile(pendingReferenceFile.value, {
+    columnMapping,
+    headerRowIndex: referencePreviewState.headerRowIndex.value,
+    sheetName: activeSheet?.name || null
+  })
+  if (referenceFile.value) {
+    nextStep()
   }
 }
 
@@ -647,78 +748,17 @@ const downloadMerged = async () => {
   }
 }
 
-const showDefaultReference = async () => {
+const previewDefaultReference = async () => {
   if (isLoadingRef.value) return
 
-  await loadDefaultReferenceTask.run(async () => {
-    const response = await fetch(DEFAULT_REFERENCE_PATH)
-    const arrayBuffer = await response.arrayBuffer()
-    const workbook = XLSX.read(arrayBuffer, { type: 'array' })
-
-    defaultRefWorkbook.value = workbook
-
-    if (workbook.SheetNames.includes(MAIN_SHEET_NAME)) {
-      const mainSheet = workbook.Sheets[MAIN_SHEET_NAME]
-      const mainData = XLSX.utils.sheet_to_json(mainSheet, { header: 1 })
-      if (mainData.length > 0) {
-        mainTableHeaders.value = mainData[0]
-        mainTableData.value = mainData.slice(1)
-      }
-    }
-
-    if (workbook.SheetNames.includes(SUPPLEMENT_SHEET_NAME)) {
-      const supplementSheet = workbook.Sheets[SUPPLEMENT_SHEET_NAME]
-      const supplementData = XLSX.utils.sheet_to_json(supplementSheet, { header: 1 })
-      if (supplementData.length > 0) {
-        supplementTableHeaders.value = supplementData[0]
-        supplementTableData.value = supplementData.slice(1)
-      }
-    }
-
-    showDefaultRefModal.value = true
-    currentTab.value = 'main'
-  }, {
-    onError: (error) => {
-      showError(t('tools.merge.messages.readDefaultFailed', { message: error.message }))
-    }
-  })
-}
-
-const downloadDefaultReference = async () => {
+  forceReferencePreview.value = true
   try {
-    const response = await fetch(DEFAULT_REFERENCE_PATH)
-    const blob = await response.blob()
-
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = DEFAULT_REFERENCE_FILE_NAME
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
-
-    showSuccess(t('tools.merge.messages.defaultDownloaded'))
+    const file = await defaultReferenceSource.resolveFile()
+    await referenceImportFlow.loadPreview(file)
   } catch (error) {
-    showError(t('tools.merge.messages.downloadFailed', { message: error.message }))
-  }
-}
-
-const useDefaultReference = async () => {
-  try {
-    const wbout = XLSX.write(defaultRefWorkbook.value, { bookType: 'xlsx', type: 'array' })
-    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-
-    const file = new File([blob], DEFAULT_REFERENCE_FILE_NAME, {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    })
-
-    await setReferenceFile(file)
-
-    showDefaultRefModal.value = false
-    showSuccess(t('tools.merge.messages.useDefaultSuccess'))
-  } catch (error) {
-    showError(t('tools.merge.messages.useDefaultFailed', { message: error.message }))
+    showError(t('tools.merge.messages.readDefaultFailed', { message: error.message }))
+  } finally {
+    forceReferencePreview.value = false
   }
 }
 
@@ -726,6 +766,7 @@ const reset = () => {
   mergePollingTask.stop()
   currentStep.value = 1
   referenceFile.value = null
+  referenceImportFlow.clearPreview()
   mergeFiles.value = []
   processing.value = false
   progress.value = 0
@@ -740,8 +781,13 @@ const reset = () => {
   if (filesInput.value) filesInput.value.value = ''
 }
 </script>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
-<style scoped>
+$color-text: var(--text-deep);
+$color-primary: var(--color-primary);
+$color-success: var(--color-success);
+$color-danger: var(--color-error-light);
 .merge-tool-container {
   height: 80%;
   display: flex;
@@ -752,10 +798,9 @@ const reset = () => {
 }
 
 .glass-container {
-  width: min(95vw, 900px);
+  width: min(95dvw, 800px);
   padding: 30px 40px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   overflow: hidden;
 }
@@ -765,89 +810,90 @@ const reset = () => {
 }
 
 .title {
+  margin: 0;
   font-size: 28px;
   font-weight: 600;
-  color: #0b2540;
-  margin: 0;
+  color: $color-text;
 }
 
 .subtitle {
-  font-size: 14px;
-  color: rgba(11, 37, 64, 0.7);
   margin: 0;
+  font-size: 14px;
+  color: rgba(var(--text-deep-rgb), 0.7);
 }
 
 .steps-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 16px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 20px;
+  background: var(--glass-40);
+  border-radius: var(--radius-xl);
 }
 
 .step {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 8px;
   cursor: default;
   transition: all 0.3s ease;
-}
 
-.step.completed {
-  cursor: pointer;
-}
+  &.completed {
+    cursor: pointer;
 
-.step-number {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.5);
-  border: 2px solid rgba(11, 37, 64, 0.2);
-  border-radius: 50%;
-  font-size: 18px;
-  font-weight: 600;
-  color: rgba(11, 37, 64, 0.5);
-  transition: all 0.3s ease;
-}
+    .step-number {
+      background: rgba(var(--color-success-rgb), 0.7);
+      border-color: rgba(var(--color-success-rgb), 0.6);
+      color: white;
+    }
+  }
 
-.step.active .step-number {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.8), rgba(0, 122, 255, 0.6));
-  border-color: rgba(0, 122, 255, 0.6);
-  color: white;
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
-}
+  &.active {
+    .step-number {
+      background: linear-gradient(
+        135deg,
+        rgba(var(--color-primary-rgb), 0.8),
+        rgba(var(--color-primary-rgb), 0.6)
+      );
+      border-color: rgba(var(--color-primary-rgb), 0.6);
+      color: white;
+      box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
+    }
 
-.step.completed .step-number {
-  background: rgba(52, 199, 89, 0.7);
-  border-color: rgba(52, 199, 89, 0.6);
-  color: white;
-}
+    .step-label {
+      color: $color-text;
+    }
+  }
 
-.step-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(11, 37, 64, 0.6);
-  transition: color 0.3s ease;
-}
+  &-number {
+    width: 48px;
+    height: 48px;
+    @include flex-center;
+    background: var(--glass-50);
+    border: 2px solid rgba(var(--text-deep-rgb), 0.2);
+    border-radius: var(--radius-full);
+    font-size: 18px;
+    font-weight: 600;
+    color: rgba(var(--text-deep-rgb), 0.5);
+    transition: all 0.3s ease;
+  }
 
-.step.active .step-label {
-  color: #0b2540;
-}
+  &-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(var(--text-deep-rgb), 0.6);
+    transition: color 0.3s ease;
+  }
 
-.step-line {
-  width: 60px;
-  height: 2px;
-  background: rgba(11, 37, 64, 0.2);
-  transition: background 0.3s ease;
-}
+  &-line {
+    width: 60px;
+    height: 2px;
+    background: rgba(var(--text-deep-rgb), 0.2);
+    transition: background 0.3s ease;
 
-.step-line.active {
-  background: rgba(0, 122, 255, 0.6);
+    &.active {
+      background: rgba(var(--color-primary-rgb), 0.6);
+    }
+  }
 }
 
 .content-area {
@@ -857,10 +903,24 @@ const reset = () => {
 }
 
 .step-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
   animation: fadeIn 0.4s ease;
+}
+
+.step-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: $color-text;
+  text-align: center;
+}
+
+.step-desc {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(var(--text-deep-rgb), 0.7);
+  text-align: center;
 }
 
 @keyframes fadeIn {
@@ -868,58 +928,56 @@ const reset = () => {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.step-title {
-  font-size: 22px;
-  font-weight: 600;
-  color: #0b2540;
-  margin: 0;
-  text-align: center;
-}
+.upload {
+  &-zone {
+    padding: 10px 40px;
+    @include flex-col;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background: var(--glass-40);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px dashed rgba(var(--color-primary-rgb), 0.3);
+    border-radius: var(--radius-2xl);
+    cursor: pointer;
+    transition: all 0.3s ease;
 
-.step-desc {
-  font-size: 14px;
-  color: rgba(11, 37, 64, 0.7);
-  margin: 0;
-  text-align: center;
-}
+    &:hover {
+      background: rgba(var(--color-primary-rgb), 0.05);
+      border-color: rgba(var(--color-primary-rgb), 0.6);
+    }
 
-.upload-zone {
-  padding: 10px 40px;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 2px dashed rgba(0, 122, 255, 0.3);
-  border-radius: 24px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-}
+    &.has-file {
+      cursor: default;
+      border-style: solid;
+      background: rgba(var(--color-success-rgb), 0.05);
+      border-color: rgba(var(--color-success-rgb), 0.4);
+    }
+  }
 
-.upload-zone:hover {
-  background: rgba(0, 122, 255, 0.05);
-  border-color: rgba(0, 122, 255, 0.6);
-}
+  &-icon {
+    font-size: 40px;
+    animation: float 3s ease-in-out infinite;
+  }
 
-.upload-zone.has-file {
-  cursor: default;
-  border-style: solid;
-  background: rgba(52, 199, 89, 0.05);
-  border-color: rgba(52, 199, 89, 0.4);
-}
+  &-text {
+    font-size: 18px;
+    font-weight: 500;
+    color: $color-text;
+  }
 
-.upload-icon {
-  font-size: 40px;
-  animation: float 3s ease-in-out infinite;
+  &-hint {
+    font-size: 13px;
+    color: rgba(var(--text-deep-rgb), 0.6);
+  }
 }
 
 @keyframes float {
@@ -927,135 +985,124 @@ const reset = () => {
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-8px);
   }
 }
 
-.upload-text {
-  font-size: 18px;
-  font-weight: 500;
-  color: #0b2540;
-}
+.file {
+  &-info-card {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    background: var(--glass-60);
+    border-radius: var(--radius-lg);
+  }
 
-.upload-hint {
-  font-size: 13px;
-  color: rgba(11, 37, 64, 0.6);
-}
+  &-icon {
+    font-size: 36px;
+  }
 
-.file-info-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px 24px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 16px;
-  width: 100%;
-  max-width: 500px;
-}
+  &-details {
+    flex: 1;
+    @include flex-col;
+    gap: 6px;
+  }
 
-.file-icon {
-  font-size: 36px;
-}
+  &-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: $color-text;
+  }
 
-.file-details {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+  &-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: rgba(var(--text-deep-rgb), 0.7);
+  }
 
-.file-name {
-  font-size: 15px;
-  font-weight: 500;
-  color: #0b2540;
-}
+  &-items {
+    @include flex-col;
+    gap: 8px;
+    overflow-y: auto;
+    padding: 12px;
+    background: var(--glass-30);
+    border-radius: var(--radius-lg);
+  }
 
-.file-meta {
-  display: flex;
-  gap: 16px;
-  font-size: 13px;
-  color: rgba(11, 37, 64, 0.7);
+  &-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--glass-50);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: var(--glass-70);
+    }
+
+    &-icon {
+      font-size: 20px;
+    }
+
+    &-name {
+      flex: 1;
+      font-size: 14px;
+      color: $color-text;
+    }
+
+    &-remove {
+      width: 28px;
+      height: 28px;
+      background: rgba(var(--color-error-light-rgb), 0.2);
+      border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(var(--color-error-light-rgb), 0.7);
+        transform: scale(1.1);
+      }
+    }
+  }
 }
 
 .remove-btn {
   width: 32px;
   height: 32px;
-  background: rgba(255, 59, 48, 0.2);
-  border: 1px solid rgba(255, 59, 48, 0.4);
-  border-radius: 8px;
+  background: rgba(var(--color-error-light-rgb), 0.2);
+  border: 1px solid rgba(var(--color-error-light-rgb), 0.4);
+  border-radius: var(--radius-sm2);
   font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-}
 
-.remove-btn:hover {
-  background: rgba(255, 59, 48, 0.7);
-  color: white;
-  transform: scale(1.1);
+  &:hover {
+    background: rgba(var(--color-error-light-rgb), 0.7);
+    color: white;
+    transform: scale(1.1);
+  }
 }
 
 .files-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
 }
 
 .list-title {
+  margin: 0;
   font-size: 15px;
   font-weight: 600;
-  color: #0b2540;
-  margin: 0;
-}
-
-.file-items {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow-y: auto;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 16px;
-}
-
-.file-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
-  transition: all 0.2s ease;
-}
-
-.file-item:hover {
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.file-item-icon {
-  font-size: 20px;
-}
-
-.file-item-name {
-  flex: 1;
-  font-size: 14px;
-  color: #0b2540;
-}
-
-.file-item-remove {
-  width: 28px;
-  height: 28px;
-  background: rgba(255, 59, 48, 0.2);
-  border: 1px solid rgba(255, 59, 48, 0.3);
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.file-item-remove:hover {
-  background: rgba(255, 59, 48, 0.7);
-  transform: scale(1.1);
+  color: $color-text;
 }
 
 .step-actions {
@@ -1067,250 +1114,281 @@ const reset = () => {
 
 .processing-view,
 .complete-view {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   gap: 20px;
   padding: 15px 20px;
 }
 
-.processing-icon {
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.processing {
+  &-icon {
+    width: 80px;
+    height: 80px;
+    @include flex-center;
+  }
+
+  &-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: $color-text;
+  }
+
+  &-text {
+    margin: 0;
+    font-size: 15px;
+    color: rgba(var(--text-deep-rgb), 0.7);
+  }
+
+  &-details {
+    display: flex;
+    gap: 24px;
+    padding: 20px 32px;
+    background: var(--glass-40);
+    border-radius: var(--radius-lg);
+  }
 }
 
+.complete {
+  &-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: $color-text;
+  }
 
+  &-text {
+    margin: 0;
+    font-size: 15px;
+    color: rgba(var(--text-deep-rgb), 0.7);
+  }
 
-.processing-title,
-.complete-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #0b2540;
-  margin: 0;
+  &-icon {
+    font-size: 80px;
+    animation: scaleIn 0.5s ease;
+  }
 }
 
-.processing-text,
-.complete-text {
-  font-size: 15px;
-  color: rgba(11, 37, 64, 0.7);
-  margin: 0;
-}
+.progress {
+  &-container {
+    width: 100%;
+    max-width: 400px;
+    @include flex-col;
+    gap: 8px;
+  }
 
-.progress-container {
-  width: 100%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+  &-bar {
+    width: 100%;
+    height: 12px;
+    overflow: hidden;
+    background: var(--glass-50);
+    border-radius: var(--radius-sm);
+  }
 
-.progress-bar {
-  width: 100%;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 6px;
-  overflow: hidden;
-}
+  &-fill {
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(var(--color-primary-rgb), 0.8),
+      rgba(0, 195, 255, 0.8)
+    );
+    border-radius: var(--radius-sm);
+    transition: width 0.3s ease;
+  }
 
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, rgba(0, 122, 255, 0.8), rgba(0, 195, 255, 0.8));
-  border-radius: 6px;
-  transition: width 0.3s ease;
-}
-
-.progress-label {
-  text-align: center;
-  font-size: 14px;
-  font-weight: 600;
-  color: #0b2540;
-}
-
-.processing-details {
-  display: flex;
-  gap: 24px;
-  padding: 20px 32px;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 16px;
+  &-label {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: $color-text;
+  }
 }
 
 .detail-item {
   display: flex;
   gap: 8px;
   font-size: 14px;
-}
 
-.detail-item .label {
-  color: rgba(11, 37, 64, 0.7);
-}
+  .label {
+    color: rgba(var(--text-deep-rgb), 0.7);
+  }
 
-.detail-item .value {
-  font-weight: 600;
-  color: #0b2540;
-}
+  .value {
+    font-weight: 600;
+    color: $color-text;
 
-.detail-item .value.success {
-  color: #34c759;
-}
-
-.complete-icon {
-  font-size: 80px;
-  animation: scaleIn 0.5s ease;
+    &.success {
+      color: $color-success;
+    }
+  }
 }
 
 @keyframes scaleIn {
   from {
-    transform: scale(0);
     opacity: 0;
+    transform: scale(0);
   }
+
   to {
-    transform: scale(1);
     opacity: 1;
+    transform: scale(1);
   }
 }
 
-.result-summary {
-  display: flex;
-  gap: 16px;
+.result {
+  &-summary {
+    display: flex;
+    gap: 16px;
+  }
+
+  &-actions {
+    display: flex;
+    gap: 16px;
+  }
 }
 
-.summary-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 28px;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 20px;
-  min-width: 140px;
+.summary {
+  &-card {
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 28px;
+    background: var(--glass-50);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-60);
+    border-radius: var(--radius-xl);
+  }
+
+  &-icon {
+    font-size: 32px;
+  }
+
+  &-content {
+    @include flex-col;
+    gap: 4px;
+  }
+
+  &-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: $color-text;
+  }
+
+  &-label {
+    font-size: 13px;
+    color: rgba(var(--text-deep-rgb), 0.7);
+  }
 }
 
-.summary-icon {
-  font-size: 32px;
-}
+.merged {
+  &-files-info {
+    width: 100%;
+    max-width: 500px;
+    margin-top: 16px;
+  }
 
-.summary-content {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+  &-list {
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 12px;
+    background: var(--glass-30);
+    border-radius: var(--radius-lg);
+  }
 
-.summary-number {
-  font-size: 28px;
-  font-weight: 700;
-  color: #0b2540;
-}
+  &-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    padding: 10px 12px;
+    background: var(--glass-50);
+    border-radius: var(--radius-md);
+    font-size: 14px;
 
-.summary-label {
-  font-size: 13px;
-  color: rgba(11, 37, 64, 0.7);
-}
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 
-.result-actions {
-  display: flex;
-  gap: 16px;
-}
+  &-index {
+    width: 24px;
+    height: 24px;
+    @include flex-center;
+    background: rgba(var(--color-primary-rgb), 0.2);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(var(--color-primary-rgb), 0.9);
+  }
 
-.merged-files-info {
-  width: 100%;
-  max-width: 500px;
-  margin-top: 16px;
+  &-name {
+    flex: 1;
+    color: $color-text;
+  }
+
+  &-status {
+    font-size: 12px;
+    font-weight: 500;
+    color: $color-success;
+  }
 }
 
 .info-title {
+  margin: 0 0 12px;
   font-size: 15px;
   font-weight: 600;
-  color: #0b2540;
-  margin: 0 0 12px 0;
+  color: $color-text;
 }
 
-.merged-list {
-  max-height: 150px;
-  overflow-y: auto;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 16px;
-}
+/* 默认参考表模态框 */
+.merge-default-ref {
+  &-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 12px 28px;
+    background: var(--glass-30);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
 
-.merged-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
-  margin-bottom: 8px;
-  font-size: 14px;
-}
+  &-content {
+    min-height: 0;
+  }
 
-.merged-item:last-child {
-  margin-bottom: 0;
-}
-
-.merged-index {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  background: rgba(0, 122, 255, 0.2);
-  border-radius: 50%;
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(0, 122, 255, 0.9);
-}
-
-.merged-name {
-  flex: 1;
-  color: #0b2540;
-}
-
-.merged-status {
-  font-size: 12px;
-  color: #34c759;
-  font-weight: 500;
-}
-
-/* 模态弹窗样式 */
-.merge-default-ref-tabs {
-  display: flex;
-  gap: 8px;
-  padding: 12px 28px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.merge-default-ref-content {
-  min-height: 0;
+  &-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin: 0 -24px -20px;
+    padding: 16px 24px;
+    background: var(--glass-30);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
 }
 
 .tab-btn {
   padding: 8px 16px;
-  border: none;
   background: transparent;
-  border-radius: 10px;
+  border: none;
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
-  color: rgba(11, 37, 64, 0.7);
+  color: rgba(var(--text-deep-rgb), 0.7);
   cursor: pointer;
   transition: all 0.2s ease;
-}
 
-.tab-btn:hover {
-  background: rgba(255, 255, 255, 0.6);
-  color: #0b2540;
-}
+  &:hover {
+    background: var(--glass-60);
+    color: $color-text;
+  }
 
-.tab-btn.active {
-  background: rgba(0, 122, 255, 0.12);
-  color: #007aff;
-  font-weight: 600;
+  &.active {
+    background: rgba(var(--color-primary-rgb), 0.12);
+    color: $color-primary;
+    font-weight: 600;
+  }
 }
 
 .table-container {
@@ -1324,64 +1402,57 @@ const reset = () => {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
-}
 
-.data-table thead {
-  position: sticky;
-  top: 0;
-  background: rgba(0, 122, 255, 0.08);
-  z-index: 10;
-}
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(var(--color-primary-rgb), 0.08);
+  }
 
-.data-table th {
-  padding: 10px 12px;
-  text-align: left;
-  font-weight: 600;
-  color: #0b2540;
-  border-bottom: 2px solid rgba(0, 122, 255, 0.2);
-  white-space: nowrap;
-  font-size: 13px;
-}
+  th {
+    padding: 10px 12px;
+    border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
+    text-align: left;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 600;
+    color: $color-text;
+  }
 
-.data-table td {
-  padding: 8px 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  color: rgba(11, 37, 64, 0.85);
-  font-size: 13px;
-}
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    font-size: 13px;
+    color: rgba(var(--text-deep-rgb), 0.85);
+  }
 
-.data-table tbody tr:hover {
-  background: rgba(0, 122, 255, 0.04);
+  tbody {
+    tr {
+      &:hover {
+        background: rgba(var(--color-primary-rgb), 0.04);
+      }
+    }
+  }
 }
 
 .load-more-hint {
+  margin-top: 8px;
   padding: 12px;
+  background: var(--glass-40);
+  border-radius: var(--radius-sm2);
   text-align: center;
   font-size: 12px;
-  color: rgba(11, 37, 64, 0.5);
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 8px;
-  margin-top: 8px;
-}
-
-.merge-default-ref-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin: 0 -24px -20px;
-  padding: 16px 24px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.3);
+  color: rgba(var(--text-deep-rgb), 0.5);
 }
 
 @media (max-width: 768px) {
   .glass-container {
-    padding: 20px 16px;
-    border-radius: 20px;
     width: 100%;
     min-height: auto;
+    padding: 20px 16px;
+    border-radius: var(--radius-xl);
   }
-
 
   .title {
     font-size: 22px;
@@ -1400,21 +1471,21 @@ const reset = () => {
 
   .step {
     min-width: 80px;
-  }
 
-  .step-number {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-  }
+    &-number {
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+    }
 
-  .step-label {
-    font-size: 12px;
-  }
+    &-label {
+      font-size: 12px;
+    }
 
-  .step-line {
-    width: 30px;
-    min-width: 30px;
+    &-line {
+      width: 30px;
+      min-width: 30px;
+    }
   }
 
   .content-area {
@@ -1429,39 +1500,56 @@ const reset = () => {
     font-size: 13px;
   }
 
-  .upload-zone {
-    padding: 24px 20px;
-    border-radius: 16px;
+  .upload {
+    &-zone {
+      padding: 24px 20px;
+      border-radius: var(--radius-lg);
+    }
+
+    &-icon {
+      font-size: 48px;
+    }
+
+    &-text {
+      font-size: 15px;
+    }
+
+    &-hint {
+      font-size: 12px;
+    }
   }
 
-  .upload-icon {
-    font-size: 48px;
-  }
+  .file {
+    &-info-card {
+      gap: 10px;
+      padding: 12px;
+    }
 
-  .upload-text {
-    font-size: 15px;
-  }
+    &-details {
+      gap: 6px;
+    }
 
-  .upload-hint {
-    font-size: 12px;
-  }
+    &-name {
+      font-size: 14px;
+    }
 
-  .file-info-card {
-    padding: 12px;
-    gap: 10px;
-  }
+    &-meta {
+      flex-wrap: wrap;
+      font-size: 12px;
+    }
 
-  .file-details {
-    gap: 6px;
-  }
+    &-items {
+      gap: 8px;
+    }
 
-  .file-name {
-    font-size: 14px;
-  }
+    &-item {
+      gap: 10px;
+      padding: 10px 12px;
 
-  .file-meta {
-    font-size: 12px;
-    flex-wrap: wrap;
+      &-name {
+        font-size: 13px;
+      }
+    }
   }
 
   .files-list {
@@ -1470,19 +1558,6 @@ const reset = () => {
 
   .list-title {
     font-size: 15px;
-  }
-
-  .file-items {
-    gap: 8px;
-  }
-
-  .file-item {
-    padding: 10px 12px;
-    gap: 10px;
-  }
-
-  .file-item-name {
-    font-size: 13px;
   }
 
   .step-actions {
@@ -1498,91 +1573,114 @@ const reset = () => {
     padding: 8px 24px;
   }
 
-  .processing-icon {
-    width: 80px;
-    height: 80px;
-  }
+  .processing {
+    &-icon {
+      width: 80px;
+      height: 80px;
+    }
 
+    &-title {
+      font-size: 20px;
+    }
 
-  .processing-title {
-    font-size: 20px;
-  }
+    &-text {
+      font-size: 14px;
+    }
 
-  .processing-text {
-    font-size: 14px;
+    &-details {
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px 20px;
+    }
   }
 
   .progress-bar-container {
     max-width: 100%;
   }
 
-  .processing-details {
-    flex-direction: column;
-    gap: 12px;
-    padding: 16px 20px;
+  .complete {
+    &-icon {
+      font-size: 60px;
+    }
+
+    &-title {
+      font-size: 22px;
+    }
   }
 
-  .complete-icon {
-    font-size: 60px;
+  .result {
+    &-summary {
+      width: 100%;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    &-actions {
+      width: 100%;
+      flex-direction: column;
+      gap: 10px;
+    }
   }
 
-  .complete-title {
-    font-size: 22px;
+  .summary {
+    &-card {
+      width: 100%;
+      padding: 16px;
+    }
+
+    &-number {
+      font-size: 26px;
+    }
+
+    &-label {
+      font-size: 13px;
+    }
   }
 
-  .result-summary {
-    flex-direction: column;
-    width: 100%;
-    gap: 12px;
-  }
+  .merged {
+    &-files-info {
+      margin-top: 20px;
+    }
 
-  .summary-card {
-    width: 100%;
-    padding: 16px;
-  }
+    &-list {
+      gap: 8px;
+    }
 
-  .summary-number {
-    font-size: 26px;
-  }
-
-  .summary-label {
-    font-size: 13px;
-  }
-
-  .result-actions {
-    flex-direction: column;
-    width: 100%;
-    gap: 10px;
-  }
-
-  .merged-files-info {
-    margin-top: 20px;
+    &-item {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
   }
 
   .info-title {
     font-size: 15px;
   }
 
-  .merged-list {
-    gap: 8px;
-  }
-
-  .merged-item {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-
   /* 默认参考表模态框移动端适配 */
-  .merge-default-ref-tabs {
-    padding: 10px 16px;
-    gap: 6px;
-    overflow-x: auto;
+  .merge-default-ref {
+    &-tabs {
+      gap: 6px;
+      padding: 10px 16px;
+      overflow-x: auto;
+    }
+
+    &-footer {
+      flex-direction: column;
+      gap: 8px;
+      margin-inline: -24px;
+      margin-bottom: -20px;
+      padding: 12px 16px;
+
+      .main-glass-button {
+        width: 100%;
+      }
+    }
   }
 
   .tab-btn {
     padding: 8px 14px;
-    font-size: 13px;
     white-space: nowrap;
+    font-size: 13px;
   }
 
   .table-container {
@@ -1592,28 +1690,16 @@ const reset = () => {
 
   .data-table {
     font-size: 11px;
-  }
 
-  .data-table th,
-  .data-table td {
-    padding: 6px 8px;
+    th,
+    td {
+      padding: 6px 8px;
+    }
   }
 
   .load-more-hint {
     padding: 10px;
     font-size: 11px;
-  }
-
-  .merge-default-ref-footer {
-    margin-inline: -24px;
-    margin-bottom: -20px;
-    padding: 12px 16px;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .merge-default-ref-footer .main-glass-button {
-    width: 100%;
   }
 }
 
@@ -1628,23 +1714,25 @@ const reset = () => {
   }
 
   .steps-indicator {
-    padding: 8px;
     gap: 6px;
+    padding: 8px;
   }
 
-  .step-number {
-    width: 28px;
-    height: 28px;
-    font-size: 12px;
-  }
+  .step {
+    &-number {
+      width: 28px;
+      height: 28px;
+      font-size: 12px;
+    }
 
-  .step-label {
-    font-size: 11px;
-  }
+    &-label {
+      font-size: 11px;
+    }
 
-  .step-line {
-    width: 20px;
-    min-width: 20px;
+    &-line {
+      width: 20px;
+      min-width: 20px;
+    }
   }
 
   .upload-zone {
@@ -1653,12 +1741,11 @@ const reset = () => {
 
   .data-table {
     font-size: 10px;
-  }
 
-  .data-table th,
-  .data-table td {
-    padding: 4px 6px;
+    th,
+    td {
+      padding: 4px 6px;
+    }
   }
 }
-
 </style>

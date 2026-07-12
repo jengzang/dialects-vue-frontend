@@ -43,12 +43,12 @@
 
           <div class="form-group">
             <label>返回數量:</label>
-            <input v-model.number="topK" type="number" min="1" max="50" class="number-input" />
+            <input v-model.number="topK" type="number" min="1" max="50" class="vml-number-input" />
           </div>
 
           <div class="form-group">
             <label>最小相似度:</label>
-            <input v-model.number="minSimilarity" type="number" min="0" max="1" step="0.1" class="number-input" />
+            <input v-model.number="minSimilarity" type="number" min="0" max="1" step="0.1" class="vml-number-input" />
           </div>
           <button
             class="query-button"
@@ -63,7 +63,7 @@
       </div>
 
       <!-- Search Results -->
-      <div v-if="loadingSearch" class="loading-state vml-glass-panel">
+      <div v-if="loadingSearch" class="vml-loading vml-glass-panel">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -154,7 +154,7 @@
       </div>
 
       <!-- Pair Results -->
-      <div v-if="loadingPair" class="loading-state vml-glass-panel">
+      <div v-if="loadingPair" class="vml-loading vml-glass-panel">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -270,7 +270,7 @@
       </div>
 
       <!-- Matrix Results -->
-      <div v-if="loadingMatrix" class="loading-state vml-glass-panel">
+      <div v-if="loadingMatrix" class="vml-loading vml-glass-panel">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -555,7 +555,7 @@ export default {
           left: 'center',
           bottom: '5%',
           inRange: {
-            color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+            color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d32f2f', '#962020']
           }
         },
         series: [{
@@ -628,7 +628,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .region-similarity-page {
   padding: 20px;
   max-width: 1400px;
@@ -639,7 +641,7 @@ export default {
   font-size: 28px;
   font-weight: 600;
   margin-bottom: 24px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .vml-glass-panel {
@@ -655,10 +657,16 @@ export default {
   padding: 12px;
 }
 
+.query-form {
+  @include flex-col;
+}
+
 .query-form h3 {
-  margin-bottom: 16px;
-  font-size: 20px;
-  color: var(--text-primary, #2c3e50);
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .form-group {
@@ -669,7 +677,7 @@ export default {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .form-row {
@@ -683,26 +691,24 @@ export default {
   min-width: 200px;
 }
 
-.select-input,
-.number-input {
+.vml-number-input {
   padding: 10px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
+  background: var(--glass-80);
   font-size: 14px;
   transition: border-color 0.3s ease;
 }
 
-.select-input:focus,
-.number-input:focus {
+.vml-number-input:focus {
   outline: none;
-  border-color: var(--color-primary, #4a90e2);
+  border-color: var(--color-primary, var(--vml-blue));
 }
 
 .results-header h3 {
   margin: 0;
   font-size: 20px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .results-grid {
@@ -723,10 +729,10 @@ export default {
 }
 
 .rank-badge {
-  background: var(--color-primary, #4a90e2);
+  background: var(--color-primary, var(--vml-blue));
   color: white;
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   font-size: 14px;
 }
@@ -734,7 +740,7 @@ export default {
 .card-header h4 {
   margin: 0;
   font-size: 18px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .similarity-bar-container {
@@ -745,19 +751,19 @@ export default {
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 8px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .similarity-bar {
   height: 24px;
-  background: rgba(74, 144, 226, 0.1);
-  border-radius: 12px;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
 .similarity-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary, #4a90e2), var(--color-success, #50c878));
+  background: linear-gradient(90deg, var(--color-primary, var(--vml-blue)), var(--color-success));
   transition: width 0.3s ease;
 }
 
@@ -772,23 +778,23 @@ export default {
 .char-label {
   font-size: 13px;
   font-weight: 500;
-  color: #666;
+  color: var(--text-tertiary);
   margin-bottom: 4px;
 }
 
 .char-list {
   font-size: 14px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
   line-height: 1.6;
 }
 
 .detail-button {
   width: 100%;
   padding: 8px 16px;
-  background: rgba(74, 144, 226, 0.1);
-  color: var(--color-primary, #4a90e2);
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  color: var(--color-primary, var(--vml-blue));
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -796,15 +802,15 @@ export default {
 }
 
 .detail-button:hover {
-  background: rgba(74, 144, 226, 0.2);
-  border-color: var(--color-primary, #4a90e2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  border-color: var(--color-primary, var(--vml-blue));
 }
 
 .similarity-metrics h3,
 .comparison-details h3 {
   margin-bottom: 16px;
   font-size: 20px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .metrics-grid {
@@ -816,20 +822,20 @@ export default {
 .metric-card {
   text-align: center;
   padding: 20px;
-  background: rgba(74, 144, 226, 0.05);
-  border-radius: 8px;
+  background: rgba(var(--vml-blue-rgb), 0.05);
+  border-radius: var(--radius-sm2);
 }
 
 .metric-label {
   font-size: 14px;
-  color: #666;
+  color: var(--text-tertiary);
   margin-bottom: 8px;
 }
 
 .metric-value {
   font-size: 32px;
   font-weight: 600;
-  color: var(--color-primary, #4a90e2);
+  color: var(--color-primary, var(--vml-blue));
 }
 
 .comparison-grid {
@@ -840,7 +846,7 @@ export default {
 .comparison-section h4 {
   margin-bottom: 12px;
   font-size: 16px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .char-cloud {
@@ -851,24 +857,24 @@ export default {
 
 .char-tag {
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
 }
 
 .char-tag.common {
-  background: rgba(80, 200, 120, 0.2);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .char-tag.unique1 {
-  background: rgba(74, 144, 226, 0.2);
-  color: #4a90e2;
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  color: var(--vml-blue);
 }
 
 .char-tag.unique2 {
-  background: rgba(243, 156, 18, 0.2);
-  color: #f39c12;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning);
 }
 
 .region-selector {
@@ -878,10 +884,10 @@ export default {
 
 .add-button {
   padding: 10px 24px;
-  background: var(--color-success, #50c878);
+  background: var(--color-success);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -890,11 +896,11 @@ export default {
 }
 
 .add-button:hover:not(:disabled) {
-  background: #45b369;
+  background: var(--color-success);
 }
 
 .add-button:disabled {
-  background: #ccc;
+  background: var(--border-gray);
   cursor: not-allowed;
 }
 
@@ -910,38 +916,44 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background: rgba(74, 144, 226, 0.1);
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 20px;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-xl);
   font-size: 14px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .remove-button {
   background: none;
   border: none;
-  color: #e74c3c;
+  color: var(--color-error);
   font-size: 20px;
   font-weight: bold;
   cursor: pointer;
   padding: 0;
   width: 20px;
   height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  @include flex-center;
+  border-radius: var(--radius-full);
   transition: background 0.3s ease;
 }
 
 .remove-button:hover {
-  background: rgba(231, 76, 60, 0.1);
+  background: rgba(var(--color-error-rgb), 0.1);
 }
 
 .heatmap-container {
   width: 100%;
   height: 600px;
   min-height: 400px;
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .query-form {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 12px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -961,7 +973,7 @@ export default {
   .mode-button{
     padding: 6px;
   }
-  .number-input{
+  .vml-number-input{
     width: 100%;
   }
 }

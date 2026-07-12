@@ -159,7 +159,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { createOrUpdateCustomRegion, deleteCustomRegion, getLocationPartitions } from '@/api'
 import PartitionInfoModal from '@/main/components/geo/PartitionInfoModal.vue'
-import UserRegionEditPopup from '@/main/components/popup/user/UserRegionEditPopup.vue'
+import UserRegionEditPopup from '@/main/components/user/popups/UserRegionEditPopup.vue'
 import { CUSTOM_REGION_MAX_LOCATIONS } from '@/main/config/constants.js'
 import { useCustomRegionStore } from '@/main/store/customRegionStore'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
@@ -509,15 +509,17 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-$region-text: #0f172a;
-$region-muted: #64748b;
-$region-soft: #94a3b8;
-$region-accent: #007aff;
-$region-danger: #ff3b30;
-$region-success: #34c759;
-$region-border: rgba(148, 163, 184, 0.22);
-$region-glass-border: rgba(255, 255, 255, 0.58);
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$region-text: var(--text-deep);
+$region-muted: var(--text-tertiary);
+$region-soft: var(--text-slate-light);
+$region-accent: var(--color-primary);
+$region-danger: var(--color-error-light);
+$region-success: var(--color-success);
+$region-border: rgba(var(--text-slate-light-rgb), 0.22);
+$region-glass-border: var(--glass-60);
 
 @mixin glass-panel($radius: 24px, $padding: 18px) {
   position: relative;
@@ -525,25 +527,25 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
   border: 1px solid $region-glass-border;
   border-radius: $radius;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.4)),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.3));
+    linear-gradient(135deg, var(--glass-80), var(--glass-40)),
+    linear-gradient(180deg, var(--glass-70), var(--glass-30));
   box-shadow:
-    0 24px 70px rgba(15, 23, 42, 0.12),
-    0 8px 22px rgba(15, 23, 42, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.24);
+    0 24px 70px rgba(var(--color-shadow-rgb), 0.12),
+    0 8px 22px rgba(var(--color-shadow-rgb), 0.08),
+    inset 0 1px 0 var(--glass-80),
+    inset 0 -1px 0 var(--glass-20);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
 }
 
 @mixin control-glass {
-  border: 1px solid rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--glass-60);
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.38)),
-    rgba(255, 255, 255, 0.54);
+    linear-gradient(135deg, var(--glass-80), var(--glass-40)),
+    var(--glass-50);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.76),
-    0 8px 22px rgba(15, 23, 42, 0.08);
+    inset 0 1px 0 var(--glass-80),
+    0 8px 22px rgba(var(--color-shadow-rgb), 0.08);
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
 }
@@ -587,8 +589,8 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
   &:focus-visible {
     outline: none;
     box-shadow:
-      0 0 0 3px rgba(0, 122, 255, 0.18),
-      0 10px 26px rgba(15, 23, 42, 0.12);
+      0 0 0 3px rgba(var(--color-primary-rgb), 0.18),
+      0 10px 26px rgba(var(--color-shadow-rgb), 0.12);
   }
 }
 
@@ -615,10 +617,10 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
     z-index: -2;
     pointer-events: none;
     background:
-      radial-gradient(circle at 12% 10%, rgba(0, 122, 255, 0.16), transparent 30%),
+      radial-gradient(circle at 12% 10%, rgba(var(--color-primary-rgb), 0.16), transparent 30%),
       radial-gradient(circle at 84% 14%, rgba(88, 86, 214, 0.14), transparent 32%),
-      radial-gradient(circle at 70% 86%, rgba(52, 199, 89, 0.11), transparent 34%),
-      linear-gradient(180deg, #f8fbff 0%, #eef4ff 48%, #f9fbff 100%);
+      radial-gradient(circle at 70% 86%, rgba(var(--color-success-rgb), 0.11), transparent 34%),
+      linear-gradient(180deg, var(--bg-blue-tint) 0%, var(--bg-blue-light) 48%, var(--bg-light-gray) 100%);
   }
 
   &::after {
@@ -628,8 +630,8 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
     z-index: -1;
     pointer-events: none;
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+      linear-gradient(var(--glass-30) 1px, transparent 1px),
+      linear-gradient(90deg, var(--glass-20) 1px, transparent 1px);
     background-size: 42px 42px;
     mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.32), transparent 72%);
   }
@@ -647,8 +649,7 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
   margin-bottom: 18px;
 
   .page-title-group {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: center;
     min-width: 0;
@@ -656,9 +657,7 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
   }
 
   .page-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     min-width: 0;
     gap: 10px;
     margin: 0;
@@ -671,7 +670,7 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
 
   .title-icon {
     display: inline-flex;
-    filter: drop-shadow(0 8px 18px rgba(0, 122, 255, 0.2));
+    filter: drop-shadow(0 8px 18px rgba(var(--color-primary-rgb), 0.2));
   }
 
   .header-stats {
@@ -688,14 +687,14 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
     gap: 6px;
     min-height: 28px;
     padding: 4px 10px;
-    border: 1px solid rgba(255, 255, 255, 0.52);
-    border-radius: 999px;
+    border: 1px solid var(--glass-50);
+    border-radius: var(--radius-pill);
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.36)),
-      rgba(0, 122, 255, 0.06);
+      linear-gradient(135deg, var(--glass-70), var(--glass-40)),
+      rgba(var(--color-primary-rgb), 0.06);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.66),
-      0 8px 18px rgba(0, 122, 255, 0.06);
+      inset 0 1px 0 var(--glass-70),
+      0 8px 18px rgba(var(--color-primary-rgb), 0.06);
   }
 
   .header-stat-label {
@@ -722,19 +721,19 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
     min-height: 34px;
     padding: 6px 13px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 999px;
-    color: #fff;
+    border: 1px solid var(--glass-50);
+    border-radius: var(--radius-pill);
+    color: var(--text-white);
     font-size: 14px;
     font-weight: 800;
     text-overflow: ellipsis;
     white-space: nowrap;
     background:
-      linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(88, 86, 214, 0.88)),
+      linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(88, 86, 214, 0.88)),
       $region-accent;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.35),
-      0 10px 24px rgba(0, 122, 255, 0.24);
+      inset 0 1px 0 var(--glass-40),
+      0 10px 24px rgba(var(--color-primary-rgb), 0.24);
   }
 }
 
@@ -749,11 +748,11 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
   color: $region-text;
 
   &:hover:not(:disabled) {
-    border-color: rgba(0, 122, 255, 0.3);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
     color: $region-accent;
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.5)),
-      rgba(0, 122, 255, 0.08);
+      linear-gradient(135deg, var(--glass-90), var(--glass-50)),
+      rgba(var(--color-primary-rgb), 0.08);
   }
 }
 
@@ -762,18 +761,18 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
 }
 
 .btn-primary {
-  color: #fff;
+  color: var(--text-white);
   background:
-    linear-gradient(135deg, rgba(0, 122, 255, 0.96), rgba(0, 81, 213, 0.92)),
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
     $region-accent;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 12px 28px rgba(0, 122, 255, 0.26);
+    inset 0 1px 0 var(--glass-30),
+    0 12px 28px rgba(var(--color-primary-rgb), 0.26);
 
   &:hover:not(:disabled) {
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.32),
-      0 16px 36px rgba(0, 122, 255, 0.34);
+      inset 0 1px 0 var(--glass-30),
+      0 16px 36px rgba(var(--color-primary-rgb), 0.34);
   }
 }
 
@@ -823,18 +822,16 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
 
   &:focus {
     outline: none;
-    border-color: rgba(0, 122, 255, 0.56);
-    background: rgba(255, 255, 255, 0.84);
+    border-color: rgba(var(--color-primary-rgb), 0.56);
+    background: var(--glass-80);
     box-shadow:
-      0 0 0 4px rgba(0, 122, 255, 0.11),
-      inset 0 1px 0 rgba(255, 255, 255, 0.76);
+      0 0 0 4px rgba(var(--color-primary-rgb), 0.11),
+      inset 0 1px 0 var(--glass-80);
   }
 }
 
 .status-panel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   min-height: 260px;
   margin-top: 18px;
   text-align: center;
@@ -861,7 +858,7 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
 
 .empty-icon {
   font-size: 58px;
-  filter: drop-shadow(0 12px 26px rgba(15, 23, 42, 0.12));
+  filter: drop-shadow(0 12px 26px rgba(var(--color-shadow-rgb), 0.12));
 }
 
 .empty-text {
@@ -890,19 +887,19 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
     border-radius: inherit;
     pointer-events: none;
     background:
-      radial-gradient(circle at 10% 0%, rgba(0, 122, 255, 0.12), transparent 32%),
-      radial-gradient(circle at 92% 18%, rgba(52, 199, 89, 0.1), transparent 28%);
+      radial-gradient(circle at 10% 0%, rgba(var(--color-primary-rgb), 0.12), transparent 32%),
+      radial-gradient(circle at 92% 18%, rgba(var(--color-success-rgb), 0.1), transparent 28%);
     opacity: 0;
     transition: opacity 0.18s ease;
   }
 
   &:hover {
     transform: translateY(-2px);
-    border-color: rgba(0, 122, 255, 0.24);
+    border-color: rgba(var(--color-primary-rgb), 0.24);
     box-shadow:
-      0 26px 76px rgba(15, 23, 42, 0.14),
-      0 12px 28px rgba(0, 122, 255, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.84);
+      0 26px 76px rgba(var(--color-shadow-rgb), 0.14),
+      0 12px 28px rgba(var(--color-primary-rgb), 0.08),
+      inset 0 1px 0 var(--glass-80);
 
     &::before {
       opacity: 1;
@@ -951,7 +948,7 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
   width: 34px;
   height: 34px;
   padding: 0;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 15px;
   cursor: pointer;
   transition:
@@ -962,10 +959,10 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
-    border-color: rgba(0, 122, 255, 0.32);
+    border-color: rgba(var(--color-primary-rgb), 0.32);
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.48)),
-      rgba(0, 122, 255, 0.08);
+      linear-gradient(135deg, var(--glass-90), var(--glass-50)),
+      rgba(var(--color-primary-rgb), 0.08);
   }
 
   &:active:not(:disabled) {
@@ -979,16 +976,16 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
   }
 
   &.danger {
-    border-color: rgba(255, 59, 48, 0.2);
+    border-color: rgba(var(--color-error-light-rgb), 0.2);
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.38)),
-      rgba(255, 59, 48, 0.08);
+      linear-gradient(135deg, var(--glass-70), var(--glass-40)),
+      rgba(var(--color-error-light-rgb), 0.08);
 
     &:hover:not(:disabled) {
-      border-color: rgba(255, 59, 48, 0.38);
+      border-color: rgba(var(--color-error-light-rgb), 0.38);
       background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.44)),
-        rgba(255, 59, 48, 0.13);
+        linear-gradient(135deg, var(--glass-80), var(--glass-40)),
+        rgba(var(--color-error-light-rgb), 0.13);
     }
   }
 }
@@ -1022,7 +1019,7 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
   align-items: center;
   min-height: 26px;
   padding: 5px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 750;
   line-height: 1;
@@ -1030,20 +1027,20 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
 
 .info-badge {
   color: $region-accent;
-  background: rgba(0, 122, 255, 0.1);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
+  background: rgba(var(--color-primary-rgb), 0.1);
+  box-shadow: inset 0 1px 0 var(--glass-60);
 }
 
 .info-date {
   color: $region-muted;
-  background: rgba(255, 255, 255, 0.44);
-  border: 1px solid rgba(255, 255, 255, 0.52);
+  background: var(--glass-40);
+  border: 1px solid var(--glass-50);
 }
 
 .region-description {
   flex-basis: 100%;
   margin: 0;
-  color: #475569;
+  color: var(--text-slate);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -1057,17 +1054,17 @@ $region-glass-border: rgba(255, 255, 255, 0.58);
 }
 
 .location-tag {
-  color: #475569;
+  color: var(--text-slate);
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.36)),
-    rgba(15, 23, 42, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.48);
+    linear-gradient(135deg, var(--glass-70), var(--glass-40)),
+    rgba(var(--color-shadow-rgb), 0.045);
+  border: 1px solid var(--glass-50);
 }
 
 .location-more {
   color: $region-accent;
-  background: rgba(0, 122, 255, 0.1);
-  border: 1px solid rgba(0, 122, 255, 0.12);
+  background: rgba(var(--color-primary-rgb), 0.1);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.12);
 }
 
 @media (max-width: 768px) {

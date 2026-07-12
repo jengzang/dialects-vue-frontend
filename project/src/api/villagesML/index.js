@@ -10,7 +10,8 @@ export {
   getVillageFeatures,
   getVillageSpatialFeatures,
   getVillageSemanticStructure,
-  getVillageNgrams
+  getVillageNgrams,
+  fetchSubsetFilter
 } from './villages.js'
 
 // 字頻統計
@@ -22,6 +23,7 @@ export {
   getCharEmbeddingsList,
   getCharEmbeddingVector,
   getCharSimilarities,
+  fetchCharacterNetwork,
   getCharSignificanceByChar,
   getCharSignificanceByRegion,
   getCharSignificanceSummary

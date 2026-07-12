@@ -25,7 +25,7 @@
         <div class="format-selector">
           <div class="format-label-row">
             <label class="format-label">{{ t('tools.checkTool.welcome.formatLabel') }}</label>
-            <button class="main-glass-button" data-size="small" @click="showFormatHelpModal = true">
+            <button class="main-glass-button info-help-btn" data-size="small" @click="showFormatHelpModal = true">
               📋 {{ t('tools.checkTool.welcome.formatHelp') }}
             </button>
           </div>
@@ -55,7 +55,7 @@
         <div
           class="upload-zone-drop"
           :class="{ 'drag-over': isDragOver, 'uploading': isUploading }"
-          @click="!isUploading && $refs.fileInput.click()"
+          @click="!isUploading && !pendingPreviewFile && $refs.fileInput.click()"
           @dragover.prevent="!isUploading && (isDragOver = true)"
           @dragleave.prevent="isDragOver = false"
           @drop.prevent="!isUploading && handleDrop($event)"
@@ -71,6 +71,29 @@
             <p class="hint-text">{{ t('tools.checkTool.welcome.uploadingHint') }}</p>
           </template>
         </div>
+
+        <TabularImportPreview
+          v-if="pendingPreviewFile"
+          :key="previewConfirmKey"
+          :model-value="Boolean(pendingPreviewFile)"
+          :title="t('common.importPreview.checkToolTitle')"
+          :description="t('common.importPreview.checkToolDescription')"
+          :file="pendingPreviewFile"
+          :schema="checkImportSchema"
+          :loading="checkPreviewState.loading.value"
+          :preview-table="checkPreviewState.previewTable.value"
+          :diagnostics="checkPreviewState.diagnostics.value"
+          :mapping="checkPreviewState.mapping.value"
+          :selected-sheet-id="checkPreviewState.selectedSheetId.value"
+          :header-row-index="checkPreviewState.headerRowIndex.value"
+          :sheets="checkPreviewState.parsedFile.value?.sheets || []"
+          @update:selected-sheet-id="checkPreviewState.selectedSheetId.value = $event"
+          @update:header-row-index="checkPreviewState.headerRowIndex.value = $event"
+          @update:mapping="handleCheckMappingUpdate"
+          @reset="clearPendingPreview"
+          @confirm="confirmPreviewAndUpload"
+        />
+
       </div>
     </div>
 
@@ -263,7 +286,7 @@
             <span class="file-rows">{{ t('tools.checkTool.fileBar.rows', { count: totalRows }) }}</span>
           </div>
           <button v-if="!isPortrait" class="main-glass-button" data-variant="secondary" data-size="small" @click="resetUpload">{{ t('tools.checkTool.fileBar.changeFile') }}</button>
-          <button v-if="!isPortrait" class="main-glass-button" data-size="small" @click="showHelpModal = true">
+          <button v-if="!isPortrait" class="main-glass-button info-help-btn" data-size="small" @click="showHelpModal = true">
             ❓ {{ t('tools.checkTool.fileBar.help') }}
           </button>
           <!-- 模式切换 -->
@@ -549,7 +572,7 @@
           <div class="command-panel glass-panel">
             <div class="command-header">
               <h3>💻 {{ t('tools.checkTool.command.title') }}</h3>
-              <button v-if="!isPortrait" class="main-glass-button" data-size="small" @click="showHelpModal = true">
+              <button v-if="!isPortrait" class="main-glass-button info-help-btn" data-size="small" @click="showHelpModal = true">
                 ❓ {{ t('tools.checkTool.command.help') }}
               </button>
             </div>
@@ -593,7 +616,7 @@
       size="sm"
       :title="t('tools.checkTool.batchReplace.title')"
       :close-label="t('tools.common.close')"
-      :z-index="1000"
+      :z-index="1500"
       @update:modelValue="showBatchReplaceModal = false"
     >
       <div class="check-tool-batch-replace-content">
@@ -658,7 +681,7 @@
       size="lg"
       :title="t('tools.checkTool.help.title')"
       :close-label="t('tools.common.close')"
-      :z-index="1000"
+      :z-index="1500"
       @update:modelValue="showHelpModal = false"
     >
       <div class="help-content ui-scrollbar">
@@ -750,7 +773,7 @@
       size="lg"
       :title="t('tools.checkTool.formatHelp.title')"
       :close-label="t('tools.common.close')"
-      :z-index="1000"
+      :z-index="1500"
       @update:modelValue="showFormatHelpModal = false"
     >
       <div class="help-content ui-scrollbar">
@@ -829,7 +852,7 @@
       size="sm"
       :title="toneCharsModalTitle"
       :close-label="t('tools.common.close')"
-      :z-index="1000"
+      :z-index="1500"
       @update:modelValue="showToneCharsModal = false"
     >
       <div class="tone-chars-display">
@@ -849,7 +872,7 @@
       size="sm"
       :title="t('tools.checkTool.filter.title', { column: getFilterColumnLabel(filterColumnType) })"
       :close-label="t('tools.common.close')"
-      :z-index="1000"
+      :z-index="1500"
       @update:modelValue="showFilterModal = false"
     >
       <div class="filter-modal-body">
@@ -894,11 +917,14 @@ import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RecycleScroller } from 'vue-virtual-scroller'
 import AppModal from '@/components/common/AppModal.vue'
+import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
+import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
+import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import {
   uploadCheckFile,
   analyzeFile as analyzeFileApi,
@@ -925,6 +951,10 @@ const isDragOver = ref(false)
 const selectedFormat = ref('音典') // 文件格式类型
 const isSimplified = ref(false) // 新增：默认为 false (繁体)
 const isUploading = ref(false) // 上传加载状态
+const pendingPreviewFile = ref(null)
+const previewConfirmKey = ref(0)
+const checkImportPayload = ref(null)
+const requireExplicitConfirmation = ref(false)
 
 // 数据
 const allData = ref([])
@@ -1013,6 +1043,87 @@ const scriptOptions = computed(() => [
   { label: t('tools.checkTool.welcome.simplifiedConvert'), value: true }
 ])
 
+const checkImportSchema = computed(() => ([
+  {
+    key: 'char',
+    label: t('common.importPreview.schemas.checkTool.char.label'),
+    required: true,
+    aliases: [
+      t('common.importPreview.schemas.checkTool.char.aliases.char'),
+      t('common.importPreview.schemas.checkTool.char.aliases.character'),
+      t('common.importPreview.schemas.checkTool.char.aliases.word')
+    ],
+    description: t('common.importPreview.schemas.checkTool.char.description'),
+    example: t('common.importPreview.schemas.checkTool.char.example')
+  },
+  {
+    key: 'ipa',
+    label: t('common.importPreview.schemas.checkTool.ipa.label'),
+    required: true,
+    aliases: [
+      t('common.importPreview.schemas.checkTool.ipa.aliases.ipa'),
+      t('common.importPreview.schemas.checkTool.ipa.aliases.phonetic'),
+      t('common.importPreview.schemas.checkTool.ipa.aliases.pronunciation')
+    ],
+    description: t('common.importPreview.schemas.checkTool.ipa.description'),
+    example: t('common.importPreview.schemas.checkTool.ipa.example')
+  },
+  {
+    key: 'note',
+    label: t('common.importPreview.schemas.checkTool.note.label'),
+    required: false,
+    aliases: [
+      t('common.importPreview.schemas.checkTool.note.aliases.note'),
+      t('common.importPreview.schemas.checkTool.note.aliases.comment')
+    ],
+    description: t('common.importPreview.schemas.checkTool.note.description'),
+    example: t('common.importPreview.schemas.checkTool.note.example')
+  }
+]))
+const checkPreviewState = useTabularImportPreview({
+  schema: checkImportSchema,
+  requireExplicitConfirmation: () => requireExplicitConfirmation.value
+})
+const checkImportFlow = useTabularImportFlow({
+  previewState: checkPreviewState,
+  pendingFileRef: pendingPreviewFile,
+  payloadRef: checkImportPayload,
+  confirmKeyRef: previewConfirmKey,
+  beforePreview: async (file) => {
+    const isAllowed = await requireAuth({
+      message: t('tools.checkTool.messages.loginRequired'),
+    })
+    if (!isAllowed) {
+      return false
+    }
+
+    const allowedExts = ['.xlsx', '.xls']
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
+
+    if (!allowedExts.includes(ext)) {
+      showError(t('tools.checkTool.messages.previewInvalidFileType'))
+      return false
+    }
+
+    if (file.size > 3 * 1024 * 1024) {
+      showError(t('tools.checkTool.messages.fileTooLarge'))
+      return false
+    }
+
+    return true
+  },
+  onAutoApply: async () => {
+    await confirmPreviewAndUpload()
+  },
+  onPreviewError: (error) => {
+    showError(t('tools.checkTool.messages.previewFailed', { message: error.message }))
+  },
+  resetInput: () => {
+    if (fileInput.value) {
+      fileInput.value.value = ''
+    }
+  }
+})
 // 计算属性
 const totalPendingChanges = computed(() => {
   return pendingChanges.value.size + rowsToDelete.value.size
@@ -1180,19 +1291,18 @@ const handleDrop = (event) => {
   isDragOver.value = false
   const file = event.dataTransfer.files[0]
   if (file) {
-    uploadFile(file)
+    checkImportFlow.loadPreview(file)
   }
 }
 
 const handleFileUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
-    uploadFile(file)
+    checkImportFlow.loadPreview(file)
   }
 }
 
-const uploadFile = async (file) => {
-  // 检查登录状态
+const uploadFile = async (file, options = {}) => {
   const isAllowed = await requireAuth({
     message: t('tools.checkTool.messages.loginRequired'),
   })
@@ -1218,7 +1328,7 @@ const uploadFile = async (file) => {
   await uploadTask.run(
     async () => {
       isUploading.value = true
-      const data = await uploadCheckFile(file, selectedFormat.value || 'excel', isSimplified.value)
+      const data = await uploadCheckFile(file, selectedFormat.value || 'excel', isSimplified.value, options)
 
       taskId.value = data.task_id
       totalRows.value = data.total_rows || 0
@@ -1235,6 +1345,40 @@ const uploadFile = async (file) => {
       }
     }
   )
+}
+
+const previewFile = async (file) => {
+  await checkImportFlow.loadPreview(file)
+}
+
+const handleCheckMappingUpdate = ({ fieldKey, sourceKey }) => {
+  checkImportFlow.updateManualMapping({ fieldKey, sourceKey })
+}
+
+const clearPendingPreview = () => {
+  checkImportFlow.clearPreview()
+}
+
+const confirmPreviewAndUpload = async () => {
+  if (!pendingPreviewFile.value || !checkImportPayload.value?.isComplete) {
+    showError(t('common.importPreview.messages.mappingIncomplete'))
+    return
+  }
+
+  const activeSheet = checkPreviewState.previewTable.value?.activeSheet
+  const columnMapping = {
+    headerChar: checkPreviewState.mapping.value.char || null,
+    headerIpa: checkPreviewState.mapping.value.ipa || null,
+    headerNotes: checkPreviewState.mapping.value.note || null
+  }
+
+  const selectedFile = pendingPreviewFile.value
+  checkImportFlow.clearPreview()
+  await uploadFile(selectedFile, {
+    columnMapping,
+    headerRowIndex: checkPreviewState.headerRowIndex.value,
+    sheetName: activeSheet?.name || null
+  })
 }
 
 const analyzeFile = async () => {
@@ -1350,6 +1494,9 @@ const resetUpload = async () => {
     rowsToDelete.value.clear()
     isEditMode.value = false
     clearAllColumnFilters()
+    pendingPreviewFile.value = null
+    checkImportPayload.value = null
+    checkPreviewState.resetState()
     if (fileInput.value) {
       fileInput.value.value = ''
     }
@@ -1903,51 +2050,45 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-$primary: #007aff;
-$text-main: #0b2540;
-$text-muted: #666;
-$danger: #ff3b30;
-$warning: #ff9500;
-$success: #34c759;
+@use '@/styles/global/mixins' as *;
 
-$glass-light: rgba(255, 255, 255, 0.3);
-$glass-soft: rgba(255, 255, 255, 0.4);
-$glass-panel: rgba(255, 255, 255, 0.5);
-$glass-strong: rgba(255, 255, 255, 0.6);
-$glass-solid: rgba(255, 255, 255, 0.8);
+$primary: var(--color-primary);
+$text-main: var(--text-deep);
+$text-muted: var(--text-tertiary);
+$danger: var(--color-error-light);
+$warning: var(--color-warning);
+$success: var(--color-success);
 
-$primary-soft: rgba(0, 122, 255, 0.1);
-$primary-hover: rgba(0, 122, 255, 0.15);
-$primary-selected: rgba(0, 122, 255, 0.2);
-$danger-soft: rgba(255, 59, 48, 0.1);
-$warning-soft: rgba(255, 149, 0, 0.15);
-$success-soft: rgba(52, 199, 89, 0.1);
+$glass-light: var(--glass-30);
+$glass-soft: var(--glass-40);
+$glass-panel: var(--glass-50);
+$glass-strong: var(--glass-60);
+$glass-solid: var(--glass-80);
 
-@mixin glass-blur($bg: $glass-panel, $blur: 10px, $radius: 16px, $border: rgba(255, 255, 255, 0.5)) {
+$primary-soft: rgba(var(--color-primary-rgb), 0.1);
+$primary-hover: rgba(var(--color-primary-rgb), 0.15);
+$primary-selected: rgba(var(--color-primary-rgb), 0.2);
+$danger-soft: rgba(var(--color-error-light-rgb), 0.1);
+$warning-soft: rgba(var(--color-warning-rgb), 0.15);
+$success-soft: rgba(var(--color-success-rgb), 0.1);
+
+@mixin glass-surface($bg: $glass-panel, $blur: 10px, $radius: 16px, $border: var(--glass-50)) {
   background: $bg;
   backdrop-filter: blur($blur);
   -webkit-backdrop-filter: blur($blur);
   border: 1px solid $border;
   border-radius: $radius;
 }
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .check {
   /* 基础布局 */
 
   &-tool-container {
     width: 100%;
     height: 90%;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     padding-top: 30px;
     --main-glass-button-padding: 8px 16px;
-    --main-glass-button-border-radius: 10px;
+    --main-glass-button-border-radius: var(--radius-md);
     --main-glass-button-font-size: 13px;
     --main-glass-button-small-padding: 6px 12px;
     --main-glass-button-small-font-size: 12px;
@@ -1960,7 +2101,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     gap: 12px;
     margin: 20px -18px -20px;
     padding: 16px 18px;
-    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    border-top: 1px solid var(--glass-50);
   }
 
   &-tool-batch-replace-content {
@@ -1984,7 +2125,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   }
 
   &-card {
-    max-width: 800px;
+    max-width: 980px;
     width: 100%;
     padding: 20px 30px;
     text-align: center;
@@ -1995,8 +2136,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   }
 
   &-features {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 6px;
     margin: 24px 0;
     text-align: left;
@@ -2013,15 +2153,15 @@ $success-soft: rgba(52, 199, 89, 0.1);
     gap: 12px;
     padding: 6px;
     background: $glass-light;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   &-icon {
     width: 24px;
     height: 24px;
     @include flex-center;
-    background: rgba(52, 199, 89, 0.2);
-    border-radius: 50%;
+    background: rgba(var(--color-success-rgb), 0.2);
+    border-radius: var(--radius-full);
     color: $success;
     font-weight: 700;
   }
@@ -2032,7 +2172,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     margin: 10px 0;
     padding: 8px;
     background: $glass-soft;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     text-align: left;
   }
 
@@ -2065,7 +2205,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     margin-top: 8px;
     padding: 12px;
     background: $glass-light;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
 
     p {
       margin: 6px 0;
@@ -2080,7 +2220,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-subsection {
     margin-top: 16px;
     padding-left: 16px;
-    border-left: 3px solid rgba(0, 122, 255, 0.3);
+    border-left: 3px solid rgba(var(--color-primary-rgb), 0.3);
 
     h5 {
       margin: 0 0 8px 0;
@@ -2088,6 +2228,28 @@ $success-soft: rgba(52, 199, 89, 0.1);
       font-weight: 600;
       color: $primary;
     }
+  }
+}
+
+.upload-zone-drop {
+  @include glass-surface(var(--glass-50), 12px, 22px, var(--glass-60));
+  @include flex-col;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  // width: 100%;
+  padding: 26px 28px;
+  border: 2px dashed rgba(var(--color-primary-rgb), 0.28);
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &.drag-over {
+    border-color: rgba(var(--color-primary-rgb), 0.58);
+    background: rgba(var(--color-primary-rgb), 0.08);
+  }
+
+  &.uploading {
+    cursor: progress;
   }
 }
 
@@ -2103,14 +2265,14 @@ $success-soft: rgba(52, 199, 89, 0.1);
   }
 }
 
+
 .sidebar {
   /* 侧边栏 */
 
   width: 280px;
   min-width: 280px;
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   padding: 16px;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -2134,30 +2296,28 @@ $success-soft: rgba(52, 199, 89, 0.1);
     z-index: 20;
     width: 40px;
     height: 40px;
-    @include glass-blur(rgba(255, 255, 255, 0.75), 10px, 10px);
+    @include glass-surface(var(--glass-80), 10px, 10px);
     cursor: pointer;
     transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.9);
+      background: var(--glass-90);
     }
   }
 
   &-content {
     flex: 1;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 6px;
   }
 
   /* 侧边栏分区 */
 
   &-section {
-    display: flex;
-    flex-direction: column;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
+    @include flex-col;
+    background: var(--glass-20);
+    border-radius: var(--radius-md);
     padding: 12px;
     overflow: hidden;
     transition: flex 0.3s ease;
@@ -2182,7 +2342,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     padding: 4px 8px;
     background: $glass-light;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -2199,7 +2359,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     align-items: center;
     padding: 8px;
     background: $primary-soft;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     cursor: pointer;
     font-weight: 600;
     font-size: 14px;
@@ -2221,8 +2381,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 12px;
     margin-top: 12px;
     min-height: 0;
@@ -2240,8 +2399,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   /* 错误统计 */
 
   &-stats {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 8px;
     flex-shrink: 0;
   }
@@ -2249,8 +2407,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   /* 错误列表 */
 
   &-list {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 4px;
     overflow-y: auto;
   }
@@ -2258,7 +2415,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-item {
     padding: 8px;
     background: $glass-light;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 12px;
@@ -2291,12 +2448,12 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-type-badge {
     display: inline-block;
     padding: 2px 6px;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     font-size: 10px;
     font-weight: 500;
 
     &.nonSingleChar {
-      background: rgba(255, 59, 48, 0.15);
+      background: rgba(var(--color-error-light-rgb), 0.15);
       color: $danger;
     }
 
@@ -2306,7 +2463,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     }
 
     &.missingTone {
-      background: rgba(0, 122, 255, 0.15);
+      background: rgba(var(--color-primary-rgb), 0.15);
       color: $primary;
     }
   }
@@ -2335,7 +2492,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     gap: 8px;
     padding: 10px;
     background: $glass-light;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -2376,8 +2533,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   /* 调值统计 */
 
   &-stats-content {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 12px;
     overflow-y: auto;
   }
@@ -2399,7 +2555,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
   &-item {
     padding: 8px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     cursor: pointer;
     font-size: 12px;
     transition: all 0.2s ease;
@@ -2408,7 +2564,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
       background: $danger-soft;
 
       &:hover {
-        background: rgba(255, 59, 48, 0.2);
+        background: rgba(var(--color-error-light-rgb), 0.2);
       }
     }
 
@@ -2454,15 +2610,13 @@ $success-soft: rgba(52, 199, 89, 0.1);
   /* 声韵统计 */
 
   &-rime-stats-content {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 12px;
     overflow-y: auto;
   }
 
   &-rime-section {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 8px;
   }
 
@@ -2475,8 +2629,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   }
 
   &-rime-items {
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 4px;
   }
 
@@ -2486,7 +2639,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     align-items: center;
     padding: 6px 8px;
     background: $glass-light;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 12px;
@@ -2497,7 +2650,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
     &.filtered {
       background: $primary-selected;
-      border: 1px solid rgba(0, 122, 255, 0.4);
+      border: 1px solid rgba(var(--color-primary-rgb), 0.4);
     }
   }
 
@@ -2511,7 +2664,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     font-size: 11px;
     background: rgba(0, 0, 0, 0.05);
     padding: 2px 6px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     min-width: 24px;
     text-align: center;
   }
@@ -2535,8 +2688,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
   &-modal-body {
     max-height: 60dvh;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 16px;
   }
 
@@ -2549,8 +2701,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-values-list {
     flex: 1;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 4px;
     max-height: 400px;
   }
@@ -2561,17 +2712,17 @@ $success-soft: rgba(52, 199, 89, 0.1);
     gap: 12px;
     padding: 10px 12px;
     background: $glass-light;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     cursor: pointer;
     transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.97);
+      background: var(--glass-90);
     }
 
     &.selected {
       background: $primary-selected;
-      border: 1px solid rgba(0, 122, 255, 0.4);
+      border: 1px solid rgba(var(--color-primary-rgb), 0.4);
 
       .checkbox {
         background: $primary-selected;
@@ -2584,8 +2735,8 @@ $success-soft: rgba(52, 199, 89, 0.1);
       height: 20px;
       @include flex-center;
       background: $glass-panel;
-      border: 2px solid rgba(0, 122, 255, 0.3);
-      border-radius: 4px;
+      border: 2px solid rgba(var(--color-primary-rgb), 0.3);
+      border-radius: var(--radius-xs);
       font-size: 12px;
       font-weight: 600;
       color: $primary;
@@ -2603,7 +2754,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
       color: $text-muted;
       background: rgba(0, 0, 0, 0.05);
       padding: 2px 8px;
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       flex-shrink: 0;
     }
   }
@@ -2622,8 +2773,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-work-area {
     flex: 1;
     height: 100%;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 12px;
     overflow: hidden;
   }
@@ -2672,8 +2822,8 @@ $success-soft: rgba(52, 199, 89, 0.1);
     padding: 10px 8px;
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 10px;
-    color: rgba(11, 37, 64, 0.7);
+    border-radius: var(--radius-md);
+    color: rgba(var(--text-deep-rgb), 0.7);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -2681,11 +2831,11 @@ $success-soft: rgba(52, 199, 89, 0.1);
     white-space: nowrap;
 
     &.active {
-      background: rgba(0, 122, 255, 0.7);
+      background: rgba(var(--color-primary-rgb), 0.7);
       backdrop-filter: blur(14px);
-      border-color: rgba(0, 122, 255, 0.6);
+      border-color: rgba(var(--color-primary-rgb), 0.6);
       color: white;
-      box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
+      box-shadow: 0 4px 20px rgba(var(--color-primary-rgb), 0.3);
     }
   }
 }
@@ -2695,8 +2845,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
   &-view {
     flex: 1;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 12px;
     overflow: hidden;
   }
@@ -2747,8 +2896,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     bottom: 0;
     background: $glass-solid;
     backdrop-filter: blur(4px);
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     justify-content: center;
     gap: 16px;
@@ -2769,7 +2917,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     gap: 4px;
     padding: 4px 10px;
     background: $primary-soft;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     font-size: 12px;
     color: $primary;
     font-weight: 500;
@@ -2807,7 +2955,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     position: sticky;
     top: 0;
     z-index: 10;
-    border-bottom: 2px solid rgba(0, 122, 255, 0.2);
+    border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
   }
 
   &-table-scroller {
@@ -2821,15 +2969,15 @@ $success-soft: rgba(52, 199, 89, 0.1);
     width: max-content;
     min-width: 100%;
     min-height: 40px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid var(--glass-30);
     transition: background 0.2s ease;
 
     &:hover {
-      background: rgba(0, 122, 255, 0.05);
+      background: rgba(var(--color-primary-rgb), 0.05);
     }
 
     &.modified-row {
-      background: rgba(255, 204, 0, 0.1);
+      background: rgba(var(--color-gold-rgb), 0.1);
     }
 
     &.marked-for-delete {
@@ -2851,7 +2999,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     font-weight: 600;
     color: $text-main;
     font-size: 13px;
-    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    border-right: 1px solid var(--glass-30);
 
     &:last-child {
       border-right: none;
@@ -2879,22 +3027,20 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
 @keyframes highlight {
   0%, 100% {
-    background: rgba(0, 122, 255, 0.05);
+    background: rgba(var(--color-primary-rgb), 0.05);
   }
 
   50% {
-    background: rgba(0, 122, 255, 0.3);
+    background: rgba(var(--color-primary-rgb), 0.3);
   }
 }
 
 .cell {
   padding: 10px 12px;
   text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   font-size: 13px;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid var(--glass-10);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2919,12 +3065,12 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-cell {
     cursor: pointer;
     position: relative;
-    background: rgba(0, 122, 255, 0.02);
-    border: 1px dashed rgba(0, 122, 255, 0.2) !important;
+    background: rgba(var(--color-primary-rgb), 0.02);
+    border: 1px dashed rgba(var(--color-primary-rgb), 0.2) !important;
 
     &:hover {
-      background: rgba(0, 122, 255, 0.08);
-      border-color: rgba(0, 122, 255, 0.4) !important;
+      background: rgba(var(--color-primary-rgb), 0.08);
+      border-color: rgba(var(--color-primary-rgb), 0.4) !important;
     }
   }
 }
@@ -2933,23 +3079,23 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-btn-icon {
     padding: 4px 8px;
     background: $danger-soft;
-    border: 1px solid rgba(255, 59, 48, 0.3);
-    border-radius: 6px;
+    border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
+    border-radius: var(--radius-sm);
     font-size: 16px;
     cursor: pointer;
     transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(255, 59, 48, 0.2);
+      background: rgba(var(--color-error-light-rgb), 0.2);
       transform: scale(1.1);
     }
 
     &.delete-active {
-      background: rgba(52, 199, 89, 0.2);
-      border-color: rgba(52, 199, 89, 0.5);
+      background: rgba(var(--color-success-rgb), 0.2);
+      border-color: rgba(var(--color-success-rgb), 0.5);
 
       &:hover {
-        background: rgba(52, 199, 89, 0.3);
+        background: rgba(var(--color-success-rgb), 0.3);
       }
     }
   }
@@ -2965,8 +3111,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
   &-panel {
     padding: 20px;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     gap: 16px;
   }
 
@@ -2984,7 +3129,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-textarea {
     min-height: 300px;
     padding: 16px;
-    @include glass-blur($glass-panel, 10px, 16px);
+    @include glass-surface($glass-panel, 10px, 16px);
     color: $text-main;
     font-size: 14px;
     font-family: "SF Mono", Monaco, monospace;
@@ -2993,9 +3138,9 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
     &:focus {
       outline: none;
-      background: rgba(255, 255, 255, 0.7);
-      border-color: rgba(0, 122, 255, 0.5);
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+      background: var(--glass-70);
+      border-color: rgba(var(--color-primary-rgb), 0.5);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
     }
   }
 
@@ -3033,7 +3178,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-item {
     padding: 8px 12px;
     margin-bottom: 8px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     font-size: 13px;
     font-family: "SF Mono", Monaco, monospace;
 
@@ -3053,21 +3198,21 @@ $success-soft: rgba(52, 199, 89, 0.1);
   /* 通用样式 */
 
   &-container {
-    background: rgba(255, 255, 255, 0.65);
+    background: var(--glass-70);
     backdrop-filter: blur(25px) saturate(180%);
     -webkit-backdrop-filter: blur(25px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--glass-50);
     border-radius: 30px;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
   }
 
   &-panel {
-    @include glass-blur($glass-panel, 10px, 16px);
+    @include glass-surface($glass-panel, 10px, 16px);
   }
 
   &-input {
     padding: 8px 12px;
-    @include glass-blur($glass-strong, 8px, 8px);
+    @include glass-surface($glass-strong, 8px, 8px);
     color: $text-main;
     font-size: 13px;
     transition: all 0.2s ease;
@@ -3075,8 +3220,8 @@ $success-soft: rgba(52, 199, 89, 0.1);
     &:focus {
       outline: none;
       background: $glass-solid;
-      border-color: rgba(0, 122, 255, 0.5);
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+      border-color: rgba(var(--color-primary-rgb), 0.5);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
     }
   }
 }
@@ -3090,7 +3235,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
 .subtitle {
   font-size: 14px;
-  color: rgba(11, 37, 64, 0.7);
+  color: rgba(var(--text-deep-rgb), 0.7);
   margin: 0 0 24px 0;
 }
 
@@ -3099,26 +3244,25 @@ $success-soft: rgba(52, 199, 89, 0.1);
     padding: 20px 40px;
     background: $glass-soft;
     backdrop-filter: blur(10px);
-    border: 2px dashed rgba(0, 122, 255, 0.3);
-    border-radius: 24px;
+    border: 2px dashed rgba(var(--color-primary-rgb), 0.3);
+    border-radius: var(--radius-2xl);
     cursor: pointer;
     transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
     align-items: center;
     gap: 12px;
 
     &:hover,
     &.drag-over {
-      background: rgba(0, 122, 255, 0.05);
-      border-color: rgba(0, 122, 255, 0.6);
+      background: rgba(var(--color-primary-rgb), 0.05);
+      border-color: rgba(var(--color-primary-rgb), 0.6);
       transform: scale(1.02);
     }
 
     &.uploading {
       cursor: not-allowed;
-      background: rgba(0, 122, 255, 0.03);
-      border-color: rgba(0, 122, 255, 0.2);
+      background: rgba(var(--color-primary-rgb), 0.03);
+      border-color: rgba(var(--color-primary-rgb), 0.2);
       pointer-events: none;
     }
   }
@@ -3160,7 +3304,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-box {
     padding: 12px;
     background: $primary-soft;
-    border-radius: 8px;
+    border-radius: var(--radius-sm2);
     font-size: 12px;
     color: $text-muted;
   }
@@ -3170,8 +3314,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   &-group {
     margin-bottom: 16px;
     align-items: center;
-    display: flex;
-    flex-direction: column;
+    @include flex-col;
 
     label {
       display: block;
@@ -3210,7 +3353,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
       margin: 8px 0;
       font-size: 13px;
       line-height: 1.6;
-      color: rgba(11, 37, 64, 0.8);
+      color: rgba(var(--text-deep-rgb), 0.8);
     }
   }
 
@@ -3223,7 +3366,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     th,
     td {
       padding: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      border: 1px solid var(--glass-30);
       text-align: left;
     }
 
@@ -3235,7 +3378,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     code {
       background: $primary-soft;
       padding: 2px 6px;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       font-family: "SF Mono", Monaco, monospace;
       font-size: 11px;
     }
@@ -3255,7 +3398,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   .glass {
     &-container {
       padding: 20px 16px;
-      border-radius: 20px;
+      border-radius: var(--radius-xl);
     }
   }
 
@@ -3330,7 +3473,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
   .upload {
     &-zone-drop {
       padding: 24px 20px;
-      border-radius: 20px;
+      border-radius: var(--radius-xl);
     }
 
     &-icon-large {
@@ -3490,7 +3633,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     }
 
     &-container {
-      border-radius: 12px;
+      border-radius: var(--radius-md);
     }
   }
 
@@ -3509,7 +3652,7 @@ $success-soft: rgba(52, 199, 89, 0.1);
     &-dialog {
       width: calc(100vw - 20px);
       max-width: 100%;
-      border-radius: 16px;
+      border-radius: var(--radius-lg);
     }
   }
 
@@ -3541,8 +3684,8 @@ $success-soft: rgba(52, 199, 89, 0.1);
 
   .editable {
     &-cell {
-      border: 1px dashed rgba(0, 122, 255, 0.3) !important;
-      background: rgba(0, 122, 255, 0.05);
+      border: 1px dashed rgba(var(--color-primary-rgb), 0.3) !important;
+      background: rgba(var(--color-primary-rgb), 0.05);
 
       &::after {
         content: "✏️";
@@ -3879,14 +4022,30 @@ $success-soft: rgba(52, 199, 89, 0.1);
     padding: 4px;
     text-align: center; /* 让文字居中 */
     border: none;
-    background: rgba(255, 255, 255, 0.5); /* 稍微明显的背景 */
+    background: var(--glass-50); /* 稍微明显的背景 */
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
 
     &:focus {
       background: white;
-      box-shadow: inset 0 0 0 2px #4a90e2;
+      box-shadow: inset 0 0 0 2px var(--color-primary);
     }
+  }
+}
+
+// "说明" help buttons — stand out from the glass background with a visible border and hover glow
+.info-help-btn {
+  border: 1px dashed rgba(var(--color-primary-rgb), 0.45) !important;
+  background: rgba(var(--color-primary-rgb), 0.07) !important;
+  color: var(--color-primary-hover) !important;
+  font-weight: 600 !important;
+  transition: all 0.22s ease !important;
+
+  &:hover:not(:disabled) {
+    background: rgba(var(--color-primary-rgb), 0.14) !important;
+    border-color: rgba(var(--color-primary-rgb), 0.65) !important;
+    box-shadow: 0 2px 12px rgba(var(--color-primary-rgb), 0.18) !important;
+    transform: translateY(-2px) !important;
   }
 }
 </style>

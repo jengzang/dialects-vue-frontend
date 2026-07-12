@@ -52,7 +52,7 @@ const props = defineProps({
   },
   iconColor: {
     type: String,
-    default: '#007aff'
+    default: 'var(--color-primary)'
   },
   fontSize: {
     type: String,
@@ -298,118 +298,102 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$text-color: var(--text-primary);
+$primary-shadow: rgba(var(--color-primary-rgb), 0.25);
+$transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+@mixin touch-area($size) {
+  &::before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: $size;
+    height: $size;
+    content: '';
+    transform: translate(-50%, -50%);
+  }
+}
+
 .help-icon-container {
+  position: relative;
   display: inline-block;
-  position: relative;
 }
 
-/* 帮助图标 - Apple 玻璃态风格 */
+/*
+ * 主体玻璃样式由 global-help-icon-shell 提供，
+ * 当前组件只负责尺寸和交互状态。
+ */
 .help-icon {
-  border-radius: 50%;
-
-  /* 液态玻璃效果 */
-
-  /* 边框和阴影 */
-}
-
-/* 尺寸变体 */
-.help-icon.size-sm {
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
-  /* 移動端增加觸控區域 */
   position: relative;
+  border-radius: var(--radius-full);
+
+  &.size-sm {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+
+    @include touch-area(44px);
+  }
+
+  &.size-md {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+
+    @include touch-area(44px);
+  }
+
+  &.size-lg {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+
+    @include touch-area(48px);
+  }
+
+  &:hover {
+    background: linear-gradient(
+      145deg,
+      var(--text-white),
+      var(--glass-90)
+    );
+    box-shadow:
+      inset 0 0 0.5px var(--glass-50),
+      0 6px 16px $primary-shadow,
+      0 0 0 0.5px var(--glass-20);
+    transform: scale(1.1);
+  }
+
+  &:active {
+    box-shadow:
+      inset 0 0 0.5px var(--glass-30),
+      0 2px 8px rgba(var(--color-primary-rgb), 0.2);
+    transform: scale(1.05);
+  }
 }
 
-.help-icon.size-sm::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 44px;
-  height: 44px;
-  /* 用於調試：取消註釋可看到觸控區域 */
-  /* background: rgba(255, 0, 0, 0.1); */
-}
-
-.help-icon.size-md {
-  width: 24px;
-  height: 24px;
-  font-size: 14px;
-  position: relative;
-}
-
-.help-icon.size-md::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 44px;
-  height: 44px;
-}
-
-.help-icon.size-lg {
-  width: 28px;
-  height: 28px;
-  font-size: 16px;
-  position: relative;
-}
-
-.help-icon.size-lg::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 48px;
-  height: 48px;
-}
-
-/* Hover 状态 */
-.help-icon:hover {
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 1),
-    rgba(255, 255, 255, 0.85)
-  );
-  box-shadow:
-    inset 0 0 0.5px rgba(255, 255, 255, 0.5),
-    0 6px 16px rgba(0, 122, 255, 0.25),
-    0 0 0 0.5px rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
-}
-
-/* Active 状态 */
-.help-icon:active {
-  transform: scale(1.05);
-  box-shadow:
-    inset 0 0 0.5px rgba(255, 255, 255, 0.3),
-    0 2px 8px rgba(0, 122, 255, 0.2);
-}
-
-/* Tooltip 面板 - Apple 玻璃态风格 */
+/*
+ * Tooltip 通过 Teleport 渲染到 body，
+ * 因此保持为顶层选择器。
+ * 玻璃表面由 global-tooltip-surface 提供。
+ */
 .help-tooltip {
   position: absolute;
   padding: 10px 14px;
+  color: $text-color;
   font-size: 13px;
   line-height: 1.5;
-  color: #1d1d1f;
   text-align: center;
+  overflow-wrap: break-word;
   pointer-events: none;
-  word-wrap: break-word;
-
-  /* 液态玻璃效果 */
-
-  /* 边框和阴影 */
 }
 
-/* Tooltip 过渡动画 */
 .tooltip-fade-enter-active,
 .tooltip-fade-leave-active {
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all $transition-tooltip;
 }
 
 .tooltip-fade-enter-from,

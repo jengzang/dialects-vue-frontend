@@ -28,7 +28,7 @@
               type="text"
               maxlength="1"
               placeholder="輸入單個字符"
-              class="char-input"
+              class="vml-char-input"
             />
           </div>
           <div class="form-group">
@@ -67,7 +67,7 @@
               type="number"
               min="10"
               max="100"
-              class="number-input"
+              class="vml-number-input"
             />
           </div>
           <button
@@ -84,7 +84,7 @@
       <div v-if="results.length > 0" class="results-table vml-glass-panel">
         <h3>顯著性分析結果</h3>
 
-        <div v-if="loading" class="loading-state">
+        <div v-if="loading" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>分析中...</p>
         </div>
@@ -293,7 +293,7 @@ const getSignificanceBadge = (pValue) => {
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .query-button{
   margin: 0 auto 0;
 }
@@ -325,17 +325,24 @@ const getSignificanceBadge = (pValue) => {
   margin-bottom: 20px;
 }
 
+.form-content {
+  @include flex-col;
+  gap: 12px;
+  margin-top: 16px;
+}
+
 .form-content h3 {
   font-size: 16px;
-  margin-bottom: 16px;
+  margin: 0 16px 0 0;
   color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .form-group {
   display: grid;
-  grid-template-columns: 100px 1fr;
-  align-items: center;
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 4px 12px;
   margin-bottom: 12px;
 }
 
@@ -345,30 +352,8 @@ const getSignificanceBadge = (pValue) => {
   color: var(--text-secondary);
 }
 
-.char-input,
-.text-input,
-.number-input,
-.select-input {
+.vml-number-input {
   padding: 8px 12px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.char-input {
-  width: auto;
-  font-size: 16px;
-  text-align: center;
-}
-
-.char-input:focus,
-.text-input:focus,
-.number-input:focus,
-.select-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
 }
 
 .results-table {
@@ -383,7 +368,7 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .table-container {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   display: inline-block;
   min-width: 100%;
@@ -404,7 +389,7 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .table-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   font-size: 14px;
   color: var(--text-primary);
@@ -412,18 +397,18 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .table-row {
-  background: rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--glass-30);
+  border-bottom: 1px solid var(--bg-hover);
   transition: background 0.3s ease;
   font-size: 14px;
 }
 
 .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .table-row.significant {
-  background: rgba(80, 200, 120, 0.1);
+  background: rgba(var(--color-success-rgb), 0.1);
 }
 
 .col {
@@ -433,17 +418,17 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .p-very-significant {
-  color: #27ae60;
+  color: var(--color-success);
   font-weight: 700;
 }
 
 .p-significant {
-  color: #2ecc71;
+  color: var(--color-success);
   font-weight: 600;
 }
 
 .p-marginal {
-  color: #f39c12;
+  color: var(--color-warning);
   font-weight: 500;
 }
 
@@ -453,29 +438,29 @@ const getSignificanceBadge = (pValue) => {
 
 .significance-badge {
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 600;
 }
 
 .badge-very-significant {
-  background: rgba(39, 174, 96, 0.2);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .badge-significant {
-  background: rgba(46, 204, 113, 0.2);
-  color: #2ecc71;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .badge-marginal {
-  background: rgba(243, 156, 18, 0.2);
-  color: #f39c12;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning);
 }
 
 .badge-not-significant {
-  background: rgba(149, 165, 166, 0.2);
-  color: #95a5a6;
+  background: rgba(var(--text-secondary-rgb), 0.2);
+  color: var(--text-secondary);
 }
 
 .summary-panel {
@@ -496,8 +481,8 @@ const getSignificanceBadge = (pValue) => {
 
 .summary-item {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
   text-align: center;
 }
 
@@ -511,6 +496,18 @@ const getSignificanceBadge = (pValue) => {
   font-size: 24px;
   font-weight: 700;
   color: var(--color-primary);
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .form-content {
+    flex-flow: row wrap;
+    align-items: center;
+  }
+
+  .form-group {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+  }
 }
 
 @media (max-width: 768px) {

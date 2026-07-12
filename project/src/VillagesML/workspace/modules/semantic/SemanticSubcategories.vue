@@ -47,7 +47,7 @@
       </div>
 
       <!-- Regional Results -->
-      <div v-if="loadingRegional" class="loading-state vml-glass-panel">
+      <div v-if="loadingRegional" class="vml-loading vml-glass-panel">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -55,7 +55,7 @@
       <div v-else-if="regionalData" class="regional-results">
         <div class="regional-header vml-glass-panel">
           <h3>{{ regionalData.region_name }} - {{ getSubcategoryName(regionalData.parent_category) || regionalData.parent_category }} 子類別分布</h3>
-          <p style="font-size: 14px; color: #666; margin-top: 8px;">
+          <p style="font-size: 14px; color: var(--text-tertiary); margin-top: 8px;">
             包含 {{ regionalData.subcategories?.length || 0 }} 個子類別：
             <span v-for="(subcat, index) in regionalData.subcategories" :key="subcat.subcategory" style="margin-left: 4px;">
               {{ getSubcategoryName(subcat.subcategory) || subcat.subcategory }}<span v-if="index < regionalData.subcategories.length - 1">、</span>
@@ -131,7 +131,7 @@
 
           <div class="form-group">
             <label>返回數量:</label>
-            <input v-model.number="topN" type="number" min="5" max="50" class="number-input" />
+            <input v-model.number="topN" type="number" min="5" max="50" class="vml-number-input" />
           </div>
         </div>
 
@@ -145,7 +145,7 @@
       </div>
 
       <!-- Ranking Results -->
-      <div v-if="loadingRanking" class="loading-state vml-glass-panel">
+      <div v-if="loadingRanking" class="vml-loading vml-glass-panel">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -521,7 +521,7 @@ export default {
           data: values,
           itemStyle: {
             color: (params) => {
-              const colors = ['#d73027', '#f46d43', '#fdae61', '#fee090', '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']
+              const colors = ['#d32f2f', '#f46d43', '#fdae61', '#fee090', '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']
               return colors[Math.min(params.dataIndex, colors.length - 1)]
             }
           },
@@ -608,7 +608,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .query-button{
   margin: 0 auto 0;
 }
@@ -623,7 +625,7 @@ export default {
   font-size: 28px;
   font-weight: 600;
   margin-bottom: 24px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .vml-glass-panel {
@@ -632,10 +634,16 @@ export default {
 }
 
 
+.query-form {
+  @include flex-col;
+}
+
 .query-form h3 {
-  margin-bottom: 16px;
-  font-size: 20px;
-  color: var(--text-primary, #2c3e50);
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .form-group {
@@ -646,7 +654,7 @@ export default {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .form-row {
@@ -655,29 +663,23 @@ export default {
   gap: 16px;
 }
 
-.select-input,
-.text-input,
-.number-input {
+.vml-number-input {
   width: 100%;
   padding: 10px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
+  border-radius: var(--radius-sm2);
+  background: var(--glass-80);
   transition: border-color 0.3s ease;
 }
 
-.select-input:focus,
-.text-input:focus,
-.number-input:focus {
+.vml-number-input:focus {
   outline: none;
-  border-color: var(--color-primary, #4a90e2);
+  border-color: var(--color-primary, var(--vml-blue));
 }
 
 .results-header h3 {
   margin: 0;
   font-size: 20px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .subcategory-grid {
@@ -700,14 +702,14 @@ export default {
 .subcat-header h4 {
   margin: 0;
   font-size: 16px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .parent-badge {
-  background: rgba(74, 144, 226, 0.2);
-  color: #4a90e2;
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  color: var(--vml-blue);
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
 }
@@ -724,12 +726,12 @@ export default {
 }
 
 .stat-label {
-  color: #666;
+  color: var(--text-tertiary);
 }
 
 .stat-value {
   font-weight: 600;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .char-preview {
@@ -739,23 +741,23 @@ export default {
 .char-label {
   font-size: 13px;
   font-weight: 500;
-  color: #666;
+  color: var(--text-tertiary);
   margin-bottom: 4px;
 }
 
 .char-list {
   font-size: 14px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
   line-height: 1.6;
 }
 
 .detail-button {
   width: 100%;
   padding: 8px 16px;
-  background: rgba(74, 144, 226, 0.1);
-  color: var(--color-primary, #4a90e2);
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  color: var(--color-primary, var(--vml-blue));
+  border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -763,8 +765,8 @@ export default {
 }
 
 .detail-button:hover {
-  background: rgba(74, 144, 226, 0.2);
-  border-color: var(--color-primary, #4a90e2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
+  border-color: var(--color-primary, var(--vml-blue));
 }
 
 .regional-header h3,
@@ -773,7 +775,7 @@ export default {
 .ranking-table h4 {
   margin: 0 0 16px 0;
   font-size: 18px;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 .radar-container,
@@ -793,67 +795,75 @@ table {
 }
 
 thead {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 th,
 td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(74, 144, 226, 0.2);
+  border-bottom: 1px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 
 th {
   font-weight: 600;
-  color: var(--text-primary, #2c3e50);
+  color: var(--text-primary);
 }
 
 tr.significant {
-  background: rgba(80, 200, 120, 0.05);
+  background: rgba(var(--color-success-rgb), 0.05);
 }
 
 .tendency-badge {
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
 }
 
 .tendency-badge.positive {
-  background: rgba(80, 200, 120, 0.2);
-  color: #27ae60;
+  background: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
 }
 
 .tendency-badge.negative {
-  background: rgba(231, 76, 60, 0.2);
-  color: #e74c3c;
+  background: rgba(var(--color-error-rgb), 0.2);
+  color: var(--color-error);
 }
 
 .rank-badge {
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   font-size: 14px;
   color: white;
 }
 
 .rank-badge.gold {
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
-  color: #333;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold));
+  color: var(--text-dark)
 }
 
 .rank-badge.silver {
-  background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
-  color: #333;
+  background: linear-gradient(135deg, var(--color-silver), var(--border-light-gray));
+  color: var(--text-dark)
 }
 
 .rank-badge.bronze {
-  background: linear-gradient(135deg, #cd7f32, #e8a87c);
-  color: #333;
+  background: linear-gradient(135deg, var(--color-bronze), var(--vml-terracotta));
+  color: var(--text-dark)
 }
 
 .rank-badge:not(.gold):not(.silver):not(.bronze) {
-  background: var(--color-primary, #4a90e2);
+  background: var(--color-primary, var(--vml-blue));
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .query-form {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 12px;
+  }
 }
 
 @media (max-width: 768px) {

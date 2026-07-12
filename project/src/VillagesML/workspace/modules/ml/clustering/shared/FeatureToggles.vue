@@ -79,7 +79,7 @@ function updateFeature(key, value) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .section-title {
   font-size: 1rem;
   font-weight: 600;
@@ -106,13 +106,13 @@ function updateFeature(key, value) {
 
 .setting-hint {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-tertiary);
   font-style: italic;
 }
 
 .morphology-params {
   margin-left: 1rem;
   padding-left: 1rem;
-  border-left: 2px solid rgba(74, 144, 226, 0.2);
+  border-left: 2px solid rgba(var(--vml-blue-rgb), 0.2);
 }
 </style>

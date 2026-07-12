@@ -11,7 +11,7 @@
     </h3>
 
     <!-- Composition Patterns -->
-    <div class="patterns-section glass-panel">
+    <div class="patterns-section vml-glass-panel">
 <!--      <h2>組合模式</h2>-->
       <p class="section-description">
         分析村名中語義類別的組合模式，例如「方位+聚落」、「水系+聚落」等。
@@ -24,7 +24,7 @@
             type="number"
             min="1"
             placeholder="例如：5"
-            class="number-input"
+            class="vml-number-input"
           />
           <span class="input-hint">過濾掉出現次數少於此值的模式</span>
         </div>
@@ -36,7 +36,7 @@
             min="10"
             max="1000"
             placeholder="例如：50"
-            class="number-input"
+            class="vml-number-input"
           />
           <span class="input-hint">返回前N個最常見的模式（最多1000）</span>
         </div>
@@ -49,7 +49,7 @@
         </button>
       </div>
 
-      <div v-if="loadingPatterns" class="loading-state">
+      <div v-if="loadingPatterns" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -120,7 +120,7 @@ const translatePattern = (patternStr) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .semantic-composition-page {
   padding: 12px;
   max-width: 1400px;
@@ -130,15 +130,12 @@ const translatePattern = (patternStr) => {
 .patterns-section {
   padding: 16px;
   margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
 }
 
 .patterns-section h2 {
-  font-size: 16px;
   margin-bottom: 10px;
-  color: var(--text-primary);
 }
 
 .section-description {
@@ -157,8 +154,7 @@ const translatePattern = (patternStr) => {
 }
 
 .input-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
 }
 
@@ -174,23 +170,12 @@ const translatePattern = (patternStr) => {
   margin-top: 2px;
 }
 
-.number-input {
-  padding: 10px 16px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
+.vml-number-input {
   width: 150px;
 }
 
-.number-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
-}
-
 .patterns-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow-x: auto;
   overflow-y: visible;
   width: 100%;
@@ -212,19 +197,19 @@ const translatePattern = (patternStr) => {
 }
 
 .table-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .table-row {
-  background: rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--glass-30);
+  border-bottom: 1px solid var(--bg-hover);
   transition: background 0.3s ease;
 }
 
 .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .col-components {
@@ -236,19 +221,19 @@ const translatePattern = (patternStr) => {
 
 .component-tag {
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .component-tag.modifier {
-  background: rgba(243, 156, 18, 0.2);
-  color: #d68910;
+  background: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning-dark);
 }
 
 .component-tag.head {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
 }
 
@@ -266,7 +251,7 @@ const translatePattern = (patternStr) => {
     align-items: stretch;
   }
 
-  .number-input {
+  .vml-number-input {
     width: 100%;
   }
 }

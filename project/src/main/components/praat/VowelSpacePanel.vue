@@ -163,12 +163,12 @@ const showReferenceVowels = ref(false)  // Toggle reference vowels
 
 // Color palette for segments
 const segmentColors = [
-  '#34c759',  // Green - rime_core
-  '#007aff',  // Blue - syllable_like
-  '#ff9500',  // Orange - voiced
+  'var(--color-success)',  // Green - rime_core
+  'var(--color-primary)',  // Blue - syllable_like
+  'var(--color-warning)',  // Orange - voiced
   '#ff2d55',  // Pink
-  '#5856d6',  // Purple
-  '#5ac8fa',  // Cyan
+  'var(--color-purple)',  // Purple
+  'var(--color-cyan)',  // Cyan
 ]
 
 const getSegmentTypeLabel = (type) => {
@@ -354,7 +354,7 @@ const initChart = () => {
       data: allVowelSpaceData.value,
       symbolSize: 6,
       itemStyle: {
-        color: '#34c759',
+        color: 'var(--color-success)',
         opacity: 0.6
       }
     }]
@@ -368,7 +368,7 @@ const initChart = () => {
       data: referenceVowelsData.map(v => [v.F2, v.F1]),
       symbolSize: 10,
       itemStyle: {
-        color: '#8e8e93',
+        color: 'var(--text-secondary)',
         opacity: 0.7,
         borderColor: '#fff',
         borderWidth: 1
@@ -381,7 +381,7 @@ const initChart = () => {
         },
         position: 'top',
         fontSize: 12,
-        color: '#8e8e93',
+        color: 'var(--text-secondary)',
         fontWeight: 'bold'
       },
       emphasis: {
@@ -532,122 +532,120 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary: var(--color-primary);
+$success: var(--color-success);
+$warning: var(--color-warning);
+
+$text-primary: var(--color-text-primary);
+$text-secondary: var(--color-text-secondary, var(--text-tertiary));
+
+$primary-background: rgba(var(--color-primary-rgb), 0.2);
+$success-background: rgba(var(--color-success-rgb), 0.2);
+$warning-background: rgba(var(--color-warning-rgb), 0.2);
+
+$surface-hover: var(--glass-20);
+$divider-light: var(--glass-20);
+
+$transition-duration: 0.3s;
+
+@mixin empty-message {
+  padding: 1rem;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
+  color: $text-secondary;
+  text-align: center;
+}
+
 .vowel-space-panel {
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
   width: 95%;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
 }
 
 .panel-title {
+  margin: 1rem;
+  color: var(--color-text-primary);
   font-size: 1.5rem;
   font-weight: 600;
-  margin:1rem;
-  color: var(--color-text-primary);
 }
 
 .usage-hint {
   max-width: 800px;
-  padding: 0.75rem 1.25rem;
   margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 152, 0, 0.1));
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 193, 7, 0.15),
+    rgba(var(--color-warning-rgb), 0.1)
+  );
   border-left: 4px solid #ffc107;
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-md, var(--radius-sm2));
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);
+  color: $text-primary;
+  text-align: left;
   font-size: 0.9rem;
   line-height: 1.6;
-  color: var(--color-text-primary, #2c3e50);
-  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);
-  text-align: left;
 }
 
 .section-title {
-  font-size: 1.1rem;
-  font-weight: 600;
   margin-bottom: 1rem;
   color: var(--color-text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
-/* Control Buttons */
+/* 显示控制 */
 .control-buttons {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-flow: row wrap;
   align-items: center;
+  justify-content: center;
+  gap: 1rem;
   width: 100%;
-  flex-direction: row;
+  margin-bottom: 2rem;
 }
 
-.control-btn {
-  padding: 0.75rem 1.5rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 500;
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
-}
-
-.control-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.control-btn.active {
-  border-color: #007aff;
-  background: rgba(0, 122, 255, 0.1);
-}
-.control-btn:disabled {
-  cursor: not-allowed;
-  pointer-events: none; /* 彻底防止点击事件 */
-}
-
-/* Switch Toggle Styles */
 .vowel-switch-container {
   display: flex;
   align-items: center;
   gap: 0.1rem;
   padding: 0.75rem 1.5rem;
-  transition: all 0.3s ease;
+  transition: opacity $transition-duration ease;
+
+  &.disabled {
+    @include disabled-state;
+    pointer-events: none;
+  }
 }
 
-
-.vowel-switch-container.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* Reference Vowels Checkbox */
 .reference-vowels-checkbox {
   display: flex;
   align-items: center;
   gap: 0.1rem;
   padding: 0.75rem 1.5rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform $transition-duration ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
 }
 
-.reference-vowels-checkbox:hover {
-  transform: translateY(-2px);
-}
-
-/* Segment Selector Section */
+/* 音段选择 */
 .segment-selector-section {
   margin-bottom: 2rem;
 }
 
-.no-segments-message {
-  padding: 1rem;
-  text-align: center;
-  color: var(--color-text-secondary);
-  background: var(--glass-light);
-  border-radius: var(--radius-md);
+.no-segments-message,
+.no-selection-message {
+  @include empty-message;
 }
 
 .segment-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.75rem;
 }
 
@@ -657,77 +655,69 @@ onBeforeUnmount(() => {
   gap: 0.75rem;
   padding: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-}
+  transition:
+    background $transition-duration ease,
+    transform $transition-duration ease;
 
-.segment-checkbox:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateX(4px);
+  &:hover {
+    background: $surface-hover;
+    transform: translateX(4px);
+  }
 }
 
 .segment-color-indicator {
+  flex-shrink: 0;
   width: 16px;
   height: 16px;
-  border-radius: 50%;
-  flex-shrink: 0;
+  border-radius: var(--radius-full);
 }
 
 .segment-label {
   flex: 1;
-  font-size: 0.95rem;
   color: var(--color-text-primary);
+  font-size: 0.95rem;
 }
 
 .segment-type-badge {
   padding: 0.25rem 0.75rem;
   border-radius: var(--radius-sm);
+  text-transform: uppercase;
   font-size: 0.8rem;
   font-weight: 500;
-  text-transform: uppercase;
+
+  &.type-rime_core {
+    background: $success-background;
+    color: $success;
+  }
+
+  &.type-syllable_like {
+    background: $primary-background;
+    color: $primary;
+  }
+
+  &.type-voiced {
+    background: $warning-background;
+    color: $warning;
+  }
 }
 
-.segment-type-badge.type-rime_core {
-  background: rgba(52, 199, 89, 0.2);
-  color: #34c759;
-}
-
-.segment-type-badge.type-syllable_like {
-  background: rgba(0, 122, 255, 0.2);
-  color: #007aff;
-}
-
-.segment-type-badge.type-voiced {
-  background: rgba(255, 149, 0, 0.2);
-  color: #ff9500;
-}
-
-/* Chart Section */
+/* 元音空间图 */
 .chart-section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   margin-bottom: 2rem;
 }
 
 .chart-container {
   width: 80%;
   height: 500px;
-  background: var(--glass-light);
-  border-radius: var(--radius-lg);
   padding: 1rem;
+  background: var(--glass-30);
+  border-radius: var(--radius-lg);
 }
 
-/* Statistics Section */
+/* 统计信息 */
 .stats-section {
   margin-bottom: 2rem;
-}
-
-.no-selection-message {
-  padding: 1rem;
-  text-align: center;
-  color: var(--color-text-secondary);
-  background: var(--glass-light);
-  border-radius: var(--radius-md);
 }
 
 .stats-grid {
@@ -746,61 +736,57 @@ onBeforeUnmount(() => {
   gap: 0.5rem;
   margin-bottom: 0.5rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
+  border-bottom: 1px solid $divider-light;
 
-.segment-color-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+  .segment-color-dot {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: var(--radius-full);
+  }
 
-.stat-header .stat-label {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  .stat-label {
+    color: var(--color-text-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
 }
 
 .stat-values {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
 }
 
 .stat-item {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
+
+  .stat-key {
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+  }
+
+  .stat-value {
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+  }
 }
 
-.stat-key {
-  font-size: 0.85rem;
-  color: var(--color-text-secondary);
-}
-
-.stat-value {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-/* Description Section */
+/* 描述区域 */
 .description-section {
+  @include flex-center;
   padding: 1rem;
-  background: var(--glass-light);
+  background: var(--glass-30);
   border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  justify-items: center;
 }
 
 .description-text {
+  margin: 0;
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
   line-height: 1.6;
-  color: var(--color-text-secondary);
-  margin: 0;
 }
 
 @media (max-aspect-ratio: 1/1) {
@@ -814,21 +800,17 @@ onBeforeUnmount(() => {
   }
 
   .usage-hint {
-    font-size: 0.85rem;
-    padding: 0.6rem 1rem;
     margin-bottom: 1rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
   }
 
-  /* Mobile optimizations for controls */
   .control-buttons {
     gap: 0.5rem;
     width: 100%;
   }
 
-  .vowel-switch-container {
-    padding: 0.5rem 1rem;
-  }
-
+  .vowel-switch-container,
   .reference-vowels-checkbox {
     padding: 0.5rem 1rem;
   }
@@ -836,6 +818,5 @@ onBeforeUnmount(() => {
   .segment-label {
     font-size: 0.8rem;
   }
-
 }
 </style>

@@ -12,10 +12,9 @@ import { defineAsyncComponent } from 'vue'
 const Dashboard = defineAsyncComponent(() => import('@/VillagesML/dashboard/Dashboard.vue'))
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .villages-ml-page {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   height: 92dvh;
   width: 98dvw;
   max-width: 1600px;

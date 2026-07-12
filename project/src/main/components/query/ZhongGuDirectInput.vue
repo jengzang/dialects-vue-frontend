@@ -70,8 +70,8 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import ZhongGuSelector from '@/main/components/query/ZhongGuSelector.vue'
-import ZhongGuInputHelpModal from '@/main/components/popup/query/ZhongGuInputHelpModal.vue'
-import { validateAll, parseTokens, tokensToPathStrings } from '@/main/utils/zhongguDirectInputValidator.js'
+import ZhongGuInputHelpModal from '@/main/components/query/popups/ZhongGuInputHelpModal.vue'
+import { validateAll, parseTokens, tokensToPathStrings } from '@/main/utils/query/zhongguDirectInputValidator.js'
 import { ROLE_LIMITS } from '@/main/config/constants.js'
 import { userStore } from '@/main/store/store.js'
 
@@ -146,58 +146,78 @@ watch(chars, (newVal) => {
 defineExpose({ pathStrings, chars, positionInput, charInput })
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary-color: var(--color-blue-custom, var(--color-primary));
+$text-medium-color: var(--text-medium, var(--text-medium));
+$error-color: var(--color-error-light);
+$warning-color: var(--color-warning);
+$transition-duration: 0.2s;
+
+@mixin status-message {
+  @include flex-col;
+  gap: 2px;
+}
+
+@mixin status-item($color) {
+  color: $color;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .zhonggu-direct-input {
-  background: none;
+  position: relative;
+  left: 50%;
+  @include flex-col;
+  gap: 6px;
   width: 80dvw;
   max-width: 600px;
   margin: 10px 0;
   padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  position: relative;
-  left: 50%;
+  background: none;
   transform: translateX(-50%);
+
+  @media (max-aspect-ratio: 1/1) {
+    gap: 0;
+    padding: 8px;
+  }
 }
 
 .input-section {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
 .input-label-row {
   display: flex;
+  gap: 16px;
   align-items: center;
   justify-content: center;
-  gap: 16px;
 }
 
 .input-label {
+  color: $text-medium-color;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-medium, #555);
 }
 
 .help-btn {
+  @include flex-center;
   width: 24px;
   height: 24px;
-  border: 1.5px solid var(--color-blue-custom, #007aff);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--color-blue-custom, #007aff);
+  color: $primary-color;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
+  background: transparent;
+  border: 1.5px solid $primary-color;
+  border-radius: var(--radius-full);
+  transition: all $transition-duration;
 
   &:hover {
-    background: var(--color-blue-custom, #007aff);
-    color: #fff;
+    color: var(--text-white);
+    background: $primary-color;
   }
 }
 
@@ -209,49 +229,34 @@ textarea {
   resize: vertical;
 
   &:focus {
-    border-color: var(--color-blue-custom, #007aff);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.15);
   }
 
   &.input-error {
-    border-color: #ff3b30;
-    box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.12);
+    border-color: $error-color;
+    box-shadow: 0 0 0 3px rgba(var(--color-error-light-rgb), 0.12);
   }
 
   &.input-warning {
-    border-color: #ff9500;
-    box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.12);
+    border-color: $warning-color;
+    box-shadow: 0 0 0 3px rgba(var(--color-warning-rgb), 0.12);
   }
 }
 
 .error-message {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  @include status-message;
 }
 
 .error-item {
-  color: #ff3b30;
-  font-size: 12px;
-  line-height: 1.4;
+  @include status-item($error-color);
 }
 
 .warning-message {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  @include status-message;
 }
 
 .warning-item {
-  color: #ff9500;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-@media (max-aspect-ratio: 1/1) {
-  .zhonggu-direct-input {
-    gap:0px;
-    padding: 8px;
-  }
+  @include status-item($warning-color);
 }
 </style>

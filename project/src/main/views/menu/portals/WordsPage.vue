@@ -45,7 +45,9 @@ const handleYuBaoGrammar = () => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .words-page {
   min-width: 80dvw;
   display: flex;
@@ -58,7 +60,7 @@ const handleYuBaoGrammar = () => {
 .page-title {
   font-size: 32px;
   font-weight: 700;
-  color: #1d1d1f;
+  color: var(--text-primary);
   margin-bottom: 30px;
   text-align: center;
 }
@@ -72,25 +74,24 @@ const handleYuBaoGrammar = () => {
 }
 
 .word-btn {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-90);
   backdrop-filter: blur(10px);
-  border: 2px solid rgba(0, 122, 255, 0.2);
-  border-radius: 16px;
+  border: 2px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: var(--radius-lg);
   padding: 30px 20px;
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: center;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 12px;
 }
 
 .word-btn:hover {
   transform: translateY(-4px);
-  border-color: #007aff;
-  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.2);
-  background: rgba(255, 255, 255, 1);
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 24px rgba(var(--color-primary-rgb), 0.2);
+  background: var(--text-white);
 }
 
 .word-icon {
@@ -101,12 +102,12 @@ const handleYuBaoGrammar = () => {
 .word-name {
   font-size: 20px;
   font-weight: 600;
-  color: #1d1d1f;
+  color: var(--text-primary);
 }
 
 .word-desc {
   font-size: 14px;
-  color: #666;
+  color: var(--text-tertiary);
   line-height: 1.5;
 }
 

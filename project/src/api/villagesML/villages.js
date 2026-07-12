@@ -117,3 +117,57 @@ export async function getVillageSemanticStructure(villageId) {
 export async function getVillageNgrams(villageId) {
   return api(`/api/villages/village/ngrams/${villageId}`)
 }
+
+/**
+ * 子集篩選 — 一次請求返回全部匹配村莊（無分頁循環）。
+ * 所有條件為 AND 關係，同組內（數組字段）為 OR。
+ *
+ * @param {Object} params
+ * @param {string} [params.city] - 城市精確匹配
+ * @param {string} [params.county] - 區縣精確匹配
+ * @param {string} [params.township] - 鄉鎮精確匹配
+ * @param {string} [params.keyword] - 村名模糊匹配
+ * @param {'contains'|'startsWith'|'endsWith'|'equals'} [params.nameMatchMode] - 名稱匹配模式，默認 "contains"
+ * @param {number} [params.minLength] - 最小名稱長度
+ * @param {number} [params.maxLength] - 最大名稱長度
+ * @param {string[]} [params.semanticCategories] - 語義大類
+ * @param {'any'|'all'} [params.semanticMatch] - 多類別邏輯，默認 "any"
+ * @param {string[]} [params.structurePatterns] - 結構模式
+ * @param {string} [params.suffix] - 後綴字符（長度=1）
+ * @param {string} [params.prefix] - 前綴字符（長度=1）
+ * @param {number} [params.charAtPosition] - 指定位置
+ * @param {string} [params.charAtValue] - 指定位置字符（長度=1）
+ * @param {number} [params.latMin] - 最小緯度
+ * @param {number} [params.latMax] - 最大緯度
+ * @param {number} [params.lonMin] - 最小經度
+ * @param {number} [params.lonMax] - 最大經度
+ * @param {number} [params.maxResults] - 返回上限，默認 5000
+ * @returns {Promise<{villages: Array<{id: number, name: string, city: string, county: string, nameLength: number}>, total: number}>}
+ */
+export async function fetchSubsetFilter(params = {}) {
+  const body = {}
+  if (params.city != null) body.city = params.city
+  if (params.county != null) body.county = params.county
+  if (params.township != null) body.township = params.township
+  if (params.keyword != null) body.keyword = params.keyword
+  if (params.nameMatchMode != null) body.name_match_mode = params.nameMatchMode
+  if (params.minLength != null) body.min_length = params.minLength
+  if (params.maxLength != null) body.max_length = params.maxLength
+  if (params.semanticCategories) body.semantic_categories = params.semanticCategories
+  if (params.semanticMatch) body.semantic_match = params.semanticMatch
+  if (params.structurePatterns) body.structure_patterns = params.structurePatterns
+  if (params.suffix != null) body.suffix = params.suffix
+  if (params.prefix != null) body.prefix = params.prefix
+  if (params.charAtPosition != null) body.char_at_position = params.charAtPosition
+  if (params.charAtValue != null) body.char_at_value = params.charAtValue
+  if (params.latMin != null) body.lat_min = params.latMin
+  if (params.latMax != null) body.lat_max = params.latMax
+  if (params.lonMin != null) body.lon_min = params.lonMin
+  if (params.lonMax != null) body.lon_max = params.lonMax
+  if (params.maxResults != null) body.max_results = params.maxResults
+
+  return api('/api/villages/subset/filter', {
+    method: 'POST',
+    body
+  })
+}

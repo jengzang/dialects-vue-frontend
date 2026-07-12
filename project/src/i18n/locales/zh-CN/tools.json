@@ -111,7 +111,8 @@
       "progressFailed": "获取进度失败：{message}",
       "processFailed": "处理失败：{message}",
       "taskMissing": "未找到任务 ID",
-      "downloadFailed": "下载失败：{message}"
+      "downloadFailed": "下载失败：{message}",
+      "previewFailed": "预览字表失败：{message}"
     },
     "export": {
       "configFileName": "jyut2ipa-rules.json",
@@ -137,6 +138,7 @@
       "columnCount": "列数",
       "viewDefault": "查看默认参考表",
       "loadingDefault": "正在载入参考表...",
+      "downloadDefault": "下载默认参考表",
       "next": "下一步"
     },
     "files": {
@@ -178,7 +180,7 @@
     },
     "validation": {
       "loginRequired": "请先登录",
-      "invalidFileType": "请上传 Excel 文件（.xlsx 或 .xls 格式）",
+      "invalidFileType": "请上传表格文件（.xlsx、.xls 或 .csv 格式）",
       "partialInvalid": "部分文件格式不正确，仅支持 .xlsx 与 .xls 格式",
       "fileTooLarge": "以下文件超过 3MB 限制：{files}",
       "referenceFileTooLarge": "文件大小不得超过 3MB",
@@ -193,7 +195,8 @@
       "readDefaultFailed": "读取默认参考表失败：{message}",
       "defaultDownloaded": "默认参考表已下载",
       "useDefaultSuccess": "已使用默认参考表",
-      "useDefaultFailed": "使用参考表失败：{message}"
+      "useDefaultFailed": "使用参考表失败：{message}",
+      "previewFailed": "预览参考表失败：{message}"
     },
     "export": {
       "resultFileName": "方音圖鑑_合併字表.xlsx",

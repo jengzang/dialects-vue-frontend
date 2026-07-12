@@ -1,11 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { computed, h, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
+import { nextTick } from 'vue'
 import i18n from '@/i18n/index.js'
 import { waitForAuthReady } from '@/api/auth/auth.js'
 import { userStore } from '@/main/store/store.js'
 import { showWarning } from '@/utils/message.js'
-import { showRouteLoading, hideRouteLoading } from '@/stores/routeLoading.js'
+import { showRouteLoading, hideRouteLoading } from '@/utils/routeLoading.js'
 import { menuRoutes } from '@/main/router/menuRoutes.js'
 import { exploreRoutes } from '@/main/router/exploreRoutes.js'
 import { resolvePreferredLocale } from '@/i18n/localeDetector.js'
@@ -23,10 +22,6 @@ import {
 } from '@/i18n/localeRouting.js'
 
 const HomePage = () => import('@/main/views/HomePage.vue')
-// 旧 intro 入口已废弃，不再保留单独入口，避免继续暴露历史页面标识。
-const LikeAuthor = () => import('./views/intro/LikeAuthor.vue')
-const Suggestions = () => import('./views/intro/Suggestions.vue')
-const Thanks = () => import('./views/intro/Thanks.vue')
 const Auth = () => import('./views/auth.vue')
 const UserDataPage = () => import('./components/user/UserDataPage.vue')
 const UserRegionPage = () => import('./components/user/UserRegionPage.vue')
@@ -46,23 +41,6 @@ function createLocaleRedirect(path) {
     query: to.query,
     hash: to.hash,
   })
-}
-
-// 旧 intro 入口已废弃：此兼容组件仅保留给内部兜底，不再作为对外页面入口。
-const IntroEntry = {
-  setup() {
-    const route = useRoute()
-    const activeComponent = computed(() => {
-      const tab = route.query.tab
-      const tabMap = {
-        like: LikeAuthor,
-        suggestions: Suggestions,
-        thanks: Thanks
-      }
-      return tabMap[tab] || LikeAuthor
-    })
-    return () => h(activeComponent.value)
-  }
 }
 
 const routes = [
@@ -143,13 +121,6 @@ const routes = [
     component: VillagesMLBridge
   },
   {
-    path: '/intro',
-    redirect: () => ({
-      path: buildLocalePath(resolvePreferredLocale('/intro'), '/'),
-      replace: true,
-    })
-  },
-  {
     path: '/:pathMatch(.*)*',
     redirect: (to) => {
       const locale = extractLocaleFromPath(to.path)
@@ -219,6 +190,7 @@ const ROUTE_QUERY_ALLOWLIST = {
       manage: [],
       gdVillages: [],
       gdVillagesTable: [],
+      allVillages: [],
       check: [],
       jyut2ipa: [],
       merge: [],
@@ -262,6 +234,9 @@ const ROUTE_QUERY_ALLOWLIST = {
     base: []
   },
   '/explore/villages/ml': {
+    base: []
+  },
+  '/explore/villages/all': {
     base: []
   },
   '/menu/pho/matrix': {
@@ -418,13 +393,6 @@ router.beforeEach(async (to, from, next) => {
       path: buildLocalePath(normalizeLocale(routeLocale), stripLocaleFromPath(to.path)),
       query: to.query,
       hash: to.hash,
-      replace: true,
-    })
-  }
-
-  if (to.path === '/intro') {
-    return next({
-      path: buildLocalePath(resolvePreferredLocale('/intro'), '/'),
       replace: true,
     })
   }

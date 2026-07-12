@@ -925,14 +925,15 @@ onBeforeUnmount(() => {
 // }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .praat-page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0;
   position: relative;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   justify-content: center;
   align-items: center;
   height: 95dvh;
@@ -954,16 +955,16 @@ onBeforeUnmount(() => {
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
-  background: rgba(255, 59, 48, 0.15);
+  background: rgba(var(--color-error-light-rgb), 0.15);
   color: var(--color-error);
-  border: 1px solid rgba(255, 59, 48, 0.3);
+  border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
 }
 
 .login-button:hover {
   background: var(--color-error);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--color-error-light-rgb), 0.3);
 }
 
 .page-header {
@@ -1003,28 +1004,27 @@ onBeforeUnmount(() => {
 }
 
 .tab-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 4px;
   padding: 4px;
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--glass-80);
   backdrop-filter: blur(60px) saturate(200%);
   -webkit-backdrop-filter: blur(60px) saturate(200%);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-40);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
-              inset 0 1px 0 rgba(255, 255, 255, 0.6);
+              inset 0 1px 0 var(--glass-60);
 }
 
 .tab-btn {
   padding: 12px 16px;
   border: none;
   background: transparent;
-  color: #6e6e73;
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.01em;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
@@ -1034,13 +1034,13 @@ onBeforeUnmount(() => {
 
 .tab-btn:hover:not(.active):not(:disabled) {
   background: rgba(0, 0, 0, 0.04);
-  color: #1d1d1f;
+  color: var(--text-primary);
   transform: translateX(2px);
 }
 
 .tab-btn.active {
-  background: #ffffff;
-  color: #0071e3;
+  background: var(--bg-white);
+  color: var(--color-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
               0 1px 2px rgba(0, 0, 0, 0.06);
   font-weight: 600;
@@ -1110,13 +1110,12 @@ onBeforeUnmount(() => {
 
 .start-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.3);
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent-purple));
 }
 
 .start-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
   filter: grayscale(0.8); /* 让颜色变灰，提示不可用 */
   box-shadow: none;
 }
@@ -1190,11 +1189,11 @@ onBeforeUnmount(() => {
 .mode-options .radio-option.active {
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent-purple));
   color: white;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
 }
 
 .mode-options .radio-option:not(.active):hover {
-  background: var(--glass-medium);
+  background: var(--glass-60);
   transform: translateY(-1px);
 }
 
@@ -1221,10 +1220,10 @@ onBeforeUnmount(() => {
   max-width: calc(100vw - 30px);
 
   /* 1. 圆角：苹果风格的核心，大圆角才会显得圆润 */
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
 
   /* 2. 背景：降低透明度，让底色更透 */
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
 
   /* 3. 增强模糊：saturate 稍微拉高一点点，模拟折射 */
   backdrop-filter: blur(40px) saturate(200%);
@@ -1233,15 +1232,14 @@ onBeforeUnmount(() => {
   /* 4. 复合阴影：这是液态感的关键 */
   box-shadow:
       0 20px 50px rgba(0, 0, 0, 0.1),            /* 整体浮动感 */
-      inset 0 0 0 1.5px rgba(255, 255, 255, 0.5), /* 环绕的高光边框，模拟玻璃边缘折射 */
-      inset 0 1px 1px rgba(255, 255, 255, 0.8);   /* 顶部微弱亮边 */
+      inset 0 0 0 1.5px var(--glass-50), /* 环绕的高光边框，模拟玻璃边缘折射 */
+      inset 0 1px 1px var(--glass-80);   /* 顶部微弱亮边 */
 
   /* 取消原来的 border-right，改用阴影里的 inset 模拟更高级 */
   border: none;
 
   z-index: 1000;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   overflow: hidden;
   transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
@@ -1307,14 +1305,14 @@ onBeforeUnmount(() => {
   right: 2rem;
   width: 320px;
   max-width: calc(100vw - 4rem);
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--glass-80);
   backdrop-filter: blur(60px) saturate(200%);
   -webkit-backdrop-filter: blur(60px) saturate(200%);
   border-radius: var(--radius-xl);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--glass-40);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    inset 0 1px 0 var(--glass-60);
   z-index: 100;
   overflow: hidden;
   max-height: 95dvh;
@@ -1401,16 +1399,14 @@ onBeforeUnmount(() => {
 
 
 .loading-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   text-align: center;
   padding: 2rem 0;
 }
 
 .error-content {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   text-align: center;
   padding: 2rem 0;
@@ -1424,7 +1420,7 @@ onBeforeUnmount(() => {
 .error-title {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #ff3b30;
+  color: var(--color-error-light);
   margin-bottom: 0.5rem;
 }
 
@@ -1452,8 +1448,7 @@ onBeforeUnmount(() => {
 .loading-progress {
   width: 100%;
   max-width: 400px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
 }
 
@@ -1461,28 +1456,27 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 8px;
   background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #007aff, #5ac8fa);
-  border-radius: 4px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-cyan));
+  border-radius: var(--radius-xs);
   transition: width 0.3s ease;
 }
 
 .progress-text {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #007aff;
+  color: var(--color-primary);
   text-align: center;
 }
 
 /* No Results State */
 .no-results-state {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
   padding: 4rem 2rem;

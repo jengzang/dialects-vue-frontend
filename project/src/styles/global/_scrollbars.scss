@@ -1,17 +1,17 @@
 :root {
   --app-scrollbar-size: 8px;
-  --app-scrollbar-track: rgba(15, 23, 42, 0.06);
-  --app-scrollbar-thumb: rgba(0, 95, 211, 0.26);
-  --app-scrollbar-thumb-hover: rgba(0, 95, 211, 0.42);
+  --app-scrollbar-track: rgba(var(--color-shadow-rgb), 0.06);
+  --app-scrollbar-thumb: rgba(var(--color-primary-hover-rgb), 0.26);
+  --app-scrollbar-thumb-hover: rgba(var(--color-primary-hover-rgb), 0.42);
   --app-scrollbar-radius: 999px;
 }
 
 @media (max-width: 768px) {
   :root {
     --app-scrollbar-size: 4px;
-    --app-scrollbar-track: rgba(15, 23, 42, 0.03);
-    --app-scrollbar-thumb: rgba(0, 95, 211, 0.18);
-    --app-scrollbar-thumb-hover: rgba(0, 95, 211, 0.28);
+    --app-scrollbar-track: rgba(var(--color-shadow-rgb), 0.03);
+    --app-scrollbar-thumb: rgba(var(--color-primary-hover-rgb), 0.18);
+    --app-scrollbar-thumb-hover: rgba(var(--color-primary-hover-rgb), 0.28);
   }
 }
 

@@ -138,9 +138,16 @@ export default defineConfig(async ({ mode }) => {
     define: {
       __WEB_BASE__: JSON.stringify(webBase),
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `@use "@/styles/global/mixins" as *;\n@use "@/styles/global/keyframes" as *;\n`,
+        },
+      },
+    },
     server: {
       proxy: {
-        '^/(api|logs|sql|upload|download|static|files)(?:/|$)': {
+        '^/(api|user|logs|sql|upload|download|static|files)(?:/|$)': {
           target: 'https://dialects.yzup.top',
           changeOrigin: true,
           secure: false,

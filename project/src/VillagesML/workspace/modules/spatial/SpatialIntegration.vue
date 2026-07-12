@@ -19,7 +19,7 @@
       <!-- Overview Mode -->
       <div v-if="queryMode === 'overview'" class="overview-section">
 
-        <div v-if="loadingIntegration" class="loading-state vml-glass-panel">
+        <div v-if="loadingIntegration" class="vml-loading vml-glass-panel">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>加載中...</p>
         </div>
@@ -128,7 +128,7 @@
           </div>
         </div>
 
-        <div v-if="loadingByChar" class="loading-state vml-glass-panel">
+        <div v-if="loadingByChar" class="vml-loading vml-glass-panel">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>加載中...</p>
         </div>
@@ -162,7 +162,7 @@
                     class="tendency-fill"
                     :style="{
                       width: `${Math.abs(item.z_score) * 10}%`,
-                      background: item.z_score >= 0 ? 'var(--color-primary)' : '#e74c3c'
+                      background: item.z_score >= 0 ? 'var(--color-primary)' : 'var(--color-error)'
                     }"
                   ></div>
                 </div>
@@ -198,7 +198,7 @@
           </div>
         </div>
 
-        <div v-if="loadingByCluster" class="loading-state vml-glass-panel">
+        <div v-if="loadingByCluster" class="vml-loading vml-glass-panel">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>加載中...</p>
         </div>
@@ -471,7 +471,7 @@ const charMapLayers = computed(() => {
       'circle-stroke-color': [
         'case',
         ['==', ['get', 'is_significant'], 1],
-        '#FFD700',
+        '#ffd700',
         '#ffffff'
       ]
     }
@@ -624,23 +624,23 @@ const handlePointClick = (properties) => {
 // 根据倾向性值返回颜色
 const getTendencyColor = (tendency) => {
   if (!tendency) return '#666'
-  if (tendency > 1) return '#228B22'  // 深绿色（高倾向性）
-  if (tendency > 0.5) return '#50c878'  // 绿色
+  if (tendency > 1) return 'green'  // 深绿色（高倾向性）
+  if (tendency > 0.5) return '#34c759'  // 绿色
   if (tendency > 0) return '#90EE90'  // 浅绿色
-  if (tendency > -0.5) return '#ff6b6b'  // 浅红色
-  if (tendency > -1) return '#e74c3c'  // 红色
-  return '#c0392b'  // 深红色（低倾向性）
+  if (tendency > -0.5) return '#ff3b30'  // 浅红色
+  if (tendency > -1) return '#d32f2f'  // 红色
+  return '#962020'  // 深红色（低倾向性）
 }
 
 // 根据偏差值返回颜色
 const getDeviationColor = (deviation) => {
   if (!deviation) return '#666'
-  if (deviation > 0.5) return '#228B22'  // 深绿色（正偏差）
-  if (deviation > 0.2) return '#50c878'  // 绿色
+  if (deviation > 0.5) return 'green'  // 深绿色（正偏差）
+  if (deviation > 0.2) return '#34c759'  // 绿色
   if (deviation > 0) return '#90EE90'  // 浅绿色
-  if (deviation > -0.2) return '#ff6b6b'  // 浅红色
-  if (deviation > -0.5) return '#e74c3c'  // 红色
-  return '#c0392b'  // 深红色（负偏差）
+  if (deviation > -0.2) return '#ff3b30'  // 浅红色
+  if (deviation > -0.5) return '#d32f2f'  // 红色
+  return '#962020'  // 深红色（负偏差）
 }
 
 // 监听 queryMode 变化，自动加载对应数据
@@ -674,7 +674,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .spatial-integration-page {
   padding: 12px;
   max-width: 1400px;
@@ -725,8 +725,8 @@ onMounted(() => {
   color: var(--text-secondary);
   margin: 0;
   padding: 4px 12px;
-  background: rgba(74, 144, 226, 0.05);
-  border-radius: 6px;
+  background: rgba(var(--vml-blue-rgb), 0.05);
+  border-radius: var(--radius-sm);
 }
 
 .form-group {
@@ -743,44 +743,8 @@ onMounted(() => {
   color: var(--text-secondary);
 }
 
-.select-input,
-.text-input,
-.number-input,
-.char-input {
-  padding: 8px 12px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.select-input {
-  cursor: pointer;
-  width: 100%;
-}
-
-.select-input option {
-  background: white;
-  color: var(--text-primary);
-  padding: 8px;
-}
-
-.char-input {
-  font-size: 20px;
-  text-align: center;
-}
-
-.select-input:focus,
-.text-input:focus,
-.number-input:focus,
-.char-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
-}
-
 .load-clusters-button {
-  background: rgba(74, 144, 226, 0.8);
+  background: rgba(var(--vml-blue-rgb), 0.8);
 }
 
 .integration-results,
@@ -811,8 +775,8 @@ onMounted(() => {
 
 .map-placeholder {
   padding: 60px 20px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
   text-align: center;
 }
 
@@ -835,8 +799,8 @@ onMounted(() => {
 
 .stat-card {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
   text-align: center;
 }
 
@@ -853,8 +817,7 @@ onMounted(() => {
 }
 
 .tendency-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 10px;
 }
 
@@ -864,8 +827,8 @@ onMounted(() => {
   align-items: center;
   gap: 6px;
   padding: 6px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
 }
 
 .tendency-region {
@@ -876,8 +839,8 @@ onMounted(() => {
 
 .tendency-bar {
   height: 20px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
+  background: var(--glass-50);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -901,8 +864,8 @@ onMounted(() => {
 
 .char-item {
   padding: 10px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
   display: flex;
   justify-content: space-between;
 }
@@ -919,8 +882,7 @@ onMounted(() => {
 }
 
 .villages-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   max-height: 350px;
   overflow-y: auto;
@@ -932,26 +894,25 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
   gap: 12px;
 }
 
 .character-item.significant {
-  background: rgba(255, 215, 0, 0.1);
-  border: 1px solid rgba(255, 215, 0, 0.3);
+  background: rgba(var(--color-gold-rgb), 0.1);
+  border: 1px solid rgba(var(--color-gold-rgb), 0.3);
 }
 
 .characters-list {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   max-height: 400px;
   overflow-y: auto;
 }
 
 .characters-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   max-height: 500px;
   overflow-y: auto;
@@ -962,7 +923,7 @@ onMounted(() => {
   grid-template-columns: 50px 80px 85px 85px 85px 70px 90px 90px 100px 80px;
   gap: 12px;
   padding: 10px 12px;
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
   font-size: 13px;
@@ -978,8 +939,7 @@ onMounted(() => {
 }
 
 .char-table-body {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 
 .char-table-row {
@@ -988,8 +948,8 @@ onMounted(() => {
   gap: 12px;
   padding: 10px 12px;
   align-items: center;
-  background: rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--glass-30);
+  border-bottom: 1px solid var(--bg-hover);
   font-size: 13px;
   transition: background 0.3s ease;
   text-align: center;
@@ -1000,12 +960,12 @@ onMounted(() => {
 }
 
 .char-table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .char-table-row.significant {
-  background: rgba(255, 215, 0, 0.1);
-  border-left: 3px solid #FFD700;
+  background: rgba(var(--color-gold-rgb), 0.1);
+  border-left: 3px solid var(--color-gold);
 }
 
 .char-name {
@@ -1017,9 +977,9 @@ onMounted(() => {
 .category-badge-small {
   display: inline-block;
   padding: 3px 8px;
-  background: rgba(74, 144, 226, 0.15);
+  background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 11px;
   font-weight: 500;
 }
@@ -1047,9 +1007,9 @@ onMounted(() => {
 .char-badge {
   font-size: 11px;
   padding: 2px 8px;
-  background: rgba(255, 215, 0, 0.2);
-  color: #c87f0a;
-  border-radius: 10px;
+  background: rgba(var(--color-gold-rgb), 0.2);
+  color: var(--color-warning-dark);
+  border-radius: var(--radius-md);
   font-weight: 500;
 }
 
@@ -1068,8 +1028,8 @@ onMounted(() => {
   margin-top: 10px;
   text-align: center;
   padding: 10px;
-  background: rgba(243, 156, 18, 0.1);
-  border-radius: 8px;
+  background: rgba(var(--color-warning-rgb), 0.1);
+  border-radius: var(--radius-sm2);
   color: var(--text-secondary);
   font-size: 13px;
 }
@@ -1080,9 +1040,7 @@ onMounted(() => {
 }
 
 .summary-section h2 {
-  font-size: 16px;
   margin-bottom: 12px;
-  color: var(--text-primary);
 }
 
 .summary-grid {
@@ -1094,8 +1052,8 @@ onMounted(() => {
 
 .summary-card {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
   text-align: center;
 }
 
@@ -1123,7 +1081,7 @@ onMounted(() => {
 }
 
 .integration-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   display: inline-block;
   min-width: 100%;
@@ -1140,7 +1098,7 @@ onMounted(() => {
 }
 
 .table-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
@@ -1152,8 +1110,8 @@ onMounted(() => {
 }
 
 .table-row {
-  background: rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--glass-30);
+  border-bottom: 1px solid var(--bg-hover);
   transition: background 0.3s ease;
   text-align: center;
 }
@@ -1163,16 +1121,16 @@ onMounted(() => {
 }
 
 .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .table-row.significant-row {
-  background: rgba(255, 215, 0, 0.1);
-  border-left: 3px solid #FFD700;
+  background: rgba(var(--color-gold-rgb), 0.1);
+  border-left: 3px solid var(--color-gold);
 }
 
 .char-cell {
@@ -1192,9 +1150,9 @@ onMounted(() => {
 .category-badge {
   display: inline-block;
   padding: 4px 10px;
-  background: rgba(74, 144, 226, 0.15);
+  background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
 }
@@ -1202,9 +1160,9 @@ onMounted(() => {
 .significant-badge {
   display: inline-block;
   padding: 4px 10px;
-  background: rgba(255, 215, 0, 0.2);
-  color: #c87f0a;
-  border-radius: 12px;
+  background: rgba(var(--color-gold-rgb), 0.2);
+  color: var(--color-warning-dark);
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
 }
@@ -1219,7 +1177,7 @@ onMounted(() => {
 }
 
 .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 @media (max-width: 768px) {

@@ -179,7 +179,7 @@ const runClustering = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .vml-glass-panel {
   padding: 20px;
 }
@@ -192,8 +192,7 @@ const runClustering = () => {
 }
 
 .settings-group {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 16px;
 }
 
@@ -212,21 +211,20 @@ const runClustering = () => {
 .setting-input {
   flex: 1;
   padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-md);
+  background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
   white-space: nowrap;
 }
 
 .feature-toggles {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
 }
 
 .feature-toggles label {
@@ -243,9 +241,9 @@ const runClustering = () => {
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: rgba(255, 193, 7, 0.15);
-  border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 10px;
+  background: rgba(var(--color-warning-rgb), 0.15);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.3);
+  border-radius: var(--radius-md);
   margin-bottom: 16px;
 }
 
@@ -255,18 +253,17 @@ const runClustering = () => {
 
 .notice-text {
   font-size: 13px;
-  color: #856404;
+  color: var(--color-warning-dark);
   font-weight: 500;
 }
 
 .dbscan-config {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 12px;
   padding: 16px;
-  background: rgba(74, 144, 226, 0.08);
-  border: 1px solid rgba(74, 144, 226, 0.2);
-  border-radius: 12px;
+  background: rgba(var(--vml-blue-rgb), 0.08);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
+  border-radius: var(--radius-md);
 }
 
 .config-header {

@@ -61,7 +61,7 @@
             </span>
         </label>
       </div>
-      <p class="hint-text" style="margin-top: 0.5rem; color: #666;">
+      <p class="hint-text" style="margin-top: 0.5rem; color: var(--text-tertiary);">
         {{ resolutionPresets[currentResolutionMode]?.description }}
       </p>
     </div>
@@ -317,7 +317,29 @@ watch(localSettings, (newSettings) => {
   emit('update:settings', JSON.parse(JSON.stringify(newSettings)))
 }, { deep: true })
 </script>
-<style scoped>
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary: var(--color-primary);
+$primary-hover: #0066cc;
+
+$text-main: var(--color-text-primary);
+$text-secondary: var(--color-text-secondary, var(--text-tertiary));
+$text-radio-title: var(--text-dark);
+$text-radio-desc: var(--text-tertiary);
+
+$surface-light: var(--glass-30);
+$surface-medium: var(--glass-60);
+$surface-white: var(--text-white);
+
+$border-default: rgba(0, 0, 0, 0.1);
+$active-background: rgba(var(--color-primary-rgb), 0.206);
+
+$radius-control: var(--radius-md);
+$transition-fast: 0.2s;
+$transition-normal: 0.3s;
+
 .settings-panel {
   padding: 1.5rem;
 }
@@ -325,45 +347,21 @@ watch(localSettings, (newSettings) => {
 .setting-group {
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--glass-border);
-}
+  border-bottom: 1px solid var(--glass-40);
 
-.setting-group:last-child {
-  border-bottom: none;
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .setting-label {
   display: block;
-  font-weight: 600;
   margin-bottom: 0.75rem;
-  color: var(--color-text-primary);
+  color: $text-main;
+  font-weight: 600;
 }
 
-.mode-selector {
-  display: flex;
-  gap: 1rem;
-}
-
-.radio-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: var(--glass-light);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.radio-option:hover {
-  background: var(--glass-medium);
-  transform: translateY(-2px);
-}
-
-.radio-option input[type="radio"] {
-  cursor: pointer;
-}
-
+/* 功能模块 */
 .module-checkboxes {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -375,16 +373,78 @@ watch(localSettings, (newSettings) => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem;
-  background: var(--glass-light);
-  border-radius: var(--radius-md);
+  background: $surface-light;
+  border-radius: $radius-control;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background $transition-normal ease;
+
+  &:hover {
+    background: $surface-medium;
+  }
 }
 
-.checkbox-option:hover {
-  background: var(--glass-medium);
+/* 分辨率预设 */
+.resolution-presets {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
 }
 
+.radio-option {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 10px;
+  background: $surface-white;
+  border: 2px solid $border-default;
+  border-radius: var(--radius-sm2);
+  cursor: pointer;
+  transition:
+    background $transition-fast ease,
+    border-color $transition-fast ease,
+    transform $transition-fast ease;
+
+  input[type="radio"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+
+  &:hover {
+    border-color: var(--text-lightest);
+    transform: translateY(-2px);
+  }
+
+  &.active {
+    background: $active-background;
+    border-color: $primary;
+
+    &:hover {
+      border-color: $primary-hover;
+    }
+  }
+
+  .radio-label {
+    @include flex-col;
+    gap: 4px;
+  }
+
+  .radio-title {
+    color: $text-radio-title;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .radio-desc {
+    color: $text-radio-desc;
+    font-size: 0.75rem;
+  }
+}
+
+/* 参数输入 */
 .param-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -392,103 +452,44 @@ watch(localSettings, (newSettings) => {
 }
 
 .param-item {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
-}
 
-.param-item label {
-  font-size: 0.9rem;
-  color: var(--color-text-primary);
-}
+  label {
+    color: $text-main;
+    font-size: 0.9rem;
+  }
 
-.param-item input[type="number"] {
-  padding: 0.75rem;
-  background: var(--glass-light);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  color: var(--color-text-primary);
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
+  input[type="number"] {
+    padding: 0.75rem;
+    background: $surface-light;
+    border: 1px solid var(--glass-40);
+    border-radius: $radius-control;
+    color: $text-main;
+    font-size: 1rem;
+    transition:
+      background $transition-normal ease,
+      border-color $transition-normal ease;
 
-.param-item input[type="number"]:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: var(--glass-medium);
+    &:focus {
+      outline: none;
+      background: $surface-medium;
+      border-color: var(--color-primary);
+    }
+  }
 }
 
 .checkbox-options {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 0.5rem;
   margin-top: 0.75rem;
 }
-/* 容器布局 */
-.resolution-presets {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-}
 
-/* 隐藏原始 Radio 按钮，使用样式模拟 */
-.radio-option {
-  flex: 1;
-  position: relative;
-  border: 2px solid rgba(0,0,0,0.1); /* 边框 */
-  border-radius: 8px;
-  padding: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: white;
-  display: flex;
-  align-items: flex-start;
-}
-
-.radio-option input[type="radio"] {
-  position: absolute;
-  opacity: 0; /* 隐藏原生圆点 */
-  width: 0;
-  height: 0;
-}
-
-/* 选中状态 */
-.radio-option.active {
-  border-color: #007aff; /* 激活色 */
-  background-color: rgba(0, 123, 255, 0.206);
-}
-
-.radio-label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.radio-title {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.radio-desc {
-  font-size: 0.75rem;
-  color: #666;
-}
-
-/* 鼠标悬停 */
-.radio-option:hover {
-  border-color: #999;
-}
-.radio-option.active:hover {
-  border-color: #0066cc;
-}
-
-/* Hint text for format options */
 .hint-text {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary, #666);
-  margin-top: 0.25rem;
-  font-style: italic;
   display: block;
+  margin-top: 0.25rem;
+  color: $text-secondary;
+  font-size: 0.75rem;
+  font-style: italic;
 }
 </style>

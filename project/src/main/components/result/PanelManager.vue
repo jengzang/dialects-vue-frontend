@@ -54,9 +54,9 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DataRow from "./DataRow.vue";
 // [修復] 導入漏掉的組件和工具函數
-import ValuePopup from '../popup/result/ValuePopup.vue';
-import FeaturePopup from '../popup/result/FeaturePopup.vue';
-import { parseFeatureString, get_detail } from '@/main/utils/ResultTable.js';
+import ValuePopup from './popups/ValuePopup.vue';
+import FeaturePopup from './popups/FeaturePopup.vue';
+import { parseFeatureString, get_detail } from '@/main/utils/query/ResultTable.js';
 import { PANEL_CONFIG, LAYOUT_CONFIG } from '@/main/config/constants.js';
 import { resultCache } from '@/main/store/store.js';
 
@@ -185,7 +185,7 @@ function showGridOverlays(origSlotIndex) {
     const rb = slotToRB(i);
     Object.assign(o.style, {
       position: 'fixed', pointerEvents: 'none', left: rb.left, bottom: rb.bottom,
-      width: rb.width, height: rb.height, border: '2px dashed rgba(0,123,255,0.35)',
+      width: rb.width, height: rb.height, border: '2px dashed rgba(var(--color-primary-rgb), 0.35)',
       borderRadius: '12px', boxSizing: 'border-box', zIndex: 9998, background: 'transparent',
     });
     if(rb.top !== undefined) { o.style.top = rb.top; o.style.bottom = 'auto'; }
@@ -199,8 +199,8 @@ function hideGridOverlays() { gridOverlays.forEach(el => el.remove()); gridOverl
 function highlightGridSlot(idx) {
   gridOverlays.forEach(el => {
     const active = Number(el.dataset.slotIndex) === idx;
-    el.style.borderColor = active ? 'rgba(0,123,255,0.9)' : 'rgba(0,123,255,0.35)';
-    el.style.boxShadow   = active ? '0 0 18px rgba(0,123,255,0.35)' : 'none';
+    el.style.borderColor = active ? 'rgba(var(--color-primary-rgb), 0.9)' : 'rgba(var(--color-primary-rgb), 0.35)';
+    el.style.boxShadow   = active ? '0 0 18px rgba(var(--color-primary-rgb), 0.35)' : 'none';
   });
 }
 function findNearestFreeSlot(cx, cy, origSlotIndex) {
@@ -388,58 +388,60 @@ onUnmounted(() => {
 });
 </script>
 
-<style scoped>
-.panel-manager-container {
-  pointer-events: none;
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000!important;
-  container-type: inline-size;
-  container-name: panel-manager;
-}
 
-.query-detail-panel {
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary-blue: var(--color-primary);
+$panel-radius: 12px;
+$panel-blur: 8px;
+$border-breath-duration: 1.5s;
+
+.panel-manager-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000 !important;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  container-name: panel-manager;
   container-type: inline-size;
-  container-name: query-panel;
 }
 
 /* 必要的 Loading 樣式 */
 .loading-container {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100%; min-height: 150px; color: #666;
-}
-.loading-text { font-size: 14px; color: #888; }
-
-</style>
-
-<style scoped>
-/* 各种弹窗的关闭按钮 */
-.query-detail-panel {
-  pointer-events: auto;
+  @include flex-col;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  height: 100%;
+  color: var(--text-tertiary);
 }
 
-.query-detail-panel.border-breath {
-  animation: border-breath 1.5s ease-in-out;
-  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.6);
-  border: 2px solid transparent;
-  border-radius: 12px;
-}
-
-@keyframes border-breath {
-  0% {
-    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.6);
-  }
-  50% {
-    box-shadow: 0 0 12px 4px rgba(0, 122, 255, 0.3);
-  }
-  100% {
-    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.6);
-  }
+.loading-text {
+  color: var(--text-muted);
+  font-size: 14px;
 }
 
 .result-panel-vue {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: var(--glass-05);
+  border: 2px solid var(--glass-10);
+  border-radius: $panel-radius;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur($panel-blur);
+  -webkit-backdrop-filter: blur($panel-blur);
+}
+
+@keyframes border-breath {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.6);
+  }
+
+  50% {
+    box-shadow: 0 0 12px 4px rgba(var(--color-primary-rgb), 0.3);
+  }
 }
 </style>

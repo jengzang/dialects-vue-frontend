@@ -271,7 +271,15 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$dropdown-item-padding: 8px 16px;
+$dropdown-font-size: 14px;
+$transition-duration: 0.2s;
+$dropdown-selected-bg: var(--bg-blue-light);
+$dropdown-selected-color: var(--color-primary-hover);
+
 .key-dropdown-group {
   display: flex;
   flex-wrap: wrap;
@@ -279,140 +287,127 @@ onUnmounted(() => {
 }
 
 .key-value-dropdown {
-  margin-top: 10px;
   display: flex;
   flex-direction: row;
   width: 135px;
+  margin-top: 10px;
 }
 
 .key-name {
   align-self: center;
-}
 
-.key-value-dropdown .dropdown-item {
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
-  border-radius: 8px;
-}
-
-.key-value-dropdown .dropdown-item:hover {
-  background-color: var(--color-blue-very-light);
-}
-
-.key-value-dropdown .dropdown-item.active {
-  background-color: var(--color-primary-medium);
-  color: var(--color-primary);
-}
-
-.dropdown-divider {
-  height: 1px;
-  background: var(--border-divider);
-  margin: 2px 0;
-}
-
-.key-name-text {
-  color: var(--color-blue-custom);
+  &-text {
+    color: var(--color-primary-hover);
+  }
 }
 
 .dropdown-wrapper {
   display: flex;
   align-items: stretch;
-  border: 1px solid var(--color-primary-medium);
-  border-radius: 8px;
   overflow: hidden;
-  background: var(--glass-light);
+  background: var(--glass-30);
+  border: 1px solid var(--color-primary-medium);
+  border-radius: var(--radius-sm2);
 }
 
 .dropdown-input {
   flex: 1;
+  width: 75px;
+  padding: 8px 0;
+  color: var(--text-dark);
+  font-size: $dropdown-font-size;
+  text-align: center;
+  background: transparent;
   border: none;
   outline: none;
-  padding: 8px 0px;
-  font-size: 14px;
-  background: transparent;
-  width: 75px;
-  color: #333;
-  text-align: center;
-}
 
-.dropdown-input::placeholder {
-  color: #6a6a6a;
-  font-size: 12px;
-  text-align: center;
+  &::placeholder {
+    color: var(--text-tertiary);
+    font-size: 12px;
+    text-align: center;
+  }
 }
 
 .arrow-trigger {
   display: flex;
   align-items: center;
   justify-content: start;
-  cursor: pointer;
-  background: var(--color-primary-medium);
-  border-left: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.2s ease;
-  user-select: none;
   min-width: 36px;
   max-width: 36px;
-}
+  cursor: pointer;
+  user-select: none;
+  background: var(--color-primary-medium);
+  border-left: 1px solid var(--glass-30);
+  transition: all $transition-duration ease;
 
-.arrow-trigger:hover {
-  background: var(--color-primary-medium2);
-}
+  &:hover {
+    background: var(--color-primary-medium2);
+  }
 
-.arrow-trigger:active {
-  transform: scale(0.95);
+  &:active {
+    transform: scale(0.95);
+  }
 }
 
 .arrow-icon {
   margin-left: 8px;
-  font-size: 14px;
   color: white;
+  font-size: $dropdown-font-size;
   font-weight: bold;
+}
+
+/*
+ * dropdown-panel 通过 Teleport 挂载到 body，
+ * 因此必须保持为顶层选择器，不能嵌套到组件容器中。
+ */
+.dropdown-panel {
+  position: absolute;
+  z-index: 1000;
+  min-width: 80px;
+  max-height: 40dvh;
+  padding: 6px 0;
+  overflow: auto;
+  background: var(--glass-90);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.dropdown-item {
+  padding: $dropdown-item-padding;
+  overflow: hidden;
+  font-size: $dropdown-font-size;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: background-color $transition-duration;
+
+  &:hover {
+    background-color: $dropdown-selected-bg;
+  }
+
+  &.active {
+    color: $dropdown-selected-color;
+    font-weight: bold;
+    background-color: $dropdown-selected-bg;
+  }
 }
 
 .select-all-item {
   color: var(--text-tertiary);
   font-size: 0.9em;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--bg-light);
+}
+
+.dropdown-divider {
+  height: 1px;
+  margin: 2px 0;
+  background: var(--border-divider);
 }
 
 .check-icon {
-  width: 16px;
   display: inline-block;
-}
-
-.dropdown-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 10px;
-  padding: 6px 0;
-  position: absolute;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  min-width: 80px;
-  max-height: 40dvh;
-  overflow: auto;
-  z-index: 1000;
-}
-
-.dropdown-item {
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.dropdown-item.active {
-  background-color: #e6f0ff;
-  color: #02469e;
-  font-weight: bold;
-}
-
-.dropdown-item:hover {
-  background-color: #e6f0ff;
+  width: 16px;
 }
 </style>

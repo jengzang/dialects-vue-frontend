@@ -99,92 +99,94 @@ const handleChange = (event, value) => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$transition-control: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+$transition-dot: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+$transition-text: 0.3s ease;
 .liquid-radio-group {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
-  gap: 24px; /* 增加间距，更有呼吸感 */
+  gap: 24px;
+  justify-content: center;
 }
 
 .liquid-radio-label {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
   position: relative;
-  user-select: none;
+  display: flex;
   gap: 8px;
-  padding: 4px 8px; /* 增加点击区域 */
+  align-items: center;
+  padding: 4px 8px;
+  cursor: pointer;
+  user-select: none;
 
-  &:hover .liquid-radio-custom {
-    transform: scale(1.1);
-    border-color: var(--color-primary-medium2);
+  &:hover {
+    .liquid-radio-custom {
+      border-color: var(--color-primary-medium2);
+      transform: scale(1.1);
+    }
   }
 }
 
 .liquid-radio-input {
   position: absolute;
-  opacity: 0;
   width: 0;
   height: 0;
+  opacity: 0;
 
   &:checked {
-    & ~ .liquid-radio-custom {
-      /* 这里的颜色分配参考了你觉得更合理的风格 */
+    ~ .liquid-radio-custom {
       background: var(--bg-white);
       border-color: var(--color-primary);
       box-shadow:
-          0 4px 12px var(--color-primary-shadow-light),
-          inset 0 2px 4px rgba(255, 255, 255, 0.3); /* 顶部微弱内发光 */
+        0 4px 12px var(--color-primary-shadow-light),
+        inset 0 2px 4px var(--glass-30);
 
       &::after {
-        transform: scale(1);
         opacity: 1;
+        transform: scale(1);
       }
     }
 
-    & ~ .liquid-radio-text {
+    ~ .liquid-radio-text {
       color: var(--color-primary);
-      font-weight: 600; /* 选中时文字加粗 */
+      font-weight: 600;
     }
   }
 }
 
 .liquid-radio-custom {
-  width: var(--radio-size, 18px); /* 稍微缩小一点，显得更精致 */
-  height: var(--radio-size, 18px);
-  border-radius: var(--radius-full);
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   flex-shrink: 0;
-
-  background: var(--glass-lighter); /* 使用更透明的白色背景 */
-  border: 2px solid var(--border-gray); /* 默认使用较明显的灰色边框 */
+  width: var(--radio-size, 18px);
+  height: var(--radio-size, 18px);
+  background: var(--glass-40);
+  border: 2px solid var(--border-gray);
+  border-radius: var(--radius-full);
+  box-shadow:
+    inset 0 1px 3px var(--glass-50),
+    0 2px 4px var(--bg-hover);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  transition: all $transition-control;
 
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-  box-shadow:
-      inset 0 1px 3px rgba(255, 255, 255, 0.5), /* 顶部内发光（玻璃质感） */
-      0 2px 4px rgba(0, 0, 0, 0.05); /* 底部微小阴影 */
+  @include flex-center;
 
   &::after {
-    content: "";
     width: var(--radio-dot-size, 12px);
     height: var(--radio-dot-size, 12px);
-    border-radius: var(--radius-full);
+    content: '';
     background: var(--color-primary);
-    transform: scale(0);
+    border-radius: var(--radius-full);
     opacity: 0;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: scale(0);
+    transition: all $transition-dot;
   }
 }
 
 .liquid-radio-text {
-  font-size: var(--radio-font-size, 14px); /* 减小到 14px，更符合管理后台风格 */
   color: var(--text-primary);
-  transition: all 0.3s ease;
+  font-size: var(--radio-font-size, 14px);
+  transition: all $transition-text;
 }
 </style>

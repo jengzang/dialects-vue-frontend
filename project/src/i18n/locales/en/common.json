@@ -16,7 +16,7 @@
   },
   "label": {
     "loading": "Loading...",
-    "noData": "No Data",
+    "noData": "No data",
     "error": "Error",
     "success": "Success",
     "warning": "Warning",
@@ -27,26 +27,26 @@
   "placeholder": {
     "input": "Please enter",
     "select": "Please select",
-    "search": "Please enter search content"
+    "search": "Search"
   },
   "components": {
     "multiSelect": {
-      "selectAll": "Select All",
-      "deselectAll": "Deselect All",
+      "selectAll": "Select all",
+      "deselectAll": "Clear all",
       "searchPlaceholder": "Search...",
-      "noResults": "No matching results",
+      "noResults": "No results",
       "placeholder": "Please select"
     },
     "dropdown": {
       "placeholder": "Please select",
       "searchPlaceholder": "Search...",
-      "noResults": "No matching results"
+      "noResults": "No results"
     },
     "filterableSelect": {
-      "placeholder": "Select or enter",
+      "placeholder": "Select or type",
       "loading": "Loading...",
-      "noResults": "No matching results",
-      "noOptions": "No available options",
+      "noResults": "No results",
+      "noOptions": "No options available",
       "levelCity": "City",
       "levelCounty": "County",
       "levelTownship": "Township",
@@ -60,10 +60,172 @@
       "defaultLabel": "Tab"
     }
   },
+  "importPreview": {
+    "referenceTitle": "Pre-import Preview & Column Mapping",
+    "referenceDescription": "Choose the sheet and header row first, then finish required column mapping before the actual upload.",
+    "jyut2ipaTitle": "Pre-import Preview & Jyutping Column Mapping",
+    "jyut2ipaDescription": "Confirm which column contains Jyutping before conversion so inconsistent column names do not block processing.",
+    "checkToolTitle": "Pre-import Preview & Check Column Mapping",
+    "checkToolDescription": "Map the character, IPA, and note columns before entering the check workspace to reduce import failures from inconsistent column names.",
+    "mergeReferenceSummary": "{mappedCount} mapped / {columnCount} source columns",
+    "actions": {
+      "exportSource": "Export source file",
+      "exporting": "Exporting...",
+      "reselect": "Choose Another File",
+      "confirmAndUse": "Confirm Mapping and Use File"
+    },
+    "empty": {
+      "title": "Choose a spreadsheet file first",
+      "description": "The sheet list, header row, and sample rows will be shown here so column mapping can happen before upload."
+    },
+    "controls": {
+      "sheet": "Sheet",
+      "headerRow": "Header Row",
+      "fileName": "File",
+      "columns": "Columns",
+      "rows": "Rows",
+      "headerRowOption": "Row {row}"
+    },
+    "mapping": {
+      "title": "Target Column Mapping",
+      "description": "The parent defines required fields. This panel only maps source columns to those target fields.",
+      "required": "Required",
+      "example": "Example: {value}",
+      "unselected": "Leave Unmapped",
+      "ready": "Ready",
+      "incomplete": "Needs Attention"
+    },
+    "diagnostics": {
+      "missingRequired": "{count} required field(s) are still unmapped.",
+      "duplicateSource": "{count} source column(s) are assigned more than once.",
+      "ok": "Column mapping passed the basic validation."
+    },
+    "preview": {
+      "title": "Table Preview",
+      "description": "Only the first few rows after the header are rendered to avoid heavy full-table previews.",
+      "empty": "There are no preview rows for the current selection."
+    },
+    "messages": {
+      "mappingIncomplete": "Finish required column mapping before continuing."
+    },
+    "schemas": {
+      "mergeReference": {
+        "char": {
+          "label": "Character",
+          "description": "Primary key column in the reference table for single-character alignment.",
+          "example": "天",
+          "aliases": {
+            "char": "Character",
+            "character": "Single Character",
+            "word": "Head Character"
+          }
+        },
+        "pronunciation": {
+          "label": "Pronunciation",
+          "description": "Core pronunciation or phonetic column used to align the reference table.",
+          "example": "tin1",
+          "aliases": {
+            "ipa": "IPA",
+            "phonetic": "Pronunciation",
+            "sound": "Reading"
+          }
+        },
+        "note": {
+          "label": "Note",
+          "description": "Optional supplemental information for human notes.",
+          "example": "Literary reading",
+          "aliases": {
+            "remark": "Remark",
+            "comment": "Comment"
+          }
+        }
+      },
+      "jyut2ipa": {
+        "jyutping": {
+          "label": "Jyutping",
+          "description": "Required core column for conversion and must contain valid Jyutping values.",
+          "example": "jyut6ping3",
+          "aliases": {
+            "jyutping": "Jyutping",
+            "cantonese": "Cantonese Romanization",
+            "pronunciation": "Pronunciation"
+          }
+        },
+        "char": {
+          "label": "Character",
+          "description": "Optional head-character column for result preview and manual review.",
+          "example": "粵",
+          "aliases": {
+            "char": "Character",
+            "character": "Single Character",
+            "word": "Head Character"
+          }
+        }
+      },
+      "checkTool": {
+        "char": {
+          "label": "Character",
+          "description": "Primary character column used for row-by-row inspection and lookup.",
+          "example": "天",
+          "aliases": {
+            "char": "Character",
+            "character": "Single Character",
+            "word": "Head Character"
+          }
+        },
+        "ipa": {
+          "label": "IPA",
+          "description": "Core phonetic column used for onset/rime/tone parsing and validation.",
+          "example": "tin55",
+          "aliases": {
+            "ipa": "IPA",
+            "phonetic": "Pronunciation",
+            "pronunciation": "Phonetic"
+          }
+        },
+        "note": {
+          "label": "Note",
+          "description": "Optional note column for manual comments.",
+          "example": "Literary reading",
+          "aliases": {
+            "note": "Note",
+            "comment": "Comment"
+          }
+        }
+      },
+      "voronoi": {
+        "name": {
+          "label": "Location Name",
+          "description": "Voronoi point label used in preview, duplicate diagnostics, and ignored-point selection.",
+          "example": "Meixian"
+        },
+        "lng": {
+          "label": "Longitude",
+          "description": "Longitude column that must pair with latitude to form a valid point.",
+          "example": "116.104"
+        },
+        "lat": {
+          "label": "Latitude",
+          "description": "Latitude column that must pair with longitude to form a valid point.",
+          "example": "24.289"
+        },
+        "mapPartition": {
+          "label": "Atlas Partition",
+          "description": "Partition column used for atlas-based Voronoi calculation. Supports A-B-C hierarchical paths.",
+          "example": "Hakka-Yuetai-Meihui"
+        },
+        "yindianPartition": {
+          "label": "Mcpdict Partition",
+          "description": "Partition column used for mcpdict-based Voronoi calculation. Supports A-B-C hierarchical paths.",
+          "example": "Hakka-Yuetai-Meihui"
+        }
+      }
+    }
+  },
   "updateNotice": {
     "title": "Update Notice",
-    "defaultItem": "New features are available in this version.",
-    "dontShowAgain": "Don't show this version again",
+    "defaultItem": "New feature tip",
+    "dontShowAgain": "Do not show this update again",
     "confirm": "Got it"
   }
 }

@@ -193,12 +193,12 @@ const selectedProfile = ref(null)
 
 // Cluster color mapping
 const clusterColors = [
-  '#4a90e2', '#50c878', '#f39c12', '#e74c3c', '#9b59b6',
-  '#1abc9c', '#34495e', '#e67e22', '#3498db', '#2ecc71'
+  '#4a90e2', '#34c759', '#ff9500', '#d32f2f', '#5856d6',
+  '#00887a', '#0b2540', '#ff9500', '#3498db', '#34c759'
 ]
 
 const getClusterColor = (clusterId) => {
-  if (clusterId === -1) return '#95a5a6' // gray for noise
+  if (clusterId === -1) return '#86868b' // gray for noise
   return clusterColors[clusterId % clusterColors.length]
 }
 
@@ -326,7 +326,7 @@ const handleQuickAdjust = (action) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .vml-glass-panel {
   padding: 20px;
   min-height: 400px;
@@ -355,8 +355,8 @@ const handleQuickAdjust = (action) => {
 
 .metric-card {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
   text-align: center;
 }
 
@@ -387,8 +387,8 @@ const handleQuickAdjust = (action) => {
 
 .profile-card {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
   border-left: 4px solid;
 }
 
@@ -401,7 +401,7 @@ const handleQuickAdjust = (action) => {
 
 .cluster-badge {
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   color: white;
   font-size: 13px;
   font-weight: 600;
@@ -426,33 +426,33 @@ const handleQuickAdjust = (action) => {
 
 .region-tag {
   padding: 4px 10px;
-  background: rgba(74, 144, 226, 0.1);
-  border-radius: 8px;
+  background: rgba(var(--vml-blue-rgb), 0.1);
+  border-radius: var(--radius-sm2);
   font-size: 12px;
   color: var(--text-primary);
 }
 
 .expand-button {
   padding: 4px 10px;
-  background: rgba(74, 144, 226, 0.15);
-  border: 1px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
+  background: rgba(var(--vml-blue-rgb), 0.15);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   font-size: 12px;
-  color: #4a90e2;
+  color: var(--vml-blue);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .expand-button:hover {
-  background: rgba(74, 144, 226, 0.25);
-  border-color: rgba(74, 144, 226, 0.5);
+  background: rgba(var(--vml-blue-rgb), 0.25);
+  border-color: rgba(var(--vml-blue-rgb), 0.5);
   transform: translateY(-1px);
 }
 
 .profile-stats {
   padding-top: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 1px solid var(--bg-hover-strong);
 }
 
 .stat-item {
@@ -472,8 +472,8 @@ const handleQuickAdjust = (action) => {
 
 .table-container {
   overflow: auto;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
   padding: 16px;
   max-height: 500px;
 }
@@ -484,14 +484,14 @@ const handleQuickAdjust = (action) => {
 }
 
 .assignments-table thead {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .assignments-table th,
 .assignments-table td {
   padding: 10px 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--bg-hover);
 }
 
 .assignments-table th {
@@ -515,9 +515,7 @@ const handleQuickAdjust = (action) => {
 }
 
 .empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   min-height: 300px;
   color: var(--text-secondary);
 }
@@ -526,22 +524,22 @@ const handleQuickAdjust = (action) => {
 .param-suggestion-alert {
   padding: 16px 20px;
   margin-bottom: 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border-left: 4px solid;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-40);
   backdrop-filter: blur(10px);
 }
 
 .alert-too_loose,
 .alert-too_strict,
 .alert-high_noise {
-  border-left-color: #f39c12;
-  background: rgba(243, 156, 18, 0.1);
+  border-left-color: var(--color-warning);
+  background: rgba(var(--color-warning-rgb), 0.1);
 }
 
 .alert-good {
-  border-left-color: #50c878;
-  background: rgba(80, 200, 120, 0.1);
+  border-left-color: var(--color-success);
+  background: rgba(var(--color-success-rgb), 0.1);
 }
 
 .alert-header {
@@ -573,17 +571,17 @@ const handleQuickAdjust = (action) => {
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 500;
-  background: rgba(74, 144, 226, 0.15);
-  border: 1px solid rgba(74, 144, 226, 0.3);
-  border-radius: 8px;
+  background: rgba(var(--vml-blue-rgb), 0.15);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .quick-adjust-button:hover {
-  background: rgba(74, 144, 226, 0.25);
-  border-color: rgba(74, 144, 226, 0.5);
+  background: rgba(var(--vml-blue-rgb), 0.25);
+  border-color: rgba(var(--vml-blue-rgb), 0.5);
   transform: translateY(-1px);
 }
 

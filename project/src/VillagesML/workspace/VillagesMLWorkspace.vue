@@ -214,6 +214,7 @@ const RegionalAggregates = defineAsyncComponent(() => import('@/VillagesML/works
 const RegionalVectors = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/regional/RegionalVectors.vue'))
 const CategoryTendency = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/regional/CategoryTendency.vue'))
 const RegionSimilarity = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/regional/RegionSimilarity.vue'))
+const FeatureAggregation = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/regional/FeatureAggregation.vue'))
 const FeatureExtraction = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/ml/FeatureExtraction.vue'))
 const SubsetAnalysis = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/ml/SubsetAnalysis.vue'))
 const SystemInfo = defineAsyncComponent(() => import('@/VillagesML/workspace/modules/system/SystemInfo.vue'))
@@ -253,13 +254,13 @@ const modules = VILLAGESML_MODULES.map(m => ({
 
 // Computed
 const currentComponent = computed(() => {
-  const module = currentModule.value
-  if (!module) return null
-
-  // System module (no subtabs)
-  if (module.id === 'system') {
+  // System module — handled independently of module config (not yet in sidebar)
+  if (activeModule.value === 'system') {
     return SystemInfo
   }
+
+  const module = currentModule.value
+  if (!module) return null
 
   // Module with subtabs
   if (module.subtabs && activeSubtab.value) {
@@ -289,6 +290,7 @@ const currentComponent = computed(() => {
       'regional-vectors': RegionalVectors,
       'regional-tendency': CategoryTendency,
       'regional-similarity': RegionSimilarity,
+      'regional-feature-agg': FeatureAggregation,
       'compute-features': FeatureExtraction,
       'compute-subset': SubsetAnalysis,
       // New clustering types
@@ -482,19 +484,20 @@ const handleAdjustParams = (action) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 /* VillagesML Module Container */
 .villagesml-module {
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
 }
 
 .content-area {
   width: 100%;
   padding: 10px 6px;
   padding-top: calc(7dvh + 10px); /* CommonBar height + spacing */
-  color: #0b2540;
+  color: var(--text-deep);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   animation: fadeIn 0.3s ease;
 }
@@ -505,12 +508,10 @@ const handleAdjustParams = (action) => {
 }
 
 .empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   min-height: 400px;
   text-align: center;
-  color: #666;
+  color: var(--text-tertiary);
   font-size: 16px;
 }
 

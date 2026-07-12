@@ -56,7 +56,8 @@
       "gdVillages": "广东自然村 - 广东自然村树状图",
       "villagesML": "机器学习 - 自然村名机器学习",
       "gdVillagesTable": "全粤村情表格 - 广东村落详细表格",
-      "ycVillages": "阳春自然村 - 阳春自然村资料"
+      "ycVillages": "阳春自然村 - 阳春自然村资料",
+      "allVillages": "全部自然村 - 全部自然村数据（仅管理员）"
     },
     "tools": {
       "title": "字表工具",
@@ -175,8 +176,8 @@
     },
     "suggestions": {
       "title": "我有建议",
-      "desc": "发现 bug？有建议？<br />欢迎通过 GitHub Issue 提出！",
-      "subtext": "点击下方卡片跳转对应仓库",
+      "desc": "发现 bug？有建议？有想法？<br />欢迎通过 GitHub Issue 或知乎留言提出！",
+      "subtext": "👇 点击下方卡片跳转对应平台",
       "frontendCard": "🐞 网页运行有 bug❓<br />💡 对交互、UI 有建议❓",
       "frontendLink": "到前端仓库提 Issue",
       "buildCard": "🔤 对字表有疑问❓<br />🎯 声/韵/调 提取出错❓",
@@ -186,9 +187,14 @@
       "title": "❤️ 喜欢作者",
       "follow": "关注",
       "starText": "「如果你觉得项目不错，可以给个 ⭐️ 吗！」",
-      "frontendRepo": "前端仓库 - 使用vue框架和原生js开发",
-      "backendRepo": "后端仓库 - 基于fastapi",
+      "zhihuLike": "「喜欢的话，也欢迎去知乎点个赞 👍」",
+      "frontendRepo":"前端仓库 - 基于Vue + js + scss开发",
+      "backendRepo": "后端仓库 - 基于FastAPI + Python + SQLAlchemy",
       "buildRepo": "字表预处理仓库 - 提取字表的声韵调",
+      "zhihuProjectName": "方音图鉴",
+      "zhihuProjectRepo": "项目 - 方音图鉴",
+      "zhihuColumnName": "知乎专栏",
+      "zhihuColumnRepo": "专栏 - 方言相关",
       "villagesMLRepo": "自然村机器学习 - 村落名称、地理数据分析",
       "supportText": "「若网站对您有帮助，可以请作者喝杯咖啡☕️，您的支持将是作者持续维护的动力🙏」",
       "supportButton": "支持一下",

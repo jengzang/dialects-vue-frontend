@@ -81,8 +81,9 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import LocationDetailPopup from '@/main/components/popup/result/LocationDetailPopup.vue';
-import PhonologyCellDetailModal from '@/main/components/popup/pho/PhonologyCellDetailModal.vue';
+import PhonologyCellDetailModal from '@/main/components/pho/popups/PhonologyCellDetailModal.vue';
 import { getLocationDetail } from '@/api';
+import { showError } from '@/utils/message.js';
 import { READING_COLORS } from '@/main/config/readingColors.js';
 
 const { t } = useI18n();
@@ -320,7 +321,7 @@ const handleShowDetails = async () => {
     locationData.value = response;
   } catch (error) {
     console.error('查詢地名數據失敗:', error);
-    alert('查詢失敗，請稍後重試');
+    showError('查詢失敗，請稍後重試');
   } finally {
     isLoading.value = false;
   }
@@ -403,40 +404,82 @@ const getToneData = (data) => {
 };
 </script>
 
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
-<style scoped>
+$primary-blue: var(--color-primary);
+$text-dark: var(--text-dark);
+$text-muted: var(--text-tertiary);
+$glass-blur: 12px;
+$button-blur: 20px;
+$transition-duration: 0.25s;
+
+@mixin sticky-cell {
+  position: sticky;
+  color: var(--text-dark);
+  border: 1px solid var(--border-gray-lighter);
+  transform: translateZ(0);
+  isolation: isolate;
+
+  &::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: "";
+    backdrop-filter: blur($glass-blur);
+    -webkit-backdrop-filter: blur($glass-blur);
+  }
+}
+
+@mixin glass-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  backdrop-filter: blur($button-blur) saturate(180%);
+  -webkit-backdrop-filter: blur($button-blur) saturate(180%);
+}
+
 .phonology-matrix {
   width: 100%;
+
+  &.is-fullscreen {
+    .matrix-wrapper {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      max-height: 100dvh;
+      margin: 0;
+      border-radius: 0;
+    }
+  }
 }
 
-.phonology-matrix.is-fullscreen .matrix-wrapper {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-  border-radius: 0;
-  max-height: 100dvh;
-  margin: 0;
-}
-
+/*
+ * 保留原有级联顺序：
+ * 这里的 margin-bottom 后续会被标题区域中的 margin: 0 覆盖。
+ */
 .location-title {
+  margin-bottom: 6px;
+  color: var(--text-dark-light);
   font-size: 24px;
   font-weight: 700;
-  color: var(--text-dark-light);
-  margin-bottom: 6px;
   text-align: center;
 }
 
 .matrix-wrapper {
+  max-height: 60dvh;
+  margin-bottom: 15px;
   overflow-x: auto;
   overflow-y: auto;
+  background: var(--glass-60);
   border: 1px solid var(--border-gray-light);
   border-radius: var(--radius-lg);
-  background: var(--glass-medium2);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   box-shadow: var(--shadow-md2);
-  max-height: 60dvh;
-  margin-bottom:15px ;
+  backdrop-filter: blur($glass-blur);
+  -webkit-backdrop-filter: blur($glass-blur);
+
   /* GPU acceleration for smooth scrolling */
   will-change: transform;
   contain: layout style;
@@ -444,113 +487,80 @@ const getToneData = (data) => {
 
 .matrix-table {
   width: 100%;
-
-  border-collapse: collapse;
   font-size: 14px;
+  border-collapse: collapse;
 }
 
 .corner-cell {
-  background: var(--glass-lighter2);
-  border: 1px solid var(--border-gray-lighter);
-  padding: 10px;
-  font-weight: 700;
-  color: var(--text-dark);
-  position: sticky;
+  @include sticky-cell;
+
   top: 0;
   left: 0;
   z-index: 3;
   min-width: 60px;
-  /* GPU acceleration and backdrop-filter optimization */
-  transform: translateZ(0);
-  isolation: isolate;
-}
-
-.corner-cell::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: -1;
+  padding: 10px;
+  font-weight: 700;
+  background: var(--glass-50);
 }
 
 .initial-header {
-  background: linear-gradient(145deg, rgba(0, 122, 255, 0.08), rgba(0, 122, 255, 0.04));
-  border: 1px solid var(--border-gray-lighter);
-  padding: 10px;
-  font-weight: 600;
-  color: var(--text-dark);
-  text-align: center;
-  position: sticky;
+  @include sticky-cell;
+
   top: 0;
   z-index: 2;
   min-width: 120px;
+  padding: 10px;
   font-size: 15px;
-  /* GPU acceleration and backdrop-filter optimization */
-  transform: translateZ(0);
-  isolation: isolate;
-}
-
-.initial-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: -1;
+  font-weight: 600;
+  text-align: center;
+  background: linear-gradient(
+    145deg,
+    rgba(var(--color-primary-rgb), 0.08),
+    rgba(var(--color-primary-rgb), 0.04)
+  );
 }
 
 .final-header {
-  background: linear-gradient(145deg, rgba(255, 152, 0, 0.08), rgba(255, 152, 0, 0.04));
-  border: 1px solid var(--border-gray-lighter);
-  padding: 10px;
-  font-weight: 600;
-  color: var(--text-dark);
-  text-align: center;
-  position: sticky;
+  @include sticky-cell;
+
   left: 0;
   z-index: 1;
   min-width: 80px;
+  padding: 10px;
   font-size: 15px;
-  /* GPU acceleration and backdrop-filter optimization */
-  transform: translateZ(0);
-  isolation: isolate;
-}
-
-.final-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: -1;
+  font-weight: 600;
+  text-align: center;
+  background: linear-gradient(
+    145deg,
+    rgba(var(--color-warning-rgb), 0.08),
+    rgba(var(--color-warning-rgb), 0.04)
+  );
 }
 
 .matrix-cell {
-  border: 1px solid var(--border-gray-lightest);
-  padding: 8px;
-  vertical-align: top;
   min-width: 120px;
   max-width: 200px;
-  background: var(--glass-very-light2);
+  padding: 8px;
+  vertical-align: top;
   cursor: default;
-  /* Remove transition for better performance on Android */
+  background: var(--glass-10);
+  border: 1px solid var(--border-gray-lightest);
+
   /* Layout isolation for better rendering performance */
   contain: layout style paint;
-}
 
-.matrix-cell:hover {
-  background: var(--glass-light2);
-  /* Instant color change - no transition needed */
-}
+  &:hover {
+    background: var(--glass-20);
+  }
 
-.matrix-cell.is-clickable {
-  cursor: pointer;
-}
+  &.is-clickable {
+    cursor: pointer;
 
-.matrix-cell.is-clickable:hover {
-  background: rgba(59, 130, 246, 0.09);
-  box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.35);
+    &:hover {
+      background: rgba(59, 130, 246, 0.09);
+      box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.35);
+    }
+  }
 }
 
 .cell-content {
@@ -566,38 +576,43 @@ const getToneData = (data) => {
 }
 
 .tone-label {
+  min-width: 35px;
   color: var(--text-dark);
   font-weight: 600;
-  min-width: 35px;
 }
+
 .characters {
   display: inline-flex;
   flex-wrap: wrap;
   gap: 0 4px;
 }
 
-.matrix-char--wendu {
-  color: v-bind('READING_COLORS.wendu');
+.matrix-char {
+  &--wendu {
+    color: v-bind("READING_COLORS.wendu");
+  }
+
+  &--baidu {
+    color: v-bind("READING_COLORS.baidu");
+  }
+
+  &--both {
+    color: v-bind("READING_COLORS.both");
+  }
+
+  &--polyphonic {
+    color: v-bind("READING_COLORS.polyphonic");
+  }
 }
 
-.matrix-char--baidu {
-  color: v-bind('READING_COLORS.baidu');
-}
-
-.matrix-char--both {
-  color: v-bind('READING_COLORS.both');
-}
-
-.matrix-char--polyphonic {
-  color: v-bind('READING_COLORS.polyphonic');
-}
-
-/* 移动端适配 */
+/*
+ * 保留原始位置，后面的 .location-title 基础规则仍会覆盖
+ * 此处对标题字号和 margin 的移动端设置。
+ */
 @media (max-aspect-ratio: 1/1) {
-
   .location-title {
-    font-size: 20px;
     margin-bottom: 5px;
+    font-size: 20px;
   }
 
   .matrix-table {
@@ -607,13 +622,13 @@ const getToneData = (data) => {
   .corner-cell,
   .initial-header,
   .final-header {
-    padding: 6px;
     min-width: 40px;
+    padding: 6px;
   }
 
   .matrix-cell {
-    padding: 4px;
     min-width: 100px;
+    padding: 4px;
   }
 
   .tone-row {
@@ -628,104 +643,104 @@ const getToneData = (data) => {
 /* 標題和按鈕區域 */
 .location-header {
   display: flex;
+  gap: 12px;
   align-items: center;
   justify-content: center;
-  gap: 12px;
   margin-bottom: 16px;
 }
 
 .header-actions {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
 }
 
+/*
+ * 该规则位于移动端媒体查询之后，
+ * 保持原代码实际生效的覆盖关系。
+ */
 .location-title {
+  margin: 0;
+  color: var(--text-dark-light);
   font-size: 24px;
   font-weight: 700;
-  color: var(--text-dark-light);
-  margin: 0;
 }
 
 .tone-search-btn {
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  color: #007aff;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
+  @include glass-button;
+
+  color: $primary-blue;
+  background: var(--glass-60);
+  border: 1px solid var(--glass-30);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 var(--glass-50);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
-              inset 0 1px 0 rgba(255, 255, 255, 0.5);
-}
 
-.tone-search-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.8);
-  border-color: rgba(0, 122, 255, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15),
-              inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
+  &:hover:not(:disabled) {
+    background: var(--glass-80);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
+    box-shadow:
+      0 4px 12px rgba(var(--color-primary-rgb), 0.15),
+      inset 0 1px 0 var(--glass-60);
+    transform: translateY(-2px);
+  }
 
-.tone-search-btn:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1),
-              inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
+  &:active:not(:disabled) {
+    box-shadow:
+      0 1px 4px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 var(--glass-40);
+    transform: translateY(0);
+  }
 
-.tone-search-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    transform: none;
+  }
 }
 
 .fullscreen-btn {
-  padding: 8px 16px;
-  background: rgba(52, 199, 89, 0.15);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(52, 199, 89, 0.35);
-  border-radius: 12px;
-  color: #1f7a35;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
+  @include glass-button;
 
-.fullscreen-btn:hover {
-  background: rgba(52, 199, 89, 0.22);
-  transform: translateY(-1px);
+  color: var(--color-success);
+  background: rgba(var(--color-success-rgb), 0.15);
+  border: 1px solid rgba(var(--color-success-rgb), 0.35);
+  transition: all $transition-duration ease;
+
+  &:hover {
+    background: rgba(var(--color-success-rgb), 0.22);
+    transform: translateY(-1px);
+  }
 }
 
 .exit-fullscreen-btn {
   position: fixed;
   top: 18px;
   right: 18px;
+  z-index: 100000;
   padding: 10px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  color: #1d1d1f;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  z-index: 100000;
-  transition: all 0.25s ease;
+  background: var(--glass-70);
+  border: 1px solid var(--glass-60);
+  border-radius: var(--radius-pill);
+  backdrop-filter: blur($button-blur) saturate(180%);
+  -webkit-backdrop-filter: blur($button-blur) saturate(180%);
+  transition: all $transition-duration ease;
+
+  &:hover {
+    background: var(--glass-90);
+    transform: scale(1.04);
+  }
 }
 
-.exit-fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 0.9);
-  transform: scale(1.04);
-}
-
-
+/*
+ * 以下样式当前模板中未直接出现。
+ * 按照不确认使用情况就不删除的原则完整保留。
+ */
 
 /* LocationDetailPopup 樣式 */
 .info-section {
@@ -733,74 +748,75 @@ const getToneData = (data) => {
 }
 
 .info-title {
+  margin-bottom: 10px;
+  color: $text-dark;
   font-size: 15px;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 10px;
 }
 
 .info-item {
-  padding: 6px 0;
-  line-height: 1.6;
   display: flex;
   align-items: baseline;
+  padding: 6px 0;
   font-size: 16px;
+  line-height: 1.6;
 }
 
 .info-label {
-  color: #666;
-  font-weight: 700;
   flex-shrink: 0;
+  color: $text-muted;
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .info-value {
-  color: #333;
   margin-left: 4px;
+  color: $text-dark;
   white-space: nowrap;
 }
 
 .tone-section {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-divider);
 }
 
 .section-title {
+  margin-bottom: 8px;
+  color: $text-dark;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
 }
 
 .tone-mini-table {
   width: 100%;
-  border-collapse: collapse;
   font-size: 12px;
-}
+  border-collapse: collapse;
 
-.tone-mini-table th,
-.tone-mini-table td {
-  padding: 6px 8px;
-  text-align: left;
-  border: 1px solid #ddd;
-}
+  th,
+  td {
+    padding: 6px 8px;
+    text-align: left;
+    border: 1px solid var(--border-divider);
+  }
 
-.tone-mini-table th {
-  background: #f5f5f5;
-  font-weight: 600;
-  color: #555;
-}
+  th {
+    color: var(--text-medium);
+    font-weight: 600;
+    background: var(--bg-light-gray);
+  }
 
-.tone-mini-table tbody tr:hover {
-  background: #f9f9f9;
+  tbody {
+    tr:hover {
+      background: var(--bg-light-gray);
+    }
+  }
 }
 
 .popup-no-data {
   padding: 20px;
-  text-align: center;
-  color: #999;
+  color: var(--text-lightest);
   font-size: 13px;
+  text-align: center;
 }
 </style>
-

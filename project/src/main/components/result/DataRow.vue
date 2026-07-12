@@ -10,7 +10,7 @@
         <p class="feature-inline-row">
           <span
               class="feature-value-clickable"
-              style="cursor: pointer; color: #007bff"
+              style="cursor: pointer; color: var(--color-primary)"
               @click.stop="(e) => $emit('trigger-popup', 'feature', item, featureKey, featureVal, e)"
           >
             {{ featureKeyDisplay }}
@@ -18,7 +18,7 @@
           <span> ☞ </span>
           <span
               class="feature-value-clickable"
-              style="cursor: pointer; color: #007bff"
+              style="cursor: pointer; color: var(--color-primary)"
               @click.stop="(e) => $emit('trigger-popup', 'value', item, featureKey, featureVal, e)"
           >
             {{ String(featureVal) }}
@@ -93,12 +93,12 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getCorrespondingCharacters, getReadingClass, getYinWeiCharReadingType, getZhongGuCharReadingType } from '@/main/utils/ResultTable.js';
+import { getCorrespondingCharacters, getReadingClass, getYinWeiCharReadingType, getZhongGuCharReadingType } from '@/main/utils/query/ResultTable.js';
 import { READING_COLORS } from '@/main/config/readingColors.js';
 import { getFeatureStats, getLocationDetail } from '@/api';
 import { globalPayload, mapStore } from '@/main/store/store.js';
 import LocationDetailPopup from '../popup/result/LocationDetailPopup.vue';
-import FeatureStatsPopup from '../popup/result/FeatureStatsPopup.vue';
+import FeatureStatsPopup from './popups/FeatureStatsPopup.vue';
 import { translateResultTerm } from '@/i18n/utils/resultI18n.js';
 
 const props = defineProps({
@@ -311,49 +311,99 @@ const handleFeatureStatsClick = async () => {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary-blue: var(--color-primary);
+$clickable-blue: var(--color-primary);
+$text-dark: var(--text-dark);
+$text-muted: var(--text-tertiary);
+$transition-duration: 0.2s;
+$glass-blur: 8px;
+
+@mixin compact-feature-layout {
+  .feature-row {
+    flex-direction: column;
+    gap: 2px;
+    align-items: stretch;
+  }
+
+  .feature-main-items {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    > p:first-child {
+      flex: 1;
+      order: 0;
+      margin-right: 0;
+      font-size: 16px;
+    }
+
+    > p:last-child {
+      order: 0;
+      font-size: 12px;
+    }
+  }
+
+  .feature-stats-btn {
+    order: 0;
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .brief-stats {
+    order: 0;
+    white-space: normal;
+    word-break: break-all;
+  }
+}
+
 /* 從 ResultTable.css 遷移的樣式 */
 .data-row-vue {
-  margin-bottom: 15px;
   display: block;
+  margin-bottom: 15px;
   text-align: center;
 }
 
 .characters-vue {
-  text-align: center;
-  font-size: 15px;
-  border: 2px solid #333;
-  padding: 5px;
   display: inline-block;
   margin-top: 0;
+  padding: 5px;
+  font-size: 15px;
+  text-align: center;
+  border: 2px solid $text-dark;
 }
 
 .characters-vue-condensed {
-  text-align: center;
-  font-size: 15px;
-  border-bottom: 2px solid #333;
-  padding: 5px;
   display: flex;
   margin-top: 0;
+  padding: 5px;
+  font-size: 15px;
+  text-align: center;
+  border-bottom: 2px solid $text-dark;
 }
 
 .char-vue {
   display: inline-flex;
-  padding: 1px 3px;
   margin-right: 2px;
+  padding: 1px 3px;
+  color: $text-dark;
   font-size: 15px;
-  color: #333;
 
   &.multi-vue,
   &.char-vue--wendu {
+    position: relative;
     color: v-bind('READING_COLORS.zhongguWendu');
     font-weight: bold;
-    position: relative;
     cursor: pointer;
 
     &:hover {
-      background-color: #f9f9f9;
-      border-radius: 4px;
+      background-color: var(--bg-light-gray);
+      border-radius: var(--radius-xs);
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
   }
@@ -372,17 +422,20 @@ const handleFeatureStatsClick = async () => {
 }
 
 .feature-value-clickable {
-  cursor: pointer;
-  text-decoration: none;
-  color: #007bff;
   display: inline-block;
-  transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.3s ease;
+  color: $clickable-blue;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform $transition-duration ease,
+    color $transition-duration ease,
+    text-shadow 0.3s ease;
 
   &:hover {
-    transform: scale(1.3);
+    color: var(--color-primary);
     text-decoration: underline;
-    color: #3c8dbc;
     text-shadow: 0 0 8px rgba(60, 141, 188, 0.6);
+    transform: scale(1.3);
   }
 }
 
@@ -390,23 +443,26 @@ const handleFeatureStatsClick = async () => {
   white-space: nowrap;
 }
 
-/* 這是傳送到 body 的彈窗樣式，不受小容器限制 */
+/*
+ * 該元素通過 Teleport 掛載到 body，
+ * 因此保持為頂層選擇器，不能嵌套到 .data-row-vue 中。
+ */
 .global-tooltip-popup {
   position: fixed;
   z-index: 10001;
-  transform: translate(-50%, -100%);
-  background-color: rgba(0, 0, 0, 0.8);
-  color: #fff;
+  max-width: 200px;
   padding: 5px 10px;
-  border-radius: 4px;
+  color: var(--text-white);
   font-size: 12px;
   pointer-events: none;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: var(--radius-xs);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  max-width: 200px;
-  animation: fadeIn 0.2s ease-out;
+  transform: translate(-50%, -100%);
+  animation: fade-in $transition-duration ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     opacity: 0;
     transform: translate(-50%, -90%);
@@ -418,19 +474,19 @@ const handleFeatureStatsClick = async () => {
   }
 }
 
-/* 地名样式 */
+/* 地名樣式 */
 .locations-vue {
-  font-size: 20px;
-  font-family: "SimHei", "黑体", sans-serif;
-  font-weight: bold;
   margin-top: 20px;
   margin-bottom: 0;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-primary);
+  font-family: "SimHei", "黑体", sans-serif;
+  font-size: 20px;
+  font-weight: bold;
   cursor: pointer;
-  color: #1d1d1f;
+  transition: all $transition-duration cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    color: #007aff;
+    color: $primary-blue;
     transform: translateX(2px);
   }
 
@@ -441,177 +497,103 @@ const handleFeatureStatsClick = async () => {
 
 /* 特徵統計按鈕 */
 .feature-stats-btn {
-  appearance: none;
+  order: 3;
   display: inline-flex;
-  align-items: center;
-  gap: 6px;
   flex-shrink: 0;
-  white-space: nowrap;
+  gap: 6px;
+  align-items: center;
+  margin-left: 12px;
   padding: 6px 12px;
-  border-radius: 999px;
+  color: $primary-blue;
   font-size: 12px;
   font-weight: 500;
-  background-color: rgba(0, 122, 255, 0.08);
-  border: 1px solid rgba(0, 122, 255, 0.2);
-  color: #007aff;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  white-space: nowrap;
+  appearance: none;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  background-color: rgba(var(--color-primary-rgb), 0.08);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: var(--radius-pill);
   box-shadow: none;
-  order: 3;
-  margin-left: 12px;
+  backdrop-filter: blur($glass-blur);
+  -webkit-backdrop-filter: blur($glass-blur);
+  transition: all $transition-duration cubic-bezier(0.25, 0.1, 0.25, 1);
 
   &:hover:not(:disabled) {
-    background-color: rgba(0, 122, 255, 0.15);
-    border-color: rgba(0, 122, 255, 0.4);
+    background-color: rgba(var(--color-primary-rgb), 0.15);
+    border-color: rgba(var(--color-primary-rgb), 0.4);
     transform: translateY(-0.5px);
   }
 
   &:active {
-    background-color: rgba(0, 122, 255, 0.2);
+    background-color: rgba(var(--color-primary-rgb), 0.2);
     transform: scale(0.98);
   }
 
   &:disabled {
-    opacity: 0.5;
-    filter: grayscale(1);
     cursor: not-allowed;
+    filter: grayscale(1);
+    opacity: 0.5;
   }
 }
 
 /* 簡要統計顯示 */
 .brief-stats {
-  font-size: 13px;
-  color: #666;
-  font-weight: 500;
-  padding: 4px 8px;
-  background: rgba(0, 122, 255, 0.05);
-  border-radius: 6px;
-  border: 1px solid rgba(0, 122, 255, 0.1);
+  order: 2;
   flex-shrink: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  order: 2;
   margin-left: 12px;
+  padding: 4px 8px;
+  overflow: hidden;
+  color: $text-muted;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: rgba(var(--color-primary-rgb), 0.05);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.1);
+  border-radius: var(--radius-sm);
 }
 
 /* feature-row 佈局：寬屏左右對齊 */
 .feature-row {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
+  align-items: center;
 }
 
-/* feature-main-items 使用 contents 讓子元素成為 feature-row 的直接 flex 項目 */
+/* 使用 contents 讓子元素成為 feature-row 的直接 flex 項目 */
 .feature-main-items {
   display: contents;
 
   > p:first-child {
-    font-size: 18px;
-    text-align: left;
-    font-weight: bold;
-    color: #007bff;
+    order: 1;
     margin: 1px;
     margin-right: auto;
-    order: 1;
+    color: $clickable-blue;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: left;
   }
 
   > p:last-child {
+    order: 4;
+    margin: 1px;
+    margin-left: 12px;
+    color: var(--text-secondary);
     font-size: 13px;
     font-style: italic;
     text-align: right;
-    color: #6c757d;
-    margin: 1px;
-    margin-left: 12px;
     white-space: nowrap;
-    order: 4;
   }
 }
 
 /* 響應式：小螢幕下垂直堆疊 */
 @media (max-width: 600px) {
-  .feature-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 2px;
-  }
-
-  .feature-main-items {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    gap: 8px;
-
-    > p:first-child {
-      font-size: 16px;
-      flex: 1;
-      margin-right: 0;
-      order: 0;
-    }
-
-    > p:last-child {
-      font-size: 12px;
-      order: 0;
-    }
-  }
-
-  .feature-stats-btn {
-    padding: 4px 10px;
-    font-size: 11px;
-    order: 0;
-  }
-
-  .brief-stats {
-    white-space: normal;
-    word-break: break-all;
-    order: 0;
-  }
+  @include compact-feature-layout;
 }
 
-/* Container Query：當面板容器寬度小於 500px 時也應用相同樣式 */
+/* 面板容器寬度小於 500px 時應用相同佈局 */
 @container query-panel (max-width: 500px) {
-  .feature-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 2px;
-  }
-
-  .feature-main-items {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    gap: 8px;
-
-    > p:first-child {
-      font-size: 16px;
-      flex: 1;
-      margin-right: 0;
-      order: 0;
-    }
-
-    > p:last-child {
-      font-size: 12px;
-      order: 0;
-    }
-  }
-
-  .feature-stats-btn {
-    padding: 4px 10px;
-    font-size: 11px;
-    order: 0;
-  }
-
-  .brief-stats {
-    white-space: normal;
-    word-break: break-all;
-    order: 0;
-  }
+  @include compact-feature-layout;
 }
 </style>

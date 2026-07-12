@@ -25,18 +25,18 @@
 import { computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 
-import IntroLayout from '../layouts/IntroLayout.vue'
+// import IntroLayout from '../layouts/IntroLayout.vue'
 import MenuLayout from '../layouts/MenuLayout.vue'
 import SimpleLayout from '../layouts/SimpleLayout.vue'
 import ExploreLayout from '../layouts/ExploreLayout.vue'
 import GlobalToast from '../components/ToastAndHelp/GlobalToast.vue'
 import GlobalConfirm from '../components/ToastAndHelp/GlobalConfirm.vue'
 import RateLimitNotice from '../components/ToastAndHelp/RateLimitNotice.vue'
-import { initOnlineTimeTracker, stopOnlineTimeTracker } from '../utils/onlineTimeTracker.js'
-import { initLoginPromptTracker, stopLoginPromptTracker } from '../utils/loginPromptTracker.js'
+import { initOnlineTimeTracker, stopOnlineTimeTracker } from '../utils/user/onlineTimeTracker.js'
+import { initLoginPromptTracker, stopLoginPromptTracker } from '../utils/user/loginPromptTracker.js'
 import { getToken } from '../api/auth/auth.js'
 import { stripLocaleFromPath } from '../i18n/localeRouting.js'
-import { isRouteLoading } from '../stores/routeLoading.js'
+import { isRouteLoading } from '../utils/routeLoading.js'
 
 // // 🌉 建立 bridge 用於跨組件共享 iframe 狀態
 // const nativeFrame = ref(null)
@@ -68,9 +68,9 @@ export default {
       }
 
       // intro 已不再作为现用页面入口，保留分支仅作兼容兜底
-      if (normalizedPath.startsWith('/intro')) {
-        return IntroLayout
-      }
+      // if (normalizedPath.startsWith('/intro')) {
+      //   return IntroLayout
+      // }
 
       // /villagesML 路由使用 SimpleLayout
       if (normalizedPath === '/villagesML' || normalizedPath.startsWith('/villagesML/')) {
@@ -155,28 +155,25 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .global-route-loading {
   position: fixed;
   inset: 0;
   z-index: 9998;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(234, 245, 255, 0.55);
+  @include flex-center;
+  background: rgba(var(--bg-blue-tint-rgb), 0.55);
   pointer-events: none;
 }
 
 .global-route-loading-shell {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 12px;
 }
 
 .global-route-loading-text {
   margin: 0;
-  color: #4a5568;
+  color: var(--text-slate);
   font-size: 14px;
   font-weight: 500;
 }

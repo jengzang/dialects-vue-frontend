@@ -12,7 +12,7 @@
       </h3>
 
       <!-- Search Section -->
-      <div class="search-section glass-panel">
+      <div class="search-section vml-glass-panel">
         <h2>
           🔍 相似字搜尋
           <HelpIcon
@@ -28,7 +28,7 @@
             type="text"
             placeholder="輸入單個字符..."
             maxlength="1"
-            class="char-input"
+            class="vml-char-input"
             @input="handleCharInput"
           />
           <input
@@ -37,7 +37,7 @@
             min="5"
             max="50"
             placeholder="返回數量"
-            class="number-input"
+            class="vml-number-input"
           />
           <button
             class="search-button"
@@ -50,9 +50,9 @@
       </div>
 
       <!-- Results Section -->
-      <div v-if="similarities.length > 0" class="results-section">
+      <div v-if="similarities.length > 0" ref="resultsSectionRef" class="results-section">
         <!-- Similarity List -->
-        <div class="similarity-list glass-panel">
+        <div class="similarity-list vml-glass-panel">
           <h3>相似字列表</h3>
           <div class="similarity-items">
             <div
@@ -75,7 +75,7 @@
         </div>
 
         <!-- Vector Visualization -->
-        <div class="vector-viz glass-panel">
+        <div class="vector-viz vml-glass-panel">
           <h3>相似度網絡圖</h3>
           <div v-if="similarities.length > 0" ref="vizChartRef" class="viz-chart"></div>
           <div v-else class="viz-placeholder">
@@ -86,27 +86,12 @@
       </div>
 
       <!-- Embeddings List -->
-      <div class="embeddings-list glass-panel">
+      <div class="embeddings-list vml-glass-panel">
         <div class="list-header">
           <h3>字符嵌入列表 (共 {{ totalEmbeddings }} 個字符)</h3>
-          <div class="pagination-controls">
-            <button
-              :disabled="currentPage === 1"
-              @click="changePage(currentPage - 1)"
-            >
-              上一頁
-            </button>
-            <span>第 {{ currentPage }} / {{ totalPages }} 頁</span>
-            <button
-              :disabled="currentPage === totalPages"
-              @click="changePage(currentPage + 1)"
-            >
-              下一頁
-            </button>
-          </div>
         </div>
 
-        <div v-if="loadingList" class="loading-state">
+        <div v-if="loadingList" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>加載中...</p>
         </div>
@@ -140,6 +125,22 @@
             </div>
           </div>
         </div>
+
+        <div class="pagination-controls">
+          <button
+            :disabled="currentPage === 1"
+            @click="changePage(currentPage - 1)"
+          >
+            上一頁
+          </button>
+          <span>第 {{ currentPage }} / {{ totalPages }} 頁</span>
+          <button
+            :disabled="currentPage === totalPages"
+            @click="changePage(currentPage + 1)"
+          >
+            下一頁
+          </button>
+        </div>
       </div>
     </div>
 <!--  </ExploreLayout>-->
@@ -169,6 +170,7 @@ const totalEmbeddings = ref(0)
 const totalPages = computed(() => Math.ceil(totalEmbeddings.value / pageSize))
 
 const vizChartRef = ref(null)
+const resultsSectionRef = ref(null)
 let vizChartInstance = null
 
 // Methods
@@ -193,7 +195,10 @@ const searchSimilarities = async () => {
     // 新格式：{ query_character, top_k, similarities: [...] }
     similarities.value = result.similarities || result || []
     // 渲染可視化圖表
-    nextTick(() => renderVizChart())
+    nextTick(() => {
+      renderVizChart()
+      resultsSectionRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
   } catch (error) {
     console.error('Similarities API error:', error)
     showError('搜尋相似字失敗')
@@ -324,7 +329,7 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .character-embeddings-page {
   padding: 12px;
   max-width: 1400px;
@@ -340,66 +345,51 @@ onBeforeUnmount(() => {
 }
 
 .search-section {
+  @include flex-col;
+  gap: 12px;
   padding: 16px;
   margin-bottom: 20px;
 }
 
 .search-section h2 {
-  font-size: 16px;
-  margin-bottom: 12px;
-  color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .search-group {
   display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 12px;
+  flex: 1;
 }
 
-.char-input {
-  padding: 10px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 12px;
-  font-size: 16px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.number-input {
+.vml-number-input {
   width: 120px;
   padding: 10px;
-  border: 2px solid rgba(74, 144, 226, 0.3);
-  border-radius: 12px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.char-input:focus,
-.number-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-md);
 }
 
 .search-button {
   flex: 1;
   padding: 10px 20px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  max-width: 100px;
 }
 
 .search-button:hover:not(:disabled) {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .search-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .results-section {
@@ -424,8 +414,7 @@ onBeforeUnmount(() => {
 }
 
 .similarity-items {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 8px;
 }
 
@@ -435,8 +424,8 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 6px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
   transition: transform 0.3s ease;
 }
 
@@ -445,7 +434,7 @@ onBeforeUnmount(() => {
 }
 
 .similarity-item.top-3 {
-  background: rgba(243, 156, 18, 0.2);
+  background: rgba(var(--color-warning-rgb), 0.2);
 }
 
 .rank {
@@ -464,8 +453,8 @@ onBeforeUnmount(() => {
 
 .similarity-bar {
   height: 24px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
+  background: var(--glass-50);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -484,8 +473,8 @@ onBeforeUnmount(() => {
 
 .viz-placeholder {
   padding: 80px 20px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
+  background: var(--glass-30);
+  border-radius: var(--radius-md);
   text-align: center;
 }
 
@@ -510,51 +499,44 @@ onBeforeUnmount(() => {
 }
 
 .list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 16px;
 }
 
 .list-header h3 {
   font-size: 16px;
   color: var(--text-primary);
+  margin: 0;
 }
 
 .pagination-controls {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 12px;
+  padding-top: 16px;
 }
 
 .pagination-controls button {
   padding: 8px 16px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .pagination-controls button:hover:not(:disabled) {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 .pagination-controls button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
-
-.loading-state {
-  text-align: center;
-  padding: 40px 20px;
-}
-
 
 
 .embeddings-table {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   display: inline-block; /* 让表格根据内容自适应宽度 */
   min-width: 100%;
@@ -563,7 +545,8 @@ onBeforeUnmount(() => {
 /* 移动端横向滚动容器 */
 .table-scroll-wrapper {
   width: 100%;
-  overflow-x: auto;
+  max-height: 500px;
+  overflow: auto;
 }
 
 .table-header,
@@ -576,20 +559,20 @@ onBeforeUnmount(() => {
 }
 
 .table-header {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap; /* 防止表头换行 */
 }
 
 .table-row {
-  background: rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--glass-30);
+  border-bottom: 1px solid var(--bg-hover);
   transition: background 0.3s ease;
 }
 
 .table-row:hover {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .col-char {
@@ -614,16 +597,16 @@ onBeforeUnmount(() => {
 .action-button {
   padding: 6px 16px;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .action-button:hover {
-  background: #3a7bc8;
+  background: var(--vml-blue-dark);
 }
 
 @media (max-width: 600px) {
@@ -646,11 +629,11 @@ onBeforeUnmount(() => {
   }
 
 
-  .char-input {
+  .vml-char-input {
     width: 80px;
   }
 
-  .number-input {
+  .vml-number-input {
     width: 60px;
   }
 
@@ -665,9 +648,17 @@ onBeforeUnmount(() => {
 }
 
 /* 移动端横向滚动样式 */
+@media (min-aspect-ratio: 1/1) {
+  .search-section {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
 @media (max-aspect-ratio: 1/1) {
   .table-scroll-wrapper {
-    overflow-x: auto;
+    max-height: 400px;
+    overflow: auto;
   }
 
 }

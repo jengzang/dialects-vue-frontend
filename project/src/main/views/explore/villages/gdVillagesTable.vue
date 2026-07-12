@@ -35,31 +35,49 @@ const spokenColumns = computed(() => [
 </script>
 
 
-<style scoped>
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$button-text-color: var(--color-primary-hover);
+$button-transition: 0.3s ease;
+
 .title-row {
   display: flex;
   align-items: center;
   gap: 16px;
   margin: 0;
 }
+
 .village-link-btn {
   padding: 8px 16px;
-  border-radius: 25px;
-  border: 3px solid rgba(255, 255, 255, 0.4);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-  color: #005fd3;
-  font-weight: 1000;
+  color: $button-text-color;
   font-size: 1rem;
+  font-weight: 1000;
+  white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
+  background: linear-gradient(
+    145deg,
+    var(--glass-20),
+    var(--glass-10)
+  );
+  border: 3px solid var(--glass-40);
+  border-radius: 25px;
+  box-shadow:
+    0 6px 10px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all $button-transition;
 
-.village-link-btn:hover {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-  transform: scale(1.05);
+  &:hover {
+    background: linear-gradient(
+      145deg,
+      var(--glass-50),
+      var(--glass-30)
+    );
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+  }
 }
 </style>

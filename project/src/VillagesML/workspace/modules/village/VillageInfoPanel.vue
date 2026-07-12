@@ -2,7 +2,7 @@
   <div class="vml-glass-panel">
     <h3 class="panel-title">📋 完整信息</h3>
 
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>加載中...</p>
     </div>
@@ -73,12 +73,12 @@ defineProps({
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .info-content {
-  animation: fadeIn 0.3s ease;
+  animation: fadeInUp 0.3s ease;
 }
 
-@keyframes fadeIn {
+@keyframes fadeInUp {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
@@ -93,8 +93,8 @@ defineProps({
   display: flex;
   justify-content: space-between;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
 }
 
 .info-label {
@@ -110,8 +110,8 @@ defineProps({
 .additional-info {
   margin-top: 20px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: var(--glass-30);
+  border-radius: var(--radius-sm2);
 }
 
 .additional-info h4 {

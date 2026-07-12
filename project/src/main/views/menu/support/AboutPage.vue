@@ -26,7 +26,11 @@
                   <p class="subfeature-body">{{ item.body }}</p>
                 </li>
               </ul>
+              <a v-if="feature.zhihuLink" :href="feature.zhihuLink" target="_blank" rel="noopener" class="zhihu-article-link">{{ $t('about.intro.readZhihuArticle') }}</a>
             </li>
+            <p style="text-align: left;">
+              <a href="https://zhuanlan.zhihu.com/p/1934345780199682731" target="_blank" rel="noopener" class="zhihu-article-link">{{ $t('about.intro.oldSiteZhihuArticle') }}</a>
+            </p>
             <!-- <li v-html="$t('about.intro.features.blueText')"></li>
             <li v-html="$t('about.intro.features.mapClick')"></li> -->
           </ul>
@@ -100,6 +104,7 @@
                 rel="noopener"
                 class="card"
               >
+                <img class="card-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
                 <span v-html="$t('about.suggestion.frontend.title')"></span>
                 <span class="thanks-link">👉 {{ $t('about.suggestion.frontend.link') }}</span>
               </a>
@@ -109,8 +114,19 @@
                 rel="noopener"
                 class="card"
               >
+                <img class="card-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
                 <span v-html="$t('about.suggestion.backend.title')"></span>
                 <span class="thanks-link">👉 {{ $t('about.suggestion.backend.link') }}</span>
+              </a>
+              <a
+                href="https://www.zhihu.com/project/detail/60225"
+                target="_blank"
+                rel="noopener"
+                class="card"
+              >
+                <img class="card-icon" src="https://static.zhihu.com/heifetz/favicon.ico" alt="Zhihu" />
+                <span v-html="$t('about.suggestion.zhihu.title')"></span>
+                <span class="thanks-link">👉 {{ $t('about.suggestion.zhihu.link') }}</span>
               </a>
             </div>
           </div>
@@ -120,17 +136,33 @@
         <div v-if="currentTab === 'like'" class="cards-container">
           <h2 class="tabs-title like-author-title">
             {{ $t('about.like.title') }}
-            <button class="follow-button" @click="followClicked">
-              {{ $t('about.like.followButton') }}
-            </button>
+            <span class="follow-buttons">
+              <button class="follow-button zhihu-follow" @click="followClicked">
+                <img
+                  class="follow-logo"
+                  src="https://static.zhihu.com/heifetz/favicon.ico"
+                  alt="Zhihu"
+                  @error="e => e.target.src = zhihuFallback"
+                />
+                {{ $t('about.like.followButton') }}
+              </button>
+              <a class="follow-button github-follow" href="https://github.com/jengzang" target="_blank" rel="noopener noreferrer">
+                <img
+                  class="follow-logo"
+                  src="https://github.githubassets.com/favicons/favicon-dark.svg"
+                  alt="GitHub"
+                  @error="e => e.target.src = githubFallback"
+                />
+                GitHub
+              </a>
+            </span>
           </h2>
-          <p style="display: block; width: 100%; clear: both; margin: 0;">
+          <p style="display: block; width: 100%; clear: both; margin: 0 0 0.8rem;">
             {{ $t('about.like.starMessage') }}
           </p>
-
           <a
             class="project-card"
-            v-for="project in localizedProjects"
+            v-for="project in githubProjects"
             :key="project.name"
             :href="project.url"
             target="_blank"
@@ -140,7 +172,26 @@
               <img class="github-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
               <span class="thanks-link" style="font-weight: bold">{{ project.name }}</span>
             </div>
-            <p>{{ project.description }}</p>
+            <p :title="project.description">{{ splitDesc(project.description)[0] }}<span class="desc-sub">{{ splitDesc(project.description)[1] }}</span></p>
+            <div class="glow-border"></div>
+          </a>
+
+          <p style="display: block; width: 100%; clear: both; margin: 1.2rem 0 0.8rem;">
+            {{ $t('about.like.zhihuLike') }}
+          </p>
+          <a
+            class="project-card"
+            v-for="project in zhihuProjects"
+            :key="project.name"
+            :href="project.url"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div class="card-header">
+              <img class="github-icon" src="https://static.zhihu.com/heifetz/favicon.ico" alt="Zhihu" />
+              <span class="thanks-link" style="font-weight: bold">{{ project.name }}</span>
+            </div>
+            <p :title="project.description">{{ splitDesc(project.description)[0] }}<span class="desc-sub">{{ splitDesc(project.description)[1] }}</span></p>
             <div class="glow-border"></div>
           </a>
 
@@ -157,11 +208,13 @@
           <p></p>
 
           <!-- 感悟部分 -->
-          <h2 class="tabs-title" style="margin-top: 20px">{{ $t('about.reflection.title') }}</h2>
-          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
-          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
-          <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
-          <p class="thoughts"><em v-html="$t('about.reflection.poem')"></em></p>
+          <div class="thoughts-container">
+            <h2 class="tabs-title" style="margin-top: 20px">{{ $t('about.reflection.title') }}</h2>
+            <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
+            <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
+            <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
+            <p class="thoughts" style="text-align: center;"><em v-html="$t('about.reflection.poem')"></em></p>
+          </div>
         </div>
 
         <!-- 设置页面 -->
@@ -209,7 +262,7 @@
                     size="sm"
                     placement="right"
                     icon="?"
-                    icon-color="#007aff"
+                    icon-color="var(--color-primary)"
                     style="margin-right: 2px; vertical-align: bottom;"
                 />
               </h3>
@@ -223,16 +276,46 @@
             </div>
           </div>
 
-          <div class="setting-section">
-            <h3 class="section-title">{{ $t('navigation.settings.interfaceMode.title') }}</h3>
-            <p class="section-description">{{ $t('navigation.settings.interfaceMode.description') }}</p>
+          <div class="setting-section setting-split">
+            <div class="setting-split-item">
+              <h3 class="section-title">
+                {{ $t('navigation.settings.colorTheme.title') }}
+                <HelpIcon
+                  :content="$t('navigation.settings.colorTheme.description')"
+                  size="sm"
+                  placement="right"
+                  icon="?"
+                  icon-color="var(--color-primary)"
+                />
+              </h3>
 
-            <RadioGroup
-              v-model="interfaceModeModel"
-              :options="interfaceModeRadioOptions"
-              name="about-interface-mode"
-              class="settings-radio-group interface-mode-radio-group"
-            />
+              <RadioGroup
+                v-model="colorThemeModel"
+                :options="colorThemeRadioOptions"
+                name="about-color-theme"
+                class="settings-radio-group color-theme-radio-group"
+              />
+            </div>
+            <hr class="setting-split-divider">
+            <div class="setting-split-item">
+              <h3 class="section-title">
+                {{ $t('navigation.settings.interfaceMode.title') }}
+                <HelpIcon
+                  :content="$t('navigation.settings.interfaceMode.description')"
+                  size="sm"
+                  placement="right"
+                  icon="?"
+                  icon-color="var(--color-primary)"
+                />
+              </h3>
+
+              <RadioGroup
+                v-model="interfaceModeModel"
+                :options="interfaceModeRadioOptions"
+                name="about-interface-mode"
+                class="settings-radio-group interface-mode-radio-group"
+              />
+            </div>
           </div>
 
           <div class="setting-section tutorial-toggle-section">
@@ -245,7 +328,7 @@
               :width="100"
               :height="40"
               :thumb-size="32"
-              color="#007aff"
+              color="var(--color-primary)"
               variant="solid"
               show-label
               :active-text="$t('about.settings.tutorialToggle.enabled')"
@@ -283,9 +366,14 @@ import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
 import {
+  COLOR_THEME_BLUE,
+  COLOR_THEME_DARK,
+  COLOR_THEME_LIGHT,
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
+  getStoredColorTheme,
   getStoredInterfaceMode,
+  setColorTheme,
   setInterfaceMode,
 } from '@/composables/core/uiPreferences.js'
 import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
@@ -303,6 +391,9 @@ const route = useRoute()
 const router = useRouter()
 const showQRCodes = ref(false)
 
+const zhihuFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#0066FF"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="sans-serif">知</text></svg>')
+const githubFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#24292f"/><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.78.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z" fill="white"/></svg>')
+
 const featureList = computed(() => {
   const messages = i18n.global.messages.value[locale.value]
   return Array.from({ length: 9 }, (_, i) => {
@@ -313,6 +404,7 @@ const featureList = computed(() => {
       subtitle: f.subtitle,
       intro: f.intro,
       items: f.items || [],
+      zhihuLink: f.zhihuLink || '',
     }
   })
 })
@@ -351,22 +443,45 @@ const localizedProjects = computed(() => [
   {
     name: 'dialects-vue-frontend',
     url: 'https://github.com/jengzang/dialects-vue-frontend',
-    description: t('about.like.projects.frontend.description')
+    description: t('about.like.projects.frontend.description'),
+    icon: 'github'
   },
   {
     name: 'dialects-backend',
     url: 'https://github.com/jengzang/dialects-backend',
-    description: t('about.like.projects.backend.description')
+    description: t('about.like.projects.backend.description'),
+    icon: 'github'
   },
   {
     name: 'dialects-build',
     url: 'https://github.com/jengzang/dialects-build',
-    description: t('about.like.projects.build.description')
+    description: t('about.like.projects.build.description'),
+    icon: 'github'
+  },
+  {
+    name: t('about.like.projects.zhihuProject.name'),
+    url: 'https://www.zhihu.com/project/detail/60225',
+    description: t('about.like.projects.zhihuProject.description'),
+    icon: 'zhihu'
+  },
+  {
+    name: t('about.like.projects.zhihuColumn.name'),
+    url: 'https://www.zhihu.com/column/c_1899090664681080236',
+    description: t('about.like.projects.zhihuColumn.description'),
+    icon: 'zhihu'
   },
 ])
 
+const githubProjects = computed(() => localizedProjects.value.filter(p => p.icon !== 'zhihu'))
+const zhihuProjects = computed(() => localizedProjects.value.filter(p => p.icon === 'zhihu'))
+
 function followClicked() {
   window.open('https://www.zhihu.com/people/da-shu-18-11', '_blank')
+}
+
+function splitDesc(text) {
+  const idx = text.indexOf(' - ')
+  return idx === -1 ? [text, ''] : [text.slice(0, idx), text.slice(idx)]
 }
 
 // 语言设置相关
@@ -379,6 +494,34 @@ const languages = ref([
 ])
 
 const interfaceMode = ref(getStoredInterfaceMode())
+const colorTheme = ref(getStoredColorTheme())
+
+const colorThemeOptions = computed(() => [
+  {
+    value: COLOR_THEME_BLUE,
+    label: t('navigation.settings.colorTheme.options.blue')
+  },
+  {
+    value: COLOR_THEME_LIGHT,
+    label: t('navigation.settings.colorTheme.options.light')
+  },
+  {
+    value: COLOR_THEME_DARK,
+    label: t('navigation.settings.colorTheme.options.dark')
+  }
+])
+
+const colorThemeRadioOptions = computed(() =>
+  colorThemeOptions.value.map(option => ({
+    value: option.value,
+    label: option.label
+  }))
+)
+
+const colorThemeModel = computed({
+  get: () => colorTheme.value,
+  set: (theme) => changeColorTheme(theme)
+})
 
 const interfaceModeOptions = computed(() => [
   {
@@ -464,6 +607,15 @@ function changeInterfaceMode(mode) {
   showSuccess(t('messages.success.interfaceModeChanged'))
 }
 
+function changeColorTheme(theme) {
+  if (theme === colorTheme.value) {
+    return
+  }
+
+  colorTheme.value = setColorTheme(theme)
+  showSuccess(t('messages.success.colorThemeChanged'))
+}
+
 function resolveTabRoute(tabName) {
   const section = tabToPathSection[tabName] || 'setting'
   return {
@@ -473,20 +625,46 @@ function resolveTabRoute(tabName) {
 }
 </script>
 
-<style lang="scss" scoped>
+
+
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+$primary: var(--color-primary);
+$zhihu-blue: #0066ff;
+$github-dark: #24292f;
+$danger: var(--color-error);
+
+$text-primary: var(--text-dark);
+$text-heading: var(--text-primary);
+$text-secondary: var(--text-medium);
+$text-muted: var(--text-tertiary);
+$text-light: var(--text-lightest);
+
+$ease-standard: 0.3s ease;@mixin glass-card(
+  $background: var(--glass-40),
+  $border: var(--glass-40)
+) {
+  background: $background;
+  border: 1px solid $border;
+
+  @include glass-blur(6px);
+}
+
 .tabs-title {
+  width: 100%;
+  margin-top: 3rem !important;
+  margin-bottom: 0.5rem !important;
   font-size: 1.8rem;
   font-weight: bold;
-  margin-top: 3rem!important;
-  margin-bottom: 0.5rem!important;
-  // color: #007aff;
 }
+
 .about-page-wrapper {
   width: 100%;
   height: 100%;
 }
 
-/* === 內容區塊 === */
+/* 教程开关 */
 .tutorial-toggle-section {
   display: flex;
   align-items: center;
@@ -496,8 +674,7 @@ function resolveTabRoute(tabName) {
 
 .tutorial-toggle-copy {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   gap: 6px;
 }
 
@@ -509,15 +686,15 @@ function resolveTabRoute(tabName) {
     font-weight: 700;
 
     &.is-on {
-      background: #007aff;
-      color: #fff;
+      background: $primary;
+      color: var(--text-white);
     }
   }
 
   :deep(.switch-toggle__label--inside) {
+    white-space: nowrap;
     color: inherit;
     font-weight: 700;
-    white-space: nowrap;
   }
 
   :deep(.switch-toggle__thumb) {
@@ -525,52 +702,32 @@ function resolveTabRoute(tabName) {
   }
 }
 
+/* 建议页面 */
 .page2 {
+  max-width: 500px;
   display: flex;
   justify-content: center;
-  max-width: 500px;
   margin: 0 auto;
   padding: 1dvw 8dvw;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px);
+  background: var(--glass-05);
+  border: 1px solid var(--glass-10);
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
   font-size: 18px;
+
+  @include glass-blur(8px);
 }
 
-@keyframes fade {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes breathing {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
+/* 通用正文 */
 p {
   margin-bottom: 20px;
-  color: #333;
-  font-family: 'Arial', sans-serif;
+  color: $text-primary;
+  font-family: Arial, sans-serif;
   font-size: 16px;
   line-height: 1.6;
 
   a {
-    color: #007aff;
+    color: $primary;
     text-decoration: none;
 
     &:hover {
@@ -580,8 +737,8 @@ p {
 
   strong {
     padding: 2px 6px;
-    border-radius: 4px;
-    background-color: rgba(0, 122, 255, 0.1);
+    background-color: rgba(var(--color-primary-rgb), 0.1);
+    border-radius: var(--radius-xs);
   }
 
   em.emoji {
@@ -595,7 +752,7 @@ p {
 }
 
 strong {
-  color: #007aff;
+  color: $primary;
   font-weight: bold;
 }
 
@@ -603,16 +760,74 @@ em {
   font-style: italic;
 }
 
+/* 简介与鸣谢 */
+.thanks-container {
+  // font-family: Georgia, serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text-primary);
+}
+
 .thanks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.8;
+
   li {
     margin-bottom: 0.5rem;
+  }
+}
+
+.thanks-link {
+  font-weight: 500;
+  color: var(--color-primary);
+  text-decoration: none;
+  position: relative;
+  transition: all 0.3s ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-cyan));
+    transition: width 0.3s ease, left 0.3s ease;
+  }
+
+  &:hover {
+    color: var(--color-primary-hover);
+    transform: scale(1.05);
+
+    &::after {
+      width: 100%;
+      left: 0;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .thanks-list {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .thanks-list {
+    font-size: 1.35rem;
   }
 }
 
 .customlist {
   margin-left: 20px;
   padding-left: 20px;
-  color: #333;
+  color: $text-primary;
   font-size: 16px;
   list-style-type: none;
 
@@ -630,7 +845,7 @@ em {
     text-align: left;
 
     a {
-      color: #007aff;
+      color: $primary;
       text-decoration: none;
 
       &:hover {
@@ -648,23 +863,35 @@ em {
 
 .feature-heading {
   margin: 0 0 4px;
-  color: #1a1a1a;
+  color: $text-heading;
   font-size: 18px;
   font-weight: 700;
 }
 
 .feature-subtitle {
   margin: 0 0 6px;
-  color: #007aff;
+  color: $primary;
   font-size: 14px;
   font-weight: 500;
 }
 
 .feature-intro {
   margin: 0 0 12px;
-  color: #555;
+  color: $text-secondary;
   font-size: 15px;
   line-height: 1.6;
+}
+
+.zhihu-article-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: $zhihu-blue;
+  font-size: 14px;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .subfeature-list {
@@ -678,102 +905,101 @@ em {
 
 .subfeature-title {
   margin: 0 0 2px;
-  color: #2c3e50;
+  color: var(--text-deep);
   font-size: 15px;
   font-weight: 600;
 }
 
 .subfeature-body {
   margin: 0;
-  color: #555;
+  color: $text-secondary;
   font-size: 14px;
   line-height: 1.65;
 }
 
+/* 感悟 */
 .thoughts {
-  p {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    border-radius: 8px;
-    color: #333;
-    font-family: 'Georgia', serif;
-    font-size: 18px;
-    line-height: 1.8;
-    text-align: left;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background: transparent;
+  border-radius: var(--radius-sm2);
+  color: $text-primary;
+  font-family: Georgia, serif;
+  font-size: 18px;
+  line-height: 1.8;
+  text-align: left;
+  text-indent: 2em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   em {
-    color: #000;
+    color: var(--text-primary);
     font-weight: bold;
     text-decoration: underline;
   }
 }
 
+.thoughts-container {
+  width: 100%;
+  max-width: 800px;
+}
+
+/* 项目卡片 */
 .cards-container {
+  max-width: 1000px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  max-width: 800px;
   gap: 1rem;
   text-align: center;
 }
 
 .project-card {
   position: relative;
-  z-index: 0;
-  display: block;
   flex: 1 1 280px;
-  box-sizing: border-box;
+  display: block;
   width: 100%;
-  max-width: 320px;
+  max-width: 300px;
   margin: 0 auto;
   padding: 1.1rem;
-  overflow: hidden;
-  border: 2px solid transparent;
-  border-radius: 12px;
-  background-color: #fff;
+  box-sizing: border-box;
+
+  @include glass-card;
+
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.08);
   color: inherit;
   text-decoration: none;
-  box-shadow: 0 2px 10px rgba(0, 122, 255, 0.08);
   transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+    transform $ease-standard,
+    box-shadow $ease-standard;
 
   &:hover {
+    background: var(--glass-80);
+    box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.15);
     transform: translateY(-6px) scale(1.01);
-    box-shadow: 0 0 12px rgba(63, 142, 255, 0.2);
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    z-index: -1;
-    border-radius: 14px;
-    background: linear-gradient(45deg, #7ec8ff, #d0eaff, #7ec8ff);
-    background-size: 400% 400%;
-    filter: blur(4px);
-    opacity: 0.5;
-    animation: breathing 6s ease infinite;
   }
 
   p {
     margin: 0.5rem 0.5rem 0.2rem;
-    color: #444;
+    overflow: hidden;
+    color: var(--text-dark);
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-size: 1rem;
     line-height: 1.6;
-    white-space: nowrap;
+  }
+
+  .desc-sub {
+    color: $text-light;
+    font-size: 0.85em;
   }
 }
 
 .card-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   margin-bottom: 0.5rem;
-  color: #3f8eff;
+  color: var(--color-primary);
   font-size: 1.2rem;
   font-weight: bold;
 }
@@ -784,7 +1010,9 @@ em {
   margin-right: 0.5rem;
 }
 
+/* 关注与支持按钮 */
 .like-author-title {
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -792,25 +1020,58 @@ em {
   gap: 1rem;
 }
 
+.follow-buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .follow-button,
 .support-button {
-  color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm2);
   cursor: pointer;
 }
 
 .follow-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.4rem 0.9rem;
-  background-color: #3f8eff;
   font-size: 1.2rem;
-  box-shadow: 0 2px 5px rgba(63, 142, 255, 0.3);
+  text-decoration: none;
   transition:
-    background-color 0.3s ease,
+    background-color $ease-standard,
     transform 0.2s ease;
+}
+
+.follow-logo {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.zhihu-follow {
+  background: rgba(0, 102, 255, 0.12);
+  border: 1px solid rgba(0, 102, 255, 0.25);
+  box-shadow: none;
+  color: $zhihu-blue;
+
+  @include glass-blur(6px);
 
   &:hover {
-    background-color: #5fa4ff;
+    background: rgba(0, 102, 255, 0.22);
+    transform: scale(1.05);
+  }
+}
+
+.github-follow {
+  background-color: $github-dark;
+  box-shadow: 0 2px 5px rgba(36, 41, 47, 0.3);
+  color: var(--text-white);
+
+  &:hover {
+    background-color: var(--text-dark);
     transform: scale(1.05);
   }
 }
@@ -818,13 +1079,14 @@ em {
 .support-button {
   margin-top: 1rem;
   padding: 0.5rem 1.1rem;
-  background-color: #c52f27;
+  background-color: $danger;
+  box-shadow: 0 2px 6px rgba(var(--color-error-light-rgb), 0.35);
+  color: var(--text-white);
   font-size: 1rem;
-  box-shadow: 0 2px 6px rgba(255, 59, 48, 0.35);
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: #ff615c;
+    background-color: var(--color-error-light);
     transform: scale(1.05);
   }
 }
@@ -833,75 +1095,88 @@ em {
   display: inline-block;
   max-width: 500px;
   margin-top: 0.5rem;
-  color: #555;
+  color: $text-secondary;
   font-size: 0.88rem;
   line-height: 1.5;
 }
 
+/* 建议入口 */
 .suggestion-box {
   max-width: 700px;
   margin: 0 auto;
-  color: #1f2937;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  text-align: center;
   justify-content: center;
+  color: var(--text-deep);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    sans-serif;
+  text-align: center;
 
   p {
-    margin: 8px 0;
-    color: #6b7280;
+    margin: 10px 0;
+    color: var(--text-secondary);
     font-size: 18px;
   }
 }
 
 .subtext {
-  color: #9ca3af;
-  font-size: 15px;
+  color: var(--text-tertiary);
+  font-size: 16px;
 }
 
 .card-links {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 16px;
   margin-top: 24px;
 }
 
 .card {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  flex: 1 1 200px;
+  min-width: 180px;
+  @include flex-col;
   align-items: center;
   padding: 20px;
   overflow: hidden;
-  border: 2px solid transparent;
-  border-radius: 16px;
-  background: linear-gradient(to bottom right, #b7cffa, #fff);
-  backdrop-filter: blur(4px);
-  color: #000;
+
+  @include glass-card;
+
+  border-radius: var(--radius-lg);
+  box-shadow: 0 6px 12px rgba(var(--color-primary-rgb), 0.1);
+  color: var(--text-primary);
   font-size: 18px;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  box-shadow: 0 6px 12px rgba(0, 122, 255, 0.1);
   transform: scale(1);
-  transition: all 0.3s ease;
+  transition: all $ease-standard;
 
   &:hover {
-    border-color: #007aff;
-    background: linear-gradient(to bottom right, #a5c1f6, #fff);
-    box-shadow: 0 10px 20px rgba(0, 122, 255, 0.2);
+    background: var(--glass-80);
+    border-color: rgba(var(--color-primary-rgb), 0.35);
+    box-shadow: 0 10px 20px rgba(var(--color-primary-rgb), 0.2);
     transform: scale(1.02) translateY(-2px);
   }
 
   span {
     margin-top: 10px;
-    color: #003cff;
     font-size: 15px;
-    text-decoration: underline;
-    transition: color 0.3s ease;
+    transition: color $ease-standard;
   }
 }
 
-/* === 设置页面样式 === */
+.card-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 4px;
+}
+
+/* 设置页面 */
 .settings-container {
   max-width: 800px;
   margin: 0 auto;
@@ -911,15 +1186,16 @@ em {
 .setting-section {
   margin-bottom: 24px;
   padding: 24px;
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  @include glass-blur(10px);
 }
 
 .setting-split {
   display: flex;
-  gap: 24px;
   align-items: flex-start;
+  gap: 24px;
 }
 
 .setting-split-item {
@@ -928,23 +1204,23 @@ em {
 }
 
 .setting-split-divider {
-  border: none;
-  width: 1px;
-  background: rgba(0, 0, 0, 0.12);
   align-self: stretch;
+  width: 1px;
   margin: 0;
+  background: rgba(0, 0, 0, 0.12);
+  border: none;
 }
 
 .section-title {
   margin: 0 0 8px;
-  color: #333;
+  color: $text-primary;
   font-size: 20px;
   font-weight: 600;
 }
 
 .section-description {
   margin: 0 0 20px;
-  color: #666;
+  color: $text-muted;
   font-size: 14px;
 }
 
@@ -961,18 +1237,13 @@ em {
   }
 }
 
-.language-radio-group {
-  :deep(.liquid-radio-text) {
-    font-size: 15px;
-  }
-}
-
 .interface-mode-radio-group {
   :deep(.liquid-radio-text) {
     font-size: 14px;
   }
 }
 
+/* 语言设置 */
 .language-options {
   display: flex;
   justify-content: center;
@@ -980,37 +1251,30 @@ em {
 }
 
 .language-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   padding: 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-80);
+  border: 2px solid var(--border-light-gray);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all $ease-standard;
 
   &:hover {
-    border-color: #007aff;
-    background: #fff;
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+    background: var(--bg-white);
+    border-color: $primary;
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
     transform: translateY(-2px);
   }
 
   &.active {
-    border-color: #007aff;
     background: linear-gradient(
       135deg,
-      rgba(0, 122, 255, 0.1),
-      rgba(0, 122, 255, 0.05)
+      rgba(var(--color-primary-rgb), 0.1),
+      rgba(var(--color-primary-rgb), 0.05)
     );
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    border-color: $primary;
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
   }
-}
-
-.language-flag {
-  margin-right: 12px;
-  font-size: 32px;
 }
 
 .language-info {
@@ -1020,25 +1284,25 @@ em {
 
 .language-name {
   margin-bottom: 4px;
-  color: #333;
+  color: $text-primary;
   font-size: 16px;
   font-weight: 600;
 }
 
 .language-code {
-  color: #999;
+  color: $text-light;
   font-size: 12px;
 }
 
 .language-check {
   margin-left: 20px;
-  color: #007aff;
+  color: $primary;
   font-size: 24px;
   font-weight: bold;
 }
 
-/* === 竖屏 / 移动端：按宽高比判断 === */
-@media (max-aspect-ratio: 1/1) {
+/* 竖屏 */
+@media (max-aspect-ratio: #{1 / 1}) {
   .tutorial-toggle-section {
     align-items: flex-start;
     gap: 12px;
@@ -1088,6 +1352,10 @@ em {
     font-size: 14px;
   }
 
+  .zhihu-article-link {
+    font-size: 13px;
+  }
+
   .subfeature-list {
     margin-left: 12px;
   }
@@ -1102,12 +1370,10 @@ em {
   }
 
   .thoughts {
-    p {
-      margin: 24px auto;
-      padding: 14px;
-      font-size: 16px;
-      line-height: 1.65;
-    }
+    margin: 24px auto;
+    padding: 14px;
+    font-size: 16px;
+    line-height: 1.65;
   }
 
   .cards-container {
@@ -1121,9 +1387,9 @@ em {
 
     p {
       margin: 6px 4px 2px;
+      white-space: normal;
       font-size: 15px;
       line-height: 1.45;
-      white-space: normal;
     }
   }
 
@@ -1147,6 +1413,11 @@ em {
     font-size: 16px;
   }
 
+  .follow-logo {
+    width: 16px;
+    height: 16px;
+  }
+
   .support-button {
     margin-top: 12px;
     padding: 7px 14px;
@@ -1161,13 +1432,13 @@ em {
     max-width: 100%;
 
     p {
-      margin: 6px 0;
+      margin: 8px 0;
       font-size: 16px;
     }
   }
 
   .subtext {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .card-links {
@@ -1176,6 +1447,8 @@ em {
   }
 
   .card {
+    flex: 1 1 100%;
+    min-width: 0;
     padding: 14px 16px;
     border-radius: 14px;
     font-size: 16px;
@@ -1184,6 +1457,12 @@ em {
       margin-top: 6px;
       font-size: 13px;
     }
+  }
+
+  .card-icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 2px;
   }
 
   .settings-container {
@@ -1231,12 +1510,6 @@ em {
     }
   }
 
-  .language-radio-group {
-    :deep(.liquid-radio-text) {
-      font-size: 14px;
-    }
-  }
-
   .interface-mode-radio-group {
     :deep(.liquid-radio-text) {
       font-size: 13px;
@@ -1253,15 +1526,10 @@ em {
     border-width: 1.5px;
   }
 
-  .language-flag {
-    margin-right: 8px;
-    font-size: 26px;
-  }
-
   .language-info {
-    gap: 0px;
-    align-items: center;
     flex-direction: column;
+    align-items: center;
+    gap: 0;
   }
 
   .language-name {

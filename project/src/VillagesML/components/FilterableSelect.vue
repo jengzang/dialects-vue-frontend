@@ -30,7 +30,7 @@
         @keydown="handleKeydown"
         :placeholder="placeholder || $t('common.components.filterableSelect.placeholder')"
         :disabled="disabled"
-        class="select-input"
+        class="vml-select"
       />
       <button
         @click.stop="toggleDropdown"
@@ -107,7 +107,7 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { showError } from '@/utils/message.js'
-import { getCities, getCounties, getTownships } from '@/utils/region/regionPreload.js'
+import { getCities, getCounties, getTownships } from '@/VillagesML/utils/regionPreload.js'
 import SimpleDropdown from '@/components/selector/SimpleDropdown.vue'
 
 const { t } = useI18n()
@@ -474,7 +474,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .filterable-select {
   display: flex;
   gap: 8px;
@@ -492,9 +492,9 @@ onUnmounted(() => {
 
 .level-select {
   padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-sm2);
+  background: var(--glass-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
   cursor: pointer;
@@ -508,12 +508,12 @@ onUnmounted(() => {
 
 .level-select:hover {
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--glass-70);
 }
 
 .level-select .arrow-icon {
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-tertiary);
 }
 
 .dropdown-wrapper {
@@ -521,8 +521,8 @@ onUnmounted(() => {
   display: flex;
   position: relative;
   border: 2px solid var(--color-primary-hover);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-sm2);
+  background: var(--glass-50);
   backdrop-filter: blur(10px);
   overflow: hidden;
   transition: all 0.3s ease;
@@ -532,10 +532,10 @@ onUnmounted(() => {
 
 .dropdown-wrapper:focus-within {
   border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--glass-70);
 }
 
-.select-input {
+.vml-select {
   flex: 1;
   width: 100%;
   padding: 10px 12px;
@@ -547,16 +547,14 @@ onUnmounted(() => {
 
 .dropdown-trigger {
   flex: 0 0 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   border: none;
   background: var(--color-primary);
-  color: white;
+  color: var(--action-primary-text);
   cursor: pointer;
   transition: all 0.3s ease;
   padding:10px 4px;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
 }
 
 .dropdown-trigger:hover:not(:disabled) {
@@ -564,8 +562,7 @@ onUnmounted(() => {
 }
 
 .dropdown-trigger:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  @include disabled-state;
 }
 
 .arrow-icon {
@@ -573,11 +570,11 @@ onUnmounted(() => {
 }
 
 .select-dropdown {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--glass-90);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--glass-80);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px var(--bg-hover-strong);
   overflow: hidden;
 }
 
@@ -589,12 +586,10 @@ onUnmounted(() => {
 }
 
 .dropdown-loading {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   gap: 10px;
 }
-
 
 
 .dropdown-options {
@@ -613,11 +608,11 @@ onUnmounted(() => {
 
 .dropdown-option:hover,
 .dropdown-option.highlighted {
-  background: rgba(74, 144, 226, 0.1);
+  background: rgba(var(--vml-blue-rgb), 0.1);
 }
 
 .dropdown-option.selected {
-  background: rgba(74, 144, 226, 0.2);
+  background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
 }
 
