@@ -276,28 +276,46 @@
             </div>
           </div>
 
-          <div class="setting-section">
-            <h3 class="section-title">{{ $t('navigation.settings.colorTheme.title') }}</h3>
-            <p class="section-description">{{ $t('navigation.settings.colorTheme.description') }}</p>
+          <div class="setting-section setting-split">
+            <div class="setting-split-item">
+              <h3 class="section-title">
+                {{ $t('navigation.settings.colorTheme.title') }}
+                <HelpIcon
+                  :content="$t('navigation.settings.colorTheme.description')"
+                  size="sm"
+                  placement="right"
+                  icon="?"
+                  icon-color="var(--color-primary)"
+                />
+              </h3>
 
-            <RadioGroup
-              v-model="colorThemeModel"
-              :options="colorThemeRadioOptions"
-              name="about-color-theme"
-              class="settings-radio-group color-theme-radio-group"
-            />
-          </div>
+              <RadioGroup
+                v-model="colorThemeModel"
+                :options="colorThemeRadioOptions"
+                name="about-color-theme"
+                class="settings-radio-group color-theme-radio-group"
+              />
+            </div>
+            <hr class="setting-split-divider">
+            <div class="setting-split-item">
+              <h3 class="section-title">
+                {{ $t('navigation.settings.interfaceMode.title') }}
+                <HelpIcon
+                  :content="$t('navigation.settings.interfaceMode.description')"
+                  size="sm"
+                  placement="right"
+                  icon="?"
+                  icon-color="var(--color-primary)"
+                />
+              </h3>
 
-          <div class="setting-section">
-            <h3 class="section-title">{{ $t('navigation.settings.interfaceMode.title') }}</h3>
-            <p class="section-description">{{ $t('navigation.settings.interfaceMode.description') }}</p>
-
-            <RadioGroup
-              v-model="interfaceModeModel"
-              :options="interfaceModeRadioOptions"
-              name="about-interface-mode"
-              class="settings-radio-group interface-mode-radio-group"
-            />
+              <RadioGroup
+                v-model="interfaceModeModel"
+                :options="interfaceModeRadioOptions"
+                name="about-interface-mode"
+                class="settings-radio-group interface-mode-radio-group"
+              />
+            </div>
           </div>
 
           <div class="setting-section tutorial-toggle-section">

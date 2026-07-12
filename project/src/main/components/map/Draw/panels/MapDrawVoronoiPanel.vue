@@ -262,6 +262,8 @@ const offsetClass = computed(() => {
 }
 
 .voronoi-data-source-actions {
+  align-items: center;
+  justify-content: center;
   display: flex;
   flex-wrap: wrap;
   gap: 0.65rem;
