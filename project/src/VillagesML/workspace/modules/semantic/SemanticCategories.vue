@@ -527,6 +527,8 @@ onMounted(() => {
 }
 
 .category-list {
+  max-height: 300px;
+  overflow-y: auto;
   padding: 16px;
   margin-bottom: 16px;
 }
@@ -603,6 +605,8 @@ onMounted(() => {
   padding: 16px;
   min-width: 0;
   overflow: hidden;
+  max-height:400px;
+  overflow-y:auto;
 }
 
 .vtf-global h3,
