@@ -124,8 +124,8 @@
       <div ref="tendencySection" class="tendency-section vml-glass-panel">
         <div class="section-header-centered" v-if="selectedCategory">
           <div class="category-title-card">
-            <span class="category-icon-large">{{ getCategoryIcon(selectedCategory.category) }}</span>
-            <h3 class="category-title-large">{{ getCategoryName(selectedCategory.category) }}</h3>
+            <span class="category-icon-large">{{ getCategoryIcon(selectedCategory.parent_category || selectedCategory.category) }}</span>
+            <h3 class="category-title-large">{{ getCategoryDisplayName(selectedCategory.category, detailMode) }}</h3>
             <span class="category-separator">-</span>
             <p class="category-subtitle">區域排行</p>
           </div>
