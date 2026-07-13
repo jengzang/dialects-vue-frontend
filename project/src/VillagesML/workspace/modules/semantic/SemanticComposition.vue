@@ -89,6 +89,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
 import { getSemanticCompositionPatterns } from '@/api/index.js'
@@ -100,7 +101,12 @@ const patterns = ref([])
 const loadingPatterns = ref(false)
 const minCount = ref(5)
 const topN = ref(50)
-const detailMode = ref(false)
+const { state: detailMode } = useRouteQueryState('detail', {
+  defaultValue: false,
+  parse: v => v === 'true',
+  serialize: v => String(v),
+  replace: true
+})
 
 // Methods
 const loadPatterns = async () => {

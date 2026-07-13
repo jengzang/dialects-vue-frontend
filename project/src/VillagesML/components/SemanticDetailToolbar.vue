@@ -15,7 +15,7 @@
             inactive-text="詳細模式"
             label-position="right"
             aria-label="詳細模式"
-            @update:modelValue="$emit('update:modelValue', $event)"
+            @update:modelValue="onToggle"
           />
         </label>
         <span class="toggle-hint">（語義分類更細緻）</span>
@@ -69,13 +69,17 @@ import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { getSubcategoryName, getCategoryIcon, SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 import lexicon from '@/VillagesML/config/semantic_lexicon_v4.json'
 
-defineProps({
+const props = defineProps({
   modelValue: { type: Boolean, default: false }
 })
 
-defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue'])
 
 const showLexiconModal = ref(false)
+
+const onToggle = (val) => {
+  emit('update:modelValue', val)
+}
 
 const getCategoryName = (key) => SEMANTIC_CATEGORY_NAMES[key] || key
 

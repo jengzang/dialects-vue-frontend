@@ -185,6 +185,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
 import {
@@ -210,7 +211,12 @@ const minPMI = ref(0)
 const pmiTopN = ref(50)
 
 // Detail mode toggle
-const detailMode = ref(false)
+const { state: detailMode } = useRouteQueryState('detail', {
+  defaultValue: false,
+  parse: v => v === 'true',
+  serialize: v => String(v),
+  replace: true
+})
 
 // Computed: 计算 PMI 数据的最大绝对值
 const maxAbsPMI = computed(() => {

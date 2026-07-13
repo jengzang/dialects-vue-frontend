@@ -138,6 +138,7 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue'
+import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
@@ -159,7 +160,12 @@ const indicesMinVillages = ref(null)
 const indicesLimit = ref(100)
 
 // Detail mode toggle
-const detailMode = ref(false)
+const { state: detailMode } = useRouteQueryState('detail', {
+  defaultValue: false,
+  parse: v => v === 'true',
+  serialize: v => String(v),
+  replace: true
+})
 
 // Options for SimpleSelectDropdown
 const categoryOptions = [
