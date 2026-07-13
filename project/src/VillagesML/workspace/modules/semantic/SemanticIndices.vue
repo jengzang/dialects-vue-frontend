@@ -143,9 +143,9 @@ import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
-import { getSemanticIndices, getSemanticSubcategoryList } from '@/api/index.js'
+import { getSemanticIndices } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
-import { getCategoryDisplayName } from '@/VillagesML/config/villagesML.js'
+import { getCategoryDisplayName, SEMANTIC_SUBCATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 import { userStore } from '@/main/store/store.js'
 
 // State
@@ -158,7 +158,6 @@ const indicesRegionLevel = ref('')
 const indicesRegionName = ref('')
 const indicesMinVillages = ref(null)
 const indicesLimit = ref(100)
-const subcategoryList = ref([])
 
 // Detail mode toggle
 const route = useRoute()
@@ -179,15 +178,25 @@ const parentCategoryOptions = [
   { label: '基建', value: 'infrastructure' }
 ]
 
+const KNOWN_PARENTS = new Set([
+  'water', 'mountain', 'settlement', 'direction', 'clan',
+  'vegetation', 'agriculture', 'symbolic', 'infrastructure',
+  'number', 'size', 'terrain', 'spatial', 'modifier', 'culture'
+])
+
 const categoryOptions = computed(() => {
-  if (detailMode.value && subcategoryList.value.length > 0) {
-    return [
-      { label: '全部類別', value: '' },
-      ...subcategoryList.value.map(item => ({
-        label: getCategoryDisplayName(item.subcategory, true),
-        value: item.subcategory
-      }))
-    ]
+  if (detailMode.value) {
+    const options = [{ label: '全部類別', value: '' }]
+    for (const key of Object.keys(SEMANTIC_SUBCATEGORY_NAMES)) {
+      const underscoreIdx = key.indexOf('_')
+      if (underscoreIdx > 0 && KNOWN_PARENTS.has(key.substring(0, underscoreIdx))) {
+        options.push({
+          label: SEMANTIC_SUBCATEGORY_NAMES[key],
+          value: key
+        })
+      }
+    }
+    return options
   }
   return parentCategoryOptions
 })
@@ -224,26 +233,15 @@ watch(indicesRegionLevel, () => {
 })
 
 // Watch detailMode changes and auto-refresh table if it has data
-const loadSubcategories = async () => {
-  try {
-    subcategoryList.value = await getSemanticSubcategoryList()
-  } catch (error) {
-    // silently fail, dropdown will fall back to parent categories
-  }
-}
-
-watch(detailMode, async (val) => {
+watch(detailMode, (val) => {
   const query = { ...route.query }
   if (val) { query.detail = 'true' } else { delete query.detail }
   router.replace({ query })
   indicesCategory.value = ''
-  if (val) await loadSubcategories()
   if (indices.value && indices.value.length > 0) {
     loadIndices()
   }
 })
-
-if (detailMode.value) loadSubcategories()
 
 // Methods
 const loadIndices = async () => {
