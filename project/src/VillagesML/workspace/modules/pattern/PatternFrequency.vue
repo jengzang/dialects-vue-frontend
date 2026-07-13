@@ -198,9 +198,9 @@ const goToTendency = (pattern) => {
   margin: 0 auto;
 }
 
-.vml-glass-panel {
-  @include flex-col;
-}
+// .vml-glass-panel {
+//   @include flex-col;
+// }
 
 .vml-glass-panel h2 {
   white-space: nowrap;

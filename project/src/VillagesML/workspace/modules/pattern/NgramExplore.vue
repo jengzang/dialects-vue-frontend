@@ -599,10 +599,10 @@ onMounted(async () => {
 }
 
 @media (min-aspect-ratio: 1/1) {
-  .frequency-section,
-  .pattern-section {
-    flex-direction: row;
-  }
+  // .frequency-section,
+  // .pattern-section {
+  //   flex-direction: row;
+  // }
 
   .controls,
   .search-controls {
