@@ -520,17 +520,18 @@ export function getSignificanceLevel(pValue) {
  * @type {Object<string, string>}
  */
 export const SPATIAL_CLUSTERING_RUN_LABELS = {
-  'spatial_eps_05': '超密集核心聚類',
-  'spatial_hdbscan_v1': '自動多密度聚類',
-  'spatial_eps_10': '標準密度聚類',
-  'spatial_eps_20': '全域覆蓋聚類'
+  'spatial_eps_05': '微尺度·緊密村落群（0.5km）',
+  'spatial_eps_15': '小尺度·村級聚集（1.5km）',
+  'spatial_eps_30': '中尺度·鄉鎮級聚集（3.0km）',
+  'spatial_eps_50': '大尺度·跨鄉鎮連通（5.0km）',
+  'spatial_hdbscan_v2': '自適應多密度聚類（HDBSCAN）'
 }
 
 /**
  * 默認的空間聚類 Run ID
  * @type {string}
  */
-export const DEFAULT_SPATIAL_CLUSTERING_RUN_ID = 'spatial_hdbscan_v1'
+export const DEFAULT_SPATIAL_CLUSTERING_RUN_ID = 'spatial_hdbscan_v2'
 
 /**
  * 獲取空間聚類 Run 標籤

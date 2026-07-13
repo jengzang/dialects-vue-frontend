@@ -107,7 +107,7 @@ export const villagesMLStore = reactive({
   spatialAwareSettings: {
     algorithm: 'kmeans',
     k: 5,
-    spatial_run_id: 'spatial_hdbscan_v1',
+    spatial_run_id: 'spatial_hdbscan_v2',
     features: {
       use_semantic_profile: true,
       use_naming_patterns: true,
