@@ -341,7 +341,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .ngram-section {
-  @include flex-col;
+  // @include flex-col;
   gap: 12px;
 }
 

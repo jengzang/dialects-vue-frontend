@@ -425,7 +425,9 @@ const charMapLayers = computed(() => {
       character: queryChar.value,
       cluster_id: item.cluster_id,
       cluster_tendency_mean: item.cluster_tendency_mean,
-      cluster_tendency_std: item.tendency_std,  // 後端字段名是 tendency_std
+      cluster_tendency_std: item.tendency_std,
+      global_tendency_mean: item.global_tendency_mean,
+      tendency_deviation: item.tendency_deviation,
       cluster_size: item.cluster_size,
       n_villages_with_char: item.n_villages_with_char,
       spatial_coherence: item.spatial_coherence,
@@ -448,10 +450,10 @@ const charMapLayers = computed(() => {
         'interpolate',
         ['linear'],
         ['get', 'cluster_size'],
-        0, 8,
-        50, 12,
-        100, 16,
-        500, 20
+        0, 4,
+        50, 6,
+        100, 9,
+        500, 11
       ],
       'circle-color': [
         'interpolate',
@@ -465,7 +467,7 @@ const charMapLayers = computed(() => {
       'circle-stroke-width': [
         'case',
         ['==', ['get', 'is_significant'], 1],
-        3,
+        2,
         1
       ],
       'circle-stroke-color': [
@@ -516,15 +518,15 @@ const clusterMapLayers = computed(() => {
         'interpolate',
         ['linear'],
         ['get', 'cluster_size'],
-        0, 15,
-        50, 20,
-        100, 25,
-        500, 30,
-        1000, 35
+        0, 8,
+        50, 11,
+        100, 14,
+        500, 17,
+        1000, 20
       ],
       'circle-color': 'rgba(74, 144, 226, 0.6)',
       'circle-opacity': 0.7,
-      'circle-stroke-width': 3,
+      'circle-stroke-width': 2,
       'circle-stroke-color': '#4a90e2'
     }
   }]
