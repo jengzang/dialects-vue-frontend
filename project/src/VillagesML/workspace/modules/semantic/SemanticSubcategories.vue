@@ -217,7 +217,7 @@ import * as echarts from 'echarts'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { SEMANTIC_SUBCATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
+import { SEMANTIC_SUBCATEGORY_NAMES, getCategoryDisplayName } from '@/VillagesML/config/villagesML.js'
 import RadioGroup from "@/components/selector/RadioGroup.vue";
 
 export default {
@@ -229,9 +229,9 @@ export default {
     HelpIcon,
   },
   setup() {
-    // Helper function to get subcategory Chinese name
+    // Helper: 獲取子類別中文名（支持 v4 帶父前綴格式如 terrain_peak_ridge）
     const getSubcategoryName = (subcategory) => {
-      return SEMANTIC_SUBCATEGORY_NAMES[subcategory] || subcategory
+      return getCategoryDisplayName(subcategory, true)
     }
 
     // Parent categories (from semantic_lexicon_v4.json)
@@ -658,8 +658,10 @@ export default {
 }
 
 .form-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
+  flex-direction: row;
+  // display: grid;
+  // grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
 }
 
