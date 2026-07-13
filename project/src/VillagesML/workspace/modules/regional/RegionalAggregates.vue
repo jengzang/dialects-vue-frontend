@@ -199,6 +199,7 @@ import {
   getRegionalSpatialAggregates
 } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
+import { SEMANTIC_FEATURE_KEYS, SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
 
 // State
@@ -236,21 +237,10 @@ const spatialLevelOptions = [
   { label: '區縣', value: 'county' }
 ]
 
-const SEM_LABELS = {
-  mountain: '山地',
-  water: '水系',
-  settlement: '聚落',
-  direction: '方位',
-  clan: '宗族',
-  symbolic: '象徵',
-  agriculture: '農業',
-  vegetation: '植被',
-  infrastructure: '基建'
-}
-
 const getSemCategories = (item) =>
-  Object.entries(SEM_LABELS).map(([key, label]) => ({
-    key, label,
+  SEMANTIC_FEATURE_KEYS.map(key => ({
+    key,
+    label: SEMANTIC_CATEGORY_NAMES[key],
     pct: item[`sem_${key}_pct`] || 0,
     count: item[`sem_${key}_count`] || 0
   }))

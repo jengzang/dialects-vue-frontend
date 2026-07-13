@@ -392,7 +392,7 @@ import { extractFeatures as apiExtractFeatures, fetchSubsetFilter } from '@/api/
 import { showError, showSuccess, showWarning } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
 import { cityHasCounties } from '@/VillagesML/utils/regionPreload.js'
-import { SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
+import { SEMANTIC_CATEGORY_NAMES, isSemanticFeature } from '@/VillagesML/config/villagesML.js'
 
 // Router
 const router = useRouter()
@@ -721,7 +721,7 @@ const aggregateFeatures = async () => {
 
         extractionResults.value.results.forEach(result => {
           const feature = result.features.semantic
-          if (feature && feature.sem_mountain !== undefined) {
+          if (isSemanticFeature(feature)) {
             Object.keys(feature).forEach(key => {
               if (feature[key] === 1) {
                 const categoryKey = key.replace('sem_', '')
@@ -933,7 +933,7 @@ const formatFeatureValue = (value) => {
   // 如果是对象（semantic_tags, morphology, clustering, spatial, character）
   if (typeof value === 'object') {
     // semantic_tags: 显示激活的标签（映射为中文）
-    if (value.sem_mountain !== undefined) {
+    if (isSemanticFeature(value)) {
       const activeTags = Object.keys(value)
         .filter(key => value[key] === 1)
         .map(key => {

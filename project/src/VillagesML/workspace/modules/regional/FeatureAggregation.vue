@@ -350,7 +350,7 @@ import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { aggregateFeatures } from '@/api/index.js'
 import { showError, showWarning } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
-import { SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
+import { SEMANTIC_CATEGORY_NAMES, SEMANTIC_FEATURE_KEYS } from '@/VillagesML/config/villagesML.js'
 
 const regionLevel = ref('county')
 const currentRegion = ref('')
@@ -445,7 +445,7 @@ const runAggregation = async () => {
 const ZSCORE_LABEL_MAP = {
   avg_name_length: '平均名稱長度',
   ...Object.fromEntries(
-    Object.entries(SEMANTIC_CATEGORY_NAMES).map(([k, v]) => [`sem_${k}_pct`, v])
+    SEMANTIC_FEATURE_KEYS.map(k => [`sem_${k}_pct`, SEMANTIC_CATEGORY_NAMES[k]])
   )
 }
 

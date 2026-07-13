@@ -52,6 +52,26 @@ export const SEMANTIC_CATEGORY_NAMES = {
 // @deprecated 请使用 SEMANTIC_CATEGORY_NAMES
 export const CATEGORY_NAMES_ZH = SEMANTIC_CATEGORY_NAMES
 
+// ========================================
+// v4 语义特征 key（与 API semantic_tags 的 sem_* 字段对应）
+// ========================================
+
+/** @type {string[]} v4 九大语义类别 key */
+export const SEMANTIC_FEATURE_KEYS = [
+  'agriculture', 'clan', 'culture', 'modifier',
+  'settlement', 'spatial', 'terrain', 'vegetation', 'water'
+]
+
+/**
+ * 判断对象是否为语义特征对象（包含 sem_* 字段）
+ * @param {Object} obj
+ * @returns {boolean}
+ */
+export const isSemanticFeature = (obj) => {
+  if (!obj) return false
+  return SEMANTIC_FEATURE_KEYS.some(k => obj[`sem_${k}`] !== undefined)
+}
+
 /**
  * 語義類別描述映射
  * @type {Object<string, string>}
