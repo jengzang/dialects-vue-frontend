@@ -76,8 +76,8 @@
             <div class="col-count">{{ pattern.frequency }}</div>
             <div class="col-percentage">{{ pattern.percentage?.toFixed(2) || '0.00' }}%</div>
             <div class="col-components">
-              <span v-if="pattern.modifier" class="component-tag modifier">{{ getCategoryName(pattern.modifier) }}</span>
-              <span v-if="pattern.head" class="component-tag head">{{ getCategoryName(pattern.head) }}</span>
+              <span v-if="pattern.modifier" class="component-tag modifier">{{ getCategoryDisplayName(pattern.modifier, detailMode) }}</span>
+              <span v-if="pattern.head" class="component-tag head">{{ getCategoryDisplayName(pattern.head, detailMode) }}</span>
             </div>
           </div>
         </div>
