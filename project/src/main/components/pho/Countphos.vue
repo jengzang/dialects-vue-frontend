@@ -1127,11 +1127,12 @@ $primary-deep: #003d9e;
 $mobile-breakpoint: 768px;
 .phonology-page {
   min-width: 80dvw;
+  max-width: min(1000px, 98%);
   margin-top: 20px;
 
   /* 输入与查询 */
   .input-section {
-    max-width: 600px;
+    max-width: min(600px,90%);
     @include flex-col;
     align-items: center;
     justify-content: center;

@@ -393,8 +393,8 @@ const initPitchChart = () => {
     {
       xAxis: seg.start_s,
       itemStyle: {
-        color: seg.type === 'rime_core' ? 'rgba(var(--color-gold-rgb), 0.2)' :
-            seg.type === 'silence' ? 'rgba(var(--color-silver-rgb), 0.1)' :
+        color: seg.type === 'rime_core' ? 'rgba(255,215,0,0.2)' :
+            seg.type === 'silence' ? 'rgba(192,192,192,0.1)' :
                 'rgba(100,150,255,0.15)'
       }
     },
@@ -405,7 +405,7 @@ const initPitchChart = () => {
     title: {
       text: t('praat.pitchTone.step1.chart.title'),
       left: 'center',
-      textStyle: { fontSize: 14, color: 'var(--text-tertiary)' }
+      textStyle: { fontSize: 14, color: '#666' }
     },
     tooltip: {
       trigger: 'axis',
@@ -448,7 +448,7 @@ const initPitchChart = () => {
       data: rawData,
       symbol: 'none',
       smooth: true,
-      lineStyle: { color: 'var(--color-primary)', width: 2 },
+      lineStyle: { color: '#007aff', width: 2 },
       markArea: markAreaData.length > 0 ? {
         data: markAreaData,
         silent: true

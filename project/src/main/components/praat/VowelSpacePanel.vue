@@ -163,12 +163,12 @@ const showReferenceVowels = ref(false)  // Toggle reference vowels
 
 // Color palette for segments
 const segmentColors = [
-  'var(--color-success)',  // Green - rime_core
-  'var(--color-primary)',  // Blue - syllable_like
-  'var(--color-warning)',  // Orange - voiced
+  '#34c759',  // Green - rime_core
+  '#007aff',  // Blue - syllable_like
+  '#ff9500',  // Orange - voiced
   '#ff2d55',  // Pink
-  'var(--color-purple)',  // Purple
-  'var(--color-cyan)',  // Cyan
+  '#5856d6',  // Purple
+  '#5ac8fa',  // Cyan
 ]
 
 const getSegmentTypeLabel = (type) => {
@@ -354,7 +354,7 @@ const initChart = () => {
       data: allVowelSpaceData.value,
       symbolSize: 6,
       itemStyle: {
-        color: 'var(--color-success)',
+        color: '#34c759',
         opacity: 0.6
       }
     }]
@@ -368,7 +368,7 @@ const initChart = () => {
       data: referenceVowelsData.map(v => [v.F2, v.F1]),
       symbolSize: 10,
       itemStyle: {
-        color: 'var(--text-secondary)',
+        color: '#8e8e93',
         opacity: 0.7,
         borderColor: '#fff',
         borderWidth: 1
@@ -381,7 +381,7 @@ const initChart = () => {
         },
         position: 'top',
         fontSize: 12,
-        color: 'var(--text-secondary)',
+        color: '#8e8e93',
         fontWeight: 'bold'
       },
       emphasis: {
