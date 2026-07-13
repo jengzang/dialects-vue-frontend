@@ -500,9 +500,10 @@ watch(detailMode, (val) => {
   const query = { ...route.query }
   if (val) { query.detail = 'true' } else { delete query.detail }
   router.replace({ query })
+  selectedCategory.value = null
+  categoryRanking.value = []
   loadVTFGlobal()
   if (vtfRegional.value.length > 0) loadVTFRegional()
-  if (categoryRanking.value.length > 0) loadCategoryRanking()
 })
 
 onMounted(() => {

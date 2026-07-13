@@ -267,7 +267,7 @@ const paginatedAggregates = computed(() => {
 
 const maxCategoryValue = computed(() => {
   if (!selectedItem.value) return 1
-  return Math.max(...Object.keys(SEM_LABELS).map(k => selectedItem.value[`sem_${k}_pct`] || 0))
+  return Math.max(...SEMANTIC_FEATURE_KEYS.map(k => selectedItem.value[`sem_${k}_pct`] || 0))
 })
 
 // Methods
