@@ -234,7 +234,7 @@ export default {
       return SEMANTIC_SUBCATEGORY_NAMES[subcategory] || subcategory
     }
 
-    // Parent categories (与 SEMANTIC_CATEGORY_NAMES 保持一致)
+    // Parent categories (9大父类别)
     const parentCategories = [
       { value: 'water', label: '水系' },
       { value: 'mountain', label: '山地' },
@@ -244,10 +244,7 @@ export default {
       { value: 'vegetation', label: '植物' },
       { value: 'agriculture', label: '農業' },
       { value: 'symbolic', label: '象徵' },
-      { value: 'infrastructure', label: '基建' },
-      { value: 'number', label: '數字' },
-      { value: 'size', label: '尺寸' },
-      { value: 'other', label: '其他' }
+      { value: 'infrastructure', label: '基建' }
     ]
 
     // State
