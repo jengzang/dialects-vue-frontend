@@ -20,6 +20,7 @@
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model="indicesCategory"
             :options="categoryOptions"
+            :searchable="detailMode"
           />
           <span class="input-hint">過濾特定語義類別</span>
         </div>
