@@ -101,7 +101,7 @@ const patterns = ref([])
 const loadingPatterns = ref(false)
 const minCount = ref(5)
 const topN = ref(50)
-const { state: detailMode } = useRouteQueryState('detail', {
+const { state: detailMode, set: setDetailMode } = useRouteQueryState('detail', {
   defaultValue: false,
   parse: v => v === 'true',
   serialize: v => String(v),
@@ -132,7 +132,8 @@ const translatePattern = (patternStr) => {
     .join('+')
 }
 
-watch(detailMode, () => {
+watch(detailMode, (val) => {
+  setDetailMode(val)
   if (patterns.value.length > 0) loadPatterns()
 })
 </script>

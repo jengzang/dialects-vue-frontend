@@ -160,7 +160,7 @@ const indicesMinVillages = ref(null)
 const indicesLimit = ref(100)
 
 // Detail mode toggle
-const { state: detailMode } = useRouteQueryState('detail', {
+const { state: detailMode, set: setDetailMode } = useRouteQueryState('detail', {
   defaultValue: false,
   parse: v => v === 'true',
   serialize: v => String(v),
@@ -213,7 +213,8 @@ watch(indicesRegionLevel, () => {
 })
 
 // Watch detailMode changes and auto-refresh table if it has data
-watch(detailMode, () => {
+watch(detailMode, (val) => {
+  setDetailMode(val)
   if (indices.value && indices.value.length > 0) {
     loadIndices()
   }

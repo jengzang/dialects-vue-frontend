@@ -211,7 +211,7 @@ const minPMI = ref(0)
 const pmiTopN = ref(50)
 
 // Detail mode toggle
-const { state: detailMode } = useRouteQueryState('detail', {
+const { state: detailMode, set: setDetailMode } = useRouteQueryState('detail', {
   defaultValue: false,
   parse: v => v === 'true',
   serialize: v => String(v),
@@ -287,7 +287,8 @@ const getPMIClass = (pmi_score) => {
 }
 
 // Watch detailMode changes and auto-refresh tables with data
-watch(detailMode, () => {
+watch(detailMode, (val) => {
+  setDetailMode(val)
   // 如果 bigrams 表格有数据，自动刷新
   if (bigrams.value.length > 0) {
     loadBigrams()

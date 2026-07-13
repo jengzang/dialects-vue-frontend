@@ -184,7 +184,7 @@ const ROUTE_QUERY_ALLOWLIST = {
       CharacterClassification: ['sub', 'table', 'levels'],
       YuBao: ['sub'],
       praat: ['tab'],
-      VillagesML: ['module', 'subtab', 'pattern', 'ngram', 'villageId'],
+      VillagesML: ['module', 'subtab', 'pattern', 'ngram', 'villageId', 'detail'],
       ycVillages: [],
       ycSpoken: [],
       manage: [],

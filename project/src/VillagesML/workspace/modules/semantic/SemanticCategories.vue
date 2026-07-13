@@ -300,7 +300,7 @@ const loadingVTFRegional = ref(false)
 const loadingRanking = ref(false)
 const loadingLabels = ref(false)
 
-const { state: detailMode } = useRouteQueryState('detail', {
+const { state: detailMode, set: setDetailMode } = useRouteQueryState('detail', {
   defaultValue: false,
   parse: v => v === 'true',
   serialize: v => String(v),
@@ -472,7 +472,8 @@ const loadLabelsByChar = async () => {
   }
 }
 
-watch(detailMode, () => {
+watch(detailMode, (val) => {
+  setDetailMode(val)
   if (vtfGlobal.value.length > 0) loadVTFGlobal()
   if (vtfRegional.value.length > 0) loadVTFRegional()
   if (categoryRanking.value.length > 0) loadCategoryRanking()
