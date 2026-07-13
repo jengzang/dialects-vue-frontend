@@ -234,17 +234,17 @@ export default {
       return SEMANTIC_SUBCATEGORY_NAMES[subcategory] || subcategory
     }
 
-    // Parent categories (9大父类别)
+    // Parent categories (from semantic_lexicon_v4.json)
     const parentCategories = [
+      { value: 'terrain', label: '地形' },
       { value: 'water', label: '水系' },
-      { value: 'mountain', label: '山地' },
       { value: 'settlement', label: '聚落' },
-      { value: 'direction', label: '方位' },
+      { value: 'spatial', label: '空間' },
       { value: 'clan', label: '宗族' },
-      { value: 'vegetation', label: '植物' },
+      { value: 'culture', label: '文化' },
       { value: 'agriculture', label: '農業' },
-      { value: 'symbolic', label: '象徵' },
-      { value: 'infrastructure', label: '基建' }
+      { value: 'vegetation', label: '植被' },
+      { value: 'modifier', label: '修飾語' }
     ]
 
     // State
