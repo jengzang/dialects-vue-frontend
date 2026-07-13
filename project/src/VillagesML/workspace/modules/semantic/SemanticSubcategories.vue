@@ -234,17 +234,20 @@ export default {
       return SEMANTIC_SUBCATEGORY_NAMES[subcategory] || subcategory
     }
 
-    // Parent categories
+    // Parent categories (与 SEMANTIC_CATEGORY_NAMES 保持一致)
     const parentCategories = [
-      { value: 'mountain', label: '山地 (mountain)' },
-      { value: 'water', label: '水系 (water)' },
-      { value: 'settlement', label: '聚落 (settlement)' },
-      { value: 'direction', label: '方位 (direction)' },
-      { value: 'vegetation', label: '植被 (vegetation)' },
-      { value: 'structure', label: '建築 (structure)' },
-      { value: 'animal', label: '動物 (animal)' },
-      { value: 'color', label: '顏色 (color)' },
-      { value: 'other', label: '其他 (other)' }
+      { value: 'water', label: '水系' },
+      { value: 'mountain', label: '山地' },
+      { value: 'settlement', label: '聚落' },
+      { value: 'direction', label: '方位' },
+      { value: 'clan', label: '宗族' },
+      { value: 'vegetation', label: '植物' },
+      { value: 'agriculture', label: '農業' },
+      { value: 'symbolic', label: '象徵' },
+      { value: 'infrastructure', label: '基建' },
+      { value: 'number', label: '數字' },
+      { value: 'size', label: '尺寸' },
+      { value: 'other', label: '其他' }
     ]
 
     // State
