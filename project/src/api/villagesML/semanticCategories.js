@@ -44,7 +44,8 @@ export async function getSemanticCategoryTendency(params) {
  */
 export async function getSemanticVTFGlobal(params = {}) {
   const queryParams = new URLSearchParams()
-  if (params.top_k) queryParams.append('top_k', params.top_k)
+  if (params.top_n) queryParams.append('top_n', params.top_n)
+  if (params.detail) queryParams.append('detail', 'true')
 
   return api(`/api/villages/semantic/category/vtf/global?${queryParams.toString()}`)
 }
@@ -70,6 +71,8 @@ export async function getSemanticVTFRegional(params) {
 
   // Legacy parameter (backward compatible)
   if (params.region_name) queryParams.append('region_name', params.region_name)
+
+  if (params.detail) queryParams.append('detail', 'true')
 
   return api(`/api/villages/semantic/category/vtf/regional?${queryParams.toString()}`)
 }

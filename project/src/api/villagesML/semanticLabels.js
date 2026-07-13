@@ -42,6 +42,7 @@ export async function getSemanticCompositionPatterns(params = {}) {
   const queryParams = new URLSearchParams()
   if (params.min_frequency) queryParams.append('min_frequency', params.min_frequency)
   if (params.limit) queryParams.append('limit', params.limit)
+  if (params.detail) queryParams.append('detail', 'true')
 
   return api(`/api/villages/semantic/composition/patterns?${queryParams.toString()}`)
 }
