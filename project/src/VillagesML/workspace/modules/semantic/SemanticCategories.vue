@@ -34,7 +34,8 @@
               <span class="category-name">{{ getCategoryDisplayName(category.category, detailMode) }}</span>
             </div>
             <div class="category-description">{{ getCardDescription(category) }}</div>
-            <div class="category-count">{{ category.character_count }} 字符</div>
+            <div class="category-count" v-if="detailMode">{{ category.village_count?.toLocaleString() || 0 }} 村莊</div>
+            <div class="category-count" v-else>{{ category.character_count }} 字符</div>
           </div>
         </div>
       </div>
