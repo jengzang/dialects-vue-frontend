@@ -185,7 +185,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import { useRoute, useRouter } from 'vue-router'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
 import {
@@ -211,12 +211,9 @@ const minPMI = ref(0)
 const pmiTopN = ref(50)
 
 // Detail mode toggle
-const { state: detailMode, set: setDetailMode } = useRouteQueryState('detail', {
-  defaultValue: false,
-  parse: v => v === 'true',
-  serialize: v => String(v),
-  replace: true
-})
+const route = useRoute()
+const router = useRouter()
+const detailMode = ref(route.query.detail === 'true')
 
 // Computed: 计算 PMI 数据的最大绝对值
 const maxAbsPMI = computed(() => {
@@ -288,7 +285,9 @@ const getPMIClass = (pmi_score) => {
 
 // Watch detailMode changes and auto-refresh tables with data
 watch(detailMode, (val) => {
-  setDetailMode(val)
+  const query = { ...route.query }
+  if (val) { query.detail = 'true' } else { delete query.detail }
+  router.replace({ query })
   // 如果 bigrams 表格有数据，自动刷新
   if (bigrams.value.length > 0) {
     loadBigrams()

@@ -264,7 +264,7 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
-import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import { useRoute, useRouter } from 'vue-router'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
@@ -300,12 +300,9 @@ const loadingVTFRegional = ref(false)
 const loadingRanking = ref(false)
 const loadingLabels = ref(false)
 
-const { state: detailMode, set: setDetailMode } = useRouteQueryState('detail', {
-  defaultValue: false,
-  parse: v => v === 'true',
-  serialize: v => String(v),
-  replace: true
-})
+const route = useRoute()
+const router = useRouter()
+const detailMode = ref(route.query.detail === 'true')
 
 const regionLevel = ref('city')
 const regionName = ref('')
@@ -473,7 +470,9 @@ const loadLabelsByChar = async () => {
 }
 
 watch(detailMode, (val) => {
-  setDetailMode(val)
+  const query = { ...route.query }
+  if (val) { query.detail = 'true' } else { delete query.detail }
+  router.replace({ query })
   if (vtfGlobal.value.length > 0) loadVTFGlobal()
   if (vtfRegional.value.length > 0) loadVTFRegional()
   if (categoryRanking.value.length > 0) loadCategoryRanking()

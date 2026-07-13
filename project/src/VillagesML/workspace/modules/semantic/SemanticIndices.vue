@@ -138,7 +138,7 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue'
-import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import { useRoute, useRouter } from 'vue-router'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
@@ -160,12 +160,9 @@ const indicesMinVillages = ref(null)
 const indicesLimit = ref(100)
 
 // Detail mode toggle
-const { state: detailMode, set: setDetailMode } = useRouteQueryState('detail', {
-  defaultValue: false,
-  parse: v => v === 'true',
-  serialize: v => String(v),
-  replace: true
-})
+const route = useRoute()
+const router = useRouter()
+const detailMode = ref(route.query.detail === 'true')
 
 // Options for SimpleSelectDropdown
 const categoryOptions = [
@@ -214,7 +211,9 @@ watch(indicesRegionLevel, () => {
 
 // Watch detailMode changes and auto-refresh table if it has data
 watch(detailMode, (val) => {
-  setDetailMode(val)
+  const query = { ...route.query }
+  if (val) { query.detail = 'true' } else { delete query.detail }
+  router.replace({ query })
   if (indices.value && indices.value.length > 0) {
     loadIndices()
   }
