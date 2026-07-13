@@ -30,10 +30,10 @@
             @click="selectCategory(category)"
           >
             <div class="category-header">
-              <span class="category-icon">{{ getCategoryIcon(category.category) }}</span>
-              <span class="category-name">{{ getCategoryName(category.category) }}</span>
+              <span class="category-icon">{{ getCategoryIcon(category.parent_category || category.category) }}</span>
+              <span class="category-name">{{ getCategoryDisplayName(category.category, detailMode) }}</span>
             </div>
-            <div class="category-description">{{ getCategoryDescription(category.category) }}</div>
+            <div class="category-description">{{ getCardDescription(category) }}</div>
             <div class="category-count">{{ category.character_count }} 字符</div>
           </div>
         </div>
@@ -271,6 +271,7 @@ import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
 import {
   getSemanticCategoryList,
+  getSemanticSubcategoryList,
   getSemanticVTFGlobal,
   getSemanticVTFRegional,
   getSemanticIndices,
@@ -370,12 +371,28 @@ const selectCategory = async (category) => {
 const loadCategories = async () => {
   loadingCategories.value = true
   try {
-    categories.value = await getSemanticCategoryList()
+    if (detailMode.value) {
+      const data = await getSemanticSubcategoryList()
+      categories.value = data.map(item => ({
+        ...item,
+        category: item.subcategory,
+        character_count: item.char_count
+      }))
+    } else {
+      categories.value = await getSemanticCategoryList()
+    }
   } catch (error) {
     showError('加載類別失敗')
   } finally {
     loadingCategories.value = false
   }
+}
+
+const getCardDescription = (cat) => {
+  if (detailMode.value && cat.parent_category) {
+    return getCategoryDisplayName(cat.parent_category) + ' · 子類'
+  }
+  return getCategoryDescription(cat.category)
 }
 
 const loadVTFGlobal = async () => {
@@ -481,6 +498,7 @@ watch(detailMode, (val) => {
   const query = { ...route.query }
   if (val) { query.detail = 'true' } else { delete query.detail }
   router.replace({ query })
+  loadCategories()
   if (vtfGlobal.value.length > 0) loadVTFGlobal()
   if (vtfRegional.value.length > 0) loadVTFRegional()
   if (categoryRanking.value.length > 0) loadCategoryRanking()
