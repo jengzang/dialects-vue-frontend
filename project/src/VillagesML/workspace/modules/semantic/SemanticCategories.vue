@@ -17,13 +17,13 @@
       <!-- Category List -->
       <div class="category-list vml-glass-panel">
         <h2>語義類別</h2>
-        <div v-if="loadingCategories" class="vml-loading">
+        <div v-if="loadingCards" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>加載中...</p>
         </div>
         <div v-else class="category-grid">
           <div
-            v-for="category in categories"
+            v-for="category in displayCategories"
             :key="category.category"
             class="category-card"
             :class="{ 'selected': selectedCategory?.category === category.category }"
@@ -271,7 +271,6 @@ import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
 import {
   getSemanticCategoryList,
-  getSemanticSubcategoryList,
   getSemanticVTFGlobal,
   getSemanticVTFRegional,
   getSemanticIndices,
@@ -334,6 +333,16 @@ const categoryOptionsForLabels = computed(() => {
 })
 
 // Computed
+const displayCategories = computed(() => {
+  if (detailMode.value && vtfGlobal.value.length > 0) {
+    return vtfGlobal.value
+  }
+  return categories.value
+})
+
+const loadingCards = computed(() => {
+  return detailMode.value ? loadingVTFGlobal.value : loadingCategories.value
+})
 const maxVTF = computed(() => {
   if (vtfGlobal.value.length === 0) return 1
   return Math.max(...vtfGlobal.value.map(item => item.vtf))
@@ -371,16 +380,7 @@ const selectCategory = async (category) => {
 const loadCategories = async () => {
   loadingCategories.value = true
   try {
-    if (detailMode.value) {
-      const data = await getSemanticSubcategoryList()
-      categories.value = data.map(item => ({
-        ...item,
-        category: item.subcategory,
-        character_count: item.char_count
-      }))
-    } else {
-      categories.value = await getSemanticCategoryList()
-    }
+    categories.value = await getSemanticCategoryList()
   } catch (error) {
     showError('加載類別失敗')
   } finally {
@@ -389,7 +389,7 @@ const loadCategories = async () => {
 }
 
 const getCardDescription = (cat) => {
-  if (detailMode.value && cat.parent_category) {
+  if (cat.parent_category) {
     return getCategoryDisplayName(cat.parent_category) + ' · 子類'
   }
   return getCategoryDescription(cat.category)
@@ -399,12 +399,12 @@ const loadVTFGlobal = async () => {
   loadingVTFGlobal.value = true
   try {
     const data = await getSemanticVTFGlobal({
-      top_n: 9,
-      ...(detailMode.value && { detail: true })
+      ...(detailMode.value ? { detail: true } : { top_n: 9 })
     })
     vtfGlobal.value = data.map(item => ({
       ...item,
-      category: item.category || item.subcategory
+      category: item.category || item.subcategory,
+      character_count: item.char_count || item.character_count
     }))
   } catch (error) {
     showError('加載全局VTF失敗')
@@ -425,7 +425,8 @@ const loadVTFRegional = async () => {
     })
     vtfRegional.value = data.map(item => ({
       ...item,
-      category: item.category || item.subcategory
+      category: item.category || item.subcategory,
+      character_count: item.char_count || item.character_count
     }))
   } catch (error) {
     showError('加載區域VTF失敗')
@@ -498,8 +499,7 @@ watch(detailMode, (val) => {
   const query = { ...route.query }
   if (val) { query.detail = 'true' } else { delete query.detail }
   router.replace({ query })
-  loadCategories()
-  if (vtfGlobal.value.length > 0) loadVTFGlobal()
+  loadVTFGlobal()
   if (vtfRegional.value.length > 0) loadVTFRegional()
   if (categoryRanking.value.length > 0) loadCategoryRanking()
 })
