@@ -158,6 +158,95 @@ export const SEMANTIC_SUBCATEGORY_NAMES = {
   'quality': '性質',
   'suffix': '後綴',
 
+  // ===== API 返回的帶父前綴子類別 key（如 "settlement_village"）=====
+  // settlement
+  'settlement_village': '村屯',
+  'settlement_dwelling': '民居',
+  'settlement_building': '建築',
+  'settlement_fort': '城寨',
+  'settlement_market': '圩市',
+  'settlement_district': '里坊',
+  'settlement_group': '社隊',
+  // mountain
+  'mountain_peak': '峰嶺',
+  'mountain_valley': '山谷',
+  'mountain_slope': '坡崗',
+  'mountain_rock': '岩石',
+  'mountain_plateau': '台坪',
+  'mountain_ridge': '山脊',
+  // water
+  'water_river': '江河',
+  'water_stream': '溪涌',
+  'water_pond': '池塘',
+  'water_lake': '湖泊',
+  'water_bay': '港灣',
+  'water_beach': '沙灘',
+  'water_spring': '泉井',
+  'water_island': '島嶼',
+  'water_shore': '洲灘',
+  'water_port': '碼頭',
+  // direction
+  'direction_vertical': '高低',
+  'direction_end': '頭尾',
+  'direction_cardinal': '四方',
+  'direction_inside': '內外',
+  'direction_opening': '邊角',
+  'direction_horizontal': '前後',
+  'direction_outside': '外圍',
+  'direction_center': '中心',
+  // symbolic
+  'symbolic_animal': '瑞獸',
+  'symbolic_religion': '宗教',
+  'symbolic_prosperity': '興旺',
+  'symbolic_peace': '吉祥',
+  'symbolic_virtue': '美德',
+  'symbolic_fortune': '福祿',
+  'symbolic_light': '天象',
+  'symbolic_treasure': '珍寶',
+  // vegetation
+  'vegetation_forest': '樹木',
+  'vegetation_bamboo': '竹',
+  'vegetation_other': '其他植被',
+  'vegetation_fruit': '果樹',
+  'vegetation_flower': '花草',
+  'vegetation_pine': '松',
+  'vegetation_tea': '茶',
+  // agriculture
+  'agriculture_field': '田地',
+  'agriculture_garden': '園圃',
+  'agriculture_irrigation': '水利',
+  'agriculture_crop': '作物',
+  'agriculture_storage': '倉儲',
+  'agriculture_activity': '農事',
+  // infrastructure
+  'infrastructure_road': '路橋',
+  'infrastructure_transport': '交通',
+  'infrastructure_bridge': '橋',
+  'infrastructure_port': '渡口',
+  'infrastructure_station': '站所',
+  // clan
+  'clan_other': '其他姓',
+  'clan_huang': '黃',
+  'clan_luo': '羅',
+  'clan_chen': '陳',
+  'clan_li': '李',
+  'clan_zhang': '張',
+  'clan_liu': '劉',
+  'clan_he': '何',
+  'clan_wu': '吳',
+  'clan_liang': '梁',
+  // number
+  'number_small': '小數',
+  'number_large': '大數',
+  'number_ordinal': '序數',
+  // size
+  'size_large': '大',
+  'size_long': '長',
+  'size_small': '小',
+  'size_short': '短',
+  // other (no parent prefix)
+  'shape': '形狀',
+
 }
 
 /** 
@@ -304,7 +393,7 @@ export function getSubcategoryName(subcategory) {
 export function getCategoryDisplayName(category, isDetailMode = false) {
   if (!category) return ''
 
-  // 如果是詳細模式，優先查找子類別映射
+  // 如果是詳細模式，優先查找子類別映射（精確匹配，如 "settlement_village"）
   if (isDetailMode && SEMANTIC_SUBCATEGORY_NAMES[category]) {
     return SEMANTIC_SUBCATEGORY_NAMES[category]
   }
@@ -314,9 +403,21 @@ export function getCategoryDisplayName(category, isDetailMode = false) {
     return SEMANTIC_CATEGORY_NAMES[category]
   }
 
-  // 如果都找不到，嘗試查找子類別映射（兼容性處理）
+  // 兼容：非detail模式也嘗試子類別映射
   if (SEMANTIC_SUBCATEGORY_NAMES[category]) {
     return SEMANTIC_SUBCATEGORY_NAMES[category]
+  }
+
+  // Detail模式：剝離父類別前綴後查找子類名（如 "settlement_village" → "village"）
+  if (isDetailMode) {
+    const underscoreIdx = category.indexOf('_')
+    if (underscoreIdx > 0) {
+      const suffix = category.substring(underscoreIdx + 1)
+      if (SEMANTIC_SUBCATEGORY_NAMES[suffix]) {
+        return SEMANTIC_SUBCATEGORY_NAMES[suffix]
+      }
+      return suffix
+    }
   }
 
   // 最後返回原始值
