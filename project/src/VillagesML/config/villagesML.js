@@ -12,13 +12,18 @@
 export const SEMANTIC_CATEGORY_ICONS = {
   'agriculture': '🌾',
   'clan': '👨‍👩‍👧‍👦',
+  'culture': '🏛️',
+  'modifier': '📝',
+  'settlement': '🏘️',
+  'spatial': '🧭',
+  'terrain': '⛰️',
+  'vegetation': '🌿',
+  'water': '💧',
+  // === 向后兼容（旧版 lexicon 类别名）===
   'direction': '🧭',
   'infrastructure': '🏗️',
   'mountain': '⛰️',
-  'settlement': '🏘️',
   'symbolic': '🎨',
-  'vegetation': '🌿',
-  'water': '💧'
 }
 
 /**
@@ -28,16 +33,19 @@ export const SEMANTIC_CATEGORY_ICONS = {
 export const SEMANTIC_CATEGORY_NAMES = {
   'agriculture': '農業',
   'clan': '宗族',
+  'culture': '文化',
+  'modifier': '修飾語',
+  'settlement': '聚落',
+  'spatial': '空間',
+  'terrain': '地形',
+  'vegetation': '植物',
+  'water': '水系',
+  // === 向后兼容（旧版 lexicon 类别名）===
   'direction': '方位',
   'infrastructure': '基建',
   'mountain': '山地',
-  'settlement': '聚落',
   'symbolic': '象徵',
-  'vegetation': '植物',
-  'water': '水系',
-  'terrain': '地形',
-  'modifier':'修飾語',
-  'head':'中心詞',
+  'head': '中心詞',
   'other': '其他',
 }
 
@@ -48,13 +56,18 @@ export const SEMANTIC_CATEGORY_NAMES = {
 export const SEMANTIC_CATEGORY_DESCRIPTIONS = {
   'agriculture': '農業、耕作、田地相關',
   'clan': '宗族、姓氏、家族相關',
+  'culture': '吉祥符號、宗教、美德等文化象徵相關',
+  'modifier': '大小、顏色、新舊、數量等修飾語相關',
+  'settlement': '村落、居住地、圩市等聚落相關',
+  'spatial': '方位、高低、內外等空間位置相關',
+  'terrain': '山峰、坡崗、山谷、岩石、平地等地形相關',
+  'vegetation': '樹木、花草、竹林等植物相關',
+  'water': '河流、湖泊、港灣、水塘等水系相關',
+  // === 向后兼容（旧版 lexicon 类别名）===
   'direction': '東西南北、方向相關',
   'infrastructure': '道路、橋樑、建築相關',
   'mountain': '山地、丘陵等地形相關',
-  'settlement': '村落、居住地相關',
   'symbolic': '吉祥、象徵意義相關',
-  'vegetation': '樹木、花草等植物相關',
-  'water': '河流、湖泊、水系相關'
 }
 
 /**
@@ -62,17 +75,87 @@ export const SEMANTIC_CATEGORY_DESCRIPTIONS = {
  * @type {Object<string, string>}
  */
 export const SEMANTIC_SUBCATEGORY_NAMES = {
-  // ===== 父类别（9个大类 + other）=====
+  // ===== 父类别（9个大类，匹配 lexicon v1.12+ / v4.5+）=====
   'agriculture': '農業',
   'clan': '宗族',
-  'direction': '方位',
-  'infrastructure': '基建',
-  'mountain': '山地',
+  'culture': '文化',
+  'modifier': '修飾語',
   'settlement': '聚落',
-  'symbolic': '象徵',
+  'spatial': '空間',
+  'terrain': '地形',
   'vegetation': '植被',
   'water': '水系',
   'other': '其他',
+  // === 向后兼容（旧版 lexicon 父类别）===
+  'infrastructure': '基建',
+  'mountain': '山地',
+  'symbolic': '象徵',
+
+  // ===== v4.7+ 子类别（层级 lexicon，不带父前缀）=====
+  // --- terrain 地形 ---
+  'peak_ridge': '峰嶺',
+  'slope': '坡崗',
+  'valley': '山谷',
+  'rock': '岩石',
+  'flatland': '台坪',
+  'surface': '沙土',
+  // --- water 水系 ---
+  'river': '江河',
+  'stream': '溪涌',
+  'ditch': '溝渠',
+  'pond_lake': '池塘',
+  'bay_port': '港灣',
+  'shore_island': '洲灘',
+  'water_source': '泉井',
+  // --- settlement 聚落 ---
+  'village': '村屯',
+  'dwelling': '民居',
+  'building': '建築',
+  'fortification': '城寨',
+  'market_trade': '圩市',
+  'road_transport': '路橋',
+  'traditional_unit': '里坊',
+  'admin_unit': '社隊',
+  // --- spatial 空间 ---
+  'direction': '方位',
+  'elevation': '高低',
+  'extremity': '頭尾',
+  'boundary': '邊角',
+  'enclosure': '內外',
+  'center': '中心',
+  'relative_position': '前後',
+  // --- clan 宗族 ---
+  'general': '通用姓',
+  'cantonese': '廣府姓',
+  'hakka': '客家姓',
+  'teochew': '潮汕姓',
+  // --- culture 文化 ---
+  'religion': '宗教',
+  'auspicious': '吉祥',
+  'virtue': '美德',
+  'animal_symbol': '瑞獸',
+  'natural_symbol': '天象',
+  'community': '社群',
+  'craft_memorial': '工藝',
+  // --- agriculture 农业 ---
+  'field': '田地',
+  'crop': '作物',
+  'livestock': '禽畜',
+  'farming_infra': '農耕',
+  // --- vegetation 植被 ---
+  'tree': '樹木',
+  'bamboo': '竹',
+  'fruit': '果樹',
+  'herb': '花草',
+  // --- modifier 修飾語 ---
+  'number': '數字',
+  'size': '尺寸',
+  'color': '顏色',
+  'time': '時序',
+  'quality': '性質',
+  'suffix': '後綴',
+
+  // ===== v4_hybrid 子类别（76个子类别，带旧父前缀，向后兼容）=====
 
   // 數字類
   'number_small': '小數',          // 一二三四五
@@ -118,8 +201,8 @@ export const SEMANTIC_SUBCATEGORY_NAMES = {
   'infrastructure_bridge': '橋樑',      // 橋
   'infrastructure_transport': '交通',
 
-  // 時間類
-  'time': '時令',                      // 今、冬、古、夏、新、舊、春、晚、朝、秋
+  // 時間類（舊版，v4.7+ 已改用 modifier.time）
+  'seasonal_time': '時令',              // 今、冬、古、夏、新、舊、春、晚、朝、秋
 
   // 農業類（簡化）
   'agriculture_storage': '倉廩',        // 倉、廩
@@ -175,12 +258,12 @@ export const SEMANTIC_SUBCATEGORY_NAMES = {
   'vegetation_flower': '花卉',          // 花、菊、蓮等
   'vegetation_tea': '茶',               // 茶
 
-  // 顏色類
-  'color': '顏色'                      // 青、赤、黃、白、黑等
+  // 顏色類（舊版，v4.7+ 已改用 modifier.color）
+  'v4hybrid_color': '顏色'             // 青、赤、黃、白、黑等
 }
 
-/**
- * 模式結構組件映射
+/** 
+* 模式結構組件映射
  * @type {Object<string, string>}
  */
 export const PATTERN_STRUCTURE_NAMES = {
