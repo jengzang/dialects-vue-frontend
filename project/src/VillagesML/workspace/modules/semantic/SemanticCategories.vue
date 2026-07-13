@@ -381,10 +381,14 @@ const loadCategories = async () => {
 const loadVTFGlobal = async () => {
   loadingVTFGlobal.value = true
   try {
-    vtfGlobal.value = await getSemanticVTFGlobal({
+    const data = await getSemanticVTFGlobal({
       top_n: 9,
       ...(detailMode.value && { detail: true })
     })
+    vtfGlobal.value = data.map(item => ({
+      ...item,
+      category: item.category || item.subcategory
+    }))
   } catch (error) {
     showError('加載全局VTF失敗')
   } finally {
@@ -397,11 +401,15 @@ const loadVTFRegional = async () => {
 
   loadingVTFRegional.value = true
   try {
-    vtfRegional.value = await getSemanticVTFRegional({
+    const data = await getSemanticVTFRegional({
       region_level: regionLevel.value,
       ...regionHierarchy.value,
       ...(detailMode.value && { detail: true })
     })
+    vtfRegional.value = data.map(item => ({
+      ...item,
+      category: item.category || item.subcategory
+    }))
   } catch (error) {
     showError('加載區域VTF失敗')
   } finally {
