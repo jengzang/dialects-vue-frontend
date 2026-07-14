@@ -330,7 +330,9 @@
       "title": "Tutorial Guide",
       "description": "Show or hide the tutorial entry and random example buttons.",
       "enabled": "Enabled",
-      "disabled": "Disabled"
+      "disabled": "Disabled",
+      "enabledSuccess": "Tutorial guide enabled",
+      "disabledSuccess": "Tutorial guide disabled"
     },
     "zhongguInputMode": {
       "title": "Middle Chinese Input Mode",

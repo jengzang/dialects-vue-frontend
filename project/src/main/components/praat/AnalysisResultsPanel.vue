@@ -756,6 +756,7 @@ $transition-normal: 0.3s;
   color: $text-primary;
   font-size: 1.5rem;
   font-weight: 600;
+  text-align: center;
 }
 
 .summary-section {
@@ -767,6 +768,7 @@ $transition-normal: 0.3s;
   color: $text-primary;
   font-size: 1.2rem;
   font-weight: 600;
+  text-align: center;
 }
 
 .stats-grid {
