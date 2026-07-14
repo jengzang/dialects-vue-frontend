@@ -104,6 +104,14 @@ $system-font:
 
 /* 竖屏布局 */
 @media (max-aspect-ratio: $portrait-ratio) {
+  .menu-bg {
+    padding:
+      max(16px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+  }
+
   .glass-content {
     padding: 17dvh 8px 8px;
     font-size: 1.1rem;
