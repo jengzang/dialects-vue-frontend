@@ -755,7 +755,7 @@ onMounted(() => {
 @use '@/styles/global/mixins' as *;
 
 $user-text: var(--text-deep);
-$user-muted: var(--text-tertiary);
+$user-muted: var(--text-slate);
 $user-border: rgba(var(--text-slate-light-rgb), 0.24);
 $user-glass-border: var(--glass-60);
 $user-accent: var(--color-primary);
@@ -921,7 +921,7 @@ $user-success: var(--color-success);
   border: 1px solid var(--glass-50);
   border-radius: var(--radius-pill);
   overflow: hidden;
-  color: var(--text-white);
+  color: var(--action-primary-text);
   font-size: 14px;
   font-weight: 800;
   text-overflow: ellipsis;
@@ -949,6 +949,7 @@ $user-success: var(--color-success);
     align-items: center;
     min-height: 34px;
     padding: 7px 12px;
+    color: var(--text-deep);
     border-radius: var(--radius-pill);
   }
 }
@@ -997,7 +998,7 @@ $user-success: var(--color-success);
 }
 
 .btn-primary {
-  color: var(--text-white);
+  color: var(--action-primary-text);
   background:
     linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
     $user-accent;
@@ -1046,7 +1047,7 @@ $user-success: var(--color-success);
   min-height: 30px;
   padding: 7px 12px;
   border-radius: 11px;
-  color: var(--text-white);
+  color: var(--action-primary-text);
   font-size: 12px;
   background:
     linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
@@ -1075,7 +1076,7 @@ $user-success: var(--color-success);
     background-color 0.18s ease;
 
   &::placeholder {
-    color: var(--text-slate-light);
+    color: var(--text-slate);
   }
 
   &:focus {
@@ -1148,12 +1149,12 @@ $user-success: var(--color-success);
     position: sticky;
     top: 0;
     z-index: 10;
-    color: var(--text-slate);
+    color: var(--text-deep);
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.02em;
     background:
-      linear-gradient(135deg, var(--glass-90), rgba(241, 245, 249, 0.68)),
+      linear-gradient(135deg, var(--glass-90), var(--glass-60)),
       var(--glass-80);
     backdrop-filter: blur(18px) saturate(180%);
     -webkit-backdrop-filter: blur(18px) saturate(180%);
@@ -1218,7 +1219,7 @@ $user-success: var(--color-success);
 
 .table-empty-cell {
   padding: 42px 20px !important;
-  color: var(--text-slate-light) !important;
+  color: var(--text-slate) !important;
   text-align: center !important;
   font-weight: 700;
   background: var(--glass-50) !important;
@@ -1277,7 +1278,7 @@ $user-success: var(--color-success);
   }
 
   &.active {
-    color: var(--text-white);
+    color: var(--action-primary-text);
     border-color: rgba(var(--color-primary-rgb), 0.45);
     background:
       linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
@@ -1349,10 +1350,10 @@ $user-success: var(--color-success);
   }
 
   th {
-    color: var(--text-slate);
+    color: var(--text-deep);
     font-weight: 800;
     background:
-      linear-gradient(135deg, var(--glass-90), rgba(241, 245, 249, 0.76)),
+      linear-gradient(135deg, var(--glass-90), var(--glass-60)),
       var(--glass-80);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);

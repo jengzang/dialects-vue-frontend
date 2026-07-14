@@ -1930,7 +1930,8 @@ $text-muted: var(--text-lightest);
   width: 100%;
   max-width: 180px;
   height: 38px;
-  background: var(--glass-90);
+  color: var(--text-primary);
+  background: var(--bg-white);
   border: 1px solid rgba(var(--color-primary-rgb), 0.35);
   border-radius: var(--radius-sm2);
   outline: none;
@@ -2117,14 +2118,14 @@ $text-muted: var(--text-lightest);
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem 0.8rem;
-  background: var(--glass-80);
+  background: var(--bg-white);
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: var(--radius-sm2);
   transition: all 0.2s ease;
 
   &:hover {
-    background: white;
-    border-color: rgba(6, 56, 110, 0.4);
+    background: var(--bg-white);
+    border-color: rgba(var(--color-primary-rgb), 0.4);
   }
 }
 

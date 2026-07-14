@@ -153,7 +153,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
   &.info {
-    color: $white;
+    color: var(--action-primary-text);
     background: linear-gradient(
       135deg,
       rgba(var(--color-primary-rgb), 0.85),

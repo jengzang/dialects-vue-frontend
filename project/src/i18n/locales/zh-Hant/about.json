@@ -330,7 +330,9 @@
       "title": "新手指導",
       "description": "是否顯示教程入口與隨機骰子",
       "enabled": "已開啟",
-      "disabled": "已關閉"
+      "disabled": "已關閉",
+      "enabledSuccess": "新手指導已開啟",
+      "disabledSuccess": "新手指導已關閉"
     },
     "zhongguInputMode": {
       "title": "中古輸入模式",

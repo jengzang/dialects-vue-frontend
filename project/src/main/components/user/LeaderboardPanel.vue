@@ -623,16 +623,28 @@ const tableData = computed(() => {
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 
-$primary: var(--color-primary);
-$primary-dark: var(--color-primary-hover);
-$text-primary: var(--text-primary);
-$text-secondary: var(--text-secondary);
-$danger: var(--color-error-light);
+// 排行榜使用硬编码颜色，在浅色/深色模式下统一显示为浅色卡片风格
+$primary: #3b82f6;
+$primary-dark: #2563eb;
+$text-primary: #1d1d1f;
+$text-secondary: #86868b;
+$danger: #ef4444;
 
-$gold: var(--color-gold);
-$gold-text: #d4af37;
-$silver: var(--color-silver);
-$bronze: var(--color-bronze);
+$gold: #d4af37;
+$gold-text: #b8860b;
+$silver: #a8afb4;
+$silver-text: #6e7e84;
+$bronze: #cd7f32;
+$bronze-text: #8b5a2b;
+
+$glass-50: rgba(255, 255, 255, 0.5);
+$glass-60: rgba(255, 255, 255, 0.6);
+$glass-70: rgba(255, 255, 255, 0.7);
+$glass-80: rgba(255, 255, 255, 0.8);
+$glass-90: rgba(255, 255, 255, 0.9);
+$bg-white: #ffffff;
+$border-light: #d1d5db;
+$warning: #f59e0b;
 
 @mixin glass($blur: 40px, $saturate: 180%) {
   backdrop-filter: blur($blur) saturate($saturate);
@@ -677,7 +689,7 @@ $bronze: var(--color-bronze);
 .retry-btn {
   padding: 10px 24px;
   background: $primary;
-  color: white;
+  color: #ffffff;
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -726,14 +738,14 @@ $bronze: var(--color-bronze);
 .metric {
   &-card {
     padding: 24px;
-    background: var(--glass-70);
+    background: $glass-70;
     @include glass;
-    border: 0.5px solid var(--glass-80);
+    border: 0.5px solid $glass-80;
     border-radius: var(--radius-xl);
     box-shadow:
       0 1px 2px rgba(0, 0, 0, 0.04),
       0 8px 32px rgba(0, 0, 0, 0.08),
-      inset 0 0 0 1px var(--glass-90);
+      inset 0 0 0 1px $glass-90;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
@@ -746,8 +758,8 @@ $bronze: var(--color-bronze);
     &.first-place {
       background: linear-gradient(
         135deg,
-        rgba(var(--color-gold-rgb), 0.15),
-        rgba(var(--color-gold-rgb), 0.08)
+        rgba($gold, 0.15),
+        rgba($gold, 0.08)
       );
       border-left: 4px solid $gold;
     }
@@ -755,7 +767,7 @@ $bronze: var(--color-bronze);
     &.second-place {
       background: linear-gradient(
         135deg,
-        rgba(var(--color-silver-rgb), 0.15),
+        rgba($silver, 0.15),
         rgba(224, 224, 224, 0.08)
       );
       border-left: 4px solid $silver;
@@ -764,7 +776,7 @@ $bronze: var(--color-bronze);
     &.third-place {
       background: linear-gradient(
         135deg,
-        rgba(var(--color-bronze-rgb), 0.15),
+        rgba($bronze, 0.15),
         rgba(255, 160, 122, 0.08)
       );
       border-left: 4px solid $bronze;
@@ -800,7 +812,7 @@ $bronze: var(--color-bronze);
     }
 
     &.silver {
-      @include gradient-text($silver, var(--border-light-gray));
+      @include gradient-text($silver, $border-light);
 
       filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
     }
@@ -824,7 +836,7 @@ $bronze: var(--color-bronze);
 
   &-gap {
     font-weight: 500;
-    color: var(--color-warning);
+    color: $warning;
   }
 
   &-first {
@@ -839,22 +851,22 @@ $bronze: var(--color-bronze);
 
 .table-wrapper {
   padding: 20px;
-  background: var(--glass-70);
+  background: $glass-70;
   @include glass;
-  border: 0.5px solid var(--glass-80);
+  border: 0.5px solid $glass-80;
   border-radius: var(--radius-xl);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 8px 32px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px var(--glass-90);
+    inset 0 0 0 1px $glass-90;
 }
 
 .table-container {
   overflow: hidden;
-  background: var(--glass-50);
+  background: $glass-50;
   backdrop-filter: blur(20px);
   border-radius: var(--radius-md);
-  box-shadow: inset 0 0 0 1px var(--glass-60);
+  box-shadow: inset 0 0 0 1px $glass-60;
 }
 
 .rankings-table {
@@ -866,7 +878,7 @@ $bronze: var(--color-bronze);
     position: sticky;
     top: 0;
     z-index: 10;
-    background: rgba(247, 247, 247, 0.95);
+    background: $bg-white;
     @include glass(20px);
   }
 
@@ -898,10 +910,10 @@ $bronze: var(--color-bronze);
     padding: 12px 8px;
     background: linear-gradient(
       135deg,
-      rgba(var(--color-primary-rgb), 0.12),
-      rgba(var(--color-primary-rgb), 0.06)
+      rgba($primary, 0.12),
+      rgba($primary, 0.06)
     );
-    border-right: 2px solid rgba(var(--color-primary-rgb), 0.3);
+    border-right: 2px solid rgba($primary, 0.3);
     vertical-align: middle;
     text-align: center;
     font-size: 14px;
@@ -912,68 +924,68 @@ $bronze: var(--color-bronze);
     &.gold {
       background: linear-gradient(
         135deg,
-        rgba(var(--color-gold-rgb), 0.18),
-        rgba(var(--color-gold-rgb), 0.08)
+        rgba($gold, 0.18),
+        rgba($gold, 0.08)
       );
-      border-right-color: rgba(var(--color-gold-rgb), 0.4);
-      color: #b8860b;
+      border-right-color: rgba($gold, 0.4);
+      color: $gold-text;
     }
 
     &.silver {
       background: linear-gradient(
         135deg,
-        rgba(var(--color-silver-rgb), 0.18),
-        rgba(var(--color-silver-rgb), 0.08)
+        rgba($silver, 0.18),
+        rgba($silver, 0.08)
       );
-      border-right-color: rgba(var(--color-silver-rgb), 0.4);
-      color: #5a6c6e;
+      border-right-color: rgba($silver, 0.4);
+      color: $silver-text;
     }
 
     &.bronze {
       background: linear-gradient(
         135deg,
-        rgba(var(--color-bronze-rgb), 0.18),
-        rgba(var(--color-bronze-rgb), 0.08)
+        rgba($bronze, 0.18),
+        rgba($bronze, 0.08)
       );
-      border-right-color: rgba(var(--color-bronze-rgb), 0.4);
-      color: #8b5a2b;
+      border-right-color: rgba($bronze, 0.4);
+      color: $bronze-text;
     }
   }
 
   &-data {
     background: linear-gradient(
       90deg,
-      rgba(var(--color-primary-rgb), 0.06),
-      rgba(var(--color-primary-rgb), 0.03)
+      rgba($primary, 0.06),
+      rgba($primary, 0.03)
     );
-    border-right: 1px solid rgba(var(--color-primary-rgb), 0.15);
+    border-right: 1px solid rgba($primary, 0.15);
     font-weight: 600;
 
     &.category-gold {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-gold-rgb), 0.12),
-        rgba(var(--color-gold-rgb), 0.05)
+        rgba($gold, 0.12),
+        rgba($gold, 0.05)
       );
-      border-right-color: rgba(var(--color-gold-rgb), 0.3);
+      border-right-color: rgba($gold, 0.3);
     }
 
     &.category-silver {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-silver-rgb), 0.12),
-        rgba(var(--color-silver-rgb), 0.05)
+        rgba($silver, 0.12),
+        rgba($silver, 0.05)
       );
-      border-right-color: rgba(var(--color-silver-rgb), 0.3);
+      border-right-color: rgba($silver, 0.3);
     }
 
     &.category-bronze {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-bronze-rgb), 0.12),
-        rgba(var(--color-bronze-rgb), 0.05)
+        rgba($bronze, 0.12),
+        rgba($bronze, 0.05)
       );
-      border-right-color: rgba(var(--color-bronze-rgb), 0.3);
+      border-right-color: rgba($bronze, 0.3);
     }
   }
 }
@@ -1002,15 +1014,15 @@ $bronze: var(--color-bronze);
     &.first-place {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-gold-rgb), 0.15),
-        rgba(var(--color-gold-rgb), 0.08)
+        rgba($gold, 0.15),
+        rgba($gold, 0.08)
       );
     }
 
     &.second-place {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-silver-rgb), 0.15),
+        rgba($silver, 0.15),
         rgba(224, 224, 224, 0.08)
       );
     }
@@ -1018,7 +1030,7 @@ $bronze: var(--color-bronze);
     &.third-place {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-bronze-rgb), 0.15),
+        rgba($bronze, 0.15),
         rgba(255, 160, 122, 0.08)
       );
     }
@@ -1042,8 +1054,8 @@ $bronze: var(--color-bronze);
     td {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-gold-rgb), 0.15),
-        rgba(var(--color-gold-rgb), 0.08)
+        rgba($gold, 0.15),
+        rgba($gold, 0.08)
       );
     }
 
@@ -1056,7 +1068,7 @@ $bronze: var(--color-bronze);
     td {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-silver-rgb), 0.15),
+        rgba($silver, 0.15),
         rgba(224, 224, 224, 0.08)
       );
     }
@@ -1070,7 +1082,7 @@ $bronze: var(--color-bronze);
     td {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-bronze-rgb), 0.15),
+        rgba($bronze, 0.15),
         rgba(255, 160, 122, 0.08)
       );
     }
@@ -1083,8 +1095,8 @@ $bronze: var(--color-bronze);
   &.category-summary {
     background: linear-gradient(
       90deg,
-      rgba(var(--color-primary-rgb), 0.08),
-      rgba(var(--color-primary-rgb), 0.04)
+      rgba($primary, 0.08),
+      rgba($primary, 0.04)
     );
     font-weight: 600;
 
@@ -1096,44 +1108,44 @@ $bronze: var(--color-bronze);
     &:hover {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-primary-rgb), 0.12),
-        rgba(var(--color-primary-rgb), 0.06)
+        rgba($primary, 0.12),
+        rgba($primary, 0.06)
       );
     }
 
     &.first-place {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-gold-rgb), 0.18),
-        rgba(var(--color-gold-rgb), 0.08)
+        rgba($gold, 0.18),
+        rgba($gold, 0.08)
       );
 
       .metric-name {
-        color: #b8860b;
+        color: $gold-text;
       }
     }
 
     &.second-place {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-silver-rgb), 0.18),
-        rgba(var(--color-silver-rgb), 0.08)
+        rgba($silver, 0.18),
+        rgba($silver, 0.08)
       );
 
       .metric-name {
-        color: #5a6c6e;
+        color: $silver-text;
       }
     }
 
     &.third-place {
       background: linear-gradient(
         90deg,
-        rgba(var(--color-bronze-rgb), 0.18),
-        rgba(var(--color-bronze-rgb), 0.08)
+        rgba($bronze, 0.18),
+        rgba($bronze, 0.08)
       );
 
       .metric-name {
-        color: #8b5a2b;
+        color: $bronze-text;
       }
     }
   }
@@ -1142,7 +1154,7 @@ $bronze: var(--color-bronze);
 .rank-badge {
   display: inline-block;
   padding: 4px 10px;
-  background: rgba(var(--color-primary-rgb), 0.1);
+  background: rgba($primary, 0.1);
   border-radius: var(--radius-sm);
   white-space: nowrap;
   font-size: 13px;
@@ -1153,34 +1165,34 @@ $bronze: var(--color-bronze);
   &.gold {
     background: linear-gradient(
       135deg,
-      rgba(var(--color-gold-rgb), 0.2),
-      rgba(var(--color-gold-rgb), 0.15)
+      rgba($gold, 0.2),
+      rgba($gold, 0.15)
     );
     color: $gold-text;
     font-weight: 700;
-    box-shadow: 0 2px 8px rgba(var(--color-gold-rgb), 0.3);
+    box-shadow: 0 2px 8px rgba($gold, 0.3);
   }
 
   &.silver {
     background: linear-gradient(
       135deg,
-      rgba(var(--color-silver-rgb), 0.2),
+      rgba($silver, 0.2),
       rgba(220, 220, 220, 0.15)
     );
-    color: #7f8c8d;
+    color: $silver-text;
     font-weight: 700;
-    box-shadow: 0 2px 8px rgba(var(--color-silver-rgb), 0.3);
+    box-shadow: 0 2px 8px rgba($silver, 0.3);
   }
 
   &.bronze {
     background: linear-gradient(
       135deg,
-      rgba(var(--color-bronze-rgb), 0.2),
+      rgba($bronze, 0.2),
       rgba(255, 160, 122, 0.15)
     );
-    color: #a0522d;
+    color: $bronze-text;
     font-weight: 700;
-    box-shadow: 0 2px 8px rgba(var(--color-bronze-rgb), 0.3);
+    box-shadow: 0 2px 8px rgba($bronze, 0.3);
   }
 }
 
