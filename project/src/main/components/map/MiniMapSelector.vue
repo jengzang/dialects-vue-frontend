@@ -131,6 +131,7 @@ function createPointElement(point) {
   if (point.label) {
     const element = document.createElement('div');
     element.className = `mini-map-point-label${point.active ? ' is-active' : ''}`;
+    element.textContent = point.label;
     return element;
   }
 
@@ -144,12 +145,13 @@ function renderMarkers() {
 
   clearPointMarkers();
 
-  normalizedPoints.value.forEach((point) => {
-    if (props.mode === 'picker' && !props.readonly) {
-      placePickedMarker(point.coord);
-      return;
-    }
+  if (props.mode === 'picker') {
+    const coord = normalizeCoord(props.coord);
+    if (coord) placePickedMarker(coord);
+    return;
+  }
 
+  normalizedPoints.value.forEach((point) => {
     const element = createPointElement(point);
     const marker = new maplibregl.Marker({
       element: element,
@@ -336,11 +338,11 @@ onBeforeUnmount(() => {
   width: 16px;
   height: 16px;
   border-radius: var(--radius-full);
-  background: $primary;
-  border: 3px solid var(--text-white);
+  background: #006eff;
+  border: 3px solid #fff;
   box-shadow:
-    0 0 0 3px $primary-hover,
-    0 8px 16px rgba(var(--color-primary-rgb), 0.28);
+    0 0 0 3px rgba(0, 110, 255, 0.25),
+    0 8px 16px rgba(0, 110, 255, 0.28);
 }
 
 :deep(.mini-map-point) {
@@ -348,33 +350,33 @@ onBeforeUnmount(() => {
   width: 12px;
   height: 12px;
   border-radius: var(--radius-full);
-  background: $success;
-  border: 2px solid var(--text-white);
-  box-shadow: 0 6px 14px rgba(var(--color-success-rgb), 0.28);
+  background: #34c759;
+  border: 2px solid #fff;
+  box-shadow: 0 6px 14px rgba(52, 199, 89, 0.28);
 
   &.is-active {
-    background: $primary;
-    box-shadow: 0 8px 18px rgba(var(--color-primary-rgb), 0.34);
+    background: #006eff;
+    box-shadow: 0 8px 18px rgba(0, 110, 255, 0.34);
   }
 }
 
 :deep(.mini-map-point-label) {
   padding: 2px 4px;
   border-radius: var(--radius-xs);
-  background-color: var(--color-dark-teal);
-  color: var(--color-cyan);
+  background-color: #1b2e2b;
+  color: #5ac8fa;
   font-size: 11px;
   line-height: 1.2;
   white-space: nowrap;
-  box-shadow: var(--shadow-focus-ring);
+  box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
   font-family: 'SimHei', '黑体', sans-serif;
   cursor: pointer;
   text-align: center;
 
   &.is-active {
-    background-color: $primary;
-    color: var(--text-white);
-    box-shadow: 0 2px 8px $primary-ring;
+    background-color: #006eff;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 110, 255, 0.5);
   }
 }
 </style>

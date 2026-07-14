@@ -924,7 +924,7 @@ $portrait-ratio: 1;
 
 .region-placeholder {
   overflow: hidden;
-  color: rgba(60, 60, 60, 0.72);
+  color: var(--text-secondary);
   white-space: nowrap;
   font-size: 13px;
 }
@@ -958,7 +958,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-pill);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 
-  color: rgba(25, 25, 25, 0.86);
+  color: var(--text-primary);
   white-space: nowrap;
   font-size: 13px;
 
@@ -973,7 +973,7 @@ $portrait-ratio: 1;
   flex: 0 0 auto;
   width: 18px;
   height: 18px;
-  background: rgba(0, 0, 0, 0.06);
+  background: var(--glass-30);
   border: none;
   border-radius: var(--radius-sm2);
   cursor: pointer;
@@ -1049,14 +1049,14 @@ $portrait-ratio: 1;
 }
 
 .topbar-title {
-  color: rgba(20, 20, 20, 0.85);
+  color: var(--text-primary);
   font-size: 13px;
   font-weight: 700;
 }
 
 .topbar-count {
   margin-left: 6px;
-  color: rgba(20, 20, 20, 0.55);
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
@@ -1138,7 +1138,7 @@ $portrait-ratio: 1;
     background: var(--glass-40);
     border-color: rgba(160, 160, 160, 0.26);
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
-    color: rgba(20, 20, 20, 0.82);
+    color: var(--text-primary);
   }
 
   &:disabled {
@@ -1191,7 +1191,7 @@ $portrait-ratio: 1;
   }
 
   &.active {
-    background: rgba(180, 223, 244, 0.72);
+    background: rgba(var(--color-primary-rgb), 0.25);
     box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.28);
   }
 }
@@ -1205,7 +1205,7 @@ $portrait-ratio: 1;
   cursor: pointer;
 
   &.chosen {
-    color: rgba(0, 60, 140, 0.92);
+    color: var(--color-primary);
     font-weight: 800;
   }
 }
@@ -1216,14 +1216,14 @@ $portrait-ratio: 1;
   padding: 0 6px;
 
   border-radius: var(--radius-md);
-  color: rgba(0, 0, 139, 0.85);
+  color: var(--color-primary);
   font-size: 13px;
   font-weight: 700;
   opacity: 0.85;
   cursor: pointer;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--glass-30);
     opacity: 1;
   }
 }

@@ -816,7 +816,7 @@ $float-catalog-button-left:0;
 
   &__summary {
     margin-top: 5px;
-    color: var(--text-secondary);
+    color: var(--text-slate);
     font-size: 0.84rem;
     line-height: 1.42;
 

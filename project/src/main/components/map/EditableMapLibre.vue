@@ -25,7 +25,7 @@ const drawStyles = [
     filter: ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
     paint: {
       'fill-color': ['coalesce', ['get', 'fill'], '#60a5fa'],
-      'fill-outline-color': ['coalesce', ['get', 'stroke'], 'var(--color-map-draw)'],
+      'fill-outline-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
       'fill-opacity': ['coalesce', ['get', 'fillOpacity'], 0.22],
     },
   },
@@ -38,7 +38,7 @@ const drawStyles = [
       'line-join': 'round',
     },
     paint: {
-      'line-color': ['coalesce', ['get', 'stroke'], 'var(--color-map-draw)'],
+      'line-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
       'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
       'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
     },
@@ -52,7 +52,7 @@ const drawStyles = [
       'line-join': 'round',
     },
     paint: {
-      'line-color': ['coalesce', ['get', 'stroke'], 'var(--color-map-draw)'],
+      'line-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
       'line-width': ['coalesce', ['get', 'strokeWidth'], 4],
       'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
     },
@@ -64,7 +64,7 @@ const drawStyles = [
     paint: {
       'circle-radius': ['coalesce', ['get', 'pointRadius'], 6],
       'circle-color': ['coalesce', ['get', 'pointColor'], '#60a5fa'],
-      'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], 'var(--color-map-draw)'],
+      'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], '#2563eb'],
       'circle-stroke-width': 2,
       'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
     },
@@ -76,7 +76,7 @@ const drawStyles = [
     paint: {
       'circle-radius': 4,
       'circle-color': '#ffffff',
-      'circle-stroke-color': 'var(--color-map-draw)',
+      'circle-stroke-color': '#2563eb',
       'circle-stroke-width': 2,
     },
   },
@@ -246,7 +246,7 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
       },
       paint: {
         'fill-color': ['coalesce', ['get', 'fill'], '#60a5fa'],
-        'fill-outline-color': ['coalesce', ['get', 'stroke'], 'var(--color-map-draw)'],
+        'fill-outline-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
         'fill-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, ['coalesce', ['get', 'fillOpacity'], 0.22]],
       },
     })
@@ -264,7 +264,7 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
         'line-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
       paint: {
-        'line-color': ['coalesce', ['get', 'stroke'], 'var(--color-map-draw)'],
+        'line-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
         'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
         'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
       },
@@ -283,7 +283,7 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
       paint: {
         'circle-radius': ['coalesce', ['get', 'pointRadius'], 6],
         'circle-color': ['coalesce', ['get', 'pointColor'], '#60a5fa'],
-        'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], 'var(--color-map-draw)'],
+        'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], '#2563eb'],
         'circle-stroke-width': 2,
         'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
       },
