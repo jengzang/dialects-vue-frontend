@@ -264,7 +264,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getMetadataOverview, getMetadataTables, getNgramStatistics } from '@/api/index.js'
+import { getVillagesOverview, getVillagesNgrams, getVillagesTables } from '@/composables/useVillagesCache.js'
 import { showError, showSuccess } from '@/utils/message.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import AppModal from '@/components/common/AppModal.vue'
@@ -336,7 +336,7 @@ const selectedTableTitle = computed(() => selectedTable.value ? `表詳情: ${se
 // Methods
 const refreshOverview = async () => {
   await overviewQuery.load(
-    () => getMetadataOverview(),
+    () => getVillagesOverview(),
     {
       onSuccess: (overviewRes) => {
         overview.value = {
@@ -359,7 +359,7 @@ const refreshOverview = async () => {
 
 const refreshTables = async () => {
   await tablesQuery.load(
-    () => getMetadataTables(),
+    () => getVillagesTables(),
     {
       onSuccess: (tablesRes) => {
         tables.value = (tablesRes || []).map(table => ({
@@ -434,7 +434,7 @@ const calculateSignificanceRate = (data) => {
 const levelLabel = (level) => ({ city: '城市', county: '區縣', township: '鄉鎮' }[level] || level)
 
 const refreshNgramStats = async () => {
-  await ngramStatsQuery.load(() => getNgramStatistics(), {
+  await ngramStatsQuery.load(() => getVillagesNgrams(), {
     onSuccess: (result) => {
       ngramStats.value = result
     },

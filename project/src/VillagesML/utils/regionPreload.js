@@ -3,7 +3,7 @@
  * 一次性加载所有区域数据，避免重复请求和错误
  */
 
-import { getRegionList } from '@/api/index.js'
+import { getVillagesRegions } from '@/composables/useVillagesCache.js'
 
 const CACHE_KEY = 'regions_all_data_v3'  // 更新版本号，强制重新加载
 const CACHE_TIMESTAMP_KEY = 'regions_cache_timestamp_v3'
@@ -150,9 +150,9 @@ async function loadAllRegionsFromAPI() {
   try {
     // 并行请求所有层级的数据
     const [cities, counties, townships] = await Promise.all([
-      getRegionList('city', null),
-      getRegionList('county', null),
-      getRegionList('township', null)
+      getVillagesRegions('city', null),
+      getVillagesRegions('county', null),
+      getVillagesRegions('township', null)
     ])
 
     // 对每个层级的数据进行去重

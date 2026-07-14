@@ -123,7 +123,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { getMetadataOverview, getNgramStatistics } from '@/api/index.js'
+import { getVillagesOverview, getVillagesNgrams } from '@/composables/useVillagesCache.js'
 import { showError } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
@@ -286,7 +286,7 @@ const navigateTo = (route) => {
 }
 
 const loadMetadata = async () => {
-  await metadataQuery.load(() => getMetadataOverview(), {
+  await metadataQuery.load(() => getVillagesOverview(), {
     onSuccess: (result) => {
       metadata.value = result
     },
@@ -297,7 +297,7 @@ const loadMetadata = async () => {
 }
 
 const loadNgramStats = async () => {
-  await ngramStatsQuery.load(() => getNgramStatistics(), {
+  await ngramStatsQuery.load(() => getVillagesNgrams(), {
     onSuccess: (result) => {
       ngramStats.value = result
     },

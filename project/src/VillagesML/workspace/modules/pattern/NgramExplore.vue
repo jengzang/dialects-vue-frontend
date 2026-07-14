@@ -190,9 +190,9 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import {
   getNgramFrequency,
-  getNgramPatterns,
-  getNgramStatistics
+  getNgramPatterns
 } from '@/api/index.js'
+import { getVillagesNgrams } from '@/composables/useVillagesCache.js'
 import { showError } from '@/utils/message.js'
 import { getNgramPositionLabel, getNgramPatternTypeLabel } from '@/VillagesML/config/villagesML.js'
 
@@ -285,7 +285,7 @@ const goToStats = (ngram) => {
 
 onMounted(async () => {
   try {
-    ngramStats.value = await getNgramStatistics()
+    ngramStats.value = await getVillagesNgrams()
   } catch {
     // Non-critical
   }
