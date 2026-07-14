@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { resultCache } from '@/main/store/store.js'
+import { isPlatformFeatureEnabled } from '@/platform/index.js'
 
 // ========================================
 // MenuBar Configuration Guide
@@ -85,6 +86,11 @@ const MENU_CHILD_PATHS = {
   map: ['/menu/map/view', '/menu/map/divide', '/menu/map/custom', '/menu/map/draw'],
   pho: ['/menu/pho/matrix', '/menu/pho/custom', '/menu/pho/count', '/menu/pho/evolution'],
   about: ['/menu/about/intro', '/menu/about/suggestion', '/menu/about/like', '/menu/about/settings']
+}
+
+function filterPlatformChildPaths(tabKey, paths) {
+  if (tabKey !== 'map') return paths
+  return paths.filter((path) => path !== '/menu/map/draw' || isPlatformFeatureEnabled('mapDraw'))
 }
 
 const createDisplayConfig = ({ preset = 'standard', overrides = {} } = {}) => ({
@@ -275,7 +281,7 @@ export function syncMenuBarMemoryFromRoute(route) {
   if (!tabKey) return
 
   const normalizedPath = stripLocaleFromPath(route?.path || '')
-  if (MENU_CHILD_PATHS[tabKey]?.includes(normalizedPath)) {
+  if (filterPlatformChildPaths(tabKey, MENU_CHILD_PATHS[tabKey] || []).includes(normalizedPath)) {
     writeMenuBarMemory(tabKey, normalizedPath)
   }
 }
@@ -314,7 +320,7 @@ export function getMenuBarActiveTab(tabs, route) {
 export function resolveMenuBarTarget(tabConfig) {
   if (!tabConfig?.to) {
     const tabKey = tabConfig?.navigation?.tabKey || tabConfig?.tab
-    return MENU_CHILD_PATHS[tabKey]?.[0] || withRouteLocale(route, '/menu/query/zhonggu')
+    return filterPlatformChildPaths(tabKey, MENU_CHILD_PATHS[tabKey] || [])[0] || '/menu/query/zhonggu'
   }
 
   if (!tabConfig.navigation?.rememberChild) {
@@ -322,11 +328,11 @@ export function resolveMenuBarTarget(tabConfig) {
   }
 
   const rememberedPath = readMenuBarMemory(tabConfig.navigation.tabKey)
-  if (!rememberedPath) {
+  const childPaths = filterPlatformChildPaths(tabConfig.navigation.tabKey, MENU_CHILD_PATHS[tabConfig.navigation.tabKey] || [])
+  if (!rememberedPath || !childPaths.includes(rememberedPath)) {
     return tabConfig.to
   }
 
   const locale = extractLocaleFromPath(tabConfig.to?.path || '/')
   return buildLocalePath(locale, rememberedPath)
 }
-

@@ -1,3 +1,5 @@
+import { isPlatformFeatureEnabled } from '@/platform/index.js'
+
 const PhoPage = () => import('@/main/views/menu/PhoPage.vue')
 const AboutPage = () => import('@/main/views/menu/support/AboutPage.vue')
 const QueryPage = () => import('@/main/views/menu/QueryPage.vue')
@@ -10,6 +12,18 @@ const ToolsPage = () => import('@/main/views/menu/portals/ToolsPage.vue')
 const WordsPage = () => import('@/main/views/menu/portals/WordsPage.vue')
 const VillagesPage = () => import('@/main/views/menu/portals/VillagesPage.vue')
 const DialectClusteringPage = () => import('@/main/views/menu/DialectClustering.vue')
+
+export function redirectUnsupportedMapDraw(to) {
+  if (to.params.sub !== 'draw' || isPlatformFeatureEnabled('mapDraw')) {
+    return true
+  }
+
+  return {
+    path: `/${to.params.locale}/menu/map/view`,
+    query: to.query,
+    hash: to.hash,
+  }
+}
 
 export const menuRoutes = [
   {
@@ -54,6 +68,7 @@ export const menuRoutes = [
   },
   {
     path: 'menu/map/:sub(view|divide|custom|draw)',
+    beforeEnter: redirectUnsupportedMapDraw,
     component: MapPage
   },
   {

@@ -77,6 +77,7 @@
           v-show="activeTab === 'custom'"
         />
         <MapDrawTab
+          v-if="canUseMapDraw"
           v-show="activeTab === 'draw'"
         />
         <!-- 自定義數據提交面板（只在 map tab 顯示） -->
@@ -98,6 +99,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { mapStore } from '@/main/store/store.js'
+import { isPlatformFeatureEnabled } from '@/platform/index.js'
 
 import TabsContainer from '@/components/common/TabsContainer.vue'
 import DivideTab from "@/main/components/map/Tabs/DivideTab.vue";
@@ -137,6 +139,7 @@ const tabToRouteSub = {
   custom: 'custom',
   draw: 'draw'
 }
+const canUseMapDraw = isPlatformFeatureEnabled('mapDraw')
 const currentTab = computed(() => routeSubToTab[route.params.sub] || 'map')
 
 // 是否处于 map 路由（用于判断基于路由的自动加载等）
@@ -152,7 +155,7 @@ const tabs = computed(() => [
   { name: 'map', label: t('map.tabs.map') },
   { name: 'divide', label: t('map.tabs.divide') },
   { name: 'custom', label: t('map.tabs.custom') },
-  { name: 'draw', label: t('map.tabs.draw') }
+  ...(canUseMapDraw ? [{ name: 'draw', label: t('map.tabs.draw') }] : [])
 ])
 
 // 處理地圖點擊事件
@@ -291,6 +294,13 @@ watch(
 );
 
 const resolveTabRoute = (tabName) => {
+  if (tabName === 'draw' && !canUseMapDraw) {
+    return {
+      path: buildLocalePath(resolveRouteLocale(route), '/menu/map/view'),
+      query: route.query
+    }
+  }
+
   const sub = tabToRouteSub[tabName] || 'view'
   return {
     path: buildLocalePath(resolveRouteLocale(route), `/menu/map/${sub}`),

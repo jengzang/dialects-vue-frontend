@@ -126,7 +126,7 @@
                 <span class="link-icon">📁</span>
                 <span class="link-text">{{ $t('home.features.map.customMap') }}</span>
               </a>
-              <a @click.stop="navigateTo('/menu/map/draw')" class="feature-link">
+              <a v-if="canUseMapDraw" @click.stop="navigateTo('/menu/map/draw')" class="feature-link">
                 <span class="link-icon">✏️</span>
                 <span class="link-text">{{ $t('home.features.map.drawMap') }}</span>
               </a>
@@ -586,6 +586,7 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useVisitStats } from '@/composables/useVisitStats.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
+import { isPlatformFeatureEnabled } from '@/platform/index.js'
 
 // ✅ 条件渲染的组件懒加载
 const UserBenefitsPopup = defineAsyncComponent(() =>
@@ -611,6 +612,7 @@ const expandedCard = ref(null)
 const showSupport = ref(false)
 const showBenefitsPopup = ref(false)
 const showUpdateNotice = ref(false)
+const canUseMapDraw = isPlatformFeatureEnabled('mapDraw')
 const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
 const cachedSourceStats = getCachedSourceStats()
 const sourceLocationCount = ref(cachedSourceStats.locationCount)
