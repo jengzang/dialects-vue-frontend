@@ -6,6 +6,7 @@
     "pho": "音系",
     "charClass": "汉字",
     "dialectClustering": "聚类",
+    "map": "地图",
     "words": "词句",
     "villages": "自然村",
     "tools": "工具",
@@ -25,6 +26,12 @@
       "tab2": "中古对比",
       "tab4": "调类对比",
       "tab5": "音值对比"
+    },
+    "map": {
+      "view": "主地图",
+      "divide": "分区着色",
+      "custom": "自定义数据",
+      "draw": "地图绘制"
     },
     "pho": {
       "phonologyMatrix": "音系查询",

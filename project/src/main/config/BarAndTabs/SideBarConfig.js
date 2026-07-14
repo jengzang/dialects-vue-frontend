@@ -43,6 +43,17 @@ export function useSidebarConfig() {
                 { label: t('navigation.submenu.compare.tab5'), icon: '🎵', path: withRouteLocale(route, '/menu/compare/phonetic') }
             ]
         },
+        map: {
+            label: t('navigation.menu.map'),
+            icon: '🗺️',
+            path: withRouteLocale(route, '/menu/map/view'),
+            children: [
+                { label: t('navigation.submenu.map.view'), icon: '🗺️', path: withRouteLocale(route, '/menu/map/view') },
+                { label: t('navigation.submenu.map.divide'), icon: '🧩', path: withRouteLocale(route, '/menu/map/divide') },
+                { label: t('navigation.submenu.map.custom'), icon: '📝', path: withRouteLocale(route, '/menu/map/custom') },
+                { label: t('navigation.submenu.map.draw'), icon: '✏️', path: withRouteLocale(route, '/menu/map/draw') }
+            ]
+        },
         pho: {
             label: t('navigation.menu.pho'),
             icon: '🧬',
@@ -161,6 +172,17 @@ export const SideConfig = {
             { label: '中古對比', icon: '📜', path: buildLocalePath('zh-Hant', '/menu/compare/zhonggu') },
             { label: '調類對比', icon: '📊', path: buildLocalePath('zh-Hant', '/menu/compare/tone') },
             { label: '音值對比', icon: '🎵', path: buildLocalePath('zh-Hant', '/menu/compare/phonetic') }
+        ]
+    },
+    map: {
+        label: '地圖',
+        icon: '🗺️',
+        path: buildLocalePath('zh-Hant', '/menu/map/view'),
+        children: [
+            { label: '地圖', icon: '📍', path: buildLocalePath('zh-Hant', '/menu/map/view') },
+            { label: '分區圖', icon: '📊', path: buildLocalePath('zh-Hant', '/menu/map/divide') },
+            { label: '自定義', icon: '🎨', path: buildLocalePath('zh-Hant', '/menu/map/custom') },
+            { label: '地圖繪製', icon: '✏️', path: buildLocalePath('zh-Hant', '/menu/map/draw') }
         ]
     },
     pho: {

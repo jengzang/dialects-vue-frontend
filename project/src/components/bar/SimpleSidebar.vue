@@ -130,8 +130,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue'
 import { clearToken, getToken } from '@/api/auth/auth.js'
@@ -142,6 +142,25 @@ import { WEB_BASE } from '@/env-config.js';
 
 const { t } = useI18n();
 const router = useRouter();
+const route = useRoute();
+
+// 侧边栏桌面端点击记忆：上次访问的子页面
+const SIDEBAR_MEMORY_PREFIX = 'sidebar_last_child_'
+
+const readSidebarMemory = (menuKey) => {
+  try {
+    return sessionStorage.getItem(SIDEBAR_MEMORY_PREFIX + menuKey)
+  } catch {
+    return null
+  }
+}
+
+const writeSidebarMemory = (menuKey, path) => {
+  try {
+    if (path) sessionStorage.setItem(SIDEBAR_MEMORY_PREFIX + menuKey, path)
+    else sessionStorage.removeItem(SIDEBAR_MEMORY_PREFIX + menuKey)
+  } catch { /* ignore */ }
+}
 const {
   todayVisits,
   totalVisits,
@@ -205,6 +224,20 @@ const getFilteredChildren = (menuKey) => {
   })
 }
 
+// 监听路由变化，记录当前路径到对应菜单项的 sessionStorage
+watch(() => route.fullPath, () => {
+  for (const [key, item] of Object.entries(menuConfigData.value)) {
+    if (!item.children) continue
+    for (const child of item.children) {
+      const childPathOnly = child.path?.split('?')[0]
+      if (route.path === childPathOnly || route.fullPath === child.path) {
+        writeSidebarMemory(key, child.path)
+        return
+      }
+    }
+  }
+})
+
 // 访问统计相关
 const isStatsExpanded = ref(false);
 
@@ -214,27 +247,32 @@ const closeSidebar = () => {
   activeSubmenu.value = null;
 };
 
-// 主按鈕點擊處理 - 有子菜單則展開，無子菜單則導航
+// 主按鈕點擊處理
+// 桌面端：有子菜單 → 直接導航到記憶頁/默認頁；無子菜單 → 導航
+// 移動端：有子菜單 → 展開子菜單；無子菜單 → 導航
 const handleMainClick = (item, key, event) => {
-  event?.stopPropagation()  // 阻止事件冒泡
-  cancelCloseSubmenu()  // 取消任何待處理的關閉
+  event?.stopPropagation()
+  cancelCloseSubmenu()
 
   if (item.children) {
-    // 有子菜單，展開子菜單
-    handleArrowClick(item, key, event)
+    if (!isMobile.value) {
+      // 桌面端：導航到記憶的子頁，無記憶則取第一個子頁
+      const remembered = readSidebarMemory(key)
+      const defaultChild = getFilteredChildren(key)[0]?.path
+      const target = remembered || defaultChild || item.path
+      router.push(target)
+      closeSidebar()
+    } else {
+      // 移動端：展開子菜單
+      handleArrowClick(item, key, event)
+    }
   } else if (item.path) {
-    // 無子菜單且有路徑，導航
     if (item.external) {
-      const targetUrl = WEB_BASE + item.path
-      console.log('🔗 External navigation:', { key, path: item.path, WEB_BASE, targetUrl })
-      window.location.href = targetUrl
+      window.location.href = WEB_BASE + item.path
     } else {
       router.push(item.path)
       closeSidebar()
     }
-  } else {
-    // 沒有路徑就console
-    console.log('按鈕點擊 - 需要設置導航路徑:', key, item)
   }
 }
 
