@@ -1,7 +1,7 @@
 // api/villagesML/characters.js
 // 字頻統計相關 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 獲取全局字頻統計
@@ -13,7 +13,7 @@ export async function getGlobalCharFrequency(params = {}) {
   const queryParams = new URLSearchParams()
   if (params.top_k) queryParams.append('top_k', params.top_k)
 
-  return api(`/api/villages/character/frequency/global?${queryParams.toString()}`)
+  return villagesMLApi(`/character/frequency/global?${queryParams.toString()}`)
 }
 
 /**
@@ -41,7 +41,7 @@ export async function getCharTendency(params) {
 
   if (params.top_n) queryParams.append('top_n', params.top_n)
 
-  return api(`/api/villages/character/tendency/by-region?${queryParams.toString()}`)
+  return villagesMLApi(`/character/tendency/by-region?${queryParams.toString()}`)
 }
 
 /**
@@ -69,7 +69,7 @@ export async function getRegionalCharFrequency(params) {
 
   if (params.top_k) queryParams.append('top_k', params.top_k)
 
-  return api(`/api/villages/character/frequency/regional?${queryParams.toString()}`)
+  return villagesMLApi(`/character/frequency/regional?${queryParams.toString()}`)
 }
 
 /**
@@ -87,7 +87,7 @@ export async function getCharTendencyByChar(params) {
   if (params.county) queryParams.append('county', params.county)
   if (params.township) queryParams.append('township', params.township)
 
-  return api(`/api/villages/character/tendency/by-char?${queryParams.toString()}`)
+  return villagesMLApi(`/character/tendency/by-char?${queryParams.toString()}`)
 }
 
 /**
@@ -102,7 +102,7 @@ export async function getCharEmbeddingsList(params = {}) {
   if (params.limit) queryParams.append('limit', params.limit)
   if (params.offset) queryParams.append('offset', params.offset)
 
-  return api(`/api/villages/character/embeddings/list?${queryParams.toString()}`)
+  return villagesMLApi(`/character/embeddings/list?${queryParams.toString()}`)
 }
 
 /**
@@ -112,7 +112,7 @@ export async function getCharEmbeddingsList(params = {}) {
  */
 export async function getCharEmbeddingVector(char) {
   const queryParams = new URLSearchParams({ char })
-  return api(`/api/villages/character/embeddings/vector?${queryParams.toString()}`)
+  return villagesMLApi(`/character/embeddings/vector?${queryParams.toString()}`)
 }
 
 /**
@@ -129,7 +129,7 @@ export async function getCharSimilarities(params) {
   if (params.top_k) queryParams.append('top_k', params.top_k)
   if (params.min_similarity) queryParams.append('min_similarity', params.min_similarity)
 
-  return api(`/api/villages/character/embeddings/similarities?${queryParams.toString()}`)
+  return villagesMLApi(`/character/embeddings/similarities?${queryParams.toString()}`)
 }
 
 /**
@@ -143,7 +143,7 @@ export async function getCharSimilarities(params) {
  * @returns {Promise<{ nodes: Array<{ character: string, depth: number, similarity: number }>, edges: Array<{ source: string, target: string, similarity: number }> }>}
  */
 export async function fetchCharacterNetwork(params) {
-  return api('/api/villages/character/network', {
+  return villagesMLApi('/character/network', {
     method: 'POST',
     body: {
       root_char: params.rootChar,
@@ -167,7 +167,7 @@ export async function getCharSignificanceByChar(params) {
   queryParams.append('char', params.char)
   queryParams.append('region_level', params.region_level)
 
-  return api(`/api/villages/character/significance/by-character?${queryParams.toString()}`)
+  return villagesMLApi(`/character/significance/by-character?${queryParams.toString()}`)
 }
 
 /**
@@ -192,7 +192,7 @@ export async function getCharSignificanceByRegion(params) {
 
   if (params.top_k) queryParams.append('top_k', params.top_k)
 
-  return api(`/api/villages/character/significance/by-region?${queryParams.toString()}`)
+  return villagesMLApi(`/character/significance/by-region?${queryParams.toString()}`)
 }
 
 /**
@@ -205,5 +205,5 @@ export async function getCharSignificanceSummary(params) {
   const queryParams = new URLSearchParams()
   queryParams.append('region_level', params.region_level)
 
-  return api(`/api/villages/character/significance/summary?${queryParams.toString()}`)
+  return villagesMLApi(`/character/significance/summary?${queryParams.toString()}`)
 }

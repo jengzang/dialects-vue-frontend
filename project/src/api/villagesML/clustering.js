@@ -1,7 +1,7 @@
 // api/villagesML/clustering.js
 // 聚類分析相關 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 運行聚類分析
@@ -15,7 +15,7 @@ import { api } from '../auth/httpClient.js'
  * @returns {Promise<Object>} 聚類結果
  */
 export async function runClustering(params) {
-  return api('/api/villages/compute/clustering/run', {
+  return villagesMLApi('/compute/clustering/run', {
     method: 'POST',
     body: params,
     timeout: 60000  // 60秒超時
@@ -32,7 +32,7 @@ export async function runClustering(params) {
  * @returns {Promise<Object>} { k_values: [], silhouette_scores: [], inertias: [] }
  */
 export async function scanClustering(params) {
-  return api('/api/villages/compute/clustering/scan', {
+  return villagesMLApi('/compute/clustering/scan', {
     method: 'POST',
     body: params,
     timeout: 120000  // 120秒超時
@@ -45,7 +45,7 @@ export async function scanClustering(params) {
  * @returns {Promise<Object>} { status: string, progress: number, result: Object }
  */
 export async function getClusteringStatus(taskId) {
-  return api(`/api/villages/compute/clustering/status/${taskId}`)
+  return villagesMLApi(`/compute/clustering/status/${taskId}`)
 }
 
 /**
@@ -53,7 +53,7 @@ export async function getClusteringStatus(taskId) {
  * @returns {Promise<Object>} { cache_size: number, cache_count: number, hit_rate: number }
  */
 export async function getClusteringCacheStats() {
-  return api('/api/villages/compute/clustering/cache-stats')
+  return villagesMLApi('/compute/clustering/cache-stats')
 }
 
 /**
@@ -61,7 +61,7 @@ export async function getClusteringCacheStats() {
  * @returns {Promise<Object>} { success: boolean, message: string }
  */
 export async function clearClusteringCache() {
-  return api('/api/villages/compute/clustering/cache', {
+  return villagesMLApi('/compute/clustering/cache', {
     method: 'DELETE'
   })
 }

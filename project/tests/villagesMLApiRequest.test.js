@@ -26,8 +26,24 @@ describe('villagesML API request helper', () => {
     })).toBe('/api/villages/ngrams/frequency?n=2&position=prefix&min_frequency=5')
   })
 
-  it('centralizes cache-facing villages API prefixes through the helper', () => {
-    ;['metadata.js', 'ngrams.js', 'villages.js'].forEach((file) => {
+  it('centralizes villages API prefixes through the helper', () => {
+    ;[
+      'characters.js',
+      'clustering.js',
+      'clusteringTypes.js',
+      'compute.js',
+      'metadata.js',
+      'ngrams.js',
+      'patterns.js',
+      'regionSimilarity.js',
+      'regional.js',
+      'semantic.js',
+      'semanticCategories.js',
+      'semanticComposition.js',
+      'semanticLabels.js',
+      'spatial.js',
+      'villages.js',
+    ].forEach((file) => {
       expect(readSource(`src/api/villagesML/${file}`)).not.toContain('/api/villages')
     })
   })
