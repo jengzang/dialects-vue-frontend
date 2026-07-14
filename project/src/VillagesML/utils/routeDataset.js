@@ -46,3 +46,16 @@ export function buildVillagesMLPath({
 
   return queryString ? `${basePath}?${queryString}` : basePath
 }
+
+export function buildVillagesMLRedirect(route = {}) {
+  if (route.path !== '/villagesML') {
+    return null
+  }
+
+  return {
+    path: `/villagesML/${DEFAULT_VILLAGESML_DATASET}`,
+    query: route.query || {},
+    hash: route.hash || '',
+    replace: true,
+  }
+}
