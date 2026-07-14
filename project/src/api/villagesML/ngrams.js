@@ -1,7 +1,7 @@
 // api/villagesML/ngrams.js
 // N-gram 分析相關 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 獲取N-gram頻率
@@ -23,7 +23,7 @@ export async function getNgramFrequency(params) {
   if (params.min_frequency) queryParams.append('min_frequency', params.min_frequency)
   if (params.position) queryParams.append('position', params.position)
 
-  return api(`/api/villages/ngrams/frequency?${queryParams.toString()}`)
+  return villagesMLApi(`/ngrams/frequency?${queryParams.toString()}`)
 }
 
 /**
@@ -42,7 +42,7 @@ export async function getNgramPatterns(params) {
   queryParams.append('pattern', params.pattern)
   queryParams.append('n', params.n)
 
-  return api(`/api/villages/ngrams/patterns?${queryParams.toString()}`)
+  return villagesMLApi(`/ngrams/patterns?${queryParams.toString()}`)
 }
 
 /**
@@ -70,7 +70,7 @@ export async function getNgramRegional(params) {
   if (params.top_k) queryParams.append('top_k', params.top_k)
   if (params.return_metadata) queryParams.append('return_metadata', 'true')
 
-  return api(`/api/villages/ngrams/regional?${queryParams.toString()}`)
+  return villagesMLApi(`/ngrams/regional?${queryParams.toString()}`)
 }
 
 /**
@@ -99,7 +99,7 @@ export async function getNgramTendency(params) {
   if (params.min_tendency !== undefined) queryParams.append('min_tendency', params.min_tendency)
   if (params.limit) queryParams.append('limit', params.limit)
 
-  return api(`/api/villages/ngrams/tendency?${queryParams.toString()}`)
+  return villagesMLApi(`/ngrams/tendency?${queryParams.toString()}`)
 }
 
 /**
@@ -114,5 +114,5 @@ export async function getNgramSignificance(params) {
   queryParams.append('ngram', params.ngram)
   queryParams.append('region_level', params.region_level)
 
-  return api(`/api/villages/ngrams/significance?${queryParams.toString()}`)
+  return villagesMLApi(`/ngrams/significance?${queryParams.toString()}`)
 }

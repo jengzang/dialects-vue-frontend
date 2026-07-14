@@ -1,4 +1,5 @@
 import { createCommonBarItem, createCommonBarSchema } from '@/components/bar/commonBarNavigation.js'
+import { buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
 
 // ========================================
 // 模組和子標籤配置（用於 CommonBar 導航）
@@ -13,7 +14,7 @@ export const VILLAGESML_MODULES = [
         id: 'search',
         label: '搜索',
         icon: '🔍',
-        path: '/villagesML?module=search',
+        path: buildVillagesMLPath({ module: 'search' }),
         weight: 0.8,
         mobileWeight: 1,
         weightIconOnly: 0.5,
@@ -31,7 +32,7 @@ export const VILLAGESML_MODULES = [
         id: 'character',
         label: '字符分析',
         icon: '🔤',
-        path: '/villagesML?module=character&subtab=frequency',
+        path: buildVillagesMLPath({ module: 'character', subtab: 'frequency' }),
         weight: 1.2,
         mobileWeight: 1,
         weightIconOnly: 0.5,
@@ -48,25 +49,25 @@ export const VILLAGESML_MODULES = [
                 id: 'frequency',
                 label: '頻率傾向',
                 icon: '📊',
-                path: '/villagesML?module=character&subtab=frequency',
+                path: buildVillagesMLPath({ module: 'character', subtab: 'frequency' }),
             },
             {
                 id: 'embeddings',
                 label: '嵌入相似',
                 icon: '🧬',
-                path: '/villagesML?module=character&subtab=embeddings',
+                path: buildVillagesMLPath({ module: 'character', subtab: 'embeddings' }),
             },
             {
                 id: 'network',
                 label: '字符網絡',
                 icon: '🕸️',
-                path: '/villagesML?module=character&subtab=network',
+                path: buildVillagesMLPath({ module: 'character', subtab: 'network' }),
             },
             {
                 id: 'significance',
                 label: '顯著性',
                 icon: '⭐',
-                path: '/villagesML?module=character&subtab=significance',
+                path: buildVillagesMLPath({ module: 'character', subtab: 'significance' }),
             },
         ]
     },
@@ -74,7 +75,7 @@ export const VILLAGESML_MODULES = [
         id: 'semantic',
         label: '語義分析',
         icon: '🏷️',
-        path: '/villagesML?module=semantic&subtab=categories',
+        path: buildVillagesMLPath({ module: 'semantic', subtab: 'categories' }),
         weight: 1.2,
         mobileWeight: 1,
         weightIconOnly: 0.5,
@@ -91,37 +92,37 @@ export const VILLAGESML_MODULES = [
                 id: 'categories',
                 label: '類別標籤',
                 icon: '🔖',
-                path: '/villagesML?module=semantic&subtab=categories',
+                path: buildVillagesMLPath({ module: 'semantic', subtab: 'categories' }),
             },
             {
                 id: 'composition',
                 label: '組合模式',
                 icon: '🧩',
-                path: '/villagesML?module=semantic&subtab=composition',
+                path: buildVillagesMLPath({ module: 'semantic', subtab: 'composition' }),
             },
             {
                 id: 'ngrams',
                 label: 'N-gram分析',
                 icon: '📊',
-                path: '/villagesML?module=semantic&subtab=ngrams',
+                path: buildVillagesMLPath({ module: 'semantic', subtab: 'ngrams' }),
             },
             {
                 id: 'indices',
                 label: '語義指數',
                 icon: '📈',
-                path: '/villagesML?module=semantic&subtab=indices',
+                path: buildVillagesMLPath({ module: 'semantic', subtab: 'indices' }),
             },
             {
                 id: 'network',
                 label: '語義網絡',
                 icon: '🕸️',
-                path: '/villagesML?module=semantic&subtab=network',
+                path: buildVillagesMLPath({ module: 'semantic', subtab: 'network' }),
             },
             {
                 id: 'subcategories',
                 label: '子類別分析',
                 icon: '🏷️',
-                path: '/villagesML?module=semantic&subtab=subcategories'
+                path: buildVillagesMLPath({ module: 'semantic', subtab: 'subcategories' })
             }
         ]
     },
@@ -129,7 +130,7 @@ export const VILLAGESML_MODULES = [
         id: 'spatial',
         label: '空間分析',
         icon: '🗺️',
-        path: '/villagesML?module=spatial&subtab=hotspots',
+        path: buildVillagesMLPath({ module: 'spatial', subtab: 'hotspots' }),
         weight: 1.2,
         mobileWeight: 1,
         weightIconOnly: 0.5,
@@ -146,25 +147,25 @@ export const VILLAGESML_MODULES = [
                 id: 'hotspots',
                 label: '空間熱點',
                 icon: '🔥',
-                path: '/villagesML?module=spatial&subtab=hotspots',
+                path: buildVillagesMLPath({ module: 'spatial', subtab: 'hotspots' }),
             },
             {
                 id: 'clusters',
                 label: '空間聚類',
                 icon: '🎯',
-                path: '/villagesML?module=spatial&subtab=clusters',
+                path: buildVillagesMLPath({ module: 'spatial', subtab: 'clusters' }),
             },
             {
                 id: 'visualization',
                 label: '空間可視化',
                 icon: '📍',
-                path: '/villagesML?module=spatial&subtab=visualization',
+                path: buildVillagesMLPath({ module: 'spatial', subtab: 'visualization' }),
             },
             {
                 id: 'integration',
                 label: '空間整合',
                 icon: '🔗',
-                path: '/villagesML?module=spatial&subtab=integration'
+                path: buildVillagesMLPath({ module: 'spatial', subtab: 'integration' })
             }
         ]
     },
@@ -172,7 +173,7 @@ export const VILLAGESML_MODULES = [
         id: 'pattern',
         label: '模式分析',
         icon: '📐',
-        path: '/villagesML?module=pattern&subtab=frequency',
+        path: buildVillagesMLPath({ module: 'pattern', subtab: 'frequency' }),
         weight: 1.2,
         mobileWeight: 1,
         weightIconOnly: 0.5,
@@ -189,31 +190,31 @@ export const VILLAGESML_MODULES = [
                 id: 'frequency',
                 label: '頻率分析',
                 icon: '📊',
-                path: '/villagesML?module=pattern&subtab=frequency',
+                path: buildVillagesMLPath({ module: 'pattern', subtab: 'frequency' }),
             },
             {
                 id: 'structural',
                 label: '結構分析',
                 icon: '🏗️',
-                path: '/villagesML?module=pattern&subtab=structural',
+                path: buildVillagesMLPath({ module: 'pattern', subtab: 'structural' }),
             },
             {
                 id: 'tendency',
                 label: '傾向性分析',
                 icon: '📈',
-                path: '/villagesML?module=pattern&subtab=tendency',
+                path: buildVillagesMLPath({ module: 'pattern', subtab: 'tendency' }),
             },
             {
                 id: 'ngram-explore',
                 label: 'N-gram 探索',
                 icon: '🔍',
-                path: '/villagesML?module=pattern&subtab=ngram-explore',
+                path: buildVillagesMLPath({ module: 'pattern', subtab: 'ngram-explore' }),
             },
             {
                 id: 'ngram-stats',
                 label: 'N-gram 統計',
                 icon: '📊',
-                path: '/villagesML?module=pattern&subtab=ngram-stats'
+                path: buildVillagesMLPath({ module: 'pattern', subtab: 'ngram-stats' })
             }
         ]
     },
@@ -221,7 +222,7 @@ export const VILLAGESML_MODULES = [
         id: 'regional',
         label: '區域分析',
         icon: '🌍',
-        path: '/villagesML?module=regional&subtab=aggregates',
+        path: buildVillagesMLPath({ module: 'regional', subtab: 'aggregates' }),
         weight: 1.2,
         mobileWeight: 1,
         weightIconOnly: 0.5,
@@ -238,31 +239,31 @@ export const VILLAGESML_MODULES = [
                 id: 'aggregates',
                 label: '聚合統計',
                 icon: '📈',
-                path: '/villagesML?module=regional&subtab=aggregates'
+                path: buildVillagesMLPath({ module: 'regional', subtab: 'aggregates' })
             },
             {
                 id: 'vectors',
                 label: '特徵向量',
                 icon: '📐',
-                path: '/villagesML?module=regional&subtab=vectors'
+                path: buildVillagesMLPath({ module: 'regional', subtab: 'vectors' })
             },
             {
                 id: 'tendency',
                 label: '類別傾向性',
                 icon: '📊',
-                path: '/villagesML?module=regional&subtab=tendency'
+                path: buildVillagesMLPath({ module: 'regional', subtab: 'tendency' })
             },
             {
                 id: 'similarity',
                 label: '相似度分析',
                 icon: '🔍',
-                path: '/villagesML?module=regional&subtab=similarity'
+                path: buildVillagesMLPath({ module: 'regional', subtab: 'similarity' })
             },
             {
                 id: 'feature-agg',
                 label: '特徵聚合',
                 icon: '🔬',
-                path: '/villagesML?module=regional&subtab=feature-agg',
+                path: buildVillagesMLPath({ module: 'regional', subtab: 'feature-agg' }),
                 requireAuth: true
             }
         ]
@@ -271,7 +272,7 @@ export const VILLAGESML_MODULES = [
         id: 'compute',
         label: 'ML計算',
         icon: '🤖',
-        path: '/villagesML?module=compute&subtab=clustering',
+        path: buildVillagesMLPath({ module: 'compute', subtab: 'clustering' }),
         weight: 1.2,
         mobileWeight: 1,
         weightIconOnly: 0.5,
@@ -289,45 +290,45 @@ export const VILLAGESML_MODULES = [
                 id: 'clustering',
                 label: '基礎聚類',  // 改名：聚類分析 → 基礎聚類
                 icon: '🎲',
-                path: '/villagesML?module=compute&subtab=clustering'
+                path: buildVillagesMLPath({ module: 'compute', subtab: 'clustering' })
             },
             // ===== 新增子標籤 =====
             {
                 id: 'char-tendency',
                 label: '字符傾向',
                 icon: '🔤',
-                path: '/villagesML?module=compute&subtab=char-tendency'
+                path: buildVillagesMLPath({ module: 'compute', subtab: 'char-tendency' })
             },
             {
                 id: 'sampled-villages',
                 label: '採樣村莊',
                 icon: '🏘️',
-                path: '/villagesML?module=compute&subtab=sampled-villages'
+                path: buildVillagesMLPath({ module: 'compute', subtab: 'sampled-villages' })
             },
             {
                 id: 'spatial-aware',
                 label: '空間感知',
                 icon: '🗺️',
-                path: '/villagesML?module=compute&subtab=spatial-aware'
+                path: buildVillagesMLPath({ module: 'compute', subtab: 'spatial-aware' })
             },
             {
                 id: 'hierarchical',
                 label: '層次聚類',
                 icon: '🌳',
-                path: '/villagesML?module=compute&subtab=hierarchical'
+                path: buildVillagesMLPath({ module: 'compute', subtab: 'hierarchical' })
             },
 
             {
                 id: 'features',
                 label: '特徵提取',
                 icon: '🔬',
-                path: '/villagesML?module=compute&subtab=features'
+                path: buildVillagesMLPath({ module: 'compute', subtab: 'features' })
             },
             {
                 id: 'subset',
                 label: '子集分析',
                 icon: '🧪',
-                path: '/villagesML?module=compute&subtab=subset'
+                path: buildVillagesMLPath({ module: 'compute', subtab: 'subset' })
             },
 
         ]
@@ -336,7 +337,7 @@ export const VILLAGESML_MODULES = [
     //   id: 'system',
     //   label: '信息',
     //   icon: 'ℹ️',
-    //   path: '/villagesML?module=system',
+    //   path: buildVillagesMLPath({ module: 'system' }),
     //   weight: 0.8,
     //   mobileWeight: 1,
     //   weightIconOnly: 0.5,

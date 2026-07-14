@@ -127,6 +127,7 @@ import { getVillagesOverview, getVillagesNgrams, getCachedVillagesNgrams } from 
 import { showError } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
+import { buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
 
 const router = useRouter()
 const searchKeyword = ref('')
@@ -194,7 +195,7 @@ const features = [
     icon: '🔍',
     title: '村名搜尋',
     description: '按關鍵詞、區域搜尋村名，查看詳細信息與深度分析報告',
-    route: '/villagesML?module=search',
+    route: buildVillagesMLPath({ module: 'search' }),
     badge: '公開',
     badgeClass: 'badge-public',
     tooltip: '支持關鍵詞模糊匹配和三級行政區（市→縣→鎮）聯動篩選。點擊村莊可查看深度分析報告，包含語義結構、N-gram分解、空間特徵等多維度信息'
@@ -204,7 +205,7 @@ const features = [
     icon: '🔤',
     title: '字頻分析',
     description: '分析村名中字符的使用頻率、區域傾向性、語義嵌入向量與統計顯著性',
-    route: '/villagesML?module=character&subtab=frequency',
+    route: buildVillagesMLPath({ module: 'character', subtab: 'frequency' }),
     badge: '公開',
     badgeClass: 'badge-public',
     tooltip: '基於283,070條村名的字符統計分析。包含：①頻率傾向（Z-score/Lift/Log-odds三種指標衡量地區偏好）②嵌入相似（Word2Vec Skipgram模型，100維向量，餘弦相似度）③字符網絡（Louvain社群識別算法）④顯著性（卡方檢驗，Cramér\'s V效應量）'
@@ -214,7 +215,7 @@ const features = [
     icon: '🏷️',
     title: '語義分析',
     description: '探索村名的語義類別、標籤組合模式、語義網絡關係與語義組成結構',
-    route: '/villagesML?module=semantic&subtab=categories',
+    route: buildVillagesMLPath({ module: 'semantic', subtab: 'categories' }),
     badge: '公開',
     badgeClass: 'badge-public',
     tooltip: '基於混合詞典v4.0（LLM標注+人工校驗），9大類別+76子類別。包含：①VTF（Virtual Term Frequency，置信度加權）②Bigram/Trigram組合模式（PMI互信息量化關聯強度）③語義網絡（NetworkX圖分析）④語義指數（Shannon熵、多樣性指標）'
@@ -224,7 +225,7 @@ const features = [
     icon: '🗺️',
     title: '空間分析',
     description: '可視化村名的地理分佈、識別空間熱點聚類、分析空間整合模式',
-    route: '/villagesML?module=spatial&subtab=hotspots',
+    route: buildVillagesMLPath({ module: 'spatial', subtab: 'hotspots' }),
     badge: '公開',
     badgeClass: 'badge-public',
     tooltip: '使用DBSCAN密度聚類算法（eps半徑+min_samples最小樣本數）識別地理熱點。支持空間自相關分析、聚類質心計算、MapLibre GPU加速渲染。可調整eps參數（0.5-20km）探索不同尺度的空間模式'
@@ -234,7 +235,7 @@ const features = [
     icon: '📐',
     title: '模式分析',
     description: '提取N-gram模式、分析結構規律、發現村名命名的語言學特徵',
-    route: '/villagesML?module=pattern&subtab=frequency',
+    route: buildVillagesMLPath({ module: 'pattern', subtab: 'frequency' }),
     badge: '公開',
     badgeClass: 'badge-public',
     tooltip: '提取2-4gram字符序列模式。統計指標：①PMI（Pointwise Mutual Information，log₂[P(A,B)/(P(A)·P(B))]）②卡方顯著性檢驗③Lift傾向性（區域頻率/全局頻率比值）。支持通配符搜索（*表示任意字符，X表示單個字符）'
@@ -244,7 +245,7 @@ const features = [
     icon: '🌍',
     title: '區域分析',
     description: '計算區域聚合統計、生成區域特徵向量、進行跨區域比較分析',
-    route: '/villagesML?module=regional&subtab=aggregates',
+    route: buildVillagesMLPath({ module: 'regional', subtab: 'aggregates' }),
     badge: '公開',
     badgeClass: 'badge-public',
     tooltip: '按市/縣/鎮三級聚合統計。生成TF-IDF特徵向量（TF=區域頻率，IDF=log(總區域數/含該特徵的區域數)）。計算區域間餘弦相似度/Jaccard相似度，識別地名文化圈。支持Z-score傾向性熱圖可視化'
@@ -254,7 +255,7 @@ const features = [
     icon: '🤖',
     title: 'ML計算',
     description: '執行機器學習聚類分析、提取高維特徵向量、進行子集深度分析',
-    route: '/villagesML?module=compute&subtab=clustering',
+    route: buildVillagesMLPath({ module: 'compute', subtab: 'clustering' }),
     badge: '需登錄',
     badgeClass: 'badge-auth',
     tooltip: '需登錄。支持三種聚類算法：①K-Means（質心聚類，需指定k值）②DBSCAN（密度聚類，自動識別噪聲點）③GMM（高斯混合模型，概率分配）。特徵工程：語義（9維）+形態（N-gram TF）+多樣性（Shannon熵）+空間（坐標+密度）。預處理：StandardScaler標準化+PCA降維（默認50維）。評估指標：Silhouette Score（輪廓係數，[-1,1]）、Davies-Bouldin Index（越低越好）、Calinski-Harabasz Score（越高越好）'
@@ -264,7 +265,7 @@ const features = [
     icon: 'ℹ️',
     title: '系統信息',
     description: '查看數據庫概覽、表統計信息、系統運行狀態與緩存管理',
-    route: '/villagesML?module=system',
+    route: buildVillagesMLPath({ module: 'system' }),
     badge: '公開',
     badgeClass: 'badge-public'
   }
@@ -278,7 +279,7 @@ const formatNumber = (num) => {
 
 const handleQuickSearch = () => {
   if (!searchKeyword.value.trim()) return
-  window.location.href = `/villagesML?module=search&keyword=${encodeURIComponent(searchKeyword.value)}`
+  window.location.href = buildVillagesMLPath({ module: 'search', query: { keyword: searchKeyword.value } })
 }
 
 const navigateTo = (route) => {

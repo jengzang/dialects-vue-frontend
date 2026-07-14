@@ -1,10 +1,11 @@
 import { getMetadataOverview, getMetadataTables, getNgramStatistics } from '@/api'
 import { getRegionList } from '@/api/villagesML/villages.js'
 import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
+import { buildVillagesCacheKey } from '@/VillagesML/utils/cacheKeys.js'
 
-const OVERVIEW_CACHE_KEY = 'villages-overview-cache'
-const NGRAMS_CACHE_KEY = 'villages-ngrams-cache'
-const TABLES_CACHE_KEY = 'villages-tables-cache'
+const OVERVIEW_CACHE_KEY = buildVillagesCacheKey('overview')
+const NGRAMS_CACHE_KEY = buildVillagesCacheKey('ngrams')
+const TABLES_CACHE_KEY = buildVillagesCacheKey('tables')
 
 const regionsPromises = new Map()
 
@@ -138,7 +139,7 @@ export async function getVillagesTables(options = {}) {
 
 export async function getVillagesRegions(level, parent = null, options = {}) {
   const { forceRefresh = false } = options
-  const cacheKey = `villages-regions-cache-${level}${parent ? '-' + parent : ''}`
+  const cacheKey = buildVillagesCacheKey('regions', { parts: [level, parent] })
 
   if (!forceRefresh) {
     const cached = readCache(cacheKey)
