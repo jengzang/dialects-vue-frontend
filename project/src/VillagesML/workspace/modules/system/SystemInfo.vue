@@ -264,7 +264,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getVillagesOverview, getVillagesNgrams, getVillagesTables } from '@/composables/useVillagesCache.js'
+import { getVillagesOverview, getVillagesNgrams, getVillagesTables, getCachedVillagesOverview, getCachedVillagesNgrams, getCachedVillagesTables } from '@/composables/useVillagesCache.js'
 import { showError, showSuccess } from '@/utils/message.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import AppModal from '@/components/common/AppModal.vue'
@@ -334,20 +334,23 @@ const totalPages = computed(() => {
 const selectedTableTitle = computed(() => selectedTable.value ? `表詳情: ${selectedTable.value.name}` : '')
 
 // Methods
+function mapOverview(overviewRes) {
+  return {
+    database_size: (overviewRes.database_size_mb || 0) * 1024 * 1024,
+    total_tables: overviewRes.total_tables || 0,
+    total_records: overviewRes.total_villages || 0,
+    village_count: overviewRes.total_villages || 0,
+    character_count: overviewRes.unique_characters || overviewRes.total_characters || 0,
+    region_count: (overviewRes.total_cities || 0) + (overviewRes.total_counties || 0) + (overviewRes.total_townships || 0)
+  }
+}
+
 const refreshOverview = async () => {
   await overviewQuery.load(
-    () => getVillagesOverview(),
+    () => getVillagesOverview({ forceRefresh: true }),
     {
       onSuccess: (overviewRes) => {
-        overview.value = {
-          database_size: (overviewRes.database_size_mb || 0) * 1024 * 1024,
-          total_tables: overviewRes.total_tables || 0,
-          total_records: overviewRes.total_villages || 0,
-          village_count: overviewRes.total_villages || 0,
-          character_count: overviewRes.unique_characters || overviewRes.total_characters || 0,
-          region_count: (overviewRes.total_cities || 0) + (overviewRes.total_counties || 0) + (overviewRes.total_townships || 0)
-        }
-
+        overview.value = mapOverview(overviewRes)
         showSuccess('系統信息刷新成功')
       },
       onError: (error) => {
@@ -359,7 +362,7 @@ const refreshOverview = async () => {
 
 const refreshTables = async () => {
   await tablesQuery.load(
-    () => getVillagesTables(),
+    () => getVillagesTables({ forceRefresh: true }),
     {
       onSuccess: (tablesRes) => {
         tables.value = (tablesRes || []).map(table => ({
@@ -434,7 +437,7 @@ const calculateSignificanceRate = (data) => {
 const levelLabel = (level) => ({ city: '城市', county: '區縣', township: '鄉鎮' }[level] || level)
 
 const refreshNgramStats = async () => {
-  await ngramStatsQuery.load(() => getVillagesNgrams(), {
+  await ngramStatsQuery.load(() => getVillagesNgrams({ forceRefresh: true }), {
     onSuccess: (result) => {
       ngramStats.value = result
     },
@@ -446,7 +449,27 @@ const refreshNgramStats = async () => {
 
 // Lifecycle
 onMounted(() => {
-  refreshOverview()
+  const cachedOverview = getCachedVillagesOverview()
+  if (cachedOverview) {
+    overview.value = mapOverview(cachedOverview)
+  } else {
+    refreshOverview()
+  }
+  const cachedNgrams = getCachedVillagesNgrams()
+  if (cachedNgrams) {
+    ngramStats.value = cachedNgrams
+  }
+  const cachedTables = getCachedVillagesTables()
+  if (cachedTables) {
+    tables.value = cachedTables.map(table => ({
+      name: table.table_name || 'unknown',
+      records: table.row_count || 0,
+      size: (table.size_mb || 0) * 1024 * 1024,
+      indexes: table.index_count || 0,
+      last_updated: table.last_modified || new Date().toISOString(),
+      columns: table.columns || []
+    }))
+  }
 })
 </script>
 
