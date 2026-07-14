@@ -9,53 +9,67 @@
         trigger="both"
       />
     </h3>
-    <!-- Search Input -->
-    <div class="search-input-group">
-      <input
-        v-model="localKeyword"
-        type="text"
-        class="search-input"
-        placeholder="搜尋村名..."
-        @input="handleSearchInput"
-      />
-      <button class="search-button solid-button" @click="handleSearch">
-        🔍 搜索
-      </button>
+    <div class="vml-control-surface">
+      <!-- Search Input -->
+      <div class="search-input-group vml-control-row">
+        <input
+          v-model="localKeyword"
+          type="text"
+          class="search-input"
+          placeholder="搜尋村名..."
+          @input="handleSearchInput"
+        />
+        <div class="vml-control-actions">
+          <button class="search-button solid-button" @click="handleSearch">
+            🔍 搜索
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Filters -->
-    <div class="filters-row">
-      <FilterableSelect
-        v-model="localFilters.city"
-        level="city"
-        :show-level-selector="false"
-        placeholder="全部城市"
-        @update:modelValue="handleCityChange"
-      />
+    <div class="vml-control-surface">
+      <!-- Filters -->
+      <div class="filters-row vml-control-row vml-control-row--center">
+        <div class="vml-control-field">
+          <FilterableSelect
+            v-model="localFilters.city"
+            level="city"
+            :show-level-selector="false"
+            placeholder="全部城市"
+            @update:modelValue="handleCityChange"
+          />
+        </div>
 
-      <FilterableSelect
-        v-model="localFilters.county"
-        level="county"
-        :parent="localFilters.city"
-        :show-level-selector="false"
-        :disabled="!localFilters.city"
-        placeholder="全部區縣"
-        @update:modelValue="handleCountyChange"
-      />
+        <div class="vml-control-field">
+          <FilterableSelect
+            v-model="localFilters.county"
+            level="county"
+            :parent="localFilters.city"
+            :show-level-selector="false"
+            :disabled="!localFilters.city"
+            placeholder="全部區縣"
+            @update:modelValue="handleCountyChange"
+          />
+        </div>
 
-      <FilterableSelect
-        v-model="localFilters.township"
-        level="township"
-        :parent="townshipParent"
-        :show-level-selector="false"
-        :disabled="!canSelectTownship"
-        placeholder="全部鄉鎮"
-        @update:modelValue="handleSearch"
-      />
+        <div class="vml-control-field">
+          <FilterableSelect
+            v-model="localFilters.township"
+            level="township"
+            :parent="townshipParent"
+            :show-level-selector="false"
+            :disabled="!canSelectTownship"
+            placeholder="全部鄉鎮"
+            @update:modelValue="handleSearch"
+          />
+        </div>
 
-      <button class="clear-filters-button" @click="clearFilters" v-if="hasFilters">
-        ✕ 清除篩選
-      </button>
+        <div class="vml-control-actions">
+          <button class="clear-filters-button" @click="clearFilters" v-if="hasFilters">
+            ✕ 清除篩選
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -150,13 +164,12 @@ const clearFilters = () => {
 }
 
 .search-input-group {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
+  align-items: stretch;
 }
 
 .search-input {
   flex: 1;
+  min-width: 0;
   padding: 12px 16px;
   border: 1px solid var(--glass-30);
   border-radius: var(--radius-md);
@@ -179,10 +192,7 @@ const clearFilters = () => {
 }
 
 .filters-row {
-  justify-content: center;
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
+  align-items: center;
 }
 
 .clear-filters-button {
@@ -205,16 +215,8 @@ const clearFilters = () => {
     padding: 14px;
   }
 
-  .search-input-group {
-    flex-direction: column;
-  }
-
   .search-button {
     width: 100%;
-  }
-
-  .filters-row {
-    gap: 10px;
   }
 }
 </style>
