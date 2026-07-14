@@ -337,7 +337,7 @@
               :gap="20"
               :aria-label="$t('about.settings.tutorialToggle.title')"
               class="tutorial-switch-toggle"
-              @update:modelValue="tutorialGuideEnabled = $event"
+              @update:modelValue="handleTutorialToggle"
             />
           </div>
 
@@ -564,6 +564,13 @@ const tutorialGuideEnabled = computed({
   get: () => tutorialEnabled.value,
   set: (value) => setTutorialEnabled(value)
 })
+
+function handleTutorialToggle(value) {
+  tutorialGuideEnabled.value = value
+  showSuccess(value
+    ? t('about.settings.tutorialToggle.enabledSuccess')
+    : t('about.settings.tutorialToggle.disabledSuccess'))
+}
 
 const zhongguInputModeModel = computed({
   get: () => zhongguInputMode.value,
@@ -947,6 +954,8 @@ em {
 /* 项目卡片 */
 .cards-container {
   max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;

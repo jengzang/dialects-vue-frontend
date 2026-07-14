@@ -150,7 +150,7 @@ $transition-duration: 0.5s;
   }
 
   &.active {
-    color: $white;
+    color: var(--action-primary-text);
     background: rgba(var(--color-primary-rgb), 0.7);
     box-shadow: 0 4px 20px rgba(var(--color-primary-rgb), 0.3);
     backdrop-filter: blur(14px);
