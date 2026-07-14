@@ -349,6 +349,7 @@ import {
 } from '@/api/index.js'
 import { showError } from '@/utils/message.js'
 import { getSignificanceLabel, getSignificanceLevel, getNgramPositionLabel } from '@/VillagesML/config/villagesML.js'
+import { buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -539,13 +540,7 @@ const getSignificanceBadge = (pValue) => {
 }
 
 const clearNgram = () => {
-  router.push({
-    path: '/villagesML',
-    query: {
-      module: 'pattern',
-      subtab: 'ngram-stats'
-    }
-  })
+  router.push(buildVillagesMLPath({ module: 'pattern', subtab: 'ngram-stats' }))
   ngram.value = ''
   significanceNgram.value = ''
 }

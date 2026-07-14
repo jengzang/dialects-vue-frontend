@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildVillagesMLPath,
+  buildVillagesMLRedirect,
   normalizeVillagesMLDataset,
   resolveVillagesMLDataset,
   resolveVillagesMLDatasetFromRoute,
@@ -36,6 +37,25 @@ describe('villagesML route dataset helpers', () => {
     expect(resolveVillagesMLDataset('/villagesML?module=search')).toBe('gd')
     expect(resolveVillagesMLDataset('/villagesML/gd?module=search')).toBe('gd')
     expect(resolveVillagesMLDataset('/villagesML/cn?module=search')).toBe('cn')
+  })
+
+  it('builds canonical redirects for legacy VillagesML paths', () => {
+    expect(buildVillagesMLRedirect({
+      path: '/villagesML',
+      query: { module: 'search' },
+      hash: '#panel',
+    })).toEqual({
+      path: '/villagesML/gd',
+      query: { module: 'search' },
+      hash: '#panel',
+      replace: true,
+    })
+
+    expect(buildVillagesMLRedirect({
+      path: '/villagesML/cn',
+      query: { module: 'search' },
+      hash: '',
+    })).toBeNull()
   })
 
   it('resolves the dataset from Vue route objects', () => {

@@ -115,6 +115,7 @@ import {
 import { showError, showSuccess } from '@/utils/message.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
+import { buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
 
 // Import CommonBar and SimpleSidebar
 import CommonBar from '@/components/bar/CommonBar.vue'
@@ -416,7 +417,7 @@ const handleRegionalAnalysis = async ({ level, name, hierarchy }) => {
 const handleRunClustering = async (settings) => {
   const authed = await requireAuth({
     message: '此功能需要登錄，請先登錄',
-    redirect: route.fullPath || '/villagesML?module=compute',
+    redirect: route.fullPath || buildVillagesMLPath({ module: 'compute' }),
   })
   if (!authed) {
     return
@@ -442,7 +443,7 @@ const handleRunClustering = async (settings) => {
 const handleRunSemantic = async (settings) => {
   const authed = await requireAuth({
     message: '此功能需要登錄，請先登錄',
-    redirect: route.fullPath || '/villagesML?module=compute',
+    redirect: route.fullPath || buildVillagesMLPath({ module: 'compute' }),
   })
   if (!authed) {
     return

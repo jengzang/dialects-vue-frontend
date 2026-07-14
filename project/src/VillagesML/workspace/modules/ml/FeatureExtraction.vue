@@ -393,6 +393,7 @@ import { showError, showSuccess, showWarning } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
 import { cityHasCounties } from '@/VillagesML/utils/regionPreload.js'
 import { SEMANTIC_CATEGORY_NAMES, isSemanticFeature } from '@/VillagesML/config/villagesML.js'
+import { buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
 
 // Router
 const router = useRouter()
@@ -508,7 +509,7 @@ const goToAuth = () => {
   router.push({
     path: '/auth',
     query: {
-      redirect: route.fullPath || '/villagesML?module=compute&subtab=features'
+      redirect: route.fullPath || buildVillagesMLPath({ module: 'compute', subtab: 'features' })
     }
   })
 }

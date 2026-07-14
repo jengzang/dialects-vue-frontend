@@ -1,3 +1,4 @@
+import { getCurrentVillagesMLDataset } from '@/VillagesML/utils/currentDataset.js'
 import { normalizeVillagesMLDataset } from '@/VillagesML/utils/routeDataset.js'
 
 const VILLAGES_API_BASE = '/api/villages'
@@ -7,11 +8,12 @@ function normalizeEndpoint(endpoint = '') {
   return value.startsWith('/') ? value : `/${value}`
 }
 
-export function buildVillagesMLApiPath(endpoint, { dataset = 'gd', query = {} } = {}) {
-  normalizeVillagesMLDataset(dataset)
+export function buildVillagesMLApiPath(endpoint, { dataset, query = {} } = {}) {
+  const requestDataset = normalizeVillagesMLDataset(dataset || getCurrentVillagesMLDataset())
 
   const [pathPart, existingQuery = ''] = normalizeEndpoint(endpoint).split('?')
   const queryParams = new URLSearchParams(existingQuery)
+  queryParams.set('type', requestDataset)
 
   Object.entries(query).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {

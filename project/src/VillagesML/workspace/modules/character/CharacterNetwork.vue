@@ -97,6 +97,7 @@ import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { fetchCharacterNetwork } from '@/api/index.js'
 import { showWarning } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
+import { buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -106,7 +107,7 @@ const isAuthenticated = computed(() => userStore.isAuthenticated)
 const goToAuth = () => router.push({
   path: '/auth',
   query: {
-    redirect: route.fullPath || '/villagesML?module=character&subtab=network'
+    redirect: route.fullPath || buildVillagesMLPath({ module: 'character', subtab: 'network' })
   }
 })
 

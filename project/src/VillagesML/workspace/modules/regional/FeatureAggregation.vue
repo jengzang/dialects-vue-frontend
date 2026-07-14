@@ -351,6 +351,7 @@ import { aggregateFeatures } from '@/api/index.js'
 import { showError, showWarning } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
 import { SEMANTIC_CATEGORY_NAMES, SEMANTIC_FEATURE_KEYS } from '@/VillagesML/config/villagesML.js'
+import { buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
 
 const regionLevel = ref('county')
 const currentRegion = ref('')
@@ -365,7 +366,7 @@ const router = useRouter()
 const isAuthenticated = computed(() => userStore.isAuthenticated)
 
 const goToAuth = () => {
-  router.push('/villagesML?showAuth=true')
+  router.push(buildVillagesMLPath({ query: { showAuth: 'true' } }))
 }
 
 const toggleRegion = (ri) => {
