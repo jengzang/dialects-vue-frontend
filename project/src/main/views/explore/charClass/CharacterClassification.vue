@@ -766,7 +766,7 @@ $panel-radius-portrait: 24px;.char-class-page {
 }
 
 .add-level-button {
-  color: $white;
+  color: var(--action-primary-text);
   font-weight: 700;
   white-space: nowrap;
   background: var(--color-primary);

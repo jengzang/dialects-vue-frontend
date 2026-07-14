@@ -285,10 +285,10 @@ const detailTitle = computed(() => {
 const mapPoints = computed(() =>
   rows.value
     .map((row) => {
-      const [lngText, latText] = String(row['經緯度'] || '').split(',');
-      const lng = Number(String(lngText).trim());
+      const [latText, lngText] = String(row['經緯度'] || '').split(',');
       const lat = Number(String(latText).trim());
-      if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
+      const lng = Number(String(lngText).trim());
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
       return {
         coord: [lng, lat],
         label: row['簡稱'] || '',

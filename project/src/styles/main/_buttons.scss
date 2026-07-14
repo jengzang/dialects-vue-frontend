@@ -61,6 +61,7 @@
 .main-glass-button[data-active='true'] {
   background: var(--action-active-bg);
   border-color: var(--action-active-border);
+  color: var(--text-deep);
 }
 
 .glass-button {
