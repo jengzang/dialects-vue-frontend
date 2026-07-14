@@ -345,7 +345,7 @@ const colorPalette = [
   "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
   "#911eb4", "#42d4f4", "#f032e6", "#bfe745", "#fabed4",
   "#469990", "#dcbaff", "#9a6324", "#fffac8", "#800000",
-  "var(--color-success)", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
+  "#34c759", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
 ];
 
 // --- 生命周期 ---
@@ -803,7 +803,7 @@ const drawCompareMap = () => {
 
     // 鼠标悬停效果 - 使用 box-shadow 而不是 transform 避免位置偏移
     el.addEventListener('mouseenter', () => {
-      el.style.boxShadow = '0 0 0 3px var(--glass-80), 0 4px 12px rgba(0,0,0,0.4)';
+      el.style.boxShadow = '0 0 0 3px rgba(255,255,255,0.80), 0 4px 12px rgba(0,0,0,0.4)';
       el.style.width = '18px';
       el.style.height = '18px';
       el.style.zIndex = '1000';
