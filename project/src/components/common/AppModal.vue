@@ -243,7 +243,7 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   --modal-content-padding-top: 16px;
   --modal-content-padding-inline: 18px;
   --modal-content-padding-bottom: 20px;
-  --modal-content-padding-mobile: 6px;
+  --modal-content-padding-mobile: 9px;
 
   position: fixed;
   inset: 0;
@@ -410,5 +410,9 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
     opacity: 0;
     transform: translateY(12px) scale(0.98);
   }
+}
+
+:root[data-color-theme='dark'] .app-modal {
+  --modal-background: rgba(22, 27, 34, 0.92);
 }
 </style>

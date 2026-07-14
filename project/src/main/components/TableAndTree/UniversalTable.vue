@@ -2371,9 +2371,7 @@ td {
 
 /* ==========================================
    批量替换对话框样式
-
-   原文件此处的标题注释没有闭合，因此以下规则当前不会生效。
-   为保持原有样式行为，继续将其保留在注释中。
+   ========================================== */
 
 .modal-fade-enter-active,
 .modal-fade-leave-active {
@@ -2387,38 +2385,36 @@ td {
 
 .batch-replace-modal-body {
   min-height: 0;
-}
 
-.batch-replace-modal-body .form-group {
-  margin-bottom: 20px;
-}
+  .form-group {
+    margin-bottom: 20px;
 
-.batch-replace-modal-body .form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: $text-dark;
-}
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-deep);
+    }
+  }
 
-.batch-replace-modal-body .glass-input {
-  width: 80%;
-  padding: 10px 14px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: var(--radius-md);
-  background: var(--glass-60);
-  font-size: 14px;
-  outline: none;
-  transition: all $transition-fast;
-}
+  .glass-input {
+    width: 80%;
+    padding: 10px 14px;
+    border: 1px solid var(--border-gray-medium);
+    border-radius: var(--radius-md);
+    background: var(--glass-60);
+    font-size: 14px;
+    outline: none;
+    transition: all $transition-fast;
 
-.batch-replace-modal-body .glass-input:focus {
-  border-color: $primary-blue;
-  background: var(--glass-90);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+    &:focus {
+      border-color: $primary-blue;
+      background: var(--glass-90);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+    }
+  }
 }
-
-*/
 
 /* 列选择器 */
 .column-selector {
@@ -2555,7 +2551,7 @@ td {
 .preview-section {
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 2px dashed rgba(0, 0, 0, 0.1);
+  border-top: 2px dashed var(--border-gray-medium);
 }
 
 .preview-section h4 {
@@ -2721,7 +2717,7 @@ td {
   gap: 12px;
   margin: 20px -18px -20px;
   padding: 16px 18px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid var(--border-gray-medium);
   background: var(--glass-50);
 }
 

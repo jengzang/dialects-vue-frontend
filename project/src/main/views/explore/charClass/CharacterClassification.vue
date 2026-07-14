@@ -645,7 +645,7 @@ $panel-radius-portrait: 24px;.char-class-page {
 
 .config-panel {
   @media (orientation: portrait) {
-    max-height: 55dvh;
+    max-height: 48dvh;
   }
 }
 
@@ -686,7 +686,7 @@ $panel-radius-portrait: 24px;.char-class-page {
   font-size: 25px;
 
   @media (orientation: portrait) {
-    font-size: 24px;
+    font-size: 20px;
   }
 }
 
@@ -720,6 +720,9 @@ $panel-radius-portrait: 24px;.char-class-page {
   @include flex-col;
   gap: 12px;
   margin-top: 20px;
+  @media (orientation: portrait) {
+    margin-top: 3px;
+  }
 }
 
 .preset-section {

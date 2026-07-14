@@ -6,6 +6,7 @@
     "pho": "Phonology",
     "charClass": "Characters",
     "dialectClustering": "Clustering",
+    "map": "Map",
     "words": "Words",
     "villages": "Villages",
     "tools": "Tools",
@@ -25,6 +26,12 @@
       "tab2": "Middle Chinese",
       "tab4": "Tone Category",
       "tab5": "Pronunciation"
+    },
+    "map": {
+      "view": "Main Map",
+      "divide": "Zone Coloring",
+      "custom": "Custom Data",
+      "draw": "Draw Map"
     },
     "pho": {
       "phonologyMatrix": "Phonology",
