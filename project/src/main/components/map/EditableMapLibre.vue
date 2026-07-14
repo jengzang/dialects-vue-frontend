@@ -179,21 +179,21 @@ const buildPreviewLayerDescriptors = () => {
     const featureCollection = normalizeFeatureCollection(layer?.featureCollection)
     const style = layer?.type === 'polygons'
       ? {
-          stroke: 'var(--color-error-light)',
+          stroke: '#ff3b30',
           strokeWidth: 2,
           fill: '#f97316',
           fillOpacity: 0.18,
           pointRadius: 6,
-          pointColor: 'var(--color-error-light)',
+          pointColor: '#ff3b30',
           pointStrokeColor: '#ffffff',
         }
       : {
-          stroke: 'var(--color-error-light)',
+          stroke: '#ff3b30',
           strokeWidth: 2,
           fill: '#f97316',
           fillOpacity: 0.18,
           pointRadius: 7,
-          pointColor: 'var(--color-error-light)',
+          pointColor: '#ff3b30',
           pointStrokeColor: '#ffffff',
         }
 

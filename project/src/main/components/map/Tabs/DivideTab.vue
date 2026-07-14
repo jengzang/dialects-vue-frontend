@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div class="divide-tab-container">
     <div
       class="page"
-      style="max-width: 90%;overflow: hidden;max-height: none;"
+      style="overflow: hidden;max-height: none;"
     >
       <div class="page-content-stack">
         <div
@@ -346,6 +346,17 @@ $apple-font:
 $text-strong: var(--text-deep);
 $text-main: var(--text-primary);
 $text-secondary: var(--text-secondary);
+
+/* 外层容器：防止内部 white-space: nowrap 撑开 */
+.divide-tab-container {
+  width: 100%;
+  min-width: 0;
+}
+
+.page {
+  width: min(90%, 920px);
+  min-width: 0;
+}
 
 /* 页面内字体统一，不改 page 全局布局 */
 .page-content-stack,
