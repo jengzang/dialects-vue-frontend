@@ -4,6 +4,11 @@ const PRIMARY_SELECTOR =
   '.tab-item:not(.tab-overflow-left):not(.tab-overflow-right),' +
   '.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)'
 
+const parsePx = (value) => {
+  const n = Number.parseFloat(value)
+  return Number.isFinite(n) ? n : 0
+}
+
 /**
  * 横向溢出滚动 + 磁吸 composable
  * @param {import('vue').Ref<HTMLElement|null>} navRef - 桌面端 nav
@@ -43,6 +48,42 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = 30, mobileNav
     })
   }
 
+  const getPrimaryContentWidth = (el) => {
+    if (!el) return 0
+    const w = el.clientWidth
+    if (w <= 0) return 0
+
+    const visiblePrimaryItems = Array.from(el.querySelectorAll(PRIMARY_SELECTOR))
+      .filter(item => getComputedStyle(item).display !== 'none')
+    const visiblePrimaryCount = visiblePrimaryItems.length
+    if (visiblePrimaryCount <= 1) return w
+
+    const styles = getComputedStyle(el)
+    const columnGap = parsePx(styles.columnGap)
+    const gap = columnGap || parsePx(styles.gap)
+    const primaryInlineExtras = visiblePrimaryItems.reduce((sum, item) => {
+      const itemStyles = getComputedStyle(item)
+      if (itemStyles.boxSizing === 'border-box') return sum
+      return sum +
+        parsePx(itemStyles.paddingLeft) +
+        parsePx(itemStyles.paddingRight) +
+        parsePx(itemStyles.borderLeftWidth) +
+        parsePx(itemStyles.borderRightWidth)
+    }, 0)
+
+    return Math.max(0, w - gap * (visiblePrimaryCount - 1) - primaryInlineExtras)
+  }
+
+  const updateNavContentWidth = (els) => {
+    for (const el of els) {
+      const w = getPrimaryContentWidth(el)
+      if (w > 0) {
+        navContentWidth.value = w
+        scrollToRest(el)
+      }
+    }
+  }
+
   const scrollToRestWhileSettling = (els, frames = 40) => {
     if (_settleFrame) {
       cancelAnimationFrame(_settleFrame)
@@ -50,6 +91,7 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = 30, mobileNav
     }
 
     const tick = () => {
+      updateNavContentWidth(els)
       for (const el of els) {
         scrollToRest(el)
       }
@@ -91,16 +133,12 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = 30, mobileNav
       const els = [navRef.value, mobileNavRef?.value].filter(Boolean)
       if (!els.length) return
 
+      updateNavContentWidth(els)
+
       // 用一个 ResizeObserver 同时观察桌面端和移动端 nav，
       // 只取可见 nav 的宽度（隐藏的 nav clientWidth 为 0，会被跳过）
       _observer = new ResizeObserver(() => {
-        for (const el of els) {
-          const w = el.clientWidth
-          if (w > 0) {
-            navContentWidth.value = w
-            scrollToRest(el)
-          }
-        }
+        updateNavContentWidth(els)
       })
       for (const el of els) {
         scrollToRest(el)

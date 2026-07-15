@@ -191,6 +191,268 @@ describe('composables', () => {
     }
   })
 
+  it('useScrollSnap reserves visible primary tab gaps from the primary width budget', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+    const resizeObservers = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      constructor(callback) {
+        this.callback = callback
+        resizeObservers.push(this)
+      }
+
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+      { tab: 'map' },
+      { tab: 'about' },
+      { tab: 'tools', scroll: 'right' },
+    ])
+    let scrollSnap
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs)
+        return { navRef }
+      },
+      render() {
+        return h('nav', { ref: 'navRef', style: { gap: '8px' } }, [
+          h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+          h('a', { class: 'menu-item' }, '搜索'),
+          h('a', { class: 'menu-item' }, '地图'),
+          h('a', { class: 'menu-item' }, '关于'),
+          h('a', { class: 'menu-item tab-overflow-right' }, '工具'),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      const nav = host.querySelector('nav')
+      Object.defineProperty(nav, 'clientWidth', {
+        configurable: true,
+        get: () => 300,
+      })
+      Object.defineProperty(nav, 'scrollWidth', {
+        configurable: true,
+        get: () => 360,
+      })
+      nav.getBoundingClientRect = () => ({
+        left: 0,
+        right: 300,
+        width: 300,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+      for (const primary of nav.querySelectorAll('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)')) {
+        primary.getBoundingClientRect = () => ({
+          left: 20,
+          right: 100,
+          width: 80,
+          top: 0,
+          bottom: 0,
+          height: 0,
+        })
+      }
+
+      for (const observer of resizeObservers) {
+        observer.callback()
+      }
+      await nextTick()
+
+      expect(scrollSnap.navContentWidth.value).toBe(284)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
+  it('useScrollSnap measures initial primary width and excludes content-box border', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+      { tab: 'map' },
+      { tab: 'about' },
+      { tab: 'tools', scroll: 'right' },
+    ])
+    let scrollSnap
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs)
+        return { navRef }
+      },
+      render() {
+        return h('nav', { ref: 'navRef', style: { gap: '8px' } }, [
+          h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+          h('a', { class: 'menu-item active', style: { borderLeft: '3px solid transparent', borderRight: '3px solid transparent' } }, '搜索'),
+          h('a', { class: 'menu-item' }, '地图'),
+          h('a', { class: 'menu-item' }, '关于'),
+          h('a', { class: 'menu-item tab-overflow-right' }, '工具'),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+
+      const nav = host.querySelector('nav')
+      Object.defineProperty(nav, 'clientWidth', {
+        configurable: true,
+        get: () => 300,
+      })
+      Object.defineProperty(nav, 'scrollWidth', {
+        configurable: true,
+        get: () => 360,
+      })
+      nav.getBoundingClientRect = () => ({
+        left: 0,
+        right: 300,
+        width: 300,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+
+      await nextTick()
+
+      expect(scrollSnap.navContentWidth.value).toBe(278)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
+  it('useScrollSnap keeps measuring while layout settles after an initially hidden nav becomes visible', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const flushAnimationFrames = async (count) => {
+      for (let frame = 0; frame < count; frame += 1) {
+        const callbacks = frameCallbacks.splice(0, frameCallbacks.length)
+        if (!callbacks.length) break
+        for (const callback of callbacks) {
+          callback()
+        }
+        await nextTick()
+      }
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+      { tab: 'map' },
+      { tab: 'tools', scroll: 'right' },
+    ])
+    let scrollSnap
+    let navClientWidth = 0
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs)
+        return { navRef }
+      },
+      render() {
+        return h('nav', { ref: 'navRef', style: { gap: '8px' } }, [
+          h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+          h('a', { class: 'menu-item' }, '搜索'),
+          h('a', { class: 'menu-item' }, '地图'),
+          h('a', { class: 'menu-item tab-overflow-right' }, '工具'),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+
+      const nav = host.querySelector('nav')
+      Object.defineProperty(nav, 'clientWidth', {
+        configurable: true,
+        get: () => navClientWidth,
+      })
+      Object.defineProperty(nav, 'scrollWidth', {
+        configurable: true,
+        get: () => 360,
+      })
+      nav.getBoundingClientRect = () => ({
+        left: 0,
+        right: navClientWidth,
+        width: navClientWidth,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+
+      await nextTick()
+      expect(scrollSnap.navContentWidth.value).toBe(0)
+
+      navClientWidth = 300
+      await flushAnimationFrames(5)
+
+      expect(scrollSnap.navContentWidth.value).toBe(292)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
   it('useAsyncTask tracks loading and success', async () => {
     const task = useAsyncTask()
     const resultPromise = task.run(async () => 'ok')

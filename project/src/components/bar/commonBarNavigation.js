@@ -47,11 +47,15 @@ const SCHEMA_DEFAULTS = {
 const normalizeDisplay = (schema, display = {}) => {
   const presetName = display.preset || 'standard'
   const preset = schema.display?.presets?.[presetName] || {}
+  const directDisplay = { ...display }
+  delete directDisplay.preset
+  delete directDisplay.overrides
 
   return {
     ...DISPLAY_DEFAULTS,
     ...(schema.display?.defaults || {}),
     ...preset,
+    ...directDisplay,
     ...(display.overrides || {})
   }
 }

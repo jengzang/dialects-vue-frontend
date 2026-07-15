@@ -211,17 +211,24 @@ const getFlexWeight = (tab, isActive, isMobile) => {
   }
 }
 
-const primaryTotalWeight = computed(() =>
+const getRenderedPrimaryTabs = (isMobile) =>
   orderedTabs.value
     .filter(t => !t.scroll || (t.scroll !== 'left' && t.scroll !== 'right'))
-    .reduce((s, t) => s + (t.weight || 1), 0) || 1
-)
+    .filter(t => !isMobile || !t.hideOnMobile)
+
+const getPrimaryTotalWeight = (isMobile) =>
+  getRenderedPrimaryTabs(isMobile)
+    .reduce((s, t) => s + getFlexWeight(t, isMenuTabActive(t.tab), isMobile), 0) || 1
 
 const getOverflowFlex = (t, isActive, isMobile) => {
   if (t.scroll) return '0 0 auto'
-  if (hasOverflow.value && navContentWidth.value > 0) {
+  if (hasOverflow.value) {
     const w = getFlexWeight(t, isActive, isMobile)
-    return `0 0 ${(w / primaryTotalWeight.value) * navContentWidth.value}px`
+    const totalWeight = getPrimaryTotalWeight(isMobile)
+    if (navContentWidth.value > 0) {
+      return `0 0 ${(w / totalWeight) * navContentWidth.value}px`
+    }
+    return `0 0 ${(w / totalWeight) * 100}%`
   }
   return getFlexWeight(t, isActive, isMobile) + ' 1 0'
 }
@@ -395,7 +402,13 @@ $mobile-aspect-ratio: 1;
   font-size: 1.3rem;
   cursor: pointer;
   user-select: none;
-  transition: all 0.25s ease;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    border-radius 0.25s ease,
+    box-shadow 0.25s ease,
+    height 0.25s ease;
 
   .label {
     overflow: hidden;
@@ -417,7 +430,13 @@ $mobile-aspect-ratio: 1;
     border-radius: 0 0 25px 25px;
     color: var(--color-primary-hover);
     font-weight: 1000;
-    transition: all 0.3s ease;
+    transition:
+      background 0.3s ease,
+      color 0.3s ease,
+      border-color 0.3s ease,
+      border-radius 0.3s ease,
+      box-shadow 0.3s ease,
+      height 0.3s ease;
 
     &:hover {
       margin: 0;

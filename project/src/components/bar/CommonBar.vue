@@ -307,17 +307,24 @@ const orderedTabs = computed(() => {
 
 const { hasOverflow, scrollClass, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(navRef, orderedTabs, 30, mobileNavRef)
 
-const primaryTotalWeight = computed(() =>
+const getRenderedPrimaryTabs = (isMobile) =>
   orderedTabs.value
     .filter(t => !t.scroll || (t.scroll !== 'left' && t.scroll !== 'right'))
-    .reduce((s, t) => s + (t.weight || 1), 0) || 1
-)
+    .filter(t => !isMobile || !t.hideOnMobile)
+
+const getPrimaryTotalWeight = (isMobile) =>
+  getRenderedPrimaryTabs(isMobile)
+    .reduce((s, t) => s + getFlexWeight(t, isActiveComputed(t.tab), isMobile), 0) || 1
 
 const getOverflowFlex = (t, isActive, isMobile) => {
   if (t.scroll) return '0 0 auto'
-  if (hasOverflow.value && navContentWidth.value > 0) {
+  if (hasOverflow.value) {
     const w = getFlexWeight(t, isActive, isMobile)
-    return `0 0 ${(w / primaryTotalWeight.value) * navContentWidth.value}px`
+    const totalWeight = getPrimaryTotalWeight(isMobile)
+    if (navContentWidth.value > 0) {
+      return `0 0 ${(w / totalWeight) * navContentWidth.value}px`
+    }
+    return `0 0 ${(w / totalWeight) * 100}%`
   }
   return getFlexWeight(t, isActive, isMobile) + ' 1 0'
 }
@@ -327,18 +334,18 @@ const activeSubmenu = ref(null)
 const submenuPosition = ref({ top: 0, left: 0 })
 let closeSubmenuTimer = null
 
-// Mobile detection
+// Portrait layout detection
 const isMobile = ref(false)
-let hoverMediaQuery = null
+let portraitMediaQuery = null
 
-const onHoverChange = (e) => {
-  isMobile.value = !e.matches
+const onPortraitChange = (e) => {
+  isMobile.value = e.matches
 }
 
 const checkMobile = () => {
-  isMobile.value = !window.matchMedia('(hover: hover)').matches
-  hoverMediaQuery = window.matchMedia('(hover: hover)')
-  hoverMediaQuery.addEventListener('change', onHoverChange)
+  portraitMediaQuery = window.matchMedia('(max-aspect-ratio: 1/1)')
+  isMobile.value = portraitMediaQuery.matches
+  portraitMediaQuery.addEventListener('change', onPortraitChange)
 }
 
 // Helper function to get children from submenuConfig
@@ -362,9 +369,9 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', closeSubmenu)
-  if (hoverMediaQuery) {
-    hoverMediaQuery.removeEventListener('change', onHoverChange)
-    hoverMediaQuery = null
+  if (portraitMediaQuery) {
+    portraitMediaQuery.removeEventListener('change', onPortraitChange)
+    portraitMediaQuery = null
   }
   if (closeSubmenuTimer) {
     clearTimeout(closeSubmenuTimer)
@@ -646,7 +653,13 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   user-select: none;
   // background: var(--glass-10);
   border-radius: var(--radius-md);
-  transition: all 0.25s ease;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    border-radius 0.25s ease,
+    box-shadow 0.25s ease,
+    height 0.25s ease;
 
   .label {
     overflow: hidden;
@@ -674,7 +687,13 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     box-shadow:
       0 6px 10px rgba(0, 0, 0, 0.1),
       0 1px 4px rgba(0, 0, 0, 0.08);
-    transition: all $transition-base ease;
+    transition:
+      background $transition-base ease,
+      color $transition-base ease,
+      border-color $transition-base ease,
+      border-radius $transition-base ease,
+      box-shadow $transition-base ease,
+      height $transition-base ease;
 
     &:hover {
       margin: 0;
@@ -788,7 +807,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   user-select: none;
 }
 
-@media (max-aspect-ratio: 1/1) and (hover: none) {
+@media (max-aspect-ratio: 1/1) {
   .commonbar-desktop {
     display: none;
   }
@@ -861,7 +880,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
   @include glass-blur(20px, 180%);
 
-  @media (max-aspect-ratio: 1/1) and (hover: none) {
+  @media (max-aspect-ratio: 1/1) {
     max-width: calc(100vw - 20px);
   }
 }
@@ -887,7 +906,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     transform: translateX(4px);
   }
 
-  @media (max-aspect-ratio: 1/1) and (hover: none) {
+  @media (max-aspect-ratio: 1/1) {
     padding: 10px 14px;
     font-size: 14px;
   }
