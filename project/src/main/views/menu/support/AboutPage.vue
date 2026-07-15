@@ -503,6 +503,10 @@ const colorThemeOptions = computed(() => [
     label: t('navigation.settings.colorTheme.options.blue')
   },
   {
+    value: COLOR_THEME_GREEN,
+    label: t('navigation.settings.colorTheme.options.green')
+  },
+  {
     value: COLOR_THEME_LIGHT,
     label: t('navigation.settings.colorTheme.options.light')
   },
@@ -510,10 +514,6 @@ const colorThemeOptions = computed(() => [
     value: COLOR_THEME_DARK,
     label: t('navigation.settings.colorTheme.options.dark')
   },
-  {
-    value: COLOR_THEME_GREEN,
-    label: t('navigation.settings.colorTheme.options.green')
-  }
 ])
 
 const colorThemeRadioOptions = computed(() =>
@@ -1230,6 +1230,7 @@ em {
   color: $text-primary;
   font-size: 20px;
   font-weight: 600;
+  text-align: center;
 }
 
 .section-description {
@@ -1249,6 +1250,12 @@ em {
   :deep(.liquid-radio-text) {
     line-height: 1.5;
   }
+}
+
+.color-theme-radio-group {
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
 }
 
 .interface-mode-radio-group {

@@ -661,15 +661,14 @@ $float-catalog-button-left:0;
     padding: 7px 12px;
     border: 1px solid var(--glass-40);
     border-radius: $radius-pill;
-    background:
-      linear-gradient(180deg, rgba(86, 166, 255, 0.98), rgba(42, 120, 216, 0.98));
-    color: var(--text-white);
+    background: var(--action-primary-bg);
+    color: var(--action-primary-text);
     font-size: 0.86rem;
     font-weight: 800;
     white-space: nowrap;
     cursor: pointer;
     box-shadow:
-      0 10px 20px rgba(45, 128, 224, 0.24),
+      0 10px 20px rgba(var(--color-primary-rgb), 0.24),
       inset 0 1px 0 var(--glass-40);
     transition:
       transform 0.18s ease,
@@ -678,7 +677,7 @@ $float-catalog-button-left:0;
     &:hover {
       transform: translateY(-1px);
       box-shadow:
-        0 12px 24px rgba(45, 128, 224, 0.28),
+        0 12px 24px rgba(var(--color-primary-rgb), 0.28),
         inset 0 1px 0 var(--glass-50);
     }
 
@@ -774,12 +773,12 @@ $float-catalog-button-left:0;
   }
 
   &.is-active {
-    border-color: rgba(100, 170, 240, 0.55);
-    background: rgba(220, 238, 255, 0.52);
+    border-color: rgba(var(--color-primary-rgb), 0.55);
+    background: rgba(var(--color-primary-rgb), 0.12);
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
     box-shadow:
-      0 10px 22px rgba(62, 132, 211, 0.14),
+      0 10px 22px rgba(var(--color-primary-rgb), 0.14),
       inset 0 1px 0 var(--glass-90);
   }
 
@@ -808,7 +807,7 @@ $float-catalog-button-left:0;
     align-items: center;
     padding: 2px 8px;
     border-radius: $radius-pill;
-    background: rgba(210, 232, 255, 0.82);
+    background: rgba(var(--color-primary-rgb), 0.14);
     color: var(--color-primary-hover);
     font-size: 0.7rem;
     font-weight: 800;
