@@ -79,6 +79,21 @@ describe('platform integration seams', () => {
     expect(jyutToolSource).not.toContain('createObjectURL(blob)')
   })
 
+  it('routes primary upload pickers through the platform file service', () => {
+    const mergeToolSource = readSource('src/main/views/explore/tools/MergeTool.vue')
+    const checkToolSource = readSource('src/main/views/explore/tools/CheckTool.vue')
+    const jyutToolSource = readSource('src/main/views/explore/tools/Jyut2IpaTool.vue')
+
+    expect(mergeToolSource).toContain('chooseReferenceFile')
+    expect(mergeToolSource).toContain('chooseMergeFiles')
+    expect(mergeToolSource).toContain('pickFilesOrOpenInput(refInput.value')
+    expect(mergeToolSource).toContain('pickFilesOrOpenInput(filesInput.value')
+    expect(checkToolSource).toContain('chooseCheckFile')
+    expect(checkToolSource).toContain('pickFilesOrOpenInput(fileInput.value')
+    expect(jyutToolSource).toContain('chooseJyutFile')
+    expect(jyutToolSource).toContain('pickFilesOrOpenInput(fileInput.value')
+  })
+
   it('routes editable map fullscreen through the platform fullscreen controller', () => {
     const editableMapSource = readSource('src/main/components/map/EditableMapLibre.vue')
 

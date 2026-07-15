@@ -55,7 +55,7 @@
         <div
           class="upload-zone-drop"
           :class="{ 'drag-over': isDragOver, 'uploading': isUploading }"
-          @click="!isUploading && !pendingPreviewFile && $refs.fileInput.click()"
+          @click="!isUploading && !pendingPreviewFile && chooseCheckFile()"
           @dragover.prevent="!isUploading && (isDragOver = true)"
           @dragleave.prevent="isDragOver = false"
           @drop.prevent="!isUploading && handleDrop($event)"
@@ -1300,6 +1300,17 @@ const handleFileUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
     checkImportFlow.loadPreview(file)
+  }
+}
+
+const chooseCheckFile = async () => {
+  const files = await getPlatformFileService().pickFilesOrOpenInput(fileInput.value, {
+    accept: '.xlsx,.xls,.doc,.docx,.tsv',
+    multiple: false,
+  })
+
+  if (files?.[0]) {
+    await checkImportFlow.loadPreview(files[0])
   }
 }
 

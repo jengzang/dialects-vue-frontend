@@ -10,7 +10,7 @@
         <div
           class="upload-zone"
           :class="{ 'drag-over': isDragOver }"
-          @click="!pendingPreviewFile && $refs.fileInput.click()"
+          @click="!pendingPreviewFile && chooseJyutFile()"
           @dragover.prevent="isDragOver = true"
           @dragleave.prevent="isDragOver = false"
           @drop.prevent="handleDrop"
@@ -611,6 +611,17 @@ const handleFileSelect = (event) => {
   const file = event.target.files[0]
   if (file) {
     fileImportFlow.loadPreview(file)
+  }
+}
+
+const chooseJyutFile = async () => {
+  const files = await getPlatformFileService().pickFilesOrOpenInput(fileInput.value, {
+    accept: '.xlsx,.xls',
+    multiple: false,
+  })
+
+  if (files?.[0]) {
+    await fileImportFlow.loadPreview(files[0])
   }
 }
 

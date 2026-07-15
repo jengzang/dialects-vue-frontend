@@ -30,6 +30,13 @@ export function hasNativeFileBridge(options = {}) {
   )
 }
 
+export function hasNativeFilePickerBridge(options = {}) {
+  const globals = getGlobals(options)
+  const directBridge = getDirectNativeBridge(globals)
+
+  return typeof directBridge?.pickFiles === 'function'
+}
+
 async function blobToBase64(blob, options = {}) {
   if (typeof blob?.arrayBuffer === 'function') {
     const arrayBuffer = await blob.arrayBuffer()
@@ -61,6 +68,28 @@ async function blobToBase64(blob, options = {}) {
   })
 }
 
+function base64ToBlob(base64, mimeType = 'application/octet-stream') {
+  const binary = atob(base64)
+  const bytes = new Uint8Array(binary.length)
+
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index)
+  }
+
+  return new Blob([bytes], { type: mimeType })
+}
+
+function nativePayloadToFile(payload) {
+  const fileName = payload?.fileName || payload?.name || 'import.dat'
+  const mimeType = payload?.mimeType || payload?.type || 'application/octet-stream'
+  const blob = payload?.blob || base64ToBlob(payload?.base64 || '', mimeType)
+
+  return new File([blob], fileName, {
+    type: mimeType,
+    lastModified: payload?.lastModified || Date.now(),
+  })
+}
+
 async function saveBlobWithNativeBridge(blob, fileName, options = {}) {
   const globals = getGlobals(options)
   const payload = {
@@ -83,6 +112,24 @@ async function saveBlobWithNativeBridge(blob, fileName, options = {}) {
   }
 
   return null
+}
+
+async function pickFilesWithNativeBridge(pickerOptions = {}, options = {}) {
+  const globals = getGlobals(options)
+  const directBridge = getDirectNativeBridge(globals)
+
+  if (typeof directBridge?.pickFiles !== 'function') {
+    return null
+  }
+
+  const result = await directBridge.pickFiles({
+    type: 'pickFiles',
+    accept: pickerOptions.accept || '',
+    multiple: Boolean(pickerOptions.multiple),
+  })
+  const payloads = Array.isArray(result) ? result : [result].filter(Boolean)
+
+  return payloads.map(nativePayloadToFile)
 }
 
 function saveBlobWithBrowserDownload(blob, fileName, options = {}) {
@@ -115,6 +162,28 @@ function saveBlobWithBrowserDownload(blob, fileName, options = {}) {
 
 export function getPlatformFileService(options = {}) {
   return {
+    canPickFiles() {
+      return hasNativeFilePickerBridge(options)
+    },
+    async pickFiles(pickerOptions = {}) {
+      if (hasNativeFilePickerBridge(options)) {
+        const nativeFiles = await pickFilesWithNativeBridge(pickerOptions, options)
+        if (nativeFiles) {
+          return nativeFiles
+        }
+      }
+
+      return null
+    },
+    async pickFilesOrOpenInput(inputElement, pickerOptions = {}) {
+      const nativeFiles = await this.pickFiles(pickerOptions)
+      if (nativeFiles) {
+        return nativeFiles
+      }
+
+      inputElement?.click?.()
+      return null
+    },
     async saveBlob(blob, fileName) {
       if (hasNativeFileBridge(options)) {
         const nativeResult = await saveBlobWithNativeBridge(blob, fileName, options)

@@ -39,7 +39,7 @@
           <div
             class="upload-zone"
             :class="{ 'has-file': referenceFile }"
-            @click="!referenceFile && $refs.refInput.click()"
+            @click="!referenceFile && chooseReferenceFile()"
             @dragover.prevent="dragOver1 = true"
             @dragleave.prevent="dragOver1 = false"
             @drop.prevent="handleRefDrop"
@@ -147,7 +147,7 @@
 
           <div
             class="upload-zone multiple"
-            @click="$refs.filesInput.click()"
+            @click="chooseMergeFiles()"
             @dragover.prevent="dragOver2 = true"
             @dragleave.prevent="dragOver2 = false"
             @drop.prevent="handleFilesDrop"
@@ -494,6 +494,17 @@ const handleRefDrop = (event) => {
   }
 }
 
+const chooseReferenceFile = async () => {
+  const files = await getPlatformFileService().pickFilesOrOpenInput(refInput.value, {
+    accept: '.xlsx,.xls,.csv',
+    multiple: false,
+  })
+
+  if (files?.[0]) {
+    await referenceImportFlow.loadPreview(files[0])
+  }
+}
+
 const resetMergeStats = () => {
   mergeStats.total = 0
   mergeStats.processed = 0
@@ -574,6 +585,17 @@ const handleFilesDrop = (event) => {
   dragOver2.value = false
   const files = Array.from(event.dataTransfer.files)
   addFiles(files)
+}
+
+const chooseMergeFiles = async () => {
+  const files = await getPlatformFileService().pickFilesOrOpenInput(filesInput.value, {
+    accept: '.xlsx,.xls',
+    multiple: true,
+  })
+
+  if (files?.length) {
+    await addFiles(files)
+  }
 }
 
 const addFiles = async (files) => {

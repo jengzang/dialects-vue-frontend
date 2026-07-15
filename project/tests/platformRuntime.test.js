@@ -10,6 +10,15 @@ import {
   isFeatureEnabled,
 } from '../src/platform/index.js'
 
+function readFileAsText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result || ''))
+    reader.onerror = () => reject(reader.error || new Error('Failed to read file'))
+    reader.readAsText(file)
+  })
+}
+
 describe('platform runtime detection and capabilities', () => {
   it('detects a web runtime by default', () => {
     const runtime = detectRuntimePlatform({
@@ -153,6 +162,49 @@ describe('platform runtime detection and capabilities', () => {
     })
   })
 
+  it('imports files through a native picker bridge when available', async () => {
+    const fileService = getPlatformFileService({
+      globals: {
+        DialectsNativeBridge: {
+          async pickFiles(payload) {
+            return [{
+              fileName: 'native.xlsx',
+              mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+              base64: 'aGVsbG8=',
+            }]
+          },
+        },
+      },
+    })
+
+    const files = await fileService.pickFiles({
+      accept: '.xlsx,.xls',
+      multiple: false,
+    })
+
+    expect(files).toHaveLength(1)
+    expect(files[0]).toBeInstanceOf(File)
+    expect(files[0].name).toBe('native.xlsx')
+    expect(files[0].type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    expect(await readFileAsText(files[0])).toBe('hello')
+  })
+
+  it('falls back to clicking browser file inputs when native picker is absent', async () => {
+    const calls = []
+    const fileService = getPlatformFileService({ globals: {} })
+
+    const files = await fileService.pickFilesOrOpenInput({
+      click() {
+        calls.push('click')
+      },
+    }, {
+      accept: '.xlsx',
+    })
+
+    expect(files).toBeNull()
+    expect(calls).toEqual(['click'])
+  })
+
   it('advertises native file export only when a save bridge is present', () => {
     expect(buildPlatformCapabilities({
       family: 'ios',
@@ -172,6 +224,30 @@ describe('platform runtime detection and capabilities', () => {
       container: 'native-webview',
     })).toMatchObject({
       fileExportDriver: 'native-file-bridge',
+    })
+
+    delete window.DialectsNativeBridge
+  })
+
+  it('advertises native file import only when a picker bridge is present', () => {
+    expect(buildPlatformCapabilities({
+      family: 'ios',
+      os: 'ios',
+      container: 'native-webview',
+    })).toMatchObject({
+      fileImportDriver: 'browser-file-input',
+    })
+
+    window.DialectsNativeBridge = {
+      pickFiles() {},
+    }
+
+    expect(buildPlatformCapabilities({
+      family: 'ios',
+      os: 'ios',
+      container: 'native-webview',
+    })).toMatchObject({
+      fileImportDriver: 'native-file-bridge',
     })
 
     delete window.DialectsNativeBridge

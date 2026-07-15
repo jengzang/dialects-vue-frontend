@@ -8,7 +8,11 @@ export {
   isFeatureEnabled,
 } from './capabilities.js'
 export { getPlatformStorage } from './storage.js'
-export { getPlatformFileService, hasNativeFileBridge } from './files.js'
+export {
+  getPlatformFileService,
+  hasNativeFileBridge,
+  hasNativeFilePickerBridge,
+} from './files.js'
 export {
   getPlatformFullscreenController,
   PLATFORM_FULLSCREEN_CLASS,
