@@ -4,15 +4,26 @@
     <div class="navbar-desktop">
       <div  class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div @click="toggleSidebar" class="logo-container" style="min-width: 6dvh;width: 6dvh;">
-          <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
+          <img class="logo" :src="faviconSrc" alt="Logo" />
         </div>
         <div class="title">
-          <img src="../../assets/picture/title.png" alt="Title" />
+          <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
         </div>
       </div>
-      <nav class="navbar-btn">
+      <nav 
+          ref="navRef" 
+          class="navbar-btn" 
+          :class="scrollClass" 
+      >
+      <!-- <nav 
+          ref="navRef" 
+          class="navbar-btn" 
+          :class="scrollClass" 
+          @scroll="onScroll" 
+          @scrollend="onScrollEnd"
+      > -->
         <RouterLink
-            v-for="t in tabs"
+            v-for="t in orderedTabs"
             :key="t.tab"
             :to="resolveMenuBarTarget(t)"
             custom
@@ -23,10 +34,11 @@
               class="menu-item"
               :class="[
                 { active: isMenuTabActive(t.tab) },
-                t.cssClass
+                t.cssClass,
+                { 'tab-overflow-left': t.scroll === 'left', 'tab-overflow-right': t.scroll === 'right' }
               ]"
               :style="{
-                flex: getFlexWeight(t, isMenuTabActive(t.tab), false) + ' 1 0',
+                flex: getOverflowFlex(t, isMenuTabActive(t.tab), false),
                 fontSize: t.fontSize + 'rem'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
@@ -64,10 +76,10 @@
       <div class="navbar-top">
         <div class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
           <div @click="toggleSidebar" class="logo-container" style="width: 6dvh;min-width: 6dvh" >
-            <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
+            <img class="logo" :src="faviconSrc" alt="Logo" />
           </div>
           <div class="title">
-            <img src="../../assets/picture/title.png" alt="Title" />
+            <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
           </div>
         </div>
         <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
@@ -82,9 +94,18 @@
       </div>
 
       <!-- 第二部分：导航按钮 -->
-      <div class="navbar-bottom">
+      <div ref="mobileNavRef" 
+          class="navbar-bottom" 
+          :class="scrollClass" 
+      >
+      <!-- <div ref="mobileNavRef" 
+          class="navbar-bottom" 
+          :class="scrollClass" 
+          @scroll="onScroll" 
+          @scrollend="onScrollEnd"
+      > -->
         <RouterLink
-            v-for="t in tabs"
+            v-for="t in orderedTabs"
             :key="t.tab"
             :to="resolveMenuBarTarget(t)"
             custom
@@ -96,10 +117,11 @@
               class="menu-item"
               :class="[
                 { active: isMenuTabActive(t.tab) },
-                t.cssClass
+                t.cssClass,
+                { 'tab-overflow-left': t.scroll === 'left', 'tab-overflow-right': t.scroll === 'right' }
               ]"
               :style="{
-                flex: getFlexWeight(t, isMenuTabActive(t.tab), true) + ' 1 0',
+                flex: getOverflowFlex(t, isMenuTabActive(t.tab), true),
                 fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
@@ -132,7 +154,7 @@
 
 
 <script setup>
-import { ref, computed, watch} from 'vue'
+import { ref, computed, watch } from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
@@ -148,11 +170,24 @@ import NavAvatar from '@/components/bar/NavAvatar.vue'
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useTabTooltip } from '@/components/bar/useTabTooltip.js'
+import { useScrollSnap } from '@/components/bar/useScrollSnap.js'
+import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+
+const faviconSrc = computed(() =>
+  currentColorTheme.value === COLOR_THEME_GREEN
+    ? new URL('@/assets/favicon_green.ico', import.meta.url).href
+    : new URL('@/assets/favicon.ico', import.meta.url).href
+)
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const isSidebarVisible = ref(false)
+const navRef = ref(null)
+const mobileNavRef = ref(null)
+
+// Tab label tooltip
+const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
 
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
@@ -166,6 +201,22 @@ watch(() => route.path, () => {
 // 过滤可见的 tabs（label 已在 TabsConfig 中定义）
 const allMenuTabs = useMenuBarConfig()
 const tabs = computed(() => filterVisibleMenuBarTabs(allMenuTabs.value))
+
+// Overflow scroll: sort tabs：左溢出 → 主 → 右溢出
+const orderedTabs = computed(() => {
+  const all = tabs.value
+  const left = all.filter(t => t.scroll === 'left')
+  const main = all.filter(t => !t.scroll || (t.scroll !== 'left' && t.scroll !== 'right'))
+  const right = all.filter(t => t.scroll === 'right')
+  return [...left, ...main, ...right]
+})
+
+const { hasOverflow, scrollClass, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(
+  navRef,
+  orderedTabs,
+  { desktop: 30, portrait: 18 },
+  mobileNavRef
+)
 
 const getFlexWeight = (tab, isActive, isMobile) => {
   let labelVisible
@@ -188,6 +239,28 @@ const getFlexWeight = (tab, isActive, isMobile) => {
   }
 }
 
+const getRenderedPrimaryTabs = (isMobile) =>
+  orderedTabs.value
+    .filter(t => !t.scroll || (t.scroll !== 'left' && t.scroll !== 'right'))
+    .filter(t => !isMobile || !t.hideOnMobile)
+
+const getPrimaryTotalWeight = (isMobile) =>
+  getRenderedPrimaryTabs(isMobile)
+    .reduce((s, t) => s + getFlexWeight(t, isMenuTabActive(t.tab), isMobile), 0) || 1
+
+const getOverflowFlex = (t, isActive, isMobile) => {
+  if (t.scroll) return '0 0 auto'
+  if (hasOverflow.value) {
+    const w = getFlexWeight(t, isActive, isMobile)
+    const totalWeight = getPrimaryTotalWeight(isMobile)
+    if (navContentWidth.value > 0) {
+      return `0 0 ${(w / totalWeight) * navContentWidth.value}px`
+    }
+    return `0 0 ${(w / totalWeight) * 100}%`
+  }
+  return getFlexWeight(t, isActive, isMobile) + ' 1 0'
+}
+
 const isMenuTabActive = (tabName) => {
   return getMenuBarActiveTab(tabs.value, route) === tabName
 }
@@ -198,7 +271,7 @@ const onMenuBarClick = async (tabConfig, navigate) => {
     return
   }
 
-  const targetRoute = resolveMenuBarTarget(tabConfig)
+  const targetRoute = resolveMenuBarTarget(tabConfig, route)
   if (isMenuBarRouteMatch(targetRoute, route)) return
 
   await router.replace(targetRoute)
@@ -347,8 +420,9 @@ $mobile-aspect-ratio: 1;
   height: 10dvh;
   @include flex-center;
   gap: 1px;
+  box-sizing: border-box;
 
-  background: var(--glass-10);
+  // background: var(--glass-10);
   border-radius: var(--radius-md);
   color: $primary;
   white-space: nowrap;
@@ -357,7 +431,20 @@ $mobile-aspect-ratio: 1;
   font-size: 1.3rem;
   cursor: pointer;
   user-select: none;
-  transition: all 0.25s ease;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    border-radius 0.25s ease,
+    box-shadow 0.25s ease,
+    height 0.25s ease;
+
+  .label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
 
   .label {
     overflow: hidden;
@@ -379,7 +466,13 @@ $mobile-aspect-ratio: 1;
     border-radius: 0 0 25px 25px;
     color: var(--color-primary-hover);
     font-weight: 1000;
-    transition: all 0.3s ease;
+    transition:
+      background 0.3s ease,
+      color 0.3s ease,
+      border-color 0.3s ease,
+      border-radius 0.3s ease,
+      box-shadow 0.3s ease,
+      height 0.3s ease;
 
     &:hover {
       margin: 0;
@@ -507,4 +600,33 @@ $mobile-aspect-ratio: 1;
 .tab-tooltip-fade-leave-to {
   opacity: 0;
 }
+
+.navbar-btn.has-overflow-tabs,
+.navbar-bottom.has-overflow-tabs {
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; width: 0; height: 0; }
+}
+
+.tab-overflow-left,
+.tab-overflow-right {
+  flex-shrink: 0;
+}
+
+@media (orientation: landscape) {
+  .tab-overflow-left,
+  .tab-overflow-right {
+    padding-inline: 10px;
+  }
+}
+
+@media (orientation: portrait) {
+  .tab-overflow-left,
+  .tab-overflow-right {
+    padding-inline: 14px;
+  }
+}
+
 </style>

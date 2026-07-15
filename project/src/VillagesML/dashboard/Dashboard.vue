@@ -277,10 +277,10 @@ const formatNumber = (num) => {
   return num.toLocaleString('zh-CN')
 }
 
-const handleQuickSearch = () => {
-  if (!searchKeyword.value.trim()) return
-  window.location.href = buildVillagesMLPath({ module: 'search', query: { keyword: searchKeyword.value } })
-}
+// const handleQuickSearch = () => {
+//   if (!searchKeyword.value.trim()) return
+//   window.location.href = `/villagesML?module=search&keyword=${encodeURIComponent(searchKeyword.value)}`
+// }
 
 const navigateTo = (route) => {
   router.push(route)

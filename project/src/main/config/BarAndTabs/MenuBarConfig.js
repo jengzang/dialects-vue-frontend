@@ -47,8 +47,8 @@ import { resultCache } from '@/main/store/store.js'
 // useMenuBarConfig() flattens them back into the legacy tab shape consumed by NavBar.
 //
 const DISPLAY_DEFAULTS = {
-  weight: 0.9,
-  mobileWeight: 0.9,
+  weight: 1,
+  mobileWeight: 1,
   weightIconOnly: 0.6,
   mobileWeightIconOnly: 0.5,
   fontSize: 1.4,
@@ -59,7 +59,8 @@ const DISPLAY_DEFAULTS = {
   showLabelOnlyWhenActive: false,
   mobileShowLabelOnlyWhenActive: true,
   cssClass: '',
-  visibleWhen: null
+  visibleWhen: null,
+  scroll: undefined // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
 }
 
 const DISPLAY_PRESETS = {
@@ -142,6 +143,45 @@ export function useMenuTabsConfig() {
 
   return computed(() => [
     createMenuTab({
+      tab: 'praat',
+      label: t('navigation.tabs.praat'),
+      icon: '🎙️',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/explore/tools/praat') }
+      }
+    }),
+    createMenuTab({
+      tab: 'home',
+      label: t('navigation.tabs.home'),
+      icon: '🏠',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.4 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/') }
+      }
+    }),
+    createMenuTab({
+      tab: 'about',
+      label: t('navigation.tabs.about'),
+      icon: '\uD83C\uDF10\uFE0F',
+      display: {
+        preset: 'compactDesktop',
+        overrides: {
+          weight: 0.8,
+          mobileWeight: 0.8,
+        }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
+      }
+    }),
+    createMenuTab({
       tab: 'pho',
       label: t('navigation.tabs.phonology'),
       icon: '\uD83E\uDDEC',
@@ -204,17 +244,53 @@ export function useMenuTabsConfig() {
       }
     }),
     createMenuTab({
-      tab: 'about',
-      label: t('navigation.tabs.about'),
-      icon: '\uD83C\uDF10\uFE0F',
+      tab: 'charClass',
+      label: t('navigation.tabs.charClass'),
+      icon: '📚',
       display: {
-        preset: 'compactDesktop',
-        overrides: {}
+        preset: 'standard',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
       },
       navigation: {
-        defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
+        defaultTo: { path: withRouteLocale(route, '/explore/char-class'), query: { tab: 'zhonggu' } }
       }
-    })
+    }),
+    createMenuTab({
+      tab: 'words',
+      label: t('navigation.tabs.phrases'),
+      icon: '📖',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/words') }
+      }
+    }),
+    createMenuTab({
+      tab: 'villages',
+      label: t('navigation.tabs.villages'),
+      icon: '🏘️',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/villages') }
+      }
+    }),
+    createMenuTab({
+      tab: 'tools',
+      label: t('navigation.tabs.tools'),
+      icon: '🧰',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/tools') }
+      }
+    }),
   ])
 }
 
@@ -311,10 +387,10 @@ export function getMenuBarActiveTab(tabs, route) {
   return tabs.find((tab) => isMenuBarRouteMatch(tab.to, route))?.tab || null
 }
 
-export function resolveMenuBarTarget(tabConfig) {
+export function resolveMenuBarTarget(tabConfig, currentRoute = null) {
   if (!tabConfig?.to) {
     const tabKey = tabConfig?.navigation?.tabKey || tabConfig?.tab
-    return MENU_CHILD_PATHS[tabKey]?.[0] || withRouteLocale(route, '/menu/query/zhonggu')
+    return MENU_CHILD_PATHS[tabKey]?.[0] || withRouteLocale(currentRoute, '/menu/query/zhonggu')
   }
 
   if (!tabConfig.navigation?.rememberChild) {
@@ -329,4 +405,3 @@ export function resolveMenuBarTarget(tabConfig) {
   const locale = extractLocaleFromPath(tabConfig.to?.path || '/')
   return buildLocalePath(locale, rememberedPath)
 }
-

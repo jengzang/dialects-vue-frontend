@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { nextTick, reactive } from 'vue'
+import { createApp, h, nextTick, reactive, ref } from 'vue'
 
 let route
 let pushMock
@@ -24,6 +24,7 @@ import { useStorageState } from '../src/composables/core/useStorageState.js'
 import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
 import { useAuthGuard } from '../src/composables/router/useAuthGuard.js'
 import { useRouteQueryState } from '../src/composables/router/useRouteQueryState.js'
+import { useScrollSnap } from '../src/components/bar/useScrollSnap.js'
 import { userStore } from '../src/main/store/store.js'
 import { showWarning } from '@/utils/message.js'
 
@@ -53,6 +54,960 @@ describe('composables', () => {
     userStore.isAuthenticated = false
     window.localStorage.clear()
     window.sessionStorage.clear()
+  })
+
+  it('useScrollSnap restores visible mobile nav after late content overflow appears', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+    const resizeObservers = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      constructor(callback) {
+        this.callback = callback
+        this.elements = []
+        resizeObservers.push(this)
+      }
+
+      observe(element) {
+        this.elements.push(element)
+      }
+
+      disconnect() {}
+    }
+
+    const flushAnimationFrames = async (count) => {
+      for (let frame = 0; frame < count; frame += 1) {
+        const callbacks = frameCallbacks.splice(0, frameCallbacks.length)
+        if (!callbacks.length) break
+        for (const callback of callbacks) {
+          callback()
+        }
+        await nextTick()
+      }
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'query' },
+    ])
+    let mobileNav
+
+    const defineGeometry = (element, { clientWidth, scrollWidth, rectLeft, rectRight, rectWidth }) => {
+      element.__clientWidth = clientWidth
+      element.__scrollWidth = scrollWidth
+      Object.defineProperty(element, 'clientWidth', {
+        configurable: true,
+        get: () => element.__clientWidth,
+      })
+      Object.defineProperty(element, 'scrollWidth', {
+        configurable: true,
+        get: () => element.__scrollWidth,
+      })
+      element.getBoundingClientRect = () => ({
+        left: rectLeft,
+        right: rectRight,
+        width: rectWidth,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+    }
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        const mobileNavRef = ref(null)
+        useScrollSnap(navRef, orderedTabs, 30, mobileNavRef)
+        return { navRef, mobileNavRef }
+      },
+      render() {
+        return h('div', [
+          h('nav', { ref: 'navRef', class: 'navbar-btn' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+            h('a', { class: 'menu-item' }, '查询'),
+          ]),
+          h('nav', { ref: 'mobileNavRef', class: 'navbar-bottom' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+            h('a', { class: 'menu-item' }, '查询'),
+          ]),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      const desktopNav = host.querySelector('.navbar-btn')
+      mobileNav = host.querySelector('.navbar-bottom')
+      const mobilePrimary = mobileNav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)')
+      let mobileScrollLeft = 0
+      Object.defineProperty(mobileNav, 'scrollLeft', {
+        configurable: true,
+        get: () => mobileScrollLeft,
+        set: (value) => {
+          mobileScrollLeft = Math.max(0, Math.min(value, mobileNav.scrollWidth - mobileNav.clientWidth))
+        },
+      })
+
+      defineGeometry(desktopNav, { clientWidth: 0, scrollWidth: 0, rectLeft: 0, rectRight: 0, rectWidth: 0 })
+      defineGeometry(mobileNav, { clientWidth: 410, scrollWidth: 410, rectLeft: -9, rectRight: 401, rectWidth: 410 })
+      mobilePrimary.getBoundingClientRect = () => ({
+        left: 25,
+        right: 72,
+        width: 47,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+
+      await nextTick()
+
+      for (const observer of resizeObservers) {
+        observer.callback()
+      }
+
+      await flushAnimationFrames(20)
+
+      mobileNav.__scrollWidth = 440
+
+      await flushAnimationFrames(40)
+      await nextTick()
+
+      expect(mobileNav.scrollLeft).toBe(30)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
+  it('useScrollSnap reserves visible primary tab gaps from the primary width budget', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+    const resizeObservers = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      constructor(callback) {
+        this.callback = callback
+        resizeObservers.push(this)
+      }
+
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+      { tab: 'map' },
+      { tab: 'about' },
+      { tab: 'tools', scroll: 'right' },
+    ])
+    let scrollSnap
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs)
+        return { navRef }
+      },
+      render() {
+        return h('nav', { ref: 'navRef', style: { gap: '8px' } }, [
+          h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+          h('a', { class: 'menu-item' }, '搜索'),
+          h('a', { class: 'menu-item' }, '地图'),
+          h('a', { class: 'menu-item' }, '关于'),
+          h('a', { class: 'menu-item tab-overflow-right' }, '工具'),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      const nav = host.querySelector('nav')
+      Object.defineProperty(nav, 'clientWidth', {
+        configurable: true,
+        get: () => 300,
+      })
+      Object.defineProperty(nav, 'scrollWidth', {
+        configurable: true,
+        get: () => 360,
+      })
+      nav.getBoundingClientRect = () => ({
+        left: 0,
+        right: 300,
+        width: 300,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+      for (const primary of nav.querySelectorAll('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)')) {
+        primary.getBoundingClientRect = () => ({
+          left: 20,
+          right: 100,
+          width: 80,
+          top: 0,
+          bottom: 0,
+          height: 0,
+        })
+      }
+
+      for (const observer of resizeObservers) {
+        observer.callback()
+      }
+      await nextTick()
+
+      expect(scrollSnap.navContentWidth.value).toBe(284)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
+  it('useScrollSnap measures initial primary width and excludes content-box border', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+      { tab: 'map' },
+      { tab: 'about' },
+      { tab: 'tools', scroll: 'right' },
+    ])
+    let scrollSnap
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs)
+        return { navRef }
+      },
+      render() {
+        return h('nav', { ref: 'navRef', style: { gap: '8px' } }, [
+          h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+          h('a', { class: 'menu-item active', style: { borderLeft: '3px solid transparent', borderRight: '3px solid transparent' } }, '搜索'),
+          h('a', { class: 'menu-item' }, '地图'),
+          h('a', { class: 'menu-item' }, '关于'),
+          h('a', { class: 'menu-item tab-overflow-right' }, '工具'),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+
+      const nav = host.querySelector('nav')
+      Object.defineProperty(nav, 'clientWidth', {
+        configurable: true,
+        get: () => 300,
+      })
+      Object.defineProperty(nav, 'scrollWidth', {
+        configurable: true,
+        get: () => 360,
+      })
+      nav.getBoundingClientRect = () => ({
+        left: 0,
+        right: 300,
+        width: 300,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+
+      await nextTick()
+
+      expect(scrollSnap.navContentWidth.value).toBe(278)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
+  it('useScrollSnap keeps measuring while layout settles after an initially hidden nav becomes visible', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const flushAnimationFrames = async (count) => {
+      for (let frame = 0; frame < count; frame += 1) {
+        const callbacks = frameCallbacks.splice(0, frameCallbacks.length)
+        if (!callbacks.length) break
+        for (const callback of callbacks) {
+          callback()
+        }
+        await nextTick()
+      }
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+      { tab: 'map' },
+      { tab: 'tools', scroll: 'right' },
+    ])
+    let scrollSnap
+    let navClientWidth = 0
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs)
+        return { navRef }
+      },
+      render() {
+        return h('nav', { ref: 'navRef', style: { gap: '8px' } }, [
+          h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+          h('a', { class: 'menu-item' }, '搜索'),
+          h('a', { class: 'menu-item' }, '地图'),
+          h('a', { class: 'menu-item tab-overflow-right' }, '工具'),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+
+      const nav = host.querySelector('nav')
+      Object.defineProperty(nav, 'clientWidth', {
+        configurable: true,
+        get: () => navClientWidth,
+      })
+      Object.defineProperty(nav, 'scrollWidth', {
+        configurable: true,
+        get: () => 360,
+      })
+      nav.getBoundingClientRect = () => ({
+        left: 0,
+        right: navClientWidth,
+        width: navClientWidth,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+
+      await nextTick()
+      expect(scrollSnap.navContentWidth.value).toBe(0)
+
+      navClientWidth = 300
+      await flushAnimationFrames(5)
+
+      expect(scrollSnap.navContentWidth.value).toBe(292)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
+  it('useScrollSnap uses separate desktop and portrait snap thresholds', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+    ])
+    let scrollSnap
+    let desktopNav
+    let portraitNav
+
+    const defineNav = (nav, primary, scrollState) => {
+      Object.defineProperty(nav, 'clientWidth', {
+        configurable: true,
+        get: () => 300,
+      })
+      Object.defineProperty(nav, 'scrollWidth', {
+        configurable: true,
+        get: () => 360,
+      })
+      Object.defineProperty(nav, 'scrollLeft', {
+        configurable: true,
+        get: () => scrollState.value,
+        set: (value) => {
+          scrollState.value = value
+        },
+      })
+      nav.getBoundingClientRect = () => ({
+        left: 0,
+        right: 300,
+        width: 300,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+      nav.scrollTo = ({ left }) => {
+        scrollState.value = left
+      }
+      primary.getBoundingClientRect = () => ({
+        left: 30 - scrollState.value,
+        right: 100 - scrollState.value,
+        width: 70,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+    }
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        const mobileNavRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs, { desktop: 30, portrait: 18 }, mobileNavRef)
+        return { navRef, mobileNavRef }
+      },
+      render() {
+        return h('div', [
+          h('nav', { ref: 'navRef', class: 'desktop-nav' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+            h('a', { class: 'menu-item' }, '搜索'),
+          ]),
+          h('nav', { ref: 'mobileNavRef', class: 'portrait-nav' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+            h('a', { class: 'menu-item' }, '搜索'),
+          ]),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      desktopNav = host.querySelector('.desktop-nav')
+      portraitNav = host.querySelector('.portrait-nav')
+      const desktopScroll = { value: 6 }
+      const portraitScroll = { value: 6 }
+
+      defineNav(desktopNav, desktopNav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)'), desktopScroll)
+      defineNav(portraitNav, portraitNav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)'), portraitScroll)
+
+      desktopScroll.value = 0
+      portraitScroll.value = 0
+      scrollSnap.onScroll({ target: desktopNav })
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: desktopNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      desktopScroll.value = 6
+      portraitScroll.value = 6
+      scrollSnap.onScroll({ target: desktopNav })
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: desktopNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      expect(desktopScroll.value).toBe(30)
+      expect(portraitScroll.value).toBe(6)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
+  it('useScrollSnap keeps one-sided desktop scroll when moving away from rest', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+    ])
+    let scrollSnap
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs, { desktop: 30, portrait: 18 })
+        return { navRef }
+      },
+      render() {
+        return h('nav', { ref: 'navRef', class: 'desktop-nav' }, [
+          h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+          h('a', { class: 'menu-item' }, '搜索'),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      const nav = host.querySelector('.desktop-nav')
+      const primary = nav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)')
+      const scrollState = { value: 100 }
+
+      Object.defineProperty(nav, 'clientWidth', {
+        configurable: true,
+        get: () => 300,
+      })
+      Object.defineProperty(nav, 'scrollWidth', {
+        configurable: true,
+        get: () => 500,
+      })
+      Object.defineProperty(nav, 'scrollLeft', {
+        configurable: true,
+        get: () => scrollState.value,
+        set: (value) => {
+          scrollState.value = value
+        },
+      })
+      nav.getBoundingClientRect = () => ({
+        left: 0,
+        right: 300,
+        width: 300,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+      nav.scrollTo = ({ left }) => {
+        scrollState.value = left
+      }
+      primary.getBoundingClientRect = () => ({
+        left: 100 - scrollState.value,
+        right: 170 - scrollState.value,
+        width: 70,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+
+      scrollSnap.onScrollEnd({ target: nav })
+      expect(scrollState.value).toBe(100)
+
+      scrollState.value = 80
+      scrollSnap.onScroll({ target: nav })
+      scrollSnap.onScrollEnd({ target: nav })
+
+      expect(scrollState.value).toBe(80)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
+  it('useScrollSnap keeps one-sided scroll when continuing away from rest inside threshold', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+    ])
+    let scrollSnap
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs, { desktop: 30, portrait: 18 })
+        return { navRef }
+      },
+      render() {
+        return h('nav', { ref: 'navRef', class: 'desktop-nav' }, [
+          h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+          h('a', { class: 'menu-item' }, '搜索'),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      const nav = host.querySelector('.desktop-nav')
+      const primary = nav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)')
+      const scrollState = { value: 90 }
+
+      Object.defineProperty(nav, 'clientWidth', {
+        configurable: true,
+        get: () => 300,
+      })
+      Object.defineProperty(nav, 'scrollWidth', {
+        configurable: true,
+        get: () => 500,
+      })
+      Object.defineProperty(nav, 'scrollLeft', {
+        configurable: true,
+        get: () => scrollState.value,
+        set: (value) => {
+          scrollState.value = value
+        },
+      })
+      nav.getBoundingClientRect = () => ({
+        left: 0,
+        right: 300,
+        width: 300,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+      nav.scrollTo = ({ left }) => {
+        scrollState.value = left
+      }
+      primary.getBoundingClientRect = () => ({
+        left: 100 - scrollState.value,
+        right: 170 - scrollState.value,
+        width: 70,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+
+      scrollSnap.onScroll({ target: nav })
+      scrollSnap.onScrollEnd({ target: nav })
+      expect(scrollState.value).toBe(90)
+
+      scrollState.value = 80
+      scrollSnap.onScroll({ target: nav })
+      scrollSnap.onScrollEnd({ target: nav })
+      expect(scrollState.value).toBe(80)
+
+      scrollState.value = 90
+      scrollSnap.onScroll({ target: nav })
+      scrollSnap.onScrollEnd({ target: nav })
+      expect(scrollState.value).toBe(100)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
+  it('useScrollSnap snaps toward rest from either side when final scrollend lands inside threshold', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+      { tab: 'tools', scroll: 'right' },
+    ])
+    let scrollSnap
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs, { desktop: 30, portrait: 18 })
+        return { navRef }
+      },
+      render() {
+        return h('nav', { ref: 'navRef', class: 'desktop-nav' }, [
+          h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+          h('a', { class: 'menu-item' }, '搜索'),
+          h('a', { class: 'menu-item tab-overflow-right' }, '工具'),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      const nav = host.querySelector('.desktop-nav')
+      const primary = nav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)')
+      const scrollState = { value: 100 }
+
+      Object.defineProperty(nav, 'clientWidth', {
+        configurable: true,
+        get: () => 300,
+      })
+      Object.defineProperty(nav, 'scrollWidth', {
+        configurable: true,
+        get: () => 500,
+      })
+      Object.defineProperty(nav, 'scrollLeft', {
+        configurable: true,
+        get: () => scrollState.value,
+        set: (value) => {
+          scrollState.value = value
+        },
+      })
+      nav.getBoundingClientRect = () => ({
+        left: 0,
+        right: 300,
+        width: 300,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+      nav.scrollTo = ({ left }) => {
+        scrollState.value = left
+      }
+      primary.getBoundingClientRect = () => ({
+        left: 100 - scrollState.value,
+        right: 170 - scrollState.value,
+        width: 70,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+
+      scrollSnap.onScrollEnd({ target: nav })
+      expect(scrollState.value).toBe(100)
+
+      scrollState.value = 60
+      scrollSnap.onScroll({ target: nav })
+      scrollState.value = 80
+      scrollSnap.onScrollEnd({ target: nav })
+      expect(scrollState.value).toBe(100)
+
+      scrollState.value = 140
+      scrollSnap.onScroll({ target: nav })
+      scrollState.value = 120
+      scrollSnap.onScrollEnd({ target: nav })
+      expect(scrollState.value).toBe(100)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
+  it('useScrollSnap snaps back to rest when scrolling across both overflow sides', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+    ])
+    let scrollSnap
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        const mobileNavRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs, {
+          desktop: 30,
+          portrait: 18,
+        }, mobileNavRef)
+        return { navRef, mobileNavRef }
+      },
+      render() {
+        return h('div', [
+          h('nav', { ref: 'navRef' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+            h('a', { class: 'menu-item' }, '搜索'),
+          ]),
+          h('nav', { ref: 'mobileNavRef', class: 'portrait-nav' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+            h('a', { class: 'menu-item' }, '搜索'),
+          ]),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      const portraitNav = host.querySelector('.portrait-nav')
+      const primary = portraitNav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)')
+      const scrollState = { value: 0 }
+
+      Object.defineProperty(portraitNav, 'clientWidth', {
+        configurable: true,
+        get: () => 300,
+      })
+      Object.defineProperty(portraitNav, 'scrollWidth', {
+        configurable: true,
+        get: () => 500,
+      })
+      Object.defineProperty(portraitNav, 'scrollLeft', {
+        configurable: true,
+        get: () => scrollState.value,
+        set: (value) => {
+          scrollState.value = value
+        },
+      })
+      portraitNav.getBoundingClientRect = () => ({
+        left: 0,
+        right: 300,
+        width: 300,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+      portraitNav.scrollTo = ({ left }) => {
+        scrollState.value = left
+      }
+      primary.getBoundingClientRect = () => ({
+        left: 100 - scrollState.value,
+        right: 170 - scrollState.value,
+        width: 70,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+
+      scrollSnap.onScrollEnd({ target: portraitNav })
+      expect(scrollState.value).toBe(0)
+
+      scrollState.value = 140
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollState.value = 60
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      expect(scrollState.value).toBe(100)
+
+      scrollState.value = 140
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      expect(scrollState.value).toBe(140)
+
+      scrollState.value = 60
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      expect(scrollState.value).toBe(100)
+
+      scrollState.value = 60
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      expect(scrollState.value).toBe(60)
+
+      scrollState.value = 140
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      expect(scrollState.value).toBe(100)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
   })
 
   it('useAsyncTask tracks loading and success', async () => {

@@ -10,24 +10,24 @@ import { buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
  * @type {Array<Object>}
  */
 export const VILLAGESML_MODULES = [
-    {
-        id: 'search',
-        label: '搜索',
-        icon: '🔍',
-        path: buildVillagesMLPath({ module: 'search' }),
-        weight: 0.8,
-        mobileWeight: 1,
-        weightIconOnly: 0.5,
-        mobileWeightIconOnly: 0.4,
-        fontSize: 1.0,
-        mobileFontSize: 0.9,
-        requireAuth: false,
-        hideOnMobile: false,
-        // hideLabelOnMobile: true,
-        showLabelOnlyWhenActive: false,
-        mobileShowLabelOnlyWhenActive: true,
-        subtabs: []
-    },
+    // {
+    //     id: 'search',
+    //     label: '搜索',
+    //     icon: '🔍',
+    //     path: '/villagesML?module=search',
+    //     weight: 0.8,
+    //     mobileWeight: 1,
+    //     weightIconOnly: 0.5,
+    //     mobileWeightIconOnly: 0.4,
+    //     fontSize: 1.0,
+    //     mobileFontSize: 0.9,
+    //     requireAuth: false,
+    //     hideOnMobile: false,
+    //     // hideLabelOnMobile: true,
+    //     showLabelOnlyWhenActive: false,
+    //     mobileShowLabelOnlyWhenActive: true,
+    //     subtabs: []
+    // },
     {
         id: 'character',
         label: '字符分析',
@@ -37,7 +37,7 @@ export const VILLAGESML_MODULES = [
         mobileWeight: 1,
         weightIconOnly: 0.5,
         mobileWeightIconOnly: 0.5,
-        fontSize: 1.0,
+        fontSize: 1.2,
         mobileFontSize: 0.9,
         requireAuth: false,
         hideOnMobile: false,
@@ -80,7 +80,7 @@ export const VILLAGESML_MODULES = [
         mobileWeight: 1,
         weightIconOnly: 0.5,
         mobileWeightIconOnly: 0.5,
-        fontSize: 1.0,
+        fontSize: 1.2,
         mobileFontSize: 0.9,
         requireAuth: false,
         hideOnMobile: false,
@@ -135,7 +135,7 @@ export const VILLAGESML_MODULES = [
         mobileWeight: 1,
         weightIconOnly: 0.5,
         mobileWeightIconOnly: 0.5,
-        fontSize: 1.0,
+        fontSize: 1.2,
         mobileFontSize: 0.9,
         requireAuth: false,
         hideOnMobile: false,
@@ -178,7 +178,7 @@ export const VILLAGESML_MODULES = [
         mobileWeight: 1,
         weightIconOnly: 0.5,
         mobileWeightIconOnly: 0.5,
-        fontSize: 1.0,
+        fontSize: 1.2,
         mobileFontSize: 0.9,
         requireAuth: false,
         hideOnMobile: false,
@@ -227,7 +227,7 @@ export const VILLAGESML_MODULES = [
         mobileWeight: 1,
         weightIconOnly: 0.5,
         mobileWeightIconOnly: 0.5,
-        fontSize: 1.0,
+        fontSize: 1.2,
         mobileFontSize: 0.9,
         requireAuth: false,
         hideOnMobile: false,
@@ -277,7 +277,7 @@ export const VILLAGESML_MODULES = [
         mobileWeight: 1,
         weightIconOnly: 0.5,
         mobileWeightIconOnly: 0.5,
-        fontSize: 1.0,
+        fontSize: 1.2,
         mobileFontSize: 0.9,
         requireAuth: false,
         hideOnMobile: false,
@@ -425,6 +425,44 @@ const createVillagesMLCommonBarItem = (module, isAuthenticated) => {
 }
 
 export function createVillagesMLCommonBarSchema(isAuthenticated = false) {
+    const homeItem = createCommonBarItem({
+        id: 'home',
+        label: '首页',
+        icon: '🏠',
+        display: {
+            overrides: { scroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
+        },
+        navigation: {
+            defaultTo: '/'
+        }
+    })
+
+    const searchItem = createCommonBarItem({
+        id: 'search',
+        label: '搜索',
+        icon: '🔍',
+         display: {
+            overrides: { scroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
+        },
+        navigation: {
+            defaultTo: '/villagesML?module=search',
+        }
+    })
+
+    const moduleItems = getVisibleModules(isAuthenticated).map(module => createVillagesMLCommonBarItem(module, isAuthenticated))
+
+    const systemItem = createCommonBarItem({
+      id: 'system',
+      label: '信息',
+      icon: 'ℹ️',
+      display: {
+            overrides: { scroll: 'right', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
+        },
+      navigation: {
+            defaultTo: '/villagesML?module=system',
+        }
+    })
+
     return createCommonBarSchema({
         meta: {
             id: 'villagesML',
@@ -440,6 +478,6 @@ export function createVillagesMLCommonBarSchema(isAuthenticated = false) {
                 tabKey: 'module'
             }
         },
-        items: getVisibleModules(isAuthenticated).map(module => createVillagesMLCommonBarItem(module, isAuthenticated))
+        items: [homeItem, searchItem, ...moduleItems, systemItem]
     })
 }
