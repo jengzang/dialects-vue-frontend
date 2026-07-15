@@ -519,7 +519,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  background: var(--glass-10);
+  // background: var(--glass-10);
   border-radius: var(--radius-md);
   transition: all 0.25s ease;
 

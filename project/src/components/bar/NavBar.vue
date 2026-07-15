@@ -348,7 +348,7 @@ $mobile-aspect-ratio: 1;
   @include flex-center;
   gap: 1px;
 
-  background: var(--glass-10);
+  // background: var(--glass-10);
   border-radius: var(--radius-md);
   color: $primary;
   white-space: nowrap;
