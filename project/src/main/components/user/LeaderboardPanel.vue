@@ -630,9 +630,9 @@ $text-primary: #1d1d1f;
 $text-secondary: #86868b;
 $danger: #ef4444;
 
-$gold: #d4af37;
+$gold: #ffd700;
 $gold-text: #b8860b;
-$silver: #a8afb4;
+$silver: #c0c0c0;
 $silver-text: #6e7e84;
 $bronze: #cd7f32;
 $bronze-text: #8b5a2b;

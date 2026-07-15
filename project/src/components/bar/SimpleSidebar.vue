@@ -462,6 +462,7 @@ $portrait-ratio: 1;
   width: 100%;
   margin-top: 10px;
   margin-bottom: 15px;
+  overflow-x: auto;
 }
 
 
@@ -471,6 +472,7 @@ $portrait-ratio: 1;
   justify-content: space-between;
   gap: 9px;
   padding: 2px 10px;
+  flex-wrap: nowrap;
 
   @include soft-glass-background;
 

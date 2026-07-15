@@ -161,8 +161,8 @@ onMounted(() => {
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
 $text-main: var(--text-primary);
-$text-secondary: rgba(0, 0, 0, 0.6);
-$text-secondary-strong: rgba(0, 0, 0, 0.7);
+$text-secondary: var(--text-secondary);
+$text-secondary-strong: var(--text-tertiary);
 $text-white: var(--text-white);
 
 $primary-background: rgba(var(--color-primary-rgb), 0.05);
@@ -272,11 +272,11 @@ $transition-button: 0.25s;
 
 .confirm-btn {
   padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+  background: var(--action-primary-bg);
   border: none;
   border-radius: $card-radius;
-  box-shadow: 0 4px 16px $primary-shadow;
-  color: $text-white;
+  box-shadow: var(--action-primary-shadow);
+  color: var(--action-primary-text);
   white-space: nowrap;
   font-size: 1rem;
   font-weight: 600;
@@ -286,7 +286,7 @@ $transition-button: 0.25s;
     transform $transition-button ease;
 
   &:hover {
-    box-shadow: 0 6px 24px $primary-shadow-hover;
+    background: var(--action-primary-bg-hover);
     transform: translateY(-2px);
   }
 

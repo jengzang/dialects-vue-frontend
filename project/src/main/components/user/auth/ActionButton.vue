@@ -91,7 +91,7 @@ $gradient-variants: (
 
   @media (max-aspect-ratio: $mobile-aspect-ratio) {
     padding: 12px 20px;
-    font-size: 18px;
+    font-size: 15px;
   }
 }
 
