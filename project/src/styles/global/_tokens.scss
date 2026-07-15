@@ -2,6 +2,7 @@
 // Migrated from _legacy.scss :root block
 
 :root {
+  color-scheme: light;
   /* 主题色 */
   --color-primary: #007aff;
   --color-primary-hover: #0051d5;
@@ -246,6 +247,7 @@
 }
 
 :root[data-color-theme='light'] {
+  color-scheme: light;
   --color-primary: #1d1d1f;
   --color-primary-hover: #050505;
   --color-primary-light: rgba(29, 29, 31, 0.08);
@@ -389,6 +391,7 @@
 }
 
 :root[data-color-theme='dark'] {
+  color-scheme: dark;
   /* ── 主色（反轉為淺色）── */
   --color-primary: #f0f6fc;
   --color-primary-hover: #ffffff;

@@ -21,6 +21,7 @@
 }
 
 :root[data-color-theme='light'] {
+  color-scheme: light;
   --vml-blue: #1d1d1f;
   --vml-blue-rgb: 29, 29, 31;
   --vml-blue-dark: #050505;
@@ -35,6 +36,7 @@
 }
 
 :root[data-color-theme='dark'] {
+  color-scheme: dark;
   --vml-blue: #f5f5f7;
   --vml-blue-rgb: 245, 245, 247;
   --vml-blue-dark: #ffffff;
