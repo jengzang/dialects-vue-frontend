@@ -970,4 +970,18 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   flex-shrink: 0;
 }
 
+@media (orientation: landscape) {
+  .tab-overflow-left,
+  .tab-overflow-right {
+    padding-inline: 10px;
+  }
+}
+
+@media (orientation: portrait) {
+  .tab-overflow-left,
+  .tab-overflow-right {
+    padding-inline: 14px;
+  }
+}
+
 </style>

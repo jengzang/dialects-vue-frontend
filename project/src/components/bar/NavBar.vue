@@ -584,4 +584,18 @@ $mobile-aspect-ratio: 1;
   flex-shrink: 0;
 }
 
+@media (orientation: landscape) {
+  .tab-overflow-left,
+  .tab-overflow-right {
+    padding-inline: 10px;
+  }
+}
+
+@media (orientation: portrait) {
+  .tab-overflow-left,
+  .tab-overflow-right {
+    padding-inline: 14px;
+  }
+}
+
 </style>

@@ -143,4 +143,17 @@ describe('bar overflow navigation config', () => {
       expect(source).not.toContain('useScrollSnap(navRef, orderedTabs, 30, mobileNavRef)')
     }
   })
+
+  it('uses px overflow tab padding per orientation', () => {
+    for (const path of [navBarPath, commonBarPath, exploreBarComponentPath]) {
+      const source = readSource(path)
+
+      expect(source).toContain('@media (orientation: landscape) {')
+      expect(source).toContain('@media (orientation: portrait) {')
+      expect(source).toContain('padding-inline: 10px;')
+      expect(source).toContain('padding-inline: 14px;')
+      expect(source).not.toContain('padding-inline: 0.6rem;')
+      expect(source).not.toContain('padding-inline: 0.85rem;')
+    }
+  })
 })
