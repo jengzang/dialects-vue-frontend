@@ -23,6 +23,7 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = 30, mobileNav
   // 容器内容宽度（用于计算主 tab 像素级 flex-basis）
   const navContentWidth = ref(0)
   let _observer = null
+  let _settleFrame = null
 
   // 第一个主 tab 在容器内容坐标系中的偏移
   const getRestPosition = (el) => {
@@ -40,6 +41,27 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = 30, mobileNav
     requestAnimationFrame(() => {
       if (el.scrollLeft !== pos) el.scrollLeft = pos
     })
+  }
+
+  const scrollToRestWhileSettling = (els, frames = 40) => {
+    if (_settleFrame) {
+      cancelAnimationFrame(_settleFrame)
+      _settleFrame = null
+    }
+
+    const tick = () => {
+      for (const el of els) {
+        scrollToRest(el)
+      }
+      frames -= 1
+      if (frames > 0) {
+        _settleFrame = requestAnimationFrame(tick)
+      } else {
+        _settleFrame = null
+      }
+    }
+
+    _settleFrame = requestAnimationFrame(tick)
   }
 
   const snapCheck = (el) => {
@@ -76,7 +98,7 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = 30, mobileNav
           const w = el.clientWidth
           if (w > 0) {
             navContentWidth.value = w
-            break
+            scrollToRest(el)
           }
         }
       })
@@ -84,6 +106,7 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = 30, mobileNav
         scrollToRest(el)
         _observer.observe(el)
       }
+      scrollToRestWhileSettling(els)
     })
   })
 
@@ -95,6 +118,10 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = 30, mobileNav
     if (_scrollTimer) {
       clearTimeout(_scrollTimer)
       _scrollTimer = null
+    }
+    if (_settleFrame) {
+      cancelAnimationFrame(_settleFrame)
+      _settleFrame = null
     }
   })
 
@@ -108,6 +135,7 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = 30, mobileNav
       if (mobileNavRef?.value) {
         scrollToRest(mobileNavRef.value)
       }
+      scrollToRestWhileSettling([navRef.value, mobileNavRef?.value].filter(Boolean))
     }
   })
 
@@ -123,6 +151,7 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = 30, mobileNav
       if (mobileNavRef?.value) {
         scrollToRest(mobileNavRef.value)
       }
+      scrollToRestWhileSettling([navRef.value, mobileNavRef?.value].filter(Boolean))
     }
   })
 

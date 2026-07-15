@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { nextTick, reactive } from 'vue'
+import { createApp, h, nextTick, reactive, ref } from 'vue'
 
 let route
 let pushMock
@@ -24,6 +24,7 @@ import { useStorageState } from '../src/composables/core/useStorageState.js'
 import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
 import { useAuthGuard } from '../src/composables/router/useAuthGuard.js'
 import { useRouteQueryState } from '../src/composables/router/useRouteQueryState.js'
+import { useScrollSnap } from '../src/components/bar/useScrollSnap.js'
 import { userStore } from '../src/main/store/store.js'
 import { showWarning } from '@/utils/message.js'
 
@@ -53,6 +54,141 @@ describe('composables', () => {
     userStore.isAuthenticated = false
     window.localStorage.clear()
     window.sessionStorage.clear()
+  })
+
+  it('useScrollSnap restores visible mobile nav after late content overflow appears', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+    const resizeObservers = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      constructor(callback) {
+        this.callback = callback
+        this.elements = []
+        resizeObservers.push(this)
+      }
+
+      observe(element) {
+        this.elements.push(element)
+      }
+
+      disconnect() {}
+    }
+
+    const flushAnimationFrames = async (count) => {
+      for (let frame = 0; frame < count; frame += 1) {
+        const callbacks = frameCallbacks.splice(0, frameCallbacks.length)
+        if (!callbacks.length) break
+        for (const callback of callbacks) {
+          callback()
+        }
+        await nextTick()
+      }
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'query' },
+    ])
+    let mobileNav
+
+    const defineGeometry = (element, { clientWidth, scrollWidth, rectLeft, rectRight, rectWidth }) => {
+      element.__clientWidth = clientWidth
+      element.__scrollWidth = scrollWidth
+      Object.defineProperty(element, 'clientWidth', {
+        configurable: true,
+        get: () => element.__clientWidth,
+      })
+      Object.defineProperty(element, 'scrollWidth', {
+        configurable: true,
+        get: () => element.__scrollWidth,
+      })
+      element.getBoundingClientRect = () => ({
+        left: rectLeft,
+        right: rectRight,
+        width: rectWidth,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+    }
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        const mobileNavRef = ref(null)
+        useScrollSnap(navRef, orderedTabs, 30, mobileNavRef)
+        return { navRef, mobileNavRef }
+      },
+      render() {
+        return h('div', [
+          h('nav', { ref: 'navRef', class: 'navbar-btn' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+            h('a', { class: 'menu-item' }, '查询'),
+          ]),
+          h('nav', { ref: 'mobileNavRef', class: 'navbar-bottom' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+            h('a', { class: 'menu-item' }, '查询'),
+          ]),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      const desktopNav = host.querySelector('.navbar-btn')
+      mobileNav = host.querySelector('.navbar-bottom')
+      const mobilePrimary = mobileNav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)')
+      let mobileScrollLeft = 0
+      Object.defineProperty(mobileNav, 'scrollLeft', {
+        configurable: true,
+        get: () => mobileScrollLeft,
+        set: (value) => {
+          mobileScrollLeft = Math.max(0, Math.min(value, mobileNav.scrollWidth - mobileNav.clientWidth))
+        },
+      })
+
+      defineGeometry(desktopNav, { clientWidth: 0, scrollWidth: 0, rectLeft: 0, rectRight: 0, rectWidth: 0 })
+      defineGeometry(mobileNav, { clientWidth: 410, scrollWidth: 410, rectLeft: -9, rectRight: 401, rectWidth: 410 })
+      mobilePrimary.getBoundingClientRect = () => ({
+        left: 25,
+        right: 72,
+        width: 47,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+
+      await nextTick()
+
+      for (const observer of resizeObservers) {
+        observer.callback()
+      }
+
+      await flushAnimationFrames(20)
+
+      mobileNav.__scrollWidth = 440
+
+      await flushAnimationFrames(40)
+      await nextTick()
+
+      expect(mobileNav.scrollLeft).toBe(30)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
   })
 
   it('useAsyncTask tracks loading and success', async () => {
