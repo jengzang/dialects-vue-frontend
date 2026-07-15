@@ -326,6 +326,7 @@ import {
   uploadJyutFile,
 } from '@/api'
 import { showConfirm, showError, showSuccess } from '@/utils/message.js'
+import { getPlatformFileService } from '@/platform/index.js'
 
 const { t } = useI18n()
 const { requireAuth } = useAuthGuard()
@@ -577,14 +578,9 @@ const saveConfig = () => {
   }
 }
 
-const exportConfig = () => {
+const exportConfig = async () => {
   const blob = new Blob([JSON.stringify(rules.value, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = JYUT2IPA_CONFIG_FILE_NAME
-  a.click()
-  URL.revokeObjectURL(url)
+  await getPlatformFileService().saveBlob(blob, JYUT2IPA_CONFIG_FILE_NAME)
 }
 
 const importConfig = () => {
@@ -768,14 +764,7 @@ const downloadResult = async () => {
 
     const blob = await downloadJyut2IpaResult(taskId.value)
 
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${JYUT2IPA_RESULT_FILE_PREFIX}${fileName.value}`
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
+    await getPlatformFileService().saveBlob(blob, `${JYUT2IPA_RESULT_FILE_PREFIX}${fileName.value}`)
   } catch (error) {
     showError(t('tools.jyut2ipa.messages.downloadFailed', { message: error.message }))
   }

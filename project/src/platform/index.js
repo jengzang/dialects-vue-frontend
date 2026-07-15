@@ -8,6 +8,11 @@ export {
   isFeatureEnabled,
 } from './capabilities.js'
 export { getPlatformStorage } from './storage.js'
+export { getPlatformFileService, hasNativeFileBridge } from './files.js'
+export {
+  getPlatformFullscreenController,
+  PLATFORM_FULLSCREEN_CLASS,
+} from './fullscreen.js'
 
 import { buildPlatformCapabilities, isFeatureEnabled } from './capabilities.js'
 import { getCurrentRuntimePlatform } from './runtime.js'

@@ -936,6 +936,7 @@ import {
   downloadCheckResult
 } from '@/api'
 import { showSuccess, showError, showWarning, showConfirm } from '@/utils/message.js'
+import { getPlatformFileService } from '@/platform/index.js'
 
 const { t } = useI18n()
 const { requireAuth } = useAuthGuard()
@@ -1995,17 +1996,10 @@ const downloadFile = async () => {
   try {
     const blob = await downloadCheckResult(taskId.value)
 
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
     const originalName = fileName.value
     const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.')) || originalName
-    // 2. 强制加上 .xlsx 后缀
-    a.download = t('tools.checkTool.export.filePrefix') + nameWithoutExt + '.xlsx'
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
+    const exportFileName = t('tools.checkTool.export.filePrefix') + nameWithoutExt + '.xlsx'
+    await getPlatformFileService().saveBlob(blob, exportFileName)
   } catch (error) {
     showError(t('tools.checkTool.messages.downloadFailed', { message: error.message }))
   }

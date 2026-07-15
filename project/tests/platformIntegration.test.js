@@ -63,6 +63,31 @@ describe('platform integration seams', () => {
     expect(storageStateSource).not.toContain('window.sessionStorage : window.localStorage')
   })
 
+  it('routes export downloads through the platform file service', () => {
+    const downloadTabularSource = readSource('src/utils/import/downloadTabularSource.js')
+    const mergeToolSource = readSource('src/main/views/explore/tools/MergeTool.vue')
+    const checkToolSource = readSource('src/main/views/explore/tools/CheckTool.vue')
+    const jyutToolSource = readSource('src/main/views/explore/tools/Jyut2IpaTool.vue')
+
+    expect(downloadTabularSource).toContain("import { getPlatformFileService } from '@/platform/index.js'")
+    expect(mergeToolSource).toContain("import { getPlatformFileService } from '@/platform/index.js'")
+    expect(checkToolSource).toContain("import { getPlatformFileService } from '@/platform/index.js'")
+    expect(jyutToolSource).toContain("import { getPlatformFileService } from '@/platform/index.js'")
+    expect(downloadTabularSource).not.toContain('createObjectURL')
+    expect(mergeToolSource).not.toContain('createObjectURL(blob)')
+    expect(checkToolSource).not.toContain('createObjectURL(blob)')
+    expect(jyutToolSource).not.toContain('createObjectURL(blob)')
+  })
+
+  it('routes editable map fullscreen through the platform fullscreen controller', () => {
+    const editableMapSource = readSource('src/main/components/map/EditableMapLibre.vue')
+
+    expect(editableMapSource).toContain("import { getPlatformFullscreenController } from '@/platform/index.js'")
+    expect(editableMapSource).toContain('fullscreenController.toggle')
+    expect(editableMapSource).toContain('is-platform-fullscreen')
+    expect(editableMapSource).not.toContain('document.fullscreenElement === mapContainer.value')
+  })
+
   it('redirects unsupported native-webview map drawing routes back to map view', () => {
     window.webkit = { messageHandlers: { dialectsNative: {} } }
 

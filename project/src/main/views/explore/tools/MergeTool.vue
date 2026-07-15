@@ -299,6 +299,7 @@ import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import defaultReferenceWorkbookUrl from '/data/参考表.xlsx?url'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { getPlatformFileService } from '@/platform/index.js'
 
 const { t } = useI18n()
 const { requireAuth } = useAuthGuard({
@@ -735,14 +736,7 @@ const downloadMerged = async () => {
 
     const blob = await downloadMerge(taskId.value)
 
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = MERGE_RESULT_FILE_NAME
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
+    await getPlatformFileService().saveBlob(blob, MERGE_RESULT_FILE_NAME)
   } catch (error) {
     showError(t('tools.merge.messages.downloadFailed', { message: error.message }))
   }

@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   buildPlatformCapabilities,
   detectRuntimePlatform,
+  getPlatformFileService,
+  getPlatformFullscreenController,
   getPlatformStorage,
   getPlatformFeature,
   isFeatureEnabled,
@@ -96,5 +98,105 @@ describe('platform runtime detection and capabilities', () => {
 
     expect(getPlatformStorage('local').getItem('platform-local-test')).toBe('ok')
     expect(getPlatformStorage('session').getItem('platform-session-test')).toBe('ok')
+  })
+
+  it('uses an injected native storage bridge when it is available', () => {
+    const calls = []
+    const storage = getPlatformStorage('local', {
+      globals: {
+        DialectsNativeStorage: {
+          getItem(key) {
+            calls.push(['get', key])
+            return key === 'native-key' ? 'native-value' : null
+          },
+          setItem(key, value) {
+            calls.push(['set', key, value])
+          },
+          removeItem(key) {
+            calls.push(['remove', key])
+          },
+        },
+      },
+    })
+
+    expect(storage.getItem('native-key')).toBe('native-value')
+    storage.setItem('native-key', 'next-value')
+    storage.removeItem('native-key')
+    expect(calls).toEqual([
+      ['get', 'native-key'],
+      ['set', 'native-key', 'next-value'],
+      ['remove', 'native-key'],
+    ])
+  })
+
+  it('exports files through a native save bridge before falling back to browser downloads', async () => {
+    const calls = []
+    const fileService = getPlatformFileService({
+      globals: {
+        DialectsNativeBridge: {
+          saveFile(payload) {
+            calls.push(payload)
+            return true
+          },
+        },
+      },
+    })
+
+    await fileService.saveBlob(new Blob(['hello'], { type: 'text/plain' }), 'hello.txt')
+
+    expect(calls).toHaveLength(1)
+    expect(calls[0]).toMatchObject({
+      type: 'saveFile',
+      fileName: 'hello.txt',
+      mimeType: 'text/plain',
+      base64: 'aGVsbG8=',
+    })
+  })
+
+  it('advertises native file export only when a save bridge is present', () => {
+    expect(buildPlatformCapabilities({
+      family: 'ios',
+      os: 'ios',
+      container: 'native-webview',
+    })).toMatchObject({
+      fileExportDriver: 'browser-download',
+    })
+
+    window.DialectsNativeBridge = {
+      saveFile() {},
+    }
+
+    expect(buildPlatformCapabilities({
+      family: 'ios',
+      os: 'ios',
+      container: 'native-webview',
+    })).toMatchObject({
+      fileExportDriver: 'native-file-bridge',
+    })
+
+    delete window.DialectsNativeBridge
+  })
+
+  it('uses CSS fullscreen state in native webviews and browser fullscreen on web', async () => {
+    const nativeElement = document.createElement('div')
+    const nativeController = getPlatformFullscreenController({
+      globals: { webkit: { messageHandlers: { dialectsNative: {} } } },
+    })
+
+    await nativeController.enter(nativeElement)
+    expect(nativeElement.classList.contains('is-platform-fullscreen')).toBe(true)
+    expect(nativeController.isFullscreen(nativeElement)).toBe(true)
+    await nativeController.exit(nativeElement)
+    expect(nativeElement.classList.contains('is-platform-fullscreen')).toBe(false)
+
+    const webCalls = []
+    const webElement = {
+      requestFullscreen() {
+        webCalls.push('request')
+      },
+    }
+    const webController = getPlatformFullscreenController({ globals: {} })
+    await webController.enter(webElement)
+    expect(webCalls).toEqual(['request'])
   })
 })

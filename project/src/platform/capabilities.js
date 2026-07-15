@@ -1,12 +1,17 @@
+import { hasNativeFileBridge } from './files.js'
+import { getNativeStorageBridge } from './storage.js'
+
 export function buildPlatformCapabilities(runtime) {
   const isWeb = runtime?.family === 'web'
   const isNativeWebView = runtime?.container === 'native-webview'
+  const hasNativeStorage = Boolean(getNativeStorageBridge('local'))
+  const hasNativeFiles = hasNativeFileBridge()
 
   return {
     runtime,
     canUseMapDraw: isWeb,
-    storageDriver: 'web-storage',
-    fileExportDriver: 'browser-download',
+    storageDriver: hasNativeStorage ? 'native-storage-bridge' : 'web-storage',
+    fileExportDriver: hasNativeFiles ? 'native-file-bridge' : 'browser-download',
     fileImportDriver: 'browser-file-input',
     fullscreenDriver: isNativeWebView ? 'css-fullscreen' : 'browser-fullscreen',
   }
