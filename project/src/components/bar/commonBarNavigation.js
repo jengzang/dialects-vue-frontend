@@ -11,7 +11,8 @@ const DISPLAY_DEFAULTS = {
   showLabelOnlyWhenActive: false,
   mobileShowLabelOnlyWhenActive: true,
   cssClass: '',
-  visibleWhen: null
+  visibleWhen: null,
+  scroll: undefined // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
 }
 
 const NAVIGATION_DEFAULTS = {

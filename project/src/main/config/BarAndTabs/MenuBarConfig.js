@@ -59,7 +59,8 @@ const DISPLAY_DEFAULTS = {
   showLabelOnlyWhenActive: false,
   mobileShowLabelOnlyWhenActive: true,
   cssClass: '',
-  visibleWhen: null
+  visibleWhen: null,
+  scroll: undefined // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
 }
 
 const DISPLAY_PRESETS = {
@@ -142,6 +143,18 @@ export function useMenuTabsConfig() {
 
   return computed(() => [
     createMenuTab({
+      tab: 'home',
+      label: t('navigation.tabs.home'),
+      icon: '🏠',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.4 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/') }
+      }
+    }),
+    createMenuTab({
       tab: 'pho',
       label: t('navigation.tabs.phonology'),
       icon: '\uD83E\uDDEC',
@@ -213,6 +226,66 @@ export function useMenuTabsConfig() {
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
+      }
+    }),
+    createMenuTab({
+      tab: 'tools',
+      label: t('navigation.tabs.tools'),
+      icon: '\uD83E\uDDF0',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/tools') }
+      }
+    }),
+    createMenuTab({
+      tab: 'praat',
+      label: t('navigation.tabs.praat'),
+      icon: '\uD83C\uDF99\uFE0F',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/explore/tools/praat') }
+      }
+    }),
+    createMenuTab({
+      tab: 'charClass',
+      label: t('navigation.tabs.charClass'),
+      icon: '\uD83D\uDCDA',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/explore/char-class'), query: { tab: 'zhonggu' } }
+      }
+    }),
+    createMenuTab({
+      tab: 'words',
+      label: t('navigation.tabs.phrases'),
+      icon: '\uD83D\uDCD6',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/words') }
+      }
+    }),
+    createMenuTab({
+      tab: 'villages',
+      label: t('navigation.tabs.villages'),
+      icon: '\uD83C\uDFD8\uFE0F',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/villages') }
       }
     })
   ])

@@ -10,9 +10,16 @@
         </div>
       </div>
 
-      <nav class="explorebar-tabs ui-scrollbar--hidden" @mouseleave="handleTabLeave">
+      <nav
+        ref="navRef"
+        class="explorebar-tabs ui-scrollbar--hidden"
+        :class="scrollClass"
+        @scroll="onScroll"
+        @scrollend="onScrollEnd"
+        @mouseleave="handleTabLeave"
+      >
         <RouterLink
-          v-for="t in tabs"
+          v-for="t in orderedTabs"
           :key="t.tab"
           :to="t.to"
           custom
@@ -21,9 +28,13 @@
           <a
             :href="href"
             class="tab-item"
-            :class="{ active: isActiveComputed(t.tab) }"
+            :class="{
+              active: isActiveComputed(t.tab),
+              'tab-overflow-left': t.scroll === 'left',
+              'tab-overflow-right': t.scroll === 'right'
+            }"
             :style="{
-              flex: getFlexWeight(t, isActiveComputed(t.tab), false) + ' 1 0',
+              flex: getOverflowFlex(t, isActiveComputed(t.tab), false),
               fontSize: t.fontSize + 'rem'
             }"
             @click.prevent.stop="onClick(t, navigate, $event)"
@@ -53,9 +64,15 @@
         <img class="logo" :src="faviconSrc" alt="Logo" />
       </div>
 
-      <nav class="explorebar-tabs ui-scrollbar--hidden">
+      <nav
+        ref="mobileNavRef"
+        class="explorebar-tabs ui-scrollbar--hidden"
+        :class="scrollClass"
+        @scroll="onScroll"
+        @scrollend="onScrollEnd"
+      >
         <RouterLink
-          v-for="t in tabs"
+          v-for="t in orderedTabs"
           :key="t.tab"
           :to="t.to"
           custom
@@ -65,9 +82,13 @@
             v-if="!t.hideOnMobile"
             :href="href"
             class="tab-item"
-            :class="{ active: isActiveComputed(t.tab) }"
+            :class="{
+              active: isActiveComputed(t.tab),
+              'tab-overflow-left': t.scroll === 'left',
+              'tab-overflow-right': t.scroll === 'right'
+            }"
             :style="{
-              flex: getFlexWeight(t, isActiveComputed(t.tab), true) + ' 1 0',
+              flex: getOverflowFlex(t, isActiveComputed(t.tab), true),
               fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
             }"
             @click.prevent.stop="onClick(t, navigate, $event)"
@@ -138,7 +159,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useI18n } from 'vue-i18n'
@@ -175,9 +196,38 @@ const tabs = computed(() => {
 
 const isSidebarVisible = ref(false)
 const activeSubmenu = ref(null)
+const navRef = ref(null)
+const mobileNavRef = ref(null)
 
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
+
+// Overflow scroll: sort tabs：左溢出 → 主 → 右溢出
+const orderedTabs = computed(() => {
+  const all = tabs.value
+  const left = all.filter(t => t.scroll === 'left')
+  const main = all.filter(t => !t.scroll || (t.scroll !== 'left' && t.scroll !== 'right'))
+  const right = all.filter(t => t.scroll === 'right')
+  return [...left, ...main, ...right]
+})
+
+const { hasOverflow, scrollClass, onScroll, onScrollEnd, scrollToRest, navContentWidth } = useScrollSnap(navRef, orderedTabs, 30, mobileNavRef)
+
+const primaryTotalWeight = computed(() =>
+  orderedTabs.value
+    .filter(t => !t.scroll || (t.scroll !== 'left' && t.scroll !== 'right'))
+    .reduce((s, t) => s + (t.weight || 1), 0) || 1
+)
+
+const getOverflowFlex = (t, isActive, isMobile) => {
+  if (t.scroll) return '0 0 auto'
+  if (hasOverflow.value && navContentWidth.value > 0) {
+    const w = getFlexWeight(t, isActive, isMobile)
+    return `0 0 ${(w / primaryTotalWeight.value) * navContentWidth.value}px`
+  }
+  return getFlexWeight(t, isActive, isMobile) + ' 1 0'
+}
+
 const submenuPosition = ref({ top: 0, left: 0 })
 let closeSubmenuTimer = null
 
@@ -265,7 +315,7 @@ watch(
   { immediate: true }
 )
 
-onMounted(() => {
+onMounted(async () => {
   checkMobile()
   document.addEventListener('click', closeSubmenu)
 })
@@ -796,4 +846,17 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .tab-tooltip-fade-leave-to {
   opacity: 0;
 }
+
+.explorebar-tabs.has-overflow-tabs {
+  justify-content: flex-start;
+  overflow-x: scroll;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; width: 0; height: 0; }
+}
+
+.tab-overflow-left,
+.tab-overflow-right {
+  flex-shrink: 0;
+}
+
 </style>

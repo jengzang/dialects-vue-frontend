@@ -424,6 +424,20 @@ const createVillagesMLCommonBarItem = (module, isAuthenticated) => {
 }
 
 export function createVillagesMLCommonBarSchema(isAuthenticated = false) {
+    const homeItem = createCommonBarItem({
+        id: 'home',
+        label: '首页',
+        icon: '🏠',
+        display: {
+            overrides: { scroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
+        },
+        navigation: {
+            defaultTo: '/'
+        }
+    })
+
+    const moduleItems = getVisibleModules(isAuthenticated).map(module => createVillagesMLCommonBarItem(module, isAuthenticated))
+
     return createCommonBarSchema({
         meta: {
             id: 'villagesML',
@@ -439,6 +453,6 @@ export function createVillagesMLCommonBarSchema(isAuthenticated = false) {
                 tabKey: 'module'
             }
         },
-        items: getVisibleModules(isAuthenticated).map(module => createVillagesMLCommonBarItem(module, isAuthenticated))
+        items: [homeItem, ...moduleItems]
     })
 }
