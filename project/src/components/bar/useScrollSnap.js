@@ -15,6 +15,13 @@ const getScrollSide = (scrollLeft, restPosition) => {
   return 'rest'
 }
 
+const getDistanceFromRest = (scrollLeft, restPosition) => Math.abs(scrollLeft - restPosition)
+
+const isMovingTowardRest = (previousScrollLeft, scrollLeft, restPosition) => {
+  if (!Number.isFinite(previousScrollLeft)) return false
+  return getDistanceFromRest(scrollLeft, restPosition) < getDistanceFromRest(previousScrollLeft, restPosition)
+}
+
 const DEFAULT_SNAP_THRESHOLD = 30
 
 const normalizeSnapThresholds = (snapThreshold) => {
@@ -140,15 +147,23 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
   const snapCheck = (el) => {
     if (!el) return
     const restPosition = getRestPosition(el)
-    const diff = Math.abs(el.scrollLeft - restPosition)
+    const diff = getDistanceFromRest(el.scrollLeft, restPosition)
     const gesture = scrollGestures.get(el)
     const crossedBothSides = gesture?.crossed || (gesture?.left && gesture?.right)
-    const returningTowardRest = gesture?.lastSettledSide && gesture.lastSettledSide !== 'rest'
-    if (diff > 0 && (crossedBothSides || (returningTowardRest && diff <= getSnapThreshold(el)))) {
+    const returningTowardRest = gesture?.lastSettledSide && gesture.lastSettledSide !== 'rest' && gesture.movingTowardRest
+    const shouldSnap = diff > 0 && (crossedBothSides || (returningTowardRest && diff <= getSnapThreshold(el)))
+    if (shouldSnap) {
       el.scrollTo({ left: restPosition, behavior: 'smooth' })
     }
-    const side = crossedBothSides ? 'rest' : getScrollSide(el.scrollLeft, restPosition)
-    scrollGestures.set(el, { left: false, right: false, crossed: false, lastSettledSide: side })
+    const side = shouldSnap ? 'rest' : getScrollSide(el.scrollLeft, restPosition)
+    scrollGestures.set(el, {
+      left: false,
+      right: false,
+      crossed: false,
+      lastSettledSide: side,
+      lastScrollLeft: side === 'rest' ? restPosition : el.scrollLeft,
+      movingTowardRest: false,
+    })
   }
 
   const onScrollEnd = (event) => {
@@ -163,7 +178,15 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
     const restPosition = getRestPosition(el)
     const side = getScrollSide(el.scrollLeft, restPosition)
     if (side !== 'rest') {
-      const gesture = scrollGestures.get(el) || { left: false, right: false, crossed: false, lastSettledSide: 'rest' }
+      const gesture = scrollGestures.get(el) || {
+        left: false,
+        right: false,
+        crossed: false,
+        lastSettledSide: 'rest',
+        lastScrollLeft: restPosition,
+        movingTowardRest: false,
+      }
+      gesture.movingTowardRest = isMovingTowardRest(gesture.lastScrollLeft, el.scrollLeft, restPosition)
       if (
         (gesture.lastSettledSide === 'left' && side === 'right') ||
         (gesture.lastSettledSide === 'right' && side === 'left')
@@ -175,6 +198,7 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
       } else {
         gesture.right = true
       }
+      gesture.lastScrollLeft = el.scrollLeft
       scrollGestures.set(el, gesture)
     }
     clearTimeout(_scrollTimer)
