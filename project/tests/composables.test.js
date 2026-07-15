@@ -507,8 +507,8 @@ describe('composables', () => {
         scrollState.value = left
       }
       primary.getBoundingClientRect = () => ({
-        left: 24,
-        right: 94,
+        left: 30 - scrollState.value,
+        right: 100 - scrollState.value,
         width: 70,
         top: 0,
         bottom: 0,
@@ -549,11 +549,119 @@ describe('composables', () => {
       defineNav(desktopNav, desktopNav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)'), desktopScroll)
       defineNav(portraitNav, portraitNav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)'), portraitScroll)
 
+      desktopScroll.value = 0
+      portraitScroll.value = 0
+      scrollSnap.onScroll({ target: desktopNav })
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: desktopNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      desktopScroll.value = 6
+      portraitScroll.value = 6
+      scrollSnap.onScroll({ target: desktopNav })
+      scrollSnap.onScroll({ target: portraitNav })
       scrollSnap.onScrollEnd({ target: desktopNav })
       scrollSnap.onScrollEnd({ target: portraitNav })
 
       expect(desktopScroll.value).toBe(30)
       expect(portraitScroll.value).toBe(6)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
+  it('useScrollSnap keeps one-sided desktop scroll when moving away from rest', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+    ])
+    let scrollSnap
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs, { desktop: 30, portrait: 18 })
+        return { navRef }
+      },
+      render() {
+        return h('nav', { ref: 'navRef', class: 'desktop-nav' }, [
+          h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+          h('a', { class: 'menu-item' }, '搜索'),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      const nav = host.querySelector('.desktop-nav')
+      const primary = nav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)')
+      const scrollState = { value: 100 }
+
+      Object.defineProperty(nav, 'clientWidth', {
+        configurable: true,
+        get: () => 300,
+      })
+      Object.defineProperty(nav, 'scrollWidth', {
+        configurable: true,
+        get: () => 500,
+      })
+      Object.defineProperty(nav, 'scrollLeft', {
+        configurable: true,
+        get: () => scrollState.value,
+        set: (value) => {
+          scrollState.value = value
+        },
+      })
+      nav.getBoundingClientRect = () => ({
+        left: 0,
+        right: 300,
+        width: 300,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+      nav.scrollTo = ({ left }) => {
+        scrollState.value = left
+      }
+      primary.getBoundingClientRect = () => ({
+        left: 100 - scrollState.value,
+        right: 170 - scrollState.value,
+        width: 70,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+
+      scrollSnap.onScrollEnd({ target: nav })
+      expect(scrollState.value).toBe(100)
+
+      scrollState.value = 80
+      scrollSnap.onScroll({ target: nav })
+      scrollSnap.onScrollEnd({ target: nav })
+
+      expect(scrollState.value).toBe(80)
     } finally {
       app.unmount()
       host.remove()
