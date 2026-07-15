@@ -143,6 +143,18 @@ export function useMenuTabsConfig() {
 
   return computed(() => [
     createMenuTab({
+      tab: 'source',
+      label: t('source.title'),
+      icon: '🔗',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/source') }
+      }
+    }),
+    createMenuTab({
       tab: 'praat',
       label: t('navigation.tabs.praat'),
       icon: '🎙️',

@@ -217,7 +217,7 @@
           <transition name="expand">
             <div v-if="expandedCard === 'words'" class="card-body">
               <a @click.stop="navigateTo('/explore/yubao?tab=vocabulary')" class="feature-link">
-                <span class="link-icon">📚</span>
+                <span class="link-icon">📖</span>
                 <span class="link-text">{{ $t('home.features.words.yubaoVocab') }}</span>
               </a>
               <a @click.stop="navigateTo('/explore/yubao?tab=grammar')" class="feature-link">
@@ -359,7 +359,7 @@
                 <span class="link-text">{{ $t('home.features.about.setting') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/source')" class="feature-link">
-                <span class="link-icon">📚</span>
+                <span class="link-icon">🔗</span>
                 <span class="link-text">{{ $t('home.features.about.source') }}</span>
               </a>
             </div>
