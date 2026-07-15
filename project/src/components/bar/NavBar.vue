@@ -7,7 +7,7 @@
           <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
         </div>
         <div class="title">
-          <img src="../../assets/picture/title.png" alt="Title" />
+          <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
         </div>
       </div>
       <nav class="navbar-btn">
@@ -67,7 +67,7 @@
             <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
           </div>
           <div class="title">
-            <img src="../../assets/picture/title.png" alt="Title" />
+            <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
           </div>
         </div>
         <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">

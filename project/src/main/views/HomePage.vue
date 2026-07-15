@@ -6,7 +6,7 @@
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-content">
-        <img src="@/assets/picture/title.png" :alt="$t('home.hero.logoAlt')" class="hero-logo" />
+        <img src="@/assets/picture/title.png" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
         <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
         <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
         <div class="hero-actions">

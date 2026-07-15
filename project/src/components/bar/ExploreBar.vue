@@ -6,7 +6,7 @@
           <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
         </div>
         <div class="title">
-          <img src="../../assets/picture/title.png" alt="Title" />
+          <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
         </div>
       </div>
 

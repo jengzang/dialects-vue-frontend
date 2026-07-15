@@ -554,3 +554,30 @@
   --shadow-glass-hover: 0 14px 34px rgba(0, 0, 0, 0.54);
   --shadow-glass-inset: inset 0 0 0.5px rgba(240, 246, 252, 0.16), 0 10px 28px rgba(0, 0, 0, 0.48), 0 0 0 0.5px rgba(240, 246, 252, 0.06);
 }
+
+/* 深色模式下 title.png（透明黑字）反转颜色 */
+:root[data-color-theme='dark'] .title-logo {
+  filter: invert(1);
+}
+
+/* 深色模式地圖控制面板 — 地圖永遠是淺色的，毛玻璃會太透 */
+:root[data-color-theme='dark'] .map-controls,
+:root[data-color-theme='dark'] .vml-map-controls {
+  background: var(--surface-panel-strong) !important;
+  border: 1px solid var(--border-glass) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* ── 蓝色系品牌图片（logo / 装饰图）── */
+
+/* 浅色模式：加深降饱和，蓝色不过于跳脱 */
+:root[data-color-theme='light'] .logo,
+:root[data-color-theme='light'] .hero-decoration {
+  filter: brightness(0.85) saturate(0.8);
+}
+
+/* 深色模式：大幅降饱和 + 微提亮 + 背光浮现 */
+:root[data-color-theme='dark'] .logo,
+:root[data-color-theme='dark'] .hero-decoration {
+  filter: saturate(0.4) brightness(1.15) drop-shadow(0 0 8px rgba(255, 255, 255, 0.12));
+}
