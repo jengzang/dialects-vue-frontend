@@ -231,7 +231,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'tools',
       label: t('navigation.tabs.tools'),
-      icon: '\uD83E\uDDF0',
+      icon: '🧰',
       display: {
         preset: 'standard',
         overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
@@ -243,7 +243,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'praat',
       label: t('navigation.tabs.praat'),
-      icon: '\uD83C\uDF99\uFE0F',
+      icon: '🎙️',
       display: {
         preset: 'standard',
         overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
@@ -255,7 +255,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'charClass',
       label: t('navigation.tabs.charClass'),
-      icon: '\uD83D\uDCDA',
+      icon: '📚',
       display: {
         preset: 'standard',
         overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
@@ -267,7 +267,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'words',
       label: t('navigation.tabs.phrases'),
-      icon: '\uD83D\uDCD6',
+      icon: '📖',
       display: {
         preset: 'standard',
         overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
@@ -279,7 +279,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'villages',
       label: t('navigation.tabs.villages'),
-      icon: '\uD83C\uDFD8\uFE0F',
+      icon: '🏘️',
       display: {
         preset: 'standard',
         overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
@@ -384,10 +384,10 @@ export function getMenuBarActiveTab(tabs, route) {
   return tabs.find((tab) => isMenuBarRouteMatch(tab.to, route))?.tab || null
 }
 
-export function resolveMenuBarTarget(tabConfig) {
+export function resolveMenuBarTarget(tabConfig, currentRoute = null) {
   if (!tabConfig?.to) {
     const tabKey = tabConfig?.navigation?.tabKey || tabConfig?.tab
-    return MENU_CHILD_PATHS[tabKey]?.[0] || withRouteLocale(route, '/menu/query/zhonggu')
+    return MENU_CHILD_PATHS[tabKey]?.[0] || withRouteLocale(currentRoute, '/menu/query/zhonggu')
   }
 
   if (!tabConfig.navigation?.rememberChild) {
@@ -402,4 +402,3 @@ export function resolveMenuBarTarget(tabConfig) {
   const locale = extractLocaleFromPath(tabConfig.to?.path || '/')
   return buildLocalePath(locale, rememberedPath)
 }
-

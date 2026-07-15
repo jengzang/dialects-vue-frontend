@@ -134,7 +134,7 @@
 
 
 <script setup>
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { ref, computed, watch } from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
@@ -188,7 +188,7 @@ const orderedTabs = computed(() => {
   return [...left, ...main, ...right]
 })
 
-const { hasOverflow, scrollClass, onScroll, onScrollEnd, scrollToRest, navContentWidth } = useScrollSnap(navRef, orderedTabs, 30, mobileNavRef)
+const { hasOverflow, scrollClass, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(navRef, orderedTabs, 30, mobileNavRef)
 
 const getFlexWeight = (tab, isActive, isMobile) => {
   let labelVisible
@@ -236,7 +236,7 @@ const onMenuBarClick = async (tabConfig, navigate) => {
     return
   }
 
-  const targetRoute = resolveMenuBarTarget(tabConfig)
+  const targetRoute = resolveMenuBarTarget(tabConfig, route)
   if (isMenuBarRouteMatch(targetRoute, route)) return
 
   await router.replace(targetRoute)
@@ -253,8 +253,6 @@ const goToAuthPage = () => {
 const toggleSidebar = () => {
   isSidebarVisible.value = !isSidebarVisible.value
 }
-
-onMounted(() => {})
 </script>
 
 

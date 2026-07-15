@@ -175,7 +175,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, useAttrs, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, useAttrs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -305,7 +305,7 @@ const orderedTabs = computed(() => {
   return [...left, ...main, ...right]
 })
 
-const { hasOverflow, scrollClass, onScroll, onScrollEnd, scrollToRest, navContentWidth } = useScrollSnap(navRef, orderedTabs, 30, mobileNavRef)
+const { hasOverflow, scrollClass, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(navRef, orderedTabs, 30, mobileNavRef)
 
 const primaryTotalWeight = computed(() =>
   orderedTabs.value
