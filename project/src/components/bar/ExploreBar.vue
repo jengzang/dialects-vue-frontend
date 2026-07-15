@@ -14,8 +14,6 @@
         ref="navRef"
         class="explorebar-tabs ui-scrollbar--hidden"
         :class="scrollClass"
-        @scroll="onScroll"
-        @scrollend="onScrollEnd"
         @mouseleave="handleTabLeave"
       >
         <RouterLink
@@ -68,8 +66,6 @@
         ref="mobileNavRef"
         class="explorebar-tabs ui-scrollbar--hidden"
         :class="scrollClass"
-        @scroll="onScroll"
-        @scrollend="onScrollEnd"
       >
         <RouterLink
           v-for="t in orderedTabs"

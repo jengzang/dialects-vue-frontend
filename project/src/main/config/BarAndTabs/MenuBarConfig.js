@@ -47,8 +47,8 @@ import { resultCache } from '@/main/store/store.js'
 // useMenuBarConfig() flattens them back into the legacy tab shape consumed by NavBar.
 //
 const DISPLAY_DEFAULTS = {
-  weight: 0.9,
-  mobileWeight: 0.9,
+  weight: 1,
+  mobileWeight: 1,
   weightIconOnly: 0.6,
   mobileWeightIconOnly: 0.5,
   fontSize: 1.4,
@@ -143,6 +143,18 @@ export function useMenuTabsConfig() {
 
   return computed(() => [
     createMenuTab({
+      tab: 'praat',
+      label: t('navigation.tabs.praat'),
+      icon: '🎙️',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/explore/tools/praat') }
+      }
+    }),
+    createMenuTab({
       tab: 'home',
       label: t('navigation.tabs.home'),
       icon: '🏠',
@@ -152,6 +164,21 @@ export function useMenuTabsConfig() {
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/') }
+      }
+    }),
+    createMenuTab({
+      tab: 'about',
+      label: t('navigation.tabs.about'),
+      icon: '\uD83C\uDF10\uFE0F',
+      display: {
+        preset: 'compactDesktop',
+        overrides: {
+          weight: 0.8,
+          mobileWeight: 0.8,
+        }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
       }
     }),
     createMenuTab({
@@ -217,42 +244,6 @@ export function useMenuTabsConfig() {
       }
     }),
     createMenuTab({
-      tab: 'about',
-      label: t('navigation.tabs.about'),
-      icon: '\uD83C\uDF10\uFE0F',
-      display: {
-        preset: 'compactDesktop',
-        overrides: {}
-      },
-      navigation: {
-        defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
-      }
-    }),
-    createMenuTab({
-      tab: 'tools',
-      label: t('navigation.tabs.tools'),
-      icon: '🧰',
-      display: {
-        preset: 'standard',
-        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
-      },
-      navigation: {
-        defaultTo: { path: withRouteLocale(route, '/menu/tools') }
-      }
-    }),
-    createMenuTab({
-      tab: 'praat',
-      label: t('navigation.tabs.praat'),
-      icon: '🎙️',
-      display: {
-        preset: 'standard',
-        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
-      },
-      navigation: {
-        defaultTo: { path: withRouteLocale(route, '/explore/tools/praat') }
-      }
-    }),
-    createMenuTab({
       tab: 'charClass',
       label: t('navigation.tabs.charClass'),
       icon: '📚',
@@ -287,7 +278,19 @@ export function useMenuTabsConfig() {
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/menu/villages') }
       }
-    })
+    }),
+    createMenuTab({
+      tab: 'tools',
+      label: t('navigation.tabs.tools'),
+      icon: '🧰',
+      display: {
+        preset: 'standard',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/tools') }
+      }
+    }),
   ])
 }
 

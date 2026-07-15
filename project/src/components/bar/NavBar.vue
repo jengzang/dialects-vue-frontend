@@ -10,7 +10,18 @@
           <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
         </div>
       </div>
-      <nav ref="navRef" class="navbar-btn" :class="scrollClass" @scroll="onScroll" @scrollend="onScrollEnd">
+      <nav 
+          ref="navRef" 
+          class="navbar-btn" 
+          :class="scrollClass" 
+      >
+      <!-- <nav 
+          ref="navRef" 
+          class="navbar-btn" 
+          :class="scrollClass" 
+          @scroll="onScroll" 
+          @scrollend="onScrollEnd"
+      > -->
         <RouterLink
             v-for="t in orderedTabs"
             :key="t.tab"
@@ -83,7 +94,16 @@
       </div>
 
       <!-- 第二部分：导航按钮 -->
-      <div ref="mobileNavRef" class="navbar-bottom" :class="scrollClass" @scroll="onScroll" @scrollend="onScrollEnd">
+      <div ref="mobileNavRef" 
+          class="navbar-bottom" 
+          :class="scrollClass" 
+      >
+      <!-- <div ref="mobileNavRef" 
+          class="navbar-bottom" 
+          :class="scrollClass" 
+          @scroll="onScroll" 
+          @scrollend="onScrollEnd"
+      > -->
         <RouterLink
             v-for="t in orderedTabs"
             :key="t.tab"
@@ -397,6 +417,7 @@ $mobile-aspect-ratio: 1;
   height: 10dvh;
   @include flex-center;
   gap: 1px;
+  box-sizing: border-box;
 
   // background: var(--glass-10);
   border-radius: var(--radius-md);
