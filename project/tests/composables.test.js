@@ -453,6 +453,115 @@ describe('composables', () => {
     }
   })
 
+  it('useScrollSnap uses separate desktop and portrait snap thresholds', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+    ])
+    let scrollSnap
+    let desktopNav
+    let portraitNav
+
+    const defineNav = (nav, primary, scrollState) => {
+      Object.defineProperty(nav, 'clientWidth', {
+        configurable: true,
+        get: () => 300,
+      })
+      Object.defineProperty(nav, 'scrollWidth', {
+        configurable: true,
+        get: () => 360,
+      })
+      Object.defineProperty(nav, 'scrollLeft', {
+        configurable: true,
+        get: () => scrollState.value,
+        set: (value) => {
+          scrollState.value = value
+        },
+      })
+      nav.getBoundingClientRect = () => ({
+        left: 0,
+        right: 300,
+        width: 300,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+      nav.scrollTo = ({ left }) => {
+        scrollState.value = left
+      }
+      primary.getBoundingClientRect = () => ({
+        left: 24,
+        right: 94,
+        width: 70,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+    }
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        const mobileNavRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs, { desktop: 30, portrait: 18 }, mobileNavRef)
+        return { navRef, mobileNavRef }
+      },
+      render() {
+        return h('div', [
+          h('nav', { ref: 'navRef', class: 'desktop-nav' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+            h('a', { class: 'menu-item' }, '搜索'),
+          ]),
+          h('nav', { ref: 'mobileNavRef', class: 'portrait-nav' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+            h('a', { class: 'menu-item' }, '搜索'),
+          ]),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      desktopNav = host.querySelector('.desktop-nav')
+      portraitNav = host.querySelector('.portrait-nav')
+      const desktopScroll = { value: 6 }
+      const portraitScroll = { value: 6 }
+
+      defineNav(desktopNav, desktopNav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)'), desktopScroll)
+      defineNav(portraitNav, portraitNav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)'), portraitScroll)
+
+      scrollSnap.onScrollEnd({ target: desktopNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      expect(desktopScroll.value).toBe(30)
+      expect(portraitScroll.value).toBe(6)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
   it('useAsyncTask tracks loading and success', async () => {
     const task = useAsyncTask()
     const resultPromise = task.run(async () => 'ok')

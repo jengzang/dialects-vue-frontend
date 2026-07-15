@@ -134,4 +134,13 @@ describe('bar overflow navigation config', () => {
       expect(tabItemBlock).toContain('box-shadow')
     }
   })
+
+  it('uses separate desktop and portrait scroll snap thresholds', () => {
+    for (const path of [navBarPath, commonBarPath, exploreBarComponentPath]) {
+      const source = readSource(path)
+
+      expect(source).toContain('{ desktop: 30, portrait: 18 }')
+      expect(source).not.toContain('useScrollSnap(navRef, orderedTabs, 30, mobileNavRef)')
+    }
+  })
 })

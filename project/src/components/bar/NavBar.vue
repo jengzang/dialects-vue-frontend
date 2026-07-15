@@ -188,7 +188,12 @@ const orderedTabs = computed(() => {
   return [...left, ...main, ...right]
 })
 
-const { hasOverflow, scrollClass, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(navRef, orderedTabs, 30, mobileNavRef)
+const { hasOverflow, scrollClass, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(
+  navRef,
+  orderedTabs,
+  { desktop: 30, portrait: 18 },
+  mobileNavRef
+)
 
 const getFlexWeight = (tab, isActive, isMobile) => {
   let labelVisible

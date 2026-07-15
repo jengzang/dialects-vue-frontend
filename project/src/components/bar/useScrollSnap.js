@@ -9,14 +9,31 @@ const parsePx = (value) => {
   return Number.isFinite(n) ? n : 0
 }
 
+const DEFAULT_SNAP_THRESHOLD = 30
+
+const normalizeSnapThresholds = (snapThreshold) => {
+  if (typeof snapThreshold === 'number') {
+    return {
+      desktop: snapThreshold,
+      portrait: snapThreshold,
+    }
+  }
+
+  const desktop = snapThreshold?.desktop ?? snapThreshold?.landscape ?? snapThreshold?.default ?? DEFAULT_SNAP_THRESHOLD
+  const portrait = snapThreshold?.portrait ?? snapThreshold?.mobile ?? desktop
+
+  return { desktop, portrait }
+}
+
 /**
  * 横向溢出滚动 + 磁吸 composable
  * @param {import('vue').Ref<HTMLElement|null>} navRef - 桌面端 nav
  * @param {import('vue').ComputedRef<Array>} orderedTabs - 已排序的 tab 列表（左溢出 → 主 → 右溢出）
- * @param {number} snapThreshold - 磁吸阈值（px），默认 40
+ * @param {number|{desktop?: number, landscape?: number, portrait?: number, mobile?: number, default?: number}} snapThreshold - 磁吸阈值（px）
  * @param {import('vue').Ref<HTMLElement|null>} [mobileNavRef] - 移动端 nav（可选）
  */
-export function useScrollSnap(navRef, orderedTabs, snapThreshold = 30, mobileNavRef = null) {
+export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_THRESHOLD, mobileNavRef = null) {
+  const snapThresholds = normalizeSnapThresholds(snapThreshold)
   const hasOverflow = computed(() =>
     orderedTabs.value.some(t => t.scroll === 'left' || t.scroll === 'right')
   )
@@ -106,11 +123,18 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = 30, mobileNav
     _settleFrame = requestAnimationFrame(tick)
   }
 
+  const getSnapThreshold = (el) => {
+    if (mobileNavRef?.value && el === mobileNavRef.value) {
+      return snapThresholds.portrait
+    }
+    return snapThresholds.desktop
+  }
+
   const snapCheck = (el) => {
     if (!el) return
     const restPosition = getRestPosition(el)
     const diff = Math.abs(el.scrollLeft - restPosition)
-    if (diff > 0 && diff <= snapThreshold) {
+    if (diff > 0 && diff <= getSnapThreshold(el)) {
       el.scrollTo({ left: restPosition, behavior: 'smooth' })
     }
   }
