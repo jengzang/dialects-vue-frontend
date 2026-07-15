@@ -148,10 +148,11 @@ import NavAvatar from '@/components/bar/NavAvatar.vue'
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useTabTooltip } from '@/components/bar/useTabTooltip.js'
-import { getStoredColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { useScrollSnap } from '@/components/bar/useScrollSnap.js'
+import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 
 const faviconSrc = computed(() =>
-  getStoredColorTheme() === COLOR_THEME_GREEN
+  currentColorTheme.value === COLOR_THEME_GREEN
     ? new URL('@/assets/favicon_green.ico', import.meta.url).href
     : new URL('@/assets/favicon.ico', import.meta.url).href
 )

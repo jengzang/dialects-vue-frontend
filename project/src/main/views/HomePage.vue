@@ -583,7 +583,7 @@ import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
-import { getStoredColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 import { useVisitStats } from '@/composables/useVisitStats.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
@@ -623,7 +623,7 @@ const CURRENT_VERSION = computed(() => homeUpdateNotice.value.version)
 const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
 
 const heroDecorationSrc = computed(() =>
-  getStoredColorTheme() === COLOR_THEME_GREEN
+  currentColorTheme.value === COLOR_THEME_GREEN
     ? new URL('@/assets/picture/GreenCircle.png', import.meta.url).href
     : new URL('@/assets/picture/BlueCircle.png', import.meta.url).href
 )

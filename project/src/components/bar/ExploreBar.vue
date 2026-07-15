@@ -154,10 +154,11 @@ import {
   matchExploreBarChildRoute
 } from '@/main/config/BarAndTabs/ExploreBarConfig.js'
 import { useTabTooltip } from '@/components/bar/useTabTooltip.js'
-import { getStoredColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { useScrollSnap } from '@/components/bar/useScrollSnap.js'
+import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 
 const faviconSrc = computed(() =>
-  getStoredColorTheme() === COLOR_THEME_GREEN
+  currentColorTheme.value === COLOR_THEME_GREEN
     ? new URL('@/assets/favicon_green.ico', import.meta.url).href
     : new URL('@/assets/favicon.ico', import.meta.url).href
 )

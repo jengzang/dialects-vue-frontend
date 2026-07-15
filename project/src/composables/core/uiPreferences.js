@@ -1,3 +1,5 @@
+import { ref } from 'vue'
+
 const UI_MODE_STORAGE_KEY = 'dialects-ui-mode'
 const COLOR_THEME_STORAGE_KEY = 'dialects-color-theme'
 
@@ -12,6 +14,8 @@ export const COLOR_THEME_DEFAULT = COLOR_THEME_BLUE
 
 const VALID_UI_MODES = new Set([UI_MODE_DEFAULT, UI_MODE_COMPACT])
 const VALID_COLOR_THEMES = new Set([COLOR_THEME_BLUE, COLOR_THEME_LIGHT, COLOR_THEME_DARK, COLOR_THEME_GREEN])
+
+export const currentColorTheme = ref(getStoredColorTheme())
 
 function normalizeInterfaceMode(mode) {
   return VALID_UI_MODES.has(mode) ? mode : UI_MODE_DEFAULT
@@ -106,6 +110,7 @@ export function initializeInterfaceMode() {
 
 export function initializeColorTheme() {
   const theme = getStoredColorTheme()
+  currentColorTheme.value = theme
   return applyColorTheme(theme)
 }
 
@@ -123,5 +128,6 @@ export function setInterfaceMode(mode) {
 
 export function setColorTheme(theme) {
   const normalizedTheme = setStoredColorTheme(theme)
+  currentColorTheme.value = normalizedTheme
   return applyColorTheme(normalizedTheme)
 }

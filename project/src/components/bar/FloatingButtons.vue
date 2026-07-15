@@ -51,10 +51,10 @@ import { useI18n } from 'vue-i18n';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js';
 import NavAvatar from '@/components/bar/NavAvatar.vue';
-import { getStoredColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 
 const faviconSrc = computed(() =>
-  getStoredColorTheme() === COLOR_THEME_GREEN
+  currentColorTheme.value === COLOR_THEME_GREEN
     ? new URL('@/assets/favicon_green.ico', import.meta.url).href
     : new URL('@/assets/favicon.ico', import.meta.url).href
 )
