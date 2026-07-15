@@ -2150,6 +2150,7 @@ td {
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-full);
   transition: all $transition-fast;
+  color: var(--action-primary-text);
 
   &:hover:not(:disabled) {
     background: var(--color-primary-light);

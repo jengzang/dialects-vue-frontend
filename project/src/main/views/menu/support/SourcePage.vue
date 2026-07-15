@@ -60,7 +60,7 @@ const goToPrivacy = () => {
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="header-row">
 
-      <h2 class="tabs-title" style="font-size: 1.5rem;">📚 {{ t('source.title') }}</h2>
+      <h2 class="tabs-title" style="font-size: 1.5rem;">🔗 {{ t('source.title') }}</h2>
       <a class="privacy-link" @click="goToPrivacy">
         {{ t('source.privacyLink') }}
       </a>
@@ -84,165 +84,51 @@ const goToPrivacy = () => {
 </template>
 
 
-
 <style scoped lang="scss">
-@use '@/styles/global/mixins' as *;
-
 $primary-blue: var(--color-primary);
-$text-primary: var(--text-dark);
-$text-secondary: var(--text-tertiary);
-$text-muted: var(--text-lightest);
-$border-color: var(--border-light-gray);
-$white: var(--text-white);
+$primary-blue-dark: var(--color-primary-hover);
+$summary-color: var(--text-deep);
 
-$transition-duration: 0.3s;
+$transition-fast: 0.2s;
 
-.settings-container {
-  max-width: 880px;
-  margin: 0 auto;
-  padding: 20px;
+.privacy-link {
+  padding: 4px 8px;
+  color: $primary-blue;
+  font-size: 14px;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all $transition-fast;
 
-  @media (max-width: 480px) {
-    padding: 12px;
+  &:hover {
+    color: $primary-blue-dark;
+    text-decoration: underline;
+    background: rgba(0, 122, 255, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 13px;
   }
 }
 
-.setting-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-  align-items: start;
-}
+.header-row {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: center;
 
-.setting-section {
-  padding: 24px;
-  background: var(--glass-90);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  @media (max-width: 480px) {
-    padding: 16px;
+  @media (max-width: 768px) {
+    gap: 8px;
   }
 }
 
-.section-title {
-  margin: 0 0 8px;
-  color: $text-primary;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.section-description {
-  margin: 0 0 20px;
-  color: $text-secondary;
+.summary {
+  margin-top: 12px;
+  margin-bottom: 0;
+  color: $summary-color;
   font-size: 14px;
 }
 
-.language-options,
-.mode-group {
-  @include flex-col;
-  gap: 12px;
-}
-
-.language-card,
-.mode-option {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 16px;
-  text-align: left;
-  cursor: pointer;
-  background: var(--glass-80);
-  border: 2px solid $border-color;
-  border-radius: var(--radius-md);
-  transition: all $transition-duration ease;
-
-  &:hover {
-    background: $white;
-    border-color: $primary-blue;
-    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
-    transform: translateY(-2px);
-  }
-
-  &.active {
-    background: linear-gradient(
-      135deg,
-      rgba(var(--color-primary-rgb), 0.1),
-      rgba(var(--color-primary-rgb), 0.05)
-    );
-    border-color: $primary-blue;
-    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
-  }
-}
-
-.mode-option {
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.language-flag {
-  margin-right: 16px;
-  font-size: 32px;
-
-  @media (max-width: 480px) {
-    margin-right: 12px;
-    font-size: 28px;
-  }
-}
-
-.language-info {
-  flex: 1;
-}
-
-.language-name,
-.mode-option-label {
-  color: $text-primary;
-  font-size: 16px;
-  font-weight: 600;
-
-  @media (max-width: 480px) {
-    font-size: 14px;
-  }
-}
-
-.language-name {
-  margin-bottom: 4px;
-}
-
-.language-code,
-.mode-option-description {
-  color: $text-muted;
-  font-size: 12px;
-
-  @media (max-width: 480px) {
-    font-size: 11px;
-  }
-}
-
-.language-check,
-.mode-option-check {
-  color: $primary-blue;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.mode-option-header {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-
-.mode-option-description {
-  color: $text-secondary;
-  font-size: 13px;
-  line-height: 1.5;
-
-  @media (max-width: 480px) {
-    font-size: 11px;
-  }
-}
 </style>
+
