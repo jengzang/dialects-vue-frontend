@@ -6,8 +6,10 @@ import {
   getPlatformFileService,
   getPlatformFullscreenController,
   getPlatformStorage,
+  initializePlatformServices,
   getPlatformFeature,
   isFeatureEnabled,
+  resetPlatformServicesForTests,
 } from '../src/platform/index.js'
 
 function readFileAsText(file) {
@@ -46,6 +48,32 @@ describe('platform runtime detection and capabilities', () => {
     expect(detectRuntimePlatform({
       userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/126.0 Mobile Safari/537.36',
       globals: { DialectsAndroidBridge: {} },
+    })).toMatchObject({
+      family: 'android',
+      os: 'android',
+      container: 'native-webview',
+    })
+  })
+
+  it('detects Capacitor iOS and Android apps as native webviews', () => {
+    expect(detectRuntimePlatform({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'ios',
+        },
+      },
+    })).toMatchObject({
+      family: 'ios',
+      os: 'ios',
+      container: 'native-webview',
+    })
+
+    expect(detectRuntimePlatform({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'android',
+        },
+      },
     })).toMatchObject({
       family: 'android',
       os: 'android',
@@ -138,6 +166,76 @@ describe('platform runtime detection and capabilities', () => {
     ])
   })
 
+  it('uses an initialized Capacitor preferences bridge synchronously', async () => {
+    const calls = []
+    const plugin = {
+      async keys() {
+        calls.push(['keys'])
+        return { keys: ['local:cached-key'] }
+      },
+      async get({ key }) {
+        calls.push(['get', key])
+        return { value: key === 'local:cached-key' ? 'cached-value' : null }
+      },
+      async set({ key, value }) {
+        calls.push(['set', key, value])
+      },
+      async remove({ key }) {
+        calls.push(['remove', key])
+      },
+    }
+
+    await initializePlatformServices({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'ios',
+          isPluginAvailable: (name) => name === 'Preferences',
+        },
+      },
+      preferences: plugin,
+    })
+
+    const storage = getPlatformStorage('local')
+    expect(storage.getItem('cached-key')).toBe('cached-value')
+    storage.setItem('cached-key', 'next-value')
+    storage.removeItem('cached-key')
+
+    expect(calls).toEqual([
+      ['keys'],
+      ['get', 'local:cached-key'],
+      ['set', 'local:cached-key', 'next-value'],
+      ['remove', 'local:cached-key'],
+    ])
+
+    resetPlatformServicesForTests()
+  })
+
+  it('advertises native storage when Capacitor preferences are initialized', async () => {
+    await initializePlatformServices({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'android',
+          isPluginAvailable: (name) => name === 'Preferences',
+        },
+      },
+      preferences: {
+        async keys() {
+          return { keys: [] }
+        },
+      },
+    })
+
+    expect(buildPlatformCapabilities({
+      family: 'android',
+      os: 'android',
+      container: 'native-webview',
+    })).toMatchObject({
+      storageDriver: 'native-storage-bridge',
+    })
+
+    resetPlatformServicesForTests()
+  })
+
   it('exports files through a native save bridge before falling back to browser downloads', async () => {
     const calls = []
     const fileService = getPlatformFileService({
@@ -162,11 +260,61 @@ describe('platform runtime detection and capabilities', () => {
     })
   })
 
+  it('exports files through Capacitor Filesystem and Share plugins in native apps', async () => {
+    const writes = []
+    const shares = []
+    const fileService = getPlatformFileService({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'android',
+          isPluginAvailable: (name) => ['Filesystem', 'Share'].includes(name),
+        },
+      },
+      filesystem: {
+        Directory: { Cache: 'CACHE' },
+        Filesystem: {
+          async writeFile(payload) {
+            writes.push(payload)
+            return { uri: `file:///cache/${payload.path}` }
+          },
+        },
+      },
+      share: {
+        Share: {
+          async canShare() {
+            return { value: true }
+          },
+          async share(payload) {
+            shares.push(payload)
+          },
+        },
+      },
+    })
+
+    const result = await fileService.saveBlob(new Blob(['hello'], { type: 'text/plain' }), 'hello.txt')
+
+    expect(result).toEqual({
+      fileName: 'hello.txt',
+      driver: 'capacitor-filesystem-share',
+    })
+    expect(writes).toEqual([{
+      path: 'exports/hello.txt',
+      directory: 'CACHE',
+      data: 'aGVsbG8=',
+      recursive: true,
+    }])
+    expect(shares).toEqual([{
+      title: 'hello.txt',
+      files: ['file:///cache/exports/hello.txt'],
+      dialogTitle: 'hello.txt',
+    }])
+  })
+
   it('imports files through a native picker bridge when available', async () => {
     const fileService = getPlatformFileService({
       globals: {
         DialectsNativeBridge: {
-          async pickFiles(payload) {
+          async pickFiles(_payload) {
             return [{
               fileName: 'native.xlsx',
               mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

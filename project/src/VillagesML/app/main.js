@@ -8,6 +8,9 @@ import '../../utils/message.js'
 import i18n from '../../i18n'
 import { initSeo } from '../../seo'
 import { initializeUiPreferences } from '../../composables/core/uiPreferences.js'
+import { initializePlatformServices } from '../../platform/index.js'
+
+await initializePlatformServices()
 
 const app = createApp(App)
 

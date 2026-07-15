@@ -10,11 +10,18 @@ function hasAndroidNativeBridge(globals) {
   return Boolean(globals?.DialectsAndroidBridge)
 }
 
+function getCapacitorPlatform(globals) {
+  const platform = globals?.Capacitor?.getPlatform?.()
+
+  return typeof platform === 'string' ? platform : ''
+}
+
 export function detectRuntimePlatform(options = {}) {
   const globals = options.globals ?? (typeof window === 'undefined' ? {} : window)
   const userAgent = options.userAgent ?? globals?.navigator?.userAgent ?? ''
+  const capacitorPlatform = getCapacitorPlatform(globals)
 
-  if (hasIosNativeBridge(globals)) {
+  if (hasIosNativeBridge(globals) || capacitorPlatform === 'ios') {
     return {
       family: 'ios',
       os: 'ios',
@@ -22,7 +29,7 @@ export function detectRuntimePlatform(options = {}) {
     }
   }
 
-  if (hasAndroidNativeBridge(globals)) {
+  if (hasAndroidNativeBridge(globals) || capacitorPlatform === 'android') {
     return {
       family: 'android',
       os: 'android',

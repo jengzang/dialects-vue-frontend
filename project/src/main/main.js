@@ -15,9 +15,12 @@ import i18n from '../i18n'
 import { initSeo } from '../seo'
 import { initializeUiPreferences } from '../composables/core/uiPreferences.js'
 import { bootstrapAuthSession } from '../api/auth/auth.js'
+import { initializePlatformServices } from '../platform/index.js'
 
 // 1. 導入你的組件
 import PanelManager from './components/result/PanelManager.vue'
+
+await initializePlatformServices()
 
 bootstrapAuthSession()
 

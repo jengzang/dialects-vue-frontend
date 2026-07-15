@@ -1,10 +1,10 @@
 import { hasNativeFileBridge, hasNativeFilePickerBridge } from './files.js'
-import { getNativeStorageBridge } from './storage.js'
+import { getNativeStorageBridge, hasCapacitorPreferencesStorage } from './storage.js'
 
 export function buildPlatformCapabilities(runtime) {
   const isWeb = runtime?.family === 'web'
   const isNativeWebView = runtime?.container === 'native-webview'
-  const hasNativeStorage = Boolean(getNativeStorageBridge('local'))
+  const hasNativeStorage = Boolean(getNativeStorageBridge('local')) || hasCapacitorPreferencesStorage()
   const hasNativeFiles = hasNativeFileBridge()
   const hasNativeFilePicker = hasNativeFilePickerBridge()
 

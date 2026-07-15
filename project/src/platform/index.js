@@ -17,6 +17,10 @@ export {
   getPlatformFullscreenController,
   PLATFORM_FULLSCREEN_CLASS,
 } from './fullscreen.js'
+export {
+  initializePlatformServices,
+  resetPlatformServicesForTests,
+} from './bootstrap.js'
 
 import { buildPlatformCapabilities, isFeatureEnabled } from './capabilities.js'
 import { getCurrentRuntimePlatform } from './runtime.js'

@@ -1,3 +1,6 @@
+import { Directory, Filesystem } from '@capacitor/filesystem'
+import { Share } from '@capacitor/share'
+
 function getGlobals(options = {}) {
   return options.globals ?? (typeof window === 'undefined' ? {} : window)
 }
@@ -19,6 +22,35 @@ function getWebkitNativeBridge(globals) {
     globals.webkit?.messageHandlers?.dialectsFile
 }
 
+function isCapacitorPluginAvailable(globals, pluginName) {
+  return Boolean(globals?.Capacitor?.isPluginAvailable?.(pluginName))
+}
+
+function isNativeCapacitorApp(globals) {
+  if (typeof globals?.Capacitor?.isNativePlatform === 'function') {
+    return globals.Capacitor.isNativePlatform()
+  }
+
+  const platform = globals?.Capacitor?.getPlatform?.()
+  return platform === 'ios' || platform === 'android'
+}
+
+function hasCapacitorFileExport(globals) {
+  return Boolean(
+    isNativeCapacitorApp(globals) &&
+    isCapacitorPluginAvailable(globals, 'Filesystem') &&
+    isCapacitorPluginAvailable(globals, 'Share')
+  )
+}
+
+function getCapacitorFilesystem(options = {}) {
+  return options.filesystem ?? { Directory, Filesystem }
+}
+
+function getCapacitorShare(options = {}) {
+  return options.share ?? { Share }
+}
+
 export function hasNativeFileBridge(options = {}) {
   const globals = getGlobals(options)
   const directBridge = getDirectNativeBridge(globals)
@@ -26,7 +58,8 @@ export function hasNativeFileBridge(options = {}) {
 
   return Boolean(
     typeof directBridge?.saveFile === 'function' ||
-    typeof webkitBridge?.postMessage === 'function'
+    typeof webkitBridge?.postMessage === 'function' ||
+    hasCapacitorFileExport(globals)
   )
 }
 
@@ -111,7 +144,41 @@ async function saveBlobWithNativeBridge(blob, fileName, options = {}) {
     return { fileName: payload.fileName, driver: 'native-file-bridge' }
   }
 
+  if (hasCapacitorFileExport(globals)) {
+    return saveBlobWithCapacitor(blob, fileName, payload.base64, options)
+  }
+
   return null
+}
+
+async function saveBlobWithCapacitor(blob, fileName, base64, options = {}) {
+  const safeFileName = fileName || 'export.dat'
+  const { Directory: CapacitorDirectory, Filesystem: CapacitorFilesystem } = getCapacitorFilesystem(options)
+  const { Share: CapacitorShare } = getCapacitorShare(options)
+  const path = `exports/${safeFileName}`
+  const result = await CapacitorFilesystem.writeFile({
+    path,
+    directory: CapacitorDirectory.Cache,
+    data: base64,
+    recursive: true,
+  })
+  const sharePayload = {
+    title: safeFileName,
+    files: [result.uri],
+    dialogTitle: safeFileName,
+  }
+  const canShareResult = typeof CapacitorShare.canShare === 'function'
+    ? await CapacitorShare.canShare()
+    : { value: true }
+
+  if (canShareResult?.value) {
+    await CapacitorShare.share(sharePayload)
+  }
+
+  return {
+    fileName: safeFileName,
+    driver: 'capacitor-filesystem-share',
+  }
 }
 
 async function pickFilesWithNativeBridge(pickerOptions = {}, options = {}) {
