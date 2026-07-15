@@ -150,7 +150,10 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
     const diff = getDistanceFromRest(el.scrollLeft, restPosition)
     const gesture = scrollGestures.get(el)
     const crossedBothSides = gesture?.crossed || (gesture?.left && gesture?.right)
-    const returningTowardRest = gesture?.lastSettledSide && gesture.lastSettledSide !== 'rest' && gesture.movingTowardRest
+    const movingTowardRest =
+      gesture?.movingTowardRest || isMovingTowardRest(gesture?.lastScrollLeft, el.scrollLeft, restPosition)
+    const hasSideMovement = gesture?.lastSettledSide !== 'rest' || gesture?.left || gesture?.right
+    const returningTowardRest = hasSideMovement && movingTowardRest
     const shouldSnap = diff > 0 && (crossedBothSides || (returningTowardRest && diff <= getSnapThreshold(el)))
     if (shouldSnap) {
       el.scrollTo({ left: restPosition, behavior: 'smooth' })
