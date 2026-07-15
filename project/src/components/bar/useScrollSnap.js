@@ -9,6 +9,12 @@ const parsePx = (value) => {
   return Number.isFinite(n) ? n : 0
 }
 
+const getScrollSide = (scrollLeft, restPosition) => {
+  if (scrollLeft < restPosition) return 'left'
+  if (scrollLeft > restPosition) return 'right'
+  return 'rest'
+}
+
 const DEFAULT_SNAP_THRESHOLD = 30
 
 const normalizeSnapThresholds = (snapThreshold) => {
@@ -44,6 +50,7 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
 
   // 容器内容宽度（用于计算主 tab 像素级 flex-basis）
   const navContentWidth = ref(0)
+  const scrollGestures = new WeakMap()
   let _observer = null
   let _settleFrame = null
 
@@ -134,9 +141,13 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
     if (!el) return
     const restPosition = getRestPosition(el)
     const diff = Math.abs(el.scrollLeft - restPosition)
-    if (diff > 0 && diff <= getSnapThreshold(el)) {
+    const gesture = scrollGestures.get(el)
+    const crossedBothSides = gesture?.crossed || (gesture?.left && gesture?.right)
+    if (diff > 0 && (crossedBothSides || diff <= getSnapThreshold(el))) {
       el.scrollTo({ left: restPosition, behavior: 'smooth' })
     }
+    const side = crossedBothSides ? 'rest' : getScrollSide(el.scrollLeft, restPosition)
+    scrollGestures.set(el, { left: false, right: false, crossed: false, lastSettledSide: side })
   }
 
   const onScrollEnd = (event) => {
@@ -148,6 +159,23 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
   const onScroll = (event) => {
     const el = event.target
     if (!el) return
+    const restPosition = getRestPosition(el)
+    const side = getScrollSide(el.scrollLeft, restPosition)
+    if (side !== 'rest') {
+      const gesture = scrollGestures.get(el) || { left: false, right: false, crossed: false, lastSettledSide: 'rest' }
+      if (
+        (gesture.lastSettledSide === 'left' && side === 'right') ||
+        (gesture.lastSettledSide === 'right' && side === 'left')
+      ) {
+        gesture.crossed = true
+      }
+      if (side === 'left') {
+        gesture.left = true
+      } else {
+        gesture.right = true
+      }
+      scrollGestures.set(el, gesture)
+    }
     clearTimeout(_scrollTimer)
     _scrollTimer = setTimeout(() => snapCheck(el), 150)
   }

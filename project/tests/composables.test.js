@@ -562,6 +562,139 @@ describe('composables', () => {
     }
   })
 
+  it('useScrollSnap snaps back to rest when scrolling across both overflow sides', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'home', scroll: 'left' },
+      { tab: 'search' },
+    ])
+    let scrollSnap
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        const mobileNavRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs, {
+          desktop: 30,
+          portrait: 18,
+        }, mobileNavRef)
+        return { navRef, mobileNavRef }
+      },
+      render() {
+        return h('div', [
+          h('nav', { ref: 'navRef' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+            h('a', { class: 'menu-item' }, '搜索'),
+          ]),
+          h('nav', { ref: 'mobileNavRef', class: 'portrait-nav' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '🏠'),
+            h('a', { class: 'menu-item' }, '搜索'),
+          ]),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      const portraitNav = host.querySelector('.portrait-nav')
+      const primary = portraitNav.querySelector('.menu-item:not(.tab-overflow-left):not(.tab-overflow-right)')
+      const scrollState = { value: 0 }
+
+      Object.defineProperty(portraitNav, 'clientWidth', {
+        configurable: true,
+        get: () => 300,
+      })
+      Object.defineProperty(portraitNav, 'scrollWidth', {
+        configurable: true,
+        get: () => 500,
+      })
+      Object.defineProperty(portraitNav, 'scrollLeft', {
+        configurable: true,
+        get: () => scrollState.value,
+        set: (value) => {
+          scrollState.value = value
+        },
+      })
+      portraitNav.getBoundingClientRect = () => ({
+        left: 0,
+        right: 300,
+        width: 300,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+      portraitNav.scrollTo = ({ left }) => {
+        scrollState.value = left
+      }
+      primary.getBoundingClientRect = () => ({
+        left: 100 - scrollState.value,
+        right: 170 - scrollState.value,
+        width: 70,
+        top: 0,
+        bottom: 0,
+        height: 0,
+      })
+
+      scrollSnap.onScrollEnd({ target: portraitNav })
+      expect(scrollState.value).toBe(0)
+
+      scrollState.value = 140
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollState.value = 60
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      expect(scrollState.value).toBe(100)
+
+      scrollState.value = 140
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      expect(scrollState.value).toBe(140)
+
+      scrollState.value = 60
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      expect(scrollState.value).toBe(100)
+
+      scrollState.value = 60
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      expect(scrollState.value).toBe(60)
+
+      scrollState.value = 140
+      scrollSnap.onScroll({ target: portraitNav })
+      scrollSnap.onScrollEnd({ target: portraitNav })
+
+      expect(scrollState.value).toBe(100)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
   it('useAsyncTask tracks loading and success', async () => {
     const task = useAsyncTask()
     const resultPromise = task.run(async () => 'ok')
