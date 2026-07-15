@@ -110,7 +110,8 @@
       "options": {
         "blue": "藍色",
         "light": "淺色",
-        "dark": "深色"
+        "dark": "深色",
+        "green": "綠色"
       }
     },
     "interfaceMode": {

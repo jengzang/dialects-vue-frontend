@@ -35,6 +35,21 @@
   --vml-blue-highlight: #475569;
 }
 
+:root[data-color-theme='green'] {
+  color-scheme: light;
+  --vml-blue: #1d3d20;
+  --vml-blue-rgb: 29, 61, 32;
+  --vml-blue-dark: #0a1f0c;
+  --vml-blue-dark-rgb: 10, 31, 12;
+  --vml-blue-darker: #0d2611;
+  --vml-blue-darker-rgb: 13, 38, 17;
+  --vml-blue-darkest: #081a0a;
+  --vml-blue-darkest-rgb: 8, 26, 10;
+  --vml-blue-medium: #4caf50;
+  --vml-blue-medium-rgb: 76, 175, 80;
+  --vml-blue-highlight: #217825;
+}
+
 :root[data-color-theme='dark'] {
   color-scheme: dark;
   --vml-blue: #f5f5f7;

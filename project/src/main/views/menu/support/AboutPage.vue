@@ -369,6 +369,7 @@ import {
   COLOR_THEME_BLUE,
   COLOR_THEME_DARK,
   COLOR_THEME_LIGHT,
+  COLOR_THEME_GREEN,
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
   getStoredColorTheme,
@@ -508,6 +509,10 @@ const colorThemeOptions = computed(() => [
   {
     value: COLOR_THEME_DARK,
     label: t('navigation.settings.colorTheme.options.dark')
+  },
+  {
+    value: COLOR_THEME_GREEN,
+    label: t('navigation.settings.colorTheme.options.green')
   }
 ])
 

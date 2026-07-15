@@ -110,7 +110,8 @@
       "options": {
         "blue": "Blue",
         "light": "Light",
-        "dark": "Dark"
+        "dark": "Dark",
+        "green": "Green"
       }
     },
     "interfaceMode": {

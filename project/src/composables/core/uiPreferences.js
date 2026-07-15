@@ -7,10 +7,11 @@ export const UI_MODE_COMPACT = 'compact'
 export const COLOR_THEME_BLUE = 'blue'
 export const COLOR_THEME_LIGHT = 'light'
 export const COLOR_THEME_DARK = 'dark'
+export const COLOR_THEME_GREEN = 'green'
 export const COLOR_THEME_DEFAULT = COLOR_THEME_BLUE
 
 const VALID_UI_MODES = new Set([UI_MODE_DEFAULT, UI_MODE_COMPACT])
-const VALID_COLOR_THEMES = new Set([COLOR_THEME_BLUE, COLOR_THEME_LIGHT, COLOR_THEME_DARK])
+const VALID_COLOR_THEMES = new Set([COLOR_THEME_BLUE, COLOR_THEME_LIGHT, COLOR_THEME_DARK, COLOR_THEME_GREEN])
 
 function normalizeInterfaceMode(mode) {
   return VALID_UI_MODES.has(mode) ? mode : UI_MODE_DEFAULT

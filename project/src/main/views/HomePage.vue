@@ -23,7 +23,7 @@
             <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
           </button>
         </div>
-        <img src="@/assets/picture/BlueCircle.png" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
+        <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
       </div>
     </section>
 
@@ -583,6 +583,7 @@ import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { getStoredColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 import { useVisitStats } from '@/composables/useVisitStats.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
@@ -620,6 +621,12 @@ const sourceDataCount = ref(cachedSourceStats.dataCount)
 const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
 const CURRENT_VERSION = computed(() => homeUpdateNotice.value.version)
 const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
+
+const heroDecorationSrc = computed(() =>
+  getStoredColorTheme() === COLOR_THEME_GREEN
+    ? new URL('@/assets/picture/GreenCircle.png', import.meta.url).href
+    : new URL('@/assets/picture/BlueCircle.png', import.meta.url).href
+)
 
 const projects = [
   {
