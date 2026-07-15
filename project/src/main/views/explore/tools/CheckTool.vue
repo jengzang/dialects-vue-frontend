@@ -2,7 +2,7 @@
   <div class="check-tool-container">
     <!-- 欢迎屏幕 -->
     <div v-if="!fileUploaded" class="welcome-screen">
-      <div class="glass-container welcome-card">
+      <div class="glass-container-shell welcome-card">
         <div class="welcome-icon">📋</div>
         <h2 class="title">{{ t('tools.checkTool.welcome.title') }}</h2>
 <!--        <p class="subtitle">上傳文件開始檢查和編輯</p>-->

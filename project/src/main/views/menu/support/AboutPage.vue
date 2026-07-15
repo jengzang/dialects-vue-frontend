@@ -209,7 +209,7 @@
 
           <!-- 感悟部分 -->
           <div class="thoughts-container">
-            <h2 class="tabs-title" style="margin-top: 20px">{{ $t('about.reflection.title') }}</h2>
+            <h2 class="tabs-title" style="margin-top: 3rem">{{ $t('about.reflection.title') }}</h2>
             <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
             <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
             <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
@@ -660,7 +660,7 @@ $ease-standard: 0.3s ease;@mixin glass-card(
 
 .tabs-title {
   width: 100%;
-  margin-top: 3rem !important;
+  margin-top: 1rem !important;
   margin-bottom: 0.5rem !important;
   font-size: 1.8rem;
   font-weight: bold;
@@ -1526,11 +1526,14 @@ em {
   }
 
   .language-options {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
     gap: 8px;
+    overflow-x: auto;
   }
 
   .language-card {
+    flex-shrink: 0;
     padding: 10px 12px;
     border-width: 1.5px;
   }

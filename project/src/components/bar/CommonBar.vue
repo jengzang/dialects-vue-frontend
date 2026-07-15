@@ -31,7 +31,9 @@
               fontSize: t.fontSize + 'rem'
             }"
             @click.prevent.stop="onClick(t, navigate, $event)"
-            @mouseenter="handleTabHover(t, t.tab, $event)"
+            @mouseenter="(e) => { handleTabHover(t, t.tab, e); handleTabTooltipEnter(e, t.label) }"
+            @mouseleave="handleTabTooltipLeave"
+            @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
             <span class="emoji">{{ t.icon }}</span>
             <span
@@ -79,6 +81,9 @@
               fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
             }"
             @click.prevent.stop="onClick(t, navigate, $event)"
+            @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
+            @mouseleave="handleTabTooltipLeave"
+            @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
             <span class="emoji">{{ t.icon }}</span>
             <span
@@ -134,6 +139,17 @@
         </div>
       </Transition>
     </Teleport>
+
+    <!-- Tab label tooltip -->
+    <Teleport to="body">
+      <Transition name="tab-tooltip-fade">
+        <div
+          v-if="tooltip.visible"
+          class="tab-tooltip global-tooltip-surface"
+          :style="tooltipStyle"
+        >{{ tooltip.label }}</div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -154,6 +170,7 @@ import {
   syncCommonBarMemoryFromRoute,
   writeCommonBarMemory
 } from '@/components/bar/commonBarNavigation.js'
+import { useTabTooltip } from '@/components/bar/useTabTooltip.js'
 
 // Props definition
 const props = defineProps({
@@ -244,6 +261,9 @@ const visibleTabs = computed(() => {
 })
 
 const isSidebarVisible = ref(false)
+
+// Tab label tooltip
+const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
 
 // Submenu state management
 const activeSubmenu = ref(null)
@@ -571,6 +591,13 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   border-radius: var(--radius-md);
   transition: all 0.25s ease;
 
+  .label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
   &:hover {
     height: 90%;
     color: $primary-blue;
@@ -829,5 +856,24 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .submenu-fade-leave-to {
   opacity: 0;
   transform: translateY(-10px) scale(0.95);
+}
+
+.tab-tooltip {
+  padding: 6px 12px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.tab-tooltip-fade-enter-active,
+.tab-tooltip-fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.tab-tooltip-fade-enter-from,
+.tab-tooltip-fade-leave-to {
+  opacity: 0;
 }
 </style>

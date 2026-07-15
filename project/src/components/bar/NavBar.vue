@@ -29,7 +29,10 @@
                 flex: getFlexWeight(t, isMenuTabActive(t.tab), false) + ' 1 0',
                 fontSize: t.fontSize + 'rem'
               }"
-          @click.prevent="onMenuBarClick(t, navigate)"
+              @click.prevent="onMenuBarClick(t, navigate)"
+              @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
+              @mouseleave="handleTabTooltipLeave"
+              @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
           <span class="emoji">{{ t.icon }}</span>
           <span
@@ -100,6 +103,9 @@
                 fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
+              @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
+              @mouseleave="handleTabTooltipLeave"
+              @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
             <span class="emoji">{{ t.icon }}</span>
             <span
@@ -110,6 +116,17 @@
         </RouterLink>
       </div>
     </div>
+
+    <!-- Tab label tooltip -->
+    <Teleport to="body">
+      <Transition name="tab-tooltip-fade">
+        <div
+          v-if="tooltip.visible"
+          class="tab-tooltip global-tooltip-surface"
+          :style="tooltipStyle"
+        >{{ tooltip.label }}</div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -130,11 +147,15 @@ import { userStore } from '@/main/store/store.js'
 import NavAvatar from '@/components/bar/NavAvatar.vue'
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { useTabTooltip } from '@/components/bar/useTabTooltip.js'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const isSidebarVisible = ref(false)
+
+// Tab label tooltip
+const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
 
 // ===== sessionStorage 管理：记住每个 tab 的最后访问的 sub =====
 watch(() => route.path, () => {
@@ -338,6 +359,13 @@ $mobile-aspect-ratio: 1;
   user-select: none;
   transition: all 0.25s ease;
 
+  .label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
   &:hover {
     background: rgba(var(--color-primary-rgb), 0.12);
     color: $primary;
@@ -461,4 +489,22 @@ $mobile-aspect-ratio: 1;
   }
 }
 
+.tab-tooltip {
+  padding: 6px 12px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.tab-tooltip-fade-enter-active,
+.tab-tooltip-fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.tab-tooltip-fade-enter-from,
+.tab-tooltip-fade-leave-to {
+  opacity: 0;
+}
 </style>
