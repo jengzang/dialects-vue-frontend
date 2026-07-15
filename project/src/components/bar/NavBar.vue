@@ -4,7 +4,7 @@
     <div class="navbar-desktop">
       <div  class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div @click="toggleSidebar" class="logo-container" style="min-width: 6dvh;width: 6dvh;">
-          <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
+          <img class="logo" :src="faviconSrc" alt="Logo" />
         </div>
         <div class="title">
           <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
@@ -64,7 +64,7 @@
       <div class="navbar-top">
         <div class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
           <div @click="toggleSidebar" class="logo-container" style="width: 6dvh;min-width: 6dvh" >
-            <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
+            <img class="logo" :src="faviconSrc" alt="Logo" />
           </div>
           <div class="title">
             <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
@@ -148,6 +148,13 @@ import NavAvatar from '@/components/bar/NavAvatar.vue'
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useTabTooltip } from '@/components/bar/useTabTooltip.js'
+import { getStoredColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+
+const faviconSrc = computed(() =>
+  getStoredColorTheme() === COLOR_THEME_GREEN
+    ? new URL('@/assets/favicon_green.ico', import.meta.url).href
+    : new URL('@/assets/favicon.ico', import.meta.url).href
+)
 
 const { t } = useI18n()
 const route = useRoute()

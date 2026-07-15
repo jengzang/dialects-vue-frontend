@@ -4,7 +4,7 @@
     <div class="commonbar-desktop">
       <div class="logo-and-title" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div class="logo-container">
-          <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
+          <img class="logo" :src="faviconSrc" alt="Logo" />
         </div>
         <div v-if="titleImage" class="title">
           <img :src="titleImage" alt="Title" />
@@ -57,7 +57,7 @@
     <!-- 移动端：单行布局（无 title.png） -->
     <div class="commonbar-mobile">
       <div class="logo-container" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
-        <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
+        <img class="logo" :src="faviconSrc" alt="Logo" />
       </div>
       <div v-if="title && showTitleOnMobile" class="title-text-mobile">
         {{ title }}
@@ -171,6 +171,13 @@ import {
   writeCommonBarMemory
 } from '@/components/bar/commonBarNavigation.js'
 import { useTabTooltip } from '@/components/bar/useTabTooltip.js'
+import { getStoredColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+
+const faviconSrc = computed(() =>
+  getStoredColorTheme() === COLOR_THEME_GREEN
+    ? new URL('@/assets/favicon_green.ico', import.meta.url).href
+    : new URL('@/assets/favicon.ico', import.meta.url).href
+)
 
 // Props definition
 const props = defineProps({

@@ -3,7 +3,7 @@
     <div class="explorebar-desktop">
       <div class="logo-and-title" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div class="logo-container">
-          <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
+          <img class="logo" :src="faviconSrc" alt="Logo" />
         </div>
         <div class="title">
           <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
@@ -50,7 +50,7 @@
 
     <div class="explorebar-mobile">
       <div class="logo-container" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
-        <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
+        <img class="logo" :src="faviconSrc" alt="Logo" />
       </div>
 
       <nav class="explorebar-tabs ui-scrollbar--hidden">
@@ -154,6 +154,13 @@ import {
   matchExploreBarChildRoute
 } from '@/main/config/BarAndTabs/ExploreBarConfig.js'
 import { useTabTooltip } from '@/components/bar/useTabTooltip.js'
+import { getStoredColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+
+const faviconSrc = computed(() =>
+  getStoredColorTheme() === COLOR_THEME_GREEN
+    ? new URL('@/assets/favicon_green.ico', import.meta.url).href
+    : new URL('@/assets/favicon.ico', import.meta.url).href
+)
 
 const { t } = useI18n()
 const route = useRoute()
