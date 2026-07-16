@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 import http from 'http';
+import { resolveBuildTarget } from './src/platform/buildTarget.js';
 
 const mpaEntryRoots = ['auth', 'menu', 'intro', 'explore', 'villagesML'];
 const localePrefixPattern = /^\/(zh-CN|zh-Hant|en)(?=\/|$)/;
@@ -111,6 +112,7 @@ async function detectBackendPort() {
 
 export default defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  const buildTarget = resolveBuildTarget(mode, env);
 
   let webBase;
   if (mode === 'web') {
@@ -127,6 +129,7 @@ export default defineConfig(async ({ mode }) => {
   }
 
   console.log(`[Vite] Mode: ${mode}, WEB_BASE: ${webBase}`);
+  console.log(`[Vite] Platform target: ${buildTarget.target}`);
 
   return {
     plugins: [vue(), devMpaRewritePlugin()],
@@ -137,6 +140,10 @@ export default defineConfig(async ({ mode }) => {
     },
     define: {
       __WEB_BASE__: JSON.stringify(webBase),
+      __PLATFORM_TARGET__: JSON.stringify(buildTarget.target),
+      __PLATFORM_FAMILY__: JSON.stringify(buildTarget.family),
+      __IS_NATIVE_BUILD__: JSON.stringify(buildTarget.isNative),
+      __IS_WEB_BUILD__: JSON.stringify(buildTarget.isWeb),
     },
     css: {
       preprocessorOptions: {
