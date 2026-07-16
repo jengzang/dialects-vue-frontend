@@ -330,7 +330,7 @@ import { showConfirm, showError, showSuccess } from '@/utils/message.js'
 
 const { t } = useI18n()
 const { requireAuth } = useAuthGuard()
-const progressPolling = usePollingTask({ intervalMs: 1000, maxFailures: 1 })
+const progressPolling = usePollingTask({ intervalMs: 1100, maxFailures: 1 })
 const JYUT2IPA_CONFIG_FILE_NAME = 'jyut2ipa-rules.json'
 const JYUT2IPA_RESULT_FILE_PREFIX = '方音圖鑒_'
 const fileName = ref('')
