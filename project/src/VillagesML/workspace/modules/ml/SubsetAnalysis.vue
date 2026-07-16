@@ -26,61 +26,69 @@
           <span class="hint-icon">💡</span>
           <span class="hint-text">添加篩選條件，定義你想要分析的村莊集合</span>
         </div>
-        <div v-for="(filter, idx) in filters" :key="idx" class="filter-row">
-          <SimpleSelectDropdown
-            v-model="filter.field"
-            :options="fieldOptions"
-            @update:modelValue="handleFieldChange(idx)"
-          />
+        <div v-for="(filter, idx) in filters" :key="idx" class="filter-row vml-control-surface vml-control-row">
+          <div class="vml-control-field">
+            <SimpleSelectDropdown
+              v-model="filter.field"
+              :options="fieldOptions"
+              @update:modelValue="handleFieldChange(idx)"
+            />
+          </div>
 
-          <SimpleSelectDropdown
-            v-model="filter.operator"
-            :options="getOperatorsForFilter(filter)"
-          />
+          <div class="vml-control-field">
+            <SimpleSelectDropdown
+              v-model="filter.operator"
+              :options="getOperatorsForFilter(filter)"
+            />
+          </div>
 
           <!-- Region field: use FilterableSelect -->
-          <FilterableSelect
-            v-if="getFieldInputType(filter.field) === 'region'"
-            v-model="filter.value"
-            :level="filter.level || 'city'"
-            :parent="filter.parent"
-            :show-level-selector="true"
-            placeholder="選擇區域"
-            @update:level="(level) => filter.level = level"
-            @update:hierarchy="(hierarchy) => filter.hierarchy = hierarchy"
-          />
+          <div class="vml-control-field">
+            <FilterableSelect
+              v-if="getFieldInputType(filter.field) === 'region'"
+              v-model="filter.value"
+              :level="filter.level || 'city'"
+              :parent="filter.parent"
+              :show-level-selector="true"
+              placeholder="選擇區域"
+              @update:level="(level) => filter.level = level"
+              @update:hierarchy="(hierarchy) => filter.hierarchy = hierarchy"
+            />
 
-          <!-- Select field: use SimpleSelectDropdown (semantic, structure) -->
-          <SimpleSelectDropdown
-            v-else-if="getFieldInputType(filter.field) === 'select'"
-            v-model="filter.value"
-            :options="getFieldOptions(filter.field)"
-            :placeholder="`選擇${FILTER_FIELDS.find(f => f.value === filter.field)?.label}`"
-          />
+            <!-- Select field: use SimpleSelectDropdown (semantic, structure) -->
+            <SimpleSelectDropdown
+              v-else-if="getFieldInputType(filter.field) === 'select'"
+              v-model="filter.value"
+              :options="getFieldOptions(filter.field)"
+              :placeholder="`選擇${FILTER_FIELDS.find(f => f.value === filter.field)?.label}`"
+            />
 
-          <!-- Number field: use number input (length) -->
-          <input
-            v-else-if="getFieldInputType(filter.field) === 'number'"
-            v-model.number="filter.value"
-            type="number"
-            min="2"
-            max="10"
-            placeholder="2-10"
-            class="glass-input"
-          >
+            <!-- Number field: use number input (length) -->
+            <input
+              v-else-if="getFieldInputType(filter.field) === 'number'"
+              v-model.number="filter.value"
+              type="number"
+              min="2"
+              max="10"
+              placeholder="2-10"
+              class="glass-input"
+            >
 
-          <!-- Text field: use text input (name, suffix, prefix) -->
-          <input
-            v-else
-            v-model="filter.value"
-            type="text"
-            placeholder="值"
-            class="glass-input"
-          >
+            <!-- Text field: use text input (name, suffix, prefix) -->
+            <input
+              v-else
+              v-model="filter.value"
+              type="text"
+              placeholder="值"
+              class="glass-input"
+            >
+          </div>
 
-          <button @click="removeFilter(idx)" class="solid-button small danger">刪除</button>
+          <div class="vml-control-actions">
+            <button @click="removeFilter(idx)" class="solid-button small danger">刪除</button>
+          </div>
         </div>
-        <div class="filter-actions">
+        <div class="filter-actions vml-control-surface vml-control-actions">
           <button @click="applyFilters" :disabled="filters.length === 0 || loading" class="solid-button primary">
             應用篩選
           </button>
@@ -436,26 +444,26 @@
         <h3>子集聚類</h3>
       </div>
       <div class="clustering-content">
-        <div class="clustering-controls">
-          <div class="control-row">
+        <div class="clustering-controls vml-control-surface vml-control-row">
+          <div class="control-row vml-control-field vml-control-field--compact">
             <label>選擇子集:</label>
             <SimpleSelectDropdown
               v-model="clusteringSubset"
               :options="clusteringSubsetOptions"
             />
           </div>
-          <div class="control-row">
+          <div class="control-row vml-control-field vml-control-field--compact">
             <label>聚類數 K:</label>
             <input v-model.number="clusterK" type="number" min="2" max="20" class="glass-input small">
           </div>
-          <div class="control-row">
+          <div class="control-row vml-control-field vml-control-field--compact">
             <label>演算法:</label>
             <SimpleSelectDropdown :match-trigger-width="true"
               v-model="clusterAlgorithm"
               :options="clusterAlgorithmOptions"
             />
           </div>
-          <div class="control-row feature-selector">
+          <div class="control-row feature-selector vml-control-field">
             <label>聚類特徵:</label>
             <div class="feature-checkboxes">
               <CheckBox
@@ -470,13 +478,15 @@
               </CheckBox>
             </div>
           </div>
-          <button
-            @click="runSubsetClustering"
-            :disabled="!canCluster || loading || clusterFeatures.length === 0"
-            class="solid-button primary"
-          >
-            執行聚類
-          </button>
+          <div class="vml-control-actions">
+            <button
+              @click="runSubsetClustering"
+              :disabled="!canCluster || loading || clusterFeatures.length === 0"
+              class="solid-button primary"
+            >
+              執行聚類
+            </button>
+          </div>
         </div>
 
         <div v-if="clusteringResults" class="clustering-results">
