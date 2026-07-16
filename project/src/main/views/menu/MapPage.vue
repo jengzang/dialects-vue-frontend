@@ -93,7 +93,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
@@ -104,7 +104,6 @@ import { isPlatformFeatureEnabled } from '@/platform/index.js'
 import TabsContainer from '@/components/common/TabsContainer.vue'
 import DivideTab from "@/main/components/map/Tabs/DivideTab.vue";
 import CustomTab from '@/main/components/map/Tabs/CustomTab.vue'
-import MapDrawTab from '@/main/components/map/Tabs/MapDrawTab.vue'
 import MapLibre from "@/main/components/map/MapLibre.vue";
 import CustomDataPanel from '@/main/components/map/custom/CustomDataPanel.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
@@ -140,6 +139,9 @@ const tabToRouteSub = {
   draw: 'draw'
 }
 const canUseMapDraw = isPlatformFeatureEnabled('mapDraw')
+const MapDrawTab = __IS_WEB_BUILD__
+  ? defineAsyncComponent(() => import('@/main/components/map/Tabs/MapDrawTab.vue'))
+  : null
 const currentTab = computed(() => routeSubToTab[route.params.sub] || 'map')
 
 // 是否处于 map 路由（用于判断基于路由的自动加载等）
