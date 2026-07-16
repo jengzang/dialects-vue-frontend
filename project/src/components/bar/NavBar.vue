@@ -3,7 +3,7 @@
     <!-- 桌面端的布局 -->
     <div class="navbar-desktop">
       <div  class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
-        <div @click="toggleSidebar" class="logo-container" style="min-width: 6dvh;width: 6dvh;">
+        <div @click="toggleSidebar" class="logo-container desktop-brand-logo">
           <img class="logo" :src="faviconSrc" alt="Logo" />
         </div>
         <div class="title">
@@ -57,7 +57,7 @@
       <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
         <NavAvatar />
       </div>
-      <div v-else class="logo-container" style="color: var(--color-primary-hover);border-radius: 30px" @click="goToAuthPage">
+      <div v-else class="logo-container desktop-login-button" @click="goToAuthPage">
         <!-- 显示用户名或"登录" -->
         <span class="login-text">
           {{ t('navigation.login') }}
@@ -75,7 +75,7 @@
       <!-- 第一部分：Logo、标题和登录按钮 -->
       <div class="navbar-top">
         <div class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
-          <div @click="toggleSidebar" class="logo-container" style="width: 6dvh;min-width: 6dvh" >
+          <div @click="toggleSidebar" class="logo-container mobile-brand-logo">
             <img class="logo" :src="faviconSrc" alt="Logo" />
           </div>
           <div class="title">
@@ -85,7 +85,7 @@
         <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
           <NavAvatar />
         </div>
-        <div v-else class="logo-container" style="color: var(--color-primary-hover); border-radius: 30px;height: 5dvh" @click="goToAuthPage">
+        <div v-else class="logo-container mobile-login-button" @click="goToAuthPage">
           <!-- 显示用户名或"登录" -->
           <span class="login-text">
             {{ t('navigation.login') }}
@@ -300,6 +300,11 @@ $primary-dark: var(--color-primary-hover);
 
 $mobile-aspect-ratio: 1;
 
+// 桌面端不再直接使用 10dvh，避免高分辨率屏幕上导航栏过高。
+$desktop-navbar-height: clamp(64px, 7dvh, 82px);
+$desktop-control-size: clamp(44px, 4.8dvh, 56px);
+$desktop-title-height: clamp(50px, 6.2dvh, 70px);
+
 @mixin soft-glass-background {
   background: linear-gradient(
     145deg,
@@ -321,6 +326,7 @@ $mobile-aspect-ratio: 1;
   left: 0;
   z-index: 999;
   width: 100%;
+  box-sizing: border-box;
 
   @include flex-center;
 
@@ -338,23 +344,26 @@ $mobile-aspect-ratio: 1;
 /* 桌面端 */
 .navbar-desktop {
   width: 100%;
-  height: 10dvh;
+  height: $desktop-navbar-height;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-sizing: border-box;
   padding: 0 0.5%;
 }
 
 .navbar-btn {
-  width: 100%;
-  max-width: 900px;
-  height: 10dvh;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 1200px;
+  height: 100%;
+  margin: 0 clamp(10px, 1vw, 20px);
+
   @include flex-center;
-  margin: 0 30px;
 }
 
 .navbar-item {
-  padding: 0.5%;
+  padding: 4px;
   color: var(--text-white);
   font-size: 1rem;
   transition: transform 0.3s;
@@ -370,22 +379,20 @@ $mobile-aspect-ratio: 1;
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 5px;
   margin-left: 5px;
   cursor: pointer;
 }
 
 .logo-container {
-  flex: 1 1 0;
-  width: 9dvh;
-  min-width: 9dvh;
-  max-width: 15dvh;
-  height: 6dvh;
+  flex: 0 0 auto;
+  // box-sizing: border-box;
+  padding: 5px;
+
   @include flex-col;
+
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 5px;
 
   @include glass-blur(15px, 150%);
   @include soft-glass-background;
@@ -401,14 +408,42 @@ $mobile-aspect-ratio: 1;
   transition: all 0.3s ease;
 }
 
+.desktop-brand-logo {
+  width: $desktop-control-size;
+  min-width: $desktop-control-size;
+  height: $desktop-control-size;
+}
+
+.desktop-login-button {
+  width: auto;
+  min-width: $desktop-control-size;
+  height: $desktop-control-size;
+  margin-right: 10px;
+  padding-inline: 12px;
+  border-radius: 30px;
+}
+
+.desktop-brand-logo,
+.desktop-login-button {
+  box-sizing: border-box;
+}
+
 .logo {
+  display: block;
   width: 90%;
   height: auto;
 }
 
 .title {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+
   img {
-    height: 10dvh;
+    display: block;
+    width: auto;
+    height: $desktop-title-height;
+    max-width: clamp(110px, 14vw, 190px);
     padding: 0;
     object-fit: contain;
   }
@@ -417,12 +452,12 @@ $mobile-aspect-ratio: 1;
 .menu-item {
   flex: 1 1 0;
   min-width: 0;
-  height: 10dvh;
-  @include flex-center;
-  gap: 1px;
+  height: 100%;
   box-sizing: border-box;
 
-  // background: var(--glass-10);
+  @include flex-center;
+
+  gap: 1px;
   border-radius: var(--radius-md);
   color: $primary;
   white-space: nowrap;
@@ -440,10 +475,10 @@ $mobile-aspect-ratio: 1;
     height 0.25s ease;
 
   .label {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    min-width: 0;
   }
 
   .label {
@@ -495,17 +530,20 @@ $mobile-aspect-ratio: 1;
 }
 
 .avatar-container {
-  flex: 0 0 calc(6dvh + 16px);
-  width: calc(6dvh + 16px);
-  min-width: calc(6dvh + 16px);
-  max-width: calc(6dvh + 16px);
-  height: calc(6dvh + 16px);
-  margin-right: 10px;
   box-sizing: border-box;
   cursor: pointer;
   user-select: none;
 
   @include flex-center;
+}
+
+.navbar-desktop .avatar-container {
+  flex: 0 0 calc(#{$desktop-control-size} + 10px);
+  width: calc(#{$desktop-control-size} + 10px);
+  min-width: calc(#{$desktop-control-size} + 10px);
+  max-width: calc(#{$desktop-control-size} + 10px);
+  height: calc(#{$desktop-control-size} + 10px);
+  margin-right: 10px;
 }
 
 /* 移动端导航布局 */
@@ -519,6 +557,7 @@ $mobile-aspect-ratio: 1;
   align-items: center;
   justify-content: space-between;
   gap: 0.5dvh;
+  box-sizing: border-box;
   padding: 0 0.5%;
 }
 
@@ -529,12 +568,12 @@ $mobile-aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-sizing: border-box;
   padding: 0 10px;
 
   .logo-container {
-    width: 6dvh;
-    height: 6dvh;
     @include flex-center;
+
     background: var(--glass-20);
     border-radius: var(--radius-full);
     color: $primary-dark;
@@ -551,12 +590,35 @@ $mobile-aspect-ratio: 1;
   }
 }
 
+.mobile-brand-logo {
+  width: 6dvh;
+  min-width: 6dvh;
+  height: 6dvh;
+}
+
+.mobile-login-button {
+  width: auto;
+  min-width: 6dvh;
+  height: 5dvh;
+  padding-inline: 12px;
+  border-radius: 30px;
+}
+
+.navbar-top .avatar-container {
+  flex: 0 0 calc(6dvh + 16px);
+  width: calc(6dvh + 16px);
+  min-width: calc(6dvh + 16px);
+  max-width: calc(6dvh + 16px);
+  height: calc(6dvh + 16px);
+}
+
 .navbar-bottom {
   width: 100%;
   height: 6dvh;
   display: flex;
   align-items: center;
   justify-content: space-around;
+  box-sizing: border-box;
   padding: 0 10px;
 }
 
@@ -577,7 +639,8 @@ $mobile-aspect-ratio: 1;
 
   .title {
     img {
-      height: 9dvh !important;
+      height: 9dvh;
+      max-width: none;
     }
   }
 }
@@ -607,7 +670,12 @@ $mobile-aspect-ratio: 1;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
 }
 
 .tab-overflow-left,
