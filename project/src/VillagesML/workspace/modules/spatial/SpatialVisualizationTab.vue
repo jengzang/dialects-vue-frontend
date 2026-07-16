@@ -783,6 +783,10 @@ h2 {
   margin-bottom: 0;
 }
 
+.filter-row .vml-control-field .filter-input {
+  width: 100%;
+}
+
 .filter-input{
   padding: 8px 12px;
   border: 1px solid var(--border-light-gray);

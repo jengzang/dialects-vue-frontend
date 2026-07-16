@@ -12,13 +12,15 @@
     <div class="vml-control-surface">
       <!-- Search Input -->
       <div class="search-input-group vml-control-row">
-        <input
-          v-model="localKeyword"
-          type="text"
-          class="search-input"
-          placeholder="搜尋村名..."
-          @input="handleSearchInput"
-        />
+        <div class="vml-control-field">
+          <input
+            v-model="localKeyword"
+            type="text"
+            class="search-input"
+            placeholder="搜尋村名..."
+            @input="handleSearchInput"
+          />
+        </div>
         <div class="vml-control-actions">
           <button class="search-button solid-button" @click="handleSearch">
             🔍 搜索
