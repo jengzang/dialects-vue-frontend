@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build the natural-village toponyms map as a first-class Explore villages page at `/explore/villages/toponyms`, using the real backend split-query API: name suggestions, point search, and detail lookup by id.
+**Goal:** Build the natural-village toponyms map as a first-class Explore villages page at `/explore/villages/toponyms`, using the real backend split-query API for search/points and prioritizing the Ministry of Civil Affairs official detail service when a point is selected.
 
-**Architecture:** This is a main-site Explore villages page, not a VillagesML page and not a new top-level `/toponyms/map` app. The page does not load all 4.34M natural-village records on first paint; users query first, then the frontend renders returned id-only point results with MapLibre clustering, and fetches names/details only after selecting a point. API code lives in the main API layer, route/navigation changes live in the existing Explore villages config, and styles reuse the current main-site glass/token system with scoped nested SCSS.
+**Architecture:** This is a main-site Explore villages page, not a VillagesML page and not a new top-level `/toponyms/map` app. The page does not load all 4.34M natural-village records on first paint; users query first, then the frontend renders returned id-only point results with MapLibre clustering. When a point is selected, the frontend calls the Ministry `detailsPub` endpoint first and falls back to the local `/api/toponyms/details` endpoint if the official request fails or returns unusable data.
 
-**Tech Stack:** Vue 3 `<script setup>`, Vue Router path routes, Vue I18n JSON locale files, MapLibre GL source/layers with clustering, existing `api` HTTP client and `/api` proxy, scoped SCSS with design tokens, Vitest.
+**Tech Stack:** Vue 3 `<script setup>`, Vue Router path routes, Vue I18n JSON locale files, MapLibre GL source/layers with clustering, existing `api` HTTP client and `/api` proxy, browser `fetch` for the official detail service, scoped SCSS with design tokens, Vitest.
 
 ---
 
@@ -70,9 +70,34 @@ Response:
 }
 ```
 
+### Official Ministry Detail Service
+
+Primary detail source after clicking a point:
+
+```http
+POST https://dmfw.mca.gov.cn/9095/stname/detailsPub
+Content-Type: application/json
+
+{ "id": "5746d76b8d5150589460729e1a28e3e3" }
+```
+
+Original product intent is to show official Ministry of Civil Affairs detail data. The backend reports direct local testing currently receives `403 Forbidden`, so the frontend must treat official lookup as best-effort and provide a local fallback.
+
+Expected useful official fields from the original PRD:
+
+```json
+{
+  "area_name": "临漳县",
+  "city_name": "邯郸市",
+  "old_name": "历史地名"
+}
+```
+
+The exact official response shape must be handled defensively because the service may return nested data, empty data, non-JSON, 403, or CORS/network failures.
+
 ### `GET /api/toponyms/details`
 
-Purpose: fetch complete local details for selected ids. This is the only endpoint that returns id + name + coordinates together.
+Purpose: local fallback and record completion for selected ids. This is the only local endpoint that returns id + name + coordinates together.
 
 Supported parameters:
 
@@ -173,8 +198,10 @@ No full-data auto-load. First screen should show:
 5. Convert point results to GeoJSON with id-only properties.
 6. Render returned points on map using MapLibre cluster layers.
 7. User clicks an unclustered point.
-8. Call `/api/toponyms/details?ids=<id>`.
-9. Show detail panel with `name`, `place_type`, `division_path`, longitude, latitude.
+8. Call Ministry `detailsPub` with the selected id.
+9. If official lookup succeeds, show official fields and mark the source as official.
+10. If official lookup fails or returns no usable detail, call `/api/toponyms/details?ids=<id>` as fallback and mark the source as local fallback.
+11. Show detail panel with whichever detail source is available, plus point id/coordinates.
 
 ### Important UI Copy Constraint
 
@@ -183,7 +210,7 @@ Because points do not include names, do not promise map labels before detail loo
 - count summaries;
 - selected id;
 - "click point to view details";
-- details panel after click.
+- official details panel after click, with local fallback if official lookup is unavailable.
 
 If labels are desired later, they require detail batching and must respect the 10-id limit.
 
@@ -196,6 +223,7 @@ If labels are desired later, they require detail batching and must respect the 1
 - `project/src/api/main/toponyms.js`
   - `getToponymNames(params)`
   - `getToponymPoints(params)`
+  - `getToponymOfficialDetail(id, options)`
   - `getToponymDetails(ids)`
   - query param builders and response normalization helpers
 
@@ -305,11 +333,17 @@ Still keep frontend coordinate validation because it is cheap and protects again
 
 - Details endpoint accepts at most 10 unique ids. MVP only fetches 1 id per click.
 - Abort or ignore stale details request when user clicks another point quickly.
-- If details returns empty `items`, show "no detail found".
-- If request returns 401, show login/permission message.
-- If request returns 422, show parameter error message.
-- If details response coordinates differ from point coordinates, display details values but keep map point unchanged.
-- Do not call Ministry of Civil Affairs `detailsPub` in MVP; backend confirmed direct local network call currently returns 403 and local details endpoint has the needed record.
+- Official `detailsPub` is attempted first because that is the product requirement.
+- Official failure modes include 403, CORS, timeout, non-JSON body, empty detail, and response shape drift.
+- If official lookup fails, call local `/api/toponyms/details` for the selected id.
+- If local details returns empty `items`, show "no detail found".
+- If local request returns 401, show login/permission message.
+- If local request returns 422, show parameter error message.
+- If local details response coordinates differ from point coordinates, display details values but keep map point unchanged.
+- The detail panel must expose the source state:
+  - official detail
+  - local fallback detail
+  - official failed and local failed
 
 ### Styling
 
@@ -390,8 +424,9 @@ describe('toponyms API contracts', () => {
     expect(source).toContain('/api/toponyms/names')
     expect(source).toContain('/api/toponyms/points')
     expect(source).toContain('/api/toponyms/details')
+    expect(source).toContain('https://dmfw.mca.gov.cn/9095/stname/detailsPub')
+    expect(source).toContain('getToponymOfficialDetail')
     expect(source).not.toContain('/api/toponyms/map')
-    expect(source).not.toContain('detailsPub')
   })
 
   it('guards details requests to the backend maximum of 10 ids', () => {
@@ -406,6 +441,7 @@ describe('toponyms API contracts', () => {
 
     expect(source).toContain('getToponymNames')
     expect(source).toContain('getToponymPoints')
+    expect(source).toContain('getToponymOfficialDetail')
     expect(source).toContain('getToponymDetails')
     expect(source).toContain('./main/toponyms.js')
   })
@@ -432,6 +468,8 @@ export const TOPONYM_DEFAULT_PLACE_TYPE_CODE = '22200'
 export const TOPONYM_DEFAULT_POINT_LIMIT = 5000
 export const TOPONYM_DEFAULT_NAME_LIMIT = 20
 export const TOPONYM_DETAILS_ID_LIMIT = 10
+
+const OFFICIAL_DETAIL_URL = 'https://dmfw.mca.gov.cn/9095/stname/detailsPub'
 
 const MATCH_MODES = new Set(['prefix', 'suffix', 'exact', 'contains'])
 
@@ -497,6 +535,56 @@ export async function getToponymPoints(params = {}) {
   }
 }
 
+function normalizeOfficialDetail(payload) {
+  const detail = payload?.data && typeof payload.data === 'object' ? payload.data : payload
+  if (!detail || typeof detail !== 'object') {
+    return null
+  }
+
+  const areaName = detail.area_name || detail.areaName || ''
+  const cityName = detail.city_name || detail.cityName || ''
+  const oldName = detail.old_name || detail.oldName || ''
+
+  if (!areaName && !cityName && !oldName) {
+    return null
+  }
+
+  return {
+    source: 'official',
+    areaName,
+    cityName,
+    oldName,
+    raw: detail,
+  }
+}
+
+export async function getToponymOfficialDetail(id, options = {}) {
+  const normalizedId = String(id || '').trim()
+  if (!normalizedId) {
+    throw new Error('toponym id cannot be empty')
+  }
+
+  const response = await fetch(OFFICIAL_DETAIL_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ id: normalizedId }),
+    signal: options.signal,
+  })
+
+  if (!response.ok) {
+    throw new Error(`official toponym detail request failed: ${response.status}`)
+  }
+
+  const payload = await response.json()
+  const detail = normalizeOfficialDetail(payload)
+  if (!detail) {
+    throw new Error('official toponym detail is empty')
+  }
+  return detail
+}
+
 export async function getToponymDetails(ids) {
   const uniqueIds = Array.from(new Set((Array.isArray(ids) ? ids : [ids])
     .map((id) => String(id || '').trim())
@@ -531,6 +619,7 @@ export async function getToponymDetails(ids) {
 export {
   getToponymNames,
   getToponymPoints,
+  getToponymOfficialDetail,
   getToponymDetails,
   TOPONYM_DEFAULT_PLACE_TYPE_CODE,
   TOPONYM_DEFAULT_POINT_LIMIT,
@@ -860,7 +949,7 @@ Add portal labels:
 ```json
 "toponyms": {
   "name": "自然村地名地圖",
-  "desc": "按關鍵詞查詢自然村點位與本地地名詳情"
+  "desc": "按關鍵詞查詢自然村點位與官方地名詳情"
 }
 ```
 
@@ -869,14 +958,14 @@ Simplified and English equivalents:
 ```json
 "toponyms": {
   "name": "自然村地名地图",
-  "desc": "按关键词查询自然村点位与本地地名详情"
+  "desc": "按关键词查询自然村点位与官方地名详情"
 }
 ```
 
 ```json
 "toponyms": {
   "name": "Village Toponyms Map",
-  "desc": "Search natural-village points and local place-name details"
+  "desc": "Search natural-village points and official place-name details"
 }
 ```
 
@@ -937,13 +1026,16 @@ Display:
 - selected point id and coordinates before details load;
 - loading state;
 - error state;
+- source badge:
+  - official
+  - local fallback
+  - unavailable
 - details:
-  - name
-  - place type
-  - division path joined by separator
-  - longitude / latitude
+  - official fields when available: city, area/county, historical name
+  - local fallback fields when available: name, place type, division path, longitude / latitude
+  - selected point id and coordinates in all states
 
-Do not call external Ministry API.
+The component should not perform API calls itself; the parent passes official/local detail state into it.
 
 - [ ] **Step 3: Create `ToponymsMapPage.vue` orchestration**
 
@@ -958,6 +1050,7 @@ const pointCollection = ref(buildEmptyToponymsFeatureCollection())
 const pointMeta = ref({ count: 0, truncated: false, next: null })
 const selectedPoint = ref(null)
 const selectedDetail = ref(null)
+const selectedDetailSource = ref('')
 const isLoadingNames = ref(false)
 const isLoadingPoints = ref(false)
 const isLoadingDetail = ref(false)
@@ -1023,6 +1116,7 @@ async function searchPoints(searchText = query.value) {
 async function loadDetail(point) {
   selectedPoint.value = point
   selectedDetail.value = null
+  selectedDetailSource.value = ''
   detailError.value = ''
   if (!point?.id) {
     detailError.value = t('villages.pages.toponyms.errors.missingId')
@@ -1031,10 +1125,19 @@ async function loadDetail(point) {
 
   isLoadingDetail.value = true
   try {
-    const result = await getToponymDetails(point.id)
-    selectedDetail.value = result.items[0] || null
-    if (!selectedDetail.value) {
-      detailError.value = t('villages.pages.toponyms.errors.detailEmpty')
+    try {
+      selectedDetail.value = await getToponymOfficialDetail(point.id)
+      selectedDetailSource.value = 'official'
+      return
+    } catch (officialError) {
+      const result = await getToponymDetails(point.id)
+      selectedDetail.value = result.items[0] || null
+      selectedDetailSource.value = selectedDetail.value ? 'local' : ''
+      if (!selectedDetail.value) {
+        detailError.value = t('villages.pages.toponyms.errors.detailEmpty')
+      } else {
+        detailError.value = t('villages.pages.toponyms.errors.officialFallback')
+      }
     }
   } catch (error) {
     detailError.value = error?.message || t('villages.pages.toponyms.errors.detailFailed')
@@ -1055,7 +1158,7 @@ Traditional:
 ```json
 "toponyms": {
   "title": "自然村地名地圖",
-  "subtitle": "輸入地名關鍵詞後查詢點位，點擊地圖點位查看本地地名詳情。",
+  "subtitle": "輸入地名關鍵詞後查詢點位，點擊地圖點位優先查看官方地名詳情。",
   "search": "搜索",
   "queryLabel": "地名關鍵詞",
   "queryPlaceholder": "例如：黃、黃村、塘",
@@ -1078,8 +1181,13 @@ Traditional:
     "title": "地名詳情",
     "empty": "點擊地圖上的點位查看詳情。",
     "loading": "正在加載詳情...",
+    "sourceOfficial": "官方詳情",
+    "sourceLocal": "本地記錄",
     "id": "ID",
     "name": "標準地名",
+    "city": "所在地市",
+    "area": "所在區縣",
+    "oldName": "歷史地名",
     "placeType": "地名類型",
     "divisionPath": "行政區劃",
     "coordinates": "經緯度",
@@ -1091,6 +1199,7 @@ Traditional:
     "pointsFailed": "無法加載點位",
     "missingId": "此點位缺少 ID，無法查詢詳情",
     "detailEmpty": "未找到此點位的詳情",
+    "officialFallback": "官方詳情暫不可用，已顯示本地記錄",
     "detailFailed": "無法加載地名詳情"
   }
 }
@@ -1263,8 +1372,11 @@ Manual checks:
 - Points render without labels.
 - If `truncated` is true, warning appears.
 - Cluster click zooms.
-- Point click calls `/api/toponyms/details?ids=<id>`.
-- Details panel shows name, place type, division path, coordinates.
+- Point click first attempts `https://dmfw.mca.gov.cn/9095/stname/detailsPub`.
+- If official detail succeeds, details panel marks the source as official.
+- If official detail fails, page falls back to `/api/toponyms/details?ids=<id>` and marks the source as local record.
+- Details panel shows official city/area/old-name fields when official detail is available.
+- Details panel shows local name, place type, division path, and coordinates when fallback is used.
 - 401/422/FastAPI `detail` errors show readable messages.
 - Mobile layout stacks without overlap.
 
@@ -1279,7 +1391,7 @@ Check:
 
 - No unrelated VillagesML files are staged.
 - No `/api/toponyms/map`.
-- No `detailsPub`.
+- `detailsPub` exists only in the official-detail API helper and is called before local fallback.
 - No `/toponyms/map` redirect.
 - Chinese and emoji are intact.
 
@@ -1294,8 +1406,8 @@ Implementation is complete only when:
 - The page does not load all toponyms on first paint.
 - Search uses `/api/toponyms/names` and `/api/toponyms/points`.
 - Map renders id-only point results using MapLibre layers and clustering.
-- Clicking a point uses `/api/toponyms/details` and respects the 10-id backend limit.
-- No Ministry direct request exists in frontend code.
+- Clicking a point tries Ministry `detailsPub` first.
+- If Ministry detail fails, clicking a point falls back to `/api/toponyms/details` and respects the 10-id backend limit.
 - No `/api/toponyms/map` usage exists.
 - No `/toponyms/map` route or redirect exists.
 - Styles use existing component classes and tokens with nested scoped SCSS.
