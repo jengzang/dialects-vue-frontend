@@ -752,7 +752,14 @@ $preview-min-column-width: 120px;
     min-height: 0;
   }
 
-  &__mapping,
+  &__mapping {
+    @include flex-col;
+
+    flex: 0 0 300px;
+    gap: 14px;
+    padding: $preview-panel-padding;
+  }
+
   &__preview {
     @include flex-col;
 
@@ -842,7 +849,7 @@ $preview-min-column-width: 120px;
   }
 
   &__mapping-control {
-    min-width: 220px;
+    // min-width: 220px;
   }
 
   &__diagnostics {
@@ -940,13 +947,17 @@ $preview-min-column-width: 120px;
   }
 
   &.is-warning {
+    white-space: nowrap;
+    text-align: center;
     color: $warning-orange;
     background: rgba(var(--color-warning-rgb), 0.12);
     border-color: rgba(var(--color-warning-rgb), 0.22);
+    border-radius: var(--radius-lg);
   }
 }
 
 .mapping-required {
+  white-space: nowrap;
   padding: 2px 8px;
   color: $warning-orange;
   background: rgba(var(--color-warning-rgb), 0.12);
@@ -954,7 +965,6 @@ $preview-min-column-width: 120px;
 
 .diagnostic {
   width: fit-content;
-  padding: 6px 12px;
   line-height: 1.4;
 
   &--warning {
@@ -976,6 +986,12 @@ $preview-min-column-width: 120px;
     &__header,
     &__toolbar {
       flex-direction: column;
+    }
+
+    &__mapping {
+      flex: 0 1 auto;
+      min-height: 0;
+      overflow: auto;
     }
 
     &__mapping-control {

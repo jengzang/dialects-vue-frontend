@@ -297,6 +297,7 @@ import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
+import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
 import defaultReferenceWorkbookUrl from '/data/参考表.xlsx?url'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
@@ -638,18 +639,20 @@ const handleReferenceConfirm = async () => {
     return
   }
 
-  const activeSheet = referencePreviewState.previewTable.value?.activeSheet
-  const columnMapping = {
-    headerChar: referencePreviewState.mapping.value.char || null,
-    headerIpa: referencePreviewState.mapping.value.pronunciation || null,
-    headerNotes: referencePreviewState.mapping.value.note || null
+  const columnMap = []
+  if (referencePreviewState.mapping.value.char) {
+    columnMap.push({ sourceKey: referencePreviewState.mapping.value.char, header: '單字' })
   }
 
-  await setReferenceFile(pendingReferenceFile.value, {
-    columnMapping,
+  const transformedFile = transformTabularFile({
+    parsedFile: referencePreviewState.parsedFile.value,
+    columnMap,
+    selectedSheetId: referencePreviewState.selectedSheetId.value,
     headerRowIndex: referencePreviewState.headerRowIndex.value,
-    sheetName: activeSheet?.name || null
+    mode: 'replace'
   })
+
+  await setReferenceFile(transformedFile)
   if (referenceFile.value) {
     nextStep()
   }

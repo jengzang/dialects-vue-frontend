@@ -319,6 +319,7 @@ import { useStorageState } from '@/composables/core/useStorageState.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
+import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
 import {
   downloadJyut2IpaResult,
   getJyut2IpaProgress,
@@ -744,19 +745,24 @@ const confirmPreviewAndProcess = async () => {
     return
   }
 
-  const activeSheet = jyutPreviewState.previewTable.value?.activeSheet
-  const columnMapping = {
-    headerJyutping: jyutPreviewState.mapping.value.jyutping || null,
-    headerChar: jyutPreviewState.mapping.value.char || null
+  const columnMap = []
+  if (jyutPreviewState.mapping.value.jyutping) {
+    columnMap.push({ sourceKey: jyutPreviewState.mapping.value.jyutping, header: '粵拼' })
+  }
+  if (jyutPreviewState.mapping.value.char) {
+    columnMap.push({ sourceKey: jyutPreviewState.mapping.value.char, header: '漢字' })
   }
 
-  const selectedFile = pendingPreviewFile.value
-  fileImportFlow.clearPreview()
-  await processFile(selectedFile, {
-    columnMapping,
+  const transformedFile = transformTabularFile({
+    parsedFile: jyutPreviewState.parsedFile.value,
+    columnMap,
+    selectedSheetId: jyutPreviewState.selectedSheetId.value,
     headerRowIndex: jyutPreviewState.headerRowIndex.value,
-    sheetName: activeSheet?.name || null
+    mode: 'rename'
   })
+
+  fileImportFlow.clearPreview()
+  await processFile(transformedFile)
 }
 
 const downloadResult = async () => {

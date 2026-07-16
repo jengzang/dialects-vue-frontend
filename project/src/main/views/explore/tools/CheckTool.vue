@@ -925,6 +925,7 @@ import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
+import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
 import {
   uploadCheckFile,
   analyzeFile as analyzeFileApi,
@@ -1287,16 +1288,18 @@ const commandPreview = computed(() => {
 })
 
 // 文件处理
-const isDocFile = (file) => {
+const shouldSkipPreview = (file) => {
   const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
-  return ['.doc', '.docx'].includes(ext)
+  if (['.doc', '.docx'].includes(ext)) return true
+  if (['跳跳老鼠', '縣志'].includes(selectedFormat.value)) return true
+  return false
 }
 
 const handleDrop = (event) => {
   isDragOver.value = false
   const file = event.dataTransfer.files[0]
   if (file) {
-    if (isDocFile(file)) {
+    if (shouldSkipPreview(file)) {
       uploadFile(file)
     } else {
       checkImportFlow.loadPreview(file)
@@ -1307,7 +1310,7 @@ const handleDrop = (event) => {
 const handleFileUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
-    if (isDocFile(file)) {
+    if (shouldSkipPreview(file)) {
       uploadFile(file)
     } else {
       checkImportFlow.loadPreview(file)
@@ -1378,20 +1381,27 @@ const confirmPreviewAndUpload = async () => {
     return
   }
 
-  const activeSheet = checkPreviewState.previewTable.value?.activeSheet
-  const columnMapping = {
-    headerChar: checkPreviewState.mapping.value.char || null,
-    headerIpa: checkPreviewState.mapping.value.ipa || null,
-    headerNotes: checkPreviewState.mapping.value.note || null
+  const columnMap = []
+  if (checkPreviewState.mapping.value.char) {
+    columnMap.push({ sourceKey: checkPreviewState.mapping.value.char, header: '漢字' })
+  }
+  if (checkPreviewState.mapping.value.ipa) {
+    columnMap.push({ sourceKey: checkPreviewState.mapping.value.ipa, header: '音標' })
+  }
+  if (checkPreviewState.mapping.value.note) {
+    columnMap.push({ sourceKey: checkPreviewState.mapping.value.note, header: '解釋' })
   }
 
-  const selectedFile = pendingPreviewFile.value
-  checkImportFlow.clearPreview()
-  await uploadFile(selectedFile, {
-    columnMapping,
+  const transformedFile = transformTabularFile({
+    parsedFile: checkPreviewState.parsedFile.value,
+    columnMap,
+    selectedSheetId: checkPreviewState.selectedSheetId.value,
     headerRowIndex: checkPreviewState.headerRowIndex.value,
-    sheetName: activeSheet?.name || null
+    mode: 'replace'
   })
+
+  checkImportFlow.clearPreview()
+  await uploadFile(transformedFile)
 }
 
 const analyzeFile = async () => {
