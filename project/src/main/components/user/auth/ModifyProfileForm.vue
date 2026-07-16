@@ -172,7 +172,7 @@ $back-gold-dark: var(--color-warning-dark);
 $text-title: var(--text-primary);
 $error-color: var(--color-error-light);
 $success-color: var(--color-success);
-$white: var(--text-white);
+$white: var(--action-primary-text);
 
 $transition-fast: 0.18s;
 $transition-base: 0.2s;

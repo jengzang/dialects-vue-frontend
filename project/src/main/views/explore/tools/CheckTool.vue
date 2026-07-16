@@ -1097,7 +1097,7 @@ const checkImportFlow = useTabularImportFlow({
       return false
     }
 
-    const allowedExts = ['.xlsx', '.xls']
+    const allowedExts = ['.xlsx', '.xls', '.tsv']
     const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
 
     if (!allowedExts.includes(ext)) {
@@ -1287,18 +1287,31 @@ const commandPreview = computed(() => {
 })
 
 // 文件处理
+const isDocFile = (file) => {
+  const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
+  return ['.doc', '.docx'].includes(ext)
+}
+
 const handleDrop = (event) => {
   isDragOver.value = false
   const file = event.dataTransfer.files[0]
   if (file) {
-    checkImportFlow.loadPreview(file)
+    if (isDocFile(file)) {
+      uploadFile(file)
+    } else {
+      checkImportFlow.loadPreview(file)
+    }
   }
 }
 
 const handleFileUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
-    checkImportFlow.loadPreview(file)
+    if (isDocFile(file)) {
+      uploadFile(file)
+    } else {
+      checkImportFlow.loadPreview(file)
+    }
   }
 }
 

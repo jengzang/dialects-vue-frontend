@@ -286,32 +286,6 @@ function showAuthPopup() {
                 }
             }
 
-            const queryStats = computed(() => {
-                const stats = user.value?.usage_summary || []
-
-                const labelMap = {
-                    '/api/phonology': '🔍 查地位',
-                    '/api/search_chars/': '🔤 查字',
-                    '/api/search_tones/': '🎶 查調',
-                }
-
-                let total = 0
-                const filtered = stats
-                    .filter(stat => Object.keys(labelMap).includes(stat.path))
-                    .map(stat => {
-                        total += stat.count
-                        return {
-                            label: labelMap[stat.path],
-                            count: stat.count
-                        }
-                    })
-
-                return {
-                    total,
-                    items: filtered
-                }
-            })
-
             onMounted(async () => {
                 if (getToken()) {
                     await fetchUser()
@@ -349,7 +323,7 @@ function showAuthPopup() {
             return {
                 username, password, email, error, loading,savePassword,saveUsername,modeType,
                 user, mode, login, register, logout, close, fmt,loginMode,newPassword,newUsername,currentPassword,
-                formatOnlineTime,showPassword,queryStats,goToAdminPanel // 👈 新增這行
+                formatOnlineTime,showPassword,goToAdminPanel
             }
 
         },
@@ -550,18 +524,6 @@ function showAuthPopup() {
               <p id="login-info" style="font-size: 20px">🗓️ 註冊時間：{{ fmt(user.created_at) }}</p>
               <p id="login-info" style="font-size: 20px">⏱️ 總在線時長：
                 {{ formatOnlineTime(user.total_online_seconds) }}</p>
-              <p id="login-info" style=" font-size: 20px;">
-                📊 總查詢次數：<span style="color: #cd0b0b;margin-bottom: 0;">{{ queryStats.total }}</span> 次
-              </p>
-              <ul class="api-log-list">
-                <li
-                    v-for="item in queryStats.items"
-                    :key="item.label"
-                    class="api-log-item"
-                >
-                  -- {{ item.label }}：{{ item.count }} 次
-                </li>
-              </ul>
               <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;">
                 <!-- 退出登录按钮 -->
                 <button class="btn-search" @click="logout" style="margin-top: 10px; display: flex;
