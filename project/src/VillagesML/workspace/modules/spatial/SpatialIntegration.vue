@@ -8,7 +8,7 @@
       </h1>
 
       <!-- Query Mode Selector -->
-      <div class="mode-selector vml-glass-panel">
+      <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
         <RadioGroup
             name="spatialQueryMode"
             :options="queryModeOptions"
@@ -120,12 +120,14 @@
           </div>
 
           <!-- Character Selector -->
-          <div v-else class="form-group vml-control-surface">
-            <label>選擇字符:</label>
-            <SimpleSelectDropdown :match-trigger-width="true"
-              v-model="queryChar"
-              :options="characterOptions"
-            />
+          <div v-else class="form-group vml-control-surface vml-control-row">
+            <div class="vml-control-field">
+              <label>選擇字符:</label>
+              <SimpleSelectDropdown :match-trigger-width="true"
+                v-model="queryChar"
+                :options="characterOptions"
+              />
+            </div>
           </div>
         </div>
 
@@ -191,12 +193,14 @@
           </div>
 
           <!-- Cluster Selector -->
-          <div v-else class="form-group vml-control-surface">
-            <label>選擇聚類:</label>
-            <SimpleSelectDropdown :match-trigger-width="true"
-              v-model="clusterId"
-              :options="clusterOptions"
-            />
+          <div v-else class="form-group vml-control-surface vml-control-row">
+            <div class="vml-control-field">
+              <label>選擇聚類:</label>
+              <SimpleSelectDropdown :match-trigger-width="true"
+                v-model="clusterId"
+                :options="clusterOptions"
+              />
+            </div>
           </div>
         </div>
 
@@ -699,10 +703,6 @@ onMounted(() => {
 }
 
 .mode-selector {
-  display: flex;
-  justify-content: center; /* 确保容器内容居中 */
-  align-items: center;
-  padding: 12px;
   margin-bottom: 16px;
 }
 
@@ -734,10 +734,7 @@ onMounted(() => {
 }
 
 .form-group {
-  display: grid;
-  grid-template-columns: 120px minmax(0, 1fr);
-  align-items: center;
-  gap: 12px;
+  max-width: 520px;
 }
 
 .form-group label {
