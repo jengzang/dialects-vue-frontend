@@ -3,7 +3,7 @@
     <div class="spatial-map-container" :class="{ 'is-fullscreen': isFullScreen }">
       <div ref="mapContainer" class="map-container">
         <!-- 地圖控制面板 -->
-        <div class="map-controls vml-control-row" v-if="!isFullScreen">
+        <div class="map-controls vml-control-surface vml-control-row" v-if="!isFullScreen">
           <div class="control-group vml-control-field">
             <SimpleSelectDropdown
               v-model="currentStyleKey"
