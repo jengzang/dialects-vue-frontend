@@ -101,7 +101,7 @@ function createMap() {
   const initialCoord = normalizeCoord(props.coord);
   mapInstance.value = new maplibregl.Map({
     container: mapContainer.value,
-    style: mapStyle('gaode'),
+    style: mapStyle('tianditu'),
     center: initialCoord || DEFAULT_CENTER,
     zoom: initialCoord ? 9.5 : 5.5,
     attributionControl: false,

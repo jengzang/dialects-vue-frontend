@@ -2217,6 +2217,7 @@ $text-muted: var(--text-lightest);
       width: 18px;
       height: 18px;
       cursor: pointer;
+      color-scheme: light;
     }
   }
 
