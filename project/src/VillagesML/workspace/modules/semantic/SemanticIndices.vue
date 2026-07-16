@@ -14,8 +14,8 @@
         獲取區域的語義強度指數，分析不同地區村莊命名的語義特徵偏好。語義強度 = 該區域村莊名稱中，平均每個村莊包含該語義類別字符的次數。
       </p>
 
-      <div class="controls">
-        <div class="input-group">
+      <div class="controls vml-control-surface vml-control-row vml-control-row--center">
+        <div class="input-group vml-control-field">
           <label class="input-label">語義類別</label>
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model="indicesCategory"
@@ -25,7 +25,7 @@
           <span class="input-hint">過濾特定語義類別</span>
         </div>
 
-        <div class="input-group">
+        <div class="input-group vml-control-field">
           <label class="input-label">行政級別</label>
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model="indicesRegionLevel"
@@ -34,7 +34,7 @@
           <span class="input-hint">過濾特定行政級別</span>
         </div>
 
-        <div class="input-group" v-if="indicesRegionLevel">
+        <div class="input-group vml-control-field" v-if="indicesRegionLevel">
           <label class="input-label">區域名稱</label>
           <div class="input-with-clear">
             <FilterableSelect
@@ -55,7 +55,7 @@
           <span class="input-hint">查詢特定區域</span>
         </div>
 
-        <div class="input-group">
+        <div class="input-group vml-control-field">
           <label class="input-label">最小村莊數</label>
           <input
             v-model.number="indicesMinVillages"
@@ -70,7 +70,7 @@
           </span>
         </div>
 
-        <div class="input-group">
+        <div class="input-group vml-control-field">
           <label class="input-label">返回數量</label>
           <input
             v-model.number="indicesLimit"
@@ -85,13 +85,15 @@
           </span>
         </div>
 
-        <button
-          class="solid-button"
-          :disabled="loadingIndices"
-          @click="loadIndices"
-        >
-          查詢
-        </button>
+        <div class="vml-control-actions">
+          <button
+            class="solid-button"
+            :disabled="loadingIndices"
+            @click="loadIndices"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
       <div v-if="loadingIndices" class="vml-loading">
@@ -317,17 +319,11 @@ const getRegionLevelName = (level) => {
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
 }
 
 .input-group {
-  @include flex-col;
-  gap: 4px;
+  min-width: 0;
 }
 
 .input-with-clear {

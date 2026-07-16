@@ -19,8 +19,8 @@
       <p class="section-description">
         分析村名中語義類別的組合模式，例如「方位+聚落」、「水系+聚落」等。
       </p>
-      <div class="controls">
-        <div class="input-group">
+      <div class="controls vml-control-surface vml-control-row">
+        <div class="input-group vml-control-field">
           <label class="input-label">最小出現次數</label>
           <input
             v-model.number="minCount"
@@ -31,7 +31,7 @@
           />
           <span class="input-hint">過濾掉出現次數少於此值的模式</span>
         </div>
-        <div class="input-group">
+        <div class="input-group vml-control-field">
           <label class="input-label">返回數量</label>
           <input
             v-model.number="topN"
@@ -43,13 +43,15 @@
           />
           <span class="input-hint">返回前N個最常見的模式（最多1000）</span>
         </div>
-        <button
-          class="solid-button"
-          :disabled="loadingPatterns"
-          @click="loadPatterns"
-        >
-          查詢
-        </button>
+        <div class="vml-control-actions">
+          <button
+            class="solid-button"
+            :disabled="loadingPatterns"
+            @click="loadPatterns"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
       <div v-if="loadingPatterns" class="vml-loading">
@@ -163,16 +165,11 @@ watch(detailMode, (val) => {
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
-  align-items: center;
-  flex-wrap: wrap;
 }
 
 .input-group {
-  @include flex-col;
-  gap: 4px;
+  min-width: 0;
 }
 
 .input-label {
@@ -261,11 +258,6 @@ watch(detailMode, (val) => {
 
   .patterns-section {
     padding: 12px;
-  }
-
-  .controls {
-    flex-direction: column;
-    align-items: stretch;
   }
 
   .vml-number-input {

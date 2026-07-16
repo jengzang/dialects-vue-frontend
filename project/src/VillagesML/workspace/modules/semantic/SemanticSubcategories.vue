@@ -19,31 +19,35 @@
       <div class="query-form vml-glass-panel">
         <h3>區域子類別對比</h3>
 
-        <div class="form-group">
-          <label>區域選擇:</label>
-          <FilterableSelect
-            v-model="regionName"
-            :level="regionLevel"
-            @update:level="(newLevel) => regionLevel = newLevel"
-            placeholder="請選擇或輸入區域"
-          />
-        </div>
+        <div class="vml-control-surface vml-control-row">
+          <div class="form-group vml-control-field">
+            <label>區域選擇:</label>
+            <FilterableSelect
+              v-model="regionName"
+              :level="regionLevel"
+              @update:level="(newLevel) => regionLevel = newLevel"
+              placeholder="請選擇或輸入區域"
+            />
+          </div>
 
-        <div class="form-group">
-          <label>父類別:</label>
-          <SimpleSelectDropdown :match-trigger-width="true"
-            v-model="regionalParentCategory"
-            :options="parentCategories"
-          />
-        </div>
+          <div class="form-group vml-control-field">
+            <label>父類別:</label>
+            <SimpleSelectDropdown :match-trigger-width="true"
+              v-model="regionalParentCategory"
+              :options="parentCategories"
+            />
+          </div>
 
-        <button
-          class="query-button"
-          :disabled="!regionName || !regionalParentCategory || loadingRegional"
-          @click="loadRegionalComparison"
-        >
-          {{ loadingRegional ? '查詢中...' : '查詢' }}
-        </button>
+          <div class="vml-control-actions">
+            <button
+              class="query-button"
+              :disabled="!regionName || !regionalParentCategory || loadingRegional"
+              @click="loadRegionalComparison"
+            >
+              {{ loadingRegional ? '查詢中...' : '查詢' }}
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Regional Results -->
@@ -112,8 +116,8 @@
       <div class="query-form vml-glass-panel">
         <h3>子類別傾向排行</h3>
 
-        <div class="form-row">
-          <div class="form-group">
+        <div class="form-row vml-control-surface vml-control-row">
+          <div class="form-group vml-control-field">
             <label>區域層級:</label>
             <SimpleSelectDropdown :match-trigger-width="true"
               v-model="rankingRegionLevel"
@@ -121,7 +125,7 @@
             />
           </div>
 
-          <div class="form-group">
+          <div class="form-group vml-control-field">
             <label>父類別:</label>
             <SimpleSelectDropdown :match-trigger-width="true"
               v-model="rankingParentCategory"
@@ -129,19 +133,21 @@
             />
           </div>
 
-          <div class="form-group">
+          <div class="form-group vml-control-field vml-control-field--compact">
             <label>返回數量:</label>
             <input v-model.number="topN" type="number" min="5" max="50" class="vml-number-input" />
           </div>
-        </div>
 
-        <button
-          class="query-button"
-          :disabled="loadingRanking"
-          @click="loadRanking"
-        >
-          {{ loadingRanking ? '查詢中...' : '查詢' }}
-        </button>
+          <div class="vml-control-actions">
+            <button
+              class="query-button"
+              :disabled="loadingRanking"
+              @click="loadRanking"
+            >
+              {{ loadingRanking ? '查詢中...' : '查詢' }}
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Ranking Results -->
@@ -636,6 +642,7 @@ export default {
 
 .query-form {
   @include flex-col;
+  gap: 12px;
 }
 
 .query-form h3 {
@@ -647,22 +654,16 @@ export default {
 }
 
 .form-group {
-  margin-bottom: 16px;
+  min-width: 0;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 8px;
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .form-row {
-  display: flex;
-  flex-direction: row;
-  // display: grid;
-  // grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  width: 100%;
 }
 
 .vml-number-input {
@@ -858,14 +859,6 @@ tr.significant {
 
 .rank-badge:not(.gold):not(.silver):not(.bronze) {
   background: var(--color-primary, var(--vml-blue));
-}
-
-@media (min-aspect-ratio: 1/1) {
-  .query-form {
-    flex-flow: row wrap;
-    align-items: center;
-    gap: 12px;
-  }
 }
 
 @media (max-width: 768px) {
