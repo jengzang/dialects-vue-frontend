@@ -452,7 +452,9 @@
     "errorTypes": {
       "nonSingleChar": "Non-single character",
       "invalidIpa": "Invalid IPA",
-      "missingTone": "Missing tone"
+      "missingTone": "Missing tone",
+      "emptyOnset": "Empty onset",
+      "emptyRime": "Empty rime"
     },
     "export": {
       "filePrefix": "方音圖鑑_"

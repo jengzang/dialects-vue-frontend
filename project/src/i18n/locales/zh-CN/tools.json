@@ -452,7 +452,9 @@
     "errorTypes": {
       "nonSingleChar": "非单字",
       "invalidIpa": "异常音标",
-      "missingTone": "缺声调"
+      "missingTone": "缺声调",
+      "emptyOnset": "声母为空",
+      "emptyRime": "韵母为空"
     },
     "export": {
       "filePrefix": "方音图鉴_"

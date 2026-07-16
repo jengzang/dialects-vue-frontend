@@ -984,13 +984,17 @@ const errorStats = ref({
   nonSingleChar: 0,
   invalidIpa: 0,
   missingTone: 0,
+  emptyOnset: 0,
+  emptyRime: 0,
   total: 0
 })
 
 const errorStatsConfig = computed(() => ({
   nonSingleChar: { icon: '❌', label: t('tools.checkTool.errorTypes.nonSingleChar'), type: 'error' },
   invalidIpa: { icon: '⚠️', label: t('tools.checkTool.errorTypes.invalidIpa'), type: 'warning' },
-  missingTone: { icon: '🔍', label: t('tools.checkTool.errorTypes.missingTone'), type: 'info' }
+  missingTone: { icon: '🔍', label: t('tools.checkTool.errorTypes.missingTone'), type: 'info' },
+  emptyOnset: { icon: '🅾', label: t('tools.checkTool.errorTypes.emptyOnset'), type: 'warning' },
+  emptyRime: { icon: '🔤', label: t('tools.checkTool.errorTypes.emptyRime'), type: 'warning' }
 }))
 
 // 调值统计
@@ -1467,6 +1471,8 @@ const analyzeFile = async () => {
       nonSingleChar: data.error_stats?.nonSingleChar || 0,
       invalidIpa: data.error_stats?.invalidIpa || 0,
       missingTone: data.error_stats?.missingTone || 0,
+      emptyOnset: data.error_stats?.emptyOnset || 0,
+      emptyRime: data.error_stats?.emptyRime || 0,
       total: Object.values(data.error_stats || {}).reduce((a, b) => a + b, 0)
     }
     showingAll.value = errorStats.value.total === 0
@@ -1561,7 +1567,7 @@ const resetUpload = async () => {
     errorData.value = []
     errorMetadata.value = []
     filteredData.value = []
-    errorStats.value = { nonSingleChar: 0, invalidIpa: 0, missingTone: 0, total: 0 }
+    errorStats.value = { nonSingleChar: 0, invalidIpa: 0, missingTone: 0, emptyOnset: 0, emptyRime: 0, total: 0 }
     toneStats.value = null
     pendingChanges.value.clear()
     rowsToDelete.value.clear()
@@ -2102,6 +2108,8 @@ const getErrorTypeLabel = (type) => {
   if (type === 'nonSingleChar') return t('tools.checkTool.errorTypes.nonSingleChar')
   if (type === 'invalidIpa') return t('tools.checkTool.errorTypes.invalidIpa')
   if (type === 'missingTone') return t('tools.checkTool.errorTypes.missingTone')
+  if (type === 'emptyOnset') return t('tools.checkTool.errorTypes.emptyOnset')
+  if (type === 'emptyRime') return t('tools.checkTool.errorTypes.emptyRime')
   return type
 }
 
@@ -2538,6 +2546,12 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     &.missingTone {
       background: rgba(var(--color-primary-rgb), 0.15);
       color: $primary;
+    }
+
+    &.emptyOnset,
+    &.emptyRime {
+      background: $warning-soft;
+      color: $warning;
     }
   }
 

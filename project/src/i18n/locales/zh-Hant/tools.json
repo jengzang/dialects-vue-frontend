@@ -454,7 +454,9 @@
     "errorTypes": {
       "nonSingleChar": "非單字",
       "invalidIpa": "異常音標",
-      "missingTone": "缺聲調"
+      "missingTone": "缺聲調",
+      "emptyOnset": "聲母為空",
+      "emptyRime": "韻母為空"
     },
     "export": {
       "filePrefix": "方音圖鑑_"
