@@ -84,6 +84,7 @@
       "fileName": "檔案",
       "columns": "列數",
       "rows": "行數",
+      "noHeader": "無表頭",
       "headerRowOption": "第 {row} 行"
     },
     "mapping": {

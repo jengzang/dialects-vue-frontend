@@ -84,6 +84,7 @@
       "fileName": "File",
       "columns": "Columns",
       "rows": "Rows",
+      "noHeader": "No header",
       "headerRowOption": "Row {row}"
     },
     "mapping": {

@@ -155,12 +155,21 @@ export function derivePreviewTable(parsedFile, options = {}) {
   }
 
   const rows = activeSheet.rows || []
-  const safeHeaderIndex = Math.max(0, Math.min(headerRowIndex, Math.max(rows.length - 1, 0)))
   const columnCount = activeSheet.columnCount || inferColumnCount(rows)
   const fallbackHeaders = buildFallbackHeaders(columnCount)
-  const headerRow = rows[safeHeaderIndex] || []
-  const headers = fallbackHeaders.map((fallback, index) => normalizeCellValue(headerRow[index]) || fallback)
-  const dataRows = rows.slice(safeHeaderIndex + 1)
+  const hasHeader = headerRowIndex >= 0
+
+  let headers, dataRows, safeHeaderIndex
+  if (hasHeader) {
+    safeHeaderIndex = Math.max(0, Math.min(headerRowIndex, Math.max(rows.length - 1, 0)))
+    const headerRow = rows[safeHeaderIndex] || []
+    headers = fallbackHeaders.map((fallback, index) => normalizeCellValue(headerRow[index]) || fallback)
+    dataRows = rows.slice(safeHeaderIndex + 1)
+  } else {
+    safeHeaderIndex = -1
+    headers = fallbackHeaders
+    dataRows = rows.slice(0)
+  }
   const previewRows = (Number.isFinite(previewRowCount)
     ? dataRows.slice(0, Math.max(0, previewRowCount))
     : dataRows

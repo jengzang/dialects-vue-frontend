@@ -577,10 +577,16 @@ function emitHeaderRowChange(value) {
 const headerRowOptions = computed(() => {
   const rowCount = props.previewTable?.activeSheet?.rowCount || 0
   const maxCount = Math.min(Math.max(rowCount, 1), 6)
-  return Array.from({ length: maxCount }, (_, index) => ({
-    label: t('common.importPreview.controls.headerRowOption', { row: index + 1 }),
-    value: index
-  }))
+  const options = [
+    { label: t('common.importPreview.controls.noHeader'), value: -1 }
+  ]
+  for (let i = 0; i < maxCount; i++) {
+    options.push({
+      label: t('common.importPreview.controls.headerRowOption', { row: i + 1 }),
+      value: i
+    })
+  }
+  return options
 })
 
 const columnOptions = computed(() => ([

@@ -55,8 +55,16 @@ export function transformTabularFile({
   if (!sheet) throw new Error('transformTabularFile: no sheet found')
 
   const rows = sheet.rows || []
-  const safeHeaderIdx = Math.max(0, Math.min(headerRowIndex, Math.max(rows.length - 1, 0)))
-  const dataRows = rows.slice(safeHeaderIdx + 1)
+  const hasHeader = headerRowIndex >= 0
+  let safeHeaderIdx, dataRows
+
+  if (hasHeader) {
+    safeHeaderIdx = Math.max(0, Math.min(headerRowIndex, Math.max(rows.length - 1, 0)))
+    dataRows = rows.slice(safeHeaderIdx + 1)
+  } else {
+    safeHeaderIdx = -1
+    dataRows = rows.slice(0)
+  }
 
   const outputHeaders = columnMap.map(m => m.header)
   const sourceIndices = columnMap.map(m => parseColumnIndex(m.sourceKey))
@@ -70,8 +78,8 @@ export function transformTabularFile({
 
   // rename mode
   const allRows = sheet.rows || []
-  const origHeaderRow = allRows[safeHeaderIdx] || []
-  const columnCount = sheet.columnCount || origHeaderRow.length
+  const origHeaderRow = hasHeader ? (allRows[safeHeaderIdx] || []) : []
+  const columnCount = sheet.columnCount || origHeaderRow.length || sourceIndices.length
 
   const renameMap = new Map()
   columnMap.forEach(m => {
