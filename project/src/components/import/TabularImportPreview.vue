@@ -111,22 +111,24 @@
                 :key="field.key"
                 class="tabular-import-preview__mapping-row"
               >
-                <div class="tabular-import-preview__mapping-meta">
+                <div class="tabular-import-preview__mapping-row-top">
                   <div class="tabular-import-preview__mapping-name-row">
                     <span class="tabular-import-preview__mapping-name">{{ field.label }}</span>
                     <span v-if="field.required" class="mapping-required">{{ t('common.importPreview.mapping.required') }}</span>
                   </div>
+                  <div class="tabular-import-preview__mapping-control">
+                    <SimpleSelectDropdown
+                      :model-value="mapping[field.key]"
+                      :options="columnOptions"
+                      searchable
+                      match-trigger-width
+                      @update:modelValue="$emit('update:mapping', { fieldKey: field.key, sourceKey: $event })"
+                    />
+                  </div>
+                </div>
+                <div v-if="field.description || field.example" class="tabular-import-preview__mapping-meta">
                   <p v-if="field.description" class="tabular-import-preview__mapping-desc">{{ field.description }}</p>
                   <p v-if="field.example" class="tabular-import-preview__mapping-example">{{ t('common.importPreview.mapping.example', { value: field.example }) }}</p>
-                </div>
-                <div class="tabular-import-preview__mapping-control">
-                  <SimpleSelectDropdown
-                    :model-value="mapping[field.key]"
-                    :options="columnOptions"
-                    searchable
-                    match-trigger-width
-                    @update:modelValue="$emit('update:mapping', { fieldKey: field.key, sourceKey: $event })"
-                  />
                 </div>
               </div>
             </div>
@@ -296,22 +298,24 @@
               :key="field.key"
               class="tabular-import-preview__mapping-row"
             >
-              <div class="tabular-import-preview__mapping-meta">
+              <div class="tabular-import-preview__mapping-row-top">
                 <div class="tabular-import-preview__mapping-name-row">
                   <span class="tabular-import-preview__mapping-name">{{ field.label }}</span>
                   <span v-if="field.required" class="mapping-required">{{ t('common.importPreview.mapping.required') }}</span>
                 </div>
+                <div class="tabular-import-preview__mapping-control">
+                  <SimpleSelectDropdown
+                    :model-value="mapping[field.key]"
+                    :options="columnOptions"
+                    searchable
+                    match-trigger-width
+                    @update:modelValue="$emit('update:mapping', { fieldKey: field.key, sourceKey: $event })"
+                  />
+                </div>
+              </div>
+              <div v-if="field.description || field.example" class="tabular-import-preview__mapping-meta">
                 <p v-if="field.description" class="tabular-import-preview__mapping-desc">{{ field.description }}</p>
                 <p v-if="field.example" class="tabular-import-preview__mapping-example">{{ t('common.importPreview.mapping.example', { value: field.example }) }}</p>
-              </div>
-              <div class="tabular-import-preview__mapping-control">
-                <SimpleSelectDropdown
-                  :model-value="mapping[field.key]"
-                  :options="columnOptions"
-                  searchable
-                  match-trigger-width
-                  @update:modelValue="$emit('update:mapping', { fieldKey: field.key, sourceKey: $event })"
-                />
               </div>
             </div>
           </div>
@@ -629,6 +633,7 @@ $preview-min-column-width: 120px;
   &__body,
   &__section-head,
   &__mapping-row,
+  &__mapping-row-top,
   &__mapping-name-row,
   &__toolbar-item,
   &__toolbar-meta {
@@ -809,30 +814,40 @@ $preview-min-column-width: 120px;
   }
 
   &__mapping-row {
-    gap: 12px;
-    align-items: flex-start;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 4px;
     padding: 12px;
     background: var(--glass-35);
     border: 1px solid var(--glass-30);
     border-radius: var(--radius-lg);
   }
 
-  &__mapping-meta {
-    min-width: 0;
-    flex: 1;
+  &__mapping-row-top {
+    display: flex;
+    gap: 20px;
+    align-items: center;
   }
 
   &__mapping-name-row {
+    flex-shrink: 0;
     gap: 8px;
     align-items: center;
-    margin-bottom: 6px;
   }
 
   &__mapping-name {
     color: $text-primary;
     font-size: 14px;
     font-weight: 600;
+    white-space: nowrap;
+  }
+
+  &__mapping-control {
+    flex: 1;
+    min-width: 0;
+
+    :deep(.simple-select-dropdown) {
+      display: block;
+    }
   }
 
   &__mapping-desc,
@@ -844,12 +859,8 @@ $preview-min-column-width: 120px;
   }
 
   &__mapping-example {
-    margin-top: 4px;
+    margin-top: 2px;
     color: $text-muted;
-  }
-
-  &__mapping-control {
-    // min-width: 220px;
   }
 
   &__diagnostics {
@@ -981,7 +992,6 @@ $preview-min-column-width: 120px;
 @media (orientation: portrait) {
   .tabular-import-preview {
     &__body,
-    &__mapping-row,
     &__section-head,
     &__header,
     &__toolbar {
@@ -992,6 +1002,10 @@ $preview-min-column-width: 120px;
       flex: 0 1 auto;
       min-height: 0;
       overflow: auto;
+    }
+
+    &__mapping-row-top {
+      flex-wrap: wrap;
     }
 
     &__mapping-control {
