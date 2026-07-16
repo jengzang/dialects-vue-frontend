@@ -38,42 +38,52 @@
           <div v-if="layers.ngrams" class="section">
             <h3>N-gram 設置</h3>
             <p class="layer-note">⚠️ 僅支持 2-4 字符的 N-gram，區域固定為鄉鎮級</p>
-            <input
-              v-model="filters.ngram"
-              type="text"
-              placeholder="輸入 2-4 字 N-gram（如：新村）"
-              class="filter-input"
-              maxlength="4"
-            >
+            <div class="filter-row vml-control-surface vml-control-row">
+              <div class="vml-control-field">
+                <input
+                  v-model="filters.ngram"
+                  type="text"
+                  placeholder="輸入 2-4 字 N-gram（如：新村）"
+                  class="filter-input"
+                  maxlength="4"
+                >
+              </div>
+            </div>
           </div>
 
           <!-- 字符過濾器 -->
           <div v-if="layers.characters" class="section">
             <h3>字符設置</h3>
-            <div class="filter-row">
-              <input
-                v-model="filters.character"
-                type="text"
-                placeholder="輸入字符（如：村）"
-                maxlength="1"
-                class="filter-input"
-              >
-              <SimpleSelectDropdown
-                v-model="filters.charLevel"
-                :options="charLevelOptions"
-              />
+            <div class="filter-row vml-control-surface vml-control-row">
+              <div class="vml-control-field vml-control-field--compact">
+                <input
+                  v-model="filters.character"
+                  type="text"
+                  placeholder="輸入字符（如：村）"
+                  maxlength="1"
+                  class="filter-input"
+                >
+              </div>
+              <div class="vml-control-field vml-control-field--compact">
+                <SimpleSelectDropdown
+                  v-model="filters.charLevel"
+                  :options="charLevelOptions"
+                />
+              </div>
             </div>
           </div>
 
           <!-- 應用按鈕 -->
           <div class="section">
-            <button
-              class="apply-btn"
-              @click="loadData"
-              :disabled="loading"
-            >
-              {{ loading ? '加載中...' : '應用' }}
-            </button>
+            <div class="vml-control-surface vml-control-actions">
+              <button
+                class="apply-btn"
+                @click="loadData"
+                :disabled="loading"
+              >
+                {{ loading ? '加載中...' : '應用' }}
+              </button>
+            </div>
           </div>
 
           <!-- 圖例 -->
