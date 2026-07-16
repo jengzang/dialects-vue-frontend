@@ -21,9 +21,10 @@
             v-for="(item, key) in filteredMenuConfig"
             :key="key"
             class="main-sidebar-item"
-            @click="handleMainClick(item, key, $event)"
+            @pointerup="handleMainPointerUp(item, key, $event)"
+            @click.stop
             @mouseenter="handleItemMouseEnter(item, key, $event)"
-            @mouseleave="item.children && !isMobile ? scheduleCloseSubmenu() : null"
+            @mouseleave="item.children && canHover ? scheduleCloseSubmenu() : null"
           >
             <span role="img" :aria-label="key">{{ item.icon }}</span>
             {{ item.label }}
@@ -112,8 +113,8 @@
           left: submenuPosition.left + 'px'
         }"
         @click.stop
-        @mouseenter="!isMobile ? cancelCloseSubmenu() : null"
-        @mouseleave="!isMobile ? scheduleCloseSubmenu() : null"
+        @mouseenter="canHover ? cancelCloseSubmenu() : null"
+        @mouseleave="canHover ? scheduleCloseSubmenu() : null"
       >
         <div
           v-for="(child, index) in getFilteredChildren(activeSubmenu)"
@@ -184,18 +185,35 @@ const activeSubmenu = ref(null)  // Currently open submenu key
 const submenuPosition = ref({ top: 0, left: 0 })  // Position for submenu panel
 const closeSubmenuTimeout = ref(null)  // Timeout for delayed closing
 
-// Mobile detection
-const isMobile = ref(false)
-let hoverMediaQuery = null
+// Input capability detection
+// Do not use hover capability alone to determine whether the device is mobile.
+// Some Android devices, styluses, desktop mode, and hybrid devices may report hover support.
+const hasTouchInput = ref(false)
+const canHover = ref(false)
 
-const onHoverChange = (e) => {
-  isMobile.value = !e.matches
+let hoverMediaQuery = null
+let coarsePointerMediaQuery = null
+let anyCoarsePointerMediaQuery = null
+
+const updateInputCapabilities = () => {
+  canHover.value = hoverMediaQuery?.matches ?? false
+  hasTouchInput.value = Boolean(
+    coarsePointerMediaQuery?.matches ||
+    anyCoarsePointerMediaQuery?.matches ||
+    navigator.maxTouchPoints > 0
+  )
 }
 
-const checkMobile = () => {
-  isMobile.value = !window.matchMedia('(hover: hover)').matches
-  hoverMediaQuery = window.matchMedia('(hover: hover)')
-  hoverMediaQuery.addEventListener('change', onHoverChange)
+const checkInputCapabilities = () => {
+  hoverMediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)')
+  coarsePointerMediaQuery = window.matchMedia('(pointer: coarse)')
+  anyCoarsePointerMediaQuery = window.matchMedia('(any-pointer: coarse)')
+
+  updateInputCapabilities()
+
+  hoverMediaQuery.addEventListener('change', updateInputCapabilities)
+  coarsePointerMediaQuery.addEventListener('change', updateInputCapabilities)
+  anyCoarsePointerMediaQuery.addEventListener('change', updateInputCapabilities)
 }
 
 // Filter menu items for SimpleSidebar (exclude items that should only show in NavBar)
@@ -247,39 +265,56 @@ const closeSidebar = () => {
   activeSubmenu.value = null;
 };
 
-// 主按鈕點擊處理
-// 桌面端：有子菜單 → 直接導航到記憶頁/默認頁；無子菜單 → 導航
-// 移動端：有子菜單 → 展開子菜單；無子菜單 → 導航
-const handleMainClick = (item, key, event) => {
+// Main menu interaction handler
+// Mouse: items with children navigate directly to the remembered/default child page.
+// Touch or pen: items with children open the submenu instead of navigating.
+const handleMainPointerUp = (item, key, event) => {
+  const pointerType = event?.pointerType
+  const isTouchInteraction =
+    pointerType === 'touch' ||
+    pointerType === 'pen' ||
+    (!pointerType && hasTouchInput.value)
+
+  handleMainClick(item, key, event, isTouchInteraction)
+}
+
+const handleMainClick = (item, key, event, isTouchInteraction) => {
   event?.stopPropagation()
   cancelCloseSubmenu()
 
   if (item.children) {
-    if (!isMobile.value) {
-      // 桌面端：導航到記憶的子頁，無記憶則取第一個子頁
+    if (isTouchInteraction) {
+      // Touch/pen: open the submenu.
+      handleArrowClick(item, key, event)
+    } else {
+      // Mouse: navigate to the remembered child, or the first visible child.
       const remembered = readSidebarMemory(key)
       const defaultChild = getFilteredChildren(key)[0]?.path
       const target = remembered || defaultChild || item.path
-      router.push(target)
-      closeSidebar()
-    } else {
-      // 移動端：展開子菜單
-      handleArrowClick(item, key, event)
+
+      if (target) {
+        router.push(target)
+        closeSidebar()
+      }
     }
-  } else if (item.path) {
-    if (item.external) {
-      window.location.href = WEB_BASE + item.path
-    } else {
-      router.push(item.path)
-      closeSidebar()
-    }
+
+    return
+  }
+
+  if (!item.path) return
+
+  if (item.external) {
+    window.location.href = WEB_BASE + item.path
+  } else {
+    router.push(item.path)
+    closeSidebar()
   }
 }
 
-// 處理項目鼠標進入
+// Handle mouse hover only when the current primary pointer truly supports hover.
 const handleItemMouseEnter = (item, key, event) => {
-  cancelCloseSubmenu()  // 取消任何待處理的關閉
-  if (!isMobile.value && item.children) {
+  cancelCloseSubmenu()
+  if (canHover.value && item.children) {
     handleArrowClick(item, key, event)
   }
 }
@@ -386,7 +421,7 @@ async function fetchVisitHistory() {
 }
 
 onMounted(async () => {
-  checkMobile();
+  checkInputCapabilities();
   await fetchVisitStats();
   document.addEventListener('click', closeSubmenu);
 });
@@ -394,8 +429,16 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', closeSubmenu);
   if (hoverMediaQuery) {
-    hoverMediaQuery.removeEventListener('change', onHoverChange);
+    hoverMediaQuery.removeEventListener('change', updateInputCapabilities);
     hoverMediaQuery = null;
+  }
+  if (coarsePointerMediaQuery) {
+    coarsePointerMediaQuery.removeEventListener('change', updateInputCapabilities);
+    coarsePointerMediaQuery = null;
+  }
+  if (anyCoarsePointerMediaQuery) {
+    anyCoarsePointerMediaQuery.removeEventListener('change', updateInputCapabilities);
+    anyCoarsePointerMediaQuery = null;
   }
 });
 </script>
@@ -884,19 +927,16 @@ $portrait-ratio: 1;
 
 /* 移动端保持 SimpleSidebar 原逻辑 */
 
-@media (max-aspect-ratio: $portrait-ratio) and (hover: none) {
+@media (max-aspect-ratio: $portrait-ratio) and (any-pointer: coarse) {
 
   .title-img {
     height: 6dvh;
-
     max-height: 50px;
   }
 
 
   .sidebar-content {
-
     gap: 15px;
-
 
     ul {
       gap: 8px;
@@ -905,7 +945,6 @@ $portrait-ratio: 1;
 
     li {
       padding: 3px 15px;
-
       font-size: 1.1rem;
     }
   }

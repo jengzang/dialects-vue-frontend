@@ -624,11 +624,11 @@ const tableData = computed(() => {
 @use '@/styles/global/mixins' as *;
 
 // 排行榜使用硬编码颜色，在浅色/深色模式下统一显示为浅色卡片风格
-$primary: #3b82f6;
-$primary-dark: #2563eb;
-$text-primary: #1d1d1f;
-$text-secondary: #86868b;
-$danger: #ef4444;
+$primary: var(--color-primary);
+$primary-dark: var(--color-primary-hover);
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-secondary);
+$danger: var(--color-error-light);
 
 $gold: #ffd700;
 $gold-text: #b8860b;
@@ -637,14 +637,14 @@ $silver-text: #6e7e84;
 $bronze: #cd7f32;
 $bronze-text: #8b5a2b;
 
-$glass-50: rgba(255, 255, 255, 0.5);
-$glass-60: rgba(255, 255, 255, 0.6);
-$glass-70: rgba(255, 255, 255, 0.7);
-$glass-80: rgba(255, 255, 255, 0.8);
-$glass-90: rgba(255, 255, 255, 0.9);
-$bg-white: #ffffff;
-$border-light: #d1d5db;
-$warning: #f59e0b;
+$glass-50: var(--glass-50);
+$glass-60: var(--glass-60);
+$glass-70: var(--glass-70);
+$glass-80: var(--glass-80);
+$glass-90: var(--glass-90);
+$bg-white: var(--bg-light-gray);
+$border-light: var(--text-white);
+$warning: var(--color-warning);
 
 @mixin glass($blur: 40px, $saturate: 180%) {
   backdrop-filter: blur($blur) saturate($saturate);
