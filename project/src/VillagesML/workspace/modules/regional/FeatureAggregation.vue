@@ -16,29 +16,35 @@
         <h3>區域選擇</h3>
         <p class="section-description">選擇多個區域進行特徵聚合對比（選擇3個以上可以評估z-score）</p>
 
-        <div class="selector-row">
-          <label class="field-label">區域級別：</label>
-          <SimpleSelectDropdown
-            v-model="regionLevel"
-            :options="levelOptions"
-            :match-trigger-width="true"
-            class="level-dropdown"
-          />
-          <FilterableSelect
-            v-model="currentRegion"
-            :level="regionLevel"
-            :show-level-selector="false"
-            placeholder="選擇或輸入區域名稱"
-            class="region-input"
-            @update:hierarchy="h => currentHierarchy = h"
-          />
-          <button
-            class="solid-button primary"
-            :disabled="!currentRegion || regionList.length >= 50"
-            @click="addRegion"
-          >
-            添加
-          </button>
+        <div class="selector-row vml-control-surface vml-control-row">
+          <div class="vml-control-field vml-control-field--compact">
+            <label class="field-label">區域級別：</label>
+            <SimpleSelectDropdown
+              v-model="regionLevel"
+              :options="levelOptions"
+              :match-trigger-width="true"
+              class="level-dropdown"
+            />
+          </div>
+          <div class="vml-control-field">
+            <FilterableSelect
+              v-model="currentRegion"
+              :level="regionLevel"
+              :show-level-selector="false"
+              placeholder="選擇或輸入區域名稱"
+              class="region-input"
+              @update:hierarchy="h => currentHierarchy = h"
+            />
+          </div>
+          <div class="vml-control-actions">
+            <button
+              class="solid-button primary"
+              :disabled="!currentRegion || regionList.length >= 50"
+              @click="addRegion"
+            >
+              添加
+            </button>
+          </div>
         </div>
 
         <div v-if="regionList.length > 0" class="region-tags">
@@ -73,8 +79,8 @@
         </div>
       </div>
 
-      <div class="section query-row">
-        <div class="topn-row">
+      <div class="section query-row vml-control-surface vml-control-row vml-control-row--center">
+        <div class="topn-row vml-control-field vml-control-field--compact">
           <label class="field-label">Top N：</label>
           <input
             type="number"
@@ -84,13 +90,15 @@
             class="number-input"
           />
         </div>
-        <button
-          class="solid-button primary large"
-          :disabled="regionList.length === 0 || loading"
-          @click="runAggregation"
-        >
-          {{ loading ? '查詢中...' : '查詢' }}
-        </button>
+        <div class="vml-control-actions">
+          <button
+            class="solid-button primary large"
+            :disabled="regionList.length === 0 || loading"
+            @click="runAggregation"
+          >
+            {{ loading ? '查詢中...' : '查詢' }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -511,9 +519,6 @@ const liftClass = (lift) => {
 }
 
 .selector-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin-bottom: 12px;
 
   .field-label {
@@ -526,7 +531,7 @@ const liftClass = (lift) => {
   }
 
   .region-input {
-    flex: 1;
+    width: 100%;
   }
 }
 
@@ -569,16 +574,7 @@ const liftClass = (lift) => {
 }
 
 .query-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-
-.topn-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin-bottom: 0;
 }
 
 .number-input {
