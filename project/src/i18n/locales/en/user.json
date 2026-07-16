@@ -258,10 +258,10 @@
       "phonology": {
         "label": "Phonological Queries",
         "items": {
-          "zhonggu": "Middle Chinese",
-          "yinwei": "Phonetic Values",
-          "diwei": "Phonological Categories",
-          "combination": "Category Combinations",
+          "zhonggu": "Middle Chinese Queries",
+          "yinwei": "Reading Queries",
+          "diwei": "Phonological Categories Queries",
+          "combination": "Category Combination Queries",
           "syllable": "Initials, Finals & Tones",
           "compareZhonggu": "Middle Chinese Comparisons"
         },
@@ -273,8 +273,8 @@
       "charsTones": {
         "label": "Character & Tone Queries",
         "items": {
-          "chars": "Characters",
-          "tones": "Tones",
+          "chars": "Character Queries",
+          "tones": "Tone Queries",
           "compareChars": "Character Comparisons",
           "compareTones": "Tone-Class Comparisons"
         }

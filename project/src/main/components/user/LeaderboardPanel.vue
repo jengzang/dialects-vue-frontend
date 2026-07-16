@@ -1160,7 +1160,7 @@ $warning: var(--color-warning);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  color: $primary;
+  color: $primary-dark;
 
   &.gold {
     background: linear-gradient(
