@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { resultCache } from '@/main/store/store.js'
-import { isPlatformFeatureEnabled } from '@/platform/index.js'
+import { isPlatformRouteEnabled } from '@/platform/index.js'
 
 // ========================================
 // MenuBar Configuration Guide
@@ -90,7 +90,7 @@ const MENU_CHILD_PATHS = {
 
 function filterPlatformChildPaths(tabKey, paths) {
   if (tabKey !== 'map') return paths
-  return paths.filter((path) => path !== '/menu/map/draw' || isPlatformFeatureEnabled('mapDraw'))
+  return paths.filter((path) => isPlatformRouteEnabled(path))
 }
 
 const createDisplayConfig = ({ preset = 'standard', overrides = {} } = {}) => ({

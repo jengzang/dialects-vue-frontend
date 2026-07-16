@@ -1,4 +1,4 @@
-import { isPlatformFeatureEnabled } from '@/platform/index.js'
+import { isPlatformRouteEnabled } from '@/platform/index.js'
 
 const PhoPage = () => import('@/main/views/menu/PhoPage.vue')
 const AboutPage = () => import('@/main/views/menu/support/AboutPage.vue')
@@ -14,7 +14,7 @@ const VillagesPage = () => import('@/main/views/menu/portals/VillagesPage.vue')
 const DialectClusteringPage = () => import('@/main/views/menu/DialectClustering.vue')
 
 export function redirectUnsupportedMapDraw(to) {
-  if (to.params.sub !== 'draw' || isPlatformFeatureEnabled('mapDraw')) {
+  if (to.params.sub !== 'draw' || isPlatformRouteEnabled('/menu/map/draw')) {
     return true
   }
 

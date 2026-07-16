@@ -3,11 +3,16 @@ import { describe, expect, it } from 'vitest'
 import {
   buildPlatformCapabilities,
   detectRuntimePlatform,
+  getNativeDistPruneManifest,
   getPlatformFileService,
   getPlatformFullscreenController,
   getPlatformStorage,
   initializePlatformServices,
   getPlatformFeature,
+  isPlatformRouteEnabled,
+  isPlatformTutorialEnabled,
+  PLATFORM_FEATURE_MATRIX,
+  resolvePlatformFeatureAvailability,
   isFeatureEnabled,
   resetPlatformServicesForTests,
 } from '../src/platform/index.js'
@@ -127,6 +132,51 @@ describe('platform runtime detection and capabilities', () => {
       enabled: false,
       reason: 'web-only',
     })
+  })
+
+  it('drives platform feature availability and native pruning from the shared matrix', () => {
+    expect(PLATFORM_FEATURE_MATRIX.mapDraw).toMatchObject({
+      targets: {
+        web: true,
+        ios: false,
+        android: false,
+      },
+      routes: ['/menu/map/draw'],
+      tutorials: ['menu-map-draw'],
+      nativeDistPrune: {
+        paths: ['data/国界面.kmz'],
+      },
+    })
+
+    expect(resolvePlatformFeatureAvailability('mapDraw', {
+      family: 'web',
+      os: 'desktop',
+      container: 'browser',
+    })).toEqual({ enabled: true, reason: null })
+    expect(resolvePlatformFeatureAvailability('mapDraw', {
+      family: 'ios',
+      os: 'ios',
+      container: 'native-webview',
+    })).toEqual({ enabled: false, reason: 'web-only' })
+    expect(getNativeDistPruneManifest()).toMatchObject({
+      paths: ['data/国界面.kmz'],
+      globPatterns: ['^assets/voronoiClip\\.worker-[\\w-]+\\.js$'],
+    })
+    expect(isPlatformRouteEnabled('/menu/map/draw', {
+      family: 'android',
+      os: 'android',
+      container: 'native-webview',
+    })).toBe(false)
+    expect(isPlatformTutorialEnabled('menu-map-draw', {
+      family: 'android',
+      os: 'android',
+      container: 'native-webview',
+    })).toBe(false)
+    expect(isPlatformRouteEnabled('/menu/map/view', {
+      family: 'android',
+      os: 'android',
+      container: 'native-webview',
+    })).toBe(true)
   })
 
   it('exposes web-compatible storage through the platform adapter', () => {

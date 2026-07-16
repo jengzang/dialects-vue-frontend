@@ -7,6 +7,13 @@ export {
   getPlatformFeature,
   isFeatureEnabled,
 } from './capabilities.js'
+export {
+  getNativeDistPruneManifest,
+  isPlatformRouteEnabled,
+  isPlatformTutorialEnabled,
+  PLATFORM_FEATURE_MATRIX,
+  resolvePlatformFeatureAvailability,
+} from './featureMatrix.js'
 export { getPlatformStorage } from './storage.js'
 export {
   getPlatformFileService,

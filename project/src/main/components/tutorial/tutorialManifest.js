@@ -1,5 +1,5 @@
 import { stripLocaleFromPath } from '@/i18n/localeRouting.js'
-import { isPlatformFeatureEnabled } from '@/platform/index.js'
+import { isPlatformTutorialEnabled } from '@/platform/index.js'
 
 function readQueryValue(query, key) {
   const rawValue = query?.[key]
@@ -299,7 +299,7 @@ export const tutorialManifest = [
     path: '/explore/tools/merge',
   }),
   createPlatformPathEntry({
-    enabled: isPlatformFeatureEnabled('mapDraw'),
+    enabled: isPlatformTutorialEnabled('menu-map-draw'),
     key: 'menu-map-draw',
     categoryKey: 'practicalTools',
     groupKey: 'menuMapDraw',

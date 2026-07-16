@@ -1,19 +1,18 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { getNativeDistPruneManifest } from '../src/platform/featureMatrix.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const projectRoot = path.resolve(__dirname, '..')
 const distRoot = path.resolve(projectRoot, 'dist')
 
-export const NATIVE_DIST_PRUNE_PATHS = [
-  'data/国界面.kmz',
-]
+const nativeDistPruneManifest = getNativeDistPruneManifest()
 
-export const NATIVE_DIST_PRUNE_GLOBS = [
-  /^assets\/voronoiClip\.worker-[\w-]+\.js$/,
-]
+export const NATIVE_DIST_PRUNE_PATHS = nativeDistPruneManifest.paths
+export const NATIVE_DIST_PRUNE_GLOB_PATTERNS = nativeDistPruneManifest.globPatterns
+export const NATIVE_DIST_PRUNE_GLOBS = NATIVE_DIST_PRUNE_GLOB_PATTERNS.map((pattern) => new RegExp(pattern))
 
 async function pathExists(filePath) {
   try {
