@@ -183,3 +183,13 @@ export function resetSemanticState() {
   villagesMLStore.semanticNetwork = null
   villagesMLStore.semanticLoading = false
 }
+
+export function resetDatasetResultState() {
+  villagesMLStore.searchResults = []
+  villagesMLStore.searchTotal = 0
+  villagesMLStore.selectedVillage = null
+  villagesMLStore.tendencyData = []
+  villagesMLStore.charFrequencyData = []
+  resetClusteringState()
+  resetSemanticState()
+}

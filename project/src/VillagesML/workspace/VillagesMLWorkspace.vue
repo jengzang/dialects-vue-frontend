@@ -102,9 +102,9 @@
 </template>
 
 <script setup>
-import { ref, computed, defineAsyncComponent } from 'vue'
+import { ref, computed, defineAsyncComponent, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
+import { resetDatasetResultState, villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import { userStore } from '@/main/store/store.js'
 import {
   searchVillages,
@@ -115,7 +115,8 @@ import {
 import { showError, showSuccess } from '@/utils/message.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
-import { buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
+import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
+import { resolveVillagesMLDatasetFromRoute } from '@/VillagesML/utils/routeDataset.js'
 
 // Import CommonBar and SimpleSidebar
 import CommonBar from '@/components/bar/CommonBar.vue'
@@ -136,14 +137,25 @@ const isAuthenticated = computed(() => userStore.isAuthenticated)
 // State
 const activeModule = computed(() => route.query.module || 'search')
 const activeSubtab = computed(() => route.query.subtab || null)
-const commonBarSchema = computed(() => createVillagesMLCommonBarSchema(isAuthenticated.value))
+const activeDataset = computed(() => resolveVillagesMLDatasetFromRoute(route))
+const commonBarSchema = computed(() => {
+  if (!route.path) {
+    return createVillagesMLCommonBarSchema(isAuthenticated.value)
+  }
+  return createVillagesMLCommonBarSchema(isAuthenticated.value)
+})
+const getRouteAwareVillagesMLModules = () => {
+  if (!route.path) return []
+  return getVillagesMLModules()
+}
 
 // Module tabs for CommonBar (只有主模組，沒有子標籤)
 const moduleTabs = computed(() => {
-  const visibleModules = getVisibleModules(isAuthenticated.value)
+  const visibleModules = getRouteAwareVillagesMLModules()
+    .filter(module => !module.requireAuth || isAuthenticated.value)
 
   return visibleModules.map(module => ({
-    ...module,  // 直接使用 VILLAGESML_MODULES 的所有配置（包括 path）
+    ...module,  // 使用当前 dataset 下的配置（包括 path）
     tab: module.id,  // CommonBar 需要 tab 屬性
     to: module.path  // 使用配置中的 path
   }))
@@ -153,7 +165,7 @@ const moduleTabs = computed(() => {
 const submenuConfig = computed(() => {
   const config = {}
 
-  VILLAGESML_MODULES.forEach(module => {
+  getRouteAwareVillagesMLModules().forEach(module => {
     if (module.subtabs && module.subtabs.length > 0) {
       config[module.id] = {
         children: module.subtabs.map(subtab => ({
@@ -171,7 +183,7 @@ const submenuConfig = computed(() => {
 // Tab to submenu map (模組 ID 映射到 submenu key)
 const tabToSubmenuMap = computed(() => {
   const map = {}
-  VILLAGESML_MODULES.forEach(module => {
+  getRouteAwareVillagesMLModules().forEach(module => {
     if (module.subtabs && module.subtabs.length > 0) {
       map[module.id] = module.id
     }
@@ -182,6 +194,12 @@ const tabToSubmenuMap = computed(() => {
 // Current module config
 const currentModule = computed(() => getModuleConfig(activeModule.value))
 const currentModuleLabel = computed(() => currentModule.value?.label || '村落機器學習')
+
+watch(activeDataset, (dataset, previousDataset) => {
+  if (previousDataset && dataset !== previousDataset) {
+    resetDatasetResultState()
+  }
+})
 
 // Active state getter for CommonBar
 
@@ -237,21 +255,23 @@ import ClusteringResultsPanel from '@/VillagesML/workspace/modules/ml/Clustering
 import SemanticSettingsPanel from '@/VillagesML/workspace/modules/semantic/SemanticSettingsPanel.vue'
 import NetworkGraphPanel from '@/VillagesML/workspace/modules/semantic/NetworkGraphPanel.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { createVillagesMLCommonBarSchema, getModuleConfig, getVisibleModules, VILLAGESML_MODULES } from '@/VillagesML/config/BarConfig.js'
+import { createVillagesMLCommonBarSchema, getModuleConfig, getVillagesMLModules } from '@/VillagesML/config/BarConfig.js'
 
-// Module configuration (from villagesML.js)
-const modules = VILLAGESML_MODULES.map(m => ({
-  id: m.id,
-  label: m.label,
-  icon: m.icon,
-  requireAuth: m.requireAuth,
-  component: null, // Will be mapped below
-  subtabs: m.subtabs?.map(s => ({
-    id: s.id,
-    label: s.label,
-    component: null // Will be mapped below
+// Module configuration
+const modules = computed(() => {
+  return getRouteAwareVillagesMLModules().map(m => ({
+    id: m.id,
+    label: m.label,
+    icon: m.icon,
+    requireAuth: m.requireAuth,
+    component: null, // Will be mapped below
+    subtabs: m.subtabs?.map(s => ({
+      id: s.id,
+      label: s.label,
+      component: null // Will be mapped below
+    }))
   }))
-}))
+})
 
 // Computed
 const currentComponent = computed(() => {
@@ -417,7 +437,7 @@ const handleRegionalAnalysis = async ({ level, name, hierarchy }) => {
 const handleRunClustering = async (settings) => {
   const authed = await requireAuth({
     message: '此功能需要登錄，請先登錄',
-    redirect: route.fullPath || buildVillagesMLPath({ module: 'compute' }),
+    redirect: route.fullPath || buildCurrentVillagesMLPath({ module: 'compute' }),
   })
   if (!authed) {
     return
@@ -443,7 +463,7 @@ const handleRunClustering = async (settings) => {
 const handleRunSemantic = async (settings) => {
   const authed = await requireAuth({
     message: '此功能需要登錄，請先登錄',
-    redirect: route.fullPath || buildVillagesMLPath({ module: 'compute' }),
+    redirect: route.fullPath || buildCurrentVillagesMLPath({ module: 'compute' }),
   })
   if (!authed) {
     return

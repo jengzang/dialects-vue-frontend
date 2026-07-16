@@ -1,10 +1,17 @@
-export const DEFAULT_VILLAGESML_DATASET = 'gd'
+import {
+  DEFAULT_VILLAGESML_DATASET,
+  VILLAGESML_DATASET_IDS,
+} from '@/VillagesML/config/datasets.js'
+
+export { DEFAULT_VILLAGESML_DATASET }
 
 const DATASET_PATTERN = /^[a-z0-9-]+$/
 
 export function normalizeVillagesMLDataset(dataset = DEFAULT_VILLAGESML_DATASET) {
   const normalized = String(dataset || DEFAULT_VILLAGESML_DATASET).trim().toLowerCase()
-  return DATASET_PATTERN.test(normalized) ? normalized : DEFAULT_VILLAGESML_DATASET
+  return DATASET_PATTERN.test(normalized) && VILLAGESML_DATASET_IDS.has(normalized)
+    ? normalized
+    : DEFAULT_VILLAGESML_DATASET
 }
 
 export function resolveVillagesMLDataset(path = '') {
@@ -48,12 +55,16 @@ export function buildVillagesMLPath({
 }
 
 export function buildVillagesMLRedirect(route = {}) {
-  if (route.path !== '/villagesML') {
+  const path = route.path || ''
+  const normalizedDataset = resolveVillagesMLDatasetFromRoute(route)
+  const canonicalPath = `/villagesML/${normalizedDataset}`
+
+  if (path !== '/villagesML' && path === canonicalPath) {
     return null
   }
 
   return {
-    path: `/villagesML/${DEFAULT_VILLAGESML_DATASET}`,
+    path: canonicalPath,
     query: route.query || {},
     hash: route.hash || '',
     replace: true,

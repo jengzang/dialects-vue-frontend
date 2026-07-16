@@ -211,7 +211,7 @@ import {
 import { getVillagesNgrams } from '@/composables/useVillagesCache.js'
 import { showError } from '@/utils/message.js'
 import { getNgramPositionLabel, getNgramPatternTypeLabel } from '@/VillagesML/config/villagesML.js'
-import { buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
+import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 
 const router = useRouter()
 
@@ -290,7 +290,7 @@ const searchPatterns = async () => {
 }
 
 const goToStats = (ngram) => {
-  router.push(buildVillagesMLPath({
+  router.push(buildCurrentVillagesMLPath({
     module: 'pattern',
     subtab: 'ngram-stats',
     query: { ngram }

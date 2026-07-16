@@ -15,7 +15,7 @@ function readSource(relativePath) {
 describe('villagesML cache keys', () => {
   it('scopes villages cache keys by dataset', () => {
     expect(buildVillagesCacheKey('overview')).toBe('villages-gd-overview-cache')
-    expect(buildVillagesCacheKey('ngrams', { dataset: 'cn' })).toBe('villages-cn-ngrams-cache')
+    expect(buildVillagesCacheKey('ngrams', { dataset: 'cn' })).toBe('villages-gd-ngrams-cache')
     expect(buildVillagesCacheKey('regions', { dataset: 'gd', parts: ['city'] })).toBe(
       'villages-gd-regions-cache-city'
     )
@@ -31,5 +31,14 @@ describe('villagesML cache keys', () => {
     expect(source).not.toContain('const OVERVIEW_CACHE_KEY')
     expect(source).not.toContain('const NGRAMS_CACHE_KEY')
     expect(source).not.toContain('const TABLES_CACHE_KEY')
+  })
+
+  it('keeps region preload caches scoped to the current route dataset', () => {
+    const source = readSource('src/VillagesML/utils/regionPreload.js')
+
+    expect(source).toContain('getCurrentVillagesMLDataset')
+    expect(source).toContain('allRegionsDataByDataset')
+    expect(source).toContain('loadingPromisesByDataset')
+    expect(source).not.toContain("const CACHE_KEY = 'regions_all_data_v3'")
   })
 })

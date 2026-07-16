@@ -545,7 +545,7 @@ import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { FILTER_FIELDS, getOperatorOptions, getDefaultOperator, getFieldInputType, getFieldOptions } from '@/VillagesML/config/subsetFilters.js'
 import { getCategoryName, getCategoryIcon } from '@/VillagesML/config/villagesML.js'
-import { buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
+import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 
 // Router
 const router = useRouter()
@@ -679,7 +679,7 @@ const goToAuth = () => {
   router.push({
     path: '/auth',
     query: {
-      redirect: route.fullPath || buildVillagesMLPath({ module: 'compute', subtab: 'subset' })
+      redirect: route.fullPath || buildCurrentVillagesMLPath({ module: 'compute', subtab: 'subset' })
     }
   })
 }

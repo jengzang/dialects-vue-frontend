@@ -34,9 +34,15 @@ describe('villagesML API request helper', () => {
     })).toBe('/api/villages/ngrams/frequency?n=2&type=gd&position=prefix&min_frequency=5')
   })
 
+  it('does not let callers override the dataset type query', () => {
+    expect(buildVillagesMLApiPath('/ngrams/frequency', {
+      query: { type: 'cn', position: 'prefix' },
+    })).toBe('/api/villages/ngrams/frequency?type=gd&position=prefix')
+  })
+
   it('uses the current VillagesML route dataset by default', () => {
     setCurrentVillagesMLDatasetFromRoute({ path: '/villagesML/cn', params: { pathMatch: ['cn'] } })
-    expect(buildVillagesMLApiPath('/metadata/stats/overview')).toBe('/api/villages/metadata/stats/overview?type=cn')
+    expect(buildVillagesMLApiPath('/metadata/stats/overview')).toBe('/api/villages/metadata/stats/overview?type=gd')
     expect(buildVillagesMLApiPath('/metadata/stats/overview', { dataset: 'gd' })).toBe(
       '/api/villages/metadata/stats/overview?type=gd'
     )

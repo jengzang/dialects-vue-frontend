@@ -1,5 +1,6 @@
 import {
   DEFAULT_VILLAGESML_DATASET,
+  buildVillagesMLPath,
   normalizeVillagesMLDataset,
   resolveVillagesMLDatasetFromRoute,
 } from './routeDataset.js'
@@ -21,4 +22,11 @@ export function setCurrentVillagesMLDatasetFromRoute(route = {}) {
 
 export function resetCurrentVillagesMLDataset() {
   currentVillagesMLDataset = DEFAULT_VILLAGESML_DATASET
+}
+
+export function buildCurrentVillagesMLPath(options = {}) {
+  return buildVillagesMLPath({
+    ...options,
+    dataset: options.dataset || getCurrentVillagesMLDataset()
+  })
 }

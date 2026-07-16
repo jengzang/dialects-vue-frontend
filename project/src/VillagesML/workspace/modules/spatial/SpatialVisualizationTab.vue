@@ -163,7 +163,7 @@ import {
   SPATIAL_CLUSTERING_RUN_LABELS,
   DEFAULT_SPATIAL_CLUSTERING_RUN_ID
 } from '@/VillagesML/config/villagesML.js'
-import { buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
+import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -171,7 +171,7 @@ const goToAuth = () => {
   router.push({
     path: '/auth',
     query: {
-      redirect: route.fullPath || buildVillagesMLPath({ module: 'spatial', subtab: 'visualization' })
+      redirect: route.fullPath || buildCurrentVillagesMLPath({ module: 'spatial', subtab: 'visualization' })
     }
   })
 }
