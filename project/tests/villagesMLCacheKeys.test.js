@@ -41,4 +41,11 @@ describe('villagesML cache keys', () => {
     expect(source).toContain('loadingPromisesByDataset')
     expect(source).not.toContain("const CACHE_KEY = 'regions_all_data_v3'")
   })
+
+  it('keeps legacy region caches scoped to the current route dataset', () => {
+    const source = readSource('src/VillagesML/utils/regionCache.js')
+
+    expect(source).toContain('getCurrentVillagesMLDataset')
+    expect(source).toContain('${getCurrentVillagesMLDataset()}')
+  })
 })

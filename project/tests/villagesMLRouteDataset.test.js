@@ -129,6 +129,10 @@ describe('villagesML route dataset helpers', () => {
   it('keeps workspace module navigation derived from current dataset at runtime', () => {
     const source = readSource('src/VillagesML/workspace/VillagesMLWorkspace.vue')
 
+    expect(source).toContain('VILLAGESML_DATASETS')
+    expect(source).toContain('dataset-selector')
+    expect(source).toContain('handleDatasetChange')
+    expect(source).toContain('buildVillagesMLPath')
     expect(source).toContain('const getRouteAwareVillagesMLModules = () => {')
     expect(source).toContain('if (!route.path) return []')
     expect(source).toContain('const activeDataset = computed(() => resolveVillagesMLDatasetFromRoute(route))')

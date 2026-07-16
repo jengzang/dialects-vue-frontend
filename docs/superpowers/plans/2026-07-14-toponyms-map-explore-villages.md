@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build the natural-village toponyms map as a first-class Explore villages page at `/explore/villages/toponyms`, using the real backend split-query API for search/points and prioritizing the Ministry of Civil Affairs official detail service when a point is selected.
+**Goal:** Build the natural-village toponyms map as a first-class Explore villages page at `/explore/villages/toponyms`, using the backend toponyms API to explore place-name distribution patterns and query one or a few place-name records, with Ministry of Civil Affairs detail lookup available for a specific selected id.
 
-**Architecture:** This is a main-site Explore villages page, not a VillagesML page and not a new top-level `/toponyms/map` app. The page does not load all 4.34M natural-village records on first paint; users query first, then the frontend renders returned id-only point results with MapLibre clustering. When a point is selected, the frontend calls the Ministry `detailsPub` endpoint first and falls back to the local `/api/toponyms/details` endpoint if the official request fails or returns unusable data.
+**Architecture:** This is a main-site Explore villages page, not a VillagesML page and not a new top-level `/toponyms/map` app. The page has two primary user workflows: a distribution workflow where users input a character/string and match mode to see where matching place names cluster geographically, and an information workflow where users query names/points and inspect selected local records. The Ministry `detailsPub` endpoint is not the main data source; it is used only for a concrete selected id when the user wants official detailed information.
 
 **Tech Stack:** Vue 3 `<script setup>`, Vue Router path routes, Vue I18n JSON locale files, MapLibre GL source/layers with clustering, existing `api` HTTP client and `/api` proxy, browser `fetch` for the official detail service, scoped SCSS with design tokens, Vitest.
 
@@ -72,7 +72,7 @@ Response:
 
 ### Official Ministry Detail Service
 
-Primary detail source after clicking a point:
+Used only for official detail lookup of a specific selected id:
 
 ```http
 POST https://dmfw.mca.gov.cn/9095/stname/detailsPub
@@ -81,7 +81,7 @@ Content-Type: application/json
 { "id": "5746d76b8d5150589460729e1a28e3e3" }
 ```
 
-Original product intent is to show official Ministry of Civil Affairs detail data. The backend reports direct local testing currently receives `403 Forbidden`, so the frontend must treat official lookup as best-effort and provide a local fallback.
+Original product intent includes using the Ministry of Civil Affairs for detailed information on a specific selected place. The backend reports direct local testing currently receives `403 Forbidden`, so the frontend must treat official lookup as best-effort and keep local `/api/toponyms/details` as the reliable record source.
 
 Expected useful official fields from the original PRD:
 
@@ -97,7 +97,7 @@ The exact official response shape must be handled defensively because the servic
 
 ### `GET /api/toponyms/details`
 
-Purpose: local fallback and record completion for selected ids. This is the only local endpoint that returns id + name + coordinates together.
+Purpose: local record lookup for one or a few known ids. This is the backend endpoint for the "query single/few place-name information" workflow, and it is the only local endpoint that returns id + name + coordinates together.
 
 Supported parameters:
 
@@ -189,28 +189,46 @@ No full-data auto-load. First screen should show:
 - result limit control or compact preset;
 - empty map/workspace state saying to search first.
 
-### Query Flow
+### Primary Workflows
 
-1. User types a non-empty keyword.
-2. Optionally call `/api/toponyms/names` for suggestions.
-3. User submits keyword or chooses a suggestion.
-4. Call `/api/toponyms/points`.
-5. Convert point results to GeoJSON with id-only properties.
-6. Render returned points on map using MapLibre cluster layers.
-7. User clicks an unclustered point.
-8. Call Ministry `detailsPub` with the selected id.
-9. If official lookup succeeds, show official fields and mark the source as official.
-10. If official lookup fails or returns no usable detail, call `/api/toponyms/details?ids=<id>` as fallback and mark the source as local fallback.
-11. Show detail panel with whichever detail source is available, plus point id/coordinates.
+#### Workflow A: Distribution Pattern Exploration
+
+1. User enters a character/string such as `黄`, `塘`, or `村`.
+2. User chooses `match_mode`: prefix, suffix, exact, or contains.
+3. User keeps or changes `place_type_code`, defaulting to natural villages (`22200`).
+4. Frontend calls `/api/toponyms/points`.
+5. The map renders id-only point results with clustering.
+6. The page summarizes returned count and `truncated` state.
+7. User visually inspects where that character/string is concentrated.
+
+This is the main map value: showing distribution patterns of place names matching the user's input.
+
+#### Workflow B: Single Or Small-Set Place-Name Information Query
+
+1. User enters a name/string.
+2. Frontend calls `/api/toponyms/names` for suggestions and/or `/api/toponyms/points` for matching points.
+3. User selects a suggestion or clicks a point.
+4. For a selected point id, frontend calls `/api/toponyms/details?ids=<id>`.
+5. The detail panel shows the local record: `name`, `place_type`, `division_path`, longitude, latitude.
+
+If multiple ids are explicitly selected later, local details must respect the backend limit of 10 unique ids.
+
+#### Workflow C: Official Detail Lookup For One Selected Id
+
+1. User has selected a local record or map point with an id.
+2. User opens or triggers official detail lookup.
+3. Frontend calls Ministry `detailsPub` with the selected id.
+4. If official lookup succeeds, show official fields and mark the source as official.
+5. If official lookup fails, keep the local record visible and show a non-blocking official-detail error.
 
 ### Important UI Copy Constraint
 
-Because points do not include names, do not promise map labels before detail lookup. Map points can show:
+Because `/points` results do not include names, do not promise map labels during distribution exploration. Map points can show:
 
 - count summaries;
 - selected id;
-- "click point to view details";
-- official details panel after click, with local fallback if official lookup is unavailable.
+- "click point to view local record";
+- official detail as an additional action for a selected id.
 
 If labels are desired later, they require detail batching and must respect the 10-id limit.
 
@@ -235,16 +253,19 @@ If labels are desired later, they require detail batching and must respect the 1
   - point bounds helper
 
 - `project/src/main/views/explore/villages/toponyms/ToponymsMapPage.vue`
-  - route-level orchestration: query state, suggestions, points, selected id, details, errors
+  - route-level orchestration: active workflow, query state, suggestions, points, selected id, local details, official details, errors
+
+- `project/src/main/views/explore/villages/toponyms/ToponymModeTabs.vue`
+  - switches between distribution exploration and information query copy/state
 
 - `project/src/main/views/explore/villages/toponyms/ToponymSearch.vue`
-  - input, match mode, limit, search button, suggestions list, truncated notice
+  - input, match mode, place type, limit, search button, suggestions list, truncated notice
 
 - `project/src/main/views/explore/villages/toponyms/ToponymMap.vue`
   - MapLibre initialization, cluster rendering, source updates, point click emits id
 
 - `project/src/main/views/explore/villages/toponyms/ToponymDetail.vue`
-  - selected point/detail panel
+  - selected point local record and optional official-detail panel
 
 - `project/tests/toponymsApiContracts.test.js`
   - API contract tests for endpoint paths and max-10 details guard
@@ -331,19 +352,19 @@ Still keep frontend coordinate validation because it is cheap and protects again
 
 ### Detail Lookup
 
-- Details endpoint accepts at most 10 unique ids. MVP only fetches 1 id per click.
-- Abort or ignore stale details request when user clicks another point quickly.
-- Official `detailsPub` is attempted first because that is the product requirement.
+- Local details endpoint accepts at most 10 unique ids. MVP fetches 1 id per point click.
+- Clicking a map point should fetch local `/api/toponyms/details` first so the user gets the known record promptly.
+- Ministry `detailsPub` is an official-detail action for the selected id, not the primary map/distribution data source.
 - Official failure modes include 403, CORS, timeout, non-JSON body, empty detail, and response shape drift.
-- If official lookup fails, call local `/api/toponyms/details` for the selected id.
+- If official lookup fails, keep local details visible and show a warning.
 - If local details returns empty `items`, show "no detail found".
 - If local request returns 401, show login/permission message.
 - If local request returns 422, show parameter error message.
 - If local details response coordinates differ from point coordinates, display details values but keep map point unchanged.
 - The detail panel must expose the source state:
-  - official detail
-  - local fallback detail
-  - official failed and local failed
+  - local record loaded
+  - official detail loaded
+  - official detail unavailable
 
 ### Styling
 
@@ -1002,10 +1023,21 @@ git commit -m "feat: expose toponyms map in villages navigation"
 **Files:**
 
 - Create: `project/src/main/views/explore/villages/toponyms/ToponymsMapPage.vue`
+- Create: `project/src/main/views/explore/villages/toponyms/ToponymModeTabs.vue`
 - Create: `project/src/main/views/explore/villages/toponyms/ToponymSearch.vue`
 - Create: `project/src/main/views/explore/villages/toponyms/ToponymDetail.vue`
 
-- [ ] **Step 1: Create `ToponymSearch.vue`**
+- [ ] **Step 1: Create `ToponymModeTabs.vue`**
+
+Responsibilities:
+
+- Shows the two primary workflows:
+  - distribution exploration
+  - place-name information query
+- Uses a segmented-control style with existing tokens.
+- Does not change route identity; this is internal page state.
+
+- [ ] **Step 2: Create `ToponymSearch.vue`**
 
 Responsibilities:
 
@@ -1013,35 +1045,43 @@ Responsibilities:
 - emits `submit-search`.
 - optional suggestions list from `/names`.
 - match mode selector.
+- place type selector or fixed default label.
 - limit input or select.
 - shows truncated warning from last `/points` response.
+- copy changes by workflow:
+  - distribution mode: "enter a character or string to see geographic distribution"
+  - query mode: "search one or a few place names, then inspect records"
 
 Use existing `SimpleSelectDropdown` for match mode if available in this part of the app. Use `main-glass-button`, `glass-input`, and nested token SCSS.
 
-- [ ] **Step 2: Create `ToponymDetail.vue`**
+- [ ] **Step 3: Create `ToponymDetail.vue`**
 
 Display:
 
 - empty state: "click a point to view details";
 - selected point id and coordinates before details load;
-- loading state;
-- error state;
+- local detail loading state;
+- local detail error state;
+- official detail loading state;
+- official detail error/warning state;
 - source badge:
-  - official
-  - local fallback
-  - unavailable
+  - local record
+  - official detail
+  - official unavailable
 - details:
-  - official fields when available: city, area/county, historical name
-  - local fallback fields when available: name, place type, division path, longitude / latitude
+  - local fields: name, place type, division path, longitude / latitude
+  - official fields when requested and available: city, area/county, historical name
   - selected point id and coordinates in all states
+- action button: "query official details" for selected ids
 
-The component should not perform API calls itself; the parent passes official/local detail state into it.
+The component should not perform API calls itself; the parent passes local and official detail states into it and handles the official-detail action.
 
-- [ ] **Step 3: Create `ToponymsMapPage.vue` orchestration**
+- [ ] **Step 4: Create `ToponymsMapPage.vue` orchestration**
 
 State:
 
 ```js
+const activeMode = ref('distribution')
 const query = ref('')
 const matchMode = ref('prefix')
 const pointLimit = ref(5000)
@@ -1049,14 +1089,16 @@ const suggestions = ref([])
 const pointCollection = ref(buildEmptyToponymsFeatureCollection())
 const pointMeta = ref({ count: 0, truncated: false, next: null })
 const selectedPoint = ref(null)
-const selectedDetail = ref(null)
-const selectedDetailSource = ref('')
+const selectedLocalDetail = ref(null)
+const selectedOfficialDetail = ref(null)
 const isLoadingNames = ref(false)
 const isLoadingPoints = ref(false)
-const isLoadingDetail = ref(false)
+const isLoadingLocalDetail = ref(false)
+const isLoadingOfficialDetail = ref(false)
 const namesError = ref('')
 const pointsError = ref('')
-const detailError = ref('')
+const localDetailError = ref('')
+const officialDetailError = ref('')
 ```
 
 Core functions:
@@ -1090,8 +1132,10 @@ async function searchPoints(searchText = query.value) {
   isLoadingPoints.value = true
   pointsError.value = ''
   selectedPoint.value = null
-  selectedDetail.value = null
-  detailError.value = ''
+  selectedLocalDetail.value = null
+  selectedOfficialDetail.value = null
+  localDetailError.value = ''
+  officialDetailError.value = ''
 
   try {
     const result = await getToponymPoints({
@@ -1113,43 +1157,54 @@ async function searchPoints(searchText = query.value) {
   }
 }
 
-async function loadDetail(point) {
+async function loadLocalDetail(point) {
   selectedPoint.value = point
-  selectedDetail.value = null
-  selectedDetailSource.value = ''
-  detailError.value = ''
+  selectedLocalDetail.value = null
+  selectedOfficialDetail.value = null
+  localDetailError.value = ''
+  officialDetailError.value = ''
   if (!point?.id) {
-    detailError.value = t('villages.pages.toponyms.errors.missingId')
+    localDetailError.value = t('villages.pages.toponyms.errors.missingId')
     return
   }
 
-  isLoadingDetail.value = true
+  isLoadingLocalDetail.value = true
   try {
-    try {
-      selectedDetail.value = await getToponymOfficialDetail(point.id)
-      selectedDetailSource.value = 'official'
-      return
-    } catch (officialError) {
-      const result = await getToponymDetails(point.id)
-      selectedDetail.value = result.items[0] || null
-      selectedDetailSource.value = selectedDetail.value ? 'local' : ''
-      if (!selectedDetail.value) {
-        detailError.value = t('villages.pages.toponyms.errors.detailEmpty')
-      } else {
-        detailError.value = t('villages.pages.toponyms.errors.officialFallback')
-      }
+    const result = await getToponymDetails(point.id)
+    selectedLocalDetail.value = result.items[0] || null
+    if (!selectedLocalDetail.value) {
+      localDetailError.value = t('villages.pages.toponyms.errors.detailEmpty')
     }
   } catch (error) {
-    detailError.value = error?.message || t('villages.pages.toponyms.errors.detailFailed')
+    localDetailError.value = error?.message || t('villages.pages.toponyms.errors.detailFailed')
   } finally {
-    isLoadingDetail.value = false
+    isLoadingLocalDetail.value = false
+  }
+}
+
+async function loadOfficialDetail() {
+  const id = selectedPoint.value?.id || selectedLocalDetail.value?.id
+  if (!id) {
+    officialDetailError.value = t('villages.pages.toponyms.errors.missingId')
+    return
+  }
+
+  isLoadingOfficialDetail.value = true
+  officialDetailError.value = ''
+  try {
+    selectedOfficialDetail.value = await getToponymOfficialDetail(id)
+  } catch (error) {
+    officialDetailError.value = error?.message || t('villages.pages.toponyms.errors.officialFailed')
+    selectedOfficialDetail.value = null
+  } finally {
+    isLoadingOfficialDetail.value = false
   }
 }
 ```
 
-Add stale request guards with a request sequence id before implementation is considered complete.
+Add stale request guards with request sequence ids before implementation is considered complete.
 
-- [ ] **Step 4: Add full page i18n strings**
+- [ ] **Step 5: Add full page i18n strings**
 
 Add under `villages.pages.toponyms`:
 
@@ -1158,13 +1213,19 @@ Traditional:
 ```json
 "toponyms": {
   "title": "自然村地名地圖",
-  "subtitle": "輸入地名關鍵詞後查詢點位，點擊地圖點位優先查看官方地名詳情。",
+  "subtitle": "輸入漢字或地名片段，查看自然村地名分佈；點擊點位可查本地記錄與官方詳情。",
+  "modes": {
+    "distribution": "分佈規律",
+    "lookup": "地名查詢"
+  },
   "search": "搜索",
   "queryLabel": "地名關鍵詞",
   "queryPlaceholder": "例如：黃、黃村、塘",
   "matchMode": "匹配方式",
   "limit": "點位上限",
   "searchFirst": "請先輸入地名關鍵詞並搜索。",
+  "distributionHint": "查看包含或匹配某個漢字、詞段的自然村地名在哪些區域更集中。",
+  "lookupHint": "查詢單個或少量地名，點擊點位後查看本地記錄。",
   "loadingNames": "正在查詢地名建議...",
   "loadingPoints": "正在加載點位...",
   "noPoints": "沒有找到匹配點位",
@@ -1180,9 +1241,11 @@ Traditional:
   "detail": {
     "title": "地名詳情",
     "empty": "點擊地圖上的點位查看詳情。",
-    "loading": "正在加載詳情...",
+    "loadingLocal": "正在加載本地記錄...",
+    "loadingOfficial": "正在查詢官方詳情...",
     "sourceOfficial": "官方詳情",
     "sourceLocal": "本地記錄",
+    "queryOfficial": "查詢官方詳情",
     "id": "ID",
     "name": "標準地名",
     "city": "所在地市",
@@ -1199,7 +1262,7 @@ Traditional:
     "pointsFailed": "無法加載點位",
     "missingId": "此點位缺少 ID，無法查詢詳情",
     "detailEmpty": "未找到此點位的詳情",
-    "officialFallback": "官方詳情暫不可用，已顯示本地記錄",
+    "officialFailed": "官方詳情暫不可用",
     "detailFailed": "無法加載地名詳情"
   }
 }
@@ -1207,7 +1270,7 @@ Traditional:
 
 Add Simplified and English equivalents without rewriting existing keys.
 
-- [ ] **Step 5: Run focused lint/tests**
+- [ ] **Step 6: Run focused lint/tests**
 
 Run:
 
@@ -1217,12 +1280,12 @@ npm test -- tests/toponymsApiContracts.test.js tests/toponymsMapData.test.js tes
 npm run lint -- src/main/views/explore/villages/toponyms src/api/main/toponyms.js
 ```
 
-- [ ] **Step 6: Commit Task 4 only**
+- [ ] **Step 7: Commit Task 4 only**
 
 Run:
 
 ```bash
-git add project/src/main/views/explore/villages/toponyms/ToponymsMapPage.vue project/src/main/views/explore/villages/toponyms/ToponymSearch.vue project/src/main/views/explore/villages/toponyms/ToponymDetail.vue project/src/i18n/locales/zh-Hant/villages.json project/src/i18n/locales/zh-CN/villages.json project/src/i18n/locales/en/villages.json
+git add project/src/main/views/explore/villages/toponyms/ToponymsMapPage.vue project/src/main/views/explore/villages/toponyms/ToponymModeTabs.vue project/src/main/views/explore/villages/toponyms/ToponymSearch.vue project/src/main/views/explore/villages/toponyms/ToponymDetail.vue project/src/i18n/locales/zh-Hant/villages.json project/src/i18n/locales/zh-CN/villages.json project/src/i18n/locales/en/villages.json
 git diff --cached
 git commit -m "feat: add toponyms search page shell"
 ```
@@ -1266,7 +1329,7 @@ In `ToponymsMapPage.vue`, render `ToponymMap` after a search has data:
 ```vue
 <ToponymMap
   :feature-collection="pointCollection"
-  @select-point="loadDetail"
+  @select-point="loadLocalDetail"
 />
 ```
 
@@ -1368,15 +1431,19 @@ Manual checks:
 
 - Page loads without initial points request.
 - Empty state asks for a keyword.
+- Distribution mode explains that the map shows where matching place names are geographically concentrated.
+- Lookup mode explains that the user can inspect single or small-set local records.
 - Search `黄` with `prefix` calls `/api/toponyms/names` and `/api/toponyms/points`.
 - Points render without labels.
 - If `truncated` is true, warning appears.
 - Cluster click zooms.
-- Point click first attempts `https://dmfw.mca.gov.cn/9095/stname/detailsPub`.
+- Point click calls `/api/toponyms/details?ids=<id>` and shows the local record.
+- Detail panel has a separate official-detail action for the selected id.
+- Official-detail action calls `https://dmfw.mca.gov.cn/9095/stname/detailsPub`.
 - If official detail succeeds, details panel marks the source as official.
-- If official detail fails, page falls back to `/api/toponyms/details?ids=<id>` and marks the source as local record.
-- Details panel shows official city/area/old-name fields when official detail is available.
-- Details panel shows local name, place type, division path, and coordinates when fallback is used.
+- If official detail fails, local record remains visible and an official-detail warning appears.
+- Details panel shows local name, place type, division path, and coordinates.
+- Details panel shows official city/area/old-name fields when official detail is requested and available.
 - 401/422/FastAPI `detail` errors show readable messages.
 - Mobile layout stacks without overlap.
 
@@ -1391,7 +1458,7 @@ Check:
 
 - No unrelated VillagesML files are staged.
 - No `/api/toponyms/map`.
-- `detailsPub` exists only in the official-detail API helper and is called before local fallback.
+- `detailsPub` exists only in the official-detail API helper and is not part of initial search/point loading.
 - No `/toponyms/map` redirect.
 - Chinese and emoji are intact.
 
@@ -1404,10 +1471,13 @@ Implementation is complete only when:
 - `/explore/villages/toponyms` exists and is reachable.
 - Explore villages nav, sidebar, and portal place the new entry above Guangdong natural villages.
 - The page does not load all toponyms on first paint.
+- The page supports distribution-pattern exploration for a user-entered character/string and match mode.
+- The page supports single/small-set place-name information lookup through local details.
 - Search uses `/api/toponyms/names` and `/api/toponyms/points`.
 - Map renders id-only point results using MapLibre layers and clustering.
-- Clicking a point tries Ministry `detailsPub` first.
-- If Ministry detail fails, clicking a point falls back to `/api/toponyms/details` and respects the 10-id backend limit.
+- Clicking a point loads local `/api/toponyms/details` and respects the 10-id backend limit.
+- A selected local record/point can request Ministry `detailsPub` for official detail.
+- If Ministry detail fails, the local record remains visible and the failure is non-blocking.
 - No `/api/toponyms/map` usage exists.
 - No `/toponyms/map` route or redirect exists.
 - Styles use existing component classes and tokens with nested scoped SCSS.

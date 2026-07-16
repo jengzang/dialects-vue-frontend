@@ -13,6 +13,23 @@
 
     <!-- Content area -->
     <div class="content-area">
+      <div class="dataset-selector">
+        <span class="dataset-selector__label">數據集</span>
+        <select
+          class="dataset-selector__select"
+          :value="activeDataset"
+          @change="handleDatasetChange($event.target.value)"
+        >
+          <option
+            v-for="dataset in VILLAGESML_DATASETS"
+            :key="dataset.id"
+            :value="dataset.id"
+          >
+            {{ dataset.label }}
+          </option>
+        </select>
+      </div>
+
       <!-- Dynamic Component Loading with KeepAlive -->
       <KeepAlive v-if="currentComponent">
         <component
@@ -103,7 +120,7 @@
 
 <script setup>
 import { ref, computed, defineAsyncComponent, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { resetDatasetResultState, villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import { userStore } from '@/main/store/store.js'
 import {
@@ -116,13 +133,15 @@ import { showError, showSuccess } from '@/utils/message.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
-import { resolveVillagesMLDatasetFromRoute } from '@/VillagesML/utils/routeDataset.js'
+import { buildVillagesMLPath, resolveVillagesMLDatasetFromRoute } from '@/VillagesML/utils/routeDataset.js'
+import { VILLAGESML_DATASETS } from '@/VillagesML/config/datasets.js'
 
 // Import CommonBar and SimpleSidebar
 import CommonBar from '@/components/bar/CommonBar.vue'
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
 
 const route = useRoute()
+const router = useRouter()
 const { requireAuth } = useAuthGuard({
   defaultRedirect: '/villagesML',
 })
@@ -200,6 +219,18 @@ watch(activeDataset, (dataset, previousDataset) => {
     resetDatasetResultState()
   }
 })
+
+const handleDatasetChange = (dataset) => {
+  if (dataset === activeDataset.value) return
+
+  const { module, subtab, ...query } = route.query
+  router.push(buildVillagesMLPath({
+    dataset,
+    module,
+    subtab,
+    query
+  }))
+}
 
 // Active state getter for CommonBar
 
@@ -521,6 +552,29 @@ const handleAdjustParams = (action) => {
   color: var(--text-deep);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   animation: fadeIn 0.3s ease;
+}
+
+.dataset-selector {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.dataset-selector__label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.dataset-selector__select {
+  min-width: 150px;
+  padding: 6px 10px;
+  border: 1px solid rgba(var(--text-deep-rgb), 0.16);
+  border-radius: var(--radius-sm);
+  background: var(--glass-80);
+  color: var(--text-primary);
+  font-size: 13px;
 }
 
 @keyframes fadeIn {
