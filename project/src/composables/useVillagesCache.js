@@ -2,16 +2,19 @@ import { getMetadataOverview, getMetadataTables, getNgramStatistics } from '@/ap
 import { getRegionList } from '@/api/villagesML/villages.js'
 import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
 import { buildVillagesCacheKey } from '@/VillagesML/utils/cacheKeys.js'
+import { getCurrentVillagesMLDataset } from '@/VillagesML/utils/currentDataset.js'
 
-const OVERVIEW_CACHE_KEY = buildVillagesCacheKey('overview')
-const NGRAMS_CACHE_KEY = buildVillagesCacheKey('ngrams')
-const TABLES_CACHE_KEY = buildVillagesCacheKey('tables')
-
+const overviewPromises = new Map()
+const ngramsPromises = new Map()
+const tablesPromises = new Map()
 const regionsPromises = new Map()
 
-let overviewPromise = null
-let ngramsPromise = null
-let tablesPromise = null
+function getVillagesCacheKey(kind, parts = []) {
+  return buildVillagesCacheKey(kind, {
+    dataset: getCurrentVillagesMLDataset(),
+    parts
+  })
+}
 
 function getCurrentDbVersion() {
   return getHomeUpdateNotice(() => '').dbVersion || 'default'
@@ -60,86 +63,89 @@ function writeCache(key, data) {
 }
 
 export function getCachedVillagesOverview() {
-  return readCache(OVERVIEW_CACHE_KEY)
+  return readCache(getVillagesCacheKey('overview'))
 }
 
 export async function getVillagesOverview(options = {}) {
   const { forceRefresh = false } = options
+  const cacheKey = getVillagesCacheKey('overview')
 
   if (!forceRefresh) {
-    const cached = readCache(OVERVIEW_CACHE_KEY)
+    const cached = readCache(cacheKey)
     if (cached) {
       return cached
     }
   }
 
-  if (!overviewPromise) {
-    overviewPromise = getMetadataOverview().then((data) => {
-      writeCache(OVERVIEW_CACHE_KEY, data)
+  if (!overviewPromises.has(cacheKey)) {
+    overviewPromises.set(cacheKey, getMetadataOverview().then((data) => {
+      writeCache(cacheKey, data)
       return data
     }).finally(() => {
-      overviewPromise = null
-    })
+      overviewPromises.delete(cacheKey)
+    }))
   }
 
-  return overviewPromise
+  return overviewPromises.get(cacheKey)
 }
 
 export function getCachedVillagesNgrams() {
-  return readCache(NGRAMS_CACHE_KEY)
+  return readCache(getVillagesCacheKey('ngrams'))
 }
 
 export async function getVillagesNgrams(options = {}) {
   const { forceRefresh = false } = options
+  const cacheKey = getVillagesCacheKey('ngrams')
 
   if (!forceRefresh) {
-    const cached = readCache(NGRAMS_CACHE_KEY)
+    const cached = readCache(cacheKey)
     if (cached) {
       return cached
     }
   }
 
-  if (!ngramsPromise) {
-    ngramsPromise = getNgramStatistics().then((data) => {
-      writeCache(NGRAMS_CACHE_KEY, data)
+  if (!ngramsPromises.has(cacheKey)) {
+    ngramsPromises.set(cacheKey, getNgramStatistics().then((data) => {
+      writeCache(cacheKey, data)
       return data
     }).finally(() => {
-      ngramsPromise = null
-    })
+      ngramsPromises.delete(cacheKey)
+    }))
   }
 
-  return ngramsPromise
+  return ngramsPromises.get(cacheKey)
 }
 
 export function getCachedVillagesTables() {
-  return readCache(TABLES_CACHE_KEY)
+  return readCache(getVillagesCacheKey('tables'))
 }
 
 export async function getVillagesTables(options = {}) {
   const { forceRefresh = false } = options
+  const cacheKey = getVillagesCacheKey('tables')
 
   if (!forceRefresh) {
-    const cached = readCache(TABLES_CACHE_KEY)
+    const cached = readCache(cacheKey)
     if (cached) {
       return cached
     }
   }
 
-  if (!tablesPromise) {
-    tablesPromise = getMetadataTables().then((data) => {
-      writeCache(TABLES_CACHE_KEY, data)
+  if (!tablesPromises.has(cacheKey)) {
+    tablesPromises.set(cacheKey, getMetadataTables().then((data) => {
+      writeCache(cacheKey, data)
       return data
     }).finally(() => {
-      tablesPromise = null
-    })
+      tablesPromises.delete(cacheKey)
+    }))
   }
 
-  return tablesPromise
+  return tablesPromises.get(cacheKey)
 }
 
 export async function getVillagesRegions(level, parent = null, options = {}) {
   const { forceRefresh = false } = options
-  const cacheKey = buildVillagesCacheKey('regions', { parts: [level, parent] })
+  const cacheKey = getVillagesCacheKey('regions', [level, parent])
 
   if (!forceRefresh) {
     const cached = readCache(cacheKey)
