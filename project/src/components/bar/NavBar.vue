@@ -189,9 +189,6 @@ const mobileNavRef = ref(null)
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
 
-// Tab label tooltip
-const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
-
 // ===== sessionStorage 管理：记住每个 tab 的最后访问的 sub =====
 watch(() => route.path, () => {
   syncMenuBarMemoryFromRoute(route)

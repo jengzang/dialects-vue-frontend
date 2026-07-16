@@ -330,9 +330,6 @@ const getOverflowFlex = (t, isActive, isMobile) => {
   return getFlexWeight(t, isActive, isMobile) + ' 1 0'
 }
 
-// Tab label tooltip
-const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
-
 // Submenu state management
 const activeSubmenu = ref(null)
 const submenuPosition = ref({ top: 0, left: 0 })
