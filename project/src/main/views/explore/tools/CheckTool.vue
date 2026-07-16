@@ -925,6 +925,7 @@ import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
+import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
 import {
   uploadCheckFile,
   analyzeFile as analyzeFileApi,
@@ -983,13 +984,17 @@ const errorStats = ref({
   nonSingleChar: 0,
   invalidIpa: 0,
   missingTone: 0,
+  emptyOnset: 0,
+  emptyRime: 0,
   total: 0
 })
 
 const errorStatsConfig = computed(() => ({
   nonSingleChar: { icon: '❌', label: t('tools.checkTool.errorTypes.nonSingleChar'), type: 'error' },
   invalidIpa: { icon: '⚠️', label: t('tools.checkTool.errorTypes.invalidIpa'), type: 'warning' },
-  missingTone: { icon: '🔍', label: t('tools.checkTool.errorTypes.missingTone'), type: 'info' }
+  missingTone: { icon: '🔍', label: t('tools.checkTool.errorTypes.missingTone'), type: 'info' },
+  emptyOnset: { icon: '🅾', label: t('tools.checkTool.errorTypes.emptyOnset'), type: 'warning' },
+  emptyRime: { icon: '🔤', label: t('tools.checkTool.errorTypes.emptyRime'), type: 'warning' }
 }))
 
 // 调值统计
@@ -1043,43 +1048,89 @@ const scriptOptions = computed(() => [
   { label: t('tools.checkTool.welcome.simplifiedConvert'), value: true }
 ])
 
-const checkImportSchema = computed(() => ([
-  {
-    key: 'char',
-    label: t('common.importPreview.schemas.checkTool.char.label'),
-    required: true,
-    aliases: [
-      t('common.importPreview.schemas.checkTool.char.aliases.char'),
-      t('common.importPreview.schemas.checkTool.char.aliases.character'),
-      t('common.importPreview.schemas.checkTool.char.aliases.word')
-    ],
-    description: t('common.importPreview.schemas.checkTool.char.description'),
-    example: t('common.importPreview.schemas.checkTool.char.example')
-  },
-  {
-    key: 'ipa',
-    label: t('common.importPreview.schemas.checkTool.ipa.label'),
-    required: true,
-    aliases: [
-      t('common.importPreview.schemas.checkTool.ipa.aliases.ipa'),
-      t('common.importPreview.schemas.checkTool.ipa.aliases.phonetic'),
-      t('common.importPreview.schemas.checkTool.ipa.aliases.pronunciation')
-    ],
-    description: t('common.importPreview.schemas.checkTool.ipa.description'),
-    example: t('common.importPreview.schemas.checkTool.ipa.example')
-  },
-  {
-    key: 'note',
-    label: t('common.importPreview.schemas.checkTool.note.label'),
-    required: false,
-    aliases: [
-      t('common.importPreview.schemas.checkTool.note.aliases.note'),
-      t('common.importPreview.schemas.checkTool.note.aliases.comment')
-    ],
-    description: t('common.importPreview.schemas.checkTool.note.description'),
-    example: t('common.importPreview.schemas.checkTool.note.example')
+const checkImportSchema = computed(() => {
+  if (selectedFormat.value === '跳跳老鼠') {
+    return ([
+      {
+        key: 'pronunciation',
+        label: t('common.importPreview.schemas.checkTool.pronunciation.label'),
+        required: true,
+        aliases: [
+          t('common.importPreview.schemas.checkTool.pronunciation.aliases.ipa'),
+          t('common.importPreview.schemas.checkTool.pronunciation.aliases.phonetic'),
+          t('common.importPreview.schemas.checkTool.pronunciation.aliases.pronunciation')
+        ],
+        description: t('common.importPreview.schemas.checkTool.pronunciation.description'),
+        example: t('common.importPreview.schemas.checkTool.pronunciation.example')
+      },
+      {
+        key: 'charGroup',
+        label: t('common.importPreview.schemas.checkTool.charGroup.label'),
+        required: true,
+        aliases: [
+          t('common.importPreview.schemas.checkTool.charGroup.aliases.char'),
+          t('common.importPreview.schemas.checkTool.charGroup.aliases.character'),
+          t('common.importPreview.schemas.checkTool.charGroup.aliases.word')
+        ],
+        description: t('common.importPreview.schemas.checkTool.charGroup.description'),
+        example: t('common.importPreview.schemas.checkTool.charGroup.example')
+      }
+    ])
   }
-]))
+  if (selectedFormat.value === '縣志') {
+    return ([
+      {
+        key: 'pinyin',
+        label: t('common.importPreview.schemas.checkTool.pinyin.label'),
+        required: true,
+        aliases: [
+          t('common.importPreview.schemas.checkTool.pinyin.aliases.pinyin'),
+          t('common.importPreview.schemas.checkTool.pinyin.aliases.phonetic'),
+          t('common.importPreview.schemas.checkTool.pinyin.aliases.reading')
+        ],
+        description: t('common.importPreview.schemas.checkTool.pinyin.description'),
+        example: t('common.importPreview.schemas.checkTool.pinyin.example')
+      }
+    ])
+  }
+  return ([
+    {
+      key: 'char',
+      label: t('common.importPreview.schemas.checkTool.char.label'),
+      required: true,
+      aliases: [
+        t('common.importPreview.schemas.checkTool.char.aliases.char'),
+        t('common.importPreview.schemas.checkTool.char.aliases.character'),
+        t('common.importPreview.schemas.checkTool.char.aliases.word')
+      ],
+      description: t('common.importPreview.schemas.checkTool.char.description'),
+      example: t('common.importPreview.schemas.checkTool.char.example')
+    },
+    {
+      key: 'ipa',
+      label: t('common.importPreview.schemas.checkTool.ipa.label'),
+      required: true,
+      aliases: [
+        t('common.importPreview.schemas.checkTool.ipa.aliases.ipa'),
+        t('common.importPreview.schemas.checkTool.ipa.aliases.phonetic'),
+        t('common.importPreview.schemas.checkTool.ipa.aliases.pronunciation')
+      ],
+      description: t('common.importPreview.schemas.checkTool.ipa.description'),
+      example: t('common.importPreview.schemas.checkTool.ipa.example')
+    },
+    {
+      key: 'note',
+      label: t('common.importPreview.schemas.checkTool.note.label'),
+      required: false,
+      aliases: [
+        t('common.importPreview.schemas.checkTool.note.aliases.note'),
+        t('common.importPreview.schemas.checkTool.note.aliases.comment')
+      ],
+      description: t('common.importPreview.schemas.checkTool.note.description'),
+      example: t('common.importPreview.schemas.checkTool.note.example')
+    }
+  ])
+})
 const checkPreviewState = useTabularImportPreview({
   schema: checkImportSchema,
   requireExplicitConfirmation: () => requireExplicitConfirmation.value
@@ -1097,7 +1148,7 @@ const checkImportFlow = useTabularImportFlow({
       return false
     }
 
-    const allowedExts = ['.xlsx', '.xls']
+    const allowedExts = ['.xlsx', '.xls', '.tsv']
     const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
 
     if (!allowedExts.includes(ext)) {
@@ -1287,18 +1338,32 @@ const commandPreview = computed(() => {
 })
 
 // 文件处理
+const shouldSkipPreview = (file) => {
+  const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
+  if (['.doc', '.docx'].includes(ext)) return true
+  return false
+}
+
 const handleDrop = (event) => {
   isDragOver.value = false
   const file = event.dataTransfer.files[0]
   if (file) {
-    checkImportFlow.loadPreview(file)
+    if (shouldSkipPreview(file)) {
+      uploadFile(file)
+    } else {
+      checkImportFlow.loadPreview(file)
+    }
   }
 }
 
 const handleFileUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
-    checkImportFlow.loadPreview(file)
+    if (shouldSkipPreview(file)) {
+      uploadFile(file)
+    } else {
+      checkImportFlow.loadPreview(file)
+    }
   }
 }
 
@@ -1365,20 +1430,32 @@ const confirmPreviewAndUpload = async () => {
     return
   }
 
-  const activeSheet = checkPreviewState.previewTable.value?.activeSheet
-  const columnMapping = {
-    headerChar: checkPreviewState.mapping.value.char || null,
-    headerIpa: checkPreviewState.mapping.value.ipa || null,
-    headerNotes: checkPreviewState.mapping.value.note || null
+  const mapping = checkPreviewState.mapping.value
+  const columnMap = []
+  let mode = 'replace'
+
+  if (selectedFormat.value === '跳跳老鼠') {
+    if (mapping.pronunciation) columnMap.push({ sourceKey: mapping.pronunciation, header: '讀音' })
+    if (mapping.charGroup) columnMap.push({ sourceKey: mapping.charGroup, header: '字組' })
+  } else if (selectedFormat.value === '縣志') {
+    if (mapping.pinyin) columnMap.push({ sourceKey: mapping.pinyin, header: '拼音' })
+    mode = 'rename'
+  } else {
+    if (mapping.char) columnMap.push({ sourceKey: mapping.char, header: '漢字' })
+    if (mapping.ipa) columnMap.push({ sourceKey: mapping.ipa, header: '音標' })
+    if (mapping.note) columnMap.push({ sourceKey: mapping.note, header: '解釋' })
   }
 
-  const selectedFile = pendingPreviewFile.value
-  checkImportFlow.clearPreview()
-  await uploadFile(selectedFile, {
-    columnMapping,
+  const transformedFile = transformTabularFile({
+    parsedFile: checkPreviewState.parsedFile.value,
+    columnMap,
+    selectedSheetId: checkPreviewState.selectedSheetId.value,
     headerRowIndex: checkPreviewState.headerRowIndex.value,
-    sheetName: activeSheet?.name || null
+    mode
   })
+
+  checkImportFlow.clearPreview()
+  await uploadFile(transformedFile)
 }
 
 const analyzeFile = async () => {
@@ -1394,6 +1471,8 @@ const analyzeFile = async () => {
       nonSingleChar: data.error_stats?.nonSingleChar || 0,
       invalidIpa: data.error_stats?.invalidIpa || 0,
       missingTone: data.error_stats?.missingTone || 0,
+      emptyOnset: data.error_stats?.emptyOnset || 0,
+      emptyRime: data.error_stats?.emptyRime || 0,
       total: Object.values(data.error_stats || {}).reduce((a, b) => a + b, 0)
     }
     showingAll.value = errorStats.value.total === 0
@@ -1488,7 +1567,7 @@ const resetUpload = async () => {
     errorData.value = []
     errorMetadata.value = []
     filteredData.value = []
-    errorStats.value = { nonSingleChar: 0, invalidIpa: 0, missingTone: 0, total: 0 }
+    errorStats.value = { nonSingleChar: 0, invalidIpa: 0, missingTone: 0, emptyOnset: 0, emptyRime: 0, total: 0 }
     toneStats.value = null
     pendingChanges.value.clear()
     rowsToDelete.value.clear()
@@ -2029,6 +2108,8 @@ const getErrorTypeLabel = (type) => {
   if (type === 'nonSingleChar') return t('tools.checkTool.errorTypes.nonSingleChar')
   if (type === 'invalidIpa') return t('tools.checkTool.errorTypes.invalidIpa')
   if (type === 'missingTone') return t('tools.checkTool.errorTypes.missingTone')
+  if (type === 'emptyOnset') return t('tools.checkTool.errorTypes.emptyOnset')
+  if (type === 'emptyRime') return t('tools.checkTool.errorTypes.emptyRime')
   return type
 }
 
@@ -2465,6 +2546,12 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     &.missingTone {
       background: rgba(var(--color-primary-rgb), 0.15);
       color: $primary;
+    }
+
+    &.emptyOnset,
+    &.emptyRime {
+      background: $warning-soft;
+      color: $warning;
     }
   }
 

@@ -94,15 +94,15 @@
         <div v-else class="tabular-import-preview__body">
           <div v-if="mappingEnabled" class="tabular-import-preview__mapping main-glass-panel-inner">
             <div class="tabular-import-preview__section-head">
-              <div>
+              <div class="tabular-import-preview__section-head-row">
                 <h4>{{ t('common.importPreview.mapping.title') }}</h4>
-                <p>{{ t('common.importPreview.mapping.description') }}</p>
+                <div class="tabular-import-preview__mapping-summary">
+                  <span :class="['mapping-badge', diagnostics.isComplete ? 'is-success' : 'is-warning']">
+                    {{ diagnostics.isComplete ? t('common.importPreview.mapping.ready') : t('common.importPreview.mapping.incomplete') }}
+                  </span>
+                </div>
               </div>
-              <div class="tabular-import-preview__mapping-summary">
-                <span :class="['mapping-badge', diagnostics.isComplete ? 'is-success' : 'is-warning']">
-                  {{ diagnostics.isComplete ? t('common.importPreview.mapping.ready') : t('common.importPreview.mapping.incomplete') }}
-                </span>
-              </div>
+              <p>{{ t('common.importPreview.mapping.description') }}</p>
             </div>
 
             <div class="tabular-import-preview__mapping-list ui-scrollbar">
@@ -111,22 +111,24 @@
                 :key="field.key"
                 class="tabular-import-preview__mapping-row"
               >
-                <div class="tabular-import-preview__mapping-meta">
+                <div class="tabular-import-preview__mapping-row-top">
                   <div class="tabular-import-preview__mapping-name-row">
                     <span class="tabular-import-preview__mapping-name">{{ field.label }}</span>
                     <span v-if="field.required" class="mapping-required">{{ t('common.importPreview.mapping.required') }}</span>
                   </div>
+                  <div class="tabular-import-preview__mapping-control">
+                    <SimpleSelectDropdown
+                      :model-value="mapping[field.key]"
+                      :options="columnOptions"
+                      searchable
+                      match-trigger-width
+                      @update:modelValue="$emit('update:mapping', { fieldKey: field.key, sourceKey: $event })"
+                    />
+                  </div>
+                </div>
+                <div v-if="field.description || field.example" class="tabular-import-preview__mapping-meta">
                   <p v-if="field.description" class="tabular-import-preview__mapping-desc">{{ field.description }}</p>
                   <p v-if="field.example" class="tabular-import-preview__mapping-example">{{ t('common.importPreview.mapping.example', { value: field.example }) }}</p>
-                </div>
-                <div class="tabular-import-preview__mapping-control">
-                  <SimpleSelectDropdown
-                    :model-value="mapping[field.key]"
-                    :options="columnOptions"
-                    searchable
-                    match-trigger-width
-                    @update:modelValue="$emit('update:mapping', { fieldKey: field.key, sourceKey: $event })"
-                  />
                 </div>
               </div>
             </div>
@@ -279,15 +281,15 @@
       <div v-else class="tabular-import-preview__body">
         <div v-if="mappingEnabled" class="tabular-import-preview__mapping main-glass-panel-inner">
           <div class="tabular-import-preview__section-head">
-            <div>
+            <div class="tabular-import-preview__section-head-row">
               <h4>{{ t('common.importPreview.mapping.title') }}</h4>
-              <p>{{ t('common.importPreview.mapping.description') }}</p>
+              <div class="tabular-import-preview__mapping-summary">
+                <span :class="['mapping-badge', diagnostics.isComplete ? 'is-success' : 'is-warning']">
+                  {{ diagnostics.isComplete ? t('common.importPreview.mapping.ready') : t('common.importPreview.mapping.incomplete') }}
+                </span>
+              </div>
             </div>
-            <div class="tabular-import-preview__mapping-summary">
-              <span :class="['mapping-badge', diagnostics.isComplete ? 'is-success' : 'is-warning']">
-                {{ diagnostics.isComplete ? t('common.importPreview.mapping.ready') : t('common.importPreview.mapping.incomplete') }}
-              </span>
-            </div>
+            <p>{{ t('common.importPreview.mapping.description') }}</p>
           </div>
 
           <div class="tabular-import-preview__mapping-list ui-scrollbar">
@@ -296,22 +298,24 @@
               :key="field.key"
               class="tabular-import-preview__mapping-row"
             >
-              <div class="tabular-import-preview__mapping-meta">
+              <div class="tabular-import-preview__mapping-row-top">
                 <div class="tabular-import-preview__mapping-name-row">
                   <span class="tabular-import-preview__mapping-name">{{ field.label }}</span>
                   <span v-if="field.required" class="mapping-required">{{ t('common.importPreview.mapping.required') }}</span>
                 </div>
+                <div class="tabular-import-preview__mapping-control">
+                  <SimpleSelectDropdown
+                    :model-value="mapping[field.key]"
+                    :options="columnOptions"
+                    searchable
+                    match-trigger-width
+                    @update:modelValue="$emit('update:mapping', { fieldKey: field.key, sourceKey: $event })"
+                  />
+                </div>
+              </div>
+              <div v-if="field.description || field.example" class="tabular-import-preview__mapping-meta">
                 <p v-if="field.description" class="tabular-import-preview__mapping-desc">{{ field.description }}</p>
                 <p v-if="field.example" class="tabular-import-preview__mapping-example">{{ t('common.importPreview.mapping.example', { value: field.example }) }}</p>
-              </div>
-              <div class="tabular-import-preview__mapping-control">
-                <SimpleSelectDropdown
-                  :model-value="mapping[field.key]"
-                  :options="columnOptions"
-                  searchable
-                  match-trigger-width
-                  @update:modelValue="$emit('update:mapping', { fieldKey: field.key, sourceKey: $event })"
-                />
               </div>
             </div>
           </div>
@@ -553,6 +557,7 @@ async function handleExport() {
 
 function closeModal() {
   isModalOpen.value = false
+  emit('reset')
 }
 
 function handleCancel() {
@@ -573,10 +578,16 @@ function emitHeaderRowChange(value) {
 const headerRowOptions = computed(() => {
   const rowCount = props.previewTable?.activeSheet?.rowCount || 0
   const maxCount = Math.min(Math.max(rowCount, 1), 6)
-  return Array.from({ length: maxCount }, (_, index) => ({
-    label: t('common.importPreview.controls.headerRowOption', { row: index + 1 }),
-    value: index
-  }))
+  const options = [
+    { label: t('common.importPreview.controls.noHeader'), value: -1 }
+  ]
+  for (let i = 0; i < maxCount; i++) {
+    options.push({
+      label: t('common.importPreview.controls.headerRowOption', { row: i + 1 }),
+      value: i
+    })
+  }
+  return options
 })
 
 const columnOptions = computed(() => ([
@@ -629,6 +640,7 @@ $preview-min-column-width: 120px;
   &__body,
   &__section-head,
   &__mapping-row,
+  &__mapping-row-top,
   &__mapping-name-row,
   &__toolbar-item,
   &__toolbar-meta {
@@ -752,7 +764,17 @@ $preview-min-column-width: 120px;
     min-height: 0;
   }
 
-  &__mapping,
+  &__mapping {
+    @include flex-col;
+
+    flex: 0 0 300px;
+    gap: 14px;
+    padding: $preview-panel-padding;
+    min-height: 0;
+    overflow: auto;
+    transform: translateZ(0);
+  }
+
   &__preview {
     @include flex-col;
 
@@ -772,12 +794,14 @@ $preview-min-column-width: 120px;
   }
 
   &__section-head {
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: stretch;
 
     h4 {
-      margin: 0 0 4px;
+      margin: 0;
       color: $text-primary;
       font-size: 16px;
+      white-space: nowrap;
     }
 
     p {
@@ -788,13 +812,21 @@ $preview-min-column-width: 120px;
     }
   }
 
+  &__section-head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
   &__mapping-summary {
     display: flex;
     align-items: center;
   }
 
   &__mapping-list {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
     max-height: 280px;
     padding-right: 4px;
@@ -802,30 +834,40 @@ $preview-min-column-width: 120px;
   }
 
   &__mapping-row {
-    gap: 12px;
-    align-items: flex-start;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 4px;
     padding: 12px;
     background: var(--glass-35);
     border: 1px solid var(--glass-30);
     border-radius: var(--radius-lg);
   }
 
-  &__mapping-meta {
-    min-width: 0;
-    flex: 1;
+  &__mapping-row-top {
+    display: flex;
+    gap: 20px;
+    align-items: center;
   }
 
   &__mapping-name-row {
+    flex-shrink: 0;
     gap: 8px;
     align-items: center;
-    margin-bottom: 6px;
   }
 
   &__mapping-name {
     color: $text-primary;
     font-size: 14px;
     font-weight: 600;
+    white-space: nowrap;
+  }
+
+  &__mapping-control {
+    flex: 1;
+    min-width: 0;
+
+    :deep(.simple-select-dropdown) {
+      display: block;
+    }
   }
 
   &__mapping-desc,
@@ -837,12 +879,8 @@ $preview-min-column-width: 120px;
   }
 
   &__mapping-example {
-    margin-top: 4px;
+    margin-top: 2px;
     color: $text-muted;
-  }
-
-  &__mapping-control {
-    min-width: 220px;
   }
 
   &__diagnostics {
@@ -934,19 +972,26 @@ $preview-min-column-width: 120px;
   border: 1px solid transparent;
 
   &.is-success {
+    white-space: nowrap;
+    text-align: center;
     color: $success-green;
     background: rgba(var(--color-success-rgb), 0.12);
     border-color: rgba(var(--color-success-rgb), 0.22);
+    border-radius: var(--radius-lg);
   }
 
   &.is-warning {
+    white-space: nowrap;
+    text-align: center;
     color: $warning-orange;
     background: rgba(var(--color-warning-rgb), 0.12);
     border-color: rgba(var(--color-warning-rgb), 0.22);
+    border-radius: var(--radius-lg);
   }
 }
 
 .mapping-required {
+  white-space: nowrap;
   padding: 2px 8px;
   color: $warning-orange;
   background: rgba(var(--color-warning-rgb), 0.12);
@@ -954,7 +999,6 @@ $preview-min-column-width: 120px;
 
 .diagnostic {
   width: fit-content;
-  padding: 6px 12px;
   line-height: 1.4;
 
   &--warning {
@@ -971,11 +1015,21 @@ $preview-min-column-width: 120px;
 @media (orientation: portrait) {
   .tabular-import-preview {
     &__body,
-    &__mapping-row,
     &__section-head,
     &__header,
     &__toolbar {
       flex-direction: column;
+    }
+
+    &__mapping {
+      flex: 0 1 auto;
+      min-height: 0;
+      overflow: auto;
+      transform: translateZ(0);
+    }
+
+    &__mapping-row-top {
+      flex-wrap: wrap;
     }
 
     &__mapping-control {
