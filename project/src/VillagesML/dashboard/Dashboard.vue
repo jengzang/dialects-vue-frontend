@@ -279,7 +279,7 @@ const formatNumber = (num) => {
 
 // const handleQuickSearch = () => {
 //   if (!searchKeyword.value.trim()) return
-//   window.location.href = `/villagesML?module=search&keyword=${encodeURIComponent(searchKeyword.value)}`
+//   window.location.href = buildVillagesMLPath({ module: 'search', query: { keyword: searchKeyword.value } })
 // }
 
 const navigateTo = (route) => {

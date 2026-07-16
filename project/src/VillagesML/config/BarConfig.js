@@ -14,7 +14,7 @@ export const VILLAGESML_MODULES = [
     //     id: 'search',
     //     label: '搜索',
     //     icon: '🔍',
-    //     path: '/villagesML?module=search',
+    //     path: buildVillagesMLPath({ module: 'search' }),
     //     weight: 0.8,
     //     mobileWeight: 1,
     //     weightIconOnly: 0.5,
@@ -445,7 +445,7 @@ export function createVillagesMLCommonBarSchema(isAuthenticated = false) {
             overrides: { scroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
         },
         navigation: {
-            defaultTo: '/villagesML?module=search',
+            defaultTo: buildVillagesMLPath({ module: 'search' }),
         }
     })
 
@@ -457,11 +457,11 @@ export function createVillagesMLCommonBarSchema(isAuthenticated = false) {
       icon: 'ℹ️',
       display: {
             overrides: { scroll: 'right', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
-        },
-      navigation: {
-            defaultTo: '/villagesML?module=system',
-        }
-    })
+       },
+       navigation: {
+             defaultTo: buildVillagesMLPath({ module: 'system' }),
+         }
+     })
 
     return createCommonBarSchema({
         meta: {
