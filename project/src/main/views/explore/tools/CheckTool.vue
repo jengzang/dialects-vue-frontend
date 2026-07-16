@@ -1044,43 +1044,89 @@ const scriptOptions = computed(() => [
   { label: t('tools.checkTool.welcome.simplifiedConvert'), value: true }
 ])
 
-const checkImportSchema = computed(() => ([
-  {
-    key: 'char',
-    label: t('common.importPreview.schemas.checkTool.char.label'),
-    required: true,
-    aliases: [
-      t('common.importPreview.schemas.checkTool.char.aliases.char'),
-      t('common.importPreview.schemas.checkTool.char.aliases.character'),
-      t('common.importPreview.schemas.checkTool.char.aliases.word')
-    ],
-    description: t('common.importPreview.schemas.checkTool.char.description'),
-    example: t('common.importPreview.schemas.checkTool.char.example')
-  },
-  {
-    key: 'ipa',
-    label: t('common.importPreview.schemas.checkTool.ipa.label'),
-    required: true,
-    aliases: [
-      t('common.importPreview.schemas.checkTool.ipa.aliases.ipa'),
-      t('common.importPreview.schemas.checkTool.ipa.aliases.phonetic'),
-      t('common.importPreview.schemas.checkTool.ipa.aliases.pronunciation')
-    ],
-    description: t('common.importPreview.schemas.checkTool.ipa.description'),
-    example: t('common.importPreview.schemas.checkTool.ipa.example')
-  },
-  {
-    key: 'note',
-    label: t('common.importPreview.schemas.checkTool.note.label'),
-    required: false,
-    aliases: [
-      t('common.importPreview.schemas.checkTool.note.aliases.note'),
-      t('common.importPreview.schemas.checkTool.note.aliases.comment')
-    ],
-    description: t('common.importPreview.schemas.checkTool.note.description'),
-    example: t('common.importPreview.schemas.checkTool.note.example')
+const checkImportSchema = computed(() => {
+  if (selectedFormat.value === '跳跳老鼠') {
+    return ([
+      {
+        key: 'pronunciation',
+        label: t('common.importPreview.schemas.checkTool.pronunciation.label'),
+        required: true,
+        aliases: [
+          t('common.importPreview.schemas.checkTool.pronunciation.aliases.ipa'),
+          t('common.importPreview.schemas.checkTool.pronunciation.aliases.phonetic'),
+          t('common.importPreview.schemas.checkTool.pronunciation.aliases.pronunciation')
+        ],
+        description: t('common.importPreview.schemas.checkTool.pronunciation.description'),
+        example: t('common.importPreview.schemas.checkTool.pronunciation.example')
+      },
+      {
+        key: 'charGroup',
+        label: t('common.importPreview.schemas.checkTool.charGroup.label'),
+        required: true,
+        aliases: [
+          t('common.importPreview.schemas.checkTool.charGroup.aliases.char'),
+          t('common.importPreview.schemas.checkTool.charGroup.aliases.character'),
+          t('common.importPreview.schemas.checkTool.charGroup.aliases.word')
+        ],
+        description: t('common.importPreview.schemas.checkTool.charGroup.description'),
+        example: t('common.importPreview.schemas.checkTool.charGroup.example')
+      }
+    ])
   }
-]))
+  if (selectedFormat.value === '縣志') {
+    return ([
+      {
+        key: 'pinyin',
+        label: t('common.importPreview.schemas.checkTool.pinyin.label'),
+        required: true,
+        aliases: [
+          t('common.importPreview.schemas.checkTool.pinyin.aliases.pinyin'),
+          t('common.importPreview.schemas.checkTool.pinyin.aliases.phonetic'),
+          t('common.importPreview.schemas.checkTool.pinyin.aliases.reading')
+        ],
+        description: t('common.importPreview.schemas.checkTool.pinyin.description'),
+        example: t('common.importPreview.schemas.checkTool.pinyin.example')
+      }
+    ])
+  }
+  return ([
+    {
+      key: 'char',
+      label: t('common.importPreview.schemas.checkTool.char.label'),
+      required: true,
+      aliases: [
+        t('common.importPreview.schemas.checkTool.char.aliases.char'),
+        t('common.importPreview.schemas.checkTool.char.aliases.character'),
+        t('common.importPreview.schemas.checkTool.char.aliases.word')
+      ],
+      description: t('common.importPreview.schemas.checkTool.char.description'),
+      example: t('common.importPreview.schemas.checkTool.char.example')
+    },
+    {
+      key: 'ipa',
+      label: t('common.importPreview.schemas.checkTool.ipa.label'),
+      required: true,
+      aliases: [
+        t('common.importPreview.schemas.checkTool.ipa.aliases.ipa'),
+        t('common.importPreview.schemas.checkTool.ipa.aliases.phonetic'),
+        t('common.importPreview.schemas.checkTool.ipa.aliases.pronunciation')
+      ],
+      description: t('common.importPreview.schemas.checkTool.ipa.description'),
+      example: t('common.importPreview.schemas.checkTool.ipa.example')
+    },
+    {
+      key: 'note',
+      label: t('common.importPreview.schemas.checkTool.note.label'),
+      required: false,
+      aliases: [
+        t('common.importPreview.schemas.checkTool.note.aliases.note'),
+        t('common.importPreview.schemas.checkTool.note.aliases.comment')
+      ],
+      description: t('common.importPreview.schemas.checkTool.note.description'),
+      example: t('common.importPreview.schemas.checkTool.note.example')
+    }
+  ])
+})
 const checkPreviewState = useTabularImportPreview({
   schema: checkImportSchema,
   requireExplicitConfirmation: () => requireExplicitConfirmation.value
@@ -1291,7 +1337,6 @@ const commandPreview = computed(() => {
 const shouldSkipPreview = (file) => {
   const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
   if (['.doc', '.docx'].includes(ext)) return true
-  if (['跳跳老鼠', '縣志'].includes(selectedFormat.value)) return true
   return false
 }
 
@@ -1381,15 +1426,20 @@ const confirmPreviewAndUpload = async () => {
     return
   }
 
+  const mapping = checkPreviewState.mapping.value
   const columnMap = []
-  if (checkPreviewState.mapping.value.char) {
-    columnMap.push({ sourceKey: checkPreviewState.mapping.value.char, header: '漢字' })
-  }
-  if (checkPreviewState.mapping.value.ipa) {
-    columnMap.push({ sourceKey: checkPreviewState.mapping.value.ipa, header: '音標' })
-  }
-  if (checkPreviewState.mapping.value.note) {
-    columnMap.push({ sourceKey: checkPreviewState.mapping.value.note, header: '解釋' })
+  let mode = 'replace'
+
+  if (selectedFormat.value === '跳跳老鼠') {
+    if (mapping.pronunciation) columnMap.push({ sourceKey: mapping.pronunciation, header: '讀音' })
+    if (mapping.charGroup) columnMap.push({ sourceKey: mapping.charGroup, header: '字組' })
+  } else if (selectedFormat.value === '縣志') {
+    if (mapping.pinyin) columnMap.push({ sourceKey: mapping.pinyin, header: '拼音' })
+    mode = 'rename'
+  } else {
+    if (mapping.char) columnMap.push({ sourceKey: mapping.char, header: '漢字' })
+    if (mapping.ipa) columnMap.push({ sourceKey: mapping.ipa, header: '音標' })
+    if (mapping.note) columnMap.push({ sourceKey: mapping.note, header: '解釋' })
   }
 
   const transformedFile = transformTabularFile({
@@ -1397,7 +1447,7 @@ const confirmPreviewAndUpload = async () => {
     columnMap,
     selectedSheetId: checkPreviewState.selectedSheetId.value,
     headerRowIndex: checkPreviewState.headerRowIndex.value,
-    mode: 'replace'
+    mode
   })
 
   checkImportFlow.clearPreview()

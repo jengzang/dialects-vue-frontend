@@ -191,6 +191,36 @@
             "note": "备注",
             "comment": "说明"
           }
+        },
+        "pronunciation": {
+          "label": "音节",
+          "description": "跳跳老鼠格式的读音列，用于声韵调拆解与错误检查。",
+          "example": "tin55",
+          "aliases": {
+            "ipa": "音标",
+            "phonetic": "读音",
+            "pronunciation": "发音"
+          }
+        },
+        "charGroup": {
+          "label": "字組",
+          "description": "跳跳老鼠格式的字组列，包含该读音下的所有单字。",
+          "example": "天地人",
+          "aliases": {
+            "char": "字",
+            "character": "单字",
+            "word": "字头"
+          }
+        },
+        "pinyin": {
+          "label": "音节",
+          "description": "縣志格式的拼音列（声母+韵母基底，不含声调），其余列自动作为字组数据。",
+          "example": "fi",
+          "aliases": {
+            "pinyin": "拼音",
+            "phonetic": "音韻",
+            "reading": "讀音"
+          }
         }
       },
       "voronoi": {

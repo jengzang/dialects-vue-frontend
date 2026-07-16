@@ -191,6 +191,36 @@
             "note": "Notes",
             "comment": "Comments"
           }
+        },
+        "pronunciation": {
+          "label": "Syllable",
+          "description": "The reading column for 跳跳老鼠 format, used for initial/final/tone analysis.",
+          "example": "tin55",
+          "aliases": {
+            "ipa": "IPA",
+            "phonetic": "Reading",
+            "pronunciation": "Pronunciation"
+          }
+        },
+        "charGroup": {
+          "label": "Char Group",
+          "description": "The character group column for 跳跳老鼠 format, containing all characters for a reading.",
+          "example": "天地人",
+          "aliases": {
+            "char": "Character",
+            "character": "Single Char",
+            "word": "Head Character"
+          }
+        },
+        "pinyin": {
+          "label": "Syllable",
+          "description": "The pinyin column for 縣志 format (initial+final base, no tone). Other columns are auto-treated as char groups.",
+          "example": "fi",
+          "aliases": {
+            "pinyin": "Pinyin",
+            "phonetic": "Phonetic",
+            "reading": "Reading"
+          }
         }
       },
       "voronoi": {

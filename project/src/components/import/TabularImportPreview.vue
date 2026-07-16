@@ -952,9 +952,12 @@ $preview-min-column-width: 120px;
   border: 1px solid transparent;
 
   &.is-success {
+    white-space: nowrap;
+    text-align: center;
     color: $success-green;
     background: rgba(var(--color-success-rgb), 0.12);
     border-color: rgba(var(--color-success-rgb), 0.22);
+    border-radius: var(--radius-lg);
   }
 
   &.is-warning {
