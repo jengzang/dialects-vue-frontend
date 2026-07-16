@@ -162,12 +162,16 @@
       <div class="spatial-section vml-glass-panel">
         <div class="spatial-header">
           <h2 style="white-space: nowrap">空間聚合</h2>
-          <div class="controls">
-            <SimpleSelectDropdown
-              v-model="spatialLevel"
-              :options="spatialLevelOptions"
-            />
-            <button class="query-button" :disabled="loadingSpatial" @click="loadSpatialAggregates">查詢</button>
+          <div class="controls vml-control-surface vml-control-row">
+            <div class="vml-control-field vml-control-field--compact">
+              <SimpleSelectDropdown
+                v-model="spatialLevel"
+                :options="spatialLevelOptions"
+              />
+            </div>
+            <div class="vml-control-actions">
+              <button class="query-button" :disabled="loadingSpatial" @click="loadSpatialAggregates">查詢</button>
+            </div>
           </div>
         </div>
 

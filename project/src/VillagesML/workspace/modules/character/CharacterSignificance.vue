@@ -21,62 +21,70 @@
         <!-- By Character Mode -->
         <div v-if="queryMode === 'by-char'" class="form-content">
           <h3>按字符查詢顯著性</h3>
-          <div class="form-group">
-            <label>字符:</label>
-            <input
-              v-model="queryChar"
-              type="text"
-              maxlength="1"
-              placeholder="輸入單個字符"
-              class="vml-char-input"
-            />
+          <div class="vml-control-surface vml-control-row">
+            <div class="form-group vml-control-field vml-control-field--compact">
+              <label>字符:</label>
+              <input
+                v-model="queryChar"
+                type="text"
+                maxlength="1"
+                placeholder="輸入單個字符"
+                class="vml-char-input"
+              />
+            </div>
+            <div class="form-group vml-control-field vml-control-field--compact">
+              <label>區域層級:</label>
+              <SimpleSelectDropdown :match-trigger-width="true"
+                v-model="regionLevel"
+                :options="regionLevelOptions"
+              />
+            </div>
+            <div class="vml-control-actions">
+              <button
+                class="query-button"
+                :disabled="!queryChar || loading"
+                @click="queryByChar"
+              >
+                查詢
+              </button>
+            </div>
           </div>
-          <div class="form-group">
-            <label>區域層級:</label>
-            <SimpleSelectDropdown :match-trigger-width="true"
-              v-model="regionLevel"
-              :options="regionLevelOptions"
-            />
-          </div>
-          <button
-            class="query-button"
-            :disabled="!queryChar || loading"
-            @click="queryByChar"
-          >
-            查詢
-          </button>
         </div>
 
         <!-- By Region Mode -->
         <div v-else class="form-content">
           <h3>按區域查詢顯著字符</h3>
-          <div class="form-group">
-            <label>區域選擇:</label>
-            <FilterableSelect
-              v-model="regionName"
-              :level="regionLevel"
-              @update:level="(newLevel) => regionLevel = newLevel"
-              @update:hierarchy="(h) => regionHierarchy = h"
-              placeholder="請選擇或輸入"
-            />
+          <div class="vml-control-surface vml-control-row">
+            <div class="form-group vml-control-field">
+              <label>區域選擇:</label>
+              <FilterableSelect
+                v-model="regionName"
+                :level="regionLevel"
+                @update:level="(newLevel) => regionLevel = newLevel"
+                @update:hierarchy="(h) => regionHierarchy = h"
+                placeholder="請選擇或輸入"
+              />
+            </div>
+            <div class="form-group vml-control-field vml-control-field--compact">
+              <label>返回數量:</label>
+              <input
+                v-model.number="topN"
+                type="number"
+                min="10"
+                max="100"
+                class="vml-number-input"
+              />
+            </div>
+            <div class="vml-control-actions">
+              <button
+                class="query-button"
+                :disabled="!regionName || loading"
+                @click="queryByRegion"
+              >
+                查詢
+              </button>
+            </div>
           </div>
-          <div class="form-group">
-            <label>返回數量:</label>
-            <input
-              v-model.number="topN"
-              type="number"
-              min="10"
-              max="100"
-              class="vml-number-input"
-            />
-          </div>
-          <button
-            class="query-button"
-            :disabled="!regionName || loading"
-            @click="queryByRegion"
-          >
-            查詢
-          </button>
         </div>
       </div>
 
@@ -340,10 +348,7 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .form-group {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 4px 12px;
-  margin-bottom: 12px;
+  min-width: 0;
 }
 
 .form-group label {
@@ -496,18 +501,6 @@ const getSignificanceBadge = (pValue) => {
   font-size: 24px;
   font-weight: 700;
   color: var(--color-primary);
-}
-
-@media (min-aspect-ratio: 1/1) {
-  .form-content {
-    flex-flow: row wrap;
-    align-items: center;
-  }
-
-  .form-group {
-    grid-template-columns: auto 1fr;
-    align-items: center;
-  }
 }
 
 @media (max-width: 768px) {
