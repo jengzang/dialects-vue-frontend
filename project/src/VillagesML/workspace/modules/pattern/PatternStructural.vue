@@ -9,18 +9,22 @@
       <h2>🏗️ 模式結構分析</h2>
 
       <!-- Controls -->
-      <div class="controls">
-        <SimpleSelectDropdown :match-trigger-width="true"
-          v-model="patternType"
-          :options="patternTypeOptions"
-        />
-        <button
-          class="query-button"
-          :disabled="loading"
-          @click="loadStructuralAnalysis"
-        >
-          查詢
-        </button>
+      <div class="controls vml-control-surface vml-control-row">
+        <div class="vml-control-field">
+          <SimpleSelectDropdown :match-trigger-width="true"
+            v-model="patternType"
+            :options="patternTypeOptions"
+          />
+        </div>
+        <div class="vml-control-actions">
+          <button
+            class="query-button"
+            :disabled="loading"
+            @click="loadStructuralAnalysis"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
       <!-- Loading State -->
@@ -130,8 +134,6 @@ const goToTendency = (pattern) => {
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
 }
 

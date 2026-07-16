@@ -9,24 +9,30 @@
       <h2>📊 模式傾向性分析</h2>
 
       <!-- Controls -->
-      <div class="controls">
-        <input
-          v-model="tendencyPattern"
-          type="text"
-          placeholder="輸入模式（如：新村）"
-          class="vml-input"
-        />
-        <SimpleSelectDropdown :match-trigger-width="true"
-          v-model="tendencyLevel"
-          :options="tendencyLevelOptions"
-        />
-        <button
-          class="query-button"
-          :disabled="!tendencyPattern || loading"
-          @click="loadPatternTendency"
-        >
-          查詢
-        </button>
+      <div class="controls vml-control-surface vml-control-row vml-control-row--center">
+        <div class="vml-control-field">
+          <input
+            v-model="tendencyPattern"
+            type="text"
+            placeholder="輸入模式（如：新村）"
+            class="vml-input"
+          />
+        </div>
+        <div class="vml-control-field vml-control-field--compact">
+          <SimpleSelectDropdown :match-trigger-width="true"
+            v-model="tendencyLevel"
+            :options="tendencyLevelOptions"
+          />
+        </div>
+        <div class="vml-control-actions">
+          <button
+            class="query-button"
+            :disabled="!tendencyPattern || loading"
+            @click="loadPatternTendency"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
       <!-- Loading State -->
@@ -172,17 +178,11 @@ watch(
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
 }
 
 .vml-input {
-  flex: 1;
-  min-width: 200px;
+  width: 100%;
   padding: 10px 16px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
