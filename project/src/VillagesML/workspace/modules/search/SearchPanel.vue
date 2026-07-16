@@ -165,10 +165,6 @@ const clearFilters = () => {
   margin-bottom: 20px;
 }
 
-.search-input-group {
-  align-items: stretch;
-}
-
 .search-input {
   flex: 1;
   min-width: 0;
@@ -191,10 +187,6 @@ const clearFilters = () => {
   padding: 12px 24px;
   max-width: 100px;
   white-space: nowrap;
-}
-
-.filters-row {
-  align-items: center;
 }
 
 .clear-filters-button {

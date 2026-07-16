@@ -666,10 +666,7 @@ watch(
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
-  align-items: center;
 }
 
 .ngram-selector {
