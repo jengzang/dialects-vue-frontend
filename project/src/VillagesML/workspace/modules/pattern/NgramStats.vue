@@ -13,9 +13,9 @@
 
     <!-- Shared Controls -->
     <div class="shared-controls vml-glass-panel">
-      <div class="controls">
+      <div class="controls vml-control-surface vml-control-row">
         <!-- N-gram 选择器 -->
-        <div class="ngram-selector">
+        <div class="ngram-selector vml-control-field">
           <SimpleSelectDropdown
             v-if="availableNgrams.length > 0"
             v-model="ngram"
@@ -41,18 +41,22 @@
             {{ loadingNgramList ? '⏳' : '📋' }}
           </button>
         </div>
-        <SimpleSelectDropdown
-          v-model="level"
-          :options="levelOptions"
-          width="120px"
-        />
-        <button
-          class="query-button"
-          :disabled="!ngram || loading"
-          @click="loadNgramData"
-        >
-          查詢
-        </button>
+        <div class="vml-control-field vml-control-field--compact">
+          <SimpleSelectDropdown
+            v-model="level"
+            :options="levelOptions"
+            width="120px"
+          />
+        </div>
+        <div class="vml-control-actions">
+          <button
+            class="query-button"
+            :disabled="!ngram || loading"
+            @click="loadNgramData"
+          >
+            查詢
+          </button>
+        </div>
       </div>
     </div>
 
@@ -247,9 +251,9 @@
     <!-- Significance Analysis -->
     <div class="significance-section vml-glass-panel">
       <h2>顯著性分析</h2>
-      <div class="controls">
+      <div class="controls vml-control-surface vml-control-row">
         <!-- N-gram 选择器 -->
-        <div class="ngram-selector">
+        <div class="ngram-selector vml-control-field">
           <SimpleSelectDropdown
             v-if="availableNgrams.length > 0"
             v-model="significanceNgram"
@@ -275,21 +279,25 @@
             {{ loadingNgramList ? '⏳' : '📋' }}
           </button>
         </div>
-        <SimpleSelectDropdown
-          v-model="significanceLevel"
-          :options="levelOptions"
-          width="120px"
-        />
-        <button
-          class="query-button"
-          :disabled="!significanceNgram || loadingSignificance"
-          @click="loadSignificance"
-        >
-          查詢
-        </button>
+        <div class="vml-control-field vml-control-field--compact">
+          <SimpleSelectDropdown
+            v-model="significanceLevel"
+            :options="levelOptions"
+            width="120px"
+          />
+        </div>
+        <div class="vml-control-actions">
+          <button
+            class="query-button"
+            :disabled="!significanceNgram || loadingSignificance"
+            @click="loadSignificance"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
-      <div v-if="loadingSignificance" class="vml-loading"">
+      <div v-if="loadingSignificance" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
 
