@@ -12,9 +12,9 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.4.2"),
-        .package(name: "CapacitorFilesystem", path: "../../../node_modules/@capacitor/filesystem"),
-        .package(name: "CapacitorPreferences", path: "../../../node_modules/@capacitor/preferences"),
-        .package(name: "CapacitorShare", path: "../../../node_modules/@capacitor/share")
+        .package(name: "CapacitorFilesystem", path: "../../../project/node_modules/@capacitor/filesystem"),
+        .package(name: "CapacitorPreferences", path: "../../../project/node_modules/@capacitor/preferences"),
+        .package(name: "CapacitorShare", path: "../../../project/node_modules/@capacitor/share")
     ],
     targets: [
         .target(

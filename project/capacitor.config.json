@@ -1,5 +1,11 @@
 {
   "appId": "top.yzup.dialects",
   "appName": "Dialects",
-  "webDir": "dist"
+  "webDir": "dist",
+  "android": {
+    "path": "../android"
+  },
+  "ios": {
+    "path": "../ios"
+  }
 }
