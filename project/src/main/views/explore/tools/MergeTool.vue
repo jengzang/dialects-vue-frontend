@@ -137,7 +137,7 @@
             <button
                 class="main-glass-button"
                 data-size="small"
-                style="display: inline-block; padding: 2px 8px; margin: 0 2px; vertical-align: middle;background: var(--color-primary);color:white"
+                style="display: inline-block; padding: 2px 8px; margin: 0 2px; vertical-align: middle;background: var(--color-primary);"
                 @click="$router.push(buildLocalePath(resolveRouteLocale(route), '/explore/tools/check'))"
             >
               {{ t('tools.merge.files.checkTool') }}
@@ -924,6 +924,9 @@ $color-danger: var(--color-error-light);
   font-size: 14px;
   color: rgba(var(--text-deep-rgb), 0.7);
   text-align: center;
+ .main-glass-button{
+  color: var(--action-primary-text)
+ } 
 }
 
 @keyframes fadeIn {

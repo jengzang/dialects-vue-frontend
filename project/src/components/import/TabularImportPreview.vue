@@ -94,15 +94,15 @@
         <div v-else class="tabular-import-preview__body">
           <div v-if="mappingEnabled" class="tabular-import-preview__mapping main-glass-panel-inner">
             <div class="tabular-import-preview__section-head">
-              <div>
+              <div class="tabular-import-preview__section-head-row">
                 <h4>{{ t('common.importPreview.mapping.title') }}</h4>
-                <p>{{ t('common.importPreview.mapping.description') }}</p>
+                <div class="tabular-import-preview__mapping-summary">
+                  <span :class="['mapping-badge', diagnostics.isComplete ? 'is-success' : 'is-warning']">
+                    {{ diagnostics.isComplete ? t('common.importPreview.mapping.ready') : t('common.importPreview.mapping.incomplete') }}
+                  </span>
+                </div>
               </div>
-              <div class="tabular-import-preview__mapping-summary">
-                <span :class="['mapping-badge', diagnostics.isComplete ? 'is-success' : 'is-warning']">
-                  {{ diagnostics.isComplete ? t('common.importPreview.mapping.ready') : t('common.importPreview.mapping.incomplete') }}
-                </span>
-              </div>
+              <p>{{ t('common.importPreview.mapping.description') }}</p>
             </div>
 
             <div class="tabular-import-preview__mapping-list ui-scrollbar">
@@ -281,15 +281,15 @@
       <div v-else class="tabular-import-preview__body">
         <div v-if="mappingEnabled" class="tabular-import-preview__mapping main-glass-panel-inner">
           <div class="tabular-import-preview__section-head">
-            <div>
+            <div class="tabular-import-preview__section-head-row">
               <h4>{{ t('common.importPreview.mapping.title') }}</h4>
-              <p>{{ t('common.importPreview.mapping.description') }}</p>
+              <div class="tabular-import-preview__mapping-summary">
+                <span :class="['mapping-badge', diagnostics.isComplete ? 'is-success' : 'is-warning']">
+                  {{ diagnostics.isComplete ? t('common.importPreview.mapping.ready') : t('common.importPreview.mapping.incomplete') }}
+                </span>
+              </div>
             </div>
-            <div class="tabular-import-preview__mapping-summary">
-              <span :class="['mapping-badge', diagnostics.isComplete ? 'is-success' : 'is-warning']">
-                {{ diagnostics.isComplete ? t('common.importPreview.mapping.ready') : t('common.importPreview.mapping.incomplete') }}
-              </span>
-            </div>
+            <p>{{ t('common.importPreview.mapping.description') }}</p>
           </div>
 
           <div class="tabular-import-preview__mapping-list ui-scrollbar">
@@ -557,6 +557,7 @@ async function handleExport() {
 
 function closeModal() {
   isModalOpen.value = false
+  emit('reset')
 }
 
 function handleCancel() {
@@ -769,6 +770,9 @@ $preview-min-column-width: 120px;
     flex: 0 0 300px;
     gap: 14px;
     padding: $preview-panel-padding;
+    min-height: 0;
+    overflow: auto;
+    transform: translateZ(0);
   }
 
   &__preview {
@@ -790,12 +794,14 @@ $preview-min-column-width: 120px;
   }
 
   &__section-head {
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: stretch;
 
     h4 {
-      margin: 0 0 4px;
+      margin: 0;
       color: $text-primary;
       font-size: 16px;
+      white-space: nowrap;
     }
 
     p {
@@ -806,13 +812,21 @@ $preview-min-column-width: 120px;
     }
   }
 
+  &__section-head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
   &__mapping-summary {
     display: flex;
     align-items: center;
   }
 
   &__mapping-list {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
     max-height: 280px;
     padding-right: 4px;
@@ -1011,6 +1025,7 @@ $preview-min-column-width: 120px;
       flex: 0 1 auto;
       min-height: 0;
       overflow: auto;
+      transform: translateZ(0);
     }
 
     &__mapping-row-top {

@@ -14,7 +14,7 @@ function buildXlsxFile(headers, dataRows, originalFileName) {
   const ws = XLSX.utils.aoa_to_sheet([headers, ...dataRows])
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
-  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array', compression: true })
 
   const blob = new Blob([wbout], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
