@@ -109,17 +109,18 @@
           <h3>按字符查詢空間分佈</h3>
 
           <!-- Load Characters Button -->
-          <button
-            v-if="availableCharacters.length === 0"
-            class="query-button load-clusters-button"
-            :disabled="loadingCharacters"
-            @click="loadCharacters"
-          >
-            {{ loadingCharacters ? '加載中...' : '加載字符列表' }}
-          </button>
+          <div v-if="availableCharacters.length === 0" class="vml-control-surface vml-control-actions">
+            <button
+              class="query-button load-clusters-button"
+              :disabled="loadingCharacters"
+              @click="loadCharacters"
+            >
+              {{ loadingCharacters ? '加載中...' : '加載字符列表' }}
+            </button>
+          </div>
 
           <!-- Character Selector -->
-          <div v-else class="form-group">
+          <div v-else class="form-group vml-control-surface">
             <label>選擇字符:</label>
             <SimpleSelectDropdown :match-trigger-width="true"
               v-model="queryChar"
@@ -179,17 +180,18 @@
           <h3>按聚類查詢</h3>
 
           <!-- Load Clusters Button -->
-          <button
-            v-if="availableClusters.length === 0"
-            class="load-clusters-button"
-            :disabled="loadingClusters"
-            @click="loadClusters"
-          >
-            {{ loadingClusters ? '加載中...' : '加載聚類列表' }}
-          </button>
+          <div v-if="availableClusters.length === 0" class="vml-control-surface vml-control-actions">
+            <button
+              class="load-clusters-button"
+              :disabled="loadingClusters"
+              @click="loadClusters"
+            >
+              {{ loadingClusters ? '加載中...' : '加載聚類列表' }}
+            </button>
+          </div>
 
           <!-- Cluster Selector -->
-          <div v-else class="form-group">
+          <div v-else class="form-group vml-control-surface">
             <label>選擇聚類:</label>
             <SimpleSelectDropdown :match-trigger-width="true"
               v-model="clusterId"
@@ -733,10 +735,9 @@ onMounted(() => {
 
 .form-group {
   display: grid;
-  grid-template-columns: 120px 1fr;
+  grid-template-columns: 120px minmax(0, 1fr);
   align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
 }
 
 .form-group label {

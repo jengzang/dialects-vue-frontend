@@ -4,8 +4,8 @@
       <!-- 地圖容器 -->
       <div ref="mapContainer" class="map-container">
         <!-- 地圖控制面板 -->
-        <div class="map-controls" v-if="!isFullScreen">
-          <div class="control-group">
+        <div class="map-controls vml-control-row" v-if="!isFullScreen">
+          <div class="control-group vml-control-field">
             <SimpleSelectDropdown :match-trigger-width="true"
               v-model="currentStyleKey"
               :options="mapStyleOptions"
@@ -13,7 +13,7 @@
             />
           </div>
 
-          <div class="button-row">
+          <div class="button-row vml-control-actions">
             <button class="action-btn" @click="resetView">🎯 復位</button>
             <button class="action-btn fullscreen-btn" @click="toggleFullScreen">⛶ 全屏</button>
           </div>
@@ -354,8 +354,6 @@ const resetView = () => {
   padding: 12px;
   border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  @include flex-col;
-  gap: 8px;
   z-index: 10;
   width: 160px;
 }
