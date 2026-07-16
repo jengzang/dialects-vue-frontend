@@ -34,7 +34,7 @@
     "description": "Readings → Middle Chinese · Trace readings back to their Middle Chinese sources",
     "noExclude": "No Exclusions",
     "selectAll": "Select All",
-    "analysisText": "Analyze the Middle Chinese sources of syllables with the selected <strong>{card}</strong>, showing which Middle Chinese [<strong>{keys}</strong>] categories the characters sharing that <strong>{card}</strong> come from",
+    "analysisText": "Trace characters sharing the selected <strong>{card}</strong> to their <strong>{keys}</strong> categories.",
     "inputPlaceholder": "Enter/select [{key}]",
     "cards": {
       "initial": "Initial",

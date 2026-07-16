@@ -31,8 +31,8 @@
   },
   "components": {
     "multiSelect": {
-      "selectAll": "Select All",
-      "deselectAll": "Deselect All",
+      "selectAll": "All",
+      "deselectAll": "Clear",
       "searchPlaceholder": "Search...",
       "noResults": "No Matching Results",
       "placeholder": "Select options"
