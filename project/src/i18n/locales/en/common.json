@@ -67,6 +67,8 @@
     "jyut2ipaDescription": "Identify the Jyutping column before starting the conversion to avoid problems caused by inconsistent column names.",
     "checkToolTitle": "Import Preview and Validation Column Mapping",
     "checkToolDescription": "Map the character, transcription, and notes columns before opening the validation workspace to reduce import failures caused by inconsistent column names.",
+    "mergeFileTitle": "Merge File Column Mapping Preview",
+    "mergeFileDescription": "Map the character, pronunciation, and note columns of the merge file, then confirm to upload.",
     "mergeReferenceSummary": "Mapped {mappedCount} of {columnCount} source columns",
     "actions": {
       "exportSource": "Export Original File",
@@ -134,6 +136,37 @@
         "note": {
           "label": "Notes",
           "description": "An optional column for preserving manually entered notes.",
+          "example": "Literary reading",
+          "aliases": {
+            "remark": "Notes",
+            "comment": "Comments"
+          }
+        }
+      },
+      "mergeFile": {
+        "char": {
+          "label": "Character",
+          "description": "The character column in the merge file, used to align with the reference table.",
+          "example": "天",
+          "aliases": {
+            "char": "Character",
+            "character": "Chinese Character",
+            "word": "Head Character"
+          }
+        },
+        "pronunciation": {
+          "label": "Pronunciation",
+          "description": "The pronunciation/IPA column in the merge file. This column is required.",
+          "example": "tin1",
+          "aliases": {
+            "ipa": "IPA",
+            "phonetic": "Reading",
+            "sound": "Phonetic Value"
+          }
+        },
+        "note": {
+          "label": "Notes",
+          "description": "An optional column for supplementary information.",
           "example": "Literary reading",
           "aliases": {
             "remark": "Notes",

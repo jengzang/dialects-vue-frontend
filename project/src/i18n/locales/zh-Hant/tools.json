@@ -149,6 +149,10 @@
       "uploadText": "點擊或拖拽上傳待合併字表檔案",
       "uploadHint": "最多可同時加入 20 個 Excel 檔案",
       "selectedCount": "已加入 {count} 個檔案",
+      "enablePreview": "啟用列映射預覽",
+      "pendingCount": "待映射 {count} 個檔案",
+      "pendingMapping": "待映射",
+      "mapped": "已映射",
       "previous": "上一步",
       "startMerge": "開始合併"
     },

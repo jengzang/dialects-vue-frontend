@@ -145,6 +145,10 @@
             {{ t('tools.merge.files.descSuffix') }}
           </p>
 
+          <div class="preview-toggle">
+            <CheckBox v-model="previewEnabled" :label="t('tools.merge.files.enablePreview')" />
+          </div>
+
           <div
             class="upload-zone multiple"
             @click="$refs.filesInput.click()"
@@ -165,7 +169,49 @@
             <div class="upload-hint">{{ t('tools.merge.files.uploadHint') }}</div>
           </div>
 
-          <div class="files-list" v-if="mergeFiles.length > 0">
+          <TabularImportPreview
+            v-if="pendingMergeFile"
+            :key="mergeImportConfirmKey"
+            :model-value="Boolean(pendingMergeFile)"
+            :title="t('common.importPreview.mergeFileTitle')"
+            :description="t('common.importPreview.mergeFileDescription')"
+            :file="pendingMergeFile"
+            :schema="mergeFileImportSchema"
+            :loading="mergeFilePreviewState.loading.value"
+            :preview-table="mergeFilePreviewState.previewTable.value"
+            :diagnostics="mergeFilePreviewState.diagnostics.value"
+            :mapping="mergeFilePreviewState.mapping.value"
+            :selected-sheet-id="mergeFilePreviewState.selectedSheetId.value"
+            :header-row-index="mergeFilePreviewState.headerRowIndex.value"
+            :sheets="mergeFilePreviewState.parsedFile.value?.sheets || []"
+            @update:selected-sheet-id="mergeFilePreviewState.selectedSheetId.value = $event"
+            @update:header-row-index="mergeFilePreviewState.headerRowIndex.value = $event"
+            @update:mapping="handleMergeFileMappingUpdate"
+            @reset="clearPendingMergeFile"
+            @confirm="handleMergeFileConfirm"
+          />
+
+          <div class="files-list" v-if="pendingMergeFiles.length > 0">
+            <h4 class="list-title">{{ t('tools.merge.files.pendingCount', { count: pendingMergeFiles.length }) }}</h4>
+            <div class="file-items">
+              <div
+                v-for="(item, index) in pendingMergeFiles"
+                :key="index"
+                class="file-item"
+                :class="{ 'file-item--mapped': item.mapped }"
+                @click="!item.mapped && loadMergeFilePreview(item.file)"
+              >
+                <div class="file-item-icon">{{ item.mapped ? '✅' : '📄' }}</div>
+                <div class="file-item-name">{{ item.file.name }}</div>
+                <div class="file-item-status">
+                  {{ item.mapped ? t('tools.merge.files.mapped') : t('tools.merge.files.pendingMapping') }}
+                </div>
+                <button v-if="!item.mapped" class="file-item-remove" @click.stop="removePendingFile(index)">🗑️</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="files-list" v-if="!previewEnabled && mergeFiles.length > 0">
             <h4 class="list-title">{{ t('tools.merge.files.selectedCount', { count: mergeFiles.length }) }}</h4>
             <div class="file-items">
               <div
@@ -188,7 +234,7 @@
               class="main-glass-button"
               data-variant="primary"
               data-size="large"
-              :disabled="mergeFiles.length === 0"
+              :disabled="!canStartMerge"
               @click="startMerge"
             >
               {{ t('tools.merge.files.startMerge') }}
@@ -288,9 +334,10 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { downloadMerge, executeMerge, getMergeProgress, uploadFiles, uploadReference } from '@/api'
 import { showError } from '@/utils/message.js'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
@@ -315,6 +362,7 @@ const referenceFile = ref(null)
 const pendingReferenceFile = ref(null)
 const referenceImportConfirmKey = ref(0)
 const referenceImportPayload = ref(null)
+const mergeFileImportPayload = ref(null)
 const mergeFiles = ref([])
 const processing = ref(false)
 const progress = ref(0)
@@ -327,6 +375,10 @@ const refInput = ref(null)
 const filesInput = ref(null)
 const requireExplicitConfirmation = ref(false)
 const forceReferencePreview = ref(false)
+const previewEnabled = ref(false)
+const pendingMergeFile = ref(null)
+const pendingMergeFiles = ref([])
+const mergeImportConfirmKey = ref(0)
 
 const referenceStats = reactive({
   charCount: 0,
@@ -349,6 +401,21 @@ const mergePollingTask = usePollingTask({
 })
 
 const isLoadingRef = computed(() => referencePreviewState.loading.value)
+const canStartMerge = computed(() => {
+  if (previewEnabled.value) {
+    return mergeFiles.value.length > 0 && pendingMergeFiles.value.every(f => f.mapped)
+  }
+  return mergeFiles.value.length > 0
+})
+
+watch(previewEnabled, (enabled) => {
+  if (enabled) {
+    mergeFiles.value = []
+  } else {
+    pendingMergeFiles.value = []
+    mergeFileImportFlow.clearPreview()
+  }
+})
 const defaultReferenceSource = {
   id: 'merge-default-reference',
   kind: 'preset',
@@ -404,9 +471,50 @@ const referenceImportSchema = computed(() => ([
     example: t('common.importPreview.schemas.mergeReference.note.example')
   }
 ]))
+const mergeFileImportSchema = computed(() => ([
+  {
+    key: 'char',
+    label: t('common.importPreview.schemas.mergeFile.char.label'),
+    required: true,
+    aliases: [
+      t('common.importPreview.schemas.mergeFile.char.aliases.char'),
+      t('common.importPreview.schemas.mergeFile.char.aliases.character'),
+      t('common.importPreview.schemas.mergeFile.char.aliases.word')
+    ],
+    description: t('common.importPreview.schemas.mergeFile.char.description'),
+    example: t('common.importPreview.schemas.mergeFile.char.example')
+  },
+  {
+    key: 'pronunciation',
+    label: t('common.importPreview.schemas.mergeFile.pronunciation.label'),
+    required: true,
+    aliases: [
+      t('common.importPreview.schemas.mergeFile.pronunciation.aliases.ipa'),
+      t('common.importPreview.schemas.mergeFile.pronunciation.aliases.phonetic'),
+      t('common.importPreview.schemas.mergeFile.pronunciation.aliases.sound')
+    ],
+    description: t('common.importPreview.schemas.mergeFile.pronunciation.description'),
+    example: t('common.importPreview.schemas.mergeFile.pronunciation.example')
+  },
+  {
+    key: 'note',
+    label: t('common.importPreview.schemas.mergeFile.note.label'),
+    required: false,
+    aliases: [
+      t('common.importPreview.schemas.mergeFile.note.aliases.remark'),
+      t('common.importPreview.schemas.mergeFile.note.aliases.comment')
+    ],
+    description: t('common.importPreview.schemas.mergeFile.note.description'),
+    example: t('common.importPreview.schemas.mergeFile.note.example')
+  }
+]))
 const referencePreviewState = useTabularImportPreview({
   schema: referenceImportSchema,
   requireExplicitConfirmation: () => forceReferencePreview.value || requireExplicitConfirmation.value
+})
+const mergeFilePreviewState = useTabularImportPreview({
+  schema: mergeFileImportSchema,
+  requireExplicitConfirmation: () => requireExplicitConfirmation.value
 })
 const referenceImportFlow = useTabularImportFlow({
   previewState: referencePreviewState,
@@ -444,6 +552,31 @@ const referenceImportFlow = useTabularImportFlow({
   resetInput: () => {
     if (refInput.value) {
       refInput.value.value = ''
+    }
+  }
+})
+const mergeFileImportFlow = useTabularImportFlow({
+  previewState: mergeFilePreviewState,
+  pendingFileRef: pendingMergeFile,
+  payloadRef: mergeFileImportPayload,
+  confirmKeyRef: mergeImportConfirmKey,
+  beforePreview: async (file) => {
+    if (!file.name.match(/\.(xlsx|xls)$/i)) {
+      showError(t('tools.merge.validation.invalidFileType'))
+      return false
+    }
+    return true
+  },
+  createPreviewFile: async (file) => file,
+  onAutoApply: async () => {
+    await handleMergeFileConfirm()
+  },
+  onPreviewError: (error) => {
+    showError(t('tools.merge.messages.previewFailed', { message: error.message }))
+  },
+  resetInput: () => {
+    if (filesInput.value) {
+      filesInput.value.value = ''
     }
   }
 })
@@ -577,8 +710,9 @@ const handleFilesDrop = (event) => {
 }
 
 const addFiles = async (files) => {
-  if (mergeFiles.value.length + files.length > 20) {
-    showError(t('tools.merge.validation.maxFiles', { count: mergeFiles.value.length }))
+  const totalCount = (previewEnabled.value ? pendingMergeFiles.value.length : mergeFiles.value.length) + files.length
+  if (totalCount > 20) {
+    showError(t('tools.merge.validation.maxFiles', { count: totalCount }))
     return
   }
 
@@ -598,16 +732,77 @@ const addFiles = async (files) => {
     return
   }
 
-  try {
-    await uploadFiles(taskId.value, validFiles)
-    mergeFiles.value.push(...validFiles)
-  } catch (error) {
-    showError(t('tools.merge.messages.uploadFailed', { message: error.message }))
+  if (previewEnabled.value) {
+    validFiles.forEach(file => {
+      pendingMergeFiles.value.push({ file, mapped: false })
+    })
+  } else {
+    try {
+      await uploadFiles(taskId.value, validFiles)
+      mergeFiles.value.push(...validFiles)
+    } catch (error) {
+      showError(t('tools.merge.messages.uploadFailed', { message: error.message }))
+    }
   }
 }
 
 const removeFile = (index) => {
   mergeFiles.value.splice(index, 1)
+}
+
+const removePendingFile = (index) => {
+  pendingMergeFiles.value.splice(index, 1)
+}
+
+const loadMergeFilePreview = (file) => {
+  mergeFileImportFlow.loadPreview(file)
+}
+
+const handleMergeFileMappingUpdate = ({ fieldKey, sourceKey }) => {
+  mergeFilePreviewState.updateMapping(fieldKey, sourceKey)
+  mergeFileImportPayload.value = mergeFilePreviewState.summary.value
+}
+
+const clearPendingMergeFile = () => {
+  mergeFileImportFlow.clearPreview()
+}
+
+const handleMergeFileConfirm = async () => {
+  if (!pendingMergeFile.value || !mergeFileImportPayload.value?.isComplete) {
+    showError(t('common.importPreview.messages.mappingIncomplete'))
+    return
+  }
+
+  const columnMap = [
+    { sourceKey: mergeFilePreviewState.mapping.value.char, header: '漢字' },
+    { sourceKey: mergeFilePreviewState.mapping.value.pronunciation, header: '音標' },
+  ]
+  if (mergeFilePreviewState.mapping.value.note) {
+    columnMap.push({ sourceKey: mergeFilePreviewState.mapping.value.note, header: '解釋' })
+  }
+
+  const transformedFile = transformTabularFile({
+    parsedFile: mergeFilePreviewState.parsedFile.value,
+    columnMap,
+    selectedSheetId: mergeFilePreviewState.selectedSheetId.value,
+    headerRowIndex: mergeFilePreviewState.headerRowIndex.value,
+    mode: 'replace'
+  })
+
+  try {
+    await uploadFiles(taskId.value, [transformedFile])
+    mergeFiles.value.push(transformedFile)
+
+    const idx = pendingMergeFiles.value.findIndex(f => f.file === pendingMergeFile.value)
+    if (idx !== -1) {
+      pendingMergeFiles.value[idx].mapped = true
+    }
+  } catch (error) {
+    showError(t('tools.merge.messages.uploadFailed', { message: error.message }))
+    return
+  }
+
+  mergeFileImportFlow.clearPreview()
 }
 
 const goToStep = (step) => {
@@ -771,6 +966,9 @@ const reset = () => {
   referenceFile.value = null
   referenceImportFlow.clearPreview()
   mergeFiles.value = []
+  pendingMergeFiles.value = []
+  previewEnabled.value = false
+  mergeFileImportFlow.clearPreview()
   processing.value = false
   progress.value = 0
   processingText.value = ''
@@ -926,7 +1124,11 @@ $color-danger: var(--color-error-light);
   text-align: center;
  .main-glass-button{
   color: var(--action-primary-text)
- } 
+ }
+}
+
+.preview-toggle {
+  padding: 4px 0;
 }
 
 @keyframes fadeIn {
@@ -1054,6 +1256,11 @@ $color-danger: var(--color-error-light);
       background: var(--glass-70);
     }
 
+    &--mapped {
+      opacity: 0.7;
+      cursor: default;
+    }
+
     &-icon {
       font-size: 20px;
     }
@@ -1062,6 +1269,12 @@ $color-danger: var(--color-error-light);
       flex: 1;
       font-size: 14px;
       color: $color-text;
+    }
+
+    &-status {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(var(--text-deep-rgb), 0.6);
     }
 
     &-remove {

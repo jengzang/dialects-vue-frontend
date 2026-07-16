@@ -149,6 +149,10 @@
       "uploadText": "点击或拖拽上传待合并字表文件",
       "uploadHint": "最多可同时加入 20 个 Excel 文件",
       "selectedCount": "已加入 {count} 个文件",
+      "enablePreview": "启用列映射预览",
+      "pendingCount": "待映射 {count} 个文件",
+      "pendingMapping": "待映射",
+      "mapped": "已映射",
       "previous": "上一步",
       "startMerge": "开始合并"
     },

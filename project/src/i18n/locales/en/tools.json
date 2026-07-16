@@ -149,6 +149,10 @@
       "uploadText": "Click or drag to upload tables to merge",
       "uploadHint": "You can add up to 20 Excel files at once",
       "selectedCount": "{count} file(s) added",
+      "enablePreview": "Enable column mapping preview",
+      "pendingCount": "{count} file(s) pending mapping",
+      "pendingMapping": "Pending",
+      "mapped": "Mapped",
       "previous": "Previous",
       "startMerge": "Start Merge"
     },
