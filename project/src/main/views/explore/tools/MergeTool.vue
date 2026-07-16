@@ -396,7 +396,7 @@ const mergeStats = reactive({
 
 const mergedFilesList = ref([])
 const mergePollingTask = usePollingTask({
-  intervalMs: 1000,
+  intervalMs: 1100,
   maxFailures: 3,
 })
 
