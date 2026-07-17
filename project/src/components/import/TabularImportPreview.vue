@@ -1000,6 +1000,7 @@ $preview-min-column-width: 120px;
 .diagnostic {
   width: fit-content;
   line-height: 1.4;
+  margin:0;
 
   &--warning {
     color: $warning-orange;

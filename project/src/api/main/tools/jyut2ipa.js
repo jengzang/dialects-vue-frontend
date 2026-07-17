@@ -62,11 +62,20 @@ export async function uploadJyutFile(file, options = {}) {
  * @example
  * await processJyut2Ipa(taskId)
  */
-export async function processJyut2Ipa(taskId) {
+export async function processJyut2Ipa(taskId, customRules = []) {
   try {
+    const body = { task_id: taskId }
+    if (Array.isArray(customRules) && customRules.length > 0) {
+      body.custom_rules = customRules.map(({ to_replace, replacement, category, enabled }) => ({
+        to_replace,
+        replacement,
+        category,
+        enabled
+      }))
+    }
     return await api('/api/tools/jyut2ipa/process', {
       method: 'POST',
-      body: { task_id: taskId }
+      body
     })
   } catch (error) {
     console.error('Process jyut2ipa error:', error)

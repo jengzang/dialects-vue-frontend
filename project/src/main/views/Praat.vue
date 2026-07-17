@@ -526,7 +526,7 @@ watch(settings, () => {
 const MAX_POLLING_FAILURES = 5
 // 统一轮询状态与清理逻辑，避免页面切换、重复分析时残留旧定时器。
 const pollingTask = usePollingTask({
-  intervalMs: 2000,
+  intervalMs: 1100,
   maxFailures: MAX_POLLING_FAILURES,
 })
 
