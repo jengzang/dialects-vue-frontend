@@ -261,8 +261,27 @@ function isValidVoronoiRing(coords) {
       && Number.isFinite(Number(coordinate[1])))
 }
 
+function convexHull(points) {
+  const sorted = [...points].sort((a, b) => (a[0] === b[0] ? a[1] - b[1] : a[0] - b[0]))
+  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+  const lower = []
+  for (const p of sorted) {
+    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop()
+    lower.push(p)
+  }
+  const upper = []
+  for (let i = sorted.length - 1; i >= 0; i -= 1) {
+    const p = sorted[i]
+    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop()
+    upper.push(p)
+  }
+  lower.pop()
+  upper.pop()
+  return lower.concat(upper)
+}
+
 function createCirclePolygon(center, radius) {
-  const n = 24
+  const n = 12
   const ring = []
   for (let i = 0; i < n; i += 1) {
     const a = (i / n) * 2 * Math.PI
@@ -370,7 +389,7 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
     return featureCollection(polygonFeatures)
   }
 
-  // 第二步：每个点画圆 → 并集 → 裁剪边界
+  // 第二步：用连通分量构建裁剪边界
   const globalMedian = (() => {
     const sorted = neighborDists.filter((d) => d > 0).sort((a, b) => a - b)
     if (!sorted.length) return 0.1
@@ -378,20 +397,84 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
     return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2
   })()
 
-  const radius = globalMedian * (0.5 + expandFactor * 3) * 3 
+  const radius = globalMedian * (0.05 + expandFactor * 8) * 2
 
-  // 每个点画一个圆
-  const circles = []
-  for (let i = 0; i < validFeatures.length; i += 1) {
-    const pi = getPointCoordinate(validFeatures[i])
-    if (pi) circles.push(createCirclePolygon(pi, radius))
+  // BFS 找连通分量（Delaunay 边 < 2*radius 的视为连通）
+  const n = validFeatures.length
+  const compVisited = new Uint8Array(n)
+  const components = []
+
+  for (let i = 0; i < n; i += 1) {
+    if (compVisited[i]) continue
+    const comp = []
+    const queue = [i]
+    compVisited[i] = 1
+    while (queue.length > 0) {
+      const idx = queue.shift()
+      comp.push(idx)
+      const pi = getPointCoordinate(validFeatures[idx])
+      if (!pi) continue
+      for (const j of delaunay.neighbors(idx)) {
+        if (compVisited[j]) continue
+        const pj = getPointCoordinate(validFeatures[j])
+        if (!pj) continue
+        if (Math.hypot(pi[0] - pj[0], pi[1] - pj[1]) < 2 * radius) {
+          compVisited[j] = 1
+          queue.push(j)
+        }
+      }
+    }
+    components.push(comp)
+  }
+
+  // 对每个分量：大分量 buffer(凸包)，小分量 union(圆)
+  const boundaries = []
+  for (const comp of components) {
+    if (comp.length < 3) {
+      for (const i of comp) {
+        const pi = getPointCoordinate(validFeatures[i])
+        if (pi) boundaries.push(createCirclePolygon(pi, radius))
+      }
+    } else if (comp.length <= 30) {
+      const compCircles = comp
+        .map((i) => {
+          const pi = getPointCoordinate(validFeatures[i])
+          return pi ? createCirclePolygon(pi, radius) : null
+        })
+        .filter(Boolean)
+      if (compCircles.length > 0) {
+        try {
+          const merged = union(featureCollection(compCircles))
+          if (merged) boundaries.push(merged)
+        } catch {
+          boundaries.push(...compCircles)
+        }
+      }
+    } else {
+      const compPoints = comp.map((i) => getPointCoordinate(validFeatures[i])).filter(Boolean)
+      const hull = convexHull(compPoints)
+      if (hull.length >= 3) {
+        const hullRing = [...hull, hull[0]]
+        try {
+          const buf = buffer(polygon([hullRing]), radius, { units: 'degrees' })
+          if (buf) boundaries.push(buf)
+        } catch {
+          // fallback: use circles
+          for (const p of hull) boundaries.push(createCirclePolygon(p, radius))
+        }
+      }
+    }
   }
 
   let clipBoundary = null
-  try {
-    clipBoundary = union(featureCollection(circles))
-  } catch (err) {
-    console.warn('[partitionVoronoi] circle union failed', err)
+  if (boundaries.length === 1) {
+    clipBoundary = boundaries[0]
+  } else if (boundaries.length > 1) {
+    try {
+      clipBoundary = union(featureCollection(boundaries))
+    } catch {
+      clipBoundary = featureCollection(boundaries)
+    }
   }
 
   // 第三步：用并集边界裁剪
@@ -424,12 +507,14 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
       })
     : polygonFeatures
 
-  console.log('[partitionVoronoi] circle-union clip', {
+  const compSizes = components.map((c) => c.length).sort((a, b) => b - a)
+  console.log('[partitionVoronoi] component clip', {
     totalCells: polygonFeatures.length,
-    totalCircles: circles.length,
+    components: compSizes.length,
+    compSizes: compSizes.slice(0, 5),
+    boundaries: boundaries.length,
     radius,
     expandFactor,
-    globalMedian,
     clipStats: `${statInside} inside, ${statNoIntersect} noIntersect, ${statIntersected} intersected, ${statFailed} failed`,
   })
 
