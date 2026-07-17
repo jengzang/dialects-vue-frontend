@@ -66,12 +66,6 @@ export async function updateUsername(newUsername, email) {
     body: form
   })
 
-  try {
-    await update_userdatas_bytoken()
-  } catch {
-    // 改名后旧 token 已失效，忽略刷新用户数据错误
-  }
-
   return data
 }
 
