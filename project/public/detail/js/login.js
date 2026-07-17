@@ -210,12 +210,12 @@ function showAuthPopup() {
 
                     error.value = '✅ 用戶名更新成功！<br>👤 您需重新登錄<br>⏳ 兩秒後將自動跳轉到登錄頁面。'
 
-                    // 延時 2 秒後，切換到個人資料界面
-                    setTimeout(async () => {
-                        mode.value = 'profile';  // 切換到個人資料界面
-                        await fetchUser();  // 獲取最新用戶數據
+                    clearToken()
+                    user.value = null
+                    setTimeout(() => {
+                        mode.value = 'login'
                         error.value = ''
-                    }, 2000);  // 延時 2 秒（2000 毫秒）
+                    }, 2000)
                 } catch (e) {
                     // 直接從 e.message 提取 detail 信息
                     try {
@@ -261,14 +261,14 @@ function showAuthPopup() {
                         body: form,
                     })
 
-                    error.value = '✅ 密碼更新成功！<br>👤 ⏳ 兩秒後將自動跳轉到個人資料頁面。'
+                    error.value = '✅ 密碼更新成功！<br>👤 您需重新登錄<br>⏳ 兩秒後將自動跳轉到登錄頁面。'
 
-                    // 延時 2 秒後，切換到個人資料界面
-                    setTimeout(async () => {
-                        mode.value = 'profile';  // 切換到個人資料界面
-                        await fetchUser();  // 獲取最新用戶數據
+                    clearToken()
+                    user.value = null
+                    setTimeout(() => {
+                        mode.value = 'login'
                         error.value = ''
-                    }, 2000);  // 延時 2 秒（2000 毫秒）
+                    }, 2000)
                 } catch (e) {
                     // 直接從 e.message 提取 detail 信息
                     try {
