@@ -1,4 +1,4 @@
-import { bbox, featureCollection, intersect, point, polygon, union } from '@turf/turf'
+import { bbox, booleanIntersects, buffer, featureCollection, intersect, point, polygon, union } from '@turf/turf'
 import { Delaunay } from 'd3-delaunay'
 
 const FIELD_KEYS = {
@@ -261,17 +261,6 @@ function isValidVoronoiRing(coords) {
       && Number.isFinite(Number(coordinate[1])))
 }
 
-function createCirclePolygon(center, radius) {
-  const n = 24
-  const ring = []
-  for (let i = 0; i < n; i += 1) {
-    const a = (i / n) * 2 * Math.PI
-    ring.push([center[0] + radius * Math.cos(a), center[1] + radius * Math.sin(a)])
-  }
-  ring.push(ring[0])
-  return polygon([ring])
-}
-
 function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) {
   const originalFeatures = pointCollection?.features ?? []
   const validFeatures = []
@@ -353,7 +342,7 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
     neighborDists.push(dists.length ? dists.sort((a, b) => a - b)[Math.floor(dists.length / 2)] : 0)
   }
 
-  // 第二步：所有点统一半径的圆形并集 → 裁剪边界
+  // 第二步：凸包缓冲区 → 裁剪边界
   const hull = Array.from(delaunay.hull)
   const hullCoords = hull.map((i) => getPointCoordinate(validFeatures[i]))
 
@@ -367,50 +356,63 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
   // 半径 = 全局中位邻居距离 × (0.5 + expandFactor × 3)
   const radius = globalMedian * (0.5 + expandFactor * 3)
 
-  // 创建圆形：凸包顶点 + 沿凸包边填充（避免间隙）
-  const circles = []
-  for (const p of hullCoords) {
-    circles.push(createCirclePolygon(p, radius))
-  }
-  for (let i = 0; i < hullCoords.length; i += 1) {
-    const a = hullCoords[i]
-    const b = hullCoords[(i + 1) % hullCoords.length]
-    const dist = Math.hypot(b[0] - a[0], b[1] - a[1])
-    const steps = Math.floor(dist / Math.max(radius, 0.001))
-    for (let s = 1; s < steps; s += 1) {
-      const t = s / steps
-      circles.push(createCirclePolygon([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], radius))
+  // 构建凸包多边形，用 buffer 扩展半径 → 裁剪边界
+  let clipBoundary = null
+  if (hullCoords.length >= 3) {
+    const hullRing = [...hullCoords, hullCoords[0]]
+    const hullPolygon = polygon([hullRing])
+    try {
+      clipBoundary = buffer(hullPolygon, radius, { units: 'degrees' })
+    } catch (err) {
+      console.warn('[partitionVoronoi] hull buffer failed', err)
     }
   }
 
-  // 并集
-  let clipBoundary = null
-  try {
-    clipBoundary = union(featureCollection(circles))
-  } catch (err) {
-    console.warn('[partitionVoronoi] circle union failed', err)
-  }
-
-  // 第三步：用并集裁剪每个泰森多边形 cell
+  // 第三步：用缓冲边界裁剪
+  const boundaryBbox = clipBoundary ? bbox(clipBoundary) : null
+  let statInside = 0
+  let statNoIntersect = 0
+  let statIntersected = 0
+  let statFailed = 0
   const clippedFeatures = clipBoundary
     ? polygonFeatures
       .map((cell) => {
-        try {
-          const clipped = intersect(featureCollection([cell, clipBoundary]))
-          return clipped || cell
-        } catch {
+        const cellBbox = bbox(cell)
+        if (
+          boundaryBbox
+          && cellBbox[0] >= boundaryBbox[0]
+          && cellBbox[1] >= boundaryBbox[1]
+          && cellBbox[2] <= boundaryBbox[2]
+          && cellBbox[3] <= boundaryBbox[3]
+        ) {
+          statInside += 1
           return cell
         }
+        if (!booleanIntersects(cell, clipBoundary)) {
+          statNoIntersect += 1
+          return cell
+        }
+        try {
+          const clipped = intersect(featureCollection([cell, clipBoundary]))
+          if (clipped) {
+            clipped.properties = cell.properties ?? {}
+            statIntersected += 1
+            return clipped
+          }
+        } catch { /* fall through */ }
+        statFailed += 1
+        return cell
       })
     : polygonFeatures
 
-  console.log('[partitionVoronoi] circle-union clip', {
+  console.log('[partitionVoronoi] buffer clip', {
     totalCells: polygonFeatures.length,
     hullPoints: hullCoords.length,
-    totalCircles: circles.length,
     radius,
     expandFactor,
     globalMedian,
+    boundaryBbox,
+    clipStats: `${statInside} inside, ${statNoIntersect} noIntersect, ${statIntersected} intersected, ${statFailed} failed`,
   })
 
   logVoronoiDiagnostics(featureCollection(validFeatures), [
