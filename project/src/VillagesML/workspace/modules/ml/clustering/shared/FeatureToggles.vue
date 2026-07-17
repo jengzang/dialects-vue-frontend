@@ -2,29 +2,29 @@
   <div class="feature-toggles vm-subpanel-shell vm-subpanel-shell-spaced">
     <h4 class="section-title">特徵選擇</h4>
 
-    <div class="setting-row">
+    <div class="setting-row vml-setting-row">
       <CheckBox
         :model-value="modelValue.use_semantic"
         @update:modelValue="updateFeature('use_semantic', $event)"
       >
         語義特徵
       </CheckBox>
-      <span class="setting-hint">語義類別分佈</span>
+      <span class="setting-hint vml-setting-hint">語義類別分佈</span>
     </div>
 
-    <div class="setting-row">
+    <div class="setting-row vml-setting-row">
       <CheckBox
         :model-value="modelValue.use_morphology"
         @update:modelValue="updateFeature('use_morphology', $event)"
       >
         形態特徵
       </CheckBox>
-      <span class="setting-hint">後綴 N-gram 特徵</span>
+      <span class="setting-hint vml-setting-hint">後綴 N-gram 特徵</span>
     </div>
 
     <div v-if="modelValue.use_morphology" class="morphology-params">
-      <div class="setting-row indented vm-setting-indent">
-        <label class="setting-label">Top N (2-gram)</label>
+      <div class="setting-row vml-setting-row indented vm-setting-indent">
+        <label class="setting-label vml-setting-label">Top N (2-gram)</label>
         <input
           type="number"
           :value="modelValue.top_n_suffix2"
@@ -35,8 +35,8 @@
         />
       </div>
 
-      <div class="setting-row indented vm-setting-indent">
-        <label class="setting-label">Top N (3-gram)</label>
+      <div class="setting-row vml-setting-row indented vm-setting-indent">
+        <label class="setting-label vml-setting-label">Top N (3-gram)</label>
         <input
           type="number"
           :value="modelValue.top_n_suffix3"
@@ -48,14 +48,14 @@
       </div>
     </div>
 
-    <div class="setting-row">
+    <div class="setting-row vml-setting-row">
       <CheckBox
         :model-value="modelValue.use_diversity"
         @update:modelValue="updateFeature('use_diversity', $event)"
       >
         多樣性特徵
       </CheckBox>
-      <span class="setting-hint">字符多樣性指標</span>
+      <span class="setting-hint vml-setting-hint">字符多樣性指標</span>
     </div>
   </div>
 </template>

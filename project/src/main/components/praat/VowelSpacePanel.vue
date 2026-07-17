@@ -570,6 +570,7 @@ $transition-duration: 0.3s;
   color: var(--color-text-primary);
   font-size: 1.5rem;
   font-weight: 600;
+  text-align: center;
 }
 
 .usage-hint {
@@ -595,6 +596,7 @@ $transition-duration: 0.3s;
   color: var(--color-text-primary);
   font-size: 1.1rem;
   font-weight: 600;
+  text-align: center;
 }
 
 /* 显示控制 */

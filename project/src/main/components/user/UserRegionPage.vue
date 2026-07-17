@@ -513,8 +513,8 @@ onMounted(() => {
 @use '@/styles/global/mixins' as *;
 
 $region-text: var(--text-deep);
-$region-muted: var(--text-tertiary);
-$region-soft: var(--text-slate-light);
+$region-muted: var(--text-slate);
+$region-soft: var(--text-slate);
 $region-accent: var(--color-primary);
 $region-danger: var(--color-error-light);
 $region-success: var(--color-success);
@@ -698,7 +698,7 @@ $region-glass-border: var(--glass-60);
   }
 
   .header-stat-label {
-    color: $region-muted;
+    color: var(--text-deep);
     font-size: 12px;
     font-weight: 750;
     line-height: 1;
@@ -723,7 +723,7 @@ $region-glass-border: var(--glass-60);
     overflow: hidden;
     border: 1px solid var(--glass-50);
     border-radius: var(--radius-pill);
-    color: var(--text-white);
+    color: var(--action-primary-text);
     font-size: 14px;
     font-weight: 800;
     text-overflow: ellipsis;
@@ -761,7 +761,7 @@ $region-glass-border: var(--glass-60);
 }
 
 .btn-primary {
-  color: var(--text-white);
+  color: var(--action-primary-text);
   background:
     linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
     $region-accent;

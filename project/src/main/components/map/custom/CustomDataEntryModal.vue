@@ -174,8 +174,8 @@ watch(
       box-shadow 0.18s ease;
 
     &.active {
-      background: var(--text-white);
-      color: $primary;
+      background: $primary;
+      color: var(--action-primary-text);
       box-shadow: 0 8px 16px $bg-subtle;
     }
   }

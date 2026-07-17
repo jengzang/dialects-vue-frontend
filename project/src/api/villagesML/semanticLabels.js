@@ -1,14 +1,14 @@
 // api/villagesML/semanticLabels.js
 // 語義標籤相關 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 獲取標籤類別
  * @returns {Promise<Array>} [{ label: string, category: string }, ...]
  */
 export async function getSemanticLabelCategories() {
-  return api('/api/villages/semantic/labels/categories')
+  return villagesMLApi('/semantic/labels/categories')
 }
 
 /**
@@ -18,7 +18,7 @@ export async function getSemanticLabelCategories() {
  */
 export async function getSemanticLabelsByCategory(category) {
   const queryParams = new URLSearchParams({ category })
-  return api(`/api/villages/semantic/labels/by-category?${queryParams.toString()}`)
+  return villagesMLApi(`/semantic/labels/by-category?${queryParams.toString()}`)
 }
 
 /**
@@ -28,7 +28,7 @@ export async function getSemanticLabelsByCategory(category) {
  */
 export async function getSemanticLabelsByChar(char) {
   const queryParams = new URLSearchParams({ char })
-  return api(`/api/villages/semantic/labels/by-character?${queryParams.toString()}`)
+  return villagesMLApi(`/semantic/labels/by-character?${queryParams.toString()}`)
 }
 
 /**
@@ -44,7 +44,7 @@ export async function getSemanticCompositionPatterns(params = {}) {
   if (params.limit) queryParams.append('limit', params.limit)
   if (params.detail) queryParams.append('detail', 'true')
 
-  return api(`/api/villages/semantic/composition/patterns?${queryParams.toString()}`)
+  return villagesMLApi(`/semantic/composition/patterns?${queryParams.toString()}`)
 }
 
 /**
@@ -60,5 +60,5 @@ export async function getSemanticBigrams(params = {}) {
   if (params.limit) queryParams.append('limit', params.limit)
   if (params.detail) queryParams.append('detail', 'true')
 
-  return api(`/api/villages/semantic/composition/bigrams?${queryParams.toString()}`)
+  return villagesMLApi(`/semantic/composition/bigrams?${queryParams.toString()}`)
 }

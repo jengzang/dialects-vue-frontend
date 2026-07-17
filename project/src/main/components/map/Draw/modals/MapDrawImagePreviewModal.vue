@@ -311,7 +311,7 @@ function ensurePreviewLayers() {
       filter: ['==', '$type', 'Polygon'],
       paint: {
         'fill-color': ['coalesce', ['get', 'fill'], '#60a5fa'],
-        'fill-outline-color': ['coalesce', ['get', 'stroke'], 'var(--color-map-draw)'],
+        'fill-outline-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
         'fill-opacity': ['coalesce', ['get', 'fillOpacity'], 0.22],
       },
     })
@@ -328,7 +328,7 @@ function ensurePreviewLayers() {
         'line-join': 'round',
       },
       paint: {
-        'line-color': ['coalesce', ['get', 'stroke'], 'var(--color-map-draw)'],
+        'line-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
         'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
       },
     })
@@ -343,7 +343,7 @@ function ensurePreviewLayers() {
       paint: {
         'circle-radius': ['coalesce', ['get', 'pointRadius'], 6],
         'circle-color': ['coalesce', ['get', 'pointColor'], '#60a5fa'],
-        'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], 'var(--color-map-draw)'],
+        'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], '#2563eb'],
         'circle-stroke-width': 2,
       },
     })
@@ -362,7 +362,7 @@ function ensurePreviewLayers() {
       type: 'fill',
       source: BBOX_SOURCE_ID,
       paint: {
-        'fill-color': 'var(--color-map-draw)',
+        'fill-color': '#2563eb',
         'fill-opacity': 0.08,
       },
     })
@@ -374,7 +374,7 @@ function ensurePreviewLayers() {
       type: 'line',
       source: BBOX_SOURCE_ID,
       paint: {
-        'line-color': 'var(--color-map-draw)',
+        'line-color': '#2563eb',
         'line-width': 2,
       },
     })

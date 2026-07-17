@@ -487,7 +487,7 @@ const helpStepsItems = computed(() => [
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
 $success-green: var(--color-success);
-$usage-green: #2e7d32;
+$usage-green: var(--color-success);
 $location-orange: var(--color-warning);
 
 $text-main: var(--text-dark);
@@ -557,7 +557,7 @@ $glass-card: var(--glass-50);
 
 .example-hint {
   padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--bg-hover-light);
   border-radius: var(--radius-sm);
   color: var(--text-tertiary);
   font-size: 12px;
@@ -594,7 +594,7 @@ $glass-card: var(--glass-50);
 
   th {
     padding: 8px 6px;
-    background-color: #f5f7fa;
+    background-color: var(--bg-light-gray);
     border-bottom: 2px solid var(--border-gray);
     color: $text-main;
     white-space: nowrap;
@@ -615,7 +615,7 @@ $glass-card: var(--glass-50);
 }
 
 .highlight-location {
-  background-color: #fffcf5;
+  background-color: var(--bg-warning-light);
   color: $text-main;
   font-weight: 700;
 }
@@ -636,8 +636,8 @@ $glass-card: var(--glass-50);
 .value-tag {
   display: inline-block;
   padding: 1px 6px;
-  background: #e6f7ff;
-  border: 1px solid #91d5ff;
+  background: rgba(var(--color-primary-rgb), 0.08);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: var(--radius-xs);
   color: $primary-blue-dark;
   font-weight: 700;
@@ -666,7 +666,7 @@ $glass-card: var(--glass-50);
   padding: 12px;
   background: var(--bg-white);
   border-radius: var(--radius-md);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .region-level {
@@ -737,7 +737,7 @@ $glass-card: var(--glass-50);
   display: flex;
   align-items: center;
   padding: 8px;
-  background: #f5fcf5;
+  background: var(--bg-success-light);
   border-radius: var(--radius-sm);
 }
 

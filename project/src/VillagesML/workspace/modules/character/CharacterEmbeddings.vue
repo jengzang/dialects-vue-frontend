@@ -22,30 +22,36 @@
             trigger="both"
           />
         </h2>
-        <div class="search-group">
-          <input
-            v-model="searchChar"
-            type="text"
-            placeholder="輸入單個字符..."
-            maxlength="1"
-            class="vml-char-input"
-            @input="handleCharInput"
-          />
-          <input
-            v-model.number="topN"
-            type="number"
-            min="5"
-            max="50"
-            placeholder="返回數量"
-            class="vml-number-input"
-          />
-          <button
-            class="search-button"
-            :disabled="!searchChar || loading"
-            @click="searchSimilarities"
-          >
-            搜索
-          </button>
+        <div class="search-group vml-control-surface vml-control-row">
+          <div class="vml-control-field vml-control-field--compact">
+            <input
+              v-model="searchChar"
+              type="text"
+              placeholder="輸入單個字符..."
+              maxlength="1"
+              class="vml-char-input"
+              @input="handleCharInput"
+            />
+          </div>
+          <div class="vml-control-field vml-control-field--compact">
+            <input
+              v-model.number="topN"
+              type="number"
+              min="5"
+              max="50"
+              placeholder="返回數量"
+              class="vml-number-input"
+            />
+          </div>
+          <div class="vml-control-actions">
+            <button
+              class="search-button"
+              :disabled="!searchChar || loading"
+              @click="searchSimilarities"
+            >
+              搜索
+            </button>
+          </div>
         </div>
       </div>
 
@@ -126,7 +132,7 @@
           </div>
         </div>
 
-        <div class="pagination-controls">
+        <div class="pagination-controls vml-control-surface vml-control-row vml-control-row--center">
           <button
             :disabled="currentPage === 1"
             @click="changePage(currentPage - 1)"

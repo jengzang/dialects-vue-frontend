@@ -479,6 +479,8 @@ onUnmounted(() => {
   display: flex;
   gap: 8px;
   align-items: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .filterable-select.disabled {
@@ -518,6 +520,7 @@ onUnmounted(() => {
 
 .dropdown-wrapper {
   flex: 1;
+  min-width: 0;
   display: flex;
   position: relative;
   border: 2px solid var(--color-primary-hover);
@@ -537,6 +540,7 @@ onUnmounted(() => {
 
 .vml-select {
   flex: 1;
+  min-width: 0;
   width: 100%;
   padding: 10px 12px;
   border: none;
@@ -553,7 +557,7 @@ onUnmounted(() => {
   color: var(--action-primary-text);
   cursor: pointer;
   transition: all 0.3s ease;
-  padding:10px 4px;
+  padding: 10px 4px;
   border-radius: var(--radius-xl);
 }
 

@@ -1,7 +1,7 @@
 // api/villagesML/clusteringTypes.js
 // VillagesML 聚類類型 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 字符傾向性聚類
@@ -20,7 +20,7 @@ import { api } from '../auth/httpClient.js'
  * @returns {Promise<Object>} 聚類結果
  */
 export async function runCharacterTendencyClustering(params) {
-  return api('/api/villages/compute/clustering/character-tendency', {
+  return villagesMLApi('/compute/clustering/character-tendency', {
     method: 'POST',
     body: params,
     timeout: 60000
@@ -44,7 +44,7 @@ export async function runCharacterTendencyClustering(params) {
  * @returns {Promise<Object>} 聚類結果
  */
 export async function runSampledVillagesClustering(params) {
-  return api('/api/villages/compute/clustering/sampled-villages', {
+  return villagesMLApi('/compute/clustering/sampled-villages', {
     method: 'POST',
     body: params,
     timeout: 120000  // 更長超時
@@ -66,7 +66,7 @@ export async function runSampledVillagesClustering(params) {
  * @returns {Promise<Object>} 聚類結果
  */
 export async function runSpatialAwareClustering(params) {
-  return api('/api/villages/compute/clustering/spatial-aware', {
+  return villagesMLApi('/compute/clustering/spatial-aware', {
     method: 'POST',
     body: params,
     timeout: 60000
@@ -89,7 +89,7 @@ export async function runSpatialAwareClustering(params) {
  * @returns {Promise<Object>} 聚類結果
  */
 export async function runHierarchicalClustering(params) {
-  return api('/api/villages/compute/clustering/hierarchical', {
+  return villagesMLApi('/compute/clustering/hierarchical', {
     method: 'POST',
     body: params,
     timeout: 180000  // 最長超時
@@ -103,5 +103,5 @@ export async function runHierarchicalClustering(params) {
  * @returns {Promise<Array<string>>} 可用的 run_id 列表
  */
 export async function getSpatialRunIds() {
-  return api('/api/villages/admin/run-ids')
+  return villagesMLApi('/admin/run-ids')
 }

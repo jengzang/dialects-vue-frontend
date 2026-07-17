@@ -4,13 +4,18 @@
  */
 
 import { getVillagesRegions } from '@/composables/useVillagesCache.js'
+import { getCurrentVillagesMLDataset } from './currentDataset.js'
 
-const CACHE_KEY = 'regions_all_data_v3'  // 更新版本号，强制重新加载
-const CACHE_TIMESTAMP_KEY = 'regions_cache_timestamp_v3'
+const CACHE_KEY_PREFIX = 'regions_all_data_v3'
+const CACHE_TIMESTAMP_KEY_PREFIX = 'regions_cache_timestamp_v3'
 const CACHE_EXPIRY = 24 * 60 * 60 * 1000 // 24小时
 
-let allRegionsData = null
-let loadingPromise = null
+const allRegionsDataByDataset = new Map()
+const loadingPromisesByDataset = new Map()
+
+function getDatasetCacheKey(prefix, dataset = getCurrentVillagesMLDataset()) {
+  return `${prefix}_${dataset}`
+}
 
 /**
  * 预加载所有区域数据
@@ -18,42 +23,46 @@ let loadingPromise = null
  * @returns {Promise<Object>} { cities, counties, townships }
  */
 export async function preloadAllRegions(forceRefresh = false) {
+  const dataset = getCurrentVillagesMLDataset()
+
   // 如果强制刷新，清除所有缓存
   if (forceRefresh) {
-    clearCache()
-    allRegionsData = null
-    loadingPromise = null
+    clearCache(dataset)
+    allRegionsDataByDataset.delete(dataset)
+    loadingPromisesByDataset.delete(dataset)
   }
 
   // 如果已经在加载中，返回同一个 Promise
-  if (loadingPromise) {
-    return loadingPromise
+  if (loadingPromisesByDataset.has(dataset)) {
+    return loadingPromisesByDataset.get(dataset)
   }
 
   // 如果已经加载过，直接返回
-  if (allRegionsData) {
-    return allRegionsData
+  if (allRegionsDataByDataset.has(dataset)) {
+    return allRegionsDataByDataset.get(dataset)
   }
 
   // 尝试从缓存读取
-  const cached = getFromCache()
+  const cached = getFromCache(dataset)
   if (cached) {
-    allRegionsData = cached
+    allRegionsDataByDataset.set(dataset, cached)
     console.log('[RegionPreload] Loaded from cache:', getCacheStats())
     return cached
   }
 
   // 开始加载
   console.log('[RegionPreload] Loading from API...')
-  loadingPromise = loadAllRegionsFromAPI()
+  const loadingPromise = loadAllRegionsFromAPI()
+  loadingPromisesByDataset.set(dataset, loadingPromise)
 
   try {
-    allRegionsData = await loadingPromise
-    saveToCache(allRegionsData)
+    const allRegionsData = await loadingPromise
+    allRegionsDataByDataset.set(dataset, allRegionsData)
+    saveToCache(allRegionsData, dataset)
     console.log('[RegionPreload] Loaded and cached:', getCacheStats())
     return allRegionsData
   } finally {
-    loadingPromise = null
+    loadingPromisesByDataset.delete(dataset)
   }
 }
 
@@ -189,17 +198,17 @@ async function loadAllRegionsFromAPI() {
 /**
  * 从缓存读取
  */
-function getFromCache() {
+function getFromCache(dataset = getCurrentVillagesMLDataset()) {
   try {
-    const cached = sessionStorage.getItem(CACHE_KEY)
-    const timestamp = sessionStorage.getItem(CACHE_TIMESTAMP_KEY)
+    const cached = sessionStorage.getItem(getDatasetCacheKey(CACHE_KEY_PREFIX, dataset))
+    const timestamp = sessionStorage.getItem(getDatasetCacheKey(CACHE_TIMESTAMP_KEY_PREFIX, dataset))
 
     if (!cached || !timestamp) return null
 
     // 检查是否过期
     const age = Date.now() - parseInt(timestamp)
     if (age > CACHE_EXPIRY) {
-      clearCache()
+      clearCache(dataset)
       return null
     }
 
@@ -213,10 +222,10 @@ function getFromCache() {
 /**
  * 保存到缓存
  */
-function saveToCache(data) {
+function saveToCache(data, dataset = getCurrentVillagesMLDataset()) {
   try {
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify(data))
-    sessionStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString())
+    sessionStorage.setItem(getDatasetCacheKey(CACHE_KEY_PREFIX, dataset), JSON.stringify(data))
+    sessionStorage.setItem(getDatasetCacheKey(CACHE_TIMESTAMP_KEY_PREFIX, dataset), Date.now().toString())
   } catch (e) {
     console.warn('Failed to save cache:', e)
   }
@@ -225,11 +234,11 @@ function saveToCache(data) {
 /**
  * 清除缓存
  */
-export function clearCache() {
+export function clearCache(dataset = getCurrentVillagesMLDataset()) {
   try {
-    sessionStorage.removeItem(CACHE_KEY)
-    sessionStorage.removeItem(CACHE_TIMESTAMP_KEY)
-    allRegionsData = null
+    sessionStorage.removeItem(getDatasetCacheKey(CACHE_KEY_PREFIX, dataset))
+    sessionStorage.removeItem(getDatasetCacheKey(CACHE_TIMESTAMP_KEY_PREFIX, dataset))
+    allRegionsDataByDataset.delete(dataset)
   } catch (e) {
     console.warn('Failed to clear cache:', e)
   }
@@ -287,6 +296,7 @@ export async function cityHasCounties(city) {
  * 获取缓存统计
  */
 export function getCacheStats() {
+  const allRegionsData = allRegionsDataByDataset.get(getCurrentVillagesMLDataset())
   if (!allRegionsData) return null
 
   return {

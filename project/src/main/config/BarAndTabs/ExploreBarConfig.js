@@ -2,7 +2,7 @@ import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { userStore } from '@/main/store/store.js'
+import { userStore, resultCache } from '@/main/store/store.js'
 
 // ========================================
 // ExploreBar (探索导航栏) 配置指南
@@ -74,7 +74,10 @@ const DISPLAY_DEFAULTS = {
 
     // 样式 / 条件可见性
     cssClass: '',
-    visibleWhen: null // 默认始终可见
+    visibleWhen: null, // 默认始终可见
+
+    // 溢出滚动
+    scroll: undefined // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
 }
 
 const NAVIGATION_DEFAULTS = {
@@ -118,20 +121,21 @@ const createNavigationConfig = (overrides = {}) => ({
     ...overrides
 })
 
-const createExploreTab = ({
-                              tab,
-                              label,
-                              icon,
-                              display,
-                              navigation,
-                              meta = {}
-                          }) => ({
-    tab,
-    label,
-    icon,
-    display: createDisplayConfig(display),
-    navigation: createNavigationConfig(navigation),
-    meta
+const createExploreTab = 
+    ({
+        tab,
+        label,
+        icon,
+        display,
+        navigation,
+        meta = {}
+    }) => ({
+            tab,
+            label,
+            icon,
+            display: createDisplayConfig(display),
+            navigation: createNavigationConfig(navigation),
+            meta
 })
 
 export function getExploreBarTabs(configMap) {
@@ -195,42 +199,30 @@ export function useExploreBarConfig() {
     const route = useRoute()
 
     return computed(() => ({
-        tools: createExploreTab({
-            tab: 'tools',
-            label: t('navigation.tabs.tools'),
-            icon: '🧰',
+        home: createExploreTab({
+            tab: 'home',
+            label: t('navigation.tabs.home'),
+            icon: '🏠',
             display: {
-                preset: 'balancedMobile',
-                overrides: {}
+                preset: 'compactDesktop',
+                overrides: { scroll: 'left', weightIconOnly: 0.4 }
             },
             navigation: {
-                defaultTo: { path: withRouteLocale(route, '/menu/tools') },
-                matchPages: ['check', 'jyut2ipa', 'merge', 'derive', 'praat'],
-                activeMatchPaths: [withRouteLocale(route, '/explore/manage')],
-                rememberChild: true,
-                defaultChild: withRouteLocale(route, '/explore/tools/check'),
-                children: [
-                    { label: t('navigation.submenu.tools.check'), icon: '📝', path: withRouteLocale(route, '/explore/tools/check') },
-                    { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: withRouteLocale(route, '/explore/tools/jyut2ipa') },
-                    { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: withRouteLocale(route, '/explore/tools/merge') },
-                    { label: t('navigation.submenu.tools.derive'), icon: '🧪', path: withRouteLocale(route, '/explore/tools/derive') },
-                    // { label: t('navigation.submenu.tools.praat'), icon: '👂️', path: '/explore/tools/praat' }
-                ]
+                defaultTo: { path: withRouteLocale(route, '/') }
             }
         }),
-        praat: createExploreTab({
-            tab: 'praat',
-            label: t('navigation.tabs.praat'),
-            icon: '🎙️',
+        about: createExploreTab({
+            tab: 'about',
+            label: t('navigation.tabs.aboutWebsite'),
+            icon: '🌐',
             display: {
-                preset: 'balancedMobile',
+                preset: 'compactDesktop',
                 overrides: {
-                    mobileWeightIconOnly: 0.6
+                    hideOnMobile: true
                 }
             },
             navigation: {
-                defaultTo: { path: '/explore/tools/praat' },
-                matchPages: ['praat']
+                defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
             }
         }),
         charClass: createExploreTab({
@@ -296,18 +288,102 @@ export function useExploreBarConfig() {
                 ]
             }
         }),
-        about: createExploreTab({
-            tab: 'about',
-            label: t('navigation.tabs.aboutWebsite'),
-            icon: '🌐',
+        tools: createExploreTab({
+            tab: 'tools',
+            label: t('navigation.tabs.tools'),
+            icon: '🧰',
             display: {
-                preset: 'compactDesktop',
+                preset: 'balancedMobile',
+                overrides: {}
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/tools') },
+                matchPages: ['check', 'jyut2ipa', 'merge', 'derive', 'praat'],
+                activeMatchPaths: [withRouteLocale(route, '/explore/manage')],
+                rememberChild: true,
+                defaultChild: withRouteLocale(route, '/explore/tools/check'),
+                children: [
+                    { label: t('navigation.submenu.tools.check'), icon: '📝', path: withRouteLocale(route, '/explore/tools/check') },
+                    { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: withRouteLocale(route, '/explore/tools/jyut2ipa') },
+                    { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: withRouteLocale(route, '/explore/tools/merge') },
+                    { label: t('navigation.submenu.tools.derive'), icon: '🧪', path: withRouteLocale(route, '/explore/tools/derive') },
+                    // { label: t('navigation.submenu.tools.praat'), icon: '👂️', path: '/explore/tools/praat' }
+                ]
+            }
+        }),
+        praat: createExploreTab({
+            tab: 'praat',
+            label: t('navigation.tabs.praat'),
+            icon: '🎙️',
+            display: {
+                preset: 'balancedMobile',
                 overrides: {
-                    hideOnMobile: true
+                    mobileWeightIconOnly: 0.6
                 }
             },
             navigation: {
-                defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
+                defaultTo: { path: '/explore/tools/praat' },
+                matchPages: ['praat']
+            }
+        }),
+        navPho: createExploreTab({
+            tab: 'pho',
+            label: t('navigation.tabs.phonology'),
+            icon: '🧬',
+            display: {
+                preset: 'standard',
+                overrides: { scroll: 'right', weightIconOnly: 0.3 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/pho/matrix') }
+            }
+        }),
+        navQuery: createExploreTab({
+            tab: 'query',
+            label: t('navigation.tabs.query'),
+            icon: '🔍',
+            display: {
+                preset: 'standard',
+                overrides: { scroll: 'right', weightIconOnly: 0.3 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/query/zhonggu') }
+            }
+        }),
+        // navResult: createExploreTab({
+        //     tab: 'result',
+        //     label: t('navigation.tabs.results'),
+        //     icon: '📉',
+        //     display: {
+        //         preset: 'standard',
+        //         overrides: { scroll: 'right', weightIconOnly: 0.3, visibleWhen: () => resultCache.latestResults.length > 0 }
+        //     },
+        //     navigation: {
+        //         defaultTo: { path: withRouteLocale(route, '/menu/result') }
+        //     }
+        // }),
+        navMap: createExploreTab({
+            tab: 'map',
+            label: t('navigation.tabs.map'),
+            icon: '🗺️',
+            display: {
+                preset: 'standard',
+                overrides: { scroll: 'right', weightIconOnly: 0.3 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/map/view') }
+            }
+        }),
+        navCompare: createExploreTab({
+            tab: 'compare',
+            label: t('navigation.tabs.compare'),
+            icon: '↔️',
+            display: {
+                preset: 'standard',
+                overrides: { scroll: 'right', weightIconOnly: 0.3 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/compare/zhonggu') }
             }
         })
     }))

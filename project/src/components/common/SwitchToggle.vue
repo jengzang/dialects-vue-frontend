@@ -247,6 +247,10 @@ $transition-ease: ease;
   .switch-toggle__label--inside {
     color: $inside-label-color;
   }
+
+  .switch-toggle__button.is-on .switch-toggle__label--inside {
+    color: var(--action-primary-text);
+  }
 }
 
 .variant-minimal {

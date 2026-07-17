@@ -1,7 +1,7 @@
 <template>
   <div class="detail-toolbar">
-    <div class="detail-toggle vml-glass-panel">
-      <div class="toggle-left">
+    <div class="detail-toggle vml-glass-panel vml-control-surface vml-control-row">
+      <div class="toggle-left vml-control-field">
         <label class="toggle-container">
           <SwitchToggle
             :model-value="modelValue"
@@ -20,9 +20,11 @@
         </label>
         <span class="toggle-hint">（語義分類更細緻）</span>
       </div>
-      <button class="lexicon-button" @click="showLexiconModal = true">
-        📖 查看詞典
-      </button>
+      <div class="vml-control-actions">
+        <button class="lexicon-button" @click="showLexiconModal = true">
+          📖 查看詞典
+        </button>
+      </div>
     </div>
 
     <AppModal
@@ -112,6 +114,12 @@ const countParentChars = (subcats) => {
   display: flex;
   align-items: center;
   gap: 12px;
+
+  @media (max-aspect-ratio: 1/1) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
 }
 
 .toggle-container {
@@ -137,6 +145,7 @@ const countParentChars = (subcats) => {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
 
   &:hover {
     background: var(--color-primary-hover);

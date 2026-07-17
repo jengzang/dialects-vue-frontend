@@ -52,7 +52,7 @@ import { showConfirm } from '@/utils/message.js'
 const props = defineProps({
   bottomOffset: {
     type: String,
-    default: '80dvh',
+    default: '76dvh',
   },
   mobileBottomOffset: {
     type: String,

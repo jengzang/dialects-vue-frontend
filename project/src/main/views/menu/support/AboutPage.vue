@@ -209,7 +209,7 @@
 
           <!-- 感悟部分 -->
           <div class="thoughts-container">
-            <h2 class="tabs-title" style="margin-top: 20px">{{ $t('about.reflection.title') }}</h2>
+            <h2 class="tabs-title" style="margin-top: 3rem">{{ $t('about.reflection.title') }}</h2>
             <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
             <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
             <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
@@ -337,7 +337,7 @@
               :gap="20"
               :aria-label="$t('about.settings.tutorialToggle.title')"
               class="tutorial-switch-toggle"
-              @update:modelValue="tutorialGuideEnabled = $event"
+              @update:modelValue="handleTutorialToggle"
             />
           </div>
 
@@ -369,6 +369,7 @@ import {
   COLOR_THEME_BLUE,
   COLOR_THEME_DARK,
   COLOR_THEME_LIGHT,
+  COLOR_THEME_GREEN,
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
   getStoredColorTheme,
@@ -502,13 +503,17 @@ const colorThemeOptions = computed(() => [
     label: t('navigation.settings.colorTheme.options.blue')
   },
   {
+    value: COLOR_THEME_GREEN,
+    label: t('navigation.settings.colorTheme.options.green')
+  },
+  {
     value: COLOR_THEME_LIGHT,
     label: t('navigation.settings.colorTheme.options.light')
   },
   {
     value: COLOR_THEME_DARK,
     label: t('navigation.settings.colorTheme.options.dark')
-  }
+  },
 ])
 
 const colorThemeRadioOptions = computed(() =>
@@ -564,6 +569,13 @@ const tutorialGuideEnabled = computed({
   get: () => tutorialEnabled.value,
   set: (value) => setTutorialEnabled(value)
 })
+
+function handleTutorialToggle(value) {
+  tutorialGuideEnabled.value = value
+  showSuccess(value
+    ? t('about.settings.tutorialToggle.enabledSuccess')
+    : t('about.settings.tutorialToggle.disabledSuccess'))
+}
 
 const zhongguInputModeModel = computed({
   get: () => zhongguInputMode.value,
@@ -653,7 +665,7 @@ $ease-standard: 0.3s ease;@mixin glass-card(
 
 .tabs-title {
   width: 100%;
-  margin-top: 3rem !important;
+  margin-top: 1rem !important;
   margin-bottom: 0.5rem !important;
   font-size: 1.8rem;
   font-weight: bold;
@@ -947,6 +959,8 @@ em {
 /* 项目卡片 */
 .cards-container {
   max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -1216,6 +1230,7 @@ em {
   color: $text-primary;
   font-size: 20px;
   font-weight: 600;
+  text-align: center;
 }
 
 .section-description {
@@ -1235,6 +1250,12 @@ em {
   :deep(.liquid-radio-text) {
     line-height: 1.5;
   }
+}
+
+.color-theme-radio-group {
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
 }
 
 .interface-mode-radio-group {
@@ -1517,11 +1538,14 @@ em {
   }
 
   .language-options {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
     gap: 8px;
+    overflow-x: auto;
   }
 
   .language-card {
+    flex-shrink: 0;
     padding: 10px 12px;
     border-width: 1.5px;
   }

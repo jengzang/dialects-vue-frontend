@@ -10,10 +10,10 @@
       <div class="panel-header">
         <h3>選擇兩個區域進行比較</h3>
       </div>
-      <div class="selector-content">
-        <div class="regions-row">
+      <div class="selector-content vml-control-surface">
+        <div class="regions-row vml-control-row">
           <!-- Region 1 -->
-          <div class="region-group">
+          <div class="region-group vml-control-field">
             <h4 class="group-title">區域 1</h4>
             <FilterableSelect
               v-model="region1"
@@ -26,7 +26,7 @@
           </div>
 
           <!-- Region 2 -->
-          <div class="region-group">
+          <div class="region-group vml-control-field">
             <h4 class="group-title">區域 2</h4>
             <FilterableSelect
               v-model="region2"
@@ -39,14 +39,16 @@
           </div>
         </div>
 
-        <button
-          @click="compareVectors"
-          :disabled="!region1 || !region2 || loading"
-          class="action-button primary"
-        >
-          <span v-if="!loading">比較向量</span>
-          <span v-else>比較中...</span>
-        </button>
+        <div class="vml-control-actions">
+          <button
+            @click="compareVectors"
+            :disabled="!region1 || !region2 || loading"
+            class="action-button primary"
+          >
+            <span v-if="!loading">比較向量</span>
+            <span v-else>比較中...</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -133,22 +135,26 @@
         <h3>批量分析（熱力圖 & 散點圖）</h3>
       </div>
       <div class="multi-region-content">
-        <div class="region-selector-row">
-          <FilterableSelect
+        <div class="region-selector-row vml-control-surface vml-control-row">
+          <div class="vml-control-field">
+            <FilterableSelect
               v-model="selectedRegionToAdd"
               v-model:level="batchLevel"
               :show-level-selector="true"
               :show-counts="true"
               placeholder="選擇區域添加到列表..."
               @update:hierarchy="(h) => selectedRegionHierarchy = h"
-          />
-          <button
+            />
+          </div>
+          <div class="vml-control-actions">
+            <button
               @click="addRegionToBatch"
               :disabled="!selectedRegionToAdd || batchRegions.length >= 20"
               class="action-button add-button"
-          >
-            添加 ({{ batchRegions.length }}/20)
-          </button>
+            >
+              添加 ({{ batchRegions.length }}/20)
+            </button>
+          </div>
         </div>
 
         <!-- Selected Regions List -->
@@ -717,22 +723,16 @@ onUnmounted(() => {
 }
 
 .selector-content {
-  @include flex-col;
   gap: 20px;
 }
 
 /* 區域選擇器並排 */
 .regions-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  width: 100%;
 }
 
 .region-group {
-  padding: 16px;
-  background: var(--glass-30);
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
+  min-width: 0;
 }
 
 .group-title {

@@ -6,9 +6,9 @@ export function getHomeUpdateNotice(t) {
             text: '重新劃分語義的類別，並優化各種聚類、特徵分析功能'
         },
         {
-            icon: '⌨️',
-            strong: '中古模式支持手動輸入',
-            text: '可以在設置頁面中啟用“手動輸入”功能，然後在中古模式下直接輸入地位或漢字集合'
+            icon: '👀',
+            strong: '優化用戶體驗',
+            text: '導航欄支持橫向滾動，增加主題色切換（藍色、綠色、淺色、深色）'
         },
         {
             icon: '📊',
@@ -19,9 +19,9 @@ export function getHomeUpdateNotice(t) {
 
     ]
   return {
-    version: 'v4.6.5',
+    version: 'v4.6.8',
     dbVersion: '2026-06-22',
-    lastUpdateDate: '2026-07-13',
+    lastUpdateDate: '2026-07-15',
     title: t('home.updateNotice.title'),
     items
   }

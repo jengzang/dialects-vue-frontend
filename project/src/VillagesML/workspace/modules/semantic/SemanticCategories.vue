@@ -83,21 +83,27 @@
               trigger="both"
             />
           </h3>
-          <div class="region-selector">
-            <FilterableSelect
-              v-model="regionName"
-              :level="regionLevel"
-              @update:level="(newLevel) => regionLevel = newLevel"
-              @update:hierarchy="(h) => regionHierarchy = h"
-              placeholder="請選擇或輸入"
-            />
-            <button
-              class="query-button"
-              :disabled="!regionName || loadingVTFRegional"
-              @click="loadVTFRegional"
-            >
-              查詢
-            </button>
+          <div class="region-selector vml-control-surface">
+            <div class="vml-control-row">
+              <div class="vml-control-field">
+                <FilterableSelect
+                  v-model="regionName"
+                  :level="regionLevel"
+                  @update:level="(newLevel) => regionLevel = newLevel"
+                  @update:hierarchy="(h) => regionHierarchy = h"
+                  placeholder="請選擇或輸入"
+                />
+              </div>
+              <div class="vml-control-actions">
+                <button
+                  class="query-button"
+                  :disabled="!regionName || loadingVTFRegional"
+                  @click="loadVTFRegional"
+                >
+                  查詢
+                </button>
+              </div>
+            </div>
           </div>
           <div v-if="loadingVTFRegional" class="vml-loading">
             <div class="ui-loading--page" aria-hidden="true"></div>
@@ -141,24 +147,30 @@
 
         <!-- Content when category selected -->
         <template v-else>
-          <div class="level-selector">
-            <label>行政級別：</label>
-            <SimpleSelectDropdown
-              v-model="rankingLevel"
-              :options="rankingLevelOptions"
-              @update:modelValue="loadCategoryRanking"
-            />
+          <div class="level-selector vml-control-surface">
+            <div class="vml-control-row">
+              <div class="vml-control-field vml-control-field--compact">
+                <label>行政級別：</label>
+                <SimpleSelectDropdown
+                  v-model="rankingLevel"
+                  :options="rankingLevelOptions"
+                  @update:modelValue="loadCategoryRanking"
+                />
+              </div>
 
-            <label style="margin-left: 20px;">最小村莊數：</label>
-            <input
-              v-model.number="minVillages"
-              type="number"
-              min="1"
-              placeholder="例如：100"
-              class="vml-number-input"
-              @change="loadCategoryRanking"
-            />
-            <span class="input-hint">（過濾小樣本區域）</span>
+              <div class="vml-control-field vml-control-field--compact">
+                <label>最小村莊數：</label>
+                <input
+                  v-model.number="minVillages"
+                  type="number"
+                  min="1"
+                  placeholder="例如：100"
+                  class="vml-number-input"
+                  @change="loadCategoryRanking"
+                />
+              </div>
+              <span class="input-hint">（過濾小樣本區域）</span>
+            </div>
           </div>
           <div v-if="loadingRanking" class="vml-loading">
             <div class="ui-loading--page" aria-hidden="true"></div>
@@ -618,8 +630,6 @@ onMounted(() => {
 }
 
 .region-selector {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
 }
 
@@ -844,16 +854,10 @@ onMounted(() => {
 }
 
 .level-selector {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin-bottom: 16px;
 }
 
 .level-selector label {
-  white-space: nowrap;
-  font-size: 14px;
-  font-weight: 500;
   color: var(--text-primary);
 }
 
@@ -982,28 +986,24 @@ onMounted(() => {
   }
 
   .region-selector {
-    flex-direction: column;
+    width: 100%;
   }
 
   /* Level selector responsive layout */
   .level-selector {
-    flex-wrap: wrap;
-    gap: 8px;
+    width: 100%;
   }
 
   .level-selector label {
-    flex-basis: 100%;
     margin-left: 0 !important;
   }
 
   .level-selector .simple-select-dropdown {
-    flex: 1;
-    min-width: 150px;
+    width: 100% !important;
   }
 
   .level-selector .vml-number-input {
-    flex: 1;
-    min-width: 120px;
+    width: 100% !important;
   }
 
   .level-selector .input-hint {

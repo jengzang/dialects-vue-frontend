@@ -3,6 +3,8 @@
  * 使用 sessionStorage 缓存区域列表数据，避免重复请求
  */
 
+import { getCurrentVillagesMLDataset } from './currentDataset.js'
+
 const CACHE_PREFIX = 'regions_'
 const CACHE_VERSION = 'v1' // 版本号，用于缓存失效
 
@@ -13,7 +15,7 @@ const CACHE_VERSION = 'v1' // 版本号，用于缓存失效
  * @returns {string} 缓存 key
  */
 export function getCacheKey(level, parent = null) {
-  return `${CACHE_PREFIX}${CACHE_VERSION}_${level}_${parent || 'null'}`
+  return `${CACHE_PREFIX}${CACHE_VERSION}_${getCurrentVillagesMLDataset()}_${level}_${parent || 'null'}`
 }
 
 /**

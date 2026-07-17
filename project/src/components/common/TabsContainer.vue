@@ -145,16 +145,21 @@ $transition-duration: 0.5s;
   transition: all $transition-duration ease;
 
   &:hover {
-    color: $primary-blue;
+    color: var(--color-primary-hover);
     background: var(--glass-10);
   }
 
   &.active {
-    color: $white;
+    color: var(--action-primary-text);
     background: rgba(var(--color-primary-rgb), 0.7);
     box-shadow: 0 4px 20px rgba(var(--color-primary-rgb), 0.3);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
+
+    &:hover {
+      background: rgba(var(--color-primary-hover-rgb), 0.7);
+      box-shadow: 0 4px 20px rgba(var(--color-primary-hover-rgb), 0.3);
+    }
   }
 
   @media (max-width: 600px) {

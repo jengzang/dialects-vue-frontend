@@ -1068,7 +1068,7 @@ const initContinuousChart = (isZScore) => {
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 
-$primary: var(--color-primary, var(--vml-blue));
+$primary: var(--color-primary);
 $primary-blue: var(--color-primary);
 $primary-purple: var(--color-purple);
 $primary-hover: var(--vml-blue-dark);
@@ -1089,8 +1089,8 @@ $border-medium: rgba(0, 0, 0, 0.1);
 
 $primary-gradient: linear-gradient(
   135deg,
-  $primary-blue,
-  $primary-purple
+  #007aff,
+  #6e00ff
 );
 
 $transition-fast: 0.2s;
@@ -1332,7 +1332,7 @@ $transition-normal: 0.3s;
   }
 
   .tag-name {
-    color: $primary;
+    color: var(--action-primary-text);
     font-weight: 700;
   }
 

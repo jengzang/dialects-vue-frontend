@@ -43,6 +43,17 @@ export function useSidebarConfig() {
                 { label: t('navigation.submenu.compare.tab5'), icon: '🎵', path: withRouteLocale(route, '/menu/compare/phonetic') }
             ]
         },
+        map: {
+            label: t('navigation.menu.map'),
+            icon: '🗺️',
+            path: withRouteLocale(route, '/menu/map/view'),
+            children: [
+                { label: t('navigation.submenu.map.view'), icon: '🗺️', path: withRouteLocale(route, '/menu/map/view') },
+                { label: t('navigation.submenu.map.divide'), icon: '🧩', path: withRouteLocale(route, '/menu/map/divide') },
+                { label: t('navigation.submenu.map.custom'), icon: '📝', path: withRouteLocale(route, '/menu/map/custom') },
+                { label: t('navigation.submenu.map.draw'), icon: '✏️', path: withRouteLocale(route, '/menu/map/draw') }
+            ]
+        },
         pho: {
             label: t('navigation.menu.pho'),
             icon: '🧬',
@@ -90,7 +101,7 @@ export function useSidebarConfig() {
         },
         source: {
             label: t('navigation.menu.source'),
-            icon: '📚',
+            icon: '🔗',
             path: withRouteLocale(route, '/menu/source'),
             children: [
                 { label: t('navigation.submenu.source.source'), icon: '📋', path: withRouteLocale(route, '/menu/source') },
@@ -163,6 +174,17 @@ export const SideConfig = {
             { label: '音值對比', icon: '🎵', path: buildLocalePath('zh-Hant', '/menu/compare/phonetic') }
         ]
     },
+    map: {
+        label: '地圖',
+        icon: '🗺️',
+        path: buildLocalePath('zh-Hant', '/menu/map/view'),
+        children: [
+            { label: '地圖', icon: '📍', path: buildLocalePath('zh-Hant', '/menu/map/view') },
+            { label: '分區圖', icon: '📊', path: buildLocalePath('zh-Hant', '/menu/map/divide') },
+            { label: '自定義', icon: '🎨', path: buildLocalePath('zh-Hant', '/menu/map/custom') },
+            { label: '地圖繪製', icon: '✏️', path: buildLocalePath('zh-Hant', '/menu/map/draw') }
+        ]
+    },
     pho: {
         label: '音系',
         icon: '🗣️',
@@ -233,7 +255,7 @@ export const SideConfig = {
             { label: '字表來源', icon: '📋', path: buildLocalePath('zh-Hant', '/menu/source') },
             { label: '隱私政策', icon: '🛡️', path: buildLocalePath('zh-Hant', '/menu/privacy') },
             { label: '提出建議', icon: '💡', path: buildLocalePath('zh-Hant', '/menu/about/suggestion') },
-            { label: '喜歡作者', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') }
+            { label: '支持作者', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') }
         ]
     },
     about_ontop: {
@@ -243,7 +265,7 @@ export const SideConfig = {
         children: [
             { label: '簡介', icon: 'ℹ️', path: buildLocalePath('zh-Hant', '/menu/about/intro') },
             { label: '提出建議', icon: '💡', path: buildLocalePath('zh-Hant', '/menu/about/suggestion') },
-            { label: '喜歡作者', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') },
+            { label: '支持作者', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') },
             { label: '設置', icon: '⚙️', path: buildLocalePath('zh-Hant', '/menu/about/settings') }
         ],
         showIn: ['none']

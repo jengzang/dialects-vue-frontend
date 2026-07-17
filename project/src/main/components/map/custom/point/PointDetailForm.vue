@@ -351,10 +351,10 @@ function createEmptyRow() {
 
 function parseCoordText(text) {
   if (!text || typeof text !== 'string') return null;
-  const [lngText, latText] = text.split(',');
-  const lng = Number(String(lngText).trim());
+  const [latText, lngText] = text.split(',');
   const lat = Number(String(latText).trim());
-  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
+  const lng = Number(String(lngText).trim());
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
   return [lng, lat];
 }
 

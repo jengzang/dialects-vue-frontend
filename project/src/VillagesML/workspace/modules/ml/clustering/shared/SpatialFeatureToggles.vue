@@ -2,44 +2,44 @@
   <div class="feature-toggles vm-subpanel-shell">
     <h4 class="section-title">特徵選擇</h4>
 
-    <div class="setting-row">
+    <div class="setting-row vml-setting-row">
       <CheckBox
         :model-value="modelValue.use_semantic_profile"
         @update:modelValue="update('use_semantic_profile', $event)"
       >
         語義特徵
       </CheckBox>
-      <span class="setting-hint">9個語義類別占比</span>
+      <span class="setting-hint vml-setting-hint">9個語義類別占比</span>
     </div>
 
-    <div class="setting-row">
+    <div class="setting-row vml-setting-row">
       <CheckBox
         :model-value="modelValue.use_naming_patterns"
         @update:modelValue="update('use_naming_patterns', $event)"
       >
         命名模式
       </CheckBox>
-      <span class="setting-hint">高頻後綴出現頻率</span>
+      <span class="setting-hint vml-setting-hint">高頻後綴出現頻率</span>
     </div>
 
-    <div class="setting-row">
+    <div class="setting-row vml-setting-row">
       <CheckBox
         :model-value="modelValue.use_geographic"
         @update:modelValue="update('use_geographic', $event)"
       >
         地理特徵
       </CheckBox>
-      <span class="setting-hint">聚類質心經緯度</span>
+      <span class="setting-hint vml-setting-hint">聚類質心經緯度</span>
     </div>
 
-    <div class="setting-row">
+    <div class="setting-row vml-setting-row">
       <CheckBox
         :model-value="modelValue.use_cluster_size"
         @update:modelValue="update('use_cluster_size', $event)"
       >
         聚類規模
       </CheckBox>
-      <span class="setting-hint">聚類包含的村莊數</span>
+      <span class="setting-hint vml-setting-hint">聚類包含的村莊數</span>
     </div>
   </div>
 </template>

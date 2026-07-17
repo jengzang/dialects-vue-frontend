@@ -1,7 +1,7 @@
 // api/villagesML/patterns.js
 // 結構模式分析相關 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 獲取全局模式頻率
@@ -15,7 +15,7 @@ export async function getPatternFrequencyGlobal(params = {}) {
   if (params.top_k) queryParams.append('top_k', params.top_k)
   if (params.min_frequency) queryParams.append('min_frequency', params.min_frequency)
 
-  return api(`/api/villages/patterns/frequency/global?${queryParams.toString()}`)
+  return villagesMLApi(`/patterns/frequency/global?${queryParams.toString()}`)
 }
 
 /**
@@ -43,7 +43,7 @@ export async function getPatternFrequencyRegional(params) {
 
   if (params.top_k) queryParams.append('top_k', params.top_k)
 
-  return api(`/api/villages/patterns/frequency/regional?${queryParams.toString()}`)
+  return villagesMLApi(`/patterns/frequency/regional?${queryParams.toString()}`)
 }
 
 /**
@@ -56,7 +56,7 @@ export async function getPatternStructural(params = {}) {
   const queryParams = new URLSearchParams()
   if (params.pattern_type) queryParams.append('pattern_type', params.pattern_type)
 
-  return api(`/api/villages/patterns/structural?${queryParams.toString()}`)
+  return villagesMLApi(`/patterns/structural?${queryParams.toString()}`)
 }
 
 /**
@@ -83,5 +83,5 @@ export async function getPatternTendency(params) {
   // Legacy parameter (backward compatible)
   if (params.region_name) queryParams.append('region_name', params.region_name)
 
-  return api(`/api/villages/patterns/tendency?${queryParams.toString()}`)
+  return villagesMLApi(`/patterns/tendency?${queryParams.toString()}`)
 }

@@ -122,12 +122,12 @@ const buildTag = (text, bgColor) => {
   const r = parseInt(bgColor.slice(1, 3), 16)
   const g = parseInt(bgColor.slice(3, 5), 16)
   const b = parseInt(bgColor.slice(5, 7), 16)
-  return `<span style="display:inline-block;padding:1px 8px;border-radius: var(--radius-md);font-size:10px;font-weight:500;color:var(--text-dark);background:rgba(${r},${g},${b},0.2);margin-top:2px">${text}</span>`
+  return `<span style="display:inline-block;padding:1px 8px;border-radius:12px;font-size:10px;font-weight:500;color:#333;background:rgba(${r},${g},${b},0.2);margin-top:2px">${text}</span>`
 }
 
 const buildHoverHtml = (name, pathStr, tagText, tagColor) => {
   let html = `<div style="text-align:center"><strong>${name}</strong></div>`
-  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:var(--text-lightest);margin-top:2px">${pathStr}</div>`
+  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:#999;margin-top:2px">${pathStr}</div>`
   if (tagText && tagColor) html += `<div style="text-align:center">${buildTag(tagText, tagColor)}</div>`
   return html
 }
@@ -308,7 +308,7 @@ const renderWithClustering = (pointFeatures) => {
       'circle-color': ['get', 'bgColor'],
       'circle-opacity': 0.9,
       'circle-stroke-width': 1.5,
-      'circle-stroke-color': 'var(--glass-80)'
+      'circle-stroke-color': 'rgba(255,255,255,0.80)'
     }
   })
 
@@ -385,14 +385,14 @@ const renderMarkers = () => {
     const lineFeatures = lineVillages.value.map(v => {
       const displayValue = getDisplayValue(v)
       const tagText = isNameMode ? (v.place_type_name || '') : displayValue
-      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || 'var(--color-dark-teal)')
+      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || '#1b2e2b')
       return {
         type: 'Feature',
         geometry: { type: 'LineString', coordinates: v.coors },
         properties: {
           name: v.name,
           displayValue: displayValue,
-          color: categoryColorMap.value[displayValue] || 'var(--color-dark-teal)',
+          color: categoryColorMap.value[displayValue] || '#1b2e2b',
           _pathStr: (v._path && v._path.length) ? v._path.join(' > ') : '',
           tagText: tagText,
           tagColor: tagColor
@@ -436,7 +436,7 @@ const renderMarkers = () => {
     const pointFeatures = pointVillages.value.map(v => {
       const displayValue = getDisplayValue(v)
       const tagText = isNameMode ? (v.place_type_name || '') : displayValue
-      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || 'var(--color-dark-teal)')
+      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || '#1b2e2b')
       return {
         type: 'Feature',
         geometry: { type: 'Point', coordinates: v.coors[0] },
@@ -444,9 +444,9 @@ const renderMarkers = () => {
           name: v.name,
           displayValue: displayValue,
           label: isNameMode ? v.name : displayValue,
-          bgColor: 'var(--color-dark-teal)',
-          textColor: 'var(--color-cyan)',
-          color: categoryColorMap.value[displayValue] || 'var(--color-dark-teal)',
+          bgColor: '#1b2e2b',
+          textColor: '#5ac8fa',
+          color: categoryColorMap.value[displayValue] || '#1b2e2b',
           _pathStr: (v._path && v._path.length) ? v._path.join(' > ') : '',
           tagText: tagText,
           tagColor: tagColor

@@ -1,9 +1,9 @@
 // api/villagesML/regionSimilarity.js
 // 區域相似度分析相關 API (Phase 15)
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
-const BASE_URL = '/api/villages/regions'
+const BASE_URL = '/regions'
 
 /**
  * 查找相似區域
@@ -45,7 +45,7 @@ export async function getRegionSimilaritySearch(params) {
   // 向後兼容（不推薦）
   if (region_name) queryParams.append('region_name', region_name)
 
-  return await api(`${BASE_URL}/similarity/search?${queryParams}`)
+  return await villagesMLApi(`${BASE_URL}/similarity/search?${queryParams}`)
 }
 
 /**
@@ -88,7 +88,7 @@ export async function getRegionSimilarityPair(params) {
   if (region1) queryParams.append('region1', region1)
   if (region2) queryParams.append('region2', region2)
 
-  return await api(`${BASE_URL}/similarity/pair?${queryParams}`)
+  return await villagesMLApi(`${BASE_URL}/similarity/pair?${queryParams}`)
 }
 
 /**
@@ -117,5 +117,5 @@ export async function getRegionSimilarityMatrix(params) {
     queryParams.append('regions', Array.isArray(region_names) ? region_names.join(',') : region_names)
   }
 
-  return await api(`${BASE_URL}/similarity/matrix?${queryParams}`)
+  return await villagesMLApi(`${BASE_URL}/similarity/matrix?${queryParams}`)
 }

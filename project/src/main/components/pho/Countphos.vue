@@ -1361,7 +1361,7 @@ $mobile-breakpoint: 768px;
     border-radius: var(--radius-md);
 
     &--wide {
-      width: 100%;
+      // width: 100%;
     }
   }
 
@@ -1411,7 +1411,7 @@ $mobile-breakpoint: 768px;
 
   .syllable-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 10px;
   }
 
@@ -1621,7 +1621,7 @@ $mobile-breakpoint: 768px;
     }
 
     .chart-block {
-      padding: 12px;
+      padding: 8px;
     }
 
     .pie-chart {

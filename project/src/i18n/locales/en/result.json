@@ -95,6 +95,10 @@
       }
     }
   },
+  "locationMapPopup": {
+    "title": "View Location: {name}",
+    "titleFallback": "View Location"
+  },
   "featureStatsPopup": {
     "title": "{location} · {featureKey}-{featureVal} Statistics",
     "loading": "Loading...",

@@ -1,13 +1,13 @@
 <template>
-  <div class="setting-row">
-    <label class="setting-label">聚類算法</label>
-    <div class="setting-control">
+  <div class="setting-row vml-setting-row">
+    <label class="setting-label vml-setting-label">聚類算法</label>
+    <div class="setting-control vml-setting-control">
       <SimpleSelectDropdown
         :modelValue="modelValue"
         :options="algorithmOptions"
         @update:modelValue="$emit('update:modelValue', $event)"
       />
-      <span class="setting-hint vm-setting-hint-muted">{{ algorithmHint }}</span>
+      <span class="setting-hint vml-setting-hint vm-setting-hint-muted">{{ algorithmHint }}</span>
     </div>
   </div>
 </template>

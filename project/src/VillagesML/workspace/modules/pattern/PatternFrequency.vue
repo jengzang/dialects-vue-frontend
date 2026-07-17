@@ -18,9 +18,9 @@
       </div>
 
       <!-- Controls -->
-      <div class="controls">
+      <div class="controls vml-control-surface vml-control-row vml-control-row--center">
         <!-- Regional Selection (only show when regional mode) -->
-        <div v-if="queryMode === 'regional'" class="control-group">
+        <div v-if="queryMode === 'regional'" class="control-group vml-control-field">
           <FilterableSelect
             v-model="regionName"
             :level="regionLevel"
@@ -30,7 +30,7 @@
           />
         </div>
 
-        <div class="control-group">
+        <div class="control-group vml-control-field vml-control-field--compact">
           <label class="control-label">返回數量</label>
           <input
             v-model.number="topN"
@@ -41,7 +41,7 @@
           />
         </div>
 
-        <div v-if="queryMode === 'global'" class="control-group">
+        <div v-if="queryMode === 'global'" class="control-group vml-control-field vml-control-field--compact">
           <label class="control-label">最小佔比(%)</label>
           <input
             v-model.number="minPercentage"
@@ -54,17 +54,19 @@
           />
         </div>
 
-        <button
-          class="query-button"
-          :disabled="loading || (queryMode === 'regional' && !regionName)"
-          @click="loadPatterns"
-        >
-          查詢
-        </button>
+        <div class="vml-control-actions">
+          <button
+            class="query-button"
+            :disabled="loading || (queryMode === 'regional' && !regionName)"
+            @click="loadPatterns"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="vml-loading"">
+      <div v-if="loading" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -228,16 +230,11 @@ const goToTendency = (pattern) => {
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
+  margin: 12px 0 16px;
 }
 
 .control-group {
-  @include flex-col;
-  gap: 6px;
+  min-width: 0;
 }
 
 .control-label {

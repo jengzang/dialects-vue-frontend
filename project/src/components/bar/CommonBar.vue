@@ -4,7 +4,7 @@
     <div class="commonbar-desktop">
       <div class="logo-and-title" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div class="logo-container">
-          <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
+          <img class="logo" :src="faviconSrc" alt="Logo" />
         </div>
         <div v-if="titleImage" class="title">
           <img :src="titleImage" alt="Title" />
@@ -14,9 +14,14 @@
         </div>
       </div>
 
-      <nav class="commonbar-tabs ui-scrollbar--hidden" @mouseleave="handleTabLeave">
+      <nav
+        ref="navRef"
+        class="commonbar-tabs ui-scrollbar--hidden"
+        :class="scrollClass"
+        @mouseleave="handleTabLeave"
+      >
         <RouterLink
-          v-for="t in visibleTabs"
+          v-for="t in orderedTabs"
           :key="t.tab"
           :to="t.to"
           custom
@@ -25,13 +30,19 @@
           <a
             :href="href"
             class="tab-item"
-            :class="{ active: isActiveComputed(t.tab) }"
+            :class="{
+              active: isActiveComputed(t.tab),
+              'tab-overflow-left': t.scroll === 'left',
+              'tab-overflow-right': t.scroll === 'right'
+            }"
             :style="{
-              flex: getFlexWeight(t, isActiveComputed(t.tab), false) + ' 1 0',
+              flex: getOverflowFlex(t, isActiveComputed(t.tab), false),
               fontSize: t.fontSize + 'rem'
             }"
             @click.prevent.stop="onClick(t, navigate, $event)"
-            @mouseenter="handleTabHover(t, t.tab, $event)"
+            @mouseenter="(e) => { handleTabHover(t, t.tab, e); handleTabTooltipEnter(e, t.label) }"
+            @mouseleave="handleTabTooltipLeave"
+            @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
             <span class="emoji">{{ t.icon }}</span>
             <span
@@ -55,15 +66,19 @@
     <!-- 移动端：单行布局（无 title.png） -->
     <div class="commonbar-mobile">
       <div class="logo-container" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
-        <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
+        <img class="logo" :src="faviconSrc" alt="Logo" />
       </div>
       <div v-if="title && showTitleOnMobile" class="title-text-mobile">
         {{ title }}
       </div>
 
-      <nav class="commonbar-tabs ui-scrollbar--hidden">
+      <nav
+        ref="mobileNavRef"
+        class="commonbar-tabs ui-scrollbar--hidden"
+        :class="scrollClass"
+      >
         <RouterLink
-          v-for="t in visibleTabs"
+          v-for="t in orderedTabs"
           :key="t.tab"
           :to="t.to"
           custom
@@ -73,12 +88,19 @@
             v-if="!t.hideOnMobile"
             :href="href"
             class="tab-item"
-            :class="{ active: isActiveComputed(t.tab) }"
+            :class="{
+              active: isActiveComputed(t.tab),
+              'tab-overflow-left': t.scroll === 'left',
+              'tab-overflow-right': t.scroll === 'right'
+            }"
             :style="{
-              flex: getFlexWeight(t, isActiveComputed(t.tab), true) + ' 1 0',
+              flex: getOverflowFlex(t, isActiveComputed(t.tab), true),
               fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
             }"
             @click.prevent.stop="onClick(t, navigate, $event)"
+            @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
+            @mouseleave="handleTabTooltipLeave"
+            @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
             <span class="emoji">{{ t.icon }}</span>
             <span
@@ -134,6 +156,17 @@
         </div>
       </Transition>
     </Teleport>
+
+    <!-- Tab label tooltip -->
+    <Teleport to="body">
+      <Transition name="tab-tooltip-fade">
+        <div
+          v-if="tooltip.visible"
+          class="tab-tooltip global-tooltip-surface"
+          :style="tooltipStyle"
+        >{{ tooltip.label }}</div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -154,6 +187,15 @@ import {
   syncCommonBarMemoryFromRoute,
   writeCommonBarMemory
 } from '@/components/bar/commonBarNavigation.js'
+import { useTabTooltip } from '@/components/bar/useTabTooltip.js'
+import { useScrollSnap } from '@/components/bar/useScrollSnap.js'
+import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+
+const faviconSrc = computed(() =>
+  currentColorTheme.value === COLOR_THEME_GREEN
+    ? new URL('@/assets/favicon_green.ico', import.meta.url).href
+    : new URL('@/assets/favicon.ico', import.meta.url).href
+)
 
 // Props definition
 const props = defineProps({
@@ -244,24 +286,67 @@ const visibleTabs = computed(() => {
 })
 
 const isSidebarVisible = ref(false)
+const navRef = ref(null)
+const mobileNavRef = ref(null)
+
+// Tab label tooltip
+const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
+
+// Overflow scroll: sort tabs：左溢出 → 主 → 右溢出
+const orderedTabs = computed(() => {
+  const tabs = visibleTabs.value
+  const left = tabs.filter(t => t.scroll === 'left')
+  const main = tabs.filter(t => !t.scroll || (t.scroll !== 'left' && t.scroll !== 'right'))
+  const right = tabs.filter(t => t.scroll === 'right')
+  return [...left, ...main, ...right]
+})
+
+const { hasOverflow, scrollClass, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(
+  navRef,
+  orderedTabs,
+  { desktop: 30, portrait: 18 },
+  mobileNavRef
+)
+
+const getRenderedPrimaryTabs = (isMobile) =>
+  orderedTabs.value
+    .filter(t => !t.scroll || (t.scroll !== 'left' && t.scroll !== 'right'))
+    .filter(t => !isMobile || !t.hideOnMobile)
+
+const getPrimaryTotalWeight = (isMobile) =>
+  getRenderedPrimaryTabs(isMobile)
+    .reduce((s, t) => s + getFlexWeight(t, isActiveComputed(t.tab), isMobile), 0) || 1
+
+const getOverflowFlex = (t, isActive, isMobile) => {
+  if (t.scroll) return '0 0 auto'
+  if (hasOverflow.value) {
+    const w = getFlexWeight(t, isActive, isMobile)
+    const totalWeight = getPrimaryTotalWeight(isMobile)
+    if (navContentWidth.value > 0) {
+      return `0 0 ${(w / totalWeight) * navContentWidth.value}px`
+    }
+    return `0 0 ${(w / totalWeight) * 100}%`
+  }
+  return getFlexWeight(t, isActive, isMobile) + ' 1 0'
+}
 
 // Submenu state management
 const activeSubmenu = ref(null)
 const submenuPosition = ref({ top: 0, left: 0 })
 let closeSubmenuTimer = null
 
-// Mobile detection
+// Portrait layout detection
 const isMobile = ref(false)
-let hoverMediaQuery = null
+let portraitMediaQuery = null
 
-const onHoverChange = (e) => {
-  isMobile.value = !e.matches
+const onPortraitChange = (e) => {
+  isMobile.value = e.matches
 }
 
 const checkMobile = () => {
-  isMobile.value = !window.matchMedia('(hover: hover)').matches
-  hoverMediaQuery = window.matchMedia('(hover: hover)')
-  hoverMediaQuery.addEventListener('change', onHoverChange)
+  portraitMediaQuery = window.matchMedia('(max-aspect-ratio: 1/1)')
+  isMobile.value = portraitMediaQuery.matches
+  portraitMediaQuery.addEventListener('change', onPortraitChange)
 }
 
 // Helper function to get children from submenuConfig
@@ -275,7 +360,7 @@ const getTabChildren = (tabKey) => {
 }
 
 // Lifecycle hooks
-onMounted(() => {
+onMounted(async () => {
   checkMobile()
   document.addEventListener('click', closeSubmenu)
   if (normalizedNavigationSchema.value) {
@@ -285,9 +370,9 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', closeSubmenu)
-  if (hoverMediaQuery) {
-    hoverMediaQuery.removeEventListener('change', onHoverChange)
-    hoverMediaQuery = null
+  if (portraitMediaQuery) {
+    portraitMediaQuery.removeEventListener('change', onPortraitChange)
+    portraitMediaQuery = null
   }
   if (closeSubmenuTimer) {
     clearTimeout(closeSubmenuTimer)
@@ -567,9 +652,29 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  background: var(--glass-10);
+  // background: var(--glass-10);
   border-radius: var(--radius-md);
-  transition: all 0.25s ease;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    border-radius 0.25s ease,
+    box-shadow 0.25s ease,
+    height 0.25s ease;
+
+  .label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  .label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
 
   &:hover {
     height: 90%;
@@ -590,7 +695,13 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     box-shadow:
       0 6px 10px rgba(0, 0, 0, 0.1),
       0 1px 4px rgba(0, 0, 0, 0.08);
-    transition: all $transition-base ease;
+    transition:
+      background $transition-base ease,
+      color $transition-base ease,
+      border-color $transition-base ease,
+      border-radius $transition-base ease,
+      box-shadow $transition-base ease,
+      height $transition-base ease;
 
     &:hover {
       margin: 0;
@@ -704,7 +815,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   user-select: none;
 }
 
-@media (max-aspect-ratio: 1/1) and (hover: none) {
+@media (max-aspect-ratio: 1/1) {
   .commonbar-desktop {
     display: none;
   }
@@ -777,7 +888,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
   @include glass-blur(20px, 180%);
 
-  @media (max-aspect-ratio: 1/1) and (hover: none) {
+  @media (max-aspect-ratio: 1/1) {
     max-width: calc(100vw - 20px);
   }
 }
@@ -803,7 +914,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     transform: translateX(4px);
   }
 
-  @media (max-aspect-ratio: 1/1) and (hover: none) {
+  @media (max-aspect-ratio: 1/1) {
     padding: 10px 14px;
     font-size: 14px;
   }
@@ -830,4 +941,50 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   opacity: 0;
   transform: translateY(-10px) scale(0.95);
 }
+
+.tab-tooltip {
+  padding: 6px 12px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.tab-tooltip-fade-enter-active,
+.tab-tooltip-fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.tab-tooltip-fade-enter-from,
+.tab-tooltip-fade-leave-to {
+  opacity: 0;
+}
+
+.commonbar-tabs.has-overflow-tabs {
+  justify-content: flex-start;
+  overflow-x: scroll;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; width: 0; height: 0; }
+}
+
+.tab-overflow-left,
+.tab-overflow-right {
+  flex-shrink: 0;
+}
+
+@media (orientation: landscape) {
+  .tab-overflow-left,
+  .tab-overflow-right {
+    padding-inline: 10px;
+  }
+}
+
+@media (orientation: portrait) {
+  .tab-overflow-left,
+  .tab-overflow-right {
+    padding-inline: 14px;
+  }
+}
+
 </style>

@@ -10,19 +10,23 @@
       />
     </h3>
 
-    <button class="analyze-button solid-button" @click="handleAnalyze" :disabled="!localName">
-      🔍 開始分析
-    </button>
+    <div class="region-selector-controls vml-control-surface vml-control-row">
+      <div class="selector-wrapper vml-control-field">
+        <FilterableSelect
+          v-model="localName"
+          :level="localLevel"
+          @update:level="handleLevelChange"
+          @update:modelValue="handleNameChange"
+          @update:hierarchy="(h) => localHierarchy = h"
+          placeholder="請選擇或輸入區域"
+        />
+      </div>
 
-    <div class="selector-wrapper">
-      <FilterableSelect
-        v-model="localName"
-        :level="localLevel"
-        @update:level="handleLevelChange"
-        @update:modelValue="handleNameChange"
-        @update:hierarchy="(h) => localHierarchy = h"
-        placeholder="請選擇或輸入區域"
-      />
+      <div class="vml-control-actions">
+        <button class="analyze-button solid-button" @click="handleAnalyze" :disabled="!localName">
+          🔍 開始分析
+        </button>
+      </div>
     </div>
   </div>
 </template>

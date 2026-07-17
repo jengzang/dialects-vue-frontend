@@ -32,7 +32,15 @@
 
         <div class="info-item">
           <span class="info-label">{{ t('result.locationDetailPopup.fields.coordinates') }}</span>
-          <span class="info-value">{{ formatCoordinates(data.data[0]['經緯度']) }}</span>
+          <span class="info-value">
+            {{ formatCoordinates(data.data[0]['經緯度']) }}
+            <button
+              v-if="parsedCoord"
+              class="map-lookup-btn"
+              :title="t('result.locationMapPopup.titleFallback')"
+              @click="showMapPopup = true"
+            >🔍</button>
+          </span>
         </div>
 
         <div class="info-item">
@@ -64,12 +72,20 @@
       <span>{{ t('result.locationDetailPopup.noData') }}</span>
     </div>
   </AppModal>
+
+  <LocationMapPopup
+    :visible="showMapPopup"
+    :coord="parsedCoord"
+    :location-name="data?.data?.[0]?.['語言'] || locationName"
+    @close="showMapPopup = false"
+  />
 </template>
 
 <script setup>
 import { useI18n } from 'vue-i18n';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import AppModal from '@/components/common/AppModal.vue'
+import LocationMapPopup from './LocationMapPopup.vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -81,7 +97,20 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 const { t } = useI18n();
+const showMapPopup = ref(false)
+
 const modalTitle = computed(() => `📍 ${t('result.locationDetailPopup.title', { name: props.locationName })}`)
+
+const parsedCoord = computed(() => {
+  const raw = props.data?.data?.[0]?.['經緯度']
+  if (!raw) return null
+  const parts = raw.split(',')
+  if (parts.length !== 2) return null
+  const lng = parseFloat(parts[0])
+  const lat = parseFloat(parts[1])
+  if (isNaN(lng) || isNaN(lat)) return null
+  return [lng, lat]
+})
 
 const formatAdministrativeRegion = (data) => {
   const parts = [];
@@ -270,6 +299,27 @@ $transition-fast: 0.2s;
         background: $primary-background-medium;
       }
     }
+  }
+}
+
+.map-lookup-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  border-radius: var(--radius-sm, 4px);
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  vertical-align: middle;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(var(--color-primary-rgb), 0.08);
   }
 }
 

@@ -1805,7 +1805,7 @@ onBeforeUnmount(() => {
   min-height: 2.5rem;
   padding: 0 0.95rem;
   border-radius: var(--radius-pill);
-  background: linear-gradient(145deg, var(--glass-80), rgba(232, 244, 255, 0.72));
+  background: linear-gradient(145deg, var(--glass-80), rgba(var(--color-primary-rgb), 0.06));
   border: 1px solid var(--glass-70);
   color: var(--text-deep);
   font-size: 0.92rem;
@@ -1922,7 +1922,7 @@ onBeforeUnmount(() => {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-md);
 }
 
 .auth-warning-icon {
@@ -1969,6 +1969,7 @@ onBeforeUnmount(() => {
     padding: 0 0.65rem;
     font-size: 0.84rem;
     justify-content: center;
+    color: var(--text-deep);
   }
 
   .draw-workbench {

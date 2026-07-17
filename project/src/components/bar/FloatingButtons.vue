@@ -29,7 +29,7 @@
       :title="t('navigation.actions.openMenu')"
 
     >
-      <img class="logo" src="../../assets/favicon.ico" alt="Logo" />
+      <img class="logo" :src="faviconSrc" alt="Logo" />
     </button>
 
     <!-- 打开侧边栏按钮 - 只在非首页时显示 -->
@@ -51,6 +51,13 @@ import { useI18n } from 'vue-i18n';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js';
 import NavAvatar from '@/components/bar/NavAvatar.vue';
+import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+
+const faviconSrc = computed(() =>
+  currentColorTheme.value === COLOR_THEME_GREEN
+    ? new URL('@/assets/favicon_green.ico', import.meta.url).href
+    : new URL('@/assets/favicon.ico', import.meta.url).href
+)
 
 const props = defineProps({
   // 认证按钮位置: 'top-right' | 'bottom-left'

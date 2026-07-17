@@ -1,14 +1,14 @@
 // api/villagesML/spatial.js
 // 空間分析相關 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 獲取空間熱點列表
  * @returns {Promise<Array>} [{ hotspot_id: number, center_lat: number, center_lng: number, radius: number, village_count: number }, ...]
  */
 export async function getSpatialHotspots() {
-  return api('/api/villages/spatial/hotspots')
+  return villagesMLApi('/spatial/hotspots')
 }
 
 /**
@@ -17,7 +17,7 @@ export async function getSpatialHotspots() {
  * @returns {Promise<Object>} { hotspot_id: number, villages: [], statistics: {} }
  */
 export async function getSpatialHotspotDetail(hotspotId) {
-  return api(`/api/villages/spatial/hotspots/${hotspotId}`)
+  return villagesMLApi(`/spatial/hotspots/${hotspotId}`)
 }
 
 /**
@@ -32,7 +32,7 @@ export async function getSpatialClusters(params = {}) {
   if (params.run_id) query.append('run_id', params.run_id)
   if (params.limit !== undefined) query.append('limit', params.limit)
   const qs = query.toString()
-  return api(`/api/villages/spatial/clusters${qs ? '?' + qs : ''}`)
+  return villagesMLApi(`/spatial/clusters${qs ? '?' + qs : ''}`)
 }
 
 /**
@@ -40,7 +40,7 @@ export async function getSpatialClusters(params = {}) {
  * @returns {Promise<Object>} { active_run_id: string, available_runs: [{ run_id, total_records, unique_clusters, avg_cluster_size, max_cluster_size, noise_count, is_active }] }
  */
 export async function getSpatialClustersAvailableRuns() {
-  return api('/api/villages/spatial/clusters/available-runs')
+  return villagesMLApi('/spatial/clusters/available-runs')
 }
 
 /**
@@ -50,7 +50,7 @@ export async function getSpatialClustersAvailableRuns() {
  */
 export async function getSpatialClustersSummary(run_id) {
   const qs = run_id ? `?run_id=${run_id}` : ''
-  return api(`/api/villages/spatial/clusters/summary${qs}`)
+  return villagesMLApi(`/spatial/clusters/summary${qs}`)
 }
 
 /**
@@ -80,7 +80,7 @@ export async function getSpatialIntegration(params = {}) {
   if (params.is_significant !== undefined) queryParams.append('is_significant', params.is_significant)
   if (params.limit) queryParams.append('limit', params.limit)
 
-  return api(`/api/villages/spatial/integration?${queryParams.toString()}`)
+  return villagesMLApi(`/spatial/integration?${queryParams.toString()}`)
 }
 
 /**
@@ -89,7 +89,7 @@ export async function getSpatialIntegration(params = {}) {
  * @returns {Promise<Object>} { char: string, spatial_distribution: [], hotspots: [], tendency: [] }
  */
 export async function getSpatialIntegrationByChar(char) {
-  return api(`/api/villages/spatial/integration/by-character/${encodeURIComponent(char)}`)
+  return villagesMLApi(`/spatial/integration/by-character/${encodeURIComponent(char)}`)
 }
 
 /**
@@ -111,7 +111,7 @@ export async function getSpatialIntegrationByChar(char) {
  */
 export async function getSpatialIntegrationAvailableCharacters(run_id) {
   const qs = run_id ? `?run_id=${run_id}` : ''
-  return api(`/api/villages/spatial/integration/available-characters${qs}`)
+  return villagesMLApi(`/spatial/integration/available-characters${qs}`)
 }
 
 /**
@@ -141,7 +141,7 @@ export async function getSpatialIntegrationClusterList(params = {}) {
   if (params.run_id) queryParams.append('run_id', params.run_id)
   if (params.min_cluster_size) queryParams.append('min_cluster_size', params.min_cluster_size)
   const qs = queryParams.toString()
-  return api(`/api/villages/spatial/integration/clusterlist${qs ? '?' + qs : ''}`)
+  return villagesMLApi(`/spatial/integration/clusterlist${qs ? '?' + qs : ''}`)
 }
 
 /**
@@ -150,7 +150,7 @@ export async function getSpatialIntegrationClusterList(params = {}) {
  * @returns {Promise<Object>} { cluster_id: number, villages: [], tendency: [], characteristics: {} }
  */
 export async function getSpatialIntegrationByCluster(clusterId) {
-  return api(`/api/villages/spatial/integration/by-cluster/${clusterId}`)
+  return villagesMLApi(`/spatial/integration/by-cluster/${clusterId}`)
 }
 
 /**
@@ -158,5 +158,5 @@ export async function getSpatialIntegrationByCluster(clusterId) {
  * @returns {Promise<Object>} { total_hotspots: number, total_clusters: number, coverage: number }
  */
 export async function getSpatialIntegrationSummary() {
-  return api('/api/villages/spatial/integration/summary')
+  return villagesMLApi('/spatial/integration/summary')
 }

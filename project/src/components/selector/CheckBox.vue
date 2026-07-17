@@ -86,7 +86,7 @@ const handleChange = (event) => {
 
 $primary-color: var(--color-primary);
 $text-color: var(--text-dark, var(--text-dark));
-$white: var(--text-white);
+$checkmark-color: var(--action-primary-text);
 
 $transition-fast: 0.2s ease;
 $transition-indicator: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -154,7 +154,7 @@ $transition-checkmark: 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
   width: 18px;
   height: 18px;
   background: var(--glass-20);
-  border: 1px solid rgba(150, 150, 150, 0.3);
+  border: 1px solid var(--border-gray-medium);
   border-radius: var(--radius-xs);
   box-shadow:
     inset 0 1px 3px var(--glass-50),
@@ -171,8 +171,8 @@ $transition-checkmark: 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
     height: 9px;
     content: '';
     background: transparent;
-    border-right: 2px solid $white;
-    border-bottom: 2px solid $white;
+    border-right: 2px solid $checkmark-color;
+    border-bottom: 2px solid $checkmark-color;
     border-radius: 0;
     box-shadow: none;
     transform: translate(-50%, -58%) rotate(45deg) scale(0);

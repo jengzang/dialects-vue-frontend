@@ -2,29 +2,29 @@
   <div class="preprocessing-settings vm-subpanel-shell vm-subpanel-shell-spaced">
     <h4 class="section-title">預處理參數</h4>
 
-    <div class="setting-row">
+    <div class="setting-row vml-setting-row">
       <CheckBox
         :model-value="modelValue.standardize"
         label="標準化"
         class="setting-label"
         @update:modelValue="updateSetting('standardize', $event)"
       />
-      <span class="setting-hint">將特徵縮放到均值0、方差1</span>
+      <span class="setting-hint vml-setting-hint">將特徵縮放到均值0、方差1</span>
     </div>
 
-    <div class="setting-row">
+    <div class="setting-row vml-setting-row">
       <CheckBox
         :model-value="modelValue.use_pca"
         label="使用 PCA 降維"
         class="setting-label"
         @update:modelValue="updateSetting('use_pca', $event)"
       />
-      <span class="setting-hint">減少特徵維度，提高計算效率</span>
+      <span class="setting-hint vml-setting-hint">減少特徵維度，提高計算效率</span>
     </div>
 
-    <div v-if="modelValue.use_pca" class="setting-row indented vm-setting-indent">
-      <label class="setting-label">PCA 維度</label>
-      <div class="setting-control">
+    <div v-if="modelValue.use_pca" class="setting-row vml-setting-row indented vm-setting-indent">
+      <label class="setting-label vml-setting-label">PCA 維度</label>
+      <div class="setting-control vml-setting-control">
         <input
           type="number"
           :value="modelValue.pca_n_components"
@@ -33,7 +33,7 @@
           max="200"
           class="setting-input vm-setting-input-compact"
         />
-        <span class="setting-hint">保留的主成分數量（2-200）</span>
+        <span class="setting-hint vml-setting-hint">保留的主成分數量（2-200）</span>
       </div>
     </div>
   </div>

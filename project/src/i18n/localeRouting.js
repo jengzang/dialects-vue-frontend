@@ -123,6 +123,16 @@ export function buildLocaleRedirectTarget({ pathname = '/', search = '', hash = 
   return `${localizedPath}${search || ''}${hash || ''}`
 }
 
+const LOCALE_STORAGE_KEY = 'user-locale'
+
+function getSavedLocale() {
+  try {
+    return typeof window !== 'undefined' ? window.localStorage.getItem(LOCALE_STORAGE_KEY) : null
+  } catch {
+    return null
+  }
+}
+
 export function resolveRouteLocale(routeLike) {
   const localeFromParams = routeLike?.params?.locale
   if (isSupportedLocale(localeFromParams)) {
@@ -130,5 +140,15 @@ export function resolveRouteLocale(routeLike) {
   }
 
   const path = routeLike?.path || routeLike?.fullPath || '/'
-  return normalizeLocale(extractLocaleFromPath(path) || FALLBACK_LOCALE)
+  const fromPath = extractLocaleFromPath(path)
+  if (fromPath) {
+    return normalizeLocale(fromPath)
+  }
+
+  const saved = getSavedLocale()
+  if (isSupportedLocale(saved)) {
+    return saved
+  }
+
+  return FALLBACK_LOCALE
 }

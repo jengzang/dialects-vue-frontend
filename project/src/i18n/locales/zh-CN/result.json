@@ -95,6 +95,10 @@
       }
     }
   },
+  "locationMapPopup": {
+    "title": "查看位置：{name}",
+    "titleFallback": "查看位置"
+  },
   "featureStatsPopup": {
     "title": "{location} · {featureKey}-{featureVal} 统计",
     "loading": "加载中...",

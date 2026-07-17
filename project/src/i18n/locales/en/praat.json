@@ -6,10 +6,10 @@
     "title": "Praat Acoustic Analysis",
     "description": "Upload audio or record to analyze acoustic features",
     "tabs": {
-      "upload": "Upload & Record",
+      "upload": "Upload",
       "results": "Results",
       "vowelSpace": "Vowel Space",
-      "pitchTone": "Pitch & Tone"
+      "pitchTone": "Pitch"
     },
     "settings": {
       "title": "Analysis Settings",

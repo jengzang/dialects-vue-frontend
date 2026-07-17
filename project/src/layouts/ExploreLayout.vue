@@ -101,6 +101,14 @@ $system-font:
 
 /* 竖屏布局 */
 @media (max-aspect-ratio: $portrait-ratio) {
+  .explore-layout {
+    padding:
+      max(16px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+  }
+
   .content-area {
     padding-top: calc(8dvh - 15px);
   }

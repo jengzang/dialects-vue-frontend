@@ -67,6 +67,8 @@
     "jyut2ipaDescription": "先確認哪一列是粵拼，再開始轉換，避免因列名不一致導致無法處理。",
     "checkToolTitle": "導入前預覽與檢查列匹配",
     "checkToolDescription": "先匹配字、音標與備註列，再進入檢查工作台，可減少因列名不一致導致的導入失敗。",
+    "mergeFileTitle": "合併文件列匹配預覽",
+    "mergeFileDescription": "匹配待合併文件的字、音標與備註列，確認後上傳。",
     "mergeReferenceSummary": "已匹配 {mappedCount} 列 / 來源 {columnCount} 列",
     "actions": {
       "exportSource": "導出源文件",
@@ -84,6 +86,7 @@
       "fileName": "檔案",
       "columns": "列數",
       "rows": "行數",
+      "noHeader": "無表頭",
       "headerRowOption": "第 {row} 行"
     },
     "mapping": {
@@ -133,6 +136,37 @@
         "note": {
           "label": "備註",
           "description": "可選補充信息，用於保留人工說明。",
+          "example": "文讀",
+          "aliases": {
+            "remark": "備註",
+            "comment": "說明"
+          }
+        }
+      },
+      "mergeFile": {
+        "char": {
+          "label": "漢字",
+          "description": "待合併文件中的漢字列，用於與參考表對齊。",
+          "example": "天",
+          "aliases": {
+            "char": "字",
+            "character": "漢字",
+            "word": "字頭"
+          }
+        },
+        "pronunciation": {
+          "label": "音標",
+          "description": "待合併文件中的讀音/音標列，必填。",
+          "example": "tin1",
+          "aliases": {
+            "ipa": "音標",
+            "phonetic": "讀音",
+            "sound": "音值"
+          }
+        },
+        "note": {
+          "label": "解釋",
+          "description": "可選補充信息列。",
           "example": "文讀",
           "aliases": {
             "remark": "備註",
@@ -190,6 +224,36 @@
           "aliases": {
             "note": "備註",
             "comment": "說明"
+          }
+        },
+        "pronunciation": {
+          "label": "音節",
+          "description": "跳跳老鼠格式的讀音列，用於聲韻調拆解與錯誤檢查。",
+          "example": "tin55",
+          "aliases": {
+            "ipa": "音標",
+            "phonetic": "讀音",
+            "pronunciation": "發音"
+          }
+        },
+        "charGroup": {
+          "label": "字組",
+          "description": "跳跳老鼠格式的字組列，包含該讀音下的所有單字。",
+          "example": "天地人",
+          "aliases": {
+            "char": "字",
+            "character": "單字",
+            "word": "字頭"
+          }
+        },
+        "pinyin": {
+          "label": "音節",
+          "description": "縣志格式的拼音列（聲母+韻母基底，不含聲調），其餘列自動作為字組數據。",
+          "example": "fi",
+          "aliases": {
+            "pinyin": "拼音",
+            "phonetic": "音韻",
+            "reading": "讀音"
           }
         }
       },

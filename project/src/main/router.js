@@ -20,6 +20,8 @@ import {
   shouldRedirectMainEntry,
   stripLocaleFromPath,
 } from '@/i18n/localeRouting.js'
+import { setCurrentVillagesMLDatasetFromRoute } from '@/VillagesML/utils/currentDataset.js'
+import { buildVillagesMLRedirect } from '@/VillagesML/utils/routeDataset.js'
 
 const HomePage = () => import('@/main/views/HomePage.vue')
 const Auth = () => import('./views/auth.vue')
@@ -371,6 +373,14 @@ function isSameQuery(left, right) {
 router.beforeEach(async (to, from, next) => {
   if (to.fullPath !== from.fullPath) {
     showRouteLoading()
+  }
+
+  if (to.path === '/villagesML' || to.path.startsWith('/villagesML/')) {
+    const villagesMLRedirect = buildVillagesMLRedirect(to)
+    if (villagesMLRedirect) {
+      return next(villagesMLRedirect)
+    }
+    setCurrentVillagesMLDatasetFromRoute(to)
   }
 
   const routeLocale = to.params.locale

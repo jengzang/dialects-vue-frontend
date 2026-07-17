@@ -20,8 +20,8 @@
         <p class="subsection-description">
           分析相鄰兩個語義類別的組合，顯示頻率、佔比和PMI關聯強度。
         </p>
-        <div class="controls">
-          <div class="input-group">
+        <div class="controls vml-control-surface vml-control-row">
+          <div class="input-group vml-control-field">
             <label class="input-label">最小次數</label>
             <input
               v-model.number="bigramMinCount"
@@ -31,13 +31,15 @@
               class="vml-number-input"
             />
           </div>
-          <button
-            class="solid-button"
-            :disabled="loadingBigrams"
-            @click="loadBigrams"
-          >
-            查詢
-          </button>
+          <div class="vml-control-actions">
+            <button
+              class="solid-button"
+              :disabled="loadingBigrams"
+              @click="loadBigrams"
+            >
+              查詢
+            </button>
+          </div>
         </div>
 
         <div v-if="loadingBigrams" class="vml-loading">
@@ -65,8 +67,8 @@
         <p class="subsection-description">
           分析連續三個語義類別的組合模式，顯示頻率和佔比。
         </p>
-        <div class="controls">
-          <div class="input-group">
+        <div class="controls vml-control-surface vml-control-row">
+          <div class="input-group vml-control-field">
             <label class="input-label">最小次數</label>
             <input
               v-model.number="trigramMinCount"
@@ -76,13 +78,15 @@
               class="vml-number-input"
             />
           </div>
-          <button
-            class="solid-button"
-            :disabled="loadingTrigrams"
-            @click="loadTrigrams"
-          >
-            查詢
-          </button>
+          <div class="vml-control-actions">
+            <button
+              class="solid-button"
+              :disabled="loadingTrigrams"
+              @click="loadTrigrams"
+            >
+              查詢
+            </button>
+          </div>
         </div>
 
         <div v-if="loadingTrigrams" class="vml-loading">
@@ -112,8 +116,8 @@
       <p class="section-description">
         PMI 衡量兩個類別共現的關聯強度。PMI > 0 表示正相關（傾向共現），PMI &lt; 0 表示負相關（傾向不共現）。
       </p>
-      <div class="controls">
-        <div class="input-group">
+      <div class="controls vml-control-surface vml-control-row">
+        <div class="input-group vml-control-field">
           <label class="input-label">最小PMI值</label>
           <input
             v-model.number="minPMI"
@@ -124,7 +128,7 @@
           />
           <span class="input-hint">過濾PMI分數低於此值的組合</span>
         </div>
-        <div class="input-group">
+        <div class="input-group vml-control-field">
           <label class="input-label">返回數量</label>
           <input
             v-model.number="pmiTopN"
@@ -136,13 +140,15 @@
           />
           <span class="input-hint">返回前N個最高PMI的組合</span>
         </div>
-        <button
-          class="solid-button"
-          :disabled="loadingPMI"
-          @click="loadPMI"
-        >
-          查詢
-        </button>
+        <div class="vml-control-actions">
+          <button
+            class="solid-button"
+            :disabled="loadingPMI"
+            @click="loadPMI"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
       <div v-if="loadingPMI" class="vml-loading">
@@ -341,16 +347,11 @@ watch(detailMode, (val) => {
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
-  align-items: center;
-  flex-wrap: wrap;
 }
 
 .input-group {
-  @include flex-col;
-  gap: 4px;
+  min-width: 0;
 }
 
 .input-label {

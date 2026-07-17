@@ -1,7 +1,7 @@
 // api/villagesML/semantic.js
 // 語義網絡分析相關 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 獲取字共現矩陣
@@ -15,7 +15,7 @@ export async function getCooccurrence(params = {}) {
   if (params.min_cooccurrence) queryParams.append('min_cooccurrence', params.min_cooccurrence)
   if (params.alpha) queryParams.append('alpha', params.alpha)
 
-  return api(`/api/villages/compute/semantic/cooccurrence?${queryParams.toString()}`, {
+  return villagesMLApi(`/compute/semantic/cooccurrence?${queryParams.toString()}`, {
     timeout: 60000  // 60秒超時
   })
 }
@@ -33,7 +33,7 @@ export async function getCooccurrence(params = {}) {
  * @returns {Promise<Object>} { nodes: [], edges: [], communities: [] }
  */
 export async function getSemanticNetwork(params = {}) {
-  return api('/api/villages/compute/semantic/network', {
+  return villagesMLApi('/compute/semantic/network', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -58,5 +58,5 @@ export async function getSemanticNetwork(params = {}) {
  * @returns {Promise<Object>} { status: string, progress: number, result: Object }
  */
 export async function getSemanticNetworkStatus(taskId) {
-  return api(`/api/villages/compute/semantic/network/status/${taskId}`)
+  return villagesMLApi(`/compute/semantic/network/status/${taskId}`)
 }

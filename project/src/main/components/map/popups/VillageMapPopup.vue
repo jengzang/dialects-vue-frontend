@@ -107,27 +107,27 @@ const colorPalette = [
   "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
   "#911eb4", "#42d4f4", "#f032e6", "#bfe745", "#fabed4",
   "#469990", "#dcbaff", "#9a6324", "#fffac8", "#800000",
-  "var(--color-success)", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
+  "#34c759", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
 ]
 
 const tagPastelPalette = [
-  '#e3f2fd', 'var(--bg-error-light)', '#e8f5e9', '#fff3e0', '#f3e5f5',
-  '#e0f7fa', 'var(--bg-error-light)', '#e8eaf6', '#f1f8e9', '#fff8e1',
+  '#e3f2fd', '#fde4ec', '#e8f5e9', '#fff3e0', '#f3e5f5',
+  '#e0f7fa', '#fde4ec', '#e8eaf6', '#f1f8e9', '#fff8e1',
   '#ede7f6', '#e1f5fe', '#f9fbe7', '#efebe9', '#e0f2f1'
 ]
 const getTagColor = (text) => {
-  if (!text) return 'var(--bg-light)'
+  if (!text) return '#f0f0f0'
   let hash = 0
   for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0
   return tagPastelPalette[Math.abs(hash) % tagPastelPalette.length]
 }
 
 const buildTag = (text, bgColor) =>
-  `<span style="display:inline-block;padding:1px 8px;border-radius: var(--radius-md);font-size:10px;font-weight:500;color:var(--text-medium);background:${bgColor};margin-top:2px">${text}</span>`
+  `<span style="display:inline-block;padding:1px 8px;border-radius:12px;font-size:10px;font-weight:500;color:#555;background:${bgColor};margin-top:2px">${text}</span>`
 
 const buildHoverHtml = (name, pathStr, tagText, tagColor) => {
   let html = `<div style="text-align:center"><strong>${name}</strong></div>`
-  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:var(--text-lightest);margin-top:2px">${pathStr}</div>`
+  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:#999;margin-top:2px">${pathStr}</div>`
   if (tagText) html += `<div style="text-align:center">${buildTag(tagText, tagColor)}</div>`
   return html
 }
@@ -310,9 +310,9 @@ const renderMarkers = () => {
     features: villagesToRender.map(village => {
       const label = displayMode.value === 'name' ? village.name : village.dialect
       const bgColor = displayMode.value === 'dialect'
-        ? (dialectColorMap[village.dialect] || 'var(--color-dark-teal)')
-        : 'var(--color-dark-teal)'
-      const textColor = displayMode.value === 'dialect' ? '#000000' : 'var(--color-cyan)'
+        ? (dialectColorMap[village.dialect] || '#1b2e2b')
+        : '#1b2e2b'
+      const textColor = displayMode.value === 'dialect' ? '#000000' : '#5ac8fa'
 
       return {
         type: 'Feature',
@@ -411,7 +411,7 @@ const renderWithClustering = (geojsonData) => {
       'circle-color': ['get', 'bgColor'],
       'circle-opacity': 0.9,
       'circle-stroke-width': 1.5,
-      'circle-stroke-color': 'var(--glass-80)'
+      'circle-stroke-color': 'rgba(255,255,255,0.80)'
     }
   })
 
@@ -461,7 +461,7 @@ const renderWithoutClustering = (geojsonData) => {
       const el = document.createElement('div')
       el.className = 'marker-text-feature'
       el.innerText = dialect
-      el.style.backgroundColor = dialectColorMap[dialect] || 'var(--color-dark-teal)'
+      el.style.backgroundColor = dialectColorMap[dialect] || '#1b2e2b'
 
       // 创建 Marker
       const marker = new maplibregl.Marker({ element: el, anchor: 'center' })

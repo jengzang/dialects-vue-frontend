@@ -109,7 +109,7 @@
             />
           </div>
           <div class="custom-color-picker">
-            <span>{{ $t('auth.profile.avatar.customColorLabel') }}</span>
+            <span>{{ $t('auth.profile.avatar.textColorCustom') }}</span>
             <input v-model="avatarConfig.bgColor" type="color" />
           </div>
         </div>
@@ -166,21 +166,15 @@
           <label class="control-label">{{ $t('auth.profile.avatar.textColorLabel') }}</label>
           <div class="text-color-pickers">
             <button
+              v-for="color in presetTextColors"
+              :key="color"
               type="button"
-              class="text-color-btn text-white"
-              :class="{ active: avatarConfig.textColor === 'var(--text-white)' }"
-              @click="avatarConfig.textColor = 'var(--text-white)'"
-            >
-              {{ $t('auth.profile.avatar.textColorWhite') }}
-            </button>
-            <button
-              type="button"
-              class="text-color-btn text-black"
-              :class="{ active: avatarConfig.textColor === 'var(--text-primary)' }"
-              @click="avatarConfig.textColor = 'var(--text-primary)'"
-            >
-              {{ $t('auth.profile.avatar.textColorBlack') }}
-            </button>
+              class="color-dot"
+              :style="{ backgroundColor: color }"
+              :class="{ active: avatarConfig.textColor === color }"
+              @click="avatarConfig.textColor = color"
+            />
+
             <div class="custom-text-color">
               <span>{{ $t('auth.profile.avatar.textColorCustom') }}</span>
               <input v-model="avatarConfig.textColor" type="color" />
@@ -241,14 +235,22 @@ let backupConfig = null;
 let isSaved = false;
 
 const presetSolids = [
-  'var(--color-primary)', // Apple Blue
-  'var(--color-success)', // Apple Green
-  'var(--color-warning)', // Apple Orange
-  '#ff2d55', // Apple Pink/Red
-  'var(--color-purple-light)', // Apple Purple
-  'var(--color-purple)', // Apple Indigo
+  '#007aff', // Apple Blue
+  '#34c759', // Apple Green
+  '#ff9500', // Apple Orange
+  '#ff2d55', // Apple Pink
+  '#af52de', // Apple Purple
+  '#5856d6', // Apple Indigo
   '#ffcc00', // Apple Yellow
-  'var(--text-secondary)', // Apple Gray
+  '#8e8e93', // Apple Gray
+];
+
+const presetTextColors = [
+  '#ffffff',
+  '#000000',
+  '#0051d5',
+  '#1b5e20',
+  '#6e00ff',
 ];
 
 const presetGradients = [
@@ -616,6 +618,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   font-size: 15px;
   font-weight: 500;
   background: var(--glass-80);
+  color: var(--color-primary-hover);
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: $radius-lg;
   outline: none;
@@ -655,7 +658,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
   &.active {
-    color: $white;
+    color: var(--action-primary-text);
     background: $primary-blue;
     border-color: $primary-blue;
     box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.25);
@@ -805,6 +808,12 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   gap: 10px;
   align-items: center;
   width: 100%;
+
+  .color-dot {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+  }
 }
 
 .text-color-btn {
@@ -868,7 +877,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
   &.save-btn {
-    color: $white;
+    color: var(--action-primary-text);
     background: $primary-blue;
     box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
 

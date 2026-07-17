@@ -141,7 +141,7 @@ $primary-blue-dark: var(--color-primary-hover);
 $success-green: var(--color-success);
 $title-color: var(--text-primary);
 $error-color: red;
-$white: var(--text-white);
+$white: var(--action-primary-text);
 $transition-fast: 0.2s;
 $transition-medium: 0.3s;
 $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);

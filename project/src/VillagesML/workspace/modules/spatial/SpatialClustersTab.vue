@@ -6,8 +6,8 @@
     </h2>
 
     <!-- Run 選擇器 -->
-    <div class="cluster-controls">
-      <div class="run-selector" v-if="availableRuns.length">
+    <div class="cluster-controls vml-control-surface vml-control-row">
+      <div class="run-selector vml-control-field" v-if="availableRuns.length">
         <label>聚類方案</label>
         <SimpleSelectDropdown :match-trigger-width="true"
           v-model="selectedRunId"
@@ -17,7 +17,7 @@
     </div>
 
     <!-- Clusters 地圖 -->
-    <div v-if="loading" class="vml-loading"">
+    <div v-if="loading" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>加載中...</p>
     </div>
@@ -168,9 +168,9 @@ watch(selectedRunId, (newRunId) => {
 h2, h3 { font-size: 24px; margin-bottom: 16px; color: var(--text-primary); font-weight: 600; }
 h3 { font-size: 16px; margin-top: 20px; }
 
-.cluster-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content:center;margin-bottom: 16px; }
+.cluster-controls { justify-content: center; margin-bottom: 16px; width: 100%; }
 
-.run-selector { display: flex; flex-direction: column; gap: 4px; }
+.run-selector { min-width: 0; }
 .run-selector label { font-size: 12px; color: var(--text-secondary); }
 .run-select {
   padding: 8px 12px; border-radius: var(--radius-sm2); font-size: 13px;
