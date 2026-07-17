@@ -928,6 +928,7 @@ const consumeVillageVoronoiPayload = async (payload) => {
   voronoiPreviewType.value = ''
   voronoiPreviewLayers.value = []
 
+  isDrawingPanelOpen.value = false
   isVoronoiPanelOpen.value = true
   setVoronoiStatus('pointsLoaded', { count: voronoiPartitionPoints.value.length })
 

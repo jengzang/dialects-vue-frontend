@@ -630,6 +630,7 @@
       "visible": "顯示圖層",
       "locked": "鎖定圖層",
       "basemap": "底圖",
+      "viewSettings": "視圖設定",
       "localDraftSelection": "選擇本地草稿",
       "localDraftName": "草稿名稱",
       "localDraftNamePlaceholder": "請輸入草稿名稱"

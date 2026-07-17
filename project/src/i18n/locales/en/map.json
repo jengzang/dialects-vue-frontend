@@ -630,6 +630,7 @@
       "visible": "Show Layer",
       "locked": "Lock Layer",
       "basemap": "Basemap",
+      "viewSettings": "View Settings",
       "localDraftSelection": "Select Local Draft",
       "localDraftName": "Draft Name",
       "localDraftNamePlaceholder": "Enter a draft name"

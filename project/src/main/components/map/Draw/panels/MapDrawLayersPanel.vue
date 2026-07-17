@@ -65,7 +65,7 @@
                   class="main-glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
-                  title="置顶"
+                  :title="t('map.drawTab.buttons.bringToFront')"
                   @click.stop="$emit('move-layer-to-top', layer.id)"
                 >
                   ⤒
@@ -74,7 +74,7 @@
                   class="main-glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
-                  title="上移"
+                  :title="t('map.drawTab.buttons.moveLayerUp')"
                   @click.stop="$emit('move-layer', layer.id, -1)"
                 >
                   ↑
@@ -83,7 +83,7 @@
                   class="main-glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
-                  title="下移"
+                  :title="t('map.drawTab.buttons.moveLayerDown')"
                   @click.stop="$emit('move-layer', layer.id, 1)"
                 >
                   ↓
@@ -92,7 +92,7 @@
                   class="main-glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
-                  title="置底"
+                  :title="t('map.drawTab.buttons.sendToBack')"
                   @click.stop="$emit('move-layer-to-bottom', layer.id)"
                 >
                   ⤓
@@ -103,7 +103,7 @@
                   type="button"
                   @click.stop="$emit('toggle-layer-visibility', layer.id)"
                 >
-                  {{ layer.visible ? '隐藏' : '显示' }}
+                  {{ layer.visible ? t('map.drawTab.buttons.hideLayer') : t('map.drawTab.buttons.showLayer') }}
                 </button>
                 <button
                   class="main-glass-button draw-layer-chip-action"
@@ -111,7 +111,7 @@
                   type="button"
                   @click.stop="$emit('toggle-layer-lock', layer.id)"
                 >
-                  {{ layer.locked ? '解锁' : '锁定' }}
+                  {{ layer.locked ? t('map.drawTab.buttons.unlockLayer') : t('map.drawTab.buttons.lockLayer') }}
                 </button>
                 <button
                   class="main-glass-button draw-layer-chip-action"
@@ -119,7 +119,7 @@
                   type="button"
                   @click.stop="$emit('delete-layer', layer.id)"
                 >
-                  删除
+                  {{ t('map.drawTab.buttons.deleteLayer') }}
                 </button>
               </div>
             </div>
@@ -134,7 +134,7 @@
 
         <section class="draw-tool-section">
           <div class="draw-tool-section-title">
-            视图设置
+            {{ t('map.drawTab.labels.viewSettings') }}
           </div>
           <div class="draw-basemap-select">
             <span class="draw-field-label">{{ t('map.drawTab.labels.basemap') }}</span>
