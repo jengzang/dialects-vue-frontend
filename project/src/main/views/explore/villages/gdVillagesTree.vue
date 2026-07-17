@@ -576,7 +576,7 @@ $error-red: var(--color-error);
 $text-primary: var(--text-primary);
 $text-secondary: var(--text-secondary);
 $text-muted: var(--text-secondary);
-$white: var(--text-white);
+$white: var(--action-primary-text);
 
 $transition-fast: 0.2s;
 $transition-base: 0.3s;
@@ -645,22 +645,6 @@ $transition-base: 0.3s;
   left: 14px;
   font-size: 16px;
   opacity: 0.5;
-}
-
-.glass-input {
-  width: 100%;
-  padding: 12px 18px 12px 42px;
-  font-size: 15px;
-  background: rgba(0, 0, 0, 0.05);
-  border: none;
-  border-radius: 15px;
-  outline: none;
-  transition: all $transition-base;
-
-  &:focus {
-    background: var(--glass-80);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3);
-  }
 }
 
 /* Content Area */
