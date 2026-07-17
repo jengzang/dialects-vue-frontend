@@ -412,7 +412,8 @@
     "buttons": {
       "reset": "復位",
       "fullscreen": "全屏",
-      "exitFullscreen": "退出全屏"
+      "exitFullscreen": "退出全屏",
+      "voronoi": "泰森多邊形"
     }
   },
   "allVillagesMapPopup": {
@@ -517,8 +518,14 @@
     },
     "voronoi": {
       "panelHint": "基於地點分區資料計算泰森多邊形，可預覽或導出為面圖層。",
+      "learnMore": "瞭解泰森多邊形 →",
       "summaryTitle": "資料概覽",
       "settingsTitle": "計算設定",
+      "fieldMergeTitle": "合併欄位",
+      "fieldMergeOpenButton": "編輯合併欄位",
+      "fieldMergeReset": "重設合併",
+      "expandRatio": "延伸比例: {ratio}%",
+      "enableExpand": "啟用圓形延伸裁剪",
       "dataSourceTitle": "資料來源",
       "actionsTitle": "操作",
       "totalPoints": "全部點位",
@@ -625,6 +632,7 @@
       "visible": "顯示圖層",
       "locked": "鎖定圖層",
       "basemap": "底圖",
+      "viewSettings": "視圖設定",
       "localDraftSelection": "選擇本地草稿",
       "localDraftName": "草稿名稱",
       "localDraftNamePlaceholder": "請輸入草稿名稱"

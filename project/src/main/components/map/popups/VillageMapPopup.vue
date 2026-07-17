@@ -50,6 +50,14 @@
             <button class="control-btn" @click="resetView">🎯 {{ t('map.villageMapPopup.buttons.reset') }}</button>
             <button class="control-btn" @click="toggleFullscreen">⛶ {{ t('map.villageMapPopup.buttons.fullscreen') }}</button>
           </div>
+
+          <button
+            v-if="hasDialectData"
+            class="control-btn control-btn-full"
+            @click="navigateToVoronoi"
+          >
+            ⬡ {{ t('map.villageMapPopup.buttons.voronoi') }}
+          </button>
         </div>
 
         <button v-if="isFullscreen" class="exit-fullscreen-btn" @click="toggleFullscreen">
@@ -63,9 +71,13 @@
 <script setup>
 import { ref, computed, watch, shallowRef, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter, useRoute } from 'vue-router'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle, mapStyleConfig, calculateDenseMapCenterAndZoom } from '@/utils/map/MapSource.js'
+import { buildVillagePartitionPoints } from '@/main/utils/drawMap/partitionVoronoi.js'
+import { globalPayload } from '@/main/store/store.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import AppModal from '@/components/common/AppModal.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 
@@ -83,6 +95,8 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 const { t } = useI18n()
+const router = useRouter()
+const route = useRoute()
 
 // 状态管理
 const mapContainer = ref(null)
@@ -542,6 +556,24 @@ const handleClose = () => {
   emit('close')
 }
 
+// 导航到泰森多边形
+const navigateToVoronoi = () => {
+  if (!hasDialectData.value) return
+
+  const points = buildVillagePartitionPoints(validVillages.value)
+  if (points.length === 0) return
+
+  globalPayload.value = {
+    _type: 'villageVoronoi',
+    points,
+    label: t('map.villageMapPopup.title'),
+    timestamp: Date.now(),
+  }
+
+  emit('close')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/map/draw'))
+}
+
 // 键盘支持
 const handleKeydown = (e) => {
   if (e.key === 'Escape' && props.visible) {
@@ -705,6 +737,11 @@ $success: var(--color-success);/* 地图容器 */
 .control-btn {
   flex: 1;
   padding: 8px 12px;
+
+  &-full {
+    flex: none;
+    width: 100%;
+  }
   background: var(--action-primary-bg);
   border: none;
   border-radius: var(--radius-sm2);

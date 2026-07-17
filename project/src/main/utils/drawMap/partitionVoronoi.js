@@ -1,4 +1,4 @@
-import { bbox, featureCollection, point, polygon, union } from '@turf/turf'
+import { bbox, booleanIntersects, buffer, featureCollection, intersect, point, polygon, union } from '@turf/turf'
 import { Delaunay } from 'd3-delaunay'
 
 const FIELD_KEYS = {
@@ -108,6 +108,31 @@ export function buildPartitionPoints(rows, options = {}) {
     .filter((item) => item && !ignoredLocations.has(item.name))
 }
 
+export function buildVillagePartitionPoints(villages) {
+  return (Array.isArray(villages) ? villages : [])
+    .filter(v => {
+      if (!v || !v.name) return false
+      if (!v.dialect || String(v.dialect).trim() === '') return false
+      if (typeof v.longitude !== 'number' || typeof v.latitude !== 'number') return false
+      if (Math.abs(v.longitude) > 180 || Math.abs(v.latitude) > 90) return false
+      return true
+    })
+    .map(v => {
+      const dialect = String(v.dialect).trim()
+      const partitionParts = normalizePartitionParts(dialect)
+      return {
+        name: String(v.name).trim(),
+        coordinate: [v.longitude, v.latitude],
+        partitionMode: 'village',
+        partitionLevel1: getPartitionKeyFromParts(partitionParts, 1),
+        partitionLevel2: getPartitionKeyFromParts(partitionParts, 2),
+        partitionLevel3: getPartitionKeyFromParts(partitionParts, 3),
+        rawPartitionPath: dialect,
+        raw: { name: v.name, dialect, _path: v._path },
+      }
+    })
+}
+
 export function buildPartitionPointFeatureCollection(points, level = 3, colorMap = {}) {
   return featureCollection(
     (Array.isArray(points) ? points : []).map((item) => {
@@ -162,11 +187,18 @@ function getSafeBbox(featureCollectionValue) {
   const [minLng, minLat, maxLng, maxLat] = bbox(featureCollectionValue)
   const lngPadding = minLng === maxLng ? 0.01 : 0
   const latPadding = minLat === maxLat ? 0.01 : 0
+
+  // 大幅扩展包围盒，给 d3-delaunay 足够空间让外圈 cells 自然延伸，
+  // 后续由逐点圆形裁剪决定最终外边界
+  const padRatio = 1.0
+  const halfLng = (maxLng - minLng) / 2
+  const halfLat = (maxLat - minLat) / 2
+
   return [
-    minLng - lngPadding,
-    minLat - latPadding,
-    maxLng + lngPadding,
-    maxLat + latPadding,
+    minLng - lngPadding - halfLng * padRatio,
+    minLat - latPadding - halfLat * padRatio,
+    maxLng + lngPadding + halfLng * padRatio,
+    maxLat + latPadding + halfLat * padRatio,
   ]
 }
 
@@ -229,7 +261,37 @@ function isValidVoronoiRing(coords) {
       && Number.isFinite(Number(coordinate[1])))
 }
 
-function buildSafeVoronoiFeatureCollection(pointCollection) {
+function convexHull(points) {
+  const sorted = [...points].sort((a, b) => (a[0] === b[0] ? a[1] - b[1] : a[0] - b[0]))
+  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+  const lower = []
+  for (const p of sorted) {
+    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop()
+    lower.push(p)
+  }
+  const upper = []
+  for (let i = sorted.length - 1; i >= 0; i -= 1) {
+    const p = sorted[i]
+    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop()
+    upper.push(p)
+  }
+  lower.pop()
+  upper.pop()
+  return lower.concat(upper)
+}
+
+function createCirclePolygon(center, radius) {
+  const n = 12
+  const ring = []
+  for (let i = 0; i < n; i += 1) {
+    const a = (i / n) * 2 * Math.PI
+    ring.push([center[0] + radius * Math.cos(a), center[1] + radius * Math.sin(a)])
+  }
+  ring.push(ring[0])
+  return polygon([ring])
+}
+
+function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) {
   const originalFeatures = pointCollection?.features ?? []
   const validFeatures = []
   const filteredFeatures = []
@@ -258,9 +320,10 @@ function buildSafeVoronoiFeatureCollection(pointCollection) {
   const safeBbox = getSafeBbox(featureCollection(validFeatures))
   const skippedCells = []
 
+  let delaunay = null
   let voronoiDiagram = null
   try {
-    const delaunay = Delaunay.from(validFeatures, (feature) => getPointCoordinate(feature)[0], (feature) => getPointCoordinate(feature)[1])
+    delaunay = Delaunay.from(validFeatures, (feature) => getPointCoordinate(feature)[0], (feature) => getPointCoordinate(feature)[1])
     voronoiDiagram = delaunay.voronoi(safeBbox)
   } catch (error) {
     console.error('[partitionVoronoi] d3-delaunay voronoi failed', {
@@ -280,7 +343,10 @@ function buildSafeVoronoiFeatureCollection(pointCollection) {
     throw error
   }
 
+  // 第一步：正常计算泰森多边形，同时记录每个 cell 离中心的最大距离
   const polygonFeatures = []
+  const cellMaxDists = []
+  const neighborDists = []
   for (let index = 0; index < validFeatures.length; index += 1) {
     const coords = voronoiDiagram?.cellPolygon(index)
     const sourceFeature = validFeatures[index]
@@ -295,14 +361,168 @@ function buildSafeVoronoiFeatureCollection(pointCollection) {
       continue
     }
 
-    polygonFeatures.push(polygon([[...coords, coords[0]]], sourceFeature?.properties ?? {}))
+    polygonFeatures.push(polygon([coords], sourceFeature?.properties ?? {}))
+
+    // 计算 cell 到中心的最大距离（用于预过滤）和邻居距离（用于计算半径）
+    const pi = getPointCoordinate(sourceFeature)
+    let maxDist = 0
+    for (let ci = 0; ci < coords.length; ci += 1) {
+      const d = Math.hypot(coords[ci][0] - pi[0], coords[ci][1] - pi[1])
+      if (d > maxDist) maxDist = d
+    }
+    cellMaxDists.push(maxDist)
+
+    const dists = []
+    for (const j of delaunay.neighbors(index)) {
+      const pj = getPointCoordinate(validFeatures[j])
+      dists.push(Math.hypot(pi[0] - pj[0], pi[1] - pj[1]))
+    }
+    neighborDists.push(dists.length ? dists.sort((a, b) => a - b)[Math.floor(dists.length / 2)] : 0)
   }
+
+  // 未启用延伸 → 跳过裁剪，直接返回
+  if (expandFactor < 0) {
+    logVoronoiDiagnostics(featureCollection(validFeatures), [
+      ...filteredFeatures.map((item) => ({ ...item, reason: 'invalid-point-feature' })),
+      ...skippedCells,
+    ])
+    return featureCollection(polygonFeatures)
+  }
+
+  // 第二步：用连通分量构建裁剪边界
+  const globalMedian = (() => {
+    const sorted = neighborDists.filter((d) => d > 0).sort((a, b) => a - b)
+    if (!sorted.length) return 0.1
+    const mid = Math.floor(sorted.length / 2)
+    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2
+  })()
+
+  const radius = globalMedian * (0.05 + expandFactor * 8) * 2
+
+  // BFS 找连通分量（Delaunay 边 < 2*radius 的视为连通）
+  const n = validFeatures.length
+  const compVisited = new Uint8Array(n)
+  const components = []
+
+  for (let i = 0; i < n; i += 1) {
+    if (compVisited[i]) continue
+    const comp = []
+    const queue = [i]
+    compVisited[i] = 1
+    while (queue.length > 0) {
+      const idx = queue.shift()
+      comp.push(idx)
+      const pi = getPointCoordinate(validFeatures[idx])
+      if (!pi) continue
+      for (const j of delaunay.neighbors(idx)) {
+        if (compVisited[j]) continue
+        const pj = getPointCoordinate(validFeatures[j])
+        if (!pj) continue
+        if (Math.hypot(pi[0] - pj[0], pi[1] - pj[1]) < 2 * radius) {
+          compVisited[j] = 1
+          queue.push(j)
+        }
+      }
+    }
+    components.push(comp)
+  }
+
+  // 对每个分量：大分量 buffer(凸包)，小分量 union(圆)
+  const boundaries = []
+  for (const comp of components) {
+    if (comp.length < 3) {
+      for (const i of comp) {
+        const pi = getPointCoordinate(validFeatures[i])
+        if (pi) boundaries.push(createCirclePolygon(pi, radius))
+      }
+    } else if (comp.length <= 30) {
+      const compCircles = comp
+        .map((i) => {
+          const pi = getPointCoordinate(validFeatures[i])
+          return pi ? createCirclePolygon(pi, radius) : null
+        })
+        .filter(Boolean)
+      if (compCircles.length > 0) {
+        try {
+          const merged = union(featureCollection(compCircles))
+          if (merged) boundaries.push(merged)
+        } catch {
+          boundaries.push(...compCircles)
+        }
+      }
+    } else {
+      const compPoints = comp.map((i) => getPointCoordinate(validFeatures[i])).filter(Boolean)
+      const hull = convexHull(compPoints)
+      if (hull.length >= 3) {
+        const hullRing = [...hull, hull[0]]
+        try {
+          const buf = buffer(polygon([hullRing]), radius, { units: 'degrees' })
+          if (buf) boundaries.push(buf)
+        } catch {
+          // fallback: use circles
+          for (const p of hull) boundaries.push(createCirclePolygon(p, radius))
+        }
+      }
+    }
+  }
+
+  let clipBoundary = null
+  if (boundaries.length === 1) {
+    clipBoundary = boundaries[0]
+  } else if (boundaries.length > 1) {
+    try {
+      clipBoundary = union(featureCollection(boundaries))
+    } catch {
+      clipBoundary = featureCollection(boundaries)
+    }
+  }
+
+  // 第三步：用并集边界裁剪
+  let statInside = 0
+  let statNoIntersect = 0
+  let statIntersected = 0
+  let statFailed = 0
+  const clippedFeatures = clipBoundary
+    ? polygonFeatures
+      .map((cell, i) => {
+        // cell 完全在自己的圆内 → 一定在 union 里
+        if (cellMaxDists[i] <= radius) {
+          statInside += 1
+          return cell
+        }
+        if (!booleanIntersects(cell, clipBoundary)) {
+          statNoIntersect += 1
+          return cell
+        }
+        try {
+          const clipped = intersect(featureCollection([cell, clipBoundary]))
+          if (clipped) {
+            clipped.properties = cell.properties ?? {}
+            statIntersected += 1
+            return clipped
+          }
+        } catch { /* fall through */ }
+        statFailed += 1
+        return cell
+      })
+    : polygonFeatures
+
+  const compSizes = components.map((c) => c.length).sort((a, b) => b - a)
+  console.log('[partitionVoronoi] component clip', {
+    totalCells: polygonFeatures.length,
+    components: compSizes.length,
+    compSizes: compSizes.slice(0, 5),
+    boundaries: boundaries.length,
+    radius,
+    expandFactor,
+    clipStats: `${statInside} inside, ${statNoIntersect} noIntersect, ${statIntersected} intersected, ${statFailed} failed`,
+  })
 
   logVoronoiDiagnostics(featureCollection(validFeatures), [
     ...filteredFeatures.map((item) => ({ ...item, reason: 'invalid-point-feature' })),
     ...skippedCells,
   ])
-  return featureCollection(polygonFeatures)
+  return featureCollection(clippedFeatures)
 }
 
 function mergePartitionCellFeatures(cellFeatures, partitionKey, level, groupPoints, style = {}) {
@@ -328,14 +548,14 @@ function mergePartitionCellFeatures(cellFeatures, partitionKey, level, groupPoin
   }
 }
 
-export function calculatePartitionVoronoi(points, level = 3, colorMap = {}) {
+export function calculatePartitionVoronoi(points, level = 3, colorMap = {}, expandRatio = 30) {
   const groups = groupPartitionPoints(points, level)
   const groupResults = {}
   const cellFeatures = []
   const partitionFeatures = []
   const pointCollection = buildPartitionPointFeatureCollection(points, level, colorMap)
   const polygonCollection = pointCollection.features.length >= 2
-    ? buildSafeVoronoiFeatureCollection(pointCollection)
+    ? buildSafeVoronoiFeatureCollection(pointCollection, (expandRatio ?? 30) / 100)
     : featureCollection([])
 
   ;(polygonCollection?.features ?? [])

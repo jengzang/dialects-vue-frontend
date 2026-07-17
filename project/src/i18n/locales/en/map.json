@@ -412,7 +412,8 @@
     "buttons": {
       "reset": "Reset",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit Fullscreen"
+      "exitFullscreen": "Exit Fullscreen",
+      "voronoi": "Thiessen Polygons"
     }
   },
   "allVillagesMapPopup": {
@@ -517,8 +518,14 @@
     },
     "voronoi": {
       "panelHint": "Calculate Voronoi polygons from location-region data, then preview them or export them as polygon layers.",
+      "learnMore": "Learn about Voronoi diagrams →",
       "summaryTitle": "Data Summary",
       "settingsTitle": "Calculation Settings",
+      "fieldMergeTitle": "Merge Fields",
+      "fieldMergeOpenButton": "Edit Merge Fields",
+      "fieldMergeReset": "Reset Merges",
+      "expandRatio": "Expand: {ratio}%",
+      "enableExpand": "Enable Circular Extension",
       "dataSourceTitle": "Data Sources",
       "actionsTitle": "Actions",
       "totalPoints": "Total Points",
@@ -625,6 +632,7 @@
       "visible": "Show Layer",
       "locked": "Lock Layer",
       "basemap": "Basemap",
+      "viewSettings": "View Settings",
       "localDraftSelection": "Select Local Draft",
       "localDraftName": "Draft Name",
       "localDraftNamePlaceholder": "Enter a draft name"
