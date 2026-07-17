@@ -523,7 +523,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { featureCollection } from '@turf/turf';
 
@@ -1156,6 +1156,7 @@ const handleBuildVoronoi = async ({ force = false } = {}) => {
     return;
   }
   isVoronoiCalculating.value = true;
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
   try {
     await ensureVoronoiPointsLoaded();

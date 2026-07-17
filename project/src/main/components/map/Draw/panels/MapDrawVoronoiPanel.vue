@@ -195,6 +195,18 @@
             {{ statusText }}
           </div>
         </section>
+        <Transition name="fade">
+          <div
+            v-if="isCalculating"
+            class="voronoi-calc-overlay"
+          >
+            <div
+              class="ui-loading--page"
+              aria-hidden="true"
+            />
+            <span class="voronoi-calc-overlay-text">{{ t('map.drawTab.buttons.voronoiRunning') }}</span>
+          </div>
+        </Transition>
       </div>
     </aside>
   </Transition>
@@ -338,6 +350,30 @@ const offsetClass = computed(() => {
 .expand-ratio-slider {
   flex: 1;
   accent-color: var(--color-primary);
+}
+
+.draw-tool-panel-body {
+  position: relative;
+}
+
+.voronoi-calc-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: rgba(var(--glass-50-rgb), 0.85);
+  backdrop-filter: blur(4px);
+  border-radius: inherit;
+  z-index: 10;
+
+  .voronoi-calc-overlay-text {
+    font-size: 0.95rem;
+    color: var(--color-primary);
+    font-weight: 600;
+  }
 }
 
 @media (max-width: 900px) {

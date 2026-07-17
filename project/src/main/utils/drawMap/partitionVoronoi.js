@@ -1,4 +1,4 @@
-import { bbox, featureCollection, point, polygon, union } from '@turf/turf'
+import { bbox, featureCollection, intersect, point, polygon, union } from '@turf/turf'
 import { Delaunay } from 'd3-delaunay'
 
 const FIELD_KEYS = {
@@ -261,7 +261,18 @@ function isValidVoronoiRing(coords) {
       && Number.isFinite(Number(coordinate[1])))
 }
 
-function buildSafeVoronoiFeatureCollection(pointCollection, _expandFactor = 0.3) {
+function createCirclePolygon(center, radius) {
+  const n = 24
+  const ring = []
+  for (let i = 0; i < n; i += 1) {
+    const a = (i / n) * 2 * Math.PI
+    ring.push([center[0] + radius * Math.cos(a), center[1] + radius * Math.sin(a)])
+  }
+  ring.push(ring[0])
+  return polygon([ring])
+}
+
+function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) {
   const originalFeatures = pointCollection?.features ?? []
   const validFeatures = []
   const filteredFeatures = []
@@ -290,9 +301,10 @@ function buildSafeVoronoiFeatureCollection(pointCollection, _expandFactor = 0.3)
   const safeBbox = getSafeBbox(featureCollection(validFeatures))
   const skippedCells = []
 
+  let delaunay = null
   let voronoiDiagram = null
   try {
-    const delaunay = Delaunay.from(validFeatures, (feature) => getPointCoordinate(feature)[0], (feature) => getPointCoordinate(feature)[1])
+    delaunay = Delaunay.from(validFeatures, (feature) => getPointCoordinate(feature)[0], (feature) => getPointCoordinate(feature)[1])
     voronoiDiagram = delaunay.voronoi(safeBbox)
   } catch (error) {
     console.error('[partitionVoronoi] d3-delaunay voronoi failed', {
@@ -312,7 +324,9 @@ function buildSafeVoronoiFeatureCollection(pointCollection, _expandFactor = 0.3)
     throw error
   }
 
+  // 第一步：正常计算泰森多边形
   const polygonFeatures = []
+  const neighborDists = []
   for (let index = 0; index < validFeatures.length; index += 1) {
     const coords = voronoiDiagram?.cellPolygon(index)
     const sourceFeature = validFeatures[index]
@@ -328,13 +342,82 @@ function buildSafeVoronoiFeatureCollection(pointCollection, _expandFactor = 0.3)
     }
 
     polygonFeatures.push(polygon([coords], sourceFeature?.properties ?? {}))
+
+    // 顺便收集每个点的邻居距离（用于计算统一半径）
+    const pi = getPointCoordinate(sourceFeature)
+    const dists = []
+    for (const j of delaunay.neighbors(index)) {
+      const pj = getPointCoordinate(validFeatures[j])
+      dists.push(Math.hypot(pi[0] - pj[0], pi[1] - pj[1]))
+    }
+    neighborDists.push(dists.length ? dists.sort((a, b) => a - b)[Math.floor(dists.length / 2)] : 0)
   }
+
+  // 第二步：所有点统一半径的圆形并集 → 裁剪边界
+  const hull = Array.from(delaunay.hull)
+  const hullCoords = hull.map((i) => getPointCoordinate(validFeatures[i]))
+
+  const globalMedian = (() => {
+    const sorted = neighborDists.filter((d) => d > 0).sort((a, b) => a - b)
+    if (!sorted.length) return 0.1
+    const mid = Math.floor(sorted.length / 2)
+    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2
+  })()
+
+  // 半径 = 全局中位邻居距离 × (0.5 + expandFactor × 3)
+  const radius = globalMedian * (0.5 + expandFactor * 3)
+
+  // 创建圆形：凸包顶点 + 沿凸包边填充（避免间隙）
+  const circles = []
+  for (const p of hullCoords) {
+    circles.push(createCirclePolygon(p, radius))
+  }
+  for (let i = 0; i < hullCoords.length; i += 1) {
+    const a = hullCoords[i]
+    const b = hullCoords[(i + 1) % hullCoords.length]
+    const dist = Math.hypot(b[0] - a[0], b[1] - a[1])
+    const steps = Math.floor(dist / Math.max(radius, 0.001))
+    for (let s = 1; s < steps; s += 1) {
+      const t = s / steps
+      circles.push(createCirclePolygon([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], radius))
+    }
+  }
+
+  // 并集
+  let clipBoundary = null
+  try {
+    clipBoundary = union(featureCollection(circles))
+  } catch (err) {
+    console.warn('[partitionVoronoi] circle union failed', err)
+  }
+
+  // 第三步：用并集裁剪每个泰森多边形 cell
+  const clippedFeatures = clipBoundary
+    ? polygonFeatures
+      .map((cell) => {
+        try {
+          const clipped = intersect(featureCollection([cell, clipBoundary]))
+          return clipped || cell
+        } catch {
+          return cell
+        }
+      })
+    : polygonFeatures
+
+  console.log('[partitionVoronoi] circle-union clip', {
+    totalCells: polygonFeatures.length,
+    hullPoints: hullCoords.length,
+    totalCircles: circles.length,
+    radius,
+    expandFactor,
+    globalMedian,
+  })
 
   logVoronoiDiagnostics(featureCollection(validFeatures), [
     ...filteredFeatures.map((item) => ({ ...item, reason: 'invalid-point-feature' })),
     ...skippedCells,
   ])
-  return featureCollection(polygonFeatures)
+  return featureCollection(clippedFeatures)
 }
 
 function mergePartitionCellFeatures(cellFeatures, partitionKey, level, groupPoints, style = {}) {
