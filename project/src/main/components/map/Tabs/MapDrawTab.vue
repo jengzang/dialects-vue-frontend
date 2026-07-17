@@ -795,7 +795,8 @@ const normalizeVoronoiLocationName = (value) => String(value || '').trim();
 
 const activeVoronoiPoints = computed(() => {
   const ignored = new Set(ignoredVoronoiLocations.value.map(normalizeVoronoiLocationName).filter(Boolean));
-  return voronoiPartitionPoints.value.filter((item) => !ignored.has(normalizeVoronoiLocationName(item.name)));
+  const filtered = voronoiPartitionPoints.value.filter((item) => !ignored.has(normalizeVoronoiLocationName(item.name)));
+  return applyFieldMerge(filtered);
 });
 
 const hasVoronoiCustomImport = computed(() => voronoiCustomImportRows.value.length > 0);
@@ -826,7 +827,7 @@ const voronoiPanelOffsetMode = computed(() => {
 });
 
 const voronoiSelectionOptions = computed(() => {
-  return buildVoronoiSelectionOptions(voronoiPartitionPoints.value, Number(voronoiRegionLevel.value) || 3);
+  return buildVoronoiSelectionOptions(applyFieldMerge(voronoiPartitionPoints.value), Number(voronoiRegionLevel.value) || 3);
 });
 
 const voronoiColorMap = computed(() => {
@@ -1154,8 +1155,7 @@ const handleBuildVoronoi = async ({ force = false } = {}) => {
   try {
     await ensureVoronoiPointsLoaded();
     const level = Number(voronoiRegionLevel.value) || 3;
-    const rawPoints = activeVoronoiPoints.value;
-    const points = applyFieldMerge(rawPoints);
+    const points = activeVoronoiPoints.value;
     console.log('[MapDrawTab] build voronoi input', {
       ignoredCount: ignoredVoronoiLocations.value.length,
       inputPointCount: points.length,
