@@ -1633,12 +1633,15 @@ $system-font:
   transition: all $transition-fast;
 
   &:hover:not(:disabled) {
-    background: var(--bg-white);
+    background: var(--color-primary-hover);
     transform: translateY(-1px);
   }
 
   &[data-size='compact'] {
     --main-glass-button-padding: 8px 6px;
+    &:hover:not(:disabled) {
+        background: var(--glass-30)
+    }
   }
 
   &[data-variant='primary'] {
@@ -1653,6 +1656,10 @@ $system-font:
       color: white;
       background: var(--color-warning);
       animation: pulse 2s ease-in-out infinite;
+    }
+
+    &:hover:not(:disabled) {
+       background : rgba(201, 149, 17, 0.937) 
     }
   }
 }
@@ -2736,8 +2743,12 @@ td {
   border: 1px solid rgba(108, 117, 125, 0.2);
 }
 
-.batch-replace-modal-footer .main-glass-button[data-variant='secondary']:hover:not(:disabled) {
+.batch-replace-modal-footer .main-glass-button[data-variant='secondary'] {
   background: rgba(108, 117, 125, 0.2);
+
+  &:hover:not(:disabled) {
+    background: var(--glass-50);
+  }
 }
 
 /* 响应式 */
