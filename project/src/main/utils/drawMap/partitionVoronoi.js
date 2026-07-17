@@ -187,11 +187,19 @@ function getSafeBbox(featureCollectionValue) {
   const [minLng, minLat, maxLng, maxLat] = bbox(featureCollectionValue)
   const lngPadding = minLng === maxLng ? 0.01 : 0
   const latPadding = minLat === maxLat ? 0.01 : 0
+
+  // 从中心向外扩展 30%，避免外圈 Voronoi cells 紧贴点集被矩形切断
+  const padRatio = 0.3
+  const centerLng = (minLng + maxLng) / 2
+  const centerLat = (minLat + maxLat) / 2
+  const halfLng = (maxLng - minLng) / 2
+  const halfLat = (maxLat - minLat) / 2
+
   return [
-    minLng - lngPadding,
-    minLat - latPadding,
-    maxLng + lngPadding,
-    maxLat + latPadding,
+    minLng - lngPadding - halfLng * padRatio,
+    minLat - latPadding - halfLat * padRatio,
+    maxLng + lngPadding + halfLng * padRatio,
+    maxLat + latPadding + halfLat * padRatio,
   ]
 }
 
