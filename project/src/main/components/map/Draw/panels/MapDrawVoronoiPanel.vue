@@ -72,7 +72,7 @@
           </div>
         </section>
 
-        <section class="draw-tool-section">
+        <section v-if="!isVillageDataSource" class="draw-tool-section">
           <div class="draw-tool-section-title">
             {{ t('map.drawTab.voronoi.settingsTitle') }}
           </div>
@@ -123,6 +123,15 @@
             {{ t('map.drawTab.voronoi.actionsTitle') }}
           </div>
           <div class="draw-tool-button-grid">
+            <button
+              v-if="hasFieldMerge"
+              class="main-glass-button"
+              data-variant="secondary"
+              type="button"
+              @click="$emit('open-field-merge')"
+            >
+              {{ t('map.drawTab.voronoi.fieldMergeOpenButton') }}
+            </button>
             <button
               class="main-glass-button"
               data-variant="secondary"
@@ -205,6 +214,8 @@ const props = defineProps({
   officialPointCount: { type: Number, default: 0 },
   customPointCount: { type: Number, default: 0 },
   customImportSummary: { type: String, default: '' },
+  isVillageDataSource: { type: Boolean, default: false },
+  hasFieldMerge: { type: Boolean, default: false },
 })
 
 defineEmits([
@@ -217,6 +228,7 @@ defineEmits([
   'preview-points',
   'export-layer',
   'calculate',
+  'open-field-merge',
 ])
 
 const { t } = useI18n()

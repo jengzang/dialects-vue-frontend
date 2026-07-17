@@ -163,6 +163,8 @@
           :official-point-count="voronoiOfficialPointCount"
           :custom-point-count="voronoiCustomPointCount"
           :custom-import-summary="voronoiCustomImportSummaryText"
+          :is-village-data-source="isVillageDataSource"
+          :has-field-merge="hasFieldMerge"
           @update:partition-mode="voronoiPartitionMode = $event"
           @update:region-level="voronoiRegionLevel = $event"
           @update:use-official-data="useVoronoiOfficialData = $event"
@@ -172,6 +174,7 @@
           @preview-points="previewVoronoiPoints"
           @export-layer="exportVoronoiToLayer"
           @calculate="handleBuildVoronoi"
+          @open-field-merge="showFieldMergeModal = true"
         />
       </div>
 
@@ -479,6 +482,13 @@
         @confirm="handleVoronoiIgnoreConfirm"
       />
 
+      <VoronoiFieldMergeModal
+        v-model="showFieldMergeModal"
+        :field-merge-entries="fieldMergeEntries"
+        @update:field-merge="updateFieldMerge"
+        @reset-field-merge="resetFieldMerge"
+      />
+
       <input
         ref="voronoiImportFileInputRef"
         class="draw-import-input"
@@ -511,7 +521,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { featureCollection } from '@turf/turf';
 
@@ -551,11 +561,13 @@ import MapDrawImageExportModal from '@/main/components/map/Draw/modals/MapDrawIm
 import MapDrawImagePreviewModal from '@/main/components/map/Draw/modals/MapDrawImagePreviewModal.vue';
 import VoronoiExportLayersModal from '@/main/components/map/Draw/modals/VoronoiExportLayersModal.vue';
 import VoronoiIgnorePointsModal from '@/main/components/map/Draw/modals/VoronoiIgnorePointsModal.vue';
+import VoronoiFieldMergeModal from '@/main/components/map/Draw/modals/VoronoiFieldMergeModal.vue';
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue';
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js';
 import { useVoronoiCustomImport } from '@/composables/import/useVoronoiCustomImport.js';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
 import AppModal from '@/components/common/AppModal.vue';
+import { globalPayload } from '@/main/store/store.js';
 
 const { t } = useI18n();
 const { requireAuth, isAuthenticated } = useAuthGuard();
@@ -713,10 +725,71 @@ const isVoronoiPanelOpen = ref(false);
 const isVoronoiLoadingPoints = ref(false);
 const isVoronoiCalculating = ref(false);
 const showVoronoiIgnoreModal = ref(false);
+const showFieldMergeModal = ref(false);
 const voronoiStatusText = ref('');
 const voronoiLastResult = ref(null);
 const voronoiExportProgress = ref({ current: 0, total: 0 });
 const showVoronoiExportProgressOverlay = computed(() => isVoronoiExporting.value && voronoiExportProgress.value.total > 0);
+
+const isVillageDataSource = computed(() => voronoiCustomImportMeta.value?.partitionMode === 'village');
+
+// 合并字段: partitionKey → groupName
+const voronoiFieldMergeMap = ref(new Map());
+
+const fieldMergeEntries = computed(() => {
+  const level = Number(voronoiRegionLevel.value) || 3
+  const keys = [...new Set(voronoiPartitionPoints.value.map(p => {
+    if (level === 1) return p.partitionLevel1
+    if (level === 2) return p.partitionLevel2
+    return p.partitionLevel3
+  }).filter(Boolean))]
+  return keys.sort((a, b) => String(a).localeCompare(String(b), 'zh-Hans-CN')).map(key => ({
+    original: key,
+    groupName: voronoiFieldMergeMap.value.get(key) ?? key,
+  }))
+})
+
+const hasFieldMerge = computed(() => fieldMergeEntries.value.length > 0)
+
+function initFieldMergeMap() {
+  const next = new Map()
+  const level = Number(voronoiRegionLevel.value) || 3
+  voronoiPartitionPoints.value.forEach(p => {
+    let key
+    if (level === 1) key = p.partitionLevel1
+    else if (level === 2) key = p.partitionLevel2
+    else key = p.partitionLevel3
+    if (key && !next.has(key)) next.set(key, key)
+  })
+  voronoiFieldMergeMap.value = next
+}
+
+function updateFieldMerge(original, groupName) {
+  const next = new Map(voronoiFieldMergeMap.value)
+  next.set(original, String(groupName ?? ''))
+  voronoiFieldMergeMap.value = next
+}
+
+function resetFieldMerge() {
+  initFieldMergeMap()
+}
+
+function applyFieldMerge(points) {
+  if (voronoiFieldMergeMap.value.size === 0) return points
+  const effective = (val) => (val != null && String(val).trim() !== '') ? val : undefined
+  return points.map(p => {
+    const group1 = effective(voronoiFieldMergeMap.value.get(p.partitionLevel1))
+    const group2 = effective(voronoiFieldMergeMap.value.get(p.partitionLevel2))
+    const group3 = effective(voronoiFieldMergeMap.value.get(p.partitionLevel3))
+    if (group1 === undefined && group2 === undefined && group3 === undefined) return p
+    return {
+      ...p,
+      partitionLevel1: group1 ?? p.partitionLevel1,
+      partitionLevel2: group2 ?? p.partitionLevel2,
+      partitionLevel3: group3 ?? p.partitionLevel3,
+    }
+  })
+}
 
 const normalizeVoronoiLocationName = (value) => String(value || '').trim();
 
@@ -825,6 +898,38 @@ const clearVoronoiCustomImport = () => {
   syncVoronoiPartitionPoints();
   clearVoronoiPreviewState();
   setVoronoiStatus('customImportCleared');
+};
+
+const consumeVillageVoronoiPayload = async (payload) => {
+  clearVoronoiCustomImport()
+
+  voronoiCustomImportRows.value = (payload.points || []).map((p, i) => ({
+    ...p,
+    source: 'village',
+    customRowId: `village-${i + 1}`,
+  }))
+  voronoiCustomImportMeta.value = {
+    partitionMode: 'village',
+    summary: {
+      totalRowCount: (payload.points || []).length,
+    },
+  }
+
+  syncVoronoiPartitionPoints()
+  initFieldMergeMap()
+
+  useVoronoiOfficialData.value = false
+  voronoiPartitionMode.value = PARTITION_MODE_MAP
+  voronoiRegionLevel.value = 1
+  ignoredVoronoiLocations.value = []
+  voronoiLastResult.value = null
+  voronoiPreviewType.value = ''
+  voronoiPreviewLayers.value = []
+
+  isVoronoiPanelOpen.value = true
+  setVoronoiStatus('pointsLoaded', { count: voronoiPartitionPoints.value.length })
+
+  globalPayload.value = null
 };
 
 function triggerVoronoiFileImport() {
@@ -1049,7 +1154,8 @@ const handleBuildVoronoi = async ({ force = false } = {}) => {
   try {
     await ensureVoronoiPointsLoaded();
     const level = Number(voronoiRegionLevel.value) || 3;
-    const points = activeVoronoiPoints.value;
+    const rawPoints = activeVoronoiPoints.value;
+    const points = applyFieldMerge(rawPoints);
     console.log('[MapDrawTab] build voronoi input', {
       ignoredCount: ignoredVoronoiLocations.value.length,
       inputPointCount: points.length,
@@ -1242,6 +1348,12 @@ watch(isVoronoiPanelOpen, async (isOpen) => {
   if (!isOpen) return;
   await ensureVoronoiPointsLoaded();
 });
+
+watch(() => globalPayload.value, (payload) => {
+  if (payload && payload._type === 'villageVoronoi' && Array.isArray(payload.points) && payload.points.length > 0) {
+    consumeVillageVoronoiPayload(payload)
+  }
+})
 
 const handleCreateLayer = (geometryType) => {
   const layer = createEmptyLayer(geometryType);

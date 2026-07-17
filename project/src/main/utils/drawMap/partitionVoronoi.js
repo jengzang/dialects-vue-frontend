@@ -108,6 +108,31 @@ export function buildPartitionPoints(rows, options = {}) {
     .filter((item) => item && !ignoredLocations.has(item.name))
 }
 
+export function buildVillagePartitionPoints(villages) {
+  return (Array.isArray(villages) ? villages : [])
+    .filter(v => {
+      if (!v || !v.name) return false
+      if (!v.dialect || String(v.dialect).trim() === '') return false
+      if (typeof v.longitude !== 'number' || typeof v.latitude !== 'number') return false
+      if (Math.abs(v.longitude) > 180 || Math.abs(v.latitude) > 90) return false
+      return true
+    })
+    .map(v => {
+      const dialect = String(v.dialect).trim()
+      const partitionParts = normalizePartitionParts(dialect)
+      return {
+        name: String(v.name).trim(),
+        coordinate: [v.longitude, v.latitude],
+        partitionMode: 'village',
+        partitionLevel1: getPartitionKeyFromParts(partitionParts, 1),
+        partitionLevel2: getPartitionKeyFromParts(partitionParts, 2),
+        partitionLevel3: getPartitionKeyFromParts(partitionParts, 3),
+        rawPartitionPath: dialect,
+        raw: { name: v.name, dialect, _path: v._path },
+      }
+    })
+}
+
 export function buildPartitionPointFeatureCollection(points, level = 3, colorMap = {}) {
   return featureCollection(
     (Array.isArray(points) ? points : []).map((item) => {

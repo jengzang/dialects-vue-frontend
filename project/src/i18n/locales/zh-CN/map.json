@@ -412,7 +412,8 @@
     "buttons": {
       "reset": "复位",
       "fullscreen": "全屏",
-      "exitFullscreen": "退出全屏"
+      "exitFullscreen": "退出全屏",
+      "voronoi": "泰森多边形"
     }
   },
   "allVillagesMapPopup": {
@@ -520,6 +521,9 @@
       "learnMore": "了解泰森多边形 →",
       "summaryTitle": "数据概览",
       "settingsTitle": "计算设置",
+      "fieldMergeTitle": "合并字段",
+      "fieldMergeOpenButton": "编辑合并字段",
+      "fieldMergeReset": "重置合并",
       "dataSourceTitle": "数据来源",
       "actionsTitle": "操作",
       "totalPoints": "全部点位",
