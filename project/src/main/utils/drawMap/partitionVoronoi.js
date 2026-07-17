@@ -261,6 +261,17 @@ function isValidVoronoiRing(coords) {
       && Number.isFinite(Number(coordinate[1])))
 }
 
+function createCirclePolygon(center, radius) {
+  const n = 24
+  const ring = []
+  for (let i = 0; i < n; i += 1) {
+    const a = (i / n) * 2 * Math.PI
+    ring.push([center[0] + radius * Math.cos(a), center[1] + radius * Math.sin(a)])
+  }
+  ring.push(ring[0])
+  return polygon([ring])
+}
+
 function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) {
   const originalFeatures = pointCollection?.features ?? []
   const validFeatures = []
@@ -313,8 +324,9 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
     throw error
   }
 
-  // 第一步：正常计算泰森多边形
+  // 第一步：正常计算泰森多边形，同时记录每个 cell 离中心的最大距离
   const polygonFeatures = []
+  const cellMaxDists = []
   const neighborDists = []
   for (let index = 0; index < validFeatures.length; index += 1) {
     const coords = voronoiDiagram?.cellPolygon(index)
@@ -332,8 +344,15 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
 
     polygonFeatures.push(polygon([coords], sourceFeature?.properties ?? {}))
 
-    // 顺便收集每个点的邻居距离（用于计算统一半径）
+    // 计算 cell 到中心的最大距离（用于预过滤）和邻居距离（用于计算半径）
     const pi = getPointCoordinate(sourceFeature)
+    let maxDist = 0
+    for (let ci = 0; ci < coords.length; ci += 1) {
+      const d = Math.hypot(coords[ci][0] - pi[0], coords[ci][1] - pi[1])
+      if (d > maxDist) maxDist = d
+    }
+    cellMaxDists.push(maxDist)
+
     const dists = []
     for (const j of delaunay.neighbors(index)) {
       const pj = getPointCoordinate(validFeatures[j])
@@ -342,10 +361,7 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
     neighborDists.push(dists.length ? dists.sort((a, b) => a - b)[Math.floor(dists.length / 2)] : 0)
   }
 
-  // 第二步：凸包缓冲区 → 裁剪边界
-  const hull = Array.from(delaunay.hull)
-  const hullCoords = hull.map((i) => getPointCoordinate(validFeatures[i]))
-
+  // 第二步：每个点画圆 → 并集 → 裁剪边界
   const globalMedian = (() => {
     const sorted = neighborDists.filter((d) => d > 0).sort((a, b) => a - b)
     if (!sorted.length) return 0.1
@@ -353,38 +369,32 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
     return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2
   })()
 
-  // 半径 = 全局中位邻居距离 × (0.5 + expandFactor × 3)
   const radius = globalMedian * (0.5 + expandFactor * 3)
 
-  // 构建凸包多边形，用 buffer 扩展半径 → 裁剪边界
-  let clipBoundary = null
-  if (hullCoords.length >= 3) {
-    const hullRing = [...hullCoords, hullCoords[0]]
-    const hullPolygon = polygon([hullRing])
-    try {
-      clipBoundary = buffer(hullPolygon, radius, { units: 'degrees' })
-    } catch (err) {
-      console.warn('[partitionVoronoi] hull buffer failed', err)
-    }
+  // 每个点画一个圆
+  const circles = []
+  for (let i = 0; i < validFeatures.length; i += 1) {
+    const pi = getPointCoordinate(validFeatures[i])
+    if (pi) circles.push(createCirclePolygon(pi, radius))
   }
 
-  // 第三步：用缓冲边界裁剪
-  const boundaryBbox = clipBoundary ? bbox(clipBoundary) : null
+  let clipBoundary = null
+  try {
+    clipBoundary = union(featureCollection(circles))
+  } catch (err) {
+    console.warn('[partitionVoronoi] circle union failed', err)
+  }
+
+  // 第三步：用并集边界裁剪
   let statInside = 0
   let statNoIntersect = 0
   let statIntersected = 0
   let statFailed = 0
   const clippedFeatures = clipBoundary
     ? polygonFeatures
-      .map((cell) => {
-        const cellBbox = bbox(cell)
-        if (
-          boundaryBbox
-          && cellBbox[0] >= boundaryBbox[0]
-          && cellBbox[1] >= boundaryBbox[1]
-          && cellBbox[2] <= boundaryBbox[2]
-          && cellBbox[3] <= boundaryBbox[3]
-        ) {
+      .map((cell, i) => {
+        // cell 完全在自己的圆内 → 一定在 union 里
+        if (cellMaxDists[i] <= radius) {
           statInside += 1
           return cell
         }
@@ -405,13 +415,12 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
       })
     : polygonFeatures
 
-  console.log('[partitionVoronoi] buffer clip', {
+  console.log('[partitionVoronoi] circle-union clip', {
     totalCells: polygonFeatures.length,
-    hullPoints: hullCoords.length,
+    totalCircles: circles.length,
     radius,
     expandFactor,
     globalMedian,
-    boundaryBbox,
     clipStats: `${statInside} inside, ${statNoIntersect} noIntersect, ${statIntersected} intersected, ${statFailed} failed`,
   })
 
