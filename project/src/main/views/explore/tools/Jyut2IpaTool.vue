@@ -701,7 +701,7 @@ const processFile = async (file, options = {}) => {
     taskId.value = uploadData.task_id
 
     processingText.value = t('tools.jyut2ipa.processing.preparingConvert')
-    await processJyut2Ipa(taskId.value)
+    await processJyut2Ipa(taskId.value, rules.value)
     processingText.value = t('tools.jyut2ipa.processing.running')
 
     await progressPolling.start(
@@ -1377,10 +1377,11 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   font-family: 'Courier New', monospace;
   font-size: 13px;
   transition: all 0.2s ease;
+  color: var(--color-primary-hover);
 
   &:focus {
     outline: none;
-    background: white;
+    background: var(--color-primary-rgb);
     border-color: rgba(var(--color-primary-rgb), 0.5);
     box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.05);
   }
