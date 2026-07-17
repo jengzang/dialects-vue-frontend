@@ -1,4 +1,4 @@
-import { bbox, featureCollection, point, polygon, union } from '@turf/turf'
+import { bbox, convex, featureCollection, intersect, point, polygon, transformScale, union } from '@turf/turf'
 import { Delaunay } from 'd3-delaunay'
 
 const FIELD_KEYS = {
@@ -188,8 +188,9 @@ function getSafeBbox(featureCollectionValue) {
   const lngPadding = minLng === maxLng ? 0.01 : 0
   const latPadding = minLat === maxLat ? 0.01 : 0
 
-  // 从中心向外扩展 30%，避免外圈 Voronoi cells 紧贴点集被矩形切断
-  const padRatio = 0.3
+  // 大幅扩展包围盒，给 d3-delaunay 足够空间让外圈 cells 自然延伸，
+  // 后续由凸包裁剪决定最终外边界而非 bbox 矩形
+  const padRatio = 1.0
   const centerLng = (minLng + maxLng) / 2
   const centerLat = (minLat + maxLat) / 2
   const halfLng = (maxLng - minLng) / 2
@@ -262,7 +263,7 @@ function isValidVoronoiRing(coords) {
       && Number.isFinite(Number(coordinate[1])))
 }
 
-function buildSafeVoronoiFeatureCollection(pointCollection) {
+function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) {
   const originalFeatures = pointCollection?.features ?? []
   const validFeatures = []
   const filteredFeatures = []
@@ -331,11 +332,36 @@ function buildSafeVoronoiFeatureCollection(pointCollection) {
     polygonFeatures.push(polygon([[...coords, coords[0]]], sourceFeature?.properties ?? {}))
   }
 
+  // 用凸包 + expandFactor 扩展作为裁剪边界，避免 Voronoi 外圈呈矩形
+  let clipBoundary = null
+  try {
+    const hull = convex(featureCollection(validFeatures))
+    if (hull) {
+      const scale = 1 + expandFactor
+      clipBoundary = scale === 1 ? hull : transformScale(hull, scale)
+    }
+  } catch (err) {
+    console.warn('[partitionVoronoi] convex hull clip failed, falling back to bbox', err)
+  }
+
+  const clippedFeatures = clipBoundary
+    ? polygonFeatures
+      .map((cell) => {
+        try {
+          const clipped = intersect(cell, clipBoundary)
+          return clipped || cell
+        } catch {
+          return cell
+        }
+      })
+      .filter(Boolean)
+    : polygonFeatures
+
   logVoronoiDiagnostics(featureCollection(validFeatures), [
     ...filteredFeatures.map((item) => ({ ...item, reason: 'invalid-point-feature' })),
     ...skippedCells,
   ])
-  return featureCollection(polygonFeatures)
+  return featureCollection(clippedFeatures)
 }
 
 function mergePartitionCellFeatures(cellFeatures, partitionKey, level, groupPoints, style = {}) {
@@ -361,14 +387,14 @@ function mergePartitionCellFeatures(cellFeatures, partitionKey, level, groupPoin
   }
 }
 
-export function calculatePartitionVoronoi(points, level = 3, colorMap = {}) {
+export function calculatePartitionVoronoi(points, level = 3, colorMap = {}, expandRatio = 30) {
   const groups = groupPartitionPoints(points, level)
   const groupResults = {}
   const cellFeatures = []
   const partitionFeatures = []
   const pointCollection = buildPartitionPointFeatureCollection(points, level, colorMap)
   const polygonCollection = pointCollection.features.length >= 2
-    ? buildSafeVoronoiFeatureCollection(pointCollection)
+    ? buildSafeVoronoiFeatureCollection(pointCollection, (expandRatio ?? 30) / 100)
     : featureCollection([])
 
   ;(polygonCollection?.features ?? [])

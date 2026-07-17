@@ -524,6 +524,7 @@
       "fieldMergeTitle": "合併欄位",
       "fieldMergeOpenButton": "編輯合併欄位",
       "fieldMergeReset": "重設合併",
+      "expandRatio": "延伸比例: {ratio}%",
       "dataSourceTitle": "資料來源",
       "actionsTitle": "操作",
       "totalPoints": "全部點位",

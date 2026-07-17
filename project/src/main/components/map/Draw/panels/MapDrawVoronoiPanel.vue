@@ -122,6 +122,17 @@
           <div class="draw-tool-section-title">
             {{ t('map.drawTab.voronoi.actionsTitle') }}
           </div>
+          <div class="draw-basemap-select">
+            <span class="draw-field-label">{{ t('map.drawTab.voronoi.expandRatio', { ratio: expandRatio }) }}</span>
+            <input
+              type="range"
+              class="expand-ratio-slider"
+              min="0"
+              max="100"
+              :value="expandRatio"
+              @input="$emit('update:expand-ratio', Number($event.target.value))"
+            >
+          </div>
           <div class="draw-tool-button-grid">
             <button
               v-if="hasFieldMerge"
@@ -216,6 +227,7 @@ const props = defineProps({
   customImportSummary: { type: String, default: '' },
   isVillageDataSource: { type: Boolean, default: false },
   hasFieldMerge: { type: Boolean, default: false },
+  expandRatio: { type: Number, default: 30 },
 })
 
 defineEmits([
@@ -229,6 +241,7 @@ defineEmits([
   'export-layer',
   'calculate',
   'open-field-merge',
+  'update:expand-ratio',
 ])
 
 const { t } = useI18n()
@@ -320,6 +333,11 @@ const offsetClass = computed(() => {
     font-size: 1.08rem;
     color: $deep-blue;
   }
+}
+
+.expand-ratio-slider {
+  flex: 1;
+  accent-color: var(--color-primary);
 }
 
 @media (max-width: 900px) {
