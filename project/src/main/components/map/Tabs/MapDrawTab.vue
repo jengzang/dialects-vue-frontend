@@ -166,6 +166,8 @@
           :is-village-data-source="isVillageDataSource"
           :has-field-merge="hasFieldMerge"
           :expand-ratio="voronoiExpandRatio"
+          :enable-expand="voronoiEnableExpand"
+          @update:enable-expand="voronoiEnableExpand = $event"
           @update:partition-mode="voronoiPartitionMode = $event"
           @update:region-level="voronoiRegionLevel = $event"
           @update:use-official-data="useVoronoiOfficialData = $event"
@@ -734,7 +736,8 @@ const voronoiExportProgress = ref({ current: 0, total: 0 });
 const showVoronoiExportProgressOverlay = computed(() => isVoronoiExporting.value && voronoiExportProgress.value.total > 0);
 
 const isVillageDataSource = computed(() => voronoiCustomImportMeta.value?.partitionMode === 'village');
-const voronoiExpandRatio = ref(30);
+const voronoiExpandRatio = ref(50);
+const voronoiEnableExpand = ref(false);
 
 // 合并字段: partitionKey → groupName
 const voronoiFieldMergeMap = ref(new Map());
@@ -1167,7 +1170,8 @@ const handleBuildVoronoi = async ({ force = false } = {}) => {
       inputPointCount: points.length,
       inputPointSamples: points.slice(0, 10).map((item) => item.name),
     });
-    const voronoiResult = calculatePartitionVoronoi(points, level, voronoiColorMap.value, voronoiExpandRatio.value);
+    const expandRatio = voronoiEnableExpand.value ? voronoiExpandRatio.value : -1;
+    const voronoiResult = calculatePartitionVoronoi(points, level, voronoiColorMap.value, expandRatio);
     voronoiLastResult.value = voronoiResult;
 
     voronoiPreviewType.value = 'polygons';
@@ -1191,7 +1195,8 @@ const exportVoronoiToLayer = async () => {
   await ensureVoronoiPointsLoaded();
   const level = Number(voronoiRegionLevel.value) || 3;
   const points = activeVoronoiPoints.value;
-  const voronoiResult = calculatePartitionVoronoi(points, level, voronoiColorMap.value, voronoiExpandRatio.value);
+  const expandRatio2 = voronoiEnableExpand.value ? voronoiExpandRatio.value : -1;
+  const voronoiResult = calculatePartitionVoronoi(points, level, voronoiColorMap.value, expandRatio2);
   voronoiLastResult.value = voronoiResult;
 
   const exportableKeys = voronoiExportGroups.value.map((item) => item.key);

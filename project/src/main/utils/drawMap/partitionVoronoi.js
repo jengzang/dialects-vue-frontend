@@ -361,6 +361,15 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
     neighborDists.push(dists.length ? dists.sort((a, b) => a - b)[Math.floor(dists.length / 2)] : 0)
   }
 
+  // 未启用延伸 → 跳过裁剪，直接返回
+  if (expandFactor < 0) {
+    logVoronoiDiagnostics(featureCollection(validFeatures), [
+      ...filteredFeatures.map((item) => ({ ...item, reason: 'invalid-point-feature' })),
+      ...skippedCells,
+    ])
+    return featureCollection(polygonFeatures)
+  }
+
   // 第二步：每个点画圆 → 并集 → 裁剪边界
   const globalMedian = (() => {
     const sorted = neighborDists.filter((d) => d > 0).sort((a, b) => a - b)
@@ -369,7 +378,7 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
     return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2
   })()
 
-  const radius = globalMedian * (0.5 + expandFactor * 3)
+  const radius = globalMedian * (0.5 + expandFactor * 3) * 3 
 
   // 每个点画一个圆
   const circles = []

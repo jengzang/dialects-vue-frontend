@@ -525,6 +525,7 @@
       "fieldMergeOpenButton": "Edit Merge Fields",
       "fieldMergeReset": "Reset Merges",
       "expandRatio": "Expand: {ratio}%",
+      "enableExpand": "Enable Circular Extension",
       "dataSourceTitle": "Data Sources",
       "actionsTitle": "Actions",
       "totalPoints": "Total Points",

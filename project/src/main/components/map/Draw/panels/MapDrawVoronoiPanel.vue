@@ -123,6 +123,14 @@
             {{ t('map.drawTab.voronoi.actionsTitle') }}
           </div>
           <div class="draw-basemap-select">
+            <CheckBox
+              :model-value="enableExpand"
+              @update:model-value="$emit('update:enable-expand', $event)"
+            >
+              {{ t('map.drawTab.voronoi.enableExpand') }}
+            </CheckBox>
+          </div>
+          <div v-if="enableExpand" class="draw-basemap-select">
             <span class="draw-field-label">{{ t('map.drawTab.voronoi.expandRatio', { ratio: expandRatio }) }}</span>
             <input
               type="range"
@@ -239,7 +247,8 @@ const props = defineProps({
   customImportSummary: { type: String, default: '' },
   isVillageDataSource: { type: Boolean, default: false },
   hasFieldMerge: { type: Boolean, default: false },
-  expandRatio: { type: Number, default: 30 },
+  expandRatio: { type: Number, default: 50 },
+  enableExpand: { type: Boolean, default: false },
 })
 
 defineEmits([
@@ -253,6 +262,7 @@ defineEmits([
   'export-layer',
   'calculate',
   'open-field-merge',
+  'update:enable-expand',
   'update:expand-ratio',
 ])
 
