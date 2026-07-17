@@ -328,7 +328,7 @@ const handleSaveUsername = async ({ newUsername }) => {
   })
 }
 
-const handleSavePassword = async ({ currentPassword, newPassword }) => {
+const handleSavePassword = async ({ currentPassword, newPassword, confirmNewPassword }) => {
   error.value = ''
   success.value = ''
 
@@ -339,6 +339,11 @@ const handleSavePassword = async ({ currentPassword, newPassword }) => {
 
   if (!validatePassword(newPassword)) {
     error.value = t('auth.confirm.modifyPassword.promptNew')
+    return
+  }
+
+  if (newPassword !== confirmNewPassword) {
+    error.value = t('auth.confirm.modifyPassword.promptMismatch')
     return
   }
 

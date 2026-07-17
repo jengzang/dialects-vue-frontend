@@ -23,6 +23,7 @@ function showAuthPopup() {
             const newUsername = ref('');  // 新用户名
             const currentPassword = ref('');  // 当前密码
             const newPassword = ref('');  // 新密码
+            const confirmNewPassword = ref('');  // 确认新密码
 
             const error = ref('')
             const loading = ref(false)
@@ -246,6 +247,11 @@ function showAuthPopup() {
                     return
                 }
 
+                if (newPassword.value !== confirmNewPassword.value) {
+                    error.value = '兩次新密碼不一致'
+                    return
+                }
+
                 loading.value = true
 
                 try {
@@ -323,7 +329,7 @@ function showAuthPopup() {
             return {
                 username, password, email, error, loading,savePassword,saveUsername,modeType,
                 user, mode, login, register, logout, close, fmt,loginMode,newPassword,newUsername,currentPassword,
-                formatOnlineTime,showPassword,goToAdminPanel
+                confirmNewPassword,formatOnlineTime,showPassword,goToAdminPanel
             }
 
         },
@@ -597,7 +603,17 @@ function showAuthPopup() {
                       style="padding-right: 2em;"
                   />
                 </div>
-                
+
+                <!-- 确认新密码 -->
+                <div class="form-row" style="display: flex; justify-content: center;">
+                  <input
+                      v-model="confirmNewPassword"
+                      :type="showPassword ? 'text' : 'password'"
+                      placeholder="請再次輸入新密碼"
+                      style="padding-right: 2em;"
+                  />
+                </div>
+
                 <span
                     @click="showPassword = !showPassword"
                     style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none; font-size: 16px;">
