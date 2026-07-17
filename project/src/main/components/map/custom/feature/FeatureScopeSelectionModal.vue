@@ -649,6 +649,7 @@ function formatRegionNames(regionNames) {
 
 .scope-selection-item {
   width: 100%;
+  color: $text-strong;
 
   &.state-full {
     border-color: $primary;

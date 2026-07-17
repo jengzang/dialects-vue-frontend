@@ -2047,7 +2047,7 @@ onBeforeUnmount(() => {
 
 .auth-warning-text {
   margin-bottom: 20px;
-  color: grey;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
 }

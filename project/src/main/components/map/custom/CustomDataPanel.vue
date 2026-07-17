@@ -397,7 +397,7 @@ const resetForm = () => {
   width: 48px;
   height: 48px;
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-md) 0 0 var(--radius-md);
   font-size: 24px;
