@@ -48,15 +48,16 @@
 
           <div class="button-row">
             <button class="control-btn" @click="resetView">🎯 {{ t('map.villageMapPopup.buttons.reset') }}</button>
-            <button
-              v-if="hasDialectData"
-              class="control-btn"
-              @click="navigateToVoronoi"
-            >
-              ⬡ {{ t('map.villageMapPopup.buttons.voronoi') }}
-            </button>
             <button class="control-btn" @click="toggleFullscreen">⛶ {{ t('map.villageMapPopup.buttons.fullscreen') }}</button>
           </div>
+
+          <button
+            v-if="hasDialectData"
+            class="control-btn control-btn-full"
+            @click="navigateToVoronoi"
+          >
+            ⬡ {{ t('map.villageMapPopup.buttons.voronoi') }}
+          </button>
         </div>
 
         <button v-if="isFullscreen" class="exit-fullscreen-btn" @click="toggleFullscreen">
@@ -736,6 +737,11 @@ $success: var(--color-success);/* 地图容器 */
 .control-btn {
   flex: 1;
   padding: 8px 12px;
+
+  &-full {
+    flex: none;
+    width: 100%;
+  }
   background: var(--action-primary-bg);
   border: none;
   border-radius: var(--radius-sm2);

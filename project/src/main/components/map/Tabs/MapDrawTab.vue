@@ -916,12 +916,13 @@ const consumeVillageVoronoiPayload = async (payload) => {
     },
   }
 
-  syncVoronoiPartitionPoints()
-  initFieldMergeMap()
-
   useVoronoiOfficialData.value = false
   voronoiPartitionMode.value = PARTITION_MODE_MAP
   voronoiRegionLevel.value = 1
+
+  syncVoronoiPartitionPoints()
+  initFieldMergeMap()
+
   ignoredVoronoiLocations.value = []
   voronoiLastResult.value = null
   voronoiPreviewType.value = ''
@@ -1353,7 +1354,7 @@ watch(() => globalPayload.value, (payload) => {
   if (payload && payload._type === 'villageVoronoi' && Array.isArray(payload.points) && payload.points.length > 0) {
     consumeVillageVoronoiPayload(payload)
   }
-})
+}, { immediate: true })
 
 const handleCreateLayer = (geometryType) => {
   const layer = createEmptyLayer(geometryType);
