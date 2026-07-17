@@ -23,6 +23,7 @@ function showAuthPopup() {
             const newUsername = ref('');  // 新用户名
             const currentPassword = ref('');  // 当前密码
             const newPassword = ref('');  // 新密码
+            const confirmNewPassword = ref('');  // 确认新密码
 
             const error = ref('')
             const loading = ref(false)
@@ -210,12 +211,12 @@ function showAuthPopup() {
 
                     error.value = '✅ 用戶名更新成功！<br>👤 您需重新登錄<br>⏳ 兩秒後將自動跳轉到登錄頁面。'
 
-                    // 延時 2 秒後，切換到個人資料界面
-                    setTimeout(async () => {
-                        mode.value = 'profile';  // 切換到個人資料界面
-                        await fetchUser();  // 獲取最新用戶數據
+                    clearToken()
+                    user.value = null
+                    setTimeout(() => {
+                        mode.value = 'login'
                         error.value = ''
-                    }, 2000);  // 延時 2 秒（2000 毫秒）
+                    }, 2000)
                 } catch (e) {
                     // 直接從 e.message 提取 detail 信息
                     try {
@@ -246,6 +247,11 @@ function showAuthPopup() {
                     return
                 }
 
+                if (newPassword.value !== confirmNewPassword.value) {
+                    error.value = '兩次新密碼不一致'
+                    return
+                }
+
                 loading.value = true
 
                 try {
@@ -261,14 +267,14 @@ function showAuthPopup() {
                         body: form,
                     })
 
-                    error.value = '✅ 密碼更新成功！<br>👤 ⏳ 兩秒後將自動跳轉到個人資料頁面。'
+                    error.value = '✅ 密碼更新成功！<br>👤 您需重新登錄<br>⏳ 兩秒後將自動跳轉到登錄頁面。'
 
-                    // 延時 2 秒後，切換到個人資料界面
-                    setTimeout(async () => {
-                        mode.value = 'profile';  // 切換到個人資料界面
-                        await fetchUser();  // 獲取最新用戶數據
+                    clearToken()
+                    user.value = null
+                    setTimeout(() => {
+                        mode.value = 'login'
                         error.value = ''
-                    }, 2000);  // 延時 2 秒（2000 毫秒）
+                    }, 2000)
                 } catch (e) {
                     // 直接從 e.message 提取 detail 信息
                     try {
@@ -323,7 +329,7 @@ function showAuthPopup() {
             return {
                 username, password, email, error, loading,savePassword,saveUsername,modeType,
                 user, mode, login, register, logout, close, fmt,loginMode,newPassword,newUsername,currentPassword,
-                formatOnlineTime,showPassword,goToAdminPanel
+                confirmNewPassword,formatOnlineTime,showPassword,goToAdminPanel
             }
 
         },
@@ -597,7 +603,17 @@ function showAuthPopup() {
                       style="padding-right: 2em;"
                   />
                 </div>
-                
+
+                <!-- 确认新密码 -->
+                <div class="form-row" style="display: flex; justify-content: center;">
+                  <input
+                      v-model="confirmNewPassword"
+                      :type="showPassword ? 'text' : 'password'"
+                      placeholder="請再次輸入新密碼"
+                      style="padding-right: 2em;"
+                  />
+                </div>
+
                 <span
                     @click="showPassword = !showPassword"
                     style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none; font-size: 16px;">

@@ -64,6 +64,14 @@
         :error="error"
       />
 
+      <FormInput
+        v-model="localConfirmNewPassword"
+        type="password"
+        :placeholder="$t('auth.modifyProfile.password.confirmNewPlaceholder')"
+        :showPasswordToggle="true"
+        :error="error"
+      />
+
       <div class="form-row">
         <button
           class="btn-search"
@@ -147,6 +155,7 @@ const tabs = computed(() => [
 const localNewUsername = ref('')
 const localCurrentPassword = ref('')
 const localNewPassword = ref('')
+const localConfirmNewPassword = ref('')
 
 const handleSaveUsername = () => {
   emit('saveUsername', { newUsername: localNewUsername.value })
@@ -155,7 +164,8 @@ const handleSaveUsername = () => {
 const handleSavePassword = () => {
   emit('savePassword', {
     currentPassword: localCurrentPassword.value,
-    newPassword: localNewPassword.value
+    newPassword: localNewPassword.value,
+    confirmNewPassword: localConfirmNewPassword.value
   })
 }
 </script>

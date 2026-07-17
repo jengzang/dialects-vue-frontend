@@ -66,9 +66,6 @@ export async function updateUsername(newUsername, email) {
     body: form
   })
 
-  // Update user store
-  await update_userdatas_bytoken()
-
   return data
 }
 

@@ -81,6 +81,7 @@ import { useI18n } from 'vue-i18n'
 import {
   getToken,
   getRefreshToken,
+  clearToken,
   initUserByToken,
   loginUser,
   registerUser,
@@ -310,11 +311,12 @@ const handleSaveUsername = async ({ newUsername }) => {
 
   await authTask.run(async () => {
     await updateUsername(newUsername, user.value.email)
+    clearToken()
+    user.value = null
     success.value = t('auth.messages.usernameUpdateSuccess')
 
-    setTimeout(async () => {
-      setMode('profile')
-      await fetchUser()
+    setTimeout(() => {
+      setMode('login')
       error.value = ''
       success.value = ''
     }, 2000)
@@ -326,7 +328,7 @@ const handleSaveUsername = async ({ newUsername }) => {
   })
 }
 
-const handleSavePassword = async ({ currentPassword, newPassword }) => {
+const handleSavePassword = async ({ currentPassword, newPassword, confirmNewPassword }) => {
   error.value = ''
   success.value = ''
 
@@ -337,6 +339,11 @@ const handleSavePassword = async ({ currentPassword, newPassword }) => {
 
   if (!validatePassword(newPassword)) {
     error.value = t('auth.confirm.modifyPassword.promptNew')
+    return
+  }
+
+  if (newPassword !== confirmNewPassword) {
+    error.value = t('auth.confirm.modifyPassword.promptMismatch')
     return
   }
 
@@ -354,11 +361,12 @@ const handleSavePassword = async ({ currentPassword, newPassword }) => {
       newPassword,
       email: user.value.email
     })
+    clearToken()
+    user.value = null
     success.value = t('auth.messages.passwordUpdateSuccess')
 
-    setTimeout(async () => {
-      setMode('profile')
-      await fetchUser()
+    setTimeout(() => {
+      setMode('login')
       error.value = ''
       success.value = ''
     }, 2000)
