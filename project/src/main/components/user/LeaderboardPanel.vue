@@ -215,6 +215,11 @@ const getRankLabel = (rank) => {
   return t('user.leaderboard.rank.default', { rank })
 }
 
+const formatPercentile = (value) => {
+  const p = value ?? 0
+  return `${Number(p).toFixed(1)}%`
+}
+
 const createRow = (label, data) => ({
   type: 'data',
   label,
@@ -222,6 +227,7 @@ const createRow = (label, data) => ({
   value: formatCount(data.value),
   gap: data.gap_to_prev ? formatCount(data.gap_to_prev) : t('user.leaderboard.format.noGap'),
   firstPlace: formatCount(data.first_place_value),
+  percentile: formatPercentile(data.percentile),
   isFirstPlace: data.rank === 1,
   isSecondPlace: data.rank === 2,
   isThirdPlace: data.rank === 3
@@ -266,6 +272,7 @@ const tableData = computed(() => {
         ? formatCount(categoryData.gap_to_prev)
         : t('user.leaderboard.format.noGap'),
       firstPlace: formatCount(categoryData.first_place_value),
+      percentile: formatPercentile(categoryData.percentile),
       isFirstPlace: categoryData.rank === 1,
       isSecondPlace: categoryData.rank === 2,
       isThirdPlace: categoryData.rank === 3
@@ -383,11 +390,13 @@ const tableData = computed(() => {
                 <th>{{ t('user.leaderboard.columns.rank') }}</th>
                 <th>{{ t('user.leaderboard.columns.count') }}</th>
                 <th class="col-gap">{{ t('user.leaderboard.columns.gap') }}</th>
+                <th class="col-percentile">{{ t('user.leaderboard.columns.percentile') }}</th>
                 <th class="col-first-place">{{ t('user.leaderboard.columns.firstPlace') }}</th>
                 <th>{{ t('user.leaderboard.columns.metric') }}</th>
                 <th>{{ t('user.leaderboard.columns.rank') }}</th>
                 <th>{{ t('user.leaderboard.columns.count') }}</th>
                 <th class="col-gap">{{ t('user.leaderboard.columns.gap') }}</th>
+                <th class="col-percentile">{{ t('user.leaderboard.columns.percentile') }}</th>
                 <th class="col-first-place">{{ t('user.leaderboard.columns.firstPlace') }}</th>
               </tr>
             </thead>
@@ -450,6 +459,17 @@ const tableData = computed(() => {
                       }"
                     >
                       {{ row.categorySummary.gap }}
+                    </td>
+                    <td
+                      :rowspan="row.categoryEndpointCount"
+                      class="percentile category-data"
+                      :class="{
+                        'category-gold': row.categorySummary.isFirstPlace,
+                        'category-silver': row.categorySummary.isSecondPlace,
+                        'category-bronze': row.categorySummary.isThirdPlace
+                      }"
+                    >
+                      {{ row.categorySummary.percentile }}
                     </td>
                     <td
                       :rowspan="row.categoryEndpointCount"
@@ -517,6 +537,14 @@ const tableData = computed(() => {
                     }"
                   >{{ row.gap }}</td>
                   <td
+                    class="percentile"
+                    :class="{
+                      'first-place': row.isFirstPlace,
+                      'second-place': row.isSecondPlace,
+                      'third-place': row.isThirdPlace
+                    }"
+                  >{{ row.percentile }}</td>
+                  <td
                     class="first-place-value"
                     :class="{
                       'first-place': row.isFirstPlace,
@@ -536,6 +564,7 @@ const tableData = computed(() => {
                 <th>{{ t('user.leaderboard.columns.rank') }}</th>
                 <th>{{ t('user.leaderboard.columns.count') }}</th>
                 <th class="col-gap">{{ t('user.leaderboard.columns.gap') }}</th>
+                <th class="col-percentile">{{ t('user.leaderboard.columns.percentile') }}</th>
                 <th class="col-first-place">{{ t('user.leaderboard.columns.firstPlace') }}</th>
               </tr>
             </thead>
@@ -565,6 +594,7 @@ const tableData = computed(() => {
                   </td>
                   <td class="value">{{ row.value }}</td>
                   <td class="gap">{{ row.gap }}</td>
+                  <td class="percentile">{{ row.percentile }}</td>
                   <td class="first-place-value">{{ row.firstPlace }}</td>
                 </tr>
               </template>
@@ -603,6 +633,7 @@ const tableData = computed(() => {
                   </td>
                   <td class="value">{{ row.value }}</td>
                   <td class="gap">{{ row.gap }}</td>
+                  <td class="percentile">{{ row.percentile }}</td>
                   <td class="first-place-value">{{ row.firstPlace }}</td>
                 </tr>
               </template>
@@ -668,7 +699,7 @@ $warning: var(--color-warning);
 }
 
 .leaderboard-container {
-  max-width: 1000px;
+  max-width: 95dvw;
   margin: 0 auto;
   padding: 20px;
 }
@@ -730,9 +761,10 @@ $warning: var(--color-warning);
 
 .top-metrics-cards {
   display: grid;
+  max-width: 600px;
+  margin: 0 auto 32px;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
-  margin-bottom: 32px;
 }
 
 .metric {
@@ -862,7 +894,7 @@ $warning: var(--color-warning);
 }
 
 .table-container {
-  overflow: hidden;
+  overflow-x: auto;
   background: $glass-50;
   backdrop-filter: blur(20px);
   border-radius: var(--radius-md);
@@ -886,7 +918,7 @@ $warning: var(--color-warning);
     padding: 14px 12px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     white-space: nowrap;
-    text-align: left;
+    text-align: center;
     text-transform: uppercase;
     font-size: 14px;
     font-weight: 600;
@@ -896,9 +928,10 @@ $warning: var(--color-warning);
 }
 
 .col-gap,
-.col-first-place {
+.col-first-place,
+.col-percentile {
   padding: 6px 8px !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
 }
 
 .category {
@@ -1202,7 +1235,8 @@ $warning: var(--color-warning);
 }
 
 .gap,
-.first-place-value {
+.first-place-value,
+.percentile {
   padding: 6px 8px !important;
   font-size: 13px !important;
   font-weight: 400;
@@ -1247,7 +1281,7 @@ $warning: var(--color-warning);
   .top-metrics-cards {
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: safe center;
     gap: 16px;
     margin-bottom: 24px;
     overflow-x: auto;
@@ -1296,7 +1330,7 @@ $warning: var(--color-warning);
     align-self: stretch;
     padding: 12px 0;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow-x: auto;
   }
 
   .table-container {
@@ -1318,9 +1352,10 @@ $warning: var(--color-warning);
   }
 
   .col-gap,
-  .col-first-place {
+  .col-first-place,
+  .col-percentile {
     padding: 4px !important;
-    font-size: 10px !important;
+    font-size: 9px !important;
   }
 
   .data-row {
@@ -1330,7 +1365,8 @@ $warning: var(--color-warning);
       font-size: 14px;
 
       &.gap,
-      &.first-place-value {
+      &.first-place-value,
+      &.percentile {
         padding: 4px !important;
         font-size: 12px !important;
       }
