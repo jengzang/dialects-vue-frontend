@@ -2146,14 +2146,14 @@ td {
   width: 36px;
   height: 36px;
   cursor: pointer;
-  background: white;
+  background: var(--color-primary);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-full);
   transition: all $transition-fast;
   color: var(--action-primary-text);
 
   &:hover:not(:disabled) {
-    background: var(--color-primary-light);
+    background: var(--color-primary-hover);
     border-color: var(--color-primary);
   }
 

@@ -230,7 +230,8 @@
       "rank": "排名",
       "count": "次數",
       "gap": "距前一名",
-      "firstPlace": "第一名"
+      "firstPlace": "第一名",
+						"percentile": "超越"
     },
     "rank": {
       "first": "第 1 名",
