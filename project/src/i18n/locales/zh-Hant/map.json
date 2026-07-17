@@ -517,6 +517,7 @@
     },
     "voronoi": {
       "panelHint": "基於地點分區資料計算泰森多邊形，可預覽或導出為面圖層。",
+      "learnMore": "瞭解泰森多邊形 →",
       "summaryTitle": "資料概覽",
       "settingsTitle": "計算設定",
       "dataSourceTitle": "資料來源",

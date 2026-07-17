@@ -517,6 +517,7 @@
     },
     "voronoi": {
       "panelHint": "Calculate Voronoi polygons from location-region data, then preview them or export them as polygon layers.",
+      "learnMore": "Learn about Voronoi diagrams →",
       "summaryTitle": "Data Summary",
       "settingsTitle": "Calculation Settings",
       "dataSourceTitle": "Data Sources",

@@ -13,6 +13,12 @@
           <div class="draw-tool-panel-subtitle">
             {{ t('map.drawTab.voronoi.panelHint') }}
           </div>
+          <a
+            class="voronoi-learn-link"
+            href="https://zhuanlan.zhihu.com/p/985825588"
+            target="_blank"
+            rel="noopener"
+          >{{ t('map.drawTab.voronoi.learnMore') }}</a>
         </div>
       </div>
 
@@ -243,6 +249,18 @@ const offsetClass = computed(() => {
 @use '../../_map-variables' as *;
 
 @use './panelShared';
+
+.voronoi-learn-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--color-primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
 
 .voronoi-panel {
   &.offset-double {
