@@ -145,7 +145,7 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
 import { getSemanticIndices } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import { getCategoryDisplayName, SEMANTIC_SUBCATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 import { userStore } from '@/main/store/store.js'
 

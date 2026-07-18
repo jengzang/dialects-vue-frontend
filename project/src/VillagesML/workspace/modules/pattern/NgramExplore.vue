@@ -193,7 +193,7 @@ import {
   getNgramPatterns
 } from '@/api/index.js'
 import { getVillagesNgrams } from '@/composables/data/useVillagesCache.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import { getNgramPositionLabel, getNgramPatternTypeLabel } from '@/VillagesML/config/villagesML.js'
 
 const router = useRouter()

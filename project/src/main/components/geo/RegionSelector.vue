@@ -287,7 +287,7 @@ import { getPartitions } from '@/api/index.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { customRegionStore } from '@/main/store/customRegionStore.js'
 import { userStore } from '@/main/store/store.js'
-import { showError, showSuccess, showConfirm } from '@/utils/message.js'
+import { showError, showSuccess, showConfirm } from '@/utils/ui/message.js'
 import AppModal from '@/components/common/AppModal.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import {STATIC_REGION_TREE, top_yindian} from "@/main/config/RegionTree.js";

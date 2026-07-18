@@ -348,7 +348,7 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import CheckBox from '@/components/selector/CheckBox.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { aggregateFeatures } from '@/api/index.js'
-import { showError, showWarning } from '@/utils/message.js'
+import { showError, showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
 import { SEMANTIC_CATEGORY_NAMES, SEMANTIC_FEATURE_KEYS } from '@/VillagesML/config/villagesML.js'
 

@@ -61,7 +61,7 @@
 import { ref, computed, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { PRAAT_AUDIO_LIMITS } from '@/main/config/constants.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 const props = defineProps({
   selectedSegment: {

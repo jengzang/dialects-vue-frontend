@@ -278,7 +278,7 @@ import {
   getSemanticLabelsByCategory,
   getSemanticLabelsByChar
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import {
   getCategoryIcon,
   getCategoryName,

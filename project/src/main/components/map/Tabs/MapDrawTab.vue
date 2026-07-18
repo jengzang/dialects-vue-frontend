@@ -540,7 +540,7 @@ import nationalBorderKmzUrl from '/data/国界面.kmz?url';
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
-import { showConfirm, showError, showSuccess } from '@/utils/message.js';
+import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js';
 import { readImportedLayerFile, readKmzArrayBuffer, splitFeatureCollectionByGeometryType } from '@/main/utils/drawMap/export.js';
 import {
   deleteDraftRecord,
@@ -563,7 +563,7 @@ import {
   buildVoronoiSelectionOptions,
   calculatePartitionVoronoi,
 } from '@/main/utils/drawMap/partitionVoronoi.js';
-import { pickDrawColor } from '@/main/config/mapColors.js';
+import { pickDrawColor } from '@/main/config/colors/mapColors.js';
 import { mapStyleConfig } from '@/utils/map/MapSource.js';
 import EditableMapLibre from '@/main/components/map/EditableMapLibre.vue';
 import MapDrawLayersPanel from '@/main/components/map/Draw/panels/MapDrawLayersPanel.vue';

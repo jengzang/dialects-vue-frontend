@@ -221,7 +221,7 @@
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import * as echarts from 'echarts'
 import { compareRegionalVectors, batchCompareRegionalVectors, reduceRegionalVectors } from '@/api/index.js'
-import { showError, showSuccess, showWarning } from '@/utils/message.js'
+import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'

@@ -44,10 +44,10 @@ import { useI18n } from 'vue-i18n'
 import { tutorialEnabled, requestTutorialAssistApply } from '@/main/store/store.js'
 import { tutorialManifest } from './tutorialManifest'
 import { resolveTutorialDocument } from './tutorialMarkdown'
-import { tutorialDiceConfig } from '@/main/utils/tutorial/tutorialDiceConfig.js'
+import { tutorialDiceConfig } from '@/main/config/tutorial/tutorialDiceConfig.js'
 import TutorialDiceTrigger from './TutorialDiceTrigger.vue'
 import TutorialGuideModal from './TutorialGuideModal.vue'
-import { showConfirm } from '@/utils/message.js'
+import { showConfirm } from '@/utils/ui/message.js'
 
 const props = defineProps({
   bottomOffset: {

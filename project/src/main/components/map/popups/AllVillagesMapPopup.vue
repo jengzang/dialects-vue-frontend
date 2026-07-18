@@ -63,7 +63,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle, mapStyleConfig, calculateDenseMapCenterAndZoom } from '@/utils/map/MapSource.js'
 import AppModal from '@/components/common/AppModal.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
-import { CATEGORY_PALETTE } from '@/main/config/mapColors.js'
+import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
 
 const props = defineProps({
   visible: {

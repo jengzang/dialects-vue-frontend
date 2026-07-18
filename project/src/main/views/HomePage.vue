@@ -586,7 +586,7 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 import { useVisitStats } from '@/composables/data/useVisitStats.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
-import { getHomeUpdateNotice } from '@/utils/updateNoticeConfig.js'
+import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
 // ✅ 条件渲染的组件懒加载
 const UserBenefitsPopup = defineAsyncComponent(() =>

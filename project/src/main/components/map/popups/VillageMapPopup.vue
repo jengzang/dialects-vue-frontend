@@ -115,7 +115,7 @@ const mapStyleOptions = computed(() => {
   }))
 })
 
-import { CATEGORY_PALETTE } from '@/main/config/mapColors.js'
+import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
 
 const tagPastelPalette = [
   '#e3f2fd', '#fde4ec', '#e8f5e9', '#fff3e0', '#f3e5f5',

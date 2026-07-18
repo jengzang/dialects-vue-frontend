@@ -1,4 +1,4 @@
-import { createCommonBarItem, createCommonBarSchema } from '@/utils/commonBarNavigation.js'
+import { createCommonBarItem, createCommonBarSchema } from '@/utils/bar/commonBarNavigation.js'
 
 // ========================================
 // 模組和子標籤配置（用於 CommonBar 導航）

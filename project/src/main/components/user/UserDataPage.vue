@@ -331,7 +331,7 @@ import { batchCreateCustomData, batchDeleteCustomData, editCustomData, getAllCus
 import { invalidateCustomDataPresence, markCustomDataExists } from '@/composables/data/useCustomDataPresence.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
 import { userStore } from '@/main/store/store.js'
-import { showConfirm, showError, showSuccess, showWarning } from '@/utils/message.js'
+import { showConfirm, showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t, locale } = useI18n()

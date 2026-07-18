@@ -139,7 +139,7 @@ import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import {mapStyle, calculateDenseMapCenterAndZoom, mapStyleConfig} from '@/utils/map/MapSource.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
-import { FEATURE_PALETTE } from '@/main/config/mapColors.js'
+import { FEATURE_PALETTE } from '@/main/config/colors/mapColors.js'
 
 // --- Props ---
 const props = defineProps({

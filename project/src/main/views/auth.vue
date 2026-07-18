@@ -98,7 +98,7 @@ import { userStore } from '@/main/store/store.js'
 import { computeQueryStats } from '@/main/utils/userStats.js'
 import { initOnlineTimeTracker, manualReport, stopOnlineTimeTracker } from '@/utils/user/onlineTimeTracker.js'
 import { WEB_BASE } from '@/env-config.js'
-import { showConfirm, showSuccess } from '@/utils/message.js'
+import { showConfirm, showSuccess } from '@/utils/ui/message.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 

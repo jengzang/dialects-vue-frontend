@@ -128,7 +128,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { mapStyle, mapStyleConfig, calculateMapCenterAndZoom } from '@/utils/map/MapSource.js';
 import {get_detail} from "@/main/utils/query/ResultTable.js";
 import {mapStore, userStore, resultCache} from "@/main/store/store.js";
-import { showSuccess, showError, showWarning, showConfirm } from '@/utils/message.js';
+import { showSuccess, showError, showWarning, showConfirm } from '@/utils/ui/message.js';
 import { getLocationDetail } from '@/api'
 import { deleteCustomForm } from '@/api'
 import { refreshCurrentCustomLayer } from '@/utils/map/MapData.js';
@@ -340,7 +340,7 @@ const getToneData = (data) => {
     .filter(tone => tone.value !== t('map.mapLibre.common.none'));
 };
 
-import { CATEGORY_PALETTE } from '@/main/config/mapColors.js'
+import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
 
 // --- 生命周期 ---
 onMounted(() => {

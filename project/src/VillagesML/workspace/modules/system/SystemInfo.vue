@@ -265,7 +265,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { getVillagesOverview, getVillagesNgrams, getVillagesTables, getCachedVillagesOverview, getCachedVillagesNgrams, getCachedVillagesTables } from '@/composables/data/useVillagesCache.js'
-import { showError, showSuccess } from '@/utils/message.js'
+import { showError, showSuccess } from '@/utils/ui/message.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'

@@ -1,6 +1,6 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
-import { showSuccess } from '@/utils/message.js'
+import { showSuccess } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 

@@ -163,7 +163,7 @@ import UserRegionEditPopup from '@/main/components/user/popups/UserRegionEditPop
 import { CUSTOM_REGION_MAX_LOCATIONS } from '@/main/config/constants.js'
 import { customRegionStore } from '@/main/store/customRegionStore'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
-import { showConfirm, showError, showSuccess, showWarning } from '@/utils/message.js'
+import { showConfirm, showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 
 const { t, locale } = useI18n()

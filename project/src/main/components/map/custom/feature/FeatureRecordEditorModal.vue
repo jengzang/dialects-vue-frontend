@@ -151,7 +151,7 @@
 <script setup>
 import { computed, ref, watch, nextTick } from 'vue';
 import { batchMatch, getRegions } from '@/api';
-import { showConfirm, showWarning } from '@/utils/message.js';
+import { showConfirm, showWarning } from '@/utils/ui/message.js';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import { batchCreateCustomData, editCustomData, getDataByFeature, getDataByPoint, getUserPoints } from '@/api';

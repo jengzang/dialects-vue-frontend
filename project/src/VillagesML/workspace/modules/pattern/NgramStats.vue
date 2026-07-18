@@ -347,7 +347,7 @@ import {
   getNgramSignificance,
   getNgramFrequency
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import { getSignificanceLabel, getSignificanceLevel, getNgramPositionLabel } from '@/VillagesML/config/villagesML.js'
 
 const route = useRoute()

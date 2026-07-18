@@ -1,6 +1,6 @@
 // api/sql/query.js - SQL查询操作 API
 import { api } from '../../auth/httpClient.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 /**
  * @typedef {Object} SqlQueryParams

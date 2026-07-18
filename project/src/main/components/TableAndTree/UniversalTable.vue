@@ -522,7 +522,7 @@ import AppModal from '@/components/common/AppModal.vue';
 import { userStore } from '@/main/store/store.js';
 import { useVirtualList } from '@vueuse/core';
 import { TABLE_CONFIG } from '@/main/config/constants.js';
-import { showSuccess, showWarning, showConfirm, showError } from '@/utils/message.js';
+import { showSuccess, showWarning, showConfirm, showError } from '@/utils/ui/message.js';
 
 const { t } = useI18n();
 

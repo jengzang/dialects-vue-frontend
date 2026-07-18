@@ -1,6 +1,6 @@
 import { bbox, booleanIntersects, buffer, featureCollection, intersect, point, polygon, union } from '@turf/turf'
 import { Delaunay } from 'd3-delaunay'
-import { pickCategoryColor } from '@/main/config/mapColors.js'
+import { pickCategoryColor } from '@/main/config/colors/mapColors.js'
 
 const FIELD_KEYS = {
   name: ['簡稱', '简称', '地點', '地点', 'name', 'location'],

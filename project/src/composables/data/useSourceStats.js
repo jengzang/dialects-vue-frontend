@@ -1,5 +1,5 @@
 import { queryCount } from '@/api'
-import { getHomeUpdateNotice } from '@/utils/updateNoticeConfig.js'
+import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
 const SOURCE_STATS_STORAGE_KEY = 'source-stats-cache'
 let inFlightPromise = null

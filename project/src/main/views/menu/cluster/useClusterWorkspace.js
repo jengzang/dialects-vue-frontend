@@ -5,7 +5,7 @@ import { useStorageState } from '@/composables/core/useStorageState.js'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useQueryConfig } from '@/composables/data/useQueryConfig.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
-import { showError, showSuccess, showWarning } from '@/utils/message.js'
+import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import {
   QUICK_RUN_FALLBACK_LABEL,
   STEP_ORDER,

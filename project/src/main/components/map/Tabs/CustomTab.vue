@@ -235,7 +235,7 @@ import {
   mapStore,
   resultCache,
 } from '@/main/store/store.js';
-import { showSuccess, showWarning, showError } from '@/utils/message.js';
+import { showSuccess, showWarning, showError } from '@/utils/ui/message.js';
 import FeatureScopeSelectionModal from '@/main/components/map/custom/feature/FeatureScopeSelectionModal.vue';
 import { addCustomFeatureDataWithoutApi } from '@/utils/map/MapData.js';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'

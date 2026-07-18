@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useI18n } from 'vue-i18n'
 import UniversalTable from "@/main/components/TableAndTree/UniversalTable.vue";
-import { getHomeUpdateNotice } from '@/utils/updateNoticeConfig.js'
+import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
 
 const { t } = useI18n()

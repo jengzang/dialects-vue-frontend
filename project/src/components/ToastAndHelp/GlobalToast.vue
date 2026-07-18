@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { messageState, triggerMessageAction, hideMessage, persistMessageUntilDismiss } from '@/utils/message.js'
+import { messageState, triggerMessageAction, hideMessage, persistMessageUntilDismiss } from '@/utils/ui/message.js'
 
 function getIcon(type) {
   const icons = {

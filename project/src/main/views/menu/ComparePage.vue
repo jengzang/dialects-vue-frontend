@@ -551,7 +551,7 @@ import {
 import { compareChars, compareZhongGu, compareTones } from '@/api/index.js'
 import { getCoordinates } from '@/api'
 import { requestMapFitView } from '@/utils/map/MapData.js'
-import { showWarning } from '@/utils/message.js'
+import { showWarning } from '@/utils/ui/message.js'
 import { useQueryConfig } from '@/composables/data/useQueryConfig.js'
 
 const { t } = useI18n()
