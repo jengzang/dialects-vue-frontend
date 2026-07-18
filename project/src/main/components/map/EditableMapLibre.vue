@@ -329,10 +329,25 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
         'circle-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
       paint: {
-        'circle-radius': ['coalesce', ['get', 'pointRadius'], 6],
+        'circle-radius': [
+          'case',
+          ['boolean', ['feature-state', 'hover'], false],
+          ['+', ['coalesce', ['get', 'pointRadius'], 6], 3],
+          ['coalesce', ['get', 'pointRadius'], 6],
+        ],
         'circle-color': ['coalesce', ['get', 'pointColor'], drawFallbackPointColor],
-        'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], drawFallbackStroke],
-        'circle-stroke-width': 2,
+        'circle-stroke-color': [
+          'case',
+          ['boolean', ['feature-state', 'hover'], false],
+          '#ffffff',
+          ['coalesce', ['get', 'pointStrokeColor'], drawFallbackStroke],
+        ],
+        'circle-stroke-width': [
+          'case',
+          ['boolean', ['feature-state', 'hover'], false],
+          4,
+          2,
+        ],
         'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
       },
     })
@@ -845,6 +860,11 @@ const gatherPreviewFillLayerIds = () => {
   return previewDescriptors.map((d) => d.fillLayerId)
 }
 
+const gatherPreviewPointLayerIds = () => {
+  const previewDescriptors = buildPreviewLayerDescriptors()
+  return previewDescriptors.map((d) => d.pointLayerId)
+}
+
 const unbindPreviewHover = () => {
   if (!map.value || !previewHoverBound) return
   map.value.off('mousemove', onPreviewMouseMove)
@@ -869,7 +889,9 @@ const resetHoveredFeature = () => {
 
 const onPreviewMouseMove = (e) => {
   const fillLayerIds = gatherPreviewFillLayerIds()
-  const features = map.value.queryRenderedFeatures(e.point, { layers: fillLayerIds })
+  const pointLayerIds = gatherPreviewPointLayerIds()
+  const allLayerIds = [...fillLayerIds, ...pointLayerIds]
+  const features = map.value.queryRenderedFeatures(e.point, { layers: allLayerIds })
   if (!features.length) {
     resetHoveredFeature()
     map.value.getCanvas().style.cursor = ''
@@ -1056,6 +1078,7 @@ defineExpose({
   selectedFeatureId,
   updateFeatureProperties,
   deleteSelected,
+  syncReadonlyLayers,
   clearAll,
   importGeoJson,
   currentStyleKey,

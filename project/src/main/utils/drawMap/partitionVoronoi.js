@@ -480,7 +480,11 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
           statInside += 1
           return cell
         }
-        if (!booleanIntersects(cell, clipBoundary)) {
+        let intersects = false
+        try {
+          intersects = booleanIntersects(cell, clipBoundary)
+        } catch { /* JSTS may throw on degenerate geometry */ }
+        if (!intersects) {
           statNoIntersect += 1
           return cell
         }
@@ -519,9 +523,18 @@ function mergePartitionCellFeatures(cellFeatures, partitionKey, level, groupPoin
   const validFeatures = (cellFeatures ?? []).filter((feature) => feature && typeof feature === 'object')
   if (!validFeatures.length) return null
 
-  const mergedFeature = validFeatures.length === 1
-    ? validFeatures[0]
-    : union(featureCollection(validFeatures))
+  let mergedFeature = null
+  if (validFeatures.length === 1) {
+    mergedFeature = validFeatures[0]
+  } else {
+    try {
+      mergedFeature = union(featureCollection(validFeatures))
+    } catch (error) {
+      console.warn('[partitionVoronoi] union merge failed for partition', partitionKey, error.message)
+      // fallback: return the individual features as a featureCollection
+      mergedFeature = null
+    }
+  }
 
   if (!mergedFeature) return null
 
