@@ -4,6 +4,8 @@
   padding: var(--main-glass-button-padding, 12px 18px);
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
   gap: 8px;
   background: var(--surface-glass-button);
   backdrop-filter: blur(6px);

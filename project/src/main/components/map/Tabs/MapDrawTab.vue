@@ -1875,7 +1875,7 @@ onBeforeUnmount(() => {
     &-header {
       display: flex;
       align-items: flex-start;
-      justify-content: space-between;
+      justify-content: center;
       gap: 1rem;
       width: 94%;
       padding: 0.4rem 1.2rem;

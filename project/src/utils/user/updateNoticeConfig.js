@@ -1,9 +1,9 @@
 export function getHomeUpdateNotice(t) {
     const items = [
         {
-            icon: '🏠',
-            strong: '更新廣東省自然村機器學習數據',
-            text: '重新劃分語義的類別，並優化各種聚類、特徵分析功能'
+            icon: '🗺️',
+            strong: '泰森多邊形繪圖完善',
+            text: '支持豐富的篩選、合併、排除等規則，泰森多邊形外邊界支持滑塊選擇範圍；可直接從廣東省自然村頁面導出方言數據到泰森多邊形進行繪圖'
         },
         {
             icon: '👀',
@@ -19,9 +19,9 @@ export function getHomeUpdateNotice(t) {
 
     ]
   return {
-    version: 'v4.6.8',
+    version: 'v4.7.0',
     dbVersion: '2026-06-22',
-    lastUpdateDate: '2026-07-15',
+    lastUpdateDate: '2026-07-18',
     title: t('home.updateNotice.title'),
     items
   }
