@@ -417,7 +417,7 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
     components.push(comp)
   }
 
-  // 对每个分量：大分量 buffer(凸包)，小分量 union(圆)
+  // 对每个分量：统一用 union(圆) 构建边界，允许凹形
   const boundaries = []
   for (const comp of components) {
     if (comp.length < 3) {
@@ -425,33 +425,23 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
         const pi = getPointCoordinate(validFeatures[i])
         if (pi) boundaries.push(createCirclePolygon(pi, radius))
       }
-    } else if (comp.length <= 30) {
+    } else {
       const compCircles = comp
         .map((i) => {
           const pi = getPointCoordinate(validFeatures[i])
           return pi ? createCirclePolygon(pi, radius) : null
         })
         .filter(Boolean)
-      if (compCircles.length > 0) {
-        try {
-          const merged = union(featureCollection(compCircles))
-          if (merged) boundaries.push(merged)
-        } catch {
-          boundaries.push(...compCircles)
-        }
+      if (compCircles.length === 0) continue
+      if (compCircles.length === 1) {
+        boundaries.push(compCircles[0])
+        continue
       }
-    } else {
-      const compPoints = comp.map((i) => getPointCoordinate(validFeatures[i])).filter(Boolean)
-      const hull = convexHull(compPoints)
-      if (hull.length >= 3) {
-        const hullRing = [...hull, hull[0]]
-        try {
-          const buf = buffer(polygon([hullRing]), radius, { units: 'degrees' })
-          if (buf) boundaries.push(buf)
-        } catch {
-          // fallback: use circles
-          for (const p of hull) boundaries.push(createCirclePolygon(p, radius))
-        }
+      try {
+        const merged = union(featureCollection(compCircles))
+        if (merged) boundaries.push(merged)
+      } catch {
+        boundaries.push(...compCircles)
       }
     }
   }
