@@ -281,6 +281,127 @@ function createCirclePolygon(center, radius) {
   return polygon([ring])
 }
 
+function buildConcaveHullRing(compIndices, validFeatures, delaunay, alpha) {
+  const compSet = new Set(compIndices)
+  const { triangles, halfedges } = delaunay
+  const triCount = triangles.length / 3
+
+  // 标记每个三角形是否属于该分量且 circumradius <= alpha
+  const triKept = new Uint8Array(triCount)
+  for (let t = 0; t < triCount; t += 1) {
+    const a = triangles[t * 3]
+    const b = triangles[t * 3 + 1]
+    const c = triangles[t * 3 + 2]
+    if (!compSet.has(a) || !compSet.has(b) || !compSet.has(c)) continue
+
+    const pa = getPointCoordinate(validFeatures[a])
+    const pb = getPointCoordinate(validFeatures[b])
+    const pc = getPointCoordinate(validFeatures[c])
+    if (!pa || !pb || !pc) continue
+
+    const ab = Math.hypot(pb[0] - pa[0], pb[1] - pa[1])
+    const bc = Math.hypot(pc[0] - pb[0], pc[1] - pb[1])
+    const ca = Math.hypot(pa[0] - pc[0], pa[1] - pc[1])
+    if (ab > alpha || bc > alpha || ca > alpha) continue
+
+    const s = (ab + bc + ca) / 2
+    const area = Math.sqrt(Math.max(0, s * (s - ab) * (s - bc) * (s - ca)))
+    const circumR = area > 0 ? (ab * bc * ca) / (4 * area) : Infinity
+    if (circumR <= alpha) triKept[t] = 1
+  }
+
+  // 收集边界半边：属于 kept 三角形但对边不属于（或无边）
+  const boundaryHalfedges = []
+  for (let e = 0; e < halfedges.length; e += 1) {
+    const t = Math.floor(e / 3)
+    if (!triKept[t]) continue
+    const opp = halfedges[e]
+    if (opp === -1 || !triKept[Math.floor(opp / 3)]) {
+      boundaryHalfedges.push(e)
+    }
+  }
+
+  if (boundaryHalfedges.length < 3) return null
+
+  // 以半边起点为 key 建邻接表
+  const edgeMap = new Map()
+  for (const e of boundaryHalfedges) {
+    const from = triangles[e]
+    const to = triangles[Math.floor(e / 3) * 3 + (e % 3 + 1) % 3]
+    const fp = getPointCoordinate(validFeatures[from])
+    const tp = getPointCoordinate(validFeatures[to])
+    if (!fp || !tp) continue
+    if (!edgeMap.has(from)) edgeMap.set(from, [])
+    edgeMap.get(from).push({
+      vertex: to,
+      angle: Math.atan2(tp[1] - fp[1], tp[0] - fp[0]),
+    })
+  }
+
+  // 按角度排序邻接边
+  for (const [, neighbors] of edgeMap) {
+    neighbors.sort((a, b) => a.angle - b.angle)
+  }
+
+  // 找最左点作为起点
+  let startV = boundaryHalfedges[0]
+  let startP = null
+  for (const e of boundaryHalfedges) {
+    const v = triangles[e]
+    const p = getPointCoordinate(validFeatures[v])
+    if (p && (!startP || p[0] < startP[0] || (p[0] === startP[0] && p[1] < startP[1]))) {
+      startV = v
+      startP = p
+    }
+  }
+
+  // 顺时针追踪外边界
+  const ring = [[startP[0], startP[1]]]
+  const visitedEdges = new Set()
+  let curr = startV
+  let prevAngle = Math.PI / 2
+
+  for (let step = 0; step < boundaryHalfedges.length + 5; step += 1) {
+    const neighbors = edgeMap.get(curr)
+    if (!neighbors || neighbors.length === 0) break
+
+    let best = null
+    let bestTurn = -Infinity
+    for (const n of neighbors) {
+      if (n.vertex === curr) continue
+      let turn = prevAngle - n.angle
+      while (turn < 0) turn += 2 * Math.PI
+      while (turn >= 2 * Math.PI) turn -= 2 * Math.PI
+      const edgeKey = curr + ',' + n.vertex
+      if (!visitedEdges.has(edgeKey) && turn > bestTurn) {
+        bestTurn = turn
+        best = n
+      }
+    }
+
+    if (!best) break
+
+    const edgeKey = curr + ',' + best.vertex
+    visitedEdges.add(edgeKey)
+
+    const nextP = getPointCoordinate(validFeatures[best.vertex])
+    if (!nextP) break
+    ring.push([nextP[0], nextP[1]])
+
+    if (best.vertex === startV) break
+
+    const currP = getPointCoordinate(validFeatures[curr])
+    prevAngle = Math.atan2(nextP[1] - currP[1], nextP[0] - currP[0])
+    curr = best.vertex
+  }
+
+  if (ring.length < 3) return null
+  if (ring[0][0] !== ring[ring.length - 1][0] || ring[0][1] !== ring[ring.length - 1][1]) {
+    ring.push([ring[0][0], ring[0][1]])
+  }
+  return ring
+}
+
 function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) {
   const originalFeatures = pointCollection?.features ?? []
   const validFeatures = []
@@ -417,7 +538,7 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
     components.push(comp)
   }
 
-  // 对每个分量：统一用 union(圆) 构建边界，允许凹形
+  // 对每个分量：大分量 buffer(凸包)，小分量 union(圆)
   const boundaries = []
   for (const comp of components) {
     if (comp.length < 3) {
@@ -425,23 +546,43 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
         const pi = getPointCoordinate(validFeatures[i])
         if (pi) boundaries.push(createCirclePolygon(pi, radius))
       }
-    } else {
+    } else if (comp.length <= 30) {
       const compCircles = comp
         .map((i) => {
           const pi = getPointCoordinate(validFeatures[i])
           return pi ? createCirclePolygon(pi, radius) : null
         })
         .filter(Boolean)
-      if (compCircles.length === 0) continue
-      if (compCircles.length === 1) {
-        boundaries.push(compCircles[0])
-        continue
+      if (compCircles.length > 0) {
+        try {
+          const merged = union(featureCollection(compCircles))
+          if (merged) boundaries.push(merged)
+        } catch {
+          boundaries.push(...compCircles)
+        }
       }
-      try {
-        const merged = union(featureCollection(compCircles))
-        if (merged) boundaries.push(merged)
-      } catch {
-        boundaries.push(...compCircles)
+    } else {
+      const compPoints = comp.map((i) => getPointCoordinate(validFeatures[i])).filter(Boolean)
+      if (compPoints.length < 3) continue
+      // 尝试用 alpha shape 构建凹边界，alpha 取半径的 3 倍
+      const alpha = radius * 3
+      const concaveRing = buildConcaveHullRing(comp, validFeatures, delaunay, alpha)
+      if (concaveRing && concaveRing.length >= 4) {
+        try {
+          const buf = buffer(polygon([concaveRing]), radius, { units: 'degrees' })
+          if (buf) { boundaries.push(buf); continue }
+        } catch { /* fallback */ }
+      }
+      // fallback: convex hull + buffer
+      const hull = convexHull(compPoints)
+      if (hull.length >= 3) {
+        const hullRing = [...hull, hull[0]]
+        try {
+          const buf = buffer(polygon([hullRing]), radius, { units: 'degrees' })
+          if (buf) boundaries.push(buf)
+        } catch {
+          for (const p of hull) boundaries.push(createCirclePolygon(p, radius))
+        }
       }
     }
   }
