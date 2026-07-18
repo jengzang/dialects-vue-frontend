@@ -1864,7 +1864,7 @@ onBeforeUnmount(() => {
 
 .map-draw-tab {
   position: relative;
-  width: min(98dvw, 1200px);
+  width: min(96dvw, 1600px);
   gap: 1rem;
 
   :deep(button) {

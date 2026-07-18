@@ -62,32 +62,13 @@
         </button>
     </template>
   </AppModal>
-
-  <Transition name="showinfo-fade" v-else>
-    <div v-if="visible" class="showinfo-card">
-      <div class="showinfo-header">
-        <span class="showinfo-icon">🎊</span>
-        <span class="showinfo-title">{{ title || $t('common.updateNotice.title') }}</span>
-        <span class="showinfo-version">{{ versionLine }}</span>
-        <button class="showinfo-close" @click="handleClose">×</button>
-      </div>
-      <div class="showinfo-items">
-        <span
-          v-for="(item, index) in items"
-          :key="index"
-          class="showinfo-item"
-        >
-          {{ item.icon }} <strong>{{ item.strong }}</strong><template v-if="item.text"> - {{ item.text }}</template>
-        </span>
-      </div>
-    </div>
-  </Transition>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import { showInfo } from '@/utils/ui/message.js'
 
 const UPDATE_NOTICE_DISMISS_STORAGE_KEY = 'update-notice-dismissed'
 const UPDATE_NOTICE_LAST_SHOWN_PREFIX = 'update-notice-last-shown'
@@ -136,6 +117,12 @@ const versionLine = computed(() => {
   return props.version
 })
 
+const buildSummaryText = () => {
+  const headline = props.title || '更新日誌'
+  const lines = props.items.map((item) => `${item.icon} ${item.strong}`)
+  return `${headline}  ${versionLine.value}\n${lines.join('\n')}`
+}
+
 const handleClose = () => {
   emit('update:visible', false)
   emit('close')
@@ -172,8 +159,19 @@ const shouldAutoShow = () => {
   return true
 }
 
+watch(() => props.visible, (val) => {
+  if (val && props.mode === 'showinfo') {
+    emit('update:visible', false)
+    showInfo(buildSummaryText(), 6000)
+  }
+})
+
 onMounted(() => {
-  if (props.autoShow && shouldAutoShow()) {
+  if (!props.autoShow || !shouldAutoShow()) return
+
+  if (props.mode === 'showinfo') {
+    showInfo(buildSummaryText(), 6000)
+  } else {
     emit('update:visible', true)
   }
 })

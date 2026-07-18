@@ -547,6 +547,7 @@
     <UpdateNoticeModal
       v-model:visible="showUpdateNotice"
       :auto-show="true"
+      :mode="updateNoticeMode"
       :version="homeUpdateNotice.version"
       :last-update-date="homeUpdateNotice.lastUpdateDate"
       :title="homeUpdateNotice.title"
@@ -619,6 +620,7 @@ const sourceDataCount = ref(cachedSourceStats.dataCount)
 
 // 当前版本号和更新时间
 const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
+const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'modal')
 const CURRENT_VERSION = computed(() => homeUpdateNotice.value.version)
 const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
 

@@ -342,6 +342,12 @@
         "direct": "直接輸入"
       }
     },
+    "updateNotice": {
+      "title": "更新提示",
+      "description": "選擇新版本更新內容的展示方式。",
+      "modeModal": "詳細",
+      "modeShowinfo": "輕量"
+    },
     "viewUpdateLog": "查看更新日誌"
   }
 }

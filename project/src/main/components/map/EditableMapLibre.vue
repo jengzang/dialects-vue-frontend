@@ -1074,13 +1074,13 @@ defineExpose({
 <style scoped lang="scss">
 .editable-map-shell {
   width: 100%;
-  min-height: 70dvh;
+  min-height: 75dvh;
   overflow: hidden;
 }
 
 .editable-map-stage {
   width: 100%;
-  min-height: 70dvh;
+  min-height: 75dvh;
 }
 
 :deep(.draw-control-container) {

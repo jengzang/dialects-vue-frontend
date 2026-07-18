@@ -1,7 +1,7 @@
 @use '@/styles/global/mixins' as *;
 
 .main-glass-button {
-  padding: var(--main-glass-button-padding, 12px 32px);
+  padding: var(--main-glass-button-padding, 12px 18px);
   display: flex;
   align-items: center;
   gap: 8px;
