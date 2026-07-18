@@ -2002,123 +2002,6 @@ onBeforeUnmount(() => {
     display: none;
   }
 
-  /* Modal Choices Styles */
-  .draw-modal {
-    &-choices {
-      @include flex-col;
-      gap: 1rem;
-      padding: 0.5rem 0;
-    }
-
-    &-card-btn {
-      display: flex;
-      align-items: center;
-      gap: 1.2rem;
-      width: 100%;
-      padding: 1.2rem;
-      border: 1px solid var(--glass-60);
-      border-radius: 14px;
-      background: var(--glass-50);
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
-      &:hover:not(:disabled) {
-        background: var(--glass-80);
-        border-color: var(--color-primary);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.08);
-      }
-
-      &:disabled {
-        @include disabled-state;
-      }
-    }
-  }
-
-  .draw-card {
-    &-icon {
-      flex-shrink: 0;
-      font-size: 1.8rem;
-    }
-
-    &-text {
-      @include flex-col;
-      gap: 0.25rem;
-    }
-
-    &-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--text-deep);
-    }
-
-    &-desc {
-      font-size: 0.85rem;
-      color: rgba(var(--text-deep-rgb), 0.65);
-    }
-  }
-
-  .draw-text-input {
-    width: 100%;
-    padding: 0.6rem 0.85rem;
-    border: 1px solid rgba(var(--text-slate-light-rgb), 0.32);
-    border-radius: var(--radius-md);
-    background: var(--glass-80);
-    color: var(--text-deep);
-
-    &:focus {
-      outline: none;
-      border-color: rgba(var(--color-primary-rgb), 0.5);
-      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.12);
-    }
-  }
-
-  .scope-modal-footer {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .auth-warning {
-    &-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-sizing: border-box;
-      width: 100%;
-      padding: 40px 20px;
-    }
-
-    &-card {
-      @include flex-col;
-      align-items: center;
-      width: 100%;
-      max-width: 360px;
-      padding: 30px;
-      border: 1px solid var(--glass-60);
-      border-radius: var(--radius-xl);
-      background: var(--glass-40);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      text-align: center;
-      box-shadow: var(--shadow-md);
-    }
-
-    &-icon {
-      margin-bottom: 16px;
-      font-size: 44px;
-      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
-      animation: floatIcon 3s ease-in-out infinite;
-    }
-
-    &-text {
-      margin-bottom: 20px;
-      color: var(--text-secondary);
-      font-size: 14px;
-      line-height: 1.6;
-    }
-  }
-
   @media (max-width: 900px) {
     .draw-tab-header,
     .draw-tool-section-header {
@@ -2172,6 +2055,123 @@ onBeforeUnmount(() => {
     .draw-tool-button-grid--three {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+  }
+}
+
+/* Modal Choices Styles — 不能嵌套在 .map-draw-tab 下，因为 AppModal 通过 Teleport 将内容移到 body */
+.draw-modal {
+  &-choices {
+    @include flex-col;
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+
+  &-card-btn {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    width: 100%;
+    padding: 1.2rem;
+    border: 1px solid var(--glass-60);
+    border-radius: 14px;
+    background: var(--glass-50);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover:not(:disabled) {
+      background: var(--glass-80);
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.08);
+    }
+
+    &:disabled {
+      @include disabled-state;
+    }
+  }
+}
+
+.draw-card {
+  &-icon {
+    flex-shrink: 0;
+    font-size: 1.8rem;
+  }
+
+  &-text {
+    @include flex-col;
+    gap: 0.25rem;
+  }
+
+  &-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-deep);
+  }
+
+  &-desc {
+    font-size: 0.85rem;
+    color: rgba(var(--text-deep-rgb), 0.65);
+  }
+}
+
+.draw-text-input {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid rgba(var(--text-slate-light-rgb), 0.32);
+  border-radius: var(--radius-md);
+  background: var(--glass-80);
+  color: var(--text-deep);
+
+  &:focus {
+    outline: none;
+    border-color: rgba(var(--color-primary-rgb), 0.5);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.12);
+  }
+}
+
+.scope-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.auth-warning {
+  &-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 40px 20px;
+  }
+
+  &-card {
+    @include flex-col;
+    align-items: center;
+    width: 100%;
+    max-width: 360px;
+    padding: 30px;
+    border: 1px solid var(--glass-60);
+    border-radius: var(--radius-xl);
+    background: var(--glass-40);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+  }
+
+  &-icon {
+    margin-bottom: 16px;
+    font-size: 44px;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    animation: floatIcon 3s ease-in-out infinite;
+  }
+
+  &-text {
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
   }
 }
 
