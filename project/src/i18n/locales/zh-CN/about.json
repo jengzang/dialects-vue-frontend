@@ -341,6 +341,7 @@
         "selector": "选择器",
         "direct": "直接输入"
       }
-    }
+    },
+    "viewUpdateLog": "查看更新日志"
   }
 }

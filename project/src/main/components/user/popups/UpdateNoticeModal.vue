@@ -1,5 +1,6 @@
 <template>
   <AppModal
+    v-if="mode === 'modal'"
     :model-value="visible"
     size="sm"
     width="100%"
@@ -49,7 +50,6 @@
     </div>
 
     <template #footer>
-<!--      <div class="update-notice-footer">-->
         <CheckBox
           class="no-show-checkbox"
           :model-value="dontShowAgain"
@@ -60,9 +60,28 @@
         <button class="confirm-btn" @click="handleConfirm">
           {{ $t('common.updateNotice.confirm') }}
         </button>
-<!--      </div>-->
     </template>
   </AppModal>
+
+  <Transition name="showinfo-fade" v-else>
+    <div v-if="visible" class="showinfo-card">
+      <div class="showinfo-header">
+        <span class="showinfo-icon">🎊</span>
+        <span class="showinfo-title">{{ title || $t('common.updateNotice.title') }}</span>
+        <span class="showinfo-version">{{ versionLine }}</span>
+        <button class="showinfo-close" @click="handleClose">×</button>
+      </div>
+      <div class="showinfo-items">
+        <span
+          v-for="(item, index) in items"
+          :key="index"
+          class="showinfo-item"
+        >
+          {{ item.icon }} <strong>{{ item.strong }}</strong><template v-if="item.text"> - {{ item.text }}</template>
+        </span>
+      </div>
+    </div>
+  </Transition>
 </template>
 
 <script setup>
@@ -98,6 +117,11 @@ const props = defineProps({
   autoShow: {
     type: Boolean,
     default: false
+  },
+  mode: {
+    type: String,
+    default: 'modal',
+    validator: (v) => ['modal', 'showinfo'].includes(v)
   }
 })
 
