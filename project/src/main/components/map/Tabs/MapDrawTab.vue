@@ -1,5 +1,5 @@
 <template>
-  <div class="map-draw-tab page-content-stack">
+  <div ref="drawTabRoot" class="map-draw-tab page-content-stack">
     <div class="page-footer draw-tab-header main-glass-panel">
       <!-- <div class="draw-tab-copy">
         <h3 class="draw-tab-title">
@@ -532,8 +532,9 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import { featureCollection } from '@turf/turf';
 
 import nationalBorderKmzUrl from '/data/国界面.kmz?url';
@@ -582,6 +583,8 @@ import AppModal from '@/components/common/AppModal.vue';
 import { globalPayload } from '@/main/store/store.js';
 
 const { t } = useI18n();
+const route = useRoute();
+const drawTabRoot = ref(null);
 const { requireAuth, isAuthenticated } = useAuthGuard();
 const { getPartitionData } = usePartitionCache();
 
@@ -1851,6 +1854,12 @@ onMounted(async () => {
 
   document.addEventListener('fullscreenchange', syncMapFullscreenState);
   syncMapFullscreenState();
+
+  if (route.query.scrollTo === 'drawBottom') {
+    nextTick(() => {
+      drawTabRoot.value?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    });
+  }
 });
 
 onBeforeUnmount(() => {
