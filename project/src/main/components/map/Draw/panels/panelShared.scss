@@ -147,6 +147,11 @@
   gap: 0.35rem;
 }
 
+.draw-tool-button-grid .main-glass-button:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: var(--action-primary-text);
+}
+
 .draw-tool-check {
   font-size: 0.88rem;
   font-weight: 800;

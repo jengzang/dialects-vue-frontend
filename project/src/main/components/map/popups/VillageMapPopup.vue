@@ -565,7 +565,10 @@ const navigateToVoronoi = () => {
   }
 
   emit('close')
-  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/map/draw'))
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), '/menu/map/draw'),
+    query: { scrollTo: 'drawBottom' },
+  })
 }
 
 // 键盘支持
