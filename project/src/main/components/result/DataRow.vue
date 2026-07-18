@@ -97,7 +97,7 @@ import { getCorrespondingCharacters, getReadingClass, getYinWeiCharReadingType, 
 import { READING_COLORS } from '@/main/config/readingColors.js';
 import { getFeatureStats, getLocationDetail } from '@/api';
 import { globalPayload, mapStore } from '@/main/store/store.js';
-import LocationDetailPopup from '../popup/result/LocationDetailPopup.vue';
+import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue';
 import FeatureStatsPopup from './popups/FeatureStatsPopup.vue';
 import { translateResultTerm } from '@/i18n/utils/resultI18n.js';
 

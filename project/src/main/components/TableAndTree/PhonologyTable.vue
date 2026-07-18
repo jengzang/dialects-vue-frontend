@@ -80,7 +80,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
-import LocationDetailPopup from '@/main/components/popup/result/LocationDetailPopup.vue';
+import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue';
 import PhonologyCellDetailModal from '@/main/components/pho/popups/PhonologyCellDetailModal.vue';
 import { getLocationDetail } from '@/api';
 import { showError } from '@/utils/message.js';
