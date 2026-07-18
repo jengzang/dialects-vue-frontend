@@ -1,16 +1,17 @@
 import { kml as kmlToGeoJson } from '@tmcw/togeojson'
 import { DOMParser } from '@xmldom/xmldom'
 import { unzipSync, strFromU8 } from 'fflate'
+import { pickDrawColor } from './colors'
 
 const DEFAULT_FEATURE_PROPERTIES = {
   name: '',
-  stroke: '#2563eb',
+  stroke: pickDrawColor(0)[0],
   strokeWidth: 3,
-  fill: '#60a5fa',
+  fill: pickDrawColor(0)[1],
   fillOpacity: 0.22,
   pointRadius: 6,
-  pointColor: '#60a5fa',
-  pointStrokeColor: '#2563eb',
+  pointColor: pickDrawColor(0)[1],
+  pointStrokeColor: pickDrawColor(0)[0],
   visible: true,
   locked: false,
 }
@@ -293,13 +294,18 @@ export function normalizeFeatureCollection(featureCollection) {
     type: 'FeatureCollection',
     features: normalizedCollection.features
       .filter((feature) => feature && typeof feature === 'object')
-      .map((feature) => {
+      .map((feature, index) => {
       const featureId = ensureFeatureId(feature, usedFeatureIds)
+      const [stroke, pointColor] = pickDrawColor(index)
       return {
         ...feature,
         id: featureId,
         properties: {
           ...DEFAULT_FEATURE_PROPERTIES,
+          stroke,
+          fill: pointColor,
+          pointColor,
+          pointStrokeColor: stroke,
           ...(feature?.properties ?? {}),
           id: featureId,
           updatedAt: new Date().toISOString(),

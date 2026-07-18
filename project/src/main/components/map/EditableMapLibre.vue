@@ -16,6 +16,9 @@ import {
   exportFeatureCollectionAsGeoJson,
   normalizeFeatureCollection,
 } from '@/main/utils/drawMap/export.js'
+import { pickDrawColor } from '@/main/utils/drawMap/colors.js'
+
+const [drawFallbackStroke, drawFallbackPointColor] = pickDrawColor(0)
 
 const drawControlContainerClass = 'draw-control-container'
 const drawStyles = [
@@ -24,8 +27,8 @@ const drawStyles = [
     type: 'fill',
     filter: ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
     paint: {
-      'fill-color': ['coalesce', ['get', 'fill'], '#60a5fa'],
-      'fill-outline-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
+      'fill-color': ['coalesce', ['get', 'fill'], drawFallbackPointColor],
+      'fill-outline-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
       'fill-opacity': ['coalesce', ['get', 'fillOpacity'], 0.22],
     },
   },
@@ -38,7 +41,7 @@ const drawStyles = [
       'line-join': 'round',
     },
     paint: {
-      'line-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
+      'line-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
       'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
       'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
     },
@@ -52,7 +55,7 @@ const drawStyles = [
       'line-join': 'round',
     },
     paint: {
-      'line-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
+      'line-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
       'line-width': ['coalesce', ['get', 'strokeWidth'], 4],
       'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
     },
@@ -63,8 +66,8 @@ const drawStyles = [
     filter: ['all', ['==', '$type', 'Point'], ['!=', 'meta', 'midpoint'], ['!=', 'mode', 'static']],
     paint: {
       'circle-radius': ['coalesce', ['get', 'pointRadius'], 6],
-      'circle-color': ['coalesce', ['get', 'pointColor'], '#60a5fa'],
-      'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], '#2563eb'],
+      'circle-color': ['coalesce', ['get', 'pointColor'], drawFallbackPointColor],
+      'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], drawFallbackStroke],
       'circle-stroke-width': 2,
       'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
     },
@@ -76,7 +79,7 @@ const drawStyles = [
     paint: {
       'circle-radius': 4,
       'circle-color': '#ffffff',
-      'circle-stroke-color': '#2563eb',
+      'circle-stroke-color': drawFallbackStroke,
       'circle-stroke-width': 2,
     },
   },
@@ -177,23 +180,25 @@ const buildReadonlyLayerDescriptors = () => {
 const buildPreviewLayerDescriptors = () => {
   return (props.previewLayers ?? []).map((layer, layerIndex) => {
     const featureCollection = normalizeFeatureCollection(layer?.featureCollection)
+    const previewStroke = '#ff3b30'
+    const previewFill = '#f97316'
     const style = layer?.type === 'polygons'
       ? {
-          stroke: '#ff3b30',
+          stroke: previewStroke,
           strokeWidth: 2,
-          fill: '#f97316',
+          fill: previewFill,
           fillOpacity: 0.18,
           pointRadius: 6,
-          pointColor: '#ff3b30',
+          pointColor: previewStroke,
           pointStrokeColor: '#ffffff',
         }
       : {
-          stroke: '#ff3b30',
+          stroke: previewStroke,
           strokeWidth: 2,
-          fill: '#f97316',
+          fill: previewFill,
           fillOpacity: 0.18,
           pointRadius: 7,
-          pointColor: '#ff3b30',
+          pointColor: previewStroke,
           pointStrokeColor: '#ffffff',
         }
 
@@ -245,8 +250,8 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
         'fill-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
       paint: {
-        'fill-color': ['coalesce', ['get', 'fill'], '#60a5fa'],
-        'fill-outline-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
+        'fill-color': ['coalesce', ['get', 'fill'], drawFallbackPointColor],
+        'fill-outline-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
         'fill-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, ['coalesce', ['get', 'fillOpacity'], 0.22]],
       },
     })
@@ -264,7 +269,7 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
         'line-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
       paint: {
-        'line-color': ['coalesce', ['get', 'stroke'], '#2563eb'],
+        'line-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
         'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
         'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
       },
@@ -282,8 +287,8 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
       },
       paint: {
         'circle-radius': ['coalesce', ['get', 'pointRadius'], 6],
-        'circle-color': ['coalesce', ['get', 'pointColor'], '#60a5fa'],
-        'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], '#2563eb'],
+        'circle-color': ['coalesce', ['get', 'pointColor'], drawFallbackPointColor],
+        'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], drawFallbackStroke],
         'circle-stroke-width': 2,
         'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
       },
