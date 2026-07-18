@@ -285,13 +285,13 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getPartitions } from '@/api/index.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
-import { useCustomRegionStore } from '@/main/store/customRegionStore.js'
+import { customRegionStore } from '@/main/store/customRegionStore.js'
 import { userStore } from '@/main/store/store.js'
 import { showError, showSuccess, showConfirm } from '@/utils/message.js'
 import AppModal from '@/components/common/AppModal.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import {STATIC_REGION_TREE, top_yindian} from "@/main/config/RegionTree.js";
-import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
@@ -327,7 +327,7 @@ const {
   customRegions: storedCustomRegions,
   loading: loadingCustomRegions,
   fetchCustomRegions
-} = useCustomRegionStore()
+} = customRegionStore()
 
 // New: Custom region selection state
 const selectedCustomRegions = ref([])  // Committed custom regions

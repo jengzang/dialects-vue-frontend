@@ -269,7 +269,7 @@ import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { TABLE_COLUMN_SCHEMAS } from '../../config/chars_positions/characters.js'
 import { userStore } from '@/main/store/store.js'
 import { showWarning } from '@/utils/message.js'
-import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from './evolutionDetail.js'
+import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from '@/main/utils/evolutionDetail.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import {
   encodeQueryValueBase64Url,

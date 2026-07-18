@@ -155,7 +155,7 @@ import { showConfirm, showWarning } from '@/utils/message.js';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import { batchCreateCustomData, editCustomData, getDataByFeature, getDataByPoint, getUserPoints } from '@/api';
-import { ensureCustomDataPresence, invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js';
+import { ensureCustomDataPresence, invalidateCustomDataPresence, markCustomDataExists } from '@/composables/data/useCustomDataPresence.js';
 import { userStore } from '@/main/store/store.js';
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js';
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue';

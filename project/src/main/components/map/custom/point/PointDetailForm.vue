@@ -279,7 +279,7 @@ import {
   getDataByPoint,
   getDataByFeature,
 } from '@/api';
-import { ensureCustomDataPresence, invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js';
+import { ensureCustomDataPresence, invalidateCustomDataPresence, markCustomDataExists } from '@/composables/data/useCustomDataPresence.js';
 import { userStore } from '@/main/store/store.js';
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js';
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue';

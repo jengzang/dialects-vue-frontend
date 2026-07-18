@@ -186,9 +186,9 @@ import {
   resolveCommonBarTabTarget,
   syncCommonBarMemoryFromRoute,
   writeCommonBarMemory
-} from '@/components/bar/commonBarNavigation.js'
-import { useTabTooltip } from '@/components/bar/useTabTooltip.js'
-import { useScrollSnap } from '@/components/bar/useScrollSnap.js'
+} from '@/utils/commonBarNavigation.js'
+import { useTabTooltip } from '@/composables/bar/useTabTooltip.js'
+import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 
 const faviconSrc = computed(() =>

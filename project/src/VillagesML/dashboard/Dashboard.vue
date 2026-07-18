@@ -123,7 +123,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { getVillagesOverview, getVillagesNgrams, getCachedVillagesNgrams } from '@/composables/useVillagesCache.js'
+import { getVillagesOverview, getVillagesNgrams, getCachedVillagesNgrams } from '@/composables/data/useVillagesCache.js'
 import { showError } from '@/utils/message.js'
 import { userStore } from '@/main/store/store.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'

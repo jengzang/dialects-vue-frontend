@@ -229,7 +229,7 @@ import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import CustomDataEntryModal from '@/main/components/map/custom/CustomDataEntryModal.vue';
 import CustomTabHelpModal from '@/main/components/map/popups/CustomTabHelpModal.vue';
 import { getUserFeatures, getDataByFeature } from '@/api';
-import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js';
+import { ensureCustomDataPresence } from '@/composables/data/useCustomDataPresence.js';
 import {
   userStore,
   mapStore,

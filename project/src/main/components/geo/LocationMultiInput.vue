@@ -98,7 +98,7 @@ import { useI18n } from 'vue-i18n'
 import { getLocations, batchMatch, getLocationPartitions } from '@/api/index.js'
 import AppModal from '@/components/common/AppModal.vue'
 import PartitionInfoModal from '@/main/components/geo/PartitionInfoModal.vue'
-import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 
 const { t } = useI18n()
 const { getPartitionData } = usePartitionCache()

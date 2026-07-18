@@ -251,7 +251,7 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import { batchDeleteCustomData, getDataByFeature, getDataByPoint } from '@/api';
-import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js';
+import { ensureCustomDataPresence } from '@/composables/data/useCustomDataPresence.js';
 import { showConfirm, showWarning } from '@/utils/message.js';
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue';
 import FeatureRecordEditorModal from './FeatureRecordEditorModal.vue';

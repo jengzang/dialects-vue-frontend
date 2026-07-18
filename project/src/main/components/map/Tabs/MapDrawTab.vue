@@ -531,7 +531,7 @@ import { featureCollection } from '@turf/turf';
 
 import nationalBorderKmzUrl from '/data/国界面.kmz?url';
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
-import { usePartitionCache } from '@/composables/domain/usePartitionCache.js';
+import { usePartitionCache } from '@/composables/data/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import { showConfirm, showError, showSuccess } from '@/utils/message.js';
 import { readImportedLayerFile, readKmzArrayBuffer, splitFeatureCollectionByGeometryType } from '@/main/utils/drawMap/export.js';

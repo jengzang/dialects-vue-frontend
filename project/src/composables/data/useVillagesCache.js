@@ -1,6 +1,6 @@
 import { getMetadataOverview, getMetadataTables, getNgramStatistics } from '@/api'
 import { getRegionList } from '@/api/villagesML/villages.js'
-import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
+import { getHomeUpdateNotice } from '@/utils/updateNoticeConfig.js'
 
 const OVERVIEW_CACHE_KEY = 'villages-overview-cache'
 const NGRAMS_CACHE_KEY = 'villages-ngrams-cache'
