@@ -47,6 +47,10 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.8rem;
+
+  @media (max-aspect-ratio: 1/1) {
+    display: none;
+  }
 }
 
 .draw-tool-panel-title {

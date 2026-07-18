@@ -1874,10 +1874,9 @@ onBeforeUnmount(() => {
   .draw-tab {
     &-header {
       display: flex;
-      align-items: flex-start;
-      justify-content: center;
+      align-items: center;
       gap: 1rem;
-      width: 94%;
+      width: fit-content;
       padding: 0.4rem 1.2rem;
     }
 
@@ -1895,7 +1894,7 @@ onBeforeUnmount(() => {
   }
 
   .main-glass-button {
-    padding: 15px 16px;
+    padding: 12px 16px;
   }
 
   .draw-toolbar {
@@ -1905,6 +1904,11 @@ onBeforeUnmount(() => {
 
     &--header {
       justify-content: flex-end;
+
+      .main-glass-button:hover:not(:disabled) {
+        background: var(--color-primary);
+        color: var(--action-primary-text);
+      }
     }
   }
 
@@ -2030,6 +2034,10 @@ onBeforeUnmount(() => {
       @include flex-col;
       gap: 0.9rem;
       overflow: visible;
+    }
+
+    .draw-map-area {
+      order: 1;
     }
 
     .draw-tool-panel,
