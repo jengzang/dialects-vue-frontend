@@ -8,7 +8,11 @@
         @click="persistMessageUntilDismiss"
       >
         <span class="toast-icon">{{ getIcon(messageState.type) }}</span>
-        <span class="toast-message">{{ messageState.message }}</span>
+        <span class="toast-message">
+          <template v-for="(line, idx) in messageLines" :key="idx">
+            {{ line }}<br v-if="idx < messageLines.length - 1" />
+          </template>
+        </span>
         <button
           v-if="messageState.actionText"
           class="toast-action"
@@ -32,7 +36,13 @@
 </template>
 
 <script setup>
-import { messageState, triggerMessageAction, hideMessage, persistMessageUntilDismiss } from '@/utils/message.js'
+import { computed } from 'vue'
+import { messageState, triggerMessageAction, hideMessage, persistMessageUntilDismiss } from '@/utils/ui/message.js'
+
+const messageLines = computed(() => {
+  const msg = messageState.value.message || ''
+  return msg.split('\n')
+})
 
 function getIcon(type) {
   const icons = {

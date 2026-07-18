@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { getLeaderboard } from '@/api'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 const { t, locale } = useI18n()
 

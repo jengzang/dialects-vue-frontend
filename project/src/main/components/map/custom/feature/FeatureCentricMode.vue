@@ -22,7 +22,7 @@
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getUserFeatures } from '@/api'
-import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js'
+import { ensureCustomDataPresence } from '@/composables/data/useCustomDataPresence.js'
 import { userStore } from '@/main/store/store.js'
 import FeatureCardList from './FeatureCardList.vue'
 import FeatureDetailTable from './FeatureDetailTable.vue'

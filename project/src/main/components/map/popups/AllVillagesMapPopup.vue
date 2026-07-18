@@ -63,6 +63,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle, mapStyleConfig, calculateDenseMapCenterAndZoom } from '@/utils/map/MapSource.js'
 import AppModal from '@/components/common/AppModal.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
 
 const props = defineProps({
   visible: {
@@ -104,18 +105,13 @@ const mapStyleOptions = computed(() => {
   }))
 })
 
-const colorPalette = [
-  "#b31919", "#b34719", "#b37519", "#b3a319", "#94b319",
-  "#66b319", "#38b319", "#19b329", "#19b357", "#19b385",
-  "#19b3b3", "#1985b3", "#1957b3", "#1929b3", "#3819b3",
-  "#6619b3", "#9419b3", "#b319a3", "#b31975", "#b31947"
-]
+// 颜色来自 mapColors.js CATEGORY_PALETTE
 
 const getCategoryColor = (text) => {
-  if (!text) return colorPalette[0]
+  if (!text) return CATEGORY_PALETTE[0]
   let hash = 0
   for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0
-  return colorPalette[Math.abs(hash) % colorPalette.length]
+  return CATEGORY_PALETTE[Math.abs(hash) % CATEGORY_PALETTE.length]
 }
 
 const buildTag = (text, bgColor) => {
@@ -158,7 +154,7 @@ const categoryColorMap = computed(() => {
   const categories = [...new Set(validVillages.value.map(v => getDisplayValue(v)).filter(Boolean))]
   const map = {}
   categories.forEach((cat, idx) => {
-    map[cat] = colorPalette[idx % colorPalette.length]
+    map[cat] = CATEGORY_PALETTE[idx % CATEGORY_PALETTE.length]
   })
   return map
 })

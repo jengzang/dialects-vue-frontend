@@ -1,5 +1,6 @@
 <template>
   <AppModal
+    v-if="mode === 'modal'"
     :model-value="visible"
     size="sm"
     width="100%"
@@ -49,7 +50,6 @@
     </div>
 
     <template #footer>
-<!--      <div class="update-notice-footer">-->
         <CheckBox
           class="no-show-checkbox"
           :model-value="dontShowAgain"
@@ -60,15 +60,15 @@
         <button class="confirm-btn" @click="handleConfirm">
           {{ $t('common.updateNotice.confirm') }}
         </button>
-<!--      </div>-->
     </template>
   </AppModal>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import { showInfo } from '@/utils/ui/message.js'
 
 const UPDATE_NOTICE_DISMISS_STORAGE_KEY = 'update-notice-dismissed'
 const UPDATE_NOTICE_LAST_SHOWN_PREFIX = 'update-notice-last-shown'
@@ -98,6 +98,11 @@ const props = defineProps({
   autoShow: {
     type: Boolean,
     default: false
+  },
+  mode: {
+    type: String,
+    default: 'modal',
+    validator: (v) => ['modal', 'showinfo'].includes(v)
   }
 })
 
@@ -111,6 +116,12 @@ const versionLine = computed(() => {
 
   return props.version
 })
+
+const buildSummaryText = () => {
+  const headline = props.title || '更新日誌'
+  const lines = props.items.map((item) => `${item.icon} ${item.strong}`)
+  return `${headline}  ${versionLine.value}\n${lines.join('\n')}`
+}
 
 const handleClose = () => {
   emit('update:visible', false)
@@ -148,8 +159,19 @@ const shouldAutoShow = () => {
   return true
 }
 
+watch(() => props.visible, (val) => {
+  if (val && props.mode === 'showinfo') {
+    emit('update:visible', false)
+    showInfo(buildSummaryText(), 6000)
+  }
+})
+
 onMounted(() => {
-  if (props.autoShow && shouldAutoShow()) {
+  if (!props.autoShow || !shouldAutoShow()) return
+
+  if (props.mode === 'showinfo') {
+    showInfo(buildSummaryText(), 6000)
+  } else {
     emit('update:visible', true)
   }
 })

@@ -208,8 +208,8 @@ import {
   getNgramFrequency,
   getNgramPatterns
 } from '@/api/index.js'
-import { getVillagesNgrams } from '@/composables/useVillagesCache.js'
-import { showError } from '@/utils/message.js'
+import { getVillagesNgrams } from '@/composables/data/useVillagesCache.js'
+import { showError } from '@/utils/ui/message.js'
 import { getNgramPositionLabel, getNgramPatternTypeLabel } from '@/VillagesML/config/villagesML.js'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 

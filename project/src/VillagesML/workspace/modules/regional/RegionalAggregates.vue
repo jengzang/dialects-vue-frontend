@@ -202,7 +202,7 @@ import {
   getRegionalAggregatesTown,
   getRegionalSpatialAggregates
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import { SEMANTIC_FEATURE_KEYS, SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
 

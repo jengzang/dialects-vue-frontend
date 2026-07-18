@@ -32,7 +32,7 @@
       "dialectMap": "地圖顯示 - 地圖上呈現查詢結果",
       "regionMap": "方言分區圖 - 按地圖集或音典分區繪製",
       "customMap": "自定義數據 - 添加個人數據繪圖",
-      "drawMap": "繪圖工具 - GIS在線繪圖 泰森多边形"
+      "drawMap": "繪圖工具 - GIS在線繪圖 泰森多邊形"
     },
     "phonology": {
       "title": "音系分析",

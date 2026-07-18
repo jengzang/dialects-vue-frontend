@@ -128,7 +128,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { mapStyle, mapStyleConfig, calculateMapCenterAndZoom } from '@/utils/map/MapSource.js';
 import {get_detail} from "@/main/utils/query/ResultTable.js";
 import {mapStore, userStore, resultCache} from "@/main/store/store.js";
-import { showSuccess, showError, showWarning, showConfirm } from '@/utils/message.js';
+import { showSuccess, showError, showWarning, showConfirm } from '@/utils/ui/message.js';
 import { getLocationDetail } from '@/api'
 import { deleteCustomForm } from '@/api'
 import { refreshCurrentCustomLayer } from '@/utils/map/MapData.js';
@@ -340,13 +340,7 @@ const getToneData = (data) => {
     .filter(tone => tone.value !== t('map.mapLibre.common.none'));
 };
 
-// 20色盤 (來自 create_dot_all)
-const colorPalette = [
-  "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
-  "#911eb4", "#42d4f4", "#f032e6", "#bfe745", "#fabed4",
-  "#469990", "#dcbaff", "#9a6324", "#fffac8", "#800000",
-  "#34c759", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
-];
+import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
 
 // --- 生命周期 ---
 onMounted(() => {
@@ -610,7 +604,7 @@ const drawDotMap = () => {
   // 3. 建立顏色映射 (保持不變)
   const levelColorMap = {};
   Array.from(uniqueLevels).forEach((lvl, idx) => {
-    levelColorMap[lvl] = colorPalette[idx % colorPalette.length];
+    levelColorMap[lvl] = CATEGORY_PALETTE[idx % CATEGORY_PALETTE.length];
   });
 
   // 4. 繪製 (保持不變)

@@ -1,5 +1,6 @@
 import { bbox, booleanIntersects, buffer, featureCollection, intersect, point, polygon, union } from '@turf/turf'
 import { Delaunay } from 'd3-delaunay'
+import { pickCategoryColor } from '@/main/config/colors/mapColors.js'
 
 const FIELD_KEYS = {
   name: ['簡稱', '简称', '地點', '地点', 'name', 'location'],
@@ -10,17 +11,6 @@ const FIELD_KEYS = {
 
 export const PARTITION_MODE_MAP = 'map'
 export const PARTITION_MODE_YINDIAN = 'yindian'
-
-const PARTITION_COLOR_PALETTE = [
-  ['#2563eb', '#60a5fa', '#dbeafe'],
-  ['#059669', '#34d399', '#d1fae5'],
-  ['#dc2626', '#f87171', '#fee2e2'],
-  ['#7c3aed', '#a78bfa', '#ede9fe'],
-  ['#d97706', '#fbbf24', '#fef3c7'],
-  ['#0891b2', '#22d3ee', '#cffafe'],
-  ['#be185d', '#f472b6', '#fce7f3'],
-  ['#4f46e5', '#818cf8', '#e0e7ff'],
-]
 
 export function getStringField(row, keys) {
   if (!row || typeof row !== 'object') return ''
@@ -158,7 +148,7 @@ export function buildPartitionColorMap(points, level = 3) {
   )).sort((a, b) => String(a).localeCompare(String(b), 'zh-Hans-CN'))
 
   return keys.reduce((accumulator, key, index) => {
-    const [stroke, pointColor, fill] = PARTITION_COLOR_PALETTE[index % PARTITION_COLOR_PALETTE.length]
+    const { stroke, pointColor, fill } = pickCategoryColor(index)
     accumulator[key] = {
       stroke,
       pointColor,

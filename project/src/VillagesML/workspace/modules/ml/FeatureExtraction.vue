@@ -393,7 +393,7 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { extractFeatures as apiExtractFeatures, fetchSubsetFilter } from '@/api/index.js'
-import { showError, showSuccess, showWarning } from '@/utils/message.js'
+import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
 import { cityHasCounties } from '@/VillagesML/utils/regionPreload.js'
 import { SEMANTIC_CATEGORY_NAMES, isSemanticFeature } from '@/VillagesML/config/villagesML.js'

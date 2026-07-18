@@ -102,12 +102,19 @@
             :active-layer="activeLayer"
             :all-layers="layers"
             :preview-layers="voronoiPreviewLayers"
+            :enable-preview-hover="voronoiPreviewLayers.length > 0"
             @features-change="handleActiveLayerFeaturesChange"
             @feature-select="handleFeatureSelect"
             @export-image="handleImageExported"
             @export-layer="handleLayerExported"
             @export-selection-bounds-change="boxSelectionBounds = $event"
+            @preview-feature-hover="handlePreviewFeatureHover"
           />
+        </div>
+
+        <div v-if="hoveredPolygon" class="voronoi-hover-tooltip">
+          <strong>{{ hoveredPolygon.name }}</strong>
+          <span class="point-count">{{ hoveredPolygon.pointCount }} 个方言点</span>
         </div>
 
         <MapDrawToolsPanel
@@ -531,9 +538,9 @@ import { featureCollection } from '@turf/turf';
 
 import nationalBorderKmzUrl from '/data/国界面.kmz?url';
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
-import { usePartitionCache } from '@/composables/domain/usePartitionCache.js';
+import { usePartitionCache } from '@/composables/data/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
-import { showConfirm, showError, showSuccess } from '@/utils/message.js';
+import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js';
 import { readImportedLayerFile, readKmzArrayBuffer, splitFeatureCollectionByGeometryType } from '@/main/utils/drawMap/export.js';
 import {
   deleteDraftRecord,
@@ -556,6 +563,7 @@ import {
   buildVoronoiSelectionOptions,
   calculatePartitionVoronoi,
 } from '@/main/utils/drawMap/partitionVoronoi.js';
+import { pickDrawColor } from '@/main/config/colors/mapColors.js';
 import { mapStyleConfig } from '@/utils/map/MapSource.js';
 import EditableMapLibre from '@/main/components/map/EditableMapLibre.vue';
 import MapDrawLayersPanel from '@/main/components/map/Draw/panels/MapDrawLayersPanel.vue';
@@ -577,14 +585,15 @@ const { t } = useI18n();
 const { requireAuth, isAuthenticated } = useAuthGuard();
 const { getPartitionData } = usePartitionCache();
 
+const [defaultStroke, defaultPointColor] = pickDrawColor(0);
 const defaultLayerStyle = {
-  stroke: 'var(--color-map-draw)',
+  stroke: defaultStroke,
   strokeWidth: 3,
-  fill: '#60a5fa',
+  fill: defaultPointColor,
   fillOpacity: 0.22,
   pointRadius: 6,
-  pointColor: '#60a5fa',
-  pointStrokeColor: 'var(--color-map-draw)',
+  pointColor: defaultPointColor,
+  pointStrokeColor: defaultStroke,
   visible: true,
   locked: false,
 };
@@ -638,6 +647,7 @@ const mapStyleOptions = computed(() => {
 
 const createEmptyLayer = (geometryType) => {
   layerIdSeed += 1;
+  const [stroke, pointColor] = pickDrawColor(layerIdSeed);
   const geometryLabels = {
     Point: t('map.drawTab.geometry.point'),
     LineString: t('map.drawTab.geometry.line'),
@@ -648,6 +658,10 @@ const createEmptyLayer = (geometryType) => {
     name: `${geometryLabels[geometryType] ?? t('map.drawTab.geometry.line')}${t('map.drawTab.labels.layer')} ${layerIdSeed}`,
     geometryType,
     ...defaultLayerStyle,
+    stroke,
+    fill: pointColor,
+    pointColor,
+    pointStrokeColor: stroke,
     featureCollection: emptyFeatureCollection(),
   };
 };
@@ -723,6 +737,10 @@ const voronoiTabularState = useTabularImportPreview({
 const ignoredVoronoiLocations = ref([]);
 const voronoiPreviewLayers = ref([]);
 const voronoiPreviewType = ref('');
+const hoveredPolygon = ref(null);
+const handlePreviewFeatureHover = (info) => {
+  hoveredPolygon.value = info;
+};
 const voronoiPartitionMode = ref(PARTITION_MODE_YINDIAN);
 const voronoiRegionLevel = ref(1);
 const isVoronoiPanelOpen = ref(false);
@@ -1271,9 +1289,9 @@ const confirmVoronoiExport = async () => {
           id: feature.id ?? `voronoi-${group.key}-${index + 1}`,
           properties: {
             ...(feature.properties ?? {}),
-            stroke: feature.properties?.stroke ?? 'var(--color-map-draw)',
+            stroke: feature.properties?.stroke ?? defaultStroke,
             strokeWidth: feature.properties?.strokeWidth ?? 2,
-            fill: feature.properties?.fill ?? '#60a5fa',
+            fill: feature.properties?.fill ?? defaultPointColor,
             fillOpacity: feature.properties?.fillOpacity ?? 0.22,
             visible: true,
             locked: false,
@@ -1282,9 +1300,9 @@ const confirmVoronoiExport = async () => {
       };
 
       layer.name = group.name;
-      layer.stroke = styledFeatureCollection.features[0]?.properties?.stroke ?? 'var(--color-map-draw)';
+      layer.stroke = styledFeatureCollection.features[0]?.properties?.stroke ?? defaultStroke;
       layer.strokeWidth = styledFeatureCollection.features[0]?.properties?.strokeWidth ?? 2;
-      layer.fill = styledFeatureCollection.features[0]?.properties?.fill ?? '#60a5fa';
+      layer.fill = styledFeatureCollection.features[0]?.properties?.fill ?? defaultPointColor;
       layer.fillOpacity = styledFeatureCollection.features[0]?.properties?.fillOpacity ?? 0.22;
       layer.featureCollection = styledFeatureCollection;
       exportedLayers.push(layer);
@@ -1842,181 +1860,282 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
-
 @use '../../../../styles/global/scrollbars' as scrollbars;
 
 .map-draw-tab {
   position: relative;
-  width: min(98dvw, 1200px);
+  width: min(96dvw, 1600px);
   gap: 1rem;
+
+  :deep(button) {
+    white-space: nowrap;
+  }
+
+  .draw-tab {
+    &-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: fit-content;
+      padding: 0.4rem 1.2rem;
+    }
+
+    &-copy {
+      min-width: 0;
+    }
+
+    &-title {
+      margin: 0;
+    }
+
+    &-hint {
+      margin: 0.35rem 0 0;
+    }
+  }
+
+  .main-glass-button {
+    padding: 12px 16px;
+  }
+
+  .draw-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    &--header {
+      justify-content: flex-end;
+
+      .main-glass-button:hover:not(:disabled) {
+        background: var(--color-primary);
+        color: var(--action-primary-text);
+      }
+    }
+  }
+
+  .voronoi-export-progress {
+    &-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+      @include flex-center;
+      padding: 1.5rem;
+      background: rgba(var(--color-shadow-rgb), 0.24);
+      backdrop-filter: blur(10px);
+    }
+
+    &-panel {
+      min-width: min(92vw, 320px);
+      @include flex-col;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1.2rem 1.4rem;
+      text-align: center;
+      border-radius: var(--radius-xl);
+      box-shadow: 0 20px 48px rgba(var(--color-shadow-rgb), 0.18);
+    }
+
+    &-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-deep);
+    }
+
+    &-text {
+      font-size: 0.92rem;
+      color: var(--text-dark);
+    }
+  }
+
+  .draw-feature-count-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0 0.95rem;
+    border: 1px solid var(--glass-70);
+    border-radius: var(--radius-pill);
+    background: linear-gradient(
+      145deg,
+      var(--glass-80),
+      rgba(var(--color-primary-rgb), 0.06)
+    );
+    color: var(--text-deep);
+    font-size: 0.92rem;
+    box-shadow:
+      inset 0 0 0.5px var(--glass-50),
+      0 8px 18px rgba(var(--color-primary-rgb), 0.08);
+  }
+
+  .draw-workbench {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .draw-map-area {
+    width: 100%;
+  }
+
+  .voronoi-hover-tooltip {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 14px;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.88rem;
+    pointer-events: none;
+
+    strong {
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+
+    .point-count {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+
+  .draw-import-input {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    .draw-tab-header,
+    .draw-tool-section-header {
+      @include flex-col;
+    }
+
+    .draw-toolbar {
+      &--header {
+        justify-content: flex-start;
+        gap: 0.45rem;
+        width: 100%;
+
+        .main-glass-button,
+        .draw-feature-count-badge {
+          justify-content: center;
+          min-width: auto;
+          min-height: 2.15rem;
+          padding: 0 0.65rem;
+          color: var(--text-deep);
+          font-size: 0.84rem;
+        }
+      }
+    }
+
+    .draw-workbench {
+      @include flex-col;
+      gap: 0.9rem;
+      overflow: visible;
+    }
+
+    .draw-map-area {
+      order: 1;
+    }
+
+    .draw-tool-panel,
+    .draw-tool-panel.offset-left,
+    .layers-panel {
+      position: static;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      width: 100%;
+      min-height: auto;
+      max-width: 100%;
+      max-height: none;
+    }
+
+    .draw-tool-panel {
+      &-body {
+        max-height: none;
+      }
+    }
+
+    .draw-tool-button-grid,
+    .draw-tool-button-grid--three {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
 }
 
-.draw-tab-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  width: 94%;
-  padding: 0.4rem 1.2rem;
+/* Modal Choices Styles — 不能嵌套在 .map-draw-tab 下，因为 AppModal 通过 Teleport 将内容移到 body */
+.draw-modal {
+  &-choices {
+    @include flex-col;
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+
+  &-card-btn {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    width: 100%;
+    padding: 1.2rem;
+    border: 1px solid var(--glass-60);
+    border-radius: 14px;
+    background: var(--glass-50);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover:not(:disabled) {
+      background: var(--glass-80);
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.08);
+    }
+
+    &:disabled {
+      @include disabled-state;
+    }
+  }
 }
 
-.draw-tab-copy {
-  min-width: 0;
-}
+.draw-card {
+  &-icon {
+    flex-shrink: 0;
+    font-size: 1.8rem;
+  }
 
-.draw-tab-title {
-  margin: 0;
-}
+  &-text {
+    @include flex-col;
+    gap: 0.25rem;
+  }
 
-.draw-tab-hint {
-  margin: 0.35rem 0 0;
-}
+  &-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-deep);
+  }
 
-.main-glass-button{
-  padding:15px 16px;
-}
-
-.map-draw-tab :deep(button) {
-  white-space: nowrap;
-}
-
-.draw-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.draw-toolbar--header {
-  justify-content: flex-end;
-}
-
-.voronoi-export-progress-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 40;
-  @include flex-center;
-  padding: 1.5rem;
-  background: rgba(var(--color-shadow-rgb), 0.24);
-  backdrop-filter: blur(10px);
-}
-
-.voronoi-export-progress-panel {
-  min-width: min(92vw, 320px);
-  @include flex-col;
-  align-items: center;
-  gap: 0.8rem;
-  padding: 1.2rem 1.4rem;
-  text-align: center;
-  border-radius: var(--radius-xl);
-  box-shadow: 0 20px 48px rgba(var(--color-shadow-rgb), 0.18);
-}
-
-.voronoi-export-progress-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-deep);
-}
-
-.voronoi-export-progress-text {
-  font-size: 0.92rem;
-  color: var(--text-dark);
-}
-
-.draw-feature-count-badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.5rem;
-  padding: 0 0.95rem;
-  border-radius: var(--radius-pill);
-  background: linear-gradient(145deg, var(--glass-80), rgba(var(--color-primary-rgb), 0.06));
-  border: 1px solid var(--glass-70);
-  color: var(--text-deep);
-  font-size: 0.92rem;
-  box-shadow:
-    inset 0 0 0.5px var(--glass-50),
-    0 8px 18px rgba(var(--color-primary-rgb), 0.08);
-}
-
-.draw-workbench {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-}
-
-.draw-map-area {
-  width: 100%;
-}
-
-.draw-import-input {
-  display: none;
-}
-
-/* Modal Choices Styles */
-.draw-modal-choices {
-  @include flex-col;
-  gap: 1rem;
-  padding: 0.5rem 0;
-}
-
-.draw-modal-card-btn {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  width: 100%;
-  padding: 1.2rem;
-  border-radius: 14px;
-  background: var(--glass-50);
-  border: 1px solid var(--glass-60);
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.draw-modal-card-btn:hover:not(:disabled) {
-  background: var(--glass-80);
-  border-color: var(--color-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.08);
-}
-
-.draw-modal-card-btn:disabled {
-  @include disabled-state;
-}
-
-.draw-card-icon {
-  font-size: 1.8rem;
-  flex-shrink: 0;
-}
-
-.draw-card-text {
-  @include flex-col;
-  gap: 0.25rem;
-}
-
-.draw-card-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--text-deep);
-}
-
-.draw-card-desc {
-  font-size: 0.85rem;
-  color: rgba(var(--text-deep-rgb), 0.65);
+  &-desc {
+    font-size: 0.85rem;
+    color: rgba(var(--text-deep-rgb), 0.65);
+  }
 }
 
 .draw-text-input {
   width: 100%;
   padding: 0.6rem 0.85rem;
-  border-radius: var(--radius-md);
   border: 1px solid rgba(var(--text-slate-light-rgb), 0.32);
+  border-radius: var(--radius-md);
   background: var(--glass-80);
   color: var(--text-deep);
-}
 
-.draw-text-input:focus {
-  outline: none;
-  border-color: rgba(var(--color-primary-rgb), 0.5);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.12);
+  &:focus {
+    outline: none;
+    border-color: rgba(var(--color-primary-rgb), 0.5);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.12);
+  }
 }
 
 .scope-modal-footer {
@@ -2024,42 +2143,44 @@ onBeforeUnmount(() => {
   justify-content: flex-end;
 }
 
-.auth-warning-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  padding: 40px 20px;
-  box-sizing: border-box;
-}
+.auth-warning {
+  &-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 40px 20px;
+  }
 
-.auth-warning-card {
-  @include flex-col;
-  align-items: center;
-  width: 100%;
-  max-width: 360px;
-  padding: 30px;
-  border: 1px solid var(--glass-60);
-  border-radius: var(--radius-xl);
-  background: var(--glass-40);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  text-align: center;
-  box-shadow: var(--shadow-md);
-}
+  &-card {
+    @include flex-col;
+    align-items: center;
+    width: 100%;
+    max-width: 360px;
+    padding: 30px;
+    border: 1px solid var(--glass-60);
+    border-radius: var(--radius-xl);
+    background: var(--glass-40);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+  }
 
-.auth-warning-icon {
-  margin-bottom: 16px;
-  font-size: 44px;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
-  animation: floatIcon 3s ease-in-out infinite;
-}
+  &-icon {
+    margin-bottom: 16px;
+    font-size: 44px;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    animation: floatIcon 3s ease-in-out infinite;
+  }
 
-.auth-warning-text {
-  margin-bottom: 20px;
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.6;
+  &-text {
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+  }
 }
 
 @keyframes floatIcon {
@@ -2072,56 +2193,4 @@ onBeforeUnmount(() => {
     transform: translateY(-6px);
   }
 }
-
-@media (max-width: 900px) {
-  .draw-tab-header,
-  .draw-tool-section-header {
-    @include flex-col;
-  }
-
-  .draw-toolbar--header {
-    width: 100%;
-    justify-content: flex-start;
-    gap: 0.45rem;
-  }
-
-  .draw-toolbar--header .main-glass-button,
-  .draw-toolbar--header .draw-feature-count-badge {
-    min-height: 2.15rem;
-    min-width: auto;
-    padding: 0 0.65rem;
-    font-size: 0.84rem;
-    justify-content: center;
-    color: var(--text-deep);
-  }
-
-  .draw-workbench {
-    @include flex-col;
-    gap: 0.9rem;
-    overflow: visible;
-  }
-
-  .draw-tool-panel,
-  .draw-tool-panel.offset-left,
-  .layers-panel {
-    position: static;
-    right: auto;
-    top: auto;
-    bottom: auto;
-    width: 100%;
-    max-width: 100%;
-    min-height: auto;
-    max-height: none;
-  }
-
-  .draw-tool-panel-body {
-    max-height: none;
-  }
-
-  .draw-tool-button-grid,
-  .draw-tool-button-grid--three {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
 </style>
-

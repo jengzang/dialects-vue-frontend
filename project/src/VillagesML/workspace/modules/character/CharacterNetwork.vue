@@ -95,7 +95,7 @@ import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { fetchCharacterNetwork } from '@/api/index.js'
-import { showWarning } from '@/utils/message.js'
+import { showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 

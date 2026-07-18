@@ -129,7 +129,7 @@ import {
   runClustering,
   getSemanticNetwork
 } from '@/api/index.js'
-import { showError, showSuccess } from '@/utils/message.js'
+import { showError, showSuccess } from '@/utils/ui/message.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'

@@ -244,7 +244,7 @@ import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import { tutorialEnabled, setTutorialEnabled } from '@/main/store/store.js'
 import CheckBox from '@/components/selector/CheckBox.vue'
-import { showInfo } from '@/utils/message.js'
+import { showInfo } from '@/utils/ui/message.js'
 
 const props = defineProps({
   modelValue: {

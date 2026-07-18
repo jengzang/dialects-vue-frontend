@@ -123,7 +123,7 @@ import {
   getPatternFrequencyGlobal,
   getPatternFrequencyRegional
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import RadioGroup from "@/components/selector/RadioGroup.vue";
 
 const router = useRouter()

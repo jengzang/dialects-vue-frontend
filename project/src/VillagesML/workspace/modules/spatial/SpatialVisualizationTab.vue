@@ -167,7 +167,7 @@ import {
   getNgramTendency,
   getCharTendencyByChar
 } from '@/api/index.js'
-import { showError, showWarning, showConfirm } from '@/utils/message.js'
+import { showError, showWarning, showConfirm } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
 import {
   SPATIAL_CLUSTERING_RUN_LABELS,

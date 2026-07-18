@@ -126,7 +126,7 @@ import ActionButton from './ActionButton.vue'
 import TabSwitcher from './TabSwitcher.vue'
 import UserAvatarEditor from './UserAvatarEditor.vue'
 import LeaderboardPanel from '@/main/components/user/LeaderboardPanel.vue'
-import { formatOnlineTime, fmt } from '@/main/store/userStats.js'
+import { formatOnlineTime, fmt } from '@/main/utils/userStats.js'
 import { getCustomCounts } from '@/api'
 
 const { t } = useI18n()

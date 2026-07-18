@@ -547,6 +547,7 @@
     <UpdateNoticeModal
       v-model:visible="showUpdateNotice"
       :auto-show="true"
+      :mode="updateNoticeMode"
       :version="homeUpdateNotice.version"
       :last-update-date="homeUpdateNotice.lastUpdateDate"
       :title="homeUpdateNotice.title"
@@ -584,19 +585,19 @@ import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
-import { useVisitStats } from '@/composables/useVisitStats.js'
-import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceStats.js'
-import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
+import { useVisitStats } from '@/composables/data/useVisitStats.js'
+import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
+import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
 // ✅ 条件渲染的组件懒加载
 const UserBenefitsPopup = defineAsyncComponent(() =>
   import('@/main/components/user/popups/UserBenefitsPopup.vue')
 )
 const SupportPopup = defineAsyncComponent(() =>
-  import('@/main/components/popup/SupportPopup.vue')
+  import('@/main/components/user/popups/SupportPopup.vue')
 )
 const UpdateNoticeModal = defineAsyncComponent(() =>
-  import('@/main/components/popup/UpdateNoticeModal.vue')
+  import('@/main/components/user/popups/UpdateNoticeModal.vue')
 )
 
 const { t, locale } = useI18n()
@@ -619,6 +620,7 @@ const sourceDataCount = ref(cachedSourceStats.dataCount)
 
 // 当前版本号和更新时间
 const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
+const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'modal')
 const CURRENT_VERSION = computed(() => homeUpdateNotice.value.version)
 const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
 

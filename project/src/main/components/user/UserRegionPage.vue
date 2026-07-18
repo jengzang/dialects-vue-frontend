@@ -161,17 +161,17 @@ import { createOrUpdateCustomRegion, deleteCustomRegion, getLocationPartitions }
 import PartitionInfoModal from '@/main/components/geo/PartitionInfoModal.vue'
 import UserRegionEditPopup from '@/main/components/user/popups/UserRegionEditPopup.vue'
 import { CUSTOM_REGION_MAX_LOCATIONS } from '@/main/config/constants.js'
-import { useCustomRegionStore } from '@/main/store/customRegionStore'
+import { customRegionStore } from '@/main/store/customRegionStore'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
-import { showConfirm, showError, showSuccess, showWarning } from '@/utils/message.js'
-import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { showConfirm, showError, showSuccess, showWarning } from '@/utils/ui/message.js'
+import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 
 const { t, locale } = useI18n()
 const { getPartitionData } = usePartitionCache()
 const router = useRouter()
 const route = useRoute()
 
-const { invalidateCache, refresh } = useCustomRegionStore()
+const { invalidateCache, refresh } = customRegionStore()
 
 const regions = ref([])
 const searchQuery = ref('')

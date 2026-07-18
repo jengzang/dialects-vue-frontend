@@ -3,8 +3,7 @@
  * 一次性加载所有区域数据，避免重复请求和错误
  */
 
-import { getVillagesRegions } from '@/composables/useVillagesCache.js'
-import { getCurrentVillagesMLDataset } from './currentDataset.js'
+import { getVillagesRegions } from '@/composables/data/useVillagesCache.js'
 
 const CACHE_KEY_PREFIX = 'regions_all_data_v3'
 const CACHE_TIMESTAMP_KEY_PREFIX = 'regions_cache_timestamp_v3'

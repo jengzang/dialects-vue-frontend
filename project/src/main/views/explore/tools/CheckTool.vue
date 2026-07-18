@@ -936,7 +936,7 @@ import {
   executeBatchOperation,
   downloadCheckResult
 } from '@/api'
-import { showSuccess, showError, showWarning, showConfirm } from '@/utils/message.js'
+import { showSuccess, showError, showWarning, showConfirm } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const { requireAuth } = useAuthGuard()

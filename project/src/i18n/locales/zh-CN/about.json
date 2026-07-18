@@ -341,6 +341,13 @@
         "selector": "选择器",
         "direct": "直接输入"
       }
-    }
+    },
+    "updateNotice": {
+      "title": "更新提示",
+      "description": "选择新版本更新内容的展示方式。",
+      "modeModal": "详细",
+      "modeShowinfo": "轻量"
+    },
+    "viewUpdateLog": "查看更新日志"
   }
 }

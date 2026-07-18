@@ -1,6 +1,6 @@
 // api/tools/jyut2ipa.js - 粤拼转IPA工具 API
 import { api } from '../../auth/httpClient.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 /**
  * @typedef {Object} Jyut2IpaUploadResponse

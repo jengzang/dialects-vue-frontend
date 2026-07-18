@@ -326,7 +326,7 @@ import {
   processJyut2Ipa,
   uploadJyutFile,
 } from '@/api'
-import { showConfirm, showError, showSuccess } from '@/utils/message.js'
+import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const { requireAuth } = useAuthGuard()

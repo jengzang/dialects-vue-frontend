@@ -186,7 +186,7 @@ import { useI18n } from 'vue-i18n'
 import WaveSurfer from 'wavesurfer.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js'
 import { userStore } from '@/main/store/store.js'
-import { showSuccess } from '@/utils/message.js'
+import { showSuccess } from '@/utils/ui/message.js'
 
 const props = defineProps({
   audioBlob: {

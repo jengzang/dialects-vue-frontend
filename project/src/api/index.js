@@ -131,14 +131,6 @@ export {
 // ==================== 日志统计 ====================
 export { getTodayVisits, getTotalVisits, getVisitHistory } from './logs/visits.js';
 
-// ==================== URL 参数工具 ====================
-export {
-  decodeParams,
-  buildQueryUrl,
-  copyCurrentUrl,
-  getUrlSegmentValue,
-} from '../utils/urlParams.js';
-
 // ==================== VillagesML 自然村分析 ====================
 export {
   // 村名搜尋

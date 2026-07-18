@@ -107,7 +107,7 @@ import MapLibre from "@/main/components/map/MapLibre.vue";
 import CustomDataPanel from '@/main/components/map/custom/CustomDataPanel.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
-import { showSuccess, showError } from '@/utils/message.js'
+import { showSuccess, showError } from '@/utils/ui/message.js'
 import { addCustomFeatureData, refreshCurrentCustomLayer } from '@/utils/map/MapData.js'
 
 const { t } = useI18n()
