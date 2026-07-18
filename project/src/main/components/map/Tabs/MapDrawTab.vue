@@ -102,12 +102,19 @@
             :active-layer="activeLayer"
             :all-layers="layers"
             :preview-layers="voronoiPreviewLayers"
+            :enable-preview-hover="voronoiPreviewLayers.length > 0"
             @features-change="handleActiveLayerFeaturesChange"
             @feature-select="handleFeatureSelect"
             @export-image="handleImageExported"
             @export-layer="handleLayerExported"
             @export-selection-bounds-change="boxSelectionBounds = $event"
+            @preview-feature-hover="handlePreviewFeatureHover"
           />
+        </div>
+
+        <div v-if="hoveredPolygon" class="voronoi-hover-tooltip">
+          <strong>{{ hoveredPolygon.name }}</strong>
+          <span class="point-count">{{ hoveredPolygon.pointCount }} 个方言点</span>
         </div>
 
         <MapDrawToolsPanel
@@ -730,6 +737,10 @@ const voronoiTabularState = useTabularImportPreview({
 const ignoredVoronoiLocations = ref([]);
 const voronoiPreviewLayers = ref([]);
 const voronoiPreviewType = ref('');
+const hoveredPolygon = ref(null);
+const handlePreviewFeatureHover = (info) => {
+  hoveredPolygon.value = info;
+};
 const voronoiPartitionMode = ref(PARTITION_MODE_YINDIAN);
 const voronoiRegionLevel = ref(1);
 const isVoronoiPanelOpen = ref(false);
@@ -1958,6 +1969,33 @@ onBeforeUnmount(() => {
 
   .draw-map-area {
     width: 100%;
+  }
+
+  .voronoi-hover-tooltip {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 14px;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.88rem;
+    pointer-events: none;
+
+    strong {
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+
+    .point-count {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
   }
 
   .draw-import-input {

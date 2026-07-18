@@ -109,6 +109,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  enablePreviewHover: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits([
@@ -118,6 +122,7 @@ const emit = defineEmits([
   'export-image',
   'export-layer',
   'update:currentStyleKey',
+  'preview-feature-hover',
 ])
 
 const mapContainer = ref(null)
@@ -127,6 +132,9 @@ const selectedFeatureId = ref('')
 const currentStyleKey = ref(props.currentStyleKey || 'gaode')
 const isFullscreen = ref(false)
 let previousPreviewSourceIds = []
+let hoveredFeatureKey = null
+let hoveredFeatureSource = null
+let previewHoverBound = false
 const emptyFeatureCollection = () => ({
   type: 'FeatureCollection',
   features: [],
@@ -209,6 +217,8 @@ const buildPreviewLayerDescriptors = () => {
       fillLayerId: `preview-draw-fill-${layer?.id ?? layerIndex}`,
       lineLayerId: `preview-draw-line-${layer?.id ?? layerIndex}`,
       pointLayerId: `preview-draw-point-${layer?.id ?? layerIndex}`,
+      isPreview: true,
+      promoteId: 'partitionKey',
       featureCollection: normalizeFeatureCollection({
         type: 'FeatureCollection',
         features: (featureCollection.features ?? []).map((feature) => ({
@@ -231,16 +241,40 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
   if (!map.value || !descriptor) return
 
   if (!map.value.getSource(descriptor.sourceId)) {
-    map.value.addSource(descriptor.sourceId, {
+    const sourceOpts = {
       type: 'geojson',
       data: descriptor.featureCollection,
-    })
+    }
+    if (descriptor.promoteId) {
+      sourceOpts.promoteId = descriptor.promoteId
+    }
+    map.value.addSource(descriptor.sourceId, sourceOpts)
   }
 
   const source = map.value.getSource(descriptor.sourceId)
   source?.setData?.(descriptor.featureCollection)
 
   if (!map.value.getLayer(descriptor.fillLayerId)) {
+    const fillPaint = descriptor.isPreview
+      ? {
+          'fill-color': ['coalesce', ['get', 'fill'], drawFallbackPointColor],
+          'fill-outline-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
+          'fill-opacity': [
+            'case',
+            ['==', ['coalesce', ['get', 'visible'], true], false], 0,
+            ['case',
+              ['boolean', ['feature-state', 'hover'], false],
+              0.35,
+              ['coalesce', ['get', 'fillOpacity'], 0.22],
+            ],
+          ],
+        }
+      : {
+          'fill-color': ['coalesce', ['get', 'fill'], drawFallbackPointColor],
+          'fill-outline-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
+          'fill-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, ['coalesce', ['get', 'fillOpacity'], 0.22]],
+        }
+
     map.value.addLayer({
       id: descriptor.fillLayerId,
       type: 'fill',
@@ -249,15 +283,28 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
       layout: {
         'fill-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
-      paint: {
-        'fill-color': ['coalesce', ['get', 'fill'], drawFallbackPointColor],
-        'fill-outline-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
-        'fill-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, ['coalesce', ['get', 'fillOpacity'], 0.22]],
-      },
+      paint: fillPaint,
     })
   }
 
   if (!map.value.getLayer(descriptor.lineLayerId)) {
+    const linePaint = descriptor.isPreview
+      ? {
+          'line-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
+          'line-width': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false],
+            4,
+            ['coalesce', ['get', 'strokeWidth'], 3],
+          ],
+          'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+        }
+      : {
+          'line-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
+          'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
+          'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+        }
+
     map.value.addLayer({
       id: descriptor.lineLayerId,
       type: 'line',
@@ -268,11 +315,7 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
         'line-join': 'round',
         'line-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
-      paint: {
-        'line-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
-        'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
-        'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
-      },
+      paint: linePaint,
     })
   }
 
@@ -348,6 +391,7 @@ const syncReadonlyLayers = () => {
     syncReadonlyLayerDescriptor(descriptor)
   })
   cleanupReadonlyLayerDescriptors(layerDescriptors)
+  applyPreviewHover()
 }
 
 const syncSelectedFeature = () => {
@@ -796,6 +840,83 @@ const initializeMap = async () => {
   })
 }
 
+const gatherPreviewFillLayerIds = () => {
+  const previewDescriptors = buildPreviewLayerDescriptors()
+  return previewDescriptors.map((d) => d.fillLayerId)
+}
+
+const unbindPreviewHover = () => {
+  if (!map.value || !previewHoverBound) return
+  map.value.off('mousemove', onPreviewMouseMove)
+  previewHoverBound = false
+  resetHoveredFeature()
+}
+
+const resetHoveredFeature = () => {
+  if (hoveredFeatureKey && hoveredFeatureSource && map.value) {
+    map.value.setFeatureState(
+      { source: hoveredFeatureSource, id: hoveredFeatureKey },
+      { hover: false }
+    )
+  }
+  hoveredFeatureKey = null
+  hoveredFeatureSource = null
+  if (map.value) {
+    map.value.getCanvas().style.cursor = ''
+  }
+  emit('preview-feature-hover', null)
+}
+
+const onPreviewMouseMove = (e) => {
+  const fillLayerIds = gatherPreviewFillLayerIds()
+  const features = map.value.queryRenderedFeatures(e.point, { layers: fillLayerIds })
+  if (!features.length) {
+    resetHoveredFeature()
+    map.value.getCanvas().style.cursor = ''
+    return
+  }
+
+  const feature = features[0]
+  const key = feature.properties?.partitionKey
+  const source = feature.source
+  if (!key || !source) {
+    resetHoveredFeature()
+    return
+  }
+
+  if (key === hoveredFeatureKey && source === hoveredFeatureSource) return
+
+  resetHoveredFeature()
+
+  hoveredFeatureKey = key
+  hoveredFeatureSource = source
+  map.value.setFeatureState(
+    { source, id: key },
+    { hover: true }
+  )
+  map.value.getCanvas().style.cursor = 'pointer'
+  emit('preview-feature-hover', {
+    name: feature.properties?.name ?? key,
+    partitionKey: key,
+    pointCount: feature.properties?.pointCount ?? 0,
+  })
+}
+
+const bindPreviewHover = () => {
+  if (!map.value || previewHoverBound) return
+  map.value.on('mousemove', onPreviewMouseMove)
+  previewHoverBound = true
+}
+
+const applyPreviewHover = () => {
+  if (!map.value) return
+  if (props.enablePreviewHover) {
+    bindPreviewHover()
+  } else {
+    unbindPreviewHover()
+  }
+}
+
 const exportLayer = async (layerName) => {
   const featureCollection = normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue)
   const safeLayerName = sanitizeLayerFilename(layerName || props.activeLayer?.name || 'map-draw-layer')
@@ -884,6 +1005,13 @@ watch(
 )
 
 watch(
+  () => props.enablePreviewHover,
+  () => {
+    applyPreviewHover()
+  }
+)
+
+watch(
   () => props.previewLayers,
   () => {
     if (!map.value) return
@@ -912,6 +1040,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('fullscreenchange', syncFullscreenState)
+  unbindPreviewHover()
   if (map.value) {
     map.value.remove()
   }
