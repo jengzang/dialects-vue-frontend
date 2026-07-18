@@ -1,6 +1,6 @@
 import { bbox, booleanIntersects, buffer, featureCollection, intersect, point, polygon, union } from '@turf/turf'
 import { Delaunay } from 'd3-delaunay'
-import { VORONOI_PALETTE } from './colors'
+import { pickCategoryColor } from '@/main/config/mapColors.js'
 
 const FIELD_KEYS = {
   name: ['簡稱', '简称', '地點', '地点', 'name', 'location'],
@@ -148,7 +148,7 @@ export function buildPartitionColorMap(points, level = 3) {
   )).sort((a, b) => String(a).localeCompare(String(b), 'zh-Hans-CN'))
 
   return keys.reduce((accumulator, key, index) => {
-    const [stroke, pointColor, fill] = VORONOI_PALETTE[index % VORONOI_PALETTE.length]
+    const { stroke, pointColor, fill } = pickCategoryColor(index)
     accumulator[key] = {
       stroke,
       pointColor,

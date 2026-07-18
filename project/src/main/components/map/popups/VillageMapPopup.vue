@@ -115,13 +115,7 @@ const mapStyleOptions = computed(() => {
   }))
 })
 
-// 20色盘 (参考 MapLibre.vue)
-const colorPalette = [
-  "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
-  "#911eb4", "#42d4f4", "#f032e6", "#bfe745", "#fabed4",
-  "#469990", "#dcbaff", "#9a6324", "#fffac8", "#800000",
-  "#34c759", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
-]
+import { CATEGORY_PALETTE } from '@/main/config/mapColors.js'
 
 const tagPastelPalette = [
   '#e3f2fd', '#fde4ec', '#e8f5e9', '#fff3e0', '#f3e5f5',
@@ -311,7 +305,7 @@ const renderMarkers = () => {
   if (displayMode.value === 'dialect') {
     const uniqueDialects = [...new Set(villagesToRender.map(v => v.dialect))]
     uniqueDialects.forEach((dialect, idx) => {
-      dialectColorMap[dialect] = colorPalette[idx % colorPalette.length]
+      dialectColorMap[dialect] = CATEGORY_PALETTE[idx % CATEGORY_PALETTE.length]
     })
   }
 

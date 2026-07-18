@@ -556,7 +556,7 @@ import {
   buildVoronoiSelectionOptions,
   calculatePartitionVoronoi,
 } from '@/main/utils/drawMap/partitionVoronoi.js';
-import { pickDrawColor } from '@/main/utils/drawMap/colors.js';
+import { pickDrawColor } from '@/main/config/mapColors.js';
 import { mapStyleConfig } from '@/utils/map/MapSource.js';
 import EditableMapLibre from '@/main/components/map/EditableMapLibre.vue';
 import MapDrawLayersPanel from '@/main/components/map/Draw/panels/MapDrawLayersPanel.vue';

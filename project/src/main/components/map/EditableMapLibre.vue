@@ -16,7 +16,7 @@ import {
   exportFeatureCollectionAsGeoJson,
   normalizeFeatureCollection,
 } from '@/main/utils/drawMap/export.js'
-import { pickDrawColor } from '@/main/utils/drawMap/colors.js'
+import { pickDrawColor } from '@/main/config/mapColors.js'
 
 const [drawFallbackStroke, drawFallbackPointColor] = pickDrawColor(0)
 

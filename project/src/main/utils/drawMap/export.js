@@ -1,7 +1,7 @@
 import { kml as kmlToGeoJson } from '@tmcw/togeojson'
 import { DOMParser } from '@xmldom/xmldom'
 import { unzipSync, strFromU8 } from 'fflate'
-import { pickDrawColor } from './colors'
+import { pickDrawColor } from '@/main/config/mapColors.js'
 
 const DEFAULT_FEATURE_PROPERTIES = {
   name: '',
