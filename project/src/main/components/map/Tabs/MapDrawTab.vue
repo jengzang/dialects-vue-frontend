@@ -114,7 +114,10 @@
 
         <div v-if="hoveredPolygon" class="voronoi-hover-tooltip">
           <strong>{{ hoveredPolygon.name }}</strong>
-          <span class="point-count">{{ hoveredPolygon.pointCount }} 个方言点</span>
+          <span
+            v-if="hoveredPolygon.pointCount > 0"
+            class="point-count"
+          >{{ hoveredPolygon.pointCount }} 个方言点</span>
         </div>
 
         <MapDrawToolsPanel
@@ -1464,6 +1467,7 @@ const toggleLayerVisibility = (layerId) => {
   layer.visible = !layer.visible;
   applyLayerPropertyToFeatures(layer, 'visible', layer.visible);
   syncAllLayersAfterMutation();
+  editableMapRef.value?.syncReadonlyLayers?.();
 };
 
 const setAllLayersVisibility = (visible) => {
@@ -1472,6 +1476,7 @@ const setAllLayersVisibility = (visible) => {
     applyLayerPropertyToFeatures(layer, 'visible', visible);
   });
   syncAllLayersAfterMutation();
+  editableMapRef.value?.syncReadonlyLayers?.();
 };
 
 const toggleLayerLock = (layerId) => {
