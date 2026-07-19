@@ -573,7 +573,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   justify-content: center;
   min-width: 0;
-  max-width: 1000px;
+  max-width: 1200px;
   height: $desktop-bar-height;
   margin: 0 10px;
   overflow-x: auto;

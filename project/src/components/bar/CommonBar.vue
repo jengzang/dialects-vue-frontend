@@ -44,7 +44,14 @@
             @mouseleave="handleTabTooltipLeave"
             @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <span class="emoji">{{ t.icon }}</span>
+            <span
+              class="emoji"
+              :style="{
+                fontSize: ((t.mobileFontSize || t.fontSize) * 1) + 'rem'
+              }"
+            >
+              {{ t.icon }}
+            </span>
             <span
               class="label"
               v-if="!t.showLabelOnlyWhenActive || isActiveComputed(t.tab)"
@@ -102,7 +109,14 @@
             @mouseleave="handleTabTooltipLeave"
             @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <span class="emoji">{{ t.icon }}</span>
+            <span
+              class="emoji"
+              :style="{
+                fontSize: ((t.mobileFontSize || t.fontSize) * 1.2) + 'rem'
+              }"
+            >
+              {{ t.icon }}
+            </span>
             <span
               class="label"
               v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isActiveComputed(t.tab))"

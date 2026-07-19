@@ -100,10 +100,10 @@ const DISPLAY_PRESETS = {
     compactDesktop: {
         weight: 0.8,
         mobileWeight: 0.8,
-        weightIconOnly: 0.25,
-        mobileWeightIconOnly: 0.25,
-        fontSize: 0.9,
-        mobileFontSize: 0.9
+        weightIconOnly: 0.3,
+        mobileWeightIconOnly: 0.3,
+        fontSize: 1,
+        mobileFontSize: 1
     },
 
     // 桌面端保持标准大小，但让移动端具有更大的点击区域和字号。
@@ -334,8 +334,8 @@ export function useExploreBarConfig() {
             label: t('navigation.tabs.phonology'),
             icon: '🧬',
             display: {
-                preset: 'standard',
-                overrides: { scroll: 'right', weightIconOnly: 0.3 }
+                preset: 'compactDesktop',
+                overrides: { mobileScroll: 'right', weightIconOnly: 0.3 }
             },
             navigation: {
                 defaultTo: { path: withRouteLocale(route, '/menu/pho/matrix') }
@@ -346,8 +346,8 @@ export function useExploreBarConfig() {
             label: t('navigation.tabs.query'),
             icon: '🔍',
             display: {
-                preset: 'standard',
-                overrides: { scroll: 'right', weightIconOnly: 0.3 }
+                preset: 'compactDesktop',
+                overrides: { mobileScroll: 'right', weightIconOnly: 0.3 }
             },
             navigation: {
                 defaultTo: { path: withRouteLocale(route, '/menu/query/zhonggu') }
@@ -370,7 +370,7 @@ export function useExploreBarConfig() {
             label: t('navigation.tabs.map'),
             icon: '🗺️',
             display: {
-                preset: 'standard',
+                preset: 'compactDesktop',
                 overrides: { scroll: 'right', weightIconOnly: 0.3 }
             },
             navigation: {
@@ -382,8 +382,8 @@ export function useExploreBarConfig() {
             label: t('navigation.tabs.compare'),
             icon: '↔️',
             display: {
-                preset: 'standard',
-                overrides: { scroll: 'right', weightIconOnly: 0.3 }
+                preset: 'compactDesktop',
+                overrides: { mobileScroll: 'right', weightIconOnly: 0.3 }
             },
             navigation: {
                 defaultTo: { path: withRouteLocale(route, '/menu/compare/zhonggu') }

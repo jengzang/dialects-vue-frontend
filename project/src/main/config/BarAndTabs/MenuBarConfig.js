@@ -150,7 +150,7 @@ export function useMenuTabsConfig() {
       label: t('source.title'),
       icon: '🔗',
       display: {
-        preset: 'standard',
+        preset: 'compactDesktop',
         overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
       },
       navigation: {
@@ -162,7 +162,7 @@ export function useMenuTabsConfig() {
       label: t('navigation.tabs.praat'),
       icon: '🎙️',
       display: {
-        preset: 'standard',
+        preset: 'compactDesktop',
         overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
       },
       navigation: {
@@ -174,8 +174,12 @@ export function useMenuTabsConfig() {
       label: t('navigation.tabs.home'),
       icon: '🏠',
       display: {
-        preset: 'standard',
-        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.4 }
+        preset: 'compactDesktop',
+        overrides: {
+          mobileScroll: 'left',
+          weight: 0.7,
+          weightIconOnly: 0.4,
+        }
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/') }
@@ -184,12 +188,12 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'about',
       label: t('navigation.tabs.about'),
-      icon: '\uD83C\uDF10\uFE0F',
+      icon: '🌐',
       display: {
         preset: 'compactDesktop',
         overrides: {
           weight: 0.8,
-          mobileWeight: 0.8,
+          mobileWeight: 0.8
         }
       },
       navigation: {
@@ -199,7 +203,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'pho',
       label: t('navigation.tabs.phonology'),
-      icon: '\uD83E\uDDEC',
+      icon: '🧬',
       display: {
         preset: 'standard',
         overrides: {}
@@ -211,7 +215,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'query',
       label: t('navigation.tabs.query'),
-      icon: '\uD83D\uDD0D\uFE0F',
+      icon: '🔍',
       display: {
         preset: 'standard',
         overrides: {}
@@ -223,7 +227,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'result',
       label: t('navigation.tabs.results'),
-      icon: '\uD83D\uDCC9',
+      icon: '📉',
       display: {
         preset: 'resultTab',
         overrides: {
@@ -237,7 +241,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'map',
       label: t('navigation.tabs.map'),
-      icon: '\uD83D\uDDFA\uFE0F',
+      icon: '🗺️',
       display: {
         preset: 'standard',
         overrides: {}
@@ -249,7 +253,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'compare',
       label: t('navigation.tabs.compare'),
-      icon: '\u2194\uFE0F',
+      icon: '↔️',
       display: {
         preset: 'standard',
         overrides: {}
@@ -263,11 +267,17 @@ export function useMenuTabsConfig() {
       label: t('navigation.tabs.charClass'),
       icon: '📚',
       display: {
-        preset: 'standard',
-        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+        preset: 'compactDesktop',
+        overrides: {
+          mobileScroll: 'right',
+          weight: 0.7,
+        }
       },
       navigation: {
-        defaultTo: { path: withRouteLocale(route, '/explore/char-class'), query: { tab: 'zhonggu' } }
+        defaultTo: {
+          path: withRouteLocale(route, '/explore/char-class'),
+          query: { tab: 'zhonggu' }
+        }
       }
     }),
     createMenuTab({
@@ -275,7 +285,7 @@ export function useMenuTabsConfig() {
       label: t('navigation.tabs.phrases'),
       icon: '📖',
       display: {
-        preset: 'standard',
+        preset: 'compactDesktop',
         overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
       },
       navigation: {
@@ -287,7 +297,7 @@ export function useMenuTabsConfig() {
       label: t('navigation.tabs.villages'),
       icon: '🏘️',
       display: {
-        preset: 'standard',
+        preset: 'compactDesktop',
         overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
       },
       navigation: {
@@ -299,7 +309,7 @@ export function useMenuTabsConfig() {
       label: t('navigation.tabs.tools'),
       icon: '🧰',
       display: {
-        preset: 'standard',
+        preset: 'compactDesktop',
         overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
       },
       navigation: {

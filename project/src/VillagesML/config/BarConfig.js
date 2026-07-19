@@ -342,7 +342,7 @@ export const VILLAGESML_MODULES = [
     //   mobileWeight: 1,
     //   weightIconOnly: 0.5,
     //   fontSize: 1.0,
-    //   mobileFontSize: 1.0,
+    //   mobileFontSize: 0.9,
     //   requireAuth: false,
     //   hideOnMobile: false,
     //   hideLabelOnMobile: true,
@@ -451,7 +451,7 @@ export function createVillagesMLCommonBarSchema(isAuthenticated = false) {
         label: '首页',
         icon: '🏠',
         display: {
-            overrides: { scroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
+            overrides: { mobileScroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
         },
         navigation: {
             defaultTo: '/'
@@ -463,7 +463,7 @@ export function createVillagesMLCommonBarSchema(isAuthenticated = false) {
         label: '搜索',
         icon: '🔍',
          display: {
-            overrides: { scroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
+            overrides: { mobileScroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
         },
         navigation: {
             defaultTo: buildCurrentVillagesMLPath({ module: 'search' }),
@@ -477,7 +477,7 @@ export function createVillagesMLCommonBarSchema(isAuthenticated = false) {
       label: '信息',
       icon: 'ℹ️',
       display: {
-            overrides: { scroll: 'right', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
+            overrides: { mobileScroll: 'right', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
        },
        navigation: {
              defaultTo: buildCurrentVillagesMLPath({ module: 'system' }),
