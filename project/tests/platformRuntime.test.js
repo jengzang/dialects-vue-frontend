@@ -179,6 +179,73 @@ describe('platform runtime detection and capabilities', () => {
     })).toBe(true)
   })
 
+  it('records the next native-sensitive features without changing their current availability', () => {
+    expect(PLATFORM_FEATURE_MATRIX).toMatchObject({
+      mapView: {
+        category: 'map',
+        targets: { web: true, ios: true, android: true },
+        routes: ['/menu/map/view', '/menu/map/divide', '/menu/map/custom'],
+      },
+      fileImport: {
+        category: 'file',
+        targets: { web: true, ios: true, android: true },
+        routes: [
+          '/explore/tools/check',
+          '/explore/tools/jyut2ipa',
+          '/explore/tools/merge',
+        ],
+      },
+      fileExport: {
+        category: 'file',
+        targets: { web: true, ios: true, android: true },
+      },
+      audioRecord: {
+        category: 'audio',
+        targets: { web: true, ios: true, android: true },
+        routes: ['/explore/tools/praat'],
+      },
+      praatTools: {
+        category: 'tool',
+        targets: { web: true, ios: true, android: true },
+        routes: ['/explore/tools/praat'],
+        tutorials: [
+          'explore-praat-upload',
+          'explore-praat-results',
+          'explore-praat-vowelspace',
+          'explore-praat-pitchtone',
+        ],
+      },
+      externalOpen: {
+        category: 'navigation',
+        targets: { web: true, ios: true, android: true },
+      },
+      seoOnly: {
+        category: 'build',
+        targets: { web: true, ios: false, android: false, native: false },
+        disabledReason: 'web-only',
+      },
+    })
+
+    for (const featureName of ['mapView', 'fileImport', 'fileExport', 'audioRecord', 'praatTools', 'externalOpen']) {
+      expect(resolvePlatformFeatureAvailability(featureName, {
+        family: 'ios',
+        os: 'ios',
+        container: 'native-webview',
+      })).toEqual({ enabled: true, reason: null })
+      expect(resolvePlatformFeatureAvailability(featureName, {
+        family: 'android',
+        os: 'android',
+        container: 'native-webview',
+      })).toEqual({ enabled: true, reason: null })
+    }
+
+    expect(resolvePlatformFeatureAvailability('seoOnly', {
+      family: 'android',
+      os: 'android',
+      container: 'native-webview',
+    })).toEqual({ enabled: false, reason: 'web-only' })
+  })
+
   it('exposes web-compatible storage through the platform adapter', () => {
     window.localStorage.setItem('platform-local-test', 'ok')
     window.sessionStorage.setItem('platform-session-test', 'ok')

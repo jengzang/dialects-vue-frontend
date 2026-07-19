@@ -1,7 +1,22 @@
 import { getCurrentRuntimePlatform } from './runtime.js'
 
 export const PLATFORM_FEATURE_MATRIX = {
+  mapView: {
+    category: 'map',
+    targets: {
+      web: true,
+      ios: true,
+      android: true,
+      native: true,
+    },
+    routes: [
+      '/menu/map/view',
+      '/menu/map/divide',
+      '/menu/map/custom',
+    ],
+  },
   mapDraw: {
+    category: 'map',
     targets: {
       web: true,
       ios: false,
@@ -19,6 +34,74 @@ export const PLATFORM_FEATURE_MATRIX = {
         '^assets/voronoiClip\\.worker-[\\w-]+\\.js$',
       ],
     },
+  },
+  fileImport: {
+    category: 'file',
+    targets: {
+      web: true,
+      ios: true,
+      android: true,
+      native: true,
+    },
+    routes: [
+      '/explore/tools/check',
+      '/explore/tools/jyut2ipa',
+      '/explore/tools/merge',
+    ],
+  },
+  fileExport: {
+    category: 'file',
+    targets: {
+      web: true,
+      ios: true,
+      android: true,
+      native: true,
+    },
+  },
+  audioRecord: {
+    category: 'audio',
+    targets: {
+      web: true,
+      ios: true,
+      android: true,
+      native: true,
+    },
+    routes: ['/explore/tools/praat'],
+  },
+  praatTools: {
+    category: 'tool',
+    targets: {
+      web: true,
+      ios: true,
+      android: true,
+      native: true,
+    },
+    routes: ['/explore/tools/praat'],
+    tutorials: [
+      'explore-praat-upload',
+      'explore-praat-results',
+      'explore-praat-vowelspace',
+      'explore-praat-pitchtone',
+    ],
+  },
+  externalOpen: {
+    category: 'navigation',
+    targets: {
+      web: true,
+      ios: true,
+      android: true,
+      native: true,
+    },
+  },
+  seoOnly: {
+    category: 'build',
+    targets: {
+      web: true,
+      ios: false,
+      android: false,
+      native: false,
+    },
+    disabledReason: 'web-only',
   },
 }
 
