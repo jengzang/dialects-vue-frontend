@@ -7,7 +7,7 @@ import {
   createCommonBarSchema,
   getCommonBarTabs,
   normalizeCommonBarSchema,
-} from '../src/components/bar/commonBarNavigation.js'
+} from '../src/utils/bar/commonBarNavigation.js'
 
 const testsDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(testsDir, '..')
@@ -55,7 +55,7 @@ describe('bar overflow navigation config', () => {
 
     expect(menuBarSource).toContain("tab: 'home'")
     expect(menuBarSource).toContain("overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.4 }")
-    expect(menuBarSource.match(/scroll: 'right'/g) || []).toHaveLength(5)
+    expect(menuBarSource.match(/scroll: 'right'/g) || []).toHaveLength(4)
 
     expect(exploreBarSource).toContain("tab: 'home'")
     expect(exploreBarSource).toContain("overrides: { scroll: 'left', weightIconOnly: 0.4 }")
@@ -85,6 +85,30 @@ describe('bar overflow navigation config', () => {
 
     expect(getCommonBarTabs(schema)[0].scroll).toBe('left')
     expect(getCommonBarTabs(normalizedSchema)[0].scroll).toBe('left')
+  })
+
+  it('preserves mobile-only overflow roles after schema normalization', () => {
+    const schema = createCommonBarSchema({
+      items: [
+        createCommonBarItem({
+          id: 'search',
+          label: '搜索',
+          icon: '🔍',
+          display: {
+            overrides: { mobileScroll: 'left', weightIconOnly: 0.4 },
+          },
+          navigation: {
+            defaultTo: '/search',
+          },
+        }),
+      ],
+    })
+    const normalizedSchema = normalizeCommonBarSchema(schema)
+
+    expect(getCommonBarTabs(schema)[0].scroll).toBeUndefined()
+    expect(getCommonBarTabs(schema)[0].mobileScroll).toBe('left')
+    expect(getCommonBarTabs(normalizedSchema)[0].scroll).toBeUndefined()
+    expect(getCommonBarTabs(normalizedSchema)[0].mobileScroll).toBe('left')
   })
 
   it('uses portrait aspect ratio without a hover gate for CommonBar and ExploreBar mobile layout', () => {
@@ -154,6 +178,26 @@ describe('bar overflow navigation config', () => {
       expect(source).toContain('padding-inline: 14px;')
       expect(source).not.toContain('padding-inline: 0.6rem;')
       expect(source).not.toContain('padding-inline: 0.85rem;')
+    }
+  })
+
+  it('supports mobile-only overflow tab sorting in each bar', () => {
+    for (const path of [navBarPath, commonBarPath, exploreBarComponentPath]) {
+      const source = readSource(path)
+
+      expect(source).toContain('const getTabScroll = (tab, isMobile) =>')
+      expect(source).toContain("return isMobile ? (tab.mobileScroll ?? tab.scroll) : tab.scroll")
+      expect(source).toContain('const sortTabsByScroll = (tabs, isMobile) =>')
+      expect(source).toContain('const orderedTabs = computed(() => sortTabsByScroll(')
+      expect(source).toContain('const orderedMobileTabs = computed(() => sortTabsByScroll(')
+      expect(source).toContain('const hasOverflowForLayout = (isMobile) => isMobile ? hasOverflowMobile.value : hasOverflowDesktop.value')
+      expect(source).toContain('v-for="t in orderedMobileTabs"')
+      expect(source).toContain("getTabScroll(t, true) === 'left'")
+      expect(source).toContain("getTabScroll(t, true) === 'right'")
+      expect(source).toContain("getTabScroll(t, false) === 'left'")
+      expect(source).toContain("getTabScroll(t, false) === 'right'")
+      expect(source).toContain('getRenderedPrimaryTabs(isMobile)')
+      expect(source).toContain('getOverflowFlex(t,')
     }
   })
 })

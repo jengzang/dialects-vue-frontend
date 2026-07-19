@@ -13,12 +13,12 @@
       <nav 
           ref="navRef" 
           class="navbar-btn" 
-          :class="scrollClass" 
+          :class="scrollClass"
       >
       <!-- <nav 
           ref="navRef" 
           class="navbar-btn" 
-          :class="scrollClass" 
+          :class="scrollClassMobile"
           @scroll="onScroll" 
           @scrollend="onScrollEnd"
       > -->
@@ -35,7 +35,7 @@
               :class="[
                 { active: isMenuTabActive(t.tab) },
                 t.cssClass,
-                { 'tab-overflow-left': t.scroll === 'left', 'tab-overflow-right': t.scroll === 'right' }
+                { 'tab-overflow-left': getTabScroll(t, false) === 'left', 'tab-overflow-right': getTabScroll(t, false) === 'right' }
               ]"
               :style="{
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), false),
@@ -105,7 +105,7 @@
           @scrollend="onScrollEnd"
       > -->
         <RouterLink
-            v-for="t in orderedTabs"
+            v-for="t in orderedMobileTabs"
             :key="t.tab"
             :to="resolveMenuBarTarget(t)"
             custom
@@ -118,7 +118,7 @@
               :class="[
                 { active: isMenuTabActive(t.tab) },
                 t.cssClass,
-                { 'tab-overflow-left': t.scroll === 'left', 'tab-overflow-right': t.scroll === 'right' }
+                { 'tab-overflow-left': getTabScroll(t, true) === 'left', 'tab-overflow-right': getTabScroll(t, true) === 'right' }
               ]"
               :style="{
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), true),
@@ -199,21 +199,31 @@ watch(() => route.path, () => {
 const allMenuTabs = useMenuBarConfig()
 const tabs = computed(() => filterVisibleMenuBarTabs(allMenuTabs.value))
 
-// Overflow scroll: sort tabs：左溢出 → 主 → 右溢出
-const orderedTabs = computed(() => {
-  const all = tabs.value
-  const left = all.filter(t => t.scroll === 'left')
-  const main = all.filter(t => !t.scroll || (t.scroll !== 'left' && t.scroll !== 'right'))
-  const right = all.filter(t => t.scroll === 'right')
-  return [...left, ...main, ...right]
-})
+const getTabScroll = (tab, isMobile) => {
+  return isMobile ? (tab.mobileScroll ?? tab.scroll) : tab.scroll
+}
 
-const { hasOverflow, scrollClass, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(
+// Overflow scroll: sort tabs：左溢出 → 主 → 右溢出
+const sortTabsByScroll = (tabs, isMobile) => {
+  const all = tabs
+  const left = all.filter(t => getTabScroll(t, isMobile) === 'left')
+  const main = all.filter(t => !getTabScroll(t, isMobile) || (getTabScroll(t, isMobile) !== 'left' && getTabScroll(t, isMobile) !== 'right'))
+  const right = all.filter(t => getTabScroll(t, isMobile) === 'right')
+  return [...left, ...main, ...right]
+}
+
+const orderedTabs = computed(() => sortTabsByScroll(tabs.value, false))
+const orderedMobileTabs = computed(() => sortTabsByScroll(tabs.value, true))
+
+const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(
   navRef,
   orderedTabs,
   { desktop: 30, portrait: 18 },
-  mobileNavRef
+  mobileNavRef,
+  orderedMobileTabs
 )
+
+const hasOverflowForLayout = (isMobile) => isMobile ? hasOverflowMobile.value : hasOverflowDesktop.value
 
 const getFlexWeight = (tab, isActive, isMobile) => {
   let labelVisible
@@ -237,8 +247,8 @@ const getFlexWeight = (tab, isActive, isMobile) => {
 }
 
 const getRenderedPrimaryTabs = (isMobile) =>
-  orderedTabs.value
-    .filter(t => !t.scroll || (t.scroll !== 'left' && t.scroll !== 'right'))
+  (isMobile ? orderedMobileTabs.value : orderedTabs.value)
+    .filter(t => !getTabScroll(t, isMobile) || (getTabScroll(t, isMobile) !== 'left' && getTabScroll(t, isMobile) !== 'right'))
     .filter(t => !isMobile || !t.hideOnMobile)
 
 const getPrimaryTotalWeight = (isMobile) =>
@@ -246,8 +256,8 @@ const getPrimaryTotalWeight = (isMobile) =>
     .reduce((s, t) => s + getFlexWeight(t, isMenuTabActive(t.tab), isMobile), 0) || 1
 
 const getOverflowFlex = (t, isActive, isMobile) => {
-  if (t.scroll) return '0 0 auto'
-  if (hasOverflow.value) {
+  if (getTabScroll(t, isMobile)) return '0 0 auto'
+  if (hasOverflowForLayout(isMobile)) {
     const w = getFlexWeight(t, isActive, isMobile)
     const totalWeight = getPrimaryTotalWeight(isMobile)
     if (navContentWidth.value > 0) {

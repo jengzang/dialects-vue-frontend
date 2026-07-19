@@ -33,7 +33,9 @@ import { userStore, resultCache } from '@/main/store/store.js'
 //       showLabelOnlyWhenActive: false,     // 桌面端是否仅在“激活选中”时才显示文字
 //       mobileShowLabelOnlyWhenActive: true,// 移动端是否仅在“激活选中”时才显示文字
 //       cssClass: '',                       // 挂载到该标签上的自定义 CSS 类名
-//       visibleWhen: null                   // 动态可见性函数（例如: () => user.isAdmin）
+//       visibleWhen: null,                  // 动态可见性函数（例如: () => user.isAdmin）
+//       scroll: undefined,                  // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+//       mobileScroll: undefined             // 仅竖屏/移动端覆盖 scroll；例如 mobileScroll: 'right' 表示桌面主tab、移动端右侧溢出
 //     }
 //   },
 //   navigation: {         // 路由与导航行为配置
@@ -77,7 +79,8 @@ const DISPLAY_DEFAULTS = {
     visibleWhen: null, // 默认始终可见
 
     // 溢出滚动
-    scroll: undefined // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+    scroll: undefined, // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+    mobileScroll: undefined // 仅竖屏/移动端覆盖 scroll；undefined = 沿用 scroll
 }
 
 const NAVIGATION_DEFAULTS = {

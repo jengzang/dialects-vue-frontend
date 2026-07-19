@@ -34,7 +34,9 @@ import { resultCache } from '@/main/store/store.js'
 //       showLabelOnlyWhenActive: false,
 //       mobileShowLabelOnlyWhenActive: true,
 //       cssClass: '',
-//       visibleWhen: null
+//       visibleWhen: null,
+//       scroll: undefined,       // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+//       mobileScroll: undefined  // 仅竖屏/移动端覆盖 scroll；例如 mobileScroll: 'left' 表示桌面主tab、移动端左侧溢出
 //     }
 //   },
 //   navigation: {
@@ -60,7 +62,8 @@ const DISPLAY_DEFAULTS = {
   mobileShowLabelOnlyWhenActive: true,
   cssClass: '',
   visibleWhen: null,
-  scroll: undefined // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+  scroll: undefined, // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+  mobileScroll: undefined // 仅竖屏/移动端覆盖 scroll；undefined = 沿用 scroll
 }
 
 const DISPLAY_PRESETS = {
