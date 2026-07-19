@@ -20,6 +20,7 @@
 - 空间分析：`SpatialIntegration.vue`、`SpatialClustersTab.vue`、`SpatialVisualizationTab.vue`、`SpatialMap.vue`、`HotspotMap.vue`、`SpatialHotspotsTab.vue`
 - 字符分析：`CharacterSignificance.vue`、`CharacterEmbeddings.vue`、`CharacterNetwork.vue`、`RegionSelectorPanel.vue`
 - ML：`FeatureExtraction.vue`、`SubsetAnalysis.vue`、`ClusteringSettingsPanel.vue`、clustering shared 设置面板
+- 工作区与系统：`VillagesMLWorkspace.vue` 顶部数据集选择器、`SystemInfo.vue` 表统计筛选工具条
 
 ## 保留旧类名但不代表未接入
 
@@ -29,6 +30,7 @@
 - `controls` / `filter-row` / `search-controls`：局部样式钩子，若同一元素已带 `vml-control-surface` 或内部已有 `vml-control-field`，视为已接入。
 - `map-controls`：地图悬浮工具条，已接入 `vml-control-surface`，但保留 overlay 定位与紧凑宽度。
 - `settings-group` / `setting-row`：保留原语义类，同时叠加 `vml-control-surface` / `vml-setting-row`。
+- `dataset-selector` / `header-controls`：顶层或面板标题区工具条，已接入轻量 `vml-control-row` / `vml-control-field` / `vml-control-actions`，不额外套完整 surface。
 
 ## 后续改动边界
 
