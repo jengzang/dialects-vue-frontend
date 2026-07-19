@@ -6,7 +6,7 @@
     </h3>
 
     <!-- Mode Selector -->
-    <div class="mode-selector vml-glass-panel">
+    <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
       <RadioGroup
           name="viewModeRadio"
           :options="viewModeOptions"
