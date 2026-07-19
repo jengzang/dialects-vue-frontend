@@ -25,51 +25,51 @@ const drawStyles = [
   {
     id: 'gl-draw-polygon-fill',
     type: 'fill',
-    filter: ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+    filter: ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static'], ['!=', 'user_visible', false]],
     paint: {
-      'fill-color': ['coalesce', ['get', 'fill'], drawFallbackPointColor],
-      'fill-outline-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
-      'fill-opacity': ['coalesce', ['get', 'fillOpacity'], 0.22],
+      'fill-color': ['coalesce', ['get', 'user_fill'], drawFallbackPointColor],
+      'fill-outline-color': ['coalesce', ['get', 'user_stroke'], drawFallbackStroke],
+      'fill-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, ['coalesce', ['get', 'user_fillOpacity'], 0.22]],
     },
   },
   {
     id: 'gl-draw-polygon-stroke',
     type: 'line',
-    filter: ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+    filter: ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static'], ['!=', 'user_visible', false]],
     layout: {
       'line-cap': 'round',
       'line-join': 'round',
     },
     paint: {
-      'line-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
-      'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
-      'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+      'line-color': ['coalesce', ['get', 'user_stroke'], drawFallbackStroke],
+      'line-width': ['coalesce', ['get', 'user_strokeWidth'], 3],
+      'line-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, 1],
     },
   },
   {
     id: 'gl-draw-line',
     type: 'line',
-    filter: ['all', ['==', '$type', 'LineString'], ['!=', 'mode', 'static']],
+    filter: ['all', ['==', '$type', 'LineString'], ['!=', 'mode', 'static'], ['!=', 'user_visible', false]],
     layout: {
       'line-cap': 'round',
       'line-join': 'round',
     },
     paint: {
-      'line-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
-      'line-width': ['coalesce', ['get', 'strokeWidth'], 4],
-      'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+      'line-color': ['coalesce', ['get', 'user_stroke'], drawFallbackStroke],
+      'line-width': ['coalesce', ['get', 'user_strokeWidth'], 4],
+      'line-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, 1],
     },
   },
   {
     id: 'gl-draw-point',
     type: 'circle',
-    filter: ['all', ['==', '$type', 'Point'], ['!=', 'meta', 'midpoint'], ['!=', 'mode', 'static']],
+    filter: ['all', ['==', '$type', 'Point'], ['!=', 'meta', 'midpoint'], ['!=', 'mode', 'static'], ['!=', 'user_visible', false]],
     paint: {
-      'circle-radius': ['coalesce', ['get', 'pointRadius'], 6],
-      'circle-color': ['coalesce', ['get', 'pointColor'], drawFallbackPointColor],
-      'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], drawFallbackStroke],
+      'circle-radius': ['coalesce', ['get', 'user_pointRadius'], 6],
+      'circle-color': ['coalesce', ['get', 'user_pointColor'], drawFallbackPointColor],
+      'circle-stroke-color': ['coalesce', ['get', 'user_pointStrokeColor'], drawFallbackStroke],
       'circle-stroke-width': 2,
-      'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+      'circle-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, 1],
     },
   },
   {
@@ -135,10 +135,6 @@ let previousPreviewSourceIds = []
 let hoveredFeatureKey = null
 let hoveredFeatureSource = null
 let previewHoverBound = false
-const emptyFeatureCollection = () => ({
-  type: 'FeatureCollection',
-  features: [],
-})
 const sanitizeLayerFilename = (layerName) => {
   return String(layerName || 'map-draw-layer')
     .trim()
@@ -524,6 +520,7 @@ const initializeDraw = () => {
       polygon: true,
       trash: true,
     },
+    userProperties: true,
     styles: drawStyles,
     defaultMode: 'simple_select',
   })
@@ -533,9 +530,7 @@ const initializeDraw = () => {
   bindDrawEvents()
   syncReadonlyLayers()
 
-  const initialFeatures = normalizeFeatureCollection(
-    props.activeLayer?.visible === false ? emptyFeatureCollection() : props.modelValue
-  )
+  const initialFeatures = normalizeFeatureCollection(props.modelValue)
   if (initialFeatures.features.length > 0) {
     draw.value.set(initialFeatures)
   }
@@ -1002,12 +997,10 @@ const exportImage = async (options = {}) => {
 }
 
 watch(
-  () => [props.modelValue, props.activeLayer?.visible],
-  ([nextValue]) => {
+  () => props.modelValue,
+  (nextValue) => {
     if (!draw.value || !nextValue) return
-    const normalized = normalizeFeatureCollection(
-      props.activeLayer?.visible === false ? emptyFeatureCollection() : nextValue
-    )
+    const normalized = normalizeFeatureCollection(nextValue)
     draw.value.deleteAll()
     if (normalized.features.length > 0) {
       draw.value.set(normalized)

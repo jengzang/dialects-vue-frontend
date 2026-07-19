@@ -1438,7 +1438,7 @@ const moveLayer = (layerId, direction) => {
 const syncActiveLayerToMap = () => {
   if (!activeLayer.value) return;
   editableMapRef.value?.importGeoJson?.(
-    activeLayer.value.visible === false ? emptyFeatureCollection() : activeLayer.value.featureCollection,
+    activeLayer.value.featureCollection,
     { emitChanges: false }
   );
 };
