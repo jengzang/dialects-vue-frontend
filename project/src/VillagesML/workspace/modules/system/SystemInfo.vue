@@ -141,22 +141,28 @@
     <div class="vml-glass-panel tables-panel">
       <div class="panel-header">
         <h3>表統計信息 Table Statistics</h3>
-        <div class="header-controls">
-          <button @click="refreshTables" :disabled="loadingTables" class="solid-button small">
-            <span v-if="loadingTables">加載中...</span>
-            <span v-else-if="tables === null">加載</span>
-            <span v-else>🔄 刷新</span>
-          </button>
-          <input
-            v-model="tableSearch"
-            type="text"
-            placeholder="搜尋表名..."
-            class="glass-input small"
-          >
-          <SimpleSelectDropdown :match-trigger-width="true"
-            v-model="tableSortBy"
-            :options="sortOptions"
-          />
+        <div class="header-controls vml-control-row">
+          <div class="vml-control-actions">
+            <button @click="refreshTables" :disabled="loadingTables" class="solid-button small">
+              <span v-if="loadingTables">加載中...</span>
+              <span v-else-if="tables === null">加載</span>
+              <span v-else>🔄 刷新</span>
+            </button>
+          </div>
+          <div class="vml-control-field vml-control-field--compact">
+            <input
+              v-model="tableSearch"
+              type="text"
+              placeholder="搜尋表名..."
+              class="glass-input small"
+            >
+          </div>
+          <div class="vml-control-field vml-control-field--compact">
+            <SimpleSelectDropdown :match-trigger-width="true"
+              v-model="tableSortBy"
+              :options="sortOptions"
+            />
+          </div>
         </div>
       </div>
       <div v-if="tables !== null" class="tables-content">
@@ -518,8 +524,7 @@ onMounted(() => {
 }
 
 .header-controls {
-  display: flex;
-  gap: 12px;
+  justify-content: flex-end;
 }
 
 .ngram-level-grid {
@@ -883,8 +888,5 @@ onMounted(() => {
     padding: 12px;
   }
 
-  .header-controls {
-    flex-direction: column;
-  }
 }
 </style>

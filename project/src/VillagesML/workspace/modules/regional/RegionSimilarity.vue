@@ -7,7 +7,7 @@
 <!--    <h1 class="page-title">🔍 區域相似度分析</h1>-->
 
     <!-- Mode Selector -->
-    <div class="mode-selector vml-glass-panel">
+    <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
       <RadioGroup
           name="regionSimilarityMode"
           :options="similarityModeOptions"
@@ -20,16 +20,18 @@
       <div class="query-form vml-glass-panel">
         <h3>查找相似區域</h3>
 
-        <div class="form-group vml-control-surface">
-          <label>目標區域:</label>
-          <FilterableSelect
-            v-model="targetRegion"
-            :level="targetRegionLevel"
-            :allowed-levels="['city', 'county']"
-            @update:level="(newLevel) => targetRegionLevel = newLevel"
-            @update:hierarchy="(h) => targetRegionHierarchy = h"
-            placeholder="請選擇或輸入區域"
-          />
+        <div class="form-group vml-control-surface vml-control-row">
+          <div class="vml-control-field">
+            <label>目標區域:</label>
+            <FilterableSelect
+              v-model="targetRegion"
+              :level="targetRegionLevel"
+              :allowed-levels="['city', 'county']"
+              @update:level="(newLevel) => targetRegionLevel = newLevel"
+              @update:hierarchy="(h) => targetRegionHierarchy = h"
+              placeholder="請選擇或輸入區域"
+            />
+          </div>
         </div>
 
         <div class="form-row vml-control-surface vml-control-row">
@@ -226,23 +228,27 @@
         <h3>相似度矩陣</h3>
 
         <div class="form-group vml-control-surface">
-          <label>選擇區域 (最多20個):</label>
           <div class="region-selector vml-control-row">
-            <FilterableSelect
-              v-model="selectedRegionToAdd"
-              :level="matrixRegionLevel"
-              :allowed-levels="['city', 'county']"
-              @update:level="(newLevel) => matrixRegionLevel = newLevel"
-              @update:hierarchy="(h) => selectedRegionHierarchy = h"
-              placeholder="選擇區域..."
-            />
-            <button
-              class="add-button"
-              :disabled="!selectedRegionToAdd || selectedRegions.length >= 20"
-              @click="addRegion"
-            >
-              添加
-            </button>
+            <div class="vml-control-field">
+              <label>選擇區域 (最多20個):</label>
+              <FilterableSelect
+                v-model="selectedRegionToAdd"
+                :level="matrixRegionLevel"
+                :allowed-levels="['city', 'county']"
+                @update:level="(newLevel) => matrixRegionLevel = newLevel"
+                @update:hierarchy="(h) => selectedRegionHierarchy = h"
+                placeholder="選擇區域..."
+              />
+            </div>
+            <div class="vml-control-actions">
+              <button
+                class="add-button"
+                :disabled="!selectedRegionToAdd || selectedRegions.length >= 20"
+                @click="addRegion"
+              >
+                添加
+              </button>
+            </div>
           </div>
         </div>
 
@@ -257,12 +263,14 @@
           </div>
         </div>
 
-        <div class="form-group vml-control-surface">
-          <label>相似度指標:</label>
-          <SimpleSelectDropdown :match-trigger-width="true"
-            v-model="matrixMetric"
-            :options="metricOptions"
-          />
+        <div class="form-group vml-control-surface vml-control-row">
+          <div class="vml-control-field">
+            <label>相似度指標:</label>
+            <SimpleSelectDropdown :match-trigger-width="true"
+              v-model="matrixMetric"
+              :options="metricOptions"
+            />
+          </div>
           <div class="vml-control-actions">
             <button
               class="query-button"
@@ -656,11 +664,7 @@ export default {
 }
 
 .mode-selector {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
+  margin-bottom: 20px;
 }
 
 .query-form {

@@ -13,21 +13,23 @@
 
     <!-- Content area -->
     <div class="content-area">
-      <div class="dataset-selector">
-        <span class="dataset-selector__label">數據集</span>
-        <select
-          class="dataset-selector__select"
-          :value="activeDataset"
-          @change="handleDatasetChange($event.target.value)"
-        >
-          <option
-            v-for="dataset in VILLAGESML_DATASETS"
-            :key="dataset.id"
-            :value="dataset.id"
+      <div class="dataset-selector vml-control-row">
+        <div class="dataset-selector__field vml-control-field vml-control-field--compact">
+          <label class="dataset-selector__label">數據集</label>
+          <select
+            class="dataset-selector__select"
+            :value="activeDataset"
+            @change="handleDatasetChange($event.target.value)"
           >
-            {{ dataset.label }}
-          </option>
-        </select>
+            <option
+              v-for="dataset in VILLAGESML_DATASETS"
+              :key="dataset.id"
+              :value="dataset.id"
+            >
+              {{ dataset.label }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <!-- Dynamic Component Loading with KeepAlive -->
@@ -555,11 +557,12 @@ const handleAdjustParams = (action) => {
 }
 
 .dataset-selector {
-  display: flex;
-  align-items: center;
   justify-content: flex-end;
-  gap: 8px;
   margin-bottom: 10px;
+}
+
+.dataset-selector__field {
+  flex-basis: 150px;
 }
 
 .dataset-selector__label {
