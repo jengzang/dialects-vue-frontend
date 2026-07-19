@@ -1,5 +1,6 @@
 import { Directory, Filesystem } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
+import { FilePicker } from '@capawesome/capacitor-file-picker'
 
 function getGlobals(options = {}) {
   return options.globals ?? (typeof window === 'undefined' ? {} : window)
@@ -43,12 +44,23 @@ function hasCapacitorFileExport(globals) {
   )
 }
 
+function hasCapacitorFilePicker(globals) {
+  return Boolean(
+    isNativeCapacitorApp(globals) &&
+    isCapacitorPluginAvailable(globals, 'FilePicker')
+  )
+}
+
 function getCapacitorFilesystem(options = {}) {
   return options.filesystem ?? { Directory, Filesystem }
 }
 
 function getCapacitorShare(options = {}) {
   return options.share ?? { Share }
+}
+
+function getCapacitorFilePicker(options = {}) {
+  return options.filePicker ?? { FilePicker }
 }
 
 export function hasNativeFileBridge(options = {}) {
@@ -67,7 +79,10 @@ export function hasNativeFilePickerBridge(options = {}) {
   const globals = getGlobals(options)
   const directBridge = getDirectNativeBridge(globals)
 
-  return typeof directBridge?.pickFiles === 'function'
+  return Boolean(
+    typeof directBridge?.pickFiles === 'function' ||
+    hasCapacitorFilePicker(globals)
+  )
 }
 
 async function blobToBase64(blob, options = {}) {
@@ -115,11 +130,11 @@ function base64ToBlob(base64, mimeType = 'application/octet-stream') {
 function nativePayloadToFile(payload) {
   const fileName = payload?.fileName || payload?.name || 'import.dat'
   const mimeType = payload?.mimeType || payload?.type || 'application/octet-stream'
-  const blob = payload?.blob || base64ToBlob(payload?.base64 || '', mimeType)
+  const blob = payload?.blob || base64ToBlob(payload?.base64 || payload?.data || '', mimeType)
 
   return new File([blob], fileName, {
     type: mimeType,
-    lastModified: payload?.lastModified || Date.now(),
+    lastModified: payload?.lastModified || payload?.modifiedAt || Date.now(),
   })
 }
 
@@ -199,6 +214,31 @@ async function pickFilesWithNativeBridge(pickerOptions = {}, options = {}) {
   return payloads.map(nativePayloadToFile)
 }
 
+function acceptToPickerTypes(accept = '') {
+  return String(accept)
+    .split(',')
+    .map((type) => type.trim())
+    .filter(Boolean)
+}
+
+async function pickFilesWithCapacitorFilePicker(pickerOptions = {}, options = {}) {
+  const globals = getGlobals(options)
+
+  if (!hasCapacitorFilePicker(globals)) {
+    return null
+  }
+
+  const { FilePicker: CapacitorFilePicker } = getCapacitorFilePicker(options)
+  const result = await CapacitorFilePicker.pickFiles({
+    types: acceptToPickerTypes(pickerOptions.accept),
+    limit: pickerOptions.multiple ? 0 : 1,
+    readData: true,
+  })
+  const payloads = Array.isArray(result?.files) ? result.files : []
+
+  return payloads.map(nativePayloadToFile)
+}
+
 function saveBlobWithBrowserDownload(blob, fileName, options = {}) {
   const globals = getGlobals(options)
   const documentRef = getDocument(options)
@@ -237,6 +277,11 @@ export function getPlatformFileService(options = {}) {
         const nativeFiles = await pickFilesWithNativeBridge(pickerOptions, options)
         if (nativeFiles) {
           return nativeFiles
+        }
+
+        const capacitorFiles = await pickFilesWithCapacitorFilePicker(pickerOptions, options)
+        if (capacitorFiles) {
+          return capacitorFiles
         }
       }
 

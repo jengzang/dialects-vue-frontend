@@ -12,6 +12,7 @@ import {
   getPlatformFeature,
   isPlatformRouteEnabled,
   isPlatformTutorialEnabled,
+  hasNativeFilePickerBridge,
   PLATFORM_FEATURE_MATRIX,
   resolvePlatformFeatureAvailability,
   isFeatureEnabled,
@@ -462,6 +463,59 @@ describe('platform runtime detection and capabilities', () => {
     expect(files[0]).toBeInstanceOf(File)
     expect(files[0].name).toBe('native.xlsx')
     expect(files[0].type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    expect(await readFileAsText(files[0])).toBe('hello')
+  })
+
+  it('imports files through Capacitor FilePicker in native apps', async () => {
+    const calls = []
+    const fileService = getPlatformFileService({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'ios',
+          isPluginAvailable: (name) => name === 'FilePicker',
+        },
+      },
+      filePicker: {
+        FilePicker: {
+          async pickFiles(payload) {
+            calls.push(payload)
+            return {
+              files: [{
+                name: 'native-audio.m4a',
+                mimeType: 'audio/mp4',
+                data: 'aGVsbG8=',
+                modifiedAt: 1234,
+              }],
+            }
+          },
+        },
+      },
+    })
+
+    expect(hasNativeFilePickerBridge({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'ios',
+          isPluginAvailable: (name) => name === 'FilePicker',
+        },
+      },
+    })).toBe(true)
+
+    const files = await fileService.pickFiles({
+      accept: 'audio/*,.m4a',
+      multiple: false,
+    })
+
+    expect(calls).toEqual([{
+      types: ['audio/*', '.m4a'],
+      limit: 1,
+      readData: true,
+    }])
+    expect(files).toHaveLength(1)
+    expect(files[0]).toBeInstanceOf(File)
+    expect(files[0].name).toBe('native-audio.m4a')
+    expect(files[0].type).toBe('audio/mp4')
+    expect(files[0].lastModified).toBe(1234)
     expect(await readFileAsText(files[0])).toBe('hello')
   })
 

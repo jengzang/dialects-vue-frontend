@@ -54,6 +54,8 @@
     "@capacitor/ios": "^8.4.2",
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/share": "^8.0.1",
+    "@capawesome/capacitor-file-picker": "^8.0.3",
+    "@capgo/capacitor-audio-recorder": "^8.2.6",
     "@mapbox/mapbox-gl-draw": "^1.5.1",
     "@tmcw/togeojson": "^7.1.2",
     "@turf/turf": "^7.3.5",
