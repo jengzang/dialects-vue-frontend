@@ -1169,14 +1169,6 @@ onBeforeUnmount(() => {
   margin-bottom: 16px;
 }
 
-.filter-group {
-  min-width: 0;
-}
-
-.filter-group label {
-  color: var(--text-primary);
-}
-
 .load-btn {
   padding: 10px 20px;
   white-space: nowrap;
@@ -1379,14 +1371,6 @@ onBeforeUnmount(() => {
 
 .controls-row {
   margin-bottom: 8px;
-}
-
-.control-item {
-  min-width: 0;
-}
-
-.control-item label {
-  color: var(--text-primary);
 }
 
 .control-item span {
@@ -1737,14 +1721,6 @@ onBeforeUnmount(() => {
 @media (max-aspect-ratio: 1/1) {
   .feature-extraction-page {
     padding: 8px;
-  }
-
-  .filter-group {
-    min-width: 100%;
-  }
-
-  .control-item {
-    min-width: 100%;
   }
 
   .button-group {

@@ -1250,11 +1250,7 @@ const handleApiError = (error) => {
 
 /* Filter Row */
 .filter-row {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
-  align-items: center;
-  flex-wrap: wrap;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -1319,10 +1315,7 @@ const handleApiError = (error) => {
 
 /* Filter Actions */
 .filter-actions {
-  display: flex;
-  gap: 12px;
   margin-top: 20px;
-  flex-wrap: wrap;
 }
 
 .subset-info {
@@ -1518,21 +1511,13 @@ const handleApiError = (error) => {
 
 /* Clustering Controls */
 .clustering-controls {
-  display: flex;
-  gap: 16px;
-  // align-items: flex-start;
   margin-bottom: 24px;
-  flex-wrap: wrap;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
 }
 
 .control-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  // width: 100%;
   max-width: 100%;
 }
 
@@ -1721,13 +1706,6 @@ const handleApiError = (error) => {
     padding: 16px;
   }
 
-  .filter-row {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-    gap: 8px;
-  }
-
   .filter-row > * {
     min-width: 0 !important;
     width: 100%;
@@ -1745,18 +1723,8 @@ const handleApiError = (error) => {
     margin: 16px 0;
   }
 
-  .clustering-controls {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-    padding: 0;
-  }
-
   .control-row {
-    flex-direction: column;
-    align-items: flex-start;
     width: 100%;
-    gap: 8px;
   }
 
   .control-row label {
