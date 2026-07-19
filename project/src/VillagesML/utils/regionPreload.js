@@ -4,6 +4,7 @@
  */
 
 import { getVillagesRegions } from '@/composables/data/useVillagesCache.js'
+import { getCurrentVillagesMLDataset } from './currentDataset.js'
 
 const CACHE_KEY_PREFIX = 'regions_all_data_v3'
 const CACHE_TIMESTAMP_KEY_PREFIX = 'regions_cache_timestamp_v3'

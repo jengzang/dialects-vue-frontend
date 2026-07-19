@@ -1,5 +1,7 @@
 import { getMetadataOverview, getMetadataTables, getNgramStatistics } from '@/api'
 import { getRegionList } from '@/api/villagesML/villages.js'
+import { buildVillagesCacheKey } from '@/VillagesML/utils/cacheKeys.js'
+import { getCurrentVillagesMLDataset } from '@/VillagesML/utils/currentDataset.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
 const overviewPromises = new Map()
