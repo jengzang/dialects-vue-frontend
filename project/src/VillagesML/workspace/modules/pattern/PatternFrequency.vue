@@ -9,7 +9,7 @@
       <h2>🔍 模式頻率分析</h2>
 
       <!-- Query Mode Selection -->
-      <div class="mode-selector">
+      <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
         <RadioGroup
             name="patternQueryMode"
             :options="queryModeOptions"
@@ -210,8 +210,7 @@ const goToTendency = (pattern) => {
 }
 
 .mode-selector {
-  display: flex;
-  gap: 24px;
+  margin-bottom: 12px;
 }
 
 .radio-label {
@@ -353,11 +352,6 @@ const goToTendency = (pattern) => {
 }
 
 @media (min-aspect-ratio: 1/1) {
-  .vml-glass-panel {
-    flex-direction: row;
-    align-items: center;
-  }
-
   .controls {
     flex: 1;
     justify-content: flex-end;
