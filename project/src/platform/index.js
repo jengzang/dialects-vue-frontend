@@ -22,6 +22,10 @@ export {
   hasNativeFilePickerBridge,
 } from './files.js'
 export {
+  getPlatformAudioRecorder,
+  hasNativeAudioRecorder,
+} from './audioRecorder.js'
+export {
   getPlatformFullscreenController,
   PLATFORM_FULLSCREEN_CLASS,
 } from './fullscreen.js'

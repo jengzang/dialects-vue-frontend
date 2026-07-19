@@ -7,6 +7,8 @@ import {
   getPlatformFeatureMatrixDiagnostics,
   getPlatformFileService,
   getPlatformFullscreenController,
+  getPlatformAudioRecorder,
+  hasNativeAudioRecorder,
   getPlatformStorage,
   initializePlatformServices,
   getPlatformFeature,
@@ -604,5 +606,70 @@ describe('platform runtime detection and capabilities', () => {
     const webController = getPlatformFullscreenController({ globals: {} })
     await webController.enter(webElement)
     expect(webCalls).toEqual(['request'])
+  })
+
+  it('records audio through Capacitor AudioRecorder in native apps', async () => {
+    const calls = []
+    const recorder = getPlatformAudioRecorder({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'android',
+          convertFileSrc: (uri) => `capacitor://localhost/_capacitor_file_${uri}`,
+          isPluginAvailable: (name) => name === 'CapacitorAudioRecorder',
+        },
+      },
+      audioRecorder: {
+        CapacitorAudioRecorder: {
+          async startRecording(payload) {
+            calls.push(['start', payload])
+          },
+          async stopRecording() {
+            calls.push(['stop'])
+            return {
+              uri: 'file:///recordings/native.m4a',
+              duration: 1234,
+            }
+          },
+        },
+      },
+      fetch: async (uri) => {
+        calls.push(['fetch', uri])
+        return {
+          ok: true,
+          async blob() {
+            return new Blob(['native audio'], { type: 'audio/mp4' })
+          },
+        }
+      },
+      now: () => 1000,
+    })
+
+    expect(hasNativeAudioRecorder({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'android',
+          isPluginAvailable: (name) => name === 'CapacitorAudioRecorder',
+        },
+      },
+    })).toBe(true)
+    expect(recorder.canRecord()).toBe(true)
+
+    await recorder.start()
+    const result = await recorder.stop()
+
+    expect(calls).toEqual([
+      ['start', {
+        sampleRate: 44100,
+        bitRate: 128000,
+      }],
+      ['stop'],
+      ['fetch', 'capacitor://localhost/_capacitor_file_file:///recordings/native.m4a'],
+    ])
+    expect(result.driver).toBe('capacitor-audio-recorder')
+    expect(result.duration).toBe(1.234)
+    expect(result.file).toBeInstanceOf(File)
+    expect(result.file.name).toBe('recording-1000.m4a')
+    expect(result.file.type).toBe('audio/mp4')
+    expect(await readFileAsText(result.file)).toBe('native audio')
   })
 })

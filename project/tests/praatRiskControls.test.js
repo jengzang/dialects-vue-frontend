@@ -59,6 +59,18 @@ describe('Praat front-end risk controls', () => {
     expect(source).toContain("emit('clear-selection')")
   })
 
+  it('Audio input keeps Praat available on native apps through platform file and recorder adapters', () => {
+    const source = readSource(audioInputPanelPath)
+
+    expect(source).toContain("import { getPlatformAudioRecorder, getPlatformFileService } from '@/platform/index.js'")
+    expect(source).toMatch(/getPlatformFileService\(\)\.pickFilesOrOpenInput\(fileInput\.value,\s*\{\s*accept: 'audio\/\*'/)
+    expect(source).toContain('const nativeAudioRecorder = getPlatformAudioRecorder()')
+    expect(source).toContain('if (nativeAudioRecorder.canRecord()) {')
+    expect(source).toContain('await nativeAudioRecorder.start()')
+    expect(source).toContain('const nativeRecording = await nativeAudioRecorder.stop()')
+    expect(source).toContain('mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true })')
+  })
+
   it('Job status panel treats processing as active and renders canceled state explicitly', () => {
     const source = readSource(jobStatusPanelPath)
 

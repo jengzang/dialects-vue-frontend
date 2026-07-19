@@ -61,6 +61,7 @@
 import { ref, computed, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { PRAAT_AUDIO_LIMITS } from '@/main/config/constants.js'
+import { getPlatformAudioRecorder, getPlatformFileService } from '@/platform/index.js'
 import { showError } from '@/utils/message.js'
 
 const props = defineProps({
@@ -79,6 +80,7 @@ const isProcessing = ref(false)
 const selectedFile = ref(null)
 const recordingTime = ref(0)
 const fileInput = ref(null)
+const nativeAudioRecorder = getPlatformAudioRecorder()
 
 // Computed property for display file (priority: selectedSegment > local selectedFile)
 const displayFile = computed(() => {
@@ -92,6 +94,7 @@ let mediaRecorder = null
 let audioChunks = []
 let recordingTimer = null
 let mediaStream = null
+let isNativeRecording = false
 
 const SUPPORTED_FORMATS = ['audio/wav', 'audio/mpeg', 'audio/mp3', 'audio/ogg', 'audio/webm', 'audio/m4a', 'audio/x-m4a', 'audio/flac', 'audio/aac', 'audio/x-aac']
 
@@ -124,8 +127,16 @@ const handleDrop = (event) => {
   }
 }
 
-const triggerFileInput = () => {
-  fileInput.value?.click()
+const triggerFileInput = async () => {
+  const files = await getPlatformFileService().pickFilesOrOpenInput(fileInput.value, {
+    accept: 'audio/*',
+    multiple: false
+  })
+  const file = files?.[0]
+
+  if (file && validateFile(file)) {
+    processFile(file)
+  }
 }
 
 const handleFileSelect = (event) => {
@@ -314,15 +325,70 @@ const writeString = (view, offset, string) => {
 
 const toggleRecording = async () => {
   if (isRecording.value) {
-    stopRecording()
+    await stopRecording()
   } else {
     await startRecording()
+  }
+}
+
+const processRecordedAudio = async (audioFile, audioBlob) => {
+  selectedFile.value = audioFile
+
+  try {
+    const segments = await checkAndSplitAudio(audioFile)
+    if (segments.length === 1) {
+      emit('file-selected', {
+        file: audioFile,
+        blob: audioBlob,
+        duration: segments[0]?.duration ?? 0,
+        origin: 'original'
+      })
+    } else {
+      emit('segments-ready', segments)
+    }
+  } catch (error) {
+    console.error('Process recording error:', error)
+    emit('file-selected', {
+      file: audioFile,
+      blob: audioBlob,
+      duration: 0,
+      origin: 'original'
+    })
+  }
+}
+
+const startRecordingTimer = () => {
+  isRecording.value = true
+  isProcessing.value = false
+  recordingTime.value = 0
+
+  recordingTimer = setInterval(() => {
+    recordingTime.value++
+    if (recordingTime.value >= PRAAT_AUDIO_LIMITS.MAX_RECORDING_TIME) {
+      stopRecording()
+    }
+  }, 1000)
+}
+
+const stopRecordingTimer = () => {
+  isRecording.value = false
+  if (recordingTimer) {
+    clearInterval(recordingTimer)
+    recordingTimer = null
   }
 }
 
 const startRecording = async () => {
   try {
     isProcessing.value = true
+
+    if (nativeAudioRecorder.canRecord()) {
+      await nativeAudioRecorder.start()
+      isNativeRecording = true
+      startRecordingTimer()
+      return
+    }
+
     mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true })
 
     const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
@@ -341,45 +407,13 @@ const startRecording = async () => {
     mediaRecorder.onstop = async () => {
       const audioBlob = new Blob(audioChunks, { type: mimeType })
       const audioFile = new File([audioBlob], `recording-${Date.now()}.webm`, { type: mimeType })
-      selectedFile.value = audioFile
-
-      // Check and split recorded audio
-      try {
-        const segments = await checkAndSplitAudio(audioFile)
-        if (segments.length === 1) {
-          emit('file-selected', {
-            file: audioFile,
-            blob: audioBlob,
-            duration: segments[0]?.duration ?? 0,
-            origin: 'original'
-          })
-        } else {
-          emit('segments-ready', segments)
-        }
-      } catch (error) {
-        console.error('Process recording error:', error)
-        emit('file-selected', {
-          file: audioFile,
-          blob: audioBlob,
-          duration: 0,
-          origin: 'original'
-        })
-      }
+      await processRecordedAudio(audioFile, audioBlob)
 
       cleanupRecording()
     }
 
     mediaRecorder.start()
-    isRecording.value = true
-    isProcessing.value = false
-    recordingTime.value = 0
-
-    recordingTimer = setInterval(() => {
-      recordingTime.value++
-      if (recordingTime.value >= PRAAT_AUDIO_LIMITS.MAX_RECORDING_TIME) {
-        stopRecording()
-      }
-    }, 1000)
+    startRecordingTimer()
   } catch (error) {
     console.error('Recording error:', error)
     showError(t('praat.audioInput.errors.microphoneAccessDenied'))
@@ -387,14 +421,29 @@ const startRecording = async () => {
   }
 }
 
-const stopRecording = () => {
+const stopRecording = async () => {
+  stopRecordingTimer()
+
+  if (isNativeRecording) {
+    try {
+      isProcessing.value = true
+      const nativeRecording = await nativeAudioRecorder.stop()
+
+      if (nativeRecording?.file && nativeRecording?.blob) {
+        await processRecordedAudio(nativeRecording.file, nativeRecording.blob)
+      }
+    } catch (error) {
+      console.error('Native recording error:', error)
+      showError(t('praat.audioInput.errors.processingFailed', { error: error.message }))
+    } finally {
+      isNativeRecording = false
+      isProcessing.value = false
+    }
+    return
+  }
+
   if (mediaRecorder && mediaRecorder.state !== 'inactive') {
     mediaRecorder.stop()
-  }
-  isRecording.value = false
-  if (recordingTimer) {
-    clearInterval(recordingTimer)
-    recordingTimer = null
   }
 }
 
