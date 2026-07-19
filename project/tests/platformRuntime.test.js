@@ -4,6 +4,7 @@ import {
   buildPlatformCapabilities,
   detectRuntimePlatform,
   getNativeDistPruneManifest,
+  getPlatformFeatureMatrixDiagnostics,
   getPlatformFileService,
   getPlatformFullscreenController,
   getPlatformStorage,
@@ -202,7 +203,6 @@ describe('platform runtime detection and capabilities', () => {
       audioRecord: {
         category: 'audio',
         targets: { web: true, ios: true, android: true },
-        routes: ['/explore/tools/praat'],
       },
       praatTools: {
         category: 'tool',
@@ -244,6 +244,17 @@ describe('platform runtime detection and capabilities', () => {
       os: 'android',
       container: 'native-webview',
     })).toEqual({ enabled: false, reason: 'web-only' })
+  })
+
+  it('keeps the platform feature matrix internally consistent', () => {
+    expect(getPlatformFeatureMatrixDiagnostics()).toEqual({
+      missingTargets: [],
+      invalidTargets: [],
+      duplicateRoutes: [],
+      duplicateTutorials: [],
+      duplicateNativeDistPrunePaths: [],
+      duplicateNativeDistPruneGlobPatterns: [],
+    })
   })
 
   it('exposes web-compatible storage through the platform adapter', () => {

@@ -1,5 +1,7 @@
 import { getCurrentRuntimePlatform } from './runtime.js'
 
+const PLATFORM_TARGET_KEYS = ['web', 'ios', 'android', 'native']
+
 export const PLATFORM_FEATURE_MATRIX = {
   mapView: {
     category: 'map',
@@ -66,7 +68,6 @@ export const PLATFORM_FEATURE_MATRIX = {
       android: true,
       native: true,
     },
-    routes: ['/explore/tools/praat'],
   },
   praatTools: {
     category: 'tool',
@@ -141,6 +142,88 @@ export function getNativeDistPruneManifest() {
   return {
     paths,
     globPatterns,
+  }
+}
+
+function collectDuplicateAssignments(matrix, key, normalizeValue = (value) => value) {
+  const ownerByValue = new Map()
+  const duplicates = []
+
+  for (const [featureName, featureConfig] of Object.entries(matrix)) {
+    const values = featureConfig[key] || []
+
+    for (const rawValue of values) {
+      const value = normalizeValue(rawValue)
+      const existingOwner = ownerByValue.get(value)
+
+      if (existingOwner) {
+        duplicates.push({
+          value,
+          features: [existingOwner, featureName],
+        })
+      } else {
+        ownerByValue.set(value, featureName)
+      }
+    }
+  }
+
+  return duplicates
+}
+
+export function getPlatformFeatureMatrixDiagnostics(matrix = PLATFORM_FEATURE_MATRIX) {
+  const missingTargets = []
+  const invalidTargets = []
+  const prunePathOwnerByValue = new Map()
+  const pruneGlobOwnerByValue = new Map()
+  const duplicateNativeDistPrunePaths = []
+  const duplicateNativeDistPruneGlobPatterns = []
+
+  for (const [featureName, featureConfig] of Object.entries(matrix)) {
+    if (!featureConfig.targets) {
+      missingTargets.push(featureName)
+      continue
+    }
+
+    for (const targetKey of Object.keys(featureConfig.targets)) {
+      if (!PLATFORM_TARGET_KEYS.includes(targetKey)) {
+        invalidTargets.push({ feature: featureName, target: targetKey })
+      }
+    }
+
+    for (const path of featureConfig.nativeDistPrune?.paths || []) {
+      const existingOwner = prunePathOwnerByValue.get(path)
+
+      if (existingOwner) {
+        duplicateNativeDistPrunePaths.push({
+          value: path,
+          features: [existingOwner, featureName],
+        })
+      } else {
+        prunePathOwnerByValue.set(path, featureName)
+      }
+    }
+
+    for (const pattern of featureConfig.nativeDistPrune?.globPatterns || []) {
+      const existingOwner = pruneGlobOwnerByValue.get(pattern)
+
+      if (existingOwner) {
+        duplicateNativeDistPruneGlobPatterns.push({
+          value: pattern,
+          features: [existingOwner, featureName],
+        })
+      } else {
+        pruneGlobOwnerByValue.set(pattern, featureName)
+      }
+    }
+  }
+
+  return {
+    missingTargets,
+    invalidTargets,
+    duplicateRoutes: collectDuplicateAssignments(matrix, 'routes'),
+    duplicateTutorials: collectDuplicateAssignments(matrix, 'tutorials'),
+    duplicateNativeDistPrunePaths,
+    duplicateNativeDistPruneGlobPatterns,
   }
 }
 
