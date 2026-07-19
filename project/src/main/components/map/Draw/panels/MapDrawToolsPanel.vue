@@ -88,6 +88,24 @@
               class="main-glass-button"
               data-variant="secondary"
               type="button"
+              :disabled="!canUndo"
+              @click="$emit('undo')"
+            >
+              {{ t('map.drawTab.buttons.undo') }}
+            </button>
+            <button
+              class="main-glass-button"
+              data-variant="secondary"
+              type="button"
+              :disabled="!canRedo"
+              @click="$emit('redo')"
+            >
+              {{ t('map.drawTab.buttons.redo') }}
+            </button>
+            <button
+              class="main-glass-button"
+              data-variant="secondary"
+              type="button"
               @click="$emit('delete-selected')"
             >
               {{ t('map.drawTab.buttons.deleteSelected') }}
@@ -281,10 +299,14 @@ const props = defineProps({
   selectedFeatureProperties: { type: Object, default: null },
   selectedFeatureGeometryType: { type: String, default: '' },
   isFullscreen: { type: Boolean, default: false },
+  canUndo: { type: Boolean, default: false },
+  canRedo: { type: Boolean, default: false },
 })
 
 defineEmits([
   'set-mode',
+  'undo',
+  'redo',
   'delete-selected',
   'clear-all',
   'reset-view',

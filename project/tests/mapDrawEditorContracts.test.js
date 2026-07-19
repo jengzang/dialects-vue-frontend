@@ -7,6 +7,7 @@ const testsDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(testsDir, '..')
 const editableMapLibrePath = resolve(projectRoot, 'src/main/components/map/EditableMapLibre.vue')
 const mapDrawTabPath = resolve(projectRoot, 'src/main/components/map/Tabs/MapDrawTab.vue')
+const mapDrawToolsPanelPath = resolve(projectRoot, 'src/main/components/map/Draw/panels/MapDrawToolsPanel.vue')
 
 function readSource(path) {
   return readFileSync(path, 'utf8')
@@ -68,5 +69,51 @@ describe('Map draw editor contracts', () => {
     expect(stylesSource).toContain(`['!=', 'user_visible', false]`)
     expect(editableSource).not.toContain('props.activeLayer?.visible === false ? emptyFeatureCollection()')
     expect(tabSource).not.toContain('activeLayer.value.visible === false ? emptyFeatureCollection()')
+  })
+
+  it('exposes undo and redo actions in the tools panel', () => {
+    const source = readSource(mapDrawToolsPanelPath)
+
+    expect(source).toContain('canUndo')
+    expect(source).toContain('canRedo')
+    expect(source).toContain(`$emit('undo')`)
+    expect(source).toContain(`$emit('redo')`)
+    expect(source).toContain(`t('map.drawTab.buttons.undo')`)
+    expect(source).toContain(`t('map.drawTab.buttons.redo')`)
+  })
+
+  it('wires map draw history to commands and keyboard shortcuts', () => {
+    const source = readSource(mapDrawTabPath)
+
+    expect(source).toContain('createMapDrawHistory')
+    expect(source).toContain('commitHistory')
+    expect(source).toContain('undoHistory')
+    expect(source).toContain('redoHistory')
+    expect(source).toContain('@undo="undoHistory"')
+    expect(source).toContain('@redo="redoHistory"')
+    expect(source).toContain('handleDrawHistoryKeydown')
+    expect(source).toContain(`document.addEventListener('keydown', handleDrawHistoryKeydown)`)
+    expect(source).toContain(`document.removeEventListener('keydown', handleDrawHistoryKeydown)`)
+    expect(source).toContain('before-features-change')
+  })
+
+  it('commits history before generated Voronoi layers are added', () => {
+    const source = readSource(mapDrawTabPath)
+
+    expect(source).toMatch(/commitHistory\(\);\s+layers\.value\.unshift\(\.\.\.exportedLayers\)/)
+  })
+
+  it('refreshes the layer id seed when history snapshots are restored', () => {
+    const source = readSource(mapDrawTabPath)
+
+    expect(source).toContain('const syncLayerIdSeedFromLayers')
+    expect(source).toMatch(/const applyHistorySnapshot = \(snapshot\) => \{[\s\S]*syncLayerIdSeedFromLayers\(\)/)
+  })
+
+  it('guards history restore state with finally and skips no-op all-layer visibility commits', () => {
+    const source = readSource(mapDrawTabPath)
+
+    expect(source).toMatch(/try \{[\s\S]*syncAllLayersAfterMutation\(\);[\s\S]*\} finally \{[\s\S]*isApplyingHistory\.value = false/)
+    expect(source).toContain('if (layers.value.every((layer) => layer.visible === visible)) return;')
   })
 })

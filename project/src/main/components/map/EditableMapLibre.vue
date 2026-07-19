@@ -117,6 +117,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'update:modelValue',
+  'before-features-change',
   'features-change',
   'feature-select',
   'export-image',
@@ -411,8 +412,11 @@ const syncSelectedFeature = () => {
   emit('feature-select', selectedFeatureId.value)
 }
 
-const syncFeaturesFromDraw = () => {
+const syncFeaturesFromDraw = (options = {}) => {
   const featureCollection = normalizeFeatureCollection(draw.value?.getAll?.())
+  if (options.commitHistory !== false) {
+    emit('before-features-change')
+  }
   emit('update:modelValue', featureCollection)
   emit('features-change', featureCollection)
   syncSelectedFeature()
@@ -462,12 +466,12 @@ const updateFeatureProperties = (featureId, nextProperties) => {
 
 const deleteSelected = () => {
   draw.value?.trash?.()
-  syncFeaturesFromDraw()
+  syncFeaturesFromDraw({ commitHistory: false })
 }
 
 const clearAll = () => {
   draw.value?.deleteAll?.()
-  syncFeaturesFromDraw()
+  syncFeaturesFromDraw({ commitHistory: false })
 }
 
 const importGeoJson = (featureCollection, options = {}) => {

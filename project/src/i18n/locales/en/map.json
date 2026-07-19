@@ -480,6 +480,8 @@
       "drawLine": "Draw Line",
       "drawPolygon": "Draw Polygon",
       "select": "Select",
+      "undo": "Undo",
+      "redo": "Redo",
       "deleteSelected": "Delete Selection",
       "deleteLayer": "Delete Layer",
       "moveLayerUp": "Move Layer Up",

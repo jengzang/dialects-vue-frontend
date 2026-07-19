@@ -103,6 +103,7 @@
             :all-layers="layers"
             :preview-layers="voronoiPreviewLayers"
             :enable-preview-hover="voronoiPreviewLayers.length > 0"
+            @before-features-change="commitHistory"
             @features-change="handleActiveLayerFeaturesChange"
             @feature-select="handleFeatureSelect"
             @export-image="handleImageExported"
@@ -129,7 +130,11 @@
           :selected-feature-properties="selectedFeatureProperties"
           :selected-feature-geometry-type="selectedFeatureGeometryType"
           :is-fullscreen="isMapFullscreen"
+          :can-undo="canUndoHistory"
+          :can-redo="canRedoHistory"
           @set-mode="setMode"
+          @undo="undoHistory"
+          @redo="redoHistory"
           @delete-selected="handleDeleteSelected"
           @clear-all="handleClearAll"
           @reset-view="handleResetView"
@@ -546,6 +551,7 @@ import { usePartitionCache } from '@/composables/data/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js';
 import { readImportedLayerFile, readKmzArrayBuffer, splitFeatureCollectionByGeometryType } from '@/main/utils/drawMap/export.js';
+import { createMapDrawHistory } from '@/main/utils/drawMap/history.js';
 import {
   deleteDraftRecord,
   getDraftRecordById,
@@ -634,6 +640,9 @@ const newDraftName = ref('');
 const storedDrafts = ref([]);
 const isMapFullscreen = ref(false);
 const voronoiExportSelections = ref([]);
+const drawHistory = createMapDrawHistory({ limit: 50 });
+const historySizes = ref(drawHistory.sizes());
+const isApplyingHistory = ref(false);
 
 const clipVoronoiToNationalBorder = ref(false);
 const isVoronoiExporting = ref(false);
@@ -670,6 +679,13 @@ const createEmptyLayer = (geometryType) => {
     pointStrokeColor: stroke,
     featureCollection: emptyFeatureCollection(),
   };
+};
+
+const syncLayerIdSeedFromLayers = () => {
+  const numericIds = layers.value
+    .map((layer) => Number(String(layer?.id || '').replace('draw-layer-', '')))
+    .filter((value) => Number.isFinite(value));
+  layerIdSeed = numericIds.length ? Math.max(...numericIds) : layerIdSeed;
 };
 
 const activeLayer = computed(() => {
@@ -1319,6 +1335,7 @@ const confirmVoronoiExport = async () => {
       return;
     }
 
+    commitHistory();
     layers.value.unshift(...exportedLayers);
     activeLayerId.value = exportedLayers[0].id;
     isLayersPanelOpen.value = true;
@@ -1391,6 +1408,7 @@ watch(() => globalPayload.value, (payload) => {
 }, { immediate: true })
 
 const handleCreateLayer = (geometryType) => {
+  commitHistory();
   const layer = createEmptyLayer(geometryType);
   layers.value.push(layer);
   activeLayerId.value = layer.id;
@@ -1430,6 +1448,7 @@ const moveLayer = (layerId, direction) => {
   if (layerIndex === -1) return;
   const targetIndex = layerIndex + direction;
   if (targetIndex < 0 || targetIndex >= layers.value.length) return;
+  commitHistory();
   const [layer] = layers.value.splice(layerIndex, 1);
   layers.value.splice(targetIndex, 0, layer);
   syncAllLayersAfterMutation();
@@ -1464,6 +1483,7 @@ const applyLayerPropertyToFeatures = (layer, key, value) => {
 const toggleLayerVisibility = (layerId) => {
   const layer = layers.value.find((item) => item.id === layerId);
   if (!layer) return;
+  commitHistory();
   layer.visible = !layer.visible;
   applyLayerPropertyToFeatures(layer, 'visible', layer.visible);
   syncAllLayersAfterMutation();
@@ -1471,6 +1491,8 @@ const toggleLayerVisibility = (layerId) => {
 };
 
 const setAllLayersVisibility = (visible) => {
+  if (layers.value.every((layer) => layer.visible === visible)) return;
+  commitHistory();
   layers.value.forEach((layer) => {
     layer.visible = visible;
     applyLayerPropertyToFeatures(layer, 'visible', visible);
@@ -1482,6 +1504,7 @@ const setAllLayersVisibility = (visible) => {
 const toggleLayerLock = (layerId) => {
   const layer = layers.value.find((item) => item.id === layerId);
   if (!layer) return;
+  commitHistory();
   layer.locked = !layer.locked;
   applyLayerPropertyToFeatures(layer, 'locked', layer.locked);
   syncAllLayersAfterMutation();
@@ -1490,6 +1513,7 @@ const toggleLayerLock = (layerId) => {
 const handleDeleteLayer = (layerId) => {
   const layerIndex = layers.value.findIndex((item) => item.id === layerId);
   if (layerIndex === -1) return;
+  commitHistory();
   layers.value.splice(layerIndex, 1);
   editableMapRef.value?.removeReadonlyLayerById?.(layerId);
 
@@ -1511,6 +1535,7 @@ const handleFeatureSelect = (featureId) => {
 
 const updateSelectedFeatureProperty = (key, value) => {
   if (!activeLayer.value) return;
+  commitHistory();
   activeLayer.value[key] = value;
   const featureCollection = activeLayer.value.featureCollection ?? emptyFeatureCollection();
   activeLayer.value.featureCollection = {
@@ -1559,11 +1584,12 @@ const handleImportAsNewLayer = async (event) => {
       group.featureCollection,
       group.geometryType
     ));
+    commitHistory();
     layers.value.unshift(...importedLayers);
     const activeImportedLayer = importedLayers[0];
     activeLayerId.value = activeImportedLayer.id;
     isDrawingPanelOpen.value = true;
-    editableMapRef.value?.importGeoJson?.(activeImportedLayer.featureCollection);
+    editableMapRef.value?.importGeoJson?.(activeImportedLayer.featureCollection, { emitChanges: false });
     currentMode.value = 'simple_select';
     showSuccess(t('map.drawTab.messages.importLayerSuccess', { count: importedLayers.length }));
   } catch (error) {
@@ -1576,6 +1602,8 @@ const handleImportAsNewLayer = async (event) => {
 };
 
 const handleDeleteSelected = async () => {
+  if (!selectedFeatureId.value) return;
+  commitHistory();
   editableMapRef.value?.deleteSelected?.();
   currentMode.value = 'simple_select';
 };
@@ -1597,13 +1625,36 @@ const syncMapFullscreenState = () => {
   isMapFullscreen.value = Boolean(editableMapRef.value?.isFullscreen?.value);
 };
 
+const isEditableKeyboardTarget = (target) => {
+  const tagName = target?.tagName?.toLowerCase?.();
+  return target?.isContentEditable || ['input', 'textarea', 'select'].includes(tagName);
+};
+
+const handleDrawHistoryKeydown = (event) => {
+  if (isEditableKeyboardTarget(event.target)) return;
+  const isUndoShortcut = (event.metaKey || event.ctrlKey) && !event.shiftKey && event.key.toLowerCase() === 'z';
+  const isRedoShortcut = (
+    (event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'z'
+  ) || (event.ctrlKey && event.key.toLowerCase() === 'y');
+
+  if (isUndoShortcut) {
+    event.preventDefault();
+    undoHistory();
+  }
+
+  if (isRedoShortcut) {
+    event.preventDefault();
+    redoHistory();
+  }
+};
+
 const handleClearAll = async () => {
   const confirmed = await showConfirm(t('map.drawTab.messages.clearAllConfirm'));
   if (!confirmed) return;
 
-  if (activeLayer.value) {
-    activeLayer.value.featureCollection = emptyFeatureCollection();
-  }
+  const currentFeatureCount = activeLayer.value?.featureCollection?.features?.length ?? 0;
+  if (currentFeatureCount <= 0) return;
+  commitHistory();
   editableMapRef.value?.clearAll?.();
   selectedFeatureId.value = '';
   currentMode.value = 'simple_select';
@@ -1676,6 +1727,57 @@ const buildPersistedWorkbenchState = () => ({
   isLayersPanelOpen: isLayersPanelOpen.value,
 });
 
+const buildHistorySnapshot = () => ({
+  layers: layers.value,
+  activeLayerId: activeLayerId.value,
+  currentStyleKey: currentStyleKey.value,
+  selectedFeatureId: selectedFeatureId.value,
+  currentMode: currentMode.value,
+});
+
+const refreshHistoryState = () => {
+  historySizes.value = drawHistory.sizes();
+};
+
+const canUndoHistory = computed(() => historySizes.value.undo > 0);
+const canRedoHistory = computed(() => historySizes.value.redo > 0);
+
+const applyHistorySnapshot = (snapshot) => {
+  if (!snapshot) return;
+  isApplyingHistory.value = true;
+  try {
+    layers.value = Array.isArray(snapshot.layers) ? snapshot.layers : [];
+    activeLayerId.value = snapshot.activeLayerId || layers.value[0]?.id || '';
+    currentStyleKey.value = snapshot.currentStyleKey || 'gaode';
+    selectedFeatureId.value = snapshot.selectedFeatureId || '';
+    currentMode.value = snapshot.currentMode || 'simple_select';
+    syncLayerIdSeedFromLayers();
+    editableMapRef.value?.setDrawMode?.('simple_select');
+    syncAllLayersAfterMutation();
+    editableMapRef.value?.syncReadonlyLayers?.();
+  } finally {
+    isApplyingHistory.value = false;
+  }
+};
+
+const commitHistory = () => {
+  if (isApplyingHistory.value) return;
+  drawHistory.commit(buildHistorySnapshot());
+  refreshHistoryState();
+};
+
+const undoHistory = () => {
+  const previousSnapshot = drawHistory.undo(buildHistorySnapshot());
+  applyHistorySnapshot(previousSnapshot);
+  refreshHistoryState();
+};
+
+const redoHistory = () => {
+  const nextSnapshot = drawHistory.redo(buildHistorySnapshot());
+  applyHistorySnapshot(nextSnapshot);
+  refreshHistoryState();
+};
+
 const storedDraftOptions = computed(() => {
   return storedDrafts.value.map((draft) => ({
     label: draft.name,
@@ -1697,10 +1799,7 @@ const applyDraftState = (state) => {
   currentStyleKey.value = state?.currentStyleKey || 'gaode';
   isDrawingPanelOpen.value = state?.isDrawingPanelOpen ?? true;
   isLayersPanelOpen.value = state?.isLayersPanelOpen ?? false;
-  const numericIds = layers.value
-    .map((layer) => Number(String(layer?.id || '').replace('draw-layer-', '')))
-    .filter((value) => Number.isFinite(value));
-  layerIdSeed = numericIds.length ? Math.max(...numericIds) : layerIdSeed;
+  syncLayerIdSeedFromLayers();
   syncAllLayersAfterMutation();
 };
 
@@ -1775,6 +1874,7 @@ const handleRestoreLocal = async () => {
   try {
     const draft = await getDraftRecordById(selectedStoredDraftId.value);
     if (!draft) return;
+    commitHistory();
     applyDraftState(draft.state);
     newDraftName.value = draft.name || '';
     showSuccess(t('map.drawTab.messages.restoreLocalSuccess'));
@@ -1837,6 +1937,7 @@ const onExportImageClicked = () => {
 const moveLayerToTop = (layerId) => {
   const index = layers.value.findIndex((item) => item.id === layerId);
   if (index === -1 || index === layers.value.length - 1) return;
+  commitHistory();
   const [layer] = layers.value.splice(index, 1);
   layers.value.push(layer);
   syncAllLayersAfterMutation();
@@ -1845,6 +1946,7 @@ const moveLayerToTop = (layerId) => {
 const moveLayerToBottom = (layerId) => {
   const index = layers.value.findIndex((item) => item.id === layerId);
   if (index === -1 || index === 0) return;
+  commitHistory();
   const [layer] = layers.value.splice(index, 1);
   layers.value.unshift(layer);
   syncAllLayersAfterMutation();
@@ -1858,6 +1960,7 @@ onMounted(async () => {
   }
 
   document.addEventListener('fullscreenchange', syncMapFullscreenState);
+  document.addEventListener('keydown', handleDrawHistoryKeydown);
   syncMapFullscreenState();
 
   if (route.query.scrollTo === 'drawBottom') {
@@ -1869,6 +1972,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('fullscreenchange', syncMapFullscreenState);
+  document.removeEventListener('keydown', handleDrawHistoryKeydown);
 });
 </script>
 

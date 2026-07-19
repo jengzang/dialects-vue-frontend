@@ -480,6 +480,8 @@
       "drawLine": "绘制线",
       "drawPolygon": "绘制面",
       "select": "选择",
+      "undo": "撤销",
+      "redo": "重做",
       "deleteSelected": "删除选中",
       "deleteLayer": "删除图层",
       "moveLayerUp": "图层上移",
