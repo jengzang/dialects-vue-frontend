@@ -95,6 +95,14 @@ export {
 
 export { postPhoPieByValue, postPhoPieByStatus } from './main/core/phoPie.js';
 
+// ==================== 自然村地名 ====================
+export {
+  getToponymNames,
+  getToponymPoints,
+  getToponymOfficialDetail,
+  getToponymDetails,
+} from './main/toponyms.js';
+
 // ==================== 比较模块 ====================
 export { compareChars, compareZhongGu, compareTones } from './main/core/compare.js';
 
