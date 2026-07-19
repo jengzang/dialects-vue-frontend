@@ -14,7 +14,9 @@ let package = Package(
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.4.2"),
         .package(name: "CapacitorFilesystem", path: "../../../project/node_modules/@capacitor/filesystem"),
         .package(name: "CapacitorPreferences", path: "../../../project/node_modules/@capacitor/preferences"),
-        .package(name: "CapacitorShare", path: "../../../project/node_modules/@capacitor/share")
+        .package(name: "CapacitorShare", path: "../../../project/node_modules/@capacitor/share"),
+        .package(name: "CapawesomeCapacitorFilePicker", path: "../../../project/node_modules/@capawesome/capacitor-file-picker"),
+        .package(name: "CapgoCapacitorAudioRecorder", path: "../../../project/node_modules/@capgo/capacitor-audio-recorder")
     ],
     targets: [
         .target(
@@ -24,7 +26,9 @@ let package = Package(
                 .product(name: "Cordova", package: "capacitor-swift-pm"),
                 .product(name: "CapacitorFilesystem", package: "CapacitorFilesystem"),
                 .product(name: "CapacitorPreferences", package: "CapacitorPreferences"),
-                .product(name: "CapacitorShare", package: "CapacitorShare")
+                .product(name: "CapacitorShare", package: "CapacitorShare"),
+                .product(name: "CapawesomeCapacitorFilePicker", package: "CapawesomeCapacitorFilePicker"),
+                .product(name: "CapgoCapacitorAudioRecorder", package: "CapgoCapacitorAudioRecorder")
             ]
         )
     ]
