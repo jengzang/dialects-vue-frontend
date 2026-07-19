@@ -480,6 +480,7 @@
       "drawLine": "繪製線",
       "drawPolygon": "繪製面",
       "select": "選擇",
+      "editShape": "編輯形狀",
       "undo": "撤銷",
       "redo": "重做",
       "deleteSelected": "刪除選中",

@@ -120,6 +120,7 @@ const emit = defineEmits([
   'before-features-change',
   'features-change',
   'feature-select',
+  'mode-change',
   'export-image',
   'export-layer',
   'update:currentStyleKey',
@@ -412,6 +413,11 @@ const syncSelectedFeature = () => {
   emit('feature-select', selectedFeatureId.value)
 }
 
+const syncDrawMode = (event) => {
+  emit('mode-change', event?.mode || draw.value?.getMode?.() || 'simple_select')
+  syncSelectedFeature()
+}
+
 const syncFeaturesFromDraw = (options = {}) => {
   const featureCollection = normalizeFeatureCollection(draw.value?.getAll?.())
   if (options.commitHistory !== false) {
@@ -451,6 +457,7 @@ const selectFeature = (featureId) => {
 
   draw.value?.changeMode?.('simple_select')
   draw.value?.changeMode?.('direct_select', { featureId })
+  emit('mode-change', 'direct_select')
   selectedFeatureId.value = String(featureId)
   emit('feature-select', selectedFeatureId.value)
 }
@@ -512,7 +519,7 @@ const bindDrawEvents = () => {
   map.value.on('draw.update', syncFeaturesFromDraw)
   map.value.on('draw.delete', syncFeaturesFromDraw)
   map.value.on('draw.selectionchange', syncSelectedFeature)
-  map.value.on('draw.modechange', syncSelectedFeature)
+  map.value.on('draw.modechange', syncDrawMode)
 }
 
 const initializeDraw = () => {

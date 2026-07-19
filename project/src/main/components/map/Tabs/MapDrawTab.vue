@@ -106,6 +106,7 @@
             @before-features-change="commitHistory"
             @features-change="handleActiveLayerFeaturesChange"
             @feature-select="handleFeatureSelect"
+            @mode-change="handleDrawModeChange"
             @export-image="handleImageExported"
             @export-layer="handleLayerExported"
             @export-selection-bounds-change="boxSelectionBounds = $event"
@@ -132,7 +133,9 @@
           :is-fullscreen="isMapFullscreen"
           :can-undo="canUndoHistory"
           :can-redo="canRedoHistory"
+          :can-edit-shape="canEditSelectedShape"
           @set-mode="setMode"
+          @edit-shape="handleEditSelectedShape"
           @undo="undoHistory"
           @redo="redoHistory"
           @delete-selected="handleDeleteSelected"
@@ -710,6 +713,14 @@ const featureCount = computed(() => {
 
 const selectedFeatureProperties = computed(() => activeLayer.value ?? null);
 const selectedFeatureGeometryType = computed(() => activeLayer.value?.geometryType ?? '');
+const canEditSelectedShape = computed(() => {
+  return Boolean(
+    selectedFeatureId.value
+    && activeLayer.value
+    && !activeLayer.value.locked
+    && ['LineString', 'Polygon'].includes(activeLayer.value.geometryType)
+  );
+});
 
 const selectedLayerLabel = computed(() => {
   if (!activeLayer.value) return t('map.drawTab.labels.emptyLayer');
@@ -1531,6 +1542,16 @@ const getFeatureId = (feature) => String(feature?.id ?? feature?.properties?.id 
 
 const handleFeatureSelect = (featureId) => {
   selectedFeatureId.value = featureId || '';
+};
+
+const handleDrawModeChange = (mode) => {
+  currentMode.value = mode || 'simple_select';
+};
+
+const handleEditSelectedShape = () => {
+  if (!canEditSelectedShape.value) return;
+  editableMapRef.value?.selectFeature?.(selectedFeatureId.value);
+  currentMode.value = 'direct_select';
 };
 
 const updateSelectedFeatureProperty = (key, value) => {

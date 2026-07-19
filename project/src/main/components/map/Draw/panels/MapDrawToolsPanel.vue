@@ -88,6 +88,15 @@
               class="main-glass-button"
               data-variant="secondary"
               type="button"
+              :disabled="!canEditShape"
+              @click="$emit('edit-shape')"
+            >
+              {{ t('map.drawTab.buttons.editShape') }}
+            </button>
+            <button
+              class="main-glass-button"
+              data-variant="secondary"
+              type="button"
               :disabled="!canUndo"
               @click="$emit('undo')"
             >
@@ -301,10 +310,12 @@ const props = defineProps({
   isFullscreen: { type: Boolean, default: false },
   canUndo: { type: Boolean, default: false },
   canRedo: { type: Boolean, default: false },
+  canEditShape: { type: Boolean, default: false },
 })
 
 defineEmits([
   'set-mode',
+  'edit-shape',
   'undo',
   'redo',
   'delete-selected',

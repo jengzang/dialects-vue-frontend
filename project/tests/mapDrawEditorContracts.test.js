@@ -116,4 +116,21 @@ describe('Map draw editor contracts', () => {
     expect(source).toMatch(/try \{[\s\S]*syncAllLayersAfterMutation\(\);[\s\S]*\} finally \{[\s\S]*isApplyingHistory\.value = false/)
     expect(source).toContain('if (layers.value.every((layer) => layer.visible === visible)) return;')
   })
+
+  it('exposes an edit shape action for selected line and polygon features', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const editableSource = readSource(editableMapLibrePath)
+
+    expect(panelSource).toContain('canEditShape')
+    expect(panelSource).toContain(`$emit('edit-shape')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.editShape')`)
+    expect(tabSource).toContain(':can-edit-shape="canEditSelectedShape"')
+    expect(tabSource).toContain('@edit-shape="handleEditSelectedShape"')
+    expect(tabSource).toContain('const canEditSelectedShape = computed')
+    expect(tabSource).toContain('const handleEditSelectedShape = () =>')
+    expect(tabSource).toContain('editableMapRef.value?.selectFeature?.(selectedFeatureId.value)')
+    expect(editableSource).toContain(`emit('mode-change'`)
+    expect(tabSource).toContain('@mode-change="handleDrawModeChange"')
+  })
 })

@@ -480,6 +480,7 @@
       "drawLine": "Draw Line",
       "drawPolygon": "Draw Polygon",
       "select": "Select",
+      "editShape": "Edit Shape",
       "undo": "Undo",
       "redo": "Redo",
       "deleteSelected": "Delete Selection",
