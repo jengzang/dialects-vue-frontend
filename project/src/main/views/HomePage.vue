@@ -1726,6 +1726,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
     &-actions {
       align-items: center;
+      flex-direction: column;
       gap: 0.75rem;
     }
   }

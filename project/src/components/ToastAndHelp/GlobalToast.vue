@@ -91,12 +91,15 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 .global-toast {
   position: fixed;
   top: 80px;
-  left: 50%;
+  left: 0;
+  right: 0;
   z-index: 99999;
   display: flex;
   gap: 10px;
   align-items: center;
+  width: fit-content;
   max-width: min(420px, calc(100vw - 32px));
+  margin: 0 auto;
   padding: 12px 14px;
   color: $text-default;
   background: linear-gradient(
@@ -109,7 +112,6 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow:
     0 18px 48px rgba(31, 45, 74, 0.18),
     inset 0 1px 0 var(--glass-50);
-  transform: translateX(-50%);
 
   @include glass-blur(22px, 180%);
 
@@ -211,14 +213,17 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-aspect-ratio:1/1) {
     top: auto;
-    right: 16px;
+    left: 25px;
+    right: 25px;
     bottom: 22px;
-    max-width: calc(100vw - 32px);
+    width: auto;
+    max-width: calc(100dvw - 50px);
     padding: 12px 14px;
     font-size: 14px;
     border-radius: 18px;
+    transform: none;
 
     .toast-icon {
       width: 22px;
@@ -272,24 +277,24 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 @keyframes toast-in {
   0% {
     opacity: 0;
-    transform: translateX(-50%) translateY(-18px) scale(0.96);
+    transform: translateY(-18px) scale(0.96);
   }
 
   100% {
     opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
+    transform: translateY(0) scale(1);
   }
 }
 
 @keyframes toast-out {
   0% {
     opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
+    transform: translateY(0) scale(1);
   }
 
   100% {
     opacity: 0;
-    transform: translateX(-50%) translateY(-12px) scale(0.98);
+    transform: translateY(-12px) scale(0.98);
   }
 }
 
