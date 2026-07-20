@@ -30,7 +30,7 @@
           :data-variant="isVoronoiPanelOpen ? 'primary' : 'secondary'"
           :data-active="isVoronoiPanelOpen"
           type="button"
-          @click="isVoronoiPanelOpen = !isVoronoiPanelOpen"
+          @click="togglePanel('voronoi')"
         >
           ⬡ {{ t('map.drawTab.buttons.voronoi') }}
         </button>
@@ -55,7 +55,7 @@
           :data-variant="isDrawingPanelOpen ? 'primary' : 'secondary'"
           :data-active="isDrawingPanelOpen"
           type="button"
-          @click="isDrawingPanelOpen = !isDrawingPanelOpen"
+          @click="togglePanel('drawing')"
         >
           🛠️ {{ t('map.drawTab.buttons.drawingTools') }}
         </button>
@@ -64,7 +64,7 @@
           :data-variant="isLayersPanelOpen ? 'primary' : 'secondary'"
           :data-active="isLayersPanelOpen"
           type="button"
-          @click="isLayersPanelOpen = !isLayersPanelOpen"
+          @click="togglePanel('layers')"
         >
           🗂️ {{ t('map.drawTab.buttons.layers') }}
         </button>
@@ -1850,6 +1850,29 @@ const moveLayerToBottom = (layerId) => {
   syncAllLayersAfterMutation();
 };
 
+const isTouchDevice = 'ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0;
+if (isTouchDevice) {
+  document.documentElement.classList.add('is-touch-device');
+}
+
+const togglePanel = (panelName) => {
+  if (isTouchDevice) {
+    const wasOpen = panelName === 'drawing' ? isDrawingPanelOpen.value
+      : panelName === 'layers' ? isLayersPanelOpen.value
+      : isVoronoiPanelOpen.value;
+    isDrawingPanelOpen.value = false;
+    isLayersPanelOpen.value = false;
+    isVoronoiPanelOpen.value = false;
+    if (panelName === 'drawing') isDrawingPanelOpen.value = !wasOpen;
+    else if (panelName === 'layers') isLayersPanelOpen.value = !wasOpen;
+    else isVoronoiPanelOpen.value = !wasOpen;
+  } else {
+    if (panelName === 'drawing') isDrawingPanelOpen.value = !isDrawingPanelOpen.value;
+    else if (panelName === 'layers') isLayersPanelOpen.value = !isLayersPanelOpen.value;
+    else isVoronoiPanelOpen.value = !isVoronoiPanelOpen.value;
+  }
+};
+
 onMounted(async () => {
   try {
     await restoreStoredDrafts();
@@ -1919,9 +1942,11 @@ onBeforeUnmount(() => {
     &--header {
       justify-content: flex-end;
 
-      .main-glass-button:hover:not(:disabled) {
-        background: var(--color-primary);
-        color: var(--action-primary-text);
+      :global(html:not(.is-touch-device)) & {
+        .main-glass-button:hover:not(:disabled) {
+          background: var(--color-primary);
+          color: var(--action-primary-text);
+        }
       }
     }
   }
@@ -2020,7 +2045,7 @@ onBeforeUnmount(() => {
     display: none;
   }
 
-  @media (max-width: 900px) {
+  @media (max-aspect-ratio:1/1) {
     .draw-tab-header,
     .draw-tool-section-header {
       @include flex-col;
@@ -2041,35 +2066,6 @@ onBeforeUnmount(() => {
           color: var(--text-deep);
           font-size: 0.84rem;
         }
-      }
-    }
-
-    .draw-workbench {
-      @include flex-col;
-      gap: 0.9rem;
-      overflow: visible;
-    }
-
-    .draw-map-area {
-      order: 1;
-    }
-
-    .draw-tool-panel,
-    .draw-tool-panel.offset-left,
-    .layers-panel {
-      position: static;
-      top: auto;
-      right: auto;
-      bottom: auto;
-      width: 100%;
-      min-height: auto;
-      max-width: 100%;
-      max-height: none;
-    }
-
-    .draw-tool-panel {
-      &-body {
-        max-height: none;
       }
     }
 
@@ -2101,11 +2097,13 @@ onBeforeUnmount(() => {
     text-align: left;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-    &:hover:not(:disabled) {
-      background: var(--glass-80);
-      border-color: var(--color-primary);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.08);
+    :global(html:not(.is-touch-device)) & {
+      &:hover:not(:disabled) {
+        background: var(--glass-80);
+        border-color: var(--color-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.08);
+      }
     }
 
     &:disabled {

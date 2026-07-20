@@ -304,8 +304,10 @@ const offsetClass = computed(() => {
   color: var(--color-primary);
   text-decoration: none;
 
-  &:hover {
-    text-decoration: underline;
+  :global(html:not(.is-touch-device)) & {
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 
@@ -321,9 +323,9 @@ const offsetClass = computed(() => {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.6rem;
 
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-  }
+  // @media (max-width: 900px) {
+  //   grid-template-columns: 1fr;
+  // }
 }
 
 .voronoi-data-source-actions {
@@ -386,12 +388,4 @@ const offsetClass = computed(() => {
   }
 }
 
-@media (max-width: 900px) {
-  .voronoi-panel {
-    &.offset-double,
-    &.offset-left {
-      right: auto;
-    }
-  }
-}
 </style>
