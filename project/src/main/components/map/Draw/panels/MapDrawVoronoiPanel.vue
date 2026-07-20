@@ -161,6 +161,21 @@
             </button>
             <button
               class="main-glass-button draw-tool-mode-button"
+              :data-variant="isAddingPoints ? 'primary' : 'secondary'"
+              :data-active="isAddingPoints"
+              type="button"
+              :disabled="!totalPoints"
+              @click="$emit('toggle-add-points')"
+            >
+              <span
+                v-if="isAddingPoints"
+                class="draw-tool-check"
+                aria-hidden="true"
+              >✓</span>
+              {{ isAddingPoints ? t('map.drawTab.voronoi.addDialectPointExit') : t('map.drawTab.voronoi.addDialectPoint') }}
+            </button>
+            <button
+              class="main-glass-button draw-tool-mode-button"
               :data-variant="isPointsPreviewActive ? 'primary' : 'secondary'"
               :data-active="isPointsPreviewActive"
               type="button"
@@ -173,15 +188,6 @@
                 aria-hidden="true"
               >✓</span>
               {{ t('map.drawTab.voronoi.previewPoints') }}
-            </button>
-            <button
-              class="main-glass-button"
-              data-variant="secondary"
-              type="button"
-              :disabled="!activePoints"
-              @click="$emit('export-layer')"
-            >
-              {{ t('map.drawTab.voronoi.exportToLayer') }}
             </button>
             <button
               class="main-glass-button draw-tool-mode-button"
@@ -197,6 +203,15 @@
                 aria-hidden="true"
               >✓</span>
               {{ isCalculating ? t('map.drawTab.buttons.voronoiRunning') : t('map.drawTab.voronoi.calculate') }}
+            </button>
+            <button
+              class="main-glass-button"
+              data-variant="secondary"
+              type="button"
+              :disabled="!activePoints"
+              @click="$emit('export-layer')"
+            >
+              {{ t('map.drawTab.voronoi.exportToLayer') }}
             </button>
           </div>
           <div v-if="statusText" class="draw-style-hint">
@@ -249,6 +264,7 @@ const props = defineProps({
   hasFieldMerge: { type: Boolean, default: false },
   expandRatio: { type: Number, default: 50 },
   enableExpand: { type: Boolean, default: false },
+  isAddingPoints: { type: Boolean, default: false },
 })
 
 defineEmits([
@@ -264,6 +280,7 @@ defineEmits([
   'open-field-merge',
   'update:enable-expand',
   'update:expand-ratio',
+  'toggle-add-points',
 ])
 
 const { t } = useI18n()

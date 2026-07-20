@@ -109,6 +109,7 @@
             @export-layer="handleLayerExported"
             @export-selection-bounds-change="boxSelectionBounds = $event"
             @preview-feature-hover="handlePreviewFeatureHover"
+            @map-click="handleMapClickForAddPoint"
           />
         </div>
 
@@ -189,6 +190,8 @@
           @calculate="handleBuildVoronoi"
           @open-field-merge="showFieldMergeModal = true"
           @update:expand-ratio="voronoiExpandRatio = $event"
+          :is-adding-points="isAddingDialectPoints"
+          @toggle-add-points="toggleAddDialectPoints"
         />
       </div>
 
@@ -503,6 +506,39 @@
         @reset-field-merge="resetFieldMerge"
       />
 
+      <AppModal
+        v-model="showAddDialectPartitionModal"
+        :title="t('map.drawTab.voronoi.addPointSelectPartition')"
+        size="sm"
+      >
+        <div class="draw-basemap-select" style="padding: 0.5rem 0;">
+          <SimpleSelectDropdown
+            v-model="pendingAddPartitionKey"
+            :options="addDialectPartitionOptions"
+          />
+        </div>
+        <template #footer>
+          <div class="scope-modal-footer">
+            <button
+              class="main-glass-button"
+              type="button"
+              @click="showAddDialectPartitionModal = false"
+            >
+              {{ t('common.button.cancel') }}
+            </button>
+            <button
+              class="main-glass-button scope-confirm-btn"
+              data-variant="primary"
+              type="button"
+              :disabled="!pendingAddPartitionKey"
+              @click="confirmAddDialectPartition"
+            >
+              {{ t('common.button.confirm') }}
+            </button>
+          </div>
+        </template>
+      </AppModal>
+
       <input
         ref="voronoiImportFileInputRef"
         class="draw-import-input"
@@ -566,6 +602,7 @@ import {
   buildPartitionPoints,
   buildVoronoiSelectionOptions,
   calculatePartitionVoronoi,
+  normalizePartitionPoint,
 } from '@/main/utils/drawMap/partitionVoronoi.js';
 import { pickDrawColor } from '@/main/config/colors/mapColors.js';
 import { mapStyleConfig } from '@/utils/map/MapSource.js';
@@ -754,6 +791,24 @@ const isVoronoiLoadingPoints = ref(false);
 const isVoronoiCalculating = ref(false);
 const showVoronoiIgnoreModal = ref(false);
 const showFieldMergeModal = ref(false);
+const isAddingDialectPoints = ref(false);
+const showAddDialectPartitionModal = ref(false);
+const addDialectPartitionKey = ref('');
+const pendingAddPartitionKey = ref('');
+let addPointCounter = 0;
+
+const addDialectPartitionOptions = computed(() => {
+  const level = Number(voronoiRegionLevel.value) || 3;
+  const keys = [...new Set(voronoiPartitionPoints.value.map((p) => {
+    if (level === 1) return p.partitionLevel1;
+    if (level === 2) return p.partitionLevel2;
+    return p.partitionLevel3;
+  }).filter(Boolean))];
+  return keys.sort((a, b) => String(a).localeCompare(String(b), 'zh-Hans-CN')).map((k) => ({
+    label: k,
+    value: k,
+  }));
+});
 const voronoiStatusText = ref('');
 const voronoiLastResult = ref(null);
 const voronoiExportProgress = ref({ current: 0, total: 0 });
@@ -1341,6 +1396,7 @@ const confirmVoronoiExport = async () => {
 watch(voronoiPartitionMode, async () => {
   normalizeVoronoiPoints();
   clearVoronoiPreviewState();
+  addDialectPartitionKey.value = '';
   await refreshVoronoiPreview();
   if (!voronoiPreviewType.value) {
     voronoiPreviewLayers.value = [];
@@ -1350,6 +1406,7 @@ watch(voronoiPartitionMode, async () => {
 watch(voronoiRegionLevel, async () => {
   voronoiLastResult.value = null;
   voronoiExportSelections.value = [];
+  addDialectPartitionKey.value = addDialectPartitionOptions.value[0]?.value ?? '';
   await refreshVoronoiPreview();
   if (!voronoiPreviewType.value) {
     voronoiPreviewLayers.value = [];
@@ -1380,7 +1437,10 @@ watch(clipVoronoiToNationalBorder, (value) => {
 });
 
 watch(isVoronoiPanelOpen, async (isOpen) => {
-  if (!isOpen) return;
+  if (!isOpen) {
+    isAddingDialectPoints.value = false;
+    return;
+  }
   await ensureVoronoiPointsLoaded();
 });
 
@@ -1870,6 +1930,57 @@ const togglePanel = (panelName) => {
     if (panelName === 'drawing') isDrawingPanelOpen.value = !isDrawingPanelOpen.value;
     else if (panelName === 'layers') isLayersPanelOpen.value = !isLayersPanelOpen.value;
     else isVoronoiPanelOpen.value = !isVoronoiPanelOpen.value;
+  }
+};
+
+const toggleAddDialectPoints = () => {
+  if (isAddingDialectPoints.value) {
+    isAddingDialectPoints.value = false;
+    return;
+  }
+  pendingAddPartitionKey.value = addDialectPartitionKey.value || addDialectPartitionOptions.value[0]?.value || '';
+  showAddDialectPartitionModal.value = true;
+};
+
+const confirmAddDialectPartition = () => {
+  addDialectPartitionKey.value = pendingAddPartitionKey.value;
+  showAddDialectPartitionModal.value = false;
+  isAddingDialectPoints.value = true;
+  if (currentMode.value !== 'simple_select') {
+    setMode('simple_select');
+  }
+};
+
+const handleMapClickForAddPoint = ({ lng, lat }) => {
+  if (!isAddingDialectPoints.value) return;
+  if (!addDialectPartitionKey.value) return;
+  if (currentMode.value !== 'simple_select') return;
+
+  addPointCounter += 1;
+
+  const mode = voronoiPartitionMode.value;
+  const rawRow = {
+    name: `自定义点-${addPointCounter}`,
+    lng,
+    lat,
+  };
+  rawRow[`${mode}Partition`] = addDialectPartitionKey.value;
+
+  const point = normalizePartitionPoint(rawRow, { partitionMode: mode });
+  if (!point) {
+    showError(t('map.drawTab.voronoi.addPointInvalid'));
+    return;
+  }
+
+  point.source = 'manual';
+  point.customRowId = `manual-${Date.now()}-${addPointCounter}`;
+
+  voronoiCustomImportRows.value.push(point);
+  syncVoronoiPartitionPoints();
+  setVoronoiStatus('addPointAdded', { name: point.name });
+
+  if (voronoiPreviewType.value === 'points') {
+    refreshVoronoiPreview('points');
   }
 };
 

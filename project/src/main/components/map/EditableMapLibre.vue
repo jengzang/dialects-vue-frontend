@@ -123,6 +123,7 @@ const emit = defineEmits([
   'export-layer',
   'update:currentStyleKey',
   'preview-feature-hover',
+  'map-click',
 ])
 
 const mapContainer = ref(null)
@@ -850,6 +851,9 @@ const initializeMap = async () => {
   map.value.addControl(new maplibregl.NavigationControl(), 'top-left')
   map.value.addControl(new maplibregl.FullscreenControl({ container: mapContainer.value }), 'top-left')
   map.value.on('load', initializeDraw)
+  map.value.on('click', (e) => {
+    emit('map-click', { lng: e.lngLat.lng, lat: e.lngLat.lat })
+  })
   map.value.on('styledata', () => {
     syncReadonlyLayers()
   })
