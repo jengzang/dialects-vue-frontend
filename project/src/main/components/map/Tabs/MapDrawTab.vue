@@ -517,6 +517,37 @@
             :options="addDialectPartitionOptions"
           />
         </div>
+        <div
+          v-if="customPointsByPartition.length"
+          class="add-point-partition-list"
+        >
+          <div class="draw-tool-section-title">
+            {{ t('map.drawTab.voronoi.customPointsManagement') }}
+          </div>
+          <div
+            v-for="item in customPointsByPartition"
+            :key="item.key"
+            class="add-point-partition-row"
+          >
+            <span class="add-point-partition-key">{{ item.key }}</span>
+            <span class="add-point-partition-count">{{ item.count }}</span>
+            <button
+              class="main-glass-button add-point-delete-btn"
+              type="button"
+              data-variant="secondary"
+              @click="deleteCustomPointsByPartition(item.key)"
+            >
+              {{ t('map.drawTab.voronoi.deletePartitionPoints') }}
+            </button>
+          </div>
+        </div>
+        <div
+          v-else
+          class="draw-style-hint"
+          style="padding: 0.5rem 0;"
+        >
+          {{ t('map.drawTab.voronoi.noCustomPoints') }}
+        </div>
         <template #footer>
           <div class="scope-modal-footer">
             <button
@@ -808,6 +839,23 @@ const addDialectPartitionOptions = computed(() => {
     label: k,
     value: k,
   }));
+});
+
+const customPointsByPartition = computed(() => {
+  const level = Number(voronoiRegionLevel.value) || 3;
+  const manualPoints = voronoiCustomImportRows.value.filter(p => p.source === 'manual');
+  const groups = {};
+  for (const p of manualPoints) {
+    let key;
+    if (level === 1) key = p.partitionLevel1;
+    else if (level === 2) key = p.partitionLevel2;
+    else key = p.partitionLevel3;
+    if (!key) continue;
+    groups[key] = (groups[key] || 0) + 1;
+  }
+  return Object.entries(groups)
+    .map(([key, count]) => ({ key, count }))
+    .sort((a, b) => b.count - a.count);
 });
 const voronoiStatusText = ref('');
 const voronoiLastResult = ref(null);
@@ -1951,6 +1999,27 @@ const confirmAddDialectPartition = () => {
   }
 };
 
+const deleteCustomPointsByPartition = (partitionKey) => {
+  const level = Number(voronoiRegionLevel.value) || 3;
+  const before = voronoiCustomImportRows.value.length;
+  voronoiCustomImportRows.value = voronoiCustomImportRows.value.filter((p) => {
+    if (p.source !== 'manual') return true;
+    let key;
+    if (level === 1) key = p.partitionLevel1;
+    else if (level === 2) key = p.partitionLevel2;
+    else key = p.partitionLevel3;
+    return key !== partitionKey;
+  });
+  const removed = before - voronoiCustomImportRows.value.length;
+  if (removed > 0) {
+    syncVoronoiPartitionPoints();
+    setVoronoiStatus('deletedPartitionPoints', { key: partitionKey, count: removed });
+    if (addDialectPartitionKey.value === partitionKey) {
+      addDialectPartitionKey.value = '';
+    }
+  }
+};
+
 const handleMapClickForAddPoint = ({ lng, lat }) => {
   if (!isAddingDialectPoints.value) return;
   if (!addDialectPartitionKey.value) return;
@@ -2314,6 +2383,60 @@ onBeforeUnmount(() => {
 
   50% {
     transform: translateY(-6px);
+  }
+}
+
+.add-point-partition-list {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.add-point-partition-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 10px;
+  background: var(--glass-50);
+  border: 1px solid var(--glass-60);
+}
+
+.add-point-partition-key {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-deep);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.add-point-partition-count {
+  font-size: 0.82rem;
+  color: rgba(var(--text-deep-rgb), 0.6);
+  background: var(--glass-70);
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.add-point-delete-btn {
+  min-width: auto;
+  padding: 0.3rem 0.65rem !important;
+  font-size: 0.82rem;
+  border-color: rgba(var(--color-error-rgb, 220 38 38), 0.35);
+  color: var(--color-error, #dc2626);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      background: var(--color-error, #dc2626);
+      color: #fff;
+      border-color: var(--color-error, #dc2626);
+    }
   }
 }
 </style>
