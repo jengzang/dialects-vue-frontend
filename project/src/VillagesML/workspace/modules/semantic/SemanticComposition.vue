@@ -166,6 +166,7 @@ watch(detailMode, (val) => {
 
 .controls {
   margin-bottom: 16px;
+  justify-content: center;
 }
 
 .input-group {
@@ -185,7 +186,7 @@ watch(detailMode, (val) => {
 }
 
 .vml-number-input {
-  width: 150px;
+  // width: 150px;
 }
 
 .patterns-table {
@@ -260,9 +261,9 @@ watch(detailMode, (val) => {
     padding: 12px;
   }
 
-  .vml-number-input {
-    width: 100%;
-  }
+  // .vml-number-input {
+  //   width: 100%;
+  // }
 }
 
 </style>

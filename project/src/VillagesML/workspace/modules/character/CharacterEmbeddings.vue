@@ -23,7 +23,7 @@
           />
         </h2>
         <div class="search-group vml-control-surface vml-control-row">
-          <div class="vml-control-field vml-control-field--compact">
+          <div class="vml-control-field">
             <input
               v-model="searchChar"
               type="text"
@@ -33,7 +33,7 @@
               @input="handleCharInput"
             />
           </div>
-          <div class="vml-control-field vml-control-field--compact">
+          <div class="vml-control-field">
             <input
               v-model.number="topN"
               type="number"
@@ -371,7 +371,7 @@ onBeforeUnmount(() => {
 }
 
 .vml-number-input {
-  width: 120px;
+  // width: 120px;
   padding: 10px;
   border-radius: var(--radius-md);
 }
@@ -640,7 +640,7 @@ onBeforeUnmount(() => {
   }
 
   .vml-number-input {
-    width: 60px;
+    // width: 60px;
   }
 
   .embeddings-list {
@@ -658,6 +658,7 @@ onBeforeUnmount(() => {
   .search-section {
     flex-direction: row;
     align-items: center;
+    justify-content: space-around;
   }
 }
 

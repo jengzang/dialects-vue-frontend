@@ -55,7 +55,7 @@
           <div v-if="layers.characters" class="section">
             <h3>字符設置</h3>
             <div class="filter-row vml-control-surface vml-control-row">
-              <div class="vml-control-field vml-control-field--compact">
+              <div class="vml-control-field">
                 <input
                   v-model="filters.character"
                   type="text"
@@ -64,7 +64,7 @@
                   class="filter-input"
                 >
               </div>
-              <div class="vml-control-field vml-control-field--compact">
+              <div class="vml-control-field">
                 <SimpleSelectDropdown
                   v-model="filters.charLevel"
                   :options="charLevelOptions"

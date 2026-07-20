@@ -1,7 +1,14 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="dashboard-page">
-      <h1 class="page-title">📊 自然村分析系統</h1>
+      <div class="page-header">
+        <h1 class="page-title">📊 自然村分析系統</h1>
+        <SimpleSelectDropdown
+          v-model="activeDataset"
+          :options="datasetOptions"
+          :width="'180px'"
+        />
+      </div>
 
       <!-- Introduction Section -->
       <div class="intro-section glass-panel">
@@ -120,14 +127,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import { getVillagesOverview, getVillagesNgrams, getCachedVillagesNgrams } from '@/composables/data/useVillagesCache.js'
 import { showError } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
+import { VILLAGESML_DATASETS } from '@/VillagesML/config/datasets.js'
+import { resolveVillagesMLDatasetFromRoute, buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -138,6 +148,18 @@ const metadataQuery = useAsyncData()
 const ngramStatsQuery = useAsyncData()
 const loading = metadataQuery.loading
 const loadingNgram = ngramStatsQuery.loading
+
+// Dataset selector
+const activeDataset = computed({
+  get: () => resolveVillagesMLDatasetFromRoute(route),
+  set: (dataset) => {
+    if (dataset === resolveVillagesMLDatasetFromRoute(route)) return
+    router.push(buildVillagesMLPath({ dataset }))
+  }
+})
+const datasetOptions = computed(() =>
+  VILLAGESML_DATASETS.map(d => ({ label: d.label, value: d.id }))
+)
 
 // Maintenance notice: show until 2026-03-02
 const showMaintenanceNotice = computed(() => new Date() < new Date('2026-03-02'))
@@ -334,6 +356,14 @@ onMounted(() => {
   color: var(--text-primary);
   margin: 5px;
   text-align: center;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .stats-grid {
@@ -663,9 +693,14 @@ onMounted(() => {
     line-height: 1.5;
   }
 
+  .page-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
   .page-title {
     font-size: 24px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
   }
 
   .intro-section {

@@ -1,6 +1,6 @@
 <template>
   <div class="detail-toolbar">
-    <div class="detail-toggle vml-glass-panel vml-control-surface vml-control-row">
+    <div class="detail-toggle vml-glass-panel vml-control-surface vml-control-row" style="flex-wrap:nowrap">
       <div class="toggle-left vml-control-field">
         <label class="toggle-container">
           <SwitchToggle
@@ -20,11 +20,9 @@
         </label>
         <span class="toggle-hint">（語義分類更細緻）</span>
       </div>
-      <div class="vml-control-actions">
-        <button class="lexicon-button" @click="showLexiconModal = true">
-          📖 查看詞典
-        </button>
-      </div>
+      <button class="lexicon-button" @click="showLexiconModal = true">
+        📖 查看詞典
+      </button>
     </div>
 
     <AppModal
@@ -113,6 +111,7 @@ const countParentChars = (subcats) => {
 .toggle-left {
   display: flex;
   align-items: center;
+  flex-direction: row;
   gap: 12px;
 
   @media (max-aspect-ratio: 1/1) {
@@ -146,6 +145,9 @@ const countParentChars = (subcats) => {
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
 
   &:hover {
     background: var(--color-primary-hover);

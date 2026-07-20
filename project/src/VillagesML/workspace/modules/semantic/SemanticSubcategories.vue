@@ -133,7 +133,7 @@
             />
           </div>
 
-          <div class="form-group vml-control-field vml-control-field--compact">
+          <div class="form-group vml-control-field">
             <label>返回數量:</label>
             <input v-model.number="topN" type="number" min="5" max="50" class="vml-number-input" />
           </div>
@@ -662,12 +662,12 @@ export default {
   color: var(--text-primary);
 }
 
-.form-row {
-  width: 100%;
-}
+// .form-row {
+//   width: 100%;
+// }
 
 .vml-number-input {
-  width: 100%;
+  // width: 100%;
   padding: 10px;
   border-radius: var(--radius-sm2);
   background: var(--glass-80);

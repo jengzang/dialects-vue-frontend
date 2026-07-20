@@ -30,7 +30,7 @@
           />
         </div>
 
-        <div class="control-group vml-control-field vml-control-field--compact">
+        <div class="control-group vml-control-field">
           <label class="control-label">返回數量</label>
           <input
             v-model.number="topN"
@@ -41,7 +41,7 @@
           />
         </div>
 
-        <div v-if="queryMode === 'global'" class="control-group vml-control-field vml-control-field--compact">
+        <div v-if="queryMode === 'global'" class="control-group vml-control-field">
           <label class="control-label">最小佔比(%)</label>
           <input
             v-model.number="minPercentage"
@@ -243,7 +243,7 @@ const goToTendency = (pattern) => {
 }
 
 .vml-number-input {
-  width: 150px;
+  // width: 150px;
 }
 
 .pattern-grid {
@@ -354,7 +354,7 @@ const goToTendency = (pattern) => {
 @media (min-aspect-ratio: 1/1) {
   .controls {
     flex: 1;
-    justify-content: flex-end;
+    justify-content: center;
   }
 }
 
@@ -363,9 +363,9 @@ const goToTendency = (pattern) => {
     flex-direction: column;
   }
 
-  .vml-number-input {
-    width: 100%;
-  }
+  // .vml-number-input {
+  //   width: 100%;
+  // }
 
 }
 </style>

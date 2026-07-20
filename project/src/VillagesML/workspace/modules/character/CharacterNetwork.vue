@@ -20,26 +20,26 @@
     <div class="controls-panel vml-glass-panel">
       <div class="vml-control-surface">
         <div class="vml-control-row vml-control-row--center">
-          <div class="vml-control-field vml-control-field--compact">
+          <div class="vml-control-field">
             <label>字符</label>
             <input v-model="rootChar" maxlength="1" class="vml-char-input" placeholder="請輸入單個漢字" />
           </div>
-          <div class="vml-control-field vml-control-field--compact">
+          <div class="vml-control-field">
             <label>擴展深度</label>
             <SimpleSelectDropdown
               v-model.number="depth"
               :options="depthOptions"
             />
           </div>
-          <div class="vml-control-field vml-control-field--compact">
+          <div class="vml-control-field">
             <label>每節點 Top-K（1-10）</label>
             <input v-model.number="topK" type="number" min="1" max="10" class="glass-input small" />
           </div>
-          <div class="vml-control-field vml-control-field--compact">
+          <div class="vml-control-field">
             <label>最低相似度</label>
             <input v-model.number="minSimilarity" type="number" min="0.1" max="0.99" step="0.05" class="glass-input small" />
           </div>
-          <div class="vml-control-field vml-control-field--compact">
+          <div class="vml-control-field">
             <label>最大節點數</label>
             <input v-model.number="maxNodes" type="number" min="10" max="1000" class="glass-input small" />
           </div>
@@ -244,13 +244,12 @@ onBeforeUnmount(() => {
   border-color: rgba(var(--color-primary-rgb), 0.3);
 }
 
-.glass-select, .glass-input {
+.glass-select {
   padding: 8px 10px; border-radius: var(--radius-sm2);
   border: 1px solid var(--glass-60);
   background: var(--glass-50);
   font-size: 14px;
 }
-.glass-input.small { min-width: 56px; width: 100%; flex: 1; }
 
 .progress-panel { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .progress-text { font-size: 13px; color: var(--text-secondary, var(--text-tertiary)); margin: 0; }

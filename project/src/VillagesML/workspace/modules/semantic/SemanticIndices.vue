@@ -320,6 +320,8 @@ const getRegionLevelName = (level) => {
 
 .controls {
   margin-bottom: 16px;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .input-group {
@@ -363,7 +365,7 @@ const getRegionLevelName = (level) => {
 }
 
 .vml-number-input {
-  width: 150px;
+  // width: 150px;
 }
 
 .vml-number-input:disabled {

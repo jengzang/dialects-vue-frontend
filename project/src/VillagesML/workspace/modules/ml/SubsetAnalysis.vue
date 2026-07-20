@@ -71,7 +71,7 @@
               min="2"
               max="10"
               placeholder="2-10"
-              class="glass-input"
+              class="glass-input small"
             >
 
             <!-- Text field: use text input (name, suffix, prefix) -->
@@ -80,7 +80,7 @@
               v-model="filter.value"
               type="text"
               placeholder="值"
-              class="glass-input"
+              class="glass-input small"
             >
           </div>
 
@@ -445,18 +445,18 @@
       </div>
       <div class="clustering-content">
         <div class="clustering-controls vml-control-surface vml-control-row">
-          <div class="control-row vml-control-field vml-control-field--compact">
+          <div class="control-row vml-control-field">
             <label>選擇子集:</label>
             <SimpleSelectDropdown
               v-model="clusteringSubset"
               :options="clusteringSubsetOptions"
             />
           </div>
-          <div class="control-row vml-control-field vml-control-field--compact">
+          <div class="control-row vml-control-field">
             <label>聚類數 K:</label>
             <input v-model.number="clusterK" type="number" min="2" max="20" class="glass-input small">
           </div>
-          <div class="control-row vml-control-field vml-control-field--compact">
+          <div class="control-row vml-control-field">
             <label>演算法:</label>
             <SimpleSelectDropdown :match-trigger-width="true"
               v-model="clusterAlgorithm"
@@ -1282,25 +1282,9 @@ const handleApiError = (error) => {
 }
 
 /* Input Styles */
-.glass-input {
-  width: 100%;
-  padding: 10px 16px;
-  background: var(--glass-50);
-  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.glass-input:focus {
-  outline: none;
-  border-color: var(--vml-blue);
-  background: var(--glass-80);
-  box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
-}
-
 .glass-input.small {
   max-width: 120px;
+  border-radius: var(--radius-md);
 }
 
 .solid-button.danger {

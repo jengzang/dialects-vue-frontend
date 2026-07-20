@@ -149,7 +149,7 @@
         <template v-else>
           <div class="level-selector vml-control-surface">
             <div class="vml-control-row">
-              <div class="vml-control-field vml-control-field--compact">
+              <div class="vml-control-field">
                 <label>行政級別：</label>
                 <SimpleSelectDropdown
                   v-model="rankingLevel"
@@ -158,7 +158,7 @@
                 />
               </div>
 
-              <div class="vml-control-field vml-control-field--compact">
+              <div class="vml-control-field">
                 <label>最小村莊數：</label>
                 <input
                   v-model.number="minVillages"
@@ -1007,7 +1007,7 @@ onMounted(() => {
   }
 
   .level-selector .input-hint {
-    flex-basis: 100%;
+    // flex-basis: 100%;
     font-size: 12px;
   }
 }
@@ -1018,7 +1018,7 @@ onMounted(() => {
   border: 1px solid var(--bg-hover-strong);
   border-radius: var(--radius-sm);
   font-size: 14px;
-  width: 120px;
+  // width: 120px;
   transition: all 0.3s ease;
 }
 

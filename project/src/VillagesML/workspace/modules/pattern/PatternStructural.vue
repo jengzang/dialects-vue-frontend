@@ -135,6 +135,7 @@ const goToTendency = (pattern) => {
 
 .controls {
   margin-bottom: 16px;
+  justify-content: center;
 }
 
 .structural-list {

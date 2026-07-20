@@ -28,7 +28,7 @@
             v-model="searchKeyword"
             type="text"
             placeholder="搜尋村莊名稱..."
-            class="glass-input"
+            class="glass-input small"
             @input="handleSearchInput"
           >
         </div>
@@ -1147,22 +1147,6 @@ onBeforeUnmount(() => {
 
 .search-bar {
   margin-bottom: 16px;
-}
-
-.glass-input {
-  width: 100%;
-  padding: 10px 16px;
-  background: var(--glass-50);
-  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: var(--radius-sm2);
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.glass-input:focus {
-  outline: none;
-  border-color: var(--vml-blue);
-  background: var(--glass-80);
 }
 
 .filters-row {

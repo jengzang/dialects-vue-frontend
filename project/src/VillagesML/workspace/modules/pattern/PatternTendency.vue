@@ -18,7 +18,7 @@
             class="vml-input"
           />
         </div>
-        <div class="vml-control-field vml-control-field--compact">
+        <div class="vml-control-field">
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model="tendencyLevel"
             :options="tendencyLevelOptions"
@@ -179,6 +179,7 @@ watch(
 
 .controls {
   margin-bottom: 16px;
+  justify-content: center;
 }
 
 .vml-input {

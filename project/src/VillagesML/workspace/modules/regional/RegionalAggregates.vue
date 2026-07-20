@@ -163,7 +163,7 @@
         <div class="spatial-header">
           <h2 style="white-space: nowrap">空間聚合</h2>
           <div class="controls vml-control-surface vml-control-row">
-            <div class="vml-control-field vml-control-field--compact">
+            <div class="vml-control-field">
               <SimpleSelectDropdown
                 v-model="spatialLevel"
                 :options="spatialLevelOptions"
@@ -738,6 +738,7 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
+  justify-content: center;
 }
 
 @media (max-width: 768px) {

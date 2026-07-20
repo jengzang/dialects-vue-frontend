@@ -17,7 +17,7 @@
         <p class="section-description">選擇多個區域進行特徵聚合對比（選擇3個以上可以評估z-score）</p>
 
         <div class="selector-row vml-control-surface vml-control-row">
-          <div class="vml-control-field vml-control-field--compact">
+          <div class="vml-control-field">
             <label class="field-label">區域級別：</label>
             <SimpleSelectDropdown
               v-model="regionLevel"
@@ -80,7 +80,7 @@
       </div>
 
       <div class="section query-row vml-control-surface vml-control-row vml-control-row--center">
-        <div class="topn-row vml-control-field vml-control-field--compact">
+        <div class="topn-row vml-control-field">
           <label class="field-label">Top N：</label>
           <input
             type="number"

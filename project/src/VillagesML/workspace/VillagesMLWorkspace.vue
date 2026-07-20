@@ -13,24 +13,6 @@
 
     <!-- Content area -->
     <div class="content-area">
-      <div class="dataset-selector vml-control-row">
-        <div class="dataset-selector__field vml-control-field vml-control-field--compact">
-          <label class="dataset-selector__label">數據集</label>
-          <select
-            class="dataset-selector__select"
-            :value="activeDataset"
-            @change="handleDatasetChange($event.target.value)"
-          >
-            <option
-              v-for="dataset in VILLAGESML_DATASETS"
-              :key="dataset.id"
-              :value="dataset.id"
-            >
-              {{ dataset.label }}
-            </option>
-          </select>
-        </div>
-      </div>
 
       <!-- Dynamic Component Loading with KeepAlive -->
       <KeepAlive v-if="currentComponent">
@@ -135,8 +117,7 @@ import { showError, showSuccess } from '@/utils/ui/message.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
-import { buildVillagesMLPath, resolveVillagesMLDatasetFromRoute } from '@/VillagesML/utils/routeDataset.js'
-import { VILLAGESML_DATASETS } from '@/VillagesML/config/datasets.js'
+import { resolveVillagesMLDatasetFromRoute } from '@/VillagesML/utils/routeDataset.js'
 
 // Import CommonBar and SimpleSidebar
 import CommonBar from '@/components/bar/CommonBar.vue'
@@ -222,17 +203,6 @@ watch(activeDataset, (dataset, previousDataset) => {
   }
 })
 
-const handleDatasetChange = (dataset) => {
-  if (dataset === activeDataset.value) return
-
-  const { module, subtab, ...query } = route.query
-  router.push(buildVillagesMLPath({
-    dataset,
-    module,
-    subtab,
-    query
-  }))
-}
 
 // Active state getter for CommonBar
 
@@ -554,30 +524,6 @@ const handleAdjustParams = (action) => {
   color: var(--text-deep);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   animation: fadeIn 0.3s ease;
-}
-
-.dataset-selector {
-  justify-content: flex-end;
-  margin-bottom: 10px;
-}
-
-.dataset-selector__field {
-  flex-basis: 150px;
-}
-
-.dataset-selector__label {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.dataset-selector__select {
-  min-width: 150px;
-  padding: 6px 10px;
-  border: 1px solid rgba(var(--text-deep-rgb), 0.16);
-  border-radius: var(--radius-sm);
-  background: var(--glass-80);
-  color: var(--text-primary);
-  font-size: 13px;
 }
 
 @keyframes fadeIn {

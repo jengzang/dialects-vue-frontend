@@ -87,3 +87,21 @@
     background: var(--glass-80);
   }
 }
+
+.glass-input.small {
+  // width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text-deep);
+  background: var(--glass-50);
+  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
+  border-radius: var(--radius-sm2);
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--vml-blue);
+    background: var(--glass-80);
+    box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
+  }
+}

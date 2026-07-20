@@ -41,7 +41,7 @@
             {{ loadingNgramList ? '⏳' : '📋' }}
           </button>
         </div>
-        <div class="vml-control-field vml-control-field--compact">
+        <div class="vml-control-field">
           <SimpleSelectDropdown
             v-model="level"
             :options="levelOptions"
@@ -279,7 +279,7 @@
             {{ loadingNgramList ? '⏳' : '📋' }}
           </button>
         </div>
-        <div class="vml-control-field vml-control-field--compact">
+        <div class="vml-control-field">
           <SimpleSelectDropdown
             v-model="significanceLevel"
             :options="levelOptions"
@@ -667,6 +667,7 @@ watch(
 
 .controls {
   margin-bottom: 16px;
+  justify-content: center;
 }
 
 .ngram-selector {

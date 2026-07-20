@@ -22,7 +22,7 @@
         <div v-if="queryMode === 'by-char'" class="form-content">
           <h3>按字符查詢顯著性</h3>
           <div class="vml-control-surface vml-control-row">
-            <div class="form-group vml-control-field vml-control-field--compact">
+            <div class="form-group vml-control-field">
               <label>字符:</label>
               <input
                 v-model="queryChar"
@@ -32,7 +32,7 @@
                 class="vml-char-input"
               />
             </div>
-            <div class="form-group vml-control-field vml-control-field--compact">
+            <div class="form-group vml-control-field">
               <label>區域層級:</label>
               <SimpleSelectDropdown :match-trigger-width="true"
                 v-model="regionLevel"
@@ -65,7 +65,7 @@
                 placeholder="請選擇或輸入"
               />
             </div>
-            <div class="form-group vml-control-field vml-control-field--compact">
+            <div class="form-group vml-control-field">
               <label>返回數量:</label>
               <input
                 v-model.number="topN"

@@ -14,9 +14,15 @@
 
 .vml-control-row {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  // width:100%;
+  // flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: 12px;
+  min-width: 0;
+  @media (max-aspect-ratio:1/1){
+    display: grid;
+  }
 }
 
 .vml-control-row--center {
@@ -29,15 +35,25 @@
 
 .vml-control-field {
   display: flex;
-  flex: 1 1 180px;
+  align-items: center;
+  // flex: 1 1 180px;
   min-width: 0;
-  flex-direction: column;
   gap: 6px;
+
+  // @media (max-aspect-ratio:1/1){
+  //   flex-direction: column;
+  // }
+
+  label{
+    white-space: nowrap;
+  }
+
 }
 
-.vml-control-field--compact {
-  flex: 0 1 120px;
-}
+// .vml-control-field--compact {
+//   flex: 0 1 120px;
+//   min-width: 0;
+// }
 
 .vml-control-field > label {
   font-size: 12px;
@@ -62,10 +78,10 @@
     gap: 10px;
   }
 
-  .vml-control-field,
-  .vml-control-actions {
-    flex-basis: 100%;
-  }
+  // .vml-control-field,
+  // .vml-control-actions {
+  //   flex-basis: 100%;
+  // }
 
   .vml-control-actions > button {
     width: 100%;

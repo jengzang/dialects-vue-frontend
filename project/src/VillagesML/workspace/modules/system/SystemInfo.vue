@@ -149,7 +149,7 @@
               <span v-else>🔄 刷新</span>
             </button>
           </div>
-          <div class="vml-control-field vml-control-field--compact">
+          <div class="vml-control-field">
             <input
               v-model="tableSearch"
               type="text"
@@ -157,7 +157,7 @@
               class="glass-input small"
             >
           </div>
-          <div class="vml-control-field vml-control-field--compact">
+          <div class="vml-control-field">
             <SimpleSelectDropdown :match-trigger-width="true"
               v-model="tableSortBy"
               :options="sortOptions"
@@ -622,7 +622,6 @@ onMounted(() => {
 
 
 
-.glass-input,
 .glass-select {
   padding: 8px 16px;
   background: var(--glass-50);
@@ -630,19 +629,17 @@ onMounted(() => {
   border-radius: var(--radius-sm2);
   font-size: 14px;
   transition: all 0.3s ease;
-}
 
-.glass-input:focus,
-.glass-select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: var(--glass-80);
-}
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--glass-80);
+  }
 
-.glass-input.small,
-.glass-select.small {
-  padding: 6px 12px;
-  font-size: 13px;
+  &.small {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
 }
 
 .solid-button {
