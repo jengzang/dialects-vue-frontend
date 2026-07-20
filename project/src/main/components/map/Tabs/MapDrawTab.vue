@@ -119,6 +119,10 @@
             v-if="hoveredPolygon.pointCount > 0"
             class="point-count"
           >{{ hoveredPolygon.pointCount }} 个方言点</span>
+          <span
+            v-else-if="hoveredPolygon.partitionKey"
+            class="partition-info"
+          >{{ hoveredPolygon.partitionKey }}</span>
         </div>
 
         <MapDrawToolsPanel
@@ -2215,7 +2219,8 @@ onBeforeUnmount(() => {
       font-size: 0.92rem;
     }
 
-    .point-count {
+    .point-count,
+    .partition-info {
       font-size: 0.78rem;
       color: rgba(255, 255, 255, 0.7);
     }

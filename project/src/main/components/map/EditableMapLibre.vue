@@ -905,21 +905,25 @@ const onPreviewMouseMove = (e) => {
   const feature = features[0]
   const key = feature.properties?.partitionKey
   const source = feature.source
+  const isPoint = pointLayerIds.includes(feature.layer?.id)
   if (!key || !source) {
     resetHoveredFeature()
     return
   }
 
-  if (key === hoveredFeatureKey && source === hoveredFeatureSource) return
+  const hoverId = isPoint ? `${key}-${feature.properties?.name ?? ''}` : key
+  if (hoverId === hoveredFeatureKey && source === hoveredFeatureSource) return
 
   resetHoveredFeature()
 
-  hoveredFeatureKey = key
+  hoveredFeatureKey = hoverId
   hoveredFeatureSource = source
-  map.value.setFeatureState(
-    { source, id: key },
-    { hover: true }
-  )
+  if (!isPoint) {
+    map.value.setFeatureState(
+      { source, id: key },
+      { hover: true }
+    )
+  }
   map.value.getCanvas().style.cursor = 'pointer'
   emit('preview-feature-hover', {
     name: feature.properties?.name ?? key,
