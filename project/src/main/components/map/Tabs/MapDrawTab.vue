@@ -2053,7 +2053,7 @@ onBeforeUnmount(() => {
     &--header {
       justify-content: flex-end;
 
-      :global(html:not(.is-touch-device)) & {
+      @media (hover: hover) and (pointer: fine) {
         .main-glass-button:hover:not(:disabled) {
           background: var(--color-primary);
           color: var(--action-primary-text);
@@ -2208,7 +2208,7 @@ onBeforeUnmount(() => {
     text-align: left;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-    :global(html:not(.is-touch-device)) & {
+    @media (hover: hover) and (pointer: fine) {
       &:hover:not(:disabled) {
         background: var(--glass-80);
         border-color: var(--color-primary);

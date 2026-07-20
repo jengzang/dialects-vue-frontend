@@ -321,7 +321,7 @@ const offsetClass = computed(() => {
   color: var(--color-primary);
   text-decoration: none;
 
-  :global(html:not(.is-touch-device)) & {
+  @media (hover: hover) and (pointer: fine) {
     &:hover {
       text-decoration: underline;
     }
