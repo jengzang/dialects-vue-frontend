@@ -308,7 +308,6 @@ export function normalizeFeatureCollection(featureCollection) {
           pointStrokeColor: stroke,
           ...(feature?.properties ?? {}),
           id: featureId,
-          updatedAt: new Date().toISOString(),
         },
       }
     }),
