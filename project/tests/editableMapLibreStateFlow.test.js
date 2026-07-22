@@ -8,6 +8,12 @@ vi.mock('maplibre-gl', () => {
   class MockMap {
     constructor() {
       this.handlers = new Map()
+      this.sources = new Map()
+      this.layers = new Map()
+      this.setStyle = vi.fn(() => {
+        this.sources.clear()
+        this.layers.clear()
+      })
       mapInstances.push(this)
     }
 
@@ -20,12 +26,17 @@ vi.mock('maplibre-gl', () => {
       return {}
     }
     on(eventName, handler) {
-      this.handlers.set(eventName, handler)
+      const handlers = this.handlers.get(eventName) ?? []
+      handlers.push(handler)
+      this.handlers.set(eventName, handlers)
       if (eventName === 'load') {
         handler()
       }
     }
     off() {}
+    emit(eventName, payload) {
+      ;(this.handlers.get(eventName) ?? []).forEach((handler) => handler(payload))
+    }
     once(_eventName, handler) {
       handler()
     }
@@ -33,13 +44,29 @@ vi.mock('maplibre-gl', () => {
     getStyle() {
       return { layers: [] }
     }
-    getLayer() {
-      return false
+    getLayer(layerId) {
+      return this.layers.get(layerId) ?? false
     }
-    getSource() {
-      return null
+    addLayer(layer) {
+      this.layers.set(layer.id, layer)
     }
-    setStyle() {}
+    removeLayer(layerId) {
+      this.layers.delete(layerId)
+    }
+    getSource(sourceId) {
+      return this.sources.get(sourceId) ?? null
+    }
+    addSource(sourceId, source) {
+      this.sources.set(sourceId, {
+        ...source,
+        setData: vi.fn((data) => {
+          this.sources.get(sourceId).data = data
+        }),
+      })
+    }
+    removeSource(sourceId) {
+      this.sources.delete(sourceId)
+    }
     setLayoutProperty() {}
     flyTo() {}
     fitBounds() {}
@@ -73,6 +100,9 @@ vi.mock('@mapbox/mapbox-gl-draw', () => ({
     constructor() {
       this.features = new Map()
       this.selectedIds = []
+      this.set = vi.fn((featureCollection) => {
+        this.features = new Map((featureCollection.features ?? []).map((feature) => [String(feature.id), feature]))
+      })
       this.changeMode = vi.fn((mode, options = {}) => {
         this.mode = mode
         this.modeOptions = options
@@ -90,9 +120,6 @@ vi.mock('@mapbox/mapbox-gl-draw', () => ({
       drawInstances.push(this)
     }
 
-    set(featureCollection) {
-      this.features = new Map((featureCollection.features ?? []).map((feature) => [String(feature.id), feature]))
-    }
     get(featureId) {
       return this.features.get(String(featureId))
     }
@@ -117,21 +144,40 @@ vi.mock('maplibre-gl/dist/maplibre-gl.css', () => ({}))
 
 import EditableMapLibre from '../src/main/components/map/EditableMapLibre.vue'
 
-function mountEditableMapLibre(modelValue) {
+function mountEditableMapLibre(modelValue, options = {}) {
   const host = document.createElement('div')
   document.body.appendChild(host)
   const events = []
   const componentRef = ref(null)
+  const currentStyleKey = ref(options.currentStyleKey ?? 'gaode')
+  const activeLayer = ref(options.activeLayer ?? null)
+  const allLayers = ref(options.allLayers ?? [])
+  const previewLayers = ref(options.previewLayers ?? [])
+  const enablePreviewHover = ref(options.enablePreviewHover ?? false)
 
   const Root = defineComponent({
     components: { EditableMapLibre },
     setup() {
-      return { componentRef, modelValue, events }
+      return {
+        componentRef,
+        modelValue,
+        currentStyleKey,
+        activeLayer,
+        allLayers,
+        previewLayers,
+        enablePreviewHover,
+        events,
+      }
     },
     template: `
       <EditableMapLibre
         ref="componentRef"
         :model-value="modelValue"
+        :current-style-key="currentStyleKey"
+        :active-layer="activeLayer"
+        :all-layers="allLayers"
+        :preview-layers="previewLayers"
+        :enable-preview-hover="enablePreviewHover"
         @before-features-change="events.push(['before-features-change'])"
         @features-change="events.push(['features-change', $event])"
         @feature-select="events.push(['feature-select', $event])"
@@ -151,6 +197,10 @@ function mountEditableMapLibre(modelValue) {
     get draw() {
       return drawInstances.at(-1)
     },
+    get map() {
+      return mapInstances.at(-1)
+    },
+    currentStyleKey,
     unmount() {
       app.unmount()
       host.remove()
@@ -227,6 +277,95 @@ describe('EditableMapLibre state flow', () => {
     expect(wrapper.draw.setFeatureProperty).toHaveBeenCalledWith('line-1', 'stroke', '#ff0000')
     expect(wrapper.events.some(([eventName]) => eventName === 'before-features-change')).toBe(false)
     expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('restores draw data and overlay layers after a basemap style reload', async () => {
+    const activeFeature = {
+      id: 'active-line-1',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[113, 23], [114, 24]] },
+    }
+    const activeLayer = {
+      id: 'active-layer',
+      geometryType: 'LineString',
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [activeFeature],
+      },
+    }
+    const readonlyLayer = {
+      id: 'readonly-layer',
+      geometryType: 'Polygon',
+      visible: false,
+      locked: false,
+      stroke: '#111111',
+      strokeWidth: 2,
+      fill: '#222222',
+      fillOpacity: 0.2,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'readonly-polygon-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [] },
+        }],
+      },
+    }
+    const previewLayer = {
+      id: 'preview-layer',
+      type: 'polygons',
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'preview-polygon-1',
+          type: 'Feature',
+          properties: { partitionKey: 'preview-1' },
+          geometry: { type: 'Polygon', coordinates: [] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre(activeLayer.featureCollection, {
+      activeLayer,
+      allLayers: [activeLayer, readonlyLayer],
+      previewLayers: [previewLayer],
+      enablePreviewHover: true,
+    })
+    await nextTick()
+
+    expect(wrapper.map.getSource('readonly-draw-source-readonly-layer')).toBeTruthy()
+    expect(wrapper.map.getSource('preview-draw-source-preview-layer')).toBeTruthy()
+    wrapper.draw.set.mockClear()
+
+    wrapper.currentStyleKey.value = 'gaode_satellite'
+    await nextTick()
+    expect(wrapper.map.setStyle).toHaveBeenCalled()
+    expect(wrapper.map.getSource('readonly-draw-source-readonly-layer')).toBeNull()
+
+    wrapper.map.emit('style.load')
+    await nextTick()
+
+    const restoredFeatureCollection = wrapper.draw.set.mock.calls.at(-1)?.[0]
+    expect(restoredFeatureCollection?.type).toBe('FeatureCollection')
+    expect(restoredFeatureCollection?.features).toHaveLength(1)
+    expect(restoredFeatureCollection?.features[0]).toMatchObject({
+      id: activeFeature.id,
+      type: activeFeature.type,
+      geometry: activeFeature.geometry,
+      properties: {
+        visible: true,
+        locked: false,
+      },
+    })
+    expect(wrapper.map.getSource('readonly-draw-source-readonly-layer')).toBeTruthy()
+    expect(wrapper.map.getSource('preview-draw-source-preview-layer')).toBeTruthy()
+    expect(wrapper.map.getLayer('readonly-draw-fill-readonly-layer')).toBeTruthy()
+    expect(wrapper.map.getLayer('preview-draw-fill-preview-layer')).toBeTruthy()
+    expect(wrapper.events.some(([eventName]) => eventName === 'before-features-change')).toBe(false)
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
 
     wrapper.unmount()
   })

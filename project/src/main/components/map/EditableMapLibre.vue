@@ -558,6 +558,18 @@ const initializeDraw = () => {
   }
 }
 
+const restoreLayersAfterStyleLoad = () => {
+  if (!map.value) return
+
+  syncReadonlyLayers()
+
+  if (!draw.value) return
+
+  const currentFeatures = draw.value.getAll?.() ?? normalizeFeatureCollection(props.modelValue)
+  draw.value.set(currentFeatures)
+  syncSelectedFeature()
+}
+
 const resetView = () => {
   if (!map.value) return
   map.value.flyTo({
@@ -867,6 +879,7 @@ const initializeMap = async () => {
   map.value.addControl(new maplibregl.NavigationControl(), 'top-left')
   map.value.addControl(new maplibregl.FullscreenControl({ container: mapContainer.value }), 'top-left')
   map.value.on('load', initializeDraw)
+  map.value.on('style.load', restoreLayersAfterStyleLoad)
   map.value.on('styledata', () => {
     syncReadonlyLayers()
   })
