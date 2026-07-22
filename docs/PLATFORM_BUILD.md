@@ -67,6 +67,8 @@ Praat 三端當前至少需要覆蓋：
 - iOS：Capacitor FilePicker 文件選擇、Capacitor AudioRecorder 錄音保存、麥克風權限拒絕態、Web Audio 解碼 / 分段、提交 Praat 分析。
 - Android：Capacitor FilePicker 文件選擇、Capacitor AudioRecorder 錄音保存、`RECORD_AUDIO` 權限拒絕態、Web Audio 解碼 / 分段、提交 Praat 分析。
 
+可使用 `project/tests/fixtures/praat-smoke.wav` 作為三端統一測試音頻。它是一個很小的合法 PCM WAV 文件，用於確認文件選擇後能顯示、能解碼、能進入分段或原始片段、能提交 Praat 分析。
+
 原生交互驗收時，應同時覆蓋取消文件選擇、拒絕麥克風權限、錄音 URI 讀取失敗提示，以及超大音頻不通過 FilePicker `readData` 一次性讀入的內存風險。
 
 Android App 構建完成後，可按腳本輸出的路徑安裝並打開：
