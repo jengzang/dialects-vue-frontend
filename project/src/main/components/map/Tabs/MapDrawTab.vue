@@ -1571,6 +1571,9 @@ const setAllLayersVisibility = (visible) => {
     layer.visible = visible;
     applyLayerPropertyToFeatures(layer, 'visible', visible);
   });
+  if (!visible && activeLayer.value) {
+    resetDrawSelectionMode();
+  }
   syncAllLayersAfterMutation();
   editableMapRef.value?.syncReadonlyLayers?.();
 };

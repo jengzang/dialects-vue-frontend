@@ -137,6 +137,7 @@ describe('Map draw editor contracts', () => {
 
     expect(source).toContain('const resetDrawSelectionMode = () =>')
     expect(source).toMatch(/const toggleLayerVisibility = \(layerId\) => \{[\s\S]*if \(layerId === activeLayerId\.value\) \{[\s\S]*resetDrawSelectionMode\(\)/)
+    expect(source).toMatch(/const setAllLayersVisibility = \(visible\) => \{[\s\S]*if \(!visible && activeLayer\.value\) \{[\s\S]*resetDrawSelectionMode\(\)/)
     expect(source).toMatch(/const toggleLayerLock = \(layerId\) => \{[\s\S]*if \(layerId === activeLayerId\.value\) \{[\s\S]*resetDrawSelectionMode\(\)/)
   })
 
