@@ -41,6 +41,11 @@ describe('platform build scripts', () => {
     expect(source).toContain('ALL_PROXY')
     expect(source).toContain('getPlatformAcceptanceChecklist')
     expect(source).toContain('verifyAcceptanceChecklist')
+    expect(source).toContain('printNativeSmokeStatus')
+    expect(source).toContain('android/app/build/outputs/apk/debug/app-debug.apk')
+    expect(source).toContain('xcrun simctl install booted')
+    expect(source).toContain('adb install -r')
+    expect(source).toContain('top.yzup.dialects')
   })
 
   it('runs from project but targets native directories at the repository root', () => {

@@ -26,6 +26,8 @@ describe('platform build documentation', () => {
     expect(doc).toContain('npm run verify:platform:acceptance')
     expect(doc).toContain('npm run verify:platform:all')
     expect(doc).toContain('Praat 真機 / 模擬器交互驗收')
+    expect(doc).toContain('adb install -r')
+    expect(doc).toContain('xcrun simctl install booted')
     expect(doc).toContain('android/')
     expect(doc).toContain('ios/')
     expect(doc).toContain('project/android')

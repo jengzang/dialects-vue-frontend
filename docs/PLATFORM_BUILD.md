@@ -59,7 +59,7 @@ npm run verify:platform:all
 
 ## Praat 真機 / 模擬器交互驗收
 
-`npm run verify:platform:acceptance` 會輸出來自 `project/src/platform/featureMatrix.js` 的機器可讀驗收清單。它用於固定每端需要驗收的能力，不會替代人工在 iOS Simulator、Android Emulator 或真機中的點擊操作。
+`npm run verify:platform:acceptance` 會輸出來自 `project/src/platform/featureMatrix.js` 的機器可讀驗收清單，並檢查 Android / iOS 的 native smoke 狀態。它用於固定每端需要驗收的能力，不會替代人工在 iOS Simulator、Android Emulator 或真機中的點擊操作；如果沒有連接設備或沒有 booted simulator，腳本會明確提示原因。
 
 Praat 三端當前至少需要覆蓋：
 
@@ -68,6 +68,20 @@ Praat 三端當前至少需要覆蓋：
 - Android：Capacitor FilePicker 文件選擇、Capacitor AudioRecorder 錄音保存、`RECORD_AUDIO` 權限拒絕態、Web Audio 解碼 / 分段、提交 Praat 分析。
 
 原生交互驗收時，應同時覆蓋取消文件選擇、拒絕麥克風權限、錄音 URI 讀取失敗提示，以及超大音頻不通過 FilePicker `readData` 一次性讀入的內存風險。
+
+Android App 構建完成後，可按腳本輸出的路徑安裝並打開：
+
+```bash
+adb install -r ../android/app/build/outputs/apk/debug/app-debug.apk
+adb shell monkey -p top.yzup.dialects -c android.intent.category.LAUNCHER 1
+```
+
+iOS Simulator App 構建完成且已有 booted simulator 後，可按腳本輸出的路徑安裝並打開：
+
+```bash
+xcrun simctl install booted build/ios-derived/Build/Products/Debug-iphonesimulator/App.app
+xcrun simctl launch booted top.yzup.dialects
+```
 
 ## iOS 驗證
 
