@@ -20,21 +20,22 @@
 | Step 3 显式编辑形状 | 已完成 | `8da76bdc` | 已暴露“编辑形状”入口，进入 Mapbox Draw `direct_select`。 |
 | Step 4 要素级属性编辑 | 已完成 | `0ddde93c` | 工具面板新增要素列表；选中要素时只改该 feature，未选中时保留图层级编辑。 |
 | 状态流测试加固 | 已完成 | `519399fa` | 新增 `EditableMapLibre` 可执行状态流测试，覆盖面板选择不进 direct edit、隐藏/锁定不可 direct edit、属性同步不重复提交 history。 |
+| Step 6 底图切换生命周期 | 已完成 | `9ff38a12` | `EditableMapLibre` 监听 `style.load`，在底图样式重载后恢复 Draw 数据、readonly layers 和 preview layers，且不触发 history/data-change 事件。 |
 | Step 7 图层管理易用性 | 部分完成 | `a3b10d90`、`9e0f5a92`、`43d828a4`、`91c5321f`、`7744c532`、`0e44785b`、`bc8bc098`、`eb1ab82c`、`add2e4fe` | 已支持复制图层、复制选中要素、删除图层确认、图层行显示几何/要素数/显示锁定状态、图层行内重命名、重命名失焦保存、选中要素移动到同类型可编辑图层，并阻止隐藏或锁定活动图层继续绘制/删除/清空。 |
 
 已验证命令：
 
 - `npm test -- editableMapLibreStateFlow.test.js mapDrawEditorContracts.test.js tests/utils/drawMap/history.test.js`
-- `npx eslint tests/editableMapLibreStateFlow.test.js --quiet`
+- `npx eslint src/main/components/map/EditableMapLibre.vue tests/editableMapLibreStateFlow.test.js --quiet`
+- `git diff --check`
 - `npm run build`
 
 下一批建议按“小步提交”继续推进：
 
 1. 完成 Step 7 剩余项：多选/批量操作的范围确认，优先考虑“多选要素后批量删除/移动到图层/批量显隐锁定”。
-2. 做 Step 6，专门验证底图切换后的 Draw/readonly/preview layer 恢复，避免样式切换后隐藏状态、选中状态或 Voronoi 预览漂移。
-3. 做一个轻量 Step 8：未保存状态与自动草稿恢复提示。当前已有手动本地草稿，但还缺 dirty 提醒和自动恢复。
-4. 再做 Step 5，将 layer mutation 逐步集中为工具函数；这一步会改变内部结构，应拆成多个小提交并先确认结构边界。
-5. 最后评估高阶几何能力：吸附、矩形/圆、切割、拆分、合并、自定义模式或 Terra Draw 迁移。
+2. 做一个轻量 Step 8：未保存状态与自动草稿恢复提示。当前已有手动本地草稿，但还缺 dirty 提醒和自动恢复。
+3. 再做 Step 5，将 layer mutation 逐步集中为工具函数；这一步会改变内部结构，应拆成多个小提交并先确认结构边界。
+4. 最后评估高阶几何能力：吸附、矩形/圆、切割、拆分、合并、自定义模式或 Terra Draw 迁移。
 
 ---
 
@@ -584,13 +585,14 @@
 
 ### Step 6：底图切换和绘制层生命周期加固
 
+**当前状态：** 已完成，提交 `9ff38a12`。
+
 **目标：** 底图切换后所有绘制层、预览层、hover、选中态可恢复。
 
 **文件：**
 
 - 修改：`project/src/main/components/map/EditableMapLibre.vue`
-- 可能修改：`project/src/main/components/map/Draw/modals/MapDrawImagePreviewModal.vue`
-- 修改测试：`project/tests/mapDrawEditorContracts.test.js`
+- 修改测试：`project/tests/editableMapLibreStateFlow.test.js`
 
 **做法：**
 
@@ -601,9 +603,9 @@
 
 **验收：**
 
-- 创建两个图层，隐藏一个，切换底图后隐藏状态不丢。
-- Voronoi 预览后切换底图，预览层恢复或明确清空并提示，不出现半挂状态。
-- 图片导出预览底图切换不报错。
+- 创建两个图层，隐藏一个，切换底图后 hidden readonly layer 的 source/layer 可恢复。
+- Voronoi 预览层切换底图后 preview source/layer 可恢复，不出现半挂状态。
+- 底图切换恢复 Draw/readonly/preview 图层时不触发 `before-features-change` 或 `features-change`，不会制造撤销历史。
 
 **提交建议：**
 
