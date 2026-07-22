@@ -23,6 +23,7 @@
 | Step 6 底图切换生命周期 | 已完成 | `9ff38a12` | `EditableMapLibre` 监听 `style.load`，在底图样式重载后恢复 Draw 数据、readonly layers 和 preview layers，且不触发 history/data-change 事件。 |
 | Step 7 图层管理易用性 | 部分完成 | `a3b10d90`、`9e0f5a92`、`43d828a4`、`91c5321f`、`7744c532`、`0e44785b`、`bc8bc098`、`eb1ab82c`、`add2e4fe` | 已支持复制图层、复制选中要素、删除图层确认、图层行显示几何/要素数/显示锁定状态、图层行内重命名、重命名失焦保存、选中要素移动到同类型可编辑图层，并阻止隐藏或锁定活动图层继续绘制/删除/清空。 |
 | Step 8 未保存保护与自动草稿恢复 | 已完成 | `9fc8103d`、`5b08e48a` | 自动草稿记录从手动草稿列表隐藏；页面打开时提示恢复未保存草稿；工作台变脏时自动保存；离开页面前提示；手动保存、更新或恢复本地草稿后清理隐藏自动草稿，并等待并发自动写入完成。 |
+| Step 9 导入导出数据清洁 | 部分完成 | `3e709c8f` | `normalizeFeatureCollection()` 不再为导入/导出 round-trip 强制新增或覆盖 `updatedAt`，已有业务更新时间会原样保留。 |
 
 已验证命令：
 
@@ -31,13 +32,15 @@
 - `npm test -- mapDrawTabDraftSafety.test.js tests/utils/drawMap/draftStorage.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js`
 - `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/utils/drawMap/draftStorage.js tests/mapDrawTabDraftSafety.test.js tests/utils/drawMap/draftStorage.test.js --quiet`
 - `node -e "JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-CN/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-Hant/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/en/map.json','utf8')); console.log('ok')"`
+- `npm test -- tests/utils/drawMap/export.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js mapDrawTabDraftSafety.test.js tests/utils/drawMap/history.test.js tests/utils/drawMap/draftStorage.test.js`
+- `npx eslint src/main/utils/drawMap/export.js tests/utils/drawMap/export.test.js --quiet`
 - `git diff --check`
 - `npm run build`
 
 下一批建议按“小步提交”继续推进：
 
 1. 完成 Step 7 剩余项：多选/批量操作的范围确认，优先考虑“多选要素后批量删除/移动到图层/批量显隐锁定”。
-2. 做 Step 9：导入导出数据清洁，减少 `updatedAt` 等内部字段在 round-trip 中产生噪声。
+2. 继续 Step 9：拆分 normalize / serialize 职责，进一步确认导出时只携带必要字段。
 3. 再做 Step 5，将 layer mutation 逐步集中为工具函数；这一步会改变内部结构，应拆成多个小提交并先确认结构边界。
 4. 最后评估高阶几何能力：吸附、矩形/圆、切割、拆分、合并、自定义模式或 Terra Draw 迁移。
 
@@ -701,6 +704,10 @@
 2. 不在每次 normalize 时刷新 `updatedAt`。
 3. 仅在用户真实编辑 feature 时写入更新时间；如果当前没有业务需要，可移除导出时强制写 `updatedAt` 的行为。
 4. 导出时保留原始业务字段，不把 UI 内部字段无脑覆盖外部字段。
+
+**已完成：**
+
+- `3e709c8f` 已完成第 2 点：`normalizeFeatureCollection()` 不再强制新增或覆盖 `updatedAt`，并新增工具层回归测试覆盖“缺失时不新增、已有时保留”。
 
 **验收：**
 
