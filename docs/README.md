@@ -26,6 +26,7 @@
   - [架構文檔](./ARCHITECTURE.md)
   - [貢獻指南](./CONTRIBUTING.md)
   - [VillagesML 專題文檔](./VillagesML/FEATURE_OVERVIEW.md)
+  - [三端構建與驗證指南](./PLATFORM_BUILD.md)
   - [部署說明](../project/DEPLOY.md)
   - [i18n 說明](../project/src/i18n/README.md)
 
@@ -74,6 +75,13 @@
 - 公共組件、公共樣式與 auth / i18n 的複用約定
 - 提交前檢查清單與交付說明建議
 
+#### [三端構建與驗證指南](./PLATFORM_BUILD.md)
+說明 Web、iOS、Android 三端構建與腳本化驗證方式：
+- `project/` 下的前端構建命令
+- 倉庫根目錄 `android/`、`ios/` 原生工程位置
+- `verify:platform:*` 驗證命令與平台依賴
+- native dist prune / audit 與 Web-only 資源邊界
+
 ### 專題文檔
 
 #### [VillagesML 功能總覽](./VillagesML/FEATURE_OVERVIEW.md)
@@ -92,6 +100,7 @@
 - [用戶指南](./USER_GUIDE.md)
 - [設計系統](./DESIGN_SYSTEM.md)
 - [貢獻指南](./CONTRIBUTING.md)
+- [三端構建與驗證指南](./PLATFORM_BUILD.md)
 
 ### English Documentation
 - [Documentation Index](./README.en.md)
@@ -106,6 +115,7 @@
 ## 快速鏈接
 
 - [主 README](../README.md) - 項目概覽與啟動方式
+- [三端構建與驗證指南](./PLATFORM_BUILD.md) - Web / iOS / Android 構建與驗證命令
 - [部署指南](../project/DEPLOY.md) - 生產環境部署說明
 - [i18n 說明](../project/src/i18n/README.md) - 多語系結構與維護說明
 - [VillagesML 功能總覽](./VillagesML/FEATURE_OVERVIEW.md) - VillagesML 專題入口
@@ -118,6 +128,7 @@
 docs/
 ├── README.md
 ├── README.en.md
+├── PLATFORM_BUILD.md
 ├── ARCHITECTURE.md
 ├── ARCHITECTURE.en.md
 ├── API.md

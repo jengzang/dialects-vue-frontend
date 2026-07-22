@@ -340,6 +340,8 @@ npm run preview
 
 `npm run build` 會先執行 `npm run seo:sitemap`，生成 / 更新 `project/public/sitemap.xml`，再進行正式打包。
 
+Web、iOS、Android 三端的構建、Capacitor 同步與原生 App 驗證命令請閱讀 [三端構建與驗證指南](./docs/PLATFORM_BUILD.md)。
+
 ### 代碼檢查與測試
 
 ```bash
@@ -734,6 +736,7 @@ README 的更新日誌則按倉庫提交歷史記錄版本演進。也就是說�
 
 ### 其他重要文檔
 
+- [三端構建與驗證指南](./docs/PLATFORM_BUILD.md)
 - [部署說明](./project/DEPLOY.md)
 - [i18n 說明](./project/src/i18n/README.md)
 
