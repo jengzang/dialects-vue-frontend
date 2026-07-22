@@ -8,6 +8,34 @@
 
 ---
 
+## 0. 当前执行进度
+
+截至当前分支 `codex/map-draw-editor-fixes`：
+
+| 阶段 | 状态 | 相关提交 | 说明 |
+| --- | --- | --- | --- |
+| Step 0 调研契约测试 | 已完成 | `85c6c04f` | 已建立 `mapDrawEditorContracts.test.js`，覆盖样式、历史、编辑入口等关键 wiring。 |
+| Step 1 图层隐藏稳定性 | 已完成 | `5233fd55` | Draw 启用 `userProperties`，活动图层隐藏通过样式过滤保持数据不丢。 |
+| Step 2 撤销/重做 | 已完成 | `b76c82d4`、`f39d071b` | 已有 undo/redo、快捷键、历史恢复状态防护和 layer id seed 恢复。 |
+| Step 3 显式编辑形状 | 已完成 | `8da76bdc` | 已暴露“编辑形状”入口，进入 Mapbox Draw `direct_select`。 |
+| Step 4 要素级属性编辑 | 已完成 | `0ddde93c` | 工具面板新增要素列表；选中要素时只改该 feature，未选中时保留图层级编辑。 |
+| 状态流测试加固 | 已完成 | `519399fa` | 新增 `EditableMapLibre` 可执行状态流测试，覆盖面板选择不进 direct edit、隐藏/锁定不可 direct edit、属性同步不重复提交 history。 |
+
+已验证命令：
+
+- `npm test -- editableMapLibreStateFlow.test.js mapDrawEditorContracts.test.js tests/utils/drawMap/history.test.js`
+- `npx eslint tests/editableMapLibreStateFlow.test.js --quiet`
+- `npm run build`
+
+下一批建议按“小步提交”继续推进：
+
+1. 先做 Step 7 的图层复制/要素复制/删除确认等低风险易用性补齐。
+2. 再做 Step 5，将 layer mutation 逐步集中为工具函数；这一步会改变内部结构，应拆成多个小提交。
+3. 之后做 Step 6，专门验证底图切换后的 Draw/readonly/preview layer 恢复。
+4. 最后再评估 Step 3/3.2 的高阶几何能力，如切割、拆分、吸附、自定义模式或 Terra Draw 迁移。
+
+---
+
 ## 1. GitHub 成熟项目调研结论
 
 ### 1.1 参考项目
