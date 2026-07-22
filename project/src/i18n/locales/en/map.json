@@ -648,6 +648,7 @@
       "locked": "Lock Layer",
       "featureVisible": "Show Feature",
       "featureLocked": "Lock Feature",
+      "moveFeatureToLayer": "Move to Layer",
       "visibleShort": "Shown",
       "hiddenShort": "Hidden",
       "lockedShort": "Locked",

@@ -252,6 +252,33 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain("editableMapRef.value?.selectFeature?.(duplicatedFeatureId, { directEdit: false });")
   })
 
+  it('supports moving the selected feature to another compatible layer', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+
+    expect(panelSource).toContain('featureMoveLayerOptions')
+    expect(panelSource).toContain('SimpleSelectDropdown')
+    expect(panelSource).toContain(`t('map.drawTab.labels.moveFeatureToLayer')`)
+    expect(panelSource).toContain(`$emit('move-feature-to-layer', $event)`)
+    expect(panelSource).toContain(`'move-feature-to-layer'`)
+    expect(tabSource).toContain(':feature-move-layer-options="featureMoveLayerOptions"')
+    expect(tabSource).toContain('@move-feature-to-layer="handleMoveSelectedFeatureToLayer"')
+    expect(tabSource).toContain('const featureMoveLayerOptions = computed')
+    expect(tabSource).toContain('if (!canDuplicateSelectedFeature.value) return [];')
+    expect(tabSource).toContain('layer.geometryType === activeLayer.value?.geometryType')
+    expect(tabSource).toContain('layer.id !== activeLayerId.value')
+    expect(tabSource).toContain('layer.visible !== false')
+    expect(tabSource).toContain('layer.locked !== true')
+    expect(tabSource).toContain('const handleMoveSelectedFeatureToLayer = (targetLayerId) =>')
+    expect(tabSource).toContain('const featureToMove = selectedFeature.value;')
+    expect(tabSource).toContain('if (!canDuplicateSelectedFeature.value) return;')
+    expect(tabSource).toMatch(/const handleMoveSelectedFeatureToLayer = \(targetLayerId\) => \{[\s\S]*commitHistory\(\)/)
+    expect(tabSource).toMatch(/sourceLayer\.featureCollection = \{[\s\S]*features: \(sourceCollection\.features \?\? \[\]\)[\s\S]*\.filter/)
+    expect(tabSource).toMatch(/targetLayer\.featureCollection = \{[\s\S]*features: \[\.\.\.\(targetCollection\.features \?\? \[\]\), featureToMove\]/)
+    expect(tabSource).toContain('activeLayerId.value = targetLayer.id;')
+    expect(tabSource).toContain("editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });")
+  })
+
   it('falls back to layer editing when selected feature id is stale', () => {
     const source = readSource(mapDrawTabPath)
 
@@ -344,6 +371,16 @@ describe('Map draw editor contracts', () => {
     expect(zhHant.drawTab.buttons.saveLayerName).toBe('保存名稱')
     expect(en.drawTab.buttons.renameLayer).toBe('Rename')
     expect(en.drawTab.buttons.saveLayerName).toBe('Save Name')
+  })
+
+  it('has localized labels for moving selected features between draw layers', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.labels.moveFeatureToLayer).toBe('移动到图层')
+    expect(zhHant.drawTab.labels.moveFeatureToLayer).toBe('移動到圖層')
+    expect(en.drawTab.labels.moveFeatureToLayer).toBe('Move to Layer')
   })
 
   it('has localized layer row feature count labels', () => {

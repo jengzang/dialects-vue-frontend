@@ -215,6 +215,18 @@
               >
             </label>
 
+            <div
+              v-if="selectedFeatureId && featureMoveLayerOptions.length"
+              class="draw-basemap-select"
+            >
+              <span class="draw-field-label">{{ t('map.drawTab.labels.moveFeatureToLayer') }}</span>
+              <SimpleSelectDropdown
+                :model-value="''"
+                :options="featureMoveLayerOptions"
+                @update:model-value="$emit('move-feature-to-layer', $event)"
+              />
+            </div>
+
             <label
               v-if="selectedFeatureGeometryType !== 'Point'"
               class="draw-field draw-color-field"
@@ -346,6 +358,7 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 
 const { t } = useI18n()
 
@@ -356,6 +369,7 @@ const props = defineProps({
   selectedLayerLabel: { type: String, default: '' },
   currentMode: { type: String, default: 'simple_select' },
   featureItems: { type: Array, default: () => [] },
+  featureMoveLayerOptions: { type: Array, default: () => [] },
   selectedFeatureId: { type: String, default: '' },
   selectedFeatureProperties: { type: Object, default: null },
   selectedFeatureGeometryType: { type: String, default: '' },
@@ -379,6 +393,7 @@ defineEmits([
   'reset-view',
   'toggle-fullscreen',
   'update-feature-property',
+  'move-feature-to-layer',
 ])
 
 const getGeometryLabel = (geometryType) => {

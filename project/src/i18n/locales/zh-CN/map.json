@@ -648,6 +648,7 @@
       "locked": "锁定图层",
       "featureVisible": "显示要素",
       "featureLocked": "锁定要素",
+      "moveFeatureToLayer": "移动到图层",
       "visibleShort": "显示",
       "hiddenShort": "隐藏",
       "lockedShort": "锁定",

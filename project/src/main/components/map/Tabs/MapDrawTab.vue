@@ -129,6 +129,7 @@
           :selected-layer-label="selectedLayerLabel"
           :current-mode="currentMode"
           :feature-items="activeLayerFeatureItems"
+          :feature-move-layer-options="featureMoveLayerOptions"
           :selected-feature-id="selectedEditorFeatureId"
           :selected-feature-properties="selectedEditorProperties"
           :selected-feature-geometry-type="selectedEditorGeometryType"
@@ -149,6 +150,7 @@
           @reset-view="handleResetView"
           @toggle-fullscreen="handleToggleFullscreen"
           @update-feature-property="updateSelectedFeatureProperty"
+          @move-feature-to-layer="handleMoveSelectedFeatureToLayer"
         />
 
         <MapDrawLayersPanel
@@ -740,6 +742,22 @@ const activeLayerFeatureItems = computed(() => activeLayerFeatures.value.map((fe
   visible: feature?.properties?.visible ?? activeLayer.value?.visible ?? true,
   locked: feature?.properties?.locked ?? activeLayer.value?.locked ?? false,
 })).filter((feature) => feature.id));
+
+const featureMoveLayerOptions = computed(() => {
+  if (!activeLayer.value || !selectedFeature.value) return [];
+  if (!canDuplicateSelectedFeature.value) return [];
+  return layers.value
+    .filter((layer) => (
+      layer.id !== activeLayerId.value
+      && layer.geometryType === activeLayer.value?.geometryType
+      && layer.visible !== false
+      && layer.locked !== true
+    ))
+    .map((layer) => ({
+      label: getLayerLabel(layer),
+      value: layer.id,
+    }));
+});
 
 const selectedEditorProperties = computed(() => {
   if (!activeLayer.value) return null;
@@ -1757,6 +1775,36 @@ const handleDuplicateSelectedFeature = () => {
   currentMode.value = 'simple_select';
   syncAllLayersAfterMutation();
   editableMapRef.value?.selectFeature?.(duplicatedFeatureId, { directEdit: false });
+};
+
+const handleMoveSelectedFeatureToLayer = (targetLayerId) => {
+  if (!canDuplicateSelectedFeature.value) return;
+  const sourceLayer = activeLayer.value;
+  const targetLayer = layers.value.find((layer) => layer.id === targetLayerId);
+  const featureToMove = selectedFeature.value;
+  if (!sourceLayer || !targetLayer || !featureToMove || sourceLayer.id === targetLayer.id) return;
+  if (
+    targetLayer.geometryType !== activeLayer.value?.geometryType
+    || targetLayer.visible === false
+    || targetLayer.locked === true
+  ) return;
+
+  commitHistory();
+  const sourceCollection = sourceLayer.featureCollection ?? emptyFeatureCollection();
+  const targetCollection = targetLayer.featureCollection ?? emptyFeatureCollection();
+  sourceLayer.featureCollection = {
+    ...sourceCollection,
+    features: (sourceCollection.features ?? [])
+      .filter((feature) => getFeatureId(feature) !== selectedFeatureId.value),
+  };
+  targetLayer.featureCollection = {
+    ...targetCollection,
+    features: [...(targetCollection.features ?? []), featureToMove],
+  };
+  activeLayerId.value = targetLayer.id;
+  currentMode.value = 'simple_select';
+  syncAllLayersAfterMutation();
+  editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
 };
 
 const handleSelectFeatureFromPanel = (featureId) => {
