@@ -32,7 +32,7 @@
           type="number"
           min="2"
           max="20"
-          class="setting-input"
+          class="setting-input vm-setting-input"
         />
       </div>
 
@@ -50,7 +50,7 @@
             min="0.1"
             max="10"
             step="0.1"
-            class="setting-input"
+            class="setting-input vm-setting-input"
           />
         </div>
 
@@ -61,7 +61,7 @@
             type="number"
             min="1"
             max="20"
-            class="setting-input"
+            class="setting-input vm-setting-input"
           />
         </div>
       </div>

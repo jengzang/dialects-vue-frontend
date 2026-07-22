@@ -904,7 +904,7 @@ watch(viewMode, async (newMode) => {
 @use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
-$white: var(--text-white);
+$white: var(--glass-50);
 $purple: var(--color-purple-light);
 
 $text-primary: var(--text-primary);
@@ -1233,10 +1233,11 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 }
 
 .modal-search-input {
-  width: 100%;
+  width: 95%;
   padding: 10px 16px;
   font-size: 14px;
   background: var(--glass-80);
+  color: var(--text-dark);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: var(--radius-md);
   outline: none;
@@ -1244,6 +1245,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 
   &:focus {
     @include field-focus;
+    
   }
 }
 
