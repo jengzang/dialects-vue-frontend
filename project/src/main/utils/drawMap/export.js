@@ -314,6 +314,22 @@ export function normalizeFeatureCollection(featureCollection) {
   }
 }
 
+export function serializeFeatureCollectionForExport(featureCollection) {
+  const normalizedCollection = ensureFeatureCollection(featureCollection)
+
+  return {
+    type: 'FeatureCollection',
+    features: normalizedCollection.features
+      .filter((feature) => feature && typeof feature === 'object')
+      .map((feature) => ({
+        ...feature,
+        properties: {
+          ...(feature?.properties ?? {}),
+        },
+      })),
+  }
+}
+
 export function splitFeatureCollectionByGeometryType(featureCollection) {
   const normalizedCollection = ensureFeatureCollection(featureCollection)
   const groupedFeatures = {
@@ -380,7 +396,7 @@ async function readFileAsArrayBuffer(file) {
 }
 
 export function exportFeatureCollectionAsGeoJson(featureCollection, filename = 'map-draw-layer.geojson') {
-  const normalized = normalizeFeatureCollection(featureCollection)
+  const normalized = serializeFeatureCollectionForExport(featureCollection)
   const blob = new Blob([
     JSON.stringify(normalized, null, 2)
   ], {
