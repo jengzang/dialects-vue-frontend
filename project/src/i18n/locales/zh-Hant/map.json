@@ -505,6 +505,7 @@
       "importLayerSuccess": "圖層導入成功，共新增 {count} 個圖層",
       "importLayerFailed": "圖層導入失敗：{error}",
       "clearAllConfirm": "確認清空目前所有繪製內容嗎？",
+      "deleteLayerConfirm": "確認刪除圖層「{name}」嗎？",
       "clearAllSuccess": "已清空全部繪製內容",
       "exportLayerSuccess": "圖層導出成功",
       "exportLayerFailed": "圖層導出失敗：{error}",

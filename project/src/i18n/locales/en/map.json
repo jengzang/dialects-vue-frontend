@@ -505,6 +505,7 @@
       "importLayerSuccess": "Layer import succeeded; {count} layer(s) were added",
       "importLayerFailed": "Failed to import layer: {error}",
       "clearAllConfirm": "Clear all current drawing content?",
+      "deleteLayerConfirm": "Delete layer \"{name}\"?",
       "clearAllSuccess": "All drawing content has been cleared",
       "exportLayerSuccess": "Layer exported successfully",
       "exportLayerFailed": "Failed to export layer: {error}",

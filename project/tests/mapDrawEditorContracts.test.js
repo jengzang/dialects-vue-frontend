@@ -241,6 +241,14 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain('syncAllLayersAfterMutation();')
   })
 
+  it('confirms before deleting a draw layer', () => {
+    const source = readSource(mapDrawTabPath)
+
+    expect(source).toContain('const handleDeleteLayer = async (layerId) =>')
+    expect(source).toMatch(/const handleDeleteLayer = async \(layerId\) => \{[\s\S]*showConfirm\(t\('map\.drawTab\.messages\.deleteLayerConfirm', \{ name: sourceLayer\.name \}\)\)/)
+    expect(source).toMatch(/const confirmed = await showConfirm[\s\S]*if \(!confirmed\) return;[\s\S]*commitHistory\(\);/)
+  })
+
   it('has localized labels for duplicating draw layers', () => {
     const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
     const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
@@ -252,5 +260,15 @@ describe('Map draw editor contracts', () => {
     expect(zhHant.drawTab.labels.copySuffix).toBe('副本')
     expect(en.drawTab.buttons.duplicateLayer).toBe('Duplicate Layer')
     expect(en.drawTab.labels.copySuffix).toBe('Copy')
+  })
+
+  it('has localized confirmation text for deleting draw layers', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.messages.deleteLayerConfirm).toBe('确认删除图层“{name}”吗？')
+    expect(zhHant.drawTab.messages.deleteLayerConfirm).toBe('確認刪除圖層「{name}」嗎？')
+    expect(en.drawTab.messages.deleteLayerConfirm).toBe('Delete layer "{name}"?')
   })
 })

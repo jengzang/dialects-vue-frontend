@@ -1623,9 +1623,12 @@ const handleDuplicateLayer = (layerId) => {
   editableMapRef.value?.syncReadonlyLayers?.();
 };
 
-const handleDeleteLayer = (layerId) => {
+const handleDeleteLayer = async (layerId) => {
   const layerIndex = layers.value.findIndex((item) => item.id === layerId);
   if (layerIndex === -1) return;
+  const sourceLayer = layers.value[layerIndex];
+  const confirmed = await showConfirm(t('map.drawTab.messages.deleteLayerConfirm', { name: sourceLayer.name }));
+  if (!confirmed) return;
   commitHistory();
   layers.value.splice(layerIndex, 1);
   editableMapRef.value?.removeReadonlyLayerById?.(layerId);
