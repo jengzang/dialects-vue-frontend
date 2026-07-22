@@ -522,7 +522,10 @@
       "noLayersToSave": "There are no layers to save",
       "voronoiFailed": "Voronoi calculation failed: {error}",
       "localDraftNameRequired": "Please enter a draft name",
-      "deleteLocalConfirm": "Delete the current local draft?"
+      "deleteLocalConfirm": "Delete the current local draft?",
+      "autoDraftRestoreConfirm": "An unsaved map drawing draft was found. Restore it?",
+      "autoDraftRestoreSuccess": "Unsaved draft restored",
+      "unsavedChangesWarning": "Map drawing changes have not been saved and may be lost if you leave."
     },
     "voronoi": {
       "panelHint": "Calculate Voronoi polygons from location-region data, then preview them or export them as polygon layers.",

@@ -566,6 +566,9 @@ import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js';
 import { readImportedLayerFile, readKmzArrayBuffer, splitFeatureCollectionByGeometryType } from '@/main/utils/drawMap/export.js';
 import { createMapDrawHistory } from '@/main/utils/drawMap/history.js';
 import {
+  AUTO_DRAFT_ID,
+  buildAutoDraftRecord,
+  buildDraftStateSignature,
   deleteDraftRecord,
   getDraftRecordById,
   listDraftRecords,
@@ -656,6 +659,9 @@ const voronoiExportSelections = ref([]);
 const drawHistory = createMapDrawHistory({ limit: 50 });
 const historySizes = ref(drawHistory.sizes());
 const isApplyingHistory = ref(false);
+const savedWorkbenchSignature = ref('');
+const isRestoringAutoDraft = ref(false);
+const pendingAutoDraftSaves = new Set();
 
 const clipVoronoiToNationalBorder = ref(false);
 const isVoronoiExporting = ref(false);
@@ -2046,6 +2052,83 @@ const buildPersistedWorkbenchState = () => ({
   isLayersPanelOpen: isLayersPanelOpen.value,
 });
 
+const getCurrentWorkbenchSignature = () => buildDraftStateSignature(buildPersistedWorkbenchState());
+
+const markWorkbenchClean = (state = buildPersistedWorkbenchState()) => {
+  savedWorkbenchSignature.value = buildDraftStateSignature(state);
+};
+
+const hasUnsavedWorkbenchChanges = computed(() => {
+  return getCurrentWorkbenchSignature() !== savedWorkbenchSignature.value;
+});
+
+const saveAutoDraft = async () => {
+  if (!isAuthenticated.value || isRestoringAutoDraft.value) return;
+  if (!hasUnsavedWorkbenchChanges.value) return;
+
+  const savePromise = Promise.resolve(saveDraftRecord(buildAutoDraftRecord(buildPersistedWorkbenchState())))
+    .catch((error) => {
+      console.warn('save map draw auto draft failed', error);
+    })
+    .finally(() => {
+      pendingAutoDraftSaves.delete(savePromise);
+    });
+  pendingAutoDraftSaves.add(savePromise);
+  await savePromise;
+};
+
+const clearAutoDraft = async () => {
+  try {
+    if (pendingAutoDraftSaves.size > 0) {
+      await Promise.all([...pendingAutoDraftSaves]);
+    }
+    await deleteDraftRecord(AUTO_DRAFT_ID);
+  } catch (error) {
+    console.warn('clear map draw auto draft failed', error);
+  }
+};
+
+const restoreAutoDraftIfAvailable = async () => {
+  const autoDraft = await getDraftRecordById(AUTO_DRAFT_ID);
+  if (!autoDraft?.state) return;
+
+  const currentSignature = getCurrentWorkbenchSignature();
+  const autoSignature = autoDraft.signature || buildDraftStateSignature(autoDraft.state);
+  if (autoSignature === currentSignature) {
+    await deleteDraftRecord(AUTO_DRAFT_ID);
+    return;
+  }
+
+  const confirmed = await showConfirm(t('map.drawTab.messages.autoDraftRestoreConfirm'));
+  if (!confirmed) {
+    await deleteDraftRecord(AUTO_DRAFT_ID);
+    return;
+  }
+
+  isRestoringAutoDraft.value = true;
+  try {
+    commitHistory();
+    applyDraftState(autoDraft.state);
+    markWorkbenchClean(autoDraft.state);
+    await deleteDraftRecord(AUTO_DRAFT_ID);
+    showSuccess(t('map.drawTab.messages.autoDraftRestoreSuccess'));
+  } finally {
+    isRestoringAutoDraft.value = false;
+  }
+};
+
+const handleBeforeUnload = (event) => {
+  if (!hasUnsavedWorkbenchChanges.value) return;
+
+  saveAutoDraft();
+  event.preventDefault();
+  event.returnValue = t('map.drawTab.messages.unsavedChangesWarning');
+};
+
+watch(getCurrentWorkbenchSignature, () => {
+  saveAutoDraft();
+}, { flush: 'post' });
+
 const buildHistorySnapshot = () => ({
   layers: layers.value,
   activeLayerId: activeLayerId.value,
@@ -2167,6 +2250,8 @@ const confirmSaveAsNewLocal = async () => {
     selectedStoredDraftId.value = nextDraft.id;
     newDraftName.value = nextDraft.name;
     showSaveLocalDraftModal.value = false;
+    markWorkbenchClean(nextDraft.state);
+    await clearAutoDraft();
     showSuccess(t('map.drawTab.messages.saveToLocalSuccess'));
   } catch (error) {
     showError(t('map.drawTab.messages.saveToLocalFailed', { error: error.message || error }));
@@ -2193,6 +2278,8 @@ const handleUpdateLocal = async () => {
     storedDrafts.value = await listDraftRecords();
     selectedStoredDraftId.value = draft.id;
     newDraftName.value = draft.name;
+    markWorkbenchClean(draft.state);
+    await clearAutoDraft();
     showSuccess(t('map.drawTab.messages.updateLocalSuccess'));
   } catch (error) {
     showError(t('map.drawTab.messages.saveToLocalFailed', { error: error.message || error }));
@@ -2208,6 +2295,8 @@ const handleRestoreLocal = async () => {
     commitHistory();
     applyDraftState(draft.state);
     newDraftName.value = draft.name || '';
+    markWorkbenchClean(draft.state);
+    await clearAutoDraft();
     showSuccess(t('map.drawTab.messages.restoreLocalSuccess'));
   } catch (error) {
     showError(t('map.drawTab.messages.saveToLocalFailed', { error: error.message || error }));
@@ -2286,12 +2375,15 @@ const moveLayerToBottom = (layerId) => {
 onMounted(async () => {
   try {
     await restoreStoredDrafts();
+    markWorkbenchClean();
+    await restoreAutoDraftIfAvailable();
   } catch (error) {
     console.warn('restore map draw workbench state failed', error);
   }
 
   document.addEventListener('fullscreenchange', syncMapFullscreenState);
   document.addEventListener('keydown', handleDrawHistoryKeydown);
+  window.addEventListener('beforeunload', handleBeforeUnload);
   syncMapFullscreenState();
 
   if (route.query.scrollTo === 'drawBottom') {
@@ -2304,6 +2396,7 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   document.removeEventListener('fullscreenchange', syncMapFullscreenState);
   document.removeEventListener('keydown', handleDrawHistoryKeydown);
+  window.removeEventListener('beforeunload', handleBeforeUnload);
 });
 </script>
 

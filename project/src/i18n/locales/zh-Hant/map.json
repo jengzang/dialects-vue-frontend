@@ -522,7 +522,10 @@
       "noLayersToSave": "目前沒有圖層可以保存",
       "voronoiFailed": "泰森多邊形計算失敗：{error}",
       "localDraftNameRequired": "請輸入草稿名稱",
-      "deleteLocalConfirm": "確認刪除目前本地草稿嗎？"
+      "deleteLocalConfirm": "確認刪除目前本地草稿嗎？",
+      "autoDraftRestoreConfirm": "發現上次未保存的地圖繪製草稿，是否恢復？",
+      "autoDraftRestoreSuccess": "已恢復上次未保存的草稿",
+      "unsavedChangesWarning": "地圖繪製內容尚未保存，離開後可能丟失更改。"
     },
     "voronoi": {
       "panelHint": "基於地點分區資料計算泰森多邊形，可預覽或導出為面圖層。",
