@@ -128,13 +128,16 @@
           :active-layer="activeLayer"
           :selected-layer-label="selectedLayerLabel"
           :current-mode="currentMode"
-          :selected-feature-properties="selectedFeatureProperties"
-          :selected-feature-geometry-type="selectedFeatureGeometryType"
+          :feature-items="activeLayerFeatureItems"
+          :selected-feature-id="selectedEditorFeatureId"
+          :selected-feature-properties="selectedEditorProperties"
+          :selected-feature-geometry-type="selectedEditorGeometryType"
           :is-fullscreen="isMapFullscreen"
           :can-undo="canUndoHistory"
           :can-redo="canRedoHistory"
           :can-edit-shape="canEditSelectedShape"
           @set-mode="setMode"
+          @select-feature="handleSelectFeatureFromPanel"
           @edit-shape="handleEditSelectedShape"
           @undo="undoHistory"
           @redo="redoHistory"
@@ -711,14 +714,52 @@ const featureCount = computed(() => {
   );
 });
 
-const selectedFeatureProperties = computed(() => activeLayer.value ?? null);
-const selectedFeatureGeometryType = computed(() => activeLayer.value?.geometryType ?? '');
+const getFeatureId = (feature) => String(feature?.id ?? feature?.properties?.id ?? '');
+
+const getFeatureLabel = (feature, index) => {
+  const properties = feature?.properties ?? {};
+  return properties.name || properties.title || properties.label || `${t('map.drawTab.labels.feature')} ${index + 1}`;
+};
+
+const activeLayerFeatures = computed(() => activeLayer.value?.featureCollection?.features ?? []);
+
+const selectedFeature = computed(() => {
+  if (!selectedFeatureId.value) return null;
+  return activeLayerFeatures.value.find((feature) => getFeatureId(feature) === selectedFeatureId.value) ?? null;
+});
+
+const activeLayerFeatureItems = computed(() => activeLayerFeatures.value.map((feature, index) => ({
+  id: getFeatureId(feature),
+  label: getFeatureLabel(feature, index),
+  geometryType: feature?.geometry?.type || activeLayer.value?.geometryType || '',
+  visible: feature?.properties?.visible ?? activeLayer.value?.visible ?? true,
+  locked: feature?.properties?.locked ?? activeLayer.value?.locked ?? false,
+})).filter((feature) => feature.id));
+
+const selectedEditorProperties = computed(() => {
+  if (!activeLayer.value) return null;
+  if (!selectedFeature.value) return activeLayer.value;
+  return {
+    ...activeLayer.value,
+    ...(selectedFeature.value.properties ?? {}),
+    name: selectedFeature.value.properties?.name ?? getFeatureLabel(
+      selectedFeature.value,
+      activeLayerFeatures.value.findIndex((feature) => getFeatureId(feature) === selectedFeatureId.value)
+    ),
+  };
+});
+
+const selectedEditorFeatureId = computed(() => selectedFeature.value ? selectedFeatureId.value : '');
+const selectedEditorGeometryType = computed(() => selectedFeature.value?.geometry?.type || activeLayer.value?.geometryType || '');
 const canEditSelectedShape = computed(() => {
   return Boolean(
     selectedFeatureId.value
     && activeLayer.value
+    && selectedFeature.value
     && !activeLayer.value.locked
-    && ['LineString', 'Polygon'].includes(activeLayer.value.geometryType)
+    && selectedFeature.value.properties?.visible !== false
+    && selectedFeature.value.properties?.locked !== true
+    && ['LineString', 'Polygon'].includes(selectedEditorGeometryType.value)
   );
 });
 
@@ -1550,8 +1591,6 @@ const handleDeleteLayer = (layerId) => {
   syncAllLayersAfterMutation();
 };
 
-const getFeatureId = (feature) => String(feature?.id ?? feature?.properties?.id ?? '');
-
 const handleFeatureSelect = (featureId) => {
   selectedFeatureId.value = featureId || '';
 };
@@ -1562,11 +1601,18 @@ const handleDrawModeChange = (mode) => {
 
 const handleEditSelectedShape = () => {
   if (!canEditSelectedShape.value) return;
-  editableMapRef.value?.selectFeature?.(selectedFeatureId.value);
+  editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: true });
   currentMode.value = 'direct_select';
 };
 
-const updateSelectedFeatureProperty = (key, value) => {
+const handleSelectFeatureFromPanel = (featureId) => {
+  if (!featureId) return;
+  selectedFeatureId.value = featureId;
+  editableMapRef.value?.selectFeature?.(featureId, { directEdit: false });
+  currentMode.value = 'simple_select';
+};
+
+const updateLayerProperty = (key, value) => {
   if (!activeLayer.value) return;
   commitHistory();
   activeLayer.value[key] = value;
@@ -1582,6 +1628,42 @@ const updateSelectedFeatureProperty = (key, value) => {
     })),
   };
   syncAllLayersAfterMutation();
+};
+
+const updateFeatureProperty = (featureId, key, value) => {
+  if (!activeLayer.value || !featureId) return;
+  commitHistory();
+  const featureCollection = activeLayer.value.featureCollection ?? emptyFeatureCollection();
+  activeLayer.value.featureCollection = {
+    ...featureCollection,
+    features: (featureCollection.features ?? []).map((feature) => {
+      if (getFeatureId(feature) !== featureId) return feature;
+      return {
+        ...feature,
+        properties: {
+          ...(feature.properties ?? {}),
+          [key]: value,
+        },
+      };
+    }),
+  };
+  selectedFeatureId.value = featureId;
+  editableMapRef.value?.updateFeatureProperties?.(featureId, { [key]: value }, { commitHistory: false });
+  selectedFeatureId.value = featureId;
+  if (key === 'visible' && value === false) {
+    resetDrawSelectionMode();
+  }
+  if (key === 'locked' && value === true) {
+    resetDrawSelectionMode();
+  }
+};
+
+const updateSelectedFeatureProperty = (key, value) => {
+  if (selectedFeature.value) {
+    updateFeatureProperty(selectedFeatureId.value, key, value);
+    return;
+  }
+  updateLayerProperty(key, value);
 };
 
 const handleActiveLayerFeaturesChange = (nextValue) => {

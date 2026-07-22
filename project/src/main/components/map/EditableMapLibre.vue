@@ -435,7 +435,7 @@ const setDrawMode = (mode) => {
   }
 }
 
-const selectFeature = (featureId) => {
+const selectFeature = (featureId, options = {}) => {
   if (!draw.value || !featureId) {
     selectedFeatureId.value = ''
     emit('feature-select', selectedFeatureId.value)
@@ -449,7 +449,18 @@ const selectFeature = (featureId) => {
     return
   }
 
-  if (feature?.properties?.locked) {
+  const shouldDirectEdit = options.directEdit !== false
+  if (!shouldDirectEdit) {
+    draw.value?.changeMode?.('simple_select', { featureIds: [featureId] })
+    emit('mode-change', 'simple_select')
+    selectedFeatureId.value = String(featureId)
+    emit('feature-select', selectedFeatureId.value)
+    return
+  }
+
+  if (feature?.properties?.locked || feature?.properties?.visible === false) {
+    draw.value?.changeMode?.('simple_select')
+    emit('mode-change', 'simple_select')
     selectedFeatureId.value = String(featureId)
     emit('feature-select', selectedFeatureId.value)
     return
@@ -462,13 +473,13 @@ const selectFeature = (featureId) => {
   emit('feature-select', selectedFeatureId.value)
 }
 
-const updateFeatureProperties = (featureId, nextProperties) => {
+const updateFeatureProperties = (featureId, nextProperties, options = {}) => {
   if (!draw.value || !featureId || !nextProperties) return
 
   Object.entries(nextProperties).forEach(([key, value]) => {
     draw.value?.setFeatureProperty?.(featureId, key, value)
   })
-  syncFeaturesFromDraw()
+  syncFeaturesFromDraw({ commitHistory: options.commitHistory !== false })
 }
 
 const deleteSelected = () => {

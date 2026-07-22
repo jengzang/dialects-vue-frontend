@@ -180,6 +180,65 @@
   gap: 0.55rem;
 }
 
+.draw-feature-list {
+  @include flex-col;
+  gap: 0.45rem;
+  max-height: 12rem;
+  overflow: auto;
+  padding-right: 0.1rem;
+  @include scrollbars.visible-scrollbar;
+  @include scrollbars.visible-scrollbar-webkit;
+}
+
+.draw-feature-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--glass-60);
+  border-radius: 10px;
+  background: var(--glass-50);
+  color: var(--text-deep);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.draw-feature-row:hover {
+  background: var(--glass-80);
+  border-color: rgba(var(--color-primary-rgb), 0.35);
+}
+
+.draw-feature-row[data-active='true'] {
+  background: rgba(var(--color-primary-rgb), 0.14);
+  border-color: rgba(var(--color-primary-rgb), 0.5);
+}
+
+.draw-feature-row-main {
+  min-width: 0;
+  @include flex-col;
+  gap: 0.18rem;
+}
+
+.draw-feature-row-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.draw-feature-row-meta,
+.draw-feature-row-state {
+  flex-shrink: 0;
+  font-size: 0.76rem;
+  color: rgba(var(--text-deep-rgb), 0.62);
+}
+
 .draw-layer-row {
   @include flex-col;
   gap: 0.45rem;

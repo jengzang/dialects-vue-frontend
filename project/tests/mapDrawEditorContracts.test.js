@@ -148,8 +148,73 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain('@edit-shape="handleEditSelectedShape"')
     expect(tabSource).toContain('const canEditSelectedShape = computed')
     expect(tabSource).toContain('const handleEditSelectedShape = () =>')
-    expect(tabSource).toContain('editableMapRef.value?.selectFeature?.(selectedFeatureId.value)')
+    expect(tabSource).toContain("editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: true })")
     expect(editableSource).toContain(`emit('mode-change'`)
     expect(tabSource).toContain('@mode-change="handleDrawModeChange"')
+  })
+
+  it('shows active layer features in the tools panel and lets users select one explicitly', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+
+    expect(panelSource).toContain('featureItems')
+    expect(panelSource).toContain('selectedFeatureId')
+    expect(panelSource).toContain(`$emit('select-feature', feature.id)`)
+    expect(panelSource).toContain(`t('map.drawTab.labels.featureList')`)
+    expect(panelSource).toContain(`t('map.drawTab.labels.emptyFeatureList')`)
+    expect(tabSource).toContain(':feature-items="activeLayerFeatureItems"')
+    expect(tabSource).toContain(':selected-feature-id="selectedEditorFeatureId"')
+    expect(tabSource).toContain('@select-feature="handleSelectFeatureFromPanel"')
+    expect(tabSource).toContain("editableMapRef.value?.selectFeature?.(featureId, { directEdit: false });")
+    expect(tabSource).toMatch(/const handleSelectFeatureFromPanel = \(featureId\) => \{[\s\S]*currentMode\.value = 'simple_select'/)
+  })
+
+  it('edits selected feature properties separately from active layer properties', () => {
+    const source = readSource(mapDrawTabPath)
+
+    expect(source).toContain('const selectedFeature = computed')
+    expect(source).toContain('const selectedEditorProperties = computed')
+    expect(source).toContain('const updateSelectedFeatureProperty = (key, value) =>')
+    expect(source).toContain('updateLayerProperty(key, value)')
+    expect(source).toContain('updateFeatureProperty(selectedFeatureId.value, key, value)')
+  })
+
+  it('keeps feature selection stable and exits direct mode when selected feature is hidden or locked', () => {
+    const source = readSource(mapDrawTabPath)
+
+    expect(source).toContain('selectedFeatureId.value = featureId;')
+    expect(source).toContain('editableMapRef.value?.updateFeatureProperties?.(featureId, { [key]: value }, { commitHistory: false });')
+    expect(source).toMatch(/if \(key === 'visible' && value === false\) \{[\s\S]*resetDrawSelectionMode\(\)/)
+    expect(source).toMatch(/if \(key === 'locked' && value === true\) \{[\s\S]*resetDrawSelectionMode\(\)/)
+  })
+
+  it('suppresses duplicate history commits when feature properties are synced into Draw', () => {
+    const source = readSource(editableMapLibrePath)
+
+    expect(source).toContain('const updateFeatureProperties = (featureId, nextProperties, options = {}) =>')
+    expect(source).toContain('syncFeaturesFromDraw({ commitHistory: options.commitHistory !== false })')
+  })
+
+  it('does not enter direct edit mode for hidden or locked selected features', () => {
+    const tabSource = readSource(mapDrawTabPath)
+    const editableSource = readSource(editableMapLibrePath)
+
+    expect(tabSource).toMatch(/const canEditSelectedShape = computed\(\(\) => \{[\s\S]*selectedFeature\.value/)
+    expect(tabSource).toContain('selectedFeature.value.properties?.visible !== false')
+    expect(tabSource).toContain('selectedFeature.value.properties?.locked !== true')
+    expect(tabSource).toContain("['LineString', 'Polygon'].includes(selectedEditorGeometryType.value)")
+    expect(editableSource).toContain('const selectFeature = (featureId, options = {}) =>')
+    expect(editableSource).toContain('const shouldDirectEdit = options.directEdit !== false')
+    expect(editableSource).toMatch(/if \(!shouldDirectEdit\) \{[\s\S]*draw\.value\?\.changeMode\?\.\('simple_select', \{ featureIds: \[featureId\] \}\)/)
+    expect(editableSource).toContain('feature?.properties?.locked || feature?.properties?.visible === false')
+    expect(editableSource).toMatch(/feature\?\.properties\?\.locked \|\| feature\?\.properties\?\.visible === false[\s\S]*draw\.value\?\.changeMode\?\.\('simple_select'\)/)
+    expect(editableSource).toMatch(/feature\?\.properties\?\.locked \|\| feature\?\.properties\?\.visible === false[\s\S]*emit\('mode-change', 'simple_select'\)/)
+  })
+
+  it('falls back to layer editing when selected feature id is stale', () => {
+    const source = readSource(mapDrawTabPath)
+
+    expect(source).toContain("const selectedEditorFeatureId = computed(() => selectedFeature.value ? selectedFeatureId.value : '');")
+    expect(source).toContain(':selected-feature-id="selectedEditorFeatureId"')
   })
 })

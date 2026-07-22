@@ -149,14 +149,50 @@
 
         <section class="draw-tool-section">
           <div class="draw-tool-section-title">
-            {{ t('map.drawTab.labels.layerEditor') }}
+            {{ t('map.drawTab.labels.featureList') }}
+          </div>
+          <div
+            v-if="featureItems.length"
+            class="draw-feature-list"
+          >
+            <button
+              v-for="feature in featureItems"
+              :key="feature.id"
+              class="draw-feature-row"
+              type="button"
+              :data-active="selectedFeatureId === feature.id"
+              @click="$emit('select-feature', feature.id)"
+            >
+              <span class="draw-feature-row-main">
+                <span class="draw-feature-row-title">{{ feature.label }}</span>
+                <span class="draw-feature-row-meta">{{ getGeometryLabel(feature.geometryType) }}</span>
+              </span>
+              <span class="draw-feature-row-state">
+                {{ feature.visible ? t('map.drawTab.labels.visibleShort') : t('map.drawTab.labels.hiddenShort') }}
+                <span v-if="feature.locked"> · {{ t('map.drawTab.labels.lockedShort') }}</span>
+              </span>
+            </button>
+          </div>
+          <div
+            v-else
+            class="draw-layer-empty"
+          >
+            {{ t('map.drawTab.labels.emptyFeatureList') }}
+          </div>
+        </section>
+
+        <section class="draw-tool-section">
+          <div class="draw-tool-section-title">
+            {{ selectedFeatureId ? t('map.drawTab.labels.featureEditor') : t('map.drawTab.labels.layerEditor') }}
           </div>
           <div
             v-if="selectedFeatureProperties"
             class="draw-layer-editor-form"
           >
             <label class="draw-field">
-              <span class="draw-field-label">{{ t('map.drawTab.labels.layerName') }}</span>
+              <span class="draw-field-label">
+                {{ selectedFeatureId ? t('map.drawTab.labels.featureName') : t('map.drawTab.labels.layerName') }}
+              </span>
               <input
                 class="draw-input"
                 type="text"
@@ -270,7 +306,7 @@
               :model-value="selectedFeatureProperties.visible"
               @update:modelValue="$emit('update-feature-property', 'visible', $event)"
             >
-              {{ t('map.drawTab.labels.visible') }}
+              {{ selectedFeatureId ? t('map.drawTab.labels.featureVisible') : t('map.drawTab.labels.visible') }}
             </CheckBox>
 
             <CheckBox
@@ -278,7 +314,7 @@
               :model-value="selectedFeatureProperties.locked"
               @update:modelValue="$emit('update-feature-property', 'locked', $event)"
             >
-              {{ t('map.drawTab.labels.locked') }}
+              {{ selectedFeatureId ? t('map.drawTab.labels.featureLocked') : t('map.drawTab.labels.locked') }}
             </CheckBox>
           </div>
           <div
@@ -305,6 +341,8 @@ const props = defineProps({
   activeLayer: { type: Object, default: null },
   selectedLayerLabel: { type: String, default: '' },
   currentMode: { type: String, default: 'simple_select' },
+  featureItems: { type: Array, default: () => [] },
+  selectedFeatureId: { type: String, default: '' },
   selectedFeatureProperties: { type: Object, default: null },
   selectedFeatureGeometryType: { type: String, default: '' },
   isFullscreen: { type: Boolean, default: false },
@@ -315,6 +353,7 @@ const props = defineProps({
 
 defineEmits([
   'set-mode',
+  'select-feature',
   'edit-shape',
   'undo',
   'redo',
@@ -324,6 +363,12 @@ defineEmits([
   'toggle-fullscreen',
   'update-feature-property',
 ])
+
+const getGeometryLabel = (geometryType) => {
+  if (geometryType === 'Point') return t('map.drawTab.geometry.point')
+  if (geometryType === 'Polygon') return t('map.drawTab.geometry.polygon')
+  return t('map.drawTab.geometry.line')
+}
 </script>
 
 <style scoped lang="scss">
