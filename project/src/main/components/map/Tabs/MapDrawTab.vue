@@ -1477,6 +1477,12 @@ const syncAllLayersAfterMutation = () => {
   syncActiveLayerToMap();
 };
 
+const resetDrawSelectionMode = () => {
+  selectedFeatureId.value = '';
+  currentMode.value = 'simple_select';
+  editableMapRef.value?.setDrawMode?.('simple_select');
+};
+
 const applyLayerPropertyToFeatures = (layer, key, value) => {
   const featureCollection = layer?.featureCollection ?? emptyFeatureCollection();
   layer.featureCollection = {
@@ -1497,6 +1503,9 @@ const toggleLayerVisibility = (layerId) => {
   commitHistory();
   layer.visible = !layer.visible;
   applyLayerPropertyToFeatures(layer, 'visible', layer.visible);
+  if (layerId === activeLayerId.value) {
+    resetDrawSelectionMode();
+  }
   syncAllLayersAfterMutation();
   editableMapRef.value?.syncReadonlyLayers?.();
 };
@@ -1518,6 +1527,9 @@ const toggleLayerLock = (layerId) => {
   commitHistory();
   layer.locked = !layer.locked;
   applyLayerPropertyToFeatures(layer, 'locked', layer.locked);
+  if (layerId === activeLayerId.value) {
+    resetDrawSelectionMode();
+  }
   syncAllLayersAfterMutation();
 };
 
@@ -1770,11 +1782,23 @@ const applyHistorySnapshot = (snapshot) => {
     layers.value = Array.isArray(snapshot.layers) ? snapshot.layers : [];
     activeLayerId.value = snapshot.activeLayerId || layers.value[0]?.id || '';
     currentStyleKey.value = snapshot.currentStyleKey || 'gaode';
-    selectedFeatureId.value = snapshot.selectedFeatureId || '';
-    currentMode.value = snapshot.currentMode || 'simple_select';
+    const restoredSelectedFeatureId = snapshot.selectedFeatureId || '';
+    selectedFeatureId.value = restoredSelectedFeatureId;
+    const restoredMode = snapshot.currentMode || 'simple_select';
+    currentMode.value = restoredMode;
     syncLayerIdSeedFromLayers();
-    editableMapRef.value?.setDrawMode?.('simple_select');
     syncAllLayersAfterMutation();
+    selectedFeatureId.value = restoredSelectedFeatureId;
+    if (restoredMode === 'direct_select') {
+      if (restoredSelectedFeatureId) {
+        editableMapRef.value?.selectFeature?.(restoredSelectedFeatureId);
+      } else {
+        currentMode.value = 'simple_select';
+        editableMapRef.value?.setDrawMode?.('simple_select');
+      }
+    } else {
+      editableMapRef.value?.setDrawMode?.(restoredMode);
+    }
     editableMapRef.value?.syncReadonlyLayers?.();
   } finally {
     isApplyingHistory.value = false;

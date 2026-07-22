@@ -117,6 +117,25 @@ describe('Map draw editor contracts', () => {
     expect(source).toContain('if (layers.value.every((layer) => layer.visible === visible)) return;')
   })
 
+  it('restores Mapbox Draw mode from history snapshots without UI mode drift', () => {
+    const source = readSource(mapDrawTabPath)
+
+    expect(source).toContain(`const restoredSelectedFeatureId = snapshot.selectedFeatureId || '';`)
+    expect(source).toContain(`const restoredMode = snapshot.currentMode || 'simple_select';`)
+    expect(source).toContain('selectedFeatureId.value = restoredSelectedFeatureId;')
+    expect(source).toContain('currentMode.value = restoredMode;')
+    expect(source).toContain('editableMapRef.value?.selectFeature?.(restoredSelectedFeatureId);')
+    expect(source).toContain('editableMapRef.value?.setDrawMode?.(restoredMode);')
+  })
+
+  it('exits direct selection when active layer visibility or lock state changes', () => {
+    const source = readSource(mapDrawTabPath)
+
+    expect(source).toContain('const resetDrawSelectionMode = () =>')
+    expect(source).toMatch(/const toggleLayerVisibility = \(layerId\) => \{[\s\S]*if \(layerId === activeLayerId\.value\) \{[\s\S]*resetDrawSelectionMode\(\)/)
+    expect(source).toMatch(/const toggleLayerLock = \(layerId\) => \{[\s\S]*if \(layerId === activeLayerId\.value\) \{[\s\S]*resetDrawSelectionMode\(\)/)
+  })
+
   it('exposes an edit shape action for selected line and polygon features', () => {
     const panelSource = readSource(mapDrawToolsPanelPath)
     const tabSource = readSource(mapDrawTabPath)

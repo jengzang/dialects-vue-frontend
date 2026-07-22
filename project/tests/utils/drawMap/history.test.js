@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { reactive } from 'vue'
 import { createMapDrawHistory } from '@/main/utils/drawMap/history.js'
 
 describe('createMapDrawHistory', () => {
@@ -50,5 +51,23 @@ describe('createMapDrawHistory', () => {
     history.undo({ layers: [{ id: 'one', visible: false }] })
 
     expect(history.canUndo()).toBe(false)
+  })
+
+  it('accepts Vue reactive snapshots without throwing DataCloneError', () => {
+    const history = createMapDrawHistory()
+    const original = reactive({
+      layers: [{ id: 'one', visible: true }],
+      activeLayerId: 'one',
+    })
+    const current = reactive({
+      layers: [{ id: 'one', visible: false }],
+      activeLayerId: 'one',
+    })
+
+    expect(() => history.commit(original)).not.toThrow()
+    expect(history.undo(current)).toEqual({
+      layers: [{ id: 'one', visible: true }],
+      activeLayerId: 'one',
+    })
   })
 })

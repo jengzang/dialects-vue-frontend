@@ -1,6 +1,12 @@
 const cloneSnapshot = (snapshot) => {
   if (typeof structuredClone === 'function') {
-    return structuredClone(snapshot)
+    try {
+      return structuredClone(snapshot)
+    } catch (error) {
+      if (error?.name !== 'DataCloneError') {
+        throw error
+      }
+    }
   }
   return JSON.parse(JSON.stringify(snapshot))
 }
