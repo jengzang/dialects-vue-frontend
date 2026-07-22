@@ -1,6 +1,7 @@
 const DB_NAME = 'map-draw-workbench'
 const STORE_NAME = 'drafts'
 const DB_VERSION = 1
+export const AUTO_DRAFT_ID = '__map_draw_auto_draft__'
 
 let dbPromise = null
 
@@ -67,13 +68,47 @@ function cloneState(value) {
   return JSON.parse(JSON.stringify(value))
 }
 
+function stableStringify(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => stableStringify(item)).join(',')}]`
+  }
+
+  if (value && typeof value === 'object') {
+    const keys = Object.keys(value).sort()
+    return `{${keys.map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`).join(',')}}`
+  }
+
+  return JSON.stringify(value)
+}
+
 function sortDraftsBySavedAt(items = []) {
   return [...items].sort((a, b) => String(a.savedAt || '').localeCompare(String(b.savedAt || '')))
 }
 
+export function buildDraftStateSignature(state) {
+  return stableStringify(state ?? {})
+}
+
+export function isAutoDraftRecord(record) {
+  return Boolean(record?.auto === true || record?.id === AUTO_DRAFT_ID)
+}
+
+export function buildAutoDraftRecord(state, options = {}) {
+  const clonedState = cloneState(state ?? {})
+  return {
+    id: AUTO_DRAFT_ID,
+    name: 'Auto Draft',
+    savedAt: options.savedAt ?? new Date().toISOString(),
+    version: 1,
+    auto: true,
+    signature: buildDraftStateSignature(clonedState),
+    state: clonedState,
+  }
+}
+
 export async function listDraftRecords() {
   const records = await withStore('readonly', (store) => store.getAll())
-  return sortDraftsBySavedAt(Array.isArray(records) ? records : [])
+  return sortDraftsBySavedAt(Array.isArray(records) ? records.filter((record) => !isAutoDraftRecord(record)) : [])
 }
 
 export async function getDraftRecordById(id) {
