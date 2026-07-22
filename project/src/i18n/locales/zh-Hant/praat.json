@@ -68,6 +68,8 @@
       "unsupportedFormat": "不支持的音頻格式，請上傳 WAV、MP3、M4A、WebM、OGG、FLAC 或 AAC 檔案",
       "processingFailed": "處理音頻檔失敗：{error}",
       "readFailed": "無法讀取音頻檔",
+      "fileSelectionFailed": "選擇音頻檔失敗：{error}",
+      "recordingReadFailed": "錄音已停止，但無法讀取錄音檔。請重新錄音後再試。",
       "microphoneAccessDenied": "無法存取麥克風，請檢查權限設定"
     }
   },

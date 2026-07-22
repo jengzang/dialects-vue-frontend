@@ -68,6 +68,8 @@
       "unsupportedFormat": "Unsupported audio format. Please upload WAV, MP3, M4A, WebM, OGG, FLAC, or AAC files",
       "processingFailed": "Failed to process audio file: {error}",
       "readFailed": "Unable to read the audio file",
+      "fileSelectionFailed": "Failed to select the audio file: {error}",
+      "recordingReadFailed": "Recording stopped, but the saved audio could not be read. Record again and retry.",
       "microphoneAccessDenied": "Unable to access the microphone. Please check permissions"
     }
   },

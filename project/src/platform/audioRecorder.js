@@ -29,6 +29,28 @@ function getNow(options = {}) {
   return options.now ?? Date.now
 }
 
+function createPlatformAudioError(code, message, cause) {
+  const error = new Error(message)
+  error.code = code
+  if (cause) {
+    error.cause = cause
+  }
+  return error
+}
+
+function isMicrophonePermissionDenied(error) {
+  const code = String(error?.code || '').toLowerCase()
+  const message = String(error?.message || error || '').toLowerCase()
+
+  return (
+    code.includes('permission') ||
+    code.includes('denied') ||
+    message.includes('permission') ||
+    message.includes('denied') ||
+    message.includes('not granted')
+  )
+}
+
 function extensionForMimeType(mimeType = '') {
   if (mimeType.includes('mp4') || mimeType.includes('m4a')) return 'm4a'
   if (mimeType.includes('wav')) return 'wav'
@@ -46,7 +68,10 @@ async function blobFromRecordingResult(result, options = {}) {
   const globals = getGlobals(options)
   const fetchApi = getFetch(options)
   if (!fetchApi || !result?.uri) {
-    throw new Error('Native recording data is not available')
+    throw createPlatformAudioError(
+      'NATIVE_RECORDING_READ_FAILED',
+      'Native recording data is not available'
+    )
   }
 
   const recordingUri = typeof globals?.Capacitor?.convertFileSrc === 'function'
@@ -54,7 +79,10 @@ async function blobFromRecordingResult(result, options = {}) {
     : result.uri
   const response = await fetchApi(recordingUri)
   if (response?.ok === false) {
-    throw new Error('Failed to read native recording')
+    throw createPlatformAudioError(
+      'NATIVE_RECORDING_READ_FAILED',
+      'Failed to read native recording'
+    )
   }
 
   return response.blob()
@@ -81,10 +109,22 @@ export function getPlatformAudioRecorder(options = {}) {
         return null
       }
 
-      await AudioRecorder.startRecording({
-        sampleRate: recordingOptions.sampleRate ?? 44100,
-        bitRate: recordingOptions.bitRate ?? 128000,
-      })
+      try {
+        await AudioRecorder.startRecording({
+          sampleRate: recordingOptions.sampleRate ?? 44100,
+          bitRate: recordingOptions.bitRate ?? 128000,
+        })
+      } catch (error) {
+        if (isMicrophonePermissionDenied(error)) {
+          throw createPlatformAudioError(
+            'NATIVE_MICROPHONE_PERMISSION_DENIED',
+            'Native microphone permission denied',
+            error
+          )
+        }
+
+        throw error
+      }
 
       return { driver: 'capacitor-audio-recorder' }
     },

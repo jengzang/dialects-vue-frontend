@@ -63,6 +63,33 @@ function getCapacitorFilePicker(options = {}) {
   return options.filePicker ?? { FilePicker }
 }
 
+function getFetch(options = {}) {
+  return options.fetch ?? (typeof fetch === 'undefined' ? null : fetch)
+}
+
+function createPlatformFileError(code, message, cause) {
+  const error = new Error(message)
+  error.code = code
+  if (cause) {
+    error.cause = cause
+  }
+  return error
+}
+
+function isFilePickerCanceled(error) {
+  const code = String(error?.code || '').toLowerCase()
+  const message = String(error?.message || error || '').toLowerCase()
+
+  return (
+    code.includes('cancel') ||
+    code.includes('dismiss') ||
+    message.includes('cancel') ||
+    message.includes('dismiss') ||
+    message.includes('user cancelled') ||
+    message.includes('user canceled')
+  )
+}
+
 export function hasNativeFileBridge(options = {}) {
   const globals = getGlobals(options)
   const directBridge = getDirectNativeBridge(globals)
@@ -131,6 +158,49 @@ function nativePayloadToFile(payload) {
   const fileName = payload?.fileName || payload?.name || 'import.dat'
   const mimeType = payload?.mimeType || payload?.type || 'application/octet-stream'
   const blob = payload?.blob || base64ToBlob(payload?.base64 || payload?.data || '', mimeType)
+
+  return new File([blob], fileName, {
+    type: mimeType,
+    lastModified: payload?.lastModified || payload?.modifiedAt || Date.now(),
+  })
+}
+
+async function capacitorPayloadToFile(payload, options = {}) {
+  const globals = getGlobals(options)
+  const fileName = payload?.fileName || payload?.name || 'import.dat'
+  const mimeType = payload?.mimeType || payload?.type || 'application/octet-stream'
+  let blob = payload?.blob
+
+  if (!blob && (payload?.base64 || payload?.data)) {
+    blob = base64ToBlob(payload.base64 || payload.data, mimeType)
+  }
+
+  if (!blob && payload?.path) {
+    const fetchApi = getFetch(options)
+    if (!fetchApi) {
+      throw createPlatformFileError(
+        'NATIVE_FILE_READ_FAILED',
+        'Native file data is not available'
+      )
+    }
+
+    const fileUri = typeof globals?.Capacitor?.convertFileSrc === 'function'
+      ? globals.Capacitor.convertFileSrc(payload.path)
+      : payload.path
+    const response = await fetchApi(fileUri)
+    if (response?.ok === false || typeof response?.blob !== 'function') {
+      throw createPlatformFileError(
+        'NATIVE_FILE_READ_FAILED',
+        'Failed to read native file'
+      )
+    }
+
+    blob = await response.blob()
+  }
+
+  if (!blob) {
+    blob = base64ToBlob('', mimeType)
+  }
 
   return new File([blob], fileName, {
     type: mimeType,
@@ -229,14 +299,29 @@ async function pickFilesWithCapacitorFilePicker(pickerOptions = {}, options = {}
   }
 
   const { FilePicker: CapacitorFilePicker } = getCapacitorFilePicker(options)
-  const result = await CapacitorFilePicker.pickFiles({
-    types: acceptToPickerTypes(pickerOptions.accept),
-    limit: pickerOptions.multiple ? 0 : 1,
-    readData: true,
-  })
+  let result
+
+  try {
+    result = await CapacitorFilePicker.pickFiles({
+      types: acceptToPickerTypes(pickerOptions.accept),
+      limit: pickerOptions.multiple ? 0 : 1,
+      readData: pickerOptions.readData !== false,
+    })
+  } catch (error) {
+    if (isFilePickerCanceled(error)) {
+      return []
+    }
+
+    throw createPlatformFileError(
+      'NATIVE_FILE_PICKER_FAILED',
+      'Native file picker failed',
+      error
+    )
+  }
+
   const payloads = Array.isArray(result?.files) ? result.files : []
 
-  return payloads.map(nativePayloadToFile)
+  return Promise.all(payloads.map((payload) => capacitorPayloadToFile(payload, options)))
 }
 
 function saveBlobWithBrowserDownload(blob, fileName, options = {}) {

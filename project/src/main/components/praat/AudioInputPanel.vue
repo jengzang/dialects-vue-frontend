@@ -127,15 +127,40 @@ const handleDrop = (event) => {
   }
 }
 
-const triggerFileInput = async () => {
-  const files = await getPlatformFileService().pickFilesOrOpenInput(fileInput.value, {
-    accept: 'audio/*',
-    multiple: false
-  })
-  const file = files?.[0]
+const showPlatformAudioInputError = (error) => {
+  if (error?.code === 'NATIVE_MICROPHONE_PERMISSION_DENIED') {
+    showError(t('praat.audioInput.errors.microphoneAccessDenied'))
+    return
+  }
 
-  if (file && validateFile(file)) {
-    processFile(file)
+  if (error?.code === 'NATIVE_RECORDING_READ_FAILED') {
+    showError(t('praat.audioInput.errors.recordingReadFailed'))
+    return
+  }
+
+  if (error?.code === 'NATIVE_FILE_PICKER_FAILED' || error?.code === 'NATIVE_FILE_READ_FAILED') {
+    showError(t('praat.audioInput.errors.fileSelectionFailed', { error: error.message }))
+    return
+  }
+
+  showError(t('praat.audioInput.errors.processingFailed', { error: error.message }))
+}
+
+const triggerFileInput = async () => {
+  try {
+    const files = await getPlatformFileService().pickFilesOrOpenInput(fileInput.value, {
+      accept: 'audio/*',
+      multiple: false,
+      readData: false
+    })
+    const file = files?.[0]
+
+    if (file && validateFile(file)) {
+      processFile(file)
+    }
+  } catch (error) {
+    console.error('Native file selection error:', error)
+    showPlatformAudioInputError(error)
   }
 }
 
@@ -416,7 +441,7 @@ const startRecording = async () => {
     startRecordingTimer()
   } catch (error) {
     console.error('Recording error:', error)
-    showError(t('praat.audioInput.errors.microphoneAccessDenied'))
+    showPlatformAudioInputError(error)
     isProcessing.value = false
   }
 }
@@ -434,7 +459,7 @@ const stopRecording = async () => {
       }
     } catch (error) {
       console.error('Native recording error:', error)
-      showError(t('praat.audioInput.errors.processingFailed', { error: error.message }))
+      showPlatformAudioInputError(error)
     } finally {
       isNativeRecording = false
       isProcessing.value = false

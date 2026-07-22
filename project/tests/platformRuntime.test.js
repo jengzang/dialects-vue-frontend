@@ -521,6 +521,61 @@ describe('platform runtime detection and capabilities', () => {
     expect(await readFileAsText(files[0])).toBe('hello')
   })
 
+  it('keeps native audio picker memory usage bounded by avoiding eager readData for audio input', async () => {
+    const calls = []
+    const fileService = getPlatformFileService({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'android',
+          isPluginAvailable: (name) => name === 'FilePicker',
+        },
+      },
+      filePicker: {
+        FilePicker: {
+          async pickFiles(payload) {
+            calls.push(payload)
+            return { files: [] }
+          },
+        },
+      },
+    })
+
+    await fileService.pickFiles({
+      accept: 'audio/*',
+      multiple: false,
+      readData: false,
+    })
+
+    expect(calls).toEqual([{
+      types: ['audio/*'],
+      limit: 1,
+      readData: false,
+    }])
+  })
+
+  it('normalizes native file picker cancellation into a non-fatal empty selection', async () => {
+    const fileService = getPlatformFileService({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'ios',
+          isPluginAvailable: (name) => name === 'FilePicker',
+        },
+      },
+      filePicker: {
+        FilePicker: {
+          async pickFiles() {
+            throw Object.assign(new Error('User cancelled document picker'), { code: 'USER_CANCELLED' })
+          },
+        },
+      },
+    })
+
+    await expect(fileService.pickFiles({
+      accept: 'audio/*',
+      multiple: false,
+    })).resolves.toEqual([])
+  })
+
   it('falls back to clicking browser file inputs when native picker is absent', async () => {
     const calls = []
     const fileService = getPlatformFileService({ globals: {} })
@@ -671,5 +726,51 @@ describe('platform runtime detection and capabilities', () => {
     expect(result.file.name).toBe('recording-1000.m4a')
     expect(result.file.type).toBe('audio/mp4')
     expect(await readFileAsText(result.file)).toBe('native audio')
+  })
+
+  it('classifies native microphone permission denial before Praat handles the message', async () => {
+    const recorder = getPlatformAudioRecorder({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'ios',
+          isPluginAvailable: (name) => name === 'CapacitorAudioRecorder',
+        },
+      },
+      audioRecorder: {
+        CapacitorAudioRecorder: {
+          async startRecording() {
+            throw Object.assign(new Error('Microphone permission denied'), { code: 'PERMISSION_DENIED' })
+          },
+        },
+      },
+    })
+
+    await expect(recorder.start()).rejects.toMatchObject({
+      code: 'NATIVE_MICROPHONE_PERMISSION_DENIED',
+    })
+  })
+
+  it('classifies native recording URI read failures before Praat handles the message', async () => {
+    const recorder = getPlatformAudioRecorder({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'android',
+          convertFileSrc: (uri) => uri,
+          isPluginAvailable: (name) => name === 'CapacitorAudioRecorder',
+        },
+      },
+      audioRecorder: {
+        CapacitorAudioRecorder: {
+          async stopRecording() {
+            return { uri: 'file:///missing.m4a' }
+          },
+        },
+      },
+      fetch: async () => ({ ok: false }),
+    })
+
+    await expect(recorder.stop()).rejects.toMatchObject({
+      code: 'NATIVE_RECORDING_READ_FAILED',
+    })
   })
 })
