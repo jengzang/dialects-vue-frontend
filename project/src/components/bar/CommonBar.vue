@@ -307,7 +307,7 @@ const mobileNavRef = ref(null)
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
 
 const getTabScroll = (tab, isMobile) => {
-  return isMobile ? (tab.mobileScroll ?? tab.scroll) : tab.scroll
+  return isMobile ? (tab.mobileScroll ?? tab.scroll) : (tab.scroll ?? tab.mobileScroll)
 }
 
 // Overflow scroll: sort tabs：左溢出 → 主 → 右溢出
@@ -779,6 +779,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   font-size: 1.8rem;
   font-weight: 600;
   white-space: nowrap;
+  font-family: 'STKaiti', 'KaiTi', 'Kaiti SC', '楷体', 'Songti SC', 'Noto Serif SC', 'STSong', 'SimSun', 'PingFang SC', 'Microsoft YaHei', serif;
+  letter-spacing: 0.05em;
 }
 
 .login-container {

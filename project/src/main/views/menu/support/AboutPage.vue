@@ -1487,6 +1487,7 @@ em {
 
   .like-author-title {
     gap: 8px;
+    flex-direction: column;
   }
 
   .follow-button {
