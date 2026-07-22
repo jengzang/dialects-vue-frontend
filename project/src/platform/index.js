@@ -9,6 +9,8 @@ export {
 } from './capabilities.js'
 export {
   getNativeDistPruneManifest,
+  getPlatformAcceptanceChecklist,
+  getPlatformAcceptanceDiagnostics,
   getPlatformFeatureMatrixDiagnostics,
   isPlatformRouteEnabled,
   isPlatformTutorialEnabled,

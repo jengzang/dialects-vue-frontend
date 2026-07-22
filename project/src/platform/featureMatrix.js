@@ -1,6 +1,7 @@
 import { getCurrentRuntimePlatform } from './runtime.js'
 
 const PLATFORM_TARGET_KEYS = ['web', 'ios', 'android', 'native']
+const PLATFORM_ACCEPTANCE_TARGET_KEYS = ['web', 'ios', 'android']
 
 export const PLATFORM_FEATURE_MATRIX = {
   mapView: {
@@ -84,6 +85,84 @@ export const PLATFORM_FEATURE_MATRIX = {
       'explore-praat-vowelspace',
       'explore-praat-pitchtone',
     ],
+    acceptance: {
+      web: [
+        {
+          id: 'praat.web.file-select',
+          label: 'Select an audio file through the browser file input',
+          driver: 'browser-file-input',
+        },
+        {
+          id: 'praat.web.record',
+          label: 'Record audio through MediaRecorder after browser microphone permission',
+          driver: 'browser-media-recorder',
+        },
+        {
+          id: 'praat.web.decode-segment',
+          label: 'Decode audio and prepare original or split segments through Web Audio',
+          driver: 'web-audio',
+        },
+        {
+          id: 'praat.web.submit-analysis',
+          label: 'Upload the selected audio and create a Praat analysis job',
+          driver: 'praat-api',
+        },
+      ],
+      ios: [
+        {
+          id: 'praat.ios.file-select',
+          label: 'Select an audio file through Capacitor FilePicker',
+          driver: 'capacitor-file-picker',
+        },
+        {
+          id: 'praat.ios.record',
+          label: 'Record and save audio through Capacitor AudioRecorder',
+          driver: 'capacitor-audio-recorder',
+        },
+        {
+          id: 'praat.ios.microphone-permission',
+          label: 'Request microphone permission using the iOS Info.plist usage description',
+          driver: 'ios-info-plist',
+        },
+        {
+          id: 'praat.ios.decode-segment',
+          label: 'Decode native audio and prepare original or split segments through Web Audio',
+          driver: 'web-audio',
+        },
+        {
+          id: 'praat.ios.submit-analysis',
+          label: 'Upload the native-selected or native-recorded audio and create a Praat analysis job',
+          driver: 'praat-api',
+        },
+      ],
+      android: [
+        {
+          id: 'praat.android.file-select',
+          label: 'Select an audio file through Capacitor FilePicker',
+          driver: 'capacitor-file-picker',
+        },
+        {
+          id: 'praat.android.record',
+          label: 'Record and save audio through Capacitor AudioRecorder',
+          driver: 'capacitor-audio-recorder',
+        },
+        {
+          id: 'praat.android.microphone-permission',
+          label: 'Request microphone permission using Android RECORD_AUDIO',
+          driver: 'android-manifest',
+        },
+        {
+          id: 'praat.android.decode-segment',
+          label: 'Decode native audio and prepare original or split segments through Web Audio',
+          driver: 'web-audio',
+        },
+        {
+          id: 'praat.android.submit-analysis',
+          label: 'Upload the native-selected or native-recorded audio and create a Praat analysis job',
+          driver: 'praat-api',
+        },
+      ],
+    },
   },
   externalOpen: {
     category: 'navigation',
@@ -104,6 +183,22 @@ export const PLATFORM_FEATURE_MATRIX = {
     },
     disabledReason: 'web-only',
   },
+}
+
+export function getPlatformAcceptanceChecklist(target, matrix = PLATFORM_FEATURE_MATRIX) {
+  const checklist = []
+
+  for (const [featureName, featureConfig] of Object.entries(matrix)) {
+    for (const item of featureConfig.acceptance?.[target] || []) {
+      checklist.push({
+        feature: featureName,
+        target,
+        ...item,
+      })
+    }
+  }
+
+  return checklist
 }
 
 export function resolvePlatformFeatureAvailability(featureName, runtime) {
@@ -224,6 +319,56 @@ export function getPlatformFeatureMatrixDiagnostics(matrix = PLATFORM_FEATURE_MA
     duplicateTutorials: collectDuplicateAssignments(matrix, 'tutorials'),
     duplicateNativeDistPrunePaths,
     duplicateNativeDistPruneGlobPatterns,
+  }
+}
+
+export function getPlatformAcceptanceDiagnostics(matrix = PLATFORM_FEATURE_MATRIX) {
+  const ownerById = new Map()
+  const duplicateIds = []
+  const invalidTargets = []
+  const missingFields = []
+
+  for (const [featureName, featureConfig] of Object.entries(matrix)) {
+    for (const [target, items] of Object.entries(featureConfig.acceptance || {})) {
+      if (!PLATFORM_ACCEPTANCE_TARGET_KEYS.includes(target)) {
+        invalidTargets.push({ feature: featureName, target })
+      }
+
+      if (!Array.isArray(items)) {
+        missingFields.push({ feature: featureName, target, field: 'items' })
+        continue
+      }
+
+      for (const item of items) {
+        if (!item?.id) {
+          missingFields.push({ feature: featureName, target, field: 'id' })
+        }
+        if (!item?.label) {
+          missingFields.push({ feature: featureName, target, field: 'label' })
+        }
+        if (!item?.driver) {
+          missingFields.push({ feature: featureName, target, field: 'driver' })
+        }
+
+        if (!item?.id) continue
+
+        const existingOwner = ownerById.get(item.id)
+        if (existingOwner) {
+          duplicateIds.push({
+            value: item.id,
+            features: [existingOwner, featureName],
+          })
+        } else {
+          ownerById.set(item.id, featureName)
+        }
+      }
+    }
+  }
+
+  return {
+    duplicateIds,
+    invalidTargets,
+    missingFields,
   }
 }
 
