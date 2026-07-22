@@ -58,7 +58,17 @@
                 type="button"
                 @click="$emit('select-layer', layer.id)"
               >
-                {{ getLayerLabel(layer) }}
+                <span class="draw-layer-row-main">
+                  <span class="draw-layer-row-title">{{ layer.name }}</span>
+                  <span class="draw-layer-row-meta">
+                    {{ getGeometryLabel(layer.geometryType) }} ·
+                    {{ t('map.drawTab.labels.layerFeatureCount', { count: getLayerFeatureCount(layer) }) }}
+                  </span>
+                </span>
+                <span class="draw-layer-row-state">
+                  {{ layer.visible ? t('map.drawTab.labels.visibleShort') : t('map.drawTab.labels.hiddenShort') }}
+                  <span v-if="layer.locked"> · {{ t('map.drawTab.labels.lockedShort') }}</span>
+                </span>
               </button>
               <div class="draw-layer-row-actions">
                 <button
@@ -185,9 +195,14 @@ const emit = defineEmits([
   'update-style-key',
 ])
 
-const getLayerLabel = (layer) => {
-  const count = layer.featureCollection?.features?.length ?? 0
-  return `${layer.name} · ${count}`
+const getLayerFeatureCount = (layer) => {
+  return layer.featureCollection?.features?.length ?? 0
+}
+
+const getGeometryLabel = (geometryType) => {
+  if (geometryType === 'Point') return t('map.drawTab.geometry.point')
+  if (geometryType === 'Polygon') return t('map.drawTab.geometry.polygon')
+  return t('map.drawTab.geometry.line')
 }
 
 const handleStyleUpdate = (value) => {

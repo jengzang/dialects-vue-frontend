@@ -249,6 +249,18 @@ describe('Map draw editor contracts', () => {
     expect(source).toMatch(/const confirmed = await showConfirm[\s\S]*if \(!confirmed\) return;[\s\S]*commitHistory\(\);/)
   })
 
+  it('shows layer geometry, feature count, and state in the layers panel', () => {
+    const source = readSource(mapDrawLayersPanelPath)
+
+    expect(source).toContain('draw-layer-row-title')
+    expect(source).toContain('getGeometryLabel(layer.geometryType)')
+    expect(source).toContain('getLayerFeatureCount(layer)')
+    expect(source).toContain(`t('map.drawTab.labels.layerFeatureCount', { count: getLayerFeatureCount(layer) })`)
+    expect(source).toContain(`layer.visible ? t('map.drawTab.labels.visibleShort') : t('map.drawTab.labels.hiddenShort')`)
+    expect(source).toContain(`v-if="layer.locked"`)
+    expect(source).toContain(`t('map.drawTab.labels.lockedShort')`)
+  })
+
   it('has localized labels for duplicating draw layers', () => {
     const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
     const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
@@ -260,6 +272,16 @@ describe('Map draw editor contracts', () => {
     expect(zhHant.drawTab.labels.copySuffix).toBe('副本')
     expect(en.drawTab.buttons.duplicateLayer).toBe('Duplicate Layer')
     expect(en.drawTab.labels.copySuffix).toBe('Copy')
+  })
+
+  it('has localized layer row feature count labels', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.labels.layerFeatureCount).toBe('{count} 个要素')
+    expect(zhHant.drawTab.labels.layerFeatureCount).toBe('{count} 個要素')
+    expect(en.drawTab.labels.layerFeatureCount).toBe('{count} feature(s)')
   })
 
   it('has localized confirmation text for deleting draw layers', () => {

@@ -628,6 +628,7 @@
       "emptyFeatureList": "The current layer has no features",
       "layer": "Layer",
       "feature": "Feature",
+      "layerFeatureCount": "{count} feature(s)",
       "copySuffix": "Copy",
       "layerEditor": "Layer Properties",
       "featureEditor": "Feature Properties",

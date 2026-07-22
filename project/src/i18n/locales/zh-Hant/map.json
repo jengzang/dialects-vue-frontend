@@ -628,6 +628,7 @@
       "emptyFeatureList": "目前圖層暫無要素",
       "layer": "圖層",
       "feature": "要素",
+      "layerFeatureCount": "{count} 個要素",
       "copySuffix": "副本",
       "layerEditor": "圖層屬性",
       "featureEditor": "要素屬性",

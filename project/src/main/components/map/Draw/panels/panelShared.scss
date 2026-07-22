@@ -255,9 +255,35 @@
 
 .draw-layer-row-button {
   width: 100%;
-  justify-content: flex-start;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.65rem;
   text-align: left;
   color: var(--action-primary-text);
+}
+
+.draw-layer-row-main {
+  flex: 1;
+  min-width: 0;
+  @include flex-col;
+  gap: 0.18rem;
+}
+
+.draw-layer-row-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.draw-layer-row-meta,
+.draw-layer-row-state {
+  flex-shrink: 0;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  text-align: right;
+  color: rgba(var(--text-deep-rgb), 0.72);
 }
 
 .draw-layer-row-actions {
