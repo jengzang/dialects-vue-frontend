@@ -22,18 +22,22 @@
 | 状态流测试加固 | 已完成 | `519399fa` | 新增 `EditableMapLibre` 可执行状态流测试，覆盖面板选择不进 direct edit、隐藏/锁定不可 direct edit、属性同步不重复提交 history。 |
 | Step 6 底图切换生命周期 | 已完成 | `9ff38a12` | `EditableMapLibre` 监听 `style.load`，在底图样式重载后恢复 Draw 数据、readonly layers 和 preview layers，且不触发 history/data-change 事件。 |
 | Step 7 图层管理易用性 | 部分完成 | `a3b10d90`、`9e0f5a92`、`43d828a4`、`91c5321f`、`7744c532`、`0e44785b`、`bc8bc098`、`eb1ab82c`、`add2e4fe` | 已支持复制图层、复制选中要素、删除图层确认、图层行显示几何/要素数/显示锁定状态、图层行内重命名、重命名失焦保存、选中要素移动到同类型可编辑图层，并阻止隐藏或锁定活动图层继续绘制/删除/清空。 |
+| Step 8 未保存保护与自动草稿恢复 | 已完成 | `9fc8103d`、`5b08e48a` | 自动草稿记录从手动草稿列表隐藏；页面打开时提示恢复未保存草稿；工作台变脏时自动保存；离开页面前提示；手动保存、更新或恢复本地草稿后清理隐藏自动草稿，并等待并发自动写入完成。 |
 
 已验证命令：
 
 - `npm test -- editableMapLibreStateFlow.test.js mapDrawEditorContracts.test.js tests/utils/drawMap/history.test.js`
 - `npx eslint src/main/components/map/EditableMapLibre.vue tests/editableMapLibreStateFlow.test.js --quiet`
+- `npm test -- mapDrawTabDraftSafety.test.js tests/utils/drawMap/draftStorage.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js`
+- `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/utils/drawMap/draftStorage.js tests/mapDrawTabDraftSafety.test.js tests/utils/drawMap/draftStorage.test.js --quiet`
+- `node -e "JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-CN/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-Hant/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/en/map.json','utf8')); console.log('ok')"`
 - `git diff --check`
 - `npm run build`
 
 下一批建议按“小步提交”继续推进：
 
 1. 完成 Step 7 剩余项：多选/批量操作的范围确认，优先考虑“多选要素后批量删除/移动到图层/批量显隐锁定”。
-2. 做一个轻量 Step 8：未保存状态与自动草稿恢复提示。当前已有手动本地草稿，但还缺 dirty 提醒和自动恢复。
+2. 做 Step 9：导入导出数据清洁，减少 `updatedAt` 等内部字段在 round-trip 中产生噪声。
 3. 再做 Step 5，将 layer mutation 逐步集中为工具函数；这一步会改变内部结构，应拆成多个小提交并先确认结构边界。
 4. 最后评估高阶几何能力：吸附、矩形/圆、切割、拆分、合并、自定义模式或 Terra Draw 迁移。
 
@@ -643,7 +647,43 @@
 
 - `feat: improve map draw layer management`
 
-### Step 8：导入导出数据清洁
+### Step 8：未保存保护与自动草稿恢复
+
+**目标：** 降低刷新、关闭页面、误离开页面时丢失绘制工作的风险。
+
+**文件：**
+
+- 修改：`project/src/main/components/map/Tabs/MapDrawTab.vue`
+- 修改：`project/src/main/utils/drawMap/draftStorage.js`
+- 修改 locale 三套 map.json。
+- 修改相关测试。
+
+**已完成做法：**
+
+1. 增加隐藏自动草稿记录，不在手动草稿列表展示。
+2. 用稳定签名判断工作台 dirty 状态。
+3. 页面挂载时检查自动草稿；与当前工作台不同时提示恢复，用户拒绝或恢复完成后删除隐藏草稿。
+4. 工作台变化后自动保存隐藏草稿。
+5. `beforeunload` 时提示未保存风险，并触发最后一次自动草稿保存。
+6. 手动保存、更新、恢复本地草稿后标记工作台为干净，并等待所有并发自动草稿写入完成后删除隐藏自动草稿。
+
+**验收：**
+
+- 未保存绘制内容刷新后可提示恢复。
+- 手动本地草稿列表不显示自动草稿。
+- 保存本地草稿后不会下次再弹出同一份“未保存草稿”。
+- 并发自动草稿写入不会在清理后把旧自动草稿写回。
+
+**已知残余风险：**
+
+- 浏览器不会保证等待 `beforeunload` 内的异步 IndexedDB 写入完成；当前策略依赖编辑过程中的自动保存作为主保护，`beforeunload` 保存只作为兜底。
+
+**提交：**
+
+- `9fc8103d feat: add map draw auto draft helpers`
+- `5b08e48a feat: protect map draw unsaved drafts`
+
+### Step 9：导入导出数据清洁
 
 **目标：** 不让 normalize 产生不必要的字段噪声。
 
@@ -672,7 +712,7 @@
 
 - `fix: reduce map draw export property churn`
 
-### Step 9：可选增强评估
+### Step 10：可选增强评估
 
 **目标：** 在核心体验稳定后再决定是否扩展复杂编辑能力。
 
