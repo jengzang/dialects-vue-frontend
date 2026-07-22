@@ -136,10 +136,12 @@
           :can-undo="canUndoHistory"
           :can-redo="canRedoHistory"
           :can-edit-shape="canEditSelectedShape"
+          :can-duplicate-feature="canDuplicateSelectedFeature"
           :can-modify-active-layer="canModifyActiveLayer"
           @set-mode="setMode"
           @select-feature="handleSelectFeatureFromPanel"
           @edit-shape="handleEditSelectedShape"
+          @duplicate-feature="handleDuplicateSelectedFeature"
           @undo="undoHistory"
           @redo="redoHistory"
           @delete-selected="handleDeleteSelected"
@@ -769,6 +771,16 @@ const canEditSelectedShape = computed(() => {
     && selectedFeature.value.properties?.visible !== false
     && selectedFeature.value.properties?.locked !== true
     && ['LineString', 'Polygon'].includes(selectedEditorGeometryType.value)
+  );
+});
+const canDuplicateSelectedFeature = computed(() => {
+  return Boolean(
+    selectedFeatureId.value
+    && activeLayer.value
+    && selectedFeature.value
+    && canModifyActiveLayer.value
+    && selectedFeature.value.properties?.visible !== false
+    && selectedFeature.value.properties?.locked !== true
   );
 });
 
@@ -1670,6 +1682,54 @@ const handleEditSelectedShape = () => {
   if (!canEditSelectedShape.value) return;
   editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: true });
   currentMode.value = 'direct_select';
+};
+
+const buildDuplicateFeatureId = (layer, sourceFeatureId) => {
+  const existingIds = new Set(
+    (layer?.featureCollection?.features ?? []).map((feature) => getFeatureId(feature)).filter(Boolean)
+  );
+  const safeSourceFeatureId = String(sourceFeatureId || 'feature');
+  let index = 1;
+  let duplicatedFeatureId = `${safeSourceFeatureId}-copy-${index}`;
+  while (existingIds.has(duplicatedFeatureId)) {
+    index += 1;
+    duplicatedFeatureId = `${safeSourceFeatureId}-copy-${index}`;
+  }
+  return duplicatedFeatureId;
+};
+
+const cloneFeatureForDuplicate = (feature, duplicatedFeatureId, options = {}) => ({
+  ...feature,
+  id: duplicatedFeatureId,
+  properties: {
+    ...(feature?.properties ?? {}),
+    id: duplicatedFeatureId,
+    name: options.name ?? feature?.properties?.name,
+  },
+  geometry: feature?.geometry
+    ? {
+        ...feature.geometry,
+        coordinates: structuredClone(feature.geometry.coordinates),
+      }
+    : feature?.geometry,
+});
+
+const handleDuplicateSelectedFeature = () => {
+  if (!canDuplicateSelectedFeature.value) return;
+  const duplicatedFeatureId = buildDuplicateFeatureId(activeLayer.value, selectedFeatureId.value);
+  const duplicatedFeature = cloneFeatureForDuplicate(selectedFeature.value, duplicatedFeatureId, {
+    name: `${selectedEditorProperties.value?.name ?? t('map.drawTab.labels.feature')} ${t('map.drawTab.labels.copySuffix')}`,
+  });
+  const featureCollection = activeLayer.value.featureCollection ?? emptyFeatureCollection();
+  commitHistory();
+  activeLayer.value.featureCollection = {
+    ...featureCollection,
+    features: [...(featureCollection.features ?? []), duplicatedFeature],
+  };
+  selectedFeatureId.value = duplicatedFeatureId;
+  currentMode.value = 'simple_select';
+  syncAllLayersAfterMutation();
+  editableMapRef.value?.selectFeature?.(duplicatedFeatureId, { directEdit: false });
 };
 
 const handleSelectFeatureFromPanel = (featureId) => {

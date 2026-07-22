@@ -484,6 +484,7 @@
       "undo": "撤銷",
       "redo": "重做",
       "deleteSelected": "刪除選中",
+      "duplicateFeature": "複製要素",
       "duplicateLayer": "複製圖層",
       "deleteLayer": "刪除圖層",
       "moveLayerUp": "圖層上移",

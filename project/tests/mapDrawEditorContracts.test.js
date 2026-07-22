@@ -232,6 +232,26 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toMatch(/const handleClearAll = async \(\) => \{[\s\S]*if \(!canModifyActiveLayer\.value\) return;/)
   })
 
+  it('supports duplicating the selected feature in the active layer', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+
+    expect(panelSource).toContain('canDuplicateFeature')
+    expect(panelSource).toContain(':disabled="!canDuplicateFeature"')
+    expect(panelSource).toContain(`$emit('duplicate-feature')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.duplicateFeature')`)
+    expect(tabSource).toContain(':can-duplicate-feature="canDuplicateSelectedFeature"')
+    expect(tabSource).toContain('@duplicate-feature="handleDuplicateSelectedFeature"')
+    expect(tabSource).toContain('const canDuplicateSelectedFeature = computed')
+    expect(tabSource).toContain('const buildDuplicateFeatureId = (layer, sourceFeatureId) =>')
+    expect(tabSource).toContain('const cloneFeatureForDuplicate = (feature, duplicatedFeatureId, options = {}) =>')
+    expect(tabSource).toContain('const handleDuplicateSelectedFeature = () =>')
+    expect(tabSource).toMatch(/const handleDuplicateSelectedFeature = \(\) => \{[\s\S]*if \(!canDuplicateSelectedFeature\.value\) return;[\s\S]*commitHistory\(\);/)
+    expect(tabSource).toContain('activeLayer.value.featureCollection = {')
+    expect(tabSource).toContain('selectedFeatureId.value = duplicatedFeatureId;')
+    expect(tabSource).toContain("editableMapRef.value?.selectFeature?.(duplicatedFeatureId, { directEdit: false });")
+  })
+
   it('falls back to layer editing when selected feature id is stale', () => {
     const source = readSource(mapDrawTabPath)
 
@@ -284,10 +304,13 @@ describe('Map draw editor contracts', () => {
     const en = JSON.parse(readSource(enMapLocalePath))
 
     expect(zhCn.drawTab.buttons.duplicateLayer).toBe('复制图层')
+    expect(zhCn.drawTab.buttons.duplicateFeature).toBe('复制要素')
     expect(zhCn.drawTab.labels.copySuffix).toBe('副本')
     expect(zhHant.drawTab.buttons.duplicateLayer).toBe('複製圖層')
+    expect(zhHant.drawTab.buttons.duplicateFeature).toBe('複製要素')
     expect(zhHant.drawTab.labels.copySuffix).toBe('副本')
     expect(en.drawTab.buttons.duplicateLayer).toBe('Duplicate Layer')
+    expect(en.drawTab.buttons.duplicateFeature).toBe('Duplicate Feature')
     expect(en.drawTab.labels.copySuffix).toBe('Copy')
   })
 

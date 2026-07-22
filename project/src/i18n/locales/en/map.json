@@ -484,6 +484,7 @@
       "undo": "Undo",
       "redo": "Redo",
       "deleteSelected": "Delete Selection",
+      "duplicateFeature": "Duplicate Feature",
       "duplicateLayer": "Duplicate Layer",
       "deleteLayer": "Delete Layer",
       "moveLayerUp": "Move Layer Up",

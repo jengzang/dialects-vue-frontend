@@ -100,6 +100,15 @@
               class="main-glass-button"
               data-variant="secondary"
               type="button"
+              :disabled="!canDuplicateFeature"
+              @click="$emit('duplicate-feature')"
+            >
+              {{ t('map.drawTab.buttons.duplicateFeature') }}
+            </button>
+            <button
+              class="main-glass-button"
+              data-variant="secondary"
+              type="button"
               :disabled="!canUndo"
               @click="$emit('undo')"
             >
@@ -354,6 +363,7 @@ const props = defineProps({
   canUndo: { type: Boolean, default: false },
   canRedo: { type: Boolean, default: false },
   canEditShape: { type: Boolean, default: false },
+  canDuplicateFeature: { type: Boolean, default: false },
   canModifyActiveLayer: { type: Boolean, default: false },
 })
 
@@ -361,6 +371,7 @@ defineEmits([
   'set-mode',
   'select-feature',
   'edit-shape',
+  'duplicate-feature',
   'undo',
   'redo',
   'delete-selected',
