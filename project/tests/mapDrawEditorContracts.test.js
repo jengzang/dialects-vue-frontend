@@ -215,6 +215,22 @@ describe('Map draw editor contracts', () => {
     expect(editableSource).toMatch(/feature\?\.properties\?\.locked \|\| feature\?\.properties\?\.visible === false[\s\S]*emit\('mode-change', 'simple_select'\)/)
   })
 
+  it('prevents drawing and destructive actions while the active layer is hidden or locked', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+
+    expect(panelSource).toContain('canModifyActiveLayer')
+    expect(panelSource).toContain(':disabled="!canModifyActiveLayer"')
+    expect(panelSource).toContain(':disabled="!canModifyActiveLayer || !selectedFeatureId"')
+    expect(tabSource).toContain('const canModifyActiveLayer = computed')
+    expect(tabSource).toContain('activeLayer.value.visible !== false')
+    expect(tabSource).toContain('activeLayer.value.locked !== true')
+    expect(tabSource).toContain(':can-modify-active-layer="canModifyActiveLayer"')
+    expect(tabSource).toMatch(/const setMode = \(mode\) => \{[\s\S]*if \(!canModifyActiveLayer\.value && mode !== 'simple_select'\) \{[\s\S]*resetDrawSelectionMode\(\);[\s\S]*return;/)
+    expect(tabSource).toMatch(/const handleDeleteSelected = async \(\) => \{[\s\S]*if \(!canModifyActiveLayer\.value\) return;/)
+    expect(tabSource).toMatch(/const handleClearAll = async \(\) => \{[\s\S]*if \(!canModifyActiveLayer\.value\) return;/)
+  })
+
   it('falls back to layer editing when selected feature id is stale', () => {
     const source = readSource(mapDrawTabPath)
 

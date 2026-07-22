@@ -45,6 +45,7 @@
               :data-variant="currentMode === 'draw_point' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'draw_point'"
               type="button"
+              :disabled="!canModifyActiveLayer"
               @click="$emit('set-mode', 'draw_point')"
             >
               <span
@@ -60,6 +61,7 @@
               :data-variant="currentMode === 'draw_line_string' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'draw_line_string'"
               type="button"
+              :disabled="!canModifyActiveLayer"
               @click="$emit('set-mode', 'draw_line_string')"
             >
               <span
@@ -75,6 +77,7 @@
               :data-variant="currentMode === 'draw_polygon' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'draw_polygon'"
               type="button"
+              :disabled="!canModifyActiveLayer"
               @click="$emit('set-mode', 'draw_polygon')"
             >
               <span
@@ -115,6 +118,7 @@
               class="main-glass-button"
               data-variant="secondary"
               type="button"
+              :disabled="!canModifyActiveLayer || !selectedFeatureId"
               @click="$emit('delete-selected')"
             >
               {{ t('map.drawTab.buttons.deleteSelected') }}
@@ -123,6 +127,7 @@
               class="main-glass-button"
               data-variant="secondary"
               type="button"
+              :disabled="!canModifyActiveLayer"
               @click="$emit('clear-all')"
             >
               {{ t('map.drawTab.buttons.clearAll') }}
@@ -349,6 +354,7 @@ const props = defineProps({
   canUndo: { type: Boolean, default: false },
   canRedo: { type: Boolean, default: false },
   canEditShape: { type: Boolean, default: false },
+  canModifyActiveLayer: { type: Boolean, default: false },
 })
 
 defineEmits([

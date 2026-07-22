@@ -136,6 +136,7 @@
           :can-undo="canUndoHistory"
           :can-redo="canRedoHistory"
           :can-edit-shape="canEditSelectedShape"
+          :can-modify-active-layer="canModifyActiveLayer"
           @set-mode="setMode"
           @select-feature="handleSelectFeatureFromPanel"
           @edit-shape="handleEditSelectedShape"
@@ -752,6 +753,13 @@ const selectedEditorProperties = computed(() => {
 
 const selectedEditorFeatureId = computed(() => selectedFeature.value ? selectedFeatureId.value : '');
 const selectedEditorGeometryType = computed(() => selectedFeature.value?.geometry?.type || activeLayer.value?.geometryType || '');
+const canModifyActiveLayer = computed(() => {
+  if (!activeLayer.value) return true;
+  return Boolean(
+    activeLayer.value.visible !== false
+    && activeLayer.value.locked !== true
+  );
+});
 const canEditSelectedShape = computed(() => {
   return Boolean(
     selectedFeatureId.value
@@ -1485,6 +1493,10 @@ const setMode = (mode) => {
     handleCreateLayer(geometryType);
     return;
   }
+  if (!canModifyActiveLayer.value && mode !== 'simple_select') {
+    resetDrawSelectionMode();
+    return;
+  }
   editableMapRef.value?.setDrawMode?.(mode);
   currentMode.value = mode;
 };
@@ -1770,6 +1782,7 @@ const handleImportAsNewLayer = async (event) => {
 
 const handleDeleteSelected = async () => {
   if (!selectedFeatureId.value) return;
+  if (!canModifyActiveLayer.value) return;
   commitHistory();
   editableMapRef.value?.deleteSelected?.();
   currentMode.value = 'simple_select';
@@ -1816,6 +1829,7 @@ const handleDrawHistoryKeydown = (event) => {
 };
 
 const handleClearAll = async () => {
+  if (!canModifyActiveLayer.value) return;
   const confirmed = await showConfirm(t('map.drawTab.messages.clearAllConfirm'));
   if (!confirmed) return;
 
