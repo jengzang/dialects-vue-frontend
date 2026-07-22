@@ -51,15 +51,30 @@
               class="draw-layer-row"
               :data-active="activeLayerId === layer.id"
             >
-              <button
+              <component
+                :is="renamingLayerId === layer.id ? 'div' : 'button'"
                 class="main-glass-button draw-layer-row-button"
                 :data-variant="activeLayerId === layer.id ? 'primary' : 'secondary'"
                 :data-active="activeLayerId === layer.id"
-                type="button"
+                :type="renamingLayerId === layer.id ? undefined : 'button'"
                 @click="$emit('select-layer', layer.id)"
               >
                 <span class="draw-layer-row-main">
-                  <span class="draw-layer-row-title">{{ layer.name }}</span>
+                  <span
+                    v-if="renamingLayerId !== layer.id"
+                    class="draw-layer-row-title"
+                  >{{ layer.name }}</span>
+                  <input
+                    v-else
+                    ref="renameInputRefs"
+                    class="draw-input draw-layer-rename-input"
+                    type="text"
+                    :value="renameDraft"
+                    @click.stop
+                    @input="renameDraft = $event.target.value"
+                    @keydown.enter.stop.prevent="commitLayerRename(layer)"
+                    @keydown.esc.stop.prevent="cancelLayerRename"
+                  >
                   <span class="draw-layer-row-meta">
                     {{ getGeometryLabel(layer.geometryType) }} ·
                     {{ t('map.drawTab.labels.layerFeatureCount', { count: getLayerFeatureCount(layer) }) }}
@@ -69,7 +84,7 @@
                   {{ layer.visible ? t('map.drawTab.labels.visibleShort') : t('map.drawTab.labels.hiddenShort') }}
                   <span v-if="layer.locked"> · {{ t('map.drawTab.labels.lockedShort') }}</span>
                 </span>
-              </button>
+              </component>
               <div class="draw-layer-row-actions">
                 <button
                   class="main-glass-button draw-layer-chip-action"
@@ -124,6 +139,24 @@
                   {{ layer.locked ? t('map.drawTab.buttons.unlockLayer') : t('map.drawTab.buttons.lockLayer') }}
                 </button>
                 <button
+                  v-if="renamingLayerId !== layer.id"
+                  class="main-glass-button draw-layer-chip-action"
+                  data-variant="secondary"
+                  type="button"
+                  @click.stop="startLayerRename(layer)"
+                >
+                  {{ t('map.drawTab.buttons.renameLayer') }}
+                </button>
+                <button
+                  v-else
+                  class="main-glass-button draw-layer-chip-action"
+                  data-variant="secondary"
+                  type="button"
+                  @click.stop="commitLayerRename(layer)"
+                >
+                  {{ t('map.drawTab.buttons.saveLayerName') }}
+                </button>
+                <button
                   class="main-glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
@@ -169,6 +202,7 @@
 </template>
 
 <script setup>
+import { nextTick, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 
@@ -189,11 +223,16 @@ const emit = defineEmits([
   'move-layer-to-bottom',
   'toggle-layer-visibility',
   'toggle-layer-lock',
+  'rename-layer',
   'duplicate-layer',
   'delete-layer',
   'set-all-layers-visibility',
   'update-style-key',
 ])
+
+const renamingLayerId = ref('')
+const renameDraft = ref('')
+const renameInputRefs = ref([])
 
 const getLayerFeatureCount = (layer) => {
   return layer.featureCollection?.features?.length ?? 0
@@ -203,6 +242,31 @@ const getGeometryLabel = (geometryType) => {
   if (geometryType === 'Point') return t('map.drawTab.geometry.point')
   if (geometryType === 'Polygon') return t('map.drawTab.geometry.polygon')
   return t('map.drawTab.geometry.line')
+}
+
+const startLayerRename = (layer) => {
+  renamingLayerId.value = layer.id
+  renameDraft.value = layer.name ?? ''
+  emit('select-layer', layer.id)
+  nextTick(() => {
+    const input = Array.isArray(renameInputRefs.value)
+      ? renameInputRefs.value[0]
+      : renameInputRefs.value
+    input?.focus?.()
+    input?.select?.()
+  })
+}
+
+const cancelLayerRename = () => {
+  renamingLayerId.value = ''
+  renameDraft.value = ''
+}
+
+const commitLayerRename = (layer) => {
+  const nextName = renameDraft.value.trim()
+  cancelLayerRename()
+  if (!nextName || nextName === layer.name) return
+  emit('rename-layer', layer.id, nextName)
 }
 
 const handleStyleUpdate = (value) => {

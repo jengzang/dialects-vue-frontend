@@ -278,6 +278,24 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain('syncAllLayersAfterMutation();')
   })
 
+  it('supports renaming a draw layer from the layers panel', () => {
+    const panelSource = readSource(mapDrawLayersPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+
+    expect(panelSource).toContain('renamingLayerId')
+    expect(panelSource).toContain('renameDraft')
+    expect(panelSource).toContain('startLayerRename(layer)')
+    expect(panelSource).toContain('commitLayerRename(layer)')
+    expect(panelSource).toContain(`emit('rename-layer', layer.id, nextName)`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.renameLayer')`)
+    expect(panelSource).toContain(`'rename-layer'`)
+    expect(tabSource).toContain('@rename-layer="handleRenameLayer"')
+    expect(tabSource).toContain('const handleRenameLayer = (layerId, name) =>')
+    expect(tabSource).toMatch(/const handleRenameLayer = \(layerId, name\) => \{[\s\S]*commitHistory\(\)/)
+    expect(tabSource).toMatch(/targetLayer\.featureCollection = \{[\s\S]*features: \(featureCollection\.features \?\? \[\]\)\.map/)
+    expect(tabSource).toContain('syncAllLayersAfterMutation();')
+  })
+
   it('confirms before deleting a draw layer', () => {
     const source = readSource(mapDrawTabPath)
 
@@ -312,6 +330,19 @@ describe('Map draw editor contracts', () => {
     expect(en.drawTab.buttons.duplicateLayer).toBe('Duplicate Layer')
     expect(en.drawTab.buttons.duplicateFeature).toBe('Duplicate Feature')
     expect(en.drawTab.labels.copySuffix).toBe('Copy')
+  })
+
+  it('has localized labels for renaming draw layers', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.buttons.renameLayer).toBe('重命名')
+    expect(zhCn.drawTab.buttons.saveLayerName).toBe('保存名称')
+    expect(zhHant.drawTab.buttons.renameLayer).toBe('重命名')
+    expect(zhHant.drawTab.buttons.saveLayerName).toBe('保存名稱')
+    expect(en.drawTab.buttons.renameLayer).toBe('Rename')
+    expect(en.drawTab.buttons.saveLayerName).toBe('Save Name')
   })
 
   it('has localized layer row feature count labels', () => {

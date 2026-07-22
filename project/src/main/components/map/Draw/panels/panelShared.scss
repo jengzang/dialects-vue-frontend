@@ -262,6 +262,10 @@
   color: var(--action-primary-text);
 }
 
+div.draw-layer-row-button {
+  cursor: default;
+}
+
 .draw-layer-row-main {
   flex: 1;
   min-width: 0;
@@ -273,6 +277,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.draw-layer-rename-input {
+  padding: 0.35rem 0.55rem;
   font-size: 0.9rem;
   font-weight: 700;
 }

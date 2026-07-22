@@ -486,6 +486,8 @@
       "deleteSelected": "删除选中",
       "duplicateFeature": "复制要素",
       "duplicateLayer": "复制图层",
+      "renameLayer": "重命名",
+      "saveLayerName": "保存名称",
       "deleteLayer": "删除图层",
       "moveLayerUp": "图层上移",
       "moveLayerDown": "图层下移",

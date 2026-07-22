@@ -486,6 +486,8 @@
       "deleteSelected": "Delete Selection",
       "duplicateFeature": "Duplicate Feature",
       "duplicateLayer": "Duplicate Layer",
+      "renameLayer": "Rename",
+      "saveLayerName": "Save Name",
       "deleteLayer": "Delete Layer",
       "moveLayerUp": "Move Layer Up",
       "moveLayerDown": "Move Layer Down",

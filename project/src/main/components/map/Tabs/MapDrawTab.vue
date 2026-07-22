@@ -163,6 +163,7 @@
           @move-layer-to-bottom="moveLayerToBottom"
           @toggle-layer-visibility="toggleLayerVisibility"
           @toggle-layer-lock="toggleLayerLock"
+          @rename-layer="handleRenameLayer"
           @duplicate-layer="handleDuplicateLayer"
           @delete-layer="handleDeleteLayer"
           @set-all-layers-visibility="setAllLayersVisibility"
@@ -1599,6 +1600,32 @@ const toggleLayerLock = (layerId) => {
   if (layerId === activeLayerId.value) {
     resetDrawSelectionMode();
   }
+  syncAllLayersAfterMutation();
+};
+
+const handleRenameLayer = (layerId, name) => {
+  const targetLayer = layers.value.find((item) => item.id === layerId);
+  const nextName = String(name || '').trim();
+  if (!targetLayer || !nextName || targetLayer.name === nextName) return;
+  commitHistory();
+  const previousName = targetLayer.name;
+  targetLayer.name = nextName;
+  const featureCollection = targetLayer.featureCollection ?? emptyFeatureCollection();
+  targetLayer.featureCollection = {
+    ...featureCollection,
+    features: (featureCollection.features ?? []).map((feature) => {
+      const properties = feature.properties ?? {};
+      const featureName = properties.name;
+      if (featureName && featureName !== previousName) return feature;
+      return {
+        ...feature,
+        properties: {
+          ...properties,
+          name: nextName,
+        },
+      };
+    }),
+  };
   syncAllLayersAfterMutation();
 };
 
