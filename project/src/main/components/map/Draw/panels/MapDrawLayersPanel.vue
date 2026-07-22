@@ -117,6 +117,14 @@
                   class="main-glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
+                  @click.stop="$emit('duplicate-layer', layer.id)"
+                >
+                  {{ t('map.drawTab.buttons.duplicateLayer') }}
+                </button>
+                <button
+                  class="main-glass-button draw-layer-chip-action"
+                  data-variant="secondary"
+                  type="button"
                   @click.stop="$emit('delete-layer', layer.id)"
                 >
                   {{ t('map.drawTab.buttons.deleteLayer') }}
@@ -171,6 +179,7 @@ const emit = defineEmits([
   'move-layer-to-bottom',
   'toggle-layer-visibility',
   'toggle-layer-lock',
+  'duplicate-layer',
   'delete-layer',
   'set-all-layers-visibility',
   'update-style-key',

@@ -8,6 +8,10 @@ const projectRoot = resolve(testsDir, '..')
 const editableMapLibrePath = resolve(projectRoot, 'src/main/components/map/EditableMapLibre.vue')
 const mapDrawTabPath = resolve(projectRoot, 'src/main/components/map/Tabs/MapDrawTab.vue')
 const mapDrawToolsPanelPath = resolve(projectRoot, 'src/main/components/map/Draw/panels/MapDrawToolsPanel.vue')
+const mapDrawLayersPanelPath = resolve(projectRoot, 'src/main/components/map/Draw/panels/MapDrawLayersPanel.vue')
+const zhCnMapLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-CN/map.json')
+const zhHantMapLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-Hant/map.json')
+const enMapLocalePath = resolve(projectRoot, 'src/i18n/locales/en/map.json')
 
 function readSource(path) {
   return readFileSync(path, 'utf8')
@@ -216,5 +220,37 @@ describe('Map draw editor contracts', () => {
 
     expect(source).toContain("const selectedEditorFeatureId = computed(() => selectedFeature.value ? selectedFeatureId.value : '');")
     expect(source).toContain(':selected-feature-id="selectedEditorFeatureId"')
+  })
+
+  it('supports duplicating a draw layer from the layers panel', () => {
+    const panelSource = readSource(mapDrawLayersPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+
+    expect(panelSource).toContain(`$emit('duplicate-layer', layer.id)`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.duplicateLayer')`)
+    expect(panelSource).toContain(`'duplicate-layer'`)
+    expect(tabSource).toContain('@duplicate-layer="handleDuplicateLayer"')
+    expect(tabSource).toContain('const cloneFeatureForDuplicateLayer = (feature, index, layerId) =>')
+    expect(tabSource).toContain('const duplicatedFeatureId = `${layerId}-feature-${index + 1}`;')
+    expect(tabSource).toContain('id: duplicatedFeatureId,')
+    expect(tabSource).toContain('const handleDuplicateLayer = (layerId) =>')
+    expect(tabSource).toMatch(/const handleDuplicateLayer = \(layerId\) => \{[\s\S]*commitHistory\(\)/)
+    expect(tabSource).toContain("duplicatedLayer.name = `${sourceLayer.name} ${t('map.drawTab.labels.copySuffix')}`;")
+    expect(tabSource).toContain('.map((feature, index) => cloneFeatureForDuplicateLayer(feature, index, duplicatedLayer.id))')
+    expect(tabSource).toContain('activeLayerId.value = duplicatedLayer.id;')
+    expect(tabSource).toContain('syncAllLayersAfterMutation();')
+  })
+
+  it('has localized labels for duplicating draw layers', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.buttons.duplicateLayer).toBe('复制图层')
+    expect(zhCn.drawTab.labels.copySuffix).toBe('副本')
+    expect(zhHant.drawTab.buttons.duplicateLayer).toBe('複製圖層')
+    expect(zhHant.drawTab.labels.copySuffix).toBe('副本')
+    expect(en.drawTab.buttons.duplicateLayer).toBe('Duplicate Layer')
+    expect(en.drawTab.labels.copySuffix).toBe('Copy')
   })
 })

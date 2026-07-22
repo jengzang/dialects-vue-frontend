@@ -160,6 +160,7 @@
           @move-layer-to-bottom="moveLayerToBottom"
           @toggle-layer-visibility="toggleLayerVisibility"
           @toggle-layer-lock="toggleLayerLock"
+          @duplicate-layer="handleDuplicateLayer"
           @delete-layer="handleDeleteLayer"
           @set-all-layers-visibility="setAllLayersVisibility"
           @update-style-key="handlePanelStyleUpdate"
@@ -1572,6 +1573,54 @@ const toggleLayerLock = (layerId) => {
     resetDrawSelectionMode();
   }
   syncAllLayersAfterMutation();
+};
+
+const cloneFeatureForDuplicateLayer = (feature, index, layerId) => {
+  const duplicatedFeatureId = `${layerId}-feature-${index + 1}`;
+  return {
+    ...feature,
+    id: duplicatedFeatureId,
+    properties: {
+      ...(feature?.properties ?? {}),
+      id: duplicatedFeatureId,
+    },
+    geometry: feature?.geometry
+      ? {
+          ...feature.geometry,
+          coordinates: structuredClone(feature.geometry.coordinates),
+        }
+      : feature?.geometry,
+  };
+};
+
+const handleDuplicateLayer = (layerId) => {
+  const sourceLayer = layers.value.find((item) => item.id === layerId);
+  if (!sourceLayer) return;
+  commitHistory();
+  const duplicatedLayer = createEmptyLayer(sourceLayer.geometryType);
+  duplicatedLayer.name = `${sourceLayer.name} ${t('map.drawTab.labels.copySuffix')}`;
+  duplicatedLayer.stroke = sourceLayer.stroke;
+  duplicatedLayer.strokeWidth = sourceLayer.strokeWidth;
+  duplicatedLayer.fill = sourceLayer.fill;
+  duplicatedLayer.fillOpacity = sourceLayer.fillOpacity;
+  duplicatedLayer.pointRadius = sourceLayer.pointRadius;
+  duplicatedLayer.pointColor = sourceLayer.pointColor;
+  duplicatedLayer.pointStrokeColor = sourceLayer.pointStrokeColor;
+  duplicatedLayer.visible = sourceLayer.visible;
+  duplicatedLayer.locked = sourceLayer.locked;
+  duplicatedLayer.featureCollection = {
+    ...(sourceLayer.featureCollection ?? emptyFeatureCollection()),
+    features: (sourceLayer.featureCollection?.features ?? [])
+      .map((feature, index) => cloneFeatureForDuplicateLayer(feature, index, duplicatedLayer.id)),
+  };
+  const sourceIndex = layers.value.findIndex((item) => item.id === layerId);
+  layers.value.splice(sourceIndex + 1, 0, duplicatedLayer);
+  activeLayerId.value = duplicatedLayer.id;
+  selectedFeatureId.value = '';
+  currentMode.value = 'simple_select';
+  editableMapRef.value?.setDrawMode?.('simple_select');
+  syncAllLayersAfterMutation();
+  editableMapRef.value?.syncReadonlyLayers?.();
 };
 
 const handleDeleteLayer = (layerId) => {
