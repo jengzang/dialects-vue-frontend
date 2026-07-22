@@ -286,6 +286,7 @@ describe('Map draw editor contracts', () => {
     expect(panelSource).toContain('renameDraft')
     expect(panelSource).toContain('startLayerRename(layer)')
     expect(panelSource).toContain('commitLayerRename(layer)')
+    expect(panelSource).toContain('@blur="commitLayerRename(layer)"')
     expect(panelSource).toContain(`emit('rename-layer', layer.id, nextName)`)
     expect(panelSource).toContain(`t('map.drawTab.buttons.renameLayer')`)
     expect(panelSource).toContain(`'rename-layer'`)

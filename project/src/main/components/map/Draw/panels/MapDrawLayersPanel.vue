@@ -71,6 +71,7 @@
                     type="text"
                     :value="renameDraft"
                     @click.stop
+                    @blur="commitLayerRename(layer)"
                     @input="renameDraft = $event.target.value"
                     @keydown.enter.stop.prevent="commitLayerRename(layer)"
                     @keydown.esc.stop.prevent="cancelLayerRename"
