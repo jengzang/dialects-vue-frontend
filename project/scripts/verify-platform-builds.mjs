@@ -2,18 +2,22 @@ import { spawn } from 'node:child_process'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import {
+  getPlatformAcceptanceChecklist,
+  getPlatformAcceptanceDiagnostics,
+} from '../src/platform/featureMatrix.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const projectRoot = path.resolve(__dirname, '..')
 const repoRoot = path.resolve(projectRoot, '..')
 
-const VALID_TARGETS = new Set(['web', 'ios', 'android', 'all'])
+const VALID_TARGETS = new Set(['web', 'ios', 'android', 'acceptance', 'all'])
 const target = process.argv[2] || 'all'
 
 if (!VALID_TARGETS.has(target)) {
   console.error(`Unknown platform verification target: ${target}`)
-  console.error('Usage: node ./scripts/verify-platform-builds.mjs [web|ios|android|all]')
+  console.error('Usage: node ./scripts/verify-platform-builds.mjs [web|ios|android|acceptance|all]')
   process.exit(1)
 }
 
@@ -80,6 +84,32 @@ async function verifyWeb() {
   await run('npm', ['run', 'build:web'])
 }
 
+function verifyAcceptanceChecklist() {
+  const diagnostics = getPlatformAcceptanceDiagnostics()
+  const hasDiagnostics = Object.values(diagnostics).some((items) => items.length > 0)
+
+  if (hasDiagnostics) {
+    console.error('Platform acceptance matrix diagnostics failed:')
+    console.error(JSON.stringify(diagnostics, null, 2))
+    process.exitCode = 1
+    return
+  }
+
+  for (const platform of ['web', 'ios', 'android']) {
+    const checklist = getPlatformAcceptanceChecklist(platform)
+    console.log(`\n${platform.toUpperCase()} acceptance checklist:`)
+
+    if (checklist.length === 0) {
+      console.log('- No acceptance items configured.')
+      continue
+    }
+
+    for (const item of checklist) {
+      console.log(`- [${item.feature}] ${item.id} (${item.driver}) ${item.label}`)
+    }
+  }
+}
+
 async function verifyAndroid() {
   await run('npm', ['run', 'build:android'])
   await syncNativeProjects()
@@ -113,6 +143,10 @@ async function verifyIos() {
 
 if (target === 'web' || target === 'all') {
   await verifyWeb()
+}
+
+if (target === 'acceptance' || target === 'all') {
+  verifyAcceptanceChecklist()
 }
 
 if (target === 'ios' || target === 'all') {

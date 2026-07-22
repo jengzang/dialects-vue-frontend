@@ -14,6 +14,7 @@
     "verify:platform:web": "node ./scripts/verify-platform-builds.mjs web",
     "verify:platform:ios": "node ./scripts/verify-platform-builds.mjs ios",
     "verify:platform:android": "node ./scripts/verify-platform-builds.mjs android",
+    "verify:platform:acceptance": "node ./scripts/verify-platform-builds.mjs acceptance",
     "verify:platform:all": "node ./scripts/verify-platform-builds.mjs all",
     "preview": "vite preview",
     "lint": "eslint src --ext .js,.vue --max-warnings=0",

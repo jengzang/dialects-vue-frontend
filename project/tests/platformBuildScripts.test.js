@@ -19,6 +19,7 @@ describe('platform build scripts', () => {
       'verify:platform:web': 'node ./scripts/verify-platform-builds.mjs web',
       'verify:platform:ios': 'node ./scripts/verify-platform-builds.mjs ios',
       'verify:platform:android': 'node ./scripts/verify-platform-builds.mjs android',
+      'verify:platform:acceptance': 'node ./scripts/verify-platform-builds.mjs acceptance',
       'verify:platform:all': 'node ./scripts/verify-platform-builds.mjs all',
     })
   })
@@ -38,6 +39,8 @@ describe('platform build scripts', () => {
     expect(source).toContain('HTTP_PROXY')
     expect(source).toContain('HTTPS_PROXY')
     expect(source).toContain('ALL_PROXY')
+    expect(source).toContain('getPlatformAcceptanceChecklist')
+    expect(source).toContain('verifyAcceptanceChecklist')
   })
 
   it('runs from project but targets native directories at the repository root', () => {

@@ -43,6 +43,7 @@ npm run build:android
 npm run verify:platform:web
 npm run verify:platform:ios
 npm run verify:platform:android
+npm run verify:platform:acceptance
 npm run verify:platform:all
 ```
 
@@ -53,7 +54,20 @@ npm run verify:platform:all
 | `npm run verify:platform:web` | 執行 `npm run build:web` |
 | `npm run verify:platform:ios` | 執行 `npm run build:ios`、`npx cap sync`、`xcodebuild` |
 | `npm run verify:platform:android` | 執行 `npm run build:android`、`npx cap sync`、`./gradlew assembleDebug` |
+| `npm run verify:platform:acceptance` | 從平台能力矩陣輸出 Web / iOS / Android 驗收清單，並檢查清單配置是否有重複或缺字段 |
 | `npm run verify:platform:all` | 依序驗證 Web、iOS、Android |
+
+## Praat 真機 / 模擬器交互驗收
+
+`npm run verify:platform:acceptance` 會輸出來自 `project/src/platform/featureMatrix.js` 的機器可讀驗收清單。它用於固定每端需要驗收的能力，不會替代人工在 iOS Simulator、Android Emulator 或真機中的點擊操作。
+
+Praat 三端當前至少需要覆蓋：
+
+- Web：瀏覽器文件選擇、瀏覽器錄音、Web Audio 解碼 / 分段、提交 Praat 分析。
+- iOS：Capacitor FilePicker 文件選擇、Capacitor AudioRecorder 錄音保存、麥克風權限拒絕態、Web Audio 解碼 / 分段、提交 Praat 分析。
+- Android：Capacitor FilePicker 文件選擇、Capacitor AudioRecorder 錄音保存、`RECORD_AUDIO` 權限拒絕態、Web Audio 解碼 / 分段、提交 Praat 分析。
+
+原生交互驗收時，應同時覆蓋取消文件選擇、拒絕麥克風權限、錄音 URI 讀取失敗提示，以及超大音頻不通過 FilePicker `readData` 一次性讀入的內存風險。
 
 ## iOS 驗證
 
