@@ -46,8 +46,9 @@ describe('vocabulary explore page shell wiring', () => {
   it('builds the vocabulary workspace with reusable controls and three workflows', () => {
     const vocabularyPage = readSource('src/main/views/explore/word/VocabularyPage.vue')
 
-    expect(vocabularyPage).toContain("import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'")
-    expect(vocabularyPage).toContain('<MultiSelectDropdown')
+    expect(vocabularyPage).toContain("import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'")
+    expect(vocabularyPage).toContain('<SimpleSelectDropdown')
+    expect(vocabularyPage).not.toContain('MultiSelectDropdown')
     expect(vocabularyPage).not.toContain('LocationAndRegionInput')
     expect(vocabularyPage).toContain('top-controls')
     expect(vocabularyPage).toContain('search-container')

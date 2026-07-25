@@ -32,22 +32,11 @@
             </div>
 
             <div class="field-filter">
-              <button
-                ref="searchFieldButton"
-                class="field-filter-btn"
-                type="button"
-                @click="isSearchFieldOpen = !isSearchFieldOpen"
-              >
-                {{ selectedSearchFieldLabel }}
-              </button>
-              <MultiSelectDropdown
-                v-if="isSearchFieldOpen"
-                v-model="selectedSearchFields"
+              <SimpleSelectDropdown
+                v-model="selectedSearchField"
                 :options="searchFieldOptions"
-                :triggerEl="searchFieldButton"
-                align="right"
-                direction="down"
-                @close="isSearchFieldOpen = false"
+                match-trigger-width
+                width="136px"
               />
             </div>
           </div>
@@ -217,7 +206,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
@@ -229,9 +218,7 @@ const query = ref('')
 const locationQuery = ref('')
 const viewMode = ref('card')
 const sortBy = ref('location')
-const selectedSearchFields = ref(['all'])
-const isSearchFieldOpen = ref(false)
-const searchFieldButton = ref(null)
+const selectedSearchField = ref('all')
 const searchInputEl = ref(null)
 
 const workflowTabs = computed(() => [
@@ -248,13 +235,6 @@ const searchFieldOptions = computed(() => [
   { value: 'detail', label: t('words.wordList.search.fields.detail') },
   { value: 'location', label: t('words.wordList.search.fields.location') }
 ])
-
-const selectedSearchFieldLabel = computed(() => {
-  if (selectedSearchFields.value.includes('all') || selectedSearchFields.value.length === 0) {
-    return t('words.wordList.search.fields.all')
-  }
-  return t('words.wordList.search.fieldCount', { count: selectedSearchFields.value.length })
-})
 
 const sortOptions = computed(() => [
   { key: 'location', label: t('words.wordList.sort.location') },
@@ -351,9 +331,9 @@ const visibleEntries = computed(() => {
 
   return previewEntries.value.filter((entry) => {
     const matchesLocation = !place || entry.location.toLowerCase().includes(place)
-    const fields = selectedSearchFields.value.includes('all') || selectedSearchFields.value.length === 0
+    const fields = selectedSearchField.value === 'all'
       ? ['definition', 'headword', 'pronunciation', 'detail', 'location']
-      : selectedSearchFields.value
+      : [selectedSearchField.value]
     const matchesText = !text || fields.some((field) => String(entry[field] ?? '').toLowerCase().includes(text))
     return matchesLocation && matchesText
   })
@@ -470,17 +450,6 @@ function handleConfirmUpload() {
 .field-filter {
   position: relative;
   flex: 0 0 auto;
-}
-
-.field-filter-btn {
-  min-height: 40px;
-  min-width: 116px;
-  padding: 0 12px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  background: var(--glass-10);
-  border: 1px solid var(--glass-30);
-  border-radius: var(--radius-md, 8px);
 }
 
 .view-mode-selector {
@@ -756,7 +725,6 @@ function handleConfirmUpload() {
   }
 
   .field-filter,
-  .field-filter-btn,
   .sort-control {
     width: 100%;
   }
