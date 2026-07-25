@@ -143,8 +143,10 @@
     <section v-else-if="activeWorkflow === 'list' && viewMode === 'table'" class="content-area table-content-area">
       <UniversalTable
         db-key="vocabulary"
-        table-name="entries"
+        table-name="vocabulary_entries"
         :columns="tableColumns"
+        primary-key="id"
+        api-adapter="vocabulary"
       />
     </section>
 
@@ -157,7 +159,27 @@
           </div>
           <label class="main-glass-button" data-variant="primary">
             {{ t('words.wordList.upload.chooseFile') }}
-            <input class="upload-file-input" type="file" accept=".xlsx,.xls,.csv" @change="handleUploadFile" />
+            <input class="upload-file-input" type="file" accept=".xlsx,.xls,.csv,.tsv,.docx,.doc" @change="handleUploadFile" />
+          </label>
+        </div>
+
+        <div class="upload-location-grid">
+          <label v-for="field in uploadLocationFields" :key="field.key" class="upload-field">
+            <span>{{ field.label }}</span>
+            <input
+              v-model="uploadLocation[field.key]"
+              type="text"
+              :required="field.required"
+              :placeholder="field.placeholder"
+            />
+          </label>
+          <label class="upload-field">
+            <span>{{ t('words.wordList.upload.parserMode') }}</span>
+            <select v-model="uploadParserMode">
+              <option v-for="option in parserModeOptions" :key="option.value" :value="option.value">
+                {{ option.label }}
+              </option>
+            </select>
           </label>
         </div>
 
@@ -165,16 +187,29 @@
           embedded
           :title="t('words.wordList.upload.previewTitle')"
           :description="t('words.wordList.upload.previewDesc')"
-          :file="importFlow.pendingFile"
+          :file="selectedUploadFile"
           :schema="importSchema"
+          :mapping-enabled="isVocabularyPreviewFile(selectedUploadFile)"
           :loading="importPreview.loading"
           :preview-table="importPreview.previewTable"
           :diagnostics="importPreview.diagnostics"
           :mapping="importPreview.mapping"
           @update:mapping="importFlow.updateManualMapping"
-          @reset="importFlow.clearPreview"
+          @reset="clearUploadFile"
           @confirm="handleConfirmUpload"
         />
+        <div class="upload-actions">
+          <button
+            class="main-glass-button"
+            data-variant="primary"
+            type="button"
+            :disabled="!canConfirmUpload"
+            @click="handleConfirmUpload"
+          >
+            {{ isUploading ? t('common.label.loading') : t('words.wordList.upload.submit') }}
+          </button>
+        </div>
+        <p v-if="uploadStatusText" class="upload-status">{{ uploadStatusText }}</p>
       </div>
     </section>
 
@@ -213,7 +248,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { watchDebounced } from '@vueuse/core'
-import { getVocabularyItems } from '@/api'
+import { getVocabularyItems, uploadVocabulary } from '@/api'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
@@ -234,6 +269,19 @@ const page = ref(1)
 const pageSize = ref(50)
 const isLoadingItems = ref(false)
 const loadError = ref('')
+const isUploading = ref(false)
+const uploadStatusText = ref('')
+const uploadParserMode = ref('auto')
+const uploadFile = ref(null)
+const uploadLocation = ref({
+  location_name: '',
+  coordinates: '',
+  province: '',
+  city: '',
+  county: '',
+  yindian_region: '',
+  atlas_region: '',
+})
 
 const workflowTabs = computed(() => [
   { key: 'list', label: t('words.wordList.tabs.list') },
@@ -257,13 +305,40 @@ const viewModes = computed(() => [
 ])
 
 const tableColumns = computed(() => [
-  { key: 'definition', label: t('words.wordList.columns.definition'), filterable: false, width: 1.2 },
-  { key: 'headword', label: t('words.wordList.columns.headword'), filterable: false, width: 1 },
-  { key: 'pronunciation', label: t('words.wordList.columns.pronunciation'), filterable: false, width: 1.2 },
-  { key: 'detail', label: t('words.wordList.columns.detail'), filterable: false, width: 1.6 },
+  { key: 'standard_word', label: t('words.wordList.columns.definition'), filterable: false, width: 1.2 },
+  { key: 'local_expression', label: t('words.wordList.columns.headword'), filterable: false, width: 1 },
+  { key: 'ipa', label: t('words.wordList.columns.pronunciation'), filterable: false, width: 1.2 },
+  { key: 'notes', label: t('words.wordList.columns.detail'), filterable: false, width: 1.6 },
   { key: 'location_name', label: t('words.wordList.columns.location'), filterable: true, width: 1 },
-  { key: 'location', label: t('words.wordList.columns.locationFull'), filterable: true, width: 1.6 },
-  { key: 'pronunciation_type', label: t('words.wordList.columns.pronunciationType'), filterable: true, width: 0.8 }
+  { key: 'informations', label: t('words.wordList.columns.informations'), filterable: false, width: 1.2 },
+  { key: 'source_filename', label: t('words.wordList.columns.sourceFilename'), filterable: true, width: 1.2 }
+])
+
+const uploadLocationFields = computed(() => [
+  {
+    key: 'location_name',
+    label: t('words.wordList.upload.locationName'),
+    placeholder: t('words.wordList.upload.locationNamePlaceholder'),
+    required: true
+  },
+  {
+    key: 'coordinates',
+    label: t('words.wordList.upload.coordinates'),
+    placeholder: t('words.wordList.upload.coordinatesPlaceholder'),
+    required: true
+  },
+  { key: 'province', label: t('words.wordList.upload.province'), placeholder: t('words.wordList.upload.province'), required: false },
+  { key: 'city', label: t('words.wordList.upload.city'), placeholder: t('words.wordList.upload.city'), required: false },
+  { key: 'county', label: t('words.wordList.upload.county'), placeholder: t('words.wordList.upload.county'), required: false },
+  { key: 'yindian_region', label: t('words.wordList.upload.yindianRegion'), placeholder: t('words.wordList.upload.yindianRegion'), required: false },
+  { key: 'atlas_region', label: t('words.wordList.upload.atlasRegion'), placeholder: t('words.wordList.upload.atlasRegion'), required: false },
+])
+
+const parserModeOptions = computed(() => [
+  { value: 'auto', label: t('words.wordList.upload.parserModes.auto') },
+  { value: 'table', label: t('words.wordList.upload.parserModes.table') },
+  { value: 'doc_whitespace', label: t('words.wordList.upload.parserModes.docWhitespace') },
+  { value: 'doc_bracket', label: t('words.wordList.upload.parserModes.docBracket') },
 ])
 
 const importSchema = computed(() => [
@@ -287,13 +362,6 @@ const importSchema = computed(() => [
     required: true,
     aliases: ['发音', '發音', '读音', 'pronunciation', 'ipa'],
     example: t('words.wordList.import.examples.pronunciation')
-  },
-  {
-    key: 'location',
-    label: t('words.wordList.columns.location'),
-    required: true,
-    aliases: ['地点', '地點', '方言点', 'location', 'place'],
-    example: t('words.wordList.import.examples.location')
   },
   {
     key: 'detail',
@@ -321,6 +389,16 @@ const mappableEntries = computed(() => {
   return entries.value.filter((entry) => Number.isFinite(entry.longitude) && Number.isFinite(entry.latitude))
 })
 
+const selectedUploadFile = computed(() => uploadFile.value || importFlow.pendingFile.value)
+
+const canConfirmUpload = computed(() => {
+  const file = selectedUploadFile.value
+  if (!file || isUploading.value) {
+    return false
+  }
+  return !isVocabularyPreviewFile(file) || importPreview.diagnostics.value.isComplete
+})
+
 const reviewSubmissions = computed(() => [
   {
     id: 'pending-1',
@@ -338,6 +416,19 @@ function parseLocationFilter(value) {
     .split(/[,，;；\n]+/)
     .map((item) => item.trim())
     .filter(Boolean)
+}
+
+function isVocabularyPreviewFile(file) {
+  return Boolean(file?.name && /\.(xlsx|xls|csv|tsv)$/i.test(file.name))
+}
+
+function isVocabularyUploadFile(file) {
+  return Boolean(file?.name && /\.(xlsx|xls|csv|tsv|docx|doc)$/i.test(file.name))
+}
+
+function clearUploadFile() {
+  uploadFile.value = null
+  importFlow.clearPreview()
 }
 
 function normalizeNumber(value) {
@@ -406,12 +497,56 @@ async function loadVocabularyItems({ append = false } = {}) {
 function handleUploadFile(event) {
   const file = event.target.files?.[0]
   if (!file) return
-  importFlow.loadPreview(file)
+  uploadStatusText.value = ''
+  clearUploadFile()
+
+  if (!isVocabularyUploadFile(file)) {
+    uploadStatusText.value = t('words.wordList.upload.unsupportedFile')
+    event.target.value = ''
+    return
+  }
+
+  if (isVocabularyPreviewFile(file)) {
+    importFlow.loadPreview(file)
+  } else {
+    uploadFile.value = file
+  }
+
   event.target.value = ''
 }
 
-function handleConfirmUpload() {
-  // Backend submission will be connected after the vocabulary API is implemented.
+async function handleConfirmUpload() {
+  const file = uploadFile.value || importFlow.pendingFile.value
+
+  if (!file || isUploading.value) {
+    return
+  }
+
+  const location = Object.fromEntries(
+    Object.entries(uploadLocation.value).map(([key, value]) => [key, String(value || '').trim()])
+  )
+
+  if (!location.location_name || !location.coordinates) {
+    uploadStatusText.value = t('words.wordList.upload.missingLocation')
+    return
+  }
+
+  isUploading.value = true
+  uploadStatusText.value = ''
+
+  try {
+    const response = await uploadVocabulary({
+      file,
+      location,
+      parser_mode: uploadParserMode.value,
+    })
+    uploadStatusText.value = t('words.wordList.upload.success', { count: response.imported_count || 0 })
+    clearUploadFile()
+  } catch (error) {
+    uploadStatusText.value = error.message || t('words.wordList.upload.failed')
+  } finally {
+    isUploading.value = false
+  }
 }
 
 onMounted(() => {
@@ -694,6 +829,39 @@ watchDebounced([query, selectedSearchField, locationQuery], () => {
 .review-mode {
   display: grid;
   gap: 16px;
+}
+
+.upload-location-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.upload-field {
+  display: grid;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.upload-field input,
+.upload-field select {
+  min-height: 38px;
+  padding: 8px 10px;
+  color: var(--text-primary);
+  background: var(--glass-10);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-md, 8px);
+}
+
+.upload-status {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.upload-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .upload-head,

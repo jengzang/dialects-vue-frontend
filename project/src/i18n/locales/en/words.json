@@ -52,6 +52,8 @@
       "pronunciationType": "Pronunciation Type",
       "location": "Location",
       "locationFull": "Full Location",
+      "informations": "Extra Info",
+      "sourceFilename": "Source File",
       "detail": "Detail"
     },
     "table": {
@@ -64,8 +66,29 @@
       "title": "Upload Vocabulary",
       "desc": "Choose a table file, map vocabulary fields, then submit it for review.",
       "chooseFile": "Choose file",
+      "submit": "Submit Vocabulary",
       "previewTitle": "Vocabulary import preview",
-      "previewDesc": "Confirm column mapping and preview rows"
+      "previewDesc": "Confirm column mapping and preview rows",
+      "locationName": "Location Name",
+      "locationNamePlaceholder": "Example: Xifeng",
+      "coordinates": "Coordinates",
+      "coordinatesPlaceholder": "Example: 106.7400,27.0900",
+      "province": "Province",
+      "city": "City",
+      "county": "County",
+      "yindianRegion": "Yindian Region",
+      "atlasRegion": "Atlas Region",
+      "parserMode": "Parser Mode",
+      "parserModes": {
+        "auto": "Auto",
+        "table": "Table",
+        "docWhitespace": "Document whitespace",
+        "docBracket": "Document brackets"
+      },
+      "missingLocation": "Fill in location name and coordinates first.",
+      "unsupportedFile": "Upload a supported vocabulary file (.xlsx, .xls, .csv, .tsv, .docx, .doc).",
+      "success": "Upload complete. Imported {count} rows.",
+      "failed": "Upload failed"
     },
     "import": {
       "examples": {

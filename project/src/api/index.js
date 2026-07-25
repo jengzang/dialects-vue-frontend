@@ -65,6 +65,8 @@ export {
 export {
   buildVocabularyItemsPath,
   getVocabularyItems,
+  uploadVocabulary,
+  vocabularySqlApi,
 } from './main/vocabulary.js';
 
 // ==================== 查询模块 ====================

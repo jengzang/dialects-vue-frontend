@@ -52,6 +52,8 @@
       "pronunciationType": "注音类型",
       "location": "地点",
       "locationFull": "完整地点",
+      "informations": "附加信息",
+      "sourceFilename": "来源文件",
       "detail": "详情"
     },
     "table": {
@@ -64,8 +66,29 @@
       "title": "上传词表",
       "desc": "选择表格文件后映射词表字段，提交后进入审查流程。",
       "chooseFile": "选择文件",
+      "submit": "提交词表",
       "previewTitle": "词表导入预览",
-      "previewDesc": "确认列映射和预览内容"
+      "previewDesc": "确认列映射和预览内容",
+      "locationName": "地点简称",
+      "locationNamePlaceholder": "例如：息烽",
+      "coordinates": "经纬度",
+      "coordinatesPlaceholder": "例如：106.7400,27.0900",
+      "province": "省",
+      "city": "市",
+      "county": "县",
+      "yindianRegion": "音典分区",
+      "atlasRegion": "地图集分区",
+      "parserMode": "解析方式",
+      "parserModes": {
+        "auto": "自动识别",
+        "table": "表格",
+        "docWhitespace": "文档空白分隔",
+        "docBracket": "文档括号识别"
+      },
+      "missingLocation": "请先填写地点简称和经纬度。",
+      "unsupportedFile": "请上传支持的词表文件（.xlsx、.xls、.csv、.tsv、.docx、.doc）。",
+      "success": "上传完成，导入 {count} 条。",
+      "failed": "上传词表失败"
     },
     "import": {
       "examples": {

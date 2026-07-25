@@ -17,6 +17,7 @@ describe('UniversalTable API adapter wiring', () => {
     expect(source).toContain("apiAdapter: { type: String, default: 'normal' }")
     expect(source).toContain('const tableApiAdapters = {')
     expect(source).toContain('normal: {')
+    expect(source).toContain('vocabulary: vocabularySqlApi')
     expect(source).toContain('query: sqlQuery')
     expect(source).toContain('distinct: distinctQuery')
     expect(source).toContain('mutateSingle: mutateSingleRow')

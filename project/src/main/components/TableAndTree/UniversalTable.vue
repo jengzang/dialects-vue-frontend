@@ -516,7 +516,8 @@ import {
   mutateSingleRow,
   batchMutate,
   batchReplacePreview,
-  batchReplaceExecute
+  batchReplaceExecute,
+  vocabularySqlApi
 } from '@/api'
 import AppModal from '@/components/common/AppModal.vue';
 import { userStore } from '@/main/store/store.js';
@@ -547,7 +548,8 @@ const tableApiAdapters = {
     batchMutate,
     batchReplacePreview,
     batchReplaceExecute
-  }
+  },
+  vocabulary: vocabularySqlApi
 }
 
 const tableApi = computed(() => tableApiAdapters[props.apiAdapter] || tableApiAdapters.normal)

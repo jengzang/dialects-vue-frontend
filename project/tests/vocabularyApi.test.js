@@ -10,7 +10,12 @@ vi.mock('../src/utils/ui/message.js', () => ({
   showError: vi.fn(),
 }))
 
-const { buildVocabularyItemsPath, getVocabularyItems } = await import('../src/api/main/vocabulary.js')
+const {
+  buildVocabularyItemsPath,
+  getVocabularyItems,
+  vocabularySqlApi,
+  uploadVocabulary,
+} = await import('../src/api/main/vocabulary.js')
 
 function paramsFromPath(path) {
   return new URL(`http://localhost${path}`).searchParams
@@ -59,5 +64,138 @@ describe('vocabulary items API', () => {
     expect(apiMock.mock.calls[0][0]).toBe(
       '/api/vocabulary/items?q=%E5%A4%AA%E9%98%B3&search_fields=definition&page=1&page_size=50'
     )
+  })
+})
+
+describe('vocabulary table API adapter', () => {
+  it('routes table mode through vocabulary SQL endpoints without db_key', async () => {
+    apiMock.mockResolvedValueOnce({ data: [], total: 0, page: 1 })
+
+    await vocabularySqlApi.query({
+      db_key: 'vocabulary',
+      table_name: 'vocabulary_entries',
+      page: 1,
+      page_size: 50,
+    })
+
+    expect(apiMock).toHaveBeenCalledWith('/api/vocabulary/sql/query', {
+      method: 'POST',
+      body: {
+        table_name: 'vocabulary_entries',
+        page: 1,
+        page_size: 50,
+      },
+    })
+  })
+
+  it('uses vocabulary distinct and mutation endpoints', async () => {
+    apiMock.mockResolvedValueOnce({ values: [] })
+    await vocabularySqlApi.distinct({
+      db_key: 'vocabulary',
+      table_name: 'vocabulary_entries',
+      target_column: 'location_name',
+    })
+
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/distinct-query', {
+      method: 'POST',
+      body: {
+        table_name: 'vocabulary_entries',
+        target_column: 'location_name',
+      },
+    })
+
+    apiMock.mockResolvedValueOnce({ status: 'success' })
+    await vocabularySqlApi.mutateSingle({
+      db_key: 'vocabulary',
+      table_name: 'vocabulary_entries',
+      action: 'update',
+      pk_column: 'id',
+      pk_value: 1,
+      data: { ipa: 'new' },
+    })
+
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/mutate', {
+      method: 'POST',
+      body: {
+        table_name: 'vocabulary_entries',
+        action: 'update',
+        pk_column: 'id',
+        pk_value: 1,
+        data: { ipa: 'new' },
+      },
+    })
+  })
+
+  it('uses vocabulary batch mutation and replace endpoints', async () => {
+    apiMock.mockResolvedValueOnce({ status: 'success' })
+    await vocabularySqlApi.batchMutate({
+      db_key: 'vocabulary',
+      table_name: 'vocabulary_entries',
+      action: 'batch_update',
+      pk_column: 'id',
+      update_data: [{ id: 1, notes: '修订' }],
+    })
+
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/batch-mutate', {
+      method: 'POST',
+      body: {
+        table_name: 'vocabulary_entries',
+        action: 'batch_update',
+        pk_column: 'id',
+        update_data: [{ id: 1, notes: '修订' }],
+      },
+    })
+
+    const replacePayload = {
+      db_key: 'vocabulary',
+      table_name: 'vocabulary_entries',
+      columns: ['notes'],
+      find_text: '旧',
+      replace_text: '新',
+    }
+
+    apiMock.mockResolvedValueOnce({ status: 'success', total_matches: 1 })
+    await vocabularySqlApi.batchReplacePreview(replacePayload)
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/batch-replace-preview', {
+      method: 'POST',
+      body: {
+        table_name: 'vocabulary_entries',
+        columns: ['notes'],
+        find_text: '旧',
+        replace_text: '新',
+      },
+    })
+
+    apiMock.mockResolvedValueOnce({ status: 'success', affected_rows: 1 })
+    await vocabularySqlApi.batchReplaceExecute(replacePayload)
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/batch-replace-execute', {
+      method: 'POST',
+      body: {
+        table_name: 'vocabulary_entries',
+        columns: ['notes'],
+        find_text: '旧',
+        replace_text: '新',
+      },
+    })
+  })
+})
+
+describe('vocabulary upload API', () => {
+  it('submits file, location JSON and parser mode as multipart form data', async () => {
+    apiMock.mockResolvedValueOnce({ success: true })
+    const file = new File(['definition,headword'], 'vocabulary.csv', { type: 'text/csv' })
+    const location = { location_name: '息烽', coordinates: '106.7400,27.0900' }
+
+    await uploadVocabulary({ file, location, parser_mode: 'table' })
+
+    expect(apiMock).toHaveBeenCalledWith('/api/vocabulary/upload', {
+      method: 'POST',
+      body: expect.any(FormData),
+    })
+
+    const formData = apiMock.mock.calls.at(-1)[1].body
+    expect(formData.get('file')).toBe(file)
+    expect(formData.get('location')).toBe(JSON.stringify(location))
+    expect(formData.get('parser_mode')).toBe('table')
   })
 })
