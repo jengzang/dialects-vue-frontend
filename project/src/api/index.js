@@ -67,6 +67,7 @@ export {
   buildVocabularyMapPointsPath,
   getVocabularyItems,
   getVocabularyMapPoints,
+  getVocabularyLocationNames,
   uploadVocabulary,
   vocabularySqlApi,
 } from './main/vocabulary.js';

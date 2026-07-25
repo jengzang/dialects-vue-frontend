@@ -152,6 +152,25 @@ export async function getVocabularyMapPoints(params = {}) {
 }
 
 /**
+ * 获取词表地点简称候选值，供卡片/地图模式的地点多选筛选使用。
+ *
+ * @returns {Promise<string[]>}
+ */
+export async function getVocabularyLocationNames() {
+  try {
+    const response = await vocabularySqlApi.distinct({
+      table_name: 'vocabulary_entries',
+      target_column: 'location_name',
+    })
+    return Array.isArray(response.values) ? response.values : []
+  } catch (error) {
+    console.error('Get vocabulary locations error:', error)
+    showError(error.message || '獲取詞表地點失敗')
+    throw new Error(error.message || '獲取詞表地點失敗')
+  }
+}
+
+/**
  * 上传词表文件。
  *
  * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket'}} params

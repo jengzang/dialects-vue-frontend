@@ -15,6 +15,7 @@ const {
   buildVocabularyMapPointsPath,
   getVocabularyItems,
   getVocabularyMapPoints,
+  getVocabularyLocationNames,
   vocabularySqlApi,
   uploadVocabulary,
 } = await import('../src/api/main/vocabulary.js')
@@ -147,6 +148,21 @@ describe('vocabulary table API adapter', () => {
         pk_column: 'id',
         pk_value: 1,
         data: { ipa: 'new' },
+      },
+    })
+  })
+
+  it('loads vocabulary location names from the vocabulary entries distinct query', async () => {
+    apiMock.mockResolvedValueOnce({ values: ['息烽', '天柱'] })
+
+    const values = await getVocabularyLocationNames()
+
+    expect(values).toEqual(['息烽', '天柱'])
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/distinct-query', {
+      method: 'POST',
+      body: {
+        table_name: 'vocabulary_entries',
+        target_column: 'location_name',
       },
     })
   })

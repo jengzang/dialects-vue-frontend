@@ -32,11 +32,24 @@
             </div>
 
             <div class="field-filter">
-              <SimpleSelectDropdown
-                v-model="selectedSearchField"
+              <button
+                ref="searchFieldTriggerEl"
+                class="select-trigger global-select-trigger filter-select-trigger"
+                :class="{ 'is-open': searchFieldDropdownOpen }"
+                type="button"
+                @click="searchFieldDropdownOpen = !searchFieldDropdownOpen"
+              >
+                <span class="select-label">{{ searchFieldTriggerLabel }}</span>
+                <span class="select-arrow" aria-hidden="true">⌄</span>
+              </button>
+              <MultiSelectDropdown
+                v-if="searchFieldDropdownOpen"
+                v-model="selectedSearchFields"
                 :options="searchFieldOptions"
-                match-trigger-width
-                width="136px"
+                :trigger-el="searchFieldTriggerEl"
+                align="right"
+                direction="down"
+                @close="searchFieldDropdownOpen = false"
               />
             </div>
           </div>
@@ -57,22 +70,27 @@
         </div>
 
         <div class="filter-strip">
-          <div class="filter-input-wrapper">
-            <span class="filter-icon" aria-hidden="true">⌕</span>
-            <input
-              v-model="locationQuery"
-              type="text"
-              :placeholder="t('words.wordList.search.locationPlaceholder')"
-              class="local-filter-input"
-            />
+          <div class="location-filter">
             <button
-              v-if="locationQuery"
-              class="clear-filter-btn"
+              ref="locationTriggerEl"
+              class="select-trigger global-select-trigger location-select-trigger"
+              :class="{ 'is-open': locationDropdownOpen, 'is-disabled': locationOptions.length === 0 }"
               type="button"
-              @click="locationQuery = ''"
+              :disabled="locationOptions.length === 0"
+              @click="locationDropdownOpen = !locationDropdownOpen"
             >
-              ×
+              <span class="select-label">{{ locationTriggerLabel }}</span>
+              <span class="select-arrow" aria-hidden="true">⌄</span>
             </button>
+            <MultiSelectDropdown
+              v-if="locationDropdownOpen"
+              v-model="selectedLocations"
+              :options="locationOptions"
+              :trigger-el="locationTriggerEl"
+              align="left"
+              direction="down"
+              @close="locationDropdownOpen = false"
+            />
           </div>
         </div>
       </template>
@@ -270,8 +288,8 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { watchDebounced } from '@vueuse/core'
-import { getVocabularyItems, getVocabularyMapPoints, uploadVocabulary } from '@/api'
-import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import { getVocabularyItems, getVocabularyLocationNames, getVocabularyMapPoints, uploadVocabulary } from '@/api'
+import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
@@ -281,10 +299,15 @@ const { t } = useI18n()
 
 const activeWorkflow = ref('list')
 const query = ref('')
-const locationQuery = ref('')
 const viewMode = ref('card')
-const selectedSearchField = ref('all')
+const selectedSearchFields = ref([])
+const selectedLocations = ref([])
 const searchInputEl = ref(null)
+const searchFieldTriggerEl = ref(null)
+const locationTriggerEl = ref(null)
+const searchFieldDropdownOpen = ref(false)
+const locationDropdownOpen = ref(false)
+const vocabularyLocationNames = ref([])
 const entries = ref([])
 const mapPoints = ref([])
 const mapStats = ref({
@@ -318,13 +341,35 @@ const workflowTabs = computed(() => [
 ])
 
 const searchFieldOptions = computed(() => [
-  { value: 'all', label: t('words.wordList.search.fields.all') },
   { value: 'definition', label: t('words.wordList.search.fields.definition') },
   { value: 'headword', label: t('words.wordList.search.fields.headword') },
   { value: 'pronunciation', label: t('words.wordList.search.fields.pronunciation') },
   { value: 'detail', label: t('words.wordList.search.fields.detail') },
   { value: 'location', label: t('words.wordList.search.fields.location') }
 ])
+
+const locationOptions = computed(() => {
+  return vocabularyLocationNames.value.map((locationName) => ({
+    value: locationName,
+    label: locationName,
+  }))
+})
+
+const searchFieldTriggerLabel = computed(() => {
+  if (!selectedSearchFields.value.length) {
+    return t('words.wordList.search.fields.all')
+  }
+
+  return formatMultiSelectLabel(selectedSearchFields.value, searchFieldOptions.value, t('words.wordList.search.fields.all'))
+})
+
+const locationTriggerLabel = computed(() => {
+  return formatMultiSelectLabel(
+    selectedLocations.value,
+    locationOptions.value,
+    t('words.wordList.search.locationPlaceholder')
+  )
+})
 
 const viewModes = computed(() => [
   { key: 'table', icon: '▤', label: t('words.wordList.viewModes.table') },
@@ -439,11 +484,29 @@ function shouldUseVocabularyMapPointsApi() {
   return activeWorkflow.value === 'list' && viewMode.value === 'map'
 }
 
-function parseLocationFilter(value) {
-  return value
-    .split(/[,，;；\n]+/)
-    .map((item) => item.trim())
+function formatMultiSelectLabel(selectedValues, options, placeholder) {
+  const selectedLabels = selectedValues
+    .map((value) => options.find((option) => option.value === value)?.label || value)
     .filter(Boolean)
+
+  if (!selectedLabels.length) {
+    return placeholder
+  }
+
+  if (selectedLabels.length === 1) {
+    return selectedLabels[0]
+  }
+
+  return `${selectedLabels[0]} +${selectedLabels.length - 1}`
+}
+
+function normalizeSelectedSearchFields() {
+  const fields = selectedSearchFields.value.filter(Boolean)
+  if (!fields.length) {
+    return []
+  }
+
+  return fields
 }
 
 function isVocabularyPreviewFile(file) {
@@ -485,16 +548,11 @@ function normalizeVocabularyEntry(item) {
 }
 
 function buildVocabularyQueryParams() {
-  const params = {
+  return {
     q: query.value.trim(),
-    locations: parseLocationFilter(locationQuery.value),
+    locations: selectedLocations.value,
+    search_fields: normalizeSelectedSearchFields(),
   }
-
-  if (selectedSearchField.value !== 'all') {
-    params.search_fields = selectedSearchField.value
-  }
-
-  return params
 }
 
 function buildVocabularyItemsParams(overrides = {}) {
@@ -576,6 +634,14 @@ async function loadVocabularyMapPoints() {
     }
   } finally {
     isLoadingItems.value = false
+  }
+}
+
+async function loadVocabularyLocationOptions() {
+  try {
+    vocabularyLocationNames.value = await getVocabularyLocationNames()
+  } catch {
+    vocabularyLocationNames.value = []
   }
 }
 
@@ -663,6 +729,7 @@ async function handleConfirmUpload() {
 }
 
 onMounted(() => {
+  loadVocabularyLocationOptions()
   loadVocabularyItems()
 })
 
@@ -674,7 +741,7 @@ watch([activeWorkflow, viewMode], () => {
   }
 })
 
-watchDebounced([query, selectedSearchField, locationQuery], () => {
+watchDebounced([query, selectedSearchFields, selectedLocations], () => {
   if (shouldUseVocabularyItemsApi()) {
     loadVocabularyItems()
   } else if (shouldUseVocabularyMapPointsApi()) {
@@ -755,8 +822,7 @@ watchDebounced([query, selectedSearchField, locationQuery], () => {
   min-width: 0;
 }
 
-.search-input,
-.local-filter-input {
+.search-input {
   width: 100%;
   min-height: 40px;
   padding: 10px 12px;
@@ -773,6 +839,41 @@ watchDebounced([query, selectedSearchField, locationQuery], () => {
 .field-filter {
   position: relative;
   flex: 0 0 auto;
+}
+
+.location-filter {
+  position: relative;
+  width: min(100%, 360px);
+}
+
+.filter-select-trigger {
+  width: 176px;
+}
+
+.location-select-trigger {
+  width: 100%;
+}
+
+.select-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-primary);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select-arrow {
+  flex: 0 0 auto;
+  margin-left: 8px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  transition: transform 0.18s ease;
+}
+
+.select-trigger.is-open .select-arrow {
+  transform: rotate(180deg);
 }
 
 .view-mode-selector {
@@ -800,37 +901,6 @@ watchDebounced([query, selectedSearchField, locationQuery], () => {
 
 .filter-strip {
   justify-content: space-between;
-}
-
-.filter-input-wrapper {
-  position: relative;
-  flex: 1;
-  min-width: 180px;
-}
-
-.filter-icon {
-  position: absolute;
-  top: 50%;
-  left: 12px;
-  color: var(--text-muted);
-  transform: translateY(-50%);
-}
-
-.local-filter-input {
-  padding-left: 34px;
-}
-
-.clear-filter-btn {
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  width: 26px;
-  height: 26px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-  transform: translateY(-50%);
 }
 
 .content-area {
