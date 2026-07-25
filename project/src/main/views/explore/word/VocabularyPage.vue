@@ -1,131 +1,135 @@
 <template>
-  <section class="vocabulary-page">
-    <header class="vocabulary-page__header main-glass-panel">
-      <div class="vocabulary-page__title-block">
-        <span class="vocabulary-page__icon" aria-hidden="true">📒</span>
-        <div>
-          <h2 class="vocabulary-page__title">{{ t('words.wordList.name') }}</h2>
-          <p class="vocabulary-page__desc">{{ t('words.wordList.desc') }}</p>
+  <div class="vocabulary-page">
+    <div class="top-controls">
+      <div class="header-container">
+        <div class="tab-container" role="tablist" :aria-label="t('words.wordList.tabs.label')">
+          <button
+            v-for="tab in workflowTabs"
+            :key="tab.key"
+            class="tab-btn"
+            :class="{ active: activeWorkflow === tab.key }"
+            type="button"
+            role="tab"
+            :aria-selected="activeWorkflow === tab.key"
+            @click="activeWorkflow = tab.key"
+          >
+            {{ tab.label }}
+          </button>
         </div>
       </div>
 
-      <div class="vocabulary-page__tabs" role="tablist" :aria-label="t('words.wordList.tabs.label')">
-        <button
-          v-for="tab in workflowTabs"
-          :key="tab.key"
-          class="vocabulary-page__tab"
-          :class="{ 'is-active': activeWorkflow === tab.key }"
-          type="button"
-          role="tab"
-          :aria-selected="activeWorkflow === tab.key"
-          @click="activeWorkflow = tab.key"
-        >
-          <span aria-hidden="true">{{ tab.icon }}</span>
-          <span>{{ tab.label }}</span>
-        </button>
-      </div>
-    </header>
+      <template v-if="activeWorkflow === 'list'">
+        <div class="search-container">
+          <div class="search-section">
+            <div class="input-wrapper">
+              <textarea
+                ref="searchInputEl"
+                v-model="query"
+                class="search-input"
+                rows="1"
+                :placeholder="t('words.wordList.search.placeholder')"
+              ></textarea>
+            </div>
 
-    <section v-if="activeWorkflow === 'list'" class="vocabulary-workspace">
-      <div class="vocabulary-toolbar main-glass-panel">
-        <div class="vocabulary-toolbar__search">
-          <label class="vocabulary-toolbar__label" for="vocabulary-search">
-            {{ t('words.wordList.search.label') }}
-          </label>
-          <div class="vocabulary-toolbar__search-row">
-            <textarea
-              id="vocabulary-search"
-              v-model="query"
-              class="vocabulary-toolbar__input"
-              rows="1"
-              :placeholder="t('words.wordList.search.placeholder')"
-            ></textarea>
+            <div class="field-filter">
+              <button
+                ref="searchFieldButton"
+                class="field-filter-btn"
+                type="button"
+                @click="isSearchFieldOpen = !isSearchFieldOpen"
+              >
+                {{ selectedSearchFieldLabel }}
+              </button>
+              <MultiSelectDropdown
+                v-if="isSearchFieldOpen"
+                v-model="selectedSearchFields"
+                :options="searchFieldOptions"
+                :triggerEl="searchFieldButton"
+                align="right"
+                direction="down"
+                @close="isSearchFieldOpen = false"
+              />
+            </div>
+          </div>
 
+          <div class="view-mode-selector">
             <button
-              ref="searchFieldButton"
-              class="main-glass-button vocabulary-toolbar__field-btn"
-              data-variant="secondary"
+              v-for="mode in viewModes"
+              :key="mode.key"
+              class="mode-btn"
+              :class="{ active: viewMode === mode.key }"
               type="button"
-              @click="isSearchFieldOpen = !isSearchFieldOpen"
+              :title="mode.label"
+              @click="viewMode = mode.key"
             >
-              {{ selectedSearchFieldLabel }}
+              <span aria-hidden="true">{{ mode.icon }}</span>
             </button>
-
-            <MultiSelectDropdown
-              v-if="isSearchFieldOpen"
-              v-model="selectedSearchFields"
-              :options="searchFieldOptions"
-              :triggerEl="searchFieldButton"
-              align="right"
-              direction="down"
-              @close="isSearchFieldOpen = false"
-            />
           </div>
         </div>
 
-        <div class="vocabulary-toolbar__filters">
-          <div class="vocabulary-toolbar__location">
-            <LocationAndRegionInput
-              v-model="locationFilter"
-              limit-context="default"
+        <div class="filter-strip">
+          <div class="filter-input-wrapper">
+            <span class="filter-icon" aria-hidden="true">⌕</span>
+            <input
+              v-model="locationQuery"
+              type="text"
+              :placeholder="t('words.wordList.search.locationPlaceholder')"
+              class="local-filter-input"
             />
+            <button
+              v-if="locationQuery"
+              class="clear-filter-btn"
+              type="button"
+              @click="locationQuery = ''"
+            >
+              ×
+            </button>
           </div>
 
-          <div class="vocabulary-toolbar__side-controls">
-            <label class="vocabulary-toolbar__label" for="vocabulary-sort">
-              {{ t('words.wordList.sort.label') }}
-            </label>
-            <select id="vocabulary-sort" v-model="sortBy" class="vocabulary-toolbar__select">
+          <label class="sort-control">
+            <span>{{ t('words.wordList.sort.label') }}</span>
+            <select v-model="sortBy">
               <option v-for="option in sortOptions" :key="option.key" :value="option.key">
                 {{ option.label }}
               </option>
             </select>
+          </label>
+        </div>
+      </template>
+    </div>
 
-            <div class="vocabulary-toolbar__view-modes" :aria-label="t('words.wordList.viewModes.label')">
-              <button
-                v-for="mode in viewModes"
-                :key="mode.key"
-                class="vocabulary-toolbar__mode"
-                :class="{ 'is-active': viewMode === mode.key }"
-                type="button"
-                :title="mode.label"
-                @click="viewMode = mode.key"
-              >
-                <span aria-hidden="true">{{ mode.icon }}</span>
-              </button>
+    <section v-if="activeWorkflow === 'list'" class="content-area">
+      <div v-if="viewMode === 'card'" class="card-mode">
+        <div class="cards-grid">
+          <article
+            v-for="entry in visibleEntries"
+            :key="entry.id"
+            class="card vocabulary-card"
+          >
+            <div class="card-row row-1">
+              <span class="location-chain">{{ entry.location }}</span>
+              <span class="category-chain">{{ entry.pronunciationType }}</span>
             </div>
-          </div>
+            <div class="card-row row-2">
+              <span class="word-text">{{ entry.headword }}</span>
+              <span class="pronunciation-text">{{ entry.pronunciation }}</span>
+            </div>
+            <div class="card-row row-3">
+              <span class="definition-text">{{ entry.definition }}</span>
+            </div>
+            <div class="card-row row-4">
+              <span class="memo-text">{{ entry.detail }}</span>
+            </div>
+          </article>
         </div>
       </div>
 
-      <div v-if="viewMode === 'card'" class="vocabulary-results vocabulary-results--cards">
-        <article
-          v-for="entry in previewEntries"
-          :key="entry.id"
-          class="vocabulary-card main-glass-panel"
-        >
-          <div class="vocabulary-card__head">
-            <div>
-              <h3>{{ entry.headword }}</h3>
-              <p>{{ entry.pronunciation }}</p>
-            </div>
-            <span>{{ entry.pronunciationType }}</span>
-          </div>
-          <p class="vocabulary-card__definition">{{ entry.definition }}</p>
-          <p class="vocabulary-card__detail">{{ entry.detail }}</p>
-          <div class="vocabulary-card__meta">
-            <span>{{ entry.location }}</span>
-            <span>{{ entry.updatedAt }}</span>
-          </div>
-        </article>
-      </div>
-
-      <div v-else-if="viewMode === 'table'" class="vocabulary-results main-glass-panel">
+      <div v-else-if="viewMode === 'table'" class="table-mode main-glass-panel">
         <div class="vocabulary-table ui-scrollbar" role="table" :aria-label="t('words.wordList.table.label')">
           <div class="vocabulary-table__row vocabulary-table__row--head" role="row">
             <span v-for="column in tableColumns" :key="column.key" role="columnheader">{{ column.label }}</span>
           </div>
-          <div v-for="entry in previewEntries" :key="entry.id" class="vocabulary-table__row" role="row">
+          <div v-for="entry in visibleEntries" :key="entry.id" class="vocabulary-table__row" role="row">
             <span>{{ entry.headword }}</span>
             <span>{{ entry.definition }}</span>
             <span>{{ entry.pronunciation }}</span>
@@ -135,13 +139,13 @@
         </div>
       </div>
 
-      <div v-else-if="viewMode === 'map'" class="vocabulary-results vocabulary-map main-glass-panel">
-        <div class="vocabulary-map__placeholder">
+      <div v-else-if="viewMode === 'map'" class="map-mode main-glass-panel">
+        <div class="map-placeholder">
           <span aria-hidden="true">🗺️</span>
           <p>{{ t('words.wordList.map.placeholder') }}</p>
         </div>
-        <div class="vocabulary-map__list">
-          <div v-for="entry in previewEntries" :key="entry.id" class="vocabulary-map__item">
+        <div class="map-result-list ui-scrollbar">
+          <div v-for="entry in visibleEntries" :key="entry.id" class="map-result-item">
             <strong>{{ entry.headword }}</strong>
             <span>{{ entry.location }}</span>
           </div>
@@ -149,14 +153,16 @@
       </div>
     </section>
 
-    <section v-else-if="activeWorkflow === 'upload'" class="vocabulary-workspace">
-      <div class="vocabulary-upload main-glass-panel">
-        <div class="vocabulary-upload__intro">
-          <h3>{{ t('words.wordList.upload.title') }}</h3>
-          <p>{{ t('words.wordList.upload.desc') }}</p>
+    <section v-else-if="activeWorkflow === 'upload'" class="content-area">
+      <div class="upload-mode main-glass-panel">
+        <div class="upload-head">
+          <div>
+            <h3>{{ t('words.wordList.upload.title') }}</h3>
+            <p>{{ t('words.wordList.upload.desc') }}</p>
+          </div>
           <label class="main-glass-button" data-variant="primary">
             {{ t('words.wordList.upload.chooseFile') }}
-            <input class="vocabulary-upload__file" type="file" accept=".xlsx,.xls,.csv" @change="handleUploadFile" />
+            <input class="upload-file-input" type="file" accept=".xlsx,.xls,.csv" @change="handleUploadFile" />
           </label>
         </div>
 
@@ -177,23 +183,23 @@
       </div>
     </section>
 
-    <section v-else-if="activeWorkflow === 'review'" class="vocabulary-workspace">
-      <div class="vocabulary-review main-glass-panel">
-        <div class="vocabulary-review__head">
+    <section v-else-if="activeWorkflow === 'review'" class="content-area">
+      <div class="review-mode main-glass-panel">
+        <div class="review-head">
           <div>
             <h3>{{ t('words.wordList.review.title') }}</h3>
             <p>{{ t('words.wordList.review.desc') }}</p>
           </div>
-          <span class="vocabulary-review__badge">{{ t('words.wordList.review.permissionBadge') }}</span>
+          <span class="review-badge">{{ t('words.wordList.review.permissionBadge') }}</span>
         </div>
 
-        <div class="vocabulary-review__list">
-          <article v-for="submission in reviewSubmissions" :key="submission.id" class="vocabulary-review__item">
+        <div class="review-list">
+          <article v-for="submission in reviewSubmissions" :key="submission.id" class="review-item">
             <div>
               <strong>{{ submission.fileName }}</strong>
               <p>{{ submission.meta }}</p>
             </div>
-            <div class="vocabulary-review__actions">
+            <div class="review-actions">
               <button class="main-glass-button" data-variant="secondary" type="button">
                 {{ t('words.wordList.review.reject') }}
               </button>
@@ -205,7 +211,7 @@
         </div>
       </div>
     </section>
-  </section>
+  </div>
 </template>
 
 <script setup>
@@ -215,23 +221,23 @@ import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
-import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
 
 const { t } = useI18n()
 
 const activeWorkflow = ref('list')
 const query = ref('')
+const locationQuery = ref('')
 const viewMode = ref('card')
 const sortBy = ref('location')
 const selectedSearchFields = ref(['all'])
 const isSearchFieldOpen = ref(false)
 const searchFieldButton = ref(null)
-const locationFilter = ref({ locations: [], regions: [], regionUsing: 'map' })
+const searchInputEl = ref(null)
 
 const workflowTabs = computed(() => [
-  { key: 'list', icon: '🔍', label: t('words.wordList.tabs.list') },
-  { key: 'upload', icon: '⬆️', label: t('words.wordList.tabs.upload') },
-  { key: 'review', icon: '✓', label: t('words.wordList.tabs.review') }
+  { key: 'list', label: t('words.wordList.tabs.list') },
+  { key: 'upload', label: t('words.wordList.tabs.upload') },
+  { key: 'review', label: t('words.wordList.tabs.review') }
 ])
 
 const searchFieldOptions = computed(() => [
@@ -258,8 +264,8 @@ const sortOptions = computed(() => [
 ])
 
 const viewModes = computed(() => [
+  { key: 'table', icon: '▤', label: t('words.wordList.viewModes.table') },
   { key: 'card', icon: '▦', label: t('words.wordList.viewModes.card') },
-  { key: 'table', icon: '☷', label: t('words.wordList.viewModes.table') },
   { key: 'map', icon: '⌖', label: t('words.wordList.viewModes.map') }
 ])
 
@@ -326,8 +332,7 @@ const previewEntries = computed(() => [
     pronunciation: t('words.wordList.samples.one.pronunciation'),
     pronunciationType: 'IPA',
     detail: t('words.wordList.samples.one.detail'),
-    location: t('words.wordList.samples.one.location'),
-    updatedAt: '2026-07-25'
+    location: t('words.wordList.samples.one.location')
   },
   {
     id: 'sample-2',
@@ -336,10 +341,23 @@ const previewEntries = computed(() => [
     pronunciation: t('words.wordList.samples.two.pronunciation'),
     pronunciationType: 'IPA',
     detail: t('words.wordList.samples.two.detail'),
-    location: t('words.wordList.samples.two.location'),
-    updatedAt: '2026-07-25'
+    location: t('words.wordList.samples.two.location')
   }
 ])
+
+const visibleEntries = computed(() => {
+  const place = locationQuery.value.trim().toLowerCase()
+  const text = query.value.trim().toLowerCase()
+
+  return previewEntries.value.filter((entry) => {
+    const matchesLocation = !place || entry.location.toLowerCase().includes(place)
+    const fields = selectedSearchFields.value.includes('all') || selectedSearchFields.value.length === 0
+      ? ['definition', 'headword', 'pronunciation', 'detail', 'location']
+      : selectedSearchFields.value
+    const matchesText = !text || fields.some((field) => String(entry[field] ?? '').toLowerCase().includes(text))
+    return matchesLocation && matchesText
+  })
+})
 
 const reviewSubmissions = computed(() => [
   {
@@ -363,63 +381,49 @@ function handleConfirmUpload() {
 
 <style scoped lang="scss">
 .vocabulary-page {
-  width: min(100%, 1180px);
-  margin: 0 auto;
-  padding: 20px;
+  width: 100%;
+  min-height: 100%;
+  padding: 16px 20px 24px;
   color: var(--text-primary);
 }
 
-.vocabulary-page__header {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px;
-}
-
-.vocabulary-page__title-block {
-  display: flex;
-  min-width: 0;
-  gap: 14px;
-  align-items: center;
-}
-
-.vocabulary-page__icon {
-  display: inline-grid;
-  flex: 0 0 44px;
-  width: 44px;
-  height: 44px;
-  place-items: center;
-  font-size: 26px;
+.top-controls {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  margin: 0 auto 16px;
   background: var(--glass-20);
   border: 1px solid var(--glass-30);
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-lg, 8px);
+  box-shadow: var(--shadow-soft, 0 8px 24px rgba(0, 0, 0, 0.08));
+  backdrop-filter: blur(10px);
 }
 
-.vocabulary-page__title {
-  margin: 0;
-  font-size: 1.45rem;
-  font-weight: 700;
+.header-container,
+.search-container,
+.search-section,
+.filter-strip {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
-.vocabulary-page__desc {
-  margin: 4px 0 0;
-  color: var(--text-secondary);
-  font-size: 0.95rem;
+.header-container {
+  justify-content: space-between;
 }
 
-.vocabulary-page__tabs {
+.tab-container {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.vocabulary-page__tab {
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
+.tab-btn {
   min-height: 36px;
-  padding: 0 12px;
+  padding: 0 14px;
   color: var(--text-secondary);
   cursor: pointer;
   background: var(--glass-10);
@@ -427,38 +431,29 @@ function handleConfirmUpload() {
   border-radius: var(--radius-md, 8px);
 }
 
-.vocabulary-page__tab.is-active {
+.tab-btn.active {
   color: var(--text-primary);
   background: var(--glass-30);
   border-color: var(--color-primary-hover);
 }
 
-.vocabulary-workspace {
-  margin-top: 16px;
+.search-container {
+  align-items: flex-start;
 }
 
-.vocabulary-toolbar {
-  display: grid;
-  gap: 16px;
-  padding: 18px;
+.search-section {
+  flex: 1;
+  min-width: 0;
 }
 
-.vocabulary-toolbar__label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
+.input-wrapper {
+  flex: 1;
+  min-width: 0;
 }
 
-.vocabulary-toolbar__search-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
-  align-items: start;
-}
-
-.vocabulary-toolbar__input,
-.vocabulary-toolbar__select {
+.search-input,
+.local-filter-input,
+.sort-control select {
   width: 100%;
   min-height: 40px;
   padding: 10px 12px;
@@ -468,35 +463,35 @@ function handleConfirmUpload() {
   border-radius: var(--radius-md, 8px);
 }
 
-.vocabulary-toolbar__input {
+.search-input {
   resize: vertical;
 }
 
-.vocabulary-toolbar__field-btn {
+.field-filter {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.field-filter-btn {
+  min-height: 40px;
   min-width: 116px;
+  padding: 0 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: var(--glass-10);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-md, 8px);
 }
 
-.vocabulary-toolbar__filters {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px;
-  gap: 16px;
-  align-items: start;
-}
-
-.vocabulary-toolbar__side-controls {
-  display: grid;
-  gap: 10px;
-}
-
-.vocabulary-toolbar__view-modes {
+.view-mode-selector {
   display: flex;
   gap: 6px;
 }
 
-.vocabulary-toolbar__mode {
+.mode-btn {
   display: inline-grid;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   place-items: center;
   color: var(--text-secondary);
   cursor: pointer;
@@ -505,72 +500,121 @@ function handleConfirmUpload() {
   border-radius: var(--radius-md, 8px);
 }
 
-.vocabulary-toolbar__mode.is-active {
+.mode-btn.active {
   color: var(--text-primary);
   background: var(--glass-30);
   border-color: var(--color-primary-hover);
 }
 
-.vocabulary-results {
-  margin-top: 16px;
+.filter-strip {
+  justify-content: space-between;
 }
 
-.vocabulary-results--cards {
+.filter-input-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+}
+
+.filter-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  color: var(--text-muted);
+  transform: translateY(-50%);
+}
+
+.local-filter-input {
+  padding-left: 34px;
+}
+
+.clear-filter-btn {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  transform: translateY(-50%);
+}
+
+.sort-control {
+  display: flex;
+  flex: 0 0 220px;
+  gap: 8px;
+  align-items: center;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.content-area {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+}
+
+.cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 14px;
 }
 
-.vocabulary-card {
-  padding: 16px;
+.card {
+  padding: 14px 16px;
+  background: var(--glass-10);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-lg, 8px);
 }
 
-.vocabulary-card__head,
-.vocabulary-card__meta {
+.card-row {
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
+  gap: 10px;
+  align-items: baseline;
   justify-content: space-between;
 }
 
-.vocabulary-card__head h3 {
-  margin: 0;
-  font-size: 1.35rem;
+.row-2,
+.row-3,
+.row-4 {
+  margin-top: 10px;
 }
 
-.vocabulary-card__head p,
-.vocabulary-card__detail,
-.vocabulary-card__meta {
+.location-chain,
+.category-chain,
+.pronunciation-text,
+.memo-text {
   color: var(--text-secondary);
 }
 
-.vocabulary-card__head p {
-  margin: 4px 0 0;
-}
-
-.vocabulary-card__head span,
-.vocabulary-review__badge {
+.category-chain {
   flex: 0 0 auto;
-  padding: 4px 8px;
-  color: var(--text-secondary);
+  padding: 2px 7px;
+  font-size: 0.82rem;
   background: var(--glass-20);
   border: 1px solid var(--glass-30);
   border-radius: var(--radius-sm, 6px);
 }
 
-.vocabulary-card__definition {
-  margin: 14px 0 8px;
+.word-text {
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.definition-text {
   font-weight: 600;
 }
 
-.vocabulary-card__detail {
-  margin: 0;
+.memo-text {
   line-height: 1.6;
 }
 
-.vocabulary-card__meta {
-  margin-top: 14px;
-  font-size: 0.88rem;
+.table-mode,
+.map-mode,
+.upload-mode,
+.review-mode {
+  padding: 16px;
 }
 
 .vocabulary-table {
@@ -600,14 +644,14 @@ function handleConfirmUpload() {
   background: var(--glass-20);
 }
 
-.vocabulary-map {
+.map-mode {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 280px;
   min-height: 420px;
   overflow: hidden;
 }
 
-.vocabulary-map__placeholder {
+.map-placeholder {
   display: grid;
   place-items: center;
   align-content: center;
@@ -616,16 +660,17 @@ function handleConfirmUpload() {
   background: var(--glass-10);
 }
 
-.vocabulary-map__placeholder span {
+.map-placeholder span {
   font-size: 42px;
 }
 
-.vocabulary-map__list {
+.map-result-list {
   padding: 14px;
+  overflow: auto;
   border-left: 1px solid var(--glass-20);
 }
 
-.vocabulary-map__item {
+.map-result-item {
   display: flex;
   justify-content: space-between;
   gap: 10px;
@@ -633,78 +678,99 @@ function handleConfirmUpload() {
   border-bottom: 1px solid var(--glass-20);
 }
 
-.vocabulary-upload,
-.vocabulary-review {
+.upload-mode,
+.review-mode {
   display: grid;
   gap: 16px;
-  padding: 18px;
 }
 
-.vocabulary-upload__intro h3,
-.vocabulary-review__head h3 {
-  margin: 0;
-  font-size: 1.15rem;
-}
-
-.vocabulary-upload__intro p,
-.vocabulary-review__head p,
-.vocabulary-review__item p {
-  margin: 6px 0 0;
-  color: var(--text-secondary);
-}
-
-.vocabulary-upload__file {
-  display: none;
-}
-
-.vocabulary-review__head,
-.vocabulary-review__item {
+.upload-head,
+.review-head,
+.review-item {
   display: flex;
   gap: 14px;
   align-items: center;
   justify-content: space-between;
 }
 
-.vocabulary-review__list {
+.upload-head h3,
+.review-head h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.upload-head p,
+.review-head p,
+.review-item p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+}
+
+.upload-file-input {
+  display: none;
+}
+
+.review-badge {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  color: var(--text-secondary);
+  background: var(--glass-20);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-sm, 6px);
+}
+
+.review-list {
   display: grid;
   gap: 10px;
 }
 
-.vocabulary-review__item {
+.review-item {
   padding: 14px;
   background: var(--glass-10);
   border: 1px solid var(--glass-30);
   border-radius: var(--radius-md, 8px);
 }
 
-.vocabulary-review__actions {
+.review-actions {
   display: flex;
   gap: 8px;
 }
 
 @media (max-width: 768px) {
   .vocabulary-page {
-    padding: 14px;
+    padding: 12px;
   }
 
-  .vocabulary-page__header,
-  .vocabulary-review__head,
-  .vocabulary-review__item {
+  .top-controls {
+    position: static;
+  }
+
+  .search-container,
+  .search-section,
+  .filter-strip,
+  .upload-head,
+  .review-head,
+  .review-item {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .vocabulary-toolbar__search-row,
-  .vocabulary-toolbar__filters,
-  .vocabulary-map {
-    grid-template-columns: 1fr;
-  }
-
-  .vocabulary-toolbar__field-btn {
+  .field-filter,
+  .field-filter-btn,
+  .sort-control {
     width: 100%;
   }
 
-  .vocabulary-map__list {
+  .sort-control {
+    flex: 1 1 auto;
+    align-items: stretch;
+  }
+
+  .map-mode {
+    grid-template-columns: 1fr;
+  }
+
+  .map-result-list {
     border-top: 1px solid var(--glass-20);
     border-left: 0;
   }

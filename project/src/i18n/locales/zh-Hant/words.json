@@ -21,6 +21,7 @@
     "search": {
       "label": "搜索",
       "placeholder": "搜索釋義、詞條、發音、詳情或地點",
+      "locationPlaceholder": "按地點篩選當前結果",
       "fieldCount": "已選 {count} 列",
       "fields": {
         "all": "全部列",

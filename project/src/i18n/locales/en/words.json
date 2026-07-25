@@ -21,6 +21,7 @@
     "search": {
       "label": "Search",
       "placeholder": "Search definition, headword, pronunciation, detail, or location",
+      "locationPlaceholder": "Filter current results by location",
       "fieldCount": "{count} columns",
       "fields": {
         "all": "All columns",

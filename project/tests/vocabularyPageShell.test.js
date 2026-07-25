@@ -48,6 +48,10 @@ describe('vocabulary explore page shell wiring', () => {
 
     expect(vocabularyPage).toContain("import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'")
     expect(vocabularyPage).toContain('<MultiSelectDropdown')
+    expect(vocabularyPage).not.toContain('LocationAndRegionInput')
+    expect(vocabularyPage).toContain('top-controls')
+    expect(vocabularyPage).toContain('search-container')
+    expect(vocabularyPage).toContain('view-mode-selector')
     expect(vocabularyPage).toContain("key: 'list'")
     expect(vocabularyPage).toContain("key: 'upload'")
     expect(vocabularyPage).toContain("key: 'review'")
