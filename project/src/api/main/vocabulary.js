@@ -4,7 +4,10 @@ import { showError } from '@/utils/ui/message.js'
 
 const VOCABULARY_ITEMS_ENDPOINT = '/api/vocabulary/items'
 const VOCABULARY_MAP_POINTS_ENDPOINT = '/api/vocabulary/map-points'
+const VOCABULARY_LOCATIONS_ENDPOINT = '/api/vocabulary/locations'
+const VOCABULARY_LOGS_ENDPOINT = '/api/vocabulary/logs'
 const VOCABULARY_SQL_ENDPOINT = '/api/vocabulary/sql'
+const VOCABULARY_ENTRIES_TABLE = 'vocabulary_entries'
 
 function stripVocabularyDbKey(params = {}) {
   const { db_key: _dbKey, ...rest } = params
@@ -30,14 +33,37 @@ function appendListIfPresent(params, key, value) {
   appendScalarIfPresent(params, key, value)
 }
 
+function appendQueryParams(values = {}) {
+  const query = new URLSearchParams()
+  Object.entries(values).forEach(([key, value]) => {
+    appendListIfPresent(query, key, value)
+  })
+  const suffix = query.toString()
+  return suffix ? `?${suffix}` : ''
+}
+
+function assertVocabularyEntriesTable(params = {}) {
+  if (params.table_name && params.table_name !== VOCABULARY_ENTRIES_TABLE) {
+    throw new Error('/api/vocabulary/sql/* 只允許操作 vocabulary_entries')
+  }
+}
+
+function stripAndValidateVocabularySqlParams(params = {}) {
+  assertVocabularyEntriesTable(params)
+  return stripVocabularyDbKey({
+    ...params,
+    table_name: VOCABULARY_ENTRIES_TABLE,
+  })
+}
+
 /**
- * @typedef {'all' | 'definition' | 'headword' | 'pronunciation' | 'detail' | 'location'} VocabularySearchField
+ * @typedef {'all' | 'definition' | 'headword' | 'ipa' | 'notes'} VocabularySearchField
  */
 
 /**
  * @typedef {object} VocabularyItemsQuery
- * @property {string} [q] 模糊搜索内容。未传 search_fields 时，后端默认只搜 definition、headword、pronunciation、detail，不搜 location。
- * @property {VocabularySearchField | VocabularySearchField[]} [search_fields] 指定 q 搜索字段；如需用 q 搜地点，需要显式传 location。
+ * @property {string} [q] 模糊搜索内容。
+ * @property {VocabularySearchField | VocabularySearchField[]} [search_fields] 指定 q 搜索字段。
  * @property {string | string[]} [locations] 独立地点筛选，多个地点之间为 OR；该筛选与 q 内容匹配是 AND 关系。
  * @property {number} [page=1] 卡片模式结果页码；后端默认 1。
  * @property {number} [page_size=50] 卡片模式每页数量；后端默认 50，最大 200。
@@ -90,15 +116,13 @@ function appendListIfPresent(params, key, value) {
  * @returns {string}
  */
 export function buildVocabularyItemsPath(params = {}) {
-  const query = new URLSearchParams()
-  appendScalarIfPresent(query, 'q', params.q)
-  appendListIfPresent(query, 'search_fields', params.search_fields)
-  appendListIfPresent(query, 'locations', params.locations)
-  appendScalarIfPresent(query, 'page', params.page)
-  appendScalarIfPresent(query, 'page_size', params.page_size)
-
-  const suffix = query.toString() ? `?${query.toString()}` : ''
-  return `${VOCABULARY_ITEMS_ENDPOINT}${suffix}`
+  return `${VOCABULARY_ITEMS_ENDPOINT}${appendQueryParams({
+    q: params.q,
+    search_fields: params.search_fields,
+    locations: params.locations,
+    page: params.page,
+    page_size: params.page_size,
+  })}`
 }
 
 /**
@@ -110,13 +134,11 @@ export function buildVocabularyItemsPath(params = {}) {
  * @returns {string}
  */
 export function buildVocabularyMapPointsPath(params = {}) {
-  const query = new URLSearchParams()
-  appendScalarIfPresent(query, 'q', params.q)
-  appendListIfPresent(query, 'search_fields', params.search_fields)
-  appendListIfPresent(query, 'locations', params.locations)
-
-  const suffix = query.toString() ? `?${query.toString()}` : ''
-  return `${VOCABULARY_MAP_POINTS_ENDPOINT}${suffix}`
+  return `${VOCABULARY_MAP_POINTS_ENDPOINT}${appendQueryParams({
+    q: params.q,
+    search_fields: params.search_fields,
+    locations: params.locations,
+  })}`
 }
 
 /**
@@ -158,15 +180,82 @@ export async function getVocabularyMapPoints(params = {}) {
  */
 export async function getVocabularyLocationNames() {
   try {
-    const response = await vocabularySqlApi.distinct({
-      table_name: 'vocabulary_entries',
-      target_column: 'location_name',
-    })
-    return Array.isArray(response.values) ? response.values : []
+    const pageSize = 200
+    let currentPage = 1
+    let totalCount = 0
+    let loadedCount = 0
+    const names = []
+
+    do {
+      const response = await getVocabularyLocations({ page: currentPage, page_size: pageSize })
+      const locations = Array.isArray(response.locations) ? response.locations : []
+      names.push(...locations.map((location) => location.location_name).filter(Boolean))
+      loadedCount += locations.length
+      totalCount = Number(response.total) || names.length
+      if (!locations.length) {
+        break
+      }
+      currentPage += 1
+    } while (loadedCount < totalCount)
+
+    return [...new Set(names)]
   } catch (error) {
     console.error('Get vocabulary locations error:', error)
     showError(error.message || '獲取詞表地點失敗')
     throw new Error(error.message || '獲取詞表地點失敗')
+  }
+}
+
+/**
+ * 获取词表地点元数据。
+ *
+ * @param {{user_id?: number|string, location_name?: string, page?: number, page_size?: number}} [params={}]
+ * @returns {Promise<{locations: Array<object>, total: number, page: number, page_size: number}>}
+ */
+export async function getVocabularyLocations(params = {}) {
+  try {
+    return await api(`${VOCABULARY_LOCATIONS_ENDPOINT}${appendQueryParams(params)}`)
+  } catch (error) {
+    console.error('Get vocabulary locations metadata error:', error)
+    showError(error.message || '獲取詞表地點信息失敗')
+    throw new Error(error.message || '獲取詞表地點信息失敗')
+  }
+}
+
+/**
+ * 更新词表地点元数据。
+ *
+ * @param {string} locationName
+ * @param {object} data
+ * @param {{user_id?: number|string}} [params={}]
+ * @returns {Promise<object>}
+ */
+export async function updateVocabularyLocation(locationName, data, params = {}) {
+  try {
+    return await api(`${VOCABULARY_LOCATIONS_ENDPOINT}/${encodeURIComponent(locationName)}${appendQueryParams(params)}`, {
+      method: 'PATCH',
+      body: data,
+    })
+  } catch (error) {
+    console.error('Update vocabulary location error:', error)
+    showError(error.message || '更新詞表地點信息失敗')
+    throw new Error(error.message || '更新詞表地點信息失敗')
+  }
+}
+
+/**
+ * 获取词表操作日志。
+ *
+ * @param {{user_id?: number|string, permission_level?: string, source?: string, action?: string, table_name?: string, status?: string, page?: number, page_size?: number}} [params={}]
+ * @returns {Promise<{logs: Array<object>, total: number, page: number, page_size: number}>}
+ */
+export async function getVocabularyLogs(params = {}) {
+  try {
+    return await api(`${VOCABULARY_LOGS_ENDPOINT}${appendQueryParams(params)}`)
+  } catch (error) {
+    console.error('Get vocabulary logs error:', error)
+    showError(error.message || '獲取詞表操作日誌失敗')
+    throw new Error(error.message || '獲取詞表操作日誌失敗')
   }
 }
 
@@ -201,45 +290,64 @@ export async function uploadVocabulary({ file, location, parser_mode = 'auto' })
  * 该 adapter 供 UniversalTable 复用表格能力，同时把旧通用 SQL payload 中的 db_key 剥离。
  */
 export const vocabularySqlApi = {
-  query(params) {
+  async query(params) {
     return api(`${VOCABULARY_SQL_ENDPOINT}/query`, {
       method: 'POST',
-      body: stripVocabularyDbKey(params),
+      body: stripAndValidateVocabularySqlParams(params),
     })
   },
 
-  distinct(params) {
+  async distinct(params) {
     return api(`${VOCABULARY_SQL_ENDPOINT}/distinct-query`, {
       method: 'POST',
-      body: stripVocabularyDbKey(params),
+      body: stripAndValidateVocabularySqlParams(params),
     })
   },
 
-  mutateSingle(params) {
+  async columns(params = {}) {
+    const body = stripAndValidateVocabularySqlParams(params)
+    return api(`${VOCABULARY_SQL_ENDPOINT}/query/columns${appendQueryParams({ table_name: body.table_name })}`)
+  },
+
+  async count(params = {}) {
+    const body = stripAndValidateVocabularySqlParams(params)
+    return api(`${VOCABULARY_SQL_ENDPOINT}/query/count${appendQueryParams({
+      table_name: body.table_name,
+      filter_column: body.filter_column,
+      filter_value: body.filter_value,
+    })}`)
+  },
+
+  async distinctDirect(params = {}) {
+    const body = stripAndValidateVocabularySqlParams(params)
+    return api(`${VOCABULARY_SQL_ENDPOINT}/distinct/${encodeURIComponent(body.table_name)}/${encodeURIComponent(body.column)}`)
+  },
+
+  async mutateSingle(params) {
     return api(`${VOCABULARY_SQL_ENDPOINT}/mutate`, {
       method: 'POST',
-      body: stripVocabularyDbKey(params),
+      body: stripAndValidateVocabularySqlParams(params),
     })
   },
 
-  batchMutate(params) {
+  async batchMutate(params) {
     return api(`${VOCABULARY_SQL_ENDPOINT}/batch-mutate`, {
       method: 'POST',
-      body: stripVocabularyDbKey(params),
+      body: stripAndValidateVocabularySqlParams(params),
     })
   },
 
-  batchReplacePreview(params) {
+  async batchReplacePreview(params) {
     return api(`${VOCABULARY_SQL_ENDPOINT}/batch-replace-preview`, {
       method: 'POST',
-      body: stripVocabularyDbKey(params),
+      body: stripAndValidateVocabularySqlParams(params),
     })
   },
 
-  batchReplaceExecute(params) {
+  async batchReplaceExecute(params) {
     return api(`${VOCABULARY_SQL_ENDPOINT}/batch-replace-execute`, {
       method: 'POST',
-      body: stripVocabularyDbKey(params),
+      body: stripAndValidateVocabularySqlParams(params),
     })
   },
 }

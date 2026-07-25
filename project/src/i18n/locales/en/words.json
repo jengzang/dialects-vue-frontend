@@ -16,7 +16,8 @@
       "label": "Vocabulary workflows",
       "list": "List",
       "upload": "Upload",
-      "review": "Review"
+      "review": "Review",
+      "locations": "Locations"
     },
     "search": {
       "label": "Search",
@@ -29,6 +30,8 @@
         "headword": "Headword",
         "pronunciation": "Pronunciation",
         "detail": "Detail",
+        "ipa": "Pronunciation",
+        "notes": "Notes",
         "location": "Location"
       }
     },
@@ -77,6 +80,9 @@
       "province": "Province",
       "city": "City",
       "county": "County",
+      "town": "Town",
+      "administrativeVillage": "Administrative Village",
+      "naturalVillage": "Natural Village",
       "yindianRegion": "Yindian Region",
       "atlasRegion": "Atlas Region",
       "parserMode": "Parser Mode",
@@ -90,6 +96,14 @@
       "unsupportedFile": "Upload a supported vocabulary file (.xlsx, .xls, .csv, .tsv, .docx, .doc).",
       "success": "Upload complete. Imported {count} rows.",
       "failed": "Upload failed"
+    },
+    "locations": {
+      "title": "Location Metadata",
+      "desc": "Manage vocabulary location metadata within your permission scope.",
+      "refresh": "Refresh locations",
+      "save": "Save",
+      "saveSuccess": "Location metadata saved.",
+      "saveFailed": "Failed to save location metadata"
     },
     "import": {
       "examples": {

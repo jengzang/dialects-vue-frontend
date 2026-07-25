@@ -61,7 +61,7 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain('view-mode-selector')
     expect(vocabularyPage).toContain("key: 'list'")
     expect(vocabularyPage).toContain("key: 'upload'")
-    expect(vocabularyPage).toContain("key: 'review'")
+    expect(vocabularyPage).toContain("key: 'locations'")
     expect(vocabularyPage).toContain("viewMode === 'card'")
     expect(vocabularyPage).toContain("viewMode === 'table'")
     expect(vocabularyPage).toContain("viewMode === 'map'")
@@ -93,6 +93,10 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain('local_expression')
     expect(vocabularyPage).toContain('ipa')
     expect(vocabularyPage).toContain('notes')
+    expect(vocabularyPage).toContain("value: 'ipa'")
+    expect(vocabularyPage).toContain("value: 'notes'")
+    expect(vocabularyPage).not.toContain("value: 'pronunciation'")
+    expect(vocabularyPage).not.toContain("value: 'detail'")
     expect(vocabularyPage).not.toContain('const mappableEntries = computed')
     expect(vocabularyPage).toContain('db-key="vocabulary"')
     expect(vocabularyPage).toContain('table-name="vocabulary_entries"')
@@ -111,6 +115,19 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).not.toContain('sortBy')
     expect(vocabularyPage).not.toContain('sortOptions')
     expect(vocabularyPage).not.toContain('previewEntries')
+  })
+
+  it('uses dedicated vocabulary locations APIs for location metadata management', () => {
+    const vocabularyPage = readSource('src/main/views/explore/word/VocabularyPage.vue')
+
+    expect(vocabularyPage).toContain('getVocabularyLocations')
+    expect(vocabularyPage).toContain('updateVocabularyLocation')
+    expect(vocabularyPage).toContain('loadVocabularyLocations')
+    expect(vocabularyPage).toContain('handleSaveLocation')
+    expect(vocabularyPage).toContain("activeWorkflow === 'locations'")
+    expect(vocabularyPage).toContain("t('words.wordList.locations.title')")
+    expect(vocabularyPage).not.toContain('reviewSubmissions')
+    expect(vocabularyPage).not.toContain("t('words.wordList.review.approve')")
   })
 
   it('matches the YuBao card grid density and glass card treatment', () => {

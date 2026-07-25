@@ -16,7 +16,8 @@
       "label": "詞表工作流",
       "list": "詞表",
       "upload": "上傳",
-      "review": "審查"
+      "review": "審查",
+      "locations": "地點"
     },
     "search": {
       "label": "搜索",
@@ -29,6 +30,8 @@
         "headword": "詞條",
         "pronunciation": "發音",
         "detail": "詳情",
+        "ipa": "發音",
+        "notes": "註釋",
         "location": "地點"
       }
     },
@@ -77,6 +80,9 @@
       "province": "省",
       "city": "市",
       "county": "縣",
+      "town": "鄉鎮",
+      "administrativeVillage": "行政村",
+      "naturalVillage": "自然村",
       "yindianRegion": "音典分區",
       "atlasRegion": "地圖集分區",
       "parserMode": "解析方式",
@@ -90,6 +96,14 @@
       "unsupportedFile": "請上傳支持的詞表文件（.xlsx、.xls、.csv、.tsv、.docx、.doc）。",
       "success": "上傳完成，導入 {count} 條。",
       "failed": "上傳詞表失敗"
+    },
+    "locations": {
+      "title": "地點信息",
+      "desc": "管理當前權限範圍內的詞表地點元數據。",
+      "refresh": "刷新地點",
+      "save": "保存",
+      "saveSuccess": "地點信息已保存。",
+      "saveFailed": "保存地點信息失敗"
     },
     "import": {
       "examples": {

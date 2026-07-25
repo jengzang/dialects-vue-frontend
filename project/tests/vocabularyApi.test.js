@@ -16,6 +16,9 @@ const {
   getVocabularyItems,
   getVocabularyMapPoints,
   getVocabularyLocationNames,
+  getVocabularyLocations,
+  getVocabularyLogs,
+  updateVocabularyLocation,
   vocabularySqlApi,
   uploadVocabulary,
 } = await import('../src/api/main/vocabulary.js')
@@ -28,7 +31,7 @@ describe('vocabulary items API', () => {
   it('serializes the card and map query contract without table-only parameters', () => {
     const path = buildVocabularyItemsPath({
       q: '日头',
-      search_fields: ['headword', 'definition'],
+      search_fields: ['headword', 'ipa', 'notes'],
       locations: ['息烽', '天柱竹林'],
       page: 2,
       page_size: 100,
@@ -39,7 +42,7 @@ describe('vocabulary items API', () => {
 
     expect(path).toContain('/api/vocabulary/items?')
     expect(searchParams.get('q')).toBe('日头')
-    expect(searchParams.get('search_fields')).toBe('headword,definition')
+    expect(searchParams.get('search_fields')).toBe('headword,ipa,notes')
     expect(searchParams.get('locations')).toBe('息烽,天柱竹林')
     expect(searchParams.get('page')).toBe('2')
     expect(searchParams.get('page_size')).toBe('100')
@@ -72,7 +75,7 @@ describe('vocabulary items API', () => {
   it('serializes map points query without pagination', async () => {
     const path = buildVocabularyMapPointsPath({
       q: '日头',
-      search_fields: ['headword', 'definition'],
+      search_fields: ['headword', 'ipa'],
       locations: ['息烽', '天柱'],
       page: 2,
       page_size: 50,
@@ -81,7 +84,7 @@ describe('vocabulary items API', () => {
 
     expect(path).toContain('/api/vocabulary/map-points?')
     expect(searchParams.get('q')).toBe('日头')
-    expect(searchParams.get('search_fields')).toBe('headword,definition')
+    expect(searchParams.get('search_fields')).toBe('headword,ipa')
     expect(searchParams.get('locations')).toBe('息烽,天柱')
     expect(searchParams.has('page')).toBe(false)
     expect(searchParams.has('page_size')).toBe(false)
@@ -94,6 +97,17 @@ describe('vocabulary items API', () => {
 })
 
 describe('vocabulary table API adapter', () => {
+  it('guards vocabulary SQL adapter to vocabulary_entries only', async () => {
+    apiMock.mockClear()
+
+    await expect(vocabularySqlApi.query({
+      table_name: 'vocabulary_locations',
+      page: 1,
+    })).rejects.toThrow('vocabulary_entries')
+
+    expect(apiMock).not.toHaveBeenCalled()
+  })
+
   it('routes table mode through vocabulary SQL endpoints without db_key', async () => {
     apiMock.mockResolvedValueOnce({ data: [], total: 0, page: 1 })
 
@@ -152,19 +166,89 @@ describe('vocabulary table API adapter', () => {
     })
   })
 
-  it('loads vocabulary location names from the vocabulary entries distinct query', async () => {
-    apiMock.mockResolvedValueOnce({ values: ['息烽', '天柱'] })
+  it('loads vocabulary location names from the dedicated locations API', async () => {
+    apiMock.mockResolvedValueOnce({
+      locations: [
+        { location_name: '息烽' },
+        { location_name: '天柱' },
+      ],
+      total: 2,
+      page: 1,
+      page_size: 200,
+    })
 
     const values = await getVocabularyLocationNames()
 
     expect(values).toEqual(['息烽', '天柱'])
-    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/distinct-query', {
-      method: 'POST',
-      body: {
-        table_name: 'vocabulary_entries',
-        target_column: 'location_name',
-      },
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/locations?page=1&page_size=200')
+  })
+
+  it('continues loading vocabulary location names when the dedicated locations API has more pages', async () => {
+    apiMock.mockClear()
+    apiMock.mockResolvedValueOnce({
+      locations: Array.from({ length: 200 }, (_, index) => ({
+        location_name: index === 199 ? '息烽' : `地点${index}`,
+      })),
+      total: 201,
+      page: 1,
+      page_size: 200,
     })
+    apiMock.mockResolvedValueOnce({
+      locations: [
+        { location_name: '息烽' },
+        { location_name: '天柱' },
+      ],
+      total: 201,
+      page: 2,
+      page_size: 200,
+    })
+
+    const values = await getVocabularyLocationNames()
+
+    expect(values).toHaveLength(201)
+    expect(values.at(-1)).toBe('天柱')
+    expect(apiMock).toHaveBeenNthCalledWith(1, '/api/vocabulary/locations?page=1&page_size=200')
+    expect(apiMock).toHaveBeenNthCalledWith(2, '/api/vocabulary/locations?page=2&page_size=200')
+  })
+
+  it('uses dedicated vocabulary location and log endpoints outside SQL table access', async () => {
+    apiMock.mockResolvedValueOnce({ locations: [], total: 0, page: 1, page_size: 50 })
+    await getVocabularyLocations({ user_id: 7, location_name: '息烽', page: 2 })
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/locations?user_id=7&location_name=%E6%81%AF%E7%83%BD&page=2')
+
+    apiMock.mockResolvedValueOnce({ location_name: '息烽' })
+    await updateVocabularyLocation('息烽', { coordinates: '106,27' }, { user_id: 7 })
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/locations/%E6%81%AF%E7%83%BD?user_id=7', {
+      method: 'PATCH',
+      body: { coordinates: '106,27' },
+    })
+
+    apiMock.mockResolvedValueOnce({ logs: [], total: 0, page: 1, page_size: 50 })
+    await getVocabularyLogs({ source: 'upload', action: 'import' })
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/logs?source=upload&action=import')
+  })
+
+  it('supports vocabulary SQL columns, count, and direct distinct endpoints for entries only', async () => {
+    apiMock.mockResolvedValueOnce({ columns: [] })
+    await vocabularySqlApi.columns({ db_key: 'vocabulary', table_name: 'vocabulary_entries' })
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/query/columns?table_name=vocabulary_entries')
+
+    apiMock.mockResolvedValueOnce({ count: 120 })
+    await vocabularySqlApi.count({
+      table_name: 'vocabulary_entries',
+      filter_column: 'location_name',
+      filter_value: '息烽',
+    })
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/query/count?table_name=vocabulary_entries&filter_column=location_name&filter_value=%E6%81%AF%E7%83%BD')
+
+    apiMock.mockResolvedValueOnce({ values: ['息烽'] })
+    await vocabularySqlApi.distinctDirect({
+      table_name: 'vocabulary_entries',
+      column: 'location_name',
+    })
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/distinct/vocabulary_entries/location_name')
+
+    await expect(vocabularySqlApi.columns({ table_name: 'vocabulary_logs' })).rejects.toThrow('vocabulary_entries')
   })
 
   it('uses vocabulary batch mutation and replace endpoints', async () => {

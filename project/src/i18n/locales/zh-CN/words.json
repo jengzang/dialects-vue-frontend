@@ -16,7 +16,8 @@
       "label": "词表工作流",
       "list": "词表",
       "upload": "上传",
-      "review": "审查"
+      "review": "审查",
+      "locations": "地点"
     },
     "search": {
       "label": "搜索",
@@ -29,6 +30,8 @@
         "headword": "词条",
         "pronunciation": "发音",
         "detail": "详情",
+        "ipa": "发音",
+        "notes": "注释",
         "location": "地点"
       }
     },
@@ -77,6 +80,9 @@
       "province": "省",
       "city": "市",
       "county": "县",
+      "town": "乡镇",
+      "administrativeVillage": "行政村",
+      "naturalVillage": "自然村",
       "yindianRegion": "音典分区",
       "atlasRegion": "地图集分区",
       "parserMode": "解析方式",
@@ -90,6 +96,14 @@
       "unsupportedFile": "请上传支持的词表文件（.xlsx、.xls、.csv、.tsv、.docx、.doc）。",
       "success": "上传完成，导入 {count} 条。",
       "failed": "上传词表失败"
+    },
+    "locations": {
+      "title": "地点信息",
+      "desc": "管理当前权限范围内的词表地点元数据。",
+      "refresh": "刷新地点",
+      "save": "保存",
+      "saveSuccess": "地点信息已保存。",
+      "saveFailed": "保存地点信息失败"
     },
     "import": {
       "examples": {

@@ -260,32 +260,47 @@
       </div>
     </section>
 
-    <section v-else-if="activeWorkflow === 'review'" class="content-area">
-      <div class="review-mode main-glass-panel">
-        <div class="review-head">
+    <section v-else-if="activeWorkflow === 'locations'" class="content-area">
+      <div class="locations-mode main-glass-panel">
+        <div class="locations-head">
           <div>
-            <h3>{{ t('words.wordList.review.title') }}</h3>
-            <p>{{ t('words.wordList.review.desc') }}</p>
+            <h3>{{ t('words.wordList.locations.title') }}</h3>
+            <p>{{ t('words.wordList.locations.desc') }}</p>
           </div>
-          <span class="review-badge">{{ t('words.wordList.review.permissionBadge') }}</span>
+          <button class="main-glass-button" data-variant="secondary" type="button" @click="loadVocabularyLocations">
+            {{ t('words.wordList.locations.refresh') }}
+          </button>
         </div>
 
-        <div class="review-list">
-          <article v-for="submission in reviewSubmissions" :key="submission.id" class="review-item">
-            <div>
-              <strong>{{ submission.fileName }}</strong>
-              <p>{{ submission.meta }}</p>
+        <div v-if="locationsLoadError" class="empty-state empty-state-base">
+          <p>{{ locationsLoadError }}</p>
+        </div>
+
+        <div v-else-if="isLoadingLocations" class="loading-state loading-state-base">
+          <div class="ui-loading--page" aria-hidden="true"></div>
+          <span>{{ t('words.yuBaoPage.states.loadingData') }}</span>
+        </div>
+
+        <div v-else class="locations-list">
+          <article v-for="location in locationRows" :key="`${location.user_id || ''}-${location.location_name}`" class="location-item">
+            <div class="location-item-head">
+              <div>
+                <strong>{{ location.location_name }}</strong>
+                <p>{{ location.location_label || location.location_name }}</p>
+              </div>
+              <button class="main-glass-button" data-variant="primary" type="button" @click="handleSaveLocation(location)">
+                {{ t('words.wordList.locations.save') }}
+              </button>
             </div>
-            <div class="review-actions">
-              <button class="main-glass-button" data-variant="secondary" type="button">
-                {{ t('words.wordList.review.reject') }}
-              </button>
-              <button class="main-glass-button" data-variant="primary" type="button">
-                {{ t('words.wordList.review.approve') }}
-              </button>
+            <div class="locations-edit-grid">
+              <label v-for="field in locationEditFields" :key="field.key" class="upload-field">
+                <span>{{ field.label }}</span>
+                <input v-model="location[field.key]" type="text" />
+              </label>
             </div>
           </article>
         </div>
+        <p v-if="locationsStatusText" class="upload-status">{{ locationsStatusText }}</p>
       </div>
     </section>
   </div>
@@ -295,7 +310,14 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { watchDebounced } from '@vueuse/core'
-import { getVocabularyItems, getVocabularyLocationNames, getVocabularyMapPoints, uploadVocabulary } from '@/api'
+import {
+  getVocabularyItems,
+  getVocabularyLocationNames,
+  getVocabularyLocations,
+  getVocabularyMapPoints,
+  updateVocabularyLocation,
+  uploadVocabulary
+} from '@/api'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
@@ -330,6 +352,9 @@ const isLoadingItems = ref(false)
 const loadError = ref('')
 const isUploading = ref(false)
 const uploadStatusText = ref('')
+const isLoadingLocations = ref(false)
+const locationsLoadError = ref('')
+const locationsStatusText = ref('')
 const uploadParserMode = ref('auto')
 const uploadFile = ref(null)
 const uploadLocation = ref({
@@ -338,22 +363,25 @@ const uploadLocation = ref({
   province: '',
   city: '',
   county: '',
+  town: '',
+  administrative_village: '',
+  natural_village: '',
   yindian_region: '',
   atlas_region: '',
 })
+const locationRows = ref([])
 
 const workflowTabs = computed(() => [
   { key: 'list', label: t('words.wordList.tabs.list') },
   { key: 'upload', label: t('words.wordList.tabs.upload') },
-  { key: 'review', label: t('words.wordList.tabs.review') }
+  { key: 'locations', label: t('words.wordList.tabs.locations') }
 ])
 
 const searchFieldOptions = computed(() => [
   { value: 'definition', label: t('words.wordList.search.fields.definition') },
   { value: 'headword', label: t('words.wordList.search.fields.headword') },
-  { value: 'pronunciation', label: t('words.wordList.search.fields.pronunciation') },
-  { value: 'detail', label: t('words.wordList.search.fields.detail') },
-  { value: 'location', label: t('words.wordList.search.fields.location') }
+  { value: 'ipa', label: t('words.wordList.search.fields.ipa') },
+  { value: 'notes', label: t('words.wordList.search.fields.notes') }
 ])
 
 const locationOptions = computed(() => {
@@ -411,8 +439,23 @@ const uploadLocationFields = computed(() => [
   { key: 'province', label: t('words.wordList.upload.province'), placeholder: t('words.wordList.upload.province'), required: false },
   { key: 'city', label: t('words.wordList.upload.city'), placeholder: t('words.wordList.upload.city'), required: false },
   { key: 'county', label: t('words.wordList.upload.county'), placeholder: t('words.wordList.upload.county'), required: false },
+  { key: 'town', label: t('words.wordList.upload.town'), placeholder: t('words.wordList.upload.town'), required: false },
+  { key: 'administrative_village', label: t('words.wordList.upload.administrativeVillage'), placeholder: t('words.wordList.upload.administrativeVillage'), required: false },
+  { key: 'natural_village', label: t('words.wordList.upload.naturalVillage'), placeholder: t('words.wordList.upload.naturalVillage'), required: false },
   { key: 'yindian_region', label: t('words.wordList.upload.yindianRegion'), placeholder: t('words.wordList.upload.yindianRegion'), required: false },
   { key: 'atlas_region', label: t('words.wordList.upload.atlasRegion'), placeholder: t('words.wordList.upload.atlasRegion'), required: false },
+])
+
+const locationEditFields = computed(() => [
+  { key: 'coordinates', label: t('words.wordList.upload.coordinates') },
+  { key: 'province', label: t('words.wordList.upload.province') },
+  { key: 'city', label: t('words.wordList.upload.city') },
+  { key: 'county', label: t('words.wordList.upload.county') },
+  { key: 'town', label: t('words.wordList.upload.town') },
+  { key: 'administrative_village', label: t('words.wordList.upload.administrativeVillage') },
+  { key: 'natural_village', label: t('words.wordList.upload.naturalVillage') },
+  { key: 'yindian_region', label: t('words.wordList.upload.yindianRegion') },
+  { key: 'atlas_region', label: t('words.wordList.upload.atlasRegion') },
 ])
 
 const parserModeOptions = computed(() => [
@@ -475,14 +518,6 @@ const canConfirmUpload = computed(() => {
   }
   return !isVocabularyPreviewFile(file) || importPreview.diagnostics.value.isComplete
 })
-
-const reviewSubmissions = computed(() => [
-  {
-    id: 'pending-1',
-    fileName: t('words.wordList.review.sampleFile'),
-    meta: t('words.wordList.review.sampleMeta')
-  }
-])
 
 const mapDataForYuBaoMap = computed(() => {
   return mapPoints.value
@@ -688,6 +723,43 @@ async function loadVocabularyLocationOptions() {
   }
 }
 
+async function loadVocabularyLocations() {
+  isLoadingLocations.value = true
+  locationsLoadError.value = ''
+
+  try {
+    const response = await getVocabularyLocations({ page: 1, page_size: 200 })
+    locationRows.value = Array.isArray(response.locations)
+      ? response.locations.map((location) => ({ ...location }))
+      : []
+  } catch (error) {
+    locationsLoadError.value = error.message || '獲取詞表地點信息失敗'
+    locationRows.value = []
+  } finally {
+    isLoadingLocations.value = false
+  }
+}
+
+async function handleSaveLocation(location) {
+  if (!location?.location_name) {
+    return
+  }
+
+  const payload = Object.fromEntries(
+    locationEditFields.value.map((field) => [field.key, String(location[field.key] || '').trim()])
+  )
+  const params = location.user_id ? { user_id: location.user_id } : {}
+  locationsStatusText.value = ''
+
+  try {
+    await updateVocabularyLocation(location.location_name, payload, params)
+    locationsStatusText.value = t('words.wordList.locations.saveSuccess')
+    await loadVocabularyLocationOptions()
+  } catch (error) {
+    locationsStatusText.value = error.message || t('words.wordList.locations.saveFailed')
+  }
+}
+
 async function handleMapPointClick(point) {
   const locations = normalizeMapPointLocations(point)
 
@@ -783,6 +855,8 @@ watch([activeWorkflow, viewMode], () => {
     loadVocabularyItems()
   } else if (shouldUseVocabularyMapPointsApi()) {
     loadVocabularyMapPoints()
+  } else if (activeWorkflow.value === 'locations') {
+    loadVocabularyLocations()
   }
 })
 
@@ -1049,7 +1123,7 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
 
 .map-mode,
 .upload-mode,
-.review-mode {
+.locations-mode {
   padding: 16px;
 }
 
@@ -1121,7 +1195,7 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
 }
 
 .upload-mode,
-.review-mode {
+.locations-mode {
   display: grid;
   gap: 16px;
 }
@@ -1160,8 +1234,8 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
 }
 
 .upload-head,
-.review-head,
-.review-item {
+.locations-head,
+.location-item {
   display: flex;
   gap: 14px;
   align-items: center;
@@ -1169,14 +1243,14 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
 }
 
 .upload-head h3,
-.review-head h3 {
+.locations-head h3 {
   margin: 0;
   font-size: 1.15rem;
 }
 
 .upload-head p,
-.review-head p,
-.review-item p {
+.locations-head p,
+.location-item p {
   margin: 6px 0 0;
   color: var(--text-secondary);
 }
@@ -1185,30 +1259,31 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
   display: none;
 }
 
-.review-badge {
-  flex: 0 0 auto;
-  padding: 4px 8px;
-  color: var(--text-secondary);
-  background: var(--glass-20);
-  border: 1px solid var(--glass-30);
-  border-radius: var(--radius-sm, 6px);
-}
-
-.review-list {
+.locations-list {
   display: grid;
   gap: 10px;
 }
 
-.review-item {
+.location-item {
+  align-items: stretch;
+  flex-direction: column;
   padding: 14px;
   background: var(--glass-10);
   border: 1px solid var(--glass-30);
   border-radius: var(--radius-md, 8px);
 }
 
-.review-actions {
+.location-item-head {
   display: flex;
   gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.locations-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
 }
 
 @media (max-width: 768px) {
@@ -1224,8 +1299,8 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
   .search-section,
   .filter-strip,
   .upload-head,
-  .review-head,
-  .review-item {
+  .locations-head,
+  .location-item-head {
     align-items: stretch;
     flex-direction: column;
   }
