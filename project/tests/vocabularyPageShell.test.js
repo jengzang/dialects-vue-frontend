@@ -24,17 +24,17 @@ describe('vocabulary explore page shell wiring', () => {
     expect(readSource('src/main/config/BarAndTabs/SideBarConfig.js')).toContain("'/explore/vocabulary'")
   })
 
-  it('uses vocabulary as the default and first words entry before YuBao pages', () => {
+  it('keeps the words parent entry on /menu/words while listing vocabulary before YuBao pages', () => {
     const wordsPortal = readSource('src/main/views/menu/portals/WordsPage.vue')
     const homePage = readSource('src/main/views/HomePage.vue')
     const exploreBar = readSource('src/main/config/BarAndTabs/ExploreBarConfig.js')
     const sidebar = readSource('src/main/config/BarAndTabs/SideBarConfig.js')
     const menuBar = readSource('src/main/config/BarAndTabs/MenuBarConfig.js')
 
-    expect(exploreBar).toContain("defaultTo: { path: withRouteLocale(route, '/explore/vocabulary') }")
+    expect(exploreBar).toContain("defaultTo: { path: withRouteLocale(route, '/menu/words') }")
     expect(exploreBar).toContain("defaultChild: '/explore/vocabulary'")
-    expect(menuBar).toContain("defaultTo: { path: withRouteLocale(route, '/explore/vocabulary') }")
-    expect(sidebar).toContain("path: withRouteLocale(route, '/explore/vocabulary')")
+    expect(menuBar).toContain("defaultTo: { path: withRouteLocale(route, '/menu/words') }")
+    expect(sidebar).toContain("path: withRouteLocale(route, '/menu/words')")
     expect(sidebar).toContain("path: buildLocalePath('zh-Hant', '/explore/vocabulary')")
 
     expect(wordsPortal.indexOf('handleWordList')).toBeLessThan(wordsPortal.indexOf('handleYuBaoVocabulary'))
