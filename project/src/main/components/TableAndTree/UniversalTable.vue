@@ -535,8 +535,22 @@ const props = defineProps({
   columns: { type: Array, required: true },
   defaultFilter: { type: Object, default: null }, // 新增：默认筛选 { columnKey: value }
   // ✅ 新增：可选的主键字段名
-  primaryKey: { type: String, default: null }
+  primaryKey: { type: String, default: null },
+  apiAdapter: { type: String, default: 'normal' }
 });
+
+const tableApiAdapters = {
+  normal: {
+    query: sqlQuery,
+    distinct: distinctQuery,
+    mutateSingle: mutateSingleRow,
+    batchMutate,
+    batchReplacePreview,
+    batchReplaceExecute
+  }
+}
+
+const tableApi = computed(() => tableApiAdapters[props.apiAdapter] || tableApiAdapters.normal)
 
 // 狀態定義
 const tableData = ref([]);
@@ -655,7 +669,7 @@ const fetchData = async () => {
   };
 
   try {
-    const response = await sqlQuery(payload);
+    const response = await tableApi.value.query(payload);
 
     tableData.value = response.data;
     total.value = response.total;
@@ -865,7 +879,7 @@ const openFilter = async (key, event) => {
   distinctValues[key] = []; // 先清空
 
   try {
-    const res = await distinctQuery(payload);
+    const res = await tableApi.value.distinct(payload);
     distinctValues[key] = res.values;
   } catch (e) {
     console.error("Filter Load Error:", e);
@@ -1120,7 +1134,7 @@ const submitBatchEdit = async () => {
       update_data: updateData
     };
 
-    const response = await batchMutate(payload);
+    const response = await tableApi.value.batchMutate(payload);
 
     if (response.status === 'completed') {
       showSuccess(t('tableTree.universalTable.messages.batchUpdateSuccess', { count: response.success_count }));
@@ -1170,7 +1184,7 @@ const handleDelete = async (row) => {
       pk_value: row[primaryKeyField.value]  // ✅ 动态主键值
     };
 
-    await mutateSingleRow(payload);
+    await tableApi.value.mutateSingle(payload);
 
     showSuccess(t('tableTree.universalTable.messages.deleteSuccess'));
     await fetchData();
@@ -1222,7 +1236,7 @@ const submitNewRecord = async () => {
       data: { ...newRecordData }
     };
 
-    await mutateSingleRow(payload);
+    await tableApi.value.mutateSingle(payload);
 
     showSuccess(t('tableTree.universalTable.messages.addSuccess'));
     closeAddModal();
@@ -1378,7 +1392,7 @@ const previewAllPagesReplace = async (findText, matchMode, isEmptySearch) => {
       search_text: searchText.value  // 尊重搜索条件
     }
 
-    const response = await batchReplacePreview(payload)
+    const response = await tableApi.value.batchReplacePreview(payload)
 
     batchReplace.totalMatches = response.total_matches
     batchReplace.previewResults = []  // 全表模式不显示详细列表
@@ -1481,7 +1495,7 @@ const executeAllPagesReplace = async () => {
       search_text: searchText.value  // 尊重搜索条件
     }
 
-    const response = await batchReplaceExecute(payload)
+    const response = await tableApi.value.batchReplaceExecute(payload)
 
     if (response.status === 'success') {
       showSuccess(t('tableTree.universalTable.messages.allPagesReplaceDone', { count: response.affected_rows }))
