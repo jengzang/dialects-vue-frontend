@@ -844,56 +844,91 @@ watchDebounced([query, selectedSearchField, locationQuery], () => {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+  min-height: 100px;
+  padding: 4px;
 }
 
 .card {
-  padding: 14px 16px;
-  background: var(--glass-10);
-  border: 1px solid var(--glass-30);
-  border-radius: var(--radius-lg, 8px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 20px;
+  overflow: hidden;
+  background: var(--glass-80);
+  border: 0.5px solid var(--glass-90);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 var(--text-white);
+  backdrop-filter: blur(20px) saturate(180%);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: rgba(var(--color-primary-rgb), 0.2);
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 var(--text-white);
+  transform: translateY(-2px);
 }
 
 .card-row {
   display: flex;
-  gap: 10px;
-  align-items: baseline;
-  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  line-height: 1.5;
 }
 
-.row-2,
-.row-3,
-.row-4 {
-  margin-top: 10px;
-}
-
-.location-chain,
-.category-chain,
-.pronunciation-text,
-.memo-text {
+.row-1 {
+  flex-wrap: wrap;
   color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.row-2 {
+  flex-wrap: wrap;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.location-chain {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 .category-chain {
   flex: 0 0 auto;
-  padding: 2px 7px;
-  font-size: 0.82rem;
-  background: var(--glass-20);
-  border: 1px solid var(--glass-30);
-  border-radius: var(--radius-sm, 6px);
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .word-text {
-  font-size: 1.45rem;
-  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 20px;
 }
 
 .definition-text {
+  color: var(--text-primary);
   font-weight: 600;
 }
 
+.pronunciation-text {
+  color: var(--color-primary);
+  font-family: var(--font-monospace, 'SF Mono', Monaco, Consolas, monospace);
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .memo-text {
+  color: var(--text-secondary);
   line-height: 1.6;
 }
 
@@ -1087,6 +1122,18 @@ watchDebounced([query, selectedSearchField, locationQuery], () => {
     width: 100%;
   }
 
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 16px 18px;
+  }
+
+  .word-text {
+    font-size: 18px;
+  }
+
   .map-mode {
     grid-template-columns: 1fr;
   }
@@ -1094,6 +1141,29 @@ watchDebounced([query, selectedSearchField, locationQuery], () => {
   .map-side-panel {
     border-top: 1px solid var(--glass-20);
     border-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .cards-grid {
+    gap: 12px;
+  }
+
+  .card {
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .row-1 {
+    font-size: 11px;
+  }
+
+  .word-text {
+    font-size: 16px;
+  }
+
+  .pronunciation-text {
+    font-size: 13px;
   }
 }
 </style>

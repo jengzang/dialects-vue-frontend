@@ -100,4 +100,14 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).not.toContain('sortOptions')
     expect(vocabularyPage).not.toContain('previewEntries')
   })
+
+  it('matches the YuBao card grid density and glass card treatment', () => {
+    const vocabularyPage = readSource('src/main/views/explore/word/VocabularyPage.vue')
+
+    expect(vocabularyPage).toContain('grid-template-columns: repeat(auto-fill, minmax(340px, 1fr))')
+    expect(vocabularyPage).toContain('background: var(--glass-80)')
+    expect(vocabularyPage).toContain('border: 0.5px solid var(--glass-90)')
+    expect(vocabularyPage).toContain('transform: translateY(-2px)')
+    expect(vocabularyPage).toContain('font-family: var(--font-monospace')
+  })
 })
