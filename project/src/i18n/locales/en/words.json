@@ -8,6 +8,11 @@
     "name": "YuBao Grammar",
     "desc": "YuBao 50 sentence grammar data"
   },
+  "wordList": {
+    "name": "Vocabulary List",
+    "desc": "Dialect vocabulary list page",
+    "placeholder": "Vocabulary page shell"
+  },
   "yuBaoPage": {
     "viewAll": "View all",
     "search": {

@@ -3,6 +3,16 @@
     <h2 class="page-title">{{ $t('words.title') }}</h2>
 
     <div class="words-grid">
+      <button class="entry-button" @click="handleWordList">
+        <div class="entry-button__icon">📒</div>
+        <div class="entry-button__name">
+          {{ $t('words.wordList.name') }}
+        </div>
+        <div class="entry-button__desc">
+          {{ $t('words.wordList.desc') }}
+        </div>
+      </button>
+
       <button class="entry-button" @click="handleYuBaoVocabulary">
         <div class="entry-button__icon">📖</div>
         <div class="entry-button__name">
@@ -51,6 +61,15 @@ const handleYcSpoken = () => {
     buildLocalePath(
       resolveRouteLocale(route),
       '/explore/yc-spoken'
+    )
+  )
+}
+
+const handleWordList = () => {
+  router.push(
+    buildLocalePath(
+      resolveRouteLocale(route),
+      '/explore/vocabulary'
     )
   )
 }

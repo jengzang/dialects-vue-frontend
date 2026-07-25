@@ -8,6 +8,11 @@
     "name": "語保語法",
     "desc": "語保50條句子語法資料"
   },
+  "wordList": {
+    "name": "詞表",
+    "desc": "方言詞表頁面",
+    "placeholder": "詞表頁面殼子"
+  },
   "yuBaoPage": {
     "viewAll": "查看全部",
     "search": {

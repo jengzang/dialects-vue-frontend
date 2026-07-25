@@ -7,6 +7,7 @@ const DeriveTool = () => import('@/main/views/explore/tools/DeriveTool.vue')
 const PraatPage = () => import('@/main/views/Praat.vue')
 const TableManagePage = () => import('@/main/views/explore/tools/TableManage.vue')
 const YuBaoPage = () => import('@/main/views/explore/word/YuBaoPage.vue')
+const VocabularyPage = () => import('@/main/views/explore/word/VocabularyPage.vue')
 const CharacterClassificationPage = () => import('@/main/views/explore/charClass/CharacterClassification.vue')
 const YangChunSpokenPage = () => import('@/main/views/explore/word/YangChunSpoken.vue')
 const GdVillagesTreePage = () => import('@/main/views/explore/villages/gdVillagesTree.vue')
@@ -43,6 +44,10 @@ export const exploreRoutes = [
   {
     path: 'explore/yubao',
     component: YuBaoPage
+  },
+  {
+    path: 'explore/vocabulary',
+    component: VocabularyPage
   },
   {
     path: 'explore/char-class',

@@ -220,6 +220,9 @@ const ROUTE_QUERY_ALLOWLIST = {
   '/explore/yubao': {
     base: ['tab']
   },
+  '/explore/vocabulary': {
+    base: []
+  },
   '/explore/char-class': {
     base: ['tab', 'table', 'levels']
   },

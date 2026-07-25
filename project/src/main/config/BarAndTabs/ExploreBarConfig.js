@@ -259,10 +259,11 @@ export function useExploreBarConfig() {
             },
             navigation: {
                 defaultTo: { path: withRouteLocale(route, '/menu/words') },
-                matchPages: ['YuBao', 'ycSpoken'],
+                matchPages: ['YuBao', 'Vocabulary', 'ycSpoken'],
                 rememberChild: true,
-                defaultChild: '/explore/yubao?tab=vocabulary',
+                defaultChild: '/explore/vocabulary',
                 children: [
+                    { label: t('navigation.submenu.words.wordList'), icon: '📒', path: withRouteLocale(route, '/explore/vocabulary') },
                     { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: withRouteLocale(route, '/explore/yubao?tab=vocabulary') },
                     { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: withRouteLocale(route, '/explore/yubao?tab=grammar') },
                     { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc-spoken') }
