@@ -135,17 +135,24 @@
       </div>
 
       <div v-else-if="viewMode === 'map'" class="map-mode main-glass-panel">
-        <div class="map-placeholder">
-          <span aria-hidden="true">⌖</span>
-          <p>{{ t('words.wordList.map.placeholder', { count: mapPoints.length }) }}</p>
+        <div class="map-canvas-shell">
+          <YuBaoMap
+            v-if="mapDataForYuBaoMap.length"
+            :map-data="mapDataForYuBaoMap"
+            active-tab="vocabulary"
+            @marker-click="handleMapPointClick"
+          />
+          <div v-else class="empty-state empty-state-base map-empty-state">
+            <p>{{ t('words.yuBaoPage.states.noData') }}</p>
+          </div>
+        </div>
+        <div class="map-side-panel ui-scrollbar">
           <p class="map-meta">
             {{ t('words.wordList.map.meta', {
               entries: mapStats.totalEntries,
               omitted: mapStats.omittedWithoutCoordinates
             }) }}
           </p>
-        </div>
-        <div class="map-side-panel ui-scrollbar">
           <div class="map-result-list">
             <button
               v-for="point in mapPoints"
@@ -292,6 +299,7 @@ import { getVocabularyItems, getVocabularyLocationNames, getVocabularyMapPoints,
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
+import YuBaoMap from '@/main/components/map/YuBaoMap.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 
@@ -476,6 +484,22 @@ const reviewSubmissions = computed(() => [
   }
 ])
 
+const mapDataForYuBaoMap = computed(() => {
+  return mapPoints.value
+    .filter((point) => Number.isFinite(point.longitude) && Number.isFinite(point.latitude))
+    .map((point) => ({
+      longitude: point.longitude,
+      latitude: point.latitude,
+      locationName: point.locationName,
+      location: point.locationName,
+      county: point.locationName,
+      province: point.locationLabel,
+      pronunciation: String(point.entryCount || ''),
+      note2: point.locationLabel,
+      note1: point.entryCount ? String(point.entryCount) : '',
+    }))
+})
+
 function shouldUseVocabularyItemsApi() {
   return activeWorkflow.value === 'list' && viewMode.value === 'card'
 }
@@ -578,6 +602,25 @@ function normalizeVocabularyMapPoint(point) {
   }
 }
 
+function normalizeMapPointLocations(point) {
+  if (Array.isArray(point?.locationNames)) {
+    return point.locationNames.filter(Boolean)
+  }
+
+  if (typeof point?.locationNames === 'string' && point.locationNames.trim()) {
+    try {
+      const parsedLocations = JSON.parse(point.locationNames)
+      if (Array.isArray(parsedLocations)) {
+        return parsedLocations.filter(Boolean)
+      }
+    } catch {
+      return [point.locationNames.trim()]
+    }
+  }
+
+  return point?.locationName ? [point.locationName] : []
+}
+
 async function loadVocabularyItems({ append = false } = {}) {
   if (!shouldUseVocabularyItemsApi()) {
     return
@@ -646,7 +689,9 @@ async function loadVocabularyLocationOptions() {
 }
 
 async function handleMapPointClick(point) {
-  if (!point?.locationName) {
+  const locations = normalizeMapPointLocations(point)
+
+  if (!locations.length) {
     return
   }
 
@@ -656,7 +701,7 @@ async function handleMapPointClick(point) {
 
   try {
     const response = await getVocabularyItems(buildVocabularyItemsParams({
-      locations: point.locationName,
+      locations,
       page: 1,
       page_size: pageSize.value,
     }))
@@ -1011,21 +1056,14 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
 .map-mode {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 280px;
-  min-height: 420px;
+  min-height: 520px;
   overflow: hidden;
 }
 
-.map-placeholder {
-  display: grid;
-  place-items: center;
-  align-content: center;
-  gap: 8px;
-  color: var(--text-secondary);
-  background: var(--glass-10);
-}
-
-.map-placeholder span {
-  font-size: 42px;
+.map-canvas-shell {
+  min-height: 488px;
+  overflow: hidden;
+  border-radius: var(--radius-md, 8px);
 }
 
 .map-side-panel {
@@ -1069,8 +1107,12 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
 }
 
 .map-meta {
-  margin: 0;
+  margin: 0 0 10px;
   font-size: 0.9rem;
+}
+
+.map-empty-state {
+  height: 100%;
 }
 
 .load-more-btn {
@@ -1206,6 +1248,10 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
 
   .map-mode {
     grid-template-columns: 1fr;
+  }
+
+  .map-canvas-shell {
+    min-height: 420px;
   }
 
   .map-side-panel {

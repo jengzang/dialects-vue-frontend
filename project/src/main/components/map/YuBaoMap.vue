@@ -152,6 +152,7 @@ const props = defineProps({
     default: 'vocabulary'
   }
 })
+const emit = defineEmits(['marker-click'])
 
 // --- State ---
 const mapContainer = ref(null)
@@ -375,6 +376,8 @@ const convertToGeoJSON = (data) => {
     // 聚合各个字段
     const aggregatedData = {
       locationChain: aggregateField(item => getLocationText(item)),
+      locationName: aggregateField(item => item.locationName || item.location),
+      locationNames: JSON.stringify(Array.from(new Set(items.map(item => item.locationName || item.location).filter(Boolean)))),
       pronunciation: aggregateField(item => item.pronunciation),
       phonetic: aggregateField(item => item.phonetic),
       word: aggregateField(item => item.note2 || item.word),
@@ -409,6 +412,8 @@ const convertToGeoJSON = (data) => {
         textColor: textColor,
         // 使用聚合后的数据用于弹窗
         locationChain: aggregatedData.locationChain,
+        locationName: aggregatedData.locationName,
+        locationNames: aggregatedData.locationNames,
         pronunciation: aggregatedData.pronunciation,
         phonetic: aggregatedData.phonetic,
         word: aggregatedData.word,
@@ -477,6 +482,13 @@ const renderMarkers = async () => {
 
 // 处理标记点击（接受 GeoJSON properties）
 const handleMarkerClick = (properties) => {
+  emit('marker-click', {
+    locationName: properties.locationName,
+    locationNames: properties.locationNames,
+    locationLabel: properties.locationChain,
+    itemCount: Number(properties.itemCount) || 0,
+  })
+
   popupData.value = {
     locationChain: properties.locationChain,
     pronunciation: properties.pronunciation,

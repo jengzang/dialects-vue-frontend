@@ -47,6 +47,7 @@ describe('vocabulary explore page shell wiring', () => {
     const vocabularyPage = readSource('src/main/views/explore/word/VocabularyPage.vue')
 
     expect(vocabularyPage).toContain("import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'")
+    expect(vocabularyPage).toContain("import YuBaoMap from '@/main/components/map/YuBaoMap.vue'")
     expect(vocabularyPage).toContain("import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'")
     expect(vocabularyPage).toContain('getVocabularyLocationNames')
     expect(vocabularyPage).toContain('<MultiSelectDropdown')
@@ -64,6 +65,8 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain("viewMode === 'card'")
     expect(vocabularyPage).toContain("viewMode === 'table'")
     expect(vocabularyPage).toContain("viewMode === 'map'")
+    expect(vocabularyPage).toContain('<YuBaoMap')
+    expect(vocabularyPage).not.toContain('map-placeholder')
   })
 
   it('keeps vocabulary card and map queries separate from the table API', () => {
@@ -80,8 +83,11 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain('loadVocabularyLocationOptions')
     expect(vocabularyPage).not.toContain('parseLocationFilter')
     expect(vocabularyPage).toContain('const mapPoints = ref([])')
+    expect(vocabularyPage).toContain('mapDataForYuBaoMap')
     expect(vocabularyPage).toContain('handleMapPointClick')
-    expect(vocabularyPage).toContain('locations: point.locationName')
+    expect(vocabularyPage).toContain('normalizeMapPointLocations')
+    expect(vocabularyPage).toContain('@marker-click="handleMapPointClick"')
+    expect(vocabularyPage).toContain('locations,')
     expect(vocabularyPage).toContain('location_label')
     expect(vocabularyPage).toContain('standard_word')
     expect(vocabularyPage).toContain('local_expression')
