@@ -74,24 +74,24 @@
               ×
             </button>
           </div>
-
-          <label class="sort-control">
-            <span>{{ t('words.wordList.sort.label') }}</span>
-            <select v-model="sortBy">
-              <option v-for="option in sortOptions" :key="option.key" :value="option.key">
-                {{ option.label }}
-              </option>
-            </select>
-          </label>
         </div>
       </template>
     </div>
 
-    <section v-if="activeWorkflow === 'list'" class="content-area">
-      <div v-if="viewMode === 'card'" class="card-mode">
-        <div class="cards-grid">
+    <section v-if="activeWorkflow === 'list' && viewMode !== 'table'" class="content-area">
+      <div v-if="isLoadingItems" class="loading-state loading-state-base">
+        <div class="ui-loading--page" aria-hidden="true"></div>
+        <span>{{ t('words.yuBaoPage.states.loadingCards') }}</span>
+      </div>
+
+      <div v-else-if="loadError" class="empty-state empty-state-base">
+        <p>{{ loadError }}</p>
+      </div>
+
+      <div v-else-if="viewMode === 'card'" class="card-mode">
+        <div v-if="entries.length" class="cards-grid">
           <article
-            v-for="entry in visibleEntries"
+            v-for="entry in entries"
             :key="entry.id"
             class="card vocabulary-card"
           >
@@ -111,35 +111,41 @@
             </div>
           </article>
         </div>
-      </div>
-
-      <div v-else-if="viewMode === 'table'" class="table-mode main-glass-panel">
-        <div class="vocabulary-table ui-scrollbar" role="table" :aria-label="t('words.wordList.table.label')">
-          <div class="vocabulary-table__row vocabulary-table__row--head" role="row">
-            <span v-for="column in tableColumns" :key="column.key" role="columnheader">{{ column.label }}</span>
-          </div>
-          <div v-for="entry in visibleEntries" :key="entry.id" class="vocabulary-table__row" role="row">
-            <span>{{ entry.headword }}</span>
-            <span>{{ entry.definition }}</span>
-            <span>{{ entry.pronunciation }}</span>
-            <span>{{ entry.location }}</span>
-            <span>{{ entry.detail }}</span>
-          </div>
+        <div v-else class="empty-state empty-state-base">
+          <p>{{ t('words.yuBaoPage.states.noData') }}</p>
         </div>
       </div>
 
       <div v-else-if="viewMode === 'map'" class="map-mode main-glass-panel">
         <div class="map-placeholder">
-          <span aria-hidden="true">🗺️</span>
-          <p>{{ t('words.wordList.map.placeholder') }}</p>
+          <span aria-hidden="true">⌖</span>
+          <p>{{ t('words.wordList.map.placeholder', { count: mappableEntries.length }) }}</p>
         </div>
         <div class="map-result-list ui-scrollbar">
-          <div v-for="entry in visibleEntries" :key="entry.id" class="map-result-item">
+          <div v-for="entry in entries" :key="entry.id" class="map-result-item">
             <strong>{{ entry.headword }}</strong>
             <span>{{ entry.location }}</span>
           </div>
         </div>
       </div>
+
+      <button
+        v-if="canLoadMore"
+        class="load-more-btn main-glass-button"
+        data-variant="secondary"
+        type="button"
+        @click="loadVocabularyItems({ append: true })"
+      >
+        {{ t('words.yuBaoPage.states.loadingMore') }}
+      </button>
+    </section>
+
+    <section v-else-if="activeWorkflow === 'list' && viewMode === 'table'" class="content-area table-content-area">
+      <UniversalTable
+        db-key="vocabulary"
+        table-name="entries"
+        :columns="tableColumns"
+      />
     </section>
 
     <section v-else-if="activeWorkflow === 'upload'" class="content-area">
@@ -204,10 +210,13 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { watchDebounced } from '@vueuse/core'
+import { getVocabularyItems } from '@/api'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
+import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 
@@ -217,9 +226,14 @@ const activeWorkflow = ref('list')
 const query = ref('')
 const locationQuery = ref('')
 const viewMode = ref('card')
-const sortBy = ref('location')
 const selectedSearchField = ref('all')
 const searchInputEl = ref(null)
+const entries = ref([])
+const total = ref(0)
+const page = ref(1)
+const pageSize = ref(50)
+const isLoadingItems = ref(false)
+const loadError = ref('')
 
 const workflowTabs = computed(() => [
   { key: 'list', label: t('words.wordList.tabs.list') },
@@ -236,13 +250,6 @@ const searchFieldOptions = computed(() => [
   { value: 'location', label: t('words.wordList.search.fields.location') }
 ])
 
-const sortOptions = computed(() => [
-  { key: 'location', label: t('words.wordList.sort.location') },
-  { key: 'definition', label: t('words.wordList.sort.definition') },
-  { key: 'headword', label: t('words.wordList.sort.headword') },
-  { key: 'updated_at', label: t('words.wordList.sort.updatedAt') }
-])
-
 const viewModes = computed(() => [
   { key: 'table', icon: '▤', label: t('words.wordList.viewModes.table') },
   { key: 'card', icon: '▦', label: t('words.wordList.viewModes.card') },
@@ -250,11 +257,13 @@ const viewModes = computed(() => [
 ])
 
 const tableColumns = computed(() => [
-  { key: 'headword', label: t('words.wordList.columns.headword') },
-  { key: 'definition', label: t('words.wordList.columns.definition') },
-  { key: 'pronunciation', label: t('words.wordList.columns.pronunciation') },
-  { key: 'location', label: t('words.wordList.columns.location') },
-  { key: 'detail', label: t('words.wordList.columns.detail') }
+  { key: 'definition', label: t('words.wordList.columns.definition'), filterable: false, width: 1.2 },
+  { key: 'headword', label: t('words.wordList.columns.headword'), filterable: false, width: 1 },
+  { key: 'pronunciation', label: t('words.wordList.columns.pronunciation'), filterable: false, width: 1.2 },
+  { key: 'detail', label: t('words.wordList.columns.detail'), filterable: false, width: 1.6 },
+  { key: 'location_name', label: t('words.wordList.columns.location'), filterable: true, width: 1 },
+  { key: 'location', label: t('words.wordList.columns.locationFull'), filterable: true, width: 1.6 },
+  { key: 'pronunciation_type', label: t('words.wordList.columns.pronunciationType'), filterable: true, width: 0.8 }
 ])
 
 const importSchema = computed(() => [
@@ -304,39 +313,12 @@ const importFlow = useTabularImportFlow({
   previewState: importPreview
 })
 
-const previewEntries = computed(() => [
-  {
-    id: 'sample-1',
-    headword: t('words.wordList.samples.one.headword'),
-    definition: t('words.wordList.samples.one.definition'),
-    pronunciation: t('words.wordList.samples.one.pronunciation'),
-    pronunciationType: 'IPA',
-    detail: t('words.wordList.samples.one.detail'),
-    location: t('words.wordList.samples.one.location')
-  },
-  {
-    id: 'sample-2',
-    headword: t('words.wordList.samples.two.headword'),
-    definition: t('words.wordList.samples.two.definition'),
-    pronunciation: t('words.wordList.samples.two.pronunciation'),
-    pronunciationType: 'IPA',
-    detail: t('words.wordList.samples.two.detail'),
-    location: t('words.wordList.samples.two.location')
-  }
-])
+const canLoadMore = computed(() => {
+  return activeWorkflow.value === 'list' && viewMode.value !== 'table' && entries.value.length < total.value
+})
 
-const visibleEntries = computed(() => {
-  const place = locationQuery.value.trim().toLowerCase()
-  const text = query.value.trim().toLowerCase()
-
-  return previewEntries.value.filter((entry) => {
-    const matchesLocation = !place || entry.location.toLowerCase().includes(place)
-    const fields = selectedSearchField.value === 'all'
-      ? ['definition', 'headword', 'pronunciation', 'detail', 'location']
-      : [selectedSearchField.value]
-    const matchesText = !text || fields.some((field) => String(entry[field] ?? '').toLowerCase().includes(text))
-    return matchesLocation && matchesText
-  })
+const mappableEntries = computed(() => {
+  return entries.value.filter((entry) => Number.isFinite(entry.longitude) && Number.isFinite(entry.latitude))
 })
 
 const reviewSubmissions = computed(() => [
@@ -346,6 +328,80 @@ const reviewSubmissions = computed(() => [
     meta: t('words.wordList.review.sampleMeta')
   }
 ])
+
+function shouldUseVocabularyItemsApi() {
+  return activeWorkflow.value === 'list' && viewMode.value !== 'table'
+}
+
+function parseLocationFilter(value) {
+  return value
+    .split(/[,，;；\n]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function normalizeNumber(value) {
+  const numberValue = Number(value)
+  return Number.isFinite(numberValue) ? numberValue : null
+}
+
+function normalizeVocabularyEntry(item) {
+  return {
+    id: item.id,
+    definition: item.definition || '',
+    headword: item.headword || '',
+    pronunciation: item.pronunciation || '',
+    pronunciationType: item.pronunciation_type || '',
+    detail: item.detail || '',
+    location: item.location || item.location_name || '',
+    locationName: item.location_name || '',
+    longitude: normalizeNumber(item.longitude),
+    latitude: normalizeNumber(item.latitude),
+  }
+}
+
+function buildVocabularyItemsParams() {
+  const params = {
+    q: query.value.trim(),
+    locations: parseLocationFilter(locationQuery.value),
+    page: page.value,
+    page_size: pageSize.value,
+  }
+
+  if (selectedSearchField.value !== 'all') {
+    params.search_fields = selectedSearchField.value
+  }
+
+  return params
+}
+
+async function loadVocabularyItems({ append = false } = {}) {
+  if (!shouldUseVocabularyItemsApi()) {
+    return
+  }
+
+  const nextPage = append ? page.value + 1 : 1
+  page.value = nextPage
+  isLoadingItems.value = true
+  loadError.value = ''
+
+  try {
+    const response = await getVocabularyItems(buildVocabularyItemsParams())
+    const nextEntries = Array.isArray(response.items) ? response.items.map(normalizeVocabularyEntry) : []
+    entries.value = append ? entries.value.concat(nextEntries) : nextEntries
+    total.value = Number(response.total) || entries.value.length
+    page.value = Number(response.page) || nextPage
+    pageSize.value = Number(response.page_size) || pageSize.value
+  } catch (error) {
+    loadError.value = error.message || '獲取詞表條目失敗'
+    if (!append) {
+      entries.value = []
+      total.value = 0
+    }
+  } finally {
+    isLoadingItems.value = false
+  }
+}
 
 function handleUploadFile(event) {
   const file = event.target.files?.[0]
@@ -357,6 +413,22 @@ function handleUploadFile(event) {
 function handleConfirmUpload() {
   // Backend submission will be connected after the vocabulary API is implemented.
 }
+
+onMounted(() => {
+  loadVocabularyItems()
+})
+
+watch([activeWorkflow, viewMode], () => {
+  if (shouldUseVocabularyItemsApi()) {
+    loadVocabularyItems()
+  }
+})
+
+watchDebounced([query, selectedSearchField, locationQuery], () => {
+  if (shouldUseVocabularyItemsApi()) {
+    loadVocabularyItems()
+  }
+}, { debounce: 250, maxWait: 800 })
 </script>
 
 <style scoped lang="scss">
@@ -432,8 +504,7 @@ function handleConfirmUpload() {
 }
 
 .search-input,
-.local-filter-input,
-.sort-control select {
+.local-filter-input {
   width: 100%;
   min-height: 40px;
   padding: 10px 12px;
@@ -510,18 +581,13 @@ function handleConfirmUpload() {
   transform: translateY(-50%);
 }
 
-.sort-control {
-  display: flex;
-  flex: 0 0 220px;
-  gap: 8px;
-  align-items: center;
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
-
 .content-area {
   width: min(100%, 1180px);
   margin: 0 auto;
+}
+
+.table-content-area {
+  width: 100%;
 }
 
 .cards-grid {
@@ -579,38 +645,10 @@ function handleConfirmUpload() {
   line-height: 1.6;
 }
 
-.table-mode,
 .map-mode,
 .upload-mode,
 .review-mode {
   padding: 16px;
-}
-
-.vocabulary-table {
-  overflow: auto;
-}
-
-.vocabulary-table__row {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr 1fr 1fr 1.6fr;
-  min-width: 760px;
-  border-bottom: 1px solid var(--glass-20);
-}
-
-.vocabulary-table__row span {
-  min-width: 0;
-  padding: 12px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.vocabulary-table__row--head {
-  position: sticky;
-  top: 0;
-  color: var(--text-secondary);
-  font-weight: 600;
-  background: var(--glass-20);
 }
 
 .map-mode {
@@ -645,6 +683,11 @@ function handleConfirmUpload() {
   gap: 10px;
   padding: 10px 0;
   border-bottom: 1px solid var(--glass-20);
+}
+
+.load-more-btn {
+  display: flex;
+  margin: 14px auto 0;
 }
 
 .upload-mode,
@@ -724,14 +767,8 @@ function handleConfirmUpload() {
     flex-direction: column;
   }
 
-  .field-filter,
-  .sort-control {
+  .field-filter {
     width: 100%;
-  }
-
-  .sort-control {
-    flex: 1 1 auto;
-    align-items: stretch;
   }
 
   .map-mode {

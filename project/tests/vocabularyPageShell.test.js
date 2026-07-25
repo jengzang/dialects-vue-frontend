@@ -47,7 +47,10 @@ describe('vocabulary explore page shell wiring', () => {
     const vocabularyPage = readSource('src/main/views/explore/word/VocabularyPage.vue')
 
     expect(vocabularyPage).toContain("import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'")
+    expect(vocabularyPage).toContain("import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'")
+    expect(vocabularyPage).toContain("import { getVocabularyItems } from '@/api'")
     expect(vocabularyPage).toContain('<SimpleSelectDropdown')
+    expect(vocabularyPage).toContain('<UniversalTable')
     expect(vocabularyPage).not.toContain('MultiSelectDropdown')
     expect(vocabularyPage).not.toContain('LocationAndRegionInput')
     expect(vocabularyPage).toContain('top-controls')
@@ -59,5 +62,22 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain("viewMode === 'card'")
     expect(vocabularyPage).toContain("viewMode === 'table'")
     expect(vocabularyPage).toContain("viewMode === 'map'")
+  })
+
+  it('keeps vocabulary card and map queries separate from the table API', () => {
+    const vocabularyPage = readSource('src/main/views/explore/word/VocabularyPage.vue')
+
+    expect(vocabularyPage).toContain("return activeWorkflow.value === 'list' && viewMode.value !== 'table'")
+    expect(vocabularyPage).toContain('getVocabularyItems(buildVocabularyItemsParams())')
+    expect(vocabularyPage).toContain("locations: parseLocationFilter(locationQuery.value)")
+    expect(vocabularyPage).toContain("selectedSearchField.value !== 'all'")
+    expect(vocabularyPage).toContain('const mappableEntries = computed')
+    expect(vocabularyPage).toContain('Number.isFinite(entry.longitude)')
+    expect(vocabularyPage).toContain('Number.isFinite(entry.latitude)')
+    expect(vocabularyPage).toContain('db-key="vocabulary"')
+    expect(vocabularyPage).toContain('table-name="entries"')
+    expect(vocabularyPage).not.toContain('sortBy')
+    expect(vocabularyPage).not.toContain('sortOptions')
+    expect(vocabularyPage).not.toContain('previewEntries')
   })
 })

@@ -20,11 +20,11 @@
     },
     "search": {
       "label": "Search",
-      "placeholder": "Search definition, headword, pronunciation, detail, or location",
+      "placeholder": "Search definition, headword, pronunciation, or detail",
       "locationPlaceholder": "Filter current results by location",
       "fieldCount": "{count} columns",
       "fields": {
-        "all": "All columns",
+        "all": "All content",
         "definition": "Definition",
         "headword": "Headword",
         "pronunciation": "Pronunciation",
@@ -49,14 +49,16 @@
       "headword": "Headword",
       "definition": "Definition",
       "pronunciation": "Pronunciation",
+      "pronunciationType": "Pronunciation Type",
       "location": "Location",
+      "locationFull": "Full Location",
       "detail": "Detail"
     },
     "table": {
       "label": "Vocabulary results"
     },
     "map": {
-      "placeholder": "The map view will show vocabulary distribution after the backend returns coordinates"
+      "placeholder": "{count} items can be mapped"
     },
     "upload": {
       "title": "Upload Vocabulary",

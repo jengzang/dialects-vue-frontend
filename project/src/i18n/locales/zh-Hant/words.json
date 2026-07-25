@@ -20,11 +20,11 @@
     },
     "search": {
       "label": "搜索",
-      "placeholder": "搜索釋義、詞條、發音、詳情或地點",
+      "placeholder": "搜索釋義、詞條、發音、詳情",
       "locationPlaceholder": "按地點篩選當前結果",
       "fieldCount": "已選 {count} 列",
       "fields": {
-        "all": "全部列",
+        "all": "全部內容",
         "definition": "釋義",
         "headword": "詞條",
         "pronunciation": "發音",
@@ -49,14 +49,16 @@
       "headword": "詞條",
       "definition": "釋義",
       "pronunciation": "發音",
+      "pronunciationType": "注音類型",
       "location": "地點",
+      "locationFull": "完整地點",
       "detail": "詳情"
     },
     "table": {
       "label": "詞表結果"
     },
     "map": {
-      "placeholder": "地圖視圖將在後端返回坐標後展示詞條分布"
+      "placeholder": "當前可上圖 {count} 條"
     },
     "upload": {
       "title": "上傳詞表",

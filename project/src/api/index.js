@@ -61,6 +61,12 @@ export {
   getYubaoGrammarItems,
 } from './main/yubao.js';
 
+// ==================== 词表业务接口 ====================
+export {
+  buildVocabularyItemsPath,
+  getVocabularyItems,
+} from './main/vocabulary.js';
+
 // ==================== 查询模块 ====================
 // 核心查询
 export {

@@ -20,11 +20,11 @@
     },
     "search": {
       "label": "搜索",
-      "placeholder": "搜索释义、词条、发音、详情或地点",
+      "placeholder": "搜索释义、词条、发音、详情",
       "locationPlaceholder": "按地点筛选当前结果",
       "fieldCount": "已选 {count} 列",
       "fields": {
-        "all": "全部列",
+        "all": "全部内容",
         "definition": "释义",
         "headword": "词条",
         "pronunciation": "发音",
@@ -49,14 +49,16 @@
       "headword": "词条",
       "definition": "释义",
       "pronunciation": "发音",
+      "pronunciationType": "注音类型",
       "location": "地点",
+      "locationFull": "完整地点",
       "detail": "详情"
     },
     "table": {
       "label": "词表结果"
     },
     "map": {
-      "placeholder": "地图视图将在后端返回坐标后展示词条分布"
+      "placeholder": "当前可上图 {count} 条"
     },
     "upload": {
       "title": "上传词表",
