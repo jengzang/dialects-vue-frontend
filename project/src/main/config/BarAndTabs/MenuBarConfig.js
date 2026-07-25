@@ -289,7 +289,7 @@ export function useMenuTabsConfig() {
         overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
       },
       navigation: {
-        defaultTo: { path: withRouteLocale(route, '/menu/words') }
+        defaultTo: { path: withRouteLocale(route, '/explore/vocabulary') }
       }
     }),
     createMenuTab({

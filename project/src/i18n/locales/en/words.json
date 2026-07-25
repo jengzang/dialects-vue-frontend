@@ -11,7 +11,93 @@
   "wordList": {
     "name": "Vocabulary List",
     "desc": "Dialect vocabulary list page",
-    "placeholder": "Vocabulary page shell"
+    "placeholder": "Vocabulary page shell",
+    "tabs": {
+      "label": "Vocabulary workflows",
+      "list": "List",
+      "upload": "Upload",
+      "review": "Review"
+    },
+    "search": {
+      "label": "Search",
+      "placeholder": "Search definition, headword, pronunciation, detail, or location",
+      "fieldCount": "{count} columns",
+      "fields": {
+        "all": "All columns",
+        "definition": "Definition",
+        "headword": "Headword",
+        "pronunciation": "Pronunciation",
+        "detail": "Detail",
+        "location": "Location"
+      }
+    },
+    "sort": {
+      "label": "Sort",
+      "location": "By location",
+      "definition": "By definition",
+      "headword": "By headword",
+      "updatedAt": "By updated time"
+    },
+    "viewModes": {
+      "label": "View mode",
+      "card": "Cards",
+      "table": "Table",
+      "map": "Map"
+    },
+    "columns": {
+      "headword": "Headword",
+      "definition": "Definition",
+      "pronunciation": "Pronunciation",
+      "location": "Location",
+      "detail": "Detail"
+    },
+    "table": {
+      "label": "Vocabulary results"
+    },
+    "map": {
+      "placeholder": "The map view will show vocabulary distribution after the backend returns coordinates"
+    },
+    "upload": {
+      "title": "Upload Vocabulary",
+      "desc": "Choose a table file, map vocabulary fields, then submit it for review.",
+      "chooseFile": "Choose file",
+      "previewTitle": "Vocabulary import preview",
+      "previewDesc": "Confirm column mapping and preview rows"
+    },
+    "import": {
+      "examples": {
+        "definition": "sun",
+        "headword": "日头",
+        "pronunciation": "ȵit̚˨ tʰɐu˩",
+        "location": "Yangchun",
+        "detail": "Common in everyday speech."
+      }
+    },
+    "review": {
+      "title": "Review Vocabulary",
+      "desc": "Designated users approve submissions before the backend updates the published database.",
+      "permissionBadge": "Permission required",
+      "reject": "Reject",
+      "approve": "Approve",
+      "sampleFile": "pending-vocabulary.xlsx",
+      "sampleMeta": "120 rows · submitter pending API"
+    },
+    "samples": {
+      "one": {
+        "headword": "日头",
+        "definition": "sun",
+        "pronunciation": "ȵit̚˨ tʰɐu˩",
+        "detail": "Common in everyday speech.",
+        "location": "Guangdong / Yangjiang / Yangchun"
+      },
+      "two": {
+        "headword": "食朝",
+        "definition": "eat breakfast",
+        "pronunciation": "sik̚˧ tsʰiu˥",
+        "detail": "A way to refer to the morning meal.",
+        "location": "Guangdong / Yangjiang"
+      }
+    }
   },
   "yuBaoPage": {
     "viewAll": "View all",

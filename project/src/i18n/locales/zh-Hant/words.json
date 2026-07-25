@@ -11,7 +11,93 @@
   "wordList": {
     "name": "詞表",
     "desc": "方言詞表頁面",
-    "placeholder": "詞表頁面殼子"
+    "placeholder": "詞表頁面殼子",
+    "tabs": {
+      "label": "詞表工作流",
+      "list": "詞表",
+      "upload": "上傳",
+      "review": "審查"
+    },
+    "search": {
+      "label": "搜索",
+      "placeholder": "搜索釋義、詞條、發音、詳情或地點",
+      "fieldCount": "已選 {count} 列",
+      "fields": {
+        "all": "全部列",
+        "definition": "釋義",
+        "headword": "詞條",
+        "pronunciation": "發音",
+        "detail": "詳情",
+        "location": "地點"
+      }
+    },
+    "sort": {
+      "label": "排序",
+      "location": "按地點",
+      "definition": "按釋義",
+      "headword": "按詞條",
+      "updatedAt": "按更新時間"
+    },
+    "viewModes": {
+      "label": "展示方式",
+      "card": "卡片",
+      "table": "表格",
+      "map": "地圖"
+    },
+    "columns": {
+      "headword": "詞條",
+      "definition": "釋義",
+      "pronunciation": "發音",
+      "location": "地點",
+      "detail": "詳情"
+    },
+    "table": {
+      "label": "詞表結果"
+    },
+    "map": {
+      "placeholder": "地圖視圖將在後端返回坐標後展示詞條分布"
+    },
+    "upload": {
+      "title": "上傳詞表",
+      "desc": "選擇表格文件後映射詞表字段，提交後進入審查流程。",
+      "chooseFile": "選擇文件",
+      "previewTitle": "詞表導入預覽",
+      "previewDesc": "確認列映射和預覽內容"
+    },
+    "import": {
+      "examples": {
+        "definition": "太陽",
+        "headword": "日頭",
+        "pronunciation": "ȵit̚˨ tʰɐu˩",
+        "location": "陽春",
+        "detail": "常用於日常口語。"
+      }
+    },
+    "review": {
+      "title": "審查詞表",
+      "desc": "指定用戶確認上傳內容後，後端會更新正式詞庫。",
+      "permissionBadge": "需要權限",
+      "reject": "退回",
+      "approve": "通過",
+      "sampleFile": "待審詞表.xlsx",
+      "sampleMeta": "120 條 · 提交者待接口返回"
+    },
+    "samples": {
+      "one": {
+        "headword": "日頭",
+        "definition": "太陽",
+        "pronunciation": "ȵit̚˨ tʰɐu˩",
+        "detail": "常用於日常口語。",
+        "location": "廣東省 / 陽江市 / 陽春市"
+      },
+      "two": {
+        "headword": "食朝",
+        "definition": "吃早飯",
+        "pronunciation": "sik̚˧ tsʰiu˥",
+        "detail": "早晨用餐的說法。",
+        "location": "廣東省 / 陽江市"
+      }
+    }
   },
   "yuBaoPage": {
     "viewAll": "查看全部",

@@ -258,7 +258,7 @@ export function useExploreBarConfig() {
                 overrides: {}
             },
             navigation: {
-                defaultTo: { path: withRouteLocale(route, '/menu/words') },
+                defaultTo: { path: withRouteLocale(route, '/explore/vocabulary') },
                 matchPages: ['YuBao', 'Vocabulary', 'ycSpoken'],
                 rememberChild: true,
                 defaultChild: '/explore/vocabulary',

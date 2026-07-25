@@ -11,7 +11,93 @@
   "wordList": {
     "name": "词表",
     "desc": "方言词表页面",
-    "placeholder": "词表页面壳子"
+    "placeholder": "词表页面壳子",
+    "tabs": {
+      "label": "词表工作流",
+      "list": "词表",
+      "upload": "上传",
+      "review": "审查"
+    },
+    "search": {
+      "label": "搜索",
+      "placeholder": "搜索释义、词条、发音、详情或地点",
+      "fieldCount": "已选 {count} 列",
+      "fields": {
+        "all": "全部列",
+        "definition": "释义",
+        "headword": "词条",
+        "pronunciation": "发音",
+        "detail": "详情",
+        "location": "地点"
+      }
+    },
+    "sort": {
+      "label": "排序",
+      "location": "按地点",
+      "definition": "按释义",
+      "headword": "按词条",
+      "updatedAt": "按更新时间"
+    },
+    "viewModes": {
+      "label": "展示方式",
+      "card": "卡片",
+      "table": "表格",
+      "map": "地图"
+    },
+    "columns": {
+      "headword": "词条",
+      "definition": "释义",
+      "pronunciation": "发音",
+      "location": "地点",
+      "detail": "详情"
+    },
+    "table": {
+      "label": "词表结果"
+    },
+    "map": {
+      "placeholder": "地图视图将在后端返回坐标后展示词条分布"
+    },
+    "upload": {
+      "title": "上传词表",
+      "desc": "选择表格文件后映射词表字段，提交后进入审查流程。",
+      "chooseFile": "选择文件",
+      "previewTitle": "词表导入预览",
+      "previewDesc": "确认列映射和预览内容"
+    },
+    "import": {
+      "examples": {
+        "definition": "太阳",
+        "headword": "日头",
+        "pronunciation": "ȵit̚˨ tʰɐu˩",
+        "location": "阳春",
+        "detail": "常用于日常口语。"
+      }
+    },
+    "review": {
+      "title": "审查词表",
+      "desc": "指定用户确认上传内容后，后端会更新正式词库。",
+      "permissionBadge": "需要权限",
+      "reject": "退回",
+      "approve": "通过",
+      "sampleFile": "待审词表.xlsx",
+      "sampleMeta": "120 条 · 提交者待接口返回"
+    },
+    "samples": {
+      "one": {
+        "headword": "日头",
+        "definition": "太阳",
+        "pronunciation": "ȵit̚˨ tʰɐu˩",
+        "detail": "常用于日常口语。",
+        "location": "广东省 / 阳江市 / 阳春市"
+      },
+      "two": {
+        "headword": "食朝",
+        "definition": "吃早饭",
+        "pronunciation": "sik̚˧ tsʰiu˥",
+        "detail": "早晨用餐的说法。",
+        "location": "广东省 / 阳江市"
+      }
+    }
   },
   "yuBaoPage": {
     "viewAll": "查看全部",

@@ -80,7 +80,7 @@ export function useSidebarConfig() {
         words: {
             label: t('navigation.menu.words'),
             icon: '📖',
-            path: withRouteLocale(route, '/menu/words'),
+            path: withRouteLocale(route, '/explore/vocabulary'),
             children: [
                 { label: t('navigation.submenu.words.wordList'), icon: '📒', path: withRouteLocale(route, '/explore/vocabulary') },
                 { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: withRouteLocale(route, '/explore/yubao?tab=vocabulary') },

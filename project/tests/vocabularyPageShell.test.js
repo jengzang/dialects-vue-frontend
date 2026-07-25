@@ -35,10 +35,24 @@ describe('vocabulary explore page shell wiring', () => {
     expect(exploreBar).toContain("defaultChild: '/explore/vocabulary'")
     expect(menuBar).toContain("defaultTo: { path: withRouteLocale(route, '/explore/vocabulary') }")
     expect(sidebar).toContain("path: withRouteLocale(route, '/explore/vocabulary')")
+    expect(sidebar).toContain("path: buildLocalePath('zh-Hant', '/explore/vocabulary')")
 
     expect(wordsPortal.indexOf('handleWordList')).toBeLessThan(wordsPortal.indexOf('handleYuBaoVocabulary'))
     expect(homePage.indexOf("navigateTo('/explore/vocabulary')")).toBeLessThan(homePage.indexOf("navigateTo('/explore/yubao?tab=vocabulary')"))
     expect(exploreBar.indexOf("'/explore/vocabulary'")).toBeLessThan(exploreBar.indexOf("'/explore/yubao?tab=vocabulary'"))
     expect(sidebar.indexOf("'/explore/vocabulary'")).toBeLessThan(sidebar.indexOf("'/explore/yubao?tab=vocabulary'"))
+  })
+
+  it('builds the vocabulary workspace with reusable controls and three workflows', () => {
+    const vocabularyPage = readSource('src/main/views/explore/word/VocabularyPage.vue')
+
+    expect(vocabularyPage).toContain("import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'")
+    expect(vocabularyPage).toContain('<MultiSelectDropdown')
+    expect(vocabularyPage).toContain("key: 'list'")
+    expect(vocabularyPage).toContain("key: 'upload'")
+    expect(vocabularyPage).toContain("key: 'review'")
+    expect(vocabularyPage).toContain("viewMode === 'card'")
+    expect(vocabularyPage).toContain("viewMode === 'table'")
+    expect(vocabularyPage).toContain("viewMode === 'map'")
   })
 })
