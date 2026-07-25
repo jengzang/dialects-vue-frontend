@@ -64,7 +64,9 @@ export {
 // ==================== 词表业务接口 ====================
 export {
   buildVocabularyItemsPath,
+  buildVocabularyMapPointsPath,
   getVocabularyItems,
+  getVocabularyMapPoints,
   uploadVocabulary,
   vocabularySqlApi,
 } from './main/vocabulary.js';

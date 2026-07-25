@@ -12,7 +12,9 @@ vi.mock('../src/utils/ui/message.js', () => ({
 
 const {
   buildVocabularyItemsPath,
+  buildVocabularyMapPointsPath,
   getVocabularyItems,
+  getVocabularyMapPoints,
   vocabularySqlApi,
   uploadVocabulary,
 } = await import('../src/api/main/vocabulary.js')
@@ -64,6 +66,29 @@ describe('vocabulary items API', () => {
     expect(apiMock.mock.calls[0][0]).toBe(
       '/api/vocabulary/items?q=%E5%A4%AA%E9%98%B3&search_fields=definition&page=1&page_size=50'
     )
+  })
+
+  it('serializes map points query without pagination', async () => {
+    const path = buildVocabularyMapPointsPath({
+      q: '日头',
+      search_fields: ['headword', 'definition'],
+      locations: ['息烽', '天柱'],
+      page: 2,
+      page_size: 50,
+    })
+    const searchParams = paramsFromPath(path)
+
+    expect(path).toContain('/api/vocabulary/map-points?')
+    expect(searchParams.get('q')).toBe('日头')
+    expect(searchParams.get('search_fields')).toBe('headword,definition')
+    expect(searchParams.get('locations')).toBe('息烽,天柱')
+    expect(searchParams.has('page')).toBe(false)
+    expect(searchParams.has('page_size')).toBe(false)
+
+    apiMock.mockResolvedValueOnce({ points: [], total_entries: 0, total_points: 0 })
+    await getVocabularyMapPoints({ q: '太阳' })
+
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/map-points?q=%E5%A4%AA%E9%98%B3')
   })
 })
 

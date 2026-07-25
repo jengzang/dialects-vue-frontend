@@ -119,12 +119,34 @@
       <div v-else-if="viewMode === 'map'" class="map-mode main-glass-panel">
         <div class="map-placeholder">
           <span aria-hidden="true">⌖</span>
-          <p>{{ t('words.wordList.map.placeholder', { count: mappableEntries.length }) }}</p>
+          <p>{{ t('words.wordList.map.placeholder', { count: mapPoints.length }) }}</p>
+          <p class="map-meta">
+            {{ t('words.wordList.map.meta', {
+              entries: mapStats.totalEntries,
+              omitted: mapStats.omittedWithoutCoordinates
+            }) }}
+          </p>
         </div>
-        <div class="map-result-list ui-scrollbar">
-          <div v-for="entry in entries" :key="entry.id" class="map-result-item">
-            <strong>{{ entry.headword }}</strong>
-            <span>{{ entry.location }}</span>
+        <div class="map-side-panel ui-scrollbar">
+          <div class="map-result-list">
+            <button
+              v-for="point in mapPoints"
+              :key="point.locationName"
+              class="map-result-item"
+              type="button"
+              @click="handleMapPointClick(point)"
+            >
+              <strong>{{ point.locationLabel }}</strong>
+              <span>{{ point.entryCount }}</span>
+            </button>
+          </div>
+
+          <div v-if="entries.length" class="map-detail-list">
+            <article v-for="entry in entries" :key="entry.id" class="map-detail-item">
+              <strong>{{ entry.headword }}</strong>
+              <span>{{ entry.pronunciation }}</span>
+              <p>{{ entry.definition }}</p>
+            </article>
           </div>
         </div>
       </div>
@@ -248,7 +270,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { watchDebounced } from '@vueuse/core'
-import { getVocabularyItems, uploadVocabulary } from '@/api'
+import { getVocabularyItems, getVocabularyMapPoints, uploadVocabulary } from '@/api'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
@@ -264,6 +286,12 @@ const viewMode = ref('card')
 const selectedSearchField = ref('all')
 const searchInputEl = ref(null)
 const entries = ref([])
+const mapPoints = ref([])
+const mapStats = ref({
+  totalEntries: 0,
+  totalPoints: 0,
+  omittedWithoutCoordinates: 0,
+})
 const total = ref(0)
 const page = ref(1)
 const pageSize = ref(50)
@@ -382,11 +410,7 @@ const importFlow = useTabularImportFlow({
 })
 
 const canLoadMore = computed(() => {
-  return activeWorkflow.value === 'list' && viewMode.value !== 'table' && entries.value.length < total.value
-})
-
-const mappableEntries = computed(() => {
-  return entries.value.filter((entry) => Number.isFinite(entry.longitude) && Number.isFinite(entry.latitude))
+  return activeWorkflow.value === 'list' && viewMode.value === 'card' && entries.value.length < total.value
 })
 
 const selectedUploadFile = computed(() => uploadFile.value || importFlow.pendingFile.value)
@@ -408,7 +432,11 @@ const reviewSubmissions = computed(() => [
 ])
 
 function shouldUseVocabularyItemsApi() {
-  return activeWorkflow.value === 'list' && viewMode.value !== 'table'
+  return activeWorkflow.value === 'list' && viewMode.value === 'card'
+}
+
+function shouldUseVocabularyMapPointsApi() {
+  return activeWorkflow.value === 'list' && viewMode.value === 'map'
 }
 
 function parseLocationFilter(value) {
@@ -437,26 +465,29 @@ function normalizeNumber(value) {
 }
 
 function normalizeVocabularyEntry(item) {
+  const detailParts = [item.notes, item.informations, item.detail]
+    .map((value) => String(value || '').trim())
+    .filter(Boolean)
+
   return {
-    id: item.id,
-    definition: item.definition || '',
-    headword: item.headword || '',
-    pronunciation: item.pronunciation || '',
+    id: item.id || `${item.location_name || ''}-${item.standard_word || ''}-${item.local_expression || ''}`,
+    definition: item.standard_word || item.definition || '',
+    headword: item.local_expression || item.headword || '',
+    pronunciation: item.ipa || item.pronunciation || '',
     pronunciationType: item.pronunciation_type || '',
-    detail: item.detail || '',
-    location: item.location || item.location_name || '',
+    detail: [...new Set(detailParts)].join(' · '),
+    information: item.informations || '',
+    location: item.location_label || item.location || item.location_name || '',
     locationName: item.location_name || '',
     longitude: normalizeNumber(item.longitude),
     latitude: normalizeNumber(item.latitude),
   }
 }
 
-function buildVocabularyItemsParams() {
+function buildVocabularyQueryParams() {
   const params = {
     q: query.value.trim(),
     locations: parseLocationFilter(locationQuery.value),
-    page: page.value,
-    page_size: pageSize.value,
   }
 
   if (selectedSearchField.value !== 'all') {
@@ -464,6 +495,29 @@ function buildVocabularyItemsParams() {
   }
 
   return params
+}
+
+function buildVocabularyItemsParams(overrides = {}) {
+  return {
+    ...buildVocabularyQueryParams(),
+    page: page.value,
+    page_size: pageSize.value,
+    ...overrides,
+  }
+}
+
+function buildVocabularyMapPointsParams() {
+  return buildVocabularyQueryParams()
+}
+
+function normalizeVocabularyMapPoint(point) {
+  return {
+    locationName: point.location_name || '',
+    locationLabel: point.location_label || point.location_name || '',
+    longitude: normalizeNumber(point.longitude),
+    latitude: normalizeNumber(point.latitude),
+    entryCount: Number(point.entry_count) || 0,
+  }
 }
 
 async function loadVocabularyItems({ append = false } = {}) {
@@ -489,6 +543,65 @@ async function loadVocabularyItems({ append = false } = {}) {
       entries.value = []
       total.value = 0
     }
+  } finally {
+    isLoadingItems.value = false
+  }
+}
+
+async function loadVocabularyMapPoints() {
+  if (!shouldUseVocabularyMapPointsApi()) {
+    return
+  }
+
+  isLoadingItems.value = true
+  loadError.value = ''
+  entries.value = []
+  total.value = 0
+
+  try {
+    const response = await getVocabularyMapPoints(buildVocabularyMapPointsParams())
+    mapPoints.value = Array.isArray(response.points) ? response.points.map(normalizeVocabularyMapPoint) : []
+    mapStats.value = {
+      totalEntries: Number(response.total_entries) || 0,
+      totalPoints: Number(response.total_points) || mapPoints.value.length,
+      omittedWithoutCoordinates: Number(response.omitted_without_coordinates) || 0,
+    }
+  } catch (error) {
+    loadError.value = error.message || '獲取詞表地圖點失敗'
+    mapPoints.value = []
+    mapStats.value = {
+      totalEntries: 0,
+      totalPoints: 0,
+      omittedWithoutCoordinates: 0,
+    }
+  } finally {
+    isLoadingItems.value = false
+  }
+}
+
+async function handleMapPointClick(point) {
+  if (!point?.locationName) {
+    return
+  }
+
+  isLoadingItems.value = true
+  loadError.value = ''
+  page.value = 1
+
+  try {
+    const response = await getVocabularyItems(buildVocabularyItemsParams({
+      locations: point.locationName,
+      page: 1,
+      page_size: pageSize.value,
+    }))
+    entries.value = Array.isArray(response.items) ? response.items.map(normalizeVocabularyEntry) : []
+    total.value = Number(response.total) || entries.value.length
+    page.value = Number(response.page) || 1
+    pageSize.value = Number(response.page_size) || pageSize.value
+  } catch (error) {
+    loadError.value = error.message || '獲取詞表條目失敗'
+    entries.value = []
+    total.value = 0
   } finally {
     isLoadingItems.value = false
   }
@@ -556,12 +669,16 @@ onMounted(() => {
 watch([activeWorkflow, viewMode], () => {
   if (shouldUseVocabularyItemsApi()) {
     loadVocabularyItems()
+  } else if (shouldUseVocabularyMapPointsApi()) {
+    loadVocabularyMapPoints()
   }
 })
 
 watchDebounced([query, selectedSearchField, locationQuery], () => {
   if (shouldUseVocabularyItemsApi()) {
     loadVocabularyItems()
+  } else if (shouldUseVocabularyMapPointsApi()) {
+    loadVocabularyMapPoints()
   }
 }, { debounce: 250, maxWait: 800 })
 </script>
@@ -806,7 +923,7 @@ watchDebounced([query, selectedSearchField, locationQuery], () => {
   font-size: 42px;
 }
 
-.map-result-list {
+.map-side-panel {
   padding: 14px;
   overflow: auto;
   border-left: 1px solid var(--glass-20);
@@ -814,10 +931,41 @@ watchDebounced([query, selectedSearchField, locationQuery], () => {
 
 .map-result-item {
   display: flex;
+  width: 100%;
   justify-content: space-between;
   gap: 10px;
   padding: 10px 0;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
   border-bottom: 1px solid var(--glass-20);
+}
+
+.map-detail-list {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid var(--glass-20);
+}
+
+.map-detail-item {
+  padding: 10px;
+  background: var(--glass-10);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-md, 8px);
+}
+
+.map-detail-item p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+}
+
+.map-meta {
+  margin: 0;
+  font-size: 0.9rem;
 }
 
 .load-more-btn {
@@ -943,7 +1091,7 @@ watchDebounced([query, selectedSearchField, locationQuery], () => {
     grid-template-columns: 1fr;
   }
 
-  .map-result-list {
+  .map-side-panel {
     border-top: 1px solid var(--glass-20);
     border-left: 0;
   }

@@ -60,7 +60,8 @@
       "label": "Vocabulary results"
     },
     "map": {
-      "placeholder": "{count} items can be mapped"
+      "placeholder": "{count} locations can be mapped",
+      "meta": "{entries} matching entries; {omitted} locations omitted without coordinates"
     },
     "upload": {
       "title": "Upload Vocabulary",
