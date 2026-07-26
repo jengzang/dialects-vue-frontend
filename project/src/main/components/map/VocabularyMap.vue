@@ -44,79 +44,6 @@
       ✕ {{ t('map.yuBaoMap.buttons.exitFullscreen') }}
     </button>
 
-    <Teleport to="body">
-      <div v-if="showPopup && popupData" class="yubao-popup-overlay" @click="closePopup">
-        <div class="yubao-popup-content" @click.stop>
-          <div class="popup-header">
-            <h3>{{ t('map.yuBaoMap.popup.title') }}</h3>
-            <button
-              class="close-btn close-btn-lg close-btn-inline"
-              @click="closePopup"
-              :title="t('common.button.close')"
-              :aria-label="t('common.button.close')"
-            >
-              &times;
-            </button>
-          </div>
-          <div class="popup-body">
-            <div v-if="popupData.itemCount && popupData.itemCount > 1" class="aggregation-notice">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="16" x2="12" y2="12"/>
-                <line x1="12" y1="8" x2="12.01" y2="8"/>
-              </svg>
-              <span>{{ t('map.yuBaoMap.popup.clusteredCount', { count: popupData.itemCount }) }}</span>
-            </div>
-
-            <template v-if="activeTab === 'vocabulary'">
-              <div class="info-row">
-                <span class="label">{{ t('map.yuBaoMap.fields.location') }}</span>
-                <span class="value">{{ popupData.locationChain }}</span>
-              </div>
-              <div class="info-row pronunciation-row">
-                <span class="label">{{ t('map.yuBaoMap.fields.pronunciation') }}</span>
-                <span class="value">{{ popupData.pronunciation || '-' }}</span>
-              </div>
-              <div class="info-row">
-                <span class="label">{{ t('map.yuBaoMap.fields.word') }}</span>
-                <span class="value word-value">{{ popupData.word || '-' }}</span>
-              </div>
-              <div class="info-row" v-if="popupData.note1">
-                <span class="label">{{ t('map.yuBaoMap.fields.note') }}</span>
-                <span class="value">{{ popupData.note1 }}</span>
-              </div>
-              <div class="info-row category-row" v-if="popupData.category && popupData.category !== '-'">
-                <span class="label">{{ t('map.yuBaoMap.fields.category') }}</span>
-                <span class="value">{{ popupData.category }}</span>
-              </div>
-            </template>
-
-            <template v-else>
-              <div class="info-row">
-                <span class="label">{{ t('map.yuBaoMap.fields.location') }}</span>
-                <span class="value">{{ popupData.locationChain }}</span>
-              </div>
-              <div class="info-row pronunciation-row">
-                <span class="label">{{ t('map.yuBaoMap.fields.pronunciation') }}</span>
-                <span class="value">{{ popupData.phonetic || '-' }}</span>
-              </div>
-              <div class="info-row" v-if="popupData.memo">
-                <span class="label">{{ t('map.yuBaoMap.fields.note') }}</span>
-                <span class="value">{{ popupData.memo }}</span>
-              </div>
-              <div class="info-row" v-if="popupData.sentence">
-                <span class="label">{{ t('map.yuBaoMap.fields.sentence') }}</span>
-                <span class="value">{{ popupData.sentence }}</span>
-              </div>
-              <div class="info-row category-row" v-if="popupData.category && popupData.category !== '-'">
-                <span class="label">{{ t('map.yuBaoMap.fields.category') }}</span>
-                <span class="value">{{ popupData.category }}</span>
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
-    </Teleport>
   </div>
 </template>
 
@@ -150,8 +77,6 @@ const map = shallowRef(null)
 const currentStyleKey = ref('gaode')
 const displayMode = ref('overview')
 const isFullScreen = ref(false)
-const popupData = ref(null)
-const showPopup = ref(false)
 const mapLoaded = ref(false)  // 跟踪地图是否已加载
 const isLoadingMarkers = ref(false)  // 跟踪标记是否正在加载
 const { t } = useI18n()
@@ -161,7 +86,7 @@ const overviewDisplayModeOptions = computed(() => [
   { value: 'location', label: t('map.vocabularyMap.controls.location') }
 ])
 const detailDisplayModeOptions = computed(() => [
-  ...overviewDisplayModeOptions.value,
+  { value: 'location', label: t('map.vocabularyMap.controls.location') },
   { value: 'pronunciation', label: t('map.vocabularyMap.controls.pronunciation') },
   { value: 'definition', label: t('map.vocabularyMap.controls.definition') }
 ])
@@ -498,24 +423,6 @@ const handleMarkerClick = (properties) => {
     locationLabel: properties.locationChain,
     itemCount: Number(properties.itemCount) || 0,
   })
-
-  popupData.value = {
-    locationChain: properties.locationChain,
-    pronunciation: properties.pronunciation,
-    phonetic: properties.phonetic,
-    word: properties.word,
-    note1: properties.note1,
-    memo: properties.memo,
-    sentence: properties.sentence,
-    category: properties.category
-  }
-  showPopup.value = true
-}
-
-// 关闭弹窗
-const closePopup = () => {
-  showPopup.value = false
-  popupData.value = null
 }
 
 // 切换显示模式
@@ -833,7 +740,7 @@ onBeforeUnmount(() => {
 // --- Watchers ---
 watch(() => props.mapData, () => {
   if (!displayModeOptions.value.some((option) => option.value === displayMode.value)) {
-    displayMode.value = 'overview'
+    displayMode.value = displayModeOptions.value[0]?.value || 'location'
   }
 
   if (map.value) {
@@ -1100,153 +1007,4 @@ watch(() => props.activeTab, () => {
 
 /* Hover effect removed for performance optimization */
 
-/* 弹窗样式 */
-.yubao-popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  @include flex-center;
-  z-index: 100000;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.yubao-popup-content {
-  background: var(--bg-white);
-  border-radius: var(--radius-lg);
-  width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
-  @include flex-col;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-}
-
-.popup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid var(--border-divider);
-  background: #f8f8f8;
-}
-
-.popup-header h3 {
-  margin: 0;
-  font-size: 18px;
-  color: var(--text-dark);
-  font-weight: 600;
-}
-
-.popup-body {
-  padding: 20px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-/* 聚合提示样式 */
-.aggregation-notice {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  margin-bottom: 16px;
-  background: rgba(var(--color-primary-rgb), 0.08);
-  border-left: 3px solid var(--color-primary);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  color: var(--color-primary);
-  font-weight: 500;
-}
-
-.aggregation-notice svg {
-  flex-shrink: 0;
-  opacity: 0.8;
-}
-
-/* 信息行样式 */
-.info-row {
-  display: flex;
-  align-items: flex-start;
-  padding: 14px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  gap: 12px;
-  transition: background-color 0.2s;
-}
-
-.info-row:last-child {
-  border-bottom: none;
-}
-
-.info-row:hover {
-  background-color: rgba(var(--color-primary-rgb), 0.02);
-  margin: 0 -12px;
-  padding-left: 12px;
-  padding-right: 12px;
-  border-radius: var(--radius-sm2);
-}
-
-/* 标签样式 */
-.info-row .label {
-  flex-shrink: 0;
-  min-width: 60px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #6e6e73;
-  letter-spacing: 0.3px;
-  line-height: 1.6;
-}
-
-/* 值样式 */
-.info-row .value {
-  flex: 1;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text-primary);
-  line-height: 1.6;
-  word-break: break-word;
-}
-
-/* 发音行特殊样式 */
-.pronunciation-row .value {
-  font-family: 'Courier New', 'Monaco', monospace;
-  color: var(--color-primary);
-  letter-spacing: 0.5px;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-/* 字/词汇特殊样式 */
-.word-value {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-/* 分区行特殊样式 */
-.category-row .value {
-  color: var(--color-purple-light);
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.info-line {
-  padding: 10px 0;
-  border-bottom: 1px solid var(--bg-light);
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.info-line:last-child {
-  border-bottom: none;
-}
-
-.info-line strong {
-  color: var(--text-medium);
-  margin-right: 8px;
-  font-weight: 600;
-}
 </style>

@@ -206,6 +206,15 @@
             <p>{{ entry.definition }}</p>
             <small v-if="entry.detail">{{ entry.detail }}</small>
           </article>
+          <button
+            v-if="canLoadMoreMapDetail"
+            class="load-more-btn main-glass-button"
+            data-variant="secondary"
+            type="button"
+            @click="loadMoreMapDetail"
+          >
+            {{ t('words.yuBaoPage.states.loadingMore') }}
+          </button>
         </div>
         <div v-else class="empty-state empty-state-base">
           <p>{{ t('words.yuBaoPage.states.noData') }}</p>
@@ -273,7 +282,10 @@ const isMapDetailModalOpen = ref(false)
 const isLoadingMapDetail = ref(false)
 const mapDetailError = ref('')
 const mapDetailEntries = ref([])
+const mapDetailTotal = ref(0)
+const mapDetailPage = ref(1)
 const selectedMapPointLabel = ref('')
+const activeMapPointLocations = ref([])
 
 
 const searchFieldOptions = computed(() => [
@@ -317,6 +329,10 @@ const standardWordTriggerLabel = computed(() => {
 
 const canLoadMore = computed(() => {
   return shouldUseVocabularyItemsApi() && !isLoadingItems.value && entries.value.length < total.value
+})
+
+const canLoadMoreMapDetail = computed(() => {
+  return !isLoadingMapDetail.value && mapDetailEntries.value.length < mapDetailTotal.value
 })
 
 const viewModes = computed(() => [
@@ -622,14 +638,32 @@ async function handleMapPointClick(point) {
   isLoadingMapDetail.value = true
   mapDetailError.value = ''
   mapDetailEntries.value = []
+  mapDetailTotal.value = 0
+  mapDetailPage.value = 1
+  activeMapPointLocations.value = locations
 
+  // map-items mode: use items already loaded in mapPoints
+  if (selectedStandardWords.value.length > 0) {
+    const locationSet = new Set(locations)
+    const matchingPoints = mapPoints.value.filter((p) => locationSet.has(p.locationName))
+    const allItems = matchingPoints.flatMap((p) => (Array.isArray(p.items) ? p.items : []))
+    mapDetailEntries.value = allItems
+    mapDetailTotal.value = allItems.length
+    isLoadingMapDetail.value = false
+    return
+  }
+
+  // overview mode: fetch entries via API
   try {
-    const response = await getVocabularyItems(buildVocabularyItemsParams({
+    const response = await getVocabularyItems({
+      ...buildVocabularyQueryParams(),
       locations,
       page: 1,
       page_size: pageSize.value,
-    }))
+    })
     mapDetailEntries.value = Array.isArray(response.items) ? response.items.map(normalizeVocabularyEntry) : []
+    mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
+    mapDetailPage.value = Number(response.page) || 1
   } catch (error) {
     mapDetailError.value = error.message || '獲取詞表條目失敗'
     mapDetailEntries.value = []
@@ -638,9 +672,36 @@ async function handleMapPointClick(point) {
   }
 }
 
+async function loadMoreMapDetail() {
+  if (isLoadingMapDetail.value || mapDetailEntries.value.length >= mapDetailTotal.value) {
+    return
+  }
+
+  const nextPage = mapDetailPage.value + 1
+  isLoadingMapDetail.value = true
+
+  try {
+    const response = await getVocabularyItems({
+      ...buildVocabularyQueryParams(),
+      locations: activeMapPointLocations.value,
+      page: nextPage,
+      page_size: pageSize.value,
+    })
+    const nextEntries = Array.isArray(response.items) ? response.items.map(normalizeVocabularyEntry) : []
+    mapDetailEntries.value = mapDetailEntries.value.concat(nextEntries)
+    mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
+    mapDetailPage.value = Number(response.page) || nextPage
+  } catch (error) {
+    mapDetailError.value = error.message || '獲取詞表條目失敗'
+  } finally {
+    isLoadingMapDetail.value = false
+  }
+}
+
 function clearMapDetailModal() {
   selectedMapPointLabel.value = ''
   mapDetailError.value = ''
+  activeMapPointLocations.value = []
 }
 
 function loadActiveViewMode() {
