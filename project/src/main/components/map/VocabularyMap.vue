@@ -740,19 +740,16 @@ onBeforeUnmount(() => {
   }
 })
 
-function hasDetailItems(data) {
-  return data && data.some((item) => Array.isArray(item.items) && item.items.length > 0)
-}
-
 // --- Watchers ---
-watch(() => props.mapData, (newData, oldData) => {
-  const wasOverview = !hasDetailItems(oldData)
-  const nowHasDetail = hasDetailItems(newData)
+watch(canShowDetailModes, (now) => {
+  if (now && props.defaultDisplayMode) {
+    displayMode.value = props.defaultDisplayMode
+  }
+})
 
+watch(() => props.mapData, () => {
   if (!displayModeOptions.value.some((option) => option.value === displayMode.value)) {
     displayMode.value = props.defaultDisplayMode || displayModeOptions.value[0]?.value || 'location'
-  } else if (wasOverview && nowHasDetail && props.defaultDisplayMode) {
-    displayMode.value = props.defaultDisplayMode
   }
 
   if (map.value) {
