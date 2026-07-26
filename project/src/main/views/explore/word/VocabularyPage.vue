@@ -146,34 +146,6 @@
             <p>{{ t('words.yuBaoPage.states.noData') }}</p>
           </div>
         </div>
-        <div class="map-side-panel ui-scrollbar">
-          <p class="map-meta">
-            {{ t('words.wordList.map.meta', {
-              entries: mapStats.totalEntries,
-              omitted: mapStats.omittedWithoutCoordinates
-            }) }}
-          </p>
-          <div class="map-result-list">
-            <button
-              v-for="point in mapPoints"
-              :key="point.locationName"
-              class="map-result-item"
-              type="button"
-              @click="handleMapPointClick(point)"
-            >
-              <strong>{{ point.locationLabel }}</strong>
-              <span>{{ point.entryCount }}</span>
-            </button>
-          </div>
-
-          <div v-if="entries.length" class="map-detail-list">
-            <article v-for="entry in entries" :key="entry.id" class="map-detail-item">
-              <strong>{{ entry.headword }}</strong>
-              <span>{{ entry.pronunciation }}</span>
-              <p>{{ entry.definition }}</p>
-            </article>
-          </div>
-        </div>
       </div>
 
       <button
@@ -303,6 +275,45 @@
         <p v-if="locationsStatusText" class="upload-status">{{ locationsStatusText }}</p>
       </div>
     </section>
+
+    <AppModal
+      v-model="isMapDetailModalOpen"
+      size="lg"
+      width="720px"
+      max-height="80dvh"
+      :title="selectedMapPointLabel"
+      close-label="關閉"
+      @close="clearMapDetailModal"
+    >
+      <div class="map-detail-modal">
+        <p class="map-meta">
+          {{ t('words.wordList.map.meta', {
+            entries: mapStats.totalEntries,
+            omitted: mapStats.omittedWithoutCoordinates
+          }) }}
+        </p>
+        <div v-if="isLoadingMapDetail" class="loading-state loading-state-base">
+          <div class="ui-loading--page" aria-hidden="true"></div>
+          <span>{{ t('words.yuBaoPage.states.loadingData') }}</span>
+        </div>
+        <div v-else-if="mapDetailError" class="empty-state empty-state-base">
+          <p>{{ mapDetailError }}</p>
+        </div>
+        <div v-else-if="mapDetailEntries.length" class="map-detail-list">
+          <article v-for="entry in mapDetailEntries" :key="entry.id" class="map-detail-item">
+            <div class="map-detail-item-head">
+              <strong>{{ entry.headword }}</strong>
+              <span>{{ entry.pronunciation }}</span>
+            </div>
+            <p>{{ entry.definition }}</p>
+            <small v-if="entry.detail">{{ entry.detail }}</small>
+          </article>
+        </div>
+        <div v-else class="empty-state empty-state-base">
+          <p>{{ t('words.yuBaoPage.states.noData') }}</p>
+        </div>
+      </div>
+    </AppModal>
   </div>
 </template>
 
@@ -319,6 +330,7 @@ import {
   uploadVocabulary
 } from '@/api'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
+import AppModal from '@/components/common/AppModal.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import YuBaoMap from '@/main/components/map/YuBaoMap.vue'
@@ -355,6 +367,11 @@ const uploadStatusText = ref('')
 const isLoadingLocations = ref(false)
 const locationsLoadError = ref('')
 const locationsStatusText = ref('')
+const isMapDetailModalOpen = ref(false)
+const isLoadingMapDetail = ref(false)
+const mapDetailError = ref('')
+const mapDetailEntries = ref([])
+const selectedMapPointLabel = ref('')
 const uploadParserMode = ref('auto')
 const uploadFile = ref(null)
 const uploadLocation = ref({
@@ -767,9 +784,11 @@ async function handleMapPointClick(point) {
     return
   }
 
-  isLoadingItems.value = true
-  loadError.value = ''
-  page.value = 1
+  selectedMapPointLabel.value = point.locationLabel || point.locationName || locations[0]
+  isMapDetailModalOpen.value = true
+  isLoadingMapDetail.value = true
+  mapDetailError.value = ''
+  mapDetailEntries.value = []
 
   try {
     const response = await getVocabularyItems(buildVocabularyItemsParams({
@@ -777,17 +796,18 @@ async function handleMapPointClick(point) {
       page: 1,
       page_size: pageSize.value,
     }))
-    entries.value = Array.isArray(response.items) ? response.items.map(normalizeVocabularyEntry) : []
-    total.value = Number(response.total) || entries.value.length
-    page.value = Number(response.page) || 1
-    pageSize.value = Number(response.page_size) || pageSize.value
+    mapDetailEntries.value = Array.isArray(response.items) ? response.items.map(normalizeVocabularyEntry) : []
   } catch (error) {
-    loadError.value = error.message || '獲取詞表條目失敗'
-    entries.value = []
-    total.value = 0
+    mapDetailError.value = error.message || '獲取詞表條目失敗'
+    mapDetailEntries.value = []
   } finally {
-    isLoadingItems.value = false
+    isLoadingMapDetail.value = false
   }
+}
+
+function clearMapDetailModal() {
+  selectedMapPointLabel.value = ''
+  mapDetailError.value = ''
 }
 
 function handleUploadFile(event) {
@@ -1128,8 +1148,6 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
 }
 
 .map-mode {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
   min-height: 520px;
   overflow: hidden;
 }
@@ -1140,32 +1158,14 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
   border-radius: var(--radius-md, 8px);
 }
 
-.map-side-panel {
-  padding: 14px;
-  overflow: auto;
-  border-left: 1px solid var(--glass-20);
-}
-
-.map-result-item {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px 0;
-  color: var(--text-primary);
-  text-align: left;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--glass-20);
+.map-detail-modal {
+  display: grid;
+  gap: 12px;
 }
 
 .map-detail-list {
   display: grid;
   gap: 10px;
-  padding-top: 12px;
-  margin-top: 12px;
-  border-top: 1px solid var(--glass-20);
 }
 
 .map-detail-item {
@@ -1175,8 +1175,21 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
   border-radius: var(--radius-md, 8px);
 }
 
+.map-detail-item-head {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
 .map-detail-item p {
   margin: 6px 0 0;
+  color: var(--text-primary);
+}
+
+.map-detail-item small {
+  display: block;
+  margin-top: 6px;
   color: var(--text-secondary);
 }
 
@@ -1321,17 +1334,8 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
     font-size: 18px;
   }
 
-  .map-mode {
-    grid-template-columns: 1fr;
-  }
-
   .map-canvas-shell {
     min-height: 420px;
-  }
-
-  .map-side-panel {
-    border-top: 1px solid var(--glass-20);
-    border-left: 0;
   }
 }
 
