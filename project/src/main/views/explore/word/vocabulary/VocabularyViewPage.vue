@@ -294,7 +294,7 @@ function setViewMode(mode) {
   router.replace({
     query: {
       ...route.query,
-      tab: nextMode === 'card' ? undefined : nextMode,
+      tab: nextMode,
     }
   })
 }
