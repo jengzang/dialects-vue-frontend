@@ -260,6 +260,11 @@ export function useExploreBarConfig() {
             navigation: {
                 defaultTo: { path: withRouteLocale(route, '/menu/words') },
                 matchPages: ['YuBao', 'Vocabulary', 'ycSpoken'],
+                activeMatchPaths: [
+                    withRouteLocale(route, '/explore/vocabulary/view'),
+                    withRouteLocale(route, '/explore/vocabulary/import'),
+                    withRouteLocale(route, '/explore/vocabulary/manage')
+                ],
                 rememberChild: true,
                 defaultChild: '/explore/vocabulary/view',
                 children: [

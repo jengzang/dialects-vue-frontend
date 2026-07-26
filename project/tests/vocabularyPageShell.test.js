@@ -31,6 +31,15 @@ describe('vocabulary explore page shell wiring', () => {
     expect(readSource('src/main/config/BarAndTabs/SideBarConfig.js')).toContain("'/explore/vocabulary/view'")
   })
 
+  it('keeps the explore words tab active across vocabulary subpages', () => {
+    const exploreBar = readSource('src/main/config/BarAndTabs/ExploreBarConfig.js')
+
+    expect(exploreBar).toContain("activeMatchPaths: [")
+    expect(exploreBar).toContain("withRouteLocale(route, '/explore/vocabulary/view')")
+    expect(exploreBar).toContain("withRouteLocale(route, '/explore/vocabulary/import')")
+    expect(exploreBar).toContain("withRouteLocale(route, '/explore/vocabulary/manage')")
+  })
+
   it('keeps the words parent entry on /menu/words while listing vocabulary before YuBao pages', () => {
     const wordsPortal = readSource('src/main/views/menu/portals/WordsPage.vue')
     const homePage = readSource('src/main/views/HomePage.vue')
