@@ -148,7 +148,6 @@
         :columns="tableColumns"
         primary-key="id"
         api-adapter="vocabulary"
-        :can-edit="canUseVocabularyTable"
       />
     </section>
 
@@ -219,8 +218,6 @@ const props = defineProps({
   vocabularyMeError: { type: String, default: '' },
 })
 
-const canUseVocabularyTable = computed(() => Boolean(props.vocabularyMe?.permission_level))
-
 const query = ref('')
 const viewMode = ref(normalizeViewMode(route.query.tab))
 const selectedSearchFields = ref([])
@@ -285,7 +282,7 @@ const viewModes = computed(() => [
   { key: 'card', icon: '▦', label: t('words.wordList.viewModes.card') },
   { key: 'map', icon: '⌖', label: t('words.wordList.viewModes.map') },
   { key: 'table', icon: '▤', label: t('words.wordList.viewModes.table') },
-].filter((mode) => mode.key !== 'table' || canUseVocabularyTable.value))
+])
 
 const tableColumns = computed(() => [
   { key: 'standard_word', label: t('words.wordList.columns.definition'), filterable: false, width: 1.2 },
@@ -298,9 +295,6 @@ const tableColumns = computed(() => [
 ])
 
 function normalizeViewMode(value) {
-  if (value === 'table' && !canUseVocabularyTable.value) {
-    return 'card'
-  }
   return ['card', 'map', 'table'].includes(value) ? value : 'card'
 }
 
@@ -561,14 +555,6 @@ watch(() => route.query.tab, (tab) => {
   const nextMode = normalizeViewMode(tab)
   if (viewMode.value !== nextMode) {
     viewMode.value = nextMode
-  }
-})
-
-watch(canUseVocabularyTable, (canUseTable) => {
-  if (!canUseTable && viewMode.value === 'table') {
-    setViewMode('card')
-  } else if (canUseTable && route.query.tab === 'table' && viewMode.value !== 'table') {
-    viewMode.value = 'table'
   }
 })
 

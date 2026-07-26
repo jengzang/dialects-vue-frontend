@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { getVocabularyMe } from '@/api'
@@ -39,23 +39,12 @@ const router = useRouter()
 const vocabularyMe = ref(null)
 const isLoadingVocabularyMe = ref(false)
 const vocabularyMeError = ref('')
-const canUploadVocabulary = computed(() => vocabularyMe.value?.can_upload === true)
-const hasVocabularyPermission = computed(() => Boolean(vocabularyMe.value?.permission_level))
-
 const pageTabs = computed(() => {
-  const tabs = [
+  return [
     { label: t('words.wordList.tabs.list'), path: '/explore/vocabulary/view' },
+    { label: t('words.wordList.tabs.upload'), path: '/explore/vocabulary/import' },
+    { label: t('words.wordList.tabs.manage'), path: '/explore/vocabulary/manage' },
   ]
-
-  if (canUploadVocabulary.value) {
-    tabs.push({ label: t('words.wordList.tabs.upload'), path: '/explore/vocabulary/import' })
-  }
-
-  if (hasVocabularyPermission.value) {
-    tabs.push({ label: t('words.wordList.tabs.manage'), path: '/explore/vocabulary/manage' })
-  }
-
-  return tabs
 })
 
 async function loadVocabularyMe() {
@@ -86,21 +75,8 @@ function navigateTo(path) {
   router.push(buildLocalePath(resolveRouteLocale(route), path))
 }
 
-function redirectUnavailablePage() {
-  const currentPath = stripLocaleFromPath(route.path)
-  const canUseCurrentPage = pageTabs.value.some((tab) => tab.path === currentPath)
-
-  if (!canUseCurrentPage) {
-    navigateTo('/explore/vocabulary/view')
-  }
-}
-
 onMounted(() => {
   loadVocabularyMe()
-})
-
-watch([pageTabs, () => route.path], () => {
-  redirectUnavailablePage()
 })
 </script>
 
