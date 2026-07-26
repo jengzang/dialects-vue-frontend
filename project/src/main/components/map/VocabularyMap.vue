@@ -67,6 +67,10 @@ const props = defineProps({
   activeTab: {
     type: String,
     default: 'vocabulary'
+  },
+  defaultDisplayMode: {
+    type: String,
+    default: ''
   }
 })
 const emit = defineEmits(['marker-click'])
@@ -193,7 +197,7 @@ const getMarkerText = (item) => {
   }
 
   if (displayMode.value === 'overview') {
-    text = item.entryCount ? String(item.entryCount) : item.note1
+    text = item.entryCount ? String(item.entryCount) : ''
   } else if (displayMode.value === 'location') {
     // 地名模式
     if (props.activeTab === 'vocabulary') {
@@ -212,7 +216,7 @@ const getMarkerText = (item) => {
     text = props.activeTab === 'vocabulary' ? item.pronunciation : item.phonetic
   } else if (displayMode.value === 'definition') {
     // 释义模式
-    text = props.activeTab === 'vocabulary' ? item.note2 : item.memo
+    text = props.activeTab === 'vocabulary' ? item.localExpression : item.memo
   }
 
   // 智能截断（使用新的截断函数）
@@ -315,8 +319,7 @@ const convertToGeoJSON = (data) => {
       locationNames: JSON.stringify(Array.from(new Set(items.map(item => item.locationName || item.location).filter(Boolean)))),
       pronunciation: aggregateField(item => item.pronunciation),
       phonetic: aggregateField(item => item.phonetic),
-      word: aggregateField(item => item.note2 || item.word),
-      note1: aggregateField(item => item.note1),
+      word: aggregateField(item => item.standardWord || item.word),
       memo: aggregateField(item => item.memo),
       sentence: aggregateField(item => item.sentence),
       category: aggregateField(item => {
@@ -740,7 +743,7 @@ onBeforeUnmount(() => {
 // --- Watchers ---
 watch(() => props.mapData, () => {
   if (!displayModeOptions.value.some((option) => option.value === displayMode.value)) {
-    displayMode.value = displayModeOptions.value[0]?.value || 'location'
+    displayMode.value = props.defaultDisplayMode || displayModeOptions.value[0]?.value || 'location'
   }
 
   if (map.value) {
@@ -885,6 +888,7 @@ watch(() => props.activeTab, () => {
 /* 模式切换按钮 */
 .mode-switcher {
   display: flex;
+  white-space: nowrap;
   gap: 4px;
   background: var(--bg-light);
   border-radius: var(--radius-sm2);

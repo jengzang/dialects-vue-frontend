@@ -145,6 +145,7 @@
             v-if="mapDataForVocabularyMap.length"
             :map-data="mapDataForVocabularyMap"
             active-tab="vocabulary"
+            :default-display-mode="selectedStandardWords.length ? 'definition' : ''"
             @marker-click="handleMapPointClick"
           />
           <div v-else class="empty-state empty-state-base map-empty-state">
@@ -378,8 +379,8 @@ const mapDataForVocabularyMap = computed(() => {
       county: point.locationName,
       province: point.locationLabel,
       pronunciation: point.pronunciation || point.markerLabel,
-      note2: point.definition || point.locationLabel,
-      note1: point.entryCount ? String(point.entryCount) : '',
+      localExpression: point.localExpression || '',
+      standardWord: point.definition || '',
       items: point.items || [],
     }))
 })
@@ -498,12 +499,14 @@ function normalizeVocabularyMapItemPoint(point) {
   const items = Array.isArray(point.items) ? point.items.map(normalizeVocabularyEntry) : []
   const pronunciations = items.map((item) => item.pronunciation).filter(Boolean)
   const definitions = items.map((item) => item.definition).filter(Boolean)
+  const localExpressions = items.map((item) => item.headword).filter(Boolean)
 
   return {
     ...normalizedPoint,
     entryCount: Number(point.entry_count) || items.length || normalizedPoint.entryCount,
     pronunciation: [...new Set(pronunciations)].join(' / '),
     definition: [...new Set(definitions)].join(' / '),
+    localExpression: [...new Set(localExpressions)].join(' / '),
     items,
   }
 }
