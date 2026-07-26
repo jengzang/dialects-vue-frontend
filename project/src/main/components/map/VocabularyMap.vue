@@ -755,6 +755,12 @@ watch(() => props.mapData, () => {
   }
 }, { deep: true })
 
+watch(() => props.defaultDisplayMode, (newMode) => {
+  if (newMode && canShowDetailModes.value) {
+    displayMode.value = newMode
+  }
+})
+
 watch(() => props.activeTab, () => {
   // 显示加载动画
   isLoadingMarkers.value = true

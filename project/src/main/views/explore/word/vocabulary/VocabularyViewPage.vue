@@ -284,6 +284,7 @@ const mapDetailTotal = ref(0)
 const mapDetailPage = ref(1)
 const selectedMapPointLabel = ref('')
 const activeMapPointLocations = ref([])
+const activeMapPointBaseLabel = ref('')
 
 
 const searchFieldOptions = computed(() => [
@@ -626,6 +627,15 @@ async function loadVocabularyStandardWords() {
   }
 }
 
+function buildMapDetailTitle(baseLabel, count) {
+  const parts = [baseLabel]
+  if (selectedStandardWords.value.length > 0) {
+    parts.push(selectedStandardWords.value.join('、'))
+  }
+  parts.push(t('words.wordList.map.pointCount', { count }))
+  return parts.join(' · ')
+}
+
 async function handleMapPointClick(point) {
   const locations = normalizeMapPointLocations(point)
 
@@ -633,13 +643,8 @@ async function handleMapPointClick(point) {
     return
   }
 
-  const locationLabel = point.locationLabel || point.locationName || locations[0]
-  const titleParts = [locationLabel]
-  if (selectedStandardWords.value.length > 0) {
-    titleParts.push(selectedStandardWords.value.join('、'))
-  }
-  titleParts.push(t('words.wordList.map.pointCount', { count: point.itemCount || 0 }))
-  selectedMapPointLabel.value = titleParts.join(' · ')
+  const baseLabel = point.locationLabel || point.locationName || locations[0]
+  activeMapPointBaseLabel.value = baseLabel
   isMapDetailModalOpen.value = true
   isLoadingMapDetail.value = true
   mapDetailError.value = ''
@@ -648,18 +653,19 @@ async function handleMapPointClick(point) {
   mapDetailPage.value = 1
   activeMapPointLocations.value = locations
 
-  // map-items mode: use items already loaded in mapPoints
+  // map-items mode: count entries from the matching points directly
   if (selectedStandardWords.value.length > 0) {
     const locationSet = new Set(locations)
     const matchingPoints = mapPoints.value.filter((p) => locationSet.has(p.locationName))
     const allItems = matchingPoints.flatMap((p) => (Array.isArray(p.items) ? p.items : []))
     mapDetailEntries.value = allItems
     mapDetailTotal.value = allItems.length
+    selectedMapPointLabel.value = buildMapDetailTitle(baseLabel, allItems.length)
     isLoadingMapDetail.value = false
     return
   }
 
-  // overview mode: fetch entries via API
+  // overview mode: fetch entries, then set title with real count
   try {
     const response = await getVocabularyItems({
       ...buildVocabularyQueryParams(),
@@ -670,6 +676,7 @@ async function handleMapPointClick(point) {
     mapDetailEntries.value = Array.isArray(response.items) ? response.items.map(normalizeVocabularyEntry) : []
     mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
     mapDetailPage.value = Number(response.page) || 1
+    selectedMapPointLabel.value = buildMapDetailTitle(baseLabel, mapDetailEntries.value.length)
   } catch (error) {
     mapDetailError.value = error.message || '獲取詞表條目失敗'
     mapDetailEntries.value = []
@@ -697,6 +704,7 @@ async function loadMoreMapDetail() {
     mapDetailEntries.value = mapDetailEntries.value.concat(nextEntries)
     mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
     mapDetailPage.value = Number(response.page) || nextPage
+    selectedMapPointLabel.value = buildMapDetailTitle(activeMapPointBaseLabel.value, mapDetailEntries.value.length)
   } catch (error) {
     mapDetailError.value = error.message || '獲取詞表條目失敗'
   } finally {
@@ -708,6 +716,7 @@ function clearMapDetailModal() {
   selectedMapPointLabel.value = ''
   mapDetailError.value = ''
   activeMapPointLocations.value = []
+  activeMapPointBaseLabel.value = ''
 }
 
 function loadActiveViewMode() {
