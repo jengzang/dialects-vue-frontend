@@ -9,8 +9,10 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
+  align-items: center;
   padding: 12px;
   margin: 0 auto 16px;
   background: var(--glass-20);
@@ -96,7 +98,9 @@
 }
 
 .search-container {
+  flex: 1 1 540px;
   align-items: flex-start;
+  min-width: min(100%, 420px);
 }
 
 .search-section {
@@ -125,12 +129,12 @@
 
 .field-filter {
   position: relative;
-  flex: 0 0 auto;
+  flex: 0 0 176px;
 }
 
 .location-filter {
   position: relative;
-  width: min(100%, 360px);
+  width: 100%;
 }
 
 .filter-select-trigger {
@@ -187,7 +191,13 @@
 }
 
 .filter-strip {
+  flex: 0 1 360px;
   justify-content: space-between;
+  min-width: 220px;
+}
+
+.view-mode-selector {
+  flex: 0 0 auto;
 }
 
 .content-area {
@@ -536,18 +546,11 @@
     min-width: 88px;
   }
 
-  .search-container,
-  .search-section,
-  .filter-strip,
   .upload-head,
   .locations-head,
   .location-item-head {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .field-filter {
-    width: 100%;
   }
 
   .cards-grid {
@@ -565,6 +568,33 @@
   .map-canvas-shell {
     height: 60dvh;
     min-height: 420px;
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .top-controls {
+    position: static;
+  }
+
+  .search-container,
+  .search-section,
+  .filter-strip {
+    align-items: stretch;
+    flex: 1 1 100%;
+  }
+
+  .search-container,
+  .search-section {
+    min-width: 100%;
+  }
+
+  .field-filter,
+  .filter-select-trigger {
+    width: 100%;
+  }
+
+  .view-mode-selector {
+    align-self: flex-end;
   }
 }
 

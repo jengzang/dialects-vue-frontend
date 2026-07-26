@@ -83,11 +83,14 @@ describe('vocabulary explore page shell wiring', () => {
 
   it('keeps vocabulary card and map queries separate from the table API', () => {
     const vocabularyPage = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+    const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
 
     expect(vocabularyPage).toContain("return viewMode.value === 'card'")
     expect(vocabularyPage).toContain("return viewMode.value === 'map'")
     expect(vocabularyPage).toContain('tab: nextMode,')
     expect(vocabularyPage).toContain('const canLoadMore = computed')
+    expect(vocabularyScss).toContain('@media (max-aspect-ratio: 1 / 1)')
+    expect(vocabularyScss).toContain('flex-wrap: wrap')
     expect(vocabularyPage).toContain('getVocabularyItems(buildVocabularyItemsParams())')
     expect(vocabularyPage).toContain('getVocabularyMapPoints(buildVocabularyMapPointsParams())')
     expect(vocabularyPage).toContain('loadActiveViewMode()')
