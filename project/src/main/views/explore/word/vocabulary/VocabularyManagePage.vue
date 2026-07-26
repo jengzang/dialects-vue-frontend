@@ -1,6 +1,15 @@
 <template>
   <div class="vocabulary-manage-page">
     <section v-if="hasVocabularyPermission" class="content-area">
+      <UniversalTable
+        db-key="vocabulary"
+        table-name="vocabulary_entries"
+        :columns="tableColumns"
+        primary-key="id"
+        api-adapter="vocabulary"
+        :can-edit="hasVocabularyPermission"
+      />
+
       <div class="locations-mode main-glass-panel">
         <div class="locations-head">
           <div>
@@ -130,6 +139,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getVocabularyLocations, getVocabularyLogs, getVocabularyMe, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
+import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 
 const { t } = useI18n()
 
@@ -155,6 +165,16 @@ const editingLocationDraft = ref(null)
 const effectiveVocabularyMe = computed(() => props.vocabularyMe || localVocabularyMe.value)
 const hasVocabularyPermission = computed(() => Boolean(effectiveVocabularyMe.value?.permission_level))
 const canViewVocabularyLogs = computed(() => effectiveVocabularyMe.value?.can_view_logs === true)
+
+const tableColumns = computed(() => [
+  { key: 'standard_word', label: t('words.wordList.columns.definition'), filterable: false, width: 1.2 },
+  { key: 'local_expression', label: t('words.wordList.columns.headword'), filterable: false, width: 1 },
+  { key: 'ipa', label: t('words.wordList.columns.pronunciation'), filterable: false, width: 1.2 },
+  { key: 'notes', label: t('words.wordList.columns.detail'), filterable: false, width: 1.6 },
+  { key: 'location_name', label: t('words.wordList.columns.location'), filterable: true, width: 1 },
+  { key: 'informations', label: t('words.wordList.columns.informations'), filterable: false, width: 1.2 },
+  { key: 'source_filename', label: t('words.wordList.columns.sourceFilename'), filterable: true, width: 1.2 }
+])
 
 async function ensureVocabularyMe() {
   if (props.vocabularyMe) {

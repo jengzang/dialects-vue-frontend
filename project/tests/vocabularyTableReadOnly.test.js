@@ -30,4 +30,18 @@ describe('vocabulary table read-only view', () => {
     expect(vocabularyViewPage).not.toContain(':can-edit=')
     expect(vocabularyViewPage).not.toContain('const canUseVocabularyTable = computed')
   })
+
+  it('places editable vocabulary table access inside the permission-gated manage page', () => {
+    const vocabularyManagePage = readSource('src/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
+
+    expect(vocabularyManagePage).toContain('<section v-if="hasVocabularyPermission" class="content-area">')
+    expect(vocabularyManagePage).toContain('<UniversalTable')
+    expect(vocabularyManagePage).toContain('db-key="vocabulary"')
+    expect(vocabularyManagePage).toContain('table-name="vocabulary_entries"')
+    expect(vocabularyManagePage).toContain('api-adapter="vocabulary"')
+    expect(vocabularyManagePage).toContain('primary-key="id"')
+    expect(vocabularyManagePage).toContain(':can-edit="hasVocabularyPermission"')
+    expect(vocabularyManagePage).toContain('import UniversalTable')
+    expect(vocabularyManagePage).toContain('const tableColumns = computed')
+  })
 })
