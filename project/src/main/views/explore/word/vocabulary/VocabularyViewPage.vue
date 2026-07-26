@@ -185,11 +185,8 @@
       @close="clearMapDetailModal"
     >
       <div class="map-detail-modal">
-        <p class="map-meta">
-          {{ t('words.wordList.map.meta', {
-            entries: mapStats.totalEntries,
-            omitted: mapStats.omittedWithoutCoordinates
-          }) }}
+        <p class="map-meta" v-if="mapDetailEntries.length">
+          {{ t('words.wordList.map.pointCount', { count: mapDetailEntries.length }) }}
         </p>
         <div v-if="isLoadingMapDetail" class="loading-state loading-state-base">
           <div class="ui-loading--page" aria-hidden="true"></div>
@@ -204,8 +201,8 @@
               <strong>{{ entry.headword }}</strong>
               <span>{{ entry.pronunciation }}</span>
             </div>
-            <p>{{ entry.definition }}</p>
-            <small v-if="entry.detail">{{ entry.detail }}</small>
+            <p v-if="!selectedStandardWords.length">{{ entry.definition }}</p>
+            <small v-if="entry.information">{{ entry.information }}</small>
           </article>
           <button
             v-if="canLoadMoreMapDetail"
@@ -636,7 +633,13 @@ async function handleMapPointClick(point) {
     return
   }
 
-  selectedMapPointLabel.value = point.locationLabel || point.locationName || locations[0]
+  const locationLabel = point.locationLabel || point.locationName || locations[0]
+  const titleParts = [locationLabel]
+  if (selectedStandardWords.value.length > 0) {
+    titleParts.push(selectedStandardWords.value.join('、'))
+  }
+  titleParts.push(t('words.wordList.map.pointCount', { count: point.itemCount || 0 }))
+  selectedMapPointLabel.value = titleParts.join(' · ')
   isMapDetailModalOpen.value = true
   isLoadingMapDetail.value = true
   mapDetailError.value = ''

@@ -66,7 +66,8 @@
     },
     "map": {
       "placeholder": "当前可上图 {count} 个地点",
-      "meta": "命中 {entries} 条，省略无坐标地点 {omitted} 个"
+      "meta": "命中 {entries} 条，省略无坐标地点 {omitted} 个",
+      "pointCount": "共 {count} 条"
     },
     "upload": {
       "title": "上传词表",

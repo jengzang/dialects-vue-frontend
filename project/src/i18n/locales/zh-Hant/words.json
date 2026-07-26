@@ -66,7 +66,8 @@
     },
     "map": {
       "placeholder": "當前可上圖 {count} 個地點",
-      "meta": "命中 {entries} 條，省略無坐標地點 {omitted} 個"
+      "meta": "命中 {entries} 條，省略無坐標地點 {omitted} 個",
+      "pointCount": "共 {count} 條"
     },
     "upload": {
       "title": "上傳詞表",
