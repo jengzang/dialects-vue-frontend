@@ -102,10 +102,10 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain('local_expression')
     expect(vocabularyPage).toContain('ipa')
     expect(vocabularyPage).toContain('notes')
-    expect(vocabularyPage).toContain("value: 'ipa'")
-    expect(vocabularyPage).toContain("value: 'notes'")
-    expect(vocabularyPage).not.toContain("value: 'pronunciation'")
-    expect(vocabularyPage).not.toContain("value: 'detail'")
+    expect(vocabularyPage).toContain("value: 'pronunciation'")
+    expect(vocabularyPage).toContain("value: 'detail'")
+    expect(vocabularyPage).not.toContain("value: 'ipa'")
+    expect(vocabularyPage).not.toContain("value: 'notes'")
     expect(vocabularyPage).not.toContain('const mappableEntries = computed')
     expect(vocabularyPage).toContain('db-key="vocabulary"')
     expect(vocabularyPage).toContain('table-name="vocabulary_entries"')
@@ -124,6 +124,15 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).not.toContain('sortBy')
     expect(vocabularyPage).not.toContain('sortOptions')
     expect(vocabularyPage).not.toContain('previewEntries')
+  })
+
+  it('feeds YuBaoMap drawable aggregate points and a fixed-height canvas', () => {
+    const vocabularyPage = readSource('src/main/views/explore/word/VocabularyPage.vue')
+
+    expect(vocabularyPage).toContain('pronunciation: point.markerLabel')
+    expect(vocabularyPage).toContain('markerLabel: entryCount ? String(entryCount) : (locationLabel || locationName)')
+    expect(vocabularyPage).toContain('height: 69dvh')
+    expect(vocabularyPage).toContain('max-height: 69dvh')
   })
 
   it('uses dedicated vocabulary locations APIs for location metadata management', () => {

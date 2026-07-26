@@ -397,8 +397,8 @@ const workflowTabs = computed(() => [
 const searchFieldOptions = computed(() => [
   { value: 'definition', label: t('words.wordList.search.fields.definition') },
   { value: 'headword', label: t('words.wordList.search.fields.headword') },
-  { value: 'ipa', label: t('words.wordList.search.fields.ipa') },
-  { value: 'notes', label: t('words.wordList.search.fields.notes') }
+  { value: 'pronunciation', label: t('words.wordList.search.fields.ipa') },
+  { value: 'detail', label: t('words.wordList.search.fields.notes') }
 ])
 
 const locationOptions = computed(() => {
@@ -543,7 +543,7 @@ const mapDataForYuBaoMap = computed(() => {
       location: point.locationName,
       county: point.locationName,
       province: point.locationLabel,
-      pronunciation: String(point.entryCount || ''),
+      pronunciation: point.markerLabel,
       note2: point.locationLabel,
       note1: point.entryCount ? String(point.entryCount) : '',
     }))
@@ -642,12 +642,17 @@ function buildVocabularyMapPointsParams() {
 }
 
 function normalizeVocabularyMapPoint(point) {
+  const locationName = point.location_name || ''
+  const locationLabel = point.location_label || locationName
+  const entryCount = Number(point.entry_count) || 0
+
   return {
-    locationName: point.location_name || '',
-    locationLabel: point.location_label || point.location_name || '',
+    locationName,
+    locationLabel,
     longitude: normalizeNumber(point.longitude),
     latitude: normalizeNumber(point.latitude),
-    entryCount: Number(point.entry_count) || 0,
+    entryCount,
+    markerLabel: entryCount ? String(entryCount) : (locationLabel || locationName),
   }
 }
 
@@ -888,7 +893,7 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
 
 <style scoped lang="scss">
 .vocabulary-page {
-  width: 100%;
+  width: 90dvw!important;
   min-height: 100%;
   padding: 16px 20px 24px;
   color: var(--text-primary);
@@ -1138,18 +1143,21 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
   line-height: 1.6;
 }
 
-.map-mode,
 .upload-mode,
 .locations-mode {
   padding: 16px;
 }
 
 .map-mode {
+  padding:0;
+  height: 69dvh;
   min-height: 520px;
+  max-height: 69dvh;
   overflow: hidden;
 }
 
 .map-canvas-shell {
+  height: 100%;
   min-height: 488px;
   overflow: hidden;
   border-radius: var(--radius-md, 8px);
@@ -1332,6 +1340,7 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
   }
 
   .map-canvas-shell {
+    height: 60dvh;
     min-height: 420px;
   }
 }

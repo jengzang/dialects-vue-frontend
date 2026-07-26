@@ -58,7 +58,7 @@ function stripAndValidateVocabularySqlParams(params = {}) {
 }
 
 /**
- * @typedef {'all' | 'definition' | 'headword' | 'ipa' | 'notes'} VocabularySearchField
+ * @typedef {'all' | 'definition' | 'headword' | 'pronunciation' | 'detail' | 'location'} VocabularySearchField
  */
 
 /**
