@@ -393,6 +393,38 @@
   gap: 12px;
 }
 
+.upload-location-summary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px;
+  background: var(--glass-10);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-md, 8px);
+}
+
+.upload-location-summary strong {
+  color: var(--text-primary);
+}
+
+.upload-location-summary p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+}
+
+.upload-location-summary-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.upload-parser-row {
+  max-width: 260px;
+}
+
 .upload-field {
   display: grid;
   gap: 6px;
@@ -455,6 +487,39 @@
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+}
+
+.upload-location-modal {
+  display: grid;
+  gap: 14px;
+}
+
+.upload-location-modal-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.upload-location-modal-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 16px;
+  align-items: start;
+}
+
+.upload-location-map-panel {
+  display: grid;
+  gap: 10px;
+  color: var(--text-primary);
+}
+
+.upload-location-map-panel :deep(.mini-map-wrapper) {
+  height: 320px;
+  border-radius: var(--radius-md, 8px);
 }
 
 .upload-head,
@@ -604,10 +669,20 @@
   }
 
   .upload-head,
+  .upload-location-summary,
+  .upload-location-modal-layout,
   .locations-head,
   .location-item-head {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .upload-parser-row {
+    max-width: none;
+  }
+
+  .upload-location-modal-layout {
+    grid-template-columns: 1fr;
   }
 
   .cards-grid {

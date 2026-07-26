@@ -13,16 +13,23 @@
           </label>
         </div>
 
-        <div class="upload-location-grid">
-          <label v-for="field in uploadLocationFields" :key="field.key" class="upload-field">
-            <span>{{ field.label }}</span>
-            <input
-              v-model="uploadLocation[field.key]"
-              type="text"
-              :required="field.required"
-              :placeholder="field.placeholder"
-            />
-          </label>
+        <div class="upload-location-summary">
+          <div>
+            <strong>{{ uploadLocation.location_name || t('words.wordList.upload.locationName') }}</strong>
+            <p>{{ uploadLocationSummaryText }}</p>
+          </div>
+          <button class="main-glass-button" data-variant="secondary" type="button" @click="openUploadLocationEditor">
+            {{ uploadLocation.location_name ? t('common.button.edit') : t('words.wordList.upload.locationName') }}
+          </button>
+        </div>
+
+        <div class="upload-location-summary-grid">
+          <span v-for="item in uploadLocationSummaryItems" :key="item.key">
+            {{ item.label }}：{{ item.value }}
+          </span>
+        </div>
+
+        <div class="upload-parser-row">
           <label class="upload-field">
             <span>{{ t('words.wordList.upload.parserMode') }}</span>
             <select v-model="uploadParserMode">
@@ -90,16 +97,80 @@
       </div>
     </section>
 
+    <AppModal
+      v-model="isUploadLocationEditorOpen"
+      size="lg"
+      width="860px"
+      max-height="84dvh"
+      :title="uploadLocationDraft.location_name || t('words.wordList.upload.locationName')"
+      :close-label="t('common.button.close')"
+      @close="closeUploadLocationEditor"
+    >
+      <div class="upload-location-modal">
+        <div class="upload-location-modal-toolbar">
+          <button
+            class="main-glass-button"
+            data-variant="secondary"
+            type="button"
+            :disabled="isLoadingYindianLocation || !uploadLocationDraft.location_name.trim()"
+            @click="useYindianLocationData"
+          >
+            {{ isLoadingYindianLocation ? t('common.label.loading') : '使用音典数据' }}
+          </button>
+          <span v-if="uploadLocationEditorStatus">{{ uploadLocationEditorStatus }}</span>
+        </div>
+
+        <div class="upload-location-modal-layout">
+          <div class="upload-location-grid">
+            <label v-for="field in uploadLocationFields" :key="field.key" class="upload-field">
+              <span>{{ field.label }}</span>
+              <input
+                v-model="uploadLocationDraft[field.key]"
+                type="text"
+                :required="field.required"
+                :placeholder="field.placeholder"
+              />
+            </label>
+          </div>
+
+          <div class="upload-location-map-panel">
+            <strong>{{ t('words.wordList.upload.coordinates') }}</strong>
+            <MiniMapSelector
+              v-model:coord="uploadLocationCoord"
+              :visible="isUploadLocationEditorOpen"
+              mode="picker"
+              :points="uploadLocationMapPoints"
+              hint-text="点击地图获取经纬度"
+            />
+          </div>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="location-edit-modal-actions">
+          <button class="main-glass-button" data-variant="secondary" type="button" @click="closeUploadLocationEditor">
+            {{ t('common.button.cancel') }}
+          </button>
+          <button class="main-glass-button" data-variant="primary" type="button" @click="confirmUploadLocationEditor">
+            {{ t('common.button.confirm') }}
+          </button>
+        </div>
+      </template>
+    </AppModal>
+
   </div>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { previewVocabularyImport, uploadVocabulary } from '@/api'
+import { getLocationDetail, previewVocabularyImport, uploadVocabulary } from '@/api'
+import AppModal from '@/components/common/AppModal.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
+import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue'
+import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 
 const { t } = useI18n()
 
@@ -117,7 +188,7 @@ const backendPreview = ref(null)
 
 const uploadParserMode = ref('auto')
 const uploadFile = ref(null)
-const uploadLocation = ref({
+const createEmptyUploadLocation = () => ({
   location_name: '',
   coordinates: '',
   province: '',
@@ -129,6 +200,11 @@ const uploadLocation = ref({
   yindian_region: '',
   atlas_region: '',
 })
+const uploadLocation = ref(createEmptyUploadLocation())
+const uploadLocationDraft = ref(createEmptyUploadLocation())
+const isUploadLocationEditorOpen = ref(false)
+const isLoadingYindianLocation = ref(false)
+const uploadLocationEditorStatus = ref('')
 
 const uploadLocationFields = computed(() => [
   {
@@ -202,6 +278,60 @@ const importFlow = useTabularImportFlow({
 
 const selectedUploadFile = computed(() => uploadFile.value || importFlow.pendingFile.value)
 
+const uploadLocationSummaryItems = computed(() => {
+  const values = uploadLocation.value
+  return uploadLocationFields.value
+    .filter((field) => field.key !== 'location_name')
+    .map((field) => ({
+      key: field.key,
+      label: field.label,
+      value: String(values[field.key] || '').trim()
+    }))
+    .filter((item) => item.value)
+})
+
+const uploadLocationSummaryText = computed(() => {
+  if (!uploadLocation.value.location_name) {
+    return t('words.wordList.upload.missingLocation')
+  }
+
+  const locationParts = [
+    uploadLocation.value.province,
+    uploadLocation.value.city,
+    uploadLocation.value.county,
+    uploadLocation.value.town,
+    uploadLocation.value.administrative_village,
+    uploadLocation.value.natural_village,
+  ].map((value) => String(value || '').trim()).filter(Boolean)
+
+  return locationParts.length
+    ? locationParts.join(' - ')
+    : (uploadLocation.value.coordinates || t('words.wordList.upload.coordinates'))
+})
+
+const uploadLocationCoord = computed({
+  get() {
+    return parseCoordText(uploadLocationDraft.value.coordinates)
+  },
+  set(coord) {
+    if (!Array.isArray(coord) || coord.length < 2) return
+    uploadLocationDraft.value.coordinates = formatCoord(coord[0], coord[1])
+    uploadLocationEditorStatus.value = ''
+  }
+})
+
+const uploadLocationMapPoints = computed(() => {
+  const coord = uploadLocationCoord.value
+  if (!coord) return []
+  return [
+    {
+      coord,
+      label: uploadLocationDraft.value.location_name,
+      active: true,
+    }
+  ]
+})
+
 const canConfirmUpload = computed(() => {
   const file = selectedUploadFile.value
   if (!file || isUploading.value || isPreviewingImport.value || !canUploadVocabulary.value) {
@@ -220,6 +350,83 @@ function isVocabularyPreviewFile(file) {
 
 function isVocabularyUploadFile(file) {
   return Boolean(file?.name && /\.(xlsx|xls|csv|tsv|docx|doc)$/i.test(file.name))
+}
+
+function parseCoordText(text) {
+  if (!text || typeof text !== 'string') return null
+  const [lngText, latText] = text.split(',')
+  const lng = Number(String(lngText || '').trim())
+  const lat = Number(String(latText || '').trim())
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null
+  return [lng, lat]
+}
+
+function normalizeUploadLocation(location) {
+  return Object.fromEntries(
+    Object.entries(createEmptyUploadLocation()).map(([key]) => [key, String(location?.[key] || '').trim()])
+  )
+}
+
+function openUploadLocationEditor() {
+  uploadLocationDraft.value = { ...uploadLocation.value }
+  uploadLocationEditorStatus.value = ''
+  isUploadLocationEditorOpen.value = true
+}
+
+function closeUploadLocationEditor() {
+  isUploadLocationEditorOpen.value = false
+  uploadLocationDraft.value = createEmptyUploadLocation()
+  uploadLocationEditorStatus.value = ''
+}
+
+function confirmUploadLocationEditor() {
+  uploadLocation.value = normalizeUploadLocation(uploadLocationDraft.value)
+  closeUploadLocationEditor()
+}
+
+function getLocationDetailRow(response) {
+  if (Array.isArray(response?.data)) return response.data[0] || null
+  if (response?.data && typeof response.data === 'object') return response.data
+  return response && typeof response === 'object' ? response : null
+}
+
+function applyYindianLocationDetail(detail) {
+  uploadLocationDraft.value = {
+    ...uploadLocationDraft.value,
+    location_name: uploadLocationDraft.value.location_name || detail?.['語言'] || '',
+    coordinates: detail?.['經緯度'] || uploadLocationDraft.value.coordinates,
+    province: detail?.['省'] || uploadLocationDraft.value.province,
+    city: detail?.['市'] || uploadLocationDraft.value.city,
+    county: detail?.['縣'] || uploadLocationDraft.value.county,
+    town: detail?.['鎮'] || uploadLocationDraft.value.town,
+    administrative_village: detail?.['行政村'] || uploadLocationDraft.value.administrative_village,
+    natural_village: detail?.['自然村'] || uploadLocationDraft.value.natural_village,
+    yindian_region: detail?.['音典分區'] || uploadLocationDraft.value.yindian_region,
+    atlas_region: detail?.['地圖集二分區'] || uploadLocationDraft.value.atlas_region,
+  }
+}
+
+async function useYindianLocationData() {
+  const locationName = uploadLocationDraft.value.location_name.trim()
+  if (!locationName || isLoadingYindianLocation.value) return
+
+  isLoadingYindianLocation.value = true
+  uploadLocationEditorStatus.value = ''
+
+  try {
+    const response = await getLocationDetail(locationName)
+    const detail = getLocationDetailRow(response)
+    if (!detail) {
+      uploadLocationEditorStatus.value = '未找到音典数据'
+      return
+    }
+    applyYindianLocationDetail(detail)
+    uploadLocationEditorStatus.value = '已填入音典数据'
+  } catch (error) {
+    uploadLocationEditorStatus.value = error.message || '获取音典数据失败'
+  } finally {
+    isLoadingYindianLocation.value = false
+  }
 }
 
 function clearUploadFile() {
@@ -255,9 +462,7 @@ watch([uploadParserMode, selectedUploadFile, uploadLocation], () => {
 }, { deep: true })
 
 function buildUploadLocation() {
-  return Object.fromEntries(
-    Object.entries(uploadLocation.value).map(([key, value]) => [key, String(value || '').trim()])
-  )
+  return normalizeUploadLocation(uploadLocation.value)
 }
 
 async function handlePreviewImport() {
