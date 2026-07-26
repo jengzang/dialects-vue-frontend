@@ -67,19 +67,15 @@ const props = defineProps({
   activeTab: {
     type: String,
     default: 'vocabulary'
-  },
-  defaultDisplayMode: {
-    type: String,
-    default: ''
   }
 })
 const emit = defineEmits(['marker-click'])
+const displayMode = defineModel('displayMode', { default: 'overview' })
 
 // --- State ---
 const mapContainer = ref(null)
 const map = shallowRef(null)
 const currentStyleKey = ref('gaode')
-const displayMode = ref('overview')
 const isFullScreen = ref(false)
 const mapLoaded = ref(false)  // 跟踪地图是否已加载
 const isLoadingMarkers = ref(false)  // 跟踪标记是否正在加载
@@ -741,19 +737,8 @@ onBeforeUnmount(() => {
 })
 
 // --- Watchers ---
-watch(canShowDetailModes, (now) => {
-  if (now && props.defaultDisplayMode) {
-    displayMode.value = props.defaultDisplayMode
-  }
-})
-
 watch(() => props.mapData, () => {
-  if (!displayModeOptions.value.some((option) => option.value === displayMode.value)) {
-    displayMode.value = props.defaultDisplayMode || displayModeOptions.value[0]?.value || 'location'
-  }
-
   if (map.value) {
-    // 显示加载动画
     isLoadingMarkers.value = true
     const { center, zoom } = calculateMapView(props.mapData)
     map.value.flyTo({ center, zoom })

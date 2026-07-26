@@ -145,7 +145,7 @@
             v-if="mapDataForVocabularyMap.length"
             :map-data="mapDataForVocabularyMap"
             active-tab="vocabulary"
-            :default-display-mode="selectedStandardWords.length ? 'definition' : ''"
+            v-model:display-mode="mapDisplayMode"
             @marker-click="handleMapPointClick"
           />
           <div v-else class="empty-state empty-state-base map-empty-state">
@@ -255,6 +255,7 @@ const viewMode = ref(normalizeViewMode(route.query.tab))
 const selectedSearchFields = ref([])
 const selectedLocations = ref([])
 const selectedStandardWords = ref([])
+const mapDisplayMode = ref('overview')
 const searchInputEl = ref(null)
 const searchFieldTriggerEl = ref(null)
 const locationTriggerEl = ref(null)
@@ -758,7 +759,10 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
   }
 }, { debounce: 250, maxWait: 800 })
 
-watch(selectedStandardWords, () => {
+watch(selectedStandardWords, (words) => {
+  if (mapDisplayMode.value === 'overview' && words.length) {
+    mapDisplayMode.value = 'definition'
+  }
   if (shouldUseVocabularyMapPointsApi() || shouldUseVocabularyMapItemsApi()) {
     loadVocabularyMapPoints()
   }
