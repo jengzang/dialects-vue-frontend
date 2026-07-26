@@ -90,6 +90,7 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain('tab: nextMode,')
     expect(vocabularyPage).toContain('const canLoadMore = computed')
     expect(vocabularyScss).toContain('@media (max-aspect-ratio: 1 / 1)')
+    expect(vocabularyScss).toContain('flex-wrap: nowrap')
     expect(vocabularyScss).toContain('flex-wrap: wrap')
     expect(vocabularyPage).toContain('getVocabularyItems(buildVocabularyItemsParams())')
     expect(vocabularyPage).toContain('getVocabularyMapPoints(buildVocabularyMapPointsParams())')

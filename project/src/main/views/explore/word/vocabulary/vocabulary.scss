@@ -10,7 +10,7 @@
   top: 0;
   z-index: 20;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 12px;
   align-items: center;
   padding: 12px;
@@ -98,9 +98,9 @@
 }
 
 .search-container {
-  flex: 1 1 540px;
+  flex: 1 1 auto;
   align-items: flex-start;
-  min-width: min(100%, 420px);
+  min-width: 0;
 }
 
 .search-section {
@@ -129,7 +129,8 @@
 
 .field-filter {
   position: relative;
-  flex: 0 0 176px;
+  flex: 0 1 176px;
+  min-width: 128px;
 }
 
 .location-filter {
@@ -138,7 +139,7 @@
 }
 
 .filter-select-trigger {
-  width: 176px;
+  width: 100%;
 }
 
 .location-select-trigger {
@@ -193,7 +194,7 @@
 .filter-strip {
   flex: 0 1 360px;
   justify-content: space-between;
-  min-width: 220px;
+  min-width: 160px;
 }
 
 .view-mode-selector {
@@ -574,6 +575,7 @@
 @media (max-aspect-ratio: 1 / 1) {
   .top-controls {
     position: static;
+    flex-wrap: wrap;
   }
 
   .search-container,
