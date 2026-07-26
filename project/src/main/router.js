@@ -223,6 +223,15 @@ const ROUTE_QUERY_ALLOWLIST = {
   '/explore/vocabulary': {
     base: []
   },
+  '/explore/vocabulary/view': {
+    base: ['tab']
+  },
+  '/explore/vocabulary/import': {
+    base: []
+  },
+  '/explore/vocabulary/manage': {
+    base: []
+  },
   '/explore/char-class': {
     base: ['tab', 'table', 'levels']
   },

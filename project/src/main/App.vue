@@ -86,7 +86,7 @@ export default {
         normalizedPath.startsWith('/explore/tools/') ||
         normalizedPath === '/explore/manage' ||
         normalizedPath === '/explore/yubao' ||
-        normalizedPath === '/explore/vocabulary' ||
+        normalizedPath.startsWith('/explore/vocabulary') ||
         normalizedPath === '/explore/char-class' ||
         normalizedPath === '/explore/yc-spoken' ||
         normalizedPath.startsWith('/explore/villages/')

@@ -1,4 +1,5 @@
 import { userStore } from '@/main/store/store.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const CheckTool = () => import('@/main/views/explore/tools/CheckTool.vue')
 const Jyut2IpaTool = () => import('@/main/views/explore/tools/Jyut2IpaTool.vue')
@@ -8,6 +9,9 @@ const PraatPage = () => import('@/main/views/Praat.vue')
 const TableManagePage = () => import('@/main/views/explore/tools/TableManage.vue')
 const YuBaoPage = () => import('@/main/views/explore/word/YuBaoPage.vue')
 const VocabularyPage = () => import('@/main/views/explore/word/VocabularyPage.vue')
+const VocabularyViewPage = () => import('@/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+const VocabularyImportPage = () => import('@/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
+const VocabularyManagePage = () => import('@/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
 const CharacterClassificationPage = () => import('@/main/views/explore/charClass/CharacterClassification.vue')
 const YangChunSpokenPage = () => import('@/main/views/explore/word/YangChunSpoken.vue')
 const GdVillagesTreePage = () => import('@/main/views/explore/villages/gdVillagesTree.vue')
@@ -47,7 +51,26 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/vocabulary',
-    component: VocabularyPage
+    component: VocabularyPage,
+    redirect: (to) => ({
+      path: buildLocalePath(resolveRouteLocale(to), '/explore/vocabulary/view'),
+      query: to.query,
+      hash: to.hash,
+    }),
+    children: [
+      {
+        path: 'view',
+        component: VocabularyViewPage
+      },
+      {
+        path: 'import',
+        component: VocabularyImportPage
+      },
+      {
+        path: 'manage',
+        component: VocabularyManagePage
+      }
+    ]
   },
   {
     path: 'explore/char-class',

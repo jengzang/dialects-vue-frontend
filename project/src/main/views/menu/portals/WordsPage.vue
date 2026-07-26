@@ -69,7 +69,7 @@ const handleWordList = () => {
   router.push(
     buildLocalePath(
       resolveRouteLocale(route),
-      '/explore/vocabulary'
+      '/explore/vocabulary/view'
     )
   )
 }
