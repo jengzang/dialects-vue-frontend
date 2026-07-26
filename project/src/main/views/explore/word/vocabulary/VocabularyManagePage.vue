@@ -1,6 +1,6 @@
 <template>
   <div class="vocabulary-manage-page">
-    <section class="content-area">
+    <section v-if="hasVocabularyPermission" class="content-area">
       <div class="locations-mode main-glass-panel">
         <div class="locations-head">
           <div>
@@ -44,7 +44,7 @@
       </div>
     </section>
 
-    <section class="content-area">
+    <section v-if="canViewVocabularyLogs" class="content-area">
       <div class="logs-mode main-glass-panel">
         <div class="locations-head">
           <div>
@@ -101,10 +101,17 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getVocabularyLocations, getVocabularyLogs, updateVocabularyLocation } from '@/api'
+import { getVocabularyLocations, getVocabularyLogs, getVocabularyMe, updateVocabularyLocation } from '@/api'
 
 const { t } = useI18n()
 
+const props = defineProps({
+  vocabularyMe: { type: Object, default: null },
+  isLoadingVocabularyMe: { type: Boolean, default: false },
+  vocabularyMeError: { type: String, default: '' },
+})
+
+const localVocabularyMe = ref(null)
 const isLoadingLocations = ref(false)
 const locationsLoadError = ref('')
 const locationsStatusText = ref('')
@@ -113,6 +120,19 @@ const logsLoadError = ref('')
 
 const locationRows = ref([])
 const logRows = ref([])
+
+const effectiveVocabularyMe = computed(() => props.vocabularyMe || localVocabularyMe.value)
+const hasVocabularyPermission = computed(() => Boolean(effectiveVocabularyMe.value?.permission_level))
+const canViewVocabularyLogs = computed(() => effectiveVocabularyMe.value?.can_view_logs === true)
+
+async function ensureVocabularyMe() {
+  if (props.vocabularyMe) {
+    return props.vocabularyMe
+  }
+
+  localVocabularyMe.value = await getVocabularyMe()
+  return localVocabularyMe.value
+}
 
 const locationEditFields = computed(() => [
   { key: 'coordinates', label: t('words.wordList.upload.coordinates') },
@@ -276,8 +296,14 @@ async function loadVocabularyLogs() {
 }
 
 onMounted(() => {
-  loadVocabularyLocations()
-  loadVocabularyLogs()
+  ensureVocabularyMe().catch(() => null).finally(() => {
+    if (hasVocabularyPermission.value) {
+      loadVocabularyLocations()
+    }
+    if (canViewVocabularyLogs.value) {
+      loadVocabularyLogs()
+    }
+  })
 })
 </script>
 

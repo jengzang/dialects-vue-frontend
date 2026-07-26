@@ -8,11 +8,13 @@ const VOCABULARY_LOCATION_OPTIONS_ENDPOINT = '/api/vocabulary/search/location-op
 const VOCABULARY_LOCATIONS_ENDPOINT = '/api/vocabulary/locations'
 const VOCABULARY_LOGS_ENDPOINT = '/api/vocabulary/logs'
 const VOCABULARY_IMPORTS_ENDPOINT = '/api/vocabulary/imports'
+const VOCABULARY_ME_ENDPOINT = '/api/vocabulary/me'
 const VOCABULARY_SQL_ENDPOINT = '/api/vocabulary/sql'
 const VOCABULARY_ENTRIES_TABLE = 'vocabulary_entries'
 
 function stripVocabularyDbKey(params = {}) {
-  const { db_key: _dbKey, ...rest } = params
+  const rest = { ...params }
+  delete rest.db_key
   return rest
 }
 
@@ -56,6 +58,12 @@ function stripAndValidateVocabularySqlParams(params = {}) {
     ...params,
     table_name: VOCABULARY_ENTRIES_TABLE,
   })
+}
+
+function stripVocabularyBatchReplaceParams(params = {}) {
+  const rest = stripAndValidateVocabularySqlParams(params)
+  delete rest.pk_column
+  return rest
 }
 
 /**
@@ -173,6 +181,17 @@ export async function getVocabularyMapPoints(params = {}) {
     showError(error.message || '獲取詞表地圖點失敗')
     throw new Error(error.message || '獲取詞表地圖點失敗')
   }
+}
+
+/**
+ * 获取当前登录用户的词表权限上下文。
+ *
+ * 该接口是 vocabulary 前端权限 UI 的唯一来源；公开展示失败时可按无权限处理。
+ *
+ * @returns {Promise<{user_id: number, permission_level: 'edit' | 'manage' | null, can_upload: boolean, can_manage_entries: boolean, can_view_logs: boolean}>}
+ */
+export async function getVocabularyMe() {
+  return api(VOCABULARY_ME_ENDPOINT)
 }
 
 /**
@@ -369,14 +388,14 @@ export const vocabularySqlApi = {
   async batchReplacePreview(params) {
     return api(`${VOCABULARY_SQL_ENDPOINT}/batch-replace-preview`, {
       method: 'POST',
-      body: stripAndValidateVocabularySqlParams(params),
+      body: stripVocabularyBatchReplaceParams(params),
     })
   },
 
   async batchReplaceExecute(params) {
     return api(`${VOCABULARY_SQL_ENDPOINT}/batch-replace-execute`, {
       method: 'POST',
-      body: stripAndValidateVocabularySqlParams(params),
+      body: stripVocabularyBatchReplaceParams(params),
     })
   },
 }

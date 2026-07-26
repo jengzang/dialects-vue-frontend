@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -20,6 +20,7 @@ const {
   buildVocabularyMapPointsPath,
   getVocabularyItems,
   getVocabularyMapPoints,
+  getVocabularyMe,
   getVocabularyLocationNames,
   getVocabularyLocationOptions,
   getVocabularyLocations,
@@ -38,6 +39,10 @@ function readSource(path) {
   return readFileSync(resolve(projectRoot, path), 'utf8')
 }
 
+beforeEach(() => {
+  apiMock.mockClear()
+})
+
 describe('vocabulary items API', () => {
   it('does not reference backend-deleted vocabulary compatibility paths', () => {
     const source = readSource('src/api/main/vocabulary.js')
@@ -47,6 +52,20 @@ describe('vocabulary items API', () => {
     expect(source).not.toContain('/api/vocabulary/location-options')
     expect(source).not.toContain('/api/vocabulary/upload')
     expect(source).not.toContain('/api/vocabulary/me/permission')
+  })
+
+  it('loads the current vocabulary permission context from /me', async () => {
+    apiMock.mockResolvedValueOnce({
+      user_id: 7,
+      permission_level: 'edit',
+      can_upload: true,
+      can_manage_entries: false,
+      can_view_logs: false,
+    })
+
+    await getVocabularyMe()
+
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/me')
   })
 
   it('serializes the card and map query contract without table-only parameters', () => {
@@ -294,6 +313,7 @@ describe('vocabulary table API adapter', () => {
     const replacePayload = {
       db_key: 'vocabulary',
       table_name: 'vocabulary_entries',
+      pk_column: 'id',
       columns: ['notes'],
       find_text: '旧',
       replace_text: '新',

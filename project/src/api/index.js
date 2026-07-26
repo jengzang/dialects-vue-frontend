@@ -67,6 +67,7 @@ export {
   buildVocabularyMapPointsPath,
   getVocabularyItems,
   getVocabularyMapPoints,
+  getVocabularyMe,
   getVocabularyLocationNames,
   getVocabularyLocationOptions,
   getVocabularyLocations,

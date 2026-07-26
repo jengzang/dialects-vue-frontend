@@ -12,7 +12,7 @@
               class="search-input"
           />
       </div>
-      <div v-if="userStore.role === 'admin'" class="action-buttons">
+      <div v-if="canUseTableActions" class="action-buttons">
         <button v-if="!isEditMode" class="main-glass-button" data-size="compact" @click="exportToExcel">
           <span class="icon">📤</span><span class="btn-text">Excel</span>
         </button>
@@ -67,7 +67,7 @@
               :key="col.key"
               :style="{ width: ((Number(col.width) || 1) / totalRatio * 100) + '%' }"
           />
-          <col v-if="userStore.role === 'admin'" style="width: 60px; min-width: 50px;" />
+          <col v-if="canUseTableActions" style="width: 60px; min-width: 50px;" />
         </colgroup>
 
         <thead>
@@ -89,7 +89,7 @@
               </div>
             </div>
           </th>
-          <th v-if="userStore.role === 'admin'" class="action-th">{{ t('tableTree.universalTable.toolbar.action') }}</th>
+          <th v-if="canUseTableActions" class="action-th">{{ t('tableTree.universalTable.toolbar.action') }}</th>
         </tr>
         </thead>
 
@@ -105,7 +105,7 @@
           >
             {{ row[col.key] }}
           </td>
-          <td v-if="userStore.role === 'admin'" class="action-td">
+          <td v-if="canUseTableActions" class="action-td">
             <button class="icon-action-btn delete" :title="t('common.button.delete')" @click="handleDelete(row)">✕</button>
           </td>
         </tr>
@@ -160,7 +160,7 @@
                       :key="col.key"
                       :style="{ width: ((Number(col.width) || 1) / totalRatio * 100) + '%' }"
                   />
-                  <col v-if="userStore.role === 'admin'" style="width: 60px; min-width: 50px;" />
+                  <col v-if="canUseTableActions" style="width: 60px; min-width: 50px;" />
                 </colgroup>
 
                 <thead>
@@ -182,7 +182,7 @@
                       </div>
                     </div>
                   </th>
-                  <th v-if="userStore.role === 'admin'" class="action-th">{{ t('tableTree.universalTable.toolbar.action') }}</th>
+                  <th v-if="canUseTableActions" class="action-th">{{ t('tableTree.universalTable.toolbar.action') }}</th>
                 </tr>
                 </thead>
 
@@ -198,7 +198,7 @@
                   >
                     {{ row[col.key] }}
                   </td>
-                  <td v-if="userStore.role === 'admin'" class="action-td">
+                  <td v-if="canUseTableActions" class="action-td">
                     <button class="icon-action-btn delete" :title="t('common.button.delete')" @click="handleDelete(row)">✕</button>
                   </td>
                 </tr>
@@ -537,7 +537,8 @@ const props = defineProps({
   defaultFilter: { type: Object, default: null }, // 新增：默认筛选 { columnKey: value }
   // ✅ 新增：可选的主键字段名
   primaryKey: { type: String, default: null },
-  apiAdapter: { type: String, default: 'normal' }
+  apiAdapter: { type: String, default: 'normal' },
+  canEdit: { type: Boolean, default: false }
 });
 
 const tableApiAdapters = {
@@ -553,6 +554,13 @@ const tableApiAdapters = {
 }
 
 const tableApi = computed(() => tableApiAdapters[props.apiAdapter] || tableApiAdapters.normal)
+
+const canUseTableActions = computed(() => {
+  if (props.apiAdapter === 'vocabulary') {
+    return props.canEdit === true
+  }
+  return userStore.role === 'admin'
+})
 
 // 狀態定義
 const tableData = ref([]);
@@ -1031,7 +1039,7 @@ const toggleFullscreen = () => {
 // 權限檢查
 // ========================================
 const checkAdminPermission = () => {
-  if (userStore.role !== 'admin') {
+  if (!canUseTableActions.value) {
     showWarning(t('tableTree.universalTable.messages.adminOnly'));
     return false;
   }
@@ -1391,7 +1399,8 @@ const previewAllPagesReplace = async (findText, matchMode, isEmptySearch) => {
       match_mode: matchMode,
       is_empty_search: isEmptySearch,
       filters: filterState,         // 尊重筛选条件
-      search_text: searchText.value  // 尊重搜索条件
+      search_text: searchText.value,  // 尊重搜索条件
+      search_columns: props.columns.map(c => c.key)
     }
 
     const response = await tableApi.value.batchReplacePreview(payload)
@@ -1494,7 +1503,8 @@ const executeAllPagesReplace = async () => {
       match_mode: batchReplace.matchMode,
       is_empty_search: isEmptySearch,
       filters: filterState,         // 尊重筛选条件
-      search_text: searchText.value  // 尊重搜索条件
+      search_text: searchText.value,  // 尊重搜索条件
+      search_columns: props.columns.map(c => c.key)
     }
 
     const response = await tableApi.value.batchReplaceExecute(payload)
