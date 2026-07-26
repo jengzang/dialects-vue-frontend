@@ -323,7 +323,7 @@ import { useI18n } from 'vue-i18n'
 import { watchDebounced } from '@vueuse/core'
 import {
   getVocabularyItems,
-  getVocabularyLocationNames,
+  getVocabularyLocationOptions,
   getVocabularyLocations,
   getVocabularyMapPoints,
   updateVocabularyLocation,
@@ -349,7 +349,7 @@ const searchFieldTriggerEl = ref(null)
 const locationTriggerEl = ref(null)
 const searchFieldDropdownOpen = ref(false)
 const locationDropdownOpen = ref(false)
-const vocabularyLocationNames = ref([])
+const vocabularyLocationOptions = ref([])
 const entries = ref([])
 const mapPoints = ref([])
 const mapStats = ref({
@@ -402,10 +402,7 @@ const searchFieldOptions = computed(() => [
 ])
 
 const locationOptions = computed(() => {
-  return vocabularyLocationNames.value.map((locationName) => ({
-    value: locationName,
-    label: locationName,
-  }))
+  return vocabularyLocationOptions.value
 })
 
 const searchFieldTriggerLabel = computed(() => {
@@ -734,9 +731,9 @@ async function loadVocabularyMapPoints() {
 
 async function loadVocabularyLocationOptions() {
   try {
-    vocabularyLocationNames.value = await getVocabularyLocationNames()
+    vocabularyLocationOptions.value = await getVocabularyLocationOptions()
   } catch {
-    vocabularyLocationNames.value = []
+    vocabularyLocationOptions.value = []
   }
 }
 

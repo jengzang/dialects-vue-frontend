@@ -4,6 +4,7 @@ import { showError } from '@/utils/ui/message.js'
 
 const VOCABULARY_ITEMS_ENDPOINT = '/api/vocabulary/items'
 const VOCABULARY_MAP_POINTS_ENDPOINT = '/api/vocabulary/map-points'
+const VOCABULARY_LOCATION_OPTIONS_ENDPOINT = '/api/vocabulary/location-options'
 const VOCABULARY_LOCATIONS_ENDPOINT = '/api/vocabulary/locations'
 const VOCABULARY_LOGS_ENDPOINT = '/api/vocabulary/logs'
 const VOCABULARY_SQL_ENDPOINT = '/api/vocabulary/sql'
@@ -174,36 +175,39 @@ export async function getVocabularyMapPoints(params = {}) {
 }
 
 /**
- * 获取词表地点简称候选值，供卡片/地图模式的地点多选筛选使用。
+ * 获取词表地点筛选候选值，供卡片/地图模式的地点多选筛选使用。
  *
- * @returns {Promise<string[]>}
+ * @returns {Promise<Array<{value: string, label: string}>>}
  */
-export async function getVocabularyLocationNames() {
+export async function getVocabularyLocationOptions() {
   try {
-    const pageSize = 200
-    let currentPage = 1
-    let totalCount = 0
-    let loadedCount = 0
-    const names = []
+    const response = await api(VOCABULARY_LOCATION_OPTIONS_ENDPOINT)
+    const seenLocationNames = new Set()
+    const locations = Array.isArray(response.locations) ? response.locations : []
 
-    do {
-      const response = await getVocabularyLocations({ page: currentPage, page_size: pageSize })
-      const locations = Array.isArray(response.locations) ? response.locations : []
-      names.push(...locations.map((location) => location.location_name).filter(Boolean))
-      loadedCount += locations.length
-      totalCount = Number(response.total) || names.length
-      if (!locations.length) {
-        break
+    return locations.reduce((options, location) => {
+      const locationName = String(location.location_name || '').trim()
+      if (!locationName || seenLocationNames.has(locationName)) {
+        return options
       }
-      currentPage += 1
-    } while (loadedCount < totalCount)
 
-    return [...new Set(names)]
+      seenLocationNames.add(locationName)
+      options.push({
+        value: locationName,
+        label: location.location_label || locationName,
+      })
+      return options
+    }, [])
   } catch (error) {
     console.error('Get vocabulary locations error:', error)
     showError(error.message || '獲取詞表地點失敗')
     throw new Error(error.message || '獲取詞表地點失敗')
   }
+}
+
+export async function getVocabularyLocationNames() {
+  const options = await getVocabularyLocationOptions()
+  return options.map((option) => option.value)
 }
 
 /**

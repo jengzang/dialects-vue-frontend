@@ -68,6 +68,7 @@ export {
   getVocabularyItems,
   getVocabularyMapPoints,
   getVocabularyLocationNames,
+  getVocabularyLocationOptions,
   getVocabularyLocations,
   getVocabularyLogs,
   updateVocabularyLocation,

@@ -16,6 +16,7 @@ const {
   getVocabularyItems,
   getVocabularyMapPoints,
   getVocabularyLocationNames,
+  getVocabularyLocationOptions,
   getVocabularyLocations,
   getVocabularyLogs,
   updateVocabularyLocation,
@@ -166,49 +167,33 @@ describe('vocabulary table API adapter', () => {
     })
   })
 
-  it('loads vocabulary location names from the dedicated locations API', async () => {
+  it('loads vocabulary location options from the public lightweight endpoint', async () => {
     apiMock.mockResolvedValueOnce({
       locations: [
-        { location_name: '息烽' },
-        { location_name: '天柱' },
+        { location_name: '息烽', location_label: '贵州 / 贵阳 / 息烽' },
+        { location_name: '天柱', location_label: '贵州 / 黔东南 / 天柱' },
       ],
       total: 2,
-      page: 1,
-      page_size: 200,
     })
 
-    const values = await getVocabularyLocationNames()
+    const values = await getVocabularyLocationOptions()
 
-    expect(values).toEqual(['息烽', '天柱'])
-    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/locations?page=1&page_size=200')
+    expect(values).toEqual([
+      { value: '息烽', label: '贵州 / 贵阳 / 息烽' },
+      { value: '天柱', label: '贵州 / 黔东南 / 天柱' },
+    ])
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/location-options')
   })
 
-  it('continues loading vocabulary location names when the dedicated locations API has more pages', async () => {
-    apiMock.mockClear()
-    apiMock.mockResolvedValueOnce({
-      locations: Array.from({ length: 200 }, (_, index) => ({
-        location_name: index === 199 ? '息烽' : `地点${index}`,
-      })),
-      total: 201,
-      page: 1,
-      page_size: 200,
-    })
+  it('keeps the legacy vocabulary location names helper returning names', async () => {
     apiMock.mockResolvedValueOnce({
       locations: [
-        { location_name: '息烽' },
-        { location_name: '天柱' },
+        { location_name: '息烽', location_label: '贵州 / 贵阳 / 息烽' },
       ],
-      total: 201,
-      page: 2,
-      page_size: 200,
+      total: 1,
     })
 
-    const values = await getVocabularyLocationNames()
-
-    expect(values).toHaveLength(201)
-    expect(values.at(-1)).toBe('天柱')
-    expect(apiMock).toHaveBeenNthCalledWith(1, '/api/vocabulary/locations?page=1&page_size=200')
-    expect(apiMock).toHaveBeenNthCalledWith(2, '/api/vocabulary/locations?page=2&page_size=200')
+    await expect(getVocabularyLocationNames()).resolves.toEqual(['息烽'])
   })
 
   it('uses dedicated vocabulary location and log endpoints outside SQL table access', async () => {

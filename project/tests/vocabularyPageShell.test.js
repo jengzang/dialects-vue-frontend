@@ -50,7 +50,7 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain("import YuBaoMap from '@/main/components/map/YuBaoMap.vue'")
     expect(vocabularyPage).toContain("import AppModal from '@/components/common/AppModal.vue'")
     expect(vocabularyPage).toContain("import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'")
-    expect(vocabularyPage).toContain('getVocabularyLocationNames')
+    expect(vocabularyPage).toContain('getVocabularyLocationOptions')
     expect(vocabularyPage).toContain('<MultiSelectDropdown')
     expect(vocabularyPage).toContain('searchFieldDropdownOpen')
     expect(vocabularyPage).toContain('locationDropdownOpen')
