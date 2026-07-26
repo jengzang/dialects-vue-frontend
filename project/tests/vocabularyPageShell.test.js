@@ -80,6 +80,7 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain("return viewMode.value === 'card'")
     expect(vocabularyPage).toContain("return viewMode.value === 'map'")
     expect(vocabularyPage).toContain('tab: nextMode,')
+    expect(vocabularyPage).toContain('const canLoadMore = computed')
     expect(vocabularyPage).toContain('getVocabularyItems(buildVocabularyItemsParams())')
     expect(vocabularyPage).toContain('getVocabularyMapPoints(buildVocabularyMapPointsParams())')
     expect(vocabularyPage).toContain('loadActiveViewMode()')

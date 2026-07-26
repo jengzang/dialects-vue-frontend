@@ -268,6 +268,10 @@ const locationTriggerLabel = computed(() => {
   )
 })
 
+const canLoadMore = computed(() => {
+  return shouldUseVocabularyItemsApi() && !isLoadingItems.value && entries.value.length < total.value
+})
+
 const viewModes = computed(() => [
   { key: 'table', icon: '▤', label: t('words.wordList.viewModes.table') },
   { key: 'card', icon: '▦', label: t('words.wordList.viewModes.card') },
