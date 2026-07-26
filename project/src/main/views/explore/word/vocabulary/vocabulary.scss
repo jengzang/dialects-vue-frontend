@@ -489,8 +489,6 @@
 }
 
 .location-item {
-  align-items: stretch;
-  flex-direction: column;
   padding: 14px;
   background: var(--glass-10);
   border: 1px solid var(--glass-30);
@@ -508,6 +506,22 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
+}
+
+.location-edit-modal {
+  display: grid;
+  gap: 14px;
+}
+
+.location-edit-modal-desc {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.location-edit-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
 .log-meta-grid {

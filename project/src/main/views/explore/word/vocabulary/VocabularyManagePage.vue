@@ -28,15 +28,9 @@
                 <strong>{{ location.location_name }}</strong>
                 <p>{{ location.location_label || location.location_name }}</p>
               </div>
-              <button class="main-glass-button" data-variant="primary" type="button" @click="handleSaveLocation(location)">
-                {{ t('words.wordList.locations.save') }}
+              <button class="main-glass-button" data-variant="primary" type="button" @click="openLocationEditor(location)">
+                {{ t('common.button.edit') }}
               </button>
-            </div>
-            <div class="locations-edit-grid">
-              <label v-for="field in locationEditFields" :key="field.key" class="upload-field">
-                <span>{{ field.label }}</span>
-                <input v-model="location[field.key]" type="text" />
-              </label>
             </div>
           </article>
         </div>
@@ -95,6 +89,39 @@
       </div>
     </section>
 
+    <AppModal
+      v-model="isLocationEditorOpen"
+      size="lg"
+      width="720px"
+      max-height="80dvh"
+      :title="editingLocationDraft?.location_name || t('words.wordList.locations.title')"
+      :close-label="t('common.button.close')"
+      @close="closeLocationEditor"
+    >
+      <div v-if="editingLocationDraft" class="location-edit-modal">
+        <p class="location-edit-modal-desc">
+          {{ editingLocationDraft.location_label || editingLocationDraft.location_name }}
+        </p>
+        <div class="locations-edit-grid">
+          <label v-for="field in locationEditFields" :key="field.key" class="upload-field">
+            <span>{{ field.label }}</span>
+            <input v-model="editingLocationDraft[field.key]" type="text" />
+          </label>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="location-edit-modal-actions">
+          <button class="main-glass-button" data-variant="secondary" type="button" @click="closeLocationEditor">
+            {{ t('common.button.cancel') }}
+          </button>
+          <button class="main-glass-button" data-variant="primary" type="button" @click="handleSaveEditingLocation">
+            {{ t('words.wordList.locations.save') }}
+          </button>
+        </div>
+      </template>
+    </AppModal>
+
   </div>
 </template>
 
@@ -102,6 +129,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getVocabularyLocations, getVocabularyLogs, getVocabularyMe, updateVocabularyLocation } from '@/api'
+import AppModal from '@/components/common/AppModal.vue'
 
 const { t } = useI18n()
 
@@ -120,6 +148,9 @@ const logsLoadError = ref('')
 
 const locationRows = ref([])
 const logRows = ref([])
+const isLocationEditorOpen = ref(false)
+const editingLocationSource = ref(null)
+const editingLocationDraft = ref(null)
 
 const effectiveVocabularyMe = computed(() => props.vocabularyMe || localVocabularyMe.value)
 const hasVocabularyPermission = computed(() => Boolean(effectiveVocabularyMe.value?.permission_level))
@@ -163,6 +194,19 @@ async function loadVocabularyLocations() {
   }
 }
 
+function openLocationEditor(location) {
+  editingLocationSource.value = location
+  editingLocationDraft.value = location ? { ...location } : null
+  locationsStatusText.value = ''
+  isLocationEditorOpen.value = Boolean(location)
+}
+
+function closeLocationEditor() {
+  isLocationEditorOpen.value = false
+  editingLocationSource.value = null
+  editingLocationDraft.value = null
+}
+
 async function handleSaveLocation(location) {
   if (!location?.location_name) {
     return
@@ -178,9 +222,14 @@ async function handleSaveLocation(location) {
     await updateVocabularyLocation(location.location_name, payload, params)
     locationsStatusText.value = t('words.wordList.locations.saveSuccess')
     await loadVocabularyLocations()
+    closeLocationEditor()
   } catch (error) {
     locationsStatusText.value = error.message || t('words.wordList.locations.saveFailed')
   }
+}
+
+function handleSaveEditingLocation() {
+  return handleSaveLocation(editingLocationDraft.value || editingLocationSource.value)
 }
 
 function parseLogPayload(payloadJson) {
