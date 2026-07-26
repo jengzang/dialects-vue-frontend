@@ -56,13 +56,6 @@
           </button>
         </div>
 
-        <div class="logs-filter-grid">
-          <label v-for="field in logFilterFields" :key="field.key" class="upload-field">
-            <span>{{ field.label }}</span>
-            <input v-model="logFilters[field.key]" type="text" :placeholder="field.placeholder" />
-          </label>
-        </div>
-
         <div v-if="logsLoadError" class="empty-state empty-state-base">
           <p>{{ logsLoadError }}</p>
         </div>
@@ -114,14 +107,6 @@ const logsLoadError = ref('')
 
 const locationRows = ref([])
 const logRows = ref([])
-const logFilters = ref({
-  user_id: '',
-  permission_level: '',
-  source: '',
-  action: '',
-  table_name: '',
-  status: '',
-})
 
 const locationEditFields = computed(() => [
   { key: 'coordinates', label: t('words.wordList.upload.coordinates') },
@@ -133,15 +118,6 @@ const locationEditFields = computed(() => [
   { key: 'natural_village', label: t('words.wordList.upload.naturalVillage') },
   { key: 'yindian_region', label: t('words.wordList.upload.yindianRegion') },
   { key: 'atlas_region', label: t('words.wordList.upload.atlasRegion') },
-])
-
-const logFilterFields = computed(() => [
-  { key: 'user_id', label: t('words.wordList.logs.filters.userId'), placeholder: '7' },
-  { key: 'permission_level', label: t('words.wordList.logs.filters.permission'), placeholder: 'edit / manage' },
-  { key: 'source', label: t('words.wordList.logs.filters.source'), placeholder: 'upload' },
-  { key: 'action', label: t('words.wordList.logs.filters.action'), placeholder: 'import' },
-  { key: 'table_name', label: t('words.wordList.logs.filters.table'), placeholder: 'vocabulary_entries' },
-  { key: 'status', label: t('words.wordList.logs.filters.status'), placeholder: 'success' },
 ])
 
 async function loadVocabularyLocations() {
@@ -181,31 +157,12 @@ async function handleSaveLocation(location) {
   }
 }
 
-function buildLogQueryParams() {
-  const params = Object.fromEntries(
-    Object.entries({
-      source: logFilters.value.source,
-      action: logFilters.value.action,
-      table_name: logFilters.value.table_name,
-      user_id: logFilters.value.user_id,
-      permission_level: logFilters.value.permission_level,
-      status: logFilters.value.status,
-    }).map(([key, value]) => [key, String(value || '').trim()])
-  )
-
-  return {
-    ...params,
-    page: 1,
-    page_size: 50,
-  }
-}
-
 async function loadVocabularyLogs() {
   isLoadingLogs.value = true
   logsLoadError.value = ''
 
   try {
-    const response = await getVocabularyLogs(buildLogQueryParams())
+    const response = await getVocabularyLogs({ page: 1, page_size: 50 })
     logRows.value = Array.isArray(response.logs) ? response.logs : []
   } catch (error) {
     logsLoadError.value = error.message || t('words.wordList.logs.loadFailed')

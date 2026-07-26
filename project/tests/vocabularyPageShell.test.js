@@ -151,16 +151,13 @@ describe('vocabulary explore page shell wiring', () => {
 
     expect(vocabularyPage).toContain('getVocabularyLogs')
     expect(vocabularyPage).toContain('loadVocabularyLogs')
-    expect(vocabularyPage).toContain('logFilters')
     expect(vocabularyPage).toContain('logRows')
     expect(vocabularyPage).toContain("t('words.wordList.logs.title')")
     expect(vocabularyPage).toContain("t('words.wordList.logs.refresh')")
-    expect(vocabularyPage).toContain('source: logFilters.value.source')
-    expect(vocabularyPage).toContain('action: logFilters.value.action')
-    expect(vocabularyPage).toContain('table_name: logFilters.value.table_name')
-    expect(vocabularyPage).toContain('user_id: logFilters.value.user_id')
-    expect(vocabularyPage).toContain('permission_level: logFilters.value.permission_level')
-    expect(vocabularyPage).toContain('status: logFilters.value.status')
+    expect(vocabularyPage).not.toContain('logFilters')
+    expect(vocabularyPage).not.toContain('logFilterFields')
+    expect(vocabularyPage).not.toContain('logs-filter-grid')
+    expect(vocabularyPage).not.toContain('v-model="logFilters')
   })
 
   it('keeps vocabulary import flow isolated from view and manage pages', () => {
