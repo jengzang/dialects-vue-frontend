@@ -1,21 +1,19 @@
 <template>
   <div class="vocabulary-page">
-    <div class="top-controls">
-      <div class="header-container">
-        <div class="tab-container" role="tablist" :aria-label="t('words.wordList.tabs.label')">
-          <button
-            v-for="tab in pageTabs"
-            :key="tab.path"
-            class="tab-btn"
-            :class="{ active: isActivePage(tab.path) }"
-            type="button"
-            role="tab"
-            :aria-selected="isActivePage(tab.path)"
-            @click="navigateTo(tab.path)"
-          >
-            {{ tab.label }}
-          </button>
-        </div>
+    <div class="page-tab-navigation">
+      <div class="page-tab-container" role="tablist" :aria-label="t('words.wordList.tabs.label')">
+        <button
+          v-for="tab in pageTabs"
+          :key="tab.path"
+          class="page-tab-btn"
+          :class="{ active: isActivePage(tab.path) }"
+          type="button"
+          role="tab"
+          :aria-selected="isActivePage(tab.path)"
+          @click="navigateTo(tab.path)"
+        >
+          {{ tab.label }}
+        </button>
       </div>
     </div>
 

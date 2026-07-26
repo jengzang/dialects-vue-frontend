@@ -20,6 +20,68 @@
   backdrop-filter: blur(10px);
 }
 
+.page-tab-navigation {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto 18px;
+  pointer-events: none;
+}
+
+.page-tab-container {
+  display: inline-flex;
+  gap: 4px;
+  max-width: 100%;
+  padding: 4px;
+  overflow-x: auto;
+  pointer-events: auto;
+  background: var(--glass-80);
+  border: 1px solid var(--glass-40);
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 var(--glass-60);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+}
+
+.page-tab-btn {
+  min-width: 96px;
+  min-height: 36px;
+  padding: 0 16px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm2);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.page-tab-btn:hover:not(.active) {
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.page-tab-btn.active {
+  color: var(--color-primary);
+  font-weight: 600;
+  background: var(--bg-white);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
 .header-container,
 .search-container,
 .search-section,
@@ -31,28 +93,6 @@
 
 .header-container {
   justify-content: space-between;
-}
-
-.tab-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tab-btn {
-  min-height: 36px;
-  padding: 0 14px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  background: var(--glass-10);
-  border: 1px solid var(--glass-30);
-  border-radius: var(--radius-md, 8px);
-}
-
-.tab-btn.active {
-  color: var(--text-primary);
-  background: var(--glass-30);
-  border-color: var(--color-primary-hover);
 }
 
 .search-container {
@@ -479,6 +519,21 @@
 
   .top-controls {
     position: static;
+  }
+
+  .page-tab-navigation {
+    position: static;
+    justify-content: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .page-tab-container {
+    width: 100%;
+  }
+
+  .page-tab-btn {
+    flex: 1 0 auto;
+    min-width: 88px;
   }
 
   .search-container,

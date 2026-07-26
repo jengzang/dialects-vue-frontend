@@ -61,9 +61,16 @@ describe('vocabulary explore page shell wiring', () => {
 
   it('keeps the vocabulary shell focused on page-level navigation', () => {
     const vocabularyPage = readSource('src/main/views/explore/word/VocabularyPage.vue')
+    const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
 
     expect(vocabularyPage).toContain('<router-view')
-    expect(vocabularyPage).toContain('top-controls')
+    expect(vocabularyPage).toContain('page-tab-navigation')
+    expect(vocabularyPage).toContain('page-tab-container')
+    expect(vocabularyPage).toContain('page-tab-btn')
+    expect(vocabularyPage).not.toContain('class="top-controls"')
+    expect(vocabularyScss).toContain('.page-tab-navigation')
+    expect(vocabularyScss).toContain('.page-tab-container')
+    expect(vocabularyScss).toContain('.page-tab-btn.active')
     expect(vocabularyPage).toContain("'/explore/vocabulary/view'")
     expect(vocabularyPage).toContain("'/explore/vocabulary/import'")
     expect(vocabularyPage).toContain("'/explore/vocabulary/manage'")
