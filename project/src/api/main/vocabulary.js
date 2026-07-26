@@ -4,6 +4,8 @@ import { showError } from '@/utils/ui/message.js'
 
 const VOCABULARY_ITEMS_ENDPOINT = '/api/vocabulary/search/entries'
 const VOCABULARY_MAP_POINTS_ENDPOINT = '/api/vocabulary/search/map-points'
+const VOCABULARY_STANDARD_WORDS_ENDPOINT = '/api/vocabulary/search/standard-words'
+const VOCABULARY_MAP_ITEMS_ENDPOINT = '/api/vocabulary/search/map-items'
 const VOCABULARY_LOCATION_OPTIONS_ENDPOINT = '/api/vocabulary/search/location-options'
 const VOCABULARY_LOCATIONS_ENDPOINT = '/api/vocabulary/locations'
 const VOCABULARY_LOGS_ENDPOINT = '/api/vocabulary/logs'
@@ -101,6 +103,17 @@ function stripVocabularyBatchReplaceParams(params = {}) {
  */
 
 /**
+ * @typedef {object} VocabularyStandardWordOption
+ * @property {string} standard_word 标准书面词。
+ * @property {number} entry_count 该标准词匹配词条数。
+ * @property {number} location_count 该标准词覆盖地点数。
+ */
+
+/**
+ * @typedef {VocabularyMapPoint & {items: VocabularyItem[]}} VocabularyMapItemPoint
+ */
+
+/**
  * @typedef {object} VocabularyItemsResponse
  * @property {VocabularyItem[]} items 卡片模式词条结果。
  * @property {number} total 后端匹配总数。
@@ -152,6 +165,40 @@ export function buildVocabularyMapPointsPath(params = {}) {
 }
 
 /**
+ * 构造词表标准词候选查询路径。
+ *
+ * 该接口用于地图模式的 standard_word 单选/多选控件；不传 limit 时由后端返回全量去重候选。
+ *
+ * @param {Omit<VocabularyItemsQuery, 'page' | 'page_size'> & {limit?: number}} [params={}]
+ * @returns {string}
+ */
+export function buildVocabularyStandardWordsPath(params = {}) {
+  return `${VOCABULARY_STANDARD_WORDS_ENDPOINT}${appendQueryParams({
+    q: params.q,
+    search_fields: params.search_fields,
+    locations: params.locations,
+    limit: params.limit,
+  })}`
+}
+
+/**
+ * 构造词表地图详情点查询路径。
+ *
+ * 该接口只在前端已选择 standard_words 时调用；不分页，返回每个地点的词条详情 items。
+ *
+ * @param {Omit<VocabularyItemsQuery, 'page' | 'page_size'> & {standard_words: string | string[]}} params
+ * @returns {string}
+ */
+export function buildVocabularyMapItemsPath(params = {}) {
+  return `${VOCABULARY_MAP_ITEMS_ENDPOINT}${appendQueryParams({
+    standard_words: params.standard_words,
+    q: params.q,
+    search_fields: params.search_fields,
+    locations: params.locations,
+  })}`
+}
+
+/**
  * 获取词表卡片模式结果。
  *
  * @param {VocabularyItemsQuery} [params={}]
@@ -180,6 +227,38 @@ export async function getVocabularyMapPoints(params = {}) {
     console.error('Get vocabulary map points error:', error)
     showError(error.message || '獲取詞表地圖點失敗')
     throw new Error(error.message || '獲取詞表地圖點失敗')
+  }
+}
+
+/**
+ * 获取词表标准词候选。
+ *
+ * @param {Omit<VocabularyItemsQuery, 'page' | 'page_size'> & {limit?: number}} [params={}]
+ * @returns {Promise<{standard_words: VocabularyStandardWordOption[], total: number}>}
+ */
+export async function getVocabularyStandardWords(params = {}) {
+  try {
+    return await api(buildVocabularyStandardWordsPath(params))
+  } catch (error) {
+    console.error('Get vocabulary standard words error:', error)
+    showError(error.message || '獲取詞表標準詞失敗')
+    throw new Error(error.message || '獲取詞表標準詞失敗')
+  }
+}
+
+/**
+ * 获取词表地图详情点。
+ *
+ * @param {Omit<VocabularyItemsQuery, 'page' | 'page_size'> & {standard_words: string | string[]}} params
+ * @returns {Promise<{points: VocabularyMapItemPoint[], total_entries: number, total_points: number, omitted_without_coordinates: number}>}
+ */
+export async function getVocabularyMapItems(params = {}) {
+  try {
+    return await api(buildVocabularyMapItemsPath(params))
+  } catch (error) {
+    console.error('Get vocabulary map items error:', error)
+    showError(error.message || '獲取詞表地圖詳情失敗')
+    throw new Error(error.message || '獲取詞表地圖詳情失敗')
   }
 }
 

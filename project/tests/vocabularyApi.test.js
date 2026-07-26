@@ -17,10 +17,14 @@ vi.mock('../src/utils/ui/message.js', () => ({
 
 const {
   buildVocabularyItemsPath,
+  buildVocabularyMapItemsPath,
   buildVocabularyMapPointsPath,
+  buildVocabularyStandardWordsPath,
   getVocabularyItems,
+  getVocabularyMapItems,
   getVocabularyMapPoints,
   getVocabularyMe,
+  getVocabularyStandardWords,
   getVocabularyLocationNames,
   getVocabularyLocationOptions,
   getVocabularyLocations,
@@ -133,6 +137,48 @@ describe('vocabulary items API', () => {
     await getVocabularyMapPoints({ q: '太阳' })
 
     expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/search/map-points?q=%E5%A4%AA%E9%98%B3')
+  })
+
+  it('serializes standard word candidates and detailed map items without pagination', async () => {
+    const standardWordsPath = buildVocabularyStandardWordsPath({
+      q: '日头',
+      search_fields: ['definition', 'headword'],
+      locations: ['息烽', '天柱'],
+      limit: 100,
+    })
+    const standardWordsParams = paramsFromPath(standardWordsPath)
+
+    expect(standardWordsPath).toContain('/api/vocabulary/search/standard-words?')
+    expect(standardWordsParams.get('q')).toBe('日头')
+    expect(standardWordsParams.get('search_fields')).toBe('definition,headword')
+    expect(standardWordsParams.get('locations')).toBe('息烽,天柱')
+    expect(standardWordsParams.get('limit')).toBe('100')
+
+    const mapItemsPath = buildVocabularyMapItemsPath({
+      standard_words: ['太阳', '月亮'],
+      q: '日头',
+      search_fields: ['headword'],
+      locations: ['息烽'],
+      page: 2,
+      page_size: 50,
+    })
+    const mapItemsParams = paramsFromPath(mapItemsPath)
+
+    expect(mapItemsPath).toContain('/api/vocabulary/search/map-items?')
+    expect(mapItemsParams.get('standard_words')).toBe('太阳,月亮')
+    expect(mapItemsParams.get('q')).toBe('日头')
+    expect(mapItemsParams.get('search_fields')).toBe('headword')
+    expect(mapItemsParams.get('locations')).toBe('息烽')
+    expect(mapItemsParams.has('page')).toBe(false)
+    expect(mapItemsParams.has('page_size')).toBe(false)
+
+    apiMock.mockResolvedValueOnce({ standard_words: [], total: 0 })
+    await getVocabularyStandardWords({ q: '太阳' })
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/search/standard-words?q=%E5%A4%AA%E9%98%B3')
+
+    apiMock.mockResolvedValueOnce({ points: [], total_entries: 0, total_points: 0 })
+    await getVocabularyMapItems({ standard_words: ['太阳'] })
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/search/map-items?standard_words=%E5%A4%AA%E9%98%B3')
   })
 })
 

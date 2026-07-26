@@ -23,6 +23,7 @@
     "search": {
       "label": "搜索",
       "placeholder": "搜索釋義、詞條、發音、詳情",
+      "standardWordPlaceholder": "按標準詞篩選地圖",
       "locationPlaceholder": "按地點篩選當前結果",
       "fieldCount": "已選 {count} 列",
       "fields": {

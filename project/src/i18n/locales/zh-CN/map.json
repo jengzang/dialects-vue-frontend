@@ -400,6 +400,14 @@
       "sentence": "句式："
     }
   },
+  "vocabularyMap": {
+    "controls": {
+      "overview": "概览",
+      "location": "地点",
+      "pronunciation": "语音",
+      "definition": "释义"
+    }
+  },
   "villageMapPopup": {
     "title": "村落分布地图",
     "count": "{count} 个村落",

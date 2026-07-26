@@ -52,6 +52,29 @@
         </div>
 
         <div class="filter-strip">
+          <div v-if="viewMode === 'map'" class="standard-word-filter">
+            <button
+              ref="standardWordTriggerEl"
+              class="select-trigger global-select-trigger standard-word-select-trigger"
+              :class="{ 'is-open': standardWordDropdownOpen, 'is-disabled': standardWordOptions.length === 0 }"
+              type="button"
+              :disabled="standardWordOptions.length === 0"
+              @click="standardWordDropdownOpen = !standardWordDropdownOpen"
+            >
+              <span class="select-label">{{ standardWordTriggerLabel }}</span>
+              <span class="select-arrow" aria-hidden="true">⌄</span>
+            </button>
+            <MultiSelectDropdown
+              v-if="standardWordDropdownOpen"
+              v-model="selectedStandardWords"
+              :options="standardWordOptions"
+              :trigger-el="standardWordTriggerEl"
+              align="left"
+              direction="down"
+              @close="standardWordDropdownOpen = false"
+            />
+          </div>
+
           <div class="location-filter">
             <button
               ref="locationTriggerEl"
@@ -118,9 +141,9 @@
 
       <div v-else-if="viewMode === 'map'" class="map-mode main-glass-panel">
         <div class="map-canvas-shell">
-          <YuBaoMap
-            v-if="mapDataForYuBaoMap.length"
-            :map-data="mapDataForYuBaoMap"
+          <VocabularyMap
+            v-if="mapDataForVocabularyMap.length"
+            :map-data="mapDataForVocabularyMap"
             active-tab="vocabulary"
             @marker-click="handleMapPointClick"
           />
@@ -201,12 +224,14 @@ import { watchDebounced } from '@vueuse/core'
 import {
   getVocabularyItems,
   getVocabularyLocationOptions,
-  getVocabularyMapPoints
+  getVocabularyMapItems,
+  getVocabularyMapPoints,
+  getVocabularyStandardWords
 } from '@/api'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
-import YuBaoMap from '@/main/components/map/YuBaoMap.vue'
+import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -222,12 +247,16 @@ const query = ref('')
 const viewMode = ref(normalizeViewMode(route.query.tab))
 const selectedSearchFields = ref([])
 const selectedLocations = ref([])
+const selectedStandardWords = ref([])
 const searchInputEl = ref(null)
 const searchFieldTriggerEl = ref(null)
 const locationTriggerEl = ref(null)
+const standardWordTriggerEl = ref(null)
 const searchFieldDropdownOpen = ref(false)
 const locationDropdownOpen = ref(false)
+const standardWordDropdownOpen = ref(false)
 const vocabularyLocationOptions = ref([])
+const vocabularyStandardWordOptions = ref([])
 const entries = ref([])
 const mapPoints = ref([])
 const mapStats = ref({
@@ -258,6 +287,10 @@ const locationOptions = computed(() => {
   return vocabularyLocationOptions.value
 })
 
+const standardWordOptions = computed(() => {
+  return vocabularyStandardWordOptions.value
+})
+
 const searchFieldTriggerLabel = computed(() => {
   if (!selectedSearchFields.value.length) {
     return t('words.wordList.search.fields.all')
@@ -271,6 +304,14 @@ const locationTriggerLabel = computed(() => {
     selectedLocations.value,
     locationOptions.value,
     t('words.wordList.search.locationPlaceholder')
+  )
+})
+
+const standardWordTriggerLabel = computed(() => {
+  return formatMultiSelectLabel(
+    selectedStandardWords.value,
+    standardWordOptions.value,
+    t('words.wordList.search.standardWordPlaceholder')
   )
 })
 
@@ -309,19 +350,21 @@ function setViewMode(mode) {
   })
 }
 
-const mapDataForYuBaoMap = computed(() => {
+const mapDataForVocabularyMap = computed(() => {
   return mapPoints.value
     .filter((point) => Number.isFinite(point.longitude) && Number.isFinite(point.latitude))
     .map((point) => ({
       longitude: point.longitude,
       latitude: point.latitude,
+      entryCount: point.entryCount,
       locationName: point.locationName,
       location: point.locationName,
       county: point.locationName,
       province: point.locationLabel,
-      pronunciation: point.markerLabel,
-      note2: point.locationLabel,
+      pronunciation: point.pronunciation || point.markerLabel,
+      note2: point.definition || point.locationLabel,
       note1: point.entryCount ? String(point.entryCount) : '',
+      items: point.items || [],
     }))
 })
 
@@ -330,7 +373,11 @@ function shouldUseVocabularyItemsApi() {
 }
 
 function shouldUseVocabularyMapPointsApi() {
-  return viewMode.value === 'map'
+  return viewMode.value === 'map' && !selectedStandardWords.value.length
+}
+
+function shouldUseVocabularyMapItemsApi() {
+  return viewMode.value === 'map' && selectedStandardWords.value.length > 0
 }
 
 function formatMultiSelectLabel(selectedValues, options, placeholder) {
@@ -404,6 +451,17 @@ function buildVocabularyMapPointsParams() {
   return buildVocabularyQueryParams()
 }
 
+function buildVocabularyStandardWordsParams() {
+  return buildVocabularyQueryParams()
+}
+
+function buildVocabularyMapItemsParams() {
+  return {
+    ...buildVocabularyQueryParams(),
+    standard_words: selectedStandardWords.value,
+  }
+}
+
 function normalizeVocabularyMapPoint(point) {
   const locationName = point.location_name || ''
   const locationLabel = point.location_label || locationName
@@ -416,6 +474,21 @@ function normalizeVocabularyMapPoint(point) {
     latitude: normalizeNumber(point.latitude),
     entryCount,
     markerLabel: entryCount ? String(entryCount) : (locationLabel || locationName),
+  }
+}
+
+function normalizeVocabularyMapItemPoint(point) {
+  const normalizedPoint = normalizeVocabularyMapPoint(point)
+  const items = Array.isArray(point.items) ? point.items.map(normalizeVocabularyEntry) : []
+  const pronunciations = items.map((item) => item.pronunciation).filter(Boolean)
+  const definitions = items.map((item) => item.definition).filter(Boolean)
+
+  return {
+    ...normalizedPoint,
+    entryCount: Number(point.entry_count) || items.length || normalizedPoint.entryCount,
+    pronunciation: [...new Set(pronunciations)].join(' / '),
+    definition: [...new Set(definitions)].join(' / '),
+    items,
   }
 }
 
@@ -467,7 +540,7 @@ async function loadVocabularyItems({ append = false } = {}) {
 }
 
 async function loadVocabularyMapPoints() {
-  if (!shouldUseVocabularyMapPointsApi()) {
+  if (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi()) {
     return
   }
 
@@ -477,8 +550,13 @@ async function loadVocabularyMapPoints() {
   total.value = 0
 
   try {
-    const response = await getVocabularyMapPoints(buildVocabularyMapPointsParams())
-    mapPoints.value = Array.isArray(response.points) ? response.points.map(normalizeVocabularyMapPoint) : []
+    const shouldLoadMapItems = shouldUseVocabularyMapItemsApi()
+    const response = shouldLoadMapItems
+      ? await getVocabularyMapItems(buildVocabularyMapItemsParams())
+      : await getVocabularyMapPoints(buildVocabularyMapPointsParams())
+    mapPoints.value = Array.isArray(response.points)
+      ? response.points.map(shouldLoadMapItems ? normalizeVocabularyMapItemPoint : normalizeVocabularyMapPoint)
+      : []
     mapStats.value = {
       totalEntries: Number(response.total_entries) || 0,
       totalPoints: Number(response.total_points) || mapPoints.value.length,
@@ -502,6 +580,33 @@ async function loadVocabularyLocationOptions() {
     vocabularyLocationOptions.value = await getVocabularyLocationOptions()
   } catch {
     vocabularyLocationOptions.value = []
+  }
+}
+
+async function loadVocabularyStandardWords() {
+  try {
+    const response = await getVocabularyStandardWords(buildVocabularyStandardWordsParams())
+    const standardWords = Array.isArray(response.standard_words) ? response.standard_words : []
+    vocabularyStandardWordOptions.value = standardWords
+      .map((item) => {
+        const standardWord = String(item.standard_word || '').trim()
+        if (!standardWord) {
+          return null
+        }
+
+        const entryCount = Number(item.entry_count) || 0
+        const locationCount = Number(item.location_count) || 0
+        return {
+          value: standardWord,
+          label: `${standardWord}（${entryCount} / ${locationCount}）`,
+        }
+      })
+      .filter(Boolean)
+    const optionValues = new Set(vocabularyStandardWordOptions.value.map((option) => option.value))
+    selectedStandardWords.value = selectedStandardWords.value.filter((value) => optionValues.has(value))
+  } catch {
+    vocabularyStandardWordOptions.value = []
+    selectedStandardWords.value = []
   }
 }
 
@@ -543,11 +648,14 @@ function loadActiveViewMode() {
     loadVocabularyItems()
   } else if (shouldUseVocabularyMapPointsApi()) {
     loadVocabularyMapPoints()
+  } else if (shouldUseVocabularyMapItemsApi()) {
+    loadVocabularyMapPoints()
   }
 }
 
 onMounted(() => {
   loadVocabularyLocationOptions()
+  loadVocabularyStandardWords()
   loadActiveViewMode()
 })
 
@@ -563,12 +671,22 @@ watch(viewMode, () => {
 })
 
 watchDebounced([query, selectedSearchFields, selectedLocations], () => {
+  loadVocabularyStandardWords()
+
   if (shouldUseVocabularyItemsApi()) {
     loadVocabularyItems()
   } else if (shouldUseVocabularyMapPointsApi()) {
     loadVocabularyMapPoints()
+  } else if (shouldUseVocabularyMapItemsApi()) {
+    loadVocabularyMapPoints()
   }
 }, { debounce: 250, maxWait: 800 })
+
+watch(selectedStandardWords, () => {
+  if (shouldUseVocabularyMapPointsApi() || shouldUseVocabularyMapItemsApi()) {
+    loadVocabularyMapPoints()
+  }
+})
 </script>
 
 <style scoped lang="scss" src="./vocabulary.scss"></style>

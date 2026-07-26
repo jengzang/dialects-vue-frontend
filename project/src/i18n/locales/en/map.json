@@ -400,6 +400,14 @@
       "sentence": "Sentence Pattern:"
     }
   },
+  "vocabularyMap": {
+    "controls": {
+      "overview": "Overview",
+      "location": "Location",
+      "pronunciation": "Pronunciation",
+      "definition": "Definition"
+    }
+  },
   "villageMapPopup": {
     "title": "Village Distribution Map",
     "count": "{count} villages",

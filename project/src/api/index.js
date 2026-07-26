@@ -64,10 +64,14 @@ export {
 // ==================== 词表业务接口 ====================
 export {
   buildVocabularyItemsPath,
+  buildVocabularyMapItemsPath,
   buildVocabularyMapPointsPath,
+  buildVocabularyStandardWordsPath,
   getVocabularyItems,
+  getVocabularyMapItems,
   getVocabularyMapPoints,
   getVocabularyMe,
+  getVocabularyStandardWords,
   getVocabularyLocationNames,
   getVocabularyLocationOptions,
   getVocabularyLocations,
