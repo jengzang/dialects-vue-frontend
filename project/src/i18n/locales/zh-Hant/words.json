@@ -113,6 +113,8 @@
       "refresh": "查詢日誌",
       "empty": "暫無操作日誌",
       "loadFailed": "獲取詞表操作日誌失敗",
+      "rollbackSupported": "記錄了恢復所需線索",
+      "rollbackUnsupported": "僅供審計，不承諾自動回滾",
       "filters": {
         "userId": "用戶 ID",
         "permission": "權限",
@@ -128,6 +130,22 @@
         "table": "表",
         "status": "狀態",
         "affectedRows": "影響行數"
+      },
+      "payload": {
+        "importedEntries": "本次導入 {count} 條",
+        "deletedEntries": "覆蓋舊詞條 {count} 條",
+        "location": "地點：{value}",
+        "file": "文件：{value}",
+        "changedFields": "變更字段：{fields}",
+        "targetUser": "目標用戶：{value}",
+        "permissionChange": "權限：{old} -> {next}",
+        "sqlAction": "SQL 動作：{value}",
+        "primaryKey": "主鍵：{value}",
+        "beforeRows": "記錄舊行快照 {count} 條",
+        "beforeFields": "記錄舊字段：{fields}",
+        "afterRows": "記錄新建 ID {count} 條",
+        "createdId": "新建 ID：{value}",
+        "replaceRule": "替換規則：{find} -> {replace}"
       }
     },
     "import": {

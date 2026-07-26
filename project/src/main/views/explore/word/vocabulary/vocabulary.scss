@@ -423,6 +423,27 @@
   gap: 10px;
 }
 
+.log-payload-list {
+  display: grid;
+  gap: 6px;
+  padding: 0 0 0 18px;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.log-recovery-line {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.log-recovery-line [data-supported='true'] {
+  color: var(--color-success, var(--color-primary));
+}
+
+.log-recovery-line [data-supported='false'] {
+  color: var(--text-tertiary);
+}
+
 .logs-list {
   display: grid;
   gap: 10px;

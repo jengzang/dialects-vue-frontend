@@ -79,6 +79,12 @@
               <span>{{ t('words.wordList.logs.columns.status') }}：{{ log.status || '-' }}</span>
               <span>{{ t('words.wordList.logs.columns.affectedRows') }}：{{ log.affected_rows ?? '-' }}</span>
             </div>
+            <div class="log-recovery-line">
+              <span :data-supported="log.rollbackSupported ? 'true' : 'false'">{{ log.rollbackLabel }}</span>
+            </div>
+            <ul v-if="log.payloadSummary.length" class="log-payload-list">
+              <li v-for="item in log.payloadSummary" :key="item">{{ item }}</li>
+            </ul>
             <p v-if="log.target_scope">{{ log.target_scope }}</p>
           </article>
         </div>
@@ -157,13 +163,110 @@ async function handleSaveLocation(location) {
   }
 }
 
+function parseLogPayload(payloadJson) {
+  if (!payloadJson || typeof payloadJson !== 'string') {
+    return null
+  }
+
+  try {
+    return JSON.parse(payloadJson)
+  } catch {
+    return null
+  }
+}
+
+function formatLogValue(value) {
+  if (value === null || value === undefined || value === '') {
+    return '-'
+  }
+
+  if (Array.isArray(value)) {
+    return value.join('、')
+  }
+
+  if (typeof value === 'object') {
+    return JSON.stringify(value)
+  }
+
+  return String(value)
+}
+
+function buildChangeSummary(changes = {}) {
+  return Object.entries(changes).map(([field, change]) => {
+    return `${field}: ${formatLogValue(change?.old)} -> ${formatLogValue(change?.new)}`
+  })
+}
+
+function buildLogPayloadSummary(log, payload) {
+  if (!payload) {
+    return []
+  }
+
+  const summary = []
+
+  if (log.source === 'upload') {
+    summary.push(t('words.wordList.logs.payload.importedEntries', { count: payload.imported_count || 0 }))
+    summary.push(t('words.wordList.logs.payload.deletedEntries', { count: payload.deleted_existing_count || 0 }))
+    if (payload.location_name) summary.push(t('words.wordList.logs.payload.location', { value: payload.location_name }))
+    if (payload.filename) summary.push(t('words.wordList.logs.payload.file', { value: payload.filename }))
+  } else if (log.source === 'location_editor') {
+    summary.push(t('words.wordList.logs.payload.location', { value: payload.location_name || payload.target_user_id || '-' }))
+    summary.push(t('words.wordList.logs.payload.changedFields', { fields: formatLogValue(payload.updated_fields) }))
+    summary.push(...buildChangeSummary(payload.changes))
+  } else if (log.source === 'admin') {
+    summary.push(t('words.wordList.logs.payload.targetUser', { value: payload.target_user_id || '-' }))
+    summary.push(t('words.wordList.logs.payload.permissionChange', {
+      old: formatLogValue(payload.before?.permission_level),
+      next: formatLogValue(payload.after?.permission_level || payload.permission_level),
+    }))
+  } else if (log.source === 'sql_editor' || log.source === 'batch_mutate') {
+    summary.push(t('words.wordList.logs.payload.sqlAction', { value: payload.action || log.action || '-' }))
+    if (payload.pk_value !== undefined && payload.pk_value !== null) {
+      summary.push(t('words.wordList.logs.payload.primaryKey', { value: payload.pk_value }))
+    }
+    if (Array.isArray(payload.before)) {
+      summary.push(t('words.wordList.logs.payload.beforeRows', { count: payload.before.length }))
+    } else if (payload.before) {
+      summary.push(t('words.wordList.logs.payload.beforeFields', { fields: Object.keys(payload.before).join('、') }))
+    }
+    if (Array.isArray(payload.after)) {
+      summary.push(t('words.wordList.logs.payload.afterRows', { count: payload.after.length }))
+    } else if (payload.after?.id) {
+      summary.push(t('words.wordList.logs.payload.createdId', { value: payload.after.id }))
+    }
+  } else if (log.source === 'batch_replace') {
+    summary.push(t('words.wordList.logs.payload.replaceRule', {
+      find: formatLogValue(payload.find_text),
+      replace: formatLogValue(payload.replace_text),
+    }))
+    summary.push(t('words.wordList.logs.payload.changedFields', { fields: formatLogValue(payload.columns) }))
+  }
+
+  return summary.filter(Boolean)
+}
+
+function normalizeVocabularyLog(log) {
+  const payload = parseLogPayload(log.payload_json)
+  const rollbackSupported = payload?.rollback_supported === true
+
+  return {
+    ...log,
+    parsedPayload: payload,
+    rollbackSupported,
+    rollbackLabel: rollbackSupported
+      ? t('words.wordList.logs.rollbackSupported')
+      : t('words.wordList.logs.rollbackUnsupported'),
+    payloadSummary: buildLogPayloadSummary(log, payload),
+  }
+}
+
 async function loadVocabularyLogs() {
   isLoadingLogs.value = true
   logsLoadError.value = ''
 
   try {
     const response = await getVocabularyLogs({ page: 1, page_size: 50 })
-    logRows.value = Array.isArray(response.logs) ? response.logs : []
+    logRows.value = Array.isArray(response.logs) ? response.logs.map(normalizeVocabularyLog) : []
   } catch (error) {
     logsLoadError.value = error.message || t('words.wordList.logs.loadFailed')
     logRows.value = []

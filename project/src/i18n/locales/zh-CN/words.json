@@ -113,6 +113,8 @@
       "refresh": "查询日志",
       "empty": "暂无操作日志",
       "loadFailed": "获取词表操作日志失败",
+      "rollbackSupported": "记录了恢复所需线索",
+      "rollbackUnsupported": "仅供审计，不承诺自动回滚",
       "filters": {
         "userId": "用户 ID",
         "permission": "权限",
@@ -128,6 +130,22 @@
         "table": "表",
         "status": "状态",
         "affectedRows": "影响行数"
+      },
+      "payload": {
+        "importedEntries": "本次导入 {count} 条",
+        "deletedEntries": "覆盖旧词条 {count} 条",
+        "location": "地点：{value}",
+        "file": "文件：{value}",
+        "changedFields": "变更字段：{fields}",
+        "targetUser": "目标用户：{value}",
+        "permissionChange": "权限：{old} -> {next}",
+        "sqlAction": "SQL 动作：{value}",
+        "primaryKey": "主键：{value}",
+        "beforeRows": "记录旧行快照 {count} 条",
+        "beforeFields": "记录旧字段：{fields}",
+        "afterRows": "记录新建 ID {count} 条",
+        "createdId": "新建 ID：{value}",
+        "replaceRule": "替换规则：{find} -> {replace}"
       }
     },
     "import": {

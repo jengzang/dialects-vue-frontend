@@ -113,6 +113,8 @@
       "refresh": "Query logs",
       "empty": "No operation logs",
       "loadFailed": "Failed to load vocabulary logs",
+      "rollbackSupported": "Recovery clues recorded",
+      "rollbackUnsupported": "Audit only; automatic rollback is not guaranteed",
       "filters": {
         "userId": "User ID",
         "permission": "Permission",
@@ -128,6 +130,22 @@
         "table": "Table",
         "status": "Status",
         "affectedRows": "Affected rows"
+      },
+      "payload": {
+        "importedEntries": "Imported {count} entries",
+        "deletedEntries": "Overwrote {count} old entries",
+        "location": "Location: {value}",
+        "file": "File: {value}",
+        "changedFields": "Changed fields: {fields}",
+        "targetUser": "Target user: {value}",
+        "permissionChange": "Permission: {old} -> {next}",
+        "sqlAction": "SQL action: {value}",
+        "primaryKey": "Primary key: {value}",
+        "beforeRows": "Old row snapshots recorded: {count}",
+        "beforeFields": "Old fields recorded: {fields}",
+        "afterRows": "Created IDs recorded: {count}",
+        "createdId": "Created ID: {value}",
+        "replaceRule": "Replace rule: {find} -> {replace}"
       }
     },
     "import": {
