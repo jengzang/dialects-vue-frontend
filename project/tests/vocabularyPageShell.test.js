@@ -145,6 +145,23 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).not.toContain("t('words.wordList.review.approve')")
   })
 
+  it('includes operation log querying inside the vocabulary manage page', () => {
+    const vocabularyPage = readSource('src/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
+
+    expect(vocabularyPage).toContain('getVocabularyLogs')
+    expect(vocabularyPage).toContain('loadVocabularyLogs')
+    expect(vocabularyPage).toContain('logFilters')
+    expect(vocabularyPage).toContain('logRows')
+    expect(vocabularyPage).toContain("t('words.wordList.logs.title')")
+    expect(vocabularyPage).toContain("t('words.wordList.logs.refresh')")
+    expect(vocabularyPage).toContain('source: logFilters.value.source')
+    expect(vocabularyPage).toContain('action: logFilters.value.action')
+    expect(vocabularyPage).toContain('table_name: logFilters.value.table_name')
+    expect(vocabularyPage).toContain('user_id: logFilters.value.user_id')
+    expect(vocabularyPage).toContain('permission_level: logFilters.value.permission_level')
+    expect(vocabularyPage).toContain('status: logFilters.value.status')
+  })
+
   it('keeps vocabulary import flow isolated from view and manage pages', () => {
     const importPage = readSource('src/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
     const viewPage = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')

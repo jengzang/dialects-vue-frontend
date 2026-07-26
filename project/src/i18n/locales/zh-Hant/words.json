@@ -107,6 +107,29 @@
       "saveSuccess": "地點信息已保存。",
       "saveFailed": "保存地點信息失敗"
     },
+    "logs": {
+      "title": "操作日誌",
+      "desc": "查詢詞表導入、地點編輯和表格操作記錄。",
+      "refresh": "查詢日誌",
+      "empty": "暫無操作日誌",
+      "loadFailed": "獲取詞表操作日誌失敗",
+      "filters": {
+        "userId": "用戶 ID",
+        "permission": "權限",
+        "source": "來源",
+        "action": "動作",
+        "table": "表名",
+        "status": "狀態"
+      },
+      "columns": {
+        "userId": "用戶",
+        "permission": "權限",
+        "source": "來源",
+        "table": "表",
+        "status": "狀態",
+        "affectedRows": "影響行數"
+      }
+    },
     "import": {
       "examples": {
         "definition": "太陽",

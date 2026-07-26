@@ -231,6 +231,21 @@ describe('vocabulary table API adapter', () => {
     apiMock.mockResolvedValueOnce({ logs: [], total: 0, page: 1, page_size: 50 })
     await getVocabularyLogs({ source: 'upload', action: 'import' })
     expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/logs?source=upload&action=import')
+
+    apiMock.mockResolvedValueOnce({ logs: [], total: 0, page: 1, page_size: 50 })
+    await getVocabularyLogs({
+      user_id: 7,
+      permission_level: 'manage',
+      source: 'sql_editor',
+      action: 'update',
+      table_name: 'vocabulary_entries',
+      status: 'success',
+      page: 1,
+      page_size: 50,
+    })
+    expect(apiMock).toHaveBeenLastCalledWith(
+      '/api/vocabulary/logs?user_id=7&permission_level=manage&source=sql_editor&action=update&table_name=vocabulary_entries&status=success&page=1&page_size=50'
+    )
   })
 
   it('supports vocabulary SQL columns, count, and direct distinct endpoints for entries only', async () => {

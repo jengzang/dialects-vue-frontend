@@ -250,7 +250,8 @@
 }
 
 .upload-mode,
-.locations-mode {
+.locations-mode,
+.logs-mode {
   padding: 16px;
 }
 
@@ -318,8 +319,14 @@
   margin: 14px auto 0;
 }
 
+.vocabulary-manage-page {
+  display: grid;
+  gap: 16px;
+}
+
 .upload-mode,
-.locations-mode {
+.locations-mode,
+.logs-mode {
   display: grid;
   gap: 16px;
 }
@@ -408,6 +415,41 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
+}
+
+.logs-filter-grid,
+.log-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.logs-list {
+  display: grid;
+  gap: 10px;
+}
+
+.log-item {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  background: var(--glass-10);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-md, 8px);
+}
+
+.log-item-head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.log-item-head span,
+.log-meta-grid,
+.log-item p {
+  margin: 0;
+  color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {

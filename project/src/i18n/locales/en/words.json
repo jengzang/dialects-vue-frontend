@@ -107,6 +107,29 @@
       "saveSuccess": "Location metadata saved.",
       "saveFailed": "Failed to save location metadata"
     },
+    "logs": {
+      "title": "Operation Logs",
+      "desc": "Query vocabulary import, location edit, and table operation records.",
+      "refresh": "Query logs",
+      "empty": "No operation logs",
+      "loadFailed": "Failed to load vocabulary logs",
+      "filters": {
+        "userId": "User ID",
+        "permission": "Permission",
+        "source": "Source",
+        "action": "Action",
+        "table": "Table",
+        "status": "Status"
+      },
+      "columns": {
+        "userId": "User",
+        "permission": "Permission",
+        "source": "Source",
+        "table": "Table",
+        "status": "Status",
+        "affectedRows": "Affected rows"
+      }
+    },
     "import": {
       "examples": {
         "definition": "sun",

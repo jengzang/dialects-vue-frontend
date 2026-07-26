@@ -107,6 +107,29 @@
       "saveSuccess": "地点信息已保存。",
       "saveFailed": "保存地点信息失败"
     },
+    "logs": {
+      "title": "操作日志",
+      "desc": "查询词表导入、地点编辑和表格操作记录。",
+      "refresh": "查询日志",
+      "empty": "暂无操作日志",
+      "loadFailed": "获取词表操作日志失败",
+      "filters": {
+        "userId": "用户 ID",
+        "permission": "权限",
+        "source": "来源",
+        "action": "动作",
+        "table": "表名",
+        "status": "状态"
+      },
+      "columns": {
+        "userId": "用户",
+        "permission": "权限",
+        "source": "来源",
+        "table": "表",
+        "status": "状态",
+        "affectedRows": "影响行数"
+      }
+    },
     "import": {
       "examples": {
         "definition": "太阳",
