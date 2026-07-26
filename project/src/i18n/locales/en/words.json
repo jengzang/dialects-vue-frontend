@@ -17,7 +17,8 @@
       "list": "List",
       "upload": "Upload",
       "review": "Review",
-      "locations": "Locations"
+      "locations": "Locations",
+      "manage": "Manage"
     },
     "search": {
       "label": "Search",
@@ -94,6 +95,7 @@
       },
       "missingLocation": "Fill in location name and coordinates first.",
       "unsupportedFile": "Upload a supported vocabulary file (.xlsx, .xls, .csv, .tsv, .docx, .doc).",
+      "previewFailed": "Vocabulary import preview failed",
       "success": "Upload complete. Imported {count} rows.",
       "failed": "Upload failed"
     },

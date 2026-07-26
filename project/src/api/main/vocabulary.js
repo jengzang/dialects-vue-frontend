@@ -2,11 +2,12 @@
 import { api } from '../auth/httpClient.js'
 import { showError } from '@/utils/ui/message.js'
 
-const VOCABULARY_ITEMS_ENDPOINT = '/api/vocabulary/items'
-const VOCABULARY_MAP_POINTS_ENDPOINT = '/api/vocabulary/map-points'
-const VOCABULARY_LOCATION_OPTIONS_ENDPOINT = '/api/vocabulary/location-options'
+const VOCABULARY_ITEMS_ENDPOINT = '/api/vocabulary/search/entries'
+const VOCABULARY_MAP_POINTS_ENDPOINT = '/api/vocabulary/search/map-points'
+const VOCABULARY_LOCATION_OPTIONS_ENDPOINT = '/api/vocabulary/search/location-options'
 const VOCABULARY_LOCATIONS_ENDPOINT = '/api/vocabulary/locations'
 const VOCABULARY_LOGS_ENDPOINT = '/api/vocabulary/logs'
+const VOCABULARY_IMPORTS_ENDPOINT = '/api/vocabulary/imports'
 const VOCABULARY_SQL_ENDPOINT = '/api/vocabulary/sql'
 const VOCABULARY_ENTRIES_TABLE = 'vocabulary_entries'
 
@@ -264,6 +265,30 @@ export async function getVocabularyLogs(params = {}) {
 }
 
 /**
+ * 预览词表导入结果。
+ *
+ * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket'}} params
+ * @returns {Promise<{success: boolean, location_name: string, permission_level: string, parsed_count: number, would_delete_existing_count: number, skipped_count: number, errors: string[], parser_mode: string}>}
+ */
+export async function previewVocabularyImport({ file, location, parser_mode = 'auto' }) {
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('location', JSON.stringify(location))
+    formData.append('parser_mode', parser_mode)
+
+    return await api(`${VOCABULARY_IMPORTS_ENDPOINT}/preview`, {
+      method: 'POST',
+      body: formData,
+    })
+  } catch (error) {
+    console.error('Preview vocabulary import error:', error)
+    showError(error.message || '預覽詞表導入失敗')
+    throw new Error(error.message || '預覽詞表導入失敗')
+  }
+}
+
+/**
  * 上传词表文件。
  *
  * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket'}} params
@@ -276,7 +301,7 @@ export async function uploadVocabulary({ file, location, parser_mode = 'auto' })
     formData.append('location', JSON.stringify(location))
     formData.append('parser_mode', parser_mode)
 
-    return await api('/api/vocabulary/upload', {
+    return await api(VOCABULARY_IMPORTS_ENDPOINT, {
       method: 'POST',
       body: formData,
     })

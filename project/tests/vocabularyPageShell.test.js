@@ -58,6 +58,8 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain("'/explore/vocabulary/view'")
     expect(vocabularyPage).toContain("'/explore/vocabulary/import'")
     expect(vocabularyPage).toContain("'/explore/vocabulary/manage'")
+    expect(vocabularyPage).toContain("t('words.wordList.tabs.manage')")
+    expect(vocabularyPage).not.toContain("t('words.wordList.tabs.locations')")
     expect(vocabularyPage).not.toContain('getVocabularyItems')
     expect(vocabularyPage).not.toContain('uploadVocabulary')
     expect(vocabularyPage).not.toContain('getVocabularyLocations')

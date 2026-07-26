@@ -36,7 +36,7 @@ const router = useRouter()
 const pageTabs = computed(() => [
   { label: t('words.wordList.tabs.list'), path: '/explore/vocabulary/view' },
   { label: t('words.wordList.tabs.upload'), path: '/explore/vocabulary/import' },
-  { label: t('words.wordList.tabs.locations'), path: '/explore/vocabulary/manage' },
+  { label: t('words.wordList.tabs.manage'), path: '/explore/vocabulary/manage' },
 ])
 
 function isActivePage(path) {

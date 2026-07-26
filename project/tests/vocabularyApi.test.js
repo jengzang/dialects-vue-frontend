@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const apiMock = vi.fn()
+const testsDir = dirname(fileURLToPath(import.meta.url))
+const projectRoot = resolve(testsDir, '..')
 
 vi.mock('../src/api/auth/httpClient.js', () => ({
   api: apiMock,
@@ -21,6 +26,7 @@ const {
   getVocabularyLogs,
   updateVocabularyLocation,
   vocabularySqlApi,
+  previewVocabularyImport,
   uploadVocabulary,
 } = await import('../src/api/main/vocabulary.js')
 
@@ -28,11 +34,25 @@ function paramsFromPath(path) {
   return new URL(`http://localhost${path}`).searchParams
 }
 
+function readSource(path) {
+  return readFileSync(resolve(projectRoot, path), 'utf8')
+}
+
 describe('vocabulary items API', () => {
+  it('does not reference backend-deleted vocabulary compatibility paths', () => {
+    const source = readSource('src/api/main/vocabulary.js')
+
+    expect(source).not.toContain('/api/vocabulary/items')
+    expect(source).not.toContain('/api/vocabulary/map-points')
+    expect(source).not.toContain('/api/vocabulary/location-options')
+    expect(source).not.toContain('/api/vocabulary/upload')
+    expect(source).not.toContain('/api/vocabulary/me/permission')
+  })
+
   it('serializes the card and map query contract without table-only parameters', () => {
     const path = buildVocabularyItemsPath({
       q: '日头',
-      search_fields: ['headword', 'ipa', 'notes'],
+      search_fields: ['headword', 'pronunciation', 'detail'],
       locations: ['息烽', '天柱竹林'],
       page: 2,
       page_size: 100,
@@ -41,9 +61,9 @@ describe('vocabulary items API', () => {
 
     const searchParams = paramsFromPath(path)
 
-    expect(path).toContain('/api/vocabulary/items?')
+    expect(path).toContain('/api/vocabulary/search/entries?')
     expect(searchParams.get('q')).toBe('日头')
-    expect(searchParams.get('search_fields')).toBe('headword,ipa,notes')
+    expect(searchParams.get('search_fields')).toBe('headword,pronunciation,detail')
     expect(searchParams.get('locations')).toBe('息烽,天柱竹林')
     expect(searchParams.get('page')).toBe('2')
     expect(searchParams.get('page_size')).toBe('100')
@@ -59,7 +79,7 @@ describe('vocabulary items API', () => {
       page_size: undefined,
     })
 
-    expect(path).toBe('/api/vocabulary/items')
+    expect(path).toBe('/api/vocabulary/search/entries')
   })
 
   it('calls the completed backend endpoint for card and map items', async () => {
@@ -69,23 +89,23 @@ describe('vocabulary items API', () => {
 
     expect(apiMock).toHaveBeenCalledTimes(1)
     expect(apiMock.mock.calls[0][0]).toBe(
-      '/api/vocabulary/items?q=%E5%A4%AA%E9%98%B3&search_fields=definition&page=1&page_size=50'
+      '/api/vocabulary/search/entries?q=%E5%A4%AA%E9%98%B3&search_fields=definition&page=1&page_size=50'
     )
   })
 
   it('serializes map points query without pagination', async () => {
     const path = buildVocabularyMapPointsPath({
       q: '日头',
-      search_fields: ['headword', 'ipa'],
+      search_fields: ['headword', 'pronunciation'],
       locations: ['息烽', '天柱'],
       page: 2,
       page_size: 50,
     })
     const searchParams = paramsFromPath(path)
 
-    expect(path).toContain('/api/vocabulary/map-points?')
+    expect(path).toContain('/api/vocabulary/search/map-points?')
     expect(searchParams.get('q')).toBe('日头')
-    expect(searchParams.get('search_fields')).toBe('headword,ipa')
+    expect(searchParams.get('search_fields')).toBe('headword,pronunciation')
     expect(searchParams.get('locations')).toBe('息烽,天柱')
     expect(searchParams.has('page')).toBe(false)
     expect(searchParams.has('page_size')).toBe(false)
@@ -93,7 +113,7 @@ describe('vocabulary items API', () => {
     apiMock.mockResolvedValueOnce({ points: [], total_entries: 0, total_points: 0 })
     await getVocabularyMapPoints({ q: '太阳' })
 
-    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/map-points?q=%E5%A4%AA%E9%98%B3')
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/search/map-points?q=%E5%A4%AA%E9%98%B3')
   })
 })
 
@@ -182,7 +202,7 @@ describe('vocabulary table API adapter', () => {
       { value: '息烽', label: '贵州 / 贵阳 / 息烽' },
       { value: '天柱', label: '贵州 / 黔东南 / 天柱' },
     ])
-    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/location-options')
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/search/location-options')
   })
 
   it('keeps the legacy vocabulary location names helper returning names', async () => {
@@ -291,6 +311,24 @@ describe('vocabulary table API adapter', () => {
 })
 
 describe('vocabulary upload API', () => {
+  it('previews file, location JSON and parser mode through the imports preview endpoint', async () => {
+    apiMock.mockResolvedValueOnce({ success: true, parsed_count: 1 })
+    const file = new File(['definition,headword'], 'vocabulary.csv', { type: 'text/csv' })
+    const location = { location_name: '息烽', coordinates: '106.7400,27.0900' }
+
+    await previewVocabularyImport({ file, location, parser_mode: 'table' })
+
+    expect(apiMock).toHaveBeenCalledWith('/api/vocabulary/imports/preview', {
+      method: 'POST',
+      body: expect.any(FormData),
+    })
+
+    const formData = apiMock.mock.calls.at(-1)[1].body
+    expect(formData.get('file')).toBe(file)
+    expect(formData.get('location')).toBe(JSON.stringify(location))
+    expect(formData.get('parser_mode')).toBe('table')
+  })
+
   it('submits file, location JSON and parser mode as multipart form data', async () => {
     apiMock.mockResolvedValueOnce({ success: true })
     const file = new File(['definition,headword'], 'vocabulary.csv', { type: 'text/csv' })
@@ -298,7 +336,7 @@ describe('vocabulary upload API', () => {
 
     await uploadVocabulary({ file, location, parser_mode: 'table' })
 
-    expect(apiMock).toHaveBeenCalledWith('/api/vocabulary/upload', {
+    expect(apiMock).toHaveBeenCalledWith('/api/vocabulary/imports', {
       method: 'POST',
       body: expect.any(FormData),
     })

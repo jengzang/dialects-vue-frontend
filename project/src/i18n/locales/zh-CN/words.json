@@ -17,7 +17,8 @@
       "list": "词表",
       "upload": "上传",
       "review": "审查",
-      "locations": "地点"
+      "locations": "地点",
+      "manage": "管理"
     },
     "search": {
       "label": "搜索",
@@ -94,6 +95,7 @@
       },
       "missingLocation": "请先填写地点简称和经纬度。",
       "unsupportedFile": "请上传支持的词表文件（.xlsx、.xls、.csv、.tsv、.docx、.doc）。",
+      "previewFailed": "词表导入预览失败",
       "success": "上传完成，导入 {count} 条。",
       "failed": "上传词表失败"
     },

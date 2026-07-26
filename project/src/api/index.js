@@ -72,6 +72,7 @@ export {
   getVocabularyLocations,
   getVocabularyLogs,
   updateVocabularyLocation,
+  previewVocabularyImport,
   uploadVocabulary,
   vocabularySqlApi,
 } from './main/vocabulary.js';

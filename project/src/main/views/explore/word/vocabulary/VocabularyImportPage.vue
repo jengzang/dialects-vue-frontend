@@ -69,7 +69,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { uploadVocabulary } from '@/api'
+import { previewVocabularyImport, uploadVocabulary } from '@/api'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
@@ -228,6 +228,16 @@ async function handleConfirmUpload() {
   uploadStatusText.value = ''
 
   try {
+    const previewResponse = await previewVocabularyImport({
+      file,
+      location,
+      parser_mode: uploadParserMode.value,
+    })
+    if (!previewResponse.success) {
+      uploadStatusText.value = previewResponse.errors?.join('；') || t('words.wordList.upload.previewFailed')
+      return
+    }
+
     const response = await uploadVocabulary({
       file,
       location,
