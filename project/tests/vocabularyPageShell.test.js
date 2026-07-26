@@ -92,6 +92,8 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyScss).toContain('@media (max-aspect-ratio: 1 / 1)')
     expect(vocabularyScss).toContain('flex-wrap: nowrap')
     expect(vocabularyScss).toContain('flex-wrap: wrap')
+    expect(vocabularyPage).toContain('{{ mode.label }}')
+    expect(vocabularyPage).not.toContain('{{ mode.icon }}')
     expect(vocabularyPage).toContain('getVocabularyItems(buildVocabularyItemsParams())')
     expect(vocabularyPage).toContain('getVocabularyMapPoints(buildVocabularyMapPointsParams())')
     expect(vocabularyPage).toContain('loadActiveViewMode()')

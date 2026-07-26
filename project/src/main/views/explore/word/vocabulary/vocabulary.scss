@@ -174,11 +174,16 @@
 }
 
 .mode-btn {
-  display: inline-grid;
-  width: 40px;
-  height: 40px;
-  place-items: center;
+  display: inline-flex;
+  min-width: 56px;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
   color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
   cursor: pointer;
   background: var(--glass-10);
   border: 1px solid var(--glass-30);

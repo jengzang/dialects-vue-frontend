@@ -46,7 +46,7 @@
               :title="mode.label"
               @click="setViewMode(mode.key)"
             >
-              <span aria-hidden="true">{{ mode.icon }}</span>
+              <span>{{ mode.label }}</span>
             </button>
           </div>
         </div>
