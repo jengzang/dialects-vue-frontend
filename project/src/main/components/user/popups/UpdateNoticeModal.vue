@@ -162,7 +162,7 @@ const shouldAutoShow = () => {
 watch(() => props.visible, (val) => {
   if (val && props.mode === 'showinfo') {
     emit('update:visible', false)
-    showInfo(buildSummaryText(), 8000)
+    showInfo(buildSummaryText(), 8000, { changelogMode: true })
   }
 })
 
@@ -170,7 +170,7 @@ onMounted(() => {
   if (!props.autoShow || !shouldAutoShow()) return
 
   if (props.mode === 'showinfo') {
-    showInfo(buildSummaryText(), 8000)
+    showInfo(buildSummaryText(), 8000, { changelogMode: true })
   } else {
     emit('update:visible', true)
   }

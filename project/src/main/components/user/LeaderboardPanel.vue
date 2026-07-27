@@ -1255,9 +1255,8 @@ $warning: var(--color-warning);
 @media (orientation: portrait) {
   .leaderboard-container {
     width: 100%;
-    padding: 16px 12px;
+    padding: 16px 6px;
     box-sizing: border-box;
-    overflow-x: clip;
   }
 
   .leaderboard-content {
@@ -1325,7 +1324,7 @@ $warning: var(--color-warning);
   }
 
   .table-wrapper {
-    width: 98dvw;
+    width: 100%;
     min-width: 0;
     align-self: stretch;
     padding: 12px 0;
