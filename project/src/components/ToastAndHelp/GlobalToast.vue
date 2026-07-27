@@ -3,7 +3,7 @@
     <Transition name="toast-fade">
       <div
         v-if="messageState.show"
-        :class="['global-toast', 'global-toast-shell', messageState.type, { 'has-action': messageState.actionText }]"
+        :class="['global-toast', 'global-toast-shell', messageState.type, { 'has-action': messageState.actionText, 'changelog-toast': messageState.changelogMode }]"
         @mouseenter="persistMessageUntilDismiss"
         @click="persistMessageUntilDismiss"
       >
@@ -215,11 +215,9 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   @media (max-aspect-ratio:1/1) {
     top: auto;
-    left: 25px;
-    right: 25px;
+    right: 16px;
     bottom: 22px;
-    width: auto;
-    max-width: calc(100dvw - 50px);
+    max-width: calc(100vw - 32px);
     padding: 12px 14px;
     font-size: 14px;
     border-radius: 18px;
@@ -236,6 +234,13 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
       right: 16px;
       bottom: 20dvh;
       transform: none;
+    }
+
+    &.changelog-toast {
+      left: 25px;
+      right: 25px;
+      width: auto;
+      max-width: calc(100dvw - 50px);
     }
   }
 }
