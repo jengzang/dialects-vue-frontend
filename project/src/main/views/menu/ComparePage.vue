@@ -1346,7 +1346,7 @@ const runAction = async () => {
 
     // 2. 準備基礎參數
     const locationVal = getLocation();
-    const locationList = locationVal ? [locationVal] : [];
+    const locationList = locationVal ? locationVal.trim().split(/\s+/).filter(Boolean) : [];
 
     const regionVal = locationRef.value?.selectedValue;
     const regionList = Array.isArray(regionVal) ? regionVal : (regionVal ? [regionVal] : []);
