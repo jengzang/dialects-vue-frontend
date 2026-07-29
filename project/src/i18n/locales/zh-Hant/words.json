@@ -83,6 +83,7 @@
       "previewSkippedCount": "將跳過",
       "previewDeleteCount": "將覆蓋舊詞條",
       "replaceWarning": "正式導入會先刪除當前用戶該地點的舊詞條 {count} 條，再寫入新詞條。",
+      "confirmOverwrite": "我確認用這次導入替換該地點已有詞條",
       "previewReady": "預覽完成，請確認後提交詞表。",
       "permissionRequired": "當前賬號沒有詞表上傳權限。",
       "locationName": "地點簡稱",

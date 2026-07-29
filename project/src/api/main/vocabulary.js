@@ -11,6 +11,7 @@ const VOCABULARY_LOCATIONS_ENDPOINT = '/api/vocabulary/locations'
 const VOCABULARY_LOGS_ENDPOINT = '/api/vocabulary/logs'
 const VOCABULARY_IMPORTS_ENDPOINT = '/api/vocabulary/imports'
 const VOCABULARY_ME_ENDPOINT = '/api/vocabulary/me'
+const VOCABULARY_ADMIN_PERMISSIONS_ENDPOINT = '/api/vocabulary/admin/permissions'
 const VOCABULARY_SQL_ENDPOINT = '/api/vocabulary/sql'
 const VOCABULARY_ENTRIES_TABLE = 'vocabulary_entries'
 
@@ -274,6 +275,44 @@ export async function getVocabularyMe() {
 }
 
 /**
+ * 分页获取词表权限配置。
+ *
+ * 该接口需要项目 admin 权限，不是 vocabulary manage 权限。
+ *
+ * @param {{page?: number, page_size?: number}} [params={}]
+ * @returns {Promise<{permissions: Array<{user_id: number, permission_level: 'none' | 'edit' | 'manage' | null}>, total: number, page: number, page_size: number}>}
+ */
+export async function getVocabularyPermissions(params = {}) {
+  return api(`${VOCABULARY_ADMIN_PERMISSIONS_ENDPOINT}${appendQueryParams(params)}`)
+}
+
+/**
+ * 获取单个用户的词表权限配置。
+ *
+ * @param {number|string} userId
+ * @returns {Promise<{user_id: number, permission_level: 'none' | 'edit' | 'manage' | null}>}
+ */
+export async function getVocabularyPermission(userId) {
+  return api(`${VOCABULARY_ADMIN_PERMISSIONS_ENDPOINT}/${encodeURIComponent(userId)}`)
+}
+
+/**
+ * 设置单个用户的词表权限配置。
+ *
+ * 后端新版本支持 none/edit/manage；none 用于撤销 vocabulary 权限。
+ *
+ * @param {number|string} userId
+ * @param {'none' | 'edit' | 'manage'} permissionLevel
+ * @returns {Promise<{user_id: number, permission_level: 'none' | 'edit' | 'manage' | null}>}
+ */
+export async function setVocabularyPermission(userId, permissionLevel) {
+  return api(`${VOCABULARY_ADMIN_PERMISSIONS_ENDPOINT}/${encodeURIComponent(userId)}`, {
+    method: 'PUT',
+    body: { permission_level: permissionLevel },
+  })
+}
+
+/**
  * 获取词表地点筛选候选值，供卡片/地图模式的地点多选筛选使用。
  *
  * @returns {Promise<Array<{value: string, label: string}>>}
@@ -389,15 +428,16 @@ export async function previewVocabularyImport({ file, location, parser_mode = 'a
 /**
  * 上传词表文件。
  *
- * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket'}} params
+ * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket', overwrite?: boolean}} params
  * @returns {Promise<{success: boolean, location_id: number, location_name: string, permission_level: string, imported_count: number, deleted_existing_count: number, skipped_count: number, errors: string[], parser_mode: string}>}
  */
-export async function uploadVocabulary({ file, location, parser_mode = 'auto' }) {
+export async function uploadVocabulary({ file, location, parser_mode = 'auto', overwrite = false }) {
   try {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('location', JSON.stringify(location))
     formData.append('parser_mode', parser_mode)
+    formData.append('overwrite', overwrite ? 'true' : 'false')
 
     return await api(VOCABULARY_IMPORTS_ENDPOINT, {
       method: 'POST',

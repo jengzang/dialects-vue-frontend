@@ -99,6 +99,12 @@ const displayModeOptions = computed(() => {
   return canShowDetailModes.value ? detailDisplayModeOptions.value : overviewDisplayModeOptions.value
 })
 
+function ensureValidDisplayMode() {
+  if (!displayModeOptions.value.some((option) => option.value === displayMode.value)) {
+    displayMode.value = 'overview'
+  }
+}
+
 // Map style options
 const mapStyleOptions = computed(() => {
   return Object.entries(mapStyleConfig).map(([key, name]) => ({
@@ -738,6 +744,7 @@ onBeforeUnmount(() => {
 
 // --- Watchers ---
 watch(() => props.mapData, () => {
+  ensureValidDisplayMode()
   if (map.value) {
     isLoadingMarkers.value = true
     const { center, zoom } = calculateMapView(props.mapData)
@@ -749,6 +756,11 @@ watch(() => props.mapData, () => {
 watch(() => props.activeTab, () => {
   // 显示加载动画
   isLoadingMarkers.value = true
+  renderMarkers()
+})
+
+watch(displayModeOptions, () => {
+  ensureValidDisplayMode()
   renderMarkers()
 })
 </script>

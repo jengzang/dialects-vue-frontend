@@ -83,6 +83,7 @@
       "previewSkippedCount": "将跳过",
       "previewDeleteCount": "将覆盖旧词条",
       "replaceWarning": "正式导入会先删除当前用户该地点的旧词条 {count} 条，再写入新词条。",
+      "confirmOverwrite": "我确认用这次导入替换该地点已有词条",
       "previewReady": "预览完成，请确认后提交词表。",
       "permissionRequired": "当前账号没有词表上传权限。",
       "locationName": "地点简称",

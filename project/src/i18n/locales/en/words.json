@@ -83,6 +83,7 @@
       "previewSkippedCount": "Will skip",
       "previewDeleteCount": "Will overwrite",
       "replaceWarning": "Importing will delete {count} old entries for this user and location before writing the new entries.",
+      "confirmOverwrite": "I confirm this import should replace the existing entries for this location",
       "previewReady": "Preview ready. Confirm to submit the vocabulary.",
       "permissionRequired": "This account does not have vocabulary upload permission.",
       "locationName": "Location Name",

@@ -243,6 +243,7 @@ import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const STANDARD_WORD_OPTIONS_LIMIT = 200
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
@@ -426,13 +427,23 @@ function normalizeNumber(value) {
   return Number.isFinite(numberValue) ? numberValue : null
 }
 
-function normalizeVocabularyEntry(item) {
+function normalizeVocabularyEntry(item, index = 0, locationContext = '') {
   const detailParts = [item.notes, item.informations, item.detail]
     .map((value) => String(value || '').trim())
     .filter(Boolean)
+  const locationName = item.location_name || locationContext || ''
+  const entryKey = [
+    locationName,
+    item.standard_word || item.definition || '',
+    item.local_expression || item.headword || '',
+    item.ipa || item.pronunciation || '',
+    item.notes || item.detail || '',
+    item.informations || '',
+    index,
+  ].join('|')
 
   return {
-    id: item.id || `${item.location_name || ''}-${item.standard_word || ''}-${item.local_expression || ''}`,
+    id: item.id || entryKey,
     definition: item.standard_word || item.definition || '',
     headword: item.local_expression || item.headword || '',
     pronunciation: item.ipa || item.pronunciation || '',
@@ -440,7 +451,7 @@ function normalizeVocabularyEntry(item) {
     detail: [...new Set(detailParts)].join(' · '),
     information: item.informations || '',
     location: item.location_label || item.location || item.location_name || '',
-    locationName: item.location_name || '',
+    locationName,
     longitude: normalizeNumber(item.longitude),
     latitude: normalizeNumber(item.latitude),
   }
@@ -468,7 +479,10 @@ function buildVocabularyMapPointsParams() {
 }
 
 function buildVocabularyStandardWordsParams() {
-  return buildVocabularyQueryParams()
+  return {
+    ...buildVocabularyQueryParams(),
+    limit: STANDARD_WORD_OPTIONS_LIMIT,
+  }
 }
 
 function buildVocabularyMapItemsParams() {
@@ -495,7 +509,9 @@ function normalizeVocabularyMapPoint(point) {
 
 function normalizeVocabularyMapItemPoint(point) {
   const normalizedPoint = normalizeVocabularyMapPoint(point)
-  const items = Array.isArray(point.items) ? point.items.map(normalizeVocabularyEntry) : []
+  const items = Array.isArray(point.items)
+    ? point.items.map((item, index) => normalizeVocabularyEntry(item, index, normalizedPoint.locationName))
+    : []
   const pronunciations = items.map((item) => item.pronunciation).filter(Boolean)
   const definitions = items.map((item) => item.definition).filter(Boolean)
   const localExpressions = items.map((item) => item.headword).filter(Boolean)
@@ -541,7 +557,7 @@ async function loadVocabularyItems({ append = false } = {}) {
 
   try {
     const response = await getVocabularyItems(buildVocabularyItemsParams())
-    const nextEntries = Array.isArray(response.items) ? response.items.map(normalizeVocabularyEntry) : []
+    const nextEntries = Array.isArray(response.items) ? response.items.map((item, index) => normalizeVocabularyEntry(item, index)) : []
     entries.value = append ? entries.value.concat(nextEntries) : nextEntries
     total.value = Number(response.total) || entries.value.length
     page.value = Number(response.page) || nextPage
@@ -674,7 +690,7 @@ async function handleMapPointClick(point) {
       page: 1,
       page_size: pageSize.value,
     })
-    mapDetailEntries.value = Array.isArray(response.items) ? response.items.map(normalizeVocabularyEntry) : []
+    mapDetailEntries.value = Array.isArray(response.items) ? response.items.map((item, index) => normalizeVocabularyEntry(item, index)) : []
     mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
     mapDetailPage.value = Number(response.page) || 1
     selectedMapPointLabel.value = buildMapDetailTitle(baseLabel, mapDetailEntries.value.length)
@@ -701,7 +717,9 @@ async function loadMoreMapDetail() {
       page: nextPage,
       page_size: pageSize.value,
     })
-    const nextEntries = Array.isArray(response.items) ? response.items.map(normalizeVocabularyEntry) : []
+    const nextEntries = Array.isArray(response.items)
+      ? response.items.map((item, index) => normalizeVocabularyEntry(item, mapDetailEntries.value.length + index))
+      : []
     mapDetailEntries.value = mapDetailEntries.value.concat(nextEntries)
     mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
     mapDetailPage.value = Number(response.page) || nextPage
@@ -762,6 +780,8 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
 watch(selectedStandardWords, (words) => {
   if (mapDisplayMode.value === 'overview' && words.length) {
     mapDisplayMode.value = 'definition'
+  } else if (!words.length && !['overview', 'location'].includes(mapDisplayMode.value)) {
+    mapDisplayMode.value = 'overview'
   }
   if (shouldUseVocabularyMapPointsApi() || shouldUseVocabularyMapItemsApi()) {
     loadVocabularyMapPoints()

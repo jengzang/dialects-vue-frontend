@@ -479,6 +479,14 @@
   color: var(--color-warning, var(--color-primary));
 }
 
+.backend-preview-overwrite {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
 .backend-preview-errors {
   padding-left: 18px;
 }

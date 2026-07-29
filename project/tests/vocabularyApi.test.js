@@ -20,6 +20,8 @@ const {
   buildVocabularyMapItemsPath,
   buildVocabularyMapPointsPath,
   buildVocabularyStandardWordsPath,
+  getVocabularyPermission,
+  getVocabularyPermissions,
   getVocabularyItems,
   getVocabularyMapItems,
   getVocabularyMapPoints,
@@ -30,6 +32,7 @@ const {
   getVocabularyLocations,
   getVocabularyLogs,
   updateVocabularyLocation,
+  setVocabularyPermission,
   vocabularySqlApi,
   previewVocabularyImport,
   uploadVocabulary,
@@ -70,6 +73,23 @@ describe('vocabulary items API', () => {
     await getVocabularyMe()
 
     expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/me')
+  })
+
+  it('wraps admin vocabulary permission endpoints including none permission removal', async () => {
+    apiMock.mockResolvedValueOnce({ permissions: [], total: 0, page: 1, page_size: 50 })
+    await getVocabularyPermissions({ page: 2, page_size: 20 })
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/admin/permissions?page=2&page_size=20')
+
+    apiMock.mockResolvedValueOnce({ user_id: 7, permission_level: 'edit' })
+    await getVocabularyPermission(7)
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/admin/permissions/7')
+
+    apiMock.mockResolvedValueOnce({ user_id: 7, permission_level: null })
+    await setVocabularyPermission(7, 'none')
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/admin/permissions/7', {
+      method: 'PUT',
+      body: { permission_level: 'none' },
+    })
   })
 
   it('serializes the card and map query contract without table-only parameters', () => {
@@ -415,7 +435,7 @@ describe('vocabulary upload API', () => {
     const file = new File(['definition,headword'], 'vocabulary.csv', { type: 'text/csv' })
     const location = { location_name: '息烽', coordinates: '106.7400,27.0900' }
 
-    await uploadVocabulary({ file, location, parser_mode: 'table' })
+    await uploadVocabulary({ file, location, parser_mode: 'table', overwrite: true })
 
     expect(apiMock).toHaveBeenCalledWith('/api/vocabulary/imports', {
       method: 'POST',
@@ -426,5 +446,17 @@ describe('vocabulary upload API', () => {
     expect(formData.get('file')).toBe(file)
     expect(formData.get('location')).toBe(JSON.stringify(location))
     expect(formData.get('parser_mode')).toBe('table')
+    expect(formData.get('overwrite')).toBe('true')
+  })
+
+  it('submits overwrite=false by default when importing without replacement confirmation', async () => {
+    apiMock.mockResolvedValueOnce({ success: true })
+    const file = new File(['definition,headword'], 'vocabulary.csv', { type: 'text/csv' })
+    const location = { location_name: '息烽', coordinates: '106.7400,27.0900' }
+
+    await uploadVocabulary({ file, location, parser_mode: 'table' })
+
+    const formData = apiMock.mock.calls.at(-1)[1].body
+    expect(formData.get('overwrite')).toBe('false')
   })
 })

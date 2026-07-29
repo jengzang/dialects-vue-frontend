@@ -69,6 +69,10 @@
           <p v-if="(backendPreview.would_delete_existing_count ?? 0) > 0" class="backend-preview-warning">
             {{ t('words.wordList.upload.replaceWarning', { count: backendPreview.would_delete_existing_count }) }}
           </p>
+          <label v-if="shouldConfirmOverwrite" class="backend-preview-overwrite">
+            <input v-model="isOverwriteConfirmed" type="checkbox" />
+            <span>{{ t('words.wordList.upload.confirmOverwrite') }}</span>
+          </label>
           <ul v-if="backendPreview.errors?.length" class="backend-preview-errors">
             <li v-for="error in backendPreview.errors" :key="error">{{ error }}</li>
           </ul>
@@ -185,6 +189,7 @@ const isUploading = ref(false)
 const isPreviewingImport = ref(false)
 const uploadStatusText = ref('')
 const backendPreview = ref(null)
+const isOverwriteConfirmed = ref(false)
 
 const uploadParserMode = ref('auto')
 const uploadFile = ref(null)
@@ -340,8 +345,14 @@ const canConfirmUpload = computed(() => {
   return !isVocabularyPreviewFile(file) || importPreview.diagnostics.value.isComplete
 })
 
+const shouldConfirmOverwrite = computed(() => {
+  return Number(backendPreview.value?.would_delete_existing_count) > 0
+})
+
 const canImportAfterPreview = computed(() => {
-  return canConfirmUpload.value && backendPreview.value?.success === true
+  return canConfirmUpload.value
+    && backendPreview.value?.success === true
+    && (!shouldConfirmOverwrite.value || isOverwriteConfirmed.value)
 })
 
 function isVocabularyPreviewFile(file) {
@@ -432,6 +443,7 @@ async function useYindianLocationData() {
 function clearUploadFile() {
   uploadFile.value = null
   backendPreview.value = null
+  isOverwriteConfirmed.value = false
   importFlow.clearPreview()
 }
 
@@ -459,6 +471,7 @@ function handleUploadFile(event) {
 
 watch([uploadParserMode, selectedUploadFile, uploadLocation], () => {
   backendPreview.value = null
+  isOverwriteConfirmed.value = false
 }, { deep: true })
 
 function buildUploadLocation() {
@@ -531,6 +544,7 @@ async function handleImportAfterPreview() {
       file,
       location,
       parser_mode: uploadParserMode.value,
+      overwrite: shouldConfirmOverwrite.value ? isOverwriteConfirmed.value : false,
     })
     uploadStatusText.value = t('words.wordList.upload.success', { count: response.imported_count || 0 })
     clearUploadFile()
