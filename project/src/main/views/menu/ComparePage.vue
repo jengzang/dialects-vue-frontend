@@ -418,6 +418,7 @@
                     min="0"
                     max="50"
                     step="1"
+                    :style="{ '--progress': (tabStates.tab5.minLinkCharCountDraft / 50 * 100) + '%' }"
                     @change="scheduleTab5SankeyFilterApply"
                   >
                 </label>
@@ -433,6 +434,7 @@
                     min="0"
                     max="100"
                     step="1"
+                    :style="{ '--progress': (tabStates.tab5.minNodeCharCountDraft / 100 * 100) + '%' }"
                     @change="scheduleTab5SankeyFilterApply"
                   >
                 </label>
@@ -551,8 +553,8 @@ import {
 import { compareChars, compareZhongGu, compareTones } from '@/api/index.js'
 import { getCoordinates } from '@/api'
 import { requestMapFitView } from '@/utils/map/MapData.js'
-import { showWarning } from '@/utils/message.js'
-import { useQueryConfig } from '@/composables/domain/useQueryConfig.js'
+import { showWarning } from '@/utils/ui/message.js'
+import { useQueryConfig } from '@/composables/data/useQueryConfig.js'
 
 const { t } = useI18n()
 const selectedCharacterTable = preferredCharacterTable
@@ -1344,7 +1346,7 @@ const runAction = async () => {
 
     // 2. 準備基礎參數
     const locationVal = getLocation();
-    const locationList = locationVal ? [locationVal] : [];
+    const locationList = locationVal ? locationVal.trim().split(/\s+/).filter(Boolean) : [];
 
     const regionVal = locationRef.value?.selectedValue;
     const regionList = Array.isArray(regionVal) ? regionVal : (regionVal ? [regionVal] : []);
@@ -2311,8 +2313,62 @@ $text-muted: var(--text-lightest);
     font-size: 12px;
     line-height: 1.35;
 
-    input {
+    input[type='range'] {
+      -webkit-appearance: none;
+      appearance: none;
       width: 100%;
+      background: transparent;
+      cursor: pointer;
+
+      &::-webkit-slider-runnable-track {
+        height: 4px;
+        border-radius: 2px;
+        background: linear-gradient(
+          to right,
+          var(--color-primary) 0%,
+          var(--color-primary) var(--progress, 0%),
+          var(--bg-hover-strong) var(--progress, 0%),
+          var(--bg-hover-strong) 100%
+        );
+      }
+
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        margin-top: -5px;
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s;
+
+        &:hover {
+          background: var(--color-primary-hover);
+          box-shadow: 0 0 6px var(--color-primary-shadow);
+        }
+      }
+
+      &::-moz-range-track {
+        height: 4px;
+        border-radius: 2px;
+        background: linear-gradient(
+          to right,
+          var(--color-primary) 0%,
+          var(--color-primary) var(--progress, 0%),
+          var(--bg-hover-strong) var(--progress, 0%),
+          var(--bg-hover-strong) 100%
+        );
+      }
+
+      &::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        border: none;
+        cursor: pointer;
+      }
     }
   }
 

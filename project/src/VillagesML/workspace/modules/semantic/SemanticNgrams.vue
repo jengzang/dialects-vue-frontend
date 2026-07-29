@@ -199,7 +199,7 @@ import {
   getSemanticTrigrams,
   getSemanticPMI
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import { getCategoryDisplayName } from '@/VillagesML/config/villagesML.js'
 
 // State
@@ -348,6 +348,8 @@ watch(detailMode, (val) => {
 
 .controls {
   margin-bottom: 16px;
+  justify-content: center;
+  
 }
 
 .input-group {
@@ -367,7 +369,7 @@ watch(detailMode, (val) => {
 }
 
 .vml-number-input {
-  width: 150px;
+  // width: 150px;
 }
 
 .bigrams-list,
@@ -531,9 +533,9 @@ watch(detailMode, (val) => {
     align-items: stretch;
   }
 
-  .vml-number-input {
-    width: 100%;
-  }
+  // .vml-number-input {
+  //   width: 100%;
+  // }
 }
 
 </style>

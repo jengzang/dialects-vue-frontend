@@ -400,6 +400,14 @@
       "sentence": "Sentence Pattern:"
     }
   },
+  "vocabularyMap": {
+    "controls": {
+      "overview": "Overview",
+      "location": "Location",
+      "pronunciation": "Pronunciation",
+      "definition": "Local Word"
+    }
+  },
   "villageMapPopup": {
     "title": "Village Distribution Map",
     "count": "{count} villages",
@@ -412,7 +420,8 @@
     "buttons": {
       "reset": "Reset",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit Fullscreen"
+      "exitFullscreen": "Exit Fullscreen",
+      "voronoi": "Thiessen Polygons"
     }
   },
   "allVillagesMapPopup": {
@@ -517,8 +526,14 @@
     },
     "voronoi": {
       "panelHint": "Calculate Voronoi polygons from location-region data, then preview them or export them as polygon layers.",
+      "learnMore": "Learn about Voronoi diagrams →",
       "summaryTitle": "Data Summary",
       "settingsTitle": "Calculation Settings",
+      "fieldMergeTitle": "Merge Fields",
+      "fieldMergeOpenButton": "Edit Merge Fields",
+      "fieldMergeReset": "Reset Merges",
+      "expandRatio": "Expand: {ratio}%",
+      "enableExpand": "Enable Circular Extension",
       "dataSourceTitle": "Data Sources",
       "actionsTitle": "Actions",
       "totalPoints": "Total Points",
@@ -531,6 +546,15 @@
       "loadPoints": "Load Points",
       "loadingPoints": "Loading...",
       "ignorePointsAction": "Select Points to Exclude",
+      "addDialectPoint": "Add Dialect Point",
+      "addDialectPointExit": "Exit",
+      "addPointSelectPartition": "Point Partition",
+      "addPointAdded": "Added: {name}",
+      "addPointInvalid": "Cannot create dialect point at this location",
+      "customPointsManagement": "Custom Points Management",
+      "deletePartitionPoints": "Delete",
+      "deletedPartitionPoints": "Deleted {count} custom point(s) under {key}",
+      "noCustomPoints": "No custom points yet",
       "previewPoints": "Preview Points",
       "exportToLayer": "Export to Layer",
       "calculate": "Calculate Voronoi Polygons",
@@ -625,6 +649,7 @@
       "visible": "Show Layer",
       "locked": "Lock Layer",
       "basemap": "Basemap",
+      "viewSettings": "View Settings",
       "localDraftSelection": "Select Local Draft",
       "localDraftName": "Draft Name",
       "localDraftNamePlaceholder": "Enter a draft name"

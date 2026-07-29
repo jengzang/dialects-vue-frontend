@@ -8,7 +8,7 @@ import router from './router'
 import '../styles/main-entry.scss'
 
 // 🍎 导入全局消息系统（会自动挂载到 window）
-import '../utils/message.js'
+import '../utils/ui/message.js'
 
 // 🌐 导入 i18n 国际化
 import i18n from '../i18n'

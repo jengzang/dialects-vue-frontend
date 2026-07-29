@@ -141,22 +141,28 @@
     <div class="vml-glass-panel tables-panel">
       <div class="panel-header">
         <h3>表統計信息 Table Statistics</h3>
-        <div class="header-controls">
-          <button @click="refreshTables" :disabled="loadingTables" class="solid-button small">
-            <span v-if="loadingTables">加載中...</span>
-            <span v-else-if="tables === null">加載</span>
-            <span v-else>🔄 刷新</span>
-          </button>
-          <input
-            v-model="tableSearch"
-            type="text"
-            placeholder="搜尋表名..."
-            class="glass-input small"
-          >
-          <SimpleSelectDropdown :match-trigger-width="true"
-            v-model="tableSortBy"
-            :options="sortOptions"
-          />
+        <div class="header-controls vml-control-row">
+          <div class="vml-control-actions">
+            <button @click="refreshTables" :disabled="loadingTables" class="solid-button small">
+              <span v-if="loadingTables">加載中...</span>
+              <span v-else-if="tables === null">加載</span>
+              <span v-else>🔄 刷新</span>
+            </button>
+          </div>
+          <div class="vml-control-field">
+            <input
+              v-model="tableSearch"
+              type="text"
+              placeholder="搜尋表名..."
+              class="glass-input small"
+            >
+          </div>
+          <div class="vml-control-field">
+            <SimpleSelectDropdown :match-trigger-width="true"
+              v-model="tableSortBy"
+              :options="sortOptions"
+            />
+          </div>
         </div>
       </div>
       <div v-if="tables !== null" class="tables-content">
@@ -264,8 +270,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getVillagesOverview, getVillagesNgrams, getVillagesTables, getCachedVillagesOverview, getCachedVillagesNgrams, getCachedVillagesTables } from '@/composables/useVillagesCache.js'
-import { showError, showSuccess } from '@/utils/message.js'
+import { getVillagesOverview, getVillagesNgrams, getVillagesTables, getCachedVillagesOverview, getCachedVillagesNgrams, getCachedVillagesTables } from '@/composables/data/useVillagesCache.js'
+import { showError, showSuccess } from '@/utils/ui/message.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
@@ -518,8 +524,7 @@ onMounted(() => {
 }
 
 .header-controls {
-  display: flex;
-  gap: 12px;
+  justify-content: flex-end;
 }
 
 .ngram-level-grid {
@@ -617,7 +622,6 @@ onMounted(() => {
 
 
 
-.glass-input,
 .glass-select {
   padding: 8px 16px;
   background: var(--glass-50);
@@ -625,19 +629,17 @@ onMounted(() => {
   border-radius: var(--radius-sm2);
   font-size: 14px;
   transition: all 0.3s ease;
-}
 
-.glass-input:focus,
-.glass-select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: var(--glass-80);
-}
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--glass-80);
+  }
 
-.glass-input.small,
-.glass-select.small {
-  padding: 6px 12px;
-  font-size: 13px;
+  &.small {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
 }
 
 .solid-button {
@@ -883,8 +885,5 @@ onMounted(() => {
     padding: 12px;
   }
 
-  .header-controls {
-    flex-direction: column;
-  }
 }
 </style>

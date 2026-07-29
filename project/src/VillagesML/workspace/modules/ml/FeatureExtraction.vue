@@ -28,7 +28,7 @@
             v-model="searchKeyword"
             type="text"
             placeholder="搜尋村莊名稱..."
-            class="glass-input"
+            class="glass-input small"
             @input="handleSearchInput"
           >
         </div>
@@ -393,7 +393,7 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { extractFeatures as apiExtractFeatures, fetchSubsetFilter } from '@/api/index.js'
-import { showError, showSuccess, showWarning } from '@/utils/message.js'
+import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
 import { cityHasCounties } from '@/VillagesML/utils/regionPreload.js'
 import { SEMANTIC_CATEGORY_NAMES, isSemanticFeature } from '@/VillagesML/config/villagesML.js'
@@ -1149,32 +1149,8 @@ onBeforeUnmount(() => {
   margin-bottom: 16px;
 }
 
-.glass-input {
-  width: 100%;
-  padding: 10px 16px;
-  background: var(--glass-50);
-  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: var(--radius-sm2);
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.glass-input:focus {
-  outline: none;
-  border-color: var(--vml-blue);
-  background: var(--glass-80);
-}
-
 .filters-row {
   margin-bottom: 16px;
-}
-
-.filter-group {
-  min-width: 0;
-}
-
-.filter-group label {
-  color: var(--text-primary);
 }
 
 .load-btn {
@@ -1379,14 +1355,6 @@ onBeforeUnmount(() => {
 
 .controls-row {
   margin-bottom: 8px;
-}
-
-.control-item {
-  min-width: 0;
-}
-
-.control-item label {
-  color: var(--text-primary);
 }
 
 .control-item span {
@@ -1737,14 +1705,6 @@ onBeforeUnmount(() => {
 @media (max-aspect-ratio: 1/1) {
   .feature-extraction-page {
     padding: 8px;
-  }
-
-  .filter-group {
-    min-width: 100%;
-  }
-
-  .control-item {
-    min-width: 100%;
   }
 
   .button-group {

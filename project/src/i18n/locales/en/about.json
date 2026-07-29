@@ -341,6 +341,13 @@
         "selector": "Selector",
         "direct": "Direct Input"
       }
-    }
+    },
+    "updateNotice": {
+      "title": "Update Notice",
+      "description": "Choose how to display new version update content.",
+      "modeModal": "Modal",
+      "modeShowinfo": "Toast"
+    },
+    "viewUpdateLog": "View Update Log"
   }
 }

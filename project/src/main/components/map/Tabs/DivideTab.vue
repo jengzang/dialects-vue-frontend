@@ -106,8 +106,8 @@ import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { mapStore, uiStore, userStore, isDivideButtonDisabled, setRunning } from "@/main/store/store.js";
 import { getCoordinates, getLocationPartitions } from '@/api'
-import { showError, showWarning } from '@/utils/message.js';
-import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { showError, showWarning } from '@/utils/ui/message.js';
+import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { requestMapFitView } from '@/utils/map/MapData.js'
 

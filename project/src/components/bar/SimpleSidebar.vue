@@ -136,7 +136,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue'
 import { clearToken, getToken } from '@/api/auth/auth.js'
-import { useVisitStats, ensureVisitHistory } from '@/composables/useVisitStats.js'
+import { useVisitStats, ensureVisitHistory } from '@/composables/data/useVisitStats.js'
 import {userStore} from "@/main/store/store.js";
 import { useSidebarConfig } from '@/main/config/index.js';
 import { WEB_BASE } from '@/env-config.js';

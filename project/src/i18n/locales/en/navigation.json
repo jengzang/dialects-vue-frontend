@@ -48,6 +48,7 @@
     "words": {
       "vocabulary": "Language Preservation Vocabulary",
       "grammar": "Language Preservation Grammar",
+      "wordList": "Vocabulary List",
       "ycSpoken": "Yangchun Colloquial Vocabulary"
     },
     "villages": {
@@ -92,7 +93,7 @@
     "praat": "Praat",
     "phrases": "Phrases",
     "villages": "Villages",
-    "aboutWebsite": "About This Site",
+    "aboutWebsite": "About",
     "settings": "Settings"
   },
   "placeholders": {

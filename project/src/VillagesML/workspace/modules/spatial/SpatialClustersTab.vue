@@ -76,7 +76,7 @@ import SpatialMap from './SpatialMap.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { getSpatialClusters, getSpatialClustersAvailableRuns, getSpatialClustersSummary } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import {
   SPATIAL_CLUSTERING_RUN_LABELS,
   DEFAULT_SPATIAL_CLUSTERING_RUN_ID

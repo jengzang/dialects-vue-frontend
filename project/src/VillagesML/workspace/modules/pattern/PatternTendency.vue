@@ -18,7 +18,7 @@
             class="vml-input"
           />
         </div>
-        <div class="vml-control-field vml-control-field--compact">
+        <div class="vml-control-field">
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model="tendencyLevel"
             :options="tendencyLevelOptions"
@@ -96,7 +96,7 @@ import { useRoute } from 'vue-router'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { getPatternTendency } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 const route = useRoute()
 
@@ -179,6 +179,7 @@ watch(
 
 .controls {
   margin-bottom: 16px;
+  justify-content: center;
 }
 
 .vml-input {

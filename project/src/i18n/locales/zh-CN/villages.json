@@ -20,6 +20,87 @@
     "name": "全部自然村",
     "desc": "全部自然村数据（仅管理员）"
   },
+  "dashboard": {
+    "pageTitle": "自然村分析系统",
+    "introTitle": "自然村机器学习分析系统",
+    "introText": "是一个基于广东省283,070个自然村名称的语言学分析平台。系统运用机器学习和自然语言处理技术，从多个维度分析村名的语义、结构、空间分布等特征，为地名学研究、文化地理学、语言学等领域提供数据支持。",
+    "githubInvite": "欢迎 Star ⭐、Fork 🍴 或提 Issue 💬",
+    "featuresHeader": "功能模块",
+    "featuresDesc": "点击下方模块开始分析",
+    "statsHeader": "数据概览",
+    "statsDesc": "系统收录的村名与区域统计",
+    "loadButton": "加载",
+    "loadingButton": "加载中...",
+    "loadStatsError": "加载统计数据失败",
+    "badge": {
+      "public": "公开",
+      "loginRequired": "需登录"
+    },
+    "features": {
+      "search": {
+        "title": "村名搜寻",
+        "description": "按关键词、区域搜寻村名，查看详细信息与深度分析报告",
+        "tooltip": "支持关键词模糊匹配和三级行政区（市→县→镇）联动筛选。点击村庄可查看深度分析报告，包含语义结构、N-gram分解、空间特征等多维度信息"
+      },
+      "character": {
+        "title": "字频分析",
+        "description": "分析村名中字符的使用频率、区域倾向性、语义嵌入向量与统计显著性",
+        "tooltip": "基于283,070条村名的字符统计分析。包含：①频率倾向（Z-score/Lift/Log-odds三种指标衡量地区偏好）②嵌入相似（Word2Vec Skipgram模型，100维向量，余弦相似度）③字符网络（Louvain社群识别算法）④显著性（卡方检验，Cramér's V效应量）"
+      },
+      "semantic": {
+        "title": "语义分析",
+        "description": "探索村名的语义类别、标签组合模式、语义网络关系与语义组成结构",
+        "tooltip": "基于混合词典v4.0（LLM标注+人工校验），9大类别+76子类别。包含：①VTF（Virtual Term Frequency，置信度加权）②Bigram/Trigram组合模式（PMI互信息量化关联强度）③语义网络（NetworkX图分析）④语义指数（Shannon熵、多样性指标）"
+      },
+      "spatial": {
+        "title": "空间分析",
+        "description": "可视化村名的地理分布、识别空间热点聚类、分析空间整合模式",
+        "tooltip": "使用DBSCAN密度聚类算法（eps半径+min_samples最小样本数）识别地理热点。支持空间自相关分析、聚类质心计算、MapLibre GPU加速渲染。可调整eps参数（0.5-20km）探索不同尺度的空间模式"
+      },
+      "pattern": {
+        "title": "模式分析",
+        "description": "提取N-gram模式、分析结构规律、发现村名命名的语言学特征",
+        "tooltip": "提取2-4gram字符序列模式。统计指标：①PMI（Pointwise Mutual Information，log₂[P(A,B)/(P(A)·P(B))]）②卡方显著性检验③Lift倾向性（区域频率/全局频率比值）。支持通配符搜索（*表示任意字符，X表示单个字符）"
+      },
+      "regional": {
+        "title": "区域分析",
+        "description": "计算区域聚合统计、生成区域特征向量、进行跨区域比较分析",
+        "tooltip": "按市/县/镇三级聚合统计。生成TF-IDF特征向量（TF=区域频率，IDF=log(总区域数/含该特征的区域数)）。计算区域间余弦相似度/Jaccard相似度，识别地名文化圈。支持Z-score倾向性热图可视化"
+      },
+      "compute": {
+        "title": "ML计算",
+        "description": "执行机器学习聚类分析、提取高维特征向量、进行子集深度分析",
+        "tooltip": "需登录。支持三种聚类算法：①K-Means（质心聚类，需指定k值）②DBSCAN（密度聚类，自动识别噪声点）③GMM（高斯混合模型，概率分配）。特征工程：语义（9维）+形态（N-gram TF）+多样性（Shannon熵）+空间（坐标+密度）。预处理：StandardScaler标准化+PCA降维（默认50维）。评估指标：Silhouette Score（轮廓系数，[-1,1]）、Davies-Bouldin Index（越低越好）、Calinski-Harabasz Score（越高越好）"
+      },
+      "system": {
+        "title": "系统信息",
+        "description": "查看数据库概览、表统计信息、系统运行状态与缓存管理"
+      }
+    },
+    "stats": {
+      "villages": {
+        "label": "自然村总数",
+        "tooltip": "广东省283,070个自然村名称，数据来源于各大网站整理汇总。覆盖21个地级市、123个区县、1500+个乡镇"
+      },
+      "cities": {
+        "label": "城市数量"
+      },
+      "counties": {
+        "label": "区县数量"
+      },
+      "townships": {
+        "label": "乡镇数量"
+      },
+      "characters": {
+        "label": "字符总数",
+        "tooltip": "地名中使用的不同汉字总数为3,067个。已为每个字符训练Word2Vec嵌入向量（维度100，窗口5，最小频率5）"
+      },
+      "ngrams": {
+        "label": "显著 N-gram",
+        "tooltip": "经PMI（互信息）和卡方检验筛选的统计显著N-gram模式。"
+      }
+    }
+  },
   "pages": {
     "gdTree": {
       "title": "广东自然村树状图",

@@ -124,9 +124,9 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getReadingClass, getSearchCharReadingType } from '@/main/utils/query/ResultTable.js';
-import { READING_COLORS } from '@/main/config/readingColors.js';
+import { READING_COLORS } from '@/main/config/colors/readingColors.js';
 import { getLocationDetail } from '@/api';
-import LocationDetailPopup from '../popup/result/LocationDetailPopup.vue';
+import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue';
 
 const props = defineProps({
   data: {

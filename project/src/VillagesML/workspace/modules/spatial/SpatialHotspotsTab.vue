@@ -87,7 +87,7 @@ import { ref, onMounted, nextTick } from 'vue'
 import SpatialMap from './SpatialMap.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { getSpatialHotspots, getSpatialHotspotDetail } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 // State
 const hotspots = ref([])

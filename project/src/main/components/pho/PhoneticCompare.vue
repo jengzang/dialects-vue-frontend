@@ -116,7 +116,7 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
-import { resolveHoverDetailCardPosition } from '@/main/utils/hoverDetailCardPosition.js'
+import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js'
 import { getFeatureStats } from '@/api/index.js'
 import { setRunning } from '@/main/store/store.js'
 

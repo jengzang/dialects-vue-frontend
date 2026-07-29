@@ -3,7 +3,7 @@ import { queryPhonology } from '@/api'
 import { API_CONFIG } from '../../config/constants.js'
 import { resultCache } from '../../store/store.js'
 import i18n from '@/i18n'
-import { showWarning } from '@/utils/message.js'
+import { showWarning } from '@/utils/ui/message.js'
 import {
     DEFAULT_CHARACTER_TABLE,
     getCharacterTableColumnValues

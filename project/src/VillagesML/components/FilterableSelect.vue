@@ -106,7 +106,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import { getCities, getCounties, getTownships } from '@/VillagesML/utils/regionPreload.js'
 import SimpleDropdown from '@/components/selector/SimpleDropdown.vue'
 

@@ -32,7 +32,7 @@
 
 <script setup>
 import AppModal from '@/components/common/AppModal.vue'
-import { confirmState, resolveConfirm } from '@/utils/message.js'
+import { confirmState, resolveConfirm } from '@/utils/ui/message.js'
 
 function handleConfirm() {
   resolveConfirm(true)

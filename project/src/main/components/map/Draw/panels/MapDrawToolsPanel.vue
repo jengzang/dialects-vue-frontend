@@ -22,7 +22,7 @@
       <div class="draw-tool-panel-body">
         <section class="draw-tool-section">
           <div class="draw-tool-section-title">
-            绘制工具
+            {{ t('map.drawTab.buttons.drawingTools') }}
           </div>
           <div class="draw-tool-button-grid draw-tool-button-grid--three">
             <button

@@ -17,7 +17,7 @@
         <p class="section-description">選擇多個區域進行特徵聚合對比（選擇3個以上可以評估z-score）</p>
 
         <div class="selector-row vml-control-surface vml-control-row">
-          <div class="vml-control-field vml-control-field--compact">
+          <div class="vml-control-field">
             <label class="field-label">區域級別：</label>
             <SimpleSelectDropdown
               v-model="regionLevel"
@@ -80,7 +80,7 @@
       </div>
 
       <div class="section query-row vml-control-surface vml-control-row vml-control-row--center">
-        <div class="topn-row vml-control-field vml-control-field--compact">
+        <div class="topn-row vml-control-field">
           <label class="field-label">Top N：</label>
           <input
             type="number"
@@ -356,7 +356,7 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import CheckBox from '@/components/selector/CheckBox.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { aggregateFeatures } from '@/api/index.js'
-import { showError, showWarning } from '@/utils/message.js'
+import { showError, showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
 import { SEMANTIC_CATEGORY_NAMES, SEMANTIC_FEATURE_KEYS } from '@/VillagesML/config/villagesML.js'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'

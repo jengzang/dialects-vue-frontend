@@ -3,8 +3,8 @@ import { nextTick } from 'vue'
 import i18n from '@/i18n/index.js'
 import { waitForAuthReady } from '@/api/auth/auth.js'
 import { userStore } from '@/main/store/store.js'
-import { showWarning } from '@/utils/message.js'
-import { showRouteLoading, hideRouteLoading } from '@/utils/routeLoading.js'
+import { showWarning } from '@/utils/ui/message.js'
+import { showRouteLoading, hideRouteLoading } from '@/utils/ui/routeLoading.js'
 import { menuRoutes } from '@/main/router/menuRoutes.js'
 import { exploreRoutes } from '@/main/router/exploreRoutes.js'
 import { resolvePreferredLocale } from '@/i18n/localeDetector.js'
@@ -219,6 +219,18 @@ const ROUTE_QUERY_ALLOWLIST = {
   },
   '/explore/yubao': {
     base: ['tab']
+  },
+  '/explore/vocabulary': {
+    base: []
+  },
+  '/explore/vocabulary/view': {
+    base: ['tab']
+  },
+  '/explore/vocabulary/import': {
+    base: []
+  },
+  '/explore/vocabulary/manage': {
+    base: []
   },
   '/explore/char-class': {
     base: ['tab', 'table', 'levels']

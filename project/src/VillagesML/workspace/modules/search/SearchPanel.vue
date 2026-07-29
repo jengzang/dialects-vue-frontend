@@ -16,7 +16,7 @@
           <input
             v-model="localKeyword"
             type="text"
-            class="search-input"
+            class="search-input vml-char-input"
             placeholder="搜尋村名..."
             @input="handleSearchInput"
           />

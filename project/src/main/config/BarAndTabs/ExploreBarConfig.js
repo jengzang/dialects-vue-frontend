@@ -33,7 +33,9 @@ import { userStore, resultCache } from '@/main/store/store.js'
 //       showLabelOnlyWhenActive: false,     // 桌面端是否仅在“激活选中”时才显示文字
 //       mobileShowLabelOnlyWhenActive: true,// 移动端是否仅在“激活选中”时才显示文字
 //       cssClass: '',                       // 挂载到该标签上的自定义 CSS 类名
-//       visibleWhen: null                   // 动态可见性函数（例如: () => user.isAdmin）
+//       visibleWhen: null,                  // 动态可见性函数（例如: () => user.isAdmin）
+//       scroll: undefined,                  // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+//       mobileScroll: undefined             // 仅竖屏/移动端覆盖 scroll；例如 mobileScroll: 'right' 表示桌面主tab、移动端右侧溢出
 //     }
 //   },
 //   navigation: {         // 路由与导航行为配置
@@ -77,7 +79,8 @@ const DISPLAY_DEFAULTS = {
     visibleWhen: null, // 默认始终可见
 
     // 溢出滚动
-    scroll: undefined // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+    scroll: undefined, // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+    mobileScroll: undefined // 仅竖屏/移动端覆盖 scroll；undefined = 沿用 scroll
 }
 
 const NAVIGATION_DEFAULTS = {
@@ -97,10 +100,10 @@ const DISPLAY_PRESETS = {
     compactDesktop: {
         weight: 0.8,
         mobileWeight: 0.8,
-        weightIconOnly: 0.25,
-        mobileWeightIconOnly: 0.25,
-        fontSize: 0.9,
-        mobileFontSize: 0.9
+        weightIconOnly: 0.3,
+        mobileWeightIconOnly: 0.3,
+        fontSize: 1,
+        mobileFontSize: 1
     },
 
     // 桌面端保持标准大小，但让移动端具有更大的点击区域和字号。
@@ -256,10 +259,16 @@ export function useExploreBarConfig() {
             },
             navigation: {
                 defaultTo: { path: withRouteLocale(route, '/menu/words') },
-                matchPages: ['YuBao', 'ycSpoken'],
+                matchPages: ['YuBao', 'Vocabulary', 'ycSpoken'],
+                activeMatchPaths: [
+                    withRouteLocale(route, '/explore/vocabulary/view'),
+                    withRouteLocale(route, '/explore/vocabulary/import'),
+                    withRouteLocale(route, '/explore/vocabulary/manage')
+                ],
                 rememberChild: true,
-                defaultChild: '/explore/yubao?tab=vocabulary',
+                defaultChild: '/explore/vocabulary/view',
                 children: [
+                    { label: t('navigation.submenu.words.wordList'), icon: '📒', path: withRouteLocale(route, '/explore/vocabulary/view') },
                     { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: withRouteLocale(route, '/explore/yubao?tab=vocabulary') },
                     { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: withRouteLocale(route, '/explore/yubao?tab=grammar') },
                     { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc-spoken') }
@@ -331,7 +340,7 @@ export function useExploreBarConfig() {
             label: t('navigation.tabs.phonology'),
             icon: '🧬',
             display: {
-                preset: 'standard',
+                preset: 'compactDesktop',
                 overrides: { scroll: 'right', weightIconOnly: 0.3 }
             },
             navigation: {
@@ -343,7 +352,7 @@ export function useExploreBarConfig() {
             label: t('navigation.tabs.query'),
             icon: '🔍',
             display: {
-                preset: 'standard',
+                preset: 'compactDesktop',
                 overrides: { scroll: 'right', weightIconOnly: 0.3 }
             },
             navigation: {
@@ -367,7 +376,7 @@ export function useExploreBarConfig() {
             label: t('navigation.tabs.map'),
             icon: '🗺️',
             display: {
-                preset: 'standard',
+                preset: 'compactDesktop',
                 overrides: { scroll: 'right', weightIconOnly: 0.3 }
             },
             navigation: {
@@ -379,7 +388,7 @@ export function useExploreBarConfig() {
             label: t('navigation.tabs.compare'),
             icon: '↔️',
             display: {
-                preset: 'standard',
+                preset: 'compactDesktop',
                 overrides: { scroll: 'right', weightIconOnly: 0.3 }
             },
             navigation: {

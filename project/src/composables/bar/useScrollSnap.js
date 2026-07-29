@@ -44,15 +44,24 @@ const normalizeSnapThresholds = (snapThreshold) => {
  * @param {import('vue').ComputedRef<Array>} orderedTabs - 已排序的 tab 列表（左溢出 → 主 → 右溢出）
  * @param {number|{desktop?: number, landscape?: number, portrait?: number, mobile?: number, default?: number}} snapThreshold - 磁吸阈值（px）
  * @param {import('vue').Ref<HTMLElement|null>} [mobileNavRef] - 移动端 nav（可选）
+ * @param {import('vue').ComputedRef<Array>} [orderedMobileTabs] - 移动端排序后的 tab 列表（可选）
  */
-export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_THRESHOLD, mobileNavRef = null) {
+export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_THRESHOLD, mobileNavRef = null, orderedMobileTabs = orderedTabs) {
   const snapThresholds = normalizeSnapThresholds(snapThreshold)
-  const hasOverflow = computed(() =>
+  const hasOverflowDesktop = computed(() =>
     orderedTabs.value.some(t => t.scroll === 'left' || t.scroll === 'right')
   )
+  const hasOverflowMobile = computed(() =>
+    orderedMobileTabs.value.some(t => (t.mobileScroll ?? t.scroll) === 'left' || (t.mobileScroll ?? t.scroll) === 'right')
+  )
+  const hasOverflow = computed(() => hasOverflowDesktop.value || hasOverflowMobile.value)
 
   const scrollClass = computed(() =>
-    hasOverflow.value ? 'has-overflow-tabs' : ''
+    hasOverflowDesktop.value ? 'has-overflow-tabs' : ''
+  )
+
+  const scrollClassMobile = computed(() =>
+    hasOverflowMobile.value ? 'has-overflow-tabs' : ''
   )
 
   // 容器内容宽度（用于计算主 tab 像素级 flex-basis）
@@ -273,5 +282,15 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
     }
   })
 
-  return { hasOverflow, scrollClass, onScroll, onScrollEnd, scrollToRest, navContentWidth }
+  return {
+    hasOverflow,
+    hasOverflowDesktop,
+    hasOverflowMobile,
+    scrollClass,
+    scrollClassMobile,
+    onScroll,
+    onScrollEnd,
+    scrollToRest,
+    navContentWidth
+  }
 }

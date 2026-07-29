@@ -1,6 +1,6 @@
 // api/compare/index.js - 比较模块 API
 import { api } from '../../auth/httpClient.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 /**
  * @typedef {Object} CompareCharsParams

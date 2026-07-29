@@ -139,6 +139,7 @@ import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import {mapStyle, calculateDenseMapCenterAndZoom, mapStyleConfig} from '@/utils/map/MapSource.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import { FEATURE_PALETTE } from '@/main/config/colors/mapColors.js'
 
 // --- Props ---
 const props = defineProps({
@@ -151,6 +152,7 @@ const props = defineProps({
     default: 'vocabulary'
   }
 })
+const emit = defineEmits(['marker-click'])
 
 // --- State ---
 const mapContainer = ref(null)
@@ -174,13 +176,7 @@ const mapStyleOptions = computed(() => {
 
 // --- Functions ---
 
-// 预定义的颜色数组（柔和的浅色系）
-const colorScale = [
-  '#FFB3B3', '#FFB366', '#FFFF99', '#B3FFB3', '#99CCFF', '#D4A6FF',
-  '#FF6666', '#FFD699', '#99CCCC', '#D1D1FF', '#FF9999', '#FFB3FF',
-  '#FFFF66', '#B3FF99', '#99CCFF', '#FFCC99', '#CCCCFF', '#FF66CC',
-  '#FFFF66', '#B3FFCC'
-]
+// 预定义的颜色数组（柔和的浅色系）— 从 mapColors.js 复用
 
 // 根据文本生成一致的颜色（从预定义数组中选择）
 const assignColor = (text) => {
@@ -193,9 +189,9 @@ const assignColor = (text) => {
   }
 
   // 取绝对值并对数组长度取模，得到索引
-  const index = Math.abs(hash) % colorScale.length
+  const index = Math.abs(hash) % FEATURE_PALETTE.length
 
-  return colorScale[index]
+  return FEATURE_PALETTE[index]
 }
 
 // 计算地图视角
@@ -380,6 +376,8 @@ const convertToGeoJSON = (data) => {
     // 聚合各个字段
     const aggregatedData = {
       locationChain: aggregateField(item => getLocationText(item)),
+      locationName: aggregateField(item => item.locationName || item.location),
+      locationNames: JSON.stringify(Array.from(new Set(items.map(item => item.locationName || item.location).filter(Boolean)))),
       pronunciation: aggregateField(item => item.pronunciation),
       phonetic: aggregateField(item => item.phonetic),
       word: aggregateField(item => item.note2 || item.word),
@@ -414,6 +412,8 @@ const convertToGeoJSON = (data) => {
         textColor: textColor,
         // 使用聚合后的数据用于弹窗
         locationChain: aggregatedData.locationChain,
+        locationName: aggregatedData.locationName,
+        locationNames: aggregatedData.locationNames,
         pronunciation: aggregatedData.pronunciation,
         phonetic: aggregatedData.phonetic,
         word: aggregatedData.word,
@@ -482,6 +482,13 @@ const renderMarkers = async () => {
 
 // 处理标记点击（接受 GeoJSON properties）
 const handleMarkerClick = (properties) => {
+  emit('marker-click', {
+    locationName: properties.locationName,
+    locationNames: properties.locationNames,
+    locationLabel: properties.locationChain,
+    itemCount: Number(properties.itemCount) || 0,
+  })
+
   popupData.value = {
     locationChain: properties.locationChain,
     pronunciation: properties.pronunciation,

@@ -557,6 +557,7 @@ function formatRegionNames(regionNames) {
   gap: 6px;
   cursor: pointer;
   text-align: left;
+  color: $text-strong;
 
   &.state-full {
     border-color: $primary-ring;
@@ -574,12 +575,14 @@ function formatRegionNames(regionNames) {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
+  color: var(--color-primary-hover);
   gap: 10px;
 }
 
 .scope-tree-caret {
   width: 1rem;
   flex: 0 0 1rem;
+  color: $text-muted;
 
   &-empty {
     width: 1rem;
@@ -595,11 +598,15 @@ function formatRegionNames(regionNames) {
   .scope-selection-title {
     font-weight: 800;
     color: $text-strong;
+    color: var(--color-primary-hover);
+
   }
 
   .scope-selection-meta {
     font-size: 12px;
     color: $text-muted;
+    color: var(--color-primary-hover);
+
   }
 }
 

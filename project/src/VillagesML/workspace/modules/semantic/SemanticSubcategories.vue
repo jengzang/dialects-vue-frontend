@@ -6,7 +6,7 @@
     </h3>
 
     <!-- Mode Selector -->
-    <div class="mode-selector vml-glass-panel">
+    <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
       <RadioGroup
           name="viewModeRadio"
           :options="viewModeOptions"
@@ -133,7 +133,7 @@
             />
           </div>
 
-          <div class="form-group vml-control-field vml-control-field--compact">
+          <div class="form-group vml-control-field">
             <label>返回數量:</label>
             <input v-model.number="topN" type="number" min="5" max="50" class="vml-number-input" />
           </div>
@@ -218,7 +218,7 @@ import {
   getSemanticSubcategoryTendencyTop,
   getSemanticSubcategoryComparison
 } from '@/api/index.js'
-import { showError, showSuccess } from '@/utils/message.js'
+import { showError, showSuccess } from '@/utils/ui/message.js'
 import * as echarts from 'echarts'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
@@ -662,12 +662,12 @@ export default {
   color: var(--text-primary);
 }
 
-.form-row {
-  width: 100%;
-}
+// .form-row {
+//   width: 100%;
+// }
 
 .vml-number-input {
-  width: 100%;
+  // width: 100%;
   padding: 10px;
   border-radius: var(--radius-sm2);
   background: var(--glass-80);

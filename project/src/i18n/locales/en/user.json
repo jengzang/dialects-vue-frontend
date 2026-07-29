@@ -230,7 +230,8 @@
       "rank": "Rank",
       "count": "Count",
       "gap": "Rank Gap",
-      "firstPlace": "First Place"
+      "firstPlace": "First Place",
+						"percentile": "Percentile"
     },
     "rank": {
       "first": "1st",

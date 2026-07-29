@@ -13,7 +13,7 @@ vi.mock('vue-router', () => ({
   }),
 }))
 
-vi.mock('@/utils/message.js', () => ({
+vi.mock('@/utils/ui/message.js', () => ({
   showWarning: vi.fn(),
 }))
 
@@ -21,12 +21,12 @@ import { useAsyncData } from '../src/composables/core/useAsyncData.js'
 import { useAsyncTask } from '../src/composables/core/useAsyncTask.js'
 import { usePollingTask } from '../src/composables/core/usePollingTask.js'
 import { useStorageState } from '../src/composables/core/useStorageState.js'
-import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 import { useAuthGuard } from '../src/composables/router/useAuthGuard.js'
 import { useRouteQueryState } from '../src/composables/router/useRouteQueryState.js'
-import { useScrollSnap } from '../src/components/bar/useScrollSnap.js'
+import { useScrollSnap } from '../src/composables/bar/useScrollSnap.js'
 import { userStore } from '../src/main/store/store.js'
-import { showWarning } from '@/utils/message.js'
+import { showWarning } from '@/utils/ui/message.js'
 
 describe('composables', () => {
   beforeEach(() => {
@@ -565,6 +565,72 @@ describe('composables', () => {
 
       expect(desktopScroll.value).toBe(30)
       expect(portraitScroll.value).toBe(6)
+    } finally {
+      app.unmount()
+      host.remove()
+      globalThis.ResizeObserver = originalResizeObserver
+      globalThis.requestAnimationFrame = originalRequestAnimationFrame
+    }
+  })
+
+  it('useScrollSnap exposes separate overflow classes for mobile-only overflow tabs', async () => {
+    const originalResizeObserver = globalThis.ResizeObserver
+    const originalRequestAnimationFrame = globalThis.requestAnimationFrame
+    const frameCallbacks = []
+
+    globalThis.requestAnimationFrame = (callback) => {
+      frameCallbacks.push(callback)
+      return frameCallbacks.length
+    }
+
+    globalThis.ResizeObserver = class {
+      observe() {}
+
+      disconnect() {}
+    }
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const orderedTabs = ref([
+      { tab: 'search', mobileScroll: 'left' },
+      { tab: 'map' },
+    ])
+    const orderedMobileTabs = ref([
+      { tab: 'search', mobileScroll: 'left' },
+      { tab: 'map' },
+    ])
+    let scrollSnap
+
+    const app = createApp({
+      setup() {
+        const navRef = ref(null)
+        const mobileNavRef = ref(null)
+        scrollSnap = useScrollSnap(navRef, orderedTabs, { desktop: 30, portrait: 18 }, mobileNavRef, orderedMobileTabs)
+        return { navRef, mobileNavRef }
+      },
+      render() {
+        return h('div', [
+          h('nav', { ref: 'navRef' }, [
+            h('a', { class: 'menu-item' }, '搜索'),
+            h('a', { class: 'menu-item' }, '地图'),
+          ]),
+          h('nav', { ref: 'mobileNavRef' }, [
+            h('a', { class: 'menu-item tab-overflow-left' }, '搜索'),
+            h('a', { class: 'menu-item' }, '地图'),
+          ]),
+        ])
+      },
+    })
+
+    try {
+      app.mount(host)
+      await nextTick()
+
+      expect(scrollSnap.scrollClass.value).toBe('')
+      expect(scrollSnap.scrollClassMobile.value).toBe('has-overflow-tabs')
+      expect(scrollSnap.hasOverflow.value).toBe(true)
+      expect(scrollSnap.hasOverflowDesktop.value).toBe(false)
+      expect(scrollSnap.hasOverflowMobile.value).toBe(true)
     } finally {
       app.unmount()
       host.remove()

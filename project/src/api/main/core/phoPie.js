@@ -1,6 +1,6 @@
 // api/query/phoPie.js
 import { api } from '../../auth/httpClient.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import {
   DEFAULT_CHARACTER_TABLE,
   VALID_CHARACTER_TABLES,

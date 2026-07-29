@@ -9,7 +9,7 @@
       <h2>🔍 模式頻率分析</h2>
 
       <!-- Query Mode Selection -->
-      <div class="mode-selector">
+      <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
         <RadioGroup
             name="patternQueryMode"
             :options="queryModeOptions"
@@ -30,7 +30,7 @@
           />
         </div>
 
-        <div class="control-group vml-control-field vml-control-field--compact">
+        <div class="control-group vml-control-field">
           <label class="control-label">返回數量</label>
           <input
             v-model.number="topN"
@@ -41,7 +41,7 @@
           />
         </div>
 
-        <div v-if="queryMode === 'global'" class="control-group vml-control-field vml-control-field--compact">
+        <div v-if="queryMode === 'global'" class="control-group vml-control-field">
           <label class="control-label">最小佔比(%)</label>
           <input
             v-model.number="minPercentage"
@@ -123,7 +123,7 @@ import {
   getPatternFrequencyGlobal,
   getPatternFrequencyRegional
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import RadioGroup from "@/components/selector/RadioGroup.vue";
 
 const router = useRouter()
@@ -210,8 +210,7 @@ const goToTendency = (pattern) => {
 }
 
 .mode-selector {
-  display: flex;
-  gap: 24px;
+  margin-bottom: 12px;
 }
 
 .radio-label {
@@ -244,7 +243,7 @@ const goToTendency = (pattern) => {
 }
 
 .vml-number-input {
-  width: 150px;
+  // width: 150px;
 }
 
 .pattern-grid {
@@ -353,14 +352,9 @@ const goToTendency = (pattern) => {
 }
 
 @media (min-aspect-ratio: 1/1) {
-  .vml-glass-panel {
-    flex-direction: row;
-    align-items: center;
-  }
-
   .controls {
     flex: 1;
-    justify-content: flex-end;
+    justify-content: center;
   }
 }
 
@@ -369,9 +363,9 @@ const goToTendency = (pattern) => {
     flex-direction: column;
   }
 
-  .vml-number-input {
-    width: 100%;
-  }
+  // .vml-number-input {
+  //   width: 100%;
+  // }
 
 }
 </style>

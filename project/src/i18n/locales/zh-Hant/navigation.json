@@ -48,6 +48,7 @@
     "words": {
       "vocabulary": "語保詞彙",
       "grammar": "語保語法",
+      "wordList": "詞表",
       "ycSpoken": "陽春口語詞"
     },
     "villages": {
@@ -92,7 +93,7 @@
     "praat": "praat",
     "phrases": "詞句",
     "villages": "村落",
-    "aboutWebsite": "關於網站",
+    "aboutWebsite": "關於",
     "settings": "設置"
   },
   "placeholders": {

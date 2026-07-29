@@ -8,6 +8,193 @@
     "name": "语保语法",
     "desc": "语保50条句子语法资料"
   },
+  "wordList": {
+    "name": "词表",
+    "desc": "方言词表页面",
+    "placeholder": "词表页面壳子",
+    "tabs": {
+      "label": "词表工作流",
+      "list": "词表",
+      "upload": "上传",
+      "review": "审查",
+      "locations": "地点",
+      "manage": "管理"
+    },
+    "search": {
+      "label": "搜索",
+      "placeholder": "搜索释义、词条、发音、详情",
+      "standardWordPlaceholder": "按标准词筛选地图",
+      "locationPlaceholder": "按地点筛选当前结果",
+      "fieldCount": "已选 {count} 列",
+      "fields": {
+        "all": "全部内容",
+        "definition": "释义",
+        "headword": "词条",
+        "pronunciation": "发音",
+        "detail": "详情",
+        "ipa": "发音",
+        "notes": "注释",
+        "location": "地点"
+      }
+    },
+    "sort": {
+      "label": "排序",
+      "location": "按地点",
+      "definition": "按释义",
+      "headword": "按词条",
+      "updatedAt": "按更新时间"
+    },
+    "viewModes": {
+      "label": "展示方式",
+      "card": "卡片",
+      "table": "表格",
+      "map": "地图"
+    },
+    "columns": {
+      "headword": "词条",
+      "definition": "释义",
+      "pronunciation": "发音",
+      "pronunciationType": "注音类型",
+      "location": "地点",
+      "locationFull": "完整地点",
+      "informations": "附加信息",
+      "sourceFilename": "来源文件",
+      "detail": "详情"
+    },
+    "table": {
+      "label": "词表结果"
+    },
+    "map": {
+      "placeholder": "当前可上图 {count} 个地点",
+      "meta": "命中 {entries} 条，省略无坐标地点 {omitted} 个",
+      "pointCount": "共 {count} 条"
+    },
+    "upload": {
+      "title": "上传词表",
+      "desc": "选择表格文件后映射词表字段，提交后进入审查流程。",
+      "chooseFile": "选择文件",
+      "previewAction": "预览导入",
+      "submit": "提交词表",
+      "previewTitle": "词表导入预览",
+      "previewDesc": "确认列映射和预览内容",
+      "backendPreviewTitle": "后端预览结果",
+      "previewParserMode": "解析方式",
+      "previewParsedCount": "将导入",
+      "previewSkippedCount": "将跳过",
+      "previewDeleteCount": "将覆盖旧词条",
+      "replaceWarning": "正式导入会先删除当前用户该地点的旧词条 {count} 条，再写入新词条。",
+      "confirmOverwrite": "我确认用这次导入替换该地点已有词条",
+      "previewReady": "预览完成，请确认后提交词表。",
+      "permissionRequired": "当前账号没有词表上传权限。",
+      "locationName": "地点简称",
+      "locationNamePlaceholder": "例如：息烽",
+      "coordinates": "经纬度",
+      "coordinatesPlaceholder": "例如：106.7400,27.0900",
+      "province": "省",
+      "city": "市",
+      "county": "县",
+      "town": "乡镇",
+      "administrativeVillage": "行政村",
+      "naturalVillage": "自然村",
+      "yindianRegion": "音典分区",
+      "atlasRegion": "地图集分区",
+      "parserMode": "解析方式",
+      "parserModes": {
+        "auto": "自动识别",
+        "table": "表格",
+        "docWhitespace": "文档空白分隔",
+        "docBracket": "文档括号识别"
+      },
+      "missingLocation": "请先填写地点简称和经纬度。",
+      "unsupportedFile": "请上传支持的词表文件（.xlsx、.xls、.csv、.tsv、.docx、.doc）。",
+      "previewFailed": "词表导入预览失败",
+      "success": "上传完成，导入 {count} 条。",
+      "failed": "上传词表失败"
+    },
+    "locations": {
+      "title": "地点信息",
+      "desc": "管理当前权限范围内的词表地点元数据。",
+      "refresh": "刷新地点",
+      "save": "保存",
+      "saveSuccess": "地点信息已保存。",
+      "saveFailed": "保存地点信息失败"
+    },
+    "logs": {
+      "title": "操作日志",
+      "desc": "查询词表导入、地点编辑和表格操作记录。",
+      "refresh": "查询日志",
+      "empty": "暂无操作日志",
+      "loadFailed": "获取词表操作日志失败",
+      "rollbackSupported": "记录了恢复所需线索",
+      "rollbackUnsupported": "仅供审计，不承诺自动回滚",
+      "filters": {
+        "userId": "用户 ID",
+        "permission": "权限",
+        "source": "来源",
+        "action": "动作",
+        "table": "表名",
+        "status": "状态"
+      },
+      "columns": {
+        "userId": "用户",
+        "permission": "权限",
+        "source": "来源",
+        "table": "表",
+        "status": "状态",
+        "affectedRows": "影响行数"
+      },
+      "payload": {
+        "importedEntries": "本次导入 {count} 条",
+        "deletedEntries": "覆盖旧词条 {count} 条",
+        "location": "地点：{value}",
+        "file": "文件：{value}",
+        "changedFields": "变更字段：{fields}",
+        "targetUser": "目标用户：{value}",
+        "permissionChange": "权限：{old} -> {next}",
+        "sqlAction": "SQL 动作：{value}",
+        "primaryKey": "主键：{value}",
+        "beforeRows": "记录旧行快照 {count} 条",
+        "beforeFields": "记录旧字段：{fields}",
+        "afterRows": "记录新建 ID {count} 条",
+        "createdId": "新建 ID：{value}",
+        "replaceRule": "替换规则：{find} -> {replace}"
+      }
+    },
+    "import": {
+      "examples": {
+        "definition": "太阳",
+        "headword": "日头",
+        "pronunciation": "ȵit̚˨ tʰɐu˩",
+        "location": "阳春",
+        "detail": "常用于日常口语。"
+      }
+    },
+    "review": {
+      "title": "审查词表",
+      "desc": "指定用户确认上传内容后，后端会更新正式词库。",
+      "permissionBadge": "需要权限",
+      "reject": "退回",
+      "approve": "通过",
+      "sampleFile": "待审词表.xlsx",
+      "sampleMeta": "120 条 · 提交者待接口返回"
+    },
+    "samples": {
+      "one": {
+        "headword": "日头",
+        "definition": "太阳",
+        "pronunciation": "ȵit̚˨ tʰɐu˩",
+        "detail": "常用于日常口语。",
+        "location": "广东省 / 阳江市 / 阳春市"
+      },
+      "two": {
+        "headword": "食朝",
+        "definition": "吃早饭",
+        "pronunciation": "sik̚˧ tsʰiu˥",
+        "detail": "早晨用餐的说法。",
+        "location": "广东省 / 阳江市"
+      }
+    }
+  },
   "yuBaoPage": {
     "viewAll": "查看全部",
     "search": {

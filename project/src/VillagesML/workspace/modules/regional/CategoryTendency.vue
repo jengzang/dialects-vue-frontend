@@ -69,14 +69,14 @@
     <h2>區域 N-gram 排行榜</h2>
     <div class="ngram-controls vml-control-surface">
       <div class="vml-control-row">
-        <div class="vml-control-field vml-control-field--compact">
+        <div class="vml-control-field">
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model="ngramN"
             :options="ngramNOptions"
           />
         </div>
 
-        <div class="vml-control-field vml-control-field--compact">
+        <div class="vml-control-field">
           <SimpleSelectDropdown
             v-model="ngramLevel"
             :options="ngramLevelOptions"
@@ -93,7 +93,7 @@
             @update:hierarchy="(h) => ngramFilterHierarchy = h"
           />
         </div>
-        <div class="vml-control-field vml-control-field--compact">
+        <div class="vml-control-field">
           <input
             v-model.number="ngramTopK"
             type="number"
@@ -167,7 +167,7 @@ import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { getSemanticCategoryTendency, getNgramRegional } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import { getCategoryName } from '@/VillagesML/config/villagesML.js'
 
 // State
@@ -375,7 +375,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .vml-number-input {
-  width: 180px;
+  // width: 180px;
 }
 
 .ngram-results {
@@ -478,9 +478,9 @@ const loadRegionalNgrams = async () => {
     max-width: 100% !important;
   }
 
-  .vml-number-input {
-    width: 100% !important;
-  }
+  // .vml-number-input {
+  //   width: 100% !important;
+  // }
 
   .simple-select-dropdown,
   .filterable-select {

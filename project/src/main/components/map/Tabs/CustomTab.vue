@@ -229,13 +229,13 @@ import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import CustomDataEntryModal from '@/main/components/map/custom/CustomDataEntryModal.vue';
 import CustomTabHelpModal from '@/main/components/map/popups/CustomTabHelpModal.vue';
 import { getUserFeatures, getDataByFeature } from '@/api';
-import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js';
+import { ensureCustomDataPresence } from '@/composables/data/useCustomDataPresence.js';
 import {
   userStore,
   mapStore,
   resultCache,
 } from '@/main/store/store.js';
-import { showSuccess, showWarning, showError } from '@/utils/message.js';
+import { showSuccess, showWarning, showError } from '@/utils/ui/message.js';
 import FeatureScopeSelectionModal from '@/main/components/map/custom/feature/FeatureScopeSelectionModal.vue';
 import { addCustomFeatureDataWithoutApi } from '@/utils/map/MapData.js';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'

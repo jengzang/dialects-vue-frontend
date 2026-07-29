@@ -188,14 +188,14 @@ import { ref, nextTick ,onMounted, onActivated, watch, computed,defineProps, def
 import { useI18n } from 'vue-i18n'
 import { getLocations, getCustomFeature, getLocationPartitions, batchMatch, getPartitions } from '@/api/index.js'
 import AppModal from '@/components/common/AppModal.vue'
-import { useCustomRegionStore } from '@/main/store/customRegionStore.js'
+import { customRegionStore } from '@/main/store/customRegionStore.js'
 import RegionSelector from "@/main/components/geo/RegionSelector.vue"
 import PartitionInfoModal from "@/main/components/geo/PartitionInfoModal.vue"
 import { userStore } from '@/main/store/store.js'
 import { LOCATION_LIMITS } from '@/main/config/constants.js'
 import { buildExplicitLocationsForGetLocs, isExplicitLocationsLimitExceeded } from '@/main/utils/query/queryLimits.js'
 import {STATIC_REGION_TREE, top_yindian} from "@/main/config/RegionTree.js";
-import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 
 const RegionInputMode = defineAsyncComponent(() => import('./RegionInputMode.vue'))
 
@@ -364,7 +364,7 @@ function handleCustomRegionDataUpdate(regionObjects) {
 }
 
 // Use custom region store
-const { fetchCustomRegions, customRegions } = useCustomRegionStore()
+const { fetchCustomRegions, customRegions } = customRegionStore()
 
 // Load custom regions data when component mounts
 async function loadCustomRegionsData() {

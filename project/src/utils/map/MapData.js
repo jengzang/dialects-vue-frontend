@@ -1,6 +1,7 @@
 // 整理數據,用於地圖繪製
 import { globalPayload, queryStore, mapStore, resultCache, userStore } from '../../main/store/store.js'
 import { getCustomData, getDataByFeature } from '@/api'
+import { FEATURE_PALETTE } from '@/main/config/colors/mapColors.js'
 
 export async function func_mergeData(resultData = null, mapData = null, customData = null) {
     // 1) 数据来源：优先参数，否则 fallback 到 window
@@ -461,12 +462,6 @@ function mergeBackendData(result, mergedData, isCustomFeatureSearch = false) {
 
 // 分配顏色
 function assignColorToMergedData(mergedData) {
-    const colorScale = [
-        '#FFB3B3', '#FFB366', '#FFFF99', '#B3FFB3', '#99CCFF', '#D4A6FF',
-        '#FF6666', '#FFD699', '#99CCCC', '#D1D1FF', '#FF9999', '#FFB3FF',
-        '#FFFF66', '#B3FF99', '#99CCFF', '#FFCC99', '#CCCCFF', '#FF66CC',
-        '#FFFF66', '#B3FFCC'
-    ];
     let featureMaxValuesToColor = {};
 
     mergedData.forEach(item => {
@@ -482,7 +477,7 @@ function assignColorToMergedData(mergedData) {
         const values = Array.from(featureMaxValuesToColor[feature]);
         featureToColor[feature] = {};
         values.forEach((val, idx) => {
-            featureToColor[feature][val] = colorScale[idx % colorScale.length];
+            featureToColor[feature][val] = FEATURE_PALETTE[idx % FEATURE_PALETTE.length];
         });
     });
 

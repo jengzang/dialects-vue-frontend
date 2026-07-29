@@ -95,6 +95,15 @@ export const EXPLORE_LEGACY_ROUTES = {
       grammar: 'grammar'
     }
   },
+  Vocabulary: {
+    path: '/explore/vocabulary/view',
+    defaultTab: 'table',
+    tabMap: {
+      table: 'table',
+      card: 'card',
+      map: 'map'
+    }
+  },
   CharacterClassification: {
     path: '/explore/char-class',
     defaultTab: 'zhonggu',
@@ -158,7 +167,7 @@ export function resolveLegacyExploreRoute(query = {}) {
     }
   }
 
-  if (page === 'YuBao' || page === 'CharacterClassification') {
+  if (page === 'YuBao' || page === 'Vocabulary' || page === 'CharacterClassification') {
     return {
       path: config.path,
       query: {

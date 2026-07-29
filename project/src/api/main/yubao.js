@@ -1,6 +1,6 @@
 // api/main/yubao.js - 语保（Yubao）业务接口
 import { api } from '../auth/httpClient.js';
-import { showError } from '@/utils/message.js';
+import { showError } from '@/utils/ui/message.js';
 
 function appendIfPresent(params, key, value) {
   if (value === undefined || value === null || value === '') {

@@ -34,7 +34,7 @@ const customRegionsStorage = useStorageState(CUSTOM_REGIONS_STORAGE_KEY, {
   }
 })
 
-export const useCustomRegionStore = () => {
+export const customRegionStore = () => {
   // 获取自定义分区（带缓存）
   const fetchCustomRegions = async (regionName = null, forceRefresh = false) => {
     console.log('🔍 fetchCustomRegions 调用:', { regionName, forceRefresh, memoryLength: customRegions.value.length })

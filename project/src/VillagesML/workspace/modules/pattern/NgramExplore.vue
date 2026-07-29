@@ -43,19 +43,19 @@
       <div class="frequency-section">
       <h2>N-gram 頻率分析</h2>
       <div class="controls vml-control-surface vml-control-row">
-        <div class="vml-control-field vml-control-field--compact">
+        <div class="vml-control-field">
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model.number="nValue"
             :options="nValueOptions"
           />
         </div>
-        <div class="vml-control-field vml-control-field--compact">
+        <div class="vml-control-field">
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model="position"
             :options="positionOptions"
           />
         </div>
-        <div class="vml-control-field vml-control-field--compact">
+        <div class="vml-control-field">
           <input
             v-model.number="minFrequency"
             type="number"
@@ -64,7 +64,7 @@
             class="vml-number-input"
           />
         </div>
-        <div class="vml-control-field vml-control-field--compact">
+        <div class="vml-control-field">
           <input
             v-model.number="topK"
             type="number"
@@ -149,7 +149,7 @@
             @keyup.enter="searchPatterns"
           />
         </div>
-        <div class="vml-control-field vml-control-field--compact">
+        <div class="vml-control-field">
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model.number="patternN"
             :options="nValueOptions"
@@ -208,8 +208,8 @@ import {
   getNgramFrequency,
   getNgramPatterns
 } from '@/api/index.js'
-import { getVillagesNgrams } from '@/composables/useVillagesCache.js'
-import { showError } from '@/utils/message.js'
+import { getVillagesNgrams } from '@/composables/data/useVillagesCache.js'
+import { showError } from '@/utils/ui/message.js'
 import { getNgramPositionLabel, getNgramPatternTypeLabel } from '@/VillagesML/config/villagesML.js'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 
@@ -333,6 +333,7 @@ onMounted(async () => {
 
 .controls,
 .search-controls {
+  justify-content: center;
   margin: 0;
   width: 100%;
 }
@@ -393,13 +394,10 @@ onMounted(async () => {
   background: var(--glass-50);
 }
 
-.vml-number-input {
-  width: 100%;
-}
+// .vml-number-input {
+//   width: 100%;
+// }
 
-.pattern-input {
-  width: 100%;
-}
 
 
 .frequency-results-wrapper {

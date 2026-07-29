@@ -9,7 +9,7 @@ import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
 import CountLocationJumpNav from '@/main/components/pho/CountLocationJumpNav.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
-import { useNavAnchorJump } from '@/composables/useNavAnchorJump.js'
+import { useNavAnchorJump } from '@/composables/bar/useNavAnchorJump.js'
 import all_feature_counts from '/data/feature_counts_20260624.json?url'
 
 const { t } = useI18n()

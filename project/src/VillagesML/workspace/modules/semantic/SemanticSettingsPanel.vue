@@ -38,7 +38,7 @@
           min="0"
           max="10"
           step="0.1"
-          class="setting-input"
+          class="setting-input vm-setting-input"
         />
         <span class="hint">過濾弱連接（0-10）</span>
       </div>

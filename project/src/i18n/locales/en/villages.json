@@ -20,6 +20,87 @@
     "name": "All Villages",
     "desc": "All villages data (admin only)"
   },
+  "dashboard": {
+    "pageTitle": "Village Analysis System",
+    "introTitle": "Natural Village Machine Learning Analysis System",
+    "introText": "is a linguistic analysis platform based on 283,070 natural village names in Guangdong Province. The system applies machine learning and natural language processing techniques to analyze village name semantics, structure, spatial distribution, and other features from multiple dimensions, providing data support for toponymy research, cultural geography, linguistics, and related fields.",
+    "githubInvite": "Star ⭐, Fork 🍴, or open an Issue 💬",
+    "featuresHeader": "Feature Modules",
+    "featuresDesc": "Click a module below to start analyzing",
+    "statsHeader": "Data Overview",
+    "statsDesc": "Village names and regional statistics in the system",
+    "loadButton": "Load",
+    "loadingButton": "Loading...",
+    "loadStatsError": "Failed to load statistics",
+    "badge": {
+      "public": "Public",
+      "loginRequired": "Login Required"
+    },
+    "features": {
+      "search": {
+        "title": "Village Search",
+        "description": "Search villages by keyword and region, view detailed information and in-depth analysis reports",
+        "tooltip": "Supports fuzzy keyword matching and three-level administrative division (City → County → Township) cascading filters. Click a village to view in-depth analysis reports covering semantic structure, N-gram decomposition, spatial features, and more."
+      },
+      "character": {
+        "title": "Character Frequency",
+        "description": "Analyze character usage frequency, regional tendencies, semantic embedding vectors, and statistical significance in village names",
+        "tooltip": "Statistical analysis of characters across 283,070 village names. Includes: ① Frequency tendency (Z-score/Lift/Log-odds metrics for regional preference) ② Embedding similarity (Word2Vec Skipgram, 100-dim vectors, cosine similarity) ③ Character network (Louvain community detection) ④ Significance (Chi-square test, Cramér's V effect size)"
+      },
+      "semantic": {
+        "title": "Semantic Analysis",
+        "description": "Explore semantic categories, label combination patterns, semantic network relationships, and semantic composition structures of village names",
+        "tooltip": "Based on hybrid lexicon v4.0 (LLM-annotated + manually verified), 9 major categories + 76 subcategories. Includes: ① VTF (Virtual Term Frequency, confidence-weighted) ② Bigram/Trigram combination patterns (PMI mutual information) ③ Semantic network (NetworkX graph analysis) ④ Semantic indices (Shannon entropy, diversity metrics)"
+      },
+      "spatial": {
+        "title": "Spatial Analysis",
+        "description": "Visualize the geographic distribution of villages, identify spatial hotspot clusters, and analyze spatial integration patterns",
+        "tooltip": "Uses DBSCAN density clustering (eps radius + min_samples) to identify geographic hotspots. Supports spatial autocorrelation analysis, cluster centroid calculation, and MapLibre GPU-accelerated rendering. Adjustable eps parameter (0.5-20km) to explore spatial patterns at different scales."
+      },
+      "pattern": {
+        "title": "Pattern Analysis",
+        "description": "Extract N-gram patterns, analyze structural regularities, and discover linguistic features in village naming",
+        "tooltip": "Extracts 2-4 gram character sequence patterns. Statistical metrics: ① PMI (Pointwise Mutual Information, log₂[P(A,B)/(P(A)·P(B))]) ② Chi-square significance test ③ Lift tendency (regional frequency / global frequency ratio). Supports wildcard search (* for any character, X for single character)."
+      },
+      "regional": {
+        "title": "Regional Analysis",
+        "description": "Compute regional aggregate statistics, generate regional feature vectors, and perform cross-regional comparative analysis",
+        "tooltip": "Aggregates by City/County/Township levels. Generates TF-IDF feature vectors (TF=regional frequency, IDF=log(total regions / regions containing feature)). Computes cosine similarity / Jaccard similarity between regions to identify toponymic cultural areas. Supports Z-score tendency heatmap visualization."
+      },
+      "compute": {
+        "title": "ML Compute",
+        "description": "Execute machine learning clustering analysis, extract high-dimensional feature vectors, and perform in-depth subset analysis",
+        "tooltip": "Login required. Supports three clustering algorithms: ① K-Means (centroid-based, requires k value) ② DBSCAN (density-based, auto-detects noise) ③ GMM (Gaussian Mixture Model, probabilistic assignment). Feature engineering: semantic (9-dim) + morphological (N-gram TF) + diversity (Shannon entropy) + spatial (coordinates + density). Preprocessing: StandardScaler + PCA (default 50 components). Evaluation metrics: Silhouette Score ([-1,1]), Davies-Bouldin Index (lower is better), Calinski-Harabasz Score (higher is better)."
+      },
+      "system": {
+        "title": "System Info",
+        "description": "View database overview, table statistics, system status, and cache management"
+      }
+    },
+    "stats": {
+      "villages": {
+        "label": "Total Villages",
+        "tooltip": "283,070 natural village names in Guangdong Province, sourced from major map websites. Covers 21 prefecture-level cities, 123 districts/counties, and 1,500+ townships."
+      },
+      "cities": {
+        "label": "Cities"
+      },
+      "counties": {
+        "label": "Counties"
+      },
+      "townships": {
+        "label": "Townships"
+      },
+      "characters": {
+        "label": "Unique Characters",
+        "tooltip": "3,067 unique Chinese characters used in place names. Word2Vec embedding vectors trained for each character (dim=100, window=5, min frequency=5)."
+      },
+      "ngrams": {
+        "label": "Significant N-grams",
+        "tooltip": "Statistically significant N-gram patterns filtered by PMI (Pointwise Mutual Information) and Chi-square test."
+      }
+    }
+  },
   "pages": {
     "gdTree": {
       "title": "Guangdong Village Tree",

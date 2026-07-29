@@ -48,6 +48,7 @@
       "desc": "Dialect vocabulary and grammar resources",
       "yubaoVocab": "Language Preservation Vocabulary - Vocabulary data from the Chinese Language Resources Protection Project",
       "yubaoGrammar": "Language Preservation Grammar - Sentence data from the Chinese Language Resources Protection Project",
+      "wordList": "Vocabulary List - Dialect vocabulary list page",
       "ycSpoken": "Yangchun Colloquial Vocabulary - Colloquial words from the Yangchun dialect"
     },
     "villages": {

@@ -51,7 +51,7 @@ import { getPartitions } from '@/api/index.js'
 import * as OpenCCT2CN from 'opencc-js/t2cn'
 import * as OpenCCCN2T from 'opencc-js/cn2t'
 import { STATIC_REGION_TREE, top_yindian } from '@/main/config/RegionTree.js'
-import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 
 const props = defineProps({
   modelValue: {

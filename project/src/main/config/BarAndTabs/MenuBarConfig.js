@@ -35,7 +35,9 @@ import { isPlatformRouteEnabled } from '@/platform/index.js'
 //       showLabelOnlyWhenActive: false,
 //       mobileShowLabelOnlyWhenActive: true,
 //       cssClass: '',
-//       visibleWhen: null
+//       visibleWhen: null,
+//       scroll: undefined,       // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+//       mobileScroll: undefined  // 仅竖屏/移动端覆盖 scroll；例如 mobileScroll: 'left' 表示桌面主tab、移动端左侧溢出
 //     }
 //   },
 //   navigation: {
@@ -48,8 +50,8 @@ import { isPlatformRouteEnabled } from '@/platform/index.js'
 // useMenuBarConfig() flattens them back into the legacy tab shape consumed by NavBar.
 //
 const DISPLAY_DEFAULTS = {
-  weight: 0.9,
-  mobileWeight: 0.9,
+  weight: 1,
+  mobileWeight: 1,
   weightIconOnly: 0.6,
   mobileWeightIconOnly: 0.5,
   fontSize: 1.4,
@@ -60,7 +62,9 @@ const DISPLAY_DEFAULTS = {
   showLabelOnlyWhenActive: false,
   mobileShowLabelOnlyWhenActive: true,
   cssClass: '',
-  visibleWhen: null
+  visibleWhen: null,
+  scroll: undefined, // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+  mobileScroll: undefined // 仅竖屏/移动端覆盖 scroll；undefined = 沿用 scroll
 }
 
 const DISPLAY_PRESETS = {
@@ -148,9 +152,60 @@ export function useMenuTabsConfig() {
 
   return computed(() => [
     createMenuTab({
+      tab: 'source',
+      label: t('source.title'),
+      icon: '🔗',
+      display: {
+        preset: 'compactDesktop',
+        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/source') }
+      }
+    }),
+    createMenuTab({
+      tab: 'praat',
+      label: t('navigation.tabs.praat'),
+      icon: '🎙️',
+      display: {
+        preset: 'compactDesktop',
+        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/explore/tools/praat') }
+      }
+    }),
+    createMenuTab({
+      tab: 'home',
+      label: t('navigation.tabs.home'),
+      icon: '🏠',
+      display: {
+        preset: 'compactDesktop',
+        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.4 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/') }
+      }
+    }),
+    createMenuTab({
+      tab: 'about',
+      label: t('navigation.tabs.about'),
+      icon: '🌐',
+      display: {
+        preset: 'compactDesktop',
+        overrides: {
+          weight: 0.8,
+          mobileWeight: 0.8
+        }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
+      }
+    }),
+    createMenuTab({
       tab: 'pho',
       label: t('navigation.tabs.phonology'),
-      icon: '\uD83E\uDDEC',
+      icon: '🧬',
       display: {
         preset: 'standard',
         overrides: {}
@@ -162,7 +217,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'query',
       label: t('navigation.tabs.query'),
-      icon: '\uD83D\uDD0D\uFE0F',
+      icon: '🔍',
       display: {
         preset: 'standard',
         overrides: {}
@@ -174,7 +229,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'result',
       label: t('navigation.tabs.results'),
-      icon: '\uD83D\uDCC9',
+      icon: '📉',
       display: {
         preset: 'resultTab',
         overrides: {
@@ -188,7 +243,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'map',
       label: t('navigation.tabs.map'),
-      icon: '\uD83D\uDDFA\uFE0F',
+      icon: '🗺️',
       display: {
         preset: 'standard',
         overrides: {}
@@ -200,7 +255,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'compare',
       label: t('navigation.tabs.compare'),
-      icon: '\u2194\uFE0F',
+      icon: '↔️',
       display: {
         preset: 'standard',
         overrides: {}
@@ -210,17 +265,56 @@ export function useMenuTabsConfig() {
       }
     }),
     createMenuTab({
-      tab: 'about',
-      label: t('navigation.tabs.about'),
-      icon: '\uD83C\uDF10\uFE0F',
+      tab: 'charClass',
+      label: t('navigation.tabs.charClass'),
+      icon: '📚',
       display: {
         preset: 'compactDesktop',
-        overrides: {}
+        overrides: { scroll: 'right', weight: 0.7 }
       },
       navigation: {
-        defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
+        defaultTo: {
+          path: withRouteLocale(route, '/explore/char-class'),
+          query: { tab: 'zhonggu' }
+        }
       }
-    })
+    }),
+    createMenuTab({
+      tab: 'words',
+      label: t('navigation.tabs.phrases'),
+      icon: '📖',
+      display: {
+        preset: 'compactDesktop',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/words') }
+      }
+    }),
+    createMenuTab({
+      tab: 'villages',
+      label: t('navigation.tabs.villages'),
+      icon: '🏘️',
+      display: {
+        preset: 'compactDesktop',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/villages') }
+      }
+    }),
+    createMenuTab({
+      tab: 'tools',
+      label: t('navigation.tabs.tools'),
+      icon: '🧰',
+      display: {
+        preset: 'compactDesktop',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/tools') }
+      }
+    }),
   ])
 }
 

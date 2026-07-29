@@ -262,14 +262,14 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
-import { resolveHoverDetailCardPosition } from '@/main/utils/hoverDetailCardPosition.js'
+import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js'
 import LocationMultiInput from '../geo/LocationMultiInput.vue'
 import { postPhoPieByValue, postPhoPieByStatus } from '@/api'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { TABLE_COLUMN_SCHEMAS } from '../../config/chars_positions/characters.js'
 import { userStore } from '@/main/store/store.js'
-import { showWarning } from '@/utils/message.js'
-import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from './evolutionDetail.js'
+import { showWarning } from '@/utils/ui/message.js'
+import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from '@/utils/EchartHover/evolutionDetail.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import {
   encodeQueryValueBase64Url,
