@@ -137,8 +137,7 @@ let previousPreviewSourceIds = []
 let hoveredFeatureKey = null
 let hoveredFeatureSource = null
 let previewHoverBound = false
-let suppressFeatureSelectionEmit = false
-let suppressFeatureSelectionToken = 0
+let suppressedProgrammaticFeatureSelectionIds = null
 const sanitizeLayerFilename = (layerName) => {
   return String(layerName || 'map-draw-layer')
     .trim()
@@ -409,10 +408,25 @@ const syncReadonlyLayers = () => {
   applyPreviewHover()
 }
 
+const normalizeFeatureIds = (featureIds = []) => featureIds
+  .map((featureId) => String(featureId || ''))
+  .filter(Boolean)
+
+const areFeatureIdsEqual = (leftFeatureIds = [], rightFeatureIds = []) => {
+  const leftIds = normalizeFeatureIds(leftFeatureIds)
+  const rightIds = normalizeFeatureIds(rightFeatureIds)
+  if (leftIds.length !== rightIds.length) return false
+  const rightIdSet = new Set(rightIds)
+  return leftIds.every((featureId) => rightIdSet.has(featureId))
+}
+
 const syncSelectedFeature = () => {
-  const selectedIds = draw.value?.getSelectedIds?.() ?? []
+  const selectedIds = normalizeFeatureIds(draw.value?.getSelectedIds?.() ?? [])
   selectedFeatureId.value = selectedIds[0] ? String(selectedIds[0]) : ''
-  if (suppressFeatureSelectionEmit) return
+  if (suppressedProgrammaticFeatureSelectionIds) {
+    if (areFeatureIdsEqual(selectedIds, suppressedProgrammaticFeatureSelectionIds)) return
+    suppressedProgrammaticFeatureSelectionIds = null
+  }
   emit('feature-select', selectedFeatureId.value)
 }
 
@@ -432,6 +446,7 @@ const syncFeaturesFromDraw = (options = {}) => {
 }
 
 const setDrawMode = (mode) => {
+  suppressedProgrammaticFeatureSelectionIds = null
   draw.value?.changeMode?.(mode)
   if (mode === 'simple_select') {
     syncSelectedFeature()
@@ -439,6 +454,7 @@ const setDrawMode = (mode) => {
 }
 
 const selectFeature = (featureId, options = {}) => {
+  suppressedProgrammaticFeatureSelectionIds = null
   if (!draw.value || !featureId) {
     selectedFeatureId.value = ''
     emit('feature-select', selectedFeatureId.value)
@@ -485,16 +501,10 @@ const selectFeatures = (featureIds = []) => {
   const selectedIds = featureIds
     .map((featureId) => String(featureId || ''))
     .filter((featureId) => featureId && draw.value?.get?.(featureId))
-  suppressFeatureSelectionToken += 1
-  const selectionToken = suppressFeatureSelectionToken
-  suppressFeatureSelectionEmit = true
+  suppressedProgrammaticFeatureSelectionIds = selectedIds
   draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })
   emit('mode-change', 'simple_select')
   selectedFeatureId.value = selectedIds[0] || ''
-  window.setTimeout(() => {
-    if (selectionToken !== suppressFeatureSelectionToken) return
-    suppressFeatureSelectionEmit = false
-  }, 0)
 }
 
 const updateFeatureProperties = (featureId, nextProperties, options = {}) => {
