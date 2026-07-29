@@ -15,6 +15,7 @@ const DEFAULT_FEATURE_PROPERTIES = {
   visible: true,
   locked: false,
 }
+const DRAW_STYLE_EXPORT_DEFAULT_KEYS = Object.keys(DEFAULT_FEATURE_PROPERTIES)
 
 const SUPPORTED_DRAW_GEOMETRY_TYPES = ['Point', 'LineString', 'Polygon']
 const CSV_LONGITUDE_KEYS = ['lng', 'lon', 'long', 'longitude', 'x', '经度']
@@ -286,6 +287,30 @@ function inferImportFormat(file) {
   return 'geojson'
 }
 
+function getDefaultDrawProperties(index) {
+  const [stroke, pointColor] = pickDrawColor(index)
+  return {
+    ...DEFAULT_FEATURE_PROPERTIES,
+    stroke,
+    fill: pointColor,
+    pointColor,
+    pointStrokeColor: stroke,
+  }
+}
+
+function stripDefaultDrawProperties(properties = {}, index = 0) {
+  const defaults = getDefaultDrawProperties(index)
+
+  return Object.fromEntries(
+    Object.entries(properties).filter(([key, value]) => {
+      return !(
+        DRAW_STYLE_EXPORT_DEFAULT_KEYS.includes(key)
+        && Object.is(value, defaults[key])
+      )
+    })
+  )
+}
+
 export function normalizeFeatureCollection(featureCollection) {
   const normalizedCollection = ensureFeatureCollection(featureCollection)
   const usedFeatureIds = new Set()
@@ -321,11 +346,9 @@ export function serializeFeatureCollectionForExport(featureCollection) {
     type: 'FeatureCollection',
     features: normalizedCollection.features
       .filter((feature) => feature && typeof feature === 'object')
-      .map((feature) => ({
+      .map((feature, index) => ({
         ...feature,
-        properties: {
-          ...(feature?.properties ?? {}),
-        },
+        properties: stripDefaultDrawProperties(feature?.properties, index),
       })),
   }
 }

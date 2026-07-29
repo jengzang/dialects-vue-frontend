@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   exportFeatureCollectionAsGeoJson,
   normalizeFeatureCollection,
+  serializeFeatureCollectionForExport,
 } from '@/main/utils/drawMap/export.js'
 
 function readBlobAsText(blob) {
@@ -119,5 +120,55 @@ describe('draw map export helpers', () => {
     expect(click).toHaveBeenCalledTimes(1)
     expect(appendChild).toHaveBeenCalledTimes(1)
     expect(removeChild).toHaveBeenCalledTimes(1)
+  })
+
+  it('strips default draw style fields from normalized GeoJSON exports', () => {
+    const normalized = normalizeFeatureCollection({
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        properties: {
+          customCode: 'A001',
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [113, 22],
+        },
+      }],
+    })
+
+    const exported = serializeFeatureCollectionForExport(normalized)
+
+    expect(exported.features[0].properties).toEqual({
+      customCode: 'A001',
+      id: exported.features[0].id,
+    })
+  })
+
+  it('keeps non-default draw style fields in GeoJSON exports', () => {
+    const normalized = normalizeFeatureCollection({
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        properties: {
+          customCode: 'A001',
+          stroke: '#ff0000',
+          visible: false,
+        },
+        geometry: {
+          type: 'LineString',
+          coordinates: [[113, 22], [114, 23]],
+        },
+      }],
+    })
+
+    const exported = serializeFeatureCollectionForExport(normalized)
+
+    expect(exported.features[0].properties).toEqual({
+      customCode: 'A001',
+      id: exported.features[0].id,
+      stroke: '#ff0000',
+      visible: false,
+    })
   })
 })
