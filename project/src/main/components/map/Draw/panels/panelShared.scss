@@ -190,6 +190,19 @@
   @include scrollbars.visible-scrollbar-webkit;
 }
 
+.draw-feature-batch-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
+
+.draw-feature-selected-count {
+  font-size: 0.76rem;
+  color: rgba(var(--text-deep-rgb), 0.62);
+  white-space: nowrap;
+}
+
 .draw-feature-row {
   display: flex;
   align-items: center;
@@ -206,6 +219,25 @@
   transition:
     background 0.2s ease,
     border-color 0.2s ease;
+}
+
+.draw-feature-row-checkbox {
+  flex-shrink: 0;
+}
+
+.draw-feature-row-select {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
 }
 
 .draw-feature-row:hover {

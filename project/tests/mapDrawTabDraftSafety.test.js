@@ -70,7 +70,7 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
     name: 'EditableMapLibreStub',
     props: ['modelValue'],
     emits: ['update:modelValue', 'features-change'],
-    setup(_props, { emit, expose }) {
+    setup(props, { emit, expose }) {
       expose({
         setDrawMode: vi.fn(),
         importGeoJson: vi.fn(),
@@ -81,10 +81,12 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         isFullscreen: ref(false),
       })
       const addPolygonFeature = () => {
+        const nextIndex = (props.modelValue?.features?.length ?? 0) + 1
+        const previousFeatures = props.modelValue?.features ?? []
         const collection = {
           type: 'FeatureCollection',
-          features: [{
-            id: 'feature-1',
+          features: [...previousFeatures, {
+            id: `feature-${nextIndex}`,
             type: 'Feature',
             properties: {},
             geometry: {
@@ -110,7 +112,33 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
 vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
   default: defineComponent({
     name: 'MapDrawToolsPanelStub',
-    template: '<div data-testid="tools-panel" />',
+    props: {
+      featureItems: { type: Array, default: () => [] },
+      selectedFeatureIds: { type: Array, default: () => [] },
+      canModifyActiveLayer: { type: Boolean, default: false },
+    },
+    emits: ['toggle-feature-selection', 'delete-selected-features'],
+    template: `
+      <div data-testid="tools-panel">
+        <label v-for="feature in featureItems" :key="feature.id" data-testid="feature-row">
+          <input
+            data-testid="feature-checkbox"
+            type="checkbox"
+            :checked="selectedFeatureIds.includes(feature.id)"
+            @change="$emit('toggle-feature-selection', feature.id)"
+          >
+          {{ feature.label }}
+        </label>
+        <button
+          data-testid="delete-selected-features"
+          type="button"
+          :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
+          @click="$emit('delete-selected-features')"
+        >
+          delete selected features
+        </button>
+      </div>
+    `,
   }),
 }))
 
@@ -474,6 +502,35 @@ describe('MapDrawTab draft safety', () => {
     pendingSecondAutoWrite.resolve()
     await flushTicks()
     expect(mocks.deleteDraftRecord).toHaveBeenCalledWith(mocks.AUTO_DRAFT_ID)
+
+    wrapper.unmount()
+  })
+
+  it('deletes checked active-layer features as one batch action', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(2)
+
+    const checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    checkboxes[1].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="delete-selected-features"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(0)
 
     wrapper.unmount()
   })

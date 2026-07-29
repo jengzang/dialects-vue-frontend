@@ -137,6 +137,8 @@ let previousPreviewSourceIds = []
 let hoveredFeatureKey = null
 let hoveredFeatureSource = null
 let previewHoverBound = false
+let suppressFeatureSelectionEmit = false
+let suppressFeatureSelectionToken = 0
 const sanitizeLayerFilename = (layerName) => {
   return String(layerName || 'map-draw-layer')
     .trim()
@@ -410,6 +412,7 @@ const syncReadonlyLayers = () => {
 const syncSelectedFeature = () => {
   const selectedIds = draw.value?.getSelectedIds?.() ?? []
   selectedFeatureId.value = selectedIds[0] ? String(selectedIds[0]) : ''
+  if (suppressFeatureSelectionEmit) return
   emit('feature-select', selectedFeatureId.value)
 }
 
@@ -471,6 +474,27 @@ const selectFeature = (featureId, options = {}) => {
   emit('mode-change', 'direct_select')
   selectedFeatureId.value = String(featureId)
   emit('feature-select', selectedFeatureId.value)
+}
+
+const selectFeatures = (featureIds = []) => {
+  if (!draw.value) {
+    selectedFeatureId.value = ''
+    return
+  }
+
+  const selectedIds = featureIds
+    .map((featureId) => String(featureId || ''))
+    .filter((featureId) => featureId && draw.value?.get?.(featureId))
+  suppressFeatureSelectionToken += 1
+  const selectionToken = suppressFeatureSelectionToken
+  suppressFeatureSelectionEmit = true
+  draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })
+  emit('mode-change', 'simple_select')
+  selectedFeatureId.value = selectedIds[0] || ''
+  window.setTimeout(() => {
+    if (selectionToken !== suppressFeatureSelectionToken) return
+    suppressFeatureSelectionEmit = false
+  }, 0)
 }
 
 const updateFeatureProperties = (featureId, nextProperties, options = {}) => {
@@ -1103,6 +1127,7 @@ defineExpose({
   getFeatureCollection: () => normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue),
   setDrawMode,
   selectFeature,
+  selectFeatures,
   selectedFeatureId,
   updateFeatureProperties,
   deleteSelected,

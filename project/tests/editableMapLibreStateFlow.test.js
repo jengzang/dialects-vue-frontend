@@ -238,6 +238,36 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('selects multiple features without emitting a single-selection override', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'polygon-2',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.selectFeatures(['polygon-1', 'polygon-2'])
+    wrapper.map.emit('draw.selectionchange')
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', {
+      featureIds: ['polygon-1', 'polygon-2'],
+    })
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+    expect(wrapper.events.some(([eventName]) => eventName === 'feature-select')).toBe(false)
+
+    wrapper.unmount()
+  })
+
   it('keeps locked or hidden features out of direct edit mode', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',

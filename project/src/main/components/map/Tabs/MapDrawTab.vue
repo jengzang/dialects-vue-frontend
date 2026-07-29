@@ -131,6 +131,7 @@
           :feature-items="activeLayerFeatureItems"
           :feature-move-layer-options="featureMoveLayerOptions"
           :selected-feature-id="selectedEditorFeatureId"
+          :selected-feature-ids="selectedFeatureIds"
           :selected-feature-properties="selectedEditorProperties"
           :selected-feature-geometry-type="selectedEditorGeometryType"
           :is-fullscreen="isMapFullscreen"
@@ -141,11 +142,13 @@
           :can-modify-active-layer="canModifyActiveLayer"
           @set-mode="setMode"
           @select-feature="handleSelectFeatureFromPanel"
+          @toggle-feature-selection="handleToggleFeatureSelection"
           @edit-shape="handleEditSelectedShape"
           @duplicate-feature="handleDuplicateSelectedFeature"
           @undo="undoHistory"
           @redo="redoHistory"
           @delete-selected="handleDeleteSelected"
+          @delete-selected-features="handleDeleteSelectedFeatures"
           @clear-all="handleClearAll"
           @reset-view="handleResetView"
           @toggle-fullscreen="handleToggleFullscreen"
@@ -638,6 +641,7 @@ const importInputRef = ref(null);
 const currentMode = ref('simple_select');
 const currentStyleKey = ref('gaode');
 const selectedFeatureId = ref('');
+const selectedFeatureIds = ref([]);
 const layers = ref([]);
 const activeLayerId = ref('');
 const isDrawingPanelOpen = ref(true);
@@ -740,6 +744,37 @@ const selectedFeature = computed(() => {
   if (!selectedFeatureId.value) return null;
   return activeLayerFeatures.value.find((feature) => getFeatureId(feature) === selectedFeatureId.value) ?? null;
 });
+
+const activeLayerFeatureIdSet = computed(() => new Set(
+  activeLayerFeatures.value.map((feature) => getFeatureId(feature)).filter(Boolean)
+));
+
+const getValidSelectedFeatureIds = (featureIds = []) => {
+  const seenFeatureIds = new Set();
+  return featureIds
+    .map((featureId) => String(featureId || ''))
+    .filter((featureId) => {
+      if (!featureId || seenFeatureIds.has(featureId) || !activeLayerFeatureIdSet.value.has(featureId)) {
+        return false;
+      }
+      seenFeatureIds.add(featureId);
+      return true;
+    });
+};
+
+const setFeatureSelection = (featureIds = [], preferredFeatureId = '') => {
+  const validFeatureIds = getValidSelectedFeatureIds(featureIds);
+  const preferredId = String(preferredFeatureId || '');
+  selectedFeatureIds.value = validFeatureIds;
+  selectedFeatureId.value = validFeatureIds.includes(preferredId)
+    ? preferredId
+    : validFeatureIds[0] || '';
+};
+
+const clearFeatureSelection = () => {
+  selectedFeatureId.value = '';
+  selectedFeatureIds.value = [];
+};
 
 const activeLayerFeatureItems = computed(() => activeLayerFeatures.value.map((feature, index) => ({
   id: getFeatureId(feature),
@@ -1510,7 +1545,7 @@ const handleCreateLayer = (geometryType) => {
   const layer = createEmptyLayer(geometryType);
   layers.value.push(layer);
   activeLayerId.value = layer.id;
-  selectedFeatureId.value = '';
+  clearFeatureSelection();
   isDrawingPanelOpen.value = true;
   const mode = geometryType === 'Point'
     ? 'draw_point'
@@ -1540,7 +1575,7 @@ const setMode = (mode) => {
 
 const handleSelectLayer = (layerId) => {
   activeLayerId.value = layerId;
-  selectedFeatureId.value = '';
+  clearFeatureSelection();
   currentMode.value = 'simple_select';
   editableMapRef.value?.setDrawMode?.('simple_select');
 };
@@ -1569,9 +1604,13 @@ const syncAllLayersAfterMutation = () => {
 };
 
 const resetDrawSelectionMode = () => {
-  selectedFeatureId.value = '';
+  clearFeatureSelection();
   currentMode.value = 'simple_select';
-  editableMapRef.value?.setDrawMode?.('simple_select');
+  if (editableMapRef.value?.selectFeatures) {
+    editableMapRef.value.selectFeatures([]);
+  } else {
+    editableMapRef.value?.setDrawMode?.('simple_select');
+  }
 };
 
 const applyLayerPropertyToFeatures = (layer, key, value) => {
@@ -1694,7 +1733,7 @@ const handleDuplicateLayer = (layerId) => {
   const sourceIndex = layers.value.findIndex((item) => item.id === layerId);
   layers.value.splice(sourceIndex + 1, 0, duplicatedLayer);
   activeLayerId.value = duplicatedLayer.id;
-  selectedFeatureId.value = '';
+  clearFeatureSelection();
   currentMode.value = 'simple_select';
   editableMapRef.value?.setDrawMode?.('simple_select');
   syncAllLayersAfterMutation();
@@ -1714,7 +1753,7 @@ const handleDeleteLayer = async (layerId) => {
   if (activeLayerId.value === layerId) {
     const fallbackLayer = layers.value[layerIndex] ?? layers.value[layerIndex - 1] ?? null;
     activeLayerId.value = fallbackLayer?.id ?? '';
-    selectedFeatureId.value = '';
+    clearFeatureSelection();
     currentMode.value = 'simple_select';
     editableMapRef.value?.setDrawMode?.('simple_select');
   }
@@ -1722,7 +1761,7 @@ const handleDeleteLayer = async (layerId) => {
 };
 
 const handleFeatureSelect = (featureId) => {
-  selectedFeatureId.value = featureId || '';
+  setFeatureSelection(featureId ? [featureId] : [], featureId);
 };
 
 const handleDrawModeChange = (mode) => {
@@ -1777,7 +1816,7 @@ const handleDuplicateSelectedFeature = () => {
     ...featureCollection,
     features: [...(featureCollection.features ?? []), duplicatedFeature],
   };
-  selectedFeatureId.value = duplicatedFeatureId;
+  setFeatureSelection([duplicatedFeatureId], duplicatedFeatureId);
   currentMode.value = 'simple_select';
   syncAllLayersAfterMutation();
   editableMapRef.value?.selectFeature?.(duplicatedFeatureId, { directEdit: false });
@@ -1808,6 +1847,7 @@ const handleMoveSelectedFeatureToLayer = (targetLayerId) => {
     features: [...(targetCollection.features ?? []), featureToMove],
   };
   activeLayerId.value = targetLayer.id;
+  setFeatureSelection([selectedFeatureId.value], selectedFeatureId.value);
   currentMode.value = 'simple_select';
   syncAllLayersAfterMutation();
   editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
@@ -1815,9 +1855,57 @@ const handleMoveSelectedFeatureToLayer = (targetLayerId) => {
 
 const handleSelectFeatureFromPanel = (featureId) => {
   if (!featureId) return;
-  selectedFeatureId.value = featureId;
+  setFeatureSelection([featureId], featureId);
   editableMapRef.value?.selectFeature?.(featureId, { directEdit: false });
   currentMode.value = 'simple_select';
+};
+
+const handleToggleFeatureSelection = (featureId) => {
+  const normalizedFeatureId = String(featureId || '');
+  if (!normalizedFeatureId || !activeLayerFeatureIdSet.value.has(normalizedFeatureId)) return;
+
+  const nextFeatureIds = new Set(selectedFeatureIds.value);
+  if (nextFeatureIds.has(normalizedFeatureId)) {
+    nextFeatureIds.delete(normalizedFeatureId);
+  } else {
+    nextFeatureIds.add(normalizedFeatureId);
+  }
+
+  setFeatureSelection([...nextFeatureIds], normalizedFeatureId);
+  currentMode.value = 'simple_select';
+  if (selectedFeatureIds.value.length > 1) {
+    editableMapRef.value?.selectFeatures?.(selectedFeatureIds.value);
+    return;
+  }
+  if (selectedFeatureId.value) {
+    editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
+    return;
+  }
+  if (editableMapRef.value?.selectFeatures) {
+    editableMapRef.value.selectFeatures([]);
+  } else {
+    editableMapRef.value?.setDrawMode?.('simple_select');
+  }
+};
+
+const handleDeleteSelectedFeatures = () => {
+  if (!canModifyActiveLayer.value || !activeLayer.value || selectedFeatureIds.value.length === 0) return;
+
+  const featureIdsToDelete = new Set(selectedFeatureIds.value);
+  const featureCollection = activeLayer.value.featureCollection ?? emptyFeatureCollection();
+  const nextFeatures = (featureCollection.features ?? [])
+    .filter((feature) => !featureIdsToDelete.has(getFeatureId(feature)));
+  if (nextFeatures.length === (featureCollection.features?.length ?? 0)) return;
+
+  commitHistory();
+  activeLayer.value.featureCollection = {
+    ...featureCollection,
+    features: nextFeatures,
+  };
+  clearFeatureSelection();
+  currentMode.value = 'simple_select';
+  syncAllLayersAfterMutation();
+  editableMapRef.value?.setDrawMode?.('simple_select');
 };
 
 const updateLayerProperty = (key, value) => {
@@ -1855,9 +1943,15 @@ const updateFeatureProperty = (featureId, key, value) => {
       };
     }),
   };
-  selectedFeatureId.value = featureId;
+  setFeatureSelection(
+    selectedFeatureIds.value.includes(featureId) ? selectedFeatureIds.value : [featureId],
+    featureId
+  );
   editableMapRef.value?.updateFeatureProperties?.(featureId, { [key]: value }, { commitHistory: false });
-  selectedFeatureId.value = featureId;
+  setFeatureSelection(
+    selectedFeatureIds.value.includes(featureId) ? selectedFeatureIds.value : [featureId],
+    featureId
+  );
   if (key === 'visible' && value === false) {
     resetDrawSelectionMode();
   }
@@ -1876,13 +1970,11 @@ const updateSelectedFeatureProperty = (key, value) => {
 
 const handleActiveLayerFeaturesChange = (nextValue) => {
   updateActiveLayerFeatureCollection(nextValue);
-  if (selectedFeatureId.value) {
-    const stillExists = nextValue.features?.some(
-      (feature) => getFeatureId(feature) === selectedFeatureId.value
-    );
-    if (!stillExists) {
-      selectedFeatureId.value = '';
-    }
+  if (selectedFeatureIds.value.length > 0 || selectedFeatureId.value) {
+    const featureIds = selectedFeatureIds.value.length > 0
+      ? selectedFeatureIds.value
+      : [selectedFeatureId.value];
+    setFeatureSelection(featureIds, selectedFeatureId.value);
   }
 };
 
@@ -1981,7 +2073,7 @@ const handleClearAll = async () => {
   if (currentFeatureCount <= 0) return;
   commitHistory();
   editableMapRef.value?.clearAll?.();
-  selectedFeatureId.value = '';
+  clearFeatureSelection();
   currentMode.value = 'simple_select';
   showSuccess(t('map.drawTab.messages.clearAllSuccess'));
 };
@@ -2134,6 +2226,7 @@ const buildHistorySnapshot = () => ({
   activeLayerId: activeLayerId.value,
   currentStyleKey: currentStyleKey.value,
   selectedFeatureId: selectedFeatureId.value,
+  selectedFeatureIds: selectedFeatureIds.value,
   currentMode: currentMode.value,
 });
 
@@ -2152,19 +2245,25 @@ const applyHistorySnapshot = (snapshot) => {
     activeLayerId.value = snapshot.activeLayerId || layers.value[0]?.id || '';
     currentStyleKey.value = snapshot.currentStyleKey || 'gaode';
     const restoredSelectedFeatureId = snapshot.selectedFeatureId || '';
-    selectedFeatureId.value = restoredSelectedFeatureId;
+    const restoredSelectedFeatureIds = Array.isArray(snapshot.selectedFeatureIds)
+      ? snapshot.selectedFeatureIds
+      : (restoredSelectedFeatureId ? [restoredSelectedFeatureId] : []);
     const restoredMode = snapshot.currentMode || 'simple_select';
     currentMode.value = restoredMode;
     syncLayerIdSeedFromLayers();
     syncAllLayersAfterMutation();
-    selectedFeatureId.value = restoredSelectedFeatureId;
+    setFeatureSelection(restoredSelectedFeatureIds, restoredSelectedFeatureId);
     if (restoredMode === 'direct_select') {
-      if (restoredSelectedFeatureId) {
-        editableMapRef.value?.selectFeature?.(restoredSelectedFeatureId);
+      if (selectedFeatureId.value) {
+        editableMapRef.value?.selectFeature?.(selectedFeatureId.value);
       } else {
         currentMode.value = 'simple_select';
         editableMapRef.value?.setDrawMode?.('simple_select');
       }
+    } else if (restoredMode === 'simple_select' && selectedFeatureIds.value.length > 1) {
+      editableMapRef.value?.selectFeatures?.(selectedFeatureIds.value);
+    } else if (restoredMode === 'simple_select' && selectedFeatureId.value) {
+      editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
     } else {
       editableMapRef.value?.setDrawMode?.(restoredMode);
     }
@@ -2213,6 +2312,7 @@ const applyDraftState = (state) => {
   currentStyleKey.value = state?.currentStyleKey || 'gaode';
   isDrawingPanelOpen.value = state?.isDrawingPanelOpen ?? true;
   isLayersPanelOpen.value = state?.isLayersPanelOpen ?? false;
+  clearFeatureSelection();
   syncLayerIdSeedFromLayers();
   syncAllLayersAfterMutation();
 };

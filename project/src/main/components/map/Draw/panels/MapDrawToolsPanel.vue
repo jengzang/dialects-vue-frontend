@@ -162,30 +162,61 @@
         </section>
 
         <section class="draw-tool-section">
-          <div class="draw-tool-section-title">
-            {{ t('map.drawTab.labels.featureList') }}
+          <div class="draw-tool-section-header">
+            <div class="draw-tool-section-title">
+              {{ t('map.drawTab.labels.featureList') }}
+            </div>
+            <div
+              v-if="featureItems.length"
+              class="draw-feature-batch-actions"
+            >
+              <span class="draw-feature-selected-count">
+                {{ t('map.drawTab.labels.selectedFeatureCount', { count: selectedFeatureIds.length }) }}
+              </span>
+              <button
+                class="main-glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                type="button"
+                :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
+                @click="$emit('delete-selected-features')"
+              >
+                {{ t('map.drawTab.buttons.deleteSelectedFeatures') }}
+              </button>
+            </div>
           </div>
           <div
             v-if="featureItems.length"
             class="draw-feature-list"
           >
-            <button
+            <div
               v-for="feature in featureItems"
               :key="feature.id"
               class="draw-feature-row"
-              type="button"
               :data-active="selectedFeatureId === feature.id"
-              @click="$emit('select-feature', feature.id)"
             >
-              <span class="draw-feature-row-main">
-                <span class="draw-feature-row-title">{{ feature.label }}</span>
-                <span class="draw-feature-row-meta">{{ getGeometryLabel(feature.geometryType) }}</span>
-              </span>
-              <span class="draw-feature-row-state">
-                {{ feature.visible ? t('map.drawTab.labels.visibleShort') : t('map.drawTab.labels.hiddenShort') }}
-                <span v-if="feature.locked"> · {{ t('map.drawTab.labels.lockedShort') }}</span>
-              </span>
-            </button>
+              <input
+                class="draw-feature-row-checkbox"
+                type="checkbox"
+                :checked="selectedFeatureIds.includes(feature.id)"
+                :aria-label="feature.label"
+                @click.stop
+                @change="$emit('toggle-feature-selection', feature.id)"
+              >
+              <button
+                class="draw-feature-row-select"
+                type="button"
+                @click="$emit('select-feature', feature.id)"
+              >
+                <span class="draw-feature-row-main">
+                  <span class="draw-feature-row-title">{{ feature.label }}</span>
+                  <span class="draw-feature-row-meta">{{ getGeometryLabel(feature.geometryType) }}</span>
+                </span>
+                <span class="draw-feature-row-state">
+                  {{ feature.visible ? t('map.drawTab.labels.visibleShort') : t('map.drawTab.labels.hiddenShort') }}
+                  <span v-if="feature.locked"> · {{ t('map.drawTab.labels.lockedShort') }}</span>
+                </span>
+              </button>
+            </div>
           </div>
           <div
             v-else
@@ -371,6 +402,7 @@ const props = defineProps({
   featureItems: { type: Array, default: () => [] },
   featureMoveLayerOptions: { type: Array, default: () => [] },
   selectedFeatureId: { type: String, default: '' },
+  selectedFeatureIds: { type: Array, default: () => [] },
   selectedFeatureProperties: { type: Object, default: null },
   selectedFeatureGeometryType: { type: String, default: '' },
   isFullscreen: { type: Boolean, default: false },
@@ -384,11 +416,13 @@ const props = defineProps({
 defineEmits([
   'set-mode',
   'select-feature',
+  'toggle-feature-selection',
   'edit-shape',
   'duplicate-feature',
   'undo',
   'redo',
   'delete-selected',
+  'delete-selected-features',
   'clear-all',
   'reset-view',
   'toggle-fullscreen',

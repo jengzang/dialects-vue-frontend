@@ -126,9 +126,12 @@ describe('Map draw editor contracts', () => {
 
     expect(source).toContain(`const restoredSelectedFeatureId = snapshot.selectedFeatureId || '';`)
     expect(source).toContain(`const restoredMode = snapshot.currentMode || 'simple_select';`)
-    expect(source).toContain('selectedFeatureId.value = restoredSelectedFeatureId;')
+    expect(source).toContain('selectedFeatureIds: selectedFeatureIds.value,')
+    expect(source).toContain('const restoredSelectedFeatureIds = Array.isArray(snapshot.selectedFeatureIds)')
+    expect(source).toContain('setFeatureSelection(restoredSelectedFeatureIds, restoredSelectedFeatureId);')
     expect(source).toContain('currentMode.value = restoredMode;')
-    expect(source).toContain('editableMapRef.value?.selectFeature?.(restoredSelectedFeatureId);')
+    expect(source).toContain('editableMapRef.value?.selectFeature?.(selectedFeatureId.value);')
+    expect(source).toContain('editableMapRef.value?.selectFeatures?.(selectedFeatureIds.value);')
     expect(source).toContain('editableMapRef.value?.setDrawMode?.(restoredMode);')
   })
 
@@ -187,7 +190,7 @@ describe('Map draw editor contracts', () => {
   it('keeps feature selection stable and exits direct mode when selected feature is hidden or locked', () => {
     const source = readSource(mapDrawTabPath)
 
-    expect(source).toContain('selectedFeatureId.value = featureId;')
+    expect(source).toContain('setFeatureSelection(')
     expect(source).toContain('editableMapRef.value?.updateFeatureProperties?.(featureId, { [key]: value }, { commitHistory: false });')
     expect(source).toMatch(/if \(key === 'visible' && value === false\) \{[\s\S]*resetDrawSelectionMode\(\)/)
     expect(source).toMatch(/if \(key === 'locked' && value === true\) \{[\s\S]*resetDrawSelectionMode\(\)/)
@@ -248,7 +251,7 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain('const handleDuplicateSelectedFeature = () =>')
     expect(tabSource).toMatch(/const handleDuplicateSelectedFeature = \(\) => \{[\s\S]*if \(!canDuplicateSelectedFeature\.value\) return;[\s\S]*commitHistory\(\);/)
     expect(tabSource).toContain('activeLayer.value.featureCollection = {')
-    expect(tabSource).toContain('selectedFeatureId.value = duplicatedFeatureId;')
+    expect(tabSource).toContain('setFeatureSelection([duplicatedFeatureId], duplicatedFeatureId);')
     expect(tabSource).toContain("editableMapRef.value?.selectFeature?.(duplicatedFeatureId, { directEdit: false });")
   })
 
@@ -277,6 +280,30 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toMatch(/targetLayer\.featureCollection = \{[\s\S]*features: \[\.\.\.\(targetCollection\.features \?\? \[\]\), featureToMove\]/)
     expect(tabSource).toContain('activeLayerId.value = targetLayer.id;')
     expect(tabSource).toContain("editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });")
+  })
+
+  it('supports checkbox-based batch deletion for active-layer features', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const editableSource = readSource(editableMapLibrePath)
+
+    expect(panelSource).toContain('selectedFeatureIds')
+    expect(panelSource).toContain(`$emit('toggle-feature-selection', feature.id)`)
+    expect(panelSource).toContain(`$emit('delete-selected-features')`)
+    expect(panelSource).toContain(`t('map.drawTab.labels.selectedFeatureCount'`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.deleteSelectedFeatures')`)
+    expect(tabSource).toContain('const selectedFeatureIds = ref([]);')
+    expect(tabSource).toContain(':selected-feature-ids="selectedFeatureIds"')
+    expect(tabSource).toContain('@toggle-feature-selection="handleToggleFeatureSelection"')
+    expect(tabSource).toContain('@delete-selected-features="handleDeleteSelectedFeatures"')
+    expect(tabSource).toContain('const handleToggleFeatureSelection = (featureId) =>')
+    expect(tabSource).toContain('const handleDeleteSelectedFeatures = () =>')
+    expect(tabSource).toMatch(/const handleDeleteSelectedFeatures = \(\) => \{[\s\S]*commitHistory\(\);/)
+    expect(tabSource).toContain('.filter((feature) => !featureIdsToDelete.has(getFeatureId(feature)));')
+    expect(tabSource).toContain('features: nextFeatures,')
+    expect(tabSource).toContain('selectedFeatureIds.value = [];')
+    expect(editableSource).toContain('const selectFeatures = (featureIds = []) =>')
+    expect(editableSource).toContain("draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })")
   })
 
   it('falls back to layer editing when selected feature id is stale', () => {
@@ -381,6 +408,19 @@ describe('Map draw editor contracts', () => {
     expect(zhCn.drawTab.labels.moveFeatureToLayer).toBe('移动到图层')
     expect(zhHant.drawTab.labels.moveFeatureToLayer).toBe('移動到圖層')
     expect(en.drawTab.labels.moveFeatureToLayer).toBe('Move to Layer')
+  })
+
+  it('has localized labels for feature batch actions', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.buttons.deleteSelectedFeatures).toBe('删除勾选要素')
+    expect(zhCn.drawTab.labels.selectedFeatureCount).toBe('已勾选 {count} 个')
+    expect(zhHant.drawTab.buttons.deleteSelectedFeatures).toBe('刪除勾選要素')
+    expect(zhHant.drawTab.labels.selectedFeatureCount).toBe('已勾選 {count} 個')
+    expect(en.drawTab.buttons.deleteSelectedFeatures).toBe('Delete Checked')
+    expect(en.drawTab.labels.selectedFeatureCount).toBe('{count} checked')
   })
 
   it('has localized layer row feature count labels', () => {
