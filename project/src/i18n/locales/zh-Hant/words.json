@@ -195,7 +195,17 @@
         "source": "來源",
         "table": "表",
         "status": "狀態",
-        "affectedRows": "影響行數"
+        "affectedRows": "影響行數",
+        "action": "動作",
+        "timestamp": "時間",
+        "payload": "操作摘要",
+        "rollback": "恢復"
+      },
+      "relativeTime": {
+        "justNow": "剛剛",
+        "minutesAgo": "{n} 分鐘前",
+        "hoursAgo": "{n} 小時前",
+        "daysAgo": "{n} 天前"
       },
       "payload": {
         "importedEntries": "本次導入 {count} 條",

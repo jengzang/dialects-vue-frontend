@@ -195,7 +195,17 @@
         "source": "来源",
         "table": "表",
         "status": "状态",
-        "affectedRows": "影响行数"
+        "affectedRows": "影响行数",
+        "action": "动作",
+        "timestamp": "时间",
+        "payload": "操作摘要",
+        "rollback": "恢复"
+      },
+      "relativeTime": {
+        "justNow": "刚刚",
+        "minutesAgo": "{n} 分钟前",
+        "hoursAgo": "{n} 小时前",
+        "daysAgo": "{n} 天前"
       },
       "payload": {
         "importedEntries": "本次导入 {count} 条",

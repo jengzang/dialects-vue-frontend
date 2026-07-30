@@ -195,7 +195,17 @@
         "source": "Source",
         "table": "Table",
         "status": "Status",
-        "affectedRows": "Affected rows"
+        "affectedRows": "Affected rows",
+        "action": "Action",
+        "timestamp": "Time",
+        "payload": "Summary",
+        "rollback": "Rollback"
+      },
+      "relativeTime": {
+        "justNow": "just now",
+        "minutesAgo": "{n} min ago",
+        "hoursAgo": "{n} hr ago",
+        "daysAgo": "{n} days ago"
       },
       "payload": {
         "importedEntries": "Imported {count} entries",

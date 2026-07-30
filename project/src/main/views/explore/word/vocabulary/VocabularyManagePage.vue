@@ -29,7 +29,7 @@
     </section>
 
     <router-view v-else v-slot="{ Component }">
-      <KeepAlive>
+      <KeepAlive :include="manageChildNames">
         <component
           :is="Component"
           :has-vocabulary-permission="hasVocabularyPermission"
@@ -51,6 +51,8 @@ import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+
+const manageChildNames = ['ManageEntriesSection', 'ManageLocationsSection', 'ManageLogsSection']
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },

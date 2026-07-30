@@ -30,38 +30,50 @@
         <p>{{ logsLoadError }}</p>
       </div>
 
-      <div v-else-if="isLoadingLogs" class="loading-state loading-state-base">
-        <div class="ui-loading--page" aria-hidden="true"></div>
-        <span>{{ t('words.wordList.states.loadingData') }}</span>
-      </div>
-
-      <div v-else-if="logRows.length" class="logs-list">
-        <article v-for="log in logRows" :key="log.id || log.operation_id" class="log-item">
-          <div class="log-item-head">
-            <strong>{{ log.action || '-' }}</strong>
-            <span>{{ log.created_at || '-' }}</span>
-          </div>
-          <div class="log-meta-grid">
-            <span>{{ t('words.wordList.logs.columns.userId') }}：{{ log.user_id || '-' }}</span>
-            <span>{{ t('words.wordList.logs.columns.permission') }}：{{ log.permission_level || '-' }}</span>
-            <span>{{ t('words.wordList.logs.columns.source') }}：{{ log.source || '-' }}</span>
-            <span>{{ t('words.wordList.logs.columns.table') }}：{{ log.table_name || '-' }}</span>
-            <span>{{ t('words.wordList.logs.columns.status') }}：{{ log.status || '-' }}</span>
-            <span>{{ t('words.wordList.logs.columns.affectedRows') }}：{{ log.affected_rows ?? '-' }}</span>
-          </div>
-          <div class="log-recovery-line">
-            <span :data-supported="log.rollbackSupported ? 'true' : 'false'">{{ log.rollbackLabel }}</span>
-          </div>
-          <ul v-if="log.payloadSummary.length" class="log-payload-list">
-            <li v-for="item in log.payloadSummary" :key="item">{{ item }}</li>
+      <GlassTable
+        v-else
+        :columns="logTableColumns"
+        :data="logRows"
+        row-key="id"
+        :loading="isLoadingLogs"
+        sortable
+        :sort-key="logSort.key"
+        :sort-order="logSort.order"
+        :empty-text="t('words.wordList.logs.empty')"
+        :loading-text="t('words.wordList.states.loadingData')"
+        @sort="handleLogSort"
+      >
+        <template #cell-action="{ value }">
+          <span class="log-action-badge" :data-action="value">{{ value || '-' }}</span>
+        </template>
+        <template #cell-created_at="{ value }">
+          <span class="log-timestamp" :title="value">{{ formatRelativeTime(value) }}</span>
+        </template>
+        <template #cell-status="{ value }">
+          <span class="log-status-badge" :data-status="value">{{ value || '-' }}</span>
+        </template>
+        <template #cell-_payload="{ row }">
+          <button
+            v-if="row.payloadSummary.length"
+            class="log-payload-toggle"
+            type="button"
+            @click="togglePayloadExpand(row)"
+          >
+            {{ row._payloadExpanded ? t('common.button.collapse') : t('common.button.expand') }}
+            ({{ row.payloadSummary.length }})
+          </button>
+          <span v-else>-</span>
+          <ul v-if="row._payloadExpanded && row.payloadSummary.length" class="log-payload-list">
+            <li v-for="item in row.payloadSummary" :key="item">{{ item }}</li>
           </ul>
-          <p v-if="log.target_scope">{{ log.target_scope }}</p>
-        </article>
-      </div>
-
-      <div v-else class="empty-state empty-state-base">
-        <p>{{ t('words.wordList.logs.empty') }}</p>
-      </div>
+        </template>
+        <template #cell-_rollback="{ row }">
+          <span
+            class="log-rollback-indicator"
+            :data-supported="row.rollbackSupported ? 'true' : 'false'"
+          >{{ row.rollbackLabel }}</span>
+        </template>
+      </GlassTable>
 
       <div class="pagination-row">
         <span>{{ t('words.wordList.pagination.total', { count: logPagination.total }) }}</span>
@@ -83,10 +95,15 @@
   </section>
 </template>
 
+<script>
+export default { name: 'ManageLogsSection' }
+</script>
+
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getVocabularyLogs } from '@/api'
+import GlassTable from '@/components/common/GlassTable.vue'
 
 const { t } = useI18n()
 const pageSizeOptions = [20, 50, 100, 200]
@@ -111,9 +128,22 @@ const logPagination = reactive({
   pageSize: 50,
   total: 0,
 })
+const logSort = reactive({ key: 'created_at', order: 'desc' })
 
 const canGoPreviousLogPage = computed(() => logPagination.page > 1)
 const canGoNextLogPage = computed(() => logPagination.page * logPagination.pageSize < logPagination.total)
+
+const logTableColumns = computed(() => [
+  { key: 'action', label: t('words.wordList.logs.columns.action'), width: '100px' },
+  { key: 'created_at', label: t('words.wordList.logs.columns.timestamp'), width: '150px' },
+  { key: 'user_id', label: t('words.wordList.logs.columns.userId'), width: '90px' },
+  { key: 'source', label: t('words.wordList.logs.columns.source'), width: '100px' },
+  { key: 'table_name', label: t('words.wordList.logs.columns.table'), width: '120px' },
+  { key: 'status', label: t('words.wordList.logs.columns.status'), width: '90px' },
+  { key: 'affected_rows', label: t('words.wordList.logs.columns.affectedRows'), width: '90px', align: 'right' },
+  { key: '_payload', label: t('words.wordList.logs.columns.payload') },
+  { key: '_rollback', label: t('words.wordList.logs.columns.rollback'), width: '140px' },
+])
 
 const logFilterFields = computed(() => [
   { key: 'user_id', label: t('words.wordList.logs.filters.userId') },
@@ -138,6 +168,8 @@ function buildLogQueryParams(overrides = {}) {
   return appendFilledFilters({
     page: logPagination.page,
     page_size: logPagination.pageSize,
+    sort_by: logSort.key,
+    sort_order: logSort.order,
     ...overrides,
   }, logFilters)
 }
@@ -232,7 +264,35 @@ function normalizeVocabularyLog(log) {
       ? t('words.wordList.logs.rollbackSupported')
       : t('words.wordList.logs.rollbackUnsupported'),
     payloadSummary: buildLogPayloadSummary(log, payload),
+    _payloadExpanded: false,
   }
+}
+
+function formatRelativeTime(isoString) {
+  if (!isoString) return '-'
+
+  const then = new Date(isoString)
+  if (isNaN(then.getTime())) return isoString
+
+  const now = Date.now()
+  const diffMs = now - then.getTime()
+  if (diffMs < 0) return isoString
+
+  const diffSec = Math.floor(diffMs / 1000)
+  if (diffSec < 60) return t('words.wordList.logs.relativeTime.justNow')
+
+  const diffMin = Math.floor(diffSec / 60)
+  if (diffMin < 60) return t('words.wordList.logs.relativeTime.minutesAgo', { n: diffMin })
+
+  const diffHr = Math.floor(diffMin / 60)
+  if (diffHr < 24) return t('words.wordList.logs.relativeTime.hoursAgo', { n: diffHr })
+
+  const diffDay = Math.floor(diffHr / 24)
+  return t('words.wordList.logs.relativeTime.daysAgo', { n: diffDay })
+}
+
+function togglePayloadExpand(row) {
+  row._payloadExpanded = !row._payloadExpanded
 }
 
 async function loadVocabularyLogs() {
@@ -276,6 +336,13 @@ function goToLogPage(delta) {
     return
   }
   logPagination.page = nextPage
+  loadVocabularyLogs()
+}
+
+function handleLogSort({ key, order }) {
+  logSort.key = key
+  logSort.order = order
+  logPagination.page = 1
   loadVocabularyLogs()
 }
 
