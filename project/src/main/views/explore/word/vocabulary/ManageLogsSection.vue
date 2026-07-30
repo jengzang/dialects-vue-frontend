@@ -82,12 +82,14 @@
             <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
           </select>
         </label>
-        <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLogPage" @click="goToLogPage(-1)">
-          {{ t('words.wordList.pagination.previous') }}
-        </button>
-        <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLogPage" @click="goToLogPage(1)">
-          {{ t('words.wordList.pagination.next') }}
-        </button>
+        <span class="pagination-nav-group">
+          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLogPage" @click="goToLogPage(-1)">
+            {{ t('words.wordList.pagination.previous') }}
+          </button>
+          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLogPage" @click="goToLogPage(1)">
+            {{ t('words.wordList.pagination.next') }}
+          </button>
+        </span>
       </div>
     </div>
   </section>

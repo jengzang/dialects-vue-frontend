@@ -405,6 +405,12 @@
   font-size: 0.9rem;
 }
 
+.pagination-nav-group {
+  display: inline-flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
 .page-size-select {
   display: inline-flex;
   gap: 6px;

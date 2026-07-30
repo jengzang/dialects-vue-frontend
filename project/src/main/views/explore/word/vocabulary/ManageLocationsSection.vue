@@ -64,12 +64,14 @@
             <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
           </select>
         </label>
-        <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLocationPage" @click="goToLocationPage(-1)">
-          {{ t('words.wordList.pagination.previous') }}
-        </button>
-        <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLocationPage" @click="goToLocationPage(1)">
-          {{ t('words.wordList.pagination.next') }}
-        </button>
+        <span class="pagination-nav-group">
+          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLocationPage" @click="goToLocationPage(-1)">
+            {{ t('words.wordList.pagination.previous') }}
+          </button>
+          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLocationPage" @click="goToLocationPage(1)">
+            {{ t('words.wordList.pagination.next') }}
+          </button>
+        </span>
       </div>
       <p v-if="locationsStatusText" class="upload-status">{{ locationsStatusText }}</p>
     </div>
