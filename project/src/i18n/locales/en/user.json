@@ -313,6 +313,15 @@
           "tree": "Includes various tree-based queries, such as the Guangdong natural-village hierarchy and Middle Chinese phonological categories.",
           "locations": "Includes retrieving details for individual locations and complete information about dialect regions."
         }
+      },
+      "vocabulary": {
+        "label": "Vocabulary Queries",
+        "items": {
+          "yubao": "Yubao Query",
+          "vocabSearch": "Vocabulary Search",
+          "vocabTable": "Vocabulary Table",
+          "vocabEdit": "Vocabulary Edit"
+        }
       }
     }
   }
