@@ -45,8 +45,8 @@
     "search": {
       "label": "Search",
       "placeholder": "Search definition, headword, pronunciation, or detail",
-      "standardWordPlaceholder": "Filter map by standard word",
-      "locationPlaceholder": "Filter current results by location",
+      "standardWordPlaceholder": "Filter by standard word",
+      "locationPlaceholder": "Filter by location",
       "fieldCount": "{count} columns",
       "fields": {
         "all": "All content",

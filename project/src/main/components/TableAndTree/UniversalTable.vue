@@ -1603,7 +1603,7 @@ $system-font:
   @include flex-col;
   gap: 6px;
   height: var(--ut-height, 85dvh);
-  width: 88dvw;
+  width: min(88dvw,100%);
   overflow: hidden;
 
   @media (max-aspect-ratio: 1 / 1) {

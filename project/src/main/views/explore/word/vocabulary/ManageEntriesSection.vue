@@ -1,5 +1,4 @@
 <template>
-  <section class="content-area">
     <UniversalTable
       db-key="vocabulary"
       table-name="vocabulary_entries"
@@ -9,7 +8,6 @@
       :can-edit="hasVocabularyPermission"
       :default-filter="defaultFilter"
     />
-  </section>
 </template>
 
 <script setup>

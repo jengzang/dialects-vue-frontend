@@ -220,9 +220,7 @@ export function useExploreBarConfig() {
             icon: '🌐',
             display: {
                 preset: 'compactDesktop',
-                overrides: {
-                    hideOnMobile: true
-                }
+                overrides: { mobileScroll: 'left', weightIconOnly: 0.4 }
             },
             navigation: {
                 defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }

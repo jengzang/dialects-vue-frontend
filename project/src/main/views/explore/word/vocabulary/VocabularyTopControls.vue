@@ -274,7 +274,7 @@ const standardWordTriggerLabel = computed(() => {
   padding: 10px 12px;
   color: var(--text-primary);
   background: var(--glass-10);
-  border: 1px solid var(--glass-30);
+  border: 1px solid var(--color-primary-border);
   border-radius: var(--radius-md, 8px);
   resize: vertical;
 }

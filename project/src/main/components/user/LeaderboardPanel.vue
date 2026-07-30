@@ -103,6 +103,30 @@ const categoryConfigs = computed(() => [
       }
     ]
   },
+    {
+    id: 'vocabulary',
+    icon: '📖',
+    label: t('user.leaderboard.categories.vocabulary.label'),
+    categoryKey: 'category_詞句查詢',
+    endpoints: [
+      {
+        key: 'endpoint_group_yubao',
+        label: t('user.leaderboard.categories.vocabulary.items.yubao')
+      },
+      {
+        key: 'endpoint_group_vocabulary_search',
+        label: t('user.leaderboard.categories.vocabulary.items.vocabSearch')
+      },
+      {
+        key: 'endpoint_group_vocabulary_table',
+        label: t('user.leaderboard.categories.vocabulary.items.vocabTable')
+      },
+      {
+        key: 'endpoint_group_vocabulary_edit',
+        label: t('user.leaderboard.categories.vocabulary.items.vocabEdit')
+      }
+    ]
+  },
   {
     id: 'tools',
     icon: '🛠️',
@@ -160,30 +184,6 @@ const categoryConfigs = computed(() => [
       },
     ]
   },
-  {
-    id: 'vocabulary',
-    icon: '📖',
-    label: t('user.leaderboard.categories.vocabulary.label'),
-    categoryKey: 'category_詞句查詢',
-    endpoints: [
-      {
-        key: 'endpoint_group_yubao',
-        label: t('user.leaderboard.categories.vocabulary.items.yubao')
-      },
-      {
-        key: 'endpoint_group_vocabulary_search',
-        label: t('user.leaderboard.categories.vocabulary.items.vocabSearch')
-      },
-      {
-        key: 'endpoint_group_vocabulary_table',
-        label: t('user.leaderboard.categories.vocabulary.items.vocabTable')
-      },
-      {
-        key: 'endpoint_group_vocabulary_edit',
-        label: t('user.leaderboard.categories.vocabulary.items.vocabEdit')
-      }
-    ]
-  }
 ])
 
 const fetchLeaderboard = async () => load(
