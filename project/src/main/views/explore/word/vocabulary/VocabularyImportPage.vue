@@ -61,8 +61,8 @@
           :header-row-index="importPreview.headerRowIndex.value"
           :sheets="importPreview.parsedFile.value?.sheets || []"
           @update:mapping="importFlow.updateManualMapping"
-          @update:selected-sheet-id="importPreview.selectedSheetId = $event"
-          @update:header-row-index="importPreview.headerRowIndex = $event"
+          @update:selected-sheet-id="importPreview.selectedSheetId.value = $event"
+          @update:header-row-index="importPreview.headerRowIndex.value = $event"
           @reset="importFlow.clearPreview"
           @confirm="handleConfirmUpload"
         />
@@ -203,6 +203,7 @@ import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue'
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -485,12 +486,15 @@ async function useYindianLocationData() {
     const detail = getLocationDetailRow(response)
     if (!detail) {
       uploadLocationEditorStatus.value = t('words.wordList.upload.yindianNotFound')
+      showWarning(uploadLocationEditorStatus.value)
       return
     }
     applyYindianLocationDetail(detail)
     uploadLocationEditorStatus.value = t('words.wordList.upload.yindianFilled')
+    showSuccess(uploadLocationEditorStatus.value)
   } catch (error) {
     uploadLocationEditorStatus.value = error.message || t('words.wordList.upload.yindianFailed')
+    showError(uploadLocationEditorStatus.value)
   } finally {
     isLoadingYindianLocation.value = false
   }
@@ -513,6 +517,7 @@ function handleDrop(event) {
 
   if (!isVocabularyUploadFile(file)) {
     uploadStatusText.value = t('words.wordList.upload.unsupportedFile')
+    showWarning(uploadStatusText.value)
     return
   }
 
@@ -533,6 +538,7 @@ function handleUploadFile(event) {
 
   if (!isVocabularyUploadFile(file)) {
     uploadStatusText.value = t('words.wordList.upload.unsupportedFile')
+    showWarning(uploadStatusText.value)
     event.target.value = ''
     return
   }
@@ -567,11 +573,13 @@ async function handlePreviewImport() {
 
   if (!location.location_name || !location.coordinates) {
     uploadStatusText.value = t('words.wordList.upload.missingLocation')
+    showWarning(t('words.wordList.upload.missingLocation'))
     return
   }
 
   if (!canUploadVocabulary.value) {
     uploadStatusText.value = t('words.wordList.upload.permissionRequired')
+    showWarning(uploadStatusText.value)
     return
   }
 
@@ -586,18 +594,27 @@ async function handlePreviewImport() {
       parser_mode: uploadParserMode.value,
     })
     backendPreview.value = previewResponse
-    uploadStatusText.value = previewResponse.success
-      ? t('words.wordList.upload.previewReady')
-      : (previewResponse.errors?.join('；') || t('words.wordList.upload.previewFailed'))
+    if (previewResponse.success) {
+      uploadStatusText.value = t('words.wordList.upload.previewReady')
+    } else {
+      uploadStatusText.value = previewResponse.errors?.join('；') || t('words.wordList.upload.previewFailed')
+      showError(uploadStatusText.value)
+    }
   } catch (error) {
     uploadStatusText.value = error.message || t('words.wordList.upload.previewFailed')
+    showError(uploadStatusText.value)
   } finally {
     isPreviewingImport.value = false
   }
 }
 
 async function handleConfirmUpload() {
+  const file = importFlow.pendingFile.value
   await handlePreviewImport()
+  if (backendPreview.value?.success && file) {
+    uploadFile.value = file
+    importFlow.pendingFile.value = null
+  }
 }
 
 async function handleImportAfterPreview() {
@@ -611,6 +628,7 @@ async function handleImportAfterPreview() {
 
   if (!location.location_name || !location.coordinates) {
     uploadStatusText.value = t('words.wordList.upload.missingLocation')
+    showWarning(t('words.wordList.upload.missingLocation'))
     return
   }
 
@@ -625,9 +643,11 @@ async function handleImportAfterPreview() {
       overwrite: shouldConfirmOverwrite.value ? isOverwriteConfirmed.value : false,
     })
     uploadStatusText.value = t('words.wordList.upload.success', { count: response.imported_count || 0 })
+    showSuccess(uploadStatusText.value)
     clearUploadFile()
   } catch (error) {
     uploadStatusText.value = error.message || t('words.wordList.upload.failed')
+    showError(uploadStatusText.value)
   } finally {
     isUploading.value = false
   }
