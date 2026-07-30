@@ -57,7 +57,12 @@
           :preview-table="importPreview.previewTable.value"
           :diagnostics="importPreview.diagnostics.value"
           :mapping="importPreview.mapping.value"
+          :selected-sheet-id="importPreview.selectedSheetId.value"
+          :header-row-index="importPreview.headerRowIndex.value"
+          :sheets="importPreview.parsedFile.value?.sheets || []"
           @update:mapping="importFlow.updateManualMapping"
+          @update:selected-sheet-id="importPreview.selectedSheetId = $event"
+          @update:header-row-index="importPreview.headerRowIndex = $event"
           @reset="importFlow.clearPreview"
           @confirm="handleConfirmUpload"
         />

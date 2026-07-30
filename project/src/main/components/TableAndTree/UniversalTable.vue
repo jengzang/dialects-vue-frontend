@@ -2275,6 +2275,7 @@ td {
 }
 
 .field-input {
+  color: var(--text-deep);
   flex: 1;
   padding: 10px 12px;
   border-radius: var(--radius-md);
