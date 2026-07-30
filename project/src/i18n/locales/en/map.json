@@ -401,11 +401,19 @@
     }
   },
   "vocabularyMap": {
+    "loading": {
+      "mapData": "Loading vocabulary map data..."
+    },
     "controls": {
       "overview": "Overview",
       "location": "Location",
       "pronunciation": "Pronunciation",
       "definition": "Local Word"
+    },
+    "buttons": {
+      "reset": "Reset",
+      "fullscreen": "Fullscreen",
+      "exitFullscreen": "Exit fullscreen"
     }
   },
   "villageMapPopup": {

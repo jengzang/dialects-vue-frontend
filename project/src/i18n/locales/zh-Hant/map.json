@@ -401,11 +401,19 @@
     }
   },
   "vocabularyMap": {
+    "loading": {
+      "mapData": "載入詞表地圖資料中..."
+    },
     "controls": {
       "overview": "概覽",
       "location": "地點",
       "pronunciation": "語音",
       "definition": "方言詞"
+    },
+    "buttons": {
+      "reset": "復位",
+      "fullscreen": "全屏",
+      "exitFullscreen": "退出全屏"
     }
   },
   "villageMapPopup": {

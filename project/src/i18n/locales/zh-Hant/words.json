@@ -50,6 +50,21 @@
       "table": "表格",
       "map": "地圖"
     },
+    "states": {
+      "loadingData": "加載數據中...",
+      "loadingCards": "加載卡片中...",
+      "loadingMore": "加載更多",
+      "noData": "暫無詞表數據",
+      "loadItemsFailed": "獲取詞表條目失敗",
+      "loadMapFailed": "獲取詞表地圖點失敗"
+    },
+    "pagination": {
+      "total": "共 {count} 條",
+      "page": "第 {page} 頁",
+      "pageSize": "每頁",
+      "previous": "上一頁",
+      "next": "下一頁"
+    },
     "columns": {
       "headword": "詞條",
       "definition": "釋義",
@@ -108,6 +123,11 @@
       "missingLocation": "請先填寫地點簡稱和經緯度。",
       "unsupportedFile": "請上傳支持的詞表文件（.xlsx、.xls、.csv、.tsv、.docx、.doc）。",
       "previewFailed": "詞表導入預覽失敗",
+      "useYindianData": "使用音典數據",
+      "mapPickerHint": "點擊地圖獲取經緯度",
+      "yindianNotFound": "未找到音典數據",
+      "yindianFilled": "已填入音典數據",
+      "yindianFailed": "獲取音典數據失敗",
       "success": "上傳完成，導入 {count} 條。",
       "failed": "上傳詞表失敗"
     },
@@ -116,8 +136,14 @@
       "desc": "管理當前權限範圍內的詞表地點元數據。",
       "refresh": "刷新地點",
       "save": "保存",
+      "empty": "暫無地點信息",
+      "loadFailed": "獲取詞表地點信息失敗",
       "saveSuccess": "地點信息已保存。",
-      "saveFailed": "保存地點信息失敗"
+      "saveFailed": "保存地點信息失敗",
+      "filters": {
+        "userId": "用戶 ID",
+        "locationName": "地點簡稱"
+      }
     },
     "logs": {
       "title": "操作日誌",

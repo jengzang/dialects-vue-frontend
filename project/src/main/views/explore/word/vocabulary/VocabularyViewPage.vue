@@ -104,7 +104,7 @@
     <section v-if="viewMode !== 'table'" class="content-area">
       <div v-if="isLoadingItems" class="loading-state loading-state-base">
         <div class="ui-loading--page" aria-hidden="true"></div>
-        <span>{{ t('words.yuBaoPage.states.loadingCards') }}</span>
+        <span>{{ t('words.wordList.states.loadingCards') }}</span>
       </div>
 
       <div v-else-if="loadError" class="empty-state empty-state-base">
@@ -135,11 +135,11 @@
           </article>
         </div>
         <div v-else class="empty-state empty-state-base">
-          <p>{{ t('words.yuBaoPage.states.noData') }}</p>
+          <p>{{ t('words.wordList.states.noData') }}</p>
         </div>
       </div>
 
-      <div v-else-if="viewMode === 'map'" class="map-mode main-glass-panel">
+      <div v-else-if="viewMode === 'map'" class="map-mode">
         <div class="map-canvas-shell">
           <VocabularyMap
             v-if="mapDataForVocabularyMap.length"
@@ -149,7 +149,7 @@
             @marker-click="handleMapPointClick"
           />
           <div v-else class="empty-state empty-state-base map-empty-state">
-            <p>{{ t('words.yuBaoPage.states.noData') }}</p>
+            <p>{{ t('words.wordList.states.noData') }}</p>
           </div>
         </div>
       </div>
@@ -161,7 +161,7 @@
         type="button"
         @click="loadVocabularyItems({ append: true })"
       >
-        {{ t('words.yuBaoPage.states.loadingMore') }}
+        {{ t('words.wordList.states.loadingMore') }}
       </button>
     </section>
 
@@ -181,7 +181,7 @@
       width="720px"
       max-height="80dvh"
       :title="selectedMapPointLabel"
-      close-label="關閉"
+      :close-label="t('common.button.close')"
       @close="clearMapDetailModal"
     >
       <div class="map-detail-modal">
@@ -190,7 +190,7 @@
         </p>
         <div v-if="isLoadingMapDetail" class="loading-state loading-state-base">
           <div class="ui-loading--page" aria-hidden="true"></div>
-          <span>{{ t('words.yuBaoPage.states.loadingData') }}</span>
+          <span>{{ t('words.wordList.states.loadingData') }}</span>
         </div>
         <div v-else-if="mapDetailError" class="empty-state empty-state-base">
           <p>{{ mapDetailError }}</p>
@@ -211,11 +211,11 @@
             type="button"
             @click="loadMoreMapDetail"
           >
-            {{ t('words.yuBaoPage.states.loadingMore') }}
+            {{ t('words.wordList.states.loadingMore') }}
           </button>
         </div>
         <div v-else class="empty-state empty-state-base">
-          <p>{{ t('words.yuBaoPage.states.noData') }}</p>
+          <p>{{ t('words.wordList.states.noData') }}</p>
         </div>
       </div>
     </AppModal>
@@ -563,7 +563,7 @@ async function loadVocabularyItems({ append = false } = {}) {
     page.value = Number(response.page) || nextPage
     pageSize.value = Number(response.page_size) || pageSize.value
   } catch (error) {
-    loadError.value = error.message || '獲取詞表條目失敗'
+    loadError.value = error.message || t('words.wordList.states.loadItemsFailed')
     if (!append) {
       entries.value = []
       total.value = 0
@@ -597,7 +597,7 @@ async function loadVocabularyMapPoints() {
       omittedWithoutCoordinates: Number(response.omitted_without_coordinates) || 0,
     }
   } catch (error) {
-    loadError.value = error.message || '獲取詞表地圖點失敗'
+    loadError.value = error.message || t('words.wordList.states.loadMapFailed')
     mapPoints.value = []
     mapStats.value = {
       totalEntries: 0,
@@ -695,7 +695,7 @@ async function handleMapPointClick(point) {
     mapDetailPage.value = Number(response.page) || 1
     selectedMapPointLabel.value = buildMapDetailTitle(baseLabel, mapDetailEntries.value.length)
   } catch (error) {
-    mapDetailError.value = error.message || '獲取詞表條目失敗'
+    mapDetailError.value = error.message || t('words.wordList.states.loadItemsFailed')
     mapDetailEntries.value = []
   } finally {
     isLoadingMapDetail.value = false
@@ -725,7 +725,7 @@ async function loadMoreMapDetail() {
     mapDetailPage.value = Number(response.page) || nextPage
     selectedMapPointLabel.value = buildMapDetailTitle(activeMapPointBaseLabel.value, mapDetailEntries.value.length)
   } catch (error) {
-    mapDetailError.value = error.message || '獲取詞表條目失敗'
+    mapDetailError.value = error.message || t('words.wordList.states.loadItemsFailed')
   } finally {
     isLoadingMapDetail.value = false
   }

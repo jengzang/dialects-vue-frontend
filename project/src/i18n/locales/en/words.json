@@ -50,6 +50,21 @@
       "table": "Table",
       "map": "Map"
     },
+    "states": {
+      "loadingData": "Loading data...",
+      "loadingCards": "Loading cards...",
+      "loadingMore": "Load more",
+      "noData": "No vocabulary data",
+      "loadItemsFailed": "Failed to load vocabulary entries",
+      "loadMapFailed": "Failed to load vocabulary map points"
+    },
+    "pagination": {
+      "total": "{count} total",
+      "page": "Page {page}",
+      "pageSize": "Per page",
+      "previous": "Previous",
+      "next": "Next"
+    },
     "columns": {
       "headword": "Headword",
       "definition": "Definition",
@@ -108,6 +123,11 @@
       "missingLocation": "Fill in location name and coordinates first.",
       "unsupportedFile": "Upload a supported vocabulary file (.xlsx, .xls, .csv, .tsv, .docx, .doc).",
       "previewFailed": "Vocabulary import preview failed",
+      "useYindianData": "Use Yindian data",
+      "mapPickerHint": "Click the map to pick coordinates",
+      "yindianNotFound": "No Yindian data found",
+      "yindianFilled": "Yindian data filled in",
+      "yindianFailed": "Failed to get Yindian data",
       "success": "Upload complete. Imported {count} rows.",
       "failed": "Upload failed"
     },
@@ -116,8 +136,14 @@
       "desc": "Manage vocabulary location metadata within your permission scope.",
       "refresh": "Refresh locations",
       "save": "Save",
+      "empty": "No location metadata",
+      "loadFailed": "Failed to load vocabulary location metadata",
       "saveSuccess": "Location metadata saved.",
-      "saveFailed": "Failed to save location metadata"
+      "saveFailed": "Failed to save location metadata",
+      "filters": {
+        "userId": "User ID",
+        "locationName": "Location name"
+      }
     },
     "logs": {
       "title": "Operation Logs",

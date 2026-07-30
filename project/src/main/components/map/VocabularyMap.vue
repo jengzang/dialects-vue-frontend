@@ -1,10 +1,10 @@
 <template>
-  <div class="yubao-map-container" :class="{ 'is-fullscreen': isFullScreen }">
+  <div class="vocabulary-map-container" :class="{ 'is-fullscreen': isFullScreen }">
     <div ref="mapContainer" class="map-container">
       <div v-if="isLoadingMarkers" class="map-loading-overlay">
         <div class="loading-content">
           <div class="ui-loading--page" aria-hidden="true"></div>
-          <span class="loading-text">{{ t('map.yuBaoMap.loading.mapData') }}</span>
+          <span class="loading-text">{{ t('map.vocabularyMap.loading.mapData') }}</span>
         </div>
       </div>
 
@@ -30,18 +30,18 @@
         </div>
 
         <div class="button-row">
-          <button class="action-btn" @click="resetView" :title="t('map.yuBaoMap.buttons.reset')">
-            🎯 {{ t('map.yuBaoMap.buttons.reset') }}
+          <button class="action-btn" @click="resetView" :title="t('map.vocabularyMap.buttons.reset')">
+            {{ t('map.vocabularyMap.buttons.reset') }}
           </button>
-          <button class="action-btn fullscreen-btn" @click="toggleFullScreen" :title="t('map.yuBaoMap.buttons.fullscreen')">
-            ⛶ {{ t('map.yuBaoMap.buttons.fullscreen') }}
+          <button class="action-btn fullscreen-btn" @click="toggleFullScreen" :title="t('map.vocabularyMap.buttons.fullscreen')">
+            {{ t('map.vocabularyMap.buttons.fullscreen') }}
           </button>
         </div>
       </div>
     </div>
 
     <button v-if="isFullScreen" class="exit-fullscreen-btn" @click="toggleFullScreen">
-      ✕ {{ t('map.yuBaoMap.buttons.exitFullscreen') }}
+      {{ t('map.vocabularyMap.buttons.exitFullscreen') }}
     </button>
 
   </div>
@@ -408,7 +408,7 @@ const renderMarkers = async () => {
   // console.log('✅ GeoJSON features:', geojsonData.features.length)
 
   // 更新 source 数据
-  const source = map.value.getSource('yubao-markers')
+  const source = map.value.getSource('vocabulary-markers')
   if (source) {
     source.setData(geojsonData)
   }
@@ -465,7 +465,7 @@ const handleStyleChange = () => {
   const newStyle = mapStyle(currentStyleKey.value)
 
   // 保存当前数据
-  const currentData = map.value.getSource('yubao-markers')?._data
+  const currentData = map.value.getSource('vocabulary-markers')?._data
 
   map.value.setStyle(newStyle)
 
@@ -474,7 +474,7 @@ const handleStyleChange = () => {
     if (!currentData) return
 
     // 重新添加 source
-    map.value.addSource('yubao-markers', {
+    map.value.addSource('vocabulary-markers', {
       type: 'geojson',
       data: currentData,
       cluster: true,
@@ -484,9 +484,9 @@ const handleStyleChange = () => {
 
     // 重新添加所有 layers（复用 initMap 中的代码）
     map.value.addLayer({
-      id: 'yubao-clusters',
+      id: 'vocabulary-clusters',
       type: 'circle',
-      source: 'yubao-markers',
+      source: 'vocabulary-markers',
       filter: ['has', 'point_count'],
       paint: {
         'circle-color': [
@@ -514,9 +514,9 @@ const handleStyleChange = () => {
     })
 
     map.value.addLayer({
-      id: 'yubao-cluster-count',
+      id: 'vocabulary-cluster-count',
       type: 'symbol',
-      source: 'yubao-markers',
+      source: 'vocabulary-markers',
       filter: ['has', 'point_count'],
       layout: {
         'text-field': '{point_count_abbreviated}',
@@ -529,9 +529,9 @@ const handleStyleChange = () => {
     })
 
     map.value.addLayer({
-      id: 'yubao-unclustered-bg',
+      id: 'vocabulary-unclustered-bg',
       type: 'circle',
-      source: 'yubao-markers',
+      source: 'vocabulary-markers',
       filter: ['!', ['has', 'point_count']],
       paint: {
         'circle-radius': 18,
@@ -543,9 +543,9 @@ const handleStyleChange = () => {
     })
 
     map.value.addLayer({
-      id: 'yubao-unclustered-text',
+      id: 'vocabulary-unclustered-text',
       type: 'symbol',
-      source: 'yubao-markers',
+      source: 'vocabulary-markers',
       filter: ['!', ['has', 'point_count']],
       layout: {
         'text-field': ['get', 'label'],
@@ -588,7 +588,7 @@ const initMap = () => {
     // 添加 GeoJSON source（带聚类）
     const geojsonData = convertToGeoJSON(props.mapData)
 
-    map.value.addSource('yubao-markers', {
+    map.value.addSource('vocabulary-markers', {
       type: 'geojson',
       data: geojsonData,
       cluster: true,
@@ -598,9 +598,9 @@ const initMap = () => {
 
     // 1. 聚类圆圈图层
     map.value.addLayer({
-      id: 'yubao-clusters',
+      id: 'vocabulary-clusters',
       type: 'circle',
-      source: 'yubao-markers',
+      source: 'vocabulary-markers',
       filter: ['has', 'point_count'],
       paint: {
         'circle-color': [
@@ -629,9 +629,9 @@ const initMap = () => {
 
     // 2. 聚类数量文字图层
     map.value.addLayer({
-      id: 'yubao-cluster-count',
+      id: 'vocabulary-cluster-count',
       type: 'symbol',
-      source: 'yubao-markers',
+      source: 'vocabulary-markers',
       filter: ['has', 'point_count'],
       layout: {
         'text-field': '{point_count_abbreviated}',
@@ -645,9 +645,9 @@ const initMap = () => {
 
     // 3. 未聚类点的圆形背景
     map.value.addLayer({
-      id: 'yubao-unclustered-bg',
+      id: 'vocabulary-unclustered-bg',
       type: 'circle',
-      source: 'yubao-markers',
+      source: 'vocabulary-markers',
       filter: ['!', ['has', 'point_count']],
       paint: {
         'circle-radius': 18,
@@ -660,9 +660,9 @@ const initMap = () => {
 
     // 4. 未聚类点的文字
     map.value.addLayer({
-      id: 'yubao-unclustered-text',
+      id: 'vocabulary-unclustered-text',
       type: 'symbol',
-      source: 'yubao-markers',
+      source: 'vocabulary-markers',
       filter: ['!', ['has', 'point_count']],
       layout: {
         'text-field': ['get', 'label'],
@@ -676,15 +676,15 @@ const initMap = () => {
     })
 
     // 点击聚类时放大
-    map.value.on('click', 'yubao-clusters', (e) => {
+    map.value.on('click', 'vocabulary-clusters', (e) => {
       const features = map.value.queryRenderedFeatures(e.point, {
-        layers: ['yubao-clusters']
+        layers: ['vocabulary-clusters']
       })
 
       if (!features.length) return
 
       const clusterId = features[0].properties.cluster_id
-      map.value.getSource('yubao-markers').getClusterExpansionZoom(
+      map.value.getSource('vocabulary-markers').getClusterExpansionZoom(
         clusterId,
         (err, zoom) => {
           if (err) return
@@ -698,7 +698,7 @@ const initMap = () => {
     })
 
     // 点击未聚类点时显示弹窗
-    map.value.on('click', 'yubao-unclustered-bg', (e) => {
+    map.value.on('click', 'vocabulary-unclustered-bg', (e) => {
       if (e.features.length > 0) {
         const properties = e.features[0].properties
         handleMarkerClick(properties)
@@ -706,20 +706,20 @@ const initMap = () => {
     })
 
     // Hover 效果 - 聚类
-    map.value.on('mouseenter', 'yubao-clusters', () => {
+    map.value.on('mouseenter', 'vocabulary-clusters', () => {
       map.value.getCanvas().style.cursor = 'pointer'
     })
 
-    map.value.on('mouseleave', 'yubao-clusters', () => {
+    map.value.on('mouseleave', 'vocabulary-clusters', () => {
       map.value.getCanvas().style.cursor = ''
     })
 
     // Hover 效果 - 未聚类点
-    map.value.on('mouseenter', 'yubao-unclustered-bg', () => {
+    map.value.on('mouseenter', 'vocabulary-unclustered-bg', () => {
       map.value.getCanvas().style.cursor = 'pointer'
     })
 
-    map.value.on('mouseleave', 'yubao-unclustered-bg', () => {
+    map.value.on('mouseleave', 'vocabulary-unclustered-bg', () => {
       map.value.getCanvas().style.cursor = ''
     })
 
@@ -767,17 +767,17 @@ watch(displayModeOptions, () => {
 
 
 <style scoped lang="scss">
-.yubao-map-container {
+.vocabulary-map-container {
   width: 100%;
   height: 100%;
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.yubao-map-container.is-fullscreen {
+.vocabulary-map-container.is-fullscreen {
   position: fixed;
   top: 0;
   left: 0;
@@ -1000,7 +1000,7 @@ watch(displayModeOptions, () => {
 
 
 /* 全局样式 - 标记 */
-.yubao-marker {
+.vocabulary-marker {
   padding: 4px 8px;
   border-radius: var(--radius-sm);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);

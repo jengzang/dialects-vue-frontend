@@ -21,16 +21,35 @@
           </button>
         </div>
 
+        <form class="manage-filter-grid locations-filter-grid" @submit.prevent="applyLocationFilters">
+          <label class="upload-field">
+            <span>{{ t('words.wordList.locations.filters.userId') }}</span>
+            <input v-model="locationFilters.user_id" type="text" :placeholder="t('words.wordList.locations.filters.userId')" />
+          </label>
+          <label class="upload-field">
+            <span>{{ t('words.wordList.locations.filters.locationName') }}</span>
+            <input v-model="locationFilters.location_name" type="text" :placeholder="t('words.wordList.locations.filters.locationName')" />
+          </label>
+          <div class="filter-actions">
+            <button class="main-glass-button" data-variant="primary" type="submit">
+              {{ t('common.button.search') }}
+            </button>
+            <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLocationFilters">
+              {{ t('common.button.reset') }}
+            </button>
+          </div>
+        </form>
+
         <div v-if="locationsLoadError" class="empty-state empty-state-base">
           <p>{{ locationsLoadError }}</p>
         </div>
 
         <div v-else-if="isLoadingLocations" class="loading-state loading-state-base">
           <div class="ui-loading--page" aria-hidden="true"></div>
-          <span>{{ t('words.yuBaoPage.states.loadingData') }}</span>
+          <span>{{ t('words.wordList.states.loadingData') }}</span>
         </div>
 
-        <div v-else class="locations-list">
+        <div v-else-if="locationRows.length" class="locations-list">
           <article v-for="location in locationRows" :key="`${location.user_id || ''}-${location.location_name}`" class="location-item">
             <div class="location-item-head">
               <div>
@@ -42,6 +61,25 @@
               </button>
             </div>
           </article>
+        </div>
+        <div v-else class="empty-state empty-state-base">
+          <p>{{ t('words.wordList.locations.empty') }}</p>
+        </div>
+        <div class="pagination-row">
+          <span>{{ t('words.wordList.pagination.total', { count: locationPagination.total }) }}</span>
+          <span>{{ t('words.wordList.pagination.page', { page: locationPagination.page }) }}</span>
+          <label class="page-size-select">
+            <span>{{ t('words.wordList.pagination.pageSize') }}</span>
+            <select v-model.number="locationPagination.pageSize" @change="applyLocationFilters">
+              <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
+            </select>
+          </label>
+          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLocationPage" @click="goToLocationPage(-1)">
+            {{ t('words.wordList.pagination.previous') }}
+          </button>
+          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLocationPage" @click="goToLocationPage(1)">
+            {{ t('words.wordList.pagination.next') }}
+          </button>
         </div>
         <p v-if="locationsStatusText" class="upload-status">{{ locationsStatusText }}</p>
       </div>
@@ -59,13 +97,28 @@
           </button>
         </div>
 
+        <form class="manage-filter-grid logs-filter-grid" @submit.prevent="applyLogFilters">
+          <label v-for="field in logFilterFields" :key="field.key" class="upload-field">
+            <span>{{ field.label }}</span>
+            <input v-model="logFilters[field.key]" type="text" :placeholder="field.label" />
+          </label>
+          <div class="filter-actions">
+            <button class="main-glass-button" data-variant="primary" type="submit">
+              {{ t('common.button.search') }}
+            </button>
+            <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLogFilters">
+              {{ t('common.button.reset') }}
+            </button>
+          </div>
+        </form>
+
         <div v-if="logsLoadError" class="empty-state empty-state-base">
           <p>{{ logsLoadError }}</p>
         </div>
 
         <div v-else-if="isLoadingLogs" class="loading-state loading-state-base">
           <div class="ui-loading--page" aria-hidden="true"></div>
-          <span>{{ t('words.yuBaoPage.states.loadingData') }}</span>
+          <span>{{ t('words.wordList.states.loadingData') }}</span>
         </div>
 
         <div v-else-if="logRows.length" class="logs-list">
@@ -94,6 +147,23 @@
 
         <div v-else class="empty-state empty-state-base">
           <p>{{ t('words.wordList.logs.empty') }}</p>
+        </div>
+
+        <div class="pagination-row">
+          <span>{{ t('words.wordList.pagination.total', { count: logPagination.total }) }}</span>
+          <span>{{ t('words.wordList.pagination.page', { page: logPagination.page }) }}</span>
+          <label class="page-size-select">
+            <span>{{ t('words.wordList.pagination.pageSize') }}</span>
+            <select v-model.number="logPagination.pageSize" @change="applyLogFilters">
+              <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
+            </select>
+          </label>
+          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLogPage" @click="goToLogPage(-1)">
+            {{ t('words.wordList.pagination.previous') }}
+          </button>
+          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLogPage" @click="goToLogPage(1)">
+            {{ t('words.wordList.pagination.next') }}
+          </button>
         </div>
       </div>
     </section>
@@ -135,13 +205,14 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getVocabularyLocations, getVocabularyLogs, getVocabularyMe, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 
 const { t } = useI18n()
+const pageSizeOptions = [20, 50, 100, 200]
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
@@ -161,10 +232,36 @@ const logRows = ref([])
 const isLocationEditorOpen = ref(false)
 const editingLocationSource = ref(null)
 const editingLocationDraft = ref(null)
+const locationFilters = reactive({
+  user_id: '',
+  location_name: '',
+})
+const locationPagination = reactive({
+  page: 1,
+  pageSize: 50,
+  total: 0,
+})
+const logFilters = reactive({
+  user_id: '',
+  permission_level: '',
+  source: '',
+  action: '',
+  table_name: '',
+  status: '',
+})
+const logPagination = reactive({
+  page: 1,
+  pageSize: 50,
+  total: 0,
+})
 
 const effectiveVocabularyMe = computed(() => props.vocabularyMe || localVocabularyMe.value)
 const hasVocabularyPermission = computed(() => Boolean(effectiveVocabularyMe.value?.permission_level))
 const canViewVocabularyLogs = computed(() => effectiveVocabularyMe.value?.can_view_logs === true)
+const canGoPreviousLocationPage = computed(() => locationPagination.page > 1)
+const canGoNextLocationPage = computed(() => locationPagination.page * locationPagination.pageSize < locationPagination.total)
+const canGoPreviousLogPage = computed(() => logPagination.page > 1)
+const canGoNextLogPage = computed(() => logPagination.page * logPagination.pageSize < logPagination.total)
 
 const tableColumns = computed(() => [
   { key: 'standard_word', label: t('words.wordList.columns.definition'), filterable: false, width: 1.2 },
@@ -174,6 +271,15 @@ const tableColumns = computed(() => [
   { key: 'location_name', label: t('words.wordList.columns.location'), filterable: true, width: 1 },
   { key: 'informations', label: t('words.wordList.columns.informations'), filterable: false, width: 1.2 },
   { key: 'source_filename', label: t('words.wordList.columns.sourceFilename'), filterable: true, width: 1.2 }
+])
+
+const logFilterFields = computed(() => [
+  { key: 'user_id', label: t('words.wordList.logs.filters.userId') },
+  { key: 'permission_level', label: t('words.wordList.logs.filters.permission') },
+  { key: 'source', label: t('words.wordList.logs.filters.source') },
+  { key: 'action', label: t('words.wordList.logs.filters.action') },
+  { key: 'table_name', label: t('words.wordList.logs.filters.table') },
+  { key: 'status', label: t('words.wordList.logs.filters.status') },
 ])
 
 async function ensureVocabularyMe() {
@@ -197,21 +303,75 @@ const locationEditFields = computed(() => [
   { key: 'atlas_region', label: t('words.wordList.upload.atlasRegion') },
 ])
 
+function appendFilledFilters(target, filters) {
+  Object.entries(filters).forEach(([key, value]) => {
+    const normalized = String(value || '').trim()
+    if (normalized) {
+      target[key] = normalized
+    }
+  })
+  return target
+}
+
+function buildLocationQueryParams(overrides = {}) {
+  return appendFilledFilters({
+    page: locationPagination.page,
+    page_size: locationPagination.pageSize,
+    ...overrides,
+  }, locationFilters)
+}
+
+function buildLogQueryParams(overrides = {}) {
+  return appendFilledFilters({
+    page: logPagination.page,
+    page_size: logPagination.pageSize,
+    ...overrides,
+  }, logFilters)
+}
+
 async function loadVocabularyLocations() {
   isLoadingLocations.value = true
   locationsLoadError.value = ''
 
   try {
-    const response = await getVocabularyLocations({ page: 1, page_size: 200 })
+    const params = buildLocationQueryParams()
+    const response = await getVocabularyLocations(params)
     locationRows.value = Array.isArray(response.locations)
       ? response.locations.map((location) => ({ ...location }))
       : []
+    locationPagination.total = Number(response.total) || locationRows.value.length
+    locationPagination.page = Number(response.page) || params.page
+    locationPagination.pageSize = Number(response.page_size) || params.page_size
   } catch (error) {
-    locationsLoadError.value = error.message || '獲取詞表地點信息失敗'
+    locationsLoadError.value = error.message || t('words.wordList.locations.loadFailed')
     locationRows.value = []
+    locationPagination.total = 0
   } finally {
     isLoadingLocations.value = false
   }
+}
+
+function applyLocationFilters() {
+  locationPagination.page = 1
+  return loadVocabularyLocations()
+}
+
+function resetLocationFilters() {
+  locationFilters.user_id = ''
+  locationFilters.location_name = ''
+  return applyLocationFilters()
+}
+
+function goToLocationPage(delta) {
+  const nextPage = locationPagination.page + delta
+  if (nextPage < 1) {
+    return
+  }
+  if (delta > 0 && !canGoNextLocationPage.value) {
+    return
+  }
+  locationPagination.page = nextPage
+  loadVocabularyLocations()
 }
 
 function openLocationEditor(location) {
@@ -354,14 +514,43 @@ async function loadVocabularyLogs() {
   logsLoadError.value = ''
 
   try {
-    const response = await getVocabularyLogs({ page: 1, page_size: 50 })
+    const params = buildLogQueryParams()
+    const response = await getVocabularyLogs(params)
     logRows.value = Array.isArray(response.logs) ? response.logs.map(normalizeVocabularyLog) : []
+    logPagination.total = Number(response.total) || logRows.value.length
+    logPagination.page = Number(response.page) || params.page
+    logPagination.pageSize = Number(response.page_size) || params.page_size
   } catch (error) {
     logsLoadError.value = error.message || t('words.wordList.logs.loadFailed')
     logRows.value = []
+    logPagination.total = 0
   } finally {
     isLoadingLogs.value = false
   }
+}
+
+function applyLogFilters() {
+  logPagination.page = 1
+  return loadVocabularyLogs()
+}
+
+function resetLogFilters() {
+  Object.keys(logFilters).forEach((key) => {
+    logFilters[key] = ''
+  })
+  return applyLogFilters()
+}
+
+function goToLogPage(delta) {
+  const nextPage = logPagination.page + delta
+  if (nextPage < 1) {
+    return
+  }
+  if (delta > 0 && !canGoNextLogPage.value) {
+    return
+  }
+  logPagination.page = nextPage
+  loadVocabularyLogs()
 }
 
 onMounted(() => {

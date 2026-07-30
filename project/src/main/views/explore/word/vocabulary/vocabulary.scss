@@ -1,25 +1,18 @@
 .vocabulary-page {
-  width: 90dvw!important;
+  width: 90dvw;
+  max-width: 1200px;
   min-height: 100%;
+  margin: 0 auto;
   padding: 16px 20px 24px;
   color: var(--text-primary);
 }
 
 .top-controls {
-  position: sticky;
-  top: 0;
-  z-index: 20;
   display: flex;
   flex-wrap: nowrap;
   gap: 12px;
-  align-items: center;
-  padding: 12px;
-  margin: 0 auto 16px;
-  background: var(--glass-20);
-  border: 1px solid var(--glass-30);
-  border-radius: var(--radius-lg, 8px);
-  box-shadow: var(--shadow-soft, 0 8px 24px rgba(0, 0, 0, 0.08));
-  backdrop-filter: blur(10px);
+  align-items: stretch;
+  margin: 0 auto 24px;
 }
 
 .page-tab-navigation {
@@ -211,6 +204,21 @@
   margin: 0 auto;
 }
 
+.vocabulary-view-page > .content-area {
+  min-height: 300px;
+  padding: 16px;
+  overflow: auto;
+  background: var(--glass-60);
+  border: 0.5px solid var(--glass-80);
+  border-radius: var(--radius-lg, 8px);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.06),
+    0 2px 6px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 var(--glass-90);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+}
+
 .table-content-area {
   width: 100%;
 }
@@ -220,7 +228,7 @@
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 16px;
   min-height: 100px;
-  padding: 4px;
+  padding: 0;
 }
 
 .card {
@@ -440,6 +448,50 @@
   background: var(--glass-10);
   border: 1px solid var(--glass-30);
   border-radius: var(--radius-md, 8px);
+}
+
+.manage-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  align-items: end;
+  padding: 12px;
+  background: var(--glass-10);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-md, 8px);
+}
+
+.filter-actions,
+.pagination-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.filter-actions {
+  justify-content: flex-end;
+}
+
+.pagination-row {
+  justify-content: flex-end;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.page-size-select {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.page-size-select select {
+  min-height: 32px;
+  padding: 4px 8px;
+  color: var(--text-primary);
+  background: var(--glass-10);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-sm2, 6px);
 }
 
 .upload-status {

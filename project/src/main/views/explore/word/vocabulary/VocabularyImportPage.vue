@@ -119,7 +119,7 @@
             :disabled="isLoadingYindianLocation || !uploadLocationDraft.location_name.trim()"
             @click="useYindianLocationData"
           >
-            {{ isLoadingYindianLocation ? t('common.label.loading') : '使用音典数据' }}
+            {{ isLoadingYindianLocation ? t('common.label.loading') : t('words.wordList.upload.useYindianData') }}
           </button>
           <span v-if="uploadLocationEditorStatus">{{ uploadLocationEditorStatus }}</span>
         </div>
@@ -144,7 +144,7 @@
               :visible="isUploadLocationEditorOpen"
               mode="picker"
               :points="uploadLocationMapPoints"
-              hint-text="点击地图获取经纬度"
+              :hint-text="t('words.wordList.upload.mapPickerHint')"
             />
           </div>
         </div>
@@ -428,13 +428,13 @@ async function useYindianLocationData() {
     const response = await getLocationDetail(locationName)
     const detail = getLocationDetailRow(response)
     if (!detail) {
-      uploadLocationEditorStatus.value = '未找到音典数据'
+      uploadLocationEditorStatus.value = t('words.wordList.upload.yindianNotFound')
       return
     }
     applyYindianLocationDetail(detail)
-    uploadLocationEditorStatus.value = '已填入音典数据'
+    uploadLocationEditorStatus.value = t('words.wordList.upload.yindianFilled')
   } catch (error) {
-    uploadLocationEditorStatus.value = error.message || '获取音典数据失败'
+    uploadLocationEditorStatus.value = error.message || t('words.wordList.upload.yindianFailed')
   } finally {
     isLoadingYindianLocation.value = false
   }
