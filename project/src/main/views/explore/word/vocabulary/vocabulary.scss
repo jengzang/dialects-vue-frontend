@@ -219,6 +219,35 @@
   -webkit-backdrop-filter: blur(30px) saturate(180%);
 }
 
+.access-gate {
+  display: grid;
+  gap: 12px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 28px;
+  text-align: center;
+}
+
+.access-gate h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.access-gate p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.access-gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
 .table-content-area {
   width: 100%;
 }

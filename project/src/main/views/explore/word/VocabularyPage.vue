@@ -21,16 +21,19 @@
       :vocabulary-me="vocabularyMe"
       :is-loading-vocabulary-me="isLoadingVocabularyMe"
       :vocabulary-me-error="vocabularyMeError"
+      :is-authenticated="isAuthenticated"
+      :is-auth-ready="isAuthReady"
     />
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { getVocabularyMe } from '@/api'
 import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
+import { userStore } from '@/main/store/store.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -39,6 +42,8 @@ const router = useRouter()
 const vocabularyMe = ref(null)
 const isLoadingVocabularyMe = ref(false)
 const vocabularyMeError = ref('')
+const isAuthReady = computed(() => userStore.authReady)
+const isAuthenticated = computed(() => userStore.isAuthenticated)
 const pageTabs = computed(() => {
   return [
     { label: t('words.wordList.tabs.list'), path: '/explore/vocabulary/view' },
@@ -47,20 +52,36 @@ const pageTabs = computed(() => {
   ]
 })
 
+function createEmptyVocabularyMe() {
+  return {
+    user_id: null,
+    permission_level: null,
+    can_upload: false,
+    can_manage_entries: false,
+    can_view_logs: false,
+  }
+}
+
 async function loadVocabularyMe() {
+  if (!userStore.authReady) {
+    isLoadingVocabularyMe.value = true
+    return
+  }
+
+  if (!userStore.isAuthenticated) {
+    vocabularyMe.value = createEmptyVocabularyMe()
+    vocabularyMeError.value = ''
+    isLoadingVocabularyMe.value = false
+    return
+  }
+
   isLoadingVocabularyMe.value = true
   vocabularyMeError.value = ''
 
   try {
     vocabularyMe.value = await getVocabularyMe()
   } catch (error) {
-    vocabularyMe.value = {
-      user_id: null,
-      permission_level: null,
-      can_upload: false,
-      can_manage_entries: false,
-      can_view_logs: false,
-    }
+    vocabularyMe.value = createEmptyVocabularyMe()
     vocabularyMeError.value = error.message || ''
   } finally {
     isLoadingVocabularyMe.value = false
@@ -75,9 +96,13 @@ function navigateTo(path) {
   router.push(buildLocalePath(resolveRouteLocale(route), path))
 }
 
-onMounted(() => {
-  loadVocabularyMe()
-})
+watch(
+  () => [userStore.authReady, userStore.isAuthenticated, userStore.id, userStore.role],
+  () => {
+    loadVocabularyMe()
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped lang="scss" src="./vocabulary/vocabulary.scss"></style>

@@ -12,6 +12,7 @@ const checkToolPath = resolve(projectRoot, 'src/main/views/explore/tools/CheckTo
 const mergeToolPath = resolve(projectRoot, 'src/main/views/explore/tools/MergeTool.vue')
 const jyut2IpaToolPath = resolve(projectRoot, 'src/main/views/explore/tools/Jyut2IpaTool.vue')
 const voronoiCustomImportPath = resolve(projectRoot, 'src/main/components/map/Draw/modals/VoronoiCustomImportModal.vue')
+const vocabularyImportPath = resolve(projectRoot, 'src/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
 const enCommonLocalePath = resolve(projectRoot, 'src/i18n/locales/en/common.json')
 const zhCnToolsLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-CN/tools.json')
 const zhHantToolsLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-Hant/tools.json')
@@ -211,5 +212,14 @@ describe('tabular import preview modal shell', () => {
       expect(source).toContain(`@update:selected-sheet-id="${state}.selectedSheetId.value = $event"`)
       expect(source).toContain(`@update:header-row-index="${state}.headerRowIndex.value = $event"`)
     }
+  })
+
+  it('passes unwrapped vocabulary import preview refs into TabularImportPreview', () => {
+    const source = readSource(vocabularyImportPath)
+
+    expect(source).toContain(':loading="importPreview.loading.value"')
+    expect(source).toContain(':preview-table="importPreview.previewTable.value"')
+    expect(source).toContain(':diagnostics="importPreview.diagnostics.value"')
+    expect(source).toContain(':mapping="importPreview.mapping.value"')
   })
 })

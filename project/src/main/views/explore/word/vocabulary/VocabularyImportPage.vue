@@ -1,6 +1,27 @@
 <template>
   <div class="vocabulary-import-page">
-    <section class="content-area">
+    <section v-if="shouldShowAccessGate" class="content-area">
+      <div class="access-gate main-glass-panel">
+        <h3>{{ accessGateTitle }}</h3>
+        <p>{{ accessGateDescription }}</p>
+        <div class="access-gate-actions">
+          <button
+            v-if="requiresLogin"
+            class="main-glass-button"
+            data-variant="primary"
+            type="button"
+            @click="navigateToAuth()"
+          >
+            {{ t('words.wordList.access.loginAction') }}
+          </button>
+          <button class="main-glass-button" data-variant="secondary" type="button" @click="navigateToList">
+            {{ t('words.wordList.access.backToList') }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section v-else class="content-area">
       <div class="upload-mode main-glass-panel">
         <div class="upload-head">
           <div>
@@ -47,10 +68,10 @@
           :file="selectedUploadFile"
           :schema="importSchema"
           :mapping-enabled="isVocabularyPreviewFile(selectedUploadFile)"
-          :loading="importPreview.loading"
-          :preview-table="importPreview.previewTable"
-          :diagnostics="importPreview.diagnostics"
-          :mapping="importPreview.mapping"
+          :loading="importPreview.loading.value"
+          :preview-table="importPreview.previewTable.value"
+          :diagnostics="importPreview.diagnostics.value"
+          :mapping="importPreview.mapping.value"
           @update:mapping="importFlow.updateManualMapping"
           @reset="clearUploadFile"
           @confirm="handleConfirmUpload"
@@ -168,23 +189,56 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 import { getLocationDetail, previewVocabularyImport, uploadVocabulary } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue'
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
   isLoadingVocabularyMe: { type: Boolean, default: false },
   vocabularyMeError: { type: String, default: '' },
+  isAuthenticated: { type: Boolean, default: false },
+  isAuthReady: { type: Boolean, default: false },
 })
 
 const canUploadVocabulary = computed(() => props.vocabularyMe?.can_upload === true)
+const isWaitingForAuth = computed(() => !props.isAuthReady || props.isLoadingVocabularyMe)
+const requiresLogin = computed(() => props.isAuthReady && !props.isAuthenticated)
+const requiresVocabularyPermission = computed(() => (
+  props.isAuthReady
+  && props.isAuthenticated
+  && !props.isLoadingVocabularyMe
+  && !canUploadVocabulary.value
+  && !props.vocabularyMeError
+))
+const shouldShowAccessGate = computed(() => (
+  isWaitingForAuth.value
+  || requiresLogin.value
+  || requiresVocabularyPermission.value
+  || Boolean(props.vocabularyMeError)
+))
+const accessGateTitle = computed(() => {
+  if (isWaitingForAuth.value) return t('words.wordList.access.loadingTitle')
+  if (requiresLogin.value) return t('words.wordList.access.loginUploadTitle')
+  if (props.vocabularyMeError) return t('words.wordList.access.permissionLoadFailedTitle')
+  return t('words.wordList.access.noUploadPermissionTitle')
+})
+const accessGateDescription = computed(() => {
+  if (isWaitingForAuth.value) return t('words.wordList.access.loadingDesc')
+  if (requiresLogin.value) return t('words.wordList.access.loginUploadDesc')
+  if (props.vocabularyMeError) return props.vocabularyMeError
+  return t('words.wordList.access.noUploadPermissionDesc')
+})
 const isUploading = ref(false)
 const isPreviewingImport = ref(false)
 const uploadStatusText = ref('')
@@ -476,6 +530,17 @@ watch([uploadParserMode, selectedUploadFile, uploadLocation], () => {
 
 function buildUploadLocation() {
   return normalizeUploadLocation(uploadLocation.value)
+}
+
+function navigateToAuth() {
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+    query: { view: 'login', redirect: route.fullPath }
+  })
+}
+
+function navigateToList() {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/vocabulary/view'))
 }
 
 async function handlePreviewImport() {

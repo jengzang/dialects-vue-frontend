@@ -1,172 +1,195 @@
 <template>
   <div class="vocabulary-manage-page">
-    <section v-if="hasVocabularyPermission" class="content-area">
-      <UniversalTable
-        db-key="vocabulary"
-        table-name="vocabulary_entries"
-        :columns="tableColumns"
-        primary-key="id"
-        api-adapter="vocabulary"
-        :can-edit="hasVocabularyPermission"
-      />
-
-      <div class="locations-mode main-glass-panel">
-        <div class="locations-head">
-          <div>
-            <h3>{{ t('words.wordList.locations.title') }}</h3>
-            <p>{{ t('words.wordList.locations.desc') }}</p>
-          </div>
-          <button class="main-glass-button" data-variant="secondary" type="button" @click="loadVocabularyLocations">
-            {{ t('words.wordList.locations.refresh') }}
+    <section v-if="shouldShowAccessGate" class="content-area">
+      <div class="access-gate main-glass-panel">
+        <h3>{{ accessGateTitle }}</h3>
+        <p>{{ accessGateDescription }}</p>
+        <div class="access-gate-actions">
+          <button
+            v-if="requiresLogin"
+            class="main-glass-button"
+            data-variant="primary"
+            type="button"
+            @click="navigateToAuth()"
+          >
+            {{ t('words.wordList.access.loginAction') }}
+          </button>
+          <button class="main-glass-button" data-variant="secondary" type="button" @click="navigateToList">
+            {{ t('words.wordList.access.backToList') }}
           </button>
         </div>
+      </div>
+    </section>
 
-        <form class="manage-filter-grid locations-filter-grid" @submit.prevent="applyLocationFilters">
-          <label class="upload-field">
-            <span>{{ t('words.wordList.locations.filters.userId') }}</span>
-            <input v-model="locationFilters.user_id" type="text" :placeholder="t('words.wordList.locations.filters.userId')" />
-          </label>
-          <label class="upload-field">
-            <span>{{ t('words.wordList.locations.filters.locationName') }}</span>
-            <input v-model="locationFilters.location_name" type="text" :placeholder="t('words.wordList.locations.filters.locationName')" />
-          </label>
-          <div class="filter-actions">
-            <button class="main-glass-button" data-variant="primary" type="submit">
-              {{ t('common.button.search') }}
-            </button>
-            <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLocationFilters">
-              {{ t('common.button.reset') }}
+    <template v-else>
+      <section v-if="hasVocabularyPermission" class="content-area">
+        <UniversalTable
+          db-key="vocabulary"
+          table-name="vocabulary_entries"
+          :columns="tableColumns"
+          primary-key="id"
+          api-adapter="vocabulary"
+          :can-edit="hasVocabularyPermission"
+        />
+
+        <div class="locations-mode main-glass-panel">
+          <div class="locations-head">
+            <div>
+              <h3>{{ t('words.wordList.locations.title') }}</h3>
+              <p>{{ t('words.wordList.locations.desc') }}</p>
+            </div>
+            <button class="main-glass-button" data-variant="secondary" type="button" @click="loadVocabularyLocations">
+              {{ t('words.wordList.locations.refresh') }}
             </button>
           </div>
-        </form>
 
-        <div v-if="locationsLoadError" class="empty-state empty-state-base">
-          <p>{{ locationsLoadError }}</p>
-        </div>
-
-        <div v-else-if="isLoadingLocations" class="loading-state loading-state-base">
-          <div class="ui-loading--page" aria-hidden="true"></div>
-          <span>{{ t('words.wordList.states.loadingData') }}</span>
-        </div>
-
-        <div v-else-if="locationRows.length" class="locations-list">
-          <article v-for="location in locationRows" :key="`${location.user_id || ''}-${location.location_name}`" class="location-item">
-            <div class="location-item-head">
-              <div>
-                <strong>{{ location.location_name }}</strong>
-                <p>{{ location.location_label || location.location_name }}</p>
-              </div>
-              <button class="main-glass-button" data-variant="primary" type="button" @click="openLocationEditor(location)">
-                {{ t('common.button.edit') }}
+          <form class="manage-filter-grid locations-filter-grid" @submit.prevent="applyLocationFilters">
+            <label class="upload-field">
+              <span>{{ t('words.wordList.locations.filters.userId') }}</span>
+              <input v-model="locationFilters.user_id" type="text" :placeholder="t('words.wordList.locations.filters.userId')" />
+            </label>
+            <label class="upload-field">
+              <span>{{ t('words.wordList.locations.filters.locationName') }}</span>
+              <input v-model="locationFilters.location_name" type="text" :placeholder="t('words.wordList.locations.filters.locationName')" />
+            </label>
+            <div class="filter-actions">
+              <button class="main-glass-button" data-variant="primary" type="submit">
+                {{ t('common.button.search') }}
+              </button>
+              <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLocationFilters">
+                {{ t('common.button.reset') }}
               </button>
             </div>
-          </article>
-        </div>
-        <div v-else class="empty-state empty-state-base">
-          <p>{{ t('words.wordList.locations.empty') }}</p>
-        </div>
-        <div class="pagination-row">
-          <span>{{ t('words.wordList.pagination.total', { count: locationPagination.total }) }}</span>
-          <span>{{ t('words.wordList.pagination.page', { page: locationPagination.page }) }}</span>
-          <label class="page-size-select">
-            <span>{{ t('words.wordList.pagination.pageSize') }}</span>
-            <select v-model.number="locationPagination.pageSize" @change="applyLocationFilters">
-              <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
-            </select>
-          </label>
-          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLocationPage" @click="goToLocationPage(-1)">
-            {{ t('words.wordList.pagination.previous') }}
-          </button>
-          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLocationPage" @click="goToLocationPage(1)">
-            {{ t('words.wordList.pagination.next') }}
-          </button>
-        </div>
-        <p v-if="locationsStatusText" class="upload-status">{{ locationsStatusText }}</p>
-      </div>
-    </section>
+          </form>
 
-    <section v-if="canViewVocabularyLogs" class="content-area">
-      <div class="logs-mode main-glass-panel">
-        <div class="locations-head">
-          <div>
-            <h3>{{ t('words.wordList.logs.title') }}</h3>
-            <p>{{ t('words.wordList.logs.desc') }}</p>
+          <div v-if="locationsLoadError" class="empty-state empty-state-base">
+            <p>{{ locationsLoadError }}</p>
           </div>
-          <button class="main-glass-button" data-variant="secondary" type="button" @click="loadVocabularyLogs">
-            {{ t('words.wordList.logs.refresh') }}
-          </button>
-        </div>
 
-        <form class="manage-filter-grid logs-filter-grid" @submit.prevent="applyLogFilters">
-          <label v-for="field in logFilterFields" :key="field.key" class="upload-field">
-            <span>{{ field.label }}</span>
-            <input v-model="logFilters[field.key]" type="text" :placeholder="field.label" />
-          </label>
-          <div class="filter-actions">
-            <button class="main-glass-button" data-variant="primary" type="submit">
-              {{ t('common.button.search') }}
+          <div v-else-if="isLoadingLocations" class="loading-state loading-state-base">
+            <div class="ui-loading--page" aria-hidden="true"></div>
+            <span>{{ t('words.wordList.states.loadingData') }}</span>
+          </div>
+
+          <div v-else-if="locationRows.length" class="locations-list">
+            <article v-for="location in locationRows" :key="`${location.user_id || ''}-${location.location_name}`" class="location-item">
+              <div class="location-item-head">
+                <div>
+                  <strong>{{ location.location_name }}</strong>
+                  <p>{{ location.location_label || location.location_name }}</p>
+                </div>
+                <button class="main-glass-button" data-variant="primary" type="button" @click="openLocationEditor(location)">
+                  {{ t('common.button.edit') }}
+                </button>
+              </div>
+            </article>
+          </div>
+          <div v-else class="empty-state empty-state-base">
+            <p>{{ t('words.wordList.locations.empty') }}</p>
+          </div>
+          <div class="pagination-row">
+            <span>{{ t('words.wordList.pagination.total', { count: locationPagination.total }) }}</span>
+            <span>{{ t('words.wordList.pagination.page', { page: locationPagination.page }) }}</span>
+            <label class="page-size-select">
+              <span>{{ t('words.wordList.pagination.pageSize') }}</span>
+              <select v-model.number="locationPagination.pageSize" @change="applyLocationFilters">
+                <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
+              </select>
+            </label>
+            <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLocationPage" @click="goToLocationPage(-1)">
+              {{ t('words.wordList.pagination.previous') }}
             </button>
-            <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLogFilters">
-              {{ t('common.button.reset') }}
+            <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLocationPage" @click="goToLocationPage(1)">
+              {{ t('words.wordList.pagination.next') }}
             </button>
           </div>
-        </form>
-
-        <div v-if="logsLoadError" class="empty-state empty-state-base">
-          <p>{{ logsLoadError }}</p>
+          <p v-if="locationsStatusText" class="upload-status">{{ locationsStatusText }}</p>
         </div>
+      </section>
 
-        <div v-else-if="isLoadingLogs" class="loading-state loading-state-base">
-          <div class="ui-loading--page" aria-hidden="true"></div>
-          <span>{{ t('words.wordList.states.loadingData') }}</span>
-        </div>
-
-        <div v-else-if="logRows.length" class="logs-list">
-          <article v-for="log in logRows" :key="log.id || log.operation_id" class="log-item">
-            <div class="log-item-head">
-              <strong>{{ log.action || '-' }}</strong>
-              <span>{{ log.created_at || '-' }}</span>
+      <section v-if="canViewVocabularyLogs" class="content-area">
+        <div class="logs-mode main-glass-panel">
+          <div class="locations-head">
+            <div>
+              <h3>{{ t('words.wordList.logs.title') }}</h3>
+              <p>{{ t('words.wordList.logs.desc') }}</p>
             </div>
-            <div class="log-meta-grid">
-              <span>{{ t('words.wordList.logs.columns.userId') }}：{{ log.user_id || '-' }}</span>
-              <span>{{ t('words.wordList.logs.columns.permission') }}：{{ log.permission_level || '-' }}</span>
-              <span>{{ t('words.wordList.logs.columns.source') }}：{{ log.source || '-' }}</span>
-              <span>{{ t('words.wordList.logs.columns.table') }}：{{ log.table_name || '-' }}</span>
-              <span>{{ t('words.wordList.logs.columns.status') }}：{{ log.status || '-' }}</span>
-              <span>{{ t('words.wordList.logs.columns.affectedRows') }}：{{ log.affected_rows ?? '-' }}</span>
-            </div>
-            <div class="log-recovery-line">
-              <span :data-supported="log.rollbackSupported ? 'true' : 'false'">{{ log.rollbackLabel }}</span>
-            </div>
-            <ul v-if="log.payloadSummary.length" class="log-payload-list">
-              <li v-for="item in log.payloadSummary" :key="item">{{ item }}</li>
-            </ul>
-            <p v-if="log.target_scope">{{ log.target_scope }}</p>
-          </article>
-        </div>
+            <button class="main-glass-button" data-variant="secondary" type="button" @click="loadVocabularyLogs">
+              {{ t('words.wordList.logs.refresh') }}
+            </button>
+          </div>
 
-        <div v-else class="empty-state empty-state-base">
-          <p>{{ t('words.wordList.logs.empty') }}</p>
-        </div>
+          <form class="manage-filter-grid logs-filter-grid" @submit.prevent="applyLogFilters">
+            <label v-for="field in logFilterFields" :key="field.key" class="upload-field">
+              <span>{{ field.label }}</span>
+              <input v-model="logFilters[field.key]" type="text" :placeholder="field.label" />
+            </label>
+            <div class="filter-actions">
+              <button class="main-glass-button" data-variant="primary" type="submit">
+                {{ t('common.button.search') }}
+              </button>
+              <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLogFilters">
+                {{ t('common.button.reset') }}
+              </button>
+            </div>
+          </form>
 
-        <div class="pagination-row">
-          <span>{{ t('words.wordList.pagination.total', { count: logPagination.total }) }}</span>
-          <span>{{ t('words.wordList.pagination.page', { page: logPagination.page }) }}</span>
-          <label class="page-size-select">
-            <span>{{ t('words.wordList.pagination.pageSize') }}</span>
-            <select v-model.number="logPagination.pageSize" @change="applyLogFilters">
-              <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
-            </select>
-          </label>
-          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLogPage" @click="goToLogPage(-1)">
-            {{ t('words.wordList.pagination.previous') }}
-          </button>
-          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLogPage" @click="goToLogPage(1)">
-            {{ t('words.wordList.pagination.next') }}
-          </button>
+          <div v-if="logsLoadError" class="empty-state empty-state-base">
+            <p>{{ logsLoadError }}</p>
+          </div>
+
+          <div v-else-if="isLoadingLogs" class="loading-state loading-state-base">
+            <div class="ui-loading--page" aria-hidden="true"></div>
+            <span>{{ t('words.wordList.states.loadingData') }}</span>
+          </div>
+
+          <div v-else-if="logRows.length" class="logs-list">
+            <article v-for="log in logRows" :key="log.id || log.operation_id" class="log-item">
+              <div class="log-item-head">
+                <strong>{{ log.action || '-' }}</strong>
+                <span>{{ log.created_at || '-' }}</span>
+              </div>
+              <div class="log-meta-grid">
+                <span>{{ t('words.wordList.logs.columns.userId') }}：{{ log.user_id || '-' }}</span>
+                <span>{{ t('words.wordList.logs.columns.permission') }}：{{ log.permission_level || '-' }}</span>
+                <span>{{ t('words.wordList.logs.columns.source') }}：{{ log.source || '-' }}</span>
+                <span>{{ t('words.wordList.logs.columns.table') }}：{{ log.table_name || '-' }}</span>
+                <span>{{ t('words.wordList.logs.columns.status') }}：{{ log.status || '-' }}</span>
+                <span>{{ t('words.wordList.logs.columns.affectedRows') }}：{{ log.affected_rows ?? '-' }}</span>
+              </div>
+              <div class="log-recovery-line">
+                <span :data-supported="log.rollbackSupported ? 'true' : 'false'">{{ log.rollbackLabel }}</span>
+              </div>
+              <ul v-if="log.payloadSummary.length" class="log-payload-list">
+                <li v-for="item in log.payloadSummary" :key="item">{{ item }}</li>
+              </ul>
+              <p v-if="log.target_scope">{{ log.target_scope }}</p>
+            </article>
+          </div>
+
+          <div v-else class="empty-state empty-state-base">
+            <p>{{ t('words.wordList.logs.empty') }}</p>
+          </div>
+
+          <div class="pagination-row">
+            <span>{{ t('words.wordList.pagination.total', { count: logPagination.total }) }}</span>
+            <span>{{ t('words.wordList.pagination.page', { page: logPagination.page }) }}</span>
+            <label class="page-size-select">
+              <span>{{ t('words.wordList.pagination.pageSize') }}</span>
+              <select v-model.number="logPagination.pageSize" @change="applyLogFilters">
+                <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
+              </select>
+            </label>
+            <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLogPage" @click="goToLogPage(-1)">
+              {{ t('words.wordList.pagination.previous') }}
+            </button>
+            <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLogPage" @click="goToLogPage(1)">
+              {{ t('words.wordList.pagination.next') }}
+            </button>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </template>
 
     <AppModal
       v-model="isLocationEditorOpen"
@@ -205,19 +228,25 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 import { getVocabularyLocations, getVocabularyLogs, getVocabularyMe, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 const pageSizeOptions = [20, 50, 100, 200]
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
   isLoadingVocabularyMe: { type: Boolean, default: false },
   vocabularyMeError: { type: String, default: '' },
+  isAuthenticated: { type: Boolean, default: false },
+  isAuthReady: { type: Boolean, default: false },
 })
 
 const localVocabularyMe = ref(null)
@@ -258,6 +287,33 @@ const logPagination = reactive({
 const effectiveVocabularyMe = computed(() => props.vocabularyMe || localVocabularyMe.value)
 const hasVocabularyPermission = computed(() => Boolean(effectiveVocabularyMe.value?.permission_level))
 const canViewVocabularyLogs = computed(() => effectiveVocabularyMe.value?.can_view_logs === true)
+const isWaitingForAuth = computed(() => !props.isAuthReady || props.isLoadingVocabularyMe)
+const requiresLogin = computed(() => props.isAuthReady && !props.isAuthenticated)
+const requiresVocabularyPermission = computed(() => (
+  props.isAuthReady
+  && props.isAuthenticated
+  && !props.isLoadingVocabularyMe
+  && !hasVocabularyPermission.value
+  && !props.vocabularyMeError
+))
+const shouldShowAccessGate = computed(() => (
+  isWaitingForAuth.value
+  || requiresLogin.value
+  || requiresVocabularyPermission.value
+  || Boolean(props.vocabularyMeError)
+))
+const accessGateTitle = computed(() => {
+  if (isWaitingForAuth.value) return t('words.wordList.access.loadingTitle')
+  if (requiresLogin.value) return t('words.wordList.access.loginManageTitle')
+  if (props.vocabularyMeError) return t('words.wordList.access.permissionLoadFailedTitle')
+  return t('words.wordList.access.noManagePermissionTitle')
+})
+const accessGateDescription = computed(() => {
+  if (isWaitingForAuth.value) return t('words.wordList.access.loadingDesc')
+  if (requiresLogin.value) return t('words.wordList.access.loginManageDesc')
+  if (props.vocabularyMeError) return props.vocabularyMeError
+  return t('words.wordList.access.noManagePermissionDesc')
+})
 const canGoPreviousLocationPage = computed(() => locationPagination.page > 1)
 const canGoNextLocationPage = computed(() => locationPagination.page * locationPagination.pageSize < locationPagination.total)
 const canGoPreviousLogPage = computed(() => logPagination.page > 1)
@@ -553,7 +609,27 @@ function goToLogPage(delta) {
   loadVocabularyLogs()
 }
 
-onMounted(() => {
+function navigateToAuth() {
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+    query: { view: 'login', redirect: route.fullPath }
+  })
+}
+
+function navigateToList() {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/vocabulary/view'))
+}
+
+watch(() => [
+  props.isAuthReady,
+  props.isAuthenticated,
+  props.vocabularyMe?.permission_level,
+  props.vocabularyMe?.can_view_logs,
+], () => {
+  if (shouldShowAccessGate.value) {
+    return
+  }
+
   ensureVocabularyMe().catch(() => null).finally(() => {
     if (hasVocabularyPermission.value) {
       loadVocabularyLocations()
@@ -562,7 +638,7 @@ onMounted(() => {
       loadVocabularyLogs()
     }
   })
-})
+}, { immediate: true })
 </script>
 
 <style scoped lang="scss" src="./vocabulary.scss"></style>

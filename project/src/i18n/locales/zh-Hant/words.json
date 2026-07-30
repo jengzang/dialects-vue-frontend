@@ -20,6 +20,21 @@
       "locations": "地點",
       "manage": "管理"
     },
+    "access": {
+      "loadingTitle": "正在確認詞表權限",
+      "loadingDesc": "請稍候，系統正在同步當前登入狀態。",
+      "loginUploadTitle": "登入後上傳詞表",
+      "loginUploadDesc": "上傳詞表需要登入，並獲得詞表 edit 或 manage 權限。",
+      "loginManageTitle": "登入後管理詞表",
+      "loginManageDesc": "詞表管理、地點元數據和操作日誌需要登入後查看。",
+      "noUploadPermissionTitle": "暫無詞表上傳權限",
+      "noUploadPermissionDesc": "當前賬號尚未開通詞表 edit 或 manage 權限，請聯繫管理員。",
+      "noManagePermissionTitle": "暫無詞表管理權限",
+      "noManagePermissionDesc": "當前賬號尚未開通詞表 edit 或 manage 權限，請聯繫管理員。",
+      "permissionLoadFailedTitle": "詞表權限狀態加載失敗",
+      "loginAction": "去登入",
+      "backToList": "返回詞表"
+    },
     "search": {
       "label": "搜索",
       "placeholder": "搜索釋義、詞條、發音、詳情",

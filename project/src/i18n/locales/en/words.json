@@ -20,6 +20,21 @@
       "locations": "Locations",
       "manage": "Manage"
     },
+    "access": {
+      "loadingTitle": "Checking vocabulary access",
+      "loadingDesc": "Please wait while the current sign-in state is synced.",
+      "loginUploadTitle": "Sign in to upload vocabulary",
+      "loginUploadDesc": "Uploading vocabulary requires signing in and having vocabulary edit or manage access.",
+      "loginManageTitle": "Sign in to manage vocabulary",
+      "loginManageDesc": "Vocabulary management, location metadata, and operation logs require signing in.",
+      "noUploadPermissionTitle": "No vocabulary upload access",
+      "noUploadPermissionDesc": "This account does not have vocabulary edit or manage access. Please contact an administrator.",
+      "noManagePermissionTitle": "No vocabulary management access",
+      "noManagePermissionDesc": "This account does not have vocabulary edit or manage access. Please contact an administrator.",
+      "permissionLoadFailedTitle": "Failed to load vocabulary access",
+      "loginAction": "Sign in",
+      "backToList": "Back to vocabulary"
+    },
     "search": {
       "label": "Search",
       "placeholder": "Search definition, headword, pronunciation, or detail",
