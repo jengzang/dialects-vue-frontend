@@ -15,44 +15,41 @@
 
         <div class="field-filter">
           <button
-            ref="searchFieldTriggerEl"
-            class="select-trigger global-select-trigger filter-select-trigger"
-            :class="{ 'is-open': searchFieldDropdownOpen }"
+            class="gear-btn main-glass-button"
             type="button"
-            @click="searchFieldDropdownOpen = !searchFieldDropdownOpen"
+            :title="t('words.wordList.search.settings')"
+            @click="searchFieldModalOpen = true"
           >
-            <span class="select-label">{{ searchFieldTriggerLabel }}</span>
-            <span
-              class="select-arrow"
-              aria-hidden="true"
-            >⌄</span>
+            <span aria-hidden="true">⚙️</span>
           </button>
-          <MultiSelectDropdown
-            v-if="searchFieldDropdownOpen"
-            :model-value="selectedSearchFields"
-            :options="searchFieldOptions"
-            :trigger-el="searchFieldTriggerEl"
-            align="right"
-            direction="down"
-            @update:model-value="emit('update:selectedSearchFields', $event)"
-            @close="searchFieldDropdownOpen = false"
-          />
+          <AppModal
+            v-model="searchFieldModalOpen"
+            :title="t('words.wordList.search.settings')"
+            size="sm"
+            :close-label="t('common.button.close')"
+            @close="searchFieldModalOpen = false"
+          >
+            <div class="search-field-modal">
+              <h4 class="search-field-modal-title">
+                {{ t('words.wordList.search.filterTitle') }}
+              </h4>
+              <CheckBox
+                v-for="field in searchFieldOptions"
+                :key="field.value"
+                :model-value="isFieldChecked(field.value)"
+                :label="field.label"
+                @update:model-value="(val) => toggleField(field.value, val)"
+              />
+            </div>
+          </AppModal>
         </div>
       </div>
 
-      <div class="view-mode-selector">
-        <button
-          v-for="mode in viewModes"
-          :key="mode.key"
-          class="mode-btn"
-          :class="{ active: viewMode === mode.key }"
-          type="button"
-          :title="mode.label"
-          @click="emit('update:viewMode', mode.key)"
-        >
-          <span>{{ mode.label }}</span>
-        </button>
-      </div>
+      <ChoiceSelector
+        v-model="localViewMode"
+        :options="choiceViewModes"
+        class="view-mode-selector"
+      />
     </div>
 
     <div class="filter-strip">
@@ -105,6 +102,9 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import AppModal from '@/components/common/AppModal.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
+import ChoiceSelector from '@/components/selector/ChoiceSelector.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 
@@ -131,9 +131,8 @@ const emit = defineEmits([
 ])
 
 const searchInputEl = ref(null)
-const searchFieldTriggerEl = ref(null)
 const locationTriggerEl = ref(null)
-const searchFieldDropdownOpen = ref(false)
+const searchFieldModalOpen = ref(false)
 const locationDropdownOpen = ref(false)
 
 function formatMultiSelectLabel(selectedValues, options, placeholder) {
@@ -152,17 +151,32 @@ function formatMultiSelectLabel(selectedValues, options, placeholder) {
   return `${selectedLabels[0]} +${selectedLabels.length - 1}`
 }
 
-const searchFieldTriggerLabel = computed(() => {
-  if (!props.selectedSearchFields.length) {
-    return t('words.wordList.search.fields.all')
-  }
-
-  return formatMultiSelectLabel(
-    props.selectedSearchFields,
-    props.searchFieldOptions,
-    t('words.wordList.search.fields.all'),
-  )
+const localViewMode = computed({
+  get: () => props.viewMode,
+  set: (val) => emit('update:viewMode', val),
 })
+
+const choiceViewModes = computed(() =>
+  props.viewModes.map((m) => ({ value: m.key, label: m.label })),
+)
+
+function isFieldChecked(value) {
+  return props.selectedSearchFields.length === 0 || props.selectedSearchFields.includes(value)
+}
+
+function toggleField(value, checked) {
+  const allValues = props.searchFieldOptions.map((o) => o.value)
+  const current = props.selectedSearchFields.length === 0
+    ? [...allValues]
+    : [...props.selectedSearchFields]
+
+  const updated = checked
+    ? [...new Set([...current, value])]
+    : current.filter((v) => v !== value)
+
+  const allChecked = allValues.every((v) => updated.includes(v))
+  emit('update:selectedSearchFields', allChecked ? [] : updated)
+}
 
 const locationTriggerLabel = computed(() => {
   return formatMultiSelectLabel(
@@ -173,12 +187,15 @@ const locationTriggerLabel = computed(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .top-controls {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  align-items: flex-start;
+  align-items: center;
+  width: min(100%, 1180px);
   margin: 0 auto 24px;
 }
 
@@ -191,7 +208,7 @@ const locationTriggerLabel = computed(() => {
 }
 
 .search-container {
-  /* flex: 1 1 320px; */
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -217,36 +234,55 @@ const locationTriggerLabel = computed(() => {
 }
 
 .field-filter {
-  position: relative;
-  flex: 0 1 136px;
-  min-width: 112px;
+  flex: 0 0 auto;
+}
+
+.gear-btn {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.search-field-modal {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  justify-items: center;
+}
+
+.search-field-modal-title {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
 }
 
 .location-filter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   width: 100%;
 }
 
-.standard-word-filter {
-  width: 100%;
-}
+// .standard-word-filter {
+//   width: 100%;
+// }
 
-.filter-select-trigger {
-  width: 100%;
-}
-
-.location-select-trigger {
-  width: 100%;
-}
+// .location-select-trigger {
+//   width: 100%;
+// }
 
 .select-label {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
   color: var(--text-primary);
   text-align: left;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include text-truncate;
 }
 
 .select-arrow {
@@ -262,42 +298,17 @@ const locationTriggerLabel = computed(() => {
 }
 
 .view-mode-selector {
-  display: flex;
   flex: 0 0 auto;
-  gap: 6px;
-}
-
-.mode-btn {
-  display: inline-flex;
-  min-width: 56px;
-  min-height: 40px;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-  background: var(--glass-10);
-  border: 1px solid var(--glass-30);
-  border-radius: var(--radius-md, 8px);
-}
-
-.mode-btn.active {
-  color: var(--text-primary);
-  background: var(--glass-30);
-  border-color: var(--color-primary-hover);
 }
 
 .filter-strip {
-  flex: 1 1 220px;
+  flex: 0 0 auto;
   min-width: 180px;
 }
 
 @media (max-aspect-ratio: 1 / 1) {
   .top-controls {
-    flex-direction: column;
+    @include flex-col;
     gap: 10px;
   }
 
@@ -308,25 +319,18 @@ const locationTriggerLabel = computed(() => {
   .search-section {
     flex: 1 1 100%;
     min-width: 100%;
-    flex-wrap: wrap;
   }
 
   .field-filter {
-    flex: 1 1 100%;
-    min-width: 100%;
+    flex: 0 0 auto;
   }
 
   .view-mode-selector {
     width: 100%;
   }
 
-  .mode-btn {
-    flex: 1;
-  }
-
   .filter-strip {
     flex: 1 1 100%;
-    /* flex-wrap: wrap; */
     min-width: 100%;
   }
 }

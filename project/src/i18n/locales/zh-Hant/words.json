@@ -50,7 +50,9 @@
         "ipa": "發音",
         "notes": "註釋",
         "location": "地點"
-      }
+      },
+      "settings": "設定",
+      "filterTitle": "搜尋篩選"
     },
     "sort": {
       "label": "排序",

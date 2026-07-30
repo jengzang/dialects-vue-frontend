@@ -50,7 +50,9 @@
         "ipa": "Pronunciation",
         "notes": "Notes",
         "location": "Location"
-      }
+      },
+      "settings": "Settings",
+      "filterTitle": "Search Filter"
     },
     "sort": {
       "label": "Sort",
