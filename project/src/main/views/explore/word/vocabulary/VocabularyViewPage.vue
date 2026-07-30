@@ -53,25 +53,14 @@
 
         <div class="filter-strip">
           <div v-if="viewMode === 'map'" class="standard-word-filter">
-            <button
-              ref="standardWordTriggerEl"
-              class="select-trigger global-select-trigger standard-word-select-trigger"
-              :class="{ 'is-open': standardWordDropdownOpen, 'is-disabled': standardWordOptions.length === 0 }"
-              type="button"
-              :disabled="standardWordOptions.length === 0"
-              @click="standardWordDropdownOpen = !standardWordDropdownOpen"
-            >
-              <span class="select-label">{{ standardWordTriggerLabel }}</span>
-              <span class="select-arrow" aria-hidden="true">⌄</span>
-            </button>
-            <MultiSelectDropdown
-              v-if="standardWordDropdownOpen"
-              v-model="selectedStandardWords"
+            <SimpleSelectDropdown
+              v-model="selectedStandardWord"
               :options="standardWordOptions"
-              :trigger-el="standardWordTriggerEl"
-              align="left"
-              direction="down"
-              @close="standardWordDropdownOpen = false"
+              :placeholder="t('words.wordList.search.standardWordPlaceholder')"
+              :disabled="standardWordOptions.length === 0"
+              searchable
+              match-trigger-width
+              width="100%"
             />
           </div>
 
@@ -236,6 +225,7 @@ import {
   getVocabularyStandardWords
 } from '@/api'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
@@ -255,15 +245,14 @@ const query = ref('')
 const viewMode = ref(normalizeViewMode(route.query.tab))
 const selectedSearchFields = ref([])
 const selectedLocations = ref([])
-const selectedStandardWords = ref([])
+const selectedStandardWord = ref('')
+const selectedStandardWords = computed(() => (selectedStandardWord.value ? [selectedStandardWord.value] : []))
 const mapDisplayMode = ref('overview')
 const searchInputEl = ref(null)
 const searchFieldTriggerEl = ref(null)
 const locationTriggerEl = ref(null)
-const standardWordTriggerEl = ref(null)
 const searchFieldDropdownOpen = ref(false)
 const locationDropdownOpen = ref(false)
-const standardWordDropdownOpen = ref(false)
 const vocabularyLocationOptions = ref([])
 const vocabularyStandardWordOptions = ref([])
 const entries = ref([])
@@ -301,7 +290,14 @@ const locationOptions = computed(() => {
 })
 
 const standardWordOptions = computed(() => {
-  return vocabularyStandardWordOptions.value
+  if (!vocabularyStandardWordOptions.value.length) {
+    return []
+  }
+
+  return [
+    { value: '', label: t('words.wordList.search.standardWordPlaceholder') },
+    ...vocabularyStandardWordOptions.value,
+  ]
 })
 
 const searchFieldTriggerLabel = computed(() => {
@@ -317,14 +313,6 @@ const locationTriggerLabel = computed(() => {
     selectedLocations.value,
     locationOptions.value,
     t('words.wordList.search.locationPlaceholder')
-  )
-})
-
-const standardWordTriggerLabel = computed(() => {
-  return formatMultiSelectLabel(
-    selectedStandardWords.value,
-    standardWordOptions.value,
-    t('words.wordList.search.standardWordPlaceholder')
   )
 })
 
@@ -637,10 +625,12 @@ async function loadVocabularyStandardWords() {
       })
       .filter(Boolean)
     const optionValues = new Set(vocabularyStandardWordOptions.value.map((option) => option.value))
-    selectedStandardWords.value = selectedStandardWords.value.filter((value) => optionValues.has(value))
+    if (selectedStandardWord.value && !optionValues.has(selectedStandardWord.value)) {
+      selectedStandardWord.value = ''
+    }
   } catch {
     vocabularyStandardWordOptions.value = []
-    selectedStandardWords.value = []
+    selectedStandardWord.value = ''
   }
 }
 
@@ -777,10 +767,10 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
   }
 }, { debounce: 250, maxWait: 800 })
 
-watch(selectedStandardWords, (words) => {
-  if (mapDisplayMode.value === 'overview' && words.length) {
+watch(selectedStandardWord, (word) => {
+  if (mapDisplayMode.value === 'overview' && word) {
     mapDisplayMode.value = 'definition'
-  } else if (!words.length && !['overview', 'location'].includes(mapDisplayMode.value)) {
+  } else if (!word && !['overview', 'location'].includes(mapDisplayMode.value)) {
     mapDisplayMode.value = 'overview'
   }
   if (shouldUseVocabularyMapPointsApi() || shouldUseVocabularyMapItemsApi()) {
