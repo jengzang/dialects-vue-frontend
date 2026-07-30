@@ -1,9 +1,10 @@
 <template>
   <div class="vocabulary-manage-page">
     <RadioGroup
-      v-model="contributeSubMode"
-      :options="contributeModeOptions"
-      name="contribute-mode"
+      v-if="!shouldShowAccessGate"
+      v-model="manageSection"
+      :options="manageSectionOptions"
+      name="manage-section"
       class="contribute-mode-switch"
     />
     <section v-if="shouldShowAccessGate" class="content-area">
@@ -28,7 +29,7 @@
     </section>
 
     <template v-else>
-      <section v-if="hasVocabularyPermission" class="content-area">
+      <section v-if="manageSection === 'entries' && hasVocabularyPermission" class="content-area">
         <UniversalTable
           db-key="vocabulary"
           table-name="vocabulary_entries"
@@ -37,7 +38,9 @@
           api-adapter="vocabulary"
           :can-edit="hasVocabularyPermission"
         />
+      </section>
 
+      <section v-if="manageSection === 'locations' && hasVocabularyPermission" class="content-area">
         <div class="locations-mode main-glass-panel">
           <div class="locations-head">
             <div>
@@ -113,7 +116,7 @@
         </div>
       </section>
 
-      <section v-if="canViewVocabularyLogs" class="content-area">
+      <section v-if="manageSection === 'logs' && canViewVocabularyLogs" class="content-area">
         <div class="logs-mode main-glass-panel">
           <div class="locations-head">
             <div>
@@ -248,11 +251,24 @@ const route = useRoute()
 const router = useRouter()
 const pageSizeOptions = [20, 50, 100, 200]
 
-const contributeSubMode = ref('manage')
-const contributeModeOptions = computed(() => [
-  { value: 'upload', label: t('words.wordList.tabs.uploadTab') },
-  { value: 'manage', label: t('words.wordList.tabs.manageTab') },
-])
+const manageSection = ref('entries')
+const manageSectionOptions = computed(() => {
+  const options = []
+  if (hasVocabularyPermission.value) {
+    options.push({ value: 'entries', label: t('words.wordList.tabs.list') })
+    options.push({ value: 'locations', label: t('words.wordList.locations.title') })
+  }
+  if (canViewVocabularyLogs.value) {
+    options.push({ value: 'logs', label: t('words.wordList.logs.title') })
+  }
+  return options
+})
+
+watch(manageSectionOptions, (options) => {
+  if (options.length && !options.some(o => o.value === manageSection.value)) {
+    manageSection.value = options[0].value
+  }
+})
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
@@ -632,12 +648,6 @@ function navigateToAuth() {
 function navigateToList() {
   router.push(buildLocalePath(resolveRouteLocale(route), '/explore/vocabulary/view'))
 }
-
-watch(contributeSubMode, (mode) => {
-  if (mode === 'upload') {
-    router.replace(buildLocalePath(resolveRouteLocale(route), '/explore/vocabulary/import'))
-  }
-})
 
 watch(() => [
   props.isAuthReady,

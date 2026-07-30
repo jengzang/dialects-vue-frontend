@@ -28,6 +28,12 @@
         >
           {{ pageTabs[1].label }}
         </button>
+        <ChoiceSelector
+          v-if="isContributeTabActive"
+          v-model="contributeSubMode"
+          :options="contributeSubModeOptions"
+          class="tab-view-mode-selector"
+        />
       </div>
     </div>
 
@@ -116,6 +122,10 @@ const isQueryTabActive = computed(() => {
   return stripLocaleFromPath(route.path) === '/explore/vocabulary/view'
 })
 
+const isContributeTabActive = computed(() => {
+  return contributeTabPaths.includes(stripLocaleFromPath(route.path))
+})
+
 const viewModeOptions = computed(() => [
   { value: 'card', label: t('words.wordList.viewModes.card') },
   { value: 'map', label: t('words.wordList.viewModes.map') },
@@ -132,13 +142,20 @@ const viewModeQuery = computed({
   },
 })
 
-const lastContributePath = ref('/explore/vocabulary/import')
+const contributeSubModeOptions = computed(() => [
+  { value: 'upload', label: t('words.wordList.tabs.uploadTab') },
+  { value: 'manage', label: t('words.wordList.tabs.manageTab') },
+])
 
-watch(() => route.path, () => {
-  const currentPath = stripLocaleFromPath(route.path)
-  if (contributeTabPaths.includes(currentPath)) {
-    lastContributePath.value = currentPath
-  }
+const contributeSubMode = computed({
+  get: () => {
+    const currentPath = stripLocaleFromPath(route.path)
+    return currentPath === '/explore/vocabulary/manage' ? 'manage' : 'upload'
+  },
+  set: (val) => {
+    const path = val === 'manage' ? '/explore/vocabulary/manage' : '/explore/vocabulary/import'
+    router.replace(buildLocalePath(resolveRouteLocale(route), path))
+  },
 })
 
 function navigateTo(path) {
@@ -147,7 +164,9 @@ function navigateTo(path) {
     if (contributeTabPaths.includes(currentPath)) {
       return
     }
-    path = lastContributePath.value
+    path = contributeSubMode.value === 'manage'
+      ? '/explore/vocabulary/manage'
+      : '/explore/vocabulary/import'
   }
   router.push(buildLocalePath(resolveRouteLocale(route), path))
 }

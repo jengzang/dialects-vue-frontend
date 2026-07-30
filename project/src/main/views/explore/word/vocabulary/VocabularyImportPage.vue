@@ -1,15 +1,8 @@
 <template>
   <div class="vocabulary-import-page">
     <section class="content-area">
-      <RadioGroup
-        v-model="contributeSubMode"
-        :options="contributeModeOptions"
-        name="contribute-mode"
-        class="contribute-mode-switch"
-      />
       <div class="upload-mode main-glass-panel">
         <div class="upload-head">
-          <div>
             <h3>{{ t('words.wordList.upload.title') }}</h3>
             <!-- <p>{{ t('words.wordList.upload.desc') }}</p> -->
             <div v-if="requiresLogin" class="upload-access-notice">
@@ -24,7 +17,6 @@
               </button>
             </div>
             <p v-else-if="uploadAccessNotice" class="upload-status">{{ uploadAccessNotice }}</p>
-          </div>
         </div>
 
         <div class="upload-location-summary">
@@ -247,11 +239,6 @@ function navigateToSuggestion() {
   router.push(buildLocalePath(resolveRouteLocale(route), '/menu/about/suggestion'))
 }
 
-const contributeSubMode = ref('upload')
-const contributeModeOptions = computed(() => [
-  { value: 'upload', label: t('words.wordList.tabs.uploadTab') },
-  { value: 'manage', label: t('words.wordList.tabs.manageTab') },
-])
 const isUploading = ref(false)
 const isPreviewingImport = ref(false)
 const uploadStatusText = ref('')
@@ -562,12 +549,6 @@ watch([uploadParserMode, selectedUploadFile, uploadLocation], () => {
   backendPreview.value = null
   isOverwriteConfirmed.value = false
 }, { deep: true })
-
-watch(contributeSubMode, (mode) => {
-  if (mode === 'manage') {
-    router.replace(buildLocalePath(resolveRouteLocale(route), '/explore/vocabulary/manage'))
-  }
-})
 
 function buildUploadLocation() {
   return normalizeUploadLocation(uploadLocation.value)
