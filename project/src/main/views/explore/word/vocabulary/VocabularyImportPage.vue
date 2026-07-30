@@ -24,7 +24,7 @@
             <strong>{{ uploadLocation.location_name || t('words.wordList.upload.locationName') }}</strong>
             <p>{{ uploadLocationSummaryText }}</p>
           </div>
-          <button class="main-glass-button" data-variant="secondary" type="button" @click="openUploadLocationEditor">
+          <button class="main-glass-button" data-variant="primary" type="button" @click="openUploadLocationEditor">
             {{ uploadLocation.location_name ? t('common.button.edit') : t('words.wordList.upload.enterLocationInfo') }}
           </button>
         </div>
@@ -133,7 +133,7 @@
         <div class="upload-location-modal-toolbar">
           <button
             class="main-glass-button"
-            data-variant="secondary"
+            data-variant="primary"
             type="button"
             :disabled="isLoadingYindianLocation || !uploadLocationDraft.location_name.trim()"
             @click="useYindianLocationData"

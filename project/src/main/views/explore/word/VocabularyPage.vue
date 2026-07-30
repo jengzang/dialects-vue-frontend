@@ -67,6 +67,10 @@ const isAuthReady = computed(() => userStore.authReady)
 const isAuthenticated = computed(() => userStore.isAuthenticated)
 const contributeTabPaths = ['/explore/vocabulary/import', '/explore/vocabulary/manage']
 
+function isContributePath(path) {
+  return path === '/explore/vocabulary/import' || path.startsWith('/explore/vocabulary/manage')
+}
+
 const pageTabs = computed(() => {
   return [
     { label: t('words.wordList.tabs.query'), path: '/explore/vocabulary/view' },
@@ -113,7 +117,7 @@ async function loadVocabularyMe() {
 function isActivePage(tabPath) {
   const currentPath = stripLocaleFromPath(route.path)
   if (tabPath === '/explore/vocabulary/import') {
-    return contributeTabPaths.includes(currentPath)
+    return isContributePath(currentPath)
   }
   return currentPath === tabPath
 }
@@ -123,7 +127,7 @@ const isQueryTabActive = computed(() => {
 })
 
 const isContributeTabActive = computed(() => {
-  return contributeTabPaths.includes(stripLocaleFromPath(route.path))
+  return isContributePath(stripLocaleFromPath(route.path))
 })
 
 const viewModeOptions = computed(() => [
@@ -150,7 +154,7 @@ const contributeSubModeOptions = computed(() => [
 const contributeSubMode = computed({
   get: () => {
     const currentPath = stripLocaleFromPath(route.path)
-    return currentPath === '/explore/vocabulary/manage' ? 'manage' : 'upload'
+    return currentPath.startsWith('/explore/vocabulary/manage') ? 'manage' : 'upload'
   },
   set: (val) => {
     const path = val === 'manage' ? '/explore/vocabulary/manage' : '/explore/vocabulary/import'
@@ -161,7 +165,7 @@ const contributeSubMode = computed({
 function navigateTo(path) {
   if (path === '/explore/vocabulary/import') {
     const currentPath = stripLocaleFromPath(route.path)
-    if (contributeTabPaths.includes(currentPath)) {
+    if (isContributePath(currentPath)) {
       return
     }
     path = contributeSubMode.value === 'manage'

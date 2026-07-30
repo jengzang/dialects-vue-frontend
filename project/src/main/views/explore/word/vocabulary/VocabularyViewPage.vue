@@ -91,7 +91,7 @@
       </button>
     </section>
 
-    <section v-else-if="viewMode === 'table'" class="content-area table-content-area">
+    <section v-else-if="viewMode === 'table'">
       <UniversalTable
         db-key="vocabulary"
         table-name="vocabulary_entries"
