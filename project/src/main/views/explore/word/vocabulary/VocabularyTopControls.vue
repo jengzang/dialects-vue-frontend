@@ -236,6 +236,7 @@ const standardWordTriggerLabel = computed(() => {
 @use '@/styles/global/mixins' as *;
 
 .top-controls {
+  // border: 1px solid var(--glass-30);
   display: flex;
   flex-wrap: wrap;
   gap: 12px;

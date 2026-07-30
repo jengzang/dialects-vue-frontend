@@ -1,27 +1,29 @@
 <template>
   <section class="content-area">
     <div class="logs-mode main-glass-panel">
-      <div class="locations-head">
-        <div>
-          <h3>{{ t('words.wordList.logs.title') }}</h3>
-          <p>{{ t('words.wordList.logs.desc') }}</p>
+      <div class="top-controls">
+        <div class="locations-head">
+          <div>
+            <h3>{{ t('words.wordList.logs.title') }}</h3>
+            <p>{{ t('words.wordList.logs.desc') }}</p>
+          </div>
         </div>
-      </div>
 
-      <form class="manage-filter-grid logs-filter-grid" @submit.prevent="applyLogFilters">
-        <label v-for="field in logFilterFields" :key="field.key" class="upload-field">
-          <span>{{ field.label }}</span>
-          <input v-model="logFilters[field.key]" type="text" :placeholder="field.label" />
-        </label>
-      </form>
+        <form class="manage-filter-grid logs-filter-grid" @submit.prevent="applyLogFilters">
+          <label v-for="field in logFilterFields" :key="field.key" class="upload-field">
+            <span>{{ field.label }}</span>
+            <input v-model="logFilters[field.key]" type="text" :placeholder="field.label" />
+          </label>
+        </form>
 
-      <div class="filter-actions">
-        <button class="main-glass-button" data-variant="primary" type="button" @click="applyLogFilters">
-          {{ t('common.button.search') }}
-        </button>
-        <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLogFilters">
-          {{ t('common.button.reset') }}
-        </button>
+        <div class="filter-actions">
+          <button class="main-glass-button" data-variant="primary" type="button" @click="applyLogFilters">
+            {{ t('common.button.search') }}
+          </button>
+          <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLogFilters">
+            {{ t('common.button.reset') }}
+          </button>
+        </div>
       </div>
 
       <div v-if="logsLoadError" class="empty-state empty-state-base">

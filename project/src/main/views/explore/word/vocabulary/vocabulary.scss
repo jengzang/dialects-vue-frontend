@@ -37,7 +37,7 @@
 .page-tab-btn {
   min-width: 96px;
   min-height: 36px;
-  padding: 0 16px;
+  padding: auto;
   color: var(--text-secondary);
   font-size: 14px;
   font-weight: 500;
@@ -144,6 +144,7 @@
 .card {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 14px;
   padding: 18px 20px;
   overflow: hidden;
@@ -171,7 +172,9 @@
   display: flex;
   gap: 12px;
   align-items: center;
+  justify-content: center;
   line-height: 1.5;
+  text-align: center;
 }
 
 .row-1 {
@@ -184,6 +187,11 @@
   flex-wrap: wrap;
   font-size: 16px;
   font-weight: 600;
+}
+
+.row-3 {
+  display: block;
+  text-align: center;
 }
 
 .location-chain {
@@ -222,6 +230,12 @@
   color: var(--text-secondary);
   font-size: 13px;
   line-height: 1.6;
+}
+
+.card-dot-sep {
+  color: var(--text-tertiary);
+  margin: 0 4px;
+  font-size: 13px;
 }
 
 .upload-mode,
@@ -385,6 +399,12 @@
   background: var(--glass-10);
   border: 1px solid var(--glass-30);
   border-radius: var(--radius-md, 8px);
+}
+
+.top-controls {
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.25);
 }
 
 .filter-actions,
@@ -808,6 +828,9 @@
 }
 
 @media (max-aspect-ratio: 1 / 1) {
+  .top-controls{
+    padding-bottom: 12px;
+  }
   .vocabulary-page {
     padding: 12px;
   }
@@ -825,6 +848,7 @@
   .page-tab-btn {
     flex: 1 0 auto;
     min-width: 88px;
+    padding: 0 6px;
   }
 
   .tab-view-mode-selector {

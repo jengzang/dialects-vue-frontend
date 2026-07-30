@@ -40,8 +40,11 @@
             </div>
             <div class="card-row row-3">
               <span class="definition-text">{{ entry.definition }}</span>
-            </div>
-            <div class="card-row row-4">
+              <span
+                v-if="entry.definition && entry.detail"
+                class="card-dot-sep"
+                aria-hidden="true"
+              >·</span>
               <span class="memo-text">{{ entry.detail }}</span>
             </div>
           </article>

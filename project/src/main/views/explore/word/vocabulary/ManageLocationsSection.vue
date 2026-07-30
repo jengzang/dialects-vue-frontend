@@ -1,34 +1,33 @@
 <template>
   <section class="content-area">
     <div class="locations-mode main-glass-panel">
-      <div class="locations-head">
-        <div>
-          <h3>{{ t('words.wordList.locations.title') }}</h3>
-          <p>{{ t('words.wordList.locations.desc') }}</p>
+      <div class="top-controls">
+        <div class="locations-head">
+          <div>
+            <h3>{{ t('words.wordList.locations.title') }}</h3>
+            <p>{{ t('words.wordList.locations.desc') }}</p>
+          </div>
         </div>
-        <!-- <button class="main-glass-button" data-variant="secondary" type="button" @click="loadVocabularyLocations">
-          {{ t('words.wordList.locations.refresh') }}
-        </button> -->
-      </div>
 
-      <form class="manage-filter-grid locations-filter-grid" @submit.prevent="applyLocationFilters">
-        <label class="upload-field">
-          <span>{{ t('words.wordList.locations.filters.userId') }}</span>
-          <input v-model="locationFilters.user_id" type="text" :placeholder="t('words.wordList.locations.filters.userId')" />
-        </label>
-        <label class="upload-field">
-          <span>{{ t('words.wordList.locations.filters.locationName') }}</span>
-          <input v-model="locationFilters.location_name" type="text" :placeholder="t('words.wordList.locations.filters.locationName')" />
-        </label>
-        <div class="filter-actions">
-          <button class="main-glass-button" data-variant="primary" type="submit">
-            {{ t('common.button.search') }}
-          </button>
-          <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLocationFilters">
-            {{ t('common.button.reset') }}
-          </button>
-        </div>
-      </form>
+        <form class="manage-filter-grid locations-filter-grid" @submit.prevent="applyLocationFilters">
+          <label class="upload-field">
+            <span>{{ t('words.wordList.locations.filters.userId') }}</span>
+            <input v-model="locationFilters.user_id" type="text" :placeholder="t('words.wordList.locations.filters.userId')" />
+          </label>
+          <label class="upload-field">
+            <span>{{ t('words.wordList.locations.filters.locationName') }}</span>
+            <input v-model="locationFilters.location_name" type="text" :placeholder="t('words.wordList.locations.filters.locationName')" />
+          </label>
+          <div class="filter-actions">
+            <button class="main-glass-button" data-variant="primary" type="submit">
+              {{ t('common.button.search') }}
+            </button>
+            <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLocationFilters">
+              {{ t('common.button.reset') }}
+            </button>
+          </div>
+        </form>
+      </div>
 
       <div v-if="locationsLoadError" class="empty-state empty-state-base">
         <p>{{ locationsLoadError }}</p>
