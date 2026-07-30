@@ -362,7 +362,7 @@ describe('vocabulary explore page shell wiring', () => {
   it('matches the YuBao card grid density and glass card treatment', () => {
     const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
 
-    expect(vocabularyScss).toContain('grid-template-columns: repeat(auto-fill, minmax(340px, 1fr))')
+    expect(vocabularyScss).toContain('grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))')
     expect(vocabularyScss).toContain('background: var(--glass-80)')
     expect(vocabularyScss).toContain('border: 0.5px solid var(--glass-90)')
     expect(vocabularyScss).toContain('transform: translateY(-2px)')

@@ -1,5 +1,5 @@
 <template>
-  <div class="universal-table glass-container">
+  <div class="universal-table glass-container" :style="containerStyle">
     <div class="toolbar">
       <div class="search-wrapper">
         <span class="search-icon">🔍</span>
@@ -538,7 +538,19 @@ const props = defineProps({
   // ✅ 新增：可选的主键字段名
   primaryKey: { type: String, default: null },
   apiAdapter: { type: String, default: 'normal' },
-  canEdit: { type: Boolean, default: false }
+  canEdit: { type: Boolean, default: false },
+  height: { type: [String, Object], default: '85dvh' }
+})
+
+const containerStyle = computed(() => {
+  const h = props.height
+  if (typeof h === 'string') {
+    return { '--ut-height': h }
+  }
+  return {
+    '--ut-height': h.desktop || '85dvh',
+    '--ut-height-mobile': h.mobile || h.desktop || '85dvh',
+  }
 });
 
 const tableApiAdapters = {
@@ -1590,9 +1602,13 @@ $system-font:
   color: var(--text-primary);
   @include flex-col;
   gap: 6px;
-  height: 85dvh;
+  height: var(--ut-height, 85dvh);
   width: 88dvw;
   overflow: hidden;
+
+  @media (max-aspect-ratio: 1 / 1) {
+    height: var(--ut-height-mobile, var(--ut-height, 85dvh));
+  }
 }
 
 /* Toolbar */
@@ -2016,7 +2032,6 @@ td {
   .universal-table.glass-container {
     padding: 8px 2px;
     border-radius: var(--radius-xl);
-    height: 85dvh;
     border: none;
   }
 

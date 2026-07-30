@@ -258,7 +258,7 @@ const standardWordTriggerLabel = computed(() => {
   gap: 12px;
   align-items: center;
   width: min(100%, 1180px);
-  margin: 0 auto 24px;
+  margin: 0 auto 20px;
 }
 
 .search-container,
