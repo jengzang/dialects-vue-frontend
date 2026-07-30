@@ -6,9 +6,6 @@
           <h3>{{ t('words.wordList.logs.title') }}</h3>
           <p>{{ t('words.wordList.logs.desc') }}</p>
         </div>
-        <button class="main-glass-button" data-variant="secondary" type="button" @click="loadVocabularyLogs">
-          {{ t('words.wordList.logs.refresh') }}
-        </button>
       </div>
 
       <form class="manage-filter-grid logs-filter-grid" @submit.prevent="applyLogFilters">
@@ -16,15 +13,16 @@
           <span>{{ field.label }}</span>
           <input v-model="logFilters[field.key]" type="text" :placeholder="field.label" />
         </label>
-        <div class="filter-actions">
-          <button class="main-glass-button" data-variant="primary" type="submit">
-            {{ t('common.button.search') }}
-          </button>
-          <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLogFilters">
-            {{ t('common.button.reset') }}
-          </button>
-        </div>
       </form>
+
+      <div class="filter-actions">
+        <button class="main-glass-button" data-variant="primary" type="button" @click="applyLogFilters">
+          {{ t('common.button.search') }}
+        </button>
+        <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLogFilters">
+          {{ t('common.button.reset') }}
+        </button>
+      </div>
 
       <div v-if="logsLoadError" class="empty-state empty-state-base">
         <p>{{ logsLoadError }}</p>
@@ -100,7 +98,7 @@ export default { name: 'ManageLogsSection' }
 </script>
 
 <script setup>
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onActivated, onDeactivated, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getVocabularyLogs } from '@/api'
 import GlassTable from '@/components/common/GlassTable.vue'
@@ -108,7 +106,12 @@ import GlassTable from '@/components/common/GlassTable.vue'
 const { t } = useI18n()
 const pageSizeOptions = [20, 50, 100, 200]
 
+onMounted(() => console.log('[ManageLogsSection] mounted'))
+onActivated(() => console.log('[ManageLogsSection] activated'))
+onDeactivated(() => console.log('[ManageLogsSection] deactivated'))
+
 const props = defineProps({
+  hasVocabularyPermission: { type: Boolean, default: false },
   canViewVocabularyLogs: { type: Boolean, default: false },
 })
 

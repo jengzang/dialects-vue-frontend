@@ -1,13 +1,24 @@
 <template>
   <div class="vocabulary-manage-page">
-    <RadioGroup
-      v-if="!shouldShowAccessGate"
-      v-model="manageSection"
-      :options="manageSectionOptions"
-      name="manage-section"
-      class="contribute-mode-switch"
-    />
-    <section v-if="shouldShowAccessGate" class="content-area">
+    <template v-if="!shouldShowAccessGate">
+      <RadioGroup
+        v-model="manageSection"
+        :options="manageSectionOptions"
+        name="manage-section"
+        class="contribute-mode-switch"
+      />
+      <router-view v-slot="{ Component }">
+        <KeepAlive :include="manageChildNames">
+          <component
+            :is="Component"
+            :has-vocabulary-permission="hasVocabularyPermission"
+            :can-view-vocabulary-logs="canViewVocabularyLogs"
+          />
+        </KeepAlive>
+      </router-view>
+    </template>
+
+    <section v-else class="content-area">
       <div class="access-gate main-glass-panel">
         <h3>{{ accessGateTitle }}</h3>
         <p>{{ accessGateDescription }}</p>
@@ -27,21 +38,11 @@
         </div>
       </div>
     </section>
-
-    <router-view v-else v-slot="{ Component }">
-      <KeepAlive :include="manageChildNames">
-        <component
-          :is="Component"
-          :has-vocabulary-permission="hasVocabularyPermission"
-          :can-view-vocabulary-logs="canViewVocabularyLogs"
-        />
-      </KeepAlive>
-    </router-view>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { getVocabularyMe } from '@/api'
@@ -53,6 +54,9 @@ const route = useRoute()
 const router = useRouter()
 
 const manageChildNames = ['ManageEntriesSection', 'ManageLocationsSection', 'ManageLogsSection']
+
+onMounted(() => console.log('[VocabularyManagePage] mounted'))
+onBeforeUnmount(() => console.log('[VocabularyManagePage] beforeUnmount'))
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },

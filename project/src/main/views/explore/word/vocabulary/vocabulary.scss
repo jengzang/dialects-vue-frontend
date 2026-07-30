@@ -532,8 +532,7 @@
 }
 
 .upload-head,
-.locations-head,
-.location-item {
+.locations-head {
   display: flex;
   gap: 14px;
   align-items: center;
@@ -588,12 +587,17 @@
 }
 
 .locations-list {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 10px;
 }
 
 .location-item {
+  width: 100%;
+  max-width: 480px;
   padding: 14px;
+  text-align: center;
   background: var(--glass-10);
   border: 1px solid var(--glass-30);
   border-radius: var(--radius-md, 8px);
@@ -603,7 +607,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .locations-edit-grid {

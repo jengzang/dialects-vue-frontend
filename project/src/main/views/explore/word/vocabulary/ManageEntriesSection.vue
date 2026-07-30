@@ -16,14 +16,19 @@ export default { name: 'ManageEntriesSection' }
 </script>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onActivated, onDeactivated, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 
 const { t } = useI18n()
 
+onMounted(() => console.log('[ManageEntriesSection] mounted'))
+onActivated(() => console.log('[ManageEntriesSection] activated'))
+onDeactivated(() => console.log('[ManageEntriesSection] deactivated'))
+
 defineProps({
   hasVocabularyPermission: { type: Boolean, default: false },
+  canViewVocabularyLogs: { type: Boolean, default: false },
 })
 
 const tableColumns = computed(() => [
