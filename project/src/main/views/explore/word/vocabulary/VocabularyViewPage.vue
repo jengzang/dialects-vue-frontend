@@ -15,12 +15,12 @@
     />
 
     <section v-if="viewMode !== 'table'" class="content-area">
-      <div v-if="isLoadingItems" class="loading-state loading-state-base">
+      <div v-if="isInitialLoading" class="loading-state loading-state-base">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <span>{{ t('words.wordList.states.loadingCards') }}</span>
       </div>
 
-      <div v-else-if="loadError" class="empty-state empty-state-base">
+      <div v-else-if="loadError && !entries.length" class="empty-state empty-state-base">
         <p>{{ loadError }}</p>
       </div>
 
@@ -53,7 +53,14 @@
       </div>
 
       <div v-else-if="viewMode === 'map'" class="map-mode">
-        <div class="map-canvas-shell">
+        <div v-if="isInitialLoading" class="empty-state empty-state-base map-empty-state">
+          <div class="ui-loading--page" aria-hidden="true"></div>
+          <span>{{ t('words.wordList.states.loadingData') }}</span>
+        </div>
+        <div v-else-if="loadError && !mapDataForVocabularyMap.length" class="empty-state empty-state-base map-empty-state">
+          <p>{{ loadError }}</p>
+        </div>
+        <div v-else class="map-canvas-shell">
           <VocabularyMap
             v-if="mapDataForVocabularyMap.length"
             :map-data="mapDataForVocabularyMap"
@@ -72,9 +79,16 @@
         class="load-more-btn main-glass-button"
         data-variant="secondary"
         type="button"
+        :disabled="isLoadingMore"
         @click="loadVocabularyItems({ append: true })"
       >
-        {{ t('words.wordList.states.loadingMore') }}
+        <template v-if="isLoadingMore">
+          <span class="btn-loading-dot" aria-hidden="true"></span>
+          {{ t('words.wordList.states.loadingData') }}
+        </template>
+        <template v-else>
+          {{ t('words.wordList.states.loadingMore') }}
+        </template>
       </button>
     </section>
 
@@ -224,6 +238,9 @@ const standardWordOptions = computed(() => {
     ...vocabularyStandardWordOptions.value,
   ]
 })
+
+const isInitialLoading = computed(() => isLoadingItems.value && !entries.value.length && !loadError.value)
+const isLoadingMore = computed(() => isLoadingItems.value && entries.value.length > 0)
 
 const canLoadMore = computed(() => {
   return shouldUseVocabularyItemsApi() && !isLoadingItems.value && entries.value.length < total.value

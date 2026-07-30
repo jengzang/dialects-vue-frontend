@@ -70,7 +70,7 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).not.toContain('class="top-controls"')
     expect(vocabularyScss).toContain('.page-tab-navigation')
     expect(vocabularyScss).toContain('.page-tab-container')
-    expect(vocabularyScss).toContain('.page-tab-btn.active')
+    expect(vocabularyScss).toContain('&.active')
     expect(vocabularyPage).toContain("'/explore/vocabulary/view'")
     expect(vocabularyPage).toContain("'/explore/vocabulary/import'")
     expect(vocabularyPage).toContain("'/explore/vocabulary/manage'")
