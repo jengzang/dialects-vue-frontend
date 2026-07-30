@@ -422,6 +422,23 @@
   color: var(--text-secondary);
 }
 
+.upload-access-notice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  background: rgba(var(--color-error-light-rgb), 0.12);
+  border: 1px solid rgba(var(--color-error-light-rgb), 0.18);
+  border-radius: var(--radius-md, 8px);
+  color: var(--color-error-dark);
+
+  p {
+    margin: 0;
+  }
+}
+
 .backend-preview {
   display: grid;
   gap: 10px;

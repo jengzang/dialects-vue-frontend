@@ -11,8 +11,19 @@
         <div class="upload-head">
           <div>
             <h3>{{ t('words.wordList.upload.title') }}</h3>
-            <p>{{ t('words.wordList.upload.desc') }}</p>
-            <p v-if="uploadAccessNotice" class="upload-status">{{ uploadAccessNotice }}</p>
+            <!-- <p>{{ t('words.wordList.upload.desc') }}</p> -->
+            <div v-if="requiresLogin" class="upload-access-notice">
+              <p>{{ uploadAccessNotice }}</p>
+              <button
+                class="main-glass-button"
+                data-variant="primary"
+                type="button"
+                @click="navigateToSuggestion"
+              >
+                {{ t('words.wordList.access.requestEditPermission') }}
+              </button>
+            </div>
+            <p v-else-if="uploadAccessNotice" class="upload-status">{{ uploadAccessNotice }}</p>
           </div>
           <label class="main-glass-button" data-variant="primary">
             {{ t('words.wordList.upload.chooseFile') }}
@@ -217,6 +228,10 @@ const uploadAccessNotice = computed(() => {
   }
   return ''
 })
+function navigateToSuggestion() {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/about/suggestion'))
+}
+
 const contributeSubMode = ref('upload')
 const contributeModeOptions = computed(() => [
   { value: 'upload', label: t('words.wordList.tabs.uploadTab') },
