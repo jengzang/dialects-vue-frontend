@@ -159,7 +159,37 @@
       "yindianFailed": "獲取音典數據失敗",
       "yindianHint": "請輸入音典檔案裡的標準地名簡稱（繁體）以匹配",
       "success": "上傳完成，導入 {count} 條。",
-      "failed": "上傳詞表失敗"
+      "failed": "上傳詞表失敗",
+      "formatHelp": "格式說明",
+      "formatHelpTitle": "詞彙上傳格式說明",
+      "formatHelpTable": {
+        "title": "表格格式（table）",
+        "desc": "適用文件：.xlsx、.xls、.csv、.tsv",
+        "required": "必填列（列名支持中英文別名，大小寫和空格不敏感）：",
+        "colField": "字段",
+        "colAliases": "接受的列名",
+        "note": "每行一條記錄，standard_word 和 local_expression 同時為空時該行跳過，任一必填列缺值時報錯。"
+      },
+      "formatHelpBracket": {
+        "title": "文檔括號格式（doc_bracket）",
+        "desc": "適用文件：.docx、.doc、.txt。每行一條記錄，用括號標記不同字段：",
+        "colSymbol": "符號",
+        "colMeaning": "含義",
+        "ipa": "IPA 音標",
+        "notes": "備註",
+        "localExpression": "方言講法",
+        "standardWord": "書面詞（standard_word）",
+        "remaining": "括號外的剩餘文字",
+        "note": "三個括號標記均為可選，但每行解析後 standard_word、local_expression、ipa 至少要有值。括號可混合使用全角/半角（() 和 （） 均支持）。"
+      },
+      "formatHelpWhitespace": {
+        "title": "文檔空格格式（doc_whitespace）",
+        "desc": "適用文件：.docx、.doc、.txt。每行一條記錄，字段之間用空格分隔，按順序為：書面詞 方言講法 音標 [備註...]",
+        "colPosition": "位置",
+        "colField": "字段",
+        "colRequired": "必填",
+        "note": "注意 IPA 中不能含空格（如 ȵit2 tʰəu2 會被拆成兩個字段導致解析錯誤），含空格的 IPA 請使用括號格式或表格格式。"
+      }
     },
     "locations": {
       "title": "地點信息",

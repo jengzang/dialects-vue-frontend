@@ -24,7 +24,9 @@
     "warning": "警告",
     "info": "提示",
     "today": "今日",
-    "totalVisits": "总访问"
+    "totalVisits": "总访问",
+    "yes": "是",
+    "no": "否"
   },
   "placeholder": {
     "input": "请输入",

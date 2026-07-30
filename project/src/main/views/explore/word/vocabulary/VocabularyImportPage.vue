@@ -36,7 +36,12 @@
         </div>
 
         <div class="upload-parser-row">
-          <h3 class="upload-section-title">{{ t('words.wordList.upload.chooseFile') }}</h3>
+          <div class="upload-parser-head">
+            <h3 class="upload-section-title">{{ t('words.wordList.upload.chooseFile') }}</h3>
+            <button class="main-glass-button info-help-btn" data-size="small" type="button" @click="showFormatHelp = true">
+              ? {{ t('words.wordList.upload.formatHelp') }}
+            </button>
+          </div>
           <RadioGroup
             v-model="uploadParserMode"
             name="parser-mode"
@@ -211,6 +216,118 @@
       </template>
     </AppModal>
 
+    <AppModal
+      :model-value="showFormatHelp"
+      size="lg"
+      :title="t('words.wordList.upload.formatHelpTitle')"
+      :close-label="t('common.button.close')"
+      @update:modelValue="showFormatHelp = false"
+    >
+      <div class="format-help-content ui-scrollbar">
+        <div class="help-section">
+          <h4>{{ t('words.wordList.upload.formatHelpTable.title') }}</h4>
+          <p>{{ t('words.wordList.upload.formatHelpTable.desc') }}</p>
+          <div class="format-details">
+            <p><strong>{{ t('words.wordList.upload.formatHelpTable.required') }}</strong></p>
+            <table class="help-table">
+              <thead>
+                <tr>
+                  <th>{{ t('words.wordList.upload.formatHelpTable.colField') }}</th>
+                  <th>{{ t('words.wordList.upload.formatHelpTable.colAliases') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="col in formatHelpTableColumns" :key="col.key">
+                  <td><code>{{ col.key }}</code><span v-if="col.required" class="help-required">*</span></td>
+                  <td>{{ col.aliases }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <p v-if="t('words.wordList.upload.formatHelpTable.note')" class="help-note">{{ t('words.wordList.upload.formatHelpTable.note') }}</p>
+          </div>
+        </div>
+
+        <div class="help-section">
+          <h4>{{ t('words.wordList.upload.formatHelpBracket.title') }}</h4>
+          <p>{{ t('words.wordList.upload.formatHelpBracket.desc') }}</p>
+          <div class="format-details">
+            <table class="help-table">
+              <thead>
+                <tr>
+                  <th>{{ t('words.wordList.upload.formatHelpBracket.colSymbol') }}</th>
+                  <th>{{ t('words.wordList.upload.formatHelpBracket.colMeaning') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>[ ]</code></td>
+                  <td>{{ t('words.wordList.upload.formatHelpBracket.ipa') }}</td>
+                </tr>
+                <tr>
+                  <td><code>{ }</code></td>
+                  <td>{{ t('words.wordList.upload.formatHelpBracket.notes') }}</td>
+                </tr>
+                <tr>
+                  <td><code>( )</code> / <code>（ ）</code></td>
+                  <td>{{ t('words.wordList.upload.formatHelpBracket.localExpression') }}</td>
+                </tr>
+                <tr>
+                  <td>{{ t('words.wordList.upload.formatHelpBracket.remaining') }}</td>
+                  <td>{{ t('words.wordList.upload.formatHelpBracket.standardWord') }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <p v-if="t('words.wordList.upload.formatHelpBracket.note')" class="help-note">{{ t('words.wordList.upload.formatHelpBracket.note') }}</p>
+          </div>
+        </div>
+
+        <div class="help-section">
+          <h4>{{ t('words.wordList.upload.formatHelpWhitespace.title') }}</h4>
+          <p>{{ t('words.wordList.upload.formatHelpWhitespace.desc') }}</p>
+          <div class="format-details">
+            <table class="help-table">
+              <thead>
+                <tr>
+                  <th>{{ t('words.wordList.upload.formatHelpWhitespace.colPosition') }}</th>
+                  <th>{{ t('words.wordList.upload.formatHelpWhitespace.colField') }}</th>
+                  <th>{{ t('words.wordList.upload.formatHelpWhitespace.colRequired') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>standard_word</td>
+                  <td>{{ t('common.label.yes') }}</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>local_expression</td>
+                  <td>{{ t('common.label.yes') }}</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>ipa</td>
+                  <td>{{ t('common.label.yes') }}</td>
+                </tr>
+                <tr>
+                  <td>4+</td>
+                  <td>notes</td>
+                  <td>{{ t('common.label.no') }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <p v-if="t('words.wordList.upload.formatHelpWhitespace.note')" class="help-note">{{ t('words.wordList.upload.formatHelpWhitespace.note') }}</p>
+          </div>
+        </div>
+      </div>
+
+      <template #footer>
+        <button class="main-glass-button" data-variant="primary" type="button" @click="showFormatHelp = false">
+          {{ t('tools.checkTool.help.gotIt') }}
+        </button>
+      </template>
+    </AppModal>
+
   </div>
 </template>
 
@@ -266,6 +383,7 @@ function navigateToSuggestion() {
 
 const isUploading = ref(false)
 const isPreviewingImport = ref(false)
+const showFormatHelp = ref(false)
 const uploadStatusText = ref('')
 const backendPreview = ref(null)
 const isOverwriteConfirmed = ref(false)
@@ -320,6 +438,13 @@ const parserModeOptions = computed(() => [
   { value: 'table', label: t('words.wordList.upload.parserModes.table') },
   { value: 'doc_whitespace', label: t('words.wordList.upload.parserModes.docWhitespace') },
   { value: 'doc_bracket', label: t('words.wordList.upload.parserModes.docBracket') },
+])
+
+const formatHelpTableColumns = computed(() => [
+  { key: 'standard_word', required: true, aliases: 'standard_word / written / 释义 / 书面 / 书面词条 / 词条 / meaning' },
+  { key: 'local_expression', required: true, aliases: 'local_expression / vocabulary / 当地讲法 / 方言词 / 方言讲法 / local' },
+  { key: 'ipa', required: true, aliases: 'ipa / IPA / 音标 / 国际音标' },
+  { key: 'notes', required: false, aliases: 'notes / note / 注释 / 备注 / 说明' },
 ])
 
 const importSchema = computed(() => [
