@@ -251,25 +251,6 @@ const route = useRoute()
 const router = useRouter()
 const pageSizeOptions = [20, 50, 100, 200]
 
-const manageSection = ref('entries')
-const manageSectionOptions = computed(() => {
-  const options = []
-  if (hasVocabularyPermission.value) {
-    options.push({ value: 'entries', label: t('words.wordList.tabs.list') })
-    options.push({ value: 'locations', label: t('words.wordList.locations.title') })
-  }
-  if (canViewVocabularyLogs.value) {
-    options.push({ value: 'logs', label: t('words.wordList.logs.title') })
-  }
-  return options
-})
-
-watch(manageSectionOptions, (options) => {
-  if (options.length && !options.some(o => o.value === manageSection.value)) {
-    manageSection.value = options[0].value
-  }
-})
-
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
   isLoadingVocabularyMe: { type: Boolean, default: false },
@@ -316,6 +297,26 @@ const logPagination = reactive({
 const effectiveVocabularyMe = computed(() => props.vocabularyMe || localVocabularyMe.value)
 const hasVocabularyPermission = computed(() => Boolean(effectiveVocabularyMe.value?.permission_level))
 const canViewVocabularyLogs = computed(() => effectiveVocabularyMe.value?.can_view_logs === true)
+
+const manageSection = ref('entries')
+const manageSectionOptions = computed(() => {
+  const options = []
+  if (hasVocabularyPermission.value) {
+    options.push({ value: 'entries', label: t('words.wordList.tabs.list') })
+    options.push({ value: 'locations', label: t('words.wordList.locations.title') })
+  }
+  if (canViewVocabularyLogs.value) {
+    options.push({ value: 'logs', label: t('words.wordList.logs.title') })
+  }
+  return options
+})
+
+watch(manageSectionOptions, (options) => {
+  if (options.length && !options.some(o => o.value === manageSection.value)) {
+    manageSection.value = options[0].value
+  }
+})
+
 const isWaitingForAuth = computed(() => !props.isAuthReady || props.isLoadingVocabularyMe)
 const requiresLogin = computed(() => props.isAuthReady && !props.isAuthenticated)
 const requiresVocabularyPermission = computed(() => (

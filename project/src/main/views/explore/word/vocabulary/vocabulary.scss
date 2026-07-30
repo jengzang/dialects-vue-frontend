@@ -504,6 +504,13 @@
   font-size: 0.9rem;
 }
 
+.upload-location-modal-hint {
+  width: 100%;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
 .upload-location-modal-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);

@@ -146,7 +146,7 @@
         "docWhitespace": "文档空白分隔",
         "docBracket": "文档括号识别"
       },
-      "missingLocation": "请先填写地点简称和经纬度。",
+      "missingLocation": "请填写上传词表对应的地点名称及经纬度。",
       "unsupportedFile": "请上传支持的词表文件（.xlsx、.xls、.csv、.tsv、.docx、.doc）。",
       "previewFailed": "词表导入预览失败",
       "useYindianData": "使用音典数据",
@@ -154,6 +154,7 @@
       "yindianNotFound": "未找到音典数据",
       "yindianFilled": "已填入音典数据",
       "yindianFailed": "获取音典数据失败",
+      "yindianHint": "请输入音典档案里的标准地名简称（繁体）以匹配",
       "success": "上传完成，导入 {count} 条。",
       "failed": "上传词表失败"
     },

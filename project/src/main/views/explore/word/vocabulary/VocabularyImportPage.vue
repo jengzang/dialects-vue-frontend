@@ -146,6 +146,7 @@
           >
             {{ isLoadingYindianLocation ? t('common.label.loading') : t('words.wordList.upload.useYindianData') }}
           </button>
+          <p class="upload-location-modal-hint">{{ t('words.wordList.upload.yindianHint') }}</p>
           <span v-if="uploadLocationEditorStatus">{{ uploadLocationEditorStatus }}</span>
         </div>
 

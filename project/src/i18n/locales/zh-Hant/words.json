@@ -146,7 +146,7 @@
         "docWhitespace": "文檔空白分隔",
         "docBracket": "文檔括號識別"
       },
-      "missingLocation": "請先填寫地點簡稱和經緯度。",
+      "missingLocation": "請填寫上傳詞表對應的地點名稱及經緯度。",
       "unsupportedFile": "請上傳支持的詞表文件（.xlsx、.xls、.csv、.tsv、.docx、.doc）。",
       "previewFailed": "詞表導入預覽失敗",
       "useYindianData": "使用音典數據",
@@ -154,6 +154,7 @@
       "yindianNotFound": "未找到音典數據",
       "yindianFilled": "已填入音典數據",
       "yindianFailed": "獲取音典數據失敗",
+      "yindianHint": "請輸入音典檔案裡的標準地名簡稱（繁體）以匹配",
       "success": "上傳完成，導入 {count} 條。",
       "failed": "上傳詞表失敗"
     },

@@ -146,7 +146,7 @@
         "docWhitespace": "Document whitespace",
         "docBracket": "Document brackets"
       },
-      "missingLocation": "Fill in location name and coordinates first.",
+      "missingLocation": "Fill in the location name and coordinates for the uploaded vocabulary.",
       "unsupportedFile": "Upload a supported vocabulary file (.xlsx, .xls, .csv, .tsv, .docx, .doc).",
       "previewFailed": "Vocabulary import preview failed",
       "useYindianData": "Use Yindian data",
@@ -154,6 +154,7 @@
       "yindianNotFound": "No Yindian data found",
       "yindianFilled": "Yindian data filled in",
       "yindianFailed": "Failed to get Yindian data",
+      "yindianHint": "Enter the standard place name (traditional Chinese) from the Yindian archive to match",
       "success": "Upload complete. Imported {count} rows.",
       "failed": "Upload failed"
     },
