@@ -154,6 +154,7 @@
           @toggle-fullscreen="handleToggleFullscreen"
           @update-feature-property="updateSelectedFeatureProperty"
           @move-feature-to-layer="handleMoveSelectedFeatureToLayer"
+          @move-selected-features-to-layer="handleMoveSelectedFeaturesToLayer"
         />
 
         <MapDrawLayersPanel
@@ -841,6 +842,12 @@ const canDuplicateSelectedFeature = computed(() => {
     && canModifyActiveLayer.value
     && selectedFeature.value.properties?.visible !== false
     && selectedFeature.value.properties?.locked !== true
+  );
+});
+const canMoveSelectedFeatures = computed(() => {
+  return Boolean(
+    canDuplicateSelectedFeature.value
+    && selectedFeatureIds.value.some((featureId) => activeLayerFeatureIdSet.value.has(featureId))
   );
 });
 
@@ -1850,6 +1857,46 @@ const handleMoveSelectedFeatureToLayer = (targetLayerId) => {
   setFeatureSelection([selectedFeatureId.value], selectedFeatureId.value);
   currentMode.value = 'simple_select';
   syncAllLayersAfterMutation();
+  editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
+};
+
+const handleMoveSelectedFeaturesToLayer = (targetLayerId) => {
+  if (!canMoveSelectedFeatures.value) return;
+  const sourceLayer = activeLayer.value;
+  const targetLayer = layers.value.find((layer) => layer.id === targetLayerId);
+  if (!sourceLayer || !targetLayer || sourceLayer.id === targetLayer.id) return;
+  if (
+    targetLayer.geometryType !== activeLayer.value?.geometryType
+    || targetLayer.visible === false
+    || targetLayer.locked === true
+  ) return;
+
+  const selectedFeatureIdSet = new Set(selectedFeatureIds.value);
+  const sourceCollection = sourceLayer.featureCollection ?? emptyFeatureCollection();
+  const sourceFeatures = sourceCollection.features ?? [];
+  const featuresToMove = sourceFeatures
+    .filter((feature) => selectedFeatureIdSet.has(getFeatureId(feature)));
+  if (featuresToMove.length === 0) return;
+
+  commitHistory();
+  sourceLayer.featureCollection = {
+    ...sourceCollection,
+    features: sourceFeatures.filter((feature) => !selectedFeatureIdSet.has(getFeatureId(feature))),
+  };
+  const targetCollection = targetLayer.featureCollection ?? emptyFeatureCollection();
+  targetLayer.featureCollection = {
+    ...targetCollection,
+    features: [...(targetCollection.features ?? []), ...featuresToMove],
+  };
+  const movedFeatureIds = featuresToMove.map((feature) => getFeatureId(feature)).filter(Boolean);
+  activeLayerId.value = targetLayer.id;
+  setFeatureSelection(movedFeatureIds, movedFeatureIds[0]);
+  currentMode.value = 'simple_select';
+  syncAllLayersAfterMutation();
+  if (selectedFeatureIds.value.length > 1) {
+    editableMapRef.value?.selectFeatures?.(selectedFeatureIds.value);
+    return;
+  }
   editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
 };
 

@@ -282,6 +282,26 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain("editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });")
   })
 
+  it('supports moving checked features to another compatible layer', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+
+    expect(panelSource).toContain('selectedFeatureIds.length > 1 && featureMoveLayerOptions.length')
+    expect(panelSource).toContain(`$emit('move-selected-features-to-layer', $event)`)
+    expect(panelSource).toContain(`'move-selected-features-to-layer'`)
+    expect(tabSource).toContain('@move-selected-features-to-layer="handleMoveSelectedFeaturesToLayer"')
+    expect(tabSource).toContain('const canMoveSelectedFeatures = computed')
+    expect(tabSource).toContain('const handleMoveSelectedFeaturesToLayer = (targetLayerId) =>')
+    expect(tabSource).toContain('if (!canMoveSelectedFeatures.value) return;')
+    expect(tabSource).toContain('const selectedFeatureIdSet = new Set(selectedFeatureIds.value);')
+    expect(tabSource).toMatch(/const handleMoveSelectedFeaturesToLayer = \(targetLayerId\) => \{[\s\S]*commitHistory\(\);/)
+    expect(tabSource).toMatch(/sourceLayer\.featureCollection = \{[\s\S]*features: sourceFeatures\.filter/)
+    expect(tabSource).toContain('features: [...(targetCollection.features ?? []), ...featuresToMove],')
+    expect(tabSource).toContain('activeLayerId.value = targetLayer.id;')
+    expect(tabSource).toContain('setFeatureSelection(movedFeatureIds, movedFeatureIds[0]);')
+    expect(tabSource).toContain('editableMapRef.value?.selectFeatures?.(selectedFeatureIds.value);')
+  })
+
   it('supports checkbox-based batch deletion for active-layer features', () => {
     const panelSource = readSource(mapDrawToolsPanelPath)
     const tabSource = readSource(mapDrawTabPath)

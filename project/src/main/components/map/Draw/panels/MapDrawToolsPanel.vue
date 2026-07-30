@@ -182,6 +182,16 @@
               >
                 {{ t('map.drawTab.buttons.deleteSelectedFeatures') }}
               </button>
+              <SimpleSelectDropdown
+                v-if="selectedFeatureIds.length > 1 && featureMoveLayerOptions.length"
+                class="draw-feature-batch-move"
+                :model-value="''"
+                :options="featureMoveLayerOptions"
+                :placeholder="t('map.drawTab.labels.moveFeatureToLayer')"
+                :disabled="!canModifyActiveLayer"
+                width="7.5rem"
+                @update:model-value="$emit('move-selected-features-to-layer', $event)"
+              />
             </div>
           </div>
           <div
@@ -428,6 +438,7 @@ defineEmits([
   'toggle-fullscreen',
   'update-feature-property',
   'move-feature-to-layer',
+  'move-selected-features-to-layer',
 ])
 
 const getGeometryLabel = (geometryType) => {
