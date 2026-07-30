@@ -553,6 +553,35 @@
   display: none;
 }
 
+.upload-zone-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 28px;
+  border: 2px dashed rgba(var(--color-primary-rgb), 0.28);
+  border-radius: var(--radius-md, 12px);
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &.drag-over {
+    border-color: rgba(var(--color-primary-rgb), 0.58);
+    background: rgba(var(--color-primary-rgb), 0.08);
+  }
+}
+
+.upload-zone-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.upload-zone-hint {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
 .locations-list {
   display: grid;
   gap: 10px;

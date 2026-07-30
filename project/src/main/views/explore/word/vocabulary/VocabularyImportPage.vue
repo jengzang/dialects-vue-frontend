@@ -10,7 +10,7 @@
       <div class="upload-mode main-glass-panel">
         <div class="upload-head">
           <div>
-            <h3>{{ t('words.wordList.upload.title') }}</h3>
+            <h3 style="margin-bottom: 15px;">{{ t('words.wordList.upload.title') }}</h3>
             <!-- <p>{{ t('words.wordList.upload.desc') }}</p> -->
             <div v-if="requiresLogin" class="upload-access-notice">
               <p>{{ uploadAccessNotice }}</p>
@@ -25,21 +25,37 @@
             </div>
             <p v-else-if="uploadAccessNotice" class="upload-status">{{ uploadAccessNotice }}</p>
           </div>
-          <label class="main-glass-button" data-variant="primary">
-            {{ t('words.wordList.upload.chooseFile') }}
-            <input class="upload-file-input" type="file" accept=".xlsx,.xls,.csv,.tsv,.docx,.doc" @change="handleUploadFile" />
-          </label>
+          <input
+            type="file"
+            ref="fileInputEl"
+            accept=".xlsx,.xls,.csv,.tsv,.docx,.doc"
+            class="upload-file-input"
+            @change="handleUploadFile"
+          />
+          <div
+            v-if="!selectedUploadFile"
+            class="upload-zone-drop"
+            :class="{ 'drag-over': isDragOver }"
+            @click="fileInputEl?.click()"
+            @dragover.prevent="isDragOver = true"
+            @dragleave.prevent="isDragOver = false"
+            @drop.prevent="handleDrop"
+          >
+            <div class="upload-zone-icon">📄</div>
+            <p class="upload-zone-hint">{{ t('words.wordList.upload.dropHint') }}</p>
+          </div>
         </div>
 
-        <div class="upload-location-summary">
-          <div>
-            <strong>{{ uploadLocation.location_name || t('words.wordList.upload.locationName') }}</strong>
-            <p>{{ uploadLocationSummaryText }}</p>
+        <template v-if="selectedUploadFile">
+          <div class="upload-location-summary">
+            <div>
+              <strong>{{ uploadLocation.location_name || t('words.wordList.upload.locationName') }}</strong>
+              <p>{{ uploadLocationSummaryText }}</p>
+            </div>
+            <button class="main-glass-button" data-variant="secondary" type="button" @click="openUploadLocationEditor">
+              {{ uploadLocation.location_name ? t('common.button.edit') : t('words.wordList.upload.locationName') }}
+            </button>
           </div>
-          <button class="main-glass-button" data-variant="secondary" type="button" @click="openUploadLocationEditor">
-            {{ uploadLocation.location_name ? t('common.button.edit') : t('words.wordList.upload.locationName') }}
-          </button>
-        </div>
 
         <div class="upload-location-summary-grid">
           <span v-for="item in uploadLocationSummaryItems" :key="item.key">
@@ -48,14 +64,11 @@
         </div>
 
         <div class="upload-parser-row">
-          <label class="upload-field">
-            <span>{{ t('words.wordList.upload.parserMode') }}</span>
-            <select v-model="uploadParserMode">
-              <option v-for="option in parserModeOptions" :key="option.value" :value="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-          </label>
+          <RadioGroup
+            v-model="uploadParserMode"
+            name="parser-mode"
+            :options="parserModeOptions"
+          />
         </div>
 
         <TabularImportPreview
@@ -116,6 +129,7 @@
           </button>
         </div>
         <p v-if="uploadStatusText" class="upload-status">{{ uploadStatusText }}</p>
+        </template>
       </div>
     </section>
 
@@ -245,6 +259,8 @@ const isOverwriteConfirmed = ref(false)
 
 const uploadParserMode = ref('auto')
 const uploadFile = ref(null)
+const fileInputEl = ref(null)
+const isDragOver = ref(false)
 const createEmptyUploadLocation = () => ({
   location_name: '',
   coordinates: '',
@@ -497,6 +513,26 @@ function clearUploadFile() {
   backendPreview.value = null
   isOverwriteConfirmed.value = false
   importFlow.clearPreview()
+}
+
+function handleDrop(event) {
+  isDragOver.value = false
+  const file = event.dataTransfer?.files?.[0]
+  if (!file) return
+  uploadStatusText.value = ''
+  backendPreview.value = null
+  clearUploadFile()
+
+  if (!isVocabularyUploadFile(file)) {
+    uploadStatusText.value = t('words.wordList.upload.unsupportedFile')
+    return
+  }
+
+  if (isVocabularyPreviewFile(file)) {
+    importFlow.loadPreview(file)
+  } else {
+    uploadFile.value = file
+  }
 }
 
 function handleUploadFile(event) {

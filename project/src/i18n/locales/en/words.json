@@ -113,6 +113,7 @@
       "title": "Upload Vocabulary",
       "desc": "Choose a table file, map vocabulary fields, then submit it for review.",
       "chooseFile": "Choose file",
+      "dropHint": "Click or drag Excel, CSV, TSV, Word files here",
       "previewAction": "Preview Import",
       "submit": "Submit Vocabulary",
       "previewTitle": "Vocabulary import preview",
