@@ -115,7 +115,7 @@
         <p class="map-meta" v-if="mapDetailEntries.length">
           {{ t('words.wordList.map.pointCount', { count: mapDetailEntries.length }) }}
         </p>
-        <div v-if="isLoadingMapDetail" class="loading-state loading-state-base">
+        <div v-if="isLoadingMapDetail && !mapDetailEntries.length" class="loading-state loading-state-base">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <span>{{ t('words.wordList.states.loadingData') }}</span>
         </div>
@@ -136,9 +136,16 @@
             class="load-more-btn main-glass-button"
             data-variant="secondary"
             type="button"
+            :disabled="isLoadingMapDetail"
             @click="loadMoreMapDetail"
           >
-            {{ t('words.wordList.states.loadingMore') }}
+            <template v-if="isLoadingMapDetail">
+              <span class="btn-loading-dot" aria-hidden="true"></span>
+              {{ t('words.wordList.states.loadingData') }}
+            </template>
+            <template v-else>
+              {{ t('words.wordList.states.loadingMore') }}
+            </template>
           </button>
         </div>
         <div v-else class="empty-state empty-state-base">
