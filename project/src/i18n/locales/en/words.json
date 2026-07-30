@@ -129,6 +129,7 @@
       "permissionRequired": "This account does not have vocabulary upload permission.",
       "locationName": "Location Name",
       "locationNamePlaceholder": "Example: Xifeng",
+      "enterLocationInfo": "Enter Location Info",
       "coordinates": "Coordinates",
       "coordinatesPlaceholder": "Example: 106.7400,27.0900",
       "province": "Province",

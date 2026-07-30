@@ -129,6 +129,7 @@
       "permissionRequired": "當前賬號沒有詞表上傳權限。",
       "locationName": "地點簡稱",
       "locationNamePlaceholder": "例如：息烽",
+      "enterLocationInfo": "輸入地點資訊",
       "coordinates": "經緯度",
       "coordinatesPlaceholder": "例如：106.7400,27.0900",
       "province": "省",

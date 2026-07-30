@@ -129,6 +129,7 @@
       "permissionRequired": "当前账号没有词表上传权限。",
       "locationName": "地点简称",
       "locationNamePlaceholder": "例如：息烽",
+      "enterLocationInfo": "输入地点信息",
       "coordinates": "经纬度",
       "coordinatesPlaceholder": "例如：106.7400,27.0900",
       "province": "省",

@@ -25,7 +25,7 @@
             <p>{{ uploadLocationSummaryText }}</p>
           </div>
           <button class="main-glass-button" data-variant="secondary" type="button" @click="openUploadLocationEditor">
-            {{ uploadLocation.location_name ? t('common.button.edit') : t('words.wordList.upload.locationName') }}
+            {{ uploadLocation.location_name ? t('common.button.edit') : t('words.wordList.upload.enterLocationInfo') }}
           </button>
         </div>
 
@@ -36,6 +36,7 @@
         </div>
 
         <div class="upload-parser-row">
+          <h3 class="upload-section-title">{{ t('words.wordList.upload.chooseFile') }}</h3>
           <RadioGroup
             v-model="uploadParserMode"
             name="parser-mode"
@@ -82,26 +83,6 @@
             <li v-for="error in backendPreview.errors" :key="error">{{ error }}</li>
           </ul>
         </div>
-        <div class="upload-actions">
-          <button
-            class="main-glass-button"
-            data-variant="secondary"
-            type="button"
-            :disabled="!canConfirmUpload"
-            @click="handlePreviewImport"
-          >
-            {{ isPreviewingImport ? t('common.label.loading') : t('words.wordList.upload.previewAction') }}
-          </button>
-          <button
-            class="main-glass-button"
-            data-variant="primary"
-            type="button"
-            :disabled="!canImportAfterPreview"
-            @click="handleImportAfterPreview"
-          >
-            {{ isUploading ? t('common.label.loading') : t('words.wordList.upload.submit') }}
-          </button>
-        </div>
         <p v-if="uploadStatusText" class="upload-status">{{ uploadStatusText }}</p>
 
         <input
@@ -123,6 +104,19 @@
           <div class="upload-zone-icon">📄</div>
           <p class="upload-zone-hint">{{ t('words.wordList.upload.dropHint') }}</p>
         </div>
+
+        <div class="upload-actions">
+          <button
+            class="main-glass-button"
+            data-variant="primary"
+            type="button"
+            :disabled="!canImportAfterPreview"
+            @click="handleImportAfterPreview"
+          >
+            {{ isUploading ? t('common.label.loading') : t('words.wordList.upload.submit') }}
+          </button>
+        </div>
+
       </div>
     </section>
 
@@ -521,6 +515,7 @@ function handleDrop(event) {
     importFlow.loadPreview(file)
   } else {
     uploadFile.value = file
+    handlePreviewImport()
   }
 }
 
@@ -541,6 +536,7 @@ function handleUploadFile(event) {
     importFlow.loadPreview(file)
   } else {
     uploadFile.value = file
+    handlePreviewImport()
   }
 
   event.target.value = ''
