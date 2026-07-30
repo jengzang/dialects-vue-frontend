@@ -300,6 +300,7 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain('activeLayerId.value = targetLayer.id;')
     expect(tabSource).toContain('setFeatureSelection(movedFeatureIds, movedFeatureIds[0]);')
     expect(tabSource).toContain('editableMapRef.value?.selectFeatures?.(selectedFeatureIds.value);')
+    expect(tabSource).toContain('{ emitChanges: false, emitSelection: false }')
   })
 
   it('supports checkbox-based batch deletion for active-layer features', () => {
@@ -324,6 +325,28 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain('selectedFeatureIds.value = [];')
     expect(editableSource).toContain('const selectFeatures = (featureIds = []) =>')
     expect(editableSource).toContain("draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })")
+  })
+
+  it('supports checkbox-based batch visibility and locking for active-layer features', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+
+    expect(panelSource).toContain(`$emit('set-selected-features-visible', false)`)
+    expect(panelSource).toContain(`$emit('set-selected-features-visible', true)`)
+    expect(panelSource).toContain(`$emit('set-selected-features-locked', true)`)
+    expect(panelSource).toContain(`$emit('set-selected-features-locked', false)`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.hideSelectedFeatures')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.showSelectedFeatures')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.lockSelectedFeatures')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.unlockSelectedFeatures')`)
+    expect(tabSource).toContain('@set-selected-features-visible="handleSetSelectedFeaturesVisible"')
+    expect(tabSource).toContain('@set-selected-features-locked="handleSetSelectedFeaturesLocked"')
+    expect(tabSource).toContain('const updateSelectedFeaturesProperty = (key, value) =>')
+    expect(tabSource).toContain('const handleSetSelectedFeaturesVisible = (visible) =>')
+    expect(tabSource).toContain('const handleSetSelectedFeaturesLocked = (locked) =>')
+    expect(tabSource).toMatch(/const updateSelectedFeaturesProperty = \(key, value\) => \{[\s\S]*commitHistory\(\);/)
+    expect(tabSource).toContain('resetDrawSelectionMode();')
+    expect(tabSource).toContain('editableMapRef.value?.selectFeatures?.(selectedFeatureIds.value);')
   })
 
   it('falls back to layer editing when selected feature id is stale', () => {

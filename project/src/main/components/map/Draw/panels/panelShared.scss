@@ -192,6 +192,7 @@
 
 .draw-feature-batch-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.45rem;
   justify-content: flex-end;

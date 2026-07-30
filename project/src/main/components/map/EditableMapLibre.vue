@@ -549,7 +549,7 @@ const importGeoJson = (featureCollection, options = {}) => {
   selectedFeatureId.value = ''
   if (shouldEmitChanges) {
     syncFeaturesFromDraw()
-  } else {
+  } else if (options.emitSelection !== false) {
     syncSelectedFeature()
   }
 }

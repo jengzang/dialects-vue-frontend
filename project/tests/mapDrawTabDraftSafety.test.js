@@ -69,11 +69,15 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
   default: defineComponent({
     name: 'EditableMapLibreStub',
     props: ['modelValue'],
-    emits: ['update:modelValue', 'features-change'],
+    emits: ['update:modelValue', 'features-change', 'feature-select'],
     setup(props, { emit, expose }) {
       expose({
         setDrawMode: vi.fn(),
-        importGeoJson: vi.fn(),
+        importGeoJson: vi.fn((_featureCollection, options = {}) => {
+          if (options.emitSelection !== false) {
+            emit('feature-select', '')
+          }
+        }),
         syncReadonlyLayers: vi.fn(),
         removeReadonlyLayerById: vi.fn(),
         resetView: vi.fn(),
@@ -119,7 +123,13 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       selectedFeatureIds: { type: Array, default: () => [] },
       canModifyActiveLayer: { type: Boolean, default: false },
     },
-    emits: ['toggle-feature-selection', 'delete-selected-features', 'move-selected-features-to-layer'],
+    emits: [
+      'toggle-feature-selection',
+      'delete-selected-features',
+      'move-selected-features-to-layer',
+      'set-selected-features-visible',
+      'set-selected-features-locked',
+    ],
     template: `
       <div data-testid="tools-panel">
         <span data-testid="active-layer-id">{{ activeLayer?.id || '' }}</span>
@@ -131,6 +141,13 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
             @change="$emit('toggle-feature-selection', feature.id)"
           >
           {{ feature.label }}
+          <span
+            data-testid="feature-state"
+            :data-visible="feature.visible ? 'true' : 'false'"
+            :data-locked="feature.locked ? 'true' : 'false'"
+          >
+            {{ feature.visible ? 'visible' : 'hidden' }} {{ feature.locked ? 'locked' : 'unlocked' }}
+          </span>
         </label>
         <button
           data-testid="delete-selected-features"
@@ -147,6 +164,38 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
           @click="$emit('move-selected-features-to-layer', featureMoveLayerOptions[0]?.value)"
         >
           move selected features
+        </button>
+        <button
+          data-testid="hide-selected-features"
+          type="button"
+          :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
+          @click="$emit('set-selected-features-visible', false)"
+        >
+          hide selected features
+        </button>
+        <button
+          data-testid="show-selected-features"
+          type="button"
+          :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
+          @click="$emit('set-selected-features-visible', true)"
+        >
+          show selected features
+        </button>
+        <button
+          data-testid="lock-selected-features"
+          type="button"
+          :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
+          @click="$emit('set-selected-features-locked', true)"
+        >
+          lock selected features
+        </button>
+        <button
+          data-testid="unlock-selected-features"
+          type="button"
+          :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
+          @click="$emit('set-selected-features-locked', false)"
+        >
+          unlock selected features
         </button>
       </div>
     `,
@@ -659,6 +708,8 @@ describe('MapDrawTab draft safety', () => {
 
     expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe('draw-layer-2')
     expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(2)
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .every((item) => item.checked)).toBe(true)
 
     document.dispatchEvent(new KeyboardEvent('keydown', {
       bubbles: true,
@@ -669,6 +720,64 @@ describe('MapDrawTab draft safety', () => {
 
     expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe('draw-layer-1')
     expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(2)
+
+    wrapper.unmount()
+  })
+
+  it('updates checked active-layer feature visibility and locking as batch actions', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    checkboxes[1].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
+      .every((item) => item.dataset.visible === 'false')).toBe(true)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'z',
+      metaKey: true,
+    }))
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
+      .every((item) => item.dataset.visible === 'true')).toBe(true)
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .every((item) => item.checked)).toBe(true)
+
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    if (!checkboxes[0].checked) checkboxes[0].click()
+    if (!checkboxes[1].checked) checkboxes[1].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="lock-selected-features"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
+      .every((item) => item.dataset.locked === 'true')).toBe(true)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'z',
+      metaKey: true,
+    }))
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
+      .every((item) => item.dataset.locked === 'false')).toBe(true)
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .every((item) => item.checked)).toBe(true)
 
     wrapper.unmount()
   })

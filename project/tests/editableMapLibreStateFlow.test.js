@@ -340,6 +340,34 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('can replace draw data without emitting a selection reset', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: {},
+        geometry: { type: 'LineString', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.importGeoJson({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-2',
+        type: 'Feature',
+        properties: {},
+        geometry: { type: 'LineString', coordinates: [] },
+      }],
+    }, { emitChanges: false, emitSelection: false })
+
+    expect(wrapper.events.some(([eventName]) => eventName === 'feature-select')).toBe(false)
+
+    wrapper.unmount()
+  })
+
   it('restores draw data and overlay layers after a basemap style reload', async () => {
     const activeFeature = {
       id: 'active-line-1',

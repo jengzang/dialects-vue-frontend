@@ -155,6 +155,8 @@
           @update-feature-property="updateSelectedFeatureProperty"
           @move-feature-to-layer="handleMoveSelectedFeatureToLayer"
           @move-selected-features-to-layer="handleMoveSelectedFeaturesToLayer"
+          @set-selected-features-visible="handleSetSelectedFeaturesVisible"
+          @set-selected-features-locked="handleSetSelectedFeaturesLocked"
         />
 
         <MapDrawLayersPanel
@@ -1602,7 +1604,7 @@ const syncActiveLayerToMap = () => {
   if (!activeLayer.value) return;
   editableMapRef.value?.importGeoJson?.(
     activeLayer.value.featureCollection,
-    { emitChanges: false }
+    { emitChanges: false, emitSelection: false }
   );
 };
 
@@ -2005,6 +2007,60 @@ const updateFeatureProperty = (featureId, key, value) => {
   if (key === 'locked' && value === true) {
     resetDrawSelectionMode();
   }
+};
+
+const getDefaultedFeatureStateValue = (feature, key) => {
+  const properties = feature?.properties ?? {};
+  if (key === 'visible') return properties.visible ?? true;
+  if (key === 'locked') return properties.locked ?? false;
+  return properties[key];
+};
+
+const updateSelectedFeaturesProperty = (key, value) => {
+  if (!canModifyActiveLayer.value || !activeLayer.value || selectedFeatureIds.value.length === 0) return;
+
+  const selectedFeatureIdSet = new Set(selectedFeatureIds.value);
+  const featureCollection = activeLayer.value.featureCollection ?? emptyFeatureCollection();
+  let hasChanges = false;
+  const nextFeatures = (featureCollection.features ?? []).map((feature) => {
+    if (!selectedFeatureIdSet.has(getFeatureId(feature))) return feature;
+    if (getDefaultedFeatureStateValue(feature, key) === value) return feature;
+    hasChanges = true;
+    return {
+      ...feature,
+      properties: {
+        ...(feature.properties ?? {}),
+        [key]: value,
+      },
+    };
+  });
+  if (!hasChanges) return;
+
+  commitHistory();
+  activeLayer.value.featureCollection = {
+    ...featureCollection,
+    features: nextFeatures,
+  };
+  syncAllLayersAfterMutation();
+  if ((key === 'visible' && value === false) || (key === 'locked' && value === true)) {
+    resetDrawSelectionMode();
+    return;
+  }
+  setFeatureSelection(selectedFeatureIds.value, selectedFeatureId.value);
+  currentMode.value = 'simple_select';
+  if (selectedFeatureIds.value.length > 1) {
+    editableMapRef.value?.selectFeatures?.(selectedFeatureIds.value);
+    return;
+  }
+  editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
+};
+
+const handleSetSelectedFeaturesVisible = (visible) => {
+  updateSelectedFeaturesProperty('visible', visible);
+};
+
+const handleSetSelectedFeaturesLocked = (locked) => {
+  updateSelectedFeaturesProperty('locked', locked);
 };
 
 const updateSelectedFeatureProperty = (key, value) => {

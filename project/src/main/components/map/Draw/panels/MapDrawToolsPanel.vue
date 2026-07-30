@@ -182,6 +182,42 @@
               >
                 {{ t('map.drawTab.buttons.deleteSelectedFeatures') }}
               </button>
+              <button
+                class="main-glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                type="button"
+                :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
+                @click="$emit('set-selected-features-visible', false)"
+              >
+                {{ t('map.drawTab.buttons.hideSelectedFeatures') }}
+              </button>
+              <button
+                class="main-glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                type="button"
+                :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
+                @click="$emit('set-selected-features-visible', true)"
+              >
+                {{ t('map.drawTab.buttons.showSelectedFeatures') }}
+              </button>
+              <button
+                class="main-glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                type="button"
+                :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
+                @click="$emit('set-selected-features-locked', true)"
+              >
+                {{ t('map.drawTab.buttons.lockSelectedFeatures') }}
+              </button>
+              <button
+                class="main-glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                type="button"
+                :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
+                @click="$emit('set-selected-features-locked', false)"
+              >
+                {{ t('map.drawTab.buttons.unlockSelectedFeatures') }}
+              </button>
               <SimpleSelectDropdown
                 v-if="selectedFeatureIds.length > 1 && featureMoveLayerOptions.length"
                 class="draw-feature-batch-move"
@@ -439,6 +475,8 @@ defineEmits([
   'update-feature-property',
   'move-feature-to-layer',
   'move-selected-features-to-layer',
+  'set-selected-features-visible',
+  'set-selected-features-locked',
 ])
 
 const getGeometryLabel = (geometryType) => {
