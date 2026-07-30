@@ -264,8 +264,8 @@ const viewModes = computed(() => [
 ])
 
 const tableColumns = computed(() => [
-  { key: 'standard_word', label: t('words.wordList.columns.definition'), filterable: false, width: 1.2 },
-  { key: 'local_expression', label: t('words.wordList.columns.headword'), filterable: false, width: 1 },
+  { key: 'standard_word', label: t('words.wordList.columns.definition'), filterable: true, width: 1.2 },
+  { key: 'local_expression', label: t('words.wordList.columns.headword'), filterable: true, width: 1 },
   { key: 'ipa', label: t('words.wordList.columns.pronunciation'), filterable: false, width: 1.2 },
   { key: 'notes', label: t('words.wordList.columns.detail'), filterable: false, width: 1.6 },
   { key: 'location_name', label: t('words.wordList.columns.location'), filterable: true, width: 1 },
