@@ -12,9 +12,6 @@ const VocabularyPage = () => import('@/main/views/explore/word/VocabularyPage.vu
 const VocabularyViewPage = () => import('@/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
 const VocabularyImportPage = () => import('@/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
 const VocabularyManagePage = () => import('@/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
-const ManageEntriesSection = () => import('@/main/views/explore/word/vocabulary/ManageEntriesSection.vue')
-const ManageLocationsSection = () => import('@/main/views/explore/word/vocabulary/ManageLocationsSection.vue')
-const ManageLogsSection = () => import('@/main/views/explore/word/vocabulary/ManageLogsSection.vue')
 const CharacterClassificationPage = () => import('@/main/views/explore/charClass/CharacterClassification.vue')
 const YangChunSpokenPage = () => import('@/main/views/explore/word/YangChunSpoken.vue')
 const GdVillagesTreePage = () => import('@/main/views/explore/villages/gdVillagesTree.vue')
@@ -71,26 +68,7 @@ export const exploreRoutes = [
       },
       {
         path: 'manage',
-        component: VocabularyManagePage,
-        redirect: (to) => ({
-          path: to.path + '/entries',
-          query: to.query,
-          hash: to.hash,
-        }),
-        children: [
-          {
-            path: 'entries',
-            component: ManageEntriesSection,
-          },
-          {
-            path: 'locations',
-            component: ManageLocationsSection,
-          },
-          {
-            path: 'logs',
-            component: ManageLogsSection,
-          },
-        ],
+        component: VocabularyManagePage
       }
     ]
   },

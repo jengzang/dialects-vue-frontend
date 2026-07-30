@@ -37,18 +37,23 @@
       </div>
     </div>
 
-    <router-view
-      :vocabulary-me="vocabularyMe"
-      :is-loading-vocabulary-me="isLoadingVocabularyMe"
-      :vocabulary-me-error="vocabularyMeError"
-      :is-authenticated="isAuthenticated"
-      :is-auth-ready="isAuthReady"
-    />
+    <router-view v-slot="{ Component }">
+      <KeepAlive>
+        <component
+          :is="Component"
+          :vocabulary-me="vocabularyMe"
+          :is-loading-vocabulary-me="isLoadingVocabularyMe"
+          :vocabulary-me-error="vocabularyMeError"
+          :is-authenticated="isAuthenticated"
+          :is-auth-ready="isAuthReady"
+        />
+      </KeepAlive>
+    </router-view>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { getVocabularyMe } from '@/api'
@@ -59,8 +64,6 @@ import ChoiceSelector from '@/components/selector/ChoiceSelector.vue'
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-
-onMounted(() => console.log('[VocabularyPage] mounted'))
 
 const vocabularyMe = ref(null)
 const isLoadingVocabularyMe = ref(false)

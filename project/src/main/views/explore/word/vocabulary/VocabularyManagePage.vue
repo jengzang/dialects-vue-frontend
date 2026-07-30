@@ -1,24 +1,13 @@
 <template>
   <div class="vocabulary-manage-page">
-    <template v-if="!shouldShowAccessGate">
-      <RadioGroup
-        v-model="manageSection"
-        :options="manageSectionOptions"
-        name="manage-section"
-        class="contribute-mode-switch"
-      />
-      <router-view v-slot="{ Component }">
-        <KeepAlive :include="manageChildNames">
-          <component
-            :is="Component"
-            :has-vocabulary-permission="hasVocabularyPermission"
-            :can-view-vocabulary-logs="canViewVocabularyLogs"
-          />
-        </KeepAlive>
-      </router-view>
-    </template>
-
-    <section v-else class="content-area">
+    <RadioGroup
+      v-if="!shouldShowAccessGate"
+      v-model="manageSection"
+      :options="manageSectionOptions"
+      name="manage-section"
+      class="contribute-mode-switch"
+    />
+    <section v-if="shouldShowAccessGate" class="content-area">
       <div class="access-gate main-glass-panel">
         <h3>{{ accessGateTitle }}</h3>
         <p>{{ accessGateDescription }}</p>
@@ -38,25 +27,38 @@
         </div>
       </div>
     </section>
+
+    <KeepAlive v-if="!shouldShowAccessGate">
+      <ManageEntriesSection
+        v-if="manageSection === 'entries'"
+        :has-vocabulary-permission="hasVocabularyPermission"
+      />
+      <ManageLocationsSection
+        v-else-if="manageSection === 'locations'"
+        :has-vocabulary-permission="hasVocabularyPermission"
+      />
+      <ManageLogsSection
+        v-else-if="manageSection === 'logs'"
+        :can-view-vocabulary-logs="canViewVocabularyLogs"
+      />
+    </KeepAlive>
   </div>
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { getVocabularyMe } from '@/api'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
+import ManageEntriesSection from './ManageEntriesSection.vue'
+import ManageLocationsSection from './ManageLocationsSection.vue'
+import ManageLogsSection from './ManageLogsSection.vue'
 import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-
-const manageChildNames = ['ManageEntriesSection', 'ManageLocationsSection', 'ManageLogsSection']
-
-onMounted(() => console.log('[VocabularyManagePage] mounted'))
-onBeforeUnmount(() => console.log('[VocabularyManagePage] beforeUnmount'))
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
@@ -84,18 +86,26 @@ const manageSectionOptions = computed(() => {
   return options
 })
 
-const manageSection = computed({
-  get: () => {
-    const path = stripLocaleFromPath(route.path)
-    if (path.endsWith('/locations')) return 'locations'
-    if (path.endsWith('/logs')) return 'logs'
-    return 'entries'
-  },
-  set: (val) => {
-    const paths = { entries: 'entries', locations: 'locations', logs: 'logs' }
-    const suffix = paths[val] || 'entries'
-    router.replace(buildLocalePath(resolveRouteLocale(route), `/explore/vocabulary/manage/${suffix}`))
-  },
+function resolveManageSection(querySection) {
+  if (querySection === 'locations') return 'locations'
+  if (querySection === 'logs') return 'logs'
+  return 'entries'
+}
+
+const manageSection = ref(resolveManageSection(route.query.section))
+
+watch(manageSection, (val) => {
+  const current = route.query.section
+  if (current !== val) {
+    router.replace({ query: { ...route.query, section: val || undefined } })
+  }
+})
+
+watch(() => route.query.section, (q) => {
+  const section = resolveManageSection(q)
+  if (manageSection.value !== section) {
+    manageSection.value = section
+  }
 })
 
 const isWaitingForAuth = computed(() => !props.isAuthReady || props.isLoadingVocabularyMe)

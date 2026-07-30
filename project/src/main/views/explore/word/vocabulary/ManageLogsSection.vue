@@ -93,22 +93,14 @@
   </section>
 </template>
 
-<script>
-export default { name: 'ManageLogsSection' }
-</script>
-
 <script setup>
-import { computed, onActivated, onDeactivated, onMounted, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getVocabularyLogs } from '@/api'
 import GlassTable from '@/components/common/GlassTable.vue'
 
 const { t } = useI18n()
 const pageSizeOptions = [20, 50, 100, 200]
-
-onMounted(() => console.log('[ManageLogsSection] mounted'))
-onActivated(() => console.log('[ManageLogsSection] activated'))
-onDeactivated(() => console.log('[ManageLogsSection] deactivated'))
 
 const props = defineProps({
   hasVocabularyPermission: { type: Boolean, default: false },

@@ -36,7 +36,8 @@ const keepAliveViewNames = [
   'VillagesML',
   'YangChunSpoken',
   'YangChunVillages',
-  'YuBaoPage'
+  'YuBaoPage',
+  'VocabularyPage'
 ]
 
 </script>

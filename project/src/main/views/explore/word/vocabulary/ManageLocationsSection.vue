@@ -109,22 +109,14 @@
   </AppModal>
 </template>
 
-<script>
-export default { name: 'ManageLocationsSection' }
-</script>
-
 <script setup>
-import { computed, onActivated, onDeactivated, onMounted, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getVocabularyLocations, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 
 const { t } = useI18n()
 const pageSizeOptions = [20, 50, 100, 200]
-
-onMounted(() => console.log('[ManageLocationsSection] mounted'))
-onActivated(() => console.log('[ManageLocationsSection] activated'))
-onDeactivated(() => console.log('[ManageLocationsSection] deactivated'))
 
 const props = defineProps({
   hasVocabularyPermission: { type: Boolean, default: false },
