@@ -128,8 +128,8 @@ import { ref, reactive, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { batchMatch, getRegions, submitCustomForm } from '@/api'
-import { invalidateCustomDataPresence, markCustomDataExists } from '@/composables/custom/useCustomDataPresence.js'
-import { showSuccess, showError, showWarning, showInfo } from '@/utils/message.js'
+import { invalidateCustomDataPresence, markCustomDataExists } from '@/composables/data/useCustomDataPresence.js'
+import { showSuccess, showError, showWarning, showInfo } from '@/utils/ui/message.js'
 import { userStore, globalPayload, resultCache } from '@/main/store/store.js'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
@@ -397,7 +397,7 @@ const resetForm = () => {
   width: 48px;
   height: 48px;
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-md) 0 0 var(--radius-md);
   font-size: 24px;

@@ -6,6 +6,7 @@
     "pho": "音系",
     "charClass": "汉字",
     "dialectClustering": "聚类",
+    "map": "地图",
     "words": "词句",
     "villages": "自然村",
     "tools": "工具",
@@ -26,6 +27,12 @@
       "tab4": "调类对比",
       "tab5": "音值对比"
     },
+    "map": {
+      "view": "主地图",
+      "divide": "分区着色",
+      "custom": "自定义数据",
+      "draw": "地图绘制"
+    },
     "pho": {
       "phonologyMatrix": "音系查询",
       "phonologyCustom": "音素分类",
@@ -41,12 +48,13 @@
     "words": {
       "vocabulary": "语保词汇",
       "grammar": "语保语法",
+      "wordList": "词表",
       "ycSpoken": "阳春口语词"
     },
     "villages": {
       "gdVillages": "广东自然村",
       "VillagesML": "机器学习",
-      "gdVillagesTable": "全粤村情表格",
+      "gdVillagesTable": "广东村庄表格",
       "ycVillages": "阳春自然村",
       "allVillages": "全部自然村"
     },
@@ -62,12 +70,12 @@
       "source": "字表来源",
       "privacy": "隐私政策",
       "suggestion": "提出建议",
-      "like": "喜欢作者"
+      "like": "支持作者"
     },
     "about": {
       "intro": "简介",
       "suggestion": "提出建议",
-      "like": "喜欢作者",
+      "like": "支持作者",
       "setting": "设置"
     }
   },
@@ -85,7 +93,7 @@
     "praat": "praat",
     "phrases": "词句",
     "villages": "村落",
-    "aboutWebsite": "关于网站",
+    "aboutWebsite": "关于",
     "settings": "设置"
   },
   "placeholders": {
@@ -103,7 +111,8 @@
       "options": {
         "blue": "蓝色",
         "light": "浅色",
-        "dark": "深色"
+        "dark": "深色",
+        "green": "绿色"
       }
     },
     "interfaceMode": {

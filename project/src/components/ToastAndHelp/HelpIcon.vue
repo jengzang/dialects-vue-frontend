@@ -78,7 +78,7 @@ const props = defineProps({
   },
   autoHideDelay: {
     type: Number,
-    default: 3000
+    default: 8000
   },
   tooltipMaxWidth: {
     type: String,

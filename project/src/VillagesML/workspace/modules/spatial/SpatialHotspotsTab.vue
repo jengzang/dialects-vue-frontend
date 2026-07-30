@@ -6,7 +6,7 @@
       <HelpIcon content="識別村莊密集分布的熱點區域。每個熱點包含中心坐標、半徑和密度分數，反映該區域的村莊聚集程度" />
     </h2>
 
-    <div v-if="loadingHotspots" class="vml-loading"">
+    <div v-if="loadingHotspots" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>加載中...</p>
     </div>
@@ -44,7 +44,7 @@
       <div v-if="selectedHotspot" ref="hotspotDetailRef" class="hotspot-detail">
         <h3>熱點詳情 #{{ selectedHotspot.hotspot_id }}</h3>
 
-        <div v-if="loadingHotspotDetail" class="vml-loading"">
+        <div v-if="loadingHotspotDetail" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
         </div>
 
@@ -87,7 +87,7 @@ import { ref, onMounted, nextTick } from 'vue'
 import SpatialMap from './SpatialMap.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { getSpatialHotspots, getSpatialHotspotDetail } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 // State
 const hotspots = ref([])

@@ -11,14 +11,16 @@
             清除
           </button>
         </div>
-        <div class="search-group">
-          <input
-            v-model="searchKeyword"
-            type="text"
-            placeholder="輸入村名搜尋..."
-            class="search-input"
-            @input="handleSearch"
-          />
+        <div class="search-group vml-control-surface vml-control-row">
+          <div class="vml-control-field">
+            <input
+              v-model="searchKeyword"
+              type="text"
+              placeholder="輸入村名搜尋..."
+              class="search-input"
+              @input="handleSearch"
+            />
+          </div>
         </div>
         <div v-if="searchResults.length > 0" class="search-results">
           <div
@@ -94,7 +96,7 @@ import {
   getVillageSemanticStructure,
   getVillageNgrams
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 // Import components
 import VillageInfoPanel from './VillageInfoPanel.vue'

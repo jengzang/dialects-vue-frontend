@@ -251,8 +251,8 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import { batchDeleteCustomData, getDataByFeature, getDataByPoint } from '@/api';
-import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js';
-import { showConfirm, showWarning } from '@/utils/message.js';
+import { ensureCustomDataPresence } from '@/composables/data/useCustomDataPresence.js';
+import { showConfirm, showWarning } from '@/utils/ui/message.js';
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue';
 import FeatureRecordEditorModal from './FeatureRecordEditorModal.vue';
 
@@ -285,10 +285,10 @@ const detailTitle = computed(() => {
 const mapPoints = computed(() =>
   rows.value
     .map((row) => {
-      const [lngText, latText] = String(row['經緯度'] || '').split(',');
-      const lng = Number(String(lngText).trim());
+      const [latText, lngText] = String(row['經緯度'] || '').split(',');
       const lat = Number(String(latText).trim());
-      if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
+      const lng = Number(String(lngText).trim());
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
       return {
         coord: [lng, lat],
         label: row['簡稱'] || '',

@@ -8,7 +8,7 @@
       </h1>
 
       <!-- Query Mode Selector -->
-      <div class="mode-selector vml-glass-panel">
+      <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
         <RadioGroup
             name="spatialQueryMode"
             :options="queryModeOptions"
@@ -109,22 +109,25 @@
           <h3>按字符查詢空間分佈</h3>
 
           <!-- Load Characters Button -->
-          <button
-            v-if="availableCharacters.length === 0"
-            class="query-button load-clusters-button"
-            :disabled="loadingCharacters"
-            @click="loadCharacters"
-          >
-            {{ loadingCharacters ? '加載中...' : '加載字符列表' }}
-          </button>
+          <div v-if="availableCharacters.length === 0" class="vml-control-surface vml-control-actions">
+            <button
+              class="query-button load-clusters-button"
+              :disabled="loadingCharacters"
+              @click="loadCharacters"
+            >
+              {{ loadingCharacters ? '加載中...' : '加載字符列表' }}
+            </button>
+          </div>
 
           <!-- Character Selector -->
-          <div v-else class="form-group">
-            <label>選擇字符:</label>
-            <SimpleSelectDropdown :match-trigger-width="true"
-              v-model="queryChar"
-              :options="characterOptions"
-            />
+          <div v-else class="form-group vml-control-surface vml-control-row">
+            <div class="vml-control-field">
+              <label>選擇字符:</label>
+              <SimpleSelectDropdown :match-trigger-width="true"
+                v-model="queryChar"
+                :options="characterOptions"
+              />
+            </div>
           </div>
         </div>
 
@@ -179,22 +182,25 @@
           <h3>按聚類查詢</h3>
 
           <!-- Load Clusters Button -->
-          <button
-            v-if="availableClusters.length === 0"
-            class="load-clusters-button"
-            :disabled="loadingClusters"
-            @click="loadClusters"
-          >
-            {{ loadingClusters ? '加載中...' : '加載聚類列表' }}
-          </button>
+          <div v-if="availableClusters.length === 0" class="vml-control-surface vml-control-actions">
+            <button
+              class="load-clusters-button"
+              :disabled="loadingClusters"
+              @click="loadClusters"
+            >
+              {{ loadingClusters ? '加載中...' : '加載聚類列表' }}
+            </button>
+          </div>
 
           <!-- Cluster Selector -->
-          <div v-else class="form-group">
-            <label>選擇聚類:</label>
-            <SimpleSelectDropdown :match-trigger-width="true"
-              v-model="clusterId"
-              :options="clusterOptions"
-            />
+          <div v-else class="form-group vml-control-surface vml-control-row">
+            <div class="vml-control-field">
+              <label>選擇聚類:</label>
+              <SimpleSelectDropdown :match-trigger-width="true"
+                v-model="clusterId"
+                :options="clusterOptions"
+              />
+            </div>
           </div>
         </div>
 
@@ -347,7 +353,7 @@ import {
   getSpatialIntegrationAvailableCharacters,
   getSpatialIntegrationClusterList
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import { getCategoryName } from '@/VillagesML/config/villagesML.js'
 import RadioGroup from "@/components/selector/RadioGroup.vue";
 
@@ -425,7 +431,9 @@ const charMapLayers = computed(() => {
       character: queryChar.value,
       cluster_id: item.cluster_id,
       cluster_tendency_mean: item.cluster_tendency_mean,
-      cluster_tendency_std: item.tendency_std,  // 後端字段名是 tendency_std
+      cluster_tendency_std: item.tendency_std,
+      global_tendency_mean: item.global_tendency_mean,
+      tendency_deviation: item.tendency_deviation,
       cluster_size: item.cluster_size,
       n_villages_with_char: item.n_villages_with_char,
       spatial_coherence: item.spatial_coherence,
@@ -448,10 +456,10 @@ const charMapLayers = computed(() => {
         'interpolate',
         ['linear'],
         ['get', 'cluster_size'],
-        0, 8,
-        50, 12,
-        100, 16,
-        500, 20
+        0, 4,
+        50, 6,
+        100, 9,
+        500, 11
       ],
       'circle-color': [
         'interpolate',
@@ -465,7 +473,7 @@ const charMapLayers = computed(() => {
       'circle-stroke-width': [
         'case',
         ['==', ['get', 'is_significant'], 1],
-        3,
+        2,
         1
       ],
       'circle-stroke-color': [
@@ -516,15 +524,15 @@ const clusterMapLayers = computed(() => {
         'interpolate',
         ['linear'],
         ['get', 'cluster_size'],
-        0, 15,
-        50, 20,
-        100, 25,
-        500, 30,
-        1000, 35
+        0, 8,
+        50, 11,
+        100, 14,
+        500, 17,
+        1000, 20
       ],
       'circle-color': 'rgba(74, 144, 226, 0.6)',
       'circle-opacity': 0.7,
-      'circle-stroke-width': 3,
+      'circle-stroke-width': 2,
       'circle-stroke-color': '#4a90e2'
     }
   }]
@@ -695,10 +703,6 @@ onMounted(() => {
 }
 
 .mode-selector {
-  display: flex;
-  justify-content: center; /* 确保容器内容居中 */
-  align-items: center;
-  padding: 12px;
   margin-bottom: 16px;
 }
 
@@ -730,11 +734,7 @@ onMounted(() => {
 }
 
 .form-group {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  max-width: 520px;
 }
 
 .form-group label {

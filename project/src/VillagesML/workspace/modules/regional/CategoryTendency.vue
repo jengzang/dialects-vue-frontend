@@ -12,21 +12,27 @@
         分析特定區域中各語義類別的傾向性，使用Z分數和Lift值衡量該區域對不同語義類別的偏好程度。
       </p>
 
-      <div class="region-selector">
-        <FilterableSelect
-          v-model="regionName"
-          :level="regionLevel"
-          @update:level="(newLevel) => regionLevel = newLevel"
-          @update:hierarchy="(h) => regionHierarchy = h"
-          placeholder="請選擇或輸入區域"
-        />
-        <button
-          class="query-button solid-button"
-          :disabled="!regionName || loadingTendency"
-          @click="loadCategoryTendency"
-        >
-          查詢
-        </button>
+      <div class="region-selector vml-control-surface">
+        <div class="vml-control-row">
+          <div class="vml-control-field">
+            <FilterableSelect
+              v-model="regionName"
+              :level="regionLevel"
+              @update:level="(newLevel) => regionLevel = newLevel"
+              @update:hierarchy="(h) => regionHierarchy = h"
+              placeholder="請選擇或輸入區域"
+            />
+          </div>
+          <div class="vml-control-actions">
+            <button
+              class="query-button solid-button"
+              :disabled="!regionName || loadingTendency"
+              @click="loadCategoryTendency"
+            >
+              查詢
+            </button>
+          </div>
+        </div>
       </div>
 
       <div v-if="loadingTendency" class="vml-loading">
@@ -61,40 +67,52 @@
   <div class="vml-glass-panel">
     <div class="ngram-section">
     <h2>區域 N-gram 排行榜</h2>
-    <div class="ngram-controls">
-      <SimpleSelectDropdown :match-trigger-width="true"
-        v-model="ngramN"
-        :options="ngramNOptions"
-      />
+    <div class="ngram-controls vml-control-surface">
+      <div class="vml-control-row">
+        <div class="vml-control-field">
+          <SimpleSelectDropdown :match-trigger-width="true"
+            v-model="ngramN"
+            :options="ngramNOptions"
+          />
+        </div>
 
-      <SimpleSelectDropdown
-        v-model="ngramLevel"
-        :options="ngramLevelOptions"
-      />
+        <div class="vml-control-field">
+          <SimpleSelectDropdown
+            v-model="ngramLevel"
+            :options="ngramLevelOptions"
+          />
+        </div>
 
-      <FilterableSelect
-        v-model="ngramFilterRegion"
-        :level="ngramParentFilterLevel"
-        :show-level-selector="false"
-        :show-counts="false"
-        placeholder="篩選父區域（可選）"
-        @update:hierarchy="(h) => ngramFilterHierarchy = h"
-      />
-      <input
-        v-model.number="ngramTopK"
-        type="number"
-        min="1"
-        max="500"
-        placeholder="返回數量 (1-500)"
-        class="vml-number-input"
-      />
-      <button
-        class="query-button solid-button"
-        :disabled="loadingNgram"
-        @click="loadRegionalNgrams"
-      >
-        查詢
-      </button>
+        <div class="vml-control-field">
+          <FilterableSelect
+            v-model="ngramFilterRegion"
+            :level="ngramParentFilterLevel"
+            :show-level-selector="false"
+            :show-counts="false"
+            placeholder="篩選父區域（可選）"
+            @update:hierarchy="(h) => ngramFilterHierarchy = h"
+          />
+        </div>
+        <div class="vml-control-field">
+          <input
+            v-model.number="ngramTopK"
+            type="number"
+            min="1"
+            max="500"
+            placeholder="返回數量 (1-500)"
+            class="vml-number-input"
+          />
+        </div>
+        <div class="vml-control-actions">
+          <button
+            class="query-button solid-button"
+            :disabled="loadingNgram"
+            @click="loadRegionalNgrams"
+          >
+            查詢
+          </button>
+        </div>
+      </div>
     </div>
 
     <div v-if="loadingNgram" class="vml-loading">
@@ -149,7 +167,7 @@ import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { getSemanticCategoryTendency, getNgramRegional } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import { getCategoryName } from '@/VillagesML/config/villagesML.js'
 
 // State
@@ -341,7 +359,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .ngram-section {
-  @include flex-col;
+  // @include flex-col;
   gap: 12px;
 }
 
@@ -357,7 +375,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .vml-number-input {
-  width: 180px;
+  // width: 180px;
 }
 
 .ngram-results {
@@ -460,9 +478,9 @@ const loadRegionalNgrams = async () => {
     max-width: 100% !important;
   }
 
-  .vml-number-input {
-    width: 100% !important;
-  }
+  // .vml-number-input {
+  //   width: 100% !important;
+  // }
 
   .simple-select-dropdown,
   .filterable-select {

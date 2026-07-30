@@ -1,7 +1,7 @@
 // api/villagesML/villages.js
 // 村名搜尋相關 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 搜尋村名
@@ -34,7 +34,7 @@ export async function searchVillages(params) {
   queryParams.append('limit', limit)
   queryParams.append('offset', offset)
 
-  return api(`/api/villages/village/search?${queryParams.toString()}`)
+  return villagesMLApi(`/village/search?${queryParams.toString()}`)
 }
 
 /**
@@ -43,7 +43,7 @@ export async function searchVillages(params) {
  * @returns {Promise<Object>} 村詳情數據
  */
 export async function getVillageDetail(villageId) {
-  return api(`/api/villages/village/search/detail?id=${villageId}`)
+  return villagesMLApi('/village/search/detail', { query: { id: villageId } })
 }
 
 /**
@@ -57,7 +57,7 @@ export async function getRegionList(level, parent = null) {
   const queryParams = new URLSearchParams({ level })
   if (parent) queryParams.append('parent', parent)
 
-  return api(`/api/villages/metadata/stats/regions?${queryParams.toString()}`)
+  return villagesMLApi(`/metadata/stats/regions?${queryParams.toString()}`)
 }
 
 /**
@@ -66,7 +66,7 @@ export async function getRegionList(level, parent = null) {
  * @returns {Promise<Object>} 完整村信息（包含所有字段）
  */
 export async function getVillageComplete(villageId) {
-  return api(`/api/villages/village/complete/${villageId}`)
+  return villagesMLApi(`/village/complete/${villageId}`)
 }
 
 /**
@@ -79,7 +79,7 @@ export async function getVillageComplete(villageId) {
  * }
  */
 export async function getVillageFeatures(villageId) {
-  return api(`/api/villages/village/features/${villageId}`)
+  return villagesMLApi(`/village/features/${villageId}`)
 }
 
 /**
@@ -91,7 +91,7 @@ export async function getVillageFeatures(villageId) {
  * }
  */
 export async function getVillageSpatialFeatures(villageId) {
-  return api(`/api/villages/village/spatial-features/${villageId}`)
+  return villagesMLApi(`/village/spatial-features/${villageId}`)
 }
 
 /**
@@ -103,7 +103,7 @@ export async function getVillageSpatialFeatures(villageId) {
  * }
  */
 export async function getVillageSemanticStructure(villageId) {
-  return api(`/api/villages/village/semantic-structure/${villageId}`)
+  return villagesMLApi(`/village/semantic-structure/${villageId}`)
 }
 
 /**
@@ -115,7 +115,7 @@ export async function getVillageSemanticStructure(villageId) {
  * }
  */
 export async function getVillageNgrams(villageId) {
-  return api(`/api/villages/village/ngrams/${villageId}`)
+  return villagesMLApi(`/village/ngrams/${villageId}`)
 }
 
 /**
@@ -166,7 +166,7 @@ export async function fetchSubsetFilter(params = {}) {
   if (params.lonMax != null) body.lon_max = params.lonMax
   if (params.maxResults != null) body.max_results = params.maxResults
 
-  return api('/api/villages/subset/filter', {
+  return villagesMLApi('/subset/filter', {
     method: 'POST',
     body
   })

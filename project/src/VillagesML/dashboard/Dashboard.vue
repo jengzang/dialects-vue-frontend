@@ -1,16 +1,22 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="dashboard-page">
-      <h1 class="page-title">📊 自然村分析系統</h1>
+      <div class="page-header">
+        <h1 class="page-title">📊 {{ t('villages.dashboard.pageTitle') }}</h1>
+        <SimpleSelectDropdown
+          v-model="activeDataset"
+          :options="datasetOptions"
+          :width="'180px'"
+        />
+      </div>
 
       <!-- Introduction Section -->
       <div class="intro-section glass-panel">
         <p class="intro-text">
-          <strong>自然村機器學習分析系統</strong>是一個基於廣東省283,070個自然村名稱的語言學分析平台。
-          系統運用機器學習和自然語言處理技術，從多個維度分析村名的語義、結構、空間分佈等特徵，為地名學研究、文化地理學、語言學等領域提供數據支持。
+          <strong>{{ t('villages.dashboard.introTitle') }}</strong>{{ t('villages.dashboard.introText') }}
         </p>
         <div class="github-row">
-          <span class="github-invite">歡迎 Star ⭐、Fork 🍴 或提 Issue 💬</span>
+          <span class="github-invite">{{ t('villages.dashboard.githubInvite') }}</span>
           <a
             href="https://github.com/jengzang/villages-ML"
             target="_blank"
@@ -36,8 +42,8 @@
 
       <!-- Section Header: Features -->
       <div class="section-header">
-        <h2>🧭 功能模塊</h2>
-        <p class="section-description">點擊下方模塊開始分析</p>
+        <h2>🧭 {{ t('villages.dashboard.featuresHeader') }}</h2>
+        <p class="section-description">{{ t('villages.dashboard.featuresDesc') }}</p>
       </div>
 
 
@@ -86,8 +92,8 @@
         </div>
       </div>
       <div class="section-header">
-        <h2>📈 數據概覽</h2>
-        <p class="section-description">系統收錄的村名與區域統計</p>
+        <h2>📈 {{ t('villages.dashboard.statsHeader') }}</h2>
+        <p class="section-description">{{ t('villages.dashboard.statsDesc') }}</p>
       </div>
       <!-- Statistics Cards -->
       <div class="stats-grid">
@@ -96,8 +102,8 @@
           <div class="stat-content">
             <template v-if="stat.loadable && !ngramStats">
               <button class="load-ngram-button" :disabled="loadingNgram" @click="loadNgramStats">
-                <span v-if="!loadingNgram">加載</span>
-                <span v-else>加載中...</span>
+                <span v-if="!loadingNgram">{{ t('villages.dashboard.loadButton') }}</span>
+                <span v-else>{{ t('villages.dashboard.loadingButton') }}</span>
               </button>
             </template>
             <div v-else class="stat-value">{{ formatNumber(stat.value) }}</div>
@@ -121,14 +127,21 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { getMetadataOverview, getNgramStatistics } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import { getVillagesOverview, getVillagesNgrams, getCachedVillagesNgrams } from '@/composables/data/useVillagesCache.js'
+import { showError } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
+import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
+import { VILLAGESML_DATASETS } from '@/VillagesML/config/datasets.js'
+import { resolveVillagesMLDatasetFromRoute, buildVillagesMLPath } from '@/VillagesML/utils/routeDataset.js'
 
+const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const searchKeyword = ref('')
 const metadata = ref(null)
 const ngramStats = ref(null)
@@ -136,6 +149,18 @@ const metadataQuery = useAsyncData()
 const ngramStatsQuery = useAsyncData()
 const loading = metadataQuery.loading
 const loadingNgram = ngramStatsQuery.loading
+
+// Dataset selector
+const activeDataset = computed({
+  get: () => resolveVillagesMLDatasetFromRoute(route),
+  set: (dataset) => {
+    if (dataset === resolveVillagesMLDatasetFromRoute(route)) return
+    router.push(buildVillagesMLPath({ dataset }))
+  }
+})
+const datasetOptions = computed(() =>
+  VILLAGESML_DATASETS.map(d => ({ label: d.label, value: d.id }))
+)
 
 // Maintenance notice: show until 2026-03-02
 const showMaintenanceNotice = computed(() => new Date() < new Date('2026-03-02'))
@@ -147,128 +172,132 @@ const statistics = computed(() => {
     {
       key: 'villages',
       icon: '🏘️',
-      label: '自然村總數',
+      label: t('villages.dashboard.stats.villages.label'),
       value: metadata.value.total_villages || 0,
-      tooltip: '廣東省283,070個自然村名稱，數據來源於各大地圖網站整理匯總。覆蓋21個地級市、123個區縣、1500+個鄉鎮'
+      tooltip: t('villages.dashboard.stats.villages.tooltip')
     },
     {
       key: 'cities',
       icon: '🏙️',
-      label: '城市數量',
+      label: t('villages.dashboard.stats.cities.label'),
       value: metadata.value.total_cities || 0
     },
     {
       key: 'counties',
       icon: '🏛️',
-      label: '區縣數量',
+      label: t('villages.dashboard.stats.counties.label'),
       value: metadata.value.total_counties || 0
     },
     {
       key: 'townships',
       icon: '🏘️',
-      label: '鄉鎮數量',
+      label: t('villages.dashboard.stats.townships.label'),
       value: metadata.value.total_townships || 0
     },
     {
       key: 'characters',
       icon: '🔤',
-      label: '字符總數',
+      label: t('villages.dashboard.stats.characters.label'),
       value: metadata.value.unique_characters || 0,
-      tooltip: '地名中使用的不同漢字總數為3,067個。已為每個字符訓練Word2Vec嵌入向量（維度100，窗口5，最小頻率5）'
+      tooltip: t('villages.dashboard.stats.characters.tooltip')
     },
     {
       key: 'ngrams',
       icon: '📐',
-      label: '顯著 N-gram',
+      label: t('villages.dashboard.stats.ngrams.label'),
       value: ngramStats.value?.ngram_significance?.significant || 0,
-      tooltip: '經PMI（互信息）和卡方檢驗篩選的統計顯著N-gram模式。',
+      tooltip: t('villages.dashboard.stats.ngrams.tooltip'),
       loadable: true
     },
   ]
 })
 
 // Features
-const features = [
-  {
-    id: 'search',
-    icon: '🔍',
-    title: '村名搜尋',
-    description: '按關鍵詞、區域搜尋村名，查看詳細信息與深度分析報告',
-    route: '/villagesML?module=search',
-    badge: '公開',
-    badgeClass: 'badge-public',
-    tooltip: '支持關鍵詞模糊匹配和三級行政區（市→縣→鎮）聯動篩選。點擊村莊可查看深度分析報告，包含語義結構、N-gram分解、空間特徵等多維度信息'
-  },
-  {
-    id: 'character',
-    icon: '🔤',
-    title: '字頻分析',
-    description: '分析村名中字符的使用頻率、區域傾向性、語義嵌入向量與統計顯著性',
-    route: '/villagesML?module=character&subtab=frequency',
-    badge: '公開',
-    badgeClass: 'badge-public',
-    tooltip: '基於283,070條村名的字符統計分析。包含：①頻率傾向（Z-score/Lift/Log-odds三種指標衡量地區偏好）②嵌入相似（Word2Vec Skipgram模型，100維向量，餘弦相似度）③字符網絡（Louvain社群識別算法）④顯著性（卡方檢驗，Cramér\'s V效應量）'
-  },
-  {
-    id: 'semantic',
-    icon: '🏷️',
-    title: '語義分析',
-    description: '探索村名的語義類別、標籤組合模式、語義網絡關係與語義組成結構',
-    route: '/villagesML?module=semantic&subtab=categories',
-    badge: '公開',
-    badgeClass: 'badge-public',
-    tooltip: '基於混合詞典v4.0（LLM標注+人工校驗），9大類別+76子類別。包含：①VTF（Virtual Term Frequency，置信度加權）②Bigram/Trigram組合模式（PMI互信息量化關聯強度）③語義網絡（NetworkX圖分析）④語義指數（Shannon熵、多樣性指標）'
-  },
-  {
-    id: 'spatial',
-    icon: '🗺️',
-    title: '空間分析',
-    description: '可視化村名的地理分佈、識別空間熱點聚類、分析空間整合模式',
-    route: '/villagesML?module=spatial&subtab=hotspots',
-    badge: '公開',
-    badgeClass: 'badge-public',
-    tooltip: '使用DBSCAN密度聚類算法（eps半徑+min_samples最小樣本數）識別地理熱點。支持空間自相關分析、聚類質心計算、MapLibre GPU加速渲染。可調整eps參數（0.5-20km）探索不同尺度的空間模式'
-  },
-  {
-    id: 'pattern',
-    icon: '📐',
-    title: '模式分析',
-    description: '提取N-gram模式、分析結構規律、發現村名命名的語言學特徵',
-    route: '/villagesML?module=pattern&subtab=frequency',
-    badge: '公開',
-    badgeClass: 'badge-public',
-    tooltip: '提取2-4gram字符序列模式。統計指標：①PMI（Pointwise Mutual Information，log₂[P(A,B)/(P(A)·P(B))]）②卡方顯著性檢驗③Lift傾向性（區域頻率/全局頻率比值）。支持通配符搜索（*表示任意字符，X表示單個字符）'
-  },
-  {
-    id: 'regional',
-    icon: '🌍',
-    title: '區域分析',
-    description: '計算區域聚合統計、生成區域特徵向量、進行跨區域比較分析',
-    route: '/villagesML?module=regional&subtab=aggregates',
-    badge: '公開',
-    badgeClass: 'badge-public',
-    tooltip: '按市/縣/鎮三級聚合統計。生成TF-IDF特徵向量（TF=區域頻率，IDF=log(總區域數/含該特徵的區域數)）。計算區域間餘弦相似度/Jaccard相似度，識別地名文化圈。支持Z-score傾向性熱圖可視化'
-  },
-  {
-    id: 'compute',
-    icon: '🤖',
-    title: 'ML計算',
-    description: '執行機器學習聚類分析、提取高維特徵向量、進行子集深度分析',
-    route: '/villagesML?module=compute&subtab=clustering',
-    badge: '需登錄',
-    badgeClass: 'badge-auth',
-    tooltip: '需登錄。支持三種聚類算法：①K-Means（質心聚類，需指定k值）②DBSCAN（密度聚類，自動識別噪聲點）③GMM（高斯混合模型，概率分配）。特徵工程：語義（9維）+形態（N-gram TF）+多樣性（Shannon熵）+空間（坐標+密度）。預處理：StandardScaler標準化+PCA降維（默認50維）。評估指標：Silhouette Score（輪廓係數，[-1,1]）、Davies-Bouldin Index（越低越好）、Calinski-Harabasz Score（越高越好）'
-  },
-  {
-    id: 'system',
-    icon: 'ℹ️',
-    title: '系統信息',
-    description: '查看數據庫概覽、表統計信息、系統運行狀態與緩存管理',
-    route: '/villagesML?module=system',
-    badge: '公開',
-    badgeClass: 'badge-public'
-  }
-]
+const features = computed(() => {
+  if (!route.path) return []
+
+  return [
+    {
+      id: 'search',
+      icon: '🔍',
+      title: t('villages.dashboard.features.search.title'),
+      description: t('villages.dashboard.features.search.description'),
+      route: buildCurrentVillagesMLPath({ module: 'search' }),
+      badge: t('villages.dashboard.badge.public'),
+      badgeClass: 'badge-public',
+      tooltip: t('villages.dashboard.features.search.tooltip')
+    },
+    {
+      id: 'character',
+      icon: '🔤',
+      title: t('villages.dashboard.features.character.title'),
+      description: t('villages.dashboard.features.character.description'),
+      route: buildCurrentVillagesMLPath({ module: 'character', subtab: 'frequency' }),
+      badge: t('villages.dashboard.badge.public'),
+      badgeClass: 'badge-public',
+      tooltip: t('villages.dashboard.features.character.tooltip')
+    },
+    {
+      id: 'semantic',
+      icon: '🏷️',
+      title: t('villages.dashboard.features.semantic.title'),
+      description: t('villages.dashboard.features.semantic.description'),
+      route: buildCurrentVillagesMLPath({ module: 'semantic', subtab: 'categories' }),
+      badge: t('villages.dashboard.badge.public'),
+      badgeClass: 'badge-public',
+      tooltip: t('villages.dashboard.features.semantic.tooltip')
+    },
+    {
+      id: 'spatial',
+      icon: '🗺️',
+      title: t('villages.dashboard.features.spatial.title'),
+      description: t('villages.dashboard.features.spatial.description'),
+      route: buildCurrentVillagesMLPath({ module: 'spatial', subtab: 'hotspots' }),
+      badge: t('villages.dashboard.badge.public'),
+      badgeClass: 'badge-public',
+      tooltip: t('villages.dashboard.features.spatial.tooltip')
+    },
+    {
+      id: 'pattern',
+      icon: '📐',
+      title: t('villages.dashboard.features.pattern.title'),
+      description: t('villages.dashboard.features.pattern.description'),
+      route: buildCurrentVillagesMLPath({ module: 'pattern', subtab: 'frequency' }),
+      badge: t('villages.dashboard.badge.public'),
+      badgeClass: 'badge-public',
+      tooltip: t('villages.dashboard.features.pattern.tooltip')
+    },
+    {
+      id: 'regional',
+      icon: '🌍',
+      title: t('villages.dashboard.features.regional.title'),
+      description: t('villages.dashboard.features.regional.description'),
+      route: buildCurrentVillagesMLPath({ module: 'regional', subtab: 'aggregates' }),
+      badge: t('villages.dashboard.badge.public'),
+      badgeClass: 'badge-public',
+      tooltip: t('villages.dashboard.features.regional.tooltip')
+    },
+    {
+      id: 'compute',
+      icon: '🤖',
+      title: t('villages.dashboard.features.compute.title'),
+      description: t('villages.dashboard.features.compute.description'),
+      route: buildCurrentVillagesMLPath({ module: 'compute', subtab: 'clustering' }),
+      badge: t('villages.dashboard.badge.loginRequired'),
+      badgeClass: 'badge-auth',
+      tooltip: t('villages.dashboard.features.compute.tooltip')
+    },
+    {
+      id: 'system',
+      icon: 'ℹ️',
+      title: t('villages.dashboard.features.system.title'),
+      description: t('villages.dashboard.features.system.description'),
+      route: buildCurrentVillagesMLPath({ module: 'system' }),
+      badge: t('villages.dashboard.badge.public'),
+      badgeClass: 'badge-public'
+    }
+  ]
+})
 
 // Methods
 const formatNumber = (num) => {
@@ -276,28 +305,28 @@ const formatNumber = (num) => {
   return num.toLocaleString('zh-CN')
 }
 
-const handleQuickSearch = () => {
-  if (!searchKeyword.value.trim()) return
-  window.location.href = `/villagesML?module=search&keyword=${encodeURIComponent(searchKeyword.value)}`
-}
+// const handleQuickSearch = () => {
+//   if (!searchKeyword.value.trim()) return
+//   window.location.href = buildCurrentVillagesMLPath({ module: 'search', query: { keyword: searchKeyword.value } })
+// }
 
 const navigateTo = (route) => {
   router.push(route)
 }
 
 const loadMetadata = async () => {
-  await metadataQuery.load(() => getMetadataOverview(), {
+  await metadataQuery.load(() => getVillagesOverview(), {
     onSuccess: (result) => {
       metadata.value = result
     },
     onError: () => {
-      showError('加載統計數據失敗')
+      showError(t('villages.dashboard.loadStatsError'))
     }
   })
 }
 
 const loadNgramStats = async () => {
-  await ngramStatsQuery.load(() => getNgramStatistics(), {
+  await ngramStatsQuery.load(() => getVillagesNgrams(), {
     onSuccess: (result) => {
       ngramStats.value = result
     },
@@ -309,6 +338,10 @@ const loadNgramStats = async () => {
 
 onMounted(() => {
   loadMetadata()
+  const cachedNgrams = getCachedVillagesNgrams()
+  if (cachedNgrams) {
+    ngramStats.value = cachedNgrams
+  }
 })
 </script>
 
@@ -324,6 +357,14 @@ onMounted(() => {
   color: var(--text-primary);
   margin: 5px;
   text-align: center;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .stats-grid {
@@ -653,9 +694,14 @@ onMounted(() => {
     line-height: 1.5;
   }
 
+  .page-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
   .page-title {
     font-size: 24px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
   }
 
   .intro-section {

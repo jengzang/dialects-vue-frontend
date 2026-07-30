@@ -1,5 +1,6 @@
 <template>
   <AppModal
+    v-if="mode === 'modal'"
     :model-value="visible"
     size="sm"
     width="100%"
@@ -49,7 +50,6 @@
     </div>
 
     <template #footer>
-<!--      <div class="update-notice-footer">-->
         <CheckBox
           class="no-show-checkbox"
           :model-value="dontShowAgain"
@@ -60,15 +60,15 @@
         <button class="confirm-btn" @click="handleConfirm">
           {{ $t('common.updateNotice.confirm') }}
         </button>
-<!--      </div>-->
     </template>
   </AppModal>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import { showInfo } from '@/utils/ui/message.js'
 
 const UPDATE_NOTICE_DISMISS_STORAGE_KEY = 'update-notice-dismissed'
 const UPDATE_NOTICE_LAST_SHOWN_PREFIX = 'update-notice-last-shown'
@@ -98,6 +98,11 @@ const props = defineProps({
   autoShow: {
     type: Boolean,
     default: false
+  },
+  mode: {
+    type: String,
+    default: 'modal',
+    validator: (v) => ['modal', 'showinfo'].includes(v)
   }
 })
 
@@ -111,6 +116,12 @@ const versionLine = computed(() => {
 
   return props.version
 })
+
+const buildSummaryText = () => {
+  const headline = props.title || '更新日誌'
+  const lines = props.items.map((item) => `${item.icon} ${item.strong}`)
+  return `${headline}  ${versionLine.value}\n${lines.join('\n')}`
+}
 
 const handleClose = () => {
   emit('update:visible', false)
@@ -148,8 +159,19 @@ const shouldAutoShow = () => {
   return true
 }
 
+watch(() => props.visible, (val) => {
+  if (val && props.mode === 'showinfo') {
+    emit('update:visible', false)
+    showInfo(buildSummaryText(), 8000, { changelogMode: true })
+  }
+})
+
 onMounted(() => {
-  if (props.autoShow && shouldAutoShow()) {
+  if (!props.autoShow || !shouldAutoShow()) return
+
+  if (props.mode === 'showinfo') {
+    showInfo(buildSummaryText(), 8000, { changelogMode: true })
+  } else {
     emit('update:visible', true)
   }
 })
@@ -161,8 +183,8 @@ onMounted(() => {
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
 $text-main: var(--text-primary);
-$text-secondary: rgba(0, 0, 0, 0.6);
-$text-secondary-strong: rgba(0, 0, 0, 0.7);
+$text-secondary: var(--text-secondary);
+$text-secondary-strong: var(--text-tertiary);
 $text-white: var(--text-white);
 
 $primary-background: rgba(var(--color-primary-rgb), 0.05);
@@ -272,11 +294,11 @@ $transition-button: 0.25s;
 
 .confirm-btn {
   padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+  background: var(--action-primary-bg);
   border: none;
   border-radius: $card-radius;
-  box-shadow: 0 4px 16px $primary-shadow;
-  color: $text-white;
+  box-shadow: var(--action-primary-shadow);
+  color: var(--action-primary-text);
   white-space: nowrap;
   font-size: 1rem;
   font-weight: 600;
@@ -286,7 +308,7 @@ $transition-button: 0.25s;
     transform $transition-button ease;
 
   &:hover {
-    box-shadow: 0 6px 24px $primary-shadow-hover;
+    background: var(--action-primary-bg-hover);
     transform: translateY(-2px);
   }
 

@@ -162,12 +162,16 @@
       <div class="spatial-section vml-glass-panel">
         <div class="spatial-header">
           <h2 style="white-space: nowrap">空間聚合</h2>
-          <div class="controls">
-            <SimpleSelectDropdown
-              v-model="spatialLevel"
-              :options="spatialLevelOptions"
-            />
-            <button class="query-button" :disabled="loadingSpatial" @click="loadSpatialAggregates">查詢</button>
+          <div class="controls vml-control-surface vml-control-row">
+            <div class="vml-control-field">
+              <SimpleSelectDropdown
+                v-model="spatialLevel"
+                :options="spatialLevelOptions"
+              />
+            </div>
+            <div class="vml-control-actions">
+              <button class="query-button" :disabled="loadingSpatial" @click="loadSpatialAggregates">查詢</button>
+            </div>
           </div>
         </div>
 
@@ -198,7 +202,8 @@ import {
   getRegionalAggregatesTown,
   getRegionalSpatialAggregates
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
+import { SEMANTIC_FEATURE_KEYS, SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
 
 // State
@@ -236,21 +241,10 @@ const spatialLevelOptions = [
   { label: '區縣', value: 'county' }
 ]
 
-const SEM_LABELS = {
-  mountain: '山地',
-  water: '水系',
-  settlement: '聚落',
-  direction: '方位',
-  clan: '宗族',
-  symbolic: '象徵',
-  agriculture: '農業',
-  vegetation: '植被',
-  infrastructure: '基建'
-}
-
 const getSemCategories = (item) =>
-  Object.entries(SEM_LABELS).map(([key, label]) => ({
-    key, label,
+  SEMANTIC_FEATURE_KEYS.map(key => ({
+    key,
+    label: SEMANTIC_CATEGORY_NAMES[key],
     pct: item[`sem_${key}_pct`] || 0,
     count: item[`sem_${key}_count`] || 0
   }))
@@ -277,7 +271,7 @@ const paginatedAggregates = computed(() => {
 
 const maxCategoryValue = computed(() => {
   if (!selectedItem.value) return 1
-  return Math.max(...Object.keys(SEM_LABELS).map(k => selectedItem.value[`sem_${k}_pct`] || 0))
+  return Math.max(...SEMANTIC_FEATURE_KEYS.map(k => selectedItem.value[`sem_${k}_pct`] || 0))
 })
 
 // Methods
@@ -744,6 +738,7 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
+  justify-content: center;
 }
 
 @media (max-width: 768px) {

@@ -6,6 +6,7 @@
     "pho": "音系",
     "charClass": "漢字",
     "dialectClustering": "聚類",
+    "map": "地圖",
     "words": "詞句",
     "villages": "自然村",
     "tools": "工具",
@@ -26,6 +27,12 @@
       "tab4": "調類對比",
       "tab5": "音值對比"
     },
+    "map": {
+      "view": "主地圖",
+      "divide": "分區著色",
+      "custom": "自定義數據",
+      "draw": "地圖繪製"
+    },
     "pho": {
       "phonologyMatrix": "音系查詢",
       "phonologyCustom": "音素分類",
@@ -41,12 +48,13 @@
     "words": {
       "vocabulary": "語保詞彙",
       "grammar": "語保語法",
+      "wordList": "詞表",
       "ycSpoken": "陽春口語詞"
     },
     "villages": {
       "gdVillages": "廣東自然村",
       "VillagesML": "機器學習",
-      "gdVillagesTable": "全粵村情表格",
+      "gdVillagesTable": "廣東村莊表格",
       "ycVillages": "陽春自然村",
       "allVillages": "全部自然村"
     },
@@ -62,12 +70,12 @@
       "source": "字表來源",
       "privacy": "隱私政策",
       "suggestion": "提出建議",
-      "like": "喜歡作者"
+      "like": "支持作者"
     },
     "about": {
       "intro": "簡介",
       "suggestion": "提出建議",
-      "like": "喜歡作者",
+      "like": "支持作者",
       "setting": "設置"
     }
   },
@@ -85,7 +93,7 @@
     "praat": "praat",
     "phrases": "詞句",
     "villages": "村落",
-    "aboutWebsite": "關於網站",
+    "aboutWebsite": "關於",
     "settings": "設置"
   },
   "placeholders": {
@@ -103,7 +111,8 @@
       "options": {
         "blue": "藍色",
         "light": "淺色",
-        "dark": "深色"
+        "dark": "深色",
+        "green": "綠色"
       }
     },
     "interfaceMode": {

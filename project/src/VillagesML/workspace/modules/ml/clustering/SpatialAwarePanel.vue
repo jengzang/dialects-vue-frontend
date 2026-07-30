@@ -60,9 +60,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
+import { SPATIAL_CLUSTERING_RUN_LABELS } from '@/VillagesML/config/villagesML.js'
 import { userStore } from '@/main/store/store.js'
 import { runSpatialAwareClustering } from '@/api/index.js'
-import { showSuccess, showError, showWarning } from '@/utils/message.js'
+import { showSuccess, showError, showWarning } from '@/utils/ui/message.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import AlgorithmSelector from './shared/AlgorithmSelector.vue'
@@ -75,13 +76,8 @@ const isAuthenticated = computed(() => userStore.isAuthenticated)
 const loading = ref(false)
 const results = ref(null)
 
-// Options for SimpleSelectDropdown
-const spatialRunIdOptions = [
-  { label: '超密集核心聚類', value: 'spatial_eps_05' },
-  { label: '自動多密度聚類', value: 'spatial_hdbscan_v1' },
-  { label: '標準密度聚類', value: 'spatial_eps_10' },
-  { label: '全域覆蓋聚類', value: 'spatial_eps_20' }
-]
+// Options for SimpleSelectDropdown — derived from config
+const spatialRunIdOptions = Object.entries(SPATIAL_CLUSTERING_RUN_LABELS).map(([value, label]) => ({ label, value }))
 
 async function runClustering() {
   if (!isAuthenticated.value) {

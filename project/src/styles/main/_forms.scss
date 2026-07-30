@@ -1,4 +1,7 @@
 @use '@/styles/global/mixins' as *;
+
+$transition-base: 0.3s;
+
 .choice-dropdown-panel {
   position: absolute;
   min-width: 80px;
@@ -56,6 +59,27 @@
   border-color: var(--border-control-focus);
   background: var(--surface-panel-strong);
   box-shadow: var(--focus-ring);
+}
+
+.glass-input {
+  width: 100%;
+  padding: 12px 18px 12px 42px;
+  font-size: 15px;
+  color: var(--text-deep);
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-radius: 15px;
+  outline: none;
+  transition: all $transition-base ease;
+
+  &:focus {
+    background: var(--glass-80);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3);
+  }
+
+  &::placeholder {
+    color: var(--text-secondary);
+  }
 }
 
 .main-input-field {

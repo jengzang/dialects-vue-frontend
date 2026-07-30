@@ -170,7 +170,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts'
 import * as XLSX from 'xlsx'
 import { useI18n } from 'vue-i18n'
-import { showSuccess, showWarning, showConfirm } from '@/utils/message.js'
+import { showSuccess, showWarning, showConfirm } from '@/utils/ui/message.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
@@ -393,8 +393,8 @@ const initPitchChart = () => {
     {
       xAxis: seg.start_s,
       itemStyle: {
-        color: seg.type === 'rime_core' ? 'rgba(var(--color-gold-rgb), 0.2)' :
-            seg.type === 'silence' ? 'rgba(var(--color-silver-rgb), 0.1)' :
+        color: seg.type === 'rime_core' ? 'rgba(255,215,0,0.2)' :
+            seg.type === 'silence' ? 'rgba(192,192,192,0.1)' :
                 'rgba(100,150,255,0.15)'
       }
     },
@@ -405,7 +405,7 @@ const initPitchChart = () => {
     title: {
       text: t('praat.pitchTone.step1.chart.title'),
       left: 'center',
-      textStyle: { fontSize: 14, color: 'var(--text-tertiary)' }
+      textStyle: { fontSize: 14, color: '#666' }
     },
     tooltip: {
       trigger: 'axis',
@@ -448,7 +448,7 @@ const initPitchChart = () => {
       data: rawData,
       symbol: 'none',
       smooth: true,
-      lineStyle: { color: 'var(--color-primary)', width: 2 },
+      lineStyle: { color: '#007aff', width: 2 },
       markArea: markAreaData.length > 0 ? {
         data: markAreaData,
         silent: true
@@ -1068,7 +1068,7 @@ const initContinuousChart = (isZScore) => {
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 
-$primary: var(--color-primary, var(--vml-blue));
+$primary: var(--color-primary);
 $primary-blue: var(--color-primary);
 $primary-purple: var(--color-purple);
 $primary-hover: var(--vml-blue-dark);
@@ -1089,8 +1089,8 @@ $border-medium: rgba(0, 0, 0, 0.1);
 
 $primary-gradient: linear-gradient(
   135deg,
-  $primary-blue,
-  $primary-purple
+  #007aff,
+  #6e00ff
 );
 
 $transition-fast: 0.2s;
@@ -1332,7 +1332,7 @@ $transition-normal: 0.3s;
   }
 
   .tag-name {
-    color: $primary;
+    color: var(--action-primary-text);
     font-weight: 700;
   }
 

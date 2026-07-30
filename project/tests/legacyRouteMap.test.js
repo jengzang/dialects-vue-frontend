@@ -59,6 +59,20 @@ describe('legacy route map', () => {
     })
   })
 
+  it('maps legacy explore vocabulary view tabs to the canonical vocabulary view route', () => {
+    expect(resolveLegacyExploreRoute({
+      page: 'Vocabulary',
+      sub: 'card',
+      foo: 'bar',
+    })).toEqual({
+      path: '/explore/vocabulary/view',
+      query: {
+        foo: 'bar',
+        tab: 'card',
+      },
+    })
+  })
+
   it('maps legacy VillagesML routes to the correct bridge target', () => {
     expect(resolveLegacyExploreRoute({
       page: 'VillagesML',

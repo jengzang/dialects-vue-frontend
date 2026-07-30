@@ -10,7 +10,7 @@
     <div v-if="isOpen" class="sidebar main-sidebar-shell" @touchmove.stop>
       <!-- 标题图片 (可选) -->
       <div v-if="showTitle" class="sidebar-header">
-        <img src="../../assets/picture/title.png" alt="Title" class="title-img" />
+        <img src="../../assets/picture/title.png" alt="Title" class="title-img title-logo" />
       </div>
       <div v-else class="sidebar-empty main-sidebar-empty"></div>
 
@@ -21,9 +21,10 @@
             v-for="(item, key) in filteredMenuConfig"
             :key="key"
             class="main-sidebar-item"
-            @click="handleMainClick(item, key, $event)"
+            @pointerup="handleMainPointerUp(item, key, $event)"
+            @click.stop
             @mouseenter="handleItemMouseEnter(item, key, $event)"
-            @mouseleave="item.children && !isMobile ? scheduleCloseSubmenu() : null"
+            @mouseleave="item.children && canHover ? scheduleCloseSubmenu() : null"
           >
             <span role="img" :aria-label="key">{{ item.icon }}</span>
             {{ item.label }}
@@ -112,8 +113,8 @@
           left: submenuPosition.left + 'px'
         }"
         @click.stop
-        @mouseenter="!isMobile ? cancelCloseSubmenu() : null"
-        @mouseleave="!isMobile ? scheduleCloseSubmenu() : null"
+        @mouseenter="canHover ? cancelCloseSubmenu() : null"
+        @mouseleave="canHover ? scheduleCloseSubmenu() : null"
       >
         <div
           v-for="(child, index) in getFilteredChildren(activeSubmenu)"
@@ -130,18 +131,37 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue'
 import { clearToken, getToken } from '@/api/auth/auth.js'
-import { useVisitStats, ensureVisitHistory } from '@/composables/useVisitStats.js'
+import { useVisitStats, ensureVisitHistory } from '@/composables/data/useVisitStats.js'
 import {userStore} from "@/main/store/store.js";
 import { useSidebarConfig } from '@/main/config/index.js';
 import { WEB_BASE } from '@/env-config.js';
 
 const { t } = useI18n();
 const router = useRouter();
+const route = useRoute();
+
+// 侧边栏桌面端点击记忆：上次访问的子页面
+const SIDEBAR_MEMORY_PREFIX = 'sidebar_last_child_'
+
+const readSidebarMemory = (menuKey) => {
+  try {
+    return sessionStorage.getItem(SIDEBAR_MEMORY_PREFIX + menuKey)
+  } catch {
+    return null
+  }
+}
+
+const writeSidebarMemory = (menuKey, path) => {
+  try {
+    if (path) sessionStorage.setItem(SIDEBAR_MEMORY_PREFIX + menuKey, path)
+    else sessionStorage.removeItem(SIDEBAR_MEMORY_PREFIX + menuKey)
+  } catch { /* ignore */ }
+}
 const {
   todayVisits,
   totalVisits,
@@ -165,18 +185,35 @@ const activeSubmenu = ref(null)  // Currently open submenu key
 const submenuPosition = ref({ top: 0, left: 0 })  // Position for submenu panel
 const closeSubmenuTimeout = ref(null)  // Timeout for delayed closing
 
-// Mobile detection
-const isMobile = ref(false)
-let hoverMediaQuery = null
+// Input capability detection
+// Do not use hover capability alone to determine whether the device is mobile.
+// Some Android devices, styluses, desktop mode, and hybrid devices may report hover support.
+const hasTouchInput = ref(false)
+const canHover = ref(false)
 
-const onHoverChange = (e) => {
-  isMobile.value = !e.matches
+let hoverMediaQuery = null
+let coarsePointerMediaQuery = null
+let anyCoarsePointerMediaQuery = null
+
+const updateInputCapabilities = () => {
+  canHover.value = hoverMediaQuery?.matches ?? false
+  hasTouchInput.value = Boolean(
+    coarsePointerMediaQuery?.matches ||
+    anyCoarsePointerMediaQuery?.matches ||
+    navigator.maxTouchPoints > 0
+  )
 }
 
-const checkMobile = () => {
-  isMobile.value = !window.matchMedia('(hover: hover)').matches
-  hoverMediaQuery = window.matchMedia('(hover: hover)')
-  hoverMediaQuery.addEventListener('change', onHoverChange)
+const checkInputCapabilities = () => {
+  hoverMediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)')
+  coarsePointerMediaQuery = window.matchMedia('(pointer: coarse)')
+  anyCoarsePointerMediaQuery = window.matchMedia('(any-pointer: coarse)')
+
+  updateInputCapabilities()
+
+  hoverMediaQuery.addEventListener('change', updateInputCapabilities)
+  coarsePointerMediaQuery.addEventListener('change', updateInputCapabilities)
+  anyCoarsePointerMediaQuery.addEventListener('change', updateInputCapabilities)
 }
 
 // Filter menu items for SimpleSidebar (exclude items that should only show in NavBar)
@@ -205,6 +242,20 @@ const getFilteredChildren = (menuKey) => {
   })
 }
 
+// 监听路由变化，记录当前路径到对应菜单项的 sessionStorage
+watch(() => route.fullPath, () => {
+  for (const [key, item] of Object.entries(menuConfigData.value)) {
+    if (!item.children) continue
+    for (const child of item.children) {
+      const childPathOnly = child.path?.split('?')[0]
+      if (route.path === childPathOnly || route.fullPath === child.path) {
+        writeSidebarMemory(key, child.path)
+        return
+      }
+    }
+  }
+})
+
 // 访问统计相关
 const isStatsExpanded = ref(false);
 
@@ -214,34 +265,56 @@ const closeSidebar = () => {
   activeSubmenu.value = null;
 };
 
-// 主按鈕點擊處理 - 有子菜單則展開，無子菜單則導航
-const handleMainClick = (item, key, event) => {
-  event?.stopPropagation()  // 阻止事件冒泡
-  cancelCloseSubmenu()  // 取消任何待處理的關閉
+// Main menu interaction handler
+// Mouse: items with children navigate directly to the remembered/default child page.
+// Touch or pen: items with children open the submenu instead of navigating.
+const handleMainPointerUp = (item, key, event) => {
+  const pointerType = event?.pointerType
+  const isTouchInteraction =
+    pointerType === 'touch' ||
+    pointerType === 'pen' ||
+    (!pointerType && hasTouchInput.value)
+
+  handleMainClick(item, key, event, isTouchInteraction)
+}
+
+const handleMainClick = (item, key, event, isTouchInteraction) => {
+  event?.stopPropagation()
+  cancelCloseSubmenu()
 
   if (item.children) {
-    // 有子菜單，展開子菜單
-    handleArrowClick(item, key, event)
-  } else if (item.path) {
-    // 無子菜單且有路徑，導航
-    if (item.external) {
-      const targetUrl = WEB_BASE + item.path
-      console.log('🔗 External navigation:', { key, path: item.path, WEB_BASE, targetUrl })
-      window.location.href = targetUrl
+    if (isTouchInteraction) {
+      // Touch/pen: open the submenu.
+      handleArrowClick(item, key, event)
     } else {
-      router.push(item.path)
-      closeSidebar()
+      // Mouse: navigate to the remembered child, or the first visible child.
+      const remembered = readSidebarMemory(key)
+      const defaultChild = getFilteredChildren(key)[0]?.path
+      const target = remembered || defaultChild || item.path
+
+      if (target) {
+        router.push(target)
+        closeSidebar()
+      }
     }
+
+    return
+  }
+
+  if (!item.path) return
+
+  if (item.external) {
+    window.location.href = WEB_BASE + item.path
   } else {
-    // 沒有路徑就console
-    console.log('按鈕點擊 - 需要設置導航路徑:', key, item)
+    router.push(item.path)
+    closeSidebar()
   }
 }
 
-// 處理項目鼠標進入
+// Handle mouse hover only when the current primary pointer truly supports hover.
 const handleItemMouseEnter = (item, key, event) => {
-  cancelCloseSubmenu()  // 取消任何待處理的關閉
-  if (!isMobile.value && item.children) {
+  cancelCloseSubmenu()
+  if (canHover.value && item.children) {
     handleArrowClick(item, key, event)
   }
 }
@@ -348,7 +421,7 @@ async function fetchVisitHistory() {
 }
 
 onMounted(async () => {
-  checkMobile();
+  checkInputCapabilities();
   await fetchVisitStats();
   document.addEventListener('click', closeSubmenu);
 });
@@ -356,8 +429,16 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', closeSubmenu);
   if (hoverMediaQuery) {
-    hoverMediaQuery.removeEventListener('change', onHoverChange);
+    hoverMediaQuery.removeEventListener('change', updateInputCapabilities);
     hoverMediaQuery = null;
+  }
+  if (coarsePointerMediaQuery) {
+    coarsePointerMediaQuery.removeEventListener('change', updateInputCapabilities);
+    coarsePointerMediaQuery = null;
+  }
+  if (anyCoarsePointerMediaQuery) {
+    anyCoarsePointerMediaQuery.removeEventListener('change', updateInputCapabilities);
+    anyCoarsePointerMediaQuery = null;
   }
 });
 </script>
@@ -424,6 +505,7 @@ $portrait-ratio: 1;
   width: 100%;
   margin-top: 10px;
   margin-bottom: 15px;
+  overflow-x: auto;
 }
 
 
@@ -433,6 +515,7 @@ $portrait-ratio: 1;
   justify-content: space-between;
   gap: 9px;
   padding: 2px 10px;
+  flex-wrap: nowrap;
 
   @include soft-glass-background;
 
@@ -844,19 +927,16 @@ $portrait-ratio: 1;
 
 /* 移动端保持 SimpleSidebar 原逻辑 */
 
-@media (max-aspect-ratio: $portrait-ratio) and (hover: none) {
+@media (max-aspect-ratio: $portrait-ratio) and (any-pointer: coarse) {
 
   .title-img {
     height: 6dvh;
-
     max-height: 50px;
   }
 
 
   .sidebar-content {
-
     gap: 15px;
-
 
     ul {
       gap: 8px;
@@ -865,7 +945,6 @@ $portrait-ratio: 1;
 
     li {
       padding: 3px 15px;
-
       font-size: 1.1rem;
     }
   }

@@ -83,7 +83,11 @@ $system-font:
   background: var(--bg-page-gradient);
 
   @media (max-aspect-ratio: $portrait-ratio) {
-    padding: 8px;
+    padding:
+      max(16px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
   }
 }
 

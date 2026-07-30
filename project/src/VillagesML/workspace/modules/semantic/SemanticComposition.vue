@@ -10,14 +10,17 @@
       />
     </h3>
 
+    <!-- Detail Mode Toggle -->
+    <SemanticDetailToolbar v-model="detailMode" />
+
     <!-- Composition Patterns -->
     <div class="patterns-section vml-glass-panel">
 <!--      <h2>組合模式</h2>-->
       <p class="section-description">
         分析村名中語義類別的組合模式，例如「方位+聚落」、「水系+聚落」等。
       </p>
-      <div class="controls">
-        <div class="input-group">
+      <div class="controls vml-control-surface vml-control-row">
+        <div class="input-group vml-control-field">
           <label class="input-label">最小出現次數</label>
           <input
             v-model.number="minCount"
@@ -28,7 +31,7 @@
           />
           <span class="input-hint">過濾掉出現次數少於此值的模式</span>
         </div>
-        <div class="input-group">
+        <div class="input-group vml-control-field">
           <label class="input-label">返回數量</label>
           <input
             v-model.number="topN"
@@ -40,13 +43,15 @@
           />
           <span class="input-hint">返回前N個最常見的模式（最多1000）</span>
         </div>
-        <button
-          class="solid-button"
-          :disabled="loadingPatterns"
-          @click="loadPatterns"
-        >
-          查詢
-        </button>
+        <div class="vml-control-actions">
+          <button
+            class="solid-button"
+            :disabled="loadingPatterns"
+            @click="loadPatterns"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
       <div v-if="loadingPatterns" class="vml-loading">
@@ -73,28 +78,34 @@
             <div class="col-count">{{ pattern.frequency }}</div>
             <div class="col-percentage">{{ pattern.percentage?.toFixed(2) || '0.00' }}%</div>
             <div class="col-components">
-              <span v-if="pattern.modifier" class="component-tag modifier">{{ getCategoryName(pattern.modifier) }}</span>
-              <span v-if="pattern.head" class="component-tag head">{{ getCategoryName(pattern.head) }}</span>
+              <span v-if="pattern.modifier" class="component-tag modifier">{{ getCategoryDisplayName(pattern.modifier, detailMode) }}</span>
+              <span v-if="pattern.head" class="component-tag head">{{ getCategoryDisplayName(pattern.head, detailMode) }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
 import { getSemanticCompositionPatterns } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
-import { getPatternTypeName, getCategoryName } from '@/VillagesML/config/villagesML.js'
+import { showError } from '@/utils/ui/message.js'
+import { getPatternTypeName, getCategoryDisplayName } from '@/VillagesML/config/villagesML.js'
 
 // State
 const patterns = ref([])
 const loadingPatterns = ref(false)
 const minCount = ref(5)
 const topN = ref(50)
+const route = useRoute()
+const router = useRouter()
+const detailMode = ref(route.query.detail === 'true')
 
 // Methods
 const loadPatterns = async () => {
@@ -102,7 +113,8 @@ const loadPatterns = async () => {
   try {
     patterns.value = await getSemanticCompositionPatterns({
       min_frequency: minCount.value,
-      limit: topN.value
+      limit: topN.value,
+      ...(detailMode.value && { detail: true })
     })
   } catch (error) {
     showError('加載組合模式失敗')
@@ -115,9 +127,16 @@ const translatePattern = (patternStr) => {
   if (!patternStr) return ''
   return patternStr
     .split('+')
-    .map(cat => getCategoryName(cat.trim()))
+    .map(cat => getCategoryDisplayName(cat.trim(), detailMode.value))
     .join('+')
 }
+
+watch(detailMode, (val) => {
+  const query = { ...route.query }
+  if (val) { query.detail = 'true' } else { delete query.detail }
+  router.replace({ query })
+  if (patterns.value.length > 0) loadPatterns()
+})
 </script>
 
 <style scoped lang="scss">
@@ -146,16 +165,12 @@ const translatePattern = (patternStr) => {
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
-  align-items: center;
-  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .input-group {
-  @include flex-col;
-  gap: 4px;
+  min-width: 0;
 }
 
 .input-label {
@@ -171,7 +186,7 @@ const translatePattern = (patternStr) => {
 }
 
 .vml-number-input {
-  width: 150px;
+  // width: 150px;
 }
 
 .patterns-table {
@@ -246,14 +261,9 @@ const translatePattern = (patternStr) => {
     padding: 12px;
   }
 
-  .controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .vml-number-input {
-    width: 100%;
-  }
+  // .vml-number-input {
+  //   width: 100%;
+  // }
 }
 
 </style>

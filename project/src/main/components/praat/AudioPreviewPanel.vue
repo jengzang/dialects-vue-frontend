@@ -186,7 +186,7 @@ import { useI18n } from 'vue-i18n'
 import WaveSurfer from 'wavesurfer.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js'
 import { userStore } from '@/main/store/store.js'
-import { showSuccess } from '@/utils/message.js'
+import { showSuccess } from '@/utils/ui/message.js'
 
 const props = defineProps({
   audioBlob: {
@@ -1006,7 +1006,7 @@ $transition-normal: 0.3s;
   &.active {
     background: $primary;
     border-color: $primary;
-    color: $white;
+    color: var(--action-primary-text);
   }
 
   &:hover:not(.active) {
@@ -1104,7 +1104,7 @@ $transition-normal: 0.3s;
 .segment-badge {
   padding: 0.15rem 0.4rem;
   border-radius: var(--radius-sm);
-  color: $white;
+  color: var(--action-primary-text);
   font-size: 0.7rem;
   font-weight: 600;
 
@@ -1134,7 +1134,7 @@ $transition-normal: 0.3s;
     padding: 0.25rem 0.5rem;
     background: $primary;
     border-radius: var(--radius-sm);
-    color: $white;
+    color: var(--action-primary-text);
     white-space: nowrap;
     font-size: 0.75rem;
     font-weight: 600;
@@ -1261,7 +1261,7 @@ $transition-normal: 0.3s;
 
 .btn-confirm {
   background: linear-gradient(135deg, #4caf50, #45a049);
-  color: $white;
+  color: var(--action-primary-text);
   font-weight: 600;
 
   &:hover:not(:disabled) {
@@ -1278,7 +1278,7 @@ $transition-normal: 0.3s;
 
 .btn-clear {
   background: $error;
-  color: $white;
+  color: var(--action-primary-text);
 
   &:hover {
     background: #cc0000;
@@ -1343,7 +1343,7 @@ $transition-normal: 0.3s;
   .region-badge {
     padding: 0.25rem 0.75rem;
     border-radius: var(--radius-sm);
-    color: $white;
+    color: var(--action-primary-text);
     font-size: 0.8rem;
     font-weight: 600;
   }
@@ -1364,7 +1364,7 @@ $transition-normal: 0.3s;
     padding: 0.25rem 0.5rem;
     background: $primary;
     border-radius: var(--radius-sm);
-    color: $white;
+    color: var(--action-primary-text);
     font-size: 0.75rem;
     font-weight: 600;
   }

@@ -230,7 +230,8 @@
       "rank": "排名",
       "count": "次數",
       "gap": "距前一名",
-      "firstPlace": "第一名"
+      "firstPlace": "第一名",
+						"percentile": "超越"
     },
     "rank": {
       "first": "第 1 名",
@@ -311,6 +312,15 @@
           "table": "包含各種表格查詢，例如語保詞彙語法、資料來源、全粵村情表格與陽春口語詞等。",
           "tree": "包含各種樹狀圖查詢，例如廣東自然村樹狀圖與中古地位等。",
           "locations": "包括獲取單個地點的詳情信息，以及獲取完整分區信息"
+        }
+      },
+      "vocabulary": {
+        "label": "詞句查詢",
+        "items": {
+          "yubao": "語保查詢",
+          "vocabSearch": "詞表搜索",
+          "vocabTable": "詞表表格",
+          "vocabEdit": "詞表編輯"
         }
       }
     }

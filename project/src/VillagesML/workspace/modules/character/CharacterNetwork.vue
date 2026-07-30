@@ -18,37 +18,41 @@
 
     <!-- Controls -->
     <div class="controls-panel vml-glass-panel">
-      <div class="controls-row">
-        <div class="control-group">
-          <label>字符</label>
-          <input v-model="rootChar" maxlength="1" class="vml-char-input" placeholder="請輸入單個漢字" />
+      <div class="vml-control-surface">
+        <div class="vml-control-row vml-control-row--center">
+          <div class="vml-control-field">
+            <label>字符</label>
+            <input v-model="rootChar" maxlength="1" class="vml-char-input" placeholder="請輸入單個漢字" />
+          </div>
+          <div class="vml-control-field">
+            <label>擴展深度</label>
+            <SimpleSelectDropdown
+              v-model.number="depth"
+              :options="depthOptions"
+            />
+          </div>
+          <div class="vml-control-field">
+            <label>每節點 Top-K（1-10）</label>
+            <input v-model.number="topK" type="number" min="1" max="10" class="glass-input small" />
+          </div>
+          <div class="vml-control-field">
+            <label>最低相似度</label>
+            <input v-model.number="minSimilarity" type="number" min="0.1" max="0.99" step="0.05" class="glass-input small" />
+          </div>
+          <div class="vml-control-field">
+            <label>最大節點數</label>
+            <input v-model.number="maxNodes" type="number" min="10" max="1000" class="glass-input small" />
+          </div>
+          <div class="vml-control-actions">
+            <button
+              class="solid-button"
+              :disabled="!rootChar || loading || !isAuthenticated"
+              @click="buildNetwork"
+            >
+              生成網絡
+            </button>
+          </div>
         </div>
-        <div class="control-group">
-          <label>擴展深度</label>
-          <SimpleSelectDropdown
-            v-model.number="depth"
-            :options="depthOptions"
-          />
-        </div>
-        <div class="control-group">
-          <label>每節點 Top-K（1-10）</label>
-          <input v-model.number="topK" type="number" min="1" max="10" class="glass-input small" />
-        </div>
-        <div class="control-group">
-          <label>最低相似度</label>
-          <input v-model.number="minSimilarity" type="number" min="0.1" max="0.99" step="0.05" class="glass-input small" />
-        </div>
-        <div class="control-group">
-          <label>最大節點數</label>
-          <input v-model.number="maxNodes" type="number" min="10" max="1000" class="glass-input small" />
-        </div>
-        <button
-          class="solid-button"
-          :disabled="!rootChar || loading || !isAuthenticated"
-          @click="buildNetwork"
-        >
-          生成網絡
-        </button>
       </div>
     </div>
 
@@ -91,8 +95,9 @@ import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { fetchCharacterNetwork } from '@/api/index.js'
-import { showWarning } from '@/utils/message.js'
+import { showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
+import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -102,7 +107,7 @@ const isAuthenticated = computed(() => userStore.isAuthenticated)
 const goToAuth = () => router.push({
   path: '/auth',
   query: {
-    redirect: route.fullPath || '/villagesML?module=character&subtab=network'
+    redirect: route.fullPath || buildCurrentVillagesMLPath({ module: 'character', subtab: 'network' })
   }
 })
 
@@ -232,27 +237,19 @@ onBeforeUnmount(() => {
   margin-bottom: 16px; padding: 16px;
 }
 
-.controls-row {
-  justify-content: center;
-  display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
-
-.control-group { display: flex; flex-direction: column; gap: 4px; }
-.control-group label { font-size: 12px; color: var(--text-secondary, var(--text-tertiary)); }
-
 .vml-char-input {
   min-width: 56px;
-  width: 100px;
+  width: 100%;
   font-size: 14px;
   border-color: rgba(var(--color-primary-rgb), 0.3);
 }
 
-.glass-select, .glass-input {
+.glass-select {
   padding: 8px 10px; border-radius: var(--radius-sm2);
   border: 1px solid var(--glass-60);
   background: var(--glass-50);
   font-size: 14px;
 }
-.glass-input.small { min-width: 56px; width: 80px; flex: 1; }
 
 .progress-panel { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .progress-text { font-size: 13px; color: var(--text-secondary, var(--text-tertiary)); margin: 0; }

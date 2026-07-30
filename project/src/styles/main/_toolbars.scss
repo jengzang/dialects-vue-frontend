@@ -41,6 +41,7 @@
   flex-grow: 1;
   max-height: 100dvh;
   overflow: auto;
+  margin-top: 10px;
 }
 
 .main-sidebar-list {
@@ -92,6 +93,7 @@
   width: 100%;
   margin-top: 10px;
   margin-bottom: 15px;
+  overflow-x: auto;
 }
 
 .main-sidebar-stats-summary {
@@ -104,6 +106,7 @@
   box-shadow: 0 4px 8px var(--bg-hover-strong);
   border: 2px solid var(--sidebar-stats-border);
   gap: 9px;
+  flex-wrap: nowrap;
 }
 
 .main-sidebar-expand-btn {

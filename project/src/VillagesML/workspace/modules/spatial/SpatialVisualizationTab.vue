@@ -38,42 +38,52 @@
           <div v-if="layers.ngrams" class="section">
             <h3>N-gram 設置</h3>
             <p class="layer-note">⚠️ 僅支持 2-4 字符的 N-gram，區域固定為鄉鎮級</p>
-            <input
-              v-model="filters.ngram"
-              type="text"
-              placeholder="輸入 2-4 字 N-gram（如：新村）"
-              class="filter-input"
-              maxlength="4"
-            >
+            <div class="filter-row vml-control-surface vml-control-row">
+              <div class="vml-control-field">
+                <input
+                  v-model="filters.ngram"
+                  type="text"
+                  placeholder="輸入 2-4 字 N-gram（如：新村）"
+                  class="filter-input"
+                  maxlength="4"
+                >
+              </div>
+            </div>
           </div>
 
           <!-- 字符過濾器 -->
           <div v-if="layers.characters" class="section">
             <h3>字符設置</h3>
-            <div class="filter-row">
-              <input
-                v-model="filters.character"
-                type="text"
-                placeholder="輸入字符（如：村）"
-                maxlength="1"
-                class="filter-input"
-              >
-              <SimpleSelectDropdown
-                v-model="filters.charLevel"
-                :options="charLevelOptions"
-              />
+            <div class="filter-row vml-control-surface vml-control-row">
+              <div class="vml-control-field">
+                <input
+                  v-model="filters.character"
+                  type="text"
+                  placeholder="輸入字符（如：村）"
+                  maxlength="1"
+                  class="filter-input"
+                >
+              </div>
+              <div class="vml-control-field">
+                <SimpleSelectDropdown
+                  v-model="filters.charLevel"
+                  :options="charLevelOptions"
+                />
+              </div>
             </div>
           </div>
 
           <!-- 應用按鈕 -->
           <div class="section">
-            <button
-              class="apply-btn"
-              @click="loadData"
-              :disabled="loading"
-            >
-              {{ loading ? '加載中...' : '應用' }}
-            </button>
+            <div class="vml-control-surface vml-control-actions">
+              <button
+                class="apply-btn"
+                @click="loadData"
+                :disabled="loading"
+              >
+                {{ loading ? '加載中...' : '應用' }}
+              </button>
+            </div>
           </div>
 
           <!-- 圖例 -->
@@ -157,12 +167,13 @@ import {
   getNgramTendency,
   getCharTendencyByChar
 } from '@/api/index.js'
-import { showError, showWarning, showConfirm } from '@/utils/message.js'
+import { showError, showWarning, showConfirm } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
 import {
   SPATIAL_CLUSTERING_RUN_LABELS,
   DEFAULT_SPATIAL_CLUSTERING_RUN_ID
 } from '@/VillagesML/config/villagesML.js'
+import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -170,7 +181,7 @@ const goToAuth = () => {
   router.push({
     path: '/auth',
     query: {
-      redirect: route.fullPath || '/villagesML?module=spatial&subtab=visualization'
+      redirect: route.fullPath || buildCurrentVillagesMLPath({ module: 'spatial', subtab: 'visualization' })
     }
   })
 }
@@ -770,6 +781,10 @@ h2 {
 .filter-row .filter-input {
   width: 120px;
   margin-bottom: 0;
+}
+
+.filter-row .vml-control-field .filter-input {
+  width: 100%;
 }
 
 .filter-input{

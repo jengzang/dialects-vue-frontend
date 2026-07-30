@@ -1,5 +1,5 @@
 <template>
-  <div class="map-draw-tab page-content-stack">
+  <div ref="drawTabRoot" class="map-draw-tab page-content-stack">
     <div class="page-footer draw-tab-header main-glass-panel">
       <!-- <div class="draw-tab-copy">
         <h3 class="draw-tab-title">
@@ -30,7 +30,7 @@
           :data-variant="isVoronoiPanelOpen ? 'primary' : 'secondary'"
           :data-active="isVoronoiPanelOpen"
           type="button"
-          @click="isVoronoiPanelOpen = !isVoronoiPanelOpen"
+          @click="togglePanel('voronoi')"
         >
           ⬡ {{ t('map.drawTab.buttons.voronoi') }}
         </button>
@@ -55,7 +55,7 @@
           :data-variant="isDrawingPanelOpen ? 'primary' : 'secondary'"
           :data-active="isDrawingPanelOpen"
           type="button"
-          @click="isDrawingPanelOpen = !isDrawingPanelOpen"
+          @click="togglePanel('drawing')"
         >
           🛠️ {{ t('map.drawTab.buttons.drawingTools') }}
         </button>
@@ -64,7 +64,7 @@
           :data-variant="isLayersPanelOpen ? 'primary' : 'secondary'"
           :data-active="isLayersPanelOpen"
           type="button"
-          @click="isLayersPanelOpen = !isLayersPanelOpen"
+          @click="togglePanel('layers')"
         >
           🗂️ {{ t('map.drawTab.buttons.layers') }}
         </button>
@@ -102,12 +102,27 @@
             :active-layer="activeLayer"
             :all-layers="layers"
             :preview-layers="voronoiPreviewLayers"
+            :enable-preview-hover="voronoiPreviewLayers.length > 0"
             @features-change="handleActiveLayerFeaturesChange"
             @feature-select="handleFeatureSelect"
             @export-image="handleImageExported"
             @export-layer="handleLayerExported"
             @export-selection-bounds-change="boxSelectionBounds = $event"
+            @preview-feature-hover="handlePreviewFeatureHover"
+            @map-click="handleMapClickForAddPoint"
           />
+        </div>
+
+        <div v-if="hoveredPolygon" class="voronoi-hover-tooltip">
+          <strong>{{ hoveredPolygon.name }}</strong>
+          <span
+            v-if="hoveredPolygon.pointCount > 0"
+            class="point-count"
+          >{{ hoveredPolygon.pointCount }} 个方言点</span>
+          <span
+            v-else-if="hoveredPolygon.partitionKey"
+            class="partition-info"
+          >{{ hoveredPolygon.partitionKey }}</span>
         </div>
 
         <MapDrawToolsPanel
@@ -163,6 +178,11 @@
           :official-point-count="voronoiOfficialPointCount"
           :custom-point-count="voronoiCustomPointCount"
           :custom-import-summary="voronoiCustomImportSummaryText"
+          :is-village-data-source="isVillageDataSource"
+          :has-field-merge="hasFieldMerge"
+          :expand-ratio="voronoiExpandRatio"
+          :enable-expand="voronoiEnableExpand"
+          @update:enable-expand="voronoiEnableExpand = $event"
           @update:partition-mode="voronoiPartitionMode = $event"
           @update:region-level="voronoiRegionLevel = $event"
           @update:use-official-data="useVoronoiOfficialData = $event"
@@ -172,6 +192,10 @@
           @preview-points="previewVoronoiPoints"
           @export-layer="exportVoronoiToLayer"
           @calculate="handleBuildVoronoi"
+          @open-field-merge="showFieldMergeModal = true"
+          @update:expand-ratio="voronoiExpandRatio = $event"
+          :is-adding-points="isAddingDialectPoints"
+          @toggle-add-points="toggleAddDialectPoints"
         />
       </div>
 
@@ -479,6 +503,77 @@
         @confirm="handleVoronoiIgnoreConfirm"
       />
 
+      <VoronoiFieldMergeModal
+        v-model="showFieldMergeModal"
+        :field-merge-entries="fieldMergeEntries"
+        @update:field-merge="updateFieldMerge"
+        @reset-field-merge="resetFieldMerge"
+      />
+
+      <AppModal
+        v-model="showAddDialectPartitionModal"
+        :title="t('map.drawTab.voronoi.addPointSelectPartition')"
+        size="sm"
+      >
+        <div class="draw-basemap-select" style="padding: 0.5rem 0;">
+          <SimpleSelectDropdown
+            v-model="pendingAddPartitionKey"
+            :options="addDialectPartitionOptions"
+          />
+        </div>
+        <div
+          v-if="customPointsByPartition.length"
+          class="add-point-partition-list"
+        >
+          <div class="draw-tool-section-title">
+            {{ t('map.drawTab.voronoi.customPointsManagement') }}
+          </div>
+          <div
+            v-for="item in customPointsByPartition"
+            :key="item.key"
+            class="add-point-partition-row"
+          >
+            <span class="add-point-partition-key">{{ item.key }}</span>
+            <span class="add-point-partition-count">{{ item.count }}</span>
+            <button
+              class="main-glass-button add-point-delete-btn"
+              type="button"
+              data-variant="secondary"
+              @click="deleteCustomPointsByPartition(item.key)"
+            >
+              {{ t('map.drawTab.voronoi.deletePartitionPoints') }}
+            </button>
+          </div>
+        </div>
+        <div
+          v-else
+          class="draw-style-hint"
+          style="padding: 0.5rem 0;"
+        >
+          {{ t('map.drawTab.voronoi.noCustomPoints') }}
+        </div>
+        <template #footer>
+          <div class="scope-modal-footer">
+            <button
+              class="main-glass-button"
+              type="button"
+              @click="showAddDialectPartitionModal = false"
+            >
+              {{ t('common.button.cancel') }}
+            </button>
+            <button
+              class="main-glass-button scope-confirm-btn"
+              data-variant="primary"
+              type="button"
+              :disabled="!pendingAddPartitionKey"
+              @click="confirmAddDialectPartition"
+            >
+              {{ t('common.button.confirm') }}
+            </button>
+          </div>
+        </template>
+      </AppModal>
+
       <input
         ref="voronoiImportFileInputRef"
         class="draw-import-input"
@@ -511,15 +606,16 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import { featureCollection } from '@turf/turf';
 
 import nationalBorderKmzUrl from '/data/国界面.kmz?url';
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
-import { usePartitionCache } from '@/composables/domain/usePartitionCache.js';
+import { usePartitionCache } from '@/composables/data/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
-import { showConfirm, showError, showSuccess } from '@/utils/message.js';
+import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js';
 import { readImportedLayerFile, readKmzArrayBuffer, splitFeatureCollectionByGeometryType } from '@/main/utils/drawMap/export.js';
 import {
   deleteDraftRecord,
@@ -541,7 +637,9 @@ import {
   buildPartitionPoints,
   buildVoronoiSelectionOptions,
   calculatePartitionVoronoi,
+  normalizePartitionPoint,
 } from '@/main/utils/drawMap/partitionVoronoi.js';
+import { pickDrawColor } from '@/main/config/colors/mapColors.js';
 import { mapStyleConfig } from '@/utils/map/MapSource.js';
 import EditableMapLibre from '@/main/components/map/EditableMapLibre.vue';
 import MapDrawLayersPanel from '@/main/components/map/Draw/panels/MapDrawLayersPanel.vue';
@@ -551,24 +649,29 @@ import MapDrawImageExportModal from '@/main/components/map/Draw/modals/MapDrawIm
 import MapDrawImagePreviewModal from '@/main/components/map/Draw/modals/MapDrawImagePreviewModal.vue';
 import VoronoiExportLayersModal from '@/main/components/map/Draw/modals/VoronoiExportLayersModal.vue';
 import VoronoiIgnorePointsModal from '@/main/components/map/Draw/modals/VoronoiIgnorePointsModal.vue';
+import VoronoiFieldMergeModal from '@/main/components/map/Draw/modals/VoronoiFieldMergeModal.vue';
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue';
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js';
 import { useVoronoiCustomImport } from '@/composables/import/useVoronoiCustomImport.js';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
 import AppModal from '@/components/common/AppModal.vue';
+import { globalPayload } from '@/main/store/store.js';
 
 const { t } = useI18n();
+const route = useRoute();
+const drawTabRoot = ref(null);
 const { requireAuth, isAuthenticated } = useAuthGuard();
 const { getPartitionData } = usePartitionCache();
 
+const [defaultStroke, defaultPointColor] = pickDrawColor(0);
 const defaultLayerStyle = {
-  stroke: 'var(--color-map-draw)',
+  stroke: defaultStroke,
   strokeWidth: 3,
-  fill: '#60a5fa',
+  fill: defaultPointColor,
   fillOpacity: 0.22,
   pointRadius: 6,
-  pointColor: '#60a5fa',
-  pointStrokeColor: 'var(--color-map-draw)',
+  pointColor: defaultPointColor,
+  pointStrokeColor: defaultStroke,
   visible: true,
   locked: false,
 };
@@ -622,6 +725,7 @@ const mapStyleOptions = computed(() => {
 
 const createEmptyLayer = (geometryType) => {
   layerIdSeed += 1;
+  const [stroke, pointColor] = pickDrawColor(layerIdSeed);
   const geometryLabels = {
     Point: t('map.drawTab.geometry.point'),
     LineString: t('map.drawTab.geometry.line'),
@@ -632,6 +736,10 @@ const createEmptyLayer = (geometryType) => {
     name: `${geometryLabels[geometryType] ?? t('map.drawTab.geometry.line')}${t('map.drawTab.labels.layer')} ${layerIdSeed}`,
     geometryType,
     ...defaultLayerStyle,
+    stroke,
+    fill: pointColor,
+    pointColor,
+    pointStrokeColor: stroke,
     featureCollection: emptyFeatureCollection(),
   };
 };
@@ -677,7 +785,7 @@ const updateActiveLayerFeatureCollection = (nextValue) => {
 const handleLogin = async () => {
   await requireAuth({
     message: t('map.drawTab.auth.loginRequired'),
-    redirect: '/menu/map/draw',
+    redirect: route.fullPath || '/menu/map/draw',
   });
 };
 
@@ -707,22 +815,125 @@ const voronoiTabularState = useTabularImportPreview({
 const ignoredVoronoiLocations = ref([]);
 const voronoiPreviewLayers = ref([]);
 const voronoiPreviewType = ref('');
+const hoveredPolygon = ref(null);
+const handlePreviewFeatureHover = (info) => {
+  hoveredPolygon.value = info;
+};
 const voronoiPartitionMode = ref(PARTITION_MODE_YINDIAN);
 const voronoiRegionLevel = ref(1);
 const isVoronoiPanelOpen = ref(false);
 const isVoronoiLoadingPoints = ref(false);
 const isVoronoiCalculating = ref(false);
 const showVoronoiIgnoreModal = ref(false);
+const showFieldMergeModal = ref(false);
+const isAddingDialectPoints = ref(false);
+const showAddDialectPartitionModal = ref(false);
+const addDialectPartitionKey = ref('');
+const pendingAddPartitionKey = ref('');
+let addPointCounter = 0;
+
+const addDialectPartitionOptions = computed(() => {
+  const level = Number(voronoiRegionLevel.value) || 3;
+  const keys = [...new Set(voronoiPartitionPoints.value.map((p) => {
+    if (level === 1) return p.partitionLevel1;
+    if (level === 2) return p.partitionLevel2;
+    return p.partitionLevel3;
+  }).filter(Boolean))];
+  return keys.sort((a, b) => String(a).localeCompare(String(b), 'zh-Hans-CN')).map((k) => ({
+    label: k,
+    value: k,
+  }));
+});
+
+const customPointsByPartition = computed(() => {
+  const level = Number(voronoiRegionLevel.value) || 3;
+  const manualPoints = voronoiCustomImportRows.value.filter(p => p.source === 'manual');
+  const groups = {};
+  for (const p of manualPoints) {
+    let key;
+    if (level === 1) key = p.partitionLevel1;
+    else if (level === 2) key = p.partitionLevel2;
+    else key = p.partitionLevel3;
+    if (!key) continue;
+    groups[key] = (groups[key] || 0) + 1;
+  }
+  return Object.entries(groups)
+    .map(([key, count]) => ({ key, count }))
+    .sort((a, b) => b.count - a.count);
+});
 const voronoiStatusText = ref('');
 const voronoiLastResult = ref(null);
 const voronoiExportProgress = ref({ current: 0, total: 0 });
 const showVoronoiExportProgressOverlay = computed(() => isVoronoiExporting.value && voronoiExportProgress.value.total > 0);
 
+const isVillageDataSource = computed(() => voronoiCustomImportMeta.value?.partitionMode === 'village');
+const voronoiExpandRatio = ref(50);
+const voronoiEnableExpand = ref(false);
+
+// 合并字段: partitionKey → groupName
+const voronoiFieldMergeMap = ref(new Map());
+
+const fieldMergeEntries = computed(() => {
+  const level = Number(voronoiRegionLevel.value) || 3
+  const keys = [...new Set(voronoiPartitionPoints.value.map(p => {
+    if (level === 1) return p.partitionLevel1
+    if (level === 2) return p.partitionLevel2
+    return p.partitionLevel3
+  }).filter(Boolean))]
+  return keys.sort((a, b) => String(a).localeCompare(String(b), 'zh-Hans-CN')).map(key => ({
+    original: key,
+    groupName: voronoiFieldMergeMap.value.get(key) ?? key,
+  }))
+})
+
+const hasFieldMerge = computed(() => fieldMergeEntries.value.length > 0)
+
+function initFieldMergeMap() {
+  const next = new Map()
+  const level = Number(voronoiRegionLevel.value) || 3
+  voronoiPartitionPoints.value.forEach(p => {
+    let key
+    if (level === 1) key = p.partitionLevel1
+    else if (level === 2) key = p.partitionLevel2
+    else key = p.partitionLevel3
+    if (key && !next.has(key)) next.set(key, key)
+  })
+  voronoiFieldMergeMap.value = next
+}
+
+function updateFieldMerge(original, groupName) {
+  const next = new Map(voronoiFieldMergeMap.value)
+  next.set(original, String(groupName ?? ''))
+  voronoiFieldMergeMap.value = next
+}
+
+function resetFieldMerge() {
+  initFieldMergeMap()
+}
+
+function applyFieldMerge(points) {
+  if (voronoiFieldMergeMap.value.size === 0) return points
+  const effective = (val) => (val != null && String(val).trim() !== '') ? val : undefined
+  return points.map(p => {
+    const group1 = effective(voronoiFieldMergeMap.value.get(p.partitionLevel1))
+    const group2 = effective(voronoiFieldMergeMap.value.get(p.partitionLevel2))
+    const group3 = effective(voronoiFieldMergeMap.value.get(p.partitionLevel3))
+    if (group1 === undefined && group2 === undefined && group3 === undefined) return p
+    return {
+      ...p,
+      partitionLevel1: group1 ?? p.partitionLevel1,
+      partitionLevel2: group2 ?? p.partitionLevel2,
+      partitionLevel3: group3 ?? p.partitionLevel3,
+    }
+  })
+}
+
 const normalizeVoronoiLocationName = (value) => String(value || '').trim();
 
 const activeVoronoiPoints = computed(() => {
   const ignored = new Set(ignoredVoronoiLocations.value.map(normalizeVoronoiLocationName).filter(Boolean));
-  return voronoiPartitionPoints.value.filter((item) => !ignored.has(normalizeVoronoiLocationName(item.name)));
+  const filtered = voronoiPartitionPoints.value.filter((item) => !ignored.has(normalizeVoronoiLocationName(item.name)));
+  return applyFieldMerge(filtered);
 });
 
 const hasVoronoiCustomImport = computed(() => voronoiCustomImportRows.value.length > 0);
@@ -753,7 +964,7 @@ const voronoiPanelOffsetMode = computed(() => {
 });
 
 const voronoiSelectionOptions = computed(() => {
-  return buildVoronoiSelectionOptions(voronoiPartitionPoints.value, Number(voronoiRegionLevel.value) || 3);
+  return buildVoronoiSelectionOptions(applyFieldMerge(voronoiPartitionPoints.value), Number(voronoiRegionLevel.value) || 3);
 });
 
 const voronoiColorMap = computed(() => {
@@ -825,6 +1036,40 @@ const clearVoronoiCustomImport = () => {
   syncVoronoiPartitionPoints();
   clearVoronoiPreviewState();
   setVoronoiStatus('customImportCleared');
+};
+
+const consumeVillageVoronoiPayload = async (payload) => {
+  clearVoronoiCustomImport()
+
+  voronoiCustomImportRows.value = (payload.points || []).map((p, i) => ({
+    ...p,
+    source: 'village',
+    customRowId: `village-${i + 1}`,
+  }))
+  voronoiCustomImportMeta.value = {
+    partitionMode: 'village',
+    summary: {
+      totalRowCount: (payload.points || []).length,
+    },
+  }
+
+  useVoronoiOfficialData.value = false
+  voronoiPartitionMode.value = PARTITION_MODE_MAP
+  voronoiRegionLevel.value = 1
+
+  syncVoronoiPartitionPoints()
+  initFieldMergeMap()
+
+  ignoredVoronoiLocations.value = []
+  voronoiLastResult.value = null
+  voronoiPreviewType.value = ''
+  voronoiPreviewLayers.value = []
+
+  isDrawingPanelOpen.value = false
+  isVoronoiPanelOpen.value = true
+  setVoronoiStatus('pointsLoaded', { count: voronoiPartitionPoints.value.length })
+
+  globalPayload.value = null
 };
 
 function triggerVoronoiFileImport() {
@@ -1045,6 +1290,7 @@ const handleBuildVoronoi = async ({ force = false } = {}) => {
     return;
   }
   isVoronoiCalculating.value = true;
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
   try {
     await ensureVoronoiPointsLoaded();
@@ -1055,7 +1301,8 @@ const handleBuildVoronoi = async ({ force = false } = {}) => {
       inputPointCount: points.length,
       inputPointSamples: points.slice(0, 10).map((item) => item.name),
     });
-    const voronoiResult = calculatePartitionVoronoi(points, level, voronoiColorMap.value);
+    const expandRatio = voronoiEnableExpand.value ? voronoiExpandRatio.value : -1;
+    const voronoiResult = calculatePartitionVoronoi(points, level, voronoiColorMap.value, expandRatio);
     voronoiLastResult.value = voronoiResult;
 
     voronoiPreviewType.value = 'polygons';
@@ -1079,7 +1326,8 @@ const exportVoronoiToLayer = async () => {
   await ensureVoronoiPointsLoaded();
   const level = Number(voronoiRegionLevel.value) || 3;
   const points = activeVoronoiPoints.value;
-  const voronoiResult = calculatePartitionVoronoi(points, level, voronoiColorMap.value);
+  const expandRatio2 = voronoiEnableExpand.value ? voronoiExpandRatio.value : -1;
+  const voronoiResult = calculatePartitionVoronoi(points, level, voronoiColorMap.value, expandRatio2);
   voronoiLastResult.value = voronoiResult;
 
   const exportableKeys = voronoiExportGroups.value.map((item) => item.key);
@@ -1154,9 +1402,9 @@ const confirmVoronoiExport = async () => {
           id: feature.id ?? `voronoi-${group.key}-${index + 1}`,
           properties: {
             ...(feature.properties ?? {}),
-            stroke: feature.properties?.stroke ?? 'var(--color-map-draw)',
+            stroke: feature.properties?.stroke ?? defaultStroke,
             strokeWidth: feature.properties?.strokeWidth ?? 2,
-            fill: feature.properties?.fill ?? '#60a5fa',
+            fill: feature.properties?.fill ?? defaultPointColor,
             fillOpacity: feature.properties?.fillOpacity ?? 0.22,
             visible: true,
             locked: false,
@@ -1165,9 +1413,9 @@ const confirmVoronoiExport = async () => {
       };
 
       layer.name = group.name;
-      layer.stroke = styledFeatureCollection.features[0]?.properties?.stroke ?? 'var(--color-map-draw)';
+      layer.stroke = styledFeatureCollection.features[0]?.properties?.stroke ?? defaultStroke;
       layer.strokeWidth = styledFeatureCollection.features[0]?.properties?.strokeWidth ?? 2;
-      layer.fill = styledFeatureCollection.features[0]?.properties?.fill ?? '#60a5fa';
+      layer.fill = styledFeatureCollection.features[0]?.properties?.fill ?? defaultPointColor;
       layer.fillOpacity = styledFeatureCollection.features[0]?.properties?.fillOpacity ?? 0.22;
       layer.featureCollection = styledFeatureCollection;
       exportedLayers.push(layer);
@@ -1200,6 +1448,7 @@ const confirmVoronoiExport = async () => {
 watch(voronoiPartitionMode, async () => {
   normalizeVoronoiPoints();
   clearVoronoiPreviewState();
+  addDialectPartitionKey.value = '';
   await refreshVoronoiPreview();
   if (!voronoiPreviewType.value) {
     voronoiPreviewLayers.value = [];
@@ -1209,6 +1458,7 @@ watch(voronoiPartitionMode, async () => {
 watch(voronoiRegionLevel, async () => {
   voronoiLastResult.value = null;
   voronoiExportSelections.value = [];
+  addDialectPartitionKey.value = addDialectPartitionOptions.value[0]?.value ?? '';
   await refreshVoronoiPreview();
   if (!voronoiPreviewType.value) {
     voronoiPreviewLayers.value = [];
@@ -1239,9 +1489,18 @@ watch(clipVoronoiToNationalBorder, (value) => {
 });
 
 watch(isVoronoiPanelOpen, async (isOpen) => {
-  if (!isOpen) return;
+  if (!isOpen) {
+    isAddingDialectPoints.value = false;
+    return;
+  }
   await ensureVoronoiPointsLoaded();
 });
+
+watch(() => globalPayload.value, (payload) => {
+  if (payload && payload._type === 'villageVoronoi' && Array.isArray(payload.points) && payload.points.length > 0) {
+    consumeVillageVoronoiPayload(payload)
+  }
+}, { immediate: true })
 
 const handleCreateLayer = (geometryType) => {
   const layer = createEmptyLayer(geometryType);
@@ -1320,6 +1579,7 @@ const toggleLayerVisibility = (layerId) => {
   layer.visible = !layer.visible;
   applyLayerPropertyToFeatures(layer, 'visible', layer.visible);
   syncAllLayersAfterMutation();
+  editableMapRef.value?.syncReadonlyLayers?.();
 };
 
 const setAllLayersVisibility = (visible) => {
@@ -1328,6 +1588,7 @@ const setAllLayersVisibility = (visible) => {
     applyLayerPropertyToFeatures(layer, 'visible', visible);
   });
   syncAllLayersAfterMutation();
+  editableMapRef.value?.syncReadonlyLayers?.();
 };
 
 const toggleLayerLock = (layerId) => {
@@ -1701,6 +1962,101 @@ const moveLayerToBottom = (layerId) => {
   syncAllLayersAfterMutation();
 };
 
+const isTouchDevice = 'ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0;
+if (isTouchDevice) {
+  document.documentElement.classList.add('is-touch-device');
+}
+
+const togglePanel = (panelName) => {
+  if (isTouchDevice) {
+    const wasOpen = panelName === 'drawing' ? isDrawingPanelOpen.value
+      : panelName === 'layers' ? isLayersPanelOpen.value
+      : isVoronoiPanelOpen.value;
+    isDrawingPanelOpen.value = false;
+    isLayersPanelOpen.value = false;
+    isVoronoiPanelOpen.value = false;
+    if (panelName === 'drawing') isDrawingPanelOpen.value = !wasOpen;
+    else if (panelName === 'layers') isLayersPanelOpen.value = !wasOpen;
+    else isVoronoiPanelOpen.value = !wasOpen;
+  } else {
+    if (panelName === 'drawing') isDrawingPanelOpen.value = !isDrawingPanelOpen.value;
+    else if (panelName === 'layers') isLayersPanelOpen.value = !isLayersPanelOpen.value;
+    else isVoronoiPanelOpen.value = !isVoronoiPanelOpen.value;
+  }
+};
+
+const toggleAddDialectPoints = () => {
+  if (isAddingDialectPoints.value) {
+    isAddingDialectPoints.value = false;
+    return;
+  }
+  pendingAddPartitionKey.value = addDialectPartitionKey.value || addDialectPartitionOptions.value[0]?.value || '';
+  showAddDialectPartitionModal.value = true;
+};
+
+const confirmAddDialectPartition = () => {
+  addDialectPartitionKey.value = pendingAddPartitionKey.value;
+  showAddDialectPartitionModal.value = false;
+  isAddingDialectPoints.value = true;
+  if (currentMode.value !== 'simple_select') {
+    setMode('simple_select');
+  }
+};
+
+const deleteCustomPointsByPartition = (partitionKey) => {
+  const level = Number(voronoiRegionLevel.value) || 3;
+  const before = voronoiCustomImportRows.value.length;
+  voronoiCustomImportRows.value = voronoiCustomImportRows.value.filter((p) => {
+    if (p.source !== 'manual') return true;
+    let key;
+    if (level === 1) key = p.partitionLevel1;
+    else if (level === 2) key = p.partitionLevel2;
+    else key = p.partitionLevel3;
+    return key !== partitionKey;
+  });
+  const removed = before - voronoiCustomImportRows.value.length;
+  if (removed > 0) {
+    syncVoronoiPartitionPoints();
+    setVoronoiStatus('deletedPartitionPoints', { key: partitionKey, count: removed });
+    if (addDialectPartitionKey.value === partitionKey) {
+      addDialectPartitionKey.value = '';
+    }
+  }
+};
+
+const handleMapClickForAddPoint = ({ lng, lat }) => {
+  if (!isAddingDialectPoints.value) return;
+  if (!addDialectPartitionKey.value) return;
+  if (currentMode.value !== 'simple_select') return;
+
+  addPointCounter += 1;
+
+  const mode = voronoiPartitionMode.value;
+  const rawRow = {
+    name: `自定义点-${addPointCounter}`,
+    lng,
+    lat,
+  };
+  rawRow[`${mode}Partition`] = addDialectPartitionKey.value;
+
+  const point = normalizePartitionPoint(rawRow, { partitionMode: mode });
+  if (!point) {
+    showError(t('map.drawTab.voronoi.addPointInvalid'));
+    return;
+  }
+
+  point.source = 'manual';
+  point.customRowId = `manual-${Date.now()}-${addPointCounter}`;
+
+  voronoiCustomImportRows.value.push(point);
+  syncVoronoiPartitionPoints();
+  setVoronoiStatus('addPointAdded', { name: point.name });
+
+  if (voronoiPreviewType.value === 'points') {
+    refreshVoronoiPreview('points');
+  }
+};
+
 onMounted(async () => {
   try {
     await restoreStoredDrafts();
@@ -1710,6 +2066,12 @@ onMounted(async () => {
 
   document.addEventListener('fullscreenchange', syncMapFullscreenState);
   syncMapFullscreenState();
+
+  if (route.query.scrollTo === 'drawBottom') {
+    nextTick(() => {
+      drawTabRoot.value?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    });
+  }
 });
 
 onBeforeUnmount(() => {
@@ -1719,181 +2081,258 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
-
 @use '../../../../styles/global/scrollbars' as scrollbars;
 
 .map-draw-tab {
   position: relative;
-  width: min(98dvw, 1200px);
+  width: min(96dvw, 1600px);
   gap: 1rem;
+
+  :deep(button) {
+    white-space: nowrap;
+  }
+
+  .draw-tab {
+    &-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: fit-content;
+      padding: 0.4rem 1.2rem;
+    }
+
+    &-copy {
+      min-width: 0;
+    }
+
+    &-title {
+      margin: 0;
+    }
+
+    &-hint {
+      margin: 0.35rem 0 0;
+    }
+  }
+
+  .main-glass-button {
+    padding: 12px 16px;
+  }
+
+  .draw-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    &--header {
+      justify-content: flex-end;
+
+      @media (hover: hover) and (pointer: fine) {
+        .main-glass-button:hover:not(:disabled) {
+          background: var(--color-primary);
+          color: var(--action-primary-text);
+        }
+      }
+    }
+  }
+
+  .voronoi-export-progress {
+    &-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+      @include flex-center;
+      padding: 1.5rem;
+      background: rgba(var(--color-shadow-rgb), 0.24);
+      backdrop-filter: blur(10px);
+    }
+
+    &-panel {
+      min-width: min(92vw, 320px);
+      @include flex-col;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1.2rem 1.4rem;
+      text-align: center;
+      border-radius: var(--radius-xl);
+      box-shadow: 0 20px 48px rgba(var(--color-shadow-rgb), 0.18);
+    }
+
+    &-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-deep);
+    }
+
+    &-text {
+      font-size: 0.92rem;
+      color: var(--text-dark);
+    }
+  }
+
+  .draw-feature-count-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0 0.95rem;
+    border: 1px solid var(--glass-70);
+    border-radius: var(--radius-pill);
+    background: linear-gradient(
+      145deg,
+      var(--glass-80),
+      rgba(var(--color-primary-rgb), 0.06)
+    );
+    color: var(--text-deep);
+    font-size: 0.92rem;
+    box-shadow:
+      inset 0 0 0.5px var(--glass-50),
+      0 8px 18px rgba(var(--color-primary-rgb), 0.08);
+  }
+
+  .draw-workbench {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .draw-map-area {
+    width: 100%;
+  }
+
+  .voronoi-hover-tooltip {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 14px;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.88rem;
+    pointer-events: none;
+
+    strong {
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+
+    .point-count,
+    .partition-info {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+
+  .draw-import-input {
+    display: none;
+  }
+
+  @media (max-aspect-ratio:1/1) {
+    .draw-tab-header,
+    .draw-tool-section-header {
+      @include flex-col;
+    }
+
+    .draw-toolbar {
+      &--header {
+        justify-content: flex-start;
+        gap: 0.45rem;
+        width: 100%;
+
+        .main-glass-button,
+        .draw-feature-count-badge {
+          justify-content: center;
+          min-width: auto;
+          min-height: 2.15rem;
+          padding: 0 0.65rem;
+          color: var(--text-deep);
+          font-size: 0.84rem;
+        }
+      }
+    }
+
+    .draw-tool-button-grid,
+    .draw-tool-button-grid--three {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
 }
 
-.draw-tab-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  width: 94%;
-  padding: 0.4rem 1.2rem;
+/* Modal Choices Styles — 不能嵌套在 .map-draw-tab 下，因为 AppModal 通过 Teleport 将内容移到 body */
+.draw-modal {
+  &-choices {
+    @include flex-col;
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+
+  &-card-btn {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    width: 100%;
+    padding: 1.2rem;
+    border: 1px solid var(--glass-60);
+    border-radius: 14px;
+    background: var(--glass-50);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(:disabled) {
+        background: var(--glass-80);
+        border-color: var(--color-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.08);
+      }
+    }
+
+    &:disabled {
+      @include disabled-state;
+    }
+  }
 }
 
-.draw-tab-copy {
-  min-width: 0;
-}
+.draw-card {
+  &-icon {
+    flex-shrink: 0;
+    font-size: 1.8rem;
+  }
 
-.draw-tab-title {
-  margin: 0;
-}
+  &-text {
+    @include flex-col;
+    gap: 0.25rem;
+  }
 
-.draw-tab-hint {
-  margin: 0.35rem 0 0;
-}
+  &-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-deep);
+  }
 
-.main-glass-button{
-  padding:15px 16px;
-}
-
-.map-draw-tab :deep(button) {
-  white-space: nowrap;
-}
-
-.draw-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.draw-toolbar--header {
-  justify-content: flex-end;
-}
-
-.voronoi-export-progress-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 40;
-  @include flex-center;
-  padding: 1.5rem;
-  background: rgba(var(--color-shadow-rgb), 0.24);
-  backdrop-filter: blur(10px);
-}
-
-.voronoi-export-progress-panel {
-  min-width: min(92vw, 320px);
-  @include flex-col;
-  align-items: center;
-  gap: 0.8rem;
-  padding: 1.2rem 1.4rem;
-  text-align: center;
-  border-radius: var(--radius-xl);
-  box-shadow: 0 20px 48px rgba(var(--color-shadow-rgb), 0.18);
-}
-
-.voronoi-export-progress-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-deep);
-}
-
-.voronoi-export-progress-text {
-  font-size: 0.92rem;
-  color: var(--text-dark);
-}
-
-.draw-feature-count-badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.5rem;
-  padding: 0 0.95rem;
-  border-radius: var(--radius-pill);
-  background: linear-gradient(145deg, var(--glass-80), rgba(232, 244, 255, 0.72));
-  border: 1px solid var(--glass-70);
-  color: var(--text-deep);
-  font-size: 0.92rem;
-  box-shadow:
-    inset 0 0 0.5px var(--glass-50),
-    0 8px 18px rgba(var(--color-primary-rgb), 0.08);
-}
-
-.draw-workbench {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-}
-
-.draw-map-area {
-  width: 100%;
-}
-
-.draw-import-input {
-  display: none;
-}
-
-/* Modal Choices Styles */
-.draw-modal-choices {
-  @include flex-col;
-  gap: 1rem;
-  padding: 0.5rem 0;
-}
-
-.draw-modal-card-btn {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  width: 100%;
-  padding: 1.2rem;
-  border-radius: 14px;
-  background: var(--glass-50);
-  border: 1px solid var(--glass-60);
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.draw-modal-card-btn:hover:not(:disabled) {
-  background: var(--glass-80);
-  border-color: var(--color-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.08);
-}
-
-.draw-modal-card-btn:disabled {
-  @include disabled-state;
-}
-
-.draw-card-icon {
-  font-size: 1.8rem;
-  flex-shrink: 0;
-}
-
-.draw-card-text {
-  @include flex-col;
-  gap: 0.25rem;
-}
-
-.draw-card-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--text-deep);
-}
-
-.draw-card-desc {
-  font-size: 0.85rem;
-  color: rgba(var(--text-deep-rgb), 0.65);
+  &-desc {
+    font-size: 0.85rem;
+    color: rgba(var(--text-deep-rgb), 0.65);
+  }
 }
 
 .draw-text-input {
   width: 100%;
   padding: 0.6rem 0.85rem;
-  border-radius: var(--radius-md);
   border: 1px solid rgba(var(--text-slate-light-rgb), 0.32);
+  border-radius: var(--radius-md);
   background: var(--glass-80);
   color: var(--text-deep);
-}
 
-.draw-text-input:focus {
-  outline: none;
-  border-color: rgba(var(--color-primary-rgb), 0.5);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.12);
+  &:focus {
+    outline: none;
+    border-color: rgba(var(--color-primary-rgb), 0.5);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.12);
+  }
 }
 
 .scope-modal-footer {
@@ -1901,42 +2340,44 @@ onBeforeUnmount(() => {
   justify-content: flex-end;
 }
 
-.auth-warning-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  padding: 40px 20px;
-  box-sizing: border-box;
-}
+.auth-warning {
+  &-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 40px 20px;
+  }
 
-.auth-warning-card {
-  @include flex-col;
-  align-items: center;
-  width: 100%;
-  max-width: 360px;
-  padding: 30px;
-  border: 1px solid var(--glass-60);
-  border-radius: var(--radius-xl);
-  background: var(--glass-40);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-}
+  &-card {
+    @include flex-col;
+    align-items: center;
+    width: 100%;
+    max-width: 360px;
+    padding: 30px;
+    border: 1px solid var(--glass-60);
+    border-radius: var(--radius-xl);
+    background: var(--glass-40);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+  }
 
-.auth-warning-icon {
-  margin-bottom: 16px;
-  font-size: 44px;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
-  animation: floatIcon 3s ease-in-out infinite;
-}
+  &-icon {
+    margin-bottom: 16px;
+    font-size: 44px;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    animation: floatIcon 3s ease-in-out infinite;
+  }
 
-.auth-warning-text {
-  margin-bottom: 20px;
-  color: grey;
-  font-size: 14px;
-  line-height: 1.6;
+  &-text {
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+  }
 }
 
 @keyframes floatIcon {
@@ -1950,54 +2391,57 @@ onBeforeUnmount(() => {
   }
 }
 
-@media (max-width: 900px) {
-  .draw-tab-header,
-  .draw-tool-section-header {
-    @include flex-col;
-  }
+.add-point-partition-list {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
-  .draw-toolbar--header {
-    width: 100%;
-    justify-content: flex-start;
-    gap: 0.45rem;
-  }
+.add-point-partition-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 10px;
+  background: var(--glass-50);
+  border: 1px solid var(--glass-60);
+}
 
-  .draw-toolbar--header .main-glass-button,
-  .draw-toolbar--header .draw-feature-count-badge {
-    min-height: 2.15rem;
-    min-width: auto;
-    padding: 0 0.65rem;
-    font-size: 0.84rem;
-    justify-content: center;
-  }
+.add-point-partition-key {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-deep);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  .draw-workbench {
-    @include flex-col;
-    gap: 0.9rem;
-    overflow: visible;
-  }
+.add-point-partition-count {
+  font-size: 0.82rem;
+  color: rgba(var(--text-deep-rgb), 0.6);
+  background: var(--glass-70);
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  min-width: 1.5rem;
+  text-align: center;
+}
 
-  .draw-tool-panel,
-  .draw-tool-panel.offset-left,
-  .layers-panel {
-    position: static;
-    right: auto;
-    top: auto;
-    bottom: auto;
-    width: 100%;
-    max-width: 100%;
-    min-height: auto;
-    max-height: none;
-  }
+.add-point-delete-btn {
+  min-width: auto;
+  padding: 0.3rem 0.65rem !important;
+  font-size: 0.82rem;
+  border-color: rgba(var(--color-error-rgb, 220 38 38), 0.35);
+  color: var(--color-error, #dc2626);
 
-  .draw-tool-panel-body {
-    max-height: none;
-  }
-
-  .draw-tool-button-grid,
-  .draw-tool-button-grid--three {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      background: var(--color-error, #dc2626);
+      color: #fff;
+      border-color: var(--color-error, #dc2626);
+    }
   }
 }
 </style>
-

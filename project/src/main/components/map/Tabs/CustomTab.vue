@@ -229,13 +229,13 @@ import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import CustomDataEntryModal from '@/main/components/map/custom/CustomDataEntryModal.vue';
 import CustomTabHelpModal from '@/main/components/map/popups/CustomTabHelpModal.vue';
 import { getUserFeatures, getDataByFeature } from '@/api';
-import { ensureCustomDataPresence } from '@/composables/custom/useCustomDataPresence.js';
+import { ensureCustomDataPresence } from '@/composables/data/useCustomDataPresence.js';
 import {
   userStore,
   mapStore,
   resultCache,
 } from '@/main/store/store.js';
-import { showSuccess, showWarning, showError } from '@/utils/message.js';
+import { showSuccess, showWarning, showError } from '@/utils/ui/message.js';
 import FeatureScopeSelectionModal from '@/main/components/map/custom/feature/FeatureScopeSelectionModal.vue';
 import { addCustomFeatureDataWithoutApi } from '@/utils/map/MapData.js';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -719,7 +719,7 @@ const openEntryModal = () => {
 
 .primary-btn {
   background: linear-gradient(135deg, $primary, $primary-dark);
-  color: var(--text-white);
+  color: var(--action-primary-text);
 
   &:hover:not(:disabled) {
     background: linear-gradient(135deg, $primary-dark, var(--color-primary-hover));
@@ -735,7 +735,7 @@ const openEntryModal = () => {
     rgba(var(--color-primary-rgb), 0.9),
     rgba(var(--color-primary-hover-rgb), 0.9)
   );
-  color: var(--text-white);
+  color: var(--action-primary-text);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -1142,8 +1142,8 @@ const openEntryModal = () => {
   &:hover {
     transform: translateY(-1.5px);
     border-color: $primary;
-    background: var(--text-white);
-    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.08);
+    background: var(--bg-white);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.12);
   }
 
   &:active {
@@ -1161,7 +1161,7 @@ const openEntryModal = () => {
   }
 
   .feature-count-badge {
-    color: $text-muted;
+    color: $text-secondary;
     font-size: 9.5px;
     font-weight: 500;
   }

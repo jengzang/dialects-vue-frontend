@@ -16,29 +16,35 @@
         <h3>區域選擇</h3>
         <p class="section-description">選擇多個區域進行特徵聚合對比（選擇3個以上可以評估z-score）</p>
 
-        <div class="selector-row">
-          <label class="field-label">區域級別：</label>
-          <SimpleSelectDropdown
-            v-model="regionLevel"
-            :options="levelOptions"
-            :match-trigger-width="true"
-            class="level-dropdown"
-          />
-          <FilterableSelect
-            v-model="currentRegion"
-            :level="regionLevel"
-            :show-level-selector="false"
-            placeholder="選擇或輸入區域名稱"
-            class="region-input"
-            @update:hierarchy="h => currentHierarchy = h"
-          />
-          <button
-            class="solid-button primary"
-            :disabled="!currentRegion || regionList.length >= 50"
-            @click="addRegion"
-          >
-            添加
-          </button>
+        <div class="selector-row vml-control-surface vml-control-row">
+          <div class="vml-control-field">
+            <label class="field-label">區域級別：</label>
+            <SimpleSelectDropdown
+              v-model="regionLevel"
+              :options="levelOptions"
+              :match-trigger-width="true"
+              class="level-dropdown"
+            />
+          </div>
+          <div class="vml-control-field">
+            <FilterableSelect
+              v-model="currentRegion"
+              :level="regionLevel"
+              :show-level-selector="false"
+              placeholder="選擇或輸入區域名稱"
+              class="region-input"
+              @update:hierarchy="h => currentHierarchy = h"
+            />
+          </div>
+          <div class="vml-control-actions">
+            <button
+              class="solid-button primary"
+              :disabled="!currentRegion || regionList.length >= 50"
+              @click="addRegion"
+            >
+              添加
+            </button>
+          </div>
         </div>
 
         <div v-if="regionList.length > 0" class="region-tags">
@@ -73,8 +79,8 @@
         </div>
       </div>
 
-      <div class="section query-row">
-        <div class="topn-row">
+      <div class="section query-row vml-control-surface vml-control-row vml-control-row--center">
+        <div class="topn-row vml-control-field">
           <label class="field-label">Top N：</label>
           <input
             type="number"
@@ -84,13 +90,15 @@
             class="number-input"
           />
         </div>
-        <button
-          class="solid-button primary large"
-          :disabled="regionList.length === 0 || loading"
-          @click="runAggregation"
-        >
-          {{ loading ? '查詢中...' : '查詢' }}
-        </button>
+        <div class="vml-control-actions">
+          <button
+            class="solid-button primary large"
+            :disabled="regionList.length === 0 || loading"
+            @click="runAggregation"
+          >
+            {{ loading ? '查詢中...' : '查詢' }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -348,9 +356,10 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import CheckBox from '@/components/selector/CheckBox.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { aggregateFeatures } from '@/api/index.js'
-import { showError, showWarning } from '@/utils/message.js'
+import { showError, showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
-import { SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
+import { SEMANTIC_CATEGORY_NAMES, SEMANTIC_FEATURE_KEYS } from '@/VillagesML/config/villagesML.js'
+import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 
 const regionLevel = ref('county')
 const currentRegion = ref('')
@@ -365,7 +374,7 @@ const router = useRouter()
 const isAuthenticated = computed(() => userStore.isAuthenticated)
 
 const goToAuth = () => {
-  router.push('/villagesML?showAuth=true')
+  router.push(buildCurrentVillagesMLPath({ query: { showAuth: 'true' } }))
 }
 
 const toggleRegion = (ri) => {
@@ -445,7 +454,7 @@ const runAggregation = async () => {
 const ZSCORE_LABEL_MAP = {
   avg_name_length: '平均名稱長度',
   ...Object.fromEntries(
-    Object.entries(SEMANTIC_CATEGORY_NAMES).map(([k, v]) => [`sem_${k}_pct`, v])
+    SEMANTIC_FEATURE_KEYS.map(k => [`sem_${k}_pct`, SEMANTIC_CATEGORY_NAMES[k]])
   )
 }
 
@@ -510,9 +519,6 @@ const liftClass = (lift) => {
 }
 
 .selector-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin-bottom: 12px;
 
   .field-label {
@@ -525,7 +531,7 @@ const liftClass = (lift) => {
   }
 
   .region-input {
-    flex: 1;
+    width: 100%;
   }
 }
 
@@ -568,16 +574,7 @@ const liftClass = (lift) => {
 }
 
 .query-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-
-.topn-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin-bottom: 0;
 }
 
 .number-input {

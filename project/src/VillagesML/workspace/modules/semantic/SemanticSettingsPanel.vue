@@ -8,9 +8,9 @@
       <span class="notice-text">此功能需要登錄</span>
     </div>
 
-    <div class="settings-group">
+    <div class="settings-group vml-control-surface">
       <!-- 區域選擇 -->
-      <div class="setting-row">
+      <div class="setting-row vml-setting-row">
         <label>行政級別：</label>
         <SimpleSelectDropdown :match-trigger-width="true"
           v-model="settings.region_level"
@@ -18,7 +18,7 @@
         />
       </div>
 
-      <div class="setting-row">
+      <div class="setting-row vml-setting-row">
         <label>區域名稱：</label>
         <FilterableSelect
           v-model="settings.region_name"
@@ -30,7 +30,7 @@
       </div>
 
       <!-- 網絡參數 -->
-      <div class="setting-row">
+      <div class="setting-row vml-setting-row">
         <label>最小邊權重：</label>
         <input
           v-model.number="settings.min_edge_weight"
@@ -38,12 +38,12 @@
           min="0"
           max="10"
           step="0.1"
-          class="setting-input"
+          class="setting-input vm-setting-input"
         />
         <span class="hint">過濾弱連接（0-10）</span>
       </div>
 
-      <div class="setting-row">
+      <div class="setting-row vml-setting-row">
         <label>中心性指標：<span class="required-hint">（至少選擇一個）</span></label>
         <div class="checkbox-group">
           <label class="checkbox-label">
@@ -67,7 +67,7 @@
       </div>
 
       <!-- Detail Mode Toggle -->
-      <div class="setting-row">
+      <div class="setting-row vml-setting-row">
         <label class="toggle-container">
           <SwitchToggle
             :model-value="detailMode"
@@ -190,12 +190,11 @@ const runAnalysis = () => {
 }
 
 .settings-group {
-  @include flex-col;
   gap: 16px;
 }
 
 .setting-row {
-  @include flex-col;
+  flex-direction: column;
   gap: 8px;
 }
 

@@ -180,7 +180,7 @@ import { getUserRole, ensureAuthenticated } from '@/api/auth/auth.js'
 import { getTableColumns } from '@/api'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
-import { showError, showSuccess, showWarning } from '@/utils/message.js'
+import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter()
@@ -613,7 +613,10 @@ onMounted(async () => {
     setTimeout(() => {
       if (!isAdmin.value) {
         console.log('[TableManage] 延迟检查后仍无权限，跳转到登录页')
-        router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
+        router.push({
+          path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+          query: { redirect: route.fullPath },
+        })
       }
     }, 3000)
   }

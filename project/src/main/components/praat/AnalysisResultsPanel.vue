@@ -260,8 +260,8 @@ const initPitchChart = () => {
     {
       xAxis: seg.start_s,
       itemStyle: {
-        color: seg.type === 'rime_core' ? 'rgba(var(--color-gold-rgb), 0.2)' :
-               seg.type === 'silence' ? 'rgba(var(--color-silver-rgb), 0.1)' :
+        color: seg.type === 'rime_core' ? 'rgba(255,215,0,0.2)' :
+               seg.type === 'silence' ? 'rgba(192,192,192,0.1)' :
                'rgba(100,150,255,0.15)'
       }
     },
@@ -282,14 +282,14 @@ const initPitchChart = () => {
     yAxis: {
       type: 'value',
       name: t('praat.results.charts.pitch.yAxis'),
-      axisLine: { lineStyle: { color: 'var(--color-primary)' } }
+      axisLine: { lineStyle: { color: '#007aff' } }
     },
     series: [{
       name: t('praat.results.charts.pitch.seriesName'),
       type: 'line',
       data: pitchData,
       smooth: true,
-      lineStyle: { color: 'var(--color-primary)', width: 2 },
+      lineStyle: { color: '#007aff', width: 2 },
       showSymbol: false,
       markArea: markAreaData.length > 0 ? { data: markAreaData } : undefined
     }],
@@ -334,14 +334,14 @@ const initIntensityChart = () => {
     yAxis: {
       type: 'value',
       name: t('praat.results.charts.intensity.yAxis'),
-      axisLine: { lineStyle: { color: 'var(--color-error-light)' } }
+      axisLine: { lineStyle: { color: '#ff3b30' } }
     },
     series: [{
       name: t('praat.results.charts.intensity.seriesName'),
       type: 'line',
       data: intensityData,
       smooth: true,
-      lineStyle: { color: 'var(--color-error-light)', width: 2 },
+      lineStyle: { color: '#ff3b30', width: 2 },
       showSymbol: false
     }],
     grid: {
@@ -367,7 +367,7 @@ const initFormantChart = () => {
   formantChart = echarts.init(formantChartContainer.value)
   const ts = props.results.timeseries
 
-  const formantColors = ['var(--color-success)', 'var(--color-warning)', 'var(--color-purple)', '#ff2d55', 'var(--color-cyan)']
+  const formantColors = ['#34c759', '#ff9500', '#5856d6', '#ff2d55', '#5ac8fa']
   const formantKeys = ['f1', 'f2', 'f3', 'f4', 'f5']
 
   const formantSeries = formantKeys.map((key, i) => {
@@ -624,7 +624,7 @@ const addSpectrogramOverlays = (option) => {
         xAxis: startIndex,
         xAxisEnd: endIndex,
         itemStyle: {
-          color: 'var(--glass-10)',
+          color: 'rgba(255, 255, 255, 0.1)',
           borderColor: '#ffffff',
           borderWidth: 1,
           borderType: 'dashed'
@@ -648,7 +648,7 @@ const addSpectrogramOverlays = (option) => {
       data: overlays.map(s => s.name),
       top: 'bottom',
       textStyle: {
-        color: 'var(--text-dark)'
+        color: '#333'
       }
     }
   }
@@ -756,6 +756,7 @@ $transition-normal: 0.3s;
   color: $text-primary;
   font-size: 1.5rem;
   font-weight: 600;
+  text-align: center;
 }
 
 .summary-section {
@@ -767,6 +768,7 @@ $transition-normal: 0.3s;
   color: $text-primary;
   font-size: 1.2rem;
   font-weight: 600;
+  text-align: center;
 }
 
 .stats-grid {

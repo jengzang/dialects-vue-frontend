@@ -6,7 +6,7 @@
     </h3>
 
     <!-- Mode Selector -->
-    <div class="mode-selector vml-glass-panel">
+    <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
       <RadioGroup
           name="viewModeRadio"
           :options="viewModeOptions"
@@ -19,31 +19,35 @@
       <div class="query-form vml-glass-panel">
         <h3>區域子類別對比</h3>
 
-        <div class="form-group">
-          <label>區域選擇:</label>
-          <FilterableSelect
-            v-model="regionName"
-            :level="regionLevel"
-            @update:level="(newLevel) => regionLevel = newLevel"
-            placeholder="請選擇或輸入區域"
-          />
-        </div>
+        <div class="vml-control-surface vml-control-row">
+          <div class="form-group vml-control-field">
+            <label>區域選擇:</label>
+            <FilterableSelect
+              v-model="regionName"
+              :level="regionLevel"
+              @update:level="(newLevel) => regionLevel = newLevel"
+              placeholder="請選擇或輸入區域"
+            />
+          </div>
 
-        <div class="form-group">
-          <label>父類別:</label>
-          <SimpleSelectDropdown :match-trigger-width="true"
-            v-model="regionalParentCategory"
-            :options="parentCategories"
-          />
-        </div>
+          <div class="form-group vml-control-field">
+            <label>父類別:</label>
+            <SimpleSelectDropdown :match-trigger-width="true"
+              v-model="regionalParentCategory"
+              :options="parentCategories"
+            />
+          </div>
 
-        <button
-          class="query-button"
-          :disabled="!regionName || !regionalParentCategory || loadingRegional"
-          @click="loadRegionalComparison"
-        >
-          {{ loadingRegional ? '查詢中...' : '查詢' }}
-        </button>
+          <div class="vml-control-actions">
+            <button
+              class="query-button"
+              :disabled="!regionName || !regionalParentCategory || loadingRegional"
+              @click="loadRegionalComparison"
+            >
+              {{ loadingRegional ? '查詢中...' : '查詢' }}
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Regional Results -->
@@ -112,8 +116,8 @@
       <div class="query-form vml-glass-panel">
         <h3>子類別傾向排行</h3>
 
-        <div class="form-row">
-          <div class="form-group">
+        <div class="form-row vml-control-surface vml-control-row">
+          <div class="form-group vml-control-field">
             <label>區域層級:</label>
             <SimpleSelectDropdown :match-trigger-width="true"
               v-model="rankingRegionLevel"
@@ -121,7 +125,7 @@
             />
           </div>
 
-          <div class="form-group">
+          <div class="form-group vml-control-field">
             <label>父類別:</label>
             <SimpleSelectDropdown :match-trigger-width="true"
               v-model="rankingParentCategory"
@@ -129,19 +133,21 @@
             />
           </div>
 
-          <div class="form-group">
+          <div class="form-group vml-control-field">
             <label>返回數量:</label>
             <input v-model.number="topN" type="number" min="5" max="50" class="vml-number-input" />
           </div>
-        </div>
 
-        <button
-          class="query-button"
-          :disabled="loadingRanking"
-          @click="loadRanking"
-        >
-          {{ loadingRanking ? '查詢中...' : '查詢' }}
-        </button>
+          <div class="vml-control-actions">
+            <button
+              class="query-button"
+              :disabled="loadingRanking"
+              @click="loadRanking"
+            >
+              {{ loadingRanking ? '查詢中...' : '查詢' }}
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Ranking Results -->
@@ -212,12 +218,12 @@ import {
   getSemanticSubcategoryTendencyTop,
   getSemanticSubcategoryComparison
 } from '@/api/index.js'
-import { showError, showSuccess } from '@/utils/message.js'
+import { showError, showSuccess } from '@/utils/ui/message.js'
 import * as echarts from 'echarts'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { SEMANTIC_SUBCATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
+import { SEMANTIC_SUBCATEGORY_NAMES, getCategoryDisplayName } from '@/VillagesML/config/villagesML.js'
 import RadioGroup from "@/components/selector/RadioGroup.vue";
 
 export default {
@@ -229,22 +235,22 @@ export default {
     HelpIcon,
   },
   setup() {
-    // Helper function to get subcategory Chinese name
+    // Helper: 獲取子類別中文名（支持 v4 帶父前綴格式如 terrain_peak_ridge）
     const getSubcategoryName = (subcategory) => {
-      return SEMANTIC_SUBCATEGORY_NAMES[subcategory] || subcategory
+      return getCategoryDisplayName(subcategory, true)
     }
 
-    // Parent categories
+    // Parent categories (from semantic_lexicon_v4.json)
     const parentCategories = [
-      { value: 'mountain', label: '山地 (mountain)' },
-      { value: 'water', label: '水系 (water)' },
-      { value: 'settlement', label: '聚落 (settlement)' },
-      { value: 'direction', label: '方位 (direction)' },
-      { value: 'vegetation', label: '植被 (vegetation)' },
-      { value: 'structure', label: '建築 (structure)' },
-      { value: 'animal', label: '動物 (animal)' },
-      { value: 'color', label: '顏色 (color)' },
-      { value: 'other', label: '其他 (other)' }
+      { value: 'terrain', label: '地形' },
+      { value: 'water', label: '水系' },
+      { value: 'settlement', label: '聚落' },
+      { value: 'spatial', label: '空間' },
+      { value: 'clan', label: '宗族' },
+      { value: 'culture', label: '文化' },
+      { value: 'agriculture', label: '農業' },
+      { value: 'vegetation', label: '植被' },
+      { value: 'modifier', label: '修飾語' }
     ]
 
     // State
@@ -636,6 +642,7 @@ export default {
 
 .query-form {
   @include flex-col;
+  gap: 12px;
 }
 
 .query-form h3 {
@@ -647,24 +654,20 @@ export default {
 }
 
 .form-group {
-  margin-bottom: 16px;
+  min-width: 0;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 8px;
   font-weight: 500;
   color: var(--text-primary);
 }
 
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-}
+// .form-row {
+//   width: 100%;
+// }
 
 .vml-number-input {
-  width: 100%;
+  // width: 100%;
   padding: 10px;
   border-radius: var(--radius-sm2);
   background: var(--glass-80);
@@ -856,14 +859,6 @@ tr.significant {
 
 .rank-badge:not(.gold):not(.silver):not(.bronze) {
   background: var(--color-primary, var(--vml-blue));
-}
-
-@media (min-aspect-ratio: 1/1) {
-  .query-form {
-    flex-flow: row wrap;
-    align-items: center;
-    gap: 12px;
-  }
 }
 
 @media (max-width: 768px) {

@@ -2,7 +2,7 @@
   "tabs": {
     "intro": "簡介",
     "suggestion": "建議",
-    "like": "喜歡作者",
+    "like": "支持作者",
     "setting": "設置"
   },
   "intro": {
@@ -330,7 +330,9 @@
       "title": "新手指導",
       "description": "是否顯示教程入口與隨機骰子",
       "enabled": "已開啟",
-      "disabled": "已關閉"
+      "disabled": "已關閉",
+      "enabledSuccess": "新手指導已開啟",
+      "disabledSuccess": "新手指導已關閉"
     },
     "zhongguInputMode": {
       "title": "中古輸入模式",
@@ -339,6 +341,13 @@
         "selector": "選擇器",
         "direct": "直接輸入"
       }
-    }
+    },
+    "updateNotice": {
+      "title": "更新提示",
+      "description": "選擇新版本更新內容的展示方式。",
+      "modeModal": "詳細",
+      "modeShowinfo": "輕量"
+    },
+    "viewUpdateLog": "查看更新日誌"
   }
 }

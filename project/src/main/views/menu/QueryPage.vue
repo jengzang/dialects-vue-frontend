@@ -14,7 +14,7 @@
             <label class="query-label" for="hanzi-input">{{ $t('query.tab1.label') }}</label>
             <textarea
                 id="hanzi-input"
-                style="height: 5dvh;white-space:nowrap;"
+                style="height: 5dvh;white-space:nowrap;width:min(80dvw,600px)"
                 :placeholder="$t('query.tab1.placeholder')"
                 v-model="hanziInput"
                 @input="handleHanziInput"
@@ -276,11 +276,11 @@ import {
   clearTutorialAssistRequest,
   zhongguInputMode,
 } from '@/main/store/store.js'
-import { useQueryConfig } from '@/composables/domain/useQueryConfig.js'
+import { useQueryConfig } from '@/composables/data/useQueryConfig.js'
 
 import { translateResultTerm } from '@/i18n/utils/resultI18n.js'
 import { readMenuBarMemory, writeMenuBarMemory } from '@/main/config/BarAndTabs/MenuBarConfig.js'
-import { showWarning } from '@/utils/message.js'
+import { showWarning } from '@/utils/ui/message.js'
 import { limitEffectiveChars } from '@/main/utils/query/queryLimits.js'
 
 const { t } = useI18n()

@@ -400,6 +400,22 @@
       "sentence": "句式："
     }
   },
+  "vocabularyMap": {
+    "loading": {
+      "mapData": "加载词表地图数据中..."
+    },
+    "controls": {
+      "overview": "概览",
+      "location": "地点",
+      "pronunciation": "语音",
+      "definition": "方言词"
+    },
+    "buttons": {
+      "reset": "复位",
+      "fullscreen": "全屏",
+      "exitFullscreen": "退出全屏"
+    }
+  },
   "villageMapPopup": {
     "title": "村落分布地图",
     "count": "{count} 个村落",
@@ -412,7 +428,8 @@
     "buttons": {
       "reset": "复位",
       "fullscreen": "全屏",
-      "exitFullscreen": "退出全屏"
+      "exitFullscreen": "退出全屏",
+      "voronoi": "泰森多边形"
     }
   },
   "allVillagesMapPopup": {
@@ -517,8 +534,14 @@
     },
     "voronoi": {
       "panelHint": "基于地点分区数据计算泰森多边形，可预览或导出为面图层。",
+      "learnMore": "了解泰森多边形 →",
       "summaryTitle": "数据概览",
       "settingsTitle": "计算设置",
+      "fieldMergeTitle": "合并字段",
+      "fieldMergeOpenButton": "编辑合并字段",
+      "fieldMergeReset": "重置合并",
+      "expandRatio": "延伸比例: {ratio}%",
+      "enableExpand": "启用圆形延伸裁剪",
       "dataSourceTitle": "数据来源",
       "actionsTitle": "操作",
       "totalPoints": "全部点位",
@@ -531,6 +554,15 @@
       "loadPoints": "加载点位",
       "loadingPoints": "加载中...",
       "ignorePointsAction": "选择忽略点",
+      "addDialectPoint": "添加方言点",
+      "addDialectPointExit": "退出",
+      "addPointSelectPartition": "点位归属分区",
+      "addPointAdded": "已添加: {name}",
+      "addPointInvalid": "无法在此位置创建方言点",
+      "customPointsManagement": "自定义点管理",
+      "deletePartitionPoints": "删除",
+      "deletedPartitionPoints": "已删除 {key} 下的 {count} 个自定义点",
+      "noCustomPoints": "暂无自定义点",
       "previewPoints": "预览点位",
       "exportToLayer": "导出至图层",
       "calculate": "泰森多边形",
@@ -625,6 +657,7 @@
       "visible": "显示图层",
       "locked": "锁定图层",
       "basemap": "底图",
+      "viewSettings": "视图设置",
       "localDraftSelection": "选择本地草稿",
       "localDraftName": "草稿名称",
       "localDraftNamePlaceholder": "请输入草稿名称"

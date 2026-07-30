@@ -126,7 +126,7 @@ import ActionButton from './ActionButton.vue'
 import TabSwitcher from './TabSwitcher.vue'
 import UserAvatarEditor from './UserAvatarEditor.vue'
 import LeaderboardPanel from '@/main/components/user/LeaderboardPanel.vue'
-import { formatOnlineTime, fmt } from '@/main/store/userStats.js'
+import { formatOnlineTime, fmt } from '@/main/utils/userStats.js'
 import { getCustomCounts } from '@/api'
 
 const { t } = useI18n()
@@ -685,19 +685,19 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
   gap: 12px;
   align-items: center;
   padding: 12px 16px;
-  background: var(--glass-90);
-  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  background: var(--bg-white);
+  border: 0.5px solid var(--border-gray-medium);
   border-radius: 18px;
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.02),
-    inset 0 0 0 1px var(--glass-90);
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 0 0 1px var(--glass-50);
   transition: all $transition-base $standard-easing;
 
   &:hover {
-    background: $white;
+    background: var(--bg-white);
     border-color: rgba(var(--color-primary-rgb), 0.3);
     box-shadow:
-      0 8px 24px rgba(0, 0, 0, 0.05),
+      0 8px 24px rgba(0, 0, 0, 0.08),
       inset 0 0 0 1.5px rgba(var(--color-primary-rgb), 0.2);
     transform: translateY(-2px);
   }

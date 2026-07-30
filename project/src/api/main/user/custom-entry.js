@@ -1,5 +1,5 @@
 import { api } from '../../auth/httpClient.js';
-import { showError } from '@/utils/message.js';
+import { showError } from '@/utils/ui/message.js';
 
 export async function getUserPoints(params = {}) {
   try {

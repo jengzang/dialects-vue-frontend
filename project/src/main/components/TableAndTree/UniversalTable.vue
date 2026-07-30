@@ -1,5 +1,5 @@
 <template>
-  <div class="universal-table glass-container">
+  <div class="universal-table glass-container" :style="containerStyle">
     <div class="toolbar">
       <div class="search-wrapper">
         <span class="search-icon">🔍</span>
@@ -12,7 +12,7 @@
               class="search-input"
           />
       </div>
-      <div v-if="userStore.role === 'admin'" class="action-buttons">
+      <div v-if="canUseTableActions" class="action-buttons">
         <button v-if="!isEditMode" class="main-glass-button" data-size="compact" @click="exportToExcel">
           <span class="icon">📤</span><span class="btn-text">Excel</span>
         </button>
@@ -67,7 +67,7 @@
               :key="col.key"
               :style="{ width: ((Number(col.width) || 1) / totalRatio * 100) + '%' }"
           />
-          <col v-if="userStore.role === 'admin'" style="width: 60px; min-width: 50px;" />
+          <col v-if="canUseTableActions" style="width: 60px; min-width: 50px;" />
         </colgroup>
 
         <thead>
@@ -89,7 +89,7 @@
               </div>
             </div>
           </th>
-          <th v-if="userStore.role === 'admin'" class="action-th">{{ t('tableTree.universalTable.toolbar.action') }}</th>
+          <th v-if="canUseTableActions" class="action-th">{{ t('tableTree.universalTable.toolbar.action') }}</th>
         </tr>
         </thead>
 
@@ -105,7 +105,7 @@
           >
             {{ row[col.key] }}
           </td>
-          <td v-if="userStore.role === 'admin'" class="action-td">
+          <td v-if="canUseTableActions" class="action-td">
             <button class="icon-action-btn delete" :title="t('common.button.delete')" @click="handleDelete(row)">✕</button>
           </td>
         </tr>
@@ -160,7 +160,7 @@
                       :key="col.key"
                       :style="{ width: ((Number(col.width) || 1) / totalRatio * 100) + '%' }"
                   />
-                  <col v-if="userStore.role === 'admin'" style="width: 60px; min-width: 50px;" />
+                  <col v-if="canUseTableActions" style="width: 60px; min-width: 50px;" />
                 </colgroup>
 
                 <thead>
@@ -182,7 +182,7 @@
                       </div>
                     </div>
                   </th>
-                  <th v-if="userStore.role === 'admin'" class="action-th">{{ t('tableTree.universalTable.toolbar.action') }}</th>
+                  <th v-if="canUseTableActions" class="action-th">{{ t('tableTree.universalTable.toolbar.action') }}</th>
                 </tr>
                 </thead>
 
@@ -198,7 +198,7 @@
                   >
                     {{ row[col.key] }}
                   </td>
-                  <td v-if="userStore.role === 'admin'" class="action-td">
+                  <td v-if="canUseTableActions" class="action-td">
                     <button class="icon-action-btn delete" :title="t('common.button.delete')" @click="handleDelete(row)">✕</button>
                   </td>
                 </tr>
@@ -516,13 +516,14 @@ import {
   mutateSingleRow,
   batchMutate,
   batchReplacePreview,
-  batchReplaceExecute
+  batchReplaceExecute,
+  vocabularySqlApi
 } from '@/api'
 import AppModal from '@/components/common/AppModal.vue';
 import { userStore } from '@/main/store/store.js';
 import { useVirtualList } from '@vueuse/core';
 import { TABLE_CONFIG } from '@/main/config/constants.js';
-import { showSuccess, showWarning, showConfirm, showError } from '@/utils/message.js';
+import { showSuccess, showWarning, showConfirm, showError } from '@/utils/ui/message.js';
 
 const { t } = useI18n();
 
@@ -535,8 +536,43 @@ const props = defineProps({
   columns: { type: Array, required: true },
   defaultFilter: { type: Object, default: null }, // 新增：默认筛选 { columnKey: value }
   // ✅ 新增：可选的主键字段名
-  primaryKey: { type: String, default: null }
+  primaryKey: { type: String, default: null },
+  apiAdapter: { type: String, default: 'normal' },
+  canEdit: { type: Boolean, default: false },
+  height: { type: [String, Object], default: '85dvh' }
+})
+
+const containerStyle = computed(() => {
+  const h = props.height
+  if (typeof h === 'string') {
+    return { '--ut-height': h }
+  }
+  return {
+    '--ut-height': h.desktop || '85dvh',
+    '--ut-height-mobile': h.mobile || h.desktop || '85dvh',
+  }
 });
+
+const tableApiAdapters = {
+  normal: {
+    query: sqlQuery,
+    distinct: distinctQuery,
+    mutateSingle: mutateSingleRow,
+    batchMutate,
+    batchReplacePreview,
+    batchReplaceExecute
+  },
+  vocabulary: vocabularySqlApi
+}
+
+const tableApi = computed(() => tableApiAdapters[props.apiAdapter] || tableApiAdapters.normal)
+
+const canUseTableActions = computed(() => {
+  if (props.apiAdapter === 'vocabulary') {
+    return props.canEdit === true
+  }
+  return userStore.role === 'admin'
+})
 
 // 狀態定義
 const tableData = ref([]);
@@ -655,7 +691,7 @@ const fetchData = async () => {
   };
 
   try {
-    const response = await sqlQuery(payload);
+    const response = await tableApi.value.query(payload);
 
     tableData.value = response.data;
     total.value = response.total;
@@ -865,7 +901,7 @@ const openFilter = async (key, event) => {
   distinctValues[key] = []; // 先清空
 
   try {
-    const res = await distinctQuery(payload);
+    const res = await tableApi.value.distinct(payload);
     distinctValues[key] = res.values;
   } catch (e) {
     console.error("Filter Load Error:", e);
@@ -1015,7 +1051,7 @@ const toggleFullscreen = () => {
 // 權限檢查
 // ========================================
 const checkAdminPermission = () => {
-  if (userStore.role !== 'admin') {
+  if (!canUseTableActions.value) {
     showWarning(t('tableTree.universalTable.messages.adminOnly'));
     return false;
   }
@@ -1120,7 +1156,7 @@ const submitBatchEdit = async () => {
       update_data: updateData
     };
 
-    const response = await batchMutate(payload);
+    const response = await tableApi.value.batchMutate(payload);
 
     if (response.status === 'completed') {
       showSuccess(t('tableTree.universalTable.messages.batchUpdateSuccess', { count: response.success_count }));
@@ -1170,7 +1206,7 @@ const handleDelete = async (row) => {
       pk_value: row[primaryKeyField.value]  // ✅ 动态主键值
     };
 
-    await mutateSingleRow(payload);
+    await tableApi.value.mutateSingle(payload);
 
     showSuccess(t('tableTree.universalTable.messages.deleteSuccess'));
     await fetchData();
@@ -1222,7 +1258,7 @@ const submitNewRecord = async () => {
       data: { ...newRecordData }
     };
 
-    await mutateSingleRow(payload);
+    await tableApi.value.mutateSingle(payload);
 
     showSuccess(t('tableTree.universalTable.messages.addSuccess'));
     closeAddModal();
@@ -1375,10 +1411,11 @@ const previewAllPagesReplace = async (findText, matchMode, isEmptySearch) => {
       match_mode: matchMode,
       is_empty_search: isEmptySearch,
       filters: filterState,         // 尊重筛选条件
-      search_text: searchText.value  // 尊重搜索条件
+      search_text: searchText.value,  // 尊重搜索条件
+      search_columns: props.columns.map(c => c.key)
     }
 
-    const response = await batchReplacePreview(payload)
+    const response = await tableApi.value.batchReplacePreview(payload)
 
     batchReplace.totalMatches = response.total_matches
     batchReplace.previewResults = []  // 全表模式不显示详细列表
@@ -1478,10 +1515,11 @@ const executeAllPagesReplace = async () => {
       match_mode: batchReplace.matchMode,
       is_empty_search: isEmptySearch,
       filters: filterState,         // 尊重筛选条件
-      search_text: searchText.value  // 尊重搜索条件
+      search_text: searchText.value,  // 尊重搜索条件
+      search_columns: props.columns.map(c => c.key)
     }
 
-    const response = await batchReplaceExecute(payload)
+    const response = await tableApi.value.batchReplaceExecute(payload)
 
     if (response.status === 'success') {
       showSuccess(t('tableTree.universalTable.messages.allPagesReplaceDone', { count: response.affected_rows }))
@@ -1564,9 +1602,13 @@ $system-font:
   color: var(--text-primary);
   @include flex-col;
   gap: 6px;
-  height: 85dvh;
-  width: 88dvw;
+  height: var(--ut-height, 85dvh);
+  width: min(88dvw,100%);
   overflow: hidden;
+
+  @media (max-aspect-ratio: 1 / 1) {
+    height: var(--ut-height-mobile, var(--ut-height, 85dvh));
+  }
 }
 
 /* Toolbar */
@@ -1633,12 +1675,15 @@ $system-font:
   transition: all $transition-fast;
 
   &:hover:not(:disabled) {
-    background: var(--bg-white);
+    background: var(--color-primary-hover);
     transform: translateY(-1px);
   }
 
   &[data-size='compact'] {
     --main-glass-button-padding: 8px 6px;
+    &:hover:not(:disabled) {
+        background: var(--glass-30)
+    }
   }
 
   &[data-variant='primary'] {
@@ -1653,6 +1698,10 @@ $system-font:
       color: white;
       background: var(--color-warning);
       animation: pulse 2s ease-in-out infinite;
+    }
+
+    &:hover:not(:disabled) {
+       background : rgba(201, 149, 17, 0.937) 
     }
   }
 }
@@ -1983,7 +2032,6 @@ td {
   .universal-table.glass-container {
     padding: 8px 2px;
     border-radius: var(--radius-xl);
-    height: 85dvh;
     border: none;
   }
 
@@ -2146,13 +2194,14 @@ td {
   width: 36px;
   height: 36px;
   cursor: pointer;
-  background: white;
+  background: var(--color-primary);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-full);
   transition: all $transition-fast;
+  color: var(--action-primary-text);
 
   &:hover:not(:disabled) {
-    background: var(--color-primary-light);
+    background: var(--color-primary-hover);
     border-color: var(--color-primary);
   }
 
@@ -2226,6 +2275,7 @@ td {
 }
 
 .field-input {
+  color: var(--text-deep);
   flex: 1;
   padding: 10px 12px;
   border-radius: var(--radius-md);
@@ -2371,9 +2421,7 @@ td {
 
 /* ==========================================
    批量替换对话框样式
-
-   原文件此处的标题注释没有闭合，因此以下规则当前不会生效。
-   为保持原有样式行为，继续将其保留在注释中。
+   ========================================== */
 
 .modal-fade-enter-active,
 .modal-fade-leave-active {
@@ -2387,38 +2435,36 @@ td {
 
 .batch-replace-modal-body {
   min-height: 0;
-}
 
-.batch-replace-modal-body .form-group {
-  margin-bottom: 20px;
-}
+  .form-group {
+    margin-bottom: 20px;
 
-.batch-replace-modal-body .form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: $text-dark;
-}
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-deep);
+    }
+  }
 
-.batch-replace-modal-body .glass-input {
-  width: 80%;
-  padding: 10px 14px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: var(--radius-md);
-  background: var(--glass-60);
-  font-size: 14px;
-  outline: none;
-  transition: all $transition-fast;
-}
+  .glass-input {
+    width: 80%;
+    padding: 10px 14px;
+    border: 1px solid var(--border-gray-medium);
+    border-radius: var(--radius-md);
+    background: var(--glass-60);
+    font-size: 14px;
+    outline: none;
+    transition: all $transition-fast;
 
-.batch-replace-modal-body .glass-input:focus {
-  border-color: $primary-blue;
-  background: var(--glass-90);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+    &:focus {
+      border-color: $primary-blue;
+      background: var(--glass-90);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+    }
+  }
 }
-
-*/
 
 /* 列选择器 */
 .column-selector {
@@ -2555,7 +2601,7 @@ td {
 .preview-section {
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 2px dashed rgba(0, 0, 0, 0.1);
+  border-top: 2px dashed var(--border-gray-medium);
 }
 
 .preview-section h4 {
@@ -2721,7 +2767,7 @@ td {
   gap: 12px;
   margin: 20px -18px -20px;
   padding: 16px 18px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid var(--border-gray-medium);
   background: var(--glass-50);
 }
 
@@ -2739,8 +2785,12 @@ td {
   border: 1px solid rgba(108, 117, 125, 0.2);
 }
 
-.batch-replace-modal-footer .main-glass-button[data-variant='secondary']:hover:not(:disabled) {
+.batch-replace-modal-footer .main-glass-button[data-variant='secondary'] {
   background: rgba(108, 117, 125, 0.2);
+
+  &:hover:not(:disabled) {
+    background: var(--glass-50);
+  }
 }
 
 /* 响应式 */

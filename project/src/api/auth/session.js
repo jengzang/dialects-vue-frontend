@@ -1,5 +1,5 @@
 import i18n from '../../i18n/index.js';
-import { showWarning } from '../../utils/message.js';
+import { showWarning } from '../../utils/ui/message.js';
 import { WEB_BASE } from '../../env-config.js';
 import { userStore } from '../../main/store/store.js';
 

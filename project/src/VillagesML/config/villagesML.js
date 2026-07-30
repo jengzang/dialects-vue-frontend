@@ -12,13 +12,18 @@
 export const SEMANTIC_CATEGORY_ICONS = {
   'agriculture': '🌾',
   'clan': '👨‍👩‍👧‍👦',
+  'culture': '🏛️',
+  'modifier': '📝',
+  'settlement': '🏘️',
+  'spatial': '🧭',
+  'terrain': '⛰️',
+  'vegetation': '🌿',
+  'water': '💧',
+  // === 向后兼容（旧版 lexicon 类别名）===
   'direction': '🧭',
   'infrastructure': '🏗️',
   'mountain': '⛰️',
-  'settlement': '🏘️',
   'symbolic': '🎨',
-  'vegetation': '🌿',
-  'water': '💧'
 }
 
 /**
@@ -28,17 +33,43 @@ export const SEMANTIC_CATEGORY_ICONS = {
 export const SEMANTIC_CATEGORY_NAMES = {
   'agriculture': '農業',
   'clan': '宗族',
+  'culture': '文化',
+  'modifier': '修飾語',
+  'settlement': '聚落',
+  'spatial': '空間',
+  'terrain': '地形',
+  'vegetation': '植被',
+  'water': '水系',
+  // === 向后兼容（旧版 lexicon 类别名）===
   'direction': '方位',
   'infrastructure': '基建',
   'mountain': '山地',
-  'settlement': '聚落',
   'symbolic': '象徵',
-  'vegetation': '植物',
-  'water': '水系',
-  'terrain': '地形',
-  'modifier':'修飾語',
-  'head':'中心詞',
+  'head': '中心詞',
   'other': '其他',
+}
+
+// @deprecated 请使用 SEMANTIC_CATEGORY_NAMES
+export const CATEGORY_NAMES_ZH = SEMANTIC_CATEGORY_NAMES
+
+// ========================================
+// v4 语义特征 key（与 API semantic_tags 的 sem_* 字段对应）
+// ========================================
+
+/** @type {string[]} v4 九大语义类别 key */
+export const SEMANTIC_FEATURE_KEYS = [
+  'agriculture', 'clan', 'culture', 'modifier',
+  'settlement', 'spatial', 'terrain', 'vegetation', 'water'
+]
+
+/**
+ * 判断对象是否为语义特征对象（包含 sem_* 字段）
+ * @param {Object} obj
+ * @returns {boolean}
+ */
+export const isSemanticFeature = (obj) => {
+  if (!obj) return false
+  return SEMANTIC_FEATURE_KEYS.some(k => obj[`sem_${k}`] !== undefined)
 }
 
 /**
@@ -48,13 +79,18 @@ export const SEMANTIC_CATEGORY_NAMES = {
 export const SEMANTIC_CATEGORY_DESCRIPTIONS = {
   'agriculture': '農業、耕作、田地相關',
   'clan': '宗族、姓氏、家族相關',
+  'culture': '吉祥符號、宗教、美德等文化象徵相關',
+  'modifier': '大小、顏色、新舊、數量等修飾語相關',
+  'settlement': '村落、居住地、圩市等聚落相關',
+  'spatial': '方位、高低、內外等空間位置相關',
+  'terrain': '山峰、坡崗、山谷、岩石、平地等地形相關',
+  'vegetation': '樹木、花草、竹林等植物相關',
+  'water': '河流、湖泊、港灣、水塘等水系相關',
+  // === 向后兼容（旧版 lexicon 类别名）===
   'direction': '東西南北、方向相關',
   'infrastructure': '道路、橋樑、建築相關',
   'mountain': '山地、丘陵等地形相關',
-  'settlement': '村落、居住地相關',
   'symbolic': '吉祥、象徵意義相關',
-  'vegetation': '樹木、花草等植物相關',
-  'water': '河流、湖泊、水系相關'
 }
 
 /**
@@ -62,125 +98,179 @@ export const SEMANTIC_CATEGORY_DESCRIPTIONS = {
  * @type {Object<string, string>}
  */
 export const SEMANTIC_SUBCATEGORY_NAMES = {
-  // ===== 父类别（9个大类 + other）=====
+  // ===== 父类别（9个大类，匹配 lexicon v1.12+ / v4.5+）=====
   'agriculture': '農業',
   'clan': '宗族',
-  'direction': '方位',
-  'infrastructure': '基建',
-  'mountain': '山地',
+  'culture': '文化',
+  'modifier': '修飾語',
   'settlement': '聚落',
-  'symbolic': '象徵',
+  'spatial': '空間',
+  'terrain': '地形',
   'vegetation': '植被',
   'water': '水系',
   'other': '其他',
+  // === 向后兼容（旧版 lexicon 父类别）===
+  'infrastructure': '基建',
+  'mountain': '山地',
+  'symbolic': '象徵',
 
-  // 數字類
-  'number_small': '小數',          // 一二三四五
-  'number_large': '大數',          // 六七八九十
-  'number_ordinal': '序數',        // 初、第、老
+  // ===== v4.7+ 子类别（层级 lexicon，不带父前缀）=====
+  // --- terrain 地形 ---
+  'peak_ridge': '峰嶺',
+  'slope': '坡崗',
+  'valley': '山谷',
+  'rock': '岩石',
+  'flatland': '台坪',
+  'surface': '沙土',
+  // --- water 水系 ---
+  'river': '江河',
+  'stream': '溪涌',
+  'ditch': '溝渠',
+  'pond_lake': '池塘',
+  'bay_port': '港灣',
+  'shore_island': '洲灘',
+  'water_source': '泉井',
+  // --- settlement 聚落 ---
+  'village': '村屯',
+  'dwelling': '民居',
+  'building': '建築',
+  'fortification': '城寨',
+  'market_trade': '圩市',
+  'road_transport': '路橋',
+  'traditional_unit': '里坊',
+  'admin_unit': '社隊',
+  // --- spatial 空间 ---
+  'direction': '方位',
+  'elevation': '高低',
+  'extremity': '頭尾',
+  'boundary': '邊角',
+  'enclosure': '內外',
+  'center': '中心',
+  'relative_position': '前後',
+  // --- clan 宗族 ---
+  'general': '通用姓',
+  'cantonese': '廣府姓',
+  'hakka': '客家姓',
+  'teochew': '潮汕姓',
+  // --- culture 文化 ---
+  'religion': '宗教',
+  'auspicious': '吉祥',
+  'virtue': '美德',
+  'animal_symbol': '瑞獸',
+  'natural_symbol': '天象',
+  'community': '社群',
+  'craft_memorial': '工藝',
+  // --- agriculture 农业 ---
+  'field': '田地',
+  'crop': '作物',
+  'livestock': '禽畜',
+  'farming_infra': '農耕',
+  // --- vegetation 植被 ---
+  'tree': '樹木',
+  'bamboo': '竹',
+  'fruit': '果樹',
+  'herb': '花草',
+  // --- modifier 修飾語 ---
+  'number': '數字',
+  'size': '尺寸',
+  'color': '顏色',
+  'time': '時序',
+  'quality': '性質',
+  'suffix': '後綴',
 
-  // 方位類
-  'direction_vertical': '上下',         // 上、下、低
-  'direction_cardinal': '東南西北',      // 東、北、南、西
-  'direction_inside': '內部',           // 中、內、裡
-  'direction_outside': '外側',          // 側、外、旁、邊
-  'direction_opening': '關口',          // 關、口、門
-  'direction_horizontal': '前後左右',    // 前、右、後、左
-  'direction_center': '中央',           // 央、心
-  'direction_end': '端點',             // 頭、尾、端、角
-
-  // 象徵類（去掉"象徵"後綴）
-  'symbolic_virtue': '美德',           // 義、仁、信、聖、德、文、智、禮、賢
-  'symbolic_religion': '宗教',         // 仙、佛、堂、宮、寺、廟、靈、神、觀
-  'symbolic_light': '光明',            // 光、明、朗、耀、輝
-  'symbolic_prosperity': '繁榮',       // 興、華、富、昌、盛、榮、貴
-  'symbolic_animal': '瑞獸',           // 鳳、虎、鶴、鹿、麟、龍、龜
-  'symbolic_fortune': '吉祥',          // 吉、喜、壽、瑞、祥、祿、福
-  'symbolic_peace': '平安',            // 和、寧、安、康、泰
-  'symbolic_treasure': '珍寶',         // 寶、玉、珍
-
-  // 水系類
-  'water_spring': '泉井',              // 井、泉
-  'water_stream': '溪流',              // 圳、溝、瀝、湧
-  'water_pond': '池塘',                // 塘、池、泊、澱、潭
-  'water_island': '島嶼',              // 嶼、島、洲
-  'water_shore': '岸濱',               // 岸、汀、沿、渚、濱
-  'water_river': '江河',               // 川、江、河、澗、溪
-  'water_beach': '灘塗',               // 灘、沙
-  'water_lake': '湖泊',                // 湖、澤、窪
-  'water_port': '港津',                // 港、津、埠
-  'water_bay': '海灣',                 // 灣、浦、滘、濠
-
-  // 基建類
-  'infrastructure_station': '驛站',     // 亭、站、驛
-  'infrastructure_port': '碼頭',        // 埠、渡、碼
-  'infrastructure_road': '道路',        // 巷、街、路、道
-  'infrastructure_bridge': '橋樑',      // 橋
+  // ===== API 返回的帶父前綴子類別 key（如 "settlement_village"）=====
+  // settlement
+  'settlement_village': '村屯',
+  'settlement_dwelling': '民居',
+  'settlement_building': '建築',
+  'settlement_fort': '城寨',
+  'settlement_market': '圩市',
+  'settlement_district': '里坊',
+  'settlement_group': '社隊',
+  // mountain
+  'mountain_peak': '峰嶺',
+  'mountain_valley': '山谷',
+  'mountain_slope': '坡崗',
+  'mountain_rock': '岩石',
+  'mountain_plateau': '台坪',
+  'mountain_ridge': '山脊',
+  // water
+  'water_river': '江河',
+  'water_stream': '溪涌',
+  'water_pond': '池塘',
+  'water_lake': '湖泊',
+  'water_bay': '港灣',
+  'water_beach': '沙灘',
+  'water_spring': '泉井',
+  'water_island': '島嶼',
+  'water_shore': '洲灘',
+  'water_port': '碼頭',
+  // direction
+  'direction_vertical': '高低',
+  'direction_end': '頭尾',
+  'direction_cardinal': '四方',
+  'direction_inside': '內外',
+  'direction_opening': '邊角',
+  'direction_horizontal': '前後',
+  'direction_outside': '外圍',
+  'direction_center': '中心',
+  // symbolic
+  'symbolic_animal': '瑞獸',
+  'symbolic_religion': '宗教',
+  'symbolic_prosperity': '興旺',
+  'symbolic_peace': '吉祥',
+  'symbolic_virtue': '美德',
+  'symbolic_fortune': '福祿',
+  'symbolic_light': '天象',
+  'symbolic_treasure': '珍寶',
+  // vegetation
+  'vegetation_forest': '樹木',
+  'vegetation_bamboo': '竹',
+  'vegetation_other': '其他植被',
+  'vegetation_fruit': '果樹',
+  'vegetation_flower': '花草',
+  'vegetation_pine': '松',
+  'vegetation_tea': '茶',
+  // agriculture
+  'agriculture_field': '田地',
+  'agriculture_garden': '園圃',
+  'agriculture_irrigation': '水利',
+  'agriculture_crop': '作物',
+  'agriculture_storage': '倉儲',
+  'agriculture_activity': '農事',
+  // infrastructure
+  'infrastructure_road': '路橋',
   'infrastructure_transport': '交通',
+  'infrastructure_bridge': '橋',
+  'infrastructure_port': '渡口',
+  'infrastructure_station': '站所',
+  // clan
+  'clan_other': '其他姓',
+  'clan_huang': '黃',
+  'clan_luo': '羅',
+  'clan_chen': '陳',
+  'clan_li': '李',
+  'clan_zhang': '張',
+  'clan_liu': '劉',
+  'clan_he': '何',
+  'clan_wu': '吳',
+  'clan_liang': '梁',
+  // number
+  'number_small': '小數',
+  'number_large': '大數',
+  'number_ordinal': '序數',
+  // size
+  'size_large': '大',
+  'size_long': '長',
+  'size_small': '小',
+  'size_short': '短',
+  // other (no parent prefix)
+  'shape': '形狀',
 
-  // 時間類
-  'time': '時令',                      // 今、冬、古、夏、新、舊、春、晚、朝、秋
-
-  // 農業類（簡化）
-  'agriculture_storage': '倉廩',        // 倉、廩
-  'agriculture_activity': '農牧',       // 農、牧、畜、耕
-  'agriculture_garden': '園圃',         // 園、圃、場
-  'agriculture_field': '田地',          // 地、田、畔、畬、疇
-  'agriculture_irrigation': '堤壩',     // 壩、堤、渠
-  'agriculture_crop': '作物',           // 稻、禾、麥等
-
-  // 宗族類（保持）
-  'clan_he': '何姓',
-  'clan_other': '其他姓氏',
-  'clan_liu': '劉姓',
-  'clan_wu': '吳姓',
-  'clan_zhang': '張姓',
-  'clan_li': '李姓',
-  'clan_liang': '梁姓',
-  'clan_luo': '羅姓',
-  'clan_chen': '陳姓',
-  'clan_huang': '黃姓',
-
-  // 山地類
-  'mountain_slope': '坡崗',            // 岡、坎、坡、坳、崗
-  'mountain_plateau': '台坪',          // 台、坪、塱
-  'mountain_valley': '山谷',           // 坑、峒、峽、峪
-  'mountain_rock': '岩石',             // 壁、岩、崖、石
-  'mountain_peak': '山峰',             // 山、嶺、峰、巔、頂
-  'mountain_ridge': '山脊',            // 岐、巒、嶂、脊
-
-  // 聚落類
-  'settlement_district': '圍坊',        // 圍、坊
-  'settlement_market': '圩市',          // 圩、墟、市、集
-  'settlement_fort': '城寨',            // 城、堡、寨
-  'settlement_village': '村莊',          // 塆、屯、莊、村
-  'settlement_building': '宅屋',        // 宅、屋、樓、祠
-  'settlement_group': '片區',           // 片、群、帶
-
-  // 形狀類
-  'shape': '形狀',                     // 圓、尖、平、扁、方、曲、直
-
-  // 尺寸類（簡化）
-  'size_large': '大',                  // 大、寬、巨、廣
-  'size_small': '小',                  // 小、微、細
-  'size_short': '短',                  // 短
-  'size_long': '長',                   // 長
-
-  // 植物類
-  'vegetation_forest': '林木',          // 林、森、樹、木
-  'vegetation_pine': '松柏',            // 松、柏
-  'vegetation_fruit': '果樹',           // 果、梅、桃、李等
-  'vegetation_other': '雜木',           // 其他植物
-  'vegetation_bamboo': '竹',            // 竹
-  'vegetation_flower': '花卉',          // 花、菊、蓮等
-  'vegetation_tea': '茶',               // 茶
-
-  // 顏色類
-  'color': '顏色'                      // 青、赤、黃、白、黑等
 }
 
-/**
- * 模式結構組件映射
+/** 
+* 模式結構組件映射
  * @type {Object<string, string>}
  */
 export const PATTERN_STRUCTURE_NAMES = {
@@ -323,7 +413,7 @@ export function getSubcategoryName(subcategory) {
 export function getCategoryDisplayName(category, isDetailMode = false) {
   if (!category) return ''
 
-  // 如果是詳細模式，優先查找子類別映射
+  // 如果是詳細模式，優先查找子類別映射（精確匹配，如 "settlement_village"）
   if (isDetailMode && SEMANTIC_SUBCATEGORY_NAMES[category]) {
     return SEMANTIC_SUBCATEGORY_NAMES[category]
   }
@@ -333,9 +423,21 @@ export function getCategoryDisplayName(category, isDetailMode = false) {
     return SEMANTIC_CATEGORY_NAMES[category]
   }
 
-  // 如果都找不到，嘗試查找子類別映射（兼容性處理）
+  // 兼容：非detail模式也嘗試子類別映射
   if (SEMANTIC_SUBCATEGORY_NAMES[category]) {
     return SEMANTIC_SUBCATEGORY_NAMES[category]
+  }
+
+  // Detail模式：剝離父類別前綴後查找子類名（如 "settlement_village" → "village"）
+  if (isDetailMode) {
+    const underscoreIdx = category.indexOf('_')
+    if (underscoreIdx > 0) {
+      const suffix = category.substring(underscoreIdx + 1)
+      if (SEMANTIC_SUBCATEGORY_NAMES[suffix]) {
+        return SEMANTIC_SUBCATEGORY_NAMES[suffix]
+      }
+      return suffix
+    }
   }
 
   // 最後返回原始值
@@ -437,17 +539,18 @@ export function getSignificanceLevel(pValue) {
  * @type {Object<string, string>}
  */
 export const SPATIAL_CLUSTERING_RUN_LABELS = {
-  'spatial_eps_05': '超密集核心聚類',
-  'spatial_hdbscan_v1': '自動多密度聚類',
-  'spatial_eps_10': '標準密度聚類',
-  'spatial_eps_20': '全域覆蓋聚類'
+  'spatial_eps_05': '微尺度·緊密村落群（0.5km）',
+  'spatial_eps_15': '小尺度·村級聚集（1.5km）',
+  'spatial_eps_25': '中尺度·鄉鎮級聚集（2.5km）',
+  'spatial_eps_45': '大尺度·跨鄉鎮連通（4.5km）',
+  'spatial_hdbscan_v2': '自適應多密度聚類（HDBSCAN）'
 }
 
 /**
  * 默認的空間聚類 Run ID
  * @type {string}
  */
-export const DEFAULT_SPATIAL_CLUSTERING_RUN_ID = 'spatial_hdbscan_v1'
+export const DEFAULT_SPATIAL_CLUSTERING_RUN_ID = 'spatial_hdbscan_v2'
 
 /**
  * 獲取空間聚類 Run 標籤

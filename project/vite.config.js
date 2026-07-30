@@ -1,4 +1,5 @@
 import { defineConfig, loadEnv } from 'vite';
+import { visualizer } from 'rollup-plugin-visualizer';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 import http from 'http';
@@ -129,7 +130,27 @@ export default defineConfig(async ({ mode }) => {
   console.log(`[Vite] Mode: ${mode}, WEB_BASE: ${webBase}`);
 
   return {
-    plugins: [vue(), devMpaRewritePlugin()],
+    // plugins: [vue(), devMpaRewritePlugin()],
+    plugins: [
+      vue(),
+      devMpaRewritePlugin(),
+
+      visualizer({
+        filename: 'dist/bundle-network.html',
+        template: 'network',
+        gzipSize: true,
+        brotliSize: true,
+        open: false,
+      }),
+
+      visualizer({
+        filename: 'dist/bundle-treemap.html',
+        template: 'flamegraph',
+        gzipSize: true,
+        brotliSize: true,
+        open: false,
+      }),
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src'),
@@ -187,12 +208,19 @@ export default defineConfig(async ({ mode }) => {
             if (id.includes('wavesurfer')) {
               return 'wavesurfer';
             }
-            if (id.includes('node_modules/vue') || id.includes('node_modules/vue-router')) {
+            if (
+              id.includes('node_modules/vue/') ||
+              id.includes('node_modules/@vue/') ||
+              id.includes('node_modules/vue-router/') ||
+              id.includes('node_modules/pinia/') ||
+              id.includes('node_modules/vue-i18n/') ||
+              id.includes('node_modules/vue-demi/')
+            ) {
               return 'vue-vendor';
             }
-            if (id.includes('node_modules')) {
-              return 'vendor';
-            }
+            // if (id.includes('node_modules')) {
+            //   return 'vendor';
+            // }
           },
         },
       },

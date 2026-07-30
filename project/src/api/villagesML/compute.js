@@ -1,7 +1,7 @@
 // api/villagesML/compute.js
 // 計算模塊相關 API（需要登錄）
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 特徵提取
@@ -14,7 +14,7 @@ import { api } from '../auth/httpClient.js'
  * @returns {Promise<Object>} { extraction_id, matched_villages, execution_time_ms, results, from_cache }
  */
 export async function extractFeatures(params) {
-  return api('/api/villages/compute/features/extract', {
+  return villagesMLApi('/compute/features/extract', {
     method: 'POST',
     body: params,
     timeout: 60000
@@ -40,7 +40,7 @@ export async function extractFeatures(params) {
  * @returns {Promise<Object>} { results: Array<{region, semantic_profile, z_scores, suffixes, distinctive_suffixes, distinctive_chars, diversity, structure_profile, cluster_distribution}>, execution_time_ms, from_cache }
  */
 export async function aggregateFeatures(params) {
-  return api('/api/villages/compute/features/aggregate', {
+  return villagesMLApi('/compute/features/aggregate', {
     method: 'POST',
     body: params,
     timeout: 60000
@@ -64,7 +64,7 @@ export async function aggregateFeatures(params) {
  * @returns {Promise<Object>} { subset_id, matched_villages, sampled_villages, clusters, metrics, from_cache }
  */
 export async function clusterSubset(params) {
-  return api('/api/villages/compute/subset/cluster', {
+  return villagesMLApi('/compute/subset/cluster', {
     method: 'POST',
     body: params,
     timeout: 120000
@@ -89,7 +89,7 @@ export async function clusterSubset(params) {
  * @returns {Promise<Object>} { comparison_id, group_a_size, group_b_size, semantic_comparison, morphology_comparison, significant_differences, from_cache }
  */
 export async function compareSubsets(params) {
-  return api('/api/villages/compute/subset/compare', {
+  return villagesMLApi('/compute/subset/compare', {
     method: 'POST',
     body: params,
     timeout: 60000

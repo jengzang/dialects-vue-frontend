@@ -11,30 +11,7 @@
     </h3>
 
     <!-- Detail Mode Toggle -->
-    <div class="detail-toggle vml-glass-panel">
-      <div class="toggle-left">
-        <label class="toggle-container">
-          <SwitchToggle
-            :model-value="detailMode"
-            :width="48"
-            :height="24"
-            :thumb-size="20"
-            color="blue"
-            variant="solid"
-            show-label
-            active-text="詳細模式"
-            inactive-text="詳細模式"
-            label-position="right"
-            :aria-label="'詳細模式'"
-            @update:modelValue="detailMode = $event"
-          />
-        </label>
-        <span class="toggle-hint">（語義分類更細緻）</span>
-      </div>
-      <button class="lexicon-button" @click="showLexiconModal = true">
-        📖 查看詞典
-      </button>
-    </div>
+    <SemanticDetailToolbar v-model="detailMode" />
 
     <!-- Bigrams and Trigrams -->
     <div class="ngrams-section">
@@ -43,8 +20,8 @@
         <p class="subsection-description">
           分析相鄰兩個語義類別的組合，顯示頻率、佔比和PMI關聯強度。
         </p>
-        <div class="controls">
-          <div class="input-group">
+        <div class="controls vml-control-surface vml-control-row">
+          <div class="input-group vml-control-field">
             <label class="input-label">最小次數</label>
             <input
               v-model.number="bigramMinCount"
@@ -54,13 +31,15 @@
               class="vml-number-input"
             />
           </div>
-          <button
-            class="solid-button"
-            :disabled="loadingBigrams"
-            @click="loadBigrams"
-          >
-            查詢
-          </button>
+          <div class="vml-control-actions">
+            <button
+              class="solid-button"
+              :disabled="loadingBigrams"
+              @click="loadBigrams"
+            >
+              查詢
+            </button>
+          </div>
         </div>
 
         <div v-if="loadingBigrams" class="vml-loading">
@@ -88,8 +67,8 @@
         <p class="subsection-description">
           分析連續三個語義類別的組合模式，顯示頻率和佔比。
         </p>
-        <div class="controls">
-          <div class="input-group">
+        <div class="controls vml-control-surface vml-control-row">
+          <div class="input-group vml-control-field">
             <label class="input-label">最小次數</label>
             <input
               v-model.number="trigramMinCount"
@@ -99,13 +78,15 @@
               class="vml-number-input"
             />
           </div>
-          <button
-            class="solid-button"
-            :disabled="loadingTrigrams"
-            @click="loadTrigrams"
-          >
-            查詢
-          </button>
+          <div class="vml-control-actions">
+            <button
+              class="solid-button"
+              :disabled="loadingTrigrams"
+              @click="loadTrigrams"
+            >
+              查詢
+            </button>
+          </div>
         </div>
 
         <div v-if="loadingTrigrams" class="vml-loading">
@@ -135,8 +116,8 @@
       <p class="section-description">
         PMI 衡量兩個類別共現的關聯強度。PMI > 0 表示正相關（傾向共現），PMI &lt; 0 表示負相關（傾向不共現）。
       </p>
-      <div class="controls">
-        <div class="input-group">
+      <div class="controls vml-control-surface vml-control-row">
+        <div class="input-group vml-control-field">
           <label class="input-label">最小PMI值</label>
           <input
             v-model.number="minPMI"
@@ -147,7 +128,7 @@
           />
           <span class="input-hint">過濾PMI分數低於此值的組合</span>
         </div>
-        <div class="input-group">
+        <div class="input-group vml-control-field">
           <label class="input-label">返回數量</label>
           <input
             v-model.number="pmiTopN"
@@ -159,13 +140,15 @@
           />
           <span class="input-hint">返回前N個最高PMI的組合</span>
         </div>
-        <button
-          class="solid-button"
-          :disabled="loadingPMI"
-          @click="loadPMI"
-        >
-          查詢
-        </button>
+        <div class="vml-control-actions">
+          <button
+            class="solid-button"
+            :disabled="loadingPMI"
+            @click="loadPMI"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
       <div v-if="loadingPMI" class="vml-loading">
@@ -203,71 +186,21 @@
       </div>
     </div>
 
-    <!-- Lexicon Modal -->
-    <AppModal
-      :model-value="showLexiconModal"
-      size="lg"
-      title="📖 語義詞典"
-      @update:modelValue="showLexiconModal = false"
-    >
-      <div class="lexicon-body">
-              <!-- 9个主类别 -->
-              <div class="lexicon-section">
-                <h4>主類別 (v1.0.0)</h4>
-                <div class="category-list">
-                  <div
-                    v-for="(chars, category) in SEMANTIC_LEXICON_V1.categories"
-                    :key="category"
-                    class="category-item"
-                  >
-                    <div class="category-header">
-                      <span class="category-name">{{ CATEGORY_NAMES_ZH[category] }}</span>
-                      <span class="category-count">{{ chars.length }} 字</span>
-                    </div>
-                    <div class="char-list">
-                      <span v-for="char in chars" :key="char" class="char-tag">{{ char }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 详细子类别 -->
-              <div class="lexicon-section">
-                <h4>子類別 (v4.0.0-hybrid)</h4>
-                <div class="category-list">
-                  <div
-                    v-for="(chars, subcategory) in SEMANTIC_LEXICON_V4.subcategories"
-                    :key="subcategory"
-                    class="category-item"
-                  >
-                    <div class="category-header">
-                      <span class="category-name">{{ getSubcategoryName(subcategory) }}</span>
-                      <span class="category-count">{{ chars.length }} 字</span>
-                    </div>
-                    <div class="char-list">
-                      <span v-for="char in chars" :key="char" class="char-tag">{{ char }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-      </div>
-    </AppModal>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import AppModal from '@/components/common/AppModal.vue'
+import { useRoute, useRouter } from 'vue-router'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import SwitchToggle from '@/components/common/SwitchToggle.vue'
+import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
 import {
   getSemanticBigrams,
   getSemanticTrigrams,
   getSemanticPMI
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
-import { getCategoryDisplayName, getSubcategoryName } from '@/VillagesML/config/villagesML.js'
-import { SEMANTIC_LEXICON_V1, SEMANTIC_LEXICON_V4, CATEGORY_NAMES_ZH } from '@/VillagesML/config/semanticLexicon.js'
+import { showError } from '@/utils/ui/message.js'
+import { getCategoryDisplayName } from '@/VillagesML/config/villagesML.js'
 
 // State
 const bigrams = ref([])
@@ -284,10 +217,9 @@ const minPMI = ref(0)
 const pmiTopN = ref(50)
 
 // Detail mode toggle
-const detailMode = ref(false)
-
-// Lexicon modal
-const showLexiconModal = ref(false)
+const route = useRoute()
+const router = useRouter()
+const detailMode = ref(route.query.detail === 'true')
 
 // Computed: 计算 PMI 数据的最大绝对值
 const maxAbsPMI = computed(() => {
@@ -358,7 +290,10 @@ const getPMIClass = (pmi_score) => {
 }
 
 // Watch detailMode changes and auto-refresh tables with data
-watch(detailMode, () => {
+watch(detailMode, (val) => {
+  const query = { ...route.query }
+  if (val) { query.detail = 'true' } else { delete query.detail }
+  router.replace({ query })
   // 如果 bigrams 表格有数据，自动刷新
   if (bigrams.value.length > 0) {
     loadBigrams()
@@ -412,16 +347,13 @@ watch(detailMode, () => {
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
-  align-items: center;
-  flex-wrap: wrap;
+  justify-content: center;
+  
 }
 
 .input-group {
-  @include flex-col;
-  gap: 4px;
+  min-width: 0;
 }
 
 .input-label {
@@ -437,7 +369,7 @@ watch(detailMode, () => {
 }
 
 .vml-number-input {
-  width: 150px;
+  // width: 150px;
 }
 
 .bigrams-list,
@@ -601,147 +533,9 @@ watch(detailMode, () => {
     align-items: stretch;
   }
 
-  .vml-number-input {
-    width: 100%;
-  }
-}
-
-/* Detail Mode Toggle */
-.detail-toggle {
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.toggle-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.toggle-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.toggle-hint {
-  white-space: nowrap;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-/* Detail Toggle Layout */
-.detail-toggle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.toggle-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* Lexicon Button */
-.lexicon-button {
-  padding: 8px 16px;
-  background: var(--color-primary);
-  color: var(--action-primary-text);
-  border: none;
-  border-radius: var(--radius-sm2);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.lexicon-button:hover {
-  background: var(--color-primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.3);
-}
-
-/* Lexicon Modal Styles */
-.lexicon-body {
-  padding: 0;
-  overflow: visible;
-}
-
-.lexicon-section {
-  margin-bottom: 32px;
-}
-
-.lexicon-section:last-child {
-  margin-bottom: 0;
-}
-
-.lexicon-section h4 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0 0 16px 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--color-primary);
-}
-
-.category-list {
-  @include flex-col;
-  gap: 16px;
-}
-
-.category-item {
-  padding: 16px;
-  background: var(--glass-50);
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(var(--vml-blue-rgb), 0.1);
-}
-
-.category-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.category-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-primary);
-}
-
-.category-count {
-  font-size: 13px;
-  color: var(--text-secondary);
-  padding: 4px 12px;
-  background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: var(--radius-md);
-}
-
-.char-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.char-tag {
-  padding: 6px 12px;
-  background: rgba(var(--vml-blue-rgb), 0.1);
-  color: var(--text-primary);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.char-tag:hover {
-  background: var(--color-primary);
-  color: var(--action-primary-text);
-  transform: translateY(-2px);
+  // .vml-number-input {
+  //   width: 100%;
+  // }
 }
 
 </style>

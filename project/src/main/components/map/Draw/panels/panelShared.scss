@@ -47,6 +47,10 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.8rem;
+
+  @media (max-aspect-ratio: 1/1) {
+    display: none;
+  }
 }
 
 .draw-tool-panel-title {
@@ -143,6 +147,13 @@
   gap: 0.35rem;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .draw-tool-button-grid .main-glass-button:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--action-primary-text);
+  }
+}
+
 .draw-tool-check {
   font-size: 0.88rem;
   font-weight: 800;
@@ -189,6 +200,7 @@
   width: 100%;
   justify-content: flex-start;
   text-align: left;
+  color: var(--action-primary-text);
 }
 
 .draw-layer-row-actions {
@@ -285,18 +297,4 @@
     @include flex-col;
   }
 
-  .draw-tool-panel {
-    position: static;
-    width: 100%;
-    max-width: 100%;
-    min-height: 0;
-  }
-
-  .draw-tool-panel.offset-left {
-    right: auto;
-  }
-
-  .draw-tool-panel-body {
-    max-height: none;
-  }
 }

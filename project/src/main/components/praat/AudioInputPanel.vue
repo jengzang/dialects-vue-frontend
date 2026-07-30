@@ -52,7 +52,7 @@
         <span class="file-name">📁 {{ displayFile.name }}</span>
         <span class="file-size">{{ formatFileSize(displayFile.size) }}</span>
       </div>
-      <button class="clear-button" @click="clearFile">✕</button>
+      <button class="close-btn" @click="clearFile">✕</button>
     </div>
   </div>
 </template>
@@ -61,7 +61,7 @@
 import { ref, computed, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { PRAAT_AUDIO_LIMITS } from '@/main/config/constants.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 const props = defineProps({
   selectedSegment: {
@@ -560,23 +560,6 @@ $transition-duration: 0.3s;
     font-size: 0.9rem;
   }
 
-  .clear-button {
-    padding: 0.5rem 0.75rem;
-    background: var(--glass-30);
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition:
-      background $transition-duration ease,
-      color $transition-duration ease,
-      transform $transition-duration ease;
-
-    &:hover {
-      background: $error-color;
-      color: $white;
-      transform: scale(1.1);
-    }
-  }
 }
 
 @media (max-aspect-ratio: 1/1) {

@@ -2,7 +2,7 @@ import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { userStore } from '@/main/store/store.js'
+import { userStore, resultCache } from '@/main/store/store.js'
 
 // ========================================
 // ExploreBar (探索导航栏) 配置指南
@@ -33,7 +33,9 @@ import { userStore } from '@/main/store/store.js'
 //       showLabelOnlyWhenActive: false,     // 桌面端是否仅在“激活选中”时才显示文字
 //       mobileShowLabelOnlyWhenActive: true,// 移动端是否仅在“激活选中”时才显示文字
 //       cssClass: '',                       // 挂载到该标签上的自定义 CSS 类名
-//       visibleWhen: null                   // 动态可见性函数（例如: () => user.isAdmin）
+//       visibleWhen: null,                  // 动态可见性函数（例如: () => user.isAdmin）
+//       scroll: undefined,                  // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+//       mobileScroll: undefined             // 仅竖屏/移动端覆盖 scroll；例如 mobileScroll: 'right' 表示桌面主tab、移动端右侧溢出
 //     }
 //   },
 //   navigation: {         // 路由与导航行为配置
@@ -74,7 +76,11 @@ const DISPLAY_DEFAULTS = {
 
     // 样式 / 条件可见性
     cssClass: '',
-    visibleWhen: null // 默认始终可见
+    visibleWhen: null, // 默认始终可见
+
+    // 溢出滚动
+    scroll: undefined, // undefined = 主tab; 'left' = 左侧溢出; 'right' = 右侧溢出
+    mobileScroll: undefined // 仅竖屏/移动端覆盖 scroll；undefined = 沿用 scroll
 }
 
 const NAVIGATION_DEFAULTS = {
@@ -94,10 +100,10 @@ const DISPLAY_PRESETS = {
     compactDesktop: {
         weight: 0.8,
         mobileWeight: 0.8,
-        weightIconOnly: 0.25,
-        mobileWeightIconOnly: 0.25,
-        fontSize: 0.9,
-        mobileFontSize: 0.9
+        weightIconOnly: 0.3,
+        mobileWeightIconOnly: 0.3,
+        fontSize: 1,
+        mobileFontSize: 1
     },
 
     // 桌面端保持标准大小，但让移动端具有更大的点击区域和字号。
@@ -118,20 +124,21 @@ const createNavigationConfig = (overrides = {}) => ({
     ...overrides
 })
 
-const createExploreTab = ({
-                              tab,
-                              label,
-                              icon,
-                              display,
-                              navigation,
-                              meta = {}
-                          }) => ({
-    tab,
-    label,
-    icon,
-    display: createDisplayConfig(display),
-    navigation: createNavigationConfig(navigation),
-    meta
+const createExploreTab = 
+    ({
+        tab,
+        label,
+        icon,
+        display,
+        navigation,
+        meta = {}
+    }) => ({
+            tab,
+            label,
+            icon,
+            display: createDisplayConfig(display),
+            navigation: createNavigationConfig(navigation),
+            meta
 })
 
 export function getExploreBarTabs(configMap) {
@@ -195,6 +202,99 @@ export function useExploreBarConfig() {
     const route = useRoute()
 
     return computed(() => ({
+        home: createExploreTab({
+            tab: 'home',
+            label: t('navigation.tabs.home'),
+            icon: '🏠',
+            display: {
+                preset: 'compactDesktop',
+                overrides: { scroll: 'left', weightIconOnly: 0.4 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/') }
+            }
+        }),
+        about: createExploreTab({
+            tab: 'about',
+            label: t('navigation.tabs.aboutWebsite'),
+            icon: '🌐',
+            display: {
+                preset: 'compactDesktop',
+                overrides: { mobileScroll: 'left', weightIconOnly: 0.4 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
+            }
+        }),
+        charClass: createExploreTab({
+            tab: 'charClass',
+            label: t('navigation.tabs.charClass'),
+            icon: '📚',
+            display: {
+                preset: 'standard',
+                overrides: {}
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/explore/char-class'), query: { tab: 'zhonggu' } },
+                matchPages: ['CharacterClassification'],
+                rememberChild: true,
+                defaultChild: '/explore/char-class?tab=zhonggu',
+                children: [
+                    { label: t('navigation.submenu.charClass.zhonggu'), icon: '📜', path: withRouteLocale(route, '/explore/char-class?tab=zhonggu') },
+                    { label: t('navigation.submenu.charClass.shanggu'), icon: '🏛️', path: withRouteLocale(route, '/explore/char-class?tab=shanggu') },
+                    { label: t('navigation.submenu.charClass.jingu'), icon: '📖', path: withRouteLocale(route, '/explore/char-class?tab=jingu') },
+                    { label: t('navigation.submenu.charClass.yueyun'), icon: '🎵', path: withRouteLocale(route, '/explore/char-class?tab=yueyun') }
+                ]
+            }
+        }),
+        words: createExploreTab({
+            tab: 'words',
+            label: t('navigation.tabs.phrases'),
+            icon: '📖',
+            display: {
+                preset: 'standard',
+                overrides: {}
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/words') },
+                matchPages: ['YuBao', 'Vocabulary', 'ycSpoken'],
+                activeMatchPaths: [
+                    withRouteLocale(route, '/explore/vocabulary/view'),
+                    withRouteLocale(route, '/explore/vocabulary/import'),
+                    withRouteLocale(route, '/explore/vocabulary/manage')
+                ],
+                rememberChild: true,
+                defaultChild: '/explore/vocabulary/view',
+                children: [
+                    { label: t('navigation.submenu.words.wordList'), icon: '📒', path: withRouteLocale(route, '/explore/vocabulary/view') },
+                    { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: withRouteLocale(route, '/explore/yubao?tab=vocabulary') },
+                    { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: withRouteLocale(route, '/explore/yubao?tab=grammar') },
+                    { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc-spoken') }
+                ]
+            }
+        }),
+        villages: createExploreTab({
+            tab: 'villages',
+            label: t('navigation.tabs.villages'),
+            icon: '🏘️',
+            display: {
+                preset: 'standard',
+                overrides: {}
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/villages') },
+                matchPages: ['gdVillages', 'gdVillagesTable', 'ycVillages', 'VillagesML'],
+                rememberChild: true,
+                defaultChild: '/explore/villages/gd',
+                children: [
+                    { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: withRouteLocale(route, '/explore/villages/ml') },
+                    { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
+                    { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
+                    { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/villages/yc') },
+                    { label: t('navigation.submenu.villages.allVillages'), icon: '📋', path: withRouteLocale(route, '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }
+                ]
+            }
+        }),
         tools: createExploreTab({
             tab: 'tools',
             label: t('navigation.tabs.tools'),
@@ -233,81 +333,64 @@ export function useExploreBarConfig() {
                 matchPages: ['praat']
             }
         }),
-        charClass: createExploreTab({
-            tab: 'charClass',
-            label: t('navigation.tabs.charClass'),
-            icon: '📚',
-            display: {
-                preset: 'standard',
-                overrides: {}
-            },
-            navigation: {
-                defaultTo: { path: withRouteLocale(route, '/explore/char-class'), query: { tab: 'zhonggu' } },
-                matchPages: ['CharacterClassification'],
-                rememberChild: true,
-                defaultChild: '/explore/char-class?tab=zhonggu',
-                children: [
-                    { label: t('navigation.submenu.charClass.zhonggu'), icon: '📜', path: withRouteLocale(route, '/explore/char-class?tab=zhonggu') },
-                    { label: t('navigation.submenu.charClass.shanggu'), icon: '🏛️', path: withRouteLocale(route, '/explore/char-class?tab=shanggu') },
-                    { label: t('navigation.submenu.charClass.jingu'), icon: '📖', path: withRouteLocale(route, '/explore/char-class?tab=jingu') },
-                    { label: t('navigation.submenu.charClass.yueyun'), icon: '🎵', path: withRouteLocale(route, '/explore/char-class?tab=yueyun') }
-                ]
-            }
-        }),
-        words: createExploreTab({
-            tab: 'words',
-            label: t('navigation.tabs.phrases'),
-            icon: '📖',
-            display: {
-                preset: 'standard',
-                overrides: {}
-            },
-            navigation: {
-                defaultTo: { path: withRouteLocale(route, '/menu/words') },
-                matchPages: ['YuBao', 'ycSpoken'],
-                rememberChild: true,
-                defaultChild: '/explore/yubao?tab=vocabulary',
-                children: [
-                    { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: withRouteLocale(route, '/explore/yubao?tab=vocabulary') },
-                    { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: withRouteLocale(route, '/explore/yubao?tab=grammar') },
-                    { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc-spoken') }
-                ]
-            }
-        }),
-        villages: createExploreTab({
-            tab: 'villages',
-            label: t('navigation.tabs.villages'),
-            icon: '🏘️',
-            display: {
-                preset: 'standard',
-                overrides: {}
-            },
-            navigation: {
-                defaultTo: { path: withRouteLocale(route, '/menu/villages') },
-                matchPages: ['gdVillages', 'gdVillagesTable', 'ycVillages', 'VillagesML'],
-                rememberChild: true,
-                defaultChild: '/explore/villages/gd',
-                children: [
-                    { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: withRouteLocale(route, '/explore/villages/ml') },
-                    { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
-                    { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
-                    { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/villages/yc') },
-                    { label: t('navigation.submenu.villages.allVillages'), icon: '📋', path: withRouteLocale(route, '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }
-                ]
-            }
-        }),
-        about: createExploreTab({
-            tab: 'about',
-            label: t('navigation.tabs.aboutWebsite'),
-            icon: '🌐',
+        navPho: createExploreTab({
+            tab: 'pho',
+            label: t('navigation.tabs.phonology'),
+            icon: '🧬',
             display: {
                 preset: 'compactDesktop',
-                overrides: {
-                    hideOnMobile: true
-                }
+                overrides: { mobileScroll: 'right', weightIconOnly: 0.3 }
             },
             navigation: {
-                defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
+                defaultTo: { path: withRouteLocale(route, '/menu/pho/matrix') }
+            }
+        }),
+        navQuery: createExploreTab({
+            tab: 'query',
+            label: t('navigation.tabs.query'),
+            icon: '🔍',
+            display: {
+                preset: 'compactDesktop',
+                overrides: { mobileScroll: 'right', weightIconOnly: 0.3 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/query/zhonggu') }
+            }
+        }),
+        // navResult: createExploreTab({
+        //     tab: 'result',
+        //     label: t('navigation.tabs.results'),
+        //     icon: '📉',
+        //     display: {
+        //         preset: 'standard',
+        //         overrides: { scroll: 'right', weightIconOnly: 0.3, visibleWhen: () => resultCache.latestResults.length > 0 }
+        //     },
+        //     navigation: {
+        //         defaultTo: { path: withRouteLocale(route, '/menu/result') }
+        //     }
+        // }),
+        navMap: createExploreTab({
+            tab: 'map',
+            label: t('navigation.tabs.map'),
+            icon: '🗺️',
+            display: {
+                preset: 'compactDesktop',
+                overrides: { scroll: 'right', weightIconOnly: 0.3 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/map/view') }
+            }
+        }),
+        navCompare: createExploreTab({
+            tab: 'compare',
+            label: t('navigation.tabs.compare'),
+            icon: '↔️',
+            display: {
+                preset: 'compactDesktop',
+                overrides: { mobileScroll: 'right', weightIconOnly: 0.3 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/compare/zhonggu') }
             }
         })
     }))

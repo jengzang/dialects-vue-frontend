@@ -802,7 +802,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     @include primary-gradient;
 
     box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
-    color: var(--text-white);
+    color: var(--action-primary-text);
   }
 }
 
@@ -828,7 +828,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   border: none;
   border-radius: var(--radius-md);
   box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
-  color: var(--text-white);
+  color: var(--action-primary-text);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;

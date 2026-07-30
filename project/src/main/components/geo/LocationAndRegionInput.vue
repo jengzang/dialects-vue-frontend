@@ -90,49 +90,12 @@
       </div>
 
       <!-- NEW MODE: Textarea input (for CustomTab) -->
-      <div v-else class="region-input-section">
-        <div class="region-input-header">
-          <label class="region-label">{{ $t('query.components.locationAndRegionInput.partitionLabel') }}</label>
-          <button
-              class="info-btn"
-              @click="openPartitionInfoModal"
-              :title="$t('query.components.locationAndRegionInput.viewPartitionDetails')"
-          >
-            <span class="icon">ℹ️</span>
-          </button>
-        </div>
-
-        <div class="region-input-wrapper">
-          <textarea
-              ref="regionTextareaEl"
-              v-model="regionInputValue"
-              @input="onRegionInput"
-              @blur="onRegionBlur"
-              :placeholder="$t('query.components.locationAndRegionInput.partitionPlaceholder')"
-              class="textarea"
-              rows="3"
-          ></textarea>
-
-          <!-- Suggestions dropdown -->
-          <Teleport to="body">
-            <div
-                v-if="showRegionSuggestions && regionSuggestions.length > 0"
-                class="suggestions-dropdown"
-                :style="regionSuggestionStyle"
-            >
-              <div
-                  v-for="(suggestion, index) in regionSuggestions"
-                  :key="index"
-                  class="suggestion-item"
-                  @mousedown.prevent="selectRegionSuggestion(suggestion)"
-              >
-                <span class="suggestion-text">{{ suggestion.display }}</span>
-                <span class="suggestion-source">{{ suggestion.source === 'map' ? $t('query.components.locationAndRegionInput.mapSource') : $t('query.components.locationAndRegionInput.yindianSource') }}</span>
-              </div>
-            </div>
-          </Teleport>
-        </div>
-      </div>
+      <RegionInputMode
+          v-else
+          v-model="regionInputValue"
+          v-model:region-using="regionUsing"
+          @open-partition-info="openPartitionInfoModal"
+      />
     </div>
     <!-- ✅ 底部提示欄：已選擇地點數 -->
     <div class="bottom-hint" >
@@ -221,21 +184,22 @@
 
 
 <script setup>
-import { ref, nextTick ,onMounted, onActivated, watch, computed,defineProps } from 'vue'
+import { ref, nextTick ,onMounted, onActivated, watch, computed,defineProps, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getLocations, getCustomFeature, getLocationPartitions, batchMatch, getPartitions } from '@/api/index.js'
 import AppModal from '@/components/common/AppModal.vue'
-import { useCustomRegionStore } from '@/main/store/customRegionStore.js'
+import { customRegionStore } from '@/main/store/customRegionStore.js'
 import RegionSelector from "@/main/components/geo/RegionSelector.vue"
 import PartitionInfoModal from "@/main/components/geo/PartitionInfoModal.vue"
 import { userStore } from '@/main/store/store.js'
 import { LOCATION_LIMITS } from '@/main/config/constants.js'
 import { buildExplicitLocationsForGetLocs, isExplicitLocationsLimitExceeded } from '@/main/utils/query/queryLimits.js'
-import * as OpenCC from 'opencc-js'
 import {STATIC_REGION_TREE, top_yindian} from "@/main/config/RegionTree.js";
-import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 
-const { getPartitionData, getCachedYindianTree, getYindianTree } = usePartitionCache()
+const RegionInputMode = defineAsyncComponent(() => import('./RegionInputMode.vue'))
+
+const { getPartitionData, getYindianTree } = usePartitionCache()
 
 // 只保留音典允许暴露的顶级分区；不改结构，只裁掉不需要的 key。
 const filterYindianTopLevelKeys = (obj) => {
@@ -252,9 +216,6 @@ const filterYindianTopLevelKeys = (obj) => {
   return filtered
 }
 
-// 创建繁简转换器
-const t2s = OpenCC.Converter({ from: 'tw', to: 'cn' })  // 繁 → 简
-const s2t = OpenCC.Converter({ from: 'cn', to: 'tw' })  // 简 → 繁
 // const API_BASE = window.API_BASE;
 // const MAP_TREE = STATIC_REGION_TREE;
 // const YINDIAN_TREE = top_yindian;
@@ -282,15 +243,6 @@ const regionUsing = ref(props.modelValue.regionUsing)
 
 // Region input mode state
 const regionInputValue = ref('')  // Textarea content for regions
-const regionSuggestions = ref([])  // Autocomplete suggestions
-const showRegionSuggestions = ref(false)  // Show/hide suggestions dropdown
-const regionMatchLoading = ref(false)  // Loading state for matching
-const regionSuggestionStyle = ref({
-  left: '0px',
-  top: '0px',
-  position: 'absolute',
-  zIndex: 99999
-})
 // watch 外部传入的值
 watch(() => props.modelValue, (newVal) => {
   if (!newVal) return
@@ -412,7 +364,7 @@ function handleCustomRegionDataUpdate(regionObjects) {
 }
 
 // Use custom region store
-const { fetchCustomRegions, customRegions } = useCustomRegionStore()
+const { fetchCustomRegions, customRegions } = customRegionStore()
 
 // Load custom regions data when component mounts
 async function loadCustomRegionsData() {
@@ -608,164 +560,6 @@ function applySuggestion(item) {
   })
 }
 
-/* ========== Region Input Mode Logic ========== */
-
-// Flatten tree structure to get all matchable region names
-const flattenRegionTree = (tree, parentPath = []) => {
-  const results = []
-
-  for (const [key, value] of Object.entries(tree)) {
-    const currentPath = [...parentPath, key]
-
-    // Add current level
-    results.push({
-      name: key,
-      path: currentPath.join('-'),
-      display: currentPath.join('·')
-    })
-
-    if (typeof value === 'object' && !Array.isArray(value)) {
-      // Recurse into nested object
-      results.push(...flattenRegionTree(value, currentPath))
-    } else if (Array.isArray(value)) {
-      // Add array items as leaf nodes
-      value.forEach(item => {
-        if (item) {
-          const leafPath = [...currentPath, item]
-          results.push({
-            name: item,
-            path: leafPath.join('-'),
-            display: leafPath.join('·')
-          })
-        }
-      })
-    }
-  }
-
-  return results
-}
-
-// Get flattened regions from both trees with source tagging
-const getFlattenedRegions = () => {
-  const results = []
-
-  // Add map tree regions
-  try {
-    if (typeof STATIC_REGION_TREE !== 'undefined' && STATIC_REGION_TREE) {
-      const mapRegions = flattenRegionTree(STATIC_REGION_TREE)
-      mapRegions.forEach(region => {
-        results.push({ ...region, source: 'map' })
-      })
-    }
-  } catch (e) {
-    console.warn('STATIC_REGION_TREE not available:', e)
-  }
-
-  // Add yindian tree regions
-  const cachedTree = getCachedYindianTree()
-  if (cachedTree) {
-    try {
-      const tree = cachedTree
-      const yindianRegions = flattenRegionTree(tree)
-      yindianRegions.forEach(region => {
-        results.push({ ...region, source: 'yindian' })
-      })
-    } catch (e) {
-      console.error('Failed to parse yindian tree cache:', e)
-    }
-  }
-
-  return results
-}
-
-// Match region input against flattened tree
-const matchRegions = (input) => {
-  const flatRegions = getFlattenedRegions()
-  const query = input.trim().toLowerCase()
-
-  if (!query) return []
-
-  // ✅ 新增：创建繁简变体用于匹配
-  const querySimplified = t2s(query).toLowerCase()
-  const queryTraditional = s2t(query).toLowerCase()
-
-  // Find matches - 支持繁简双向匹配
-  const matches = flatRegions.filter(region => {
-    const nameLower = region.name.toLowerCase()
-    const pathLower = region.path.toLowerCase()
-
-    // ✅ 检查原文、简体、繁体是否匹配
-    return nameLower.includes(query) ||
-           nameLower.includes(querySimplified) ||
-           nameLower.includes(queryTraditional) ||
-           pathLower.includes(query) ||
-           pathLower.includes(querySimplified) ||
-           pathLower.includes(queryTraditional)
-  })
-
-  // Limit to top 10 matches
-  return matches.slice(0, 10)
-}
-
-// Debounced region input handler
-let regionInputTimeout = null
-const regionTextareaEl = ref(null)
-
-const onRegionInput = () => {
-  clearTimeout(regionInputTimeout)
-
-  regionInputTimeout = setTimeout(() => {
-    const lastWord = regionInputValue.value.split(/\s+/).pop()
-
-    if (lastWord && lastWord.length > 0) {
-      regionMatchLoading.value = true
-      const matches = matchRegions(lastWord)
-      regionSuggestions.value = matches
-      showRegionSuggestions.value = matches.length > 0
-      regionMatchLoading.value = false
-
-      // Update suggestion position
-      if (matches.length > 0) {
-        nextTick(() => {
-          const el = regionTextareaEl.value
-          if (el) {
-            const rect = el.getBoundingClientRect()
-            regionSuggestionStyle.value = {
-              position: 'absolute',
-              left: `${rect.left + window.scrollX}px`,
-              top: `${rect.top + rect.height + 6 + window.scrollY}px`,
-              zIndex: 99999,
-              minWidth: `${el.offsetWidth}px`
-            }
-          }
-        })
-      }
-    } else {
-      showRegionSuggestions.value = false
-    }
-  }, 200)
-}
-
-const onRegionBlur = () => {
-  setTimeout(() => {
-    showRegionSuggestions.value = false
-  }, 200)
-}
-
-// Select a suggestion and auto-detect region mode
-const selectRegionSuggestion = (suggestion) => {
-  const words = regionInputValue.value.split(/\s+/)
-  // Only insert the leaf level name, not the full path
-  words[words.length - 1] = suggestion.name
-  regionInputValue.value = words.join(' ')
-  showRegionSuggestions.value = false
-
-  // Auto-detect and update regionUsing based on suggestion source
-  if (suggestion.source) {
-    regionUsing.value = suggestion.source
-  }
-}
-
 /* ========== 分區選擇邏輯 ========== */
 // const selectedValue = ref([])  // ✅ 不要 ['']
 
@@ -837,22 +631,6 @@ function loadTreeFor(mode) {
 // 初始加載
 loadTreeFor(regionUsing.value)
 
-// ✅ 新增：预加载音典分区数据到缓存，确保输入模式可以匹配所有分区
-const preloadYindianTree = async () => {
-  if (!getCachedYindianTree()) {
-    try {
-      await getYindianTree(() => getPartitions(), {
-        transform: filterYindianTopLevelKeys,
-      })
-      console.log('✅ 音典分区数据已预加载到缓存')
-    } catch (error) {
-      console.warn('⚠️ 预加载音典分区失败:', error)
-    }
-  }
-}
-
-// 预加载音典数据（异步，不阻塞页面）
-preloadYindianTree()
 
 // const cascaderRef = ref(null)
 
@@ -1557,9 +1335,8 @@ $portrait-ratio: 1;
   @include flex-col;
   align-items: center;
   justify-content: center;
-  justify-self: center;
   gap: 6px;
-  margin: 0 1dvw 3dvh;
+  margin: 0 auto 3dvh;
   padding: 6px 20px;
   background: var(--glass-50);
   border: 1px solid var(--border-gray-lighter);
@@ -1707,66 +1484,6 @@ $portrait-ratio: 1;
   .icon {
     display: inline-block;
   }
-}
-
-/* 分区输入模式 */
-.region-input-section {
-  flex: 1;
-  @include flex-col;
-  gap: 1px;
-}
-
-.region-input-header {
-  @include flex-center;
-
-  gap: 8px;
-}
-
-.region-label {
-  color: var(--text-dark);
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.region-input-wrapper {
-  position: relative;
-  flex: 1;
-}
-
-.suggestions-dropdown {
-  @include suggestion-panel(400px, 30dvh);
-}
-
-.suggestion-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  padding: 6px 8px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: var(--bg-blue-hover);
-  }
-}
-
-.suggestion-text {
-  flex: 1;
-  color: var(--text-dark);
-  font-size: 14px;
-}
-
-.suggestion-source {
-  margin-left: 8px;
-  padding: 2px 6px;
-  background: rgba(var(--color-primary-rgb), 0.1);
-  border-radius: var(--radius-xs);
-  color: $primary;
-  white-space: nowrap;
-  font-size: 11px;
-  font-weight: 600;
 }
 
 /* 竖屏 */

@@ -107,7 +107,7 @@ export const villagesMLStore = reactive({
   spatialAwareSettings: {
     algorithm: 'kmeans',
     k: 5,
-    spatial_run_id: 'spatial_hdbscan_v1',
+    spatial_run_id: 'spatial_hdbscan_v2',
     features: {
       use_semantic_profile: true,
       use_naming_patterns: true,
@@ -182,4 +182,14 @@ export function resetClusteringState() {
 export function resetSemanticState() {
   villagesMLStore.semanticNetwork = null
   villagesMLStore.semanticLoading = false
+}
+
+export function resetDatasetResultState() {
+  villagesMLStore.searchResults = []
+  villagesMLStore.searchTotal = 0
+  villagesMLStore.selectedVillage = null
+  villagesMLStore.tendencyData = []
+  villagesMLStore.charFrequencyData = []
+  resetClusteringState()
+  resetSemanticState()
 }

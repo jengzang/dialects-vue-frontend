@@ -260,7 +260,7 @@ const comparisonData = computed(() => [
     key: 'hourlyApiUsage',
     feature: t('user.benefitsPopup.items.hourlyApiUsage'),
     unit: 'callRate',
-    anonymous: 50,
+    anonymous: 60,
     user: 600
   }
 ])
@@ -374,8 +374,8 @@ $orange-border: rgba(var(--color-warning-rgb), 0.2);
 $orange-shadow: rgba(var(--color-warning-rgb), 0.4);
 $orange-shadow-hover: rgba(var(--color-warning-rgb), 0.5);
 
-$border-light: rgba(0, 0, 0, 0.04);
-$border-medium: rgba(0, 0, 0, 0.06);
+$border-light: var(--glass-10);
+$border-medium: var(--glass-20);
 
 $transition-fast: 0.2s;
 $transition-normal: 0.3s;
@@ -412,7 +412,7 @@ $transition-normal: 0.3s;
 /* 权益对比表 */
 .comparison-table-wrapper {
   overflow-x: auto;
-  background: rgba(247, 247, 247, 0.5);
+  background: var(--glass-10);
   border-radius: var(--radius-md);
 }
 

@@ -23,66 +23,70 @@
       </div>
       <div class="selector-content">
         <!-- Search Input -->
-        <div class="search-bar">
+        <div class="search-bar vml-control-surface">
           <input
             v-model="searchKeyword"
             type="text"
             placeholder="搜尋村莊名稱..."
-            class="glass-input"
+            class="glass-input small"
             @input="handleSearchInput"
           >
         </div>
 
         <!-- Region Filters -->
-        <div class="filters-row">
-          <div class="filter-group">
-            <label>城市:</label>
-            <FilterableSelect
-              v-model="filterCity"
-              level="city"
-              :show-level-selector="false"
-              placeholder="選擇城市"
-              @update:modelValue="handleCityChange"
-            />
-          </div>
+        <div class="filters-row vml-control-surface">
+          <div class="vml-control-row">
+            <div class="filter-group vml-control-field">
+              <label>城市:</label>
+              <FilterableSelect
+                v-model="filterCity"
+                level="city"
+                :show-level-selector="false"
+                placeholder="選擇城市"
+                @update:modelValue="handleCityChange"
+              />
+            </div>
 
-          <div class="filter-group">
-            <label>區縣:</label>
-            <FilterableSelect
-              v-model="filterCounty"
-              level="county"
-              :parent="filterCity"
-              :show-level-selector="false"
-              :disabled="!filterCity"
-              placeholder="選擇區縣"
-              @update:modelValue="handleCountyChange"
-            />
-          </div>
+            <div class="filter-group vml-control-field">
+              <label>區縣:</label>
+              <FilterableSelect
+                v-model="filterCounty"
+                level="county"
+                :parent="filterCity"
+                :show-level-selector="false"
+                :disabled="!filterCity"
+                placeholder="選擇區縣"
+                @update:modelValue="handleCountyChange"
+              />
+            </div>
 
-          <div class="filter-group">
-            <label>鄉鎮:</label>
-            <FilterableSelect
-              v-model="filterTownship"
-              level="township"
-              :parent="townshipParent"
-              :show-level-selector="false"
-              :disabled="!canSelectTownship"
-              placeholder="選擇鄉鎮"
-              @update:modelValue="loadVillages"
-            />
-          </div>
+            <div class="filter-group vml-control-field">
+              <label>鄉鎮:</label>
+              <FilterableSelect
+                v-model="filterTownship"
+                level="township"
+                :parent="townshipParent"
+                :show-level-selector="false"
+                :disabled="!canSelectTownship"
+                placeholder="選擇鄉鎮"
+                @update:modelValue="loadVillages"
+              />
+            </div>
 
-          <button
-            @click="loadVillages"
-            :disabled="(!searchKeyword && !hasFilters) || loading"
-            class="solid-button primary load-btn"
-          >
-            {{ loading ? '載入中...' : '載入村莊' }}
-          </button>
+            <div class="vml-control-actions">
+              <button
+                @click="loadVillages"
+                :disabled="(!searchKeyword && !hasFilters) || loading"
+                class="solid-button primary load-btn"
+              >
+                {{ loading ? '載入中...' : '載入村莊' }}
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Quick Select -->
-        <div class="quick-select-row" v-if="allVillages.length > 0">
+        <div class="quick-select-row vml-control-surface" v-if="allVillages.length > 0">
           <label>快速選擇:</label>
           <button @click="selectTop100" class="solid-button small">前 100 個</button>
           <button @click="selectRandom50" class="solid-button small">隨機 50 個</button>
@@ -151,22 +155,22 @@
       <div class="panel-header">
         <h3>提取控制</h3>
       </div>
-      <div class="controls-content">
-        <div class="controls-row">
-          <div class="control-item">
+      <div class="controls-content vml-control-surface">
+        <div class="controls-row vml-control-row">
+          <div class="control-item vml-control-field">
             <label>聚合方法:</label>
             <SimpleSelectDropdown
               v-model="aggregationMethod"
               :options="aggregationMethodOptions"
             />
           </div>
-          <div class="control-item">
+          <div class="control-item vml-control-field">
             <label>標準化:</label>
             <CheckBox :model-value="normalize" @update:modelValue="normalize = $event" />
             <span>對特徵向量進行標準化</span>
           </div>
         </div>
-        <div class="button-group">
+        <div class="button-group vml-control-actions">
           <button
             @click="extractFeatures"
             :disabled="!canExtract || loading"
@@ -389,10 +393,11 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { extractFeatures as apiExtractFeatures, fetchSubsetFilter } from '@/api/index.js'
-import { showError, showSuccess, showWarning } from '@/utils/message.js'
+import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
 import { cityHasCounties } from '@/VillagesML/utils/regionPreload.js'
-import { SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
+import { SEMANTIC_CATEGORY_NAMES, isSemanticFeature } from '@/VillagesML/config/villagesML.js'
+import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 
 // Router
 const router = useRouter()
@@ -508,7 +513,7 @@ const goToAuth = () => {
   router.push({
     path: '/auth',
     query: {
-      redirect: route.fullPath || '/villagesML?module=compute&subtab=features'
+      redirect: route.fullPath || buildCurrentVillagesMLPath({ module: 'compute', subtab: 'features' })
     }
   })
 }
@@ -721,7 +726,7 @@ const aggregateFeatures = async () => {
 
         extractionResults.value.results.forEach(result => {
           const feature = result.features.semantic
-          if (feature && feature.sem_mountain !== undefined) {
+          if (isSemanticFeature(feature)) {
             Object.keys(feature).forEach(key => {
               if (feature[key] === 1) {
                 const categoryKey = key.replace('sem_', '')
@@ -933,7 +938,7 @@ const formatFeatureValue = (value) => {
   // 如果是对象（semantic_tags, morphology, clustering, spatial, character）
   if (typeof value === 'object') {
     // semantic_tags: 显示激活的标签（映射为中文）
-    if (value.sem_mountain !== undefined) {
+    if (isSemanticFeature(value)) {
       const activeTags = Object.keys(value)
         .filter(key => value[key] === 1)
         .map(key => {
@@ -1144,40 +1149,8 @@ onBeforeUnmount(() => {
   margin-bottom: 16px;
 }
 
-.glass-input {
-  padding: 10px 16px;
-  background: var(--glass-50);
-  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: var(--radius-sm2);
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.glass-input:focus {
-  outline: none;
-  border-color: var(--vml-blue);
-  background: var(--glass-80);
-}
-
 .filters-row {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
-  flex-wrap: wrap;
-  align-items: flex-end;
-}
-
-.filter-group {
-  flex: 1;
-  min-width: 150px;
-  @include flex-col;
-  gap: 6px;
-}
-
-.filter-group label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-primary);
 }
 
 .load-btn {
@@ -1377,30 +1350,11 @@ onBeforeUnmount(() => {
 }
 
 .controls-content {
-  @include flex-col;
   gap: 16px;
-  flex: 1;
 }
 
 .controls-row {
-  // justify-content: center;
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.control-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-  min-width: 250px;
-}
-
-.control-item label {
-  font-weight: 500;
-  color: var(--text-primary);
-  white-space: nowrap;
+  margin-bottom: 8px;
 }
 
 .control-item span {
@@ -1409,8 +1363,6 @@ onBeforeUnmount(() => {
 }
 
 .button-group {
-  display: flex;
-  gap: 12px;
   margin-top: 8px;
   justify-content: center;
 }
@@ -1753,23 +1705,6 @@ onBeforeUnmount(() => {
 @media (max-aspect-ratio: 1/1) {
   .feature-extraction-page {
     padding: 8px;
-  }
-
-  .filters-row {
-    flex-direction: column;
-  }
-
-  .filter-group {
-    min-width: 100%;
-  }
-
-  .controls-row {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .control-item {
-    min-width: 100%;
   }
 
   .button-group {

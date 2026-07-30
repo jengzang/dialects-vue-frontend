@@ -9,7 +9,7 @@ import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
 import CountLocationJumpNav from '@/main/components/pho/CountLocationJumpNav.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
-import { useNavAnchorJump } from '@/composables/useNavAnchorJump.js'
+import { useNavAnchorJump } from '@/composables/bar/useNavAnchorJump.js'
 import all_feature_counts from '/data/feature_counts_20260624.json?url'
 
 const { t } = useI18n()
@@ -1127,11 +1127,12 @@ $primary-deep: #003d9e;
 $mobile-breakpoint: 768px;
 .phonology-page {
   min-width: 80dvw;
+  max-width: min(1000px, 98%);
   margin-top: 20px;
 
   /* 输入与查询 */
   .input-section {
-    max-width: 600px;
+    max-width: min(600px,90%);
     @include flex-col;
     align-items: center;
     justify-content: center;
@@ -1360,7 +1361,7 @@ $mobile-breakpoint: 768px;
     border-radius: var(--radius-md);
 
     &--wide {
-      width: 100%;
+      // width: 100%;
     }
   }
 
@@ -1410,7 +1411,7 @@ $mobile-breakpoint: 768px;
 
   .syllable-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 10px;
   }
 
@@ -1620,7 +1621,7 @@ $mobile-breakpoint: 768px;
     }
 
     .chart-block {
-      padding: 12px;
+      padding: 8px;
     }
 
     .pie-chart {

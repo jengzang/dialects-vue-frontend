@@ -2,7 +2,8 @@ import * as XLSX from 'xlsx'
 
 const EXCEL_FILE_PATTERN = /\.(xlsx|xls)$/i
 const CSV_FILE_PATTERN = /\.csv$/i
-const TABULAR_FILE_PATTERN = /\.(xlsx|xls|csv)$/i
+const TSV_FILE_PATTERN = /\.tsv$/i
+const TABULAR_FILE_PATTERN = /\.(xlsx|xls|csv|tsv)$/i
 
 export const DEFAULT_PREVIEW_ROW_COUNT = null
 
@@ -72,7 +73,10 @@ function parseWorkbook(workbook) {
 }
 
 function parseCsvText(text, fileName = 'CSV') {
-  const workbook = XLSX.read(text, { type: 'string' })
+  const workbook = XLSX.read(text, {
+    type: 'string',
+    FS: TSV_FILE_PATTERN.test(fileName) ? '\t' : undefined
+  })
   const sheets = parseWorkbook(workbook)
 
   if (sheets.length > 0) {
@@ -105,7 +109,7 @@ export async function parseTabularFile(file) {
 
   let sheets = []
 
-  if (CSV_FILE_PATTERN.test(file.name)) {
+  if (CSV_FILE_PATTERN.test(file.name) || TSV_FILE_PATTERN.test(file.name)) {
     const text = await file.text()
     sheets = parseCsvText(text, file.name)
   } else if (EXCEL_FILE_PATTERN.test(file.name)) {
@@ -155,12 +159,21 @@ export function derivePreviewTable(parsedFile, options = {}) {
   }
 
   const rows = activeSheet.rows || []
-  const safeHeaderIndex = Math.max(0, Math.min(headerRowIndex, Math.max(rows.length - 1, 0)))
   const columnCount = activeSheet.columnCount || inferColumnCount(rows)
   const fallbackHeaders = buildFallbackHeaders(columnCount)
-  const headerRow = rows[safeHeaderIndex] || []
-  const headers = fallbackHeaders.map((fallback, index) => normalizeCellValue(headerRow[index]) || fallback)
-  const dataRows = rows.slice(safeHeaderIndex + 1)
+  const hasHeader = headerRowIndex >= 0
+
+  let headers, dataRows, safeHeaderIndex
+  if (hasHeader) {
+    safeHeaderIndex = Math.max(0, Math.min(headerRowIndex, Math.max(rows.length - 1, 0)))
+    const headerRow = rows[safeHeaderIndex] || []
+    headers = fallbackHeaders.map((fallback, index) => normalizeCellValue(headerRow[index]) || fallback)
+    dataRows = rows.slice(safeHeaderIndex + 1)
+  } else {
+    safeHeaderIndex = -1
+    headers = fallbackHeaders
+    dataRows = rows.slice(0)
+  }
   const previewRows = (Number.isFinite(previewRowCount)
     ? dataRows.slice(0, Math.max(0, previewRowCount))
     : dataRows

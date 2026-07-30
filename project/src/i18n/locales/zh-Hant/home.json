@@ -32,7 +32,7 @@
       "dialectMap": "地圖顯示 - 地圖上呈現查詢結果",
       "regionMap": "方言分區圖 - 按地圖集或音典分區繪製",
       "customMap": "自定義數據 - 添加個人數據繪圖",
-      "drawMap": "繪圖工具 - GIS在線繪圖 泰森多边形"
+      "drawMap": "繪圖工具 - GIS在線繪圖 泰森多邊形"
     },
     "phonology": {
       "title": "音系分析",
@@ -48,6 +48,7 @@
       "desc": "方言詞彙與語法資料",
       "yubaoVocab": "語保詞彙 - 語保工程詞彙資料",
       "yubaoGrammar": "語保語法 - 語保工程句子資料",
+      "wordList": "詞表 - 方言詞表頁面",
       "ycSpoken": "陽春口語詞 - 陽春方言口語詞彙"
     },
     "villages": {

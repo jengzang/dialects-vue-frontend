@@ -649,6 +649,7 @@ function formatRegionNames(regionNames) {
 
 .scope-selection-item {
   width: 100%;
+  color: $text-strong;
 
   &.state-full {
     border-color: $primary;
@@ -720,7 +721,7 @@ function formatRegionNames(regionNames) {
 }
 
 .scope-confirm-btn {
-  color: var(--text-white);
+  color: var(--action-primary-text);
 }
 
 .scope-modal-footer {

@@ -319,17 +319,18 @@ import { useStorageState } from '@/composables/core/useStorageState.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
+import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
 import {
   downloadJyut2IpaResult,
   getJyut2IpaProgress,
   processJyut2Ipa,
   uploadJyutFile,
 } from '@/api'
-import { showConfirm, showError, showSuccess } from '@/utils/message.js'
+import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const { requireAuth } = useAuthGuard()
-const progressPolling = usePollingTask({ intervalMs: 1000, maxFailures: 1 })
+const progressPolling = usePollingTask({ intervalMs: 1100, maxFailures: 1 })
 const JYUT2IPA_CONFIG_FILE_NAME = 'jyut2ipa-rules.json'
 const JYUT2IPA_RESULT_FILE_PREFIX = '方音圖鑒_'
 const fileName = ref('')
@@ -700,7 +701,7 @@ const processFile = async (file, options = {}) => {
     taskId.value = uploadData.task_id
 
     processingText.value = t('tools.jyut2ipa.processing.preparingConvert')
-    await processJyut2Ipa(taskId.value)
+    await processJyut2Ipa(taskId.value, rules.value)
     processingText.value = t('tools.jyut2ipa.processing.running')
 
     await progressPolling.start(
@@ -744,19 +745,24 @@ const confirmPreviewAndProcess = async () => {
     return
   }
 
-  const activeSheet = jyutPreviewState.previewTable.value?.activeSheet
-  const columnMapping = {
-    headerJyutping: jyutPreviewState.mapping.value.jyutping || null,
-    headerChar: jyutPreviewState.mapping.value.char || null
+  const columnMap = []
+  if (jyutPreviewState.mapping.value.jyutping) {
+    columnMap.push({ sourceKey: jyutPreviewState.mapping.value.jyutping, header: '粵拼' })
+  }
+  if (jyutPreviewState.mapping.value.char) {
+    columnMap.push({ sourceKey: jyutPreviewState.mapping.value.char, header: '漢字' })
   }
 
-  const selectedFile = pendingPreviewFile.value
-  fileImportFlow.clearPreview()
-  await processFile(selectedFile, {
-    columnMapping,
+  const transformedFile = transformTabularFile({
+    parsedFile: jyutPreviewState.parsedFile.value,
+    columnMap,
+    selectedSheetId: jyutPreviewState.selectedSheetId.value,
     headerRowIndex: jyutPreviewState.headerRowIndex.value,
-    sheetName: activeSheet?.name || null
+    mode: 'rename'
   })
+
+  fileImportFlow.clearPreview()
+  await processFile(transformedFile)
 }
 
 const downloadResult = async () => {
@@ -1371,10 +1377,11 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   font-family: 'Courier New', monospace;
   font-size: 13px;
   transition: all 0.2s ease;
+  color: var(--color-primary-hover);
 
   &:focus {
     outline: none;
-    background: white;
+    background: var(--color-primary-rgb);
     border-color: rgba(var(--color-primary-rgb), 0.5);
     box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.05);
   }

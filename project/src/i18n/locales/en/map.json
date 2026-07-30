@@ -1,89 +1,89 @@
 {
   "tabs": {
     "map": "Map",
-    "divide": "Regions",
-    "custom": "Custom",
+    "divide": "Regional Map",
+    "custom": "Custom Data",
     "draw": "Map Drawing"
   },
   "placeholder": {
-    "selectFeature": "Please select a feature first"
+    "selectFeature": "Select a feature first"
   },
   "messages": {
     "submitSuccess": "Custom data submitted successfully!",
-    "dataRefreshed": "Data refreshed",
-    "dataRefreshFailed": "Failed to refresh data:",
-    "featureLoaded": "Feature loaded: {feature}",
+    "dataRefreshed": "Data reorganized",
+    "dataRefreshFailed": "Failed to reorganize data:",
+    "featureLoaded": "Loaded feature: {feature}",
     "featureLoadFailed": "Failed to load feature:",
     "loadFeatureFailed": "Failed to load feature: {error}"
   },
   "help": {
-    "noFeature": "Please select a feature before adding custom data",
-    "withFeature": "To add custom data, the feature will be: {feature}"
+    "noFeature": "Select a feature before adding custom data",
+    "withFeature": "New custom data will use this feature: {feature}"
   },
   "customDataPanel": {
-    "title": "Submit Custom Data",
+    "title": "Add Custom Data",
     "labels": {
       "location": "Location",
       "region": "Region",
       "coordinates": "Coordinates",
-      "featureType": "Type",
-      "featureField": "Current Feature",
+      "featureType": "Category",
+      "featureField": "Current Query Feature",
       "value": "Value",
-      "description": "Description"
+      "description": "Notes"
     },
     "placeholders": {
-      "location": "Enter a location name...",
-      "region": "Auto-filled after selecting a location...",
-      "coordinates": "Click the map to auto-fill...",
-      "featureType": "e.g. Initial, Final, Tone, Lexicon",
-      "featureField": "e.g. Liu She, First Division, Open...",
+      "location": "Enter a short location name...",
+      "region": "Filled automatically after selecting a location...",
+      "coordinates": "Click the map to fill automatically...",
+      "featureType": "For example: Initial, Final, Tone Value, Vocabulary",
+      "featureField": "For example: 流 rime group, Division I, open...",
       "value": "e.g. p, a, 55...",
-      "description": "Optional: add notes..."
+      "description": "Optional: add a note..."
     },
     "buttons": {
-      "submit": "Submit Data",
+      "submit": "Submit",
       "expand": "+",
       "collapse": "-"
     },
     "helpText": {
-      "region": "Recommended: use the full atlas region or phonetic region, for example \"Hakka-Yuetai-Meihui\".",
+      "region": "Use the full atlas or pronunciation-dictionary region where possible, for example “Hakka–Yuetai–Meihui”.",
       "value": "The value entered here will be shown directly on the map."
     },
     "validation": {
-      "locationRequired": "Please fill in the location",
-      "regionRequired": "Please fill in the region",
-      "coordinatesRequired": "Please fill in the coordinates",
-      "featureTypeRequired": "Please fill in the feature type",
-      "featureFieldRequired": "Please fill in the feature",
-      "valueRequired": "Please fill in the value",
-      "loginRequired": "Login required to submit personal data"
+      "locationRequired": "Enter a short location name",
+      "regionRequired": "Enter a region",
+      "coordinatesRequired": "Enter coordinates",
+      "featureTypeRequired": "Enter an initial/final/tone category or another category",
+      "featureFieldRequired": "Enter a feature",
+      "valueRequired": "Enter a value",
+      "loginRequired": "Log in to submit personal data"
     },
     "messages": {
       "submitSuccess": "Submitted successfully!",
       "submitFailed": "Submission failed: {message}",
       "submitError": "An error occurred during submission: {error}",
-      "regionNotFound": "Matching region not found",
-      "regionRequestFailed": "Region lookup failed",
+      "regionNotFound": "No matching region found",
+      "regionRequestFailed": "Region query failed",
       "locationMatchFailed": "Location matching failed"
     }
   },
   "divideTab": {
     "title": "Regional Mapping",
-    "hint": "Draw dialect distribution maps by yindian or map atlas regional levels.<br>Colors are assigned automatically.",
+    "hint": "Draw dialect-distribution maps by hierarchy using Atlas Regions or MCPDict Regions.<br>Colors are assigned automatically.",
     "labels": {
-      "regionLevel": "Regional Level",
+      "regionLevel": "Region Level",
       "useAllData": "Use All Data",
-      "partitionSource": "Partition Source"
+      "partitionSource": "Region Source"
     },
     "placeholders": {
-      "selectLevel": "Please select a level"
+      "selectLevel": "Select a level"
     },
     "options": {
       "level1": "Level 1 Region",
       "level2": "Level 2 Region",
       "level3": "Level 3 Region",
-      "mapPartition": "Atlas Division",
-      "yindianPartition": "Mcpdict Division"
+      "mapPartition": "Atlas Regions",
+      "yindianPartition": "MCPDict Regions"
     },
     "buttons": {
       "run": "Draw Map",
@@ -96,40 +96,40 @@
       "dataFetchFailed": "Failed to fetch data: {error}",
       "allDataLoading": "Loading all location data...",
       "allDataLoaded": "Loaded {count} location records",
-      "allDataNotLoaded": "All location data has not been loaded yet",
+      "allDataNotLoaded": "The complete location dataset has not been loaded yet",
       "allDataLoadFailed": "Failed to load all location data: {error}",
-      "allDataNoDrawablePoints": "No drawable coordinates found in all data"
+      "allDataNoDrawablePoints": "The complete dataset contains no valid coordinates that can be drawn"
     }
   },
   "customTab": {
-    "title": "User Custom Data Editing & Search",
+    "title": "Edit and Search Custom Data",
     "labels": {
       "featureSearch": "Feature Search",
-      "login": "Login",
+      "login": "Log In",
       "uncategorized": "Uncategorized"
     },
     "placeholders": {
       "featureSearch": "Enter feature keywords..."
     },
     "badges": {
-      "loginRequired": "Login required to manage personal data",
-      "noData": "No personal data yet. Add some entries first.",
-      "dataCount": "You currently have {count} personal entries",
-      "dataAndFeatureCount": "{dataCount} records, {featureCount} features"
+      "loginRequired": "Log in to manage personal data",
+      "noData": "No personal data yet. Add some data first.",
+      "dataCount": "You currently have {count} personal records",
+      "dataAndFeatureCount": "{dataCount} records across {featureCount} comparison features"
     },
     "selected": "Selected feature: {feature}",
     "buttons": {
       "run": "Run Query",
       "running": "Running...",
-      "addSingle": "Add One",
-      "addBatch": "Batch Add",
+      "addSingle": "Add Individually",
+      "addBatch": "Add in Batch",
       "addData": "Add Data",
       "help": "Help"
     },
-    "divider": "Add New Custom Data",
-    "helpTrigger": "Not sure how to add data? Open the guide",
+    "divider": "Add Custom Data",
+    "helpTrigger": "Not sure how to add data? View the guide",
     "helpIcons": {
-      "addSingle": "Go to the map page and click the map to fill coordinates automatically.",
+      "addSingle": "After opening the map page, click directly on the map to fill in the coordinates.",
       "addBatch": "Add multiple rows at once. Supports pasting directly from Excel."
     },
     "validation": {
@@ -140,51 +140,51 @@
       "noMatch": "No matching features found",
       "searchFailed": "Search failed: {error}",
       "loading": "Loading feature data...",
-      "fetchCountFailed": "Failed to fetch personal data count"
+      "fetchCountFailed": "Failed to retrieve the number of personal records"
     },
     "helpModal": {
-      "title": "Guide to Custom Data",
+      "title": "Custom Data Guide (Legacy Version; Some Details May Be Outdated)",
       "sections": {
         "overview": {
-          "title": "Start Here",
+          "title": "Understand This Section First",
           "items": {
             "privateSpace": {
-              "label": "Private space: ",
-              "text": "Your custom data belongs to your account and is only visible after login."
+              "label": "Private data library: ",
+              "text": "These data belong only to your account and can be viewed or edited only after you log in."
             },
             "mapRendering": {
-              "label": "Map rendering: ",
-              "text": "The system groups by \"Feature\" and shows \"Value\" directly on each map point."
+              "label": "Map display: ",
+              "text": "The system groups records by “Feature” and displays “Value” directly at each map location."
             }
           }
         },
         "fieldGuide": {
-          "title": "How to Read the Fields",
+          "title": "Understanding the Fields",
           "items": {
             "feature": {
               "label": "Feature: ",
-              "text": "The searchable category, such as \"Liu She\", \"Hao Rime\", or \"Yesterday\"."
+              "text": "Used for grouping and searching, for example “流 rime group”, “豪 rime”, or “Yesterday”."
             },
             "value": {
               "label": "Value: ",
-              "text": "The text displayed on the map, such as \"iu\", \"tasty\", or \"53\"."
+              "text": "The content actually displayed on the map, for example “iu”, “Tasty”, or “53”."
             },
             "featureType": {
-              "label": "Feature Type: ",
-              "text": "A broad class such as Initial, Final, Tone, or Lexicon."
+              "label": "Initial/Final/Tone or Category: ",
+              "text": "A broad category for the data, such as Initial, Final, Tone Value, or Vocabulary."
             },
             "location": {
-              "label": "Location: ",
-              "text": "The place name shown on the map."
+              "label": "Short Location Name: ",
+              "text": "The location name displayed on the map; use the name you normally use."
             },
             "region": {
               "label": "Region: ",
-              "text": "The dataset scope or collection name, such as \"Yue-Gaoyang\" or \"2025 Fieldwork\"."
+              "text": "The region to which the location belongs; this may be one of your custom regions."
             }
           },
           "examples": {
-            "middleChinese": "Recommended use: supplement locations that are missing from the public atlas or character tables.",
-            "personalCorpus": "If you know a site's reading or lexical form but the website does not include it yet, add it here as your own layer."
+            "middleChinese": "Recommended use: add location data that are not yet included in the public maps or character lists.",
+            "personalCorpus": "When you know the reading or lexical form used at a location that is not yet covered by the site, you can add it here yourself."
           }
         },
         "customCollection": {
@@ -193,41 +193,41 @@
           "items": {
             "region": {
               "label": "Region: ",
-              "text": "Use it as a folder or project name, for example \"2025 Fieldwork\"."
+              "text": "The region to which the location belongs; you may enter one of your own custom regions."
             },
             "featureType": {
-              "label": "Feature Type: ",
-              "text": "Leave it blank, or use a broad class such as \"Lexicon\"."
+              "label": "Initial/Final/Tone or Category: ",
+              "text": "Used for broad classification, such as “Vocabulary” or “2026 Fieldwork”."
             },
             "feature": {
               "label": "Feature: ",
-              "text": "Use it as the search key, such as \"Yesterday\", \"Play\", or \"Zhi · Jing Group · Open\"."
+              "text": "Treat this as the search key, for example “Yesterday”, “Play”, or “止 · 精 initial group · open”."
             },
             "value": {
               "label": "Value: ",
-              "text": "Use it as the map label, such as \"congri\", \"nau\", or \"ei\"."
+              "text": "Treat this as the map label, for example “从日”, “嬲”, or “ei”."
             },
             "manage": {
-              "label": "Manage all my custom data",
-              "text": "Manage, edit, delete, and search all your submitted personal custom entries."
+              "label": "Manage All My Custom Data",
+              "text": "Manage, edit, delete, and search all the personal custom data you have submitted."
             }
           },
           "notes": {
-            "scope": "Enter the dataset name in the region field so later searches stay inside that personal collection.",
+            "scope": "First enter the name of your dataset in the Region field. Later searches can then be limited to that dataset.",
             "search": "The search box matches \"Feature\", not \"Value\".",
             "display": "\"Value\" is shown directly on the map, so it works well for pronunciations, lexical forms, scores, or short notes."
           }
         },
         "dailyUsage": {
-          "title": "It Also Works as a Life Map",
-          "intro": "You can use the same system as a private map for food spots, landmarks, interviews, or other personal notes.",
+          "title": "Useful Beyond Dialect Research",
+          "intro": "The same system can also serve as a private personal map, such as a food map, saved-attractions map, or interview log.",
           "connectors": {
-            "regionToLocation": "Contains multiple locations",
-            "locationToData": "Add labels to each location"
+            "regionToLocation": "Can contain multiple locations",
+            "locationToData": "Then add labels to each location"
           },
           "cards": {
             "region": {
-              "label": "Region",
+              "label": "Initial/Final/Tone or Category",
               "text": "Like a folder or project name",
               "example": "Example: My Food Map"
             },
@@ -247,22 +247,22 @@
               "example": "Example: Tasty / Barbecue"
             }
           },
-          "result": "For example, if the region is \"My Food Map\" and the feature is \"Rating\", searching that feature will show your note at each saved location."
+          "result": "For example, set the category to “My Food Map” and search for the feature “Rating”; the map will display your comments at each restaurant location."
         },
         "steps": {
-          "title": "How to Add Data",
+          "title": "Steps for Adding Data",
           "items": {
             "mode": {
               "label": "1. Choose a mode: ",
-              "text": "\"Add One\" is better for precise coordinates, while \"Batch Add\" is better when you already have many rows in Excel."
+              "text": "“Add Individually” is suitable for selecting precise coordinates, while “Add in Batch” is suitable for pasting multiple records from Excel or another table."
             },
             "coordinates": {
               "label": "2. Get coordinates: ",
-              "text": "In single-entry mode, open the panel and click the target position on the map to fill coordinates automatically."
+              "text": "In individual-entry mode, open the panel and click a position on the map to fill in its latitude and longitude automatically."
             },
             "save": {
               "label": "3. Save: ",
-              "text": "Submit after checking the fields, and the record will be stored in your personal dataset."
+              "text": "After confirming that the fields are correct, submit the record to save it in your private data library."
             }
           }
         }
@@ -276,7 +276,7 @@
       "emptySelection": "There is no data to display for the current selection.",
       "emptyRegions": "No regions are available for this feature.",
       "emptyLocations": "No locations are available for this feature.",
-      "confirm": "Open map",
+      "confirm": "Open Map",
       "regionMeta": "{locations} locations · {records} records",
       "locationMeta": "{records} records · {regions}",
       "summary": {
@@ -284,21 +284,21 @@
         "records": "Records",
         "locations": "Locations",
         "regions": "Regions",
-        "empty": "Not set"
+        "empty": "Not Provided"
       },
-      "confirmSuccess": "Opened the map with the current selection",
+      "confirmSuccess": "Opened the map using the current selection",
       "clearSelection": "Clear selection",
       "selectedCount": "{count} locations selected",
       "regionTitle": "Regions",
       "locationTitle": "Locations",
       "regionStates": {
-        "none": "Not selected",
-        "partial": "Partially selected",
-        "full": "Fully selected"
+        "none": "None Selected",
+        "partial": "Partially Selected",
+        "full": "All Selected"
       },
-      "singleLocationSuccess": "Only one location matched this feature, so the map was opened directly",
-      "recognizeHierarchy": "Recognize hierarchy",
-      "searchPlaceholder": "search for locations or regions"
+      "singleLocationSuccess": "This feature matched only one location, so the map was opened directly",
+      "recognizeHierarchy": "Detect Hierarchy",
+      "searchPlaceholder": "Search locations or regions"
     }
   },
   "mapLibre": {
@@ -306,17 +306,17 @@
       "none": "None"
     },
     "controls": {
-      "personalData": "Personal Data",
+      "personalData": "Personal Custom Data",
       "show": "Show",
       "hide": "Hide",
-      "viewPlaceNames": "View Place Names",
+      "viewPlaceNames": "Show Place Names",
       "enabled": "On",
       "disabled": "Off"
     },
     "buttons": {
       "reset": "Reset",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit",
+      "exitFullscreen": "Exit Fullscreen",
       "delete": "Delete",
       "detail": "Details"
     },
@@ -324,16 +324,16 @@
       "rendering": "Rendering map..."
     },
     "locationPopup": {
-      "title": "{location} - Details",
+      "title": "{location} – Details",
       "loading": "Loading...",
       "noData": "No data available",
       "fields": {
-        "mapRegion2": "Map Atlas Region 2:",
-        "phoneticRegion": "Phonetic Region:",
-        "characterSource": "Character Table Source:",
+        "mapRegion2": "Atlas Level-2 Region:",
+        "phoneticRegion": "MCPDict Region:",
+        "characterSource": "Character-List Source:",
         "coordinates": "Coordinates:",
-        "adminRegion": "Administrative Region:",
-        "toneCategory": "Tone Category",
+        "adminRegion": "Administrative Division:",
+        "toneCategory": "Tone Class",
         "toneValue": "Tone Value"
       }
     },
@@ -341,13 +341,13 @@
       "note": "Note: {note}"
     },
     "confirm": {
-      "deleteMessage": "Location: {location}\nFeature: {feature}  Value: {value}\n\nThis action cannot be undone!",
+      "deleteMessage": "Location: {location}\nFeature: {feature}  Value: {value}\n\nThis action cannot be undone.",
       "title": "Confirm Deletion",
       "confirmText": "Delete",
       "cancelText": "Cancel"
     },
     "messages": {
-      "anonymousNoCustomData": "Anonymous users cannot view personal data.",
+      "anonymousNoCustomData": "Users who are not logged in cannot view personal custom data.",
       "queryLocationFailed": "Query failed: {error}",
       "deleteInvalid": "Delete failed: location, feature, or value is empty.",
       "deleteSuccess": "Deleted successfully!\n{message}",
@@ -356,11 +356,11 @@
     },
     "compare": {
       "status": {
-        "same": "Exactly the same",
-        "diff": "Completely different",
-        "partial": "Partially the same",
-        "maybe": "Possibly mergeable",
-        "highSimilar": "Highly similar",
+        "same": "Identical",
+        "diff": "Completely Different",
+        "partial": "Partial Match",
+        "maybe": "Possible Merger",
+        "highSimilar": "Highly Similar",
         "noData": "No data"
       },
       "fields": {
@@ -369,7 +369,7 @@
         "readingComparison": "Reading Comparison:",
         "similarity": "Similarity:",
         "detail": "Details:",
-        "toneComparison": "Tone Comparison:"
+        "toneComparison": "Tone-Value Comparison:"
       }
     }
   },
@@ -385,19 +385,35 @@
     "buttons": {
       "reset": "Reset",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit"
+      "exitFullscreen": "Exit Fullscreen"
     },
     "popup": {
       "title": "Details",
-      "clusteredCount": "This position combines {count} data points"
+      "clusteredCount": "This location contains a cluster of {count} data points"
     },
     "fields": {
       "location": "Location:",
       "pronunciation": "Pronunciation:",
-      "word": "Word:",
+      "word": "Entry:",
       "note": "Note:",
-      "category": "Category:",
-      "sentence": "Sentence:"
+      "category": "Dialect Region:",
+      "sentence": "Sentence Pattern:"
+    }
+  },
+  "vocabularyMap": {
+    "loading": {
+      "mapData": "Loading vocabulary map data..."
+    },
+    "controls": {
+      "overview": "Overview",
+      "location": "Location",
+      "pronunciation": "Pronunciation",
+      "definition": "Local Word"
+    },
+    "buttons": {
+      "reset": "Reset",
+      "fullscreen": "Fullscreen",
+      "exitFullscreen": "Exit fullscreen"
     }
   },
   "villageMapPopup": {
@@ -412,22 +428,23 @@
     "buttons": {
       "reset": "Reset",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit"
+      "exitFullscreen": "Exit Fullscreen",
+      "voronoi": "Thiessen Polygons"
     }
   },
   "allVillagesMapPopup": {
-    "title": "All Villages Distribution Map",
+    "title": "All Natural Villages Distribution Map",
     "count": "{count} features",
     "toggle": {
-      "name": "Name",
+      "name": "Place Name",
       "level2": "Level 2",
       "level3": "Level 3",
-      "code": "Raw"
+      "code": "Raw Value"
     },
     "buttons": {
       "reset": "Reset",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit"
+      "exitFullscreen": "Exit Fullscreen"
     }
   },
   "legend": {
@@ -435,38 +452,38 @@
     "compareTypes": {
       "chars": "Character Comparison",
       "zhonggu": "Middle Chinese Comparison",
-      "tones": "Tone Category Comparison"
+      "tones": "Tone-Class Comparison"
     }
   },
   "drawTab": {
     "title": "Map Drawing",
     "hint": "Sign in to draw lines and polygons on the map, then export the current layer or an image.",
     "auth": {
-      "loginRequired": "Please sign in before using map drawing",
-      "loginAction": "Login"
+      "loginRequired": "Log in before using the map-drawing tools",
+      "loginAction": "Log In"
     },
     "buttons": {
       "addLayer": "Add Layer",
-      "voronoi": "Voronoi",
+      "voronoi": "Voronoi Polygons",
       "voronoiRunning": "Calculating...",
       "export": "Export",
       "drawingTools": "Drawing Tools",
-      "saveToLocal": "Local Drafts",
+      "saveToLocal": "Local Draft",
       "cancel": "Cancel",
       "saveAsNewLocal": "Save Locally",
       "updateLocal": "Update Local Draft",
-      "restoreLocal": "Restore Local Draft",
+      "restoreLocal": "Restore from Local Storage",
       "deleteLocal": "Delete Local Draft",
       "localStorageModalTitle": "Local Drafts",
       "layers": "Layers",
       "addLayerModalTitle": "Create or Import Layer",
       "exportModalTitle": "Export Data",
-      "createPointLayerDesc": "Create a new point or marker layer",
+      "createPointLayerDesc": "Create a new point or annotation layer",
       "createLineLayerDesc": "Create a new line or path layer",
       "createPolygonLayerDesc": "Create a new polygon or area layer",
-      "importLayerDesc": "Support importing GeoJSON / JSON / KML / KMZ / CSV geographical data files",
+      "importLayerDesc": "Import GeoJSON, JSON, KML, KMZ, or CSV geospatial data",
       "exportCurrentLayerDesc": "Export the currently selected active layer as a GeoJSON file",
-      "exportAllLayersDesc": "Merge and export all drawing layers as a single GeoJSON file",
+      "exportAllLayersDesc": "Merge all drawn layers and export them as a single GeoJSON file",
       "exportImageDesc": "Export a PNG map image using the selected range and options",
       "bringToFront": "Bring to Front",
       "sendToBack": "Send to Back",
@@ -479,7 +496,7 @@
       "drawLine": "Draw Line",
       "drawPolygon": "Draw Polygon",
       "select": "Select",
-      "deleteSelected": "Delete Selected",
+      "deleteSelected": "Delete Selection",
       "deleteLayer": "Delete Layer",
       "moveLayerUp": "Move Layer Up",
       "moveLayerDown": "Move Layer Down",
@@ -494,13 +511,13 @@
       "hideAllLayers": "Hide All Layers",
       "lockLayer": "Lock Layer",
       "unlockLayer": "Unlock Layer",
-      "saveLocalDraftModalTitle": "Save Local Draft"
+      "saveLocalDraftModalTitle": "Save a Local Draft"
     },
     "messages": {
-      "importLayerSuccess": "Layer imported successfully, added {count} layer(s)",
+      "importLayerSuccess": "Layer import succeeded; {count} layer(s) were added",
       "importLayerFailed": "Failed to import layer: {error}",
-      "clearAllConfirm": "Clear all current drawings?",
-      "clearAllSuccess": "All drawings cleared",
+      "clearAllConfirm": "Clear all current drawing content?",
+      "clearAllSuccess": "All drawing content has been cleared",
       "exportLayerSuccess": "Layer exported successfully",
       "exportLayerFailed": "Failed to export layer: {error}",
       "exportImageSuccess": "Image exported successfully",
@@ -508,7 +525,7 @@
       "saveToLocalSuccess": "Saved locally",
       "saveToLocalFailed": "Failed to save locally: {error}",
       "updateLocalSuccess": "Local draft updated",
-      "restoreLocalSuccess": "Local draft restored",
+      "restoreLocalSuccess": "Draft restored from local storage",
       "deleteLocalSuccess": "Local draft deleted",
       "noLayersToSave": "There are no layers to save",
       "voronoiFailed": "Voronoi calculation failed: {error}",
@@ -516,100 +533,115 @@
       "deleteLocalConfirm": "Delete the current local draft?"
     },
     "voronoi": {
-      "panelHint": "Calculate Voronoi polygons from location partition data. You can preview them or export them as a polygon layer.",
+      "panelHint": "Calculate Voronoi polygons from location-region data, then preview them or export them as polygon layers.",
+      "learnMore": "Learn about Voronoi diagrams →",
       "summaryTitle": "Data Summary",
       "settingsTitle": "Calculation Settings",
+      "fieldMergeTitle": "Merge Fields",
+      "fieldMergeOpenButton": "Edit Merge Fields",
+      "fieldMergeReset": "Reset Merges",
+      "expandRatio": "Expand: {ratio}%",
+      "enableExpand": "Enable Circular Extension",
       "dataSourceTitle": "Data Sources",
       "actionsTitle": "Actions",
-      "totalPoints": "All Points",
+      "totalPoints": "Total Points",
       "activePoints": "Included Points",
       "officialPoints": "Official Points",
       "customPoints": "Custom Points",
-      "useOfficialData": "Include official partition data",
-      "ignoredPoints": "Ignored Points",
-      "partitionGroups": "Partition Groups",
+      "useOfficialData": "Also Include Official Region Data",
+      "ignoredPoints": "Excluded Points",
+      "partitionGroups": "Region Groups",
       "loadPoints": "Load Points",
       "loadingPoints": "Loading...",
-      "ignorePointsAction": "Choose Ignored Points",
+      "ignorePointsAction": "Select Points to Exclude",
+      "addDialectPoint": "Add Dialect Point",
+      "addDialectPointExit": "Exit",
+      "addPointSelectPartition": "Point Partition",
+      "addPointAdded": "Added: {name}",
+      "addPointInvalid": "Cannot create dialect point at this location",
+      "customPointsManagement": "Custom Points Management",
+      "deletePartitionPoints": "Delete",
+      "deletedPartitionPoints": "Deleted {count} custom point(s) under {key}",
+      "noCustomPoints": "No custom points yet",
       "previewPoints": "Preview Points",
       "exportToLayer": "Export to Layer",
-      "calculate": "Voronoi",
+      "calculate": "Calculate Voronoi Polygons",
       "pointsLoaded": "Loaded {count} valid point(s)",
-      "ignoreUpdated": "Set {count} ignored point(s)",
+      "ignoreUpdated": "Excluded {count} point(s)",
       "previewReady": "Previewing {count} point(s)",
       "calculated": "Calculated {count} Voronoi polygon(s)",
-      "ignoreModalTitle": "Choose Ignored Points",
-      "ignoreSelectedCount": "{count} point(s) selected to ignore",
+      "ignoreModalTitle": "Select Points to Exclude",
+      "ignoreSelectedCount": "{count} point(s) selected for exclusion",
       "clearSelection": "Clear Selection",
-      "regionTitle": "Select by Partition",
+      "regionTitle": "Select by Region",
       "locationTitle": "Select by Location",
-      "emptyRegions": "No partitions available",
+      "emptyRegions": "No regions available",
       "emptyLocations": "No locations available",
       "regionMeta": "{locations} location(s), {records} record(s)",
-      "locationMeta": "{records} record(s); partitions: {regions}",
+      "locationMeta": "{records} record(s); regions: {regions}",
       "emptySummary": "None",
-      "confirmIgnore": "Confirm Ignored Points",
+      "confirmIgnore": "Confirm Exclusions",
       "searchPlaceholder": "Search regions or locations",
       "exportModalTitle": "Export Voronoi Layers",
-      "exportSelectedCount": "Selected Partitions",
-      "clipToNationalBorder": "Clip to National Border",
+      "exportSelectedCount": "Selected Regions",
+      "clipToNationalBorder": "Clip to National Boundary",
       "clipToNationalBorderConfirmMessage": "This operation may be very slow. Please be patient.",
-      "exportLayerListTitle": "Choose Partition Layers to Export",
-      "exportListEmpty": "No partition Voronoi layers are available for export",
+      "exportLayerListTitle": "Select Region Layers to Export",
+      "exportListEmpty": "No regional Voronoi layers are currently available for export",
       "exportLayerMeta": "{count} point(s)",
       "confirmExport": "Export as Multiple Layers",
-      "exportSelectionRequired": "Select at least one partition layer",
-      "exportSelectionLimit": "You can export up to {count} partition layers at once",
+      "exportSelectionRequired": "Select at least one regional layer",
+      "exportSelectionLimit": "You can export at most {count} regional layers at a time",
       "exportEmptyAfterClip": "No layers remained after clipping",
-      "exportLoadingTitle": "Exporting clipped border layers",
+      "exportLoadingTitle": "Exporting Layers Clipped to the National Boundary",
       "exportLoadingProgress": "Completed {current}/{total}",
       "customImportLoaded": "Imported {count} custom point(s)",
-      "customImportCleared": "Custom point set cleared",
-      "sourceUpdated": "Points currently included in calculation: {count}",
+      "customImportCleared": "Custom points cleared",
+      "sourceUpdated": "Points currently included in the calculation: {count}",
       "customImport": {
         "modalTitle": "Import Custom Voronoi Data",
         "introTitle": "Preview the table and complete column mapping",
-        "introText": "This modal only handles preview, sheet switching, and column mapping. The parent workbench consumes the mapped rows for Voronoi calculation.",
+        "introText": "This panel handles only previewing, worksheet switching, and column mapping. The parent component receives the mapped rows and includes them in the Voronoi calculation.",
         "fileLabel": "Spreadsheet File",
-        "partitionModeLabel": "Partition Column",
+        "partitionModeLabel": "Current Region Column",
         "previewTitle": "Custom Data Preview",
-        "previewDescription": "Make sure the location name, coordinates, and partition column are mapped correctly before using the rows in Voronoi.",
+        "previewDescription": "Confirm that the location names, longitude, latitude, and region column are mapped correctly before adding the data to the Voronoi calculation.",
         "partitionModeOptions": {
-          "map": "Atlas Partition",
-          "yindian": "Mcpdict Partition"
+          "map": "Atlas Regions",
+          "yindian": "MCPDict Regions"
         },
         "actions": {
           "selectFile": "Choose xlsx / xls / csv",
           "replace": "Choose Another File",
           "clear": "Clear Custom Data",
-          "confirm": "Confirm and Use"
+          "confirm": "Confirm and Add"
         },
         "summary": {
           "rows": "Total rows {count}",
           "validRows": "Valid points {count}",
-          "message": "Using {count} custom point(s) from {total} source row(s)"
+          "message": "Added {count} custom point(s) from {total} original row(s)"
         },
         "messages": {
-          "ready": "The current mapping can be used for Voronoi calculation.",
-          "incomplete": "The current file still needs mapping fixes or data cleanup before use.",
+          "ready": "The current mapped data can be added to the Voronoi calculation.",
+          "incomplete": "Complete the column mapping or correct invalid data before continuing.",
           "parseFailed": "Failed to parse spreadsheet: {error}",
           "invalidCoordinates": "Skipped {count} row(s) because the coordinates are invalid.",
-          "missingPartition": "Skipped {count} row(s) because the current partition column is missing.",
-          "duplicateNames": "Detected {count} duplicated point name group(s). V1 keeps them as parallel points.",
-          "noValidRows": "There are no valid Voronoi points in the current file."
+          "missingPartition": "Skipped {count} row(s) because the current region column was missing.",
+          "duplicateNames": "Detected {count} group(s) of duplicate location names. Version 1 retains them as separate colocated points.",
+          "noValidRows": "The current file contains no valid points for the Voronoi calculation."
         }
       },
       "regionStates": {
-        "none": "Not selected",
-        "partial": "Partially selected",
+        "none": "None Selected",
+        "partial": "Partially Selected",
         "full": "Selected"
       }
     },
     "labels": {
-      "featureCount": "{count} shapes currently on the map",
-      "styleHint": "Default point, line, and polygon styles are ready to use and export.",
+      "featureCount": "{count} geometries in total",
+      "styleHint": "Default styles for points, lines, and polygons are already configured; draw and export them directly.",
       "layerList": "Layers",
-      "selectedLayer": "Selected",
+      "selectedLayer": "Current Selection",
       "emptyLayer": "No layer selected",
       "emptyState": "No layers yet. Create a point layer, line layer, polygon layer, or import a layer first",
       "layer": "Layer",
@@ -622,12 +654,13 @@
       "pointColor": "Point Fill Color",
       "pointStrokeColor": "Point Stroke Color",
       "pointRadius": "Point Radius",
-      "visible": "Visible",
-      "locked": "Locked",
+      "visible": "Show Layer",
+      "locked": "Lock Layer",
       "basemap": "Basemap",
+      "viewSettings": "View Settings",
       "localDraftSelection": "Select Local Draft",
       "localDraftName": "Draft Name",
-      "localDraftNamePlaceholder": "Enter draft name"
+      "localDraftNamePlaceholder": "Enter a draft name"
     },
     "geometry": {
       "point": "Point",
@@ -641,18 +674,18 @@
       "confirmAction": "Open Preview",
       "exportAction": "Export Image",
       "previewGuideTitle": "Preview Guide",
-      "previewHint": "Check the preview map for the final range, size, and basemap visibility before exporting.",
-      "previewCustomBboxHint": "Drag directly on the preview map to box-select the export area. The selection updates immediately.",
+      "previewHint": "Check the extent, dimensions, and basemap appearance in the preview before exporting.",
+      "previewCustomBboxHint": "Drag a box directly on the preview map to select the export area. The selected extent is updated immediately.",
       "summary": {
         "layers": "Layers",
-        "features": "Features",
+        "features": "Geometries",
         "activeLayer": "Active Layer",
         "outputSize": "Output Size"
       },
       "sections": {
         "range": "Export Range",
         "size": "Export Size",
-        "zoom": "Export Zoom",
+        "zoom": "Export Zoom Level",
         "content": "Export Content"
       },
       "labels": {
@@ -663,12 +696,12 @@
       },
       "range": {
         "currentView": "Current View",
-        "currentViewDesc": "Export the currently visible map extent",
+        "currentViewDesc": "Export the area currently visible on the map",
         "selectedLayer": "Selected Layer",
         "selectedFeature": "Selected Feature",
-        "selectedFeatureDesc": "No feature is currently selected. The current view will be used.",
-        "customBbox": "Box Selection",
-        "customBboxDesc": "Drag on the map to box-select the export area"
+        "selectedFeatureDesc": "No feature is currently selected; the current view will be used instead",
+        "customBbox": "Draw Export Area",
+        "customBboxDesc": "Drag a box on the map to select the area to export"
       },
       "size": {
         "current": "Current Size",
@@ -677,13 +710,13 @@
         "custom": "Custom"
       },
       "zoom": {
-        "current": "Current Zoom",
-        "custom": "Specify zoom"
+        "current": "Current Level",
+        "custom": "Specify Zoom Level"
       },
       "content": {
         "includeBasemap": "Include basemap",
-        "includeDrawLayers": "Include draw layers",
-        "onlySelectedLayers": "Only selected layers"
+        "includeDrawLayers": "Include Drawn Layers",
+        "onlySelectedLayers": "Export Selected Layers Only"
       }
     }
   }

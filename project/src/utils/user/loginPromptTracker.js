@@ -1,5 +1,5 @@
 import { userStore } from '@/main/store/store.js'
-import { showInfo } from '@/utils/message.js'
+import { showInfo } from '@/utils/ui/message.js'
 
 const STORAGE_KEY = 'login-prompt-session'
 const VISIBLE_THRESHOLD_MS = 5 * 60 * 1000

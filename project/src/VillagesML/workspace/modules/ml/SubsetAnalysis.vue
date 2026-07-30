@@ -26,61 +26,69 @@
           <span class="hint-icon">💡</span>
           <span class="hint-text">添加篩選條件，定義你想要分析的村莊集合</span>
         </div>
-        <div v-for="(filter, idx) in filters" :key="idx" class="filter-row">
-          <SimpleSelectDropdown
-            v-model="filter.field"
-            :options="fieldOptions"
-            @update:modelValue="handleFieldChange(idx)"
-          />
+        <div v-for="(filter, idx) in filters" :key="idx" class="filter-row vml-control-surface vml-control-row">
+          <div class="vml-control-field">
+            <SimpleSelectDropdown
+              v-model="filter.field"
+              :options="fieldOptions"
+              @update:modelValue="handleFieldChange(idx)"
+            />
+          </div>
 
-          <SimpleSelectDropdown
-            v-model="filter.operator"
-            :options="getOperatorsForFilter(filter)"
-          />
+          <div class="vml-control-field">
+            <SimpleSelectDropdown
+              v-model="filter.operator"
+              :options="getOperatorsForFilter(filter)"
+            />
+          </div>
 
           <!-- Region field: use FilterableSelect -->
-          <FilterableSelect
-            v-if="getFieldInputType(filter.field) === 'region'"
-            v-model="filter.value"
-            :level="filter.level || 'city'"
-            :parent="filter.parent"
-            :show-level-selector="true"
-            placeholder="選擇區域"
-            @update:level="(level) => filter.level = level"
-            @update:hierarchy="(hierarchy) => filter.hierarchy = hierarchy"
-          />
+          <div class="vml-control-field">
+            <FilterableSelect
+              v-if="getFieldInputType(filter.field) === 'region'"
+              v-model="filter.value"
+              :level="filter.level || 'city'"
+              :parent="filter.parent"
+              :show-level-selector="true"
+              placeholder="選擇區域"
+              @update:level="(level) => filter.level = level"
+              @update:hierarchy="(hierarchy) => filter.hierarchy = hierarchy"
+            />
 
-          <!-- Select field: use SimpleSelectDropdown (semantic, structure) -->
-          <SimpleSelectDropdown
-            v-else-if="getFieldInputType(filter.field) === 'select'"
-            v-model="filter.value"
-            :options="getFieldOptions(filter.field)"
-            :placeholder="`選擇${FILTER_FIELDS.find(f => f.value === filter.field)?.label}`"
-          />
+            <!-- Select field: use SimpleSelectDropdown (semantic, structure) -->
+            <SimpleSelectDropdown
+              v-else-if="getFieldInputType(filter.field) === 'select'"
+              v-model="filter.value"
+              :options="getFieldOptions(filter.field)"
+              :placeholder="`選擇${FILTER_FIELDS.find(f => f.value === filter.field)?.label}`"
+            />
 
-          <!-- Number field: use number input (length) -->
-          <input
-            v-else-if="getFieldInputType(filter.field) === 'number'"
-            v-model.number="filter.value"
-            type="number"
-            min="2"
-            max="10"
-            placeholder="2-10"
-            class="glass-input"
-          >
+            <!-- Number field: use number input (length) -->
+            <input
+              v-else-if="getFieldInputType(filter.field) === 'number'"
+              v-model.number="filter.value"
+              type="number"
+              min="2"
+              max="10"
+              placeholder="2-10"
+              class="glass-input small"
+            >
 
-          <!-- Text field: use text input (name, suffix, prefix) -->
-          <input
-            v-else
-            v-model="filter.value"
-            type="text"
-            placeholder="值"
-            class="glass-input"
-          >
+            <!-- Text field: use text input (name, suffix, prefix) -->
+            <input
+              v-else
+              v-model="filter.value"
+              type="text"
+              placeholder="值"
+              class="glass-input small"
+            >
+          </div>
 
-          <button @click="removeFilter(idx)" class="solid-button small danger">刪除</button>
+          <div class="vml-control-actions">
+            <button @click="removeFilter(idx)" class="solid-button small danger">刪除</button>
+          </div>
         </div>
-        <div class="filter-actions">
+        <div class="filter-actions vml-control-surface vml-control-actions">
           <button @click="applyFilters" :disabled="filters.length === 0 || loading" class="solid-button primary">
             應用篩選
           </button>
@@ -436,26 +444,26 @@
         <h3>子集聚類</h3>
       </div>
       <div class="clustering-content">
-        <div class="clustering-controls">
-          <div class="control-row">
+        <div class="clustering-controls vml-control-surface vml-control-row">
+          <div class="control-row vml-control-field">
             <label>選擇子集:</label>
             <SimpleSelectDropdown
               v-model="clusteringSubset"
               :options="clusteringSubsetOptions"
             />
           </div>
-          <div class="control-row">
+          <div class="control-row vml-control-field">
             <label>聚類數 K:</label>
             <input v-model.number="clusterK" type="number" min="2" max="20" class="glass-input small">
           </div>
-          <div class="control-row">
+          <div class="control-row vml-control-field">
             <label>演算法:</label>
             <SimpleSelectDropdown :match-trigger-width="true"
               v-model="clusterAlgorithm"
               :options="clusterAlgorithmOptions"
             />
           </div>
-          <div class="control-row feature-selector">
+          <div class="control-row feature-selector vml-control-field">
             <label>聚類特徵:</label>
             <div class="feature-checkboxes">
               <CheckBox
@@ -470,13 +478,15 @@
               </CheckBox>
             </div>
           </div>
-          <button
-            @click="runSubsetClustering"
-            :disabled="!canCluster || loading || clusterFeatures.length === 0"
-            class="solid-button primary"
-          >
-            執行聚類
-          </button>
+          <div class="vml-control-actions">
+            <button
+              @click="runSubsetClustering"
+              :disabled="!canCluster || loading || clusterFeatures.length === 0"
+              class="solid-button primary"
+            >
+              執行聚類
+            </button>
+          </div>
         </div>
 
         <div v-if="clusteringResults" class="clustering-results">
@@ -538,13 +548,14 @@ import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import { clusterSubset, compareSubsets as compareSubsetsAPI, fetchSubsetFilter } from '@/api/index.js'
-import { showError, showSuccess, showWarning } from '@/utils/message.js'
+import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { FILTER_FIELDS, getOperatorOptions, getDefaultOperator, getFieldInputType, getFieldOptions } from '@/VillagesML/config/subsetFilters.js'
 import { getCategoryName, getCategoryIcon } from '@/VillagesML/config/villagesML.js'
+import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 
 // Router
 const router = useRouter()
@@ -678,7 +689,7 @@ const goToAuth = () => {
   router.push({
     path: '/auth',
     query: {
-      redirect: route.fullPath || '/villagesML?module=compute&subtab=subset'
+      redirect: route.fullPath || buildCurrentVillagesMLPath({ module: 'compute', subtab: 'subset' })
     }
   })
 }
@@ -1239,11 +1250,7 @@ const handleApiError = (error) => {
 
 /* Filter Row */
 .filter-row {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
-  align-items: center;
-  flex-wrap: wrap;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -1275,25 +1282,9 @@ const handleApiError = (error) => {
 }
 
 /* Input Styles */
-.glass-input {
-  width: 100%;
-  padding: 10px 16px;
-  background: var(--glass-50);
-  border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.glass-input:focus {
-  outline: none;
-  border-color: var(--vml-blue);
-  background: var(--glass-80);
-  box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
-}
-
 .glass-input.small {
   max-width: 120px;
+  border-radius: var(--radius-md);
 }
 
 .solid-button.danger {
@@ -1308,10 +1299,7 @@ const handleApiError = (error) => {
 
 /* Filter Actions */
 .filter-actions {
-  display: flex;
-  gap: 12px;
   margin-top: 20px;
-  flex-wrap: wrap;
 }
 
 .subset-info {
@@ -1507,21 +1495,13 @@ const handleApiError = (error) => {
 
 /* Clustering Controls */
 .clustering-controls {
-  display: flex;
-  gap: 16px;
-  // align-items: flex-start;
   margin-bottom: 24px;
-  flex-wrap: wrap;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
 }
 
 .control-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  // width: 100%;
   max-width: 100%;
 }
 
@@ -1710,13 +1690,6 @@ const handleApiError = (error) => {
     padding: 16px;
   }
 
-  .filter-row {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-    gap: 8px;
-  }
-
   .filter-row > * {
     min-width: 0 !important;
     width: 100%;
@@ -1734,18 +1707,8 @@ const handleApiError = (error) => {
     margin: 16px 0;
   }
 
-  .clustering-controls {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-    padding: 0;
-  }
-
   .control-row {
-    flex-direction: column;
-    align-items: flex-start;
     width: 100%;
-    gap: 8px;
   }
 
   .control-row label {

@@ -1,79 +1,80 @@
 {
   "hero": {
     "title": "Dialect Comparison · Geolinguistics",
-    "subtitle": "✨ Explore the Historical Layers of Dialects · 🎵 Touch the Phonological Beauty of Chinese Characters",
+    "subtitle": "✨ Explore the Historical Layers of Dialects · 🎵 Discover the Phonological Beauty of Chinese Characters",
     "startExploring": "Start Exploring",
-    "expandTools": "Extended Tools",
-    "featuresIntro": "Features Overview",
-    "logoAlt": "Dialects Atlas",
-    "decorationAlt": "Blue circle"
+    "expandTools": "More Tools",
+    "featuresIntro": "Feature Overview",
+    "logoAlt": "Dialect Pronunciation Atlas",
+    "decorationAlt": "Blue ring"
   },
   "features": {
     "sectionTitle": "Core Features",
     "query": {
       "title": "Query & Analysis",
-      "desc": "Multi-dimensional dialect phonology queries",
-      "searchChar": "Character Search - Query pronunciation and position",
-      "searchMiddle": "Middle Chinese Search - Organize readings by Middle Chinese position",
-      "searchPhoneme": "Phoneme Search - Analyze Middle Chinese origins of phonemes",
-      "searchTone": "Tone Search - Query tone values and categories"
+      "desc": "Explore dialect phonology from multiple perspectives",
+      "searchChar": "Characters - View character readings and Middle Chinese categories",
+      "searchMiddle": "Middle Chinese - Organize readings by Middle Chinese categories",
+      "searchPhoneme": "Readings - Trace dialect readings back to their Middle Chinese categories",
+      "searchTone": "Tones - View tone values and tone classes"
     },
     "compare": {
       "title": "Dialect Comparison",
       "desc": "Compare phonological features across dialects",
-      "compareChar": "Compare Characters - Compare differences in initials, finals, and tones across locations",
-        "compareMiddle": "Compare Middle Chinese - Compare locations by phonological categories",
-        "compareTone": "Compare Tone Categories - Compare tone systems across locations",
-        "comparePhonetic": "Compare Phonetic Values - Visualize phonetic differences across locations with a Sankey diagram"
-      },
+      "compareChar": "Characters - Compare initials, finals, and tones across locations",
+      "compareMiddle": "Middle Chinese - Compare locations by phonological category",
+      "compareTone": "Tone Classes - Compare tone systems across locations",
+      "comparePhonetic": "Readings - Visualize phonetic-value differences across locations with Sankey diagrams"
+    },
     "map": {
       "title": "Map Visualization",
-      "desc": "Geolinguistic perspective presentation",
-      "dialectMap": "Dialect Map - Display query results on map",
-      "regionMap": "Dialect Zoning Map - Draw by Atlas or Mcpdict Division",
-      "customMap": "Custom Data - Add personal data for mapping",
-      "drawMap": "Drawing Tool - GIS Online Mapping & Voronoi Polygons"
+      "desc": "Visualize dialect data from a geolinguistic perspective",
+      "dialectMap": "Map View - Display query results on a map",
+      "regionMap": "Dialect Regions - Draw maps using atlas- or pronunciation-dictionary-based divisions",
+      "customMap": "Custom Data - Add your own data to create maps",
+      "drawMap": "Map Drawing - Online GIS drawing and Voronoi polygons"
     },
     "phonology": {
       "title": "Phonological Analysis",
-      "desc": "Dialect phonological structure research",
-      "phonologyQuery": "Phonology Query - View dialect phonology tables",
-      "phonemeClassify": "Phoneme Classification - Custom phoneme classification",
-      "syllableCount": "Syllable Statistics - Count syllable quantities",
-      "evolution": "Evolution - Pie chart Sankey chart shows dialect evolution",
-      "middlePosition": "Middle Chinese Position - Query Middle Chinese position of characters"
+      "desc": "Analyze dialect sound systems",
+      "phonologyQuery": "Phonological Systems - View dialect phonology charts",
+      "phonemeClassify": "Phoneme Classification - Analyze phonemes using custom categories",
+      "syllableCount": "Syllable Statistics - Count syllables",
+      "middlePosition": "Middle Chinese Categories - View the Middle Chinese categories of Chinese characters",
+      "evolution": "Evolution - Visualize dialect change with pie charts and Sankey diagrams"
     },
     "words": {
-      "title": "Lexical Data",
-      "desc": "Dialect vocabulary and grammar data",
-      "yubaoVocab": "Yubao Vocabulary - Language Protection Project vocabulary data",
-      "yubaoGrammar": "Yubao Grammar - Language Protection Project sentence data",
-      "ycSpoken": "Yangchun Colloquial - Yangchun dialect colloquial vocabulary"
+      "title": "Lexical & Grammatical Data",
+      "desc": "Dialect vocabulary and grammar resources",
+      "yubaoVocab": "Language Preservation Vocabulary - Vocabulary data from the Chinese Language Resources Protection Project",
+      "yubaoGrammar": "Language Preservation Grammar - Sentence data from the Chinese Language Resources Protection Project",
+      "wordList": "Vocabulary List - Dialect vocabulary list page",
+      "ycSpoken": "Yangchun Colloquial Vocabulary - Colloquial words from the Yangchun dialect"
     },
     "villages": {
-      "title": "Village Data",
-      "desc": "Village place name analysis and dialect mapping",
-      "gdVillages": "Guangdong Villages - Guangdong village tree diagram",
-      "villagesML": "Machine Learning - Village name machine learning",
-      "gdVillagesTable": "Guangdong Village Table - Detailed Guangdong village table",
-      "ycVillages": "Yangchun Villages - Yangchun village data",
-      "allVillages": "All Villages - All villages data (admin only)"
+      "title": "Natural Village Data",
+      "desc": "Village-name analysis and dialect mapping",
+      "gdVillages": "Guangdong Natural Villages - Browse the Guangdong natural-village hierarchy",
+      "villagesML": "Machine Learning - Analyze natural-village names with machine learning",
+      "gdVillagesTable": "Guangdong Village Table - Detailed village data for Guangdong",
+      "ycVillages": "Yangchun Natural Villages - Natural-village data for Yangchun",
+      "allVillages": "All Natural Villages - Complete natural-village data (administrators only)"
     },
     "tools": {
-      "title": "Character Table Tools",
-      "desc": "Character table conversion, merging, checking tools",
-      "tableProcess": "Table Processing - Table checking and format conversion",
-      "jyut2ipa": "Jyutping to IPA - Convert Jyutping to International Phonetic Alphabet",
-      "tableMerge": "Table Merging - Merge multiple character tables",
-      "tableDerive": "Character Table Inference - Generate a full character table from rule presets"
+      "title": "Character List Tools",
+      "desc": "Convert, merge, validate, and process character lists",
+      "tableProcess": "Character List Processing - Validate character lists and convert formats",
+      "jyut2ipa": "Jyutping to IPA - Convert Jyutping to the International Phonetic Alphabet",
+      "tableMerge": "Merge Character Lists - Combine multiple character lists",
+      "tableDerive": "Character List Derivation - Generate a complete character list from phonological rules"
     },
     "charClass": {
-      "title": "Character Positions",
-      "desc": "Historical phonology positions for Chinese characters",
-      "zhonggu": "Middle Chinese - Guangyun and Middle Chinese phonology positions",
-      "shanggu": "Old Chinese - Shijing rhymes and Old Chinese phonology",
-      "jingu": "Late Middle Chinese - Late Middle Chinese phonological positions",
-      "yueyun": "Cantonese Rhyme Books - FenYun Cuoyao and traditional Cantonese rhyme position data"
+      "title": "Historical Phonological Categories",
+      "desc": "Phonological categories of Chinese characters across historical periods",
+      "zhonggu": "Middle Chinese - Categories from Guangyun and other Middle Chinese systems",
+      "shanggu": "Old Chinese - Categories based on Shijing rhymes, phonetic series, and related evidence",
+      "jingu": "Early Modern Chinese - Categories from Hongwu Zhengyun, Zhongyuan Yinyun, and other early modern sources",
+      "yueyun": "Cantonese Rime Books - Data from Fenyun Cuoyao and other Cantonese rime books"
     },
     "praat": {
       "title": "Praat Acoustic Analysis",
@@ -81,151 +82,151 @@
     },
     "dialectClustering": {
       "title": "Dialect Clustering",
-      "desc": "Placeholder page for dialect clustering workflows"
+      "desc": "Placeholder page for the dialect-clustering workflow"
     },
     "about": {
-      "title": "About Website",
-      "desc": "Website introduction and data sources",
-      "intro": "Introduction - Website features overview",
-      "reflection": "Reflections - Development insights and acknowledgments",
-      "suggestion": "Suggestions - Feedback and suggestions",
-      "likeAuthor": "Support Author - Support and follow",
-      "source": "Data Sources - View character table sources and related information",
-      "setting": "Settings - Language and phonological data preferences"
+      "title": "About This Site",
+      "desc": "Site introduction and data sources",
+      "intro": "Introduction - Overview of the site's features",
+      "reflection": "Reflections - Development reflections and acknowledgments",
+      "suggestion": "Feedback - Share comments and suggestions",
+      "likeAuthor": "Support the Author - Follow and support the project",
+      "source": "Data Sources - View character-list sources and related information",
+      "setting": "Settings - Choose the language and phonological resources"
     }
   },
   "roadmap": {
     "sectionTitle": "Features in Development",
-    "sectionSubtitle": "Upcoming new features",
-    "charsGeneration": {
-      "title": "Character Table Inference Tool",
-      "desc": "A character table inference tool based on phonological categories. Generate a complete character table from a small set of characters, with multiple rhyme books available."
-    },
+    "sectionSubtitle": "Upcoming Features",
     "phoneticsToolbox": {
       "title": "Shaozi's Phonetics Toolbox",
-      "desc": "Batch acoustic parameter estimation, multi-algorithm pitch detection, EGG signal analysis, glottal parameter extraction"
+      "desc": "Batch acoustic-parameter estimation, multi-algorithm pitch detection, EGG signal analysis, and glottal-parameter extraction"
+    },
+    "charsGeneration": {
+      "title": "Character List Derivation Tool",
+      "desc": "Derive a complete character list from a small seed list using phonological categories, with multiple rime books available"
     },
     "dialectClustering": {
       "title": "Dialect Clustering",
-      "desc": "Custom phonetic value and phoneme weights, adjust clustering algorithm parameters, multi-dimensional similarity calculation based on phoneme vectors"
+      "desc": "Customize weights for phonetic values and phonemes, adjust clustering parameters, and calculate multidimensional similarity from phoneme vectors"
     },
     "evolutionTree": {
       "title": "Dialect Evolution Tree",
-      "desc": "Custom evolution model parameters, adjust branch length algorithms, interactive phylogenetic tree construction and visualization"
+      "desc": "Customize evolutionary-model parameters, adjust branch-length algorithms, and interactively build and visualize phylogenetic trees"
     },
     "ipaTTS": {
-      "title": "IPA to Speech Synthesis",
-      "desc": "Real-time conversion from International Phonetic Alphabet to speech, multi-dialect voice support（long-term plan）"
+      "title": "IPA-to-Speech Synthesis",
+      "desc": "Real-time conversion from the International Phonetic Alphabet to speech, with support for multiple dialect voices (long-term plan)"
     },
     "dialectBot": {
       "title": "Dialect Chatbot",
-      "desc": "LLM fine-tuning based on standardized character tables, voice cloning, dialect voice interaction (long-term plan)"
+      "desc": "Fine-tune LLMs on standardized character-list datasets, clone voices, and enable spoken dialect interaction (long-term plan)"
     }
   },
   "login": {
-    "title": "Login to Unlock More Features",
-    "desc": "View detailed permission comparison and understand full benefits after login",
+    "title": "Log In to Unlock More Features",
+    "desc": "View a detailed comparison of permissions and all benefits available after signing in",
     "benefits": {
-      "customMap": "Custom map drawing",
-      "customRegion": "Custom dialect regions",
-      "moreLocations": "Increased query location limit",
-      "praatTools": "Praat acoustic tools",
-      "tableTools": "Character table processing tools",
+      "customMap": "Create custom maps",
+      "customRegion": "Define custom dialect regions",
+      "moreLocations": "Higher location limits for queries",
+      "praatTools": "Praat acoustic-analysis tools",
+      "tableTools": "Character-list processing tools",
       "queryHistory": "Query history and leaderboard"
     },
-    "loginNow": "Login Now",
+    "loginNow": "Log In Now",
     "viewDetails": "View Details"
   },
   "intro": {
     "thanks": {
-      "aboutTitle": "ℹ️ About Website",
-      "aboutDesc": "\"Dialects Atlas\" is an online tool focused on Middle Chinese position analysis, dialect comparison, and geolinguistics, dedicated to presenting the phonological layers and phonemic distributions of various dialect points in a clear and interactive manner.",
-      "feature1": "Feature 1: <strong>Middle Chinese Search</strong> (organize readings by Middle Chinese position). Users can input various combinations for analysis, currently supporting categories such as rhyme group, rhyme, grade, division, tone, series, group, initial, voicing, place of articulation, manner of articulation, etc. The website will analyze initials/finals/tones based on the input combinations and present the results in tables and maps.",
-      "feature2": "Feature 2: <strong>Phoneme Search</strong> (analyze Middle Chinese origins of phonemes). Users can input the above categories, and the website will analyze the Middle Chinese origins of the input phonetic values (phonemes) and present the results in tables and maps.",
-      "feature3": "Feature 3: <strong>Tone Search</strong> (query tone values and categories). The website will organize tone values and categories based on the user's selected region and location, with different tone categories marked in different colors.",
-      "feature4": "Feature 4: <strong>Character Search</strong> (query character pronunciation and position). Query based on user-input Chinese characters, ultimately presenting the phonetic values, annotations, and Middle Chinese positions of characters at various locations.",
-      "feature5": "Feature 5: <strong>Regional Mapping</strong> (draw dialect maps by atlas regions/mcpdict regions).",
-      "feature6": "Feature 6: <strong>Custom Mapping</strong> (users add personal data for mapping). Users can select points and annotate on the map themselves, and the website will automatically assign colors based on feature values.",
-      "feature7": "<strong>Blue text</strong> in tables (positions, phonetic values, etc.) are generally clickable. After clicking, a detailed query will be performed in a new popup, making it easy to compare and analyze with the original results.",
-      "feature8": "Points on the map can also be clicked to query detailed information.",
-      "welcomeText": "Welcome to explore \"Dialects Atlas\" and touch the historical layers of dialects together!",
+      "aboutTitle": "ℹ️ About This Site",
+      "aboutDesc": "\"Dialect Pronunciation Atlas\" is an online tool for analyzing Middle Chinese categories, comparing dialects, and exploring geolinguistic patterns. It presents the historical layering of initials and finals and the merger and split patterns of phonemes across dialect locations in a clear, interactive form.",
+      "feature1": "Feature 1: <strong>Middle Chinese</strong> (organize readings by Middle Chinese categories). Users can combine categories such as rhyme group, rime, division, openness, tone, initial class, initial group, initial, voicing, place of articulation, and manner of articulation. The site analyzes initials, finals, and tones from the selected combination and presents the results in tables and maps.",
+      "feature2": "Feature 2: <strong>Readings</strong> (trace dialect readings back to their Middle Chinese sources). Users enter dialect readings, and the site identifies the Middle Chinese categories represented by the matching characters, with results shown in tables and maps.",
+      "feature3": "Feature 3: <strong>Tones</strong> (view tone values and tone classes). The site organizes tone values and tone classes for the selected regions and locations, with different tone classes shown in different colors.",
+      "feature4": "Feature 4: <strong>Characters</strong> (view readings and Middle Chinese categories). Enter Chinese characters to view their phonetic values, annotations, and Middle Chinese categories across locations.",
+      "feature5": "Feature 5: <strong>Regional Mapping</strong> (draw dialect maps using atlas classifications or pronunciation-dictionary regions).",
+      "feature6": "Feature 6: <strong>Custom Mapping</strong> (add your own data to create maps). Users can select and annotate points on the map, and the site automatically assigns colors based on feature values.",
+      "feature7": "<strong>Blue text</strong> in tables, such as phonological categories and phonetic values, is generally clickable. Clicking it opens a detailed query in a new pop-up, making it easy to compare the new results with the original ones.",
+      "feature8": "Points on the map are also clickable and open detailed information.",
+      "welcomeText": "Welcome to \"Dialect Pronunciation Atlas\"—explore the historical layers of dialects with us!",
       "devTitle": "🧑‍💻 Development Reflections",
-      "devPara1": "Initially, I just wanted to create a handy tool for my own research, but unknowingly, I explored a vast universe. From the first line of code to the first feature, from naive ideas to a gradually enriched system, day and night alternating at the keyboard, my vision gradually took root from nothingness. Watching this website is like watching my own child learning to walk, step by step forming its own outline. Every button, every interaction, is imprinted with a period of time. I was exhausted trying to implement the desired query logic, and I was also delighted when the visual effects were successfully presented—these bits and pieces have become her blood and flesh, soul and spirit.",
-      "devPara2": "In fact, this is also a journey of self-transformation. From knowing nothing about front-end development, to exploring DOM, trying virtual scrolling, advancing to using frameworks, and even appreciating the subtleties of JWT and ORM. I learned while building, matured through mistakes. The most fascinating part is that the bricks I used to build all this are the knowledge I longed to learn: building the website deepened my understanding of phonology, and studying phonology drove the iteration of code. Technology is no longer cold commands to me, but a vessel carrying culture; culture is no longer distant literature to me, gradually becoming an interactive, traceable, and touchable entity.",
-      "devPara3": "This is my answer written with code and passion, a sincere gift from an ordinary student to the field of dialects. Thank you to everyone who encounters it. I hope this still immature creation can stir a ripple of curiosity in your heart, or save you a moment of time searching through materials—this is the meaning of her existence.",
-      "devPara4": "May the dialects from all directions live on forever;<br>May the beauty of Chinese characters be cherished forever;<br>May the flame of civilization endure in every interaction and resonance.",
+      "devPara1": "At first, I only wanted to build a tool that suited my own research. Before I knew it, I had begun exploring a vast starry sky. From the first line of code to the first working feature, from a tentative idea to a steadily growing system, days and nights passed at the keyboard as the vision gradually took root. Watching the site grow felt like watching my own child learn to walk, slowly taking on a shape of its own. Every button and every interaction carries the imprint of a moment in time. I was exhausted by the challenge of implementing the query logic I imagined, yet overjoyed whenever a visual idea finally came to life. All these fragments became the project's flesh and blood, its spirit and soul.",
+      "devPara2": "It was also a journey of personal transformation. I went from knowing nothing about front-end development to exploring the DOM, experimenting with virtual scrolling, learning frameworks, and eventually appreciating the elegance of JWT and ORM. I learned by building and matured through mistakes. Most fascinating of all, the very bricks with which I built the site were the knowledge I longed to acquire: developing the site deepened my understanding of phonology, while studying phonology drove each new iteration of the code. Technology was no longer a set of cold instructions, but a vessel for carrying culture; culture was no longer confined to distant texts, but gradually became something interactive, traceable, and tangible.",
+      "devPara3": "This is the answer I wrote with code and passion: the most sincere gift an ordinary student could offer to the field of dialect studies. Thank you to everyone who encounters it. I hope this still-imperfect creation can stir a small ripple of curiosity in your heart, or save you a little time spent searching through sources. That alone would give its existence meaning.",
+      "devPara4": "May the voices of every region live on;<br>May the beauty of Chinese characters always be cherished;<br>May the flame of civilization endure through every interaction and every moment of resonance.",
       "thanksTitle": "Special Thanks",
       "mcpdict": "MCPDict",
-      "mcpdictDesc": "Most of the data on this website comes from",
-      "mcpdictData": "MCPDict open source data",
+      "mcpdictDesc": "Most of the data on this site comes from",
+      "mcpdictData": "MCPDict's open-source data",
       "jyutjam": "Jyutjam",
-      "jyutjamDesc": "Provided a communication platform and",
+      "jyutjamDesc": "Provided a platform for discussion and access to",
       "jyutdict": "Jyutdict",
-      "yubao": "Language Protection",
-      "yubaoDesc": "Screened some data",
+      "yubao": "Chinese Language Resources Protection Project",
+      "yubaoDesc": "Selected data were drawn from this source",
       "xiaoxue": "Xiaoxue",
-      "xiaoxueDesc": "Screened some data",
-      "yueminke": "Yue-Min-Hakka Dialect System",
-      "yueminkeDesc": "Screened some data",
+      "xiaoxueDesc": "Selected data were drawn from this source",
+      "yueminke": "Yue–Min–Hakka Dialect System",
+      "yueminkeDesc": "Selected data were drawn from this source",
       "testers": "Testers",
-      "testersDesc": "Netizens who tested and provided suggestions before the official launch!",
+      "testersDesc": "Users who tested the site and shared suggestions before its official launch!",
       "friends": "Friends ❤️",
-      "friendsDesc": "All friends who supported, encouraged, and helped me during the project development!",
+      "friendsDesc": "Every friend who supported, encouraged, or helped me during the development of this project!",
       "you": "You ❤️",
-      "youDesc": "And of course, you who are reading this!"
+      "youDesc": "And, of course, you for reading this far!"
     },
     "suggestions": {
-      "title": "I Have Suggestions",
-      "desc": "Found a bug? Have suggestions? Got ideas?<br />Welcome to submit via GitHub Issue or leave a comment on Zhihu!",
-      "subtext": "👇 Click the cards below to jump to the corresponding platform",
-      "frontendCard": "🐞 Website has bugs❓<br />💡 Have suggestions for interaction or UI❓",
-      "frontendLink": "Submit Issue to frontend repository",
-      "buildCard": "🔤 Questions about character tables❓<br />🎯 Errors in initial/final/tone extraction❓",
-      "buildLink": "Submit Issue to character table processing repository"
+      "title": "Share Feedback",
+      "desc": "Found a bug? Have a suggestion or an idea?<br />You are welcome to open a GitHub issue or leave a comment on Zhihu!",
+      "subtext": "👇 Select a card below to open the corresponding platform",
+      "frontendCard": "🐞 Found a bug on the site?<br />💡 Have suggestions about the UI or interactions?",
+      "frontendLink": "Open an issue in the frontend repository",
+      "buildCard": "🔤 Questions about a character list?<br />🎯 Problems with initial, final, or tone extraction?",
+      "buildLink": "Open an issue in the character-list processing repository"
     },
     "likeAuthor": {
-      "title": "❤️ Support Author",
+      "title": "❤️ Support the Author",
       "follow": "Follow",
-      "starText": "\"If you think the project is good, can you give it a ⭐️!\"",
-      "zhihuLike": "\"If you like it, feel free to give it a like on Zhihu too 👍\"",
-      "frontendRepo":"FrontendRepo - Vue 3 + JS + SCSS",
-      "backendRepo": "BackendRepo - FastAPI + Python + SQLAlchemy",
-      "buildRepo": "Data pipeline - Character table preprocessing",
-      "zhihuProjectName": "方音圖鑑",
-      "zhihuProjectRepo": "Project - 方音圖鑑",
-      "zhihuColumnName": "知乎專欄",
-      "zhihuColumnRepo": "Column - Dialect-related",
-      "villagesMLRepo": "Village Machine Learning - Village name and geographic data analysis",
-      "supportText": "\"If the website is helpful to you, you can buy the author a coffee☕️. Your support will be the motivation for the author to continue maintaining🙏\"",
+      "starText": "\"If you like the project, would you consider giving it a ⭐️?\"",
+      "zhihuLike": "\"You are also welcome to give it a like on Zhihu 👍\"",
+      "frontendRepo": "Frontend Repository - Built with Vue 3, JavaScript, and SCSS",
+      "backendRepo": "Backend Repository - Built with FastAPI, Python, and SQLAlchemy",
+      "buildRepo": "Character-List Preprocessing Repository - Extracts initials, finals, and tones",
+      "zhihuProjectName": "方音图鉴",
+      "zhihuProjectRepo": "Project - 方音图鉴",
+      "zhihuColumnName": "Zhihu Column",
+      "zhihuColumnRepo": "Column - Dialect Studies",
+      "villagesMLRepo": "Natural-Village Machine Learning - Village-name and geographic-data analysis",
+      "supportText": "\"If this site has been helpful, you can buy the author a coffee ☕️. Your support helps keep the project maintained and moving forward 🙏\"",
       "supportButton": "Support",
-      "supportNote": "\"Note: This site is developed and operated by an undergraduate student. From character table processing, backend API to frontend interface, all completed by one person; the expenses for servers and domain names are also saved from living expenses💸\"",
-      "modalTitle": "☕️ Buy Author a Coffee",
+      "supportNote": "\"Note: This site is developed and operated by an undergraduate student. Character-list processing, the backend API, and the frontend interface were all completed by one person, while server and domain expenses are paid out of the developer's living allowance 💸\"",
+      "modalTitle": "☕️ Buy the Author a Coffee",
       "modalSubtitle": "Thank you for your support! 💖",
       "weixinAlt": "WeChat payment QR code",
       "alipayAlt": "Alipay payment QR code"
     }
   },
   "projects": {
-    "sectionTitle": "Open Source Projects",
-    "sectionSubtitle": "Star, fork, and contribute to the project"
+    "sectionTitle": "Open-Source Projects",
+    "sectionSubtitle": "Stars, forks, and code contributions are welcome"
   },
   "contact": {
     "title": "Contact the Author",
-    "desc": "Follow on Zhihu for more dialect research and GIS content",
-    "button": "Open Zhihu"
+    "desc": "Follow the author on Zhihu for more content on dialect research and GIS",
+    "button": "Visit Zhihu"
   },
   "footer": {
     "links": {
-      "about": "About Website",
-      "source": "Sources",
+      "about": "About This Site",
+      "source": "Data Sources",
       "privacy": "Privacy Policy",
       "setting": "Settings",
       "oldSite": "Legacy Site",
-      "support": "Support Author"
+      "support": "Support the Author"
     },
-    "stats": "Today Visits {today} · Total Visits {total}",
-    "dataStats": "📚 {locationCount} dialect points · 🗃️ {dataCount} rows of data",
-    "copyright": "© 2026 方音圖鑑 · Developed by jengzang",
+    "stats": "Visits today: {today} · Total visits: {total}",
+    "dataStats": "📚 {locationCount} dialect locations · 🗃️ {dataCount} data records",
+    "copyright": "© 2026 方音图鉴 · Developed by 不羁 (jengzang)",
     "versionInfo": "{version} · Last updated: {date}",
     "icp": "粤ICP备2025466875号"
   },
@@ -234,22 +235,22 @@
     "items": {
       "homepage": {
         "title": "New Homepage",
-        "description": "A refreshed liquid-glass homepage that highlights core features, open-source projects, and login benefits with clearer navigation."
+        "description": "A new liquid-glass design highlights core features, open-source projects, and login benefits while providing clearer navigation."
       },
       "compare": {
         "title": "Dialect Comparison",
-        "description": "Character, Middle Chinese, and tone-class comparison now share a clearer map legend and more direct visual contrast between two groups."
+        "description": "Supports character, Middle Chinese, and tone-class comparisons. Maps use differently colored points to show differences between two groups, with a legend for reference."
       },
       "villages": {
-        "title": "Village ML Analysis",
-        "description": "Added machine-learning analysis for village dialect data to help surface hidden distribution patterns."
+        "title": "Natural-Village Machine Learning",
+        "description": "Adds machine-learning analysis of village dialect data to help researchers identify potential patterns in dialect distribution."
       }
     }
   },
   "supportModal": {
-    "title": "?? Buy the Author a Coffee",
-    "subtitle": "Thank you for your support! ??",
-    "donorThanks": "Thank you for buying the author a coffee. Every contribution becomes part of the motivation to keep this site maintained.",
+    "title": "☕️ Buy the Author a Coffee",
+    "subtitle": "Thank you for your support! 💖",
+    "donorThanks": "Thank you for buying the author a coffee. Every contribution helps keep this site maintained.",
     "donorColumns": {
       "time": "Time",
       "donor": "Donor",

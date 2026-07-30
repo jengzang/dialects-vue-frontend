@@ -1,7 +1,7 @@
 // api/villagesML/semanticComposition.js
 // 語義組合分析相關 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 獲取語義三元組合
@@ -16,7 +16,7 @@ export async function getSemanticTrigrams(params = {}) {
   if (params.limit) queryParams.append('limit', params.limit)
   if (params.detail) queryParams.append('detail', 'true')
 
-  return api(`/api/villages/semantic/composition/trigrams?${queryParams.toString()}`)
+  return villagesMLApi(`/semantic/composition/trigrams?${queryParams.toString()}`)
 }
 
 /**
@@ -32,7 +32,7 @@ export async function getSemanticPMI(params = {}) {
   if (params.limit) queryParams.append('limit', params.limit)
   if (params.detail) queryParams.append('detail', 'true')
 
-  return api(`/api/villages/semantic/composition/pmi?${queryParams.toString()}`)
+  return villagesMLApi(`/semantic/composition/pmi?${queryParams.toString()}`)
 }
 
 /**
@@ -78,8 +78,8 @@ export async function getSemanticIndices(params = {}) {
 
   const queryString = queryParams.toString()
   const url = queryString
-    ? `/api/villages/semantic/indices?${queryString}`
-    : '/api/villages/semantic/indices'
+    ? `/semantic/indices?${queryString}`
+    : '/semantic/indices'
 
-  return api(url)
+  return villagesMLApi(url)
 }

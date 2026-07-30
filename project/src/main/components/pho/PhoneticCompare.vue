@@ -116,7 +116,7 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
-import { resolveHoverDetailCardPosition } from '@/main/utils/hoverDetailCardPosition.js'
+import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js'
 import { getFeatureStats } from '@/api/index.js'
 import { setRunning } from '@/main/store/store.js'
 
@@ -550,14 +550,14 @@ const renderSankey = async (queryLocs) => {
         opacity: 0.25
       },
       label: {
-        color: 'var(--text-dark)',
+        color: '#333',
         fontSize: 12,
         fontWeight: 'bold',
         formatter: ({ data }) => data.rawLabel
       },
       itemStyle: {
         borderWidth: 1,
-        borderColor: 'var(--glass-80)'
+        borderColor: 'rgba(255,255,255,0.8)'
       },
       levels: [
         { depth: 0, itemStyle: { color: '#4f7cff' } },

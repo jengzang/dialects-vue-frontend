@@ -77,12 +77,12 @@ export function validateEmail(email) {
 }
 
 /**
- * Username validation (3-50 characters)
+ * Username validation (1-50 characters)
  */
 export function validateUsername(username) {
   if (!username || typeof username !== 'string') return false
   const trimmed = username.trim()
-  return trimmed.length >= 3 && trimmed.length <= 50
+  return trimmed.length >= 1 && trimmed.length <= 50
 }
 
 /**

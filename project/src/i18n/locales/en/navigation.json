@@ -6,7 +6,8 @@
     "pho": "Phonology",
     "charClass": "Characters",
     "dialectClustering": "Clustering",
-    "words": "Words",
+    "map": "Map",
+    "words": "Phrases",
     "villages": "Villages",
     "tools": "Tools",
     "source": "Sources",
@@ -17,18 +18,24 @@
     "query": {
       "tab1": "Characters",
       "tab2": "Middle Chinese",
-      "tab3": "Phonemes",
+      "tab3": "Readings",
       "tab4": "Tones"
     },
     "compare": {
-      "tab1": "Character",
+      "tab1": "Characters",
       "tab2": "Middle Chinese",
-      "tab4": "Tone Category",
-      "tab5": "Pronunciation"
+      "tab4": "Tone Classes",
+      "tab5": "Readings"
+    },
+    "map": {
+      "view": "Main Map",
+      "divide": "Regional Coloring",
+      "custom": "Custom Data",
+      "draw": "Draw Map"
     },
     "pho": {
-      "phonologyMatrix": "Phonology",
-      "phonologyCustom": "Phoneme Class",
+      "phonologyMatrix": "Phonological Systems",
+      "phonologyCustom": "Phoneme Classes",
       "Countphos": "Syllable Statistics",
       "evolution": "Evolution"
     },
@@ -36,38 +43,39 @@
       "zhonggu": "Middle Chinese",
       "shanggu": "Old Chinese",
       "jingu": "Early Modern Chinese",
-      "yueyun": "Cantonese Rhyme Books"
+      "yueyun": "Cantonese Rime Books"
     },
     "words": {
-      "vocabulary": "YuBao Vocabulary",
-      "grammar": "YuBao Grammar",
-      "ycSpoken": "Yangchun Colloquial Words"
+      "vocabulary": "Language Preservation Vocabulary",
+      "grammar": "Language Preservation Grammar",
+      "wordList": "Vocabulary List",
+      "ycSpoken": "Yangchun Colloquial Vocabulary"
     },
     "villages": {
       "gdVillages": "Guangdong Villages",
       "VillagesML": "Machine Learning",
-      "gdVillagesTable": "Guangdong Villages Table",
+      "gdVillagesTable": "Guangdong Village Table",
       "ycVillages": "Yangchun Villages",
       "allVillages": "All Villages"
     },
     "tools": {
-      "check": "Character Table Tool",
+      "check": "Character List Tools",
       "jyut2ipa": "Jyutping to IPA",
-      "merge": "Character Table Merge",
-      "derive": "Character Table Inference",
+      "merge": "Merge Character Lists",
+      "derive": "Character List Derivation",
       "praat": "Acoustic Analysis",
       "praatname": "Praat"
     },
     "source": {
-      "source": "Data Sources",
+      "source": "Character List Sources",
       "privacy": "Privacy Policy",
-      "suggestion": "Suggestions",
-      "like": "Support Author"
+      "suggestion": "Send Feedback",
+      "like": "Support the Author"
     },
     "about": {
       "intro": "Introduction",
-      "suggestion": "Suggestions",
-      "like": "Support Author",
+      "suggestion": "Send Feedback",
+      "like": "Support the Author",
       "setting": "Settings"
     }
   },
@@ -85,7 +93,7 @@
     "praat": "Praat",
     "phrases": "Phrases",
     "villages": "Villages",
-    "aboutWebsite": "About Website",
+    "aboutWebsite": "About",
     "settings": "Settings"
   },
   "placeholders": {
@@ -94,52 +102,53 @@
   "settings": {
     "language": {
       "title": "Language Settings",
-      "description": "Choose your preferred interface language"
+      "description": "Choose your preferred interface language."
     },
     "colorTheme": {
       "title": "Color Theme",
-      "description": "Choose the overall palette for page backgrounds, glass panels, and text.",
+      "description": "Choose the overall color scheme for page backgrounds, glass panels, and text.",
       "label": "Current Theme",
       "options": {
         "blue": "Blue",
         "light": "Light",
-        "dark": "Dark"
+        "dark": "Dark",
+        "green": "Green"
       }
     },
     "interfaceMode": {
-      "title": "Interface Mode",
-      "description": "Choose between the standard and compact interface styles. Compact mode disables animations, shadows, blur, and similar visual effects for better performance on low-end devices.",
+      "title": "Interface Style",
+      "description": "Choose between the standard and simplified interface styles. Simplified mode disables animations, shadows, blur, and other visual effects to improve performance on less powerful devices.",
       "label": "Current Mode",
       "options": {
         "default": "Standard",
-        "compact": "Compact"
+        "compact": "Simplified"
       },
       "help": {
         "default": "Keeps the current animations and visual effects.",
-        "compact": "Disables animations, shadows, blur, and similar visual effects for smoother performance on low-end devices."
+        "compact": "Disables animations, shadows, blur, and other visual effects for smoother performance on less powerful devices."
       }
     },
     "characterTable": {
-      "title": "Character Table",
-      "description": "Choose the default table for new queries"
+      "title": "Character Set",
+      "description": "Choose the default rime book for new queries."
     }
   },
   "stats": {
     "today": "Today",
     "totalVisits": "Total Visits",
-    "historyTitle": "Visit Statistics History",
+    "historyTitle": "Visit History",
     "loading": "Loading...",
-    "todayVisits": "Today's Visits",
-    "historyRecords": "History Records"
+    "todayVisits": "Visits Today",
+    "historyRecords": "Historical Records"
   },
-  "login": "Login",
+  "login": "Log In",
   "actions": {
-    "openMenu": "Open menu",
-    "backHome": "Back to home"
+    "openMenu": "Open Menu",
+    "backHome": "Back to Home"
   },
   "introTabs": {
-    "like": "Support",
-    "suggestions": "Suggestions",
-    "thanks": "Thanks"
+    "like": "Support the Author",
+    "suggestions": "Send Feedback",
+    "thanks": "Acknowledgements"
   }
 }

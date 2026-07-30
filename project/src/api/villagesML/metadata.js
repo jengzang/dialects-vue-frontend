@@ -1,7 +1,7 @@
 // api/villagesML/metadata.js
 // 系統元數據相關 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 獲取數據庫概覽統計
@@ -17,7 +17,7 @@ import { api } from '../auth/httpClient.js'
  * }
  */
 export async function getMetadataOverview() {
-  return api('/api/villages/metadata/stats/overview')
+  return villagesMLApi('/metadata/stats/overview')
 }
 
 /**
@@ -30,7 +30,7 @@ export async function getMetadataOverview() {
  * }, ...]
  */
 export async function getMetadataTables() {
-  return api('/api/villages/metadata/stats/tables')
+  return villagesMLApi('/metadata/stats/tables')
 }
 
 /**
@@ -50,7 +50,7 @@ export async function getMetadataTables() {
  * }
  */
 export async function getNgramStatistics() {
-  return api('/api/villages/statistics/ngrams')
+  return villagesMLApi('/statistics/ngrams')
 }
 
 /**
@@ -58,5 +58,5 @@ export async function getNgramStatistics() {
  * @returns {Promise<Object>}
  */
 export async function getDatabaseStatistics() {
-  return api('/api/villages/statistics/database')
+  return villagesMLApi('/statistics/database')
 }

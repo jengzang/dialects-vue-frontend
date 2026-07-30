@@ -39,8 +39,8 @@ $mobile-aspect-ratio: 1;
 
 $solid-variants: (
   'blue': (
-    background: var(--color-primary),
-    hover: var(--color-primary-hover)
+    background: #007aff,
+    hover: #0051d5
   ),
   'green': (
     background: #28a745,
@@ -62,7 +62,7 @@ $gradient-variants: (
     hover: linear-gradient(135deg, #5568d3, #5f3d8a)
   ),
   'teal': (
-    background: linear-gradient(135deg, var(--color-cyan), #4a9fd8),
+    background: linear-gradient(135deg, #5ac8fa, #4a9fd8),
     hover: linear-gradient(135deg, #4ab8e8, #3a8fc6)
   )
 );
@@ -91,7 +91,7 @@ $gradient-variants: (
 
   @media (max-aspect-ratio: $mobile-aspect-ratio) {
     padding: 12px 20px;
-    font-size: 18px;
+    font-size: 15px;
   }
 }
 

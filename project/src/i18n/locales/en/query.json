@@ -2,40 +2,40 @@
   "title": "Query",
   "tab1": {
     "title": "Characters",
-    "label": "Please enter Chinese characters",
+    "label": "Enter Chinese characters",
     "placeholder": "Enter one or more characters",
-    "maxCharsWarning": "You can enter up to {max} characters. Extra characters were trimmed automatically.",
+    "maxCharsWarning": "You can enter up to {max} characters. Extra characters have been removed automatically.",
     "button": "Query",
-    "description": "Query pronunciation, position and notes of characters"
+    "description": "View character readings, Middle Chinese categories, and annotations"
   },
   "tab2": {
     "title": "Middle Chinese",
-    "placeholder": "Please enter Middle Chinese pronunciation",
+    "placeholder": "Enter Middle Chinese categories",
     "button": "Query",
-    "description": "Middle Chinese → Pronunciation • Organize by Middle Chinese position",
-    "noExclude": "No Exclusion",
+    "description": "Middle Chinese → Readings · Organize readings by Middle Chinese categories",
+    "noExclude": "No Exclusions",
     "selectAll": "Select All",
     "cards": {
       "initial": "Final",
       "rime": "Rime Group"
     },
     "excludeOptions": {
-      "allMulti": "All Multi-positions",
-      "excludeMultiGrade": "Exclude Multi-grade",
-      "excludeMultiRime": "Exclude Multi-rime",
-      "excludeMultiInitial": "Exclude Multi-initial",
-      "excludeMultiTone": "Exclude Multi-tone"
+      "allMulti": "All Multiple-Category Entries",
+      "excludeMultiGrade": "Exclude Multiple Divisions",
+      "excludeMultiRime": "Exclude Multiple Rimes",
+      "excludeMultiInitial": "Exclude Multiple Initials",
+      "excludeMultiTone": "Exclude Multiple Tones"
     }
   },
   "tab3": {
-    "title": "Phonemes",
-    "placeholder": "Please enter phoneme",
+    "title": "Readings",
+    "placeholder": "Enter readings",
     "button": "Query",
-    "description": "Pronunciation → Middle Chinese • Analyze phoneme origins",
-    "noExclude": "No Exclusion",
+    "description": "Readings → Middle Chinese · Trace readings back to their Middle Chinese sources",
+    "noExclude": "No Exclusions",
     "selectAll": "Select All",
-    "analysisText": "Analyze the Middle Chinese origins of <strong>{card}</strong> syllables, i.e., which Middle Chinese [<strong>{keys}</strong>] the current <strong>{card}</strong> characters come from",
-    "inputPlaceholder": "Enter/Select [{key}]",
+    "analysisText": "Trace characters sharing the selected <strong>{card}</strong> to their <strong>{keys}</strong> categories.",
+    "inputPlaceholder": "Enter/select [{key}]",
     "cards": {
       "initial": "Initial",
       "final": "Final",
@@ -45,9 +45,9 @@
   },
   "tab4": {
     "title": "Tones",
-    "placeholder": "Please enter tone",
+    "placeholder": "Enter a tone",
     "button": "Query",
-    "description": "Query tone categories and values of each location"
+    "description": "View tone classes and tone values across locations"
   },
   "button": {
     "running": "Running...",
@@ -57,109 +57,109 @@
   "components": {
     "locationInput": {
       "label": "Location",
-      "selectButton": "Select",
-      "selectButtonTitle": "Select location from partition",
-      "placeholder": "Enter location (matchable)"
+      "selectButton": "Select Location",
+      "selectButtonTitle": "Select a location from a region",
+      "placeholder": "Enter a location (automatic matching supported)"
     },
     "locationMultiInput": {
-      "label": "Location",
-      "selectButton": "Select",
-      "selectButtonTitle": "Select location from partition",
+      "label": "Locations",
+      "selectButton": "Select Locations",
+      "selectButtonTitle": "Select locations from a region",
       "locationCount": "{count} locations",
       "expandButton": "Expand",
-      "placeholder": "Enter locations (space-separated, auto-match supported)",
+      "placeholder": "Enter locations separated by spaces (automatic matching supported)",
       "modalTitle": "Matched Locations ({count})",
-      "warningMaxLocations": "Matched {total} locations, automatically truncated to first {max}",
-      "errorFetchSuggestions": "Failed to fetch suggestions",
-      "errorFetchLocations": "Failed to fetch matched locations",
-      "errorFetchPartitions": "Failed to fetch partition data",
-      "errorPartitionMessage": "Failed to fetch partition data, please try again later"
+      "warningMaxLocations": "{total} locations matched; only the first {max} have been kept",
+      "errorFetchSuggestions": "Failed to retrieve suggestions",
+      "errorFetchLocations": "Failed to retrieve matching locations",
+      "errorFetchPartitions": "Failed to retrieve region data",
+      "errorPartitionMessage": "Failed to retrieve region data. Please try again later."
     },
     "regionSelector": {
-      "placeholder": "Select partition",
-      "selectedTitle": "Selected Partitions",
+      "placeholder": "Select regions",
+      "selectedTitle": "Selected Regions",
       "selectedCount": "({count})",
       "clearButton": "Clear",
       "confirmButton": "Confirm",
-      "emptyState": "No partition selected",
+      "emptyState": "No regions selected",
       "customRegionButton": {
-        "notLoggedIn": "Login to use custom partitions",
-        "noRegions": "Create custom partition",
-        "hasRegions": "Use custom partition"
+        "notLoggedIn": "Log in to create custom regions",
+        "noRegions": "Create a Custom Region",
+        "hasRegions": "Use a Custom Region"
       },
       "customRegionModal": {
-        "title": "My Custom Partitions",
+        "title": "My Custom Regions",
         "loading": "Loading...",
-        "empty": "You haven't created any custom partitions yet",
-        "createButton": "Create Now",
-        "manageButton": "Manage Partitions",
+        "empty": "You have not created any custom regions yet",
+        "createButton": "Create One",
+        "manageButton": "Manage My Regions",
         "locationCount": "{count} locations"
       },
       "tabs": {
-        "map": "Atlas Division",
-        "yindian": "Mcpdict Division"
+        "map": "Atlas Regions",
+        "yindian": "MCPDict Regions"
       },
-      "myCustomRegions": "My Custom Partitions",
-      "customRegionSelectPlaceholder": "Select custom partitions",
+      "myCustomRegions": "My Custom Regions",
+      "customRegionSelectPlaceholder": "Select a custom region",
       "expandChildren": "Expand",
       "messages": {
-        "loadCustomRegionsFailed": "Failed to load custom partitions: {message}",
-        "loginRequired": "Please log in to use custom partitions",
-        "noCustomRegionsConfirm": "You have not created any custom partitions yet. Go create one now?",
-        "loadRegionDetailsFailed": "Failed to load details",
-        "selectedCustomRegion": "Selected custom partition: {name}",
-        "selectRegionFailed": "Failed to select partition: {message}"
+        "loadCustomRegionsFailed": "Failed to load custom regions: {message}",
+        "loginRequired": "Please log in to use custom regions",
+        "noCustomRegionsConfirm": "You have not created any custom regions yet. Would you like to create one?",
+        "loadRegionDetailsFailed": "Failed to retrieve region details",
+        "selectedCustomRegion": "Selected custom region: {name}",
+        "selectRegionFailed": "Failed to select region: {message}"
       }
     },
     "yinweiSelector": {
-      "label": "Syllable to Query",
-      "helpTrigger": "Don't know what syllable to input❓",
-      "placeholder": "Please enter syllable to query, e.g. \"a\"",
+      "label": "Target Syllables",
+      "helpTrigger": "Not sure which syllables to enter❓",
+      "placeholder": "Enter syllables to query, for example: a",
       "modalTitle": "Syllable Query Assistant",
-      "emptyState": "Please select location or partition first! After selection, you can view syllables contained in the location.",
+      "emptyState": "Select a location or region first. You can then view the syllables available at the selected locations.",
       "queryButton": "Query",
       "queryingButton": "Querying...",
       "initial": "Initial",
       "final": "Final",
       "tone": "Tone",
-      "errorFetch": "Feature count fetch error",
+      "errorFetch": "Failed to retrieve feature counts",
       "queryFailed": "Query failed",
-      "inputLimitHint": "You can enter at most {max} valid syllables. Please stop adding more."
+      "inputLimitHint": "You can enter no more than {max} valid syllables."
     },
     "zhongguSelector": {
-      "possibleCombinations": "May generate {count} combinations",
-      "actualMatches": ", actually matched {count} groups",
-      "outputFormat": ", will organize output by selected combination {format}",
+      "possibleCombinations": "May produce {count} combinations",
+      "actualMatches": ", with {count} actual matches",
+      "outputFormat": ", organized by the selected combination: {format}",
       "detailsButton": "⤢ Details",
       "querying": "Querying data...",
       "noMatches": "No matching characters",
-      "pleaseSelect": "Please select conditions above to search",
+      "pleaseSelect": "Select the criteria above to search",
       "detailsTitle": "Search Details",
-      "charCount": "{count} chars",
-      "tooManyCombinations": "Too many combinations ({count}>{limit}), please narrow search scope",
-      "queryFailed": "Data query failed, please try again later",
-      "tooManyResultsAnonymous": "Too many results ({count}>{limit}), login to query more combinations",
-      "tooManyResults": "Too many results ({count}>{limit}), please reduce combinations"
+      "charCount": "{count} characters",
+      "tooManyCombinations": "Too many combinations ({count}>{limit}). Please narrow the search.",
+      "queryFailed": "Data query failed. Please try again later.",
+      "tooManyResultsAnonymous": "Too many results ({count}>{limit}). Log in to query more combinations.",
+      "tooManyResults": "Too many results ({count}>{limit}). Please reduce the number of combinations."
     },
     "partitionModal": {
-      "title": "Details",
+      "title": "Region Details",
       "selectionToggle": "Enable Selection",
       "enableSelection": "Enable Selection",
-      "selectAll": "All",
-      "clearSelection": "Clear Selection",
+      "selectAll": "Select All",
+      "clearSelection": "Clear",
       "confirmButton": "Confirm ({count})",
       "confirmSelection": "Confirm Selection ({count})",
-      "maxSelectionExceeded": "Selected {count}, limit {max}",
-      "mapPartition": "Atlas Division",
-      "dictPartition": "Mcpdict Division",
-      "administrativeDivision": "Administrative Division",
+      "maxSelectionExceeded": "{count} selected; maximum {max}",
+      "mapPartition": "Atlas Regions",
+      "dictPartition": "MCPDict Regions",
+      "administrativeDivision": "Administrative Hierarchy",
       "emptyNode": "(Empty)",
-      "unknownDialect": "Unknown Dialect",
+      "unknownDialect": "Unknown Dialect Location",
       "loading": "Loading...",
       "tabs": {
-        "map": "Atlas Division",
-        "yindian": "Mcpdict Division",
-        "administrativeDivision": "Administrative Division"
+        "map": "Atlas Regions",
+        "yindian": "MCPDict Regions",
+        "administrativeDivision": "Administrative Hierarchy"
       }
     },
     "floatingDice": {
@@ -168,26 +168,26 @@
       "helpButton": "Instructions",
       "modalTitle": "Query Instructions",
       "examples": {
-        "title": "Some Examples",
-        "example1": "\"泥\" uses Ni initial for analysis.",
-        "example2": "\"豪\" uses Hao rime for analysis.",
-        "example3": "\"蟹 + (Select All) Grade\" uses Xie rime group grades 1, 2, 3, 4 for analysis (\"-\" means match all, Middle Chinese category required after \"-\")",
-        "example4": "\"次浊 + (Select All) Tone\" uses voiced aspirated initials + level, rising, departing, entering tones for analysis.",
-        "example5": "\"宕 江\" uses merged Dang and Jiang rime groups for analysis (space means analyze together, Enter means treat as different features)",
-        "example6": "\"庄組\" uses Zhuang group for analysis (if only \"庄\" is entered, Zhuang initial will be used).",
-        "example7": "\"流開一\" uses Liu rime group open mouth grade 1 characters for analysis.",
-        "example8": "\"假 + 知組 章組\" uses Jia rime group's Zhi and Zhang groups for analysis.",
+        "title": "Examples",
+        "example1": "\"泥\" is analyzed as the 泥 initial.",
+        "example2": "\"豪\" is analyzed as the 豪 rime.",
+        "example3": "\"蟹 + (Select All) Division\" analyzes divisions I, II, III, and IV of the 蟹 rime group (\"-\" means match all; a Middle Chinese category name must follow it).",
+        "example4": "\"次浊 + (Select All) Tone\" analyzes secondary-voiced initials with all four tones.",
+        "example5": "\"宕 江\" analyzes the characters belonging to the 宕 and 江 rime groups together (a space combines them; pressing Enter treats them as separate features).",
+        "example6": "\"庄组\" is analyzed as the 庄 initial group (entering only \"庄\" uses the 庄 initial).",
+        "example7": "\"流开一\" analyzes open Division I characters in the 流 rime group.",
+        "example8": "\"假 + 知组 章组\" analyzes characters in the 知 and 章 initial groups within the 假 rime group.",
         "example9": "\"塞擦\" extracts affricates for analysis.",
-        "example10": "\"(Select All) Place\" analyzes all articulation places, including \"labiodental, glottal, retroflex, palatal, velar, bilabial, dental\"."
+        "example10": "\"(Select All) Place\" analyzes all places of articulation, including labiodental, glottal, retroflex, palatal, velar, bilabial, and dental."
       },
-      "tableTitle": "Supported inputs (Simplified Chinese also accepted)",
+      "tableTitle": "Supported Inputs (Simplified Chinese is also accepted)",
       "tableHeaders": {
         "category": "Category",
-        "values": "Corresponding Values"
+        "values": "Values"
       },
       "inputRows": {
         "she": {
-          "category": "She",
+          "category": "Rime Group",
           "values": "通、宕、江、止、遇、蟹、流、山、效、咸、深、臻、曾、梗、果、假"
         },
         "yun": {
@@ -195,15 +195,15 @@
           "values": "之、仙、佳、侯、侵、元、先、冬、凡、刪、咍、咸、唐、嚴、夬、宵、寒、尤、山、幽、庚、廢、微、支、文、東、模、欣、歌、江、泰、添、灰、痕、登、皆、真、祭、耕、肴、脂、臻、蒸、蕭、虞、覃、談、豪、銜、鍾、陽、青、魂、魚、鹽、麻、齊、清"
         },
         "hu": {
-          "category": "Opening",
+          "category": "Openness",
           "values": "合、開"
         },
         "deng": {
           "category": "Division",
-          "values": "一、二、三、三A、三B、三C、三銳、四 (enter \"三\" to include all third-division syllables; specify \"ABC銳\" to distinguish chongniu, for example \"三A\")"
+          "values": "一、二、三、三A、三B、三C、三銳、四 (enter \"三\" to include all third-division syllables; specify \"A/B/C/銳\" when distinguishing chongniu, for example \"三A\")"
         },
         "ru": {
-          "category": "Entering",
+          "category": "Checkedness",
           "values": "舒、入"
         },
         "diao": {
@@ -211,11 +211,11 @@
           "values": "平、上、去、入"
         },
         "buwei": {
-          "category": "Place",
+          "category": "Place of Articulation",
           "values": "雙唇、齒、唇齒、喉、捲舌、腭、軟腭"
         },
         "fangshi": {
-          "category": "Manner",
+          "category": "Manner of Articulation",
           "values": "塞、塞擦、擦、近、鼻"
         },
         "qingzhuo": {
@@ -223,11 +223,11 @@
           "values": "全清、全濁、次清、次濁"
         },
         "xi": {
-          "category": "Xi",
+          "category": "Initial Series",
           "values": "幫、知、端、見"
         },
         "zu": {
-          "category": "Zu",
+          "category": "Initial Group",
           "values": "幫、非、端、泥、精、莊、知、章、見、曉、影、日"
         },
         "mu": {
@@ -236,86 +236,86 @@
         }
       },
       "notes": {
-        "note1": "Click the button to query!",
-        "note2": "In the analysis results, blue text like this is clickable.",
-        "note3": "Click to select features in a popup, then generate a new window for detailed query.",
-        "note4": "Such windows can be generated infinitely (if your browser can handle it), allowing simultaneous comparison of multiple locations/features.",
-        "note5": "✔ Note 1: Mobile interface may not display fully, please scroll/drag more.",
-        "note6": "✔ Note 2: Click the Partition ▼ button to open partition popup, users can click to select desired partition. To display next level partition:",
-        "note7": "※ Desktop: just move cursor to the corresponding partition;",
-        "note8": "※ Mobile: need to click arrow ⌵ for corresponding partition",
-        "note9": "Click 🎲 to randomly generate analysis examples"
+        "note1": "Click the button to run the query!",
+        "note2": "Blue text in the analysis results is clickable.",
+        "note3": "Click it to select features in a pop-up and open another window for a more detailed query.",
+        "note4": "You can open as many such windows as your browser can handle, making it possible to compare multiple locations or features at once.",
+        "note5": "✔ Note 1: Some content may be off-screen on mobile devices. Scroll or drag to view it.",
+        "note6": "✔ Note 2: Click the Region ▼ button to open the region selector. To view lower-level regions:",
+        "note7": "※ On desktop, hover over the corresponding region;",
+        "note8": "※ On mobile, tap the arrow ⌵ next to the corresponding region.",
+        "note9": "Click 🎲 to generate a random example."
       }
     },
     "locationAndRegionInput": {
       "locationLabel": "Location",
-      "selectLocationButton": "Select",
-      "selectLocationTitle": "Select location from partition",
-      "locationPlaceholder": "Enter location (auto-match supported)",
+      "selectLocationButton": "Select Location",
+      "selectLocationTitle": "Select a location from a region",
+      "locationPlaceholder": "Enter a location (automatic matching supported)",
       "mapTab": "Atlas",
-      "yindianTab": "Mcpdict",
-      "viewPartitionDetails": "View details",
-      "selectMapPartition": "Please select atlas division",
-      "selectYindianPartition": "Please select Mcpdict division",
-      "partitionLabel": "Division",
-      "partitionPlaceholder": "Enter division names, space-separated (e.g.: Cantonese)",
+      "yindianTab": "MCPDict",
+      "viewPartitionDetails": "View Region Details",
+      "selectMapPartition": "Select an atlas region",
+      "selectYindianPartition": "Select an MCPDict region",
+      "partitionLabel": "Region",
+      "partitionPlaceholder": "Enter region names separated by spaces (for example: Cantonese)",
       "selectedCount": "You have selected {count} locations",
       "selectedCountPre": "You have selected",
       "selectedCountPost": "locations",
       "mapSource": "Atlas",
-      "yindianSource": "Mcpdict",
+      "yindianSource": "MCPDict",
       "expandButton": "Expand",
       "customLocationsLabel": "Custom locations:",
       "selectedLocationsModalTitle": "Selected Locations ({count})",
       "customLocationsModalTitle": "Custom Locations ({count})",
-      "requireInput": "Please enter a location or division",
-      "tooManyLocations": "Too many explicit locations were provided. Reduce manual locations or custom-region locations and try again."
+      "requireInput": "Enter a location or region",
+      "tooManyLocations": "Too many explicitly selected locations. Reduce the manually entered locations or the number of locations in custom regions."
     },
     "zhongguDirectInput": {
-      "positionLabel": "Middle Chinese Position Input",
-      "positionPlaceholder": "Spaces = independent, joined = combined, dash = match all. E.g.: 泥母 流開一 蟹-等",
+      "positionLabel": "Middle Chinese Category Input",
+      "positionPlaceholder": "Separate independent category expressions with spaces; concatenate values to combine criteria; use a hyphen to match every value in a category. Example: 泥母 流開一 蟹-等",
       "charLabel": "Direct Character Input",
-      "charPlaceholder": "Enter Chinese characters, e.g.: 你好",
+      "charPlaceholder": "Enter Chinese characters, for example: 你好",
       "helpButton": "?",
-      "possibleCombinations": "{count} possible combinations",
-      "actualMatches": ", {count} actual matches",
-      "outputFormat": ", output format: {format}",
+      "possibleCombinations": "May produce {count} combinations",
+      "actualMatches": ", with {count} actual matches",
+      "outputFormat": ", organized by: {format}",
       "detailsButton": "⤢ Details",
       "querying": "Querying data...",
       "noMatches": "No matching characters",
-      "pleaseSelect": "Enter Middle Chinese positions to search",
+      "pleaseSelect": "Enter Middle Chinese categories to search",
       "detailsTitle": "Search Details",
-      "charCount": "{count} chars",
-      "tooManyCombinations": "Too many combinations ({count} > {limit}), please narrow the search",
-      "queryFailed": "Data query failed, please try again later",
-      "duplicateValueError": "\"{value}\" exists in multiple categories ({categories}), please add a category suffix",
-      "unknownValueError": "\"{value}\" is not a valid Middle Chinese position value",
-      "unknownCategoryError": "\"{category}\" is not a valid category name",
-      "tooManyTokens": "Too many position tokens ({count} > {limit}), please reduce input",
+      "charCount": "{count} characters",
+      "tooManyCombinations": "Too many combinations ({count}>{limit}). Please narrow the search.",
+      "queryFailed": "Data query failed. Please try again later.",
+      "duplicateValueError": "\"{value}\" occurs in multiple categories ({categories}). Add a category suffix.",
+      "unknownValueError": "\"{value}\" is not a valid Middle Chinese category value.",
+      "unknownCategoryError": "\"{category}\" is not a valid category name.",
+      "tooManyTokens": "Too many category expressions ({count}>{limit}). Please shorten the input.",
       "help": {
         "title": "Direct Input Guide",
         "rules": {
-          "rule1": "Separate position tokens with spaces. Each token represents one query combination.",
-          "rule2": "Values that appear in only one category (e.g., \"泥\" only in \"母\") do not need a suffix.",
-          "rule3": "Values appearing in multiple categories (e.g., \"山\" in both \"攝\" and \"韻\") MUST have a category suffix (e.g., \"山攝\" or \"山韻\").",
-          "rule4": "The \"-\" prefix means \"all values from this category\" (e.g., \"-等\" matches all grade values; \"蟹-等\" matches 蟹攝 with all grades).",
-          "rule5": "Freely combine multiple query tokens (e.g., \"蟹-等 知組\" queries 蟹攝 with all grades AND 知組).",
-          "rule6": "Compounds like \"流開一\" are parsed character by character."
+          "rule1": "Separate multiple category expressions with spaces. Each expression represents one query combination.",
+          "rule2": "A value that occurs in only one category, such as \"泥\" in \"母\", does not require a suffix.",
+          "rule3": "A value that occurs in more than one category, such as \"山\" in both \"攝\" and \"韻\", must include a category suffix, for example \"山攝\" or \"山韻\".",
+          "rule4": "A \"-\" prefix before a category name matches every value in that category. For example, \"-等\" matches every division, while \"蟹-等\" matches every division of the 蟹 rime group.",
+          "rule5": "Multiple criteria can be combined freely. For example, \"蟹-等 知組\" queries every division of the 蟹 rime group together with the 知 initial group.",
+          "rule6": "Compound expressions such as \"流開一\" are parsed into their component criteria."
         },
-        "examplesNote": "The following examples are based on the Middle Chinese (Guangyun) character table",
+        "examplesNote": "The following examples use the Middle Chinese (Guangyun) character list",
         "examples": {
           "title": "Examples",
-          "example1": "\"泥\" → Analyze with 泥母",
-          "example2": "\"蟹-等\" → Analyze with 蟹攝 divisions I, II, III, IV",
-          "example3": "\"次濁-調\" → Analyze with 次濁 initial + all tones",
-          "example4": "\"庄組\" → Analyze with 庄組 (entering just \"庄\" defaults to 庄母)",
-          "example5": "\"流開一\" → Analyze with 流攝開口一等",
-          "example6": "\"塞擦\" → Extract 塞擦音 for analysis",
-          "example7": "\"-部位\" → Analyze all places of articulation",
-          "example8": "\"山攝 知組\" → Analyze with 山攝 + 知組"
+          "example1": "\"泥\" → Use the 泥 initial",
+          "example2": "\"蟹-等\" → Use divisions I, II, III, and IV of the 蟹 rime group",
+          "example3": "\"次濁-調\" → Use secondary-voiced initials with all four tones",
+          "example4": "\"庄組\" → Use the 庄 initial group (entering only \"庄\" uses the 庄 initial)",
+          "example5": "\"流開一\" → Use open Division I characters in the 流 rime group",
+          "example6": "\"塞擦\" → Extract affricates",
+          "example7": "\"-部位\" → Use all places of articulation",
+          "example8": "\"山攝 知組\" → Combine the 山 rime group with the 知 initial group"
         },
         "table": {
-          "title": "Supported Categories & Values (simplified Chinese also accepted)",
+          "title": "Supported Categories and Values (Simplified Chinese is also accepted)",
           "tableHeaders": {
             "category": "Category",
             "values": "Values"
@@ -326,20 +326,20 @@
   },
   "result": {
     "loading": "Analyzing...",
-    "longWaitWarning": "⚠️ The current request involves a large dataset and may take longer.<br>Consider reducing query conditions to improve speed.",
-    "noData": "No data available, please start a query",
+    "longWaitWarning": "⚠️ This request involves a large amount of data and may take longer to process.<br>Consider reducing the query criteria to improve performance.",
+    "noData": "No data yet. Start a query first.",
     "goToQuery": "Go to Query",
-    "pleaseQuery": "Please query first",
+    "pleaseQuery": "Run a query first",
     "tabs": {
-      "tab1": "Search Characters",
-      "tab2": "Search Middle Chinese",
-      "tab3": "Search Phonemes",
-      "tab4": "Search Tones"
+      "tab1": "Characters",
+      "tab2": "Middle Chinese",
+      "tab3": "Readings",
+      "tab4": "Tones"
     },
     "toneType": {
       "default": "Default",
       "value": "Tone Value",
-      "category": "Tone Category"
+      "category": "Tone Class"
     }
   }
 }

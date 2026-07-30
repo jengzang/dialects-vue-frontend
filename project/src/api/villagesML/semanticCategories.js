@@ -1,14 +1,14 @@
 // api/villagesML/semanticCategories.js
 // 語義類別相關 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 獲取語義類別列表
  * @returns {Promise<Array>} [{ category_id: number, name: string, description: string }, ...]
  */
 export async function getSemanticCategoryList() {
-  return api('/api/villages/semantic/category/list')
+  return villagesMLApi('/semantic/category/list')
 }
 
 /**
@@ -33,7 +33,7 @@ export async function getSemanticCategoryTendency(params) {
   // Legacy parameter (backward compatible)
   if (params.region_name) queryParams.append('region_name', params.region_name)
 
-  return api(`/api/villages/semantic/category/tendency?${queryParams.toString()}`)
+  return villagesMLApi(`/semantic/category/tendency?${queryParams.toString()}`)
 }
 
 /**
@@ -44,9 +44,10 @@ export async function getSemanticCategoryTendency(params) {
  */
 export async function getSemanticVTFGlobal(params = {}) {
   const queryParams = new URLSearchParams()
-  if (params.top_k) queryParams.append('top_k', params.top_k)
+  if (params.top_n) queryParams.append('top_n', params.top_n)
+  if (params.detail) queryParams.append('detail', 'true')
 
-  return api(`/api/villages/semantic/category/vtf/global?${queryParams.toString()}`)
+  return villagesMLApi(`/semantic/category/vtf/global?${queryParams.toString()}`)
 }
 
 /**
@@ -71,7 +72,9 @@ export async function getSemanticVTFRegional(params) {
   // Legacy parameter (backward compatible)
   if (params.region_name) queryParams.append('region_name', params.region_name)
 
-  return api(`/api/villages/semantic/category/vtf/regional?${queryParams.toString()}`)
+  if (params.detail) queryParams.append('detail', 'true')
+
+  return villagesMLApi(`/semantic/category/vtf/regional?${queryParams.toString()}`)
 }
 
 // ========== 子類別 API (Phase 17) ==========
@@ -87,7 +90,7 @@ export async function getSemanticSubcategoryList(params = {}) {
   const queryParams = parent_category
     ? new URLSearchParams({ parent_category })
     : ''
-  return api(`/api/villages/semantic/subcategory/list${queryParams ? '?' + queryParams : ''}`)
+  return villagesMLApi(`/semantic/subcategory/list${queryParams ? '?' + queryParams : ''}`)
 }
 
 /**
@@ -96,7 +99,7 @@ export async function getSemanticSubcategoryList(params = {}) {
  * @returns {Promise<Object>} { subcategory: string, parent_category: string, characters: [] }
  */
 export async function getSemanticSubcategoryChars(subcategory) {
-  return api(`/api/villages/semantic/subcategory/chars/${encodeURIComponent(subcategory)}`)
+  return villagesMLApi(`/semantic/subcategory/chars/${encodeURIComponent(subcategory)}`)
 }
 
 /**
@@ -113,7 +116,7 @@ export async function getSemanticSubcategoryVTFGlobal(params = {}) {
   if (parent_category) queryParams.append('parent_category', parent_category)
   if (subcategory) queryParams.append('subcategory', subcategory)
   queryParams.append('limit', limit.toString())
-  return api(`/api/villages/semantic/subcategory/vtf/global?${queryParams}`)
+  return villagesMLApi(`/semantic/subcategory/vtf/global?${queryParams}`)
 }
 
 /**
@@ -136,7 +139,7 @@ export async function getSemanticSubcategoryVTFRegional(params = {}) {
   if (subcategory) queryParams.append('subcategory', subcategory)
   if (min_tendency !== undefined) queryParams.append('min_tendency', min_tendency.toString())
   queryParams.append('limit', limit.toString())
-  return api(`/api/villages/semantic/subcategory/vtf/regional?${queryParams}`)
+  return villagesMLApi(`/semantic/subcategory/vtf/regional?${queryParams}`)
 }
 
 /**
@@ -153,7 +156,7 @@ export async function getSemanticSubcategoryTendencyTop(params = {}) {
   queryParams.append('region_level', region_level)
   if (parent_category) queryParams.append('parent_category', parent_category)
   queryParams.append('top_n', top_n.toString())
-  return api(`/api/villages/semantic/subcategory/tendency/top?${queryParams}`)
+  return villagesMLApi(`/semantic/subcategory/tendency/top?${queryParams}`)
 }
 
 /**
@@ -171,5 +174,5 @@ export async function getSemanticSubcategoryComparison(params) {
     region_level,
     parent_category
   })
-  return api(`/api/villages/semantic/subcategory/comparison?${queryParams}`)
+  return villagesMLApi(`/semantic/subcategory/comparison?${queryParams}`)
 }

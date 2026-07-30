@@ -6,7 +6,7 @@
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-content">
-        <img src="@/assets/picture/title.png" :alt="$t('home.hero.logoAlt')" class="hero-logo" />
+        <img src="@/assets/picture/title.png" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
         <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
         <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
         <div class="hero-actions">
@@ -23,7 +23,7 @@
             <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
           </button>
         </div>
-        <img src="@/assets/picture/BlueCircle.png" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
+        <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
       </div>
     </section>
 
@@ -216,8 +216,12 @@
           </div>
           <transition name="expand">
             <div v-if="expandedCard === 'words'" class="card-body">
+              <a @click.stop="navigateTo('/explore/vocabulary/view')" class="feature-link">
+                <span class="link-icon">📒</span>
+                <span class="link-text">{{ $t('home.features.words.wordList') }}</span>
+              </a>
               <a @click.stop="navigateTo('/explore/yubao?tab=vocabulary')" class="feature-link">
-                <span class="link-icon">📚</span>
+                <span class="link-icon">📖</span>
                 <span class="link-text">{{ $t('home.features.words.yubaoVocab') }}</span>
               </a>
               <a @click.stop="navigateTo('/explore/yubao?tab=grammar')" class="feature-link">
@@ -359,7 +363,7 @@
                 <span class="link-text">{{ $t('home.features.about.setting') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/source')" class="feature-link">
-                <span class="link-icon">📚</span>
+                <span class="link-icon">🔗</span>
                 <span class="link-text">{{ $t('home.features.about.source') }}</span>
               </a>
             </div>
@@ -547,6 +551,7 @@
     <UpdateNoticeModal
       v-model:visible="showUpdateNotice"
       :auto-show="true"
+      :mode="updateNoticeMode"
       :version="homeUpdateNotice.version"
       :last-update-date="homeUpdateNotice.lastUpdateDate"
       :title="homeUpdateNotice.title"
@@ -583,19 +588,20 @@ import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
-import { useVisitStats } from '@/composables/useVisitStats.js'
-import { getCachedSourceStats, getSourceStats } from '@/composables/useSourceStats.js'
-import { getHomeUpdateNotice } from '@/main/config/updateNoticeConfig.js'
+import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { useVisitStats } from '@/composables/data/useVisitStats.js'
+import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
+import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
 // ✅ 条件渲染的组件懒加载
 const UserBenefitsPopup = defineAsyncComponent(() =>
   import('@/main/components/user/popups/UserBenefitsPopup.vue')
 )
 const SupportPopup = defineAsyncComponent(() =>
-  import('@/main/components/popup/SupportPopup.vue')
+  import('@/main/components/user/popups/SupportPopup.vue')
 )
 const UpdateNoticeModal = defineAsyncComponent(() =>
-  import('@/main/components/popup/UpdateNoticeModal.vue')
+  import('@/main/components/user/popups/UpdateNoticeModal.vue')
 )
 
 const { t, locale } = useI18n()
@@ -618,8 +624,15 @@ const sourceDataCount = ref(cachedSourceStats.dataCount)
 
 // 当前版本号和更新时间
 const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
+const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'modal')
 const CURRENT_VERSION = computed(() => homeUpdateNotice.value.version)
 const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
+
+const heroDecorationSrc = computed(() =>
+  currentColorTheme.value === COLOR_THEME_GREEN
+    ? new URL('@/assets/picture/GreenCircle.png', import.meta.url).href
+    : new URL('@/assets/picture/BlueCircle.png', import.meta.url).href
+)
 
 const projects = [
   {
@@ -1717,6 +1730,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
     &-actions {
       align-items: center;
+      flex-direction: column;
       gap: 0.75rem;
     }
   }

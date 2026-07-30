@@ -1,6 +1,6 @@
 // api/sql/tree.js - 树形数据查询 API
 import { api } from '../../auth/httpClient.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 /**
  * @typedef {Object} LazyLoadTreeResult

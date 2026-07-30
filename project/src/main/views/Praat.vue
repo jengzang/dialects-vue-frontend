@@ -187,7 +187,7 @@ import VowelSpacePanel from '../components/praat/VowelSpacePanel.vue'
 import PitchTonePanel from '../components/praat/PitchTonePanel.vue'
 import { usePraatApi } from '@/api'
 import { userStore } from '@/main/store/store.js'
-import { showError, showWarning } from '@/utils/message.js'
+import { showError, showWarning } from '@/utils/ui/message.js'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
@@ -526,7 +526,7 @@ watch(settings, () => {
 const MAX_POLLING_FAILURES = 5
 // 统一轮询状态与清理逻辑，避免页面切换、重复分析时残留旧定时器。
 const pollingTask = usePollingTask({
-  intervalMs: 2000,
+  intervalMs: 1100,
   maxFailures: MAX_POLLING_FAILURES,
 })
 
@@ -977,7 +977,7 @@ onBeforeUnmount(() => {
   font-weight: 700;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent-purple));
+  background: linear-gradient(135deg, #007aff, #6e00ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1103,7 +1103,7 @@ onBeforeUnmount(() => {
   font-weight: 600;
   border: none;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent-purple));
+  background: linear-gradient(135deg, #007aff, #6e00ff);
   color: white;
   transition: all 0.3s ease;
 }
@@ -1111,7 +1111,7 @@ onBeforeUnmount(() => {
 .start-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.3);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent-purple));
+  background: linear-gradient(135deg, #0056b3, #4b00b3);
 }
 
 .start-button:disabled {
@@ -1187,7 +1187,7 @@ onBeforeUnmount(() => {
 }
 
 .mode-options .radio-option.active {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent-purple));
+  background: linear-gradient(135deg, #007aff, #6e00ff);
   color: white;
   box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
 }

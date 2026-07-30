@@ -262,14 +262,14 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
-import { resolveHoverDetailCardPosition } from '@/main/utils/hoverDetailCardPosition.js'
+import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js'
 import LocationMultiInput from '../geo/LocationMultiInput.vue'
 import { postPhoPieByValue, postPhoPieByStatus } from '@/api'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { TABLE_COLUMN_SCHEMAS } from '../../config/chars_positions/characters.js'
 import { userStore } from '@/main/store/store.js'
-import { showWarning } from '@/utils/message.js'
-import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from './evolutionDetail.js'
+import { showWarning } from '@/utils/ui/message.js'
+import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from '@/utils/EchartHover/evolutionDetail.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import {
   encodeQueryValueBase64Url,
@@ -529,7 +529,10 @@ const applyDemoData = async ({ syncLocations = locationQuery.value.length === 0 
 const handleQuery = async () => {
   if (!userStore.isAuthenticated) {
     showWarning(t('user.dataPage.messages.authRequired'))
-    router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
+    router.push({
+      path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+      query: { redirect: route.fullPath },
+    })
     return
   }
 
@@ -658,12 +661,12 @@ const generatePieChartOption = (pieData) => {
       textStyle: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: 'var(--text-dark)',
+        color: '#333',
         lineHeight: 14
       },
       subtextStyle: {
         fontSize: 11,
-        color: 'var(--text-tertiary)'
+        color: '#666'
       }
     },
     tooltip: {
@@ -1098,7 +1101,7 @@ const generateSankeyOption = () => {
       textStyle: {
         fontSize: 15,
         fontWeight: 'bold',
-        color: 'var(--text-dark)'
+        color: '#333'
       }
     },
     tooltip: {
@@ -1138,13 +1141,13 @@ const generateSankeyOption = () => {
         opacity: 0.35
       },
       label: {
-        color: 'var(--text-dark)',
+        color: '#333',
         fontSize: 12,
         formatter: ({ data }) => data.rawLabel
       },
       itemStyle: {
         borderWidth: 1,
-        borderColor: 'var(--glass-80)'
+        borderColor: 'rgba(255,255,255,0.8)'
       },
       levels: [
         { depth: 0, itemStyle: { color: '#4f7cff' }, lineStyle: { opacity: 0.35 } },

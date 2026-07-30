@@ -141,22 +141,28 @@
     <div class="vml-glass-panel tables-panel">
       <div class="panel-header">
         <h3>表統計信息 Table Statistics</h3>
-        <div class="header-controls">
-          <button @click="refreshTables" :disabled="loadingTables" class="solid-button small">
-            <span v-if="loadingTables">加載中...</span>
-            <span v-else-if="tables === null">加載</span>
-            <span v-else>🔄 刷新</span>
-          </button>
-          <input
-            v-model="tableSearch"
-            type="text"
-            placeholder="搜尋表名..."
-            class="glass-input small"
-          >
-          <SimpleSelectDropdown :match-trigger-width="true"
-            v-model="tableSortBy"
-            :options="sortOptions"
-          />
+        <div class="header-controls vml-control-row">
+          <div class="vml-control-actions">
+            <button @click="refreshTables" :disabled="loadingTables" class="solid-button small">
+              <span v-if="loadingTables">加載中...</span>
+              <span v-else-if="tables === null">加載</span>
+              <span v-else>🔄 刷新</span>
+            </button>
+          </div>
+          <div class="vml-control-field">
+            <input
+              v-model="tableSearch"
+              type="text"
+              placeholder="搜尋表名..."
+              class="glass-input small"
+            >
+          </div>
+          <div class="vml-control-field">
+            <SimpleSelectDropdown :match-trigger-width="true"
+              v-model="tableSortBy"
+              :options="sortOptions"
+            />
+          </div>
         </div>
       </div>
       <div v-if="tables !== null" class="tables-content">
@@ -264,8 +270,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getMetadataOverview, getMetadataTables, getNgramStatistics } from '@/api/index.js'
-import { showError, showSuccess } from '@/utils/message.js'
+import { getVillagesOverview, getVillagesNgrams, getVillagesTables, getCachedVillagesOverview, getCachedVillagesNgrams, getCachedVillagesTables } from '@/composables/data/useVillagesCache.js'
+import { showError, showSuccess } from '@/utils/ui/message.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
@@ -334,20 +340,23 @@ const totalPages = computed(() => {
 const selectedTableTitle = computed(() => selectedTable.value ? `表詳情: ${selectedTable.value.name}` : '')
 
 // Methods
+function mapOverview(overviewRes) {
+  return {
+    database_size: (overviewRes.database_size_mb || 0) * 1024 * 1024,
+    total_tables: overviewRes.total_tables || 0,
+    total_records: overviewRes.total_villages || 0,
+    village_count: overviewRes.total_villages || 0,
+    character_count: overviewRes.unique_characters || overviewRes.total_characters || 0,
+    region_count: (overviewRes.total_cities || 0) + (overviewRes.total_counties || 0) + (overviewRes.total_townships || 0)
+  }
+}
+
 const refreshOverview = async () => {
   await overviewQuery.load(
-    () => getMetadataOverview(),
+    () => getVillagesOverview({ forceRefresh: true }),
     {
       onSuccess: (overviewRes) => {
-        overview.value = {
-          database_size: (overviewRes.database_size_mb || 0) * 1024 * 1024,
-          total_tables: overviewRes.total_tables || 0,
-          total_records: overviewRes.total_villages || 0,
-          village_count: overviewRes.total_villages || 0,
-          character_count: overviewRes.unique_characters || overviewRes.total_characters || 0,
-          region_count: (overviewRes.total_cities || 0) + (overviewRes.total_counties || 0) + (overviewRes.total_townships || 0)
-        }
-
+        overview.value = mapOverview(overviewRes)
         showSuccess('系統信息刷新成功')
       },
       onError: (error) => {
@@ -359,7 +368,7 @@ const refreshOverview = async () => {
 
 const refreshTables = async () => {
   await tablesQuery.load(
-    () => getMetadataTables(),
+    () => getVillagesTables({ forceRefresh: true }),
     {
       onSuccess: (tablesRes) => {
         tables.value = (tablesRes || []).map(table => ({
@@ -434,7 +443,7 @@ const calculateSignificanceRate = (data) => {
 const levelLabel = (level) => ({ city: '城市', county: '區縣', township: '鄉鎮' }[level] || level)
 
 const refreshNgramStats = async () => {
-  await ngramStatsQuery.load(() => getNgramStatistics(), {
+  await ngramStatsQuery.load(() => getVillagesNgrams({ forceRefresh: true }), {
     onSuccess: (result) => {
       ngramStats.value = result
     },
@@ -446,7 +455,27 @@ const refreshNgramStats = async () => {
 
 // Lifecycle
 onMounted(() => {
-  refreshOverview()
+  const cachedOverview = getCachedVillagesOverview()
+  if (cachedOverview) {
+    overview.value = mapOverview(cachedOverview)
+  } else {
+    refreshOverview()
+  }
+  const cachedNgrams = getCachedVillagesNgrams()
+  if (cachedNgrams) {
+    ngramStats.value = cachedNgrams
+  }
+  const cachedTables = getCachedVillagesTables()
+  if (cachedTables) {
+    tables.value = cachedTables.map(table => ({
+      name: table.table_name || 'unknown',
+      records: table.row_count || 0,
+      size: (table.size_mb || 0) * 1024 * 1024,
+      indexes: table.index_count || 0,
+      last_updated: table.last_modified || new Date().toISOString(),
+      columns: table.columns || []
+    }))
+  }
 })
 </script>
 
@@ -495,8 +524,7 @@ onMounted(() => {
 }
 
 .header-controls {
-  display: flex;
-  gap: 12px;
+  justify-content: flex-end;
 }
 
 .ngram-level-grid {
@@ -594,7 +622,6 @@ onMounted(() => {
 
 
 
-.glass-input,
 .glass-select {
   padding: 8px 16px;
   background: var(--glass-50);
@@ -602,19 +629,17 @@ onMounted(() => {
   border-radius: var(--radius-sm2);
   font-size: 14px;
   transition: all 0.3s ease;
-}
 
-.glass-input:focus,
-.glass-select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: var(--glass-80);
-}
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--glass-80);
+  }
 
-.glass-input.small,
-.glass-select.small {
-  padding: 6px 12px;
-  font-size: 13px;
+  &.small {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
 }
 
 .solid-button {
@@ -860,8 +885,5 @@ onMounted(() => {
     padding: 12px;
   }
 
-  .header-controls {
-    flex-direction: column;
-  }
 }
 </style>

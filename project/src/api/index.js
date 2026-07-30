@@ -61,6 +61,30 @@ export {
   getYubaoGrammarItems,
 } from './main/yubao.js';
 
+// ==================== 词表业务接口 ====================
+export {
+  buildVocabularyItemsPath,
+  buildVocabularyMapItemsPath,
+  buildVocabularyMapPointsPath,
+  buildVocabularyStandardWordsPath,
+  getVocabularyPermission,
+  getVocabularyPermissions,
+  getVocabularyItems,
+  getVocabularyMapItems,
+  getVocabularyMapPoints,
+  getVocabularyMe,
+  getVocabularyStandardWords,
+  getVocabularyLocationNames,
+  getVocabularyLocationOptions,
+  getVocabularyLocations,
+  getVocabularyLogs,
+  updateVocabularyLocation,
+  setVocabularyPermission,
+  previewVocabularyImport,
+  uploadVocabulary,
+  vocabularySqlApi,
+} from './main/vocabulary.js';
+
 // ==================== 查询模块 ====================
 // 核心查询
 export {
@@ -94,6 +118,14 @@ export {
 } from './main/core/phonology.js';
 
 export { postPhoPieByValue, postPhoPieByStatus } from './main/core/phoPie.js';
+
+// ==================== 自然村地名 ====================
+export {
+  getToponymNames,
+  getToponymPoints,
+  getToponymOfficialDetail,
+  getToponymDetails,
+} from './main/toponyms.js';
 
 // ==================== 比较模块 ====================
 export { compareChars, compareZhongGu, compareTones } from './main/core/compare.js';
@@ -130,14 +162,6 @@ export {
 
 // ==================== 日志统计 ====================
 export { getTodayVisits, getTotalVisits, getVisitHistory } from './logs/visits.js';
-
-// ==================== URL 参数工具 ====================
-export {
-  decodeParams,
-  buildQueryUrl,
-  copyCurrentUrl,
-  getUrlSegmentValue,
-} from '../utils/urlParams.js';
 
 // ==================== VillagesML 自然村分析 ====================
 export {

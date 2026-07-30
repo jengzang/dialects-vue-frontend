@@ -10,29 +10,32 @@
           trigger="both"
         />
       </h3>
-<!--      <h1 class="page-title">🏷️ 語義類別與標籤</h1>-->
+
+      <!-- Detail Mode Toggle -->
+      <SemanticDetailToolbar v-model="detailMode" />
 
       <!-- Category List -->
       <div class="category-list vml-glass-panel">
         <h2>語義類別</h2>
-        <div v-if="loadingCategories" class="vml-loading">
+        <div v-if="loadingCards" class="vml-loading">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <p>加載中...</p>
         </div>
         <div v-else class="category-grid">
           <div
-            v-for="category in categories"
+            v-for="category in displayCategories"
             :key="category.category"
             class="category-card"
             :class="{ 'selected': selectedCategory?.category === category.category }"
             @click="selectCategory(category)"
           >
             <div class="category-header">
-              <span class="category-icon">{{ getCategoryIcon(category.category) }}</span>
-              <span class="category-name">{{ getCategoryName(category.category) }}</span>
+              <span class="category-icon">{{ getCategoryIcon(category.parent_category || category.category) }}</span>
+              <span class="category-name">{{ getCategoryDisplayName(category.category, detailMode) }}</span>
             </div>
-            <div class="category-description">{{ getCategoryDescription(category.category) }}</div>
-            <div class="category-count">{{ category.character_count }} 字符</div>
+            <div class="category-description">{{ getCardDescription(category) }}</div>
+            <div class="category-count" v-if="detailMode">{{ category.village_count?.toLocaleString() || 0 }} 村莊</div>
+            <div class="category-count" v-else>{{ category.character_count }} 字符</div>
           </div>
         </div>
       </div>
@@ -58,7 +61,7 @@
               :key="item.category"
               class="vtf-bar-container"
             >
-              <div class="vtf-label">{{ getCategoryName(item.category) }}</div>
+              <div class="vtf-label">{{ getCategoryDisplayName(item.category, detailMode) }}</div>
               <div class="vtf-bar">
                 <div
                   class="vtf-fill"
@@ -80,21 +83,27 @@
               trigger="both"
             />
           </h3>
-          <div class="region-selector">
-            <FilterableSelect
-              v-model="regionName"
-              :level="regionLevel"
-              @update:level="(newLevel) => regionLevel = newLevel"
-              @update:hierarchy="(h) => regionHierarchy = h"
-              placeholder="請選擇或輸入"
-            />
-            <button
-              class="query-button"
-              :disabled="!regionName || loadingVTFRegional"
-              @click="loadVTFRegional"
-            >
-              查詢
-            </button>
+          <div class="region-selector vml-control-surface">
+            <div class="vml-control-row">
+              <div class="vml-control-field">
+                <FilterableSelect
+                  v-model="regionName"
+                  :level="regionLevel"
+                  @update:level="(newLevel) => regionLevel = newLevel"
+                  @update:hierarchy="(h) => regionHierarchy = h"
+                  placeholder="請選擇或輸入"
+                />
+              </div>
+              <div class="vml-control-actions">
+                <button
+                  class="query-button"
+                  :disabled="!regionName || loadingVTFRegional"
+                  @click="loadVTFRegional"
+                >
+                  查詢
+                </button>
+              </div>
+            </div>
           </div>
           <div v-if="loadingVTFRegional" class="vml-loading">
             <div class="ui-loading--page" aria-hidden="true"></div>
@@ -105,7 +114,7 @@
               :key="item.category"
               class="vtf-bar-container"
             >
-              <div class="vtf-label">{{ getCategoryName(item.category) }}</div>
+              <div class="vtf-label">{{ getCategoryDisplayName(item.category, detailMode) }}</div>
               <div class="vtf-bar">
                 <div
                   class="vtf-fill regional"
@@ -122,8 +131,8 @@
       <div ref="tendencySection" class="tendency-section vml-glass-panel">
         <div class="section-header-centered" v-if="selectedCategory">
           <div class="category-title-card">
-            <span class="category-icon-large">{{ getCategoryIcon(selectedCategory.category) }}</span>
-            <h3 class="category-title-large">{{ getCategoryName(selectedCategory.category) }}</h3>
+            <span class="category-icon-large">{{ getCategoryIcon(selectedCategory.parent_category || selectedCategory.category) }}</span>
+            <h3 class="category-title-large">{{ getCategoryDisplayName(selectedCategory.category, detailMode) }}</h3>
             <span class="category-separator">-</span>
             <p class="category-subtitle">區域排行</p>
           </div>
@@ -138,24 +147,30 @@
 
         <!-- Content when category selected -->
         <template v-else>
-          <div class="level-selector">
-            <label>行政級別：</label>
-            <SimpleSelectDropdown
-              v-model="rankingLevel"
-              :options="rankingLevelOptions"
-              @update:modelValue="loadCategoryRanking"
-            />
+          <div class="level-selector vml-control-surface">
+            <div class="vml-control-row">
+              <div class="vml-control-field">
+                <label>行政級別：</label>
+                <SimpleSelectDropdown
+                  v-model="rankingLevel"
+                  :options="rankingLevelOptions"
+                  @update:modelValue="loadCategoryRanking"
+                />
+              </div>
 
-            <label style="margin-left: 20px;">最小村莊數：</label>
-            <input
-              v-model.number="minVillages"
-              type="number"
-              min="1"
-              placeholder="例如：100"
-              class="vml-number-input"
-              @change="loadCategoryRanking"
-            />
-            <span class="input-hint">（過濾小樣本區域）</span>
+              <div class="vml-control-field">
+                <label>最小村莊數：</label>
+                <input
+                  v-model.number="minVillages"
+                  type="number"
+                  min="1"
+                  placeholder="例如：100"
+                  class="vml-number-input"
+                  @change="loadCategoryRanking"
+                />
+              </div>
+              <span class="input-hint">（過濾小樣本區域）</span>
+            </div>
           </div>
           <div v-if="loadingRanking" class="vml-loading">
             <div class="ui-loading--page" aria-hidden="true"></div>
@@ -256,14 +271,17 @@
 <!--      </div>-->
 
     </div>
+
 <!--  </ExploreLayout>-->
 </template>
 
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
 import {
   getSemanticCategoryList,
   getSemanticVTFGlobal,
@@ -272,11 +290,12 @@ import {
   getSemanticLabelsByCategory,
   getSemanticLabelsByChar
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import {
   getCategoryIcon,
   getCategoryName,
-  getCategoryDescription
+  getCategoryDescription,
+  getCategoryDisplayName
 } from '@/VillagesML/config/villagesML.js'
 
 // State
@@ -293,6 +312,10 @@ const loadingVTFGlobal = ref(false)
 const loadingVTFRegional = ref(false)
 const loadingRanking = ref(false)
 const loadingLabels = ref(false)
+
+const route = useRoute()
+const router = useRouter()
+const detailMode = ref(route.query.detail === 'true')
 
 const regionLevel = ref('city')
 const regionName = ref('')
@@ -323,6 +346,16 @@ const categoryOptionsForLabels = computed(() => {
 })
 
 // Computed
+const displayCategories = computed(() => {
+  if (detailMode.value && vtfGlobal.value.length > 0) {
+    return vtfGlobal.value
+  }
+  return categories.value
+})
+
+const loadingCards = computed(() => {
+  return detailMode.value ? loadingVTFGlobal.value : loadingCategories.value
+})
 const maxVTF = computed(() => {
   if (vtfGlobal.value.length === 0) return 1
   return Math.max(...vtfGlobal.value.map(item => item.vtf))
@@ -368,10 +401,24 @@ const loadCategories = async () => {
   }
 }
 
+const getCardDescription = (cat) => {
+  if (cat.parent_category) {
+    return getCategoryDisplayName(cat.parent_category) + ' · 子類'
+  }
+  return getCategoryDescription(cat.category)
+}
+
 const loadVTFGlobal = async () => {
   loadingVTFGlobal.value = true
   try {
-    vtfGlobal.value = await getSemanticVTFGlobal({ top_n: 9 })
+    const data = await getSemanticVTFGlobal({
+      ...(detailMode.value ? { detail: true } : { top_n: 9 })
+    })
+    vtfGlobal.value = data.map(item => ({
+      ...item,
+      category: item.category || item.subcategory,
+      character_count: item.char_count || item.character_count
+    }))
   } catch (error) {
     showError('加載全局VTF失敗')
   } finally {
@@ -384,10 +431,16 @@ const loadVTFRegional = async () => {
 
   loadingVTFRegional.value = true
   try {
-    vtfRegional.value = await getSemanticVTFRegional({
+    const data = await getSemanticVTFRegional({
       region_level: regionLevel.value,
-      ...regionHierarchy.value
+      ...regionHierarchy.value,
+      ...(detailMode.value && { detail: true })
     })
+    vtfRegional.value = data.map(item => ({
+      ...item,
+      category: item.category || item.subcategory,
+      character_count: item.char_count || item.character_count
+    }))
   } catch (error) {
     showError('加載區域VTF失敗')
   } finally {
@@ -411,7 +464,10 @@ const loadCategoryRanking = async () => {
       params.min_villages = minVillages.value
     }
 
-    categoryRanking.value = await getSemanticIndices(params)
+    categoryRanking.value = await getSemanticIndices({
+      ...params,
+      ...(detailMode.value && { detail: true })
+    })
   } catch (error) {
     showError('加載排行失敗')
   } finally {
@@ -452,6 +508,16 @@ const loadLabelsByChar = async () => {
   }
 }
 
+watch(detailMode, (val) => {
+  const query = { ...route.query }
+  if (val) { query.detail = 'true' } else { delete query.detail }
+  router.replace({ query })
+  selectedCategory.value = null
+  categoryRanking.value = []
+  loadVTFGlobal()
+  if (vtfRegional.value.length > 0) loadVTFRegional()
+})
+
 onMounted(() => {
   loadCategories()
   loadVTFGlobal()
@@ -474,6 +540,8 @@ onMounted(() => {
 }
 
 .category-list {
+  max-height: 300px;
+  overflow-y: auto;
   padding: 16px;
   margin-bottom: 16px;
 }
@@ -550,6 +618,8 @@ onMounted(() => {
   padding: 16px;
   min-width: 0;
   overflow: hidden;
+  max-height:400px;
+  overflow-y:auto;
 }
 
 .vtf-global h3,
@@ -560,8 +630,6 @@ onMounted(() => {
 }
 
 .region-selector {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
 }
 
@@ -786,16 +854,10 @@ onMounted(() => {
 }
 
 .level-selector {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin-bottom: 16px;
 }
 
 .level-selector label {
-  white-space: nowrap;
-  font-size: 14px;
-  font-weight: 500;
   color: var(--text-primary);
 }
 
@@ -924,32 +986,28 @@ onMounted(() => {
   }
 
   .region-selector {
-    flex-direction: column;
+    width: 100%;
   }
 
   /* Level selector responsive layout */
   .level-selector {
-    flex-wrap: wrap;
-    gap: 8px;
+    width: 100%;
   }
 
   .level-selector label {
-    flex-basis: 100%;
     margin-left: 0 !important;
   }
 
   .level-selector .simple-select-dropdown {
-    flex: 1;
-    min-width: 150px;
+    width: 100% !important;
   }
 
   .level-selector .vml-number-input {
-    flex: 1;
-    min-width: 120px;
+    width: 100% !important;
   }
 
   .level-selector .input-hint {
-    flex-basis: 100%;
+    // flex-basis: 100%;
     font-size: 12px;
   }
 }
@@ -960,7 +1018,7 @@ onMounted(() => {
   border: 1px solid var(--bg-hover-strong);
   border-radius: var(--radius-sm);
   font-size: 14px;
-  width: 120px;
+  // width: 120px;
   transition: all 0.3s ease;
 }
 
@@ -974,4 +1032,5 @@ onMounted(() => {
   font-size: 12px;
   color: var(--text-secondary);
 }
+
 </style>

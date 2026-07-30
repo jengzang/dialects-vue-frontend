@@ -3,8 +3,8 @@ import { nextTick } from 'vue'
 import i18n from '@/i18n/index.js'
 import { waitForAuthReady } from '@/api/auth/auth.js'
 import { userStore } from '@/main/store/store.js'
-import { showWarning } from '@/utils/message.js'
-import { showRouteLoading, hideRouteLoading } from '@/utils/routeLoading.js'
+import { showWarning } from '@/utils/ui/message.js'
+import { showRouteLoading, hideRouteLoading } from '@/utils/ui/routeLoading.js'
 import { menuRoutes } from '@/main/router/menuRoutes.js'
 import { exploreRoutes } from '@/main/router/exploreRoutes.js'
 import { resolvePreferredLocale } from '@/i18n/localeDetector.js'
@@ -20,6 +20,8 @@ import {
   shouldRedirectMainEntry,
   stripLocaleFromPath,
 } from '@/i18n/localeRouting.js'
+import { setCurrentVillagesMLDatasetFromRoute } from '@/VillagesML/utils/currentDataset.js'
+import { buildVillagesMLRedirect } from '@/VillagesML/utils/routeDataset.js'
 
 const HomePage = () => import('@/main/views/HomePage.vue')
 const Auth = () => import('./views/auth.vue')
@@ -184,7 +186,7 @@ const ROUTE_QUERY_ALLOWLIST = {
       CharacterClassification: ['sub', 'table', 'levels'],
       YuBao: ['sub'],
       praat: ['tab'],
-      VillagesML: ['module', 'subtab', 'pattern', 'ngram', 'villageId'],
+      VillagesML: ['module', 'subtab', 'pattern', 'ngram', 'villageId', 'detail'],
       ycVillages: [],
       ycSpoken: [],
       manage: [],
@@ -217,6 +219,18 @@ const ROUTE_QUERY_ALLOWLIST = {
   },
   '/explore/yubao': {
     base: ['tab']
+  },
+  '/explore/vocabulary': {
+    base: []
+  },
+  '/explore/vocabulary/view': {
+    base: ['tab']
+  },
+  '/explore/vocabulary/import': {
+    base: []
+  },
+  '/explore/vocabulary/manage': {
+    base: []
   },
   '/explore/char-class': {
     base: ['tab', 'table', 'levels']
@@ -371,6 +385,14 @@ function isSameQuery(left, right) {
 router.beforeEach(async (to, from, next) => {
   if (to.fullPath !== from.fullPath) {
     showRouteLoading()
+  }
+
+  if (to.path === '/villagesML' || to.path.startsWith('/villagesML/')) {
+    const villagesMLRedirect = buildVillagesMLRedirect(to)
+    if (villagesMLRedirect) {
+      return next(villagesMLRedirect)
+    }
+    setCurrentVillagesMLDatasetFromRoute(to)
   }
 
   const routeLocale = to.params.locale

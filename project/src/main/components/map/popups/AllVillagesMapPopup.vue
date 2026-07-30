@@ -63,6 +63,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle, mapStyleConfig, calculateDenseMapCenterAndZoom } from '@/utils/map/MapSource.js'
 import AppModal from '@/components/common/AppModal.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
 
 const props = defineProps({
   visible: {
@@ -104,30 +105,25 @@ const mapStyleOptions = computed(() => {
   }))
 })
 
-const colorPalette = [
-  "#b31919", "#b34719", "#b37519", "#b3a319", "#94b319",
-  "#66b319", "#38b319", "#19b329", "#19b357", "#19b385",
-  "#19b3b3", "#1985b3", "#1957b3", "#1929b3", "#3819b3",
-  "#6619b3", "#9419b3", "#b319a3", "#b31975", "#b31947"
-]
+// 颜色来自 mapColors.js CATEGORY_PALETTE
 
 const getCategoryColor = (text) => {
-  if (!text) return colorPalette[0]
+  if (!text) return CATEGORY_PALETTE[0]
   let hash = 0
   for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0
-  return colorPalette[Math.abs(hash) % colorPalette.length]
+  return CATEGORY_PALETTE[Math.abs(hash) % CATEGORY_PALETTE.length]
 }
 
 const buildTag = (text, bgColor) => {
   const r = parseInt(bgColor.slice(1, 3), 16)
   const g = parseInt(bgColor.slice(3, 5), 16)
   const b = parseInt(bgColor.slice(5, 7), 16)
-  return `<span style="display:inline-block;padding:1px 8px;border-radius: var(--radius-md);font-size:10px;font-weight:500;color:var(--text-dark);background:rgba(${r},${g},${b},0.2);margin-top:2px">${text}</span>`
+  return `<span style="display:inline-block;padding:1px 8px;border-radius:12px;font-size:10px;font-weight:500;color:var(--text-primary);background:rgba(${r},${g},${b},0.2);margin-top:2px">${text}</span>`
 }
 
 const buildHoverHtml = (name, pathStr, tagText, tagColor) => {
   let html = `<div style="text-align:center"><strong>${name}</strong></div>`
-  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:var(--text-lightest);margin-top:2px">${pathStr}</div>`
+  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:var(--text-secondary);margin-top:2px">${pathStr}</div>`
   if (tagText && tagColor) html += `<div style="text-align:center">${buildTag(tagText, tagColor)}</div>`
   return html
 }
@@ -158,7 +154,7 @@ const categoryColorMap = computed(() => {
   const categories = [...new Set(validVillages.value.map(v => getDisplayValue(v)).filter(Boolean))]
   const map = {}
   categories.forEach((cat, idx) => {
-    map[cat] = colorPalette[idx % colorPalette.length]
+    map[cat] = CATEGORY_PALETTE[idx % CATEGORY_PALETTE.length]
   })
   return map
 })
@@ -308,7 +304,7 @@ const renderWithClustering = (pointFeatures) => {
       'circle-color': ['get', 'bgColor'],
       'circle-opacity': 0.9,
       'circle-stroke-width': 1.5,
-      'circle-stroke-color': 'var(--glass-80)'
+      'circle-stroke-color': 'rgba(255,255,255,0.80)'
     }
   })
 
@@ -385,14 +381,14 @@ const renderMarkers = () => {
     const lineFeatures = lineVillages.value.map(v => {
       const displayValue = getDisplayValue(v)
       const tagText = isNameMode ? (v.place_type_name || '') : displayValue
-      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || 'var(--color-dark-teal)')
+      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || '#1b2e2b')
       return {
         type: 'Feature',
         geometry: { type: 'LineString', coordinates: v.coors },
         properties: {
           name: v.name,
           displayValue: displayValue,
-          color: categoryColorMap.value[displayValue] || 'var(--color-dark-teal)',
+          color: categoryColorMap.value[displayValue] || '#1b2e2b',
           _pathStr: (v._path && v._path.length) ? v._path.join(' > ') : '',
           tagText: tagText,
           tagColor: tagColor
@@ -436,7 +432,7 @@ const renderMarkers = () => {
     const pointFeatures = pointVillages.value.map(v => {
       const displayValue = getDisplayValue(v)
       const tagText = isNameMode ? (v.place_type_name || '') : displayValue
-      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || 'var(--color-dark-teal)')
+      const tagColor = isNameMode ? getCategoryColor(v.place_type_name || '') : (categoryColorMap.value[displayValue] || '#1b2e2b')
       return {
         type: 'Feature',
         geometry: { type: 'Point', coordinates: v.coors[0] },
@@ -444,9 +440,9 @@ const renderMarkers = () => {
           name: v.name,
           displayValue: displayValue,
           label: isNameMode ? v.name : displayValue,
-          bgColor: 'var(--color-dark-teal)',
-          textColor: 'var(--color-cyan)',
-          color: categoryColorMap.value[displayValue] || 'var(--color-dark-teal)',
+          bgColor: '#1b2e2b',
+          textColor: '#5ac8fa',
+          color: categoryColorMap.value[displayValue] || '#1b2e2b',
           _pathStr: (v._path && v._path.length) ? v._path.join(' > ') : '',
           tagText: tagText,
           tagColor: tagColor
@@ -657,10 +653,10 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
 .control-btn {
   flex: 1;
   padding: 8px 12px;
-  background: $primary;
+  background: var(--action-primary-bg);
   border: none;
   border-radius: var(--radius-sm2);
-  color: var(--text-white);
+  color: var(--action-primary-text);
   white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
@@ -668,7 +664,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   transition: all 0.2s;
 
   &:hover {
-    background: $primary-hover;
+    background: var(--action-primary-bg-hover);
   }
 }
 
@@ -701,18 +697,18 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
 /* MapLibre 动态弹窗 */
 :deep(.maplibregl-popup-content) {
   padding: 10px 12px;
-  background: var(--glass-90);
+  background: var(--surface-panel-strong);
   border-radius: var(--radius-sm2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  color: var(--text-dark);
+  color: var(--text-primary);
   font-size: 13px;
   line-height: 1.6;
 
   @include glass-blur(10px);
 
   strong {
-    color: $text-dark;
-    font-weight: 600;
+    color: var(--text-primary);
+    font-weight: 700;
   }
 }
 

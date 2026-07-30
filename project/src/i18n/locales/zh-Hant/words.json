@@ -8,6 +8,289 @@
     "name": "語保語法",
     "desc": "語保50條句子語法資料"
   },
+  "wordList": {
+    "name": "詞表",
+    "desc": "方言詞表頁面",
+    "placeholder": "詞表頁面殼子",
+    "tabs": {
+      "label": "詞表工作流",
+      "list": "詞表",
+      "myEntries": "我的詞表",
+      "allEntries": "所有詞表",
+      "upload": "上傳",
+      "review": "審查",
+      "locations": "地點",
+      "manage": "管理",
+      "query": "查詢",
+      "contribute": "貢獻",
+      "uploadTab": "上傳",
+      "manageTab": "管理"
+    },
+    "access": {
+      "loadingTitle": "正在確認詞表權限",
+      "loadingDesc": "請稍候，系統正在同步當前登入狀態。",
+      "loginUploadTitle": "登入後上傳詞表",
+      "loginUploadDesc": "上傳詞表需要登入，並向管理員申請編輯權限。",
+      "requestEditPermission": "申請編輯權限",
+      "loginManageTitle": "登入後管理詞表",
+      "loginManageDesc": "詞表管理、地點元數據和操作日誌需要登入後查看。",
+      "noUploadPermissionTitle": "暫無詞表上傳權限",
+      "noUploadPermissionDesc": "當前賬號尚未開通詞表 edit 或 manage 權限，請聯繫管理員。",
+      "noManagePermissionTitle": "暫無詞表管理權限",
+      "noManagePermissionDesc": "當前賬號尚未開通詞表 edit 或 manage 權限，請聯繫管理員。",
+      "permissionLoadFailedTitle": "詞表權限狀態加載失敗",
+      "loginAction": "去登入",
+      "backToList": "返回詞表"
+    },
+    "search": {
+      "label": "搜索",
+      "placeholder": "搜索釋義、詞條、發音、詳情",
+      "standardWordPlaceholder": "按標準詞篩選地圖",
+      "locationPlaceholder": "按地點篩選當前結果",
+      "fieldCount": "已選 {count} 列",
+      "fields": {
+        "all": "全部內容",
+        "definition": "釋義",
+        "headword": "詞條",
+        "pronunciation": "發音",
+        "detail": "詳情",
+        "ipa": "發音",
+        "notes": "註釋",
+        "location": "地點"
+      },
+      "settings": "設定",
+      "filterTitle": "搜尋篩選",
+      "standardWordFilterMode": "地圖標準詞篩選",
+      "singleSelect": "單選",
+      "multiSelect": "多選"
+    },
+    "sort": {
+      "label": "排序",
+      "location": "按地點",
+      "definition": "按釋義",
+      "headword": "按詞條",
+      "updatedAt": "按更新時間"
+    },
+    "viewModes": {
+      "label": "展示方式",
+      "card": "卡片",
+      "table": "表格",
+      "map": "地圖"
+    },
+    "states": {
+      "loadingData": "加載數據中...",
+      "loadingCards": "加載卡片中...",
+      "loadingMore": "加載更多",
+      "noData": "暫無詞表數據",
+      "loadItemsFailed": "獲取詞表條目失敗",
+      "loadMapFailed": "獲取詞表地圖點失敗"
+    },
+    "pagination": {
+      "total": "共 {count} 條",
+      "page": "第 {page} 頁",
+      "pageSize": "每頁",
+      "previous": "上一頁",
+      "next": "下一頁"
+    },
+    "columns": {
+      "headword": "詞條",
+      "definition": "釋義",
+      "pronunciation": "發音",
+      "pronunciationType": "注音類型",
+      "location": "地點",
+      "locationFull": "完整地點",
+      "informations": "附加信息",
+      "sourceFilename": "來源文件",
+      "detail": "詳情"
+    },
+    "table": {
+      "label": "詞表結果"
+    },
+    "map": {
+      "placeholder": "當前可上圖 {count} 個地點",
+      "meta": "命中 {entries} 條，省略無坐標地點 {omitted} 個",
+      "pointCount": "共 {count} 條"
+    },
+    "upload": {
+      "title": "上傳詞表",
+      "desc": "選擇表格文件後映射詞表字段，提交後進入審查流程。",
+      "chooseFile": "選擇文件",
+      "dropHint": "點擊或拖放 Excel、CSV、TSV、Word 文檔到此處",
+      "previewAction": "預覽導入",
+      "submit": "提交詞表",
+      "previewTitle": "詞表導入預覽",
+      "previewDesc": "確認列映射和預覽內容",
+      "backendPreviewTitle": "後端預覽結果",
+      "previewParserMode": "解析方式",
+      "previewParsedCount": "將導入",
+      "previewSkippedCount": "將跳過",
+      "previewDeleteCount": "將覆蓋舊詞條",
+      "replaceWarning": "正式導入會先刪除當前用戶該地點的舊詞條 {count} 條，再寫入新詞條。",
+      "confirmOverwrite": "我確認用這次導入替換該地點已有詞條",
+      "previewReady": "預覽完成，請確認後提交詞表。",
+      "permissionRequired": "當前賬號沒有詞表上傳權限。",
+      "locationName": "地點簡稱",
+      "locationNamePlaceholder": "例如：息烽",
+      "enterLocationInfo": "輸入地點資訊",
+      "coordinates": "經緯度",
+      "coordinatesPlaceholder": "例如：106.7400,27.0900",
+      "province": "省",
+      "city": "市",
+      "county": "縣",
+      "town": "鄉鎮",
+      "administrativeVillage": "行政村",
+      "naturalVillage": "自然村",
+      "yindianRegion": "音典分區",
+      "atlasRegion": "地圖集分區",
+      "parserMode": "解析方式",
+      "parserModes": {
+        "auto": "自動識別",
+        "table": "表格",
+        "docWhitespace": "文檔空白分隔",
+        "docBracket": "文檔括號識別"
+      },
+      "missingLocation": "請填寫上傳詞表對應的地點名稱及經緯度。",
+      "unsupportedFile": "請上傳支持的詞表文件（.xlsx、.xls、.csv、.tsv、.docx、.doc）。",
+      "previewFailed": "詞表導入預覽失敗",
+      "useYindianData": "使用音典數據",
+      "mapPickerHint": "點擊地圖獲取經緯度",
+      "yindianNotFound": "未找到音典數據",
+      "yindianFilled": "已填入音典數據",
+      "yindianFailed": "獲取音典數據失敗",
+      "yindianHint": "請輸入音典檔案裡的標準地名簡稱（繁體）以匹配",
+      "success": "上傳完成，導入 {count} 條。",
+      "failed": "上傳詞表失敗",
+      "formatHelp": "格式說明",
+      "formatHelpTitle": "詞彙上傳格式說明",
+      "formatHelpTable": {
+        "title": "表格格式（table）",
+        "desc": "適用文件：.xlsx、.xls、.csv、.tsv",
+        "required": "必填列（列名支持中英文別名，大小寫和空格不敏感）：",
+        "colField": "字段",
+        "colAliases": "接受的列名",
+        "note": "每行一條記錄，standard_word 和 local_expression 同時為空時該行跳過，任一必填列缺值時報錯。"
+      },
+      "formatHelpBracket": {
+        "title": "文檔括號格式（doc_bracket）",
+        "desc": "適用文件：.docx、.doc、.txt。每行一條記錄，用括號標記不同字段：",
+        "colSymbol": "符號",
+        "colMeaning": "含義",
+        "ipa": "IPA 音標",
+        "notes": "備註",
+        "localExpression": "方言講法",
+        "standardWord": "書面詞（standard_word）",
+        "remaining": "括號外的剩餘文字",
+        "note": "三個括號標記均為可選，但每行解析後 standard_word、local_expression、ipa 至少要有值。括號可混合使用全角/半角（() 和 （） 均支持）。"
+      },
+      "formatHelpWhitespace": {
+        "title": "文檔空格格式（doc_whitespace）",
+        "desc": "適用文件：.docx、.doc、.txt。每行一條記錄，字段之間用空格分隔，按順序為：書面詞 方言講法 音標 [備註...]",
+        "colPosition": "位置",
+        "colField": "字段",
+        "colRequired": "必填",
+        "note": "注意 IPA 中不能含空格（如 ȵit2 tʰəu2 會被拆成兩個字段導致解析錯誤），含空格的 IPA 請使用括號格式或表格格式。"
+      }
+    },
+    "locations": {
+      "title": "地點信息",
+      "desc": "管理當前權限範圍內的詞表地點元數據。",
+      "refresh": "刷新地點",
+      "save": "保存",
+      "empty": "暫無地點信息",
+      "loadFailed": "獲取詞表地點信息失敗",
+      "saveSuccess": "地點信息已保存。",
+      "saveFailed": "保存地點信息失敗",
+      "filters": {
+        "userId": "用戶 ID",
+        "locationName": "地點簡稱"
+      }
+    },
+    "logs": {
+      "title": "操作日誌",
+      "desc": "查詢詞表導入、地點編輯和表格操作記錄。",
+      "refresh": "查詢日誌",
+      "empty": "暫無操作日誌",
+      "loadFailed": "獲取詞表操作日誌失敗",
+      "rollbackSupported": "記錄了恢復所需線索",
+      "rollbackUnsupported": "僅供審計，不承諾自動回滾",
+      "filters": {
+        "userId": "用戶 ID",
+        "permission": "權限",
+        "source": "來源",
+        "action": "動作",
+        "table": "表名",
+        "status": "狀態"
+      },
+      "columns": {
+        "userId": "用戶",
+        "permission": "權限",
+        "source": "來源",
+        "table": "表",
+        "status": "狀態",
+        "affectedRows": "影響行數",
+        "action": "動作",
+        "timestamp": "時間",
+        "payload": "操作摘要",
+        "rollback": "恢復"
+      },
+      "relativeTime": {
+        "justNow": "剛剛",
+        "minutesAgo": "{n} 分鐘前",
+        "hoursAgo": "{n} 小時前",
+        "daysAgo": "{n} 天前"
+      },
+      "payload": {
+        "importedEntries": "本次導入 {count} 條",
+        "deletedEntries": "覆蓋舊詞條 {count} 條",
+        "location": "地點：{value}",
+        "file": "文件：{value}",
+        "changedFields": "變更字段：{fields}",
+        "targetUser": "目標用戶：{value}",
+        "permissionChange": "權限：{old} -> {next}",
+        "sqlAction": "SQL 動作：{value}",
+        "primaryKey": "主鍵：{value}",
+        "beforeRows": "記錄舊行快照 {count} 條",
+        "beforeFields": "記錄舊字段：{fields}",
+        "afterRows": "記錄新建 ID {count} 條",
+        "createdId": "新建 ID：{value}",
+        "replaceRule": "替換規則：{find} -> {replace}"
+      }
+    },
+    "import": {
+      "examples": {
+        "definition": "太陽",
+        "headword": "日頭",
+        "pronunciation": "ȵit̚˨ tʰɐu˩",
+        "location": "陽春",
+        "detail": "常用於日常口語。"
+      }
+    },
+    "review": {
+      "title": "審查詞表",
+      "desc": "指定用戶確認上傳內容後，後端會更新正式詞庫。",
+      "permissionBadge": "需要權限",
+      "reject": "退回",
+      "approve": "通過",
+      "sampleFile": "待審詞表.xlsx",
+      "sampleMeta": "120 條 · 提交者待接口返回"
+    },
+    "samples": {
+      "one": {
+        "headword": "日頭",
+        "definition": "太陽",
+        "pronunciation": "ȵit̚˨ tʰɐu˩",
+        "detail": "常用於日常口語。",
+        "location": "廣東省 / 陽江市 / 陽春市"
+      },
+      "two": {
+        "headword": "食朝",
+        "definition": "吃早飯",
+        "pronunciation": "sik̚˧ tsʰiu˥",
+        "detail": "早晨用餐的說法。",
+        "location": "廣東省 / 陽江市"
+      }
+    }
+  },
   "yuBaoPage": {
     "viewAll": "查看全部",
     "search": {

@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div class="divide-tab-container">
     <div
       class="page"
-      style="max-width: 90%;overflow: hidden;max-height: none;"
+      style="overflow: hidden;max-height: none;"
     >
       <div class="page-content-stack">
         <div
@@ -106,8 +106,8 @@ import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { mapStore, uiStore, userStore, isDivideButtonDisabled, setRunning } from "@/main/store/store.js";
 import { getCoordinates, getLocationPartitions } from '@/api'
-import { showError, showWarning } from '@/utils/message.js';
-import { usePartitionCache } from '@/composables/domain/usePartitionCache.js'
+import { showError, showWarning } from '@/utils/ui/message.js';
+import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { requestMapFitView } from '@/utils/map/MapData.js'
 
@@ -343,9 +343,20 @@ $apple-font:
   Arial,
   sans-serif;
 
-$text-strong: rgba(8, 24, 48, 0.92);
-$text-main: rgba(20, 40, 70, 0.86);
-$text-secondary: rgba(60, 60, 67, 0.72);
+$text-strong: var(--text-deep);
+$text-main: var(--text-primary);
+$text-secondary: var(--text-secondary);
+
+/* 外层容器：防止内部 white-space: nowrap 撑开 */
+.divide-tab-container {
+  width: 100%;
+  min-width: 0;
+}
+
+.page {
+  width: min(90%, 920px);
+  min-width: 0;
+}
 
 /* 页面内字体统一，不改 page 全局布局 */
 .page-content-stack,
@@ -391,7 +402,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
   gap: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: rgba(20, 40, 70, 0.86);
+  color: var(--text-primary);
   cursor: pointer;
   user-select: none;
 }
@@ -405,7 +416,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
 .all-data-hint {
   font-size: 12px;
   line-height: 1.5;
-  color: rgba(60, 60, 67, 0.72);
+  color: var(--text-secondary);
   text-align: center;
 }
 
@@ -435,7 +446,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
   font-weight: 600;
   line-height: 1.4;
   letter-spacing: 0.01em;
-  color: rgba(20, 40, 70, 0.82);
+  color: var(--text-primary);
 }
 
 /* 下拉框外层 */
@@ -498,7 +509,7 @@ $text-secondary: rgba(60, 60, 67, 0.72);
 /* 运行按钮 */
 .allmap-first {
   @include flex-center;
-  background: linear-gradient(90deg, var(--color-primary), mediumblue);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
   border: none;
   border-radius: 30px;
   padding: 14px 28px;
@@ -510,15 +521,13 @@ $text-secondary: rgba(60, 60, 67, 0.72);
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
-  box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.2),
-    0 6px 20px rgba(0, 0, 0, 0.19);
+  box-shadow: var(--shadow-md2);
   pointer-events: auto;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 
   &:hover {
-    background: linear-gradient(145deg, #4e5d5b, #212d2b);
+    background: var(--color-primary-hover);
     transform: translateY(-3px);
   }
 

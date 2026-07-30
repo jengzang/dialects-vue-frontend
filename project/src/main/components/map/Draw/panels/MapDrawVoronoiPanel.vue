@@ -13,6 +13,12 @@
           <div class="draw-tool-panel-subtitle">
             {{ t('map.drawTab.voronoi.panelHint') }}
           </div>
+          <a
+            class="voronoi-learn-link"
+            href="https://zhuanlan.zhihu.com/p/985825588"
+            target="_blank"
+            rel="noopener"
+          >{{ t('map.drawTab.voronoi.learnMore') }}</a>
         </div>
       </div>
 
@@ -66,7 +72,7 @@
           </div>
         </section>
 
-        <section class="draw-tool-section">
+        <section v-if="!isVillageDataSource" class="draw-tool-section">
           <div class="draw-tool-section-title">
             {{ t('map.drawTab.voronoi.settingsTitle') }}
           </div>
@@ -116,7 +122,35 @@
           <div class="draw-tool-section-title">
             {{ t('map.drawTab.voronoi.actionsTitle') }}
           </div>
+          <div class="draw-basemap-select">
+            <CheckBox
+              :model-value="enableExpand"
+              @update:model-value="$emit('update:enable-expand', $event)"
+            >
+              {{ t('map.drawTab.voronoi.enableExpand') }}
+            </CheckBox>
+          </div>
+          <div v-if="enableExpand" class="draw-basemap-select">
+            <span class="draw-field-label">{{ t('map.drawTab.voronoi.expandRatio', { ratio: expandRatio }) }}</span>
+            <input
+              type="range"
+              class="expand-ratio-slider"
+              min="0"
+              max="100"
+              :value="expandRatio"
+              @input="$emit('update:expand-ratio', Number($event.target.value))"
+            >
+          </div>
           <div class="draw-tool-button-grid">
+            <button
+              v-if="hasFieldMerge"
+              class="main-glass-button"
+              data-variant="secondary"
+              type="button"
+              @click="$emit('open-field-merge')"
+            >
+              {{ t('map.drawTab.voronoi.fieldMergeOpenButton') }}
+            </button>
             <button
               class="main-glass-button"
               data-variant="secondary"
@@ -124,6 +158,21 @@
               @click="$emit('open-ignore-modal')"
             >
               {{ t('map.drawTab.voronoi.ignorePointsAction') }}
+            </button>
+            <button
+              class="main-glass-button draw-tool-mode-button"
+              :data-variant="isAddingPoints ? 'primary' : 'secondary'"
+              :data-active="isAddingPoints"
+              type="button"
+              :disabled="!totalPoints"
+              @click="$emit('toggle-add-points')"
+            >
+              <span
+                v-if="isAddingPoints"
+                class="draw-tool-check"
+                aria-hidden="true"
+              >✓</span>
+              {{ isAddingPoints ? t('map.drawTab.voronoi.addDialectPointExit') : t('map.drawTab.voronoi.addDialectPoint') }}
             </button>
             <button
               class="main-glass-button draw-tool-mode-button"
@@ -141,15 +190,6 @@
               {{ t('map.drawTab.voronoi.previewPoints') }}
             </button>
             <button
-              class="main-glass-button"
-              data-variant="secondary"
-              type="button"
-              :disabled="!activePoints"
-              @click="$emit('export-layer')"
-            >
-              {{ t('map.drawTab.voronoi.exportToLayer') }}
-            </button>
-            <button
               class="main-glass-button draw-tool-mode-button"
               :data-variant="isPolygonPreviewActive ? 'primary' : 'secondary'"
               :data-active="isPolygonPreviewActive"
@@ -164,11 +204,32 @@
               >✓</span>
               {{ isCalculating ? t('map.drawTab.buttons.voronoiRunning') : t('map.drawTab.voronoi.calculate') }}
             </button>
+            <button
+              class="main-glass-button"
+              data-variant="secondary"
+              type="button"
+              :disabled="!activePoints"
+              @click="$emit('export-layer')"
+            >
+              {{ t('map.drawTab.voronoi.exportToLayer') }}
+            </button>
           </div>
           <div v-if="statusText" class="draw-style-hint">
             {{ statusText }}
           </div>
         </section>
+        <Transition name="fade">
+          <div
+            v-if="isCalculating"
+            class="voronoi-calc-overlay"
+          >
+            <div
+              class="ui-loading--page"
+              aria-hidden="true"
+            />
+            <span class="voronoi-calc-overlay-text">{{ t('map.drawTab.buttons.voronoiRunning') }}</span>
+          </div>
+        </Transition>
       </div>
     </aside>
   </Transition>
@@ -199,6 +260,11 @@ const props = defineProps({
   officialPointCount: { type: Number, default: 0 },
   customPointCount: { type: Number, default: 0 },
   customImportSummary: { type: String, default: '' },
+  isVillageDataSource: { type: Boolean, default: false },
+  hasFieldMerge: { type: Boolean, default: false },
+  expandRatio: { type: Number, default: 50 },
+  enableExpand: { type: Boolean, default: false },
+  isAddingPoints: { type: Boolean, default: false },
 })
 
 defineEmits([
@@ -211,6 +277,10 @@ defineEmits([
   'preview-points',
   'export-layer',
   'calculate',
+  'open-field-merge',
+  'update:enable-expand',
+  'update:expand-ratio',
+  'toggle-add-points',
 ])
 
 const { t } = useI18n()
@@ -244,6 +314,20 @@ const offsetClass = computed(() => {
 
 @use './panelShared';
 
+.voronoi-learn-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--color-primary);
+  text-decoration: none;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 .voronoi-panel {
   &.offset-double {
     right: 47rem;
@@ -256,9 +340,9 @@ const offsetClass = computed(() => {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.6rem;
 
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-  }
+  // @media (max-width: 900px) {
+  //   grid-template-columns: 1fr;
+  // }
 }
 
 .voronoi-data-source-actions {
@@ -292,12 +376,33 @@ const offsetClass = computed(() => {
   }
 }
 
-@media (max-width: 900px) {
-  .voronoi-panel {
-    &.offset-double,
-    &.offset-left {
-      right: auto;
-    }
+.expand-ratio-slider {
+  flex: 1;
+  accent-color: var(--color-primary);
+}
+
+.draw-tool-panel-body {
+  position: relative;
+}
+
+.voronoi-calc-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: rgba(var(--glass-50-rgb), 0.85);
+  backdrop-filter: blur(4px);
+  border-radius: inherit;
+  z-index: 10;
+
+  .voronoi-calc-overlay-text {
+    font-size: 0.95rem;
+    color: var(--color-primary);
+    font-weight: 600;
   }
 }
+
 </style>

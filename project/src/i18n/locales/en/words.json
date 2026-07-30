@@ -8,6 +8,259 @@
     "name": "YuBao Grammar",
     "desc": "YuBao 50 sentence grammar data"
   },
+  "wordList": {
+    "name": "Vocabulary List",
+    "desc": "Dialect vocabulary list page",
+    "placeholder": "Vocabulary page shell",
+    "tabs": {
+      "label": "Vocabulary workflows",
+      "list": "List",
+      "myEntries": "My Entries",
+      "allEntries": "All Entries",
+      "upload": "Upload",
+      "review": "Review",
+      "locations": "Locations",
+      "manage": "Manage",
+      "query": "Query",
+      "contribute": "Contribute",
+      "uploadTab": "Upload",
+      "manageTab": "Manage"
+    },
+    "access": {
+      "loadingTitle": "Checking vocabulary access",
+      "loadingDesc": "Please wait while the current sign-in state is synced.",
+      "loginUploadTitle": "Sign in to upload vocabulary",
+      "loginUploadDesc": "Please log in to upload vocabulary and request edit permission from an administrator.",
+      "requestEditPermission": "Request Edit Permission",
+      "loginManageTitle": "Sign in to manage vocabulary",
+      "loginManageDesc": "Vocabulary management, location metadata, and operation logs require signing in.",
+      "noUploadPermissionTitle": "No vocabulary upload access",
+      "noUploadPermissionDesc": "This account does not have vocabulary edit or manage access. Please contact an administrator.",
+      "noManagePermissionTitle": "No vocabulary management access",
+      "noManagePermissionDesc": "This account does not have vocabulary edit or manage access. Please contact an administrator.",
+      "permissionLoadFailedTitle": "Failed to load vocabulary access",
+      "loginAction": "Sign in",
+      "backToList": "Back to vocabulary"
+    },
+    "search": {
+      "label": "Search",
+      "placeholder": "Search definition, headword, pronunciation, or detail",
+      "standardWordPlaceholder": "Filter by standard word",
+      "locationPlaceholder": "Filter by location",
+      "fieldCount": "{count} columns",
+      "fields": {
+        "all": "All content",
+        "definition": "Definition",
+        "headword": "Headword",
+        "pronunciation": "Pronunciation",
+        "detail": "Detail",
+        "ipa": "Pronunciation",
+        "notes": "Notes",
+        "location": "Location"
+      },
+      "settings": "Settings",
+      "filterTitle": "Search Filter",
+      "standardWordFilterMode": "Map Standard Word Filter",
+      "singleSelect": "Single",
+      "multiSelect": "Multi"
+    },
+    "sort": {
+      "label": "Sort",
+      "location": "By location",
+      "definition": "By definition",
+      "headword": "By headword",
+      "updatedAt": "By updated time"
+    },
+    "viewModes": {
+      "label": "View mode",
+      "card": "Cards",
+      "table": "Table",
+      "map": "Map"
+    },
+    "states": {
+      "loadingData": "Loading data...",
+      "loadingCards": "Loading cards...",
+      "loadingMore": "Load more",
+      "noData": "No vocabulary data",
+      "loadItemsFailed": "Failed to load vocabulary entries",
+      "loadMapFailed": "Failed to load vocabulary map points"
+    },
+    "pagination": {
+      "total": "{count} total",
+      "page": "Page {page}",
+      "pageSize": "Per page",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "columns": {
+      "headword": "Headword",
+      "definition": "Definition",
+      "pronunciation": "Pronunciation",
+      "pronunciationType": "Pronunciation Type",
+      "location": "Location",
+      "locationFull": "Full Location",
+      "informations": "Extra Info",
+      "sourceFilename": "Source File",
+      "detail": "Detail"
+    },
+    "table": {
+      "label": "Vocabulary results"
+    },
+    "map": {
+      "placeholder": "{count} locations can be mapped",
+      "meta": "{entries} matching entries; {omitted} locations omitted without coordinates",
+      "pointCount": "{count} entries"
+    },
+    "upload": {
+      "title": "Upload Vocabulary",
+      "desc": "Choose a table file, map vocabulary fields, then submit it for review.",
+      "chooseFile": "Choose file",
+      "dropHint": "Click or drag Excel, CSV, TSV, Word files here",
+      "previewAction": "Preview Import",
+      "submit": "Submit Vocabulary",
+      "previewTitle": "Vocabulary import preview",
+      "previewDesc": "Confirm column mapping and preview rows",
+      "backendPreviewTitle": "Backend preview",
+      "previewParserMode": "Parser mode",
+      "previewParsedCount": "Will import",
+      "previewSkippedCount": "Will skip",
+      "previewDeleteCount": "Will overwrite",
+      "replaceWarning": "Importing will delete {count} old entries for this user and location before writing the new entries.",
+      "confirmOverwrite": "I confirm this import should replace the existing entries for this location",
+      "previewReady": "Preview ready. Confirm to submit the vocabulary.",
+      "permissionRequired": "This account does not have vocabulary upload permission.",
+      "locationName": "Location Name",
+      "locationNamePlaceholder": "Example: Xifeng",
+      "enterLocationInfo": "Enter Location Info",
+      "coordinates": "Coordinates",
+      "coordinatesPlaceholder": "Example: 106.7400,27.0900",
+      "province": "Province",
+      "city": "City",
+      "county": "County",
+      "town": "Town",
+      "administrativeVillage": "Administrative Village",
+      "naturalVillage": "Natural Village",
+      "yindianRegion": "Yindian Region",
+      "atlasRegion": "Atlas Region",
+      "parserMode": "Parser Mode",
+      "parserModes": {
+        "auto": "Auto",
+        "table": "Table",
+        "docWhitespace": "Document whitespace",
+        "docBracket": "Document brackets"
+      },
+      "missingLocation": "Fill in the location name and coordinates for the uploaded vocabulary.",
+      "unsupportedFile": "Upload a supported vocabulary file (.xlsx, .xls, .csv, .tsv, .docx, .doc).",
+      "previewFailed": "Vocabulary import preview failed",
+      "useYindianData": "Use Yindian data",
+      "mapPickerHint": "Click the map to pick coordinates",
+      "yindianNotFound": "No Yindian data found",
+      "yindianFilled": "Yindian data filled in",
+      "yindianFailed": "Failed to get Yindian data",
+      "yindianHint": "Enter the standard place name (traditional Chinese) from the Yindian archive to match",
+      "success": "Upload complete. Imported {count} rows.",
+      "failed": "Upload failed"
+    },
+    "locations": {
+      "title": "Location Metadata",
+      "desc": "Manage vocabulary location metadata within your permission scope.",
+      "refresh": "Refresh locations",
+      "save": "Save",
+      "empty": "No location metadata",
+      "loadFailed": "Failed to load vocabulary location metadata",
+      "saveSuccess": "Location metadata saved.",
+      "saveFailed": "Failed to save location metadata",
+      "filters": {
+        "userId": "User ID",
+        "locationName": "Location name"
+      }
+    },
+    "logs": {
+      "title": "Operation Logs",
+      "desc": "Query vocabulary import, location edit, and table operation records.",
+      "refresh": "Query logs",
+      "empty": "No operation logs",
+      "loadFailed": "Failed to load vocabulary logs",
+      "rollbackSupported": "Recovery clues recorded",
+      "rollbackUnsupported": "Audit only; automatic rollback is not guaranteed",
+      "filters": {
+        "userId": "User ID",
+        "permission": "Permission",
+        "source": "Source",
+        "action": "Action",
+        "table": "Table",
+        "status": "Status"
+      },
+      "columns": {
+        "userId": "User",
+        "permission": "Permission",
+        "source": "Source",
+        "table": "Table",
+        "status": "Status",
+        "affectedRows": "Affected rows",
+        "action": "Action",
+        "timestamp": "Time",
+        "payload": "Summary",
+        "rollback": "Rollback"
+      },
+      "relativeTime": {
+        "justNow": "just now",
+        "minutesAgo": "{n} min ago",
+        "hoursAgo": "{n} hr ago",
+        "daysAgo": "{n} days ago"
+      },
+      "payload": {
+        "importedEntries": "Imported {count} entries",
+        "deletedEntries": "Overwrote {count} old entries",
+        "location": "Location: {value}",
+        "file": "File: {value}",
+        "changedFields": "Changed fields: {fields}",
+        "targetUser": "Target user: {value}",
+        "permissionChange": "Permission: {old} -> {next}",
+        "sqlAction": "SQL action: {value}",
+        "primaryKey": "Primary key: {value}",
+        "beforeRows": "Old row snapshots recorded: {count}",
+        "beforeFields": "Old fields recorded: {fields}",
+        "afterRows": "Created IDs recorded: {count}",
+        "createdId": "Created ID: {value}",
+        "replaceRule": "Replace rule: {find} -> {replace}"
+      }
+    },
+    "import": {
+      "examples": {
+        "definition": "sun",
+        "headword": "日头",
+        "pronunciation": "ȵit̚˨ tʰɐu˩",
+        "location": "Yangchun",
+        "detail": "Common in everyday speech."
+      }
+    },
+    "review": {
+      "title": "Review Vocabulary",
+      "desc": "Designated users approve submissions before the backend updates the published database.",
+      "permissionBadge": "Permission required",
+      "reject": "Reject",
+      "approve": "Approve",
+      "sampleFile": "pending-vocabulary.xlsx",
+      "sampleMeta": "120 rows · submitter pending API"
+    },
+    "samples": {
+      "one": {
+        "headword": "日头",
+        "definition": "sun",
+        "pronunciation": "ȵit̚˨ tʰɐu˩",
+        "detail": "Common in everyday speech.",
+        "location": "Guangdong / Yangjiang / Yangchun"
+      },
+      "two": {
+        "headword": "食朝",
+        "definition": "eat breakfast",
+        "pronunciation": "sik̚˧ tsʰiu˥",
+        "detail": "A way to refer to the morning meal.",
+        "location": "Guangdong / Yangjiang"
+      }
+    }
+  },
   "yuBaoPage": {
     "viewAll": "View all",
     "search": {

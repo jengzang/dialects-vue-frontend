@@ -203,18 +203,8 @@ $transition-base: 0.3s;
 }
 
 .glass-input {
-  width: 100%;
   padding: 10px 16px 10px 36px;
-  background: rgba(0, 0, 0, 0.05);
-  border: none;
-  border-radius: 15px;
-  outline: none;
-  transition: all $transition-base;
-
-  &:focus {
-    background: var(--glass-80);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3);
-  }
+  font-size: 14px;
 }
 
 .tree-content {

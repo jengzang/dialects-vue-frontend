@@ -7,7 +7,7 @@
 <!--    <h1 class="page-title">🔍 區域相似度分析</h1>-->
 
     <!-- Mode Selector -->
-    <div class="mode-selector vml-glass-panel">
+    <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
       <RadioGroup
           name="regionSimilarityMode"
           :options="similarityModeOptions"
@@ -20,20 +20,22 @@
       <div class="query-form vml-glass-panel">
         <h3>查找相似區域</h3>
 
-        <div class="form-group">
-          <label>目標區域:</label>
-          <FilterableSelect
-            v-model="targetRegion"
-            :level="targetRegionLevel"
-            :allowed-levels="['city', 'county']"
-            @update:level="(newLevel) => targetRegionLevel = newLevel"
-            @update:hierarchy="(h) => targetRegionHierarchy = h"
-            placeholder="請選擇或輸入區域"
-          />
+        <div class="form-group vml-control-surface vml-control-row">
+          <div class="vml-control-field">
+            <label>目標區域:</label>
+            <FilterableSelect
+              v-model="targetRegion"
+              :level="targetRegionLevel"
+              :allowed-levels="['city', 'county']"
+              @update:level="(newLevel) => targetRegionLevel = newLevel"
+              @update:hierarchy="(h) => targetRegionHierarchy = h"
+              placeholder="請選擇或輸入區域"
+            />
+          </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
+        <div class="form-row vml-control-surface vml-control-row">
+          <div class="form-group vml-control-field">
             <label>相似度指標:</label>
             <SimpleSelectDropdown :match-trigger-width="true"
               v-model="metric"
@@ -41,22 +43,24 @@
             />
           </div>
 
-          <div class="form-group">
+          <div class="form-group vml-control-field">
             <label>返回數量:</label>
             <input v-model.number="topK" type="number" min="1" max="50" class="vml-number-input" />
           </div>
 
-          <div class="form-group">
+          <div class="form-group vml-control-field">
             <label>最小相似度:</label>
             <input v-model.number="minSimilarity" type="number" min="0" max="1" step="0.1" class="vml-number-input" />
           </div>
-          <button
-            class="query-button"
-            :disabled="!targetRegion || loadingSearch"
-            @click="searchSimilarRegions"
-          >
-            {{ loadingSearch ? '查詢中...' : '查詢' }}
-        </button>
+          <div class="vml-control-actions">
+            <button
+              class="query-button"
+              :disabled="!targetRegion || loadingSearch"
+              @click="searchSimilarRegions"
+            >
+              {{ loadingSearch ? '查詢中...' : '查詢' }}
+            </button>
+          </div>
         </div>
 
 
@@ -118,8 +122,8 @@
       <div class="query-form vml-glass-panel">
         <h3>兩區域對比</h3>
 
-        <div class="form-row">
-          <div class="form-group">
+        <div class="form-row vml-control-surface vml-control-row">
+          <div class="form-group vml-control-field">
             <label>區域 1:</label>
             <FilterableSelect
               v-model="region1"
@@ -131,7 +135,7 @@
             />
           </div>
 
-          <div class="form-group">
+          <div class="form-group vml-control-field">
             <label>區域 2:</label>
             <FilterableSelect
               v-model="region2"
@@ -144,13 +148,15 @@
           </div>
         </div>
 
-        <button
-          class="query-button"
-          :disabled="!region1 || !region2 || region1 === region2 || loadingPair"
-          @click="loadPairComparison"
-        >
-          {{ loadingPair ? '對比中...' : '對比' }}
-        </button>
+        <div class="vml-control-actions">
+          <button
+            class="query-button"
+            :disabled="!region1 || !region2 || region1 === region2 || loadingPair"
+            @click="loadPairComparison"
+          >
+            {{ loadingPair ? '對比中...' : '對比' }}
+          </button>
+        </div>
       </div>
 
       <!-- Pair Results -->
@@ -221,24 +227,28 @@
       <div class="query-form vml-glass-panel">
         <h3>相似度矩陣</h3>
 
-        <div class="form-group">
-          <label>選擇區域 (最多20個):</label>
-          <div class="region-selector">
-            <FilterableSelect
-              v-model="selectedRegionToAdd"
-              :level="matrixRegionLevel"
-              :allowed-levels="['city', 'county']"
-              @update:level="(newLevel) => matrixRegionLevel = newLevel"
-              @update:hierarchy="(h) => selectedRegionHierarchy = h"
-              placeholder="選擇區域..."
-            />
-            <button
-              class="add-button"
-              :disabled="!selectedRegionToAdd || selectedRegions.length >= 20"
-              @click="addRegion"
-            >
-              添加
-            </button>
+        <div class="form-group vml-control-surface">
+          <div class="region-selector vml-control-row">
+            <div class="vml-control-field">
+              <label>選擇區域 (最多20個):</label>
+              <FilterableSelect
+                v-model="selectedRegionToAdd"
+                :level="matrixRegionLevel"
+                :allowed-levels="['city', 'county']"
+                @update:level="(newLevel) => matrixRegionLevel = newLevel"
+                @update:hierarchy="(h) => selectedRegionHierarchy = h"
+                placeholder="選擇區域..."
+              />
+            </div>
+            <div class="vml-control-actions">
+              <button
+                class="add-button"
+                :disabled="!selectedRegionToAdd || selectedRegions.length >= 20"
+                @click="addRegion"
+              >
+                添加
+              </button>
+            </div>
           </div>
         </div>
 
@@ -253,19 +263,23 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label>相似度指標:</label>
-          <SimpleSelectDropdown :match-trigger-width="true"
-            v-model="matrixMetric"
-            :options="metricOptions"
-          />
-          <button
-            class="query-button"
-            :disabled="selectedRegions.length < 2 || loadingMatrix"
-            @click="loadMatrix"
-          >
-            {{ loadingMatrix ? '生成中...' : '生成矩陣' }}
-          </button>
+        <div class="form-group vml-control-surface vml-control-row">
+          <div class="vml-control-field">
+            <label>相似度指標:</label>
+            <SimpleSelectDropdown :match-trigger-width="true"
+              v-model="matrixMetric"
+              :options="metricOptions"
+            />
+          </div>
+          <div class="vml-control-actions">
+            <button
+              class="query-button"
+              :disabled="selectedRegions.length < 2 || loadingMatrix"
+              @click="loadMatrix"
+            >
+              {{ loadingMatrix ? '生成中...' : '生成矩陣' }}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -290,7 +304,7 @@ import {
   getRegionSimilarityPair,
   getRegionSimilarityMatrix
 } from '@/api/index.js'
-import { showError, showSuccess } from '@/utils/message.js'
+import { showError, showSuccess } from '@/utils/ui/message.js'
 import * as echarts from 'echarts'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
@@ -650,15 +664,12 @@ export default {
 }
 
 .mode-selector {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
+  margin-bottom: 20px;
 }
 
 .query-form {
   @include flex-col;
+  gap: 12px;
 }
 
 .query-form h3 {
@@ -670,26 +681,18 @@ export default {
 }
 
 .form-group {
-  margin-bottom: 16px;
+  min-width: 0;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
   font-weight: 500;
   color: var(--text-primary);
 }
 
-.form-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.form-row > .form-group {
-  flex: 1;
-  min-width: 200px;
-}
+// .form-row {
+//   width: 100%;
+// }
 
 .vml-number-input {
   padding: 10px;
@@ -878,8 +881,7 @@ export default {
 }
 
 .region-selector {
-  display: flex;
-  gap: 12px;
+  align-items: center;
 }
 
 .add-button {
@@ -948,20 +950,8 @@ export default {
   min-height: 400px;
 }
 
-@media (min-aspect-ratio: 1/1) {
-  .query-form {
-    flex-flow: row wrap;
-    align-items: center;
-    gap: 12px;
-  }
-}
-
 @media (max-width: 768px) {
   .results-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .form-row {
     grid-template-columns: 1fr;
   }
 
@@ -973,8 +963,8 @@ export default {
   .mode-button{
     padding: 6px;
   }
-  .vml-number-input{
-    width: 100%;
-  }
+  // .vml-number-input{
+  //   width: 100%;
+  // }
 }
 </style>

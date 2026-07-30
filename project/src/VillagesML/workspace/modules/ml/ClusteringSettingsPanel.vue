@@ -8,8 +8,8 @@
       <span class="notice-text">此功能需要登錄</span>
     </div>
 
-    <div class="settings-group">
-      <div class="setting-row">
+    <div class="settings-group vml-control-surface">
+      <div class="setting-row vml-setting-row">
         <label>區域級別：</label>
         <SimpleSelectDropdown :match-trigger-width="true"
           v-model="settings.region_level"
@@ -17,7 +17,7 @@
         />
       </div>
 
-      <div class="setting-row">
+      <div class="setting-row vml-setting-row">
         <label>算法：</label>
         <SimpleSelectDropdown :match-trigger-width="true"
           v-model="settings.algorithm"
@@ -25,14 +25,14 @@
         />
       </div>
 
-      <div class="setting-row" v-if="settings.algorithm !== 'dbscan'">
+      <div class="setting-row vml-setting-row" v-if="settings.algorithm !== 'dbscan'">
         <label>聚類數 K：</label>
         <input
           v-model.number="settings.k"
           type="number"
           min="2"
           max="20"
-          class="setting-input"
+          class="setting-input vm-setting-input"
         />
       </div>
 
@@ -42,7 +42,7 @@
           <span class="config-title">DBSCAN 參數</span>
         </div>
 
-        <div class="setting-row">
+        <div class="setting-row vml-setting-row">
           <label>鄰域半徑 (eps)：</label>
           <input
             v-model.number="settings.dbscan_config.eps"
@@ -50,18 +50,18 @@
             min="0.1"
             max="10"
             step="0.1"
-            class="setting-input"
+            class="setting-input vm-setting-input"
           />
         </div>
 
-        <div class="setting-row">
+        <div class="setting-row vml-setting-row">
           <label>最小樣本數：</label>
           <input
             v-model.number="settings.dbscan_config.min_samples"
             type="number"
             min="1"
             max="20"
-            class="setting-input"
+            class="setting-input vm-setting-input"
           />
         </div>
       </div>
@@ -192,14 +192,11 @@ const runClustering = () => {
 }
 
 .settings-group {
-  @include flex-col;
   gap: 16px;
 }
 
 .setting-row {
-  display: flex;
   align-items: center;
-  gap: 12px;
 }
 
 .setting-row label {

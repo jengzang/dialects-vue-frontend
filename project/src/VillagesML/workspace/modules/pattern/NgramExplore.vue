@@ -42,40 +42,50 @@
     <div class="vml-glass-panel">
       <div class="frequency-section">
       <h2>N-gram 頻率分析</h2>
-      <div class="controls">
-        <SimpleSelectDropdown :match-trigger-width="true"
-          v-model.number="nValue"
-          :options="nValueOptions"
-        />
-        <SimpleSelectDropdown :match-trigger-width="true"
-          v-model="position"
-          :options="positionOptions"
-        />
-        <input
-          v-model.number="minFrequency"
-          type="number"
-          min="1"
-          placeholder="最小頻次 (≥1)"
-          class="vml-number-input"
-        />
-        <input
-          v-model.number="topK"
-          type="number"
-          min="1"
-          max="1000"
-          placeholder="返回數量 (1-1000)"
-          class="vml-number-input"
-        />
-        <button
-          class="query-button"
-          :disabled="loadingFrequency"
-          @click="loadFrequency"
-        >
-          查詢
-        </button>
+      <div class="controls vml-control-surface vml-control-row">
+        <div class="vml-control-field">
+          <SimpleSelectDropdown :match-trigger-width="true"
+            v-model.number="nValue"
+            :options="nValueOptions"
+          />
+        </div>
+        <div class="vml-control-field">
+          <SimpleSelectDropdown :match-trigger-width="true"
+            v-model="position"
+            :options="positionOptions"
+          />
+        </div>
+        <div class="vml-control-field">
+          <input
+            v-model.number="minFrequency"
+            type="number"
+            min="1"
+            placeholder="最小頻次 (≥1)"
+            class="vml-number-input"
+          />
+        </div>
+        <div class="vml-control-field">
+          <input
+            v-model.number="topK"
+            type="number"
+            min="1"
+            max="1000"
+            placeholder="返回數量 (1-1000)"
+            class="vml-number-input"
+          />
+        </div>
+        <div class="vml-control-actions">
+          <button
+            class="query-button"
+            :disabled="loadingFrequency"
+            @click="loadFrequency"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
-      <div v-if="loadingFrequency" class="vml-loading"">
+      <div v-if="loadingFrequency" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -129,28 +139,34 @@
     <div class="vml-glass-panel">
       <div class="pattern-section">
       <h2>模式搜索</h2>
-      <div class="search-controls">
-        <input
-          v-model="searchPattern"
-          type="text"
-          placeholder="輸入模式（支持通配符 *）"
-          class="pattern-input"
-          @keyup.enter="searchPatterns"
-        />
-        <SimpleSelectDropdown :match-trigger-width="true"
-          v-model.number="patternN"
-          :options="nValueOptions"
-        />
-        <button
-          class="query-button"
-          :disabled="!searchPattern || loadingPatterns"
-          @click="searchPatterns"
-        >
-          搜尋
-        </button>
+      <div class="search-controls vml-control-surface vml-control-row">
+        <div class="vml-control-field">
+          <input
+            v-model="searchPattern"
+            type="text"
+            placeholder="輸入模式（支持通配符 *）"
+            class="pattern-input"
+            @keyup.enter="searchPatterns"
+          />
+        </div>
+        <div class="vml-control-field">
+          <SimpleSelectDropdown :match-trigger-width="true"
+            v-model.number="patternN"
+            :options="nValueOptions"
+          />
+        </div>
+        <div class="vml-control-actions">
+          <button
+            class="query-button"
+            :disabled="!searchPattern || loadingPatterns"
+            @click="searchPatterns"
+          >
+            搜尋
+          </button>
+        </div>
       </div>
 
-      <div v-if="loadingPatterns" class="vml-loading"">
+      <div v-if="loadingPatterns" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
       </div>
 
@@ -190,11 +206,12 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import {
   getNgramFrequency,
-  getNgramPatterns,
-  getNgramStatistics
+  getNgramPatterns
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { getVillagesNgrams } from '@/composables/data/useVillagesCache.js'
+import { showError } from '@/utils/ui/message.js'
 import { getNgramPositionLabel, getNgramPatternTypeLabel } from '@/VillagesML/config/villagesML.js'
+import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 
 const router = useRouter()
 
@@ -273,19 +290,16 @@ const searchPatterns = async () => {
 }
 
 const goToStats = (ngram) => {
-  router.push({
-    path: '/villagesML',
-    query: {
-      module: 'pattern',
-      subtab: 'ngram-stats',
-      ngram: ngram
-    }
-  })
+  router.push(buildCurrentVillagesMLPath({
+    module: 'pattern',
+    subtab: 'ngram-stats',
+    query: { ngram }
+  }))
 }
 
 onMounted(async () => {
   try {
-    ngramStats.value = await getNgramStatistics()
+    ngramStats.value = await getVillagesNgrams()
   } catch {
     // Non-critical
   }
@@ -319,8 +333,7 @@ onMounted(async () => {
 
 .controls,
 .search-controls {
-  display: flex;
-  gap: 12px;
+  justify-content: center;
   margin: 0;
   width: 100%;
 }
@@ -381,13 +394,10 @@ onMounted(async () => {
   background: var(--glass-50);
 }
 
-.vml-number-input {
-  width: 150px;
-}
+// .vml-number-input {
+//   width: 100%;
+// }
 
-.pattern-input {
-  flex: 1;
-}
 
 
 .frequency-results-wrapper {
@@ -599,23 +609,17 @@ onMounted(async () => {
 }
 
 @media (min-aspect-ratio: 1/1) {
-  .frequency-section,
-  .pattern-section {
-    flex-direction: row;
-  }
+  // .frequency-section,
+  // .pattern-section {
+  //   flex-direction: row;
+  // }
 
   .controls,
   .search-controls {
-    width: auto;
     flex: 1;
   }
 }
 
 @media (max-width: 768px) {
-  .controls,
-  .search-controls {
-    flex-direction: column;
-  }
-
 }
 </style>

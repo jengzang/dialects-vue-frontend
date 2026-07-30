@@ -1,7 +1,7 @@
 // api/villagesML/regional.js
 // 區域聚合統計相關 API
 
-import { api } from '../auth/httpClient.js'
+import { villagesMLApi } from './request.js'
 
 /**
  * 獲取城市級聚合統計
@@ -16,7 +16,7 @@ export async function getRegionalAggregatesCity(params = {}) {
   if (params.city) queryParams.append('city', params.city)
   else if (params.city_name) queryParams.append('city_name', params.city_name)
 
-  return api(`/api/villages/regional/aggregates/city?${queryParams.toString()}`)
+  return villagesMLApi(`/regional/aggregates/city?${queryParams.toString()}`)
 }
 
 /**
@@ -37,7 +37,7 @@ export async function getRegionalAggregatesCounty(params = {}) {
   if (params.county) queryParams.append('county', params.county)
   else if (params.county_name) queryParams.append('county_name', params.county_name)
 
-  return api(`/api/villages/regional/aggregates/county?${queryParams.toString()}`)
+  return villagesMLApi(`/regional/aggregates/county?${queryParams.toString()}`)
 }
 
 /**
@@ -64,7 +64,7 @@ export async function getRegionalAggregatesTown(params = {}) {
 
   if (params.limit) queryParams.append('limit', params.limit)
 
-  return api(`/api/villages/regional/aggregates/town?${queryParams.toString()}`)
+  return villagesMLApi(`/regional/aggregates/town?${queryParams.toString()}`)
 }
 
 /**
@@ -92,7 +92,7 @@ export async function getRegionalSpatialAggregates(params) {
 
   if (params.limit) queryParams.append('limit', params.limit)
 
-  return api(`/api/villages/regional/spatial-aggregates?${queryParams.toString()}`)
+  return villagesMLApi(`/regional/spatial-aggregates?${queryParams.toString()}`)
 }
 
 /**
@@ -113,7 +113,7 @@ export async function getRegionalVectors(params = {}) {
   if (params.township) queryParams.append('township', params.township)
   if (params.limit) queryParams.append('limit', params.limit)
 
-  return api(`/api/villages/regional/vectors?${queryParams.toString()}`)
+  return villagesMLApi(`/regional/vectors?${queryParams.toString()}`)
 }
 
 
@@ -131,7 +131,7 @@ export async function getRegionalVectors(params = {}) {
  * @returns {Promise<Object>} { regions, feature_dimension, categories, cosine_similarity, euclidean_distance, manhattan_distance, vector_diff, region1_vector, region2_vector }
  */
 export async function compareRegionalVectors(params) {
-  return api('/api/villages/regional/vectors/compare', {
+  return villagesMLApi('/regional/vectors/compare', {
     method: 'POST',
     body: params
   })
@@ -144,7 +144,7 @@ export async function compareRegionalVectors(params) {
  * @returns {Promise<Object>} { regions, similarity_matrix, distance_matrix, feature_dimension, categories, run_id }
  */
 export async function batchCompareRegionalVectors(params) {
-  return api('/api/villages/regional/vectors/compare/batch', {
+  return villagesMLApi('/regional/vectors/compare/batch', {
     method: 'POST',
     body: params
   })
@@ -159,7 +159,7 @@ export async function batchCompareRegionalVectors(params) {
  * @returns {Promise<Object>} { regions, coordinates, method, n_components, explained_variance?, run_id }
  */
 export async function reduceRegionalVectors(params) {
-  return api('/api/villages/regional/vectors/reduce', {
+  return villagesMLApi('/regional/vectors/reduce', {
     method: 'POST',
     body: params
   })

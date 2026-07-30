@@ -85,6 +85,7 @@ import SpatialFeaturesPanel from '../village/SpatialFeaturesPanel.vue'
 import SemanticStructurePanel from '../village/SemanticStructurePanel.vue'
 import NgramPanel from '../village/NgramPanel.vue'
 import { getVillageComplete } from '@/api/index.js'
+import { SEMANTIC_FEATURE_KEYS, SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 
 const props = defineProps({
   show: {
@@ -126,17 +127,9 @@ const features = computed(() => {
   const f = completeData.value.features
   return {
     features: {
-      semantic: {
-        山地: f.sem_mountain,
-        水系: f.sem_water,
-        聚落: f.sem_settlement,
-        方位: f.sem_direction,
-        宗族: f.sem_clan,
-        象徵: f.sem_symbolic,
-        農業: f.sem_agriculture,
-        植被: f.sem_vegetation,
-        基建: f.sem_infrastructure
-      },
+      semantic: Object.fromEntries(
+        SEMANTIC_FEATURE_KEYS.map(k => [SEMANTIC_CATEGORY_NAMES[k], f[`sem_${k}`]])
+      ),
       morphology: {
         名稱長度: f.name_length,
         後綴1: f.suffix_1,

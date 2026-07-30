@@ -216,26 +216,27 @@
     }
   },
   "leaderboard": {
-    "title": "My Ranking Stats",
+    "title": "My Ranking Statistics",
     "loading": "Loading ranking data...",
     "retry": "Retry",
     "loadFailedToast": "Failed to load ranking data: {message}",
     "errorDetail": "Failed to load ranking data: {message}",
-    "gapLabel": "Gap to previous",
-    "firstPlaceLabel": "First place",
+    "gapLabel": "Rank Gap",
+    "firstPlaceLabel": "First Place",
     "totalUsers": "{value} users are included in the ranking",
     "columns": {
       "category": "Category",
       "metric": "Metric",
       "rank": "Rank",
       "count": "Count",
-      "gap": "Gap",
-      "firstPlace": "First place"
+      "gap": "Rank Gap",
+      "firstPlace": "First Place",
+						"percentile": "Percentile"
     },
     "rank": {
-      "first": "Rank 1",
-      "second": "Rank 2",
-      "third": "Rank 3",
+      "first": "1st",
+      "second": "2nd",
+      "third": "3rd",
       "default": "Rank {rank}"
     },
     "format": {
@@ -246,73 +247,83 @@
     },
     "topMetrics": {
       "onlineTime": {
-        "label": "Online time"
+        "label": "Time Online"
       },
       "totalQueries": {
-        "label": "Total queries",
-        "tooltip": "This differs from the total shown in personal info and also includes language-preservation queries and various table queries."
+        "label": "Total Queries",
+        "tooltip": "Unlike the total query count shown on the profile page, this also includes language-preservation queries and various table-based queries."
       }
     },
     "categories": {
       "summary": "{label} (Total)",
       "phonology": {
-        "label": "Phonology queries",
+        "label": "Phonological Queries",
         "items": {
-          "zhonggu": "Middle Chinese",
-          "yinwei": "Phonemes",
-          "diwei": "Statuses",
-          "combination": "Status combos",
-          "syllable": "Pronunciations",
-          "compareZhonggu": "Compare Middle Chinese"
+          "zhonggu": "Middle Chinese Queries",
+          "yinwei": "Reading Queries",
+          "diwei": "Phonological Categories Queries",
+          "combination": "Category Combination Queries",
+          "syllable": "Initials, Finals & Tones",
+          "compareZhonggu": "Middle Chinese Comparisons"
         },
         "tooltips": {
-          "diwei": "Includes detailed popup queries and related requests from the legacy site.",
-          "syllable": "Including 'statistical' queries on the Middle Chinese results page and comparing the frequencies of phonetic values."
+          "diwei": "Includes detailed queries performed in pop-up windows and related queries from the legacy website.",
+          "syllable": "Includes Statistics queries on Middle Chinese result pages and phonetic-value comparisons."
         }
       },
       "charsTones": {
-        "label": "Character and tone queries",
+        "label": "Character & Tone Queries",
         "items": {
-          "chars": "Characters",
-          "tones": "Tones",
-          "compareChars": "Compare characters",
-          "compareTones": "Compare tone classes"
+          "chars": "Character Queries",
+          "tones": "Tone Queries",
+          "compareChars": "Character Comparisons",
+          "compareTones": "Tone-Class Comparisons"
         }
       },
       "analysis": {
-        "label": "Phonology analysis",
+        "label": "Phonological Analysis",
         "items": {
-          "matrix": "Phonology matrix",
-          "classification": "Phoneme classes",
-          "counts": "Syllable stats",
-          "pie": "evolution"
+          "matrix": "Phonological Systems",
+          "classification": "Phoneme Classification",
+          "counts": "Syllable Statistics",
+          "pie": "Evolution"
         }
       },
       "tools": {
-        "label": "Tool usage",
+        "label": "Tool Usage",
         "items": {
-          "check": "Character-list check",
-          "jyut2ipa": "Jyutping conversion",
-          "merge": "Merge character lists",
-          "praat": "Acoustic analysis"
+          "check": "Character List Check",
+          "jyut2ipa": "Jyutping-to-IPA Conversion",
+          "merge": "Merge Character Lists",
+          "praat": "Acoustic Analysis"
         }
       },
       "other": {
-        "label": "Other queries",
+        "label": "Other Queries",
         "items": {
-          "coordinates": "Coordinate lookup",
-          "table": "Table lookup",
-          "tree": "Tree lookup",
-          "villages": "Villages Machine Learning",
+          "coordinates": "Coordinate Lookup",
+          "table": "Table Queries",
+          "tree": "Tree Queries",
+          "villages": "Village Machine Learning",
           "locations": "Location Information"
         },
         "tooltips": {
-          "coordinates": "Used to fetch map coordinates for Middle Chinese, phoneme, character, tone, partition-map, and custom-map queries.",
-          "table": "Includes table-based queries such as language-preservation vocabulary and grammar, sources, Guangdong village tables, and Yangchun spoken-word lists.",
-          "tree": "Includes tree-based queries such as Guangdong natural-village trees and Middle Chinese status trees.",
-          "locations": "Includes retrieving individual location details and obtaining complete zone information."
+          "coordinates": "Used to retrieve the coordinates required for map rendering. Middle Chinese, phonetic-value, character, tone, regional-map, and custom-map queries may all use this feature.",
+          "table": "Includes various table-based queries, such as language-preservation vocabulary and grammar data, data sources, Guangdong village datasets, and Yangchun colloquial vocabulary.",
+          "tree": "Includes various tree-based queries, such as the Guangdong natural-village hierarchy and Middle Chinese phonological categories.",
+          "locations": "Includes retrieving details for individual locations and complete information about dialect regions."
+        }
+      },
+      "vocabulary": {
+        "label": "Vocabulary Queries",
+        "items": {
+          "yubao": "Yubao Query",
+          "vocabSearch": "Vocabulary Search",
+          "vocabTable": "Vocabulary Table",
+          "vocabEdit": "Vocabulary Edit"
         }
       }
     }
   }
+
 }

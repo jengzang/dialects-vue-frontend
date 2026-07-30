@@ -1,6 +1,6 @@
 // api/query/core.js - 核心查询 API
 import { api } from '../../auth/httpClient.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 /**
  * @typedef {Object} ZhongGuQueryParams

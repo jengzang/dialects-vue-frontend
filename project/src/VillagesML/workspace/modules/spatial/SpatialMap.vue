@@ -3,8 +3,8 @@
     <div class="spatial-map-container" :class="{ 'is-fullscreen': isFullScreen }">
       <div ref="mapContainer" class="map-container">
         <!-- 地圖控制面板 -->
-        <div class="map-controls" v-if="!isFullScreen">
-          <div class="control-group">
+        <div class="map-controls vml-control-surface vml-control-row" v-if="!isFullScreen">
+          <div class="control-group vml-control-field">
             <SimpleSelectDropdown
               v-model="currentStyleKey"
               :options="mapStyleOptions"
@@ -12,7 +12,7 @@
             />
           </div>
 
-          <div class="button-row">
+          <div class="button-row vml-control-actions">
             <button class="action-btn" @click="resetView">🎯 復位</button>
             <button class="action-btn fullscreen-btn" @click="toggleFullScreen">⛶ 全屏</button>
           </div>
@@ -271,9 +271,10 @@ const showPopup = (feature, lngLat) => {
       <p style="margin: 4px 0;"><strong>聚類 ID:</strong> ${props.cluster_id}</p>
       <p style="margin: 4px 0;"><strong>聚類大小:</strong> ${props.cluster_size} 村</p>
       <p style="margin: 4px 0;"><strong>含該字村數:</strong> ${props.n_villages_with_char}</p>
-      <p style="margin: 4px 0;"><strong>傾向性均值:</strong> ${props.cluster_tendency_mean?.toFixed(3)}</p>
-      <p style="margin: 4px 0;"><strong>傾向性標準差:</strong> ${props.cluster_tendency_std?.toFixed(3)}</p>
-      <p style="margin: 4px 0;"><strong>空間一致性:</strong> ${props.spatial_coherence?.toFixed(3)}</p>
+      <p style="margin: 4px 0;"><strong>傾向性均值:</strong> ${props.cluster_tendency_mean?.toFixed(3) || 'N/A'}</p>
+      <p style="margin: 4px 0;"><strong>全局傾向均值:</strong> ${props.global_tendency_mean?.toFixed(3) || 'N/A'}</p>
+      <p style="margin: 4px 0;"><strong>傾向偏差:</strong> ${props.tendency_deviation >= 0 ? '+' : ''}${props.tendency_deviation?.toFixed(3) || 'N/A'}</p>
+      <p style="margin: 4px 0;"><strong>空間一致性:</strong> ${props.spatial_coherence?.toFixed(3) || 'N/A'}</p>
       <p style="margin: 4px 0;"><strong>主要城市:</strong> ${props.dominant_city || 'N/A'}</p>
       <p style="margin: 4px 0;"><strong>主要區縣:</strong> ${props.dominant_county || 'N/A'}</p>
       ${props.is_significant ? '<p style="margin: 4px 0; color: #ffd700; font-weight: bold;">✨ 統計顯著</p>' : ''}
@@ -736,9 +737,6 @@ const resetView = () => {
   padding: 12px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   z-index: 10;
   width: 160px;
 }

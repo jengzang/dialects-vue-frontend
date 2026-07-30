@@ -192,10 +192,10 @@ const updatePosition = () => {
 
   if (!triggerElement || !dropdownPanel.value) return
 
-  nextTick(() => {
+  requestAnimationFrame(() => {
     const triggerRect = triggerElement.getBoundingClientRect()
     const panelWidth = props.matchTriggerWidth ? triggerRect.width : (dropdownPanel.value.offsetWidth || 200)
-    const panelHeight = dropdownPanel.value.offsetHeight || 300
+    const panelHeight = dropdownPanel.value.offsetHeight || 60
     const viewportHeight = window.innerHeight
     const viewportWidth = window.innerWidth
 
@@ -244,7 +244,7 @@ const updatePosition = () => {
     }
 
     dropdownStyle.value = {
-      position: 'fixed',
+      position: 'absolute',
       top: `${top}px`,
       left: `${left}px`,
       zIndex: 30000,
@@ -265,6 +265,8 @@ const initializeFocusedIndex = () => {
 
 onMounted(() => {
   updatePosition()
+  // Safari 布局延迟补偿：二次矫正位置
+  setTimeout(() => updatePosition(), 0)
   initializeFocusedIndex()
 
   // Focus search input if searchable, otherwise focus the panel for keyboard navigation
@@ -331,7 +333,7 @@ $transition-fast: 0.2s;
   padding: 6px 10px;
   color: $text-primary;
   font-size: 13px;
-  background: var(--glass-90);
+  background: var(--bg-white);
   border: 1px solid var(--border-control);
   border-radius: var(--radius-sm);
   outline: none;

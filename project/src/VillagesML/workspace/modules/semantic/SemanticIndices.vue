@@ -6,30 +6,7 @@
     </h3>
 
     <!-- Detail Mode Toggle -->
-    <div class="detail-toggle vml-glass-panel">
-      <div class="toggle-left">
-        <label class="toggle-container">
-          <SwitchToggle
-            :model-value="detailMode"
-            :width="48"
-            :height="24"
-            :thumb-size="20"
-            color="blue"
-            variant="solid"
-            show-label
-            active-text="詳細模式"
-            inactive-text="詳細模式"
-            label-position="right"
-            :aria-label="'詳細模式'"
-            @update:modelValue="detailMode = $event"
-          />
-        </label>
-        <span class="toggle-hint">（語義分類更細緻）</span>
-      </div>
-      <button class="lexicon-button" @click="showLexiconModal = true">
-        📖 查看詞典
-      </button>
-    </div>
+    <SemanticDetailToolbar v-model="detailMode" />
 
     <div class="indices-section vml-glass-panel">
       <h2>語義指數</h2>
@@ -37,17 +14,18 @@
         獲取區域的語義強度指數，分析不同地區村莊命名的語義特徵偏好。語義強度 = 該區域村莊名稱中，平均每個村莊包含該語義類別字符的次數。
       </p>
 
-      <div class="controls">
-        <div class="input-group">
+      <div class="controls vml-control-surface vml-control-row vml-control-row--center">
+        <div class="input-group vml-control-field">
           <label class="input-label">語義類別</label>
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model="indicesCategory"
             :options="categoryOptions"
+            :searchable="detailMode"
           />
           <span class="input-hint">過濾特定語義類別</span>
         </div>
 
-        <div class="input-group">
+        <div class="input-group vml-control-field">
           <label class="input-label">行政級別</label>
           <SimpleSelectDropdown :match-trigger-width="true"
             v-model="indicesRegionLevel"
@@ -56,7 +34,7 @@
           <span class="input-hint">過濾特定行政級別</span>
         </div>
 
-        <div class="input-group" v-if="indicesRegionLevel">
+        <div class="input-group vml-control-field" v-if="indicesRegionLevel">
           <label class="input-label">區域名稱</label>
           <div class="input-with-clear">
             <FilterableSelect
@@ -77,7 +55,7 @@
           <span class="input-hint">查詢特定區域</span>
         </div>
 
-        <div class="input-group">
+        <div class="input-group vml-control-field">
           <label class="input-label">最小村莊數</label>
           <input
             v-model.number="indicesMinVillages"
@@ -92,7 +70,7 @@
           </span>
         </div>
 
-        <div class="input-group">
+        <div class="input-group vml-control-field">
           <label class="input-label">返回數量</label>
           <input
             v-model.number="indicesLimit"
@@ -107,13 +85,15 @@
           </span>
         </div>
 
-        <button
-          class="solid-button"
-          :disabled="loadingIndices"
-          @click="loadIndices"
-        >
-          查詢
-        </button>
+        <div class="vml-control-actions">
+          <button
+            class="solid-button"
+            :disabled="loadingIndices"
+            @click="loadIndices"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
       <div v-if="loadingIndices" class="vml-loading">
@@ -156,70 +136,20 @@
       </div>
     </div>
 
-    <!-- Lexicon Modal -->
-    <AppModal
-      :model-value="showLexiconModal"
-      size="lg"
-      title="📖 語義詞典"
-      @update:modelValue="showLexiconModal = false"
-    >
-      <div class="lexicon-body">
-              <!-- 9个主类别 -->
-              <div class="lexicon-section">
-                <h4>主類別 (v1.0.0)</h4>
-                <div class="category-list">
-                  <div
-                    v-for="(chars, category) in SEMANTIC_LEXICON_V1.categories"
-                    :key="category"
-                    class="category-item"
-                  >
-                    <div class="category-header">
-                      <span class="category-name">{{ CATEGORY_NAMES_ZH[category] }}</span>
-                      <span class="category-count">{{ chars.length }} 字</span>
-                    </div>
-                    <div class="char-list">
-                      <span v-for="char in chars" :key="char" class="char-tag">{{ char }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 详细子类别 -->
-              <div class="lexicon-section">
-                <h4>子類別 (v4.0.0-hybrid)</h4>
-                <div class="category-list">
-                  <div
-                    v-for="(chars, subcategory) in SEMANTIC_LEXICON_V4.subcategories"
-                    :key="subcategory"
-                    class="category-item"
-                  >
-                    <div class="category-header">
-                      <span class="category-name">{{ getSubcategoryName(subcategory) }}</span>
-                      <span class="category-count">{{ chars.length }} 字</span>
-                    </div>
-                    <div class="char-list">
-                      <span v-for="char in chars" :key="char" class="char-tag">{{ char }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-      </div>
-    </AppModal>
   </div>
 </template>
 
 <script setup>
 import { ref, watch, computed } from 'vue'
-import AppModal from '@/components/common/AppModal.vue'
+import { useRoute, useRouter } from 'vue-router'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import SwitchToggle from '@/components/common/SwitchToggle.vue'
+import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
 import { getSemanticIndices } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
-import { getCategoryDisplayName, getSubcategoryName } from '@/VillagesML/config/villagesML.js'
+import { showError } from '@/utils/ui/message.js'
+import { getCategoryDisplayName, SEMANTIC_SUBCATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 import { userStore } from '@/main/store/store.js'
-import { SEMANTIC_LEXICON_V1, SEMANTIC_LEXICON_V4, CATEGORY_NAMES_ZH } from '@/VillagesML/config/semanticLexicon.js'
 
 // State
 const indices = ref(null)
@@ -233,13 +163,12 @@ const indicesMinVillages = ref(null)
 const indicesLimit = ref(100)
 
 // Detail mode toggle
-const detailMode = ref(false)
-
-// Lexicon modal
-const showLexiconModal = ref(false)
+const route = useRoute()
+const router = useRouter()
+const detailMode = ref(route.query.detail === 'true')
 
 // Options for SimpleSelectDropdown
-const categoryOptions = [
+const parentCategoryOptions = [
   { label: '全部類別', value: '' },
   { label: '水系', value: 'water' },
   { label: '山地', value: 'mountain' },
@@ -251,6 +180,29 @@ const categoryOptions = [
   { label: '象徵', value: 'symbolic' },
   { label: '基建', value: 'infrastructure' }
 ]
+
+const KNOWN_PARENTS = new Set([
+  'water', 'mountain', 'settlement', 'direction', 'clan',
+  'vegetation', 'agriculture', 'symbolic', 'infrastructure',
+  'number', 'size', 'terrain', 'spatial', 'modifier', 'culture'
+])
+
+const categoryOptions = computed(() => {
+  if (detailMode.value) {
+    const options = [{ label: '全部類別', value: '' }]
+    for (const key of Object.keys(SEMANTIC_SUBCATEGORY_NAMES)) {
+      const underscoreIdx = key.indexOf('_')
+      if (underscoreIdx > 0 && KNOWN_PARENTS.has(key.substring(0, underscoreIdx))) {
+        options.push({
+          label: SEMANTIC_SUBCATEGORY_NAMES[key],
+          value: key
+        })
+      }
+    }
+    return options
+  }
+  return parentCategoryOptions
+})
 
 const regionLevelOptions = [
   { label: '全部級別', value: '' },
@@ -284,7 +236,11 @@ watch(indicesRegionLevel, () => {
 })
 
 // Watch detailMode changes and auto-refresh table if it has data
-watch(detailMode, () => {
+watch(detailMode, (val) => {
+  const query = { ...route.query }
+  if (val) { query.detail = 'true' } else { delete query.detail }
+  router.replace({ query })
+  indicesCategory.value = ''
   if (indices.value && indices.value.length > 0) {
     loadIndices()
   }
@@ -363,17 +319,13 @@ const getRegionLevelName = (level) => {
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  flex-wrap: wrap;
 }
 
 .input-group {
-  @include flex-col;
-  gap: 4px;
+  min-width: 0;
 }
 
 .input-with-clear {
@@ -413,7 +365,7 @@ const getRegionLevelName = (level) => {
 }
 
 .vml-number-input {
-  width: 150px;
+  // width: 150px;
 }
 
 .vml-number-input:disabled {
@@ -521,144 +473,6 @@ const getRegionLevelName = (level) => {
   .vml-number-input {
     width: 100%;
   }
-}
-
-/* Detail Mode Toggle */
-.detail-toggle {
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.toggle-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.toggle-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.toggle-hint {
-  white-space: nowrap;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-/* Detail Toggle Layout */
-.detail-toggle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.toggle-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* Lexicon Button */
-.lexicon-button {
-  padding: 8px 16px;
-  background: var(--color-primary);
-  color: var(--action-primary-text);
-  border: none;
-  border-radius: var(--radius-sm2);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.lexicon-button:hover {
-  background: var(--color-primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(var(--vml-blue-rgb), 0.3);
-}
-
-/* Lexicon Modal Styles */
-.lexicon-body {
-  padding: 0;
-  overflow: visible;
-}
-
-.lexicon-section {
-  margin-bottom: 32px;
-}
-
-.lexicon-section:last-child {
-  margin-bottom: 0;
-}
-
-.lexicon-section h4 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0 0 16px 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--color-primary);
-}
-
-.category-list {
-  @include flex-col;
-  gap: 16px;
-}
-
-.category-item {
-  padding: 16px;
-  background: var(--glass-50);
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(var(--vml-blue-rgb), 0.1);
-}
-
-.category-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.category-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-primary);
-}
-
-.category-count {
-  font-size: 13px;
-  color: var(--text-secondary);
-  padding: 4px 12px;
-  background: rgba(var(--vml-blue-rgb), 0.1);
-  border-radius: var(--radius-md);
-}
-
-.char-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.char-tag {
-  padding: 6px 12px;
-  background: rgba(var(--vml-blue-rgb), 0.1);
-  color: var(--text-primary);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.char-tag:hover {
-  background: var(--color-primary);
-  color: var(--action-primary-text);
-  transform: translateY(-2px);
 }
 
 </style>

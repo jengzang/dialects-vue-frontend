@@ -1,0 +1,788 @@
+<template>
+  <div class="vocabulary-map-container" :class="{ 'is-fullscreen': isFullScreen }">
+    <div ref="mapContainer" class="map-container">
+      <div v-if="isLoadingMarkers" class="map-loading-overlay">
+        <div class="loading-content">
+          <div class="ui-loading--page" aria-hidden="true"></div>
+          <span class="loading-text">{{ t('map.vocabularyMap.loading.mapData') }}</span>
+        </div>
+      </div>
+
+      <div class="map-controls" v-if="!isFullScreen">
+        <div class="control-group">
+          <SimpleSelectDropdown
+            v-model="currentStyleKey"
+            :options="mapStyleOptions"
+            @update:modelValue="handleStyleChange"
+          />
+        </div>
+
+        <div class="control-group mode-switcher">
+          <button
+            v-for="mode in displayModeOptions"
+            :key="mode.value"
+            :class="{ active: displayMode === mode.value }"
+            @click="switchDisplayMode(mode.value)"
+            :title="mode.label"
+          >
+            {{ mode.label }}
+          </button>
+        </div>
+
+        <div class="button-row">
+          <button class="action-btn" @click="resetView" :title="t('map.vocabularyMap.buttons.reset')">
+            {{ t('map.vocabularyMap.buttons.reset') }}
+          </button>
+          <button class="action-btn fullscreen-btn" @click="toggleFullScreen" :title="t('map.vocabularyMap.buttons.fullscreen')">
+            {{ t('map.vocabularyMap.buttons.fullscreen') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <button v-if="isFullScreen" class="exit-fullscreen-btn" @click="toggleFullScreen">
+      {{ t('map.vocabularyMap.buttons.exitFullscreen') }}
+    </button>
+
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, onBeforeUnmount, shallowRef, nextTick, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import maplibregl from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css'
+import {mapStyle, calculateDenseMapCenterAndZoom, mapStyleConfig} from '@/utils/map/MapSource.js'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import { FEATURE_PALETTE } from '@/main/config/colors/mapColors.js'
+
+defineOptions({ name: "VocabularyMap" })
+
+// --- Props ---
+const props = defineProps({
+  mapData: {
+    type: Array,
+    default: () => []
+  },
+  activeTab: {
+    type: String,
+    default: 'vocabulary'
+  }
+})
+const emit = defineEmits(['marker-click'])
+const displayMode = defineModel('displayMode', { default: 'overview' })
+
+// --- State ---
+const mapContainer = ref(null)
+const map = shallowRef(null)
+const currentStyleKey = ref('gaode')
+const isFullScreen = ref(false)
+const mapLoaded = ref(false)  // 跟踪地图是否已加载
+const isLoadingMarkers = ref(false)  // 跟踪标记是否正在加载
+const { t } = useI18n()
+
+let currentMarkers = []
+
+function clearMarkers() {
+  currentMarkers.forEach(m => m.remove())
+  currentMarkers = []
+}
+
+const overviewDisplayModeOptions = computed(() => [
+  { value: 'overview', label: t('map.vocabularyMap.controls.overview') },
+  { value: 'location', label: t('map.vocabularyMap.controls.location') }
+])
+const detailDisplayModeOptions = computed(() => [
+  { value: 'location', label: t('map.vocabularyMap.controls.location') },
+  { value: 'pronunciation', label: t('map.vocabularyMap.controls.pronunciation') },
+  { value: 'definition', label: t('map.vocabularyMap.controls.definition') }
+])
+
+const canShowDetailModes = computed(() => {
+  return props.mapData.some((item) => Array.isArray(item.items) && item.items.length > 0)
+})
+
+const displayModeOptions = computed(() => {
+  return canShowDetailModes.value ? detailDisplayModeOptions.value : overviewDisplayModeOptions.value
+})
+
+function ensureValidDisplayMode() {
+  if (!displayModeOptions.value.some((option) => option.value === displayMode.value)) {
+    displayMode.value = 'overview'
+  }
+}
+
+// Map style options
+const mapStyleOptions = computed(() => {
+  return Object.entries(mapStyleConfig).map(([key, name]) => ({
+    label: name,
+    value: key
+  }))
+})
+
+// --- Functions ---
+
+// 预定义的颜色数组（柔和的浅色系）— 从 mapColors.js 复用
+
+// 根据文本生成一致的颜色（从预定义数组中选择）
+const assignColor = (text) => {
+  if (!text || text === '-') return '#E5E5E5'
+
+  // 使用哈希函数计算索引
+  let hash = 0
+  for (let i = 0; i < text.length; i++) {
+    hash = text.charCodeAt(i) + ((hash << 5) - hash)
+  }
+
+  // 取绝对值并对数组长度取模，得到索引
+  const index = Math.abs(hash) % FEATURE_PALETTE.length
+
+  return FEATURE_PALETTE[index]
+}
+
+// 计算地图视角
+const calculateMapView = (data) => {
+  if (!data || data.length === 0) {
+    return { center: [113.2644, 23.1291], zoom: 8 }
+  }
+
+  // 修复：使用正确的字段名 longitude 和 latitude
+  const coordinates = data
+    .map(item => {
+      const lng = parseFloat(item.longitude)
+      const lat = parseFloat(item.latitude)
+      return [lng, lat]
+    })
+    .filter(coord => Array.isArray(coord) && coord.length >= 2 &&
+            Number.isFinite(coord[0]) && Number.isFinite(coord[1]))
+
+  if (coordinates.length === 0) {
+    return { center: [113.2644, 23.1291], zoom: 8 }
+  }
+
+  return calculateDenseMapCenterAndZoom(coordinates)
+}
+
+// 智能截断文字（区分汉字和非汉字）
+const truncateText = (text, maxLength = 6) => {
+  if (!text) return ''
+
+  let currentLength = 0
+  let truncatedText = ''
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i]
+    const code = char.charCodeAt(0)
+
+    // 判断是否为汉字（CJK 统一表意文字）
+    const isHanzi = (
+      (code >= 0x4E00 && code <= 0x9FFF) ||   // CJK 统一表意文字
+      (code >= 0x3400 && code <= 0x4DBF) ||   // CJK 扩展 A
+      (code >= 0x20000 && code <= 0x2A6DF) || // CJK 扩展 B
+      (code >= 0xF900 && code <= 0xFAFF) ||   // CJK 兼容表意文字
+      (code >= 0x2F800 && code <= 0x2FA1F)    // CJK 兼容表意文字补充
+    )
+
+    const charLength = isHanzi ? 1 : 0.5
+
+    if (currentLength + charLength > maxLength) {
+      return truncatedText + '...'
+    }
+
+    truncatedText += char
+    currentLength += charLength
+  }
+
+  return truncatedText
+}
+
+// 获取标记文本
+const getMarkerText = (item) => {
+  let text = ''
+
+  // 检查值是否为空的辅助函数
+  const isEmpty = (val) => {
+    return !val || val === '（空）' || val === '(空)' || val.trim() === ''|| val === '(无)'|| val === '（无）'
+  }
+
+  if (displayMode.value === 'overview') {
+    text = item.entryCount ? String(item.entryCount) : ''
+  } else if (displayMode.value === 'location') {
+    // 地名模式
+    if (props.activeTab === 'vocabulary') {
+      // 優先順序: county -> village -> city
+      text = isEmpty(item.county)
+          ? (isEmpty(item.village) ? item.city : item.village)
+          : item.county
+    } else {
+      // 優先順序: form_c -> form_d -> form_b
+      text = isEmpty(item.form_c)
+          ? (isEmpty(item.form_d) ? item.form_b : item.form_d)
+          : item.form_c
+    }
+  } else if (displayMode.value === 'pronunciation') {
+    // 语音模式
+    text = props.activeTab === 'vocabulary' ? item.pronunciation : item.phonetic
+  } else if (displayMode.value === 'definition') {
+    // 释义模式
+    text = props.activeTab === 'vocabulary' ? item.localExpression : item.memo
+  }
+
+  if (text) {
+    text = truncateText(text, 6)
+  }
+
+  return text || '-'
+}
+
+// 获取地点链
+const getLocationText = (item) => {
+  if (props.activeTab === 'vocabulary') {
+    return [item.province, item.city, item.county, item.village, item.location]
+      .filter(Boolean)
+      .join('-') || '-'
+  } else {
+    return [item.form_a, item.form_b, item.form_c, item.form_d, item.form_e]
+      .filter(Boolean)
+      .join('-') || '-'
+  }
+}
+
+// 转换数据为 GeoJSON 格式
+const convertToGeoJSON = (data) => {
+  if (!data || data.length === 0) {
+    return {
+      type: 'FeatureCollection',
+      features: []
+    }
+  }
+
+  // 第一步：过滤有效坐标
+  const validItems = data.filter(item => {
+    const lng = parseFloat(item.longitude)
+    const lat = parseFloat(item.latitude)
+    return Number.isFinite(lng) && Number.isFinite(lat)
+  })
+
+  // 第二步：按经纬度分组，合并相同坐标的不同文字
+  const coordinatesMap = new Map()
+
+  for (const item of validItems) {
+    const lng = parseFloat(item.longitude)
+    const lat = parseFloat(item.latitude)
+    const coordKey = `${lng},${lat}`
+
+    if (!coordinatesMap.has(coordKey)) {
+      coordinatesMap.set(coordKey, {
+        lng,
+        lat,
+        items: []
+      })
+    }
+    coordinatesMap.get(coordKey).items.push(item)
+  }
+
+  // 第三步：对每个坐标位置，合并不同的显示文字
+  const deduplicatedFeatures = []
+
+  for (const [coordKey, coordData] of coordinatesMap) {
+    const { lng, lat, items } = coordData
+
+    // 收集所有不同的显示文字
+    const textSet = new Set()
+    const textToItem = new Map() // 记录每个文字对应的第一个数据项
+
+    for (const item of items) {
+      const text = getMarkerText(item)
+      if (text && text !== '-') {
+        if (!textSet.has(text)) {
+          textSet.add(text)
+          textToItem.set(text, item)
+        }
+      }
+    }
+
+    // 如果没有有效文字，跳过
+    if (textSet.size === 0) continue
+
+    // 合并文字（用 / 分隔）
+    const mergedText = Array.from(textSet).join(' / ')
+
+    // 聚合所有数据项的信息用于弹窗
+    const aggregateField = (fieldGetter) => {
+      const values = new Set()
+      for (const item of items) {
+        const value = fieldGetter(item)
+        if (value && value !== '-' && value.trim() !== '') {
+          values.add(value)
+        }
+      }
+      return values.size > 0 ? Array.from(values).join(' / ') : '-'
+    }
+
+    // 聚合各个字段
+    const aggregatedData = {
+      locationChain: aggregateField(item => getLocationText(item)),
+      locationName: aggregateField(item => item.locationName || item.location),
+      locationNames: JSON.stringify(Array.from(new Set(items.map(item => item.locationName || item.location).filter(Boolean)))),
+      pronunciation: aggregateField(item => item.pronunciation),
+      phonetic: aggregateField(item => item.phonetic),
+      word: aggregateField(item => item.standardWord || item.word),
+      memo: aggregateField(item => item.memo),
+      sentence: aggregateField(item => item.sentence),
+      category: aggregateField(item => {
+        const cats = [item.lang_cat1, item.lang_cat2, item.lang_cat3].filter(Boolean)
+        return cats.length > 0 ? cats.join('-') : ''
+      })
+    }
+
+    // 计算颜色（基于合并后的文字）
+    let bgColor, textColor
+    if (displayMode.value === 'location') {
+       bgColor = '#1b2e2b'
+       textColor = '#a6ffdc'
+    } else {
+      bgColor = assignColor(mergedText)
+      textColor = '#1d1d1f'
+    }
+
+    deduplicatedFeatures.push({
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [lng, lat]
+      },
+      properties: {
+        label: mergedText,
+        bgColor: bgColor,
+        textColor: textColor,
+        // 使用聚合后的数据用于弹窗
+        locationChain: aggregatedData.locationChain,
+        locationName: aggregatedData.locationName,
+        locationNames: aggregatedData.locationNames,
+        pronunciation: aggregatedData.pronunciation,
+        phonetic: aggregatedData.phonetic,
+        word: aggregatedData.word,
+        note1: aggregatedData.note1,
+        memo: aggregatedData.memo,
+        sentence: aggregatedData.sentence,
+        category: aggregatedData.category,
+        // 添加额外信息：此位置的数据点数量
+        itemCount: items.length,
+        uniqueTextCount: textSet.size
+      }
+    })
+  }
+
+  console.log(`📍 原始数据: ${validItems.length} 个点, 去重后: ${deduplicatedFeatures.length} 个位置`)
+
+  // 统计聚合信息
+  const aggregatedCount = deduplicatedFeatures.filter(f => f.properties.itemCount > 1).length
+  const totalAggregatedItems = deduplicatedFeatures.reduce((sum, f) => sum + (f.properties.itemCount - 1), 0)
+
+  if (aggregatedCount > 0) {
+    console.log(`🔗 聚合统计: ${aggregatedCount} 个位置包含多个数据点, 共聚合了 ${totalAggregatedItems} 个重复点`)
+  }
+
+  return {
+    type: 'FeatureCollection',
+    features: deduplicatedFeatures
+  }
+}
+
+// 渲染标记（HTML markers）
+const renderMarkers = () => {
+  if (!map.value || !props.mapData || props.mapData.length === 0) {
+    isLoadingMarkers.value = false
+    return
+  }
+
+  clearMarkers()
+
+  const geojsonData = convertToGeoJSON(props.mapData)
+
+  geojsonData.features.forEach(feature => {
+    const [lng, lat] = feature.geometry.coordinates
+    const { label, bgColor, textColor } = feature.properties
+
+    const el = document.createElement('div')
+    el.className = 'vocabulary-marker'
+    el.textContent = label
+    el.style.backgroundColor = bgColor
+    el.style.color = textColor
+
+    el.addEventListener('click', () => {
+      handleMarkerClick(feature.properties)
+    })
+
+    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
+      .setLngLat([lng, lat])
+      .addTo(map.value)
+
+    currentMarkers.push(marker)
+  })
+
+  isLoadingMarkers.value = false
+}
+
+
+// 处理标记点击（接受 GeoJSON properties）
+const handleMarkerClick = (properties) => {
+  emit('marker-click', {
+    locationName: properties.locationName,
+    locationNames: properties.locationNames,
+    locationLabel: properties.locationChain,
+    itemCount: Number(properties.itemCount) || 0,
+  })
+}
+
+// 切换显示模式
+const switchDisplayMode = (mode) => {
+  if (!displayModeOptions.value.some((option) => option.value === mode)) {
+    return
+  }
+  displayMode.value = mode
+}
+
+// 复位视角
+const resetView = () => {
+  if (!map.value) return
+
+  const { center, zoom } = calculateMapView(props.mapData)
+  map.value.flyTo({
+    center,
+    zoom,
+    essential: true
+  })
+}
+
+// 切换全屏
+const toggleFullScreen = async () => {
+  isFullScreen.value = !isFullScreen.value
+  await nextTick()
+  if (map.value) map.value.resize()
+}
+
+// 切换地图样式
+const handleStyleChange = () => {
+  if (!map.value) return
+  const newStyle = mapStyle(currentStyleKey.value)
+
+  map.value.setStyle(newStyle)
+
+  map.value.once('style.load', () => {
+    renderMarkers()
+  })
+}
+
+// 初始化地图
+const initMap = () => {
+  if (!mapContainer.value) return
+
+  isLoadingMarkers.value = true
+  mapLoaded.value = false
+
+  const { center, zoom } = calculateMapView(props.mapData)
+
+  map.value = new maplibregl.Map({
+    container: mapContainer.value,
+    style: mapStyle(currentStyleKey.value),
+    center,
+    zoom,
+    attributionControl: false
+  })
+
+  map.value.addControl(new maplibregl.NavigationControl(), 'top-left')
+
+  map.value.on('load', () => {
+    renderMarkers()
+    mapLoaded.value = true
+  })
+}
+
+// --- Lifecycle ---
+onMounted(() => {
+  initMap()
+})
+
+onBeforeUnmount(() => {
+  clearMarkers()
+  if (map.value) {
+    map.value.remove()
+    map.value = null
+  }
+})
+
+// --- Watchers ---
+watch(() => props.mapData, () => {
+  ensureValidDisplayMode()
+  if (map.value) {
+    isLoadingMarkers.value = true
+    const { center, zoom } = calculateMapView(props.mapData)
+    map.value.flyTo({ center, zoom })
+    renderMarkers()
+  }
+}, { deep: true })
+
+watch(() => props.activeTab, () => {
+  // 显示加载动画
+  isLoadingMarkers.value = true
+  renderMarkers()
+})
+
+watch(displayModeOptions, () => {
+  ensureValidDisplayMode()
+  renderMarkers()
+})
+
+watch(displayMode, () => {
+  renderMarkers()
+})
+</script>
+
+
+<style scoped lang="scss">
+.vocabulary-map-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: none;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.vocabulary-map-container.is-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  border-radius: 0;
+  z-index: 99999;
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* 加载动画覆盖层 */
+.map-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--glass-90);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  @include flex-center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.loading-content {
+  @include flex-col;
+  align-items: center;
+  gap: 16px;
+}
+
+
+
+.loading-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+/* 地图控制面板 */
+.map-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--glass-90);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  @include flex-col;
+  gap: 10px;
+  z-index: 10;
+  width: 160px;
+}
+
+.control-group {
+  width: 100%;
+  position: relative;
+  display: flex;
+}
+
+/* 自定义 Select */
+.custom-select {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select select {
+  width: 100%;
+  appearance: none;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light-gray);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm2);
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: border 0.3s;
+}
+
+.custom-select select:focus {
+  border-color: var(--color-primary);
+}
+
+.custom-select .arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 12px;
+  color: var(--text-muted)
+}
+
+/* 模式切换按钮 */
+.mode-switcher {
+  display: flex;
+  white-space: nowrap;
+  gap: 4px;
+  background: var(--bg-light);
+  border-radius: var(--radius-sm2);
+  padding: 4px;
+}
+
+.mode-switcher button {
+  flex: 1;
+  padding: 6px 8px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-tertiary)
+}
+
+.mode-switcher button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.mode-switcher button.active {
+  background: white;
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  :root[data-color-theme='dark'] & {
+    color: var(--text-primary);
+    background: var(--surface-panel-strong);
+  }
+}
+
+/* 按钮行 */
+.button-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.button-row .action-btn {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.action-btn {
+  background: var(--color-primary);
+  color: var(--action-primary-text);
+  border: none;
+  padding: 8px;
+  border-radius: var(--radius-sm2);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.action-btn:hover {
+  background: var(--color-primary-hover);
+}
+
+.fullscreen-btn {
+  background: var(--color-success);
+}
+
+.fullscreen-btn:hover {
+  background: #2db34e;
+}
+
+/* 退出全屏按钮 */
+.exit-fullscreen-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-dark);
+  background: var(--glass-70);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-50);
+  border-radius: 50px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  z-index: 2000;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.exit-fullscreen-btn:hover {
+  background: var(--glass-90);
+  transform: scale(1.05);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
+}
+
+.exit-fullscreen-btn:active {
+  transform: scale(0.95);
+}
+
+/* HTML markers — 圆角矩形标签 */
+:deep(.vocabulary-marker) {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  font-size: 12px;
+  white-space: nowrap;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+</style>

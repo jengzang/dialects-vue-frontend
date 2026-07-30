@@ -9,7 +9,7 @@
       <h2>🔍 模式頻率分析</h2>
 
       <!-- Query Mode Selection -->
-      <div class="mode-selector">
+      <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
         <RadioGroup
             name="patternQueryMode"
             :options="queryModeOptions"
@@ -18,9 +18,9 @@
       </div>
 
       <!-- Controls -->
-      <div class="controls">
+      <div class="controls vml-control-surface vml-control-row vml-control-row--center">
         <!-- Regional Selection (only show when regional mode) -->
-        <div v-if="queryMode === 'regional'" class="control-group">
+        <div v-if="queryMode === 'regional'" class="control-group vml-control-field">
           <FilterableSelect
             v-model="regionName"
             :level="regionLevel"
@@ -30,7 +30,7 @@
           />
         </div>
 
-        <div class="control-group">
+        <div class="control-group vml-control-field">
           <label class="control-label">返回數量</label>
           <input
             v-model.number="topN"
@@ -41,7 +41,7 @@
           />
         </div>
 
-        <div v-if="queryMode === 'global'" class="control-group">
+        <div v-if="queryMode === 'global'" class="control-group vml-control-field">
           <label class="control-label">最小佔比(%)</label>
           <input
             v-model.number="minPercentage"
@@ -54,17 +54,19 @@
           />
         </div>
 
-        <button
-          class="query-button"
-          :disabled="loading || (queryMode === 'regional' && !regionName)"
-          @click="loadPatterns"
-        >
-          查詢
-        </button>
+        <div class="vml-control-actions">
+          <button
+            class="query-button"
+            :disabled="loading || (queryMode === 'regional' && !regionName)"
+            @click="loadPatterns"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="vml-loading"">
+      <div v-if="loading" class="vml-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <p>加載中...</p>
       </div>
@@ -121,7 +123,7 @@ import {
   getPatternFrequencyGlobal,
   getPatternFrequencyRegional
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 import RadioGroup from "@/components/selector/RadioGroup.vue";
 
 const router = useRouter()
@@ -198,9 +200,9 @@ const goToTendency = (pattern) => {
   margin: 0 auto;
 }
 
-.vml-glass-panel {
-  @include flex-col;
-}
+// .vml-glass-panel {
+//   @include flex-col;
+// }
 
 .vml-glass-panel h2 {
   white-space: nowrap;
@@ -208,8 +210,7 @@ const goToTendency = (pattern) => {
 }
 
 .mode-selector {
-  display: flex;
-  gap: 24px;
+  margin-bottom: 12px;
 }
 
 .radio-label {
@@ -228,16 +229,11 @@ const goToTendency = (pattern) => {
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
+  margin: 12px 0 16px;
 }
 
 .control-group {
-  @include flex-col;
-  gap: 6px;
+  min-width: 0;
 }
 
 .control-label {
@@ -247,7 +243,7 @@ const goToTendency = (pattern) => {
 }
 
 .vml-number-input {
-  width: 150px;
+  // width: 150px;
 }
 
 .pattern-grid {
@@ -356,14 +352,9 @@ const goToTendency = (pattern) => {
 }
 
 @media (min-aspect-ratio: 1/1) {
-  .vml-glass-panel {
-    flex-direction: row;
-    align-items: center;
-  }
-
   .controls {
     flex: 1;
-    justify-content: flex-end;
+    justify-content: center;
   }
 }
 
@@ -372,9 +363,9 @@ const goToTendency = (pattern) => {
     flex-direction: column;
   }
 
-  .vml-number-input {
-    width: 100%;
-  }
+  // .vml-number-input {
+  //   width: 100%;
+  // }
 
 }
 </style>

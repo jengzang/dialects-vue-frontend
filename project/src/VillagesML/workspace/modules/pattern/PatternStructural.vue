@@ -9,18 +9,22 @@
       <h2>🏗️ 模式結構分析</h2>
 
       <!-- Controls -->
-      <div class="controls">
-        <SimpleSelectDropdown :match-trigger-width="true"
-          v-model="patternType"
-          :options="patternTypeOptions"
-        />
-        <button
-          class="query-button"
-          :disabled="loading"
-          @click="loadStructuralAnalysis"
-        >
-          查詢
-        </button>
+      <div class="controls vml-control-surface vml-control-row">
+        <div class="vml-control-field">
+          <SimpleSelectDropdown :match-trigger-width="true"
+            v-model="patternType"
+            :options="patternTypeOptions"
+          />
+        </div>
+        <div class="vml-control-actions">
+          <button
+            class="query-button"
+            :disabled="loading"
+            @click="loadStructuralAnalysis"
+          >
+            查詢
+          </button>
+        </div>
       </div>
 
       <!-- Loading State -->
@@ -71,7 +75,7 @@ import { useRouter, useRoute } from 'vue-router'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { getPatternStructural } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -130,9 +134,8 @@ const goToTendency = (pattern) => {
 }
 
 .controls {
-  display: flex;
-  gap: 12px;
   margin-bottom: 16px;
+  justify-content: center;
 }
 
 .structural-list {

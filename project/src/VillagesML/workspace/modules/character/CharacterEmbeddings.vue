@@ -22,30 +22,36 @@
             trigger="both"
           />
         </h2>
-        <div class="search-group">
-          <input
-            v-model="searchChar"
-            type="text"
-            placeholder="輸入單個字符..."
-            maxlength="1"
-            class="vml-char-input"
-            @input="handleCharInput"
-          />
-          <input
-            v-model.number="topN"
-            type="number"
-            min="5"
-            max="50"
-            placeholder="返回數量"
-            class="vml-number-input"
-          />
-          <button
-            class="search-button"
-            :disabled="!searchChar || loading"
-            @click="searchSimilarities"
-          >
-            搜索
-          </button>
+        <div class="search-group vml-control-surface vml-control-row">
+          <div class="vml-control-field">
+            <input
+              v-model="searchChar"
+              type="text"
+              placeholder="輸入單個字符..."
+              maxlength="1"
+              class="vml-char-input"
+              @input="handleCharInput"
+            />
+          </div>
+          <div class="vml-control-field">
+            <input
+              v-model.number="topN"
+              type="number"
+              min="5"
+              max="50"
+              placeholder="返回數量"
+              class="vml-number-input"
+            />
+          </div>
+          <div class="vml-control-actions">
+            <button
+              class="search-button"
+              :disabled="!searchChar || loading"
+              @click="searchSimilarities"
+            >
+              搜索
+            </button>
+          </div>
         </div>
       </div>
 
@@ -126,7 +132,7 @@
           </div>
         </div>
 
-        <div class="pagination-controls">
+        <div class="pagination-controls vml-control-surface vml-control-row vml-control-row--center">
           <button
             :disabled="currentPage === 1"
             @click="changePage(currentPage - 1)"
@@ -154,7 +160,7 @@ import {
   getCharEmbeddingsList,
   getCharSimilarities
 } from '@/api/index.js'
-import { showError } from '@/utils/message.js'
+import { showError } from '@/utils/ui/message.js'
 
 // State
 const searchChar = ref('')
@@ -365,7 +371,7 @@ onBeforeUnmount(() => {
 }
 
 .vml-number-input {
-  width: 120px;
+  // width: 120px;
   padding: 10px;
   border-radius: var(--radius-md);
 }
@@ -634,7 +640,7 @@ onBeforeUnmount(() => {
   }
 
   .vml-number-input {
-    width: 60px;
+    // width: 60px;
   }
 
   .embeddings-list {
@@ -652,6 +658,7 @@ onBeforeUnmount(() => {
   .search-section {
     flex-direction: row;
     align-items: center;
+    justify-content: space-around;
   }
 }
 

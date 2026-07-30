@@ -50,6 +50,14 @@
             <button class="control-btn" @click="resetView">🎯 {{ t('map.villageMapPopup.buttons.reset') }}</button>
             <button class="control-btn" @click="toggleFullscreen">⛶ {{ t('map.villageMapPopup.buttons.fullscreen') }}</button>
           </div>
+
+          <button
+            v-if="hasDialectData"
+            class="control-btn control-btn-full"
+            @click="navigateToVoronoi"
+          >
+            ⬡ {{ t('map.villageMapPopup.buttons.voronoi') }}
+          </button>
         </div>
 
         <button v-if="isFullscreen" class="exit-fullscreen-btn" @click="toggleFullscreen">
@@ -63,9 +71,13 @@
 <script setup>
 import { ref, computed, watch, shallowRef, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter, useRoute } from 'vue-router'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle, mapStyleConfig, calculateDenseMapCenterAndZoom } from '@/utils/map/MapSource.js'
+import { buildVillagePartitionPoints } from '@/main/utils/drawMap/partitionVoronoi.js'
+import { globalPayload } from '@/main/store/store.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import AppModal from '@/components/common/AppModal.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 
@@ -83,6 +95,8 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 const { t } = useI18n()
+const router = useRouter()
+const route = useRoute()
 
 // 状态管理
 const mapContainer = ref(null)
@@ -90,7 +104,6 @@ const map = shallowRef(null)
 const currentStyle = ref('gaode')
 const displayMode = ref('name') // 'name' | 'dialect'
 const isFullscreen = ref(false)
-let currentMarkers = []
 let clusteredPopup = null
 let clusteredInteractionHandlers = null
 
@@ -102,32 +115,26 @@ const mapStyleOptions = computed(() => {
   }))
 })
 
-// 20色盘 (参考 MapLibre.vue)
-const colorPalette = [
-  "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
-  "#911eb4", "#42d4f4", "#f032e6", "#bfe745", "#fabed4",
-  "#469990", "#dcbaff", "#9a6324", "#fffac8", "#800000",
-  "var(--color-success)", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
-]
+import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
 
 const tagPastelPalette = [
-  '#e3f2fd', 'var(--bg-error-light)', '#e8f5e9', '#fff3e0', '#f3e5f5',
-  '#e0f7fa', 'var(--bg-error-light)', '#e8eaf6', '#f1f8e9', '#fff8e1',
+  '#e3f2fd', '#fde4ec', '#e8f5e9', '#fff3e0', '#f3e5f5',
+  '#e0f7fa', '#fde4ec', '#e8eaf6', '#f1f8e9', '#fff8e1',
   '#ede7f6', '#e1f5fe', '#f9fbe7', '#efebe9', '#e0f2f1'
 ]
 const getTagColor = (text) => {
-  if (!text) return 'var(--bg-light)'
+  if (!text) return '#f0f0f0'
   let hash = 0
   for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0
   return tagPastelPalette[Math.abs(hash) % tagPastelPalette.length]
 }
 
 const buildTag = (text, bgColor) =>
-  `<span style="display:inline-block;padding:1px 8px;border-radius: var(--radius-md);font-size:10px;font-weight:500;color:var(--text-medium);background:${bgColor};margin-top:2px">${text}</span>`
+  `<span style="display:inline-block;padding:1px 8px;border-radius:12px;font-size:10px;font-weight:500;color:#333;background:${bgColor};margin-top:2px">${text}</span>`
 
 const buildHoverHtml = (name, pathStr, tagText, tagColor) => {
   let html = `<div style="text-align:center"><strong>${name}</strong></div>`
-  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:var(--text-lightest);margin-top:2px">${pathStr}</div>`
+  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:var(--text-secondary);margin-top:2px">${pathStr}</div>`
   if (tagText) html += `<div style="text-align:center">${buildTag(tagText, tagColor)}</div>`
   return html
 }
@@ -253,9 +260,7 @@ const bindClusteredInteractions = () => {
 
 // 渲染标记 - 村名模式使用聚合，方言模式不聚合
 const renderMarkers = () => {
-  // 清除旧标记和图层
-  currentMarkers.forEach(m => m.remove())
-  currentMarkers.length = 0
+  // 清除旧图层和交互
   unbindClusteredInteractions()
 
   if (!map.value || !validVillages.value.length) return
@@ -300,7 +305,7 @@ const renderMarkers = () => {
   if (displayMode.value === 'dialect') {
     const uniqueDialects = [...new Set(villagesToRender.map(v => v.dialect))]
     uniqueDialects.forEach((dialect, idx) => {
-      dialectColorMap[dialect] = colorPalette[idx % colorPalette.length]
+      dialectColorMap[dialect] = CATEGORY_PALETTE[idx % CATEGORY_PALETTE.length]
     })
   }
 
@@ -310,9 +315,9 @@ const renderMarkers = () => {
     features: villagesToRender.map(village => {
       const label = displayMode.value === 'name' ? village.name : village.dialect
       const bgColor = displayMode.value === 'dialect'
-        ? (dialectColorMap[village.dialect] || 'var(--color-dark-teal)')
-        : 'var(--color-dark-teal)'
-      const textColor = displayMode.value === 'dialect' ? '#000000' : 'var(--color-cyan)'
+        ? (dialectColorMap[village.dialect] || '#1b2e2b')
+        : '#1b2e2b'
+      const textColor = displayMode.value === 'dialect' ? '#000000' : '#5ac8fa'
 
       return {
         type: 'Feature',
@@ -411,7 +416,7 @@ const renderWithClustering = (geojsonData) => {
       'circle-color': ['get', 'bgColor'],
       'circle-opacity': 0.9,
       'circle-stroke-width': 1.5,
-      'circle-stroke-color': 'var(--glass-80)'
+      'circle-stroke-color': 'rgba(255,255,255,0.80)'
     }
   })
 
@@ -435,73 +440,44 @@ const renderWithClustering = (geojsonData) => {
   bindClusteredInteractions()
 }
 
-// 不带聚合的渲染（方言模式）- 使用 DOM Marker，优化性能
+// 不带聚合的渲染（方言模式）- 用彩色圆点 + hover popup，性能优于 DOM Marker
 const renderWithoutClustering = (geojsonData) => {
-  // 方言模式使用 DOM Marker，分批渲染优化性能
-  const dialectColorMap = {}
-  const uniqueDialects = [...new Set(geojsonData.features.map(f => f.properties.dialect).filter(d => d))]
-  uniqueDialects.forEach((dialect, idx) => {
-    dialectColorMap[dialect] = colorPalette[idx % colorPalette.length]
+  map.value.addSource('villages', {
+    type: 'geojson',
+    data: geojsonData
   })
 
-  const features = geojsonData.features
-  const batchSize = 100 // 每批渲染 100 个标记
-  let currentIndex = 0
-
-  // 分批渲染函数
-  const renderBatch = () => {
-    const endIndex = Math.min(currentIndex + batchSize, features.length)
-
-    for (let i = currentIndex; i < endIndex; i++) {
-      const feature = features[i]
-      const { name, dialect, _pathStr } = feature.properties
-      const [lng, lat] = feature.geometry.coordinates
-
-      // 创建文字标记元素（类似 MapLibre.vue 的 marker-text-feature）
-      const el = document.createElement('div')
-      el.className = 'marker-text-feature'
-      el.innerText = dialect
-      el.style.backgroundColor = dialectColorMap[dialect] || 'var(--color-dark-teal)'
-
-      // 创建 Marker
-      const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
-        .setLngLat([lng, lat])
-        .addTo(map.value)
-
-      // 使用单个 Popup 实例，优化性能
-      if (!window._villagePopup) {
-        window._villagePopup = new maplibregl.Popup({
-          offset: 10,
-          closeButton: false,
-          closeOnClick: false
-        })
-      }
-
-      // 优化事件监听：使用箭头函数避免重复创建
-      el.addEventListener('mouseenter', () => {
-        window._villagePopup
-          .setLngLat([lng, lat])
-          .setHTML(buildHoverHtml(name, _pathStr, dialect, getTagColor(dialect)))
-          .addTo(map.value)
-      })
-
-      el.addEventListener('mouseleave', () => {
-        window._villagePopup.remove()
-      })
-
-      currentMarkers.push(marker)
+  map.value.addLayer({
+    id: 'unclustered-point-bg',
+    type: 'circle',
+    source: 'villages',
+    paint: {
+      'circle-radius': 6,
+      'circle-color': ['get', 'bgColor'],
+      'circle-opacity': 0.85,
+      'circle-stroke-width': 1.5,
+      'circle-stroke-color': '#fff'
     }
+  })
 
-    currentIndex = endIndex
+  const dialectPopup = new maplibregl.Popup({
+    closeButton: false,
+    closeOnClick: false,
+    offset: 10
+  })
 
-    // 如果还有未渲染的标记，继续下一批
-    if (currentIndex < features.length) {
-      requestAnimationFrame(renderBatch)
-    }
-  }
+  map.value.on('mouseenter', 'unclustered-point-bg', (e) => {
+    map.value.getCanvas().style.cursor = 'pointer'
+    const props = e.features[0].properties
+    dialectPopup.setLngLat(e.lngLat)
+      .setHTML(buildHoverHtml(props.name, props._pathStr, props.dialect, getTagColor(props.dialect)))
+      .addTo(map.value)
+  })
 
-  // 开始分批渲染
-  renderBatch()
+  map.value.on('mouseleave', 'unclustered-point-bg', () => {
+    map.value.getCanvas().style.cursor = ''
+    dialectPopup.remove()
+  })
 }
 
 // 切换显示模式
@@ -542,15 +518,7 @@ const changeMapStyle = () => {
 
 // 清理地图
 const cleanupMap = () => {
-  currentMarkers.forEach(m => m.remove())
-  currentMarkers.length = 0
   unbindClusteredInteractions()
-
-  // 清理全局 popup
-  if (window._villagePopup) {
-    window._villagePopup.remove()
-    delete window._villagePopup
-  }
 
   if (map.value) {
     // 移除所有图层
@@ -580,6 +548,27 @@ const cleanupMap = () => {
 // 关闭弹窗
 const handleClose = () => {
   emit('close')
+}
+
+// 导航到泰森多边形
+const navigateToVoronoi = () => {
+  if (!hasDialectData.value) return
+
+  const points = buildVillagePartitionPoints(validVillages.value)
+  if (points.length === 0) return
+
+  globalPayload.value = {
+    _type: 'villageVoronoi',
+    points,
+    label: t('map.villageMapPopup.title'),
+    timestamp: Date.now(),
+  }
+
+  emit('close')
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), '/menu/map/draw'),
+    query: { scrollTo: 'drawBottom' },
+  })
 }
 
 // 键盘支持
@@ -745,10 +734,15 @@ $success: var(--color-success);/* 地图容器 */
 .control-btn {
   flex: 1;
   padding: 8px 12px;
-  background: $primary;
+
+  &-full {
+    flex: none;
+    width: 100%;
+  }
+  background: var(--action-primary-bg);
   border: none;
   border-radius: var(--radius-sm2);
-  color: var(--text-white);
+  color: var(--action-primary-text);
   white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
@@ -756,7 +750,7 @@ $success: var(--color-success);/* 地图容器 */
   transition: all 0.2s;
 
   &:hover {
-    background: $primary-hover;
+    background: var(--action-primary-bg-hover);
   }
 }
 
@@ -786,35 +780,21 @@ $success: var(--color-success);/* 地图容器 */
   }
 }
 
-/* 方言模式下由脚本动态创建的 DOM Marker */
-:deep(.marker-text-feature) {
-  padding: 2px 4px;
-  background: transparent;
-  border: 0.7px solid #000;
-  border-radius: var(--radius-xs);
-  box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
-  color: #000;
-  white-space: nowrap;
-  font-family: "Times New Roman", serif;
-  font-size: 15px;
-  cursor: pointer;
-}
-
 /* MapLibre 动态弹窗 */
 :deep(.maplibregl-popup-content) {
   padding: 10px 12px;
-  background: var(--glass-90);
+  background: var(--surface-panel-strong);
   border-radius: var(--radius-sm2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  color: var(--text-dark);
+  color: var(--text-primary);
   font-size: 13px;
   line-height: 1.6;
 
   @include glass-blur(10px);
 
   strong {
-    color: $text-dark;
-    font-weight: 600;
+    color: var(--text-primary);
+    font-weight: 700;
   }
 }
 
