@@ -46,16 +46,15 @@
           </div>
         </div>
 
-        <template v-if="selectedUploadFile">
-          <div class="upload-location-summary">
-            <div>
-              <strong>{{ uploadLocation.location_name || t('words.wordList.upload.locationName') }}</strong>
-              <p>{{ uploadLocationSummaryText }}</p>
-            </div>
-            <button class="main-glass-button" data-variant="secondary" type="button" @click="openUploadLocationEditor">
-              {{ uploadLocation.location_name ? t('common.button.edit') : t('words.wordList.upload.locationName') }}
-            </button>
+        <div class="upload-location-summary">
+          <div>
+            <strong>{{ uploadLocation.location_name || t('words.wordList.upload.locationName') }}</strong>
+            <p>{{ uploadLocationSummaryText }}</p>
           </div>
+          <button class="main-glass-button" data-variant="secondary" type="button" @click="openUploadLocationEditor">
+            {{ uploadLocation.location_name ? t('common.button.edit') : t('words.wordList.upload.locationName') }}
+          </button>
+        </div>
 
         <div class="upload-location-summary-grid">
           <span v-for="item in uploadLocationSummaryItems" :key="item.key">
@@ -129,7 +128,6 @@
           </button>
         </div>
         <p v-if="uploadStatusText" class="upload-status">{{ uploadStatusText }}</p>
-        </template>
       </div>
     </section>
 
