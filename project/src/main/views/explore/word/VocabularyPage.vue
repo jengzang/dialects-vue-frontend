@@ -3,16 +3,30 @@
     <div class="page-tab-navigation">
       <div class="page-tab-container" role="tablist" :aria-label="t('words.wordList.tabs.label')">
         <button
-          v-for="tab in pageTabs"
-          :key="tab.path"
           class="page-tab-btn"
-          :class="{ active: isActivePage(tab.path) }"
+          :class="{ active: isActivePage(pageTabs[0].path) }"
           type="button"
           role="tab"
-          :aria-selected="isActivePage(tab.path)"
-          @click="navigateTo(tab.path)"
+          :aria-selected="isActivePage(pageTabs[0].path)"
+          @click="navigateTo(pageTabs[0].path)"
         >
-          {{ tab.label }}
+          {{ pageTabs[0].label }}
+        </button>
+        <ChoiceSelector
+          v-if="isQueryTabActive"
+          v-model="viewModeQuery"
+          :options="viewModeOptions"
+          class="tab-view-mode-selector"
+        />
+        <button
+          class="page-tab-btn"
+          :class="{ active: isActivePage(pageTabs[1].path) }"
+          type="button"
+          role="tab"
+          :aria-selected="isActivePage(pageTabs[1].path)"
+          @click="navigateTo(pageTabs[1].path)"
+        >
+          {{ pageTabs[1].label }}
         </button>
       </div>
     </div>
@@ -34,6 +48,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { getVocabularyMe } from '@/api'
 import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js'
+import ChoiceSelector from '@/components/selector/ChoiceSelector.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -44,11 +59,12 @@ const isLoadingVocabularyMe = ref(false)
 const vocabularyMeError = ref('')
 const isAuthReady = computed(() => userStore.authReady)
 const isAuthenticated = computed(() => userStore.isAuthenticated)
+const contributeTabPaths = ['/explore/vocabulary/import', '/explore/vocabulary/manage']
+
 const pageTabs = computed(() => {
   return [
-    { label: t('words.wordList.tabs.list'), path: '/explore/vocabulary/view' },
-    { label: t('words.wordList.tabs.upload'), path: '/explore/vocabulary/import' },
-    { label: t('words.wordList.tabs.manage'), path: '/explore/vocabulary/manage' },
+    { label: t('words.wordList.tabs.query'), path: '/explore/vocabulary/view' },
+    { label: t('words.wordList.tabs.contribute'), path: '/explore/vocabulary/import' },
   ]
 })
 
@@ -88,11 +104,51 @@ async function loadVocabularyMe() {
   }
 }
 
-function isActivePage(path) {
-  return stripLocaleFromPath(route.path) === path
+function isActivePage(tabPath) {
+  const currentPath = stripLocaleFromPath(route.path)
+  if (tabPath === '/explore/vocabulary/import') {
+    return contributeTabPaths.includes(currentPath)
+  }
+  return currentPath === tabPath
 }
 
+const isQueryTabActive = computed(() => {
+  return stripLocaleFromPath(route.path) === '/explore/vocabulary/view'
+})
+
+const viewModeOptions = computed(() => [
+  { value: 'card', label: t('words.wordList.viewModes.card') },
+  { value: 'map', label: t('words.wordList.viewModes.map') },
+  { value: 'table', label: t('words.wordList.viewModes.table') },
+])
+
+const viewModeQuery = computed({
+  get: () => {
+    const tab = route.query.tab
+    return (tab === 'map' || tab === 'table') ? tab : 'card'
+  },
+  set: (val) => {
+    router.replace({ query: { ...route.query, tab: val } })
+  },
+})
+
+const lastContributePath = ref('/explore/vocabulary/import')
+
+watch(() => route.path, () => {
+  const currentPath = stripLocaleFromPath(route.path)
+  if (contributeTabPaths.includes(currentPath)) {
+    lastContributePath.value = currentPath
+  }
+})
+
 function navigateTo(path) {
+  if (path === '/explore/vocabulary/import') {
+    const currentPath = stripLocaleFromPath(route.path)
+    if (contributeTabPaths.includes(currentPath)) {
+      return
+    }
+    path = lastContributePath.value
+  }
   router.push(buildLocalePath(resolveRouteLocale(route), path))
 }
 

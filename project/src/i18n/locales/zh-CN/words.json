@@ -18,7 +18,11 @@
       "upload": "上传",
       "review": "审查",
       "locations": "地点",
-      "manage": "管理"
+      "manage": "管理",
+      "query": "查询",
+      "contribute": "贡献",
+      "uploadTab": "上传",
+      "manageTab": "管理"
     },
     "access": {
       "loadingTitle": "正在确认词表权限",

@@ -18,7 +18,11 @@
       "upload": "Upload",
       "review": "Review",
       "locations": "Locations",
-      "manage": "Manage"
+      "manage": "Manage",
+      "query": "Query",
+      "contribute": "Contribute",
+      "uploadTab": "Upload",
+      "manageTab": "Manage"
     },
     "access": {
       "loadingTitle": "Checking vocabulary access",

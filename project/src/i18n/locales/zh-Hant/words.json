@@ -18,7 +18,11 @@
       "upload": "上傳",
       "review": "審查",
       "locations": "地點",
-      "manage": "管理"
+      "manage": "管理",
+      "query": "查詢",
+      "contribute": "貢獻",
+      "uploadTab": "上傳",
+      "manageTab": "管理"
     },
     "access": {
       "loadingTitle": "正在確認詞表權限",

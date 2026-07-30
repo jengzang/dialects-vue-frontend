@@ -56,11 +56,6 @@
         </div>
       </div>
 
-      <ChoiceSelector
-        v-model="localViewMode"
-        :options="choiceViewModes"
-        class="view-mode-selector"
-      />
     </div>
 
     <div class="filter-strip">
@@ -143,7 +138,6 @@ import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
-import ChoiceSelector from '@/components/selector/ChoiceSelector.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 
@@ -160,7 +154,6 @@ const props = defineProps({
   searchFieldOptions: { type: Array, default: () => [] },
   locationOptions: { type: Array, default: () => [] },
   standardWordOptions: { type: Array, default: () => [] },
-  viewModes: { type: Array, default: () => [] },
 })
 
 const emit = defineEmits([
@@ -170,7 +163,6 @@ const emit = defineEmits([
   'update:selectedStandardWord',
   'update:selectedStandardWords',
   'update:singleSelect',
-  'update:viewMode',
 ])
 
 const searchInputEl = ref(null)
@@ -196,11 +188,6 @@ function formatMultiSelectLabel(selectedValues, options, placeholder) {
   return `${selectedLabels[0]} +${selectedLabels.length - 1}`
 }
 
-const localViewMode = computed({
-  get: () => props.viewMode,
-  set: (val) => emit('update:viewMode', val),
-})
-
 const localSingleSelect = computed({
   get: () => props.singleSelect,
   set: (val) => emit('update:singleSelect', val),
@@ -208,10 +195,6 @@ const localSingleSelect = computed({
 
 const multiStandardWordOptions = computed(() =>
   props.standardWordOptions.filter((o) => o.value !== ''),
-)
-
-const choiceViewModes = computed(() =>
-  props.viewModes.map((m) => ({ value: m.key, label: m.label })),
 )
 
 function isFieldChecked(value) {
@@ -369,10 +352,6 @@ const standardWordTriggerLabel = computed(() => {
   transform: rotate(180deg);
 }
 
-.view-mode-selector {
-  flex: 0 0 auto;
-}
-
 .filter-strip {
   flex: 0 0 auto;
   min-width: 180px;
@@ -384,10 +363,6 @@ const standardWordTriggerLabel = computed(() => {
     gap: 10px;
   }
 
-  .search-container {
-    flex-wrap: wrap;
-  }
-
   .search-section {
     flex: 1 1 100%;
     min-width: 100%;
@@ -395,10 +370,6 @@ const standardWordTriggerLabel = computed(() => {
 
   .field-filter {
     flex: 0 0 auto;
-  }
-
-  .view-mode-selector {
-    width: 100%;
   }
 
   .filter-strip {

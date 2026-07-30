@@ -1,6 +1,12 @@
 <template>
   <div class="vocabulary-import-page">
     <section class="content-area">
+      <RadioGroup
+        v-model="contributeSubMode"
+        :options="contributeModeOptions"
+        name="contribute-mode"
+        class="contribute-mode-switch"
+      />
       <div class="upload-mode main-glass-panel">
         <div class="upload-head">
           <div>
@@ -169,15 +175,20 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 import { getLocationDetail, previewVocabularyImport, uploadVocabulary } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue'
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
@@ -206,6 +217,11 @@ const uploadAccessNotice = computed(() => {
   }
   return ''
 })
+const contributeSubMode = ref('upload')
+const contributeModeOptions = computed(() => [
+  { value: 'upload', label: t('words.wordList.tabs.uploadTab') },
+  { value: 'manage', label: t('words.wordList.tabs.manageTab') },
+])
 const isUploading = ref(false)
 const isPreviewingImport = ref(false)
 const uploadStatusText = ref('')
@@ -494,6 +510,12 @@ watch([uploadParserMode, selectedUploadFile, uploadLocation], () => {
   backendPreview.value = null
   isOverwriteConfirmed.value = false
 }, { deep: true })
+
+watch(contributeSubMode, (mode) => {
+  if (mode === 'manage') {
+    router.replace(buildLocalePath(resolveRouteLocale(route), '/explore/vocabulary/manage'))
+  }
+})
 
 function buildUploadLocation() {
   return normalizeUploadLocation(uploadLocation.value)

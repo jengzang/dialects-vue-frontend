@@ -1,5 +1,11 @@
 <template>
   <div class="vocabulary-manage-page">
+    <RadioGroup
+      v-model="contributeSubMode"
+      :options="contributeModeOptions"
+      name="contribute-mode"
+      class="contribute-mode-switch"
+    />
     <section v-if="shouldShowAccessGate" class="content-area">
       <div class="access-gate main-glass-panel">
         <h3>{{ accessGateTitle }}</h3>
@@ -233,6 +239,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { getVocabularyLocations, getVocabularyLogs, getVocabularyMe, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
@@ -240,6 +247,12 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const pageSizeOptions = [20, 50, 100, 200]
+
+const contributeSubMode = ref('manage')
+const contributeModeOptions = computed(() => [
+  { value: 'upload', label: t('words.wordList.tabs.uploadTab') },
+  { value: 'manage', label: t('words.wordList.tabs.manageTab') },
+])
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
@@ -619,6 +632,12 @@ function navigateToAuth() {
 function navigateToList() {
   router.push(buildLocalePath(resolveRouteLocale(route), '/explore/vocabulary/view'))
 }
+
+watch(contributeSubMode, (mode) => {
+  if (mode === 'upload') {
+    router.replace(buildLocalePath(resolveRouteLocale(route), '/explore/vocabulary/import'))
+  }
+})
 
 watch(() => [
   props.isAuthReady,

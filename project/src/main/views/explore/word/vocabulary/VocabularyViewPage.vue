@@ -7,11 +7,10 @@
       v-model:selected-standard-word="selectedStandardWord"
       v-model:selected-standard-words="selectedStandardWordsModel"
       v-model:single-select="singleSelect"
-      v-model:view-mode="viewMode"
+      :view-mode="viewMode"
       :search-field-options="searchFieldOptions"
       :location-options="locationOptions"
       :standard-word-options="standardWordOptions"
-      :view-modes="viewModes"
     />
 
     <section v-if="viewMode !== 'table'" class="content-area">
@@ -256,12 +255,6 @@ const canLoadMore = computed(() => {
 const canLoadMoreMapDetail = computed(() => {
   return !isLoadingMapDetail.value && mapDetailEntries.value.length < mapDetailTotal.value
 })
-
-const viewModes = computed(() => [
-  { key: 'card', icon: '▦', label: t('words.wordList.viewModes.card') },
-  { key: 'map', icon: '⌖', label: t('words.wordList.viewModes.map') },
-  { key: 'table', icon: '▤', label: t('words.wordList.viewModes.table') },
-])
 
 const tableColumns = computed(() => [
   { key: 'standard_word', label: t('words.wordList.columns.definition'), filterable: true, width: 1.2 },
