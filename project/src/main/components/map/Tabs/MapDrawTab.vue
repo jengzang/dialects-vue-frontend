@@ -785,7 +785,7 @@ const updateActiveLayerFeatureCollection = (nextValue) => {
 const handleLogin = async () => {
   await requireAuth({
     message: t('map.drawTab.auth.loginRequired'),
-    redirect: '/menu/map/draw',
+    redirect: route.fullPath || '/menu/map/draw',
   });
 };
 

@@ -613,7 +613,10 @@ onMounted(async () => {
     setTimeout(() => {
       if (!isAdmin.value) {
         console.log('[TableManage] 延迟检查后仍无权限，跳转到登录页')
-        router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
+        router.push({
+          path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+          query: { redirect: route.fullPath },
+        })
       }
     }, 3000)
   }

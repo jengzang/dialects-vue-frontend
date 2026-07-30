@@ -524,7 +524,7 @@ const referenceImportFlow = useTabularImportFlow({
   beforePreview: async (file) => {
     const authed = await requireAuth({
       message: t('tools.merge.validation.loginRequired'),
-      redirect: '/explore/tools/merge',
+      redirect: route.fullPath || '/explore/tools/merge',
     })
     if (!authed) {
       return false
@@ -650,7 +650,7 @@ const normalizePercentProgress = (value) => {
 const setReferenceFile = async (file, options = {}) => {
   const authed = await requireAuth({
     message: t('tools.merge.validation.loginRequired'),
-    redirect: '/explore/tools/merge',
+    redirect: route.fullPath || '/explore/tools/merge',
   })
   if (!authed) {
     return

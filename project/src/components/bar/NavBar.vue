@@ -288,7 +288,10 @@ const goToAuthPage = () => {
   if (userStore.isAuthenticated) {
     router.push({ path: buildLocalePath(resolveRouteLocale(route), '/auth'), query: { view: 'profile' } })
   } else {
-    router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
+    router.push({
+      path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+      query: { redirect: route.fullPath },
+    })
   }
 }
 
