@@ -428,7 +428,12 @@
 
 .upload-status {
   margin: 0;
-  color: var(--text-secondary);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: var(--glass-15);
+  border-left: 3px solid var(--color-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
 }
 
 .upload-access-notice {
@@ -450,28 +455,80 @@
 
 .backend-preview {
   display: grid;
-  gap: 10px;
-  padding: 14px;
-  background: var(--glass-10);
-  border: 1px solid var(--glass-30);
-  border-radius: var(--radius-md, 8px);
-}
-
-.backend-preview-head,
-.backend-preview-grid {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--glass-25);
+  border: 2px solid var(--color-success, rgba(var(--color-success-rgb), 0.45));
+  border-radius: var(--radius-lg);
 }
 
 .backend-preview-head {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 12px;
+}
+
+.backend-preview-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.backend-preview-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-success, rgba(var(--color-success-rgb), 0.25));
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.backend-preview-location {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
 .backend-preview-grid {
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.backend-preview-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 5px;
+  background: var(--glass-20);
+  border-radius: var(--radius-md);
+}
+
+.backend-preview-stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.backend-preview-stat-label {
+  font-size: 0.8rem;
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  text-align: center;
+}
+
+.backend-preview-meta {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
 }
 
 .backend-preview-warning,

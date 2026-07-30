@@ -68,14 +68,28 @@
         />
         <div v-if="backendPreview" class="backend-preview">
           <div class="backend-preview-head">
-            <strong>{{ t('words.wordList.upload.backendPreviewTitle') }}</strong>
-            <span>{{ backendPreview.location_name || uploadLocation.location_name }}</span>
+            <div class="backend-preview-title-row">
+              <span class="backend-preview-icon">&#10003;</span>
+              <strong>{{ t('words.wordList.upload.backendPreviewTitle') }}</strong>
+            </div>
+            <span class="backend-preview-location">{{ backendPreview.location_name || uploadLocation.location_name }}</span>
           </div>
           <div class="backend-preview-grid">
+            <div class="backend-preview-stat">
+              <span class="backend-preview-stat-value">{{ backendPreview.parsed_count ?? 0 }}</span>
+              <span class="backend-preview-stat-label">{{ t('words.wordList.upload.previewParsedCount') }}</span>
+            </div>
+            <div class="backend-preview-stat">
+              <span class="backend-preview-stat-value">{{ backendPreview.skipped_count ?? 0 }}</span>
+              <span class="backend-preview-stat-label">{{ t('words.wordList.upload.previewSkippedCount') }}</span>
+            </div>
+            <div class="backend-preview-stat">
+              <span class="backend-preview-stat-value">{{ backendPreview.would_delete_existing_count ?? 0 }}</span>
+              <span class="backend-preview-stat-label">{{ t('words.wordList.upload.previewDeleteCount') }}</span>
+            </div>
+          </div>
+          <div class="backend-preview-meta">
             <span>{{ t('words.wordList.upload.previewParserMode') }}：{{ backendPreview.parser_mode || uploadParserMode }}</span>
-            <span>{{ t('words.wordList.upload.previewParsedCount') }}：{{ backendPreview.parsed_count ?? 0 }}</span>
-            <span>{{ t('words.wordList.upload.previewSkippedCount') }}：{{ backendPreview.skipped_count ?? 0 }}</span>
-            <span>{{ t('words.wordList.upload.previewDeleteCount') }}：{{ backendPreview.would_delete_existing_count ?? 0 }}</span>
           </div>
           <p v-if="(backendPreview.would_delete_existing_count ?? 0) > 0" class="backend-preview-warning">
             {{ t('words.wordList.upload.replaceWarning', { count: backendPreview.would_delete_existing_count }) }}
