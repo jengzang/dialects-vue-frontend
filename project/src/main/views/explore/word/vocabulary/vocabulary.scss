@@ -230,6 +230,7 @@
   display: grid;
   gap: 16px;
   padding: 16px;
+  min-width: 0;
 }
 
 .map-mode {
@@ -610,6 +611,16 @@
   justify-content: center;
 }
 
+.location-item-info {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+
+  p {
+    margin: 0;
+  }
+}
+
 .locations-edit-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -762,9 +773,15 @@
   .upload-location-summary,
   .upload-location-modal-layout,
   .locations-head,
-  .location-item-head {
-    align-items: stretch;
+  .location-item-head,
+  .location-item-info {
+    align-items: center;
     flex-direction: column;
+  }
+
+  .pagination-row {
+    justify-content: center;
+    font-size: 0.8rem;
   }
 
   .upload-parser-row {

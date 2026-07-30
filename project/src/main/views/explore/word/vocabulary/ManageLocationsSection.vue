@@ -6,9 +6,9 @@
           <h3>{{ t('words.wordList.locations.title') }}</h3>
           <p>{{ t('words.wordList.locations.desc') }}</p>
         </div>
-        <button class="main-glass-button" data-variant="secondary" type="button" @click="loadVocabularyLocations">
+        <!-- <button class="main-glass-button" data-variant="secondary" type="button" @click="loadVocabularyLocations">
           {{ t('words.wordList.locations.refresh') }}
-        </button>
+        </button> -->
       </div>
 
       <form class="manage-filter-grid locations-filter-grid" @submit.prevent="applyLocationFilters">
@@ -42,7 +42,7 @@
       <div v-else-if="locationRows.length" class="locations-list">
         <article v-for="location in locationRows" :key="`${location.user_id || ''}-${location.location_name}`" class="location-item">
           <div class="location-item-head">
-            <div>
+            <div class="location-item-info">
               <strong>{{ location.location_name }}</strong>
               <p>{{ location.location_label || location.location_name }}</p>
             </div>

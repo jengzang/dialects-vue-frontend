@@ -110,6 +110,7 @@ function onSort(col) {
 
 <style scoped lang="scss">
 .glass-table-shell {
+  min-width: 0;
   background: var(--surface-panel);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-xl);
