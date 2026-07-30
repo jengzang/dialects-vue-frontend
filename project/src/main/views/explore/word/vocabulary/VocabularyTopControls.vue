@@ -41,6 +41,17 @@
                 @update:model-value="(val) => toggleField(field.value, val)"
               />
             </div>
+            <div class="search-field-mode-section">
+              <h4 class="search-field-modal-title">
+                {{ t('words.wordList.search.standardWordFilterMode') }}
+              </h4>
+              <SwitchToggle
+                v-model="localSingleSelect"
+                :show-label="true"
+                :active-text="t('words.wordList.search.singleSelect')"
+                :inactive-text="t('words.wordList.search.multiSelect')"
+              />
+            </div>
           </AppModal>
         </div>
       </div>
@@ -58,6 +69,7 @@
         class="standard-word-filter"
       >
         <SimpleSelectDropdown
+          v-if="singleSelect"
           :model-value="selectedStandardWord"
           :options="standardWordOptions"
           :placeholder="t('words.wordList.search.standardWordPlaceholder')"
@@ -67,6 +79,32 @@
           width="100%"
           @update:model-value="emit('update:selectedStandardWord', $event)"
         />
+        <template v-else>
+          <button
+            ref="standardWordTriggerEl"
+            class="select-trigger global-select-trigger standard-word-select-trigger"
+            :class="{ 'is-open': standardWordDropdownOpen, 'is-disabled': standardWordOptions.length === 0 }"
+            type="button"
+            :disabled="standardWordOptions.length === 0"
+            @click="standardWordDropdownOpen = !standardWordDropdownOpen"
+          >
+            <span class="select-label">{{ standardWordTriggerLabel }}</span>
+            <span
+              class="select-arrow"
+              aria-hidden="true"
+            >⌄</span>
+          </button>
+          <MultiSelectDropdown
+            v-if="standardWordDropdownOpen"
+            :model-value="selectedStandardWords"
+            :options="multiStandardWordOptions"
+            :trigger-el="standardWordTriggerEl"
+            align="left"
+            direction="down"
+            @update:model-value="emit('update:selectedStandardWords', $event)"
+            @close="standardWordDropdownOpen = false"
+          />
+        </template>
       </div>
 
       <div class="location-filter">
@@ -103,6 +141,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import ChoiceSelector from '@/components/selector/ChoiceSelector.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
@@ -115,6 +154,8 @@ const props = defineProps({
   selectedSearchFields: { type: Array, default: () => [] },
   selectedLocations: { type: Array, default: () => [] },
   selectedStandardWord: { type: String, default: '' },
+  selectedStandardWords: { type: Array, default: () => [] },
+  singleSelect: { type: Boolean, default: true },
   viewMode: { type: String, default: 'card' },
   searchFieldOptions: { type: Array, default: () => [] },
   locationOptions: { type: Array, default: () => [] },
@@ -127,13 +168,17 @@ const emit = defineEmits([
   'update:selectedSearchFields',
   'update:selectedLocations',
   'update:selectedStandardWord',
+  'update:selectedStandardWords',
+  'update:singleSelect',
   'update:viewMode',
 ])
 
 const searchInputEl = ref(null)
 const locationTriggerEl = ref(null)
+const standardWordTriggerEl = ref(null)
 const searchFieldModalOpen = ref(false)
 const locationDropdownOpen = ref(false)
+const standardWordDropdownOpen = ref(false)
 
 function formatMultiSelectLabel(selectedValues, options, placeholder) {
   const selectedLabels = selectedValues
@@ -155,6 +200,15 @@ const localViewMode = computed({
   get: () => props.viewMode,
   set: (val) => emit('update:viewMode', val),
 })
+
+const localSingleSelect = computed({
+  get: () => props.singleSelect,
+  set: (val) => emit('update:singleSelect', val),
+})
+
+const multiStandardWordOptions = computed(() =>
+  props.standardWordOptions.filter((o) => o.value !== ''),
+)
 
 const choiceViewModes = computed(() =>
   props.viewModes.map((m) => ({ value: m.key, label: m.label })),
@@ -183,6 +237,14 @@ const locationTriggerLabel = computed(() => {
     props.selectedLocations,
     props.locationOptions,
     t('words.wordList.search.locationPlaceholder'),
+  )
+})
+
+const standardWordTriggerLabel = computed(() => {
+  return formatMultiSelectLabel(
+    props.selectedStandardWords,
+    multiStandardWordOptions.value,
+    t('words.wordList.search.standardWordPlaceholder'),
   )
 })
 </script>
@@ -261,6 +323,16 @@ const locationTriggerLabel = computed(() => {
   text-align: center;
 }
 
+.search-field-mode-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--glass-30);
+}
+
 .location-filter {
   display: flex;
   align-items: center;
@@ -269,9 +341,9 @@ const locationTriggerLabel = computed(() => {
   width: 100%;
 }
 
-// .standard-word-filter {
-//   width: 100%;
-// }
+.standard-word-filter {
+  width: 100%;
+}
 
 // .location-select-trigger {
 //   width: 100%;

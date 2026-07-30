@@ -5,6 +5,8 @@
       v-model:selected-search-fields="selectedSearchFields"
       v-model:selected-locations="selectedLocations"
       v-model:selected-standard-word="selectedStandardWord"
+      v-model:selected-standard-words="selectedStandardWordsModel"
+      v-model:single-select="singleSelect"
       v-model:view-mode="viewMode"
       :search-field-options="searchFieldOptions"
       :location-options="locationOptions"
@@ -167,7 +169,14 @@ const viewMode = ref(normalizeViewMode(route.query.tab))
 const selectedSearchFields = ref([])
 const selectedLocations = ref([])
 const selectedStandardWord = ref('')
-const selectedStandardWords = computed(() => (selectedStandardWord.value ? [selectedStandardWord.value] : []))
+const singleSelect = ref(true)
+const selectedStandardWordsModel = ref([])
+const selectedStandardWords = computed(() => {
+  if (singleSelect.value) {
+    return selectedStandardWord.value ? [selectedStandardWord.value] : []
+  }
+  return selectedStandardWordsModel.value
+})
 const mapDisplayMode = ref('overview')
 const vocabularyLocationOptions = ref([])
 const vocabularyStandardWordOptions = ref([])
@@ -510,6 +519,7 @@ async function loadVocabularyStandardWords() {
     if (selectedStandardWord.value && !optionValues.has(selectedStandardWord.value)) {
       selectedStandardWord.value = ''
     }
+    selectedStandardWordsModel.value = selectedStandardWordsModel.value.filter((value) => optionValues.has(value))
   } catch {
     vocabularyStandardWordOptions.value = []
     selectedStandardWord.value = ''
@@ -649,10 +659,18 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
   }
 }, { debounce: 250, maxWait: 800 })
 
-watch(selectedStandardWord, (word) => {
-  if (mapDisplayMode.value === 'overview' && word) {
+watch(singleSelect, (isSingle) => {
+  if (isSingle) {
+    selectedStandardWord.value = selectedStandardWordsModel.value[0] || ''
+  } else {
+    selectedStandardWordsModel.value = selectedStandardWord.value ? [selectedStandardWord.value] : []
+  }
+})
+
+watch(selectedStandardWords, (words) => {
+  if (mapDisplayMode.value === 'overview' && words.length) {
     mapDisplayMode.value = 'definition'
-  } else if (!word && !['overview', 'location'].includes(mapDisplayMode.value)) {
+  } else if (!words.length && !['overview', 'location'].includes(mapDisplayMode.value)) {
     mapDisplayMode.value = 'overview'
   }
   if (shouldUseVocabularyMapPointsApi() || shouldUseVocabularyMapItemsApi()) {

@@ -52,7 +52,10 @@
         "location": "地点"
       },
       "settings": "设置",
-      "filterTitle": "搜索筛选"
+      "filterTitle": "搜索筛选",
+      "standardWordFilterMode": "地图标准词筛选",
+      "singleSelect": "单选",
+      "multiSelect": "多选"
     },
     "sort": {
       "label": "排序",

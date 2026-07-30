@@ -52,7 +52,10 @@
         "location": "Location"
       },
       "settings": "Settings",
-      "filterTitle": "Search Filter"
+      "filterTitle": "Search Filter",
+      "standardWordFilterMode": "Map Standard Word Filter",
+      "singleSelect": "Single",
+      "multiSelect": "Multi"
     },
     "sort": {
       "label": "Sort",
