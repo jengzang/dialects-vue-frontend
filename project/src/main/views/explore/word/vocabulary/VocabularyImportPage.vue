@@ -10,7 +10,7 @@
       <div class="upload-mode main-glass-panel">
         <div class="upload-head">
           <div>
-            <h3 style="margin-bottom: 15px;">{{ t('words.wordList.upload.title') }}</h3>
+            <h3>{{ t('words.wordList.upload.title') }}</h3>
             <!-- <p>{{ t('words.wordList.upload.desc') }}</p> -->
             <div v-if="requiresLogin" class="upload-access-notice">
               <p>{{ uploadAccessNotice }}</p>
@@ -24,25 +24,6 @@
               </button>
             </div>
             <p v-else-if="uploadAccessNotice" class="upload-status">{{ uploadAccessNotice }}</p>
-          </div>
-          <input
-            type="file"
-            ref="fileInputEl"
-            accept=".xlsx,.xls,.csv,.tsv,.docx,.doc"
-            class="upload-file-input"
-            @change="handleUploadFile"
-          />
-          <div
-            v-if="!selectedUploadFile"
-            class="upload-zone-drop"
-            :class="{ 'drag-over': isDragOver }"
-            @click="fileInputEl?.click()"
-            @dragover.prevent="isDragOver = true"
-            @dragleave.prevent="isDragOver = false"
-            @drop.prevent="handleDrop"
-          >
-            <div class="upload-zone-icon">📄</div>
-            <p class="upload-zone-hint">{{ t('words.wordList.upload.dropHint') }}</p>
           </div>
         </div>
 
@@ -71,18 +52,20 @@
         </div>
 
         <TabularImportPreview
-          embedded
+          v-if="importFlow.pendingFile.value"
+          :key="importFlow.confirmKey.value"
+          :model-value="Boolean(importFlow.pendingFile.value)"
           :title="t('words.wordList.upload.previewTitle')"
           :description="t('words.wordList.upload.previewDesc')"
-          :file="selectedUploadFile"
+          :file="importFlow.pendingFile.value"
           :schema="importSchema"
-          :mapping-enabled="isVocabularyPreviewFile(selectedUploadFile)"
+          :mapping-enabled="isVocabularyPreviewFile(importFlow.pendingFile.value)"
           :loading="importPreview.loading.value"
           :preview-table="importPreview.previewTable.value"
           :diagnostics="importPreview.diagnostics.value"
           :mapping="importPreview.mapping.value"
           @update:mapping="importFlow.updateManualMapping"
-          @reset="clearUploadFile"
+          @reset="importFlow.clearPreview"
           @confirm="handleConfirmUpload"
         />
         <div v-if="backendPreview" class="backend-preview">
@@ -128,6 +111,26 @@
           </button>
         </div>
         <p v-if="uploadStatusText" class="upload-status">{{ uploadStatusText }}</p>
+
+        <input
+          type="file"
+          ref="fileInputEl"
+          accept=".xlsx,.xls,.csv,.tsv,.docx,.doc"
+          style="display: none"
+          @change="handleUploadFile"
+        />
+        <div
+          v-if="!selectedUploadFile"
+          class="upload-zone-drop"
+          :class="{ 'drag-over': isDragOver }"
+          @click="fileInputEl?.click()"
+          @dragover.prevent="isDragOver = true"
+          @dragleave.prevent="isDragOver = false"
+          @drop.prevent="handleDrop"
+        >
+          <div class="upload-zone-icon">📄</div>
+          <p class="upload-zone-hint">{{ t('words.wordList.upload.dropHint') }}</p>
+        </div>
       </div>
     </section>
 
