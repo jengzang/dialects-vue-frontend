@@ -2,19 +2,12 @@
   <div class="glass-table-shell" :class="{ 'glass-table--loading': loading }">
     <div class="glass-table-scroll">
       <table>
-        <colgroup>
-          <col
-            v-for="col in columns"
-            :key="col.key"
-            :style="colStyle(col)"
-          />
-        </colgroup>
-
         <thead>
           <tr>
             <th
               v-for="col in columns"
               :key="col.key"
+              :style="thStyle(col)"
               :class="[
                 col.headerClass,
                 alignClass(col.align),
@@ -26,8 +19,8 @@
                 {{ col.label }}
               </slot>
               <span v-if="sortable && col.sortable !== false" class="glass-table-sort-arrow">
-                <template v-if="sortKey === col.key">{{ sortOrder === 'asc' ? '▲' : '▼' }}</template>
-                <template v-else>⬍</template>
+                <template v-if="sortKey === col.key">{{ sortOrder === 'asc' ? '&#9650;' : '&#9660;' }}</template>
+                <template v-else>&#8691;</template>
               </span>
             </th>
           </tr>
@@ -41,10 +34,12 @@
             <td
               v-for="col in columns"
               :key="col.key"
+              :style="tdStyle(col)"
+              :title="cellTitle(row, col)"
               :class="[col.cellClass, alignClass(col.align)]"
             >
               <slot :name="`cell-${col.key}`" :row="row" :value="row[col.key]" :index="index">
-                {{ row[col.key] ?? '-' }}
+                {{ formatCell(row[col.key], col) }}
               </slot>
             </td>
           </tr>
@@ -90,11 +85,34 @@ const props = defineProps({
 
 const emit = defineEmits(['sort'])
 
-function colStyle(col) {
+function thStyle(col) {
   const style = {}
   if (col.width) style.width = col.width
   if (col.minWidth) style.minWidth = col.minWidth
+  if (col.maxWidth) style.maxWidth = col.maxWidth
   return style
+}
+
+function tdStyle(col) {
+  const style = {}
+  if (col.width) style.width = col.width
+  if (col.minWidth) style.minWidth = col.minWidth
+  if (col.maxWidth) style.maxWidth = col.maxWidth
+  return style
+}
+
+function formatCell(value, col) {
+  if (col.formatter && typeof col.formatter === 'function') {
+    return col.formatter(value)
+  }
+  return value ?? '-'
+}
+
+function cellTitle(row, col) {
+  const value = row[col.key]
+  if (value === null || value === undefined || value === '') return ''
+  const display = formatCell(value, col)
+  return String(display)
 }
 
 function alignClass(align) {
@@ -127,7 +145,6 @@ function onSort(col) {
 table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
 }
 
 thead {

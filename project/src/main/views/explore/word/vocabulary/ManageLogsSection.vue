@@ -266,11 +266,16 @@ function normalizeVocabularyLog(log) {
   }
 }
 
-function formatRelativeTime(isoString) {
-  if (!isoString) return '-'
+function parseUTCTime(isoString) {
+  if (!isoString) return null
+  const normalized = isoString.endsWith('Z') || isoString.includes('+') || isoString.includes('-', 10) ? isoString : isoString + 'Z'
+  const d = new Date(normalized)
+  return isNaN(d.getTime()) ? null : d
+}
 
-  const then = new Date(isoString)
-  if (isNaN(then.getTime())) return isoString
+function formatRelativeTime(isoString) {
+  const then = parseUTCTime(isoString)
+  if (!then) return isoString || '-'
 
   const now = Date.now()
   const diffMs = now - then.getTime()
