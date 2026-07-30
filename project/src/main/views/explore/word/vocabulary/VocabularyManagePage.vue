@@ -32,6 +32,8 @@
       <ManageEntriesSection
         v-if="manageSection === 'entries'"
         :has-vocabulary-permission="hasVocabularyPermission"
+        :manage-user-id="effectiveVocabularyMe?.user_id"
+        :manage-permission-level="effectiveVocabularyMe?.permission_level"
       />
       <ManageLocationsSection
         v-else-if="manageSection === 'locations'"
@@ -74,10 +76,17 @@ const effectiveVocabularyMe = computed(() => props.vocabularyMe || localVocabula
 const hasVocabularyPermission = computed(() => Boolean(effectiveVocabularyMe.value?.permission_level))
 const canViewVocabularyLogs = computed(() => effectiveVocabularyMe.value?.can_view_logs === true)
 
+const entriesTabLabel = computed(() => {
+  if (effectiveVocabularyMe.value?.permission_level === 'edit') {
+    return t('words.wordList.tabs.myEntries')
+  }
+  return t('words.wordList.tabs.allEntries')
+})
+
 const manageSectionOptions = computed(() => {
   const options = []
   if (hasVocabularyPermission.value) {
-    options.push({ value: 'entries', label: t('words.wordList.tabs.list') })
+    options.push({ value: 'entries', label: entriesTabLabel.value })
     options.push({ value: 'locations', label: t('words.wordList.locations.title') })
   }
   if (canViewVocabularyLogs.value) {

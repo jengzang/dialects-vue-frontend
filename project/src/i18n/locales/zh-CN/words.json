@@ -15,6 +15,8 @@
     "tabs": {
       "label": "词表工作流",
       "list": "词表",
+      "myEntries": "我的词表",
+      "allEntries": "所有词表",
       "upload": "上传",
       "review": "审查",
       "locations": "地点",

@@ -7,6 +7,7 @@
       primary-key="id"
       api-adapter="vocabulary"
       :can-edit="hasVocabularyPermission"
+      :default-filter="defaultFilter"
     />
   </section>
 </template>
@@ -18,9 +19,18 @@ import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 
 const { t } = useI18n()
 
-defineProps({
+const props = defineProps({
   hasVocabularyPermission: { type: Boolean, default: false },
   canViewVocabularyLogs: { type: Boolean, default: false },
+  manageUserId: { type: [Number, String], default: null },
+  managePermissionLevel: { type: String, default: null },
+})
+
+const defaultFilter = computed(() => {
+  if (props.managePermissionLevel === 'edit' && props.manageUserId != null) {
+    return { user_id: props.manageUserId }
+  }
+  return null
 })
 
 const tableColumns = computed(() => [
