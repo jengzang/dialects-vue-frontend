@@ -100,6 +100,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getVocabularyLogs } from '@/api'
 import GlassTable from '@/components/common/GlassTable.vue'
+import { showError } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const pageSizeOptions = [20, 50, 100, 200]
@@ -305,6 +306,7 @@ async function loadVocabularyLogs() {
     logPagination.pageSize = Number(response.page_size) || params.page_size
   } catch (error) {
     logsLoadError.value = error.message || t('words.wordList.logs.loadFailed')
+    showError(logsLoadError.value)
     logRows.value = []
     logPagination.total = 0
   } finally {

@@ -60,6 +60,7 @@ import { getVocabularyMe } from '@/api'
 import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js'
 import ChoiceSelector from '@/components/selector/ChoiceSelector.vue'
+import { showError } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -114,6 +115,7 @@ async function loadVocabularyMe() {
   } catch (error) {
     vocabularyMe.value = createEmptyVocabularyMe()
     vocabularyMeError.value = error.message || ''
+    showError(vocabularyMeError.value)
   } finally {
     isLoadingVocabularyMe.value = false
   }

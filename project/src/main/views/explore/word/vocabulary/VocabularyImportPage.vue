@@ -126,6 +126,16 @@
 
         <div class="upload-actions">
           <button
+            v-if="selectedUploadFile"
+            class="main-glass-button"
+            data-variant="secondary"
+            type="button"
+            :disabled="isUploading"
+            @click="clearUploadFile()"
+          >
+            {{ t('common.importPreview.actions.reselect') }}
+          </button>
+          <button
             class="main-glass-button"
             data-variant="primary"
             type="button"

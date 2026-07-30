@@ -116,6 +116,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getVocabularyLocations, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
+import { showError, showSuccess } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const pageSizeOptions = [20, 50, 100, 200]
@@ -190,6 +191,7 @@ async function loadVocabularyLocations() {
     locationPagination.pageSize = Number(response.page_size) || params.page_size
   } catch (error) {
     locationsLoadError.value = error.message || t('words.wordList.locations.loadFailed')
+    showError(locationsLoadError.value)
     locationRows.value = []
     locationPagination.total = 0
   } finally {
@@ -247,10 +249,12 @@ async function handleSaveLocation(location) {
   try {
     await updateVocabularyLocation(location.location_name, payload, params)
     locationsStatusText.value = t('words.wordList.locations.saveSuccess')
+    showSuccess(locationsStatusText.value)
     await loadVocabularyLocations()
     closeLocationEditor()
   } catch (error) {
     locationsStatusText.value = error.message || t('words.wordList.locations.saveFailed')
+    showError(locationsStatusText.value)
   }
 }
 
