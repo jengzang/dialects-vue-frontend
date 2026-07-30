@@ -92,6 +92,12 @@ This repository has strict collaboration and change-control rules. Read this bef
 - Do not assume partial coverage is enough when the user asks whether "all" places are handled.
 - If a style or layout change was not explicitly requested, avoid touching it.
 
+## 7.1 Responsive Design Conventions
+
+- Do NOT use width-based media queries (`max-width`, `min-width`) for responsive layout breakpoints.
+- Use `@media (max-aspect-ratio: 1 / 1)` to detect portrait/mobile orientation instead.
+- The project does not use pixel-based width breakpoints; aspect-ratio is the only accepted approach for responsive breakpoints.
+
 ## 8. Git and Recovery
 
 - Never overwrite or revert unrelated user changes.

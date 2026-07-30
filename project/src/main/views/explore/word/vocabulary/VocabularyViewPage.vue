@@ -1,94 +1,16 @@
 <template>
   <div class="vocabulary-view-page">
-    <div class="top-controls">
-        <div class="search-container">
-          <div class="search-section">
-            <div class="input-wrapper">
-              <textarea
-                ref="searchInputEl"
-                v-model="query"
-                class="search-input"
-                rows="1"
-                :placeholder="t('words.wordList.search.placeholder')"
-              ></textarea>
-            </div>
-
-            <div class="field-filter">
-              <button
-                ref="searchFieldTriggerEl"
-                class="select-trigger global-select-trigger filter-select-trigger"
-                :class="{ 'is-open': searchFieldDropdownOpen }"
-                type="button"
-                @click="searchFieldDropdownOpen = !searchFieldDropdownOpen"
-              >
-                <span class="select-label">{{ searchFieldTriggerLabel }}</span>
-                <span class="select-arrow" aria-hidden="true">⌄</span>
-              </button>
-              <MultiSelectDropdown
-                v-if="searchFieldDropdownOpen"
-                v-model="selectedSearchFields"
-                :options="searchFieldOptions"
-                :trigger-el="searchFieldTriggerEl"
-                align="right"
-                direction="down"
-                @close="searchFieldDropdownOpen = false"
-              />
-            </div>
-          </div>
-
-          <div class="view-mode-selector">
-            <button
-              v-for="mode in viewModes"
-              :key="mode.key"
-              class="mode-btn"
-              :class="{ active: viewMode === mode.key }"
-              type="button"
-              :title="mode.label"
-              @click="setViewMode(mode.key)"
-            >
-              <span>{{ mode.label }}</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="filter-strip">
-          <div v-if="viewMode === 'map'" class="standard-word-filter">
-            <SimpleSelectDropdown
-              v-model="selectedStandardWord"
-              :options="standardWordOptions"
-              :placeholder="t('words.wordList.search.standardWordPlaceholder')"
-              :disabled="standardWordOptions.length === 0"
-              searchable
-              match-trigger-width
-              width="100%"
-            />
-          </div>
-
-          <div class="location-filter">
-            <button
-              ref="locationTriggerEl"
-              class="select-trigger global-select-trigger location-select-trigger"
-              :class="{ 'is-open': locationDropdownOpen, 'is-disabled': locationOptions.length === 0 }"
-              type="button"
-              :disabled="locationOptions.length === 0"
-              @click="locationDropdownOpen = !locationDropdownOpen"
-            >
-              <span class="select-label">{{ locationTriggerLabel }}</span>
-              <span class="select-arrow" aria-hidden="true">⌄</span>
-            </button>
-            <MultiSelectDropdown
-              v-if="locationDropdownOpen"
-              v-model="selectedLocations"
-              :options="locationOptions"
-              :trigger-el="locationTriggerEl"
-              align="left"
-              direction="down"
-              @close="locationDropdownOpen = false"
-            />
-          </div>
-        </div>
-
-    </div>
+    <VocabularyTopControls
+      v-model:query="query"
+      v-model:selected-search-fields="selectedSearchFields"
+      v-model:selected-locations="selectedLocations"
+      v-model:selected-standard-word="selectedStandardWord"
+      v-model:view-mode="viewMode"
+      :search-field-options="searchFieldOptions"
+      :location-options="locationOptions"
+      :standard-word-options="standardWordOptions"
+      :view-modes="viewModes"
+    />
 
     <section v-if="viewMode !== 'table'" class="content-area">
       <div v-if="isLoadingItems" class="loading-state loading-state-base">
@@ -224,11 +146,10 @@ import {
   getVocabularyMapPoints,
   getVocabularyStandardWords
 } from '@/api'
-import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
-import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
+import VocabularyTopControls from './VocabularyTopControls.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -248,11 +169,6 @@ const selectedLocations = ref([])
 const selectedStandardWord = ref('')
 const selectedStandardWords = computed(() => (selectedStandardWord.value ? [selectedStandardWord.value] : []))
 const mapDisplayMode = ref('overview')
-const searchInputEl = ref(null)
-const searchFieldTriggerEl = ref(null)
-const locationTriggerEl = ref(null)
-const searchFieldDropdownOpen = ref(false)
-const locationDropdownOpen = ref(false)
 const vocabularyLocationOptions = ref([])
 const vocabularyStandardWordOptions = ref([])
 const entries = ref([])
@@ -300,22 +216,6 @@ const standardWordOptions = computed(() => {
   ]
 })
 
-const searchFieldTriggerLabel = computed(() => {
-  if (!selectedSearchFields.value.length) {
-    return t('words.wordList.search.fields.all')
-  }
-
-  return formatMultiSelectLabel(selectedSearchFields.value, searchFieldOptions.value, t('words.wordList.search.fields.all'))
-})
-
-const locationTriggerLabel = computed(() => {
-  return formatMultiSelectLabel(
-    selectedLocations.value,
-    locationOptions.value,
-    t('words.wordList.search.locationPlaceholder')
-  )
-})
-
 const canLoadMore = computed(() => {
   return shouldUseVocabularyItemsApi() && !isLoadingItems.value && entries.value.length < total.value
 })
@@ -344,16 +244,14 @@ function normalizeViewMode(value) {
   return ['card', 'map', 'table'].includes(value) ? value : 'card'
 }
 
-function setViewMode(mode) {
-  const nextMode = normalizeViewMode(mode)
-  viewMode.value = nextMode
+watch(viewMode, (nextMode) => {
   router.replace({
     query: {
       ...route.query,
       tab: nextMode,
     }
   })
-}
+})
 
 const mapDataForVocabularyMap = computed(() => {
   return mapPoints.value
@@ -383,22 +281,6 @@ function shouldUseVocabularyMapPointsApi() {
 
 function shouldUseVocabularyMapItemsApi() {
   return viewMode.value === 'map' && selectedStandardWords.value.length > 0
-}
-
-function formatMultiSelectLabel(selectedValues, options, placeholder) {
-  const selectedLabels = selectedValues
-    .map((value) => options.find((option) => option.value === value)?.label || value)
-    .filter(Boolean)
-
-  if (!selectedLabels.length) {
-    return placeholder
-  }
-
-  if (selectedLabels.length === 1) {
-    return selectedLabels[0]
-  }
-
-  return `${selectedLabels[0]} +${selectedLabels.length - 1}`
 }
 
 function normalizeSelectedSearchFields() {
