@@ -269,8 +269,6 @@ const tableColumns = computed(() => [
   { key: 'ipa', label: t('words.wordList.columns.pronunciation'), filterable: false, width: 1.2 },
   { key: 'notes', label: t('words.wordList.columns.detail'), filterable: false, width: 1.6 },
   { key: 'location_name', label: t('words.wordList.columns.location'), filterable: true, width: 1 },
-  { key: 'informations', label: t('words.wordList.columns.informations'), filterable: false, width: 1.2 },
-  { key: 'source_filename', label: t('words.wordList.columns.sourceFilename'), filterable: true, width: 1.2 }
 ])
 
 function normalizeViewMode(value) {
