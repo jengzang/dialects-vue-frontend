@@ -35,6 +35,22 @@
           </span>
         </div>
 
+        <div class="upload-example">
+          <div class="upload-example__title">{{ t('words.wordList.upload.dataExample') }}</div>
+          <div class="upload-example__row">
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--def">{{ t('words.wordList.columns.definition') }}</b>吃饭</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--head">{{ t('words.wordList.columns.headword') }}</b>食饭</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--ipa">{{ t('words.wordList.columns.pronunciation') }}</b>sek2fan22</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--note">{{ t('words.wordList.columns.detail') }}</b>也可说喫饭</span>
+          </div>
+          <div class="upload-example__row">
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--def">{{ t('words.wordList.columns.definition') }}</b>睡觉</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--head">{{ t('words.wordList.columns.headword') }}</b>睏觉</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--ipa">{{ t('words.wordList.columns.pronunciation') }}</b>kʰuəŋ34kɔ34</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--note">{{ t('words.wordList.columns.detail') }}</b>多见于吴语淮官等</span>
+          </div>
+        </div>
+
         <div class="upload-parser-row">
           <div class="upload-parser-head">
             <h3 class="upload-section-title">{{ t('words.wordList.upload.chooseFile') }}</h3>

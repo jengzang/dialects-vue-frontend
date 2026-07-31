@@ -160,6 +160,7 @@
       "yindianHint": "請輸入音典檔案裡的標準地名簡稱（繁體）以匹配",
       "success": "上傳完成，導入 {count} 條。",
       "failed": "上傳詞表失敗",
+      "dataExample": "數據示例",
       "downloadSample": "下載示例文件",
       "formatHelp": "格式說明",
       "formatHelpTitle": "詞彙上傳格式說明",

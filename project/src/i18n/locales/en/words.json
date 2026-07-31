@@ -159,7 +159,40 @@
       "yindianFailed": "Failed to get Yindian data",
       "yindianHint": "Enter the standard place name (traditional Chinese) from the Yindian archive to match",
       "success": "Upload complete. Imported {count} rows.",
-      "failed": "Upload failed"
+      "failed": "Upload failed",
+      "dataExample": "Data Example",
+      "downloadSample": "Download sample",
+      "formatHelp": "Format Help",
+      "formatHelpTitle": "Vocabulary Upload Format",
+      "formatHelpTable": {
+        "title": "Table Format",
+        "desc": "Supported files: .xlsx, .xls, .csv, .tsv",
+        "required": "Required columns:",
+        "colField": "Field",
+        "colAliases": "Auto-recognized column names",
+        "atLeastOne": "At least one required",
+        "note": "One record per row. Standard Word is required. Local Expression and IPA: at least one must be non-empty; the row is skipped if both are empty."
+      },
+      "formatHelpBracket": {
+        "title": "Document Bracket Format",
+        "desc": "Supported files: .docx, .doc, .txt. One record per row, with fields marked by brackets:",
+        "colSymbol": "Symbol",
+        "colMeaning": "Meaning",
+        "ipa": "IPA",
+        "notes": "Notes",
+        "localExpression": "Local Expression",
+        "standardWord": "Standard Word",
+        "remaining": "Remaining text outside brackets",
+        "note": "All three bracket types are optional, but after parsing each row, Standard Word is required, and at least one of Local Expression or IPA must be non-empty. Full-width and half-width brackets are both supported (() and （）)."
+      },
+      "formatHelpWhitespace": {
+        "title": "Document Whitespace Format",
+        "desc": "Supported files: .docx, .doc, .txt. One record per row, fields separated by spaces. Minimum 2 fields (Standard Word + Local Expression); IPA and Notes are optional. Order: Standard Word, Local Expression, [IPA], [Notes...]",
+        "colPosition": "Position",
+        "colField": "Field",
+        "colRequired": "Required",
+        "note": "IPA must not contain spaces (e.g. ȵit2 tʰəu2 would be split into two fields). Use bracket or table format for IPA with spaces."
+      }
     },
     "locations": {
       "title": "Location Metadata",
