@@ -364,6 +364,10 @@ const standardWordTriggerLabel = computed(() => {
     gap: 10px;
   }
 
+  .search-container {
+    width: 100%;
+  }
+
   .search-section {
     flex: 1 1 100%;
     min-width: 100%;
