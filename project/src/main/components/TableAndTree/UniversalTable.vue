@@ -1635,6 +1635,7 @@ $system-font:
   background: var(--glass-60);
   font-size: 14px;
   outline: none;
+  color: var(--text-deep);
   transition: all 0.3s;
 
   &:focus {

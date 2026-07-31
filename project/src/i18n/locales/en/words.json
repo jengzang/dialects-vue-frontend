@@ -161,6 +161,8 @@
       "success": "Upload complete. Imported {count} rows.",
       "failed": "Upload failed",
       "dataExample": "Data Example",
+      "fillStandardFromLocal": "Auto-fill Standard Word from Local Expression",
+      "fillStandardFromLocalHint": "Enabled: empty Standard Words will be auto-filled from Local Expressions. We recommend reviewing and correcting auto-filled Standard Words on the Manage page after upload — inconsistent Standard Words may affect map rendering.",
       "downloadSample": "Download sample",
       "formatHelp": "Format Help",
       "formatHelpTitle": "Vocabulary Upload Format",
@@ -187,7 +189,7 @@
       },
       "formatHelpWhitespace": {
         "title": "Document Whitespace Format",
-        "desc": "Supported files: .docx, .doc, .txt. One record per row, fields separated by spaces. Minimum 2 fields (Standard Word + Local Expression); IPA and Notes are optional. Order: Standard Word, Local Expression, [IPA], [Notes...]",
+        "desc": "Supported files: .docx, .doc, .txt. One record per row, fields separated by spaces. Minimum 1 field (Local Expression); single-field rows work when \"Auto-fill Standard Word from Local Expression\" is enabled. Order: Standard Word, Local Expression, [IPA], [Notes...]",
         "colPosition": "Position",
         "colField": "Field",
         "colRequired": "Required",

@@ -1049,6 +1049,17 @@
   }
 }
 
+.upload-fill-hint {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: var(--color-warning-dark);
+  background: rgba(var(--color-warning-rgb), 0.12);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.35);
+  border-radius: 8px;
+  padding: 8px 12px;
+  line-height: 1.5;
+}
+
 .upload-example {
   margin-bottom: 1rem;
   padding: 0.6rem 0.75rem;

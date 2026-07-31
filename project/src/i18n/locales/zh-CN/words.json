@@ -161,6 +161,8 @@
       "success": "上传完成，导入 {count} 条。",
       "failed": "上传词表失败",
       "dataExample": "数据示例",
+      "fillStandardFromLocal": "方言词自动填充标准词",
+      "fillStandardFromLocalHint": "已开启方言词自动填充标准词，仅针对没有标准词的词表。建议在上传成功后，前往管理页面自行更正标准词。标准词用于地图绘制，不统一可能影响地图绘制效果",
       "downloadSample": "下载示例文件",
       "formatHelp": "格式说明",
       "formatHelpTitle": "词汇上传格式说明",
@@ -187,7 +189,7 @@
       },
       "formatHelpWhitespace": {
         "title": "文档空格格式",
-        "desc": "适用文件：.docx、.doc、.txt。每行一条记录，字段之间用空格分隔，最少 2 个字段（标准词 + 方言词），音标和详细释义为可选。顺序为：标准词 方言词 [音标] [详细释义...]",
+        "desc": "适用文件：.docx、.doc、.txt。每行一条记录，字段之间用空格分隔，最少 1 个字段（方言词），开启「方言词自动填充标准词」后单字段行也能正常导入。顺序为：标准词 方言词 [音标] [详细释义...]",
         "colPosition": "位置",
         "colField": "字段",
         "colRequired": "必填",

@@ -161,6 +161,8 @@
       "success": "上傳完成，導入 {count} 條。",
       "failed": "上傳詞表失敗",
       "dataExample": "數據示例",
+      "fillStandardFromLocal": "方言詞自動填充標準詞",
+      "fillStandardFromLocalHint": "已開啟用方言詞自動填充標準詞，僅針對沒有標準詞的詞表。建議在上傳成功後，前往管理頁面自行更正標準詞。標準詞用於地圖繪製，不統一可能影響地圖繪製效果",
       "downloadSample": "下載示例文件",
       "formatHelp": "格式說明",
       "formatHelpTitle": "詞彙上傳格式說明",
@@ -187,7 +189,7 @@
       },
       "formatHelpWhitespace": {
         "title": "文檔空格格式",
-        "desc": "適用文件：.docx、.doc、.txt。每行一條記錄，字段之間用空格分隔，最少 2 個字段（標準詞 + 方言詞），音標和詳細釋義為可選。順序為：標準詞 方言詞 [音標] [詳細釋義...]",
+        "desc": "適用文件：.docx、.doc、.txt。每行一條記錄，字段之間用空格分隔，最少 1 個字段（方言詞），開啟「方言詞自動填充標準詞」後單字段行也能正常導入。順序為：標準詞 方言詞 [音標] [詳細釋義...]",
         "colPosition": "位置",
         "colField": "字段",
         "colRequired": "必填",

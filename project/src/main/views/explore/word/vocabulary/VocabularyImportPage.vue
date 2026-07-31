@@ -63,6 +63,8 @@
             name="parser-mode"
             :options="parserModeOptions"
           />
+          <CheckBox v-model="fillStandardFromLocal" :label="t('words.wordList.upload.fillStandardFromLocal')" />
+          <p v-if="fillStandardFromLocal" class="upload-fill-hint">{{ t('words.wordList.upload.fillStandardFromLocalHint') }}</p>
         </div>
 
         <TabularImportPreview
@@ -371,6 +373,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { getLocationDetail, previewVocabularyImport, uploadVocabulary } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
@@ -378,7 +381,7 @@ import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue'
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
-import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
+import { showError, showInfo, showSuccess, showWarning } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -423,6 +426,7 @@ const backendPreview = ref(null)
 const isOverwriteConfirmed = ref(false)
 
 const uploadParserMode = ref('auto')
+const fillStandardFromLocal = ref(false)
 const uploadFile = ref(null)
 const fileInputEl = ref(null)
 const isDragOver = ref(false)
@@ -485,7 +489,7 @@ const importSchema = computed(() => [
   {
     key: 'standard_word',
     label: t('words.wordList.columns.definition'),
-    required: true,
+    required: !fillStandardFromLocal.value,
     aliases: ['standard_word', 'written', '释义', '釋義', '书面', '書面', '书面词条', '書面詞條', '词条', '詞條', 'meaning'],
     example: t('words.wordList.import.examples.definition')
   },
@@ -736,6 +740,12 @@ function handleUploadFile(event) {
   event.target.value = ''
 }
 
+watch(fillStandardFromLocal, (val) => {
+  if (val) {
+    showInfo(t('words.wordList.upload.fillStandardFromLocalHint'))
+  }
+})
+
 watch([uploadParserMode, selectedUploadFile, uploadLocation], () => {
   backendPreview.value = null
   isOverwriteConfirmed.value = false
@@ -775,6 +785,7 @@ async function handlePreviewImport() {
       file,
       location,
       parser_mode: uploadParserMode.value,
+      fill_standard_from_local: fillStandardFromLocal.value,
     })
     backendPreview.value = previewResponse
     if (previewResponse.success) {
@@ -824,6 +835,7 @@ async function handleImportAfterPreview() {
       location,
       parser_mode: uploadParserMode.value,
       overwrite: shouldConfirmOverwrite.value ? isOverwriteConfirmed.value : false,
+      fill_standard_from_local: fillStandardFromLocal.value,
     })
     uploadStatusText.value = t('words.wordList.upload.success', { count: response.imported_count || 0 })
     showSuccess(uploadStatusText.value)

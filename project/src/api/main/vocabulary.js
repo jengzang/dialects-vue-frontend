@@ -407,12 +407,13 @@ export async function getVocabularyLogs(params = {}) {
  * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket'}} params
  * @returns {Promise<{success: boolean, location_name: string, permission_level: string, parsed_count: number, would_delete_existing_count: number, skipped_count: number, errors: string[], parser_mode: string}>}
  */
-export async function previewVocabularyImport({ file, location, parser_mode = 'auto' }) {
+export async function previewVocabularyImport({ file, location, parser_mode = 'auto', fill_standard_from_local = false }) {
   try {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('location', JSON.stringify(location))
     formData.append('parser_mode', parser_mode)
+    formData.append('fill_standard_from_local', fill_standard_from_local ? 'true' : 'false')
 
     return await api(`${VOCABULARY_IMPORTS_ENDPOINT}/preview`, {
       method: 'POST',
@@ -431,13 +432,14 @@ export async function previewVocabularyImport({ file, location, parser_mode = 'a
  * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket', overwrite?: boolean}} params
  * @returns {Promise<{success: boolean, location_id: number, location_name: string, permission_level: string, imported_count: number, deleted_existing_count: number, skipped_count: number, errors: string[], parser_mode: string}>}
  */
-export async function uploadVocabulary({ file, location, parser_mode = 'auto', overwrite = false }) {
+export async function uploadVocabulary({ file, location, parser_mode = 'auto', overwrite = false, fill_standard_from_local = false }) {
   try {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('location', JSON.stringify(location))
     formData.append('parser_mode', parser_mode)
     formData.append('overwrite', overwrite ? 'true' : 'false')
+    formData.append('fill_standard_from_local', fill_standard_from_local ? 'true' : 'false')
 
     return await api(VOCABULARY_IMPORTS_ENDPOINT, {
       method: 'POST',
