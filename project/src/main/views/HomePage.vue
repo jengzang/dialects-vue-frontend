@@ -358,7 +358,7 @@
                 <span class="link-icon">❤️</span>
                 <span class="link-text">{{ $t('home.features.about.likeAuthor') }}</span>
               </a>
-              <a @click.stop="navigateTo('/menu/about/settings')" class="feature-link">
+              <a @click.stop="navigateTo('/menu/settings')" class="feature-link">
                 <span class="link-icon">⚙️</span>
                 <span class="link-text">{{ $t('home.features.about.setting') }}</span>
               </a>
@@ -515,7 +515,7 @@
           <span class="footer-divider">·</span>
           <a @click="navigateTo('/menu/privacy')" class="footer-link">{{ $t('home.footer.links.privacy') }}</a>
           <span class="footer-divider">·</span>
-          <a @click="navigateTo('/menu/about/settings')" class="footer-link">{{ $t('home.footer.links.setting') }}</a>
+          <a @click="navigateTo('/menu/settings')" class="footer-link">{{ $t('home.footer.links.setting') }}</a>
           <span class="footer-divider">·</span>
           <a href="https://dialects.yzup.top/detail/" target="_blank" class="footer-link">{{ $t('home.footer.links.oldSite') }}</a>
           <span class="footer-divider">·</span>

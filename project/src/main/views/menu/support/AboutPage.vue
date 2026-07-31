@@ -217,162 +217,6 @@
           </div>
         </div>
 
-        <!-- 设置页面 -->
-        <div v-if="currentTab === 'setting'" class="settings-container">
-        <!-- <h2 class="tabs-title">{{ $t('navigation.tabs.settings') }}</h2> -->
-
-          <div class="setting-section">
-            <h3 class="section-title">{{ $t('navigation.settings.language.title') }}</h3>
-<!--          <p class="section-description">{{ $t('navigation.settings.language.description') }}</p>-->
-
-          <div class="language-options">
-            <div
-              v-for="lang in languages"
-              :key="lang.code"
-              class="language-card"
-              :class="{ active: currentLocale === lang.code }"
-              @click="changeLanguage(lang.code)"
-            >
-              <!-- <div class="language-flag">{{ lang.flag }}</div> -->
-              <div class="language-info">
-                <div class="language-name">{{ lang.name }}</div>
-                <div class="language-code">{{ lang.code }}</div>
-              </div>
-              <div v-if="currentLocale === lang.code" class="language-check">&check;</div>
-            </div>
-          </div>
-          </div>
-
-          <div class="setting-section setting-split">
-            <div class="setting-split-item">
-              <h3 class="section-title">{{ $t('navigation.settings.characterTable.title') }}</h3>
-              <p class="section-description">{{ $t('navigation.settings.characterTable.description') }}</p>
-
-              <SimpleSelectDropdown
-                v-model="currentCharacterTable"
-                :options="characterTableOptions"
-                width="100%"
-              />
-            </div>
-            <hr class="setting-split-divider">
-            <div class="setting-split-item">
-              <h3 class="section-title">{{ $t('about.settings.zhongguInputMode.title') }}
-                <HelpIcon
-                    :content="$t('about.settings.zhongguInputMode.description')"
-                    size="sm"
-                    placement="right"
-                    icon="?"
-                    icon-color="var(--color-primary)"
-                    style="margin-right: 2px; vertical-align: bottom;"
-                />
-              </h3>
-              <!-- <p class="section-description">{{ $t('about.settings.zhongguInputMode.description') }}</p> -->
-              <RadioGroup
-                v-model="zhongguInputModeModel"
-                :options="zhongguInputModeOptions"
-                name="about-zhonggu-input-mode"
-                class="settings-radio-group"
-              />
-            </div>
-          </div>
-
-          <div class="setting-section setting-split">
-            <div class="setting-split-item">
-              <h3 class="section-title">
-                {{ $t('navigation.settings.colorTheme.title') }}
-                <HelpIcon
-                  :content="$t('navigation.settings.colorTheme.description')"
-                  size="sm"
-                  placement="right"
-                  icon="?"
-                  icon-color="var(--color-primary)"
-                />
-              </h3>
-
-              <RadioGroup
-                v-model="colorThemeModel"
-                :options="colorThemeRadioOptions"
-                name="about-color-theme"
-                class="settings-radio-group color-theme-radio-group"
-              />
-            </div>
-            <hr class="setting-split-divider">
-            <div class="setting-split-item">
-              <h3 class="section-title">
-                {{ $t('navigation.settings.interfaceMode.title') }}
-                <HelpIcon
-                  :content="$t('navigation.settings.interfaceMode.description')"
-                  size="sm"
-                  placement="right"
-                  icon="?"
-                  icon-color="var(--color-primary)"
-                />
-              </h3>
-
-              <RadioGroup
-                v-model="interfaceModeModel"
-                :options="interfaceModeRadioOptions"
-                name="about-interface-mode"
-                class="settings-radio-group interface-mode-radio-group"
-              />
-            </div>
-          </div>
-
-          <div class="setting-section tutorial-toggle-section">
-            <div class="tutorial-toggle-copy">
-              <h3 class="section-title">{{ $t('about.settings.tutorialToggle.title') }}</h3>
-              <p class="section-description">{{ $t('about.settings.tutorialToggle.description') }}</p>
-            </div>
-            <SwitchToggle
-              :model-value="tutorialGuideEnabled"
-              :width="100"
-              :height="40"
-              :thumb-size="32"
-              color="var(--color-primary)"
-              variant="solid"
-              show-label
-              :active-text="$t('about.settings.tutorialToggle.enabled')"
-              :inactive-text="$t('about.settings.tutorialToggle.disabled')"
-              label-position="inside"
-              :gap="20"
-              :aria-label="$t('about.settings.tutorialToggle.title')"
-              class="tutorial-switch-toggle"
-              @update:modelValue="handleTutorialToggle"
-            />
-          </div>
-
-          <div class="setting-section update-notice-section">
-            <div class="update-notice-copy">
-              <h3 class="section-title">
-                {{ $t('about.settings.updateNotice.title') }}
-                <HelpIcon
-                  :content="$t('about.settings.updateNotice.description')"
-                  size="sm"
-                  placement="right"
-                  icon="?"
-                  icon-color="var(--color-primary)"
-                />
-              </h3>
-            </div>
-            <div class="update-notice-controls">
-              <RadioGroup
-                v-model="updateNoticeModeModel"
-                :options="updateNoticeModeOptions"
-                name="about-update-notice-mode"
-                class="settings-radio-group"
-              />
-              <button 
-                class="main-glass-button" 
-                data-variant="secondary" 
-                @click="showUpdateNotice = true"
-                style="white-space: nowrap;"
-              >
-                📋 {{ $t('about.settings.viewUpdateLog') }}
-              </button>
-            </div>
-          </div>
-
-        </div>
       </template>
     </TabsContainer>
 
@@ -380,76 +224,21 @@
       :visible="showQRCodes"
       @close="showQRCodes = false"
     />
-
-    <UpdateNoticeModal
-      v-model:visible="showUpdateNotice"
-      :version="updateNoticeData.version"
-      :last-update-date="updateNoticeData.lastUpdateDate"
-      :title="updateNoticeData.title"
-      :items="updateNoticeData.items"
-      :mode="updateNoticeMode"
-    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, defineAsyncComponent } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
-import i18n, { setLocale } from '@/i18n/index.js'
-import { showSuccess } from '@/utils/ui/message.js'
+import { useRoute } from 'vue-router'
+import i18n from '@/i18n/index.js'
 import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
-import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import TabsContainer from '@/components/common/TabsContainer.vue'
-import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
-import RadioGroup from '@/components/selector/RadioGroup.vue'
-import SwitchToggle from '@/components/common/SwitchToggle.vue'
-import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
-import {
-  COLOR_THEME_BLUE,
-  COLOR_THEME_DARK,
-  COLOR_THEME_LIGHT,
-  COLOR_THEME_GREEN,
-  UI_MODE_DEFAULT,
-  UI_MODE_COMPACT,
-  getStoredColorTheme,
-  getStoredInterfaceMode,
-  setColorTheme,
-  setInterfaceMode,
-} from '@/composables/core/uiPreferences.js'
-import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
-import {
-  preferredCharacterTable,
-  setPreferredCharacterTable,
-  tutorialEnabled,
-  setTutorialEnabled,
-  zhongguInputMode,
-  setZhongguInputMode,
-} from '@/main/store/store.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t, locale } = useI18n()
 const route = useRoute()
-const router = useRouter()
-const UpdateNoticeModal = defineAsyncComponent(() => import('@/main/components/user/popups/UpdateNoticeModal.vue'))
 const showQRCodes = ref(false)
-const UPDATE_NOTICE_MODE_KEY = 'update-notice-mode'
-const showUpdateNotice = ref(false)
-const updateNoticeData = computed(() => getHomeUpdateNotice(t))
-const updateNoticeMode = ref(localStorage.getItem(UPDATE_NOTICE_MODE_KEY) || 'modal')
-
-const updateNoticeModeModel = computed({
-  get: () => updateNoticeMode.value,
-  set: (val) => {
-    updateNoticeMode.value = val
-    localStorage.setItem(UPDATE_NOTICE_MODE_KEY, val)
-  }
-})
-
-const updateNoticeModeOptions = computed(() => [
-  { value: 'modal', label: t('about.settings.updateNotice.modeModal') },
-  { value: 'showinfo', label: t('about.settings.updateNotice.modeShowinfo') },
-])
 
 const zhihuFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#0066FF"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="sans-serif">知</text></svg>')
 const githubFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#24292f"/><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.78.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z" fill="white"/></svg>')
@@ -472,15 +261,13 @@ const featureList = computed(() => {
 const pathSectionToTab = {
   intro: 'intro',
   suggestion: 'suggestion',
-  like: 'like',
-  settings: 'setting'
+  like: 'like'
 }
 
 const tabToPathSection = {
   intro: 'intro',
   suggestion: 'suggestion',
-  like: 'like',
-  setting: 'settings'
+  like: 'like'
 }
 
 const currentTab = computed(() => {
@@ -489,11 +276,10 @@ const currentTab = computed(() => {
     return pathSectionToTab[section]
   }
 
-  return 'setting'
+  return 'intro'
 })
 
 const tabs = computed(() => [
-  { name: 'setting', label: t('about.tabs.setting') },
   { name: 'intro', label: t('about.tabs.intro') },
   { name: 'suggestion', label: t('about.tabs.suggestion') },
   { name: 'like', label: t('about.tabs.like') },
@@ -544,151 +330,8 @@ function splitDesc(text) {
   return idx === -1 ? [text, ''] : [text.slice(0, idx), text.slice(idx)]
 }
 
-// 语言设置相关
-const currentLocale = computed(() => locale.value)
-
-const languages = ref([
-  { code: 'zh-Hant', name: '繁體中文', flag: '🇭🇰' },
-  { code: 'zh-CN', name: '简体中文', flag: '🇨🇳' },
-  { code: 'en', name: 'English', flag: '🇺🇸' }
-])
-
-const interfaceMode = ref(getStoredInterfaceMode())
-const colorTheme = ref(getStoredColorTheme())
-
-const colorThemeOptions = computed(() => [
-  {
-    value: COLOR_THEME_BLUE,
-    label: t('navigation.settings.colorTheme.options.blue')
-  },
-  {
-    value: COLOR_THEME_GREEN,
-    label: t('navigation.settings.colorTheme.options.green')
-  },
-  {
-    value: COLOR_THEME_LIGHT,
-    label: t('navigation.settings.colorTheme.options.light')
-  },
-  {
-    value: COLOR_THEME_DARK,
-    label: t('navigation.settings.colorTheme.options.dark')
-  },
-])
-
-const colorThemeRadioOptions = computed(() =>
-  colorThemeOptions.value.map(option => ({
-    value: option.value,
-    label: option.label
-  }))
-)
-
-const colorThemeModel = computed({
-  get: () => colorTheme.value,
-  set: (theme) => changeColorTheme(theme)
-})
-
-const interfaceModeOptions = computed(() => [
-  {
-    value: UI_MODE_DEFAULT,
-    label: t('navigation.settings.interfaceMode.options.default'),
-    description: t('navigation.settings.interfaceMode.help.default')
-  },
-  {
-    value: UI_MODE_COMPACT,
-    label: t('navigation.settings.interfaceMode.options.compact'),
-    description: t('navigation.settings.interfaceMode.help.compact')
-  }
-])
-
-const interfaceModeRadioOptions = computed(() =>
-  interfaceModeOptions.value.map(option => ({
-    value: option.value,
-    label: `${option.label}`
-  }))
-)
-
-const interfaceModeModel = computed({
-  get: () => interfaceMode.value,
-  set: (mode) => changeInterfaceMode(mode)
-})
-
-const characterTableOptions = computed(() =>
-  Object.entries(TABLE_COLUMN_SCHEMAS).map(([tableName, schema]) => ({
-    value: tableName,
-    label: schema.meta?.label || tableName
-  }))
-)
-
-const currentCharacterTable = computed({
-  get: () => preferredCharacterTable.value,
-  set: (tableName) => setPreferredCharacterTable(tableName)
-})
-
-const tutorialGuideEnabled = computed({
-  get: () => tutorialEnabled.value,
-  set: (value) => setTutorialEnabled(value)
-})
-
-function handleTutorialToggle(value) {
-  tutorialGuideEnabled.value = value
-  showSuccess(value
-    ? t('about.settings.tutorialToggle.enabledSuccess')
-    : t('about.settings.tutorialToggle.disabledSuccess'))
-}
-
-const zhongguInputModeModel = computed({
-  get: () => zhongguInputMode.value,
-  set: (mode) => setZhongguInputMode(mode)
-})
-
-const zhongguInputModeOptions = computed(() => [
-  {
-    value: 'selector',
-    label: t('about.settings.zhongguInputMode.options.selector')
-  },
-  {
-    value: 'direct',
-    label: t('about.settings.zhongguInputMode.options.direct')
-  }
-])
-
-function changeLanguage(newLocale) {
-  if (newLocale === currentLocale.value) {
-    return
-  }
-
-  setLocale(newLocale)
-
-  const targetPath = buildLocalePath(newLocale, stripLocaleFromPath(route.path))
-  router.push({
-    path: targetPath,
-    query: route.query,
-    hash: route.hash,
-  })
-  showSuccess(t('messages.success.languageChanged'))
-  setTimeout(() => window.location.reload(), 500)
-}
-
-function changeInterfaceMode(mode) {
-  if (mode === interfaceMode.value) {
-    return
-  }
-
-  interfaceMode.value = setInterfaceMode(mode)
-  showSuccess(t('messages.success.interfaceModeChanged'))
-}
-
-function changeColorTheme(theme) {
-  if (theme === colorTheme.value) {
-    return
-  }
-
-  colorTheme.value = setColorTheme(theme)
-  showSuccess(t('messages.success.colorThemeChanged'))
-}
-
 function resolveTabRoute(tabName) {
-  const section = tabToPathSection[tabName] || 'setting'
+  const section = tabToPathSection[tabName] || 'intro'
   return {
     path: buildLocalePath(resolveRouteLocale(route), `/menu/about/${section}`),
     query: route.query
@@ -709,7 +352,6 @@ $danger: var(--color-error);
 $text-primary: var(--text-dark);
 $text-heading: var(--text-primary);
 $text-secondary: var(--text-medium);
-$text-muted: var(--text-tertiary);
 $text-light: var(--text-lightest);
 
 $ease-standard: 0.3s ease;@mixin glass-card(
@@ -733,44 +375,6 @@ $ease-standard: 0.3s ease;@mixin glass-card(
 .about-page-wrapper {
   width: 100%;
   height: 100%;
-}
-
-/* 教程开关 */
-.tutorial-toggle-section {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.tutorial-toggle-copy {
-  flex: 1;
-  @include flex-col;
-  gap: 6px;
-}
-
-.tutorial-switch-toggle {
-  flex-shrink: 0;
-  justify-content: flex-end;
-
-  :deep(.switch-toggle__button) {
-    font-weight: 700;
-
-    &.is-on {
-      background: $primary;
-      color: var(--text-white);
-    }
-  }
-
-  :deep(.switch-toggle__label--inside) {
-    white-space: nowrap;
-    color: inherit;
-    font-weight: 700;
-  }
-
-  :deep(.switch-toggle__thumb) {
-    box-shadow: 0 6px 14px rgba(38, 88, 137, 0.18);
-  }
 }
 
 /* 建议页面 */
@@ -1249,155 +853,8 @@ em {
   margin-bottom: 4px;
 }
 
-/* 设置页面 */
-.settings-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.setting-section {
-  margin-bottom: 24px;
-  padding: 24px;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-  @include glass-blur(10px);
-}
-
-.setting-split {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-}
-
-.setting-split-item {
-  flex: 1;
-  min-width: 0;
-}
-
-.setting-split-divider {
-  align-self: stretch;
-  width: 1px;
-  margin: 0;
-  background: rgba(0, 0, 0, 0.12);
-  border: none;
-}
-
-.section-title {
-  margin: 0 0 8px;
-  color: $text-primary;
-  font-size: 20px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.section-description {
-  margin: 0 0 20px;
-  color: $text-muted;
-  font-size: 14px;
-}
-
-.settings-radio-group {
-  justify-content: center;
-  gap: 18px 24px;
-
-  :deep(.liquid-radio-label) {
-    padding: 6px 8px;
-  }
-
-  :deep(.liquid-radio-text) {
-    line-height: 1.5;
-  }
-}
-
-.color-theme-radio-group {
-  flex-wrap: nowrap;
-  gap: 6px;
-  overflow-x: auto;
-}
-
-.interface-mode-radio-group {
-  :deep(.liquid-radio-text) {
-    font-size: 14px;
-  }
-}
-
-/* 语言设置 */
-.language-options {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  overflow-x: auto;
-}
-
-.language-card {
-  @include flex-center;
-  padding: 16px;
-  background: var(--glass-80);
-  border: 2px solid var(--border-light-gray);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all $ease-standard;
-
-  &:hover {
-    background: var(--bg-white);
-    border-color: $primary;
-    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
-    transform: translateY(-2px);
-  }
-
-  &.active {
-    background: linear-gradient(
-      135deg,
-      rgba(var(--color-primary-rgb), 0.1),
-      rgba(var(--color-primary-rgb), 0.05)
-    );
-    border-color: $primary;
-    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
-  }
-}
-
-.language-info {
-  display: flex;
-  gap: 12px;
-}
-
-.language-name {
-  margin-bottom: 4px;
-  color: $text-primary;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.language-code {
-  color: $text-light;
-  font-size: 12px;
-}
-
-.language-check {
-  margin-left: 20px;
-  color: $primary;
-  font-size: 24px;
-  font-weight: bold;
-}
-
 /* 竖屏 */
 @media (max-aspect-ratio: #{1 / 1}) {
-  .tutorial-toggle-section {
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .tutorial-toggle-copy {
-    gap: 4px;
-  }
-
-  .tutorial-switch-toggle {
-    flex-shrink: 0;
-    justify-content: flex-end;
-  }
-
   .page2 {
     max-width: none;
     padding: 10px 14px;
@@ -1546,98 +1003,5 @@ em {
     height: 24px;
     margin-bottom: 2px;
   }
-
-  .settings-container {
-    padding: 12px;
-  }
-
-  .setting-section {
-    margin-bottom: 14px;
-    padding: 16px;
-    border-radius: 14px;
-  }
-
-  .setting-split {
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-  }
-
-  .setting-split-divider {
-    width: 100%;
-    height: 1px;
-    margin: 16px 0;
-  }
-
-  .section-title {
-    margin-bottom: 6px;
-    font-size: 18px;
-  }
-
-  .section-description {
-    margin-bottom: 14px;
-    font-size: 13px;
-    line-height: 1.45;
-  }
-
-  .settings-radio-group {
-    gap: 10px 12px;
-
-    :deep(.liquid-radio-label) {
-      padding: 4px 6px;
-    }
-
-    :deep(.liquid-radio-text) {
-      line-height: 1.4;
-    }
-  }
-
-  .interface-mode-radio-group {
-    :deep(.liquid-radio-text) {
-      font-size: 13px;
-    }
-  }
-
-  .language-options {
-    flex-wrap: nowrap;
-    justify-content: center;
-    gap: 8px;
-    overflow-x: auto;
-  }
-
-  .language-card {
-    flex-shrink: 0;
-    padding: 10px 12px;
-    border-width: 1.5px;
-  }
-
-  .language-info {
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-  }
-
-  .language-name {
-    margin-bottom: 0;
-    font-size: 14px;
-  }
-
-  .language-code {
-    font-size: 11px;
-  }
-
-  .language-check {
-    margin-left: 8px;
-    font-size: 18px;
-  }
-}
-
-.update-notice-controls {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 8px;
 }
 </style>

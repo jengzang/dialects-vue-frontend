@@ -460,7 +460,7 @@ const goToUserRegions = () => {
 }
 
 const goToSettings = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/about/settings'))
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/settings'))
   showSuccess(t('navigation.submenu.about.setting'))
 }
 

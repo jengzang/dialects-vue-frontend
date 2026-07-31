@@ -1,5 +1,6 @@
 const PhoPage = () => import('@/main/views/menu/PhoPage.vue')
 const AboutPage = () => import('@/main/views/menu/support/AboutPage.vue')
+const SettingsPage = () => import('@/main/views/menu/support/SettingsPage.vue')
 const QueryPage = () => import('@/main/views/menu/QueryPage.vue')
 const ComparePage = () => import('@/main/views/menu/ComparePage.vue')
 const MapPage = () => import('@/main/views/menu/MapPage.vue')
@@ -17,7 +18,7 @@ export const menuRoutes = [
     component: PhoPage
   },
   {
-    path: 'menu/about/:section(intro|suggestion|like|settings)',
+    path: 'menu/about/:section(intro|suggestion|like)',
     component: AboutPage
   },
   {
@@ -59,6 +60,10 @@ export const menuRoutes = [
   {
     path: 'menu/result',
     component: ResultPage
+  },
+  {
+    path: 'menu/settings',
+    component: SettingsPage
   },
   {
     path: 'menu/source',

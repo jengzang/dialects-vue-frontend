@@ -274,7 +274,7 @@ const ROUTE_QUERY_ALLOWLIST = {
   '/menu/about/like': {
     base: []
   },
-  '/menu/about/settings': {
+  '/menu/settings': {
     base: []
   },
   '/menu/result': {
