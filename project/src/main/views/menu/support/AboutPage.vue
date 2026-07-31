@@ -702,7 +702,7 @@ function resolveTabRoute(tabName) {
 @use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
-$zhihu-blue: #0066ff;
+$zhihu-blue: var(--color-primary);
 $github-dark: #24292f;
 $danger: var(--color-error);
 

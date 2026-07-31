@@ -461,6 +461,7 @@ const goToUserRegions = () => {
 
 const goToSettings = () => {
   router.push(buildLocalePath(resolveRouteLocale(route), '/menu/about/settings'))
+  showSuccess(t('navigation.submenu.about.setting'))
 }
 
 const showBenefitsPopup = () => {

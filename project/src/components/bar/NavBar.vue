@@ -180,6 +180,7 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useTabTooltip } from '@/composables/bar/useTabTooltip.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { showSuccess } from '@/utils/ui/message.js'
 
 const faviconSrc = computed(() =>
   currentColorTheme.value === COLOR_THEME_GREEN
@@ -309,6 +310,7 @@ const toggleSidebar = () => {
 
 const goToSettings = () => {
   router.push(buildLocalePath(resolveRouteLocale(route), '/menu/about/settings'))
+  showSuccess(t('navigation.submenu.about.setting'))
 }
 </script>
 
