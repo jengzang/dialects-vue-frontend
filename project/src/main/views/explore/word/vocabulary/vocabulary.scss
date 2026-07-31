@@ -87,6 +87,7 @@
 
 .vocabulary-view-page > .content-area {
   min-height: 300px;
+  max-height: 70dvh;
   padding: 0;
   overflow: auto;
   background: var(--glass-60);
@@ -850,6 +851,9 @@
     padding: 12px;
   }
 
+  .vocabulary-view-page > .content-area {
+    max-height: 65dvh;
+  }
   .page-tab-navigation {
     position: static;
     justify-content: flex-start;

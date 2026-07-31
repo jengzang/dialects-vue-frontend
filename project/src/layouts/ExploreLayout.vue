@@ -78,7 +78,6 @@ $system-font:
 /* 内容区域 */
 .content-area {
   position: relative;
-  height: 88dvh;
   display: flex;
   justify-content: center;
   padding: 10px 6px;
