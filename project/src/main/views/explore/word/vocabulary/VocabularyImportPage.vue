@@ -4,6 +4,11 @@
       <div class="upload-mode main-glass-panel">
         <div class="upload-head">
             <h3>{{ t('words.wordList.upload.title') }}</h3>
+            <div class="upload-head-counts">
+              <span>{{ t('words.wordList.upload.totalEntries', { count: vocabTotalCount ?? '…' }) }}</span>
+              <span class="count-sep">·</span>
+              <span>{{ t('words.wordList.upload.totalLocations', { count: vocabLocationCount ?? '…' }) }}</span>
+            </div>
             <!-- <p>{{ t('words.wordList.upload.desc') }}</p> -->
             <div v-if="requiresLogin" class="upload-access-notice">
               <p>{{ uploadAccessNotice }}</p>
@@ -368,10 +373,10 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { getLocationDetail, previewVocabularyImport, uploadVocabulary } from '@/api'
+import { getLocationDetail, getVocabularyCounts, previewVocabularyImport, uploadVocabulary } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
@@ -414,6 +419,16 @@ const uploadAccessNotice = computed(() => {
   }
   return ''
 })
+
+const vocabTotalCount = ref(null)
+const vocabLocationCount = ref(null)
+
+onMounted(async () => {
+  const counts = await getVocabularyCounts()
+  vocabTotalCount.value = counts.total
+  vocabLocationCount.value = counts.locations
+})
+
 function navigateToSuggestion() {
   router.push(buildLocalePath(resolveRouteLocale(route), '/menu/about/suggestion'))
 }

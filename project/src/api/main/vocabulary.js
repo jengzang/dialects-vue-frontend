@@ -372,6 +372,22 @@ export async function getVocabularyLocations(params = {}) {
  * @param {{user_id?: number|string}} [params={}]
  * @returns {Promise<object>}
  */
+export async function getVocabularyCounts() {
+  try {
+    const [totalResult, locationResult] = await Promise.all([
+      api(`${VOCABULARY_SQL_ENDPOINT}/query/count?table_name=${encodeURIComponent(VOCABULARY_ENTRIES_TABLE)}`),
+      api(`${VOCABULARY_SQL_ENDPOINT}/query/count?table_name=${encodeURIComponent(VOCABULARY_ENTRIES_TABLE)}&distinct_column=location_name`),
+    ])
+    return {
+      total: totalResult.count ?? 0,
+      locations: locationResult.count ?? 0,
+    }
+  } catch (error) {
+    console.error('Get vocabulary counts error:', error)
+    return { total: null, locations: null }
+  }
+}
+
 export async function updateVocabularyLocation(locationName, data, params = {}) {
   try {
     return await api(`${VOCABULARY_LOCATIONS_ENDPOINT}/${encodeURIComponent(locationName)}${appendQueryParams(params)}`, {

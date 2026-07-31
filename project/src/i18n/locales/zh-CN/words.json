@@ -113,6 +113,8 @@
     },
     "upload": {
       "title": "上传词表",
+      "totalEntries": "词条 {count}",
+      "totalLocations": "地点 {count}",
       "desc": "选择表格文件后映射词表字段，提交后进入审查流程。",
       "chooseFile": "选择文件",
       "dropHint": "点击或拖放 Excel、CSV、TSV、Word 文档到此处",

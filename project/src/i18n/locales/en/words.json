@@ -113,6 +113,8 @@
     },
     "upload": {
       "title": "Upload Vocabulary",
+      "totalEntries": "{count} entries",
+      "totalLocations": "{count} locations",
       "desc": "Choose a table file, map vocabulary fields, then submit it for review.",
       "chooseFile": "Choose file",
       "dropHint": "Click or drag Excel, CSV, TSV, Word files here",

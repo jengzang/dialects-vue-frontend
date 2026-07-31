@@ -618,6 +618,7 @@
 .upload-head,
 .locations-head {
   display: flex;
+  flex-wrap: wrap;
   gap: 14px;
   align-items: center;
   justify-content: space-between;
@@ -633,6 +634,20 @@
   p {
     margin: 6px 0 0;
     color: var(--text-secondary);
+  }
+}
+
+.upload-head-counts {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  white-space: nowrap;
+
+  .count-sep {
+    color: var(--text-muted, var(--text-secondary));
   }
 }
 

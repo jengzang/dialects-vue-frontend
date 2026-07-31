@@ -113,6 +113,8 @@
     },
     "upload": {
       "title": "上傳詞表",
+      "totalEntries": "詞條 {count}",
+      "totalLocations": "地點 {count}",
       "desc": "選擇表格文件後映射詞表字段，提交後進入審查流程。",
       "chooseFile": "選擇文件",
       "dropHint": "點擊或拖放 Excel、CSV、TSV、Word 文檔到此處",
