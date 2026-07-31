@@ -1,6 +1,7 @@
 <template>
   <div class="settings-page-wrapper">
     <div class="settings-container">
+      <h2 class="page-title">{{ $t('navigation.tabs.settings') }}</h2>
       <div class="setting-section">
         <h3 class="section-title">{{ $t('navigation.settings.language.title') }}</h3>
         <div class="language-options">
@@ -333,6 +334,16 @@ $text-muted: var(--text-tertiary);
 .settings-page-wrapper {
   width: 100%;
   height: 100%;
+}
+
+.page-title {
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-align: center;
+  color: $text-primary;
 }
 
 .settings-container {

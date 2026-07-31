@@ -871,7 +871,10 @@
     // padding-left: 8px;
   }
 
-  .upload-head,
+  .upload-head {
+    align-items: center;
+  }
+
   .upload-location-summary,
   .upload-location-modal-layout,
   .locations-head,

@@ -11,7 +11,7 @@ const copyCitation = () => {
 </script>
 
 <template>
-  <div class="privacy-container">
+  <!-- <div class="privacy-container"> -->
     <div class="privacy-content glass-container glass-container-soft">
       <!-- 标题和语言切换 -->
       <div class="header">
@@ -105,7 +105,7 @@ const copyCitation = () => {
         </section>
       </div>
     </div>
-  </div>
+  <!-- </div> -->
 </template>
 
 
@@ -282,7 +282,7 @@ $transition-base: 0.3s;
 
 .copy-btn {
   padding: 10px 20px;
-  color: $white;
+  color: var(--action-primary-text);
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
