@@ -1010,6 +1010,34 @@
   white-space: nowrap;
 }
 
+.help-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h4 {
+    margin: 0;
+  }
+}
+
+.help-download {
+  font-size: 0.8rem;
+  color: var(--color-primary, #409eff);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &::before {
+    content: '\2B07';
+    margin-right: 0.3rem;
+  }
+}
+
 .upload-parser-head {
   display: flex;
   align-items: center;

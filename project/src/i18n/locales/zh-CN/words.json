@@ -160,6 +160,7 @@
       "yindianHint": "请输入音典档案里的标准地名简称（繁体）以匹配",
       "success": "上传完成，导入 {count} 条。",
       "failed": "上传词表失败",
+      "downloadSample": "下载示例文件",
       "formatHelp": "格式说明",
       "formatHelpTitle": "词汇上传格式说明",
       "formatHelpTable": {

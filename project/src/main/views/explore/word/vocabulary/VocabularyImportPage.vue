@@ -225,7 +225,10 @@
     >
       <div class="format-help-content ui-scrollbar">
         <div class="help-section">
-          <h4>{{ t('words.wordList.upload.formatHelpTable.title') }}</h4>
+          <div class="help-section-head">
+            <h4>{{ t('words.wordList.upload.formatHelpTable.title') }}</h4>
+            <a class="help-download" :href="`/data/sample/vocabulary_sample_table.xlsx`" download>{{ t('words.wordList.upload.downloadSample') }}</a>
+          </div>
           <p>{{ t('words.wordList.upload.formatHelpTable.desc') }}</p>
           <div class="format-details">
             <p><strong>{{ t('words.wordList.upload.formatHelpTable.required') }}</strong></p>
@@ -251,7 +254,10 @@
         </div>
 
         <div class="help-section">
-          <h4>{{ t('words.wordList.upload.formatHelpBracket.title') }}</h4>
+          <div class="help-section-head">
+            <h4>{{ t('words.wordList.upload.formatHelpBracket.title') }}</h4>
+            <a class="help-download" :href="`/data/sample/vocabulary_sample_doc_bracket.docx`" download>{{ t('words.wordList.upload.downloadSample') }}</a>
+          </div>
           <p>{{ t('words.wordList.upload.formatHelpBracket.desc') }}</p>
           <div class="format-details">
             <table class="help-table">
@@ -285,7 +291,10 @@
         </div>
 
         <div class="help-section">
-          <h4>{{ t('words.wordList.upload.formatHelpWhitespace.title') }}</h4>
+          <div class="help-section-head">
+            <h4>{{ t('words.wordList.upload.formatHelpWhitespace.title') }}</h4>
+            <a class="help-download" :href="`/data/sample/vocabulary_sample_doc_whitespace.docx`" download>{{ t('words.wordList.upload.downloadSample') }}</a>
+          </div>
           <p>{{ t('words.wordList.upload.formatHelpWhitespace.desc') }}</p>
           <div class="format-details">
             <table class="help-table">
