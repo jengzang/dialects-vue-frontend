@@ -3,9 +3,7 @@
     <div class="header-section">
       <div class="title-row">
         <h2 style="margin: 0;">{{ t('villages.pages.yangChun.title') }}</h2>
-<!--        <button class="village-link-btn" @click="goToGDVillages">-->
-<!--          <span role="img" aria-label="ycVillages">🏠</span> 廣東自然村-->
-<!--        </button>-->
+        <span class="cross-link" @click="goToYcSpoken">{{ t('words.ycSpoken.name') }} →</span>
       </div>
       <p>{{ t('villages.pages.yangChun.source') }}</p>
       <div class="search-wrapper">
@@ -37,9 +35,13 @@
 <script setup>
 import {ref, computed} from 'vue';
 import { useI18n } from 'vue-i18n';
-import TreeItem from '@/main/components/TableAndTree/TreeItem.vue'; // 👈 導入剛才創建的子組件
-import villageData from '@/assets/data/yc_villages.json'; // 👈 導入你的 JSON
+import { useRouter, useRoute } from 'vue-router';
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import TreeItem from '@/main/components/TableAndTree/TreeItem.vue';
+import villageData from '@/assets/data/yc_villages.json';
 const { t } = useI18n();
+const router = useRouter();
+const route = useRoute();
 
 // 數據標準化邏輯
 let idCounter = 0;
@@ -137,6 +139,10 @@ const displayData = computed(() => {
   return filterTree(fullTreeData.value, searchQuery.value.trim());
 });
 
+const goToYcSpoken = () => {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/yc-spoken'));
+};
+
 </script>
 
 
@@ -181,6 +187,20 @@ $transition-base: 0.3s;
   align-items: center;
   gap: 16px;
   margin: 0;
+}
+
+.cross-link {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.7;
+  }
 }
 
 .title {

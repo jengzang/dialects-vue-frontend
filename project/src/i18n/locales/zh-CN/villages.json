@@ -122,7 +122,7 @@
       }
     },
     "gdTable": {
-      "title": "全粤村情",
+      "title": "广东自然村表格",
       "columns": {
         "prefecture": "地级",
         "county": "县级",
