@@ -985,9 +985,29 @@
 }
 
 .help-note {
-  font-size: 0.82rem;
-  color: var(--text-muted, rgba(var(--text-deep-rgb), 0.55));
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-warning-dark, #d97706);
+  background: rgba(var(--color-warning-rgb, 255 193 7), 0.18);
+  border: 1px solid rgba(var(--color-warning-rgb, 255 193 7), 0.4);
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  display: inline-block;
   line-height: 1.5;
+}
+
+.help-field-hint {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--color-warning-dark, #d97706);
+  background: rgba(var(--color-warning-rgb, 255 149 0), 0.12);
+  border: 1px solid rgba(var(--color-warning-rgb, 255 149 0), 0.35);
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
 .upload-parser-head {

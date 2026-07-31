@@ -238,7 +238,10 @@
               </thead>
               <tbody>
                 <tr v-for="col in formatHelpTableColumns" :key="col.key">
-                  <td><code>{{ col.key }}</code><span v-if="col.required" class="help-required">*</span></td>
+                  <td>
+                    <code>{{ col.label }}</code><span v-if="col.required" class="help-required">*</span>
+                    <span v-if="col.hint" class="help-field-hint">{{ col.hint }}</span>
+                  </td>
                   <td>{{ col.aliases }}</td>
                 </tr>
               </tbody>
@@ -296,22 +299,28 @@
               <tbody>
                 <tr>
                   <td>1</td>
-                  <td>standard_word</td>
+                  <td>{{ t('words.wordList.columns.definition') }}</td>
                   <td>{{ t('common.label.yes') }}</td>
                 </tr>
                 <tr>
                   <td>2</td>
-                  <td>local_expression</td>
-                  <td>{{ t('common.label.yes') }}</td>
+                  <td>
+                    {{ t('words.wordList.columns.headword') }}
+                    <span class="help-field-hint">{{ t('words.wordList.upload.formatHelpTable.atLeastOne') }}</span>
+                  </td>
+                  <td>{{ t('common.label.no') }}</td>
                 </tr>
                 <tr>
                   <td>3</td>
-                  <td>ipa</td>
-                  <td>{{ t('common.label.yes') }}</td>
+                  <td>
+                    {{ t('words.wordList.columns.pronunciation') }}
+                    <span class="help-field-hint">{{ t('words.wordList.upload.formatHelpTable.atLeastOne') }}</span>
+                  </td>
+                  <td>{{ t('common.label.no') }}</td>
                 </tr>
                 <tr>
                   <td>4+</td>
-                  <td>notes</td>
+                  <td>{{ t('words.wordList.columns.detail') }}</td>
                   <td>{{ t('common.label.no') }}</td>
                 </tr>
               </tbody>
@@ -441,10 +450,10 @@ const parserModeOptions = computed(() => [
 ])
 
 const formatHelpTableColumns = computed(() => [
-  { key: 'standard_word', required: true, aliases: 'standard_word / written / 释义 / 书面 / 书面词条 / 词条 / meaning' },
-  { key: 'local_expression', required: true, aliases: 'local_expression / vocabulary / 当地讲法 / 方言词 / 方言讲法 / local' },
-  { key: 'ipa', required: true, aliases: 'ipa / IPA / 音标 / 国际音标' },
-  { key: 'notes', required: false, aliases: 'notes / note / 注释 / 备注 / 说明' },
+  { key: 'standard_word', label: t('words.wordList.columns.definition'), required: true, aliases: 'standard_word / written / 释义 / 书面 / 书面词条 / 词条 / meaning' },
+  { key: 'local_expression', label: t('words.wordList.columns.headword'), required: false, aliases: 'local_expression / vocabulary / 当地讲法 / 方言词 / 方言讲法 / local', hint: t('words.wordList.upload.formatHelpTable.atLeastOne') },
+  { key: 'ipa', label: t('words.wordList.columns.pronunciation'), required: false, aliases: 'ipa / IPA / 音标 / 国际音标', hint: t('words.wordList.upload.formatHelpTable.atLeastOne') },
+  { key: 'notes', label: t('words.wordList.columns.detail'), required: false, aliases: 'notes / note / 注释 / 备注 / 说明' },
 ])
 
 const importSchema = computed(() => [
@@ -458,14 +467,14 @@ const importSchema = computed(() => [
   {
     key: 'local_expression',
     label: t('words.wordList.columns.headword'),
-    required: true,
+    required: false,
     aliases: ['local_expression', 'vocabulary', '当地讲法', '當地講法', '方言词', '方言詞', '方言讲法', '方言講法', 'local'],
     example: t('words.wordList.import.examples.headword')
   },
   {
     key: 'ipa',
     label: t('words.wordList.columns.pronunciation'),
-    required: true,
+    required: false,
     aliases: ['ipa', 'IPA', '音标', '音標', '国际音标', '國際音標'],
     example: t('words.wordList.import.examples.pronunciation')
   },
