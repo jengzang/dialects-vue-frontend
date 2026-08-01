@@ -1,5 +1,9 @@
 {
   "title": "Natural Villages",
+  "toponyms": {
+    "name": "Village Toponym Distribution",
+    "desc": "Explore where natural-village place names cluster by character or name fragment"
+  },
   "gdVillages": {
     "name": "Guangdong Villages",
     "desc": "Guangdong Province natural villages tree view"

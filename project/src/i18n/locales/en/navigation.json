@@ -52,6 +52,7 @@
       "ycSpoken": "Yangchun Colloquial Vocabulary"
     },
     "villages": {
+      "toponyms": "Village Toponym Distribution",
       "gdVillages": "Guangdong Villages",
       "VillagesML": "Machine Learning",
       "gdVillagesTable": "Guangdong Village Table",
