@@ -208,6 +208,68 @@
   min-width: 7.5rem;
 }
 
+.draw-feature-table-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.55rem;
+}
+
+.draw-feature-table-batch-field {
+  flex: 1 1 10rem;
+}
+
+.draw-feature-table-wrap {
+  max-height: 14rem;
+  overflow: auto;
+  border: 1px solid var(--glass-60);
+  border-radius: var(--radius-sm2);
+  background: var(--glass-40);
+  @include scrollbars.visible-scrollbar;
+  @include scrollbars.visible-scrollbar-webkit;
+}
+
+.draw-feature-table {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+  color: var(--text-deep);
+  font-size: 0.82rem;
+}
+
+.draw-feature-table th,
+.draw-feature-table td {
+  padding: 0.48rem 0.55rem;
+  border-bottom: 1px solid var(--glass-50);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.draw-feature-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--glass-70);
+  color: rgba(var(--text-deep-rgb), 0.7);
+  font-weight: 700;
+}
+
+.draw-feature-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.draw-feature-table-input {
+  min-width: 8.5rem;
+  padding: 0.38rem 0.55rem;
+  font-size: 0.82rem;
+}
+
+.draw-feature-table-summary {
+  display: block;
+  max-width: 11rem;
+  @include text-truncate;
+}
+
 .draw-feature-row {
   display: flex;
   align-items: center;

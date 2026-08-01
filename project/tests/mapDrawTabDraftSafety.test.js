@@ -119,7 +119,9 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
     props: {
       activeLayer: { type: Object, default: null },
       featureItems: { type: Array, default: () => [] },
+      featureTableRows: { type: Array, default: () => [] },
       featureMoveLayerOptions: { type: Array, default: () => [] },
+      selectedFeatureBatchName: { type: String, default: '' },
       selectedFeatureIds: { type: Array, default: () => [] },
       canModifyActiveLayer: { type: Boolean, default: false },
     },
@@ -129,6 +131,9 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       'move-selected-features-to-layer',
       'set-selected-features-visible',
       'set-selected-features-locked',
+      'update-feature-table-cell',
+      'update:selected-feature-batch-name',
+      'apply-selected-feature-batch-name',
     ],
     template: `
       <div data-testid="tools-panel">
@@ -197,6 +202,34 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
         >
           unlock selected features
         </button>
+        <input
+          data-testid="batch-name-input"
+          :value="selectedFeatureBatchName"
+          @input="$emit('update:selected-feature-batch-name', $event.target.value)"
+        >
+        <button
+          data-testid="apply-batch-name"
+          type="button"
+          :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0 || !selectedFeatureBatchName.trim()"
+          @click="$emit('apply-selected-feature-batch-name')"
+        >
+          apply batch name
+        </button>
+        <table data-testid="feature-table">
+          <tbody>
+            <tr v-for="row in featureTableRows" :key="row.id" data-testid="feature-table-row">
+              <td>
+                <input
+                  data-testid="feature-table-name"
+                  :value="row.name"
+                  @input="$emit('update-feature-table-cell', row.id, 'name', $event.target.value)"
+                >
+              </td>
+              <td data-testid="feature-table-geometry">{{ row.geometryType }}</td>
+              <td data-testid="feature-table-property-summary">{{ row.propertySummary }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     `,
   }),
@@ -778,6 +811,101 @@ describe('MapDrawTab draft safety', () => {
       .every((item) => item.dataset.locked === 'false')).toBe(true)
     expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
       .every((item) => item.checked)).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('edits feature names from the data table and applies a checked batch name as one action', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-table-row"]')).toHaveLength(2)
+    const firstNameInput = wrapper.host.querySelectorAll('[data-testid="feature-table-name"]')[0]
+    firstNameInput.value = 'North patch'
+    firstNameInput.dispatchEvent(new Event('input'))
+    await flushTicks()
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-table-name"]')[0].value).toBe('North patch')
+
+    const checkboxes = [...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+    checkboxes.forEach((checkbox) => {
+      if (!checkbox.checked) checkbox.click()
+    })
+    await flushTicks()
+
+    const batchNameInput = wrapper.host.querySelector('[data-testid="batch-name-input"]')
+    batchNameInput.value = 'Batch patch'
+    batchNameInput.dispatchEvent(new Event('input'))
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="apply-batch-name"]').click()
+    await flushTicks()
+
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-table-name"]')]
+      .every((input) => input.value === 'Batch patch')).toBe(true)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'z',
+      metaKey: true,
+    }))
+    await flushTicks()
+
+    const restoredNames = [...wrapper.host.querySelectorAll('[data-testid="feature-table-name"]')]
+      .map((input) => input.value)
+    expect(restoredNames[0]).toBe('North patch')
+    expect(restoredNames[1]).not.toBe('Batch patch')
+
+    wrapper.unmount()
+  })
+
+  it('does not edit feature names from the data table when the active layer is hidden or locked', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    let nameInput = wrapper.host.querySelector('[data-testid="feature-table-name"]')
+    nameInput.value = 'Editable patch'
+    nameInput.dispatchEvent(new Event('input'))
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="feature-row"]').textContent).toContain('Editable patch')
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+    nameInput = wrapper.host.querySelector('[data-testid="feature-table-name"]')
+    nameInput.value = 'Hidden patch'
+    nameInput.dispatchEvent(new Event('input'))
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="feature-row"]').textContent).toContain('Editable patch')
+    expect(wrapper.host.querySelector('[data-testid="feature-row"]').textContent).not.toContain('Hidden patch')
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="toggle-layer-lock"]').click()
+    await flushTicks()
+    nameInput = wrapper.host.querySelector('[data-testid="feature-table-name"]')
+    nameInput.value = 'Locked patch'
+    nameInput.dispatchEvent(new Event('input'))
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="feature-row"]').textContent).toContain('Editable patch')
+    expect(wrapper.host.querySelector('[data-testid="feature-row"]').textContent).not.toContain('Locked patch')
 
     wrapper.unmount()
   })

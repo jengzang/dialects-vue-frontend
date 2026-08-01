@@ -129,9 +129,11 @@
           :selected-layer-label="selectedLayerLabel"
           :current-mode="currentMode"
           :feature-items="activeLayerFeatureItems"
+          :feature-table-rows="activeLayerFeatureTableRows"
           :feature-move-layer-options="featureMoveLayerOptions"
           :selected-feature-id="selectedEditorFeatureId"
           :selected-feature-ids="selectedFeatureIds"
+          :selected-feature-batch-name="selectedFeatureBatchName"
           :selected-feature-properties="selectedEditorProperties"
           :selected-feature-geometry-type="selectedEditorGeometryType"
           :is-fullscreen="isMapFullscreen"
@@ -153,6 +155,9 @@
           @reset-view="handleResetView"
           @toggle-fullscreen="handleToggleFullscreen"
           @update-feature-property="updateSelectedFeatureProperty"
+          @update-feature-table-cell="handleUpdateFeatureTableCell"
+          @update:selected-feature-batch-name="selectedFeatureBatchName = $event"
+          @apply-selected-feature-batch-name="handleApplySelectedFeatureBatchName"
           @move-feature-to-layer="handleMoveSelectedFeatureToLayer"
           @move-selected-features-to-layer="handleMoveSelectedFeaturesToLayer"
           @set-selected-features-visible="handleSetSelectedFeaturesVisible"
@@ -645,6 +650,7 @@ const currentMode = ref('simple_select');
 const currentStyleKey = ref('gaode');
 const selectedFeatureId = ref('');
 const selectedFeatureIds = ref([]);
+const selectedFeatureBatchName = ref('');
 const layers = ref([]);
 const activeLayerId = ref('');
 const isDrawingPanelOpen = ref(true);
@@ -786,6 +792,45 @@ const activeLayerFeatureItems = computed(() => activeLayerFeatures.value.map((fe
   visible: feature?.properties?.visible ?? activeLayer.value?.visible ?? true,
   locked: feature?.properties?.locked ?? activeLayer.value?.locked ?? false,
 })).filter((feature) => feature.id));
+
+const tableSummaryHiddenPropertyKeys = new Set([
+  'id',
+  'name',
+  'title',
+  'label',
+  'stroke',
+  'strokeWidth',
+  'fill',
+  'fillOpacity',
+  'pointRadius',
+  'pointColor',
+  'pointStrokeColor',
+  'visible',
+  'locked',
+]);
+
+const formatFeatureTableValue = (value) => {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'object') return JSON.stringify(value);
+  return String(value);
+};
+
+const summarizeFeatureTableProperties = (properties = {}) => {
+  const summaryItems = Object.entries(properties)
+    .filter(([key, value]) => !tableSummaryHiddenPropertyKeys.has(key) && value !== '' && value !== null && value !== undefined)
+    .slice(0, 3)
+    .map(([key, value]) => `${key}: ${formatFeatureTableValue(value)}`);
+  return summaryItems.length ? summaryItems.join(' · ') : t('map.drawTab.labels.featurePropertiesEmpty');
+};
+
+const activeLayerFeatureTableRows = computed(() => activeLayerFeatures.value.map((feature, index) => ({
+  id: getFeatureId(feature),
+  name: feature?.properties?.name ?? getFeatureLabel(feature, index),
+  geometryType: feature?.geometry?.type || activeLayer.value?.geometryType || '',
+  visible: feature?.properties?.visible ?? activeLayer.value?.visible ?? true,
+  locked: feature?.properties?.locked ?? activeLayer.value?.locked ?? false,
+  propertySummary: summarizeFeatureTableProperties(feature?.properties ?? {}),
+})).filter((row) => row.id));
 
 const featureMoveLayerOptions = computed(() => {
   if (!activeLayer.value || !selectedFeature.value) return [];
@@ -2061,6 +2106,18 @@ const handleSetSelectedFeaturesVisible = (visible) => {
 
 const handleSetSelectedFeaturesLocked = (locked) => {
   updateSelectedFeaturesProperty('locked', locked);
+};
+
+const handleUpdateFeatureTableCell = (featureId, key, value) => {
+  if (!canModifyActiveLayer.value) return;
+  if (key !== 'name') return;
+  updateFeatureProperty(featureId, key, value);
+};
+
+const handleApplySelectedFeatureBatchName = () => {
+  const nextName = selectedFeatureBatchName.value.trim();
+  if (!nextName) return;
+  updateSelectedFeaturesProperty('name', nextName);
 };
 
 const updateSelectedFeatureProperty = (key, value) => {

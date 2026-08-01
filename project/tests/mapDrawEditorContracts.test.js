@@ -349,6 +349,29 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain('editableMapRef.value?.selectFeatures?.(selectedFeatureIds.value);')
   })
 
+  it('supports a feature data table and checked-name batch editing', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+
+    expect(panelSource).toContain('featureTableRows')
+    expect(panelSource).toContain('selectedFeatureBatchName')
+    expect(panelSource).toContain(`t('map.drawTab.labels.featureDataTable')`)
+    expect(panelSource).toContain(`t('map.drawTab.labels.batchFeatureName')`)
+    expect(panelSource).toContain(`$emit('update-feature-table-cell', row.id, 'name', $event.target.value)`)
+    expect(panelSource).toContain(`$emit('update:selected-feature-batch-name', $event.target.value)`)
+    expect(panelSource).toContain(`$emit('apply-selected-feature-batch-name')`)
+    expect(tabSource).toContain(':feature-table-rows="activeLayerFeatureTableRows"')
+    expect(tabSource).toContain(':selected-feature-batch-name="selectedFeatureBatchName"')
+    expect(tabSource).toContain('@update-feature-table-cell="handleUpdateFeatureTableCell"')
+    expect(tabSource).toContain('@update:selected-feature-batch-name="selectedFeatureBatchName = $event"')
+    expect(tabSource).toContain('@apply-selected-feature-batch-name="handleApplySelectedFeatureBatchName"')
+    expect(tabSource).toContain('const selectedFeatureBatchName = ref')
+    expect(tabSource).toContain('const activeLayerFeatureTableRows = computed')
+    expect(tabSource).toContain('const handleUpdateFeatureTableCell = (featureId, key, value) =>')
+    expect(tabSource).toContain('const handleApplySelectedFeatureBatchName = () =>')
+    expect(tabSource).toContain("updateSelectedFeaturesProperty('name', nextName);")
+  })
+
   it('falls back to layer editing when selected feature id is stale', () => {
     const source = readSource(mapDrawTabPath)
 

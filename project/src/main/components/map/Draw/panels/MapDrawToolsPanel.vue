@@ -273,6 +273,83 @@
         </section>
 
         <section class="draw-tool-section">
+          <div class="draw-tool-section-header">
+            <div class="draw-tool-section-title">
+              {{ t('map.drawTab.labels.featureDataTable') }}
+            </div>
+          </div>
+          <div
+            v-if="featureTableRows.length"
+            class="draw-feature-table-tools"
+          >
+            <label class="draw-field draw-feature-table-batch-field">
+              <span class="draw-field-label">
+                {{ t('map.drawTab.labels.batchFeatureName') }}
+              </span>
+              <input
+                class="draw-input"
+                type="text"
+                :value="selectedFeatureBatchName"
+                @input="$emit('update:selected-feature-batch-name', $event.target.value)"
+              >
+            </label>
+            <button
+              class="main-glass-button draw-tool-inline-button"
+              data-variant="secondary"
+              type="button"
+              :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0 || !selectedFeatureBatchName.trim()"
+              @click="$emit('apply-selected-feature-batch-name')"
+            >
+              {{ t('map.drawTab.buttons.applyBatchFeatureName') }}
+            </button>
+          </div>
+          <div
+            v-if="featureTableRows.length"
+            class="draw-feature-table-wrap"
+          >
+            <table class="draw-feature-table">
+              <thead>
+                <tr>
+                  <th>{{ t('map.drawTab.labels.featureTableName') }}</th>
+                  <th>{{ t('map.drawTab.labels.featureTableGeometry') }}</th>
+                  <th>{{ t('map.drawTab.labels.featureTableState') }}</th>
+                  <th>{{ t('map.drawTab.labels.featureTableProperties') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="row in featureTableRows"
+                  :key="row.id"
+                >
+                  <td>
+                    <input
+                      class="draw-input draw-feature-table-input"
+                      type="text"
+                      :value="row.name"
+                      :disabled="!canModifyActiveLayer"
+                      @input="$emit('update-feature-table-cell', row.id, 'name', $event.target.value)"
+                    >
+                  </td>
+                  <td>{{ getGeometryLabel(row.geometryType) }}</td>
+                  <td>{{ getFeatureStateLabel(row) }}</td>
+                  <td>
+                    <span class="draw-feature-table-summary">
+                      {{ row.propertySummary }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div
+            v-else
+            class="draw-layer-empty"
+          >
+            {{ t('map.drawTab.labels.emptyFeatureList') }}
+          </div>
+        </section>
+
+        <section class="draw-tool-section">
           <div class="draw-tool-section-title">
             {{ selectedFeatureId ? t('map.drawTab.labels.featureEditor') : t('map.drawTab.labels.layerEditor') }}
           </div>
@@ -446,9 +523,11 @@ const props = defineProps({
   selectedLayerLabel: { type: String, default: '' },
   currentMode: { type: String, default: 'simple_select' },
   featureItems: { type: Array, default: () => [] },
+  featureTableRows: { type: Array, default: () => [] },
   featureMoveLayerOptions: { type: Array, default: () => [] },
   selectedFeatureId: { type: String, default: '' },
   selectedFeatureIds: { type: Array, default: () => [] },
+  selectedFeatureBatchName: { type: String, default: '' },
   selectedFeatureProperties: { type: Object, default: null },
   selectedFeatureGeometryType: { type: String, default: '' },
   isFullscreen: { type: Boolean, default: false },
@@ -473,6 +552,9 @@ defineEmits([
   'reset-view',
   'toggle-fullscreen',
   'update-feature-property',
+  'update-feature-table-cell',
+  'update:selected-feature-batch-name',
+  'apply-selected-feature-batch-name',
   'move-feature-to-layer',
   'move-selected-features-to-layer',
   'set-selected-features-visible',
@@ -484,9 +566,15 @@ const getGeometryLabel = (geometryType) => {
   if (geometryType === 'Polygon') return t('map.drawTab.geometry.polygon')
   return t('map.drawTab.geometry.line')
 }
+
+const getFeatureStateLabel = (feature) => {
+  const visibleLabel = feature?.visible ? t('map.drawTab.labels.visibleShort') : t('map.drawTab.labels.hiddenShort')
+  return feature?.locked ? `${visibleLabel} · ${t('map.drawTab.labels.lockedShort')}` : visibleLabel
+}
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 @use '../../_map-variables' as *;
 
 @use './panelShared';
