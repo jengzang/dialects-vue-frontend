@@ -24,7 +24,7 @@
 | Step 7 图层管理易用性 | 已完成本轮 | `a3b10d90`、`9e0f5a92`、`43d828a4`、`91c5321f`、`7744c532`、`0e44785b`、`bc8bc098`、`eb1ab82c`、`add2e4fe`、`896b0633`、`e6d7360b`、`52214be3` | 已支持复制图层、复制选中要素、删除图层确认、图层行显示几何/要素数/显示锁定状态、图层行内重命名、重命名失焦保存、选中要素移动到同类型可编辑图层、要素列表勾选多选、批量删除、批量移动到兼容图层、批量显隐和批量锁定/解锁；批量移动和显示/解锁会在内部同步 Draw 数据时保留多选状态，并阻止隐藏或锁定活动图层继续绘制/删除/清空。 |
 | 数据表格与批量名称编辑 | 已完成 | `cdf19bf2` | 工具面板新增活动图层要素数据表，可直接编辑要素名称；勾选要素可一次性应用批量名称，并作为一条历史记录撤销；隐藏或锁定活动图层时表格编辑也会被拦截。 |
 | 数据表格与业务字段编辑 | 已完成 | `136e56b2` | 活动图层数据表会推断业务字段列，可逐格编辑要素业务属性；勾选要素可批量应用指定字段值并进入历史；`user_id` 这类业务字段不再被误判为 Draw 内部样式字段；切换图层后失效字段会禁用批量输入和应用按钮。 |
-| 选择能力补强 | 已完成 | `4525e921`、`011baf88`、`b712d1db`、`457081d8`、`d4988acb`、`d9faa1cc` | 已支持全选可编辑、反选可编辑、清空勾选和地图框选；框选只选择当前活动图层中可见且未锁定的要素，完成后退出框选模式，并通过覆盖层拦截鼠标事件，避免与 Mapbox Draw 拖拽编辑冲突。框选支持 Shift 追加、Alt/Option 减选；Mapbox Draw 原生多选会同步到工具面板；`Ctrl/Cmd+A` 可选择当前活动图层可编辑要素，`Escape` 可清空选择并退出框选，`Delete/Backspace` 可删除当前选中几何，且输入框内不拦截快捷键。 |
+| 选择能力补强 | 已完成 | `4525e921`、`011baf88`、`b712d1db`、`457081d8`、`d4988acb`、`d9faa1cc`、`7548a5ed` | 已支持全选可编辑、反选可编辑、清空勾选和地图框选；框选只选择当前活动图层中可见且未锁定的要素，完成后退出框选模式，并通过覆盖层拦截鼠标事件，避免与 Mapbox Draw 拖拽编辑冲突。框选支持 Shift 追加、Alt/Option 减选；Mapbox Draw 原生多选会同步到工具面板，并过滤隐藏或锁定要素后回写地图内部选择；`Ctrl/Cmd+A` 可选择当前活动图层可编辑要素，`Escape` 可清空选择并退出框选，`Delete/Backspace` 可删除当前选中几何，且输入框内不拦截快捷键。 |
 | 几何编辑可发现性 | 已完成 | `903e800d` | 自定义 Draw 样式恢复显示 midpoint 手柄，使线/面在 `direct_select` 中可以看到边中点入口，便于点击边新增顶点后调整边界。 |
 | 导入数据质量诊断基础 | 已完成 | `9414eed6` | 导入 GeoJSON/KML/KMZ/CSV 时会在标准化前统计重复 ID、空几何、不支持几何、异常坐标；成功导入后通过 warning 汇总提示。CSV 被过滤的无效/空坐标行和 GeometryCollection 内被跳过的不支持子几何也会计入诊断。 |
 | Step 8 未保存保护与自动草稿恢复 | 已完成 | `9fc8103d`、`5b08e48a` | 自动草稿记录从手动草稿列表隐藏；页面打开时提示恢复未保存草稿；工作台变脏时自动保存；离开页面前提示；手动保存、更新或恢复本地草稿后清理隐藏自动草稿，并等待并发自动写入完成。 |
@@ -49,6 +49,12 @@
 - `npm run build`
 - `npm test -- mapDrawTabDraftSafety.test.js -t "Delete and Backspace|shortcuts when the active layer is hidden or locked|Delete while focus"`
 - `npm test -- editableMapLibreStateFlow.test.js mapDrawTabDraftSafety.test.js -t "naturally selected|natural map multi-selection"`
+- `npm test -- mapDrawTabDraftSafety.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js tests/utils/drawMap/draftStorage.test.js tests/utils/drawMap/export.test.js`
+- `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/components/map/EditableMapLibre.vue tests/mapDrawTabDraftSafety.test.js tests/mapDrawEditorContracts.test.js tests/editableMapLibreStateFlow.test.js --quiet`
+- `git diff --check`
+- `npm run build`
+- `npm test -- mapDrawTabDraftSafety.test.js -t "drops hidden and locked features"`
+- `npm test -- mapDrawTabDraftSafety.test.js -t "natural map multi-selection|drops hidden and locked features|ignores hidden feature selection|select-all harmless"`
 - `npm test -- mapDrawTabDraftSafety.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js tests/utils/drawMap/draftStorage.test.js tests/utils/drawMap/export.test.js`
 - `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/components/map/EditableMapLibre.vue tests/mapDrawTabDraftSafety.test.js tests/mapDrawEditorContracts.test.js tests/editableMapLibreStateFlow.test.js --quiet`
 - `git diff --check`
