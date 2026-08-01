@@ -2143,6 +2143,7 @@ td {
 
   &.clickable {
     cursor: pointer;
+    // color: var(--text-deep);
     background: var(--glass-50);
     border: 1px solid var(--border-light);
 
@@ -2167,7 +2168,8 @@ td {
   font-weight: 600;
   text-align: center;
   appearance: textfield;
-  background: white;
+  color: var(--text-deep);
+  background: var(--bg-white);
   border: 2px solid var(--color-primary);
   border-radius: var(--radius-md);
   outline: none;
@@ -2281,7 +2283,7 @@ td {
   padding: 10px 12px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: white;
+  background: var(--bg-white);
   font-size: 14px;
   outline: none;
   transition: all 0.3s;
