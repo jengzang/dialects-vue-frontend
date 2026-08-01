@@ -80,6 +80,7 @@ $system-font:
   position: relative;
   display: flex;
   justify-content: center;
+  width: 100%;
   padding: 10px 6px;
   padding-top: calc(7.5dvh - 15px);
   color: var(--text-deep);

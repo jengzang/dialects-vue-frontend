@@ -20,15 +20,13 @@ import * as echarts from 'echarts';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
+  buildBoundaryLineSeriesData,
   buildRiverLineSeriesData,
   extractToponymPointFromChartParams,
 } from './toponymsChartData.js';
 
 const COUNTRY_MAP_NAME = 'toponyms-country';
-const LAYER_MAP_NAMES = {
-  provinces: 'toponyms-provinces',
-  cities: 'toponyms-cities',
-};
+const BOUNDARY_LAYER_KEYS = ['provinces', 'cities'];
 const POINT_CLICK_FILTER = {
   seriesType: 'scatter',
 };
@@ -129,8 +127,10 @@ function initChart() {
 function renderChart() {
   if (!chartInstance || !props.countryLayer) return;
 
-  registerCountryMap();
-  registerOptionalMapLayers();
+  if (!registeredLayers.has(COUNTRY_MAP_NAME)) {
+    echarts.registerMap(COUNTRY_MAP_NAME, props.countryLayer);
+    registeredLayers.add(COUNTRY_MAP_NAME);
+  }
 
   chartInstance.setOption(
     {
@@ -140,7 +140,7 @@ function renderChart() {
       geo: {
         map: COUNTRY_MAP_NAME,
         roam: true,
-        silent: false,
+        silent: true,
         zoom: 1.18,
         scaleLimit: {
           min: 0.8,
@@ -156,7 +156,7 @@ function renderChart() {
         },
       },
       series: [
-        ...buildMapOverlaySeries(),
+        ...buildBoundarySeries(),
         ...buildRiverSeries(),
         buildPointSeries(),
       ],
@@ -165,46 +165,23 @@ function renderChart() {
   );
 }
 
-function registerCountryMap() {
-  if (!props.countryLayer || registeredLayers.has(COUNTRY_MAP_NAME)) return;
-  echarts.registerMap('toponyms-country', props.countryLayer);
-  registeredLayers.add(COUNTRY_MAP_NAME);
-}
-
-function registerOptionalMapLayers() {
-  for (const [key, mapName] of Object.entries(LAYER_MAP_NAMES)) {
-    const layer = props.loadedLayers[key];
-    if (!props.layerState[key] || !layer) continue;
-    registerMapLayer(mapName, layer);
-  }
-}
-
-function registerMapLayer(mapName, geoJson) {
-  if (!geoJson || registeredLayers.has(mapName)) return;
-  echarts.registerMap(mapName, geoJson);
-  registeredLayers.add(mapName);
-}
-
-function buildMapOverlaySeries() {
-  return Object.entries(LAYER_MAP_NAMES)
-    .filter(([key]) => props.layerState[key] && props.loadedLayers[key])
-    .map(([key, mapName]) => ({
+function buildBoundarySeries() {
+  return BOUNDARY_LAYER_KEYS
+    .filter((key) => props.layerState[key] && props.loadedLayers[key])
+    .map((key, index) => ({
       id: `toponym-${key}`,
       name: t(`villages.pages.toponyms.layers.${key}`),
-      type: 'map',
-      map: mapName,
-      roam: false,
+      type: 'lines',
+      coordinateSystem: 'geo',
+      polyline: true,
       silent: true,
       z: key === 'provinces' ? 2 : 3,
-      itemStyle: {
-        areaColor: cssToken('--glass-05'),
-        borderColor: cssToken(key === 'provinces' ? '--border-control' : '--border-glass'),
-        borderWidth: key === 'provinces' ? 1 : 0.6,
+      data: buildBoundaryLineSeriesData(props.loadedLayers[key]),
+      lineStyle: {
+        color: cssToken(key === 'provinces' ? '--border-medium' : '--border-control'),
+        opacity: key === 'provinces' ? 0.65 : 0.55,
+        width: key === 'provinces' ? 1.2 : 0.7,
       },
-      emphasis: {
-        disabled: true,
-      },
-      data: [],
     }));
 }
 
@@ -222,8 +199,8 @@ function buildRiverSeries() {
       data: buildRiverLineSeriesData(props.loadedLayers[key]),
       lineStyle: {
         color: cssToken('--color-primary'),
-        opacity: key === 'riverL1' ? 0.56 : 0.32,
-        width: key === 'riverL1' ? 1.4 : 0.8,
+        opacity: key === 'riverL1' ? 0.5 : 0.32,
+        width: key === 'riverL1' ? 1.1 : 0.8,
       },
     }));
 }

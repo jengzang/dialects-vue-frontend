@@ -56,6 +56,53 @@ function pushLineString(lines, feature, coordinates) {
   });
 }
 
+function cleanRing(ring) {
+  return (Array.isArray(ring) ? ring : [])
+    .map((coord) => toCoordinatePair(coord?.[0], coord?.[1]))
+    .filter(Boolean);
+}
+
+export function extractPolygonFeatures(geoJson) {
+  const features = Array.isArray(geoJson?.features) ? geoJson.features : [];
+  return features
+    .map((feature) => {
+      const geometry = feature?.geometry;
+      if (!geometry) return null;
+      if (geometry.type === 'Polygon') {
+        return (geometry.coordinates || []).map(cleanRing).filter((ring) => ring.length >= 3);
+      }
+      if (geometry.type === 'MultiPolygon') {
+        return (geometry.coordinates || []).flatMap(
+          (polygon) => (polygon || []).map(cleanRing).filter((ring) => ring.length >= 3)
+        );
+      }
+      return null;
+    })
+    .filter((rings) => rings && rings.length > 0);
+}
+
+export function buildBoundaryLineSeriesData(geoJson) {
+  const lines = [];
+  const features = Array.isArray(geoJson?.features) ? geoJson.features : [];
+
+  features.forEach((feature) => {
+    const geometry = feature?.geometry;
+    const rings = [];
+    if (geometry?.type === 'Polygon') {
+      rings.push(...(geometry.coordinates || []));
+    } else if (geometry?.type === 'MultiPolygon') {
+      (geometry.coordinates || []).forEach((polygon) => {
+        rings.push(...(polygon || []));
+      });
+    }
+    rings.forEach((ring) => {
+      pushLineString(lines, feature, ring);
+    });
+  });
+
+  return lines;
+}
+
 export function buildRiverLineSeriesData(geoJson) {
   const lines = [];
   const features = Array.isArray(geoJson?.features) ? geoJson.features : [];
