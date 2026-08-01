@@ -43,9 +43,8 @@
 ### Task 3: Analysis Engine Facade
 
 **Files:**
-- Create: `project/src/main/composables/praat/usePraatAnalysis.js`
+- Create: `project/src/composables/core/usePraatAnalysis.js`
 - Modify: `project/src/main/views/Praat.vue`
-- Modify: `project/src/api/main/tools/Praat.js`
 - Test: `project/tests/praatAnalysisFacade.test.js`
 
 - [ ] Add a failing test that the facade chooses remote on Web and native-local on App when available.
