@@ -2399,6 +2399,7 @@ const handleDrawHistoryKeydown = (event) => {
     (event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'z'
   ) || (event.ctrlKey && event.key.toLowerCase() === 'y');
   const isSelectAllShortcut = (event.metaKey || event.ctrlKey) && !event.shiftKey && event.key.toLowerCase() === 'a';
+  const isDeleteSelectionShortcut = event.key === 'Delete' || event.key === 'Backspace';
   const isClearSelectionShortcut = event.key === 'Escape';
 
   if (isUndoShortcut) {
@@ -2416,6 +2417,12 @@ const handleDrawHistoryKeydown = (event) => {
   if (isSelectAllShortcut && canModifyActiveLayer.value) {
     event.preventDefault();
     handleSelectAllFeatures();
+    return;
+  }
+
+  if (isDeleteSelectionShortcut && selectedFeatureId.value && canModifyActiveLayer.value) {
+    event.preventDefault();
+    handleDeleteSelected();
     return;
   }
 

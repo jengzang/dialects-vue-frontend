@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => ({
   mapSetDrawMode: vi.fn(),
   mapSelectFeature: vi.fn(),
   mapSelectFeatures: vi.fn(),
+  mapDeleteSelected: vi.fn(),
   AUTO_DRAFT_ID: '__map_draw_auto_draft__',
 }))
 
@@ -80,6 +81,7 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         setDrawMode: mocks.mapSetDrawMode,
         selectFeature: mocks.mapSelectFeature,
         selectFeatures: mocks.mapSelectFeatures,
+        deleteSelected: mocks.mapDeleteSelected,
         importGeoJson: vi.fn((_featureCollection, options = {}) => {
           if (options.emitSelection !== false) {
             emit('feature-select', '')
@@ -566,6 +568,7 @@ describe('MapDrawTab draft safety', () => {
     mocks.mapSetDrawMode.mockReset()
     mocks.mapSelectFeature.mockReset()
     mocks.mapSelectFeatures.mockReset()
+    mocks.mapDeleteSelected.mockReset()
     readImportedLayerFile.mockReset()
     splitFeatureCollectionByGeometryType.mockReset()
 
@@ -1351,6 +1354,130 @@ describe('MapDrawTab draft safety', () => {
     nameInput.dispatchEvent(escapeEvent)
     await flushTicks()
     expect(escapeEvent.defaultPrevented).toBe(false)
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('deletes the selected geometry with Delete and Backspace shortcuts', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    const checkbox = wrapper.host.querySelector('[data-testid="feature-checkbox"]')
+    checkbox.click()
+    await flushTicks()
+
+    const deleteEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Delete',
+    })
+    document.dispatchEvent(deleteEvent)
+    await flushTicks()
+    expect(deleteEvent.defaultPrevented).toBe(true)
+    expect(mocks.mapDeleteSelected).toHaveBeenCalledTimes(1)
+
+    const backspaceEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Backspace',
+    })
+    document.dispatchEvent(backspaceEvent)
+    await flushTicks()
+    expect(backspaceEvent.defaultPrevented).toBe(true)
+    expect(mocks.mapDeleteSelected).toHaveBeenCalledTimes(2)
+
+    wrapper.unmount()
+  })
+
+  it('does not delete selected geometry with shortcuts when the active layer is hidden or locked', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="feature-checkbox"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+
+    const hiddenDeleteEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Delete',
+    })
+    document.dispatchEvent(hiddenDeleteEvent)
+    await flushTicks()
+    expect(hiddenDeleteEvent.defaultPrevented).toBe(false)
+    expect(mocks.mapDeleteSelected).not.toHaveBeenCalled()
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+    if (!wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked) {
+      wrapper.host.querySelector('[data-testid="feature-checkbox"]').click()
+      await flushTicks()
+    }
+    wrapper.host.querySelector('[data-testid="toggle-layer-lock"]').click()
+    await flushTicks()
+
+    const lockedBackspaceEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Backspace',
+    })
+    document.dispatchEvent(lockedBackspaceEvent)
+    await flushTicks()
+    expect(lockedBackspaceEvent.defaultPrevented).toBe(false)
+    expect(mocks.mapDeleteSelected).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('does not handle Delete while focus is in editable fields', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    const checkbox = wrapper.host.querySelector('[data-testid="feature-checkbox"]')
+    checkbox.click()
+    await flushTicks()
+    const nameInput = wrapper.host.querySelector('[data-testid="feature-table-name"]')
+    expect(nameInput).toBeTruthy()
+
+    const deleteEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Delete',
+    })
+    nameInput.dispatchEvent(deleteEvent)
+    await flushTicks()
+
+    expect(deleteEvent.defaultPrevented).toBe(false)
+    expect(mocks.mapDeleteSelected).not.toHaveBeenCalled()
     expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(true)
 
     wrapper.unmount()
