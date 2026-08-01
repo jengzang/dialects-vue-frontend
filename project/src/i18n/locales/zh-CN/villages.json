@@ -179,11 +179,15 @@
         "loading": "加载中"
       },
       "chart": {
+        "ariaLabel": "自然村地名分布图",
         "placeholderTitle": "ECharts 分布图",
         "countryLoading": "正在加载中国国界底图",
         "countryReady": "中国国界底图已就绪",
         "searchFirst": "输入关键词后搜索，点位将显示在这里",
         "pointsReady": "已准备 {count} 个可绘制点位",
+        "noDrawablePoints": "没有可绘制点位。",
+        "pointsSeries": "匹配点位",
+        "pointTooltip": "点击查看本地详情",
         "baseMapError": "底图加载失败"
       },
       "results": {

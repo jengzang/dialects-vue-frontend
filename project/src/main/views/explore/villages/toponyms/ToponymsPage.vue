@@ -27,23 +27,16 @@
     <section class="toponyms-page__body">
       <div class="toponyms-page__chart main-glass-panel">
         <div class="toponyms-page__chart-inner main-glass-panel-inner">
-          <div
-            v-if="countryError"
-            class="toponyms-page__chart-state"
-          >
-            <strong>{{ t('villages.pages.toponyms.chart.baseMapError') }}</strong>
-            <span>{{ countryError }}</span>
-          </div>
-          <div
-            v-else
-            class="toponyms-page__chart-state"
-          >
-            <strong>{{ t('villages.pages.toponyms.chart.placeholderTitle') }}</strong>
-            <span v-if="countryLayer">{{ t('villages.pages.toponyms.chart.countryReady') }}</span>
-            <span v-else>{{ t('villages.pages.toponyms.chart.countryLoading') }}</span>
-            <span v-if="!hasSearched">{{ t('villages.pages.toponyms.chart.searchFirst') }}</span>
-            <span v-else>{{ t('villages.pages.toponyms.chart.pointsReady', { count: scatterData.length }) }}</span>
-          </div>
+          <ToponymDistributionChart
+            :country-layer="countryLayer"
+            :loaded-layers="loadedLayers"
+            :layer-state="layerState"
+            :scatter-data="scatterData"
+            :loading="pointsLoading"
+            :error="countryError || pointsError"
+            :has-searched="hasSearched"
+            @select-point="handleSelectPoint"
+          />
         </div>
       </div>
 
@@ -81,6 +74,7 @@ import {
   getToponymPoints,
 } from '@/api';
 import ToponymLayerControls from './ToponymLayerControls.vue';
+import ToponymDistributionChart from './ToponymDistributionChart.vue';
 import ToponymResultsPanel from './ToponymResultsPanel.vue';
 import ToponymSearchBar from './ToponymSearchBar.vue';
 import { buildToponymScatterData } from './toponymsChartData.js';
@@ -343,9 +337,6 @@ async function handleToggleLayer({ key, visible }) {
   }
 }
 
-defineExpose({
-  handleSelectPoint,
-});
 </script>
 
 <style scoped lang="scss">
@@ -402,28 +393,7 @@ defineExpose({
   }
 
   &__chart-inner {
-    @include flex-center;
     min-block-size: 68dvh;
-  }
-
-  &__chart-state {
-    @include flex-col;
-    align-items: center;
-    gap: 8px;
-    max-inline-size: 420px;
-    text-align: center;
-
-    strong {
-      color: var(--text-deep);
-      font-size: 18px;
-      line-height: 1.4;
-    }
-
-    span {
-      color: var(--text-secondary);
-      font-size: 13px;
-      line-height: 1.6;
-    }
   }
 }
 

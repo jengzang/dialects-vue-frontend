@@ -179,11 +179,15 @@
         "loading": "Loading"
       },
       "chart": {
+        "ariaLabel": "Natural village toponym distribution chart",
         "placeholderTitle": "ECharts Distribution",
         "countryLoading": "Loading China country boundary",
         "countryReady": "China country boundary is ready",
         "searchFirst": "Search a keyword to draw matching points here",
         "pointsReady": "{count} drawable points are ready",
+        "noDrawablePoints": "No drawable points.",
+        "pointsSeries": "Matching points",
+        "pointTooltip": "Click to view local detail",
         "baseMapError": "Base map failed to load"
       },
       "results": {
