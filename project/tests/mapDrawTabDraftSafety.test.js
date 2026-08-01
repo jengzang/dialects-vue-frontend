@@ -133,6 +133,34 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         >
           emit box selection
         </button>
+        <button
+          data-testid="emit-box-add-selection"
+          type="button"
+          @click="$emit('feature-box-select', { featureIds: ['feature-2'], selectionMode: 'add' })"
+        >
+          emit box add selection
+        </button>
+        <button
+          data-testid="emit-box-subtract-selection"
+          type="button"
+          @click="$emit('feature-box-select', { featureIds: ['feature-1'], selectionMode: 'subtract' })"
+        >
+          emit box subtract selection
+        </button>
+        <button
+          data-testid="emit-box-null-selection"
+          type="button"
+          @click="$emit('feature-box-select', null)"
+        >
+          emit box null selection
+        </button>
+        <button
+          data-testid="emit-feature-one-selection"
+          type="button"
+          @click="$emit('feature-select', 'feature-1')"
+        >
+          emit feature one selection
+        </button>
       </div>
     `,
   }),
@@ -1035,6 +1063,122 @@ describe('MapDrawTab draft safety', () => {
     wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
     await flushTicks()
     expect(wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').disabled).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('adds and subtracts box-selected active-layer features without replacing the whole selection', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([true, false, false])
+
+    const saveCountBeforeAddSelection = mocks.saveDraftRecord.mock.calls.length
+    wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-box-add-selection"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([true, true, false])
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith(['feature-1', 'feature-2'])
+    expect(mocks.saveDraftRecord).toHaveBeenCalledTimes(saveCountBeforeAddSelection)
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('off')
+
+    const saveCountBeforeSubtractSelection = mocks.saveDraftRecord.mock.calls.length
+    wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-box-subtract-selection"]').click()
+    await flushTicks()
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    expect([...checkboxes].map((checkbox) => checkbox.checked)).toEqual([false, true, false])
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-2', { directEdit: false })
+    expect(mocks.saveDraftRecord).toHaveBeenCalledTimes(saveCountBeforeSubtractSelection)
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('off')
+
+    wrapper.unmount()
+  })
+
+  it('treats a malformed box selection payload as an empty replacement', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    const checkbox = wrapper.host.querySelector('[data-testid="feature-checkbox"]')
+    checkbox.click()
+    await flushTicks()
+    expect(checkbox.checked).toBe(true)
+
+    wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-box-null-selection"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(false)
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('off')
+
+    wrapper.unmount()
+  })
+
+  it('drops stale hidden feature selection when adding box-selected features', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
+      .map((item) => item.dataset.visible)).toEqual(['false', 'true'])
+
+    wrapper.host.querySelector('[data-testid="emit-feature-one-selection"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([true, false])
+
+    wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-box-add-selection"]').click()
+    await flushTicks()
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    expect([...checkboxes].map((checkbox) => checkbox.checked)).toEqual([false, true])
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-2', { directEdit: false })
 
     wrapper.unmount()
   })

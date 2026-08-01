@@ -2094,11 +2094,26 @@ const handleToggleFeatureBoxSelect = () => {
   editableMapRef.value?.setDrawMode?.('simple_select');
 };
 
-const handleFeatureBoxSelect = (featureIds = []) => {
+const handleFeatureBoxSelect = (payload = []) => {
+  const isPayloadObject = Boolean(payload && typeof payload === 'object' && !Array.isArray(payload));
+  const featureIds = Array.isArray(payload)
+    ? payload
+    : (isPayloadObject && Array.isArray(payload.featureIds) ? payload.featureIds : []);
+  const selectionMode = isPayloadObject && (payload.selectionMode === 'add' || payload.selectionMode === 'subtract')
+    ? payload.selectionMode
+    : 'replace';
   const selectableFeatureIdSet = new Set(activeLayerSelectableFeatureIds.value);
-  const nextFeatureIds = featureIds
+  const filteredFeatureIds = featureIds
     .map((featureId) => String(featureId || ''))
     .filter((featureId) => selectableFeatureIdSet.has(featureId));
+  const filteredFeatureIdSet = new Set(filteredFeatureIds);
+  const currentSelectableFeatureIds = selectedFeatureIds.value
+    .filter((featureId) => selectableFeatureIdSet.has(featureId));
+  const nextFeatureIds = selectionMode === 'add'
+    ? [...currentSelectableFeatureIds, ...filteredFeatureIds]
+    : selectionMode === 'subtract'
+      ? currentSelectableFeatureIds.filter((featureId) => !filteredFeatureIdSet.has(featureId))
+      : filteredFeatureIds;
   setFeatureSelection(nextFeatureIds, nextFeatureIds[0]);
   syncFeatureSelectionToMap();
   isFeatureBoxSelectMode.value = false;

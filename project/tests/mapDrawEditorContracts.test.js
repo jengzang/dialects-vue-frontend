@@ -340,13 +340,16 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain(':can-use-feature-box-select="canUseFeatureBoxSelect"')
     expect(tabSource).toContain('const isFeatureBoxSelectMode = ref(false);')
     expect(tabSource).toContain('const handleToggleFeatureBoxSelect = () =>')
-    expect(tabSource).toContain('const handleFeatureBoxSelect = (featureIds = []) =>')
+    expect(tabSource).toContain('const handleFeatureBoxSelect = (payload = []) =>')
     expect(tabSource).toContain('const selectableFeatureIdSet = new Set(activeLayerSelectableFeatureIds.value);')
+    expect(tabSource).toContain("payload.selectionMode === 'add'")
+    expect(tabSource).toContain("payload.selectionMode === 'subtract'")
     expect(tabSource).toContain('@toggle-feature-box-select="handleToggleFeatureBoxSelect"')
     expect(editableSource).toContain('featureBoxSelectEnabled')
     expect(editableSource).toContain(`'feature-box-select'`)
     expect(editableSource).toContain('const buildFeatureIdsInScreenBox = (box) =>')
-    expect(editableSource).toContain("emit('feature-box-select', selectedFeatureIds)")
+    expect(editableSource).toContain('const featureBoxSelectionMode = ref(defaultFeatureBoxSelectionMode)')
+    expect(editableSource).toContain("emit('feature-box-select', {")
   })
 
   it('supports checkbox-based batch visibility and locking for active-layer features', () => {

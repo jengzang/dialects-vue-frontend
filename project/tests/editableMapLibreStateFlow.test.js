@@ -453,7 +453,72 @@ describe('EditableMapLibre state flow', () => {
     await nextTick()
 
     expect(wasCanceled).toBe(true)
-    expect(wrapper.events).toContainEqual(['feature-box-select', ['polygon-1']])
+    expect(wrapper.events).toContainEqual([
+      'feature-box-select',
+      { featureIds: ['polygon-1'], selectionMode: 'replace' },
+    ])
+    expect(wrapper.events.some(([eventName]) => eventName === 'before-features-change')).toBe(false)
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('emits additive and subtractive box selection modes from pointer modifiers', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [[[20, 20], [30, 20], [30, 30], [20, 20]]] },
+      }],
+    }, { featureBoxSelectEnabled: true })
+    await nextTick()
+    const captureLayer = wrapper.host.querySelector('.editable-map-box-select-capture')
+
+    wrapper.events.length = 0
+    captureLayer.dispatchEvent(new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      shiftKey: true,
+      clientX: 10,
+      clientY: 10,
+    }))
+    document.dispatchEvent(new MouseEvent('mouseup', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 40,
+      clientY: 40,
+    }))
+    await nextTick()
+    expect(wrapper.events).toContainEqual([
+      'feature-box-select',
+      { featureIds: ['polygon-1'], selectionMode: 'add' },
+    ])
+    expect(wrapper.events.some(([eventName]) => eventName === 'before-features-change')).toBe(false)
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+
+    wrapper.events.length = 0
+    captureLayer.dispatchEvent(new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      altKey: true,
+      clientX: 10,
+      clientY: 10,
+    }))
+    document.dispatchEvent(new MouseEvent('mouseup', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 40,
+      clientY: 40,
+    }))
+    await nextTick()
+    expect(wrapper.events).toContainEqual([
+      'feature-box-select',
+      { featureIds: ['polygon-1'], selectionMode: 'subtract' },
+    ])
     expect(wrapper.events.some(([eventName]) => eventName === 'before-features-change')).toBe(false)
     expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
 

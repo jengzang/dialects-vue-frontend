@@ -172,6 +172,8 @@ const isFullscreen = ref(false)
 const isFeatureBoxDragging = ref(false)
 const featureBoxStartPoint = ref(null)
 const featureBoxEndPoint = ref(null)
+const defaultFeatureBoxSelectionMode = 'replace'
+const featureBoxSelectionMode = ref(defaultFeatureBoxSelectionMode)
 let previousPreviewSourceIds = []
 let hoveredFeatureKey = null
 let hoveredFeatureSource = null
@@ -673,6 +675,13 @@ const syncFeatureBoxCursor = () => {
   canvas.style.cursor = props.featureBoxSelectEnabled ? 'crosshair' : ''
 }
 
+const getFeatureBoxSelectionMode = (event) => {
+  const sourceEvent = event?.originalEvent ?? event ?? {}
+  if (sourceEvent.altKey || sourceEvent.optionKey) return 'subtract'
+  if (sourceEvent.shiftKey) return 'add'
+  return defaultFeatureBoxSelectionMode
+}
+
 const restoreFeatureBoxDragPan = () => {
   if (featureBoxDragPanWasEnabled) {
     map.value?.dragPan?.enable?.()
@@ -689,6 +698,7 @@ const resetFeatureBoxSelection = () => {
   isFeatureBoxDragging.value = false
   featureBoxStartPoint.value = null
   featureBoxEndPoint.value = null
+  featureBoxSelectionMode.value = defaultFeatureBoxSelectionMode
   unbindFeatureBoxDocumentListeners()
   if (wasDragging) {
     restoreFeatureBoxDragPan()
@@ -701,9 +711,13 @@ const finishFeatureBoxSelection = (point) => {
   featureBoxEndPoint.value = point
   const box = buildScreenBox(featureBoxStartPoint.value, featureBoxEndPoint.value)
   const selectedFeatureIds = buildFeatureIdsInScreenBox(box)
+  const selectionMode = featureBoxSelectionMode.value
   resetFeatureBoxSelection()
   selectFeatures(selectedFeatureIds)
-  emit('feature-box-select', selectedFeatureIds)
+  emit('feature-box-select', {
+    featureIds: selectedFeatureIds,
+    selectionMode,
+  })
 }
 
 const handleFeatureBoxMouseDown = (event) => {
@@ -717,6 +731,7 @@ const handleFeatureBoxMouseDown = (event) => {
   if (featureBoxDragPanWasEnabled) {
     map.value.dragPan?.disable?.()
   }
+  featureBoxSelectionMode.value = getFeatureBoxSelectionMode(event)
   featureBoxStartPoint.value = normalizeFeatureBoxPoint(event.point ?? event)
   featureBoxEndPoint.value = featureBoxStartPoint.value
   isFeatureBoxDragging.value = true
