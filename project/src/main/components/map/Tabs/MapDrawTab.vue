@@ -1898,8 +1898,23 @@ const handleDeleteLayer = async (layerId) => {
   syncAllLayersAfterMutation();
 };
 
-const handleFeatureSelect = (featureId) => {
-  setFeatureSelection(featureId ? [featureId] : [], featureId);
+const normalizeFeatureSelectPayload = (featureSelection) => {
+  if (Array.isArray(featureSelection)) {
+    return {
+      featureIds: featureSelection,
+      preferredFeatureId: featureSelection[0] || '',
+    };
+  }
+
+  return {
+    featureIds: featureSelection ? [featureSelection] : [],
+    preferredFeatureId: featureSelection || '',
+  };
+};
+
+const handleFeatureSelect = (featureSelection) => {
+  const { featureIds, preferredFeatureId } = normalizeFeatureSelectPayload(featureSelection);
+  setFeatureSelection(featureIds, preferredFeatureId);
 };
 
 const handleDrawModeChange = (mode) => {

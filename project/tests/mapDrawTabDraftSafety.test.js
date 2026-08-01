@@ -163,6 +163,13 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         >
           emit feature one selection
         </button>
+        <button
+          data-testid="emit-feature-multi-selection"
+          type="button"
+          @click="$emit('feature-select', ['feature-1', 'feature-2'])"
+        >
+          emit feature multi selection
+        </button>
       </div>
     `,
   }),
@@ -1019,6 +1026,30 @@ describe('MapDrawTab draft safety', () => {
       .map((item) => item.dataset.locked)).toEqual(['false', 'false', 'false'])
     expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
       .map((item) => item.dataset.visible)).toEqual(['false', 'true', 'true'])
+
+    wrapper.unmount()
+  })
+
+  it('keeps natural map multi-selection from draw selection changes', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="emit-feature-multi-selection"]').click()
+    await flushTicks()
+
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((item) => item.checked)).toEqual([true, true])
 
     wrapper.unmount()
   })

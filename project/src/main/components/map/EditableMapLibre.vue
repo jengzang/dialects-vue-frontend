@@ -469,7 +469,7 @@ const syncSelectedFeature = () => {
     if (areFeatureIdsEqual(selectedIds, suppressedProgrammaticFeatureSelectionIds)) return
     suppressedProgrammaticFeatureSelectionIds = null
   }
-  emit('feature-select', selectedFeatureId.value)
+  emit('feature-select', selectedIds.length > 1 ? selectedIds : selectedFeatureId.value)
 }
 
 const syncDrawMode = (event) => {

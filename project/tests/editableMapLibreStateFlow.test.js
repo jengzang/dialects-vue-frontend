@@ -299,6 +299,32 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('emits every naturally selected feature from draw selection changes', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'polygon-2',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.draw.selectedIds = ['polygon-1', 'polygon-2']
+    wrapper.map.emit('draw.selectionchange')
+
+    expect(wrapper.events).toContainEqual(['feature-select', ['polygon-1', 'polygon-2']])
+
+    wrapper.unmount()
+  })
+
   it('keeps programmatic multi-selection quiet when selectionchange arrives after the next tick', async () => {
     vi.useFakeTimers()
     const wrapper = mountEditableMapLibre({

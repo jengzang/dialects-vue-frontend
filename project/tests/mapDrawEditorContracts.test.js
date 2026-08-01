@@ -324,6 +324,8 @@ describe('Map draw editor contracts', () => {
     expect(panelSource).toContain(`t('map.drawTab.buttons.deleteSelectedFeatures')`)
     expect(tabSource).toContain('const selectedFeatureIds = ref([]);')
     expect(tabSource).toContain(':selected-feature-ids="selectedFeatureIds"')
+    expect(tabSource).toContain('const normalizeFeatureSelectPayload = (featureSelection) =>')
+    expect(tabSource).toContain('if (Array.isArray(featureSelection))')
     expect(tabSource).toContain('@toggle-feature-selection="handleToggleFeatureSelection"')
     expect(tabSource).toContain('@delete-selected-features="handleDeleteSelectedFeatures"')
     expect(tabSource).toContain('const handleToggleFeatureSelection = (featureId) =>')
@@ -333,6 +335,7 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain('features: nextFeatures,')
     expect(tabSource).toContain('selectedFeatureIds.value = [];')
     expect(editableSource).toContain('const selectFeatures = (featureIds = []) =>')
+    expect(editableSource).toContain("emit('feature-select', selectedIds.length > 1 ? selectedIds : selectedFeatureId.value)")
     expect(editableSource).toContain("draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })")
   })
 
