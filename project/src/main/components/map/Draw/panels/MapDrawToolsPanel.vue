@@ -177,6 +177,33 @@
                 class="main-glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
+                :disabled="!canModifyActiveLayer || featureItems.length === 0"
+                @click="$emit('select-all-features')"
+              >
+                {{ t('map.drawTab.buttons.selectAllFeatures') }}
+              </button>
+              <button
+                class="main-glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                type="button"
+                :disabled="!canModifyActiveLayer || featureItems.length === 0"
+                @click="$emit('invert-feature-selection')"
+              >
+                {{ t('map.drawTab.buttons.invertFeatureSelection') }}
+              </button>
+              <button
+                class="main-glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                type="button"
+                :disabled="selectedFeatureIds.length === 0"
+                @click="$emit('clear-feature-selection')"
+              >
+                {{ t('map.drawTab.buttons.clearFeatureSelection') }}
+              </button>
+              <button
+                class="main-glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
                 @click="$emit('delete-selected-features')"
               >
@@ -598,6 +625,9 @@ defineEmits([
   'set-mode',
   'select-feature',
   'toggle-feature-selection',
+  'select-all-features',
+  'invert-feature-selection',
+  'clear-feature-selection',
   'edit-shape',
   'duplicate-feature',
   'undo',

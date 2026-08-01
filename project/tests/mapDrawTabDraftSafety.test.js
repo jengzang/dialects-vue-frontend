@@ -11,6 +11,9 @@ const mocks = vi.hoisted(() => ({
   migrateLegacyDraftsFromLocalStorage: vi.fn(),
   updateDraftRecord: vi.fn(),
   deleteDraftRecord: vi.fn(),
+  mapSetDrawMode: vi.fn(),
+  mapSelectFeature: vi.fn(),
+  mapSelectFeatures: vi.fn(),
   AUTO_DRAFT_ID: '__map_draw_auto_draft__',
 }))
 
@@ -72,7 +75,9 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
     emits: ['update:modelValue', 'features-change', 'feature-select'],
     setup(props, { emit, expose }) {
       expose({
-        setDrawMode: vi.fn(),
+        setDrawMode: mocks.mapSetDrawMode,
+        selectFeature: mocks.mapSelectFeature,
+        selectFeatures: mocks.mapSelectFeatures,
         importGeoJson: vi.fn((_featureCollection, options = {}) => {
           if (options.emitSelection !== false) {
             emit('feature-select', '')
@@ -137,6 +142,9 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
     },
     emits: [
       'toggle-feature-selection',
+      'select-all-features',
+      'invert-feature-selection',
+      'clear-feature-selection',
       'delete-selected-features',
       'move-selected-features-to-layer',
       'set-selected-features-visible',
@@ -167,6 +175,30 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
             {{ feature.visible ? 'visible' : 'hidden' }} {{ feature.locked ? 'locked' : 'unlocked' }}
           </span>
         </label>
+        <button
+          data-testid="select-all-features"
+          type="button"
+          :disabled="!canModifyActiveLayer || featureItems.length === 0"
+          @click="$emit('select-all-features')"
+        >
+          select all features
+        </button>
+        <button
+          data-testid="invert-feature-selection"
+          type="button"
+          :disabled="!canModifyActiveLayer || featureItems.length === 0"
+          @click="$emit('invert-feature-selection')"
+        >
+          invert feature selection
+        </button>
+        <button
+          data-testid="clear-feature-selection"
+          type="button"
+          :disabled="selectedFeatureIds.length === 0"
+          @click="$emit('clear-feature-selection')"
+        >
+          clear feature selection
+        </button>
         <button
           data-testid="delete-selected-features"
           type="button"
@@ -475,6 +507,9 @@ describe('MapDrawTab draft safety', () => {
     mocks.migrateLegacyDraftsFromLocalStorage.mockReset()
     mocks.updateDraftRecord.mockReset()
     mocks.deleteDraftRecord.mockReset()
+    mocks.mapSetDrawMode.mockReset()
+    mocks.mapSelectFeature.mockReset()
+    mocks.mapSelectFeatures.mockReset()
 
     mocks.listDraftRecords.mockResolvedValue([])
     mocks.migrateLegacyDraftsFromLocalStorage.mockResolvedValue(false)
@@ -856,6 +891,73 @@ describe('MapDrawTab draft safety', () => {
       .every((item) => item.dataset.locked === 'false')).toBe(true)
     expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
       .every((item) => item.checked)).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('selects, inverts, and clears only visible unlocked active-layer features', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[1].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="lock-selected-features"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="select-all-features"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([false, false, true])
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-3', { directEdit: false })
+
+    wrapper.host.querySelector('[data-testid="invert-feature-selection"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([false, false, false])
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    wrapper.host.querySelector('[data-testid="invert-feature-selection"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([false, false, true])
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-3', { directEdit: false })
+
+    wrapper.host.querySelector('[data-testid="clear-feature-selection"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([false, false, false])
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'z',
+      metaKey: true,
+    }))
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
+      .map((item) => item.dataset.locked)).toEqual(['false', 'false', 'false'])
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
+      .map((item) => item.dataset.visible)).toEqual(['false', 'true', 'true'])
 
     wrapper.unmount()
   })

@@ -149,6 +149,9 @@
           @set-mode="setMode"
           @select-feature="handleSelectFeatureFromPanel"
           @toggle-feature-selection="handleToggleFeatureSelection"
+          @select-all-features="handleSelectAllFeatures"
+          @invert-feature-selection="handleInvertFeatureSelection"
+          @clear-feature-selection="resetDrawSelectionMode"
           @edit-shape="handleEditSelectedShape"
           @duplicate-feature="handleDuplicateSelectedFeature"
           @undo="undoHistory"
@@ -801,6 +804,13 @@ const activeLayerFeatureItems = computed(() => activeLayerFeatures.value.map((fe
   visible: feature?.properties?.visible ?? activeLayer.value?.visible ?? true,
   locked: feature?.properties?.locked ?? activeLayer.value?.locked ?? false,
 })).filter((feature) => feature.id));
+
+const activeLayerSelectableFeatureIds = computed(() => {
+  if (!canModifyActiveLayer.value) return [];
+  return activeLayerFeatureItems.value
+    .filter((feature) => feature.visible !== false && feature.locked !== true)
+    .map((feature) => feature.id);
+});
 
 const featureTableHiddenPropertyKeys = new Set([
   'id',
@@ -1713,6 +1723,23 @@ const resetDrawSelectionMode = () => {
   }
 };
 
+const syncFeatureSelectionToMap = () => {
+  currentMode.value = 'simple_select';
+  if (selectedFeatureIds.value.length > 1) {
+    editableMapRef.value?.selectFeatures?.(selectedFeatureIds.value);
+    return;
+  }
+  if (selectedFeatureId.value) {
+    editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
+    return;
+  }
+  if (editableMapRef.value?.selectFeatures) {
+    editableMapRef.value.selectFeatures([]);
+  } else {
+    editableMapRef.value?.setDrawMode?.('simple_select');
+  }
+};
+
 const applyLayerPropertyToFeatures = (layer, key, value) => {
   const featureCollection = layer?.featureCollection ?? emptyFeatureCollection();
   layer.featureCollection = {
@@ -2026,6 +2053,20 @@ const handleToggleFeatureSelection = (featureId) => {
   } else {
     editableMapRef.value?.setDrawMode?.('simple_select');
   }
+};
+
+const handleSelectAllFeatures = () => {
+  const featureIds = activeLayerSelectableFeatureIds.value;
+  setFeatureSelection(featureIds, featureIds[0]);
+  syncFeatureSelectionToMap();
+};
+
+const handleInvertFeatureSelection = () => {
+  const selectableFeatureIds = activeLayerSelectableFeatureIds.value;
+  const selectedFeatureIdSet = new Set(selectedFeatureIds.value);
+  const nextFeatureIds = selectableFeatureIds.filter((featureId) => !selectedFeatureIdSet.has(featureId));
+  setFeatureSelection(nextFeatureIds, nextFeatureIds[0]);
+  syncFeatureSelectionToMap();
 };
 
 const handleDeleteSelectedFeatures = () => {
