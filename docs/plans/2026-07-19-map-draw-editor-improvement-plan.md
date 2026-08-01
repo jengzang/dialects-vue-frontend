@@ -23,6 +23,7 @@
 | Step 6 底图切换生命周期 | 已完成 | `9ff38a12` | `EditableMapLibre` 监听 `style.load`，在底图样式重载后恢复 Draw 数据、readonly layers 和 preview layers，且不触发 history/data-change 事件。 |
 | Step 7 图层管理易用性 | 已完成本轮 | `a3b10d90`、`9e0f5a92`、`43d828a4`、`91c5321f`、`7744c532`、`0e44785b`、`bc8bc098`、`eb1ab82c`、`add2e4fe`、`896b0633`、`e6d7360b`、`52214be3` | 已支持复制图层、复制选中要素、删除图层确认、图层行显示几何/要素数/显示锁定状态、图层行内重命名、重命名失焦保存、选中要素移动到同类型可编辑图层、要素列表勾选多选、批量删除、批量移动到兼容图层、批量显隐和批量锁定/解锁；批量移动和显示/解锁会在内部同步 Draw 数据时保留多选状态，并阻止隐藏或锁定活动图层继续绘制/删除/清空。 |
 | 数据表格与批量名称编辑 | 已完成 | `cdf19bf2` | 工具面板新增活动图层要素数据表，可直接编辑要素名称；勾选要素可一次性应用批量名称，并作为一条历史记录撤销；隐藏或锁定活动图层时表格编辑也会被拦截。 |
+| 数据表格与业务字段编辑 | 已完成 | `136e56b2` | 活动图层数据表会推断业务字段列，可逐格编辑要素业务属性；勾选要素可批量应用指定字段值并进入历史；`user_id` 这类业务字段不再被误判为 Draw 内部样式字段；切换图层后失效字段会禁用批量输入和应用按钮。 |
 | Step 8 未保存保护与自动草稿恢复 | 已完成 | `9fc8103d`、`5b08e48a` | 自动草稿记录从手动草稿列表隐藏；页面打开时提示恢复未保存草稿；工作台变脏时自动保存；离开页面前提示；手动保存、更新或恢复本地草稿后清理隐藏自动草稿，并等待并发自动写入完成。 |
 | Step 9 导入导出数据清洁 | 部分完成 | `3e709c8f`、`f9ac43f4` | `normalizeFeatureCollection()` 不再为导入/导出 round-trip 强制新增或覆盖 `updatedAt`；GeoJSON 导出会剥离自动补齐的默认绘图样式字段，同时保留业务字段和非默认样式。 |
 
@@ -49,12 +50,19 @@
 - `node -e "JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-CN/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-Hant/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/en/map.json','utf8')); console.log('ok')"`
 - `git diff --check`
 - `npm run build`
+- `npm test -- mapDrawTabDraftSafety.test.js -t "business properties"`
+- `npm test -- mapDrawTabDraftSafety.test.js -t "stale after switching layers"`
+- `npm test -- mapDrawTabDraftSafety.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js tests/utils/drawMap/draftStorage.test.js tests/utils/drawMap/export.test.js`
+- `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/components/map/Draw/panels/MapDrawToolsPanel.vue src/main/components/map/Draw/panels/panelShared.scss src/main/components/map/EditableMapLibre.vue tests/mapDrawTabDraftSafety.test.js tests/mapDrawEditorContracts.test.js tests/editableMapLibreStateFlow.test.js --quiet`
+- `node -e "JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-CN/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-Hant/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/en/map.json','utf8')); console.log('ok')"`
+- `git diff --check`
+- `npm run build`
 
 下一批建议按“小步提交”继续推进：
 
 1. 继续 Step 9：如后续确实需要区分导入标准化和工作台内部标准化，再拆出更明确的 normalize 函数名；当前已先收敛导出字段噪声。
 2. 再做 Step 5，将 layer mutation 逐步集中为工具函数；这一步会改变内部结构，应拆成多个小提交并先确认结构边界。
-3. 继续扩展数据表格：增加字段列编辑、排序筛选、按选中要素批量改任意属性，让导入后的字段检查更接近 geojson.io 这类成熟编辑器。
+3. 继续扩展数据表格：增加排序筛选、字段类型/schema、列显示控制、字段校验、导入字段诊断，让导入后的字段检查更接近 geojson.io 这类成熟编辑器。
 4. 最后评估高阶几何能力：吸附、矩形/圆、切割、拆分、合并、自定义模式或 Terra Draw 迁移。
 
 ---
@@ -183,7 +191,9 @@
 
 ---
 
-## 3. 当前明确缺失的能力
+## 3. 原始调研缺失与当前差距
+
+3.1 和 3.2 保留最初调研时确认的缺失项，方便追溯这些问题为什么要修；3.3 是截至当前分支最新提交后的真实剩余差距。
 
 ### 3.1 P0/P1 缺失
 
@@ -227,6 +237,40 @@
 5. **自动草稿/未保存提示**
    - 现在是手动本地草稿。
    - 没有 dirty 状态、离开页面提醒、自动保存恢复。
+
+### 3.3 截至 `136e56b2` 的真实剩余差距
+
+这一分支已经补齐了第一轮图层状态、撤销重做、显式形状编辑、要素列表、多选批量操作、自动草稿恢复、导出字段清洁、以及要素数据表业务字段编辑。和成熟 GIS 绘图工具相比，当前主要还差这些能力：
+
+1. **几何编辑深度**
+   - 缺少 snapping、共享边 pinning、拓扑约束。
+   - 缺少切割、拆分、合并、洞编辑、旋转、缩放。
+   - 缺少矩形、圆、自由绘制等高频快捷几何。
+
+2. **数据表格成熟度**
+   - 已能编辑名称和业务字段，但还没有排序、筛选、搜索、列显示控制。
+   - 还没有字段 schema、字段类型、枚举值、数字/布尔/日期编辑器。
+   - 批量编辑仍是文本值写入，缺少字段校验和错误提示。
+
+3. **选择与空间查询**
+   - 还没有框选、套索选择、按属性选择、按空间关系选择。
+   - 还没有“只选择可见/未锁定要素”的高级筛选入口。
+
+4. **数据质量与拓扑检查**
+   - 还没有自相交、多边形闭合、重复点、空几何、坐标越界等校验。
+   - 还没有自动修复或导入前诊断报告。
+
+5. **坐标参考与导入诊断**
+   - 当前主要围绕 WGS84 GeoJSON 使用。
+   - CSV/KML/KMZ 已可导入，但还缺字段识别确认、CRS/投影提示、失败行明细。
+
+6. **大数据性能**
+   - 当前更像中小规模工作台。
+   - 成熟 GIS 通常需要表格虚拟滚动、地图要素抽稀/聚合、分块渲染、批量操作进度反馈。
+
+7. **协作与版本化**
+   - 当前是本地草稿和前端历史栈。
+   - 成熟产品通常有多人协作、变更审计、版本比较、冲突处理、权限模型。
 
 ---
 
