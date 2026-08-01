@@ -138,6 +138,93 @@
         "latitude": "Latitude"
       }
     },
+    "toponyms": {
+      "title": "Village Toponym Distribution",
+      "subtitle": "Enter a Chinese character or place-name fragment to inspect matching point distribution, then look up local and Ministry details by known ID.",
+      "search": {
+        "keyword": "Keyword",
+        "placeholder": "Try: 黄, 塘, 村",
+        "matchMode": "Match",
+        "placeType": "Type",
+        "limit": "Point limit",
+        "submit": "Search",
+        "searching": "Searching..."
+      },
+      "matchModes": {
+        "prefix": "Prefix",
+        "suffix": "Suffix",
+        "exact": "Exact",
+        "contains": "Contains"
+      },
+      "placeTypes": {
+        "naturalVillage": "Natural village / rural settlement",
+        "adminVillage": "Administrative village",
+        "villageCommittee": "Village committee"
+      },
+      "limits": {
+        "oneThousand": "1,000",
+        "fiveThousand": "5,000",
+        "tenThousand": "10,000",
+        "fiftyThousand": "50,000"
+      },
+      "layers": {
+        "title": "Base Layers",
+        "caption": "Country boundary loads by default",
+        "country": "Country",
+        "provinces": "Provinces",
+        "cities": "Cities",
+        "riverL1": "River level 1",
+        "riverL2": "River level 2",
+        "riverL3": "River level 3",
+        "loading": "Loading"
+      },
+      "chart": {
+        "placeholderTitle": "ECharts Distribution",
+        "countryLoading": "Loading China country boundary",
+        "countryReady": "China country boundary is ready",
+        "searchFirst": "Search a keyword to draw matching points here",
+        "pointsReady": "{count} drawable points are ready",
+        "baseMapError": "Base map failed to load"
+      },
+      "results": {
+        "title": "Results",
+        "empty": "Search a keyword first.",
+        "loading": "Loading points...",
+        "count": "Backend matched {count}; {shown} points are drawable.",
+        "truncated": "Results were truncated. Narrow the keyword or choose a stricter match mode."
+      },
+      "suggestions": {
+        "title": "Name Suggestions",
+        "loading": "Loading",
+        "empty": "No suggestions yet"
+      },
+      "detail": {
+        "title": "Point Detail",
+        "empty": "Click a map point to view local details.",
+        "selectedPoint": "Selected coordinates",
+        "localLoading": "Loading local detail...",
+        "noLocalDetail": "No local detail found.",
+        "name": "Standard name",
+        "placeType": "Type",
+        "coordinates": "Detail coordinates",
+        "divisionPath": "Administrative path",
+        "officialButton": "Query Ministry detail",
+        "officialLoading": "Querying...",
+        "officialArea": "Ministry area",
+        "officialCity": "Ministry city",
+        "officialOldName": "Former name",
+        "unknown": "Unknown"
+      },
+      "errors": {
+        "emptyQuery": "Enter a keyword before searching.",
+        "countryLayer": "Failed to load the country boundary.",
+        "optionalLayer": "Failed to load the optional layer.",
+        "suggestions": "Failed to load name suggestions.",
+        "points": "Failed to load points.",
+        "details": "Failed to load local detail.",
+        "official": "Failed to load Ministry detail."
+      }
+    },
     "allVillages": {
       "title": "All Villages",
       "searchPlaceholder": "Search loaded villages...",

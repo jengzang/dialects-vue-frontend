@@ -138,6 +138,93 @@
         "latitude": "纬度"
       }
     },
+    "toponyms": {
+      "title": "自然村地名分布",
+      "subtitle": "输入汉字或地名片段，查看匹配地名的全国点位分布，并按已知 ID 查询本地与民政部详情。",
+      "search": {
+        "keyword": "关键词",
+        "placeholder": "例如：黄、塘、村",
+        "matchMode": "匹配方式",
+        "placeType": "地名类型",
+        "limit": "点位上限",
+        "submit": "搜索分布",
+        "searching": "搜索中..."
+      },
+      "matchModes": {
+        "prefix": "前缀匹配",
+        "suffix": "后缀匹配",
+        "exact": "精确匹配",
+        "contains": "包含匹配"
+      },
+      "placeTypes": {
+        "naturalVillage": "自然村/农村居民点",
+        "adminVillage": "行政村",
+        "villageCommittee": "村委会"
+      },
+      "limits": {
+        "oneThousand": "1,000",
+        "fiveThousand": "5,000",
+        "tenThousand": "10,000",
+        "fiftyThousand": "50,000"
+      },
+      "layers": {
+        "title": "底图图层",
+        "caption": "默认仅加载国界",
+        "country": "国界",
+        "provinces": "省界",
+        "cities": "市界",
+        "riverL1": "一级河流",
+        "riverL2": "二级河流",
+        "riverL3": "三级河流",
+        "loading": "加载中"
+      },
+      "chart": {
+        "placeholderTitle": "ECharts 分布图",
+        "countryLoading": "正在加载中国国界底图",
+        "countryReady": "中国国界底图已就绪",
+        "searchFirst": "输入关键词后搜索，点位将显示在这里",
+        "pointsReady": "已准备 {count} 个可绘制点位",
+        "baseMapError": "底图加载失败"
+      },
+      "results": {
+        "title": "结果",
+        "empty": "先输入关键词搜索分布。",
+        "loading": "正在加载点位...",
+        "count": "后端匹配 {count} 条，当前可绘制 {shown} 个点位。",
+        "truncated": "结果已截断，可缩小关键词或切换为更严格的匹配方式。"
+      },
+      "suggestions": {
+        "title": "地名建议",
+        "loading": "加载中",
+        "empty": "暂无建议"
+      },
+      "detail": {
+        "title": "点位详情",
+        "empty": "点击地图点位后查看本地详情。",
+        "selectedPoint": "选中坐标",
+        "localLoading": "正在加载本地详情...",
+        "noLocalDetail": "未找到本地详情。",
+        "name": "标准地名",
+        "placeType": "类型",
+        "coordinates": "详情坐标",
+        "divisionPath": "行政区划",
+        "officialButton": "查询民政部详情",
+        "officialLoading": "查询中...",
+        "officialArea": "民政部区县",
+        "officialCity": "民政部城市",
+        "officialOldName": "曾用名",
+        "unknown": "未知"
+      },
+      "errors": {
+        "emptyQuery": "请输入关键词后再搜索。",
+        "countryLayer": "无法加载国界底图。",
+        "optionalLayer": "无法加载可选图层。",
+        "suggestions": "无法加载地名建议。",
+        "points": "无法加载点位。",
+        "details": "无法加载本地详情。",
+        "official": "无法加载民政部详情。"
+      }
+    },
     "allVillages": {
       "title": "全部自然村",
       "searchPlaceholder": "搜索已加载的村落...",
