@@ -170,6 +170,13 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         >
           emit feature multi selection
         </button>
+        <button
+          data-testid="emit-feature-mixed-selection"
+          type="button"
+          @click="$emit('feature-select', ['feature-1', 'feature-2', 'feature-3'])"
+        >
+          emit feature mixed selection
+        </button>
       </div>
     `,
   }),
@@ -1045,11 +1052,54 @@ describe('MapDrawTab draft safety', () => {
     wrapper.host.querySelector('[data-testid="editable-map"]').click()
     await flushTicks()
 
+    const mapSelectFeaturesCallCountBeforeNaturalSelection = mocks.mapSelectFeatures.mock.calls.length
     wrapper.host.querySelector('[data-testid="emit-feature-multi-selection"]').click()
     await flushTicks()
 
     expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
       .map((item) => item.checked)).toEqual([true, true])
+    expect(mocks.mapSelectFeatures).toHaveBeenCalledTimes(mapSelectFeaturesCallCountBeforeNaturalSelection)
+
+    wrapper.unmount()
+  })
+
+  it('drops hidden and locked features from natural map selection changes', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[1].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="lock-selected-features"]').click()
+    await flushTicks()
+
+    const mapSelectFeatureCallCountBeforeNaturalSelection = mocks.mapSelectFeature.mock.calls.length
+    wrapper.host.querySelector('[data-testid="emit-feature-mixed-selection"]').click()
+    await flushTicks()
+
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((item) => item.checked)).toEqual([false, false, true])
+    expect(mocks.mapSelectFeature).toHaveBeenCalledTimes(mapSelectFeatureCallCountBeforeNaturalSelection + 1)
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-3', { directEdit: false })
 
     wrapper.unmount()
   })
@@ -1178,7 +1228,7 @@ describe('MapDrawTab draft safety', () => {
     wrapper.unmount()
   })
 
-  it('drops stale hidden feature selection when adding box-selected features', async () => {
+  it('ignores hidden feature selection when adding box-selected features', async () => {
     mocks.getDraftRecordById.mockResolvedValue(null)
     mocks.saveDraftRecord.mockResolvedValue({})
     const wrapper = mountMapDrawTab()
@@ -1204,7 +1254,7 @@ describe('MapDrawTab draft safety', () => {
     wrapper.host.querySelector('[data-testid="emit-feature-one-selection"]').click()
     await flushTicks()
     expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
-      .map((checkbox) => checkbox.checked)).toEqual([true, false])
+      .map((checkbox) => checkbox.checked)).toEqual([false, false])
 
     wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').click()
     await flushTicks()
@@ -1265,7 +1315,7 @@ describe('MapDrawTab draft safety', () => {
     wrapper.unmount()
   })
 
-  it('clears stale selection with the select-all keyboard shortcut when no editable features remain', async () => {
+  it('keeps select-all harmless when no editable features remain', async () => {
     mocks.getDraftRecordById.mockResolvedValue(null)
     mocks.saveDraftRecord.mockResolvedValue({})
     const wrapper = mountMapDrawTab()
@@ -1285,7 +1335,7 @@ describe('MapDrawTab draft safety', () => {
     await flushTicks()
     wrapper.host.querySelector('[data-testid="emit-feature-one-selection"]').click()
     await flushTicks()
-    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(true)
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(false)
 
     const saveCountBeforeShortcut = mocks.saveDraftRecord.mock.calls.length
     const event = new KeyboardEvent('keydown', {

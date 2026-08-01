@@ -325,6 +325,7 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain('const selectedFeatureIds = ref([]);')
     expect(tabSource).toContain(':selected-feature-ids="selectedFeatureIds"')
     expect(tabSource).toContain('const normalizeFeatureSelectPayload = (featureSelection) =>')
+    expect(tabSource).toContain('const selectableFeatureIdSet = new Set(activeLayerSelectableFeatureIds.value)')
     expect(tabSource).toContain('if (Array.isArray(featureSelection))')
     expect(tabSource).toContain('@toggle-feature-selection="handleToggleFeatureSelection"')
     expect(tabSource).toContain('@delete-selected-features="handleDeleteSelectedFeatures"')

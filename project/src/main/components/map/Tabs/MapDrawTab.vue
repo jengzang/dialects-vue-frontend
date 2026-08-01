@@ -1899,22 +1899,37 @@ const handleDeleteLayer = async (layerId) => {
 };
 
 const normalizeFeatureSelectPayload = (featureSelection) => {
+  const selectableFeatureIdSet = new Set(activeLayerSelectableFeatureIds.value);
+  const sourceFeatureIds = (Array.isArray(featureSelection)
+    ? featureSelection
+    : featureSelection ? [featureSelection] : [])
+    .map((featureId) => String(featureId || ''))
+    .filter(Boolean);
+  const featureIds = sourceFeatureIds.filter((featureId) => selectableFeatureIdSet.has(featureId));
+  const shouldSyncMapSelection = sourceFeatureIds.length !== featureIds.length
+    || sourceFeatureIds.some((featureId, index) => featureId !== featureIds[index]);
+
   if (Array.isArray(featureSelection)) {
     return {
-      featureIds: featureSelection,
-      preferredFeatureId: featureSelection[0] || '',
+      featureIds,
+      preferredFeatureId: featureIds[0] || '',
+      shouldSyncMapSelection,
     };
   }
 
   return {
-    featureIds: featureSelection ? [featureSelection] : [],
-    preferredFeatureId: featureSelection || '',
+    featureIds,
+    preferredFeatureId: featureIds[0] || '',
+    shouldSyncMapSelection,
   };
 };
 
 const handleFeatureSelect = (featureSelection) => {
-  const { featureIds, preferredFeatureId } = normalizeFeatureSelectPayload(featureSelection);
+  const { featureIds, preferredFeatureId, shouldSyncMapSelection } = normalizeFeatureSelectPayload(featureSelection);
   setFeatureSelection(featureIds, preferredFeatureId);
+  if (shouldSyncMapSelection) {
+    syncFeatureSelectionToMap();
+  }
 };
 
 const handleDrawModeChange = (mode) => {
