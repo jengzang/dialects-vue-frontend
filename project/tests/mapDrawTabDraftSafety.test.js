@@ -1183,6 +1183,179 @@ describe('MapDrawTab draft safety', () => {
     wrapper.unmount()
   })
 
+  it('selects editable active-layer features with the select-all keyboard shortcut', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[1].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="lock-selected-features"]').click()
+    await flushTicks()
+
+    const saveCountBeforeShortcut = mocks.saveDraftRecord.mock.calls.length
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'a',
+      metaKey: true,
+    })
+    document.dispatchEvent(event)
+    await flushTicks()
+
+    expect(event.defaultPrevented).toBe(true)
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([false, false, true])
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-3', { directEdit: false })
+    expect(mocks.saveDraftRecord).toHaveBeenCalledTimes(saveCountBeforeShortcut)
+
+    wrapper.unmount()
+  })
+
+  it('clears stale selection with the select-all keyboard shortcut when no editable features remain', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    const checkbox = wrapper.host.querySelector('[data-testid="feature-checkbox"]')
+    checkbox.click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-feature-one-selection"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(true)
+
+    const saveCountBeforeShortcut = mocks.saveDraftRecord.mock.calls.length
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'a',
+      ctrlKey: true,
+    })
+    document.dispatchEvent(event)
+    await flushTicks()
+
+    expect(event.defaultPrevented).toBe(true)
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(false)
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+    expect(mocks.saveDraftRecord).toHaveBeenCalledTimes(saveCountBeforeShortcut)
+
+    wrapper.unmount()
+  })
+
+  it('clears feature selection and exits box selection with Escape', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    const checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('on')
+
+    const saveCountBeforeShortcut = mocks.saveDraftRecord.mock.calls.length
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Escape',
+    })
+    document.dispatchEvent(event)
+    await flushTicks()
+
+    expect(event.defaultPrevented).toBe(true)
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([false, false])
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('off')
+    expect(mocks.saveDraftRecord).toHaveBeenCalledTimes(saveCountBeforeShortcut)
+
+    wrapper.unmount()
+  })
+
+  it('does not handle selection shortcuts while focus is in editable fields', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    const nameInput = wrapper.host.querySelector('[data-testid="feature-table-name"]')
+    expect(nameInput).toBeTruthy()
+    const selectAllEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'a',
+      metaKey: true,
+    })
+    nameInput.dispatchEvent(selectAllEvent)
+    await flushTicks()
+    expect(selectAllEvent.defaultPrevented).toBe(false)
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(false)
+
+    const checkbox = wrapper.host.querySelector('[data-testid="feature-checkbox"]')
+    checkbox.click()
+    await flushTicks()
+    expect(checkbox.checked).toBe(true)
+
+    const escapeEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Escape',
+    })
+    nameInput.dispatchEvent(escapeEvent)
+    await flushTicks()
+    expect(escapeEvent.defaultPrevented).toBe(false)
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(true)
+
+    wrapper.unmount()
+  })
+
   it('warns about import diagnostics after importing a layer with data quality issues', async () => {
     mocks.getDraftRecordById.mockResolvedValue(null)
     mocks.saveDraftRecord.mockResolvedValue({})

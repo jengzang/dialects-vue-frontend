@@ -2398,15 +2398,38 @@ const handleDrawHistoryKeydown = (event) => {
   const isRedoShortcut = (
     (event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'z'
   ) || (event.ctrlKey && event.key.toLowerCase() === 'y');
+  const isSelectAllShortcut = (event.metaKey || event.ctrlKey) && !event.shiftKey && event.key.toLowerCase() === 'a';
+  const isClearSelectionShortcut = event.key === 'Escape';
 
   if (isUndoShortcut) {
     event.preventDefault();
     undoHistory();
+    return;
   }
 
   if (isRedoShortcut) {
     event.preventDefault();
     redoHistory();
+    return;
+  }
+
+  if (isSelectAllShortcut && canModifyActiveLayer.value) {
+    event.preventDefault();
+    handleSelectAllFeatures();
+    return;
+  }
+
+  if (
+    isClearSelectionShortcut
+    && (
+      isFeatureBoxSelectMode.value
+      || selectedFeatureIds.value.length > 0
+      || selectedFeatureId.value
+      || currentMode.value !== 'simple_select'
+    )
+  ) {
+    event.preventDefault();
+    resetDrawSelectionMode();
   }
 };
 

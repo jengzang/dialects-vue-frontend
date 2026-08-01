@@ -98,6 +98,11 @@ describe('Map draw editor contracts', () => {
     expect(source).toContain('handleDrawHistoryKeydown')
     expect(source).toContain(`document.addEventListener('keydown', handleDrawHistoryKeydown)`)
     expect(source).toContain(`document.removeEventListener('keydown', handleDrawHistoryKeydown)`)
+    expect(source).toContain("event.key.toLowerCase() === 'a'")
+    expect(source).toContain("event.key === 'Escape'")
+    expect(source).toContain('isSelectAllShortcut && canModifyActiveLayer.value')
+    expect(source).toMatch(/if \([\s\S]*isClearSelectionShortcut[\s\S]*resetDrawSelectionMode\(\);/)
+    expect(source).toMatch(/handleSelectAllFeatures\(\);/)
     expect(source).toContain('before-features-change')
   })
 
