@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   showConfirm: vi.fn(),
   showError: vi.fn(),
   showSuccess: vi.fn(),
+  showWarning: vi.fn(),
   saveDraftRecord: vi.fn(),
   listDraftRecords: vi.fn(),
   getDraftRecordById: vi.fn(),
@@ -38,6 +39,7 @@ vi.mock('@/utils/ui/message.js', () => ({
   showConfirm: mocks.showConfirm,
   showError: mocks.showError,
   showSuccess: mocks.showSuccess,
+  showWarning: mocks.showWarning,
 }))
 
 vi.mock('@/api/main/geo/LocationAndRegion.js', () => ({
@@ -474,6 +476,7 @@ vi.mock('@/main/utils/drawMap/export.js', () => ({
 vi.mock('/data/国界面.kmz?url', () => ({ default: '/data/border.kmz' }))
 
 import { buildAutoDraftRecord } from '../src/main/utils/drawMap/draftStorage.js'
+import { readImportedLayerFile, splitFeatureCollectionByGeometryType } from '../src/main/utils/drawMap/export.js'
 import MapDrawTab from '../src/main/components/map/Tabs/MapDrawTab.vue'
 
 function mountMapDrawTab() {
@@ -525,6 +528,7 @@ describe('MapDrawTab draft safety', () => {
     mocks.showConfirm.mockReset()
     mocks.showError.mockReset()
     mocks.showSuccess.mockReset()
+    mocks.showWarning.mockReset()
     mocks.saveDraftRecord.mockReset()
     mocks.listDraftRecords.mockReset()
     mocks.getDraftRecordById.mockReset()
@@ -534,6 +538,8 @@ describe('MapDrawTab draft safety', () => {
     mocks.mapSetDrawMode.mockReset()
     mocks.mapSelectFeature.mockReset()
     mocks.mapSelectFeatures.mockReset()
+    readImportedLayerFile.mockReset()
+    splitFeatureCollectionByGeometryType.mockReset()
 
     mocks.listDraftRecords.mockResolvedValue([])
     mocks.migrateLegacyDraftsFromLocalStorage.mockResolvedValue(false)
@@ -1029,6 +1035,62 @@ describe('MapDrawTab draft safety', () => {
     wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
     await flushTicks()
     expect(wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').disabled).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('warns about import diagnostics after importing a layer with data quality issues', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    readImportedLayerFile.mockImplementation(async (_file, options = {}) => {
+      options.onDiagnostics?.({
+        totalFeatureCount: 2,
+        duplicateFeatureIdCount: 1,
+        duplicateFeatureIds: ['feature-1'],
+        emptyGeometryCount: 0,
+        unsupportedGeometryCount: 0,
+        invalidCoordinateFeatureCount: 0,
+        hasIssues: true,
+      })
+      return {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'feature-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Point', coordinates: [113, 22] },
+        }],
+      }
+    })
+    splitFeatureCollectionByGeometryType.mockReturnValue([{
+      geometryType: 'Point',
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'feature-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Point', coordinates: [113, 22] },
+        }],
+      },
+    }])
+
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+    const importInput = wrapper.host.querySelector('.draw-import-input')
+    Object.defineProperty(importInput, 'files', {
+      value: [new File(['{}'], 'quality.geojson', { type: 'application/geo+json' })],
+      configurable: true,
+    })
+    importInput.dispatchEvent(new Event('change'))
+    await flushTicks()
+
+    expect(mocks.showSuccess).toHaveBeenCalledWith(
+      'map.drawTab.messages.importLayerSuccess{"count":1}'
+    )
+    expect(mocks.showWarning).toHaveBeenCalledTimes(1)
+    expect(mocks.showWarning.mock.calls[0][0]).toContain('map.drawTab.messages.importLayerDiagnostics')
+    expect(mocks.showWarning.mock.calls[0][0]).toContain('map.drawTab.messages.importDiagnosticsDuplicateIds')
 
     wrapper.unmount()
   })

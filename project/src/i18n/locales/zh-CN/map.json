@@ -518,6 +518,11 @@
     "messages": {
       "importLayerSuccess": "图层导入成功，共新增 {count} 个图层",
       "importLayerFailed": "图层导入失败：{error}",
+      "importLayerDiagnostics": "导入数据提示：{summary}",
+      "importDiagnosticsDuplicateIds": "{count} 个重复 ID 已自动改名",
+      "importDiagnosticsEmptyGeometry": "{count} 个空几何已跳过",
+      "importDiagnosticsUnsupportedGeometry": "{count} 个不支持的几何类型已跳过",
+      "importDiagnosticsInvalidCoordinates": "{count} 个要素包含异常坐标，请检查",
       "clearAllConfirm": "确认清空当前所有绘制内容吗？",
       "deleteLayerConfirm": "确认删除图层“{name}”吗？",
       "clearAllSuccess": "已清空全部绘制内容",

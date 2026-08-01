@@ -518,6 +518,11 @@
     "messages": {
       "importLayerSuccess": "Layer import succeeded; {count} layer(s) were added",
       "importLayerFailed": "Failed to import layer: {error}",
+      "importLayerDiagnostics": "Import data note: {summary}",
+      "importDiagnosticsDuplicateIds": "{count} duplicate ID(s) were renamed automatically",
+      "importDiagnosticsEmptyGeometry": "{count} empty geometries were skipped",
+      "importDiagnosticsUnsupportedGeometry": "{count} unsupported geometries were skipped",
+      "importDiagnosticsInvalidCoordinates": "{count} feature(s) contain unusual coordinates; please review them",
       "clearAllConfirm": "Clear all current drawing content?",
       "deleteLayerConfirm": "Delete layer \"{name}\"?",
       "clearAllSuccess": "All drawing content has been cleared",

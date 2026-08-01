@@ -518,6 +518,11 @@
     "messages": {
       "importLayerSuccess": "圖層導入成功，共新增 {count} 個圖層",
       "importLayerFailed": "圖層導入失敗：{error}",
+      "importLayerDiagnostics": "導入資料提示：{summary}",
+      "importDiagnosticsDuplicateIds": "{count} 個重複 ID 已自動改名",
+      "importDiagnosticsEmptyGeometry": "{count} 個空幾何已跳過",
+      "importDiagnosticsUnsupportedGeometry": "{count} 個不支援的幾何類型已跳過",
+      "importDiagnosticsInvalidCoordinates": "{count} 個要素包含異常座標，請檢查",
       "clearAllConfirm": "確認清空目前所有繪製內容嗎？",
       "deleteLayerConfirm": "確認刪除圖層「{name}」嗎？",
       "clearAllSuccess": "已清空全部繪製內容",

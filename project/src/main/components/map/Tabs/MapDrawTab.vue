@@ -588,7 +588,7 @@ import nationalBorderKmzUrl from '/data/国界面.kmz?url';
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
-import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js';
+import { showConfirm, showError, showSuccess, showWarning } from '@/utils/ui/message.js';
 import { readImportedLayerFile, readKmzArrayBuffer, splitFeatureCollectionByGeometryType } from '@/main/utils/drawMap/export.js';
 import { createMapDrawHistory } from '@/main/utils/drawMap/history.js';
 import {
@@ -2280,12 +2280,50 @@ const createImportedLayer = (featureCollection, geometryType) => {
   return layer;
 };
 
+const buildImportDiagnosticsMessages = (diagnostics) => {
+  const messages = [];
+  if (diagnostics?.duplicateFeatureIdCount > 0) {
+    messages.push(t('map.drawTab.messages.importDiagnosticsDuplicateIds', {
+      count: diagnostics.duplicateFeatureIdCount,
+    }));
+  }
+  if (diagnostics?.emptyGeometryCount > 0) {
+    messages.push(t('map.drawTab.messages.importDiagnosticsEmptyGeometry', {
+      count: diagnostics.emptyGeometryCount,
+    }));
+  }
+  if (diagnostics?.unsupportedGeometryCount > 0) {
+    messages.push(t('map.drawTab.messages.importDiagnosticsUnsupportedGeometry', {
+      count: diagnostics.unsupportedGeometryCount,
+    }));
+  }
+  if (diagnostics?.invalidCoordinateFeatureCount > 0) {
+    messages.push(t('map.drawTab.messages.importDiagnosticsInvalidCoordinates', {
+      count: diagnostics.invalidCoordinateFeatureCount,
+    }));
+  }
+  return messages;
+};
+
+const showImportDiagnostics = (diagnostics) => {
+  const messages = buildImportDiagnosticsMessages(diagnostics);
+  if (messages.length === 0) return;
+  showWarning(t('map.drawTab.messages.importLayerDiagnostics', {
+    summary: messages.join('; '),
+  }), 6000);
+};
+
 const handleImportAsNewLayer = async (event) => {
   const file = event?.target?.files?.[0];
   if (!file) return;
 
   try {
-    const importedFeatureCollection = await readImportedLayerFile(file);
+    let importDiagnostics = null;
+    const importedFeatureCollection = await readImportedLayerFile(file, {
+      onDiagnostics: (diagnostics) => {
+        importDiagnostics = diagnostics;
+      },
+    });
     const importedLayerGroups = splitFeatureCollectionByGeometryType(importedFeatureCollection);
     const importedLayers = importedLayerGroups.map((group) => createImportedLayer(
       group.featureCollection,
@@ -2299,6 +2337,7 @@ const handleImportAsNewLayer = async (event) => {
     editableMapRef.value?.importGeoJson?.(activeImportedLayer.featureCollection, { emitChanges: false });
     currentMode.value = 'simple_select';
     showSuccess(t('map.drawTab.messages.importLayerSuccess', { count: importedLayers.length }));
+    showImportDiagnostics(importDiagnostics);
   } catch (error) {
     showError(t('map.drawTab.messages.importLayerFailed', { error: error.message || error }));
   } finally {

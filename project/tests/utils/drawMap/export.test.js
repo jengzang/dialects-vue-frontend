@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  analyzeFeatureCollectionQuality,
   exportFeatureCollectionAsGeoJson,
   normalizeFeatureCollection,
+  readImportedLayerFile,
   serializeFeatureCollectionForExport,
 } from '@/main/utils/drawMap/export.js'
 
@@ -170,5 +172,94 @@ describe('draw map export helpers', () => {
       stroke: '#ff0000',
       visible: false,
     })
+  })
+
+  it('reports duplicate ids and geometry quality issues before import normalization', async () => {
+    const source = {
+      type: 'FeatureCollection',
+      features: [{
+        id: 'same-id',
+        type: 'Feature',
+        properties: {},
+        geometry: { type: 'Point', coordinates: [113, 22] },
+      }, {
+        id: 'same-id',
+        type: 'Feature',
+        properties: {},
+        geometry: null,
+      }, {
+        type: 'Feature',
+        properties: {},
+        geometry: { type: 'Circle', coordinates: [113, 22] },
+      }, {
+        type: 'Feature',
+        properties: {},
+        geometry: { type: 'Point', coordinates: [999, 22] },
+      }],
+    }
+
+    const diagnostics = analyzeFeatureCollectionQuality(source)
+
+    expect(diagnostics).toMatchObject({
+      totalFeatureCount: 4,
+      duplicateFeatureIdCount: 1,
+      emptyGeometryCount: 1,
+      unsupportedGeometryCount: 1,
+      invalidCoordinateFeatureCount: 1,
+      hasIssues: true,
+    })
+    expect(diagnostics.duplicateFeatureIds).toEqual(['same-id'])
+
+    const callback = vi.fn()
+    await readImportedLayerFile({
+      name: 'quality.geojson',
+      text: async () => JSON.stringify(source),
+    }, { onDiagnostics: callback })
+
+    expect(callback).toHaveBeenCalledWith(expect.objectContaining({
+      duplicateFeatureIdCount: 1,
+      emptyGeometryCount: 1,
+      unsupportedGeometryCount: 1,
+      invalidCoordinateFeatureCount: 1,
+    }))
+  })
+
+  it('reports skipped invalid CSV rows and unsupported nested collection geometries', async () => {
+    const csvDiagnosticsCallback = vi.fn()
+
+    await readImportedLayerFile({
+      name: 'mixed.csv',
+      text: async () => [
+        'name,lng,lat',
+        'valid,113,22',
+        'bad-number,nope,23',
+        'out-of-range,999,24',
+        'empty-lng,,25',
+      ].join('\n'),
+    }, { onDiagnostics: csvDiagnosticsCallback })
+
+    expect(csvDiagnosticsCallback).toHaveBeenCalledWith(expect.objectContaining({
+      totalFeatureCount: 1,
+      invalidCoordinateFeatureCount: 3,
+      hasIssues: true,
+    }))
+
+    const geometryDiagnostics = analyzeFeatureCollectionQuality({
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'GeometryCollection',
+          geometries: [
+            { type: 'Point', coordinates: [113, 22] },
+            { type: 'Circle', coordinates: [113, 22] },
+          ],
+        },
+      }],
+    })
+
+    expect(geometryDiagnostics.unsupportedGeometryCount).toBe(1)
+    expect(geometryDiagnostics.hasIssues).toBe(true)
   })
 })
