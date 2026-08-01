@@ -22,6 +22,7 @@
 | 状态流测试加固 | 已完成 | `519399fa`、`59e89e8e` | 新增 `EditableMapLibre` 可执行状态流测试，覆盖面板选择不进 direct edit、隐藏/锁定不可 direct edit、属性同步不重复提交 history；程序化多选不再被异步 `selectionchange` 压回单选。 |
 | Step 6 底图切换生命周期 | 已完成 | `9ff38a12` | `EditableMapLibre` 监听 `style.load`，在底图样式重载后恢复 Draw 数据、readonly layers 和 preview layers，且不触发 history/data-change 事件。 |
 | Step 7 图层管理易用性 | 已完成本轮 | `a3b10d90`、`9e0f5a92`、`43d828a4`、`91c5321f`、`7744c532`、`0e44785b`、`bc8bc098`、`eb1ab82c`、`add2e4fe`、`896b0633`、`e6d7360b`、`52214be3` | 已支持复制图层、复制选中要素、删除图层确认、图层行显示几何/要素数/显示锁定状态、图层行内重命名、重命名失焦保存、选中要素移动到同类型可编辑图层、要素列表勾选多选、批量删除、批量移动到兼容图层、批量显隐和批量锁定/解锁；批量移动和显示/解锁会在内部同步 Draw 数据时保留多选状态，并阻止隐藏或锁定活动图层继续绘制/删除/清空。 |
+| 数据表格与批量名称编辑 | 已完成 | `cdf19bf2` | 工具面板新增活动图层要素数据表，可直接编辑要素名称；勾选要素可一次性应用批量名称，并作为一条历史记录撤销；隐藏或锁定活动图层时表格编辑也会被拦截。 |
 | Step 8 未保存保护与自动草稿恢复 | 已完成 | `9fc8103d`、`5b08e48a` | 自动草稿记录从手动草稿列表隐藏；页面打开时提示恢复未保存草稿；工作台变脏时自动保存；离开页面前提示；手动保存、更新或恢复本地草稿后清理隐藏自动草稿，并等待并发自动写入完成。 |
 | Step 9 导入导出数据清洁 | 部分完成 | `3e709c8f`、`f9ac43f4` | `normalizeFeatureCollection()` 不再为导入/导出 round-trip 强制新增或覆盖 `updatedAt`；GeoJSON 导出会剥离自动补齐的默认绘图样式字段，同时保留业务字段和非默认样式。 |
 
@@ -42,12 +43,18 @@
 - `node -e "JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-CN/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-Hant/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/en/map.json','utf8')); console.log('ok')"`
 - `git diff --check`
 - `npm run build`
+- `npm test -- mapDrawTabDraftSafety.test.js -t "does not edit feature names"`
+- `npm test -- mapDrawTabDraftSafety.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js tests/utils/drawMap/draftStorage.test.js tests/utils/drawMap/export.test.js`
+- `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/components/map/Draw/panels/MapDrawToolsPanel.vue src/main/components/map/Draw/panels/panelShared.scss src/main/components/map/EditableMapLibre.vue tests/mapDrawTabDraftSafety.test.js tests/mapDrawEditorContracts.test.js tests/editableMapLibreStateFlow.test.js --quiet`
+- `node -e "JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-CN/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-Hant/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/en/map.json','utf8')); console.log('ok')"`
+- `git diff --check`
+- `npm run build`
 
 下一批建议按“小步提交”继续推进：
 
 1. 继续 Step 9：如后续确实需要区分导入标准化和工作台内部标准化，再拆出更明确的 normalize 函数名；当前已先收敛导出字段噪声。
 2. 再做 Step 5，将 layer mutation 逐步集中为工具函数；这一步会改变内部结构，应拆成多个小提交并先确认结构边界。
-3. 补数据表格视图与批量属性编辑，让导入后的字段检查、排序筛选和批量改属性更接近 geojson.io 这类成熟编辑器。
+3. 继续扩展数据表格：增加字段列编辑、排序筛选、按选中要素批量改任意属性，让导入后的字段检查更接近 geojson.io 这类成熟编辑器。
 4. 最后评估高阶几何能力：吸附、矩形/圆、切割、拆分、合并、自定义模式或 Terra Draw 迁移。
 
 ---
