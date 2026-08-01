@@ -302,6 +302,39 @@
             >
               {{ t('map.drawTab.buttons.applyBatchFeatureName') }}
             </button>
+            <div
+              v-if="featureTableColumns.length"
+              class="draw-feature-table-property-tools"
+            >
+              <span class="draw-field-label">
+                {{ t('map.drawTab.labels.batchFeatureProperty') }}
+              </span>
+              <SimpleSelectDropdown
+                :model-value="selectedFeatureBatchPropertyKey"
+                :options="featureTableBatchPropertyOptions"
+                :placeholder="t('map.drawTab.labels.batchFeatureProperty')"
+                :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
+                width="7.5rem"
+                @update:model-value="$emit('update:selected-feature-batch-property-key', $event)"
+              />
+              <input
+                class="draw-input draw-feature-table-batch-value"
+                type="text"
+                :value="selectedFeatureBatchPropertyValue"
+                :placeholder="t('map.drawTab.labels.batchFeaturePropertyValue')"
+                :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0 || !canApplySelectedFeatureBatchProperty"
+                @input="$emit('update:selected-feature-batch-property-value', $event.target.value)"
+              >
+              <button
+                class="main-glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                type="button"
+                :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0 || !canApplySelectedFeatureBatchProperty"
+                @click="$emit('apply-selected-feature-batch-property')"
+              >
+                {{ t('map.drawTab.buttons.applyBatchFeatureProperty') }}
+              </button>
+            </div>
           </div>
           <div
             v-if="featureTableRows.length"
@@ -311,6 +344,12 @@
               <thead>
                 <tr>
                   <th>{{ t('map.drawTab.labels.featureTableName') }}</th>
+                  <th
+                    v-for="column in featureTableColumns"
+                    :key="column.key"
+                  >
+                    {{ column.label }}
+                  </th>
                   <th>{{ t('map.drawTab.labels.featureTableGeometry') }}</th>
                   <th>{{ t('map.drawTab.labels.featureTableState') }}</th>
                   <th>{{ t('map.drawTab.labels.featureTableProperties') }}</th>
@@ -328,6 +367,18 @@
                       :value="row.name"
                       :disabled="!canModifyActiveLayer"
                       @input="$emit('update-feature-table-cell', row.id, 'name', $event.target.value)"
+                    >
+                  </td>
+                  <td
+                    v-for="column in featureTableColumns"
+                    :key="column.key"
+                  >
+                    <input
+                      class="draw-input draw-feature-table-input"
+                      type="text"
+                      :value="row.properties?.[column.key] ?? ''"
+                      :disabled="!canModifyActiveLayer"
+                      @input="$emit('update-feature-table-cell', row.id, column.key, $event.target.value)"
                     >
                   </td>
                   <td>{{ getGeometryLabel(row.geometryType) }}</td>
@@ -510,6 +561,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
@@ -523,11 +575,15 @@ const props = defineProps({
   selectedLayerLabel: { type: String, default: '' },
   currentMode: { type: String, default: 'simple_select' },
   featureItems: { type: Array, default: () => [] },
+  featureTableColumns: { type: Array, default: () => [] },
   featureTableRows: { type: Array, default: () => [] },
   featureMoveLayerOptions: { type: Array, default: () => [] },
   selectedFeatureId: { type: String, default: '' },
   selectedFeatureIds: { type: Array, default: () => [] },
   selectedFeatureBatchName: { type: String, default: '' },
+  selectedFeatureBatchPropertyKey: { type: String, default: '' },
+  selectedFeatureBatchPropertyValue: { type: String, default: '' },
+  canApplySelectedFeatureBatchProperty: { type: Boolean, default: false },
   selectedFeatureProperties: { type: Object, default: null },
   selectedFeatureGeometryType: { type: String, default: '' },
   isFullscreen: { type: Boolean, default: false },
@@ -555,6 +611,9 @@ defineEmits([
   'update-feature-table-cell',
   'update:selected-feature-batch-name',
   'apply-selected-feature-batch-name',
+  'update:selected-feature-batch-property-key',
+  'update:selected-feature-batch-property-value',
+  'apply-selected-feature-batch-property',
   'move-feature-to-layer',
   'move-selected-features-to-layer',
   'set-selected-features-visible',
@@ -571,6 +630,11 @@ const getFeatureStateLabel = (feature) => {
   const visibleLabel = feature?.visible ? t('map.drawTab.labels.visibleShort') : t('map.drawTab.labels.hiddenShort')
   return feature?.locked ? `${visibleLabel} · ${t('map.drawTab.labels.lockedShort')}` : visibleLabel
 }
+
+const featureTableBatchPropertyOptions = computed(() => props.featureTableColumns.map((column) => ({
+  label: column.label,
+  value: column.key,
+})))
 </script>
 
 <style scoped lang="scss">

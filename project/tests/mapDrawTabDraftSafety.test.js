@@ -68,7 +68,7 @@ vi.mock('@/main/utils/drawMap/draftStorage.js', async () => {
 vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
   default: defineComponent({
     name: 'EditableMapLibreStub',
-    props: ['modelValue'],
+    props: ['modelValue', 'activeLayer'],
     emits: ['update:modelValue', 'features-change', 'feature-select'],
     setup(props, { emit, expose }) {
       expose({
@@ -87,12 +87,18 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
       const addPolygonFeature = () => {
         const nextIndex = (props.modelValue?.features?.length ?? 0) + 1
         const previousFeatures = props.modelValue?.features ?? []
+        const featureProperties = props.activeLayer?.id === 'draw-layer-2'
+          ? { zone: `Zone ${nextIndex}` }
+          : {
+              region: `Region ${nextIndex}`,
+              user_id: `user-${nextIndex}`,
+            }
         const collection = {
           type: 'FeatureCollection',
           features: [...previousFeatures, {
             id: `feature-${nextIndex}`,
             type: 'Feature',
-            properties: {},
+            properties: featureProperties,
             geometry: {
               type: 'Polygon',
               coordinates: [[
@@ -119,10 +125,14 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
     props: {
       activeLayer: { type: Object, default: null },
       featureItems: { type: Array, default: () => [] },
+      featureTableColumns: { type: Array, default: () => [] },
       featureTableRows: { type: Array, default: () => [] },
       featureMoveLayerOptions: { type: Array, default: () => [] },
       selectedFeatureBatchName: { type: String, default: '' },
+      selectedFeatureBatchPropertyKey: { type: String, default: '' },
+      selectedFeatureBatchPropertyValue: { type: String, default: '' },
       selectedFeatureIds: { type: Array, default: () => [] },
+      canApplySelectedFeatureBatchProperty: { type: Boolean, default: false },
       canModifyActiveLayer: { type: Boolean, default: false },
     },
     emits: [
@@ -134,6 +144,9 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       'update-feature-table-cell',
       'update:selected-feature-batch-name',
       'apply-selected-feature-batch-name',
+      'update:selected-feature-batch-property-key',
+      'update:selected-feature-batch-property-value',
+      'apply-selected-feature-batch-property',
     ],
     template: `
       <div data-testid="tools-panel">
@@ -215,6 +228,30 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
         >
           apply batch name
         </button>
+        <select
+          data-testid="batch-property-key"
+          :value="selectedFeatureBatchPropertyKey"
+          @change="$emit('update:selected-feature-batch-property-key', $event.target.value)"
+        >
+          <option value="">select property</option>
+          <option v-for="column in featureTableColumns" :key="column.key" :value="column.key">
+            {{ column.label }}
+          </option>
+        </select>
+        <input
+          data-testid="batch-property-value"
+          :value="selectedFeatureBatchPropertyValue"
+          :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0 || !canApplySelectedFeatureBatchProperty"
+          @input="$emit('update:selected-feature-batch-property-value', $event.target.value)"
+        >
+        <button
+          data-testid="apply-batch-property"
+          type="button"
+          :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0 || !canApplySelectedFeatureBatchProperty"
+          @click="$emit('apply-selected-feature-batch-property')"
+        >
+          apply batch property
+        </button>
         <table data-testid="feature-table">
           <tbody>
             <tr v-for="row in featureTableRows" :key="row.id" data-testid="feature-table-row">
@@ -223,6 +260,14 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
                   data-testid="feature-table-name"
                   :value="row.name"
                   @input="$emit('update-feature-table-cell', row.id, 'name', $event.target.value)"
+                >
+              </td>
+              <td v-for="column in featureTableColumns" :key="column.key">
+                <input
+                  data-testid="feature-table-property-input"
+                  :data-property-key="column.key"
+                  :value="row.properties?.[column.key] ?? ''"
+                  @input="$emit('update-feature-table-cell', row.id, column.key, $event.target.value)"
                 >
               </td>
               <td data-testid="feature-table-geometry">{{ row.geometryType }}</td>
@@ -864,6 +909,162 @@ describe('MapDrawTab draft safety', () => {
       .map((input) => input.value)
     expect(restoredNames[0]).toBe('North patch')
     expect(restoredNames[1]).not.toBe('Batch patch')
+
+    wrapper.unmount()
+  })
+
+  it('edits feature business properties from the data table and batch applies a checked property', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    let regionInputs = [...wrapper.host.querySelectorAll('[data-testid="feature-table-property-input"][data-property-key="region"]')]
+    expect(regionInputs).toHaveLength(2)
+    expect(regionInputs.map((input) => input.value)).toEqual(['Region 1', 'Region 2'])
+    const userIdInputs = [...wrapper.host.querySelectorAll('[data-testid="feature-table-property-input"][data-property-key="user_id"]')]
+    expect(userIdInputs).toHaveLength(2)
+    expect(userIdInputs.map((input) => input.value)).toEqual(['user-1', 'user-2'])
+
+    regionInputs[0].value = 'North region'
+    regionInputs[0].dispatchEvent(new Event('input'))
+    await flushTicks()
+    regionInputs = [...wrapper.host.querySelectorAll('[data-testid="feature-table-property-input"][data-property-key="region"]')]
+    expect(regionInputs[0].value).toBe('North region')
+
+    const checkboxes = [...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+    checkboxes.forEach((checkbox) => {
+      if (!checkbox.checked) checkbox.click()
+    })
+    await flushTicks()
+
+    const batchPropertyKey = wrapper.host.querySelector('[data-testid="batch-property-key"]')
+    batchPropertyKey.value = 'region'
+    batchPropertyKey.dispatchEvent(new Event('change'))
+    const batchPropertyValue = wrapper.host.querySelector('[data-testid="batch-property-value"]')
+    batchPropertyValue.value = 'Batch region'
+    batchPropertyValue.dispatchEvent(new Event('input'))
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="apply-batch-property"]').click()
+    await flushTicks()
+
+    regionInputs = [...wrapper.host.querySelectorAll('[data-testid="feature-table-property-input"][data-property-key="region"]')]
+    expect(regionInputs.every((input) => input.value === 'Batch region')).toBe(true)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'z',
+      metaKey: true,
+    }))
+    await flushTicks()
+
+    regionInputs = [...wrapper.host.querySelectorAll('[data-testid="feature-table-property-input"][data-property-key="region"]')]
+    expect(regionInputs[0].value).toBe('North region')
+    expect(regionInputs[1].value).toBe('Region 2')
+
+    wrapper.unmount()
+  })
+
+  it('disables checked property batch editing when the selected field is stale after switching layers', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="feature-checkbox"]').click()
+    await flushTicks()
+    const batchPropertyKey = wrapper.host.querySelector('[data-testid="batch-property-key"]')
+    batchPropertyKey.value = 'region'
+    batchPropertyKey.dispatchEvent(new Event('change'))
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="apply-batch-property"]').disabled).toBe(false)
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="feature-checkbox"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-table-property-input"][data-property-key="region"]')).toHaveLength(0)
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-table-property-input"][data-property-key="zone"]')).toHaveLength(1)
+    expect(wrapper.host.querySelector('[data-testid="apply-batch-property"]').disabled).toBe(true)
+    expect(wrapper.host.querySelector('[data-testid="batch-property-value"]').disabled).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('does not edit feature business properties when the active layer is hidden or locked', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    let regionInput = wrapper.host.querySelector('[data-testid="feature-table-property-input"][data-property-key="region"]')
+    regionInput.value = 'Editable region'
+    regionInput.dispatchEvent(new Event('input'))
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="feature-table-property-input"][data-property-key="region"]').value).toBe('Editable region')
+
+    wrapper.host.querySelector('[data-testid="feature-checkbox"]').click()
+    await flushTicks()
+    const batchPropertyKey = wrapper.host.querySelector('[data-testid="batch-property-key"]')
+    batchPropertyKey.value = 'region'
+    batchPropertyKey.dispatchEvent(new Event('change'))
+    const batchPropertyValue = wrapper.host.querySelector('[data-testid="batch-property-value"]')
+    batchPropertyValue.value = 'Hidden batch region'
+    batchPropertyValue.dispatchEvent(new Event('input'))
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+    regionInput = wrapper.host.querySelector('[data-testid="feature-table-property-input"][data-property-key="region"]')
+    regionInput.value = 'Hidden region'
+    regionInput.dispatchEvent(new Event('input'))
+    wrapper.host.querySelector('[data-testid="apply-batch-property"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="feature-table-property-summary"]').textContent).toContain('Editable region')
+    expect(wrapper.host.querySelector('[data-testid="feature-table-property-summary"]').textContent).not.toContain('Hidden region')
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="toggle-layer-lock"]').click()
+    await flushTicks()
+    regionInput = wrapper.host.querySelector('[data-testid="feature-table-property-input"][data-property-key="region"]')
+    regionInput.value = 'Locked region'
+    regionInput.dispatchEvent(new Event('input'))
+    batchPropertyValue.value = 'Locked batch region'
+    batchPropertyValue.dispatchEvent(new Event('input'))
+    wrapper.host.querySelector('[data-testid="apply-batch-property"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="feature-table-property-summary"]').textContent).toContain('Editable region')
+    expect(wrapper.host.querySelector('[data-testid="feature-table-property-summary"]').textContent).not.toContain('Locked region')
+    expect(wrapper.host.querySelector('[data-testid="feature-table-property-summary"]').textContent).not.toContain('Locked batch region')
 
     wrapper.unmount()
   })

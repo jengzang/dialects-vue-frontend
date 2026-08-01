@@ -129,11 +129,15 @@
           :selected-layer-label="selectedLayerLabel"
           :current-mode="currentMode"
           :feature-items="activeLayerFeatureItems"
+          :feature-table-columns="activeLayerFeatureTableColumns"
           :feature-table-rows="activeLayerFeatureTableRows"
           :feature-move-layer-options="featureMoveLayerOptions"
           :selected-feature-id="selectedEditorFeatureId"
           :selected-feature-ids="selectedFeatureIds"
           :selected-feature-batch-name="selectedFeatureBatchName"
+          :selected-feature-batch-property-key="selectedFeatureBatchPropertyKey"
+          :selected-feature-batch-property-value="selectedFeatureBatchPropertyValue"
+          :can-apply-selected-feature-batch-property="canApplySelectedFeatureBatchProperty"
           :selected-feature-properties="selectedEditorProperties"
           :selected-feature-geometry-type="selectedEditorGeometryType"
           :is-fullscreen="isMapFullscreen"
@@ -158,6 +162,9 @@
           @update-feature-table-cell="handleUpdateFeatureTableCell"
           @update:selected-feature-batch-name="selectedFeatureBatchName = $event"
           @apply-selected-feature-batch-name="handleApplySelectedFeatureBatchName"
+          @update:selected-feature-batch-property-key="selectedFeatureBatchPropertyKey = $event"
+          @update:selected-feature-batch-property-value="selectedFeatureBatchPropertyValue = $event"
+          @apply-selected-feature-batch-property="handleApplySelectedFeatureBatchProperty"
           @move-feature-to-layer="handleMoveSelectedFeatureToLayer"
           @move-selected-features-to-layer="handleMoveSelectedFeaturesToLayer"
           @set-selected-features-visible="handleSetSelectedFeaturesVisible"
@@ -651,6 +658,8 @@ const currentStyleKey = ref('gaode');
 const selectedFeatureId = ref('');
 const selectedFeatureIds = ref([]);
 const selectedFeatureBatchName = ref('');
+const selectedFeatureBatchPropertyKey = ref('');
+const selectedFeatureBatchPropertyValue = ref('');
 const layers = ref([]);
 const activeLayerId = ref('');
 const isDrawingPanelOpen = ref(true);
@@ -793,7 +802,7 @@ const activeLayerFeatureItems = computed(() => activeLayerFeatures.value.map((fe
   locked: feature?.properties?.locked ?? activeLayer.value?.locked ?? false,
 })).filter((feature) => feature.id));
 
-const tableSummaryHiddenPropertyKeys = new Set([
+const featureTableHiddenPropertyKeys = new Set([
   'id',
   'name',
   'title',
@@ -807,7 +816,19 @@ const tableSummaryHiddenPropertyKeys = new Set([
   'pointStrokeColor',
   'visible',
   'locked',
+  'user_stroke',
+  'user_strokeWidth',
+  'user_fill',
+  'user_fillOpacity',
+  'user_visible',
+  'user_pointRadius',
+  'user_pointColor',
+  'user_pointStrokeColor',
 ]);
+
+const isFeatureTableBusinessPropertyKey = (key) => {
+  return Boolean(key && !featureTableHiddenPropertyKeys.has(key));
+};
 
 const formatFeatureTableValue = (value) => {
   if (value === null || value === undefined) return '';
@@ -817,11 +838,35 @@ const formatFeatureTableValue = (value) => {
 
 const summarizeFeatureTableProperties = (properties = {}) => {
   const summaryItems = Object.entries(properties)
-    .filter(([key, value]) => !tableSummaryHiddenPropertyKeys.has(key) && value !== '' && value !== null && value !== undefined)
+    .filter(([key, value]) => isFeatureTableBusinessPropertyKey(key) && value !== '' && value !== null && value !== undefined)
     .slice(0, 3)
     .map(([key, value]) => `${key}: ${formatFeatureTableValue(value)}`);
   return summaryItems.length ? summaryItems.join(' · ') : t('map.drawTab.labels.featurePropertiesEmpty');
 };
+
+const activeLayerFeatureTableColumns = computed(() => {
+  const seenKeys = new Set();
+  const columns = [];
+  activeLayerFeatures.value.forEach((feature) => {
+    Object.keys(feature?.properties ?? {}).forEach((key) => {
+      if (!isFeatureTableBusinessPropertyKey(key) || seenKeys.has(key)) return;
+      seenKeys.add(key);
+      columns.push({ key, label: key });
+    });
+  });
+  return columns;
+});
+
+const canApplySelectedFeatureBatchProperty = computed(() => activeLayerFeatureTableColumns.value.some((column) => {
+  return column.key === selectedFeatureBatchPropertyKey.value;
+}));
+
+const buildFeatureTableProperties = (properties = {}) => Object.fromEntries(
+  activeLayerFeatureTableColumns.value.map((column) => [
+    column.key,
+    formatFeatureTableValue(properties[column.key]),
+  ])
+);
 
 const activeLayerFeatureTableRows = computed(() => activeLayerFeatures.value.map((feature, index) => ({
   id: getFeatureId(feature),
@@ -829,6 +874,7 @@ const activeLayerFeatureTableRows = computed(() => activeLayerFeatures.value.map
   geometryType: feature?.geometry?.type || activeLayer.value?.geometryType || '',
   visible: feature?.properties?.visible ?? activeLayer.value?.visible ?? true,
   locked: feature?.properties?.locked ?? activeLayer.value?.locked ?? false,
+  properties: buildFeatureTableProperties(feature?.properties ?? {}),
   propertySummary: summarizeFeatureTableProperties(feature?.properties ?? {}),
 })).filter((row) => row.id));
 
@@ -2110,14 +2156,24 @@ const handleSetSelectedFeaturesLocked = (locked) => {
 
 const handleUpdateFeatureTableCell = (featureId, key, value) => {
   if (!canModifyActiveLayer.value) return;
-  if (key !== 'name') return;
-  updateFeatureProperty(featureId, key, value);
+  const nextKey = String(key || '');
+  if (
+    nextKey !== 'name'
+    && !activeLayerFeatureTableColumns.value.some((column) => column.key === nextKey)
+  ) return;
+  updateFeatureProperty(featureId, nextKey, value);
 };
 
 const handleApplySelectedFeatureBatchName = () => {
   const nextName = selectedFeatureBatchName.value.trim();
   if (!nextName) return;
   updateSelectedFeaturesProperty('name', nextName);
+};
+
+const handleApplySelectedFeatureBatchProperty = () => {
+  const nextKey = String(selectedFeatureBatchPropertyKey.value || '');
+  if (!canApplySelectedFeatureBatchProperty.value) return;
+  updateSelectedFeaturesProperty(nextKey, selectedFeatureBatchPropertyValue.value);
 };
 
 const updateSelectedFeatureProperty = (key, value) => {

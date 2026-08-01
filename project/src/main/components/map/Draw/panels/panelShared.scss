@@ -219,6 +219,18 @@
   flex: 1 1 10rem;
 }
 
+.draw-feature-table-property-tools {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.draw-feature-table-batch-value {
+  flex: 1 1 8rem;
+}
+
 .draw-feature-table-wrap {
   max-height: 14rem;
   overflow: auto;
