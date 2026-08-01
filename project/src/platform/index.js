@@ -32,6 +32,12 @@ export {
   PLATFORM_FULLSCREEN_CLASS,
 } from './fullscreen.js'
 export {
+  getPraatInputAccept,
+  getPraatPlatformCapabilities,
+  isPraatFileAcceptedOnPlatform,
+  PRAAT_PLATFORM_CAPABILITIES,
+} from './praatCapabilities.js'
+export {
   initializePlatformServices,
   resetPlatformServicesForTests,
 } from './bootstrap.js'

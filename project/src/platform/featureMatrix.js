@@ -1,4 +1,5 @@
 import { getCurrentRuntimePlatform } from './runtime.js'
+import { PRAAT_PLATFORM_CAPABILITIES } from './praatCapabilities.js'
 
 const PLATFORM_TARGET_KEYS = ['web', 'ios', 'android', 'native']
 const PLATFORM_ACCEPTANCE_TARGET_KEYS = ['web', 'ios', 'android']
@@ -78,6 +79,7 @@ export const PLATFORM_FEATURE_MATRIX = {
       android: true,
       native: true,
     },
+    capabilities: PRAAT_PLATFORM_CAPABILITIES,
     routes: ['/explore/tools/praat'],
     tutorials: [
       'explore-praat-upload',
@@ -131,8 +133,13 @@ export const PLATFORM_FEATURE_MATRIX = {
         },
         {
           id: 'praat.ios.submit-analysis',
-          label: 'Upload the native-selected or native-recorded audio and create a Praat analysis job',
-          driver: 'praat-api',
+          label: 'Run WAV Praat analysis locally through the bundled Python Parselmouth engine',
+          driver: 'python-parselmouth',
+        },
+        {
+          id: 'praat.ios.local-python-analysis',
+          label: 'Keep result JSON and run metadata while treating input audio as temporary',
+          driver: 'python-parselmouth',
         },
       ],
       android: [
@@ -158,8 +165,13 @@ export const PLATFORM_FEATURE_MATRIX = {
         },
         {
           id: 'praat.android.submit-analysis',
-          label: 'Upload the native-selected or native-recorded audio and create a Praat analysis job',
-          driver: 'praat-api',
+          label: 'Run WAV Praat analysis locally through the bundled Python Parselmouth engine',
+          driver: 'python-parselmouth',
+        },
+        {
+          id: 'praat.android.local-python-analysis',
+          label: 'Keep result JSON and run metadata while treating input audio as temporary',
+          driver: 'python-parselmouth',
         },
       ],
     },

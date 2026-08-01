@@ -20,14 +20,16 @@ describe('platform acceptance matrix', () => {
         expect.objectContaining({ id: 'praat.ios.record', driver: 'capacitor-audio-recorder' }),
         expect.objectContaining({ id: 'praat.ios.microphone-permission', driver: 'ios-info-plist' }),
         expect.objectContaining({ id: 'praat.ios.decode-segment', driver: 'web-audio' }),
-        expect.objectContaining({ id: 'praat.ios.submit-analysis', driver: 'praat-api' }),
+        expect.objectContaining({ id: 'praat.ios.submit-analysis', driver: 'python-parselmouth' }),
+        expect.objectContaining({ id: 'praat.ios.local-python-analysis', driver: 'python-parselmouth' }),
       ]),
       android: expect.arrayContaining([
         expect.objectContaining({ id: 'praat.android.file-select', driver: 'capacitor-file-picker' }),
         expect.objectContaining({ id: 'praat.android.record', driver: 'capacitor-audio-recorder' }),
         expect.objectContaining({ id: 'praat.android.microphone-permission', driver: 'android-manifest' }),
         expect.objectContaining({ id: 'praat.android.decode-segment', driver: 'web-audio' }),
-        expect.objectContaining({ id: 'praat.android.submit-analysis', driver: 'praat-api' }),
+        expect.objectContaining({ id: 'praat.android.submit-analysis', driver: 'python-parselmouth' }),
+        expect.objectContaining({ id: 'praat.android.local-python-analysis', driver: 'python-parselmouth' }),
       ]),
     })
   })
@@ -43,6 +45,7 @@ describe('platform acceptance matrix', () => {
       'praat.ios.microphone-permission',
       'praat.ios.decode-segment',
       'praat.ios.submit-analysis',
+      'praat.ios.local-python-analysis',
     ]))
     expect(androidChecklist.map((item) => item.id)).toEqual(expect.arrayContaining([
       'praat.android.file-select',
@@ -50,6 +53,7 @@ describe('platform acceptance matrix', () => {
       'praat.android.microphone-permission',
       'praat.android.decode-segment',
       'praat.android.submit-analysis',
+      'praat.android.local-python-analysis',
     ]))
     expect(webChecklist.map((item) => item.id)).toEqual(expect.arrayContaining([
       'praat.web.file-select',

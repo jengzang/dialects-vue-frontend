@@ -63,9 +63,11 @@ npm run verify:platform:all
 
 Praat 三端當前至少需要覆蓋：
 
-- Web：瀏覽器文件選擇、瀏覽器錄音、Web Audio 解碼 / 分段、提交 Praat 分析。
-- iOS：Capacitor FilePicker 文件選擇、Capacitor AudioRecorder 錄音保存、麥克風權限拒絕態、Web Audio 解碼 / 分段、提交 Praat 分析。
-- Android：Capacitor FilePicker 文件選擇、Capacitor AudioRecorder 錄音保存、`RECORD_AUDIO` 權限拒絕態、Web Audio 解碼 / 分段、提交 Praat 分析。
+- Web：瀏覽器文件選擇、瀏覽器錄音、Web Audio 解碼 / 分段、提交後端 Praat 分析。
+- iOS：Capacitor FilePicker 選擇 WAV、Capacitor AudioRecorder 錄音保存、麥克風權限拒絕態、Web Audio 解碼 / 分段、本地 Python / Parselmouth Praat 分析。
+- Android：Capacitor FilePicker 選擇 WAV、Capacitor AudioRecorder 錄音保存、`RECORD_AUDIO` 權限拒絕態、Web Audio 解碼 / 分段、本地 Python / Parselmouth Praat 分析。
+
+Web 端保留後端 FFmpeg 能力，支持 WAV、MP3、M4A、WebM、OGG、FLAC、AAC。iOS / Android App 不打包 FFmpeg，Praat 本地分析只接受 WAV；其他格式應提示用戶前往網頁端使用。App 端本地分析結果 JSON 與 run metadata 應保留，原始輸入副本與規範化音頻視為臨時文件，分析完成後默認清理。
 
 可使用 `project/tests/fixtures/praat-smoke.wav` 作為三端統一測試音頻。它是一個很小的合法 PCM WAV 文件，用於確認文件選擇後能顯示、能解碼、能進入分段或原始片段、能提交 Praat 分析。
 
@@ -126,7 +128,7 @@ npm run verify:platform:android
 
 三端差異由 `project/src/platform/`、平台能力矩陣、Vite build mode 與 native dist prune / audit 共同控制。當前原則是：
 
-- Praat 保留在 Web、iOS、Android 三端，native 端使用 Capacitor 錄音能力。
+- Praat 保留在 Web、iOS、Android 三端。Web 端沿用後端 Praat API；native 端以本地 Python / Parselmouth 作為優先引擎，僅接受 WAV，保留後端 API 作為 fallback。
 - 文件導入 / 導出在 native 端走 Capacitor FilePicker、Filesystem、Share 等真實插件能力。
 - 地圖繪製保留在 Web 端，native 端不打包地圖繪製專用靜態資源。
 - native dist audit 會檢查 Web-only 地圖繪製資源是否被誤打進 native 產物，例如 `data/国界面.kmz`。
