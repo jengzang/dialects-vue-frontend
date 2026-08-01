@@ -192,6 +192,7 @@ import { usePollingTask } from '@/composables/core/usePollingTask.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import { getCurrentRuntimePlatform, isPraatFileAcceptedOnPlatform } from '@/platform/index.js'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -202,6 +203,7 @@ const { requireAuth } = useAuthGuard({
 
 const STORAGE_KEY = 'praat_analysis_settings'
 const VALID_TABS = ['upload', 'results', 'vowelspace', 'pitchtone']
+const praatPlatformTarget = getCurrentRuntimePlatform().family
 
 // Tab state - sync with router
 const { state: activeTab, set: setActiveTab } = useRouteQueryState('tab', {
@@ -613,6 +615,14 @@ const startAnalysis = async () => {
   if (!audioFile.value) return
   if (isUploading.value || isAnalyzing.value || isActiveJobStatus(normalizedJobStatus.value)) {
     showWarning(t('praat.main.errors.analysisInProgress'))
+    return
+  }
+  if (!isPraatFileAcceptedOnPlatform(audioFile.value, praatPlatformTarget)) {
+    showError(
+      praatPlatformTarget === 'ios' || praatPlatformTarget === 'android'
+        ? t('praat.audioInput.errors.nativeUnsupportedFormat')
+        : t('praat.audioInput.errors.unsupportedFormat')
+    )
     return
   }
 

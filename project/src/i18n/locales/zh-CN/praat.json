@@ -66,6 +66,7 @@
     "errors": {
       "fileSizeExceeded": "文件大小超过 5MB 限制",
       "unsupportedFormat": "不支持的音频格式，请上传 WAV、MP3、M4A、WebM、OGG、FLAC 或 AAC 文件",
+      "nativeUnsupportedFormat": "iOS 和 Android App 当前仅支持 WAV 文件。其他音频格式请前往网页版使用。",
       "processingFailed": "处理音频文件失败：{error}",
       "readFailed": "无法读取音频文件",
       "fileSelectionFailed": "选择音频文件失败：{error}",

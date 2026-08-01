@@ -17,7 +17,7 @@
       <input
         ref="fileInput"
         type="file"
-        accept="audio/*"
+        :accept="fileInputAccept"
         @change="handleFileSelect"
         style="display: none"
       />
@@ -61,7 +61,13 @@
 import { ref, computed, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { PRAAT_AUDIO_LIMITS } from '@/main/config/constants.js'
-import { getPlatformAudioRecorder, getPlatformFileService } from '@/platform/index.js'
+import {
+  getCurrentRuntimePlatform,
+  getPlatformAudioRecorder,
+  getPlatformFileService,
+  getPraatInputAccept,
+  isPraatFileAcceptedOnPlatform,
+} from '@/platform/index.js'
 import { showError } from '@/utils/ui/message.js'
 
 const props = defineProps({
@@ -81,6 +87,8 @@ const selectedFile = ref(null)
 const recordingTime = ref(0)
 const fileInput = ref(null)
 const nativeAudioRecorder = getPlatformAudioRecorder()
+const praatPlatformTarget = getCurrentRuntimePlatform().family
+const fileInputAccept = computed(() => getPraatInputAccept(praatPlatformTarget))
 
 // Computed property for display file (priority: selectedSegment > local selectedFile)
 const displayFile = computed(() => {
@@ -101,6 +109,15 @@ const SUPPORTED_FORMATS = ['audio/wav', 'audio/mpeg', 'audio/mp3', 'audio/ogg', 
 const validateFile = (file) => {
   if (file.size > PRAAT_AUDIO_LIMITS.MAX_FILE_SIZE) {
     showError(t('praat.audioInput.errors.fileSizeExceeded'))
+    return false
+  }
+
+  if (!isPraatFileAcceptedOnPlatform(file, praatPlatformTarget)) {
+    showError(
+      praatPlatformTarget === 'ios' || praatPlatformTarget === 'android'
+        ? t('praat.audioInput.errors.nativeUnsupportedFormat')
+        : t('praat.audioInput.errors.unsupportedFormat')
+    )
     return false
   }
 
@@ -149,7 +166,7 @@ const showPlatformAudioInputError = (error) => {
 const triggerFileInput = async () => {
   try {
     const files = await getPlatformFileService().pickFilesOrOpenInput(fileInput.value, {
-      accept: 'audio/*',
+      accept: fileInputAccept.value,
       multiple: false,
       readData: false
     })
