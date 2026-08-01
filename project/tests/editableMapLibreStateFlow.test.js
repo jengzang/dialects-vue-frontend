@@ -120,7 +120,8 @@ vi.mock('maplibre-gl', () => {
 
 vi.mock('@mapbox/mapbox-gl-draw', () => ({
   default: class MockMapboxDraw {
-    constructor() {
+    constructor(options = {}) {
+      this.options = options
       this.features = new Map()
       this.selectedIds = []
       this.set = vi.fn((featureCollection) => {
@@ -344,6 +345,24 @@ describe('EditableMapLibre state flow', () => {
     expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('direct_select', { featureId: 'hidden-1' })
     expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
     expect(wrapper.events).toContainEqual(['feature-select', 'hidden-1'])
+
+    wrapper.unmount()
+  })
+
+  it('keeps midpoint handles visible for line and polygon edge editing', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [],
+    })
+    await nextTick()
+
+    expect(wrapper.draw.options.styles).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: 'gl-draw-midpoint',
+        type: 'circle',
+      }),
+    ]))
+    expect(JSON.stringify(wrapper.draw.options.styles)).toContain('"midpoint"')
 
     wrapper.unmount()
   })

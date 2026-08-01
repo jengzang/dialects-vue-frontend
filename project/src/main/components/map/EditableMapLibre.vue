@@ -86,6 +86,18 @@ const drawStyles = [
     },
   },
   {
+    id: 'gl-draw-midpoint',
+    type: 'circle',
+    filter: ['all', ['==', 'meta', 'midpoint'], ['!=', 'mode', 'static']],
+    paint: {
+      'circle-radius': 5,
+      'circle-color': drawFallbackStroke,
+      'circle-stroke-color': '#ffffff',
+      'circle-stroke-width': 2,
+      'circle-opacity': 0.9,
+    },
+  },
+  {
     id: 'gl-draw-vertex',
     type: 'circle',
     filter: ['all', ['==', 'meta', 'vertex'], ['!=', 'mode', 'static']],
