@@ -71,8 +71,8 @@ vi.mock('@/main/utils/drawMap/draftStorage.js', async () => {
 vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
   default: defineComponent({
     name: 'EditableMapLibreStub',
-    props: ['modelValue', 'activeLayer'],
-    emits: ['update:modelValue', 'features-change', 'feature-select'],
+    props: ['modelValue', 'activeLayer', 'featureBoxSelectEnabled'],
+    emits: ['update:modelValue', 'features-change', 'feature-select', 'feature-box-select'],
     setup(props, { emit, expose }) {
       expose({
         setDrawMode: mocks.mapSetDrawMode,
@@ -120,7 +120,19 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
       }
       return { addPolygonFeature }
     },
-    template: '<button data-testid="editable-map" type="button" @click="addPolygonFeature">draw polygon</button>',
+    template: `
+      <div>
+        <button data-testid="editable-map" type="button" @click="addPolygonFeature">draw polygon</button>
+        <span data-testid="box-select-mode">{{ featureBoxSelectEnabled ? 'on' : 'off' }}</span>
+        <button
+          data-testid="emit-box-selection"
+          type="button"
+          @click="$emit('feature-box-select', ['feature-1', 'feature-2', 'feature-3'])"
+        >
+          emit box selection
+        </button>
+      </div>
+    `,
   }),
 }))
 
@@ -138,6 +150,8 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       selectedFeatureBatchPropertyValue: { type: String, default: '' },
       selectedFeatureIds: { type: Array, default: () => [] },
       canApplySelectedFeatureBatchProperty: { type: Boolean, default: false },
+      isFeatureBoxSelectMode: { type: Boolean, default: false },
+      canUseFeatureBoxSelect: { type: Boolean, default: false },
       canModifyActiveLayer: { type: Boolean, default: false },
     },
     emits: [
@@ -145,6 +159,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       'select-all-features',
       'invert-feature-selection',
       'clear-feature-selection',
+      'toggle-feature-box-select',
       'delete-selected-features',
       'move-selected-features-to-layer',
       'set-selected-features-visible',
@@ -175,6 +190,15 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
             {{ feature.visible ? 'visible' : 'hidden' }} {{ feature.locked ? 'locked' : 'unlocked' }}
           </span>
         </label>
+        <button
+          data-testid="toggle-feature-box-select"
+          type="button"
+          :data-active="isFeatureBoxSelectMode ? 'true' : 'false'"
+          :disabled="!canUseFeatureBoxSelect"
+          @click="$emit('toggle-feature-box-select')"
+        >
+          toggle box select
+        </button>
         <button
           data-testid="select-all-features"
           type="button"
@@ -958,6 +982,53 @@ describe('MapDrawTab draft safety', () => {
       .map((item) => item.dataset.locked)).toEqual(['false', 'false', 'false'])
     expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
       .map((item) => item.dataset.visible)).toEqual(['false', 'true', 'true'])
+
+    wrapper.unmount()
+  })
+
+  it('box selects only visible unlocked active-layer features and exits box mode after selection', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[1].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="lock-selected-features"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('on')
+
+    wrapper.host.querySelector('[data-testid="emit-box-selection"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([false, false, true])
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-3', { directEdit: false })
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('off')
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').disabled).toBe(true)
 
     wrapper.unmount()
   })

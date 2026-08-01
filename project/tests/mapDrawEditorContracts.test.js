@@ -327,6 +327,28 @@ describe('Map draw editor contracts', () => {
     expect(editableSource).toContain("draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })")
   })
 
+  it('supports map box selection for visible unlocked active-layer features', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const editableSource = readSource(editableMapLibrePath)
+
+    expect(panelSource).toContain(`$emit('toggle-feature-box-select')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.boxSelectFeatures')`)
+    expect(tabSource).toContain(':feature-box-select-enabled="isFeatureBoxSelectMode"')
+    expect(tabSource).toContain('@feature-box-select="handleFeatureBoxSelect"')
+    expect(tabSource).toContain(':is-feature-box-select-mode="isFeatureBoxSelectMode"')
+    expect(tabSource).toContain(':can-use-feature-box-select="canUseFeatureBoxSelect"')
+    expect(tabSource).toContain('const isFeatureBoxSelectMode = ref(false);')
+    expect(tabSource).toContain('const handleToggleFeatureBoxSelect = () =>')
+    expect(tabSource).toContain('const handleFeatureBoxSelect = (featureIds = []) =>')
+    expect(tabSource).toContain('const selectableFeatureIdSet = new Set(activeLayerSelectableFeatureIds.value);')
+    expect(tabSource).toContain('@toggle-feature-box-select="handleToggleFeatureBoxSelect"')
+    expect(editableSource).toContain('featureBoxSelectEnabled')
+    expect(editableSource).toContain(`'feature-box-select'`)
+    expect(editableSource).toContain('const buildFeatureIdsInScreenBox = (box) =>')
+    expect(editableSource).toContain("emit('feature-box-select', selectedFeatureIds)")
+  })
+
   it('supports checkbox-based batch visibility and locking for active-layer features', () => {
     const panelSource = readSource(mapDrawToolsPanelPath)
     const tabSource = readSource(mapDrawTabPath)

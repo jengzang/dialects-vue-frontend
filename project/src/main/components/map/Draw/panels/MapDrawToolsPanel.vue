@@ -193,6 +193,16 @@
               </button>
               <button
                 class="main-glass-button draw-tool-inline-button"
+                :data-variant="isFeatureBoxSelectMode ? 'primary' : 'secondary'"
+                :data-active="isFeatureBoxSelectMode"
+                type="button"
+                :disabled="!canUseFeatureBoxSelect"
+                @click="$emit('toggle-feature-box-select')"
+              >
+                {{ t('map.drawTab.buttons.boxSelectFeatures') }}
+              </button>
+              <button
+                class="main-glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="selectedFeatureIds.length === 0"
@@ -618,6 +628,8 @@ const props = defineProps({
   canRedo: { type: Boolean, default: false },
   canEditShape: { type: Boolean, default: false },
   canDuplicateFeature: { type: Boolean, default: false },
+  isFeatureBoxSelectMode: { type: Boolean, default: false },
+  canUseFeatureBoxSelect: { type: Boolean, default: false },
   canModifyActiveLayer: { type: Boolean, default: false },
 })
 
@@ -628,6 +640,7 @@ defineEmits([
   'select-all-features',
   'invert-feature-selection',
   'clear-feature-selection',
+  'toggle-feature-box-select',
   'edit-shape',
   'duplicate-feature',
   'undo',

@@ -103,9 +103,11 @@
             :all-layers="layers"
             :preview-layers="voronoiPreviewLayers"
             :enable-preview-hover="voronoiPreviewLayers.length > 0"
+            :feature-box-select-enabled="isFeatureBoxSelectMode"
             @before-features-change="commitHistory"
             @features-change="handleActiveLayerFeaturesChange"
             @feature-select="handleFeatureSelect"
+            @feature-box-select="handleFeatureBoxSelect"
             @mode-change="handleDrawModeChange"
             @export-image="handleImageExported"
             @export-layer="handleLayerExported"
@@ -145,6 +147,8 @@
           :can-redo="canRedoHistory"
           :can-edit-shape="canEditSelectedShape"
           :can-duplicate-feature="canDuplicateSelectedFeature"
+          :is-feature-box-select-mode="isFeatureBoxSelectMode"
+          :can-use-feature-box-select="canUseFeatureBoxSelect"
           :can-modify-active-layer="canModifyActiveLayer"
           @set-mode="setMode"
           @select-feature="handleSelectFeatureFromPanel"
@@ -152,6 +156,7 @@
           @select-all-features="handleSelectAllFeatures"
           @invert-feature-selection="handleInvertFeatureSelection"
           @clear-feature-selection="resetDrawSelectionMode"
+          @toggle-feature-box-select="handleToggleFeatureBoxSelect"
           @edit-shape="handleEditSelectedShape"
           @duplicate-feature="handleDuplicateSelectedFeature"
           @undo="undoHistory"
@@ -660,6 +665,7 @@ const currentMode = ref('simple_select');
 const currentStyleKey = ref('gaode');
 const selectedFeatureId = ref('');
 const selectedFeatureIds = ref([]);
+const isFeatureBoxSelectMode = ref(false);
 const selectedFeatureBatchName = ref('');
 const selectedFeatureBatchPropertyKey = ref('');
 const selectedFeatureBatchPropertyValue = ref('');
@@ -946,6 +952,9 @@ const canDuplicateSelectedFeature = computed(() => {
     && selectedFeature.value.properties?.visible !== false
     && selectedFeature.value.properties?.locked !== true
   );
+});
+const canUseFeatureBoxSelect = computed(() => {
+  return canModifyActiveLayer.value && activeLayerSelectableFeatureIds.value.length > 0;
 });
 const canMoveSelectedFeatures = computed(() => {
   return Boolean(
@@ -1666,6 +1675,7 @@ const handleCreateLayer = (geometryType) => {
 };
 
 const setMode = (mode) => {
+  isFeatureBoxSelectMode.value = false;
   if (!activeLayer.value && mode !== 'simple_select') {
     const geometryType = mode === 'draw_point'
       ? 'Point'
@@ -1714,6 +1724,7 @@ const syncAllLayersAfterMutation = () => {
 };
 
 const resetDrawSelectionMode = () => {
+  isFeatureBoxSelectMode.value = false;
   clearFeatureSelection();
   currentMode.value = 'simple_select';
   if (editableMapRef.value?.selectFeatures) {
@@ -1893,6 +1904,9 @@ const handleFeatureSelect = (featureId) => {
 
 const handleDrawModeChange = (mode) => {
   currentMode.value = mode || 'simple_select';
+  if (currentMode.value !== 'simple_select') {
+    isFeatureBoxSelectMode.value = false;
+  }
 };
 
 const handleEditSelectedShape = () => {
@@ -2067,6 +2081,27 @@ const handleInvertFeatureSelection = () => {
   const nextFeatureIds = selectableFeatureIds.filter((featureId) => !selectedFeatureIdSet.has(featureId));
   setFeatureSelection(nextFeatureIds, nextFeatureIds[0]);
   syncFeatureSelectionToMap();
+};
+
+const handleToggleFeatureBoxSelect = () => {
+  if (!canUseFeatureBoxSelect.value) {
+    isFeatureBoxSelectMode.value = false;
+    return;
+  }
+  isFeatureBoxSelectMode.value = !isFeatureBoxSelectMode.value;
+  if (!isFeatureBoxSelectMode.value) return;
+  currentMode.value = 'simple_select';
+  editableMapRef.value?.setDrawMode?.('simple_select');
+};
+
+const handleFeatureBoxSelect = (featureIds = []) => {
+  const selectableFeatureIdSet = new Set(activeLayerSelectableFeatureIds.value);
+  const nextFeatureIds = featureIds
+    .map((featureId) => String(featureId || ''))
+    .filter((featureId) => selectableFeatureIdSet.has(featureId));
+  setFeatureSelection(nextFeatureIds, nextFeatureIds[0]);
+  syncFeatureSelectionToMap();
+  isFeatureBoxSelectMode.value = false;
 };
 
 const handleDeleteSelectedFeatures = () => {

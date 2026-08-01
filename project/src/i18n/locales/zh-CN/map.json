@@ -488,6 +488,7 @@
       "selectAllFeatures": "全选可编辑",
       "invertFeatureSelection": "反选可编辑",
       "clearFeatureSelection": "清空勾选",
+      "boxSelectFeatures": "框选可编辑",
       "hideSelectedFeatures": "隐藏勾选",
       "showSelectedFeatures": "显示勾选",
       "lockSelectedFeatures": "锁定勾选",

@@ -10,17 +10,37 @@ vi.mock('maplibre-gl', () => {
       this.handlers = new Map()
       this.sources = new Map()
       this.layers = new Map()
+      this.canvas = {
+        style: {},
+        getBoundingClientRect: () => ({
+          left: 0,
+          top: 0,
+          width: 100,
+          height: 100,
+        }),
+      }
       this.setStyle = vi.fn(() => {
         this.sources.clear()
         this.layers.clear()
       })
+      this.queryRenderedFeatures = vi.fn(() => [])
+      this.dragPan = {
+        enabled: true,
+        isEnabled: vi.fn(() => this.dragPan.enabled),
+        disable: vi.fn(() => {
+          this.dragPan.enabled = false
+        }),
+        enable: vi.fn(() => {
+          this.dragPan.enabled = true
+        }),
+      }
       mapInstances.push(this)
     }
 
     addControl() {}
     remove() {}
     getCanvas() {
-      return { style: {} }
+      return this.canvas
     }
     getCanvasContainer() {
       return {}
@@ -83,6 +103,9 @@ vi.mock('maplibre-gl', () => {
     }
     getPitch() {
       return 0
+    }
+    project([longitude, latitude]) {
+      return { x: longitude, y: latitude }
     }
   }
 
@@ -154,6 +177,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
   const allLayers = ref(options.allLayers ?? [])
   const previewLayers = ref(options.previewLayers ?? [])
   const enablePreviewHover = ref(options.enablePreviewHover ?? false)
+  const featureBoxSelectEnabled = ref(options.featureBoxSelectEnabled ?? false)
 
   const Root = defineComponent({
     components: { EditableMapLibre },
@@ -166,6 +190,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
         allLayers,
         previewLayers,
         enablePreviewHover,
+        featureBoxSelectEnabled,
         events,
       }
     },
@@ -178,9 +203,11 @@ function mountEditableMapLibre(modelValue, options = {}) {
         :all-layers="allLayers"
         :preview-layers="previewLayers"
         :enable-preview-hover="enablePreviewHover"
+        :feature-box-select-enabled="featureBoxSelectEnabled"
         @before-features-change="events.push(['before-features-change'])"
         @features-change="events.push(['features-change', $event])"
         @feature-select="events.push(['feature-select', $event])"
+        @feature-box-select="events.push(['feature-box-select', $event])"
         @mode-change="events.push(['mode-change', $event])"
       />
     `,
@@ -201,6 +228,8 @@ function mountEditableMapLibre(modelValue, options = {}) {
       return mapInstances.at(-1)
     },
     currentStyleKey,
+    featureBoxSelectEnabled,
+    host,
     unmount() {
       app.unmount()
       host.remove()
@@ -364,6 +393,50 @@ describe('EditableMapLibre state flow', () => {
     }, { emitChanges: false, emitSelection: false })
 
     expect(wrapper.events.some(([eventName]) => eventName === 'feature-select')).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('captures box selection pointer events above the map without emitting draw updates', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [[[20, 20], [30, 20], [30, 30], [20, 20]]] },
+      }],
+    }, { featureBoxSelectEnabled: true })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const captureLayer = wrapper.host.querySelector('.editable-map-box-select-capture')
+    expect(captureLayer).toBeTruthy()
+    const wasCanceled = !captureLayer.dispatchEvent(new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      clientX: 10,
+      clientY: 10,
+    }))
+    document.dispatchEvent(new MouseEvent('mousemove', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 40,
+      clientY: 40,
+    }))
+    document.dispatchEvent(new MouseEvent('mouseup', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 40,
+      clientY: 40,
+    }))
+    await nextTick()
+
+    expect(wasCanceled).toBe(true)
+    expect(wrapper.events).toContainEqual(['feature-box-select', ['polygon-1']])
+    expect(wrapper.events.some(([eventName]) => eventName === 'before-features-change')).toBe(false)
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
 
     wrapper.unmount()
   })

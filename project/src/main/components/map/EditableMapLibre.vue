@@ -1,6 +1,19 @@
 <template>
   <div class="editable-map-shell main-glass-panel">
     <div ref="mapContainer" class="editable-map-stage" />
+    <div
+      v-if="props.featureBoxSelectEnabled"
+      class="editable-map-box-select-capture"
+      @mousedown.prevent.stop="handleFeatureBoxMouseDown"
+      @mousemove.prevent.stop="handleFeatureBoxMouseMove"
+      @mouseup.prevent.stop="handleFeatureBoxMouseUp"
+    >
+      <div
+        v-if="featureBoxOverlayStyle"
+        class="editable-map-box-select-overlay"
+        :style="featureBoxOverlayStyle"
+      />
+    </div>
   </div>
 </template>
 
@@ -84,6 +97,12 @@ const drawStyles = [
     },
   },
 ]
+const featureBoxSelectableLayerIds = [
+  'gl-draw-polygon-fill',
+  'gl-draw-polygon-stroke',
+  'gl-draw-line',
+  'gl-draw-point',
+]
 
 const props = defineProps({
   modelValue: {
@@ -113,6 +132,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  featureBoxSelectEnabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits([
@@ -125,6 +148,7 @@ const emit = defineEmits([
   'export-layer',
   'update:currentStyleKey',
   'preview-feature-hover',
+  'feature-box-select',
 ])
 
 const mapContainer = ref(null)
@@ -133,11 +157,15 @@ const draw = shallowRef(null)
 const selectedFeatureId = ref('')
 const currentStyleKey = ref(props.currentStyleKey || 'gaode')
 const isFullscreen = ref(false)
+const isFeatureBoxDragging = ref(false)
+const featureBoxStartPoint = ref(null)
+const featureBoxEndPoint = ref(null)
 let previousPreviewSourceIds = []
 let hoveredFeatureKey = null
 let hoveredFeatureSource = null
 let previewHoverBound = false
 let suppressedProgrammaticFeatureSelectionIds = null
+let featureBoxDragPanWasEnabled = true
 const sanitizeLayerFilename = (layerName) => {
   return String(layerName || 'map-draw-layer')
     .trim()
@@ -505,6 +533,209 @@ const selectFeatures = (featureIds = []) => {
   draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })
   emit('mode-change', 'simple_select')
   selectedFeatureId.value = selectedIds[0] || ''
+}
+
+const normalizeFeatureBoxPoint = (point) => {
+  if (Number.isFinite(Number(point?.x)) && Number.isFinite(Number(point?.y))) {
+    return {
+      x: Number(point.x),
+      y: Number(point.y),
+    }
+  }
+
+  const clientX = point?.clientX ?? point?.originalEvent?.clientX
+  const clientY = point?.clientY ?? point?.originalEvent?.clientY
+  const rect = map.value?.getCanvas?.()?.getBoundingClientRect?.()
+  if (Number.isFinite(Number(clientX)) && Number.isFinite(Number(clientY)) && rect) {
+    return {
+      x: Number(clientX) - rect.left,
+      y: Number(clientY) - rect.top,
+    }
+  }
+
+  return { x: 0, y: 0 }
+}
+
+const buildScreenBox = (startPoint, endPoint) => ({
+  minX: Math.min(startPoint.x, endPoint.x),
+  minY: Math.min(startPoint.y, endPoint.y),
+  maxX: Math.max(startPoint.x, endPoint.x),
+  maxY: Math.max(startPoint.y, endPoint.y),
+})
+
+const isPointInScreenBox = (point, box) => {
+  return point.x >= box.minX
+    && point.x <= box.maxX
+    && point.y >= box.minY
+    && point.y <= box.maxY
+}
+
+const getDrawFeatureId = (feature) => String(feature?.id ?? feature?.properties?.id ?? '')
+
+const isFeatureBoxSelectableFeature = (featureId) => {
+  const feature = draw.value?.get?.(featureId)
+  return Boolean(
+    feature
+    && feature.properties?.visible !== false
+    && feature.properties?.locked !== true
+  )
+}
+
+const collectProjectedFeaturePoints = (coordinates, points = []) => {
+  if (!Array.isArray(coordinates)) return points
+  const longitude = Number(coordinates[0])
+  const latitude = Number(coordinates[1])
+  if (
+    coordinates.length >= 2
+    && Number.isFinite(longitude)
+    && Number.isFinite(latitude)
+  ) {
+    points.push(map.value.project([longitude, latitude]))
+    return points
+  }
+  coordinates.forEach((childCoordinates) => {
+    collectProjectedFeaturePoints(childCoordinates, points)
+  })
+  return points
+}
+
+const featureIntersectsScreenBox = (feature, box) => {
+  if (!map.value || !feature?.geometry) return false
+  return collectProjectedFeaturePoints(feature.geometry.coordinates)
+    .some((point) => isPointInScreenBox(point, box))
+}
+
+const buildRenderedFeatureIdsInScreenBox = (box) => {
+  if (!map.value) return []
+  const layerIds = featureBoxSelectableLayerIds
+    .filter((layerId) => map.value.getLayer?.(layerId))
+  if (layerIds.length === 0) return []
+
+  try {
+    return map.value.queryRenderedFeatures(
+      [[box.minX, box.minY], [box.maxX, box.maxY]],
+      { layers: layerIds }
+    )
+      .map(getDrawFeatureId)
+      .filter((featureId) => featureId && isFeatureBoxSelectableFeature(featureId))
+  } catch {
+    return []
+  }
+}
+
+const buildGeometryFeatureIdsInScreenBox = (box) => {
+  return (normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue).features ?? [])
+    .filter((feature) => {
+      const featureId = getDrawFeatureId(feature)
+      return featureId
+        && isFeatureBoxSelectableFeature(featureId)
+        && featureIntersectsScreenBox(feature, box)
+    })
+    .map(getDrawFeatureId)
+}
+
+const buildFeatureIdsInScreenBox = (box) => {
+  const selectedFeatureIdSet = new Set([
+    ...buildRenderedFeatureIdsInScreenBox(box),
+    ...buildGeometryFeatureIdsInScreenBox(box),
+  ])
+  return (normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue).features ?? [])
+    .map(getDrawFeatureId)
+    .filter((featureId) => selectedFeatureIdSet.has(featureId))
+}
+
+const featureBoxOverlayStyle = computed(() => {
+  if (!isFeatureBoxDragging.value || !featureBoxStartPoint.value || !featureBoxEndPoint.value) return null
+  const box = buildScreenBox(featureBoxStartPoint.value, featureBoxEndPoint.value)
+  return {
+    left: `${box.minX}px`,
+    top: `${box.minY}px`,
+    width: `${Math.max(box.maxX - box.minX, 1)}px`,
+    height: `${Math.max(box.maxY - box.minY, 1)}px`,
+  }
+})
+
+const syncFeatureBoxCursor = () => {
+  const canvas = map.value?.getCanvas?.()
+  if (!canvas) return
+  canvas.style.cursor = props.featureBoxSelectEnabled ? 'crosshair' : ''
+}
+
+const restoreFeatureBoxDragPan = () => {
+  if (featureBoxDragPanWasEnabled) {
+    map.value?.dragPan?.enable?.()
+  }
+}
+
+const unbindFeatureBoxDocumentListeners = () => {
+  document.removeEventListener('mousemove', handleFeatureBoxDocumentMouseMove)
+  document.removeEventListener('mouseup', handleFeatureBoxDocumentMouseUp)
+}
+
+const resetFeatureBoxSelection = () => {
+  const wasDragging = isFeatureBoxDragging.value
+  isFeatureBoxDragging.value = false
+  featureBoxStartPoint.value = null
+  featureBoxEndPoint.value = null
+  unbindFeatureBoxDocumentListeners()
+  if (wasDragging) {
+    restoreFeatureBoxDragPan()
+  }
+  syncFeatureBoxCursor()
+}
+
+const finishFeatureBoxSelection = (point) => {
+  if (!isFeatureBoxDragging.value || !featureBoxStartPoint.value) return
+  featureBoxEndPoint.value = point
+  const box = buildScreenBox(featureBoxStartPoint.value, featureBoxEndPoint.value)
+  const selectedFeatureIds = buildFeatureIdsInScreenBox(box)
+  resetFeatureBoxSelection()
+  selectFeatures(selectedFeatureIds)
+  emit('feature-box-select', selectedFeatureIds)
+}
+
+const handleFeatureBoxMouseDown = (event) => {
+  const button = event?.originalEvent?.button ?? event?.button
+  if (!props.featureBoxSelectEnabled || !map.value || (button !== undefined && button !== 0)) return
+
+  event?.preventDefault?.()
+  event?.originalEvent?.preventDefault?.()
+  event?.originalEvent?.stopPropagation?.()
+  featureBoxDragPanWasEnabled = map.value.dragPan?.isEnabled?.() ?? true
+  if (featureBoxDragPanWasEnabled) {
+    map.value.dragPan?.disable?.()
+  }
+  featureBoxStartPoint.value = normalizeFeatureBoxPoint(event.point ?? event)
+  featureBoxEndPoint.value = featureBoxStartPoint.value
+  isFeatureBoxDragging.value = true
+  document.addEventListener('mousemove', handleFeatureBoxDocumentMouseMove)
+  document.addEventListener('mouseup', handleFeatureBoxDocumentMouseUp)
+}
+
+const handleFeatureBoxMouseMove = (event) => {
+  if (!isFeatureBoxDragging.value) return
+  event?.preventDefault?.()
+  event?.stopPropagation?.()
+  featureBoxEndPoint.value = normalizeFeatureBoxPoint(event.point ?? event)
+}
+
+const handleFeatureBoxMouseUp = (event) => {
+  event?.preventDefault?.()
+  event?.stopPropagation?.()
+  finishFeatureBoxSelection(normalizeFeatureBoxPoint(event.point ?? event))
+}
+
+const handleFeatureBoxDocumentMouseMove = (event) => {
+  if (!isFeatureBoxDragging.value) return
+  event?.preventDefault?.()
+  event?.stopPropagation?.()
+  featureBoxEndPoint.value = normalizeFeatureBoxPoint(event)
+}
+
+const handleFeatureBoxDocumentMouseUp = (event) => {
+  event?.preventDefault?.()
+  event?.stopPropagation?.()
+  finishFeatureBoxSelection(normalizeFeatureBoxPoint(event))
 }
 
 const updateFeatureProperties = (featureId, nextProperties, options = {}) => {
@@ -917,6 +1148,7 @@ const initializeMap = async () => {
   map.value.on('styledata', () => {
     syncReadonlyLayers()
   })
+  syncFeatureBoxCursor()
 }
 
 const gatherPreviewFillLayerIds = () => {
@@ -946,12 +1178,13 @@ const resetHoveredFeature = () => {
   hoveredFeatureKey = null
   hoveredFeatureSource = null
   if (map.value) {
-    map.value.getCanvas().style.cursor = ''
+    syncFeatureBoxCursor()
   }
   emit('preview-feature-hover', null)
 }
 
 const onPreviewMouseMove = (e) => {
+  if (props.featureBoxSelectEnabled) return
   const fillLayerIds = gatherPreviewFillLayerIds()
   const pointLayerIds = gatherPreviewPointLayerIds()
   const allLayerIds = [...fillLayerIds, ...pointLayerIds]
@@ -1096,6 +1329,18 @@ watch(
 )
 
 watch(
+  () => props.featureBoxSelectEnabled,
+  (enabled) => {
+    if (!enabled) {
+      resetFeatureBoxSelection()
+      return
+    }
+    resetHoveredFeature()
+    syncFeatureBoxCursor()
+  }
+)
+
+watch(
   () => props.previewLayers,
   () => {
     if (!map.value) return
@@ -1124,6 +1369,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('fullscreenchange', syncFullscreenState)
+  resetFeatureBoxSelection()
   unbindPreviewHover()
   if (map.value) {
     map.value.remove()
@@ -1159,6 +1405,7 @@ defineExpose({
 
 <style scoped lang="scss">
 .editable-map-shell {
+  position: relative;
   width: 100%;
   min-height: 80dvh;
   overflow: hidden;
@@ -1175,6 +1422,21 @@ defineExpose({
   @media (max-aspect-ratio:1/1) {
     min-height: 70dvh;
   }
+}
+
+.editable-map-box-select-capture {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  cursor: crosshair;
+}
+
+.editable-map-box-select-overlay {
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid rgba(37, 99, 235, 0.85);
+  background: rgba(59, 130, 246, 0.16);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.72) inset;
 }
 
 :deep(.draw-control-container) {

@@ -488,6 +488,7 @@
       "selectAllFeatures": "Select Editable",
       "invertFeatureSelection": "Invert Editable",
       "clearFeatureSelection": "Clear Checked",
+      "boxSelectFeatures": "Box Select",
       "hideSelectedFeatures": "Hide Checked",
       "showSelectedFeatures": "Show Checked",
       "lockSelectedFeatures": "Lock Checked",
