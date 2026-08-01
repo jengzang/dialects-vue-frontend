@@ -1,4 +1,5 @@
 import { getCurrentRuntimePlatform } from '@/platform/index.js'
+import { createPraatLocalBridge } from '@/platform/praatLocal.js'
 
 function normalizePraatTarget(target) {
   return target === 'ios' || target === 'android' ? target : 'web'
@@ -60,7 +61,7 @@ export function createPraatLocalEngine(bridge = null) {
   }
 }
 
-export function usePraatAnalysis({ api, localBridge = null, runtime = getCurrentRuntimePlatform() } = {}) {
+export function usePraatAnalysis({ api, localBridge = createPraatLocalBridge(), runtime = getCurrentRuntimePlatform() } = {}) {
   const remoteEngine = createPraatRemoteEngine(api)
   const localEngine = createPraatLocalEngine(localBridge)
   const strategy = resolvePraatAnalysisStrategy(runtime.family, {

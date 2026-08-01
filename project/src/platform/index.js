@@ -38,6 +38,11 @@ export {
   PRAAT_PLATFORM_CAPABILITIES,
 } from './praatCapabilities.js'
 export {
+  createPraatLocalBridge,
+  hasPraatLocalBridge,
+  PRAAT_LOCAL_TEMPORARY_AUDIO_POLICY,
+} from './praatLocal.js'
+export {
   initializePlatformServices,
   resetPlatformServicesForTests,
 } from './bootstrap.js'

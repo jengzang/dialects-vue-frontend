@@ -316,6 +316,22 @@ export function praat() {
     }
   }
 
+  /**
+   * 上报本地 Praat 分析记录，用于排行榜与统计。
+   * 本接口只同步 run metadata / summary，不上传原始音频。
+   */
+  const reportLocalPraatRun = async (payload) => {
+    try {
+      return await api('/api/tools/praat/local-runs', {
+        method: 'POST',
+        body: payload,
+      })
+    } catch (error) {
+      console.error('Report local Praat run error:', error)
+      throw new Error(error.message || '同步本地 Praat 分析記錄失敗')
+    }
+  }
+
 
   // ========== 4. 高级功能：轮询任务直到完成 ==========
 
@@ -444,6 +460,7 @@ export function praat() {
     getJobStatus,
     getJobResult,
     cancelJob,
+    reportLocalPraatRun,
 
     // 高级功能
     pollUntilComplete,
