@@ -623,6 +623,7 @@
       "clipBoundaryLevelCountry": "Country",
       "clipBoundaryLevelProvinces": "Provinces",
       "clipBoundaryLevelCities": "Cities",
+      "clipBoundaryLevelCounties": "Counties",
       "clipBoundaryDisabled": "No Clipping",
       "clipBoundarySummaryDisabled": "Not Set",
       "clipBoundaryNoOptions": "No options available",

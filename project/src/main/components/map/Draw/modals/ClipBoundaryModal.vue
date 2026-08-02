@@ -85,7 +85,7 @@ const props = defineProps({
   },
   boundaryOptions: {
     type: Object,
-    default: () => ({ country: [], provinces: [], cities: [] }),
+    default: () => ({ country: [], provinces: [], cities: [], counties: [] }),
   },
   mode: {
     type: String,
@@ -106,6 +106,7 @@ const levelOptions = computed(() => [
   { label: t('map.drawTab.voronoi.clipBoundaryLevelCountry'), value: 'country' },
   { label: t('map.drawTab.voronoi.clipBoundaryLevelProvinces'), value: 'provinces' },
   { label: t('map.drawTab.voronoi.clipBoundaryLevelCities'), value: 'cities' },
+  { label: t('map.drawTab.voronoi.clipBoundaryLevelCounties'), value: 'counties' },
 ]);
 
 const currentOptions = computed(() => {

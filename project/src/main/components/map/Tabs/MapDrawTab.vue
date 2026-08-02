@@ -714,6 +714,7 @@ import { featureCollection } from '@turf/turf';
 import nationalBorderGeoJsonUrl from '/data/gis/china_country.geojson?url';
 import provincesGeoJsonUrl from '/data/gis/china_provinces.geojson?url';
 import citiesGeoJsonUrl from '/data/gis/china_cities_simplified_balanced.geojson?url';
+import countiesGeoJsonUrl from '/data/gis/china_counties_simplified_light.geojson?url';
 import riversL1GeoJsonUrl from '/data/gis/china_rivers_l1.geojson?url';
 import riversL2GeoJsonUrl from '/data/gis/china_rivers_l2.geojson?url';
 import riversL3GeoJsonUrl from '/data/gis/china_rivers_l3.geojson?url';
@@ -795,6 +796,7 @@ let layerIdSeed = 0;
 let nationalBorderPreparedCache = null;
 const provincesGeoJsonCache = ref(null);
 const citiesGeoJsonCache = ref(null);
+const countiesGeoJsonCache = ref(null);
 const riversL1Cache = ref(null);
 const riversL2Cache = ref(null);
 const riversL3Cache = ref(null);
@@ -1356,10 +1358,15 @@ const boundaryOptionsMap = computed(() => {
     .map((f) => f?.properties?.name)
     .filter(Boolean)
     .map((name) => ({ label: name, value: name }));
+  const countiesOpts = (countiesGeoJsonCache.value?.features ?? [])
+    .map((f) => f?.properties?.name)
+    .filter(Boolean)
+    .map((name) => ({ label: name, value: name }));
   return {
     country: countryOpts,
     provinces: provincesOpts,
     cities: citiesOpts,
+    counties: countiesOpts,
   };
 });
 
@@ -1377,6 +1384,7 @@ const levelOptionsMap = {
   country: '国界',
   provinces: '省界',
   cities: '市界',
+  counties: '县界',
 };
 
 const setVoronoiStatus = (key, params = {}) => {
@@ -1600,14 +1608,23 @@ const loadCitiesGeoJson = async () => {
   return citiesGeoJsonCache.value;
 };
 
+const loadCountiesGeoJson = async () => {
+  if (countiesGeoJsonCache.value) return countiesGeoJsonCache.value;
+  const response = await fetch(countiesGeoJsonUrl);
+  if (!response.ok) throw new Error(`Failed to load counties GeoJSON: ${response.status}`);
+  countiesGeoJsonCache.value = await response.json();
+  return countiesGeoJsonCache.value;
+};
+
 const loadBorderFeatureCollection = async (level, selectedNames) => {
   if (level === 'country') {
     return loadNationalBorderFeatureCollection();
   }
 
-  const geoJson = level === 'provinces'
-    ? await loadProvincesGeoJson()
-    : await loadCitiesGeoJson();
+  let geoJson;
+  if (level === 'provinces') geoJson = await loadProvincesGeoJson();
+  else if (level === 'counties') geoJson = await loadCountiesGeoJson();
+  else geoJson = await loadCitiesGeoJson();
 
   const filteredFeatures = (geoJson.features ?? []).filter(
     (f) => selectedNames.includes(f?.properties?.name)
@@ -1627,6 +1644,7 @@ const handleOpenClipBoundary = () => {
   Promise.all([
     loadProvincesGeoJson().catch(() => {}),
     loadCitiesGeoJson().catch(() => {}),
+    loadCountiesGeoJson().catch(() => {}),
   ]).finally(() => {
     isBoundaryOptionsLoading.value = false;
   });
@@ -1643,6 +1661,7 @@ const onAdminBoundaryClicked = () => {
   Promise.all([
     loadProvincesGeoJson().catch(() => {}),
     loadCitiesGeoJson().catch(() => {}),
+    loadCountiesGeoJson().catch(() => {}),
   ]).finally(() => {
     isBoundaryOptionsLoading.value = false;
   });
@@ -1661,8 +1680,10 @@ const handleImportBoundaryConfirm = async (config) => {
     geoJson = await response.json();
   } else if (level === 'provinces') {
     geoJson = await loadProvincesGeoJson();
-  } else {
+  } else if (level === 'cities') {
     geoJson = await loadCitiesGeoJson();
+  } else {
+    geoJson = await loadCountiesGeoJson();
   }
 
   const filteredFeatures = (geoJson.features ?? []).filter(
@@ -1678,7 +1699,9 @@ const handleImportBoundaryConfirm = async (config) => {
     ? t('map.drawTab.voronoi.clipBoundaryLevelCountry')
     : level === 'provinces'
       ? t('map.drawTab.voronoi.clipBoundaryLevelProvinces')
-      : t('map.drawTab.voronoi.clipBoundaryLevelCities');
+      : level === 'cities'
+        ? t('map.drawTab.voronoi.clipBoundaryLevelCities')
+        : t('map.drawTab.voronoi.clipBoundaryLevelCounties');
 
   commitHistory();
   const layer = createEmptyLayer('Polygon');

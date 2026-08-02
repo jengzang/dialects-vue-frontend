@@ -623,6 +623,7 @@
       "clipBoundaryLevelCountry": "国界",
       "clipBoundaryLevelProvinces": "省界",
       "clipBoundaryLevelCities": "市界",
+      "clipBoundaryLevelCounties": "县界",
       "clipBoundaryDisabled": "不裁剪",
       "clipBoundarySummaryDisabled": "未设置",
       "clipBoundaryNoOptions": "暂无可选区域",
