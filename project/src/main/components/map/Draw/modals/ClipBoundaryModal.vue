@@ -2,7 +2,7 @@
   <AppModal
     :model-value="modelValue"
     size="md"
-    :title="t('map.drawTab.voronoi.clipBoundarySettings')"
+    :title="mode === 'import' ? t('map.drawTab.voronoi.clipBoundaryImportTitle') : t('map.drawTab.voronoi.clipBoundarySettings')"
     @update:modelValue="handleClose"
   >
     <div class="clip-boundary-modal">
@@ -59,7 +59,7 @@
           :disabled="localSelected.length === 0"
           @click="handleConfirm"
         >
-          {{ t('map.drawTab.voronoi.confirmExport') }}
+          {{ mode === 'import' ? t('map.drawTab.voronoi.clipBoundaryConfirmImport') : t('map.drawTab.voronoi.confirmExport') }}
         </button>
       </div>
     </template>
@@ -82,6 +82,11 @@ const props = defineProps({
   boundaryOptions: {
     type: Object,
     default: () => ({ country: [], provinces: [], cities: [] }),
+  },
+  mode: {
+    type: String,
+    default: 'clip',
+    validator: (value) => ['clip', 'import'].includes(value),
   },
 });
 
@@ -146,11 +151,14 @@ function handleClose() {
 }
 
 function handleConfirm() {
-  emit('confirm', {
-    enabled: true,
+  const payload = {
     level: localLevel.value,
     selectedNames: [...localSelected.value],
-  });
+  };
+  if (props.mode !== 'import') {
+    payload.enabled = true;
+  }
+  emit('confirm', payload);
   emit('update:modelValue', false);
 }
 </script>

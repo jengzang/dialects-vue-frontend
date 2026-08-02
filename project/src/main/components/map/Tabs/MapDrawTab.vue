@@ -321,6 +321,22 @@
               </div>
             </div>
           </button>
+
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            @click="onAdminBoundaryClicked"
+          >
+            <span class="draw-card-icon">🗺️</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.adminBoundary') }}
+              </div>
+              <div class="draw-card-desc">
+                {{ t('map.drawTab.buttons.adminBoundaryDesc') }}
+              </div>
+            </div>
+          </button>
         </div>
       </AppModal>
 
@@ -530,6 +546,14 @@
         :boundary-config="clipBoundaryConfig"
         :boundary-options="boundaryOptionsMap"
         @confirm="handleClipBoundaryConfirm"
+      />
+
+      <ClipBoundaryModal
+        v-model="showImportBoundaryModal"
+        mode="import"
+        :boundary-config="importBoundaryConfig"
+        :boundary-options="boundaryOptionsMap"
+        @confirm="handleImportBoundaryConfirm"
       />
 
       <div v-if="showVoronoiExportProgressOverlay" class="voronoi-export-progress-overlay">
@@ -785,6 +809,8 @@ const clipBoundaryConfig = ref({
   selectedNames: [],
 });
 const showClipBoundaryModal = ref(false);
+const showImportBoundaryModal = ref(false);
+const importBoundaryConfig = ref({ level: 'country', selectedNames: [] });
 const isVoronoiExporting = ref(false);
 const activeFeatureId = computed(() => activeLayerId.value);
 
@@ -1569,6 +1595,54 @@ const handleOpenClipBoundary = async () => {
 
 const handleClipBoundaryConfirm = (config) => {
   clipBoundaryConfig.value = { ...config };
+};
+
+const onAdminBoundaryClicked = async () => {
+  showAddLayerModal.value = false;
+  try { await loadProvincesGeoJson(); } catch { /* ignore */ }
+  try { await loadCitiesGeoJson(); } catch { /* ignore */ }
+  showImportBoundaryModal.value = true;
+};
+
+const handleImportBoundaryConfirm = async (config) => {
+  const { level, selectedNames } = config;
+
+  let geoJson;
+  if (level === 'country') {
+    const response = await fetch(nationalBorderGeoJsonUrl);
+    if (!response.ok) {
+      showError('Failed to load country GeoJSON');
+      return;
+    }
+    geoJson = await response.json();
+  } else if (level === 'provinces') {
+    geoJson = await loadProvincesGeoJson();
+  } else {
+    geoJson = await loadCitiesGeoJson();
+  }
+
+  const filteredFeatures = (geoJson.features ?? []).filter(
+    (f) => level === 'country' || selectedNames.includes(f?.properties?.name),
+  );
+
+  if (!filteredFeatures.length) {
+    showError(t('map.drawTab.voronoi.clipBoundaryNoOptions'));
+    return;
+  }
+
+  const levelLabel = level === 'country'
+    ? t('map.drawTab.voronoi.clipBoundaryLevelCountry')
+    : level === 'provinces'
+      ? t('map.drawTab.voronoi.clipBoundaryLevelProvinces')
+      : t('map.drawTab.voronoi.clipBoundaryLevelCities');
+
+  commitHistory();
+  const layer = createEmptyLayer('Polygon');
+  layer.name = `${t('map.drawTab.buttons.adminBoundary')}-${levelLabel}`;
+  layer.featureCollection = { type: 'FeatureCollection', features: filteredFeatures };
+  layer.fillOpacity = 0.12;
+  layers.value.push(layer);
+  activeLayerId.value = layer.id;
 };
 
 const ensureVoronoiPointsLoaded = async () => {
