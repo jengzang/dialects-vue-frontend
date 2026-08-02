@@ -516,12 +516,20 @@
         :selected-count="selectedVoronoiExportCount"
         :export-limit="voronoiExportLimit"
         :is-selection-full="isVoronoiExportSelectionFull"
-        :clip-to-national-border="clipVoronoiToNationalBorder"
+        :clip-boundary-config="clipBoundaryConfig"
+        :clip-boundary-summary="clipBoundarySummary"
         :is-exporting="isVoronoiExporting"
-        @update:clip-to-national-border="handleClipVoronoiToggle"
+        @open-clip-boundary="handleOpenClipBoundary"
         @toggle-selection="toggleVoronoiExportSelection"
         @clear-selection="voronoiExportSelections = []"
         @confirm="confirmVoronoiExport"
+      />
+
+      <ClipBoundaryModal
+        v-model="showClipBoundaryModal"
+        :boundary-config="clipBoundaryConfig"
+        :boundary-options="boundaryOptionsMap"
+        @confirm="handleClipBoundaryConfirm"
       />
 
       <div v-if="showVoronoiExportProgressOverlay" class="voronoi-export-progress-overlay">
@@ -656,11 +664,13 @@ import { useRoute } from 'vue-router';
 import { featureCollection } from '@turf/turf';
 
 import nationalBorderGeoJsonUrl from '/data/gis/china_country.geojson?url';
+import provincesGeoJsonUrl from '/data/gis/china_provinces.geojson?url';
+import citiesGeoJsonUrl from '/data/gis/china_cities_simplified_light.geojson?url';
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import { showConfirm, showError, showSuccess, showWarning } from '@/utils/ui/message.js';
-import { readImportedLayerFile, readKmzArrayBuffer, splitFeatureCollectionByGeometryType } from '@/main/utils/drawMap/export.js';
+import { readImportedLayerFile, splitFeatureCollectionByGeometryType } from '@/main/utils/drawMap/export.js';
 import { createMapDrawHistory } from '@/main/utils/drawMap/history.js';
 import {
   AUTO_DRAFT_ID,
@@ -698,6 +708,7 @@ import MapDrawImagePreviewModal from '@/main/components/map/Draw/modals/MapDrawI
 import VoronoiExportLayersModal from '@/main/components/map/Draw/modals/VoronoiExportLayersModal.vue';
 import VoronoiIgnorePointsModal from '@/main/components/map/Draw/modals/VoronoiIgnorePointsModal.vue';
 import VoronoiFieldMergeModal from '@/main/components/map/Draw/modals/VoronoiFieldMergeModal.vue';
+import ClipBoundaryModal from '@/main/components/map/Draw/modals/ClipBoundaryModal.vue';
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue';
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js';
 import { useVoronoiCustomImport } from '@/composables/import/useVoronoiCustomImport.js';
@@ -730,6 +741,8 @@ const nationalBorderAssetCacheName = 'map-draw-assets';
 const voronoiExportLimit = 20;
 let layerIdSeed = 0;
 let nationalBorderPreparedCache = null;
+const provincesGeoJsonCache = ref(null);
+const citiesGeoJsonCache = ref(null);
 
 const editableMapRef = ref(null);
 const importInputRef = ref(null);
@@ -766,7 +779,12 @@ const savedWorkbenchSignature = ref('');
 const isRestoringAutoDraft = ref(false);
 const pendingAutoDraftSaves = new Set();
 
-const clipVoronoiToNationalBorder = ref(false);
+const clipBoundaryConfig = ref({
+  enabled: false,
+  level: 'country',
+  selectedNames: [],
+});
+const showClipBoundaryModal = ref(false);
 const isVoronoiExporting = ref(false);
 const activeFeatureId = computed(() => activeLayerId.value);
 
@@ -1268,6 +1286,39 @@ const voronoiExportGroups = computed(() => {
 const selectedVoronoiExportCount = computed(() => voronoiExportSelections.value.length);
 const isVoronoiExportSelectionFull = computed(() => selectedVoronoiExportCount.value >= voronoiExportLimit);
 
+const boundaryOptionsMap = computed(() => {
+  const countryOpts = [{ label: t('map.drawTab.voronoi.clipBoundaryLevelCountry'), value: '中国' }];
+  const provincesOpts = (provincesGeoJsonCache.value?.features ?? [])
+    .map((f) => f?.properties?.name)
+    .filter(Boolean)
+    .map((name) => ({ label: name, value: name }));
+  const citiesOpts = (citiesGeoJsonCache.value?.features ?? [])
+    .map((f) => f?.properties?.name)
+    .filter(Boolean)
+    .map((name) => ({ label: name, value: name }));
+  return {
+    country: countryOpts,
+    provinces: provincesOpts,
+    cities: citiesOpts,
+  };
+});
+
+const clipBoundarySummary = computed(() => {
+  if (!clipBoundaryConfig.value.enabled) {
+    return t('map.drawTab.voronoi.clipBoundarySettings');
+  }
+  const levelLabel = levelOptionsMap[clipBoundaryConfig.value.level] || '';
+  const names = clipBoundaryConfig.value.selectedNames;
+  if (!names.length) return levelLabel;
+  return `${levelLabel} · ${names.slice(0, 3).join(', ')}${names.length > 3 ? '...' : ''}`;
+});
+
+const levelOptionsMap = {
+  country: '国界',
+  provinces: '省界',
+  cities: '市界',
+};
+
 const setVoronoiStatus = (key, params = {}) => {
   voronoiStatusText.value = t(`map.drawTab.voronoi.${key}`, params);
 };
@@ -1469,6 +1520,57 @@ const loadNationalBorderFeatureCollection = async () => {
   return nationalBorderPreparedCache;
 };
 
+const loadProvincesGeoJson = async () => {
+  if (provincesGeoJsonCache.value) return provincesGeoJsonCache.value;
+  const response = await fetch(provincesGeoJsonUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to load provinces GeoJSON: ${response.status}`);
+  }
+  provincesGeoJsonCache.value = await response.json();
+  return provincesGeoJsonCache.value;
+};
+
+const loadCitiesGeoJson = async () => {
+  if (citiesGeoJsonCache.value) return citiesGeoJsonCache.value;
+  const response = await fetch(citiesGeoJsonUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to load cities GeoJSON: ${response.status}`);
+  }
+  citiesGeoJsonCache.value = await response.json();
+  return citiesGeoJsonCache.value;
+};
+
+const loadBorderFeatureCollection = async (level, selectedNames) => {
+  if (level === 'country') {
+    return loadNationalBorderFeatureCollection();
+  }
+
+  const geoJson = level === 'provinces'
+    ? await loadProvincesGeoJson()
+    : await loadCitiesGeoJson();
+
+  const filteredFeatures = (geoJson.features ?? []).filter(
+    (f) => selectedNames.includes(f?.properties?.name)
+  );
+
+  if (!filteredFeatures.length) return null;
+
+  return prepareNationalBorderForVoronoiClip({
+    type: 'FeatureCollection',
+    features: filteredFeatures,
+  });
+};
+
+const handleOpenClipBoundary = async () => {
+  try { await loadProvincesGeoJson(); } catch { /* ignore */ }
+  try { await loadCitiesGeoJson(); } catch { /* ignore */ }
+  showClipBoundaryModal.value = true;
+};
+
+const handleClipBoundaryConfirm = (config) => {
+  clipBoundaryConfig.value = { ...config };
+};
+
 const ensureVoronoiPointsLoaded = async () => {
   if (voronoiPartitionPoints.value.length) return;
   await loadVoronoiPoints();
@@ -1609,18 +1711,6 @@ const toggleVoronoiExportSelection = (partitionKey) => {
   voronoiExportSelections.value = Array.from(next);
 };
 
-const handleClipVoronoiToggle = async (nextValue) => {
-  if (!nextValue) {
-    clipVoronoiToNationalBorder.value = false;
-    return;
-  }
-
-  const confirmed = await showConfirm(t('map.drawTab.voronoi.clipToNationalBorderConfirmMessage'), {
-    title: t('messages.confirm.title'),
-  });
-  clipVoronoiToNationalBorder.value = confirmed;
-};
-
 const confirmVoronoiExport = async () => {
   if (isVoronoiExporting.value) return;
   if (!voronoiExportSelections.value.length) {
@@ -1632,8 +1722,9 @@ const confirmVoronoiExport = async () => {
   showVoronoiExportModal.value = false;
   isVoronoiExporting.value = true;
   try {
-    const preparedBorderEntries = clipVoronoiToNationalBorder.value
-      ? await loadNationalBorderFeatureCollection()
+    const config = clipBoundaryConfig.value;
+    const preparedBorderEntries = config.enabled
+      ? await loadBorderFeatureCollection(config.level, config.selectedNames)
       : null;
 
     voronoiExportProgress.value = { current: 0, total: selectedGroups.length };
@@ -1741,11 +1832,11 @@ watch(selectedStoredDraftId, async (draftId) => {
   newDraftName.value = draft?.name || '';
 });
 
-watch(clipVoronoiToNationalBorder, (value) => {
+watch(clipBoundaryConfig, (value) => {
   localStorage.setItem(voronoiExportStorageKey, JSON.stringify({
-    clipVoronoiToNationalBorder: Boolean(value),
+    clipBoundaryConfig: value,
   }));
-});
+}, { deep: true });
 
 watch(isVoronoiPanelOpen, async (isOpen) => {
   if (!isOpen) {
