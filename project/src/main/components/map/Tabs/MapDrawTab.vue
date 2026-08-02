@@ -337,6 +337,22 @@
               </div>
             </div>
           </button>
+
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            @click="onRiverImportClicked"
+          >
+            <span class="draw-card-icon">🌊</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.riverImport') }}
+              </div>
+              <div class="draw-card-desc">
+                {{ t('map.drawTab.buttons.riverImportDesc') }}
+              </div>
+            </div>
+          </button>
         </div>
       </AppModal>
 
@@ -558,6 +574,12 @@
         @confirm="handleImportBoundaryConfirm"
       />
 
+      <RiverImportModal
+        v-model="showRiverImportModal"
+        :importing="isRiverImporting"
+        @confirm="handleRiverImportConfirm"
+      />
+
       <div v-if="showVoronoiExportProgressOverlay" class="voronoi-export-progress-overlay">
         <div class="voronoi-export-progress-panel main-glass-panel-inner">
           <div class="ui-loading--page" aria-hidden="true"></div>
@@ -692,6 +714,9 @@ import { featureCollection } from '@turf/turf';
 import nationalBorderGeoJsonUrl from '/data/gis/china_country.geojson?url';
 import provincesGeoJsonUrl from '/data/gis/china_provinces.geojson?url';
 import citiesGeoJsonUrl from '/data/gis/china_cities_simplified_balanced.geojson?url';
+import riversL1GeoJsonUrl from '/data/gis/china_rivers_l1.geojson?url';
+import riversL2GeoJsonUrl from '/data/gis/china_rivers_l2.geojson?url';
+import riversL3GeoJsonUrl from '/data/gis/china_rivers_l3.geojson?url';
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
@@ -735,6 +760,7 @@ import VoronoiExportLayersModal from '@/main/components/map/Draw/modals/VoronoiE
 import VoronoiIgnorePointsModal from '@/main/components/map/Draw/modals/VoronoiIgnorePointsModal.vue';
 import VoronoiFieldMergeModal from '@/main/components/map/Draw/modals/VoronoiFieldMergeModal.vue';
 import ClipBoundaryModal from '@/main/components/map/Draw/modals/ClipBoundaryModal.vue';
+import RiverImportModal from '@/main/components/map/Draw/modals/RiverImportModal.vue';
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue';
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js';
 import { useVoronoiCustomImport } from '@/composables/import/useVoronoiCustomImport.js';
@@ -769,6 +795,9 @@ let layerIdSeed = 0;
 let nationalBorderPreparedCache = null;
 const provincesGeoJsonCache = ref(null);
 const citiesGeoJsonCache = ref(null);
+const riversL1Cache = ref(null);
+const riversL2Cache = ref(null);
+const riversL3Cache = ref(null);
 
 const editableMapRef = ref(null);
 const importInputRef = ref(null);
@@ -812,6 +841,8 @@ const clipBoundaryConfig = ref({
 });
 const showClipBoundaryModal = ref(false);
 const showImportBoundaryModal = ref(false);
+const showRiverImportModal = ref(false);
+const isRiverImporting = ref(false);
 const importBoundaryConfig = ref({ level: 'country', selectedNames: [] });
 const isBoundaryOptionsLoading = ref(false);
 const isVoronoiExporting = ref(false);
@@ -1656,6 +1687,77 @@ const handleImportBoundaryConfirm = async (config) => {
   layer.fillOpacity = 0.12;
   layers.value.push(layer);
   activeLayerId.value = layer.id;
+};
+
+const loadRiversL1GeoJson = async () => {
+  if (riversL1Cache.value) return riversL1Cache.value;
+  const response = await fetch(riversL1GeoJsonUrl);
+  if (!response.ok) throw new Error(`Failed to load rivers L1 GeoJSON: ${response.status}`);
+  riversL1Cache.value = await response.json();
+  return riversL1Cache.value;
+};
+
+const loadRiversL2GeoJson = async () => {
+  if (riversL2Cache.value) return riversL2Cache.value;
+  const response = await fetch(riversL2GeoJsonUrl);
+  if (!response.ok) throw new Error(`Failed to load rivers L2 GeoJSON: ${response.status}`);
+  riversL2Cache.value = await response.json();
+  return riversL2Cache.value;
+};
+
+const loadRiversL3GeoJson = async () => {
+  if (riversL3Cache.value) return riversL3Cache.value;
+  const response = await fetch(riversL3GeoJsonUrl);
+  if (!response.ok) throw new Error(`Failed to load rivers L3 GeoJSON: ${response.status}`);
+  riversL3Cache.value = await response.json();
+  return riversL3Cache.value;
+};
+
+const RIVER_LOADERS = {
+  riverL1: loadRiversL1GeoJson,
+  riverL2: loadRiversL2GeoJson,
+  riverL3: loadRiversL3GeoJson,
+};
+
+const RIVER_LABELS = {
+  riverL1: () => t('map.drawTab.voronoi.clipBoundaryLevelRiverL1'),
+  riverL2: () => t('map.drawTab.voronoi.clipBoundaryLevelRiverL2'),
+  riverL3: () => t('map.drawTab.voronoi.clipBoundaryLevelRiverL3'),
+};
+
+const onRiverImportClicked = () => {
+  showAddLayerModal.value = false;
+  showRiverImportModal.value = true;
+};
+
+const handleRiverImportConfirm = async (selectedLevels) => {
+  if (isRiverImporting.value) return;
+  isRiverImporting.value = true;
+  showRiverImportModal.value = false;
+
+  try {
+    for (const level of selectedLevels) {
+      const loader = RIVER_LOADERS[level];
+      if (!loader) continue;
+      const geoJson = await loader();
+      if (!geoJson?.features?.length) continue;
+
+      commitHistory();
+      const layer = createEmptyLayer('LineString');
+      layer.name = RIVER_LABELS[level]();
+      layer.featureCollection = geoJson;
+      layer.stroke = '#3b82f6';
+      layer.strokeWidth = level === 'riverL1' ? 1.5 : level === 'riverL2' ? 1 : 0.7;
+      layer.fill = '';
+      layer.fillOpacity = 0;
+      layers.value.push(layer);
+      activeLayerId.value = layer.id;
+    }
+  } catch (error) {
+    showError(t('map.drawTab.messages.importLayerFailed', { error: error.message || error }));
+  } finally {
+    isRiverImporting.value = false;
+  }
 };
 
 const ensureVoronoiPointsLoaded = async () => {
