@@ -143,8 +143,8 @@ function renderChart() {
         silent: true,
         zoom: 1.18,
         scaleLimit: {
-          min: 0.8,
-          max: 18,
+          min: 0.4,
+          max: 28,
         },
         itemStyle: {
           areaColor: cssToken('--surface-panel-subtle'),
@@ -168,7 +168,7 @@ function renderChart() {
 function buildBoundarySeries() {
   return BOUNDARY_LAYER_KEYS
     .filter((key) => props.layerState[key] && props.loadedLayers[key])
-    .map((key, index) => ({
+    .map((key) => ({
       id: `toponym-${key}`,
       name: t(`villages.pages.toponyms.layers.${key}`),
       type: 'lines',
@@ -213,6 +213,7 @@ function buildPointSeries() {
     coordinateSystem: 'geo',
     z: 20,
     data: props.scatterData,
+    symbol: 'rect',
     symbolSize: getPointSize(),
     large: props.scatterData.length > 2000,
     largeThreshold: 2000,
@@ -243,11 +244,7 @@ function buildTooltipOption() {
       if (params.seriesType !== 'scatter') return params.seriesName || '';
       const point = extractToponymPointFromChartParams(params);
       if (!point) return '';
-      return [
-        t('villages.pages.toponyms.chart.pointTooltip'),
-        point.id,
-        point.coordinates.map((value) => Number(value).toFixed(6)).join(', '),
-      ].join('<br>');
+      return point.coordinates.map((value) => Number(value).toFixed(6)).join(', ');
     },
   };
 }

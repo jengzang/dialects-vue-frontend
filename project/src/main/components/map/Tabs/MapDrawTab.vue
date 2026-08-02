@@ -655,7 +655,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { featureCollection } from '@turf/turf';
 
-import nationalBorderKmzUrl from '/data/国界面.kmz?url';
+import nationalBorderGeoJsonUrl from '/data/gis/china_country.geojson?url';
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
@@ -725,7 +725,7 @@ const defaultLayerStyle = {
 };
 const mapDrawStorageKey = 'map-draw-workbench-state';
 const voronoiExportStorageKey = 'map-draw-voronoi-export-state';
-const nationalBorderCacheKey = 'map-draw-national-border-cache';
+const nationalBorderCacheKey = 'map-draw-national-border-cache-v3';
 const nationalBorderAssetCacheName = 'map-draw-assets';
 const voronoiExportLimit = 20;
 let layerIdSeed = 0;
@@ -1421,61 +1421,51 @@ const loadVoronoiPoints = async () => {
 const readNationalBorderCache = async () => {
   if (nationalBorderPreparedCache) return nationalBorderPreparedCache;
 
-  const storageRaw = localStorage.getItem(nationalBorderCacheKey);
   const cacheStorage = typeof window !== 'undefined' && 'caches' in window
     ? await caches.open(nationalBorderAssetCacheName)
     : null;
-  const cachedResponse = cacheStorage ? await cacheStorage.match(nationalBorderKmzUrl) : null;
+  const cachedResponse = cacheStorage ? await cacheStorage.match(nationalBorderGeoJsonUrl) : null;
 
   if (!cachedResponse) {
-    if (storageRaw) {
-      localStorage.removeItem(nationalBorderCacheKey);
-    }
+    localStorage.removeItem(nationalBorderCacheKey);
     return null;
   }
 
-  const arrayBuffer = await cachedResponse.arrayBuffer();
-  const featureCollectionValue = readKmzArrayBuffer(arrayBuffer);
+  const featureCollectionValue = await cachedResponse.json();
   nationalBorderPreparedCache = prepareNationalBorderForVoronoiClip(featureCollectionValue);
 
-  const nextMeta = JSON.stringify({ version: 2, cachedAt: Date.now() });
-  if (storageRaw !== nextMeta) {
-    localStorage.setItem(nationalBorderCacheKey, nextMeta);
-  }
+  localStorage.setItem(nationalBorderCacheKey, JSON.stringify({ version: 3, cachedAt: Date.now() }));
 
   return nationalBorderPreparedCache;
 };
 
-const writeNationalBorderCache = async (arrayBuffer) => {
+const writeNationalBorderCache = async (featureCollectionValue) => {
   const cacheStorage = typeof window !== 'undefined' && 'caches' in window
     ? await caches.open(nationalBorderAssetCacheName)
     : null;
 
   if (cacheStorage) {
-    const response = new Response(arrayBuffer.slice(0), {
-      headers: {
-        'Content-Type': 'application/vnd.google-earth.kmz',
-      },
+    const response = new Response(JSON.stringify(featureCollectionValue), {
+      headers: { 'Content-Type': 'application/geo+json' },
     });
-    await cacheStorage.put(nationalBorderKmzUrl, response);
+    await cacheStorage.put(nationalBorderGeoJsonUrl, response);
   }
 
-  localStorage.setItem(nationalBorderCacheKey, JSON.stringify({ version: 2, cachedAt: Date.now() }));
+  localStorage.setItem(nationalBorderCacheKey, JSON.stringify({ version: 3, cachedAt: Date.now() }));
 };
 
 const loadNationalBorderFeatureCollection = async () => {
   const cached = await readNationalBorderCache();
   if (cached) return cached;
 
-  const response = await fetch(nationalBorderKmzUrl);
+  const response = await fetch(nationalBorderGeoJsonUrl);
   if (!response.ok) {
-    throw new Error(`Failed to load national border KMZ: ${response.status}`);
+    throw new Error(`Failed to load national border GeoJSON: ${response.status}`);
   }
 
-  const arrayBuffer = await response.arrayBuffer();
-  const featureCollectionValue = readKmzArrayBuffer(arrayBuffer);
+  const featureCollectionValue = await response.json();
   nationalBorderPreparedCache = prepareNationalBorderForVoronoiClip(featureCollectionValue);
-  await writeNationalBorderCache(arrayBuffer);
+  await writeNationalBorderCache(featureCollectionValue);
   return nationalBorderPreparedCache;
 };
 
