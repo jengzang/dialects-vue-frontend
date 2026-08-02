@@ -624,6 +624,8 @@
       "clipBoundaryLevelProvinces": "Provinces",
       "clipBoundaryLevelCities": "Cities",
       "clipBoundaryLevelCounties": "Counties",
+      "clipBoundaryHighPrecision": "High Precision (API)",
+      "clipBoundaryHighPrecisionLimitHint": "Max 3 regions in high precision mode",
       "clipBoundaryDisabled": "No Clipping",
       "clipBoundarySummaryDisabled": "Not Set",
       "clipBoundaryNoOptions": "No options available",

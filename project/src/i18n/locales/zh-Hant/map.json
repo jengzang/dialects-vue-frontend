@@ -624,6 +624,8 @@
       "clipBoundaryLevelProvinces": "省界",
       "clipBoundaryLevelCities": "市界",
       "clipBoundaryLevelCounties": "縣界",
+      "clipBoundaryHighPrecision": "高精度（API）",
+      "clipBoundaryHighPrecisionLimitHint": "高精度模式下最多選擇 3 個區域",
       "clipBoundaryDisabled": "不裁剪",
       "clipBoundarySummaryDisabled": "未設定",
       "clipBoundaryNoOptions": "暫無可選區域",

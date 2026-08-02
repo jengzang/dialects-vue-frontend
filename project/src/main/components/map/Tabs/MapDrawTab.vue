@@ -562,6 +562,8 @@
         :boundary-config="clipBoundaryConfig"
         :boundary-options="boundaryOptionsMap"
         :loading="isBoundaryOptionsLoading"
+        :high-precision="highPrecisionEnabled"
+        @update:high-precision="highPrecisionEnabled = $event"
         @confirm="handleClipBoundaryConfirm"
       />
 
@@ -571,6 +573,8 @@
         :boundary-config="importBoundaryConfig"
         :boundary-options="boundaryOptionsMap"
         :loading="isBoundaryOptionsLoading"
+        :high-precision="highPrecisionEnabled"
+        @update:high-precision="highPrecisionEnabled = $event"
         @confirm="handleImportBoundaryConfirm"
       />
 
@@ -719,6 +723,7 @@ import riversL1GeoJsonUrl from '/data/gis/china_rivers_l1.geojson?url';
 import riversL2GeoJsonUrl from '/data/gis/china_rivers_l2.geojson?url';
 import riversL3GeoJsonUrl from '/data/gis/china_rivers_l3.geojson?url';
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
+import { api } from '@/api/auth/httpClient.js';
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import { showConfirm, showError, showSuccess, showWarning } from '@/utils/ui/message.js';
@@ -846,6 +851,7 @@ const showImportBoundaryModal = ref(false);
 const showRiverImportModal = ref(false);
 const isRiverImporting = ref(false);
 const importBoundaryConfig = ref({ level: 'country', selectedNames: [] });
+const highPrecisionEnabled = ref(false);
 const isBoundaryOptionsLoading = ref(false);
 const isVoronoiExporting = ref(false);
 const activeFeatureId = computed(() => activeLayerId.value);
@@ -1376,8 +1382,8 @@ const clipBoundarySummary = computed(() => {
   }
   const levelLabel = levelOptionsMap[clipBoundaryConfig.value.level] || '';
   const names = clipBoundaryConfig.value.selectedNames;
-  if (!names.length) return levelLabel;
-  return `${levelLabel} · ${names.slice(0, 3).join(', ')}${names.length > 3 ? '...' : ''}`;
+  const base = !names.length ? levelLabel : `${levelLabel} · ${names.slice(0, 3).join(', ')}${names.length > 3 ? '...' : ''}`;
+  return clipBoundaryConfig.value.highPrecision ? `⚡ ${base}` : base;
 });
 
 const levelOptionsMap = {
@@ -1616,9 +1622,49 @@ const loadCountiesGeoJson = async () => {
   return countiesGeoJsonCache.value;
 };
 
-const loadBorderFeatureCollection = async (level, selectedNames) => {
+const LEVEL_DEEP_MAP = { provinces: 0, cities: 1, counties: 2 };
+
+const fetchHighPrecisionBoundaries = async (level, selectedNames) => {
+  const deep = LEVEL_DEEP_MAP[level];
+  if (deep === undefined) {
+    showError(`High precision not supported for level: ${level}`);
+    return null;
+  }
+  const childrenData = await api(`/api/gis/children?deep=${deep}`);
+  if (!childrenData?.items?.length) {
+    showError('Failed to fetch boundary list from API');
+    return null;
+  }
+
+  const nameToId = new Map(childrenData.items.map((item) => [item.name, item.id]));
+  const ids = selectedNames.map((name) => nameToId.get(name)).filter(Boolean);
+
+  if (!ids.length) {
+    showError('No matching boundary IDs found');
+    return null;
+  }
+
+  const features = [];
+  for (const id of ids) {
+    const data = await api(`/api/gis/boundary/by-id?feature_id=${id}`);
+    if (data?.geometry) {
+      features.push({ type: 'Feature', properties: data.feature || {}, geometry: data.geometry });
+    }
+  }
+
+  if (!features.length) return null;
+  return { type: 'FeatureCollection', features };
+};
+
+const loadBorderFeatureCollection = async (level, selectedNames, highPrecision = false) => {
   if (level === 'country') {
     return loadNationalBorderFeatureCollection();
+  }
+
+  if (highPrecision) {
+    const fc = await fetchHighPrecisionBoundaries(level, selectedNames);
+    if (!fc) return null;
+    return prepareNationalBorderForVoronoiClip(fc);
   }
 
   let geoJson;
@@ -1668,10 +1714,16 @@ const onAdminBoundaryClicked = () => {
 };
 
 const handleImportBoundaryConfirm = async (config) => {
-  const { level, selectedNames } = config;
+  const { level, selectedNames, highPrecision } = config;
 
   let geoJson;
-  if (level === 'country') {
+  if (highPrecision && level !== 'country') {
+    geoJson = await fetchHighPrecisionBoundaries(level, selectedNames);
+    if (!geoJson) {
+      showError(t('map.drawTab.voronoi.clipBoundaryNoOptions'));
+      return;
+    }
+  } else if (level === 'country') {
     const response = await fetch(nationalBorderGeoJsonUrl);
     if (!response.ok) {
       showError('Failed to load country GeoJSON');
@@ -1936,7 +1988,7 @@ const confirmVoronoiExport = async () => {
   try {
     const config = clipBoundaryConfig.value;
     const preparedBorderEntries = config.enabled
-      ? await loadBorderFeatureCollection(config.level, config.selectedNames)
+      ? await loadBorderFeatureCollection(config.level, config.selectedNames, config.highPrecision)
       : null;
 
     voronoiExportProgress.value = { current: 0, total: selectedGroups.length };

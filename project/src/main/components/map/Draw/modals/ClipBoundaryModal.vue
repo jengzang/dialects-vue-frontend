@@ -17,6 +17,15 @@
       </div>
 
       <div class="clip-boundary-field">
+        <label class="clip-boundary-label">{{ t('map.drawTab.voronoi.clipBoundaryHighPrecision') }}</label>
+        <SwitchToggle
+          :model-value="localHighPrecision"
+          :disabled="loading"
+          @update:model-value="handleHighPrecisionToggle"
+        />
+      </div>
+
+      <div class="clip-boundary-field">
         <label class="clip-boundary-label">{{ t('map.drawTab.voronoi.clipBoundarySelectRegions') }}</label>
         <input
           v-if="localLevel !== 'country'"
@@ -25,6 +34,9 @@
           class="clip-boundary-search"
           :placeholder="t('map.drawTab.voronoi.clipBoundarySearchPlaceholder')"
         >
+        <p v-if="highPrecisionLimit" class="clip-boundary-hint">
+          {{ t('map.drawTab.voronoi.clipBoundaryHighPrecisionLimitHint') }}
+        </p>
         <div v-if="loading" class="clip-boundary-loading">
           <div class="ui-loading--page" aria-hidden="true" />
           <span>{{ t('map.drawTab.voronoi.clipBoundaryLoading') }}</span>
@@ -35,7 +47,7 @@
             :key="option.value"
             class="clip-boundary-item"
             :model-value="localSelected.includes(option.value)"
-            :disabled="localLevel === 'country'"
+            :disabled="isOptionDisabled(option.value)"
             @update:model-value="(checked) => handleToggle(option.value, checked)"
           >
             {{ option.label }}
@@ -76,6 +88,9 @@ import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import CheckBox from '@/components/selector/CheckBox.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
+import SwitchToggle from '@/components/common/SwitchToggle.vue';
+
+const HIGH_PRECISION_MAX = 3;
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -93,14 +108,18 @@ const props = defineProps({
     validator: (value) => ['clip', 'import'].includes(value),
   },
   loading: { type: Boolean, default: false },
+  highPrecision: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(['update:modelValue', 'confirm']);
+const emit = defineEmits(['update:modelValue', 'confirm', 'update:highPrecision']);
 const { t } = useI18n();
 
 const localLevel = ref('country');
 const localSelected = ref([]);
 const searchQuery = ref('');
+const localHighPrecision = ref(false);
+
+const highPrecisionLimit = computed(() => localHighPrecision.value && localLevel.value !== 'country');
 
 const levelOptions = computed(() => [
   { label: t('map.drawTab.voronoi.clipBoundaryLevelCountry'), value: 'country' },
@@ -127,12 +146,27 @@ watch(
       searchQuery.value = '';
       localLevel.value = props.boundaryConfig.level || 'country';
       localSelected.value = [...(props.boundaryConfig.selectedNames || [])];
+      localHighPrecision.value = props.highPrecision;
       if (localSelected.value.length === 0 && localLevel.value === 'country') {
         localSelected.value = ['中国'];
       }
     }
   },
 );
+
+function isOptionDisabled(optionValue) {
+  if (localLevel.value === 'country') return true;
+  if (!highPrecisionLimit.value) return false;
+  return !localSelected.value.includes(optionValue) && localSelected.value.length >= HIGH_PRECISION_MAX;
+}
+
+function handleHighPrecisionToggle(val) {
+  localHighPrecision.value = val;
+  emit('update:highPrecision', val);
+  if (val && localSelected.value.length > HIGH_PRECISION_MAX) {
+    localSelected.value = localSelected.value.slice(0, HIGH_PRECISION_MAX);
+  }
+}
 
 function handleLevelChange(level) {
   localLevel.value = level;
@@ -160,6 +194,7 @@ function handleConfirm() {
   const payload = {
     level: localLevel.value,
     selectedNames: [...localSelected.value],
+    highPrecision: localHighPrecision.value,
   };
   if (props.mode !== 'import') {
     payload.enabled = true;
@@ -186,6 +221,12 @@ function handleConfirm() {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-deep);
+}
+
+.clip-boundary-hint {
+  margin: 0;
+  color: var(--color-warning, #e6a23c);
+  font-size: 12px;
 }
 
 .clip-boundary-search {
