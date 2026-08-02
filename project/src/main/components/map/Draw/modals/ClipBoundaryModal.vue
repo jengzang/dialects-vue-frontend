@@ -6,23 +6,24 @@
     @update:modelValue="handleClose"
   >
     <div class="clip-boundary-modal">
-      <div class="clip-boundary-field">
-        <label class="clip-boundary-label">{{ t('map.drawTab.voronoi.clipBoundaryLevel') }}</label>
-        <SimpleSelectDropdown
-          :model-value="localLevel"
-          :options="levelOptions"
-          :width="'160px'"
-          @update:model-value="handleLevelChange"
-        />
-      </div>
-
-      <div class="clip-boundary-field">
-        <label class="clip-boundary-label">{{ t('map.drawTab.voronoi.clipBoundaryHighPrecision') }}</label>
-        <SwitchToggle
-          :model-value="localHighPrecision"
-          :disabled="loading"
-          @update:model-value="handleHighPrecisionToggle"
-        />
+      <div class="clip-boundary-row">
+        <div class="clip-boundary-field" style="flex:1">
+          <label class="clip-boundary-label">{{ t('map.drawTab.voronoi.clipBoundaryLevel') }}</label>
+          <SimpleSelectDropdown
+            :model-value="localLevel"
+            :options="levelOptions"
+            :width="'160px'"
+            @update:model-value="handleLevelChange"
+          />
+        </div>
+        <div class="clip-boundary-field">
+          <label class="clip-boundary-label">{{ t('map.drawTab.voronoi.clipBoundaryHighPrecision') }}</label>
+          <SwitchToggle
+            :model-value="localHighPrecision"
+            :disabled="loading"
+            @update:model-value="handleHighPrecisionToggle"
+          />
+        </div>
       </div>
 
       <div class="clip-boundary-field">
@@ -37,7 +38,7 @@
         <p v-if="highPrecisionLimit" class="clip-boundary-hint">
           {{ t('map.drawTab.voronoi.clipBoundaryHighPrecisionLimitHint') }}
         </p>
-        <div v-if="loading" class="clip-boundary-loading">
+        <div v-if="isOptionsLoading" class="clip-boundary-loading">
           <div class="ui-loading--page" aria-hidden="true" />
           <span>{{ t('map.drawTab.voronoi.clipBoundaryLoading') }}</span>
         </div>
@@ -89,8 +90,10 @@ import AppModal from '@/components/common/AppModal.vue';
 import CheckBox from '@/components/selector/CheckBox.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
 import SwitchToggle from '@/components/common/SwitchToggle.vue';
+import { api } from '@/api/auth/httpClient.js';
 
 const HIGH_PRECISION_MAX = 3;
+const LEVEL_DEEP_MAP = { provinces: 0, cities: 1, counties: 2 };
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -118,8 +121,15 @@ const localLevel = ref('country');
 const localSelected = ref([]);
 const searchQuery = ref('');
 const localHighPrecision = ref(false);
+const highPrecisionOptions = ref([]);
+const isHighPrecisionLoading = ref(false);
 
 const highPrecisionLimit = computed(() => localHighPrecision.value && localLevel.value !== 'country');
+
+const isOptionsLoading = computed(() => {
+  if (localHighPrecision.value) return isHighPrecisionLoading.value;
+  return props.loading;
+});
 
 const levelOptions = computed(() => [
   { label: t('map.drawTab.voronoi.clipBoundaryLevelCountry'), value: 'country' },
@@ -129,6 +139,9 @@ const levelOptions = computed(() => [
 ]);
 
 const currentOptions = computed(() => {
+  if (localHighPrecision.value && localLevel.value !== 'country') {
+    return highPrecisionOptions.value;
+  }
   return props.boundaryOptions[localLevel.value] ?? [];
 });
 
@@ -139,14 +152,33 @@ const filteredOptions = computed(() => {
   return currentOptions.value.filter((opt) => opt.label.toLowerCase().includes(query));
 });
 
+const fetchHighPrecisionOptions = async (level) => {
+  const deep = LEVEL_DEEP_MAP[level];
+  if (deep === undefined) return;
+  isHighPrecisionLoading.value = true;
+  try {
+    const data = await api(`/api/gis/children?deep=${deep}`);
+    highPrecisionOptions.value = (data?.items ?? []).map((item) => ({
+      label: item.name,
+      value: item.id,
+    }));
+  } catch (error) {
+    console.warn('Failed to fetch boundary options from API', error);
+    highPrecisionOptions.value = [];
+  } finally {
+    isHighPrecisionLoading.value = false;
+  }
+};
+
 watch(
   () => props.modelValue,
   (val) => {
     if (val) {
       searchQuery.value = '';
       localLevel.value = props.boundaryConfig.level || 'country';
-      localSelected.value = [...(props.boundaryConfig.selectedNames || [])];
       localHighPrecision.value = props.highPrecision;
+      highPrecisionOptions.value = [];
+      localSelected.value = [...(props.boundaryConfig.selectedNames || [])];
       if (localSelected.value.length === 0 && localLevel.value === 'country') {
         localSelected.value = ['中国'];
       }
@@ -163,26 +195,31 @@ function isOptionDisabled(optionValue) {
 function handleHighPrecisionToggle(val) {
   localHighPrecision.value = val;
   emit('update:highPrecision', val);
-  if (val && localSelected.value.length > HIGH_PRECISION_MAX) {
-    localSelected.value = localSelected.value.slice(0, HIGH_PRECISION_MAX);
+  if (val && localLevel.value !== 'country') {
+    localSelected.value = [];
+    fetchHighPrecisionOptions(localLevel.value);
+  } else if (!val) {
+    highPrecisionOptions.value = [];
+    localSelected.value = [];
   }
 }
 
 function handleLevelChange(level) {
   localLevel.value = level;
   searchQuery.value = '';
+  localSelected.value = [];
   if (level === 'country') {
     localSelected.value = ['中国'];
-  } else {
-    localSelected.value = [];
+  } else if (localHighPrecision.value) {
+    fetchHighPrecisionOptions(level);
   }
 }
 
-function handleToggle(name, checked) {
+function handleToggle(optionValue, checked) {
   if (checked) {
-    localSelected.value = [...localSelected.value, name];
+    localSelected.value = [...localSelected.value, optionValue];
   } else {
-    localSelected.value = localSelected.value.filter((item) => item !== name);
+    localSelected.value = localSelected.value.filter((item) => item !== optionValue);
   }
 }
 
@@ -193,9 +230,15 @@ function handleClose() {
 function handleConfirm() {
   const payload = {
     level: localLevel.value,
-    selectedNames: [...localSelected.value],
     highPrecision: localHighPrecision.value,
   };
+  if (localHighPrecision.value && localLevel.value !== 'country') {
+    payload.selectedIds = [...localSelected.value];
+    const idToName = new Map(highPrecisionOptions.value.map((o) => [o.value, o.label]));
+    payload.selectedNames = localSelected.value.map((id) => idToName.get(id)).filter(Boolean);
+  } else {
+    payload.selectedNames = [...localSelected.value];
+  }
   if (props.mode !== 'import') {
     payload.enabled = true;
   }
@@ -210,6 +253,12 @@ function handleConfirm() {
 .clip-boundary-modal {
   @include flex-col;
   gap: 16px;
+}
+
+.clip-boundary-row {
+  display: flex;
+  gap: 24px;
+  align-items: flex-end;
 }
 
 .clip-boundary-field {

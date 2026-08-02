@@ -1622,30 +1622,9 @@ const loadCountiesGeoJson = async () => {
   return countiesGeoJsonCache.value;
 };
 
-const LEVEL_DEEP_MAP = { provinces: 0, cities: 1, counties: 2 };
-
-const fetchHighPrecisionBoundaries = async (level, selectedNames) => {
-  const deep = LEVEL_DEEP_MAP[level];
-  if (deep === undefined) {
-    showError(`High precision not supported for level: ${level}`);
-    return null;
-  }
-  const childrenData = await api(`/api/gis/children?deep=${deep}`);
-  if (!childrenData?.items?.length) {
-    showError('Failed to fetch boundary list from API');
-    return null;
-  }
-
-  const nameToId = new Map(childrenData.items.map((item) => [item.name, item.id]));
-  const ids = selectedNames.map((name) => nameToId.get(name)).filter(Boolean);
-
-  if (!ids.length) {
-    showError('No matching boundary IDs found');
-    return null;
-  }
-
+const fetchHighPrecisionBoundaries = async (selectedIds) => {
   const features = [];
-  for (const id of ids) {
+  for (const id of selectedIds) {
     const data = await api(`/api/gis/boundary/by-id?feature_id=${id}`);
     if (data?.geometry) {
       features.push({ type: 'Feature', properties: data.feature || {}, geometry: data.geometry });
@@ -1662,7 +1641,7 @@ const loadBorderFeatureCollection = async (level, selectedNames, highPrecision =
   }
 
   if (highPrecision) {
-    const fc = await fetchHighPrecisionBoundaries(level, selectedNames);
+    const fc = await fetchHighPrecisionBoundaries(selectedNames);
     if (!fc) return null;
     return prepareNationalBorderForVoronoiClip(fc);
   }
@@ -1714,11 +1693,11 @@ const onAdminBoundaryClicked = () => {
 };
 
 const handleImportBoundaryConfirm = async (config) => {
-  const { level, selectedNames, highPrecision } = config;
+  const { level, selectedNames, selectedIds, highPrecision } = config;
 
   let geoJson;
   if (highPrecision && level !== 'country') {
-    geoJson = await fetchHighPrecisionBoundaries(level, selectedNames);
+    geoJson = await fetchHighPrecisionBoundaries(selectedIds);
     if (!geoJson) {
       showError(t('map.drawTab.voronoi.clipBoundaryNoOptions'));
       return;
@@ -1988,7 +1967,7 @@ const confirmVoronoiExport = async () => {
   try {
     const config = clipBoundaryConfig.value;
     const preparedBorderEntries = config.enabled
-      ? await loadBorderFeatureCollection(config.level, config.selectedNames, config.highPrecision)
+      ? await loadBorderFeatureCollection(config.level, config.selectedIds || config.selectedNames, config.highPrecision)
       : null;
 
     voronoiExportProgress.value = { current: 0, total: selectedGroups.length };
@@ -3340,7 +3319,20 @@ if (isTouchDevice) {
   document.documentElement.classList.add('is-touch-device');
 }
 
+const autoDraftChecked = ref(false);
+
+const checkAutoDraftOnce = async () => {
+  if (autoDraftChecked.value) return;
+  autoDraftChecked.value = true;
+  try {
+    await restoreAutoDraftIfAvailable();
+  } catch (error) {
+    console.warn('restore auto draft failed', error);
+  }
+};
+
 const togglePanel = (panelName) => {
+  checkAutoDraftOnce();
   if (isTouchDevice) {
     const wasOpen = panelName === 'drawing' ? isDrawingPanelOpen.value
       : panelName === 'layers' ? isLayersPanelOpen.value
@@ -3434,7 +3426,6 @@ onMounted(async () => {
   try {
     await restoreStoredDrafts();
     markWorkbenchClean();
-    await restoreAutoDraftIfAvailable();
   } catch (error) {
     console.warn('restore map draw workbench state failed', error);
   }
