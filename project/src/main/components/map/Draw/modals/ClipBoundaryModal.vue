@@ -25,7 +25,11 @@
           class="clip-boundary-search"
           :placeholder="t('map.drawTab.voronoi.clipBoundarySearchPlaceholder')"
         >
-        <div class="clip-boundary-list ui-scrollbar">
+        <div v-if="loading" class="clip-boundary-loading">
+          <div class="ui-loading--page" aria-hidden="true" />
+          <span>{{ t('map.drawTab.voronoi.clipBoundaryLoading') }}</span>
+        </div>
+        <div v-else class="clip-boundary-list ui-scrollbar">
           <CheckBox
             v-for="option in filteredOptions"
             :key="option.value"
@@ -88,6 +92,7 @@ const props = defineProps({
     default: 'clip',
     validator: (value) => ['clip', 'import'].includes(value),
   },
+  loading: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['update:modelValue', 'confirm']);
@@ -198,6 +203,20 @@ function handleConfirm() {
   &::placeholder {
     color: var(--text-tertiary);
   }
+}
+
+.clip-boundary-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 160px;
+  padding: 24px;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 13px;
 }
 
 .clip-boundary-list {

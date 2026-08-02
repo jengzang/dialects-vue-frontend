@@ -545,6 +545,7 @@
         v-model="showClipBoundaryModal"
         :boundary-config="clipBoundaryConfig"
         :boundary-options="boundaryOptionsMap"
+        :loading="isBoundaryOptionsLoading"
         @confirm="handleClipBoundaryConfirm"
       />
 
@@ -553,6 +554,7 @@
         mode="import"
         :boundary-config="importBoundaryConfig"
         :boundary-options="boundaryOptionsMap"
+        :loading="isBoundaryOptionsLoading"
         @confirm="handleImportBoundaryConfirm"
       />
 
@@ -689,7 +691,7 @@ import { featureCollection } from '@turf/turf';
 
 import nationalBorderGeoJsonUrl from '/data/gis/china_country.geojson?url';
 import provincesGeoJsonUrl from '/data/gis/china_provinces.geojson?url';
-import citiesGeoJsonUrl from '/data/gis/china_cities_simplified_light.geojson?url';
+import citiesGeoJsonUrl from '/data/gis/china_cities_simplified_balanced.geojson?url';
 import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js';
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
@@ -811,6 +813,7 @@ const clipBoundaryConfig = ref({
 const showClipBoundaryModal = ref(false);
 const showImportBoundaryModal = ref(false);
 const importBoundaryConfig = ref({ level: 'country', selectedNames: [] });
+const isBoundaryOptionsLoading = ref(false);
 const isVoronoiExporting = ref(false);
 const activeFeatureId = computed(() => activeLayerId.value);
 
@@ -1587,21 +1590,31 @@ const loadBorderFeatureCollection = async (level, selectedNames) => {
   });
 };
 
-const handleOpenClipBoundary = async () => {
-  try { await loadProvincesGeoJson(); } catch { /* ignore */ }
-  try { await loadCitiesGeoJson(); } catch { /* ignore */ }
+const handleOpenClipBoundary = () => {
   showClipBoundaryModal.value = true;
+  isBoundaryOptionsLoading.value = true;
+  Promise.all([
+    loadProvincesGeoJson().catch(() => {}),
+    loadCitiesGeoJson().catch(() => {}),
+  ]).finally(() => {
+    isBoundaryOptionsLoading.value = false;
+  });
 };
 
 const handleClipBoundaryConfirm = (config) => {
   clipBoundaryConfig.value = { ...config };
 };
 
-const onAdminBoundaryClicked = async () => {
+const onAdminBoundaryClicked = () => {
   showAddLayerModal.value = false;
-  try { await loadProvincesGeoJson(); } catch { /* ignore */ }
-  try { await loadCitiesGeoJson(); } catch { /* ignore */ }
   showImportBoundaryModal.value = true;
+  isBoundaryOptionsLoading.value = true;
+  Promise.all([
+    loadProvincesGeoJson().catch(() => {}),
+    loadCitiesGeoJson().catch(() => {}),
+  ]).finally(() => {
+    isBoundaryOptionsLoading.value = false;
+  });
 };
 
 const handleImportBoundaryConfirm = async (config) => {

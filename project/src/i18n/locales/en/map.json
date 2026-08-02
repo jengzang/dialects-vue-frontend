@@ -625,6 +625,7 @@
       "clipBoundarySummaryDisabled": "Not Set",
       "clipBoundaryNoOptions": "No options available",
       "clipBoundarySearchPlaceholder": "Search...",
+      "clipBoundaryLoading": "Loading region data...",
       "clipBoundaryConfirmImport": "Import to Layer",
       "clipBoundaryImportTitle": "Select Administrative Boundary",
       "exportLayerListTitle": "Select Region Layers to Export",

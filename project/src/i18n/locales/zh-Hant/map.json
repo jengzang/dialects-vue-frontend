@@ -625,6 +625,7 @@
       "clipBoundarySummaryDisabled": "未設定",
       "clipBoundaryNoOptions": "暫無可選區域",
       "clipBoundarySearchPlaceholder": "搜尋...",
+      "clipBoundaryLoading": "正在載入區域數據...",
       "clipBoundaryConfirmImport": "匯入到圖層",
       "clipBoundaryImportTitle": "選擇行政區劃",
       "exportLayerListTitle": "選擇要導出的分區圖層",
