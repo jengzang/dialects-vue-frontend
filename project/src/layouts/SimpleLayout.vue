@@ -16,6 +16,7 @@
     <!-- 悬浮按钮组 -->
     <FloatingButtons
       :auth-button-position="authButtonPosition"
+      :show-home-button="false"
       @toggle-sidebar="isSidebarOpen = !isSidebarOpen"
     />
 

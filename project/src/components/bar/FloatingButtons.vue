@@ -34,7 +34,7 @@
 
     <!-- 打开侧边栏按钮 - 只在非首页时显示 -->
     <button
-      v-if="!isHomePage"
+      v-if="showHomeButton && !isHomePage"
       class="float-btn home-btn"
       @click="goToHome"
       :title="t('navigation.actions.backHome')"
@@ -65,6 +65,11 @@ const props = defineProps({
     type: String,
     default: 'top-right',
     validator: (value) => ['top-right', 'bottom-left'].includes(value)
+  },
+  // 是否显示返回首页按钮，默认在非首页时显示
+  showHomeButton: {
+    type: Boolean,
+    default: true
   }
 });
 
