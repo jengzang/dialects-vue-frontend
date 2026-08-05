@@ -347,7 +347,7 @@ export function useExploreBarConfig() {
             display: {
                 preset: 'balancedMobile',
                 overrides: {
-                    mobileWeightIconOnly: 0.6
+                    mobileScroll: 'right', mobileWeightIconOnly: 0.6
                 }
             },
             navigation: {
