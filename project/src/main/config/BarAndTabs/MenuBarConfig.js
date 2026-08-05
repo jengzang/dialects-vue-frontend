@@ -288,7 +288,7 @@ export function useMenuTabsConfig() {
     createMenuTab({
       tab: 'vocabulary',
       label: t('navigation.tabs.vocabulary'),
-      icon: '📒',
+      icon: '📋',
       display: {
         preset: 'standard_small',
         overrides: {}

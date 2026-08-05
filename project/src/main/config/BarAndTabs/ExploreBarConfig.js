@@ -265,10 +265,27 @@ export function useExploreBarConfig() {
                 defaultChild: '/explore/villages/gd',
                 children: [
                     { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: withRouteLocale(route, '/explore/villages/ml') },
-                    { label: t('navigation.submenu.villages.toponyms'), icon: '🗺️', path: withRouteLocale(route, '/explore/villages/toponyms') },
+                    { label: t('navigation.submenu.villages.toponyms'), icon: '📍', path: withRouteLocale(route, '/explore/villages/toponyms') },
                     { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
                     // { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
                     { label: t('navigation.submenu.villages.allVillages'), icon: '📋', path: withRouteLocale(route, '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }
+                ]
+            }
+        }),
+        gis: createExploreTab({
+            tab: 'gis',
+            label: t('navigation.tabs.gis'),
+            icon: '🗺️',
+            display: {
+                preset: 'balancedMobile',
+                overrides: {
+                    mobileScroll: 'right', mobileWeightIconOnly: 0.6
+                }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/explore/gis') },
+                activeMatchPaths: [
+                    withRouteLocale(route, '/explore/gis')
                 ]
             }
         }),
@@ -310,23 +327,6 @@ export function useExploreBarConfig() {
                 matchPages: ['praat'],
                 activeMatchPaths: [
                     withRouteLocale(route, '/explore/tools/praat')
-                ]
-            }
-        }),
-        gis: createExploreTab({
-            tab: 'gis',
-            label: t('navigation.tabs.gis'),
-            icon: '🗺️',
-            display: {
-                preset: 'balancedMobile',
-                overrides: {
-                    mobileScroll: 'right', mobileWeightIconOnly: 0.6
-                }
-            },
-            navigation: {
-                defaultTo: { path: withRouteLocale(route, '/explore/gis') },
-                activeMatchPaths: [
-                    withRouteLocale(route, '/explore/gis')
                 ]
             }
         }),
@@ -409,6 +409,30 @@ export function useExploreBarConfig() {
             navigation: {
                 defaultTo: { path: withRouteLocale(route, '/menu/compare/zhonggu') }
             }
-        })
+        }),
+        navVocab: createExploreTab({
+            tab: 'vocabulary',
+            label: t('navigation.tabs.vocabulary'),
+            icon: '📋',
+            display: {
+                preset: 'compactDesktop',
+                overrides: { scroll: 'right', weightIconOnly: 0.3 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/vocabulary') }
+            }
+        }),
+        navYubao: createExploreTab({
+            tab: 'yubao',
+            label: t('navigation.tabs.yubao'),
+            icon: '📖',
+            display: {
+                preset: 'compactDesktop',
+                overrides: { scroll: 'right', weightIconOnly: 0.3 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/menu/yubao') }
+            }
+        }),
     }))
 }
