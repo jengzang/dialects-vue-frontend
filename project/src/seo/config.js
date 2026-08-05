@@ -352,6 +352,42 @@ const SEO_CONFIG = {
         en: 'Browse vocabulary materials with card, map, and table views, plus upload and management features.',
       },
     },
+    '/menu/vocabulary/view': {
+      title: {
+        'zh-Hant': '詞表瀏覽｜方音圖鑑',
+        'zh-CN': '词表浏览｜方音图鉴',
+        en: 'Vocabulary Browser | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '以卡片、地圖或表格視圖瀏覽方言詞彙資料，支持分類篩選與搜索。',
+        'zh-CN': '以卡片、地图或表格视图浏览方言词汇资料，支持分类筛选与搜索。',
+        en: 'Browse dialect vocabulary in card, map, or table views with category filtering and search.',
+      },
+    },
+    '/menu/vocabulary/import': {
+      title: {
+        'zh-Hant': '詞表匯入｜方音圖鑑',
+        'zh-CN': '词表导入｜方音图鉴',
+        en: 'Vocabulary Import | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '匯入方言詞彙資料，支持批量上傳與格式校驗。',
+        'zh-CN': '导入方言词汇资料，支持批量上传与格式校验。',
+        en: 'Import dialect vocabulary data with batch upload and format validation.',
+      },
+    },
+    '/menu/vocabulary/manage': {
+      title: {
+        'zh-Hant': '詞表管理｜方音圖鑑',
+        'zh-CN': '词表管理｜方音图鉴',
+        en: 'Vocabulary Management | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '管理方言詞彙資料庫，支持編輯、刪除與批量操作。',
+        'zh-CN': '管理方言词汇数据库，支持编辑、删除与批量操作。',
+        en: 'Manage the dialect vocabulary database with editing, deletion, and batch operations.',
+      },
+    },
     '/menu/villages': {
       title: {
         'zh-Hant': '自然村｜方音圖鑑',
@@ -623,7 +659,6 @@ export const SITEMAP_PATHS = [
   '/explore/tools/praat',
   '/explore/manage',
   '/explore/char-class',
-  '/explore/yc/words',
   '/explore/yc/villages',
   '/explore/villages/gd',
   '/explore/villages/table',

@@ -1,0 +1,110 @@
+import { ref, nextTick, onMounted, onBeforeUnmount, watch } from 'vue'
+
+export function useScrollArrows(navRef, hasOverflow, scrollAmount = 180, desktopRef = null) {
+  const canScrollLeft = ref(false)
+  const canScrollRight = ref(false)
+  const arrowLeftPx = ref(0)
+  const arrowRightPx = ref(0)
+  let _interval = null
+
+  const updateVisibility = () => {
+    const el = navRef?.value
+    if (!el || !hasOverflow?.value) {
+      canScrollLeft.value = false
+      canScrollRight.value = false
+      return
+    }
+    canScrollLeft.value = el.scrollLeft > 1
+    canScrollRight.value = el.scrollLeft + el.clientWidth < el.scrollWidth - 1
+  }
+
+  const updateArrowPositions = () => {
+    if (!desktopRef?.value || !navRef?.value) return
+    const desktopRect = desktopRef.value.getBoundingClientRect()
+    const navRect = navRef.value.getBoundingClientRect()
+
+    let leftSibling = navRef.value.previousElementSibling
+    while (leftSibling?.classList.contains('scroll-arrow')) {
+      leftSibling = leftSibling.previousElementSibling
+    }
+    if (leftSibling) {
+      const r = leftSibling.getBoundingClientRect()
+      arrowLeftPx.value = (r.right + navRect.left) / 2 - desktopRect.left - 5
+    }
+
+    let rightSibling = navRef.value.nextElementSibling
+    while (rightSibling?.classList.contains('scroll-arrow')) {
+      rightSibling = rightSibling.nextElementSibling
+    }
+    if (rightSibling) {
+      const r = rightSibling.getBoundingClientRect()
+      arrowRightPx.value = desktopRect.right - (navRect.right + r.left) / 2 - 5
+    }
+  }
+
+  const stopScroll = () => {
+    if (_interval) {
+      clearInterval(_interval)
+      _interval = null
+    }
+  }
+
+  const startScroll = (direction) => {
+    stopScroll()
+    const el = navRef?.value
+    if (!el) return
+
+    const delta = direction === 'left' ? -scrollAmount : scrollAmount
+    el.scrollBy({ left: delta, behavior: 'smooth' })
+
+    _interval = setInterval(() => {
+      el.scrollBy({ left: delta, behavior: 'auto' })
+      updateVisibility()
+    }, 50)
+  }
+
+  onMounted(() => {
+    const el = navRef?.value
+    if (el) {
+      el.addEventListener('scroll', updateVisibility, { passive: true })
+      el.addEventListener('scroll', updateArrowPositions, { passive: true })
+      updateVisibility()
+      nextTick(updateArrowPositions)
+    }
+    if (desktopRef?.value) {
+      window.addEventListener('resize', updateArrowPositions)
+    }
+  })
+
+  onBeforeUnmount(() => {
+    stopScroll()
+    const el = navRef?.value
+    if (el) {
+      el.removeEventListener('scroll', updateVisibility)
+      el.removeEventListener('scroll', updateArrowPositions)
+    }
+    if (desktopRef?.value) {
+      window.removeEventListener('resize', updateArrowPositions)
+    }
+  })
+
+  watch(hasOverflow, () => {
+    updateVisibility()
+    nextTick(updateArrowPositions)
+  })
+
+  watch([canScrollLeft, canScrollRight], () => {
+    nextTick(updateArrowPositions)
+  })
+
+  return {
+    canScrollLeft,
+    canScrollRight,
+    arrowLeftPx,
+    arrowRightPx,
+    startScroll,
+    stopScroll,
+    updateVisibility,
+    updateArrowPositions,
+  }
+}
