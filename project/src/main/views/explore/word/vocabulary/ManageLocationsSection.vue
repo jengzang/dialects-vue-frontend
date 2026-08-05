@@ -266,4 +266,10 @@ watch(() => props.hasVocabularyPermission, (has) => {
 }, { immediate: true })
 </script>
 
+<script>
+export default {
+  name: 'ManageLocationsSection'
+}
+</script>
+
 <style scoped lang="scss" src="./vocabulary.scss"></style>

@@ -77,7 +77,7 @@ const DISPLAY_PRESETS = {
   compactDesktop: {
     weight: 0.8,
     weightIconOnly: 0.25,
-    fontSize: 1.2
+    fontSize: 1.1
   },
   resultTab: {
     mobileWeightIconOnly: 0.4

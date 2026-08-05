@@ -697,4 +697,10 @@ watch(selectedStandardWords, (words) => {
 })
 </script>
 
+<script>
+export default {
+  name: 'VocabularyViewPage'
+}
+</script>
+
 <style scoped lang="scss" src="./vocabulary.scss"></style>

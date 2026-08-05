@@ -177,4 +177,10 @@ watch(() => [
 }, { immediate: true })
 </script>
 
+<script>
+export default {
+  name: 'VocabularyManagePage'
+}
+</script>
+
 <style scoped lang="scss" src="./vocabulary.scss"></style>

@@ -20,6 +20,10 @@
     "name": "Acoustic Analysis",
     "desc": "Analyze pitch, formants, and related data with Praat"
   },
+  "gis": {
+    "name": "Map Drawing",
+    "desc": "Draw, edit, and manage polygons, markers, and layers on an interactive map"
+  },
   "common": {
     "close": "Close",
     "reset": "Start Over",

@@ -37,6 +37,8 @@ const keepAliveViewNames = [
   'PhoPage',
   'QueryPage',
   'ResultPage',
+  'VocabularyPage',
+  'YuBaoMenuPage',
 ]
 
 // const shouldShowHeader = computed(() => {
@@ -113,7 +115,7 @@ $system-font:
   }
 
   .glass-content {
-    padding: 17dvh 8px 8px;
+    padding: 15dvh 8px 8px;
     font-size: 1.1rem;
     line-height: 1.6;
   }

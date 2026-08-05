@@ -42,4 +42,10 @@ const tableColumns = computed(() => [
 ])
 </script>
 
+<script>
+export default {
+  name: 'ManageEntriesSection'
+}
+</script>
+
 <style scoped lang="scss" src="./vocabulary.scss"></style>

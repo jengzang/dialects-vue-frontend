@@ -247,26 +247,6 @@ export function useExploreBarConfig() {
                 ]
             }
         }),
-        yangchun: createExploreTab({
-            tab: 'yangchun',
-            label: t('navigation.tabs.yangchun'),
-            icon: '🌿',
-            display: {
-                preset: 'standard',
-                overrides: {}
-            },
-            navigation: {
-                defaultTo: { path: withRouteLocale(route, '/explore/yc/words') },
-                matchPages: ['ycSpoken', 'ycVillages'],
-                activeMatchPaths: [],
-                rememberChild: true,
-                defaultChild: '/explore/yc/words',
-                children: [
-                    { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc/words') },
-                    { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/yc/villages') }
-                ]
-            }
-        }),
         villages: createExploreTab({
             tab: 'villages',
             label: t('navigation.tabs.villages'),
@@ -347,6 +327,26 @@ export function useExploreBarConfig() {
                 defaultTo: { path: withRouteLocale(route, '/explore/gis') },
                 activeMatchPaths: [
                     withRouteLocale(route, '/explore/gis')
+                ]
+            }
+        }),
+        yangchun: createExploreTab({
+            tab: 'yangchun',
+            label: t('navigation.tabs.yangchun'),
+            icon: '🏡',
+            display: {
+                preset: 'compactDesktop',
+                overrides: { mobileScroll: 'right', weightIconOnly: 0.3 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/explore/yc/words') },
+                matchPages: ['ycSpoken', 'ycVillages'],
+                activeMatchPaths: [],
+                rememberChild: true,
+                defaultChild: '/explore/yc/words',
+                children: [
+                    { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc/words') },
+                    { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/yc/villages') }
                 ]
             }
         }),

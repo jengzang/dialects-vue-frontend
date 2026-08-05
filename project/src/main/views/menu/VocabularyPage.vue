@@ -191,4 +191,10 @@ watch(
 )
 </script>
 
+<script>
+export default {
+  name: 'VocabularyPage'
+}
+</script>
+
 <style scoped lang="scss" src="@/main/views/explore/word/vocabulary/vocabulary.scss"></style>

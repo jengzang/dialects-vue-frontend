@@ -864,4 +864,10 @@ async function handleImportAfterPreview() {
 }
 </script>
 
+<script>
+export default {
+  name: 'VocabularyImportPage'
+}
+</script>
+
 <style scoped lang="scss" src="./vocabulary.scss"></style>

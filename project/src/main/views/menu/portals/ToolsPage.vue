@@ -52,6 +52,16 @@
           {{ $t('tools.praatAnalysis.desc') }}
         </div>
       </button>
+
+      <button class="entry-button" @click="handleGis">
+        <div class="entry-button__icon">🗺️</div>
+        <div class="entry-button__name">
+          {{ $t('tools.gis.name') }}
+        </div>
+        <div class="entry-button__desc">
+          {{ $t('tools.gis.desc') }}
+        </div>
+      </button>
     </div>
   </div>
 </template>
@@ -108,6 +118,15 @@ const handlePraatTables = () => {
     buildLocalePath(
       resolveRouteLocale(route),
       '/explore/tools/praat'
+    )
+  )
+}
+
+const handleGis = () => {
+  router.push(
+    buildLocalePath(
+      resolveRouteLocale(route),
+      '/explore/gis'
     )
   )
 }
