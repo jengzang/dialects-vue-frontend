@@ -33,7 +33,7 @@
         </div>
       </button>
 
-      <button class="entry-button" @click="handleDeriveTables">
+      <!-- <button class="entry-button" @click="handleDeriveTables">
         <div class="entry-button__icon">🧪</div>
         <div class="entry-button__name">
           {{ $t('tools.deriveTables.name') }}
@@ -41,7 +41,7 @@
         <div class="entry-button__desc">
           {{ $t('tools.deriveTables.desc') }}
         </div>
-      </button>
+      </button> -->
 
       <button class="entry-button" @click="handlePraatTables">
         <div class="entry-button__icon">👂️</div>
@@ -94,14 +94,14 @@ const handleMergeTables = () => {
   )
 }
 
-const handleDeriveTables = () => {
-  router.push(
-    buildLocalePath(
-      resolveRouteLocale(route),
-      '/explore/tools/derive'
-    )
-  )
-}
+// const handleDeriveTables = () => {
+//   router.push(
+//     buildLocalePath(
+//       resolveRouteLocale(route),
+//       '/explore/tools/derive'
+//     )
+//   )
+// }
 
 const handlePraatTables = () => {
   router.push(

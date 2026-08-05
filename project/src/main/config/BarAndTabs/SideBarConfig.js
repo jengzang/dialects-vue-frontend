@@ -120,7 +120,7 @@ export function useSidebarConfig() {
                 { label: t('navigation.submenu.tools.check'), icon: '📝', path: withRouteLocale(route, '/explore/tools/check') },
                 { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: withRouteLocale(route, '/explore/tools/jyut2ipa') },
                 { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: withRouteLocale(route, '/explore/tools/merge') },
-                { label: t('navigation.submenu.tools.derive'), icon: '🧪', path: withRouteLocale(route, '/explore/tools/derive') },
+                // { label: t('navigation.submenu.tools.derive'), icon: '🧪', path: withRouteLocale(route, '/explore/tools/derive') },
                 // { label: t('navigation.submenu.tools.praat'), icon: '👂️', path: withRouteLocale(route, '/explore/tools/praat') }
             ]
         },
@@ -247,7 +247,7 @@ export const SideConfig = {
             { label: '字表工具', icon: '📋', path: buildLocalePath('zh-Hant', '/explore/tools/check') },
             { label: '粵拼轉IPA', icon: '🔄', path: buildLocalePath('zh-Hant', '/explore/tools/jyut2ipa') },
             { label: '字表合併', icon: '🔗', path: buildLocalePath('zh-Hant', '/explore/tools/merge') },
-            { label: '字表推導', icon: '🧪', path: buildLocalePath('zh-Hant', '/explore/tools/derive') },
+            // { label: '字表推導', icon: '🧪', path: buildLocalePath('zh-Hant', '/explore/tools/derive') },
             { label: '聲學分析', icon: '🌊', path: buildLocalePath('zh-Hant', '/explore/tools/praat') }
         ]
     },
