@@ -220,11 +220,11 @@
                 <span class="link-icon">📒</span>
                 <span class="link-text">{{ $t('home.features.words.wordList') }}</span>
               </a>
-              <a @click.stop="navigateTo('/menu/yubao')" class="feature-link">
+              <a @click.stop="navigateTo('/menu/yubao?tab=vocabulary')" class="feature-link">
                 <span class="link-icon">📖</span>
                 <span class="link-text">{{ $t('home.features.words.yubaoVocab') }}</span>
               </a>
-              <a @click.stop="navigateTo('/menu/yubao')" class="feature-link">
+              <a @click.stop="navigateTo('/menu/yubao?tab=grammar')" class="feature-link">
                 <span class="link-icon">🗣️</span>
                 <span class="link-text">{{ $t('home.features.words.yubaoGrammar') }}</span>
               </a>

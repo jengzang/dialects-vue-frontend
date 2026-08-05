@@ -68,6 +68,12 @@ const DISPLAY_DEFAULTS = {
 
 const DISPLAY_PRESETS = {
   standard: {},
+  standard_small: {
+    weight: 0.8,
+    mobileWeight: 0.9,
+    weightIconOnly: 0.5,
+    fontSize: 1.2,
+  },
   compactDesktop: {
     weight: 0.8,
     weightIconOnly: 0.25,
@@ -132,7 +138,7 @@ function getMenuTabKeyFromRoute(route) {
   if (normalizedPath === '/menu/privacy') return 'privacy'
   if (normalizedPath === '/menu/settings') return 'setting'
   if (normalizedPath === '/menu/tools') return 'tools'
-  if (normalizedPath === '/menu/vocabulary') return 'vocabulary'
+  if (normalizedPath.startsWith('/menu/vocabulary')) return 'vocabulary'
   if (normalizedPath === '/menu/yubao') return 'yubao'
   if (normalizedPath === '/menu/words') return 'vocabulary'
   if (normalizedPath === '/menu/villages') return 'villages'
@@ -207,8 +213,9 @@ export function useMenuTabsConfig() {
       display: {
         preset: 'compactDesktop',
         overrides: {
-          weight: 0.8,
-          mobileWeight: 0.8
+          mobileScroll: 'left',
+          weight: 0.7,
+          weightIconOnly: 0.4,
         }
       },
       navigation: {
@@ -282,8 +289,8 @@ export function useMenuTabsConfig() {
       label: t('navigation.tabs.vocabulary'),
       icon: '📒',
       display: {
-        preset: 'compactDesktop',
-        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+        preset: 'standard_small',
+        overrides: {}
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/menu/vocabulary') }
@@ -294,8 +301,8 @@ export function useMenuTabsConfig() {
       label: t('navigation.tabs.yubao'),
       icon: '📖',
       display: {
-        preset: 'compactDesktop',
-        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+        preset: 'standard_small',
+        overrides: {}
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/menu/yubao') }
