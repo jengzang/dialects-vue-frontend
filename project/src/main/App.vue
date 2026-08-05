@@ -78,10 +78,6 @@ export default {
       }
 
       // New canonical explore routes
-      if (normalizedPath === '/explore/tools/praat') {
-        return SimpleLayout
-      }
-
       if (
         normalizedPath.startsWith('/explore/tools/') ||
         normalizedPath === '/explore/manage' ||
@@ -94,16 +90,8 @@ export default {
         return ExploreLayout
       }
 
-      // Legacy /explore entry: choose layout by query.page
+      // Legacy /explore entry: use ExploreLayout（有 ExploreBar）
       if (normalizedPath === '/explore') {
-        const page = route.query.page
-
-        // Praat 页面使用 SimpleLayout（无 navbar）
-        if (page === 'praat') {
-          return SimpleLayout
-        }
-
-        // 其他 explore 页面使用 ExploreLayout（有 ExploreBar）
         return ExploreLayout
       }
 

@@ -333,8 +333,11 @@ export function useExploreBarConfig() {
                 }
             },
             navigation: {
-                defaultTo: { path: '/explore/tools/praat' },
-                matchPages: ['praat']
+                defaultTo: { path: withRouteLocale(route, '/explore/tools/praat') },
+                matchPages: ['praat'],
+                activeMatchPaths: [
+                    withRouteLocale(route, '/explore/tools/praat')
+                ]
             }
         }),
         navPho: createExploreTab({

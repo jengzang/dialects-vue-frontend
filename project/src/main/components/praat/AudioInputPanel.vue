@@ -505,8 +505,6 @@ $transition-duration: 0.3s;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    padding: 1rem;
-    border: none;
     font-size: 1rem;
     cursor: pointer;
 

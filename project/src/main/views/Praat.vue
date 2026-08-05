@@ -1,4 +1,5 @@
 <template>
+
   <div class="praat-page">
 <!--    &lt;!&ndash; Login Button (top right) &ndash;&gt;-->
 <!--    <div v-if="!userStore.isAuthenticated" class="login-prompt">-->
@@ -7,12 +8,6 @@
 <!--        <span>請先登錄</span>-->
 <!--      </button>-->
 <!--    </div>-->
-
-    <div class="page-header">
-      <h1 class="page-title">{{ t('praat.main.title') }}</h1>
-      <p class="page-description">{{ t('praat.main.description') }}</p>
-    </div>
-
     <!-- Tab Navigation -->
     <div class="tab-navigation">
       <div class="tab-container">
@@ -48,6 +43,11 @@
           {{ t('praat.main.tabs.pitchTone') }}
         </button>
       </div>
+    </div>
+
+    <div class="page-header">
+      <h1 class="page-title">{{ t('praat.main.title') }}</h1>
+      <p v-if="activeTab === 'upload'" class="page-description">{{ t('praat.main.description') }}</p>
     </div>
 
 <!--    <div class="page-content">-->
@@ -936,7 +936,7 @@ onBeforeUnmount(() => {
   @include flex-col;
   justify-content: center;
   align-items: center;
-  height: 95dvh;
+  // height: 88dvh;
 }
 
 /* Login Prompt */
@@ -951,7 +951,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.2rem;
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
@@ -969,11 +969,11 @@ onBeforeUnmount(() => {
 
 .page-header {
   text-align: center;
-  margin-bottom: 1rem;
+  // margin-bottom: 1rem;
 }
 
 .page-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
@@ -1081,7 +1081,7 @@ onBeforeUnmount(() => {
   gap: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: 75dvh;
+  max-height: 80dvh;
   border-radius: 25px;
   width: 90dvw;
 }
@@ -1093,12 +1093,12 @@ onBeforeUnmount(() => {
 }
 
 .action-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
 }
 
 .start-button {
   width: 100%;
-  padding: 1rem 1.5rem;
+  padding: 1rem 1.2rem;
   font-size: 1.1rem;
   font-weight: 600;
   border: none;
@@ -1122,7 +1122,7 @@ onBeforeUnmount(() => {
 
 /* Job Status Inline (in Tab 2) */
 .job-status-inline {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
 }
 
 /* Settings Trigger */
@@ -1130,7 +1130,7 @@ onBeforeUnmount(() => {
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.2rem;
   flex-wrap: wrap;
 }
 
@@ -1262,7 +1262,7 @@ onBeforeUnmount(() => {
 }
 
 .sidebar-title {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0;
@@ -1315,7 +1315,7 @@ onBeforeUnmount(() => {
     inset 0 1px 0 var(--glass-60);
   z-index: 100;
   overflow: hidden;
-  max-height: 95dvh;
+  max-height: 90dvh;
 }
 
 /* Preview Fade Transition */
@@ -1335,22 +1335,20 @@ onBeforeUnmount(() => {
 }
 
 /* Mobile Responsive */
-/* Mobile Responsive */
-@media (max-width: 768px) {
+@media (max-aspect-ratio: 1/1) {
   .praat-page {
     padding: 0;
+    height: 90dvh;
+    margin: 0;
   }
 
   .page-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
+    margin:0;
   }
 
   .tab-navigation {
-    position: fixed;
-    bottom: auto;
-    top: 0.5rem;
-    left: 50%;
-    transform: translateX(-50%);
+    position: static;
     width: 100%;
   }
 
@@ -1374,7 +1372,9 @@ onBeforeUnmount(() => {
   .audio-preview-float {
     position: fixed;
     bottom: auto;
-    top: 0;
+    top: 8dvh;
+    max-height: 90dvh;
+    // overflow-y: auto;
     left: 0;
     right: 0;
     width: 100%;
@@ -1433,7 +1433,7 @@ onBeforeUnmount(() => {
 
 
 .loading-title {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin-bottom: 0.5rem;
@@ -1487,12 +1487,12 @@ onBeforeUnmount(() => {
 
 .no-results-icon {
   font-size: 4rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
   opacity: 0.6;
 }
 
 .no-results-title {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin-bottom: 0.5rem;

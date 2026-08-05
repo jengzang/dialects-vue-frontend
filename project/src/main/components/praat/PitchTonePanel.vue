@@ -1172,7 +1172,7 @@ $transition-normal: 0.3s;
   height: 350px;
   overflow: hidden;
   padding: 0.5rem;
-  background: $white;
+  // background: $white;
   border: 1px solid $border-light;
   border-radius: var(--radius-md, var(--radius-sm2));
   box-shadow: 0 2px 8px $border-light;
@@ -1316,7 +1316,7 @@ $transition-normal: 0.3s;
   align-items: center;
   gap: 0.5rem;
   padding: 0.4rem 0.8rem;
-  background: $white;
+  // background: $white;
   border: 2px solid rgba(0, 0, 0, 0.5);
   border-radius: var(--radius-2xl);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -1332,7 +1332,7 @@ $transition-normal: 0.3s;
   }
 
   .tag-name {
-    color: var(--action-primary-text);
+    color: var(--color-primary);
     font-weight: 700;
   }
 

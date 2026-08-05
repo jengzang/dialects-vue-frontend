@@ -961,7 +961,7 @@ $transition-normal: 0.3s;
 }
 
 .audio-preview-panel {
-  padding: 1.25rem;
+  padding: 0.6rem 1rem;
 }
 
 .panel-title {
@@ -985,7 +985,7 @@ $transition-normal: 0.3s;
   display: flex;
   justify-content: center;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .mode-button {
@@ -1207,7 +1207,7 @@ $transition-normal: 0.3s;
 }
 
 .full-waveform-section {
-  padding: 1rem;
+  padding: 0.5rem;
   background: $surface-medium;
   border-radius: var(--radius-lg);
 }
@@ -1299,11 +1299,11 @@ $transition-normal: 0.3s;
 .regions-list {
   @include flex-col;
   gap: 0.75rem;
-  max-height: 20rem;
+  max-height: 38dvh;
   overflow-y: auto;
 
   > h4 {
-    margin: 0 0 0.5rem;
+    margin: 0.5rem 0 0;
     color: $text-primary;
     text-align: center;
     font-size: 0.9rem;
@@ -1444,7 +1444,15 @@ $transition-normal: 0.3s;
 
 @media (max-aspect-ratio: 1/1) {
   .audio-preview-panel {
-    padding: 0.5rem;
+    padding: 0.3rem 0.8rem;
+  }
+
+  .full-waveform-section{
+    padding:0.1rem;
+  }
+
+  .full-waveform{
+    padding:0;
   }
 
   .manual-mode {
