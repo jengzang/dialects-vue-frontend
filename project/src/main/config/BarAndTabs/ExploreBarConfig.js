@@ -284,6 +284,9 @@ export function useExploreBarConfig() {
             navigation: {
                 defaultTo: { path: withRouteLocale(route, '/menu/villages') },
                 matchPages: ['toponyms', 'gdVillages', 'gdVillagesTable', 'ycVillages', 'VillagesML'],
+                activeMatchPaths: [
+                    withRouteLocale(route, '/explore/villages/table')
+                ],
                 rememberChild: true,
                 defaultChild: '/explore/villages/gd',
                 children: [
