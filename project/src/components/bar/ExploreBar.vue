@@ -204,7 +204,7 @@ const props = defineProps({
   },
   scrollArrowAmount: {
     type: Number,
-    default: 180,
+    default: 100,
   },
 })
 

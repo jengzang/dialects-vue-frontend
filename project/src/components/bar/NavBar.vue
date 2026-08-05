@@ -1,7 +1,7 @@
 <template>
   <div class="navbar">
     <!-- 桌面端的布局 -->
-    <div class="navbar-desktop">
+    <div ref="desktopRef" class="navbar-desktop">
       <div  class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div @click="toggleSidebar" class="logo-container desktop-brand-logo">
           <img class="logo" :src="faviconSrc" alt="Logo" />
@@ -10,9 +10,20 @@
           <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
         </div>
       </div>
-      <nav 
-          ref="navRef" 
-          class="navbar-btn" 
+      <button
+        v-if="canScrollLeft"
+        class="scroll-arrow scroll-arrow--left"
+        :style="{ left: arrowLeftPx + 'px' }"
+        @mousedown.prevent="startScroll('left')"
+        @mouseup="stopScroll"
+        @mouseleave="stopScroll"
+        @touchstart.prevent="startScroll('left')"
+        @touchend="stopScroll"
+      >◀</button>
+
+      <nav
+          ref="navRef"
+          class="navbar-btn"
           :class="scrollClass"
       >
       <!-- <nav 
@@ -54,6 +65,18 @@
           </a>
         </RouterLink>
       </nav>
+
+      <button
+        v-if="canScrollRight"
+        class="scroll-arrow scroll-arrow--right"
+        :style="{ right: arrowRightPx + 'px' }"
+        @mousedown.prevent="startScroll('right')"
+        @mouseup="stopScroll"
+        @mouseleave="stopScroll"
+        @touchstart.prevent="startScroll('right')"
+        @touchend="stopScroll"
+      >▶</button>
+
       <div class="settings-icon-container" @click="goToSettings" :title="t('navigation.submenu.about.setting')">
         ⚙️
       </div>
@@ -179,6 +202,7 @@ import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useTabTooltip } from '@/composables/bar/useTabTooltip.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
+import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 import { showSuccess } from '@/utils/ui/message.js'
 
@@ -192,6 +216,7 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const isSidebarVisible = ref(false)
+const desktopRef = ref(null)
 const navRef = ref(null)
 const mobileNavRef = ref(null)
 
@@ -230,6 +255,13 @@ const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, o
   { desktop: 30, portrait: 18 },
   mobileNavRef,
   orderedMobileTabs
+)
+
+const { canScrollLeft, canScrollRight, arrowLeftPx, arrowRightPx, startScroll, stopScroll } = useScrollArrows(
+  navRef,
+  hasOverflowDesktop,
+  100,
+  desktopRef
 )
 
 const hasOverflowForLayout = (isMobile) => isMobile ? hasOverflowMobile.value : hasOverflowDesktop.value
@@ -367,6 +399,7 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
 
 /* 桌面端 */
 .navbar-desktop {
+  position: relative;
   width: 100%;
   height: $desktop-navbar-height;
   display: flex;
@@ -744,6 +777,44 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
   .tab-overflow-left,
   .tab-overflow-right {
     padding-inline: 14px;
+  }
+}
+
+.scroll-arrow {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  color: var(--text-dark);
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  background: var(--glass-40);
+  border: 1px solid var(--glass-50);
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 0.2s ease, opacity 0.2s ease;
+
+  &:hover {
+    background: var(--glass-70);
+  }
+
+  &:active {
+    background: var(--glass-90);
+  }
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .scroll-arrow {
+    display: none;
   }
 }
 

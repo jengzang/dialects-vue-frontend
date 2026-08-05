@@ -303,7 +303,7 @@ const showLoginButton = computed(() => {
   return legacy !== false
 })
 const scrollArrows = computed(() => props.layoutConfig?.scrollArrows ?? false)
-const scrollArrowAmount = computed(() => props.layoutConfig?.scrollArrowAmount ?? 180)
+const scrollArrowAmount = computed(() => props.layoutConfig?.scrollArrowAmount ?? 100)
 const height = computed(() => props.layoutConfig?.height || getLegacyAttr('height') || '7.5dvh')
 const mobileHeight = computed(() => props.layoutConfig?.mobileHeight || getLegacyAttr('mobileHeight', 'mobile-height') || '8dvh')
 const normalizedNavigationSchema = computed(() => {
