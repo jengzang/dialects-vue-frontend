@@ -3332,7 +3332,6 @@ const checkAutoDraftOnce = async () => {
 };
 
 const togglePanel = (panelName) => {
-  checkAutoDraftOnce();
   if (isTouchDevice) {
     const wasOpen = panelName === 'drawing' ? isDrawingPanelOpen.value
       : panelName === 'layers' ? isLayersPanelOpen.value
@@ -3426,6 +3425,7 @@ onMounted(async () => {
   try {
     await restoreStoredDrafts();
     markWorkbenchClean();
+    await checkAutoDraftOnce();
   } catch (error) {
     console.warn('restore map draw workbench state failed', error);
   }
