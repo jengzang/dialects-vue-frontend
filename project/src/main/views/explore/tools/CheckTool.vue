@@ -2199,7 +2199,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
 .welcome {
   &-screen {
-    width: 100%;
+    // width: 100%;
     height: 100%;
     @include flex-center;
     padding: 20px;

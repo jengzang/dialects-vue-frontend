@@ -178,13 +178,13 @@
 import { ref, reactive, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import AudioInputPanel from '../components/praat/AudioInputPanel.vue'
-import AudioPreviewPanel from '../components/praat/AudioPreviewPanel.vue'
-import SettingsPanel from '../components/praat/SettingsPanel.vue'
-import JobStatusPanel from '../components/praat/JobStatusPanel.vue'
-import AnalysisResultsPanel from '../components/praat/AnalysisResultsPanel.vue'
-import VowelSpacePanel from '../components/praat/VowelSpacePanel.vue'
-import PitchTonePanel from '../components/praat/PitchTonePanel.vue'
+import AudioInputPanel from '@/main/components/praat/AudioInputPanel.vue'
+import AudioPreviewPanel from '@/main/components/praat/AudioPreviewPanel.vue'
+import SettingsPanel from '@/main/components/praat/SettingsPanel.vue'
+import JobStatusPanel from '@/main/components/praat/JobStatusPanel.vue'
+import AnalysisResultsPanel from '@/main/components/praat/AnalysisResultsPanel.vue'
+import VowelSpacePanel from '@/main/components/praat/VowelSpacePanel.vue'
+import PitchTonePanel from '@/main/components/praat/PitchTonePanel.vue'
 import { usePraatApi } from '@/api'
 import { userStore } from '@/main/store/store.js'
 import { showError, showWarning } from '@/utils/ui/message.js'
@@ -936,7 +936,7 @@ onBeforeUnmount(() => {
   @include flex-col;
   justify-content: center;
   align-items: center;
-  // height: 88dvh;
+  min-height: 100%;
 }
 
 /* Login Prompt */
@@ -1338,7 +1338,7 @@ onBeforeUnmount(() => {
 @media (max-aspect-ratio: 1/1) {
   .praat-page {
     padding: 0;
-    height: 90dvh;
+    min-height: 100%;
     margin: 0;
   }
 
