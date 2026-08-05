@@ -335,6 +335,7 @@
 
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
@@ -349,6 +350,7 @@ import defaultReferenceWorkbookUrl from '/data/参考表.xlsx?url'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
+const route = useRoute()
 const { requireAuth } = useAuthGuard({
   defaultRedirect: '/explore/tools/merge',
 })
