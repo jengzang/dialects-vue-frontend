@@ -1139,7 +1139,7 @@ const updateActiveLayerFeatureCollection = (nextValue) => {
 const handleLogin = async () => {
   await requireAuth({
     message: t('map.drawTab.auth.loginRequired'),
-    redirect: route.fullPath || '/menu/map/draw',
+    redirect: route.fullPath || '/explore/gis',
   });
 };
 
@@ -3451,7 +3451,7 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
-@use '../../../../styles/global/scrollbars' as scrollbars;
+@use '@/styles/global/scrollbars' as scrollbars;
 
 .map-draw-tab {
   position: relative;

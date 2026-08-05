@@ -521,7 +521,7 @@ vi.mock('/data/国界面.kmz?url', () => ({ default: '/data/border.kmz' }))
 
 import { buildAutoDraftRecord } from '../src/main/utils/drawMap/draftStorage.js'
 import { readImportedLayerFile, splitFeatureCollectionByGeometryType } from '../src/main/utils/drawMap/export.js'
-import MapDrawTab from '../src/main/components/map/Tabs/MapDrawTab.vue'
+import MapDrawTab from '../src/main/views/explore/GisPage.vue'
 
 function mountMapDrawTab() {
   const host = document.createElement('div')

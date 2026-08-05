@@ -65,6 +65,7 @@
       "merge": "字表合併",
       "derive": "字表推導",
       "praat": "聲學分析",
+      "gis": "GIS",
       "praatname": "Praat"
     },
     "source": {
@@ -92,6 +93,7 @@
     "about": "關於",
     "tools": "工具",
     "praat": "praat",
+    "gis": "GIS",
     "phrases": "詞句",
     "villages": "村落",
     "aboutWebsite": "關於",

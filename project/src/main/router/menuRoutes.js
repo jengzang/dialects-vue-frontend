@@ -54,7 +54,7 @@ export const menuRoutes = [
     })
   },
   {
-    path: 'menu/map/:sub(view|divide|custom|draw)',
+    path: 'menu/map/:sub(view|divide|custom)',
     component: MapPage
   },
   {

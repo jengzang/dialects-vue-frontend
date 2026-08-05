@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 const testsDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(testsDir, '..')
 const editableMapLibrePath = resolve(projectRoot, 'src/main/components/map/EditableMapLibre.vue')
-const mapDrawTabPath = resolve(projectRoot, 'src/main/components/map/Tabs/MapDrawTab.vue')
+const mapDrawTabPath = resolve(projectRoot, 'src/main/views/explore/GisPage.vue')
 const mapDrawToolsPanelPath = resolve(projectRoot, 'src/main/components/map/Draw/panels/MapDrawToolsPanel.vue')
 const mapDrawLayersPanelPath = resolve(projectRoot, 'src/main/components/map/Draw/panels/MapDrawLayersPanel.vue')
 const zhCnMapLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-CN/map.json')

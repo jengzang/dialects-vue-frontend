@@ -298,7 +298,7 @@ export const tutorialManifest = [
     categoryKey: 'practicalTools',
     groupKey: 'menuMapDraw',
     order: 47,
-    path: '/menu/map/draw',
+    path: '/explore/gis',
   }),
 
   // ==================== 自然村 ====================

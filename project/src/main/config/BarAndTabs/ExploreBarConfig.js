@@ -340,6 +340,23 @@ export function useExploreBarConfig() {
                 ]
             }
         }),
+        gis: createExploreTab({
+            tab: 'gis',
+            label: t('navigation.tabs.gis'),
+            icon: '🗺️',
+            display: {
+                preset: 'balancedMobile',
+                overrides: {
+                    mobileWeightIconOnly: 0.6
+                }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/explore/gis') },
+                activeMatchPaths: [
+                    withRouteLocale(route, '/explore/gis')
+                ]
+            }
+        }),
         navPho: createExploreTab({
             tab: 'pho',
             label: t('navigation.tabs.phonology'),

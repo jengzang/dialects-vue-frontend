@@ -566,7 +566,7 @@ const navigateToVoronoi = () => {
 
   emit('close')
   router.push({
-    path: buildLocalePath(resolveRouteLocale(route), '/menu/map/draw'),
+    path: buildLocalePath(resolveRouteLocale(route), '/explore/gis'),
     query: { scrollTo: 'drawBottom' },
   })
 }

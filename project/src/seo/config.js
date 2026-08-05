@@ -408,7 +408,7 @@ export const SITEMAP_PATHS = [
   '/menu/map/view',
   '/menu/map/divide',
   '/menu/map/custom',
-  '/menu/map/draw',
+  '/explore/gis',
   '/menu/result',
   '/menu/tools',
   '/menu/words',

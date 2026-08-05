@@ -126,7 +126,7 @@
                 <span class="link-icon">📁</span>
                 <span class="link-text">{{ $t('home.features.map.customMap') }}</span>
               </a>
-              <a @click.stop="navigateTo('/menu/map/draw')" class="feature-link">
+              <a @click.stop="navigateTo('/explore/gis')" class="feature-link">
                 <span class="link-icon">✏️</span>
                 <span class="link-text">{{ $t('home.features.map.drawMap') }}</span>
               </a>

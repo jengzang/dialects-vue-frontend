@@ -23,7 +23,7 @@ export const MENU_LEGACY_ROUTES = {
       map: '/menu/map/view',
       divide: '/menu/map/divide',
       custom: '/menu/map/custom',
-      draw: '/menu/map/draw'
+      draw: '/explore/gis'
     }
   },
   pho: {

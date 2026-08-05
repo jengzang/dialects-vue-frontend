@@ -65,6 +65,7 @@
       "merge": "Merge Character Lists",
       "derive": "Character List Derivation",
       "praat": "Acoustic Analysis",
+      "gis": "GIS",
       "praatname": "Praat"
     },
     "source": {
@@ -92,6 +93,7 @@
     "about": "About",
     "tools": "Tools",
     "praat": "Praat",
+    "gis": "GIS",
     "phrases": "Phrases",
     "villages": "Villages",
     "aboutWebsite": "About",

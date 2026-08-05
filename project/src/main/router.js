@@ -68,6 +68,10 @@ const routes = [
         redirect: createLocaleRedirect('/explore/tools/praat')
       },
       {
+        path: 'menu/map/draw',
+        redirect: createLocaleRedirect('/explore/gis')
+      },
+      {
         path: 'auth',
         component: Auth
       },
@@ -213,6 +217,9 @@ const ROUTE_QUERY_ALLOWLIST = {
   },
   '/explore/tools/praat': {
     base: ['tab']
+  },
+  '/explore/gis': {
+    base: ['scrollTo']
   },
   '/explore/manage': {
     base: []

@@ -6,6 +6,7 @@ const Jyut2IpaTool = () => import('@/main/views/explore/tools/Jyut2IpaTool.vue')
 const MergeTool = () => import('@/main/views/explore/tools/MergeTool.vue')
 const DeriveTool = () => import('@/main/views/explore/tools/DeriveTool.vue')
 const PraatPage = () => import('@/main/views/Praat.vue')
+const GisPage = () => import('@/main/views/explore/GisPage.vue')
 const TableManagePage = () => import('@/main/views/explore/tools/TableManage.vue')
 const YuBaoPage = () => import('@/main/views/explore/word/YuBaoPage.vue')
 const VocabularyPage = () => import('@/main/views/explore/word/VocabularyPage.vue')
@@ -41,6 +42,10 @@ export const exploreRoutes = [
   {
     path: 'explore/tools/praat',
     component: PraatPage
+  },
+  {
+    path: 'explore/gis',
+    component: GisPage
   },
   {
     path: 'explore/manage',
