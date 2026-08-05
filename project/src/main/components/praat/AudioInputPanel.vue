@@ -17,7 +17,7 @@
       <input
         ref="fileInput"
         type="file"
-        accept="audio/*"
+        accept="audio/*,.m4a,.mp3,.wav,.ogg,.flac,.aac,.webm"
         @change="handleFileSelect"
         style="display: none"
       />
