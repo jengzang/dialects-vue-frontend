@@ -132,7 +132,9 @@ function getMenuTabKeyFromRoute(route) {
   if (normalizedPath === '/menu/privacy') return 'privacy'
   if (normalizedPath === '/menu/settings') return 'setting'
   if (normalizedPath === '/menu/tools') return 'tools'
-  if (normalizedPath === '/menu/words') return 'words'
+  if (normalizedPath === '/menu/vocabulary') return 'vocabulary'
+  if (normalizedPath === '/menu/yubao') return 'yubao'
+  if (normalizedPath === '/menu/words') return 'vocabulary'
   if (normalizedPath === '/menu/villages') return 'villages'
   if (normalizedPath === '/menu/cluster') return 'cluster'
   if (normalizedPath.startsWith('/menu/pho/')) return 'pho'
@@ -276,6 +278,30 @@ export function useMenuTabsConfig() {
       }
     }),
     createMenuTab({
+      tab: 'vocabulary',
+      label: t('navigation.tabs.vocabulary'),
+      icon: '📒',
+      display: {
+        preset: 'compactDesktop',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/vocabulary') }
+      }
+    }),
+    createMenuTab({
+      tab: 'yubao',
+      label: t('navigation.tabs.yubao'),
+      icon: '📖',
+      display: {
+        preset: 'compactDesktop',
+        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/yubao') }
+      }
+    }),
+    createMenuTab({
       tab: 'charClass',
       label: t('navigation.tabs.charClass'),
       icon: '📚',
@@ -291,18 +317,6 @@ export function useMenuTabsConfig() {
           path: withRouteLocale(route, '/explore/char-class'),
           query: { tab: 'zhonggu' }
         }
-      }
-    }),
-    createMenuTab({
-      tab: 'words',
-      label: t('navigation.tabs.phrases'),
-      icon: '📖',
-      display: {
-        preset: 'compactDesktop',
-        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
-      },
-      navigation: {
-        defaultTo: { path: withRouteLocale(route, '/menu/words') }
       }
     }),
     createMenuTab({

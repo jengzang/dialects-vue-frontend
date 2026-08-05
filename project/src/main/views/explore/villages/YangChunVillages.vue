@@ -140,7 +140,7 @@ const displayData = computed(() => {
 });
 
 const goToYcSpoken = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/yc-spoken'));
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/yc/words'));
 };
 
 </script>

@@ -161,7 +161,7 @@ function navigateToAuth() {
 }
 
 function navigateToList() {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/vocabulary/view'))
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/vocabulary/view'))
 }
 
 watch(() => [

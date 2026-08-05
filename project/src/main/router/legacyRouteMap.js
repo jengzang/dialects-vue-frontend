@@ -88,7 +88,7 @@ export const EXPLORE_LEGACY_ROUTES = {
     path: '/explore/manage'
   },
   YuBao: {
-    path: '/explore/yubao',
+    path: '/menu/yubao',
     defaultTab: 'vocabulary',
     tabMap: {
       vocabulary: 'vocabulary',
@@ -96,7 +96,7 @@ export const EXPLORE_LEGACY_ROUTES = {
     }
   },
   Vocabulary: {
-    path: '/explore/vocabulary/view',
+    path: '/menu/vocabulary',
     defaultTab: 'table',
     tabMap: {
       table: 'table',
@@ -115,7 +115,7 @@ export const EXPLORE_LEGACY_ROUTES = {
     }
   },
   ycSpoken: {
-    path: '/explore/yc-spoken'
+    path: '/explore/yc/words'
   },
   gdVillages: {
     path: '/explore/villages/gd'

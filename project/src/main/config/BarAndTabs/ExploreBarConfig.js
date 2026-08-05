@@ -247,29 +247,23 @@ export function useExploreBarConfig() {
                 ]
             }
         }),
-        words: createExploreTab({
-            tab: 'words',
-            label: t('navigation.tabs.phrases'),
-            icon: '📖',
+        yangchun: createExploreTab({
+            tab: 'yangchun',
+            label: t('navigation.tabs.yangchun'),
+            icon: '🌿',
             display: {
                 preset: 'standard',
                 overrides: {}
             },
             navigation: {
-                defaultTo: { path: withRouteLocale(route, '/menu/words') },
-                matchPages: ['YuBao', 'Vocabulary', 'ycSpoken'],
-                activeMatchPaths: [
-                    withRouteLocale(route, '/explore/vocabulary/view'),
-                    withRouteLocale(route, '/explore/vocabulary/import'),
-                    withRouteLocale(route, '/explore/vocabulary/manage')
-                ],
+                defaultTo: { path: withRouteLocale(route, '/explore/yc/words') },
+                matchPages: ['ycSpoken', 'ycVillages'],
+                activeMatchPaths: [],
                 rememberChild: true,
-                defaultChild: '/explore/vocabulary/view',
+                defaultChild: '/explore/yc/words',
                 children: [
-                    { label: t('navigation.submenu.words.wordList'), icon: '📒', path: withRouteLocale(route, '/explore/vocabulary/view') },
-                    { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: withRouteLocale(route, '/explore/yubao?tab=vocabulary') },
-                    { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: withRouteLocale(route, '/explore/yubao?tab=grammar') },
-                    { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc-spoken') }
+                    { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc/words') },
+                    { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/yc/villages') }
                 ]
             }
         }),
@@ -283,7 +277,7 @@ export function useExploreBarConfig() {
             },
             navigation: {
                 defaultTo: { path: withRouteLocale(route, '/menu/villages') },
-                matchPages: ['toponyms', 'gdVillages', 'gdVillagesTable', 'ycVillages', 'VillagesML'],
+                matchPages: ['toponyms', 'gdVillages', 'gdVillagesTable', 'VillagesML'],
                 activeMatchPaths: [
                     withRouteLocale(route, '/explore/villages/table')
                 ],
@@ -294,7 +288,6 @@ export function useExploreBarConfig() {
                     { label: t('navigation.submenu.villages.toponyms'), icon: '🗺️', path: withRouteLocale(route, '/explore/villages/toponyms') },
                     { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
                     // { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
-                    { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/villages/yc') },
                     { label: t('navigation.submenu.villages.allVillages'), icon: '📋', path: withRouteLocale(route, '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }
                 ]
             }

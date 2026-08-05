@@ -238,7 +238,7 @@ const SEO_CONFIG = {
         en: 'Visualize dialect evolution with charts to examine correspondences and differentiation across locations.',
       },
     },
-    '/explore/yubao': {
+    '/menu/yubao': {
       title: {
         'zh-Hant': '詞彙與語法｜方音圖鑑',
         'zh-CN': '词汇与语法｜方音图鉴',
@@ -262,7 +262,7 @@ const SEO_CONFIG = {
         en: 'Explore phonological status data of Chinese characters across Middle Chinese, Old Chinese, Early Modern Chinese, and Cantonese rhyme books.',
       },
     },
-    '/explore/yc-spoken': {
+    '/explore/yc/words': {
       title: {
         'zh-Hant': '陽春口語詞｜方音圖鑑',
         'zh-CN': '阳春口语词｜方音图鉴',
@@ -299,6 +299,9 @@ const SEO_CONFIG = {
       },
     },
     '/explore/villages/yc': {
+      redirect: '/explore/yc/villages'
+    },
+    '/explore/yc/villages': {
       title: {
         'zh-Hant': '陽春自然村｜方音圖鑑',
         'zh-CN': '阳春自然村｜方音图鉴',
@@ -335,15 +338,18 @@ const SEO_CONFIG = {
       },
     },
     '/menu/words': {
+      redirect: '/menu/vocabulary'
+    },
+    '/menu/vocabulary': {
       title: {
-        'zh-Hant': '詞彙與語法｜方音圖鑑',
-        'zh-CN': '词汇与语法｜方音图鉴',
-        en: 'Vocabulary & Grammar | Dialects Atlas',
+        'zh-Hant': '詞表｜方音圖鑑',
+        'zh-CN': '词表｜方音图鉴',
+        en: 'Vocabulary List | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '集中查看語保詞彙、語保語法與陽春口語詞等詞句資料入口。',
-        'zh-CN': '集中查看语保词汇、语保语法与阳春口语词等词句资料入口。',
-        en: 'Browse entry points to language preservation vocabulary, grammar materials, and Yangchun colloquial word resources.',
+        'zh-Hant': '查閱詞彙資料，支持卡片、地圖、表格三種視圖，以及詞彙上傳與管理。',
+        'zh-CN': '查阅词汇资料，支持卡片、地图、表格三种视图，以及词汇上传与管理。',
+        en: 'Browse vocabulary materials with card, map, and table views, plus upload and management features.',
       },
     },
     '/menu/villages': {
@@ -412,6 +418,9 @@ export const SITEMAP_PATHS = [
   '/menu/result',
   '/menu/tools',
   '/menu/words',
+  '/menu/vocabulary',
+  '/menu/yubao',
+  '/explore/yc/words',
   '/menu/villages',
   '/menu/cluster',
   '/explore',
@@ -421,9 +430,9 @@ export const SITEMAP_PATHS = [
   '/explore/tools/derive',
   '/explore/tools/praat',
   '/explore/manage',
-  '/explore/yubao',
   '/explore/char-class',
-  '/explore/yc-spoken',
+  '/explore/yc/words',
+  '/explore/yc/villages',
   '/explore/villages/gd',
   '/explore/villages/table',
   '/explore/villages/yc',

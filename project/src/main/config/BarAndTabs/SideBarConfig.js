@@ -80,12 +80,12 @@ export function useSidebarConfig() {
         words: {
             label: t('navigation.menu.words'),
             icon: '📖',
-            path: withRouteLocale(route, '/menu/words'),
+            path: withRouteLocale(route, '/menu/vocabulary'),
             children: [
-                { label: t('navigation.submenu.words.wordList'), icon: '📒', path: withRouteLocale(route, '/explore/vocabulary/view') },
-                { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: withRouteLocale(route, '/explore/yubao?tab=vocabulary') },
-                { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: withRouteLocale(route, '/explore/yubao?tab=grammar') },
-                { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc-spoken') }
+                { label: t('navigation.submenu.words.wordList'), icon: '📒', path: withRouteLocale(route, '/menu/vocabulary') },
+                { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: withRouteLocale(route, '/menu/yubao') },
+                { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: withRouteLocale(route, '/menu/yubao') },
+                { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc/words') }
             ]
         },
         villages: {
@@ -97,7 +97,7 @@ export function useSidebarConfig() {
                 { label: t('navigation.submenu.villages.toponyms'), icon: '🗺️', path: withRouteLocale(route, '/explore/villages/toponyms') },
                 { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
                 // { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
-                { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/villages/yc') },
+                { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/yc/villages') },
                 { label: t('navigation.submenu.villages.allVillages'), icon: '📋', path: withRouteLocale(route, '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }
             ]
         },
@@ -218,12 +218,12 @@ export const SideConfig = {
     words: {
         label: '詞句',
         icon: '💬',
-        path: buildLocalePath('zh-Hant', '/explore/vocabulary/view'),
+        path: buildLocalePath('zh-Hant', '/menu/vocabulary'),
         children: [
-            { label: '詞表', icon: '📒', path: buildLocalePath('zh-Hant', '/explore/vocabulary/view') },
-            { label: '語保詞彙', icon: '📝', path: buildLocalePath('zh-Hant', '/explore/yubao?tab=vocabulary') },
-            { label: '語保語法', icon: '🗂️', path: buildLocalePath('zh-Hant', '/explore/yubao?tab=grammar') },
-            { label: '陽春口語詞', icon: '🗣️', path: buildLocalePath('zh-Hant', '/explore/yc-spoken') }
+            { label: '詞表', icon: '📒', path: buildLocalePath('zh-Hant', '/menu/vocabulary') },
+            { label: '語保詞彙', icon: '📝', path: buildLocalePath('zh-Hant', '/menu/yubao') },
+            { label: '語保語法', icon: '🗂️', path: buildLocalePath('zh-Hant', '/menu/yubao') },
+            { label: '陽春口語詞', icon: '🗣️', path: buildLocalePath('zh-Hant', '/explore/yc/words') }
         ]
     },
     villages: {
@@ -235,7 +235,7 @@ export const SideConfig = {
             { label: '廣東自然村', icon: '🏕️', path: buildLocalePath('zh-Hant', '/explore/villages/gd') },
             { label: '機器學習', icon: '🤖', path: buildLocalePath('zh-Hant', '/explore/villages/ml') },
             { label: '全粵村情表格', icon: '📊', path: buildLocalePath('zh-Hant', '/explore/villages/table') },
-            { label: '陽春自然村', icon: '🏠', path: buildLocalePath('zh-Hant', '/explore/villages/yc') },
+            { label: '陽春自然村', icon: '🏠', path: buildLocalePath('zh-Hant', '/explore/yc/villages') },
             { label: '全部自然村', icon: '📋', path: buildLocalePath('zh-Hant', '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }
         ]
     },

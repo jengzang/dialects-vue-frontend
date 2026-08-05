@@ -218,7 +218,7 @@ export const tutorialManifest = [
     categoryKey: 'corpusAndCharClass',
     groupKey: 'exploreYubao',
     order: 30,
-    pathPrefix: '/explore/yubao',
+    pathPrefix: '/menu/yubao',
   }),
   createPathPrefixEntry({
     key: 'explore-char-class',
@@ -232,7 +232,7 @@ export const tutorialManifest = [
     categoryKey: 'corpusAndCharClass',
     groupKey: 'exploreYcSpoken',
     order: 32,
-    path: '/explore/yc-spoken',
+    path: '/explore/yc/words',
   }),
 
   // ==================== 实用工具 ====================

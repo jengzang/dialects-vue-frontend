@@ -34,10 +34,7 @@ const keepAliveViewNames = [
   'MergeTool',
   'TableManage',
   'VillagesML',
-  'YangChunSpoken',
-  'YangChunVillages',
-  'YuBaoPage',
-  'VocabularyPage'
+  'YangChunVillages'
 ]
 
 </script>

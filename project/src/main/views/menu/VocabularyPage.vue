@@ -71,16 +71,16 @@ const isLoadingVocabularyMe = ref(false)
 const vocabularyMeError = ref('')
 const isAuthReady = computed(() => userStore.authReady)
 const isAuthenticated = computed(() => userStore.isAuthenticated)
-const contributeTabPaths = ['/explore/vocabulary/import', '/explore/vocabulary/manage']
+const contributeTabPaths = ['/menu/vocabulary/import', '/menu/vocabulary/manage']
 
 function isContributePath(path) {
-  return path === '/explore/vocabulary/import' || path.startsWith('/explore/vocabulary/manage')
+  return path === '/menu/vocabulary/import' || path.startsWith('/menu/vocabulary/manage')
 }
 
 const pageTabs = computed(() => {
   return [
-    { label: t('words.wordList.tabs.query'), path: '/explore/vocabulary/view' },
-    { label: t('words.wordList.tabs.contribute'), path: '/explore/vocabulary/import' },
+    { label: t('words.wordList.tabs.query'), path: '/menu/vocabulary/view' },
+    { label: t('words.wordList.tabs.contribute'), path: '/menu/vocabulary/import' },
   ]
 })
 
@@ -123,14 +123,14 @@ async function loadVocabularyMe() {
 
 function isActivePage(tabPath) {
   const currentPath = stripLocaleFromPath(route.path)
-  if (tabPath === '/explore/vocabulary/import') {
+  if (tabPath === '/menu/vocabulary/import') {
     return isContributePath(currentPath)
   }
   return currentPath === tabPath
 }
 
 const isQueryTabActive = computed(() => {
-  return stripLocaleFromPath(route.path) === '/explore/vocabulary/view'
+  return stripLocaleFromPath(route.path) === '/menu/vocabulary/view'
 })
 
 const isContributeTabActive = computed(() => {
@@ -161,23 +161,23 @@ const contributeSubModeOptions = computed(() => [
 const contributeSubMode = computed({
   get: () => {
     const currentPath = stripLocaleFromPath(route.path)
-    return currentPath.startsWith('/explore/vocabulary/manage') ? 'manage' : 'upload'
+    return currentPath.startsWith('/menu/vocabulary/manage') ? 'manage' : 'upload'
   },
   set: (val) => {
-    const path = val === 'manage' ? '/explore/vocabulary/manage' : '/explore/vocabulary/import'
+    const path = val === 'manage' ? '/menu/vocabulary/manage' : '/menu/vocabulary/import'
     router.replace(buildLocalePath(resolveRouteLocale(route), path))
   },
 })
 
 function navigateTo(path) {
-  if (path === '/explore/vocabulary/import') {
+  if (path === '/menu/vocabulary/import') {
     const currentPath = stripLocaleFromPath(route.path)
     if (isContributePath(currentPath)) {
       return
     }
     path = contributeSubMode.value === 'manage'
-      ? '/explore/vocabulary/manage'
-      : '/explore/vocabulary/import'
+      ? '/menu/vocabulary/manage'
+      : '/menu/vocabulary/import'
   }
   router.push(buildLocalePath(resolveRouteLocale(route), path))
 }
@@ -191,4 +191,4 @@ watch(
 )
 </script>
 
-<style scoped lang="scss" src="./vocabulary/vocabulary.scss"></style>
+<style scoped lang="scss" src="@/main/views/explore/word/vocabulary/vocabulary.scss"></style>

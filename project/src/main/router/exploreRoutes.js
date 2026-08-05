@@ -8,16 +8,11 @@ const DeriveTool = () => import('@/main/views/explore/tools/DeriveTool.vue')
 const PraatPage = () => import('@/main/views/explore/Praat.vue')
 const GisPage = () => import('@/main/views/explore/GisPage.vue')
 const TableManagePage = () => import('@/main/views/explore/tools/TableManage.vue')
-const YuBaoPage = () => import('@/main/views/explore/word/YuBaoPage.vue')
-const VocabularyPage = () => import('@/main/views/explore/word/VocabularyPage.vue')
-const VocabularyViewPage = () => import('@/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
-const VocabularyImportPage = () => import('@/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
-const VocabularyManagePage = () => import('@/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
 const CharacterClassificationPage = () => import('@/main/views/explore/charClass/CharacterClassification.vue')
-const YangChunSpokenPage = () => import('@/main/views/explore/word/YangChunSpoken.vue')
 const GdVillagesTreePage = () => import('@/main/views/explore/villages/gdVillagesTree.vue')
 const GdVillagesTablePage = () => import('@/main/views/explore/villages/gdVillagesTable.vue')
 const YangChunVillagesPage = () => import('@/main/views/explore/villages/YangChunVillages.vue')
+const YangChunSpokenPage = () => import('@/main/views/explore/word/YangChunSpoken.vue')
 const AllVillagesPage = () => import('@/main/views/explore/villages/AllVillages.vue')
 const VillagesMLPage = () => import('@/main/views/explore/villages/VillagesML.vue')
 const ToponymsPage = () => import('@/main/views/explore/villages/toponyms/ToponymsPage.vue')
@@ -53,30 +48,19 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/yubao',
-    component: YuBaoPage
-  },
-  {
-    path: 'explore/vocabulary',
-    component: VocabularyPage,
     redirect: (to) => ({
-      path: buildLocalePath(resolveRouteLocale(to), '/explore/vocabulary/view'),
+      path: buildLocalePath(resolveRouteLocale(to), '/menu/yubao'),
       query: to.query,
       hash: to.hash,
-    }),
-    children: [
-      {
-        path: 'view',
-        component: VocabularyViewPage
-      },
-      {
-        path: 'import',
-        component: VocabularyImportPage
-      },
-      {
-        path: 'manage',
-        component: VocabularyManagePage
-      }
-    ]
+    })
+  },
+  {
+    path: 'explore/vocabulary/:child?',
+    redirect: (to) => ({
+      path: buildLocalePath(resolveRouteLocale(to), '/menu/vocabulary'),
+      query: to.query,
+      hash: to.hash,
+    })
   },
   {
     path: 'explore/char-class',
@@ -84,7 +68,19 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/yc-spoken',
+    redirect: (to) => ({
+      path: buildLocalePath(resolveRouteLocale(to), '/explore/yc/words'),
+      query: to.query,
+      hash: to.hash,
+    })
+  },
+  {
+    path: 'explore/yc/words',
     component: YangChunSpokenPage
+  },
+  {
+    path: 'explore/yc/villages',
+    component: YangChunVillagesPage
   },
   {
     path: 'explore/villages/toponyms',
@@ -100,7 +96,11 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/villages/yc',
-    component: YangChunVillagesPage
+    redirect: (to) => ({
+      path: buildLocalePath(resolveRouteLocale(to), '/explore/yc/villages'),
+      query: to.query,
+      hash: to.hash,
+    })
   },
   {
     path: 'explore/villages/ml',
