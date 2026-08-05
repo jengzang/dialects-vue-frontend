@@ -188,7 +188,15 @@ const props = defineProps({
 })
 
 const query = ref('')
-const viewMode = ref(normalizeViewMode(route.query.tab))
+function resolveViewModeFromRoute() {
+  const tab = route.query.tab
+  if (tab === 'map' || tab === 'table') return tab
+  const stored = sessionStorage.getItem('vocabulary_view_mode')
+  if (stored === 'map' || stored === 'table') return stored
+  return 'card'
+}
+
+const viewMode = ref(resolveViewModeFromRoute())
 const selectedSearchFields = ref([])
 const selectedLocations = ref([])
 const selectedStandardWord = ref('')
@@ -655,7 +663,7 @@ onMounted(() => {
 })
 
 watch(() => route.query.tab, (tab) => {
-  const nextMode = normalizeViewMode(tab)
+  const nextMode = tab ? normalizeViewMode(tab) : resolveViewModeFromRoute()
   if (viewMode.value !== nextMode) {
     viewMode.value = nextMode
   }

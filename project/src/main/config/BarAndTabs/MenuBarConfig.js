@@ -94,6 +94,7 @@ const MENU_CHILD_PATHS = {
   compare: ['/menu/compare/char', '/menu/compare/zhonggu', '/menu/compare/tone', '/menu/compare/phonetic'],
   map: ['/menu/map/view', '/menu/map/divide', '/menu/map/custom'],
   pho: ['/menu/pho/matrix', '/menu/pho/custom', '/menu/pho/count', '/menu/pho/evolution'],
+  vocabulary: ['/menu/vocabulary/view', '/menu/vocabulary/import', '/menu/vocabulary/manage'],
   about: ['/menu/about/intro', '/menu/about/suggestion', '/menu/about/like']
 }
 

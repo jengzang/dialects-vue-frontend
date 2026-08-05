@@ -38,7 +38,7 @@
     </div>
 
     <router-view v-slot="{ Component }">
-      <KeepAlive>
+      <KeepAlive :include="['VocabularyViewPage', 'VocabularyImportPage', 'VocabularyManagePage']">
         <component
           :is="Component"
           :vocabulary-me="vocabularyMe"
@@ -143,12 +143,18 @@ const viewModeOptions = computed(() => [
   { value: 'table', label: t('words.wordList.viewModes.table') },
 ])
 
+const STORED_VIEW_MODE_KEY = 'vocabulary_view_mode'
+
 const viewModeQuery = computed({
   get: () => {
     const tab = route.query.tab
-    return (tab === 'map' || tab === 'table') ? tab : 'card'
+    if (tab === 'map' || tab === 'table') return tab
+    const stored = sessionStorage.getItem(STORED_VIEW_MODE_KEY)
+    if (stored === 'map' || stored === 'table') return stored
+    return 'card'
   },
   set: (val) => {
+    sessionStorage.setItem(STORED_VIEW_MODE_KEY, val)
     router.replace({ query: { ...route.query, tab: val } })
   },
 })
