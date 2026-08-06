@@ -7,10 +7,15 @@
       v-model:selected-standard-word="selectedStandardWord"
       v-model:selected-standard-words="selectedStandardWordsModel"
       v-model:single-select="singleSelect"
+      v-model:filter-by-region="filterByRegion"
+      v-model:selected-province="selectedProvince"
+      v-model:selected-city="selectedCity"
       :view-mode="viewMode"
       :search-field-options="searchFieldOptions"
       :location-options="locationOptions"
       :standard-word-options="standardWordOptions"
+      :province-options="provinceOptions"
+      :city-options="cityOptions"
     />
 
     <section v-if="viewMode !== 'table'" class="content-area">
@@ -199,6 +204,9 @@ function resolveViewModeFromRoute() {
 const viewMode = ref(resolveViewModeFromRoute())
 const selectedSearchFields = ref([])
 const selectedLocations = ref([])
+const filterByRegion = ref(false)
+const selectedProvince = ref('')
+const selectedCity = ref('')
 const selectedStandardWord = ref('')
 const singleSelect = ref(true)
 const selectedStandardWordsModel = ref([])
@@ -243,6 +251,25 @@ const searchFieldOptions = computed(() => [
 
 const locationOptions = computed(() => {
   return vocabularyLocationOptions.value
+})
+
+const provinceOptions = computed(() => {
+  const seen = new Set()
+  return vocabularyLocationOptions.value
+    .filter((opt) => {
+      if (!opt.province || seen.has(opt.province)) return false
+      seen.add(opt.province)
+      return true
+    })
+    .map((opt) => ({ value: opt.province, label: opt.province }))
+})
+
+const cityOptions = computed(() => {
+  if (!selectedProvince.value) return []
+  const seen = new Set()
+  return vocabularyLocationOptions.value
+    .filter((opt) => opt.province === selectedProvince.value && opt.city && !seen.has(opt.city) && seen.add(opt.city))
+    .map((opt) => ({ value: opt.city, label: opt.city }))
 })
 
 const standardWordOptions = computed(() => {
@@ -363,11 +390,17 @@ function normalizeVocabularyEntry(item, index = 0, locationContext = '') {
 }
 
 function buildVocabularyQueryParams() {
-  return {
+  const params = {
     q: query.value.trim(),
-    locations: selectedLocations.value,
     search_fields: normalizeSelectedSearchFields(),
   }
+  if (filterByRegion.value) {
+    if (selectedProvince.value) params.province = selectedProvince.value
+    if (selectedCity.value) params.city = selectedCity.value
+  } else {
+    params.locations = selectedLocations.value
+  }
+  return params
 }
 
 function buildVocabularyItemsParams(overrides = {}) {
@@ -673,7 +706,11 @@ watch(viewMode, () => {
   loadActiveViewMode()
 })
 
-watchDebounced([query, selectedSearchFields, selectedLocations], () => {
+watch(selectedProvince, () => {
+  selectedCity.value = ''
+})
+
+watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, selectedProvince, selectedCity], () => {
   loadVocabularyStandardWords()
 
   if (shouldUseVocabularyItemsApi()) {

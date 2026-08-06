@@ -52,6 +52,18 @@
                 :inactive-text="t('words.wordList.search.multiSelect')"
               />
             </div>
+            <div class="search-field-mode-section">
+              <h4 class="search-field-modal-title">
+                {{ t('words.wordList.search.filterModeTitle') }}
+              </h4>
+              <SwitchToggle
+                :model-value="filterByRegion"
+                :show-label="true"
+                :active-text="t('words.wordList.search.filterByRegion')"
+                :inactive-text="t('words.wordList.search.filterByLocation')"
+                @update:model-value="emit('update:filterByRegion', $event)"
+              />
+            </div>
           </AppModal>
         </div>
       </div>
@@ -102,7 +114,10 @@
         </template>
       </div>
 
-      <div class="location-filter">
+      <div
+        v-if="!filterByRegion"
+        class="location-filter"
+      >
         <button
           ref="locationTriggerEl"
           class="select-trigger global-select-trigger location-select-trigger"
@@ -126,6 +141,31 @@
           direction="down"
           @update:model-value="emit('update:selectedLocations', $event)"
           @close="locationDropdownOpen = false"
+        />
+      </div>
+
+      <div
+        v-else
+        class="location-filter"
+      >
+        <SimpleSelectDropdown
+          :model-value="selectedProvince"
+          :options="provinceOptions"
+          :placeholder="t('words.wordList.search.provincePlaceholder')"
+          searchable
+          match-trigger-width
+          width="100%"
+          @update:model-value="emit('update:selectedProvince', $event)"
+        />
+        <SimpleSelectDropdown
+          :model-value="selectedCity"
+          :options="cityOptions"
+          :placeholder="t('words.wordList.search.cityPlaceholder')"
+          :disabled="!selectedProvince"
+          searchable
+          match-trigger-width
+          width="100%"
+          @update:model-value="emit('update:selectedCity', $event)"
         />
       </div>
     </div>
@@ -154,6 +194,11 @@ const props = defineProps({
   searchFieldOptions: { type: Array, default: () => [] },
   locationOptions: { type: Array, default: () => [] },
   standardWordOptions: { type: Array, default: () => [] },
+  filterByRegion: { type: Boolean, default: false },
+  selectedProvince: { type: String, default: '' },
+  selectedCity: { type: String, default: '' },
+  provinceOptions: { type: Array, default: () => [] },
+  cityOptions: { type: Array, default: () => [] },
 })
 
 const emit = defineEmits([
@@ -163,6 +208,9 @@ const emit = defineEmits([
   'update:selectedStandardWord',
   'update:selectedStandardWords',
   'update:singleSelect',
+  'update:filterByRegion',
+  'update:selectedProvince',
+  'update:selectedCity',
 ])
 
 const searchInputEl = ref(null)
