@@ -130,8 +130,6 @@
       <div ref="mobileNavRef"
           class="navbar-bottom"
           :class="scrollClassMobile"
-          @scroll="onScroll"
-          @scrollend="onScrollEnd"
       >
         <RouterLink
             v-for="t in orderedMobileTabs"

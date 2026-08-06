@@ -173,7 +173,7 @@ export function useMenuTabsConfig() {
       icon: '🔗',
       display: {
         preset: 'compactDesktop',
-        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
+        overrides: { scroll: 'left', weight: 0.85, weightIconOnly: 0.3 }
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/menu/source') }
@@ -185,7 +185,7 @@ export function useMenuTabsConfig() {
       icon: '🎙️',
       display: {
         preset: 'compactDesktop',
-        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
+        overrides: { scroll: 'left', weight: 0.85, weightIconOnly: 0.3 }
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/explore/tools/praat') }
@@ -333,7 +333,7 @@ export function useMenuTabsConfig() {
       icon: '🏘️',
       display: {
         preset: 'compactDesktop',
-        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+        overrides: { scroll: 'right', weight: 0.8, weightIconOnly: 0.3 }
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/menu/villages') }
@@ -345,7 +345,7 @@ export function useMenuTabsConfig() {
       icon: '🧰',
       display: {
         preset: 'compactDesktop',
-        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+        overrides: { scroll: 'right', weight: 0.8, weightIconOnly: 0.3 }
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/menu/tools') }
