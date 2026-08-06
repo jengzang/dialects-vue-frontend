@@ -32,7 +32,15 @@ export function useGisFeatures(options = {}) {
     selectedFeatureBatchPropertyKey,
     selectedFeatureBatchPropertyValue,
     featureMoveLayerOptions,
+    isAuthenticated,
+    onAuthRequired,
   } = options;
+
+  async function guardWrite() {
+    if (isAuthenticated?.value) return true;
+    if (onAuthRequired) return onAuthRequired();
+    return true;
+  }
 
   function emptyFeatureCollection() {
     return { type: 'FeatureCollection', features: [] };
@@ -73,7 +81,8 @@ export function useGisFeatures(options = {}) {
 
   // ---- Shape editing ----
 
-  function handleEditSelectedShape() {
+  async function handleEditSelectedShape() {
+    if (!await guardWrite()) return;
     if (!canEditSelectedShape.value) return;
     editableMapRef?.value?.selectFeature?.(selectedFeatureId.value, { directEdit: true });
     currentMode.value = 'direct_select';
@@ -100,7 +109,8 @@ export function useGisFeatures(options = {}) {
     };
   }
 
-  function handleDuplicateSelectedFeature() {
+  async function handleDuplicateSelectedFeature() {
+    if (!await guardWrite()) return;
     if (!canDuplicateSelectedFeature.value) return;
     const layer = activeLayer.value;
     const selected = layer?.featureCollection?.features?.find((f) => getFeatureId(f) === selectedFeatureId.value);
@@ -121,6 +131,7 @@ export function useGisFeatures(options = {}) {
   // ---- Delete ----
 
   async function handleDeleteSelected() {
+    if (!await guardWrite()) return;
     if (!canDeleteSelection.value) return;
     const wasDirectSelect = currentMode.value === 'direct_select';
     if (editableMapRef?.value?.canDeleteSelected?.() === false) return;
@@ -132,7 +143,8 @@ export function useGisFeatures(options = {}) {
     }
   }
 
-  function handleDeleteSelectedFeatures() {
+  async function handleDeleteSelectedFeatures() {
+    if (!await guardWrite()) return;
     if (!canModifyActiveLayer.value || !activeLayer.value || selectedFeatureIds.value.length === 0) return;
     const fc = activeLayer.value.featureCollection ?? emptyFeatureCollection();
     const selectedIdsBeforeDelete = selectedFeatureIds.value;
@@ -157,6 +169,7 @@ export function useGisFeatures(options = {}) {
   }
 
   async function handleClearAll() {
+    if (!await guardWrite()) return;
     if (!canModifyActiveLayer.value) return;
     const confirmed = await showConfirm(t('map.drawTab.messages.clearAllConfirm'));
     if (!confirmed) return;
@@ -171,7 +184,8 @@ export function useGisFeatures(options = {}) {
 
   // ---- Feature properties ----
 
-  function updateFeatureProperty(featureId, key, value) {
+  async function updateFeatureProperty(featureId, key, value) {
+    if (!await guardWrite()) return;
     if (!activeLayer.value || !featureId) return;
     const targetFeature = activeLayer.value.featureCollection?.features
       ?.find((feature) => getFeatureId(feature) === featureId);
@@ -198,7 +212,8 @@ export function useGisFeatures(options = {}) {
     if (key === 'locked' && value === true) resetDrawSelectionMode();
   }
 
-  function updateSelectedFeatureProperty(key, value) {
+  async function updateSelectedFeatureProperty(key, value) {
+    if (!await guardWrite()) return;
     if (selectedFeatureId.value) {
       updateFeatureProperty(selectedFeatureId.value, key, value);
       return;
@@ -225,7 +240,8 @@ export function useGisFeatures(options = {}) {
     return props[key];
   }
 
-  function updateSelectedFeaturesProperty(key, value) {
+  async function updateSelectedFeaturesProperty(key, value) {
+    if (!await guardWrite()) return;
     if (!canModifyActiveLayer.value || !activeLayer.value || selectedFeatureIds.value.length === 0) return;
     const selectedIdsBeforeMutation = selectedFeatureIds.value;
     const mutationFeatureIds = getSelectedMutationFeatureIds(key, value);
@@ -278,7 +294,8 @@ export function useGisFeatures(options = {}) {
 
   // ---- Move between layers ----
 
-  function handleMoveSelectedFeatureToLayer(targetLayerId) {
+  async function handleMoveSelectedFeatureToLayer(targetLayerId) {
+    if (!await guardWrite()) return;
     if (!canDuplicateSelectedFeature.value) return;
     const source = activeLayer.value;
     const target = layers.value.find((l) => l.id === targetLayerId);
@@ -297,7 +314,8 @@ export function useGisFeatures(options = {}) {
     editableMapRef?.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
   }
 
-  function handleMoveSelectedFeaturesToLayer(targetLayerId) {
+  async function handleMoveSelectedFeaturesToLayer(targetLayerId) {
+    if (!await guardWrite()) return;
     if (!canMoveSelectedFeatures.value) return;
     const source = activeLayer.value;
     const target = layers.value.find((l) => l.id === targetLayerId);

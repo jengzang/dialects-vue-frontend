@@ -32,11 +32,20 @@ export function useGisLayers(options = {}) {
     resetDrawSelectionMode,
     applyLayerPropertyToFeatures,
     importInputRef,
+    isAuthenticated,
+    onAuthRequired,
   } = options;
+
+  async function guardWrite() {
+    if (isAuthenticated?.value) return true;
+    if (onAuthRequired) return onAuthRequired();
+    return true;
+  }
 
   // ---- Layer CRUD ----
 
-  function handleCreateLayer(geometryType) {
+  async function handleCreateLayer(geometryType) {
+    if (!await guardWrite()) return;
     commitHistory();
     const layer = createEmptyLayer(geometryType);
     layers.value.push(layer);
@@ -58,7 +67,8 @@ export function useGisLayers(options = {}) {
     editableMapRef?.value?.setDrawMode?.('simple_select');
   }
 
-  function moveLayer(layerId, direction) {
+  async function moveLayer(layerId, direction) {
+    if (!await guardWrite()) return;
     const idx = layers.value.findIndex((item) => item.id === layerId);
     if (idx === -1) return;
     const target = idx + direction;
@@ -69,7 +79,8 @@ export function useGisLayers(options = {}) {
     syncAllLayersAfterMutation();
   }
 
-  function moveLayerToTop(layerId) {
+  async function moveLayerToTop(layerId) {
+    if (!await guardWrite()) return;
     const idx = layers.value.findIndex((item) => item.id === layerId);
     if (idx === -1 || idx === layers.value.length - 1) return;
     commitHistory();
@@ -78,7 +89,8 @@ export function useGisLayers(options = {}) {
     syncAllLayersAfterMutation();
   }
 
-  function moveLayerToBottom(layerId) {
+  async function moveLayerToBottom(layerId) {
+    if (!await guardWrite()) return;
     const idx = layers.value.findIndex((item) => item.id === layerId);
     if (idx === -1 || idx === 0) return;
     commitHistory();
@@ -87,7 +99,8 @@ export function useGisLayers(options = {}) {
     syncAllLayersAfterMutation();
   }
 
-  function toggleLayerVisibility(layerId) {
+  async function toggleLayerVisibility(layerId) {
+    if (!await guardWrite()) return;
     const layer = layers.value.find((item) => item.id === layerId);
     if (!layer) return;
     commitHistory();
@@ -100,7 +113,8 @@ export function useGisLayers(options = {}) {
     editableMapRef?.value?.syncReadonlyLayers?.();
   }
 
-  function setAllLayersVisibility(visible) {
+  async function setAllLayersVisibility(visible) {
+    if (!await guardWrite()) return;
     if (layers.value.every((layer) => layer.visible === visible)) return;
     commitHistory();
     layers.value.forEach((layer) => {
@@ -114,7 +128,8 @@ export function useGisLayers(options = {}) {
     editableMapRef?.value?.syncReadonlyLayers?.();
   }
 
-  function toggleLayerLock(layerId) {
+  async function toggleLayerLock(layerId) {
+    if (!await guardWrite()) return;
     const layer = layers.value.find((item) => item.id === layerId);
     if (!layer) return;
     commitHistory();
@@ -126,7 +141,8 @@ export function useGisLayers(options = {}) {
     syncAllLayersAfterMutation();
   }
 
-  function handleRenameLayer(layerId, name) {
+  async function handleRenameLayer(layerId, name) {
+    if (!await guardWrite()) return;
     const target = layers.value.find((item) => item.id === layerId);
     const nextName = String(name || '').trim();
     if (!target || !nextName || target.name === nextName) return;
@@ -157,7 +173,8 @@ export function useGisLayers(options = {}) {
     };
   };
 
-  function handleDuplicateLayer(layerId) {
+  async function handleDuplicateLayer(layerId) {
+    if (!await guardWrite()) return;
     const src = layers.value.find((item) => item.id === layerId);
     if (!src) return;
     commitHistory();
@@ -188,6 +205,7 @@ export function useGisLayers(options = {}) {
   }
 
   async function handleDeleteLayer(layerId) {
+    if (!await guardWrite()) return;
     const idx = layers.value.findIndex((item) => item.id === layerId);
     if (idx === -1) return;
     const layer = layers.value[idx];
@@ -236,6 +254,7 @@ export function useGisLayers(options = {}) {
   }
 
   async function handleImportAsNewLayer(event) {
+    if (!await guardWrite()) return;
     const file = event?.target?.files?.[0];
     if (!file) return;
     try {
@@ -264,6 +283,7 @@ export function useGisLayers(options = {}) {
   // ---- Export ----
 
   async function handleExportLayer() {
+    if (!await guardWrite()) return;
     if (!activeLayerId.value) return;
     const layer = layers.value.find((l) => l.id === activeLayerId.value);
     if (!layer) return;
@@ -276,6 +296,7 @@ export function useGisLayers(options = {}) {
   }
 
   async function handleExportAllLayers() {
+    if (!await guardWrite()) return;
     try {
       await editableMapRef?.value?.exportAllLayers?.(layers.value);
       showSuccess(t('map.drawTab.messages.exportLayerSuccess'));
@@ -337,6 +358,7 @@ export function useGisLayers(options = {}) {
   }
 
   async function handleImportBoundaryConfirm(config) {
+    if (!await guardWrite()) return;
     const { level, selectedNames, selectedIds, highPrecision } = config;
     let geoJson;
     if (highPrecision && level !== 'country') {
@@ -395,6 +417,7 @@ export function useGisLayers(options = {}) {
   };
 
   async function handleRiverImportConfirm(selectedLevels, isImportingRef) {
+    if (!await guardWrite()) return;
     if (isImportingRef?.value) return;
     if (isImportingRef) isImportingRef.value = true;
     try {

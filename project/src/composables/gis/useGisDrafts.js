@@ -24,11 +24,18 @@ export function useGisDrafts(options = {}) {
     isDrawingPanelOpen,
     isLayersPanelOpen,
     isAuthenticated,
+    onAuthRequired,
     clearFeatureSelection,
     syncLayerIdSeedFromLayers,
     syncAllLayersAfterMutation,
     commitHistory,
   } = options;
+
+  async function guardWrite() {
+    if (isAuthenticated?.value) return true;
+    if (onAuthRequired) return onAuthRequired();
+    return true;
+  }
 
   const showLocalStorageModal = ref(false);
   const showSaveLocalDraftModal = ref(false);
@@ -147,13 +154,15 @@ export function useGisDrafts(options = {}) {
     newDraftName.value = '';
   };
 
-  const openSaveLocalDraftModal = () => {
+  const openSaveLocalDraftModal = async () => {
+    if (!await guardWrite()) return;
     if (!hasLayersToPersist.value) { showError(t('map.drawTab.messages.noLayersToSave')); return; }
     newDraftName.value = '';
     showSaveLocalDraftModal.value = true;
   };
 
   const confirmSaveAsNewLocal = async () => {
+    if (!await guardWrite()) return;
     if (!hasLayersToPersist.value) { showError(t('map.drawTab.messages.noLayersToSave')); return; }
     if (!newDraftName.value.trim()) { showError(t('map.drawTab.messages.localDraftNameRequired')); return; }
     try {
@@ -172,6 +181,7 @@ export function useGisDrafts(options = {}) {
   };
 
   const handleUpdateLocal = async () => {
+    if (!await guardWrite()) return;
     if (!hasLayersToPersist.value) { showError(t('map.drawTab.messages.noLayersToSave')); return; }
     if (!selectedStoredDraftId.value) return;
     try {
@@ -193,6 +203,7 @@ export function useGisDrafts(options = {}) {
   };
 
   const handleRestoreLocal = async () => {
+    if (!await guardWrite()) return;
     if (!selectedStoredDraftId.value) return;
     try {
       const draft = await getDraftRecordById(selectedStoredDraftId.value);
@@ -209,6 +220,7 @@ export function useGisDrafts(options = {}) {
   };
 
   const handleDeleteLocal = async () => {
+    if (!await guardWrite()) return;
     if (!selectedStoredDraftId.value) return;
     const confirmed = await showConfirm(t('map.drawTab.messages.deleteLocalConfirm'));
     if (!confirmed) return;

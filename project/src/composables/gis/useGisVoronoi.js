@@ -59,7 +59,15 @@ export function useGisVoronoi(options = {}) {
     setMode,
     fetchHighPrecisionBoundaries,
     importInputRef: _importInputRef,
+    isAuthenticated,
+    onAuthRequired,
   } = options;
+
+  async function guardWrite() {
+    if (isAuthenticated?.value) return true;
+    if (onAuthRequired) return onAuthRequired();
+    return true;
+  }
 
   const { getPartitionData } = usePartitionCache();
 
@@ -380,7 +388,8 @@ export function useGisVoronoi(options = {}) {
     voronoiPreviewLayers.value = [];
   }
 
-  function clearVoronoiCustomImport() {
+  async function clearVoronoiCustomImport() {
+    if (!await guardWrite()) return;
     voronoiCustomImportRows.value = [];
     voronoiCustomImportMeta.value = null;
     syncVoronoiPartitionPoints();
@@ -430,9 +439,13 @@ export function useGisVoronoi(options = {}) {
 
   // ---- Custom import ----
 
-  function triggerVoronoiFileImport() { voronoiImportFileInputRef.value?.click(); }
+  async function triggerVoronoiFileImport() {
+    if (!await guardWrite()) return;
+    voronoiImportFileInputRef.value?.click();
+  }
 
   async function handleVoronoiFileChange(event) {
+    if (!await guardWrite()) return;
     const file = event?.target?.files?.[0];
     if (!file) return;
     try {
@@ -443,20 +456,23 @@ export function useGisVoronoi(options = {}) {
     } finally { if (event?.target) event.target.value = ''; }
   }
 
-  function handleVoronoiPreviewReset() {
+  async function handleVoronoiPreviewReset() {
+    if (!await guardWrite()) return;
     voronoiTabularState.resetState();
     voronoiImport.clearImportedData();
     showVoronoiPreviewModal.value = false;
   }
 
-  function handleVoronoiPreviewConfirm() {
+  async function handleVoronoiPreviewConfirm() {
+    if (!await guardWrite()) return;
     const rows = voronoiImport.applyPreviewSummary(voronoiTabularState.summary.value);
     if (!rows.length) { showError(t('map.drawTab.voronoi.customImport.messages.noValidRows')); return; }
     handleVoronoiCustomImportConfirm({ rows, partitionMode: voronoiImport.partitionMode.value, summary: voronoiImport.summary.value });
     showVoronoiPreviewModal.value = false;
   }
 
-  function handleVoronoiCustomImportConfirm({ rows, partitionMode, summary }) {
+  async function handleVoronoiCustomImportConfirm({ rows, partitionMode, summary }) {
+    if (!await guardWrite()) return;
     voronoiCustomImportRows.value = Array.isArray(rows)
       ? rows.map((row, i) => ({ ...row, name: String(row?.name || '').trim(), source: row?.source || 'custom', customRowId: row?.customRowId || `custom-${i + 1}`, partitionMode }))
       : [];
@@ -476,6 +492,7 @@ export function useGisVoronoi(options = {}) {
   }
 
   async function handleVoronoiIgnoreConfirm(locations) {
+    if (!await guardWrite()) return;
     const prev = voronoiPreviewType.value;
     ignoredVoronoiLocations.value = Array.isArray(locations) ? locations.map(normalizeVoronoiLocationName).filter(Boolean) : [];
     voronoiLastResult.value = null;
@@ -500,6 +517,7 @@ export function useGisVoronoi(options = {}) {
   }
 
   async function handleBuildVoronoi({ force = false } = {}) {
+    if (!await guardWrite()) return;
     if (isVoronoiCalculating.value) return;
     if (!force && voronoiPreviewType.value === 'polygons') {
       voronoiPreviewType.value = ''; voronoiPreviewLayers.value = [];
@@ -527,6 +545,7 @@ export function useGisVoronoi(options = {}) {
   // ---- Export to layers ----
 
   async function exportVoronoiToLayer() {
+    if (!await guardWrite()) return;
     await ensureVoronoiPointsLoaded();
     const level = Number(voronoiRegionLevel.value) || 3;
     const pts = activeVoronoiPoints.value;
@@ -550,6 +569,7 @@ export function useGisVoronoi(options = {}) {
   }
 
   async function confirmVoronoiExport() {
+    if (!await guardWrite()) return;
     if (isVoronoiExporting.value) return;
     if (!voronoiExportSelections.value.length) { showError(t('map.drawTab.voronoi.exportSelectionRequired')); return; }
     const selectedGroups = voronoiExportGroups.value.filter((item) => voronoiExportSelections.value.includes(item.key));
@@ -614,39 +634,50 @@ export function useGisVoronoi(options = {}) {
   // ---- Clip boundary ----
 
   async function handleOpenClipBoundary() {
+    if (!await guardWrite()) return;
     showClipBoundaryModal.value = true;
     isBoundaryOptionsLoading.value = true;
     Promise.all([loadProvincesGeoJson().catch(() => {}), loadCitiesGeoJson().catch(() => {}), loadCountiesGeoJson().catch(() => {})])
       .finally(() => { isBoundaryOptionsLoading.value = false; });
   }
 
-  function handleClipBoundaryConfirm(config) { clipBoundaryConfig.value = { ...config }; }
+  async function handleClipBoundaryConfirm(config) {
+    if (!await guardWrite()) return;
+    clipBoundaryConfig.value = { ...config };
+  }
 
-  function onAdminBoundaryClicked() {
+  async function onAdminBoundaryClicked() {
+    if (!await guardWrite()) return;
     showImportBoundaryModal.value = true;
     isBoundaryOptionsLoading.value = true;
     Promise.all([loadProvincesGeoJson().catch(() => {}), loadCitiesGeoJson().catch(() => {}), loadCountiesGeoJson().catch(() => {})])
       .finally(() => { isBoundaryOptionsLoading.value = false; });
   }
 
-  function onRiverImportClicked() { showRiverImportModal.value = true; }
+  async function onRiverImportClicked() {
+    if (!await guardWrite()) return;
+    showRiverImportModal.value = true;
+  }
 
   // ---- Add points on map ----
 
-  function toggleAddDialectPoints() {
+  async function toggleAddDialectPoints() {
+    if (!await guardWrite()) return;
     if (isAddingDialectPoints.value) { isAddingDialectPoints.value = false; return; }
     pendingAddPartitionKey.value = addDialectPartitionKey.value || addDialectPartitionOptions.value[0]?.value || '';
     showAddDialectPartitionModal.value = true;
   }
 
-  function confirmAddDialectPartition() {
+  async function confirmAddDialectPartition() {
+    if (!await guardWrite()) return;
     addDialectPartitionKey.value = pendingAddPartitionKey.value;
     showAddDialectPartitionModal.value = false;
     isAddingDialectPoints.value = true;
     if (currentMode.value !== 'simple_select') { setMode('simple_select'); }
   }
 
-  function deleteCustomPointsByPartition(partitionKey) {
+  async function deleteCustomPointsByPartition(partitionKey) {
+    if (!await guardWrite()) return;
     const level = Number(voronoiRegionLevel.value) || 3;
     const before = voronoiCustomImportRows.value.length;
     voronoiCustomImportRows.value = voronoiCustomImportRows.value.filter((p) => {
@@ -665,7 +696,8 @@ export function useGisVoronoi(options = {}) {
     }
   }
 
-  function handleMapClickForAddPoint({ lng, lat }) {
+  async function handleMapClickForAddPoint({ lng, lat }) {
+    if (!await guardWrite()) return;
     if (!isAddingDialectPoints.value || !addDialectPartitionKey.value || currentMode.value !== 'simple_select') return;
     addPointCounter += 1;
     const mode = voronoiPartitionMode.value;
@@ -686,7 +718,8 @@ export function useGisVoronoi(options = {}) {
   const handleImageExported = () => {};
   const handleLayerExported = () => {};
 
-  const handleConfirmImageExport = (settings) => {
+  const handleConfirmImageExport = async (settings) => {
+    if (!await guardWrite()) return;
     showImageExportModal.value = false;
     imageExportSettings.value = settings;
     imageExportViewState.value = {
@@ -704,6 +737,7 @@ export function useGisVoronoi(options = {}) {
   };
 
   const handleExportImage = async (settings = {}) => {
+    if (!await guardWrite()) return;
     try { await editableMapRef?.value?.exportImage?.(settings); showSuccess(t('map.drawTab.messages.exportImageSuccess')); }
     catch (error) { showError(t('map.drawTab.messages.exportImageFailed', { error: error.message || error })); }
   };

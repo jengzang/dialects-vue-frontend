@@ -11,7 +11,6 @@
       </div> -->
 
       <div
-        v-if="isAuthenticated"
         class="draw-toolbar draw-toolbar--header"
       >
         <span class="draw-feature-count-badge">
@@ -72,7 +71,7 @@
     </div>
 
     <div
-      v-if="!isAuthenticated"
+      v-if="false"
       class="auth-warning-container"
     >
       <div class="auth-warning-card">
@@ -715,7 +714,8 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { showConfirm } from '@/utils/ui/message.js';
 
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
 import { useGisMapCore } from '@/composables/gis/useGisMapCore.js';
@@ -742,7 +742,17 @@ import AppModal from '@/components/common/AppModal.vue';
 
 const { t } = useI18n();
 const route = useRoute();
+const router = useRouter();
 const { requireAuth, isAuthenticated } = useAuthGuard();
+
+async function guardWrite() {
+  if (isAuthenticated.value) return true;
+  const confirmed = await showConfirm(t('map.drawTab.auth.loginRequired'));
+  if (confirmed) {
+    router.push({ path: '/auth', query: { redirect: route.fullPath } });
+  }
+  return false;
+}
 
 // ---- Template refs ----
 const drawTabRoot = ref(null);
@@ -802,6 +812,7 @@ const gisLayers = useGisLayers({
   clearFeatureSelection, setFeatureSelection,
   syncAllLayersAfterMutation, resetDrawSelectionMode,
   applyLayerPropertyToFeatures, importInputRef,
+  isAuthenticated, onAuthRequired: guardWrite,
 });
 
 const {
@@ -829,6 +840,7 @@ const gisFeatures = useGisFeatures({
   canApplySelectedFeatureBatchProperty,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
   featureMoveLayerOptions,
+  isAuthenticated, onAuthRequired: guardWrite,
 });
 
 const {
@@ -848,6 +860,7 @@ const drafts = useGisDrafts({
   isDrawingPanelOpen, isLayersPanelOpen, isAuthenticated,
   clearFeatureSelection, syncLayerIdSeedFromLayers,
   syncAllLayersAfterMutation, commitHistory,
+  onAuthRequired: guardWrite,
 });
 
 const {
@@ -873,6 +886,7 @@ const voronoi = useGisVoronoi({
   syncAllLayersAfterMutation,
   setMode,
   fetchHighPrecisionBoundaries,
+  isAuthenticated, onAuthRequired: guardWrite,
 });
 
 const {
