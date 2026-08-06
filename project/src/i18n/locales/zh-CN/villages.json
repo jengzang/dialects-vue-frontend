@@ -146,7 +146,6 @@
         "placeholder": "例如：黄、塘、村",
         "matchMode": "匹配方式",
         "placeType": "地名类型",
-        "limit": "点位上限",
         "submit": "搜索分布",
         "searching": "搜索中..."
       },
@@ -160,12 +159,6 @@
         "naturalVillage": "自然村/农村居民点",
         "adminVillage": "行政村",
         "villageCommittee": "村委会"
-      },
-      "limits": {
-        "oneThousand": "1,000",
-        "fiveThousand": "5,000",
-        "tenThousand": "10,000",
-        "fiftyThousand": "50,000"
       },
       "layers": {
         "title": "底图图层",
@@ -197,10 +190,13 @@
         "count": "后端匹配 {count} 条，当前可绘制 {shown} 个点位。",
         "truncated": "结果已截断，可缩小关键词或切换为更严格的匹配方式。"
       },
-      "suggestions": {
-        "title": "地名建议",
+      "nameTree": {
+        "title": "地名层级",
+        "load": "查询地名层级",
         "loading": "加载中",
-        "empty": "暂无建议"
+        "idle": "搜索点位后，可手动查询行政区层级地名。",
+        "empty": "暂无地名层级结果",
+        "level": "{level} 级"
       },
       "detail": {
         "title": "点位详情",
@@ -229,7 +225,7 @@
         "emptyQuery": "请输入关键词后再搜索。",
         "countryLayer": "无法加载国界底图。",
         "optionalLayer": "无法加载可选图层。",
-        "suggestions": "无法加载地名建议。",
+        "nameTree": "无法加载地名层级。",
         "points": "无法加载点位。",
         "details": "无法加载本地详情。",
         "official": "无法加载民政部详情。"

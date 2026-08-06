@@ -31,6 +31,7 @@ describe('toponyms page shell', () => {
     expect(page).toContain('loadToponymsGisAsset(\'country\')');
     expect(page).toContain('const hasSearched = ref(false)');
     expect(page).toContain('async function handleSearch');
+    expect(page).toContain('async function handleNameTreeRequest');
     expect(page).toContain('async function handleSelectPoint');
     expect(page).toContain('async function handleLocalDetailRequest');
     expect(page).toContain('async function handleOfficialDetailRequest');
@@ -48,17 +49,42 @@ describe('toponyms page shell', () => {
     expect(page).toContain('<ToponymSearchBar');
     expect(page).toContain('<ToponymLayerControls');
     expect(page).toContain('<ToponymResultsPanel');
-    expect(page).toContain(':suggestions="suggestions"');
+    expect(page).toContain(':name-tree="nameTree"');
+    expect(page).toContain('@request-name-tree="handleNameTreeRequest"');
     expect(page).toContain('<HoverDetailCard');
     expect(searchBar).toContain('<SimpleSelectDropdown');
     expect(searchBar).toContain('class="toponym-search-bar__form"');
     expect(searchBar).toContain('@submit.prevent');
+    expect(searchBar).not.toContain('pointLimit');
+    expect(searchBar).not.toContain('toponyms.search.limit');
     expect(layerControls).toContain('riverL1');
     expect(layerControls).toContain('riverL2');
     expect(layerControls).toContain('riverL3');
     expect(resultsPanel).not.toContain('<ToponymDetailPanel');
+    expect(resultsPanel).toContain("emit('request-name-tree')");
+    expect(resultsPanel).toContain('toponym-results-panel__name-tree');
+    expect(resultsPanel).toContain('flattenNameTreeNodes');
     expect(detailPanel).toContain("emit('request-local-detail')");
     expect(detailPanel).toContain("emit('request-official-detail')");
+  });
+
+  it('loads full point results and only fetches name trees on explicit request', () => {
+    const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
+    const searchBar = readSource('src/main/views/explore/villages/toponyms/ToponymSearchBar.vue');
+    const searchBody = functionBody(page, 'handleSearch');
+    const nameTreeBody = functionBody(page, 'handleNameTreeRequest');
+
+    expect(searchBody).toContain('limit: 0');
+    expect(searchBody).toContain('lastPointSearchParams.value = searchParams');
+    expect(searchBody).not.toContain('pointLimit.value');
+    expect(nameTreeBody).toContain('getToponymNames');
+    expect(nameTreeBody).toContain('const searchParams = lastPointSearchParams.value');
+    expect(nameTreeBody).toContain('include_division_tree: true');
+    expect(nameTreeBody).not.toContain('query.value.trim()');
+    expect(page).not.toContain('watch([query, matchMode, placeTypeCode]');
+    expect(page).not.toContain('scheduleSuggestionLoad');
+    expect(page).not.toContain('loadSuggestions');
+    expect(searchBar).not.toContain("emit('update:pointLimit'");
   });
 
   it('opens point detail cards without exposing ids or auto-fetching details', () => {
@@ -96,7 +122,7 @@ describe('toponyms page shell', () => {
     expect(page).toContain('toponyms-page__stat-strip');
     expect(searchBar).toContain('toponym-search-bar__hint');
     expect(resultsPanel).toContain('toponym-results-panel__inspector');
-    expect(resultsPanel).toContain('toponym-results-panel__suggestion-note');
+    expect(resultsPanel).toContain('toponym-results-panel__name-tree-note');
     expect(detailPanel).toContain('toponym-detail-panel__source-label');
   });
 

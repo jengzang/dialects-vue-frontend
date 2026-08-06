@@ -19,6 +19,9 @@ describe('toponyms API contracts', () => {
     expect(source).toContain('/api/toponyms/details');
     expect(source).toContain('https://dmfw.mca.gov.cn/9095/stname/detailsPub');
     expect(source).toContain('getToponymOfficialDetail');
+    expect(source).toContain('TOPONYM_DEFAULT_POINT_LIMIT = 0');
+    expect(source).toContain('parent_path');
+    expect(source).toContain('page_size');
     expect(source).not.toContain('/api/toponyms/map');
   });
 

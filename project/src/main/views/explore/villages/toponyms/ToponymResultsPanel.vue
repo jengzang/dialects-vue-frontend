@@ -31,46 +31,71 @@
         </p>
       </section>
 
-      <section class="toponym-results-panel__suggestions">
+      <section class="toponym-results-panel__name-tree">
         <div class="toponym-results-panel__section-header">
-          <h3>{{ t('villages.pages.toponyms.suggestions.title') }}</h3>
-          <span v-if="suggestionsLoading">{{ t('villages.pages.toponyms.suggestions.loading') }}</span>
+          <h3>{{ t('villages.pages.toponyms.nameTree.title') }}</h3>
+          <span v-if="nameTreeLoading">{{ t('villages.pages.toponyms.nameTree.loading') }}</span>
         </div>
+        <button
+          class="main-glass-button toponym-results-panel__tree-action"
+          type="button"
+          :disabled="loading || nameTreeLoading || !hasSearched"
+          @click="emit('request-name-tree')"
+        >
+          {{
+            nameTreeLoading
+              ? t('villages.pages.toponyms.nameTree.loading')
+              : t('villages.pages.toponyms.nameTree.load')
+          }}
+        </button>
         <p
-          v-if="suggestionsError"
+          v-if="nameTreeError"
           class="toponym-results-panel__error"
         >
-          {{ suggestionsError }}
+          {{ nameTreeError }}
         </p>
         <p
-          v-else-if="!suggestions.length"
-          class="toponym-results-panel__muted toponym-results-panel__suggestion-note"
+          v-else-if="!nameTreeLoaded"
+          class="toponym-results-panel__muted toponym-results-panel__name-tree-note"
         >
-          {{ t('villages.pages.toponyms.suggestions.empty') }}
+          {{ t('villages.pages.toponyms.nameTree.idle') }}
         </p>
-        <div
-          v-else
-          class="toponym-results-panel__chips ui-scrollbar"
+        <p
+          v-else-if="!nameTreeRows.length"
+          class="toponym-results-panel__muted toponym-results-panel__name-tree-note"
         >
-          <button
-            v-for="name in suggestions"
-            :key="name"
-            class="toponym-results-panel__chip"
-            type="button"
-            @click="emit('select-suggestion', name)"
+          {{ t('villages.pages.toponyms.nameTree.empty') }}
+        </p>
+        <ol
+          v-else
+          class="toponym-results-panel__tree-list ui-scrollbar"
+        >
+          <li
+            v-for="row in nameTreeRows"
+            :key="row.key"
+            class="toponym-results-panel__tree-node"
+            :style="getTreeRowStyle(row)"
           >
-            {{ name }}
-          </button>
-        </div>
+            <span>{{ row.name }}</span>
+            <small>{{ t('villages.pages.toponyms.nameTree.level', { level: row.level }) }}</small>
+            <div
+              v-if="row.names.length"
+              class="toponym-results-panel__names"
+            >
+              {{ formatNames(row.names) }}
+            </div>
+          </li>
+        </ol>
       </section>
     </div>
   </aside>
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-defineProps({
+const props = defineProps({
   hasSearched: {
     type: Boolean,
     default: false,
@@ -95,22 +120,60 @@ defineProps({
     type: Boolean,
     default: false,
   },
-  suggestions: {
+  nameTree: {
     type: Array,
     default: () => [],
   },
-  suggestionsLoading: {
+  nameTreeLoading: {
     type: Boolean,
     default: false,
   },
-  suggestionsError: {
+  nameTreeError: {
     type: String,
     default: '',
   },
+  nameTreeLoaded: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(['select-suggestion']);
+const emit = defineEmits(['request-name-tree']);
 const { t } = useI18n();
+
+const nameTreeRows = computed(() => flattenNameTreeNodes(props.nameTree));
+
+function formatNames(names) {
+  return names.join(', ');
+}
+
+function getTreeRowStyle(row) {
+  return {
+    '--toponym-tree-indent': `${row.depth * 10}px`,
+  };
+}
+
+function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
+  if (!Array.isArray(nodes)) return [];
+
+  return nodes.flatMap((node, index) => {
+    const name = typeof node?.name === 'string' && node.name ? node.name : '-';
+    const level = node?.level ?? '-';
+    const key = `${lineage}/${level}:${name}:${index}`;
+    const row = {
+      key,
+      name,
+      level,
+      names: Array.isArray(node?.names) ? node.names.filter((item) => typeof item === 'string' && item) : [],
+      depth,
+    };
+
+    return [
+      row,
+      ...flattenNameTreeNodes(node?.children, key, depth + 1),
+    ];
+  });
+}
 </script>
 
 <style scoped lang="scss">
@@ -131,7 +194,7 @@ const { t } = useI18n();
   }
 
   &__summary,
-  &__suggestions {
+  &__name-tree {
     @include flex-col;
     gap: 8px;
 
@@ -172,32 +235,56 @@ const { t } = useI18n();
     }
   }
 
-  &__chips {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    max-block-size: 132px;
-    overflow: auto;
-    padding-inline-end: 4px;
-  }
+  &__tree-action {
+    align-self: flex-start;
 
-  &__suggestion-note {
-    color: var(--text-tertiary);
-  }
-
-  &__chip {
-    max-inline-size: 100%;
-    padding: 6px 10px;
-    border: 1px solid var(--border-glass);
-    border-radius: var(--radius-pill);
-    background: var(--surface-glass-button);
-    color: var(--text-primary);
-    font: inherit;
-    cursor: pointer;
-
-    &:hover {
-      background: var(--surface-glass-button-hover);
+    &:disabled {
+      @include disabled-state;
     }
+  }
+
+  &__tree-list {
+    @include flex-col;
+    gap: 8px;
+    max-block-size: 240px;
+    margin: 0;
+    overflow: auto;
+    padding-inline-start: 0;
+    padding-inline-end: 4px;
+    list-style: none;
+  }
+
+  &__tree-node {
+    @include flex-col;
+    gap: 3px;
+    padding: 8px;
+    padding-inline-start: calc(8px + var(--toponym-tree-indent, 0px));
+    border: 1px solid var(--border-glass-subtle);
+    border-radius: var(--radius-sm2);
+    background: var(--surface-panel-subtle);
+
+    span {
+      color: var(--text-primary);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    small {
+      color: var(--text-tertiary);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+  }
+
+  &__names {
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  &__name-tree-note {
+    color: var(--text-tertiary);
   }
 
   &__muted {

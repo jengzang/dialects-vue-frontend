@@ -1,7 +1,7 @@
 import { api } from '../auth/httpClient.js';
 
 export const TOPONYM_DEFAULT_PLACE_TYPE_CODE = '22200';
-export const TOPONYM_DEFAULT_POINT_LIMIT = 5000;
+export const TOPONYM_DEFAULT_POINT_LIMIT = 0;
 export const TOPONYM_DEFAULT_NAME_LIMIT = 20;
 export const TOPONYM_DETAILS_ID_LIMIT = 10;
 
@@ -83,11 +83,24 @@ export async function getToponymNames(params = {}) {
   if (params.include_division_tree) {
     query.set('include_division_tree', 'true');
   }
+  if (params.parent_path) {
+    query.set('parent_path', String(params.parent_path));
+  }
+  if (params.page !== undefined && params.page !== null && params.page !== '') {
+    query.set('page', String(params.page));
+  }
+  if (params.page_size !== undefined && params.page_size !== null && params.page_size !== '') {
+    query.set('page_size', String(params.page_size));
+  }
 
   try {
     const payload = await api(`/api/toponyms/names?${query.toString()}`);
     return {
       items: Array.isArray(payload?.items) ? payload.items : [],
+      mode: payload?.mode || 'full_tree',
+      page: payload?.page ?? null,
+      page_size: payload?.page_size ?? null,
+      has_more: Boolean(payload?.has_more),
     };
   } catch (error) {
     throw new Error(getFastApiErrorMessage(error, 'failed to load toponym names'));

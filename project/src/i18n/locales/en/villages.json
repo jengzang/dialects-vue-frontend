@@ -146,7 +146,6 @@
         "placeholder": "Try: 黄, 塘, 村",
         "matchMode": "Match",
         "placeType": "Type",
-        "limit": "Point limit",
         "submit": "Search",
         "searching": "Searching..."
       },
@@ -160,12 +159,6 @@
         "naturalVillage": "Natural village / rural settlement",
         "adminVillage": "Administrative village",
         "villageCommittee": "Village committee"
-      },
-      "limits": {
-        "oneThousand": "1,000",
-        "fiveThousand": "5,000",
-        "tenThousand": "10,000",
-        "fiftyThousand": "50,000"
       },
       "layers": {
         "title": "Base Layers",
@@ -197,10 +190,13 @@
         "count": "Backend matched {count}; {shown} points are drawable.",
         "truncated": "Results were truncated. Narrow the keyword or choose a stricter match mode."
       },
-      "suggestions": {
-        "title": "Name Suggestions",
+      "nameTree": {
+        "title": "Name Hierarchy",
+        "load": "Query name hierarchy",
         "loading": "Loading",
-        "empty": "No suggestions yet"
+        "idle": "After searching points, query administrative name hierarchy manually.",
+        "empty": "No name hierarchy results",
+        "level": "Level {level}"
       },
       "detail": {
         "title": "Point Detail",
@@ -229,7 +225,7 @@
         "emptyQuery": "Enter a keyword before searching.",
         "countryLayer": "Failed to load the country boundary.",
         "optionalLayer": "Failed to load the optional layer.",
-        "suggestions": "Failed to load name suggestions.",
+        "nameTree": "Failed to load name hierarchy.",
         "points": "Failed to load points.",
         "details": "Failed to load local detail.",
         "official": "Failed to load Ministry detail."

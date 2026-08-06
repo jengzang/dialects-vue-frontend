@@ -11,7 +11,6 @@
           v-model:query="query"
           v-model:match-mode="matchMode"
           v-model:place-type-code="placeTypeCode"
-          v-model:point-limit="pointLimit"
           :loading="pointsLoading"
           @search="handleSearch"
         />
@@ -67,10 +66,11 @@
         :point-count="pointCount"
         :scatter-count="scatterData.length"
         :truncated="pointsTruncated"
-        :suggestions="suggestions"
-        :suggestions-loading="suggestionsLoading"
-        :suggestions-error="suggestionsError"
-        @select-suggestion="handleSelectSuggestion"
+        :name-tree="nameTree"
+        :name-tree-loading="nameTreeLoading"
+        :name-tree-error="nameTreeError"
+        :name-tree-loaded="nameTreeLoaded"
+        @request-name-tree="handleNameTreeRequest"
       />
     </section>
 
@@ -108,7 +108,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
   getToponymDetails,
@@ -131,14 +131,14 @@ const { t } = useI18n();
 const query = ref('');
 const matchMode = ref('prefix');
 const placeTypeCode = ref('22200');
-const pointLimit = ref(5000);
 const hasSearched = ref(false);
+const lastPointSearchParams = ref(null);
 
-const suggestions = ref([]);
-const suggestionsLoading = ref(false);
-const suggestionsError = ref('');
-const suggestionRequestId = ref(0);
-let suggestionTimer = null;
+const nameTree = ref([]);
+const nameTreeLoading = ref(false);
+const nameTreeError = ref('');
+const nameTreeLoaded = ref(false);
+const nameTreeRequestId = ref(0);
 
 const pointRows = ref([]);
 const pointCount = ref(0);
@@ -181,10 +181,6 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  if (suggestionTimer) {
-    clearTimeout(suggestionTimer);
-  }
-
   if (officialAbortController) {
     officialAbortController.abort();
   }
@@ -193,10 +189,6 @@ onBeforeUnmount(() => {
     layoutMediaQuery.removeEventListener('change', syncLayoutMode);
     layoutMediaQuery = null;
   }
-});
-
-watch([query, matchMode, placeTypeCode], () => {
-  scheduleSuggestionLoad();
 });
 
 async function loadCountryLayer() {
@@ -214,58 +206,15 @@ async function loadCountryLayer() {
   }
 }
 
-function scheduleSuggestionLoad() {
-  if (suggestionTimer) {
-    clearTimeout(suggestionTimer);
-  }
-
-  const keyword = query.value.trim();
-  if (!keyword) {
-    suggestions.value = [];
-    suggestionsError.value = '';
-    suggestionsLoading.value = false;
-    return;
-  }
-
-  suggestionTimer = setTimeout(() => {
-    loadSuggestions(keyword);
-  }, 280);
-}
-
-async function loadSuggestions(keyword) {
-  const requestId = suggestionRequestId.value + 1;
-  suggestionRequestId.value = requestId;
-  suggestionsLoading.value = true;
-  suggestionsError.value = '';
-
-  try {
-    const payload = await getToponymNames({
-      q: keyword,
-      match_mode: matchMode.value,
-      place_type_code: placeTypeCode.value,
-      limit: 20,
-    });
-
-    if (requestId !== suggestionRequestId.value) return;
-    suggestions.value = payload.items.filter((item) => typeof item === 'string');
-  } catch (error) {
-    if (requestId !== suggestionRequestId.value) return;
-    suggestions.value = [];
-    suggestionsError.value = error.message || t('villages.pages.toponyms.errors.suggestions');
-  } finally {
-    if (requestId === suggestionRequestId.value) {
-      suggestionsLoading.value = false;
-    }
-  }
-}
-
 async function handleSearch() {
   const keyword = query.value.trim();
   hasSearched.value = true;
   pointsError.value = '';
+  resetNameTree();
   resetSelectedDetails();
 
   if (!keyword) {
+    lastPointSearchParams.value = null;
     pointRows.value = [];
     pointCount.value = 0;
     pointsTruncated.value = false;
@@ -273,24 +222,29 @@ async function handleSearch() {
     return;
   }
 
+  const searchParams = {
+    q: keyword,
+    match_mode: matchMode.value,
+    place_type_code: placeTypeCode.value,
+  };
   const requestId = pointsRequestId.value + 1;
   pointsRequestId.value = requestId;
   pointsLoading.value = true;
 
   try {
     const payload = await getToponymPoints({
-      q: keyword,
-      match_mode: matchMode.value,
-      place_type_code: placeTypeCode.value,
-      limit: pointLimit.value,
+      ...searchParams,
+      limit: 0,
     });
 
     if (requestId !== pointsRequestId.value) return;
+    lastPointSearchParams.value = searchParams;
     pointRows.value = payload.items;
     pointCount.value = payload.count;
     pointsTruncated.value = payload.truncated;
   } catch (error) {
     if (requestId !== pointsRequestId.value) return;
+    lastPointSearchParams.value = null;
     pointRows.value = [];
     pointCount.value = 0;
     pointsTruncated.value = false;
@@ -302,9 +256,39 @@ async function handleSearch() {
   }
 }
 
-function handleSelectSuggestion(name) {
-  query.value = name;
-  handleSearch();
+async function handleNameTreeRequest() {
+  const searchParams = lastPointSearchParams.value;
+  nameTreeError.value = '';
+  nameTreeLoaded.value = true;
+
+  if (!searchParams?.q) {
+    nameTree.value = [];
+    nameTreeError.value = t('villages.pages.toponyms.errors.emptyQuery');
+    return;
+  }
+
+  const requestId = nameTreeRequestId.value + 1;
+  nameTreeRequestId.value = requestId;
+  nameTreeLoading.value = true;
+
+  try {
+    const payload = await getToponymNames({
+      ...searchParams,
+      include_division_tree: true,
+      limit: 0,
+    });
+
+    if (requestId !== nameTreeRequestId.value) return;
+    nameTree.value = payload.items;
+  } catch (error) {
+    if (requestId !== nameTreeRequestId.value) return;
+    nameTree.value = [];
+    nameTreeError.value = error.message || t('villages.pages.toponyms.errors.nameTree');
+  } finally {
+    if (requestId === nameTreeRequestId.value) {
+      nameTreeLoading.value = false;
+    }
+  }
 }
 
 async function handleSelectPoint(point) {
@@ -380,6 +364,14 @@ function resetSelectedDetails() {
   officialError.value = '';
   officialLoading.value = false;
   closeDetailCard();
+}
+
+function resetNameTree() {
+  nameTreeRequestId.value += 1;
+  nameTree.value = [];
+  nameTreeError.value = '';
+  nameTreeLoading.value = false;
+  nameTreeLoaded.value = false;
 }
 
 function setupLayoutWatcher() {

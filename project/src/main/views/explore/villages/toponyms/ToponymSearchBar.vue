@@ -37,16 +37,6 @@
       />
     </label>
 
-    <label class="toponym-search-bar__field">
-      <span>{{ t('villages.pages.toponyms.search.limit') }}</span>
-      <SimpleSelectDropdown
-        :model-value="pointLimit"
-        :options="pointLimitOptions"
-        match-trigger-width
-        @update:model-value="emit('update:pointLimit', Number($event))"
-      />
-    </label>
-
     <button
       class="main-glass-button toponym-search-bar__submit"
       type="submit"
@@ -75,10 +65,6 @@ defineProps({
     type: String,
     default: '22200',
   },
-  pointLimit: {
-    type: Number,
-    default: 5000,
-  },
   loading: {
     type: Boolean,
     default: false,
@@ -89,7 +75,6 @@ const emit = defineEmits([
   'update:query',
   'update:matchMode',
   'update:placeTypeCode',
-  'update:pointLimit',
   'search',
 ]);
 
@@ -106,13 +91,6 @@ const placeTypeOptions = computed(() => [
   { value: '22200', label: t('villages.pages.toponyms.placeTypes.naturalVillage') },
   { value: '21610', label: t('villages.pages.toponyms.placeTypes.adminVillage') },
   { value: '27610', label: t('villages.pages.toponyms.placeTypes.villageCommittee') },
-]);
-
-const pointLimitOptions = computed(() => [
-  { value: 1000, label: t('villages.pages.toponyms.limits.oneThousand') },
-  { value: 5000, label: t('villages.pages.toponyms.limits.fiveThousand') },
-  { value: 10000, label: t('villages.pages.toponyms.limits.tenThousand') },
-  { value: 50000, label: t('villages.pages.toponyms.limits.fiftyThousand') },
 ]);
 
 function handleSubmit() {
