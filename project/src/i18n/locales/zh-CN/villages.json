@@ -140,7 +140,7 @@
     },
     "toponyms": {
       "title": "地名分布",
-      "subtitle": "输入汉字或地名片段，查看匹配地名的全国点位分布，并按已知 ID 查询本地与民政部详情。",
+      "subtitle": "输入汉字或地名片段，查看匹配地名的全国点位分布；点击点位后可手动查询本地与民政部详情。",
       "search": {
         "keyword": "关键词",
         "placeholder": "例如：黄、塘、村",
@@ -187,7 +187,7 @@
         "pointsReady": "已准备 {count} 个可绘制点位",
         "noDrawablePoints": "没有可绘制点位。",
         "pointsSeries": "匹配点位",
-        "pointTooltip": "点击查看本地详情",
+        "pointTooltip": "点击后可以查询具体村庄信息",
         "baseMapError": "底图加载失败"
       },
       "results": {
@@ -205,8 +205,14 @@
       "detail": {
         "title": "点位详情",
         "empty": "点击地图点位后查看本地详情。",
+        "cardHint": "点击按钮后再查询具体村庄信息。",
         "selectedPoint": "选中坐标",
+        "localButton": "查询本地详情",
+        "localButtonLoading": "查询中...",
+        "localHint": "可先查询本地详情，再按需查询民政部详情。",
         "localLoading": "正在加载本地详情...",
+        "localSource": "来源",
+        "localSourceName": "本地地名库",
         "noLocalDetail": "未找到本地详情。",
         "name": "标准地名",
         "placeType": "类型",

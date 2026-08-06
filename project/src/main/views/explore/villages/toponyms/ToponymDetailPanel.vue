@@ -1,16 +1,5 @@
 <template>
   <section class="toponym-detail-panel">
-    <div class="toponym-detail-panel__header">
-      <h3>{{ t('villages.pages.toponyms.detail.title') }}</h3>
-      <small
-        v-if="localDetail"
-        class="toponym-detail-panel__source-label"
-      >
-        {{ t('villages.pages.toponyms.detail.name') }}
-      </small>
-      <span v-if="selectedPoint">{{ selectedPoint.id }}</span>
-    </div>
-
     <p
       v-if="!selectedPoint"
       class="toponym-detail-panel__empty"
@@ -22,6 +11,33 @@
       <div class="toponym-detail-panel__selected">
         <span>{{ t('villages.pages.toponyms.detail.selectedPoint') }}</span>
         <strong>{{ formatCoordinates(selectedPoint.coordinates) }}</strong>
+      </div>
+
+      <div class="toponym-detail-panel__actions">
+        <button
+          class="main-glass-button"
+          type="button"
+          :disabled="localLoading"
+          @click="emit('request-local-detail')"
+        >
+          {{
+            localLoading
+              ? t('villages.pages.toponyms.detail.localButtonLoading')
+              : t('villages.pages.toponyms.detail.localButton')
+          }}
+        </button>
+        <button
+          class="main-glass-button"
+          type="button"
+          :disabled="officialLoading"
+          @click="emit('request-official-detail')"
+        >
+          {{
+            officialLoading
+              ? t('villages.pages.toponyms.detail.officialLoading')
+              : t('villages.pages.toponyms.detail.officialButton')
+          }}
+        </button>
       </div>
 
       <p
@@ -37,16 +53,26 @@
         {{ localError }}
       </p>
       <p
-        v-else-if="selectedPoint && !localDetail"
+        v-else-if="selectedPoint && !localDetail && localRequested"
         class="toponym-detail-panel__status"
       >
         {{ t('villages.pages.toponyms.detail.noLocalDetail') }}
+      </p>
+      <p
+        v-else-if="selectedPoint && !localDetail"
+        class="toponym-detail-panel__status"
+      >
+        {{ t('villages.pages.toponyms.detail.localHint') }}
       </p>
 
       <dl
         v-if="localDetail"
         class="toponym-detail-panel__list"
       >
+        <div class="toponym-detail-panel__source-label">
+          <dt>{{ t('villages.pages.toponyms.detail.localSource') }}</dt>
+          <dd>{{ t('villages.pages.toponyms.detail.localSourceName') }}</dd>
+        </div>
         <div>
           <dt>{{ t('villages.pages.toponyms.detail.name') }}</dt>
           <dd>{{ localDetail.name || t('villages.pages.toponyms.detail.unknown') }}</dd>
@@ -66,19 +92,6 @@
       </dl>
 
       <div class="toponym-detail-panel__official">
-        <button
-          class="main-glass-button"
-          type="button"
-          :disabled="officialLoading"
-          @click="emit('request-official-detail')"
-        >
-          {{
-            officialLoading
-              ? t('villages.pages.toponyms.detail.officialLoading')
-              : t('villages.pages.toponyms.detail.officialButton')
-          }}
-        </button>
-
         <p
           v-if="officialError"
           class="toponym-detail-panel__error"
@@ -141,9 +154,13 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  localRequested: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(['request-official-detail']);
+const emit = defineEmits(['request-local-detail', 'request-official-detail']);
 const { t } = useI18n();
 
 const divisionPathText = computed(() => {
@@ -171,31 +188,9 @@ function formatCoordinates(coordinates) {
 .toponym-detail-panel {
   @include flex-col;
   gap: 12px;
-  padding-block-start: 12px;
-  border-block-start: 1px solid var(--border-glass-subtle);
-
-  &__header {
-    @include flex-col;
-    gap: 4px;
-
-    h3 {
-      margin: 0;
-      color: var(--text-deep);
-      font-size: 16px;
-      line-height: 1.4;
-    }
-
-    span {
-      @include text-truncate;
-      color: var(--text-tertiary);
-      font-size: 12px;
-    }
-  }
 
   &__source-label {
-    color: var(--text-secondary);
-    font-size: 12px;
-    line-height: 1.4;
+    padding-block-end: 2px;
   }
 
   &__empty,
@@ -259,13 +254,19 @@ function formatCoordinates(coordinates) {
     }
   }
 
-  &__official {
-    @include flex-col;
-    gap: 10px;
+  &__actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
 
     button:disabled {
       @include disabled-state;
     }
+  }
+
+  &__official {
+    @include flex-col;
+    gap: 10px;
   }
 }
 </style>

@@ -63,24 +63,12 @@
           </button>
         </div>
       </section>
-
-      <ToponymDetailPanel
-        :selected-point="selectedPoint"
-        :local-detail="localDetail"
-        :local-loading="localLoading"
-        :local-error="localError"
-        :official-detail="officialDetail"
-        :official-loading="officialLoading"
-        :official-error="officialError"
-        @request-official-detail="emit('request-official-detail')"
-      />
     </div>
   </aside>
 </template>
 
 <script setup>
 import { useI18n } from 'vue-i18n';
-import ToponymDetailPanel from './ToponymDetailPanel.vue';
 
 defineProps({
   hasSearched: {
@@ -119,37 +107,9 @@ defineProps({
     type: String,
     default: '',
   },
-  selectedPoint: {
-    type: Object,
-    default: null,
-  },
-  localDetail: {
-    type: Object,
-    default: null,
-  },
-  localLoading: {
-    type: Boolean,
-    default: false,
-  },
-  localError: {
-    type: String,
-    default: '',
-  },
-  officialDetail: {
-    type: Object,
-    default: null,
-  },
-  officialLoading: {
-    type: Boolean,
-    default: false,
-  },
-  officialError: {
-    type: String,
-    default: '',
-  },
 });
 
-const emit = defineEmits(['select-suggestion', 'request-official-detail']);
+const emit = defineEmits(['select-suggestion']);
 const { t } = useI18n();
 </script>
 

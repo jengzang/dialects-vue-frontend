@@ -140,7 +140,7 @@
     },
     "toponyms": {
       "title": "自然村地名分佈",
-      "subtitle": "輸入漢字或地名片段，查看匹配地名的全國點位分佈，並按已知 ID 查詢本地與民政部詳情。",
+      "subtitle": "輸入漢字或地名片段，查看匹配地名的全國點位分佈；點擊點位後可手動查詢本地與民政部詳情。",
       "search": {
         "keyword": "關鍵詞",
         "placeholder": "例如：黃、塘、村",
@@ -187,7 +187,7 @@
         "pointsReady": "已準備 {count} 個可繪製點位",
         "noDrawablePoints": "沒有可繪製點位。",
         "pointsSeries": "匹配點位",
-        "pointTooltip": "點擊查看本地詳情",
+        "pointTooltip": "點擊後可以查詢具體村莊資訊",
         "baseMapError": "底圖加載失敗"
       },
       "results": {
@@ -205,8 +205,14 @@
       "detail": {
         "title": "點位詳情",
         "empty": "點擊地圖點位後查看本地詳情。",
+        "cardHint": "點擊按鈕後再查詢具體村莊資訊。",
         "selectedPoint": "選中坐標",
+        "localButton": "查詢本地詳情",
+        "localButtonLoading": "查詢中...",
+        "localHint": "可先查詢本地詳情，再按需查詢民政部詳情。",
         "localLoading": "正在加載本地詳情...",
+        "localSource": "來源",
+        "localSourceName": "本地地名庫",
         "noLocalDetail": "未找到本地詳情。",
         "name": "標準地名",
         "placeType": "類型",

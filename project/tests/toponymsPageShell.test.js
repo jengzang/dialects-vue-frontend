@@ -10,6 +10,16 @@ function readSource(path) {
   return readFileSync(resolve(projectRoot, path), 'utf8');
 }
 
+function functionBody(source, functionName) {
+  const start = source.indexOf(`function ${functionName}`);
+  if (start === -1) return '';
+  const nextFunction = source.indexOf('\nasync function ', start + 1);
+  const nextPlainFunction = source.indexOf('\nfunction ', start + 1);
+  const candidates = [nextFunction, nextPlainFunction].filter((index) => index > start);
+  const end = candidates.length ? Math.min(...candidates) : source.length;
+  return source.slice(start, end);
+}
+
 describe('toponyms page shell', () => {
   it('wires split toponyms APIs without first-paint point loading', () => {
     const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
@@ -22,6 +32,7 @@ describe('toponyms page shell', () => {
     expect(page).toContain('const hasSearched = ref(false)');
     expect(page).toContain('async function handleSearch');
     expect(page).toContain('async function handleSelectPoint');
+    expect(page).toContain('async function handleLocalDetailRequest');
     expect(page).toContain('async function handleOfficialDetailRequest');
     expect(page).not.toContain('/api/toponyms/map');
     expect(page).not.toContain('onMounted(handleSearch');
@@ -38,15 +49,40 @@ describe('toponyms page shell', () => {
     expect(page).toContain('<ToponymLayerControls');
     expect(page).toContain('<ToponymResultsPanel');
     expect(page).toContain(':suggestions="suggestions"');
-    expect(page).toContain(':local-detail="selectedLocalDetail"');
+    expect(page).toContain('<HoverDetailCard');
     expect(searchBar).toContain('<SimpleSelectDropdown');
     expect(searchBar).toContain('class="toponym-search-bar__form"');
     expect(searchBar).toContain('@submit.prevent');
     expect(layerControls).toContain('riverL1');
     expect(layerControls).toContain('riverL2');
     expect(layerControls).toContain('riverL3');
-    expect(resultsPanel).toContain('<ToponymDetailPanel');
+    expect(resultsPanel).not.toContain('<ToponymDetailPanel');
+    expect(detailPanel).toContain("emit('request-local-detail')");
     expect(detailPanel).toContain("emit('request-official-detail')");
+  });
+
+  it('opens point detail cards without exposing ids or auto-fetching details', () => {
+    const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
+    const chart = readSource('src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue');
+    const detailPanel = readSource('src/main/views/explore/villages/toponyms/ToponymDetailPanel.vue');
+    const zhCNVillages = readSource('src/i18n/locales/zh-CN/villages.json');
+    const zhHantVillages = readSource('src/i18n/locales/zh-Hant/villages.json');
+    const enVillages = readSource('src/i18n/locales/en/villages.json');
+    const selectPointBody = functionBody(page, 'handleSelectPoint');
+    const localDetailBody = functionBody(page, 'handleLocalDetailRequest');
+
+    expect(page).toContain("import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'");
+    expect(page).toContain("import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js'");
+    expect(page).toContain('isDetailCardOpen');
+    expect(page).toContain('desktopCardPosition');
+    expect(selectPointBody).not.toContain('getToponymDetails');
+    expect(localDetailBody).toContain('getToponymDetails');
+    expect(chart).toContain("t('villages.pages.toponyms.chart.pointTooltip')");
+    expect(chart).not.toContain('point.id');
+    expect(detailPanel).not.toContain('{{ selectedPoint.id }}');
+    expect(zhCNVillages).not.toContain('已知 ID');
+    expect(zhHantVillages).not.toContain('已知 ID');
+    expect(enVillages).not.toContain('known ID');
   });
 
   it('uses a denser explore-tool layout with chart-first hierarchy and quiet inspector panels', () => {

@@ -215,8 +215,7 @@ function buildPointSeries() {
     data: props.scatterData,
     symbol: 'rect',
     symbolSize: getPointSize(),
-    large: props.scatterData.length > 2000,
-    largeThreshold: 2000,
+    large: false,
     itemStyle: {
       color: cssToken('--color-primary'),
       opacity: 0.72,
@@ -244,7 +243,7 @@ function buildTooltipOption() {
       if (params.seriesType !== 'scatter') return params.seriesName || '';
       const point = extractToponymPointFromChartParams(params);
       if (!point) return '';
-      return point.coordinates.map((value) => Number(value).toFixed(6)).join(', ');
+      return t('villages.pages.toponyms.chart.pointTooltip');
     },
   };
 }
@@ -259,7 +258,13 @@ function handleChartClick(params) {
   if (params?.seriesType !== POINT_CLICK_FILTER.seriesType) return;
   const point = extractToponymPointFromChartParams(params);
   if (!point) return;
-  emit('select-point', point);
+  const eventPosition = params.event?.event
+    ? {
+        clientX: params.event.event.clientX,
+        clientY: params.event.event.clientY,
+      }
+    : null;
+  emit('select-point', { ...point, eventPosition });
 }
 
 function cssToken(name) {

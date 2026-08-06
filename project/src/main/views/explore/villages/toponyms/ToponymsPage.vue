@@ -70,17 +70,40 @@
         :suggestions="suggestions"
         :suggestions-loading="suggestionsLoading"
         :suggestions-error="suggestionsError"
-        :selected-point="selectedPoint"
-        :local-detail="selectedLocalDetail"
-        :local-loading="detailsLoading"
-        :local-error="detailsError"
-        :official-detail="officialDetail"
-        :official-loading="officialLoading"
-        :official-error="officialError"
         @select-suggestion="handleSelectSuggestion"
-        @request-official-detail="handleOfficialDetailRequest"
       />
     </section>
+
+    <Teleport to="body">
+      <HoverDetailCard
+        :visible="isDetailCardOpen"
+        :is-mobile-layout="isMobileLayout"
+        :is-pinned="isDetailCardPinned"
+        :desktop-card-position="desktopCardPosition"
+        root-class="toponym-detail-card"
+        @close="closeDetailCard"
+      >
+        <template #header>
+          <div class="toponyms-page__detail-card-header">
+            <strong>{{ t('villages.pages.toponyms.detail.title') }}</strong>
+            <span>{{ t('villages.pages.toponyms.detail.cardHint') }}</span>
+          </div>
+        </template>
+
+        <ToponymDetailPanel
+          :selected-point="selectedPoint"
+          :local-detail="selectedLocalDetail"
+          :local-loading="detailsLoading"
+          :local-error="detailsError"
+          :local-requested="localDetailRequested"
+          :official-detail="officialDetail"
+          :official-loading="officialLoading"
+          :official-error="officialError"
+          @request-local-detail="handleLocalDetailRequest"
+          @request-official-detail="handleOfficialDetailRequest"
+        />
+      </HoverDetailCard>
+    </Teleport>
   </main>
 </template>
 
@@ -93,6 +116,9 @@ import {
   getToponymOfficialDetail,
   getToponymPoints,
 } from '@/api';
+import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue';
+import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js';
+import ToponymDetailPanel from './ToponymDetailPanel.vue';
 import ToponymLayerControls from './ToponymLayerControls.vue';
 import ToponymDistributionChart from './ToponymDistributionChart.vue';
 import ToponymResultsPanel from './ToponymResultsPanel.vue';
@@ -125,12 +151,19 @@ const selectedPoint = ref(null);
 const selectedLocalDetail = ref(null);
 const detailsLoading = ref(false);
 const detailsError = ref('');
+const localDetailRequested = ref(false);
 const detailsRequestId = ref(0);
 
 const officialDetail = ref(null);
 const officialLoading = ref(false);
 const officialError = ref('');
+const officialRequestId = ref(0);
 let officialAbortController = null;
+const isDetailCardOpen = ref(false);
+const isDetailCardPinned = ref(false);
+const isMobileLayout = ref(false);
+const desktopCardPosition = ref({ left: '0px', top: '0px' });
+let layoutMediaQuery = null;
 
 const layerState = reactive(getDefaultToponymsLayerState());
 const loadedLayers = reactive({});
@@ -143,6 +176,7 @@ const scatterData = computed(() => buildToponymScatterData(pointRows.value));
 const countryLayer = computed(() => loadedLayers.country || null);
 
 onMounted(() => {
+  setupLayoutWatcher();
   loadCountryLayer();
 });
 
@@ -153,6 +187,11 @@ onBeforeUnmount(() => {
 
   if (officialAbortController) {
     officialAbortController.abort();
+  }
+
+  if (layoutMediaQuery) {
+    layoutMediaQuery.removeEventListener('change', syncLayoutMode);
+    layoutMediaQuery = null;
   }
 });
 
@@ -224,11 +263,7 @@ async function handleSearch() {
   const keyword = query.value.trim();
   hasSearched.value = true;
   pointsError.value = '';
-  selectedPoint.value = null;
-  selectedLocalDetail.value = null;
-  detailsError.value = '';
-  officialDetail.value = null;
-  officialError.value = '';
+  resetSelectedDetails();
 
   if (!keyword) {
     pointRows.value = [];
@@ -280,14 +315,38 @@ async function handleSelectPoint(point) {
     id,
     coordinates: Array.isArray(point.coordinates) ? point.coordinates : point.value || [],
   };
+  detailsRequestId.value += 1;
   selectedLocalDetail.value = null;
   detailsError.value = '';
+  detailsLoading.value = false;
+  localDetailRequested.value = false;
+  officialRequestId.value += 1;
+  abortOfficialDetailRequest();
   officialDetail.value = null;
   officialError.value = '';
+  officialLoading.value = false;
+  isDetailCardOpen.value = true;
+  isDetailCardPinned.value = true;
+
+  if (!isMobileLayout.value && point.eventPosition) {
+    desktopCardPosition.value = resolveHoverDetailCardPosition({
+      clientX: point.eventPosition.clientX,
+      clientY: point.eventPosition.clientY,
+      cardWidth: 340,
+      cardHeight: 420,
+    });
+  }
+}
+
+async function handleLocalDetailRequest() {
+  const id = selectedPoint.value?.id;
+  if (!id) return;
 
   const requestId = detailsRequestId.value + 1;
   detailsRequestId.value = requestId;
   detailsLoading.value = true;
+  detailsError.value = '';
+  localDetailRequested.value = true;
 
   try {
     const payload = await getToponymDetails(id);
@@ -303,28 +362,72 @@ async function handleSelectPoint(point) {
   }
 }
 
+function closeDetailCard() {
+  isDetailCardOpen.value = false;
+  isDetailCardPinned.value = false;
+}
+
+function resetSelectedDetails() {
+  detailsRequestId.value += 1;
+  selectedPoint.value = null;
+  selectedLocalDetail.value = null;
+  detailsError.value = '';
+  detailsLoading.value = false;
+  localDetailRequested.value = false;
+  officialRequestId.value += 1;
+  abortOfficialDetailRequest();
+  officialDetail.value = null;
+  officialError.value = '';
+  officialLoading.value = false;
+  closeDetailCard();
+}
+
+function setupLayoutWatcher() {
+  if (typeof window === 'undefined' || !window.matchMedia) return;
+
+  layoutMediaQuery = window.matchMedia('(max-aspect-ratio: 1 / 1)');
+  syncLayoutMode();
+  layoutMediaQuery.addEventListener('change', syncLayoutMode);
+}
+
+function syncLayoutMode() {
+  isMobileLayout.value = Boolean(layoutMediaQuery?.matches);
+}
+
+function abortOfficialDetailRequest() {
+  if (!officialAbortController) return;
+  officialAbortController.abort();
+  officialAbortController = null;
+}
+
 async function handleOfficialDetailRequest() {
   const id = selectedPoint.value?.id || selectedLocalDetail.value?.id;
   if (!id) return;
 
-  if (officialAbortController) {
-    officialAbortController.abort();
-  }
+  abortOfficialDetailRequest();
 
+  const requestId = officialRequestId.value + 1;
+  officialRequestId.value = requestId;
   officialAbortController = new AbortController();
   officialLoading.value = true;
   officialError.value = '';
   officialDetail.value = null;
 
   try {
-    officialDetail.value = await getToponymOfficialDetail(id, {
+    const detail = await getToponymOfficialDetail(id, {
       signal: officialAbortController.signal,
     });
+    if (requestId !== officialRequestId.value) return;
+    officialDetail.value = detail;
   } catch (error) {
+    if (requestId !== officialRequestId.value) return;
     if (error.name === 'AbortError') return;
     officialError.value = error.message || t('villages.pages.toponyms.errors.official');
   } finally {
-    officialLoading.value = false;
+    if (requestId === officialRequestId.value) {
+      officialLoading.value = false;
+      officialAbortController = null;
+    }
   }
 }
 
@@ -457,6 +560,28 @@ async function handleToggleLayer({ key, visible }) {
     justify-content: flex-end;
     min-inline-size: 0;
   }
+
+  &__detail-card-header {
+    @include flex-col;
+    gap: 4px;
+
+    strong {
+      color: var(--text-deep);
+      font-size: 15px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    span {
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+  }
+}
+
+:global(.toponym-detail-card.is-desktop-card) {
+  width: 360px;
 }
 
 @media (max-aspect-ratio: 1 / 1) {

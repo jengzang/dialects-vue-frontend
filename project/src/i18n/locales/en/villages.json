@@ -140,7 +140,7 @@
     },
     "toponyms": {
       "title": "Village Toponym Distribution",
-      "subtitle": "Enter a Chinese character or place-name fragment to inspect matching point distribution, then look up local and Ministry details by known ID.",
+      "subtitle": "Enter a Chinese character or place-name fragment to inspect matching point distribution, then click a point to query local and Ministry details manually.",
       "search": {
         "keyword": "Keyword",
         "placeholder": "Try: 黄, 塘, 村",
@@ -187,7 +187,7 @@
         "pointsReady": "{count} drawable points are ready",
         "noDrawablePoints": "No drawable points.",
         "pointsSeries": "Matching points",
-        "pointTooltip": "Click to view local detail",
+        "pointTooltip": "Click to query detailed village information",
         "baseMapError": "Base map failed to load"
       },
       "results": {
@@ -205,8 +205,14 @@
       "detail": {
         "title": "Point Detail",
         "empty": "Click a map point to view local details.",
+        "cardHint": "Use the buttons to query detailed village information.",
         "selectedPoint": "Selected coordinates",
+        "localButton": "Query local detail",
+        "localButtonLoading": "Querying...",
+        "localHint": "Query local detail first, then query Ministry detail if needed.",
         "localLoading": "Loading local detail...",
+        "localSource": "Source",
+        "localSourceName": "Local toponyms database",
         "noLocalDetail": "No local detail found.",
         "name": "Standard name",
         "placeType": "Type",

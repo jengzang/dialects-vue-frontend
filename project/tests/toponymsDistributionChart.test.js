@@ -23,7 +23,11 @@ describe('toponyms ECharts distribution chart', () => {
     expect(chart).toContain('buildBoundarySeries');
     expect(chart).toContain('buildRiverSeries');
     expect(chart).toContain('extractToponymPointFromChartParams');
+    expect(chart).toContain('eventPosition');
+    expect(chart).toContain('params.event.event.clientX');
     expect(chart).toContain("emit('select-point'");
+    expect(chart).toContain('large: false');
+    expect(chart).not.toContain('large: props.scatterData');
   });
 
   it('keeps layer controls in a compact chart toolbar and status text centered over the chart', () => {
