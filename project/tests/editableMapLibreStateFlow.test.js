@@ -141,6 +141,12 @@ vi.mock('@mapbox/mapbox-gl-draw', () => ({
           }
         }
       })
+      this.getMode = vi.fn(() => this.mode || 'simple_select')
+      this.trash = vi.fn(() => {
+        const map = mapInstances.at(-1)
+        map?.emit('draw.update')
+        map?.emit('draw.delete')
+      })
       drawInstances.push(this)
     }
 
@@ -160,7 +166,6 @@ vi.mock('@mapbox/mapbox-gl-draw', () => ({
       this.features.clear()
       this.selectedIds = []
     }
-    trash() {}
   },
 }))
 
@@ -371,6 +376,73 @@ describe('EditableMapLibre state flow', () => {
     expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('direct_select', { featureId: 'hidden-1' })
     expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
     expect(wrapper.events).toContainEqual(['feature-select', 'hidden-1'])
+
+    wrapper.unmount()
+  })
+
+  it('emits a history checkpoint before Draw update features change', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.map.emit('draw.update')
+
+    const eventNames = wrapper.events.map(([eventName]) => eventName)
+    expect(eventNames.indexOf('before-features-change')).toBeGreaterThanOrEqual(0)
+    expect(eventNames.indexOf('features-change')).toBeGreaterThan(eventNames.indexOf('before-features-change'))
+
+    wrapper.unmount()
+  })
+
+  it('preserves direct-select feature identity after Draw update events', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+
+    wrapper.exposed.selectFeature('polygon-1', { directEdit: true })
+    wrapper.events.length = 0
+    wrapper.draw.selectedIds = []
+    wrapper.map.emit('draw.update')
+
+    expect(wrapper.events).toContainEqual(['feature-select', 'polygon-1'])
+    expect(wrapper.events).not.toContainEqual(['feature-select', ''])
+
+    wrapper.unmount()
+  })
+
+  it('delegates selected deletion to Draw trash without a duplicate history checkpoint', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.deleteSelected()
+
+    expect(wrapper.draw.trash).toHaveBeenCalledTimes(1)
+    expect(wrapper.events.some(([eventName]) => eventName === 'before-features-change')).toBe(false)
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(true)
 
     wrapper.unmount()
   })

@@ -180,6 +180,7 @@ let hoveredFeatureKey = null
 let hoveredFeatureSource = null
 let previewHoverBound = false
 let suppressedProgrammaticFeatureSelectionIds = null
+let isDeletingSelected = false
 let featureBoxDragPanWasEnabled = true
 const sanitizeLayerFilename = (layerName) => {
   return String(layerName || 'map-draw-layer')
@@ -463,8 +464,18 @@ const areFeatureIdsEqual = (leftFeatureIds = [], rightFeatureIds = []) => {
   return leftIds.every((featureId) => rightIdSet.has(featureId))
 }
 
-const syncSelectedFeature = () => {
+const getSelectedFeatureIdsFromDraw = () => {
   const selectedIds = normalizeFeatureIds(draw.value?.getSelectedIds?.() ?? [])
+  if (selectedIds.length > 0) return selectedIds
+  const mode = draw.value?.getMode?.()
+  if (mode === 'direct_select' && selectedFeatureId.value && draw.value?.get?.(selectedFeatureId.value)) {
+    return [selectedFeatureId.value]
+  }
+  return selectedIds
+}
+
+const syncSelectedFeature = () => {
+  const selectedIds = getSelectedFeatureIdsFromDraw()
   selectedFeatureId.value = selectedIds[0] ? String(selectedIds[0]) : ''
   if (suppressedProgrammaticFeatureSelectionIds) {
     if (areFeatureIdsEqual(selectedIds, suppressedProgrammaticFeatureSelectionIds)) return
@@ -480,7 +491,8 @@ const syncDrawMode = (event) => {
 
 const syncFeaturesFromDraw = (options = {}) => {
   const featureCollection = normalizeFeatureCollection(draw.value?.getAll?.())
-  if (options.commitHistory !== false) {
+  const shouldCommitHistory = options.commitHistory !== false && !isDeletingSelected
+  if (shouldCommitHistory) {
     emit('before-features-change')
   }
   emit('update:modelValue', featureCollection)
@@ -776,8 +788,13 @@ const updateFeatureProperties = (featureId, nextProperties, options = {}) => {
 }
 
 const deleteSelected = () => {
-  draw.value?.trash?.()
-  syncFeaturesFromDraw({ commitHistory: false })
+  isDeletingSelected = true
+  try {
+    draw.value?.trash?.()
+    syncFeaturesFromDraw({ commitHistory: false })
+  } finally {
+    isDeletingSelected = false
+  }
 }
 
 const clearAll = () => {

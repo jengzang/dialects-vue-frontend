@@ -83,7 +83,14 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
   default: defineComponent({
     name: 'EditableMapLibreStub',
     props: ['modelValue', 'activeLayer', 'featureBoxSelectEnabled'],
-    emits: ['update:modelValue', 'features-change', 'feature-select', 'feature-box-select'],
+    emits: [
+      'update:modelValue',
+      'before-features-change',
+      'features-change',
+      'feature-select',
+      'feature-box-select',
+      'mode-change',
+    ],
     setup(props, { emit, expose }) {
       let firstLayerId = ''
       expose({
@@ -134,11 +141,42 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         emit('update:modelValue', collection)
         emit('features-change', collection)
       }
-      return { addPolygonFeature }
+      const emitGeometryUpdate = () => {
+        const [firstFeature, ...remainingFeatures] = props.modelValue?.features ?? []
+        if (!firstFeature) return
+        const collection = {
+          type: 'FeatureCollection',
+          features: [{
+            ...firstFeature,
+            geometry: {
+              ...firstFeature.geometry,
+              coordinates: [[
+                [0, 0],
+                [2, 0],
+                [2, 2],
+                [0, 0],
+              ]],
+            },
+          }, ...remainingFeatures],
+        }
+        emit('before-features-change')
+        emit('update:modelValue', collection)
+        emit('features-change', collection)
+      }
+      return { addPolygonFeature, emitGeometryUpdate }
     },
     template: `
       <div>
         <button data-testid="editable-map" type="button" @click="addPolygonFeature">draw polygon</button>
+        <button data-testid="emit-geometry-update" type="button" @click="emitGeometryUpdate">emit geometry update</button>
+        <button
+          data-testid="emit-direct-select"
+          type="button"
+          @click="$emit('feature-select', 'feature-1'); $emit('mode-change', 'direct_select')"
+        >
+          emit direct select
+        </button>
+        <span data-testid="first-feature-coordinate">{{ modelValue?.features?.[0]?.geometry?.coordinates?.[0]?.[1]?.[0] ?? '' }}</span>
         <span data-testid="box-select-mode">{{ featureBoxSelectEnabled ? 'on' : 'off' }}</span>
         <button
           data-testid="emit-box-selection"
@@ -1775,6 +1813,79 @@ describe('MapDrawTab draft safety', () => {
     await flushTicks()
     expect(backspaceEvent.defaultPrevented).toBe(true)
     expect(mocks.mapDeleteSelected).toHaveBeenCalledTimes(2)
+
+    wrapper.unmount()
+  })
+
+  it('undoes geometry changes emitted by Draw update events', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinate"]').textContent).toBe('1')
+
+    wrapper.host.querySelector('[data-testid="emit-geometry-update"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinate"]').textContent).toBe('2')
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'z',
+      metaKey: true,
+    }))
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinate"]').textContent).toBe('1')
+
+    wrapper.unmount()
+  })
+
+  it('delegates Delete in direct select mode to Draw semantics', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+
+    const deleteEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Delete',
+    })
+    document.dispatchEvent(deleteEvent)
+    await flushTicks()
+
+    expect(deleteEvent.defaultPrevented).toBe(true)
+    expect(mocks.mapDeleteSelected).toHaveBeenCalledTimes(1)
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(1)
+
+    const backspaceEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Backspace',
+    })
+    document.dispatchEvent(backspaceEvent)
+    await flushTicks()
+
+    expect(backspaceEvent.defaultPrevented).toBe(true)
+    expect(mocks.mapDeleteSelected).toHaveBeenCalledTimes(2)
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(1)
 
     wrapper.unmount()
   })
