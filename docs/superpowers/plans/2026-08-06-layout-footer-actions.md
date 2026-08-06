@@ -4,7 +4,7 @@
 
 **Goal:** Add a shared footer to `MenuLayout`, `ExploreLayout`, and `SimpleLayout` with cached stats, current-page help text, tutorial, feedback, share, settings, language/theme identity, version, and ICP information.
 
-**Architecture:** Build one shared footer component and small focused helpers. The footer reuses existing stats composables, existing common controls, existing design tokens, and the existing tutorial modal through a tiny global request bridge. Feedback submits through the backend suggestions API; link sharing ships in the first pass, while screenshot upload and branded image sharing are phase-2 enhancements gated by backend/dependency readiness.
+**Architecture:** Build one shared footer component and small focused helpers. The footer reuses existing stats composables, existing common controls, existing design tokens, and the existing tutorial modal through a tiny global request bridge. Feedback submits directly to the confirmed backend suggestions API with optional screenshot upload; link sharing ships in the first pass, while branded image sharing stays as a phase-2 enhancement.
 
 **Tech Stack:** Vue 3, Vue Router, Vue I18n, SCSS scoped component styles, existing `api()` client, existing `AppModal`, existing selector controls, existing `main-glass-button` styles, existing design tokens, existing `useVisitStats()` and `useSourceStats()`, Vitest.
 
@@ -12,25 +12,91 @@
 
 ## Backend Contract
 
-The frontend plan assumes the backend adds this optional request field:
+The backend has confirmed these suggestions APIs are ready for frontend
+integration.
+
+### Submit Feedback
+
+`POST /api/suggestions`
+
+Authentication is optional. Anonymous visitors can submit feedback; logged-in
+users are recorded only as optional attribution through `user_id` and
+`username`.
+
+Request body:
 
 ```json
 {
-  "image_base64": "data:image/webp;base64,UklGR..."
+  "title": "页面反馈标题",
+  "content": "具体反馈内容",
+  "category": "bug",
+  "source_path": "/some/page",
+  "context": {
+    "client_version": "web-v5.0.0",
+    "extra": "optional"
+  },
+  "contact": "optional@example.com",
+  "image_base64": "data:image/webp;base64,..."
 }
 ```
 
-Expected backend behavior:
+Field rules:
 
-- Treat suggestions as site-wide feedback, not as user-only data. Anonymous visitors can submit; `user_id` and `username` are nullable attribution fields when the requester is logged in.
-- Prefer a neutral storage name such as `suggestions` or `site_suggestions` if the schema can still be renamed safely. If production compatibility requires keeping the existing `user_suggestions` table, keep that as an internal legacy name and expose neutral API/domain naming to the frontend.
-- Add `image_base64 TEXT` to the suggestions table/model.
-- Accept optional `image_base64` on `POST /api/suggestions`.
-- Store compressed screenshot data URLs only when present.
-- Return `image_base64` only on admin detail/list responses or behind an admin-only route. Public or submitter-facing list responses can omit it to keep normal lists light.
-- Reject overly large images with `413` or `422`; the frontend will cap generated screenshots to about 600 KB before submit.
+- `title`: required, 1-200 characters after trimming.
+- `content`: required, 1-5000 characters after trimming.
+- `category`: optional open text, defaults to `general`; backend does not enforce a whitelist.
+- `source_path`: optional. The footer should send the current page path, not the full query string.
+- `context`: optional object. The footer should include route diagnostics, locale, theme, layout kind, and app/database version.
+- `contact`: optional. Anonymous visitors can provide contact information if they want follow-up.
+- `image_base64`: optional. Supports `data:image/webp;base64,...`, `data:image/png;base64,...`, and `data:image/jpeg;base64,...`.
 
-If the backend chooses a different field name, update only `project/src/api/main/suggestions.js` and `project/src/main/components/footer/LayoutFeedbackModal.vue` in this plan.
+Backend image limits:
+
+- `image_base64` maximum is 1 MB.
+- Invalid image format or oversize image returns `422`.
+- The frontend should compress automatic screenshots to about 600 KB for safer submission.
+
+Success response:
+
+```json
+{
+  "success": true,
+  "id": 123,
+  "message": "建议已提交"
+}
+```
+
+Normal submit responses do not return screenshot data.
+
+### My Feedback
+
+`GET /api/suggestions/my?status=open&page=1&page_size=20`
+
+Requires login. Anonymous visitors cannot query historical anonymous feedback.
+Response items do not include `image_base64`, keeping the list light.
+
+### Admin Feedback
+
+`GET /admin/suggestions?status=open&category=bug&user_id=7&q=关键词&page=1&page_size=50`
+
+Admin list items include `image_base64` so UI/page problems can be inspected.
+
+`PATCH /admin/suggestions/{suggestion_id}`
+
+```json
+{
+  "status": "reviewing",
+  "priority": "high",
+  "admin_note": "需要跟进"
+}
+```
+
+`status` supports `open`, `reviewing`, `accepted`, `rejected`, and `done`.
+`priority` supports `low`, `normal`, and `high`.
+
+Frontend category options should stay fixed initially for analytics and admin
+filtering: `general`, `bug`, `feature`, `data_issue`, and `ui`. The backend
+still accepts open category strings for future expansion.
 
 ## Implementation Constraints
 
@@ -40,7 +106,7 @@ These constraints are part of the plan, not optional style advice:
 - Do not introduce new visual systems for the footer. Reuse existing common components and global classes:
   - `AppModal` for feedback.
   - `RadioGroup` for feedback category selection.
-  - `CheckBox` for optional screenshot consent when Task 6 is enabled.
+  - `CheckBox` for optional screenshot consent.
   - `main-glass-button` for footer actions and modal submit buttons, tuned through CSS custom properties when compact sizing is needed.
 - Every new Vue component style block must be `<style scoped lang="scss">` and must start with `@use '@/styles/global/mixins' as *;`.
 - Use existing CSS custom properties from `project/src/styles/global/_tokens.scss` for colors, radii, shadows, surfaces, and text. Do not add hardcoded UI colors in component SCSS.
@@ -48,8 +114,9 @@ These constraints are part of the plan, not optional style advice:
 - Do not add width-based media queries. Responsive footer layout must use `@media (max-aspect-ratio: 1 / 1)`.
 - The footer is a compact utility surface, not a marketing section. It should not use hero-scale text, decorative blobs, nested cards, or one-off visual effects.
 - Footer stats must use the shared `useVisitStats()` and `useSourceStats()` cache path. Do not create duplicate homepage/sidebar stats requests.
-- First-pass share behavior is link-first: `navigator.share` when available, then clipboard fallback. Screenshot feedback and branded share images are phase-2 tasks and must not block the base footer.
-- If backend `image_base64` support is not confirmed when executing Task 6, skip Task 6 and keep feedback submissions sending `image_base64: ''`.
+- First-pass feedback opens a modal and calls `POST /api/suggestions` directly. Do not navigate users to the old `/menu/about/suggestion` page for this flow.
+- First-pass feedback includes optional automatic screenshot capture because backend `image_base64` support is confirmed.
+- First-pass share behavior is link-first: `navigator.share` when available, then clipboard fallback. Branded share images are a phase-2 task and must not block the base footer.
 
 ## File Structure
 
@@ -66,9 +133,9 @@ These constraints are part of the plan, not optional style advice:
 - Create `project/src/components/footer/AppFooter.vue`
   - Shared footer UI and action wiring.
 - Create `project/src/main/components/footer/LayoutFeedbackModal.vue`
-  - Feedback type picker and suggestion form. Reuses `AppModal`, `RadioGroup`, and later `CheckBox` for screenshot consent.
+  - Feedback type picker and suggestion form. Reuses `AppModal`, `RadioGroup`, and `CheckBox` for screenshot consent.
 - Create `project/src/utils/share/pageSnapshot.js`
-  - Optional phase-2 page screenshot capture and compression helper.
+  - Optional page screenshot capture and compression helper for feedback.
 - Create `project/src/utils/share/shareCard.js`
   - Optional phase-2 branded share-image canvas helper for social sharing.
 - Modify `project/src/layouts/MenuLayout.vue`
@@ -196,12 +263,11 @@ Create `project/src/api/main/suggestions.js`:
 import { api } from '../../auth/httpClient.js'
 
 export const SUGGESTION_CATEGORY_OPTIONS = [
+  'general',
   'bug',
   'feature',
   'data_issue',
   'ui',
-  'performance',
-  'general',
 ]
 
 function trimText(value) {
@@ -275,6 +341,10 @@ CR checklist:
 
 - The API path is exactly `/api/suggestions`.
 - Optional empty fields are not sent.
+- `category` defaults to `general`.
+- `SUGGESTION_CATEGORY_OPTIONS` matches the initial frontend filter set: `general`, `bug`, `feature`, `data_issue`, `ui`.
+- `image_base64` is optional and omitted when empty.
+- The API file is neutral `suggestions.js`; it is not under `api/main/user/`.
 - Chinese strings in tests remain literal Chinese.
 - No unrelated files are changed.
 
@@ -1078,7 +1148,7 @@ Create `project/src/components/footer/AppFooter.vue`:
     <LayoutFeedbackModal
       v-model="isFeedbackOpen"
       :page-title="t(context.pageTitleKey)"
-      :source-path="route.fullPath"
+      :source-path="route.path"
       :context="feedbackContext"
     />
   </footer>
@@ -1109,7 +1179,8 @@ const props = defineProps({
 const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
-const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
+const homeUpdateNotice = getHomeUpdateNotice(t)
+const sourceDbVersion = homeUpdateNotice.dbVersion
 const cachedSourceStats = getCachedSourceStats()
 const sourceLocationCount = ref(cachedSourceStats.locationCount)
 const sourceDataCount = ref(cachedSourceStats.dataCount)
@@ -1128,10 +1199,15 @@ const context = computed(() => resolveLayoutFooterContext({
 }))
 
 const feedbackContext = computed(() => ({
-  route: route.fullPath,
+  path: route.path,
+  fullPath: route.fullPath,
+  query: route.query,
+  hash: route.hash,
   layout: props.layoutKind,
   locale: locale.value,
   colorTheme: currentColorTheme.value,
+  client_version: `web-${homeUpdateNotice.version}`,
+  database_version: sourceDbVersion,
   pageTitle: t(context.value.pageTitleKey),
   pageDescription: t(context.value.pageDescriptionKey),
   viewport: typeof window === 'undefined'
@@ -1370,6 +1446,7 @@ CR checklist:
 - Styles use `<style scoped lang="scss">` and project mixins.
 - Footer action buttons reuse `main-glass-button`; footer SCSS only supplies compact CSS custom-property overrides.
 - Footer surfaces, text, borders, and states use existing `var(--...)` design tokens.
+- `source_path` passed to feedback is `route.path`; `route.fullPath`, query, hash, locale, theme, layout, app version, and database version stay in feedback context.
 - No width-based responsive media query appears.
 
 Commit:
@@ -1381,7 +1458,7 @@ git commit -m "feat: mount shared layout footer"
 
 ---
 
-### Task 5: Feedback Modal Without Screenshot
+### Task 5: Feedback Modal API Submission
 
 **Files:**
 - Create: `project/src/main/components/footer/LayoutFeedbackModal.vue`
@@ -1453,7 +1530,7 @@ function mountModal(component, props = {}) {
     modelValue: true,
     pageTitle: '查中古',
     sourcePath: '/menu/query/zhonggu',
-    context: { route: '/menu/query/zhonggu', locale: 'zh-CN' },
+    context: { path: '/menu/query/zhonggu', fullPath: '/menu/query/zhonggu', locale: 'zh-CN' },
     ...props,
   })
   app.mount(host)
@@ -1504,13 +1581,35 @@ describe('LayoutFeedbackModal', () => {
       source_path: '/menu/query/zhonggu',
       contact: '',
       context: {
-        route: '/menu/query/zhonggu',
+        path: '/menu/query/zhonggu',
+        fullPath: '/menu/query/zhonggu',
         locale: 'zh-CN',
         pageTitle: '查中古',
       },
       image_base64: '',
     })
     expect(showSuccessMock).toHaveBeenCalledWith('layoutFooter.feedback.success')
+
+    wrapper.unmount()
+  })
+
+  it('shows a validation message for backend 422 responses', async () => {
+    submitSuggestionMock.mockRejectedValue({ status: 422 })
+
+    const { default: LayoutFeedbackModal } = await import('../src/main/components/footer/LayoutFeedbackModal.vue')
+    const wrapper = mountModal(LayoutFeedbackModal)
+    await nextTick()
+
+    wrapper.host.querySelector('[name="title"]').value = '截图太大'
+    wrapper.host.querySelector('[name="title"]').dispatchEvent(new Event('input'))
+    wrapper.host.querySelector('[name="content"]').value = '后端返回字段或截图不合法。'
+    wrapper.host.querySelector('[name="content"]').dispatchEvent(new Event('input'))
+
+    wrapper.host.querySelector('[data-submit-feedback]').click()
+    await nextTick()
+    await nextTick()
+
+    expect(showErrorMock).toHaveBeenCalledWith('layoutFooter.feedback.validationFailed')
 
     wrapper.unmount()
   })
@@ -1543,14 +1642,14 @@ Add this block to each `layoutFooter.json`, translated per locale:
   "contactPlaceholder": "邮箱或其他联系方式，可留空",
   "submit": "提交",
   "success": "反馈已提交，感谢你的帮助",
+  "validationFailed": "反馈内容或截图不符合要求，请检查后再提交",
   "failed": "反馈提交失败，请稍后再试",
   "categories": {
+    "general": "其他",
     "bug": "问题",
     "feature": "功能建议",
     "data_issue": "资料问题",
-    "ui": "界面体验",
-    "performance": "性能",
-    "general": "其他"
+    "ui": "界面体验"
   }
 }
 ```
@@ -1566,6 +1665,7 @@ Create `project/src/main/components/footer/LayoutFeedbackModal.vue`:
   <AppModal
     :model-value="modelValue"
     size="sm"
+    data-layout-feedback-modal
     :title="t('layoutFooter.feedback.title')"
     :close-label="t('common.button.close')"
     @update:modelValue="emit('update:modelValue', $event)"
@@ -1666,12 +1766,11 @@ const contact = ref('')
 const isSubmitting = ref(false)
 
 const categoryOptions = computed(() => ([
+  { value: 'general', label: t('layoutFooter.feedback.categories.general') },
   { value: 'bug', label: t('layoutFooter.feedback.categories.bug') },
   { value: 'feature', label: t('layoutFooter.feedback.categories.feature') },
   { value: 'data_issue', label: t('layoutFooter.feedback.categories.data_issue') },
   { value: 'ui', label: t('layoutFooter.feedback.categories.ui') },
-  { value: 'performance', label: t('layoutFooter.feedback.categories.performance') },
-  { value: 'general', label: t('layoutFooter.feedback.categories.general') },
 ]))
 
 const canSubmit = computed(() => title.value.trim() && content.value.trim())
@@ -1705,8 +1804,11 @@ async function submit() {
     showSuccess(t('layoutFooter.feedback.success'))
     emit('update:modelValue', false)
     resetForm()
-  } catch {
-    showError(t('layoutFooter.feedback.failed'))
+  } catch (error) {
+    const errorKey = error?.status === 422 || error?.message === 'screenshot_too_large'
+      ? 'layoutFooter.feedback.validationFailed'
+      : 'layoutFooter.feedback.failed'
+    showError(t(errorKey))
   } finally {
     isSubmitting.value = false
   }
@@ -1779,8 +1881,11 @@ git diff -- project/src/main/components/footer/LayoutFeedbackModal.vue project/s
 CR checklist:
 
 - The modal uses `AppModal`, so the header does not scroll with content.
+- Feedback submits directly through `submitSuggestion()`; it does not navigate to `/menu/about/suggestion`.
 - The category picker reuses `RadioGroup`; do not replace it with a custom segmented-control skin.
 - The submit button reuses `main-glass-button` with compact CSS custom-property overrides.
+- The initial frontend category choices are `general`, `bug`, `feature`, `data_issue`, and `ui`.
+- Backend `422` responses show `layoutFooter.feedback.validationFailed`; other errors show `layoutFooter.feedback.failed`.
 - Existing Chinese copy outside `layoutFooter.json` is untouched.
 - The request includes route context but does not include screenshot data yet.
 - No width-based media queries are introduced.
@@ -1794,11 +1899,10 @@ git commit -m "feat: add layout feedback modal"
 
 ---
 
-### Task 6: Phase-2 Screenshot Capture for Feedback
+### Task 6: Opt-In Screenshot Capture for Feedback
 
-Execute this task only after the backend confirms `image_base64` support on
-`POST /api/suggestions`. If backend support is not ready, skip this task and
-keep the base feedback flow sending `image_base64: ''`.
+Backend `image_base64` support is confirmed. This task adds optional automatic
+page screenshots to the real feedback submission path.
 
 **Files:**
 - Modify: `project/package.json`
@@ -1862,6 +1966,26 @@ describe('page snapshot helper', () => {
     })
     expect(canvas.toDataURL).toHaveBeenCalledWith('image/webp', 0.72)
   })
+
+  it('lowers webp quality until the screenshot is below the target size', async () => {
+    const largeDataUrl = `data:image/webp;base64,${'a'.repeat(1200)}`
+    const smallDataUrl = 'data:image/webp;base64,abc'
+    const canvas = {
+      width: 1200,
+      height: 800,
+      toDataURL: vi.fn()
+        .mockReturnValueOnce(largeDataUrl)
+        .mockReturnValueOnce(smallDataUrl),
+    }
+    html2canvasMock.mockResolvedValue(canvas)
+
+    const { capturePageSnapshot } = await import('../src/utils/share/pageSnapshot.js')
+    const result = await capturePageSnapshot({ targetBytes: 100, maxBytes: 1024, quality: 0.8 })
+
+    expect(result).toBe(smallDataUrl)
+    expect(canvas.toDataURL).toHaveBeenNthCalledWith(1, 'image/webp', 0.8)
+    expect(canvas.toDataURL).toHaveBeenNthCalledWith(2, 'image/webp', 0.72)
+  })
 })
 ```
 
@@ -1882,9 +2006,65 @@ Create `project/src/utils/share/pageSnapshot.js`:
 ```js
 import html2canvas from 'html2canvas'
 
+const DEFAULT_MAX_WIDTH = 1200
+const DEFAULT_TARGET_BYTES = 600 * 1024
+const DEFAULT_MAX_BYTES = 1024 * 1024
+const DEFAULT_QUALITY = 0.72
+const MIN_QUALITY = 0.42
+const QUALITY_STEP = 0.08
+
+export function estimateDataUrlBytes(dataUrl) {
+  if (typeof dataUrl !== 'string') return 0
+  const base64 = dataUrl.split(',', 2)[1] || ''
+  return Math.ceil((base64.length * 3) / 4)
+}
+
+function resizeCanvasIfNeeded(canvas, maxWidth) {
+  if (!canvas || !maxWidth || canvas.width <= maxWidth) {
+    return canvas
+  }
+
+  const ratio = maxWidth / canvas.width
+  const resizedCanvas = document.createElement('canvas')
+  resizedCanvas.width = maxWidth
+  resizedCanvas.height = Math.round(canvas.height * ratio)
+  resizedCanvas
+    .getContext('2d')
+    .drawImage(canvas, 0, 0, resizedCanvas.width, resizedCanvas.height)
+
+  return resizedCanvas
+}
+
+export function encodeCanvasWithinLimit(
+  canvas,
+  {
+    mimeType = 'image/webp',
+    quality = DEFAULT_QUALITY,
+    targetBytes = DEFAULT_TARGET_BYTES,
+    maxBytes = DEFAULT_MAX_BYTES,
+  } = {}
+) {
+  let currentQuality = quality
+  let dataUrl = canvas.toDataURL(mimeType, currentQuality)
+
+  while (estimateDataUrlBytes(dataUrl) > targetBytes && currentQuality > MIN_QUALITY) {
+    currentQuality = Math.max(MIN_QUALITY, Number((currentQuality - QUALITY_STEP).toFixed(2)))
+    dataUrl = canvas.toDataURL(mimeType, currentQuality)
+  }
+
+  if (estimateDataUrlBytes(dataUrl) > maxBytes) {
+    throw new Error('screenshot_too_large')
+  }
+
+  return dataUrl
+}
+
 export async function capturePageSnapshot({
   target = document.body,
-  quality = 0.72,
+  maxWidth = DEFAULT_MAX_WIDTH,
+  quality = DEFAULT_QUALITY,
+  targetBytes = DEFAULT_TARGET_BYTES,
+  maxBytes = DEFAULT_MAX_BYTES,
 } = {}) {
   const canvas = await html2canvas(target, {
     backgroundColor: null,
@@ -1902,7 +2082,11 @@ export async function capturePageSnapshot({
     windowWidth: window.innerWidth,
   })
 
-  return canvas.toDataURL('image/webp', quality)
+  return encodeCanvasWithinLimit(resizeCanvasIfNeeded(canvas, maxWidth), {
+    quality,
+    targetBytes,
+    maxBytes,
+  })
 }
 ```
 
@@ -1915,7 +2099,10 @@ Add i18n keys to all three `layoutFooter.json` files:
 ```json
 "screenshot": {
   "label": "附带当前页面截图",
-  "hint": "截图会压缩后随反馈提交。若页面含跨域地图瓦片，截图可能不完整。"
+  "hint": "勾选后会生成压缩预览，并随反馈提交。若页面含跨域地图瓦片，截图可能不完整。",
+  "capturing": "正在生成截图预览…",
+  "retake": "重新截图",
+  "previewAlt": "当前页面截图预览"
 }
 ```
 
@@ -1930,6 +2117,23 @@ Add the checkbox inside the form:
   {{ t('layoutFooter.feedback.screenshot.label') }}
 </CheckBox>
 <p class="screenshot-hint">{{ t('layoutFooter.feedback.screenshot.hint') }}</p>
+<div v-if="includeScreenshot" class="screenshot-preview">
+  <img
+    v-if="screenshotDataUrl"
+    :src="screenshotDataUrl"
+    :alt="t('layoutFooter.feedback.screenshot.previewAlt')"
+  />
+  <span v-else>{{ t('layoutFooter.feedback.screenshot.capturing') }}</span>
+  <button
+    type="button"
+    class="main-glass-button screenshot-retake"
+    data-size="small"
+    :disabled="isCapturingScreenshot"
+    @click="captureScreenshotPreview"
+  >
+    {{ t('layoutFooter.feedback.screenshot.retake') }}
+  </button>
+</div>
 ```
 
 Add imports and state:
@@ -1939,20 +2143,63 @@ import CheckBox from '@/components/selector/CheckBox.vue'
 import { capturePageSnapshot } from '@/utils/share/pageSnapshot.js'
 
 const includeScreenshot = ref(false)
+const screenshotDataUrl = ref('')
+const isCapturingScreenshot = ref(false)
 ```
 
 Update `resetForm()`:
 
 ```js
 includeScreenshot.value = false
+screenshotDataUrl.value = ''
+isCapturingScreenshot.value = false
+```
+
+Add preview capture logic:
+
+```js
+async function captureScreenshotPreview() {
+  if (!includeScreenshot.value || isCapturingScreenshot.value) {
+    return
+  }
+
+  isCapturingScreenshot.value = true
+  try {
+    screenshotDataUrl.value = await capturePageSnapshot()
+  } catch (error) {
+    screenshotDataUrl.value = ''
+    includeScreenshot.value = false
+    const errorKey = error?.message === 'screenshot_too_large'
+      ? 'layoutFooter.feedback.validationFailed'
+      : 'layoutFooter.feedback.failed'
+    showError(t(errorKey))
+  } finally {
+    isCapturingScreenshot.value = false
+  }
+}
+
+watch(includeScreenshot, (checked) => {
+  if (!checked) {
+    screenshotDataUrl.value = ''
+    return
+  }
+
+  captureScreenshotPreview()
+})
 ```
 
 Update `submit()` before calling `submitSuggestion`:
 
 ```js
 const imageBase64 = includeScreenshot.value
-  ? await capturePageSnapshot()
+  ? screenshotDataUrl.value || await capturePageSnapshot()
   : ''
+```
+
+Update the submit button disabled state:
+
+```vue
+:disabled="isSubmitting || isCapturingScreenshot || !canSubmit"
 ```
 
 Update payload:
@@ -1974,6 +2221,30 @@ Add styles:
   margin: -6px 0 0;
   color: var(--text-dark-lighter);
   font-size: 0.82rem;
+}
+
+.screenshot-preview {
+  @include flex-col;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--border-glass-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel-subtle);
+  color: var(--text-dark-lighter);
+}
+
+.screenshot-preview img {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  border-radius: var(--radius-xs);
+}
+
+.screenshot-retake {
+  align-self: flex-start;
+  --main-glass-button-padding: 6px 10px;
+  --main-glass-button-font-size: 0.82rem;
 }
 ```
 
@@ -1997,7 +2268,14 @@ it('includes a compressed screenshot when the user opts in', async () => {
   wrapper.host.querySelector('[name="title"]').dispatchEvent(new Event('input'))
   wrapper.host.querySelector('[name="content"]').value = '附上截图方便定位。'
   wrapper.host.querySelector('[name="content"]').dispatchEvent(new Event('input'))
-  wrapper.host.querySelector('[data-include-screenshot]').click()
+  const screenshotInput = wrapper.host.querySelector('[data-include-screenshot] input')
+  screenshotInput.checked = true
+  screenshotInput.dispatchEvent(new Event('change'))
+  await nextTick()
+  await nextTick()
+
+  expect(wrapper.host.querySelector('.screenshot-preview img')?.getAttribute('src'))
+    .toBe('data:image/webp;base64,shot')
 
   wrapper.host.querySelector('[data-submit-feedback]').click()
   await nextTick()
@@ -2032,6 +2310,8 @@ git diff -- project/package.json project/src/utils/share/pageSnapshot.js project
 CR checklist:
 
 - `image_base64` is included only when the checkbox is checked.
+- Automatic screenshots are encoded as `image/webp`.
+- Screenshot compression targets about 600 KB and throws `screenshot_too_large` if output remains above 1 MB.
 - Screenshot consent reuses `CheckBox`; do not style a native checkbox from scratch.
 - Modal and footer are ignored by screenshot capture.
 - Chinese and emoji content remain literal.
@@ -2336,7 +2616,7 @@ CR checklist:
 - No PowerShell or bulk rewrite was used on Chinese/emoji-heavy files.
 - No width-based responsive media queries were added.
 - Footer stats call existing shared composables only.
-- Screenshot feedback sends `image_base64` only after backend support exists.
+- Screenshot feedback sends optional `image_base64` only when the user opts in, and compression respects the backend 1 MB limit.
 
 - [ ] **Step 5: Final commit if Task 8 changed files**
 
@@ -2359,7 +2639,7 @@ Spec coverage:
 - Stats share HomePage/sidebar caches: Task 4 uses `useVisitStats()` and `useSourceStats()`.
 - Tutorial opens the current page guide: Task 2 and Task 4.
 - Feedback uses backend suggestions API and route context: Task 1 and Task 5.
-- Screenshot upload is opt-in and uses backend image field: Task 6.
+- Screenshot upload is opt-in, compressed, and uses the confirmed backend image field: Task 6.
 - Share supports link first and branded image fallback: Task 7.
 - Base share does not require Task 7; branded image sharing is explicitly phase 2.
 - Language/theme identity, version, database stats, and ICP are displayed: Task 3 and Task 4.
@@ -2378,4 +2658,4 @@ Type consistency:
 - Tutorial request bridge is consistently named `tutorialGuideRequestState` and `requestCurrentTutorialGuideOpen`.
 - Footer context helper is consistently named `resolveLayoutFooterContext`.
 - Feedback component is consistently named `LayoutFeedbackModal`.
-- First-pass feedback intentionally sends `image_base64: ''`; Task 6 is the only step that enables screenshot capture.
+- Task 5 sends `image_base64: ''` until Task 6 wires the user-controlled screenshot checkbox and compressed capture helper.
