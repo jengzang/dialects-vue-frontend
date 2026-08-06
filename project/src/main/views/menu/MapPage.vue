@@ -139,9 +139,7 @@ const tabToRouteSub = {
   draw: 'draw'
 }
 const canUseMapDraw = isPlatformFeatureEnabled('mapDraw')
-const MapDrawTab = __IS_WEB_BUILD__
-  ? defineAsyncComponent(() => import('@/main/components/map/Tabs/MapDrawTab.vue'))
-  : null
+const MapDrawTab = defineAsyncComponent(() => import('@/main/components/map/Tabs/MapDrawTab.vue'))
 const currentTab = computed(() => routeSubToTab[route.params.sub] || 'map')
 
 // 是否处于 map 路由（用于判断基于路由的自动加载等）

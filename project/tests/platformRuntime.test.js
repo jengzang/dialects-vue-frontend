@@ -110,7 +110,7 @@ describe('platform runtime detection and capabilities', () => {
       fullscreenDriver: 'browser-fullscreen',
     })
     expect(iosCapabilities).toMatchObject({
-      canUseMapDraw: false,
+      canUseMapDraw: true,
       storageDriver: 'web-storage',
       fileExportDriver: 'browser-download',
       fileImportDriver: 'browser-file-input',
@@ -131,26 +131,25 @@ describe('platform runtime detection and capabilities', () => {
     })
 
     expect(isFeatureEnabled('mapDraw', webCapabilities)).toBe(true)
-    expect(isFeatureEnabled('mapDraw', androidCapabilities)).toBe(false)
+    expect(isFeatureEnabled('mapDraw', androidCapabilities)).toBe(true)
     expect(getPlatformFeature('mapDraw', androidCapabilities)).toEqual({
-      enabled: false,
-      reason: 'web-only',
+      enabled: true,
+      reason: null,
     })
   })
 
-  it('drives platform feature availability and native pruning from the shared matrix', () => {
+  it('drives platform feature availability from the shared matrix', () => {
     expect(PLATFORM_FEATURE_MATRIX.mapDraw).toMatchObject({
       targets: {
         web: true,
-        ios: false,
-        android: false,
+        ios: true,
+        android: true,
+        native: true,
       },
       routes: ['/menu/map/draw'],
       tutorials: ['menu-map-draw'],
-      nativeDistPrune: {
-        paths: ['data/国界面.kmz'],
-      },
     })
+    expect(PLATFORM_FEATURE_MATRIX.mapDraw).not.toHaveProperty('nativeDistPrune')
 
     expect(resolvePlatformFeatureAvailability('mapDraw', {
       family: 'web',
@@ -161,21 +160,19 @@ describe('platform runtime detection and capabilities', () => {
       family: 'ios',
       os: 'ios',
       container: 'native-webview',
-    })).toEqual({ enabled: false, reason: 'web-only' })
-    expect(getNativeDistPruneManifest()).toMatchObject({
-      paths: ['data/国界面.kmz'],
-      globPatterns: ['^assets/voronoiClip\\.worker-[\\w-]+\\.js$'],
-    })
+    })).toEqual({ enabled: true, reason: null })
+    expect(getNativeDistPruneManifest().paths).not.toContain('data/国界面.kmz')
+    expect(getNativeDistPruneManifest().globPatterns).not.toContain('^assets/voronoiClip\\.worker-[\\w-]+\\.js$')
     expect(isPlatformRouteEnabled('/menu/map/draw', {
       family: 'android',
       os: 'android',
       container: 'native-webview',
-    })).toBe(false)
+    })).toBe(true)
     expect(isPlatformTutorialEnabled('menu-map-draw', {
       family: 'android',
       os: 'android',
       container: 'native-webview',
-    })).toBe(false)
+    })).toBe(true)
     expect(isPlatformRouteEnabled('/menu/map/view', {
       family: 'android',
       os: 'android',

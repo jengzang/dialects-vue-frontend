@@ -23,21 +23,12 @@ export const PLATFORM_FEATURE_MATRIX = {
     category: 'map',
     targets: {
       web: true,
-      ios: false,
-      android: false,
-      native: false,
+      ios: true,
+      android: true,
+      native: true,
     },
-    disabledReason: 'web-only',
     routes: ['/menu/map/draw'],
     tutorials: ['menu-map-draw'],
-    nativeDistPrune: {
-      paths: [
-        'data/国界面.kmz',
-      ],
-      globPatterns: [
-        '^assets/voronoiClip\\.worker-[\\w-]+\\.js$',
-      ],
-    },
   },
   fileImport: {
     category: 'file',

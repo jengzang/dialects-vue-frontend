@@ -46,7 +46,7 @@ describe('platform integration seams', () => {
     expect(mapPageSource).toContain("isPlatformFeatureEnabled('mapDraw')")
     expect(mapPageSource).toContain("v-if=\"canUseMapDraw\"")
     expect(mapPageSource).toContain('defineAsyncComponent')
-    expect(mapPageSource).toContain('__IS_WEB_BUILD__')
+    expect(mapPageSource).toContain("const MapDrawTab = defineAsyncComponent(() => import('@/main/components/map/Tabs/MapDrawTab.vue'))")
     expect(mapPageSource).not.toContain("import MapDrawTab from '@/main/components/map/Tabs/MapDrawTab.vue'")
     expect(menuBarSource).toContain("import { isPlatformRouteEnabled } from '@/platform/index.js'")
     expect(menuBarSource).toContain("filterPlatformChildPaths")
@@ -109,18 +109,14 @@ describe('platform integration seams', () => {
     expect(editableMapSource).not.toContain('document.fullscreenElement === mapContainer.value')
   })
 
-  it('redirects unsupported native-webview map drawing routes back to map view', () => {
+  it('keeps native-webview map drawing routes available for GIS', () => {
     window.webkit = { messageHandlers: { dialectsNative: {} } }
 
     expect(redirectUnsupportedMapDraw({
       params: { locale: 'zh-Hant', sub: 'draw' },
       query: { from: 'test' },
       hash: '#top',
-    })).toEqual({
-      path: '/zh-Hant/menu/map/view',
-      query: { from: 'test' },
-      hash: '#top',
-    })
+    })).toBe(true)
   })
 
   it('keeps supported web map drawing routes available', () => {
@@ -131,12 +127,12 @@ describe('platform integration seams', () => {
     })).toBe(true)
   })
 
-  it('omits map drawing tutorials in native-webview runtimes only', async () => {
+  it('keeps map drawing tutorials in native-webview runtimes for GIS', async () => {
     window.webkit = { messageHandlers: { dialectsNative: {} } }
     vi.resetModules()
     const { tutorialManifest: nativeManifest } = await import('../src/main/components/tutorial/tutorialManifest.js')
 
-    expect(nativeManifest.some((entry) => entry.key === 'menu-map-draw')).toBe(false)
+    expect(nativeManifest.some((entry) => entry.key === 'menu-map-draw')).toBe(true)
 
     delete window.webkit
     vi.resetModules()
