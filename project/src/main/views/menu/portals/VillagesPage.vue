@@ -104,41 +104,17 @@ const handleAllVillages = () => {
 </script>
 
 <style scoped lang="scss">
-@use '@/styles/global/mixins' as *;
+@use './portal-page' as *;
 
 .villages-page {
-  min-width: 80dvw;
-  min-height: 70dvh;
-  padding: 20px;
-  @include flex-col;
-  align-items: center;
-  justify-content: center;
+  @include portal-page;
 }
 
 .page-title {
-  margin: 0 0 40px;
-  color: var(--text-deep);
-  font-size: 28px;
-  font-weight: 700;
-  text-align: center;
+  @include portal-page-title;
 }
 
 .villages-grid {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
-}
-
-@media (max-aspect-ratio: 1 / 1) {
-  .page-title {
-    margin-bottom: 15px;
-    font-size: 24px;
-  }
-
-  .villages-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+  @include portal-grid;
 }
 </style>

@@ -133,41 +133,17 @@ const handleGis = () => {
 </script>
 
 <style scoped lang="scss">
+@use './portal-page' as *;
+
 .tools-page {
-  min-width: 80dvw;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  @include portal-page;
 }
 
 .page-title {
-  margin: 0 0 30px;
-  color: var(--text-primary);
-  font-size: 32px;
-  font-weight: 700;
-  text-align: center;
+  @include portal-page-title;
 }
 
 .tools-grid {
-  width: 100%;
-  max-width: 1000px;
-  display: grid;
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(250px, 1fr)
-  );
-  gap: 20px;
-}
-
-@media (max-width: 768px) {
-  .page-title {
-    font-size: 24px;
-  }
-
-  .tools-grid {
-    grid-template-columns: 1fr;
-  }
+  @include portal-grid;
 }
 </style>
