@@ -738,7 +738,7 @@ function onYindianInput() {
   }
   yindianDebounceTimer = setTimeout(async () => {
     try {
-      const results = await batchMatch(query, true)
+      const results = await batchMatch(query, false)
       const items = Array.isArray(results) ? results.flatMap((r) => r.items || []) : []
       yindianSuggestions.value = [...new Set(items)]
     } catch {
