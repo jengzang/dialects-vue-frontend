@@ -507,7 +507,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed, onUnmounted, nextTick } from 'vue';
+import { ref, reactive, onMounted, computed, onUnmounted, nextTick, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import * as XLSX from 'xlsx';
 import {
@@ -673,6 +673,20 @@ if (props.defaultFilter) {
     }
   });
 }
+
+watch(() => props.defaultFilter, (next) => {
+  if (!next) return
+  let changed = false
+  Object.keys(next).forEach(key => {
+    const value = next[key]
+    const normalized = Array.isArray(value) ? [...value] : [value]
+    if (JSON.stringify(filterState[key]) !== JSON.stringify(normalized)) {
+      filterState[key] = normalized
+      changed = true
+    }
+  })
+  if (changed) fetchData()
+})
 
 // 獲取數據
 const fetchData = async () => {
