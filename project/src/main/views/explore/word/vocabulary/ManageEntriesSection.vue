@@ -11,8 +11,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { getVocabularyLocations } from '@/api'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 
 const { t } = useI18n()
@@ -24,11 +25,24 @@ const props = defineProps({
   managePermissionLevel: { type: String, default: null },
 })
 
-const defaultFilter = computed(() => {
-  if (props.managePermissionLevel === 'edit' && props.manageUserId != null) {
-    return { user_id: props.manageUserId }
+const defaultFilter = ref(null)
+
+async function loadDefaultFilter() {
+  if (props.managePermissionLevel !== 'edit') return
+  try {
+    const response = await getVocabularyLocations({ page_size: 200 })
+    const locations = Array.isArray(response.locations) ? response.locations : []
+    const names = locations.map((l) => l.location_name).filter(Boolean)
+    if (names.length) {
+      defaultFilter.value = { location_name: names }
+    }
+  } catch {
+    // no-op
   }
-  return null
+}
+
+onMounted(() => {
+  loadDefaultFilter()
 })
 
 const tableColumns = computed(() => [
