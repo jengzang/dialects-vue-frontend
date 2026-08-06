@@ -255,21 +255,28 @@ const locationOptions = computed(() => {
 
 const provinceOptions = computed(() => {
   const seen = new Set()
-  return vocabularyLocationOptions.value
+  const provinces = vocabularyLocationOptions.value
     .filter((opt) => {
       if (!opt.province || seen.has(opt.province)) return false
       seen.add(opt.province)
       return true
     })
     .map((opt) => ({ value: opt.province, label: opt.province }))
+  return [
+    { value: '', label: t('words.wordList.search.allProvinces') },
+    ...provinces,
+  ]
 })
 
 const cityOptions = computed(() => {
-  if (!selectedProvince.value) return []
   const seen = new Set()
-  return vocabularyLocationOptions.value
+  const cities = vocabularyLocationOptions.value
     .filter((opt) => opt.province === selectedProvince.value && opt.city && !seen.has(opt.city) && seen.add(opt.city))
     .map((opt) => ({ value: opt.city, label: opt.city }))
+  return [
+    { value: '', label: t('words.wordList.search.allCities') },
+    ...cities,
+  ]
 })
 
 const standardWordOptions = computed(() => {

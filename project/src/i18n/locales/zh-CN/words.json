@@ -67,7 +67,9 @@
       "filterByRegion": "按行政区",
       "filterByLocation": "按地点",
       "provincePlaceholder": "选择省",
-      "cityPlaceholder": "选择市"
+      "cityPlaceholder": "选择市",
+      "allProvinces": "全部省份",
+      "allCities": "全部城市"
     },
     "sort": {
       "label": "排序",
