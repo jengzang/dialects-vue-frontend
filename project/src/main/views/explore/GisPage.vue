@@ -109,6 +109,7 @@
             @feature-select="handleFeatureSelect"
             @feature-box-select="handleFeatureBoxSelect"
             @mode-change="handleDrawModeChange"
+            @shape-edit-state-change="handleShapeEditStateChange"
             @export-image="handleImageExported"
             @export-layer="handleLayerExported"
             @export-selection-bounds-change="boxSelectionBounds = $event"
@@ -141,6 +142,7 @@
           :feature-move-layer-options="featureMoveLayerOptions"
           :selected-feature-id="selectedEditorFeatureId"
           :selected-feature-ids="selectedFeatureIds"
+          :selected-vertex-count="selectedVertexCount"
           :selected-feature-batch-name="selectedFeatureBatchName"
           :selected-feature-batch-property-key="selectedFeatureBatchPropertyKey"
           :selected-feature-batch-property-value="selectedFeatureBatchPropertyValue"
@@ -151,6 +153,7 @@
           :can-undo="canUndoHistory"
           :can-redo="canRedoHistory"
           :can-edit-shape="canEditSelectedShape"
+          :can-delete-selection="canDeleteSelection"
           :can-duplicate-feature="canDuplicateSelectedFeature"
           :is-feature-box-select-mode="isFeatureBoxSelectMode"
           :can-use-feature-box-select="canUseFeatureBoxSelect"
@@ -760,7 +763,7 @@ const { setCommitHistory } = core;
 
 const {
   layers, activeLayerId, currentMode, currentStyleKey,
-  selectedFeatureId, selectedFeatureIds, isFeatureBoxSelectMode,
+  selectedFeatureId, selectedFeatureIds, selectedVertexCount, isFeatureBoxSelectMode,
   isDrawingPanelOpen, isLayersPanelOpen, isMapFullscreen,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
   mapStyleOptions, activeLayer, activeLayerFeatureCollection, featureCount,
@@ -769,11 +772,11 @@ const {
   activeLayerFeatureTableColumns, activeLayerFeatureTableRows,
   canApplySelectedFeatureBatchProperty, featureMoveLayerOptions,
   selectedEditorProperties, selectedEditorFeatureId, selectedEditorGeometryType,
-  canModifyActiveLayer, canEditSelectedShape, canDuplicateSelectedFeature,
+  canModifyActiveLayer, canEditSelectedShape, canDeleteSelection, canDuplicateSelectedFeature,
   canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel,
   createEmptyLayer, getFeatureId, getFeatureLabel, getLayerLabel,
   syncLayerIdSeedFromLayers, applyLayerPropertyToFeatures,
-  setMode, handleDrawModeChange, handleFeatureSelect,
+  setMode, handleDrawModeChange, handleShapeEditStateChange, handleFeatureSelect,
   handleFeatureBoxSelect, handleToggleFeatureBoxSelect,
   handleSelectFeatureFromPanel, handleToggleFeatureSelection,
   handleSelectAllFeatures, handleInvertFeatureSelection,
@@ -817,7 +820,7 @@ const gisFeatures = useGisFeatures({
   layers, activeLayerId, activeLayer, selectedFeatureId, selectedFeatureIds,
   editableMapRef, currentMode, getFeatureId,
   canModifyActiveLayer, canDuplicateSelectedFeature,
-  canEditSelectedShape, canMoveSelectedFeatures,
+  canEditSelectedShape, canDeleteSelection, canMoveSelectedFeatures,
   setFeatureSelection, clearFeatureSelection,
   syncAllLayersAfterMutation, syncFeatureSelectionToMap,
   resetDrawSelectionMode, commitHistory,
@@ -985,7 +988,7 @@ const handleDrawHistoryKeydown = (event) => {
   if (isUndo) { event.preventDefault(); undoHistory(); return; }
   if (isRedo) { event.preventDefault(); redoHistory(); return; }
   if (isSelectAll && canModifyActiveLayer.value) { event.preventDefault(); handleSelectAllFeatures(); return; }
-  if (isDelete && selectedFeatureId.value && canModifyActiveLayer.value) { event.preventDefault(); handleDeleteSelected(); return; }
+  if (isDelete && canDeleteSelection.value) { event.preventDefault(); handleDeleteSelected(); return; }
   if (isEscape && (isFeatureBoxSelectMode.value || selectedFeatureIds.value.length > 0
     || selectedFeatureId.value || currentMode.value !== 'simple_select')) {
     event.preventDefault(); resetDrawSelectionMode();

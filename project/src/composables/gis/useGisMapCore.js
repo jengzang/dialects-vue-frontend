@@ -101,6 +101,7 @@ export function useGisMapCore(options = {}) {
   const currentStyleKey = ref('gaode');
   const selectedFeatureId = ref('');
   const selectedFeatureIds = ref([]);
+  const selectedVertexCount = ref(0);
   const isFeatureBoxSelectMode = ref(false);
   const isDrawingPanelOpen = ref(true);
   const isLayersPanelOpen = ref(false);
@@ -174,11 +175,13 @@ export function useGisMapCore(options = {}) {
     selectedFeatureId.value = validIds.includes(preferredId)
       ? preferredId
       : validIds[0] || '';
+    selectedVertexCount.value = 0;
   };
 
   const clearFeatureSelection = () => {
     selectedFeatureId.value = '';
     selectedFeatureIds.value = [];
+    selectedVertexCount.value = 0;
   };
 
   const activeLayerFeatureItems = computed(() => activeLayerFeatures.value.map((feature, index) => ({
@@ -278,6 +281,18 @@ export function useGisMapCore(options = {}) {
       && selectedFeature.value.properties?.visible !== false
       && selectedFeature.value.properties?.locked !== true
       && ['LineString', 'Polygon'].includes(selectedEditorGeometryType.value)
+    );
+  });
+
+  const canDeleteSelection = computed(() => {
+    return Boolean(
+      selectedFeatureId.value
+      && activeLayer.value
+      && selectedFeature.value
+      && canModifyActiveLayer.value
+      && selectedFeature.value.properties?.visible !== false
+      && selectedFeature.value.properties?.locked !== true
+      && (currentMode.value !== 'direct_select' || selectedVertexCount.value > 0)
     );
   });
 
@@ -424,6 +439,20 @@ export function useGisMapCore(options = {}) {
     if (currentMode.value !== 'simple_select') {
       isFeatureBoxSelectMode.value = false;
     }
+    if (currentMode.value !== 'direct_select') {
+      selectedVertexCount.value = 0;
+    }
+  };
+
+  const handleShapeEditStateChange = (state = {}) => {
+    const mode = state?.mode || currentMode.value || 'simple_select';
+    const featureId = String(state?.featureId || '');
+    if (mode !== 'direct_select' || !featureId || featureId !== selectedFeatureId.value || !activeLayerFeatureIdSet.value.has(featureId)) {
+      selectedVertexCount.value = 0;
+      return;
+    }
+    const nextCount = Number(state.selectedVertexCount);
+    selectedVertexCount.value = Number.isFinite(nextCount) && nextCount > 0 ? nextCount : 0;
   };
 
   const normalizeFeatureSelectPayload = (featureSelection) => {
@@ -575,6 +604,7 @@ export function useGisMapCore(options = {}) {
     currentStyleKey,
     selectedFeatureId,
     selectedFeatureIds,
+    selectedVertexCount,
     isFeatureBoxSelectMode,
     isDrawingPanelOpen,
     isLayersPanelOpen,
@@ -601,6 +631,7 @@ export function useGisMapCore(options = {}) {
     selectedEditorGeometryType,
     canModifyActiveLayer,
     canEditSelectedShape,
+    canDeleteSelection,
     canDuplicateSelectedFeature,
     canUseFeatureBoxSelect,
     canMoveSelectedFeatures,
@@ -617,6 +648,7 @@ export function useGisMapCore(options = {}) {
     setMode,
     handleCreateLayer,
     handleDrawModeChange,
+    handleShapeEditStateChange,
     handleFeatureSelect,
     handleFeatureBoxSelect,
     handleToggleFeatureBoxSelect,

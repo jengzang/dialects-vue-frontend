@@ -124,6 +124,7 @@ vi.mock('@mapbox/mapbox-gl-draw', () => ({
       this.options = options
       this.features = new Map()
       this.selectedIds = []
+      this.selectedPoints = []
       this.set = vi.fn((featureCollection) => {
         this.features = new Map((featureCollection.features ?? []).map((feature) => [String(feature.id), feature]))
       })
@@ -162,9 +163,16 @@ vi.mock('@mapbox/mapbox-gl-draw', () => ({
     getSelectedIds() {
       return this.selectedIds
     }
+    getSelectedPoints() {
+      return {
+        type: 'FeatureCollection',
+        features: this.selectedPoints,
+      }
+    }
     deleteAll() {
       this.features.clear()
       this.selectedIds = []
+      this.selectedPoints = []
     }
   },
 }))
@@ -213,6 +221,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
         @before-features-change="events.push(['before-features-change'])"
         @features-change="events.push(['features-change', $event])"
         @feature-select="events.push(['feature-select', $event])"
+        @shape-edit-state-change="events.push(['shape-edit-state-change', $event])"
         @feature-box-select="events.push(['feature-box-select', $event])"
         @mode-change="events.push(['mode-change', $event])"
       />
@@ -425,6 +434,77 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('emits direct-select vertex selection count from Draw selected points', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+
+    wrapper.exposed.selectFeature('polygon-1', { directEdit: true })
+    wrapper.events.length = 0
+    wrapper.draw.selectedIds = []
+    wrapper.draw.selectedPoints = [{
+      type: 'Feature',
+      properties: {},
+      geometry: { type: 'Point', coordinates: [1, 1] },
+    }]
+    wrapper.map.emit('draw.selectionchange')
+
+    expect(wrapper.events).toContainEqual([
+      'shape-edit-state-change',
+      {
+        mode: 'direct_select',
+        featureId: 'polygon-1',
+        selectedVertexCount: 1,
+      },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('clears selected vertex count when leaving direct select mode', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+
+    wrapper.exposed.selectFeature('polygon-1', { directEdit: true })
+    wrapper.draw.selectedPoints = [{
+      type: 'Feature',
+      properties: {},
+      geometry: { type: 'Point', coordinates: [1, 1] },
+    }]
+    wrapper.map.emit('draw.selectionchange')
+    wrapper.events.length = 0
+
+    wrapper.draw.selectedPoints = []
+    wrapper.draw.mode = 'simple_select'
+    wrapper.map.emit('draw.modechange', { mode: 'simple_select' })
+
+    expect(wrapper.events).toContainEqual([
+      'shape-edit-state-change',
+      {
+        mode: 'simple_select',
+        featureId: '',
+        selectedVertexCount: 0,
+      },
+    ])
+
+    wrapper.unmount()
+  })
+
   it('delegates selected deletion to Draw trash without a duplicate history checkpoint', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',
@@ -443,6 +523,104 @@ describe('EditableMapLibre state flow', () => {
     expect(wrapper.draw.trash).toHaveBeenCalledTimes(1)
     expect(wrapper.events.some(([eventName]) => eventName === 'before-features-change')).toBe(false)
     expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('disables Draw native keybindings so page shortcuts own delete semantics', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [],
+    })
+    await nextTick()
+
+    expect(wrapper.draw.options.keybindings).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('prevents selected vertex deletion when a line would become invalid', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
+      }],
+    })
+    await nextTick()
+
+    wrapper.exposed.selectFeature('line-1', { directEdit: true })
+    wrapper.draw.selectedIds = []
+    wrapper.draw.selectedPoints = [{
+      type: 'Feature',
+      properties: {},
+      geometry: { type: 'Point', coordinates: [1, 1] },
+    }]
+    wrapper.exposed.deleteSelected()
+
+    expect(wrapper.draw.trash).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('prevents selected vertex deletion when a polygon ring would become invalid', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [1, 0],
+            [0, 1],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+
+    wrapper.exposed.selectFeature('polygon-1', { directEdit: true })
+    wrapper.draw.selectedIds = []
+    wrapper.draw.selectedPoints = [{
+      type: 'Feature',
+      properties: {},
+      geometry: { type: 'Point', coordinates: [1, 0] },
+    }]
+    wrapper.exposed.deleteSelected()
+
+    expect(wrapper.draw.trash).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('allows selected vertex deletion when line geometry remains valid', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1], [2, 2]] },
+      }],
+    })
+    await nextTick()
+
+    wrapper.exposed.selectFeature('line-1', { directEdit: true })
+    wrapper.draw.selectedIds = []
+    wrapper.draw.selectedPoints = [{
+      type: 'Feature',
+      properties: {},
+      geometry: { type: 'Point', coordinates: [1, 1] },
+    }]
+    wrapper.exposed.deleteSelected()
+
+    expect(wrapper.draw.trash).toHaveBeenCalledTimes(1)
 
     wrapper.unmount()
   })

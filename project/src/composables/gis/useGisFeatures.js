@@ -15,6 +15,7 @@ export function useGisFeatures(options = {}) {
     canModifyActiveLayer,
     canDuplicateSelectedFeature,
     canEditSelectedShape,
+    canDeleteSelection,
     canMoveSelectedFeatures,
     setFeatureSelection,
     clearFeatureSelection,
@@ -120,10 +121,15 @@ export function useGisFeatures(options = {}) {
   // ---- Delete ----
 
   async function handleDeleteSelected() {
-    if (!selectedFeatureId.value || !canModifyActiveLayer.value) return;
+    if (!canDeleteSelection.value) return;
+    const wasDirectSelect = currentMode.value === 'direct_select';
+    if (editableMapRef?.value?.canDeleteSelected?.() === false) return;
     commitHistory();
-    editableMapRef?.value?.deleteSelected?.();
-    currentMode.value = 'simple_select';
+    const didDelete = editableMapRef?.value?.deleteSelected?.();
+    if (didDelete === false) return;
+    if (!wasDirectSelect) {
+      currentMode.value = 'simple_select';
+    }
   }
 
   function handleDeleteSelectedFeatures() {

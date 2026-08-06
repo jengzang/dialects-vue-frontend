@@ -88,13 +88,19 @@
               {{ t('map.drawTab.buttons.drawPolygon') }}
             </button>
             <button
-              class="main-glass-button"
-              data-variant="secondary"
+              class="main-glass-button draw-tool-mode-button"
+              :data-variant="currentMode === 'direct_select' ? 'primary' : 'secondary'"
+              :data-active="currentMode === 'direct_select'"
               type="button"
-              :disabled="!canEditShape"
-              @click="$emit('edit-shape')"
+              :disabled="currentMode !== 'direct_select' && !canEditShape"
+              @click="currentMode === 'direct_select' ? $emit('set-mode', 'simple_select') : $emit('edit-shape')"
             >
-              {{ t('map.drawTab.buttons.editShape') }}
+              <span
+                v-if="currentMode === 'direct_select'"
+                class="draw-tool-check"
+                aria-hidden="true"
+              >✓</span>
+              {{ currentMode === 'direct_select' ? t('map.drawTab.buttons.finishShapeEdit') : t('map.drawTab.buttons.editShape') }}
             </button>
             <button
               class="main-glass-button"
@@ -127,10 +133,10 @@
               class="main-glass-button"
               data-variant="secondary"
               type="button"
-              :disabled="!canModifyActiveLayer || !selectedFeatureId"
+              :disabled="!canDeleteSelection"
               @click="$emit('delete-selected')"
             >
-              {{ t('map.drawTab.buttons.deleteSelected') }}
+              {{ currentMode === 'direct_select' && selectedVertexCount > 0 ? t('map.drawTab.buttons.deleteSelectedVertices') : t('map.drawTab.buttons.deleteSelected') }}
             </button>
             <button
               class="main-glass-button"
@@ -158,6 +164,14 @@
             >
               {{ isFullscreen ? t('map.mapLibre.buttons.exitFullscreen') : t('map.mapLibre.buttons.fullscreen') }}
             </button>
+          </div>
+          <div
+            v-if="currentMode === 'direct_select'"
+            class="draw-shape-edit-status"
+            data-testid="shape-edit-status"
+          >
+            <span>{{ t('map.drawTab.labels.shapeEditing') }}</span>
+            <span>{{ t('map.drawTab.labels.selectedVertexCount', { count: selectedVertexCount }) }}</span>
           </div>
         </section>
 
@@ -617,6 +631,7 @@ const props = defineProps({
   featureMoveLayerOptions: { type: Array, default: () => [] },
   selectedFeatureId: { type: String, default: '' },
   selectedFeatureIds: { type: Array, default: () => [] },
+  selectedVertexCount: { type: Number, default: 0 },
   selectedFeatureBatchName: { type: String, default: '' },
   selectedFeatureBatchPropertyKey: { type: String, default: '' },
   selectedFeatureBatchPropertyValue: { type: String, default: '' },
@@ -627,6 +642,7 @@ const props = defineProps({
   canUndo: { type: Boolean, default: false },
   canRedo: { type: Boolean, default: false },
   canEditShape: { type: Boolean, default: false },
+  canDeleteSelection: { type: Boolean, default: false },
   canDuplicateFeature: { type: Boolean, default: false },
   isFeatureBoxSelectMode: { type: Boolean, default: false },
   canUseFeatureBoxSelect: { type: Boolean, default: false },

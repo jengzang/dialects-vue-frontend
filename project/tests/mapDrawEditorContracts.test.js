@@ -37,6 +37,7 @@ describe('Map draw editor contracts', () => {
     const source = readSource(editableMapLibrePath)
 
     expect(source).toContain('userProperties: true')
+    expect(source).toContain('keybindings: false')
   })
 
   it('reads user-prefixed style properties in active Draw layers', () => {
@@ -110,7 +111,7 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain("event.key === 'Backspace'")
     expect(tabSource).toContain("event.key === 'Escape'")
     expect(tabSource).toContain('isSelectAll && canModifyActiveLayer.value')
-    expect(tabSource).toContain('isDelete && selectedFeatureId.value && canModifyActiveLayer.value')
+    expect(tabSource).toContain('isDelete && canDeleteSelection.value')
     expect(tabSource).toMatch(/if \(isEscape[\s\S]*resetDrawSelectionMode\(\);/)
     expect(tabSource).toContain('handleSelectAllFeatures();')
     expect(tabSource).toContain('handleDeleteSelected();')
@@ -251,13 +252,16 @@ describe('Map draw editor contracts', () => {
 
     expect(panelSource).toContain('canModifyActiveLayer')
     expect(panelSource).toContain(':disabled="!canModifyActiveLayer"')
-    expect(panelSource).toContain(':disabled="!canModifyActiveLayer || !selectedFeatureId"')
+    expect(panelSource).toContain(':disabled="!canDeleteSelection"')
     expect(coreSource).toContain('const canModifyActiveLayer = computed')
+    expect(coreSource).toContain('const canDeleteSelection = computed')
     expect(coreSource).toContain('activeLayer.value.visible !== false')
     expect(coreSource).toContain('activeLayer.value.locked !== true')
     expect(tabSource).toContain(':can-modify-active-layer="canModifyActiveLayer"')
+    expect(tabSource).toContain(':can-delete-selection="canDeleteSelection"')
     expect(coreSource).toMatch(/const setMode = \(mode\) => \{[\s\S]*if \(!canModifyActiveLayer\.value && mode !== 'simple_select'\) \{[\s\S]*resetDrawSelectionMode\(\);[\s\S]*return;/)
-    expect(featuresSource).toMatch(/async function handleDeleteSelected\(\) \{[\s\S]*if \(!selectedFeatureId\.value \|\| !canModifyActiveLayer\.value\) return;/)
+    expect(featuresSource).toMatch(/async function handleDeleteSelected\(\) \{[\s\S]*if \(!canDeleteSelection\.value\) return;/)
+    expect(featuresSource).toContain('editableMapRef?.value?.canDeleteSelected?.() === false')
     expect(featuresSource).toMatch(/async function handleClearAll\(\) \{[\s\S]*if \(!canModifyActiveLayer\.value\) return;/)
   })
 

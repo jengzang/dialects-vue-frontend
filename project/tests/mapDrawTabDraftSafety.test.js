@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => {
     mapSetDrawMode: vi.fn(),
     mapSelectFeature: vi.fn(),
     mapSelectFeatures: vi.fn(),
+    mapCanDeleteSelected: vi.fn(),
     mapDeleteSelected: vi.fn(),
     AUTO_DRAFT_ID: '__map_draw_auto_draft__',
   }
@@ -90,6 +91,7 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
       'feature-select',
       'feature-box-select',
       'mode-change',
+      'shape-edit-state-change',
     ],
     setup(props, { emit, expose }) {
       let firstLayerId = ''
@@ -97,6 +99,7 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         setDrawMode: mocks.mapSetDrawMode,
         selectFeature: mocks.mapSelectFeature,
         selectFeatures: mocks.mapSelectFeatures,
+        canDeleteSelected: mocks.mapCanDeleteSelected,
         deleteSelected: mocks.mapDeleteSelected,
         importGeoJson: vi.fn((_featureCollection, options = {}) => {
           if (options.emitSelection !== false) {
@@ -176,6 +179,20 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         >
           emit direct select
         </button>
+        <button
+          data-testid="emit-direct-select-vertex"
+          type="button"
+          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 1 })"
+        >
+          emit selected vertex
+        </button>
+        <button
+          data-testid="emit-direct-select-no-vertex"
+          type="button"
+          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 0 })"
+        >
+          emit no selected vertex
+        </button>
         <span data-testid="first-feature-coordinate">{{ modelValue?.features?.[0]?.geometry?.coordinates?.[0]?.[1]?.[0] ?? '' }}</span>
         <span data-testid="box-select-mode">{{ featureBoxSelectEnabled ? 'on' : 'off' }}</span>
         <button
@@ -245,6 +262,8 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       selectedFeatureBatchPropertyKey: { type: String, default: '' },
       selectedFeatureBatchPropertyValue: { type: String, default: '' },
       selectedFeatureIds: { type: Array, default: () => [] },
+      currentMode: { type: String, default: 'simple_select' },
+      selectedVertexCount: { type: Number, default: 0 },
       canApplySelectedFeatureBatchProperty: { type: Boolean, default: false },
       isFeatureBoxSelectMode: { type: Boolean, default: false },
       canUseFeatureBoxSelect: { type: Boolean, default: false },
@@ -270,6 +289,8 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
     template: `
       <div data-testid="tools-panel">
         <span data-testid="active-layer-id">{{ activeLayer?.id || '' }}</span>
+        <span data-testid="current-mode">{{ currentMode }}</span>
+        <span data-testid="selected-vertex-count">{{ selectedVertexCount }}</span>
         <label v-for="feature in featureItems" :key="feature.id" data-testid="feature-row">
           <input
             data-testid="feature-checkbox"
@@ -632,6 +653,8 @@ describe('MapDrawTab draft safety', () => {
     mocks.mapSetDrawMode.mockReset()
     mocks.mapSelectFeature.mockReset()
     mocks.mapSelectFeatures.mockReset()
+    mocks.mapCanDeleteSelected.mockReset()
+    mocks.mapCanDeleteSelected.mockReturnValue(true)
     mocks.mapDeleteSelected.mockReset()
     readImportedLayerFile.mockReset()
     splitFeatureCollectionByGeometryType.mockReset()
@@ -1848,7 +1871,7 @@ describe('MapDrawTab draft safety', () => {
     wrapper.unmount()
   })
 
-  it('delegates Delete in direct select mode to Draw semantics', async () => {
+  it('keeps direct select active while deleting selected vertices', async () => {
     mocks.getDraftRecordById.mockResolvedValue(null)
     mocks.saveDraftRecord.mockResolvedValue({})
     const wrapper = mountMapDrawTab()
@@ -1863,6 +1886,27 @@ describe('MapDrawTab draft safety', () => {
     wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
     await flushTicks()
 
+    wrapper.host.querySelector('[data-testid="emit-direct-select-no-vertex"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+    expect(wrapper.host.querySelector('[data-testid="selected-vertex-count"]').textContent).toBe('0')
+
+    const emptyDeleteEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Delete',
+    })
+    document.dispatchEvent(emptyDeleteEvent)
+    await flushTicks()
+
+    expect(emptyDeleteEvent.defaultPrevented).toBe(false)
+    expect(mocks.mapDeleteSelected).not.toHaveBeenCalled()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+
+    wrapper.host.querySelector('[data-testid="emit-direct-select-vertex"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="selected-vertex-count"]').textContent).toBe('1')
+
     const deleteEvent = new KeyboardEvent('keydown', {
       bubbles: true,
       cancelable: true,
@@ -1874,18 +1918,42 @@ describe('MapDrawTab draft safety', () => {
     expect(deleteEvent.defaultPrevented).toBe(true)
     expect(mocks.mapDeleteSelected).toHaveBeenCalledTimes(1)
     expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(1)
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(1)
 
-    const backspaceEvent = new KeyboardEvent('keydown', {
-      bubbles: true,
-      cancelable: true,
-      key: 'Backspace',
-    })
-    document.dispatchEvent(backspaceEvent)
+    wrapper.unmount()
+  })
+
+  it('does not call Draw delete when selected vertices would make geometry invalid', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    mocks.mapCanDeleteSelected.mockReturnValue(false)
+    const wrapper = mountMapDrawTab()
     await flushTicks()
 
-    expect(backspaceEvent.defaultPrevented).toBe(true)
-    expect(mocks.mapDeleteSelected).toHaveBeenCalledTimes(2)
-    expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(1)
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select-vertex"]').click()
+    await flushTicks()
+
+    const deleteEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Delete',
+    })
+    document.dispatchEvent(deleteEvent)
+    await flushTicks()
+
+    expect(deleteEvent.defaultPrevented).toBe(true)
+    expect(mocks.mapCanDeleteSelected).toHaveBeenCalledTimes(1)
+    expect(mocks.mapDeleteSelected).not.toHaveBeenCalled()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
 
     wrapper.unmount()
   })

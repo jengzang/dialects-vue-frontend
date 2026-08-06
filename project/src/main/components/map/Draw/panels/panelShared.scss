@@ -151,6 +151,19 @@
   gap: 0.35rem;
 }
 
+.draw-shape-edit-status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.45rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.24);
+  border-radius: var(--radius-sm2);
+  background: rgba(var(--color-primary-rgb), 0.08);
+  color: rgba(var(--text-deep-rgb), 0.72);
+  font-size: 0.78rem;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .draw-tool-button-grid .main-glass-button:hover:not(:disabled) {
     background: var(--color-primary);
