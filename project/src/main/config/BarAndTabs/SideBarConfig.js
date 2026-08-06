@@ -82,7 +82,7 @@ export function useSidebarConfig() {
             icon: '📖',
             path: withRouteLocale(route, '/menu/vocabulary'),
             children: [
-                { label: t('navigation.submenu.words.wordList'), icon: '📒', path: withRouteLocale(route, '/menu/vocabulary') },
+                { label: t('navigation.submenu.words.wordList'), icon: '📋', path: withRouteLocale(route, '/menu/vocabulary') },
                 { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: withRouteLocale(route, '/menu/yubao?tab=vocabulary') },
                 { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: withRouteLocale(route, '/menu/yubao?tab=grammar') },
                 { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc/words') }
@@ -106,7 +106,7 @@ export function useSidebarConfig() {
             icon: '🔗',
             path: withRouteLocale(route, '/menu/source'),
             children: [
-                { label: t('navigation.submenu.source.source'), icon: '📋', path: withRouteLocale(route, '/menu/source') },
+                { label: t('navigation.submenu.source.source'), icon: '📎', path: withRouteLocale(route, '/menu/source') },
                 { label: t('navigation.submenu.source.privacy'), icon: '🔒', path: withRouteLocale(route, '/menu/privacy') },
                 { label: t('navigation.submenu.source.suggestion'), icon: '💬', path: withRouteLocale(route, '/menu/about/suggestion') },
                 { label: t('navigation.submenu.source.like'), icon: '❤️', path: withRouteLocale(route, '/menu/about/like') }
@@ -220,7 +220,7 @@ export const SideConfig = {
         icon: '💬',
         path: buildLocalePath('zh-Hant', '/menu/vocabulary'),
         children: [
-            { label: '詞表', icon: '📒', path: buildLocalePath('zh-Hant', '/menu/vocabulary') },
+            { label: '詞表', icon: '�', path: buildLocalePath('zh-Hant', '/menu/vocabulary') },
             { label: '語保詞彙', icon: '📝', path: buildLocalePath('zh-Hant', '/menu/yubao?tab=vocabulary') },
             { label: '語保語法', icon: '🗂️', path: buildLocalePath('zh-Hant', '/menu/yubao?tab=grammar') },
             { label: '陽春口語詞', icon: '🗣️', path: buildLocalePath('zh-Hant', '/explore/yc/words') }
@@ -256,7 +256,7 @@ export const SideConfig = {
         icon: '📂',
         path: buildLocalePath('zh-Hant', '/menu/source'),
         children: [
-            { label: '字表來源', icon: '📋', path: buildLocalePath('zh-Hant', '/menu/source') },
+            { label: '字表來源', icon: '📎', path: buildLocalePath('zh-Hant', '/menu/source') },
             { label: '隱私政策', icon: '🛡️', path: buildLocalePath('zh-Hant', '/menu/privacy') },
             { label: '提出建議', icon: '💡', path: buildLocalePath('zh-Hant', '/menu/about/suggestion') },
             { label: '支持作者', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') }

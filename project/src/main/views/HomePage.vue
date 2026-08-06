@@ -217,7 +217,7 @@
           <transition name="expand">
             <div v-if="expandedCard === 'words'" class="card-body">
               <a @click.stop="navigateTo('/menu/vocabulary')" class="feature-link">
-                <span class="link-icon">📒</span>
+                <span class="link-icon">📋</span>
                 <span class="link-text">{{ $t('home.features.words.wordList') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/yubao?tab=vocabulary')" class="feature-link">
