@@ -187,17 +187,40 @@
       @close="closeUploadLocationEditor"
     >
       <div class="upload-location-modal">
-        <div class="upload-location-modal-toolbar">
-          <button
-            class="main-glass-button"
-            data-variant="primary"
-            type="button"
-            :disabled="isLoadingYindianLocation || !uploadLocationDraft.location_name.trim()"
-            @click="useYindianLocationData"
-          >
-            {{ isLoadingYindianLocation ? t('common.label.loading') : t('words.wordList.upload.useYindianData') }}
-          </button>
-          <p class="upload-location-modal-hint">{{ t('words.wordList.upload.yindianHint') }}</p>
+        <div class="yindian-match-section">
+          <h4 class="yindian-match-title">{{ t('words.wordList.upload.useYindianData') }}</h4>
+          <div class="yindian-match-row">
+            <div class="yindian-input-wrapper">
+              <input
+                v-model="yindianQuery"
+                type="text"
+                :placeholder="t('words.wordList.upload.yindianHint')"
+                autocomplete="off"
+                @input="onYindianInput"
+                @keydown.enter.prevent="confirmYindianQuery"
+                @blur="onYindianBlur"
+              />
+              <div v-if="yindianSuggestions.length" class="yindian-suggestions">
+                <div
+                  v-for="item in yindianSuggestions"
+                  :key="item"
+                  class="yindian-suggest-item"
+                  @mousedown.prevent="applyYindianSuggestion(item)"
+                >
+                  {{ item }}
+                </div>
+              </div>
+            </div>
+            <button
+              class="main-glass-button"
+              data-variant="primary"
+              type="button"
+              :disabled="!yindianQuery.trim() || isLoadingYindian"
+              @click="confirmYindianQuery"
+            >
+              {{ isLoadingYindian ? t('common.label.loading') : t('common.button.confirm') }}
+            </button>
+          </div>
           <span v-if="uploadLocationEditorStatus">{{ uploadLocationEditorStatus }}</span>
         </div>
 
@@ -376,7 +399,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { getLocationDetail, getVocabularyCounts, previewVocabularyImport, uploadVocabulary } from '@/api'
+import { batchMatch, getLocationDetail, getVocabularyCounts, previewVocabularyImport, uploadVocabulary } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
@@ -460,8 +483,11 @@ const createEmptyUploadLocation = () => ({
 const uploadLocation = ref(createEmptyUploadLocation())
 const uploadLocationDraft = ref(createEmptyUploadLocation())
 const isUploadLocationEditorOpen = ref(false)
-const isLoadingYindianLocation = ref(false)
+const yindianQuery = ref('')
+const yindianSuggestions = ref([])
+const isLoadingYindian = ref(false)
 const uploadLocationEditorStatus = ref('')
+let yindianDebounceTimer = null
 
 const uploadLocationFields = computed(() => [
   {
@@ -640,6 +666,8 @@ function normalizeUploadLocation(location) {
 function openUploadLocationEditor() {
   uploadLocationDraft.value = { ...uploadLocation.value }
   uploadLocationEditorStatus.value = ''
+  yindianQuery.value = ''
+  yindianSuggestions.value = []
   isUploadLocationEditorOpen.value = true
 }
 
@@ -647,6 +675,8 @@ function closeUploadLocationEditor() {
   isUploadLocationEditorOpen.value = false
   uploadLocationDraft.value = createEmptyUploadLocation()
   uploadLocationEditorStatus.value = ''
+  yindianQuery.value = ''
+  yindianSuggestions.value = []
 }
 
 function confirmUploadLocationEditor() {
@@ -676,15 +706,12 @@ function applyYindianLocationDetail(detail) {
   }
 }
 
-async function useYindianLocationData() {
-  const locationName = uploadLocationDraft.value.location_name.trim()
-  if (!locationName || isLoadingYindianLocation.value) return
-
-  isLoadingYindianLocation.value = true
+async function fillFromYindian(name) {
+  if (!name || isLoadingYindian.value) return
+  isLoadingYindian.value = true
   uploadLocationEditorStatus.value = ''
-
   try {
-    const response = await getLocationDetail(locationName)
+    const response = await getLocationDetail(name)
     const detail = getLocationDetailRow(response)
     if (!detail) {
       uploadLocationEditorStatus.value = t('words.wordList.upload.yindianNotFound')
@@ -698,8 +725,44 @@ async function useYindianLocationData() {
     uploadLocationEditorStatus.value = error.message || t('words.wordList.upload.yindianFailed')
     showError(uploadLocationEditorStatus.value)
   } finally {
-    isLoadingYindianLocation.value = false
+    isLoadingYindian.value = false
   }
+}
+
+function onYindianInput() {
+  clearTimeout(yindianDebounceTimer)
+  const query = yindianQuery.value.trim()
+  if (!query) {
+    yindianSuggestions.value = []
+    return
+  }
+  yindianDebounceTimer = setTimeout(async () => {
+    try {
+      const results = await batchMatch(query, true)
+      const items = Array.isArray(results) ? results.flatMap((r) => r.items || []) : []
+      yindianSuggestions.value = [...new Set(items)]
+    } catch {
+      yindianSuggestions.value = []
+    }
+  }, 300)
+}
+
+function onYindianBlur() {
+  setTimeout(() => {
+    yindianSuggestions.value = []
+  }, 200)
+}
+
+function applyYindianSuggestion(item) {
+  yindianQuery.value = item
+  yindianSuggestions.value = []
+  return fillFromYindian(item)
+}
+
+function confirmYindianQuery() {
+  const name = yindianQuery.value.trim()
+  if (!name || isLoadingYindian.value) return
+  return fillFromYindian(name)
 }
 
 function clearUploadFile() {

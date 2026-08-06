@@ -744,6 +744,72 @@
   color: var(--text-secondary);
 }
 
+.yindian-match-section {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--color-primary-border);
+  padding: 8px 0;
+  gap: 8px;
+}
+
+.yindian-match-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.yindian-match-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.yindian-input-wrapper {
+  // flex: 1;
+  position: relative;
+
+  input {
+    // width: 100%;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    background: var(--surface-panel);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    color: var(--text-deep);
+    outline: none;
+
+    &:focus {
+      border-color: var(--action-primary-border);
+    }
+  }
+}
+
+.yindian-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--surface-panel);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-glass-hover);
+}
+
+.yindian-suggest-item {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: var(--text-deep);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-panel-hover);
+  }
+}
+
 .location-edit-modal-actions {
   display: flex;
   gap: 10px;
