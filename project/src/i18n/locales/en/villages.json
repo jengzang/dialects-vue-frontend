@@ -5,24 +5,24 @@
     "desc": "Explore where natural-village place names cluster by character or name fragment"
   },
   "gdVillages": {
-    "name": "Guangdong Villages",
-    "desc": "Guangdong Province natural villages tree view"
+    "name": "Guangdong Natural Villages",
+    "desc": "Browse the Guangdong natural-village hierarchy"
   },
   "villagesML": {
-    "name": "Village Analysis",
-    "desc": "Machine learning and NLP analysis of Guangdong villages"
+    "name": "Machine Learning",
+    "desc": "Analyze natural-village names with machine learning"
   },
   "gdVillagesTable": {
-    "name": "Village Data Table",
-    "desc": "Guangdong Province natural villages table data"
+    "name": "Guangdong Village Table",
+    "desc": "Detailed village data for Guangdong"
   },
   "ycVillages": {
-    "name": "Yangchun Villages",
-    "desc": "Yangchun County natural villages (from county records)"
+    "name": "Yangchun Natural Villages",
+    "desc": "Natural-village data for Yangchun"
   },
   "allVillages": {
-    "name": "All Villages",
-    "desc": "All villages data (admin only)"
+    "name": "All Natural Villages",
+    "desc": "Complete natural-village data (administrators only)"
   },
   "dashboard": {
     "pageTitle": "Village Analysis System",

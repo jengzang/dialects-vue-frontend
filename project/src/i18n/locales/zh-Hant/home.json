@@ -54,6 +54,7 @@
     "villages": {
       "title": "自然村資料",
       "desc": "村落地名分析與方言繪圖",
+      "toponyms": "地名分佈 - 按漢字或地名片段查看自然村地名的地理分佈",
       "gdVillages": "廣東自然村 - 廣東自然村樹狀圖",
       "villagesML": "機器學習 - 自然村名機器學習",
       "gdVillagesTable": "全粵村情表格 - 廣東村落詳細表格",

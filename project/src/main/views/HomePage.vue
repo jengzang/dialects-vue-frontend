@@ -250,6 +250,10 @@
           </div>
           <transition name="expand">
             <div v-if="expandedCard === 'villages'" class="card-body">
+              <a @click.stop="navigateTo('/explore/villages/toponyms')" class="feature-link">
+                <span class="link-icon">📍</span>
+                <span class="link-text">{{ $t('home.features.villages.toponyms') }}</span>
+              </a>
               <a @click.stop="navigateTo('/explore/villages/ml')" class="feature-link">
                 <span class="link-icon">🤖</span>
                 <span class="link-text">{{ $t('home.features.villages.villagesML') }}</span>

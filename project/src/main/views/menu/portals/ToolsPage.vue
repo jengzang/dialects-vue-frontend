@@ -4,7 +4,7 @@
 
     <div class="tools-grid">
       <button class="entry-button" @click="handleDataCheck">
-        <div class="entry-button__icon">🔍</div>
+        <div class="entry-button__icon">📋</div>
         <div class="entry-button__name">
           {{ $t('tools.dataCheck.name') }}
         </div>
@@ -14,7 +14,7 @@
       </button>
 
       <button class="entry-button" @click="handleJyutpingToIpa">
-        <div class="entry-button__icon">🔄</div>
+        <div class="entry-button__icon">🔤</div>
         <div class="entry-button__name">
           {{ $t('tools.jyutpingToIpa.name') }}
         </div>
@@ -44,7 +44,7 @@
       </button> -->
 
       <button class="entry-button" @click="handlePraatTables">
-        <div class="entry-button__icon">👂️</div>
+        <div class="entry-button__icon">🎙️</div>
         <div class="entry-button__name">
           {{ $t('tools.praatAnalysis.name') }}
         </div>
@@ -54,7 +54,7 @@
       </button>
 
       <button class="entry-button" @click="handleGis">
-        <div class="entry-button__icon">🗺️</div>
+        <div class="entry-button__icon">🗺</div>
         <div class="entry-button__name">
           {{ $t('tools.gis.name') }}
         </div>

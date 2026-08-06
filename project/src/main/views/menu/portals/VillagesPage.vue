@@ -4,7 +4,7 @@
 
     <div class="villages-grid">
       <button class="entry-button" @click="handleToponyms">
-        <div class="entry-button__icon">🗺️</div>
+        <div class="entry-button__icon">📍</div>
         <div class="entry-button__name">
           {{ $t('villages.toponyms.name') }}
         </div>
@@ -34,7 +34,7 @@
       </button>
 
       <button class="entry-button" @click="handleGdVillagesTable">
-        <div class="entry-button__icon">📈</div>
+        <div class="entry-button__icon">📊</div>
         <div class="entry-button__name">
           {{ $t('villages.gdVillagesTable.name') }}
         </div>
@@ -44,7 +44,7 @@
       </button>
 
       <button class="entry-button" @click="handleYcVillages">
-        <div class="entry-button__icon">🏠</div>
+        <div class="entry-button__icon">🌾</div>
         <div class="entry-button__name">
           {{ $t('villages.ycVillages.name') }}
         </div>
