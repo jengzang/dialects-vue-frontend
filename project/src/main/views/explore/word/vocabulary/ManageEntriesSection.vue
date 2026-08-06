@@ -18,31 +18,28 @@ import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 
 const { t } = useI18n()
 
-const props = defineProps({
+defineProps({
   hasVocabularyPermission: { type: Boolean, default: false },
   canViewVocabularyLogs: { type: Boolean, default: false },
   manageUserId: { type: [Number, String], default: null },
   managePermissionLevel: { type: String, default: null },
 })
 
-const defaultFilter = ref(null)
+const userLocationNames = ref([])
 
-async function loadDefaultFilter() {
-  if (props.managePermissionLevel !== 'edit') return
+onMounted(async () => {
   try {
     const response = await getVocabularyLocations({ page_size: 200 })
     const locations = Array.isArray(response.locations) ? response.locations : []
-    const names = locations.map((l) => l.location_name).filter(Boolean)
-    if (names.length) {
-      defaultFilter.value = { location_name: names }
-    }
+    userLocationNames.value = locations.map((l) => l.location_name).filter(Boolean)
   } catch {
     // no-op
   }
-}
+})
 
-onMounted(() => {
-  loadDefaultFilter()
+const defaultFilter = computed(() => {
+  if (!userLocationNames.value.length) return null
+  return { location_name: [...userLocationNames.value] }
 })
 
 const tableColumns = computed(() => [
