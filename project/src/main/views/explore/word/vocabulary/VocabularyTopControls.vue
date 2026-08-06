@@ -5,11 +5,13 @@
         <div class="input-wrapper">
           <textarea
             ref="searchInputEl"
-            :value="query"
+            :value="inputText"
             class="search-input"
             rows="1"
             :placeholder="t('words.wordList.search.placeholder')"
-            @input="emit('update:query', ($event.target).value)"
+            @compositionstart="handleCompositionStart"
+            @compositionend="handleCompositionEnd"
+            @input="handleInput"
           />
         </div>
 
@@ -173,7 +175,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
@@ -219,6 +221,38 @@ const standardWordTriggerEl = ref(null)
 const searchFieldModalOpen = ref(false)
 const locationDropdownOpen = ref(false)
 const standardWordDropdownOpen = ref(false)
+
+const inputText = ref(props.query)
+const isComposing = ref(false)
+let searchTimer = null
+
+watch(() => props.query, (val) => {
+  inputText.value = val
+})
+
+function handleCompositionStart() {
+  isComposing.value = true
+  clearTimeout(searchTimer)
+}
+
+function handleCompositionEnd(e) {
+  isComposing.value = false
+  inputText.value = e.target.value
+  scheduleSearchEmit()
+}
+
+function handleInput(e) {
+  inputText.value = e.target.value
+  if (isComposing.value) return
+  scheduleSearchEmit()
+}
+
+function scheduleSearchEmit() {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    emit('update:query', inputText.value)
+  }, 500)
+}
 
 function formatMultiSelectLabel(selectedValues, options, placeholder) {
   const selectedLabels = selectedValues
