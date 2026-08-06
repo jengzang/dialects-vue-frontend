@@ -51,6 +51,7 @@
               :style="{
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), false),
                 minWidth: getOverflowMinWidth(t, false),
+                maxWidth: getOverflowMaxWidth(t, false),
                 fontSize: t.fontSize + 'rem'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
@@ -126,16 +127,12 @@
       </div>
 
       <!-- 第二部分：导航按钮 -->
-      <div ref="mobileNavRef" 
-          class="navbar-bottom" 
-          :class="scrollClass" 
-      >
-      <!-- <div ref="mobileNavRef" 
-          class="navbar-bottom" 
-          :class="scrollClass" 
-          @scroll="onScroll" 
+      <div ref="mobileNavRef"
+          class="navbar-bottom"
+          :class="scrollClassMobile"
+          @scroll="onScroll"
           @scrollend="onScrollEnd"
-      > -->
+      >
         <RouterLink
             v-for="t in orderedMobileTabs"
             :key="t.tab"
@@ -155,6 +152,7 @@
               :style="{
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), true),
                 minWidth: getOverflowMinWidth(t, true),
+                maxWidth: getOverflowMaxWidth(t, true),
                 fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
@@ -256,7 +254,7 @@ const { canScrollLeft, canScrollRight, arrowLeftPx, arrowRightPx, startScroll, s
   desktopRef
 )
 
-const { getOverflowFlex, getOverflowMinWidth } = useBarOverflow({
+const { getOverflowFlex, getOverflowMinWidth, getOverflowMaxWidth } = useBarOverflow({
   orderedTabs,
   orderedMobileTabs,
   hasOverflowDesktop,
