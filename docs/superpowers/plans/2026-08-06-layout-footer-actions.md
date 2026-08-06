@@ -4,9 +4,9 @@
 
 **Goal:** Add a shared footer to `MenuLayout`, `ExploreLayout`, and `SimpleLayout` with cached stats, current-page help text, tutorial, feedback, share, settings, language/theme identity, version, and ICP information.
 
-**Architecture:** Build one shared footer component and small focused helpers. The footer reuses existing stats composables, drives the existing tutorial modal through a tiny global request bridge, submits feedback through the backend suggestions API, and treats screenshot upload as an optional field named `image_base64` once the backend adds it to the suggestions storage model.
+**Architecture:** Build one shared footer component and small focused helpers. The footer reuses existing stats composables, existing common controls, existing design tokens, and the existing tutorial modal through a tiny global request bridge. Feedback submits through the backend suggestions API; link sharing ships in the first pass, while screenshot upload and branded image sharing are phase-2 enhancements gated by backend/dependency readiness.
 
-**Tech Stack:** Vue 3, Vue Router, Vue I18n, SCSS scoped component styles, existing `api()` client, existing `AppModal`, existing `useVisitStats()` and `useSourceStats()`, Vitest.
+**Tech Stack:** Vue 3, Vue Router, Vue I18n, SCSS scoped component styles, existing `api()` client, existing `AppModal`, existing selector controls, existing `main-glass-button` styles, existing design tokens, existing `useVisitStats()` and `useSourceStats()`, Vitest.
 
 ---
 
@@ -32,6 +32,25 @@ Expected backend behavior:
 
 If the backend chooses a different field name, update only `project/src/api/main/suggestions.js` and `project/src/main/components/footer/LayoutFeedbackModal.vue` in this plan.
 
+## Implementation Constraints
+
+These constraints are part of the plan, not optional style advice:
+
+- Work from the current `dev` branch. Preserve unrelated local changes, especially map draw files.
+- Do not introduce new visual systems for the footer. Reuse existing common components and global classes:
+  - `AppModal` for feedback.
+  - `RadioGroup` for feedback category selection.
+  - `CheckBox` for optional screenshot consent when Task 6 is enabled.
+  - `main-glass-button` for footer actions and modal submit buttons, tuned through CSS custom properties when compact sizing is needed.
+- Every new Vue component style block must be `<style scoped lang="scss">` and must start with `@use '@/styles/global/mixins' as *;`.
+- Use existing CSS custom properties from `project/src/styles/global/_tokens.scss` for colors, radii, shadows, surfaces, and text. Do not add hardcoded UI colors in component SCSS.
+- Use existing mixins such as `flex-col`, `flex-center`, `text-truncate`, `disabled-state`, and `glass-blur` instead of raw duplicated declarations where they apply.
+- Do not add width-based media queries. Responsive footer layout must use `@media (max-aspect-ratio: 1 / 1)`.
+- The footer is a compact utility surface, not a marketing section. It should not use hero-scale text, decorative blobs, nested cards, or one-off visual effects.
+- Footer stats must use the shared `useVisitStats()` and `useSourceStats()` cache path. Do not create duplicate homepage/sidebar stats requests.
+- First-pass share behavior is link-first: `navigator.share` when available, then clipboard fallback. Screenshot feedback and branded share images are phase-2 tasks and must not block the base footer.
+- If backend `image_base64` support is not confirmed when executing Task 6, skip Task 6 and keep feedback submissions sending `image_base64: ''`.
+
 ## File Structure
 
 - Create `project/src/api/main/suggestions.js`
@@ -47,11 +66,11 @@ If the backend chooses a different field name, update only `project/src/api/main
 - Create `project/src/components/footer/AppFooter.vue`
   - Shared footer UI and action wiring.
 - Create `project/src/main/components/footer/LayoutFeedbackModal.vue`
-  - Feedback type picker and suggestion form.
+  - Feedback type picker and suggestion form. Reuses `AppModal`, `RadioGroup`, and later `CheckBox` for screenshot consent.
 - Create `project/src/utils/share/pageSnapshot.js`
-  - Optional page screenshot capture and compression helper.
+  - Optional phase-2 page screenshot capture and compression helper.
 - Create `project/src/utils/share/shareCard.js`
-  - Branded share-image canvas helper for social sharing.
+  - Optional phase-2 branded share-image canvas helper for social sharing.
 - Modify `project/src/layouts/MenuLayout.vue`
   - Mounts `AppFooter`.
 - Modify `project/src/layouts/ExploreLayout.vue`
@@ -1027,19 +1046,20 @@ Create `project/src/components/footer/AppFooter.vue`:
       <div class="footer-actions" aria-label="layout footer actions">
         <button
           type="button"
-          class="footer-action"
+          class="main-glass-button footer-action"
+          data-size="small"
           :disabled="!context.hasTutorial"
           @click="openTutorial"
         >
           {{ t('layoutFooter.actions.tutorial') }}
         </button>
-        <button type="button" class="footer-action" @click="isFeedbackOpen = true">
+        <button type="button" class="main-glass-button footer-action" data-size="small" @click="isFeedbackOpen = true">
           {{ t('layoutFooter.actions.feedback') }}
         </button>
-        <button type="button" class="footer-action" @click="shareCurrentPage">
+        <button type="button" class="main-glass-button footer-action" data-size="small" @click="shareCurrentPage">
           {{ t('layoutFooter.actions.share') }}
         </button>
-        <button type="button" class="footer-action" @click="goToSettings">
+        <button type="button" class="main-glass-button footer-action" data-size="small" @click="goToSettings">
           {{ t('layoutFooter.actions.settings') }}
         </button>
       </div>
@@ -1219,7 +1239,6 @@ onMounted(fetchFooterStats)
   justify-content: flex-end;
 }
 
-.footer-action,
 .theme-chip {
   padding: 4px 8px;
   border: 1px solid rgba(var(--color-primary-rgb), 0.18);
@@ -1229,7 +1248,9 @@ onMounted(fetchFooterStats)
 }
 
 .footer-action {
-  cursor: pointer;
+  --main-glass-button-padding: 4px 8px;
+  --main-glass-button-border-radius: var(--radius-sm);
+  --main-glass-button-font-size: 0.85rem;
 
   &:disabled {
     @include disabled-state;
@@ -1347,6 +1368,8 @@ CR checklist:
 - Existing `PageTutorialGuide`, `PanelManager`, `FloatingButtons`, and `SimpleSidebar` remain mounted.
 - `SimpleLayout` behavior changes only enough to stack footer after content.
 - Styles use `<style scoped lang="scss">` and project mixins.
+- Footer action buttons reuse `main-glass-button`; footer SCSS only supplies compact CSS custom-property overrides.
+- Footer surfaces, text, borders, and states use existing `var(--...)` design tokens.
 - No width-based responsive media query appears.
 
 Commit:
@@ -1395,6 +1418,24 @@ vi.mock('../src/components/common/AppModal.vue', () => ({
         <slot />
         <slot name="footer" />
       </section>
+    `,
+  },
+}))
+
+vi.mock('../src/components/selector/RadioGroup.vue', () => ({
+  default: {
+    props: ['modelValue', 'options', 'name'],
+    emits: ['update:modelValue', 'change'],
+    template: `
+      <select
+        :name="name"
+        :value="modelValue"
+        @change="$emit('update:modelValue', $event.target.value); $emit('change', $event.target.value)"
+      >
+        <option v-for="option in options" :key="option.value" :value="option.value">
+          {{ option.label }}
+        </option>
+      </select>
     `,
   },
 }))
@@ -1530,17 +1571,15 @@ Create `project/src/main/components/footer/LayoutFeedbackModal.vue`:
     @update:modelValue="emit('update:modelValue', $event)"
   >
     <form class="feedback-form" @submit.prevent="submit">
-      <label class="field">
+      <div class="field feedback-category">
         <span>{{ t('layoutFooter.feedback.category') }}</span>
-        <select v-model="category" name="category">
-          <option value="bug">{{ t('layoutFooter.feedback.categories.bug') }}</option>
-          <option value="feature">{{ t('layoutFooter.feedback.categories.feature') }}</option>
-          <option value="data_issue">{{ t('layoutFooter.feedback.categories.data_issue') }}</option>
-          <option value="ui">{{ t('layoutFooter.feedback.categories.ui') }}</option>
-          <option value="performance">{{ t('layoutFooter.feedback.categories.performance') }}</option>
-          <option value="general">{{ t('layoutFooter.feedback.categories.general') }}</option>
-        </select>
-      </label>
+        <RadioGroup
+          v-model="category"
+          name="category"
+          :options="categoryOptions"
+          :size="13"
+        />
+      </div>
 
       <label class="field">
         <span>{{ t('layoutFooter.feedback.titleLabel') }}</span>
@@ -1577,7 +1616,9 @@ Create `project/src/main/components/footer/LayoutFeedbackModal.vue`:
     <template #footer>
       <button
         type="button"
-        class="submit-button"
+        class="main-glass-button submit-button"
+        data-variant="primary"
+        data-size="small"
         data-submit-feedback
         :disabled="isSubmitting || !canSubmit"
         @click="submit"
@@ -1592,6 +1633,7 @@ Create `project/src/main/components/footer/LayoutFeedbackModal.vue`:
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
 import { submitSuggestion } from '@/api/main/suggestions.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'
 
@@ -1622,6 +1664,15 @@ const title = ref('')
 const content = ref('')
 const contact = ref('')
 const isSubmitting = ref(false)
+
+const categoryOptions = computed(() => ([
+  { value: 'bug', label: t('layoutFooter.feedback.categories.bug') },
+  { value: 'feature', label: t('layoutFooter.feedback.categories.feature') },
+  { value: 'data_issue', label: t('layoutFooter.feedback.categories.data_issue') },
+  { value: 'ui', label: t('layoutFooter.feedback.categories.ui') },
+  { value: 'performance', label: t('layoutFooter.feedback.categories.performance') },
+  { value: 'general', label: t('layoutFooter.feedback.categories.general') },
+]))
 
 const canSubmit = computed(() => title.value.trim() && content.value.trim())
 
@@ -1685,7 +1736,6 @@ watch(
 }
 
 input,
-select,
 textarea {
   width: 100%;
   padding: 8px 10px;
@@ -1701,16 +1751,9 @@ textarea {
 }
 
 .submit-button {
-  padding: 8px 14px;
-  border: 1px solid rgba(var(--color-primary-rgb), 0.28);
-  border-radius: var(--radius-sm);
-  background: var(--color-primary);
-  color: var(--action-primary-text);
-  cursor: pointer;
-
-  &:disabled {
-    @include disabled-state;
-  }
+  --main-glass-button-padding: 8px 14px;
+  --main-glass-button-border-radius: var(--radius-sm);
+  --main-glass-button-font-size: 0.9rem;
 }
 </style>
 ```
@@ -1736,6 +1779,8 @@ git diff -- project/src/main/components/footer/LayoutFeedbackModal.vue project/s
 CR checklist:
 
 - The modal uses `AppModal`, so the header does not scroll with content.
+- The category picker reuses `RadioGroup`; do not replace it with a custom segmented-control skin.
+- The submit button reuses `main-glass-button` with compact CSS custom-property overrides.
 - Existing Chinese copy outside `layoutFooter.json` is untouched.
 - The request includes route context but does not include screenshot data yet.
 - No width-based media queries are introduced.
@@ -1749,7 +1794,11 @@ git commit -m "feat: add layout feedback modal"
 
 ---
 
-### Task 6: Screenshot Capture for Feedback
+### Task 6: Phase-2 Screenshot Capture for Feedback
+
+Execute this task only after the backend confirms `image_base64` support on
+`POST /api/suggestions`. If backend support is not ready, skip this task and
+keep the base feedback flow sending `image_base64: ''`.
 
 **Files:**
 - Modify: `project/package.json`
@@ -1759,6 +1808,9 @@ git commit -m "feat: add layout feedback modal"
 - Test: `project/tests/layoutFeedbackModal.test.js`
 
 - [ ] **Step 1: Add dependency**
+
+This is the only planned new runtime dependency for the footer work. Do not add
+another screenshot or DOM-to-image library in the same pass.
 
 Run from `project/`:
 
@@ -1870,16 +1922,20 @@ Add i18n keys to all three `layoutFooter.json` files:
 Add the checkbox inside the form:
 
 ```vue
-<label class="screenshot-field">
-  <input v-model="includeScreenshot" type="checkbox" name="includeScreenshot" />
-  <span>{{ t('layoutFooter.feedback.screenshot.label') }}</span>
-</label>
+<CheckBox
+  v-model="includeScreenshot"
+  class="screenshot-field"
+  data-include-screenshot
+>
+  {{ t('layoutFooter.feedback.screenshot.label') }}
+</CheckBox>
 <p class="screenshot-hint">{{ t('layoutFooter.feedback.screenshot.hint') }}</p>
 ```
 
 Add imports and state:
 
 ```js
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { capturePageSnapshot } from '@/utils/share/pageSnapshot.js'
 
 const includeScreenshot = ref(false)
@@ -1941,8 +1997,7 @@ it('includes a compressed screenshot when the user opts in', async () => {
   wrapper.host.querySelector('[name="title"]').dispatchEvent(new Event('input'))
   wrapper.host.querySelector('[name="content"]').value = '附上截图方便定位。'
   wrapper.host.querySelector('[name="content"]').dispatchEvent(new Event('input'))
-  wrapper.host.querySelector('[name="includeScreenshot"]').checked = true
-  wrapper.host.querySelector('[name="includeScreenshot"]').dispatchEvent(new Event('change'))
+  wrapper.host.querySelector('[data-include-screenshot]').click()
 
   wrapper.host.querySelector('[data-submit-feedback]').click()
   await nextTick()
@@ -1977,6 +2032,7 @@ git diff -- project/package.json project/src/utils/share/pageSnapshot.js project
 CR checklist:
 
 - `image_base64` is included only when the checkbox is checked.
+- Screenshot consent reuses `CheckBox`; do not style a native checkbox from scratch.
 - Modal and footer are ignored by screenshot capture.
 - Chinese and emoji content remain literal.
 - The new dependency is justified by current-page screenshot support.
@@ -1990,7 +2046,12 @@ git commit -m "feat: support screenshot feedback"
 
 ---
 
-### Task 7: Branded Share Image
+### Task 7: Phase-2 Branded Share Image
+
+Execute this after the base footer share button is working. The base share path
+in Task 4 remains `navigator.share` first and clipboard fallback second; this
+task only adds an optional image fallback for platforms/workflows that benefit
+from picture sharing.
 
 **Files:**
 - Create: `project/src/utils/share/shareCard.js`
@@ -2059,11 +2120,21 @@ Expected: FAIL because `shareCard.js` does not exist.
 Create `project/src/utils/share/shareCard.js`:
 
 ```js
-const THEME_COLORS = {
-  blue: '#2f74c0',
-  green: '#2f8f54',
-  light: '#607080',
-  dark: '#1f2937',
+const THEME_COLOR_TOKENS = {
+  blue: '--color-primary',
+  green: '--color-success',
+  light: '--text-slate',
+  dark: '--text-deep',
+}
+
+function readCssToken(tokenName, fallback) {
+  if (typeof window === 'undefined') {
+    return fallback
+  }
+
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(tokenName)
+    .trim() || fallback
 }
 
 function wrapText(ctx, text, maxWidth) {
@@ -2097,14 +2168,14 @@ export function createShareCardDataUrl({
   canvas.width = 1200
   canvas.height = 630
   const ctx = canvas.getContext('2d')
-  const accent = THEME_COLORS[colorTheme] || THEME_COLORS.blue
+  const accent = readCssToken(THEME_COLOR_TOKENS[colorTheme] || THEME_COLOR_TOKENS.blue, '#2f74c0')
 
-  ctx.fillStyle = '#f7fbf8'
+  ctx.fillStyle = readCssToken('--surface-panel-strong', '#f7fbf8')
   ctx.fillRect(0, 0, canvas.width, canvas.height)
   ctx.fillStyle = accent
   ctx.fillRect(0, 0, canvas.width, 18)
 
-  ctx.fillStyle = '#203026'
+  ctx.fillStyle = readCssToken('--text-deep', '#203026')
   ctx.font = '500 54px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
   ctx.fillText(title, 80, 160)
 
@@ -2118,7 +2189,7 @@ export function createShareCardDataUrl({
   ctx.font = '500 30px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
   ctx.fillText(`${languageLabel} · ${themeLabel}`, 80, 450)
 
-  ctx.fillStyle = '#637268'
+  ctx.fillStyle = readCssToken('--text-slate', '#637268')
   ctx.font = '400 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
   ctx.fillText('方音图鉴', 80, 530)
   ctx.fillText(url, 80, 570)
@@ -2202,6 +2273,7 @@ CR checklist:
 
 - Link sharing remains the first path when `navigator.share` exists.
 - The generated share card includes page title, description, language, theme, brand, and URL.
+- The share card reads theme colors from CSS custom properties and uses literal color values only as canvas fallbacks.
 - The share card helper does not depend on external network resources.
 
 Commit:
@@ -2289,6 +2361,7 @@ Spec coverage:
 - Feedback uses backend suggestions API and route context: Task 1 and Task 5.
 - Screenshot upload is opt-in and uses backend image field: Task 6.
 - Share supports link first and branded image fallback: Task 7.
+- Base share does not require Task 7; branded image sharing is explicitly phase 2.
 - Language/theme identity, version, database stats, and ICP are displayed: Task 3 and Task 4.
 - Responsive behavior uses aspect ratio, not width breakpoints: Tasks 4 and 8 CR checklist.
 - Chinese and emoji safety is explicitly reviewed: every commit CR checklist.
@@ -2305,3 +2378,4 @@ Type consistency:
 - Tutorial request bridge is consistently named `tutorialGuideRequestState` and `requestCurrentTutorialGuideOpen`.
 - Footer context helper is consistently named `resolveLayoutFooterContext`.
 - Feedback component is consistently named `LayoutFeedbackModal`.
+- First-pass feedback intentionally sends `image_base64: ''`; Task 6 is the only step that enables screenshot capture.
