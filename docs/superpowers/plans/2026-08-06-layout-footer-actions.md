@@ -4,7 +4,7 @@
 
 **Goal:** Add a shared footer to `MenuLayout`, `ExploreLayout`, and `SimpleLayout` with cached stats, current-page help text, tutorial, feedback, share, settings, language/theme identity, version, and ICP information.
 
-**Architecture:** Build one shared footer component and small focused helpers. The footer reuses existing stats composables, drives the existing tutorial modal through a tiny global request bridge, submits feedback through the backend suggestions API, and treats screenshot upload as an optional field named `image_base64` once the backend adds it to `user_suggestions`.
+**Architecture:** Build one shared footer component and small focused helpers. The footer reuses existing stats composables, drives the existing tutorial modal through a tiny global request bridge, submits feedback through the backend suggestions API, and treats screenshot upload as an optional field named `image_base64` once the backend adds it to the suggestions storage model.
 
 **Tech Stack:** Vue 3, Vue Router, Vue I18n, SCSS scoped component styles, existing `api()` client, existing `AppModal`, existing `useVisitStats()` and `useSourceStats()`, Vitest.
 
@@ -22,18 +22,20 @@ The frontend plan assumes the backend adds this optional request field:
 
 Expected backend behavior:
 
-- Add `image_base64 TEXT` to `user_suggestions`.
+- Treat suggestions as site-wide feedback, not as user-only data. Anonymous visitors can submit; `user_id` and `username` are nullable attribution fields when the requester is logged in.
+- Prefer a neutral storage name such as `suggestions` or `site_suggestions` if the schema can still be renamed safely. If production compatibility requires keeping the existing `user_suggestions` table, keep that as an internal legacy name and expose neutral API/domain naming to the frontend.
+- Add `image_base64 TEXT` to the suggestions table/model.
 - Accept optional `image_base64` on `POST /api/suggestions`.
 - Store compressed screenshot data URLs only when present.
-- Return `image_base64` only on admin detail/list responses or behind an admin-only route. `GET /api/suggestions/my` can omit it to keep normal user lists light.
+- Return `image_base64` only on admin detail/list responses or behind an admin-only route. Public or submitter-facing list responses can omit it to keep normal lists light.
 - Reject overly large images with `413` or `422`; the frontend will cap generated screenshots to about 600 KB before submit.
 
-If the backend chooses a different field name, update only `project/src/api/main/user/suggestions.js` and `project/src/main/components/footer/LayoutFeedbackModal.vue` in this plan.
+If the backend chooses a different field name, update only `project/src/api/main/suggestions.js` and `project/src/main/components/footer/LayoutFeedbackModal.vue` in this plan.
 
 ## File Structure
 
-- Create `project/src/api/main/user/suggestions.js`
-  - Owns user-facing suggestion API calls and payload normalization.
+- Create `project/src/api/main/suggestions.js`
+  - Owns public suggestion API calls and payload normalization.
 - Modify `project/src/api/index.js`
   - Re-exports suggestion API helpers.
 - Modify `project/src/main/store/store.js`
@@ -76,7 +78,7 @@ If the backend chooses a different field name, update only `project/src/api/main
 ### Task 1: Suggestions API Client
 
 **Files:**
-- Create: `project/src/api/main/user/suggestions.js`
+- Create: `project/src/api/main/suggestions.js`
 - Modify: `project/src/api/index.js`
 - Test: `project/tests/suggestionsApi.test.js`
 
@@ -102,7 +104,7 @@ describe('suggestions API client', () => {
   it('submits trimmed suggestion payload with page context and optional screenshot', async () => {
     apiMock.mockResolvedValue({ success: true, id: 9, message: '建议已提交' })
 
-    const { submitSuggestion } = await import('../src/api/main/user/suggestions.js')
+    const { submitSuggestion } = await import('../src/api/main/suggestions.js')
     const result = await submitSuggestion({
       title: '  地图颜色建议  ',
       content: '  希望绿色主题的地图点更明显。  ',
@@ -132,7 +134,7 @@ describe('suggestions API client', () => {
   it('omits empty optional fields and defaults category to general', async () => {
     apiMock.mockResolvedValue({ success: true, id: 10, message: '建议已提交' })
 
-    const { submitSuggestion } = await import('../src/api/main/user/suggestions.js')
+    const { submitSuggestion } = await import('../src/api/main/suggestions.js')
     await submitSuggestion({
       title: '  资料问题  ',
       content: '  某地点注释可能有误。  ',
@@ -154,17 +156,6 @@ describe('suggestions API client', () => {
     })
   })
 
-  it('fetches my suggestions with encoded filters', async () => {
-    apiMock.mockResolvedValue({ success: true, total: 0, page: 1, page_size: 20, items: [] })
-
-    const { getMySuggestions } = await import('../src/api/main/user/suggestions.js')
-    await getMySuggestions({ status: 'open', page: 2, page_size: 5 })
-
-    expect(apiMock).toHaveBeenCalledWith('/api/suggestions/my?status=open&page=2&page_size=5', {
-      method: 'GET',
-      responseType: 'json',
-    })
-  })
 })
 ```
 
@@ -176,11 +167,11 @@ Run from `project/`:
 npm test -- tests/suggestionsApi.test.js
 ```
 
-Expected: FAIL because `src/api/main/user/suggestions.js` does not exist.
+Expected: FAIL because `src/api/main/suggestions.js` does not exist.
 
 - [ ] **Step 3: Implement the API helper**
 
-Create `project/src/api/main/user/suggestions.js`:
+Create `project/src/api/main/suggestions.js`:
 
 ```js
 import { api } from '../../auth/httpClient.js'
@@ -231,20 +222,6 @@ export function submitSuggestion(payload) {
   })
 }
 
-export function getMySuggestions(params = {}) {
-  const query = new URLSearchParams()
-
-  if (params.status) query.set('status', params.status)
-  if (params.page) query.set('page', String(params.page))
-  if (params.page_size) query.set('page_size', String(params.page_size))
-
-  const suffix = query.toString() ? `?${query.toString()}` : ''
-
-  return api(`/api/suggestions/my${suffix}`, {
-    method: 'GET',
-    responseType: 'json',
-  })
-}
 ```
 
 Modify `project/src/api/index.js`:
@@ -252,10 +229,9 @@ Modify `project/src/api/index.js`:
 ```js
 export {
   SUGGESTION_CATEGORY_OPTIONS,
-  getMySuggestions,
   normalizeSuggestionPayload,
   submitSuggestion,
-} from './main/user/suggestions.js';
+} from './main/suggestions.js';
 ```
 
 - [ ] **Step 4: Run test to verify it passes**
@@ -273,7 +249,7 @@ Expected: PASS.
 Run from repository root:
 
 ```bash
-git diff -- project/src/api/main/user/suggestions.js project/src/api/index.js project/tests/suggestionsApi.test.js
+git diff -- project/src/api/main/suggestions.js project/src/api/index.js project/tests/suggestionsApi.test.js
 ```
 
 CR checklist:
@@ -286,7 +262,7 @@ CR checklist:
 Commit:
 
 ```bash
-git add project/src/api/main/user/suggestions.js project/src/api/index.js project/tests/suggestionsApi.test.js
+git add project/src/api/main/suggestions.js project/src/api/index.js project/tests/suggestionsApi.test.js
 git commit -m "feat: add suggestions api client"
 ```
 
@@ -1400,7 +1376,7 @@ const submitSuggestionMock = vi.fn()
 const showSuccessMock = vi.fn()
 const showErrorMock = vi.fn()
 
-vi.mock('../src/api/main/user/suggestions.js', () => ({
+vi.mock('../src/api/main/suggestions.js', () => ({
   submitSuggestion: submitSuggestionMock,
 }))
 
@@ -1616,7 +1592,7 @@ Create `project/src/main/components/footer/LayoutFeedbackModal.vue`:
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
-import { submitSuggestion } from '@/api/main/user/suggestions.js'
+import { submitSuggestion } from '@/api/main/suggestions.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'
 
 const props = defineProps({
@@ -2325,6 +2301,7 @@ Placeholder scan:
 Type consistency:
 
 - Backend image field is consistently named `image_base64`.
+- Suggestions are consistently treated as site-wide feedback; logged-in identity is optional attribution, not a submission requirement.
 - Tutorial request bridge is consistently named `tutorialGuideRequestState` and `requestCurrentTutorialGuideOpen`.
 - Footer context helper is consistently named `resolveLayoutFooterContext`.
 - Feedback component is consistently named `LayoutFeedbackModal`.
