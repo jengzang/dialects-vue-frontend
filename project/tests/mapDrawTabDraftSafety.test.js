@@ -927,6 +927,163 @@ describe('MapDrawTab draft safety', () => {
     wrapper.unmount()
   })
 
+  it('moves editable checked features even when the last checked feature is locked', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    const layerButtons = wrapper.host.querySelectorAll('[data-testid="layer-button"]')
+    const sourceLayerId = layerButtons[0].textContent
+    const targetLayerId = layerButtons[1].textContent
+    layerButtons[0].click()
+    await flushTicks()
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="lock-selected-features"]').click()
+    await flushTicks()
+
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[1].click()
+    await flushTicks()
+    checkboxes[0].click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe(sourceLayerId)
+    expect(wrapper.host.querySelector('[data-testid="move-selected-features"]').disabled).toBe(false)
+
+    wrapper.host.querySelector('[data-testid="move-selected-features"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe(targetLayerId)
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(1)
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
+      .map((item) => item.dataset.locked)).toEqual(['false'])
+
+    wrapper.unmount()
+  })
+
+  it('moves editable checked features even when the last checked feature is hidden', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    const layerButtons = wrapper.host.querySelectorAll('[data-testid="layer-button"]')
+    const sourceLayerId = layerButtons[0].textContent
+    const targetLayerId = layerButtons[1].textContent
+    layerButtons[0].click()
+    await flushTicks()
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[1].click()
+    await flushTicks()
+    checkboxes[0].click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe(sourceLayerId)
+    expect(wrapper.host.querySelector('[data-testid="move-selected-features"]').disabled).toBe(false)
+
+    wrapper.host.querySelector('[data-testid="move-selected-features"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe(targetLayerId)
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(1)
+
+    wrapper.unmount()
+  })
+
+  it('keeps an editable primary checked feature after unchecking another editable feature', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    const layerButtons = wrapper.host.querySelectorAll('[data-testid="layer-button"]')
+    const sourceLayerId = layerButtons[0].textContent
+    const targetLayerId = layerButtons[1].textContent
+    layerButtons[0].click()
+    await flushTicks()
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    checkboxes[1].click()
+    await flushTicks()
+    checkboxes[2].click()
+    await flushTicks()
+    checkboxes[2].click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe(sourceLayerId)
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([true, true, false])
+    expect(wrapper.host.querySelector('[data-testid="move-selected-features"]').disabled).toBe(false)
+
+    wrapper.host.querySelector('[data-testid="move-selected-features"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe(targetLayerId)
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(1)
+
+    wrapper.unmount()
+  })
+
   it('updates checked active-layer feature visibility and locking as batch actions', async () => {
     mocks.getDraftRecordById.mockResolvedValue(null)
     mocks.saveDraftRecord.mockResolvedValue({})
@@ -981,6 +1138,133 @@ describe('MapDrawTab draft safety', () => {
       .every((item) => item.dataset.locked === 'false')).toBe(true)
     expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
       .every((item) => item.checked)).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('only mutates editable checked features while allowing hidden and locked recovery actions', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+
+    const layerButtons = wrapper.host.querySelectorAll('[data-testid="layer-button"]')
+    const sourceLayerId = layerButtons[0].textContent
+    layerButtons[0].click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe(sourceLayerId)
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[1].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="lock-selected-features"]').click()
+    await flushTicks()
+
+    mocks.mapSelectFeatures.mockClear()
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes.forEach((checkbox) => {
+      if (!checkbox.checked) checkbox.click()
+    })
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
+      .map((item) => item.dataset.visible)).toEqual(['false', 'true', 'true'])
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
+      .map((item) => item.dataset.locked)).toEqual(['false', 'true', 'false'])
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith(['feature-3'])
+
+    const batchNameInput = wrapper.host.querySelector('[data-testid="batch-name-input"]')
+    batchNameInput.value = 'Editable only'
+    batchNameInput.dispatchEvent(new Event('input'))
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="apply-batch-name"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-table-name"]')]
+      .map((input) => input.value)).toEqual([
+        'map.drawTab.labels.feature 1',
+        'map.drawTab.labels.feature 2',
+        'Editable only',
+      ])
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([true, true, true])
+
+    const batchPropertyKey = wrapper.host.querySelector('[data-testid="batch-property-key"]')
+    batchPropertyKey.value = 'region'
+    batchPropertyKey.dispatchEvent(new Event('change'))
+    const batchPropertyValue = wrapper.host.querySelector('[data-testid="batch-property-value"]')
+    batchPropertyValue.value = 'Editable region only'
+    batchPropertyValue.dispatchEvent(new Event('input'))
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="apply-batch-property"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-table-property-input"][data-property-key="region"]')]
+      .map((input) => input.value)).toEqual(['Region 1', 'Region 2', 'Editable region only'])
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([true, true, true])
+
+    wrapper.host.querySelector('[data-testid="delete-selected-features"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-table-name"]')]
+      .map((input) => input.value)).toEqual([
+        'map.drawTab.labels.feature 1',
+        'map.drawTab.labels.feature 2',
+      ])
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((checkbox) => checkbox.checked)).toEqual([true, true])
+
+    mocks.mapSelectFeatures.mockClear()
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes.forEach((checkbox) => {
+      if (!checkbox.checked) checkbox.click()
+    })
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="show-selected-features"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
+      .map((item) => item.dataset.visible)).toEqual(['true', 'true'])
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith(['feature-1'])
+
+    mocks.mapSelectFeatures.mockClear()
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes.forEach((checkbox) => {
+      if (!checkbox.checked) checkbox.click()
+    })
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="unlock-selected-features"]').click()
+    await flushTicks()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-state"]')]
+      .map((item) => item.dataset.locked)).toEqual(['false', 'false'])
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith(['feature-1', 'feature-2'])
+
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes.forEach((checkbox) => {
+      if (!checkbox.checked) checkbox.click()
+    })
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="move-selected-features"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelectorAll('[data-testid="feature-table-row"]')).toHaveLength(2)
 
     wrapper.unmount()
   })

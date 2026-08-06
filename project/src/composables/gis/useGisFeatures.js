@@ -37,6 +37,39 @@ export function useGisFeatures(options = {}) {
     return { type: 'FeatureCollection', features: [] };
   }
 
+  function isFeatureEditableForMutation(feature) {
+    return Boolean(
+      feature
+      && feature.properties?.visible !== false
+      && feature.properties?.locked !== true
+    );
+  }
+
+  function canMutateFeatureProperty(feature, key, value) {
+    if (key === 'visible' && value === true) return true;
+    if (key === 'locked' && value === false) return true;
+    return isFeatureEditableForMutation(feature);
+  }
+
+  function getSelectedMutationFeatureIds(key, value) {
+    if (!activeLayer.value || selectedFeatureIds.value.length === 0) return [];
+    const selectedIds = new Set(selectedFeatureIds.value);
+    return (activeLayer.value.featureCollection?.features ?? [])
+      .filter((feature) => selectedIds.has(getFeatureId(feature)))
+      .filter((feature) => canMutateFeatureProperty(feature, key, value))
+      .map((feature) => getFeatureId(feature))
+      .filter(Boolean);
+  }
+
+  function getEditableSelectedFeatureIds(features = [], featureIds = []) {
+    const selectedIds = new Set(featureIds);
+    return features
+      .filter((feature) => selectedIds.has(getFeatureId(feature)))
+      .filter(isFeatureEditableForMutation)
+      .map((feature) => getFeatureId(feature))
+      .filter(Boolean);
+  }
+
   // ---- Shape editing ----
 
   function handleEditSelectedShape() {
@@ -95,16 +128,26 @@ export function useGisFeatures(options = {}) {
 
   function handleDeleteSelectedFeatures() {
     if (!canModifyActiveLayer.value || !activeLayer.value || selectedFeatureIds.value.length === 0) return;
-    const idsToDelete = new Set(selectedFeatureIds.value);
     const fc = activeLayer.value.featureCollection ?? emptyFeatureCollection();
+    const selectedIdsBeforeDelete = selectedFeatureIds.value;
+    const idsToDelete = new Set((fc.features ?? [])
+      .filter((feature) => selectedFeatureIds.value.includes(getFeatureId(feature)))
+      .filter(isFeatureEditableForMutation)
+      .map((feature) => getFeatureId(feature)));
+    if (idsToDelete.size === 0) return;
     const next = (fc.features ?? []).filter((f) => !idsToDelete.has(getFeatureId(f)));
     if (next.length === (fc.features?.length ?? 0)) return;
     commitHistory();
     activeLayer.value.featureCollection = { ...fc, features: next };
-    clearFeatureSelection();
+    const remainingSelectedIds = selectedIdsBeforeDelete.filter((id) => !idsToDelete.has(id));
+    setFeatureSelection(remainingSelectedIds, remainingSelectedIds[0]);
     currentMode.value = 'simple_select';
     syncAllLayersAfterMutation();
-    editableMapRef?.value?.setDrawMode?.('simple_select');
+    if (editableMapRef?.value?.selectFeatures) {
+      editableMapRef.value.selectFeatures([]);
+    } else {
+      editableMapRef?.value?.setDrawMode?.('simple_select');
+    }
   }
 
   async function handleClearAll() {
@@ -124,6 +167,9 @@ export function useGisFeatures(options = {}) {
 
   function updateFeatureProperty(featureId, key, value) {
     if (!activeLayer.value || !featureId) return;
+    const targetFeature = activeLayer.value.featureCollection?.features
+      ?.find((feature) => getFeatureId(feature) === featureId);
+    if (!canMutateFeatureProperty(targetFeature, key, value)) return;
     commitHistory();
     const fc = activeLayer.value.featureCollection ?? emptyFeatureCollection();
     activeLayer.value.featureCollection = {
@@ -175,7 +221,10 @@ export function useGisFeatures(options = {}) {
 
   function updateSelectedFeaturesProperty(key, value) {
     if (!canModifyActiveLayer.value || !activeLayer.value || selectedFeatureIds.value.length === 0) return;
-    const idsSet = new Set(selectedFeatureIds.value);
+    const selectedIdsBeforeMutation = selectedFeatureIds.value;
+    const mutationFeatureIds = getSelectedMutationFeatureIds(key, value);
+    if (mutationFeatureIds.length === 0) return;
+    const idsSet = new Set(mutationFeatureIds);
     const fc = activeLayer.value.featureCollection ?? emptyFeatureCollection();
     let hasChanges = false;
     const next = (fc.features ?? []).map((f) => {
@@ -192,13 +241,9 @@ export function useGisFeatures(options = {}) {
       resetDrawSelectionMode();
       return;
     }
-    setFeatureSelection(selectedFeatureIds.value, selectedFeatureId.value);
+    setFeatureSelection(selectedIdsBeforeMutation, selectedFeatureId.value);
     currentMode.value = 'simple_select';
-    if (selectedFeatureIds.value.length > 1) {
-      editableMapRef?.value?.selectFeatures?.(selectedFeatureIds.value);
-      return;
-    }
-    editableMapRef?.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
+    editableMapRef?.value?.selectFeatures?.(getEditableSelectedFeatureIds(next, selectedIdsBeforeMutation));
   }
 
   function handleSetSelectedFeaturesVisible(visible) { updateSelectedFeaturesProperty('visible', visible); }
@@ -252,11 +297,12 @@ export function useGisFeatures(options = {}) {
     const target = layers.value.find((l) => l.id === targetLayerId);
     if (!source || !target || source.id === target.id) return;
     if (target.geometryType !== source.geometryType || target.visible === false || target.locked === true) return;
-    const idsSet = new Set(selectedFeatureIds.value);
     const srcFc = source.featureCollection ?? emptyFeatureCollection();
     const srcFeatures = srcFc.features ?? [];
-    const toMove = srcFeatures.filter((f) => idsSet.has(getFeatureId(f)));
+    const selectedIds = new Set(selectedFeatureIds.value);
+    const toMove = srcFeatures.filter((f) => selectedIds.has(getFeatureId(f)) && isFeatureEditableForMutation(f));
     if (!toMove.length) return;
+    const idsSet = new Set(toMove.map((f) => getFeatureId(f)));
     commitHistory();
     source.featureCollection = { ...srcFc, features: srcFeatures.filter((f) => !idsSet.has(getFeatureId(f))) };
     const tgtFc = target.featureCollection ?? emptyFeatureCollection();

@@ -358,14 +358,21 @@ export function useGisMapCore(options = {}) {
     }
   };
 
+  const getSelectableFeatureSelectionIds = (featureIds = []) => {
+    const selectableSet = new Set(activeLayerSelectableFeatureIds.value);
+    return featureIds.filter((id) => selectableSet.has(id));
+  };
+
   const syncFeatureSelectionToMap = () => {
     currentMode.value = 'simple_select';
-    if (selectedFeatureIds.value.length > 1) {
-      editableMapRef.value?.selectFeatures?.(selectedFeatureIds.value);
+    const mapFeatureIds = getSelectableFeatureSelectionIds(selectedFeatureIds.value);
+    const hasOnlySelectableSelection = mapFeatureIds.length === selectedFeatureIds.value.length;
+    if (mapFeatureIds.length > 1 || !hasOnlySelectableSelection) {
+      editableMapRef.value?.selectFeatures?.(mapFeatureIds);
       return;
     }
-    if (selectedFeatureId.value) {
-      editableMapRef.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
+    if (mapFeatureIds[0]) {
+      editableMapRef.value?.selectFeature?.(mapFeatureIds[0], { directEdit: false });
       return;
     }
     if (editableMapRef.value?.selectFeatures) {
@@ -487,6 +494,17 @@ export function useGisMapCore(options = {}) {
     currentMode.value = 'simple_select';
   };
 
+  const getPreferredFeatureSelectionId = (featureIds = [], requestedFeatureId = '') => {
+    const selectableSet = new Set(activeLayerSelectableFeatureIds.value);
+    const checkedSet = new Set(featureIds);
+    const requestedId = String(requestedFeatureId || '');
+    if (requestedId && checkedSet.has(requestedId) && selectableSet.has(requestedId)) return requestedId;
+    if (selectedFeatureId.value && featureIds.includes(selectedFeatureId.value) && selectableSet.has(selectedFeatureId.value)) {
+      return selectedFeatureId.value;
+    }
+    return featureIds.find((id) => selectableSet.has(id)) || requestedId || featureIds[0] || '';
+  };
+
   const handleToggleFeatureSelection = (featureId) => {
     const normalizedId = String(featureId || '');
     if (!normalizedId || !activeLayerFeatureIdSet.value.has(normalizedId)) return;
@@ -498,14 +516,16 @@ export function useGisMapCore(options = {}) {
       nextSet.add(normalizedId);
     }
 
-    setFeatureSelection([...nextSet], normalizedId);
+    const nextIds = [...nextSet];
+    setFeatureSelection(nextIds, getPreferredFeatureSelectionId(nextIds, normalizedId));
     currentMode.value = 'simple_select';
-    if (selectedFeatureIds.value.length > 1) {
-      editableMapRef?.value?.selectFeatures?.(selectedFeatureIds.value);
+    const mapFeatureIds = getSelectableFeatureSelectionIds(selectedFeatureIds.value);
+    if (selectedFeatureIds.value.length > 1 || mapFeatureIds.length !== selectedFeatureIds.value.length) {
+      editableMapRef?.value?.selectFeatures?.(mapFeatureIds);
       return;
     }
-    if (selectedFeatureId.value) {
-      editableMapRef?.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
+    if (mapFeatureIds[0]) {
+      editableMapRef?.value?.selectFeature?.(mapFeatureIds[0], { directEdit: false });
       return;
     }
     if (editableMapRef?.value?.selectFeatures) {
