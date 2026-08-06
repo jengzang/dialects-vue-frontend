@@ -282,10 +282,12 @@ function cssToken(name) {
   }
 
   &__status {
+    @include flex-center;
     position: absolute;
-    inset-block-start: 14px;
-    inset-inline-start: 14px;
+    inset: 0;
+    margin: auto;
     max-inline-size: 340px;
+    block-size: fit-content;
     padding: 8px 10px;
     border: 1px solid var(--border-glass);
     border-radius: var(--radius-sm2);
@@ -293,6 +295,7 @@ function cssToken(name) {
     color: var(--text-secondary);
     font-size: 13px;
     line-height: 1.5;
+    text-align: center;
     pointer-events: none;
   }
 }

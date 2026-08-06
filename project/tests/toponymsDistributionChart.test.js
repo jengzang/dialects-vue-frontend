@@ -15,14 +15,30 @@ describe('toponyms ECharts distribution chart', () => {
     const chart = readSource('src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue');
 
     expect(chart).toContain("import * as echarts from 'echarts'");
-    expect(chart).toContain("echarts.registerMap('toponyms-country'");
+    expect(chart).toContain('echarts.registerMap(COUNTRY_MAP_NAME');
     expect(chart).toContain("coordinateSystem: 'geo'");
     expect(chart).toContain("seriesType: 'scatter'");
     expect(chart).toContain('buildRiverLineSeriesData');
-    expect(chart).toContain('buildMapOverlaySeries');
+    expect(chart).toContain('buildBoundaryLineSeriesData');
+    expect(chart).toContain('buildBoundarySeries');
     expect(chart).toContain('buildRiverSeries');
     expect(chart).toContain('extractToponymPointFromChartParams');
     expect(chart).toContain("emit('select-point'");
+  });
+
+  it('keeps layer controls in a compact chart toolbar and status text centered over the chart', () => {
+    const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
+    const chart = readSource('src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue');
+    const layers = readSource('src/main/views/explore/villages/toponyms/ToponymLayerControls.vue');
+
+    expect(page).toContain('toponyms-page__chart-toolbar');
+    expect(page).toContain('<ToponymLayerControls');
+    expect(page.indexOf('<ToponymSearchBar')).toBeLessThan(page.indexOf('toponyms-page__chart-toolbar'));
+    expect(layers).toContain('toponym-layer-controls--compact');
+    expect(layers).toContain('class="toponym-layer-controls__toggle"');
+    expect(chart).toContain('inset: 0');
+    expect(chart).toContain('@include flex-center');
+    expect(chart).not.toContain('inset-block-start: 14px');
   });
 
   it('uses token-derived chart colors and cleans up ECharts lifecycle resources', () => {

@@ -49,6 +49,21 @@ describe('toponyms page shell', () => {
     expect(detailPanel).toContain("emit('request-official-detail')");
   });
 
+  it('uses a denser explore-tool layout with chart-first hierarchy and quiet inspector panels', () => {
+    const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
+    const searchBar = readSource('src/main/views/explore/villages/toponyms/ToponymSearchBar.vue');
+    const resultsPanel = readSource('src/main/views/explore/villages/toponyms/ToponymResultsPanel.vue');
+    const detailPanel = readSource('src/main/views/explore/villages/toponyms/ToponymDetailPanel.vue');
+
+    expect(page).toContain('toponyms-page__workspace');
+    expect(page).toContain('toponyms-page__chart-header');
+    expect(page).toContain('toponyms-page__stat-strip');
+    expect(searchBar).toContain('toponym-search-bar__hint');
+    expect(resultsPanel).toContain('toponym-results-panel__inspector');
+    expect(resultsPanel).toContain('toponym-results-panel__suggestion-note');
+    expect(detailPanel).toContain('toponym-detail-panel__source-label');
+  });
+
   it('keeps toponyms component styles scoped, tokenized, nested, and aspect-ratio responsive', () => {
     const files = [
       'src/main/views/explore/villages/toponyms/ToponymsPage.vue',

@@ -1,5 +1,5 @@
 <template>
-  <aside class="toponym-results-panel main-glass-panel">
+  <aside class="toponym-results-panel toponym-results-panel__inspector main-glass-panel">
     <div class="toponym-results-panel__inner main-glass-panel-inner">
       <section class="toponym-results-panel__summary">
         <h2>{{ t('villages.pages.toponyms.results.title') }}</h2>
@@ -44,7 +44,7 @@
         </p>
         <p
           v-else-if="!suggestions.length"
-          class="toponym-results-panel__muted"
+          class="toponym-results-panel__muted toponym-results-panel__suggestion-note"
         >
           {{ t('villages.pages.toponyms.suggestions.empty') }}
         </p>
@@ -159,9 +159,13 @@ const { t } = useI18n();
 .toponym-results-panel {
   min-inline-size: 320px;
 
+  &__inspector {
+    align-self: stretch;
+  }
+
   &__inner {
     @include flex-col;
-    gap: 16px;
+    gap: 14px;
     max-block-size: 68dvh;
     overflow: auto;
   }
@@ -179,7 +183,7 @@ const { t } = useI18n();
 
     h2 {
       color: var(--text-deep);
-      font-size: 18px;
+      font-size: 16px;
       line-height: 1.35;
     }
 
@@ -215,6 +219,10 @@ const { t } = useI18n();
     max-block-size: 132px;
     overflow: auto;
     padding-inline-end: 4px;
+  }
+
+  &__suggestion-note {
+    color: var(--text-tertiary);
   }
 
   &__chip {

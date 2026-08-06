@@ -12,6 +12,9 @@
         autocomplete="off"
         @input="emit('update:query', $event.target.value)"
       >
+      <small class="toponym-search-bar__hint">
+        {{ t('villages.pages.toponyms.search.placeholder') }}
+      </small>
     </label>
 
     <label class="toponym-search-bar__field">
@@ -142,6 +145,13 @@ function handleSubmit() {
     &--query {
       flex: 1 1 260px;
     }
+  }
+
+  &__hint {
+    @include text-truncate;
+    color: var(--text-tertiary);
+    font-size: 12px;
+    line-height: 1.4;
   }
 
   &__submit {

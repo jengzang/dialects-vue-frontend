@@ -15,18 +15,38 @@
           :loading="pointsLoading"
           @search="handleSearch"
         />
-        <ToponymLayerControls
-          :layer-state="layerState"
-          :loading-layers="loadingLayers"
-          :layer-errors="layerErrors"
-          @toggle-layer="handleToggleLayer"
-        />
       </div>
     </section>
 
-    <section class="toponyms-page__body">
+    <section class="toponyms-page__workspace">
       <div class="toponyms-page__chart main-glass-panel">
         <div class="toponyms-page__chart-inner main-glass-panel-inner">
+          <div class="toponyms-page__chart-header">
+            <div class="toponyms-page__stat-strip">
+              <span>{{ t('villages.pages.toponyms.chart.pointsSeries') }}</span>
+              <strong>{{ scatterData.length }}</strong>
+              <small v-if="hasSearched">
+                {{
+                  t('villages.pages.toponyms.results.count', {
+                    count: pointCount,
+                    shown: scatterData.length,
+                  })
+                }}
+              </small>
+              <small v-else>{{ t('villages.pages.toponyms.chart.searchFirst') }}</small>
+            </div>
+
+            <div class="toponyms-page__chart-toolbar">
+              <ToponymLayerControls
+                compact
+                :layer-state="layerState"
+                :loading-layers="loadingLayers"
+                :layer-errors="layerErrors"
+                @toggle-layer="handleToggleLayer"
+              />
+            </div>
+          </div>
+
           <ToponymDistributionChart
             :country-layer="countryLayer"
             :loaded-layers="loadedLayers"
@@ -381,7 +401,7 @@ async function handleToggleLayer({ key, visible }) {
     gap: 14px;
   }
 
-  &__body {
+  &__workspace {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 360px;
     gap: 16px;
@@ -393,7 +413,49 @@ async function handleToggleLayer({ key, visible }) {
   }
 
   &__chart-inner {
+    @include flex-col;
+    gap: 12px;
     min-block-size: 68dvh;
+  }
+
+  &__chart-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  &__stat-strip {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-inline-size: 0;
+
+    span,
+    small {
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    strong {
+      color: var(--text-deep);
+      font-size: 20px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    small {
+      @include text-truncate;
+      max-inline-size: 520px;
+    }
+  }
+
+  &__chart-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    min-inline-size: 0;
   }
 }
 
@@ -401,8 +463,16 @@ async function handleToggleLayer({ key, visible }) {
   .toponyms-page {
     padding: 14px;
 
-    &__body {
+    &__workspace {
       grid-template-columns: 1fr;
+    }
+
+    &__chart-header {
+      @include flex-col;
+    }
+
+    &__chart-toolbar {
+      justify-content: flex-start;
     }
 
     &__chart,

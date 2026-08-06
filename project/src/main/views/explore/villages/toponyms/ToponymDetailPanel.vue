@@ -2,6 +2,12 @@
   <section class="toponym-detail-panel">
     <div class="toponym-detail-panel__header">
       <h3>{{ t('villages.pages.toponyms.detail.title') }}</h3>
+      <small
+        v-if="localDetail"
+        class="toponym-detail-panel__source-label"
+      >
+        {{ t('villages.pages.toponyms.detail.name') }}
+      </small>
       <span v-if="selectedPoint">{{ selectedPoint.id }}</span>
     </div>
 
@@ -184,6 +190,12 @@ function formatCoordinates(coordinates) {
       color: var(--text-tertiary);
       font-size: 12px;
     }
+  }
+
+  &__source-label {
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.4;
   }
 
   &__empty,
