@@ -35,19 +35,25 @@ describe('toponyms ECharts distribution chart', () => {
     expect(chart).not.toContain('large: false');
   });
 
-  it('keeps layer controls in a compact chart toolbar and status text centered over the chart', () => {
+  it('keeps layer controls and point style config in a chart settings modal', () => {
     const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
     const chart = readSource('src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue');
     const layers = readSource('src/main/views/explore/villages/toponyms/ToponymLayerControls.vue');
 
-    expect(page).toContain('toponyms-page__chart-toolbar');
-    expect(page).toContain('<ToponymLayerControls');
-    expect(page.indexOf('<ToponymSearchBar')).toBeLessThan(page.indexOf('toponyms-page__chart-toolbar'));
-    expect(layers).toContain('toponym-layer-controls--compact');
+    expect(chart).toContain('<AppModal');
+    expect(chart).toContain('<ToponymLayerControls');
+    expect(page).toContain('⚙');
+    expect(page).toContain('openChartConfig');
+    expect(chart).toContain('POINT_SHAPE_OPTIONS');
+    expect(chart).toContain('pointConfig.size');
+    expect(chart).toContain('pointConfig.shape');
+    expect(chart).toContain('pointConfig.color');
+    expect(chart).toContain('pointConfig.backgroundColor');
     expect(layers).toContain('class="toponym-layer-controls__toggle"');
-    expect(chart).toContain('inset: 0');
+    expect(page).toContain(':loading-layers="loadingLayers"');
+    expect(page).toContain(':layer-errors="layerErrors"');
+    expect(page).not.toContain('toponyms-page__chart-toolbar');
     expect(chart).toContain('@include flex-center');
-    expect(chart).not.toContain('inset-block-start: 14px');
   });
 
   it('uses token-derived chart colors and cleans up ECharts lifecycle resources', () => {

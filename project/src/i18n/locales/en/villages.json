@@ -181,7 +181,14 @@
         "noDrawablePoints": "No drawable points.",
         "pointsSeries": "Matching points",
         "pointTooltip": "Click to query detailed village information",
-        "baseMapError": "Base map failed to load"
+        "baseMapError": "Base map failed to load",
+        "configAriaLabel": "Chart settings",
+        "configTitle": "Chart Settings",
+        "configPointStyle": "Point Style",
+        "configSize": "Size",
+        "configShape": "Shape",
+        "configColor": "Color",
+        "configBackground": "Background"
       },
       "results": {
         "title": "Results",

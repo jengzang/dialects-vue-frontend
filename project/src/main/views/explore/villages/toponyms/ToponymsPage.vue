@@ -12,7 +12,19 @@
           v-model:match-mode="matchMode"
           :loading="pointsLoading"
           @search="handleSearch"
-        />
+        >
+          <template #actions>
+            <button
+              class="main-glass-button"
+              type="button"
+              data-variant="secondary"
+              :aria-label="t('villages.pages.toponyms.chart.configAriaLabel')"
+              @click="openChartConfig"
+            >
+              ⚙
+            </button>
+          </template>
+        </ToponymSearchBar>
       </div>
     </section>
 
@@ -33,27 +45,21 @@
               </small>
               <small v-else>{{ t('villages.pages.toponyms.chart.searchFirst') }}</small>
             </div>
-
-            <div class="toponyms-page__chart-toolbar">
-              <ToponymLayerControls
-                compact
-                :layer-state="layerState"
-                :loading-layers="loadingLayers"
-                :layer-errors="layerErrors"
-                @toggle-layer="handleToggleLayer"
-              />
-            </div>
           </div>
 
           <ToponymDistributionChart
+            ref="chartRef"
             :country-layer="countryLayer"
             :loaded-layers="loadedLayers"
             :layer-state="layerState"
+            :loading-layers="loadingLayers"
+            :layer-errors="layerErrors"
             :scatter-data="scatterData"
             :loading="pointsLoading"
             :error="countryError || pointsError"
             :has-searched="hasSearched"
             @select-point="handleSelectPoint"
+            @toggle-layer="handleToggleLayer"
           />
         </div>
       </div>
@@ -121,7 +127,6 @@ import {
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue';
 import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js';
 import ToponymDetailPanel from './ToponymDetailPanel.vue';
-import ToponymLayerControls from './ToponymLayerControls.vue';
 import ToponymDistributionChart from './ToponymDistributionChart.vue';
 import ToponymResultsPanel from './ToponymResultsPanel.vue';
 import ToponymSearchBar from './ToponymSearchBar.vue';
@@ -131,6 +136,7 @@ import { getDefaultToponymsLayerState, loadToponymsGisAsset } from './toponymsGi
 const { t } = useI18n();
 const TOPONYM_NAME_TREE_PAGE_SIZE = 100;
 
+const chartRef = ref(null);
 const query = ref('');
 const matchMode = ref('prefix');
 const hasSearched = ref(false);
@@ -414,6 +420,12 @@ async function handleLocalDetailRequest() {
     if (requestId === detailsRequestId.value) {
       detailsLoading.value = false;
     }
+  }
+}
+
+function openChartConfig() {
+  if (chartRef.value?.showConfigModal !== undefined) {
+    chartRef.value.showConfigModal = true;
   }
 }
 

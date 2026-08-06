@@ -34,6 +34,7 @@
     >
       {{ loading ? t('villages.pages.toponyms.search.searching') : t('villages.pages.toponyms.search.submit') }}
     </button>
+    <slot name="actions" />
   </form>
 </template>
 

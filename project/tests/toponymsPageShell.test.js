@@ -41,13 +41,14 @@ describe('toponyms page shell', () => {
 
   it('uses dedicated shell components for horizontal search, optional layers, results, and details', () => {
     const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
+    const chart = readSource('src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue');
     const searchBar = readSource('src/main/views/explore/villages/toponyms/ToponymSearchBar.vue');
     const layerControls = readSource('src/main/views/explore/villages/toponyms/ToponymLayerControls.vue');
     const resultsPanel = readSource('src/main/views/explore/villages/toponyms/ToponymResultsPanel.vue');
     const detailPanel = readSource('src/main/views/explore/villages/toponyms/ToponymDetailPanel.vue');
 
     expect(page).toContain('<ToponymSearchBar');
-    expect(page).toContain('<ToponymLayerControls');
+    expect(chart).toContain('<ToponymLayerControls');
     expect(page).toContain('<ToponymResultsPanel');
     expect(page).toContain(':name-tree="nameTree"');
     expect(page).toContain(':name-tree-meta="nameTreeMeta"');

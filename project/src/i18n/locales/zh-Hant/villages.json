@@ -181,7 +181,14 @@
         "noDrawablePoints": "沒有可繪製點位。",
         "pointsSeries": "匹配點位",
         "pointTooltip": "點擊後可以查詢具體村莊資訊",
-        "baseMapError": "底圖加載失敗"
+        "baseMapError": "底圖加載失敗",
+        "configAriaLabel": "圖表設定",
+        "configTitle": "圖表設定",
+        "configPointStyle": "點位樣式",
+        "configSize": "大小",
+        "configShape": "形狀",
+        "configColor": "顏色",
+        "configBackground": "背景色"
       },
       "results": {
         "title": "結果",

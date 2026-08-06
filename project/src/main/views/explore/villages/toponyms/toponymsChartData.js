@@ -122,6 +122,30 @@ export function buildRiverLineSeriesData(geoJson) {
   return lines;
 }
 
+export function findNearestToponymPoint(data, target, tolerance) {
+  if (!Array.isArray(data) || !Array.isArray(target) || target.length < 2) return null;
+  const maxDist = Number(tolerance);
+  if (!Number.isFinite(maxDist) || maxDist <= 0) return null;
+
+  let best = null;
+  let bestDist = Infinity;
+
+  for (let i = 0; i < data.length; i++) {
+    const item = data[i];
+    const value = item?.value;
+    if (!Array.isArray(value) || value.length < 2) continue;
+    const dlng = Number(value[0]) - Number(target[0]);
+    const dlat = Number(value[1]) - Number(target[1]);
+    const dist = Math.sqrt(dlng * dlng + dlat * dlat);
+    if (dist <= maxDist && dist < bestDist) {
+      bestDist = dist;
+      best = { id: String(item.id || ''), coordinates: [Number(value[0]), Number(value[1])] };
+    }
+  }
+
+  return best;
+}
+
 export function getToponymPointExtent(scatterData = []) {
   const coordinates = (Array.isArray(scatterData) ? scatterData : [])
     .map((item) => (Array.isArray(item?.value) ? item.value.slice(0, 2) : null))
