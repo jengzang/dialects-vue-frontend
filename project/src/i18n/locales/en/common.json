@@ -12,7 +12,9 @@
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
-    "ok": "OK"
+    "ok": "OK",
+    "expand": "Expand",
+    "collapse": "Collapse"
   },
   "label": {
     "loading": "Loading...",

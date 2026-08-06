@@ -22,6 +22,9 @@
 
     <!-- Overview Tab -->
     <div v-if="currentTab === 'overview'">
+      <div class="settings-link" @click="$emit('goToSettings')">
+        {{ $t('auth.profile.goToSettings') }} →
+      </div>
       <!-- User Info Card -->
       <div class="user-profile-card">
         <!-- Avatar Header -->
@@ -157,6 +160,7 @@ defineEmits([
   'goToUserData',
   'goToUserRegions',
   'goToModifyProfile',
+  'goToSettings',
   'logout',
   'goToAdminPanel',
   'goToTableManager',
@@ -491,6 +495,27 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
 
   @media (max-aspect-ratio: 1/1) {
     padding: 12px 20px !important;
+  }
+}
+
+.settings-link {
+  max-width: 600px;
+  margin: 12px auto 6px;
+  padding-right: 4px;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  @media (min-aspect-ratio: 1/1) {
+    max-width: 650px;
   }
 }
 

@@ -36,7 +36,8 @@ const keepAliveViewNames = [
   'VillagesML',
   'YangChunSpoken',
   'YangChunVillages',
-  'YuBaoPage'
+  'YuBaoPage',
+  'VocabularyPage'
 ]
 
 </script>
@@ -77,9 +78,9 @@ $system-font:
 /* 内容区域 */
 .content-area {
   position: relative;
-  height: 88dvh;
   display: flex;
   justify-content: center;
+  width: 100%;
   padding: 10px 6px;
   padding-top: calc(7.5dvh - 15px);
   color: var(--text-deep);

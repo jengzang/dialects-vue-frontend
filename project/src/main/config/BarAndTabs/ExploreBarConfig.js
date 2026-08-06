@@ -220,12 +220,10 @@ export function useExploreBarConfig() {
             icon: '🌐',
             display: {
                 preset: 'compactDesktop',
-                overrides: {
-                    hideOnMobile: true
-                }
+                overrides: { mobileScroll: 'left', weightIconOnly: 0.4 }
             },
             navigation: {
-                defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
+                defaultTo: { path: withRouteLocale(route, '/menu/about/intro') }
             }
         }),
         charClass: createExploreTab({
@@ -285,13 +283,17 @@ export function useExploreBarConfig() {
             },
             navigation: {
                 defaultTo: { path: withRouteLocale(route, '/menu/villages') },
-                matchPages: ['gdVillages', 'gdVillagesTable', 'ycVillages', 'VillagesML'],
+                matchPages: ['toponyms', 'gdVillages', 'gdVillagesTable', 'ycVillages', 'VillagesML'],
+                activeMatchPaths: [
+                    withRouteLocale(route, '/explore/villages/table')
+                ],
                 rememberChild: true,
                 defaultChild: '/explore/villages/gd',
                 children: [
                     { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: withRouteLocale(route, '/explore/villages/ml') },
+                    { label: t('navigation.submenu.villages.toponyms'), icon: '🗺️', path: withRouteLocale(route, '/explore/villages/toponyms') },
                     { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
-                    { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
+                    // { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
                     { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/villages/yc') },
                     { label: t('navigation.submenu.villages.allVillages'), icon: '📋', path: withRouteLocale(route, '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }
                 ]

@@ -54,6 +54,9 @@
           </a>
         </RouterLink>
       </nav>
+      <div class="settings-icon-container" @click="goToSettings" :title="t('navigation.submenu.about.setting')">
+        ⚙️
+      </div>
       <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
         <NavAvatar />
       </div>
@@ -82,14 +85,19 @@
             <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
           </div>
         </div>
-        <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
-          <NavAvatar />
-        </div>
-        <div v-else class="logo-container mobile-login-button" @click="goToAuthPage">
-          <!-- 显示用户名或"登录" -->
-          <span class="login-text">
-            {{ t('navigation.login') }}
-          </span>
+        <div class="navbar-top-actions">
+          <div class="settings-icon-container" @click="goToSettings" :title="t('navigation.submenu.about.setting')">
+            ⚙️
+          </div>
+          <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
+            <NavAvatar />
+          </div>
+          <div v-else class="logo-container mobile-login-button" @click="goToAuthPage">
+            <!-- 显示用户名或"登录" -->
+            <span class="login-text">
+              {{ t('navigation.login') }}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -172,6 +180,7 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useTabTooltip } from '@/composables/bar/useTabTooltip.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { showSuccess } from '@/utils/ui/message.js'
 
 const faviconSrc = computed(() =>
   currentColorTheme.value === COLOR_THEME_GREEN
@@ -288,12 +297,20 @@ const goToAuthPage = () => {
   if (userStore.isAuthenticated) {
     router.push({ path: buildLocalePath(resolveRouteLocale(route), '/auth'), query: { view: 'profile' } })
   } else {
-    router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
+    router.push({
+      path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+      query: { redirect: route.fullPath },
+    })
   }
 }
 
 const toggleSidebar = () => {
   isSidebarVisible.value = !isSidebarVisible.value
+}
+
+const goToSettings = () => {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/settings'))
+  showSuccess(t('navigation.submenu.about.setting'))
 }
 </script>
 
@@ -553,6 +570,27 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
   margin-right: 10px;
 }
 
+.settings-icon-container {
+  @include flex-center;
+
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  margin-right: 2px;
+  font-size: 16px;
+  cursor: pointer;
+  user-select: none;
+  border-radius: var(--radius-full);
+  transition: all 0.3s ease;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+    background: rgba(var(--color-primary-rgb), 0.1);
+    transform: rotate(30deg);
+  }
+}
+
 /* 移动端导航布局 */
 .navbar-content {
   position: relative;
@@ -609,6 +647,11 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
   height: 5dvh;
   padding-inline: 12px;
   border-radius: 30px;
+}
+
+.navbar-top-actions {
+  display: flex;
+  align-items: center;
 }
 
 .navbar-top .avatar-container {

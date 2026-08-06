@@ -12,7 +12,9 @@
     "back": "返回",
     "next": "下一步",
     "previous": "上一步",
-    "ok": "好的"
+    "ok": "好的",
+    "expand": "展開",
+    "collapse": "收起"
   },
   "label": {
     "loading": "加載中...",
@@ -22,7 +24,9 @@
     "warning": "警告",
     "info": "提示",
     "today": "今日",
-    "totalVisits": "總訪問"
+    "totalVisits": "總訪問",
+    "yes": "是",
+    "no": "否"
   },
   "placeholder": {
     "input": "請輸入",

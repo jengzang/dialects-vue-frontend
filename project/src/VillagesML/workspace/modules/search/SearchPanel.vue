@@ -18,7 +18,7 @@
             type="text"
             class="search-input vml-char-input"
             placeholder="搜尋村名..."
-            @input="handleSearchInput"
+            @keyup.enter="handleSearch"
           />
         </div>
         <div class="vml-control-actions">
@@ -90,8 +90,6 @@ const localKeyword = ref(villagesMLStore.searchKeyword)
 const localFilters = ref({ ...villagesMLStore.searchFilters })
 const hasCounties = ref(true)  // 标记当前城市是否有区县
 
-let searchTimeout = null
-
 // Computed
 const hasFilters = computed(() => {
   return localFilters.value.city || localFilters.value.county || localFilters.value.township
@@ -120,13 +118,6 @@ const townshipParent = computed(() => {
 })
 
 // Methods
-const handleSearchInput = () => {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    handleSearch()
-  }, 300)
-}
-
 const handleSearch = () => {
   // console.log('[SearchPanel] handleSearch called with filters:', localFilters.value)
   villagesMLStore.searchKeyword = localKeyword.value

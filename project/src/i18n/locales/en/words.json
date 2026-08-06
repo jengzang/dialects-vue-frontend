@@ -15,16 +15,38 @@
     "tabs": {
       "label": "Vocabulary workflows",
       "list": "List",
+      "myEntries": "My Entries",
+      "allEntries": "All Entries",
       "upload": "Upload",
       "review": "Review",
       "locations": "Locations",
-      "manage": "Manage"
+      "manage": "Manage",
+      "query": "Query",
+      "contribute": "Contribute",
+      "uploadTab": "Upload",
+      "manageTab": "Manage"
+    },
+    "access": {
+      "loadingTitle": "Checking vocabulary access",
+      "loadingDesc": "Please wait while the current sign-in state is synced.",
+      "loginUploadTitle": "Sign in to upload vocabulary",
+      "loginUploadDesc": "Please log in to upload vocabulary and request edit permission from an administrator.",
+      "requestEditPermission": "Request Edit Permission",
+      "loginManageTitle": "Sign in to manage vocabulary",
+      "loginManageDesc": "Vocabulary management, location metadata, and operation logs require signing in.",
+      "noUploadPermissionTitle": "No vocabulary upload access",
+      "noUploadPermissionDesc": "This account does not have vocabulary edit or manage access. Please contact an administrator.",
+      "noManagePermissionTitle": "No vocabulary management access",
+      "noManagePermissionDesc": "This account does not have vocabulary edit or manage access. Please contact an administrator.",
+      "permissionLoadFailedTitle": "Failed to load vocabulary access",
+      "loginAction": "Sign in",
+      "backToList": "Back to vocabulary"
     },
     "search": {
       "label": "Search",
       "placeholder": "Search definition, headword, pronunciation, or detail",
-      "standardWordPlaceholder": "Filter map by standard word",
-      "locationPlaceholder": "Filter current results by location",
+      "standardWordPlaceholder": "Filter by standard word",
+      "locationPlaceholder": "Filter by location",
       "fieldCount": "{count} columns",
       "fields": {
         "all": "All content",
@@ -35,7 +57,12 @@
         "ipa": "Pronunciation",
         "notes": "Notes",
         "location": "Location"
-      }
+      },
+      "settings": "Settings",
+      "filterTitle": "Search Filter",
+      "standardWordFilterMode": "Map Standard Word Filter",
+      "singleSelect": "Single",
+      "multiSelect": "Multi"
     },
     "sort": {
       "label": "Sort",
@@ -49,6 +76,21 @@
       "card": "Cards",
       "table": "Table",
       "map": "Map"
+    },
+    "states": {
+      "loadingData": "Loading data...",
+      "loadingCards": "Loading cards...",
+      "loadingMore": "Load more",
+      "noData": "No vocabulary data",
+      "loadItemsFailed": "Failed to load vocabulary entries",
+      "loadMapFailed": "Failed to load vocabulary map points"
+    },
+    "pagination": {
+      "total": "{count} total",
+      "page": "Page {page}",
+      "pageSize": "Per page",
+      "previous": "Previous",
+      "next": "Next"
     },
     "columns": {
       "headword": "Headword",
@@ -71,8 +113,11 @@
     },
     "upload": {
       "title": "Upload Vocabulary",
+      "totalEntries": "{count} entries",
+      "totalLocations": "{count} locations",
       "desc": "Choose a table file, map vocabulary fields, then submit it for review.",
       "chooseFile": "Choose file",
+      "dropHint": "Click or drag Excel, CSV, TSV, Word files here",
       "previewAction": "Preview Import",
       "submit": "Submit Vocabulary",
       "previewTitle": "Vocabulary import preview",
@@ -88,6 +133,7 @@
       "permissionRequired": "This account does not have vocabulary upload permission.",
       "locationName": "Location Name",
       "locationNamePlaceholder": "Example: Xifeng",
+      "enterLocationInfo": "Enter Location Info",
       "coordinates": "Coordinates",
       "coordinatesPlaceholder": "Example: 106.7400,27.0900",
       "province": "Province",
@@ -105,19 +151,66 @@
         "docWhitespace": "Document whitespace",
         "docBracket": "Document brackets"
       },
-      "missingLocation": "Fill in location name and coordinates first.",
+      "missingLocation": "Fill in the location name and coordinates for the uploaded vocabulary.",
       "unsupportedFile": "Upload a supported vocabulary file (.xlsx, .xls, .csv, .tsv, .docx, .doc).",
       "previewFailed": "Vocabulary import preview failed",
+      "useYindianData": "Use Yindian data",
+      "mapPickerHint": "Click the map to pick coordinates",
+      "yindianNotFound": "No Yindian data found",
+      "yindianFilled": "Yindian data filled in",
+      "yindianFailed": "Failed to get Yindian data",
+      "yindianHint": "Enter the standard place name (traditional Chinese) from the Yindian archive to match",
       "success": "Upload complete. Imported {count} rows.",
-      "failed": "Upload failed"
+      "failed": "Upload failed",
+      "dataExample": "Data Example",
+      "fillStandardFromLocal": "Auto-fill Standard Word from Local Expression",
+      "fillStandardFromLocalHint": "Enabled: empty Standard Words will be auto-filled from Local Expressions. We recommend reviewing and correcting auto-filled Standard Words on the Manage page after upload — inconsistent Standard Words may affect map rendering.",
+      "downloadSample": "Download sample",
+      "formatHelp": "Format Help",
+      "formatHelpTitle": "Vocabulary Upload Format",
+      "formatHelpTable": {
+        "title": "Table Format",
+        "desc": "Supported files: .xlsx, .xls, .csv, .tsv",
+        "required": "Required columns:",
+        "colField": "Field",
+        "colAliases": "Auto-recognized column names",
+        "atLeastOne": "At least one required",
+        "note": "One record per row. Standard Word is required. Local Expression and IPA: at least one must be non-empty; the row is skipped if both are empty."
+      },
+      "formatHelpBracket": {
+        "title": "Document Bracket Format",
+        "desc": "Supported files: .docx, .doc, .txt. One record per row, with fields marked by brackets:",
+        "colSymbol": "Symbol",
+        "colMeaning": "Meaning",
+        "ipa": "IPA",
+        "notes": "Notes",
+        "localExpression": "Local Expression",
+        "standardWord": "Standard Word",
+        "remaining": "Remaining text outside brackets",
+        "note": "All three bracket types are optional, but after parsing each row, Standard Word is required, and at least one of Local Expression or IPA must be non-empty. Full-width and half-width brackets are both supported (() and （）)."
+      },
+      "formatHelpWhitespace": {
+        "title": "Document Whitespace Format",
+        "desc": "Supported files: .docx, .doc, .txt. One record per row, fields separated by spaces. Minimum 1 field (Local Expression); single-field rows work when \"Auto-fill Standard Word from Local Expression\" is enabled. Order: Standard Word, Local Expression, [IPA], [Notes...]",
+        "colPosition": "Position",
+        "colField": "Field",
+        "colRequired": "Required",
+        "note": "IPA must not contain spaces (e.g. ȵit2 tʰəu2 would be split into two fields). Use bracket or table format for IPA with spaces."
+      }
     },
     "locations": {
       "title": "Location Metadata",
       "desc": "Manage vocabulary location metadata within your permission scope.",
       "refresh": "Refresh locations",
       "save": "Save",
+      "empty": "No location metadata",
+      "loadFailed": "Failed to load vocabulary location metadata",
       "saveSuccess": "Location metadata saved.",
-      "saveFailed": "Failed to save location metadata"
+      "saveFailed": "Failed to save location metadata",
+      "filters": {
+        "userId": "User ID",
+        "locationName": "Location name"
+      }
     },
     "logs": {
       "title": "Operation Logs",
@@ -141,7 +234,17 @@
         "source": "Source",
         "table": "Table",
         "status": "Status",
-        "affectedRows": "Affected rows"
+        "affectedRows": "Affected rows",
+        "action": "Action",
+        "timestamp": "Time",
+        "payload": "Summary",
+        "rollback": "Rollback"
+      },
+      "relativeTime": {
+        "justNow": "just now",
+        "minutesAgo": "{n} min ago",
+        "hoursAgo": "{n} hr ago",
+        "daysAgo": "{n} days ago"
       },
       "payload": {
         "importedEntries": "Imported {count} entries",

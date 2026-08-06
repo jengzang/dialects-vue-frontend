@@ -25,13 +25,13 @@
           >
             {{ t('map.drawTab.voronoi.clearSelection') }}
           </button>
-          <CheckBox
-            class="scope-toggle-label summary-toggle-label"
-            :model-value="clipToNationalBorder"
-            @update:modelValue="emit('update:clip-to-national-border', $event)"
+          <button
+            class="scope-clip-btn summary-action-button"
+            type="button"
+            @click="emit('open-clip-boundary')"
           >
-            {{ t('map.drawTab.voronoi.clipToNationalBorder') }}
-          </CheckBox>
+            {{ clipBoundarySummary }}
+          </button>
         </div>
       </div>
 
@@ -89,16 +89,17 @@ defineProps({
   selectedCount: { type: Number, default: 0 },
   exportLimit: { type: Number, default: 20 },
   isSelectionFull: { type: Boolean, default: false },
-  clipToNationalBorder: { type: Boolean, default: false },
+  clipBoundaryConfig: { type: Object, default: () => ({ enabled: false, level: 'country', selectedNames: [] }) },
+  clipBoundarySummary: { type: String, default: '' },
   isExporting: { type: Boolean, default: false },
 })
 
 const emit = defineEmits([
   'update:modelValue',
-  'update:clip-to-national-border',
   'toggle-selection',
   'clear-selection',
   'confirm',
+  'open-clip-boundary',
 ])
 
 const { t } = useI18n()
@@ -165,11 +166,6 @@ function handleClose(value = false) {
     white-space: nowrap;
   }
 
-  .summary-toggle-label {
-    flex: 0 0 auto;
-    white-space: nowrap;
-  }
-
   .summary-label {
     font-size: 11px;
     color: $text-muted;
@@ -207,19 +203,6 @@ function handleClose(value = false) {
   }
 }
 
-.scope-toggle-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: $text-dark;
-
-  input {
-    margin: 0;
-    accent-color: $primary;
-  }
-}
-
 .scope-clear-btn {
   border: 1px solid rgba(var(--color-error-light-rgb), 0.28);
   background: var(--bg-error-light);
@@ -242,6 +225,24 @@ function handleClose(value = false) {
 
   &:active {
     transform: translateY(0);
+  }
+}
+
+.scope-clip-btn {
+  border: 1px solid var(--border-glass);
+  background: var(--surface-glass-button);
+  color: var(--text-deep);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 9px 14px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    background: var(--glass-60);
+    border-color: var(--border-control);
   }
 }
 

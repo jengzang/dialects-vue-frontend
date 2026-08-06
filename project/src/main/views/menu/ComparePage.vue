@@ -1322,7 +1322,10 @@ const runTab5Action = () => {
 
   if (!userStore.isAuthenticated) {
     showWarning(t('user.dataPage.messages.authRequired'))
-    router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
+    router.push({
+      path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+      query: { redirect: route.fullPath },
+    })
     return
   }
 

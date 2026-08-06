@@ -1,113 +1,25 @@
 <template>
   <div class="vocabulary-view-page">
-    <div class="top-controls">
-        <div class="search-container">
-          <div class="search-section">
-            <div class="input-wrapper">
-              <textarea
-                ref="searchInputEl"
-                v-model="query"
-                class="search-input"
-                rows="1"
-                :placeholder="t('words.wordList.search.placeholder')"
-              ></textarea>
-            </div>
-
-            <div class="field-filter">
-              <button
-                ref="searchFieldTriggerEl"
-                class="select-trigger global-select-trigger filter-select-trigger"
-                :class="{ 'is-open': searchFieldDropdownOpen }"
-                type="button"
-                @click="searchFieldDropdownOpen = !searchFieldDropdownOpen"
-              >
-                <span class="select-label">{{ searchFieldTriggerLabel }}</span>
-                <span class="select-arrow" aria-hidden="true">⌄</span>
-              </button>
-              <MultiSelectDropdown
-                v-if="searchFieldDropdownOpen"
-                v-model="selectedSearchFields"
-                :options="searchFieldOptions"
-                :trigger-el="searchFieldTriggerEl"
-                align="right"
-                direction="down"
-                @close="searchFieldDropdownOpen = false"
-              />
-            </div>
-          </div>
-
-          <div class="view-mode-selector">
-            <button
-              v-for="mode in viewModes"
-              :key="mode.key"
-              class="mode-btn"
-              :class="{ active: viewMode === mode.key }"
-              type="button"
-              :title="mode.label"
-              @click="setViewMode(mode.key)"
-            >
-              <span>{{ mode.label }}</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="filter-strip">
-          <div v-if="viewMode === 'map'" class="standard-word-filter">
-            <button
-              ref="standardWordTriggerEl"
-              class="select-trigger global-select-trigger standard-word-select-trigger"
-              :class="{ 'is-open': standardWordDropdownOpen, 'is-disabled': standardWordOptions.length === 0 }"
-              type="button"
-              :disabled="standardWordOptions.length === 0"
-              @click="standardWordDropdownOpen = !standardWordDropdownOpen"
-            >
-              <span class="select-label">{{ standardWordTriggerLabel }}</span>
-              <span class="select-arrow" aria-hidden="true">⌄</span>
-            </button>
-            <MultiSelectDropdown
-              v-if="standardWordDropdownOpen"
-              v-model="selectedStandardWords"
-              :options="standardWordOptions"
-              :trigger-el="standardWordTriggerEl"
-              align="left"
-              direction="down"
-              @close="standardWordDropdownOpen = false"
-            />
-          </div>
-
-          <div class="location-filter">
-            <button
-              ref="locationTriggerEl"
-              class="select-trigger global-select-trigger location-select-trigger"
-              :class="{ 'is-open': locationDropdownOpen, 'is-disabled': locationOptions.length === 0 }"
-              type="button"
-              :disabled="locationOptions.length === 0"
-              @click="locationDropdownOpen = !locationDropdownOpen"
-            >
-              <span class="select-label">{{ locationTriggerLabel }}</span>
-              <span class="select-arrow" aria-hidden="true">⌄</span>
-            </button>
-            <MultiSelectDropdown
-              v-if="locationDropdownOpen"
-              v-model="selectedLocations"
-              :options="locationOptions"
-              :trigger-el="locationTriggerEl"
-              align="left"
-              direction="down"
-              @close="locationDropdownOpen = false"
-            />
-          </div>
-        </div>
-
-    </div>
+    <VocabularyTopControls
+      v-model:query="query"
+      v-model:selected-search-fields="selectedSearchFields"
+      v-model:selected-locations="selectedLocations"
+      v-model:selected-standard-word="selectedStandardWord"
+      v-model:selected-standard-words="selectedStandardWordsModel"
+      v-model:single-select="singleSelect"
+      :view-mode="viewMode"
+      :search-field-options="searchFieldOptions"
+      :location-options="locationOptions"
+      :standard-word-options="standardWordOptions"
+    />
 
     <section v-if="viewMode !== 'table'" class="content-area">
-      <div v-if="isLoadingItems" class="loading-state loading-state-base">
+      <div v-if="isInitialLoading" class="loading-state loading-state-base">
         <div class="ui-loading--page" aria-hidden="true"></div>
-        <span>{{ t('words.yuBaoPage.states.loadingCards') }}</span>
+        <span>{{ t('words.wordList.states.loadingCards') }}</span>
       </div>
 
-      <div v-else-if="loadError" class="empty-state empty-state-base">
+      <div v-else-if="loadError && !entries.length" class="empty-state empty-state-base">
         <p>{{ loadError }}</p>
       </div>
 
@@ -128,19 +40,29 @@
             </div>
             <div class="card-row row-3">
               <span class="definition-text">{{ entry.definition }}</span>
-            </div>
-            <div class="card-row row-4">
+              <span
+                v-if="entry.definition && entry.detail"
+                class="card-dot-sep"
+                aria-hidden="true"
+              >·</span>
               <span class="memo-text">{{ entry.detail }}</span>
             </div>
           </article>
         </div>
         <div v-else class="empty-state empty-state-base">
-          <p>{{ t('words.yuBaoPage.states.noData') }}</p>
+          <p>{{ t('words.wordList.states.noData') }}</p>
         </div>
       </div>
 
-      <div v-else-if="viewMode === 'map'" class="map-mode main-glass-panel">
-        <div class="map-canvas-shell">
+      <div v-else-if="viewMode === 'map'" class="map-mode">
+        <div v-if="isInitialLoading" class="empty-state empty-state-base map-empty-state">
+          <div class="ui-loading--page" aria-hidden="true"></div>
+          <span>{{ t('words.wordList.states.loadingData') }}</span>
+        </div>
+        <div v-else-if="loadError && !mapDataForVocabularyMap.length" class="empty-state empty-state-base map-empty-state">
+          <p>{{ loadError }}</p>
+        </div>
+        <div v-else class="map-canvas-shell">
           <VocabularyMap
             v-if="mapDataForVocabularyMap.length"
             :map-data="mapDataForVocabularyMap"
@@ -149,7 +71,7 @@
             @marker-click="handleMapPointClick"
           />
           <div v-else class="empty-state empty-state-base map-empty-state">
-            <p>{{ t('words.yuBaoPage.states.noData') }}</p>
+            <p>{{ t('words.wordList.states.noData') }}</p>
           </div>
         </div>
       </div>
@@ -159,13 +81,20 @@
         class="load-more-btn main-glass-button"
         data-variant="secondary"
         type="button"
+        :disabled="isLoadingMore"
         @click="loadVocabularyItems({ append: true })"
       >
-        {{ t('words.yuBaoPage.states.loadingMore') }}
+        <template v-if="isLoadingMore">
+          <span class="btn-loading-dot" aria-hidden="true"></span>
+          {{ t('words.wordList.states.loadingData') }}
+        </template>
+        <template v-else>
+          {{ t('words.wordList.states.loadingMore') }}
+        </template>
       </button>
     </section>
 
-    <section v-else-if="viewMode === 'table'" class="content-area table-content-area">
+    <section v-else-if="viewMode === 'table'">
       <UniversalTable
         db-key="vocabulary"
         table-name="vocabulary_entries"
@@ -181,16 +110,16 @@
       width="720px"
       max-height="80dvh"
       :title="selectedMapPointLabel"
-      close-label="關閉"
+      :close-label="t('common.button.close')"
       @close="clearMapDetailModal"
     >
       <div class="map-detail-modal">
         <p class="map-meta" v-if="mapDetailEntries.length">
           {{ t('words.wordList.map.pointCount', { count: mapDetailEntries.length }) }}
         </p>
-        <div v-if="isLoadingMapDetail" class="loading-state loading-state-base">
+        <div v-if="isLoadingMapDetail && !mapDetailEntries.length" class="loading-state loading-state-base">
           <div class="ui-loading--page" aria-hidden="true"></div>
-          <span>{{ t('words.yuBaoPage.states.loadingData') }}</span>
+          <span>{{ t('words.wordList.states.loadingData') }}</span>
         </div>
         <div v-else-if="mapDetailError" class="empty-state empty-state-base">
           <p>{{ mapDetailError }}</p>
@@ -209,13 +138,20 @@
             class="load-more-btn main-glass-button"
             data-variant="secondary"
             type="button"
+            :disabled="isLoadingMapDetail"
             @click="loadMoreMapDetail"
           >
-            {{ t('words.yuBaoPage.states.loadingMore') }}
+            <template v-if="isLoadingMapDetail">
+              <span class="btn-loading-dot" aria-hidden="true"></span>
+              {{ t('words.wordList.states.loadingData') }}
+            </template>
+            <template v-else>
+              {{ t('words.wordList.states.loadingMore') }}
+            </template>
           </button>
         </div>
         <div v-else class="empty-state empty-state-base">
-          <p>{{ t('words.yuBaoPage.states.noData') }}</p>
+          <p>{{ t('words.wordList.states.noData') }}</p>
         </div>
       </div>
     </AppModal>
@@ -235,10 +171,10 @@ import {
   getVocabularyMapPoints,
   getVocabularyStandardWords
 } from '@/api'
-import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
+import VocabularyTopControls from './VocabularyTopControls.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -255,15 +191,16 @@ const query = ref('')
 const viewMode = ref(normalizeViewMode(route.query.tab))
 const selectedSearchFields = ref([])
 const selectedLocations = ref([])
-const selectedStandardWords = ref([])
+const selectedStandardWord = ref('')
+const singleSelect = ref(true)
+const selectedStandardWordsModel = ref([])
+const selectedStandardWords = computed(() => {
+  if (singleSelect.value) {
+    return selectedStandardWord.value ? [selectedStandardWord.value] : []
+  }
+  return selectedStandardWordsModel.value
+})
 const mapDisplayMode = ref('overview')
-const searchInputEl = ref(null)
-const searchFieldTriggerEl = ref(null)
-const locationTriggerEl = ref(null)
-const standardWordTriggerEl = ref(null)
-const searchFieldDropdownOpen = ref(false)
-const locationDropdownOpen = ref(false)
-const standardWordDropdownOpen = ref(false)
 const vocabularyLocationOptions = ref([])
 const vocabularyStandardWordOptions = ref([])
 const entries = ref([])
@@ -301,32 +238,18 @@ const locationOptions = computed(() => {
 })
 
 const standardWordOptions = computed(() => {
-  return vocabularyStandardWordOptions.value
-})
-
-const searchFieldTriggerLabel = computed(() => {
-  if (!selectedSearchFields.value.length) {
-    return t('words.wordList.search.fields.all')
+  if (!vocabularyStandardWordOptions.value.length) {
+    return []
   }
 
-  return formatMultiSelectLabel(selectedSearchFields.value, searchFieldOptions.value, t('words.wordList.search.fields.all'))
+  return [
+    { value: '', label: t('words.wordList.search.standardWordPlaceholder') },
+    ...vocabularyStandardWordOptions.value,
+  ]
 })
 
-const locationTriggerLabel = computed(() => {
-  return formatMultiSelectLabel(
-    selectedLocations.value,
-    locationOptions.value,
-    t('words.wordList.search.locationPlaceholder')
-  )
-})
-
-const standardWordTriggerLabel = computed(() => {
-  return formatMultiSelectLabel(
-    selectedStandardWords.value,
-    standardWordOptions.value,
-    t('words.wordList.search.standardWordPlaceholder')
-  )
-})
+const isInitialLoading = computed(() => isLoadingItems.value && !entries.value.length && !loadError.value)
+const isLoadingMore = computed(() => isLoadingItems.value && entries.value.length > 0)
 
 const canLoadMore = computed(() => {
   return shouldUseVocabularyItemsApi() && !isLoadingItems.value && entries.value.length < total.value
@@ -336,36 +259,26 @@ const canLoadMoreMapDetail = computed(() => {
   return !isLoadingMapDetail.value && mapDetailEntries.value.length < mapDetailTotal.value
 })
 
-const viewModes = computed(() => [
-  { key: 'card', icon: '▦', label: t('words.wordList.viewModes.card') },
-  { key: 'map', icon: '⌖', label: t('words.wordList.viewModes.map') },
-  { key: 'table', icon: '▤', label: t('words.wordList.viewModes.table') },
-])
-
 const tableColumns = computed(() => [
-  { key: 'standard_word', label: t('words.wordList.columns.definition'), filterable: false, width: 1.2 },
-  { key: 'local_expression', label: t('words.wordList.columns.headword'), filterable: false, width: 1 },
+  { key: 'standard_word', label: t('words.wordList.columns.definition'), filterable: true, width: 1.2 },
+  { key: 'local_expression', label: t('words.wordList.columns.headword'), filterable: true, width: 1 },
   { key: 'ipa', label: t('words.wordList.columns.pronunciation'), filterable: false, width: 1.2 },
   { key: 'notes', label: t('words.wordList.columns.detail'), filterable: false, width: 1.6 },
   { key: 'location_name', label: t('words.wordList.columns.location'), filterable: true, width: 1 },
-  { key: 'informations', label: t('words.wordList.columns.informations'), filterable: false, width: 1.2 },
-  { key: 'source_filename', label: t('words.wordList.columns.sourceFilename'), filterable: true, width: 1.2 }
 ])
 
 function normalizeViewMode(value) {
   return ['card', 'map', 'table'].includes(value) ? value : 'card'
 }
 
-function setViewMode(mode) {
-  const nextMode = normalizeViewMode(mode)
-  viewMode.value = nextMode
+watch(viewMode, (nextMode) => {
   router.replace({
     query: {
       ...route.query,
       tab: nextMode,
     }
   })
-}
+})
 
 const mapDataForVocabularyMap = computed(() => {
   return mapPoints.value
@@ -395,22 +308,6 @@ function shouldUseVocabularyMapPointsApi() {
 
 function shouldUseVocabularyMapItemsApi() {
   return viewMode.value === 'map' && selectedStandardWords.value.length > 0
-}
-
-function formatMultiSelectLabel(selectedValues, options, placeholder) {
-  const selectedLabels = selectedValues
-    .map((value) => options.find((option) => option.value === value)?.label || value)
-    .filter(Boolean)
-
-  if (!selectedLabels.length) {
-    return placeholder
-  }
-
-  if (selectedLabels.length === 1) {
-    return selectedLabels[0]
-  }
-
-  return `${selectedLabels[0]} +${selectedLabels.length - 1}`
 }
 
 function normalizeSelectedSearchFields() {
@@ -563,7 +460,7 @@ async function loadVocabularyItems({ append = false } = {}) {
     page.value = Number(response.page) || nextPage
     pageSize.value = Number(response.page_size) || pageSize.value
   } catch (error) {
-    loadError.value = error.message || '獲取詞表條目失敗'
+    loadError.value = error.message || t('words.wordList.states.loadItemsFailed')
     if (!append) {
       entries.value = []
       total.value = 0
@@ -597,7 +494,7 @@ async function loadVocabularyMapPoints() {
       omittedWithoutCoordinates: Number(response.omitted_without_coordinates) || 0,
     }
   } catch (error) {
-    loadError.value = error.message || '獲取詞表地圖點失敗'
+    loadError.value = error.message || t('words.wordList.states.loadMapFailed')
     mapPoints.value = []
     mapStats.value = {
       totalEntries: 0,
@@ -637,10 +534,13 @@ async function loadVocabularyStandardWords() {
       })
       .filter(Boolean)
     const optionValues = new Set(vocabularyStandardWordOptions.value.map((option) => option.value))
-    selectedStandardWords.value = selectedStandardWords.value.filter((value) => optionValues.has(value))
+    if (selectedStandardWord.value && !optionValues.has(selectedStandardWord.value)) {
+      selectedStandardWord.value = ''
+    }
+    selectedStandardWordsModel.value = selectedStandardWordsModel.value.filter((value) => optionValues.has(value))
   } catch {
     vocabularyStandardWordOptions.value = []
-    selectedStandardWords.value = []
+    selectedStandardWord.value = ''
   }
 }
 
@@ -695,7 +595,7 @@ async function handleMapPointClick(point) {
     mapDetailPage.value = Number(response.page) || 1
     selectedMapPointLabel.value = buildMapDetailTitle(baseLabel, mapDetailEntries.value.length)
   } catch (error) {
-    mapDetailError.value = error.message || '獲取詞表條目失敗'
+    mapDetailError.value = error.message || t('words.wordList.states.loadItemsFailed')
     mapDetailEntries.value = []
   } finally {
     isLoadingMapDetail.value = false
@@ -725,7 +625,7 @@ async function loadMoreMapDetail() {
     mapDetailPage.value = Number(response.page) || nextPage
     selectedMapPointLabel.value = buildMapDetailTitle(activeMapPointBaseLabel.value, mapDetailEntries.value.length)
   } catch (error) {
-    mapDetailError.value = error.message || '獲取詞表條目失敗'
+    mapDetailError.value = error.message || t('words.wordList.states.loadItemsFailed')
   } finally {
     isLoadingMapDetail.value = false
   }
@@ -776,6 +676,14 @@ watchDebounced([query, selectedSearchFields, selectedLocations], () => {
     loadVocabularyMapPoints()
   }
 }, { debounce: 250, maxWait: 800 })
+
+watch(singleSelect, (isSingle) => {
+  if (isSingle) {
+    selectedStandardWord.value = selectedStandardWordsModel.value[0] || ''
+  } else {
+    selectedStandardWordsModel.value = selectedStandardWord.value ? [selectedStandardWord.value] : []
+  }
+})
 
 watch(selectedStandardWords, (words) => {
   if (mapDisplayMode.value === 'overview' && words.length) {

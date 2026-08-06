@@ -529,7 +529,10 @@ const applyDemoData = async ({ syncLocations = locationQuery.value.length === 0 
 const handleQuery = async () => {
   if (!userStore.isAuthenticated) {
     showWarning(t('user.dataPage.messages.authRequired'))
-    router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
+    router.push({
+      path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+      query: { redirect: route.fullPath },
+    })
     return
   }
 

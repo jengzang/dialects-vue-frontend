@@ -107,7 +107,7 @@ $transition-text: 0.3s ease;
 .liquid-radio-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: 6px 24px;
   justify-content: center;
 }
 

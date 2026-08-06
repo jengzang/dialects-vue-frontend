@@ -25,7 +25,7 @@ The system SHALL provide the current about-page tabs for intro, suggestion, like
 
 #### Scenario: About settings tab is opened
 
-- WHEN a user opens `/menu/about/settings`
+- WHEN a user opens `/menu/settings`
 - THEN the system SHALL render the current settings content, including language switching
 
 ### Requirement: Intro route exposes the current standalone intro views

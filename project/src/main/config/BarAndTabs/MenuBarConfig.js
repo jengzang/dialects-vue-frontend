@@ -89,7 +89,7 @@ const MENU_CHILD_PATHS = {
   compare: ['/menu/compare/char', '/menu/compare/zhonggu', '/menu/compare/tone', '/menu/compare/phonetic'],
   map: ['/menu/map/view', '/menu/map/divide', '/menu/map/custom', '/menu/map/draw'],
   pho: ['/menu/pho/matrix', '/menu/pho/custom', '/menu/pho/count', '/menu/pho/evolution'],
-  about: ['/menu/about/intro', '/menu/about/suggestion', '/menu/about/like', '/menu/about/settings']
+  about: ['/menu/about/intro', '/menu/about/suggestion', '/menu/about/like']
 }
 
 function filterPlatformChildPaths(tabKey, paths) {
@@ -136,6 +136,7 @@ function getMenuTabKeyFromRoute(route) {
   if (normalizedPath === '/menu/result') return 'result'
   if (normalizedPath === '/menu/source') return 'source'
   if (normalizedPath === '/menu/privacy') return 'privacy'
+  if (normalizedPath === '/menu/settings') return 'setting'
   if (normalizedPath === '/menu/tools') return 'tools'
   if (normalizedPath === '/menu/words') return 'words'
   if (normalizedPath === '/menu/villages') return 'villages'
@@ -151,6 +152,18 @@ export function useMenuTabsConfig() {
   const route = useRoute()
 
   return computed(() => [
+    createMenuTab({
+      tab: 'setting',
+      label: t('navigation.tabs.settings'),
+      icon: '⚙️',
+      display: {
+        preset: 'compactDesktop',
+        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/settings') }
+      }
+    }),
     createMenuTab({
       tab: 'source',
       label: t('source.title'),
@@ -199,7 +212,7 @@ export function useMenuTabsConfig() {
         }
       },
       navigation: {
-        defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
+        defaultTo: { path: withRouteLocale(route, '/menu/about/intro') }
       }
     }),
     createMenuTab({
@@ -424,6 +437,11 @@ export function resolveMenuBarTarget(tabConfig) {
   const rememberedPath = readMenuBarMemory(tabConfig.navigation.tabKey)
   const childPaths = filterPlatformChildPaths(tabConfig.navigation.tabKey, MENU_CHILD_PATHS[tabConfig.navigation.tabKey] || [])
   if (!rememberedPath || !childPaths.includes(rememberedPath)) {
+    return tabConfig.to
+  }
+
+  const validPaths = MENU_CHILD_PATHS[tabConfig.navigation.tabKey]
+  if (validPaths && !validPaths.includes(rememberedPath)) {
     return tabConfig.to
   }
 

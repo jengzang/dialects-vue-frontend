@@ -456,7 +456,10 @@ const fetchData = async () => {
       showError(t('user.dataPage.messages.fetchFailed', { message: error.message }))
 
       if (error.message.includes('401') || error.message.includes('登錄') || error.message.includes('登录')) {
-        setTimeout(() => router.replace(buildLocalePath(resolveRouteLocale(route), '/auth')), 1500)
+        setTimeout(() => router.replace({
+          path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+          query: { redirect: route.fullPath },
+        }), 1500)
       }
     }
   })
@@ -736,13 +739,19 @@ const formatDate = (dateStr) => {
 }
 
 const goBack = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+    query: { redirect: route.fullPath },
+  })
 }
 
 onMounted(() => {
   if (!userStore.isAuthenticated) {
     showWarning(t('user.dataPage.messages.authRequired'))
-    router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
+    router.push({
+      path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+      query: { redirect: route.fullPath },
+    })
     return
   }
 

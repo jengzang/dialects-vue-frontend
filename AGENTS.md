@@ -92,6 +92,26 @@ This repository has strict collaboration and change-control rules. Read this bef
 - Do not assume partial coverage is enough when the user asks whether "all" places are handled.
 - If a style or layout change was not explicitly requested, avoid touching it.
 
+## 7.1 Responsive Design Conventions
+
+- Do NOT use width-based media queries (`max-width`, `min-width`) for responsive layout breakpoints.
+- Use `@media (max-aspect-ratio: 1 / 1)` to detect portrait/mobile orientation instead.
+- The project does not use pixel-based width breakpoints; aspect-ratio is the only accepted approach for responsive breakpoints.
+
+## 7.2 SCSS and Component Style Conventions
+
+- All component `<style>` blocks must use `<style scoped lang="scss">` with SCSS, never plain CSS.
+- Import the project mixins at the top of every component style block: `@use '@/styles/global/mixins' as *;`
+- Use available mixins instead of writing the raw CSS they abstract:
+  - `@include flex-center` — `display: flex; align-items: center; justify-content: center`
+  - `@include flex-col` — `display: flex; flex-direction: column`
+  - `@include text-truncate` — `overflow: hidden; text-overflow: ellipsis; white-space: nowrap`
+  - `@include disabled-state` — `opacity: 0.5; cursor: not-allowed`
+  - `@include glass-blur($blur, $saturation)` — backdrop-filter blur
+- Design tokens are CSS custom properties (`var(--xxx)`), defined in `src/styles/global/_tokens.scss`. Always use these instead of hardcoded colors or values.
+- Do not write raw `overflow: hidden; text-overflow: ellipsis; white-space: nowrap` — use `@include text-truncate`.
+- Do not write raw `display: flex; flex-direction: column` — use `@include flex-col`.
+
 ## 8. Git and Recovery
 
 - Never overwrite or revert unrelated user changes.

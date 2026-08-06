@@ -948,6 +948,7 @@ $panel-radius-portrait: 24px;.char-class-page {
 }
 
 .glass-input {
+  width: auto;
   padding: 11px 14px 11px 40px;
   color: $text-primary;
   background: var(--glass-30);

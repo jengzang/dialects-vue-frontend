@@ -52,6 +52,7 @@
       "ycSpoken": "陽春口語詞"
     },
     "villages": {
+      "toponyms": "自然村地名分佈",
       "gdVillages": "廣東自然村",
       "VillagesML": "機器學習",
       "gdVillagesTable": "廣東村莊表格",

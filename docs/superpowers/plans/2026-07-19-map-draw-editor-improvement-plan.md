@@ -8,6 +8,81 @@
 
 ---
 
+## 0. 当前执行进度
+
+截至当前分支 `codex/map-draw-editor-fixes`：
+
+| 阶段 | 状态 | 相关提交 | 说明 |
+| --- | --- | --- | --- |
+| Step 0 调研契约测试 | 已完成 | `85c6c04f` | 已建立 `mapDrawEditorContracts.test.js`，覆盖样式、历史、编辑入口等关键 wiring。 |
+| Step 1 图层隐藏稳定性 | 已完成 | `5233fd55` | Draw 启用 `userProperties`，活动图层隐藏通过样式过滤保持数据不丢。 |
+| Step 2 撤销/重做 | 已完成 | `b76c82d4`、`f39d071b` | 已有 undo/redo、快捷键、历史恢复状态防护和 layer id seed 恢复。 |
+| Step 3 显式编辑形状 | 已完成 | `8da76bdc` | 已暴露“编辑形状”入口，进入 Mapbox Draw `direct_select`。 |
+| Step 4 要素级属性编辑 | 已完成 | `0ddde93c` | 工具面板新增要素列表；选中要素时只改该 feature，未选中时保留图层级编辑。 |
+| 状态流测试加固 | 已完成 | `519399fa`、`59e89e8e` | 新增 `EditableMapLibre` 可执行状态流测试，覆盖面板选择不进 direct edit、隐藏/锁定不可 direct edit、属性同步不重复提交 history；程序化多选不再被异步 `selectionchange` 压回单选。 |
+| Step 6 底图切换生命周期 | 已完成 | `9ff38a12` | `EditableMapLibre` 监听 `style.load`，在底图样式重载后恢复 Draw 数据、readonly layers 和 preview layers，且不触发 history/data-change 事件。 |
+| Step 7 图层管理易用性 | 已完成本轮 | `a3b10d90`、`9e0f5a92`、`43d828a4`、`91c5321f`、`7744c532`、`0e44785b`、`bc8bc098`、`eb1ab82c`、`add2e4fe`、`896b0633`、`e6d7360b`、`52214be3` | 已支持复制图层、复制选中要素、删除图层确认、图层行显示几何/要素数/显示锁定状态、图层行内重命名、重命名失焦保存、选中要素移动到同类型可编辑图层、要素列表勾选多选、批量删除、批量移动到兼容图层、批量显隐和批量锁定/解锁；批量移动和显示/解锁会在内部同步 Draw 数据时保留多选状态，并阻止隐藏或锁定活动图层继续绘制/删除/清空。 |
+| 数据表格与批量名称编辑 | 已完成 | `cdf19bf2` | 工具面板新增活动图层要素数据表，可直接编辑要素名称；勾选要素可一次性应用批量名称，并作为一条历史记录撤销；隐藏或锁定活动图层时表格编辑也会被拦截。 |
+| 数据表格与业务字段编辑 | 已完成 | `136e56b2` | 活动图层数据表会推断业务字段列，可逐格编辑要素业务属性；勾选要素可批量应用指定字段值并进入历史；`user_id` 这类业务字段不再被误判为 Draw 内部样式字段；切换图层后失效字段会禁用批量输入和应用按钮。 |
+| 选择能力补强 | 已完成 | `4525e921`、`011baf88`、`b712d1db`、`457081d8`、`d4988acb`、`d9faa1cc`、`7548a5ed` | 已支持全选可编辑、反选可编辑、清空勾选和地图框选；框选只选择当前活动图层中可见且未锁定的要素，完成后退出框选模式，并通过覆盖层拦截鼠标事件，避免与 Mapbox Draw 拖拽编辑冲突。框选支持 Shift 追加、Alt/Option 减选；Mapbox Draw 原生多选会同步到工具面板，并过滤隐藏或锁定要素后回写地图内部选择；`Ctrl/Cmd+A` 可选择当前活动图层可编辑要素，`Escape` 可清空选择并退出框选，`Delete/Backspace` 可删除当前选中几何，且输入框内不拦截快捷键。 |
+| 几何编辑可发现性 | 已完成 | `903e800d` | 自定义 Draw 样式恢复显示 midpoint 手柄，使线/面在 `direct_select` 中可以看到边中点入口，便于点击边新增顶点后调整边界。 |
+| 导入数据质量诊断基础 | 已完成 | `9414eed6` | 导入 GeoJSON/KML/KMZ/CSV 时会在标准化前统计重复 ID、空几何、不支持几何、异常坐标；成功导入后通过 warning 汇总提示。CSV 被过滤的无效/空坐标行和 GeometryCollection 内被跳过的不支持子几何也会计入诊断。 |
+| Step 8 未保存保护与自动草稿恢复 | 已完成 | `9fc8103d`、`5b08e48a` | 自动草稿记录从手动草稿列表隐藏；页面打开时提示恢复未保存草稿；工作台变脏时自动保存；离开页面前提示；手动保存、更新或恢复本地草稿后清理隐藏自动草稿，并等待并发自动写入完成。 |
+| Step 9 导入导出数据清洁 | 部分完成 | `3e709c8f`、`f9ac43f4` | `normalizeFeatureCollection()` 不再为导入/导出 round-trip 强制新增或覆盖 `updatedAt`；GeoJSON 导出会剥离自动补齐的默认绘图样式字段，同时保留业务字段和非默认样式。 |
+
+已验证命令：
+
+- `npm test -- editableMapLibreStateFlow.test.js mapDrawEditorContracts.test.js tests/utils/drawMap/history.test.js`
+- `npx eslint src/main/components/map/EditableMapLibre.vue tests/editableMapLibreStateFlow.test.js --quiet`
+- `npm test -- mapDrawTabDraftSafety.test.js tests/utils/drawMap/draftStorage.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js`
+- `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/utils/drawMap/draftStorage.js tests/mapDrawTabDraftSafety.test.js tests/utils/drawMap/draftStorage.test.js --quiet`
+- `node -e "JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-CN/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-Hant/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/en/map.json','utf8')); console.log('ok')"`
+- `npm test -- tests/utils/drawMap/export.test.js`
+- `npm test -- tests/utils/drawMap/export.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js mapDrawTabDraftSafety.test.js tests/utils/drawMap/history.test.js tests/utils/drawMap/draftStorage.test.js`
+- `npx eslint src/main/utils/drawMap/export.js tests/utils/drawMap/export.test.js --quiet`
+- `npm test -- mapDrawTabDraftSafety.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js tests/utils/drawMap/draftStorage.test.js tests/utils/drawMap/export.test.js`
+- `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/components/map/Draw/panels/MapDrawToolsPanel.vue src/main/components/map/EditableMapLibre.vue tests/mapDrawTabDraftSafety.test.js tests/mapDrawEditorContracts.test.js tests/editableMapLibreStateFlow.test.js --quiet`
+- `npm test -- mapDrawTabDraftSafety.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js tests/utils/drawMap/draftStorage.test.js tests/utils/drawMap/export.test.js`
+- `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/components/map/Draw/panels/MapDrawToolsPanel.vue src/main/components/map/Draw/panels/panelShared.scss src/main/components/map/EditableMapLibre.vue tests/mapDrawTabDraftSafety.test.js tests/mapDrawEditorContracts.test.js tests/editableMapLibreStateFlow.test.js --quiet`
+- `node -e "JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-CN/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-Hant/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/en/map.json','utf8')); console.log('ok')"`
+- `git diff --check`
+- `npm run build`
+- `npm test -- mapDrawTabDraftSafety.test.js -t "Delete and Backspace|shortcuts when the active layer is hidden or locked|Delete while focus"`
+- `npm test -- editableMapLibreStateFlow.test.js mapDrawTabDraftSafety.test.js -t "naturally selected|natural map multi-selection"`
+- `npm test -- mapDrawTabDraftSafety.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js tests/utils/drawMap/draftStorage.test.js tests/utils/drawMap/export.test.js`
+- `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/components/map/EditableMapLibre.vue tests/mapDrawTabDraftSafety.test.js tests/mapDrawEditorContracts.test.js tests/editableMapLibreStateFlow.test.js --quiet`
+- `git diff --check`
+- `npm run build`
+- `npm test -- mapDrawTabDraftSafety.test.js -t "drops hidden and locked features"`
+- `npm test -- mapDrawTabDraftSafety.test.js -t "natural map multi-selection|drops hidden and locked features|ignores hidden feature selection|select-all harmless"`
+- `npm test -- mapDrawTabDraftSafety.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js tests/utils/drawMap/draftStorage.test.js tests/utils/drawMap/export.test.js`
+- `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/components/map/EditableMapLibre.vue tests/mapDrawTabDraftSafety.test.js tests/mapDrawEditorContracts.test.js tests/editableMapLibreStateFlow.test.js --quiet`
+- `git diff --check`
+- `npm run build`
+- `npm test -- mapDrawTabDraftSafety.test.js -t "does not edit feature names"`
+- `npm test -- mapDrawTabDraftSafety.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js tests/utils/drawMap/draftStorage.test.js tests/utils/drawMap/export.test.js`
+- `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/components/map/Draw/panels/MapDrawToolsPanel.vue src/main/components/map/Draw/panels/panelShared.scss src/main/components/map/EditableMapLibre.vue tests/mapDrawTabDraftSafety.test.js tests/mapDrawEditorContracts.test.js tests/editableMapLibreStateFlow.test.js --quiet`
+- `node -e "JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-CN/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-Hant/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/en/map.json','utf8')); console.log('ok')"`
+- `git diff --check`
+- `npm run build`
+- `npm test -- mapDrawTabDraftSafety.test.js -t "business properties"`
+- `npm test -- mapDrawTabDraftSafety.test.js -t "stale after switching layers"`
+- `npm test -- mapDrawTabDraftSafety.test.js mapDrawEditorContracts.test.js editableMapLibreStateFlow.test.js tests/utils/drawMap/history.test.js tests/utils/drawMap/draftStorage.test.js tests/utils/drawMap/export.test.js`
+- `npx eslint src/main/components/map/Tabs/MapDrawTab.vue src/main/components/map/Draw/panels/MapDrawToolsPanel.vue src/main/components/map/Draw/panels/panelShared.scss src/main/components/map/EditableMapLibre.vue tests/mapDrawTabDraftSafety.test.js tests/mapDrawEditorContracts.test.js tests/editableMapLibreStateFlow.test.js --quiet`
+- `node -e "JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-CN/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/zh-Hant/map.json','utf8')); JSON.parse(require('fs').readFileSync('src/i18n/locales/en/map.json','utf8')); console.log('ok')"`
+- `git diff --check`
+- `npm run build`
+
+下一批建议按“小步提交”继续推进：
+
+1. 继续选择与几何主线：补充键盘辅助选择、点选/框选追加选择、顶点删除提示，以及可撤销的几何编辑回归测试。
+2. 继续导入诊断：把当前 warning 摘要升级为可展开诊断面板，显示被改名 ID、跳过的行号/要素序号和几何类型。
+3. 继续数据质量：增加坐标范围、空字段、重复名称、字段类型/schema、列显示控制和字段校验。
+4. 再做 Step 5，将 layer mutation 逐步集中为工具函数；这一步会改变内部结构，应拆成多个小提交并先确认结构边界。
+5. 最后评估高阶几何能力：吸附、矩形/圆、切割、拆分、合并、自定义模式或 Terra Draw 迁移。
+
+---
+
 ## 1. GitHub 成熟项目调研结论
 
 ### 1.1 参考项目
@@ -132,7 +207,9 @@
 
 ---
 
-## 3. 当前明确缺失的能力
+## 3. 原始调研缺失与当前差距
+
+3.1 和 3.2 保留最初调研时确认的缺失项，方便追溯这些问题为什么要修；3.3 是截至当前分支最新提交后的真实剩余差距。
 
 ### 3.1 P0/P1 缺失
 
@@ -176,6 +253,40 @@
 5. **自动草稿/未保存提示**
    - 现在是手动本地草稿。
    - 没有 dirty 状态、离开页面提醒、自动保存恢复。
+
+### 3.3 截至 `136e56b2` 的真实剩余差距
+
+这一分支已经补齐了第一轮图层状态、撤销重做、显式形状编辑、要素列表、多选批量操作、自动草稿恢复、导出字段清洁、以及要素数据表业务字段编辑。和成熟 GIS 绘图工具相比，当前主要还差这些能力：
+
+1. **几何编辑深度**
+   - 缺少 snapping、共享边 pinning、拓扑约束。
+   - 缺少切割、拆分、合并、洞编辑、旋转、缩放。
+   - 缺少矩形、圆、自由绘制等高频快捷几何。
+
+2. **数据表格成熟度**
+   - 已能编辑名称和业务字段，但还没有排序、筛选、搜索、列显示控制。
+   - 还没有字段 schema、字段类型、枚举值、数字/布尔/日期编辑器。
+   - 批量编辑仍是文本值写入，缺少字段校验和错误提示。
+
+3. **选择与空间查询**
+   - 还没有框选、套索选择、按属性选择、按空间关系选择。
+   - 还没有“只选择可见/未锁定要素”的高级筛选入口。
+
+4. **数据质量与拓扑检查**
+   - 还没有自相交、多边形闭合、重复点、空几何、坐标越界等校验。
+   - 还没有自动修复或导入前诊断报告。
+
+5. **坐标参考与导入诊断**
+   - 当前主要围绕 WGS84 GeoJSON 使用。
+   - CSV/KML/KMZ 已可导入，但还缺字段识别确认、CRS/投影提示、失败行明细。
+
+6. **大数据性能**
+   - 当前更像中小规模工作台。
+   - 成熟 GIS 通常需要表格虚拟滚动、地图要素抽稀/聚合、分块渲染、批量操作进度反馈。
+
+7. **协作与版本化**
+   - 当前是本地草稿和前端历史栈。
+   - 成熟产品通常有多人协作、变更审计、版本比较、冲突处理、权限模型。
 
 ---
 
@@ -554,13 +665,14 @@
 
 ### Step 6：底图切换和绘制层生命周期加固
 
+**当前状态：** 已完成，提交 `9ff38a12`。
+
 **目标：** 底图切换后所有绘制层、预览层、hover、选中态可恢复。
 
 **文件：**
 
 - 修改：`project/src/main/components/map/EditableMapLibre.vue`
-- 可能修改：`project/src/main/components/map/Draw/modals/MapDrawImagePreviewModal.vue`
-- 修改测试：`project/tests/mapDrawEditorContracts.test.js`
+- 修改测试：`project/tests/editableMapLibreStateFlow.test.js`
 
 **做法：**
 
@@ -571,9 +683,9 @@
 
 **验收：**
 
-- 创建两个图层，隐藏一个，切换底图后隐藏状态不丢。
-- Voronoi 预览后切换底图，预览层恢复或明确清空并提示，不出现半挂状态。
-- 图片导出预览底图切换不报错。
+- 创建两个图层，隐藏一个，切换底图后 hidden readonly layer 的 source/layer 可恢复。
+- Voronoi 预览层切换底图后 preview source/layer 可恢复，不出现半挂状态。
+- 底图切换恢复 Draw/readonly/preview 图层时不触发 `before-features-change` 或 `features-change`，不会制造撤销历史。
 
 **提交建议：**
 
@@ -600,6 +712,7 @@
 3. 删除图层前确认。
 4. hidden layer 禁止成为误编辑目标；如果隐藏 active layer，自动退回 simple_select 并清空选中态。
 5. locked layer 若为 active，允许查看但不允许进入 draw/direct_select。
+6. 要素列表支持复选框多选，已勾选要素可以一次性批量删除，并进入同一次 history 变更。
 
 **验收：**
 
@@ -611,7 +724,43 @@
 
 - `feat: improve map draw layer management`
 
-### Step 8：导入导出数据清洁
+### Step 8：未保存保护与自动草稿恢复
+
+**目标：** 降低刷新、关闭页面、误离开页面时丢失绘制工作的风险。
+
+**文件：**
+
+- 修改：`project/src/main/components/map/Tabs/MapDrawTab.vue`
+- 修改：`project/src/main/utils/drawMap/draftStorage.js`
+- 修改 locale 三套 map.json。
+- 修改相关测试。
+
+**已完成做法：**
+
+1. 增加隐藏自动草稿记录，不在手动草稿列表展示。
+2. 用稳定签名判断工作台 dirty 状态。
+3. 页面挂载时检查自动草稿；与当前工作台不同时提示恢复，用户拒绝或恢复完成后删除隐藏草稿。
+4. 工作台变化后自动保存隐藏草稿。
+5. `beforeunload` 时提示未保存风险，并触发最后一次自动草稿保存。
+6. 手动保存、更新、恢复本地草稿后标记工作台为干净，并等待所有并发自动草稿写入完成后删除隐藏自动草稿。
+
+**验收：**
+
+- 未保存绘制内容刷新后可提示恢复。
+- 手动本地草稿列表不显示自动草稿。
+- 保存本地草稿后不会下次再弹出同一份“未保存草稿”。
+- 并发自动草稿写入不会在清理后把旧自动草稿写回。
+
+**已知残余风险：**
+
+- 浏览器不会保证等待 `beforeunload` 内的异步 IndexedDB 写入完成；当前策略依赖编辑过程中的自动保存作为主保护，`beforeunload` 保存只作为兜底。
+
+**提交：**
+
+- `9fc8103d feat: add map draw auto draft helpers`
+- `5b08e48a feat: protect map draw unsaved drafts`
+
+### Step 9：导入导出数据清洁
 
 **目标：** 不让 normalize 产生不必要的字段噪声。
 
@@ -630,6 +779,11 @@
 3. 仅在用户真实编辑 feature 时写入更新时间；如果当前没有业务需要，可移除导出时强制写 `updatedAt` 的行为。
 4. 导出时保留原始业务字段，不把 UI 内部字段无脑覆盖外部字段。
 
+**已完成：**
+
+- `3e709c8f` 已完成第 2 点：`normalizeFeatureCollection()` 不再强制新增或覆盖 `updatedAt`，并新增工具层回归测试覆盖“缺失时不新增、已有时保留”。
+- `f9ac43f4` 已完成第 1/4 点的低风险部分：`serializeFeatureCollectionForExport()` 独立承载导出序列化，并在导出时移除自动补齐的默认绘图样式字段；非默认样式、业务字段和 feature id 会保留。
+
 **验收：**
 
 - 导入后立即导出，不应出现每次不同的 `updatedAt`。
@@ -639,15 +793,16 @@
 **提交建议：**
 
 - `fix: reduce map draw export property churn`
+- 已提交：`fix: clean default map draw export properties`
 
-### Step 9：可选增强评估
+### Step 10：可选增强评估
 
 **目标：** 在核心体验稳定后再决定是否扩展复杂编辑能力。
 
 候选方向：
 
 1. **继续 Mapbox Draw custom modes**
-   - 矩形、圆、cut/split polygon、snapping、rotate/scale。
+   - 优先验证点/边级几何编辑能力：顶点删除提示、面边插入回归、可行的 snapping；再评估矩形、圆、cut/split polygon、rotate/scale。
    - 优点：沿用当前技术栈。
    - 缺点：第三方 custom modes 质量不一，需要逐个验证。
 

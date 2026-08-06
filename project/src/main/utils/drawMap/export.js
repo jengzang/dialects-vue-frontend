@@ -15,6 +15,7 @@ const DEFAULT_FEATURE_PROPERTIES = {
   visible: true,
   locked: false,
 }
+const DRAW_STYLE_EXPORT_DEFAULT_KEYS = Object.keys(DEFAULT_FEATURE_PROPERTIES)
 
 const SUPPORTED_DRAW_GEOMETRY_TYPES = ['Point', 'LineString', 'Polygon']
 const CSV_LONGITUDE_KEYS = ['lng', 'lon', 'long', 'longitude', 'x', '经度']
@@ -172,17 +173,27 @@ function parseCsvText(text) {
     throw new Error('CSV must include longitude/lng and latitude/lat columns')
   }
 
+  let invalidCoordinateFeatureCount = 0
   const features = lines
     .slice(1)
     .map((line) => parseCsvRow(line))
     .map((values, rowIndex) => {
-      const lng = Number(values[lngIndex])
-      const lat = Number(values[latIndex])
+      const rawLng = values[lngIndex]
+      const rawLat = values[latIndex]
+      if (!String(rawLng ?? '').trim() || !String(rawLat ?? '').trim()) {
+        invalidCoordinateFeatureCount += 1
+        return null
+      }
+
+      const lng = Number(rawLng)
+      const lat = Number(rawLat)
 
       if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
+        invalidCoordinateFeatureCount += 1
         return null
       }
       if (Math.abs(lng) > 180 || Math.abs(lat) > 90) {
+        invalidCoordinateFeatureCount += 1
         return null
       }
 
@@ -211,7 +222,12 @@ function parseCsvText(text) {
     throw new Error('CSV did not contain any valid coordinates')
   }
 
-  return buildFeatureCollection(features)
+  return {
+    ...buildFeatureCollection(features),
+    importDiagnostics: {
+      invalidCoordinateFeatureCount,
+    },
+  }
 }
 
 function expandFeatureByGeometry(feature, geometry = feature?.geometry, context = {}) {
@@ -270,6 +286,92 @@ function expandFeatureByGeometry(feature, geometry = feature?.geometry, context 
   }
 }
 
+function collectCoordinatePairs(coordinates, pairs = []) {
+  if (!Array.isArray(coordinates)) return pairs
+  const longitude = coordinates[0]
+  const latitude = coordinates[1]
+  if (typeof longitude === 'number' && typeof latitude === 'number') {
+    pairs.push([longitude, latitude])
+    return pairs
+  }
+  coordinates.forEach((item) => collectCoordinatePairs(item, pairs))
+  return pairs
+}
+
+function hasInvalidCoordinates(geometry) {
+  if (!geometry?.type) return false
+  if (geometry.type === 'GeometryCollection') {
+    return (geometry.geometries ?? []).some(hasInvalidCoordinates)
+  }
+  const coordinatePairs = collectCoordinatePairs(geometry.coordinates)
+  if (SUPPORTED_DRAW_GEOMETRY_TYPES.includes(geometry.type) && coordinatePairs.length === 0) {
+    return true
+  }
+  return coordinatePairs.some(([longitude, latitude]) => {
+    return !Number.isFinite(longitude)
+      || !Number.isFinite(latitude)
+      || Math.abs(longitude) > 180
+      || Math.abs(latitude) > 90
+  })
+}
+
+function countUnsupportedGeometryParts(geometry) {
+  if (!geometry?.type) return 0
+  if (geometry.type === 'GeometryCollection') {
+    return (geometry.geometries ?? [])
+      .reduce((count, nestedGeometry) => count + countUnsupportedGeometryParts(nestedGeometry), 0)
+  }
+  return expandFeatureByGeometry({ type: 'Feature', properties: {}, geometry }).length > 0 ? 0 : 1
+}
+
+export function analyzeFeatureCollectionQuality(featureCollection, extraDiagnostics = {}) {
+  const features = ensureFeatureCollection(featureCollection).features
+    .filter((feature) => feature && typeof feature === 'object')
+  const seenFeatureIds = new Set()
+  const duplicateFeatureIds = new Set()
+  let emptyGeometryCount = 0
+  let unsupportedGeometryCount = 0
+  let invalidCoordinateFeatureCount = Number(extraDiagnostics.invalidCoordinateFeatureCount) || 0
+
+  features.forEach((feature) => {
+    const rawFeatureId = feature.id ?? feature.properties?.id
+    if (rawFeatureId !== undefined && rawFeatureId !== null && String(rawFeatureId)) {
+      const featureId = String(rawFeatureId)
+      if (seenFeatureIds.has(featureId)) {
+        duplicateFeatureIds.add(featureId)
+      }
+      seenFeatureIds.add(featureId)
+    }
+
+    if (!feature.geometry?.type) {
+      emptyGeometryCount += 1
+      return
+    }
+    unsupportedGeometryCount += countUnsupportedGeometryParts(feature.geometry)
+    if (hasInvalidCoordinates(feature.geometry)) {
+      invalidCoordinateFeatureCount += 1
+    }
+  })
+
+  return {
+    totalFeatureCount: features.length,
+    duplicateFeatureIdCount: duplicateFeatureIds.size,
+    duplicateFeatureIds: [...duplicateFeatureIds],
+    emptyGeometryCount,
+    unsupportedGeometryCount,
+    invalidCoordinateFeatureCount,
+    hasIssues: duplicateFeatureIds.size > 0
+      || emptyGeometryCount > 0
+      || unsupportedGeometryCount > 0
+      || invalidCoordinateFeatureCount > 0,
+  }
+}
+
+function normalizeImportedFeatureCollection(featureCollection, options = {}) {
+  options.onDiagnostics?.(analyzeFeatureCollectionQuality(featureCollection, featureCollection?.importDiagnostics))
+  return normalizeFeatureCollection(featureCollection)
+}
+
 function inferImportFormat(file) {
   const fileName = file?.name?.toLowerCase?.() ?? ''
   const fileType = file?.type?.toLowerCase?.() ?? ''
@@ -284,6 +386,30 @@ function inferImportFormat(file) {
     return 'csv'
   }
   return 'geojson'
+}
+
+function getDefaultDrawProperties(index) {
+  const [stroke, pointColor] = pickDrawColor(index)
+  return {
+    ...DEFAULT_FEATURE_PROPERTIES,
+    stroke,
+    fill: pointColor,
+    pointColor,
+    pointStrokeColor: stroke,
+  }
+}
+
+function stripDefaultDrawProperties(properties = {}, index = 0) {
+  const defaults = getDefaultDrawProperties(index)
+
+  return Object.fromEntries(
+    Object.entries(properties).filter(([key, value]) => {
+      return !(
+        DRAW_STYLE_EXPORT_DEFAULT_KEYS.includes(key)
+        && Object.is(value, defaults[key])
+      )
+    })
+  )
 }
 
 export function normalizeFeatureCollection(featureCollection) {
@@ -308,10 +434,23 @@ export function normalizeFeatureCollection(featureCollection) {
           pointStrokeColor: stroke,
           ...(feature?.properties ?? {}),
           id: featureId,
-          updatedAt: new Date().toISOString(),
         },
       }
     }),
+  }
+}
+
+export function serializeFeatureCollectionForExport(featureCollection) {
+  const normalizedCollection = ensureFeatureCollection(featureCollection)
+
+  return {
+    type: 'FeatureCollection',
+    features: normalizedCollection.features
+      .filter((feature) => feature && typeof feature === 'object')
+      .map((feature, index) => ({
+        ...feature,
+        properties: stripDefaultDrawProperties(feature?.properties, index),
+      })),
   }
 }
 
@@ -381,7 +520,7 @@ async function readFileAsArrayBuffer(file) {
 }
 
 export function exportFeatureCollectionAsGeoJson(featureCollection, filename = 'map-draw-layer.geojson') {
-  const normalized = normalizeFeatureCollection(featureCollection)
+  const normalized = serializeFeatureCollectionForExport(featureCollection)
   const blob = new Blob([
     JSON.stringify(normalized, null, 2)
   ], {
@@ -470,23 +609,23 @@ export function readKmzArrayBuffer(arrayBuffer) {
   return normalizeFeatureCollection(parseKmlText(getKmzKmlText(arrayBuffer)))
 }
 
-export async function readImportedLayerFile(file) {
+export async function readImportedLayerFile(file, options = {}) {
   const importFormat = inferImportFormat(file)
 
   if (importFormat === 'kmz') {
     const arrayBuffer = await readFileAsArrayBuffer(file)
-    return readKmzArrayBuffer(arrayBuffer)
+    return normalizeImportedFeatureCollection(parseKmlText(getKmzKmlText(arrayBuffer)), options)
   }
 
   const text = await readFileAsText(file)
 
   if (importFormat === 'kml') {
-    return normalizeFeatureCollection(parseKmlText(text))
+    return normalizeImportedFeatureCollection(parseKmlText(text), options)
   }
 
   if (importFormat === 'csv') {
-    return normalizeFeatureCollection(parseCsvText(text))
+    return normalizeImportedFeatureCollection(parseCsvText(text), options)
   }
 
-  return normalizeFeatureCollection(parseGeoJsonText(text))
+  return normalizeImportedFeatureCollection(parseGeoJsonText(text), options)
 }

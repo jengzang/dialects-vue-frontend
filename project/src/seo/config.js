@@ -389,7 +389,7 @@ export const SITEMAP_PATHS = [
   '/',
   '/menu/source',
   '/menu/privacy',
-  '/menu/about/settings',
+  '/menu/settings',
   '/menu/about/intro',
   '/menu/about/suggestion',
   '/menu/about/like',

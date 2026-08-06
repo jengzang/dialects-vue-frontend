@@ -1,10 +1,10 @@
 <template>
-  <div class="yubao-map-container" :class="{ 'is-fullscreen': isFullScreen }">
+  <div class="vocabulary-map-container" :class="{ 'is-fullscreen': isFullScreen }">
     <div ref="mapContainer" class="map-container">
       <div v-if="isLoadingMarkers" class="map-loading-overlay">
         <div class="loading-content">
           <div class="ui-loading--page" aria-hidden="true"></div>
-          <span class="loading-text">{{ t('map.yuBaoMap.loading.mapData') }}</span>
+          <span class="loading-text">{{ t('map.vocabularyMap.loading.mapData') }}</span>
         </div>
       </div>
 
@@ -30,18 +30,18 @@
         </div>
 
         <div class="button-row">
-          <button class="action-btn" @click="resetView" :title="t('map.yuBaoMap.buttons.reset')">
-            🎯 {{ t('map.yuBaoMap.buttons.reset') }}
+          <button class="action-btn" @click="resetView" :title="t('map.vocabularyMap.buttons.reset')">
+            {{ t('map.vocabularyMap.buttons.reset') }}
           </button>
-          <button class="action-btn fullscreen-btn" @click="toggleFullScreen" :title="t('map.yuBaoMap.buttons.fullscreen')">
-            ⛶ {{ t('map.yuBaoMap.buttons.fullscreen') }}
+          <button class="action-btn fullscreen-btn" @click="toggleFullScreen" :title="t('map.vocabularyMap.buttons.fullscreen')">
+            {{ t('map.vocabularyMap.buttons.fullscreen') }}
           </button>
         </div>
       </div>
     </div>
 
     <button v-if="isFullScreen" class="exit-fullscreen-btn" @click="toggleFullScreen">
-      ✕ {{ t('map.yuBaoMap.buttons.exitFullscreen') }}
+      {{ t('map.vocabularyMap.buttons.exitFullscreen') }}
     </button>
 
   </div>
@@ -80,6 +80,13 @@ const isFullScreen = ref(false)
 const mapLoaded = ref(false)  // 跟踪地图是否已加载
 const isLoadingMarkers = ref(false)  // 跟踪标记是否正在加载
 const { t } = useI18n()
+
+let currentMarkers = []
+
+function clearMarkers() {
+  currentMarkers.forEach(m => m.remove())
+  currentMarkers = []
+}
 
 const overviewDisplayModeOptions = computed(() => [
   { value: 'overview', label: t('map.vocabularyMap.controls.overview') },
@@ -221,9 +228,8 @@ const getMarkerText = (item) => {
     text = props.activeTab === 'vocabulary' ? item.localExpression : item.memo
   }
 
-  // 智能截断（使用新的截断函数）
   if (text) {
-    text = truncateText(text, 6)  // 6 个"汉字等效长度"
+    text = truncateText(text, 6)
   }
 
   return text || '-'
@@ -384,39 +390,39 @@ const convertToGeoJSON = (data) => {
   }
 }
 
-// 渲染标记（使用 GeoJSON + Symbol Layer）
-const renderMarkers = async () => {
+// 渲染标记（HTML markers）
+const renderMarkers = () => {
   if (!map.value || !props.mapData || props.mapData.length === 0) {
-    console.log('❌ renderMarkers: 无法渲染', {
-      hasMap: !!map.value,
-      hasData: !!props.mapData,
-      dataLength: props.mapData?.length
-    })
     isLoadingMarkers.value = false
     return
   }
 
-  await nextTick()  // 确保加载动画显示
-
-  // console.log('🗺️ 开始渲染标记', {
-  //   dataCount: props.mapData.length,
-  //   displayMode: displayMode.value,
-  //   activeTab: props.activeTab
-  // })
+  clearMarkers()
 
   const geojsonData = convertToGeoJSON(props.mapData)
-  // console.log('✅ GeoJSON features:', geojsonData.features.length)
 
-  // 更新 source 数据
-  const source = map.value.getSource('yubao-markers')
-  if (source) {
-    source.setData(geojsonData)
-  }
+  geojsonData.features.forEach(feature => {
+    const [lng, lat] = feature.geometry.coordinates
+    const { label, bgColor, textColor } = feature.properties
 
-  // 等待地图渲染完成后隐藏加载动画
-  setTimeout(() => {
-    isLoadingMarkers.value = false
-  }, 300)  // 给地图一些时间来渲染标记
+    const el = document.createElement('div')
+    el.className = 'vocabulary-marker'
+    el.textContent = label
+    el.style.backgroundColor = bgColor
+    el.style.color = textColor
+
+    el.addEventListener('click', () => {
+      handleMarkerClick(feature.properties)
+    })
+
+    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
+      .setLngLat([lng, lat])
+      .addTo(map.value)
+
+    currentMarkers.push(marker)
+  })
+
+  isLoadingMarkers.value = false
 }
 
 
@@ -435,9 +441,7 @@ const switchDisplayMode = (mode) => {
   if (!displayModeOptions.value.some((option) => option.value === mode)) {
     return
   }
-
   displayMode.value = mode
-  renderMarkers()
 }
 
 // 复位视角
@@ -464,103 +468,10 @@ const handleStyleChange = () => {
   if (!map.value) return
   const newStyle = mapStyle(currentStyleKey.value)
 
-  // 保存当前数据
-  const currentData = map.value.getSource('yubao-markers')?._data
-
   map.value.setStyle(newStyle)
 
-  // 样式加载完成后重新添加 layers
   map.value.once('style.load', () => {
-    if (!currentData) return
-
-    // 重新添加 source
-    map.value.addSource('yubao-markers', {
-      type: 'geojson',
-      data: currentData,
-      cluster: true,
-      clusterMaxZoom: 14,
-      clusterRadius: 50
-    })
-
-    // 重新添加所有 layers（复用 initMap 中的代码）
-    map.value.addLayer({
-      id: 'yubao-clusters',
-      type: 'circle',
-      source: 'yubao-markers',
-      filter: ['has', 'point_count'],
-      paint: {
-        'circle-color': [
-          'step',
-          ['get', 'point_count'],
-          '#51bbd6',
-          100,
-          '#f1f075',
-          750,
-          '#f28cb1'
-        ],
-        'circle-radius': [
-          'step',
-          ['get', 'point_count'],
-          20,
-          100,
-          30,
-          750,
-          40
-        ],
-        'circle-opacity': 0.85,
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#fff'
-      }
-    })
-
-    map.value.addLayer({
-      id: 'yubao-cluster-count',
-      type: 'symbol',
-      source: 'yubao-markers',
-      filter: ['has', 'point_count'],
-      layout: {
-        'text-field': '{point_count_abbreviated}',
-        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-        'text-size': 14
-      },
-      paint: {
-        'text-color': '#ffffff'
-      }
-    })
-
-    map.value.addLayer({
-      id: 'yubao-unclustered-bg',
-      type: 'circle',
-      source: 'yubao-markers',
-      filter: ['!', ['has', 'point_count']],
-      paint: {
-        'circle-radius': 18,
-        'circle-color': ['get', 'bgColor'],
-        'circle-opacity': 0.9,
-        'circle-stroke-width': 1.5,
-        'circle-stroke-color': 'rgba(255, 255, 255, 0.8)'
-      }
-    })
-
-    map.value.addLayer({
-      id: 'yubao-unclustered-text',
-      type: 'symbol',
-      source: 'yubao-markers',
-      filter: ['!', ['has', 'point_count']],
-      layout: {
-        'text-field': ['get', 'label'],
-        'text-size': 12,
-        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-        'text-anchor': 'center'
-      },
-      paint: {
-        'text-color': ['get', 'textColor']
-      }
-    })
-
-    // 标记地图已重新加载完成
-    mapLoaded.value = true
-    console.log('✅ 地图样式切换完成，layers 已重新添加')
+    renderMarkers()
   })
 }
 
@@ -568,7 +479,6 @@ const handleStyleChange = () => {
 const initMap = () => {
   if (!mapContainer.value) return
 
-  // 设置初始加载状态
   isLoadingMarkers.value = true
   mapLoaded.value = false
 
@@ -585,148 +495,8 @@ const initMap = () => {
   map.value.addControl(new maplibregl.NavigationControl(), 'top-left')
 
   map.value.on('load', () => {
-    // 添加 GeoJSON source（带聚类）
-    const geojsonData = convertToGeoJSON(props.mapData)
-
-    map.value.addSource('yubao-markers', {
-      type: 'geojson',
-      data: geojsonData,
-      cluster: true,
-      clusterMaxZoom: 14,
-      clusterRadius: 50
-    })
-
-    // 1. 聚类圆圈图层
-    map.value.addLayer({
-      id: 'yubao-clusters',
-      type: 'circle',
-      source: 'yubao-markers',
-      filter: ['has', 'point_count'],
-      paint: {
-        'circle-color': [
-          'step',
-          ['get', 'point_count'],
-          '#51bbd6',
-          100,
-          '#f1f075',
-          750,
-          '#f28cb1'
-        ],
-        'circle-radius': [
-          'step',
-          ['get', 'point_count'],
-          20,
-          100,
-          30,
-          750,
-          40
-        ],
-        'circle-opacity': 0.85,
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#fff'
-      }
-    })
-
-    // 2. 聚类数量文字图层
-    map.value.addLayer({
-      id: 'yubao-cluster-count',
-      type: 'symbol',
-      source: 'yubao-markers',
-      filter: ['has', 'point_count'],
-      layout: {
-        'text-field': '{point_count_abbreviated}',
-        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-        'text-size': 14
-      },
-      paint: {
-        'text-color': '#ffffff'
-      }
-    })
-
-    // 3. 未聚类点的圆形背景
-    map.value.addLayer({
-      id: 'yubao-unclustered-bg',
-      type: 'circle',
-      source: 'yubao-markers',
-      filter: ['!', ['has', 'point_count']],
-      paint: {
-        'circle-radius': 18,
-        'circle-color': ['get', 'bgColor'],
-        'circle-opacity': 0.9,
-        'circle-stroke-width': 1.5,
-        'circle-stroke-color': 'rgba(255, 255, 255, 0.8)'
-      }
-    })
-
-    // 4. 未聚类点的文字
-    map.value.addLayer({
-      id: 'yubao-unclustered-text',
-      type: 'symbol',
-      source: 'yubao-markers',
-      filter: ['!', ['has', 'point_count']],
-      layout: {
-        'text-field': ['get', 'label'],
-        'text-size': 12,
-        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-        'text-anchor': 'center'
-      },
-      paint: {
-        'text-color': ['get', 'textColor']
-      }
-    })
-
-    // 点击聚类时放大
-    map.value.on('click', 'yubao-clusters', (e) => {
-      const features = map.value.queryRenderedFeatures(e.point, {
-        layers: ['yubao-clusters']
-      })
-
-      if (!features.length) return
-
-      const clusterId = features[0].properties.cluster_id
-      map.value.getSource('yubao-markers').getClusterExpansionZoom(
-        clusterId,
-        (err, zoom) => {
-          if (err) return
-
-          map.value.easeTo({
-            center: features[0].geometry.coordinates,
-            zoom: zoom + 0.5
-          })
-        }
-      )
-    })
-
-    // 点击未聚类点时显示弹窗
-    map.value.on('click', 'yubao-unclustered-bg', (e) => {
-      if (e.features.length > 0) {
-        const properties = e.features[0].properties
-        handleMarkerClick(properties)
-      }
-    })
-
-    // Hover 效果 - 聚类
-    map.value.on('mouseenter', 'yubao-clusters', () => {
-      map.value.getCanvas().style.cursor = 'pointer'
-    })
-
-    map.value.on('mouseleave', 'yubao-clusters', () => {
-      map.value.getCanvas().style.cursor = ''
-    })
-
-    // Hover 效果 - 未聚类点
-    map.value.on('mouseenter', 'yubao-unclustered-bg', () => {
-      map.value.getCanvas().style.cursor = 'pointer'
-    })
-
-    map.value.on('mouseleave', 'yubao-unclustered-bg', () => {
-      map.value.getCanvas().style.cursor = ''
-    })
-
-    // 标记地图已加载完成
+    renderMarkers()
     mapLoaded.value = true
-    isLoadingMarkers.value = false  // 隐藏加载动画
-    console.log('✅ Symbol layers 已添加，地图加载完成')
   })
 }
 
@@ -736,6 +506,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  clearMarkers()
   if (map.value) {
     map.value.remove()
     map.value = null
@@ -763,21 +534,25 @@ watch(displayModeOptions, () => {
   ensureValidDisplayMode()
   renderMarkers()
 })
+
+watch(displayMode, () => {
+  renderMarkers()
+})
 </script>
 
 
 <style scoped lang="scss">
-.yubao-map-container {
+.vocabulary-map-container {
   width: 100%;
   height: 100%;
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.yubao-map-container.is-fullscreen {
+.vocabulary-map-container.is-fullscreen {
   position: fixed;
   top: 0;
   left: 0;
@@ -997,21 +772,17 @@ watch(displayModeOptions, () => {
   transform: scale(0.95);
 }
 
-
-
-/* 全局样式 - 标记 */
-.yubao-marker {
-  padding: 4px 8px;
+/* HTML markers — 圆角矩形标签 */
+:deep(.vocabulary-marker) {
+  padding: 4px 10px;
   border-radius: var(--radius-sm);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  font-size: 13px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  font-size: 12px;
   white-space: nowrap;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
   font-weight: 500;
-  transition: all 0.2s;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
-
-/* Hover effect removed for performance optimization */
 
 </style>

@@ -4,9 +4,7 @@
     <div class="header-section">
       <div class="title-row">
         <h2 style="margin: 0;">{{ t('villages.pages.gdTree.title') }}</h2>
-<!--        <button class="village-link-btn" @click="goToYCVillages">-->
-<!--          <span role="img" aria-label="ycVillages">🏠</span> 陽春自然村-->
-<!--        </button>-->
+        <span class="cross-link" @click="goToGdTable">{{ t('villages.pages.gdTable.title') }} →</span>
       </div>
       <!-- <p class="subtitle">{{ t('villages.pages.gdTree.subtitle') }}</p> -->
       <div class="search-wrapper">
@@ -561,6 +559,10 @@ const handleCityMapClick = (city) => {
 onMounted(() => {
   loadInitialCities();
 });
+
+const goToGdTable = () => {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/table'));
+};
 </script>
 
 
@@ -618,6 +620,20 @@ $transition-base: 0.3s;
     gap: 5px !important;
     font-size: 14px;
     white-space: nowrap;
+  }
+}
+
+.cross-link {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.7;
   }
 }
 

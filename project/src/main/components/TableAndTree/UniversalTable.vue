@@ -1,5 +1,5 @@
 <template>
-  <div class="universal-table glass-container">
+  <div class="universal-table glass-container" :style="containerStyle">
     <div class="toolbar">
       <div class="search-wrapper">
         <span class="search-icon">🔍</span>
@@ -538,7 +538,19 @@ const props = defineProps({
   // ✅ 新增：可选的主键字段名
   primaryKey: { type: String, default: null },
   apiAdapter: { type: String, default: 'normal' },
-  canEdit: { type: Boolean, default: false }
+  canEdit: { type: Boolean, default: false },
+  height: { type: [String, Object], default: '85dvh' }
+})
+
+const containerStyle = computed(() => {
+  const h = props.height
+  if (typeof h === 'string') {
+    return { '--ut-height': h }
+  }
+  return {
+    '--ut-height': h.desktop || '85dvh',
+    '--ut-height-mobile': h.mobile || h.desktop || '85dvh',
+  }
 });
 
 const tableApiAdapters = {
@@ -1590,9 +1602,13 @@ $system-font:
   color: var(--text-primary);
   @include flex-col;
   gap: 6px;
-  height: 85dvh;
-  width: 88dvw;
+  height: var(--ut-height, 85dvh);
+  width: min(88dvw,100%);
   overflow: hidden;
+
+  @media (max-aspect-ratio: 1 / 1) {
+    height: var(--ut-height-mobile, var(--ut-height, 85dvh));
+  }
 }
 
 /* Toolbar */
@@ -1619,6 +1635,7 @@ $system-font:
   background: var(--glass-60);
   font-size: 14px;
   outline: none;
+  color: var(--text-deep);
   transition: all 0.3s;
 
   &:focus {
@@ -2016,7 +2033,6 @@ td {
   .universal-table.glass-container {
     padding: 8px 2px;
     border-radius: var(--radius-xl);
-    height: 85dvh;
     border: none;
   }
 
@@ -2127,6 +2143,7 @@ td {
 
   &.clickable {
     cursor: pointer;
+    // color: var(--text-deep);
     background: var(--glass-50);
     border: 1px solid var(--border-light);
 
@@ -2151,7 +2168,8 @@ td {
   font-weight: 600;
   text-align: center;
   appearance: textfield;
-  background: white;
+  color: var(--text-deep);
+  background: var(--bg-white);
   border: 2px solid var(--color-primary);
   border-radius: var(--radius-md);
   outline: none;
@@ -2260,11 +2278,12 @@ td {
 }
 
 .field-input {
+  color: var(--text-deep);
   flex: 1;
   padding: 10px 12px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: white;
+  background: var(--bg-white);
   font-size: 14px;
   outline: none;
   transition: all 0.3s;

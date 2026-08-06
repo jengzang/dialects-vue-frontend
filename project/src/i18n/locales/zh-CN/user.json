@@ -313,6 +313,15 @@
           "tree": "包含各种树状图查询，例如广东自然村树状图与中古地位等。",
           "locations": "包括获取单个地点的详情信息，以及获取完整分区信息"
         }
+      },
+      "vocabulary": {
+        "label": "词句查询",
+        "items": {
+          "yubao": "语保查询",
+          "vocabSearch": "词表搜索",
+          "vocabTable": "词表表格",
+          "vocabEdit": "词表编辑"
+        }
       }
     }
   }

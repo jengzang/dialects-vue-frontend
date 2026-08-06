@@ -335,6 +335,7 @@
 
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
@@ -350,6 +351,7 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { getPlatformFileService } from '@/platform/index.js'
 
 const { t } = useI18n()
+const route = useRoute()
 const { requireAuth } = useAuthGuard({
   defaultRedirect: '/explore/tools/merge',
 })
@@ -525,7 +527,7 @@ const referenceImportFlow = useTabularImportFlow({
   beforePreview: async (file) => {
     const authed = await requireAuth({
       message: t('tools.merge.validation.loginRequired'),
-      redirect: '/explore/tools/merge',
+      redirect: route.fullPath || '/explore/tools/merge',
     })
     if (!authed) {
       return false
@@ -662,7 +664,7 @@ const normalizePercentProgress = (value) => {
 const setReferenceFile = async (file, options = {}) => {
   const authed = await requireAuth({
     message: t('tools.merge.validation.loginRequired'),
-    redirect: '/explore/tools/merge',
+    redirect: route.fullPath || '/explore/tools/merge',
   })
   if (!authed) {
     return

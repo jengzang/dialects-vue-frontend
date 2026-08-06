@@ -19,6 +19,7 @@ const GdVillagesTablePage = () => import('@/main/views/explore/villages/gdVillag
 const YangChunVillagesPage = () => import('@/main/views/explore/villages/YangChunVillages.vue')
 const AllVillagesPage = () => import('@/main/views/explore/villages/AllVillages.vue')
 const VillagesMLPage = () => import('@/main/views/explore/villages/VillagesML.vue')
+const ToponymsPage = () => import('@/main/views/explore/villages/toponyms/ToponymsPage.vue')
 
 export const exploreRoutes = [
   {
@@ -79,6 +80,10 @@ export const exploreRoutes = [
   {
     path: 'explore/yc-spoken',
     component: YangChunSpokenPage
+  },
+  {
+    path: 'explore/villages/toponyms',
+    component: ToponymsPage
   },
   {
     path: 'explore/villages/gd',

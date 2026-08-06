@@ -2,7 +2,7 @@
   <div class="ngram-explore-page">
     <h3 class="villagesml-subtab-title">
       模式分析 - N-gram 探索
-      <HelpIcon content="探索N-gram（2-4字組合）的頻率分布和模式搜索。支持按位置（前綴/中間/後綴）篩選，支持通配符（*）模式搜索。顯著率表示統計顯著（p<0.05）的N-gram比例" />
+      <HelpIcon content="探索N-gram（2-3字組合）的頻率分布和模式搜索。支持按位置（前綴/中間/後綴）篩選，支持通配符（*）模式搜索。顯著率表示統計顯著（p<0.05）的N-gram比例" />
     </h3>
 
     <!-- Statistics Banner -->
@@ -234,7 +234,6 @@ const loadingPatterns = ref(false)
 const nValueOptions = [
   { label: '二元組 (Bigrams)', value: 2 },
   { label: '三元組 (Trigrams)', value: 3 },
-  { label: '四元組 (4-grams)', value: 4 }
 ]
 
 const positionOptions = [

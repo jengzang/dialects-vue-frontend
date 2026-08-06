@@ -3,6 +3,16 @@
     <h2 class="page-title">{{ $t('villages.title') }}</h2>
 
     <div class="villages-grid">
+      <button class="entry-button" @click="handleToponyms">
+        <div class="entry-button__icon">🗺️</div>
+        <div class="entry-button__name">
+          {{ $t('villages.toponyms.name') }}
+        </div>
+        <div class="entry-button__desc">
+          {{ $t('villages.toponyms.desc') }}
+        </div>
+      </button>
+
       <button class="entry-button" @click="handleGdVillages">
         <div class="entry-button__icon">🏘️</div>
         <div class="entry-button__name">
@@ -68,6 +78,10 @@ import { userStore } from '@/main/store/store.js'
 const router = useRouter()
 const route = useRoute()
 
+const handleToponyms = () => {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/toponyms'))
+};
+
 const handleGdVillagesTable = () => {
   router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/table'))
 };
@@ -90,13 +104,13 @@ const handleAllVillages = () => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 .villages-page {
   min-width: 80dvw;
   min-height: 70dvh;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
 }

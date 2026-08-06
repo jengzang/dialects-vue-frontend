@@ -587,7 +587,10 @@ const toggleSidebar = () => {
 }
 
 const goToAuthPage = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/auth'))
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), '/auth'),
+    query: { redirect: route.fullPath },
+  })
 }
 </script>
 

@@ -78,6 +78,7 @@ export {
   getVocabularyLocationOptions,
   getVocabularyLocations,
   getVocabularyLogs,
+  getVocabularyCounts,
   updateVocabularyLocation,
   setVocabularyPermission,
   previewVocabularyImport,

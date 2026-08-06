@@ -11,8 +11,7 @@ const copyCitation = () => {
 </script>
 
 <template>
-  <div class="privacy-container">
-    <div class="privacy-content glass-container glass-container-soft">
+  <div class="privacy-content glass-container glass-container-soft">
       <!-- 标题和语言切换 -->
       <div class="header">
         <h1 class="title">📜 {{ t('privacy.title') }}</h1>
@@ -104,7 +103,6 @@ const copyCitation = () => {
           </p>
         </section>
       </div>
-    </div>
   </div>
 </template>
 
@@ -129,23 +127,6 @@ $radius-lg: 20px;
 
 $transition-base: 0.3s;
 
-.privacy-container {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  width: 100%;
-  min-height: 100vh;
-  padding: 40px 20px;
-  background: linear-gradient(
-    135deg,
-    rgba(240, 248, 255, 0.8),
-    rgba(230, 240, 255, 0.6)
-  );
-
-  @media (max-width: 768px) {
-    padding: 20px 10px;
-  }
-}
 
 .privacy-content {
   width: 100%;
@@ -282,7 +263,7 @@ $transition-base: 0.3s;
 
 .copy-btn {
   padding: 10px 20px;
-  color: $white;
+  color: var(--action-primary-text);
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;

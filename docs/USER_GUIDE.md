@@ -226,7 +226,7 @@
 
 ### 語言設置
 
-**路徑：** `/menu/about/settings`
+**路徑：** `/menu/settings`
 
 這裡主要是站點語言與界面偏好設置，不等同於個人資料頁。
 
@@ -249,9 +249,9 @@
 如果您想先看總覽與入口卡片，從 `/explore/villages/ml` 進。
 如果您已經知道要打開哪個模塊，直接訪問 `/villagesML?module=...&subtab=...`。
 
-### `/menu/about/settings` 和 `/auth?view=profile` 有什麼區別？
+### `/menu/settings` 和 `/auth?view=profile` 有什麼區別？
 
-- `/menu/about/settings`：站點語言與界面設置
+- `/menu/settings`：站點語言與界面設置
 - `/auth?view=profile`：個人賬戶與資料總覽
 
 ---

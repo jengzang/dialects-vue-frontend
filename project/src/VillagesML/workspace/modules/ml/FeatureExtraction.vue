@@ -29,7 +29,7 @@
             type="text"
             placeholder="搜尋村莊名稱..."
             class="glass-input small"
-            @input="handleSearchInput"
+            @keyup.enter="loadVillages"
           >
         </div>
 
@@ -436,8 +436,6 @@ const resultsPageSize = 20
 const aggregationChart = ref(null)
 let aggregationChartInstance = null
 
-let searchTimeout = null
-
 // Feature types (现在后端已支持所有类型)
 const featureTypes = [
   { value: 'semantic', label: '語義特徵', description: '9 個語義類別向量' },
@@ -516,18 +514,6 @@ const goToAuth = () => {
       redirect: route.fullPath || buildCurrentVillagesMLPath({ module: 'compute', subtab: 'features' })
     }
   })
-}
-
-// 搜索输入防抖 (参考 SearchPanel)
-const handleSearchInput = () => {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    currentPage.value = 1
-    // 只要有搜索关键词或筛选条件，就自动加载
-    if (searchKeyword.value || hasFilters.value) {
-      loadVillages()
-    }
-  }, 300)
 }
 
 // 城市变化处理 (参考 SearchPanel)

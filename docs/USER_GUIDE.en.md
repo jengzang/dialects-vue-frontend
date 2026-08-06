@@ -226,7 +226,7 @@ Both routes are protected by router checks and redirect unauthenticated users ba
 
 ### Language Settings
 
-**Path:** `/menu/about/settings`
+**Path:** `/menu/settings`
 
 This page is mainly for site-level language and interface preferences. It is not the same as the profile overview.
 
@@ -249,9 +249,9 @@ When needed, the app redirects to `/auth` with a `redirect` query so you can ret
 Use `/explore/villages/ml` if you want the dashboard / discovery view first.
 Use `/villagesML?module=...&subtab=...` if you already know which workspace module you want.
 
-### What is the difference between `/menu/about/settings` and `/auth?view=profile`?
+### What is the difference between `/menu/settings` and `/auth?view=profile`?
 
-- `/menu/about/settings`: site language and interface settings
+- `/menu/settings`: site language and interface settings
 - `/auth?view=profile`: personal account overview
 
 ---

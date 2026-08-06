@@ -949,7 +949,7 @@ $glass-transition: all 0.3s ease;
   // left: 50%;
   z-index: 100;
 
-  width: 70dvw;
+  width: 75dvw;
   height: 70dvh;
 
   overflow: hidden;
