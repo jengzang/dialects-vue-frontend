@@ -3022,9 +3022,20 @@ const clearAutoDraft = async () => {
   }
 };
 
+const draftStateHasContent = (state) => {
+  return (state?.layers || []).some(
+    (layer) => (layer?.featureCollection?.features?.length ?? 0) > 0
+  );
+};
+
 const restoreAutoDraftIfAvailable = async () => {
   const autoDraft = await getDraftRecordById(AUTO_DRAFT_ID);
   if (!autoDraft?.state) return;
+
+  if (!draftStateHasContent(autoDraft.state)) {
+    await deleteDraftRecord(AUTO_DRAFT_ID);
+    return;
+  }
 
   const currentSignature = getCurrentWorkbenchSignature();
   const autoSignature = autoDraft.signature || buildDraftStateSignature(autoDraft.state);
