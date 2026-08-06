@@ -204,7 +204,7 @@ function resolveViewModeFromRoute() {
 const viewMode = ref(resolveViewModeFromRoute())
 const selectedSearchFields = ref([])
 const selectedLocations = ref([])
-const filterByRegion = ref(sessionStorage.getItem('vocabulary_filter_by_region') === 'true')
+const filterByRegion = ref(localStorage.getItem('vocabulary_filter_by_region') === 'true')
 const selectedProvince = ref('')
 const selectedCity = ref('')
 const selectedStandardWord = ref('')
@@ -711,7 +711,7 @@ watch(selectedProvince, () => {
 })
 
 watch(filterByRegion, (val) => {
-  sessionStorage.setItem('vocabulary_filter_by_region', val ? 'true' : 'false')
+  localStorage.setItem('vocabulary_filter_by_region', val ? 'true' : 'false')
 })
 
 watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, selectedProvince, selectedCity], () => {
