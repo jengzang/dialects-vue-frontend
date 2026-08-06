@@ -204,6 +204,7 @@ import {
 import { useTabTooltip } from '@/composables/bar/useTabTooltip.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { isInternalAppNavigationTarget, navigatePlatformLink } from '@/platform/index.js'
 
 const faviconSrc = computed(() =>
   currentColorTheme.value === COLOR_THEME_GREEN
@@ -562,15 +563,13 @@ const handleSubmenuLeave = () => {
   }, 200)
 }
 
-const handleSubmenuClick = (child) => {
-  if (child.external) {
-    window.open(child.path, '_blank')
-  } else {
+const handleSubmenuClick = async (child) => {
+  if (isInternalAppNavigationTarget(child.path)) {
     if (normalizedNavigationSchema.value && activeSubmenu.value) {
       writeCommonBarMemory(normalizedNavigationSchema.value, activeSubmenu.value, child.path)
     }
-    router.push(child.path)
   }
+  await navigatePlatformLink(router, child.path, { external: child.external })
   activeSubmenu.value = null
 }
 

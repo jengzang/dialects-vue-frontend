@@ -43,6 +43,11 @@ export {
   PRAAT_LOCAL_TEMPORARY_AUDIO_POLICY,
 } from './praatLocal.js'
 export {
+  isInternalAppNavigationTarget,
+  navigatePlatformLink,
+  resolveInternalNavigationTarget,
+} from './navigation.js'
+export {
   initializePlatformServices,
   resetPlatformServicesForTests,
 } from './bootstrap.js'

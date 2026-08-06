@@ -139,7 +139,7 @@ import { clearToken, getToken } from '@/api/auth/auth.js'
 import { useVisitStats, ensureVisitHistory } from '@/composables/data/useVisitStats.js'
 import {userStore} from "@/main/store/store.js";
 import { useSidebarConfig } from '@/main/config/index.js';
-import { WEB_BASE } from '@/env-config.js';
+import { navigatePlatformLink } from '@/platform/index.js'
 
 const { t } = useI18n();
 const router = useRouter();
@@ -278,7 +278,7 @@ const handleMainPointerUp = (item, key, event) => {
   handleMainClick(item, key, event, isTouchInteraction)
 }
 
-const handleMainClick = (item, key, event, isTouchInteraction) => {
+const handleMainClick = async (item, key, event, isTouchInteraction) => {
   event?.stopPropagation()
   cancelCloseSubmenu()
 
@@ -303,12 +303,8 @@ const handleMainClick = (item, key, event, isTouchInteraction) => {
 
   if (!item.path) return
 
-  if (item.external) {
-    window.location.href = WEB_BASE + item.path
-  } else {
-    router.push(item.path)
-    closeSidebar()
-  }
+  await navigatePlatformLink(router, item.path, { external: item.external })
+  closeSidebar()
 }
 
 // Handle mouse hover only when the current primary pointer truly supports hover.
@@ -357,13 +353,9 @@ const handleArrowClick = (item, key, event) => {
 }
 
 // Submenu item click handler
-const handleSubmenuClick = (child) => {
+const handleSubmenuClick = async (child) => {
   cancelCloseSubmenu()
-  if (child.external) {
-    window.open(child.path, '_blank')
-  } else {
-    router.push(child.path)
-  }
+  await navigatePlatformLink(router, child.path, { external: child.external })
   closeSidebar()
 }
 
@@ -967,4 +959,3 @@ $portrait-ratio: 1;
 }
 
 </style>
-
