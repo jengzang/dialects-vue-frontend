@@ -302,8 +302,11 @@ export function useMenuTabsConfig() {
       label: t('navigation.tabs.yubao'),
       icon: '📖',
       display: {
-        preset: 'standard_small',
-        overrides: {}
+        preset: 'compactDesktop',
+        overrides: {
+          mobileScroll: 'right',
+          weight: 0.7,
+        }
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/menu/yubao') }
