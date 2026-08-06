@@ -11,8 +11,8 @@
 
         <form class="manage-filter-grid locations-filter-grid" @submit.prevent="applyLocationFilters">
           <label class="upload-field">
-            <span>{{ t('words.wordList.locations.filters.userId') }}</span>
-            <input v-model="locationFilters.user_id" type="text" :placeholder="t('words.wordList.locations.filters.userId')" />
+            <span>{{ t('words.wordList.locations.filters.userName') }}</span>
+            <input v-model="locationFilters.username" type="text" :placeholder="t('words.wordList.locations.filters.userName')" />
           </label>
           <label class="upload-field">
             <span>{{ t('words.wordList.locations.filters.locationName') }}</span>
@@ -39,14 +39,18 @@
       </div>
 
       <div v-else-if="locationRows.length" class="locations-list">
-        <article v-for="location in locationRows" :key="`${location.user_id || ''}-${location.location_name}`" class="location-item">
+        <article v-for="location in locationRows" :key="`${location.username || location.user_id || ''}-${location.location_name}`" class="location-item">
           <div class="location-item-head">
             <div class="location-item-info">
               <strong>{{ location.location_name }}</strong>
               <p>{{ location.location_label || location.location_name }}</p>
             </div>
+            <span class="location-item-username">{{ location.username }}</span>
             <button class="main-glass-button" data-variant="primary" type="button" @click="openLocationEditor(location)">
               {{ t('common.button.edit') }}
+            </button>
+            <button v-if="canDeleteLocation" class="main-glass-button" data-variant="danger" type="button" @click="handleDeleteLocation(location)">
+              {{ t('common.button.delete') }}
             </button>
           </div>
         </article>
@@ -113,9 +117,9 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getVocabularyLocations, updateVocabularyLocation } from '@/api'
+import { deleteVocabularyLocation, getVocabularyLocations, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
-import { showError, showSuccess } from '@/utils/ui/message.js'
+import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const pageSizeOptions = [20, 50, 100, 200]
@@ -123,6 +127,7 @@ const pageSizeOptions = [20, 50, 100, 200]
 const props = defineProps({
   hasVocabularyPermission: { type: Boolean, default: false },
   canViewVocabularyLogs: { type: Boolean, default: false },
+  canDeleteLocation: { type: Boolean, default: false },
 })
 
 const isLoadingLocations = ref(false)
@@ -133,7 +138,7 @@ const isLocationEditorOpen = ref(false)
 const editingLocationSource = ref(null)
 const editingLocationDraft = ref(null)
 const locationFilters = reactive({
-  user_id: '',
+  username: '',
   location_name: '',
 })
 const locationPagination = reactive({
@@ -204,7 +209,7 @@ function applyLocationFilters() {
 }
 
 function resetLocationFilters() {
-  locationFilters.user_id = ''
+  locationFilters.username = ''
   locationFilters.location_name = ''
   return applyLocationFilters()
 }
@@ -259,6 +264,28 @@ async function handleSaveLocation(location) {
 
 function handleSaveEditingLocation() {
   return handleSaveLocation(editingLocationDraft.value || editingLocationSource.value)
+}
+
+async function handleDeleteLocation(location) {
+  if (!location?.location_name) return
+
+  const confirmed = await showConfirm(
+    t('words.wordList.locations.deleteConfirm', { name: location.location_name }),
+    { confirmText: t('common.button.delete'), cancelText: t('common.button.cancel') },
+  )
+  if (!confirmed) return
+
+  locationsStatusText.value = ''
+  try {
+    const params = location.user_id ? { user_id: location.user_id } : {}
+    const result = await deleteVocabularyLocation(location.location_name, params)
+    locationsStatusText.value = t('words.wordList.locations.deleteSuccess', { count: result.deleted_entries })
+    showSuccess(locationsStatusText.value)
+    await loadVocabularyLocations()
+  } catch (error) {
+    locationsStatusText.value = error.message || t('words.wordList.locations.deleteFailed')
+    showError(locationsStatusText.value)
+  }
 }
 
 watch(() => props.hasVocabularyPermission, (has) => {

@@ -207,8 +207,11 @@
       "loadFailed": "獲取詞表地點信息失敗",
       "saveSuccess": "地點信息已保存。",
       "saveFailed": "保存地點信息失敗",
+      "deleteConfirm": "確定刪除地點「{name}」及其所有詞條？此操作不可撤銷。",
+      "deleteSuccess": "已刪除地點，共移除 {count} 條詞條。",
+      "deleteFailed": "刪除地點失敗",
       "filters": {
-        "userId": "用戶 ID",
+        "userName": "用戶名",
         "locationName": "地點簡稱"
       }
     },

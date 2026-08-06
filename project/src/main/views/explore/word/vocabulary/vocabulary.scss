@@ -710,6 +710,14 @@
   justify-content: center;
 }
 
+.location-item-username {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #888);
+  background: var(--glass-10);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm, 4px);
+}
+
 .location-item-info {
   display: flex;
   gap: 8px;
@@ -760,6 +768,7 @@
   font-weight: 600;
 
   &[data-action='create'],
+  &[data-action='batch_create'],
   &[data-action='insert'],
   &[data-action='INSERT'] {
     background: rgba(var(--color-success-rgb), 0.12);
@@ -767,6 +776,7 @@
   }
 
   &[data-action='update'],
+  &[data-action='batch_update'],
   &[data-action='edit'],
   &[data-action='UPDATE'] {
     background: rgba(var(--color-primary-rgb), 0.12);
@@ -774,6 +784,7 @@
   }
 
   &[data-action='delete'],
+  &[data-action='batch_delete'],
   &[data-action='remove'],
   &[data-action='DELETE'] {
     background: rgba(var(--color-error-rgb), 0.12);
