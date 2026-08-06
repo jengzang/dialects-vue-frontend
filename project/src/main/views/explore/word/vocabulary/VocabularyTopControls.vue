@@ -43,17 +43,6 @@
             </div>
             <div class="search-field-mode-section">
               <h4 class="search-field-modal-title">
-                {{ t('words.wordList.search.standardWordFilterMode') }}
-              </h4>
-              <SwitchToggle
-                v-model="localSingleSelect"
-                :show-label="true"
-                :active-text="t('words.wordList.search.singleSelect')"
-                :inactive-text="t('words.wordList.search.multiSelect')"
-              />
-            </div>
-            <div class="search-field-mode-section">
-              <h4 class="search-field-modal-title">
                 {{ t('words.wordList.search.filterModeTitle') }}
               </h4>
               <SwitchToggle
@@ -62,6 +51,17 @@
                 :active-text="t('words.wordList.search.filterByRegion')"
                 :inactive-text="t('words.wordList.search.filterByLocation')"
                 @update:model-value="emit('update:filterByRegion', $event)"
+              />
+            </div>
+            <div class="search-field-mode-section">
+              <h4 class="search-field-modal-title">
+                {{ t('words.wordList.search.standardWordFilterMode') }}
+              </h4>
+              <SwitchToggle
+                v-model="localSingleSelect"
+                :show-label="true"
+                :active-text="t('words.wordList.search.singleSelect')"
+                :inactive-text="t('words.wordList.search.multiSelect')"
               />
             </div>
           </AppModal>

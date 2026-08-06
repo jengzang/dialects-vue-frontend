@@ -202,13 +202,13 @@ function resolveViewModeFromRoute() {
 }
 
 const viewMode = ref(resolveViewModeFromRoute())
-const selectedSearchFields = ref([])
+const selectedSearchFields = ref(JSON.parse(localStorage.getItem('vocabulary_search_fields') || '[]'))
 const selectedLocations = ref([])
 const filterByRegion = ref(localStorage.getItem('vocabulary_filter_by_region') === 'true')
 const selectedProvince = ref('')
 const selectedCity = ref('')
 const selectedStandardWord = ref('')
-const singleSelect = ref(true)
+const singleSelect = ref(localStorage.getItem('vocabulary_single_select') !== 'false')
 const selectedStandardWordsModel = ref([])
 const selectedStandardWords = computed(() => {
   if (singleSelect.value) {
@@ -712,6 +712,14 @@ watch(selectedProvince, () => {
 
 watch(filterByRegion, (val) => {
   localStorage.setItem('vocabulary_filter_by_region', val ? 'true' : 'false')
+})
+
+watch(selectedSearchFields, (val) => {
+  localStorage.setItem('vocabulary_search_fields', JSON.stringify(val))
+}, { deep: true })
+
+watch(singleSelect, (val) => {
+  localStorage.setItem('vocabulary_single_select', val ? 'true' : 'false')
 })
 
 watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, selectedProvince, selectedCity], () => {
