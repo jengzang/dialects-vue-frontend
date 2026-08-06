@@ -37,6 +37,14 @@ function appendCommonSearchParams(query, params = {}, defaultLimit) {
   }
 }
 
+function appendRepeatedParams(query, key, value) {
+  const values = Array.isArray(value) ? value : [value];
+  values
+    .map((item) => String(item || '').trim())
+    .filter(Boolean)
+    .forEach((item) => query.append(key, item));
+}
+
 function getFastApiErrorMessage(error, fallback) {
   const detail = error?.detail ?? error?.response?.detail;
   if (typeof detail === 'string' && detail.trim()) {
@@ -84,7 +92,7 @@ export async function getToponymNames(params = {}) {
     query.set('include_division_tree', 'true');
   }
   if (params.parent_path) {
-    query.set('parent_path', String(params.parent_path));
+    appendRepeatedParams(query, 'parent_path', params.parent_path);
   }
   if (params.page !== undefined && params.page !== null && params.page !== '') {
     query.set('page', String(params.page));
@@ -97,7 +105,16 @@ export async function getToponymNames(params = {}) {
     const payload = await api(`/api/toponyms/names?${query.toString()}`);
     return {
       items: Array.isArray(payload?.items) ? payload.items : [],
-      mode: payload?.mode || 'full_tree',
+      mode: payload?.mode || (params.include_division_tree ? 'full' : 'flat'),
+      reason: payload?.reason || '',
+      threshold: payload?.threshold ?? null,
+      filtered_count: payload?.filtered_count ?? null,
+      levels: payload?.levels ?? null,
+      lazy_bootstrap: Array.isArray(payload?.lazy_bootstrap) ? payload.lazy_bootstrap : [],
+      level: payload?.level ?? null,
+      parent_path: Array.isArray(payload?.parent_path) ? payload.parent_path : [],
+      children: Array.isArray(payload?.children) ? payload.children : [],
+      names: Array.isArray(payload?.names) ? payload.names : [],
       page: payload?.page ?? null,
       page_size: payload?.page_size ?? null,
       has_more: Boolean(payload?.has_more),
