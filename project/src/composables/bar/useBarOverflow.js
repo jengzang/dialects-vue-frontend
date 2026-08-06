@@ -74,5 +74,15 @@ export function useBarOverflow(options) {
     return 'max-content'
   }
 
-  return { hasOverflowForLayout, getOverflowFlex, getOverflowMinWidth }
+  const getOverflowMaxWidth = (t, isMobile) => {
+    const scroll = getTabScroll(t, isMobile)
+    if (!scroll) return undefined
+    if (!hasOverflowForLayout(isMobile)) return undefined
+    if (navContentWidth.value <= 0) return undefined
+    const w = getFlexWeight(t, resolveIsActive(t.tab), isMobile)
+    const totalWeight = getPrimaryTotalWeight(isMobile)
+    return `${(w / totalWeight) * navContentWidth.value}px`
+  }
+
+  return { hasOverflowForLayout, getOverflowFlex, getOverflowMinWidth, getOverflowMaxWidth }
 }
