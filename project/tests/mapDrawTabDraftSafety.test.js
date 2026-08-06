@@ -1,23 +1,27 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, defineComponent, nextTick, ref } from 'vue'
 
-const mocks = vi.hoisted(() => ({
-  showConfirm: vi.fn(),
-  showError: vi.fn(),
-  showSuccess: vi.fn(),
-  showWarning: vi.fn(),
-  saveDraftRecord: vi.fn(),
-  listDraftRecords: vi.fn(),
-  getDraftRecordById: vi.fn(),
-  migrateLegacyDraftsFromLocalStorage: vi.fn(),
-  updateDraftRecord: vi.fn(),
-  deleteDraftRecord: vi.fn(),
-  mapSetDrawMode: vi.fn(),
-  mapSelectFeature: vi.fn(),
-  mapSelectFeatures: vi.fn(),
-  mapDeleteSelected: vi.fn(),
-  AUTO_DRAFT_ID: '__map_draw_auto_draft__',
-}))
+const mocks = vi.hoisted(() => {
+  globalThis.__WEB_BASE__ = ''
+
+  return {
+    showConfirm: vi.fn(),
+    showError: vi.fn(),
+    showSuccess: vi.fn(),
+    showWarning: vi.fn(),
+    saveDraftRecord: vi.fn(),
+    listDraftRecords: vi.fn(),
+    getDraftRecordById: vi.fn(),
+    migrateLegacyDraftsFromLocalStorage: vi.fn(),
+    updateDraftRecord: vi.fn(),
+    deleteDraftRecord: vi.fn(),
+    mapSetDrawMode: vi.fn(),
+    mapSelectFeature: vi.fn(),
+    mapSelectFeatures: vi.fn(),
+    mapDeleteSelected: vi.fn(),
+    AUTO_DRAFT_ID: '__map_draw_auto_draft__',
+  }
+})
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -45,6 +49,10 @@ vi.mock('@/utils/ui/message.js', () => ({
 
 vi.mock('@/api/main/geo/LocationAndRegion.js', () => ({
   getLocationPartitions: vi.fn(),
+}))
+
+vi.mock('@/api/auth/httpClient.js', () => ({
+  api: vi.fn(),
 }))
 
 vi.mock('@/composables/data/usePartitionCache.js', () => ({
@@ -77,6 +85,7 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
     props: ['modelValue', 'activeLayer', 'featureBoxSelectEnabled'],
     emits: ['update:modelValue', 'features-change', 'feature-select', 'feature-box-select'],
     setup(props, { emit, expose }) {
+      let firstLayerId = ''
       expose({
         setDrawMode: mocks.mapSetDrawMode,
         selectFeature: mocks.mapSelectFeature,
@@ -96,7 +105,10 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
       const addPolygonFeature = () => {
         const nextIndex = (props.modelValue?.features?.length ?? 0) + 1
         const previousFeatures = props.modelValue?.features ?? []
-        const featureProperties = props.activeLayer?.id === 'draw-layer-2'
+        const activeLayerId = props.activeLayer?.id || ''
+        if (!firstLayerId && activeLayerId) firstLayerId = activeLayerId
+        const isFollowupLayer = activeLayerId && firstLayerId && activeLayerId !== firstLayerId
+        const featureProperties = isFollowupLayer
           ? { zone: `Zone ${nextIndex}` }
           : {
               region: `Region ${nextIndex}`,
@@ -883,10 +895,13 @@ describe('MapDrawTab draft safety', () => {
     await nextTick()
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
     await flushTicks()
-    wrapper.host.querySelectorAll('[data-testid="layer-button"]')[0].click()
+    const layerButtons = wrapper.host.querySelectorAll('[data-testid="layer-button"]')
+    const sourceLayerId = layerButtons[0].textContent
+    const targetLayerId = layerButtons[1].textContent
+    layerButtons[0].click()
     await flushTicks()
 
-    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe('draw-layer-1')
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe(sourceLayerId)
     const checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
     checkboxes[0].click()
     checkboxes[1].click()
@@ -894,7 +909,7 @@ describe('MapDrawTab draft safety', () => {
     wrapper.host.querySelector('[data-testid="move-selected-features"]').click()
     await flushTicks()
 
-    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe('draw-layer-2')
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe(targetLayerId)
     expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(2)
     expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
       .every((item) => item.checked)).toBe(true)
@@ -906,7 +921,7 @@ describe('MapDrawTab draft safety', () => {
     }))
     await flushTicks()
 
-    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe('draw-layer-1')
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe(sourceLayerId)
     expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(2)
 
     wrapper.unmount()
