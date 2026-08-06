@@ -132,6 +132,10 @@
 
 .draw-tool-button-grid {
   @include draw-button-grid(2);
+
+  .main-glass-button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
 }
 
 .draw-tool-button-grid--three {

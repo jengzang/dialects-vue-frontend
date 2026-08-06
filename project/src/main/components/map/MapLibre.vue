@@ -950,7 +950,7 @@ $glass-transition: all 0.3s ease;
   z-index: 100;
 
   width: 75dvw;
-  height: 70dvh;
+  height: 75dvh;
 
   overflow: hidden;
   // transform: translateX(-50%);

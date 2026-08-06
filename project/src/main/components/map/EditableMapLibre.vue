@@ -1201,10 +1201,14 @@ const unbindPreviewHover = () => {
 
 const resetHoveredFeature = () => {
   if (hoveredFeatureKey && hoveredFeatureSource && map.value) {
-    map.value.setFeatureState(
-      { source: hoveredFeatureSource, id: hoveredFeatureKey },
-      { hover: false }
-    )
+    try {
+      map.value.setFeatureState(
+        { source: hoveredFeatureSource, id: hoveredFeatureKey },
+        { hover: false }
+      )
+    } catch {
+      /* source may have been removed (e.g. voronoi preview cleared) */
+    }
   }
   hoveredFeatureKey = null
   hoveredFeatureSource = null
