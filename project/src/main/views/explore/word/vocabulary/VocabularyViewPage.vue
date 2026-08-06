@@ -172,7 +172,6 @@ import { watchDebounced } from '@vueuse/core'
 import {
   getVocabularyItems,
   getVocabularyLocationOptions,
-  getVocabularyLocations,
   getVocabularyMapItems,
   getVocabularyMapPoints,
   getVocabularyStandardWords
@@ -697,33 +696,10 @@ function loadActiveViewMode() {
   }
 }
 
-const hasAutoFilteredLocations = ref(false)
-
-async function loadUserLocationFilter() {
-  if (hasAutoFilteredLocations.value) return
-  if (!props.vocabularyMe || props.vocabularyMe.permission_level === 'manage') return
-  try {
-    const response = await getVocabularyLocations({ page_size: 500 })
-    const locations = Array.isArray(response.locations) ? response.locations : []
-    const names = locations.map((l) => l.location_name).filter(Boolean)
-    if (names.length) {
-      selectedLocations.value = names
-      hasAutoFilteredLocations.value = true
-    }
-  } catch {
-    // 获取失败则不过滤
-  }
-}
-
 onMounted(async () => {
   await loadVocabularyLocationOptions()
-  await loadUserLocationFilter()
   loadVocabularyStandardWords()
   loadActiveViewMode()
-})
-
-watch(() => props.vocabularyMe, () => {
-  loadUserLocationFilter()
 })
 
 watch(() => route.query.tab, (tab) => {
