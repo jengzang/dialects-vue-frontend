@@ -50,6 +50,7 @@
               ]"
               :style="{
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), false),
+                minWidth: getOverflowMinWidth(t, false),
                 fontSize: t.fontSize + 'rem'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
@@ -153,6 +154,7 @@
               ]"
               :style="{
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), true),
+                minWidth: getOverflowMinWidth(t, true),
                 fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
@@ -254,7 +256,7 @@ const { canScrollLeft, canScrollRight, arrowLeftPx, arrowRightPx, startScroll, s
   desktopRef
 )
 
-const { getOverflowFlex } = useBarOverflow({
+const { getOverflowFlex, getOverflowMinWidth } = useBarOverflow({
   orderedTabs,
   orderedMobileTabs,
   hasOverflowDesktop,
