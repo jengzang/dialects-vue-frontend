@@ -36,6 +36,17 @@
           <h3>{{ t('villages.pages.toponyms.nameTree.title') }}</h3>
           <span v-if="nameTreeLoading">{{ t('villages.pages.toponyms.nameTree.loading') }}</span>
         </div>
+        <p
+          v-if="nameTreeMeta.mode === 'lazy_fallback'"
+          class="toponym-results-panel__muted toponym-results-panel__name-tree-note"
+        >
+          {{
+            t('villages.pages.toponyms.nameTree.lazyFallback', {
+              count: nameTreeMeta.filteredCount,
+              threshold: nameTreeMeta.threshold,
+            })
+          }}
+        </p>
         <button
           class="main-glass-button toponym-results-panel__tree-action"
           type="button"
@@ -61,7 +72,7 @@
           {{ t('villages.pages.toponyms.nameTree.idle') }}
         </p>
         <p
-          v-else-if="!nameTreeRows.length"
+          v-else-if="!nameTreeLoading && !nameTreeRows.length"
           class="toponym-results-panel__muted toponym-results-panel__name-tree-note"
         >
           {{ t('villages.pages.toponyms.nameTree.empty') }}
@@ -76,14 +87,51 @@
             class="toponym-results-panel__tree-node"
             :style="getTreeRowStyle(row)"
           >
-            <span>{{ row.name }}</span>
-            <small>{{ t('villages.pages.toponyms.nameTree.level', { level: row.level }) }}</small>
+            <div class="toponym-results-panel__tree-row-main">
+              <button
+                v-if="row.expandable"
+                class="toponym-results-panel__tree-toggle"
+                type="button"
+                :aria-label="t('villages.pages.toponyms.nameTree.expand')"
+                :disabled="row.node.loading"
+                @click="emit('expand-name-tree-node', row.node)"
+              >
+                {{ row.node.expanded ? '-' : '+' }}
+              </button>
+              <span>{{ row.name }}</span>
+              <small>{{ t('villages.pages.toponyms.nameTree.level', { level: row.level }) }}</small>
+            </div>
+            <p
+              v-if="row.node.loading"
+              class="toponym-results-panel__muted"
+            >
+              {{ t('villages.pages.toponyms.nameTree.loadingNode') }}
+            </p>
+            <p
+              v-if="row.node.error"
+              class="toponym-results-panel__error"
+            >
+              {{ row.node.error }}
+            </p>
             <div
               v-if="row.names.length"
               class="toponym-results-panel__names"
             >
               {{ formatNames(row.names) }}
             </div>
+            <button
+              v-if="row.node.namesHasMore"
+              class="main-glass-button toponym-results-panel__more-action"
+              type="button"
+              :disabled="row.node.namesLoading"
+              @click="emit('load-more-name-tree-names', row.node)"
+            >
+              {{
+                row.node.namesLoading
+                  ? t('villages.pages.toponyms.nameTree.loading')
+                  : t('villages.pages.toponyms.nameTree.loadMore')
+              }}
+            </button>
           </li>
         </ol>
       </section>
@@ -124,6 +172,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  nameTreeMeta: {
+    type: Object,
+    default: () => ({}),
+  },
   nameTreeLoading: {
     type: Boolean,
     default: false,
@@ -138,7 +190,11 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['request-name-tree']);
+const emit = defineEmits([
+  'request-name-tree',
+  'expand-name-tree-node',
+  'load-more-name-tree-names',
+]);
 const { t } = useI18n();
 
 const nameTreeRows = computed(() => flattenNameTreeNodes(props.nameTree));
@@ -166,11 +222,16 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
       level,
       names: Array.isArray(node?.names) ? node.names.filter((item) => typeof item === 'string' && item) : [],
       depth,
+      node,
+      expandable: Boolean(node?.lazy || (Array.isArray(node?.children) && node.children.length)),
     };
+    const childRows = node?.expanded
+      ? flattenNameTreeNodes(node.children, key, depth + 1)
+      : [];
 
     return [
       row,
-      ...flattenNameTreeNodes(node?.children, key, depth + 1),
+      ...childRows,
     ];
   });
 }
@@ -263,7 +324,22 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
     border-radius: var(--radius-sm2);
     background: var(--surface-panel-subtle);
 
+    p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+  }
+
+  &__tree-row-main {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-inline-size: 0;
+
     span {
+      @include text-truncate;
+      min-inline-size: 0;
       color: var(--text-primary);
       font-size: 13px;
       line-height: 1.4;
@@ -276,6 +352,28 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
     }
   }
 
+  &__tree-toggle {
+    @include flex-center;
+    flex: 0 0 22px;
+    inline-size: 22px;
+    block-size: 22px;
+    padding: 0;
+    border: 1px solid var(--border-glass-subtle);
+    border-radius: var(--radius-sm);
+    background: var(--surface-glass-button);
+    color: var(--text-primary);
+    font: inherit;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--surface-glass-button-hover);
+    }
+
+    &:disabled {
+      @include disabled-state;
+    }
+  }
+
   &__names {
     color: var(--text-secondary);
     font-size: 12px;
@@ -285,6 +383,14 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
   &__name-tree-note {
     color: var(--text-tertiary);
+  }
+
+  &__more-action {
+    align-self: flex-start;
+
+    &:disabled {
+      @include disabled-state;
+    }
   }
 
   &__muted {

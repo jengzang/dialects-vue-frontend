@@ -67,10 +67,13 @@
         :scatter-count="scatterData.length"
         :truncated="pointsTruncated"
         :name-tree="nameTree"
+        :name-tree-meta="nameTreeMeta"
         :name-tree-loading="nameTreeLoading"
         :name-tree-error="nameTreeError"
         :name-tree-loaded="nameTreeLoaded"
         @request-name-tree="handleNameTreeRequest"
+        @expand-name-tree-node="handleNameTreeNodeExpand"
+        @load-more-name-tree-names="handleNameTreeNamesMore"
       />
     </section>
 
@@ -127,6 +130,7 @@ import { buildToponymScatterData } from './toponymsChartData.js';
 import { getDefaultToponymsLayerState, loadToponymsGisAsset } from './toponymsGisAssets.js';
 
 const { t } = useI18n();
+const TOPONYM_NAME_TREE_PAGE_SIZE = 100;
 
 const query = ref('');
 const matchMode = ref('prefix');
@@ -135,6 +139,13 @@ const hasSearched = ref(false);
 const lastPointSearchParams = ref(null);
 
 const nameTree = ref([]);
+const nameTreeMeta = reactive({
+  mode: '',
+  reason: '',
+  threshold: null,
+  filteredCount: null,
+  levels: 4,
+});
 const nameTreeLoading = ref(false);
 const nameTreeError = ref('');
 const nameTreeLoaded = ref(false);
@@ -279,7 +290,7 @@ async function handleNameTreeRequest() {
     });
 
     if (requestId !== nameTreeRequestId.value) return;
-    nameTree.value = payload.items;
+    normalizeToponymNameTreePayload(payload);
   } catch (error) {
     if (requestId !== nameTreeRequestId.value) return;
     nameTree.value = [];
@@ -287,6 +298,69 @@ async function handleNameTreeRequest() {
   } finally {
     if (requestId === nameTreeRequestId.value) {
       nameTreeLoading.value = false;
+    }
+  }
+}
+
+async function handleNameTreeNodeExpand(node) {
+  if (!node?.path?.length || node.loading) return;
+
+  if (node.loaded || !node.lazy) {
+    node.expanded = !node.expanded;
+    return;
+  }
+
+  const requestId = nameTreeRequestId.value;
+  node.loading = true;
+  node.error = '';
+
+  try {
+    const payload = await getToponymNames({
+      ...lastPointSearchParams.value,
+      include_division_tree: true,
+      limit: 0,
+      parent_path: node.path,
+      page: 1,
+      page_size: TOPONYM_NAME_TREE_PAGE_SIZE,
+    });
+
+    if (requestId !== nameTreeRequestId.value) return;
+    mergeLazyTreePayload(node, payload);
+  } catch (error) {
+    if (requestId !== nameTreeRequestId.value) return;
+    node.error = error.message || t('villages.pages.toponyms.errors.nameTree');
+  } finally {
+    if (requestId === nameTreeRequestId.value) {
+      node.loading = false;
+    }
+  }
+}
+
+async function handleNameTreeNamesMore(node) {
+  if (!node?.path?.length || node.namesLoading || !node.namesHasMore) return;
+
+  const requestId = nameTreeRequestId.value;
+  node.namesLoading = true;
+  node.error = '';
+
+  try {
+    const payload = await getToponymNames({
+      ...lastPointSearchParams.value,
+      include_division_tree: true,
+      limit: 0,
+      parent_path: node.path,
+      page: node.namesPage + 1,
+      page_size: TOPONYM_NAME_TREE_PAGE_SIZE,
+    });
+
+    if (requestId !== nameTreeRequestId.value) return;
+    mergeLazyTreePayload(node, payload);
+  } catch (error) {
+    if (requestId !== nameTreeRequestId.value) return;
+    node.error = error.message || t('villages.pages.toponyms.errors.nameTree');
+  } finally {
+    if (requestId === nameTreeRequestId.value) {
+      node.namesLoading = false;
     }
   }
 }
@@ -369,9 +443,106 @@ function resetSelectedDetails() {
 function resetNameTree() {
   nameTreeRequestId.value += 1;
   nameTree.value = [];
+  resetNameTreeMeta();
   nameTreeError.value = '';
   nameTreeLoading.value = false;
   nameTreeLoaded.value = false;
+}
+
+function resetNameTreeMeta() {
+  nameTreeMeta.mode = '';
+  nameTreeMeta.reason = '';
+  nameTreeMeta.threshold = null;
+  nameTreeMeta.filteredCount = null;
+  nameTreeMeta.levels = 4;
+}
+
+function normalizeToponymNameTreePayload(payload) {
+  updateNameTreeMeta(payload);
+  if (payload.mode === 'lazy_fallback') {
+    nameTree.value = buildToponymTreeNodes(payload.lazy_bootstrap, {
+      lazyBootstrap: true,
+      expanded: true,
+      levels: nameTreeMeta.levels,
+    });
+    return;
+  }
+
+  nameTree.value = buildToponymTreeNodes(payload.items, {
+    expanded: true,
+    levels: nameTreeMeta.levels,
+  });
+}
+
+function updateNameTreeMeta(payload) {
+  nameTreeMeta.mode = payload.mode || '';
+  nameTreeMeta.reason = payload.reason || '';
+  nameTreeMeta.threshold = payload.threshold;
+  nameTreeMeta.filteredCount = payload.filtered_count;
+  nameTreeMeta.levels = payload.levels || nameTreeMeta.levels || 4;
+}
+
+function mergeLazyTreePayload(node, payload) {
+  if (Array.isArray(payload.children)) {
+    node.children = buildToponymTreeNodes(payload.children, {
+      parentPath: node.path,
+      lazy: true,
+      levels: nameTreeMeta.levels,
+    });
+    node.loaded = true;
+    node.expanded = true;
+    return;
+  }
+
+  if (Array.isArray(payload.names)) {
+    node.names = payload.page && payload.page > 1
+      ? [...node.names, ...payload.names]
+      : payload.names;
+    node.namesPage = payload.page || 1;
+    node.namesHasMore = Boolean(payload.has_more);
+    node.loaded = true;
+    node.expanded = true;
+    node.lazy = false;
+  }
+}
+
+function buildToponymTreeNodes(nodes, options = {}) {
+  if (!Array.isArray(nodes)) return [];
+
+  return nodes.map((node, index) => createToponymTreeNode(node, index, options));
+}
+
+function createToponymTreeNode(node, index, options = {}) {
+  const name = typeof node?.name === 'string' && node.name ? node.name : '-';
+  const level = Number.isFinite(Number(node?.level)) ? Number(node.level) : null;
+  const path = [...(options.parentPath || []), name];
+  const rawChildren = Array.isArray(node?.children) ? node.children : [];
+  const lazyBootstrap = Boolean(options.lazyBootstrap);
+  const lazy = Boolean(options.lazy || (lazyBootstrap && level && level < options.levels));
+  const childOptions = {
+    parentPath: path,
+    expanded: options.expanded,
+    lazy: lazyBootstrap,
+    levels: options.levels,
+  };
+  const children = buildToponymTreeNodes(rawChildren, childOptions);
+
+  return {
+    key: `${path.join('/')}:${level ?? '-'}:${index}`,
+    name,
+    level: level ?? '-',
+    path,
+    names: Array.isArray(node?.names) ? node.names.filter((item) => typeof item === 'string' && item) : [],
+    children,
+    expanded: options.expanded || Boolean(children.length && !lazy),
+    lazy,
+    loaded: Boolean(!lazy || children.length),
+    loading: false,
+    error: '',
+    namesPage: 1,
+    namesHasMore: false,
+    namesLoading: false,
+  };
 }
 
 function setupLayoutWatcher() {

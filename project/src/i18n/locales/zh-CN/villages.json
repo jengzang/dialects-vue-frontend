@@ -196,7 +196,11 @@
         "loading": "加载中",
         "idle": "搜索点位后，可手动查询行政区层级地名。",
         "empty": "暂无地名层级结果",
-        "level": "{level} 级"
+        "level": "{level} 级",
+        "lazyFallback": "结果较多：{count} 条，超过完整树阈值 {threshold}，可逐级展开。",
+        "expand": "展开地名层级",
+        "loadingNode": "正在加载下级...",
+        "loadMore": "加载更多"
       },
       "detail": {
         "title": "点位详情",

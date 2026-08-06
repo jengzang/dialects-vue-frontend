@@ -196,7 +196,11 @@
         "loading": "Loading",
         "idle": "After searching points, query administrative name hierarchy manually.",
         "empty": "No name hierarchy results",
-        "level": "Level {level}"
+        "level": "Level {level}",
+        "lazyFallback": "{count} results exceed the full-tree threshold of {threshold}; expand levels manually.",
+        "expand": "Expand name hierarchy",
+        "loadingNode": "Loading child level...",
+        "loadMore": "Load more"
       },
       "detail": {
         "title": "Point Detail",
