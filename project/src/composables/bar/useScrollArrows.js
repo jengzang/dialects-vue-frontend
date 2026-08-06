@@ -63,11 +63,18 @@ export function useScrollArrows(navRef, hasOverflow, scrollAmount = 180, desktop
     }, 50)
   }
 
+  const handleWheel = (e) => {
+    if (!hasOverflow?.value) return
+    e.preventDefault()
+    navRef.value?.scrollBy({ left: e.deltaY + (e.deltaX || 0), behavior: 'auto' })
+  }
+
   onMounted(() => {
     const el = navRef?.value
     if (el) {
       el.addEventListener('scroll', updateVisibility, { passive: true })
       el.addEventListener('scroll', updateArrowPositions, { passive: true })
+      el.addEventListener('wheel', handleWheel, { passive: false })
       updateVisibility()
       nextTick(updateArrowPositions)
     }
@@ -82,6 +89,7 @@ export function useScrollArrows(navRef, hasOverflow, scrollAmount = 180, desktop
     if (el) {
       el.removeEventListener('scroll', updateVisibility)
       el.removeEventListener('scroll', updateArrowPositions)
+      el.removeEventListener('wheel', handleWheel)
     }
     if (desktopRef?.value) {
       window.removeEventListener('resize', updateArrowPositions)
