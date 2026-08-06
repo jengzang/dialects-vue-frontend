@@ -692,6 +692,14 @@ watch(() => props.defaultFilter, (next) => {
 const fetchData = async () => {
   isLoading.value = true; // 開啟 loading
   const searchCols = props.columns.map(c => c.key);
+  const filters = { ...filterState }
+  if (props.defaultFilter) {
+    Object.entries(props.defaultFilter).forEach(([key, value]) => {
+      if (!filters[key] || filters[key].length === 0) {
+        filters[key] = Array.isArray(value) ? [...value] : [value]
+      }
+    })
+  }
   const payload = {
     db_key: props.dbKey,
     table_name: props.tableName,
@@ -699,7 +707,7 @@ const fetchData = async () => {
     page_size: TABLE_CONFIG.PAGE_SIZE,  // ✅ 使用 constants 配置
     sort_by: sortCol.value,
     sort_desc: sortDesc.value,
-    filters: filterState,
+    filters,
     search_text: searchText.value,
     search_columns: searchCols
   };
