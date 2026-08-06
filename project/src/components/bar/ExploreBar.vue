@@ -195,6 +195,7 @@ import {
 import { useTabTooltip } from '@/composables/bar/useTabTooltip.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
+import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 
 const props = defineProps({
@@ -233,21 +234,10 @@ const mobileNavRef = ref(null)
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
 
-const getTabScroll = (tab, isMobile) => {
-  return isMobile ? (tab.mobileScroll ?? tab.scroll) : tab.scroll
-}
+const getTabScroll = (tab, isMobile) => getDefaultTabScroll(tab, isMobile)
 
-// Overflow scroll: sort tabs：左溢出 → 主 → 右溢出
-const sortTabsByScroll = (tabs, isMobile) => {
-  const all = tabs
-  const left = all.filter(t => getTabScroll(t, isMobile) === 'left')
-  const main = all.filter(t => !getTabScroll(t, isMobile) || (getTabScroll(t, isMobile) !== 'left' && getTabScroll(t, isMobile) !== 'right'))
-  const right = all.filter(t => getTabScroll(t, isMobile) === 'right')
-  return [...left, ...main, ...right]
-}
-
-const orderedTabs = computed(() => sortTabsByScroll(tabs.value, false))
-const orderedMobileTabs = computed(() => sortTabsByScroll(tabs.value, true))
+const orderedTabs = computed(() => sortTabsByScroll(tabs.value, false, getTabScroll))
+const orderedMobileTabs = computed(() => sortTabsByScroll(tabs.value, true, getTabScroll))
 
 const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(
   navRef,
@@ -264,29 +254,15 @@ const { canScrollLeft, canScrollRight, arrowLeftPx, arrowRightPx, startScroll, s
   desktopRef
 )
 
-const hasOverflowForLayout = (isMobile) => isMobile ? hasOverflowMobile.value : hasOverflowDesktop.value
-
-const getRenderedPrimaryTabs = (isMobile) =>
-  (isMobile ? orderedMobileTabs.value : orderedTabs.value)
-    .filter(t => !getTabScroll(t, isMobile) || (getTabScroll(t, isMobile) !== 'left' && getTabScroll(t, isMobile) !== 'right'))
-    .filter(t => !isMobile || !t.hideOnMobile)
-
-const getPrimaryTotalWeight = (isMobile) =>
-  getRenderedPrimaryTabs(isMobile)
-    .reduce((s, t) => s + getFlexWeight(t, isActiveComputed(t.tab), isMobile), 0) || 1
-
-const getOverflowFlex = (t, isActive, isMobile) => {
-  if (getTabScroll(t, isMobile)) return '0 0 auto'
-  if (hasOverflowForLayout(isMobile)) {
-    const w = getFlexWeight(t, isActive, isMobile)
-    const totalWeight = getPrimaryTotalWeight(isMobile)
-    if (navContentWidth.value > 0) {
-      return `0 0 ${(w / totalWeight) * navContentWidth.value}px`
-    }
-    return `0 0 ${(w / totalWeight) * 100}%`
-  }
-  return getFlexWeight(t, isActive, isMobile) + ' 1 0'
-}
+const { getOverflowFlex } = useBarOverflow({
+  orderedTabs,
+  orderedMobileTabs,
+  hasOverflowDesktop,
+  hasOverflowMobile,
+  navContentWidth,
+  getTabScroll,
+  resolveIsActive: (tabName) => isActiveComputed(tabName),
+})
 
 const submenuPosition = ref({ top: 0, left: 0 })
 let closeSubmenuTimer = null
@@ -402,27 +378,6 @@ const getCurrentTab = () => {
 
 const isActiveComputed = (tabName) => {
   return getCurrentTab() === tabName
-}
-
-const getFlexWeight = (tab, isActive, isMobileLayout) => {
-  let labelVisible
-
-  if (isMobileLayout) {
-    const showOnlyWhenActive = tab.mobileShowLabelOnlyWhenActive ?? tab.showLabelOnlyWhenActive
-    labelVisible = !tab.hideLabelOnMobile && (!showOnlyWhenActive || isActive)
-  } else {
-    labelVisible = !tab.showLabelOnlyWhenActive || isActive
-  }
-
-  if (labelVisible) {
-    return isMobileLayout ? (tab.mobileWeight || tab.weight) : tab.weight
-  }
-
-  if (isMobileLayout) {
-    return tab.mobileWeightIconOnly || tab.mobileWeight || tab.weightIconOnly || tab.weight
-  }
-
-  return tab.weightIconOnly || tab.weight
 }
 
 const onClick = async (tabConfig, navigate, event) => {
@@ -555,6 +510,7 @@ const goToAuthPage = () => {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+@use './bar-shared' as *;
 
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
@@ -911,82 +867,19 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   transform: translateY(-10px) scale(0.95);
 }
 
-.tab-tooltip {
-  padding: 6px 12px;
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.tab-tooltip-fade-enter-active,
-.tab-tooltip-fade-leave-active {
-  transition: opacity 0.15s ease;
-}
-
-.tab-tooltip-fade-enter-from,
-.tab-tooltip-fade-leave-to {
-  opacity: 0;
-}
+@include bar-tab-tooltip;
 
 .explorebar-tabs.has-overflow-tabs {
-  justify-content: flex-start;
-  overflow-x: scroll;
-  scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  @include bar-has-overflow-tabs;
 }
 
 .tab-overflow-left,
 .tab-overflow-right {
-  flex-shrink: 0;
-}
-
-@media (orientation: landscape) {
-  .tab-overflow-left,
-  .tab-overflow-right {
-    padding-inline: 10px;
-  }
+  @include bar-overflow-tabs;
 }
 
 .scroll-arrow {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  color: var(--text-dark);
-  font-size: 10px;
-  line-height: 1;
-  cursor: pointer;
-  user-select: none;
-  background: var(--glass-40);
-  border: 1px solid var(--glass-50);
-  border-radius: var(--radius-full);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  transition: background 0.2s ease, opacity 0.2s ease;
-
-  &:hover {
-    background: var(--glass-70);
-  }
-
-  &:active {
-    background: var(--glass-90);
-  }
-
-  &--left {
-    left: 0;
-  }
-
-  &--right {
-    right: 0;
-  }
+  @include bar-scroll-arrow;
 }
 
 @media (max-aspect-ratio: 1/1) {

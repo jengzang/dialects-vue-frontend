@@ -203,6 +203,7 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useTabTooltip } from '@/composables/bar/useTabTooltip.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
+import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 import { showSuccess } from '@/utils/ui/message.js'
 
@@ -233,21 +234,10 @@ watch(() => route.path, () => {
 const allMenuTabs = useMenuBarConfig()
 const tabs = computed(() => filterVisibleMenuBarTabs(allMenuTabs.value))
 
-const getTabScroll = (tab, isMobile) => {
-  return isMobile ? (tab.mobileScroll ?? tab.scroll) : tab.scroll
-}
+const getTabScroll = (tab, isMobile) => getDefaultTabScroll(tab, isMobile)
 
-// Overflow scroll: sort tabs：左溢出 → 主 → 右溢出
-const sortTabsByScroll = (tabs, isMobile) => {
-  const all = tabs
-  const left = all.filter(t => getTabScroll(t, isMobile) === 'left')
-  const main = all.filter(t => !getTabScroll(t, isMobile) || (getTabScroll(t, isMobile) !== 'left' && getTabScroll(t, isMobile) !== 'right'))
-  const right = all.filter(t => getTabScroll(t, isMobile) === 'right')
-  return [...left, ...main, ...right]
-}
-
-const orderedTabs = computed(() => sortTabsByScroll(tabs.value, false))
-const orderedMobileTabs = computed(() => sortTabsByScroll(tabs.value, true))
+const orderedTabs = computed(() => sortTabsByScroll(tabs.value, false, getTabScroll))
+const orderedMobileTabs = computed(() => sortTabsByScroll(tabs.value, true, getTabScroll))
 
 const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(
   navRef,
@@ -264,50 +254,15 @@ const { canScrollLeft, canScrollRight, arrowLeftPx, arrowRightPx, startScroll, s
   desktopRef
 )
 
-const hasOverflowForLayout = (isMobile) => isMobile ? hasOverflowMobile.value : hasOverflowDesktop.value
-
-const getFlexWeight = (tab, isActive, isMobile) => {
-  let labelVisible
-
-  if (isMobile) {
-    const showOnlyWhenActive = tab.mobileShowLabelOnlyWhenActive ?? tab.showLabelOnlyWhenActive
-    labelVisible = !tab.hideLabelOnMobile && (!showOnlyWhenActive || isActive)
-  } else {
-    labelVisible = !tab.showLabelOnlyWhenActive || isActive
-  }
-
-  if (labelVisible) {
-    return isMobile ? (tab.mobileWeight || tab.weight) : tab.weight
-  } else {
-    if (isMobile) {
-      return tab.mobileWeightIconOnly || tab.mobileWeight || tab.weightIconOnly || tab.weight
-    } else {
-      return tab.weightIconOnly || tab.weight
-    }
-  }
-}
-
-const getRenderedPrimaryTabs = (isMobile) =>
-  (isMobile ? orderedMobileTabs.value : orderedTabs.value)
-    .filter(t => !getTabScroll(t, isMobile) || (getTabScroll(t, isMobile) !== 'left' && getTabScroll(t, isMobile) !== 'right'))
-    .filter(t => !isMobile || !t.hideOnMobile)
-
-const getPrimaryTotalWeight = (isMobile) =>
-  getRenderedPrimaryTabs(isMobile)
-    .reduce((s, t) => s + getFlexWeight(t, isMenuTabActive(t.tab), isMobile), 0) || 1
-
-const getOverflowFlex = (t, isActive, isMobile) => {
-  if (getTabScroll(t, isMobile)) return '0 0 auto'
-  if (hasOverflowForLayout(isMobile)) {
-    const w = getFlexWeight(t, isActive, isMobile)
-    const totalWeight = getPrimaryTotalWeight(isMobile)
-    if (navContentWidth.value > 0) {
-      return `0 0 ${(w / totalWeight) * navContentWidth.value}px`
-    }
-    return `0 0 ${(w / totalWeight) * 100}%`
-  }
-  return getFlexWeight(t, isActive, isMobile) + ' 1 0'
-}
+const { getOverflowFlex } = useBarOverflow({
+  orderedTabs,
+  orderedMobileTabs,
+  hasOverflowDesktop,
+  hasOverflowMobile,
+  navContentWidth,
+  getTabScroll,
+  resolveIsActive: (tabName) => isMenuTabActive(tabName),
+})
 
 const isMenuTabActive = (tabName) => {
   return getMenuBarActiveTab(tabs.value, route) === tabName
@@ -350,6 +305,7 @@ const goToSettings = () => {
 
 
 <style scoped lang="scss">
+@use './bar-shared' as *;
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
@@ -728,88 +684,20 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
   }
 }
 
-.tab-tooltip {
-  padding: 6px 12px;
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.tab-tooltip-fade-enter-active,
-.tab-tooltip-fade-leave-active {
-  transition: opacity 0.15s ease;
-}
-
-.tab-tooltip-fade-enter-from,
-.tab-tooltip-fade-leave-to {
-  opacity: 0;
-}
+@include bar-tab-tooltip;
 
 .navbar-btn.has-overflow-tabs,
 .navbar-bottom.has-overflow-tabs {
-  justify-content: flex-start;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    height: 0;
-  }
+  @include bar-has-overflow-tabs;
 }
 
 .tab-overflow-left,
 .tab-overflow-right {
-  flex-shrink: 0;
-}
-
-@media (orientation: landscape) {
-  .tab-overflow-left,
-  .tab-overflow-right {
-    padding-inline: 10px;
-  }
-}
-
-@media (orientation: portrait) {
-  .tab-overflow-left,
-  .tab-overflow-right {
-    padding-inline: 14px;
-  }
+  @include bar-overflow-tabs;
 }
 
 .scroll-arrow {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  color: var(--text-dark);
-  font-size: 10px;
-  line-height: 1;
-  cursor: pointer;
-  user-select: none;
-  background: var(--glass-40);
-  border: 1px solid var(--glass-50);
-  border-radius: var(--radius-full);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  transition: background 0.2s ease, opacity 0.2s ease;
-
-  &:hover {
-    background: var(--glass-70);
-  }
-
-  &:active {
-    background: var(--glass-90);
-  }
+  @include bar-scroll-arrow;
 }
 
 @media (max-aspect-ratio: 1/1) {
