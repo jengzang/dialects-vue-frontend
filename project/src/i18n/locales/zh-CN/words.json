@@ -62,7 +62,12 @@
       "filterTitle": "搜索筛选",
       "standardWordFilterMode": "地图标准词筛选",
       "singleSelect": "单选",
-      "multiSelect": "多选"
+      "multiSelect": "多选",
+      "filterModeTitle": "筛选方式",
+      "filterByRegion": "按行政区",
+      "filterByLocation": "按地点",
+      "provincePlaceholder": "选择省",
+      "cityPlaceholder": "选择市"
     },
     "sort": {
       "label": "排序",

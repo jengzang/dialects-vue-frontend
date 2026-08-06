@@ -367,6 +367,7 @@ const standardWordTriggerLabel = computed(() => {
 
 .location-filter {
   display: flex;
+  gap: 10px;
   align-items: center;
   justify-content: center;
   position: relative;

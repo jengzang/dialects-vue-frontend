@@ -62,7 +62,12 @@
       "filterTitle": "Search Filter",
       "standardWordFilterMode": "Map Standard Word Filter",
       "singleSelect": "Single",
-      "multiSelect": "Multi"
+      "multiSelect": "Multi",
+      "filterModeTitle": "Filter Mode",
+      "filterByRegion": "By Region",
+      "filterByLocation": "By Location",
+      "provincePlaceholder": "Select Province",
+      "cityPlaceholder": "Select City"
     },
     "sort": {
       "label": "Sort",
