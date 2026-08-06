@@ -60,6 +60,9 @@ describe('toponyms page shell', () => {
     expect(searchBar).toContain('@submit.prevent');
     expect(searchBar).not.toContain('pointLimit');
     expect(searchBar).not.toContain('toponyms.search.limit');
+    expect(searchBar).not.toContain('placeTypeCode');
+    expect(searchBar).not.toContain('placeTypeOptions');
+    expect(searchBar).not.toContain('toponyms.search.placeType');
     expect(layerControls).toContain('riverL1');
     expect(layerControls).toContain('riverL2');
     expect(layerControls).toContain('riverL3');
@@ -96,6 +99,9 @@ describe('toponyms page shell', () => {
     expect(page).toContain('lazy_bootstrap');
     expect(page).toContain('lazyBootstrap: true');
     expect(page).toContain('expanded: true');
+    expect(page).not.toContain('const placeTypeCode');
+    expect(page).not.toContain('v-model:place-type-code');
+    expect(page).not.toContain('place_type_code: placeTypeCode.value');
     expect(page).not.toContain('watch([query, matchMode, placeTypeCode]');
     expect(page).not.toContain('scheduleSuggestionLoad');
     expect(page).not.toContain('loadSuggestions');

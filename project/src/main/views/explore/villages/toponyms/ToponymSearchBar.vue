@@ -27,16 +27,6 @@
       />
     </label>
 
-    <label class="toponym-search-bar__field">
-      <span>{{ t('villages.pages.toponyms.search.placeType') }}</span>
-      <SimpleSelectDropdown
-        :model-value="placeTypeCode"
-        :options="placeTypeOptions"
-        match-trigger-width
-        @update:model-value="emit('update:placeTypeCode', $event)"
-      />
-    </label>
-
     <button
       class="main-glass-button toponym-search-bar__submit"
       type="submit"
@@ -61,10 +51,6 @@ defineProps({
     type: String,
     default: 'prefix',
   },
-  placeTypeCode: {
-    type: String,
-    default: '22200',
-  },
   loading: {
     type: Boolean,
     default: false,
@@ -74,7 +60,6 @@ defineProps({
 const emit = defineEmits([
   'update:query',
   'update:matchMode',
-  'update:placeTypeCode',
   'search',
 ]);
 
@@ -85,12 +70,6 @@ const matchModeOptions = computed(() => [
   { value: 'suffix', label: t('villages.pages.toponyms.matchModes.suffix') },
   { value: 'exact', label: t('villages.pages.toponyms.matchModes.exact') },
   { value: 'contains', label: t('villages.pages.toponyms.matchModes.contains') },
-]);
-
-const placeTypeOptions = computed(() => [
-  { value: '22200', label: t('villages.pages.toponyms.placeTypes.naturalVillage') },
-  { value: '21610', label: t('villages.pages.toponyms.placeTypes.adminVillage') },
-  { value: '27610', label: t('villages.pages.toponyms.placeTypes.villageCommittee') },
 ]);
 
 function handleSubmit() {

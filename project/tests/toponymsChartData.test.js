@@ -3,6 +3,7 @@ import {
   buildRiverLineSeriesData,
   buildToponymScatterData,
   extractToponymPointFromChartParams,
+  findNearestToponymPoint,
   getToponymPointExtent,
 } from '../src/main/views/explore/villages/toponyms/toponymsChartData.js';
 
@@ -35,6 +36,20 @@ describe('toponyms ECharts data helpers', () => {
       id: 'abc',
       coordinates: [114.1, 22.2],
     });
+  });
+
+  it('finds the nearest toponym point within a click tolerance', () => {
+    const data = [
+      { id: 'far', value: [110, 20] },
+      { id: 'near', value: [113.05, 23.02] },
+      { id: 'outside', value: [113.6, 23.6] },
+    ];
+
+    expect(findNearestToponymPoint(data, [113, 23], 0.1)).toEqual({
+      id: 'near',
+      coordinates: [113.05, 23.02],
+    });
+    expect(findNearestToponymPoint(data, [113, 23], 0.01)).toBeNull();
   });
 
   it('converts river GeoJSON lines into ECharts line segments', () => {

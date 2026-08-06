@@ -26,8 +26,13 @@ describe('toponyms ECharts distribution chart', () => {
     expect(chart).toContain('eventPosition');
     expect(chart).toContain('params.event.event.clientX');
     expect(chart).toContain("emit('select-point'");
-    expect(chart).toContain('large: false');
-    expect(chart).not.toContain('large: props.scatterData');
+    expect(chart).toContain('large: true');
+    expect(chart).toContain('largeThreshold: TOPONYM_LARGE_RENDER_THRESHOLD');
+    expect(chart).toContain('progressive: 0');
+    expect(chart).toContain('replaceMerge: [\'series\']');
+    expect(chart).toContain('notMerge: false');
+    expect(chart).not.toContain('setOption(' + '\n    {' + '\n      backgroundColor');
+    expect(chart).not.toContain('large: false');
   });
 
   it('keeps layer controls in a compact chart toolbar and status text centered over the chart', () => {

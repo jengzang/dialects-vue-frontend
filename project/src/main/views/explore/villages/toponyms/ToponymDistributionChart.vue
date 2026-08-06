@@ -27,6 +27,7 @@ import {
 
 const COUNTRY_MAP_NAME = 'toponyms-country';
 const BOUNDARY_LAYER_KEYS = ['provinces', 'cities'];
+const TOPONYM_LARGE_RENDER_THRESHOLD = 2000;
 const POINT_CLICK_FILTER = {
   seriesType: 'scatter',
 };
@@ -115,7 +116,10 @@ watch(
 function initChart() {
   if (!chartEl.value || chartInstance) return;
 
-  chartInstance = echarts.init(chartEl.value);
+  chartInstance = echarts.init(chartEl.value, null, {
+    renderer: 'canvas',
+    useDirtyRect: true,
+  });
   chartInstance.on('click', handleChartClick);
 
   resizeObserver = new ResizeObserver(() => {
@@ -132,37 +136,40 @@ function renderChart() {
     registeredLayers.add(COUNTRY_MAP_NAME);
   }
 
-  chartInstance.setOption(
-    {
-      backgroundColor: 'transparent',
-      animation: false,
-      tooltip: buildTooltipOption(),
-      geo: {
-        map: COUNTRY_MAP_NAME,
-        roam: true,
-        silent: true,
-        zoom: 1.18,
-        scaleLimit: {
-          min: 0.4,
-          max: 28,
-        },
-        itemStyle: {
-          areaColor: cssToken('--surface-panel-subtle'),
-          borderColor: cssToken('--border-control'),
-          borderWidth: 1,
-        },
-        emphasis: {
-          disabled: true,
-        },
+  const option = {
+    backgroundColor: 'transparent',
+    animation: false,
+    tooltip: buildTooltipOption(),
+    geo: {
+      map: COUNTRY_MAP_NAME,
+      roam: true,
+      silent: true,
+      zoom: 1.18,
+      scaleLimit: {
+        min: 0.4,
+        max: 28,
       },
-      series: [
-        ...buildBoundarySeries(),
-        ...buildRiverSeries(),
-        buildPointSeries(),
-      ],
+      itemStyle: {
+        areaColor: cssToken('--surface-panel-subtle'),
+        borderColor: cssToken('--border-control'),
+        borderWidth: 1,
+      },
+      emphasis: {
+        disabled: true,
+      },
     },
-    true
-  );
+    series: [
+      ...buildBoundarySeries(),
+      ...buildRiverSeries(),
+      buildPointSeries(),
+    ],
+  };
+
+  chartInstance.setOption(option, {
+    notMerge: false,
+    replaceMerge: ['series'],
+    lazyUpdate: false,
+  });
 }
 
 function buildBoundarySeries() {
@@ -215,19 +222,16 @@ function buildPointSeries() {
     data: props.scatterData,
     symbol: 'rect',
     symbolSize: getPointSize(),
-    large: false,
+    large: true,
+    largeThreshold: TOPONYM_LARGE_RENDER_THRESHOLD,
+    progressive: 0,
+    progressiveThreshold: Number.MAX_SAFE_INTEGER,
     itemStyle: {
       color: cssToken('--color-primary'),
       opacity: 0.72,
-      borderColor: cssToken('--surface-panel-strong'),
-      borderWidth: 0.5,
     },
     emphasis: {
-      scale: true,
-      itemStyle: {
-        color: cssToken('--color-primary-hover'),
-        opacity: 0.95,
-      },
+      disabled: true,
     },
   };
 }
@@ -235,6 +239,7 @@ function buildPointSeries() {
 function buildTooltipOption() {
   return {
     trigger: 'item',
+    triggerOn: 'click',
     confine: true,
     textStyle: {
       color: cssToken('--text-deep'),

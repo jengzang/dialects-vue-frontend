@@ -1,6 +1,5 @@
 import { api } from '../auth/httpClient.js';
 
-export const TOPONYM_DEFAULT_PLACE_TYPE_CODE = '22200';
 export const TOPONYM_DEFAULT_POINT_LIMIT = 0;
 export const TOPONYM_DEFAULT_NAME_LIMIT = 20;
 export const TOPONYM_DETAILS_ID_LIMIT = 10;
@@ -26,7 +25,10 @@ function appendCommonSearchParams(query, params = {}, defaultLimit) {
   query.set('q', keyword);
   query.set('match_mode', normalizeMatchMode(params.match_mode));
   query.set('limit', String(normalizeLimit(params.limit, defaultLimit)));
-  query.set('place_type_code', String(params.place_type_code || TOPONYM_DEFAULT_PLACE_TYPE_CODE));
+
+  if (params.place_type_code !== undefined && params.place_type_code !== null && params.place_type_code !== '') {
+    query.set('place_type_code', String(params.place_type_code));
+  }
 
   if (params.bbox) {
     query.set('bbox', String(params.bbox));

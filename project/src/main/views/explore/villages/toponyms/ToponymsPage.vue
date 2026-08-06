@@ -10,7 +10,6 @@
         <ToponymSearchBar
           v-model:query="query"
           v-model:match-mode="matchMode"
-          v-model:place-type-code="placeTypeCode"
           :loading="pointsLoading"
           @search="handleSearch"
         />
@@ -134,7 +133,6 @@ const TOPONYM_NAME_TREE_PAGE_SIZE = 100;
 
 const query = ref('');
 const matchMode = ref('prefix');
-const placeTypeCode = ref('22200');
 const hasSearched = ref(false);
 const lastPointSearchParams = ref(null);
 
@@ -236,7 +234,6 @@ async function handleSearch() {
   const searchParams = {
     q: keyword,
     match_mode: matchMode.value,
-    place_type_code: placeTypeCode.value,
   };
   const requestId = pointsRequestId.value + 1;
   pointsRequestId.value = requestId;
