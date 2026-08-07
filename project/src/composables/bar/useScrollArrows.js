@@ -3,6 +3,7 @@ import { ref, nextTick, onMounted, onBeforeUnmount, watch } from 'vue'
 export function useScrollArrows(navRef, hasOverflow, scrollAmount = 180, desktopRef = null) {
   const canScrollLeft = ref(false)
   const canScrollRight = ref(false)
+  const isScrolling = ref(false)
   const arrowLeftPx = ref(0)
   const arrowRightPx = ref(0)
   let _interval = null
@@ -44,6 +45,7 @@ export function useScrollArrows(navRef, hasOverflow, scrollAmount = 180, desktop
   }
 
   const stopScroll = () => {
+    isScrolling.value = false
     if (_interval) {
       clearInterval(_interval)
       _interval = null
@@ -55,6 +57,7 @@ export function useScrollArrows(navRef, hasOverflow, scrollAmount = 180, desktop
     const el = navRef?.value
     if (!el) return
 
+    isScrolling.value = true
     const delta = direction === 'left' ? -scrollAmount : scrollAmount
     el.scrollBy({ left: delta, behavior: 'smooth' })
 
@@ -120,6 +123,7 @@ export function useScrollArrows(navRef, hasOverflow, scrollAmount = 180, desktop
   return {
     canScrollLeft,
     canScrollRight,
+    isScrolling,
     arrowLeftPx,
     arrowRightPx,
     startScroll,

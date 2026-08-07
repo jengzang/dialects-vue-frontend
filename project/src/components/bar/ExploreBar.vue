@@ -11,7 +11,7 @@
       </div>
 
       <button
-        v-if="showScrollArrows && canScrollLeft"
+        v-if="(showScrollArrows && canScrollLeft) || isScrolling"
         class="scroll-arrow scroll-arrow--left"
         :style="{ left: arrowLeftPx + 'px' }"
         @mousedown.prevent="startScroll('left')"
@@ -66,7 +66,7 @@
       </nav>
 
       <button
-        v-if="showScrollArrows && canScrollRight"
+        v-if="(showScrollArrows && canScrollRight) || isScrolling"
         class="scroll-arrow scroll-arrow--right"
         :style="{ right: arrowRightPx + 'px' }"
         @mousedown.prevent="startScroll('right')"
@@ -256,7 +256,7 @@ const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, o
   orderedMobileTabs
 )
 
-const { canScrollLeft, canScrollRight, arrowLeftPx, arrowRightPx, startScroll, stopScroll } = useScrollArrows(
+const { canScrollLeft, canScrollRight, isScrolling, arrowLeftPx, arrowRightPx, startScroll, stopScroll } = useScrollArrows(
   navRef,
   hasOverflowDesktop,
   props.scrollArrowAmount,
