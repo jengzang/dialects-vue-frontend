@@ -106,6 +106,7 @@
             :href="href"
             class="tab-item"
             :class="{
+              active: isActiveComputed(t.tab),
               'tab-overflow-left': getTabScroll(t, true) === 'left',
               'tab-overflow-right': getTabScroll(t, true) === 'right'
             }"
@@ -120,15 +121,13 @@
             @mouseleave="handleTabTooltipLeave"
             @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <span class="tab-inner" :class="{ active: isActiveComputed(t.tab) }">
-              <span class="emoji">{{ t.icon }}</span>
-              <span
-                class="label"
-                v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isActiveComputed(t.tab))"
-              >{{ t.label }}</span>
-              <svg v-if="getTabChildren(t.tab).length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
-              <svg v-else-if="!t.navigation?.matchPages?.length && !t.navigation?.activeMatchPaths?.length" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
-            </span>
+            <span class="emoji">{{ t.icon }}</span>
+            <span
+              class="label"
+              v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isActiveComputed(t.tab))"
+            >{{ t.label }}</span>
+            <svg v-if="getTabChildren(t.tab).length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            <svg v-else-if="!t.navigation?.matchPages?.length && !t.navigation?.activeMatchPaths?.length" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </a>
         </RouterLink>
       </nav>
@@ -618,6 +617,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   height: calc(100% - clamp(3px, 1dvh, 6px));
   margin: 0 calc(var(--tab-pad) * -1);
   padding: 0 var(--tab-pad);
+  font-size: 0.9em;
   border-radius: var(--radius-md);
 
   &:has(.tab-chevron),
@@ -630,7 +630,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     color 0.25s ease,
     border-color 0.25s ease,
     border-radius 0.25s ease,
-    box-shadow 0.25s ease;
+    box-shadow 0.25s ease,
+    font-size 0.25s ease;
 
   .label {
     overflow: hidden;
@@ -642,7 +643,6 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   .tab-chevron,
   .tab-external {
     flex-shrink: 0;
-    margin-left: 1px;
     opacity: 0.6;
   }
 
@@ -653,6 +653,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   &.active {
     color: $active-blue;
     font-weight: 1000;
+    font-size: 1.1em;
     background: linear-gradient(
       145deg,
       var(--glass-20),
@@ -668,7 +669,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       color $transition-base ease,
       border-color $transition-base ease,
       border-radius $transition-base ease,
-      box-shadow $transition-base ease;
+      box-shadow $transition-base ease,
+      font-size $transition-base ease;
 
     &:hover {
       background: linear-gradient(
@@ -788,13 +790,35 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     .tab-item {
       flex-shrink: 0;
       height: max(6dvh, 40px);
-    }
 
-    .tab-inner {
-      border-radius: 30px;
+      .emoji, .label {
+        font-size: 0.9em;
+      }
+
+      .tab-chevron,
+      .tab-external {
+        flex-shrink: 0;
+        margin-left: 1px;
+        opacity: 0.6;
+      }
 
       &.active {
+        color: $active-blue;
+        font-weight: 1000;
+        background: linear-gradient(
+          145deg,
+          var(--glass-20),
+          var(--glass-10)
+        );
+        border: 3px solid var(--glass-40);
         border-radius: 30px;
+        box-shadow:
+          0 6px 10px rgba(0, 0, 0, 0.1),
+          0 1px 4px rgba(0, 0, 0, 0.08);
+
+        .emoji, .label {
+          font-size: 1.1em;
+        }
       }
     }
 

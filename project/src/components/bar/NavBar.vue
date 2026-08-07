@@ -146,7 +146,7 @@
               class="menu-item"
               :class="[
                 t.cssClass,
-                { 'tab-overflow-left': getTabScroll(t, true) === 'left', 'tab-overflow-right': getTabScroll(t, true) === 'right' }
+                { active: isMenuTabActive(t.tab), 'tab-overflow-left': getTabScroll(t, true) === 'left', 'tab-overflow-right': getTabScroll(t, true) === 'right' }
               ]"
               :style="{
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), true),
@@ -159,14 +159,12 @@
               @mouseleave="handleTabTooltipLeave"
               @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <span class="menu-inner" :class="{ active: isMenuTabActive(t.tab) }">
-              <span class="emoji">{{ t.icon }}</span>
-              <span
-                class="label"
-                v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isMenuTabActive(t.tab))"
-              >{{ t.label }}</span>
-              <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
-            </span>
+            <span class="emoji">{{ t.icon }}</span>
+            <span
+              class="label"
+              v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isMenuTabActive(t.tab))"
+            >{{ t.label }}</span>
+            <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </a>
         </RouterLink>
       </div>
@@ -483,7 +481,6 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   user-select: none;
   .tab-external {
     flex-shrink: 0;
-    margin-left: 1px;
     opacity: 0.6;
   }
 }
@@ -496,6 +493,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   height: calc(100% - clamp(3px, 1dvh, 6px));
   margin: 0 calc(var(--tab-pad) * -1);
   padding: 0 var(--tab-pad);
+  font-size: 0.9em;
   border-radius: var(--radius-md);
 
   &:has(.tab-external) {
@@ -506,7 +504,8 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     color 0.25s ease,
     border-color 0.25s ease,
     border-radius 0.25s ease,
-    box-shadow 0.25s ease;
+    box-shadow 0.25s ease,
+    font-size 0.25s ease;
 
   .label {
     min-width: 0;
@@ -527,12 +526,14 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     border-radius: 25px;
     color: var(--color-primary-hover);
     font-weight: 1000;
+    font-size: 1.1em;
     transition:
       background 0.3s ease,
       color 0.3s ease,
       border-color 0.3s ease,
       border-radius 0.3s ease,
-      box-shadow 0.3s ease;
+      box-shadow 0.3s ease,
+      font-size 0.3s ease;
 
     &:hover {
       background: linear-gradient(
@@ -685,11 +686,25 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   .menu-item {
     height: 6dvh !important;
     border-radius: 30px !important;
+
+    .emoji, .label {
+      font-size: 0.9em;
+    }
+
+    &.active {
+      @include soft-glass-background;
+      @include soft-glass-shadow;
+
+      border: 3px solid var(--glass-40);
+      color: var(--color-primary-hover);
+      font-weight: 1000;
+
+      .emoji, .label {
+        font-size: 1.1em;
+      }
+    }
   }
 
-  .menu-inner {
-    --tab-pad: clamp(4px, 2vw, 10px);
-  }
 
   .title {
     img {
