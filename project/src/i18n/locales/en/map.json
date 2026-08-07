@@ -293,14 +293,14 @@
               "desc": "Returns when querying tone values"
             },
             "zhongGu": {
-              "scene": "Middle Chinese",
+              "scene": "MC Search",
               "phonology": "聲母 / 韻母 / 聲調",
               "feature": "MC query string",
               "value": "Corresponding sound value",
               "desc": "Matches e.g. 幫 initial group"
             },
             "yinWei": {
-              "scene": "Phoneme",
+              "scene": "Phoneme Search",
               "phonology": "聲母 / 韻母 / 聲調",
               "feature": "Phoneme identifier, e.g. p",
               "value": "Specific sound value",

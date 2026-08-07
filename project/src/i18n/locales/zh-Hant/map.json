@@ -293,14 +293,14 @@
               "desc": "搜某方言點的調值時返回"
             },
             "zhongGu": {
-              "scene": "中古音",
+              "scene": "查中古",
               "phonology": "聲母 / 韻母 / 聲調",
               "feature": "中古音查詢條件字符串",
               "value": "對應的音值",
               "desc": "如搜「幫」組聲母時命中"
             },
             "yinWei": {
-              "scene": "音位",
+              "scene": "查音位",
               "phonology": "聲母 / 韻母 / 聲調",
               "feature": "音位標識，如 p",
               "value": "具體音值",
