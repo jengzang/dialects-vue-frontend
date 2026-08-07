@@ -80,7 +80,7 @@ $system-font:
   flex: 1;
   width: 100%;
   padding: 10px 6px;
-  padding-top: calc(7.5dvh - 15px);
+  padding-top: calc(7dvh - 15px);
   color: var(--text-deep);
   font-family: $system-font;
 }
