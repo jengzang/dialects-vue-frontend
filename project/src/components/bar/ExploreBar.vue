@@ -613,7 +613,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   align-items: center;
   gap: 1px;
-  --tab-pad: clamp(2px, 1vw, 12px);
+  --tab-pad: clamp(3px, 1.2vw, 14px);
   height: calc(100% - clamp(3px, 1dvh, 6px));
   margin: 0 calc(var(--tab-pad) * -1);
   padding: 0 var(--tab-pad);
@@ -651,6 +651,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
   &.active {
+    position: relative;
     color: $active-blue;
     font-weight: 1000;
     font-size: 1.1em;
@@ -671,6 +672,19 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       border-radius $transition-base ease,
       box-shadow $transition-base ease,
       font-size $transition-base ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 65%;
+      height: 2px;
+      background: var(--color-primary-hover);
+      border-radius: 2px;
+      opacity: 0.5;
+    }
 
     &:hover {
       background: linear-gradient(
@@ -803,6 +817,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       &.active {
+        position: relative;
         color: $active-blue;
         font-weight: 1000;
         background: linear-gradient(
@@ -818,6 +833,19 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
         .emoji, .label {
           font-size: 1.1em;
+        }
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 3px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 65%;
+          height: 2px;
+          background: var(--color-primary-hover);
+          border-radius: 2px;
+          opacity: 0.5;
         }
       }
     }
