@@ -6,6 +6,7 @@ export function useScrollArrows(navRef, hasOverflow, scrollAmount = 180, desktop
   const arrowLeftPx = ref(0)
   const arrowRightPx = ref(0)
   let _interval = null
+  let _arrowResizeObserver = null
 
   const updateVisibility = () => {
     const el = navRef?.value
@@ -80,6 +81,13 @@ export function useScrollArrows(navRef, hasOverflow, scrollAmount = 180, desktop
     }
     if (desktopRef?.value) {
       window.addEventListener('resize', updateArrowPositions)
+      _arrowResizeObserver = new ResizeObserver(() => {
+        updateArrowPositions()
+      })
+      _arrowResizeObserver.observe(desktopRef.value)
+      if (navRef?.value) {
+        _arrowResizeObserver.observe(navRef.value)
+      }
     }
   })
 
@@ -93,6 +101,10 @@ export function useScrollArrows(navRef, hasOverflow, scrollAmount = 180, desktop
     }
     if (desktopRef?.value) {
       window.removeEventListener('resize', updateArrowPositions)
+    }
+    if (_arrowResizeObserver) {
+      _arrowResizeObserver.disconnect()
+      _arrowResizeObserver = null
     }
   })
 

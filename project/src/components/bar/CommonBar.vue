@@ -69,6 +69,8 @@
             class="label"
             v-if="!t.showLabelOnlyWhenActive || isActiveComputed(t.tab)"
           >{{ t.label }}</span>
+          <svg v-if="getTabChildren(t.tab)?.length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+          <svg v-else-if="t.to && !t.to.startsWith('/villagesML')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
         </a>
       </RouterLink>
       </nav>
@@ -147,6 +149,8 @@
               class="label"
               v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isActiveComputed(t.tab))"
             >{{ t.label }}</span>
+            <svg v-if="getTabChildren(t.tab)?.length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            <svg v-else-if="t.to && !t.to.startsWith('/villagesML')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </a>
         </RouterLink>
       </nav>
@@ -307,7 +311,7 @@ const showLoginButton = computed(() => {
   if (props.authConfig?.showLoginButton !== undefined) return props.authConfig.showLoginButton
   return legacy !== false
 })
-const scrollArrows = computed(() => props.layoutConfig?.scrollArrows ?? false)
+const scrollArrows = computed(() => props.layoutConfig?.scrollArrows ?? true)
 const scrollArrowAmount = computed(() => props.layoutConfig?.scrollArrowAmount ?? 100)
 const height = computed(() => props.layoutConfig?.height || getLegacyAttr('height') || '7.5dvh')
 const mobileHeight = computed(() => props.layoutConfig?.mobileHeight || getLegacyAttr('mobileHeight', 'mobile-height') || '8dvh')
@@ -337,9 +341,7 @@ const mobileNavRef = ref(null)
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
 
-const getTabScroll = (tab, isMobile) => {
-  return isMobile ? (tab.mobileScroll ?? tab.scroll) : (tab.scroll ?? tab.mobileScroll)
-}
+const getTabScroll = (tab, isMobile) => getDefaultTabScroll(tab, isMobile)
 
 const orderedTabs = computed(() => sortTabsByScroll(visibleTabs.value, false, getTabScroll))
 const orderedMobileTabs = computed(() => sortTabsByScroll(visibleTabs.value, true, getTabScroll))
@@ -685,11 +687,11 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     min-width: 0;
   }
 
-  .label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-width: 0;
+  .tab-chevron,
+  .tab-external {
+    flex-shrink: 0;
+    margin-left: 1px;
+    opacity: 0.6;
   }
 
   &:hover {

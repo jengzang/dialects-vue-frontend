@@ -64,6 +64,7 @@
             class="label"
             v-if="!t.showLabelOnlyWhenActive || isMenuTabActive(t.tab)"
           >{{ t.label }}</span>
+          <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </a>
         </RouterLink>
       </nav>
@@ -163,6 +164,7 @@
               class="label"
               v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isMenuTabActive(t.tab))"
             >{{ t.label }}</span>
+            <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </a>
         </RouterLink>
       </div>
@@ -311,9 +313,9 @@ $primary-dark: var(--color-primary-hover);
 $mobile-aspect-ratio: 1;
 
 // 桌面端不再直接使用 10dvh，避免高分辨率屏幕上导航栏过高。
-$desktop-navbar-height: clamp(64px, 7dvh, 82px);
-$desktop-control-size: clamp(44px, 4.8dvh, 56px);
-$desktop-title-height: clamp(50px, 6.2dvh, 70px);
+$desktop-navbar-height: clamp(50px, 6.8dvh, 70px);
+$desktop-control-size: clamp(44px, 5dvh, 56px);
+$desktop-title-height: clamp(40px, 6.2dvh, 60px);
 
 @mixin soft-glass-background {
   background: linear-gradient(
@@ -492,11 +494,10 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
     white-space: nowrap;
   }
 
-  .label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-width: 0;
+  .tab-external {
+    flex-shrink: 0;
+    margin-left: 1px;
+    opacity: 0.6;
   }
 
   &:hover {

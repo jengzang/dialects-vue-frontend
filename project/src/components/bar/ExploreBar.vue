@@ -58,6 +58,8 @@
             class="label"
             v-if="!t.showLabelOnlyWhenActive || isActiveComputed(t.tab)"
           >{{ t.label }}</span>
+          <svg v-if="getTabChildren(t.tab).length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+          <svg v-else-if="!t.navigation?.matchPages?.length && !t.navigation?.activeMatchPaths?.length" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
         </a>
       </RouterLink>
       </nav>
@@ -123,6 +125,8 @@
               class="label"
               v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isActiveComputed(t.tab))"
             >{{ t.label }}</span>
+            <svg v-if="getTabChildren(t.tab).length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            <svg v-else-if="!t.navigation?.matchPages?.length && !t.navigation?.activeMatchPaths?.length" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </a>
         </RouterLink>
       </nav>
@@ -521,8 +525,8 @@ $primary-blue-dark: var(--color-primary-hover);
 $active-blue: var(--color-primary-hover);
 $text-primary: var(--text-dark);
 
-$desktop-bar-height: 7.5dvh;
-$desktop-tab-height: 6.5dvh;
+$desktop-bar-height: 6.5dvh;
+$desktop-tab-height: 5.8dvh;
 
 $transition-fast: 0.2s;
 $transition-base: 0.3s;
@@ -618,11 +622,11 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     min-width: 0;
   }
 
-  .label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-width: 0;
+  .tab-chevron,
+  .tab-external {
+    flex-shrink: 0;
+    margin-left: 1px;
+    opacity: 0.6;
   }
 
   &:hover {
@@ -666,9 +670,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .logo-container {
   flex-shrink: 0;
-  width: 6dvh;
+  width: 5.5dvh;
   min-width: 5dvh;
-  height: 6dvh;
+  height: 5.5dvh;
   cursor: pointer;
   border-radius: var(--radius-full);
   transition: all $transition-base ease;
@@ -755,7 +759,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     gap: 3px;
     align-items: center;
     justify-content: space-between;
-    height: max(8dvh, 44px);
+    height: max(7dvh, 40px);
     padding: 0 1%;
 
     .explorebar-tabs {

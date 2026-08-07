@@ -28,6 +28,8 @@
           >
             <span role="img" :aria-label="key">{{ item.icon }}</span>
             {{ item.label }}
+            <svg v-if="item.children" class="sidebar-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+            <svg v-else-if="item.external" class="sidebar-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </li>
         </ul>
 
@@ -854,6 +856,13 @@ $portrait-ratio: 1;
 }
 
 
+.sidebar-chevron,
+.sidebar-external {
+  flex-shrink: 0;
+  margin-left: auto;
+  opacity: 0.6;
+}
+
 .submenu-icon {
   flex-shrink: 0;
 
@@ -944,7 +953,7 @@ $portrait-ratio: 1;
 
 
     li {
-      padding: 3px 15px;
+      padding: 3px 8px 3px 15px;
       font-size: 1.1rem;
     }
   }

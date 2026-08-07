@@ -404,7 +404,7 @@ export function useExploreBarConfig() {
             icon: '↔️',
             display: {
                 preset: 'compactDesktop',
-                overrides: { mobileScroll: 'right', weightIconOnly: 0.3 }
+                overrides: { scroll: 'right', weightIconOnly: 0.3 }
             },
             navigation: {
                 defaultTo: { path: withRouteLocale(route, '/menu/compare/zhonggu') }

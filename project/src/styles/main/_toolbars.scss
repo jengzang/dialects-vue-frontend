@@ -62,7 +62,7 @@
   color: var(--sidebar-item-text);
   font-weight: 1000;
   border-radius: 25px;
-  padding: 5px 15px;
+  padding: 5px 8px 5px 15px;
   box-shadow: 0 4px 8px var(--bg-overlay-light2), 0 1px 3px var(--bg-hover);
   border: 2px solid var(--sidebar-item-border);
   transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
@@ -186,7 +186,7 @@
 
   .main-sidebar-item {
     font-size: 1.1rem;
-    padding: 3px 15px;
+    padding: 3px 8px 3px 15px;
   }
 
   .main-sidebar-submenu-item {
