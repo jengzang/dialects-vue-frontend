@@ -90,6 +90,9 @@
           <p class="point-rows-description">
             {{ t('customEntry.pointDetail.rows.description') }}
           </p>
+          <button class="main-glass-button field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
+            {{ t('customEntry.pointDetail.rows.noticeTrigger') }}
+          </button>
         </div>
 
         <div class="point-rows-table">
@@ -206,6 +209,39 @@
     </div>
 
     <div v-if="saveMessage" class="point-save-message">{{ saveMessage }}</div>
+
+    <!-- 字段填写注意事项弹窗 -->
+    <AppModal v-model="isFieldNoticeOpen" size="sm" width="480px">
+      <template #header>
+        <div class="feature-detail-modal-header">
+          <h4 class="feature-detail-modal-title">{{ t('customEntry.pointDetail.rows.noticeTitle') }}</h4>
+          <button class="close-btn close-btn-sm close-btn-inline" type="button" @click="isFieldNoticeOpen = false">×</button>
+        </div>
+      </template>
+      <div class="field-notice-body">
+        <div class="field-notice-item">
+          <div class="field-notice-label">
+            <span class="field-notice-tag">{{ t('customEntry.pointDetail.rows.headers.phonology') }}</span>
+          </div>
+          <p>{{ t('customEntry.pointDetail.rows.hints.phonology') }}</p>
+        </div>
+        <div class="field-notice-item">
+          <div class="field-notice-label">
+            <span class="field-notice-tag">{{ t('customEntry.pointDetail.rows.headers.feature') }}</span>
+          </div>
+          <p>{{ t('customEntry.pointDetail.rows.hints.feature') }}</p>
+        </div>
+        <div class="field-notice-item">
+          <div class="field-notice-label">
+            <span class="field-notice-tag">{{ t('customEntry.pointDetail.rows.headers.value') }}</span>
+          </div>
+          <p>{{ t('customEntry.pointDetail.rows.hints.value') }}</p>
+        </div>
+        <div class="field-notice-warning">
+          {{ t('customEntry.pointDetail.rows.hints.warning') }}
+        </div>
+      </div>
+    </AppModal>
 
     <!-- 特征详情联动弹窗 -->
     <AppModal v-model="isFeatureModalOpen" size="md" width="640px" max-height="80dvh">
@@ -351,10 +387,10 @@ function createEmptyRow() {
 
 function parseCoordText(text) {
   if (!text || typeof text !== 'string') return null;
-  const [latText, lngText] = text.split(',');
-  const lat = Number(String(latText).trim());
+  const [lngText, latText] = text.split(',');
   const lng = Number(String(lngText).trim());
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  const lat = Number(String(latText).trim());
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
   return [lng, lat];
 }
 
@@ -685,6 +721,7 @@ async function handleSave() {
 }
 
 const isFeatureModalOpen = ref(false);
+const isFieldNoticeOpen = ref(false);
 const selectedFeatureName = ref('');
 const selectedFeaturePhonology = ref('');
 const featureLoading = ref(false);
@@ -1195,6 +1232,66 @@ watch(
   margin-top: $radius-md;
   font-size: 13px;
   color: $text-secondary;
+}
+
+.field-notice-trigger {
+  --main-glass-button-padding: 2px 10px;
+  font-size: 11px;
+  color: $warning;
+  border-color: rgba(var(--color-warning-rgb), 0.3);
+  background: rgba(var(--color-warning-rgb), 0.06);
+
+  &:hover:not(:disabled) {
+    background: rgba(var(--color-warning-rgb), 0.12);
+    border-color: $warning;
+    color: $warning;
+  }
+}
+
+.field-notice-body {
+  @include flex-col;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.field-notice-item {
+  padding: 10px 12px;
+  background: var(--glass-50);
+  border-radius: $radius-sm;
+
+  p {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: $text-secondary;
+    line-height: 1.7;
+  }
+}
+
+.field-notice-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-notice-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  background: rgba(var(--color-primary-rgb), 0.08);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: var(--radius-pill);
+  color: $primary;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.field-notice-warning {
+  padding: 10px 12px;
+  background: rgba(var(--color-warning-rgb), 0.08);
+  border-left: 3px solid $warning;
+  border-radius: 0 $radius-sm $radius-sm 0;
+  font-size: 13px;
+  color: $text-secondary;
+  line-height: 1.6;
 }
 
 // -- Feature detail modal --

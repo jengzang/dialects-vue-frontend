@@ -265,6 +265,48 @@
               "text": "After confirming that the fields are correct, submit the record to save it in your private data library."
             }
           }
+        },
+        "searchMapping": {
+          "title": "Field Requirements by Search Scenario",
+          "intro": "For custom data to be discoverable in search, the combination of \"Category\" and \"Comparative Feature\" determines which search scenario it appears in. If filled incorrectly, data is stored but will never be found in search.",
+          "note": "Additionally, the \"Location\" must match the dialect point specified in the search, otherwise it will not be found.",
+          "columns": {
+            "scene": "Search Scenario",
+            "phonology": "Category (required)",
+            "feature": "Comparative Feature (required)",
+            "value": "Value",
+            "desc": "Description"
+          },
+          "rows": {
+            "chars": {
+              "scene": "Char Search",
+              "phonology": "漢字",
+              "feature": "A specific character, e.g. 好",
+              "value": "Pronunciation at this location",
+              "desc": "Matches when searching 好"
+            },
+            "tones": {
+              "scene": "Tone Search",
+              "phonology": "調值",
+              "feature": "Tone class, e.g. 陰平",
+              "value": "Tone value, e.g. 55",
+              "desc": "Returns when querying tone values"
+            },
+            "zhongGu": {
+              "scene": "Middle Chinese",
+              "phonology": "聲母 / 韻母 / 聲調",
+              "feature": "MC query string",
+              "value": "Corresponding sound value",
+              "desc": "Matches e.g. 幫 initial group"
+            },
+            "yinWei": {
+              "scene": "Phoneme",
+              "phonology": "聲母 / 韻母 / 聲調",
+              "feature": "Phoneme identifier, e.g. p",
+              "value": "Specific sound value",
+              "desc": "Matches when querying phoneme distribution"
+            }
+          }
         }
       }
     },
