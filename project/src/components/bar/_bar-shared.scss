@@ -35,11 +35,9 @@
   line-height: 1;
   cursor: pointer;
   user-select: none;
-  background: var(--glass-40);
+  background: var(--glass-60);
   border: 1px solid var(--glass-50);
   border-radius: var(--radius-full);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   transition: background 0.2s ease, opacity 0.2s ease;
 
   &:hover {

@@ -44,7 +44,6 @@
               :href="href"
               class="menu-item"
               :class="[
-                { active: isMenuTabActive(t.tab) },
                 t.cssClass,
                 { 'tab-overflow-left': getTabScroll(t, false) === 'left', 'tab-overflow-right': getTabScroll(t, false) === 'right' }
               ]"
@@ -59,12 +58,14 @@
               @mouseleave="handleTabTooltipLeave"
               @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-          <span class="emoji">{{ t.icon }}</span>
-          <span
-            class="label"
-            v-if="!t.showLabelOnlyWhenActive || isMenuTabActive(t.tab)"
-          >{{ t.label }}</span>
-          <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          <span class="menu-inner" :class="{ active: isMenuTabActive(t.tab) }">
+            <span class="emoji">{{ t.icon }}</span>
+            <span
+              class="label"
+              v-if="!t.showLabelOnlyWhenActive || isMenuTabActive(t.tab)"
+            >{{ t.label }}</span>
+            <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </span>
           </a>
         </RouterLink>
       </nav>
@@ -144,7 +145,6 @@
               :href="href"
               class="menu-item"
               :class="[
-                { active: isMenuTabActive(t.tab) },
                 t.cssClass,
                 { 'tab-overflow-left': getTabScroll(t, true) === 'left', 'tab-overflow-right': getTabScroll(t, true) === 'right' }
               ]"
@@ -159,12 +159,14 @@
               @mouseleave="handleTabTooltipLeave"
               @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <span class="emoji">{{ t.icon }}</span>
-            <span
-              class="label"
-              v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isMenuTabActive(t.tab))"
-            >{{ t.label }}</span>
-            <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <span class="menu-inner" :class="{ active: isMenuTabActive(t.tab) }">
+              <span class="emoji">{{ t.icon }}</span>
+              <span
+                class="label"
+                v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isMenuTabActive(t.tab))"
+              >{{ t.label }}</span>
+              <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            </span>
           </a>
         </RouterLink>
       </div>
@@ -345,8 +347,9 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   background: linear-gradient(135deg, var(--glass-20), var(--glass-10));
   border: 1px solid var(--glass-30);
   box-shadow: var(--shadow-glass-inset);
-  backdrop-filter: blur(6px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(6px) saturate(160%);
+  -webkit-backdrop-filter: blur(6px) saturate(160%);
+  will-change: backdrop-filter;
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease,
@@ -407,7 +410,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   justify-content: center;
   gap: 4px;
 
-  @include glass-blur(15px, 150%);
+  @include glass-blur(8px, 150%);
   @include soft-glass-background;
   @include soft-glass-shadow;
 
@@ -470,7 +473,6 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 
   @include flex-center;
 
-  gap: 1px;
   border-radius: var(--radius-md);
   color: $primary;
   white-space: nowrap;
@@ -479,13 +481,32 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   font-size: 1.3rem;
   cursor: pointer;
   user-select: none;
+  .tab-external {
+    flex-shrink: 0;
+    margin-left: 1px;
+    opacity: 0.6;
+  }
+}
+
+.menu-inner {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  --tab-pad: clamp(2px, 1vw, 12px);
+  height: calc(100% - clamp(3px, 1dvh, 6px));
+  margin: 0 calc(var(--tab-pad) * -1);
+  padding: 0 var(--tab-pad);
+  border-radius: var(--radius-md);
+
+  &:has(.tab-external) {
+    padding-right: calc(var(--tab-pad) / 2);
+  }
   transition:
     background 0.25s ease,
     color 0.25s ease,
     border-color 0.25s ease,
     border-radius 0.25s ease,
-    box-shadow 0.25s ease,
-    height 0.25s ease;
+    box-shadow 0.25s ease;
 
   .label {
     min-width: 0;
@@ -494,15 +515,8 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     white-space: nowrap;
   }
 
-  .tab-external {
-    flex-shrink: 0;
-    margin-left: 1px;
-    opacity: 0.6;
-  }
-
-  &:hover {
+  .menu-item:hover & {
     background: rgba(var(--color-primary-rgb), 0.12);
-    color: $primary;
   }
 
   &.active {
@@ -510,7 +524,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     @include soft-glass-shadow;
 
     border: 3px solid var(--glass-40);
-    border-radius: 0 0 25px 25px;
+    border-radius: 25px;
     color: var(--color-primary-hover);
     font-weight: 1000;
     transition:
@@ -518,11 +532,9 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
       color 0.3s ease,
       border-color 0.3s ease,
       border-radius 0.3s ease,
-      box-shadow 0.3s ease,
-      height 0.3s ease;
+      box-shadow 0.3s ease;
 
     &:hover {
-      margin: 0;
       background: linear-gradient(
         145deg,
         var(--glass-50),
@@ -673,6 +685,10 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   .menu-item {
     height: 6dvh !important;
     border-radius: 30px !important;
+  }
+
+  .menu-inner {
+    --tab-pad: clamp(4px, 2vw, 10px);
   }
 
   .title {

@@ -38,7 +38,6 @@
           :href="href"
           class="tab-item"
           :class="{
-            active: isActiveComputed(t.tab),
             'tab-overflow-left': getTabScroll(t, false) === 'left',
             'tab-overflow-right': getTabScroll(t, false) === 'right'
           }"
@@ -53,13 +52,15 @@
           @mouseleave="handleTabTooltipLeave"
           @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
         >
-          <span class="emoji">{{ t.icon }}</span>
-          <span
-            class="label"
-            v-if="!t.showLabelOnlyWhenActive || isActiveComputed(t.tab)"
-          >{{ t.label }}</span>
-          <svg v-if="getTabChildren(t.tab).length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
-          <svg v-else-if="!t.navigation?.matchPages?.length && !t.navigation?.activeMatchPaths?.length" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          <span class="tab-inner" :class="{ active: isActiveComputed(t.tab) }">
+            <span class="emoji">{{ t.icon }}</span>
+            <span
+              class="label"
+              v-if="!t.showLabelOnlyWhenActive || isActiveComputed(t.tab)"
+            >{{ t.label }}</span>
+            <svg v-if="getTabChildren(t.tab).length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            <svg v-else-if="!t.navigation?.matchPages?.length && !t.navigation?.activeMatchPaths?.length" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </span>
         </a>
       </RouterLink>
       </nav>
@@ -105,7 +106,6 @@
             :href="href"
             class="tab-item"
             :class="{
-              active: isActiveComputed(t.tab),
               'tab-overflow-left': getTabScroll(t, true) === 'left',
               'tab-overflow-right': getTabScroll(t, true) === 'right'
             }"
@@ -120,13 +120,15 @@
             @mouseleave="handleTabTooltipLeave"
             @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <span class="emoji">{{ t.icon }}</span>
-            <span
-              class="label"
-              v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isActiveComputed(t.tab))"
-            >{{ t.label }}</span>
-            <svg v-if="getTabChildren(t.tab).length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
-            <svg v-else-if="!t.navigation?.matchPages?.length && !t.navigation?.activeMatchPaths?.length" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <span class="tab-inner" :class="{ active: isActiveComputed(t.tab) }">
+              <span class="emoji">{{ t.icon }}</span>
+              <span
+                class="label"
+                v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isActiveComputed(t.tab))"
+              >{{ t.label }}</span>
+              <svg v-if="getTabChildren(t.tab).length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+              <svg v-else-if="!t.navigation?.matchPages?.length && !t.navigation?.activeMatchPaths?.length" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            </span>
           </a>
         </RouterLink>
       </nav>
@@ -555,7 +557,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   border-bottom: 1px solid var(--glass-50);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-  @include glass-blur(12px, 160%);
+  @include glass-blur(8px, 160%);
+  will-change: backdrop-filter;
 }
 
 .explorebar-desktop {
@@ -593,7 +596,6 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .tab-item {
   display: flex;
   flex: 1 1 0;
-  gap: 1px;
   align-items: center;
   justify-content: center;
   min-width: 0;
@@ -605,15 +607,30 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  // background: var(--glass-10);
   border-radius: var(--radius-md);
+}
+
+.tab-inner {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  --tab-pad: clamp(2px, 1vw, 12px);
+  height: calc(100% - clamp(3px, 1dvh, 6px));
+  margin: 0 calc(var(--tab-pad) * -1);
+  padding: 0 var(--tab-pad);
+  border-radius: var(--radius-md);
+
+  &:has(.tab-chevron),
+  &:has(.tab-external) {
+    padding-right: calc(var(--tab-pad) / 2);
+  }
+
   transition:
     background 0.25s ease,
     color 0.25s ease,
     border-color 0.25s ease,
     border-radius 0.25s ease,
-    box-shadow 0.25s ease,
-    height 0.25s ease;
+    box-shadow 0.25s ease;
 
   .label {
     overflow: hidden;
@@ -629,9 +646,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     opacity: 0.6;
   }
 
-  &:hover {
-    height: 90%;
-    color: $primary-blue;
+  .tab-item:hover & {
     background: rgba(var(--color-primary-rgb), 0.12);
   }
 
@@ -644,7 +659,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       var(--glass-10)
     );
     border: 3px solid var(--glass-40);
-    border-radius: 0 0 25px 25px;
+    border-radius: 25px;
     box-shadow:
       0 6px 10px rgba(0, 0, 0, 0.1),
       0 1px 4px rgba(0, 0, 0, 0.08);
@@ -653,11 +668,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       color $transition-base ease,
       border-color $transition-base ease,
       border-radius $transition-base ease,
-      box-shadow $transition-base ease,
-      height $transition-base ease;
+      box-shadow $transition-base ease;
 
     &:hover {
-      margin: 0;
       background: linear-gradient(
         145deg,
         var(--glass-50),
@@ -775,6 +788,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     .tab-item {
       flex-shrink: 0;
       height: max(6dvh, 40px);
+    }
+
+    .tab-inner {
       border-radius: 30px;
 
       &.active {
