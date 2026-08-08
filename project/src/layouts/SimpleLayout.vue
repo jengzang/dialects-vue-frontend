@@ -27,11 +27,10 @@
       @close="isSidebarOpen = false"
     />
 
+    <ScrollToTop />
     <PageTutorialGuide
       v-if="showTutorialGuide"
     />
-
-    <ScrollToTop />
   </div>
 </template>
 

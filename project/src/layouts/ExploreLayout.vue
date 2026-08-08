@@ -16,9 +16,8 @@
         </transition>
       </router-view>
     </div>
-    <PageTutorialGuide />
-
     <ScrollToTop />
+    <PageTutorialGuide />
   </div>
 </template>
 
