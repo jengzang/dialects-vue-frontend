@@ -346,8 +346,8 @@
       "title": "Icon Style",
       "description": "Choose icon appearance for navigation and page content.",
       "options": {
-        "allEmoji": "All Color Icons",
-        "allSvg": "All Mono Icons",
+        "allEmoji": "All Color",
+        "allSvg": "All Mono",
         "barSvg": "Nav Bar Mono"
       }
     },

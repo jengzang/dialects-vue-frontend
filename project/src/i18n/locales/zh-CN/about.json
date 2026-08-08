@@ -346,8 +346,8 @@
       "title": "图标效果",
       "description": "导航栏和页面内图标的外观风格。",
       "options": {
-        "allEmoji": "全部彩色图标",
-        "allSvg": "全部单色图标",
+        "allEmoji": "全部彩色",
+        "allSvg": "全部单色",
         "barSvg": "导航栏单色"
       }
     },

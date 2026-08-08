@@ -346,8 +346,8 @@
       "title": "圖標效果",
       "description": "導航欄和頁面內圖標的外觀風格。",
       "options": {
-        "allEmoji": "全部彩色圖標",
-        "allSvg": "全部單色圖標",
+        "allEmoji": "全部彩色",
+        "allSvg": "全部單色",
         "barSvg": "導航欄單色"
       }
     },
