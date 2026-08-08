@@ -697,7 +697,7 @@ $glass-card: var(--glass-50);
 .highlight-geo {
   background-color: var(--bg-light-gray);
   color: var(--text-muted);
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
 }
 
@@ -781,7 +781,7 @@ $glass-card: var(--glass-50);
   background: rgba(var(--color-primary-rgb), 0.08);
   border-radius: var(--radius-xs);
   color: $primary-blue;
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
 }
 
@@ -836,7 +836,7 @@ $glass-card: var(--glass-50);
 .usage-example-sm {
   margin-top: 2px;
   color: $usage-green;
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
 }

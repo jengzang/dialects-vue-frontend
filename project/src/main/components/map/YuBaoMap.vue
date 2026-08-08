@@ -1192,7 +1192,7 @@ watch(() => props.activeTab, () => {
 
 /* 发音行特殊样式 */
 .pronunciation-row .value {
-  font-family: 'Courier New', 'Monaco', monospace;
+  font-family: var(--font-mono);
   color: var(--color-primary);
   letter-spacing: 0.5px;
   font-size: 16px;

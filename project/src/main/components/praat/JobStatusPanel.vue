@@ -148,7 +148,7 @@ $transition-duration: 0.3s;
 
   .job-id {
     color: $text-primary;
-    font-family: "Courier New", monospace;
+    font-family: var(--font-mono);
     font-size: 0.9rem;
     font-weight: 600;
   }

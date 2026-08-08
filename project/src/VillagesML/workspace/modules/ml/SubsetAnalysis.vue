@@ -1932,7 +1932,7 @@ const handleApiError = (error) => {
   font-size: 16px;
   font-weight: 700;
   color: var(--vml-blue);
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-mono);
 }
 
 .char-cell {
@@ -2017,7 +2017,7 @@ const handleApiError = (error) => {
   font-size: 14px;
   color: var(--text-primary);
   font-weight: 600;
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-mono);
 }
 
 .centroid-distance {

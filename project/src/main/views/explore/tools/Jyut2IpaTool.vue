@@ -1364,7 +1364,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   background: var(--glass-80);
   border: 1px solid rgba(var(--color-primary-rgb), 0.15);
   border-radius: var(--radius-sm);
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   transition: all 0.2s ease;
   color: var(--color-primary-hover);

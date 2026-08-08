@@ -817,7 +817,7 @@ $transition-normal: 0.3s;
 
   &.contour-display {
     color: $primary-blue;
-    font-family: "Courier New", monospace;
+    font-family: var(--font-mono);
     font-size: 1.1rem;
     letter-spacing: 0.05em;
   }

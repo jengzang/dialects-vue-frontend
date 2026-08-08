@@ -3211,7 +3211,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     @include glass-surface($glass-panel, 10px, 16px);
     color: $text-main;
     font-size: 14px;
-    font-family: "SF Mono", Monaco, monospace;
+    font-family: var(--font-mono);
     resize: vertical;
     transition: all 0.2s ease;
 
@@ -3259,7 +3259,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     margin-bottom: 8px;
     border-radius: var(--radius-sm2);
     font-size: 13px;
-    font-family: "SF Mono", Monaco, monospace;
+    font-family: var(--font-mono);
 
     &.success {
       background: $success-soft;
@@ -3458,7 +3458,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
       background: $primary-soft;
       padding: 2px 6px;
       border-radius: var(--radius-xs);
-      font-family: "SF Mono", Monaco, monospace;
+      font-family: var(--font-mono);
       font-size: 11px;
     }
   }

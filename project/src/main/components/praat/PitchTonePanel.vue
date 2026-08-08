@@ -1457,7 +1457,7 @@ $transition-normal: 0.3s;
   background: $surface;
   border-radius: var(--radius-md, var(--radius-sm2));
   color: $text-primary;
-  font-family: "Courier New", monospace;
+  font-family: var(--font-mono);
   font-size: 0.95rem;
   font-weight: 600;
 }

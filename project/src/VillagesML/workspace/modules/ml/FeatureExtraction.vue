@@ -1261,7 +1261,7 @@ onBeforeUnmount(() => {
   background: rgba(var(--vml-blue-rgb), 0.1);
   padding: 2px 8px;
   border-radius: var(--radius-sm2);
-  font-family: monospace;
+  font-family: var(--font-mono);
 }
 
 .village-location {
