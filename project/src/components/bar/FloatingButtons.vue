@@ -187,10 +187,12 @@ $transition-base: 0.3s ease;
     padding: 0 10px;
     border-radius: 22px;
 
-    &.position-top-right,
+    &.position-top-right {
+      top: $mobile-offset;
+      right: $mobile-offset;
+    }
+
     &.position-bottom-left {
-      top: auto;
-      right: auto;
       bottom: $mobile-offset;
       left: $mobile-offset;
     }
@@ -301,10 +303,12 @@ $transition-base: 0.3s ease;
     width: $mobile-auth-size;
     height: $mobile-auth-size;
 
-    &.position-top-right,
+    &.position-top-right {
+      top: $mobile-offset;
+      right: $mobile-offset;
+    }
+
     &.position-bottom-left {
-      top: auto;
-      right: auto;
       bottom: $mobile-offset;
       left: $mobile-offset;
     }

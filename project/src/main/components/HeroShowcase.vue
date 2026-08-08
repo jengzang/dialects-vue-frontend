@@ -315,6 +315,11 @@ $duration: 450ms;
 
     img {
       box-shadow: var(--shadow-lg);
+      transition: box-shadow $duration $ease-apple, transform $duration $ease-apple;
+    }
+
+    &:hover img {
+      box-shadow: 0 12px 48px rgba(var(--color-primary-rgb), 0.22), var(--shadow-lg);
     }
   }
 
@@ -326,7 +331,16 @@ $duration: 450ms;
     pointer-events: auto;
 
     &:hover {
-      opacity: 0.9;
+      opacity: 1;
+      transform: translate(-50%, -50%) translateX($side-translate) scale(calc(#{$side-scale} + 0.04)) rotateY($side-rotate);
+
+      img {
+        box-shadow: 0 8px 32px rgba(var(--color-primary-rgb), 0.18);
+      }
+    }
+
+    &:active {
+      transform: translate(-50%, -50%) translateX($side-translate) scale(calc(#{$side-scale} - 0.02)) rotateY($side-rotate);
     }
   }
 
@@ -338,7 +352,16 @@ $duration: 450ms;
     pointer-events: auto;
 
     &:hover {
-      opacity: 0.9;
+      opacity: 1;
+      transform: translate(-50%, -50%) translateX(calc(-1 * #{$side-translate})) scale(calc(#{$side-scale} + 0.04)) rotateY(-#{$side-rotate});
+
+      img {
+        box-shadow: 0 8px 32px rgba(var(--color-primary-rgb), 0.18);
+      }
+    }
+
+    &:active {
+      transform: translate(-50%, -50%) translateX(calc(-1 * #{$side-translate})) scale(calc(#{$side-scale} - 0.02)) rotateY(-#{$side-rotate});
     }
   }
 
@@ -440,11 +463,29 @@ $duration: 450ms;
     &.is-prev {
       transform: translate(-50%, -50%) translateX(-60%) scale($side-scale) rotateY(0deg);
       opacity: 0.45;
+
+      &:hover {
+        opacity: 0.85;
+        transform: translate(-50%, -50%) translateX(-60%) scale(calc(#{$side-scale} + 0.04)) rotateY(0deg);
+      }
+
+      &:active {
+        transform: translate(-50%, -50%) translateX(-60%) scale(calc(#{$side-scale} - 0.02)) rotateY(0deg);
+      }
     }
 
     &.is-next {
       transform: translate(-50%, -50%) translateX(40%) scale($side-scale) rotateY(0deg);
       opacity: 0.45;
+
+      &:hover {
+        opacity: 0.85;
+        transform: translate(-50%, -50%) translateX(40%) scale(calc(#{$side-scale} + 0.04)) rotateY(0deg);
+      }
+
+      &:active {
+        transform: translate(-50%, -50%) translateX(40%) scale(calc(#{$side-scale} - 0.02)) rotateY(0deg);
+      }
     }
   }
 
