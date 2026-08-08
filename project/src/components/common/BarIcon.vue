@@ -1,15 +1,12 @@
 <template>
-  <svg
-    v-if="svgContent"
+  <component
+    v-if="phosphorIcon"
+    :is="phosphorIcon"
     class="bar-icon-svg"
-    :style="{ width: '1em', height: '1em' }"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    v-html="svgContent"
+    :size="'1em'"
+    :weight="phosphorWeight"
+    :mirrored="false"
+    color="currentColor"
   />
   <span v-else class="bar-icon-emoji">{{ icon }}</span>
 </template>
@@ -21,10 +18,24 @@ const props = defineProps({
   icon: { type: String, required: true }
 })
 
-const SVG_MAP = {
-  // 示例：'search': '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
-  // 后续在此处添加图标映射
-}
+const phosphorWeight = 'regular'
 
-const svgContent = computed(() => SVG_MAP[props.icon] || null)
+/*
+ * PHOSPHOR_MAP: icon key → Phosphor Vue component
+ *
+ * 用法示例（等 UI 确认后添加）：
+ *   import { MagnifyingGlass, MapTrifold, House } from '@phosphor-icons/vue'
+ *   const PHOSPHOR_MAP = {
+ *     'search': MagnifyingGlass,
+ *     'map': MapTrifold,
+ *     'home': House,
+ *   }
+ *
+ * 届时 config 文件中的 icon: '🔍' 改为 icon: 'search' 即可。
+ * 未匹配到的 key 自动 fallback 为 emoji 渲染。
+ */
+
+const PHOSPHOR_MAP = {}
+
+const phosphorIcon = computed(() => PHOSPHOR_MAP[props.icon] || null)
 </script>
