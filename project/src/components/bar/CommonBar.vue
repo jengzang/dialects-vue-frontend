@@ -58,7 +58,7 @@
           @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
         >
           <span class="tab-inner" :class="{ active: isActiveComputed(t.tab) }">
-            <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'regular'" :style="{ fontSize: ((t.mobileFontSize || t.fontSize) * 1) + 'rem' }" />
+            <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: ((t.mobileFontSize || t.fontSize) * 1) + 'rem' }" />
             <span
               class="label"
               v-if="!t.showLabelOnlyWhenActive || isActiveComputed(t.tab)"
@@ -133,7 +133,7 @@
             @mouseleave="handleTabTooltipLeave"
             @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'regular'" :style="{ fontSize: ((t.mobileFontSize || t.fontSize) * 1.2) + 'rem' }" />
+            <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: ((t.mobileFontSize || t.fontSize) * 1.2) + 'rem' }" />
             <span
               class="label"
               v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isActiveComputed(t.tab))"
