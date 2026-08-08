@@ -52,7 +52,7 @@ import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js';
 import { getCoordinates, searchChars, searchZhongGu, searchYinWei, searchTones } from '@/api'
 import {globalPayload, mapStore, resultCache, userStore} from '@/main/store/store.js';
-import { showInfo } from '@/utils/ui/message.js';
+import { showInfo, hideMessage } from '@/utils/ui/message.js';
 import ResultList from "@/main/components/result/ResultList.vue";
 import CharsAndTones from "@/main/components/result/CharsAndTones.vue";
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
@@ -335,6 +335,16 @@ watch(
       }
     },
     { immediate: true }
+);
+
+// 用户切到地图页面时自动关闭 toast
+watch(
+  () => route.path,
+  (newPath) => {
+    if (newPath.endsWith('/menu/map/view')) {
+      hideMessage()
+    }
+  }
 );
 
 const goToQuery = () => {
