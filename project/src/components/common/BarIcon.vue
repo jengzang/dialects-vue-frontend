@@ -80,10 +80,11 @@ import {
 } from '@phosphor-icons/vue'
 
 const props = defineProps({
-  icon: { type: String, required: true }
+  icon: { type: String, required: true },
+  weight: { type: String, default: 'bold' }
 })
 
-const phosphorWeight = 'regular'
+const phosphorWeight = computed(() => props.weight)
 
 const PHOSPHOR_MAP = {
   '⚛️': PhAtom,

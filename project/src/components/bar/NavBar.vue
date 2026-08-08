@@ -60,7 +60,7 @@
               @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
           <span class="menu-inner" :class="{ active: isMenuTabActive(t.tab) }">
-            <BarIcon :icon="t.icon" class="nav-icon" />
+            <BarIcon :icon="t.icon" class="nav-icon" :weight="isMenuTabActive(t.tab) ? 'fill' : 'regular'" />
             <span
               class="label"
               v-if="!t.showLabelOnlyWhenActive || isMenuTabActive(t.tab)"
@@ -161,7 +161,7 @@
               @mouseleave="handleTabTooltipLeave"
               @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <BarIcon :icon="t.icon" class="nav-icon" />
+            <BarIcon :icon="t.icon" class="nav-icon" :weight="isMenuTabActive(t.tab) ? 'fill' : 'regular'" />
             <span
               class="label"
               v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isMenuTabActive(t.tab))"
