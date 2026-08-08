@@ -84,7 +84,9 @@
 }
 
 .glass-card {
-  background: var(--surface-panel-subtle);
+  background: var(--glass-30);
+  backdrop-filter: blur(14px) saturate(145%);
+  -webkit-backdrop-filter: blur(14px) saturate(145%);
   border: 1px solid var(--border-glass);
   box-shadow: 0 6px 18px var(--bg-hover-light), inset 0 0 0 1px var(--glass-30);
   border-radius: var(--radius-xl);
@@ -99,9 +101,11 @@
   max-height: 35dvh;
   overflow-y: auto;
   font-size: 18px;
-  background: var(--surface-panel-subtle);
-  border: 2px solid var(--border-glass-subtle);
+  background: var(--glass-05);
+  border: 2px solid var(--glass-10);
   border-radius: var(--radius-md);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   box-shadow: var(--shadow-md);
 }
 
