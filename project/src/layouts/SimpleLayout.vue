@@ -30,6 +30,8 @@
     <PageTutorialGuide
       v-if="showTutorialGuide"
     />
+
+    <ScrollToTop />
   </div>
 </template>
 
@@ -39,6 +41,7 @@ import { useRoute } from 'vue-router';
 import FloatingButtons from '@/components/bar/FloatingButtons.vue';
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue';
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
+import ScrollToTop from '@/components/common/ScrollToTop.vue'
 
 const route = useRoute();
 const isSidebarOpen = ref(false);

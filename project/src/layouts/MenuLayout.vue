@@ -18,6 +18,8 @@
     </div>
     <PageTutorialGuide />
     <PanelManager />
+
+    <ScrollToTop />
   </div>
 </template>
 
@@ -29,6 +31,7 @@
 import NavBar from "@/components/bar/NavBar.vue";
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import PanelManager from '@/main/components/result/PanelManager.vue'
+import ScrollToTop from '@/components/common/ScrollToTop.vue'
 
 const keepAliveViewNames = [
   'ComparePage',

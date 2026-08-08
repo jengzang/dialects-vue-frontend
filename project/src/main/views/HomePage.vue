@@ -586,12 +586,10 @@
     -->
   </div>
 
-  <ScrollToTop />
 </template>
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import ScrollToTop from '@/components/common/ScrollToTop.vue'
 import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'

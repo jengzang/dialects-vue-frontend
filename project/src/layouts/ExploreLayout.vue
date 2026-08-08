@@ -17,12 +17,15 @@
       </router-view>
     </div>
     <PageTutorialGuide />
+
+    <ScrollToTop />
   </div>
 </template>
 
 <script setup>
 import ExploreBar from '@/components/bar/ExploreBar.vue'
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
+import ScrollToTop from '@/components/common/ScrollToTop.vue'
 
 const keepAliveViewNames = [
   'AllVillages',

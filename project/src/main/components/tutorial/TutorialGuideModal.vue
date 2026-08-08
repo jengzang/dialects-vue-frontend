@@ -162,7 +162,9 @@
           </section>
         </aside>
 
-        <article class="tutorial-article ui-scrollbar">
+        <article
+          ref="articleScrollRef"
+          class="tutorial-article ui-scrollbar">
           <div
             ref="articleTopRef"
             class="tutorial-article__anchor"
@@ -198,6 +200,7 @@
           >
             {{ t('tutorial.ui.missing') }}
           </p>
+
         </article>
       </div>
     </div>
@@ -236,12 +239,15 @@
       </div>
     </template>
   </AppModal>
+
+  <ScrollToTop :container="articleScrollRef" :show-after="200" />
 </template>
 
 <script setup>
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import ScrollToTop from '@/components/common/ScrollToTop.vue'
 import { tutorialEnabled, setTutorialEnabled } from '@/main/store/store.js'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { showInfo } from '@/utils/ui/message.js'
@@ -314,6 +320,7 @@ const { t } = useI18n()
 
 const modalBodyRef = ref(null)
 const articleTopRef = ref(null)
+const articleScrollRef = ref(null)
 
 const shouldShowCatalog = computed(() => {
   return !props.isCompact || props.isMobileLandscape || props.isCatalogOpen
